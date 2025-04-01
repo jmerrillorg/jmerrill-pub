@@ -1,5 +1,5 @@
 import { type Config } from "tailwindcss";
-import { slate } from "tailwindcss/colors";
+import colors from "tailwindcss/colors";
 
 const config: Config = {
   content: [
@@ -11,11 +11,12 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: "#1E90FF",   // Dodger Blue
+          DEFAULT: "#1E90FF", // Dodger Blue
           light: "#63B3FF",
           dark: "#006fd6",
         },
         primary: "#1E90FF",
+        slate: colors.slate, // <-- This works
       },
     },
   },
