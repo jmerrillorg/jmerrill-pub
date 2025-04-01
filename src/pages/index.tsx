@@ -3,6 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { BookOpen, Rocket, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
