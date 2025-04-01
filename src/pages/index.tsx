@@ -6,8 +6,10 @@ import Navbar from "../components/Navbar";
 import Link from "next/link";
 import Image from "next/image";
 
+// ✅ Correct
 export default function Home() {
-  return ( 
+  return <Navbar />;
+}  return ( 
     <main>
       <Navbar />
       {/* Existing hero + rest of homepage */}
