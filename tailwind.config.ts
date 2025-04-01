@@ -19,7 +19,9 @@ const config: Config = {
         slate: colors.slate, // <-- This works
       },
     },
-  },
+  },html {
+    scroll-behavior: smooth;
+  }
   plugins: [],
 };
 

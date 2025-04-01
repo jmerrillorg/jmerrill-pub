@@ -31,9 +31,9 @@ export default function Home() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
         >
-          <Button className="text-lg px-6 py-3 rounded-2xl shadow-xl">
+          <a href="#booking" className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition">
             Book a Consultation
-          </Button>
+          </a>
         </motion.div>
       </section>
 
@@ -66,6 +66,16 @@ export default function Home() {
           </CardContent>
         </Card>
       </section>
+      <section id="booking" className="my-12 px-4 scroll-mt-20">
+  <h2 className="text-2xl font-semibold text-center mb-4">Schedule a Consultation</h2>
+  <div className="w-full h-[750px]">
+    <iframe
+      src="https://outlook.office.com/book/JMerrillPublishingInc@jmerrill.pub/"
+      className="w-full h-full border-none rounded-xl shadow-xl"
+      title="Book a Consultation"
+    />
+  </div>
+</section>
     </main>
   );
 }
