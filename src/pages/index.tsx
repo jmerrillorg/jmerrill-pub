@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
       {/* Hero Section */}
-      <section className="text-center py-24 px-4 bg-gradient-to-br from-purple-800 to-purple-900 text-white">
+      <section className="bg-gradient-to-br from-[#006fd6] to-[#1E90FF] text-white py-24 px-4 text-center">
         <motion.h1
           className="text-5xl font-bold mb-6"
           initial={{ opacity: 0, y: -20 }}
@@ -50,7 +50,7 @@ export default function Home() {
         </Card>
         <Card>
           <CardContent className="p-6 text-center">
-            <BookOpen className="w-12 h-12 mx-auto mb-4 text-purple-700" />
+            <BookOpen className="w-12 h-12 mx-auto mb-4 text-[#1E90FF]" />
             <h2 className="text-xl font-semibold mb-2">Full-Service Publishing</h2>
             <p>
               From manuscript to marketing—our authors retain 70% royalties across
@@ -60,7 +60,7 @@ export default function Home() {
         </Card>
         <Card>
           <CardContent className="p-6 text-center">
-            <Users className="w-12 h-12 mx-auto mb-4 text-purple-700" />
+            <Users className="w-12 h-12 mx-auto mb-4 text-[#1E90FF]" />
             <h2 className="text-xl font-semibold mb-2">Author Empowerment</h2>
             <p>We don’t just publish books—we build author legacies.</p>
           </CardContent>
