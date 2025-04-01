@@ -3,7 +3,7 @@
 const nextConfig = {
   output: 'export',
   images: {
-    unoptimized: true, // ✅ disables image optimization API
+    unoptimized: true, // ✅ Required for Azure static deploy
   },
 };
 
