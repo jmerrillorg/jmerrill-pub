@@ -41,7 +41,7 @@ export default function Home() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 px-6 py-16 bg-gray-100">
         <Card>
           <CardContent className="p-6 text-center">
-            <Rocket className="w-12 h-12 mx-auto mb-4 text-purple-700" />
+            <Rocket className="w-12 h-12 mx-auto mb-4 text-[#1E90FF]" />
             <h2 className="text-xl font-semibold mb-2">Blockchain Publishing</h2>
             <p>
               Leading the industry with transparent, tech-forward author royalties.
