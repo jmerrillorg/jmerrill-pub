@@ -1,8 +1,8 @@
-import type { NextConfig } from "next";
-
+// next.config.js
 const nextConfig = {
-  output: "export", // 👈 This replaces the need for 'next export'
-  // (optional) Add other config options below
+  images: {
+    unoptimized: true,
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
