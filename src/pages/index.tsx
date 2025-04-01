@@ -7,7 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export default function Home() {
-  return (
+  return ( 
     <main>
       <Navbar />
       {/* Existing hero + rest of homepage */}
