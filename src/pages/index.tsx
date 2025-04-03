@@ -1,7 +1,6 @@
+import Link from "next/link";
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { BookOpen, Rocket, Users } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -35,53 +34,68 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
           >
-            <a href="#" className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition">
-              Book a Consultation
-            </a>
+            <div className="flex justify-center gap-4 mt-4">
+              <Link href="/bookings" legacyBehavior>
+                <a className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition">
+                  Book a Consultation
+                </a>
+              </Link>
+              <Link href="/join" legacyBehavior>
+                <a className="bg-white text-[#1E90FF] px-6 py-2 rounded-full border border-white hover:bg-blue-100 hover:text-blue-700 transition">
+                  Join the Family
+                </a>
+              </Link>
+            </div>
           </motion.div>
         </section>
 
-        {/* About Section */}
-        <section id="about" className="px-4 py-16 bg-white dark:bg-gray-900 text-center scroll-mt-20">
-          <h2 className="text-3xl font-bold mb-4">About Us</h2>
-          <p className="max-w-2xl mx-auto text-gray-700 dark:text-gray-300">
-            J Merrill Publishing, Inc. was built for authors who value transparency, empowerment, and creative control.
-            We're redefining publishing with bold tech, diverse voices, and human-first partnerships.
+        {/* Services & About Section */}
+        <section className="py-20 px-6 max-w-7xl mx-auto text-center">
+          {/* SERVICES */}
+          <h2 id="services" className="text-3xl font-bold mb-4">Our Publishing Services</h2>
+          <p className="text-gray-600 mb-12">
+            Explore our comprehensive offerings designed to support you through every step of your publishing journey.
           </p>
-        </section>
+          <div className="grid gap-6 md:grid-cols-3 text-left">
+            <div className="p-6 border rounded-2xl shadow-sm hover:shadow-md transition">
+              <h3 className="text-xl font-semibold mb-2">Full-Service Publishing</h3>
+              <p className="text-gray-700 text-sm">
+                From manuscript to marketplace, we manage editing, design, ISBN, distribution, and more.
+              </p>
+            </div>
+            <div className="p-6 border rounded-2xl shadow-sm hover:shadow-md transition">
+              <h3 className="text-xl font-semibold mb-2">Audiobook Production</h3>
+              <p className="text-gray-700 text-sm">
+                Bring your book to life with professional narration, studio-quality sound, and global distribution.
+              </p>
+            </div>
+            <div className="p-6 border rounded-2xl shadow-sm hover:shadow-md transition">
+              <h3 className="text-xl font-semibold mb-2">Blockchain Publishing</h3>
+              <p className="text-gray-700 text-sm">
+                Secure your intellectual property on the blockchain. Immutable records. Transparent royalties. Future-ready.
+              </p>
+            </div>
+          </div>
 
-        {/* Services Section */}
-        <section id="services" className="scroll-mt-20 py-16 px-4 bg-gray-100 dark:bg-gray-900">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-              Our Services
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <Card>
-                <CardContent className="p-6">
-                  <Rocket className="w-12 h-12 mx-auto mb-4 text-[#1E90FF]" />
-                  <h3 className="text-xl font-semibold mb-2">Blockchain Publishing</h3>
-                  <p>Leading the industry with transparent, tech-forward author royalties.</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6">
-                  <BookOpen className="w-12 h-12 mx-auto mb-4 text-[#1E90FF]" />
-                  <h3 className="text-xl font-semibold mb-2">Full-Service Publishing</h3>
-                  <p>From manuscript to marketing—our authors retain 70% royalties across all formats.</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6">
-                  <Users className="w-12 h-12 mx-auto mb-4 text-[#1E90FF]" />
-                  <h3 className="text-xl font-semibold mb-2">Author Empowerment</h3>
-                  <p>We don’t just publish books—we build author legacies.</p>
-                </CardContent>
-              </Card>
+          {/* ABOUT */}
+          <div id="about" className="mt-24 text-left">
+            <h2 className="text-3xl font-bold mb-4 text-center">About J Merrill Publishing</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto text-center">
+              J Merrill Publishing, Inc. is a full-service, author-focused publishing company committed to excellence, empowerment, and inclusivity.
+              Founded by <strong>Jackie Smith, Jr.</strong>, our mission is simple: <em>Helping Authors Help Themselves</em>.
+            </p>
+            <p className="text-gray-600 max-w-3xl mx-auto text-center mt-6">
+              We believe in transparency, high standards, and providing publishing solutions that evolve with technology — like our blockchain and audiobook innovations.
+            </p>
+            <div className="mt-8 flex justify-center">
+              <Link href="/join" legacyBehavior>
+                <a className="bg-[#1E90FF] text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">
+                  Join the Family
+                </a>
+              </Link>
             </div>
           </div>
         </section>
-
       </main>
 
       <Footer />
