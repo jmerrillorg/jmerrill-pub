@@ -34,5 +34,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "/"
-          app_build_command: npm install --legacy-peer-deps && npm run build
           output_location: "out"
+          skip_app_build: true     # 🆕 Important to skip Oryx auto-build
+          skip_api_build: true     # 🆕 Skip API build unless you're using Azure Functions
+          app_build_command: npm install --legacy-peer-deps && npm run build
