@@ -128,13 +128,7 @@ export default function AuthorOnboarding() {
               </>
             ) : (
               <div className="grid grid-cols-1 gap-6">
-                {/* Replace this block with real form content per tab */}
-                <textarea
-                  name={`notes-${currentTab}`}
-                  placeholder={`Enter details for ${TABS[currentTab]}`}
-                  className="w-full p-4 rounded border border-gray-300 dark:border-gray-600"
-                  onChange={handleChange}
-                />
+                
               </div>
             )}
 
@@ -450,7 +444,6 @@ export default function AuthorOnboarding() {
     />
   </div>
 )}
-
 
 
 
