@@ -1,9 +1,8 @@
-// next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  reactStrictMode: true,
   images: {
-    unoptimized: true, // ✅ Required for Azure static deploy
+    unoptimized: true, // ✅ Still good for Azure static hosting
   },
 };
 
