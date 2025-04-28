@@ -492,4 +492,4 @@ export default function AuthorOnboarding() {
 <Footer />
 </div>
 );
-}
+} 
