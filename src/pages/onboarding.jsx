@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { motion } from "framer-motion";
-import W9Form from "../components/ui/W9Form";
 
 const TABS = [
   "Author & Book Info",
@@ -12,7 +11,7 @@ const TABS = [
   "Publishing & Marketing",
   "Additional Services",
   "Other",
-  "Tax Information", // ✅ NEW FINAL TAB
+  //"Tax Information", // ✅ NEW FINAL TAB
 ];
 
 export default function AuthorOnboarding() {
@@ -120,17 +119,9 @@ export default function AuthorOnboarding() {
           >
             {console.log("📄 Rendering tab:", TABS[currentTab])}
 
-            {TABS[currentTab] === "Tax Information" ? (
-              <>
-                <h2 className="text-xl font-semibold mb-4">Tax Information (W-9)</h2>
-                {/* 🟢 Replace with dynamic authorId lookup as needed */}
-                <W9Form authorId="YOUR_DYNAMIC_GUID_HERE" />
-              </>
-            ) : (
-              <div className="grid grid-cols-1 gap-6">
-                
-              </div>
-            )}
+            <div className="grid grid-cols-1 gap-6">
+             {/* Default content for non-W9 tabs */}
+            </div>
 
             
             
