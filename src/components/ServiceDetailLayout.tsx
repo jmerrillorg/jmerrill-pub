@@ -1,7 +1,6 @@
 // components/ServiceDetailLayout.tsx
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 
 interface ServiceDetailLayoutProps {
@@ -21,9 +20,6 @@ const ServiceDetailLayout: React.FC<ServiceDetailLayoutProps> = ({
   ctaText,
   ctaLink
 }) => {
-  const router = useRouter();
-  const path = router.asPath;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
