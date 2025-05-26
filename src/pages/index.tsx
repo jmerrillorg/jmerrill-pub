@@ -35,9 +35,9 @@ export default function Home() {
             transition={{ duration: 1 }}
           >
             <div className="flex justify-center gap-4 mt-4">
-              <Link href="/bookings" legacyBehavior>
+              <Link href="/schedule" legacyBehavior>
                 <a className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition">
-                  Book a Consultation
+                  Schedule a Consultation
                 </a>
               </Link>
               <Link href="/join" legacyBehavior>

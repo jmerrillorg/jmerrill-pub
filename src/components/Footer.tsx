@@ -24,6 +24,7 @@ export default function Footer() {
         <div className="text-sm space-y-2">
           <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Quick Links</h4>
           <div className="space-y-1 flex flex-col items-center md:items-start">
+            <Link href="/books" className="hover:underline">Our Books</Link>
             <Link href="/services" className="hover:underline">Services</Link>
             <Link href="/pricing" className="hover:underline">Pricing</Link>
             <Link href="/about" className="hover:underline">About</Link>

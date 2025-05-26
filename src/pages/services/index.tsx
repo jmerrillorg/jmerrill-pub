@@ -1,125 +1,110 @@
-import Link from "next/link";
+// pages/services/index.tsx
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { motion } from "framer-motion";
-import { BookOpen, Rocket, Users, Megaphone, Star, BadgePercent } from "lucide-react";
+import Head from "next/head";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { motion } from "framer-motion";
+import Link from "next/link";
+
+const services = [
+  {
+    title: "Full-Service Publishing",
+    description:
+      "From manuscript to marketplace, we handle editing, layout, ISBN registration, and distribution. Perfect for authors seeking a guided, professional publishing experience.",
+    link: "/services/full-service"
+  },
+  {
+    title: "Blockchain Digital Publishing",
+    description:
+      "Future-proof your work. We tokenize your book on the blockchain for proof of ownership, royalty tracking, and digital monetization.",
+    link: "/services/blockchain"
+  },
+  {
+    title: "Audiobook Production",
+    description:
+      "Bring your book to life with professional voice talent, studio-quality editing, and distribution across major audio platforms.",
+    link: "/services/audiobook"
+  },
+  {
+    title: "Branding & Design",
+    description:
+      "Author websites, social graphics, and print materials designed to match your voice and vision. Stand out in a crowded market.",
+    link: "/services/branding"
+  },
+  {
+    title: "Legacy Writing Services",
+    description:
+      "Preserve your story. We help families, professionals, and visionaries capture their life experiences in published form.",
+    link: "/services/legacy"
+  },
+  {
+    title: "Marketing & Promotion",
+    description:
+      "Custom campaigns to launch your book with visibility. Includes social strategy, influencer outreach, and retail placements.",
+    link: "/services/marketing"
+  }
+];
 
 export default function ServicesPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+      <Head>
+        <title>Publishing Services | J Merrill Publishing</title>
+        <meta
+          name="description"
+          content="Explore J Merrill Publishing’s premium publishing services, including editing, design, distribution, and blockchain publishing."
+        />
+      </Head>
+
       <Navbar />
 
-      <main className="flex-grow px-4 py-16 text-gray-900 dark:text-gray-100">
-        <section className="text-center max-w-4xl mx-auto mb-16">
-          <motion.h1
-            className="text-4xl md:text-5xl font-bold mb-4"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            Our Publishing Services
-          </motion.h1>
-          <motion.p
-            className="text-lg text-gray-600 dark:text-gray-300"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            We offer tailored solutions to fit your publishing vision. Explore our core service offerings below.
-          </motion.p>
-        </section>
-
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          <Link href="/services/full-service">
-            <Card className="hover:shadow-md transition cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <BookOpen className="w-10 h-10 mx-auto text-[#1E90FF] mb-3" />
-                <h3 className="text-xl font-semibold mb-2">Full-Service Publishing</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Manuscript to marketplace with editing, design, distribution & more.
-                </p>
-                <span className="text-[#1E90FF] mt-2 inline-block">Learn More →</span>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/services/blockchain">
-            <Card className="hover:shadow-md transition cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <Rocket className="w-10 h-10 mx-auto text-[#1E90FF] mb-3" />
-                <h3 className="text-xl font-semibold mb-2">Blockchain Publishing</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Protect your rights, track royalties, and future-proof your work.
-                </p>
-                <span className="text-[#1E90FF] mt-2 inline-block">Learn More →</span>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/services/audiobook">
-            <Card className="hover:shadow-md transition cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <Users className="w-10 h-10 mx-auto text-[#1E90FF] mb-3" />
-                <h3 className="text-xl font-semibold mb-2">Audiobook Production</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Studio-quality audio, global platforms, and pro narration.
-                </p>
-                <span className="text-[#1E90FF] mt-2 inline-block">Learn More →</span>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/services/branding">
-            <Card className="hover:shadow-md transition cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <Star className="w-10 h-10 mx-auto text-[#1E90FF] mb-3" />
-                <h3 className="text-xl font-semibold mb-2">Branding</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Logos, author kits, and brand visuals that leave an impression.
-                </p>
-                <span className="text-[#1E90FF] mt-2 inline-block">Learn More →</span>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/services/legacy">
-            <Card className="hover:shadow-md transition cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <BadgePercent className="w-10 h-10 mx-auto text-[#1E90FF] mb-3" />
-                <h3 className="text-xl font-semibold mb-2">Legacy Projects</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Biographies, memoirs & generational publishing to preserve family history.
-                </p>
-                <span className="text-[#1E90FF] mt-2 inline-block">Learn More →</span>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/services/marketing">
-            <Card className="hover:shadow-md transition cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <Megaphone className="w-10 h-10 mx-auto text-[#1E90FF] mb-3" />
-                <h3 className="text-xl font-semibold mb-2">Marketing & Promotion</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Launch campaigns, platform building, and long-term author marketing.
-                </p>
-                <span className="text-[#1E90FF] mt-2 inline-block">Learn More →</span>
-              </CardContent>
-            </Card>
-          </Link>
-        </section>
-
-        <section className="mt-24 text-center">
-          <h2 className="text-2xl font-bold mb-4">Not sure where to start?</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Compare plans and publishing tiers — including our annual subscription model.
+      <main className="flex-grow px-6 py-12 max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-bold mb-4 text-center">Our Publishing Services</h1>
+          <p className="text-lg mb-12 text-center text-gray-600 dark:text-gray-300">
+            Every story deserves expert support. Explore our core publishing services below.
           </p>
-          <Link href="/pricing" className="bg-[#1E90FF] text-white px-6 py-3 rounded-full hover:bg-blue-700 transition">
-            View Pricing & Packages
-          </Link>
-        </section>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, idx) => (
+              <div
+                key={idx}
+                className="rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm bg-white dark:bg-gray-800 flex flex-col justify-between"
+              >
+                <div>
+                  <h2 className="text-xl font-semibold mb-2">{service.title}</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    {service.description}
+                  </p>
+                </div>
+                <Link
+                  href={service.link}
+                  className="inline-block mt-auto bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition"
+                >
+                  Learn More
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* Join the Family CTA */}
+          <div className="mt-16 text-center">
+            <h3 className="text-2xl font-bold mb-2">Ready to Publish?</h3>
+            <p className="mb-4 text-gray-600 dark:text-gray-300">
+              Join the J Merrill Publishing family and bring your vision to life.
+            </p>
+            <Link
+              href="/join"
+              className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
+            >
+              Join the Family
+            </Link>
+          </div>
+        </motion.div>
       </main>
 
       <Footer />
