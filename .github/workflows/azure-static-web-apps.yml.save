@@ -21,8 +21,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies (ignore peer deps conflicts)
-        run: npm install --legacy-peer-deps
+      - name: Install dependencies
+        run: npm install
 
       - name: Build project
         run: npm run build
