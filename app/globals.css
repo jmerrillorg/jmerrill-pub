@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Outfit:wght@200;300;400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────
+   BASE
+───────────────────────────────────────────── */
+@layer base {
+  :root {
+    --blue:        #1E90FF;
+    --blue-dark:   #0A7AE8;
+    --blue-pale:   #E8F3FF;
+    --slate:       #6A5ACD;
+    --sky:         #A3C4DC;
+    --charcoal:    #111111;
+    --ink:         #0D0D10;
+    --paper:       #F7F8FA;
+    --gray-200:    #E4E6EA;
+    --gray-400:    #8A8F9A;
+    --gray-500:    #4A4E58;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply font-body text-charcoal bg-white overflow-x-hidden;
+    cursor: none;
+  }
+
+  /* Selection color */
+  ::selection {
+    background: rgba(30, 144, 255, 0.15);
+    color: var(--charcoal);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   CUSTOM CURSOR
+───────────────────────────────────────────── */
+@layer components {
+  .cursor-dot {
+    @apply fixed w-3 h-3 rounded-full pointer-events-none z-[9999];
+    background: var(--blue);
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s;
+    mix-blend-mode: multiply;
+  }
+
+  .cursor-ring {
+    @apply fixed rounded-full pointer-events-none z-[9998];
+    width: 40px;
+    height: 40px;
+    border: 1.5px solid var(--blue);
+    transform: translate(-50%, -50%);
+    opacity: 0.4;
+    transition:
+      width 0.35s cubic-bezier(0.23,1,0.32,1),
+      height 0.35s cubic-bezier(0.23,1,0.32,1);
+  }
+
+  /* Hover expansion */
+  body:has(a:hover) .cursor-dot,
+  body:has(button:hover) .cursor-dot { width: 20px; height: 20px; }
+  body:has(a:hover) .cursor-ring,
+  body:has(button:hover) .cursor-ring { width: 56px; height: 56px; opacity: 0.25; }
+}
+
+/* ─────────────────────────────────────────────
+   SCROLL REVEAL
+───────────────────────────────────────────── */
+@layer utilities {
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+      opacity 0.75s cubic-bezier(0.16,1,0.3,1),
+      transform 0.75s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* Typography utilities */
+  .font-display   { font-family: 'Libre Baskerville', Georgia, serif; }
+  .font-body      { font-family: 'Outfit', system-ui, sans-serif; }
+  .font-mono-jm1  { font-family: 'DM Mono', monospace; }
+
+  /* Section kicker (eyebrow) */
+  .kicker {
+    @apply flex items-center gap-3;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--blue);
+  }
+  .kicker::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--blue);
+    flex-shrink: 0;
+  }
+
+  /* System badge */
+  .system-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* Ghost background text */
+  .ghost-text {
+    position: absolute;
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 700;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.04);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* Grid overlay */
+  .grid-overlay {
+    background-image:
+      linear-gradient(rgba(30,144,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30,144,255,0.06) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+  }
+
+  /* Blue line separator (parent design language) */
+  .rule-blue {
+    @apply w-8 h-px bg-blue-500;
+  }
+}
