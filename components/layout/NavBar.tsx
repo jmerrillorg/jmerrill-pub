@@ -27,7 +27,7 @@ export function NavBar() {
       {/* Logo */}
       <Link href="/" className="flex items-center gap-0 flex-shrink-0">
         <Image
-          src="/apple-touch-icon.png"
+          src="/logo.jpg"
           alt="J Merrill Publishing"
           width={44}
           height={44}

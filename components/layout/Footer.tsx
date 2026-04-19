@@ -15,7 +15,7 @@ export function Footer() {
           <div>
             <div className="mb-5">
               <Image
-                src="/apple-touch-icon.png"
+                src="/logo.jpg"
                 alt="J Merrill Publishing"
                 width={52}
                 height={52}

@@ -86,7 +86,7 @@ export default function BookPage({ params }: Props) {
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
                   <div className="relative h-28 w-28">
                     <Image
-                      src="/apple-touch-icon.png"
+                      src="/logo.jpg"
                       alt="J Merrill Publishing logo"
                       fill
                       className="object-contain"
