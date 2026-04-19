@@ -1,13 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Allow jmerrill.pub logo from live site during development
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'www.jmerrill.pub',
-        pathname: '/**',
-      },
       {
         protocol: 'https',
         hostname: 'covers3.booksamillion.com',

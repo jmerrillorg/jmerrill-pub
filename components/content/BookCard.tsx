@@ -52,13 +52,12 @@ export function BookCard({ book, compact = false }: { book: BookRecord; compact?
             <div className="absolute inset-0 flex items-center justify-center p-6">
               <div className="relative h-20 w-20 sm:h-24 sm:w-24">
                 <Image
-                  src="https://www.jmerrill.pub/logo.jpg"
+                  src="/apple-touch-icon.png"
                   alt="J Merrill Publishing logo"
                   fill
                   className="object-contain"
                   sizes="96px"
-                  unoptimized
-                  style={{ filter: 'invert(1) brightness(0.88)', opacity: 0.9 }}
+                  style={{ opacity: 0.92 }}
                 />
               </div>
             </div>

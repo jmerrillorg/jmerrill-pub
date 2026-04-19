@@ -15,11 +15,11 @@ export function Footer() {
           <div>
             <div className="mb-5">
               <Image
-                src="https://www.jmerrill.pub/logo.jpg"
+                src="/apple-touch-icon.png"
                 alt="J Merrill Publishing"
                 width={52}
                 height={52}
-                className="h-13 w-auto opacity-60 invert"
+                className="h-13 w-auto opacity-80"
               />
             </div>
             <p className="font-display italic text-[15px] text-white/30 leading-relaxed mb-6 max-w-[280px]">

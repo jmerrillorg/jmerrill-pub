@@ -87,7 +87,7 @@ export function HeroSection() {
 
         <div className="relative z-10 h-full flex flex-col items-center justify-center px-12 py-20">
           <div className="relative mb-10 animate-[float_8s_ease-in-out_infinite]">
-            <Image src="https://www.jmerrill.pub/logo.jpg" alt="J Merrill Publishing" width={240} height={240} className="w-[220px] h-[220px] object-contain" style={{ filter: 'invert(1) brightness(0.85)' }} priority />
+            <Image src="/apple-touch-icon.png" alt="J Merrill Publishing" width={240} height={240} className="w-[220px] h-[220px] object-contain" priority />
             <div className="absolute -top-3 -right-5 bg-blue-500 text-white text-[10px] font-semibold tracking-[0.1em] uppercase px-4 py-2 rounded-full whitespace-nowrap animate-[badgePulse_3s_ease-in-out_infinite]">
               Vision · Creativity · Innovation
             </div>

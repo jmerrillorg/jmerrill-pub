@@ -86,13 +86,12 @@ export default function BookPage({ params }: Props) {
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
                   <div className="relative h-28 w-28">
                     <Image
-                      src="https://www.jmerrill.pub/logo.jpg"
+                      src="/apple-touch-icon.png"
                       alt="J Merrill Publishing logo"
                       fill
                       className="object-contain"
                       sizes="112px"
-                      unoptimized
-                      style={{ filter: 'invert(1) brightness(0.88)', opacity: 0.92 }}
+                      style={{ opacity: 0.94 }}
                     />
                   </div>
                   <div
