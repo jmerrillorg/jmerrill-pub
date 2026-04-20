@@ -25,7 +25,7 @@ export default function JoinForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.firstName || !form.lastName || !form.email || !form.bookTitle) {
+    if (!form.firstName || !form.lastName || !form.email || !form.bookTitle || !form.genre || !form.goal) {
       setErrorMsg('Please fill in all required fields.')
       return
     }

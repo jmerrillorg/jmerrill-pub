@@ -1,0 +1,48 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { submitWebsiteForm } from '@/lib/server/form-integrations'
+import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json()
+    const required = ['authorName', 'email', 'legalPayeeName', 'taxClassification', 'paymentPreference']
+    const missing = missingFields(body, required)
+    if (missing.length) return requiredFieldsResponse(missing)
+
+    const payload = {
+      authorName: cleanString(body.authorName),
+      email: cleanString(body.email),
+      phone: cleanString(body.phone),
+      legalPayeeName: cleanString(body.legalPayeeName),
+      businessName: cleanString(body.businessName),
+      taxClassification: cleanString(body.taxClassification),
+      paymentPreference: cleanString(body.paymentPreference),
+      paymentEmail: cleanString(body.paymentEmail),
+      mailingAddress: cleanString(body.mailingAddress),
+      taxDocumentStatus: cleanString(body.taxDocumentStatus),
+      notes: cleanString(body.notes),
+      source: 'author-financial-setup-form',
+      division: 'publishing',
+      divisionNumber: '01',
+      workflowStage: 'financial-setup',
+      sensitiveIntake: true,
+    }
+
+    const integration = await submitWebsiteForm({
+      formType: 'author-financial-setup',
+      source: 'author-financial-setup-form',
+      subject: `Author financial setup submitted: ${payload.authorName}`,
+      dataverseFlowUrl: process.env.POWER_AUTOMATE_AUTHOR_FINANCIAL_URL,
+      payload,
+      notificationPreview: `${payload.authorName} submitted financial setup details. Sensitive follow-up may be required.`,
+    })
+
+    return NextResponse.json({ success: true, integration })
+  } catch (error) {
+    console.error('Author financial setup form error:', error)
+    return NextResponse.json(
+      { error: 'Unable to submit financial setup.' },
+      { status: 500 },
+    )
+  }
+}

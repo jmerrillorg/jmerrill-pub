@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { submitWebsiteForm } from '@/lib/server/form-integrations'
+import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
 export const runtime = 'edge'
 
@@ -16,59 +18,51 @@ export async function POST(req: NextRequest) {
 
     // Validate required fields
     const required = ['firstName', 'lastName', 'email', 'bookTitle', 'genre', 'goal']
-    const missing = required.filter(f => !body[f])
+    const missing = missingFields(body, required)
     if (missing.length) {
-      return NextResponse.json(
-        { error: `Missing required fields: ${missing.join(', ')}` },
-        { status: 400 }
-      )
+      return requiredFieldsResponse(missing)
     }
 
     // Build Dataverse-ready payload
     const payload = {
       // Contact fields → jm1_author table
-      firstName:       body.firstName,
-      lastName:        body.lastName,
-      email:           body.email,
-      phone:           body.phone || '',
-      timezone:        body.timezone || '',
+      firstName:       cleanString(body.firstName),
+      lastName:        cleanString(body.lastName),
+      email:           cleanString(body.email),
+      phone:           cleanString(body.phone),
+      timezone:        cleanString(body.timezone),
 
       // Title fields → jm1_title (intake stage)
-      bookTitle:       body.bookTitle,
-      genre:           body.genre,
-      estimatedWords:  body.wordCount || '',
-      publishDate:     body.publishDate || '',
-      imprint:         deriveImprint(body.genre),
+      bookTitle:       cleanString(body.bookTitle),
+      genre:           cleanString(body.genre),
+      estimatedWords:  cleanString(body.wordCount),
+      publishDate:     cleanString(body.publishDate),
+      imprint:         deriveImprint(cleanString(body.genre)),
 
       // Lead routing
-      goal:            body.goal,
-      message:         body.message || '',
+      goal:            cleanString(body.goal),
+      message:         cleanString(body.message),
       source:          'website-join-form',
-      submittedAt:     new Date().toISOString(),
 
       // JM1 metadata
       division:        'publishing',
       divisionNumber:  '01',
     }
 
-    // Send to Power Automate
-    const paUrl = process.env.POWER_AUTOMATE_JOIN_URL
-    if (paUrl) {
-      const res = await fetch(paUrl, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload),
-      })
-      if (!res.ok) {
-        console.error('Power Automate error:', res.status, await res.text())
-        // Don't fail the user — log and continue
-      }
-    } else {
-      // Dev mode — log payload
-      console.log('DEV: Join form submission:', JSON.stringify(payload, null, 2))
-    }
+    const integration = await submitWebsiteForm({
+      formType: 'join-family-inquiry',
+      source: 'website-join-form',
+      subject: `New Join the Family inquiry: ${payload.firstName} ${payload.lastName}`,
+      dataverseFlowUrl: process.env.POWER_AUTOMATE_JOIN_URL,
+      payload,
+      notificationPreview: `${payload.firstName} ${payload.lastName} submitted a Join the Family inquiry for "${payload.bookTitle}".`,
+    })
 
-    return NextResponse.json({ success: true, message: 'Inquiry received. We\'ll be in touch within 1–2 business days.' })
+    return NextResponse.json({
+      success: true,
+      message: 'Inquiry received. We\'ll be in touch within 1–2 business days.',
+      integration,
+    })
 
   } catch (err) {
     console.error('Join form error:', err)
