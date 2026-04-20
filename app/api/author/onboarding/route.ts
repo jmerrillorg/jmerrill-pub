@@ -5,13 +5,27 @@ import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const required = ['authorName', 'email', 'phone', 'bookTitle', 'manuscriptStatus', 'publishingGoal']
+    const required = [
+      'authorName',
+      'legalName',
+      'email',
+      'phone',
+      'mailingAddress',
+      'bookTitle',
+      'genre',
+      'targetAudience',
+      'shortDescription',
+      'manuscriptStatus',
+      'originalWorkConfirmation',
+      'publishingGoal',
+    ]
     const missing = missingFields(body, required)
     if (missing.length) return requiredFieldsResponse(missing)
 
     const payload = {
       authorName: cleanString(body.authorName),
       legalName: cleanString(body.legalName),
+      penName: cleanString(body.penName),
       preferredName: cleanString(body.preferredName),
       email: cleanString(body.email),
       phone: cleanString(body.phone),
@@ -19,13 +33,28 @@ export async function POST(req: NextRequest) {
       bookTitle: cleanString(body.bookTitle),
       subtitle: cleanString(body.subtitle),
       genre: cleanString(body.genre),
+      targetAudience: cleanString(body.targetAudience),
+      shortDescription: cleanString(body.shortDescription),
+      longDescription: cleanString(body.longDescription),
       manuscriptStatus: cleanString(body.manuscriptStatus),
+      manuscriptLink: cleanString(body.manuscriptLink),
+      supportingFilesLink: cleanString(body.supportingFilesLink),
+      editingLevelAcknowledgment: cleanString(body.editingLevelAcknowledgment),
+      authorIntentNotes: cleanString(body.authorIntentNotes),
+      originalWorkConfirmation: cleanString(body.originalWorkConfirmation),
+      hasCoAuthors: cleanString(body.hasCoAuthors),
+      coAuthorNames: cleanString(body.coAuthorNames),
+      priorPublication: cleanString(body.priorPublication),
+      coverVision: cleanString(body.coverVision),
+      referenceCovers: cleanString(body.referenceCovers),
+      toneStylePreferences: cleanString(body.toneStylePreferences),
       publishingGoal: cleanString(body.publishingGoal),
       packageInterest: cleanString(body.packageInterest),
       authorBio: cleanString(body.authorBio),
-      audience: cleanString(body.audience),
-      platformLinks: cleanString(body.platformLinks),
-      manuscriptLink: cleanString(body.manuscriptLink),
+      authorPlatform: cleanString(body.authorPlatform),
+      socialMediaLinks: cleanString(body.socialMediaLinks),
+      emailListSize: cleanString(body.emailListSize),
+      speakingInterest: cleanString(body.speakingInterest),
       notes: cleanString(body.notes),
       source: 'author-onboarding-form',
       division: 'publishing',

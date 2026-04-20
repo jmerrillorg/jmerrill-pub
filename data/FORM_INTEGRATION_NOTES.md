@@ -41,3 +41,11 @@ Notifications are supported through the shared integration layer. In production,
 - Resend sender settings
 
 If a form-specific Power Automate URL is configured but no separate notification sender exists, the notification instruction is included in the Power Automate payload so the flow can send the email.
+
+If a `/join` submission succeeds but no email arrives at `publishing@jmerrill.one`, the site code has accepted the submission but production notification delivery is not active. Most likely causes:
+
+- `POWER_AUTOMATE_NOTIFICATION_URL` is not configured.
+- Microsoft Graph or Resend sender settings are not configured.
+- `POWER_AUTOMATE_JOIN_URL` is configured, but that flow does not send the included notification email.
+
+For the quickest production fix, create a Power Automate HTTP-triggered notification flow and set `POWER_AUTOMATE_NOTIFICATION_URL` in Azure Static Web Apps app settings.

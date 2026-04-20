@@ -24,8 +24,8 @@ export function AuthorPortalShell({
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)', backgroundSize: '72px 72px' }} />
 
         <div className="relative z-10 mx-auto max-w-[1180px]">
-          <Link href="/join" className="mb-10 inline-flex text-[13px] text-white/30 transition-colors hover:text-blue-400">
-            ← Back to Join the Family
+          <Link href="/author" className="mb-10 inline-flex text-[13px] text-white/30 transition-colors hover:text-blue-400">
+            ← Back to Author Hub
           </Link>
           <div className="max-w-[820px]">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-500/25 bg-blue-500/10 px-4 py-2">

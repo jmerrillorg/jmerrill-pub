@@ -5,7 +5,7 @@ import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const required = ['authorName', 'email', 'legalPayeeName', 'taxClassification', 'paymentPreference']
+    const required = ['authorName', 'email', 'legalPayeeName', 'activeAuthorStatus', 'taxClassification', 'paymentPreference', 'mailingAddress', 'taxDocumentStatus']
     const missing = missingFields(body, required)
     if (missing.length) return requiredFieldsResponse(missing)
 
@@ -15,8 +15,11 @@ export async function POST(req: NextRequest) {
       phone: cleanString(body.phone),
       legalPayeeName: cleanString(body.legalPayeeName),
       businessName: cleanString(body.businessName),
+      activeAuthorStatus: cleanString(body.activeAuthorStatus),
       taxClassification: cleanString(body.taxClassification),
+      taxIdentifierType: cleanString(body.taxIdentifierType),
       paymentPreference: cleanString(body.paymentPreference),
+      securePaymentLinkPreference: cleanString(body.securePaymentLinkPreference),
       paymentEmail: cleanString(body.paymentEmail),
       mailingAddress: cleanString(body.mailingAddress),
       taxDocumentStatus: cleanString(body.taxDocumentStatus),
