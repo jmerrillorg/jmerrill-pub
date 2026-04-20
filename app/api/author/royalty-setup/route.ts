@@ -35,11 +35,13 @@ export async function POST(req: NextRequest) {
 
     const integration = await submitWebsiteForm({
       formType: 'author-royalty-setup',
+      route: '/author/royalty-setup',
       source: 'author-royalty-setup-form',
       subject: `Author royalty setup submitted: ${payload.authorName}`,
-      dataverseFlowUrl: process.env.POWER_AUTOMATE_AUTHOR_ROYALTY_URL,
+      routeSpecificFlowUrl: process.env.POWER_AUTOMATE_AUTHOR_ROYALTY_URL,
       payload,
       notificationPreview: `${payload.authorName} submitted royalty setup details for: ${payload.titleList}.`,
+      internalClassification: 'Other',
     })
 
     if (!hasConfirmedNotificationDelivery(integration)) {

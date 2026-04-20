@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm } from '@/lib/server/form-integrations'
+import { hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
 export const runtime = 'edge'
@@ -51,11 +51,13 @@ export async function POST(req: NextRequest) {
 
     const integration = await submitWebsiteForm({
       formType: 'join-family-inquiry',
+      route: '/join',
       source: 'website-join-form',
       subject: `New Join the Family inquiry: ${payload.firstName} ${payload.lastName}`,
-      dataverseFlowUrl: process.env.POWER_AUTOMATE_JOIN_URL,
+      routeSpecificFlowUrl: process.env.POWER_AUTOMATE_JOIN_URL,
       payload,
       notificationPreview: `${payload.firstName} ${payload.lastName} submitted a Join the Family inquiry for "${payload.bookTitle}".`,
+      internalClassification: deriveInternalClassification(payload.genre),
     })
 
     if (!hasConfirmedNotificationDelivery(integration)) {
@@ -100,4 +102,14 @@ function deriveImprint(genre: string): string {
   if (genre === 'Poetry') return 'JM Verse'
   if (worksGenres.includes(genre)) return 'JM Works'
   return 'J Merrill Publishing'
+}
+
+function deriveInternalClassification(genre: string): Jm1PubInternalClassification {
+  if (genre === "Children's") return 'Children'
+  if (genre === 'Poetry') return 'Poetry'
+  if (genre === 'Biography / Memoir') return 'Memoir'
+  if (genre === 'Fiction') return 'Fiction'
+  if (genre === 'Business') return 'Business'
+  if (genre === 'Christian / Faith' || genre === 'Devotional' || genre === 'Inspirational') return 'Ministry'
+  return 'Other'
 }

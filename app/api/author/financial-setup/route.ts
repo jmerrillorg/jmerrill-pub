@@ -37,11 +37,13 @@ export async function POST(req: NextRequest) {
 
     const integration = await submitWebsiteForm({
       formType: 'author-financial-setup',
+      route: '/author/financial-setup',
       source: 'author-financial-setup-form',
       subject: `Author financial setup submitted: ${payload.authorName}`,
-      dataverseFlowUrl: process.env.POWER_AUTOMATE_AUTHOR_FINANCIAL_URL,
+      routeSpecificFlowUrl: process.env.POWER_AUTOMATE_AUTHOR_FINANCIAL_URL,
       payload,
       notificationPreview: `${payload.authorName} submitted financial setup details. Sensitive follow-up may be required.`,
+      internalClassification: 'Other',
     })
 
     if (!hasConfirmedNotificationDelivery(integration)) {

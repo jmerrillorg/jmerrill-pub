@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuthorAccess } from '@/lib/server/author-access'
-import { hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm } from '@/lib/server/form-integrations'
+import { hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
 export async function POST(req: NextRequest) {
@@ -68,11 +68,13 @@ export async function POST(req: NextRequest) {
 
     const integration = await submitWebsiteForm({
       formType: 'author-onboarding',
+      route: '/author/onboarding',
       source: 'author-onboarding-form',
       subject: `Author onboarding submitted: ${payload.authorName}`,
-      dataverseFlowUrl: process.env.POWER_AUTOMATE_AUTHOR_ONBOARDING_URL,
+      routeSpecificFlowUrl: process.env.POWER_AUTOMATE_AUTHOR_ONBOARDING_URL,
       payload,
       notificationPreview: `${payload.authorName} submitted author onboarding for "${payload.bookTitle}".`,
+      internalClassification: deriveInternalClassification(payload.genre),
     })
 
     if (!hasConfirmedNotificationDelivery(integration)) {
@@ -93,4 +95,14 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     )
   }
+}
+
+function deriveInternalClassification(genre: string): Jm1PubInternalClassification {
+  if (genre === "Children's") return 'Children'
+  if (genre === 'Poetry') return 'Poetry'
+  if (genre === 'Biography / Memoir') return 'Memoir'
+  if (genre === 'Fiction') return 'Fiction'
+  if (genre === 'Business') return 'Business'
+  if (genre === 'Christian / Faith' || genre === 'Devotional' || genre === 'Inspirational') return 'Ministry'
+  return 'Other'
 }
