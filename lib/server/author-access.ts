@@ -4,7 +4,7 @@ const LOCAL_TEST_ACCESS_CODE = 'JMP-AUTHOR-2026'
 
 export function getExpectedAuthorAccessCode() {
   if (process.env.AUTHOR_ONBOARDING_ACCESS_CODE) return process.env.AUTHOR_ONBOARDING_ACCESS_CODE
-  if (process.env.NODE_ENV !== 'production') return LOCAL_TEST_ACCESS_CODE
+  if (process.env.NODE_ENV === 'development') return LOCAL_TEST_ACCESS_CODE
   return ''
 }
 
