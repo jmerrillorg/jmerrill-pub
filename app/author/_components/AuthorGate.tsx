@@ -26,6 +26,7 @@ export function AuthorGate({ children }: { children: React.ReactNode }) {
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Invalid access code.')
       sessionStorage.setItem('jmp-author-onboarding-unlocked', 'true')
+      sessionStorage.setItem('jmp-author-onboarding-access-code', code)
       setUnlocked(true)
     } catch (err: any) {
       setError(err.message || 'Unable to validate access code.')

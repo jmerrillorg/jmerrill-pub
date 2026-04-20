@@ -19,7 +19,7 @@ These routes are not listed in public navigation or the sitemap. They use a ligh
 ## Azure environment variables
 
 - `FORM_NOTIFICATION_TO`: optional override for notification recipient. Defaults to `publishing@jmerrill.one`.
-- `AUTHOR_ONBOARDING_ACCESS_CODE`: required for production private-route access control.
+- `AUTHOR_ONBOARDING_ACCESS_CODE`: required for production private-route and API access control. Local development uses `JMP-AUTHOR-2026` if this variable is not set.
 - `POWER_AUTOMATE_JOIN_URL`: optional Join form Power Automate/Dataverse ingestion endpoint.
 - `POWER_AUTOMATE_AUTHOR_ONBOARDING_URL`: optional author onboarding ingestion endpoint.
 - `POWER_AUTOMATE_AUTHOR_FINANCIAL_URL`: optional financial setup ingestion endpoint.

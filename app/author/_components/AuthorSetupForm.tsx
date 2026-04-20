@@ -50,7 +50,10 @@ export function AuthorSetupForm({
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-author-access-code': sessionStorage.getItem('jmp-author-onboarding-access-code') || '',
+        },
         body: JSON.stringify(values),
       })
       const data = await response.json()

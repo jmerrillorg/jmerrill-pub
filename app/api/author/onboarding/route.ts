@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAuthorAccess } from '@/lib/server/author-access'
 import { hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
 export async function POST(req: NextRequest) {
   try {
+    const unauthorized = requireAuthorAccess(req)
+    if (unauthorized) return unauthorized
+
     const body = await req.json()
     const required = [
       'authorName',
