@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { submitWebsiteForm } from '@/lib/server/form-integrations'
+import { hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
 export const runtime = 'edge'
@@ -57,6 +57,16 @@ export async function POST(req: NextRequest) {
       payload,
       notificationPreview: `${payload.firstName} ${payload.lastName} submitted a Join the Family inquiry for "${payload.bookTitle}".`,
     })
+
+    if (!hasConfirmedNotificationDelivery(integration)) {
+      return NextResponse.json(
+        {
+          error: notificationNotConfiguredMessage(),
+          integration,
+        },
+        { status: 502 },
+      )
+    }
 
     return NextResponse.json({
       success: true,

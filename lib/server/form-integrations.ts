@@ -60,6 +60,14 @@ export async function submitWebsiteForm(input: SubmitWebsiteFormInput): Promise<
   return { dataverse, notification }
 }
 
+export function hasConfirmedNotificationDelivery(result: FormIntegrationResult) {
+  return result.notification.status === 'sent'
+}
+
+export function notificationNotConfiguredMessage() {
+  return 'Submission received, but staff notification delivery is not fully configured. Please email publishing@jmerrill.one directly so the team can follow up.'
+}
+
 async function submitToDataverseFlow(
   flowUrl: string | undefined,
   payload: Record<string, unknown>,
@@ -161,8 +169,8 @@ async function sendFormNotification({
 
   if (delegatedToFormFlow) {
     return {
-      status: 'delegated',
-      detail: 'Notification instruction included in the Dataverse/Power Automate form payload.',
+      status: 'skipped',
+      detail: 'Dedicated notification sender is not configured. Notification instructions were included in the Dataverse/Power Automate payload, but email delivery is unverified.',
       to,
     }
   }

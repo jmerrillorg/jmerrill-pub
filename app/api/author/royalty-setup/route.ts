@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { submitWebsiteForm } from '@/lib/server/form-integrations'
+import { hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
 export async function POST(req: NextRequest) {
@@ -37,6 +37,16 @@ export async function POST(req: NextRequest) {
       payload,
       notificationPreview: `${payload.authorName} submitted royalty setup details for: ${payload.titleList}.`,
     })
+
+    if (!hasConfirmedNotificationDelivery(integration)) {
+      return NextResponse.json(
+        {
+          error: notificationNotConfiguredMessage(),
+          integration,
+        },
+        { status: 502 },
+      )
+    }
 
     return NextResponse.json({ success: true, integration })
   } catch (error) {
