@@ -4,7 +4,18 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 const GENRES = ['Fiction', 'Nonfiction', 'Christian / Faith', 'Inspirational', 'Biography / Memoir', 'Self-Help', "Children's", 'Devotional', 'Poetry', 'Business', 'Other']
-const GOALS  = ['Reach my church community', 'Build a personal brand', 'Share my story', 'Become a professional author', 'Ministry / speaking', 'Leave a legacy', 'Other']
+const GOALS = [
+  'Build my personal brand',
+  'Share my story',
+  'Become a professional author',
+  'Publish and distribute my book',
+  'Grow my audience',
+  'Establish authority in my field',
+  'Create a legacy work',
+  'Launch a book-based business',
+  'Ministry / faith-based impact',
+  'Other',
+]
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 

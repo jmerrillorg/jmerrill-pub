@@ -318,7 +318,18 @@ export function BookAnalyzerSection() {
   const [error, setError] = useState('')
 
   const genres = ['Fiction', 'Nonfiction', 'Christian / Faith', 'Inspirational', 'Biography / Memoir', 'Self-Help', "Children's", 'Devotional', 'Poetry', 'Business', 'Other']
-  const goals  = ['Reach my church community', 'Build a personal brand', 'Share my story', 'Become a professional author', 'Ministry / speaking', 'Leave a legacy', 'Other']
+  const goals = [
+    'Build my personal brand',
+    'Share my story',
+    'Become a professional author',
+    'Publish and distribute my book',
+    'Grow my audience',
+    'Establish authority in my field',
+    'Create a legacy work',
+    'Launch a book-based business',
+    'Ministry / faith-based impact',
+    'Other',
+  ]
 
   const analyze = useCallback(async () => {
     if (!form.title || !form.genre || !form.goal) { setError('Please fill in the required fields.'); return }
