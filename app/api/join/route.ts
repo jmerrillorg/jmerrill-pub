@@ -4,6 +4,16 @@ import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server
 
 export const runtime = 'edge'
 
+type JoinImprint = 'J Merrill Publishing' | 'JM Little' | 'JM Verse' | 'JM Works' | 'JM Signature'
+
+const OFFICIAL_JOIN_IMPRINTS: JoinImprint[] = [
+  'J Merrill Publishing',
+  'JM Little',
+  'JM Verse',
+  'JM Works',
+  'JM Signature',
+]
+
 // ─────────────────────────────────────────────────────────────
 // POST /api/join
 // Author intake form → Power Automate HTTP trigger → Dataverse
@@ -37,7 +47,7 @@ export async function POST(req: NextRequest) {
       genre:           cleanString(body.genre),
       estimatedWords:  cleanString(body.wordCount),
       publishDate:     cleanString(body.publishDate),
-      imprint:         deriveImprint(cleanString(body.genre)),
+      imprint:         deriveImprint(cleanString(body.genre), cleanString(body.imprint)),
 
       // Lead routing
       goal:            cleanString(body.goal),
@@ -86,7 +96,10 @@ export async function POST(req: NextRequest) {
 }
 
 // Auto-derive imprint from genre for Dataverse routing
-function deriveImprint(genre: string): string {
+function deriveImprint(genre: string, requestedImprint = ''): JoinImprint {
+  const explicitImprint = normalizeRequestedImprint(requestedImprint)
+  if (explicitImprint) return explicitImprint
+
   const worksGenres = [
     'Christian / Faith',
     'Devotional',
@@ -102,6 +115,20 @@ function deriveImprint(genre: string): string {
   if (genre === 'Poetry') return 'JM Verse'
   if (worksGenres.includes(genre)) return 'JM Works'
   return 'J Merrill Publishing'
+}
+
+function normalizeRequestedImprint(imprint: string): JoinImprint | null {
+  if (OFFICIAL_JOIN_IMPRINTS.includes(imprint as JoinImprint)) {
+    return imprint as JoinImprint
+  }
+
+  if (imprint === 'Signature') return 'JM Signature'
+  if (imprint === 'Little') return 'JM Little'
+  if (imprint === 'Verse') return 'JM Verse'
+  if (imprint === 'Works') return 'JM Works'
+  if (imprint === 'Publishing') return 'J Merrill Publishing'
+
+  return null
 }
 
 function deriveInternalClassification(genre: string): Jm1PubInternalClassification {
