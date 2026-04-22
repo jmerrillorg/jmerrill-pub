@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
-export const runtime = 'edge'
-
 type JoinImprint = 'J Merrill Publishing' | 'JM Little' | 'JM Verse' | 'JM Works' | 'JM Signature'
 
 const OFFICIAL_JOIN_IMPRINTS: JoinImprint[] = [
