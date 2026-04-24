@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { authorCatalog, bookCatalog } from '@/lib/content'
+import { imprintStrategies } from '@/data/imprints'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = 'https://jmerrill.pub'
@@ -9,6 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/services`,               priority: 0.9,  changeFrequency: 'monthly' as const },
     { url: `${base}/packages`,               priority: 0.9,  changeFrequency: 'monthly' as const },
     { url: `${base}/books`,                  priority: 0.8,  changeFrequency: 'weekly'  as const },
+    { url: `${base}/imprints`,               priority: 0.7,  changeFrequency: 'monthly' as const },
+    { url: `${base}/readers`,                priority: 0.8,  changeFrequency: 'monthly' as const },
     { url: `${base}/authors`,                priority: 0.8,  changeFrequency: 'weekly'  as const },
     { url: `${base}/about`,                  priority: 0.7,  changeFrequency: 'monthly' as const },
     { url: `${base}/author-journey`,         priority: 0.8,  changeFrequency: 'monthly' as const },
@@ -37,5 +40,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: 'monthly' as const,
   }))
 
-  return [...staticPages, ...bookPages, ...authorPages]
+  const imprintPages = imprintStrategies.map((imprint) => ({
+    url: `${base}${imprint.pageHref}`,
+    priority: 0.6 as number,
+    changeFrequency: 'monthly' as const,
+  }))
+
+  return [...staticPages, ...bookPages, ...authorPages, ...imprintPages]
 }

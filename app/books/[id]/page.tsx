@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { BookCard } from '@/components/content/BookCard'
 import { CTASection } from '@/components/content/CTASection'
 import { getAuthorBySlug, getBookById, getBooksByAuthorSlug, getBooksByImprint, getBooksBySeries, bookCatalog } from '@/lib/content'
+import { getImprintStrategyByLabel } from '@/data/imprints'
 
 type Props = { params: { id: string } }
 
@@ -45,6 +46,7 @@ export default function BookPage({ params }: Props) {
   const book = getBookById(params.id)
   if (!book) notFound()
   const coverIsRemote = book.coverUrl.startsWith('http')
+  const readerImprint = getImprintStrategyByLabel(book.imprint)
 
   const author = book.authorSlug ? getAuthorBySlug(book.authorSlug) : undefined
   const relatedBySeries = book.series ? getBooksBySeries(book.series).filter((item) => item.id !== book.id).slice(0, 4) : []
@@ -155,6 +157,17 @@ export default function BookPage({ params }: Props) {
                   Collaborative title
                 </div>
               )}
+              {readerImprint ? (
+                <Link
+                  href={{
+                    pathname: '/readers',
+                    query: { imprint: readerImprint.slug, book: book.id, title: book.title },
+                  }}
+                  className="block rounded-full border border-white/10 py-3 text-center text-[13px] font-medium text-white/40 transition-all hover:border-blue-500/40 hover:text-blue-400"
+                >
+                  Get reader updates
+                </Link>
+              ) : null}
             </div>
           </aside>
 

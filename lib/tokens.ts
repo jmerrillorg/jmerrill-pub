@@ -247,6 +247,7 @@ export const footerLinks = {
     { label: 'Authors',                href: '/authors' },
     { label: 'Author Journey',         href: '/author-journey' },
     { label: 'Our Books',              href: '/books' },
+    { label: 'Readers',                href: '/readers' },
     { label: 'Publishing',             href: '/publishing' },
     { label: 'Pricing',                href: '/packages' },
     { label: 'Publishing Partner',     href: '/publishing-partner' },

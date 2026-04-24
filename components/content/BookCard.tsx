@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { BookRecord } from '@/lib/content'
+import { getImprintStrategyByLabel } from '@/data/imprints'
 
 const IMPRINT_STYLES: Record<string, { pill: string; gradient: string }> = {
   'J Merrill Publishing': {
@@ -31,6 +32,7 @@ export function BookCard({ book, compact = false }: { book: BookRecord; compact?
     gradient: 'linear-gradient(145deg,#0F1C2E,#070710)',
   }
   const coverIsRemote = book.coverUrl.startsWith('http')
+  const readerImprint = getImprintStrategyByLabel(book.imprint)
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-white/8 bg-[#0B1320] transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/40 hover:shadow-[0_16px_50px_rgba(30,144,255,0.18)]">
@@ -109,9 +111,22 @@ export function BookCard({ book, compact = false }: { book: BookRecord; compact?
           </div>
         ) : null}
         <div className="mt-auto pt-5">
-          <Link href={`/books/${book.id}`} className="font-mono text-[11px] uppercase tracking-[0.08em] text-blue-400">
-            View title -&gt;
-          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Link href={`/books/${book.id}`} className="font-mono text-[11px] uppercase tracking-[0.08em] text-blue-400">
+              View title -&gt;
+            </Link>
+            {readerImprint ? (
+              <Link
+                href={{
+                  pathname: '/readers',
+                  query: { imprint: readerImprint.slug, book: book.id, title: book.title },
+                }}
+                className="font-mono text-[11px] uppercase tracking-[0.08em] text-white/35 transition-colors hover:text-blue-400"
+              >
+                Reader updates
+              </Link>
+            ) : null}
+          </div>
         </div>
       </div>
     </article>

@@ -154,6 +154,114 @@ Or create `app/api/join/route.ts` as a Next.js API route that calls the Power Au
 
 ---
 
+## Reader Funnel + Imprint Discovery
+
+The site now includes a reader-funnel foundation built for website-first audience capture and imprint-based segmentation.
+
+### New routes
+
+- `/readers` — reader signup funnel with imprint-interest selection
+- `/imprints/[slug]` — scalable imprint discovery/detail pages
+- `/api/readers` — server route for reader-funnel submissions
+
+### New config structure
+
+- `data/imprints.ts` is the source of truth for:
+  - imprint label
+  - slug
+  - audience summary
+  - primary platforms
+  - secondary platforms
+  - recommended CTA emphasis
+  - imprint positioning and assignment rule
+
+Book cards and title pages now use this config to send readers into `/readers` with imprint context already selected.
+
+### Live integration seam
+
+`/api/readers` is prepared for Power Automate wiring.
+
+Supported environment variables:
+
+- `POWER_AUTOMATE_READER_SIGNUP_URL` — preferred dedicated reader-funnel endpoint
+- `POWER_AUTOMATE_NEWSLETTER_URL` — optional fallback if you want reader signups to flow through the existing newsletter automation
+
+### `/api/readers` backend contract
+
+Endpoint:
+
+- `POST /api/readers`
+
+Primary environment variable:
+
+- `POWER_AUTOMATE_READER_SIGNUP_URL`
+
+Fallback environment variable:
+
+- `POWER_AUTOMATE_NEWSLETTER_URL`
+
+Expected payload fields:
+
+- `firstName`
+- `email`
+- `imprintInterest`
+- `source`
+- `submittedAt`
+
+Additional context currently sent by the website:
+
+- `imprintLabel`
+- `audienceSummary`
+- `ctaEmphasis`
+- `contextBookId`
+- `contextTitle`
+
+Recommended Dataverse table:
+
+- `jm1pub_reader`
+
+Recommended Dataverse fields:
+
+- `jm1_firstname`
+- `jm1_email`
+- `jm1_imprintinterest`
+- `jm1_source`
+- `jm1_submittedat`
+- `jm1_subscriptionstatus`
+- `jm1_consentstatus`
+- `jm1_consenttimestamp`
+
+Recommended flow behavior:
+
+1. Receive the `/api/readers` payload in Power Automate.
+2. Create or upsert a `jm1pub_reader` record.
+3. Map `payload.firstName` → `jm1_firstname`.
+4. Map `payload.email` → `jm1_email`.
+5. Map `payload.imprintInterest` → `jm1_imprintinterest`.
+6. Map `source` → `jm1_source`.
+7. Map `submittedAt` → `jm1_submittedat`.
+8. Set subscription and consent fields according to your opt-in policy and timestamping standard.
+9. Return HTTP 200 to the website after the intake is accepted.
+
+Current behavior:
+
+- If one of the automation URLs is configured, `/api/readers` forwards the signup payload there.
+- If no automation URL is configured:
+  - development returns a stub success and logs the payload
+  - production returns a `503` so the site does not falsely claim a subscriber was captured
+
+### Future Dataverse / Power Automate work
+
+Recommended downstream path:
+
+1. Receive `/api/readers` payload in Power Automate
+2. Create or upsert a reader/contact record
+3. Store imprint interest and source = `Book CTA`
+4. Trigger imprint-specific email segmentation or list membership
+5. Return HTTP 200 to the website
+
+---
+
 ## Azure Deployment
 
 The project is configured for **Azure Static Web Apps** via `output: 'standalone'` in `next.config.ts`.
