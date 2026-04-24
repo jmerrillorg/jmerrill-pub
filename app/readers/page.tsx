@@ -2,30 +2,15 @@ import type { Metadata } from 'next'
 import { PageHero } from '@/components/site/PageHero'
 import { PageSection } from '@/components/site/PageSection'
 import { ReaderFunnelSection } from '@/components/readers/ReaderFunnelSection'
-import { normalizeImprintSlug } from '@/data/imprints'
 
 export const metadata: Metadata = {
   title: 'Readers',
   description:
     'Discover your next read and subscribe for new releases, special editions, and exclusive content from J Merrill Publishing.',
 }
+export const dynamic = 'force-static'
 
-type ReadersPageProps = {
-  searchParams?: {
-    imprint?: string | string[]
-    book?: string | string[]
-    title?: string | string[]
-  }
-}
-
-function firstValue(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value
-}
-
-export default function ReadersPage({ searchParams }: ReadersPageProps) {
-  const initialImprintSlug = normalizeImprintSlug(firstValue(searchParams?.imprint))
-  const contextBookId = firstValue(searchParams?.book) || ''
-  const contextTitle = firstValue(searchParams?.title) || ''
+export default function ReadersPage() {
 
   return (
     <div className="pt-[76px]">
@@ -42,11 +27,7 @@ export default function ReadersPage({ searchParams }: ReadersPageProps) {
         title="Choose the reader path that fits your taste"
         description="Select an imprint interest first, then step into the signup flow built to keep discovery clean, premium, and easier to grow over time."
       >
-        <ReaderFunnelSection
-          initialImprintSlug={initialImprintSlug}
-          contextBookId={contextBookId}
-          contextTitle={contextTitle}
-        />
+        <ReaderFunnelSection />
       </PageSection>
     </div>
   )

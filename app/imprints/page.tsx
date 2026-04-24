@@ -10,6 +10,8 @@ export const metadata: Metadata = {
     'Explore the multi-imprint publishing structure behind J Merrill Publishing and discover the reader path that fits each audience.',
 }
 
+export const dynamic = 'force-static'
+
 export default function ImprintsPage() {
   return (
     <div className="pt-[76px]">

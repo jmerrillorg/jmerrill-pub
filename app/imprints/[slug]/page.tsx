@@ -4,6 +4,9 @@ import { ImprintDetailTemplate } from '@/components/imprints/ImprintDetailTempla
 import { getBooksByImprint } from '@/lib/content'
 import { getImprintStrategyBySlug, imprintStrategies } from '@/data/imprints'
 
+export const dynamic = 'force-static'
+export const dynamicParams = false
+
 type Props = {
   params: {
     slug: string

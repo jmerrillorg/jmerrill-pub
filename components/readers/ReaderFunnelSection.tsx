@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import type { ImprintSlug } from '@/data/imprints'
-import { getImprintStrategyBySlug, imprintStrategies } from '@/data/imprints'
+import { getImprintStrategyBySlug, imprintStrategies, normalizeImprintSlug } from '@/data/imprints'
 import { ReaderSignupForm } from './ReaderSignupForm'
 
 type ReaderFunnelSectionProps = {
@@ -17,12 +18,20 @@ export function ReaderFunnelSection({
   contextBookId = '',
   contextTitle = '',
 }: ReaderFunnelSectionProps) {
-  const [selectedImprintSlug, setSelectedImprintSlug] = useState<ImprintSlug | null>(initialImprintSlug)
+  const searchParams = useSearchParams()
+  const searchImprintSlug = normalizeImprintSlug(searchParams.get('imprint'))
+  const searchContextBookId = searchParams.get('book') || ''
+  const searchContextTitle = searchParams.get('title') || ''
+
+  const [selectedImprintSlug, setSelectedImprintSlug] = useState<ImprintSlug | null>(initialImprintSlug || searchImprintSlug)
 
   const selectedImprint = useMemo(
     () => getImprintStrategyBySlug(selectedImprintSlug),
     [selectedImprintSlug],
   )
+
+  const resolvedContextBookId = contextBookId || searchContextBookId
+  const resolvedContextTitle = contextTitle || searchContextTitle
 
   function selectImprint(slug: ImprintSlug) {
     setSelectedImprintSlug(slug)
@@ -100,8 +109,8 @@ export function ReaderFunnelSection({
         <ReaderSignupForm
           imprintSlug={selectedImprintSlug}
           source="Book CTA"
-          contextBookId={contextBookId}
-          contextTitle={contextTitle}
+          contextBookId={resolvedContextBookId}
+          contextTitle={resolvedContextTitle}
         />
 
         <div className="mt-5 rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
