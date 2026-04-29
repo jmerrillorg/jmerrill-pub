@@ -260,6 +260,41 @@ Recommended downstream path:
 4. Trigger imprint-specific email segmentation or list membership
 5. Return HTTP 200 to the website
 
+## Publishing Partner Application Intake
+
+The `/publishing-partner/apply` page now submits through a website API route:
+
+- `/api/partner-apply`
+
+Phase 1 production path:
+
+1. Website form submits JSON to `/api/partner-apply`
+2. `/api/partner-apply` posts a canonical envelope to Power Automate
+3. Power Automate handles:
+   - internal email notification to `publishing@jmerrill.one`
+   - Dataverse write / duplicate detection
+   - branded confirmation email to the applicant
+   - HTTP 200 response to the website
+
+Supported environment variables:
+
+- `POWER_AUTOMATE_PARTNER_APPLY_URL` — preferred route-specific Publishing Partner intake endpoint
+- `POWER_AUTOMATE_PARTNER_URL` — legacy alias supported for backward compatibility
+
+Payload highlights sent from the website include:
+
+- contact fields
+- program tier
+- primary imprint
+- existing titles
+- pipeline
+- publishing vision
+- `dataverseTableHint: "jm1pub_partnerapp"`
+- `duplicateDetectionKey` based on lowercased applicant email
+- `applicantConfirmation` object with the desired confirmation subject/body
+
+If the route-specific endpoint is missing in production, the route returns an error instead of falsely claiming the application was fully processed.
+
 ---
 
 ## Azure Deployment

@@ -21,6 +21,8 @@ These routes are not listed in public navigation or the sitemap. They use a ligh
 - `FORM_NOTIFICATION_TO`: optional override for notification recipient. Defaults to `publishing@jmerrill.one`.
 - `AUTHOR_ONBOARDING_ACCESS_CODE`: required for production private-route and API access control. Local development uses `JMP-AUTHOR-2026` only when `NODE_ENV=development` and this variable is not set.
 - `POWER_AUTOMATE_JOIN_URL`: optional route-specific Join form ingestion endpoint.
+- `POWER_AUTOMATE_PARTNER_APPLY_URL`: optional route-specific Publishing Partner application endpoint.
+- `POWER_AUTOMATE_PARTNER_URL`: legacy alias for the Publishing Partner application endpoint.
 - `POWER_AUTOMATE_AUTHOR_ONBOARDING_URL`: optional route-specific author onboarding ingestion endpoint.
 - `POWER_AUTOMATE_AUTHOR_FINANCIAL_URL`: optional route-specific financial setup ingestion endpoint.
 - `POWER_AUTOMATE_AUTHOR_ROYALTY_URL`: optional route-specific royalty setup ingestion endpoint.
