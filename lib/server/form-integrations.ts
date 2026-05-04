@@ -195,6 +195,8 @@ async function submitToRouteSpecificPowerAutomate(
     })
   }
 
+  const notificationFallback = await sendFormNotification(envelope)
+
   return makeIntegrationResult({
     strategy: 'route_specific_ingestion',
     ingestion: {
@@ -202,12 +204,16 @@ async function submitToRouteSpecificPowerAutomate(
       detail: result.detail,
       endpointType: 'route_specific_power_automate',
     },
-    notification: {
-      status: 'failed',
-      detail: 'Route-specific Power Automate endpoint did not confirm delivery.',
-      endpointType: 'route_specific_power_automate',
-      to: envelope.to,
-    },
+    notification:
+      notificationFallback.status === 'sent'
+        ? {
+            ...notificationFallback,
+            detail: `Route-specific Power Automate ingestion failed. ${notificationFallback.detail}`,
+          }
+        : {
+            ...notificationFallback,
+            detail: `${result.detail} Shared notification fallback did not confirm delivery.`,
+          },
   })
 }
 
