@@ -25,36 +25,98 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
 
     // Validate required fields
-    const required = ['firstName', 'lastName', 'email', 'bookTitle', 'genre', 'goal']
+    const required = ['firstName', 'lastName', 'email', 'bookTitle', 'genre', 'goal', 'workType', 'manuscriptStatus']
     const missing = missingFields(body, required)
     if (missing.length) {
       return requiredFieldsResponse(missing)
     }
 
+    if (!asBoolean(body.consentToContact) || !asBoolean(body.consentToTerms)) {
+      return NextResponse.json(
+        { error: 'Please fill in all required fields and confirm consent to continue.' },
+        { status: 400 },
+      )
+    }
+
+    if (asBoolean(body.returningAuthor) && !cleanString(body.priorTitles)) {
+      return NextResponse.json(
+        { error: 'Please fill in all required fields and confirm consent to continue.' },
+        { status: 400 },
+      )
+    }
+
+    const firstName = cleanString(body.firstName)
+    const lastName = cleanString(body.lastName)
+    const email = cleanString(body.email)
+    const phone = cleanString(body.phone)
+    const city = cleanString(body.city)
+    const stateProvince = cleanString(body.stateProvince)
+    const country = cleanString(body.country) || 'United States'
+    const timezone = cleanString(body.timezone)
+    const bookTitle = cleanString(body.bookTitle)
+    const workType = cleanString(body.workType)
+    const genre = cleanString(body.genre)
+    const manuscriptStatus = cleanString(body.manuscriptStatus)
+    const wordCount = parseOptionalInteger(body.wordCount)
+    const goal = cleanString(body.goal)
+    const primaryAudience = cleanString(body.primaryAudience)
+    const comparableBooks = cleanString(body.comparableBooks)
+    const publishTimeline = cleanString(body.publishTimeline)
+    const authorBio = cleanString(body.authorBio)
+    const submissionUrl = cleanString(body.submissionUrl)
+    const existingPlatform = cleanString(body.existingPlatform)
+    const returningAuthor = asBoolean(body.returningAuthor)
+    const priorTitles = cleanString(body.priorTitles)
+    const consentToContact = asBoolean(body.consentToContact)
+    const consentToTerms = asBoolean(body.consentToTerms)
+    const message = cleanString(body.message)
+
     // Build Dataverse-ready payload
     const payload = {
-      // Contact fields → jm1_author table
-      firstName:       cleanString(body.firstName),
-      lastName:        cleanString(body.lastName),
-      email:           cleanString(body.email),
-      phone:           cleanString(body.phone),
-      timezone:        cleanString(body.timezone),
+      websiteSource: 196650016,
+      intakeStatus: 'New',
 
-      // Title fields → jm1_title (intake stage)
-      bookTitle:       cleanString(body.bookTitle),
-      genre:           cleanString(body.genre),
-      estimatedWords:  cleanString(body.wordCount),
-      publishDate:     cleanString(body.publishDate),
-      imprint:         deriveImprint(cleanString(body.genre), cleanString(body.imprint)),
+      firstName,
+      lastName,
+      email,
+      phone: phone || null,
 
-      // Lead routing
-      goal:            cleanString(body.goal),
-      message:         cleanString(body.message),
-      source:          'website-join-form',
+      city: city || null,
+      stateProvince: stateProvince || null,
+      country,
+      timezone: timezone || null,
 
-      // JM1 metadata
-      division:        'publishing',
-      divisionNumber:  '01',
+      projectTitle: bookTitle,
+      workType: workType || null,
+      genre,
+      manuscriptStatus: manuscriptStatus || null,
+      estimatedWordCount: wordCount,
+      imprint: deriveImprint(genre, cleanString(body.imprint)),
+
+      goals: goal,
+      primaryTargetAudience: primaryAudience || null,
+      comparableBooks: comparableBooks || null,
+
+      desiredPublishingTimeline: publishTimeline || null,
+      needBrandingSupport: asBoolean(body.needsBranding),
+      needMarketingSupport: asBoolean(body.needsMarketing),
+      allowAiAssistedEditing: asBoolean(body.allowAiEditing),
+
+      authorBio: authorBio || null,
+      submissionUrl: submissionUrl || null,
+      existingPlatform: existingPlatform || null,
+
+      returningAuthor,
+      priorTitles: priorTitles || null,
+
+      purpose: message || null,
+
+      consentToContact,
+      consentToTerms,
+
+      source: 'website-join-form',
+      division: 'publishing',
+      divisionNumber: '01',
     }
 
     const integration = await submitWebsiteForm({
@@ -64,7 +126,7 @@ export async function POST(req: NextRequest) {
       subject: `New Join the Family inquiry: ${payload.firstName} ${payload.lastName}`,
       routeSpecificFlowUrl: process.env.POWER_AUTOMATE_JOIN_URL,
       payload,
-      notificationPreview: `${payload.firstName} ${payload.lastName} submitted a Join the Family inquiry for "${payload.bookTitle}".`,
+      notificationPreview: `${payload.firstName} ${payload.lastName} submitted a Join the Family inquiry for "${payload.projectTitle}".`,
       internalClassification: deriveInternalClassification(payload.genre),
     })
 
@@ -91,6 +153,18 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+function asBoolean(value: unknown) {
+  return value === true || value === 'true'
+}
+
+function parseOptionalInteger(value: unknown) {
+  const cleaned = cleanString(value)
+  if (!cleaned) return null
+
+  const parsed = Number.parseInt(cleaned, 10)
+  return Number.isNaN(parsed) ? null : parsed
 }
 
 // Auto-derive imprint from genre for Dataverse routing
