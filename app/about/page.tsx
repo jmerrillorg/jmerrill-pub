@@ -66,7 +66,7 @@ export default function AboutPage() {
               We believe every author deserves a publishing home — not just a transaction. We walk with our authors through every stage of their journey: from manuscript evaluation through publication, launch, and long-term career building.
             </p>
             <p className="text-[16px] font-light text-gray-500 leading-[1.85]">
-              We believe in transparency, high standards, and publishing solutions that evolve with technology — from AI-powered production to the enterprise-grade distribution infrastructure of the Ingram Content Group, giving our authors access to 450+ distribution channels that most independent publishers can't offer.
+              We believe in transparency, high standards, and publishing solutions that evolve with technology — from AI-powered production to the enterprise-grade distribution infrastructure of our Ingram Content partnership, giving our authors access to global retail, library, and wholesale channels that most independent publishers can&apos;t offer.
             </p>
             <p className="text-[16px] font-light text-gray-500 leading-[1.85]">
               Founded in December 2018 by Jackie Smith Jr. after publishing his first two books, J Merrill Publishing was built on a simple conviction: that authors deserve a true partner — not just a vendor. Authors retain full ownership of their intellectual property. We retain no rights to any manuscript, title, or creative work published through our services. 70% of royalties stay with the author.
@@ -99,7 +99,7 @@ export default function AboutPage() {
             { n: division.stats.titles,    l: 'Published Titles',     sub: 'Across multiple genres and formats' },
             { n: division.stats.services,  l: 'Services Offered',     sub: 'Across 16 categories' },
             { n: division.stats.categories,l: 'Service Categories',   sub: 'Full-spectrum publishing support' },
-            { n: division.stats.reach,     l: 'Distribution Reach',   sub: 'Ingram + CoreSource infrastructure' },
+            { n: division.stats.reach,     l: 'Distribution Reach',   sub: 'Ingram Content infrastructure' },
           ].map((stat) => (
             <div key={stat.l} className="text-center">
               <div

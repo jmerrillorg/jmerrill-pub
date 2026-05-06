@@ -18,7 +18,7 @@ export function Ticker() {
     'Helping Authors Help Themselves',
     '101+ Published Titles',
     'Editorial · Design · Distribution',
-    '450+ CoreSource Digital Partners',
+    '450+ Ingram Content Digital Partners',
     'AI-Powered Publishing Intelligence',
     'Faith · Inspirational · Children\'s · Memoir',
     'Founded 2018 · Columbus, Ohio',
@@ -69,7 +69,7 @@ export function AboutSection() {
   const steps = [
     { n: '01', title: 'Join the Family',       body: 'Discovery call, manuscript evaluation, package selection — we meet you where you are and build a plan around your goals, timeline, and vision.' },
     { n: '02', title: 'Editorial & Design',    body: 'Professional editing at every level — developmental, line, copy, and proof. Paired with cover design and interior layout that makes your book undeniable.' },
-    { n: '03', title: 'Publish & Distribute',  body: 'ISBN, BISAC metadata, and global distribution through our IngramSpark, CoreSource, and Lightning Source infrastructure — publisher-grade channels.' },
+    { n: '03', title: 'Publish & Distribute',  body: 'ISBN, BISAC metadata, and global distribution through our Ingram Content partnership — publisher-grade channels.' },
     { n: '04', title: 'Launch & Market',       body: 'Launch strategy, ARC campaigns, Amazon advertising, press releases, BookTok packages, and author platform development.' },
     { n: '05', title: 'Build Your Career',     body: 'Ongoing membership plans, royalty reporting dashboard, community access, backlist optimization, and long-term author support.' },
   ]
@@ -248,7 +248,7 @@ export function PackagesSection() {
         </div>
 
         <p className="text-center text-[14px] text-white/25 mt-8 reveal">
-          All packages include eBook conversion via CoreSource. Audiobook, children's, large print, and 90+ add-on services available.{' '}
+          All packages include digital distribution support through our Ingram Content partnership. Audiobook, children&apos;s, large print, and 90+ add-on services available.{' '}
           <Link href="/services" className="text-sky-400/70 hover:text-sky-400 transition-colors">
             View full catalog →
           </Link>

@@ -4,9 +4,9 @@
 
 // ── NETWORK STATS (Ingram verified) ─────────────────────────────────────────
 export const NETWORK_STATS = [
-  { n: '450+',    label: 'CoreSource\ndirect partners',      source: 'CoreSource Direct Partners page' },
-  { n: '45,000+', label: 'Global retail\noutlets',           source: 'IngramSpark distribution page' },
-  { n: '39,000+', label: 'Bookstores, libraries\n& schools', source: 'IngramSpark distribution page' },
+  { n: '450+',    label: 'Digital\ndistribution partners',   source: 'Ingram Content partner data' },
+  { n: '45,000+', label: 'Global retail\noutlets',           source: 'Ingram Content distribution data' },
+  { n: '39,000+', label: 'Bookstores, libraries\n& schools', source: 'Ingram Content distribution data' },
   { n: '40+',     label: 'Countries\nreached',               source: 'Ingram network' },
   { n: '47',      label: 'Managed digital\nsales partners',  source: 'Digital Sales Partners table' },
   { n: '18',      label: 'Audio-capable\nplatforms',         source: 'Digital Sales Partners table' },
@@ -71,7 +71,7 @@ export const DIGITAL_SALES_PARTNERS: DigitalPartner[] = [
   { name: "Wheelers Books",               model: "Library",          hq: "Australia",     territory: "Oceania, Africa, Europe",                      format: "Ebook" },
 ]
 
-// ── FAITH CHANNELS (from CoreSource Direct — not in digital sales table) ─────
+// ── FAITH CHANNELS (from direct faith-channel research — not in digital sales table) ─────
 export const FAITH_CHANNELS = [
   "Christian Book Distributors",
   "Cokesbury",
@@ -123,8 +123,8 @@ export const PRINT_REGIONS = [
   {
     region:    "Middle East",
     flag:      "🇦🇪",
-    stat:      "Lightning Source Sharjah — joint venture with Sharjah Book Authority",
-    summary:   "Physical printing and distribution in the Middle East via Lightning Source Sharjah.",
+    stat:      "Ingram Content Sharjah partnership — joint venture with Sharjah Book Authority",
+    summary:   "Physical printing and distribution in the Middle East through Ingram Content's Sharjah partnership.",
     channels:  ["Books Kinokuniya", "Ciel", "Jarir Bookstore", "Magrudy", "Pan World General Trading (UAE)", "Rushd Bookstore", "White Lion", "Zendy (UAE)"],
   },
   {

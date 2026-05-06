@@ -51,7 +51,7 @@ export default function DistributionPage() {
             <span className="w-8 h-px bg-[#1E90FF]" />
             <span className="text-[11px] font-medium tracking-[0.18em] uppercase text-[#A3C4DC]"
               style={{ fontFamily: "'DM Mono', monospace" }}>
-              Powered by Ingram Content Group
+              Powered by Ingram Content
             </span>
           </div>
 
@@ -157,7 +157,7 @@ export default function DistributionPage() {
               })}
             </div>
             <p className="mt-5 text-[12px] text-white/20 leading-[1.7]">
-              Distribution via Ingram Content Group — IngramSpark (independent publishing) and Lightning Source (expanded distribution). Each channel partner independently determines whether to list a title.
+              Distribution via Ingram Content. Each channel partner independently determines whether to list a title.
             </p>
           </div>
         )}
@@ -170,7 +170,7 @@ export default function DistributionPage() {
               Digital & Audio Partners — 47 Managed
             </h2>
             <p className="text-[15px] text-white/40 font-light max-w-[580px] leading-[1.7] mb-8">
-              Ingram's managed digital sales program — structured relationships with 47 partners across retail, library, subscription, and education. All 47 are available to J Merrill titles via CoreSource.
+              Ingram Content&apos;s managed digital sales program includes structured relationships across retail, library, subscription, and education channels. All 47 are available to J Merrill titles through our distribution partnership.
             </p>
 
             {/* Filter */}
@@ -217,7 +217,7 @@ export default function DistributionPage() {
 
             <div className="px-5 py-5 bg-[#1E90FF]/5 border border-[#1E90FF]/20 rounded-2xl">
               <p className="text-[13px] text-white/40 font-light leading-[1.7]">
-                <span className="text-white/60 font-medium">These 47 are Ingram's managed digital sales partners</span> — direct distribution relationships with structured agreements. The full CoreSource network extends to 450+ additional channel partners available through standard digital distribution. All are accessible to J Merrill titles at no additional distribution fee.
+                <span className="text-white/60 font-medium">These 47 are managed digital sales partners within the Ingram Content ecosystem</span> — direct distribution relationships with structured agreements. The full network extends to 450+ additional channel partners available through standard digital distribution. All are accessible to J Merrill titles at no additional distribution fee.
               </p>
             </div>
           </div>
@@ -231,7 +231,7 @@ export default function DistributionPage() {
               Faith Market Distribution
             </h2>
             <p className="text-[15px] text-white/40 font-light max-w-[580px] leading-[1.7] mb-8">
-              A significant portion of the J Merrill catalog is faith-based, devotional, inspirational, and ministry content. The Ingram CoreSource network includes 15+ dedicated faith distribution channels.
+              A significant portion of the J Merrill catalog is faith-based, devotional, inspirational, and ministry content. The Ingram Content network includes 15+ dedicated faith distribution channels.
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">

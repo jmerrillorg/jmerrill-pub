@@ -28,7 +28,7 @@ export function CredibilityStrip() {
           {[
             { n: '101+',     l: 'Titles in print globally' },
             { n: '45,000+',  l: 'Global retail outlets via Ingram' },
-            { n: '450+',     l: 'CoreSource digital partners' },
+            { n: '450+',     l: 'Ingram Content digital partners' },
             { n: 'GPO',      l: 'Registered publisher' },
             { n: 'SAM.gov',  l: 'Active entity · UEI EL4RLED5MUW5' },
           ].map(item => (
@@ -61,7 +61,7 @@ export function PublishingSystemSection() {
     { n: '01', icon: '📝', title: 'Intake',        sub: 'Manuscript evaluation, package selection, onboarding portal' },
     { n: '02', icon: '✏️', title: 'Editorial',     sub: 'Developmental, line, copy editing, AI sensitivity review' },
     { n: '03', icon: '🎨', title: 'Design',        sub: 'Cover design, interior layout, eBook conversion, audiobook' },
-    { n: '04', icon: '🌐', title: 'Distribution',  sub: 'IngramSpark, CoreSource, Lightning Source, library channels' },
+    { n: '04', icon: '🌐', title: 'Distribution',  sub: 'Ingram Content, retail, library, and wholesale channels' },
     { n: '05', icon: '📣', title: 'Launch',        sub: 'ARC campaign, Amazon ads, press release, BookTok video' },
     { n: '06', icon: '📊', title: 'Intelligence',  sub: 'Royalty dashboard, Ingram iQ analytics, metadata optimization' },
   ]
@@ -513,7 +513,7 @@ export function AuthorJourneySection() {
   const steps = [
     { n: '01', title: 'Join the Family',     body: 'Discovery call, manuscript evaluation, package selection.', detail: 'We assess your manuscript, understand your goals, and map the right package and publishing pathway.', icon: '🤝' },
     { n: '02', title: 'Editorial & Design',  body: 'Professional editing at every level. Cover and interior that make your book undeniable.', detail: 'Developmental guidance, line editing, copy editing, and proofreading — plus custom cover and interior typesetting.', icon: '✏️' },
-    { n: '03', title: 'Publish & Distribute',body: 'ISBN, metadata, and global distribution through IngramSpark, CoreSource, and Lightning Source.', detail: 'Print default through IngramSpark. eBook through CoreSource to Apple Books, Kobo, Amazon, and library platforms.', icon: '🌐' },
+    { n: '03', title: 'Publish & Distribute',body: 'ISBN, metadata, and global distribution through our Ingram Content partnership.', detail: 'Print, ebook, and audio distribution are structured for retail, library, and international reach.', icon: '🌐' },
     { n: '04', title: 'Launch & Market',     body: 'ARC campaigns, Amazon advertising, press, BookTok, and author platform.', detail: 'Pre-launch, launch-week, and post-launch strategy your title deserves.', icon: '📣' },
     { n: '05', title: 'Build Your Career',   body: 'Membership plans, royalty dashboard, community, and long-term author support.', detail: 'One book is the beginning. We support your next title, your backlist, and your long-term career.', icon: '🚀' },
   ]
@@ -654,7 +654,7 @@ export function ImprintsSection() {
         <div className="mt-8 flex items-start gap-3 px-5 py-4 bg-gray-50 rounded-xl border border-gray-100 reveal">
           <span className="text-[16px] mt-0.5">ℹ️</span>
           <p className="text-[13px] font-light text-gray-400 leading-[1.7]">
-            <span className="font-semibold text-gray-600">Distribution imprint:</span> All titles are distributed under J Merrill Publishing, Inc. — the official publisher of record at IngramSpark, CoreSource, and Lightning Source. Imprint names above are the brand identity layer, not a change to distribution metadata.
+            <span className="font-semibold text-gray-600">Distribution imprint:</span> All titles are distributed under J Merrill Publishing, Inc. through our Ingram Content partnership. Imprint names above are the brand identity layer, not a change to distribution metadata.
           </p>
         </div>
       </div>

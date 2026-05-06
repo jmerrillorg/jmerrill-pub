@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'JM Prestige — Premium Publishing Imprint | J Merrill Publishing',
-  description: "JM Prestige is J Merrill Publishing's premium imprint for serious authors. Application-based. End-to-end production. Global distribution. Starting at $750/month.",
+  description: "JM Prestige is J Merrill Publishing's selective premium imprint for authors ready for a serious publishing commitment. Application-based. Global distribution. Starting at $750/month.",
 }
 
 const distinctionCards = [
@@ -14,8 +14,8 @@ const distinctionCards = [
   },
   {
     icon: '▣',
-    title: 'End-to-End Support',
-    body: "Editorial. Layout. Cover design. Distribution. Marketing. Audiobook. Every stage of your book's journey is supported by the full JMP production pipeline.",
+    title: 'A Publishing Relationship',
+    body: "JM Prestige is built for authors who want thoughtful editorial care, publisher-level presentation, and a long-term relationship with a house that is invested in the work.",
   },
   {
     icon: '◉',
@@ -28,42 +28,41 @@ const includedColumns = [
   {
     title: 'Production',
     items: [
-      'Stage 0 Editorial Diagnostic',
-      'Full editorial review (developmental, line, copy, or proof — based on manuscript)',
-      'Professional interior layout',
-      'Professional cover design',
-      'Up to 3 revision rounds per stage',
-      'Final approval gate before distribution',
+      'Editorial shaping that strengthens the manuscript for release',
+      'Publisher-level cover and interior presentation',
+      'A finished book that reflects the standards of the house',
+      'Release readiness across print, digital, and catalog presentation',
+      'Professional stewardship from manuscript to final approval',
     ],
   },
   {
     title: 'Distribution',
     items: [
-      'ISBN assignment (print, ebook, audiobook)',
+      'Retail-ready positioning for national and global discovery',
       'Distribution through our Ingram Content partnership',
       '45,000+ retailers, libraries, bookstores, and distribution channels worldwide',
-      'Global retail availability (Amazon, Barnes & Noble, libraries, international)',
-      'Metadata optimization (BISAC, keywords, description)',
+      'Metadata and catalog preparation built for discoverability',
+      'A release plan shaped for real-world market readiness',
     ],
   },
   {
     title: 'Author Services',
     items: [
-      'Author profile page on jmerrill.pub',
-      'Marketing Core Kit (social, caption kit, 14-day launch script)',
-      '30/60/90-day post-launch monitoring',
+      'Author profile placement on jmerrill.pub',
+      'Launch support assets that help position the book well',
+      'Ongoing post-release visibility and performance review',
       'Quarterly royalty reporting',
-      'Annual publishing review',
+      'Annual publishing review for long-term growth',
     ],
   },
   {
     title: 'Prestige Additions',
     items: [
-      'Priority production scheduling',
-      'Dedicated author communication cadence',
-      'Access to JM Prestige Growth Pipeline (audiobook, hardcover, relaunch)',
-      'Early access to new JMP services and imprint opportunities',
-      'Invitation to JMP Author Community',
+      'A higher-touch publishing path for ambitious authors',
+      'Priority scheduling and a more dedicated communication cadence',
+      'Stronger launch planning and long-range release strategy',
+      'Access to future growth pathways across format and catalog expansion',
+      'Early invitation into new JMP opportunities and author community benefits',
     ],
   },
 ]
@@ -76,12 +75,12 @@ const pricingCards = [
     cadence: '/ month',
     annual: 'or $8,000/year — save $1,000',
     features: [
-      'Full production pipeline',
-      'One title per year',
-      'Standard production scheduling',
-      'Author profile page',
-      'Marketing Core Kit',
-      'Quarterly royalty reporting',
+      'A selective publishing relationship under JM Prestige',
+      'Professional editorial and production care',
+      'Retail-ready presentation and distribution readiness',
+      'Launch support, metadata shaping, and author positioning',
+      'Quarterly royalty reporting and ongoing publisher visibility',
+      'Structured for up to two titles within a 12-month commitment',
     ],
     cta: 'Apply for Standard →',
   },
@@ -92,13 +91,12 @@ const pricingCards = [
     cadence: '/ month',
     annual: 'or $13,500/year — save $1,500',
     features: [
-      'Everything in Standard',
-      'Up to two titles per year',
-      'Priority production scheduling',
-      'Dedicated author communication',
-      'Growth Pipeline access',
-      'Author Community invitation',
-      'Early access to new JMP services',
+      'A deeper publishing partnership for high-commitment authors',
+      'Signature-level editorial, production, and release care',
+      'Priority publishing attention and more dedicated guidance',
+      'Premium positioning for launch quality, distribution, and catalog growth',
+      'Expanded access to the JM Prestige growth path and author community',
+      'Structured for up to two high-touch releases within a 12-month commitment',
     ],
     cta: 'Apply for Premium →',
   },
@@ -167,7 +165,7 @@ export default function PublishingPartnerPage() {
           </h1>
 
           <p className="text-[16px] font-light text-white/45 leading-[1.75] max-w-[720px] mx-auto">
-            JM Prestige is J Merrill Publishing&apos;s premium imprint — selective, supported, and built for authors who are serious about their work and their legacy.
+            JM Prestige is J Merrill Publishing&apos;s selective premium imprint — built for authors who are serious about their work, their release quality, and the legacy they are building.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4">
@@ -192,7 +190,7 @@ export default function PublishingPartnerPage() {
           <div className="max-w-[860px] mb-10">
             <SectionLabel>What Is JM Prestige</SectionLabel>
             <p className="text-[15px] font-light leading-[1.8] text-white/60">
-              JM Prestige is not a standard publishing offering. It is a publishing imprint — the same imprint that appears on the cover, in the distributor catalog, and in every retailer listing. When you publish under JM Prestige, you are not a client purchasing services. You are an author publishing under a house that believes in your work.
+              JM Prestige is not a standard publishing offering. It is a selective publishing imprint — the same imprint that appears on the cover, in the distributor catalog, and in every retailer listing. When you publish under JM Prestige, you are not a client purchasing services. You are an author publishing under a house that believes in your work.
             </p>
           </div>
 
@@ -243,9 +241,9 @@ export default function PublishingPartnerPage() {
         </section>
 
         <section className="mb-20 sm:mb-24">
-          <SectionLabel>Investment</SectionLabel>
+          <SectionLabel>Your Publishing Commitment</SectionLabel>
           <p className="text-[15px] font-light leading-[1.75] text-white/45 mb-10">
-            JM Prestige is an annual publishing partnership. Two options. One commitment.
+            JM Prestige is an annual publishing relationship for authors whose work aligns with the house. Two paths. One serious commitment.
           </p>
 
           <div className="grid gap-4 lg:grid-cols-2">

@@ -143,14 +143,14 @@ export const relationshipPages: SitePage[] = [
     ctaLabel: 'Walk the journey',
   },
   {
-    title: 'Publishing Partner Program',
+    title: 'JM Prestige',
     href: '/publishing-partner',
     eyebrow: 'High-Touch Layer',
     description:
-      'Application-based publishing support for authors building a body of work, not just one title.',
+      'Application-based premium imprint support for authors building a body of work, not just one title.',
     audience: 'Authors, coaches, and ministry leaders with real catalog momentum.',
     status: 'Live',
-    ctaLabel: 'See the program',
+    ctaLabel: 'Explore JM Prestige',
   },
   {
     title: 'Author Memberships',

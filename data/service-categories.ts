@@ -26,8 +26,8 @@ export const serviceCategories = [
     services: [
       { name: 'Cover Design', desc: 'Custom front cover design from concept through print-ready file.' },
       { name: 'Premium Cover Design', desc: 'Original graphics, illustration, and full wrap for front, back, and spine.' },
-      { name: 'Interior Layout & Typesetting', desc: 'Print-ready interior files meeting IngramSpark and Lightning Source specifications.' },
-      { name: 'eBook Conversion', desc: 'Optimized EPUB for CoreSource distribution across Apple Books, Kobo, Amazon, and libraries.' },
+      { name: 'Interior Layout & Typesetting', desc: 'Print-ready interior files prepared for professional distribution standards through our Ingram Content partnership.' },
+      { name: 'eBook Conversion', desc: 'Optimized EPUB for digital distribution across Apple Books, Kobo, Amazon, and library channels.' },
       { name: 'Hardcover Formatting', desc: 'Hardcover-ready interior and dust jacket setup.' },
       { name: 'Large Print Formatting', desc: 'Accessibility-compliant large print editions for broader reader reach.' },
       { name: 'Devotional / Curriculum Formatting', desc: 'Workbook structure, discussion questions, and curriculum layout for ministry use.' },
@@ -42,9 +42,9 @@ export const serviceCategories = [
     description:
       'Professional audio pathways for every budget and audience, from AI-assisted production to studio narration.',
     services: [
-      { name: 'AI Audiobook Production', desc: 'Professional AI narration with audio formatting and CoreSource distribution setup.' },
+      { name: 'AI Audiobook Production', desc: 'Professional AI narration with audio formatting and digital distribution setup.' },
       { name: 'Professional Narrated Audiobook', desc: 'Human-narrated, studio-quality audiobook production for premium titles.' },
-      { name: 'Audiobook Distribution Setup', desc: 'Distribution configuration via CoreSource, Findaway Voices, and ACX.' },
+      { name: 'Audiobook Distribution Setup', desc: 'Distribution configuration through our Ingram Content partnership and leading audiobook channels.' },
       { name: 'Royalty Share Production Coordination', desc: 'ACX royalty-share pathway coordination for select titles.' },
     ],
   },
@@ -59,7 +59,7 @@ export const serviceCategories = [
       { name: 'AI Manuscript Analysis', desc: 'AI-assisted evaluation of structure, pacing, and market positioning.' },
       { name: 'AI Marketing Starter Kit', desc: 'AI-generated descriptions, keyword strategy, and social assets.' },
       { name: 'AI Launch Kit', desc: 'A fuller marketing asset set spanning copy, social, and launch timing.' },
-      { name: 'AI Metadata Optimization', desc: 'Keyword and BISAC optimization for CoreSource and IngramSpark submission.' },
+      { name: 'AI Metadata Optimization', desc: 'Keyword and BISAC optimization for professional retail and library distribution.' },
       { name: 'AI Cover Concept Ideation', desc: 'AI-generated cover direction concepts for designer briefing.' },
       { name: 'AI Sensitivity Reading', desc: 'Content review for language, representation, and unintended harm.' },
     ],
@@ -137,12 +137,12 @@ export const serviceCategories = [
     description:
       'Enterprise-grade distribution infrastructure and catalog optimization for real market reach.',
     services: [
-      { name: 'Print Distribution Setup', desc: 'IngramSpark setup for global print reach through wholesale and retail channels.' },
-      { name: 'Digital Distribution Setup', desc: 'CoreSource setup for eBook and audiobook delivery across major platforms.' },
-      { name: 'LSI Distribution Upgrade', desc: 'Migration from IngramSpark to Lightning Source for expanded needs.' },
+      { name: 'Print Distribution Setup', desc: 'Ingram Content setup for global print reach through wholesale and retail channels.' },
+      { name: 'Digital Distribution Setup', desc: 'Ingram Content setup for eBook and audiobook delivery across major platforms.' },
+      { name: 'Distribution Upgrade', desc: 'Expanded distribution support for titles with larger operational needs.' },
       { name: 'Library Distribution', desc: 'Metadata optimization for OverDrive, Libby, and Baker & Taylor pathways.' },
       { name: 'Title Transfer / Republishing', desc: 'ISBN transition, metadata cleanup, and platform migration for existing titles.' },
-      { name: 'Metadata Optimization', desc: 'Keyword and BISAC optimization for CoreSource and IngramSpark.' },
+      { name: 'Metadata Optimization', desc: 'Keyword and BISAC optimization for Ingram Content distribution and retailer discovery.' },
       { name: 'Revised Edition Service', desc: 'New edition setup with updated content, refreshed metadata, and new ISBN guidance.' },
     ],
   },

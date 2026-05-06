@@ -22,7 +22,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-[20px] font-semibold text-charcoal mb-3" style={{ fontFamily: "'Libre Baskerville', serif" }}>1. Information We Collect</h2>
-            <p>J Merrill Publishing, Inc. collects information you provide directly when you submit an inquiry, join our author family, apply for the Publishing Partner Program, or communicate with us. This includes your name, email address, phone number, and information about your book project.</p>
+            <p>J Merrill Publishing, Inc. collects information you provide directly when you submit an inquiry, join our author family, apply for JM Prestige, or communicate with us. This includes your name, email address, phone number, and information about your book project.</p>
             <p className="mt-3">We also collect standard web analytics data (page views, referral sources, browser type) through privacy-respecting analytics tools. We do not use cookies for advertising purposes.</p>
           </section>
 
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-[20px] font-semibold text-charcoal mb-3" style={{ fontFamily: "'Libre Baskerville', serif" }}>5. Third-Party Services</h2>
-            <p>We use Microsoft Bookings for consultation scheduling. We distribute titles through the Ingram Content Group (IngramSpark, CoreSource, Lightning Source) and their associated retail partners. These services operate under their own privacy policies.</p>
+            <p>We use Microsoft Bookings for consultation scheduling. We distribute titles through our Ingram Content partnership and associated retail partners. These services operate under their own privacy policies.</p>
           </section>
 
           <section>

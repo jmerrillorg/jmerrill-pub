@@ -130,7 +130,7 @@ export const packages = [
       'Professional cover design',
       'Interior layout & typesetting',
       'ISBN assignment',
-      'IngramSpark + CoreSource distribution',
+      'Ingram Content distribution',
       'Author Profile Page — included',
       '30-minute publishing consultation',
       '5 complimentary paperback copies',
@@ -176,7 +176,7 @@ export const packages = [
 export const serviceCategories = [
   { num: '01', icon: '✏️', title: 'Editorial Services',           body: 'Developmental, line, copy editing, proofreading, manuscript evaluation, AI sensitivity reading, and co-author coordination.' },
   { num: '02', icon: '🎨', title: 'Design & Production',          body: 'Cover design, interior layout, eBook conversion, hardcover formatting, large print, devotional formatting, and illustrated books.' },
-  { num: '03', icon: '🎙️', title: 'Audiobook Production',         body: 'AI narration from $699 or professional studio narration. Distributed via CoreSource, Findaway Voices, and ACX.' },
+  { num: '03', icon: '🎙️', title: 'Audiobook Production',         body: 'AI narration from $699 or professional studio narration. Distributed through our Ingram Content partnership and leading audiobook channels.' },
   { num: '04', icon: '🤖', title: 'AI Publishing Intelligence',   body: 'Manuscript analysis, metadata optimization, AI marketing kits, sensitivity reading, and cover concept ideation.' },
   { num: '05', icon: '📣', title: 'Marketing & Launch',           body: 'Launch strategy, ARC campaigns, Amazon ads, press releases, BookTok video packages, and complete launch programs.' },
   { num: '06', icon: '⛪', title: 'Faith Market Distribution',    body: 'CBA positioning, church bookstore placement, Bible study kit creation, ministry bulk licensing, and conference sales.' },
@@ -222,10 +222,9 @@ export const memberships = [
 
 // ── DISTRIBUTION INFRASTRUCTURE ───────────────────────────────
 export const distribution = [
-  { name: 'Lightning Source',   role: 'Premium print distribution' },
-  { name: 'CoreSource',         role: 'All digital asset distribution' },
-  { name: 'IngramSpark',        role: 'New author default — free ingestion' },
+  { name: 'Ingram Content',     role: 'Print, digital, and wholesale distribution' },
   { name: 'Ingram iQ',          role: 'Sales analytics & market data' },
+  { name: 'Retail & library channels', role: 'Global reader access across major outlets' },
   { name: 'OverDrive / Libby',  role: 'Library digital access' },
   { name: 'ACX / Findaway',     role: 'Audiobook distribution' },
   { name: 'Apple Books',        role: 'Global digital retail' },
