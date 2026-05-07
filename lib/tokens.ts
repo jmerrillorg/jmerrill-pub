@@ -100,7 +100,7 @@ export const nav = {
     { label: 'About',         href: '/about' },
   ],
   partner: {
-    label: 'Publishing Partner',
+    label: 'JM Prestige',
     href:  '/publishing-partner',
   },
   cta: {
@@ -249,7 +249,7 @@ export const footerLinks = {
     { label: 'Readers',                href: '/readers' },
     { label: 'Publishing',             href: '/publishing' },
     { label: 'Pricing',                href: '/packages' },
-    { label: 'Publishing Partner',     href: '/publishing-partner' },
+    { label: 'JM Prestige',            href: '/publishing-partner' },
     { label: 'Distribution',           href: '/distribution' },
     { label: 'Platform Roadmap',       href: '/platform' },
     { label: 'Contact',                href: '/contact' },

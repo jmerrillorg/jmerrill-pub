@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { packages } from '@/lib/tokens'
 
 export const metadata: Metadata = {
-  title: 'Publishing Packages — Starter, Professional, Signature',
-  description: 'Three publishing packages built for authors at every stage. From $1,999 Starter to $7,500 Signature. Full-service editorial, design, distribution, and marketing.',
+  title: 'Publishing Packages — Flexible Payment Plans | J Merrill Publishing',
+  description: 'Three full-service publishing packages from $1,999. Pay in full or choose 2, 4, 8, or 12-month autopay plans. Editorial, design, distribution, and eBook included.',
 }
 
 const matrix = [
@@ -47,8 +47,46 @@ const matrix = [
   { feature: 'Digital distribution',       starter: '✓',               pro: '✓',                 sig: '✓' },
   { feature: 'BISAC / metadata',           starter: 'Basic',           pro: 'Advanced',          sig: 'Advanced' },
   { feature: 'Library distribution',       starter: 'Add-on',          pro: 'Add-on',            sig: 'Add-on' },
+  { feature: 'AUDIOBOOK',                  starter: '',                pro: '',                  sig: '',                  head: true },
+  { feature: 'Audiobook',                  starter: 'Add-on ($699)',   pro: 'AI narration included', sig: 'AI narration included' },
   { feature: 'AUTHOR COPIES',             starter: '',                pro: '',                  sig: '',                  head: true },
   { feature: 'Complimentary paperbacks',   starter: '5 copies',        pro: '10 copies',         sig: '15 copies' },
+]
+
+const paymentOptions = [
+  {
+    package: 'Starter',
+    base: '$1,999',
+    rows: [
+      { option: 'Pay in Full (7% off)', perPayment: '$1,859', total: '$1,859' },
+      { option: '2-Month', perPayment: '~$1,000', total: '$1,999' },
+      { option: '4-Month', perPayment: '$500/mo', total: '$1,999' },
+      { option: '8-Month', perPayment: '$250/mo', total: '$1,999' },
+      { option: '12-Month', perPayment: '$167/mo', total: '$1,999' },
+    ],
+  },
+  {
+    package: 'Professional',
+    base: '$4,500',
+    rows: [
+      { option: 'Pay in Full (7% off)', perPayment: '$4,185', total: '$4,185' },
+      { option: '2-Month', perPayment: '$2,250/mo', total: '$4,500' },
+      { option: '4-Month', perPayment: '$1,125/mo', total: '$4,500' },
+      { option: '8-Month', perPayment: '$563/mo', total: '$4,500' },
+      { option: '12-Month', perPayment: '$375/mo', total: '$4,500' },
+    ],
+  },
+  {
+    package: 'Signature',
+    base: '$7,500',
+    rows: [
+      { option: 'Pay in Full (7% off)', perPayment: '$6,975', total: '$6,975' },
+      { option: '2-Month', perPayment: '$3,750/mo', total: '$7,500' },
+      { option: '4-Month', perPayment: '$1,875/mo', total: '$7,500' },
+      { option: '8-Month', perPayment: '$938/mo', total: '$7,500' },
+      { option: '12-Month', perPayment: '$625/mo', total: '$7,500' },
+    ],
+  },
 ]
 
 const addOnGuide = [
@@ -130,8 +168,74 @@ export default function PackagesPage() {
         </div>
       </div>
 
+      {/* Payment options */}
+      <div className="px-12 py-20 bg-white border-t border-gray-100">
+        <div className="max-w-[1280px] mx-auto">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-8 h-px bg-blue-500 block" />
+            <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-blue-500">Flexible Payment Options</span>
+          </div>
+          <h2
+            className="text-charcoal mb-4"
+            style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(28px,3vw,40px)', fontWeight: 700, letterSpacing: '-0.02em' }}
+          >
+            Flexible payment options for every<br />
+            <em className="not-italic italic text-blue-500">publishing path</em>
+          </h2>
+          <p className="text-[15px] font-light text-gray-500 max-w-[760px] leading-[1.8] mb-10">
+            All packages are available in pay-in-full or installment plans. Pay-in-full saves 7%. Installment plans run on Stripe autopay, with the author&apos;s card saved at signing and payments processed automatically. Payment 1 gates production start.
+          </p>
+
+          <div className="grid gap-4 lg:grid-cols-3">
+            {paymentOptions.map((plan) => (
+              <div key={plan.package} className="rounded-[26px] border border-gray-200 bg-[#F7F8FA] overflow-hidden">
+                <div className="border-b border-gray-200 px-6 py-5">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-blue-500 mb-2">{plan.package}</div>
+                  <div className="text-[26px] text-charcoal" style={{ fontFamily: "'Libre Baskerville', serif", fontWeight: 700 }}>
+                    {plan.base}
+                  </div>
+                </div>
+                <div className="px-6 py-4">
+                  <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-3 border-b border-gray-200 pb-3 mb-3">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.12em] text-gray-400">Option</div>
+                    <div className="text-[11px] font-mono uppercase tracking-[0.12em] text-gray-400 text-right">Per Payment</div>
+                    <div className="text-[11px] font-mono uppercase tracking-[0.12em] text-gray-400 text-right">Total</div>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    {plan.rows.map((row) => (
+                      <div key={row.option} className="grid grid-cols-[1.4fr_1fr_1fr] gap-3 items-start">
+                        <div className="text-[13px] font-medium text-charcoal leading-[1.5]">{row.option}</div>
+                        <div className="text-[13px] text-right text-gray-500">{row.perPayment}</div>
+                        <div className="text-[13px] text-right text-gray-500">{row.total}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Ghostwriting bundle */}
+      <div className="px-12 pb-10 bg-white">
+        <div className="max-w-[1280px] mx-auto">
+          <div className="rounded-[28px] border border-blue-200 bg-blue-50 px-8 py-7">
+            <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-blue-500 mb-3">
+              Ghostwriting + Publishing Bundle
+            </div>
+            <p className="text-[16px] font-light text-gray-600 leading-[1.8] max-w-[940px]">
+              Commission your manuscript with JMP and publish it here — your publishing package is 10% off when contracted together or within 90 days of ghostwriting completion.
+            </p>
+            <Link href="/services#ghostwriting" className="inline-flex mt-4 text-[14px] font-semibold text-blue-600 hover:text-blue-800 transition-colors">
+              Learn more about ghostwriting →
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Comparison matrix */}
-      <div className="px-12 py-20 bg-white">
+      <div className="px-12 pb-20 bg-white">
         <div className="max-w-[1280px] mx-auto">
           <div className="flex items-center gap-3 mb-4">
             <span className="w-8 h-px bg-blue-500 block" />

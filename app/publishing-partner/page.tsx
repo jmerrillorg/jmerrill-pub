@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'JM Prestige — Premium Publishing Imprint | J Merrill Publishing',
-  description: "JM Prestige is J Merrill Publishing's selective premium imprint for authors ready for a serious publishing commitment. Application-based. Global distribution. Starting at $750/month.",
+  title: 'JM Prestige — Application-Based Publishing Program | J Merrill Publishing',
+  description: "JM Prestige is J Merrill Publishing's selective annual publishing program. Two tiers starting at $750/month. Application required. Publisher-reviewed.",
 }
 
 const distinctionCards = [
@@ -116,6 +116,20 @@ const rightForYou = [
   'Are committed to the full production process, not a shortcut',
   'Want a publisher who will be invested in their success',
 ]
+
+const acceptanceCriteria = {
+  standard: [
+    'A complete or nearly complete manuscript, or at least one previously published title',
+    'Work that aligns editorially with the JMP catalog and values',
+    'A realistic publishing cadence — 1 to 2 titles per year',
+    'An author who is ready for a professional publishing relationship, not a shortcut',
+  ],
+  premium: [
+    'A full year of JM Prestige Standard in good standing, or equivalent track record at Publisher’s discretion',
+    'Demonstrated author platform — email list, speaking presence, ministry audience, or social following',
+    'Active, performing titles in the JMP catalog',
+  ],
+}
 
 const bookingUrl = 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled'
 
@@ -300,8 +314,8 @@ export default function PublishingPartnerPage() {
             ))}
           </div>
 
-          <p className="text-center text-[12px] text-white/25 mt-6">
-            Both annual options require a 1-year commitment and renew automatically. Single-pay annual pricing reflects a savings versus monthly.
+          <p className="text-center text-[12px] text-white/25 mt-6 max-w-[760px] mx-auto leading-[1.7]">
+            Annual pricing saves $1,000 (Standard) or $1,500 (Premium) versus monthly. Both options run on Stripe autopay with a 1-year commitment that renews automatically.
           </p>
         </section>
 
@@ -346,6 +360,49 @@ export default function PublishingPartnerPage() {
             style={{ fontFamily: "'Libre Baskerville', serif" }}
           >
             If that&apos;s you — we&apos;d love to review your application.
+          </p>
+        </section>
+
+        <section className="mb-20 sm:mb-24">
+          <SectionLabel>What We Look For</SectionLabel>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="bg-white/[0.04] border border-white/8 rounded-3xl p-8">
+              <h2
+                className="text-white mb-5"
+                style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '24px', fontWeight: 700 }}
+              >
+                Standard tier — we consider:
+              </h2>
+              <ul className="flex flex-col gap-3">
+                {acceptanceCriteria.standard.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-[14px] font-light leading-[1.7] text-white/55">
+                    <span className="text-blue-400 mt-0.5">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-white/[0.04] border border-white/8 rounded-3xl p-8">
+              <h2
+                className="text-white mb-5"
+                style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '24px', fontWeight: 700 }}
+              >
+                Premium tier — additionally:
+              </h2>
+              <ul className="flex flex-col gap-3">
+                {acceptanceCriteria.premium.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-[14px] font-light leading-[1.7] text-white/55">
+                    <span className="text-blue-400 mt-0.5">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <p className="text-[14px] font-light italic text-white/30 mt-8 max-w-[900px]">
+            Applications are reviewed by the Publisher. Acceptance is at Publisher&apos;s discretion. We respond within 3–5 business days.
           </p>
         </section>
 

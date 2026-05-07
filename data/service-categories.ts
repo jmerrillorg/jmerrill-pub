@@ -162,6 +162,21 @@ export const serviceCategories = [
       { name: 'Copyright Registration', desc: 'Support for filing with the U.S. Copyright Office.' },
     ],
   },
+  {
+    num: '11',
+    icon: '🖋️',
+    title: 'Ghostwriting Services',
+    anchor: 'ghostwriting',
+    description:
+      'Our ghostwriting team works in your voice to deliver a manuscript that is authentically yours — from short-form ministry booklets to full-length trade books.',
+    services: [
+      { name: 'Ghostwriting – Short', desc: 'Short nonfiction, devotionals, ministry booklets, memoir. 10,000–25,000 words.' },
+      { name: 'Ghostwriting – Standard', desc: 'Full-length nonfiction, faith-based books, memoir, self-help. 25,000–50,000 words.' },
+      { name: 'Ghostwriting – Extended', desc: 'Extended nonfiction, trade books, comprehensive ministry and leadership titles. 50,000–75,000 words.' },
+      { name: 'Ghostwriting – Premium', desc: 'Major trade books, legacy projects, flagship ministry titles. 75,000–100,000 words.' },
+      { name: 'Anthology Creation', desc: 'Multi-contributor compilations — churches, author collectives, memorial volumes. Scope varies; Publisher-reviewed.' },
+    ],
+  },
 ] as const
 
 export const comingSoonServices = [

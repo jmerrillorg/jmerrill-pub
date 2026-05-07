@@ -5,7 +5,7 @@ import { useState } from 'react'
 type Field = {
   name: string
   label: string
-  type?: 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox'
+  type?: 'text' | 'email' | 'tel' | 'date' | 'textarea' | 'select' | 'checkbox'
   kind?: 'field' | 'section'
   required?: boolean
   placeholder?: string
@@ -89,7 +89,7 @@ export function AuthorSetupForm({
               <div key={field.name} className="sm:col-span-2">
                 <div className="rounded-3xl border border-blue-500/15 bg-blue-500/[0.06] px-5 py-4">
                   <div className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">{field.label}</div>
-                  {field.note ? <p className="mt-2 max-w-[760px] text-[13px] font-light leading-[1.7] text-white/38">{field.note}</p> : null}
+                  {field.note ? <p className="mt-2 max-w-[760px] text-[13px] font-light leading-[1.7] text-white/60">{field.note}</p> : null}
                 </div>
               </div>
             )
@@ -143,6 +143,7 @@ export function AuthorSetupForm({
                   required={field.required}
                   placeholder={field.placeholder}
                   className={fieldClass}
+                  style={field.type === 'date' ? { colorScheme: 'dark' } : undefined}
                 />
               )}
               {field.note ? <p className="mt-2 text-[12px] leading-[1.6] text-white/25">{field.note}</p> : null}
@@ -186,6 +187,12 @@ export const onboardingFields: Field[] = [
   { name: 'preferredName', label: 'Preferred name' },
   { name: 'email', label: 'Email', type: 'email', required: true },
   { name: 'phone', label: 'Phone', type: 'tel', required: true },
+  {
+    name: 'birthday',
+    label: 'Date of birth',
+    type: 'date',
+    note: 'Used for account verification and personalized anniversary recognition.',
+  },
   { name: 'mailingAddress', label: 'Mailing address', type: 'textarea', required: true },
   {
     kind: 'section',

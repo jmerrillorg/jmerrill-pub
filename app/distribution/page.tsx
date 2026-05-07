@@ -173,6 +173,10 @@ export default function DistributionPage() {
               Ingram Content&apos;s managed digital sales program includes structured relationships across retail, library, subscription, and education channels. All 47 are available to J Merrill titles through our distribution partnership.
             </p>
 
+            <p className="text-[14px] text-white/35 font-light max-w-[760px] leading-[1.75] mb-8">
+              All eBook titles distribute exclusively through Ingram Content&apos;s digital distribution network, reaching Apple Books, Kobo, Barnes &amp; Noble Nook, library platforms, and global digital retailers.
+            </p>
+
             {/* Filter */}
             <div className="flex flex-wrap gap-2 mb-8">
               {FILTER_LABELS.map(f => {

@@ -104,7 +104,7 @@ type JoinFormState = {
   stateProvince: string
   country: string
   authorBio: string
-  submissionUrl: string
+  manuscriptUrl: string
   existingPlatform: string
   returningAuthor: boolean
   priorTitles: string
@@ -135,7 +135,7 @@ const initialForm: JoinFormState = {
   stateProvince: '',
   country: 'United States',
   authorBio: '',
-  submissionUrl: '',
+  manuscriptUrl: '',
   existingPlatform: '',
   returningAuthor: false,
   priorTitles: '',
@@ -555,16 +555,33 @@ export default function JoinForm() {
               className={fieldClass}
             />
           </div>
+        </div>
 
+        <div className="bg-blue-500/[0.04] border border-blue-500/15 rounded-3xl p-6">
+          <p
+            className="text-[11px] font-medium tracking-[0.1em] uppercase text-blue-400/70 mb-1"
+            style={{ fontFamily: "'DM Mono', monospace" }}
+          >
+            Your Manuscript
+          </p>
+          <p className="text-[13px] text-white/35 mb-4 leading-[1.6]">
+            Sharing your manuscript or a sample chapter helps us begin your editorial review immediately — no back-and-forth required.
+          </p>
+
+          <label className={labelClass} style={{ fontFamily: "'DM Mono', monospace" }}>
+            Manuscript or Sample Chapter Link
+          </label>
           <div>
-            <label className={labelClass} style={{ fontFamily: "'DM Mono', monospace" }}>Existing Manuscript or Sample</label>
             <input
               type="url"
-              value={form.submissionUrl}
-              onChange={set('submissionUrl')}
-              placeholder="Link to a Google Doc, Dropbox, or OneDrive file if you'd like to share a sample (optional)"
+              value={form.manuscriptUrl}
+              onChange={set('manuscriptUrl')}
+              placeholder="Paste a Google Drive, Dropbox, or OneDrive link"
               className={fieldClass}
             />
+            <p className="text-[11px] text-white/25 mt-1.5">
+              Make sure sharing is set to &quot;Anyone with the link can view.&quot; DOCX or PDF preferred. This field is optional — you can share it later.
+            </p>
           </div>
         </div>
 

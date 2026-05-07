@@ -10,7 +10,7 @@ import { serviceCatalog, serviceInnovationPipeline } from '@/lib/content'
 export const metadata: Metadata = {
   title: 'Publishing Services',
   description:
-    'Full-spectrum publishing services across editorial, design, AI, marketing, distribution, and author growth infrastructure.',
+    'Full-service publishing, editorial, design, audiobook production, marketing, and ghostwriting services. J Merrill Publishing — Helping Authors Help Themselves.',
 }
 
 export default function ServicesPage() {

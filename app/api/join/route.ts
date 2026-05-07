@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     const comparableBooks = cleanString(body.comparableBooks)
     const publishTimeline = cleanString(body.publishTimeline)
     const authorBio = cleanString(body.authorBio)
-    const submissionUrl = cleanString(body.submissionUrl)
+    const manuscriptUrl = cleanString(body.manuscriptUrl || body.submissionUrl)
     const existingPlatform = cleanString(body.existingPlatform)
     const returningAuthor = asBoolean(body.returningAuthor)
     const priorTitles = cleanString(body.priorTitles)
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
       allowAiAssistedEditing: asBoolean(body.allowAiEditing),
 
       authorBio: authorBio || null,
-      submissionUrl: submissionUrl || null,
+      manuscriptUrl: manuscriptUrl || null,
       existingPlatform: existingPlatform || null,
 
       returningAuthor,

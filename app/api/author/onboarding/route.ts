@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
       preferredName: cleanString(body.preferredName),
       email: cleanString(body.email),
       phone: cleanString(body.phone),
+      birthday: cleanString(body.birthday) || null,
       mailingAddress: cleanString(body.mailingAddress),
       bookTitle: cleanString(body.bookTitle),
       subtitle: cleanString(body.subtitle),
