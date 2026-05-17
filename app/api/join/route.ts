@@ -45,6 +45,19 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    if (
+      asBoolean(body.wereYouReferred) &&
+      (!cleanString(body.referrerType) ||
+        !cleanString(body.referrerFirstName) ||
+        !cleanString(body.referrerLastName) ||
+        !cleanString(body.referrerEmail))
+    ) {
+      return NextResponse.json(
+        { error: 'Please fill in all required fields and confirm consent to continue.' },
+        { status: 400 },
+      )
+    }
+
     const firstName = cleanString(body.firstName)
     const lastName = cleanString(body.lastName)
     const email = cleanString(body.email)
@@ -67,6 +80,13 @@ export async function POST(req: NextRequest) {
     const existingPlatform = cleanString(body.existingPlatform)
     const returningAuthor = asBoolean(body.returningAuthor)
     const priorTitles = cleanString(body.priorTitles)
+    const wereYouReferred = asBoolean(body.wereYouReferred)
+    const referrerType = cleanString(body.referrerType)
+    const referrerFirstName = cleanString(body.referrerFirstName)
+    const referrerLastName = cleanString(body.referrerLastName)
+    const referrerEmail = cleanString(body.referrerEmail)
+    const referrerPhone = cleanString(body.referrerPhone)
+    const referralNotes = cleanString(body.referralNotes)
     const consentToContact = asBoolean(body.consentToContact)
     const consentToTerms = asBoolean(body.consentToTerms)
     const message = cleanString(body.message)
@@ -108,6 +128,22 @@ export async function POST(req: NextRequest) {
 
       returningAuthor,
       priorTitles: priorTitles || null,
+      referral: {
+        wereYouReferred,
+        referrerType: referrerType || null,
+        referrerFirstName: referrerFirstName || null,
+        referrerLastName: referrerLastName || null,
+        referrerEmail: referrerEmail || null,
+        referrerPhone: referrerPhone || null,
+        referralNotes: referralNotes || null,
+      },
+      wereYouReferred,
+      referrerType: referrerType || null,
+      referrerFirstName: referrerFirstName || null,
+      referrerLastName: referrerLastName || null,
+      referrerEmail: referrerEmail || null,
+      referrerPhone: referrerPhone || null,
+      referralNotes: referralNotes || null,
 
       purpose: message || null,
 

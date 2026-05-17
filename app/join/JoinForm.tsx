@@ -81,6 +81,14 @@ const TIMEZONES = [
   'Other',
 ]
 
+const REFERRER_TYPES = [
+  'J Merrill Publishing Author',
+  'Friend or Family',
+  'Professional Network',
+  'Ministry or Organization',
+  'Other',
+]
+
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
 type JoinFormState = {
@@ -108,6 +116,13 @@ type JoinFormState = {
   existingPlatform: string
   returningAuthor: boolean
   priorTitles: string
+  wereYouReferred: boolean
+  referrerType: string
+  referrerFirstName: string
+  referrerLastName: string
+  referrerEmail: string
+  referrerPhone: string
+  referralNotes: string
   consentToContact: boolean
   consentToTerms: boolean
   timezone: string
@@ -139,6 +154,13 @@ const initialForm: JoinFormState = {
   existingPlatform: '',
   returningAuthor: false,
   priorTitles: '',
+  wereYouReferred: false,
+  referrerType: '',
+  referrerFirstName: '',
+  referrerLastName: '',
+  referrerEmail: '',
+  referrerPhone: '',
+  referralNotes: '',
   consentToContact: false,
   consentToTerms: false,
   timezone: '',
@@ -197,7 +219,12 @@ export default function JoinForm() {
       !form.manuscriptStatus ||
       !form.consentToContact ||
       !form.consentToTerms ||
-      (form.returningAuthor && !form.priorTitles)
+      (form.returningAuthor && !form.priorTitles) ||
+      (form.wereYouReferred &&
+        (!form.referrerType ||
+          !form.referrerFirstName ||
+          !form.referrerLastName ||
+          !form.referrerEmail))
     ) {
       setErrorMsg('Please fill in all required fields and confirm consent to continue.')
       return
@@ -328,6 +355,123 @@ export default function JoinForm() {
               <p className="text-[11px] text-white/25 mt-1.5">
                 This helps us pull up your author record and fast-track your intake.
               </p>
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className={labelClass} style={{ fontFamily: "'DM Mono', monospace" }}>
+            Were you referred to J Merrill Publishing?
+          </label>
+          <div className="flex gap-3 mt-1">
+            {['No', 'Yes'].map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() =>
+                  setForm((current) => ({
+                    ...current,
+                    wereYouReferred: opt === 'Yes',
+                    referrerType: opt === 'No' ? '' : current.referrerType,
+                    referrerFirstName: opt === 'No' ? '' : current.referrerFirstName,
+                    referrerLastName: opt === 'No' ? '' : current.referrerLastName,
+                    referrerEmail: opt === 'No' ? '' : current.referrerEmail,
+                    referrerPhone: opt === 'No' ? '' : current.referrerPhone,
+                    referralNotes: opt === 'No' ? '' : current.referralNotes,
+                  }))
+                }
+                className={`${togglePillClass} ${
+                  (opt === 'Yes' ? form.wereYouReferred : !form.wereYouReferred)
+                    ? pillSelectedClass
+                    : pillUnselectedClass
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+
+          {form.wereYouReferred && (
+            <div className="mt-4 flex flex-col gap-4">
+              <div>
+                <label className={labelClass} style={{ fontFamily: "'DM Mono', monospace" }}>
+                  How do you know the person or organization who referred you? <span className="text-blue-500">*</span>
+                </label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {REFERRER_TYPES.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setTag('referrerType', type)}
+                      className={`${pillClass} ${form.referrerType === type ? pillSelectedClass : pillUnselectedClass}`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass} style={{ fontFamily: "'DM Mono', monospace" }}>
+                    Referrer first name <span className="text-blue-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.referrerFirstName}
+                    onChange={set('referrerFirstName')}
+                    className={fieldClass}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass} style={{ fontFamily: "'DM Mono', monospace" }}>
+                    Referrer last name <span className="text-blue-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.referrerLastName}
+                    onChange={set('referrerLastName')}
+                    className={fieldClass}
+                  />
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass} style={{ fontFamily: "'DM Mono', monospace" }}>
+                    Referrer email <span className="text-blue-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={form.referrerEmail}
+                    onChange={set('referrerEmail')}
+                    className={fieldClass}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass} style={{ fontFamily: "'DM Mono', monospace" }}>
+                    Referrer phone, optional
+                  </label>
+                  <input
+                    type="tel"
+                    value={form.referrerPhone}
+                    onChange={set('referrerPhone')}
+                    className={fieldClass}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass} style={{ fontFamily: "'DM Mono', monospace" }}>
+                  Anything else we should know about the referral?
+                </label>
+                <textarea
+                  value={form.referralNotes}
+                  onChange={set('referralNotes')}
+                  rows={3}
+                  className={`${fieldClass} resize-none`}
+                />
+              </div>
             </div>
           )}
         </div>
