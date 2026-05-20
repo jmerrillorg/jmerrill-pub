@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     default:  'J Merrill Publishing, Inc. — Helping Authors Help Themselves',
   },
   description:
-    'J Merrill Publishing, Inc. is a full-service publisher helping authors own their intellectual property and reach readers worldwide. 101+ titles in print. 45,000+ global retail outlets via Ingram. Founded 2018, Columbus, Ohio. A J Merrill One company.',
+    'J Merrill Publishing, Inc. is a full-service publisher helping authors own their intellectual property and reach readers worldwide. 125+ titles in print. 45,000+ global retail outlets via Ingram. Founded 2018, Columbus, Ohio. A J Merrill One company.',
   keywords: [
     'full-service publisher',
     'book publishing',

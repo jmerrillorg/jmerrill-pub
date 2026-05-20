@@ -26,7 +26,7 @@ export function CredibilityStrip() {
       <div className="max-w-[1280px] mx-auto px-12 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-8 flex-wrap">
           {[
-            { n: '101+',     l: 'Titles in print globally' },
+            { n: '125+',     l: 'Titles in print globally' },
             { n: '45,000+',  l: 'Global retail outlets via Ingram' },
             { n: '450+',     l: 'Ingram Content digital partners' },
             { n: 'GPO',      l: 'Registered publisher' },

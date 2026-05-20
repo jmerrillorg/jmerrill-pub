@@ -1,7 +1,6 @@
 import { Fragment } from 'react'
 import { HeroSection } from '@/components/sections/HeroSection'
 import {
-  Ticker,
   PackagesSection,
   ServicesSection,
   DistributionBand,
@@ -20,7 +19,6 @@ import {
   PullQuote,
 } from '@/components/sections/UpgradedSections'
 import { homePageSectionOrder } from '@/lib/site-architecture'
-import { HomeArchitectureSection } from '@/components/home/modules/HomeArchitectureSection'
 import { HomeFamilyOnboardingSection } from '@/components/home/modules/HomeFamilyOnboardingSection'
 import { HomePlatformSection } from '@/components/home/modules/HomePlatformSection'
 
@@ -29,7 +27,6 @@ const sectionRegistry: Record<(typeof homePageSectionOrder)[number], React.React
     <>
       <HeroSection />
       <CredibilityStrip />
-      <Ticker />
     </>
   ),
   'operating-system': <PublishingSystemSection />,
@@ -57,7 +54,6 @@ const sectionRegistry: Record<(typeof homePageSectionOrder)[number], React.React
       />
     </>
   ),
-  architecture: <HomeArchitectureSection />,
   memberships: (
     <>
       <MembershipsSection />

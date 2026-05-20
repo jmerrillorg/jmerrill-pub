@@ -32,7 +32,6 @@ export const homePageSectionOrder = [
   'onboarding',
   'packages',
   'imprints',
-  'architecture',
   'memberships',
   'platform',
   'closing',
