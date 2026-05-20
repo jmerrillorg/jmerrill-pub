@@ -11,6 +11,15 @@ type Field = {
   placeholder?: string
   options?: string[]
   note?: string
+  showWhen?: {
+    field: string
+    value: string
+  }
+  helperWhen?: {
+    field: string
+    value: string
+    note: string
+  }
 }
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
@@ -20,12 +29,14 @@ export function AuthorSetupForm({
   submitLabel,
   successTitle,
   successMessage,
+  failureMessage,
   fields,
 }: {
   endpoint: string
   submitLabel: string
   successTitle: string
   successMessage: string
+  failureMessage?: string
   fields: Field[]
 }) {
   const [values, setValues] = useState<Record<string, string>>(() =>
@@ -42,10 +53,44 @@ export function AuthorSetupForm({
     setValues((current) => ({ ...current, [name]: value }))
   }
 
+  function getFieldValue(name: string) {
+    return values[name] || ''
+  }
+
+  function matchesCondition(field?: Field['showWhen'] | Field['helperWhen']) {
+    if (!field) return true
+    return getFieldValue(field.field) === field.value
+  }
+
+  function isEmailValid(value: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+  }
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
-    setStatus('submitting')
     setError('')
+
+    const visibleFields = fields.filter((field) => field.kind !== 'section' && matchesCondition(field.showWhen))
+    const missingRequired = visibleFields.find((field) => field.required && !getFieldValue(field.name).trim())
+
+    if (missingRequired) {
+      setStatus('error')
+      if (missingRequired.name === 'rightsHolderConfirmed') {
+        setError('Please confirm that you own or control the rights necessary to publish this work before continuing.')
+      } else {
+        setError('Please complete all required fields before submitting.')
+      }
+      return
+    }
+
+    const emailValue = getFieldValue('email').trim()
+    if (emailValue && !isEmailValid(emailValue)) {
+      setStatus('error')
+      setError('Please enter a valid email address before continuing.')
+      return
+    }
+
+    setStatus('submitting')
 
     try {
       const response = await fetch(endpoint, {
@@ -61,7 +106,7 @@ export function AuthorSetupForm({
       setStatus('success')
     } catch (err: any) {
       setStatus('error')
-      setError(err.message || 'Something went wrong. Please try again.')
+      setError(err.message || failureMessage || 'Something went wrong. Please try again.')
     }
   }
 
@@ -93,6 +138,10 @@ export function AuthorSetupForm({
                 </div>
               </div>
             )
+          }
+
+          if (!matchesCondition(field.showWhen)) {
+            return null
           }
 
           const isWide = field.type === 'textarea' || field.type === 'checkbox' || field.name.includes('Address') || field.name.includes('notes') || field.name.includes('Links') || field.name.includes('titleList') || field.name.includes('Description') || field.name.includes('Vision')
@@ -147,6 +196,9 @@ export function AuthorSetupForm({
                 />
               )}
               {field.note ? <p className="mt-2 text-[12px] leading-[1.6] text-white/25">{field.note}</p> : null}
+              {field.helperWhen && matchesCondition(field.helperWhen) ? (
+                <p className="mt-2 text-[12px] leading-[1.6] text-blue-300/80">{field.helperWhen.note}</p>
+              ) : null}
             </div>
           )
         })}
@@ -235,11 +287,11 @@ export const onboardingFields: Field[] = [
     note: 'Lightweight rights screening. Formal contract, permissions, and legal review remain separate from this intake.',
   },
   {
-    name: 'originalWorkConfirmation',
-    label: 'Original work confirmation',
+    name: 'rightsHolderConfirmed',
+    label: 'Rights holder confirmation',
     type: 'checkbox',
     required: true,
-    placeholder: 'I confirm this work is original to me/us or that I am prepared to provide permissions for any third-party material.',
+    placeholder: 'I confirm that I own or control the rights necessary to publish this work, or I am authorized to act on behalf of the rights holder.',
   },
   {
     name: 'hasCoAuthors',
@@ -277,10 +329,66 @@ export const onboardingFields: Field[] = [
     options: ['Share my story', 'Build authority', 'Ministry / speaking', 'Professional author platform', 'Legacy project', 'Other'],
   },
   {
-    name: 'packageInterest',
-    label: 'Package interest',
+    name: 'packageConfirmation',
+    label: 'Package confirmation',
     type: 'select',
-    options: ['Starter', 'Pro', 'Signature', 'Not sure yet'],
+    required: true,
+    options: [
+      'Starter Publishing Package',
+      'Professional Publishing Package',
+      'Signature Publishing Package',
+      'JM Prestige / Publishing Partner',
+      'Custom Bundle / Special Agreement',
+      'Not sure yet',
+    ],
+  },
+  {
+    name: 'audiobookInterest',
+    label: 'Audiobook interest',
+    type: 'select',
+    options: [
+      'Not sure yet',
+      'Yes — Azure AI narration',
+      'Yes — human narration',
+      'No audiobook at this time',
+    ],
+  },
+  {
+    name: 'acxAudiblePreference',
+    label: 'ACX / Audible preference',
+    type: 'select',
+    options: [
+      'Not applicable',
+      'Open to CoreSource audiobook distribution',
+      'Prefers ACX / Audible direct',
+      'Needs recommendation',
+    ],
+  },
+  {
+    name: 'w9Status',
+    label: 'W-9 status',
+    type: 'select',
+    options: [
+      'Not yet submitted',
+      'Ready to submit',
+      'Already submitted',
+      'Not applicable',
+    ],
+  },
+  {
+    name: 'multiTitleIntent',
+    label: 'Are you onboarding more than one book?',
+    type: 'select',
+    options: [
+      'No — one book only',
+      'Yes — multiple books',
+      'Not sure yet',
+    ],
+    helperWhen: {
+      field: 'multiTitleIntent',
+      value: 'Yes — multiple books',
+      note: 'For now, please complete this onboarding for the primary title. Our team will capture additional titles separately if needed.',
+    },
   },
   { name: 'authorBio', label: 'Author bio', type: 'textarea', placeholder: 'Short author bio, credentials, ministry, business, or story context.' },
   { name: 'authorPlatform', label: 'Author platform', type: 'textarea', placeholder: 'Ministry, business, speaking, nonprofit, community, media, or professional platform.' },

@@ -107,17 +107,21 @@ export async function POST(req: NextRequest) {
       timezone: timezone || null,
 
       projectTitle: bookTitle,
+      bookTitle,
       workType: workType || null,
       genre,
       manuscriptStatus: manuscriptStatus || null,
       estimatedWordCount: wordCount,
+      estimatedWords: cleanString(body.wordCount) || null,
       imprint: deriveImprint(genre, cleanString(body.imprint)),
 
       goals: goal,
+      goal,
       primaryTargetAudience: primaryAudience || null,
       comparableBooks: comparableBooks || null,
 
       desiredPublishingTimeline: publishTimeline || null,
+      publishDate: publishTimeline || null,
       needBrandingSupport: asBoolean(body.needsBranding),
       needMarketingSupport: asBoolean(body.needsMarketing),
       allowAiAssistedEditing: asBoolean(body.allowAiEditing),
@@ -146,6 +150,7 @@ export async function POST(req: NextRequest) {
       referralNotes: referralNotes || null,
 
       purpose: message || null,
+      message: message || null,
 
       consentToContact,
       consentToTerms,

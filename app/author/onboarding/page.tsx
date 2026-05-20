@@ -26,7 +26,8 @@ export default function AuthorOnboardingPage() {
           fields={onboardingFields}
           submitLabel="Submit onboarding"
           successTitle="Onboarding received."
-          successMessage="Your author onboarding details have been received. The publishing team will review your setup and follow up with next steps."
+          successMessage="Thank you. Your author onboarding information has been received by J Merrill Publishing. Our team will review your submission and follow up with next steps."
+          failureMessage="We could not submit your onboarding form at this time. Please try again or contact publishing@jmerrill.one."
         />
       </AuthorGate>
     </AuthorPortalShell>
