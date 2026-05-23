@@ -123,7 +123,7 @@ export function PackagesSection() {
       <div className="max-w-[1280px] mx-auto relative z-10">
 
         {/* Header */}
-        <div className="flex justify-between items-end mb-16">
+        <div className="grid lg:grid-cols-[1fr_auto] gap-8 items-end mb-16">
           <div>
             <Kicker light>Publishing Packages</Kicker>
             <h2
@@ -134,9 +134,12 @@ export function PackagesSection() {
                 fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em',
               }}
             >
-              Choose your<br />
-              <em className="not-italic italic text-blue-500">publishing path</em>
+              Publishing options<br />
+              <em className="not-italic italic text-blue-500">for serious authors</em>
             </h2>
+            <p className="text-[15px] font-light text-white/45 leading-[1.8] mt-5 max-w-[560px] reveal reveal-delay-2">
+              Every book does not need the same level of support. Our publishing paths are designed to match the manuscript, the author’s goals, and the level of guidance needed to bring the work into the world professionally.
+            </p>
           </div>
           <Link
             href="/packages"
@@ -168,6 +171,11 @@ export function PackagesSection() {
               >
                 {pkg.sku}
               </div>
+              {pkg.tier === 'Signature' && (
+                <div className="text-[11px] text-blue-400 mb-3 uppercase tracking-[0.1em]" style={{ fontFamily: "'DM Mono', monospace" }}>
+                  Selective publishing path
+                </div>
+              )}
               <div
                 className="text-white mb-2"
                 style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '32px', fontWeight: 700 }}
@@ -187,6 +195,13 @@ export function PackagesSection() {
               >
                 Up to {pkg.wordLimit} words
               </div>
+              <p className="text-[13px] font-light text-white/45 leading-[1.7] mb-6">
+                {pkg.tier === 'Starter'
+                  ? 'A clear starting point for authors who need professional structure, polish, and a guided way into publishing.'
+                  : pkg.tier === 'Professional'
+                    ? 'A stronger publishing path for authors who want deeper editorial support, broader production care, and a more developed release.'
+                    : 'A selective publishing path for works that require elevated positioning, expanded guidance, or prestige presentation.'}
+              </p>
               <div className="w-full h-px bg-white/8 mb-7" />
               <ul className="flex flex-col gap-3 flex-1 mb-10">
                 {pkg.features.map((feat) => (
@@ -204,16 +219,20 @@ export function PackagesSection() {
                     : 'border-white/15 text-white/60 hover:border-blue-500 hover:text-blue-400'
                 }`}
               >
-                Get Started
+                {pkg.tier === 'Starter'
+                  ? 'Explore Starter'
+                  : pkg.tier === 'Professional'
+                    ? 'Explore Professional'
+                    : 'Apply for Signature'}
               </Link>
             </div>
           ))}
         </div>
 
         <p className="text-center text-[14px] text-white/25 mt-8 reveal">
-          All packages include digital distribution support through our Ingram Content partnership. Audiobook, children&apos;s, large print, and 90+ add-on services available.{' '}
+          Every package is designed to give authors a professional path into the marketplace while preserving ownership and long-term support.{' '}
           <Link href="/services" className="text-sky-400/70 hover:text-sky-400 transition-colors">
-            View full catalog →
+            Explore publishing services →
           </Link>
         </p>
       </div>
@@ -551,7 +570,7 @@ export function ClosingCTA() {
           className="text-[11px] font-medium tracking-[0.16em] uppercase text-blue-400 mb-7"
           style={{ fontFamily: "'DM Mono', monospace" }}
         >
-          Ready to publish?
+          Final invitation
         </div>
         <h2
           className="text-white mb-5"
@@ -561,18 +580,18 @@ export function ClosingCTA() {
             fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.03em',
           }}
         >
-          Your story deserves<br />
-          to be <em className="not-italic italic text-blue-500">heard</em>
+          Ready to share your<br />
+          <em className="not-italic italic text-blue-500">story with the world?</em>
         </h2>
         <p className="text-[18px] font-light text-white/45 max-w-[520px] mx-auto leading-[1.7] mb-12">
-          Tell us about your book and your vision. We'll match you with the right package and walk you through every step — from manuscript to marketplace.
+          Tell us about your book, your message, and where you are in the journey. We will help you understand the right publishing path and the next step forward.
         </p>
         <div className="flex items-center justify-center gap-4 flex-wrap">
           <Link
             href="/join"
             className="inline-flex items-center gap-2.5 bg-blue-500 text-white text-[14px] font-semibold tracking-[0.06em] uppercase px-11 py-[18px] rounded-full hover:bg-blue-600 transition-all duration-250 hover:-translate-y-0.5 shadow-blue-cta"
           >
-            Complete the Inquiry Form →
+            Tell Us About Your Book →
           </Link>
           <a
             href="https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled"
@@ -580,7 +599,7 @@ export function ClosingCTA() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2.5 bg-transparent text-white/60 text-[14px] font-light px-11 py-[18px] rounded-full border-[1.5px] border-white/15 hover:border-blue-500 hover:text-blue-400 transition-all duration-250 hover:-translate-y-0.5"
           >
-            Schedule a Call First
+            Talk With Our Publishing Team
           </a>
         </div>
       </div>
