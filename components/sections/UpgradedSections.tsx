@@ -182,7 +182,7 @@ export function WhyAuthorsChooseSection() {
               <h3 className="text-white mb-3" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '26px', fontWeight: 700, lineHeight: 1.18 }}>
                 {pillar.title}
               </h3>
-              <p className="text-[14px] font-light leading-[1.8] text-white/48">{pillar.body}</p>
+              <p className="text-[14px] font-light leading-[1.8] text-white/70">{pillar.body}</p>
             </div>
           ))}
         </div>
@@ -191,7 +191,7 @@ export function WhyAuthorsChooseSection() {
           {proofPoints.map((point) => (
             <div key={point} className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2.5">
               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-              <span className="text-[12px] text-white/68">{point}</span>
+              <span className="text-[12px] text-white/80">{point}</span>
             </div>
           ))}
         </div>
