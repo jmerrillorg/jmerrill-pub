@@ -1,5 +1,12 @@
 # JM1-PUB-PAGE-AUDIT-AUTHORFIRST-001
 
+**Workstream:** JM1-PUB-PAGE-AUDIT-AUTHORFIRST-001
+**Doctrine:** JM1-WEB-WHYFIRST-DOCTRINE-v1.0
+**Document type:** Author-first page audit map
+**Status:** Approved for documentation commit; ready for first implementation workstream
+**Scope:** Remaining jmerrill.pub public pages after homepage author-first rewrite
+**Proving instance:** J Merrill Publishing, Inc. — `jmerrill.pub`
+
 ## 1. Purpose
 
 This document audits the remaining public jmerrill.pub pages against the approved Why-First Doctrine and the author-first homepage standard now established under `JM1-PUB-HOMEPAGE-AUTHORFIRST-REWRITE-001`.
@@ -613,7 +620,17 @@ Why this sequence:
 
 ---
 
-## 9. Guardrails
+## 9. Next Implementation Workstream
+
+The first implementation workstream following this audit map is:
+
+- `JM1-PUB-PUBLISHING-AUTHORFIRST-REWRITE-001`
+
+This route should be treated as the next highest-priority page-level implementation after the homepage rewrite because it defines the publishing relationship in author language and supports the strongest acquisition decisions.
+
+---
+
+## 10. Guardrails
 
 Do not change as part of this audit planning work:
 - `/join`
@@ -629,7 +646,7 @@ Author-first repositioning should happen in the web presentation layer only unle
 
 ---
 
-## 10. Approval Block
+## 11. Approval Block
 
 | Item | Status |
 |---|---|
@@ -639,5 +656,7 @@ Author-first repositioning should happen in the web presentation layer only unle
 | Phase 2 pages audited | Complete |
 | Phase 3 page audited | Complete |
 | Recommended rewrite sequence proposed | Complete |
+| Next implementation workstream identified | Complete |
 | Code changes made | None |
-| Ready for review | Yes |
+| Documentation commit approved | Approved |
+| Ready for first implementation workstream | Approved |
