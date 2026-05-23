@@ -227,7 +227,7 @@ export default function PublishingPage() {
               >
                 {pillar.title}
               </h3>
-              <p className="text-[14px] font-light leading-[1.8] text-white/58">{pillar.body}</p>
+              <p className="text-[14px] font-light leading-[1.8] text-white/70">{pillar.body}</p>
             </div>
           ))}
         </div>
@@ -281,7 +281,7 @@ export default function PublishingPage() {
               >
                 {item.title}
               </h3>
-              <p className="text-[14px] font-light leading-[1.8] text-white/58">{item.body}</p>
+              <p className="text-[14px] font-light leading-[1.8] text-white/70">{item.body}</p>
             </div>
           ))}
         </div>
@@ -370,14 +370,14 @@ export default function PublishingPage() {
       >
         <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-8">
-            <p className="text-[16px] font-light leading-[1.9] text-white/62">
+            <p className="text-[16px] font-light leading-[1.9] text-white/70">
               Publishing with J Merrill means professional support without losing your voice. We work to preserve the identity of the author, protect the integrity of the message, and help the work reach readers with strength, clarity, and care.
             </p>
           </div>
           <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-8">
             <ul className="flex flex-col gap-4">
               {authorKeeps.map((item) => (
-                <li key={item} className="flex items-start gap-3 text-[15px] text-white/74">
+                <li key={item} className="flex items-start gap-3 text-[15px] text-white/80">
                   <span className="mt-0.5 text-blue-400">•</span>
                   {item}
                 </li>
