@@ -53,6 +53,225 @@ export function CredibilityStrip() {
   )
 }
 
+export function ChooseYourPathSection() {
+  const paths = [
+    {
+      title: 'I want to publish my book',
+      body: 'For authors with a manuscript, message, or completed draft ready for professional publishing guidance.',
+      cta: 'Tell Us About Your Book',
+      href: '/join',
+      featured: true,
+    },
+    {
+      title: 'I want to explore the books',
+      body: 'See the authors, voices, and titles already part of the J Merrill Publishing family.',
+      cta: 'Browse the Catalog',
+      href: '/books',
+      featured: false,
+    },
+    {
+      title: 'I’m already a JMP author',
+      body: 'Access author support, memberships, next-title guidance, and long-term publishing resources.',
+      cta: 'Author Support',
+      href: '/authors',
+      featured: false,
+    },
+  ]
+
+  return (
+    <section className="py-[120px] px-12 bg-white">
+      <div className="max-w-[1280px] mx-auto">
+        <div className="max-w-[760px] mb-14">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-8 h-px bg-blue-500 block" />
+            <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-blue-500" style={{ fontFamily: "'DM Mono', monospace" }}>
+              Choose Your Path
+            </span>
+          </div>
+          <h2 className="text-charcoal reveal reveal-delay-1" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(36px,4vw,56px)', fontWeight: 700, lineHeight: 1.08, letterSpacing: '-0.02em' }}>
+            Where are you<br /><em className="not-italic italic text-blue-500">in the journey?</em>
+          </h2>
+          <p className="text-[16px] font-light text-gray-500 leading-[1.85] mt-5 reveal reveal-delay-2">
+            Every author arrives at a different point. Some have a finished manuscript. Some have an idea. Some are ready to publish now. Choose the path that sounds most like you.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-4 reveal reveal-delay-2">
+          {paths.map((path) => (
+            <Link
+              key={path.title}
+              href={path.href}
+              className={`group rounded-3xl border p-9 transition-all duration-300 hover:-translate-y-1 ${
+                path.featured
+                  ? 'bg-[#0F1C2E] border-blue-500/25 hover:border-blue-500/50'
+                  : 'bg-gray-50 border-gray-200 hover:border-blue-300 hover:bg-blue-50/50'
+              }`}
+            >
+              <div className={`text-[10px] font-medium tracking-[0.12em] uppercase mb-5 ${path.featured ? 'text-blue-400' : 'text-gray-400'}`} style={{ fontFamily: "'DM Mono', monospace" }}>
+                {path.featured ? 'Recommended First Step' : 'Next Step'}
+              </div>
+              <h3 className={`mb-3 ${path.featured ? 'text-white' : 'text-charcoal'}`} style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '28px', fontWeight: 700, lineHeight: 1.15 }}>
+                {path.title}
+              </h3>
+              <p className={`text-[14px] font-light leading-[1.8] mb-8 ${path.featured ? 'text-white/55' : 'text-gray-500'}`}>
+                {path.body}
+              </p>
+              <span className={`inline-flex items-center gap-2 text-[13px] font-medium ${path.featured ? 'text-blue-400' : 'text-blue-500'}`}>
+                {path.cta}
+                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export function WhyAuthorsChooseSection() {
+  const pillars = [
+    {
+      title: 'Your work stays yours',
+      body: 'We help you publish professionally without taking ownership of your story, your message, or your name.',
+    },
+    {
+      title: 'You are guided through the process',
+      body: 'From editorial review to design, distribution, and launch support, you are not left to figure out the road alone.',
+    },
+    {
+      title: 'Your book is built for the marketplace',
+      body: 'We prepare your title with the metadata, formatting, distribution setup, and presentation needed to reach real readers.',
+    },
+    {
+      title: 'You join a publishing family',
+      body: 'One book may begin the relationship, but our goal is to support the author beyond a single release.',
+    },
+  ]
+
+  const proofPoints = [
+    '125+ titles',
+    'Five official imprints',
+    'Global distribution through Ingram’s retail and library network',
+    'Registered publisher',
+  ]
+
+  return (
+    <section className="py-[120px] px-12 bg-[#0F1C2E] relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 55% at 50% 45%, rgba(30,144,255,0.08) 0%, transparent 65%)' }} />
+      <div className="max-w-[1280px] mx-auto relative z-10">
+        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-16 mb-14 items-end">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="w-8 h-px bg-blue-400 block" />
+              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-blue-400" style={{ fontFamily: "'DM Mono', monospace" }}>
+                Why Authors Choose JMP
+              </span>
+            </div>
+            <h2 className="text-white reveal reveal-delay-1" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(36px,4vw,56px)', fontWeight: 700, lineHeight: 1.08, letterSpacing: '-0.02em' }}>
+              Trust built on<br /><em className="not-italic italic text-blue-500">care and ownership.</em>
+            </h2>
+          </div>
+          <p className="text-[16px] font-light text-white/50 leading-[1.85] pb-2 reveal reveal-delay-2">
+            Authors come to us because they want more than upload-and-pray publishing. They want guidance, professional standards, distribution access, and a publishing relationship that respects their voice and their ownership.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-4 mb-8 reveal reveal-delay-2">
+          {pillars.map((pillar) => (
+            <div key={pillar.title} className="rounded-3xl border border-white/8 bg-white/[0.04] p-8">
+              <h3 className="text-white mb-3" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '26px', fontWeight: 700, lineHeight: 1.18 }}>
+                {pillar.title}
+              </h3>
+              <p className="text-[14px] font-light leading-[1.8] text-white/48">{pillar.body}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-3 reveal reveal-delay-3">
+          {proofPoints.map((point) => (
+            <div key={point} className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2.5">
+              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+              <span className="text-[12px] text-white/68">{point}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export function HowPublishingWorksSection() {
+  const steps = [
+    {
+      step: '01',
+      title: 'Discover',
+      body: 'We learn about your book, your goals, your audience, and where you are in the process.',
+    },
+    {
+      step: '02',
+      title: 'Prepare',
+      body: 'Your manuscript is reviewed and matched with the right editorial, design, and publishing path.',
+    },
+    {
+      step: '03',
+      title: 'Produce',
+      body: 'Your book moves through editing, cover design, interior layout, formatting, and production setup.',
+    },
+    {
+      step: '04',
+      title: 'Publish',
+      body: 'We prepare your ISBN, metadata, files, and distribution setup so your book can enter the marketplace professionally.',
+    },
+    {
+      step: '05',
+      title: 'Grow',
+      body: 'After launch, we help you think about visibility, future titles, author support, and long-term opportunity.',
+    },
+  ]
+
+  return (
+    <section className="py-[120px] px-12 bg-white">
+      <div className="max-w-[1280px] mx-auto">
+        <div className="max-w-[760px] mb-14">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-8 h-px bg-blue-500 block" />
+            <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-blue-500" style={{ fontFamily: "'DM Mono', monospace" }}>
+              How Publishing Works
+            </span>
+          </div>
+          <h2 className="text-charcoal reveal reveal-delay-1" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(36px,4vw,56px)', fontWeight: 700, lineHeight: 1.08, letterSpacing: '-0.02em' }}>
+            A guided path from<br /><em className="not-italic italic text-blue-500">manuscript to marketplace.</em>
+          </h2>
+          <p className="text-[16px] font-light text-gray-500 leading-[1.85] mt-5 reveal reveal-delay-2">
+            Publishing should not feel confusing. We walk with you through a clear path from first conversation to finished book and beyond launch.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-5 gap-4 reveal reveal-delay-2">
+          {steps.map((step, index) => (
+            <div key={step.step} className="relative rounded-3xl border border-gray-200 bg-gray-50 p-8 hover:border-blue-300 hover:bg-blue-50/60 transition-all duration-300">
+              {index < steps.length - 1 && (
+                <div className="hidden lg:block absolute top-10 -right-3 z-10">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M8 6l6 6-6 6" stroke="rgba(30,144,255,0.45)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              )}
+              <div className="text-[10px] text-gray-300 mb-4" style={{ fontFamily: "'DM Mono', monospace" }}>
+                {step.step}
+              </div>
+              <h3 className="text-charcoal mb-3" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '26px', fontWeight: 700, lineHeight: 1.16 }}>
+                {step.title}
+              </h3>
+              <p className="text-[14px] font-light leading-[1.75] text-gray-500">{step.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ─────────────────────────────────────────────────────────────
 // FIX 1: PUBLISHING SYSTEM — lighter bg, better headline
 // ─────────────────────────────────────────────────────────────
@@ -136,7 +355,7 @@ export function PublishingSystemSection() {
 // ─────────────────────────────────────────────────────────────
 export function FeaturedTitlesSection() {
   const [activeImprint, setActiveImprint] = useState<string>('all')
-  const [showCount, setShowCount] = useState(24)
+  const [showCount, setShowCount] = useState(6)
 
   const filtered = activeImprint === 'all'
     ? bookCatalog
@@ -166,22 +385,24 @@ export function FeaturedTitlesSection() {
   ) as Record<string, string>
 
   return (
-    <section className="py-[120px] px-12 bg-[#070710] overflow-hidden">
+    <section id="featured-books" className="py-[120px] px-12 bg-[#070710] overflow-hidden">
       <div className="max-w-[1280px] mx-auto">
 
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10">
           <div>
             <div className="flex items-center gap-3 mb-4">
               <span className="w-8 h-px bg-blue-500 block" />
-              {/* FIX: "Proof of Authority" → "Our Catalog" — less self-congratulatory, more inviting */}
-              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-blue-400" style={{ fontFamily: "'DM Mono', monospace" }}>Our Catalog</span>
+              <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-blue-400" style={{ fontFamily: "'DM Mono', monospace" }}>Featured Books</span>
             </div>
             <h2 className="text-white reveal reveal-delay-1" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(36px,4vw,56px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-              125+ titles.<br /><em className="not-italic italic text-blue-500">Across every genre.</em>
+              Books from the<br /><em className="not-italic italic text-blue-500">JMP family.</em>
             </h2>
+            <p className="text-[16px] font-light text-white/42 leading-[1.8] mt-5 max-w-[560px]">
+              Every title represents an author who trusted us with their words. Explore a few featured works, then visit the full catalog to see more of the voices in our publishing family.
+            </p>
           </div>
           <Link href="/books" className="text-[13px] text-white/35 border-b border-white/15 pb-px hover:text-blue-400 hover:border-blue-400 transition-all mt-4 lg:mt-0 mb-2 reveal">
-            View full catalog →
+            Explore the Full Catalog →
           </Link>
         </div>
 
@@ -190,7 +411,7 @@ export function FeaturedTitlesSection() {
           {filters.map(f => (
             <button
               key={f.id}
-              onClick={() => { setActiveImprint(f.id); setShowCount(24) }}
+              onClick={() => { setActiveImprint(f.id); setShowCount(6) }}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium border transition-all duration-200 ${
                 activeImprint === f.id
                   ? 'bg-blue-500 border-blue-500 text-white'
@@ -282,12 +503,12 @@ export function FeaturedTitlesSection() {
         <div className="flex items-center justify-center gap-4 mt-8">
           <p className="text-[13px] text-white/25">
             {activeImprint === 'all'
-              ? `Showing ${displayed.length} featured titles`
+              ? 'Showing featured titles from a catalog of 125+ books.'
               : `Showing ${displayed.length} of ${filtered.length} titles · ${imprintIdToName[activeImprint] || activeImprint}`}
           </p>
           {displayed.length < filtered.length && (
             <button
-              onClick={() => setShowCount(c => c + 24)}
+              onClick={() => setShowCount(c => c + 6)}
               className="text-[13px] text-blue-400 border-b border-blue-400/30 hover:border-blue-400 transition-colors"
             >
               Load more →
@@ -353,7 +574,7 @@ export function BookAnalyzerSection() {
     : ''
 
   return (
-    <section id="analyze" className="py-[120px] px-12 bg-white overflow-hidden">
+    <section id="pathfinder" className="py-[120px] px-12 bg-white overflow-hidden">
       <div className="max-w-[1280px] mx-auto grid lg:grid-cols-2 gap-20 items-start">
 
         {/* Left */}
@@ -361,28 +582,26 @@ export function BookAnalyzerSection() {
           <div className="flex items-center gap-3 mb-5">
             <span className="w-8 h-px bg-blue-500 block" />
             <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-blue-500" style={{ fontFamily: "'DM Mono', monospace" }}>
-              AI Publishing Intelligence
+              Publishing Pathfinder
             </span>
           </div>
-          {/* FIX: "Find Your Publishing Path" → "Find Your Publishing Path" */}
           <h2 className="text-charcoal mb-4 reveal reveal-delay-1" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(36px,4vw,56px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
             Find your<br /><em className="not-italic italic text-blue-500">publishing path</em>
           </h2>
-          {/* FIX: reframed benefit copy — clarity and routing, not "analysis" */}
           <p className="text-[16px] font-light text-gray-500 leading-[1.85] mb-3 reveal reveal-delay-2">
-            Not sure where to start? Tell us about your book and your goal. In seconds, our publishing intelligence engine maps the right entry point, the right package, and the right next step — specific to your genre, your audience, and your vision.
+            Not sure where to begin? Tell us a little about your book and your goal. We will help point you toward the publishing path that fits your stage, your genre, and your vision.
           </p>
           <p className="text-[14px] font-light text-gray-400 leading-[1.7] mb-8 reveal reveal-delay-2">
-            This is not a grammar checker or a quality score. It is a decision engine — built to replace the confusion of "where do I begin?" with a clear, confident direction.
+            This is a guided recommendation designed to replace “where do I begin?” with a more confident next step.
           </p>
 
           <div className="flex flex-col gap-3 reveal reveal-delay-2">
             {[
-              { icon: '🧭', label: 'Publishing Path',          sub: 'Right entry point for your stage and goals' },
-              { icon: '📦', label: 'Package Recommendation',   sub: 'Starter / Professional / Signature — and why' },
-              { icon: '🌐', label: 'Distribution Readiness',   sub: 'What your title needs to reach its audience' },
-              { icon: '💡', label: 'Genre-Specific Insight',   sub: 'Advice tuned to your category, not generic advice' },
-              { icon: '➡️', label: 'Your Next Step',           sub: 'One clear action to move forward today' },
+              { icon: '🧭', label: 'Publishing path',        sub: 'Right entry point for your stage and goals' },
+              { icon: '📦', label: 'Guided recommendation',  sub: 'Starter, Professional, or Signature — and why' },
+              { icon: '🌐', label: 'Reader reach',           sub: 'What your title may need to reach its audience' },
+              { icon: '💡', label: 'Genre-specific insight', sub: 'Advice tuned to your category, not generic advice' },
+              { icon: '➡️', label: 'Your next step',         sub: 'One clear action to move forward today' },
             ].map(item => (
               <div key={item.label} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 border border-gray-100">
                 <span className="text-[18px]">{item.icon}</span>
@@ -393,7 +612,7 @@ export function BookAnalyzerSection() {
               </div>
             ))}
           </div>
-          <p className="text-[12px] text-gray-300 mt-4 font-light reveal">Free · No account required · Results in under 5 seconds</p>
+          <p className="text-[12px] text-gray-300 mt-4 font-light reveal">Free · No account required · A clearer next step in under 5 seconds</p>
         </div>
 
         {/* Right */}
@@ -453,7 +672,7 @@ export function BookAnalyzerSection() {
                 <div className="text-[12px] text-white/30 uppercase tracking-[0.1em]" style={{ fontFamily: "'DM Mono', monospace" }}>Your Publishing Path</div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-                  <span className="text-[11px] text-blue-400" style={{ fontFamily: "'DM Mono', monospace" }}>AI-generated</span>
+                  <span className="text-[11px] text-blue-400" style={{ fontFamily: "'DM Mono', monospace" }}>Guided recommendation</span>
                 </div>
               </div>
               <div className="flex items-start gap-6 mb-6">
@@ -461,7 +680,7 @@ export function BookAnalyzerSection() {
                   <div className={`leading-none ${scoreColor}`} style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '64px', fontWeight: 700, letterSpacing: '-0.03em' }}>
                     {result.marketabilityScore}
                   </div>
-                  <div className="text-[10px] text-white/25 uppercase tracking-[0.1em] mt-1" style={{ fontFamily: "'DM Mono', monospace" }}>Readiness Score</div>
+                  <div className="text-[10px] text-white/25 uppercase tracking-[0.1em] mt-1" style={{ fontFamily: "'DM Mono', monospace" }}>Publishing Snapshot</div>
                 </div>
                 <div className="flex flex-col gap-2 flex-1 pt-2">
                   {[
@@ -490,11 +709,11 @@ export function BookAnalyzerSection() {
                   <div className="text-[12px] text-white/40 mt-0.5">{result.packageReason}</div>
                 </div>
                 <Link href="/packages" className="flex-shrink-0 bg-blue-500 text-white text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-blue-600 transition-colors">
-                  View Package →
+                  Explore Package →
                 </Link>
               </div>
               <Link href="/join" className="mt-4 block text-center text-[13px] text-blue-400 border-b border-blue-400/20 pb-px hover:border-blue-400 transition-colors w-fit mx-auto">
-                Ready to start? Join the Family →
+                Ready to start? Tell us about your book →
               </Link>
             </div>
           )}

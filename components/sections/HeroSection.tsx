@@ -28,17 +28,15 @@ export function HeroSection() {
           style={{ background: `radial-gradient(600px circle at ${glowX} ${glowY}, rgba(30,144,255,0.04) 0%, transparent 70%)`, transition: 'background 0.3s' }}
         />
 
-        {/* Repositioned badge: Operating System, not services site */}
         <div className="flex items-center gap-3 mb-8 animate-[fadeUp_0.5s_ease_both]">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-full">
             <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
             <span className="text-[10px] font-medium tracking-[0.14em] uppercase text-blue-600" style={{ fontFamily: "'DM Mono', monospace" }}>
-              Publishing Operating System · Division 01
+              Registered Publisher · 125+ Titles
             </span>
           </div>
         </div>
 
-        {/* Canon headline from JM1 divisions/publishing page */}
         <h1
           className="mb-5 text-charcoal relative z-10"
           style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: 'clamp(48px, 5.2vw, 84px)', fontWeight: 700, lineHeight: 1.0, letterSpacing: '-0.03em' }}
@@ -49,26 +47,30 @@ export function HeroSection() {
         </h1>
 
         <p className="text-[11px] font-medium tracking-[0.1em] uppercase text-gray-400 mb-5 animate-[fadeUp_0.6s_0.5s_both]" style={{ fontFamily: "'DM Mono', monospace" }}>
-          What you write should not disappear.
+          What you wrote matters.
         </p>
 
         <p className="text-[18px] font-light leading-[1.75] text-gray-500 max-w-[500px] mb-12 animate-[fadeUp_0.7s_0.55s_both]">
-          J Merrill Publishing is a full-service publisher and publishing intelligence platform — built on enterprise infrastructure, powered by AI, governed by the JM1 operating system.
+          You wrote something that matters. J Merrill Publishing helps authors turn manuscripts, messages, and lived experience into professionally published books with care, guidance, and a path to reach readers.
+        </p>
+
+        <p className="text-[17px] font-light leading-[1.75] text-gray-500 max-w-[500px] mb-12 animate-[fadeUp_0.7s_0.62s_both]">
+          Your name belongs on the front. Your rights stay with you. We help carry the work from manuscript to marketplace.
         </p>
 
         <div className="flex items-center gap-5 flex-wrap animate-[fadeUp_0.7s_0.7s_both]">
           <Link href="/join" className="group inline-flex items-center gap-2.5 bg-blue-500 text-white text-[14px] font-semibold tracking-[0.04em] uppercase px-9 py-4 rounded-full hover:bg-blue-600 transition-all duration-250 hover:-translate-y-0.5 shadow-[0_4px_20px_rgba(30,144,255,0.35)]">
-            Join the Family
+            Tell Us About Your Book
             <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
           </Link>
-          <a href="#analyze" className="inline-flex items-center gap-2 text-[14px] font-medium text-blue-500 hover:text-blue-600 transition-colors">
+          <a href="#pathfinder" className="inline-flex items-center gap-2 text-[14px] font-medium text-blue-500 hover:text-blue-600 transition-colors">
             <span className="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-[13px]">✦</span>
             Find Your Publishing Path
           </a>
         </div>
 
         <div className="flex gap-10 mt-14 pt-8 border-t border-gray-100 animate-[fadeUp_0.7s_0.85s_both]">
-          {[['125', '+', 'Titles Published'], ['95', '+', 'Services'], ['16', '', 'Categories']].map(([n, suf, l]) => (
+          {[['125', '+', 'Titles Published'], ['5', '', 'Official Imprints'], ['Ingram', '', 'Global Distribution']].map(([n, suf, l]) => (
             <div key={l}>
               <div className="leading-none mb-1 text-charcoal" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '34px', fontWeight: 700, letterSpacing: '-0.02em' }}>
                 {n}<span className="text-blue-500">{suf}</span>
@@ -89,22 +91,21 @@ export function HeroSection() {
           <div className="relative mb-10 animate-[float_8s_ease-in-out_infinite]">
             <Image src="/logo.jpg" alt="J Merrill Publishing" width={240} height={240} className="w-[220px] h-[220px] object-contain" priority />
             <div className="absolute -top-3 -right-5 bg-blue-500 text-white text-[10px] font-semibold tracking-[0.1em] uppercase px-4 py-2 rounded-full whitespace-nowrap animate-[badgePulse_3s_ease-in-out_infinite]">
-              Vision · Creativity · Innovation
+              Protect · Honor · Share
             </div>
           </div>
 
           <p className="text-center text-[18px] leading-[1.5] text-white/55 mb-10 max-w-[300px]" style={{ fontFamily: "'Libre Baskerville', Georgia, serif", fontStyle: 'italic' }}>
-            "Every book deserves<br />a system behind it."
+            "Your story deserves<br />professional care."
           </p>
 
-          {/* System layers visual */}
           <div className="w-full max-w-[300px] flex flex-col gap-2">
             {[
-              { label: 'Editorial Intelligence', icon: '✏️' },
-              { label: 'Design & Production',    icon: '🎨' },
-              { label: 'Distribution Network',   icon: '🌐' },
-              { label: 'Marketing Engine',       icon: '📣' },
-              { label: 'AI Publishing Layer',    icon: '🤖' },
+              { label: 'Editorial guidance',        icon: '✏️' },
+              { label: 'Design & production care',  icon: '🎨' },
+              { label: 'Distribution readiness',    icon: '🌐' },
+              { label: 'Launch support',            icon: '📣' },
+              { label: 'Long-term author support',  icon: '🤝' },
             ].map((layer) => (
               <div key={layer.label} className="flex items-center gap-3 px-4 py-2.5 rounded-xl border bg-blue-500/[0.07] border-blue-500/20 hover:bg-blue-500/12 hover:border-blue-500/35 transition-all duration-200">
                 <span className="text-[14px]">{layer.icon}</span>
