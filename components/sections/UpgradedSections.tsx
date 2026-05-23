@@ -357,9 +357,13 @@ export function FeaturedTitlesSection() {
   const [activeImprint, setActiveImprint] = useState<string>('all')
   const [showCount, setShowCount] = useState(6)
 
+  const imprintIdToName = Object.fromEntries(
+    imprintCatalog.map((imprint) => [imprint.toLowerCase().replace(/[^a-z0-9]+/g, '-'), imprint]),
+  ) as Record<string, string>
+
   const filtered = activeImprint === 'all'
     ? bookCatalog
-    : bookCatalog.filter(b => b.imprint === activeImprint)
+    : bookCatalog.filter((book) => book.imprint === imprintIdToName[activeImprint])
 
   const displayed = filtered.slice(0, showCount)
 
@@ -380,10 +384,6 @@ export function FeaturedTitlesSection() {
       showCount: false,
     })),
   ]
-
-  const imprintIdToName = Object.fromEntries(
-    imprintCatalog.map((imprint) => [imprint.toLowerCase().replace(/[^a-z0-9]+/g, '-'), imprint]),
-  ) as Record<string, string>
 
   return (
     <section id="featured-books" className="py-[120px] px-12 bg-[#070710] overflow-hidden">
