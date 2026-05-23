@@ -372,11 +372,12 @@ export function FeaturedTitlesSection() {
   }
 
   const filters = [
-    { id: 'all', label: 'All Titles', count: '125+' },
+    { id: 'all', label: 'All Titles', count: '125+', showCount: true },
     ...imprintCatalog.map((imprint) => ({
       id: imprint.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       label: imprint,
-      count: bookCatalog.filter((book) => book.imprint === imprint).length,
+      count: '',
+      showCount: false,
     })),
   ]
 
@@ -419,7 +420,9 @@ export function FeaturedTitlesSection() {
               }`}
             >
               {f.label}
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeImprint === f.id ? 'bg-white/20' : 'bg-white/5'}`}>{f.count}</span>
+              {f.showCount && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeImprint === f.id ? 'bg-white/20' : 'bg-white/5'}`}>{f.count}</span>
+              )}
             </button>
           ))}
         </div>
@@ -487,7 +490,7 @@ export function FeaturedTitlesSection() {
                 {/* Hover: imprint badge + formats */}
                 <div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gradient-to-t from-black/60 to-transparent">
                   <span className={`inline-block text-[8px] font-semibold px-2 py-0.5 rounded-full border ${colorClass} mb-1`}>
-                    {book.imprint.replace('J Merrill ', '')}
+                    {book.imprint === 'J Merrill Publishing' ? 'J Merrill' : book.imprint}
                   </span>
                   <div className="flex gap-0.5">
                     {book.formats.map((f) => (
