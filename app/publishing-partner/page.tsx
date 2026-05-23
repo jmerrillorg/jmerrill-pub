@@ -2,67 +2,68 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'JM Prestige — Application-Based Publishing Program | J Merrill Publishing',
-  description: "JM Prestige is J Merrill Publishing's selective annual publishing program. Two tiers starting at $750/month. Application required. Publisher-reviewed.",
+  title: 'JM Prestige — Selective Publishing Path | J Merrill Publishing',
+  description:
+    "JM Prestige is J Merrill Publishing's selective publishing path for serious work. Two tiers starting at $750/month. Application required. Publisher-reviewed.",
 }
 
 const distinctionCards = [
   {
     icon: '✓',
-    title: 'Application-Based',
-    body: 'JM Prestige is not open enrollment. Every author is reviewed. Every title is evaluated. We accept authors we believe in.',
+    title: 'Selective Fit',
+    body: 'JM Prestige is not open enrollment. We review the work, the manuscript stage, the author’s goals, and whether the path truly fits the book.',
   },
   {
     icon: '▣',
-    title: 'A Publishing Relationship',
-    body: "JM Prestige is built for authors who want thoughtful editorial care, publisher-level presentation, and a long-term relationship with a house that is invested in the work.",
+    title: 'Elevated Guidance',
+    body: 'This path is built for authors who want deeper editorial care, stronger positioning, and a publishing house that stays meaningfully involved in the work.',
   },
   {
     icon: '◉',
-    title: 'Published Under JM Prestige',
-    body: 'Your book carries the JM Prestige imprint — registered with Bowker and distributed through our Ingram Content partnership to readers worldwide.',
+    title: 'Prestige Presentation',
+    body: 'When a title is accepted, it is handled with elevated presentation, release care, and a longer-range view of what the work can become.',
   },
 ]
 
 const includedColumns = [
   {
-    title: 'Production',
+    title: 'Manuscript And Direction',
     items: [
-      'Editorial shaping that strengthens the manuscript for release',
-      'Publisher-level cover and interior presentation',
-      'A finished book that reflects the standards of the house',
-      'Release readiness across print, digital, and catalog presentation',
-      'Professional stewardship from manuscript to final approval',
+      'A close review of the manuscript, message, and publishing path',
+      'Editorial guidance that strengthens the work without flattening the author’s voice',
+      'Clear direction on the level of production, positioning, and release care the book needs',
+      'Publisher stewardship from planning through final approval',
+      'A publishing path shaped around the seriousness of the work',
     ],
   },
   {
-    title: 'Distribution',
+    title: 'Presentation And Release',
     items: [
-      'Retail-ready positioning for national and global discovery',
-      'Distribution through our Ingram Content partnership',
-      '45,000+ retailers, libraries, bookstores, and distribution channels worldwide',
-      'Metadata and catalog preparation built for discoverability',
-      'A release plan shaped for real-world market readiness',
+      'Publisher-level cover, interior, and release presentation',
+      'Professional preparation across print, digital, and catalog formats',
+      'Metadata and publishing details shaped for marketplace readiness',
+      'Format and release planning that reflects the standards of the house',
+      'A finished book prepared to enter the marketplace with credibility',
     ],
   },
   {
-    title: 'Author Services',
+    title: 'Positioning And Growth',
     items: [
-      'Author profile placement on jmerrill.pub',
-      'Launch support assets that help position the book well',
-      'Ongoing post-release visibility and performance review',
-      'Quarterly royalty reporting',
-      'Annual publishing review for long-term growth',
+      'Distribution preparation through Ingram’s retail and library network',
+      'Launch planning that helps position the book with strength and clarity',
+      'Author positioning support across catalog, profile, and visibility touchpoints',
+      'Quarterly royalty reporting and annual publishing review',
+      'A release strategy designed with future opportunity in view',
     ],
   },
   {
-    title: 'Prestige Additions',
+    title: 'Long-Term Relationship',
     items: [
-      'A higher-touch publishing path for ambitious authors',
+      'A higher-touch relationship for authors building more than one release',
       'Priority scheduling and a more dedicated communication cadence',
-      'Stronger launch planning and long-range release strategy',
-      'Access to future growth pathways across format and catalog expansion',
-      'Early invitation into new JMP opportunities and author community benefits',
+      'Guidance on future titles, catalog growth, and broader publishing direction',
+      'A publishing home that thinks beyond one transaction',
+      'A serious path for authors who want the house invested in the work',
     ],
   },
 ]
@@ -76,11 +77,11 @@ const pricingCards = [
     annual: 'or $8,000/year — save $1,000',
     features: [
       'A selective publishing relationship under JM Prestige',
-      'Professional editorial and production care',
-      'Retail-ready presentation and distribution readiness',
-      'Launch support, metadata shaping, and author positioning',
-      'Quarterly royalty reporting and ongoing publisher visibility',
-      'Structured for up to two titles within a 12-month commitment',
+      'Professional editorial, design, and production care for serious work',
+      'Release preparation shaped for presentation, discoverability, and readiness',
+      'Author positioning, launch support, and publisher guidance through the process',
+      'Quarterly royalty reporting and ongoing publishing visibility',
+      'A 12-month path structured for authors building intentional momentum',
     ],
     cta: 'Apply for Standard →',
   },
@@ -92,11 +93,11 @@ const pricingCards = [
     annual: 'or $13,500/year — save $1,500',
     features: [
       'A deeper publishing partnership for high-commitment authors',
-      'Signature-level editorial, production, and release care',
-      'Priority publishing attention and more dedicated guidance',
-      'Premium positioning for launch quality, distribution, and catalog growth',
-      'Expanded access to the JM Prestige growth path and author community',
-      'Structured for up to two high-touch releases within a 12-month commitment',
+      'Expanded editorial, production, and release attention for elevated work',
+      'Priority guidance, stronger consultation, and a more dedicated cadence',
+      'Prestige positioning for launch quality, marketplace presence, and long-range growth',
+      'Expanded access to the JM Prestige relationship and future publishing opportunities',
+      'A 12-month high-touch path for authors pursuing elevated presentation',
     ],
     cta: 'Apply for Premium →',
   },
@@ -104,17 +105,18 @@ const pricingCards = [
 
 const trustIndicators = [
   '📚 Bowker Registered Imprint',
-  '🌐 Ingram Content Distribution Partner',
-  '📖 45,000+ Global Distribution Points',
+  '🌐 Global distribution through Ingram’s retail and library network',
+  '✍️ Retained rights and author-centered publishing',
 ]
 
 const rightForYou = [
   'Have a manuscript that is complete or nearly complete',
-  'Are ready to invest in professional publishing — not just printing',
-  'Want their book in retail stores, libraries, and global distribution',
-  'Are building a platform, a brand, or a legacy — not just a book',
-  'Are committed to the full production process, not a shortcut',
-  'Want a publisher who will be invested in their success',
+  'Carry a message, ministry, expertise, story, or legacy that deserves elevated handling',
+  'Want a publishing path shaped around presentation, positioning, and long-term care',
+  'Are building a broader platform, body of work, or multi-title future',
+  'Need deeper editorial, production, or strategic guidance than a standard path provides',
+  'Are open to discernment, preparation, and a serious publishing relationship',
+  'Want a house that will stay invested in the work beyond one transaction',
 ]
 
 const acceptanceCriteria = {
@@ -159,8 +161,8 @@ export default function PublishingPartnerPage() {
             <span
               className="text-[11px] text-blue-400 font-medium tracking-[0.1em] uppercase"
               style={{ fontFamily: "'DM Mono', monospace" }}
-            >
-              JM Prestige — Now Accepting Applications
+          >
+              JM Prestige — Selective Application Path
             </span>
           </div>
 
@@ -174,12 +176,12 @@ export default function PublishingPartnerPage() {
               letterSpacing: '-0.03em',
             }}
           >
-            Publishing for authors<br />
-            who are ready.
+            A selective publishing path<br />
+            for serious work.
           </h1>
 
           <p className="text-[16px] font-light text-white/45 leading-[1.75] max-w-[720px] mx-auto">
-            JM Prestige is J Merrill Publishing&apos;s selective premium imprint — built for authors who are serious about their work, their release quality, and the legacy they are building.
+            Some books require more than a standard path to publication. JM Prestige is designed for authors whose work needs elevated care, strategic positioning, expanded guidance, and a publishing relationship built for more than one release.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4">
@@ -195,16 +197,16 @@ export default function PublishingPartnerPage() {
               rel="noopener noreferrer"
               className="text-[14px] text-blue-400 border-b border-blue-400/30 pb-px hover:border-blue-400 transition-colors"
             >
-              Not sure yet? Start with a free consultation ↗
+              Talk with our publishing team ↗
             </a>
           </div>
         </section>
 
         <section className="mb-20 sm:mb-24">
           <div className="max-w-[860px] mb-10">
-            <SectionLabel>What Is JM Prestige</SectionLabel>
+            <SectionLabel>What Makes JM Prestige Different</SectionLabel>
             <p className="text-[15px] font-light leading-[1.8] text-white/60">
-              JM Prestige is not a standard publishing offering. It is a selective publishing imprint — the same imprint that appears on the cover, in the distributor catalog, and in every retailer listing. When you publish under JM Prestige, you are not a client purchasing services. You are an author publishing under a house that believes in your work.
+              JM Prestige is not a standard publishing offering. It is a selective publishing imprint and a higher-touch publishing relationship. When you publish under JM Prestige, you are not a client purchasing services. You are an author publishing under a house that believes in your work.
             </p>
           </div>
 
@@ -227,9 +229,25 @@ export default function PublishingPartnerPage() {
         </section>
 
         <section className="mb-20 sm:mb-24">
-          <SectionLabel>What JM Prestige Includes</SectionLabel>
+          <SectionLabel>Who This Path Is For</SectionLabel>
+          <p className="text-[15px] font-light leading-[1.75] text-white/45 mb-8">
+            This path is for authors who are serious about the work, open to guidance, and ready for a more strategic publishing relationship.
+          </p>
+
+          <div className="grid gap-3 max-w-[900px]">
+            {rightForYou.map((item) => (
+              <div key={item} className="flex items-start gap-3 bg-white/[0.04] border border-white/8 rounded-3xl px-5 py-4">
+                <span className="text-blue-400 mt-0.5">✓</span>
+                <span className="text-[15px] font-light leading-[1.7] text-white">{item}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-20 sm:mb-24">
+          <SectionLabel>What The Relationship Includes</SectionLabel>
           <p className="text-[15px] font-light leading-[1.75] text-white/45 mb-10">
-            Everything in J Merrill Publishing&apos;s standard production pipeline, plus:
+            The path is built around author outcomes: stronger preparation, elevated presentation, thoughtful release care, and a publishing relationship designed to grow with the work.
           </p>
 
           <div className="grid gap-4 lg:grid-cols-2">
@@ -255,9 +273,9 @@ export default function PublishingPartnerPage() {
         </section>
 
         <section className="mb-20 sm:mb-24">
-          <SectionLabel>Your Publishing Commitment</SectionLabel>
+          <SectionLabel>Investment And Expectations</SectionLabel>
           <p className="text-[15px] font-light leading-[1.75] text-white/45 mb-10">
-            JM Prestige is an annual publishing relationship for authors whose work aligns with the house. Two paths. One serious commitment.
+            Prestige publishing requires time, preparation, communication, and clear expectations. The investment reflects the level of guidance, presentation, and care involved. Two paths. One serious commitment.
           </p>
 
           <div className="grid gap-4 lg:grid-cols-2">
@@ -320,18 +338,42 @@ export default function PublishingPartnerPage() {
         </section>
 
         <section className="mb-20 sm:mb-24">
-          <SectionLabel>A Real Imprint. A Real Catalog.</SectionLabel>
+          <SectionLabel>What Authors Keep</SectionLabel>
           <div className="max-w-[860px]">
             <p className="text-[15px] font-light leading-[1.8] text-white/60">
-              JM Prestige is a registered publishing imprint under J Merrill Publishing, Inc. — recognized by Bowker and distributed through our partnership with Ingram Content, the world&apos;s largest book distributor. Every JM Prestige title reaches readers through 45,000+ retailers, libraries, bookstores, and distribution channels worldwide. This is not a label. It is a publishing home.
+              The elevated path does not mean the author disappears. Your name remains at the center of the work. Our role is to help prepare, position, and support the book while honoring the voice, ownership, and legacy behind it.
             </p>
+          </div>
+
+          <div className="mt-10 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="bg-white/[0.04] border border-white/8 rounded-3xl p-8">
+              <p className="text-[15px] font-light leading-[1.85] text-white/70">
+                Publishing with J Merrill means professional support without losing your voice. We work to preserve the identity of the author, protect the integrity of the message, and help the work reach readers with strength, clarity, and care.
+              </p>
+            </div>
+
+            <div className="bg-white/[0.04] border border-white/8 rounded-3xl p-8">
+              <ul className="flex flex-col gap-4">
+                {[
+                  'Your name on the front',
+                  'Your rights and ownership',
+                  'Your voice and message at the center',
+                  'Your long-term authorship and future opportunities',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-[14px] font-light leading-[1.7] text-white/70">
+                    <span className="text-blue-400 mt-0.5">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <div className="mt-10 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-center gap-4">
             {trustIndicators.map((indicator) => (
               <div
                 key={indicator}
-                className="rounded-full border border-white/8 bg-white/[0.04] px-5 py-3 text-[12px] text-white/55 tracking-[0.08em] uppercase text-center"
+                className="rounded-full border border-white/8 bg-white/[0.04] px-5 py-3 text-[12px] text-white/70 tracking-[0.08em] uppercase text-center"
                 style={{ fontFamily: "'DM Mono', monospace" }}
               >
                 {indicator}
@@ -341,30 +383,11 @@ export default function PublishingPartnerPage() {
         </section>
 
         <section className="mb-20 sm:mb-24">
-          <SectionLabel>Is JM Prestige Right For You?</SectionLabel>
-          <p className="text-[15px] font-light leading-[1.75] text-white/45 mb-8">
-            JM Prestige is built for authors who:
+          <SectionLabel>How We Decide Fit</SectionLabel>
+          <p className="text-[15px] font-light leading-[1.75] text-white/45 mb-8 max-w-[860px]">
+            Because JM Prestige is selective, the first step is not a checkout. It is a conversation about the work, the author’s goals, the manuscript stage, and whether this path is the right home.
           </p>
 
-          <div className="grid gap-3 max-w-[900px]">
-            {rightForYou.map((item) => (
-              <div key={item} className="flex items-start gap-3 bg-white/[0.04] border border-white/8 rounded-3xl px-5 py-4">
-                <span className="text-blue-400 mt-0.5">✓</span>
-                <span className="text-[15px] font-light leading-[1.7] text-white">{item}</span>
-              </div>
-            ))}
-          </div>
-
-          <p
-            className="text-[15px] font-light italic text-white/30 mt-8"
-            style={{ fontFamily: "'Libre Baskerville', serif" }}
-          >
-            If that&apos;s you — we&apos;d love to review your application.
-          </p>
-        </section>
-
-        <section className="mb-20 sm:mb-24">
-          <SectionLabel>What We Look For</SectionLabel>
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="bg-white/[0.04] border border-white/8 rounded-3xl p-8">
               <h2
@@ -417,12 +440,12 @@ export default function PublishingPartnerPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            Ready to publish under<br />
-            <em className="not-italic italic text-blue-500">JM Prestige?</em>
+            Ready to see if<br />
+            <em className="not-italic italic text-blue-500">JM Prestige is the right fit?</em>
           </h2>
 
           <p className="text-[15px] font-light leading-[1.75] text-white/40 max-w-[640px] mx-auto">
-            Applications are reviewed on a rolling basis. We respond within 3–5 business days.
+            Tell us about the work, where the manuscript stands, and what you believe the book is meant to become. We will review the fit and help you understand the next step.
           </p>
 
           <div className="mt-8 flex flex-col items-center gap-4">
@@ -430,16 +453,14 @@ export default function PublishingPartnerPage() {
               href="/publishing-partner/apply"
               className="inline-flex items-center justify-center rounded-full bg-blue-500 px-8 py-4 text-[14px] font-semibold uppercase tracking-[0.04em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-600"
             >
-              Apply Now →
+              Apply for JM Prestige →
             </Link>
-            <a
-              href={bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/packages"
               className="text-[14px] text-blue-400 border-b border-blue-400/30 pb-px hover:border-blue-400 transition-colors"
             >
-              Questions? Schedule a free consultation ↗
-            </a>
+              Explore Publishing Options →
+            </Link>
           </div>
         </section>
       </div>
