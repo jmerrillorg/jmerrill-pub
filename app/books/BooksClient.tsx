@@ -94,6 +94,12 @@ export default function BooksClient() {
     <div className="min-h-screen bg-[#070710]">
       <div className="sticky top-[76px] z-40 border-b border-white/5 bg-[#070710]/96 px-6 py-4 backdrop-blur sm:px-12">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-3">
+          <div className="max-w-[900px]">
+            <p className="text-[14px] font-light leading-[1.75] text-white/45">
+              More than a list of titles, this catalog is a family gallery of authors, messages, genres, and imprints. Some books were written to teach. Some to testify. Some to entertain, inspire, preserve legacy, or reach children and families.
+            </p>
+          </div>
+
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap gap-2">
               {IMPRINT_OPTIONS.map((option) => (
@@ -183,7 +189,7 @@ export default function BooksClient() {
 
           <div className="font-mono text-[12px] text-white/20">
             {isDefaultView
-              ? '125+ titles in the publishing catalog'
+              ? '125+ titles in a living catalog of voices'
               : `${filtered.length} title${filtered.length !== 1 ? 's' : ''}`}
             {activeImprint?.name && ` · ${activeImprint.name}`}
             {genre !== 'All Genres' && ` · ${genre}`}
@@ -254,6 +260,30 @@ export default function BooksClient() {
             </button>
           </div>
         )}
+
+        <div className="mt-16 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-[28px] border border-white/8 bg-white/[0.03] p-8">
+            <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-blue-400">
+              What This Means If You Are Considering JMP
+            </div>
+            <p className="text-[15px] font-light leading-[1.8] text-white/50">
+              Books are visible here. Authors remain connected to their work. The range of voices,
+              imprints, and genres shows that J Merrill Publishing is trusted with more than one
+              kind of message or one kind of story.
+            </p>
+          </div>
+
+          <div className="rounded-[28px] border border-white/8 bg-white/[0.03] p-8">
+            <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-blue-400">
+              Explore By Imprint
+            </div>
+            <p className="text-[15px] font-light leading-[1.8] text-white/50">
+              J Merrill Publishing, JM Little, JM Verse, JM Signature, and JM Works each give
+              different kinds of books a home. Use the imprint filters above to discover the part
+              of the publishing family that feels closest to your work.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )
