@@ -6,7 +6,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import {
-  NETWORK_STATS, DIGITAL_SALES_PARTNERS, FAITH_CHANNELS,
+  DIGITAL_SALES_PARTNERS, FAITH_CHANNELS,
   PRINT_REGIONS, JMP_CONTACT, type DigitalPartner
 } from '@/lib/distribution-data'
 
@@ -51,33 +51,65 @@ export default function DistributionPage() {
             <span className="w-8 h-px bg-[#1E90FF]" />
             <span className="text-[11px] font-medium tracking-[0.18em] uppercase text-[#A3C4DC]"
               style={{ fontFamily: "'DM Mono', monospace" }}>
-              Powered by Ingram Content
+              Distribution Through Ingram Content
             </span>
           </div>
 
           <h1 className="text-white mb-5"
             style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(36px,5vw,72px)', fontWeight: 700, lineHeight: 1.0, letterSpacing: '-0.025em' }}>
-            Your book. Online,<br />
-            <em className="not-italic text-[#1E90FF]">in stores,</em><br />
-            and around the world.
+            Helping your book<br />
+            reach the <em className="not-italic text-[#1E90FF]">marketplace.</em>
           </h1>
           <p className="text-[16px] font-light text-white/45 leading-[1.8] max-w-[540px] mb-12">
-            Publishing with J Merrill connects your title to one of the world's largest book distribution infrastructures — the same network used by major publishers globally.
+            Publishing does not end when the files are finished. Your book needs to be prepared, positioned, and distributed through the right channels so readers, retailers, libraries, and partners can find it. J Merrill Publishing helps authors move from finished book to marketplace access with clarity.
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {NETWORK_STATS.map(s => (
-              <div key={s.label} className="bg-white/[0.05] border border-white/8 rounded-2xl px-4 py-5 text-center">
-                <div className="text-white font-bold mb-1.5"
-                  style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '26px', letterSpacing: '-0.03em' }}>
-                  {s.n}
-                </div>
-                <div className="text-[11px] text-white/30 leading-[1.45] whitespace-pre-line"
-                  style={{ fontFamily: "'DM Mono', monospace" }}>
-                  {s.label}
-                </div>
+          <div className="flex flex-wrap gap-3">
+            {[
+              'Global distribution through Ingram’s retail and library network',
+              'Print, eBook, audio, wholesale, and library pathways',
+              'Professional preparation before marketplace entry',
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-[11px] uppercase tracking-[0.12em] text-white/55"
+                style={{ fontFamily: "'DM Mono', monospace" }}
+              >
+                {item}
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-[1280px] mx-auto px-8 md:px-12 py-14">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-[28px] border border-white/8 bg-white/[0.03] p-8">
+            <div className="mb-3 text-[11px] uppercase tracking-[0.12em] text-[#A3C4DC]"
+              style={{ fontFamily: "'DM Mono', monospace" }}>
+              What Distribution Really Means
+            </div>
+            <h2 className="text-white mb-3"
+              style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '28px', fontWeight: 700, letterSpacing: '-0.02em' }}>
+              Distribution is access — not a sales guarantee.
+            </h2>
+            <p className="text-[15px] text-white/45 font-light leading-[1.8]">
+              Distribution makes a professionally prepared book available through retail, wholesale, library, and digital channels. It does not automatically guarantee sales, shelf placement, or reader demand. That is why metadata, presentation, launch support, and author visibility still matter.
+            </p>
+          </div>
+
+          <div className="rounded-[28px] border border-white/8 bg-white/[0.03] p-8">
+            <div className="mb-3 text-[11px] uppercase tracking-[0.12em] text-[#A3C4DC]"
+              style={{ fontFamily: "'DM Mono', monospace" }}>
+              Global Distribution Through Ingram
+            </div>
+            <h2 className="text-white mb-3"
+              style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '28px', fontWeight: 700, letterSpacing: '-0.02em' }}>
+              Professional marketplace access beyond upload-only publishing.
+            </h2>
+            <p className="text-[15px] text-white/45 font-light leading-[1.8]">
+              Through our Ingram distribution relationship, eligible titles can be prepared for broad marketplace access across print, eBook, wholesale, and library channels. This gives authors a professional publishing path many cannot unlock alone.
+            </p>
           </div>
         </div>
       </div>
@@ -87,8 +119,8 @@ export default function DistributionPage() {
         <div className="max-w-[1280px] mx-auto flex gap-2.5 flex-wrap">
           {([
             { id: 'print',   label: 'Print Distribution',    icon: '📚' },
-            { id: 'digital', label: 'Digital & Audio (47)',   icon: '🌐' },
-            { id: 'faith',   label: 'Faith Market Channels',  icon: '✝️' },
+            { id: 'digital', label: 'Digital & Audio',   icon: '🌐' },
+            { id: 'faith',   label: 'Faith & Specialty',  icon: '✝️' },
           ] as const).map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-medium border transition-all ${
@@ -110,10 +142,10 @@ export default function DistributionPage() {
           <div>
             <h2 className="text-white mb-2"
               style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '32px', fontWeight: 700, letterSpacing: '-0.02em' }}>
-              Worldwide Print Distribution
+              Print distribution
             </h2>
             <p className="text-[15px] text-white/40 font-light max-w-[580px] leading-[1.7] mb-10">
-              Every J Merrill title enters the Ingram print network automatically — reaching retailers, libraries, schools, and e-commerce companies across 40+ countries.
+              Print distribution helps a professionally prepared book become orderable across retail, wholesale, library, school, and e-commerce pathways. The goal is professional availability, not a promise of automatic placement.
             </p>
             <div className="flex flex-col gap-2.5">
               {PRINT_REGIONS.map(reg => {
@@ -157,7 +189,7 @@ export default function DistributionPage() {
               })}
             </div>
             <p className="mt-5 text-[12px] text-white/20 leading-[1.7]">
-              Distribution via Ingram Content. Each channel partner independently determines whether to list a title.
+              Distribution via Ingram Content. Retailers, wholesalers, and library partners independently determine whether to list or stock a title.
             </p>
           </div>
         )}
@@ -167,10 +199,10 @@ export default function DistributionPage() {
           <div>
             <h2 className="text-white mb-2"
               style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '32px', fontWeight: 700, letterSpacing: '-0.02em' }}>
-              Digital & Audio Partners — 47 Managed
+              eBook and audiobook pathways
             </h2>
             <p className="text-[15px] text-white/40 font-light max-w-[580px] leading-[1.7] mb-8">
-              Ingram Content&apos;s managed digital sales program includes structured relationships across retail, library, subscription, and education channels. All 47 are available to J Merrill titles through our distribution partnership.
+              Different formats take different paths to readers. Digital distribution helps make eBooks and audiobooks available across retail, subscription, education, and library channels when the title is prepared correctly.
             </p>
 
             <p className="text-[14px] text-white/35 font-light max-w-[760px] leading-[1.75] mb-8">
@@ -221,7 +253,7 @@ export default function DistributionPage() {
 
             <div className="px-5 py-5 bg-[#1E90FF]/5 border border-[#1E90FF]/20 rounded-2xl">
               <p className="text-[13px] text-white/40 font-light leading-[1.7]">
-                <span className="text-white/60 font-medium">These 47 are managed digital sales partners within the Ingram Content ecosystem</span> — direct distribution relationships with structured agreements. The full network extends to 450+ additional channel partners available through standard digital distribution. All are accessible to J Merrill titles at no additional distribution fee.
+                <span className="text-white/60 font-medium">These digital pathways matter because they expand availability, not because they guarantee demand.</span> Strong metadata, the right format decisions, launch support, and an active author presence still shape how far a book goes after distribution begins.
               </p>
             </div>
           </div>
@@ -232,10 +264,10 @@ export default function DistributionPage() {
           <div>
             <h2 className="text-white mb-2"
               style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '32px', fontWeight: 700, letterSpacing: '-0.02em' }}>
-              Faith Market Distribution
+              Faith, ministry, and specialty pathways
             </h2>
             <p className="text-[15px] text-white/40 font-light max-w-[580px] leading-[1.7] mb-8">
-              A significant portion of the J Merrill catalog is faith-based, devotional, inspirational, and ministry content. The Ingram Content network includes 15+ dedicated faith distribution channels.
+              Some books are written for churches, ministries, devotional readers, Christian retailers, or specialty audiences. When a title fits those pathways, distribution preparation can help it reach the right market more clearly.
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
@@ -253,7 +285,7 @@ export default function DistributionPage() {
                   style={{ fontFamily: "'DM Mono', monospace" }}>Faith Market Add-On Service</div>
                 <div className="text-[15px] font-semibold text-white mb-1">JMP-DIST-FAITH</div>
                 <p className="text-[13px] text-white/40 font-light leading-[1.7]">
-                  Faith Market Distribution — $295. CBA market positioning, LifeWay-ready metadata, Christian retail channel access, and church/conference placement support. Available as an add-on to any publishing package.
+                  Faith Market Distribution — $295. CBA market positioning, LifeWay-ready metadata, Christian retail channel access, and church/conference placement support. Available as an add-on to any publishing package where it fits the work.
                 </p>
               </div>
               <div className="px-5 py-5 bg-white/[0.03] border border-white/7 rounded-2xl">
@@ -276,6 +308,62 @@ export default function DistributionPage() {
             </div>
           </div>
         )}
+
+        <div className="mt-16 grid gap-6 lg:grid-cols-2">
+          <div className="rounded-[28px] border border-white/8 bg-white/[0.03] p-8">
+            <div className="mb-3 text-[11px] uppercase tracking-[0.12em] text-[#A3C4DC]"
+              style={{ fontFamily: "'DM Mono', monospace" }}>
+              What Authors Should Understand
+            </div>
+            <h3 className="text-white mb-3"
+              style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '26px', fontWeight: 700, letterSpacing: '-0.02em' }}>
+              What distribution can — and cannot — do.
+            </h3>
+            <ul className="flex flex-col gap-3 text-[14px] font-light leading-[1.75] text-white/50">
+              {[
+                'Distribution helps make the book available through professional channels.',
+                'Marketing helps create demand and visibility.',
+                'Metadata helps readers, retailers, and libraries understand the book.',
+                'Quality production affects confidence and discoverability.',
+                'Author platform, audience fit, and effort still matter.',
+                'Results vary by book, category, audience, and release strategy.',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span className="text-[#1E90FF] mt-0.5">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-[28px] border border-white/8 bg-white/[0.03] p-8">
+            <div className="mb-3 text-[11px] uppercase tracking-[0.12em] text-[#A3C4DC]"
+              style={{ fontFamily: "'DM Mono', monospace" }}>
+              Distribution Readiness
+            </div>
+            <h3 className="text-white mb-3"
+              style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '26px', fontWeight: 700, letterSpacing: '-0.02em' }}>
+              Before a book enters the marketplace, it needs to be ready.
+            </h3>
+            <ul className="grid gap-3 sm:grid-cols-2 text-[14px] font-light leading-[1.75] text-white/50">
+              {[
+                'An edited manuscript',
+                'A finished cover and interior',
+                'ISBN assignment',
+                'Strong metadata and categories',
+                'A clear book description',
+                'Pricing and format decisions',
+                'Distribution setup',
+                'A launch and visibility plan',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span className="text-[#1E90FF] mt-0.5">✓</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
 
       {/* ── FOOTER CTA + CONTACT ──────────────────────────────────────── */}
@@ -284,20 +372,20 @@ export default function DistributionPage() {
           <div>
             <h3 className="text-white mb-3"
               style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '32px', fontWeight: 700, letterSpacing: '-0.02em' }}>
-              Your story belongs<br />
-              <em className="not-italic text-[#1E90FF]">in every market.</em>
+              Ready to prepare your book<br />
+              <em className="not-italic text-[#1E90FF]">for the marketplace?</em>
             </h3>
             <p className="text-[15px] text-white/40 mb-8 leading-[1.75]">
-              Every J Merrill title enters this global network automatically at no additional distribution fee.
+              Tell us about your book and where you are in the publishing process. We will help you understand what your title needs before distribution.
             </p>
             <div className="flex gap-3 flex-wrap">
               <Link href="/join"
                 className="inline-flex items-center gap-2 bg-[#1E90FF] text-white text-[13px] font-semibold tracking-[0.04em] uppercase px-7 py-3.5 rounded-full hover:bg-blue-500 transition-all hover:-translate-y-0.5 shadow-[0_4px_20px_rgba(30,144,255,0.35)]">
-                Start Publishing →
+                Tell Us About Your Book →
               </Link>
-              <Link href="/packages"
+              <Link href="/publishing"
                 className="inline-flex items-center gap-2 border border-white/15 text-white/55 text-[13px] px-7 py-3.5 rounded-full hover:border-[#1E90FF]/40 hover:text-[#A3C4DC] transition-all">
-                View Packages
+                Publish With Us
               </Link>
             </div>
           </div>

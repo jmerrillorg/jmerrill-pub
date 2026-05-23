@@ -1,39 +1,96 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { CTASection } from '@/components/content/CTASection'
 import { PageHero } from '@/components/site/PageHero'
 import { PageSection } from '@/components/site/PageSection'
-import { authorJourneyMilestones } from '@/lib/site-architecture'
 
 export const metadata: Metadata = {
   title: 'Author Journey',
   description:
-    'Follow the full J Merrill Publishing author experience from discovery and onboarding through launch, growth, and long-term catalog development.',
+    'Follow the J Merrill Publishing author journey from first conversation through editorial preparation, production, publication, and long-term support.',
 }
 
-const checkpoints = [
+const emotionalPromises = [
+  'You will not be left guessing.',
+  'Your voice remains central.',
+  'Your rights and ownership matter.',
+  'Your book is prepared professionally.',
+  'The relationship can continue after release.',
+]
+
+const stages = [
   {
-    label: 'Discovery',
-    title: 'Start with clarity',
-    body:
-      'Authors should understand the path before they commit. We orient package fit, publishing readiness, and service scope before a project is sold.',
+    step: '01',
+    title: 'Discover',
+    body: 'We learn about your book, your goals, your audience, your manuscript stage, and what kind of support the work may need.',
   },
   {
-    label: 'Onboarding',
-    title: 'Join the Family',
-    body:
-      'Inquiry, consultation, and evaluation create the first real relationship moment. The goal is trust, not friction.',
+    step: '02',
+    title: 'Prepare',
+    body: 'We review the manuscript and help identify the right editorial, design, package, and production path.',
   },
   {
-    label: 'Production',
-    title: 'Move through one operating system',
-    body:
-      'Editorial, design, distribution, and launch are sequenced as one connected publishing engine with real human guidance.',
+    step: '03',
+    title: 'Produce',
+    body: 'Your book moves through the needed professional work: editing, cover design, interior layout, formatting, and production preparation.',
   },
   {
-    label: 'Growth',
-    title: 'Turn one book into an author career',
-    body:
-      'Memberships, partner tiers, and future dashboards support the author after release instead of ending the relationship at publication.',
+    step: '04',
+    title: 'Publish',
+    body: 'We prepare the ISBN, metadata, files, and distribution setup so your book can enter the marketplace professionally.',
+  },
+  {
+    step: '05',
+    title: 'Grow',
+    body: 'After publication, we help you think about visibility, future titles, author support, and the long-term opportunity around your work.',
+  },
+]
+
+const youCanExpect = [
+  'Clear communication',
+  'Honest guidance',
+  'Editorial and design professionalism',
+  'Respect for the author’s voice',
+  'Care with rights, metadata, and presentation',
+  'Guidance beyond launch where appropriate',
+]
+
+const weNeedFromYou = [
+  'Your manuscript or book idea',
+  'Your goals for the work',
+  'Your intended audience',
+  'Your availability for decisions and approvals',
+  'Your openness to professional guidance',
+  'Your long-term vision, if you have one',
+]
+
+const whereItLeads = [
+  'Future titles',
+  'Author platform growth',
+  'Speaking, ministry, or business extensions where relevant',
+  'Memberships or long-term support where available',
+  'Catalog-building and legacy-building',
+]
+
+const faq = [
+  {
+    question: 'Do I need a finished manuscript before reaching out?',
+    answer: 'No. Some authors come with a completed draft, while others come with an idea, an outline, or a work that still needs shaping. We can help you understand the right next step from where you are.',
+  },
+  {
+    question: 'Will I keep the rights to my book?',
+    answer: 'Yes. Your rights and ownership matter. Our role is to help prepare, publish, and support the work without taking your authorship away from you.',
+  },
+  {
+    question: 'How do I know which package fits?',
+    answer: 'We look at the manuscript, the goals, the stage of the work, and the level of guidance needed. You do not have to sort that out alone before reaching out.',
+  },
+  {
+    question: 'Can you help if my book still needs editing?',
+    answer: 'Yes. Many books need editorial work before they are ready for publication. Part of the journey is identifying what kind of editorial care the manuscript needs.',
+  },
+  {
+    question: 'What happens after the book is published?',
+    answer: 'Publication is not always the end of the relationship. Depending on your goals, the journey can continue through visibility support, future titles, memberships, and long-term author growth.',
   },
 ]
 
@@ -45,123 +102,171 @@ export default function AuthorJourneyPage() {
         ghost="Journey"
         title={
           <>
-            A publishing experience
+            A clear path
             <br />
-            built to <em className="not-italic italic text-blue-500">guide, not confuse</em>
+            <em className="not-italic italic text-blue-500">from manuscript to marketplace.</em>
           </>
         }
-        description="This is the full author pathway behind J Merrill Publishing. Every page, package, service, and onboarding touchpoint should reinforce a confident journey from first inquiry to long-term catalog growth."
+        description="Publishing should not feel confusing or lonely. At J Merrill Publishing, we walk with authors through a clear process from the first conversation to editorial preparation, design, distribution, launch, and long-term support."
         actions={[
-          { label: 'Join the Family', href: '/join' },
-          { label: 'Compare Packages', href: '/packages' },
+          { label: 'Tell Us About Your Book', href: '/join' },
+          { label: 'Publish With Us', href: '/publishing' },
         ]}
       />
 
       <PageSection
-        eyebrow="Journey Architecture"
+        eyebrow="What The Journey Should Feel Like"
         title={
           <>
-            Four stages.
+            You should know where you are,
             <br />
-            <em className="not-italic italic text-blue-500">One relationship.</em>
+            <em className="not-italic italic text-blue-500">what comes next, and who is walking with you.</em>
           </>
         }
-        description="The flagship site now treats the author relationship like a structured progression instead of a collection of disconnected marketing pages."
+        description="Authors often arrive with a manuscript, an idea, a message, or a story they have carried for years. The publishing process should bring clarity, not confusion. This page explains how we help move the work forward with care."
       >
-        <div className="grid gap-4 lg:grid-cols-4">
-          {checkpoints.map((checkpoint) => (
-            <div
-              key={checkpoint.label}
-              className="rounded-[24px] border border-gray-200 bg-[#F7F8FA] p-7"
-            >
-              <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.12em] text-blue-500">
-                {checkpoint.label}
-              </div>
-              <h3 className="mb-3 text-[24px] text-charcoal" style={{ fontFamily: "'Libre Baskerville', serif" }}>
-                {checkpoint.title}
-              </h3>
-              <p className="text-[14px] font-light leading-[1.75] text-gray-500">{checkpoint.body}</p>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {emotionalPromises.map((item) => (
+            <div key={item} className="rounded-[24px] border border-gray-200 bg-[#F7F8FA] p-7">
+              <div className="mb-4 text-[20px] text-blue-500">•</div>
+              <p className="text-[15px] font-light leading-[1.8] text-gray-500">{item}</p>
             </div>
           ))}
         </div>
       </PageSection>
 
       <PageSection
-        eyebrow="Route-by-Route"
+        eyebrow="The Five Stages Of Publishing With JMP"
         title={
           <>
-            The site now mirrors
+            The publishing journey,
             <br />
-            <em className="not-italic italic text-blue-500">the actual author lifecycle</em>
+            <em className="not-italic italic text-blue-500">step by step.</em>
           </>
         }
-        description="Each step of the journey points to a page that carries the next conversation forward."
+        description="From first conversation to life after launch, we help authors move forward in a way that feels clear, professional, and supported."
         surface="dark"
       >
-        <div className="grid gap-4 lg:grid-cols-2">
-          {authorJourneyMilestones.map((milestone) => (
-            <Link
-              key={milestone.step}
-              href={milestone.destination}
-              className="group rounded-[28px] border border-white/8 bg-white/[0.03] p-8 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/30"
-            >
-              <div className="mb-4 flex items-center gap-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-blue-500/30 bg-blue-500/10 font-mono text-[12px] text-blue-400">
-                  {milestone.step}
-                </div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/20">
-                  Author lifecycle step
-                </div>
-              </div>
-              <h3 className="mb-3 text-[26px] text-white" style={{ fontFamily: "'Libre Baskerville', serif" }}>
-                {milestone.title}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {stages.map((stage) => (
+            <div key={stage.step} className="rounded-[24px] border border-white/10 bg-white/[0.03] p-6">
+              <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.14em] text-blue-400">{stage.step}</div>
+              <h3
+                className="mb-3 text-white"
+                style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '26px', fontWeight: 700, lineHeight: 1.14 }}
+              >
+                {stage.title}
               </h3>
-              <p className="text-[14px] font-light leading-[1.75] text-white/45">
-                {milestone.description}
-              </p>
-              <span className="mt-6 inline-flex text-[13px] font-medium text-blue-400 transition-transform duration-200 group-hover:translate-x-1">
-                Open destination -&gt;
-              </span>
-            </Link>
+              <p className="text-[14px] font-light leading-[1.8] text-white/70">{stage.body}</p>
+            </div>
           ))}
         </div>
       </PageSection>
 
-      <section className="bg-charcoal px-6 py-20 text-center sm:px-12">
-        <div className="mx-auto max-w-[760px]">
-          <h2
-            className="mb-4 text-white"
-            style={{
-              fontFamily: "'Libre Baskerville', serif",
-              fontSize: 'clamp(34px,4vw,56px)',
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-            }}
-          >
-            Ready to begin
+      <PageSection
+        eyebrow="What You Can Expect From Us"
+        title={
+          <>
+            What you can
             <br />
-            <em className="not-italic italic text-blue-500">the right way?</em>
-          </h2>
-          <p className="mx-auto mb-8 max-w-[560px] text-[16px] leading-[1.75] text-white/45">
-            Start with the flagship onboarding experience and we will route you to the right package,
-            service mix, and next step.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/join"
-              className="rounded-full bg-blue-500 px-8 py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-blue-600"
-            >
-              Join the Family -&gt;
-            </Link>
-            <Link
-              href="/packages"
-              className="rounded-full border border-white/15 px-8 py-3.5 text-[14px] text-white/60 transition-all hover:border-blue-500 hover:text-blue-400"
-            >
-              Review package tiers
-            </Link>
-          </div>
+            <em className="not-italic italic text-blue-500">expect from us.</em>
+          </>
+        }
+        description="A publishing relationship should feel steady, respectful, and professionally handled. These are the standards we bring to the journey."
+      >
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {youCanExpect.map((item) => (
+            <div key={item} className="rounded-[24px] border border-gray-200 bg-white p-7">
+              <div className="mb-4 text-[20px] text-blue-500">•</div>
+              <p className="text-[15px] font-light leading-[1.8] text-gray-500">{item}</p>
+            </div>
+          ))}
         </div>
-      </section>
+      </PageSection>
+
+      <PageSection
+        eyebrow="What We’ll Need From You"
+        title={
+          <>
+            What we’ll need
+            <br />
+            <em className="not-italic italic text-blue-500">from you.</em>
+          </>
+        }
+        description="You do not need to arrive with everything figured out. But a publishing journey works best when we can understand the work, the hopes behind it, and the decisions that will shape it."
+        surface="dark"
+      >
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {weNeedFromYou.map((item) => (
+            <div key={item} className="rounded-[24px] border border-white/10 bg-white/[0.03] p-7">
+              <div className="mb-4 text-[20px] text-blue-400">•</div>
+              <p className="text-[15px] font-light leading-[1.8] text-white/80">{item}</p>
+            </div>
+          ))}
+        </div>
+      </PageSection>
+
+      <PageSection
+        eyebrow="Where The Journey Can Lead"
+        title={
+          <>
+            One book can become
+            <br />
+            <em className="not-italic italic text-blue-500">the beginning of something larger.</em>
+          </>
+        }
+        description="A single title can open the door to future books, stronger author identity, broader reach, and a longer publishing relationship. We do not promise fame. We do help authors think beyond one release."
+      >
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {whereItLeads.map((item) => (
+            <div key={item} className="rounded-[24px] border border-gray-200 bg-[#F7F8FA] p-7">
+              <div className="mb-4 text-[20px] text-blue-500">•</div>
+              <p className="text-[15px] font-light leading-[1.8] text-gray-500">{item}</p>
+            </div>
+          ))}
+        </div>
+      </PageSection>
+
+      <PageSection
+        eyebrow="Common Author Questions"
+        title={
+          <>
+            The questions authors
+            <br />
+            <em className="not-italic italic text-blue-500">usually ask first.</em>
+          </>
+        }
+        description="A little clarity up front can remove a lot of uncertainty. These are some of the questions authors bring into the conversation most often."
+        surface="dark"
+      >
+        <div className="grid gap-4 lg:grid-cols-2">
+          {faq.map((item) => (
+            <div key={item.question} className="rounded-[26px] border border-white/10 bg-white/[0.03] p-8">
+              <h3
+                className="mb-3 text-white"
+                style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '28px', fontWeight: 700, lineHeight: 1.14 }}
+              >
+                {item.question}
+              </h3>
+              <p className="text-[15px] font-light leading-[1.85] text-white/70">{item.answer}</p>
+            </div>
+          ))}
+        </div>
+      </PageSection>
+
+      <CTASection
+        eyebrow="Next Step"
+        title={
+          <>
+            Ready to take
+            <br />
+            <em className="not-italic italic text-blue-500">the next step?</em>
+          </>
+        }
+        description="Tell us about your book, where you are in the journey, and what you hope the work will become. We will help you understand the publishing path that fits."
+        primary={{ label: 'Tell Us About Your Book', href: '/join' }}
+        secondary={{ label: 'Explore Packages', href: '/packages' }}
+      />
     </div>
   )
 }

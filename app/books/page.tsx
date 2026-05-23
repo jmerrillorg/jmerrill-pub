@@ -8,7 +8,7 @@ import { CTASection } from '@/components/content/CTASection'
 export const metadata: Metadata = {
   title: 'Books',
   description:
-    'Browse the J Merrill Publishing catalog across books, formats, authors, and imprints from the flagship publishing brand of J Merrill One.',
+    'Browse books from the J Merrill Publishing family and explore the authors, imprints, and voices behind the work.',
 }
 
 export default function BooksPage() {
@@ -36,19 +36,35 @@ export default function BooksPage() {
         <div className="relative z-10 mx-auto max-w-[1280px]">
           <div className="mb-5 flex items-center gap-3">
             <span className="block h-px w-8 bg-blue-500" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-blue-400">Published Catalog</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-blue-400">Books From The JMP Family</span>
           </div>
           <h1
             className="mb-4 text-white"
             style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(40px,5vw,68px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.02em' }}
           >
-            125+ titles.
+            Books from the
             <br />
-            <em className="not-italic italic text-blue-500">{imprintCatalog.length} imprints. Direct authority.</em>
+            <em className="not-italic italic text-blue-500">J Merrill Publishing family.</em>
           </h1>
           <p className="max-w-[620px] text-[17px] font-light leading-[1.75] text-white/40">
-            Every title lives here with its own domain authority, author relationship context, and future-ready content structure. This catalog is built to strengthen jmerrill.pub, not just hand traffic away.
+            Every title in this catalog began with an author who had something to say. Explore the books, voices, stories, ministries, lessons, and legacy works that have found a publishing home with J Merrill Publishing.
           </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            {[
+              '125+ titles',
+              `${imprintCatalog.length} official imprints`,
+              'Real authors and visible book pages',
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[11px] uppercase tracking-[0.12em] text-white/55"
+                style={{ fontFamily: "'DM Mono', monospace" }}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -66,36 +82,35 @@ export default function BooksPage() {
         <div className="mx-auto flex max-w-[1280px] flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-[680px]">
             <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-blue-400">
-              Catalog as platform
+              What This Catalog Shows New Authors
             </div>
             <p className="text-[15px] font-light leading-[1.8] text-white/45">
-              Every book page is structured to support richer descriptions, author context, keyword depth,
-              excerpts, quotes, and future Dataverse-powered metadata. The catalog is now a real platform foundation.
+              When you are choosing a publisher, look beyond promises. Look at the books, the authors, the range of voices, and the care given to the catalog. Your work should have a visible home, not disappear into a system.
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
             <Link href="/authors" className="rounded-full bg-blue-500 px-8 py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-blue-600">
-              Meet the authors
+              Meet the Authors
             </Link>
             <Link href="/join" className="rounded-full border border-white/15 px-8 py-3.5 text-[14px] text-white/60 transition-all hover:border-blue-500 hover:text-blue-400">
-              Join the Family
+              Tell Us About Your Book
             </Link>
           </div>
         </div>
       </section>
 
       <CTASection
-        eyebrow="Add Your Title"
+        eyebrow="Final CTA"
         title={
           <>
-            Ready to publish into
+            Could your book belong
             <br />
-            the flagship catalog?
+            in this family?
           </>
         }
-        description="Every book on this page is part of the J Merrill Publishing family. Start your path and we’ll help position your title with the same premium standard."
-        primary={{ label: 'Join the Family', href: '/join' }}
-        secondary={{ label: 'Explore publishing', href: '/publishing' }}
+        description="Tell us about your book, your message, and where you are in the journey. We will help you understand the publishing path that fits."
+        primary={{ label: 'Tell Us About Your Book', href: '/join' }}
+        secondary={{ label: 'Publish With Us', href: '/publishing' }}
       />
     </div>
   )

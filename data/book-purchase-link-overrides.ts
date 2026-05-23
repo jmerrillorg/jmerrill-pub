@@ -30,9 +30,6 @@ export const bookPurchaseLinkOverrides: Record<string, BookPurchaseLinks> = {
   'delicious-ideas': {
     amazon: 'https://www.amazon.com/s?k=9781961475335&i=stripbooks',
   },
-  'department-of-the-air-force-mission-driven-leadership': {
-    amazon: 'https://www.amazon.com/s?k=9781961475687&i=stripbooks',
-  },
   'discipline-and-direction': {
     amazon: 'https://www.amazon.com/s?k=9781954414914&i=stripbooks',
   },
