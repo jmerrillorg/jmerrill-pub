@@ -50,8 +50,8 @@ export default function AuthorsPage() {
             'JMP exists to help authors carry the work forward with visibility, care, and professional preparation.',
             'The author remains visible. The publisher should strengthen the name behind the book, not hide it.',
           ].map((item) => (
-            <div key={item} className="rounded-[28px] border border-white/8 bg-white/[0.03] p-7">
-              <p className="text-[15px] font-light leading-[1.8] text-white/60">{item}</p>
+            <div key={item} className="rounded-[28px] border border-[#0F1C2E]/10 bg-[#F8FAFD] p-7 shadow-[0_18px_45px_rgba(15,28,46,0.06)]">
+              <p className="text-[15px] font-light leading-[1.8] text-[#0F1C2E]/70">{item}</p>
             </div>
           ))}
         </div>

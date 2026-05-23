@@ -313,7 +313,7 @@ export default function ServicesPage() {
                       {category.title}
                     </h2>
                   </div>
-                  <p className="text-[14px] font-light text-white/55">{category.description}</p>
+                  <p className="text-[14px] font-light text-white/60">{category.description}</p>
                 </div>
               </div>
 
@@ -324,7 +324,7 @@ export default function ServicesPage() {
                     className="rounded-xl border border-white/8 p-5 transition-all duration-200 hover:border-blue-500/30 hover:bg-blue-500/[0.05]"
                   >
                     <div className="mb-1.5 text-[14px] font-semibold text-white">{service.name}</div>
-                    <div className="text-[13px] font-light leading-[1.65] text-white/55">{service.desc}</div>
+                    <div className="text-[13px] font-light leading-[1.65] text-white/60">{service.desc}</div>
                   </div>
                 ))}
               </div>
@@ -362,7 +362,7 @@ export default function ServicesPage() {
         surface="dark"
       >
         <div className="rounded-[28px] border border-blue-500/20 bg-blue-500/[0.06] px-8 py-7">
-          <p className="max-w-[920px] text-[16px] font-light leading-[1.85] text-white/72">
+          <p className="max-w-[920px] text-[16px] font-light leading-[1.85] text-white/75">
             Ghostwriting remains part of the normal publishing support available through JMP. If the message is clear but the manuscript is not finished yet, we can help you understand whether ghostwriting or manuscript-development support is the right next step.
           </p>
           <Link href="#ghostwriting" className="mt-4 inline-flex text-[14px] font-semibold text-blue-400 transition-colors hover:text-blue-300">
