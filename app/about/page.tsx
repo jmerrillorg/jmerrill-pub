@@ -1,231 +1,259 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { CTASection } from '@/components/content/CTASection'
+import { PageHero } from '@/components/site/PageHero'
+import { PageSection } from '@/components/site/PageSection'
 import { division } from '@/lib/tokens'
 
 export const metadata: Metadata = {
   title: 'About — J Merrill Publishing, Inc.',
-  description: 'J Merrill Publishing, Inc. is a full-service publisher founded by Jackie Smith, Jr. in Columbus, OH. Part of the J Merrill One enterprise system.',
+  description:
+    'J Merrill Publishing exists to help authors protect, prepare, publish, and support the work that matters most while keeping rights, legacy, and authorship at the center.',
 }
+
+const beliefs = [
+  'Publishing should strengthen the author’s voice, not replace it.',
+  'Every manuscript deserves professional care before it reaches readers.',
+  'Books should be prepared for the people they were written for, not just uploaded and left alone.',
+  'The author should remain visible, respected, and protected through the entire process.',
+]
+
+const authorsKeep = [
+  'You remain at the center of the work.',
+  'Your rights and ownership matter.',
+  'Your voice is preserved through the process.',
+  'Your book is supported, not absorbed.',
+]
+
+const authorsGain = [
+  'Editorial care',
+  'Cover and interior design',
+  'Publishing guidance',
+  'Distribution setup',
+  'Launch and visibility support',
+  'Long-term author relationship',
+]
+
+const imprints = [
+  {
+    name: 'J Merrill Publishing',
+    body: 'The flagship publishing home for authors whose work lives directly under the primary J Merrill brand.',
+  },
+  {
+    name: 'JM Little',
+    body: 'A home for children’s voices, family stories, and books shaped for younger readers.',
+  },
+  {
+    name: 'JM Verse',
+    body: 'A home for poetry, lyrical work, and voices that move through rhythm, reflection, and art.',
+  },
+  {
+    name: 'JM Signature',
+    body: 'A selective home for books that call for elevated positioning, premium presentation, or signature treatment.',
+  },
+  {
+    name: 'JM Works',
+    body: 'A home for mission-driven, practical, leadership, and impact-focused books with a strong message to carry.',
+  },
+]
+
+const carePrinciples = [
+  'We communicate clearly.',
+  'We guide the author through the process.',
+  'We protect the integrity of the work.',
+  'We prepare books for the marketplace.',
+  'We think beyond one release.',
+]
+
+const proofPoints = [
+  '125+ titles',
+  'Five official imprints',
+  "Global distribution through Ingram's retail and library network",
+  'Registered publisher',
+  'Author-first publishing model',
+]
 
 export default function AboutPage() {
   return (
     <div className="pt-[76px]">
+      <PageHero
+        eyebrow="About J Merrill Publishing"
+        ghost="About"
+        title={
+          <>
+            A publishing home
+            <br />
+            <em className="not-italic italic text-blue-500">for authors whose work matters.</em>
+          </>
+        }
+        description="J Merrill Publishing exists because authors deserve more than a transaction. Your book carries your name, your story, your message, and your legacy. Our role is to help protect, prepare, publish, and support the work without taking the heart of it away from you."
+        actions={[
+          { label: 'Tell Us About Your Book', href: '/join' },
+          { label: 'See How Publishing Works', href: '/publishing' },
+        ]}
+      />
 
-      {/* Hero */}
-      <div
-        className="relative px-12 py-28 overflow-hidden"
-        style={{ background: '#0F1C2E' }}
+      <PageSection
+        eyebrow="The Belief"
+        title={
+          <>
+            We believe the author
+            <br />
+            <em className="not-italic italic text-blue-500">should never disappear behind the process.</em>
+          </>
+        }
+        description="Publishing should strengthen the author’s voice, not replace it. Whether the work is faith-based, inspirational, children’s, poetry, memoir, business, or general trade, the goal is the same: honor the message, prepare the book professionally, and help it reach the people it was written for."
       >
-        <div className="absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse 60% 80% at 20% 50%, rgba(30,144,255,0.12) 0%, transparent 65%)' }}
-        />
-        {/* Ghost text */}
-        <div
-          className="absolute -bottom-8 -right-4 pointer-events-none select-none"
-          style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '200px', fontWeight: 700, color: 'transparent', WebkitTextStroke: '1px rgba(255,255,255,0.03)', whiteSpace: 'nowrap', letterSpacing: '-0.05em' }}
-        >
-          Our Story
-        </div>
-        <div className="max-w-[1280px] mx-auto relative z-10">
-          <div className="flex items-center gap-3 mb-5">
-            <span className="w-8 h-px bg-blue-500 block" />
-            <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-blue-400">About JMP</span>
-          </div>
-          <h1
-            className="text-white mb-5 max-w-[700px]"
-            style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(40px,5vw,68px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.02em' }}
-          >
-            What you write<br />
-            <em className="not-italic italic text-blue-500">should not disappear.</em>
-          </h1>
-          <p className="text-[18px] font-light text-white/45 max-w-[580px] leading-[1.75]">
-            J Merrill Publishing exists because authors deserve a publisher that believes in them — not just a service that processes their manuscript.
-          </p>
-        </div>
-      </div>
-
-      {/* Mission */}
-      <div className="px-12 py-20 bg-white">
-        <div className="max-w-[1280px] mx-auto grid lg:grid-cols-2 gap-24 items-start">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="w-8 h-px bg-blue-500 block" />
-              <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-blue-500">Our Mission</span>
-            </div>
-            <h2
-              className="text-charcoal mb-6"
-              style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(28px,3vw,44px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em' }}
-            >
-              Helping Authors<br />
-              <em className="not-italic italic text-blue-500">Help Themselves.</em>
-            </h2>
-            <p className="text-[16px] font-light text-gray-500 leading-[1.85] mb-5">
-              J Merrill Publishing, Inc. is a full-service, author-focused publishing company committed to excellence, empowerment, and inclusivity. Founded by {division.founder} in {division.established}, our mission is to give every author access to professional-grade publishing — without the gatekeeping.
-            </p>
-            <p className="text-[16px] font-light text-gray-500 leading-[1.85] mb-5">
-              We believe every author deserves a publishing home — not just a transaction. We walk with our authors through every stage of their journey: from manuscript evaluation through publication, launch, and long-term career building.
-            </p>
-            <p className="text-[16px] font-light text-gray-500 leading-[1.85]">
-              We believe in transparency, high standards, and publishing solutions that evolve with technology — from AI-powered production to the enterprise-grade distribution infrastructure of our Ingram Content partnership, giving our authors access to global retail, library, and wholesale channels that most independent publishers can&apos;t offer.
-            </p>
-            <p className="text-[16px] font-light text-gray-500 leading-[1.85]">
-              Founded in December 2018 by Jackie Smith Jr. after publishing his first two books, J Merrill Publishing was built on a simple conviction: that authors deserve a true partner — not just a vendor. Authors retain full ownership of their intellectual property. We retain no rights to any manuscript, title, or creative work published through our services. 70% of royalties stay with the author.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-5">
-            {[
-              { label: 'Why We Exist',    value: division.why },
-              { label: 'Brand Truth',     value: division.tagline },
-              { label: 'Theme',           value: division.theme },
-              { label: 'Division',        value: `Division ${division.number} — ${division.name}` },
-              { label: 'Domain',          value: division.domain },
-              { label: 'Parent System',   value: 'J Merrill One Enterprise' },
-              { label: 'Headquarters',    value: division.established },
-            ].map((item) => (
-              <div key={item.label} className="grid grid-cols-[180px_1fr] gap-4 py-4 border-b border-gray-100">
-                <div className="font-mono text-[11px] tracking-[0.08em] uppercase text-gray-400">{item.label}</div>
-                <div className="text-[15px] text-charcoal font-light">{item.value}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="bg-gray-50 border-y border-gray-200 px-12 py-16">
-        <div className="max-w-[1280px] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {[
-            { n: division.stats.titles,    l: 'Published Titles',     sub: 'Across multiple genres and formats' },
-            { n: division.stats.services,  l: 'Services Offered',     sub: 'Across 16 categories' },
-            { n: division.stats.categories,l: 'Service Categories',   sub: 'Full-spectrum publishing support' },
-            { n: division.stats.reach,     l: 'Distribution Reach',   sub: 'Ingram Content infrastructure' },
-          ].map((stat) => (
-            <div key={stat.l} className="text-center">
-              <div
-                className="text-charcoal mb-1"
-                style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '52px', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}
-              >
-                {stat.n}
-              </div>
-              <div className="text-[15px] font-semibold text-charcoal mb-1">{stat.l}</div>
-              <div className="text-[12px] text-gray-400 font-light">{stat.sub}</div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {beliefs.map((belief) => (
+            <div key={belief} className="rounded-[24px] border border-gray-200 bg-[#F7F8FA] p-7">
+              <p className="text-[16px] font-light leading-[1.9] text-gray-500">{belief}</p>
             </div>
           ))}
         </div>
-      </div>
+      </PageSection>
 
-      {/* Values */}
-      <div className="px-12 py-20 bg-white">
-        <div className="max-w-[1280px] mx-auto">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="w-8 h-px bg-blue-500 block" />
-            <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-blue-500">What We Believe</span>
+      <PageSection
+        eyebrow="What Authors Keep"
+        title={
+          <>
+            Your name.
+            <br />
+            <em className="not-italic italic text-blue-500">Your voice. Your rights.</em>
+          </>
+        }
+        description="Publishing with JMP is built to support the author without erasing the person behind the work."
+        surface="dark"
+      >
+        <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-8">
+            <p className="text-[16px] font-light leading-[1.9] text-white/70">
+              Your book should not cost you your authorship. We help strengthen the work, prepare it professionally, and move it toward readers while keeping your identity, your message, and your ownership at the center.
+            </p>
           </div>
-          <h2
-            className="text-charcoal mb-14"
-            style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(28px,3vw,44px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em' }}
-          >
-            The principles that<br />
-            <em className="not-italic italic text-blue-500">govern everything we do</em>
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { n: '01', title: 'Accessibility',   body: 'Professional publishing should not be gatekept. Every author deserves access to the same quality standards and infrastructure as traditionally published authors.' },
-              { n: '02', title: 'Ownership',       body: 'Authors own their intellectual property. Full stop. We help you publish your work, not take a piece of what you built.' },
-              { n: '03', title: 'Transparency',    body: 'Clear pricing. Clear timelines. Clear deliverables. No surprises, no hidden fees, no scope creep that catches authors off guard.' },
-              { n: '04', title: 'Family Culture',  body: 'You are not a transaction. You are a member of a publishing family. We invest in your success because your success reflects ours.' },
-              { n: '05', title: 'Innovation',      body: 'Publishing is evolving. AI tools, blockchain, direct-to-reader sales — we stay ahead of the curve so our authors always have access to what\'s next.' },
-              { n: '06', title: 'Legacy',          body: 'We are not building a company. We are building the infrastructure for generational legacy — for authors whose words should outlive the moment.' },
-            ].map((v) => (
-              <div key={v.n} className="p-7 rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-blue-sm transition-all duration-200">
-                <div className="font-mono text-[10px] text-gray-300 mb-4">{v.n}</div>
-                <div className="text-[17px] font-semibold text-charcoal mb-3">{v.title}</div>
-                <div className="text-[13px] font-light text-gray-400 leading-[1.7]">{v.body}</div>
-              </div>
-            ))}
+          <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-8">
+            <ul className="flex flex-col gap-4">
+              {authorsKeep.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-[15px] text-white/80">
+                  <span className="mt-0.5 text-blue-400">•</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-      </div>
+      </PageSection>
 
-      {/* JM1 System */}
-      <div className="bg-[#0A1F33] px-12 py-16">
-        <div className="max-w-[1280px] mx-auto grid lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1.5 mb-5">
-              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-              <span className="font-mono text-[10px] text-blue-400 tracking-[0.1em] uppercase">Part of J Merrill One</span>
-            </div>
-            <h3
-              className="text-white mb-4"
-              style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(24px,3vw,38px)', fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.02em' }}
-            >
-              One of four divisions.<br />
-              <em className="not-italic italic text-blue-500">One unified system.</em>
-            </h3>
-            <p className="text-[15px] font-light text-white/45 leading-[1.75] mb-6">
-              J Merrill Publishing is Division 01 of the J Merrill One enterprise platform — a unified system that also includes J Merrill Financial, J Merrill Foundation, and J Merrill Productions. Every division shares one data layer, one governance model, and one intelligence infrastructure.
-            </p>
-            <p className="text-[15px] font-light text-white/45 leading-[1.75] mb-8">
-              Authors who publish with JMP have a natural pathway into the broader JM1 ecosystem — estate planning to protect their intellectual property, media production to amplify their message, and community impact to extend their legacy.
-            </p>
-            <a
-              href="https://www.jmerrill.one"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-[14px] text-blue-400 border-b border-blue-400/30 pb-px hover:border-blue-400 transition-colors"
-            >
-              Explore J Merrill One ↗
-            </a>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { num: '01', name: 'Publishing',   domain: 'jmerrill.pub',        active: true },
-              { num: '02', name: 'Financial',    domain: 'jmerrill.financial',  active: false },
-              { num: '03', name: 'Foundation',   domain: 'jmerrill.foundation', active: false },
-              { num: '04', name: 'Productions',  domain: 'productions.jmerrill.one', active: false },
-            ].map((div) => (
-              <div
-                key={div.num}
-                className={`p-5 rounded-2xl border transition-all duration-200 ${
-                  div.active
-                    ? 'bg-blue-500/10 border-blue-500/30'
-                    : 'bg-white/3 border-white/8 hover:border-white/15'
-                }`}
+      <PageSection
+        eyebrow="What Authors Gain"
+        title={
+          <>
+            Professional guidance
+            <br />
+            <em className="not-italic italic text-blue-500">without losing ownership.</em>
+          </>
+        }
+        description="Authors come to JMP because they want professional publishing care without giving up the message or the meaning of the work."
+      >
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {authorsGain.map((item) => (
+            <div key={item} className="rounded-[24px] border border-gray-200 bg-white p-7">
+              <div className="mb-4 text-[20px] text-blue-500">•</div>
+              <h3
+                className="text-charcoal"
+                style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '26px', fontWeight: 700, lineHeight: 1.18 }}
               >
-                <div className="font-mono text-[10px] text-white/20 mb-2">{div.num}</div>
-                <div className="text-[15px] font-semibold text-white mb-1">{div.name}</div>
-                <div className="text-[11px] text-white/30 font-mono">{div.domain}</div>
-                {div.active && (
-                  <div className="mt-2 inline-block text-[10px] bg-blue-500 text-white px-2 py-0.5 rounded-full font-mono">Active</div>
-                )}
-              </div>
-            ))}
-          </div>
+                {item}
+              </h3>
+            </div>
+          ))}
         </div>
-      </div>
+      </PageSection>
 
-      {/* CTA */}
-      <div className="bg-charcoal px-12 py-20 text-center">
-        <h3
-          className="text-white mb-4"
-          style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(32px,4vw,52px)', fontWeight: 700, letterSpacing: '-0.02em' }}
-        >
-          Ready to join the <em className="not-italic italic text-blue-500">family?</em>
-        </h3>
-        <p className="text-[16px] text-white/40 mb-8 max-w-[400px] mx-auto leading-[1.7]">Tell us about your book and your vision. We'll build a plan around your goals.</p>
-        <div className="flex gap-4 justify-center flex-wrap">
-          <Link href="/join" className="bg-blue-500 text-white text-[14px] font-semibold px-9 py-4 rounded-full hover:bg-blue-600 transition-colors tracking-[0.03em]">
-            Join the Family →
-          </Link>
-          <a
-            href="https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled"
-            className="border border-white/15 text-white/60 text-[14px] px-9 py-4 rounded-full hover:border-blue-500 hover:text-blue-400 transition-all"
-          >
-            Schedule a Consultation
-          </a>
+      <PageSection
+        eyebrow="Our Publishing Family"
+        title={
+          <>
+            A family of imprints
+            <br />
+            <em className="not-italic italic text-blue-500">for different kinds of voices.</em>
+          </>
+        }
+        description="Different books need different homes. Our imprints help us position books according to voice, audience, and purpose without turning the author’s work into a technical matrix."
+        surface="dark"
+      >
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {imprints.map((imprint) => (
+            <div key={imprint.name} className="rounded-[24px] border border-white/10 bg-white/[0.03] p-6">
+              <h3
+                className="mb-3 text-white"
+                style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '24px', fontWeight: 700, lineHeight: 1.14 }}
+              >
+                {imprint.name}
+              </h3>
+              <p className="text-[14px] font-light leading-[1.8] text-white/70">{imprint.body}</p>
+            </div>
+          ))}
         </div>
-      </div>
+      </PageSection>
+
+      <PageSection
+        eyebrow="Our Standard Of Care"
+        title={
+          <>
+            Care, clarity,
+            <br />
+            <em className="not-italic italic text-blue-500">and professional standards.</em>
+          </>
+        }
+        description={`Founded by ${division.founder} in ${division.established}, J Merrill Publishing was built on the conviction that authors deserve a true publishing home, not just a vendor. That conviction shapes how we communicate, guide, and support every project.`}
+      >
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {carePrinciples.map((item, index) => (
+            <div key={item} className="rounded-[24px] border border-gray-200 bg-[#F7F8FA] p-7">
+              <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.12em] text-blue-500">
+                {String(index + 1).padStart(2, '0')}
+              </div>
+              <p className="text-[16px] font-light leading-[1.8] text-gray-500">{item}</p>
+            </div>
+          ))}
+        </div>
+      </PageSection>
+
+      <PageSection
+        eyebrow="Proof & Credibility"
+        title={
+          <>
+            Built on trust.
+            <br />
+            <em className="not-italic italic text-blue-500">Backed by real publishing proof.</em>
+          </>
+        }
+        description="Authors need more than warm words. They need signs that the house is real, active, and prepared to help the work reach readers well."
+        surface="dark"
+      >
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {proofPoints.map((item) => (
+            <div key={item} className="rounded-[24px] border border-white/10 bg-white/[0.03] p-6">
+              <div className="mb-3 text-[18px] text-blue-400">•</div>
+              <p className="text-[15px] font-light leading-[1.8] text-white/80">{item}</p>
+            </div>
+          ))}
+        </div>
+      </PageSection>
+
+      <CTASection
+        eyebrow="Next Step"
+        title={
+          <>
+            Ready to see where
+            <br />
+            your book <em className="not-italic italic text-blue-500">could belong?</em>
+          </>
+        }
+        description="Tell us about your book, your goals, and where you are in the journey. We will help you understand the next step."
+        primary={{ label: 'Tell Us About Your Book', href: '/join' }}
+        secondary={{ label: 'Publish With Us', href: '/publishing' }}
+      />
     </div>
   )
 }

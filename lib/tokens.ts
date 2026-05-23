@@ -93,11 +93,11 @@ export const division = {
 // ── NAVIGATION ────────────────────────────────────────────────
 export const nav = {
   primary: [
-    { label: 'Our Books',     href: '/books' },
-    { label: 'Authors',       href: '/authors' },
-    { label: 'Services',      href: '/services' },
-    { label: 'Publishing',    href: '/publishing' },
-    { label: 'About',         href: '/about' },
+    { label: 'Publish With Us', href: '/publishing' },
+    { label: 'Our Books',       href: '/books' },
+    { label: 'Authors',         href: '/authors' },
+    { label: 'Services',        href: '/services' },
+    { label: 'About',           href: '/about' },
   ],
   partner: {
     label: 'JM Prestige',
