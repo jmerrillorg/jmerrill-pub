@@ -67,7 +67,7 @@ export function BookCard({ book, compact = false }: { book: BookRecord; compact?
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <span className={`inline-flex rounded-full border px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.1em] ${style.pill}`}>
-              {book.imprint.replace('J Merrill ', '')}
+              {book.imprint === 'J Merrill Publishing' ? 'J Merrill' : book.imprint}
             </span>
             <h3
               className="mt-3 line-clamp-2 text-white"

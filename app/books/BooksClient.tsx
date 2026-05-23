@@ -75,9 +75,7 @@ export default function BooksClient() {
 
   const counts = useMemo(() => {
     const countMap: Record<string, string | number> = { all: '125+' }
-    IMPRINT_OPTIONS.filter((option) => option.id !== 'all').forEach((option) => {
-      countMap[option.id] = bookCatalog.filter((book) => book.imprint === option.name).length
-    })
+    // Imprint-level counts are intentionally omitted — use 125+ marketing label only
     return countMap
   }, [])
 
@@ -116,9 +114,11 @@ export default function BooksClient() {
                   }`}
                 >
                   {option.label}
-                  <span className={`rounded-full px-1.5 py-0.5 font-mono text-[10px] ${imprint === option.id ? 'bg-white/20' : 'bg-white/5'}`}>
-                    {counts[option.id] ?? 0}
-                  </span>
+                  {option.id === 'all' && (
+                    <span className={`rounded-full px-1.5 py-0.5 font-mono text-[10px] ${imprint === option.id ? 'bg-white/20' : 'bg-white/5'}`}>
+                      {counts[option.id] ?? ''}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
