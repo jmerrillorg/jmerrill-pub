@@ -42,7 +42,7 @@ export default function BooksPage() {
             className="mb-4 text-white"
             style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(40px,5vw,68px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.02em' }}
           >
-            {bookCatalog.length}+ titles.
+            125+ titles.
             <br />
             <em className="not-italic italic text-blue-500">{imprintCatalog.length} imprints. Direct authority.</em>
           </h1>

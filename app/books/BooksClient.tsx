@@ -71,9 +71,10 @@ export default function BooksClient() {
   }, [activeImprint?.name, format, genre, search])
 
   const displayed = filtered.slice(0, showCount)
+  const isDefaultView = !activeImprint?.name && genre === 'All Genres' && format === 'All Formats' && !search
 
   const counts = useMemo(() => {
-    const countMap: Record<string, number> = { all: bookCatalog.length }
+    const countMap: Record<string, string | number> = { all: '125+' }
     IMPRINT_OPTIONS.filter((option) => option.id !== 'all').forEach((option) => {
       countMap[option.id] = bookCatalog.filter((book) => book.imprint === option.name).length
     })
@@ -181,7 +182,9 @@ export default function BooksClient() {
           </div>
 
           <div className="font-mono text-[12px] text-white/20">
-            {filtered.length} title{filtered.length !== 1 ? 's' : ''}
+            {isDefaultView
+              ? '125+ titles in the publishing catalog'
+              : `${filtered.length} title${filtered.length !== 1 ? 's' : ''}`}
             {activeImprint?.name && ` · ${activeImprint.name}`}
             {genre !== 'All Genres' && ` · ${genre}`}
             {format !== 'All Formats' && ` · ${format}`}

@@ -26,7 +26,7 @@ export function CredibilityStrip() {
       <div className="max-w-[1280px] mx-auto px-12 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-8 flex-wrap">
           {[
-            { n: '101+',     l: 'Titles in print globally' },
+            { n: '125+',     l: 'Titles in print globally' },
             { n: '45,000+',  l: 'Global retail outlets via Ingram' },
             { n: '450+',     l: 'Ingram Content digital partners' },
             { n: 'GPO',      l: 'Registered publisher' },
@@ -153,7 +153,7 @@ export function FeaturedTitlesSection() {
   }
 
   const filters = [
-    { id: 'all', label: 'All Titles', count: bookCatalog.length },
+    { id: 'all', label: 'All Titles', count: '125+' },
     ...imprintCatalog.map((imprint) => ({
       id: imprint.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       label: imprint,
@@ -177,7 +177,7 @@ export function FeaturedTitlesSection() {
               <span className="text-[10px] font-medium tracking-[0.16em] uppercase text-blue-400" style={{ fontFamily: "'DM Mono', monospace" }}>Our Catalog</span>
             </div>
             <h2 className="text-white reveal reveal-delay-1" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(36px,4vw,56px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-              {bookCatalog.length}+ titles.<br /><em className="not-italic italic text-blue-500">Across every genre.</em>
+              125+ titles.<br /><em className="not-italic italic text-blue-500">Across every genre.</em>
             </h2>
           </div>
           <Link href="/books" className="text-[13px] text-white/35 border-b border-white/15 pb-px hover:text-blue-400 hover:border-blue-400 transition-all mt-4 lg:mt-0 mb-2 reveal">
@@ -281,8 +281,9 @@ export function FeaturedTitlesSection() {
 
         <div className="flex items-center justify-center gap-4 mt-8">
           <p className="text-[13px] text-white/25">
-            Showing {displayed.length} of {filtered.length} titles
-            {activeImprint !== 'all' && ` · ${imprintIdToName[activeImprint] || activeImprint}`}
+            {activeImprint === 'all'
+              ? `Showing ${displayed.length} featured titles`
+              : `Showing ${displayed.length} of ${filtered.length} titles · ${imprintIdToName[activeImprint] || activeImprint}`}
           </p>
           {displayed.length < filtered.length && (
             <button

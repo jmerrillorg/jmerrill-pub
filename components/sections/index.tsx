@@ -9,43 +9,6 @@ import {
 } from '@/lib/tokens'
 
 // ─────────────────────────────────────────
-// TICKER
-// ─────────────────────────────────────────
-export function Ticker() {
-  const items = [
-    'Full-Service Publisher',
-    '45,000+ Global Retail Outlets via Ingram',
-    'Helping Authors Help Themselves',
-    '101+ Published Titles',
-    'Editorial · Design · Distribution',
-    '450+ Ingram Content Digital Partners',
-    'AI-Powered Publishing Intelligence',
-    'Faith · Inspirational · Children\'s · Memoir',
-    'Founded 2018 · Columbus, Ohio',
-    'Author Careers Built Here',
-  ]
-  const doubled = [...items, ...items]
-
-  return (
-    <div className="bg-blue-500 h-11 flex items-center overflow-hidden">
-      <div
-        className="flex items-center gap-0 whitespace-nowrap animate-[ticker_28s_linear_infinite]"
-        style={{ willChange: 'transform' }}
-      >
-        {doubled.map((item, i) => (
-          <div key={i} className="flex items-center gap-6 px-8">
-            <span className="text-[12px] font-semibold tracking-[0.1em] uppercase text-white/85">
-              {item}
-            </span>
-            <span className="w-1 h-1 bg-white/40 rounded-full flex-shrink-0" />
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────
 // SECTION KICKER
 // ─────────────────────────────────────────
 function Kicker({ children, light = false }: { children: string; light?: boolean }) {
