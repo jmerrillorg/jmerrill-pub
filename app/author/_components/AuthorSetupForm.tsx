@@ -2,8 +2,19 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import {
+  authorPhotoOnBackCoverOptions,
+  bindingTypeOptions,
+  coverFinishPreferenceOptions,
+  initialAuthorCopyNeedsOptions,
+  interiorColorOptions,
+  paperTypePreferenceOptions,
+  preferredPrintFormatOptions,
+  preferredTrimSizeOptions,
+  type PublishingSelectOption,
+} from '@/lib/publishing/onboarding-production-options'
 
-type FieldOption = string | { label: string; value: string }
+type FieldOption = string | PublishingSelectOption | { label: string; value: string }
 
 type Field = {
   name: string
@@ -12,6 +23,7 @@ type Field = {
   kind?: 'field' | 'section'
   required?: boolean
   placeholder?: string
+  defaultValue?: string
   options?: FieldOption[]
   note?: string
   showWhen?: {
@@ -50,7 +62,11 @@ export function AuthorSetupForm({
   fields: Field[]
 }) {
   const [values, setValues] = useState<Record<string, string>>(() =>
-    Object.fromEntries(fields.filter((field) => field.kind !== 'section').map((field) => [field.name, ''])),
+    Object.fromEntries(
+      fields
+        .filter((field) => field.kind !== 'section')
+        .map((field) => [field.name, field.defaultValue || '']),
+    ),
   )
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState('')
@@ -73,7 +89,8 @@ export function AuthorSetupForm({
   }
 
   function getOptionValue(option: FieldOption) {
-    return typeof option === 'string' ? option : option.value
+    if (typeof option === 'string') return option
+    return 'key' in option ? option.key : option.value
   }
 
   function getOptionLabel(option: FieldOption) {
@@ -344,8 +361,105 @@ export const onboardingFields: Field[] = [
   { name: 'authorIntentNotes', label: 'Author intent / manuscript notes', type: 'textarea' },
   {
     kind: 'section',
+    name: 'section-production-specifications',
+    label: 'Section 4 - Production specifications',
+    note: 'Confirm the technical book setup before cover wrap, interior finalization, metadata, and distribution.',
+  },
+  {
+    name: 'preferredPrintFormat',
+    label: 'Preferred print format',
+    type: 'select',
+    required: true,
+    defaultValue: 'paperback_ebook',
+    options: preferredPrintFormatOptions,
+  },
+  {
+    name: 'preferredTrimSize',
+    label: 'Preferred trim size',
+    type: 'select',
+    required: true,
+    note: 'If you are unsure, select “Not sure — recommend best option.” J Merrill Publishing will recommend the best trim size based on genre, page count, audience, and distribution requirements.',
+    options: preferredTrimSizeOptions,
+  },
+  {
+    name: 'interiorColor',
+    label: 'Interior color',
+    type: 'select',
+    required: true,
+    options: interiorColorOptions,
+  },
+  {
+    name: 'paperTypePreference',
+    label: 'Paper type preference',
+    type: 'select',
+    required: true,
+    note: 'Cream paper is often preferred for devotional, memoir, faith-based, and narrative nonfiction. White paper is often preferred for workbooks, leadership books, textbooks, and books with charts or tables.',
+    options: paperTypePreferenceOptions,
+  },
+  {
+    name: 'bindingType',
+    label: 'Binding type',
+    type: 'select',
+    required: true,
+    options: bindingTypeOptions,
+  },
+  {
+    name: 'coverFinishPreference',
+    label: 'Cover finish preference',
+    type: 'select',
+    options: coverFinishPreferenceOptions,
+  },
+  {
+    name: 'backCoverCopy',
+    label: 'Back cover copy',
+    type: 'textarea',
+    note: 'Paste the text you would like considered for the back cover. If left blank, J Merrill Publishing may draft or adapt copy from your book description.',
+  },
+  {
+    name: 'backCoverAuthorBio',
+    label: 'Back cover author bio',
+    type: 'textarea',
+    note: 'If you want a shorter bio on the back cover, enter it here. Otherwise, we may adapt from your author bio.',
+  },
+  {
+    name: 'authorPhotoOnBackCover',
+    label: 'Should your author photo appear on the back cover?',
+    type: 'select',
+    options: authorPhotoOnBackCoverOptions,
+  },
+  {
+    name: 'coverEndorsements',
+    label: 'Endorsements or testimonials for cover/interior',
+    type: 'textarea',
+    note: 'Paste any endorsements, testimonials, foreword credits, or advance praise you want considered for the cover or interior.',
+  },
+  {
+    name: 'retailPricePreference',
+    label: 'Retail price preference',
+    note: 'You may suggest a retail price, but final pricing must account for trim size, page count, production cost, wholesale discount, and distribution requirements.',
+  },
+  {
+    name: 'initialAuthorCopyNeeds',
+    label: 'Initial author copy needs',
+    type: 'select',
+    options: initialAuthorCopyNeedsOptions,
+  },
+  {
+    name: 'eventLaunchDeadline',
+    label: 'Do you have an event, conference, launch date, or deadline connected to this book?',
+    type: 'textarea',
+    note: 'Include any important dates, events, speaking engagements, ministry events, conferences, or desired publication windows.',
+  },
+  {
+    name: 'productionNotes',
+    label: 'Production notes or special instructions',
+    type: 'textarea',
+    note: 'Use this space for anything the production team should know about formatting, cover, audience, design, ministry use, curriculum use, or distribution expectations.',
+  },
+  {
+    kind: 'section',
     name: 'section-rights-compliance',
-    label: 'Section 4 - Rights and compliance',
+    label: 'Section 5 - Rights and compliance',
     note: 'Lightweight rights screening. Formal contract, permissions, and legal review remain separate from this intake.',
   },
   {
@@ -371,7 +485,7 @@ export const onboardingFields: Field[] = [
   {
     kind: 'section',
     name: 'section-design-direction',
-    label: 'Section 5 - Design direction',
+    label: 'Section 6 - Design direction',
     note: 'Optional creative direction for cover, interior, tone, and visual references.',
   },
   { name: 'coverVision', label: 'Cover vision', type: 'textarea' },
@@ -380,7 +494,7 @@ export const onboardingFields: Field[] = [
   {
     kind: 'section',
     name: 'section-marketing-foundation',
-    label: 'Section 6 - Marketing foundation',
+    label: 'Section 7 - Marketing foundation',
     note: 'Early platform signals for launch planning, speaking, ministry/business alignment, and future author growth infrastructure.',
   },
   {
