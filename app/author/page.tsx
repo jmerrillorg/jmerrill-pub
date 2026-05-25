@@ -54,7 +54,7 @@ const hubCards = [
   {
     status: 'Live',
     title: 'Books Catalog',
-    body: 'Review live title pages, covers, metadata, and purchase-link presentation.',
+    body: 'Browse the full JMP catalog. Your title will appear here once it is live in distribution.',
     href: '/books',
     cta: 'Browse titles',
     secondary: 'Live',
@@ -102,6 +102,37 @@ export default function AuthorHubPage() {
           </h1>
           <p className="text-[16px] font-light text-white/45 leading-[1.75]">
             Everything related to your book, your royalties, and your journey with J Merrill Publishing.
+          </p>
+        </section>
+
+        <section className="max-w-[980px] mx-auto mb-10">
+          <div className="rounded-3xl border border-blue-500/15 bg-blue-500/[0.06] px-6 py-5">
+            <p
+              className="text-[11px] font-medium tracking-[0.12em] uppercase text-blue-300 mb-4"
+              style={{ fontFamily: "'DM Mono', monospace" }}
+            >
+              New authors
+            </p>
+            <p className="mb-4 text-[15px] font-light text-white/65">
+              New authors: complete these steps in order.
+            </p>
+            <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
+              {[
+                'Step 1 — Author Onboarding',
+                'Step 2 — Financial Setup',
+                'Step 3 — Royalty Setup',
+              ].map((step, index) => (
+                <div key={step} className="inline-flex items-center gap-3 rounded-full border border-white/8 bg-white/[0.03] px-4 py-2.5">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500 text-[11px] font-semibold text-white">
+                    {index + 1}
+                  </span>
+                  <span className="text-[13px] font-light text-white/70">{step}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="mt-4 text-[13px] font-light text-white/35 text-center">
+            Controlled routes are for active and invited authors only. Questions? Contact publishing@jmerrill.one
           </p>
         </section>
 

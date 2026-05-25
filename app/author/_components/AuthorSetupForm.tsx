@@ -1,6 +1,20 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
+import {
+  authorPhotoOnBackCoverOptions,
+  bindingTypeOptions,
+  coverFinishPreferenceOptions,
+  initialAuthorCopyNeedsOptions,
+  interiorColorOptions,
+  paperTypePreferenceOptions,
+  preferredPrintFormatOptions,
+  preferredTrimSizeOptions,
+  type PublishingSelectOption,
+} from '@/lib/publishing/onboarding-production-options'
+
+type FieldOption = string | PublishingSelectOption | { label: string; value: string }
 
 type Field = {
   name: string
@@ -9,7 +23,8 @@ type Field = {
   kind?: 'field' | 'section'
   required?: boolean
   placeholder?: string
-  options?: string[]
+  defaultValue?: string
+  options?: FieldOption[]
   note?: string
   showWhen?: {
     field: string
@@ -29,6 +44,8 @@ export function AuthorSetupForm({
   submitLabel,
   successTitle,
   successMessage,
+  successDetails,
+  successLink,
   failureMessage,
   fields,
 }: {
@@ -36,11 +53,20 @@ export function AuthorSetupForm({
   submitLabel: string
   successTitle: string
   successMessage: string
+  successDetails?: string[]
+  successLink?: {
+    href: string
+    label: string
+  }
   failureMessage?: string
   fields: Field[]
 }) {
   const [values, setValues] = useState<Record<string, string>>(() =>
-    Object.fromEntries(fields.filter((field) => field.kind !== 'section').map((field) => [field.name, ''])),
+    Object.fromEntries(
+      fields
+        .filter((field) => field.kind !== 'section')
+        .map((field) => [field.name, field.defaultValue || '']),
+    ),
   )
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState('')
@@ -60,6 +86,15 @@ export function AuthorSetupForm({
   function matchesCondition(field?: Field['showWhen'] | Field['helperWhen']) {
     if (!field) return true
     return getFieldValue(field.field) === field.value
+  }
+
+  function getOptionValue(option: FieldOption) {
+    if (typeof option === 'string') return option
+    return 'key' in option ? option.key : option.value
+  }
+
+  function getOptionLabel(option: FieldOption) {
+    return typeof option === 'string' ? option : option.label
   }
 
   function isEmailValid(value: string) {
@@ -121,6 +156,21 @@ export function AuthorSetupForm({
           {successTitle}
         </h2>
         <p className="mx-auto mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/45">{successMessage}</p>
+        {successDetails?.map((detail) => (
+          <p key={detail} className="mx-auto mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/55">
+            {detail}
+          </p>
+        ))}
+        {successLink ? (
+          <div className="mt-7">
+            <Link
+              href={successLink.href}
+              className="inline-flex items-center justify-center rounded-full border border-blue-500/25 px-6 py-3 text-[13px] font-semibold uppercase tracking-[0.08em] text-blue-300 transition-all hover:border-blue-400 hover:text-blue-200"
+            >
+              {successLink.label} →
+            </Link>
+          </div>
+        ) : null}
       </div>
     )
   }
@@ -181,7 +231,9 @@ export function AuthorSetupForm({
                 >
                   <option value="">Select one</option>
                   {field.options?.map((option) => (
-                    <option key={option} value={option}>{option}</option>
+                    <option key={getOptionValue(option)} value={getOptionValue(option)}>
+                      {getOptionLabel(option)}
+                    </option>
                   ))}
                 </select>
               ) : (
@@ -254,7 +306,26 @@ export const onboardingFields: Field[] = [
   },
   { name: 'bookTitle', label: 'Book title', required: true },
   { name: 'subtitle', label: 'Subtitle' },
+  {
+    name: 'isbn_preassigned',
+    label: 'ISBN (if pre-assigned)',
+    note: 'If you have a pre-assigned ISBN for this title, enter it here. If not, J Merrill Publishing will assign one from our registered pool at no additional charge.',
+  },
   { name: 'genre', label: 'Genre / category', required: true },
+  {
+    name: 'imprint_preference',
+    label: 'Imprint preference (optional)',
+    type: 'select',
+    note: 'Your preferred imprint is used as a starting point. Final imprint is confirmed by the JMP editorial team.',
+    options: [
+      'J Merrill Publishing (flagship — faith, general)',
+      'JM Works (general trade fiction and nonfiction)',
+      "JM Little (children's books)",
+      'JM Verse (poetry collections)',
+      'JM Signature (prestige — selective)',
+      'Not sure — let JMP recommend',
+    ],
+  },
   { name: 'targetAudience', label: 'Target audience', type: 'textarea', required: true },
   { name: 'shortDescription', label: 'Short description', type: 'textarea', required: true, placeholder: '50-100 words for quick catalog, sales, and reviewer context.' },
   { name: 'longDescription', label: 'Long description', type: 'textarea', placeholder: '150-300 words for expanded catalog and future title pages.' },
@@ -277,13 +348,118 @@ export const onboardingFields: Field[] = [
     name: 'editingLevelAcknowledgment',
     label: 'Editing level acknowledgment',
     type: 'select',
-    options: ['Developmental editing may be needed', 'Line editing may be needed', 'Copyediting may be needed', 'Proofread only', 'Not sure yet'],
+    options: [
+      'I understand my package includes editorial review and copy editing',
+      'I am requesting a manuscript evaluation only',
+      'I am requesting developmental editing',
+      'I am requesting line editing',
+      'I am requesting copy editing',
+      'I am requesting proofreading only',
+      'I am not sure — I would like a recommendation',
+    ],
   },
   { name: 'authorIntentNotes', label: 'Author intent / manuscript notes', type: 'textarea' },
   {
     kind: 'section',
+    name: 'section-production-specifications',
+    label: 'Section 4 - Production specifications',
+    note: 'Confirm the technical book setup before cover wrap, interior finalization, metadata, and distribution.',
+  },
+  {
+    name: 'preferredPrintFormat',
+    label: 'Preferred print format',
+    type: 'select',
+    required: true,
+    defaultValue: 'paperback_ebook',
+    options: preferredPrintFormatOptions,
+  },
+  {
+    name: 'preferredTrimSize',
+    label: 'Preferred trim size',
+    type: 'select',
+    required: true,
+    note: 'If you are unsure, select “Not sure — recommend best option.” J Merrill Publishing will recommend the best trim size based on genre, page count, audience, and distribution requirements.',
+    options: preferredTrimSizeOptions,
+  },
+  {
+    name: 'interiorColor',
+    label: 'Interior color',
+    type: 'select',
+    required: true,
+    options: interiorColorOptions,
+  },
+  {
+    name: 'paperTypePreference',
+    label: 'Paper type preference',
+    type: 'select',
+    required: true,
+    note: 'Cream paper is often preferred for devotional, memoir, faith-based, and narrative nonfiction. White paper is often preferred for workbooks, leadership books, textbooks, and books with charts or tables.',
+    options: paperTypePreferenceOptions,
+  },
+  {
+    name: 'bindingType',
+    label: 'Binding type',
+    type: 'select',
+    required: true,
+    options: bindingTypeOptions,
+  },
+  {
+    name: 'coverFinishPreference',
+    label: 'Cover finish preference',
+    type: 'select',
+    options: coverFinishPreferenceOptions,
+  },
+  {
+    name: 'backCoverCopy',
+    label: 'Back cover copy',
+    type: 'textarea',
+    note: 'Paste the text you would like considered for the back cover. If left blank, J Merrill Publishing may draft or adapt copy from your book description.',
+  },
+  {
+    name: 'backCoverAuthorBio',
+    label: 'Back cover author bio',
+    type: 'textarea',
+    note: 'If you want a shorter bio on the back cover, enter it here. Otherwise, we may adapt from your author bio.',
+  },
+  {
+    name: 'authorPhotoOnBackCover',
+    label: 'Should your author photo appear on the back cover?',
+    type: 'select',
+    options: authorPhotoOnBackCoverOptions,
+  },
+  {
+    name: 'coverEndorsements',
+    label: 'Endorsements or testimonials for cover/interior',
+    type: 'textarea',
+    note: 'Paste any endorsements, testimonials, foreword credits, or advance praise you want considered for the cover or interior.',
+  },
+  {
+    name: 'retailPricePreference',
+    label: 'Retail price preference',
+    note: 'You may suggest a retail price, but final pricing must account for trim size, page count, production cost, wholesale discount, and distribution requirements.',
+  },
+  {
+    name: 'initialAuthorCopyNeeds',
+    label: 'Initial author copy needs',
+    type: 'select',
+    options: initialAuthorCopyNeedsOptions,
+  },
+  {
+    name: 'eventLaunchDeadline',
+    label: 'Do you have an event, conference, launch date, or deadline connected to this book?',
+    type: 'textarea',
+    note: 'Include any important dates, events, speaking engagements, ministry events, conferences, or desired publication windows.',
+  },
+  {
+    name: 'productionNotes',
+    label: 'Production notes or special instructions',
+    type: 'textarea',
+    note: 'Use this space for anything the production team should know about formatting, cover, audience, design, ministry use, curriculum use, or distribution expectations.',
+  },
+  {
+    kind: 'section',
     name: 'section-rights-compliance',
-    label: 'Section 4 - Rights and compliance',
+    label: 'Section 5 - Rights and compliance',
     note: 'Lightweight rights screening. Formal contract, permissions, and legal review remain separate from this intake.',
   },
   {
@@ -309,7 +485,7 @@ export const onboardingFields: Field[] = [
   {
     kind: 'section',
     name: 'section-design-direction',
-    label: 'Section 5 - Design direction',
+    label: 'Section 6 - Design direction',
     note: 'Optional creative direction for cover, interior, tone, and visual references.',
   },
   { name: 'coverVision', label: 'Cover vision', type: 'textarea' },
@@ -318,7 +494,7 @@ export const onboardingFields: Field[] = [
   {
     kind: 'section',
     name: 'section-marketing-foundation',
-    label: 'Section 6 - Marketing foundation',
+    label: 'Section 7 - Marketing foundation',
     note: 'Early platform signals for launch planning, speaking, ministry/business alignment, and future author growth infrastructure.',
   },
   {
@@ -326,7 +502,18 @@ export const onboardingFields: Field[] = [
     label: 'Publishing goal',
     type: 'select',
     required: true,
-    options: ['Share my story', 'Build authority', 'Ministry / speaking', 'Professional author platform', 'Legacy project', 'Other'],
+    options: [
+      'Build my personal brand',
+      'Share my story',
+      'Become a professional author',
+      'Publish and distribute my book',
+      'Grow my audience',
+      'Establish authority in my field',
+      'Create a legacy work',
+      'Launch a book-based business',
+      'Ministry / faith-based impact',
+      'Other',
+    ],
   },
   {
     name: 'packageConfirmation',
@@ -341,6 +528,12 @@ export const onboardingFields: Field[] = [
       'Custom Bundle / Special Agreement',
       'Not sure yet',
     ],
+  },
+  {
+    name: 'payment_acknowledgment',
+    label: 'Payment / deposit acknowledgment',
+    type: 'checkbox',
+    placeholder: 'I understand that production begins upon receipt of my signed agreement and initial deposit. (Optional)',
   },
   {
     name: 'audiobookInterest',
@@ -384,11 +577,7 @@ export const onboardingFields: Field[] = [
       'Yes — multiple books',
       'Not sure yet',
     ],
-    helperWhen: {
-      field: 'multiTitleIntent',
-      value: 'Yes — multiple books',
-      note: 'For now, please complete this onboarding for the primary title. Our team will capture additional titles separately if needed.',
-    },
+    note: 'If you are onboarding multiple titles, please complete a separate onboarding submission for each book. One form per title keeps your project records clean.',
   },
   { name: 'authorBio', label: 'Author bio', type: 'textarea', placeholder: 'Short author bio, credentials, ministry, business, or story context.' },
   { name: 'authorPlatform', label: 'Author platform', type: 'textarea', placeholder: 'Ministry, business, speaking, nonprofit, community, media, or professional platform.' },
@@ -415,7 +604,8 @@ export const financialFields: Field[] = [
     label: 'Activation status',
     type: 'select',
     required: true,
-    options: ['Active author', 'Contract/payment complete', 'Manuscript intake complete', 'Invited by JMP staff', 'Not sure'],
+    options: ['Active author', 'Contract/payment complete', 'Manuscript intake complete', 'Invited by JMP staff'],
+    note: 'If you are unsure whether you are an active author, contact publishing@jmerrill.one before completing this form.',
   },
   {
     name: 'taxClassification',
@@ -436,7 +626,13 @@ export const financialFields: Field[] = [
     label: 'Payment preference',
     type: 'select',
     required: true,
-    options: ['Secure ACH onboarding link', 'Check by mail', 'PayPal / digital payment follow-up', 'Stripe/processor onboarding when available', 'Not sure yet'],
+    options: [
+      'Secure ACH onboarding link',
+      'Check by mail',
+      'PayPal / digital payment follow-up',
+      { label: 'Stripe payment link — request from publishing@jmerrill.one', value: 'Stripe/processor onboarding when available' },
+      'Not sure yet',
+    ],
   },
   { name: 'securePaymentLinkPreference', label: 'Secure payment onboarding link', type: 'checkbox', placeholder: 'I prefer to complete bank or processor details through a secure payment onboarding link.' },
   { name: 'paymentEmail', label: 'Payment email, if different', type: 'email' },
@@ -447,6 +643,7 @@ export const financialFields: Field[] = [
     type: 'select',
     required: true,
     options: ['Need secure upload link', 'Already provided', 'Will provide later', 'Not sure'],
+    note: 'If you need a secure W-9 upload link or have already provided your W-9, select the appropriate option above. JMP will send a secure document request to your email within 2 business days of form submission.',
   },
   { name: 'notes', label: 'Financial setup notes', type: 'textarea', note: 'Do not enter SSNs or bank account numbers here. JMP will request sensitive documents through a secure channel.' },
 ]
@@ -461,7 +658,13 @@ export const royaltyFields: Field[] = [
   { name: 'authorName', label: 'Author name', required: true },
   { name: 'email', label: 'Email', type: 'email', required: true },
   { name: 'phone', label: 'Phone', type: 'tel' },
-  { name: 'titleList', label: 'Titles covered by this setup', type: 'textarea', required: true },
+  {
+    name: 'titleList',
+    label: 'Titles covered by this setup',
+    type: 'textarea',
+    required: true,
+    note: 'List each title by its full name, one per line. Example: The Shift: Changing With God',
+  },
   { name: 'royaltyContact', label: 'Royalty contact name', required: true },
   {
     name: 'reportingPreference',
@@ -486,7 +689,12 @@ export const royaltyFields: Field[] = [
     name: 'paymentCadence',
     label: 'Payment cadence',
     type: 'select',
-    options: ['Monthly if eligible', 'Quarterly', 'Annual', 'Per agreement', 'Not sure'],
+    options: [
+      'Per agreement — JMP standard 90-day cycle',
+      'Per agreement — custom terms (confirm with publishing@jmerrill.one)',
+      'Not sure',
+    ],
+    note: 'JMP processes royalty payments on a 90-day cycle following the close of each reporting period. Your signed publishing agreement defines the specific terms for your titles.',
   },
   {
     name: 'existingAgreementStatus',
@@ -496,4 +704,10 @@ export const royaltyFields: Field[] = [
   },
   { name: 'royaltyNotes', label: 'Royalty notes / special terms to confirm', type: 'textarea' },
   { name: 'notes', label: 'Royalty setup notes', type: 'textarea' },
+  {
+    name: 'royalty_terms_acknowledgment',
+    label: 'Royalty rate acknowledgment',
+    type: 'checkbox',
+    placeholder: 'I understand that my royalty terms, rates, and payment schedule are defined in my signed publishing agreement. (Optional)',
+  },
 ]

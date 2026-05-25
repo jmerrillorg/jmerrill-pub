@@ -1,4 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import {
+  authorPhotoOnBackCoverOptions,
+  bindingTypeOptions,
+  coverFinishPreferenceOptions,
+  getOptionLabel,
+  initialAuthorCopyNeedsOptions,
+  interiorColorOptions,
+  paperTypePreferenceOptions,
+  preferredPrintFormatOptions,
+  preferredTrimSizeOptions,
+} from '@/lib/publishing/onboarding-production-options'
 import { requireAuthorAccess } from '@/lib/server/author-access'
 import { hasConfirmedNotificationDelivery, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
@@ -32,6 +43,11 @@ export async function POST(req: NextRequest) {
       'targetAudience',
       'shortDescription',
       'manuscriptStatus',
+      'preferredPrintFormat',
+      'preferredTrimSize',
+      'interiorColor',
+      'paperTypePreference',
+      'bindingType',
       'rightsHolderConfirmed',
       'publishingGoal',
     ]
@@ -53,6 +69,28 @@ export async function POST(req: NextRequest) {
     const rightsHolderConfirmed = asBoolean(body.rightsHolderConfirmed)
     const multiTitleIntent = cleanString(body.multiTitleIntent)
     const message = cleanString(body.notes || body.authorIntentNotes)
+    const preferredPrintFormatKey = cleanString(body.preferredPrintFormat)
+    const preferredTrimSizeKey = cleanString(body.preferredTrimSize)
+    const interiorColorKey = cleanString(body.interiorColor)
+    const paperTypePreferenceKey = cleanString(body.paperTypePreference)
+    const bindingTypeKey = cleanString(body.bindingType)
+    const coverFinishPreferenceKey = cleanString(body.coverFinishPreference)
+    const backCoverCopy = cleanString(body.backCoverCopy)
+    const backCoverAuthorBio = cleanString(body.backCoverAuthorBio)
+    const authorPhotoOnBackCoverKey = cleanString(body.authorPhotoOnBackCover)
+    const coverEndorsements = cleanString(body.coverEndorsements)
+    const retailPricePreference = cleanString(body.retailPricePreference)
+    const initialAuthorCopyNeedsKey = cleanString(body.initialAuthorCopyNeeds)
+    const eventLaunchDeadline = cleanString(body.eventLaunchDeadline)
+    const productionNotes = cleanString(body.productionNotes)
+    const preferredPrintFormat = getOptionLabel(preferredPrintFormatOptions, preferredPrintFormatKey)
+    const preferredTrimSize = getOptionLabel(preferredTrimSizeOptions, preferredTrimSizeKey)
+    const interiorColor = getOptionLabel(interiorColorOptions, interiorColorKey)
+    const paperTypePreference = getOptionLabel(paperTypePreferenceOptions, paperTypePreferenceKey)
+    const bindingType = getOptionLabel(bindingTypeOptions, bindingTypeKey)
+    const coverFinishPreference = getOptionLabel(coverFinishPreferenceOptions, coverFinishPreferenceKey)
+    const authorPhotoOnBackCover = getOptionLabel(authorPhotoOnBackCoverOptions, authorPhotoOnBackCoverKey)
+    const initialAuthorCopyNeeds = getOptionLabel(initialAuthorCopyNeedsOptions, initialAuthorCopyNeedsKey)
 
     const author = {
       firstName,
@@ -81,16 +119,48 @@ export async function POST(req: NextRequest) {
       multiTitleIntent: multiTitleIntent || null,
     }
 
+    const productionSpecifications = {
+      preferredPrintFormat,
+      preferredPrintFormatKey,
+      preferredTrimSize,
+      preferredTrimSizeKey,
+      interiorColor,
+      interiorColorKey,
+      paperTypePreference,
+      paperTypePreferenceKey,
+      bindingType,
+      bindingTypeKey,
+      coverFinishPreference: coverFinishPreference || null,
+      coverFinishPreferenceKey: coverFinishPreferenceKey || null,
+      backCoverCopy: backCoverCopy || null,
+      backCoverAuthorBio: backCoverAuthorBio || null,
+      authorPhotoOnBackCover: authorPhotoOnBackCover || null,
+      authorPhotoOnBackCoverKey: authorPhotoOnBackCoverKey || null,
+      coverEndorsements: coverEndorsements || null,
+      retailPricePreference: retailPricePreference || null,
+      initialAuthorCopyNeeds: initialAuthorCopyNeeds || null,
+      initialAuthorCopyNeedsKey: initialAuthorCopyNeedsKey || null,
+      eventLaunchDeadline: eventLaunchDeadline || null,
+      productionNotes: productionNotes || null,
+    }
+
     const payload = {
       formType: 'author-onboarding',
-      source: 'website-author-onboarding',
+      source: 'private-author-onboarding',
       division: 'publishing',
       divisionNumber: '01',
-      route: '/author/onboarding',
+      route: '/onboarding',
       recipient,
+      accessCodeUsed: true,
+      dataverseTarget: {
+        primaryTable: 'jm1pub_authoronboarding',
+        relatedTitleTable: 'jm1pub_title',
+        relatedProjectTable: 'jm1pub_authorproject',
+      },
       author,
       book,
       publishing,
+      productionSpecifications,
       message,
       rawFormData: body,
 
@@ -114,6 +184,28 @@ export async function POST(req: NextRequest) {
       supportingFilesLink: cleanString(body.supportingFilesLink),
       editingLevelAcknowledgment: cleanString(body.editingLevelAcknowledgment),
       authorIntentNotes: cleanString(body.authorIntentNotes),
+      preferredPrintFormat,
+      preferredPrintFormatKey,
+      preferredTrimSize,
+      preferredTrimSizeKey,
+      interiorColor,
+      interiorColorKey,
+      paperTypePreference,
+      paperTypePreferenceKey,
+      bindingType,
+      bindingTypeKey,
+      coverFinishPreference: coverFinishPreference || null,
+      coverFinishPreferenceKey: coverFinishPreferenceKey || null,
+      backCoverCopy: backCoverCopy || null,
+      backCoverAuthorBio: backCoverAuthorBio || null,
+      authorPhotoOnBackCover: authorPhotoOnBackCover || null,
+      authorPhotoOnBackCoverKey: authorPhotoOnBackCoverKey || null,
+      coverEndorsements: coverEndorsements || null,
+      retailPricePreference: retailPricePreference || null,
+      initialAuthorCopyNeeds: initialAuthorCopyNeeds || null,
+      initialAuthorCopyNeedsKey: initialAuthorCopyNeedsKey || null,
+      eventLaunchDeadline: eventLaunchDeadline || null,
+      productionNotes: productionNotes || null,
       rightsHolderConfirmed,
       originalWorkConfirmation: rightsHolderConfirmed,
       hasCoAuthors: cleanString(body.hasCoAuthors),
@@ -143,7 +235,7 @@ export async function POST(req: NextRequest) {
     const integration = await submitWebsiteForm({
       formType: 'author-onboarding',
       route: '/author/onboarding',
-      source: 'website-author-onboarding',
+      source: 'private-author-onboarding',
       subject: `Author onboarding submitted: ${payload.authorName}`,
       routeSpecificFlowUrl: onboardingFlowUrl,
       payload,

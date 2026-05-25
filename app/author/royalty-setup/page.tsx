@@ -25,8 +25,10 @@ export default function AuthorRoyaltySetupPage() {
           endpoint="/api/author/royalty-setup"
           fields={royaltyFields}
           submitLabel="Submit royalty setup"
-          successTitle="Royalty setup received."
-          successMessage="Your royalty setup details have been received. The publishing team will confirm reporting and payment workflow details as the account is prepared."
+          successTitle="Your royalty setup has been received."
+          successMessage="A notification has been sent to publishing@jmerrill.one. Your reporting preferences will be applied when your royalty cycle begins."
+          successDetails={['Your Author Hub setup is complete.']}
+          successLink={{ href: '/author', label: 'Return to Author Hub' }}
         />
       </AuthorGate>
     </AuthorPortalShell>

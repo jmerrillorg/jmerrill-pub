@@ -25,8 +25,10 @@ export default function AuthorOnboardingPage() {
           endpoint="/api/author/onboarding"
           fields={onboardingFields}
           submitLabel="Submit onboarding"
-          successTitle="Onboarding received."
-          successMessage="Thank you. Your author onboarding information has been received by J Merrill Publishing. Our team will review your submission and follow up with next steps."
+          successTitle="Your onboarding intake has been received."
+          successMessage="A notification has been sent to publishing@jmerrill.one. You can expect a follow-up within 1–2 business days."
+          successDetails={['Next step: complete Financial Setup using the Author Hub.']}
+          successLink={{ href: '/author', label: 'Return to Author Hub' }}
           failureMessage="We could not submit your onboarding form at this time. Please try again or contact publishing@jmerrill.one."
         />
       </AuthorGate>
