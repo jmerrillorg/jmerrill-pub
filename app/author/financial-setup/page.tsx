@@ -25,8 +25,10 @@ export default function AuthorFinancialSetupPage() {
           endpoint="/api/author/financial-setup"
           fields={financialFields}
           submitLabel="Submit financial setup"
-          successTitle="Financial setup received."
-          successMessage="Your financial setup details have been received. J Merrill Publishing will use a secure channel for any tax forms or bank details that should not be entered here."
+          successTitle="Your financial setup has been received."
+          successMessage="A notification has been sent to publishing@jmerrill.one. If a W-9 or secure payment link is needed, you will receive a follow-up email within 2 business days."
+          successDetails={['Next step: complete Royalty Setup using the Author Hub.']}
+          successLink={{ href: '/author', label: 'Return to Author Hub' }}
         />
       </AuthorGate>
     </AuthorPortalShell>
