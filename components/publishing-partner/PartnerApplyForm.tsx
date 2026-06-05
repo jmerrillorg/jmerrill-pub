@@ -287,6 +287,7 @@ export function PartnerApplyForm() {
       !form.whyPartner ||
       !form.whatYouBring ||
       !form.partnerTier ||
+      !form.referredBy ||
       !form.budgetConfirmed ||
       !form.consentToContact ||
       !form.consentToTerms ||
