@@ -283,11 +283,11 @@ function sentenceFromTitle(title: string) {
 }
 
 function fallbackShortDescription(book: RawBook, genre: string) {
-  return `${sentenceFromTitle(book.title)} A ${genre.toLowerCase()} title published through ${book.imprint}, part of the J Merrill Publishing flagship catalog.`
+  return `${sentenceFromTitle(book.title)} Publisher description pending. This ${genre.toLowerCase()} title is listed in the J Merrill Publishing catalog.`
 }
 
 function fallbackLongDescription(book: RawBook, genre: string, formats: BookFormat[]) {
-  return `${book.title} is part of the J Merrill Publishing catalog, positioned for readers seeking ${genre.toLowerCase()} work delivered with professional editorial, design, and distribution standards. This title is structured to support long-term discoverability on jmerrill.pub while also preparing for future Dataverse-driven catalog enrichment across formats including ${formats.join(', ')}.`
+  return `Publisher-approved description copy is pending for ${book.title}. Current catalog metadata lists this title under ${genre} with available formats: ${formats.join(', ')}.`
 }
 
 function titleKeywords(title: string) {

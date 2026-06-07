@@ -44,7 +44,6 @@ export const bookRetailerEnrichmentOverrides: Record<string, BookRetailerEnrichm
     subtitle: 'A Self-Determined Leader',
     retailerTitle: "A Principal's Tale: A Self-Determined Leader",
     releaseDate: '2021-02-14',
-    retailerCoverUrl: 'https://covers3.booksamillion.com/covers/bam/1/95/071/966/1950719669_b.jpg',
     retailerDescription:
       'Shelley McIntosh shares an education memoir and leadership study rooted in urban school administration, using lived experience and self-determination theory to reflect on autonomy, competence, relatedness, and principal leadership in underserved communities.',
     retailerLastVerifiedAt: '2026-04-19',
