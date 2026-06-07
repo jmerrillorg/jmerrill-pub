@@ -37,7 +37,7 @@ export function NavBar() {
       </Link>
 
       {/* Center links */}
-      <div className="hidden lg:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
+      <div className="hidden xl:flex items-center gap-6 2xl:gap-10 absolute left-1/2 -translate-x-1/2">
         {nav.primary.map((link) => (
           <Link
             key={link.href}
@@ -59,7 +59,7 @@ export function NavBar() {
       <div className="ml-auto flex items-center gap-4">
         <a
           href={nav.secondary.href}
-          className="hidden lg:block text-[13px] text-gray-500 hover:text-blue-500 transition-colors duration-200"
+          className="hidden xl:block text-[13px] text-gray-500 hover:text-blue-500 transition-colors duration-200"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -75,7 +75,7 @@ export function NavBar() {
         {/* Mobile hamburger */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="lg:hidden flex flex-col gap-1.5 w-6"
+          className="xl:hidden flex flex-col gap-1.5 w-6"
           aria-label="Toggle menu"
         >
           <span className={`block h-px bg-charcoal transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
@@ -86,7 +86,7 @@ export function NavBar() {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg lg:hidden">
+        <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg xl:hidden">
           <div className="flex flex-col px-6 py-6 gap-4">
             {nav.primary.map((link) => (
               <Link
