@@ -3,9 +3,9 @@ import Link from 'next/link'
 import { memberships } from '@/lib/tokens'
 
 export const metadata: Metadata = {
-  title: 'Author Memberships — Ongoing Author Support | J Merrill Publishing',
+  title: 'Author Memberships for Support After Publication | J Merrill Publishing',
   description:
-    'Post-publication support for authors who want ongoing guidance, visibility, resources, and continued connection after launch.',
+    'Stay connected after launch with practical author support, visibility guidance, resources, and continued care from J Merrill Publishing.',
 }
 
 const bookingUrl = 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled'
@@ -115,7 +115,13 @@ export default function MembershipsPage() {
               Choose the level of support that matches your next season.
             </h2>
             <p className="text-[15px] font-light text-white/45 leading-[1.8]">
-              Membership is not about paying for access to a system. It is about choosing the level of continued support that fits where you are after publication.
+              Membership is not about paying for access to a system. It is about choosing the level of continued support that fits where you are after publication, so the author relationship can keep serving the work after launch.
+            </p>
+          </div>
+
+          <div className="mb-8 rounded-[24px] border border-blue-500/20 bg-blue-500/[0.06] p-6">
+            <p className="text-[14px] font-light leading-[1.8] text-white/58">
+              These tiers are support paths, not promises of automatic sales or platform growth. The right fit depends on what kind of guidance, accountability, and continued connection the author needs next.
             </p>
           </div>
 

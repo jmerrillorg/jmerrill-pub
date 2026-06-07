@@ -6,9 +6,9 @@ import { PageSection } from '@/components/site/PageSection'
 import { packages } from '@/lib/tokens'
 
 export const metadata: Metadata = {
-  title: 'Publishing Packages — Flexible Payment Plans | J Merrill Publishing',
+  title: 'Publishing Paths for Serious Authors | J Merrill Publishing',
   description:
-    'Three full-service publishing packages from $1,999. Pay in full or choose 2, 4, 8, or 12-month autopay plans. Editorial, design, distribution, and eBook included.',
+    'Find the J Merrill Publishing path that fits your manuscript, goals, and level of support while keeping your voice, rights, and long-term author journey at the center.',
 }
 
 const bookingUrl = 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled'
@@ -262,9 +262,14 @@ export default function PackagesPage() {
               <br />
               <em className="not-italic italic text-blue-500">each path includes.</em>
             </>
-          }
-          description="Once you understand the level of support your book may need, the details below can help you compare each publishing path more clearly."
-        >
+        }
+        description="Once you understand the level of care your book may need, the details below can help you compare each publishing path without reducing the decision to price alone."
+      >
+          <div className="mb-6 rounded-[22px] border border-blue-100 bg-blue-50 px-6 py-5">
+            <p className="text-[14px] font-light leading-[1.8] text-blue-950/65">
+              This comparison is here to support discernment. The right path should protect the work, respect the author, and give the book the level of preparation it actually needs.
+            </p>
+          </div>
           <div className="rounded-2xl border border-gray-200 overflow-hidden">
             <div className="grid grid-cols-[1fr_160px_160px_160px] bg-charcoal">
               <div className="p-4 text-[13px] font-semibold text-white/60">Feature</div>
@@ -321,8 +326,11 @@ export default function PackagesPage() {
             <em className="not-italic italic text-blue-500">for serious publishing projects.</em>
           </>
         }
-        description="Publishing is an investment in the work. Where available, payment options help authors plan responsibly while moving the project forward with clarity."
+        description="Publishing is an investment in the work and the author behind it. Where available, payment options help authors plan responsibly while moving forward with clarity."
       >
+        <p className="mb-8 max-w-[760px] text-[15px] font-light leading-[1.8] text-gray-500">
+          Payment structure should make the publishing relationship clearer, not pressure an author into a rushed decision. We keep these options visible so authors can plan the care their book needs with realistic expectations.
+        </p>
         <div className="grid gap-4 lg:grid-cols-3">
           {paymentOptions.map((plan) => (
             <div key={plan.package} className="overflow-hidden rounded-[26px] border border-gray-200 bg-[#F7F8FA]">

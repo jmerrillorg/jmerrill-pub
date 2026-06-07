@@ -61,7 +61,7 @@ export default function DistributionPage() {
             reach the <em className="not-italic text-[#1E90FF]">marketplace.</em>
           </h1>
           <p className="text-[16px] font-light text-white/45 leading-[1.8] max-w-[540px] mb-12">
-            Publishing does not end when the files are finished. Your book needs to be prepared, positioned, and distributed through the right channels so readers, retailers, libraries, and partners can find it. J Merrill Publishing helps authors move from finished book to marketplace access with clarity.
+            Publishing does not end when the files are finished. Your book needs to be prepared, positioned, and distributed through the right channels so readers, retailers, libraries, and partners can find it. J Merrill Publishing helps authors move from finished book to marketplace access with clarity and realistic expectations.
           </p>
 
           <div className="flex flex-wrap gap-3">
@@ -94,7 +94,7 @@ export default function DistributionPage() {
               Distribution is access — not a sales guarantee.
             </h2>
             <p className="text-[15px] text-white/45 font-light leading-[1.8]">
-              Distribution makes a professionally prepared book available through retail, wholesale, library, and digital channels. It does not automatically guarantee sales, shelf placement, or reader demand. That is why metadata, presentation, launch support, and author visibility still matter.
+              Distribution makes a professionally prepared book available through retail, wholesale, library, and digital channels. It does not automatically guarantee sales, shelf placement, or reader demand. That is why metadata, presentation, launch support, and author visibility still matter after the book is released.
             </p>
           </div>
 
@@ -108,7 +108,7 @@ export default function DistributionPage() {
               Professional marketplace access beyond upload-only publishing.
             </h2>
             <p className="text-[15px] text-white/45 font-light leading-[1.8]">
-              Through our Ingram distribution relationship, eligible titles can be prepared for broad marketplace access across print, eBook, wholesale, and library channels. This gives authors a professional publishing path many cannot unlock alone.
+              Through our Ingram distribution relationship, eligible titles can be prepared for broad marketplace access across print, eBook, wholesale, and library channels. This gives authors a professional publishing path many cannot unlock alone while keeping the focus on a prepared book, not an empty promise of automatic sales.
             </p>
           </div>
         </div>
@@ -136,6 +136,12 @@ export default function DistributionPage() {
 
       {/* ── CONTENT ───────────────────────────────────────────────────── */}
       <div className="max-w-[1280px] mx-auto px-8 md:px-12 py-14">
+
+        <div className="mb-10 rounded-[28px] border border-[#1E90FF]/20 bg-[#1E90FF]/[0.05] p-7">
+          <p className="max-w-[860px] text-[15px] font-light leading-[1.8] text-white/55">
+            Distribution matters because it gives a well-prepared book a professional path into the marketplace. The channel details below are here to explain availability, not to imply guaranteed placement, stocking, sales, or reader demand.
+          </p>
+        </div>
 
         {/* PRINT */}
         {tab === 'print' && (
@@ -285,7 +291,7 @@ export default function DistributionPage() {
                   style={{ fontFamily: "'DM Mono', monospace" }}>Faith Market Add-On Service</div>
                 <div className="text-[15px] font-semibold text-white mb-1">JMP-DIST-FAITH</div>
                 <p className="text-[13px] text-white/40 font-light leading-[1.7]">
-                  Faith Market Distribution — $295. CBA market positioning, LifeWay-ready metadata, Christian retail channel access, and church/conference placement support. Available as an add-on to any publishing package where it fits the work.
+                  Faith Market Distribution — $295. Faith-market positioning, Christian retail metadata preparation, and church/conference channel guidance. Available as an add-on to any publishing package where it fits the work and audience.
                 </p>
               </div>
               <div className="px-5 py-5 bg-white/[0.03] border border-white/7 rounded-2xl">

@@ -7,9 +7,9 @@ import { NewsletterSignup } from '@/components/content/NewsletterSignup'
 import { JMP_CONTACT } from '@/lib/distribution-data'
 
 export const metadata: Metadata = {
-  title: 'Contact',
+  title: 'Contact J Merrill Publishing | Start the Right Conversation',
   description:
-    'Contact J Merrill Publishing for consultations, publishing inquiries, media requests, and flagship brand communication.',
+    'Reach J Merrill Publishing to talk about your book, ask publishing questions, schedule a consultation, or take the next step toward joining the family.',
 }
 
 const contactCards = [
@@ -17,7 +17,7 @@ const contactCards = [
     label: 'Publishing inquiries',
     value: JMP_CONTACT.email,
     href: JMP_CONTACT.emailHref,
-    description: 'General publishing, package, and service questions.',
+    description: 'Ask about your book, your publishing stage, and whether JMP may be the right home for the work.',
   },
   {
     label: 'Consultation booking',
@@ -29,7 +29,7 @@ const contactCards = [
     label: 'Phone',
     value: JMP_CONTACT.phone,
     href: JMP_CONTACT.phoneHref,
-    description: 'For direct flagship publishing contact during business hours.',
+    description: 'For direct publishing contact when a conversation is the clearest next step.',
   },
 ]
 
@@ -41,12 +41,12 @@ export default function ContactPage() {
         ghost="Contact"
         title={
           <>
-            Reach the flagship team
+            Start the right
             <br />
-            <em className="not-italic italic text-blue-500">the right way</em>
+            <em className="not-italic italic text-blue-500">publishing conversation.</em>
           </>
         }
-        description="Use this contact surface for consultations, publishing questions, media inquiries, and flagship communication. If you are ready to begin your publishing path, Join the Family remains the primary onboarding route."
+        description="If you are carrying a manuscript, message, story, or legacy work, we want the next step to feel clear. Use this page for publishing questions, consultations, media inquiries, and direct communication with J Merrill Publishing."
         actions={[
           { label: 'Join the Family', href: '/join' },
           { label: 'Schedule a Consultation', href: JMP_CONTACT.booking, external: true },
@@ -57,12 +57,12 @@ export default function ContactPage() {
         eyebrow="Direct Paths"
         title={
           <>
-            Clear routes for
+            Clear paths for
             <br />
-            <em className="not-italic italic text-blue-500">every kind of inquiry</em>
+            <em className="not-italic italic text-blue-500">the conversation you need.</em>
           </>
         }
-        description="The contact page should clarify the difference between general communication and publishing onboarding so the flagship brand feels organized, responsive, and premium."
+        description="Whether you are ready to tell us about your book or simply need to ask a question first, these routes help the conversation reach the right place without losing the human care behind the work."
       >
         <div className="grid gap-4 lg:grid-cols-3">
           {contactCards.map((card) => (
@@ -89,7 +89,7 @@ export default function ContactPage() {
             </div>
             <p className="text-[15px] font-light leading-[1.8] text-gray-500">
               {JMP_CONTACT.address.display}. Business hours are structured for both daytime and evening
-              author conversations, with consultations available by appointment.
+              author conversations, with consultations available by appointment so authors can talk through the work before making a publishing decision.
             </p>
             <div className="mt-6 flex flex-col gap-2">
               {JMP_CONTACT.hours.map((slot) => (
