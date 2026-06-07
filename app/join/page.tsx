@@ -3,7 +3,7 @@ import JoinForm from './JoinForm'
 
 export const metadata: Metadata = {
   title: 'Join the Family — Start Your Publishing Journey',
-  description: "Tell us about your book and your vision. We'll match you with the right publishing package and walk you through every step of your journey.",
+  description: "Tell us about your book, your message, and where you are in the journey. We'll help you understand the right next step while your voice and rights stay at the center.",
 }
 
 export default function JoinPage() {
@@ -40,7 +40,13 @@ export default function JoinPage() {
             <em className="not-italic italic text-blue-500">Join the Family.</em>
           </h1>
           <p className="text-[16px] font-light text-white/45 leading-[1.75]">
-            Complete the inquiry below. We follow up within 1–2 business days.
+            Complete the inquiry below. You do not need every publishing answer yet. This first step helps us understand the work, protect the author's voice, and follow up within 1–2 business days.
+          </p>
+        </div>
+
+        <div className="mb-8 rounded-3xl border border-blue-500/20 bg-blue-500/[0.07] p-6">
+          <p className="text-[14px] font-light leading-[1.8] text-white/58">
+            Your inquiry starts a conversation, not a transaction. Your name, rights, message, and long-term goals remain central while we help identify whether J Merrill Publishing is the right family for your book.
           </p>
         </div>
 

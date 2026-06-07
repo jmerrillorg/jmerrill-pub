@@ -6,9 +6,9 @@ import { PageSection } from '@/components/site/PageSection'
 import { serviceCatalog } from '@/lib/content'
 
 export const metadata: Metadata = {
-  title: 'Publishing Services',
+  title: 'Publishing Support for Every Stage of the Book | J Merrill Publishing',
   description:
-    'Full-service publishing, editorial, design, audiobook production, marketing, and ghostwriting services. J Merrill Publishing — Helping Authors Help Themselves.',
+    'Explore author-first publishing support for manuscript care, design, production, distribution preparation, launch planning, and long-term growth.',
 }
 
 const bookingUrl = 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled'
@@ -203,7 +203,7 @@ export default function ServicesPage() {
       <div className="border-b border-blue-100 bg-blue-50 px-6 py-5 sm:px-12">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[14px] font-light text-blue-900/60">
-            Need help understanding package fit first? Start with the publishing paths, then come here for deeper support details.
+            You do not need to know every service your book needs before reaching out. We help identify the right support after we understand the manuscript, the author, and the goal.
           </p>
           <Link href="/packages" className="text-[13px] font-semibold text-blue-600 transition-colors hover:text-blue-800">
             Explore publishing packages →
@@ -255,7 +255,7 @@ export default function ServicesPage() {
             <em className="not-italic italic text-blue-500">authors may need most.</em>
           </>
         }
-        description="These service areas are here to help authors understand what kind of support may strengthen the manuscript, the release, and the long-term life of the work."
+        description="These service areas are here to help authors understand what kind of support may strengthen the manuscript, protect the voice, prepare the release, and support the long-term life of the work."
         surface="dark"
       >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -282,7 +282,7 @@ export default function ServicesPage() {
             <em className="not-italic italic text-blue-500">shape the work.</em>
           </>
         }
-        description="This stage is about strengthening the manuscript, clarifying the message, and identifying the right path before the book moves into production."
+        description="This stage is about strengthening the manuscript, clarifying the message, and identifying the right path before the book moves into production. The goal is to honor the work before we start building around it."
       >
         {beforePublishing.map((category) => (
           <LightServiceCategorySection key={category.anchor} category={category} />
@@ -298,7 +298,7 @@ export default function ServicesPage() {
             <em className="not-italic italic text-blue-500">prepare the book professionally.</em>
           </>
         }
-        description="Once the manuscript is moving forward, the work shifts into design, formatting, metadata, formats, and distribution preparation that help the book enter the marketplace well."
+        description="Once the manuscript is moving forward, the work shifts into design, formatting, metadata, formats, and distribution preparation that help the book enter the marketplace with professional care."
         surface="dark"
       >
         <div className="space-y-16">
@@ -342,7 +342,7 @@ export default function ServicesPage() {
             <em className="not-italic italic text-blue-500">keep building the author relationship.</em>
           </>
         }
-        description="Publication does not have to be the end of the support. This stage is about helping authors think beyond the release itself into visibility, platform, and future growth."
+        description="Publication does not have to be the end of the support. This stage is about helping authors think beyond the release itself into visibility, platform, future growth, and continued relationship."
       >
         {afterLaunch.map((category) => (
           <LightServiceCategorySection key={category.anchor} category={category} />
