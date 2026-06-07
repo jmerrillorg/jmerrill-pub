@@ -4,7 +4,7 @@ Scope: catalog data sources, book rendering, cover image references, purchase li
 
 ## Executive Summary
 
-The catalog has a strong normalized rendering layer, but the underlying source data is incomplete. `data/books.json` contains 123 unique book records with valid ISBN-shaped values, but no publisher-entered descriptions, no publisher cover paths, and, before this PR, only one direct publisher purchase URL. The live book pages therefore depend on enrichment overrides and generated fallback copy.
+The catalog has a strong normalized rendering layer, but the underlying source data is incomplete. `data/books.json` contains 122 visible title records after grouping one duplicate-format title, with valid ISBN-shaped values, but no publisher-entered descriptions, no publisher cover paths, and, before this PR, only one direct publisher purchase URL. The live book pages therefore depend on enrichment overrides and generated fallback copy.
 
 Safe fixes in this PR are intentionally narrow:
 
@@ -16,7 +16,7 @@ Safe fixes in this PR are intentionally narrow:
 Jackie has since resolved the open publisher-decision items:
 
 - Keep `125+` catalog language unchanged because it includes published titles plus active production pipeline titles.
-- Preserve `Focus, Trust, and Follow` as separate paperback and ebook records because they have distinct ISBNs and formats.
+- Preserve `Focus, Trust, and Follow` as one visible title record with both paperback and ebook metadata.
 - Route missing covers to a future Catalog Asset Recovery Initiative.
 - Route verified direct purchase links to a future Catalog Commerce Modernization project.
 - Route descriptions and metadata enrichment to a future CoreSource Metadata Integration project.
@@ -44,24 +44,24 @@ Jackie has since resolved the open publisher-decision items:
 
 | Area | Result | Category |
 | --- | ---: | --- |
-| Book records | 123 | Informational |
+| Book records | 122 after grouping duplicate-format Focus records | Informational |
 | Duplicate IDs | 0 | Informational |
 | ISBN format issues | 0 | Informational |
 | Publisher `description` values in `books.json` | 0 | Needs source data |
 | Resolved descriptions after enrichment | 37 | Informational |
-| Generated fallback descriptions | 86 | Safe auto-fix for fallback wording; source data needed for real descriptions |
+| Generated fallback descriptions | 85 after grouping duplicate-format Focus records | Safe auto-fix for fallback wording; source data needed for real descriptions |
 | Publisher `coverUrl` values in `books.json` | 0 | Needs source data |
 | Resolved covers after enrichment | 51 before fixes; 50 after removing one blocked URL | Informational |
-| Missing resolved covers | 72 before fixes; 73 after removing one blocked URL | Needs source data |
+| Missing resolved covers | 72 after grouping duplicate-format Focus records | Needs source data |
 | Broken local cover paths | 0 | Informational |
 | Broken remote cover URLs | 1 before fixes; 0 known after fixes | Safe auto-fix |
-| Titles with any purchase link | 43 before fixes; 42 after removing one dead publisher link | Informational |
-| Titles with no purchase link | 80 before fixes; 81 after removing one dead publisher link | Needs source data |
+| Titles with any purchase link | 42 after removing one dead publisher link | Informational |
+| Titles with no purchase link | 80 after grouping duplicate-format Focus records | Needs source data |
 | Amazon links | 42 ISBN search fallbacks | Needs source data for verified product links |
 | Publisher/direct purchase links | 1 broken before fixes; 0 after fixes | Safe auto-fix |
 | Missing author names after overrides | 0 | Informational |
 | Suspicious author formatting | 1 | Safe auto-fix |
-| Suspicious duplicate title groups | 1 before publisher decision; preserved as distinct editions after review | No action required |
+| Suspicious duplicate title groups | 1 before publisher decision; grouped into one visible title record after review | No action required |
 | Unmatched override keys | 0 | Informational |
 
 ## Findings
@@ -89,13 +89,14 @@ Jackie has since resolved the open publisher-decision items:
 
 ### Publisher Decisions Applied
 
-1. `Focus, Trust, and Follow` title records
-   - `focus-trust-and-follow-paperback`: paperback ISBN `978-1-950719-49-5`
-   - `focus-trust-and-follow`: ebook ISBN `978-1-950719-50-1`
-   - Decision: preserve both as legitimate separate format records. The paperback record was normalized from the incorrect `Focus, Trust, & Follow` title to `Focus, Trust, and Follow`.
+1. `Focus, Trust, and Follow` title record
+   - `focus-trust-and-follow`: single visible catalog record
+   - Paperback ISBN: `978-1-950719-49-5`
+   - eBook ISBN: `978-1-950719-50-1`
+   - Decision: group the duplicate-format records into one visible title card while preserving both format ISBNs. The incorrect `Focus, Trust, & Follow` title does not remain in public catalog data.
 
 2. Catalog count language
-   - The UI says `125+ titles`, while the canonical JSON currently has 123 public records.
+   - The UI says `125+ titles`, while the canonical JSON currently has 122 visible title records after grouping duplicate-format Focus records.
    - Decision: no action required. The label includes published titles plus active production pipeline titles.
 
 3. Author fallback profile copy
@@ -122,7 +123,7 @@ Jackie has since resolved the open publisher-decision items:
    - See Appendix B for the full no-link list.
 
 3. Missing real descriptions
-   - 86 titles have no publisher or retailer description.
+   - 85 titles have no publisher or retailer description after grouping duplicate-format Focus records.
    - This PR improves fallback honesty but does not invent descriptions.
    - Decision: create a future CoreSource Metadata Integration project.
    - See Appendix C for the full list.
@@ -150,12 +151,12 @@ Live URL checks were performed before safe fixes on all resolved remote covers a
 
 ## Appendix A: Missing Resolved Covers
 
-`100-wisdom-lessons-for-life-and-living`, `27-days-to-overcoming-depression`, `a-little-bit-of-everything`, `a-portrait-of-paradise`, `a-truebies-guide-part-1`, `a-truebies-guide-part-2`, `abortion`, `aligned`, `are-you-sure-that-you-are-ready`, `because-the-lord-is-my-shepherd`, `bee-careful`, `biblical-prescriptions-for-life-s-troubles`, `come-out-of-hiding`, `connected`, `damaged`, `delicious-ideas`, `destined-to-break-the-curse`, `destined-to-break-the-curse-devotional`, `establishing-glory`, `establishing-glory-2`, `establishing-glory-3`, `focus-trust-and-follow-paperback`, `for-what-it-s-worth`, `from-stylist-to-ceo`, `girl-you-re-not-crazy-you-re-dealing-with-a-narcissist`, `god-s-business-plan`, `god-s-word-for-this-world`, `grandmothers-educating-minds-2nd-edition`, `have-you-considered-my-servant`, `help-god-i-am-confused`, `i-am-my-worst-enemy`, `inner-peace-through-life-s-storms`, `inspirations-from-god`, `jewels-by-lady-j`, `just-what-i-needed`, `life-after-detour`, `love-is-an-action-word`, `love-lucy`, `loving-the-addict`, `melodies-from-heaven`, `more-than-a-village`, `my-abc-s`, `naughty-tales`, `never-give-up-on-love`, `number-23-and-me`, `one-soul`, `pieces-of-me-all-over-the-place`, `seasons-of-life`, `she`, `speech-therapy-works`, `support-beyond-the-cycle`, `taylor-made`, `the-celestial-advantage`, `the-doctrine-of-last-things`, `the-essence-of-life-love-letters-to-christ`, `the-flame`, `the-girl-with-the-ebony-locs-and-the-three-bears`, `the-hood`, `the-i-am-in-me-part-2`, `the-little-girl-with-the-plow`, `the-messenger-2`, `the-never-before-told-story-of-the-gelatin-monster`, `the-paper-champ`, `the-princess-and-the-black-eyed-pea`, `the-release-of-the-spirit`, `uncomfortable-conversations-with-god`, `understanding-the-misunderstood`, `war-mother`, `when-zuri-came-to-earth`, `why-faith-works-for-some-and-not-for-others`, `girl-did-you-know`, `the-conquest-of-azenga`.
+`100-wisdom-lessons-for-life-and-living`, `27-days-to-overcoming-depression`, `a-little-bit-of-everything`, `a-portrait-of-paradise`, `a-truebies-guide-part-1`, `a-truebies-guide-part-2`, `abortion`, `aligned`, `are-you-sure-that-you-are-ready`, `because-the-lord-is-my-shepherd`, `bee-careful`, `biblical-prescriptions-for-life-s-troubles`, `come-out-of-hiding`, `connected`, `damaged`, `delicious-ideas`, `destined-to-break-the-curse`, `destined-to-break-the-curse-devotional`, `establishing-glory`, `establishing-glory-2`, `establishing-glory-3`, `for-what-it-s-worth`, `from-stylist-to-ceo`, `girl-you-re-not-crazy-you-re-dealing-with-a-narcissist`, `god-s-business-plan`, `god-s-word-for-this-world`, `grandmothers-educating-minds-2nd-edition`, `have-you-considered-my-servant`, `help-god-i-am-confused`, `i-am-my-worst-enemy`, `inner-peace-through-life-s-storms`, `inspirations-from-god`, `jewels-by-lady-j`, `just-what-i-needed`, `life-after-detour`, `love-is-an-action-word`, `love-lucy`, `loving-the-addict`, `melodies-from-heaven`, `more-than-a-village`, `my-abc-s`, `naughty-tales`, `never-give-up-on-love`, `number-23-and-me`, `one-soul`, `pieces-of-me-all-over-the-place`, `seasons-of-life`, `she`, `speech-therapy-works`, `support-beyond-the-cycle`, `taylor-made`, `the-celestial-advantage`, `the-doctrine-of-last-things`, `the-essence-of-life-love-letters-to-christ`, `the-flame`, `the-girl-with-the-ebony-locs-and-the-three-bears`, `the-hood`, `the-i-am-in-me-part-2`, `the-little-girl-with-the-plow`, `the-messenger-2`, `the-never-before-told-story-of-the-gelatin-monster`, `the-paper-champ`, `the-princess-and-the-black-eyed-pea`, `the-release-of-the-spirit`, `uncomfortable-conversations-with-god`, `understanding-the-misunderstood`, `war-mother`, `when-zuri-came-to-earth`, `why-faith-works-for-some-and-not-for-others`, `girl-did-you-know`, `the-conquest-of-azenga`.
 
 ## Appendix B: Missing All Purchase Links
 
-`100-wisdom-lessons-for-life-and-living`, `a-blended-family`, `a-little-bit-of-everything`, `a-portrait-of-paradise`, `a-truebies-guide-part-1`, `a-truebies-guide-part-2`, `abortion`, `aligned`, `are-you-sure-that-you-are-ready`, `because-the-lord-is-my-shepherd`, `bee-careful`, `bodacious`, `come-out-of-hiding`, `connected`, `conquer-your-fears-and-win`, `damaged`, `department-of-the-air-force-mission-driven-leadership`, `destined-to-break-the-curse`, `destined-to-break-the-curse-devotional`, `focus-trust-and-follow-paperback`, `focus-trust-and-follow`, `for-what-it-s-worth`, `from-stylist-to-ceo`, `girl-you-re-not-crazy-you-re-dealing-with-a-narcissist`, `god-s-business-plan`, `god-s-word-for-this-world`, `grandmothers-educating-minds`, `grandmothers-educating-minds-2nd-edition`, `have-you-considered-my-servant`, `hop-hop-hop`, `i-am-my-worst-enemy`, `inner-peace-through-life-s-storms`, `inspirations-from-god`, `jewels-by-lady-j`, `just-what-i-needed`, `life-after-detour`, `love-is-an-action-word`, `love-lucy`, `love-of-my-life`, `loving-the-addict`, `melodies-from-heaven`, `memoir-of-a-black-christian-nationalist`, `mirror-of-refining-insight`, `more-than-a-village`, `my-abc-s`, `naughty-tales`, `number-23-and-me`, `one-soul`, `ordinary-people-searching-for-greatness`, `pieces-of-me-all-over-the-place`, `pretty-wings`, `rhyming-it-up-with-church-stuff`, `seasons-of-life`, `she`, `speech-therapy-works`, `support-beyond-the-cycle`, `taylor-made`, `the-celestial-advantage`, `the-doctrine-of-last-things`, `the-essence-of-life-love-letters-to-christ`, `the-flame`, `the-girl-with-the-ebony-locs-and-the-three-bears`, `the-hood`, `the-i-am-in-me-part-2`, `the-little-girl-with-the-plow`, `the-messenger-2`, `the-never-before-told-story-of-the-gelatin-monster`, `the-paper-champ`, `the-princess-and-the-black-eyed-pea`, `the-release-of-the-spirit`, `uncomfortable-conversations-with-god`, `understanding-the-misunderstood`, `war-mother`, `warriors-and-angels`, `when-zuri-came-to-earth`, `why-faith-works-for-some-and-not-for-others`, `your-brain-has-too-much-what-mommy`, `you-re-still-not-crazy`, `girl-did-you-know`, `the-conquest-of-azenga`.
+`100-wisdom-lessons-for-life-and-living`, `a-blended-family`, `a-little-bit-of-everything`, `a-portrait-of-paradise`, `a-truebies-guide-part-1`, `a-truebies-guide-part-2`, `abortion`, `aligned`, `are-you-sure-that-you-are-ready`, `because-the-lord-is-my-shepherd`, `bee-careful`, `bodacious`, `come-out-of-hiding`, `connected`, `conquer-your-fears-and-win`, `damaged`, `department-of-the-air-force-mission-driven-leadership`, `destined-to-break-the-curse`, `destined-to-break-the-curse-devotional`, `focus-trust-and-follow`, `for-what-it-s-worth`, `from-stylist-to-ceo`, `girl-you-re-not-crazy-you-re-dealing-with-a-narcissist`, `god-s-business-plan`, `god-s-word-for-this-world`, `grandmothers-educating-minds`, `grandmothers-educating-minds-2nd-edition`, `have-you-considered-my-servant`, `hop-hop-hop`, `i-am-my-worst-enemy`, `inner-peace-through-life-s-storms`, `inspirations-from-god`, `jewels-by-lady-j`, `just-what-i-needed`, `life-after-detour`, `love-is-an-action-word`, `love-lucy`, `love-of-my-life`, `loving-the-addict`, `melodies-from-heaven`, `memoir-of-a-black-christian-nationalist`, `mirror-of-refining-insight`, `more-than-a-village`, `my-abc-s`, `naughty-tales`, `number-23-and-me`, `one-soul`, `ordinary-people-searching-for-greatness`, `pieces-of-me-all-over-the-place`, `pretty-wings`, `rhyming-it-up-with-church-stuff`, `seasons-of-life`, `she`, `speech-therapy-works`, `support-beyond-the-cycle`, `taylor-made`, `the-celestial-advantage`, `the-doctrine-of-last-things`, `the-essence-of-life-love-letters-to-christ`, `the-flame`, `the-girl-with-the-ebony-locs-and-the-three-bears`, `the-hood`, `the-i-am-in-me-part-2`, `the-little-girl-with-the-plow`, `the-messenger-2`, `the-never-before-told-story-of-the-gelatin-monster`, `the-paper-champ`, `the-princess-and-the-black-eyed-pea`, `the-release-of-the-spirit`, `uncomfortable-conversations-with-god`, `understanding-the-misunderstood`, `war-mother`, `warriors-and-angels`, `when-zuri-came-to-earth`, `why-faith-works-for-some-and-not-for-others`, `your-brain-has-too-much-what-mommy`, `you-re-still-not-crazy`, `girl-did-you-know`, `the-conquest-of-azenga`.
 
 ## Appendix C: Generated Fallback Descriptions
 
-86 titles rely on generated fallback description copy. The missing-description list overlaps heavily with Appendix B and should be resolved by adding publisher-approved descriptions or verified retailer descriptions, not by inventing metadata in code.
+85 titles rely on generated fallback description copy. The missing-description list overlaps heavily with Appendix B and should be resolved by adding publisher-approved descriptions or verified retailer descriptions, not by inventing metadata in code.

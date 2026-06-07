@@ -716,39 +716,19 @@
     "isEmbedTag": ""
   },
   {
-    "id": "focus-trust-and-follow-paperback",
-    "title": "Focus, Trust, and Follow",
-    "author": "Shana Byrd",
-    "genre": "",
-    "imprint": "J Merrill Publishing",
-    "year": "",
-    "format": "Paperback",
-    "formats": [
-      "Paperback"
-    ],
-    "isbn": "978-1-950719-49-5",
-    "isbn_pb": "978-1-950719-49-5",
-    "isbn_hc": "",
-    "isbn_eb": "",
-    "isbn_audio": "",
-    "description": "",
-    "coverUrl": "",
-    "purchaseUrl": "",
-    "isEmbedTag": false
-  },
-  {
     "id": "focus-trust-and-follow",
     "title": "Focus, Trust, and Follow",
     "author": "Shana Byrd",
     "genre": "Faith",
     "imprint": "J Merrill Publishing",
     "year": 2020,
-    "format": "eBook",
+    "format": "Paperback",
     "formats": [
+      "Paperback",
       "eBook"
     ],
-    "isbn": "978-1-950719-50-1",
-    "isbn_pb": "",
+    "isbn": "978-1-950719-49-5",
+    "isbn_pb": "978-1-950719-49-5",
     "isbn_hc": "",
     "isbn_eb": "978-1-950719-50-1",
     "isbn_audio": "",
