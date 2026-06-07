@@ -57,6 +57,10 @@ export default function BookPage({ params }: Props) {
     relatedByAuthor.length > 0
       ? []
       : getBooksByImprint(book.imprint).filter((item) => item.id !== book.id).slice(0, 4)
+  const isbnDisplay =
+    book.isbnByFormat.length > 1
+      ? book.isbnByFormat.map((item) => `${item.format}: ${item.isbn}`).join(' · ')
+      : book.isbn || book.isbnByFormat[0]?.isbn || 'Catalog record pending'
 
   return (
     <div className="min-h-screen bg-[#070710] pt-[76px]">
@@ -228,7 +232,7 @@ export default function BookPage({ params }: Props) {
                 { label: 'Genre', value: book.genre },
                 { label: book.releaseDate ? 'Release date' : 'Catalog year', value: book.releaseDateDisplay || book.displayYear },
                 { label: 'Primary format', value: book.primaryFormat },
-                { label: 'ISBN', value: book.isbn || 'Catalog record pending' },
+                { label: book.isbnByFormat.length > 1 ? 'ISBNs' : 'ISBN', value: isbnDisplay },
               ].map((item) => (
                 <div key={item.label} className="rounded-xl border border-white/6 bg-white/[0.03] px-4 py-4">
                   <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.1em] text-white/20">{item.label}</div>

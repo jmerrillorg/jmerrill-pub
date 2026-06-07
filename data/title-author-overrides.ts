@@ -25,7 +25,6 @@ export const titleAuthorOverrides: Record<string, string> = {
   'establishing-glory': 'Jackie Smith, Jr.',
   'establishing-glory-2': 'Jackie Smith, Jr.',
   'establishing-glory-3': 'Jackie Smith, Jr.',
-  'focus-trust-and-follow-paperback': 'Shana Byrd',
   'focus-trust-and-follow': 'Shana Byrd',
   'for-what-it-s-worth': 'Kelli Milligan Stammen',
   'getting-back-2-happy': 'Jaylonna Stevette',

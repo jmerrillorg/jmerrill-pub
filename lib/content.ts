@@ -29,6 +29,11 @@ export type BookContributor = {
   hasProfile: boolean
 }
 
+export type BookFormatIsbn = {
+  format: BookFormat
+  isbn: string
+}
+
 export type BookRecord = {
   id: string
   slug: string
@@ -49,6 +54,7 @@ export type BookRecord = {
   formats: BookFormat[]
   primaryFormat: BookFormat
   isbn: string
+  isbnByFormat: BookFormatIsbn[]
   asin: string
   publisherCoverUrl: string
   retailerCoverUrl: string
@@ -222,6 +228,23 @@ function buildAvailablePurchaseLinks(purchaseLinks: BookPurchaseLinks) {
   }, [])
 }
 
+function buildFormatIsbns(book: RawBook): BookFormatIsbn[] {
+  const entries: Array<[BookFormat, string | null | undefined]> = [
+    ['Paperback', book.isbn_pb],
+    ['Hardcover', book.isbn_hc],
+    ['eBook', book.isbn_eb],
+    ['Audiobook', book.isbn_audio],
+  ]
+
+  return entries.reduce<BookFormatIsbn[]>((items, [format, isbn]) => {
+    const normalizedIsbn = cleanText(isbn)
+    if (normalizedIsbn) {
+      items.push({ format, isbn: normalizedIsbn })
+    }
+    return items
+  }, [])
+}
+
 function normalizeAuthorDisplayName(rawName: string) {
   const trimmed = cleanText(rawName)
   return AUTHOR_NAME_ALIASES[trimmed] || trimmed
@@ -346,6 +369,7 @@ export const bookCatalog: BookRecord[] = [...rawBooks]
     const amazonLinkType: AmazonLinkType | '' = retailerEnrichment.amazonLinkType || ''
     const publisherAuthorBio = authorOverride?.shortBio || ''
     const retailerAuthorBio = cleanText(retailerEnrichment.retailerAuthorBio)
+    const isbnByFormat = buildFormatIsbns(book)
     const keywords = Array.from(
       new Set([
         ...titleKeywords(book.title),
@@ -376,6 +400,7 @@ export const bookCatalog: BookRecord[] = [...rawBooks]
       formats,
       primaryFormat: formats[0] || 'Paperback',
       isbn: cleanText(book.isbn),
+      isbnByFormat,
       asin: cleanText(retailerEnrichment.asin),
       publisherCoverUrl,
       retailerCoverUrl,
