@@ -73,7 +73,7 @@ export function ChooseYourPathSection() {
       title: 'I’m already a JMP author',
       body: 'Access author support, memberships, next-title guidance, and long-term publishing resources.',
       cta: 'Author Support',
-      href: '/authors',
+      href: '/memberships',
       featured: false,
     },
   ]

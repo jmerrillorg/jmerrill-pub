@@ -1,7 +1,16 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { division, footerLinks } from '@/lib/tokens'
+import { footerLinks } from '@/lib/tokens'
 import { NewsletterSignup } from '@/components/content/NewsletterSignup'
+
+const footerGroups = [
+  { title: 'Start Here',       links: footerLinks.startHere },
+  { title: 'Publishing Paths', links: footerLinks.publishingPaths },
+  { title: 'Proof',            links: footerLinks.proof },
+  { title: 'Author Support',   links: footerLinks.authorSupport },
+  { title: 'Company',          links: footerLinks.company },
+  { title: 'JM1 Network',      links: footerLinks.jm1Network },
+] as const
 
 export function Footer() {
   return (
@@ -53,11 +62,10 @@ export function Footer() {
           </div>
 
           {/* Link columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
-            <FooterCol title="Services"    links={footerLinks.services} />
-            <FooterCol title="Company"     links={footerLinks.company} />
-            <FooterCol title="Memberships" links={footerLinks.memberships} />
-            <FooterCol title="Enterprise"  links={footerLinks.enterprise} external />
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-8">
+            {footerGroups.map((group) => (
+              <FooterCol key={group.title} title={group.title} links={group.links} />
+            ))}
           </div>
         </div>
 
@@ -92,11 +100,9 @@ export function Footer() {
 function FooterCol({
   title,
   links,
-  external = false,
 }: {
   title: string
   links: readonly { label: string; href: string }[]
-  external?: boolean
 }) {
   return (
     <div>
@@ -106,7 +112,7 @@ function FooterCol({
       <ul className="flex flex-col gap-2.5">
         {links.map((link) => (
           <li key={link.href}>
-            {external || link.href.startsWith('http') ? (
+            {link.href.startsWith('http') ? (
               <a
                 href={link.href}
                 target="_blank"

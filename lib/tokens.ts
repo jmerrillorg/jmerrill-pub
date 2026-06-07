@@ -94,9 +94,11 @@ export const division = {
 export const nav = {
   primary: [
     { label: 'Publish With Us', href: '/publishing' },
-    { label: 'Our Books',       href: '/books' },
-    { label: 'Authors',         href: '/authors' },
+    { label: 'How It Works',    href: '/author-journey' },
+    { label: 'Publishing Paths', href: '/packages' },
     { label: 'Services',        href: '/services' },
+    { label: 'Books',           href: '/books' },
+    { label: 'Authors',         href: '/authors' },
     { label: 'About',           href: '/about' },
   ],
   partner: {
@@ -233,41 +235,39 @@ export const distribution = [
 
 // ── FOOTER LINKS ──────────────────────────────────────────────
 export const footerLinks = {
-  services: [
-    { label: 'Publishing Packages', href: '/packages' },
-    { label: 'Editorial Services',  href: '/services' },
-    { label: 'Audiobook Production',href: '/services#audio' },
-    { label: 'Marketing & Launch',  href: '/services#marketing' },
-    { label: 'Faith Market',        href: '/services#faith' },
-    { label: 'View Full Catalog',   href: '/services' },
+  startHere: [
+    { label: 'Publish With Us',          href: '/publishing' },
+    { label: 'How It Works',             href: '/author-journey' },
+    { label: 'Join the Family',          href: '/join' },
+    { label: 'Schedule a Consultation',  href: 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled' },
+  ],
+  publishingPaths: [
+    { label: 'Publishing Paths', href: '/packages' },
+    { label: 'Services',         href: '/services' },
+    { label: 'JM Prestige',      href: '/publishing-partner' },
+    { label: 'Distribution',     href: '/distribution' },
+  ],
+  proof: [
+    { label: 'Books',    href: '/books' },
+    { label: 'Authors',  href: '/authors' },
+    { label: 'Imprints', href: '/imprints' },
+  ],
+  authorSupport: [
+    { label: 'Memberships', href: '/memberships' },
+    { label: 'Contact',     href: '/contact' },
+    { label: 'Readers',     href: '/readers' },
   ],
   company: [
-    { label: 'About JMP',              href: '/about' },
-    { label: 'Authors',                href: '/authors' },
-    { label: 'Author Journey',         href: '/author-journey' },
-    { label: 'Our Books',              href: '/books' },
-    { label: 'Readers',                href: '/readers' },
-    { label: 'Publishing',             href: '/publishing' },
-    { label: 'Pricing',                href: '/packages' },
-    { label: 'JM Prestige',            href: '/publishing-partner' },
-    { label: 'Distribution',           href: '/distribution' },
-    { label: 'Platform Roadmap',       href: '/platform' },
-    { label: 'Contact',                href: '/contact' },
-    { label: 'Advertising (iD)',       href: '/advertising' },
-    { label: 'Join the Family',        href: '/join' },
-    { label: 'Schedule a Call',        href: 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled' },
+    { label: 'About',    href: '/about' },
+    { label: 'Platform', href: '/platform' },
+    { label: 'Privacy',  href: '/privacy' },
+    { label: 'Terms',    href: '/terms' },
   ],
-  memberships: [
-    { label: 'Community — $79/mo',  href: '/memberships' },
-    { label: 'Support — $149/mo',   href: '/memberships' },
-    { label: 'Marketing — $199/mo', href: '/memberships' },
-    { label: 'AI Author — $249/mo', href: '/memberships' },
-  ],
-  enterprise: [
-    { label: 'J Merrill One ↗',     href: 'https://www.jmerrill.one' },
-    { label: 'JM Financial ↗',      href: 'https://www.jmerrill.financial' },
-    { label: 'JM Foundation ↗',     href: 'https://www.jmerrill.foundation' },
-    { label: 'JM Productions ↗',    href: 'https://productions.jmerrill.one' },
+  jm1Network: [
+    { label: 'J Merrill One ↗',         href: 'https://www.jmerrill.one' },
+    { label: 'J Merrill Financial ↗',   href: 'https://www.jmerrill.financial' },
+    { label: 'J Merrill Foundation ↗',  href: 'https://www.jmerrill.foundation' },
+    { label: 'J Merrill Productions ↗', href: 'https://productions.jmerrill.one' },
   ],
 } as const
 
