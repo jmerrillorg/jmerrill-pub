@@ -40,7 +40,7 @@ export default function JoinPage() {
             <em className="not-italic italic text-blue-500">Join the Family.</em>
           </h1>
           <p className="text-[16px] font-light text-white/45 leading-[1.75]">
-            Complete the inquiry below. You do not need every publishing answer yet. This first step helps us understand the work, protect the author's voice, and follow up within 1–2 business days.
+            Complete the inquiry below. You do not need every publishing answer yet. This first step helps us understand the work, protect the author's voice, and prepare our editorial review.
           </p>
         </div>
 
