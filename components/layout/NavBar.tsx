@@ -21,7 +21,7 @@ export function NavBar() {
         'fixed left-0 right-0 z-50 h-[76px] flex items-center px-12 transition-all duration-300',
         scrolled
           ? 'bg-white/96 border-b border-gray-200 backdrop-blur-xl shadow-sm'
-          : 'bg-transparent border-b border-transparent',
+          : 'bg-[#0F1C2E]/72 border-b border-white/10 backdrop-blur-md',
       ].join(' ')}
     >
       {/* Logo */}
@@ -43,11 +43,11 @@ export function NavBar() {
             key={link.href}
             href={link.href}
             className={[
-              'text-[13.5px] font-normal tracking-[0.01em] relative pb-0.5',
+              'text-[13.5px] font-medium tracking-[0.01em] relative pb-0.5',
               'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px',
               'after:bg-blue-500 after:scale-x-0 after:origin-left after:transition-transform after:duration-250',
-              'hover:text-blue-500 hover:after:scale-x-100 transition-colors duration-200',
-              scrolled ? 'text-charcoal' : 'text-charcoal',
+              'hover:text-blue-300 hover:after:scale-x-100 transition-colors duration-200',
+              scrolled ? 'text-charcoal' : 'text-white/86',
             ].join(' ')}
           >
             {link.label}
@@ -59,7 +59,10 @@ export function NavBar() {
       <div className="ml-auto flex items-center gap-4">
         <a
           href={nav.secondary.href}
-          className="hidden xl:block text-[13px] text-gray-500 hover:text-blue-500 transition-colors duration-200"
+          className={[
+            'hidden xl:block text-[13px] font-medium transition-colors duration-200',
+            scrolled ? 'text-gray-500 hover:text-blue-500' : 'text-white/82 hover:text-blue-200',
+          ].join(' ')}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -67,7 +70,10 @@ export function NavBar() {
         </a>
         <Link
           href={nav.cta.href}
-          className="bg-charcoal text-white text-[13px] font-medium px-5 py-2.5 rounded-full hover:bg-blue-500 transition-all duration-200 hover:-translate-y-0.5 tracking-[0.02em]"
+          className={[
+            'text-[13px] font-semibold px-5 py-2.5 rounded-full transition-all duration-200 hover:-translate-y-0.5 tracking-[0.02em]',
+            scrolled ? 'bg-charcoal text-white hover:bg-blue-500' : 'bg-white text-charcoal hover:bg-blue-100',
+          ].join(' ')}
         >
           {nav.cta.label}
         </Link>
@@ -78,9 +84,9 @@ export function NavBar() {
           className="xl:hidden flex flex-col gap-1.5 w-6"
           aria-label="Toggle menu"
         >
-          <span className={`block h-px bg-charcoal transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
-          <span className={`block h-px bg-charcoal transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''}`} />
-          <span className={`block h-px bg-charcoal transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+          <span className={`block h-px transition-all duration-300 ${scrolled ? 'bg-charcoal' : 'bg-white'} ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
+          <span className={`block h-px transition-all duration-300 ${scrolled ? 'bg-charcoal' : 'bg-white'} ${mobileOpen ? 'opacity-0' : ''}`} />
+          <span className={`block h-px transition-all duration-300 ${scrolled ? 'bg-charcoal' : 'bg-white'} ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
         </button>
       </div>
 
