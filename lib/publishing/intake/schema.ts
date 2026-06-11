@@ -39,6 +39,9 @@ export type NormalizedPublishingIntake = PublishingIntakeInput & {
   email: string
   reference: string
   receivedAt: string
+  intakeChannel: 'INT-PUB-005 /join'
+  consentTimestamp: string
+  wordCountSource: 'Intake-Reported'
   source: 'website-join'
   route: '/join'
   formType: 'publishing-intake'
@@ -194,6 +197,9 @@ export function createNormalizedPublishingIntake(
     ...data,
     reference,
     receivedAt,
+    intakeChannel: 'INT-PUB-005 /join',
+    consentTimestamp: receivedAt,
+    wordCountSource: 'Intake-Reported',
     source: 'website-join',
     route: '/join',
     formType: 'publishing-intake',
