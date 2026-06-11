@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function JoinPage() {
   return (
-    <div className="pt-[76px] min-h-screen bg-[#0F1C2E] relative overflow-hidden">
+    <div className="join-page pt-[76px] min-h-screen bg-[#0F1C2E] relative overflow-hidden">
       <div
         className="absolute inset-x-0 top-0 h-[560px] pointer-events-none"
         style={{ background: 'radial-gradient(ellipse 70% 58% at 50% 20%, rgba(30,144,255,0.18) 0%, rgba(30,144,255,0.08) 36%, transparent 74%)' }}
