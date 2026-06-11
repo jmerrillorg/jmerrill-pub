@@ -1,9 +1,9 @@
 # INT-PUB-005 Publishing Intake Dataverse Mapping
 
-Status: Draft mapping appendix updated after Power Apps column creation
+Status: Draft mapping appendix updated after final Power Apps column creation
 Table display name: Publishing Intake
 Dataverse table: `jm1_publishingintake`
-Activation status: Blocked pending remaining schema corrections, choice option values, entity-set confirmation, and app-user/security-role confirmation.
+Activation status: Schema mapping complete; activation blocked pending entity-set confirmation, app-user/security-role confirmation, adapter activation, and end-to-end Dataverse write validation.
 
 This appendix documents the website/API-to-Dataverse mapping for the canonical INT-PUB-005 `/join` intake flow. The Next.js API is responsible only for preparing one Publishing Intake row. Power Automate / Dataverse remain responsible for downstream Contact, Lead, Opportunity, acknowledgment, loyalty, diagnostics, and execution-log work.
 
@@ -15,7 +15,9 @@ This appendix documents the website/API-to-Dataverse mapping for the canonical I
 | Dataverse table | `jm1_publishingintake` |
 | Web API entity set | `jm1_publishingintakes` pending confirmation |
 | Primary row written by website | One Publishing Intake row only |
-| Production write status | Blocked |
+| Production write status | Blocked pending activation validation |
+| Power Apps publish status | Published successfully |
+| Column count after publish | 57 |
 
 ## 2. Confirmed Existing and Created Columns
 
@@ -26,13 +28,16 @@ This appendix documents the website/API-to-Dataverse mapping for the canonical I
 | email | Email | `jm1_Email` | Email | Confirmed existing | Lowercase-normalized server-side. |
 | phone | Mobile Phone | `jm1_MobilePhone` | Phone number | Confirmed existing | Optional. |
 | bookTitle | Project Title | `jm1_ProjectTitle` | Single line of text | Confirmed existing | Required by `/join`. |
+| workType | Manuscript Type | `jm1_ManuscriptType` | Choice | Confirmed existing | Required numeric option values captured below. |
 | wordCount | Estimated Word Count | `jm1_EstimatedWordCount` | Whole number | Confirmed existing | Required; `/join` accepts 100-500000. |
+| manuscriptStatus | Manuscript Status at Intake | `jm1_ManuscriptStatusAtIntake` | Single line of text | Confirmed-created | Max length 100. |
 | manuscriptUrl | Manuscript URL | `jm1_ManuscriptURL` | URL | Confirmed existing | Optional. |
 | bookDescription | Purpose | `jm1_Purpose` | Multiple lines of text | Confirmed existing | Required; maps author-facing book description to Purpose. |
+| referralSource | Referral Source | `jm1_ReferralSource` | Single line of text | Confirmed-created | Max length 100. |
 | consent | Consent to Contact | `jm1_ConsenttoContact` | Yes/no | Confirmed existing | Required true. |
 | reference | Intake Reference Code | `jm1_IntakeReferenceCode` | Single line of text | Confirmed-created | Max length 100. |
 | genre | Genre / Subject | `jm1_GenreSubject` | Single line of text | Confirmed-created | Max length 100. Used because canonical `/join` captures genre/subject as free text. |
-| publishedBefore | Published Before | `jm1_PublishedBefore` | Choice | Confirmed-created | Values: First book; Published before with JMP; Published before elsewhere. Numeric option values still pending. |
+| publishedBefore | Published Before | `jm1_PublishedBefore` | Choice | Confirmed-created | Required numeric option values captured below. |
 | additionalNotes | Additional Notes | `jm1_AdditionalNotes` | Multiple lines of text | Confirmed-created | Max length 1000. Do not mix author-submitted notes into internal-only `jm1_InternalNotes`. |
 | intakeChannel | Intake Channel | `jm1_IntakeChannel` | Single line of text | Confirmed-created | Max length 100. Submitted value: `INT-PUB-005 /join`. |
 | idempotencyKey | Idempotency Key | `jm1_IdempotencyKey` | Single line of text | Confirmed-created | Max length 100. |
@@ -41,45 +46,70 @@ This appendix documents the website/API-to-Dataverse mapping for the canonical I
 
 ## 3. Choice and Schema Findings
 
-| API Field | Existing Candidate | Finding | Mapping Decision | Status |
-|---|---|---|---|---|
-| workType | `jm1_WorkType` | Existing values do not match canonical `/join` work-type values. Observed examples include Book - Full Service, Book - Blockchain, Book - Children's Book (Picture Book), and Distribution Only. | Do not use `jm1_WorkType`. Map to `jm1_ManuscriptType`. | `blocked_pending_choice_option_values` |
-| manuscriptStatus | `jm1_ManuscriptStatus` | Existing column is synced to a Manuscript Type-style value set: Full-length Book, Novella, Children's Picture Book, Poetry Collection, Devotional, Workbook / Journal, Short Story Collection, Other. | Do not use `jm1_ManuscriptStatus`. Use `jm1_StageatSubmission` only if it has exact status values; otherwise create `jm1_ManuscriptStatusAtIntake`. Mapping object currently targets `jm1_ManuscriptStatusAtIntake`. | `blocked_pending_column_creation_or_stage_at_submission_confirmation` |
-| referralSource | `jm1_WebsiteSource` | Existing values are only a partial match. Observed examples include Referral, Facebook, Instagram, Google Search, Event / Workshop, and Other. | Do not use `jm1_WebsiteSource`. Create `jm1_ReferralSource` as Single line of text, max 100. | `blocked_pending_column_creation` |
-| publishedBefore | `jm1_ApplicantType` | Existing values are Standard and Prestige, which do not match `/join`. | Use confirmed-created `jm1_PublishedBefore`. | Blocked only pending numeric choice option values. |
-| genre | `jm1pub_GenreInterest` | Existing column is Choice, but `/join` needs free-text genre/subject. | Use confirmed-created `jm1_GenreSubject`. | Confirmed-created. |
+| API Field | Final Mapping | Decision | Status |
+|---|---|---|---|
+| workType | `jm1_ManuscriptType` | Do not use `jm1_WorkType`; its observed values do not match canonical `/join` work-type values. | Confirmed. |
+| manuscriptStatus | `jm1_ManuscriptStatusAtIntake` | Do not use `jm1_ManuscriptStatus`; it is synced to a Manuscript Type-style value set. | Confirmed-created. |
+| referralSource | `jm1_ReferralSource` | Do not use `jm1_WebsiteSource`; its observed values only partially match `/join`. | Confirmed-created. |
+| publishedBefore | `jm1_PublishedBefore` | Do not use `jm1_ApplicantType`; its observed values are Standard and Prestige. | Confirmed-created. |
+| genre | `jm1_GenreSubject` | Do not use `jm1pub_GenreInterest`; `/join` captures genre/subject as free text. | Confirmed-created. |
 
-## 4. Remaining Columns Recommended for Creation or Confirmation
+## 4. Completed Final Column Creation
 
-| API Field | Dataverse Display Name | Logical Name | Data Type | Status | Notes |
+| API Field | Dataverse Display Name | Logical Name | Data Type | Max Length | Status |
 |---|---|---|---|---|---|
-| manuscriptStatus | Manuscript Status at Intake | `jm1_ManuscriptStatusAtIntake` | Single line of text | Recommended unless `jm1_StageatSubmission` is confirmed | Max length 100. Required `/join` values: Complete; Near complete; In progress; Idea stage. |
-| referralSource | Referral Source | `jm1_ReferralSource` | Single line of text | Recommended | Max length 100. Required `/join` values: Referral; Church or ministry; Social media; Search; Event; Other. |
+| manuscriptStatus | Manuscript Status at Intake | `jm1_ManuscriptStatusAtIntake` | Single line of text | 100 | Confirmed-created |
+| referralSource | Referral Source | `jm1_ReferralSource` | Single line of text | 100 | Confirmed-created |
 
 ## 5. Final API Payload Mapping
 
 | API Field | Dataverse Display Name | Logical Name | Data Type | Status | Notes |
 |---|---|---|---|---|---|
-| firstName | First Name | `jm1_FirstName` | Single line of text | Confirmed existing | Required. |
-| lastName | Last Name | `jm1_LastName` | Single line of text | Confirmed existing | Required. |
-| email | Email | `jm1_Email` | Email | Confirmed existing | Lowercase-normalized. |
-| phone | Mobile Phone | `jm1_MobilePhone` | Phone number | Confirmed existing | Optional. |
-| bookTitle | Project Title | `jm1_ProjectTitle` | Single line of text | Confirmed existing | Required. |
-| workType | Manuscript Type | `jm1_ManuscriptType` | Choice | Blocked pending numeric choice option values | Do not map to `jm1_WorkType`. |
-| genre | Genre / Subject | `jm1_GenreSubject` | Single line of text | Confirmed-created | Free-text genre/subject. |
-| wordCount | Estimated Word Count | `jm1_EstimatedWordCount` | Whole number | Confirmed existing | Required. |
-| manuscriptStatus | Manuscript Status at Intake | `jm1_ManuscriptStatusAtIntake` | Single line of text | Blocked pending column creation or `jm1_StageatSubmission` confirmation | Do not map to `jm1_ManuscriptStatus`. |
-| manuscriptUrl | Manuscript URL | `jm1_ManuscriptURL` | URL | Confirmed existing | Optional. |
-| publishedBefore | Published Before | `jm1_PublishedBefore` | Choice | Confirmed-created, blocked pending numeric choice option values | Values confirmed; numeric values needed for Web API writes. |
-| bookDescription | Purpose | `jm1_Purpose` | Multiple lines of text | Confirmed existing | Required. |
-| referralSource | Referral Source | `jm1_ReferralSource` | Single line of text | Blocked pending column creation | Do not map to `jm1_WebsiteSource`. |
-| additionalNotes | Additional Notes | `jm1_AdditionalNotes` | Multiple lines of text | Confirmed-created | Author-submitted notes. |
-| consent | Consent to Contact | `jm1_ConsenttoContact` | Yes/no | Confirmed existing | Required true. |
-| reference | Intake Reference Code | `jm1_IntakeReferenceCode` | Single line of text | Confirmed-created | Canonical reference code. |
-| intakeChannel | Intake Channel | `jm1_IntakeChannel` | Single line of text | Confirmed-created | Submitted value: `INT-PUB-005 /join`. |
-| idempotencyKey | Idempotency Key | `jm1_IdempotencyKey` | Single line of text | Confirmed-created | Stored for replay/audit support. |
-| consentTimestamp | Consent Timestamp | `jm1_ConsentTimestamp` | Date and time | Confirmed-created | Server receipt timestamp. |
-| wordCountSource | Word Count Source | `jm1_WordCountSource` | Single line of text | Confirmed-created | Submitted value: `Intake-Reported`. |
+| firstName | First Name | `jm1_FirstName` | Single line of text | Confirmed | Required. |
+| lastName | Last Name | `jm1_LastName` | Single line of text | Confirmed | Required. |
+| email | Email | `jm1_Email` | Email | Confirmed | Lowercase-normalized. |
+| phone | Mobile Phone | `jm1_MobilePhone` | Phone number | Confirmed | Optional. |
+| bookTitle | Project Title | `jm1_ProjectTitle` | Single line of text | Confirmed | Required. |
+| workType | Manuscript Type | `jm1_ManuscriptType` | Choice | Confirmed | Numeric option values captured below. |
+| genre | Genre / Subject | `jm1_GenreSubject` | Single line of text | Confirmed | Free-text genre/subject. |
+| wordCount | Estimated Word Count | `jm1_EstimatedWordCount` | Whole number | Confirmed | Required. |
+| manuscriptStatus | Manuscript Status at Intake | `jm1_ManuscriptStatusAtIntake` | Single line of text | Confirmed | Author-submitted manuscript status. |
+| manuscriptUrl | Manuscript URL | `jm1_ManuscriptURL` | URL | Confirmed | Optional. |
+| publishedBefore | Published Before | `jm1_PublishedBefore` | Choice | Confirmed | Numeric option values captured below. |
+| bookDescription | Purpose | `jm1_Purpose` | Multiple lines of text | Confirmed | Required. |
+| referralSource | Referral Source | `jm1_ReferralSource` | Single line of text | Confirmed | Author-submitted referral source. |
+| additionalNotes | Additional Notes | `jm1_AdditionalNotes` | Multiple lines of text | Confirmed | Author-submitted notes. |
+| consent | Consent to Contact | `jm1_ConsenttoContact` | Yes/no | Confirmed | Required true. |
+| reference | Intake Reference Code | `jm1_IntakeReferenceCode` | Single line of text | Confirmed | Canonical reference code. |
+| intakeChannel | Intake Channel | `jm1_IntakeChannel` | Single line of text | Confirmed | Submitted value: `INT-PUB-005 /join`. |
+| idempotencyKey | Idempotency Key | `jm1_IdempotencyKey` | Single line of text | Confirmed | Stored for replay/audit support. |
+| consentTimestamp | Consent Timestamp | `jm1_ConsentTimestamp` | Date and time | Confirmed | Server receipt timestamp. |
+| wordCountSource | Word Count Source | `jm1_WordCountSource` | Single line of text | Confirmed | Submitted value: `Intake-Reported`. |
+
+Non-field activation items still pending: Web API entity set confirmation, app user/security role confirmation, adapter activation, required-field validation in a test environment, and end-to-end Dataverse write testing.
+
+### Choice Option Values for Web API Writes
+
+#### `jm1_ManuscriptType`
+
+| Label | Numeric value |
+|---|---|
+| Full-length Book | 196650000 |
+| Novella | 196650001 |
+| Children's Picture Book | 196650002 |
+| Poetry Collection | 196650003 |
+| Devotional | 196650004 |
+| Workbook / Journal | 196650005 |
+| Short Story Collection | 196650006 |
+| Other | 196650007 |
+
+#### `jm1_PublishedBefore`
+
+| Label | Numeric value |
+|---|---|
+| First book | 835500000 |
+| Published before with JMP | 835500001 |
+| Published before elsewhere | 835500002 |
 
 ## 6. Fields Intentionally Not Mapped
 
@@ -100,14 +130,10 @@ This appendix documents the website/API-to-Dataverse mapping for the canonical I
 
 Do not activate production Dataverse writes until all of the following are confirmed:
 
-- `jm1_ManuscriptStatusAtIntake` is created or `jm1_StageatSubmission` is confirmed to have exact `/join` status values.
-- `jm1_ReferralSource` is created.
-- Choice option numeric values are confirmed for `jm1_ManuscriptType`.
-- Choice option numeric values are confirmed for `jm1_PublishedBefore`.
 - Web API entity set name is confirmed.
 - Dataverse app user and security role are confirmed.
+- Dataverse adapter activation is completed deliberately after environment confirmation.
 - Required fields are satisfied in a test environment.
-- Test environment is ready.
 - End-to-end `/api/publishing/intake` Dataverse write test passes.
 - Dead-letter behavior is either implemented or explicitly accepted as not configured for the activation phase.
 
@@ -121,9 +147,11 @@ Do not activate production Dataverse writes until all of the following are confi
 - Confirmed-created `jm1_AdditionalNotes`.
 - Confirmed-created `jm1_GenreSubject`.
 - Confirmed-created `jm1_PublishedBefore`.
+- Confirmed-created `jm1_ManuscriptStatusAtIntake`.
+- Confirmed-created `jm1_ReferralSource`.
+- Captured numeric choice option values for `jm1_ManuscriptType`.
+- Captured numeric choice option values for `jm1_PublishedBefore`.
 - Confirm table customizations were published. Power Apps reported `Publish succeeded`.
-- Confirm or create manuscript status target: `jm1_StageatSubmission` exact values or new `jm1_ManuscriptStatusAtIntake`.
-- Create `jm1_ReferralSource`.
-- Capture numeric choice option values for `jm1_ManuscriptType`.
-- Capture numeric choice option values for `jm1_PublishedBefore`.
-- Return final mapping to Codex for production adapter activation.
+- Confirm Web API entity set name.
+- Confirm Dataverse app user/security role.
+- Activate the Dataverse adapter only after test-environment validation.
