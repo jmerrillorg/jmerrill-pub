@@ -7,15 +7,18 @@ export const publishingIntakeDataverseMapping = {
     email: 'jm1_Email',
     phone: 'jm1_MobilePhone',
     bookTitle: 'jm1_ProjectTitle',
-    workType: 'jm1_WorkType',
+    // jm1_WorkType exists, but its current choices do not match the canonical /join values.
+    // jm1_ManuscriptType is the intended work-type target pending numeric choice option values.
+    workType: 'jm1_ManuscriptType',
     wordCount: 'jm1_EstimatedWordCount',
-    manuscriptStatus: 'jm1_ManuscriptStatus',
+    // jm1_ManuscriptStatus is currently synced to manuscript/work-type values, not status values.
+    manuscriptStatus: 'jm1_ManuscriptStatusAtIntake',
     manuscriptUrl: 'jm1_ManuscriptURL',
     bookDescription: 'jm1_Purpose',
-    referralSource: 'jm1_WebsiteSource',
+    // jm1_WebsiteSource only partially matches /join referral-source values.
+    referralSource: 'jm1_ReferralSource',
     consent: 'jm1_ConsenttoContact',
 
-    // Pending creation or confirmation:
     reference: 'jm1_IntakeReferenceCode',
     genre: 'jm1_GenreSubject',
     publishedBefore: 'jm1_PublishedBefore',
@@ -25,15 +28,16 @@ export const publishingIntakeDataverseMapping = {
     consentTimestamp: 'jm1_ConsentTimestamp',
     wordCountSource: 'jm1_WordCountSource',
   },
-  activationStatus: 'blocked_pending_column_creation_and_choice_value_verification',
+  activationStatus: 'blocked_pending_schema_corrections_and_choice_option_values',
 } as const
 
 export type PublishingIntakeDataverseColumn = keyof typeof publishingIntakeDataverseMapping.columns
 
 export const publishingIntakeActivationBlockers = [
-  'Missing columns must be created or alternate mappings approved.',
-  'Choice values for jm1_WorkType, jm1_ManuscriptStatus, jm1_WebsiteSource, and publishedBefore mapping must be verified.',
+  'jm1_ManuscriptStatusAtIntake must be created or jm1_StageatSubmission must be confirmed to have exact /join status values.',
+  'jm1_ReferralSource must be created.',
+  'Choice option numeric values for jm1_ManuscriptType and jm1_PublishedBefore must be confirmed.',
   'Web API entity set name must be confirmed.',
   'Dataverse app user and security role must be confirmed.',
-  'Required fields must be satisfied in a test environment.',
+  'Test environment readiness and end-to-end Dataverse write behavior must be verified.',
 ] as const

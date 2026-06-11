@@ -25,7 +25,7 @@ export async function writePublishingIntakeToDataverse(
   if (
     !hasCredentials ||
     CONFIRMED_DATAVERSE_MAPPING_REQUIRED.activationStatus ===
-      'blocked_pending_column_creation_and_choice_value_verification'
+      'blocked_pending_schema_corrections_and_choice_option_values'
   ) {
     if (process.env.NODE_ENV !== 'production') {
       return { status: 'skipped', reason: 'non_production_mapping_pending' }
