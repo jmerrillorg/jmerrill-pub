@@ -282,9 +282,9 @@ export default function JoinForm() {
   if (status === 'success') {
     return (
       <Panel>
-        <h2 className="mb-3 text-white" style={headingStyle}>Thank you, {form.firstName} — we have your submission.</h2>
+        <h2 className="mb-3 text-white" style={headingStyle}>Thank you, {form.firstName} — welcome to the family conversation.</h2>
         <p className="mb-4 text-[15px] leading-[1.75] text-white/75">
-          A confirmation is on its way to {statusEmail}. Our editorial team will review your submission and reach out within 7–10 business days.
+          We have your story details and will review them with care. A confirmation is on its way to {statusEmail}, and our editorial team will reach out within 7–10 business days.
         </p>
         <p className="rounded-2xl border border-blue-500/25 bg-blue-500/10 px-5 py-4 font-mono text-[13px] uppercase tracking-[0.08em] text-blue-200">
           Your reference: {reference}
@@ -299,7 +299,7 @@ export default function JoinForm() {
   if (status === 'duplicate') {
     return (
       <Panel>
-        <h2 className="mb-3 text-white" style={headingStyle}>Your submission may already be received.</h2>
+        <h2 className="mb-3 text-white" style={headingStyle}>Your story may already be with us.</h2>
         <p className="text-[15px] leading-[1.75] text-white/75">
           We detected a repeated submission attempt. Please check your email for a confirmation, or contact publishing@jmerrill.one and we&apos;ll take care of you personally.
         </p>
@@ -339,7 +339,7 @@ export default function JoinForm() {
           </Field>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Work type" name="workType" required error={visibleError('workType', touched, errors)}>
+            <Field label="What kind of book is this?" name="workType" required error={visibleError('workType', touched, errors)}>
               <select id="workType" name="workType" value={form.workType} onChange={set('workType')} onBlur={markTouched('workType')} className={fieldClass(Boolean(visibleError('workType', touched, errors)))} style={{ colorScheme: 'dark' }}>
                 <option value="">Select one</option>
                 {WORK_TYPE_OPTIONS.map((option) => (
@@ -348,7 +348,7 @@ export default function JoinForm() {
               </select>
             </Field>
 
-            <Field label="Genre" name="genre" required error={visibleError('genre', touched, errors)}>
+            <Field label="Genre or subject" name="genre" required error={visibleError('genre', touched, errors)}>
               <input id="genre" name="genre" value={form.genre} onChange={set('genre')} onBlur={markTouched('genre')} className={fieldClass(Boolean(visibleError('genre', touched, errors)))} />
             </Field>
           </div>
@@ -358,7 +358,7 @@ export default function JoinForm() {
               <input id="wordCount" name="wordCount" type="number" min={100} max={500000} value={form.wordCount} onChange={set('wordCount')} onBlur={markTouched('wordCount')} className={fieldClass(Boolean(visibleError('wordCount', touched, errors)))} />
             </Field>
 
-            <Field label="Manuscript status" name="manuscriptStatus" required error={visibleError('manuscriptStatus', touched, errors)}>
+            <Field label="Where are you in the writing journey?" name="manuscriptStatus" required error={visibleError('manuscriptStatus', touched, errors)}>
               <select id="manuscriptStatus" name="manuscriptStatus" value={form.manuscriptStatus} onChange={set('manuscriptStatus')} onBlur={markTouched('manuscriptStatus')} className={fieldClass(Boolean(visibleError('manuscriptStatus', touched, errors)))} style={{ colorScheme: 'dark' }}>
                 <option value="">Select one</option>
                 {MANUSCRIPT_STATUS_OPTIONS.map((option) => (
@@ -387,7 +387,7 @@ export default function JoinForm() {
               </select>
             </Field>
 
-            <Field label="How did you hear about us?" name="referralSource" error={visibleError('referralSource', touched, errors)}>
+            <Field label="How did you find us?" name="referralSource" error={visibleError('referralSource', touched, errors)}>
               <select id="referralSource" name="referralSource" value={form.referralSource} onChange={set('referralSource')} onBlur={markTouched('referralSource')} className={fieldClass(Boolean(visibleError('referralSource', touched, errors)))} style={{ colorScheme: 'dark' }}>
                 <option value="">Optional</option>
                 {REFERRAL_SOURCE_OPTIONS.map((option) => (
@@ -397,19 +397,19 @@ export default function JoinForm() {
             </Field>
           </div>
 
-          <Field label="Book description" name="bookDescription" required error={visibleError('bookDescription', touched, errors)} helper="Tell us what the book is about, who it is for, and why it matters. Minimum 50 characters.">
+          <Field label="Why does this book matter?" name="bookDescription" required error={visibleError('bookDescription', touched, errors)} helper="Tell us what the book is about, who it is for, and why it needs to exist. Minimum 50 characters.">
             <textarea id="bookDescription" name="bookDescription" value={form.bookDescription} onChange={set('bookDescription')} onBlur={markTouched('bookDescription')} rows={6} className={`${fieldClass(Boolean(visibleError('bookDescription', touched, errors)))} resize-none`} />
           </Field>
 
-          <Field label="Additional notes" name="additionalNotes" error={visibleError('additionalNotes', touched, errors)} helper="Optional. Use this for timing, context, or anything else our editorial team should know.">
+          <Field label="Anything else on your heart?" name="additionalNotes" error={visibleError('additionalNotes', touched, errors)} helper="Optional. Share timing, hopes, concerns, or anything else that helps us understand how to care for the work.">
             <textarea id="additionalNotes" name="additionalNotes" value={form.additionalNotes} onChange={set('additionalNotes')} onBlur={markTouched('additionalNotes')} rows={4} className={`${fieldClass(Boolean(visibleError('additionalNotes', touched, errors)))} resize-none`} />
           </Field>
         </section>
 
         <section className="flex flex-col gap-4" aria-labelledby="verification-heading">
-          <SectionHeading id="verification-heading" title="Consent and verification" />
+          <SectionHeading id="verification-heading" title="Permission and verification" />
 
-          <Field label="Consent" name="consent" required error={visibleError('consent', touched, errors)}>
+          <Field label="Permission to connect" name="consent" required error={visibleError('consent', touched, errors)}>
             <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/15 bg-white/[0.06] p-4 focus-within:border-blue-400">
               <input
                 id="consent"
@@ -421,7 +421,7 @@ export default function JoinForm() {
                 className="mt-1 accent-blue-500"
               />
               <span className="text-[13px] leading-[1.7] text-white/75">
-                I consent to J Merrill Publishing reviewing my inquiry and contacting me about my book. I understand this form does not collect payment data, SSN, banking information, or file uploads.
+                I give J Merrill Publishing permission to review my inquiry and contact me about my book. I understand this form does not collect payment data, SSN, banking information, or file uploads.
               </span>
             </label>
           </Field>
@@ -429,7 +429,7 @@ export default function JoinForm() {
           <div>
             {verificationConfigStatus === 'loading' && (
               <p className="min-h-[70px] rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-5 text-[13px] text-white/70">
-                Loading verification…
+                Preparing verification…
               </p>
             )}
             {verificationConfigStatus !== 'loading' && (
@@ -469,7 +469,7 @@ export default function JoinForm() {
           disabled={!canSubmit}
           className="w-full rounded-full bg-blue-500 py-4 text-[14px] font-semibold uppercase tracking-[0.04em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 focus:ring-offset-[#0F1C2E] disabled:cursor-not-allowed disabled:bg-blue-500/55 disabled:shadow-none disabled:hover:translate-y-0"
         >
-          {status === 'submitting' ? 'Submitting...' : 'Submit Intake'}
+          {status === 'submitting' ? 'Joining...' : 'Join the Family'}
         </button>
       </form>
     </div>
