@@ -1,5 +1,4 @@
 export const publishingIntakeDataverseMapping = {
-  // TODO: Confirm entity set name for jm1_publishingintake before production activation.
   table: 'jm1_publishingintakes',
   columns: {
     firstName: 'jm1_FirstName',
@@ -24,7 +23,7 @@ export const publishingIntakeDataverseMapping = {
     consentTimestamp: 'jm1_ConsentTimestamp',
     wordCountSource: 'jm1_WordCountSource',
   },
-  activationStatus: 'blocked_pending_adapter_activation_and_write_validation',
+  activationStatus: 'adapter_activated_pending_e2e_validation',
 } as const
 
 export type PublishingIntakeDataverseColumn = keyof typeof publishingIntakeDataverseMapping.columns
@@ -47,9 +46,7 @@ export const publishedBeforeOptions = {
 } as const
 
 export const publishingIntakeActivationBlockers = [
-  'Web API entity set name must be confirmed.',
-  'Dataverse app user and security role must be confirmed.',
-  'Dataverse adapter activation must be completed deliberately after environment confirmation.',
   'Required field validation must be confirmed in a test environment.',
   'End-to-end /api/publishing/intake Dataverse write behavior must be verified.',
+  'Dead-letter behavior must be confirmed or explicitly accepted as not configured.',
 ] as const
