@@ -67,15 +67,15 @@ export default function RootLayout({
       </head>
       <body>
         {/* JM1 parent system — division top bar */}
-        <div className="w-full bg-[#0A1F33] text-white/50 flex items-center justify-between px-6 py-1.5">
+        <div className="w-full bg-[#0A1F33] text-white/78 flex items-center justify-between px-6 py-1.5">
           <span className="font-mono text-[10px] tracking-[0.12em] uppercase">
             Division 01 · Publishing
           </span>
           <a
             href="https://www.jmerrill.one"
-            className="font-mono text-[10px] tracking-[0.1em] uppercase text-white/40 hover:text-sky-300 transition-colors flex items-center gap-2"
+            className="font-mono text-[10px] tracking-[0.1em] uppercase text-white/70 hover:text-sky-200 transition-colors flex items-center gap-2"
           >
-            <span className="w-4 h-px bg-white/20 block" />
+            <span className="w-4 h-px bg-white/45 block" />
             J Merrill One ↗
           </a>
         </div>
