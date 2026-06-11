@@ -27,6 +27,7 @@ declare global {
 }
 
 type Status = 'idle' | 'submitting' | 'success' | 'duplicate' | 'rate_limited' | 'error'
+type VerificationConfigStatus = 'loading' | 'ready' | 'missing'
 
 type JoinFormState = {
   firstName: string
@@ -71,7 +72,7 @@ const initialForm: JoinFormState = {
 }
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+const buildTimeSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || ''
 
 export default function JoinForm() {
   const [form, setForm] = useState<JoinFormState>(initialForm)
@@ -81,19 +82,69 @@ export default function JoinForm() {
   const [reference, setReference] = useState('')
   const [statusEmail, setStatusEmail] = useState('')
   const [serverMessage, setServerMessage] = useState('')
+  const [turnstileSiteKey, setTurnstileSiteKey] = useState(buildTimeSiteKey)
+  const [verificationConfigStatus, setVerificationConfigStatus] = useState<VerificationConfigStatus>(
+    buildTimeSiteKey ? 'ready' : 'loading',
+  )
   const turnstileRef = useRef<HTMLDivElement | null>(null)
   const widgetIdRef = useRef<string>()
 
   const allErrors = useMemo(() => validate(form), [form])
-  const canSubmit = Object.keys(allErrors).length === 0 && status !== 'submitting'
+  const canSubmit = Object.keys(allErrors).length === 0 && status !== 'submitting' && verificationConfigStatus === 'ready'
 
   useEffect(() => {
-    if (!siteKey && process.env.NODE_ENV !== 'production') {
-      setForm((current) => ({ ...current, turnstileToken: 'development-turnstile-token' }))
-      return
+    let cancelled = false
+
+    async function loadRuntimeConfig() {
+      try {
+        const res = await fetch('/api/publishing/intake/config', { cache: 'no-store' })
+        const data = await res.json().catch(() => null)
+        const runtimeSiteKey = typeof data?.turnstileSiteKey === 'string' ? data.turnstileSiteKey.trim() : ''
+        const nextSiteKey = runtimeSiteKey || buildTimeSiteKey
+
+        if (cancelled) return
+
+        if (nextSiteKey) {
+          setTurnstileSiteKey(nextSiteKey)
+          setVerificationConfigStatus('ready')
+          return
+        }
+
+        if (process.env.NODE_ENV !== 'production') {
+          setForm((current) => ({ ...current, turnstileToken: 'development-turnstile-token' }))
+          setVerificationConfigStatus('ready')
+          return
+        }
+
+        setVerificationConfigStatus('missing')
+      } catch {
+        if (cancelled) return
+
+        if (buildTimeSiteKey) {
+          setTurnstileSiteKey(buildTimeSiteKey)
+          setVerificationConfigStatus('ready')
+          return
+        }
+
+        if (process.env.NODE_ENV !== 'production') {
+          setForm((current) => ({ ...current, turnstileToken: 'development-turnstile-token' }))
+          setVerificationConfigStatus('ready')
+          return
+        }
+
+        setVerificationConfigStatus('missing')
+      }
     }
 
-    if (!siteKey || !turnstileRef.current) return
+    loadRuntimeConfig()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!turnstileSiteKey || !turnstileRef.current) return
 
     const scriptId = 'cloudflare-turnstile-script'
     if (!document.getElementById(scriptId)) {
@@ -108,7 +159,7 @@ export default function JoinForm() {
     const interval = window.setInterval(() => {
       if (window.turnstile && turnstileRef.current && !widgetIdRef.current) {
         widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
-          sitekey: siteKey,
+          sitekey: turnstileSiteKey,
           callback: (token) => setForm((current) => ({ ...current, turnstileToken: token })),
           'expired-callback': () => setForm((current) => ({ ...current, turnstileToken: '' })),
           'error-callback': () => setForm((current) => ({ ...current, turnstileToken: '' })),
@@ -118,7 +169,7 @@ export default function JoinForm() {
     }, 250)
 
     return () => window.clearInterval(interval)
-  }, [])
+  }, [turnstileSiteKey])
 
   const set =
     (field: keyof JoinFormState) =>
@@ -232,13 +283,13 @@ export default function JoinForm() {
     return (
       <Panel>
         <h2 className="mb-3 text-white" style={headingStyle}>Thank you, {form.firstName} — we have your submission.</h2>
-        <p className="mb-4 text-[15px] leading-[1.75] text-white/55">
+        <p className="mb-4 text-[15px] leading-[1.75] text-white/75">
           A confirmation is on its way to {statusEmail}. Our editorial team will review your submission and reach out within 7–10 business days.
         </p>
-        <p className="rounded-2xl border border-blue-500/25 bg-blue-500/10 px-5 py-4 font-mono text-[13px] uppercase tracking-[0.08em] text-blue-300">
+        <p className="rounded-2xl border border-blue-500/25 bg-blue-500/10 px-5 py-4 font-mono text-[13px] uppercase tracking-[0.08em] text-blue-200">
           Your reference: {reference}
         </p>
-        <Link href="/" className="mt-6 inline-flex text-[13px] text-blue-400 underline underline-offset-4">
+        <Link href="/" className="mt-6 inline-flex text-[13px] text-blue-300 underline underline-offset-4 hover:text-blue-200">
           Back to J Merrill Publishing
         </Link>
       </Panel>
@@ -249,7 +300,7 @@ export default function JoinForm() {
     return (
       <Panel>
         <h2 className="mb-3 text-white" style={headingStyle}>Your submission may already be received.</h2>
-        <p className="text-[15px] leading-[1.75] text-white/55">
+        <p className="text-[15px] leading-[1.75] text-white/75">
           We detected a repeated submission attempt. Please check your email for a confirmation, or contact publishing@jmerrill.one and we&apos;ll take care of you personally.
         </p>
       </Panel>
@@ -257,7 +308,7 @@ export default function JoinForm() {
   }
 
   return (
-    <div className="rounded-3xl border border-white/8 bg-white/[0.04] p-6 backdrop-blur sm:p-8">
+    <div className="rounded-3xl border border-blue-200/20 bg-[#18283B] p-6 shadow-[0_20px_70px_rgba(0,0,0,0.24)] sm:p-8">
       <form onSubmit={handleSubmit} className="flex flex-col gap-8" noValidate>
         <section className="flex flex-col gap-4" aria-labelledby="about-you-heading">
           <SectionHeading id="about-you-heading" title="About you" />
@@ -359,7 +410,7 @@ export default function JoinForm() {
           <SectionHeading id="verification-heading" title="Consent and verification" />
 
           <Field label="Consent" name="consent" required error={visibleError('consent', touched, errors)}>
-            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 focus-within:border-blue-500">
+            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/15 bg-white/[0.06] p-4 focus-within:border-blue-400">
               <input
                 id="consent"
                 name="consent"
@@ -369,19 +420,26 @@ export default function JoinForm() {
                 onBlur={markTouched('consent')}
                 className="mt-1 accent-blue-500"
               />
-              <span className="text-[13px] leading-[1.7] text-white/58">
+              <span className="text-[13px] leading-[1.7] text-white/75">
                 I consent to J Merrill Publishing reviewing my inquiry and contacting me about my book. I understand this form does not collect payment data, SSN, banking information, or file uploads.
               </span>
             </label>
           </Field>
 
           <div>
-            <div ref={turnstileRef} className="min-h-[70px]" aria-label="Cloudflare Turnstile verification" />
-            {!siteKey && process.env.NODE_ENV === 'production' && (
-              <p className="text-[13px] text-red-300">Verification is not configured. Please email publishing@jmerrill.one.</p>
+            {verificationConfigStatus === 'loading' && (
+              <p className="min-h-[70px] rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-5 text-[13px] text-white/70">
+                Loading verification…
+              </p>
             )}
-            {visibleError('turnstileToken', touched, errors) && (
-              <p className="mt-2 text-[12px] text-red-300" role="alert">
+            {verificationConfigStatus !== 'loading' && (
+              <div ref={turnstileRef} className="min-h-[70px]" aria-label="Cloudflare Turnstile verification" />
+            )}
+            {verificationConfigStatus === 'missing' && process.env.NODE_ENV === 'production' && (
+              <p className="text-[13px] text-red-200">Verification is not configured. Please email publishing@jmerrill.one.</p>
+            )}
+            {visibleError('turnstileToken', touched, errors) && verificationConfigStatus !== 'loading' && (
+              <p className="mt-2 text-[12px] text-red-200" role="alert">
                 {visibleError('turnstileToken', touched, errors)}
               </p>
             )}
@@ -390,17 +448,17 @@ export default function JoinForm() {
 
         <div aria-live="polite" className="min-h-[44px]">
           {serverMessage && (
-            <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[13px] text-red-300">
+            <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[13px] text-red-200">
               {serverMessage}
             </p>
           )}
           {status === 'rate_limited' && (
-            <p className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-[13px] leading-[1.7] text-amber-200">
+            <p className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-[13px] leading-[1.7] text-amber-100">
               The submission limit was reached for now. Please try again later, or email publishing@jmerrill.one and we&apos;ll take care of you personally.
             </p>
           )}
           {status === 'error' && (
-            <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[13px] leading-[1.7] text-red-300">
+            <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[13px] leading-[1.7] text-red-200">
               We&apos;re sorry — something went wrong on our end. Your submission did not go through. Please try again in a few minutes, or email us directly at publishing@jmerrill.one and we&apos;ll take care of you personally.
             </p>
           )}
@@ -409,7 +467,7 @@ export default function JoinForm() {
         <button
           type="submit"
           disabled={!canSubmit}
-          className="w-full rounded-full bg-blue-500 py-4 text-[14px] font-semibold uppercase tracking-[0.04em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 focus:ring-offset-[#0F1C2E] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+          className="w-full rounded-full bg-blue-500 py-4 text-[14px] font-semibold uppercase tracking-[0.04em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 focus:ring-offset-[#0F1C2E] disabled:cursor-not-allowed disabled:bg-blue-500/55 disabled:shadow-none disabled:hover:translate-y-0"
         >
           {status === 'submitting' ? 'Submitting...' : 'Submit Intake'}
         </button>
@@ -421,10 +479,10 @@ export default function JoinForm() {
 function SectionHeading({ id, title }: { id: string; title: string }) {
   return (
     <div>
-      <h2 id={id} className="font-mono text-[12px] uppercase tracking-[0.16em] text-blue-400">
+      <h2 id={id} className="font-mono text-[12px] uppercase tracking-[0.16em] text-blue-300">
         {title}
       </h2>
-      <div className="mt-2 h-px bg-white/10" />
+      <div className="mt-2 h-px bg-white/15" />
     </div>
   )
 }
@@ -446,17 +504,17 @@ function Field({
 }) {
   return (
     <div>
-      <label htmlFor={name} className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.1em] text-white/45">
-        {label} {required && <span className="text-blue-400">*</span>}
+      <label htmlFor={name} className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.1em] text-white/70">
+        {label} {required && <span className="text-blue-300">*</span>}
       </label>
       {children}
       {helper && !error && (
-        <p className="mt-1.5 text-[11px] leading-[1.6] text-white/30">
+        <p className="mt-1.5 text-[11px] leading-[1.6] text-white/55">
           {helper}
         </p>
       )}
       {error && (
-        <p className="mt-1.5 text-[12px] text-red-300" role="alert">
+        <p className="mt-1.5 text-[12px] text-red-200" role="alert">
           {error}
         </p>
       )}
@@ -466,7 +524,7 @@ function Field({
 
 function Panel({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-3xl border border-blue-500/25 bg-white/[0.04] p-8 text-center sm:p-12">
+    <div className="rounded-3xl border border-blue-500/25 bg-[#18283B] p-8 text-center shadow-[0_20px_70px_rgba(0,0,0,0.24)] sm:p-12">
       {children}
     </div>
   )
@@ -504,9 +562,9 @@ function visibleError(field: keyof JoinFormState, touched: Partial<Record<keyof 
 
 function fieldClass(hasError: boolean) {
   return [
-    'w-full rounded-xl border bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/20 transition-colors',
+    'w-full rounded-xl border bg-white/[0.08] px-4 py-3 text-[14px] text-white placeholder:text-white/30 transition-colors',
     'focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 focus:ring-offset-[#0F1C2E]',
-    hasError ? 'border-red-400 focus:border-red-300' : 'border-white/10 focus:border-blue-500',
+    hasError ? 'border-red-300 focus:border-red-200' : 'border-white/15 focus:border-blue-400',
   ].join(' ')
 }
 
