@@ -23,7 +23,7 @@ export default function JoinPage() {
               className="text-[11px] text-blue-100 font-semibold tracking-[0.1em] uppercase"
               style={{ fontFamily: "'DM Mono', monospace" }}
             >
-              Now Accepting New Authors
+              Now Welcoming New Authors
             </span>
           </div>
           <h1
@@ -42,13 +42,13 @@ export default function JoinPage() {
             <em className="not-italic italic" style={{ color: '#57A8FF' }}>Join the Family.</em>
           </h1>
           <p className="mx-auto max-w-[620px] text-[16px] font-normal leading-[1.75]" style={{ color: 'rgba(255,255,255,0.88)' }}>
-            Complete the inquiry below. You do not need every publishing answer yet. This first step helps us understand the work, protect the author&apos;s voice, and prepare our editorial review.
+            Your book is more than a project. It carries your story, your voice, and the people you hope to reach. Start here so we can understand the heart of your work and help you find the right publishing path.
           </p>
         </div>
 
         <div className="mb-8 rounded-3xl border border-blue-300/35 bg-[#14345A] p-6 shadow-[0_14px_50px_rgba(0,0,0,0.24)]">
           <p className="text-[14px] font-normal leading-[1.8]" style={{ color: 'rgba(255,255,255,0.9)' }}>
-            Your inquiry starts a conversation, not a transaction. Your name, rights, message, and long-term goals remain central while we help identify whether J Merrill Publishing is the right family for your book.
+            This first step is not a transaction. It is an invitation to be heard. We want to know why this book matters, who it is for, and how J Merrill Publishing can walk with you through the next right step.
           </p>
         </div>
 
