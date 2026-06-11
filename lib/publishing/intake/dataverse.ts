@@ -1,10 +1,10 @@
 import type { NormalizedPublishingIntake } from './schema'
+import {
+  publishingIntakeActivationBlockers,
+  publishingIntakeDataverseMapping,
+} from './dataverseMapping'
 
-export const CONFIRMED_DATAVERSE_MAPPING_REQUIRED = {
-  table: 'jm1_publishingintake',
-  columns: null,
-  // TODO: Blocked until Chad provides the jm1_publishingintake mapping appendix per INT-PUB-005 §4.
-} as const
+export const CONFIRMED_DATAVERSE_MAPPING_REQUIRED = publishingIntakeDataverseMapping
 
 export type DataverseWriteResult =
   | { status: 'success' }
@@ -22,14 +22,18 @@ export async function writePublishingIntakeToDataverse(
       process.env.DATAVERSE_ENVIRONMENT_URL,
   )
 
-  if (!hasCredentials || !CONFIRMED_DATAVERSE_MAPPING_REQUIRED.columns) {
+  if (
+    !hasCredentials ||
+    CONFIRMED_DATAVERSE_MAPPING_REQUIRED.activationStatus ===
+      'blocked_pending_adapter_activation_and_write_validation'
+  ) {
     if (process.env.NODE_ENV !== 'production') {
       return { status: 'skipped', reason: 'non_production_mapping_pending' }
     }
 
     return {
       status: 'failed',
-      reason: 'dataverse_mapping_required',
+      reason: `dataverse_activation_blocked: ${publishingIntakeActivationBlockers.join('; ')}`,
       retryable: false,
     }
   }
