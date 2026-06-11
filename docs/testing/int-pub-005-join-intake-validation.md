@@ -1,6 +1,6 @@
 # INT-PUB-005 Join Intake Validation Notes
 
-This repo does not currently include Jest, Vitest, Playwright, or another test runner. Validation for the INT-PUB-005 intake foundation is covered by TypeScript-safe utility boundaries and manual/API checks until a test framework is approved.
+This repo does not currently include Jest, Vitest, Playwright, or another test runner. Validation for the INT-PUB-005 intake adapter is covered by TypeScript-safe utility boundaries, local/API checks, and manual Dataverse verification until a test framework is approved.
 
 ## Utility Coverage
 
@@ -13,29 +13,153 @@ Implemented utility boundaries:
 - `lib/publishing/intake/idempotency.ts`
 - `lib/publishing/intake/turnstile.ts`
 - `lib/publishing/intake/dataverse.ts`
+- `lib/publishing/intake/dataverseMapping.ts`
 - `lib/publishing/intake/deadLetter.ts`
 
-## Manual Validation Cases
+## Required Environment Variables
 
-Use `POST /api/publishing/intake` with JSON payloads matching the INT-PUB-005 body.
+Server-side Dataverse adapter variables:
 
-1. Valid new submission payload should return `201` with `status: "received"` and a `JMP-INT-YYYYMM-XXXXXX` reference in non-production when Dataverse mapping is pending.
-2. Missing required fields should return `400` with `status: "invalid"` and field-level errors.
-3. Invalid email should return `400`.
-4. `wordCount` below `100` or above `500000` should return `400`.
-5. `bookDescription` below `50` characters should return `400`.
-6. `additionalNotes` above `1000` characters should return `400`.
-7. Script or HTML input should return `400`; unsupported control characters should return `400`.
-8. Generated references should match `JMP-INT-YYYYMM-XXXXXX`.
-9. Replaying the same idempotency key within 24 hours after a received submission should return `409` with `status: "duplicate"`.
-10. Turnstile failure should return `400` before rate limit, validation, idempotency, or adapter writes.
-11. Dataverse failure should attempt dead-letter handling; if neither Dataverse nor dead-letter succeeds in production, the API should return `5xx`.
-12. Missing `manuscriptUrl` should be accepted.
+- `DATAVERSE_TENANT_ID`
+- `DATAVERSE_CLIENT_ID`
+- `DATAVERSE_CLIENT_SECRET`
+- `DATAVERSE_RESOURCE_URL`
+- `DATAVERSE_ENVIRONMENT_URL`
+- `DATAVERSE_WEB_API_BASE_URL`
+- `DATAVERSE_PUBLISHING_INTAKE_ENTITY_SET`
 
-## Non-Production Turnstile Behavior
+Confirmed non-secret values for JM1-Core:
 
-When `TURNSTILE_SECRET_KEY` and `NEXT_PUBLIC_TURNSTILE_SITE_KEY` are not configured outside production, the client uses `development-turnstile-token` and the server accepts that token for local validation.
+```text
+DATAVERSE_TENANT_ID=352d075e-8e17-4169-9f8e-22e6946ce66d
+DATAVERSE_CLIENT_ID=71ec4dd0-d261-4ffc-9f5a-626d885ecc85
+DATAVERSE_RESOURCE_URL=https://jm1hq.crm.dynamics.com
+DATAVERSE_ENVIRONMENT_URL=https://jm1hq.crm.dynamics.com
+DATAVERSE_WEB_API_BASE_URL=https://jm1hq.crm.dynamics.com/api/data/v9.2
+DATAVERSE_PUBLISHING_INTAKE_ENTITY_SET=jm1_publishingintakes
+```
+
+Do not commit or paste `DATAVERSE_CLIENT_SECRET`. Place it only in the secure deployment environment.
+
+Turnstile and intake controls:
+
+- `TURNSTILE_SECRET_KEY`
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+- `INTAKE_ALLOWED_ORIGINS`
+- `INTAKE_RATE_LIMIT_ENABLED`
+
+Optional dead-letter variables:
+
+- `AZURE_STORAGE_CONNECTION_STRING`
+- `INTAKE_DEADLETTER_QUEUE_NAME`
+
+The current dead-letter adapter returns `not_configured` when these settings are absent. If they are present, the adapter remains explicit and fails with `dead_letter_adapter_not_implemented_without_azure_storage_sdk` until an approved queue implementation is added.
+
+## Local Validation Without Exposing Secrets
+
+1. Copy `.env.example` to `.env.local`.
+2. Add non-secret Dataverse values from the confirmed list above.
+3. Add `DATAVERSE_CLIENT_SECRET` only in your local `.env.local`; never paste it into chat, docs, GitHub, or terminal logs.
+4. Leave Turnstile unset for local non-production validation, or use the development client token path.
+5. Run `npm run type-check`, `npm run lint`, and `npm run build`.
+
+In non-production, if Dataverse credentials are missing, the adapter returns `skipped` and the API can still validate the request path without writing a row.
+
+## Manual API Test Payload
+
+Use `POST /api/publishing/intake` with JSON matching the INT-PUB-005 body. Replace the UUID and Turnstile token for each run.
+
+```json
+{
+  "firstName": "Test",
+  "lastName": "Author",
+  "email": "jackie+intpub005test@jmerrill.pub",
+  "phone": "6140000000",
+  "bookTitle": "TEST - INT-PUB-005 Publishing Intake",
+  "workType": "Full-length Book",
+  "genre": "Inspirational nonfiction",
+  "wordCount": 50000,
+  "manuscriptStatus": "Complete",
+  "manuscriptUrl": "https://example.com/manuscript",
+  "publishedBefore": "First book",
+  "bookDescription": "This is a safe test submission used to validate the INT-PUB-005 Dataverse intake adapter path.",
+  "referralSource": "Search",
+  "additionalNotes": "Test submission only. Do not route downstream.",
+  "consent": true,
+  "turnstileToken": "development-turnstile-token",
+  "idempotencyKey": "00000000-0000-4000-8000-000000000005"
+}
+```
+
+## Expected Successful API Response
+
+When Dataverse writes succeed, the public API response remains:
+
+```json
+{
+  "status": "received",
+  "reference": "JMP-INT-YYYYMM-XXXXXX"
+}
+```
+
+Expected status: `201`.
+
+## Expected Dataverse Row Fields
+
+Verify the created row in `jm1_publishingintakes` / Publishing Intake:
+
+- `jm1_FirstName`
+- `jm1_LastName`
+- `jm1_Email`
+- `jm1_MobilePhone`
+- `jm1_ProjectTitle`
+- `jm1_ManuscriptType`
+- `jm1_GenreSubject`
+- `jm1_EstimatedWordCount`
+- `jm1_ManuscriptStatusAtIntake`
+- `jm1_ManuscriptURL`
+- `jm1_PublishedBefore`
+- `jm1_Purpose`
+- `jm1_ReferralSource`
+- `jm1_AdditionalNotes`
+- `jm1_ConsenttoContact`
+- `jm1_IntakeReferenceCode`
+- `jm1_IntakeChannel`
+- `jm1_IdempotencyKey`
+- `jm1_ConsentTimestamp`
+- `jm1_WordCountSource`
+
+Choice values are mapped to Dataverse numeric option values:
+
+- `jm1_ManuscriptType`: `Full-length Book` -> `196650000`
+- `jm1_PublishedBefore`: `First book` -> `835500000`
+
+## Expected Failure Behavior
+
+- Missing required fields return `400` with `status: "invalid"`.
+- Invalid email returns `400`.
+- Invalid work type, manuscript status, publishing history, or referral source returns `400`.
+- Turnstile failure returns `400` before rate limit, validation, idempotency, or adapter writes.
+- Replaying the same idempotency key within 24 hours after a received submission returns `409` with `status: "duplicate"`.
+- Dataverse retryable failures are retried up to two additional times with backoff.
+- If Dataverse fails and dead-letter is successfully enqueued, the API returns `201`.
+- If Dataverse fails and dead-letter is not configured or enqueue fails, production returns `500` with `status: "error"`.
+- Client-visible errors do not expose PII or Dataverse internals.
+
+## Manual Dataverse Verification Checklist
+
+- Confirm exactly one Publishing Intake row is created per successful submission.
+- Confirm no Contact, Lead, Opportunity, execution log, acknowledgment email, loyalty-tier logic, Stage 0 diagnostic, or Power Automate Flow A behavior is triggered by the website.
+- Confirm `jm1_IntakeReferenceCode` matches the API response reference.
+- Confirm `jm1_IdempotencyKey` stores the submitted idempotency key.
+- Confirm `jm1_ConsentTimestamp` is an ISO server receipt timestamp.
+- Confirm optional blank fields are omitted or blank, not filled with placeholder text.
+- Confirm the application user is `JM1-PUB-INTAKE-WEBAPI` with the `JM1 Publishing Intake API - Create Only` role.
+
+## Idempotency Note
+
+Current idempotency memory is process-local. It is acceptable for first activation testing only. A durable idempotency store should be added before relying on idempotency across scaled instances, restarts, or multi-region runtime behavior.
 
 ## Dataverse Boundary
 
-`lib/publishing/intake/dataverse.ts` intentionally does not guess Dataverse column names. The adapter is blocked until Chad provides the `jm1_publishingintake` mapping appendix per INT-PUB-005 §4.
+The website/API writes only one row to `jm1_publishingintakes`. It does not create or match Contacts, Leads, Opportunities, acknowledgments, loyalty-tier records, execution logs, Stage 0 diagnostics, or downstream Power Automate behavior.
