@@ -151,9 +151,42 @@ Choice values are mapped to Dataverse numeric option values:
 - Turnstile failure returns `400` before rate limit, validation, idempotency, or adapter writes.
 - Replaying the same idempotency key within 24 hours after a received submission returns `409` with `status: "duplicate"`.
 - Dataverse retryable failures are retried up to two additional times with backoff.
-- If Dataverse fails and dead-letter is successfully enqueued, the API returns `201`.
-- If Dataverse fails and dead-letter is not configured or enqueue fails, production returns `500` with `status: "error"`.
+- If Dataverse fails and dead-letter is successfully enqueued, the API still returns a server-side failure response; `201` is reserved for Dataverse create success.
+- If Dataverse fails and dead-letter is not configured or enqueue fails, production returns a server-side failure response with `status: "error"`.
 - Client-visible errors do not expose PII or Dataverse internals.
+
+## Safe Troubleshooting Diagnostics
+
+When the public form shows the generic error, open DevTools > Network > `/api/publishing/intake` > Response.
+
+Capture only:
+
+- HTTP status
+- `status`
+- `code`
+- `detail`
+- `reference`
+
+Do not capture:
+
+- request headers
+- cookies
+- Turnstile token
+- email
+- phone
+- full name
+- full request payload
+
+Diagnostic interpretation:
+
+| Diagnostic | Meaning |
+|---|---|
+| `dataverse_configuration_missing` | Azure app setting missing. |
+| `dataverse_token_failed` | Tenant, client ID, client secret, or API permission issue. |
+| `dataverse_write_failed:400` | Dataverse payload, column, choice, or required field issue. |
+| `dataverse_write_failed:401` / `dataverse_write_failed:403` | Dataverse application user or security role issue. |
+| `turnstile_verification_failed` | Turnstile secret, domain, or server verification issue. |
+| `unexpected_exception` | Inspect the code path and safe server logs. |
 
 ## Manual Dataverse Verification Checklist
 

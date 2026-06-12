@@ -16,17 +16,37 @@ export const dynamic = 'force-dynamic'
 
 type IntakeResponseBody =
   | { status: 'received'; reference: string }
-  | { status: 'invalid'; errors: IntakeValidationError[] }
+  | { status: 'invalid'; code: 'validation_failed'; errors: IntakeValidationError[] }
   | { status: 'duplicate' }
   | { status: 'rate_limited' }
-  | { status: 'error' }
+  | IntakeErrorResponse
+
+type IntakeErrorCode =
+  | 'validation_failed'
+  | 'turnstile_verification_failed'
+  | 'dataverse_configuration_missing'
+  | 'dataverse_token_failed'
+  | 'dataverse_write_failed'
+  | 'dead_letter_failed'
+  | 'unexpected_exception'
+
+type IntakeErrorResponse = {
+  status: 'error'
+  message: 'We could not receive your submission right now.'
+  code: IntakeErrorCode
+  detail: string
+  reference?: string
+}
 
 export async function OPTIONS(req: NextRequest) {
   const origin = req.headers.get('origin')
   const originResult = validateOrigin(origin)
 
   if (!originResult.allowed) {
-    return json({ status: 'error' }, 403)
+    return json(
+      buildErrorResponse('unexpected_exception', 'origin_not_allowed'),
+      403,
+    )
   }
 
   return new NextResponse(null, {
@@ -36,11 +56,29 @@ export async function OPTIONS(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  try {
+    return await handlePublishingIntakePost(req)
+  } catch (error) {
+    console.error('Publishing intake unexpected exception.', {
+      reason: error instanceof Error ? error.name : 'unknown',
+    })
+
+    return json(
+      buildErrorResponse('unexpected_exception', error instanceof Error ? error.name : 'unknown'),
+      500,
+    )
+  }
+}
+
+async function handlePublishingIntakePost(req: NextRequest) {
   const origin = req.headers.get('origin')
   const originResult = validateOrigin(origin)
 
   if (!originResult.allowed) {
-    return json({ status: 'error' }, 403)
+    return json(
+      buildErrorResponse('unexpected_exception', 'origin_not_allowed'),
+      403,
+    )
   }
 
   let body: unknown
@@ -51,6 +89,7 @@ export async function POST(req: NextRequest) {
     return json(
       {
         status: 'invalid',
+        code: 'validation_failed',
         errors: [{ field: 'request', message: 'Invalid JSON request body.' }],
       },
       400,
@@ -69,10 +108,7 @@ export async function POST(req: NextRequest) {
     })
 
     return json(
-      {
-        status: 'invalid',
-        errors: [{ field: 'turnstileToken', message: 'Please complete the verification challenge.' }],
-      },
+      buildErrorResponse('turnstile_verification_failed', sanitizeDiagnosticDetail(turnstile.reason || 'unknown')),
       400,
       originResult.origin,
     )
@@ -90,7 +126,15 @@ export async function POST(req: NextRequest) {
 
   const validation = validatePublishingIntakeBody(body)
   if (!validation.ok) {
-    return json({ status: 'invalid', errors: validation.errors }, 400, originResult.origin)
+    return json(
+      {
+        status: 'invalid',
+        code: 'validation_failed',
+        errors: validation.errors,
+      },
+      400,
+      originResult.origin,
+    )
   }
 
   const replay = getIdempotencyReplay(validation.data.idempotencyKey)
@@ -109,15 +153,12 @@ export async function POST(req: NextRequest) {
 
   const deadLetter = await enqueuePublishingIntakeDeadLetter(intake, dataverse.reason)
   if (deadLetter.status === 'enqueued') {
-    rememberIdempotencyKey(intake.idempotencyKey, reference)
     console.error('Publishing intake Dataverse write failed; payload dead-lettered.', {
       reason: dataverse.reason,
       reference,
       firstName: maskName(intake.firstName),
       email: maskEmail(intake.email),
     })
-
-    return json({ status: 'received', reference }, 201, originResult.origin)
   }
 
   console.error('Publishing intake failed without Dataverse write or dead-letter.', {
@@ -128,7 +169,12 @@ export async function POST(req: NextRequest) {
     email: maskEmail(intake.email),
   })
 
-  return json({ status: 'error' }, 500, originResult.origin)
+  const diagnostics = buildFailureDiagnostics(dataverse.reason)
+  return json(
+    buildErrorResponse(diagnostics.code, diagnostics.detail, reference),
+    diagnostics.httpStatus,
+    originResult.origin,
+  )
 }
 
 function json(
@@ -150,6 +196,53 @@ function extractTurnstileToken(body: unknown) {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) return ''
   const value = (body as Record<string, unknown>).turnstileToken
   return typeof value === 'string' ? value : ''
+}
+
+function buildErrorResponse(code: IntakeErrorCode, detail: string, reference?: string): IntakeErrorResponse {
+  return {
+    status: 'error',
+    message: 'We could not receive your submission right now.',
+    code,
+    detail: sanitizeDiagnosticDetail(detail),
+    ...(reference ? { reference } : {}),
+  }
+}
+
+function buildFailureDiagnostics(reason: string): {
+  code: IntakeErrorCode
+  detail: string
+  httpStatus: number
+} {
+  const detail = sanitizeDiagnosticDetail(reason)
+
+  if (reason.startsWith('dataverse_configuration_missing:')) {
+    return { code: 'dataverse_configuration_missing', detail, httpStatus: 500 }
+  }
+
+  if (reason.startsWith('dataverse_write_exception:dataverse_token_failed:')) {
+    return { code: 'dataverse_token_failed', detail, httpStatus: 502 }
+  }
+
+  if (reason.startsWith('dataverse_write_failed:')) {
+    const status = Number.parseInt(reason.split(':')[1] || '', 10)
+    const httpStatus = status === 401 || status === 403 ? 502 : status >= 500 ? 503 : 502
+    return { code: 'dataverse_write_failed', detail, httpStatus }
+  }
+
+  if (reason.startsWith('dataverse_write_exception:')) {
+    return { code: 'dataverse_write_failed', detail, httpStatus: 503 }
+  }
+
+  return { code: 'dead_letter_failed', detail, httpStatus: 500 }
+}
+
+function sanitizeDiagnosticDetail(value: string) {
+  return value
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[redacted-email]')
+    .replace(/\+?\d[\d\s().-]{7,}\d/g, '[redacted-phone]')
+    .replace(/Bearer\s+[A-Za-z0-9._~+/=-]+/gi, 'Bearer [redacted-token]')
+    .replace(/secret[=:][^,;\s]+/gi, 'secret=[redacted-secret]')
+    .slice(0, 240)
 }
 
 function validateOrigin(origin: string | null): { allowed: true; origin: string | null } | { allowed: false } {
