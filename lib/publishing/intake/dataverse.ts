@@ -52,15 +52,31 @@ export async function writePublishingIntakeToDataverse(
     }
 
     const errorBody = await safeResponseText(response)
+    const dataverseError = summarizeDataverseError(errorBody)
+    console.error('Publishing intake Dataverse create failed.', {
+      status: response.status,
+      errorCode: dataverseError.code,
+      errorMessage: dataverseError.message,
+      reference: payload.reference,
+      entitySet: config.value.entitySet,
+    })
+
     return {
       status: 'failed',
-      reason: `dataverse_write_failed:${response.status}:${summarizeDataverseError(errorBody)}`,
+      reason: `dataverse_write_failed:${response.status}:${dataverseError.code}`,
       retryable: isRetryableStatus(response.status),
     }
   } catch (error) {
+    const errorReason = summarizeWriteException(error)
+    console.error('Publishing intake Dataverse write exception.', {
+      reason: errorReason,
+      reference: payload.reference,
+      entitySet: config.ok ? config.value.entitySet : CONFIRMED_DATAVERSE_MAPPING_REQUIRED.table,
+    })
+
     return {
       status: 'failed',
-      reason: `dataverse_write_exception:${error instanceof Error ? error.name : 'unknown'}`,
+      reason: `dataverse_write_exception:${errorReason}`,
       retryable: true,
     }
   }
@@ -154,6 +170,7 @@ function buildPublishingIntakeDataversePayload(payload: NormalizedPublishingInta
   const columns = CONFIRMED_DATAVERSE_MAPPING_REQUIRED.columns
 
   return omitUndefined({
+    [columns.name]: buildPublishingIntakeName(payload),
     [columns.firstName]: payload.firstName,
     [columns.lastName]: payload.lastName,
     [columns.email]: payload.email,
@@ -177,6 +194,10 @@ function buildPublishingIntakeDataversePayload(payload: NormalizedPublishingInta
   })
 }
 
+function buildPublishingIntakeName(payload: NormalizedPublishingIntake) {
+  return `${payload.reference} — ${payload.bookTitle}`.slice(0, 100)
+}
+
 function omitUndefined(values: Record<string, string | number | boolean | undefined>) {
   return Object.fromEntries(Object.entries(values).filter(([, value]) => value !== undefined && value !== ''))
 }
@@ -197,19 +218,37 @@ async function safeResponseText(response: Response) {
   }
 }
 
-function summarizeDataverseError(body: string) {
-  if (!body) return 'empty_error_body'
+function summarizeDataverseError(body: string): { code: string; message: string } {
+  if (!body) return { code: 'empty_error_body', message: 'Dataverse returned an empty error body.' }
 
   try {
     const parsed: unknown = JSON.parse(body)
     if (isRecord(parsed) && isRecord(parsed.error) && typeof parsed.error.code === 'string') {
-      return parsed.error.code
+      return {
+        code: parsed.error.code,
+        message: sanitizeDataverseMessage(
+          typeof parsed.error.message === 'string' ? parsed.error.message : 'Dataverse returned an error.',
+        ),
+      }
     }
   } catch {
     // Fall through to the redacted fallback.
   }
 
-  return 'unstructured_error_body'
+  return { code: 'unstructured_error_body', message: 'Dataverse returned an unstructured error body.' }
+}
+
+function summarizeWriteException(error: unknown) {
+  if (!(error instanceof Error)) return 'unknown'
+  if (error.message.startsWith('dataverse_token_failed:')) return error.message
+  return error.name
+}
+
+function sanitizeDataverseMessage(message: string) {
+  return message
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[redacted-email]')
+    .replace(/\+?\d[\d\s().-]{7,}\d/g, '[redacted-phone]')
+    .slice(0, 300)
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

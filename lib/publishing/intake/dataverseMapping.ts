@@ -1,6 +1,7 @@
 export const publishingIntakeDataverseMapping = {
   table: 'jm1_publishingintakes',
   columns: {
+    name: 'jm1_Name',
     firstName: 'jm1_FirstName',
     lastName: 'jm1_LastName',
     email: 'jm1_Email',

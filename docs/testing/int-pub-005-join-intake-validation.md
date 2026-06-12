@@ -108,6 +108,7 @@ Expected status: `201`.
 
 Verify the created row in `jm1_publishingintakes` / Publishing Intake:
 
+- `jm1_Name`
 - `jm1_FirstName`
 - `jm1_LastName`
 - `jm1_Email`
@@ -128,6 +129,14 @@ Verify the created row in `jm1_publishingintakes` / Publishing Intake:
 - `jm1_IdempotencyKey`
 - `jm1_ConsentTimestamp`
 - `jm1_WordCountSource`
+
+Expected primary name format:
+
+```text
+JMP-INT-YYYYMM-XXXXXX — [Book Title]
+```
+
+The primary name is capped at 100 characters by the website adapter unless a different Dataverse max length is confirmed.
 
 Choice values are mapped to Dataverse numeric option values:
 
@@ -150,6 +159,7 @@ Choice values are mapped to Dataverse numeric option values:
 
 - Confirm exactly one Publishing Intake row is created per successful submission.
 - Confirm no Contact, Lead, Opportunity, execution log, acknowledgment email, loyalty-tier logic, Stage 0 diagnostic, or Power Automate Flow A behavior is triggered by the website.
+- Confirm `jm1_Name` is populated as `JMP-INT-YYYYMM-XXXXXX — [Book Title]`.
 - Confirm `jm1_IntakeReferenceCode` matches the API response reference.
 - Confirm `jm1_IdempotencyKey` stores the submitted idempotency key.
 - Confirm `jm1_ConsentTimestamp` is an ISO server receipt timestamp.
