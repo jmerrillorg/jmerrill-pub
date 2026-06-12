@@ -108,27 +108,27 @@ Expected status: `201`.
 
 Verify the created row in `jm1_publishingintakes` / Publishing Intake:
 
-- `jm1_Name`
-- `jm1_FirstName`
-- `jm1_LastName`
-- `jm1_Email`
-- `jm1_MobilePhone`
-- `jm1_ProjectTitle`
-- `jm1_ManuscriptType`
-- `jm1_GenreSubject`
-- `jm1_EstimatedWordCount`
-- `jm1_ManuscriptStatusAtIntake`
-- `jm1_ManuscriptURL`
-- `jm1_PublishedBefore`
-- `jm1_Purpose`
-- `jm1_ReferralSource`
-- `jm1_AdditionalNotes`
-- `jm1_ConsenttoContact`
-- `jm1_IntakeReferenceCode`
-- `jm1_IntakeChannel`
-- `jm1_IdempotencyKey`
-- `jm1_ConsentTimestamp`
-- `jm1_WordCountSource`
+- `jm1_name`
+- `jm1_firstname`
+- `jm1_lastname`
+- `jm1_email`
+- `jm1_mobilephone`
+- `jm1_projecttitle`
+- `jm1_manuscripttype`
+- `jm1_genresubject`
+- `jm1_estimatedwordcount`
+- `jm1_manuscriptstatusatintake`
+- `jm1_manuscripturl`
+- `jm1_publishedbefore`
+- `jm1_purpose`
+- `jm1_referralsource`
+- `jm1_additionalnotes`
+- `jm1_consenttocontact`
+- `jm1_intakereferencecode`
+- `jm1_intakechannel`
+- `jm1_idempotencykey`
+- `jm1_consenttimestamp`
+- `jm1_wordcountsource`
 
 Expected primary name format:
 
@@ -138,10 +138,16 @@ JMP-INT-YYYYMM-XXXXXX — [Book Title]
 
 The primary name is capped at 100 characters by the website adapter unless a different Dataverse max length is confirmed.
 
+## Web API Attribute Name Requirement
+
+Dataverse Web API create payloads must use logical attribute names from metadata, not display names or schema names.
+
+The INT-PUB-005 mapping was verified against Dataverse metadata for `jm1_publishingintake`. The JSON payload should use names such as `jm1_name`, `jm1_firstname`, and `jm1_intakereferencecode`. Schema-style names such as `jm1_Name`, `jm1_FirstName`, or `jm1_IntakeReferenceCode` should not be used in the Web API payload unless Dataverse metadata confirms that exact value is the attribute logical name.
+
 Choice values are mapped to Dataverse numeric option values:
 
-- `jm1_ManuscriptType`: `Full-length Book` -> `196650000`
-- `jm1_PublishedBefore`: `First book` -> `835500000`
+- `jm1_manuscripttype`: `Full-length Book` -> `196650000`
+- `jm1_publishedbefore`: `First book` -> `835500000`
 
 ## Expected Failure Behavior
 
@@ -192,10 +198,10 @@ Diagnostic interpretation:
 
 - Confirm exactly one Publishing Intake row is created per successful submission.
 - Confirm no Contact, Lead, Opportunity, execution log, acknowledgment email, loyalty-tier logic, Stage 0 diagnostic, or Power Automate Flow A behavior is triggered by the website.
-- Confirm `jm1_Name` is populated as `JMP-INT-YYYYMM-XXXXXX — [Book Title]`.
-- Confirm `jm1_IntakeReferenceCode` matches the API response reference.
-- Confirm `jm1_IdempotencyKey` stores the submitted idempotency key.
-- Confirm `jm1_ConsentTimestamp` is an ISO server receipt timestamp.
+- Confirm `jm1_name` is populated as `JMP-INT-YYYYMM-XXXXXX — [Book Title]`.
+- Confirm `jm1_intakereferencecode` matches the API response reference.
+- Confirm `jm1_idempotencykey` stores the submitted idempotency key.
+- Confirm `jm1_consenttimestamp` is an ISO server receipt timestamp.
 - Confirm optional blank fields are omitted or blank, not filled with placeholder text.
 - Confirm the application user is `JM1-PUB-INTAKE-WEBAPI` with the `JM1 Publishing Intake API - Create Only` role.
 
