@@ -80,7 +80,6 @@ export default function JoinForm() {
   const [errors, setErrors] = useState<Errors>({})
   const [status, setStatus] = useState<Status>('idle')
   const [reference, setReference] = useState('')
-  const [statusEmail, setStatusEmail] = useState('')
   const [serverMessage, setServerMessage] = useState('')
   const [turnstileSiteKey, setTurnstileSiteKey] = useState(buildTimeSiteKey)
   const [verificationConfigStatus, setVerificationConfigStatus] = useState<VerificationConfigStatus>(
@@ -237,7 +236,6 @@ export default function JoinForm() {
       if (res.status === 201 && data.status === 'received') {
         localStorage.setItem(referenceStorageKey(form.idempotencyKey), data.reference)
         setReference(data.reference)
-        setStatusEmail(payload.email)
         setStatus('success')
         return
       }
@@ -246,7 +244,6 @@ export default function JoinForm() {
         const priorReference = localStorage.getItem(referenceStorageKey(form.idempotencyKey))
         if (priorReference) {
           setReference(priorReference)
-          setStatusEmail(payload.email)
           setStatus('success')
           return
         }
@@ -284,7 +281,7 @@ export default function JoinForm() {
       <Panel>
         <h2 className="mb-3 text-white" style={headingStyle}>Thank you, {form.firstName} — welcome to the family conversation.</h2>
         <p className="mb-4 text-[15px] leading-[1.75] text-white/75">
-          We have your story details and will review them with care. A confirmation is on its way to {statusEmail}, and our editorial team will reach out within 7–10 business days.
+          We have your story details and will review them with care. Please save your reference number. Our editorial team will reach out within 7–10 business days.
         </p>
         <p className="rounded-2xl border border-blue-500/25 bg-blue-500/10 px-5 py-4 font-mono text-[13px] uppercase tracking-[0.08em] text-blue-200">
           Your reference: {reference}
