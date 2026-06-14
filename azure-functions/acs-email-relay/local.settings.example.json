@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "JM1_RELAY_API_KEY": "replace-with-local-test-key",
+    "ACS_EMAIL_SENDER": "DoNotReply@email.jmerrill.one",
+    "ACS_CONNECTION_STRING": "replace-with-acs-connection-string"
+  }
+}

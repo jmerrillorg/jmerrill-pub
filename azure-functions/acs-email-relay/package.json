@@ -1,0 +1,19 @@
+{
+  "name": "jm1-acs-email-relay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Governed ACS Email relay for JM1 INT-PUB-005 author acknowledgments.",
+  "main": "src/functions/*.js",
+  "scripts": {
+    "start": "func start",
+    "lint": "node --check src/functions/sendAuthorAcknowledgment.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@azure/communication-email": "^1.0.0",
+    "@azure/functions": "^4.7.0",
+    "@azure/identity": "^4.5.0"
+  },
+  "devDependencies": {}
+}
+
