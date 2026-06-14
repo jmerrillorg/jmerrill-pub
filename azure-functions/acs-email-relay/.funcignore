@@ -1,0 +1,10 @@
+node_modules
+local.settings.json
+test
+coverage
+.nyc_output
+.git
+.gitignore
+README.md
+npm-debug.log
+*.log
