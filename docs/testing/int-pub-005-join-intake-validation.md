@@ -212,3 +212,118 @@ Current idempotency memory is process-local. It is acceptable for first activati
 ## Dataverse Boundary
 
 The website/API writes only one row to `jm1_publishingintakes`. It does not create or match Contacts, Leads, Opportunities, acknowledgments, loyalty-tier records, execution logs, Stage 0 diagnostics, or downstream Power Automate behavior.
+
+## Flow B - Author Acknowledgment Email
+
+Flow B is the governed acknowledgment process for validated INT-PUB-005 intake rows after Flow A has processed the Publishing Intake record.
+
+- Flow name: `INT-PUB-005 Author Acknowledgment Email`
+- Flow link: https://make.powerapps.com/environments/dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10/solutions/e0991664-1b94-f011-b4cc-7ced8d1cd64f/objects/cloudflows/ecbfd3a1-5368-f111-a826-00224820105b
+- Flow ID: `ecbfd3a1-5368-f111-a826-00224820105b`
+- Status: active, `statecode: 1`, `statuscode: 2`
+- Relay endpoint: `https://func-jm1-acs-email-relay.azurewebsites.net/api/send-author-acknowledgment`
+- Relay key handling: `jm1_INTPUB005RelayApiKey` resolves through a Power Platform secret environment variable backed by Azure Key Vault secret `jm1-int-pub-005-relay-api-key`
+- Sender: `DoNotReply@email.jmerrill.one`
+
+Validated controlled test:
+
+- Reference: `JMP-INT-202606-UZ3AL5`
+- Safe relay result: `status: accepted`, `reference: JMP-INT-202606-UZ3AL5`, `operationId: null`, `messageId: null`
+- Acknowledgment sent: `jm1_acknowledgmentsent: true`
+- Acknowledgment status: `jm1_acknowledgmentstatus: 835500001`
+- Acknowledgment sent on: `2026-06-15T00:53:29Z`
+- Acknowledgment attempt count: `1`
+- Acknowledgment last attempt on: `2026-06-15T00:53:25Z`
+- Acknowledgment error: `null`
+- Acknowledgment message ID: `null`
+
+Duplicate guard:
+
+- A self-triggered second run terminated before retrieving the relay key or calling the relay.
+- `Get_Relay_Key` and `Call_ACS_Email_Relay` were skipped in the duplicate-guard run.
+
+Boundaries:
+
+- No Opportunity was created.
+- No Stage 0 diagnostic was created by Flow B.
+- No historical rows were processed.
+- No website changes or Flow A changes were made for Flow B.
+- No fallback email provider was used.
+
+Execution Log integration for Flow B was deferred because the schema was not fully confirmed. The Publishing Intake acknowledgment fields are the source of truth for this pass.
+
+## Flow C - Stage 0 Diagnostic Handoff
+
+Flow C is the separate governed handoff process for INT-PUB-005 Stage 0 diagnostic readiness. It is intentionally separate from Flow A and Flow B.
+
+- Flow name: `INT-PUB-005 Stage 0 Diagnostic Handoff`
+- Flow link: https://make.powerapps.com/environments/dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10/solutions/e0991664-1b94-f011-b4cc-7ced8d1cd64f/objects/cloudflows/c8ddc3f8-5668-f111-a826-000d3a14673b
+- Flow ID: `c8ddc3f8-5668-f111-a826-000d3a14673b`
+- Status: active, `statecode: 1`, `statuscode: 2`
+- Solution: `JM1_Publishing`
+- Purpose: create a Stage 0 diagnostic handoff record only after Flow A and Flow B have completed for a fresh INT-PUB-005 `/join` intake row.
+
+Trigger condition:
+
+```text
+@and(equals(triggerOutputs()?['body/jm1_intakechannel'], 'INT-PUB-005 /join'), equals(triggerOutputs()?['body/jm1_routerprocessed'], true), equals(triggerOutputs()?['body/jm1_routerstatus'], 196650002), equals(triggerOutputs()?['body/jm1_acknowledgmentsent'], true), equals(triggerOutputs()?['body/jm1_acknowledgmentstatus'], 835500001), not(equals(triggerOutputs()?['body/jm1_stage0handoffcreated'], true)), or(equals(triggerOutputs()?['body/jm1_stage0handoffstatus'], null), equals(triggerOutputs()?['body/jm1_stage0handoffstatus'], 835500000), equals(triggerOutputs()?['body/jm1_stage0handoffstatus'], 835500001), equals(triggerOutputs()?['body/jm1_stage0handoffstatus'], 835500004)))
+```
+
+Duplicate guard:
+
+- The flow re-reads the Publishing Intake row at start.
+- If `jm1_stage0handoffcreated` is `true` or `jm1_stage0handoffstatus` is `835500002`, the flow terminates succeeded before creating another diagnostic handoff.
+- The controlled test created exactly one diagnostic handoff record for the intake.
+
+Stage 0 handoff fields on Publishing Intake:
+
+| Display name | Logical name | Type | Values |
+|---|---|---|---|
+| Stage 0 Handoff Status | `jm1_stage0handoffstatus` | Choice | `835500000` Not Ready; `835500001` Ready; `835500002` Handed Off; `835500003` Exception; `835500004` Deferred |
+| Stage 0 Handoff Created | `jm1_stage0handoffcreated` | Yes/No | `false` No; `true` Yes |
+| Stage 0 Handoff Created On | `jm1_stage0handoffcreatedon` | DateTime | User local date and time |
+| Stage 0 Handoff Error | `jm1_stage0handofferror` | Multiple lines of text | Max length 2000 |
+| Stage 0 Diagnostic | `jm1_stage0diagnostic` | Lookup | Target: `jm1pub_editorialdiagnostic` |
+| Stage 0 Handoff Attempt Count | `jm1_stage0handoffattemptcount` | Whole number | Minimum 0 |
+| Stage 0 Handoff Last Attempt On | `jm1_stage0handofflastattempton` | DateTime | User local date and time |
+
+Diagnostic table contract used for handoff:
+
+- Table: `jm1pub_editorialdiagnostic`
+- Entity set: `jm1pub_editorialdiagnostics`
+- Required handoff fields used: `jm1pub_name`, `jm1pub_diagnosticreason`, `jm1pub_diagnosticstatus`, `jm1pub_diagnosticversion`, `jm1pub_iscurrentdiagnostic`, `jm1pub_publishingintake`, and `jm1pub_lead`
+- Optional lookup populated when present: `jm1pub_authorcontact`
+- Diagnostic reason: `196650000` Initial
+- Diagnostic status: `196650000` Pending
+- Diagnostic version: `1`
+- Diagnostic summary notes that the row is handoff-only and diagnostic execution was not run by Flow C.
+
+Controlled Stage 0 test:
+
+- `/join` reference: `JMP-INT-202606-IP82OF`
+- Publishing Intake ID: `22da13b5-5768-f111-a826-000d3a14673b`
+- Contact ID: `8dded0b4-5768-f111-a826-00224820105b`
+- Lead ID: `0a46f4b4-5768-f111-a826-6045bdd69678`
+- Diagnostic handoff ID: `e8b8c5be-5768-f111-a826-7c1e525b15c2`
+- Stage 0 Handoff Created: `true`
+- Stage 0 Handoff Status: `835500002`
+- Stage 0 Handoff Created On: `2026-06-15T01:15:54Z`
+- Stage 0 Handoff Attempt Count: `1`
+- Stage 0 Handoff Last Attempt On: `2026-06-15T01:15:54Z`
+- Stage 0 Handoff Error: `null`
+- Opportunity count for this test: `0`
+- Diagnostic handoff count for this intake: `1`
+
+Observed run results:
+
+- Flow A `INT-PUB-005 Intake Router`: succeeded for the controlled test.
+- Flow B `INT-PUB-005 Author Acknowledgment Email`: one send run succeeded and a later duplicate-guard run skipped relay key retrieval and the ACS relay call.
+- Flow C `INT-PUB-005 Stage 0 Diagnostic Handoff`: one run succeeded; `Create_Stage0_Diagnostic_Handoff` and `Update_Intake_Stage0_Handoff_Created` succeeded; exception and missing-field updates were skipped.
+
+AI diagnostic execution:
+
+- `JM1 PUB - Run Diagnostic AI Assessment` had no run during the controlled Stage 0 handoff window.
+- `jm1_airunlogs`, `jm1_aiactivitylogs`, and `jm1_airequestlogs` had zero rows during the controlled Stage 0 handoff window.
+- Flow C does not call Foundry, OpenAI, child diagnostic flows, or any AI diagnostic execution endpoint.
+
+Execution Log integration for Flow C was deferred for the same reason as Flow B: the schema was not fully confirmed for this governed pass. The Publishing Intake Stage 0 handoff fields and the linked Editorial Diagnostic row are the source of truth.
