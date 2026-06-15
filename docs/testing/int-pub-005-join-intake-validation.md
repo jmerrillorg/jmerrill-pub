@@ -328,6 +328,88 @@ AI diagnostic execution:
 
 Execution Log integration for Flow C was deferred for the same reason as Flow B: the schema was not fully confirmed for this governed pass. The Publishing Intake Stage 0 handoff fields and the linked Editorial Diagnostic row are the source of truth.
 
+## Flow D - Stage 0 Diagnostic Execution
+
+Flow D is the separate governed execution layer for INT-PUB-005 Stage 0 diagnostics. It is intentionally separate from Flow C: Flow C creates the handoff record, and Flow D owns execution readiness.
+
+- Flow name: `INT-PUB-005 Stage 0 Diagnostic Execution`
+- Flow link: https://make.powerapps.com/environments/dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10/solutions/e0991664-1b94-f011-b4cc-7ced8d1cd64f/objects/cloudflows/bad14262-9068-f111-a826-000d3a14673b
+- Flow ID: `bad14262-9068-f111-a826-000d3a14673b`
+- Status: active, `statecode: 1`, `statuscode: 2`
+- Solution: `JM1_Publishing`
+- Purpose: detect a fresh INT-PUB-005 Stage 0 diagnostic handoff and mark diagnostic execution as deferred/needs human review until manuscript asset attachment and a side-effect-free AI execution contract are approved.
+
+Trigger condition:
+
+```text
+@and(startsWith(triggerOutputs()?['body/jm1pub_name'], 'INT-PUB-005 Stage 0 Handoff'), equals(triggerOutputs()?['body/jm1pub_diagnosticreason'], 196650000), equals(triggerOutputs()?['body/jm1pub_diagnosticstatus'], 196650000), or(equals(triggerOutputs()?['body/jm1_diagnosticexecutionstatus'], null), equals(triggerOutputs()?['body/jm1_diagnosticexecutionstatus'], 835500000), equals(triggerOutputs()?['body/jm1_diagnosticexecutionstatus'], 835500005)), or(equals(triggerOutputs()?['body/jm1_diagnosticattemptcount'], null), less(triggerOutputs()?['body/jm1_diagnosticattemptcount'], 1)))
+```
+
+Duplicate guard:
+
+- Flow D re-reads the Editorial Diagnostic record at the start of the run.
+- If `jm1_diagnosticexecutionstatus` is `835500002`, `jm1_diagnosticexecutioncompletedon` is populated, or completed output already exists with completed status, the flow terminates succeeded.
+- Flow D does not retry after the first readiness/deferred attempt unless the retry threshold is explicitly changed later.
+
+Diagnostic execution fields on Editorial Diagnostic:
+
+| Display name | Logical name | Type | Values |
+|---|---|---|---|
+| Diagnostic Execution Status | `jm1_diagnosticexecutionstatus` | Choice | `835500000` Ready; `835500001` Processing; `835500002` Completed; `835500003` Exception; `835500004` Needs Human Review; `835500005` Deferred |
+| Diagnostic Execution Started On | `jm1_diagnosticexecutionstartedon` | DateTime | User local date and time |
+| Diagnostic Execution Completed On | `jm1_diagnosticexecutioncompletedon` | DateTime | User local date and time |
+| Diagnostic Execution Error | `jm1_diagnosticexecutionerror` | Multiple lines of text | Max length 2000 |
+| Diagnostic Attempt Count | `jm1_diagnosticattemptcount` | Whole number | Minimum 0; maximum 2147483647 |
+| Diagnostic Last Attempt On | `jm1_diagnosticlastattempton` | DateTime | User local date and time |
+| Diagnostic Output Summary | `jm1_diagnosticoutputsummary` | Multiple lines of text | Max length 2000 |
+| Diagnostic Recommendation | `jm1_diagnosticrecommendation` | Multiple lines of text | Max length 2000 |
+| Diagnostic Confidence | `jm1_diagnosticconfidence` | Decimal | Precision 2; minimum 0; maximum 1 |
+| Diagnostic Requires Human Review | `jm1_diagnosticrequireshumanreview` | Yes/No | `false` No; `true` Yes |
+| Diagnostic Model / Agent ID | `jm1_diagnosticagentid` | Single line of text | Max length 100 |
+| Diagnostic Correlation ID | `jm1_diagnosticcorrelationid` | Single line of text | Max length 100 |
+
+Confirmed diagnostic table:
+
+- Display name: `Editorial Diagnostic`
+- Logical name: `jm1pub_editorialdiagnostic`
+- Entity set: `jm1pub_editorialdiagnostics`
+- Existing handoff status field: `jm1pub_diagnosticstatus`
+- Existing handoff status values: `196650000` Pending; `196650001` In Progress; `196650002` Complete; `196650003` Auto-Routed; `196650004` Awaiting Jackie Review; `196650005` Jackie Approved; `196650006` Jackie Redirected; `196650007` Declined; `196650008` Hard Stop
+- Existing handoff reason field: `jm1pub_diagnosticreason`
+- Existing handoff reason value used by Flow C: `196650000` Initial
+- Existing output fields include `jm1pub_diagnosticsummary`, `jm1pub_diagnosticjson`, `jm1pub_airawresponse`, `jm1pub_aiconfidencescore`, `jm1pub_confidence`, `jm1pub_editorialrecommendation`, `jm1pub_recommendedpackage`, and routing/review fields.
+- Existing references include `jm1pub_publishingintake`, `jm1pub_lead`, optional `jm1pub_authorcontact`, and optional `jm1pub_project`.
+- Existing Execution Log lookup: `jm1pub_executionlogentry`.
+
+AI execution contract status:
+
+- Existing flow found: `JM1 PUB - Run Diagnostic AI Assessment`, ID `56d5901d-874b-f111-bec7-6045bdd69678`, active.
+- Existing prompt template found: `Stage 0 Editorial Diagnostic`, prompt type `196650000`, prompt version `v1.0.0`, model deployment alias `jm1-pub-diagnostic-primary`, JSON schema version `v1.0.0`.
+- Existing environment-variable contract names found for Azure OpenAI endpoint, key, API version, and deployment alias.
+- Flow D does not call the existing AI assessment flow because that flow includes Opportunity creation and Execution Log actions that are outside the approved INT-PUB-005 Flow D scope.
+- Flow D does not call Foundry, Azure OpenAI, OpenAI, or any AI endpoint.
+- Flow D marks diagnostics as `Deferred` with `Diagnostic Requires Human Review = true` until manuscript asset attachment and a side-effect-free AI execution contract are approved.
+
+Controlled test:
+
+- No Flow D controlled `/join` test was run in this pass.
+- Reason: the AI execution contract is not confirmed for INT-PUB-005 because the only discovered diagnostic execution flow has disallowed side effects.
+- No historical Publishing Intake rows were processed.
+
+Execution Log behavior:
+
+- Execution Log writes remain deferred for Flow D because the execution-log contract was not confirmed for this governed pass.
+- Flow D uses the new diagnostic execution fields on `jm1pub_editorialdiagnostic` as the source of truth.
+
+Boundaries:
+
+- No Opportunity is created by Flow D.
+- No author email is sent by Flow D.
+- No historical rows are processed by Flow D.
+- No duplicate completed diagnostic execution is allowed.
+- No uncontrolled AI execution is allowed.
+- No full prompt, full manuscript text, endpoint key, header, token, cookie, or secret is logged or stored by this documentation.
+
 ## Email-Submitted Manuscript Before /join
 
 When an author sends a manuscript by email before completing `/join`, the email submission does not replace the governed intake record. Ask the author to complete the public intake form so the project can enter the validated INT-PUB-005 pipeline.
