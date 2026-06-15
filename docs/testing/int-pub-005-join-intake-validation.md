@@ -424,14 +424,24 @@ Operational rule:
 
 1. Ask the author to complete https://jmerrill.pub/join.
 2. Tell the author to note in Additional Notes that the manuscript was already submitted by email.
-3. `/join` remains the governed intake record of truth.
-4. Flow A should match/create Contact and create/link Lead.
-5. Flow B should send acknowledgment.
-6. Flow C should create Stage 0 diagnostic handoff.
-7. The emailed manuscript remains an external/manual asset until attached through the approved manuscript asset process.
-8. Do not manually create a duplicate intake unless `/join` cannot be completed.
-9. Do not create Opportunity at this stage.
-10. Do not run AI diagnostic execution until Flow D is approved and built.
+3. After the `/join` reference is created and the intake reference code is assigned, save the manuscript to:
+   ```
+   Publishing Team / Documents / 01_Pre-Pipeline / 01_Manuscript-Review / 00_Intake-Manuscripts / [Intake Reference Code] / Original
+   ```
+4. Update the Editorial Diagnostic record with the manuscript asset fields:
+   - `jm1_manuscriptasseturl` — SharePoint URL of the saved file
+   - `jm1_manuscriptfilename` — original filename
+   - `jm1_manuscriptfiletype` — file extension (e.g. `docx`, `pdf`)
+   - `jm1_manuscriptattachedon` — date/time attached
+   - `jm1_manuscriptattachedby` — operator name or identifier
+   - `jm1_manuscriptassetstatus` — set to `Received` or `Attached` as appropriate
+5. Do not run AI diagnostic execution until Jackie or an assigned editorial operator sets `jm1_manuscriptassetstatus` to `Approved` and `jm1_manuscriptapprovedfordiagnostic` to `Yes`.
+6. Do not create an Opportunity at this stage.
+7. `/join` remains the governed intake record of truth.
+8. Flow A should match/create Contact and create/link Lead.
+9. Flow B should send acknowledgment.
+10. Flow C should create Stage 0 diagnostic handoff.
+11. Do not manually create a duplicate intake unless `/join` cannot be completed.
 
 Internal operator note:
 
