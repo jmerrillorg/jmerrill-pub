@@ -448,3 +448,79 @@ Internal operator note:
 - If the author is already known to JMP, Flow A should match Contact by email.
 - A new Lead is still appropriate for a new manuscript/project inquiry.
 - If this is already an active contracted/onboarded project, do not ask for `/join` unless intake data is missing; handle the manuscript against the existing project record.
+
+## Flow D — Manuscript Asset Gate
+
+### Gate logic
+
+Flow D enforces a three-condition manuscript asset gate before any AI execution is permitted. The gate is evaluated in `Condition_Manuscript_Asset_Ready` inside `Scope_Try_Preflight_Diagnostic`, after the existing required-data preflight passes.
+
+Flow D may proceed to AI execution only when all three conditions are simultaneously true:
+
+| Condition | Required value |
+|---|---|
+| `jm1_manuscriptassetstatus` | `3` (Approved) |
+| `jm1_manuscriptapprovedfordiagnostic` | `true` (Yes) |
+| `jm1_manuscriptasseturl` | populated (not null and not empty) |
+
+If any condition is not met, Flow D:
+
+1. Sets `jm1_diagnosticexecutionstatus` = `835500005` (Deferred)
+2. Sets `jm1_diagnosticexecutionerror` = `Manuscript asset not attached or not approved.`
+3. Sets `jm1_diagnosticlastattempton` = `utcNow()`
+4. Sets `jm1_diagnosticrequireshumanreview` = `true`
+5. Sets handoff status = `196650004` (Awaiting Jackie Review)
+6. Terminates cleanly with status Succeeded
+
+No AI is called. No Opportunity is created. No author email is sent.
+
+### Changes made to Flow D in this pass
+
+- `Condition_Manuscript_Asset_Ready` added to the else branch of `Condition_Missing_Required_Data_Or_Contract`
+- The three always-true `jm1pub_manuscriptpresent` clauses removed from `Condition_Missing_Required_Data_Or_Contract` (they blocked the gate from being reached; the new gate replaces them)
+- Flow D remains active: `statecode: 1`, `statuscode: 2`, `state: Started`
+- No AI execution flow called
+- No Opportunity created
+- No author email sent
+
+### Controlled test — 2026-06-15
+
+Test diagnostic record: `INT-PUB-005 Stage 0 Handoff — TEST-FLOWD-GATE-003`
+
+Diagnostic ID: `6490a7de-b868-f111-a826-000d3a14673b`
+
+Linked intake: `JMP-INT-202606-IP82OF` (reference from prior Stage 0 controlled test)
+
+Test conditions: no manuscript asset fields set (`jm1_manuscriptassetstatus` = null, `jm1_manuscriptapprovedfordiagnostic` = false, `jm1_manuscriptasseturl` = null)
+
+Expected result:
+
+- Diagnostic Execution Status = `835500005` (Deferred)
+- Diagnostic Execution Error = `Manuscript asset not attached or not approved.`
+- No AI called
+- No Opportunity created
+- No author email sent from Flow D
+
+Actual result:
+
+| Field | Value |
+|---|---|
+| `jm1_diagnosticexecutionstatus` | `835500005` (Deferred) |
+| `jm1_diagnosticexecutionerror` | `Manuscript asset not attached or not approved.` |
+| `jm1_diagnosticrequireshumanreview` | `true` |
+| `jm1pub_jackiereviewrequired` | `true` |
+| `jm1pub_diagnosticstatus` | `196650004` (Awaiting Jackie Review) |
+| `jm1_diagnosticlastattempton` | 2026-06-15T12:51:18Z |
+| `jm1_diagnosticattemptcount` | 1 |
+
+Gate confirmed. No AI execution occurred. No Opportunity created. No author email sent from Flow D. No historical rows processed.
+
+### Boundaries
+
+- Flow A behavior: unchanged
+- Flow B behavior: unchanged
+- Flow C behavior: unchanged
+- `/join`: unchanged
+- AI execution: blocked until gate passes
+- Opportunity creation: not performed
+- Historical row processing: not performed
