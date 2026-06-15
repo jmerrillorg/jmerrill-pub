@@ -144,12 +144,98 @@ The following actions are prohibited for Flow D:
 - No uncontrolled AI execution.
 - No full prompt text, full manuscript text, endpoint key, header, token, cookie, or secret is logged or stored.
 
+## Manuscript Asset Path
+
+### Storage and truth layer
+
+- Storage: SharePoint (`Publishing Team` site)
+- Truth layer: Dataverse (`jm1pub_editorialdiagnostic`)
+- SharePoint stores the file. Dataverse stores asset status, URL, filename, file type, attached/approved metadata, and the approval flag.
+
+### File location before active project
+
+```
+Publishing Team / Documents / 01_Pre-Pipeline / 01_Manuscript-Review / 00_Intake-Manuscripts / [Intake Reference Code] / Original
+```
+
+Optional internal subfolders under each intake reference code:
+
+| Subfolder | Purpose |
+|---|---|
+| `Original` | Manuscript file as received from author |
+| `Converted` | Format-converted version for internal processing |
+| `Notes` | Operator notes related to the manuscript |
+
+### File location after project becomes active
+
+```
+Publishing Team / Documents / 02_Active-Pipeline / [Author or Project Folder] / 03_Manuscript
+```
+
+Moving or copying to the active-pipeline path requires Jackie's explicit authorization.
+
+### Attachment method
+
+An internal operator saves the manuscript file from email into the SharePoint path above, then updates the Editorial Diagnostic record with the SharePoint asset URL and metadata. No public upload mechanism exists. No author-facing upload is permitted.
+
+### Approval
+
+Jackie or an assigned editorial operator explicitly approves the manuscript asset for diagnostic execution by setting:
+
+- `jm1_manuscriptassetstatus` = Approved
+- `jm1_manuscriptapprovedfordiagnostic` = Yes
+
+## Manuscript Asset Fields on Editorial Diagnostic
+
+These fields are planned for the `jm1pub_editorialdiagnostic` table. Create each field only if it does not already exist. Publish table changes after creation.
+
+| Display name | Logical name | Type | Specification |
+|---|---|---|---|
+| Manuscript Asset Status | `jm1_manuscriptassetstatus` | Choice | `0` Missing; `1` Received; `2` Attached; `3` Approved; `4` Exception |
+| Manuscript Asset URL | `jm1_manuscriptasseturl` | Single line of text | Max length 500; stores SharePoint file URL |
+| Manuscript File Name | `jm1_manuscriptfilename` | Single line of text | Max length 255 |
+| Manuscript File Type | `jm1_manuscriptfiletype` | Single line of text | Max length 50 (e.g. `docx`, `pdf`) |
+| Manuscript Attached On | `jm1_manuscriptattachedon` | DateTime | User local date and time |
+| Manuscript Attached By | `jm1_manuscriptattachedby` | Single line of text | Max length 100; operator name or system user identifier |
+| Manuscript Approved for Diagnostic | `jm1_manuscriptapprovedfordiagnostic` | Yes/No | Default: No |
+| Manuscript Approved On | `jm1_manuscriptapprovedon` | DateTime | User local date and time |
+| Manuscript Asset Notes | `jm1_manuscriptassetnotes` | Multiple lines of text | Max length 2000 |
+
+### Choice values for Manuscript Asset Status (`jm1_manuscriptassetstatus`)
+
+| Label | Value |
+|---|---|
+| Missing | `0` |
+| Received | `1` |
+| Attached | `2` |
+| Approved | `3` |
+| Exception | `4` |
+
+## Flow D AI Gate
+
+Flow D may execute AI only when all three conditions are true:
+
+| Condition | Required value |
+|---|---|
+| `jm1_manuscriptassetstatus` | `3` (Approved) |
+| `jm1_manuscriptapprovedfordiagnostic` | `true` (Yes) |
+| `jm1_manuscriptasseturl` | populated (not null or empty) |
+
+If any condition is not met, Flow D must:
+
+- Set `jm1_diagnosticexecutionstatus` to `835500005` (Deferred) or `835500004` (Needs Human Review)
+- Set `jm1_diagnosticrequireshumanreview` to `true`
+- Set `jm1_diagnosticexecutionerror` to: `Manuscript asset not attached or not approved.`
+
+Flow D behavior is not changed in this pass. The gate rule is documented here for the next governed implementation pass.
+
 ## What Must Be Confirmed Before AI Execution
 
 AI execution in Flow D is blocked until all of the following are confirmed and documented:
 
-1. Manuscript asset is attached to the Publishing Intake record before diagnostic execution begins.
-2. A side-effect-free AI execution contract is written, reviewed, and approved. The contract must confirm that the AI call produces no Opportunity creation, no email send, no Execution Log write, and no other side effect outside the diagnostic output fields.
-3. The confirmed contract is linked from this document and the flow solution component is updated to reflect the approved scope.
+1. Manuscript asset is saved to SharePoint at the correct intake path and the URL is populated in `jm1_manuscriptasseturl` on the Editorial Diagnostic record.
+2. `jm1_manuscriptassetstatus` is set to `Approved` and `jm1_manuscriptapprovedfordiagnostic` is set to `Yes` by Jackie or an assigned editorial operator.
+3. A side-effect-free AI execution contract is written, reviewed, and approved. The contract must confirm that the AI call produces no Opportunity creation, no email send, no Execution Log write, and no other side effect outside the diagnostic output fields.
+4. The confirmed contract is linked from this document and the flow solution component is updated to reflect the approved scope.
 
 Until these are confirmed, Flow D sets `jm1_diagnosticexecutionstatus` to `835500005` (Deferred) and `jm1_diagnosticrequireshumanreview` to `true`.
