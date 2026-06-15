@@ -223,7 +223,7 @@ app.http("send-author-acknowledgment", {
     }
 
     const validation = validatePayload(body || {});
-    reference = validation.reference || "";
+    reference = validation.value ? validation.value.reference : validation.reference || "";
 
     if (!validation.ok) {
       context.warn(`ACS relay validation failed: ${validation.code}; reference=${reference}`);
