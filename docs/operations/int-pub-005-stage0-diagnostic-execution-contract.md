@@ -239,3 +239,13 @@ AI execution in Flow D is blocked until all of the following are confirmed and d
 4. The confirmed contract is linked from this document and the flow solution component is updated to reflect the approved scope.
 
 Until these are confirmed, Flow D sets `jm1_diagnosticexecutionstatus` to `835500005` (Deferred) and `jm1_diagnosticrequireshumanreview` to `true`.
+
+## Next Contract
+
+The governed AI execution contract for the Flow D true branch is documented in:
+
+[`docs/operations/int-pub-005-stage0-diagnostic-ai-execution-contract.md`](./int-pub-005-stage0-diagnostic-ai-execution-contract.md)
+
+That contract defines the side-effect-free execution boundary, approved inputs, manuscript handling, prompt governance, output storage, status mapping, human review gate, logging boundary, and open decisions that must be resolved before implementation.
+
+Flow D's true branch (`Condition_Manuscript_Asset_Ready` true) remains unimplemented until that AI execution contract is explicitly approved by Jackie and all open decisions are resolved.

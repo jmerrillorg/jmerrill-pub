@@ -524,3 +524,14 @@ Gate confirmed. No AI execution occurred. No Opportunity created. No author emai
 - AI execution: blocked until gate passes
 - Opportunity creation: not performed
 - Historical row processing: not performed
+
+## Stage 0 AI Execution Status
+
+- Flow D manuscript asset gate: live and verified (2026-06-15).
+- AI execution: deferred. No AI call is made until the side-effect-free diagnostic AI execution contract is approved and all open decisions are resolved.
+- No Opportunity is created at any stage of the current INT-PUB-005 pipeline.
+- No author email is sent by Flow D.
+- No historical rows are processed.
+
+The next contract is documented at:
+`docs/operations/int-pub-005-stage0-diagnostic-ai-execution-contract.md`
