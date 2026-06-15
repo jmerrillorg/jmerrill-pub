@@ -327,3 +327,32 @@ AI diagnostic execution:
 - Flow C does not call Foundry, OpenAI, child diagnostic flows, or any AI diagnostic execution endpoint.
 
 Execution Log integration for Flow C was deferred for the same reason as Flow B: the schema was not fully confirmed for this governed pass. The Publishing Intake Stage 0 handoff fields and the linked Editorial Diagnostic row are the source of truth.
+
+## Email-Submitted Manuscript Before /join
+
+When an author sends a manuscript by email before completing `/join`, the email submission does not replace the governed intake record. Ask the author to complete the public intake form so the project can enter the validated INT-PUB-005 pipeline.
+
+Recommended author-facing language:
+
+> Please complete our author intake form so we can place your manuscript into our governed review process. Since you already sent the manuscript by email, just note that in the additional notes section.
+
+Author intake form: https://jmerrill.pub/join
+
+Operational rule:
+
+1. Ask the author to complete https://jmerrill.pub/join.
+2. Tell the author to note in Additional Notes that the manuscript was already submitted by email.
+3. `/join` remains the governed intake record of truth.
+4. Flow A should match/create Contact and create/link Lead.
+5. Flow B should send acknowledgment.
+6. Flow C should create Stage 0 diagnostic handoff.
+7. The emailed manuscript remains an external/manual asset until attached through the approved manuscript asset process.
+8. Do not manually create a duplicate intake unless `/join` cannot be completed.
+9. Do not create Opportunity at this stage.
+10. Do not run AI diagnostic execution until Flow D is approved and built.
+
+Internal operator note:
+
+- If the author is already known to JMP, Flow A should match Contact by email.
+- A new Lead is still appropriate for a new manuscript/project inquiry.
+- If this is already an active contracted/onboarded project, do not ask for `/join` unless intake data is missing; handle the manuscript against the existing project record.
