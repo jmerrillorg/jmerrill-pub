@@ -535,3 +535,60 @@ Gate confirmed. No AI execution occurred. No Opportunity created. No author emai
 
 The next contract is documented at:
 `docs/operations/int-pub-005-stage0-diagnostic-ai-execution-contract.md`
+
+## Diagnostic AI Runner — Contract-Test Confirmation
+
+**Date:** 2026-06-15
+
+**Mode:** Contract-test (no AI execution)
+
+**Function:** `jm1-diagnostic-ai-runner` — `azure-functions/diagnostic-ai-runner/`
+
+**Route:** `POST /api/run-stage0-diagnostic`
+
+The Azure Function scaffold was created and validated in contract-test mode.
+
+### Validation checks passed
+
+| Check | Result |
+|---|---|
+| `node --check src/functions/runStage0Diagnostic.js` | Pass |
+| `node --check src/dataverse/client.js` | Pass |
+| `node --test test/validation.test.js` | Pass — 11 assertions |
+| `next lint` | Pass |
+| `next build` | Pass |
+| `git diff --check` | Pass |
+
+### Contract-test response confirmed
+
+A valid request with correct `x-jm1-diagnostic-runner-key`, a valid UUID `diagnosticId`, a valid `intakeReferenceCode`, and an optional `correlationId` returns:
+
+```json
+{
+  "status": "accepted",
+  "mode": "contract-test",
+  "diagnosticId": "<UUID>",
+  "intakeReferenceCode": "<JMP-INT-...>",
+  "correlationId": "<value or null>",
+  "message": "Diagnostic runner contract accepted. AI execution not enabled."
+}
+```
+
+HTTP status: `202 Accepted`
+
+### Boundaries
+
+- AI execution: not performed. `CONTRACT_TEST_MODE = true`.
+- Dataverse: not read or written.
+- SharePoint / manuscript file: not accessed.
+- Opportunity: not created.
+- Author email: not sent.
+- Historical rows: not processed.
+- Secrets, tokens, manuscript content: not committed.
+
+### Next step
+
+Flow D integration and AI execution are not authorized in this pass. The full function specification and open decisions are documented in:
+
+- `docs/operations/int-pub-005-stage0-diagnostic-ai-runner-azure-function.md`
+- `docs/operations/int-pub-005-stage0-diagnostic-ai-execution-contract.md`
