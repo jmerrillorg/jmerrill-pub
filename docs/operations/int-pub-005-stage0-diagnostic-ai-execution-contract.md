@@ -13,6 +13,20 @@ This document does not authorize AI execution. Implementation requires Jackie's 
 - The existing flow `JM1 PUB - Run Diagnostic AI Assessment` (ID `56d5901d-874b-f111-bec7-6045bdd69678`) is not reused as-is. See Section 12 for the assessment.
 - No AI execution is authorized at this time.
 
+## 2a. Approved Architecture
+
+**Decision:** Jackie approved the use of a new, isolated Azure Function for diagnostic-only AI execution.
+
+**Architecture:** Flow D calls the `jm1-diagnostic-ai-runner` Azure Function via HTTP after the manuscript asset gate passes. The function performs the controlled diagnostic AI call. Dataverse stores the result via a Flow D PATCH action after the function returns.
+
+**Current function status:** Contract-test mode. `CONTRACT_TEST_MODE = true`. The function validates the request contract and returns HTTP 202 with a safe confirmation. No AI call is made.
+
+**Function path:** `azure-functions/diagnostic-ai-runner/`
+
+**Route:** `POST /api/run-stage0-diagnostic`
+
+**Full function specification:** [`docs/operations/int-pub-005-stage0-diagnostic-ai-runner-azure-function.md`](./int-pub-005-stage0-diagnostic-ai-runner-azure-function.md)
+
 ## 3. Execution Boundary
 
 ### Permitted
