@@ -187,19 +187,19 @@ Jackie or an assigned editorial operator explicitly approves the manuscript asse
 
 ## Manuscript Asset Fields on Editorial Diagnostic
 
-These fields are planned for the `jm1pub_editorialdiagnostic` table. Create each field only if it does not already exist. Publish table changes after creation.
+These fields are confirmed created and published on the `jm1pub_editorialdiagnostic` table in the `JM1_Publishing` solution. Created 2026-06-15. Table published after creation.
 
-| Display name | Logical name | Type | Specification |
-|---|---|---|---|
-| Manuscript Asset Status | `jm1_manuscriptassetstatus` | Choice | `0` Missing; `1` Received; `2` Attached; `3` Approved; `4` Exception |
-| Manuscript Asset URL | `jm1_manuscriptasseturl` | Single line of text | Max length 500; stores SharePoint file URL |
-| Manuscript File Name | `jm1_manuscriptfilename` | Single line of text | Max length 255 |
-| Manuscript File Type | `jm1_manuscriptfiletype` | Single line of text | Max length 50 (e.g. `docx`, `pdf`) |
-| Manuscript Attached On | `jm1_manuscriptattachedon` | DateTime | User local date and time |
-| Manuscript Attached By | `jm1_manuscriptattachedby` | Single line of text | Max length 100; operator name or system user identifier |
-| Manuscript Approved for Diagnostic | `jm1_manuscriptapprovedfordiagnostic` | Yes/No | Default: No |
-| Manuscript Approved On | `jm1_manuscriptapprovedon` | DateTime | User local date and time |
-| Manuscript Asset Notes | `jm1_manuscriptassetnotes` | Multiple lines of text | Max length 2000 |
+| Display name | Logical name | Type | Specification | Status |
+|---|---|---|---|---|
+| Manuscript Asset Status | `jm1_manuscriptassetstatus` | Choice | `0` Missing; `1` Received; `2` Attached; `3` Approved; `4` Exception | Created |
+| Manuscript Asset URL | `jm1_manuscriptasseturl` | Single line of text | Max length 500; stores SharePoint file URL | Created |
+| Manuscript File Name | `jm1_manuscriptfilename` | Single line of text | Max length 255 | Created |
+| Manuscript File Type | `jm1_manuscriptfiletype` | Single line of text | Max length 50 (e.g. `docx`, `pdf`) | Created |
+| Manuscript Attached On | `jm1_manuscriptattachedon` | DateTime | User local date and time | Created |
+| Manuscript Attached By | `jm1_manuscriptattachedby` | Single line of text | Max length 100; operator name or system user identifier | Created |
+| Manuscript Approved for Diagnostic | `jm1_manuscriptapprovedfordiagnostic` | Yes/No | Default: No | Created |
+| Manuscript Approved On | `jm1_manuscriptapprovedon` | DateTime | User local date and time | Created |
+| Manuscript Asset Notes | `jm1_manuscriptassetnotes` | Multiple lines of text | Max length 2000 | Created |
 
 ### Choice values for Manuscript Asset Status (`jm1_manuscriptassetstatus`)
 
