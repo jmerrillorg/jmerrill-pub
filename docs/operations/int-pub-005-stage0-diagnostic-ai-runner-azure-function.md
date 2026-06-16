@@ -25,6 +25,22 @@ This document describes the architecture, contract, and operational boundary for
 | Auth level | `anonymous` (key enforced via `x-jm1-diagnostic-runner-key` header) |
 | Path | `azure-functions/diagnostic-ai-runner/` |
 
+## Deployment
+
+| Property | Value |
+|---|---|
+| Function App name | `func-jm1-diagnostic-ai-runner` |
+| Resource group | `rg-jm1-ai` |
+| Location | East US |
+| Runtime | Node.js 22 |
+| Hosting plan | Consumption (Y1) |
+| Storage account | `stjm1diagrunner` |
+| Application Insights | `func-jm1-diagnostic-ai-runner` (in `rg-jm1-ai`) |
+| Deployed route | `https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-stage0-diagnostic` |
+| Deployment method | Zip deploy with remote Oryx build (`SCM_DO_BUILD_DURING_DEPLOYMENT=true`) |
+| Managed identity | System-assigned; `Key Vault Secrets User` on `jm1-core-vault` |
+| Deployment date | 2026-06-16 |
+
 ## Current Mode
 
 **Contract-test mode.** `CONTRACT_TEST_MODE = true` in `src/functions/runStage0Diagnostic.js`.
@@ -101,14 +117,20 @@ Contract-test mode remains active until Jackie explicitly authorizes AI executio
 
 ## Environment Variables
 
-Defined in `local.settings.example.json`. No values are committed to the repository.
+Defined in `local.settings.example.json`. No values are committed to the repository. Production values are set in Azure Function App settings; secrets are stored in `jm1-core-vault` and referenced via Key Vault reference syntax.
 
-| Variable | Purpose |
-|---|---|
-| `JM1_DIAGNOSTIC_RUNNER_KEY` | Pre-shared key for `x-jm1-diagnostic-runner-key` header authentication |
-| `DATAVERSE_ENDPOINT` | Dataverse Web API base URL (e.g. `https://jm1hq.crm.dynamics.com`) — validated by config stub, not used in contract-test mode |
-| `DATAVERSE_CLIENT_ID` | Service principal client ID for Dataverse access — validated by config stub, not used in contract-test mode |
-| `DATAVERSE_TENANT_ID` | Azure AD tenant ID — validated by config stub, not used in contract-test mode |
+| Variable | Source | Purpose |
+|---|---|---|
+| `JM1_DIAGNOSTIC_RUNNER_KEY` | Key Vault reference (`jm1-int-pub-005-diagnostic-runner-key`) | Pre-shared key for `x-jm1-diagnostic-runner-key` header authentication |
+| `CONTRACT_TEST_MODE` | App setting (plain) | `true` — keeps function in contract-test mode |
+| `DATAVERSE_TENANT_ID` | App setting (plain) | Azure AD tenant ID — not used in contract-test mode |
+| `DATAVERSE_CLIENT_ID` | App setting | Service principal client ID — set before live use |
+| `DATAVERSE_CLIENT_SECRET` | App setting | Service principal secret — set before live use |
+| `DATAVERSE_RESOURCE_URL` | App setting (plain) | `https://jm1hq.crm.dynamics.com` — not used in contract-test mode |
+| `DATAVERSE_WEB_API_BASE_URL` | App setting (plain) | `https://jm1hq.crm.dynamics.com/api/data/v9.2/` — not used in contract-test mode |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | App setting (from App Insights resource) | Telemetry |
+| `AzureWebJobsStorage` | App setting (set by platform) | Function App storage |
+| `FUNCTIONS_WORKER_RUNTIME` | App setting (plain) | `node` |
 
 Azure OpenAI / Foundry endpoint and key variables are intentionally absent. They will be added in a separate governed pass, with Jackie's explicit authorization, after the open decisions in the AI execution contract are resolved.
 
