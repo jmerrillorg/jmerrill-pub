@@ -13,8 +13,14 @@ This document confirms the governed location, access pattern, and editorial cont
 | Blob name | `knowledge.md` |
 | Container access | Private — no public access |
 | Blob URL (private) | `https://stjm1diagrunner.blob.core.windows.net/knowledge/knowledge.md` |
-| File status | Draft skeleton uploaded 2026-06-16. Editorial content not yet authored. |
-| File version | `v0.1-draft` |
+| File status | v1.0 — approved and uploaded 2026-06-16T22:50:25Z |
+| File version | `v1.0` |
+| Approved via | PR #60, merge commit `10b8429` |
+| Upload timestamp | `2026-06-16T22:50:25Z` |
+| SHA-256 | `64e0e38f8a2cfdacf49fd8238b45939efbafef3bd23d526ab3d0d414b24e8a78` |
+| ETag | `"0x8DECBF9A7DEF3A2"` |
+| File size | `29,232 bytes` |
+| Content type | `text/markdown; charset=utf-8` |
 
 ## Access Pattern
 
@@ -31,20 +37,20 @@ The Azure Function `func-jm1-diagnostic-ai-runner` reads `knowledge.md` at execu
 
 The runner must not cache `knowledge.md` across cold starts unless a governed cache TTL is established. It must not write to the `knowledge` container.
 
-## What `knowledge.md` Must Contain Before Activation
+## `knowledge.md` Content Status
 
-The file structure is established. Jackie must author the following editorial content sections before the prompt may be activated:
+All editorial content sections authored, approved, and uploaded. Version v1.0 is live.
 
-| Section | Content needed | Status |
-|---|---|---|
-| 1. Imprint Definitions | Description, target audience, genre focus, quality bar for: J Merrill Publishing, JM Works, JM Little, JM Verse, JM Signature | **Not authored** |
-| 2. Stage 0 Scoring Rubric | Per-dimension scoring guidance for all 11 scoring dimensions | **Not authored** |
-| 3. Package Categories | Internal package category names and distinguishing criteria (no pricing) | **Not authored** |
-| 4. Publishing Goal Interpretation | How to interpret author-stated publishing goals when assigning imprint/editorial path | **Not authored** |
-| 5. Editorial Path Definitions | What each editorial path means and selection criteria | **Not authored** |
-| 6. Risk Flag Guidance | Hard Stop criteria, ethics flag, legal flag, brand misalignment, AI disclosure threshold, copyright risk level thresholds | **Not authored** |
-| 7. Author Readiness Guidance | Scoring guidance for author readiness, investment fit, timeline fit | **Not authored** |
-| 8. Routing Rules | Current routing defaults (all Stage 0 → Jackie review; no auto-routing) | Skeleton in place — confirm |
+| Section | Status |
+|---|---|
+| 1. Imprint Definitions | **Complete** — J Merrill Publishing, JM Works, JM Little (age bands), JM Verse (poetry-first), JM Signature (BP-07) |
+| 2. Stage 0 Scoring Rubric | **Complete** — 11 dimensions, canonical 1–5 scale |
+| 3. Package Categories | **Complete** — 4 SKUs + null |
+| 4. Publishing Goal Interpretation | **Complete** — 9 goal categories |
+| 5. Editorial Path Definitions | **Complete** — thresholds set; Co-Development as human-review path |
+| 6. Risk Flag Guidance | **Complete** — hard stops, ethics/legal/defamation routing, AI caps, brand misalignment, rights |
+| 7. Author Readiness Guidance | **Complete** — authorReadinessScore, authorInvestmentFit, timelineFit |
+| 8. Routing Rules | **Complete** — Legacy exclusion rule, closed humanReviewTrigger enum, BP-07 Signature |
 
 ## Update and Versioning Governance
 
@@ -55,12 +61,14 @@ The file structure is established. Jackie must author the following editorial co
 
 ## Activation Gate
 
-`knowledge.md` is a pre-execution blocker. The prompt may not be activated until:
+`knowledge.md` is a pre-execution blocker. Status as of 2026-06-16:
 
-1. All editorial content sections above are authored by Jackie.
-2. Jackie approves the completed file.
-3. The approved file is uploaded to `stjm1diagrunner/knowledge/knowledge.md` replacing the draft skeleton.
-4. The `jm1pub_groundingdependencies` field on the prompt template record confirms `knowledge.md` as the declared dependency (already set).
+1. All editorial content sections authored by Jackie. **Done.**
+2. Jackie approved the completed file via PR #60 (merged 2026-06-16T20:18:11Z, commit `10b8429`). **Done.**
+3. Approved file uploaded to `stjm1diagrunner/knowledge/knowledge.md` replacing the draft skeleton. **Done — v1.0 live.**
+4. `jm1pub_groundingdependencies` field on the prompt template record confirms `knowledge.md` as the declared dependency. **Done** (set 2026-06-16).
+
+**Remaining blocker:** Prompt remains `jm1pub_active=false`. Runner remains `CONTRACT_TEST_MODE=true`. Real AI execution is not yet authorized. See ADR Section 15 for remaining implementation steps before activation.
 
 ## Runner Implementation Note
 
