@@ -26,7 +26,7 @@ Key resolved items:
 | Canonical prompt template ID | `jm1-prompt-pub-stage0-diagnostic` |
 | Operational alias / version code | `PUB-STAGE0-DIAGNOSTIC-V1` |
 | Agent ID | `jm1-agent-pub-diagnostic-01` |
-| Canonical AI metadata log | `jm1_airequestlog` (canonical across JM1 Publishing AI agents) |
+| Canonical AI metadata log | `jm1_airequestlogs` entity set (table: `jm1_airequestlog`), canonical across JM1 Publishing AI agents |
 | Summary-field no-quotation rule | `jm1_diagnosticoutputsummary` and all output/log fields must characterize only — never quote manuscript |
 | Legacy exclusion | Legacy-flagged intakes blocked from this runner path; deferred until a separate Legacy diagnostic path is approved |
 | Real AI | Still disabled. `CONTRACT_TEST_MODE=true`. |
@@ -115,11 +115,17 @@ Inputs that are not approved:
 
 Prompt text must come from an approved governed source before implementation begins. No hard-coded production prompt text may appear in Flow D or any child flow.
 
-**Open decision:** prompt source — one of:
+**Resolved:** Dataverse AI Prompt Template table (`jm1pub_aiprompttemplates`, logical name `jm1pub_aiprompttemplate`). Canonical governance shell record created 2026-06-16:
 
-- Dataverse AI Prompt Template table (`jm1pub_aiprompttemplates`) with version-controlled records — already used by the existing assessment flow; preferred if the template can be scoped cleanly
-- Foundry prompt asset (versioned, governed)
-- Repository-held versioned prompt file (committed, reviewed, no manuscript content)
+| Field | Value |
+|---|---|
+| Record ID | `ef8acd4f-6869-f111-a826-000d3a14673b` |
+| `jm1pub_promptkey` | `jm1-prompt-pub-stage0-diagnostic` |
+| `jm1pub_promptname` | `Stage 0 Editorial Diagnostic` |
+| `jm1pub_promptversion` | `PUB-STAGE0-DIAGNOSTIC-V1` |
+| `jm1pub_modeldeploymentalias` | `jm1-pub-diagnostic-primary` |
+| `jm1pub_groundingdependencies` | `knowledge.md` |
+| `jm1pub_active` | `false` — inactive until Jackie approves activation |
 
 The chosen approach must:
 
