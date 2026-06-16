@@ -650,3 +650,58 @@ HTTP status: `401 Unauthorized`
 - Flow D: not connected to this runner.
 - Secrets, tokens, manuscript content: not committed or logged.
 - Runner key: stored in `jm1-core-vault` as `jm1-int-pub-005-diagnostic-runner-key`; referenced via Key Vault reference in app settings; never exposed in logs or repo.
+
+## Flow D → Diagnostic Runner Contract-Test Integration
+
+**Date:** 2026-06-16
+
+**Diagnostic record ID:** `0e744c11-5969-f111-a826-00224820105b`
+
+**Correlation ID:** `INT-PUB-005-FLOWD-20260616T075759Z-0e744c11-5969-f111-a826-00224820105b`
+
+**Linked intake:** `JMP-INT-202606-IP82OF` (TEST - INT-PUB-005 Stage 0 Handoff)
+
+**Flow D run ID:** `08584200102066771974924206807CU18` — Succeeded
+
+### Flow D true-branch change
+
+The true branch of `Condition_Manuscript_Asset_Ready` was updated via `pac solution import` to replace the deferred path with:
+
+1. `Get_Runner_Key` — reads `jm1pub_DiagnosticRunnerApiKey` environment variable value from Dataverse at runtime (key never stored in flow definition or repo)
+2. `Call_Diagnostic_Runner` — HTTP POST to `https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-stage0-diagnostic` with `x-jm1-diagnostic-runner-key` header sourced from the env var
+3. `Condition_Runner_Accepted` — checks HTTP 202; on success writes contract-test accepted result; on failure writes Exception status
+
+### Manuscript gate fields set on test record
+
+| Field | Value |
+|---|---|
+| `jm1_manuscriptassetstatus` | `3` (Approved) |
+| `jm1_manuscriptapprovedfordiagnostic` | `true` |
+| `jm1_manuscriptasseturl` | SharePoint-style placeholder URL (contract-test only, no real file) |
+| `jm1_manuscriptassetnotes` | "CONTRACT TEST ONLY — not a real manuscript." |
+
+### Result after Flow D run
+
+| Field | Value |
+|---|---|
+| `jm1_diagnosticexecutionstatus` | `835500004` — Needs Human Review |
+| `jm1_diagnosticexecutionerror` | `Contract-test runner accepted: diagnostic runner returned 202. AI execution not enabled.` |
+| `jm1pub_diagnosticsummary` | `Stage 0 diagnostic contract-test runner accepted. AI execution not enabled. Awaiting Jackie review.` |
+| `jm1pub_diagnosticstatus` | `196650004` — Awaiting Jackie Review |
+| `jm1_diagnosticattemptcount` | `1` |
+| `jm1_diagnosticrequireshumanreview` | `true` |
+| `jm1pub_jackiereviewrequired` | `true` |
+
+Runner returned HTTP 202. Flow D wrote `Needs Human Review` — not Completed. No AI execution occurred.
+
+### Boundaries confirmed — Flow D runner integration
+
+- AI execution: not performed. Runner in `CONTRACT_TEST_MODE=true`.
+- Dataverse manuscript fields: not read for AI. Gate passed based on metadata only.
+- Real manuscript file: not accessed. No SharePoint read was made.
+- Opportunity: not created.
+- Author email: not sent.
+- Historical rows: not processed.
+- Flow A / B / C / /join: not modified.
+- Runner key: retrieved at runtime from Dataverse environment variable `jm1pub_DiagnosticRunnerApiKey`; value sourced from Key Vault; never in flow JSON or repo.
+- No secrets, tokens, or PII committed or logged.
