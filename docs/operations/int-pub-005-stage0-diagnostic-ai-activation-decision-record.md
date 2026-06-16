@@ -26,7 +26,7 @@ This record does not authorize real AI execution. See Section 14.
 | AI service endpoint / provider | Azure AI Foundry / Azure OpenAI Service via Diagnostic AI Runner Azure Function |
 | Deployment alias — production | `jm1-pub-diagnostic-primary` |
 | Deployment alias — safe test | `jm1-pub-diagnostic-safe-test` |
-| Prompt / template source | Dataverse AI Prompt Template table (`jm1_aiprompttemplate`) |
+| Prompt / template source | Dataverse AI Prompt Template table (`jm1pub_aiprompttemplate`, entity set `jm1pub_aiprompttemplates`) |
 | Canonical prompt identifier | `jm1-prompt-pub-stage0-diagnostic` |
 | Operational prompt alias / version code | `PUB-STAGE0-DIAGNOSTIC-V1` |
 | First-activation manuscript formats | DOCX and TXT only. PDF and scanned-file extraction deferred. |
@@ -48,7 +48,7 @@ This record does not authorize real AI execution. See Section 14.
 | Agent ID | `jm1-agent-pub-diagnostic-01` |
 | Canonical Prompt Template ID | `jm1-prompt-pub-stage0-diagnostic` |
 | Operational Prompt Alias / Version Code | `PUB-STAGE0-DIAGNOSTIC-V1` |
-| Dataverse table | `jm1_aiprompttemplate` |
+| Dataverse table | `jm1pub_aiprompttemplate` (entity set: `jm1pub_aiprompttemplates`) |
 | Deployment alias (production) | `jm1-pub-diagnostic-primary` |
 | Deployment alias (safe test) | `jm1-pub-diagnostic-safe-test` |
 | Azure Function | `func-jm1-diagnostic-ai-runner` |
@@ -62,7 +62,7 @@ No AI call may proceed using an unregistered deployment alias or an unresolvable
 
 ## 5. Prompt / Template Governance
 
-- Prompt text is stored in the Dataverse `jm1_aiprompttemplate` table.
+- Prompt text is stored in the Dataverse `jm1pub_aiprompttemplate` table (entity set: `jm1pub_aiprompttemplates`).
 - Canonical prompt template identifier: `jm1-prompt-pub-stage0-diagnostic`
 - Operational version code logged at every AI call: `PUB-STAGE0-DIAGNOSTIC-V1`
 - No prompt text may be hard-coded in Flow D, the Azure Function, or any repo file.
@@ -74,7 +74,7 @@ No AI call may proceed using an unregistered deployment alias or an unresolvable
 
 The prompt template must declare grounding dependencies using the ADR-011 / BP-08 field:
 
-**Dataverse field:** `jm1_groundingdependencies` on `jm1_aiprompttemplate`
+**Dataverse field:** `jm1pub_groundingdependencies` on `jm1pub_aiprompttemplate` (entity set: `jm1pub_aiprompttemplates`)
 
 Grounding dependencies must not be left implicit. The canonical diagnostic prompt `jm1-prompt-pub-stage0-diagnostic` must declare a minimum of:
 
@@ -268,8 +268,8 @@ The following must be completed, verified, and documented before the runner may 
 | `CONTRACT_TEST_MODE` changed from `true` to `false` on `func-jm1-diagnostic-ai-runner` app settings | Not started |
 | Azure OpenAI / Foundry deployment alias `jm1-pub-diagnostic-primary` confirmed active and accessible from the Function App's managed identity | Not verified |
 | `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION` (or Foundry equivalents) added to Function App app settings via Key Vault references | Not started |
-| Prompt template `jm1-prompt-pub-stage0-diagnostic` created in `jm1_aiprompttemplate` Dataverse table with version `PUB-STAGE0-DIAGNOSTIC-V1` | Not verified |
-| `jm1_groundingdependencies` field on prompt template populated with `knowledge.md` and other declared grounding dependencies | Not verified |
+| Prompt template `jm1-prompt-pub-stage0-diagnostic` created in `jm1pub_aiprompttemplates` Dataverse table with version `PUB-STAGE0-DIAGNOSTIC-V1` | Done — record ID `ef8acd4f-6869-f111-a826-000d3a14673b`, inactive shell, prompt body not yet authored, 2026-06-16 |
+| `jm1pub_groundingdependencies` field on prompt template populated with `knowledge.md` and other declared grounding dependencies | Done — field created on `jm1pub_aiprompttemplate`, value `knowledge.md` set on governance shell record, 2026-06-16 |
 | `knowledge.md` grounding file confirmed in governed location accessible to the AI runtime | Not verified |
 | DOCX and TXT extraction logic implemented in the Azure Function (transient, no persistence) | Not started |
 | Legacy-exclusion gate implemented in the Azure Function pre-flight check | Not started |
