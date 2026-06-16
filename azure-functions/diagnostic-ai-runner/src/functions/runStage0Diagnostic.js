@@ -1,4 +1,5 @@
 const { app } = require("@azure/functions");
+const { verifyKnowledgeBlob } = require("../blob/knowledgeReader");
 
 const CONTRACT_TEST_MODE = true;
 
@@ -98,6 +99,59 @@ app.http("run-stage0-diagnostic", {
     const { diagnosticId, intakeReferenceCode, correlationId } = validation.value;
 
     if (CONTRACT_TEST_MODE) {
+      const verifyKnowledge = body.verifyKnowledge === true;
+
+      if (verifyKnowledge) {
+        context.info(`Diagnostic runner knowledge-verify requested; diagnosticId=${diagnosticId}; reference=${intakeReferenceCode}`);
+
+        const knowledgeMeta = await verifyKnowledgeBlob();
+
+        if (!knowledgeMeta.reachable || !knowledgeMeta.hashMatched) {
+          context.warn(
+            `knowledge.md verification failed; reachable=${knowledgeMeta.reachable}; hashMatched=${knowledgeMeta.hashMatched}; error=${knowledgeMeta.error || "none"}`
+          );
+          return {
+            status: 503,
+            jsonBody: {
+              status: "error",
+              code: "KNOWLEDGE_VERIFICATION_FAILED",
+              diagnosticId,
+              knowledge: {
+                reachable: knowledgeMeta.reachable,
+                hashMatched: knowledgeMeta.hashMatched,
+                expectedSha256: knowledgeMeta.expectedSha256,
+                error: knowledgeMeta.error
+              }
+            }
+          };
+        }
+
+        context.info(
+          `knowledge.md verified; diagnosticId=${diagnosticId}; byteLength=${knowledgeMeta.byteLength}; hashMatched=true`
+        );
+
+        return {
+          status: 202,
+          jsonBody: {
+            status: "accepted",
+            mode: "contract-test",
+            diagnosticId,
+            intakeReferenceCode,
+            correlationId,
+            knowledge: {
+              reachable: knowledgeMeta.reachable,
+              hashMatched: knowledgeMeta.hashMatched,
+              calculatedSha256: knowledgeMeta.calculatedSha256,
+              expectedSha256: knowledgeMeta.expectedSha256,
+              byteLength: knowledgeMeta.byteLength,
+              etag: knowledgeMeta.etag,
+              lastModified: knowledgeMeta.lastModified
+            },
+            message: "Diagnostic runner contract accepted. knowledge.md verified. AI execution not enabled."
+          }
+        };
+      }
+
       context.info(`Diagnostic runner contract-test accepted; diagnosticId=${diagnosticId}; reference=${intakeReferenceCode}`);
 
       return {

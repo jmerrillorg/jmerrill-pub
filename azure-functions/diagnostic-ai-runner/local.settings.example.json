@@ -6,6 +6,8 @@
     "JM1_DIAGNOSTIC_RUNNER_KEY": "",
     "DATAVERSE_ENDPOINT": "",
     "DATAVERSE_CLIENT_ID": "",
-    "DATAVERSE_TENANT_ID": ""
+    "DATAVERSE_TENANT_ID": "",
+    "KNOWLEDGE_BLOB_URL": "https://stjm1diagrunner.blob.core.windows.net/knowledge/knowledge.md",
+    "KNOWLEDGE_BLOB_SHA256": ""
   }
 }
