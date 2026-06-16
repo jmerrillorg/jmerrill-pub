@@ -78,9 +78,15 @@ The prompt template must declare grounding dependencies using the ADR-011 / BP-0
 
 Grounding dependencies must not be left implicit. The canonical diagnostic prompt `jm1-prompt-pub-stage0-diagnostic` must declare a minimum of:
 
-| Dependency | Purpose |
-|---|---|
-| `knowledge.md` | Imprint definitions; package and scoring weights; Stage 0 diagnostic rubric; publishing intake interpretation rules |
+| Dependency | Governed location | Purpose |
+|---|---|---|
+| `knowledge.md` | `stjm1diagrunner` / `knowledge` container / `knowledge.md` | Imprint definitions; scoring rubric; package categories; editorial path definitions; risk flag guidance; routing rules |
+
+**Canonical blob URL (private):** `https://stjm1diagrunner.blob.core.windows.net/knowledge/knowledge.md`
+
+**Access:** Azure Function managed identity (`e8c51a80-bdb0-46fa-b398-9109719d6427`) has `Storage Blob Data Reader` on `stjm1diagrunner`. The runner reads this file via `@azure/storage-blob` + `DefaultAzureCredential` at startup.
+
+**File status:** Draft skeleton uploaded 2026-06-16. Editorial content (imprint definitions, scoring weights, package categories, editorial paths, risk guidance) not yet authored. Jackie must review and complete the file before activation.
 
 Additional grounding dependencies (e.g. style guide, genre taxonomy) must be declared explicitly before use. Undeclared grounding is a pre-execution blocker.
 
@@ -270,7 +276,7 @@ The following must be completed, verified, and documented before the runner may 
 | `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION` (or Foundry equivalents) added to Function App app settings via Key Vault references | Not started |
 | Prompt template `jm1-prompt-pub-stage0-diagnostic` created in `jm1pub_aiprompttemplates` Dataverse table with version `PUB-STAGE0-DIAGNOSTIC-V1` | Done — record ID `ef8acd4f-6869-f111-a826-000d3a14673b`, prompt body drafted 2026-06-16, inactive pending Jackie approval |
 | `jm1pub_groundingdependencies` field on prompt template populated with `knowledge.md` and other declared grounding dependencies | Done — field created on `jm1pub_aiprompttemplate`, value `knowledge.md` set on governance shell record, 2026-06-16 |
-| `knowledge.md` grounding file confirmed in governed location accessible to the AI runtime | Not verified |
+| `knowledge.md` grounding file confirmed in governed location accessible to the AI runtime | Location confirmed — `stjm1diagrunner/knowledge/knowledge.md`; managed identity `Storage Blob Data Reader` granted; draft skeleton uploaded 2026-06-16. **Editorial content not yet authored — Jackie must complete before activation.** |
 | DOCX and TXT extraction logic implemented in the Azure Function (transient, no persistence) | Not started |
 | Legacy-exclusion gate implemented in the Azure Function pre-flight check | Not started |
 | No-quotation output validation implemented in the Azure Function (output fields contain no manuscript excerpts) | Not started |
