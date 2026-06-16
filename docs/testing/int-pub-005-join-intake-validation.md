@@ -592,3 +592,61 @@ Flow D integration and AI execution are not authorized in this pass. The full fu
 
 - `docs/operations/int-pub-005-stage0-diagnostic-ai-runner-azure-function.md`
 - `docs/operations/int-pub-005-stage0-diagnostic-ai-execution-contract.md`
+
+## Diagnostic AI Runner — Live Deployment Contract Test
+
+**Date:** 2026-06-16
+
+**Function App:** `func-jm1-diagnostic-ai-runner`
+
+**Route:** `https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-stage0-diagnostic`
+
+**Resource group:** `rg-jm1-ai`
+
+**Runtime:** Node.js 22
+
+### HTTP 202 — Valid request
+
+Request: `POST /api/run-stage0-diagnostic` with valid `x-jm1-diagnostic-runner-key`, valid `diagnosticId` (all-zeros UUID), valid `intakeReferenceCode`, valid `correlationId`.
+
+Response:
+
+```json
+{
+  "status": "accepted",
+  "mode": "contract-test",
+  "diagnosticId": "00000000-0000-0000-0000-000000000000",
+  "intakeReferenceCode": "JMP-INT-000000-CONTRACT-TEST",
+  "correlationId": "INT-PUB-005-RUNNER-CONTRACT-TEST-001",
+  "message": "Diagnostic runner contract accepted. AI execution not enabled."
+}
+```
+
+HTTP status: `202 Accepted`
+
+### HTTP 401 — Missing runner key
+
+Request: `POST /api/run-stage0-diagnostic` with no `x-jm1-diagnostic-runner-key` header.
+
+Response:
+
+```json
+{
+  "status": "error",
+  "code": "UNAUTHORIZED"
+}
+```
+
+HTTP status: `401 Unauthorized`
+
+### Boundaries confirmed — live deployment
+
+- AI execution: not performed. `CONTRACT_TEST_MODE=true` set in app settings.
+- Dataverse: not read or written.
+- SharePoint / manuscript file: not accessed.
+- Opportunity: not created.
+- Author email: not sent.
+- Historical rows: not processed.
+- Flow D: not connected to this runner.
+- Secrets, tokens, manuscript content: not committed or logged.
+- Runner key: stored in `jm1-core-vault` as `jm1-int-pub-005-diagnostic-runner-key`; referenced via Key Vault reference in app settings; never exposed in logs or repo.
