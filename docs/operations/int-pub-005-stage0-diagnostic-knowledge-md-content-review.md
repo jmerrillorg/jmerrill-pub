@@ -2,23 +2,32 @@
 
 ## Purpose
 
-This document is the editorial content review artifact for Jackie. It presents the full proposed
-content for `knowledge.md` — the AI grounding file for the Stage 0 Diagnostic prompt
-`jm1-prompt-pub-stage0-diagnostic`.
+This document is the editorial content review artifact for the Stage 0 Diagnostic prompt
+`jm1-prompt-pub-stage0-diagnostic`. It presents the full approved and proposed content for
+`knowledge.md` — the AI grounding file stored at `stjm1diagrunner/knowledge/knowledge.md`.
 
-**The blob at `stjm1diagrunner/knowledge/knowledge.md` must not be overwritten until Jackie
-approves the content below.**
+**The blob must not be overwritten until all remaining `[Jackie: confirm]` markers are resolved.**
 
-Source documents used for this draft: `JMP_Product_Reference_Guide_v1_1.docx` and
-`JMP_Full_Catalog_v2_1.docx` (both May 2026, v2.1/v1.1 canon, Internal Use Only).
+Source documents: `JMP_Product_Reference_Guide_v1_1.docx` and `JMP_Full_Catalog_v2_1.docx`
+(May 2026, v2.1/v1.1 canon, Internal Use Only).
 
-Items marked `[Jackie: confirm]` require Jackie's explicit sign-off before the file is finalized.
-Items marked `[Jackie: revise]` are plausible drafts that may need adjustment.
-Items with no marker are directly sourced from the reference documents.
+Jackie's governance rulings applied in this revision (2026-06-16):
+- Scoring scale: canonical 1–5 (not 1–10). All band descriptions converted.
+- JM Signature dual authorization: BP-07 — two deliberate Jackie actions, not two people.
+- Hard stops: grounded on filed knowledge.md Section 4 table. Author conduct/suitability
+  demoted to human-review flag.
+- Brand misalignment: Jackie's approved language applied verbatim.
+- AI caps: confirmed as canon; treated as internal review thresholds, advisory-only framing.
+- humanReviewTrigger: closed enum of 11 approved phrases. Freeform triggers disallowed.
+- Legal/defamation routing: High risk = Hard Stop. Low/moderate = Needs Manual Review.
+- Legacy exclusion: stated as a rule in Section 8, not only as a trigger phrase.
+- Imprint fit, package categories, publishing goals: confirmed as canon.
 
-After Jackie approves:
-1. Finalize all `[Jackie: confirm/revise]` items.
-2. Increment version to `v1.0` in the file header.
+Items marked `[Jackie: confirm]` remain open and must be resolved before the blob is finalized.
+
+After all markers are resolved:
+1. Remove all remaining `[Jackie: confirm]` markers.
+2. Set version to `v1.0` in the file header.
 3. Upload to `stjm1diagrunner/knowledge/knowledge.md` (overwriting the `v0.1-draft` skeleton).
 4. Record the upload timestamp and SHA-256 hash in `int-pub-005-stage0-diagnostic-knowledge-grounding.md`.
 5. Merge this PR as the approval record.
@@ -43,31 +52,34 @@ After Jackie approves:
 Canon imprint names effective May 2026 (CANON-CERT-001). All prior legacy names are retired.
 Use only these canonical names in all output fields.
 
+Imprint assignment at Stage 0 is advisory only. The diagnostic agent signals the most likely
+imprint fit based on submission data. Jackie confirms the final imprint after human review.
+No imprint is committed to the author based on a diagnostic result alone.
+
 ### J Merrill Publishing
 Formerly: J Merrill Faith (legacy — retired)
-AI content cap: 5%
+AI content cap: 5% (internal review threshold — see Section 6)
 Focus: Flagship faith imprint. Pastoral voice, Christian testimony, devotional writing, ministry
 leadership, and faith-based nonfiction. This is J Merrill Publishing's primary and most
 established imprint. Authors are typically ministry leaders, pastors, faith community voices,
 or authors with a strong faith platform.
 Fit signals: Faith-integrated theme or message, pastoral or testimony voice, church/ministry
 distribution channel, devotional or Bible study expansion potential.
-[Jackie: confirm fit signals and add any genre nuances not captured above]
 
 ### JM Works
 Formerly: J Merrill Voices (legacy — retired)
-AI content cap: 15%
+AI content cap: 15% (internal review threshold — see Section 6)
 Focus: General trade nonfiction imprint. Self-help, memoir, health, how-to, and practical
 nonfiction. Broader submission latitude than J Merrill Publishing. Suited for authors with
 a defined audience and practical or personal subject matter that does not require a faith
-frame but is consistent with JM1 values.
+frame but is compatible with JM1 values and care standard.
 Fit signals: Practical or instructional nonfiction, personal memoir, health/wellness subject
 matter, defined community or professional audience.
 [Jackie: confirm whether JM Works also accepts commercial fiction or is nonfiction-only]
 
 ### JM Little
 Formerly: J Merrill Kids (legacy — retired)
-AI content cap: 10%
+AI content cap: 10% (internal review threshold — see Section 6)
 Focus: Children's imprint. Picture books, early reader, and illustrated manuscripts. Author
 must supply illustrations (JMP-PKG-CHILD) or elect illustration services (JMP-CHILD-ILLUS).
 Age appropriateness is a hard diagnostic requirement — content maturity must match the stated
@@ -78,7 +90,7 @@ appropriate to the stated age range; author has art supplied or is prepared to c
 
 ### JM Verse
 Formerly: J Merrill Lit (legacy — retired)
-AI content cap: 5%
+AI content cap: 5% (internal review threshold — see Section 6)
 Focus: Poetry and literary imprint. Single-author collections, chapbooks, and hybrid
 prose-poetry works. Prosodic control and structural coherence across the collection are the
 primary assessment dimensions. Commercial potential is weighted less heavily than formal and
@@ -89,122 +101,141 @@ form; coherent organizing principle across the collection; author's voice is the
 
 ### JM Signature
 No legacy name.
-AI content cap: 0%
-Focus: Prestige reserve imprint. Publisher-invited only. Dual authorization required before
-any Signature commitment is made to an author. This imprint is not available through standard
-intake routing. The diagnostic agent must not recommend JM Signature as a primary imprint —
-it must flag the work for Signature consideration and set `signatureReviewRequired = true`.
+AI content cap: 0% (no AI-generated content may appear in any Signature title)
+Focus: Prestige reserve imprint. Publisher-invited only. JM Signature requires two deliberate
+Jackie actions per BP-07: (1) final imprint set to JM Signature, and (2) Signature
+dual-authorization confirmation set separately. This is not Jackie plus a second person —
+it is two distinct deliberate authorizations by Jackie. This imprint is not available through
+standard intake routing. The diagnostic agent must not recommend JM Signature as a primary
+imprint — it must flag the work for Signature consideration and set `signatureReviewRequired = true`.
 No AI-generated content may appear in any Signature title.
 Fit signals: Exceptional editorial quality AND significant author platform or cultural moment;
 would represent a flagship publishing investment; cannot be confirmed by the AI agent alone.
-[Jackie: confirm dual authorization requirement — who are the two authorizers?]
 
 ---
 
 ## 2. Stage 0 Scoring Rubric
 
-All dimensions scored 1–10. Score 0 = insufficient information to assess, or dimension does
+All dimensions scored 1–5. Score 0 = insufficient information to assess, or dimension does
 not apply to this submission type (see per-dimension notes). Score 0 is excluded from the
 averageScore calculation. Assign the best-supported score at the available evidence level —
-do not default to 0 on uncertainty alone; use confidence qualifiers in other output fields.
+do not default to 0 on uncertainty alone.
 
-### structureFlow (1–10)
+Canonical scale:
+5 = strong / ready
+4 = promising / minor review
+3 = moderate / developmental review
+2 = weak / significant concern
+1 = poor / not ready
+0 = insufficient information / not applicable
+
+### structureFlow (1–5)
 Organizational logic of the manuscript: chapter or section sequencing, pacing, narrative or
 argumentative arc, and internal consistency.
-8–10: Structure actively serves the work; sequencing is clear and purposeful.
-4–7: Discernible structure with notable gaps, pacing issues, or inconsistencies.
-1–3: Structural problems likely requiring significant developmental editing.
-[Jackie: confirm band descriptions]
+5: Structure actively serves the work; sequencing is clear and purposeful.
+4: Discernible structure with minor gaps or pacing issues.
+3: Moderate structural issues; developmental review recommended.
+2: Significant structural problems likely requiring substantive developmental editing.
+1: Fundamental structural concerns; not ready for editorial process.
 
-### voiceTone (1–10)
+### voiceTone (1–5)
 Distinctiveness and consistency of the author's voice; appropriateness of tone to genre,
 imprint, and audience.
-8–10: Unmistakably the author's voice; consistent register; tone fully serves the work.
-4–7: Recognizable but inconsistent voice, or voice not yet fully serving the work.
-1–3: Generic, inconsistent, or inappropriate to genre or stated audience.
-[Jackie: confirm]
+5: Unmistakably the author's voice; consistent register; tone fully serves the work.
+4: Distinctive voice with minor inconsistencies.
+3: Recognizable but inconsistent voice, or voice not yet fully serving the work.
+2: Voice is generic or inconsistent in ways requiring significant editorial attention.
+1: No discernible author voice; inappropriate to genre or stated audience.
 
-### clarityGrammar (1–10)
+### clarityGrammar (1–5)
 Sentence-level clarity, grammatical correctness, and mechanics.
-8–10: Would require only light copyediting; clear and well-constructed.
-4–7: Moderate mechanical issues; addressable in a standard edit pass.
-1–3: Pervasive issues requiring substantive rewriting at the sentence level.
-[Jackie: confirm; note that AI must characterize the level of concern without quoting examples]
+5: Would require only light copyediting; clear and well-constructed.
+4: Minor mechanical issues; addressable in a standard edit pass.
+3: Moderate mechanical issues; copyedit pass required.
+2: Pervasive issues requiring substantive rewriting at the sentence level.
+1: Severe mechanical concerns throughout; not ready for editorial process.
+Note: AI must characterize the level of concern without quoting manuscript examples.
 
-### marketFit (1–10)
+### marketFit (1–5)
 Alignment with current publishing market, comparable titles, and audience.
-8–10: Clear comps, identifiable readership, timely or enduring subject.
-4–7: Plausible market; limited differentiation or unclear audience.
-1–3: Weak market alignment or over-saturated category with no distinguishing approach.
-[Jackie: confirm; note that J Merrill Publishing's faith market and JM Works' trade nonfiction market should be evaluated separately]
+5: Clear comps, identifiable readership, timely or enduring subject.
+4: Plausible market with some differentiation; audience is identifiable.
+3: Plausible market; limited differentiation or unclear audience definition.
+2: Weak market alignment; limited audience identification.
+1: No identifiable market or audience; over-saturated category with no distinguishing approach.
+Note: J Merrill Publishing's faith market and JM Works' trade nonfiction market are evaluated
+on their respective standards — not interchangeably.
 
-### commercialPotential (1–10)
+### commercialPotential (1–5)
 Revenue potential, platform potential, format flexibility (audio, hardcover, series), and
 long-term commercial viability. Includes author platform strength as a signal.
-8–10: Strong commercial indicators across multiple dimensions; clear revenue path.
-4–7: Moderate commercial potential; notable gaps in one or more dimensions.
-1–3: Limited commercial potential as assessed from the available submission data.
-[Jackie: confirm; note whether author platform data from intake is available to the agent]
+5: Strong commercial indicators across multiple dimensions; clear revenue path.
+4: Solid commercial potential with minor gaps.
+3: Moderate commercial potential; notable gaps in one or more dimensions.
+2: Limited commercial potential as assessed from the available submission data.
+1: Minimal commercial indicators.
 
-### originality (1–10)
+### originality (1–5)
 Freshness of concept, uniqueness of approach, or distinctiveness of perspective within the
 submission's genre or category.
-8–10: Offers something genuinely new within its genre; distinctive perspective.
-4–7: Solid submission in familiar territory; limited differentiation.
-1–3: Closely follows established formulas without adding distinctive value.
-[Jackie: confirm]
+5: Offers something genuinely new within its genre; distinctive perspective.
+4: Solid submission with a distinguishing angle.
+3: Solid submission in familiar territory; limited differentiation.
+2: Closely follows established formulas with little distinctive value.
+1: Derivative; no distinguishing approach.
 
-### ethicsCompliance (1–10)
+### ethicsCompliance (1–5)
 Absence of ethical, legal, and compliance concerns detectable from the submission sample.
-10: No detectable concerns.
-7–9: Minor concerns that require disclosure or review but are not disqualifying.
-4–6: Moderate concerns that may require editorial or legal review before advancement.
-1–3: Serious concerns; may trigger hardStopFlag. See Section 6.
-AI content disclosure signals, defamation risk, third-party content, and permissions gaps
-all reduce this score.
-[Jackie: confirm score-to-flag threshold mapping in Section 6]
+5: No detectable concerns.
+4: Minor concerns that require disclosure or awareness but are not disqualifying.
+3: Moderate concerns requiring editorial review before advancement; flag appropriate.
+2: Significant concerns requiring legal or editorial review; risk flags should be set.
+1: Serious concerns within hard-stop criteria. See Section 4.
+Note: This score informs flag-setting — it does not replace flag logic in Section 6.
 
-### technicalFormatting (1–10)
+### technicalFormatting (1–5)
 Manuscript preparation quality: formatting conventions, consistent style application,
 chapter/section delineation, and submission formatting standards.
-8–10: Professionally prepared; would require only minor pre-production cleanup.
-4–7: Workable formatting with notable inconsistencies.
-1–3: Formatting that would require significant preparation before editorial processing.
-[Jackie: confirm]
+5: Professionally prepared; would require only minor pre-production cleanup.
+4: Well-prepared with minor inconsistencies.
+3: Workable formatting with notable inconsistencies.
+2: Significant formatting issues requiring substantial preparation.
+1: Formatting not meeting minimum submission standards.
 
-### ageAppropriateness (1–10)
+### ageAppropriateness (1–5)
 Applies to JM Little submissions. Content maturity versus stated or apparent target age range.
-10: Perfect alignment; content is fully appropriate for the stated age group.
-7–9: Minor content considerations; addressable editorially.
-4–6: Material mismatch requiring significant revision.
-1–3: Serious mismatch that may be a hard stop. Score 1 for adult content in a children's
-submission — this triggers hardStopFlag.
-For non-JM Little submissions where age appropriateness is not directly relevant, score 0.
-[Jackie: confirm hard-stop threshold; confirm 0-score rule for non-children's submissions]
+5: Perfect alignment; content is fully appropriate for the stated age group.
+4: Age-appropriate with minor content considerations; addressable editorially.
+3: Some content maturity concerns requiring review.
+2: Material mismatch requiring significant revision before this imprint is appropriate.
+1: Serious mismatch — adult content in a children's submission. Score 1 triggers hardStopFlag.
+Score 0 for non-JM Little submissions where this dimension does not apply.
 
-### illustrationReadiness (1–10)
+### illustrationReadiness (1–5)
 Applies to JM Little illustrated works. Whether the manuscript has clear illustration notes,
 placeholder markers, or an indicated illustration concept suitable for the JM Little package.
-8–10: Manuscript translates cleanly to illustrated format; illustration direction is clear.
-4–7: Partial illustration direction; gaps that would need to be resolved with the author.
-1–3: No illustration guidance in a format that requires it.
+5: Manuscript translates cleanly to illustrated format; illustration direction is clear.
+4: Illustration direction present with minor gaps.
+3: Partial illustration direction; gaps that would need to be resolved with the author.
+2: Minimal illustration guidance in a format that requires it.
+1: No illustration guidance present.
 Score 0 for non-illustrated submissions.
-[Jackie: confirm; clarify whether absence of illustration notes is expected for picture books at submission stage]
 
-### poetryFormStructure (1–10)
+### poetryFormStructure (1–5)
 Applies to JM Verse submissions. Prosodic control, form adherence (where applicable), line and
 stanza integrity, and structural coherence across the collection or chapbook.
-8–10: Strong formal control and a coherent organizing principle across the work.
-4–7: Variable quality or inconsistent formal execution.
-1–3: Weak prosodic control or an incoherent collection structure.
+5: Strong formal control and a coherent organizing principle across the work.
+4: Strong form with minor inconsistencies.
+3: Variable quality or inconsistent formal execution.
+2: Weak prosodic control or limited collection coherence.
+1: Incoherent collection structure; prosodic control not demonstrated.
 For experimental or free verse submissions, evaluate structural coherence and intentionality
-of form choices rather than adherence to traditional form. Score 0 for non-poetry submissions.
-[Jackie: confirm free verse / experimental poetry handling]
+of form choices rather than adherence to traditional form.
+Score 0 for non-poetry submissions.
 
 ### averageScore
-Arithmetic mean of all non-zero dimension scores. Calculated across applicable dimensions
+Arithmetic mean of all non-zero dimension scores, calculated across applicable dimensions
 for this submission type. Informational diagnostic signal — does not directly drive routing.
-[Jackie: confirm whether averageScore should inform routing threshold recommendations]
 
 ---
 
@@ -218,20 +249,17 @@ The agent must return one of the following values or `null`:
 
 | suggestedPackageCategory | SKU | Word count | Best fit |
 |---|---|---|---|
-| `Starter` | JMP-PKG-STARTER | ≤50,000 words | First-time authors with a mostly clean manuscript; lighter editorial investment needed |
-| `Professional` | JMP-PKG-PRO | ≤75,000 words | Authors seeking stronger editorial polish and market positioning; manuscript has strong foundation |
-| `Signature` | JMP-PKG-SIGNATURE | ≤100,000 words | Legacy authors, ministry leaders, authors investing in long-term platform; highest editorial investment |
-| `Children's` | JMP-PKG-CHILD | N/A | JM Little submissions; author supplies illustrations or will commission them |
+| `Starter` | JMP-PKG-STARTER | ≤50,000 words | First-time authors with a mostly clean manuscript; lighter editorial investment |
+| `Professional` | JMP-PKG-PRO | ≤75,000 words | Authors seeking stronger editorial polish and market positioning |
+| `Signature` | JMP-PKG-SIGNATURE | ≤100,000 words | Legacy authors, ministry leaders, authors investing in long-term platform |
+| `Children's` | JMP-PKG-CHILD | N/A | JM Little submissions; author supplies or commissions illustrations |
 | `null` | — | — | Insufficient information to recommend a category; Jackie to determine |
 
 Note on JM Signature imprint vs. Signature package: `JMP-PKG-SIGNATURE` is a publishing
 package available to any qualifying author. `JM Signature` imprint is publisher-invited only
-with dual authorization. A work recommended for the Signature package does not automatically
-qualify for the JM Signature imprint. Set `signatureReviewRequired = true` only for imprint
-consideration, not package selection.
-
-[Jackie: confirm these four package categories are the correct values for the agent to return.
-Add any additional package categories not listed above.]
+with dual authorization per BP-07. A work recommended for the Signature package does not
+automatically qualify for the JM Signature imprint. Set `signatureReviewRequired = true` only
+for imprint consideration, not for Signature package selection.
 
 ---
 
@@ -252,8 +280,6 @@ imprint alignment and editorial path recommendations — not to make commitments
 | Devotional / Bible study / curriculum | J Merrill Publishing; flag devotional/curriculum expansion potential in diagnosticSummary |
 | Unsure / not stated | Note the gap in diagnosticSummary; do not invent a goal; apply general scoring |
 
-[Jackie: review and confirm; add any self-reported goal categories from the intake form not listed above]
-
 ---
 
 ## 5. Editorial Path Definitions
@@ -263,15 +289,15 @@ without Jackie's explicit approval.
 
 | Editorial path | When to recommend | Notes |
 |---|---|---|
-| `Standard` | Manuscript is editorially ready or near-ready; strong foundation | Full editorial process included in publishing package |
-| `Developmental First` | Voice or concept has potential but structural or clarity issues score 4–6 | Developmental edit needed before standard editorial pass |
+| `Standard` | Manuscript is editorially ready or near-ready (structureFlow ≥ 4) | Full editorial process included in publishing package |
+| `Developmental First` | Voice or concept has potential but structureFlow or clarityGrammar ≤ 3 | Developmental edit needed before standard editorial pass |
 | `Children's` | JM Little submission | Specialized children's editorial path; includes illustration coordination |
 | `Poetry` | JM Verse submission | Specialized poetry editorial path; poetryFormStructure is primary dimension |
-| `Signature Review` | Exceptional work potentially suited to JM Signature imprint | Must set `signatureReviewRequired = true`; Jackie determines imprint |
-| `Hold — Not Ready` | Work shows promise but needs author-side development | Author needs to revise before editorial investment is appropriate |
-| `Do Not Advance` | Work does not meet minimum criteria for any current imprint or path | See hard stop and minimum threshold guidance in Section 6 |
+| `Signature Review` | Exceptional work with signals consistent with JM Signature imprint | Must set `signatureReviewRequired = true`; BP-07 dual authorization required |
+| `Hold — Not Ready` | Work shows promise but needs author-side development before editorial investment | Author needs to revise; use `humanReviewTrigger = "Editorial path requires manual review"` |
+| `Do Not Advance` | Work does not meet minimum criteria for any current imprint or path | See Section 4 (hard-stop table); diagnostic holds and routes — does not reject |
 
-[Jackie: confirm path names, descriptions, and thresholds. Add Co-Development or other paths if used.]
+[Jackie: confirm path names, descriptions, and score thresholds for Developmental First and Hold — Not Ready. Add Co-Development or other paths if used.]
 
 ---
 
@@ -280,44 +306,67 @@ without Jackie's explicit approval.
 Risk flags name the category of concern only. The agent must never reproduce manuscript text
 in a risk flag or notes field. No quotation, no excerpt, no verbatim passage.
 
-### hardStopFlag
-Set true when the submission contains content that disqualifies it from further processing
-without immediate human review. When true: set `diagnosticStatus = "Hard Stop"`.
+The diagnostic does not reject submissions. It holds and routes for human review.
 
-Hard stop conditions:
-- Explicit sexual content inappropriate for any current JM1 imprint and audience
-- Content identifying real individuals in a defamatory or harmful way with specificity
-- Direct evidence of wholesale plagiarism or reproduction of copyrighted material
-- Content presenting legal exposure requiring legal review before any further action
-- Adult content in a children's submission (ageAppropriateness score = 1–2)
-[Jackie: confirm list; add any JM-specific hard stop conditions]
+### hardStopFlag
+Grounded on the filed knowledge.md Section 4 hard-stop table. Set true when the submission
+contains content that disqualifies it from further automated processing and requires immediate
+human review before any pipeline step. When true: set `diagnosticStatus = "Hard Stop"`.
+
+Hard-stop conditions (from filed Section 4):
+- Explicit sexual content incompatible with any current JM1 imprint and audience
+- Content identifying real individuals in a defamatory or harmful way with sufficient specificity
+  to constitute a legal risk requiring review — HIGH legal/defamation risk only (see legalFlag)
+- Direct evidence of wholesale reproduction of copyrighted material at a level that presents
+  serious legal exposure
+- Adult content in a children's submission (ageAppropriateness = 1)
+
+Note: Author conduct, author expectations, or author suitability concerns are NOT automated
+hard stops. Route these via `humanReviewTrigger = "Suitability concern requires Jackie review"`.
+These require human judgment, not automated blocking.
 
 ### ethicsFlag
 Set true when the submission raises an ethical concern that does not rise to a hard stop but
 requires editorial judgment before advancement. Examples: insensitive cultural representation,
-unacknowledged appropriation, framing concerns in memoir or narrative nonfiction, content
-that may be harmful to a reader group.
-[Jackie: confirm threshold]
+unacknowledged appropriation, framing concerns in memoir or narrative nonfiction, content that
+may be harmful to a reader group.
+[Jackie: confirm threshold — what distinguishes an ethics concern from a hard stop in borderline cases?]
 
 ### legalFlag
-Set true when the submission raises a legal concern: potential defamation, privacy concerns
-(real individuals portrayed fictionally), contractual red flags (author claims rights they
-may not hold). When true, flag for legal review before any further pipeline step.
-[Jackie: confirm; note whether legalFlag alone requires a hold before any next step]
+Set true when the submission raises a legal concern.
+
+Routing by severity:
+- HIGH legal or defamation risk: set `hardStopFlag = true` AND `legalFlag = true`.
+  Set `diagnosticStatus = "Hard Stop"`. Do not advance until Jackie clears.
+- LOW or MODERATE legal concern: set `legalFlag = true` only. Do not set `hardStopFlag`.
+  Use `humanReviewTrigger = "Legal or defamation concern"`.
+
+The diagnostic holds and routes — it does not reject.
+
+### defamationRiskFlag
+Set true when characterizations of identifiable real individuals may constitute defamation.
+Distinct from `legalFlag` — both are typically set simultaneously for defamation concerns.
+
+Routing by severity mirrors legalFlag:
+- HIGH defamation risk: set `hardStopFlag = true`, `defamationRiskFlag = true`, `legalFlag = true`.
+- LOW or MODERATE: set `defamationRiskFlag = true` and `legalFlag = true` without `hardStopFlag`.
+  Use `humanReviewTrigger = "Legal or defamation concern"`.
 
 ### brandMisalignmentFlag
-Set true when the submission conflicts with JM1 Publishing values in a way that would make
-it unsuitable for any current imprint, even if it does not reach a hard stop threshold.
-JM1 Publishing is a faith-aligned publisher. Content that is anti-faith, explicitly secular
-in a way that conflicts with J Merrill Publishing's pastoral identity, or that conflicts with
-stated JM1 brand values should trigger this flag.
-[Jackie: define additional brand misalignment criteria beyond the faith-alignment note above]
+Set true when the work conflicts with JMP's family-centered, faith-aware, integrity-first
+publishing posture, or would reasonably harm the trust JMP has built with authors, readers,
+ministry/community partners, or distribution partners.
+
+Clarification: Not every title must be faith-based; every title must be compatible with JMP's
+values and care standard. Content does not need a faith theme to be published under JM Works
+or JM Little. But content that conflicts with JMP's posture or would damage partner trust
+triggers this flag regardless of imprint.
 
 ### rightsConcernFlag
 Set true when the submission includes third-party content (lyrics, extended quotations,
 illustrations, or other materials) where rights status is unclear and permissions may be
-required before publication. See JMP-RIGHTS-MINISTRY and JMP-RIGHTS-CATALOG for context.
-[Jackie: confirm fair-use threshold for short quotation vs. extended quotation requiring permissions]
+required before publication.
+[Jackie: confirm fair-use threshold — at what point does a quotation shift from fair use to requiring permissions clearance?]
 
 ### thirdPartyContentDetected
 Set true when third-party content is present regardless of apparent rights status.
@@ -329,16 +378,25 @@ Set true when one or more elements will require permissions clearance before pub
 Pair with `rightsConcernNotes` — describe the category of content, not the content itself.
 
 ### aiContentDisclosureNeeded
-Set true when the manuscript shows signals consistent with AI-generated content at a level
-that may require disclosure. JM Signature imprint has a 0% AI content cap — flag any AI
-content signals in Signature-adjacent submissions. J Merrill Publishing and JM Verse caps
-are 5%; JM Works cap is 15%; JM Little cap is 10%.
-[Jackie: define disclosure threshold and confirm how AI cap percentages should influence flagging]
+Set true when submission data or manuscript signals are consistent with AI-generated content
+at a level that may require author disclosure.
 
-### defamationRiskFlag
-Set true when characterizations of identifiable real individuals may constitute defamation.
-Distinct from `legalFlag` — both may be true simultaneously for a high-risk submission.
-[Jackie: confirm whether defamationRiskFlag + legalFlag together constitutes an automatic hard stop]
+AI content caps per imprint are internal review thresholds — they are not automatic rejection
+criteria. When an AI-use signal is present, the diagnostic labels it advisory-only. The
+diagnostic does not factually detect AI authorship — it signals that author-disclosed AI use
+may need to be reviewed against the applicable imprint cap.
+
+| Imprint | AI content cap (internal threshold) |
+|---|---|
+| JM Signature | 0% — any signal triggers this flag and `signatureReviewRequired` |
+| J Merrill Publishing | 5% |
+| JM Verse | 5% |
+| JM Little | 10% |
+| JM Works | 15% |
+
+Use `humanReviewTrigger = "AI disclosure concern"` whenever this flag is set.
+Prefer language such as: "Submission signals may be consistent with AI-generated content;
+author disclosure status should be confirmed before further review."
 
 ### copyrightRiskLevel
 Categorical: `None Detected` / `Low` / `Medium` / `High`.
@@ -348,14 +406,12 @@ Categorical: `None Detected` / `Low` / `Medium` / `High`.
 | None Detected | No signals of copyright concern in the submitted sample |
 | Low | Minor third-party references likely within fair use; no action required; flagged for awareness |
 | Medium | Third-party content present at a level warranting permissions review before publication |
-| High | Significant copyright concern; likely triggers `legalFlag` and may trigger `hardStopFlag` |
-
-[Jackie: confirm level definitions; confirm whether High automatically triggers legalFlag]
+| High | Significant copyright concern — set `legalFlag = true`; assess whether `hardStopFlag` applies |
 
 ### rightsConcernNotes
 Free text. Describes the category of concern — the type of content, not the content itself.
-Must never contain manuscript excerpts. Example: "Extended lyric quotation present — permissions
-review needed before publication." Never: the actual lyrics.
+Must never contain manuscript excerpts.
+Example: "Extended lyric quotation present — permissions review needed before publication."
 
 ---
 
@@ -364,17 +420,17 @@ review needed before publication." Never: the actual lyrics.
 Author readiness is an editorial signal about preparedness for the publishing process.
 It informs how Jackie structures the editorial conversation — not whether the work is accepted.
 
-### authorReadinessScore (1–10)
+### authorReadinessScore (1–5)
 Overall readiness for the editorial and publishing process based on intake metadata and
-manuscript preparation signals.
+manuscript preparation signals. Uses the canonical 1–5 scale.
 
 | Score | Interpretation |
 |---|---|
-| 8–10 | Well-prepared: clear publishing goal, professional manuscript preparation, realistic expectations |
-| 5–7 | Moderately prepared; gaps in one or more readiness dimensions |
-| 1–4 | Early-stage readiness; editorial conversation should set clear expectations |
-
-[Jackie: confirm score bands; confirm what intake metadata fields the agent may use to assess this]
+| 5 | Well-prepared: clear publishing goal, professional manuscript preparation, realistic expectations |
+| 4 | Mostly prepared; minor gaps in one readiness dimension |
+| 3 | Moderately prepared; gaps in one or more readiness dimensions |
+| 2 | Early-stage readiness in multiple areas; editorial conversation should set clear expectations |
+| 1 | Significant readiness concerns across multiple dimensions |
 
 ### authorInvestmentFit
 Categorical alignment of author's stated goals and expectations with what the publishing
@@ -387,7 +443,7 @@ process requires.
 | `Unclear` | Insufficient information to assess |
 | `Misaligned` | Stated goals appear to conflict with what the imprint or path requires |
 
-[Jackie: confirm values; confirm whether Misaligned triggers a routing note or human review flag]
+[Jackie: confirm whether Misaligned triggers a suitability routing note or is handled via humanReviewTrigger = "Suitability concern requires Jackie review"]
 
 ### timelineFit
 Compatibility of author's implied or stated timeline with JM1 Publishing's production schedule.
@@ -401,7 +457,7 @@ audiobook +2–3 weeks; rush production available via JMP-OPS-RUSH (+25%).
 | `Flexible` | Author has indicated flexibility; no constraint |
 | `Unclear` | No timeline information available |
 
-[Jackie: confirm values; add any additional timeline signals from the intake form]
+[Jackie: confirm these values and add any additional timeline signals from the intake form]
 
 ---
 
@@ -410,6 +466,20 @@ audiobook +2–3 weeks; rush production available via JMP-OPS-RUSH (+25%).
 All Stage 0 diagnostics from the `jm1-prompt-pub-stage0-diagnostic` runner route to Jackie
 review. No automatic advancement. No author-facing action. No Opportunity creation.
 No package discussion with the author.
+
+### Legacy-Exclusion Rule
+
+Legacy-flagged intakes cannot enter the INT-PUB-005 Stage 0 Diagnostic Runner path.
+
+If a Legacy flag or Legacy route designation is detected on the Publishing Intake or Editorial
+Diagnostic record before execution, diagnostic execution must remain Deferred or blocked with
+a safe internal note. No Legacy manuscript may be processed by this runner unless a separate
+governed Legacy diagnostic path is approved by Jackie and documented in a separate activation
+contract.
+
+The Legacy-exclusion check is a pre-flight rule — it occurs before any manuscript read or AI
+call. If triggered at runtime, set `diagnosticStatus = "Awaiting Jackie Review"` and use
+`humanReviewTrigger = "Legacy-exclusion check required"`.
 
 ### diagnosticStatus allowed values
 
@@ -427,25 +497,40 @@ Always `true`. No exceptions.
 Always `false`. No exceptions.
 
 ### humanReviewTrigger
-Required on all results. Characterize the primary reason for Jackie's review — do not quote
-the manuscript. Standard phrases:
+Required on all results. The diagnostic may only emit the following approved trigger phrases.
+Freeform trigger reasons are not permitted. If multiple triggers apply, emit the highest-priority
+one (Hard Stop conditions take priority over advisory flags).
 
-- "Manuscript meets Stage 0 advancement criteria; confidence above threshold. Awaiting Jackie editorial determination."
-- "Confidence below threshold in one or more dimensions. Jackie review required before any advancement."
-- "Risk flag present: [flag name]. Jackie review required before any pipeline step."
-- "Hard stop condition detected: [category]. No further processing until Jackie clears."
-- "Imprint alignment is ambiguous; multiple imprints are within range. Jackie to determine fit."
-- "JM Signature consideration flagged. Dual authorization required. No Signature commitment may be made without Jackie's explicit approval."
-- "Work is JM Little submission; age appropriateness and illustration readiness flagged for Jackie's review."
+Approved trigger phrases (closed enum):
 
-[Jackie: review and add any standard humanReviewTrigger phrases you want the agent to use consistently]
+- `Manuscript asset requires Jackie review`
+- `Imprint fit requires Jackie review`
+- `Rights or permissions concern`
+- `Legal or defamation concern`
+- `AI disclosure concern`
+- `JM Signature eligibility requires dual authorization`
+- `Package fit unclear`
+- `Author readiness concern`
+- `Editorial path requires manual review`
+- `Legacy-exclusion check required`
+- `Suitability concern requires Jackie review`
+
+Note: "Suitability concern requires Jackie review" is the correct trigger for author conduct,
+author expectations, or author suitability concerns. These are human-review flags — they are
+not automated hard stops and must not set `hardStopFlag = true`.
 
 ### signatureReviewRequired
 Set `true` when the agent identifies signals consistent with JM Signature imprint consideration.
-This is an additional routing flag alongside `jackieReviewRequired = true`. When `true`, Jackie's
-Signature review (including dual authorization) is required before any Signature conversation
-with the author. JM Signature has a 0% AI content cap — any AI content signals in a
-Signature-adjacent submission must be noted in `rightsConcernNotes` or `humanReviewTrigger`.
+This is an additional routing flag alongside `jackieReviewRequired = true`.
+
+Per BP-07, JM Signature requires two deliberate Jackie actions:
+1. Final imprint set to JM Signature.
+2. Signature dual-authorization confirmation set separately.
+
+This is not Jackie plus a second person — it is two distinct deliberate authorizations by
+Jackie. No Signature conversation may be initiated with the author until both actions are
+complete. JM Signature has a 0% AI content cap — any AI-use signals in a Signature-adjacent
+submission must trigger `aiContentDisclosureNeeded = true` in addition to `signatureReviewRequired = true`.
 
 ---
 
@@ -468,39 +553,56 @@ Signature-adjacent submission must be noted in `rightsConcernNotes` or `humanRev
 | No manuscript text | Confirmed |
 | No secrets, keys, or tokens | Confirmed |
 | No author PII | Confirmed |
-| No pricing | Confirmed — package categories reference SKUs only, no dollar amounts |
+| No pricing | Confirmed — package categories reference SKUs only |
 | Sourced from governed documents | Confirmed — Reference Guide v1.1 + Full Catalog v2.1 (May 2026) |
-| Imprint definitions | Complete — all 5 imprints with canon names, AI caps, focus descriptions |
-| Scoring rubric (11 dimensions) | Complete with score bands — Jackie confirm |
-| Package categories | **Complete** — 4 values + null, sourced from active SKUs |
-| Publishing goal interpretation | Complete — 9 rows; Jackie to add any missing goals |
-| Editorial path definitions | Complete — 7 paths; Jackie to confirm and add paths |
-| Risk flag guidance | All 9 flags — hard stop conditions and AI cap thresholds drafted |
-| Author readiness indicators | Complete with delivery timeline references from Reference Guide |
-| Routing rules | Complete — hard rules in place; humanReviewTrigger phrases drafted |
+| Scoring scale | **1–5 canonical scale applied throughout** |
+| JM Signature dual authorization | **BP-07 — two deliberate Jackie actions** |
+| Hard stops | **Grounded on filed Section 4 table; author conduct/suitability demoted** |
+| Brand misalignment | **Jackie's approved language applied verbatim** |
+| AI caps | **Confirmed as canon; advisory-only framing; not automatic rejection** |
+| humanReviewTrigger | **Closed enum of 11 approved phrases** |
+| Legal/defamation routing | **High = Hard Stop; Low/moderate = Needs Manual Review** |
+| Legacy exclusion | **Stated as a rule in Section 8** |
+| Imprint fit advisory | **Confirmed — advisory only at Stage 0** |
+| Package categories | **Confirmed** |
+| Publishing goals | **Confirmed** |
 
-## Key Changes From Prior Draft
+## Marker Count
 
-| Section | What changed |
+| | Count |
 |---|---|
-| Imprint definitions | **J Merrill Publishing corrected to faith imprint** (formerly J Merrill Faith) — prior draft incorrectly described it as general trade. JM Works is the general trade imprint. |
-| Imprint AI caps | Added from Reference Guide: JM Publishing 5%, JM Works 15%, JM Little 10%, JM Verse 5%, JM Signature 0% |
-| Package categories | **Section now complete** — sourced from active SKUs: Starter / Professional / Signature / Children's / null |
-| Timeline references | Delivery timelines added to `timelineFit` from Reference Guide specs |
-| brandMisalignmentFlag | Clarified that JM1 is faith-aligned; anti-faith content is a misalignment signal |
-| aiContentDisclosureNeeded | AI caps per imprint now referenced; JM Signature 0% cap highlighted for diagnostic use |
-| signatureReviewRequired | Clarified dual authorization requirement; JM Signature is not available through standard intake routing |
+| `[Jackie: confirm]` markers before this revision | 32 |
+| `[Jackie: confirm]` markers after this revision | **8** |
+| Markers resolved by Jackie's governance rulings | 24 |
 
-## Remaining Items Requiring Jackie's Input
+## Remaining `[Jackie: confirm]` Items (8)
 
-1. **Imprint fit signals** — all 5 imprint descriptions end with `[Jackie: confirm]` for genre nuances not in the reference docs (e.g. whether JM Works accepts fiction, JM Verse accepts literary fiction, JM Little age band boundaries).
-2. **Hard stop conditions** — listed conditions need Jackie's confirmation; add any JMP-specific conditions not captured.
-3. **brandMisalignmentFlag criteria** — faith-alignment note drafted; Jackie to confirm and add any additional brand values.
-4. **aiContentDisclosureNeeded threshold** — AI caps are documented; Jackie to confirm how the diagnostic agent should express percentage-based concerns in a flagging context.
-5. **Scoring score bands** — all drafted from common editorial practice; Jackie should adjust any that don't match how she evaluates manuscripts.
-6. **humanReviewTrigger phrases** — drafted as standard phrases; Jackie to add or revise.
-7. **defamationRiskFlag + legalFlag** — whether both together constitutes an automatic hard stop.
-8. **Dual authorization for JM Signature** — confirm who the two authorizers are.
+These are the only items not covered by Jackie's 2026-06-16 governance rulings:
+
+1. **JM Works: fiction or nonfiction-only?** (Section 1, JM Works) — confirm whether JM Works accepts commercial fiction.
+2. **JM Little age band boundaries** (Section 1, JM Little) — confirm picture book / early reader / middle grade age ranges.
+3. **JM Verse: literary fiction?** (Section 1, JM Verse) — confirm whether JM Verse accepts literary fiction in addition to poetry.
+4. **Editorial path score thresholds** (Section 5) — confirm numeric score thresholds for Developmental First and Hold — Not Ready; confirm Co-Development if used.
+5. **ethicsFlag threshold** (Section 6) — confirm what distinguishes an ethics concern from a hard stop in borderline cases.
+6. **rightsConcernFlag fair-use threshold** (Section 6) — confirm the quotation length or type threshold that triggers a permissions concern vs. fair use.
+7. **authorInvestmentFit: Misaligned routing** (Section 7) — confirm whether Misaligned triggers a separate routing note or is handled via the Suitability concern trigger phrase.
+8. **timelineFit: additional signals** (Section 7) — confirm whether the intake form captures timeline signals beyond what is listed.
+
+## Governance Rulings Applied (2026-06-16)
+
+| Ruling | Applied |
+|---|---|
+| Scoring scale: 1–5 canonical | Yes — all 11 dimensions and authorReadinessScore converted from 1–10 to 1–5 |
+| JM Signature dual auth: BP-07, two Jackie actions | Yes — imprint definition and signatureReviewRequired section updated |
+| Hard stops: grounded on filed Section 4; author conduct/suitability demoted | Yes — hardStopFlag section rewritten; suitability concern moved to humanReviewTrigger enum |
+| Brand misalignment: Jackie's approved language | Yes — verbatim text applied |
+| AI caps: advisory framing, author-disclosed language | Yes — aiContentDisclosureNeeded rewritten with advisory framing |
+| humanReviewTrigger: closed enum | Yes — 11 approved phrases; freeform triggers disallowed |
+| Legal/defamation routing: High = Hard Stop; Low/moderate = Needs Manual Review | Yes — legalFlag and defamationRiskFlag sections updated |
+| Legacy exclusion: state as a rule | Yes — Section 8 legacy rule added |
+| Imprint fit: confirmed as advisory | Yes — Section 1 preamble added |
+| Package categories: confirmed | Yes — marker removed |
+| Publishing goals: confirmed | Yes — marker removed |
 
 ## Related Documents
 
