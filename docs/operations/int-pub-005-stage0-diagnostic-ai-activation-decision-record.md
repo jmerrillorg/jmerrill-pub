@@ -268,7 +268,7 @@ The following must be completed, verified, and documented before the runner may 
 | `CONTRACT_TEST_MODE` changed from `true` to `false` on `func-jm1-diagnostic-ai-runner` app settings | Not started |
 | Azure OpenAI / Foundry deployment alias `jm1-pub-diagnostic-primary` confirmed active and accessible from the Function App's managed identity | Not verified |
 | `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_VERSION` (or Foundry equivalents) added to Function App app settings via Key Vault references | Not started |
-| Prompt template `jm1-prompt-pub-stage0-diagnostic` created in `jm1pub_aiprompttemplates` Dataverse table with version `PUB-STAGE0-DIAGNOSTIC-V1` | Done — record ID `ef8acd4f-6869-f111-a826-000d3a14673b`, inactive shell, prompt body not yet authored, 2026-06-16 |
+| Prompt template `jm1-prompt-pub-stage0-diagnostic` created in `jm1pub_aiprompttemplates` Dataverse table with version `PUB-STAGE0-DIAGNOSTIC-V1` | Done — record ID `ef8acd4f-6869-f111-a826-000d3a14673b`, prompt body drafted 2026-06-16, inactive pending Jackie approval |
 | `jm1pub_groundingdependencies` field on prompt template populated with `knowledge.md` and other declared grounding dependencies | Done — field created on `jm1pub_aiprompttemplate`, value `knowledge.md` set on governance shell record, 2026-06-16 |
 | `knowledge.md` grounding file confirmed in governed location accessible to the AI runtime | Not verified |
 | DOCX and TXT extraction logic implemented in the Azure Function (transient, no persistence) | Not started |
