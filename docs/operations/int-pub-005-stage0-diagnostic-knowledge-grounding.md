@@ -70,6 +70,28 @@ All editorial content sections authored, approved, and uploaded. Version v1.0 is
 
 **Remaining blocker:** Prompt remains `jm1pub_active=false`. Runner remains `CONTRACT_TEST_MODE=true`. Real AI execution is not yet authorized. See ADR Section 15 for remaining implementation steps before activation.
 
+## Runner Read Verification
+
+The runner's managed identity read of `knowledge.md` was verified via direct HTTP contract test on 2026-06-16.
+
+| Field | Result |
+|---|---|
+| Test timestamp | 2026-06-16 (post PR #61 merge) |
+| HTTP status | 202 |
+| `knowledge.reachable` | `true` |
+| `knowledge.hashMatched` | `true` |
+| `knowledge.calculatedSha256` | `64e0e38f8a2cfdacf49fd8238b45939efbafef3bd23d526ab3d0d414b24e8a78` |
+| `knowledge.expectedSha256` | `64e0e38f8a2cfdacf49fd8238b45939efbafef3bd23d526ab3d0d414b24e8a78` |
+| `knowledge.byteLength` | `29232` |
+| `knowledge.etag` | `"0x8DECBF9A7DEF3A2"` |
+| `knowledge.lastModified` | `2026-06-16T22:50:25.000Z` |
+| `knowledge.md` content in response | Not present — metadata only |
+| Runner mode | `CONTRACT_TEST_MODE=true` |
+| AI execution | Not enabled |
+| Blob content logged | No — safe metadata only |
+
+Access confirmed: `func-jm1-diagnostic-ai-runner` managed identity reads `knowledge.md` via `@azure/storage-blob` + `DefaultAzureCredential` using `Storage Blob Data Reader` on `stjm1diagrunner`.
+
 ## Runner Implementation Note
 
 The `azure-functions/diagnostic-ai-runner/src/functions/runStage0Diagnostic.js` function must be updated (in a separate governed pass, after Jackie approves activation) to:

@@ -4,7 +4,7 @@
 
 This document describes the architecture, contract, and operational boundary for the `jm1-diagnostic-ai-runner` Azure Function. This function is the approved execution vehicle for the future side-effect-free INT-PUB-005 Stage 0 diagnostic AI call.
 
-**Current status:** Contract-test mode only. `CONTRACT_TEST_MODE=true`. Real AI execution is not enabled. The runner validates requests and returns HTTP 202 with a safe contract-test confirmation. It does not call any AI endpoint, read manuscripts, or write Dataverse.
+**Current status:** Contract-test mode only. `CONTRACT_TEST_MODE=true`. Real AI execution is not enabled. The runner validates requests, optionally reads and verifies the `knowledge.md` grounding file via managed identity, and returns HTTP 202 with a safe contract-test confirmation. It does not call any AI endpoint, read manuscripts, or write Dataverse.
 
 The runner will remain in contract-test mode until Jackie explicitly approves activation and all items in the activation checklist are satisfied. See:
 
@@ -55,10 +55,12 @@ In contract-test mode, the function:
 
 - Validates the `x-jm1-diagnostic-runner-key` header
 - Validates the request payload (diagnosticId, intakeReferenceCode, correlationId)
-- Returns HTTP 202 with a safe confirmation JSON
+- Optionally reads and SHA-256 verifies `knowledge.md` when `verifyKnowledge: true` is set in the request body
+- Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata if requested)
 - Does not call any AI service
 - Does not read or write Dataverse
 - Does not access SharePoint or the manuscript file
+- Does not return or log `knowledge.md` file content — metadata only
 
 Contract-test mode remains active until Jackie explicitly authorizes AI execution and all open decisions in the AI execution contract are resolved.
 
@@ -77,7 +79,9 @@ Contract-test mode remains active until Jackie explicitly authorizes AI executio
 {
   "diagnosticId": "<UUID of the jm1pub_editorialdiagnostic record>",
   "intakeReferenceCode": "<JMP-INT-NNNNNN-... reference code>",
-  "correlationId": "<optional correlation key for log matching>"
+  "correlationId": "<optional correlation key for log matching>",
+  "mode": "contract-test",
+  "verifyKnowledge": true
 }
 ```
 
@@ -86,10 +90,12 @@ Contract-test mode remains active until Jackie explicitly authorizes AI executio
 | `diagnosticId` | Yes | UUID format (`/^[0-9a-f]{8}-[0-9a-f]{4}-…$/i`) |
 | `intakeReferenceCode` | Yes | JMP-INT reference pattern (`/^JMP-INT-\d{6}-[A-Z0-9-]+$/i`) |
 | `correlationId` | No | Alphanumeric, hyphens, underscores; max 100 characters |
+| `mode` | No | Informational field; does not change routing — `CONTRACT_TEST_MODE` is code-controlled |
+| `verifyKnowledge` | No | `true` (boolean) to trigger `knowledge.md` Blob read and SHA-256 verification |
 
 ## Response Contract
 
-### HTTP 202 — Contract-test accepted
+### HTTP 202 — Contract-test accepted (standard)
 
 ```json
 {
@@ -99,6 +105,50 @@ Contract-test mode remains active until Jackie explicitly authorizes AI executio
   "intakeReferenceCode": "<echoed from request>",
   "correlationId": "<echoed or null>",
   "message": "Diagnostic runner contract accepted. AI execution not enabled."
+}
+```
+
+### HTTP 202 — Contract-test accepted with knowledge verification
+
+Returned when `verifyKnowledge: true` and the blob is reachable with a matching hash.
+
+```json
+{
+  "status": "accepted",
+  "mode": "contract-test",
+  "diagnosticId": "<echoed from request>",
+  "intakeReferenceCode": "<echoed from request>",
+  "correlationId": "<echoed or null>",
+  "knowledge": {
+    "reachable": true,
+    "hashMatched": true,
+    "calculatedSha256": "<hex digest>",
+    "expectedSha256": "<hex digest from KNOWLEDGE_BLOB_SHA256>",
+    "byteLength": 29232,
+    "etag": "<blob etag>",
+    "lastModified": "<ISO 8601 timestamp>"
+  },
+  "message": "Diagnostic runner contract accepted. knowledge.md verified. AI execution not enabled."
+}
+```
+
+`knowledge.md` file content is never included in the response. The response contains safe metadata only.
+
+### HTTP 503 — Knowledge verification failed
+
+Returned when `verifyKnowledge: true` but the blob is unreachable or the hash does not match.
+
+```json
+{
+  "status": "error",
+  "code": "KNOWLEDGE_VERIFICATION_FAILED",
+  "diagnosticId": "<echoed from request>",
+  "knowledge": {
+    "reachable": false,
+    "hashMatched": false,
+    "expectedSha256": "<hex digest from env>",
+    "error": "<safe error description — no secrets>"
+  }
 }
 ```
 
@@ -129,6 +179,8 @@ Defined in `local.settings.example.json`. No values are committed to the reposit
 |---|---|---|
 | `JM1_DIAGNOSTIC_RUNNER_KEY` | Key Vault reference (`jm1-int-pub-005-diagnostic-runner-key`) | Pre-shared key for `x-jm1-diagnostic-runner-key` header authentication |
 | `CONTRACT_TEST_MODE` | App setting (plain) | `true` — keeps function in contract-test mode |
+| `KNOWLEDGE_BLOB_URL` | App setting (plain) | Full private Blob URL for `knowledge.md`; set to `https://stjm1diagrunner.blob.core.windows.net/knowledge/knowledge.md` |
+| `KNOWLEDGE_BLOB_SHA256` | App setting (plain) | Approved SHA-256 hex digest for `knowledge.md` v1.0; set to `64e0e38f8a2cfdacf49fd8238b45939efbafef3bd23d526ab3d0d414b24e8a78` |
 | `DATAVERSE_TENANT_ID` | App setting (plain) | Azure AD tenant ID — not used in contract-test mode |
 | `DATAVERSE_CLIENT_ID` | App setting | Service principal client ID — set before live use |
 | `DATAVERSE_CLIENT_SECRET` | App setting | Service principal secret — set before live use |
