@@ -13,6 +13,24 @@ This document does not authorize AI execution. Implementation requires Jackie's 
 - The existing flow `JM1 PUB - Run Diagnostic AI Assessment` (ID `56d5901d-874b-f111-bec7-6045bdd69678`) is not reused as-is. See Section 12 for the assessment.
 - No AI execution is authorized at this time.
 
+## 2b. Activation Decision Record
+
+The resolved activation design decisions — including canonical identifier mapping, prompt governance, grounding dependencies, manuscript boundary, confidence thresholds, output storage, logging contract, human review model, no-quotation discipline, and Legacy exclusion — are documented in:
+
+[`docs/operations/int-pub-005-stage0-diagnostic-ai-activation-decision-record.md`](./int-pub-005-stage0-diagnostic-ai-activation-decision-record.md)
+
+Key resolved items:
+
+| Item | Resolution |
+|---|---|
+| Canonical prompt template ID | `jm1-prompt-pub-stage0-diagnostic` |
+| Operational alias / version code | `PUB-STAGE0-DIAGNOSTIC-V1` |
+| Agent ID | `jm1-agent-pub-diagnostic-01` |
+| Canonical AI metadata log | `jm1_airequestlog` (canonical across JM1 Publishing AI agents) |
+| Summary-field no-quotation rule | `jm1_diagnosticoutputsummary` and all output/log fields must characterize only — never quote manuscript |
+| Legacy exclusion | Legacy-flagged intakes blocked from this runner path; deferred until a separate Legacy diagnostic path is approved |
+| Real AI | Still disabled. `CONTRACT_TEST_MODE=true`. |
+
 ## 2a. Approved Architecture
 
 **Decision:** Jackie approved the use of a new, isolated Azure Function for diagnostic-only AI execution.

@@ -4,6 +4,12 @@
 
 This document describes the architecture, contract, and operational boundary for the `jm1-diagnostic-ai-runner` Azure Function. This function is the approved execution vehicle for the future side-effect-free INT-PUB-005 Stage 0 diagnostic AI call.
 
+**Current status:** Contract-test mode only. `CONTRACT_TEST_MODE=true`. Real AI execution is not enabled. The runner validates requests and returns HTTP 202 with a safe contract-test confirmation. It does not call any AI endpoint, read manuscripts, or write Dataverse.
+
+The runner will remain in contract-test mode until Jackie explicitly approves activation and all items in the activation checklist are satisfied. See:
+
+[`docs/operations/int-pub-005-stage0-diagnostic-ai-activation-decision-record.md`](./int-pub-005-stage0-diagnostic-ai-activation-decision-record.md)
+
 ## Architecture Decision
 
 **Decision recorded:** Jackie approved the use of a new, isolated Azure Function for diagnostic-only AI execution.
@@ -134,6 +140,40 @@ Defined in `local.settings.example.json`. No values are committed to the reposit
 
 Azure OpenAI / Foundry endpoint and key variables are intentionally absent. They will be added in a separate governed pass, with Jackie's explicit authorization, after the open decisions in the AI execution contract are resolved.
 
+## Canonical Purpose and Identifier Mapping
+
+When real AI execution is authorized, this function executes the Stage 0 diagnostic AI call using the following canonical identifiers:
+
+| Identifier type | Value |
+|---|---|
+| Agent ID | `jm1-agent-pub-diagnostic-01` |
+| Canonical Prompt Template ID | `jm1-prompt-pub-stage0-diagnostic` |
+| Operational Prompt Alias / Version Code | `PUB-STAGE0-DIAGNOSTIC-V1` |
+| Production deployment alias | `jm1-pub-diagnostic-primary` |
+| Safe-test deployment alias | `jm1-pub-diagnostic-safe-test` |
+
+These identifiers must resolve consistently across ADR-008 (agent registry), ADR-011 (prompt template governance), and this runner. No AI call may proceed with an unregistered alias or unresolvable prompt ID.
+
+## No-Manuscript-Quotation Rule
+
+All output written by this runner — to Dataverse fields, AI Request Log, or Execution Log — must be characterization only. No field may contain:
+
+- Manuscript excerpts or verbatim passages
+- Quoted author-submitted prose
+- Any raw text extracted from the manuscript file
+
+This rule applies to `jm1_diagnosticoutputsummary`, `jm1_diagnosticstructuredoutputjson`, `jm1_diagnosticriskflags`, `jm1_airequestlog`, `jm1_executionlog`, and all error and notes fields.
+
+## Legacy-Exclusion Rule
+
+This runner must not process any manuscript associated with a Legacy-flagged intake or Legacy route. If a Legacy flag is detected during pre-flight:
+
+- Return a safe error without calling any AI endpoint
+- Set `jm1_diagnosticexecutionstatus` to Deferred or Exception with a safe internal note
+- Do not read or extract the manuscript file
+
+Legacy diagnostic processing requires a separate governed path approved by Jackie.
+
 ## Execution Boundary
 
 ### Permitted in this pass (contract-test mode)
@@ -142,21 +182,31 @@ Azure OpenAI / Foundry endpoint and key variables are intentionally absent. They
 - Validate request payload fields
 - Return safe contract-test confirmation
 
+### Permitted when AI execution is authorized (future)
+
+- Read Editorial Diagnostic and Publishing Intake metadata
+- Read the approved manuscript file (DOCX or TXT only) transiently in memory
+- Call the approved AI deployment alias using the approved prompt template
+- Write diagnostic results to approved Dataverse output fields
+- Write to `jm1_airequestlog` and `jm1_executionlog` (no raw manuscript text)
+
 ### Prohibited (permanent)
 
 - Opportunity creation
 - Author email send
 - Publishing package selection or commitment
 - Processing historical rows
-- Reading, downloading, attaching, moving, or exposing real manuscript files
-- Committing manuscript content, prompt text, secrets, tokens, headers, cookies, or PII
+- Storing raw manuscript text in any persistent medium
+- Reading Legacy-flagged manuscripts
+- Reading PDF or scanned-file formats (deferred)
 - Calling `JM1 PUB - Run Diagnostic AI Assessment`
+- Committing manuscript content, prompt text, secrets, tokens, headers, cookies, or PII to logs or repo
 
 ### Prohibited until explicitly authorized
 
 - Any AI call (Azure OpenAI, Foundry, OpenAI, or any other endpoint)
-- Dataverse reads or writes
-- SharePoint access
+- Changing `CONTRACT_TEST_MODE` from `true` to `false`
+- Manuscript file access
 
 ## File Structure
 
