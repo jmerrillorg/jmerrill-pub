@@ -6,12 +6,12 @@ This document is the editorial content review artifact for the Stage 0 Diagnosti
 `jm1-prompt-pub-stage0-diagnostic`. It presents the full approved and proposed content for
 `knowledge.md` — the AI grounding file stored at `stjm1diagrunner/knowledge/knowledge.md`.
 
-**The blob must not be overwritten until all remaining `[Jackie: confirm]` markers are resolved.**
+**All `[Jackie: confirm]` markers are resolved. Blob may be finalized after Jackie approves this PR.**
 
 Source documents: `JMP_Product_Reference_Guide_v1_1.docx` and `JMP_Full_Catalog_v2_1.docx`
 (May 2026, v2.1/v1.1 canon, Internal Use Only).
 
-Jackie's governance rulings applied in this revision (2026-06-16):
+Jackie's governance rulings applied in this revision (2026-06-16 — pass 1):
 - Scoring scale: canonical 1–5 (not 1–10). All band descriptions converted.
 - JM Signature dual authorization: BP-07 — two deliberate Jackie actions, not two people.
 - Hard stops: grounded on filed knowledge.md Section 4 table. Author conduct/suitability
@@ -23,7 +23,19 @@ Jackie's governance rulings applied in this revision (2026-06-16):
 - Legacy exclusion: stated as a rule in Section 8, not only as a trigger phrase.
 - Imprint fit, package categories, publishing goals: confirmed as canon.
 
-Items marked `[Jackie: confirm]` remain open and must be resolved before the blob is finalized.
+Jackie's governance rulings applied in this revision (2026-06-16 — pass 2, final):
+- JM Works scope: confirmed — commercial fiction + general trade nonfiction (not nonfiction-only).
+- JM Little age bands: Picture Book 0–8, Early Reader 5–9, Middle Grade 8–12. YA → Jackie review.
+- JM Verse scope: poetry-first. Literary fiction routes to JM Works unless substantially verse-driven.
+- Editorial path thresholds: Developmental First = averageScore 3.0–4.1; Hold = below 3.0.
+  Co-Development is a human-review path only — not automatic routing.
+- Ethics/hard-stop borderline: borderline = human-review flag; hard stop = clear material unresolved risk.
+- Fair-use / rights threshold: diagnostic must not decide fair use. Meaningful third-party
+  content always triggers rightsConcernFlag. Short ordinary references unflagged unless central/unclear.
+- authorInvestmentFit = Misaligned: always emit humanReviewTrigger = "Suitability concern requires Jackie review".
+- timelineFit values: confirmed (Aligned / Accelerated / Flexible / Unclear) + timeline signal list.
+
+All [Jackie: confirm] markers are resolved. The blob may now be finalized after Jackie approves this PR.
 
 After all markers are resolved:
 1. Remove all remaining `[Jackie: confirm]` markers.
@@ -69,35 +81,47 @@ distribution channel, devotional or Bible study expansion potential.
 ### JM Works
 Formerly: J Merrill Voices (legacy — retired)
 AI content cap: 15% (internal review threshold — see Section 6)
-Focus: General trade nonfiction imprint. Self-help, memoir, health, how-to, and practical
-nonfiction. Broader submission latitude than J Merrill Publishing. Suited for authors with
-a defined audience and practical or personal subject matter that does not require a faith
-frame but is compatible with JM1 values and care standard.
+Focus: General trade imprint — commercial fiction and general trade nonfiction. JM Works
+is not nonfiction-only. It accepts self-help, memoir, health, how-to, practical nonfiction,
+commercial fiction, and broad-reader trade work that does not belong in the faith, children's,
+poetry, or Signature lanes. Broader submission latitude than J Merrill Publishing. Content
+does not require a faith frame but must be compatible with JM1 values and care standard.
 Fit signals: Practical or instructional nonfiction, personal memoir, health/wellness subject
-matter, defined community or professional audience.
-[Jackie: confirm whether JM Works also accepts commercial fiction or is nonfiction-only]
+matter, commercial fiction, defined community or professional audience.
 
 ### JM Little
 Formerly: J Merrill Kids (legacy — retired)
 AI content cap: 10% (internal review threshold — see Section 6)
-Focus: Children's imprint. Picture books, early reader, and illustrated manuscripts. Author
-must supply illustrations (JMP-PKG-CHILD) or elect illustration services (JMP-CHILD-ILLUS).
-Age appropriateness is a hard diagnostic requirement — content maturity must match the stated
-or apparent target audience age range. Illustration readiness is assessed for all submissions.
-Fit signals: Target audience is children or young readers; manuscript is written in a register
-appropriate to the stated age range; author has art supplied or is prepared to commission it.
-[Jackie: confirm age band boundaries for JM Little (picture book / early reader / middle grade)]
+Focus: Children's imprint. Picture books, early reader, and middle grade illustrated
+manuscripts. Author must supply illustrations (JMP-PKG-CHILD) or elect illustration services
+(JMP-CHILD-ILLUS). Age appropriateness is a hard diagnostic requirement — content maturity
+must match the stated or apparent target audience age range. Illustration readiness is assessed
+for all submissions.
+
+Age bands:
+- Picture Book: ages 0–8
+- Early Reader: ages 5–9
+- Middle Grade: ages 8–12
+
+YA (Young Adult) is not JM Little by default — route YA submissions to Jackie review via
+`humanReviewTrigger = "Imprint fit requires Jackie review"`.
+
+Fit signals: Target audience is children (ages 0–12); manuscript register is appropriate to
+the stated age band; author has art supplied or is prepared to commission it.
 
 ### JM Verse
 Formerly: J Merrill Lit (legacy — retired)
 AI content cap: 5% (internal review threshold — see Section 6)
-Focus: Poetry and literary imprint. Single-author collections, chapbooks, and hybrid
-prose-poetry works. Prosodic control and structural coherence across the collection are the
-primary assessment dimensions. Commercial potential is weighted less heavily than formal and
-artistic quality for this imprint.
-Fit signals: Verse collection or chapbook; strong formal control or intentional experimental
-form; coherent organizing principle across the collection; author's voice is the work.
-[Jackie: confirm whether JM Verse accepts literary fiction in addition to poetry]
+Focus: Poetry-first imprint. JM Verse is not a general literary-fiction imprint. It accepts
+single-author poetry collections, chapbooks, spoken-word and verse projects, reflective poetic
+prose, and hybrid verse works where the verse or poetry dimension is central. Prosodic control
+and structural coherence across the collection are the primary assessment dimensions.
+Commercial potential is weighted less heavily than formal and artistic quality for this imprint.
+Literary fiction should route to JM Works unless the manuscript is substantially verse- or
+poetry-driven.
+Fit signals: Verse collection or chapbook; poetry-driven hybrid form; spoken-word project;
+strong formal control or intentional experimental form; coherent organizing principle across
+the collection; author's voice is the work.
 
 ### JM Signature
 No legacy name.
@@ -290,14 +314,13 @@ without Jackie's explicit approval.
 | Editorial path | When to recommend | Notes |
 |---|---|---|
 | `Standard` | Manuscript is editorially ready or near-ready (structureFlow ≥ 4) | Full editorial process included in publishing package |
-| `Developmental First` | Voice or concept has potential but structureFlow or clarityGrammar ≤ 3 | Developmental edit needed before standard editorial pass |
+| `Developmental First` | averageScore 3.0–4.1, OR strong concept with craft/structure/clarity/editorial-development gaps | Developmental edit needed before standard editorial pass |
 | `Children's` | JM Little submission | Specialized children's editorial path; includes illustration coordination |
 | `Poetry` | JM Verse submission | Specialized poetry editorial path; poetryFormStructure is primary dimension |
 | `Signature Review` | Exceptional work with signals consistent with JM Signature imprint | Must set `signatureReviewRequired = true`; BP-07 dual authorization required |
-| `Hold — Not Ready` | Work shows promise but needs author-side development before editorial investment | Author needs to revise; use `humanReviewTrigger = "Editorial path requires manual review"` |
+| `Hold — Not Ready` | averageScore below 3.0, OR missing manuscript readiness / unclear rights / incomplete core intake data / insufficient context for responsible advancement | Use `humanReviewTrigger = "Editorial path requires manual review"` |
 | `Do Not Advance` | Work does not meet minimum criteria for any current imprint or path | See Section 4 (hard-stop table); diagnostic holds and routes — does not reject |
-
-[Jackie: confirm path names, descriptions, and score thresholds for Developmental First and Hold — Not Ready. Add Co-Development or other paths if used.]
+| `Co-Development` | Human-review path only — not automatic routing | Jackie assigns Co-Development after reviewing the diagnostic; the agent must not set this path directly |
 
 ---
 
@@ -330,7 +353,12 @@ Set true when the submission raises an ethical concern that does not rise to a h
 requires editorial judgment before advancement. Examples: insensitive cultural representation,
 unacknowledged appropriation, framing concerns in memoir or narrative nonfiction, content that
 may be harmful to a reader group.
-[Jackie: confirm threshold — what distinguishes an ethics concern from a hard stop in borderline cases?]
+
+Borderline threshold: a borderline ethics concern is a human-review flag (`ethicsFlag = true`),
+not an automated hard stop. A hard stop applies only when there is a clear, material, unresolved
+ethical/legal/rights/reputational risk that JMP should not advance without Jackie's explicit
+clearance. When in doubt, set `ethicsFlag = true` and route for human review — do not set
+`hardStopFlag` on ambiguity alone.
 
 ### legalFlag
 Set true when the submission raises a legal concern.
@@ -363,10 +391,21 @@ or JM Little. But content that conflicts with JMP's posture or would damage part
 triggers this flag regardless of imprint.
 
 ### rightsConcernFlag
-Set true when the submission includes third-party content (lyrics, extended quotations,
-illustrations, or other materials) where rights status is unclear and permissions may be
-required before publication.
-[Jackie: confirm fair-use threshold — at what point does a quotation shift from fair use to requiring permissions clearance?]
+Set true when the submission includes third-party content where rights status is unclear
+and permissions may be required before publication.
+
+The diagnostic must not decide fair use. When meaningful third-party content is detected,
+set `rightsConcernFlag = true` and route for review. The following always trigger this flag:
+- Lyrics (song lyrics, hymns, musical works)
+- Poetry by other authors
+- Scripture-heavy use beyond incidental reference
+- Extended excerpts or quoted material central to the work
+- Images, illustrations, or branded material with unclear licensing
+- Any third-party content where repetition, centrality, or volume suggests it may require clearance
+
+Short ordinary references (a title, a name, a brief passing quotation) may be left unflagged
+unless they are repeated, central to the argument, or the rights status is unclear. When in
+doubt, set `thirdPartyContentDetected = true` and add a note in `rightsConcernNotes`.
 
 ### thirdPartyContentDetected
 Set true when third-party content is present regardless of apparent rights status.
@@ -443,7 +482,11 @@ process requires.
 | `Unclear` | Insufficient information to assess |
 | `Misaligned` | Stated goals appear to conflict with what the imprint or path requires |
 
-[Jackie: confirm whether Misaligned triggers a suitability routing note or is handled via humanReviewTrigger = "Suitability concern requires Jackie review"]
+When `authorInvestmentFit = Misaligned`, always emit:
+`humanReviewTrigger = "Suitability concern requires Jackie review"`
+
+No separate routing note is required unless the `diagnosticSummary` needs a brief
+characterization of the nature of the misalignment (without quoting the author).
 
 ### timelineFit
 Compatibility of author's implied or stated timeline with JM1 Publishing's production schedule.
@@ -457,7 +500,13 @@ audiobook +2–3 weeks; rush production available via JMP-OPS-RUSH (+25%).
 | `Flexible` | Author has indicated flexibility; no constraint |
 | `Unclear` | No timeline information available |
 
-[Jackie: confirm these values and add any additional timeline signals from the intake form]
+These four values are confirmed. Timeline signals the agent may use to assess this field:
+- Desired release date (explicit or implied)
+- Urgency language in the intake form
+- Manuscript readiness signals (a complete manuscript ready now vs. still in progress)
+- Launch, event, or ministry deadline references
+- Seasonal or holiday timing references
+- Whether the expected timeline appears realistic given the applicable package and editorial path
 
 ---
 
@@ -571,24 +620,18 @@ submission must trigger `aiContentDisclosureNeeded = true` in addition to `signa
 
 | | Count |
 |---|---|
-| `[Jackie: confirm]` markers before this revision | 32 |
-| `[Jackie: confirm]` markers after this revision | **8** |
-| Markers resolved by Jackie's governance rulings | 24 |
+| `[Jackie: confirm]` markers before pass 1 | 32 |
+| `[Jackie: confirm]` markers after pass 1 | 8 |
+| `[Jackie: confirm]` markers after pass 2 (this revision) | **0** |
+| Total markers resolved across both passes | 32 |
 
-## Remaining `[Jackie: confirm]` Items (8)
+## Remaining `[Jackie: confirm]` Items
 
-These are the only items not covered by Jackie's 2026-06-16 governance rulings:
+None. All markers resolved.
 
-1. **JM Works: fiction or nonfiction-only?** (Section 1, JM Works) — confirm whether JM Works accepts commercial fiction.
-2. **JM Little age band boundaries** (Section 1, JM Little) — confirm picture book / early reader / middle grade age ranges.
-3. **JM Verse: literary fiction?** (Section 1, JM Verse) — confirm whether JM Verse accepts literary fiction in addition to poetry.
-4. **Editorial path score thresholds** (Section 5) — confirm numeric score thresholds for Developmental First and Hold — Not Ready; confirm Co-Development if used.
-5. **ethicsFlag threshold** (Section 6) — confirm what distinguishes an ethics concern from a hard stop in borderline cases.
-6. **rightsConcernFlag fair-use threshold** (Section 6) — confirm the quotation length or type threshold that triggers a permissions concern vs. fair use.
-7. **authorInvestmentFit: Misaligned routing** (Section 7) — confirm whether Misaligned triggers a separate routing note or is handled via the Suitability concern trigger phrase.
-8. **timelineFit: additional signals** (Section 7) — confirm whether the intake form captures timeline signals beyond what is listed.
+## Governance Rulings Applied
 
-## Governance Rulings Applied (2026-06-16)
+### Pass 1 (2026-06-16)
 
 | Ruling | Applied |
 |---|---|
@@ -603,6 +646,19 @@ These are the only items not covered by Jackie's 2026-06-16 governance rulings:
 | Imprint fit: confirmed as advisory | Yes — Section 1 preamble added |
 | Package categories: confirmed | Yes — marker removed |
 | Publishing goals: confirmed | Yes — marker removed |
+
+### Pass 2 (2026-06-16) — Final
+
+| Ruling | Applied |
+|---|---|
+| JM Works scope: commercial fiction + general trade nonfiction | Yes — imprint definition rewritten |
+| JM Little age bands: 0–8 / 5–9 / 8–12; YA → Jackie review | Yes — age bands added; YA routing note added |
+| JM Verse: poetry-first; literary fiction → JM Works unless verse-driven | Yes — imprint definition updated |
+| Editorial path thresholds: Developmental First 3.0–4.1; Hold below 3.0; Co-Development human-review only | Yes — table updated with canonical 1–5 averages and Co-Development row |
+| Ethics borderline = human-review flag; hard stop = clear material unresolved risk | Yes — ethicsFlag section updated |
+| Fair-use threshold: diagnostic must not decide fair use; meaningful content always flags | Yes — rightsConcernFlag section rewritten |
+| authorInvestmentFit Misaligned: always emit Suitability concern trigger | Yes — trigger rule stated explicitly |
+| timelineFit: confirmed values + timeline signal list | Yes — signal list added |
 
 ## Related Documents
 
