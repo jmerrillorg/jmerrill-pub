@@ -1,5 +1,8 @@
 const { app } = require("@azure/functions");
+const path = require("node:path");
+const fs = require("node:fs");
 const { verifyKnowledgeBlob } = require("../blob/knowledgeReader");
+const { extractManuscript } = require("../extraction/manuscriptExtractor");
 
 const CONTRACT_TEST_MODE = true;
 
@@ -148,6 +151,62 @@ app.http("run-stage0-diagnostic", {
               lastModified: knowledgeMeta.lastModified
             },
             message: "Diagnostic runner contract accepted. knowledge.md verified. AI execution not enabled."
+          }
+        };
+      }
+
+      const verifyExtraction = body.verifyExtraction === true;
+      const syntheticFixture = typeof body.syntheticFixture === "string" ? body.syntheticFixture.toLowerCase() : null;
+
+      if (verifyExtraction) {
+        const ALLOWED_FIXTURES = ["txt", "docx"];
+        if (!syntheticFixture || !ALLOWED_FIXTURES.includes(syntheticFixture)) {
+          context.warn(`Extraction verify rejected: invalid syntheticFixture='${syntheticFixture}'`);
+          return validationError("INVALID_SYNTHETIC_FIXTURE", diagnosticId);
+        }
+
+        const fixtureName = `synthetic-stage0.${syntheticFixture}`;
+        const fixturePath = path.join(__dirname, "..", "..", "test", "fixtures", fixtureName);
+
+        let fileBuffer;
+        try {
+          fileBuffer = fs.readFileSync(fixturePath);
+        } catch {
+          context.error(`Extraction verify: fixture not found at ${fixturePath}`);
+          return { status: 503, jsonBody: { status: "error", code: "FIXTURE_NOT_FOUND", diagnosticId } };
+        }
+
+        const ext = `.${syntheticFixture}`;
+        const extractionResult = await extractManuscript(ext, fileBuffer);
+
+        if (!extractionResult.supported) {
+          return { status: 503, jsonBody: { status: "error", code: "EXTRACTION_TYPE_NOT_SUPPORTED", diagnosticId, extraction: { supported: false, fileType: ext } } };
+        }
+
+        context.info(
+          `Extraction verify ok; diagnosticId=${diagnosticId}; fixture=${fixtureName}; byteLength=${extractionResult.byteLength}; wordCount=${extractionResult.wordCount}; charCount=${extractionResult.charCount}; contentReturned=${extractionResult.contentReturned}`
+        );
+
+        return {
+          status: 202,
+          jsonBody: {
+            status: "accepted",
+            mode: "contract-test",
+            diagnosticId,
+            intakeReferenceCode,
+            correlationId,
+            extraction: {
+              supported: extractionResult.supported,
+              fileType: extractionResult.fileType,
+              byteLength: extractionResult.byteLength,
+              charCount: extractionResult.charCount,
+              wordCount: extractionResult.wordCount,
+              lineCount: extractionResult.lineCount,
+              sha256: extractionResult.sha256,
+              extractionWarnings: extractionResult.extractionWarnings,
+              contentReturned: extractionResult.contentReturned
+            },
+            message: `Diagnostic runner contract accepted. Synthetic ${syntheticFixture.toUpperCase()} extraction verified. AI execution not enabled.`
           }
         };
       }
