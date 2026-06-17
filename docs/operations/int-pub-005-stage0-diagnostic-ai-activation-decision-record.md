@@ -17,7 +17,7 @@ This document records the resolved activation design decisions for the INT-PUB-0
 | Flow D — manuscript asset gate | Live |
 | Diagnostic AI Runner Azure Function (`func-jm1-diagnostic-ai-runner`) | Deployed. `CONTRACT_TEST_MODE=false`, `JM1_AI_EXECUTION_ENABLED=true`. Synthetic AI tests authorized under Approval 1. |
 | Flow D → Runner integration | Live. Real manuscript processing via Flow D not authorized until Approval 2. |
-| Real AI execution | **Controlled synthetic AI test authorized under Approval 1** (2026-06-17). Real manuscript processing requires Approval 2. |
+| Real AI execution | **Approval 2 granted 2026-06-17** — one limited real-manuscript diagnostic pilot authorized. See Section 18. General production execution, author-facing output, Opportunity creation, and author email remain prohibited. |
 
 ## 3. Approved Activation Decisions
 
@@ -556,6 +556,80 @@ The following must be completed before Approval 2 (limited production diagnostic
 | Jackie review of Claude Sonnet output for editorial quality, confidence calibration, and safety | **Done** — 2026-06-17. Sonnet confirmed preferred for REV. Risk-flag behavior (cautious, explicit) preferred over gpt-4o-mini (empty array). `jm1_confidence: 0` on synthetic content confirmed correct. See Section 16b Jackie interpretation. |
 | Decision on whether `jm1-pub-diagnostic-primary` alias is reassigned or a new alias is created for Sonnet | **Resolved by provider abstraction** — `JM1_AI_PROVIDER` selects provider at runtime. `jm1-pub-diagnostic-primary` remains the Azure OpenAI deployment. Anthropic uses `ANTHROPIC_MODEL` directly. No alias reassignment needed. |
 | `knowledge.md` editorial content completed by Jackie (imprint definitions, scoring weights, genre taxonomy, editorial paths, risk guidance, confidence calibration) | **Done** — PR #73, 2026-06-17. v1.1 live: 35,754 bytes, SHA-256 `771c0b6d…`, ETag `"0x8DECC63EAC29DE7"`. Added Section 2a (dimension weights per imprint) and Section 2b (confidence calibration: baseline, upward/downward adjustments, hard caps, confidence-to-routing table). Runner `hashMatched=true` verified. `KNOWLEDGE_BLOB_SHA256` app setting updated. |
-| Approval 2 statement from Jackie | **Pending — ready for Jackie decision** |
+| Approval 2 statement from Jackie | **Granted 2026-06-17** — one limited real-manuscript diagnostic pilot. See Section 18. |
 
-**Current runner state:** AI gates open (`CONTRACT_TEST_MODE=false`, `JM1_AI_EXECUTION_ENABLED=true`). `JM1_AI_PROVIDER=anthropic`. `ANTHROPIC_MODEL=claude-sonnet-4-6`. `knowledge.md` v1.1 live and hash-verified. All pre-Approval 2 requirements are complete. **Approval 2 decision is the only remaining blocker.** Real manuscript processing remains prohibited until Approval 2 is granted.
+**Current runner state:** Approval 2 granted 2026-06-17. One limited real-manuscript diagnostic pilot authorized. Provider: `anthropic` / `claude-sonnet-4-6`. `knowledge.md` v1.1. Pilot manuscript must be explicitly selected by Jackie, must have passed the manuscript asset gate, and must use the full governed pipeline. Jackie review required before any decision to expand.
+
+## 18. Approval 2 — Limited Real-Manuscript Diagnostic Pilot
+
+### Approval statement
+
+**Granted by:** Jackie Merrill
+**Date:** 2026-06-17
+**Scope:** One limited real-manuscript diagnostic pilot
+
+> "I approve INT-PUB-005 for one limited real-manuscript diagnostic pilot. This approval authorizes the Diagnostic AI Runner to process one approved manuscript asset that has passed the manuscript asset gate and is explicitly selected for this pilot. This approval does not authorize general production diagnostic execution, author-facing AI output, Opportunity creation, author emails, automatic package recommendations, or unattended pipeline advancement. The pilot diagnostic must use the approved provider/model configuration, the governed knowledge.md v1.1 grounding file, no-quotation validation, confidence routing, metadata-safe logging, and human review before any further action. The result must be reviewed by Jackie before any decision is made to expand beyond this single pilot."
+
+### What Approval 2 authorizes
+
+| Authorized | Condition |
+|---|---|
+| One real-manuscript diagnostic pilot call | Manuscript must be explicitly selected by Jackie; must have passed the manuscript asset gate |
+| `claude-sonnet-4-6` via Anthropic provider | `JM1_AI_PROVIDER=anthropic`, `ANTHROPIC_MODEL=claude-sonnet-4-6` |
+| `knowledge.md` v1.1 grounding | SHA-256 `771c0b6d…` — runner must confirm `hashMatched=true` before any real manuscript call |
+| No-quotation validation on all output fields | Must pass before metadata write |
+| Confidence routing per Section 8 thresholds | `requiresHumanReview=true` always |
+| Metadata-safe logging to `jm1_airequestlog` and `jm1_executionlog` | Safe fields only; prohibited fields never written |
+| Jackie review of pilot result | Required before any further action |
+
+### What Approval 2 does not authorize
+
+| Not authorized |
+|---|
+| General production diagnostic execution on multiple manuscripts |
+| Author-facing AI output of any kind |
+| Opportunity creation |
+| Author email send |
+| Automatic package recommendation to author |
+| Unattended pipeline advancement |
+| Expansion beyond one pilot manuscript without a separate explicit Jackie decision |
+| Flow D calling the runner automatically for any record |
+| Any change to the prompt template without a separate governed pass |
+| Any change to `knowledge.md` without Jackie approval and a separate PR |
+
+### Pilot execution requirements
+
+Before the pilot call is made, the following must be confirmed:
+
+| Requirement | Detail |
+|---|---|
+| Manuscript explicitly selected by Jackie | Jackie must name the specific manuscript / Editorial Diagnostic record |
+| Manuscript asset gate passed | `jm1pub_editorialdiagnostic` record must confirm manuscript asset is available |
+| Legacy-exclusion check passed | Record must not be Legacy-flagged |
+| `diagnosticId` confirmed | UUID from the `jm1pub_editorialdiagnostic` record |
+| `intakeReferenceCode` confirmed | `JMP-INT-…` code from the related Publishing Intake |
+| `knowledge.md` `hashMatched=true` | Runner confirms at pipeline start |
+| No-quotation validation | Must pass on all output fields before metadata write |
+| All output internal | No output shared with author before Jackie review |
+
+### Pilot result record
+
+_To be completed after Jackie selects the pilot manuscript and the diagnostic is run._
+
+| Item | Value |
+|---|---|
+| Pilot date | — |
+| Manuscript / Diagnostic ID | — |
+| Intake reference | — |
+| HTTP status | — |
+| Gate state | — |
+| knowledge.md hashMatched | — |
+| Tokens | — |
+| No-quotation validation | — |
+| Confidence | — |
+| Routing status | — |
+| AI Request Log ID | — |
+| Execution Log ID | — |
+| Jackie review date | — |
+| Jackie review outcome | — |
+| Expansion decision | — |
