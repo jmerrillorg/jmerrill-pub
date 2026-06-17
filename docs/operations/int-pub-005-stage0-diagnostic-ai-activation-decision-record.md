@@ -86,7 +86,7 @@ Grounding dependencies must not be left implicit. The canonical diagnostic promp
 
 **Access:** Azure Function managed identity (`e8c51a80-bdb0-46fa-b398-9109719d6427`) has `Storage Blob Data Reader` on `stjm1diagrunner`. The runner reads this file via `@azure/storage-blob` + `DefaultAzureCredential` at startup.
 
-**File status:** Draft skeleton uploaded 2026-06-16. Editorial content (imprint definitions, scoring weights, package categories, editorial paths, risk guidance) not yet authored. Jackie must review and complete the file before activation.
+**File status:** v1.1 live as of 2026-06-17T11:31:04Z. SHA-256: `771c0b6d198ba47abf0c2cc411a49a0c16a7fee4b0960403e08d41da433fb957`. All sections complete including v1.1 additions: Section 2a (Scoring Dimension Weights by Imprint) and Section 2b (Confidence Score Calibration). Runner `hashMatched=true` verified 2026-06-17. See knowledge grounding doc for full version history.
 
 Additional grounding dependencies (e.g. style guide, genre taxonomy) must be declared explicitly before use. Undeclared grounding is a pre-execution blocker.
 
@@ -483,8 +483,8 @@ All fields characterization only. No manuscript text. No prompt leakage.
 | Execution Log created | **Pass** — `5b5507e3-3e6a-f111-a826-000d3a14673b` |
 | No manuscript text in any log field | **Pass** — metadata only |
 | ANTHROPIC_API_KEY not in response | **Pass** — key material never returned or logged |
-| Sonnet output quality vs gpt-4o-mini | **See Jackie interpretation below** |
-| Approval 2 decision | **See below** |
+| Sonnet output quality vs gpt-4o-mini | **Pass — Sonnet preferred for REV** — risk-flag behavior is more editorially honest and cautious than gpt-4o-mini. Jackie reviewed 2026-06-17. |
+| Approval 2 decision | **Deferred — knowledge.md doctrine must be completed first** |
 
 ### Comparison: gpt-4o-mini (PR #70) vs claude-sonnet-4-6 (PR #72)
 
@@ -499,23 +499,32 @@ All fields characterization only. No manuscript text. No prompt leakage.
 
 **Notable difference:** Claude Sonnet returned structured risk flags on synthetic content where gpt-4o-mini returned an empty array. Both correctly returned `jm1_confidence: 0` — appropriate behavior for a synthetic fixture that carries no real editorial substance. Neither fabricated editorial direction.
 
-### Jackie's interpretation (for completion after review)
+### Jackie's interpretation (2026-06-17)
 
-_Pending Jackie review. The following questions should be answered:_
+Sonnet's risk-flag behavior is preferable to gpt-4o-mini's for REV / intake editorial review. The key distinction: gpt-4o-mini treated the synthetic fixture as not requiring risk flags; Sonnet explicitly flagged the synthetic nature and limited substance. For real manuscript diagnostics, this posture is more editorially honest — it preserves concern in the structured output rather than suppressing it.
 
-1. Is the risk-flag behavior (Sonnet returning category labels vs gpt-4o-mini returning empty) the preferred approach for real manuscript flags?
-2. Is `jm1_confidence: 0` on synthetic content the expected signal, or should the prompt be adjusted to return `null` / omit confidence when the submission is non-evaluable?
-3. Is the Sonnet summary phrasing conservative enough for internal diagnostic use?
-4. Does this output suggest the prompt needs refinement before real manuscript use, or is it acceptable as-is?
+**Q1 — Should risk flags remain for synthetic/test content?**
+Yes. If a submission does not meet the bar for real editorial evaluation, that should be flagged. Sonnet's behavior is correct.
+
+**Q2 — Is `jm1_confidence: 0` appropriate for synthetic content?**
+Yes. A synthetic short fixture should not receive real editorial confidence. Low confidence → Needs Human Review → no author-facing action is the correct posture.
+
+**Q3 — Is the Sonnet summary phrasing conservative enough for internal use?**
+Yes. The phrasing is appropriately minimal and non-committal for non-real content.
+
+**Q4 — Does the prompt need refinement before real manuscript use?**
+The prompt behavior on synthetic content is acceptable. The prompt cannot be properly calibrated until `knowledge.md` editorial doctrine is complete (scoring weights, imprint definitions, genre taxonomy, risk guidance). `knowledge.md` completion is the prerequisite, not further prompt surgery at this stage.
+
+**Overall:** Sonnet is confirmed as the preferred model for INT-PUB-005 REV. The provider path is ready. The blocking dependency before Approval 2 is `knowledge.md` editorial doctrine — not code, not provider configuration.
 
 ### Approval 2 decision
 
-**Still deferred. This section will be completed after Jackie review.**
+**Deferred. `knowledge.md` doctrine must be completed and approved before Approval 2 can be considered.**
 
-The Anthropic provider path is verified end-to-end. The preferred model (`claude-sonnet-4-6`) calls successfully, passes safety validation, and writes safe metadata. The remaining blockers before Approval 2 are:
+The Anthropic provider path is verified end-to-end. The preferred model (`claude-sonnet-4-6`) is confirmed suitable for REV. The remaining blockers before Approval 2 are:
 
-1. Jackie review of Sonnet output (this section) and answers to the four interpretation questions above
-2. `knowledge.md` editorial content completed (imprint definitions, scoring weights, genre taxonomy, editorial paths, risk guidance) — currently draft skeleton only
+1. `knowledge.md` editorial content completed by Jackie: scoring weights, imprint fit definitions, genre taxonomy, human review triggers, risk flag rules, readiness levels, confidence calibration guidance, package-fit language, no-author-facing-output rule
+2. Jackie review and approval of completed `knowledge.md`
 3. Explicit Approval 2 statement from Jackie
 
 **What this test proves:**
@@ -544,9 +553,9 @@ The following must be completed before Approval 2 (limited production diagnostic
 | Provider abstraction in `modelCaller.js` to support Claude Sonnet (Azure AI Foundry or Anthropic API) | **Done** — PR #71, 2026-06-17. `JM1_AI_PROVIDER` env var selects `anthropic` or `azure-openai`. `anthropicProvider.js` calls Anthropic Messages API with `x-api-key` (never logged). `ANTHROPIC_MODEL=claude-sonnet-4-6` default. Gate enforcement unchanged. |
 | Claude Sonnet endpoint configured and accessible | **Done** — PR #72, 2026-06-17. `ANTHROPIC_API_KEY` set as Key Vault reference on `func-jm1-diagnostic-ai-runner`. `ANTHROPIC_MODEL=claude-sonnet-4-6`. `JM1_AI_PROVIDER=anthropic`. Key Vault RBAC enabled; MSI `Key Vault Secrets User` in place. Key resolves at runtime — never returned or logged. |
 | Second controlled synthetic real-AI test using Claude Sonnet | **Done** — PR #72, 2026-06-17. See Section 16b. HTTP 202, `ok=true`, 98 input / 95 output / 193 total tokens. No-quotation validation passed. Metadata logs created. No real manuscript processed. |
-| Jackie review of Claude Sonnet output for editorial quality, confidence calibration, and safety | **Pending** — Section 16b post-test checklist and four interpretation questions require Jackie response. |
+| Jackie review of Claude Sonnet output for editorial quality, confidence calibration, and safety | **Done** — 2026-06-17. Sonnet confirmed preferred for REV. Risk-flag behavior (cautious, explicit) preferred over gpt-4o-mini (empty array). `jm1_confidence: 0` on synthetic content confirmed correct. See Section 16b Jackie interpretation. |
 | Decision on whether `jm1-pub-diagnostic-primary` alias is reassigned or a new alias is created for Sonnet | **Resolved by provider abstraction** — `JM1_AI_PROVIDER` selects provider at runtime. `jm1-pub-diagnostic-primary` remains the Azure OpenAI deployment. Anthropic uses `ANTHROPIC_MODEL` directly. No alias reassignment needed. |
-| `knowledge.md` editorial content completed by Jackie (imprint definitions, scoring weights, genre taxonomy, editorial paths, risk guidance) | Not started — draft skeleton only as of 2026-06-17 |
-| Approval 2 statement from Jackie | Not started |
+| `knowledge.md` editorial content completed by Jackie (imprint definitions, scoring weights, genre taxonomy, editorial paths, risk guidance, confidence calibration) | **Done** — PR #73, 2026-06-17. v1.1 live: 35,754 bytes, SHA-256 `771c0b6d…`, ETag `"0x8DECC63EAC29DE7"`. Added Section 2a (dimension weights per imprint) and Section 2b (confidence calibration: baseline, upward/downward adjustments, hard caps, confidence-to-routing table). Runner `hashMatched=true` verified. `KNOWLEDGE_BLOB_SHA256` app setting updated. |
+| Approval 2 statement from Jackie | **Pending — ready for Jackie decision** |
 
-**Current runner state:** AI gates open (`CONTRACT_TEST_MODE=false`, `JM1_AI_EXECUTION_ENABLED=true`). `JM1_AI_PROVIDER=anthropic`. `ANTHROPIC_MODEL=claude-sonnet-4-6`. Synthetic Sonnet test complete (Section 16b). Jackie review of Sonnet output pending. `knowledge.md` editorial content not yet complete. Real manuscript processing remains prohibited until Approval 2.
+**Current runner state:** AI gates open (`CONTRACT_TEST_MODE=false`, `JM1_AI_EXECUTION_ENABLED=true`). `JM1_AI_PROVIDER=anthropic`. `ANTHROPIC_MODEL=claude-sonnet-4-6`. `knowledge.md` v1.1 live and hash-verified. All pre-Approval 2 requirements are complete. **Approval 2 decision is the only remaining blocker.** Real manuscript processing remains prohibited until Approval 2 is granted.
