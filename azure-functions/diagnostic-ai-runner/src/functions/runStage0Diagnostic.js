@@ -7,6 +7,8 @@ const { checkLegacyExclusion, parseLegacyFlag } = require("../preflight/legacyEx
 const { validateNoQuotation } = require("../validation/noQuotationValidator");
 const { routeDiagnosticResult } = require("../routing/confidenceRouter");
 const { writeMetadata } = require("../dataverse/metadataWriter");
+const { checkAiExecutionGate, getGateState } = require("../activation/aiExecutionGate");
+const { callModel } = require("../ai/modelCaller");
 
 const CONTRACT_TEST_MODE = true;
 
@@ -488,6 +490,236 @@ app.http("run-stage0-diagnostic", {
             message: allStagesPassed
               ? "Diagnostic runner synthetic end-to-end pipeline contract accepted. All 5 stages passed. AI execution not enabled."
               : "Diagnostic runner synthetic E2E pipeline completed with partial metadata write failure. Check metadataWrites for details."
+          }
+        };
+      }
+
+      const controlledAiTest = body.controlledAiTest === true;
+
+      if (controlledAiTest) {
+        // This branch is reachable in contract-test mode only to verify the gate
+        // is correctly closed. When Jackie Approval 1 is granted, CONTRACT_TEST_MODE
+        // will be set to false and JM1_AI_EXECUTION_ENABLED=true will be added to
+        // app settings — at that point this branch will perform a real model call
+        // using a synthetic fixture only.
+        const gate = checkAiExecutionGate(CONTRACT_TEST_MODE);
+        const gateState = getGateState(CONTRACT_TEST_MODE);
+
+        context.info(
+          `Controlled AI test requested; diagnosticId=${diagnosticId}; gate.permitted=${gate.permitted}; gate.reason=${gate.reason}`
+        );
+
+        if (!gate.permitted) {
+          return {
+            status: 200,
+            jsonBody: {
+              status: "gate-closed",
+              mode: "contract-test",
+              diagnosticId,
+              intakeReferenceCode,
+              correlationId,
+              gate: {
+                permitted: false,
+                reason: gate.reason,
+                contractTestModeActive: gateState.contractTestModeActive,
+                aiExecutionEnabled: gateState.aiExecutionEnabled
+              },
+              message: `Controlled AI test gate is closed: ${gate.reason}. No model call attempted. No manuscript processed.`
+            }
+          };
+        }
+
+        // Gate is open — run the controlled synthetic AI test.
+        // At this point CONTRACT_TEST_MODE must be false (Jackie Approval 1 granted).
+        const aiFixture = typeof body.syntheticFixture === "string" ? body.syntheticFixture.toLowerCase() : "txt";
+        const ALLOWED_AI_FIXTURES = ["txt", "docx"];
+        if (!ALLOWED_AI_FIXTURES.includes(aiFixture)) {
+          return validationError("INVALID_SYNTHETIC_FIXTURE", diagnosticId);
+        }
+
+        // Stage 1: Knowledge verification
+        const knowledgeMeta = await verifyKnowledgeBlob();
+        if (!knowledgeMeta.reachable || !knowledgeMeta.hashMatched) {
+          return {
+            status: 503,
+            jsonBody: { status: "error", code: "CONTROLLED_AI_KNOWLEDGE_FAILED", diagnosticId, failedStage: "knowledge", knowledge: { reachable: knowledgeMeta.reachable, hashMatched: knowledgeMeta.hashMatched } }
+          };
+        }
+
+        // Stage 2: Synthetic extraction only — no real manuscript
+        const aiFixturePath = path.join(__dirname, "..", "..", "test", "fixtures", `synthetic-stage0.${aiFixture}`);
+        let aiFileBuffer;
+        try {
+          aiFileBuffer = fs.readFileSync(aiFixturePath);
+        } catch {
+          return { status: 503, jsonBody: { status: "error", code: "CONTROLLED_AI_FIXTURE_NOT_FOUND", diagnosticId, failedStage: "extraction" } };
+        }
+
+        const aiExtractionResult = await extractManuscript(`.${aiFixture}`, aiFileBuffer);
+        if (!aiExtractionResult.supported) {
+          return { status: 503, jsonBody: { status: "error", code: "CONTROLLED_AI_EXTRACTION_UNSUPPORTED", diagnosticId, failedStage: "extraction" } };
+        }
+
+        // Stage 3: Build prompt from knowledge + synthetic extraction
+        // The prompt body is assembled here and passed to callModel — it is never
+        // returned in the response, never logged, never stored in Dataverse.
+        const knowledgeContent = knowledgeMeta.content || "";
+        const syntheticContentPlaceholder = `[SYNTHETIC FIXTURE: ${aiFixture.toUpperCase()} — ${aiExtractionResult.wordCount} words — contract-test only — not a real manuscript]`;
+        const promptKey = process.env.JM1_PROMPT_KEY || "jm1-prompt-pub-stage0-diagnostic";
+        const promptVersion = process.env.JM1_PROMPT_VERSION || "PUB-STAGE0-DIAGNOSTIC-V1";
+
+        const promptBody = [
+          knowledgeContent,
+          "",
+          "---",
+          "MANUSCRIPT (controlled synthetic fixture only — not a real submission):",
+          syntheticContentPlaceholder,
+          "---",
+          "",
+          "Provide a structured Stage 0 Diagnostic in JSON format with keys:",
+          "jm1_diagnosticoutputsummary, jm1_diagnosticriskflags, jm1_confidence (0.0-1.0), jm1_requireshumanreview (always true)"
+        ].join("\n");
+
+        context.info(
+          `Controlled AI test calling model; diagnosticId=${diagnosticId}; fixture=${aiFixture}; promptKey=${promptKey}`
+        );
+
+        const requestTimestamp = new Date().toISOString();
+        const modelResult = await callModel({
+          contractTestMode: CONTRACT_TEST_MODE,
+          promptBody,
+          diagnosticId,
+          promptKey,
+          promptVersion
+        });
+        const responseTimestamp = new Date().toISOString();
+
+        context.info(
+          `Model call complete; diagnosticId=${diagnosticId}; ok=${modelResult.ok}; httpStatus=${modelResult.httpStatus}; gateBlocked=${modelResult.gateBlocked}; tokens=${JSON.stringify(modelResult.tokenCounts)}`
+        );
+
+        if (!modelResult.ok) {
+          const errorCode = modelResult.gateBlocked
+            ? `GATE_BLOCKED_${modelResult.gateReason}`
+            : (modelResult.error || "MODEL_CALL_FAILED");
+
+          const metadataInputFail = {
+            diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
+            executionMode: "controlled-ai-test",
+            modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+            promptKey, promptVersion,
+            confidence: null,
+            requiresHumanReview: true,
+            tokenCounts: modelResult.tokenCounts,
+            requestTimestamp, responseTimestamp,
+            errorCode, errorMessage: modelResult.error
+          };
+          await writeMetadata(metadataInputFail);
+
+          return {
+            status: 503,
+            jsonBody: {
+              status: "error",
+              code: errorCode,
+              diagnosticId,
+              failedStage: "modelCall",
+              gate: { permitted: gate.permitted, reason: gate.reason },
+              tokens: modelResult.tokenCounts,
+              message: "Controlled AI test model call failed. Metadata logged."
+            }
+          };
+        }
+
+        // Stage 4: Output validation — required before any routing or logging
+        const aiOutput = modelResult.output || {};
+        const aiValidation = validateNoQuotation(aiOutput);
+
+        if (!aiValidation.valid) {
+          context.warn(
+            `Controlled AI test output failed no-quotation validation; diagnosticId=${diagnosticId}; violations=${aiValidation.violations.length}`
+          );
+
+          const metadataInputViolation = {
+            diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
+            executionMode: "controlled-ai-test",
+            modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+            promptKey, promptVersion,
+            confidence: null,
+            requiresHumanReview: true,
+            tokenCounts: modelResult.tokenCounts,
+            requestTimestamp, responseTimestamp,
+            errorCode: "OUTPUT_QUOTATION_VIOLATION",
+            errorMessage: `${aiValidation.violations.length} violation(s) in model output`
+          };
+          await writeMetadata(metadataInputViolation);
+
+          return {
+            status: 422,
+            jsonBody: {
+              status: "error",
+              code: "CONTROLLED_AI_OUTPUT_QUOTATION_VIOLATION",
+              diagnosticId,
+              failedStage: "outputValidation",
+              validation: { valid: false, violations: aiValidation.violations, fieldsChecked: aiValidation.fieldsChecked },
+              tokens: modelResult.tokenCounts,
+              message: "Model output failed no-quotation validation. No output forwarded. Metadata logged."
+            }
+          };
+        }
+
+        // Stage 5: Confidence routing
+        const confidence = typeof aiOutput.jm1_confidence === "number" ? aiOutput.jm1_confidence : null;
+        const aiRoutingDecision = routeDiagnosticResult({
+          confidence,
+          requiresHumanReview: true
+        });
+
+        // Stage 6: Metadata write — never includes prompt body or model response text
+        const metadataInputSuccess = {
+          diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
+          executionMode: "controlled-ai-test",
+          modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+          promptKey, promptVersion,
+          confidence,
+          requiresHumanReview: true,
+          tokenCounts: modelResult.tokenCounts,
+          requestTimestamp, responseTimestamp,
+          errorCode: null,
+          errorMessage: null
+        };
+
+        const aiWriteResult = await writeMetadata(metadataInputSuccess);
+
+        context.info(
+          `Controlled AI test complete; diagnosticId=${diagnosticId}; routing=${aiRoutingDecision.routingBasis}; aiRequestLog.created=${aiWriteResult.aiRequestLog.created}; executionLog.created=${aiWriteResult.executionLog.created}`
+        );
+
+        return {
+          status: 202,
+          jsonBody: {
+            status: "accepted",
+            mode: "controlled-ai-test",
+            diagnosticId,
+            intakeReferenceCode,
+            correlationId,
+            gate: { permitted: true, reason: gate.reason },
+            pipeline: {
+              legacyGate: { excluded: false },
+              knowledge: { reachable: knowledgeMeta.reachable, hashMatched: knowledgeMeta.hashMatched, byteLength: knowledgeMeta.byteLength },
+              extraction: { supported: aiExtractionResult.supported, fileType: aiExtractionResult.fileType, byteLength: aiExtractionResult.byteLength, wordCount: aiExtractionResult.wordCount, contentReturned: aiExtractionResult.contentReturned },
+              modelCall: { ok: true, httpStatus: modelResult.httpStatus, tokens: modelResult.tokenCounts },
+              outputValidation: { valid: true, violations: [], fieldsChecked: aiValidation.fieldsChecked },
+              confidenceRouting: { status: aiRoutingDecision.status, statusLabel: aiRoutingDecision.statusLabel, requiresHumanReview: true, lowConfidenceNote: aiRoutingDecision.lowConfidenceNote, routingBasis: aiRoutingDecision.routingBasis },
+              metadataWrites: { aiRequestLog: { created: aiWriteResult.aiRequestLog.created, id: aiWriteResult.aiRequestLog.id }, executionLog: { created: aiWriteResult.executionLog.created, id: aiWriteResult.executionLog.id } }
+            },
+            diagnosticOutput: {
+              jm1_diagnosticoutputsummary: aiOutput.jm1_diagnosticoutputsummary || null,
+              jm1_diagnosticriskflags: aiOutput.jm1_diagnosticriskflags || null,
+              jm1_confidence: confidence,
+              jm1_requireshumanreview: true
+            },
+            requiresHumanReview: true,
+            message: "Controlled synthetic real-AI test complete. Output requires Jackie review before any production use. No real manuscript processed. No author-facing action taken."
           }
         };
       }

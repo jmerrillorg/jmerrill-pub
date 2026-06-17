@@ -62,6 +62,7 @@ In contract-test mode, the function:
 - Optionally routes a synthetic diagnostic result through confidence-based routing when `verifyConfidenceRouting: true` and `syntheticResult: {...}` are set — returns routing decision with no Dataverse write
 - Optionally writes safe synthetic metadata to `jm1_airequestlog` and `jm1_executionlog` when `verifyMetadataWrites: true` is set — returns both record IDs; no manuscript text, prompt body, model output, secrets, or headers are stored
 - Optionally runs the full 5-stage synthetic pipeline when `verifyFullPipeline: true` is set: knowledge → extraction → output validation → confidence routing → metadata writes — returns all stage results in a single aggregated response
+- Responds to `controlledAiTest: true` with `gate-closed` status and full gate state (both gates closed while `CONTRACT_TEST_MODE=true`); when Jackie Approval 1 is granted and both gates are opened, executes the synthetic-fixture-only real-AI path: knowledge verify → synthetic extraction → model call → no-quotation validation → confidence routing → metadata write
 - Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata, extraction metadata, validation result, routing decision, or metadata write IDs if requested)
 - Does not call any AI service
 - Does not read or write Dataverse
@@ -402,9 +403,13 @@ azure-functions/diagnostic-ai-runner/
 │   │   └── noQuotationValidator.js      — No-quotation output field validator
 │   ├── routing/
 │   │   └── confidenceRouter.js          — Confidence-based routing (pure logic, no side effects)
-│   └── dataverse/
-│       ├── client.js                    — config validation stub (no live reads)
-│       └── metadataWriter.js            — safe metadata writer for jm1_airequestlog + jm1_executionlog
+│   ├── dataverse/
+│   │   ├── client.js                    — config validation stub (no live reads)
+│   │   └── metadataWriter.js            — safe metadata writer for jm1_airequestlog + jm1_executionlog
+│   ├── activation/
+│   │   └── aiExecutionGate.js           — dual-gate guard (CONTRACT_TEST_MODE + JM1_AI_EXECUTION_ENABLED)
+│   └── ai/
+│       └── modelCaller.js              — Azure OpenAI caller scaffold (gate-enforced; inactive until Approval 1)
 └── test/
     ├── validation.test.js               — payload pattern validation
     ├── knowledge.test.js                — knowledge.md SHA-256 and Blob verification
@@ -414,10 +419,54 @@ azure-functions/diagnostic-ai-runner/
     ├── noQuotationValidation.test.js    — No-quotation output validation rules and safety
     ├── metadataWrite.test.js            — Metadata writer payload safety and prohibited field tests
     ├── syntheticE2E.test.js             — Synthetic end-to-end pipeline stage chain tests
+    ├── aiActivationGate.test.js         — Dual-gate logic and model caller gate enforcement (23 tests)
     └── fixtures/
         ├── synthetic-stage0.txt         — synthetic TXT fixture (no real content)
         └── synthetic-stage0.docx        — synthetic DOCX fixture (no real content)
 ```
+
+## AI Execution Dual-Gate
+
+AI execution is guarded by two independent gates. Both must be open before any model call is attempted:
+
+| Gate | Mechanism | Current state | Opens when |
+|---|---|---|---|
+| 1. `CONTRACT_TEST_MODE` | Hardcoded constant in `runStage0Diagnostic.js` | `true` — closed | Code change + Jackie Approval 1 |
+| 2. `JM1_AI_EXECUTION_ENABLED` | Azure Function app setting (env var) | absent / `false` — closed | Env var set to `"true"` after Approval 1 |
+
+Neither gate alone is sufficient. A request that passes Gate 1 but not Gate 2 is still blocked. A request that satisfies Gate 2 in env vars but CONTRACT_TEST_MODE is still `true` is still blocked.
+
+Gate state is returned on every `controlledAiTest: true` request so the caller can confirm which gates are closed and why.
+
+### `controlledAiTest` request behaviour
+
+| Gate state | HTTP status | `status` field | Response includes |
+|---|---|---|---|
+| Both gates closed (current) | 200 | `gate-closed` | `gate.permitted=false`, `gate.reason`, `gate.contractTestModeActive`, `gate.aiExecutionEnabled` |
+| Both gates open (post-approval) | 202 | `accepted` | Full pipeline result including `diagnosticOutput` (Jackie review required) |
+| Model call fails | 503 | `error` | Error code, gate state, token counts |
+| Output validation fails | 422 | `error` | Violation details, token counts |
+
+### Live gate-closed verification (2026-06-17)
+
+```
+POST /api/run-stage0-diagnostic
+{ "controlledAiTest": true, "syntheticFixture": "txt", ... }
+
+→ 200
+{
+  "status": "gate-closed",
+  "mode": "contract-test",
+  "gate": {
+    "permitted": false,
+    "reason": "CONTRACT_TEST_MODE_ACTIVE",
+    "contractTestModeActive": true,
+    "aiExecutionEnabled": false
+  }
+}
+```
+
+`CONTRACT_TEST_MODE=true`. No model call attempted. No manuscript processed.
 
 ## Flow D Integration (Future)
 
