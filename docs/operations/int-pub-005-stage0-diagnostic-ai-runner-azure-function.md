@@ -61,6 +61,7 @@ In contract-test mode, the function:
 - Optionally validates synthetic diagnostic output against the no-quotation rule when `verifyOutputValidation: true` and `syntheticOutput: {...}` are set — returns 202 if valid, 422 `OUTPUT_QUOTATION_VIOLATION` if any field fails
 - Optionally routes a synthetic diagnostic result through confidence-based routing when `verifyConfidenceRouting: true` and `syntheticResult: {...}` are set — returns routing decision with no Dataverse write
 - Optionally writes safe synthetic metadata to `jm1_airequestlog` and `jm1_executionlog` when `verifyMetadataWrites: true` is set — returns both record IDs; no manuscript text, prompt body, model output, secrets, or headers are stored
+- Optionally runs the full 5-stage synthetic pipeline when `verifyFullPipeline: true` is set: knowledge → extraction → output validation → confidence routing → metadata writes — returns all stage results in a single aggregated response
 - Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata, extraction metadata, validation result, routing decision, or metadata write IDs if requested)
 - Does not call any AI service
 - Does not read or write Dataverse
@@ -412,6 +413,7 @@ azure-functions/diagnostic-ai-runner/
     ├── legacyExclusion.test.js          — Legacy-exclusion gate and flag parsing
     ├── noQuotationValidation.test.js    — No-quotation output validation rules and safety
     ├── metadataWrite.test.js            — Metadata writer payload safety and prohibited field tests
+    ├── syntheticE2E.test.js             — Synthetic end-to-end pipeline stage chain tests
     └── fixtures/
         ├── synthetic-stage0.txt         — synthetic TXT fixture (no real content)
         └── synthetic-stage0.docx        — synthetic DOCX fixture (no real content)
@@ -458,6 +460,31 @@ No-quotation output validation was verified via direct HTTP contract test on 202
 | `legacyFlag: true` + `verifyOutputValidation: true` (gate ordering) | 422 | `LEGACY_EXCLUDED` — Legacy gate fires before output validation |
 
 Violation objects contain only `field`, `rule`, and `ruleDescription`. No offending text appears in any response field. `CONTRACT_TEST_MODE=true`. No AI was called. No Dataverse writes occurred.
+
+## Synthetic End-to-End Pipeline Verification
+
+The full 5-stage synthetic pipeline was verified via live HTTP contract tests on 2026-06-17 using `verifyFullPipeline: true`.
+
+### Pipeline Stages
+
+| Stage | Component | Contract |
+|---|---|---|
+| 1 | Legacy-exclusion gate | `legacyFlag: true` returns 422 before any downstream stage |
+| 2 | Knowledge verification | `knowledge.md` read, SHA-256 verified (`64e0e38f…`), `reachable=true`, `hashMatched=true` |
+| 3 | Synthetic extraction | DOCX (52 words, 1704 bytes) or TXT (153 words, 1094 bytes); `contentReturned=false` always |
+| 4 | Output validation | Clean synthetic output passes; quoted prose or prompt leakage returns 422 |
+| 5 | Confidence routing | All 5 routing paths available; `requiresHumanReview=true` on every path |
+| 6 | Metadata writes | Both `jm1_airequestlog` and `jm1_executionlog` created; prohibited fields null |
+
+### Live E2E Test Results (2026-06-17)
+
+| Test | Fixture | Confidence | Result | AI Request Log ID | Execution Log ID |
+|---|---|---|---|---|---|
+| High confidence → Completed | DOCX | 0.90 | 202 — all 5 stages passed, status 835500002 | `62724728-226a-f111-a826-6045bdd69678` | `fad33c2d-226a-f111-a826-7c1e525b15c2` |
+| Low confidence → Needs Human Review | TXT | 0.50 | 202 — all 5 stages passed, status 835500004, lowConfidenceNote set | `dc7e6879-226a-f111-a826-6045bdd69738` | `5ed98575-226a-f111-a826-6045bdd69678` |
+| Legacy gate blocks pipeline | DOCX | 0.90 | 422 LEGACY_EXCLUDED — no downstream stages ran | — | — |
+
+`CONTRACT_TEST_MODE=true`. No AI called. No real manuscript processed. No Flow D modified. No Opportunity created. No author email sent.
 
 ## Metadata Write Verification
 

@@ -327,6 +327,171 @@ app.http("run-stage0-diagnostic", {
         };
       }
 
+      const verifyFullPipeline = body.verifyFullPipeline === true;
+
+      if (verifyFullPipeline) {
+        const e2eFixture = typeof body.syntheticFixture === "string" ? body.syntheticFixture.toLowerCase() : "docx";
+        const e2eSyntheticOutput = body.syntheticOutput;
+        const e2eSyntheticResult = body.syntheticResult || {};
+
+        context.info(
+          `Synthetic E2E pipeline requested; diagnosticId=${diagnosticId}; reference=${intakeReferenceCode}; fixture=${e2eFixture}`
+        );
+
+        // Stage 1: Knowledge verification
+        const knowledgeMeta = await verifyKnowledgeBlob();
+        if (!knowledgeMeta.reachable || !knowledgeMeta.hashMatched) {
+          context.warn(
+            `E2E pipeline failed at knowledge stage; reachable=${knowledgeMeta.reachable}; hashMatched=${knowledgeMeta.hashMatched}`
+          );
+          return {
+            status: 503,
+            jsonBody: {
+              status: "error",
+              code: "E2E_KNOWLEDGE_FAILED",
+              diagnosticId,
+              failedStage: "knowledge",
+              knowledge: {
+                reachable: knowledgeMeta.reachable,
+                hashMatched: knowledgeMeta.hashMatched,
+                error: knowledgeMeta.error
+              }
+            }
+          };
+        }
+
+        context.info(`E2E stage 1 knowledge OK; diagnosticId=${diagnosticId}`);
+
+        // Stage 2: Extraction
+        const ALLOWED_E2E_FIXTURES = ["txt", "docx"];
+        if (!ALLOWED_E2E_FIXTURES.includes(e2eFixture)) {
+          return validationError("INVALID_SYNTHETIC_FIXTURE", diagnosticId);
+        }
+
+        const fixturePath = path.join(__dirname, "..", "..", "test", "fixtures", `synthetic-stage0.${e2eFixture}`);
+        let fileBuffer;
+        try {
+          fileBuffer = fs.readFileSync(fixturePath);
+        } catch {
+          return { status: 503, jsonBody: { status: "error", code: "E2E_FIXTURE_NOT_FOUND", diagnosticId, failedStage: "extraction" } };
+        }
+
+        const extractionResult = await extractManuscript(`.${e2eFixture}`, fileBuffer);
+        if (!extractionResult.supported) {
+          return { status: 503, jsonBody: { status: "error", code: "E2E_EXTRACTION_UNSUPPORTED", diagnosticId, failedStage: "extraction" } };
+        }
+
+        context.info(
+          `E2E stage 2 extraction OK; diagnosticId=${diagnosticId}; fixture=synthetic-stage0.${e2eFixture}; wordCount=${extractionResult.wordCount}; contentReturned=${extractionResult.contentReturned}`
+        );
+
+        // Stage 3: Output validation
+        if (e2eSyntheticOutput == null || typeof e2eSyntheticOutput !== "object" || Array.isArray(e2eSyntheticOutput)) {
+          return validationError("INVALID_SYNTHETIC_OUTPUT", diagnosticId);
+        }
+
+        const validationResult = validateNoQuotation(e2eSyntheticOutput);
+        if (!validationResult.valid) {
+          context.warn(
+            `E2E pipeline failed at output validation; diagnosticId=${diagnosticId}; violationCount=${validationResult.violations.length}`
+          );
+          return {
+            status: 422,
+            jsonBody: {
+              status: "error",
+              code: "E2E_OUTPUT_VALIDATION_FAILED",
+              diagnosticId,
+              failedStage: "outputValidation",
+              validation: { valid: false, violations: validationResult.violations, fieldsChecked: validationResult.fieldsChecked }
+            }
+          };
+        }
+
+        context.info(`E2E stage 3 output validation OK; diagnosticId=${diagnosticId}; fieldsChecked=${validationResult.fieldsChecked.join(",")}`);
+
+        // Stage 4: Confidence routing
+        const routingDecision = routeDiagnosticResult(e2eSyntheticResult);
+
+        context.info(
+          `E2E stage 4 confidence routing OK; diagnosticId=${diagnosticId}; basis=${routingDecision.routingBasis}; status=${routingDecision.status}`
+        );
+
+        // Stage 5: Metadata writes
+        const now = new Date().toISOString();
+        const e2eMetadataInput = {
+          diagnosticId,
+          intakeReferenceCode,
+          correlationId: correlationId || null,
+          executionMode: "contract-test-e2e",
+          modelDeploymentAlias: "jm1-pub-diagnostic-safe-test",
+          promptKey: "jm1-prompt-pub-stage0-diagnostic",
+          promptVersion: "PUB-STAGE0-DIAGNOSTIC-V1",
+          confidence: typeof e2eSyntheticResult.confidence === "number" ? e2eSyntheticResult.confidence : null,
+          requiresHumanReview: routingDecision.requiresHumanReview,
+          tokenCounts: { input: 0, output: 0, total: 0 },
+          requestTimestamp: now,
+          responseTimestamp: now,
+          errorCode: routingDecision.routingBasis === "TECHNICAL_FAILURE" || routingDecision.routingBasis === "INVALID_CONFIDENCE" ? routingDecision.routingBasis : null,
+          errorMessage: routingDecision.error || null
+        };
+
+        const writeResult = await writeMetadata(e2eMetadataInput);
+
+        context.info(
+          `E2E stage 5 metadata writes; diagnosticId=${diagnosticId}; aiRequestLog.created=${writeResult.aiRequestLog.created}; executionLog.created=${writeResult.executionLog.created}`
+        );
+
+        const allStagesPassed = writeResult.aiRequestLog.created && writeResult.executionLog.created;
+
+        return {
+          status: allStagesPassed ? 202 : 207,
+          jsonBody: {
+            status: allStagesPassed ? "accepted" : "partial",
+            mode: "contract-test",
+            diagnosticId,
+            intakeReferenceCode,
+            correlationId,
+            pipeline: {
+              legacyGate: { excluded: false },
+              knowledge: {
+                reachable: knowledgeMeta.reachable,
+                hashMatched: knowledgeMeta.hashMatched,
+                byteLength: knowledgeMeta.byteLength,
+                etag: knowledgeMeta.etag
+              },
+              extraction: {
+                supported: extractionResult.supported,
+                fileType: extractionResult.fileType,
+                byteLength: extractionResult.byteLength,
+                wordCount: extractionResult.wordCount,
+                charCount: extractionResult.charCount,
+                sha256: extractionResult.sha256,
+                contentReturned: extractionResult.contentReturned
+              },
+              outputValidation: {
+                valid: validationResult.valid,
+                violations: validationResult.violations,
+                fieldsChecked: validationResult.fieldsChecked
+              },
+              confidenceRouting: {
+                status: routingDecision.status,
+                statusLabel: routingDecision.statusLabel,
+                requiresHumanReview: routingDecision.requiresHumanReview,
+                lowConfidenceNote: routingDecision.lowConfidenceNote,
+                routingBasis: routingDecision.routingBasis
+              },
+              metadataWrites: {
+                aiRequestLog: { created: writeResult.aiRequestLog.created, id: writeResult.aiRequestLog.id, error: writeResult.aiRequestLog.error },
+                executionLog: { created: writeResult.executionLog.created, id: writeResult.executionLog.id, error: writeResult.executionLog.error }
+              }
+            },
+            message: allStagesPassed
+              ? "Diagnostic runner synthetic end-to-end pipeline contract accepted. All 5 stages passed. AI execution not enabled."
+              : "Diagnostic runner synthetic E2E pipeline completed with partial metadata write failure. Check metadataWrites for details."
+          }
+        };
+      }
+
       const verifyMetadataWrites = body.verifyMetadataWrites === true;
 
       if (verifyMetadataWrites) {
