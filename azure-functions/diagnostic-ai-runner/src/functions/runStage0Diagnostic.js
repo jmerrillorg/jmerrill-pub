@@ -5,6 +5,7 @@ const { verifyKnowledgeBlob } = require("../blob/knowledgeReader");
 const { extractManuscript } = require("../extraction/manuscriptExtractor");
 const { checkLegacyExclusion, parseLegacyFlag } = require("../preflight/legacyExclusionCheck");
 const { validateNoQuotation } = require("../validation/noQuotationValidator");
+const { routeDiagnosticResult } = require("../routing/confidenceRouter");
 
 const CONTRACT_TEST_MODE = true;
 
@@ -284,6 +285,43 @@ app.http("run-stage0-diagnostic", {
               fieldsChecked: validationResult.fieldsChecked
             },
             message: "Diagnostic runner contract accepted. Synthetic output passed no-quotation validation. AI execution not enabled."
+          }
+        };
+      }
+
+      const verifyConfidenceRouting = body.verifyConfidenceRouting === true;
+
+      if (verifyConfidenceRouting) {
+        const syntheticResult = body.syntheticResult;
+
+        if (syntheticResult == null || typeof syntheticResult !== "object" || Array.isArray(syntheticResult)) {
+          context.warn(`Confidence routing verify rejected: syntheticResult missing or not an object; diagnosticId=${diagnosticId}`);
+          return validationError("INVALID_SYNTHETIC_RESULT", diagnosticId);
+        }
+
+        const routingDecision = routeDiagnosticResult(syntheticResult);
+
+        context.info(
+          `Confidence routing verified; diagnosticId=${diagnosticId}; basis=${routingDecision.routingBasis}; status=${routingDecision.status}; statusLabel=${routingDecision.statusLabel}`
+        );
+
+        return {
+          status: 202,
+          jsonBody: {
+            status: "accepted",
+            mode: "contract-test",
+            diagnosticId,
+            intakeReferenceCode,
+            correlationId,
+            routing: {
+              status: routingDecision.status,
+              statusLabel: routingDecision.statusLabel,
+              requiresHumanReview: routingDecision.requiresHumanReview,
+              lowConfidenceNote: routingDecision.lowConfidenceNote,
+              routingBasis: routingDecision.routingBasis,
+              error: routingDecision.error
+            },
+            message: `Diagnostic runner contract accepted. Confidence routing verified: ${routingDecision.statusLabel} (${routingDecision.routingBasis}). No Dataverse write. AI execution not enabled.`
           }
         };
       }
