@@ -15,9 +15,9 @@ This document records the resolved activation design decisions for the INT-PUB-0
 | Flow B — ACS acknowledgment email | Live |
 | Flow C — Stage 0 Editorial Diagnostic handoff | Live |
 | Flow D — manuscript asset gate | Live |
-| Diagnostic AI Runner Azure Function (`func-jm1-diagnostic-ai-runner`) | Deployed, contract-test mode |
-| Flow D → Runner integration | Live, contract-test mode |
-| Real AI execution | Not enabled. `CONTRACT_TEST_MODE=true`. |
+| Diagnostic AI Runner Azure Function (`func-jm1-diagnostic-ai-runner`) | Deployed. `CONTRACT_TEST_MODE=false`, `JM1_AI_EXECUTION_ENABLED=true`. Synthetic AI tests authorized under Approval 1. |
+| Flow D → Runner integration | Live. Real manuscript processing via Flow D not authorized until Approval 2. |
+| Real AI execution | **Controlled synthetic AI test authorized under Approval 1** (2026-06-17). Real manuscript processing requires Approval 2. |
 
 ## 3. Approved Activation Decisions
 
@@ -300,10 +300,12 @@ The following must be completed, verified, and documented before the runner may 
 
 **Scope:** One controlled synthetic AI call using synthetic fixture only. No real manuscripts. No production use. All outputs subject to Jackie review before any further activation decision.
 
+### Test parameters
+
 | Item | Value |
 |---|---|
 | Test date | 2026-06-17 |
-| Fixture | TXT synthetic fixture (`synthetic-stage0.txt`) |
+| Fixture | TXT synthetic fixture (`synthetic-stage0.txt`, 153 words, 1094 bytes) |
 | Model | `gpt-4o-mini` (2024-07-18) |
 | Deployment | `jm1-pub-diagnostic-primary` |
 | Endpoint | `https://oai-jm1-diagnostic.openai.azure.com/` |
@@ -311,28 +313,97 @@ The following must be completed, verified, and documented before the runner may 
 | Execution mode | `controlled-ai-test` |
 | Real manuscript | None |
 | Author content | None |
-| Result | Pending — to be filled after live test |
+| HTTP result | 202 accepted |
+| Gate state | `permitted=true`, reason `OPEN` |
+| Tokens | 98 input / 76 output / 174 total |
+
+### Pipeline stage results
+
+| Stage | Result |
+|---|---|
+| Legacy gate | `excluded=false` |
+| knowledge.md | `reachable=true`, `hashMatched=true`, 29,232 bytes |
+| Extraction | `supported=true`, `.txt`, 153 words, `contentReturned=false` |
+| Model call | HTTP 200, ok |
+| Output validation | Passed — 0 violations, no quoted text, no prompt leakage |
+| Confidence routing | `CONFIDENCE_LOW` (0.0) → `Needs Human Review` (835500004), low-confidence note set |
+| AI Request Log | Created — `1040adcd-386a-f111-a826-00224820105b` |
+| Execution Log | Created — `0dc395cc-386a-f111-a826-000d3a14673b` |
+
+### Model output (full, for Jackie review)
+
+```json
+{
+  "jm1_diagnosticoutputsummary": "The manuscript is a controlled synthetic fixture and does not represent a real submission. It contains 153 words and is intended for contract testing purposes only.",
+  "jm1_diagnosticriskflags": [],
+  "jm1_confidence": 0,
+  "jm1_requireshumanreview": true
+}
+```
 
 ### Post-test review checklist (Jackie)
 
 | Check | Result |
 |---|---|
-| Output is characterization only — no quoted manuscript text | Pending |
-| No prompt leakage in output | Pending |
-| No-quotation validation passed | Pending |
-| Confidence score present and numeric | Pending |
-| `requiresHumanReview=true` on result | Pending |
-| AI Request Log created, prohibited fields null | Pending |
-| Execution Log created | Pending |
-| No manuscript text in any log field | Pending |
-| Output is editorially useful (Stage 0 direction) | Pending |
-| Output safety: conservative enough for internal use | Pending |
+| Output is characterization only — no quoted manuscript text | **Pass** — output describes the fixture, contains no prose excerpts |
+| No prompt leakage in output | **Pass** — no prompt instruction text in output |
+| No-quotation validation passed | **Pass** — validator confirmed 0 violations |
+| Confidence score present and numeric | **Pass** — `jm1_confidence: 0` (numeric zero, not absent) |
+| `requiresHumanReview=true` on result | **Pass** |
+| AI Request Log created, prohibited fields null | **Pass** — record `1040adcd…` created; `jm1_requestpayload`, `jm1_responsepayload`, `jm1_airecommendation` not set |
+| Execution Log created | **Pass** — record `0dc395cc…` created |
+| No manuscript text in any log field | **Pass** — action description contains only safe identifiers and mode name |
+| Output is editorially useful (Stage 0 direction) | **N/A for this test** — synthetic fixture correctly identified as non-real; no editorial direction expected or appropriate |
+| Output safety: conservative enough for internal use | **Pass** — model appropriately declined to evaluate a non-real fixture |
+
+### Jackie's interpretation (2026-06-17)
+
+The model returning `jm1_confidence: 0` is the correct behavior for this test. The model recognized it was not evaluating a real manuscript and signalled low confidence rather than fabricating editorial direction. This proves:
+
+- The gate and routing posture work correctly
+- Synthetic / insufficient editorial substance → low confidence → Needs Human Review → no author-facing action
+- The infrastructure (MSI auth, knowledge.md grounding, no-quotation validation, Dataverse writes) is validated end-to-end
 
 ### Approval 2 decision
 
-After reviewing the above checklist, Jackie will decide:
+**Deferred. Approval 2 is not yet recommended.**
 
-- **Proceed to Approval 2** (limited production diagnostic execution on real approved manuscript assets) — requires all checks above to pass
-- **Do not proceed** — gates remain open for synthetic testing only; production activation deferred
+**Reason:** This test validates infrastructure and safety gates. It does not validate editorial diagnostic quality. The model used (`gpt-4o-mini`) is not the preferred model for real manuscript REV / Intake Editorial Review work.
 
-_This section will be completed in PR #70._
+Per the approved model strategy:
+
+| Use case | Preferred model |
+|---|---|
+| REV / Intake Editorial Review | Claude Sonnet |
+| Developmental diagnostic | Claude Sonnet |
+| Line / Copy | GPT-5.x (to be tested) |
+
+`gpt-4o-mini` was the correct choice for infrastructure validation. It is not the right model for real manuscript Stage 0 Editorial Diagnostics.
+
+**Decision:** Approval 1 test passed. Infrastructure validated. Safety gates validated. Production real-manuscript execution remains blocked.
+
+**What must happen before Approval 2:**
+
+1. Add provider abstraction to `modelCaller.js` to support Claude Sonnet (via Azure AI Foundry or Anthropic API)
+2. Deploy a Claude Sonnet endpoint under `jm1-pub-diagnostic-primary` or a new alias
+3. Run a second controlled synthetic real-AI test using the preferred model
+4. Review that output for editorial quality, confidence calibration, and safety
+5. Only then consider Approval 2 — limited production diagnostic execution on a real approved manuscript asset
+
+**In plain terms:** the pipes work. We still need to decide which water we want running through them.
+
+## 17. Pre-Approval 2 Requirements
+
+The following must be completed before Approval 2 (limited production diagnostic execution) can be considered:
+
+| Requirement | Status |
+|---|---|
+| Provider abstraction in `modelCaller.js` to support Claude Sonnet (Azure AI Foundry or Anthropic API) | Not started |
+| Claude Sonnet deployment or endpoint configured and MSI-accessible | Not started |
+| Second controlled synthetic real-AI test using Claude Sonnet | Not started |
+| Jackie review of Claude Sonnet output for editorial quality, confidence calibration, and safety | Not started |
+| Decision on whether `jm1-pub-diagnostic-primary` alias is reassigned or a new alias is created for Sonnet | Not started |
+| `knowledge.md` editorial content completed by Jackie (imprint definitions, scoring weights, genre taxonomy, editorial paths, risk guidance) | Not started — draft skeleton only as of 2026-06-17 |
+| Approval 2 statement from Jackie | Not started |
+
+**Current runner state:** AI gates open (`CONTRACT_TEST_MODE=false`, `JM1_AI_EXECUTION_ENABLED=true`). Synthetic AI tests may continue. Real manuscript processing remains prohibited until Approval 2.
