@@ -477,6 +477,47 @@ POST /api/run-stage0-diagnostic
 
 `CONTRACT_TEST_MODE=true`. No model call attempted. No manuscript processed.
 
+### Live controlled Sonnet test (PR #72 — 2026-06-17)
+
+Both gates open (`CONTRACT_TEST_MODE=false`, `JM1_AI_EXECUTION_ENABLED=true`). `JM1_AI_PROVIDER=anthropic`, `ANTHROPIC_MODEL=claude-sonnet-4-6`. Synthetic TXT fixture. One authorized call.
+
+```
+POST /api/run-stage0-diagnostic
+{
+  "controlledAiTest": true,
+  "syntheticFixture": "txt",
+  "diagnosticId": "a2b3c4d5-e6f7-4890-abcd-ef1234567890",
+  "intakeReferenceCode": "JMP-INT-260617-SONNET-SYNTHETIC-TEST",
+  "correlationId": "pr72-sonnet-synthetic-20260617"
+}
+
+→ 202
+{
+  "status": "accepted",
+  "mode": "controlled-ai-test",
+  "gate": { "permitted": true, "reason": "OPEN" },
+  "pipeline": {
+    "knowledge": { "reachable": true, "hashMatched": true, "byteLength": 29232 },
+    "extraction": { "supported": true, "fileType": ".txt", "wordCount": 153, "contentReturned": false },
+    "modelCall": { "ok": true, "httpStatus": 200, "tokens": { "input": 98, "output": 95, "total": 193 } },
+    "outputValidation": { "valid": true, "violations": [] },
+    "confidenceRouting": { "status": 835500004, "statusLabel": "Needs Human Review", "requiresHumanReview": true },
+    "metadataWrites": {
+      "aiRequestLog": { "created": true, "id": "94c0ffe5-3e6a-f111-a826-7c1e525b15c2" },
+      "executionLog": { "created": true, "id": "5b5507e3-3e6a-f111-a826-000d3a14673b" }
+    }
+  },
+  "diagnosticOutput": {
+    "jm1_diagnosticoutputsummary": "The manuscript is a controlled synthetic fixture and is not intended for real submission. It contains 153 words and serves as a contract-test only.",
+    "jm1_diagnosticriskflags": ["Synthetic content", "Not a real manuscript", "Limited word count"],
+    "jm1_confidence": 0,
+    "jm1_requireshumanreview": true
+  }
+}
+```
+
+No-quotation validation: passed (0 violations). No real manuscript processed. No author-facing action. `ANTHROPIC_API_KEY` not in response. Pending Jackie review (see decision record Section 16b).
+
 ## Provider Abstraction
 
 The model caller uses a provider abstraction layer so the runner is not hardwired to a single AI backend. Provider is selected at runtime via the `JM1_AI_PROVIDER` app setting.

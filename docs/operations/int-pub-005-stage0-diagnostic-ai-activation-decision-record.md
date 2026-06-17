@@ -393,6 +393,148 @@ Per the approved model strategy:
 
 **In plain terms:** the pipes work. We still need to decide which water we want running through them.
 
+---
+
+## 16b. Controlled Synthetic Sonnet Real-AI Test Record (PR #72)
+
+**Authorization:** Jackie Approval 1 (granted 2026-06-17) — synthetic fixture only. Same authorization scope as Section 16. Approval 2 not granted.
+
+**Scope:** One controlled synthetic AI call using `JM1_AI_PROVIDER=anthropic`, `ANTHROPIC_MODEL=claude-sonnet-4-6`, synthetic TXT fixture only. No real manuscripts. No production use. All output subject to Jackie review. This test proves the Anthropic provider path works end-to-end and produces safe output on the preferred model.
+
+### Configuration confirmed (PR #72 — 2026-06-17)
+
+| Setting | Value |
+|---|---|
+| `JM1_AI_PROVIDER` | `anthropic` |
+| `ANTHROPIC_MODEL` | `claude-sonnet-4-6` |
+| `ANTHROPIC_API_KEY` | Key Vault reference — `@Microsoft.KeyVault(VaultName=jm1-core-vault;SecretName=AnthropicApiKey)` |
+| Key Vault RBAC | Enabled |
+| Function App MSI | `e8c51a80-bdb0-46fa-b398-9109719d6427` — `Key Vault Secrets User` on `jm1-core-vault` |
+
+### Test parameters
+
+| Item | Value |
+|---|---|
+| Test date | 2026-06-17 |
+| Fixture | TXT synthetic fixture (`synthetic-stage0.txt`, 153 words, 1094 bytes) |
+| Provider | `anthropic` |
+| Model | `claude-sonnet-4-6` |
+| Endpoint | `https://api.anthropic.com/v1/messages` |
+| Anthropic API version | `2023-06-01` |
+| Execution mode | `controlled-ai-test` |
+| Diagnostic ID | `a2b3c4d5-e6f7-4890-abcd-ef1234567890` |
+| Intake reference | `JMP-INT-260617-SONNET-SYNTHETIC-TEST` |
+| Correlation ID | `pr72-sonnet-synthetic-20260617` |
+| Real manuscript | None |
+| Author content | None |
+| HTTP result | 202 accepted |
+| Gate state | `permitted=true`, reason `OPEN` |
+| Tokens | 98 input / 95 output / 193 total |
+
+### Pipeline stage results
+
+| Stage | Result |
+|---|---|
+| Legacy gate | `excluded=false` |
+| knowledge.md | `reachable=true`, `hashMatched=true`, 29,232 bytes |
+| Extraction | `supported=true`, `.txt`, 153 words, `contentReturned=false` |
+| Model call | HTTP 200, `ok=true`, provider `anthropic` |
+| Output validation | `valid=true`, 0 violations, `fieldsChecked: ["jm1_diagnosticoutputsummary"]` |
+| Confidence routing | `CONFIDENCE_LOW` (0.0) → `Needs Human Review` (835500004), low-confidence note set |
+| AI Request Log | Created — `94c0ffe5-3e6a-f111-a826-7c1e525b15c2` |
+| Execution Log | Created — `5b5507e3-3e6a-f111-a826-000d3a14673b` |
+
+### Model output (full, for Jackie review)
+
+```json
+{
+  "jm1_diagnosticoutputsummary": "The manuscript is a controlled synthetic fixture and is not intended for real submission. It contains 153 words and serves as a contract-test only.",
+  "jm1_diagnosticriskflags": ["Synthetic content", "Not a real manuscript", "Limited word count"],
+  "jm1_confidence": 0,
+  "jm1_requireshumanreview": true
+}
+```
+
+### Independent output safety validation (CeCe — 2026-06-17)
+
+No-quotation validator run against all text output fields after test call:
+
+| Field | Validation result |
+|---|---|
+| `jm1_diagnosticoutputsummary` | `valid=true`, 0 violations — no quoted prose, no prompt leakage |
+| `jm1_diagnosticriskflags[0]` (`"Synthetic content"`) | `valid=true` |
+| `jm1_diagnosticriskflags[1]` (`"Not a real manuscript"`) | `valid=true` |
+| `jm1_diagnosticriskflags[2]` (`"Limited word count"`) | `valid=true` |
+
+All fields characterization only. No manuscript text. No prompt leakage.
+
+### Post-test review checklist (Jackie)
+
+| Check | Result |
+|---|---|
+| Provider confirmed as Anthropic / Claude Sonnet | **Pass** — `provider: "anthropic"` in pipeline response |
+| Output is characterization only — no quoted manuscript text | **Pass** — output describes the synthetic fixture, contains no prose excerpts |
+| No prompt leakage in output | **Pass** — no prompt instruction phrases in any output field |
+| No-quotation validation passed | **Pass** — validator confirmed 0 violations |
+| Risk flags are category labels, not prose quotations | **Pass** — `["Synthetic content", "Not a real manuscript", "Limited word count"]` |
+| Confidence score present and numeric | **Pass** — `jm1_confidence: 0` (numeric zero) |
+| `requiresHumanReview=true` on result | **Pass** |
+| AI Request Log created | **Pass** — `94c0ffe5-3e6a-f111-a826-7c1e525b15c2` |
+| Execution Log created | **Pass** — `5b5507e3-3e6a-f111-a826-000d3a14673b` |
+| No manuscript text in any log field | **Pass** — metadata only |
+| ANTHROPIC_API_KEY not in response | **Pass** — key material never returned or logged |
+| Sonnet output quality vs gpt-4o-mini | **See Jackie interpretation below** |
+| Approval 2 decision | **See below** |
+
+### Comparison: gpt-4o-mini (PR #70) vs claude-sonnet-4-6 (PR #72)
+
+| Attribute | gpt-4o-mini | claude-sonnet-4-6 |
+|---|---|---|
+| Summary | "…does not represent a real submission. It contains 153 words and is intended for contract testing purposes only." | "…is not intended for real submission. It contains 153 words and serves as a contract-test only." |
+| Risk flags | `[]` (empty array) | `["Synthetic content", "Not a real manuscript", "Limited word count"]` |
+| Confidence | `0` | `0` |
+| Tokens | 98 input / 76 output / 174 total | 98 input / 95 output / 193 total |
+| No-quotation pass | Yes | Yes |
+| Prompt leakage | None | None |
+
+**Notable difference:** Claude Sonnet returned structured risk flags on synthetic content where gpt-4o-mini returned an empty array. Both correctly returned `jm1_confidence: 0` — appropriate behavior for a synthetic fixture that carries no real editorial substance. Neither fabricated editorial direction.
+
+### Jackie's interpretation (for completion after review)
+
+_Pending Jackie review. The following questions should be answered:_
+
+1. Is the risk-flag behavior (Sonnet returning category labels vs gpt-4o-mini returning empty) the preferred approach for real manuscript flags?
+2. Is `jm1_confidence: 0` on synthetic content the expected signal, or should the prompt be adjusted to return `null` / omit confidence when the submission is non-evaluable?
+3. Is the Sonnet summary phrasing conservative enough for internal diagnostic use?
+4. Does this output suggest the prompt needs refinement before real manuscript use, or is it acceptable as-is?
+
+### Approval 2 decision
+
+**Still deferred. This section will be completed after Jackie review.**
+
+The Anthropic provider path is verified end-to-end. The preferred model (`claude-sonnet-4-6`) calls successfully, passes safety validation, and writes safe metadata. The remaining blockers before Approval 2 are:
+
+1. Jackie review of Sonnet output (this section) and answers to the four interpretation questions above
+2. `knowledge.md` editorial content completed (imprint definitions, scoring weights, genre taxonomy, editorial paths, risk guidance) — currently draft skeleton only
+3. Explicit Approval 2 statement from Jackie
+
+**What this test proves:**
+
+- Anthropic provider path: confirmed working
+- Key Vault reference for `ANTHROPIC_API_KEY`: resolves correctly at runtime
+- `JM1_AI_PROVIDER=anthropic` routing: confirmed
+- Claude Sonnet model call: successful
+- No-quotation safety on Sonnet output: confirmed
+- Metadata write with `anthropic` provider: confirmed
+- Dual gate enforcement unchanged: confirmed
+- Real manuscript path: still blocked
+
+**What this test does not prove:**
+
+- Editorial diagnostic quality on real manuscripts — synthetic fixture only
+- Prompt calibration adequacy — knowledge.md content not yet complete
+- Confidence score calibration — `jm1_confidence: 0` on non-real content is expected and correct, but real manuscript confidence behavior is unknown until tested under Approval 2
+
 ## 17. Pre-Approval 2 Requirements
 
 The following must be completed before Approval 2 (limited production diagnostic execution) can be considered:
@@ -400,11 +542,11 @@ The following must be completed before Approval 2 (limited production diagnostic
 | Requirement | Status |
 |---|---|
 | Provider abstraction in `modelCaller.js` to support Claude Sonnet (Azure AI Foundry or Anthropic API) | **Done** — PR #71, 2026-06-17. `JM1_AI_PROVIDER` env var selects `anthropic` or `azure-openai`. `anthropicProvider.js` calls Anthropic Messages API with `x-api-key` (never logged). `ANTHROPIC_MODEL=claude-sonnet-4-6` default. Gate enforcement unchanged. |
-| Claude Sonnet deployment or endpoint configured and MSI-accessible | Not started — requires `ANTHROPIC_API_KEY` set on Function App and Jackie Approval 2 to use Sonnet for any editorial review |
-| Second controlled synthetic real-AI test using Claude Sonnet | Not started |
-| Jackie review of Claude Sonnet output for editorial quality, confidence calibration, and safety | Not started |
-| Decision on whether `jm1-pub-diagnostic-primary` alias is reassigned or a new alias is created for Sonnet | Not started |
+| Claude Sonnet endpoint configured and accessible | **Done** — PR #72, 2026-06-17. `ANTHROPIC_API_KEY` set as Key Vault reference on `func-jm1-diagnostic-ai-runner`. `ANTHROPIC_MODEL=claude-sonnet-4-6`. `JM1_AI_PROVIDER=anthropic`. Key Vault RBAC enabled; MSI `Key Vault Secrets User` in place. Key resolves at runtime — never returned or logged. |
+| Second controlled synthetic real-AI test using Claude Sonnet | **Done** — PR #72, 2026-06-17. See Section 16b. HTTP 202, `ok=true`, 98 input / 95 output / 193 total tokens. No-quotation validation passed. Metadata logs created. No real manuscript processed. |
+| Jackie review of Claude Sonnet output for editorial quality, confidence calibration, and safety | **Pending** — Section 16b post-test checklist and four interpretation questions require Jackie response. |
+| Decision on whether `jm1-pub-diagnostic-primary` alias is reassigned or a new alias is created for Sonnet | **Resolved by provider abstraction** — `JM1_AI_PROVIDER` selects provider at runtime. `jm1-pub-diagnostic-primary` remains the Azure OpenAI deployment. Anthropic uses `ANTHROPIC_MODEL` directly. No alias reassignment needed. |
 | `knowledge.md` editorial content completed by Jackie (imprint definitions, scoring weights, genre taxonomy, editorial paths, risk guidance) | Not started — draft skeleton only as of 2026-06-17 |
 | Approval 2 statement from Jackie | Not started |
 
-**Current runner state:** AI gates open (`CONTRACT_TEST_MODE=false`, `JM1_AI_EXECUTION_ENABLED=true`). Synthetic AI tests may continue. Real manuscript processing remains prohibited until Approval 2.
+**Current runner state:** AI gates open (`CONTRACT_TEST_MODE=false`, `JM1_AI_EXECUTION_ENABLED=true`). `JM1_AI_PROVIDER=anthropic`. `ANTHROPIC_MODEL=claude-sonnet-4-6`. Synthetic Sonnet test complete (Section 16b). Jackie review of Sonnet output pending. `knowledge.md` editorial content not yet complete. Real manuscript processing remains prohibited until Approval 2.
