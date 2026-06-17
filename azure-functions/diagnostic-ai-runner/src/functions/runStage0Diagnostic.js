@@ -6,6 +6,7 @@ const { extractManuscript } = require("../extraction/manuscriptExtractor");
 const { checkLegacyExclusion, parseLegacyFlag } = require("../preflight/legacyExclusionCheck");
 const { validateNoQuotation } = require("../validation/noQuotationValidator");
 const { routeDiagnosticResult } = require("../routing/confidenceRouter");
+const { writeMetadata } = require("../dataverse/metadataWriter");
 
 const CONTRACT_TEST_MODE = true;
 
@@ -322,6 +323,75 @@ app.http("run-stage0-diagnostic", {
               error: routingDecision.error
             },
             message: `Diagnostic runner contract accepted. Confidence routing verified: ${routingDecision.statusLabel} (${routingDecision.routingBasis}). No Dataverse write. AI execution not enabled.`
+          }
+        };
+      }
+
+      const verifyMetadataWrites = body.verifyMetadataWrites === true;
+
+      if (verifyMetadataWrites) {
+        const syntheticResult = body.syntheticResult || {};
+        const now = new Date().toISOString();
+
+        const metadataInput = {
+          diagnosticId,
+          intakeReferenceCode,
+          correlationId: correlationId || null,
+          executionMode: "contract-test",
+          modelDeploymentAlias: "jm1-pub-diagnostic-safe-test",
+          promptKey: "jm1-prompt-pub-stage0-diagnostic",
+          promptVersion: "PUB-STAGE0-DIAGNOSTIC-V1",
+          confidence: typeof syntheticResult.confidence === "number" ? syntheticResult.confidence : null,
+          requiresHumanReview: syntheticResult.requiresHumanReview !== false,
+          tokenCounts: { input: 0, output: 0, total: 0 },
+          requestTimestamp: now,
+          responseTimestamp: now,
+          errorCode: null,
+          errorMessage: null
+        };
+
+        context.info(
+          `Metadata write contract test requested; diagnosticId=${diagnosticId}; reference=${intakeReferenceCode}`
+        );
+
+        const writeResult = await writeMetadata(metadataInput);
+
+        const bothCreated = writeResult.aiRequestLog.created && writeResult.executionLog.created;
+        const anyFailed = !writeResult.aiRequestLog.created || !writeResult.executionLog.created;
+
+        context.info(
+          `Metadata writes complete; diagnosticId=${diagnosticId}; aiRequestLog.created=${writeResult.aiRequestLog.created}; executionLog.created=${writeResult.executionLog.created}`
+        );
+
+        if (anyFailed && !bothCreated) {
+          return {
+            status: 503,
+            jsonBody: {
+              status: "error",
+              code: "METADATA_WRITE_PARTIAL_OR_FAILED",
+              diagnosticId,
+              metadataWrites: {
+                aiRequestLog: { created: writeResult.aiRequestLog.created, id: writeResult.aiRequestLog.id, error: writeResult.aiRequestLog.error },
+                executionLog: { created: writeResult.executionLog.created, id: writeResult.executionLog.id, error: writeResult.executionLog.error }
+              },
+              message: "One or more metadata writes failed. No manuscript text, prompt body, or secrets were stored."
+            }
+          };
+        }
+
+        return {
+          status: 202,
+          jsonBody: {
+            status: "accepted",
+            mode: "contract-test",
+            diagnosticId,
+            intakeReferenceCode,
+            correlationId,
+            metadataWrites: {
+              aiRequestLog: { created: writeResult.aiRequestLog.created, id: writeResult.aiRequestLog.id },
+              executionLog: { created: writeResult.executionLog.created, id: writeResult.executionLog.id }
+            },
+            message: "Diagnostic runner metadata write contract accepted. AI execution not enabled."
           }
         };
       }

@@ -60,7 +60,8 @@ In contract-test mode, the function:
 - Optionally runs DOCX or TXT extraction on a synthetic fixture when `verifyExtraction: true` and `syntheticFixture: "txt"|"docx"` are set — returns safe metadata only (no extracted text)
 - Optionally validates synthetic diagnostic output against the no-quotation rule when `verifyOutputValidation: true` and `syntheticOutput: {...}` are set — returns 202 if valid, 422 `OUTPUT_QUOTATION_VIOLATION` if any field fails
 - Optionally routes a synthetic diagnostic result through confidence-based routing when `verifyConfidenceRouting: true` and `syntheticResult: {...}` are set — returns routing decision with no Dataverse write
-- Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata, extraction metadata, validation result, or routing decision if requested)
+- Optionally writes safe synthetic metadata to `jm1_airequestlog` and `jm1_executionlog` when `verifyMetadataWrites: true` is set — returns both record IDs; no manuscript text, prompt body, model output, secrets, or headers are stored
+- Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata, extraction metadata, validation result, routing decision, or metadata write IDs if requested)
 - Does not call any AI service
 - Does not read or write Dataverse
 - Does not access SharePoint or the manuscript file
@@ -401,7 +402,8 @@ azure-functions/diagnostic-ai-runner/
 │   ├── routing/
 │   │   └── confidenceRouter.js          — Confidence-based routing (pure logic, no side effects)
 │   └── dataverse/
-│       └── client.js                    — config validation stub (no live reads)
+│       ├── client.js                    — config validation stub (no live reads)
+│       └── metadataWriter.js            — safe metadata writer for jm1_airequestlog + jm1_executionlog
 └── test/
     ├── validation.test.js               — payload pattern validation
     ├── knowledge.test.js                — knowledge.md SHA-256 and Blob verification
@@ -409,6 +411,7 @@ azure-functions/diagnostic-ai-runner/
     ├── confidenceRouting.test.js        — Confidence routing (all 5 paths, thresholds, invariants)
     ├── legacyExclusion.test.js          — Legacy-exclusion gate and flag parsing
     ├── noQuotationValidation.test.js    — No-quotation output validation rules and safety
+    ├── metadataWrite.test.js            — Metadata writer payload safety and prohibited field tests
     └── fixtures/
         ├── synthetic-stage0.txt         — synthetic TXT fixture (no real content)
         └── synthetic-stage0.docx        — synthetic DOCX fixture (no real content)
@@ -455,6 +458,92 @@ No-quotation output validation was verified via direct HTTP contract test on 202
 | `legacyFlag: true` + `verifyOutputValidation: true` (gate ordering) | 422 | `LEGACY_EXCLUDED` — Legacy gate fires before output validation |
 
 Violation objects contain only `field`, `rule`, and `ruleDescription`. No offending text appears in any response field. `CONTRACT_TEST_MODE=true`. No AI was called. No Dataverse writes occurred.
+
+## Metadata Write Verification
+
+Safe metadata writes to `jm1_airequestlog` and `jm1_executionlog` were verified via live HTTP contract test on 2026-06-17.
+
+### Dataverse Schema
+
+| Table | Logical Name | Entity Set Name |
+|---|---|---|
+| AI Request Log | `jm1_airequestlog` | `jm1_airequestlogs` |
+| Execution Log | `jm1_executionlog` | `jm1_executionlogs` |
+
+### Authentication
+
+Runner managed identity (`func-jm1-diagnostic-ai-runner`, MSI appId `dc8d1429-8c1b-473b-83ca-f9545fad8074`) registered as Dataverse application user (systemuserid `cb6e97e5-1d6a-f111-a826-000d3a9eacee`). Role: `JM1 Publishing Intake API - Create Only` with additional privileges `prvCreatejm1_AIRequestLog`, `prvWritejm1_AIRequestLog`, `prvReadjm1_AIRequestLog`, `prvCreatejm1_ExecutionLog`, `prvWritejm1_ExecutionLog`, `prvReadjm1_ExecutionLog`. Token acquired via `DefaultAzureCredential` (MSI on Azure). No client secret committed.
+
+### Metadata Fields Written
+
+**`jm1_airequestlog` safe fields:**
+
+| Field | Value written |
+|---|---|
+| `jm1_agentname` | `jm1-diagnostic-ai-runner` |
+| `jm1_agentversion` | `1.0.0` |
+| `jm1_airequestid` | correlationId or diagnosticId |
+| `jm1_modeldeployment` | `jm1-pub-diagnostic-safe-test` |
+| `jm1_modelprovider` | `835500000` (Azure OpenAI) |
+| `jm1_promptname` | `jm1-prompt-pub-stage0-diagnostic` |
+| `jm1_promptversion` | `PUB-STAGE0-DIAGNOSTIC-V1` |
+| `jm1_requeststatus` | `835500002` (Completed) or `835500003` (Failed) |
+| `jm1_requesttimestamp` | ISO 8601 UTC |
+| `jm1_responsetimestamp` | ISO 8601 UTC |
+| `jm1_requesttype` | `835500000` (Diagnostic) |
+| `jm1_sourcebrand` | `835500001` (J Merrill Publishing) |
+| `jm1_sourceentity` | `jm1pub_editorialdiagnostic` |
+| `jm1_sourcerecordid` | diagnosticId |
+| `jm1_sourcesystem` | `jm1-diagnostic-ai-runner` |
+| `jm1_humanreviewrequired` | `true` always |
+| `jm1_confidence` | numeric confidence if set |
+| `jm1_actualinputtokens` | `0` (contract-test) |
+| `jm1_actualoutputtokens` | `0` (contract-test) |
+| `jm1_flowrunid` | correlationId or null |
+| `jm1_contentdisclosurerequired` | `false` |
+
+**`jm1_executionlog` safe fields:**
+
+| Field | Value written |
+|---|---|
+| `jm1_agentname` | `jm1-diagnostic-ai-runner` |
+| `jm1_agentmodel` | `jm1-pub-diagnostic-safe-test` |
+| `jm1_actiontype` | `Stage0DiagnosticRun` |
+| `jm1_actiondescription` | Mode + reference code + safety statement |
+| `jm1_bandlevel` | `835500000` (Band 1) |
+| `jm1_executionstatus` | `835500001` (Success) or `835500002` (Failed) |
+| `jm1_startedon` | ISO 8601 UTC |
+| `jm1_completedon` | ISO 8601 UTC |
+| `jm1_sourceentity` | `jm1pub_editorialdiagnostic` |
+| `jm1_sourcerecordid` | diagnosticId |
+
+### Prohibited Fields
+
+The following fields are **never set** by `metadataWriter.js`:
+
+| Field | Reason |
+|---|---|
+| `jm1_requestpayload` | Prompt body text — prohibited |
+| `jm1_responsepayload` | AI model output — prohibited |
+| `jm1_airecommendation` | AI model recommendation — prohibited |
+| Any manuscript text | Prohibited in all fields |
+| Any extracted text | Prohibited in all fields |
+| Secrets, headers, tokens, PII | Prohibited in all fields |
+
+### Live Contract Test Result (2026-06-17)
+
+Request: `verifyMetadataWrites: true`, `confidence: 0.9`, `requiresHumanReview: true`, `intakeReferenceCode: JMP-INT-260617-METADATA-TEST`
+
+| Record | Created | ID |
+|---|---|---|
+| AI Request Log | `true` | `3435a7f9-206a-f111-a826-00224820105b` |
+| Execution Log | `true` | `62ec86f8-206a-f111-a826-6045bdd69678` |
+
+Dataverse inspection confirmed: `jm1_requestpayload=null`, `jm1_responsepayload=null`, `jm1_airecommendation=null`. No manuscript text, prompt body, model output, secrets, headers, or tokens stored. `CONTRACT_TEST_MODE=true`. No AI was called. No Opportunity created. No author email sent. No Flow D modified.
+
+### Rollback / Cleanup Note
+
+Synthetic contract-test records (`3435a7f9...` and `62ec86f8...`) are retained as audit evidence of the metadata write scaffold verification. If cleanup is required, both records can be deleted by Dataverse admin. Future runs with `verifyMetadataWrites: true` will create new synthetic records; these should be periodically purged or tagged to distinguish from production records.
 
 ## Legacy-Exclusion Gate Verification
 
