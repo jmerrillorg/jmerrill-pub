@@ -4,7 +4,7 @@
 
 This document describes the architecture, contract, and operational boundary for the `jm1-diagnostic-ai-runner` Azure Function. This function is the approved execution vehicle for the future side-effect-free INT-PUB-005 Stage 0 diagnostic AI call.
 
-**Current status:** Contract-test mode only. `CONTRACT_TEST_MODE=true`. Real AI execution is not enabled. The runner validates requests, enforces the Legacy-exclusion pre-flight gate, optionally reads and verifies the `knowledge.md` grounding file via managed identity, and optionally runs DOCX/TXT extraction verification against synthetic fixtures. It returns HTTP 202 with a safe contract-test confirmation. It does not call any AI endpoint, read real manuscripts, or write Dataverse.
+**Current status:** Contract-test mode only. `CONTRACT_TEST_MODE=true`. Real AI execution is not enabled. The runner validates requests, enforces the Legacy-exclusion pre-flight gate, optionally reads and verifies the `knowledge.md` grounding file via managed identity, optionally runs DOCX/TXT extraction verification against synthetic fixtures, and optionally validates synthetic diagnostic output against the no-quotation rule. It returns HTTP 202 with a safe contract-test confirmation. It does not call any AI endpoint, read real manuscripts, or write Dataverse.
 
 The runner will remain in contract-test mode until Jackie explicitly approves activation and all items in the activation checklist are satisfied. See:
 
@@ -58,8 +58,9 @@ In contract-test mode, the function:
 - Enforces the Legacy-exclusion pre-flight gate: if `legacyFlag: true` is present in the request body, returns HTTP 422 `LEGACY_EXCLUDED` before any manuscript access or AI call
 - Optionally reads and SHA-256 verifies `knowledge.md` when `verifyKnowledge: true` is set in the request body
 - Optionally runs DOCX or TXT extraction on a synthetic fixture when `verifyExtraction: true` and `syntheticFixture: "txt"|"docx"` are set — returns safe metadata only (no extracted text)
+- Optionally validates synthetic diagnostic output against the no-quotation rule when `verifyOutputValidation: true` and `syntheticOutput: {...}` are set — returns 202 if valid, 422 `OUTPUT_QUOTATION_VIOLATION` if any field fails
 - Optionally routes a synthetic diagnostic result through confidence-based routing when `verifyConfidenceRouting: true` and `syntheticResult: {...}` are set — returns routing decision with no Dataverse write
-- Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata, extraction metadata, or routing decision if requested)
+- Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata, extraction metadata, validation result, or routing decision if requested)
 - Does not call any AI service
 - Does not read or write Dataverse
 - Does not access SharePoint or the manuscript file
@@ -100,6 +101,8 @@ Contract-test mode remains active until Jackie explicitly authorizes AI executio
 | `verifyKnowledge` | No | `true` (boolean) to trigger `knowledge.md` Blob read and SHA-256 verification |
 | `verifyExtraction` | No | `true` (boolean) to trigger synthetic-fixture extraction verification — requires `syntheticFixture` |
 | `syntheticFixture` | No | `"txt"` or `"docx"` — selects the synthetic test fixture for extraction verification; only valid when `verifyExtraction: true` |
+| `verifyOutputValidation` | No | `true` (boolean) to trigger no-quotation validation on `syntheticOutput`; requires `syntheticOutput` |
+| `syntheticOutput` | No | Object with Dataverse output field logical names as keys and string (or null) values; only valid when `verifyOutputValidation: true` |
 
 ## Response Contract
 
@@ -169,6 +172,63 @@ Returned when `verifyExtraction: true`, `syntheticFixture: "txt"` or `"docx"`, a
 ```
 
 `contentReturned` is always `false`. Extracted text is never returned. `lineCount` is `null` for DOCX.
+
+### HTTP 202 — Output validation passed
+
+Returned when `verifyOutputValidation: true` and the synthetic output passes all no-quotation rules.
+
+```json
+{
+  "status": "accepted",
+  "mode": "contract-test",
+  "diagnosticId": "<echoed>",
+  "intakeReferenceCode": "<echoed>",
+  "correlationId": null,
+  "validation": {
+    "valid": true,
+    "violations": [],
+    "fieldsChecked": ["jm1_diagnosticoutputsummary", "jm1_diagnosticstructuredoutputjson", "..."]
+  },
+  "message": "Diagnostic runner contract accepted. Synthetic output passed no-quotation validation. AI execution not enabled."
+}
+```
+
+### HTTP 422 — Output quotation violation
+
+Returned when `verifyOutputValidation: true` and the synthetic output fails a no-quotation rule. Violation objects contain only `field`, `rule`, and `ruleDescription` — never the offending text.
+
+```json
+{
+  "status": "error",
+  "code": "OUTPUT_QUOTATION_VIOLATION",
+  "diagnosticId": "<echoed>",
+  "validation": {
+    "valid": false,
+    "violations": [
+      {
+        "field": "jm1_diagnosticoutputsummary",
+        "rule": "QUOTED_CONTENT",
+        "ruleDescription": "Field 'jm1_diagnosticoutputsummary' contains quoted text with 7 words. Output must be characterization only — no quoted manuscript prose"
+      }
+    ],
+    "fieldsChecked": ["jm1_diagnosticoutputsummary"]
+  },
+  "message": "Synthetic output failed no-quotation validation. Output must be characterization only."
+}
+```
+
+**No-quotation rules applied (all output fields, permanent):**
+
+| Rule | Description |
+|---|---|
+| `QUOTED_CONTENT` | Text in double/curly quotes with ≥ 4 word tokens — indicates direct manuscript quotation |
+| `PROMPT_LEAKAGE` | Known prompt-instruction phrases echoed in output (e.g. "you are a", "given the manuscript") |
+| `PROSE_BLOCK` | Unbroken prose span > 300 chars in non-JSON fields — indicates possible verbatim copy |
+| `JSON_PROSE_VALUE` | String value > 300 chars in `jm1_diagnosticstructuredoutputjson` |
+| `INVALID_JSON` | `jm1_diagnosticstructuredoutputjson` is not valid JSON |
+| `UNKNOWN_FIELD` | Field key not in the declared validated output field set |
+
+**Validated output fields:** `jm1_diagnosticoutputsummary`, `jm1_diagnosticstructuredoutputjson`, `jm1_diagnosticriskflags`, `jm1_diagnosticexecutionerror`, `jm1_humanreviewnotes`.
 
 ### HTTP 400 — Invalid synthetic fixture
 
@@ -336,6 +396,8 @@ azure-functions/diagnostic-ai-runner/
 │   │   └── manuscriptExtractor.js       — DOCX/TXT transient extraction (metadata only)
 │   ├── preflight/
 │   │   └── legacyExclusionCheck.js      — Legacy-exclusion pre-flight gate
+│   ├── validation/
+│   │   └── noQuotationValidator.js      — No-quotation output field validator
 │   ├── routing/
 │   │   └── confidenceRouter.js          — Confidence-based routing (pure logic, no side effects)
 │   └── dataverse/
@@ -346,6 +408,7 @@ azure-functions/diagnostic-ai-runner/
     ├── extraction.test.js               — extraction metadata safety and correctness
     ├── confidenceRouting.test.js        — Confidence routing (all 5 paths, thresholds, invariants)
     ├── legacyExclusion.test.js          — Legacy-exclusion gate and flag parsing
+    ├── noQuotationValidation.test.js    — No-quotation output validation rules and safety
     └── fixtures/
         ├── synthetic-stage0.txt         — synthetic TXT fixture (no real content)
         └── synthetic-stage0.docx        — synthetic DOCX fixture (no real content)
@@ -379,6 +442,19 @@ Confidence-based routing was verified via direct HTTP contract test on 2026-06-1
 All paths returned HTTP 202. `requiresHumanReview` was `true` on every path. No Dataverse write occurred. AI execution not enabled.
 
 Routing priority order confirmed: manuscriptGateFailure → technicalFailure → confidence thresholds. Missing or invalid confidence routes to Exception.
+
+## No-Quotation Output Validation Verification
+
+No-quotation output validation was verified via direct HTTP contract test on 2026-06-17.
+
+| Test case | HTTP status | Result |
+|---|---|---|
+| Clean characterization output (5 fields, all clean) | 202 | `valid: true`, all fields checked |
+| Output with ASCII double-quoted prose span (7 words) | 422 | `QUOTED_CONTENT` violation on `jm1_diagnosticoutputsummary` |
+| Output with prompt-instruction phrase ("You are a...") | 422 | `PROMPT_LEAKAGE` violation on `jm1_diagnosticoutputsummary` |
+| `legacyFlag: true` + `verifyOutputValidation: true` (gate ordering) | 422 | `LEGACY_EXCLUDED` — Legacy gate fires before output validation |
+
+Violation objects contain only `field`, `rule`, and `ruleDescription`. No offending text appears in any response field. `CONTRACT_TEST_MODE=true`. No AI was called. No Dataverse writes occurred.
 
 ## Legacy-Exclusion Gate Verification
 

@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const { verifyKnowledgeBlob } = require("../blob/knowledgeReader");
 const { extractManuscript } = require("../extraction/manuscriptExtractor");
 const { checkLegacyExclusion, parseLegacyFlag } = require("../preflight/legacyExclusionCheck");
+const { validateNoQuotation } = require("../validation/noQuotationValidator");
 const { routeDiagnosticResult } = require("../routing/confidenceRouter");
 
 const CONTRACT_TEST_MODE = true;
@@ -230,6 +231,60 @@ app.http("run-stage0-diagnostic", {
               contentReturned: extractionResult.contentReturned
             },
             message: `Diagnostic runner contract accepted. Synthetic ${syntheticFixture.toUpperCase()} extraction verified. AI execution not enabled.`
+          }
+        };
+      }
+
+      const verifyOutputValidation = body.verifyOutputValidation === true;
+
+      if (verifyOutputValidation) {
+        const syntheticOutput = body.syntheticOutput;
+
+        if (syntheticOutput == null || typeof syntheticOutput !== "object" || Array.isArray(syntheticOutput)) {
+          context.warn(`Output validation rejected: syntheticOutput missing or not an object; diagnosticId=${diagnosticId}`);
+          return validationError("INVALID_SYNTHETIC_OUTPUT", diagnosticId);
+        }
+
+        const validationResult = validateNoQuotation(syntheticOutput);
+
+        if (!validationResult.valid) {
+          context.warn(
+            `Output validation failed; diagnosticId=${diagnosticId}; violationCount=${validationResult.violations.length}; fields=${validationResult.fieldsChecked.join(",")}`
+          );
+          return {
+            status: 422,
+            jsonBody: {
+              status: "error",
+              code: "OUTPUT_QUOTATION_VIOLATION",
+              diagnosticId,
+              validation: {
+                valid: false,
+                violations: validationResult.violations,
+                fieldsChecked: validationResult.fieldsChecked
+              },
+              message: "Synthetic output failed no-quotation validation. Output must be characterization only."
+            }
+          };
+        }
+
+        context.info(
+          `Output validation passed; diagnosticId=${diagnosticId}; fieldsChecked=${validationResult.fieldsChecked.join(",")}`
+        );
+
+        return {
+          status: 202,
+          jsonBody: {
+            status: "accepted",
+            mode: "contract-test",
+            diagnosticId,
+            intakeReferenceCode,
+            correlationId,
+            validation: {
+              valid: true,
+              violations: [],
+              fieldsChecked: validationResult.fieldsChecked
+            },
+            message: "Diagnostic runner contract accepted. Synthetic output passed no-quotation validation. AI execution not enabled."
           }
         };
       }
