@@ -4,7 +4,7 @@
 
 This document describes the architecture, contract, and operational boundary for the `jm1-diagnostic-ai-runner` Azure Function. This function is the approved execution vehicle for the future side-effect-free INT-PUB-005 Stage 0 diagnostic AI call.
 
-**Current status:** Contract-test mode only. `CONTRACT_TEST_MODE=true`. Real AI execution is not enabled. The runner validates requests, optionally reads and verifies the `knowledge.md` grounding file via managed identity, and optionally runs DOCX/TXT extraction verification against synthetic fixtures. It returns HTTP 202 with a safe contract-test confirmation. It does not call any AI endpoint, read real manuscripts, or write Dataverse.
+**Current status:** Contract-test mode only. `CONTRACT_TEST_MODE=true`. Real AI execution is not enabled. The runner validates requests, enforces the Legacy-exclusion pre-flight gate, optionally reads and verifies the `knowledge.md` grounding file via managed identity, and optionally runs DOCX/TXT extraction verification against synthetic fixtures. It returns HTTP 202 with a safe contract-test confirmation. It does not call any AI endpoint, read real manuscripts, or write Dataverse.
 
 The runner will remain in contract-test mode until Jackie explicitly approves activation and all items in the activation checklist are satisfied. See:
 
@@ -55,6 +55,7 @@ In contract-test mode, the function:
 
 - Validates the `x-jm1-diagnostic-runner-key` header
 - Validates the request payload (diagnosticId, intakeReferenceCode, correlationId)
+- Enforces the Legacy-exclusion pre-flight gate: if `legacyFlag: true` is present in the request body, returns HTTP 422 `LEGACY_EXCLUDED` before any manuscript access or AI call
 - Optionally reads and SHA-256 verifies `knowledge.md` when `verifyKnowledge: true` is set in the request body
 - Optionally runs DOCX or TXT extraction on a synthetic fixture when `verifyExtraction: true` and `syntheticFixture: "txt"|"docx"` are set — returns safe metadata only (no extracted text)
 - Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata or extraction metadata if requested)
@@ -92,6 +93,7 @@ Contract-test mode remains active until Jackie explicitly authorizes AI executio
 | `intakeReferenceCode` | Yes | JMP-INT reference pattern (`/^JMP-INT-\d{6}-[A-Z0-9-]+$/i`) |
 | `correlationId` | No | Alphanumeric, hyphens, underscores; max 100 characters |
 | `mode` | No | Informational field; does not change routing — `CONTRACT_TEST_MODE` is code-controlled |
+| `legacyFlag` | No | `true` (boolean) to simulate a Legacy-flagged intake. Gate fires before any downstream processing. In production this will be read from Dataverse. |
 | `verifyKnowledge` | No | `true` (boolean) to trigger `knowledge.md` Blob read and SHA-256 verification |
 | `verifyExtraction` | No | `true` (boolean) to trigger synthetic-fixture extraction verification — requires `syntheticFixture` |
 | `syntheticFixture` | No | `"txt"` or `"docx"` — selects the synthetic test fixture for extraction verification; only valid when `verifyExtraction: true` |
@@ -172,6 +174,19 @@ Returned when `verifyExtraction: true`, `syntheticFixture: "txt"` or `"docx"`, a
   "status": "error",
   "code": "INVALID_SYNTHETIC_FIXTURE",
   "diagnosticId": "<echoed or null>"
+}
+```
+
+### HTTP 422 — Legacy-excluded
+
+Returned when `legacyFlag: true`. The gate fires before any manuscript access, knowledge verification, or extraction. No AI is called.
+
+```json
+{
+  "status": "error",
+  "code": "LEGACY_EXCLUDED",
+  "diagnosticId": "<echoed from request>",
+  "message": "This intake is flagged as Legacy and cannot be processed by the Stage 0 Diagnostic Runner. A separate governed Legacy diagnostic path is required."
 }
 ```
 
@@ -316,12 +331,15 @@ azure-functions/diagnostic-ai-runner/
 │   │   └── knowledgeReader.js           — Blob read + SHA-256 verification via managed identity
 │   ├── extraction/
 │   │   └── manuscriptExtractor.js       — DOCX/TXT transient extraction (metadata only)
+│   ├── preflight/
+│   │   └── legacyExclusionCheck.js      — Legacy-exclusion pre-flight gate
 │   └── dataverse/
 │       └── client.js                    — config validation stub (no live reads)
 └── test/
     ├── validation.test.js               — payload pattern validation
     ├── knowledge.test.js                — knowledge.md SHA-256 and Blob verification
     ├── extraction.test.js               — extraction metadata safety and correctness
+    ├── legacyExclusion.test.js          — Legacy-exclusion gate and flag parsing
     └── fixtures/
         ├── synthetic-stage0.txt         — synthetic TXT fixture (no real content)
         └── synthetic-stage0.docx        — synthetic DOCX fixture (no real content)
@@ -339,6 +357,21 @@ When AI execution is authorized, Flow D's true branch (`Condition_Manuscript_Ass
 | `x-jm1-diagnostic-runner-key` | Flow D environment variable (not committed) |
 
 Flow D integration is not implemented in this pass. The true branch currently routes to a deferred update.
+
+## Legacy-Exclusion Gate Verification
+
+Legacy-exclusion pre-flight gate was verified via direct HTTP contract test on 2026-06-17 (post gate deployment).
+
+| Test case | HTTP status | Response code |
+|---|---|---|
+| `legacyFlag: true` | 422 | `LEGACY_EXCLUDED` |
+| `legacyFlag: true` + `verifyExtraction: true` (gate fires first) | 422 | `LEGACY_EXCLUDED` |
+| `legacyFlag` absent (normal path) | 202 | — |
+| `legacyFlag: false` (non-Legacy) | 202 | — |
+
+No manuscript was accessed. No AI was called. No Dataverse writes occurred. `CONTRACT_TEST_MODE=true`.
+
+In production, `legacyFlag` will be resolved from the Dataverse record (Publishing Intake or Editorial Diagnostic) before the gate check. The gate location in the runner (before knowledge verification, before extraction) is permanent.
 
 ## Synthetic Extraction Verification
 

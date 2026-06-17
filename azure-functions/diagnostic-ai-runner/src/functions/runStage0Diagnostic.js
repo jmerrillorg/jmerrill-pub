@@ -3,6 +3,7 @@ const path = require("node:path");
 const fs = require("node:fs");
 const { verifyKnowledgeBlob } = require("../blob/knowledgeReader");
 const { extractManuscript } = require("../extraction/manuscriptExtractor");
+const { checkLegacyExclusion, parseLegacyFlag } = require("../preflight/legacyExclusionCheck");
 
 const CONTRACT_TEST_MODE = true;
 
@@ -102,6 +103,27 @@ app.http("run-stage0-diagnostic", {
     const { diagnosticId, intakeReferenceCode, correlationId } = validation.value;
 
     if (CONTRACT_TEST_MODE) {
+      // Legacy-exclusion pre-flight gate — must run before any manuscript access or AI call.
+      // In contract-test mode, legacyFlag is read from the request body.
+      // In production, the runner will read jm1_legacyroute from Dataverse before reaching this point.
+      const legacyFlag = parseLegacyFlag(body);
+      const legacyCheck = checkLegacyExclusion(legacyFlag);
+
+      if (legacyCheck.excluded) {
+        context.warn(
+          `Legacy-exclusion gate fired; diagnosticId=${diagnosticId}; reference=${intakeReferenceCode}; reason=${legacyCheck.reason}`
+        );
+        return {
+          status: 422,
+          jsonBody: {
+            status: "error",
+            code: "LEGACY_EXCLUDED",
+            diagnosticId,
+            message: "This intake is flagged as Legacy and cannot be processed by the Stage 0 Diagnostic Runner. A separate governed Legacy diagnostic path is required."
+          }
+        };
+      }
+
       const verifyKnowledge = body.verifyKnowledge === true;
 
       if (verifyKnowledge) {
