@@ -4,7 +4,7 @@
 
 This document describes the architecture, contract, and operational boundary for the `jm1-diagnostic-ai-runner` Azure Function. This function is the approved execution vehicle for the future side-effect-free INT-PUB-005 Stage 0 diagnostic AI call.
 
-**Current status:** Contract-test mode only. `CONTRACT_TEST_MODE=true`. Real AI execution is not enabled. The runner validates requests, optionally reads and verifies the `knowledge.md` grounding file via managed identity, and returns HTTP 202 with a safe contract-test confirmation. It does not call any AI endpoint, read manuscripts, or write Dataverse.
+**Current status:** Contract-test mode only. `CONTRACT_TEST_MODE=true`. Real AI execution is not enabled. The runner validates requests, optionally reads and verifies the `knowledge.md` grounding file via managed identity, and optionally runs DOCX/TXT extraction verification against synthetic fixtures. It returns HTTP 202 with a safe contract-test confirmation. It does not call any AI endpoint, read real manuscripts, or write Dataverse.
 
 The runner will remain in contract-test mode until Jackie explicitly approves activation and all items in the activation checklist are satisfied. See:
 
@@ -56,7 +56,8 @@ In contract-test mode, the function:
 - Validates the `x-jm1-diagnostic-runner-key` header
 - Validates the request payload (diagnosticId, intakeReferenceCode, correlationId)
 - Optionally reads and SHA-256 verifies `knowledge.md` when `verifyKnowledge: true` is set in the request body
-- Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata if requested)
+- Optionally runs DOCX or TXT extraction on a synthetic fixture when `verifyExtraction: true` and `syntheticFixture: "txt"|"docx"` are set — returns safe metadata only (no extracted text)
+- Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata or extraction metadata if requested)
 - Does not call any AI service
 - Does not read or write Dataverse
 - Does not access SharePoint or the manuscript file
@@ -92,6 +93,8 @@ Contract-test mode remains active until Jackie explicitly authorizes AI executio
 | `correlationId` | No | Alphanumeric, hyphens, underscores; max 100 characters |
 | `mode` | No | Informational field; does not change routing — `CONTRACT_TEST_MODE` is code-controlled |
 | `verifyKnowledge` | No | `true` (boolean) to trigger `knowledge.md` Blob read and SHA-256 verification |
+| `verifyExtraction` | No | `true` (boolean) to trigger synthetic-fixture extraction verification — requires `syntheticFixture` |
+| `syntheticFixture` | No | `"txt"` or `"docx"` — selects the synthetic test fixture for extraction verification; only valid when `verifyExtraction: true` |
 
 ## Response Contract
 
@@ -133,6 +136,44 @@ Returned when `verifyKnowledge: true` and the blob is reachable with a matching 
 ```
 
 `knowledge.md` file content is never included in the response. The response contains safe metadata only.
+
+### HTTP 202 — Contract-test accepted with extraction verification
+
+Returned when `verifyExtraction: true`, `syntheticFixture: "txt"` or `"docx"`, and extraction succeeds.
+
+```json
+{
+  "status": "accepted",
+  "mode": "contract-test",
+  "diagnosticId": "<echoed from request>",
+  "intakeReferenceCode": "<echoed from request>",
+  "correlationId": "<echoed or null>",
+  "extraction": {
+    "supported": true,
+    "fileType": ".txt",
+    "byteLength": 1094,
+    "charCount": 1094,
+    "wordCount": 162,
+    "lineCount": 23,
+    "sha256": "<hex digest of raw bytes>",
+    "extractionWarnings": [],
+    "contentReturned": false
+  },
+  "message": "Diagnostic runner contract accepted. Synthetic TXT extraction verified. AI execution not enabled."
+}
+```
+
+`contentReturned` is always `false`. Extracted text is never returned. `lineCount` is `null` for DOCX.
+
+### HTTP 400 — Invalid synthetic fixture
+
+```json
+{
+  "status": "error",
+  "code": "INVALID_SYNTHETIC_FIXTURE",
+  "diagnosticId": "<echoed or null>"
+}
+```
 
 ### HTTP 503 — Knowledge verification failed
 
@@ -270,11 +311,20 @@ azure-functions/diagnostic-ai-runner/
 ├── local.settings.example.json
 ├── src/
 │   ├── functions/
-│   │   └── runStage0Diagnostic.js   — POST /api/run-stage0-diagnostic
+│   │   └── runStage0Diagnostic.js       — POST /api/run-stage0-diagnostic
+│   ├── blob/
+│   │   └── knowledgeReader.js           — Blob read + SHA-256 verification via managed identity
+│   ├── extraction/
+│   │   └── manuscriptExtractor.js       — DOCX/TXT transient extraction (metadata only)
 │   └── dataverse/
-│       └── client.js                — config validation stub (no live reads)
+│       └── client.js                    — config validation stub (no live reads)
 └── test/
-    └── validation.test.js           — pattern validation unit tests
+    ├── validation.test.js               — payload pattern validation
+    ├── knowledge.test.js                — knowledge.md SHA-256 and Blob verification
+    ├── extraction.test.js               — extraction metadata safety and correctness
+    └── fixtures/
+        ├── synthetic-stage0.txt         — synthetic TXT fixture (no real content)
+        └── synthetic-stage0.docx        — synthetic DOCX fixture (no real content)
 ```
 
 ## Flow D Integration (Future)
@@ -289,6 +339,50 @@ When AI execution is authorized, Flow D's true branch (`Condition_Manuscript_Ass
 | `x-jm1-diagnostic-runner-key` | Flow D environment variable (not committed) |
 
 Flow D integration is not implemented in this pass. The true branch currently routes to a deferred update.
+
+## Synthetic Extraction Verification
+
+Synthetic DOCX and TXT extraction was verified via direct HTTP contract test on 2026-06-17 (post extraction scaffold deployment).
+
+### TXT fixture
+
+| Field | Result |
+|---|---|
+| HTTP status | 202 |
+| `extraction.supported` | `true` |
+| `extraction.fileType` | `.txt` |
+| `extraction.byteLength` | `1094` |
+| `extraction.charCount` | `1094` |
+| `extraction.wordCount` | `153` |
+| `extraction.lineCount` | `27` |
+| `extraction.sha256` | `a9bceb94530e0711e0a27d1cae38da32226337c6232b668aeb2429d8b9383a79` |
+| `extraction.contentReturned` | `false` |
+| Extracted text in response | Not present — metadata only |
+| Runner mode | `CONTRACT_TEST_MODE=true` |
+
+### DOCX fixture
+
+| Field | Result |
+|---|---|
+| HTTP status | 202 |
+| `extraction.supported` | `true` |
+| `extraction.fileType` | `.docx` |
+| `extraction.byteLength` | `1704` |
+| `extraction.charCount` | `331` |
+| `extraction.wordCount` | `52` |
+| `extraction.lineCount` | `null` (not applicable for DOCX) |
+| `extraction.sha256` | `844b0ad405569f6becbd8074743567a3a73c70c3a6df9d2d28b9e564da09e869` |
+| `extraction.contentReturned` | `false` |
+| Extracted text in response | Not present — metadata only |
+| Runner mode | `CONTRACT_TEST_MODE=true` |
+
+### Invalid fixture guard
+
+| Test | HTTP status |
+|---|---|
+| `syntheticFixture: "pdf"` with `verifyExtraction: true` | `400 INVALID_SYNTHETIC_FIXTURE` |
+
+No real manuscript content was used. No AI was called. No Dataverse writes occurred.
 
 ## Related Documents
 
