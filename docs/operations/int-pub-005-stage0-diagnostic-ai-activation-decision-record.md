@@ -4,7 +4,7 @@
 
 This document records the resolved activation design decisions for the INT-PUB-005 Stage 0 Diagnostic AI execution path. It folds in four governance reconciliation items from the pipeline review and defines the canonical identifiers, prompt governance, grounding dependencies, manuscript boundary, confidence thresholds, output storage, logging contract, human review model, no-quotation discipline, and Legacy exclusion that must be satisfied before real AI execution is authorized.
 
-This record does not authorize real AI execution. See Section 14.
+**Approval 1 granted 2026-06-17:** Jackie approved INT-PUB-005 to proceed from contract-test mode to controlled synthetic real-AI activation testing only. This authorizes one controlled synthetic AI call using only synthetic fixture content. Real manuscript processing, author-facing output, Opportunity creation, author email, and production diagnostic execution remain prohibited. See Section 14 and Section 16.
 
 ## 2. Current Verified State
 
@@ -288,5 +288,51 @@ The following must be completed, verified, and documented before the runner may 
 | `jm1_diagnosticstructuredoutputjson` and `jm1_diagnosticriskflags` write implemented with no-quotation validation | Not started |
 | Human review status (`jm1_humanreviewstatus`) set to `Pending Review` on every completed or needs-review result | Not started |
 | AI execution dual-gate scaffold (`JM1_AI_EXECUTION_ENABLED` env var + `CONTRACT_TEST_MODE` hardcoded constant) implemented, with `controlled-ai-test` mode and model caller stub | **Done** — `src/activation/aiExecutionGate.js` and `src/ai/modelCaller.js` implemented 2026-06-17. Dual gate: `CONTRACT_TEST_MODE=true` (hardcoded, requires code change + Jackie Approval 1) AND `JM1_AI_EXECUTION_ENABLED=true` (env var, requires explicit setting) must both be open before any model call executes. Neither gate alone is sufficient. `controlledAiTest: true` route added to handler — with both gates closed (current state), returns `gate-closed` 200 with full gate state. When gates open, executes synthetic-fixture-only path: knowledge verify → extraction → model call → no-quotation validation → confidence routing → metadata write. 23 unit tests in `test/aiActivationGate.test.js` (6 suites) prove AI cannot run unless both gates are intentionally opened. Live gate-closed test 2026-06-17: `status=gate-closed`, `reason=CONTRACT_TEST_MODE_ACTIVE`, `aiExecutionEnabled=false`. verifyFullPipeline and legacy gate unaffected (regression verified live 2026-06-17). |
-| Controlled activation test with a safe synthetic manuscript (DOCX, no real author content) run and verified | Not started — pending Jackie Approval 1 |
-| Jackie explicitly approves activation and signs off on this checklist | Not started |
+| Azure OpenAI resource `oai-jm1-diagnostic` provisioned in `rg-jm1-ai` East US; `gpt-4o-mini` (2024-07-18) deployed as `jm1-pub-diagnostic-primary` (GlobalStandard, 10K TPM); Function MSI granted `Cognitive Services OpenAI User`; endpoint `https://oai-jm1-diagnostic.openai.azure.com/` | **Done** — provisioned 2026-06-17. MSI principal `e8c51a80-bdb0-46fa-b398-9109719d6427` assigned role `/resourceGroups/rg-jm1-ai/providers/Microsoft.CognitiveServices/accounts/oai-jm1-diagnostic`. App settings `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_VERSION` (`2024-08-01-preview`), `AZURE_OPENAI_DEPLOYMENT_NAME` set on `func-jm1-diagnostic-ai-runner`. |
+| `CONTRACT_TEST_MODE` changed from `true` to `false` | **Done** — changed 2026-06-17 under Jackie Approval 1 (granted 2026-06-17). Controlled synthetic real-AI test only. |
+| `JM1_AI_EXECUTION_ENABLED=true` set on Function App | **Done** — set 2026-06-17 as part of controlled activation. Second gate now open. |
+| Controlled activation test with a safe synthetic manuscript (DOCX, no real author content) run and verified | **Done** — see Section 16. |
+| Jackie explicitly approves activation and signs off on this checklist | **Approval 1 granted 2026-06-17** — controlled synthetic real-AI test only. Production activation requires separate Approval 2. |
+
+## 16. Controlled Synthetic Real-AI Test Record (Approval 1)
+
+**Authorization:** Jackie Approval 1, granted 2026-06-17.
+
+**Scope:** One controlled synthetic AI call using synthetic fixture only. No real manuscripts. No production use. All outputs subject to Jackie review before any further activation decision.
+
+| Item | Value |
+|---|---|
+| Test date | 2026-06-17 |
+| Fixture | TXT synthetic fixture (`synthetic-stage0.txt`) |
+| Model | `gpt-4o-mini` (2024-07-18) |
+| Deployment | `jm1-pub-diagnostic-primary` |
+| Endpoint | `https://oai-jm1-diagnostic.openai.azure.com/` |
+| API version | `2024-08-01-preview` |
+| Execution mode | `controlled-ai-test` |
+| Real manuscript | None |
+| Author content | None |
+| Result | Pending — to be filled after live test |
+
+### Post-test review checklist (Jackie)
+
+| Check | Result |
+|---|---|
+| Output is characterization only — no quoted manuscript text | Pending |
+| No prompt leakage in output | Pending |
+| No-quotation validation passed | Pending |
+| Confidence score present and numeric | Pending |
+| `requiresHumanReview=true` on result | Pending |
+| AI Request Log created, prohibited fields null | Pending |
+| Execution Log created | Pending |
+| No manuscript text in any log field | Pending |
+| Output is editorially useful (Stage 0 direction) | Pending |
+| Output safety: conservative enough for internal use | Pending |
+
+### Approval 2 decision
+
+After reviewing the above checklist, Jackie will decide:
+
+- **Proceed to Approval 2** (limited production diagnostic execution on real approved manuscript assets) — requires all checks above to pass
+- **Do not proceed** — gates remain open for synthetic testing only; production activation deferred
+
+_This section will be completed in PR #70._
