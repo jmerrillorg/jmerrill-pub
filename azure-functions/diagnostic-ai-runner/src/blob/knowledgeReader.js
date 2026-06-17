@@ -1,11 +1,12 @@
 /**
  * Reads knowledge.md from Azure Blob Storage using managed identity.
  *
- * Returns safe metadata only. Never returns or logs file content.
- * Never calls AI. Used for grounding-read verification in contract-test mode.
+ * Returns safe metadata and content for prompt injection.
+ * Content must not be logged, stored, or returned in API responses.
+ * Never calls AI.
  *
  * Required env vars:
- *   KNOWLEDGE_BLOB_URL   — full private blob URL
+ *   KNOWLEDGE_BLOB_URL    — full private blob URL
  *   KNOWLEDGE_BLOB_SHA256 — approved SHA-256 hex digest
  */
 
@@ -26,6 +27,7 @@ const { createHash } = require("node:crypto");
  *   byteLength: number|null,
  *   etag: string|null,
  *   lastModified: string|null,
+ *   content: string|null,
  *   error: string|null
  * }>}
  */
@@ -42,6 +44,7 @@ async function verifyKnowledgeBlob() {
       byteLength: null,
       etag: null,
       lastModified: null,
+      content: null,
       error: "KNOWLEDGE_BLOB_URL not configured"
     };
   }
@@ -55,6 +58,7 @@ async function verifyKnowledgeBlob() {
       byteLength: null,
       etag: null,
       lastModified: null,
+      content: null,
       error: "KNOWLEDGE_BLOB_SHA256 not configured"
     };
   }
@@ -88,6 +92,8 @@ async function verifyKnowledgeBlob() {
       byteLength,
       etag,
       lastModified,
+      // For prompt injection only — must not be logged, stored, or returned in API responses
+      content: content.toString("utf8"),
       error: null
     };
   } catch (err) {
@@ -99,6 +105,7 @@ async function verifyKnowledgeBlob() {
       byteLength: null,
       etag: null,
       lastModified: null,
+      content: null,
       error: "Blob read failed"
     };
   }

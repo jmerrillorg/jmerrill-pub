@@ -4,9 +4,14 @@
     "AzureWebJobsStorage": "",
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "JM1_DIAGNOSTIC_RUNNER_KEY": "",
-    "DATAVERSE_ENDPOINT": "",
-    "DATAVERSE_CLIENT_ID": "",
-    "DATAVERSE_TENANT_ID": "",
+    "JM1_AI_EXECUTION_ENABLED": "false",
+    "JM1_AI_PROVIDER": "anthropic",
+    "ANTHROPIC_API_KEY": "",
+    "ANTHROPIC_MODEL": "claude-sonnet-4-6",
+    "DATAVERSE_WEB_API_BASE_URL": "",
+    "DATAVERSE_RESOURCE_URL": "",
+    "DATAVERSE_EDITORIAL_DIAGNOSTIC_ENTITY_SET": "jm1pub_editorialdiagnostics",
+    "DATAVERSE_EDITORIAL_DIAGNOSTIC_MANUSCRIPT_URL_COLUMN": "jm1pub_manuscripturl",
     "KNOWLEDGE_BLOB_URL": "https://stjm1diagrunner.blob.core.windows.net/knowledge/knowledge.md",
     "KNOWLEDGE_BLOB_SHA256": ""
   }

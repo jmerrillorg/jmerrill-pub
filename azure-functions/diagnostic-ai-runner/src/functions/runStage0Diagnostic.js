@@ -3,6 +3,8 @@ const path = require("node:path");
 const fs = require("node:fs");
 const { verifyKnowledgeBlob } = require("../blob/knowledgeReader");
 const { extractManuscript } = require("../extraction/manuscriptExtractor");
+const { fetchAndExtractManuscript } = require("../extraction/pilotContentExtractor");
+const { readDiagnosticRecord } = require("../dataverse/diagnosticRecordReader");
 const { checkLegacyExclusion, parseLegacyFlag } = require("../preflight/legacyExclusionCheck");
 const { validateNoQuotation } = require("../validation/noQuotationValidator");
 const { routeDiagnosticResult } = require("../routing/confidenceRouter");
@@ -14,6 +16,11 @@ const { resolveProvider } = require("../model/providerRouter");
 // CONTRACT_TEST_MODE=false — Jackie Approval 1 granted 2026-06-17.
 // Controlled synthetic real-AI test only. No real manuscripts. No production use.
 const CONTRACT_TEST_MODE = false;
+
+// Approval 2 — one limited real-manuscript diagnostic pilot.
+// Jackie approval granted 2026-06-17 (PR #74). One record only.
+// Any diagnosticId that does not match this value is rejected on the realManuscriptPilot path.
+const AUTHORIZED_PILOT_DIAGNOSTIC_ID = "64e387e0-7e6a-f111-a826-00224820105b";
 
 const DIAGNOSTIC_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i;
@@ -363,6 +370,296 @@ app.http("run-stage0-diagnostic", {
           },
           requiresHumanReview: true,
           message: "Controlled synthetic real-AI test complete. Output requires Jackie review before any production use. No real manuscript processed. No author-facing action taken."
+        }
+      };
+    }
+
+    // -----------------------------------------------------------------------
+    // Real-manuscript pilot path — Approval 2 scope only
+    // One authorized record: 64e387e0-7e6a-f111-a826-00224820105b
+    // JM1_AI_EXECUTION_ENABLED must be true when Jackie re-opens the gate for PR #76 execution.
+    // -----------------------------------------------------------------------
+    const realManuscriptPilot = body.realManuscriptPilot === true;
+
+    if (realManuscriptPilot) {
+      // Pilot authorization guard — hard stop on any record that is not the one authorized record
+      if (diagnosticId.toLowerCase() !== AUTHORIZED_PILOT_DIAGNOSTIC_ID) {
+        context.error(
+          `Real manuscript pilot blocked: unauthorized diagnosticId=${diagnosticId}; authorized=${AUTHORIZED_PILOT_DIAGNOSTIC_ID}`
+        );
+        return {
+          status: 403,
+          jsonBody: {
+            status: "error",
+            code: "PILOT_RECORD_NOT_AUTHORIZED",
+            diagnosticId,
+            message: `This diagnostic record is not authorized for the limited real-manuscript pilot. Authorized record: ${AUTHORIZED_PILOT_DIAGNOSTIC_ID}.`
+          }
+        };
+      }
+
+      // Gate check — JM1_AI_EXECUTION_ENABLED must be true
+      const gate = checkAiExecutionGate(CONTRACT_TEST_MODE);
+      if (!gate.permitted) {
+        context.warn(
+          `Real manuscript pilot gate closed; diagnosticId=${diagnosticId}; reason=${gate.reason}`
+        );
+        return {
+          status: 200,
+          jsonBody: {
+            status: "gate-closed",
+            mode: "real-manuscript-pilot",
+            diagnosticId,
+            intakeReferenceCode,
+            correlationId,
+            gate: {
+              permitted: false,
+              reason: gate.reason,
+              contractTestModeActive: getGateState(CONTRACT_TEST_MODE).contractTestModeActive,
+              aiExecutionEnabled: getGateState(CONTRACT_TEST_MODE).aiExecutionEnabled
+            },
+            message: `Real manuscript pilot gate is closed: ${gate.reason}. No manuscript accessed. No model call attempted.`
+          }
+        };
+      }
+
+      context.info(
+        `Real manuscript pilot authorized; diagnosticId=${diagnosticId}; reference=${intakeReferenceCode}`
+      );
+
+      // Stage 1: Knowledge verification
+      const knowledgeMeta = await verifyKnowledgeBlob();
+      if (!knowledgeMeta.reachable || !knowledgeMeta.hashMatched) {
+        context.error(
+          `Real manuscript pilot failed at knowledge stage; reachable=${knowledgeMeta.reachable}; hashMatched=${knowledgeMeta.hashMatched}`
+        );
+        return {
+          status: 503,
+          jsonBody: {
+            status: "error",
+            code: "PILOT_KNOWLEDGE_FAILED",
+            diagnosticId,
+            failedStage: "knowledge",
+            knowledge: { reachable: knowledgeMeta.reachable, hashMatched: knowledgeMeta.hashMatched }
+          }
+        };
+      }
+
+      context.info(`Pilot stage 1 knowledge OK; diagnosticId=${diagnosticId}`);
+
+      // Stage 2: Read Dataverse record — get manuscript URL (not logged)
+      const recordResult = await readDiagnosticRecord(diagnosticId);
+      if (!recordResult.ok) {
+        context.error(
+          `Real manuscript pilot failed at record read stage; diagnosticId=${diagnosticId}; code=${recordResult.code}`
+        );
+        return {
+          status: 503,
+          jsonBody: {
+            status: "error",
+            code: `PILOT_RECORD_READ_FAILED:${recordResult.code}`,
+            diagnosticId,
+            failedStage: "dataverseRead"
+          }
+        };
+      }
+
+      context.info(`Pilot stage 2 record read OK; diagnosticId=${diagnosticId}`);
+
+      // Stage 3: Download + extract manuscript in memory (content not logged)
+      const extractResult = await fetchAndExtractManuscript(recordResult.manuscriptUrl);
+      if (!extractResult.ok) {
+        context.error(
+          `Real manuscript pilot failed at extraction stage; diagnosticId=${diagnosticId}; code=${extractResult.code}`
+        );
+        return {
+          status: 503,
+          jsonBody: {
+            status: "error",
+            code: `PILOT_EXTRACTION_FAILED:${extractResult.code}`,
+            diagnosticId,
+            failedStage: "extraction",
+            extraction: extractResult.metadata
+          }
+        };
+      }
+
+      context.info(
+        `Pilot stage 3 extraction OK; diagnosticId=${diagnosticId}; fileType=${extractResult.metadata.fileType}; wordCount=${extractResult.metadata.wordCount}`
+      );
+
+      // Stage 4: Build prompt — content and promptBody never logged, never stored, never returned
+      const knowledgeContent = knowledgeMeta.content || "";
+      const promptKey = process.env.JM1_PROMPT_KEY || "jm1-prompt-pub-stage0-diagnostic";
+      const promptVersion = process.env.JM1_PROMPT_VERSION || "PUB-STAGE0-DIAGNOSTIC-V1";
+
+      const promptBody = [
+        knowledgeContent,
+        "",
+        "---",
+        "MANUSCRIPT (authorized pilot record — real submission for diagnostic review only):",
+        extractResult.content,
+        "---",
+        "",
+        "Provide a structured Stage 0 Diagnostic in JSON format with keys:",
+        "jm1_diagnosticoutputsummary, jm1_diagnosticriskflags, jm1_confidence (0.0-1.0), jm1_requireshumanreview (always true)"
+      ].join("\n");
+
+      // Clear content reference — no longer needed after prompt construction
+      extractResult.content = null;
+
+      context.info(
+        `Pilot stage 4 prompt built; diagnosticId=${diagnosticId}; promptKey=${promptKey}`
+      );
+
+      // Stage 5: Model call
+      const requestTimestamp = new Date().toISOString();
+      const modelResult = await callModel({
+        contractTestMode: CONTRACT_TEST_MODE,
+        promptBody,
+        diagnosticId,
+        promptKey,
+        promptVersion
+      });
+      const responseTimestamp = new Date().toISOString();
+
+      context.info(
+        `Pilot stage 5 model call complete; diagnosticId=${diagnosticId}; ok=${modelResult.ok}; httpStatus=${modelResult.httpStatus}; tokens=${JSON.stringify(modelResult.tokenCounts)}`
+      );
+
+      if (!modelResult.ok) {
+        const errorCode = modelResult.gateBlocked
+          ? `GATE_BLOCKED_${modelResult.gateReason}`
+          : (modelResult.error || "MODEL_CALL_FAILED");
+
+        const metadataFail = {
+          diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
+          executionMode: "real-manuscript-pilot",
+          modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+          promptKey, promptVersion,
+          confidence: null,
+          requiresHumanReview: true,
+          tokenCounts: modelResult.tokenCounts,
+          requestTimestamp, responseTimestamp,
+          errorCode, errorMessage: modelResult.error
+        };
+        await writeMetadata(metadataFail);
+
+        return {
+          status: 503,
+          jsonBody: {
+            status: "error",
+            code: errorCode,
+            diagnosticId,
+            failedStage: "modelCall",
+            gate: { permitted: gate.permitted, reason: gate.reason },
+            tokens: modelResult.tokenCounts,
+            message: "Real manuscript pilot model call failed. Metadata logged."
+          }
+        };
+      }
+
+      // Stage 6: Output validation — no-quotation rule required
+      const aiOutput = modelResult.output || {};
+      const aiTextFields = {};
+      if (typeof aiOutput.jm1_diagnosticoutputsummary === "string") {
+        aiTextFields.jm1_diagnosticoutputsummary = aiOutput.jm1_diagnosticoutputsummary;
+      }
+      if (typeof aiOutput.jm1_diagnosticriskflags === "string") {
+        aiTextFields.jm1_diagnosticriskflags = aiOutput.jm1_diagnosticriskflags;
+      }
+      const aiValidation = validateNoQuotation(aiTextFields);
+
+      if (!aiValidation.valid) {
+        context.warn(
+          `Real manuscript pilot output failed no-quotation validation; diagnosticId=${diagnosticId}; violations=${aiValidation.violations.length}`
+        );
+
+        const metadataViolation = {
+          diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
+          executionMode: "real-manuscript-pilot",
+          modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+          promptKey, promptVersion,
+          confidence: null,
+          requiresHumanReview: true,
+          tokenCounts: modelResult.tokenCounts,
+          requestTimestamp, responseTimestamp,
+          errorCode: "OUTPUT_QUOTATION_VIOLATION",
+          errorMessage: `${aiValidation.violations.length} violation(s) in model output`
+        };
+        await writeMetadata(metadataViolation);
+
+        return {
+          status: 422,
+          jsonBody: {
+            status: "error",
+            code: "PILOT_OUTPUT_QUOTATION_VIOLATION",
+            diagnosticId,
+            failedStage: "outputValidation",
+            validation: { valid: false, violations: aiValidation.violations, fieldsChecked: aiValidation.fieldsChecked },
+            tokens: modelResult.tokenCounts,
+            message: "Real manuscript pilot output failed no-quotation validation. No output forwarded. Metadata logged."
+          }
+        };
+      }
+
+      // Stage 7: Confidence routing
+      const confidence = typeof aiOutput.jm1_confidence === "number" ? aiOutput.jm1_confidence : null;
+      const routingDecision = routeDiagnosticResult({ confidence, requiresHumanReview: true });
+
+      // Stage 8: Metadata write — never includes manuscript text, prompt body, or model response text
+      const metadataSuccess = {
+        diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
+        executionMode: "real-manuscript-pilot",
+        modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+        promptKey, promptVersion,
+        confidence,
+        requiresHumanReview: true,
+        tokenCounts: modelResult.tokenCounts,
+        requestTimestamp, responseTimestamp,
+        errorCode: null,
+        errorMessage: null
+      };
+
+      const writeResult = await writeMetadata(metadataSuccess);
+
+      context.info(
+        `Pilot stage 8 metadata writes; diagnosticId=${diagnosticId}; aiRequestLog.created=${writeResult.aiRequestLog.created}; executionLog.created=${writeResult.executionLog.created}; routing=${routingDecision.routingBasis}`
+      );
+
+      return {
+        status: 202,
+        jsonBody: {
+          status: "accepted",
+          mode: "real-manuscript-pilot",
+          diagnosticId,
+          intakeReferenceCode,
+          correlationId,
+          gate: { permitted: true, reason: gate.reason },
+          pipeline: {
+            legacyGate: { excluded: false },
+            knowledge: { reachable: knowledgeMeta.reachable, hashMatched: knowledgeMeta.hashMatched, byteLength: knowledgeMeta.byteLength },
+            manuscriptRead: {
+              ok: true,
+              fileType: extractResult.metadata.fileType,
+              byteLength: extractResult.metadata.byteLength,
+              wordCount: extractResult.metadata.wordCount,
+              sha256: extractResult.metadata.sha256,
+              contentReturned: false
+            },
+            modelCall: { ok: true, provider: modelResult.provider, httpStatus: modelResult.httpStatus, tokens: modelResult.tokenCounts },
+            outputValidation: { valid: true, violations: [], fieldsChecked: aiValidation.fieldsChecked },
+            confidenceRouting: { status: routingDecision.status, statusLabel: routingDecision.statusLabel, requiresHumanReview: true, lowConfidenceNote: routingDecision.lowConfidenceNote, routingBasis: routingDecision.routingBasis },
+            metadataWrites: { aiRequestLog: { created: writeResult.aiRequestLog.created, id: writeResult.aiRequestLog.id }, executionLog: { created: writeResult.executionLog.created, id: writeResult.executionLog.id } }
+          },
+          diagnosticOutput: {
+            jm1_diagnosticoutputsummary: aiOutput.jm1_diagnosticoutputsummary || null,
+            jm1_diagnosticriskflags: aiOutput.jm1_diagnosticriskflags || null,
+            jm1_confidence: confidence,
+            jm1_requireshumanreview: true
+          },
+          requiresHumanReview: true,
+          message: "Real manuscript pilot diagnostic complete. Output is for Jackie internal review only. No author-facing action taken. No Opportunity created. No email sent."
         }
       };
     }
