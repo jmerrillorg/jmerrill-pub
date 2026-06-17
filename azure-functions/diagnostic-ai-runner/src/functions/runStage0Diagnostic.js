@@ -19,8 +19,9 @@ const CONTRACT_TEST_MODE = false;
 
 // Approval 2 — one limited real-manuscript diagnostic pilot.
 // Jackie approval granted 2026-06-17 (PR #74). One record only.
-// Any diagnosticId that does not match this value is rejected on the realManuscriptPilot path.
-const AUTHORIZED_PILOT_DIAGNOSTIC_ID = "64e387e0-7e6a-f111-a826-00224820105b";
+// Both diagnosticId AND intakeReferenceCode must match. Either mismatch rejects with 403.
+const AUTHORIZED_PILOT_DIAGNOSTIC_ID    = "64e387e0-7e6a-f111-a826-00224820105b";
+const AUTHORIZED_PILOT_REFERENCE_CODE   = "JMP-INT-202606-UFYG60";
 
 const DIAGNOSTIC_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i;
@@ -382,10 +383,14 @@ app.http("run-stage0-diagnostic", {
     const realManuscriptPilot = body.realManuscriptPilot === true;
 
     if (realManuscriptPilot) {
-      // Pilot authorization guard — hard stop on any record that is not the one authorized record
-      if (diagnosticId.toLowerCase() !== AUTHORIZED_PILOT_DIAGNOSTIC_ID) {
+      // Pilot authorization guard — both diagnosticId AND intakeReferenceCode must match.
+      // Either mismatch is a hard stop.
+      const idMatch  = diagnosticId.toLowerCase()       === AUTHORIZED_PILOT_DIAGNOSTIC_ID;
+      const refMatch = intakeReferenceCode.toUpperCase() === AUTHORIZED_PILOT_REFERENCE_CODE;
+
+      if (!idMatch || !refMatch) {
         context.error(
-          `Real manuscript pilot blocked: unauthorized diagnosticId=${diagnosticId}; authorized=${AUTHORIZED_PILOT_DIAGNOSTIC_ID}`
+          `Real manuscript pilot blocked: idMatch=${idMatch}; refMatch=${refMatch}; diagnosticId=${diagnosticId}; intakeReferenceCode=${intakeReferenceCode}`
         );
         return {
           status: 403,
@@ -393,7 +398,7 @@ app.http("run-stage0-diagnostic", {
             status: "error",
             code: "PILOT_RECORD_NOT_AUTHORIZED",
             diagnosticId,
-            message: `This diagnostic record is not authorized for the limited real-manuscript pilot. Authorized record: ${AUTHORIZED_PILOT_DIAGNOSTIC_ID}.`
+            message: `This record is not authorized for the limited real-manuscript pilot. Authorized: diagnosticId=${AUTHORIZED_PILOT_DIAGNOSTIC_ID}, intakeReferenceCode=${AUTHORIZED_PILOT_REFERENCE_CODE}.`
           }
         };
       }
