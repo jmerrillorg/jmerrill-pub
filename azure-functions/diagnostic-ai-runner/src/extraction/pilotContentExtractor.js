@@ -39,7 +39,12 @@ function detectExtension(manuscriptUrl) {
 /**
  * Downloads from URL and extracts text in memory.
  *
+ * Extension detection priority:
+ *   1. fileTypeHint — from jm1_manuscriptfiletype on the Dataverse record (preferred)
+ *   2. URL path extension — fallback when fileTypeHint is absent or unrecognized
+ *
  * @param {string} manuscriptUrl — shareable manuscript URL (not logged by this module)
+ * @param {{ fileTypeHint?: string|null }} [options]
  * @returns {Promise<{
  *   ok: boolean,
  *   code: string|null,
@@ -53,7 +58,7 @@ function detectExtension(manuscriptUrl) {
  *   }
  * }>}
  */
-async function fetchAndExtractManuscript(manuscriptUrl) {
+async function fetchAndExtractManuscript(manuscriptUrl, { fileTypeHint = null } = {}) {
   const emptyMeta = { fileType: null, byteLength: null, wordCount: null, charCount: null, sha256: null };
 
   // Download
@@ -86,8 +91,8 @@ async function fetchAndExtractManuscript(manuscriptUrl) {
   const byteLength = buffer.byteLength;
   const sha256 = createHash("sha256").update(buffer).digest("hex");
 
-  // Detect type from URL path
-  const ext = detectExtension(manuscriptUrl);
+  // Detect type — prefer fileTypeHint from Dataverse, fall back to URL path
+  const ext = fileTypeHint || detectExtension(manuscriptUrl);
   if (!ext) {
     return { ok: false, code: "MANUSCRIPT_TYPE_UNSUPPORTED", content: null, metadata: { fileType: null, byteLength, wordCount: null, charCount: null, sha256 } };
   }

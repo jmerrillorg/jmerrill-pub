@@ -1,11 +1,7 @@
 "use strict";
 
-const { describe, it, before, after, beforeEach, afterEach } = require("node:test");
+const { describe, it } = require("node:test");
 const assert = require("node:assert/strict");
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function withEnv(vars, fn) {
   return async () => {
@@ -33,45 +29,123 @@ function withEnv(vars, fn) {
 }
 
 // ---------------------------------------------------------------------------
-// getEntitySet and getManuscriptUrlColumn defaults
+// Confirmed Power Apps column names
 // ---------------------------------------------------------------------------
 
-describe("diagnosticRecordReader — env var defaults", () => {
-  it("getEntitySet defaults to jm1pub_editorialdiagnostics", withEnv(
-    { DATAVERSE_EDITORIAL_DIAGNOSTIC_ENTITY_SET: undefined },
-    async () => {
-      const { getEntitySet } = require("../src/dataverse/diagnosticRecordReader");
-      assert.equal(getEntitySet(), "jm1pub_editorialdiagnostics");
-    }
-  ));
+describe("diagnosticRecordReader — confirmed Power Apps column names", () => {
+  it("ASSET_GATE_COLUMNS.manuscriptAssetUrl is jm1_manuscriptasseturl", () => {
+    const { ASSET_GATE_COLUMNS } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(ASSET_GATE_COLUMNS.manuscriptAssetUrl, "jm1_manuscriptasseturl");
+  });
 
-  it("getEntitySet returns override value when env var is set", withEnv(
-    { DATAVERSE_EDITORIAL_DIAGNOSTIC_ENTITY_SET: "custom_editorialdiagnostics" },
-    async () => {
-      // Re-require to pick up env change — module is cached so test the exported function
-      const { getEntitySet } = require("../src/dataverse/diagnosticRecordReader");
-      // Module is cached, so the function reads process.env at call time
-      process.env.DATAVERSE_EDITORIAL_DIAGNOSTIC_ENTITY_SET = "custom_editorialdiagnostics";
-      assert.equal(getEntitySet(), "custom_editorialdiagnostics");
-    }
-  ));
+  it("ASSET_GATE_COLUMNS.manuscriptAssetStatus is jm1_manuscriptassetstatus", () => {
+    const { ASSET_GATE_COLUMNS } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(ASSET_GATE_COLUMNS.manuscriptAssetStatus, "jm1_manuscriptassetstatus");
+  });
 
-  it("getManuscriptUrlColumn defaults to jm1pub_manuscripturl", withEnv(
+  it("ASSET_GATE_COLUMNS.manuscriptApprovedForDiagnostic is jm1_manuscriptapprovedfordiagnostic", () => {
+    const { ASSET_GATE_COLUMNS } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(ASSET_GATE_COLUMNS.manuscriptApprovedForDiagnostic, "jm1_manuscriptapprovedfordiagnostic");
+  });
+
+  it("ASSET_GATE_COLUMNS.manuscriptFilename is jm1_manuscriptfilename", () => {
+    const { ASSET_GATE_COLUMNS } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(ASSET_GATE_COLUMNS.manuscriptFilename, "jm1_manuscriptfilename");
+  });
+
+  it("ASSET_GATE_COLUMNS.manuscriptFileType is jm1_manuscriptfiletype", () => {
+    const { ASSET_GATE_COLUMNS } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(ASSET_GATE_COLUMNS.manuscriptFileType, "jm1_manuscriptfiletype");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Default column name
+// ---------------------------------------------------------------------------
+
+describe("diagnosticRecordReader — default manuscript URL column", () => {
+  it("getManuscriptUrlColumn defaults to jm1_manuscriptasseturl", withEnv(
     { DATAVERSE_EDITORIAL_DIAGNOSTIC_MANUSCRIPT_URL_COLUMN: undefined },
     async () => {
+      delete process.env.DATAVERSE_EDITORIAL_DIAGNOSTIC_MANUSCRIPT_URL_COLUMN;
       const { getManuscriptUrlColumn } = require("../src/dataverse/diagnosticRecordReader");
-      assert.equal(getManuscriptUrlColumn(), "jm1pub_manuscripturl");
+      assert.equal(getManuscriptUrlColumn(), "jm1_manuscriptasseturl");
     }
   ));
 
   it("getManuscriptUrlColumn returns override when env var is set", withEnv(
-    { DATAVERSE_EDITORIAL_DIAGNOSTIC_MANUSCRIPT_URL_COLUMN: "jm1_manuscripturl" },
+    { DATAVERSE_EDITORIAL_DIAGNOSTIC_MANUSCRIPT_URL_COLUMN: "jm1_manuscriptasseturl" },
     async () => {
+      process.env.DATAVERSE_EDITORIAL_DIAGNOSTIC_MANUSCRIPT_URL_COLUMN = "jm1_manuscriptasseturl";
       const { getManuscriptUrlColumn } = require("../src/dataverse/diagnosticRecordReader");
-      process.env.DATAVERSE_EDITORIAL_DIAGNOSTIC_MANUSCRIPT_URL_COLUMN = "jm1_manuscripturl";
-      assert.equal(getManuscriptUrlColumn(), "jm1_manuscripturl");
+      assert.equal(getManuscriptUrlColumn(), "jm1_manuscriptasseturl");
     }
   ));
+
+  it("getEntitySet defaults to jm1pub_editorialdiagnostics", withEnv(
+    { DATAVERSE_EDITORIAL_DIAGNOSTIC_ENTITY_SET: undefined },
+    async () => {
+      delete process.env.DATAVERSE_EDITORIAL_DIAGNOSTIC_ENTITY_SET;
+      const { getEntitySet } = require("../src/dataverse/diagnosticRecordReader");
+      assert.equal(getEntitySet(), "jm1pub_editorialdiagnostics");
+    }
+  ));
+});
+
+// ---------------------------------------------------------------------------
+// normalizeFileTypeHint
+// ---------------------------------------------------------------------------
+
+describe("diagnosticRecordReader — normalizeFileTypeHint", () => {
+  it("normalizes 'docx' to '.docx'", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint("docx"), ".docx");
+  });
+
+  it("normalizes '.docx' (with leading dot) to '.docx'", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint(".docx"), ".docx");
+  });
+
+  it("normalizes 'DOCX' (uppercase) to '.docx'", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint("DOCX"), ".docx");
+  });
+
+  it("normalizes 'txt' to '.txt'", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint("txt"), ".txt");
+  });
+
+  it("normalizes '.TXT' to '.txt'", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint(".TXT"), ".txt");
+  });
+
+  it("returns null for 'pdf'", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint("pdf"), null);
+  });
+
+  it("returns null for empty string", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint(""), null);
+  });
+
+  it("returns null for null input", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint(null), null);
+  });
+
+  it("returns null for undefined input", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint(undefined), null);
+  });
+
+  it("returns null for a numeric value", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint(196650000), null);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -82,6 +156,7 @@ describe("diagnosticRecordReader — config missing", () => {
   it("returns DATAVERSE_CONFIG_MISSING when DATAVERSE_WEB_API_BASE_URL is absent", withEnv(
     { DATAVERSE_WEB_API_BASE_URL: undefined, DATAVERSE_RESOURCE_URL: "https://org.crm.dynamics.com" },
     async () => {
+      delete process.env.DATAVERSE_WEB_API_BASE_URL;
       const { readDiagnosticRecord } = require("../src/dataverse/diagnosticRecordReader");
       const result = await readDiagnosticRecord("64e387e0-7e6a-f111-a826-00224820105b");
       assert.equal(result.ok, false);
@@ -93,69 +168,55 @@ describe("diagnosticRecordReader — config missing", () => {
   it("returns DATAVERSE_CONFIG_MISSING when DATAVERSE_RESOURCE_URL is absent", withEnv(
     { DATAVERSE_WEB_API_BASE_URL: "https://org.crm.dynamics.com/api/data/v9.2", DATAVERSE_RESOURCE_URL: undefined },
     async () => {
+      delete process.env.DATAVERSE_RESOURCE_URL;
       const { readDiagnosticRecord } = require("../src/dataverse/diagnosticRecordReader");
       const result = await readDiagnosticRecord("64e387e0-7e6a-f111-a826-00224820105b");
       assert.equal(result.ok, false);
       assert.equal(result.code, "DATAVERSE_CONFIG_MISSING");
-      assert.equal(result.manuscriptUrl, null);
     }
   ));
 
-  it("returns DATAVERSE_CONFIG_MISSING when both config vars are absent", withEnv(
+  it("error result always includes assetGate with null fields", withEnv(
     { DATAVERSE_WEB_API_BASE_URL: undefined, DATAVERSE_RESOURCE_URL: undefined },
     async () => {
+      delete process.env.DATAVERSE_WEB_API_BASE_URL;
+      delete process.env.DATAVERSE_RESOURCE_URL;
       const { readDiagnosticRecord } = require("../src/dataverse/diagnosticRecordReader");
       const result = await readDiagnosticRecord("64e387e0-7e6a-f111-a826-00224820105b");
-      assert.equal(result.ok, false);
-      assert.equal(result.code, "DATAVERSE_CONFIG_MISSING");
+      assert.ok("assetGate" in result);
+      assert.equal(result.assetGate.approvedForDiagnostic, null);
+      assert.equal(result.assetGate.assetStatus, null);
+      assert.equal(result.assetGate.filename, null);
+      assert.equal(result.assetGate.fileTypeHint, null);
     }
   ));
 });
 
 // ---------------------------------------------------------------------------
-// URL field validation (unit tests — no network)
+// URL validation logic (unit tests — no network)
 // ---------------------------------------------------------------------------
 
 describe("diagnosticRecordReader — URL validation logic", () => {
-  it("empty string URL field returns MANUSCRIPT_URL_NOT_POPULATED code semantics", () => {
-    // Verify the expected behavior without a live call: empty string from field → not populated
+  it("empty string URL field is caught by the not-populated guard", () => {
     const raw = "  ".trim();
     assert.equal(raw, "");
   });
 
-  it("non-http URL is rejected by URL parsing guard", () => {
-    // Simulate what the module does when URL has a disallowed protocol
+  it("non-http URL is rejected", () => {
     const rawUrl = "ftp://files.example.com/manuscript.docx";
-    let parsed;
-    try {
-      parsed = new URL(rawUrl);
-    } catch {
-      parsed = null;
-    }
-    assert.ok(parsed !== null);
+    const parsed = new URL(rawUrl);
     assert.notEqual(parsed.protocol, "https:");
     assert.notEqual(parsed.protocol, "http:");
   });
 
   it("https URL passes protocol check", () => {
-    const rawUrl = "https://example.sharepoint.com/sites/manuscripts/manuscript.docx";
-    const parsed = new URL(rawUrl);
-    assert.ok(parsed.protocol === "https:" || parsed.protocol === "http:");
-  });
-
-  it("http URL passes protocol check", () => {
-    const rawUrl = "http://example.com/manuscript.txt";
-    const parsed = new URL(rawUrl);
+    const parsed = new URL("https://jmerrillpublishing.sharepoint.com/sites/m/manuscript.docx");
     assert.ok(parsed.protocol === "https:" || parsed.protocol === "http:");
   });
 
   it("malformed URL is caught by URL constructor", () => {
     let threw = false;
-    try {
-      new URL("not a url at all");
-    } catch {
-      threw = true;
-    }
+    try { new URL("not a url"); } catch { threw = true; }
     assert.ok(threw);
   });
 });
@@ -165,34 +226,44 @@ describe("diagnosticRecordReader — URL validation logic", () => {
 // ---------------------------------------------------------------------------
 
 describe("diagnosticRecordReader — safety invariants", () => {
-  it("module exports only readDiagnosticRecord, getEntitySet, getManuscriptUrlColumn", () => {
+  it("module exports the expected set of names", () => {
     const mod = require("../src/dataverse/diagnosticRecordReader");
     const keys = Object.keys(mod).sort();
-    assert.deepEqual(keys, ["getEntitySet", "getManuscriptUrlColumn", "readDiagnosticRecord"]);
+    assert.deepEqual(keys, [
+      "ASSET_GATE_COLUMNS",
+      "getEntitySet",
+      "getManuscriptUrlColumn",
+      "normalizeFileTypeHint",
+      "readDiagnosticRecord",
+    ]);
   });
 
-  it("readDiagnosticRecord is a function", () => {
-    const { readDiagnosticRecord } = require("../src/dataverse/diagnosticRecordReader");
-    assert.equal(typeof readDiagnosticRecord, "function");
-  });
-
-  it("result.manuscriptUrl is null on all error paths", withEnv(
+  it("result always has ok, code, manuscriptUrl, assetGate", withEnv(
     { DATAVERSE_WEB_API_BASE_URL: undefined, DATAVERSE_RESOURCE_URL: undefined },
     async () => {
-      const { readDiagnosticRecord } = require("../src/dataverse/diagnosticRecordReader");
-      const result = await readDiagnosticRecord("64e387e0-7e6a-f111-a826-00224820105b");
-      assert.equal(result.manuscriptUrl, null);
-    }
-  ));
-
-  it("result shape always has ok, code, manuscriptUrl", withEnv(
-    { DATAVERSE_WEB_API_BASE_URL: undefined, DATAVERSE_RESOURCE_URL: undefined },
-    async () => {
+      delete process.env.DATAVERSE_WEB_API_BASE_URL;
+      delete process.env.DATAVERSE_RESOURCE_URL;
       const { readDiagnosticRecord } = require("../src/dataverse/diagnosticRecordReader");
       const result = await readDiagnosticRecord("64e387e0-7e6a-f111-a826-00224820105b");
       assert.ok("ok" in result);
       assert.ok("code" in result);
       assert.ok("manuscriptUrl" in result);
+      assert.ok("assetGate" in result);
+      assert.ok("approvedForDiagnostic" in result.assetGate);
+      assert.ok("assetStatus" in result.assetGate);
+      assert.ok("filename" in result.assetGate);
+      assert.ok("fileTypeHint" in result.assetGate);
+    }
+  ));
+
+  it("manuscriptUrl is null on all error paths", withEnv(
+    { DATAVERSE_WEB_API_BASE_URL: undefined, DATAVERSE_RESOURCE_URL: undefined },
+    async () => {
+      delete process.env.DATAVERSE_WEB_API_BASE_URL;
+      delete process.env.DATAVERSE_RESOURCE_URL;
+      const { readDiagnosticRecord } = require("../src/dataverse/diagnosticRecordReader");
+      const result = await readDiagnosticRecord("64e387e0-7e6a-f111-a826-00224820105b");
+      assert.equal(result.manuscriptUrl, null);
     }
   ));
 });

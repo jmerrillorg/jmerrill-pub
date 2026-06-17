@@ -451,7 +451,7 @@ app.http("run-stage0-diagnostic", {
       const recordResult = await readDiagnosticRecord(diagnosticId);
       if (!recordResult.ok) {
         context.error(
-          `Real manuscript pilot failed at record read stage; diagnosticId=${diagnosticId}; code=${recordResult.code}`
+          `Real manuscript pilot failed at record read stage; diagnosticId=${diagnosticId}; code=${recordResult.code}; approvedForDiagnostic=${recordResult.assetGate.approvedForDiagnostic}; assetStatus=${recordResult.assetGate.assetStatus}`
         );
         return {
           status: 503,
@@ -459,15 +459,21 @@ app.http("run-stage0-diagnostic", {
             status: "error",
             code: `PILOT_RECORD_READ_FAILED:${recordResult.code}`,
             diagnosticId,
-            failedStage: "dataverseRead"
+            failedStage: "dataverseRead",
+            assetGate: recordResult.assetGate
           }
         };
       }
 
-      context.info(`Pilot stage 2 record read OK; diagnosticId=${diagnosticId}`);
+      context.info(
+        `Pilot stage 2 record read OK; diagnosticId=${diagnosticId}; assetStatus=${recordResult.assetGate.assetStatus}; filename=${recordResult.assetGate.filename}; fileTypeHint=${recordResult.assetGate.fileTypeHint}`
+      );
 
       // Stage 3: Download + extract manuscript in memory (content not logged)
-      const extractResult = await fetchAndExtractManuscript(recordResult.manuscriptUrl);
+      const extractResult = await fetchAndExtractManuscript(
+        recordResult.manuscriptUrl,
+        { fileTypeHint: recordResult.assetGate.fileTypeHint }
+      );
       if (!extractResult.ok) {
         context.error(
           `Real manuscript pilot failed at extraction stage; diagnosticId=${diagnosticId}; code=${extractResult.code}`
@@ -639,6 +645,12 @@ app.http("run-stage0-diagnostic", {
           pipeline: {
             legacyGate: { excluded: false },
             knowledge: { reachable: knowledgeMeta.reachable, hashMatched: knowledgeMeta.hashMatched, byteLength: knowledgeMeta.byteLength },
+            assetGate: {
+              approvedForDiagnostic: recordResult.assetGate.approvedForDiagnostic,
+              assetStatus: recordResult.assetGate.assetStatus,
+              filename: recordResult.assetGate.filename,
+              fileTypeHint: recordResult.assetGate.fileTypeHint
+            },
             manuscriptRead: {
               ok: true,
               fileType: extractResult.metadata.fileType,

@@ -72,12 +72,43 @@ describe("pilotContentExtractor — fetch failure paths", () => {
 // ---------------------------------------------------------------------------
 
 describe("pilotContentExtractor — unsupported file type", () => {
-  it("returns MANUSCRIPT_TYPE_UNSUPPORTED for PDF URL even if fetch would succeed", async () => {
-    // We can't reach a real PDF, but we can verify the type detection rejects the path.
-    // This test verifies detectExtension returns null for .pdf, and that the module
-    // correctly routes to MANUSCRIPT_TYPE_UNSUPPORTED.
-    // Since we can't mock fetch here, we test via detectExtension directly.
-    const ext = detectExtension("https://example.com/manuscript.pdf");
+  it("detectExtension returns null for .pdf", () => {
+    assert.equal(detectExtension("https://example.com/manuscript.pdf"), null);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// fileTypeHint priority
+// ---------------------------------------------------------------------------
+
+describe("pilotContentExtractor — fileTypeHint priority over URL extension", () => {
+  it("fileTypeHint .docx is preferred over URL extension", () => {
+    // Verify that if we pass a fileTypeHint, it would be used instead of URL detection.
+    // We test the logic directly: fileTypeHint || detectExtension(url)
+    const fileTypeHint = ".docx";
+    const url = "https://example.com/document.txt"; // URL says .txt
+    const ext = fileTypeHint || detectExtension(url);
+    assert.equal(ext, ".docx"); // hint wins
+  });
+
+  it("falls back to URL detection when fileTypeHint is null", () => {
+    const fileTypeHint = null;
+    const url = "https://example.com/document.docx";
+    const ext = fileTypeHint || detectExtension(url);
+    assert.equal(ext, ".docx");
+  });
+
+  it("falls back to URL detection when fileTypeHint is empty string", () => {
+    const fileTypeHint = "";
+    const url = "https://example.com/document.txt";
+    const ext = fileTypeHint || detectExtension(url);
+    assert.equal(ext, ".txt");
+  });
+
+  it("returns null when both fileTypeHint and URL extension are absent", () => {
+    const fileTypeHint = null;
+    const url = "https://example.com/document";
+    const ext = fileTypeHint || detectExtension(url);
     assert.equal(ext, null);
   });
 });

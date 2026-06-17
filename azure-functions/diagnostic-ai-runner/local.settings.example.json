@@ -11,7 +11,7 @@
     "DATAVERSE_WEB_API_BASE_URL": "",
     "DATAVERSE_RESOURCE_URL": "",
     "DATAVERSE_EDITORIAL_DIAGNOSTIC_ENTITY_SET": "jm1pub_editorialdiagnostics",
-    "DATAVERSE_EDITORIAL_DIAGNOSTIC_MANUSCRIPT_URL_COLUMN": "jm1pub_manuscripturl",
+    "DATAVERSE_EDITORIAL_DIAGNOSTIC_MANUSCRIPT_URL_COLUMN": "jm1_manuscriptasseturl",
     "KNOWLEDGE_BLOB_URL": "https://stjm1diagrunner.blob.core.windows.net/knowledge/knowledge.md",
     "KNOWLEDGE_BLOB_SHA256": ""
   }
