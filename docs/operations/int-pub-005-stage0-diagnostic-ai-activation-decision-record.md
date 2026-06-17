@@ -23,7 +23,7 @@ This document records the resolved activation design decisions for the INT-PUB-0
 
 | Decision | Resolved value |
 |---|---|
-| AI service endpoint / provider | Azure AI Foundry / Azure OpenAI Service via Diagnostic AI Runner Azure Function |
+| AI service endpoint / provider | Provider abstraction via `JM1_AI_PROVIDER`: `anthropic` (Claude Sonnet — preferred for REV) or `azure-openai` (infrastructure-validated fallback). Selectable at runtime without code change. |
 | Deployment alias — production | `jm1-pub-diagnostic-primary` |
 | Deployment alias — safe test | `jm1-pub-diagnostic-safe-test` |
 | Prompt / template source | Dataverse AI Prompt Template table (`jm1pub_aiprompttemplate`, entity set `jm1pub_aiprompttemplates`) |
@@ -293,6 +293,7 @@ The following must be completed, verified, and documented before the runner may 
 | `JM1_AI_EXECUTION_ENABLED=true` set on Function App | **Done** — set 2026-06-17 as part of controlled activation. Second gate now open. |
 | Controlled activation test with a safe synthetic manuscript (DOCX, no real author content) run and verified | **Done** — see Section 16. |
 | Jackie explicitly approves activation and signs off on this checklist | **Approval 1 granted 2026-06-17** — controlled synthetic real-AI test only. Production activation requires separate Approval 2. |
+| Provider abstraction layer (`JM1_AI_PROVIDER`) with `anthropic` and `azure-openai` providers; `modelCaller.js` refactored to gate-enforced router; `anthropicProvider.js` (Anthropic Messages API, Claude Sonnet) and `azureOpenAiProvider.js` (MSI) implemented; `src/ai/modelCaller.js` made a backward-compatible shim; 44 new unit tests (260 total, 0 failures); dual gate still enforced on all provider paths | **Done** — PR #71, 2026-06-17. `JM1_AI_PROVIDER` selects provider at runtime. Supported values: `anthropic` (Claude Sonnet — preferred for REV), `azure-openai` (infrastructure-validated fallback). Neither provider is called when either gate is closed. No secrets logged or returned. |
 
 ## 16. Controlled Synthetic Real-AI Test Record (Approval 1)
 
@@ -398,8 +399,8 @@ The following must be completed before Approval 2 (limited production diagnostic
 
 | Requirement | Status |
 |---|---|
-| Provider abstraction in `modelCaller.js` to support Claude Sonnet (Azure AI Foundry or Anthropic API) | Not started |
-| Claude Sonnet deployment or endpoint configured and MSI-accessible | Not started |
+| Provider abstraction in `modelCaller.js` to support Claude Sonnet (Azure AI Foundry or Anthropic API) | **Done** — PR #71, 2026-06-17. `JM1_AI_PROVIDER` env var selects `anthropic` or `azure-openai`. `anthropicProvider.js` calls Anthropic Messages API with `x-api-key` (never logged). `ANTHROPIC_MODEL=claude-sonnet-4-6` default. Gate enforcement unchanged. |
+| Claude Sonnet deployment or endpoint configured and MSI-accessible | Not started — requires `ANTHROPIC_API_KEY` set on Function App and Jackie Approval 2 to use Sonnet for any editorial review |
 | Second controlled synthetic real-AI test using Claude Sonnet | Not started |
 | Jackie review of Claude Sonnet output for editorial quality, confidence calibration, and safety | Not started |
 | Decision on whether `jm1-pub-diagnostic-primary` alias is reassigned or a new alias is created for Sonnet | Not started |

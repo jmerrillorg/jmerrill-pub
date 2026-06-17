@@ -8,7 +8,8 @@ const { validateNoQuotation } = require("../validation/noQuotationValidator");
 const { routeDiagnosticResult } = require("../routing/confidenceRouter");
 const { writeMetadata } = require("../dataverse/metadataWriter");
 const { checkAiExecutionGate, getGateState } = require("../activation/aiExecutionGate");
-const { callModel } = require("../ai/modelCaller");
+const { callModel } = require("../model/modelCaller");
+const { resolveProvider } = require("../model/providerRouter");
 
 // CONTRACT_TEST_MODE=false — Jackie Approval 1 granted 2026-06-17.
 // Controlled synthetic real-AI test only. No real manuscripts. No production use.
@@ -142,6 +143,8 @@ app.http("run-stage0-diagnostic", {
         `Controlled AI test requested; diagnosticId=${diagnosticId}; gate.permitted=${gate.permitted}; gate.reason=${gate.reason}`
       );
 
+      const providerResolution = resolveProvider();
+
       if (!gate.permitted) {
         return {
           status: 200,
@@ -156,6 +159,10 @@ app.http("run-stage0-diagnostic", {
               reason: gate.reason,
               contractTestModeActive: gateState.contractTestModeActive,
               aiExecutionEnabled: gateState.aiExecutionEnabled
+            },
+            provider: {
+              configured: providerResolution.ok,
+              name: providerResolution.provider || null
             },
             message: `Controlled AI test gate is closed: ${gate.reason}. No model call attempted. No manuscript processed.`
           }
@@ -343,7 +350,7 @@ app.http("run-stage0-diagnostic", {
             legacyGate: { excluded: false },
             knowledge: { reachable: knowledgeMeta.reachable, hashMatched: knowledgeMeta.hashMatched, byteLength: knowledgeMeta.byteLength },
             extraction: { supported: aiExtractionResult.supported, fileType: aiExtractionResult.fileType, byteLength: aiExtractionResult.byteLength, wordCount: aiExtractionResult.wordCount, contentReturned: aiExtractionResult.contentReturned },
-            modelCall: { ok: true, httpStatus: modelResult.httpStatus, tokens: modelResult.tokenCounts },
+            modelCall: { ok: true, provider: modelResult.provider, httpStatus: modelResult.httpStatus, tokens: modelResult.tokenCounts },
             outputValidation: { valid: true, violations: [], fieldsChecked: aiValidation.fieldsChecked },
             confidenceRouting: { status: aiRoutingDecision.status, statusLabel: aiRoutingDecision.statusLabel, requiresHumanReview: true, lowConfidenceNote: aiRoutingDecision.lowConfidenceNote, routingBasis: aiRoutingDecision.routingBasis },
             metadataWrites: { aiRequestLog: { created: aiWriteResult.aiRequestLog.created, id: aiWriteResult.aiRequestLog.id }, executionLog: { created: aiWriteResult.executionLog.created, id: aiWriteResult.executionLog.id } }

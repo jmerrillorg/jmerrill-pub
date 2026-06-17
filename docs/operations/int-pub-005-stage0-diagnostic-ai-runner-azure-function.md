@@ -4,7 +4,9 @@
 
 This document describes the architecture, contract, and operational boundary for the `jm1-diagnostic-ai-runner` Azure Function. This function is the approved execution vehicle for the future side-effect-free INT-PUB-005 Stage 0 diagnostic AI call.
 
-**Current status:** Contract-test mode only. `CONTRACT_TEST_MODE=true`. Real AI execution is not enabled. The runner validates requests, enforces the Legacy-exclusion pre-flight gate, optionally reads and verifies the `knowledge.md` grounding file via managed identity, optionally runs DOCX/TXT extraction verification against synthetic fixtures, and optionally validates synthetic diagnostic output against the no-quotation rule. It returns HTTP 202 with a safe contract-test confirmation. It does not call any AI endpoint, read real manuscripts, or write Dataverse.
+**Current status:** `CONTRACT_TEST_MODE=false` (Approval 1 granted 2026-06-17). `JM1_AI_EXECUTION_ENABLED=true`. Both gates are open. The runner can execute a real AI call on the `controlledAiTest: true` path using synthetic fixture content only. Provider abstraction layer is implemented: `JM1_AI_PROVIDER` selects between `anthropic` (Claude Sonnet — preferred for REV) and `azure-openai` (infrastructure-validated fallback). Azure OpenAI resource `oai-jm1-diagnostic` is provisioned and MSI-authorized. Anthropic (Claude Sonnet) requires Approval 2 before being used for any editorial review.
+
+Real manuscript processing requires Approval 2 (not yet granted). No author-facing output, no Opportunity creation, no author email, no production use of AI-generated diagnostics.
 
 The runner will remain in contract-test mode until Jackie explicitly approves activation and all items in the activation checklist are satisfied. See:
 
@@ -49,9 +51,9 @@ The runner will remain in contract-test mode until Jackie explicitly approves ac
 
 ## Current Mode
 
-**Contract-test mode.** `CONTRACT_TEST_MODE = true` in `src/functions/runStage0Diagnostic.js`.
+**Controlled real-AI mode.** `CONTRACT_TEST_MODE = false` (Approval 1 granted 2026-06-17). `JM1_AI_EXECUTION_ENABLED=true` (Azure Function app setting).
 
-In contract-test mode, the function:
+The function:
 
 - Validates the `x-jm1-diagnostic-runner-key` header
 - Validates the request payload (diagnosticId, intakeReferenceCode, correlationId)
@@ -64,12 +66,12 @@ In contract-test mode, the function:
 - Optionally runs the full 5-stage synthetic pipeline when `verifyFullPipeline: true` is set: knowledge → extraction → output validation → confidence routing → metadata writes — returns all stage results in a single aggregated response
 - Responds to `controlledAiTest: true` with `gate-closed` status and full gate state (both gates closed while `CONTRACT_TEST_MODE=true`); when Jackie Approval 1 is granted and both gates are opened, executes the synthetic-fixture-only real-AI path: knowledge verify → synthetic extraction → model call → no-quotation validation → confidence routing → metadata write
 - Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata, extraction metadata, validation result, routing decision, or metadata write IDs if requested)
-- Does not call any AI service
-- Does not read or write Dataverse
+- Does not read or write Dataverse except via the `controlledAiTest` path metadata write
 - Does not access SharePoint or the manuscript file
 - Does not return or log `knowledge.md` file content — metadata only
+- Does not call real AI on `verifyKnowledge`, `verifyExtraction`, `verifyOutputValidation`, `verifyConfidenceRouting`, `verifyMetadataWrites`, or `verifyFullPipeline` paths — synthetic only
 
-Contract-test mode remains active until Jackie explicitly authorizes AI execution and all open decisions in the AI execution contract are resolved.
+Real manuscript processing remains prohibited until Approval 2 is granted.
 
 ## Request Contract
 
@@ -408,8 +410,14 @@ azure-functions/diagnostic-ai-runner/
 │   │   └── metadataWriter.js            — safe metadata writer for jm1_airequestlog + jm1_executionlog
 │   ├── activation/
 │   │   └── aiExecutionGate.js           — dual-gate guard (CONTRACT_TEST_MODE + JM1_AI_EXECUTION_ENABLED)
-│   └── ai/
-│       └── modelCaller.js              — Azure OpenAI caller scaffold (gate-enforced; inactive until Approval 1)
+│   ├── ai/
+│   │   └── modelCaller.js              — compatibility shim (delegates to src/model/modelCaller)
+│   └── model/
+│       ├── modelCaller.js              — gate-enforced entry point for all AI calls
+│       ├── providerRouter.js           — resolves JM1_AI_PROVIDER, routes to provider module
+│       └── providers/
+│           ├── anthropicProvider.js    — Anthropic Messages API (Claude Sonnet; preferred for REV)
+│           └── azureOpenAiProvider.js  — Azure OpenAI via MSI (infrastructure-validated fallback)
 └── test/
     ├── validation.test.js               — payload pattern validation
     ├── knowledge.test.js                — knowledge.md SHA-256 and Blob verification
@@ -420,6 +428,7 @@ azure-functions/diagnostic-ai-runner/
     ├── metadataWrite.test.js            — Metadata writer payload safety and prohibited field tests
     ├── syntheticE2E.test.js             — Synthetic end-to-end pipeline stage chain tests
     ├── aiActivationGate.test.js         — Dual-gate logic and model caller gate enforcement (23 tests)
+    ├── providerAbstraction.test.js      — Provider selection, routing, config validation, safety invariants (44 tests)
     └── fixtures/
         ├── synthetic-stage0.txt         — synthetic TXT fixture (no real content)
         └── synthetic-stage0.docx        — synthetic DOCX fixture (no real content)
@@ -431,8 +440,8 @@ AI execution is guarded by two independent gates. Both must be open before any m
 
 | Gate | Mechanism | Current state | Opens when |
 |---|---|---|---|
-| 1. `CONTRACT_TEST_MODE` | Hardcoded constant in `runStage0Diagnostic.js` | `true` — closed | Code change + Jackie Approval 1 |
-| 2. `JM1_AI_EXECUTION_ENABLED` | Azure Function app setting (env var) | absent / `false` — closed | Env var set to `"true"` after Approval 1 |
+| 1. `CONTRACT_TEST_MODE` | Hardcoded constant in `runStage0Diagnostic.js` | `false` — **open** (Approval 1 granted 2026-06-17) | Code change + Jackie Approval 1 |
+| 2. `JM1_AI_EXECUTION_ENABLED` | Azure Function app setting (env var) | `"true"` — **open** (set under Approval 1) | Env var set to `"true"` after Approval 1 |
 
 Neither gate alone is sufficient. A request that passes Gate 1 but not Gate 2 is still blocked. A request that satisfies Gate 2 in env vars but CONTRACT_TEST_MODE is still `true` is still blocked.
 
@@ -467,6 +476,61 @@ POST /api/run-stage0-diagnostic
 ```
 
 `CONTRACT_TEST_MODE=true`. No model call attempted. No manuscript processed.
+
+## Provider Abstraction
+
+The model caller uses a provider abstraction layer so the runner is not hardwired to a single AI backend. Provider is selected at runtime via the `JM1_AI_PROVIDER` app setting.
+
+### Supported Providers
+
+| Provider value | Module | Model | Status |
+|---|---|---|---|
+| `anthropic` | `src/model/providers/anthropicProvider.js` | `ANTHROPIC_MODEL` (default: `claude-sonnet-4-6`) | Preferred for REV — requires Approval 2 |
+| `azure-openai` | `src/model/providers/azureOpenAiProvider.js` | `AZURE_OPENAI_DEPLOYMENT_NAME` (`jm1-pub-diagnostic-primary` = `gpt-4o-mini`) | Infrastructure-validated; not preferred for editorial REV |
+
+### Model Strategy
+
+Claude Sonnet (`claude-sonnet-4-6`) is the preferred model for the INT-PUB-005 Stage 0 Intake Editorial Review (REV) diagnostic. Azure OpenAI (`gpt-4o-mini`) was provisioned for infrastructure validation only and is not the intended editorial review model.
+
+Switching to Anthropic/Claude Sonnet for any editorial review use requires Approval 2.
+
+### Required Environment Variables by Provider
+
+**`anthropic`:**
+
+| Variable | Purpose |
+|---|---|
+| `ANTHROPIC_API_KEY` | Anthropic API key (never logged or returned) |
+| `ANTHROPIC_MODEL` | Model ID (e.g. `claude-sonnet-4-6`) |
+
+**`azure-openai`:**
+
+| Variable | Purpose |
+|---|---|
+| `AZURE_OPENAI_ENDPOINT` | Azure OpenAI resource endpoint |
+| `AZURE_OPENAI_API_VERSION` | API version (e.g. `2024-08-01-preview`) |
+| `AZURE_OPENAI_DEPLOYMENT_NAME` | Deployment name (e.g. `jm1-pub-diagnostic-primary`) |
+
+### Provider Routing Architecture
+
+```
+callModel() — gate check — routeToProvider() — resolveProvider() → JM1_AI_PROVIDER
+                                                   │
+                                        ┌──────────┴──────────┐
+                                        │                     │
+                              anthropicProvider          azureOpenAiProvider
+                              (Anthropic API)            (Azure OpenAI via MSI)
+```
+
+Both gates must be open before `routeToProvider` is ever called. A missing or unsupported `JM1_AI_PROVIDER` value returns a typed error (`AI_PROVIDER_NOT_CONFIGURED` or `AI_PROVIDER_UNSUPPORTED`) without silent fallthrough.
+
+### Safety Invariants (enforced in tests)
+
+- API key value never appears in any result field, log, or error message
+- Prompt body never appears in any result field
+- Gate-blocked result always has `output: null` and zero token counts
+- Unsupported provider returns typed error; does not fall through to any provider
+- 260 tests pass (0 failures) including 44 provider abstraction tests
 
 ## Flow D Integration (Future)
 
