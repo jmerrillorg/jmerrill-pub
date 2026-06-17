@@ -58,7 +58,8 @@ In contract-test mode, the function:
 - Enforces the Legacy-exclusion pre-flight gate: if `legacyFlag: true` is present in the request body, returns HTTP 422 `LEGACY_EXCLUDED` before any manuscript access or AI call
 - Optionally reads and SHA-256 verifies `knowledge.md` when `verifyKnowledge: true` is set in the request body
 - Optionally runs DOCX or TXT extraction on a synthetic fixture when `verifyExtraction: true` and `syntheticFixture: "txt"|"docx"` are set — returns safe metadata only (no extracted text)
-- Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata or extraction metadata if requested)
+- Optionally routes a synthetic diagnostic result through confidence-based routing when `verifyConfidenceRouting: true` and `syntheticResult: {...}` are set — returns routing decision with no Dataverse write
+- Returns HTTP 202 with a safe confirmation JSON (including safe knowledge metadata, extraction metadata, or routing decision if requested)
 - Does not call any AI service
 - Does not read or write Dataverse
 - Does not access SharePoint or the manuscript file
@@ -94,6 +95,8 @@ Contract-test mode remains active until Jackie explicitly authorizes AI executio
 | `correlationId` | No | Alphanumeric, hyphens, underscores; max 100 characters |
 | `mode` | No | Informational field; does not change routing — `CONTRACT_TEST_MODE` is code-controlled |
 | `legacyFlag` | No | `true` (boolean) to simulate a Legacy-flagged intake. Gate fires before any downstream processing. In production this will be read from Dataverse. |
+| `verifyConfidenceRouting` | No | `true` (boolean) to trigger confidence-based routing on `syntheticResult`; requires `syntheticResult` |
+| `syntheticResult` | No | Object with `confidence` (number 0–1), `technicalFailure` (boolean), or `manuscriptGateFailure` (boolean); only valid when `verifyConfidenceRouting: true` |
 | `verifyKnowledge` | No | `true` (boolean) to trigger `knowledge.md` Blob read and SHA-256 verification |
 | `verifyExtraction` | No | `true` (boolean) to trigger synthetic-fixture extraction verification — requires `syntheticFixture` |
 | `syntheticFixture` | No | `"txt"` or `"docx"` — selects the synthetic test fixture for extraction verification; only valid when `verifyExtraction: true` |
@@ -333,12 +336,15 @@ azure-functions/diagnostic-ai-runner/
 │   │   └── manuscriptExtractor.js       — DOCX/TXT transient extraction (metadata only)
 │   ├── preflight/
 │   │   └── legacyExclusionCheck.js      — Legacy-exclusion pre-flight gate
+│   ├── routing/
+│   │   └── confidenceRouter.js          — Confidence-based routing (pure logic, no side effects)
 │   └── dataverse/
 │       └── client.js                    — config validation stub (no live reads)
 └── test/
     ├── validation.test.js               — payload pattern validation
     ├── knowledge.test.js                — knowledge.md SHA-256 and Blob verification
     ├── extraction.test.js               — extraction metadata safety and correctness
+    ├── confidenceRouting.test.js        — Confidence routing (all 5 paths, thresholds, invariants)
     ├── legacyExclusion.test.js          — Legacy-exclusion gate and flag parsing
     └── fixtures/
         ├── synthetic-stage0.txt         — synthetic TXT fixture (no real content)
@@ -357,6 +363,22 @@ When AI execution is authorized, Flow D's true branch (`Condition_Manuscript_Ass
 | `x-jm1-diagnostic-runner-key` | Flow D environment variable (not committed) |
 
 Flow D integration is not implemented in this pass. The true branch currently routes to a deferred update.
+
+## Confidence Routing Verification
+
+Confidence-based routing was verified via direct HTTP contract test on 2026-06-17 for all five routing outcomes.
+
+| Routing path | Input | `routing.status` | `routing.statusLabel` | `requiresHumanReview` | `lowConfidenceNote` |
+|---|---|---|---|---|---|
+| Completed | `confidence: 0.90` | `835500002` | `Completed` | `true` | `null` |
+| Needs Human Review mid | `confidence: 0.75` | `835500004` | `Needs Human Review` | `true` | `null` |
+| Needs Human Review low | `confidence: 0.50` | `835500004` | `Needs Human Review` | `true` | Set with confidence value |
+| Exception | `technicalFailure: true` | `835500003` | `Exception` | `true` | `null` |
+| Deferred | `manuscriptGateFailure: true` | `835500005` | `Deferred` | `true` | `null` |
+
+All paths returned HTTP 202. `requiresHumanReview` was `true` on every path. No Dataverse write occurred. AI execution not enabled.
+
+Routing priority order confirmed: manuscriptGateFailure → technicalFailure → confidence thresholds. Missing or invalid confidence routes to Exception.
 
 ## Legacy-Exclusion Gate Verification
 
