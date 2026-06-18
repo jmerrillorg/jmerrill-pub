@@ -22,11 +22,14 @@ const DEFAULT_API_VERSION = "2023-06-01";
 // Tool schema enforces the exact output contract.
 // tool_choice forces the model to call this tool — freeform text responses are rejected.
 // String fields must contain characterization only (enforced downstream by noQuotationValidator).
+// All four fields are required; minLength on strings prevents empty-string compliance.
 const DIAGNOSTIC_TOOL = {
   name: "submit_stage0_diagnostic",
   description:
-    "Submit the structured Stage 0 Diagnostic result. " +
-    "Call this tool with your complete assessment. " +
+    "Submit the complete structured Stage 0 Diagnostic result. " +
+    "You MUST populate ALL FOUR fields: jm1_diagnosticoutputsummary, jm1_diagnosticriskflags, " +
+    "jm1_confidence, and jm1_requireshumanreview. " +
+    "Do not call this tool until all four fields are ready. " +
     "ALL string fields must contain characterization only — " +
     "no manuscript excerpts, no quoted prose, no verbatim author text.",
   input_schema: {
@@ -34,19 +37,34 @@ const DIAGNOSTIC_TOOL = {
     properties: {
       jm1_diagnosticoutputsummary: {
         type: "string",
-        description: "Characterization-only diagnostic summary. No manuscript excerpts or quoted prose."
+        minLength: 1,
+        description:
+          "Characterization-only diagnostic summary of the manuscript (2–4 sentences). " +
+          "Describe the work's nature, category, and overall diagnostic impression. " +
+          "No manuscript excerpts, no quoted prose, no verbatim author text."
       },
       jm1_diagnosticriskflags: {
         type: "string",
-        description: "Characterization-only risk flag summary. No manuscript excerpts or quoted prose."
+        minLength: 1,
+        description:
+          "Characterization-only summary of editorial risk flags (1–3 sentences). " +
+          "Describe structural, commercial, or editorial concerns at a categorical level. " +
+          "If no significant risk flags are identified, state that explicitly. " +
+          "No manuscript excerpts, no quoted prose, no verbatim author text."
       },
       jm1_confidence: {
         type: "number",
-        description: "Confidence score between 0.0 and 1.0."
+        minimum: 0.0,
+        maximum: 1.0,
+        description:
+          "Your confidence in this diagnostic assessment as a decimal between 0.0 and 1.0. " +
+          "Example: 0.75 means moderately confident. Must be a number, not a string."
       },
       jm1_requireshumanreview: {
         type: "boolean",
-        description: "Always true for Stage 0 Diagnostic."
+        description:
+          "Whether this diagnostic requires human editorial review. " +
+          "This field must always be true for Stage 0 Diagnostic — never false."
       }
     },
     required: [
@@ -92,7 +110,7 @@ async function call({ promptBody, diagnosticId }) {
 
   const requestBody = {
     model,
-    max_tokens: 1200,
+    max_tokens: 4096,
     tools: [DIAGNOSTIC_TOOL],
     tool_choice: { type: "tool", name: "submit_stage0_diagnostic" },
     messages: [{ role: "user", content: promptBody }]
