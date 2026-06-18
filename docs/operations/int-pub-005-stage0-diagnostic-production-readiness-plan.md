@@ -410,3 +410,59 @@ PR #86 does not authorize:
 - Broad production automation
 
 Human review remains required before any author-facing communication. Any future author-facing system email must still copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
+## 16. PR #87 - Diagnostic Result Persistence for Internal Review
+
+PR #87 introduces an internal diagnostic review persistence adapter for safe Stage 0 diagnostic review payloads.
+
+The persistence layer is for internal review only. It accepts the PR #86 safe review payload after schema validation, no-quotation/output validation, and confidence routing have succeeded, then prepares it for persistence against the existing `jm1pub_editorialdiagnostic` review record pattern. It does not authorize diagnostic execution, author-facing output, author email, Opportunity creation, Flow D activation, or broad production automation.
+
+### Persistence target and schema boundary
+
+The approved persistence home is the existing `jm1pub_editorialdiagnostic` record for the diagnostic. PR #87 does not create a new Dataverse table.
+
+Because dedicated internal review fields/status mappings require governed Dataverse schema confirmation, PR #87 keeps the runtime behavior as an injected persistence adapter with tests. A later schema/governance PR must confirm the exact Dataverse logical fields before production wiring. The adapter is designed to write only safe internal review fields and to fail closed if the Dataverse client/write contract is unavailable.
+
+### Safe fields prepared for persistence
+
+The adapter may persist only:
+
+| Field | Purpose |
+|---|---|
+| `diagnosticId` | Existing diagnostic record ID |
+| `intakeReferenceCode` | Governed intake reference |
+| `diagnosticOutputSummary` | Validated concise internal diagnostic summary |
+| `diagnosticRiskFlags` | Validated internal risk labels |
+| `confidence` | Validated 0.0-1.0 confidence score |
+| `requiresHumanReview` | Always `true` |
+| `routingDecision` | Safe routing status, label, and basis |
+| `reviewStatus` | `PENDING_HUMAN_REVIEW` |
+| `approvalStatus` | `PENDING_HUMAN_REVIEW` |
+| `reviewedBy` / `reviewedOn` | `null` until human review occurs |
+| `preparedAt` | Safe payload preparation timestamp |
+| `metadata` | Safe provider, model, prompt, correlation/execution ID, and token-count metadata only |
+
+### Safety exclusions
+
+The persistence layer must not persist manuscript text, extracted manuscript content, prompt body, raw model response, author-facing email body, author email send fields, Opportunity fields, Flow D trigger fields, secrets, tokens, keys, headers, or arbitrary external file URLs beyond already-governed safe asset references.
+
+### Fail-closed behavior
+
+Persistence refuses to write when the review payload is missing, identifiers are missing or malformed, the diagnostic summary or risk flags are empty, confidence is missing/non-finite/out of range, `requiresHumanReview` is not `true`, review or approval status is not `PENDING_HUMAN_REVIEW`, unsafe fields are present, the Dataverse client is missing, or the Dataverse write fails.
+
+### Non-activation boundary
+
+PR #87 does not authorize:
+
+- Diagnostic production activation
+- Automatic diagnostic runs
+- Opening `JM1_AI_EXECUTION_ENABLED`
+- Author-facing diagnostic output
+- Author email
+- Opportunity creation
+- Flow D activation
+- Historical row processing
+
+Human review remains required. Any future author-facing system email must still copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
