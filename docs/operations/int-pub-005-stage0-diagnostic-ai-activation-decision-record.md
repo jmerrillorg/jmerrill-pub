@@ -794,6 +794,34 @@ PR #96 introduces a pure internal send-preparation record for author-response dr
 - Queue eligibility is not permission to process a record.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 32. PR #97 - Internal Author Draft Review Notification
+
+PR #97 introduces an internal author draft review notification payload for drafts ready for human review.
+
+### What changed
+
+- Internal notification payloads can be prepared with `notificationType=AUTHOR_DRAFT_READY_FOR_REVIEW`.
+- The notification recipient is `publishing@jmerrill.one`.
+- The notification preserves `sendStatus=DRAFT_ONLY`.
+- The notification preserves `approvalStatus=PENDING_HUMAN_APPROVAL`.
+- The notification states that no author email has been sent.
+- The notification uses a safe preview and excludes manuscript text, prompts, raw model output, provider responses, send execution fields, Opportunity fields, and Flow D trigger fields.
+- No Dataverse/internal notification persistence fields are confirmed by this PR.
+
+### Governance status
+
+- Internal review visibility only.
+- No send.
+- No send event.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No author email was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
 ## 22. PR #86 - Internal Diagnostic Result Review Layer
 
 PR #86 introduces an internal-only review payload builder for validated Stage 0 diagnostic results.
