@@ -714,3 +714,26 @@ PR #85 introduces a controlled queue selection layer for approved INT-PUB-005 di
 - Flow D activation is not authorized.
 - Queue eligibility is not permission to process a record.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
+## 22. PR #86 - Internal Diagnostic Result Review Layer
+
+PR #86 introduces an internal-only review payload builder for validated Stage 0 diagnostic results.
+
+### What changed
+
+- Internal diagnostic review payload preparation added for already-validated AI diagnostic output.
+- Review payload defaults to `PENDING_HUMAN_REVIEW`.
+- Review payload requires safe identifiers, validated summary, risk flags, confidence, `requiresHumanReview=true`, and a safe routing decision.
+- Review payload excludes manuscript text, extracted content, prompt body, raw model response, author email fields, Opportunity fields, Flow D trigger fields, secrets, tokens, headers, and keys.
+
+### Governance status
+
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output is authorized.
+- No author email is authorized.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Human review remains required before any author-facing communication.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
