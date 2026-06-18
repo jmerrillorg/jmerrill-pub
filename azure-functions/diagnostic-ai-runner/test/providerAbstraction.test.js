@@ -297,16 +297,23 @@ describe("Anthropic provider — DIAGNOSTIC_TOOL schema contract", () => {
     assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_confidence.type, "number");
   });
 
+  test("jm1_confidence schema has minimum 0.0 and maximum 1.0", () => {
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_confidence.minimum, 0.0);
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_confidence.maximum, 1.0);
+  });
+
   test("jm1_requireshumanreview schema type is boolean", () => {
     assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_requireshumanreview.type, "boolean");
   });
 
-  test("jm1_diagnosticoutputsummary schema type is string", () => {
+  test("jm1_diagnosticoutputsummary schema type is string with minLength 1", () => {
     assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticoutputsummary.type, "string");
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticoutputsummary.minLength, 1);
   });
 
-  test("jm1_diagnosticriskflags schema type is string", () => {
+  test("jm1_diagnosticriskflags schema type is string with minLength 1", () => {
     assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticriskflags.type, "string");
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticriskflags.minLength, 1);
   });
 
   test("DIAGNOSTIC_TOOL description instructs characterization-only output", () => {
@@ -314,6 +321,26 @@ describe("Anthropic provider — DIAGNOSTIC_TOOL schema contract", () => {
     assert.ok(desc.includes("characterization"), "description must instruct characterization-only output");
     assert.ok(desc.includes("no manuscript excerpts") || desc.includes("no quoted prose"),
       "description must prohibit manuscript content in output");
+  });
+
+  test("DIAGNOSTIC_TOOL description instructs all four fields must be populated", () => {
+    const desc = DIAGNOSTIC_TOOL.description;
+    assert.ok(
+      desc.includes("ALL FOUR") || desc.includes("all four") || desc.includes("all 4"),
+      "description must explicitly instruct that all four fields are required"
+    );
+  });
+
+  test("jm1_requireshumanreview description states it must always be true", () => {
+    const desc = DIAGNOSTIC_TOOL.input_schema.properties.jm1_requireshumanreview.description.toLowerCase();
+    assert.ok(desc.includes("always true") || desc.includes("must always be true"),
+      "description must state requiresHumanReview is always true");
+  });
+
+  test("jm1_confidence description includes numeric example", () => {
+    const desc = DIAGNOSTIC_TOOL.input_schema.properties.jm1_confidence.description;
+    assert.ok(desc.includes("0.") || desc.includes("1.0"),
+      "description should include a numeric example to prevent string submission");
   });
 });
 

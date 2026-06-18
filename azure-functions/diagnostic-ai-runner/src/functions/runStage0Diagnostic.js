@@ -514,8 +514,15 @@ app.http("run-stage0-diagnostic", {
         "---",
         "",
         "Call the submit_stage0_diagnostic tool with your complete assessment.",
-        "ALL string fields must contain characterization only — no manuscript excerpts, no quoted prose, no verbatim author text.",
-        "jm1_confidence: decimal between 0.0 and 1.0. jm1_requireshumanreview: must be true."
+        "You MUST populate ALL FOUR fields before calling the tool. Do not call the tool with any field missing.",
+        "",
+        "Field requirements:",
+        "  jm1_diagnosticoutputsummary (string, required) — characterization-only diagnostic summary, 2–4 sentences.",
+        "  jm1_diagnosticriskflags (string, required) — characterization-only risk flag summary, 1–3 sentences. If none, state that explicitly.",
+        "  jm1_confidence (number, required) — your confidence as a decimal between 0.0 and 1.0. Must be a number, not a string.",
+        "  jm1_requireshumanreview (boolean, required) — must be true.",
+        "",
+        "ALL string fields: characterization only. No manuscript excerpts. No quoted prose. No verbatim author text."
       ].join("\n");
 
       // Clear content reference — no longer needed after prompt construction
