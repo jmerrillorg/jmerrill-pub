@@ -787,6 +787,53 @@ PR #90 introduces an internal-only author response draft preparation layer for d
 - Human approval remains required before any author-facing email.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 27. PR #92 - Author Draft Dataverse Field Map
+
+PR #92 introduces the internal Dataverse field map for author-response draft persistence.
+
+### What changed
+
+- Author draft persistence target remains the existing `jm1pub_editorialdiagnostic` record.
+- Entity set remains `jm1pub_editorialdiagnostics`.
+- Row identity remains `jm1pub_editorialdiagnosticid`.
+- Draft subject, body, template, send status, approval status, visibility mailbox, future internal-copy requirement, future Dataverse send-log requirement, preparation metadata, and approval metadata fields are mapped.
+- Draft send status remains `DRAFT_ONLY`.
+- Draft approval status remains `PENDING_HUMAN_APPROVAL`.
+- Required future visibility mailbox remains `publishing@jmerrill.one`.
+- Any unconfirmed Dataverse fields must be created or confirmed before live production writes are enabled.
+
+### Field map
+
+| Draft payload item | Dataverse logical field |
+|---|---|
+| `draftSubject` | `jm1_authordraftsubject` |
+| `draftBody` | `jm1_authordraftbody` |
+| `templateName` | `jm1_authordrafttemplate` |
+| `sendStatus` | `jm1_authordraftsendstatus` |
+| `approvalStatus` | `jm1_authordraftapprovalstatus` |
+| `internalVisibilityMailbox` | `jm1_authorvisibilitymailbox` |
+| `futureSendRequiresInternalCopy` | `jm1_authorfuturesendrequiresinternalcopy` |
+| `futureSendRequiresDataverseLog` | `jm1_authorfuturesendrequiresdataverselog` |
+| `preparedAt` | `jm1_authordraftpreparedon` |
+| `preparedBy` | `jm1_authordraftpreparedby` |
+| `approvedBy` | `jm1_authordraftapprovedby` |
+| `approvedOn` | `jm1_authordraftapprovedon` |
+| `approvalNotes` | `jm1_authordraftapprovalnotes` |
+
+No manuscript text, extracted content, prompt body, raw model response, send-now field, sent timestamp, mail provider message ID, Opportunity field, Flow D trigger field, secret, token, header, or key is mapped.
+
+### Governance status
+
+- Field-map only.
+- No send.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No author email was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+
 ## 26. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.

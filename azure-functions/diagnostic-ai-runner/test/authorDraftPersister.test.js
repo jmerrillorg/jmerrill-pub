@@ -6,7 +6,10 @@ const {
   persistAuthorResponseDraft,
   buildAuthorDraftRecord,
   validateAuthorDraftPayload,
+  TABLE_LOGICAL_NAME,
   ENTITY_SET,
+  ROW_IDENTITY,
+  AUTHOR_DRAFT_FIELD_MAP,
   PERSISTENCE_ERROR_CODE,
   WRITE_ERROR_CODE
 } = require("../src/author/authorDraftPersister");
@@ -73,9 +76,12 @@ function assertInvalid(result, reason) {
 describe("authorDraftPersister — valid persistence", () => {
   test("valid draft payload persists successfully with mock Dataverse client", async () => {
     const client = makeClient((input) => {
+      assert.equal(input.tableLogicalName, TABLE_LOGICAL_NAME);
       assert.equal(input.entitySet, ENTITY_SET);
+      assert.equal(input.rowIdentity, ROW_IDENTITY);
       assert.equal(input.diagnosticId, baseDraftInput.diagnosticId);
       assert.equal(input.intakeReferenceCode, baseDraftInput.intakeReferenceCode);
+      assert.deepEqual(input.fieldMap, AUTHOR_DRAFT_FIELD_MAP);
       assert.equal(input.draftRecord.templateName, TEMPLATE_NAME);
       assert.equal(input.draftRecord.sendStatus, DRAFT_STATUS);
       assert.equal(input.draftRecord.approvalStatus, DRAFT_APPROVAL_STATUS);
