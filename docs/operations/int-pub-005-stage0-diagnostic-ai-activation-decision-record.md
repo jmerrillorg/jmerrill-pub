@@ -787,6 +787,33 @@ PR #90 introduces an internal-only author response draft preparation layer for d
 - Human approval remains required before any author-facing email.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 26. PR #91 - Author Draft Persistence for Human Approval
+
+PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
+
+### What changed
+
+- Safe draft payloads can be prepared for internal persistence through an injected Dataverse adapter.
+- Persisted drafts remain `sendStatus=DRAFT_ONLY`.
+- Persisted drafts remain `approvalStatus=PENDING_HUMAN_APPROVAL`.
+- The required future visibility mailbox remains `publishing@jmerrill.one`.
+- Future send-copy/mirror and Dataverse send-log requirements are preserved as safe draft metadata.
+- Exact author-draft Dataverse fields remain a later governed schema/adapter step before any live write is wired.
+
+### Governance status
+
+- Draft-only.
+- No send.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No author email was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Human approval remains required before any author-facing email.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
 ## 23. PR #87 - Diagnostic Result Persistence for Internal Review
 
 PR #87 introduces an internal diagnostic review persistence adapter for the safe review payload prepared by PR #86.

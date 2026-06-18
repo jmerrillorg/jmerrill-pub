@@ -576,3 +576,47 @@ PR #90 does not authorize:
 - Production activation
 
 Human approval remains required before any author-facing email. Any future send must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
+## 19. PR #91 - Author Draft Persistence for Human Approval
+
+PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
+
+Draft persistence is not sending. A persisted draft remains internal-only and pending human approval. It does not create a send event, send author email, create an Opportunity, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+
+### Persistence target and schema boundary
+
+The preferred internal review home remains the existing `jm1pub_editorialdiagnostic` record. PR #91 does not create a new Dataverse table.
+
+Exact author-draft Dataverse fields are not yet confirmed. PR #91 therefore uses an injected persistence adapter with tests and prepares a safe author-draft record for a later governed schema/adapter PR. The future schema/adapter PR must confirm where `draftSubject`, `draftBody`, `templateName`, `sendStatus`, `approvalStatus`, visibility-copy requirements, and safe draft metadata are stored before any live write is wired.
+
+### Safe draft fields prepared for persistence
+
+The adapter may persist only:
+
+- `diagnosticId`
+- `intakeReferenceCode`
+- `authorName`
+- `authorEmail`
+- `projectTitle`
+- `draftSubject`
+- `draftBody`
+- `templateName=INITIAL_DIAGNOSTIC_REVIEW_NEXT_STEP`
+- `sendStatus=DRAFT_ONLY`
+- `approvalStatus=PENDING_HUMAN_APPROVAL`
+- `internalVisibilityMailbox=publishing@jmerrill.one`
+- `preparedAt`
+- `preparedBy`
+- safe diagnostic summary, risk flags, confidence, review status, and human-review flag
+- safe correlation/execution metadata
+- `futureSendRequiresInternalCopy=true`
+- `futureSendRequiresDataverseLog=true`
+
+### Fail-closed and safety boundary
+
+Persistence refuses to write if the draft payload is missing, identifiers are missing or malformed, author email is missing, subject/body are empty, template/status/approval/visibility values are wrong, future internal copy or Dataverse send-log requirements are missing, unsafe fields are present, the Dataverse client is missing, or the write fails.
+
+The persisted draft must not contain manuscript text, extracted manuscript content, prompt body, raw model output, send-now flags, sent timestamps, sent/delivery claims, mail provider message IDs, Opportunity fields, Flow D trigger fields, secrets, tokens, keys, headers, or arbitrary external file URLs beyond already-governed safe references.
+
+Human approval remains required before any author-facing email. Any future send must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
