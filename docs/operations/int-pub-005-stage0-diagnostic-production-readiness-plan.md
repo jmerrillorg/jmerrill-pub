@@ -751,6 +751,31 @@ Author-facing sending remains a later governed phase. Any future send must copy 
 
 ---
 
+## 25. PR #97 - Internal Author Draft Review Notification
+
+PR #97 introduces the first visible internal review touchpoint for author-response drafts that are ready for human review.
+
+The notification is internal-only. It means a draft author response is ready for review, not that the draft has been sent or approved for author-facing delivery.
+
+### Notification boundary
+
+- Notification type is `AUTHOR_DRAFT_READY_FOR_REVIEW`.
+- Notification recipient is `publishing@jmerrill.one`.
+- Draft status remains `DRAFT_ONLY`.
+- Approval status remains `PENDING_HUMAN_APPROVAL`.
+- The notification body states that no author email has been sent.
+- The payload uses a safe draft preview rather than unsafe manuscript, prompt, raw model, or provider content.
+
+### Non-execution boundary
+
+PR #97 does not send author email, call Gmail, Outlook, ACS, SendGrid, Graph mail, SMTP, or any mail API, create a send event, create an Opportunity, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+
+No Dataverse/internal notification persistence fields are confirmed in PR #97. The notification builder is pure and does not fake a sent internal email. A later governed schema/field-map PR must define any persistence target or governed internal-delivery mechanism before notifications are written or sent.
+
+Future author-facing sending remains a later governed phase. Any future send must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
