@@ -673,3 +673,22 @@ PR #82 adds brevity constraints so the model is directed to produce concise, non
 - No author email was sent.
 - No Opportunity was created.
 - No raw model response, manuscript text, or prompt body was stored.
+
+## 20. PR #84 - Stage 0 Diagnostic Production Readiness Plan
+
+PR #83 recorded the first successful, safe, accepted real-manuscript diagnostic pilot result. The result passed schema validation, passed no-quotation/output validation with 0 violations, routed to Needs Human Review, and left production activation unauthorized.
+
+The next step is planning, not execution. PR #84 defines the controlled-production readiness path in:
+
+[`int-pub-005-stage0-diagnostic-production-readiness-plan.md`](./int-pub-005-stage0-diagnostic-production-readiness-plan.md)
+
+### Governance status
+
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No additional diagnostic run is authorized.
+- Flow D production activation is not authorized.
+- No author-facing output is authorized.
+- No author email is authorized.
+- No Opportunity creation is authorized.
+- No historical or broad record processing is authorized.
+- A separate explicit Jackie decision is required before controlled-production implementation or activation.
