@@ -692,3 +692,25 @@ The next step is planning, not execution. PR #84 defines the controlled-producti
 - No Opportunity creation is authorized.
 - No historical or broad record processing is authorized.
 - A separate explicit Jackie decision is required before controlled-production implementation or activation.
+
+## 21. PR #85 - Controlled Diagnostic Queue Selection
+
+PR #85 introduces a controlled queue selection layer for approved INT-PUB-005 diagnostic records. The selector is internal-only and evaluates eligibility without processing records.
+
+### What changed
+
+- Queue selection logic added for diagnostic records and Dataverse-style query results.
+- Eligibility returns only safe fields: `eligible`, `reason`, `missingFields`, `blockingConditions`, `diagnosticId`, and `intakeReferenceCode`.
+- Queue selection blocks records with missing governance fields, unapproved manuscript assets, unsupported file types, completed/processing/human-review statuses, retry-limit exhaustion, manual blocks, or missing/malformed execution status.
+
+### Governance status
+
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output is authorized.
+- No author email is authorized.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Queue eligibility is not permission to process a record.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
