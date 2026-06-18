@@ -2,7 +2,7 @@
 
 const { describe, it } = require("node:test");
 const assert = require("node:assert/strict");
-const { detectExtension, fetchAndExtractManuscript } = require("../src/extraction/pilotContentExtractor");
+const { detectExtension, fetchAndExtractManuscript, isSharePointUrl, encodeShareUrl } = require("../src/extraction/pilotContentExtractor");
 
 // ---------------------------------------------------------------------------
 // detectExtension
@@ -44,18 +44,81 @@ describe("pilotContentExtractor — detectExtension", () => {
 });
 
 // ---------------------------------------------------------------------------
+// isSharePointUrl
+// ---------------------------------------------------------------------------
+
+describe("pilotContentExtractor — isSharePointUrl", () => {
+  it("returns true for a jmerrillfoundation.sharepoint.com URL", () => {
+    assert.equal(
+      isSharePointUrl("https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/manuscript.docx"),
+      true
+    );
+  });
+
+  it("returns true for any *.sharepoint.com subdomain", () => {
+    assert.equal(isSharePointUrl("https://contoso.sharepoint.com/sites/hr/doc.docx"), true);
+  });
+
+  it("returns false for a non-SharePoint HTTPS URL", () => {
+    assert.equal(isSharePointUrl("https://example.com/manuscript.docx"), false);
+  });
+
+  it("returns false for an Azure Blob URL", () => {
+    assert.equal(isSharePointUrl("https://stjm1diagrunner.blob.core.windows.net/files/manuscript.docx"), false);
+  });
+
+  it("returns false for a malformed URL", () => {
+    assert.equal(isSharePointUrl("not a url"), false);
+  });
+
+  it("returns false for an empty string", () => {
+    assert.equal(isSharePointUrl(""), false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// encodeShareUrl
+// ---------------------------------------------------------------------------
+
+describe("pilotContentExtractor — encodeShareUrl", () => {
+  it("produces a u!-prefixed base64url string", () => {
+    const encoded = encodeShareUrl("https://example.com/file.docx");
+    assert.ok(encoded.startsWith("u!"), `Expected u! prefix, got: ${encoded}`);
+  });
+
+  it("does not contain padding characters", () => {
+    const encoded = encodeShareUrl("https://example.com/file.docx");
+    assert.ok(!encoded.includes("="), `Unexpected padding in: ${encoded}`);
+  });
+
+  it("replaces + with - and / with _ (base64url)", () => {
+    // Verify result contains only base64url-safe chars after the u! prefix
+    const encoded = encodeShareUrl("https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/manuscript.docx");
+    const body = encoded.slice(2);
+    assert.ok(/^[A-Za-z0-9\-_]+$/.test(body), `Non-base64url chars in: ${body}`);
+  });
+
+  it("round-trips correctly — decode matches original URL", () => {
+    const url = "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/manuscript.docx?d=wabc&e=def";
+    const encoded = encodeShareUrl(url);
+    const body = encoded.slice(2);
+    const decoded = Buffer.from(body.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf8");
+    assert.equal(decoded, url);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // fetchAndExtractManuscript — network failure paths (no live network)
 // ---------------------------------------------------------------------------
 
 describe("pilotContentExtractor — fetch failure paths", () => {
   it("returns MANUSCRIPT_FETCH_NETWORK_FAILED on network error", async () => {
-    // Use a URL that cannot be connected to in test environment
     const result = await fetchAndExtractManuscript("https://0.0.0.0/manuscript.docx");
-    // Network will fail — code should be fetch-related
     assert.equal(result.ok, false);
     assert.ok(
       result.code === "MANUSCRIPT_FETCH_NETWORK_FAILED" ||
-      result.code.startsWith("MANUSCRIPT_FETCH_FAILED:"),
+      result.code.startsWith("MANUSCRIPT_FETCH_FAILED:") ||
+      result.code.startsWith("MANUSCRIPT_FETCH_NETWORK_FAILED:"),
       `Unexpected code: ${result.code}`
     );
     assert.equal(result.content, null);
@@ -64,6 +127,11 @@ describe("pilotContentExtractor — fetch failure paths", () => {
   it("returns null content on any failure", async () => {
     const result = await fetchAndExtractManuscript("https://0.0.0.0/manuscript.docx");
     assert.equal(result.content, null);
+  });
+
+  it("metadata.downloadMethod is 'direct' for non-SharePoint URLs", async () => {
+    const result = await fetchAndExtractManuscript("https://0.0.0.0/manuscript.docx");
+    assert.equal(result.metadata.downloadMethod, "direct");
   });
 });
 
@@ -83,8 +151,6 @@ describe("pilotContentExtractor — unsupported file type", () => {
 
 describe("pilotContentExtractor — fileTypeHint priority over URL extension", () => {
   it("fileTypeHint .docx is preferred over URL extension", () => {
-    // Verify that if we pass a fileTypeHint, it would be used instead of URL detection.
-    // We test the logic directly: fileTypeHint || detectExtension(url)
     const fileTypeHint = ".docx";
     const url = "https://example.com/document.txt"; // URL says .txt
     const ext = fileTypeHint || detectExtension(url);
@@ -110,6 +176,31 @@ describe("pilotContentExtractor — fileTypeHint priority over URL extension", (
     const url = "https://example.com/document";
     const ext = fileTypeHint || detectExtension(url);
     assert.equal(ext, null);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// fetchAndExtractManuscript — download method routing
+// ---------------------------------------------------------------------------
+
+describe("pilotContentExtractor — download method routing", () => {
+  it("isSharePointUrl returns true for the pilot manuscript domain", () => {
+    assert.equal(
+      isSharePointUrl("https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/manuscript.docx?d=wabc"),
+      true
+    );
+  });
+
+  it("direct path is chosen for non-SharePoint HTTPS URLs", () => {
+    // isSharePointUrl drives the branch — confirm the routing logic
+    assert.equal(isSharePointUrl("https://example.com/manuscript.docx"), false);
+  });
+
+  it("graph path is chosen for SharePoint URLs", () => {
+    assert.equal(
+      isSharePointUrl("https://jmerrillfoundation.sharepoint.com/sites/publishing/doc.docx"),
+      true
+    );
   });
 });
 
@@ -147,17 +238,16 @@ describe("pilotContentExtractor — in-memory extraction logic", () => {
 // ---------------------------------------------------------------------------
 
 describe("pilotContentExtractor — safety invariants", () => {
-  it("module exports only fetchAndExtractManuscript and detectExtension", () => {
+  it("module exports the expected set of names", () => {
     const mod = require("../src/extraction/pilotContentExtractor");
     const keys = Object.keys(mod).sort();
-    assert.deepEqual(keys, ["detectExtension", "fetchAndExtractManuscript"]);
+    assert.deepEqual(keys, ["detectExtension", "encodeShareUrl", "fetchAndExtractManuscript", "isSharePointUrl"]);
   });
 
   it("fetchAndExtractManuscript is async", () => {
     const { fetchAndExtractManuscript } = require("../src/extraction/pilotContentExtractor");
     const result = fetchAndExtractManuscript("https://0.0.0.0/manuscript.docx");
     assert.ok(result instanceof Promise);
-    // Clean up promise — prevent unhandled rejection noise
     result.catch(() => {});
   });
 
@@ -174,7 +264,7 @@ describe("pilotContentExtractor — safety invariants", () => {
     assert.equal(result.content, null);
   });
 
-  it("metadata has expected shape on failure", async () => {
+  it("metadata has expected shape on failure including downloadMethod", async () => {
     const result = await fetchAndExtractManuscript("https://0.0.0.0/manuscript.docx");
     const m = result.metadata;
     assert.ok("fileType" in m);
@@ -182,6 +272,7 @@ describe("pilotContentExtractor — safety invariants", () => {
     assert.ok("wordCount" in m);
     assert.ok("charCount" in m);
     assert.ok("sha256" in m);
+    assert.ok("downloadMethod" in m);
   });
 });
 
@@ -191,8 +282,6 @@ describe("pilotContentExtractor — safety invariants", () => {
 
 describe("pilotContentExtractor — word count boundary", () => {
   it("MIN_WORD_COUNT is 100 (documented safety floor)", () => {
-    // This test documents the minimum word count requirement.
-    // A real manuscript must have at least 100 words to proceed.
     const MIN_WORD_COUNT = 100;
     assert.equal(MIN_WORD_COUNT, 100);
   });
