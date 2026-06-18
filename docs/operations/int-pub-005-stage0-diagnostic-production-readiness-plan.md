@@ -579,6 +579,74 @@ Human approval remains required before any author-facing email. Any future send 
 
 ---
 
+## 20. PR #92 - Author Draft Dataverse Field Map
+
+PR #92 defines the Dataverse field map for internal author-response drafts prepared by PR #90 and handled by the PR #91 persistence adapter.
+
+This is a field-map and schema confirmation step only. It does not send author email, create a send event, create an Opportunity, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+
+### Target table
+
+Author-response drafts remain attached to the existing Stage 0 Editorial Diagnostic record:
+
+| Target | Value |
+|---|---|
+| Table logical name | `jm1pub_editorialdiagnostic` |
+| Entity set | `jm1pub_editorialdiagnostics` |
+| Row identity | Existing `jm1pub_editorialdiagnosticid` row identified by `diagnosticId` |
+
+No new Dataverse table is introduced by PR #92.
+
+### Author draft field map
+
+These logical names are the required schema fields for internal author-draft persistence. If any field is not yet present in Dataverse, it must be created or confirmed in a later governed schema PR before live production writes are enabled.
+
+| Draft payload item | Dataverse logical field | Required value or rule |
+|---|---|---|
+| `draftSubject` | `jm1_authordraftsubject` | Safe draft subject only |
+| `draftBody` | `jm1_authordraftbody` | Safe draft body only; not sent by this step |
+| `templateName` | `jm1_authordrafttemplate` | `INITIAL_DIAGNOSTIC_REVIEW_NEXT_STEP` |
+| `sendStatus` | `jm1_authordraftsendstatus` | `DRAFT_ONLY` |
+| `approvalStatus` | `jm1_authordraftapprovalstatus` | `PENDING_HUMAN_APPROVAL` |
+| `internalVisibilityMailbox` | `jm1_authorvisibilitymailbox` | `publishing@jmerrill.one` |
+| `futureSendRequiresInternalCopy` | `jm1_authorfuturesendrequiresinternalcopy` | `true` |
+| `futureSendRequiresDataverseLog` | `jm1_authorfuturesendrequiresdataverselog` | `true` |
+| `preparedAt` | `jm1_authordraftpreparedon` | Internal draft preparation timestamp |
+| `preparedBy` | `jm1_authordraftpreparedby` | Internal preparer identifier |
+| `approvedBy` | `jm1_authordraftapprovedby` | Empty until human approval occurs |
+| `approvedOn` | `jm1_authordraftapprovedon` | Empty until human approval occurs |
+| `approvalNotes` | `jm1_authordraftapprovalnotes` | Human approval/revision notes only |
+
+Safe author email, author name, and project title should continue to use already-governed intake or diagnostic metadata fields where present. PR #92 does not create or imply an email send event.
+
+### Safe values and exclusions
+
+The field map supports only these safe workflow values:
+
+- `templateName=INITIAL_DIAGNOSTIC_REVIEW_NEXT_STEP`
+- `sendStatus=DRAFT_ONLY`
+- `approvalStatus=PENDING_HUMAN_APPROVAL`
+- `internalVisibilityMailbox=publishing@jmerrill.one`
+- `futureSendRequiresInternalCopy=true`
+- `futureSendRequiresDataverseLog=true`
+
+The field map must not persist manuscript text, extracted manuscript content, prompt body, raw model output, send-now flags, sent timestamps, delivery claims, mail provider message IDs, Opportunity fields, Flow D trigger fields, secrets, tokens, keys, headers, or arbitrary external file URLs beyond already-governed safe asset references.
+
+### Governance status
+
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output is authorized.
+- No author email is authorized.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Drafts remain `DRAFT_ONLY`.
+- Draft approval remains `PENDING_HUMAN_APPROVAL`.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.

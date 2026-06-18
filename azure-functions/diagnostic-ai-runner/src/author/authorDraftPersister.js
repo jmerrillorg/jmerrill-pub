@@ -15,41 +15,20 @@ const {
   DRAFT_STATUS,
   DRAFT_APPROVAL_STATUS
 } = require("./authorResponseDraftBuilder");
+const {
+  TABLE_LOGICAL_NAME,
+  ENTITY_SET,
+  ROW_IDENTITY,
+  AUTHOR_DRAFT_FIELD_MAP,
+  AUTHOR_DRAFT_UNMAPPED_UNSAFE_FIELDS
+} = require("./authorDraftFieldMap");
 const { DIAGNOSTIC_ID_PATTERN, INTAKE_REFERENCE_PATTERN } = require("../queue/diagnosticQueueSelector");
 
-const ENTITY_SET = "jm1pub_editorialdiagnostics";
 const PERSISTENCE_ERROR_CODE = "AUTHOR_DRAFT_PERSISTENCE_INVALID_PAYLOAD";
 const WRITE_ERROR_CODE = "AUTHOR_DRAFT_PERSISTENCE_WRITE_FAILED";
 
 const FORBIDDEN_DRAFT_PERSISTENCE_FIELDS = [
-  "manuscriptText",
-  "manuscriptContent",
-  "extractedManuscriptContent",
-  "extractedContent",
-  "promptBody",
-  "rawPrompt",
-  "rawModelOutput",
-  "rawModelResponse",
-  "sendNow",
-  "sendImmediately",
-  "sentAt",
-  "emailSent",
-  "mailSent",
-  "deliveryStatus",
-  "mailProviderMessageId",
-  "messageId",
-  "operationId",
-  "opportunityId",
-  "opportunityPayload",
-  "opportunityCreate",
-  "createOpportunity",
-  "flowDTrigger",
-  "activateFlowD",
-  "flowDActivation",
-  "headers",
-  "tokens",
-  "apiKey",
-  "secret"
+  ...AUTHOR_DRAFT_UNMAPPED_UNSAFE_FIELDS
 ];
 
 const SAFE_DRAFT_FIELDS = [
@@ -257,9 +236,12 @@ async function persistAuthorResponseDraft(input = {}) {
 
   try {
     const writeResult = await input.dataverseClient.persistAuthorDraft({
+      tableLogicalName: TABLE_LOGICAL_NAME,
       entitySet: ENTITY_SET,
+      rowIdentity: ROW_IDENTITY,
       diagnosticId: draftRecord.diagnosticId,
       intakeReferenceCode: draftRecord.intakeReferenceCode,
+      fieldMap: AUTHOR_DRAFT_FIELD_MAP,
       draftRecord,
       persistedAt
     });
@@ -284,7 +266,10 @@ module.exports = {
   persistAuthorResponseDraft,
   buildAuthorDraftRecord,
   validateAuthorDraftPayload,
+  TABLE_LOGICAL_NAME,
   ENTITY_SET,
+  ROW_IDENTITY,
+  AUTHOR_DRAFT_FIELD_MAP,
   SAFE_DRAFT_FIELDS,
   FORBIDDEN_DRAFT_PERSISTENCE_FIELDS,
   PERSISTENCE_ERROR_CODE,
