@@ -737,3 +737,27 @@ PR #86 introduces an internal-only review payload builder for validated Stage 0 
 - Flow D activation is not authorized.
 - Human review remains required before any author-facing communication.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
+## 23. PR #87 - Diagnostic Result Persistence for Internal Review
+
+PR #87 introduces an internal diagnostic review persistence adapter for the safe review payload prepared by PR #86.
+
+### What changed
+
+- Internal review persistence is prepared for the existing `jm1pub_editorialdiagnostic` review record pattern.
+- The adapter accepts only safe review payload fields: diagnostic ID, intake reference, validated summary, validated risk flags, confidence, human-review requirement, routing decision, pending review/approval statuses, review timestamps, and safe provider/model/prompt/token metadata.
+- The adapter fails closed if required fields are missing or malformed, if review/approval status is not `PENDING_HUMAN_REVIEW`, if unsafe fields are present, if the Dataverse client is missing, or if the Dataverse write fails.
+- Manuscript text, extracted content, prompt body, raw model response, author email fields, Opportunity fields, Flow D trigger fields, secrets, tokens, headers, and keys are excluded.
+- Exact Dataverse field mapping remains subject to a separate governed schema/adapter PR before production wiring.
+
+### Governance status
+
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output is authorized.
+- No author email is authorized.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Human review remains required before any author-facing communication.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
