@@ -693,7 +693,7 @@ Human approval remains required before any author-facing email. Any future send 
 
 ## 21. PR #93 - Author Draft Dataverse Schema Confirmation
 
-PR #93 documents the live Dataverse schema required before internal author-response draft persistence can be enabled.
+PR #93 documents and confirms the live Dataverse schema required before internal author-response draft persistence can be enabled.
 
 This is schema confirmation and documentation only. It does not send author email, create a send event, create an Opportunity, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
 
@@ -705,13 +705,13 @@ This is schema confirmation and documentation only. It does not send author emai
 | Entity set | `jm1pub_editorialdiagnostics` |
 | Row identity | Existing `jm1pub_editorialdiagnosticid` row identified by `diagnosticId` |
 
-The required author-draft columns remain attached to the existing Stage 0 Editorial Diagnostic record. No new Dataverse table is introduced.
+The required author-draft columns are confirmed created and published on the existing Stage 0 Editorial Diagnostic record. No new Dataverse table is introduced.
 
 ### Required schema fields
 
 The required fields are documented in `docs/operations/int-pub-005-author-draft-dataverse-schema.md` and represented in `authorDraftSchemaManifest.js`.
 
-The fields remain required before live writes:
+The fields are confirmed created and added to the `JM1_Publishing` solution:
 
 - `jm1_authordraftsubject`
 - `jm1_authordraftbody`
@@ -729,7 +729,7 @@ The fields remain required before live writes:
 
 ### Governance status
 
-- Field schema must be confirmed before live author-draft persistence.
+- Field schema is confirmed, but live author-draft persistence still requires a later governed adapter activation PR.
 - Production activation remains unauthorized.
 - `JM1_AI_EXECUTION_ENABLED=false`.
 - No diagnostic run occurred.

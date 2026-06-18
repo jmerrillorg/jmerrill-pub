@@ -4,7 +4,7 @@
 
 This document defines the Dataverse schema required before internal author-response draft persistence can be enabled for INT-PUB-005.
 
-PR #92 established the author draft field map. PR #93 documents the required live Dataverse columns and keeps them marked as required before live writes. This document does not authorize sending author email, creating a send event, creating an Opportunity, activating Flow D, running diagnostics, opening `JM1_AI_EXECUTION_ENABLED`, or enabling production automation.
+PR #92 established the author draft field map. PR #93 documents the live Dataverse columns created and published on `jm1pub_editorialdiagnostic` on 2026-06-18 and added to the `JM1_Publishing` solution. This document does not authorize sending author email, creating a send event, creating an Opportunity, activating Flow D, running diagnostics, opening `JM1_AI_EXECUTION_ENABLED`, or enabling production automation.
 
 ## Target
 
@@ -16,9 +16,9 @@ PR #92 established the author draft field map. PR #93 documents the required liv
 
 Author-response drafts remain attached to the existing Stage 0 Editorial Diagnostic record identified by `diagnosticId`. No new table is introduced.
 
-## Required Schema Fields
+## Confirmed Schema Fields
 
-These fields must exist before live author-draft writes are enabled.
+These fields are confirmed created and published on the target table.
 
 | Display name | Logical name | Expected type | Required value or rule |
 |---|---|---|---|
@@ -65,23 +65,19 @@ Do not create, map, or document storage for:
 - tokens, keys, or headers
 - arbitrary external file URLs beyond governed asset references
 
-## Manual Confirmation Or Creation Checklist
+## Confirmation Record
 
-Before live author-draft writes are enabled:
+- Confirmed table: `jm1pub_editorialdiagnostic`
+- Confirmed entity set: `jm1pub_editorialdiagnostics`
+- Confirmed row identity: `jm1pub_editorialdiagnosticid`
+- Confirmed solution: `JM1_Publishing`
+- Confirmation date: 2026-06-18
+- Publish status: table customizations published after creation
 
-1. Confirm the `jm1pub_editorialdiagnostic` table exists in the governed JM1 Publishing Dataverse solution.
-2. Confirm the entity set remains `jm1pub_editorialdiagnostics`.
-3. Confirm row identity remains `jm1pub_editorialdiagnosticid`.
-4. Confirm each required logical name in this document exists on the table.
-5. If any column is missing, create it using the display name, logical name, and expected type above.
-6. If choice fields are used for template, send status, or approval status, confirm they support only the governed safe values needed for this phase.
-7. Confirm `jm1_authorvisibilitymailbox` stores `publishing@jmerrill.one`.
-8. Confirm the two future-send requirement columns are Yes/No fields and can store `true`.
-9. Publish the table customizations.
-10. Record the schema confirmation evidence in a later governed PR before live production writes are enabled.
+The template, send status, approval status, and preparer fields were created as text fields for this phase. The future internal-copy and Dataverse send-log requirements were created as Yes/No fields. Draft body and approval notes were created as multiline text fields. Prepared/approved timestamps were created as Date/Time fields.
 
 ## Non-Activation Boundary
 
-Live writes are not enabled until these fields are confirmed. This schema confirmation does not send author email, create a send event, create an Opportunity, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+Live author-draft writes remain disabled until a later governed adapter activation PR. This schema confirmation does not send author email, create a send event, create an Opportunity, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
 
 Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.

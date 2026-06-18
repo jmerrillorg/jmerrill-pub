@@ -16,8 +16,8 @@ const {
 } = require("../src/author/authorDraftSchemaManifest");
 
 describe("authorDraftSchemaManifest — target and status", () => {
-  test("documents schema as required before live writes", () => {
-    assert.equal(SCHEMA_STATUS, "REQUIRED_BEFORE_LIVE_WRITES");
+  test("documents schema as confirmed while live writes remain disabled", () => {
+    assert.equal(SCHEMA_STATUS, "CONFIRMED_CREATED_PUBLISHED");
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.status, SCHEMA_STATUS);
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.tableLogicalName, TABLE_LOGICAL_NAME);
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.entitySet, ENTITY_SET);
@@ -26,6 +26,7 @@ describe("authorDraftSchemaManifest — target and status", () => {
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.entitySet, "jm1pub_editorialdiagnostics");
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.rowIdentity, "jm1pub_editorialdiagnosticid");
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.liveWritesEnabled, false);
+    assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.solutionUniqueName, "JM1_Publishing");
   });
 });
 
@@ -38,7 +39,7 @@ describe("authorDraftSchemaManifest — field coverage", () => {
     assert.deepEqual(manifestNames, mapNames);
   });
 
-  test("documents expected field types and required-before-live-write status", () => {
+  test("documents expected field types and confirmed-created status", () => {
     const byPayloadField = Object.fromEntries(AUTHOR_DRAFT_SCHEMA_FIELDS.map((field) => [field.payloadField, field]));
 
     assert.equal(byPayloadField.draftSubject.expectedType, "Text");
@@ -56,7 +57,7 @@ describe("authorDraftSchemaManifest — field coverage", () => {
     assert.equal(byPayloadField.approvalNotes.expectedType, "Multiline Text");
 
     for (const field of AUTHOR_DRAFT_SCHEMA_FIELDS) {
-      assert.equal(field.requiredBeforeLiveWrites, true, `${field.logicalName} must be required before live writes`);
+      assert.equal(field.confirmedCreated, true, `${field.logicalName} must be confirmed created`);
     }
   });
 

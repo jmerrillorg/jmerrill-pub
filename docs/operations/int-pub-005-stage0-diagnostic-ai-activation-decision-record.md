@@ -836,17 +836,18 @@ No manuscript text, extracted content, prompt body, raw model response, send-now
 
 ## 28. PR #93 - Author Draft Dataverse Schema Confirmation
 
-PR #93 introduces the required Dataverse schema manifest and documentation for internal author-response draft persistence.
+PR #93 introduces the required Dataverse schema manifest and documents live schema confirmation for internal author-response draft persistence.
 
 ### What changed
 
 - Author draft schema target remains the existing `jm1pub_editorialdiagnostic` record.
 - Entity set remains `jm1pub_editorialdiagnostics`.
 - Row identity remains `jm1pub_editorialdiagnosticid`.
-- Thirteen author-draft fields are documented as required before live writes.
+- Thirteen author-draft fields are confirmed created and published on `jm1pub_editorialdiagnostic`.
+- The fields are added to the `JM1_Publishing` solution.
 - Expected field types are documented.
 - Required safe values remain `INITIAL_DIAGNOSTIC_REVIEW_NEXT_STEP`, `DRAFT_ONLY`, `PENDING_HUMAN_APPROVAL`, `publishing@jmerrill.one`, future internal copy required `true`, and future Dataverse send log required `true`.
-- Live author-draft writes remain blocked until the fields are created or confirmed in the governed Dataverse environment.
+- Live author-draft writes remain blocked until a later governed adapter activation PR.
 
 ### Governance status
 
