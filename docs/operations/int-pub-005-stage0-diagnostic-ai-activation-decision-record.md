@@ -614,25 +614,31 @@ Before the pilot call is made, the following must be confirmed:
 
 ### Pilot result record
 
-_To be completed after Jackie selects the pilot manuscript and the diagnostic is run._
-
 | Item | Value |
 |---|---|
-| Pilot date | — |
-| Manuscript / Diagnostic ID | — |
-| Intake reference | — |
-| HTTP status | — |
-| Gate state | — |
-| knowledge.md hashMatched | — |
-| Tokens | — |
-| No-quotation validation | — |
-| Confidence | — |
-| Routing status | — |
-| AI Request Log ID | — |
-| Execution Log ID | — |
-| Jackie review date | — |
-| Jackie review outcome | — |
-| Expansion decision | — |
+| Pilot date | 2026-06-18 |
+| Manuscript / Diagnostic ID | Establishing Glory: The Library / `64e387e0-7e6a-f111-a826-00224820105b` |
+| Intake reference | `JMP-INT-202606-UFYG60` |
+| HTTP status | `202 Accepted` |
+| Gate state | Closed before call, opened for one authorized request, closed immediately after call (`JM1_AI_EXECUTION_ENABLED=false`) |
+| knowledge.md hashMatched | `true` |
+| Tokens | 74,886 input / 223 output / 75,109 total |
+| No-quotation validation | passed (`valid=true`, 0 violations; fields checked: `jm1_diagnosticoutputsummary`, `jm1_diagnosticriskflags`) |
+| Confidence | 0.79 |
+| Routing status | Needs Human Review (`835500004`, basis `CONFIDENCE_MID`) |
+| AI Request Log ID | `7bc36fcb-fb6a-f111-a826-6045bdd69738` |
+| Execution Log ID | `930310ce-fb6a-f111-a826-000d3a14673b` |
+| Jackie review date | Pending |
+| Jackie review outcome | Pending |
+| Expansion decision | No expansion authorized; gate closed |
+
+Safe result record: [`int-pub-005-real-manuscript-pilot-attempt-4.md`](./int-pub-005-real-manuscript-pilot-attempt-4.md)
+
+The fourth attempt was authorized only after PR #81 and PR #82 were merged and PR #82 was deployed. It was limited to diagnostic `64e387e0-7e6a-f111-a826-00224820105b`, intake reference `JMP-INT-202606-UFYG60`, and manuscript `Establishing Glory: The Library`.
+
+The call confirmed the PR #82 brevity constraints can pass schema validation and the unchanged no-quotation/output validator. The raw diagnostic output, prompt body, manuscript content, runner key, request headers, cookies, tokens, and connection strings are not stored in this record.
+
+No author-facing output was generated. No author email was sent. No Opportunity was created. Flow D production wiring remains inactive.
 
 ## 19. PR #82 — Output Brevity Constraints After Attempt 3
 
