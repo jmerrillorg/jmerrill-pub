@@ -785,6 +785,21 @@ Synthetic DOCX and TXT extraction was verified via direct HTTP contract test on 
 
 No real manuscript content was used. No AI was called. No Dataverse writes occurred.
 
+## PR #82 Output Brevity Constraints
+
+PR #82 constrains the real-manuscript pilot text output fields so model output is concise enough to pass the existing no-quotation validator.
+
+| Field | Constraint |
+|---|---|
+| `jm1_diagnosticoutputsummary` | Concise characterization only; one short sentence or compact phrase; preferred maximum 240 characters |
+| `jm1_diagnosticriskflags` | Short labels only, separated by semicolons; not prose paragraphs; preferred maximum 240 characters |
+
+The Anthropic tool schema now sets `maxLength: 240` for both text fields. The real-manuscript pilot prompt repeats the same brevity rules and instructs the model not to include manuscript quotations, manuscript excerpts, close paraphrase, prompt text, or implementation details.
+
+The no-quotation validator remains the enforcement gate. Its `PROSE_BLOCK` rule still rejects non-JSON text fields with a continuous prose block over 300 characters. PR #82 does not relax this validator and does not change the 300-character safety limit.
+
+No real manuscript rerun occurred in PR #82. The gate remained closed (`JM1_AI_EXECUTION_ENABLED=false`), and a fourth pilot attempt requires new Jackie authorization.
+
 ## Related Documents
 
 - [`docs/operations/int-pub-005-stage0-diagnostic-ai-execution-contract.md`](./int-pub-005-stage0-diagnostic-ai-execution-contract.md) — AI execution contract governing the future AI call

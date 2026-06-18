@@ -311,9 +311,35 @@ describe("Anthropic provider — DIAGNOSTIC_TOOL schema contract", () => {
     assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticoutputsummary.minLength, 1);
   });
 
+  test("jm1_diagnosticoutputsummary schema has maxLength 240", () => {
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticoutputsummary.maxLength, 240);
+  });
+
   test("jm1_diagnosticriskflags schema type is string with minLength 1", () => {
     assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticriskflags.type, "string");
     assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticriskflags.minLength, 1);
+  });
+
+  test("jm1_diagnosticriskflags schema has maxLength 240", () => {
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticriskflags.maxLength, 240);
+  });
+
+  test("jm1_diagnosticoutputsummary description requires concise non-paragraph output", () => {
+    const desc = DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticoutputsummary.description.toLowerCase();
+    assert.ok(desc.includes("concise"), "summary description must mention concise output");
+    assert.ok(desc.includes("no paragraph"), "summary description must prohibit paragraphs");
+    assert.ok(desc.includes("no manuscript excerpt"), "summary description must prohibit excerpts");
+    assert.ok(desc.includes("under 240 characters"), "summary description must state the 240-character limit");
+  });
+
+  test("jm1_diagnosticriskflags description requires label-style non-prose output", () => {
+    const desc = DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticriskflags.description.toLowerCase();
+    assert.ok(desc.includes("short labels"), "risk flags description must require labels");
+    assert.ok(desc.includes("semicolon-separated") || desc.includes("comma-separated"),
+      "risk flags description must mention separated labels");
+    assert.ok(desc.includes("no explanatory paragraph"), "risk flags description must prohibit paragraphs");
+    assert.ok(desc.includes("no manuscript excerpt"), "risk flags description must prohibit excerpts");
+    assert.ok(desc.includes("under 240 characters"), "risk flags description must state the 240-character limit");
   });
 
   test("DIAGNOSTIC_TOOL description instructs characterization-only output", () => {
@@ -341,6 +367,48 @@ describe("Anthropic provider — DIAGNOSTIC_TOOL schema contract", () => {
     const desc = DIAGNOSTIC_TOOL.input_schema.properties.jm1_confidence.description;
     assert.ok(desc.includes("0.") || desc.includes("1.0"),
       "description should include a numeric example to prevent string submission");
+  });
+
+  test("Anthropic request keeps max_tokens at 4096", async () => {
+    let capturedRequestBody = null;
+    const originalFetch = global.fetch;
+    global.fetch = async (_url, options) => {
+      capturedRequestBody = JSON.parse(options.body);
+      return {
+        ok: true,
+        status: 200,
+        async json() {
+          return {
+            usage: { input_tokens: 10, output_tokens: 5 },
+            content: [{
+              type: "tool_use",
+              name: "submit_stage0_diagnostic",
+              input: {
+                jm1_diagnosticoutputsummary: "Concise diagnostic characterization.",
+                jm1_diagnosticriskflags: "Rights review needed; Developmental review likely",
+                jm1_confidence: 0.8,
+                jm1_requireshumanreview: true
+              }
+            }]
+          };
+        }
+      };
+    };
+
+    try {
+      await withEnv({
+        ANTHROPIC_API_KEY: "test-key-not-real",
+        ANTHROPIC_MODEL: "claude-sonnet-4-6"
+      }, async () => {
+        const { call } = require("../src/model/providers/anthropicProvider");
+        const result = await call({ promptBody: "test prompt", diagnosticId: "test-id" });
+        assert.equal(result.ok, true);
+      });
+    } finally {
+      global.fetch = originalFetch;
+    }
+
+    assert.equal(capturedRequestBody.max_tokens, 4096);
   });
 });
 

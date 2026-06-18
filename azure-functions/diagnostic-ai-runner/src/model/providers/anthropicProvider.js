@@ -38,19 +38,22 @@ const DIAGNOSTIC_TOOL = {
       jm1_diagnosticoutputsummary: {
         type: "string",
         minLength: 1,
+        maxLength: 240,
         description:
-          "Characterization-only diagnostic summary of the manuscript (2–4 sentences). " +
-          "Describe the work's nature, category, and overall diagnostic impression. " +
-          "No manuscript excerpts, no quoted prose, no verbatim author text."
+          "Concise characterization only; prefer one short sentence or compact phrase. " +
+          "No paragraph, no quotation, no manuscript excerpt, no verbatim author text, " +
+          "no close paraphrase, and no long prose block. Must be under 240 characters."
       },
       jm1_diagnosticriskflags: {
         type: "string",
         minLength: 1,
+        maxLength: 240,
         description:
-          "Characterization-only summary of editorial risk flags (1–3 sentences). " +
-          "Describe structural, commercial, or editorial concerns at a categorical level. " +
-          "If no significant risk flags are identified, state that explicitly. " +
-          "No manuscript excerpts, no quoted prose, no verbatim author text."
+          "Short labels only; use comma-separated or semicolon-separated labels. " +
+          "No explanatory paragraph, no quotation, no manuscript excerpt, " +
+          "no verbatim author text, no close paraphrase, and no long prose block. " +
+          "Must be under 240 characters. Example: Rights review needed; " +
+          "Brand alignment review; Developmental review likely."
       },
       jm1_confidence: {
         type: "number",
