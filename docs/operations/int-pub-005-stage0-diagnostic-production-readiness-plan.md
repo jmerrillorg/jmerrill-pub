@@ -647,6 +647,39 @@ The field map must not persist manuscript text, extracted manuscript content, pr
 
 ---
 
+## 22. PR #94 - Author Draft Live Persistence Enablement
+
+PR #94 enables live Dataverse persistence for internal author-response drafts only.
+
+The live write target is the existing `jm1pub_editorialdiagnostic` row addressed through entity set `jm1pub_editorialdiagnostics` and row identity `jm1pub_editorialdiagnosticid`. The update payload writes only the confirmed author-draft fields created in PR #93.
+
+### Persistence boundary
+
+Author draft persistence remains internal-only:
+
+- Persisted draft does not mean sent.
+- `sendStatus=DRAFT_ONLY`.
+- `approvalStatus=PENDING_HUMAN_APPROVAL`.
+- `internalVisibilityMailbox=publishing@jmerrill.one`.
+- `futureSendRequiresInternalCopy=true`.
+- `futureSendRequiresDataverseLog=true`.
+- `approvedBy=null`.
+- `approvedOn=null`.
+
+The live persister updates an existing Editorial Diagnostic record when explicitly called with a validated safe draft payload and a valid Dataverse client. PR #94 does not add broad automatic invocation from Flow D or the diagnostic runner.
+
+### Non-activation status
+
+- No author email is sent.
+- No send event is created.
+- No Opportunity is created.
+- Flow D remains inactive.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.

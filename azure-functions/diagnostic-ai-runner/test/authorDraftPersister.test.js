@@ -5,6 +5,7 @@ const assert = require("node:assert/strict");
 const {
   persistAuthorResponseDraft,
   buildAuthorDraftRecord,
+  buildDataverseUpdatePayload,
   validateAuthorDraftPayload,
   TABLE_LOGICAL_NAME,
   ENTITY_SET,
@@ -88,6 +89,13 @@ describe("authorDraftPersister — valid persistence", () => {
       assert.equal(input.draftRecord.internalVisibilityMailbox, INTERNAL_VISIBILITY_MAILBOX);
       assert.equal(input.draftRecord.futureSendRequiresInternalCopy, true);
       assert.equal(input.draftRecord.futureSendRequiresDataverseLog, true);
+      assert.equal(input.dataverseUpdatePayload[AUTHOR_DRAFT_FIELD_MAP.draftSendStatus], DRAFT_STATUS);
+      assert.equal(input.dataverseUpdatePayload[AUTHOR_DRAFT_FIELD_MAP.draftApprovalStatus], DRAFT_APPROVAL_STATUS);
+      assert.equal(input.dataverseUpdatePayload[AUTHOR_DRAFT_FIELD_MAP.internalVisibilityMailbox], INTERNAL_VISIBILITY_MAILBOX);
+      assert.equal(input.dataverseUpdatePayload[AUTHOR_DRAFT_FIELD_MAP.futureSendRequiresInternalCopy], true);
+      assert.equal(input.dataverseUpdatePayload[AUTHOR_DRAFT_FIELD_MAP.futureSendRequiresDataverseLog], true);
+      assert.equal(input.dataverseUpdatePayload[AUTHOR_DRAFT_FIELD_MAP.draftApprovedBy], null);
+      assert.equal(input.dataverseUpdatePayload[AUTHOR_DRAFT_FIELD_MAP.draftApprovedOn], null);
     });
 
     const result = await persistAuthorResponseDraft({
@@ -120,6 +128,25 @@ describe("authorDraftPersister — valid persistence", () => {
     assert.equal(record.internalVisibilityMailbox, INTERNAL_VISIBILITY_MAILBOX);
     assert.equal(record.futureSendRequiresInternalCopy, true);
     assert.equal(record.futureSendRequiresDataverseLog, true);
+  });
+
+  test("Dataverse update payload includes only confirmed safe author draft fields", () => {
+    const record = buildAuthorDraftRecord(makeDraft());
+    const payload = buildDataverseUpdatePayload(record);
+
+    assert.deepEqual(Object.keys(payload).sort(), Object.values(AUTHOR_DRAFT_FIELD_MAP).sort());
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.draftSubject], "Next step for your J Merrill Publishing submission");
+    assert.ok(payload[AUTHOR_DRAFT_FIELD_MAP.draftBody].includes("J Merrill Publishing"));
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.draftTemplate], TEMPLATE_NAME);
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.draftSendStatus], DRAFT_STATUS);
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.draftApprovalStatus], DRAFT_APPROVAL_STATUS);
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.internalVisibilityMailbox], INTERNAL_VISIBILITY_MAILBOX);
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.futureSendRequiresInternalCopy], true);
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.futureSendRequiresDataverseLog], true);
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.draftPreparedBy], "system/internal");
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.draftApprovedBy], null);
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.draftApprovedOn], null);
+    assert.equal(payload[AUTHOR_DRAFT_FIELD_MAP.draftApprovalNotes], "Pending human approval. Draft only; no author-facing email sent.");
   });
 });
 

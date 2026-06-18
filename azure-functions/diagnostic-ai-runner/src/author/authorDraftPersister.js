@@ -5,8 +5,8 @@
  *
  * This module persists only the safe draft payload prepared by
  * authorResponseDraftBuilder. It does not send email, call mail APIs, create
- * send events, create Opportunities, activate Flow D, run diagnostics, write
- * live Dataverse directly, or open execution gates.
+ * send events, create Opportunities, activate Flow D, run diagnostics, or open
+ * execution gates.
  */
 
 const {
@@ -24,8 +24,8 @@ const {
 } = require("./authorDraftFieldMap");
 const { DIAGNOSTIC_ID_PATTERN, INTAKE_REFERENCE_PATTERN } = require("../queue/diagnosticQueueSelector");
 
-const PERSISTENCE_ERROR_CODE = "AUTHOR_DRAFT_PERSISTENCE_INVALID_PAYLOAD";
-const WRITE_ERROR_CODE = "AUTHOR_DRAFT_PERSISTENCE_WRITE_FAILED";
+const PERSISTENCE_ERROR_CODE = "AUTHOR_DRAFT_PERSISTENCE_FAILED";
+const WRITE_ERROR_CODE = "AUTHOR_DRAFT_PERSISTENCE_FAILED";
 
 const FORBIDDEN_DRAFT_PERSISTENCE_FIELDS = [
   ...AUTHOR_DRAFT_UNMAPPED_UNSAFE_FIELDS
@@ -216,6 +216,24 @@ function buildAuthorDraftRecord(draftPayload) {
   };
 }
 
+function buildDataverseUpdatePayload(draftRecord) {
+  return {
+    [AUTHOR_DRAFT_FIELD_MAP.draftSubject]: draftRecord.draftSubject,
+    [AUTHOR_DRAFT_FIELD_MAP.draftBody]: draftRecord.draftBody,
+    [AUTHOR_DRAFT_FIELD_MAP.draftTemplate]: draftRecord.templateName,
+    [AUTHOR_DRAFT_FIELD_MAP.draftSendStatus]: DRAFT_STATUS,
+    [AUTHOR_DRAFT_FIELD_MAP.draftApprovalStatus]: DRAFT_APPROVAL_STATUS,
+    [AUTHOR_DRAFT_FIELD_MAP.internalVisibilityMailbox]: INTERNAL_VISIBILITY_MAILBOX,
+    [AUTHOR_DRAFT_FIELD_MAP.futureSendRequiresInternalCopy]: true,
+    [AUTHOR_DRAFT_FIELD_MAP.futureSendRequiresDataverseLog]: true,
+    [AUTHOR_DRAFT_FIELD_MAP.draftPreparedAt]: draftRecord.preparedAt,
+    [AUTHOR_DRAFT_FIELD_MAP.draftPreparedBy]: draftRecord.preparedBy,
+    [AUTHOR_DRAFT_FIELD_MAP.draftApprovedBy]: null,
+    [AUTHOR_DRAFT_FIELD_MAP.draftApprovedOn]: null,
+    [AUTHOR_DRAFT_FIELD_MAP.draftApprovalNotes]: "Pending human approval. Draft only; no author-facing email sent."
+  };
+}
+
 function validateDataverseClient(dataverseClient) {
   return isPlainObject(dataverseClient) && typeof dataverseClient.persistAuthorDraft === "function";
 }
@@ -232,6 +250,7 @@ async function persistAuthorResponseDraft(input = {}) {
   }
 
   const draftRecord = buildAuthorDraftRecord(draftPayload);
+  const dataverseUpdatePayload = buildDataverseUpdatePayload(draftRecord);
   const persistedAt = new Date().toISOString();
 
   try {
@@ -243,6 +262,7 @@ async function persistAuthorResponseDraft(input = {}) {
       intakeReferenceCode: draftRecord.intakeReferenceCode,
       fieldMap: AUTHOR_DRAFT_FIELD_MAP,
       draftRecord,
+      dataverseUpdatePayload,
       persistedAt
     });
 
@@ -265,6 +285,7 @@ async function persistAuthorResponseDraft(input = {}) {
 module.exports = {
   persistAuthorResponseDraft,
   buildAuthorDraftRecord,
+  buildDataverseUpdatePayload,
   validateAuthorDraftPayload,
   TABLE_LOGICAL_NAME,
   ENTITY_SET,

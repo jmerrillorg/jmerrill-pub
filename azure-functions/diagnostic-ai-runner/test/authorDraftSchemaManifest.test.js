@@ -16,7 +16,7 @@ const {
 } = require("../src/author/authorDraftSchemaManifest");
 
 describe("authorDraftSchemaManifest — target and status", () => {
-  test("documents schema as confirmed while live writes remain disabled", () => {
+  test("documents schema as confirmed with internal draft-only live writes enabled", () => {
     assert.equal(SCHEMA_STATUS, "CONFIRMED_CREATED_PUBLISHED");
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.status, SCHEMA_STATUS);
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.tableLogicalName, TABLE_LOGICAL_NAME);
@@ -25,7 +25,8 @@ describe("authorDraftSchemaManifest — target and status", () => {
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.tableLogicalName, "jm1pub_editorialdiagnostic");
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.entitySet, "jm1pub_editorialdiagnostics");
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.rowIdentity, "jm1pub_editorialdiagnosticid");
-    assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.liveWritesEnabled, false);
+    assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.liveWritesEnabled, true);
+    assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.liveWritesScope, "INTERNAL_DRAFT_ONLY_EXPLICIT_CALL");
     assert.equal(AUTHOR_DRAFT_SCHEMA_MANIFEST.solutionUniqueName, "JM1_Publishing");
   });
 });

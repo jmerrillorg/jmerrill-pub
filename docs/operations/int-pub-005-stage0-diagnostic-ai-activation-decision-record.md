@@ -712,6 +712,32 @@ PR #85 introduces a controlled queue selection layer for approved INT-PUB-005 di
 - No author email is authorized.
 - No Opportunity creation is authorized.
 - Flow D activation is not authorized.
+
+## 29. PR #94 - Author Draft Live Persistence Enablement
+
+PR #94 enables live Dataverse persistence for internal `DRAFT_ONLY` author-response drafts on the existing Stage 0 Editorial Diagnostic record.
+
+### What changed
+
+- Safe author-response drafts can be written to the confirmed author draft fields on `jm1pub_editorialdiagnostic`.
+- Writes update the existing `jm1pub_editorialdiagnostics(<diagnosticId>)` row.
+- Draft send status remains `DRAFT_ONLY`.
+- Draft approval status remains `PENDING_HUMAN_APPROVAL`.
+- Required future visibility mailbox remains `publishing@jmerrill.one`.
+- Future internal-copy and Dataverse send-log requirements remain `true`.
+- Approval fields remain empty until later human approval.
+
+### Governance status
+
+- Internal draft persistence only.
+- No send.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No author email was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
 - Queue eligibility is not permission to process a record.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
