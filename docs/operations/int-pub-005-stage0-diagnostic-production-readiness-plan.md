@@ -321,3 +321,47 @@ As of this PR:
 - No broad or historical record processing is authorized
 
 The next governance decision is whether to approve controlled-production implementation planning, not whether to run more manuscripts.
+
+---
+
+## 14. PR #85 - Controlled Diagnostic Queue for Approved Intake Records
+
+PR #85 introduces an internal-only controlled diagnostic queue selection layer for INT-PUB-005 Stage 0 diagnostics.
+
+Queue selection is not production activation. It only evaluates whether a diagnostic record has the required governance fields and safe state to be considered for a later controlled run. It does not process records automatically.
+
+### Queue eligibility
+
+A diagnostic record is queue-eligible only when all conditions are true:
+
+| Requirement | Rule |
+|---|---|
+| Diagnostic ID | Present and valid enough for safe record identification |
+| Intake reference | Present and tied to the governed intake |
+| Manuscript asset URL | Present and valid as a governed asset URL |
+| Manuscript asset status | Ready or approved |
+| Approved for diagnostic | `jm1_manuscriptapprovedfordiagnostic=true` |
+| File type | Supported diagnostic format (`.docx` or `.txt`) |
+| Execution status | Ready for diagnostic selection |
+| Attempt count | Below retry/failure limit |
+| Manual block | Not manually blocked |
+| Gate | Real diagnostic processing remains controlled by `JM1_AI_EXECUTION_ENABLED` |
+
+### Blocking conditions
+
+Queue selection fails closed when required fields are missing, the manuscript asset is not approved, the file type is unsupported, the diagnostic already completed, the diagnostic is processing, the diagnostic already requires human review, retry/failure limits are exceeded, the record is manually blocked, or execution status is missing or malformed.
+
+### Non-activation boundary
+
+PR #85 does not authorize:
+
+- Automatic broad production execution
+- Flow D activation
+- Real manuscript diagnostic processing
+- Opening `JM1_AI_EXECUTION_ENABLED`
+- Author-facing diagnostic output
+- Author email
+- Opportunity creation
+- Historical row processing
+
+Human review remains required for every diagnostic result. Any future author-facing system email must be copied to, or internally mirrored to, `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
