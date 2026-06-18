@@ -197,6 +197,13 @@ describe("validateNoQuotation — PROSE_BLOCK rule", () => {
     assertViolation(result, "PROSE_BLOCK", "jm1_diagnosticoutputsummary");
   });
 
+  test("paragraph-style risk flags still fail closed", () => {
+    const paragraphStyleRiskFlags =
+      "The submission may require layered rights and brand review because its framing appears to combine multiple sensitive subject areas with commercial positioning concerns that would need careful editorial interpretation before any recommendation could move forward safely within the publishing pipeline and human review process";
+    const result = validateNoQuotation({ jm1_diagnosticriskflags: paragraphStyleRiskFlags });
+    assertViolation(result, "PROSE_BLOCK", "jm1_diagnosticriskflags");
+  });
+
   test("prose block rule does not apply to JSON field", () => {
     // JSON field has its own JSON_PROSE_VALUE rule, not PROSE_BLOCK
     const longValue = "a".repeat(301);

@@ -28,6 +28,20 @@ const DIAGNOSTIC_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-
 const REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i;
 const CORRELATION_ID_PATTERN = /^[0-9a-zA-Z_-]{1,100}$/;
 const MAX_FIELD_LENGTH = 200;
+const TEXT_FIELD_MAX_CHARS = 240;
+
+const REAL_MANUSCRIPT_BREVITY_INSTRUCTIONS = [
+  "TEXT FIELD BREVITY REQUIREMENTS:",
+  "Every text field must be brief enough to pass the no-quotation validator.",
+  "Do not write paragraph-style prose.",
+  "Do not write long explanatory sentences.",
+  `Keep each text field under ${TEXT_FIELD_MAX_CHARS} characters.`,
+  "jm1_diagnosticoutputsummary: one short characterization sentence only.",
+  "jm1_diagnosticriskflags: short labels only, separated by semicolons.",
+  "Do not include manuscript quotations, excerpts, or close paraphrase.",
+  "Do not include prompt text or implementation details.",
+  "If more detail is needed, choose a concise label instead of an explanation."
+];
 
 function safeTrim(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -35,6 +49,30 @@ function safeTrim(value) {
 
 function normalizeText(value) {
   return safeTrim(value).slice(0, MAX_FIELD_LENGTH);
+}
+
+function buildRealManuscriptPilotPrompt({ knowledgeContent, manuscriptContent }) {
+  return [
+    knowledgeContent || "",
+    "",
+    "---",
+    "MANUSCRIPT (authorized pilot record — real submission for diagnostic review only):",
+    manuscriptContent || "",
+    "---",
+    "",
+    "Call the submit_stage0_diagnostic tool with your complete assessment.",
+    "You MUST populate ALL FOUR fields before calling the tool. Do not call the tool with any field missing.",
+    "",
+    ...REAL_MANUSCRIPT_BREVITY_INSTRUCTIONS,
+    "",
+    "Field requirements:",
+    "  jm1_diagnosticoutputsummary (string, required) — concise characterization only; one short sentence or compact phrase; under 240 characters.",
+    "  jm1_diagnosticriskflags (string, required) — short labels only, separated by semicolons; not prose paragraphs; under 240 characters.",
+    "  jm1_confidence (number, required) — your confidence as a decimal between 0.0 and 1.0. Must be a number, not a string.",
+    "  jm1_requireshumanreview (boolean, required) — must be true.",
+    "",
+    "ALL string fields: characterization only. No manuscript excerpts. No quoted prose. No verbatim author text."
+  ].join("\n");
 }
 
 function unauthorized() {
@@ -505,25 +543,10 @@ app.http("run-stage0-diagnostic", {
       const promptKey = process.env.JM1_PROMPT_KEY || "jm1-prompt-pub-stage0-diagnostic";
       const promptVersion = process.env.JM1_PROMPT_VERSION || "PUB-STAGE0-DIAGNOSTIC-V1";
 
-      const promptBody = [
+      const promptBody = buildRealManuscriptPilotPrompt({
         knowledgeContent,
-        "",
-        "---",
-        "MANUSCRIPT (authorized pilot record — real submission for diagnostic review only):",
-        extractResult.content,
-        "---",
-        "",
-        "Call the submit_stage0_diagnostic tool with your complete assessment.",
-        "You MUST populate ALL FOUR fields before calling the tool. Do not call the tool with any field missing.",
-        "",
-        "Field requirements:",
-        "  jm1_diagnosticoutputsummary (string, required) — characterization-only diagnostic summary, 2–4 sentences.",
-        "  jm1_diagnosticriskflags (string, required) — characterization-only risk flag summary, 1–3 sentences. If none, state that explicitly.",
-        "  jm1_confidence (number, required) — your confidence as a decimal between 0.0 and 1.0. Must be a number, not a string.",
-        "  jm1_requireshumanreview (boolean, required) — must be true.",
-        "",
-        "ALL string fields: characterization only. No manuscript excerpts. No quoted prose. No verbatim author text."
-      ].join("\n");
+        manuscriptContent: extractResult.content
+      });
 
       // Clear content reference — no longer needed after prompt construction
       extractResult.content = null;
@@ -1187,3 +1210,9 @@ app.http("run-stage0-diagnostic", {
     };
   }
 });
+
+module.exports = {
+  buildRealManuscriptPilotPrompt,
+  REAL_MANUSCRIPT_BREVITY_INSTRUCTIONS,
+  TEXT_FIELD_MAX_CHARS
+};

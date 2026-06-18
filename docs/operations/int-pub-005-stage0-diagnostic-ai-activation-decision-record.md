@@ -633,3 +633,37 @@ _To be completed after Jackie selects the pilot manuscript and the diagnostic is
 | Jackie review date | — |
 | Jackie review outcome | — |
 | Expansion decision | — |
+
+## 19. PR #82 — Output Brevity Constraints After Attempt 3
+
+### Attempt 3 result
+
+Attempt 3 reached the real-manuscript route and passed schema validation. The runner successfully completed Dataverse read, manuscript asset gate, Graph-authenticated SharePoint download, DOCX extraction, prompt injection, Anthropic tool-use, and required-field schema validation.
+
+The attempt failed at `outputValidation`, not schema validation. The no-quotation validator returned `PILOT_OUTPUT_QUOTATION_VIOLATION` because two text fields contained prose blocks longer than the 300-character safety limit:
+
+| Field | Rule | Result |
+|---|---|---|
+| `jm1_diagnosticoutputsummary` | `PROSE_BLOCK` | 313-character prose block exceeded 300-character limit |
+| `jm1_diagnosticriskflags` | `PROSE_BLOCK` | 453-character prose block exceeded 300-character limit |
+
+### PR #82 change
+
+PR #82 adds brevity constraints so the model is directed to produce concise, non-paragraph text fields that can pass the existing no-quotation validator.
+
+- `jm1_diagnosticoutputsummary`: Anthropic tool schema `maxLength: 240`; prompt directs one short characterization sentence only.
+- `jm1_diagnosticriskflags`: Anthropic tool schema `maxLength: 240`; prompt directs short labels only, separated by semicolons.
+- Prompt explicitly prohibits paragraph-style prose, long explanatory sentences, manuscript quotations, manuscript excerpts, close paraphrase, prompt text, and implementation details.
+
+### Governance status
+
+- The no-quotation validator remains strict.
+- The 300-character `PROSE_BLOCK` rule remains unchanged.
+- Schema validation remains strict for required fields, types, confidence range, and `jm1_requireshumanreview=true`.
+- Gate remains closed: `JM1_AI_EXECUTION_ENABLED=false`.
+- No fourth pilot call occurred in PR #82.
+- A fourth attempt requires new Jackie authorization.
+- Flow D was not changed.
+- No author email was sent.
+- No Opportunity was created.
+- No raw model response, manuscript text, or prompt body was stored.
