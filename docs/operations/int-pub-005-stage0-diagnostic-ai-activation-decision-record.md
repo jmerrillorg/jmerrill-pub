@@ -738,6 +738,30 @@ PR #86 introduces an internal-only review payload builder for validated Stage 0 
 - Human review remains required before any author-facing communication.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 24. PR #89 - Human Review Decision Model
+
+PR #89 introduces an internal-only decision model for human review of persisted Stage 0 diagnostic results.
+
+### What changed
+
+- Human reviewers may choose `APPROVE_FOR_AUTHOR_DRAFT`, `NEEDS_REVISION`, `REJECT_BLOCK`, or `HOLD_FOR_REVIEW`.
+- Decisions are valid only from `PENDING_HUMAN_REVIEW`.
+- `NEEDS_REVISION` and `REJECT_BLOCK` require reviewer notes.
+- Decision updates write only internal review fields and safe structured decision metadata.
+- Approval for author draft authorizes only later draft preparation work; it does not send an email, create an Opportunity, activate Flow D, or authorize production automation.
+
+### Governance status
+
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output is authorized.
+- No author email is authorized.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Human review decisions are internal-only at this stage.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
 ## 23. PR #87 - Diagnostic Result Persistence for Internal Review
 
 PR #87 introduces an internal diagnostic review persistence adapter for the safe review payload prepared by PR #86.

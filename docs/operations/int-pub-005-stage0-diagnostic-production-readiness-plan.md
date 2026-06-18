@@ -495,3 +495,43 @@ PR #87 does not authorize:
 - Historical row processing
 
 Human review remains required. Any future author-facing system email must still copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
+## 17. PR #89 - Human Review Decision Model
+
+PR #89 introduces an internal-only human review decision model for persisted Stage 0 diagnostic results.
+
+The decision model defines what an internal reviewer may decide after a safe diagnostic result has been persisted for review. It does not send author email, draft author-facing messages, create Opportunities, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+
+### Supported internal decisions
+
+| Decision | Internal meaning | Resulting internal status |
+|---|---|---|
+| `APPROVE_FOR_AUTHOR_DRAFT` | The diagnostic may be used to prepare an author-facing draft in a later governed PR | `APPROVED_FOR_AUTHOR_DRAFT` |
+| `NEEDS_REVISION` | The diagnostic needs human correction or another internal review pass | `NEEDS_REVISION` |
+| `REJECT_BLOCK` | The diagnostic should not be used unless reopened by a later governed decision | `BLOCKED` |
+| `HOLD_FOR_REVIEW` | Keep the diagnostic pending for further human review | `PENDING_HUMAN_REVIEW` |
+
+Approval for author draft is not permission to send an email. It is not permission to create an Opportunity. It is not permission to activate Flow D.
+
+### Reviewer requirements
+
+Human review decisions require a valid diagnostic ID, governed intake reference, current review status of `PENDING_HUMAN_REVIEW`, supported decision, and reviewer identifier. Reviewer notes are required for `NEEDS_REVISION` and `REJECT_BLOCK`; notes are optional for `APPROVE_FOR_AUTHOR_DRAFT` and `HOLD_FOR_REVIEW`.
+
+### Internal Dataverse decision mapping
+
+Human review decisions map only to internal review fields on `jm1pub_editorialdiagnostic`:
+
+| Decision | `jm1_humanreviewstatus` value | Notes |
+|---|---:|---|
+| `APPROVE_FOR_AUTHOR_DRAFT` | `835510001` Approved for Editorial Review | Internal approval for later draft preparation only |
+| `NEEDS_REVISION` | `835510003` Revise / Re-run Diagnostic | Notes required |
+| `REJECT_BLOCK` | `835510004` Do Not Use AI Result | Notes required |
+| `HOLD_FOR_REVIEW` | `835510000` Pending Review | Remains under internal review |
+
+Decision updates may also set `jm1_humanreviewedby`, `jm1_humanreviewedon`, `jm1_humanreviewnotes`, `jm1_diagnosticstructuredoutputjson`, and safe correlation metadata. Decision updates must not include manuscript text, extracted manuscript content, prompt body, raw model output, author email fields, Opportunity fields, Flow D trigger fields, secrets, tokens, keys, or headers.
+
+### Non-activation boundary
+
+Human review decisions are internal-only at this stage. Author-facing communication remains a later governed phase. Any future author-facing system email must still copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
