@@ -365,3 +365,48 @@ PR #85 does not authorize:
 - Historical row processing
 
 Human review remains required for every diagnostic result. Any future author-facing system email must be copied to, or internally mirrored to, `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
+## 15. PR #86 - Internal Diagnostic Result Review Layer
+
+PR #86 introduces an internal-only diagnostic result review payload layer for validated Stage 0 diagnostic results.
+
+The review layer prepares safe diagnostic output for human review after schema validation, no-quotation/output validation, and confidence routing have succeeded. It does not authorize author-facing communication, Opportunity creation, Flow D activation, or production automation.
+
+### Review payload boundary
+
+The internal review payload may include:
+
+| Field | Purpose |
+|---|---|
+| `diagnosticId` | Safe diagnostic record identifier |
+| `intakeReferenceCode` | Safe governed intake reference |
+| `diagnosticOutputSummary` | Validated concise internal diagnostic summary |
+| `diagnosticRiskFlags` | Validated internal risk flags |
+| `confidence` | Validated 0.0-1.0 confidence score |
+| `requiresHumanReview` | Always `true` |
+| `routingDecision` | Safe routing result and basis |
+| `reviewStatus` | Defaults to `PENDING_HUMAN_REVIEW` |
+| `approvalStatus` | Defaults to `PENDING_HUMAN_REVIEW` |
+| `reviewedBy` / `reviewedOn` | `null` until human review occurs |
+| `preparedAt` | Safe preparation timestamp |
+| `metadata` | Safe provider/model/prompt/token metadata only |
+
+### Safety exclusions
+
+The internal review payload must not include manuscript text, extracted manuscript content, prompt body, raw model response, author-facing email body, email send fields, Opportunity fields, Flow D trigger fields, secrets, tokens, headers, or keys.
+
+### Non-activation boundary
+
+PR #86 does not authorize:
+
+- Diagnostic production activation
+- Real manuscript diagnostic processing
+- Author-facing diagnostic output
+- Author email
+- Opportunity creation
+- Flow D activation
+- Broad production automation
+
+Human review remains required before any author-facing communication. Any future author-facing system email must still copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
