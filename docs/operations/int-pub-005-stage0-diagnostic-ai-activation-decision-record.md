@@ -764,6 +764,33 @@ PR #95 introduces the internal human approval decision model for persisted autho
 - No author email was sent.
 - No Opportunity creation is authorized.
 - Flow D activation is not authorized.
+
+## 31. PR #96 - Author Draft Send Preparation Record
+
+PR #96 introduces a pure internal send-preparation record for author-response drafts approved for send preparation.
+
+### What changed
+
+- Drafts approved with `APPROVE_FOR_SEND_PREPARATION` can produce an internal send-preparation record.
+- The record uses `sendPreparationStatus=READY_FOR_HUMAN_SEND_APPROVAL`.
+- The record preserves `sendStatus=DRAFT_ONLY`.
+- The record uses `deliveryStatus=NOT_SENT`.
+- The required future visibility mailbox remains `publishing@jmerrill.one`.
+- Future internal-copy and Dataverse send-log requirements remain `true`.
+- No Dataverse send-preparation persistence fields are confirmed by this PR.
+
+### Governance status
+
+- Send preparation only.
+- No send.
+- No send event.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No author email was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
 - Queue eligibility is not permission to process a record.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 

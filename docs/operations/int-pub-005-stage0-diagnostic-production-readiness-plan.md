@@ -712,6 +712,45 @@ Future author-facing communication remains a later governed phase. Any future se
 
 ---
 
+## 24. PR #96 - Author Draft Send Preparation Record
+
+PR #96 introduces a pure internal send-preparation record for author-response drafts that have been approved with `APPROVE_FOR_SEND_PREPARATION`.
+
+Send preparation is not sending. It does not call a mail API, create a send event, log a successful send, create an Opportunity, activate Flow D, run diagnostics, or authorize production automation.
+
+### Send-preparation status
+
+The send-preparation record uses explicit internal statuses:
+
+- `sendPreparationStatus=READY_FOR_HUMAN_SEND_APPROVAL`
+- `sendStatus=DRAFT_ONLY`
+- `deliveryStatus=NOT_SENT`
+
+The record preserves:
+
+- `internalVisibilityMailbox=publishing@jmerrill.one`
+- `futureSendRequiresInternalCopy=true`
+- `futureSendRequiresDataverseLog=true`
+
+### Preconditions
+
+A send-preparation record may be built only when:
+
+- approval decision is `APPROVE_FOR_SEND_PREPARATION`
+- approval status is `APPROVED_FOR_SEND_PREPARATION`
+- current send status is `DRAFT_ONLY`
+- author email, draft subject, and draft body are present
+- visibility mailbox and future send-log requirements are intact
+- no send execution, sent timestamp, mail provider, Opportunity, Flow D, manuscript, prompt, raw model, secret, token, key, or header fields are present
+
+### Future persistence boundary
+
+No Dataverse send-preparation persistence fields are confirmed in PR #96. The builder is pure and does not fake live writes. A later governed schema/field-map PR must define any persistence target before send-preparation records are written.
+
+Author-facing sending remains a later governed phase. Any future send must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
