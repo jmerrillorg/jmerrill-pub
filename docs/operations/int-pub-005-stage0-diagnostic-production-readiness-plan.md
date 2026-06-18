@@ -688,3 +688,53 @@ Persistence refuses to write if the draft payload is missing, identifiers are mi
 The persisted draft must not contain manuscript text, extracted manuscript content, prompt body, raw model output, send-now flags, sent timestamps, sent/delivery claims, mail provider message IDs, Opportunity fields, Flow D trigger fields, secrets, tokens, keys, headers, or arbitrary external file URLs beyond already-governed safe references.
 
 Human approval remains required before any author-facing email. Any future send must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
+## 21. PR #93 - Author Draft Dataverse Schema Confirmation
+
+PR #93 documents and confirms the live Dataverse schema required before internal author-response draft persistence can be enabled.
+
+This is schema confirmation and documentation only. It does not send author email, create a send event, create an Opportunity, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+
+### Required schema target
+
+| Target | Value |
+|---|---|
+| Table logical name | `jm1pub_editorialdiagnostic` |
+| Entity set | `jm1pub_editorialdiagnostics` |
+| Row identity | Existing `jm1pub_editorialdiagnosticid` row identified by `diagnosticId` |
+
+The required author-draft columns are confirmed created and published on the existing Stage 0 Editorial Diagnostic record. No new Dataverse table is introduced.
+
+### Required schema fields
+
+The required fields are documented in `docs/operations/int-pub-005-author-draft-dataverse-schema.md` and represented in `authorDraftSchemaManifest.js`.
+
+The fields are confirmed created and added to the `JM1_Publishing` solution:
+
+- `jm1_authordraftsubject`
+- `jm1_authordraftbody`
+- `jm1_authordrafttemplate`
+- `jm1_authordraftsendstatus`
+- `jm1_authordraftapprovalstatus`
+- `jm1_authorvisibilitymailbox`
+- `jm1_authorfuturesendrequiresinternalcopy`
+- `jm1_authorfuturesendrequiresdataverselog`
+- `jm1_authordraftpreparedon`
+- `jm1_authordraftpreparedby`
+- `jm1_authordraftapprovedby`
+- `jm1_authordraftapprovedon`
+- `jm1_authordraftapprovalnotes`
+
+### Governance status
+
+- Field schema is confirmed, but live author-draft persistence still requires a later governed adapter activation PR.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output is authorized.
+- No author email is authorized.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
