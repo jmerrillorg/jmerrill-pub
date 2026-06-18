@@ -419,11 +419,40 @@ PR #87 introduces an internal diagnostic review persistence adapter for safe Sta
 
 The persistence layer is for internal review only. It accepts the PR #86 safe review payload after schema validation, no-quotation/output validation, and confidence routing have succeeded, then prepares it for persistence against the existing `jm1pub_editorialdiagnostic` review record pattern. It does not authorize diagnostic execution, author-facing output, author email, Opportunity creation, Flow D activation, or broad production automation.
 
-### Persistence target and schema boundary
+### Persistence target and field map
 
 The approved persistence home is the existing `jm1pub_editorialdiagnostic` record for the diagnostic. PR #87 does not create a new Dataverse table.
 
-Because dedicated internal review fields/status mappings require governed Dataverse schema confirmation, PR #87 keeps the runtime behavior as an injected persistence adapter with tests. A later schema/governance PR must confirm the exact Dataverse logical fields before production wiring. The adapter is designed to write only safe internal review fields and to fail closed if the Dataverse client/write contract is unavailable.
+The exact Dataverse target is:
+
+| Item | Value |
+|---|---|
+| Table display name | `Editorial Diagnostic` |
+| Table logical name | `jm1pub_editorialdiagnostic` |
+| Entity set | `jm1pub_editorialdiagnostics` |
+| Record identity | Existing `jm1pub_editorialdiagnosticid` row identified by `diagnosticId` |
+
+The internal review payload maps to existing confirmed fields:
+
+| Review payload item | Dataverse logical field | Storage rule |
+|---|---|---|
+| `diagnosticId` | `jm1pub_editorialdiagnosticid` | Existing row ID; used to address the update, not duplicated |
+| `intakeReferenceCode` | `jm1_diagnosticstructuredoutputjson` | Stored inside the safe structured review packet for audit correlation |
+| `diagnosticOutputSummary` | `jm1_diagnosticoutputsummary` | Concise validated summary only |
+| `diagnosticRiskFlags` | `jm1_diagnosticriskflags` | Concise validated risk labels only |
+| `confidence` | `jm1_diagnosticconfidence` | Decimal 0.0-1.0 |
+| `requiresHumanReview` | `jm1_diagnosticrequireshumanreview` | Always `true` |
+| `routingDecision.status` | `jm1_diagnosticexecutionstatus` | Existing diagnostic status choice, for example `835500004` Needs Human Review |
+| `routingDecision`, `reviewStatus`, `approvalStatus`, `preparedAt`, safe metadata | `jm1_diagnosticstructuredoutputjson` | Safe JSON packet only; no manuscript text, prompt body, or raw model output |
+| `reviewStatus=PENDING_HUMAN_REVIEW` | `jm1_humanreviewstatus` | Stored as `835510000` Pending Review |
+| `approvalStatus=PENDING_HUMAN_REVIEW` | `jm1_humanreviewstatus` | Represented by the same pending human review choice until a separate approval model is authorized |
+| `reviewedBy` | `jm1_humanreviewedby` | `null` until human review occurs |
+| `reviewedOn` | `jm1_humanreviewedon` | `null` until human review occurs |
+| Internal review note | `jm1_humanreviewnotes` | Safe note: pending internal human review; no author-facing output authorized |
+| Safe model/provider metadata | `jm1_diagnosticagentid` | Model/deployment/provider identifier, if present |
+| Safe correlation/execution ID | `jm1_diagnosticcorrelationid` | Correlation or execution ID, if present |
+
+No author email field, Opportunity field, Flow D trigger field, manuscript field, prompt field, or raw model output field is part of the persistence map.
 
 ### Safe fields prepared for persistence
 
@@ -432,14 +461,14 @@ The adapter may persist only:
 | Field | Purpose |
 |---|---|
 | `diagnosticId` | Existing diagnostic record ID |
-| `intakeReferenceCode` | Governed intake reference |
+| `intakeReferenceCode` | Governed intake reference stored in safe structured review packet |
 | `diagnosticOutputSummary` | Validated concise internal diagnostic summary |
 | `diagnosticRiskFlags` | Validated internal risk labels |
 | `confidence` | Validated 0.0-1.0 confidence score |
 | `requiresHumanReview` | Always `true` |
 | `routingDecision` | Safe routing status, label, and basis |
-| `reviewStatus` | `PENDING_HUMAN_REVIEW` |
-| `approvalStatus` | `PENDING_HUMAN_REVIEW` |
+| `reviewStatus` | `PENDING_HUMAN_REVIEW`, represented by `jm1_humanreviewstatus=835510000` |
+| `approvalStatus` | `PENDING_HUMAN_REVIEW`, represented by `jm1_humanreviewstatus=835510000` until a separate approval model is authorized |
 | `reviewedBy` / `reviewedOn` | `null` until human review occurs |
 | `preparedAt` | Safe payload preparation timestamp |
 | `metadata` | Safe provider, model, prompt, correlation/execution ID, and token-count metadata only |

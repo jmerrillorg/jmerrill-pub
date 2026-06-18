@@ -5,8 +5,11 @@ const assert = require("node:assert/strict");
 const {
   persistInternalDiagnosticReview,
   buildInternalDiagnosticReviewRecord,
+  buildDataverseUpdatePayload,
   validateReviewPayload,
   ENTITY_SET,
+  DATAVERSE_FIELD_MAP,
+  HUMAN_REVIEW_STATUS,
   PERSISTENCE_ERROR_CODE,
   WRITE_ERROR_CODE
 } = require("../src/review/diagnosticReviewPersister");
@@ -92,6 +95,8 @@ describe("diagnosticReviewPersister — valid persistence", () => {
       assert.equal(input.intakeReferenceCode, baseReviewPayload.intakeReferenceCode);
       assert.equal(input.reviewRecord.reviewStatus, REVIEW_STATUS.PENDING_HUMAN_REVIEW);
       assert.equal(input.reviewRecord.approvalStatus, APPROVAL_STATUS.PENDING_HUMAN_REVIEW);
+      assert.equal(input.dataverseUpdatePayload.jm1_humanreviewstatus, HUMAN_REVIEW_STATUS.PENDING_REVIEW);
+      assert.equal(input.dataverseUpdatePayload.jm1_diagnosticexecutionstatus, 835500004);
     });
 
     const result = await persistInternalDiagnosticReview({
@@ -128,6 +133,48 @@ describe("diagnosticReviewPersister — valid persistence", () => {
     assert.equal(record.approvalStatus, APPROVAL_STATUS.PENDING_HUMAN_REVIEW);
     assert.equal(record.reviewedBy, null);
     assert.equal(record.reviewedOn, null);
+  });
+
+  test("Dataverse update payload uses exact approved Editorial Diagnostic logical names", () => {
+    const record = buildInternalDiagnosticReviewRecord(makePayload());
+    const payload = buildDataverseUpdatePayload(record);
+
+    assert.equal(DATAVERSE_FIELD_MAP.diagnosticOutputSummary, "jm1_diagnosticoutputsummary");
+    assert.equal(DATAVERSE_FIELD_MAP.diagnosticRiskFlags, "jm1_diagnosticriskflags");
+    assert.equal(DATAVERSE_FIELD_MAP.confidence, "jm1_diagnosticconfidence");
+    assert.equal(DATAVERSE_FIELD_MAP.requiresHumanReview, "jm1_diagnosticrequireshumanreview");
+    assert.equal(DATAVERSE_FIELD_MAP.routingStatus, "jm1_diagnosticexecutionstatus");
+    assert.equal(DATAVERSE_FIELD_MAP.structuredOutputJson, "jm1_diagnosticstructuredoutputjson");
+    assert.equal(DATAVERSE_FIELD_MAP.humanReviewStatus, "jm1_humanreviewstatus");
+    assert.equal(DATAVERSE_FIELD_MAP.humanReviewedBy, "jm1_humanreviewedby");
+    assert.equal(DATAVERSE_FIELD_MAP.humanReviewedOn, "jm1_humanreviewedon");
+    assert.equal(DATAVERSE_FIELD_MAP.humanReviewNotes, "jm1_humanreviewnotes");
+
+    assert.equal(payload.jm1_diagnosticoutputsummary, baseReviewPayload.diagnosticOutputSummary);
+    assert.equal(payload.jm1_diagnosticriskflags, baseReviewPayload.diagnosticRiskFlags);
+    assert.equal(payload.jm1_diagnosticconfidence, 0.79);
+    assert.equal(payload.jm1_diagnosticrequireshumanreview, true);
+    assert.equal(payload.jm1_diagnosticexecutionstatus, 835500004);
+    assert.equal(payload.jm1_humanreviewstatus, 835510000);
+    assert.equal(payload.jm1_humanreviewedby, null);
+    assert.equal(payload.jm1_humanreviewedon, null);
+    assert.equal(payload.jm1_diagnosticagentid, "claude-sonnet-4-6");
+    assert.equal(payload.jm1_diagnosticcorrelationid, "INT-PUB-005-REVIEW-PERSISTENCE-TEST");
+  });
+
+  test("structured output JSON stores only the safe internal review packet", () => {
+    const record = buildInternalDiagnosticReviewRecord(makePayload());
+    const payload = buildDataverseUpdatePayload(record);
+    const structured = JSON.parse(payload.jm1_diagnosticstructuredoutputjson);
+
+    assert.equal(structured.intakeReferenceCode, baseReviewPayload.intakeReferenceCode);
+    assert.deepEqual(structured.routingDecision, baseReviewPayload.routingDecision);
+    assert.equal(structured.reviewStatus, REVIEW_STATUS.PENDING_HUMAN_REVIEW);
+    assert.equal(structured.approvalStatus, APPROVAL_STATUS.PENDING_HUMAN_REVIEW);
+    assert.equal(structured.reviewedBy, null);
+    assert.equal(structured.reviewedOn, null);
+    assert.equal(structured.preparedAt, baseReviewPayload.preparedAt);
+    assert.deepEqual(structured.metadata.tokenCounts, { input: 10, output: 20, total: 30 });
   });
 });
 

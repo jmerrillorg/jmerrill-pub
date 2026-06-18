@@ -744,11 +744,32 @@ PR #87 introduces an internal diagnostic review persistence adapter for the safe
 
 ### What changed
 
-- Internal review persistence is prepared for the existing `jm1pub_editorialdiagnostic` review record pattern.
+- Internal review persistence is prepared for the existing `jm1pub_editorialdiagnostic` review record pattern, entity set `jm1pub_editorialdiagnostics`.
 - The adapter accepts only safe review payload fields: diagnostic ID, intake reference, validated summary, validated risk flags, confidence, human-review requirement, routing decision, pending review/approval statuses, review timestamps, and safe provider/model/prompt/token metadata.
 - The adapter fails closed if required fields are missing or malformed, if review/approval status is not `PENDING_HUMAN_REVIEW`, if unsafe fields are present, if the Dataverse client is missing, or if the Dataverse write fails.
 - Manuscript text, extracted content, prompt body, raw model response, author email fields, Opportunity fields, Flow D trigger fields, secrets, tokens, headers, and keys are excluded.
-- Exact Dataverse field mapping remains subject to a separate governed schema/adapter PR before production wiring.
+
+### Exact Dataverse field map
+
+| Review payload item | Dataverse logical field | Storage rule |
+|---|---|---|
+| `diagnosticId` | `jm1pub_editorialdiagnosticid` | Existing row ID; used to address the update, not duplicated |
+| `intakeReferenceCode` | `jm1_diagnosticstructuredoutputjson` | Stored inside safe structured review packet |
+| `diagnosticOutputSummary` | `jm1_diagnosticoutputsummary` | Validated concise summary |
+| `diagnosticRiskFlags` | `jm1_diagnosticriskflags` | Validated concise risk labels |
+| `confidence` | `jm1_diagnosticconfidence` | Decimal 0.0-1.0 |
+| `requiresHumanReview` | `jm1_diagnosticrequireshumanreview` | Always `true` |
+| `routingDecision.status` | `jm1_diagnosticexecutionstatus` | Existing diagnostic status choice |
+| `routingDecision`, `reviewStatus`, `approvalStatus`, `preparedAt`, safe metadata | `jm1_diagnosticstructuredoutputjson` | Safe JSON packet only |
+| `reviewStatus=PENDING_HUMAN_REVIEW` | `jm1_humanreviewstatus` | `835510000` Pending Review |
+| `approvalStatus=PENDING_HUMAN_REVIEW` | `jm1_humanreviewstatus` | Same pending human review choice until a separate approval model is authorized |
+| `reviewedBy` | `jm1_humanreviewedby` | `null` until human review occurs |
+| `reviewedOn` | `jm1_humanreviewedon` | `null` until human review occurs |
+| Internal review note | `jm1_humanreviewnotes` | Safe pending-review note only |
+| Safe model/provider metadata | `jm1_diagnosticagentid` | Model/deployment/provider identifier, if present |
+| Safe correlation/execution ID | `jm1_diagnosticcorrelationid` | Correlation or execution ID, if present |
+
+No new Dataverse table is introduced. No author email field, Opportunity field, Flow D trigger field, manuscript field, prompt field, or raw model output field is included in this map.
 
 ### Governance status
 

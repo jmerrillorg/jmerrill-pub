@@ -8,10 +8,8 @@
  * create Opportunities, activate Flow D, call AI, read manuscripts, or open
  * execution gates.
  *
- * The approved target is the existing jm1pub_editorialdiagnostic record. This
- * module uses an injected Dataverse client so schema-specific field names can
- * be supplied by the governed Dataverse adapter/schema PR before production
- * wiring. Tests use a mock client; no live Dataverse writes happen here.
+ * The approved target is the existing jm1pub_editorialdiagnostic record. Tests
+ * use a mock client; no live Dataverse writes happen here.
  */
 
 const {
@@ -24,6 +22,24 @@ const { DIAGNOSTIC_ID_PATTERN, INTAKE_REFERENCE_PATTERN } = require("../queue/di
 const ENTITY_SET = "jm1pub_editorialdiagnostics";
 const PERSISTENCE_ERROR_CODE = "INTERNAL_REVIEW_PERSISTENCE_INVALID_PAYLOAD";
 const WRITE_ERROR_CODE = "INTERNAL_REVIEW_PERSISTENCE_WRITE_FAILED";
+const HUMAN_REVIEW_STATUS = {
+  PENDING_REVIEW: 835510000
+};
+
+const DATAVERSE_FIELD_MAP = Object.freeze({
+  diagnosticOutputSummary: "jm1_diagnosticoutputsummary",
+  diagnosticRiskFlags: "jm1_diagnosticriskflags",
+  confidence: "jm1_diagnosticconfidence",
+  requiresHumanReview: "jm1_diagnosticrequireshumanreview",
+  routingStatus: "jm1_diagnosticexecutionstatus",
+  modelOrAgentId: "jm1_diagnosticagentid",
+  correlationId: "jm1_diagnosticcorrelationid",
+  structuredOutputJson: "jm1_diagnosticstructuredoutputjson",
+  humanReviewStatus: "jm1_humanreviewstatus",
+  humanReviewedBy: "jm1_humanreviewedby",
+  humanReviewedOn: "jm1_humanreviewedon",
+  humanReviewNotes: "jm1_humanreviewnotes"
+});
 
 const SAFE_REVIEW_FIELDS = [
   "diagnosticId",
@@ -177,6 +193,44 @@ function buildInternalDiagnosticReviewRecord(reviewPayload) {
   };
 }
 
+function buildDataverseUpdatePayload(reviewRecord) {
+  const structuredReviewPacket = {
+    intakeReferenceCode: reviewRecord.intakeReferenceCode,
+    routingDecision: reviewRecord.routingDecision,
+    reviewStatus: reviewRecord.reviewStatus,
+    approvalStatus: reviewRecord.approvalStatus,
+    reviewedBy: reviewRecord.reviewedBy,
+    reviewedOn: reviewRecord.reviewedOn,
+    preparedAt: reviewRecord.preparedAt,
+    metadata: reviewRecord.metadata
+  };
+
+  const payload = {
+    [DATAVERSE_FIELD_MAP.diagnosticOutputSummary]: reviewRecord.diagnosticOutputSummary,
+    [DATAVERSE_FIELD_MAP.diagnosticRiskFlags]: reviewRecord.diagnosticRiskFlags,
+    [DATAVERSE_FIELD_MAP.confidence]: reviewRecord.confidence,
+    [DATAVERSE_FIELD_MAP.requiresHumanReview]: true,
+    [DATAVERSE_FIELD_MAP.routingStatus]: reviewRecord.routingDecision.status,
+    [DATAVERSE_FIELD_MAP.structuredOutputJson]: JSON.stringify(structuredReviewPacket),
+    [DATAVERSE_FIELD_MAP.humanReviewStatus]: HUMAN_REVIEW_STATUS.PENDING_REVIEW,
+    [DATAVERSE_FIELD_MAP.humanReviewedBy]: null,
+    [DATAVERSE_FIELD_MAP.humanReviewedOn]: null,
+    [DATAVERSE_FIELD_MAP.humanReviewNotes]: "Pending internal human review. No author-facing output authorized."
+  };
+
+  if (reviewRecord.metadata.modelDeploymentAlias || reviewRecord.metadata.model || reviewRecord.metadata.provider) {
+    payload[DATAVERSE_FIELD_MAP.modelOrAgentId] =
+      reviewRecord.metadata.modelDeploymentAlias || reviewRecord.metadata.model || reviewRecord.metadata.provider;
+  }
+
+  if (reviewRecord.metadata.correlationId || reviewRecord.metadata.executionId) {
+    payload[DATAVERSE_FIELD_MAP.correlationId] =
+      reviewRecord.metadata.correlationId || reviewRecord.metadata.executionId;
+  }
+
+  return payload;
+}
+
 function validateDataverseClient(dataverseClient) {
   return isPlainObject(dataverseClient) && typeof dataverseClient.updateDiagnosticReview === "function";
 }
@@ -200,6 +254,7 @@ async function persistInternalDiagnosticReview(input = {}) {
   }
 
   const reviewRecord = buildInternalDiagnosticReviewRecord(reviewPayload);
+  const dataverseUpdatePayload = buildDataverseUpdatePayload(reviewRecord);
   const persistedAt = new Date().toISOString();
 
   try {
@@ -208,6 +263,7 @@ async function persistInternalDiagnosticReview(input = {}) {
       diagnosticId: reviewRecord.diagnosticId,
       intakeReferenceCode: reviewRecord.intakeReferenceCode,
       reviewRecord,
+      dataverseUpdatePayload,
       persistedAt
     });
 
@@ -228,8 +284,11 @@ async function persistInternalDiagnosticReview(input = {}) {
 module.exports = {
   persistInternalDiagnosticReview,
   buildInternalDiagnosticReviewRecord,
+  buildDataverseUpdatePayload,
   validateReviewPayload,
   ENTITY_SET,
+  DATAVERSE_FIELD_MAP,
+  HUMAN_REVIEW_STATUS,
   SAFE_REVIEW_FIELDS,
   PERSISTENCE_ERROR_CODE,
   WRITE_ERROR_CODE
