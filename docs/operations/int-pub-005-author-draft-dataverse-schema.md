@@ -78,6 +78,6 @@ The template, send status, approval status, and preparer fields were created as 
 
 ## Non-Activation Boundary
 
-Live author-draft writes remain disabled until a later governed adapter activation PR. This schema confirmation does not send author email, create a send event, create an Opportunity, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+Live author-draft writes are enabled only for explicit internal `DRAFT_ONLY` persistence calls against the existing diagnostic row. This does not send author email, create a send event, create an Opportunity, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
 
 Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
