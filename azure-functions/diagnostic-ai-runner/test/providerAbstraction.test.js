@@ -22,7 +22,7 @@ const assert = require("node:assert/strict");
 const { resolveProvider, routeToProvider, SUPPORTED_PROVIDERS } = require("../src/model/providerRouter");
 const { callModel } = require("../src/model/modelCaller");
 const { checkConfig: checkAzureConfig, REQUIRED_VARS: AZURE_REQUIRED_VARS } = require("../src/model/providers/azureOpenAiProvider");
-const { checkConfig: checkAnthropicConfig, REQUIRED_VARS: ANTHROPIC_REQUIRED_VARS, ANTHROPIC_ENDPOINT } = require("../src/model/providers/anthropicProvider");
+const { checkConfig: checkAnthropicConfig, REQUIRED_VARS: ANTHROPIC_REQUIRED_VARS, ANTHROPIC_ENDPOINT, DIAGNOSTIC_TOOL } = require("../src/model/providers/anthropicProvider");
 const { GATE_REASON } = require("../src/activation/aiExecutionGate");
 
 // ── Env var helper ────────────────────────────────────────────────────────────
@@ -270,6 +270,50 @@ describe("Anthropic provider — typed error codes when config missing", () => {
       const result = await call({ promptBody: "test", diagnosticId: "test-id" });
       assert.deepEqual(result.tokenCounts, { input: 0, output: 0, total: 0 });
     });
+  });
+});
+
+// ── Anthropic provider — tool-use schema contract ────────────────────────────
+
+describe("Anthropic provider — DIAGNOSTIC_TOOL schema contract", () => {
+  test("DIAGNOSTIC_TOOL name is submit_stage0_diagnostic", () => {
+    assert.equal(DIAGNOSTIC_TOOL.name, "submit_stage0_diagnostic");
+  });
+
+  test("DIAGNOSTIC_TOOL input_schema type is object", () => {
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.type, "object");
+  });
+
+  test("DIAGNOSTIC_TOOL requires all four output fields", () => {
+    const req = DIAGNOSTIC_TOOL.input_schema.required;
+    assert.ok(req.includes("jm1_diagnosticoutputsummary"));
+    assert.ok(req.includes("jm1_diagnosticriskflags"));
+    assert.ok(req.includes("jm1_confidence"));
+    assert.ok(req.includes("jm1_requireshumanreview"));
+    assert.equal(req.length, 4);
+  });
+
+  test("jm1_confidence schema type is number", () => {
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_confidence.type, "number");
+  });
+
+  test("jm1_requireshumanreview schema type is boolean", () => {
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_requireshumanreview.type, "boolean");
+  });
+
+  test("jm1_diagnosticoutputsummary schema type is string", () => {
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticoutputsummary.type, "string");
+  });
+
+  test("jm1_diagnosticriskflags schema type is string", () => {
+    assert.equal(DIAGNOSTIC_TOOL.input_schema.properties.jm1_diagnosticriskflags.type, "string");
+  });
+
+  test("DIAGNOSTIC_TOOL description instructs characterization-only output", () => {
+    const desc = DIAGNOSTIC_TOOL.description.toLowerCase();
+    assert.ok(desc.includes("characterization"), "description must instruct characterization-only output");
+    assert.ok(desc.includes("no manuscript excerpts") || desc.includes("no quoted prose"),
+      "description must prohibit manuscript content in output");
   });
 });
 

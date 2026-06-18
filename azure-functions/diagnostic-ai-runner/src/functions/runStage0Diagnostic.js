@@ -7,6 +7,7 @@ const { fetchAndExtractManuscript } = require("../extraction/pilotContentExtract
 const { readDiagnosticRecord } = require("../dataverse/diagnosticRecordReader");
 const { checkLegacyExclusion, parseLegacyFlag } = require("../preflight/legacyExclusionCheck");
 const { validateNoQuotation } = require("../validation/noQuotationValidator");
+const { validateDiagnosticOutputSchema } = require("../validation/diagnosticOutputSchemaValidator");
 const { routeDiagnosticResult } = require("../routing/confidenceRouter");
 const { writeMetadata } = require("../dataverse/metadataWriter");
 const { checkAiExecutionGate, getGateState } = require("../activation/aiExecutionGate");
@@ -512,8 +513,9 @@ app.http("run-stage0-diagnostic", {
         extractResult.content,
         "---",
         "",
-        "Provide a structured Stage 0 Diagnostic in JSON format with keys:",
-        "jm1_diagnosticoutputsummary, jm1_diagnosticriskflags, jm1_confidence (0.0-1.0), jm1_requireshumanreview (always true)"
+        "Call the submit_stage0_diagnostic tool with your complete assessment.",
+        "ALL string fields must contain characterization only — no manuscript excerpts, no quoted prose, no verbatim author text.",
+        "jm1_confidence: decimal between 0.0 and 1.0. jm1_requireshumanreview: must be true."
       ].join("\n");
 
       // Clear content reference — no longer needed after prompt construction
@@ -570,8 +572,43 @@ app.http("run-stage0-diagnostic", {
         };
       }
 
-      // Stage 6: Output validation — no-quotation rule required
+      // Stage 6a: Schema validation — required fields and types must be present before any downstream use
       const aiOutput = modelResult.output || {};
+      const schemaResult = validateDiagnosticOutputSchema(aiOutput);
+      if (!schemaResult.valid) {
+        context.error(
+          `Real manuscript pilot output failed schema validation; diagnosticId=${diagnosticId}; errors=${schemaResult.errors.join("; ")}`
+        );
+
+        const metadataSchema = {
+          diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
+          executionMode: "real-manuscript-pilot",
+          modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+          promptKey, promptVersion,
+          confidence: null,
+          requiresHumanReview: true,
+          tokenCounts: modelResult.tokenCounts,
+          requestTimestamp, responseTimestamp,
+          errorCode: "PILOT_OUTPUT_SCHEMA_INVALID",
+          errorMessage: schemaResult.errors.join("; ")
+        };
+        await writeMetadata(metadataSchema);
+
+        return {
+          status: 422,
+          jsonBody: {
+            status: "error",
+            code: "PILOT_OUTPUT_SCHEMA_INVALID",
+            diagnosticId,
+            failedStage: "schemaValidation",
+            schemaErrors: schemaResult.errors,
+            tokens: modelResult.tokenCounts,
+            message: "Real manuscript pilot output failed schema validation. No output forwarded. Metadata logged."
+          }
+        };
+      }
+
+      // Stage 6b: Output validation — no-quotation rule required
       const aiTextFields = {};
       if (typeof aiOutput.jm1_diagnosticoutputsummary === "string") {
         aiTextFields.jm1_diagnosticoutputsummary = aiOutput.jm1_diagnosticoutputsummary;

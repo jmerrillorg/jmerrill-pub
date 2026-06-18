@@ -3,7 +3,10 @@
 /**
  * Anthropic (Claude Sonnet) provider for the Stage 0 Diagnostic AI Runner.
  *
- * Uses direct Anthropic Messages API via fetch (Node 18+).
+ * Uses Anthropic Messages API with tool_use forced via tool_choice.
+ * The model must call submit_stage0_diagnostic — it cannot return freeform text.
+ * Structured output arrives in content[0].input; no JSON.parse is needed.
+ *
  * API key read from ANTHROPIC_API_KEY env var — never logged, never returned.
  * Never stores prompt body, raw response, or manuscript text.
  * Returns a normalized result shape shared by all providers.
@@ -15,6 +18,45 @@
 const REQUIRED_VARS = ["ANTHROPIC_API_KEY", "ANTHROPIC_MODEL"];
 const ANTHROPIC_ENDPOINT = "https://api.anthropic.com/v1/messages";
 const DEFAULT_API_VERSION = "2023-06-01";
+
+// Tool schema enforces the exact output contract.
+// tool_choice forces the model to call this tool — freeform text responses are rejected.
+// String fields must contain characterization only (enforced downstream by noQuotationValidator).
+const DIAGNOSTIC_TOOL = {
+  name: "submit_stage0_diagnostic",
+  description:
+    "Submit the structured Stage 0 Diagnostic result. " +
+    "Call this tool with your complete assessment. " +
+    "ALL string fields must contain characterization only — " +
+    "no manuscript excerpts, no quoted prose, no verbatim author text.",
+  input_schema: {
+    type: "object",
+    properties: {
+      jm1_diagnosticoutputsummary: {
+        type: "string",
+        description: "Characterization-only diagnostic summary. No manuscript excerpts or quoted prose."
+      },
+      jm1_diagnosticriskflags: {
+        type: "string",
+        description: "Characterization-only risk flag summary. No manuscript excerpts or quoted prose."
+      },
+      jm1_confidence: {
+        type: "number",
+        description: "Confidence score between 0.0 and 1.0."
+      },
+      jm1_requireshumanreview: {
+        type: "boolean",
+        description: "Always true for Stage 0 Diagnostic."
+      }
+    },
+    required: [
+      "jm1_diagnosticoutputsummary",
+      "jm1_diagnosticriskflags",
+      "jm1_confidence",
+      "jm1_requireshumanreview"
+    ]
+  }
+};
 
 function checkConfig() {
   const missing = REQUIRED_VARS.filter(v => !process.env[v]);
@@ -51,6 +93,8 @@ async function call({ promptBody, diagnosticId }) {
   const requestBody = {
     model,
     max_tokens: 1200,
+    tools: [DIAGNOSTIC_TOOL],
+    tool_choice: { type: "tool", name: "submit_stage0_diagnostic" },
     messages: [{ role: "user", content: promptBody }]
   };
 
@@ -82,18 +126,19 @@ async function call({ promptBody, diagnosticId }) {
       };
     }
 
-    // Anthropic response: content array, first text block
-    const rawText = responseBody?.content?.[0]?.text || "";
     const usage = responseBody?.usage || {};
     const inputTokens = usage.input_tokens || 0;
     const outputTokens = usage.output_tokens || 0;
 
-    let parsedOutput = null;
-    try {
-      // Strip markdown code fences if the model wraps the JSON
-      const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/m, "").trim();
-      parsedOutput = JSON.parse(cleaned);
-    } catch {
+    // With tool_choice forced, the model must return a tool_use block.
+    // Freeform text blocks are not accepted.
+    const toolBlock = Array.isArray(responseBody?.content)
+      ? responseBody.content.find(
+          b => b.type === "tool_use" && b.name === "submit_stage0_diagnostic"
+        )
+      : null;
+
+    if (!toolBlock || !toolBlock.input) {
       return {
         ok: false,
         provider: "anthropic",
@@ -101,15 +146,17 @@ async function call({ promptBody, diagnosticId }) {
         output: null,
         tokenCounts: { input: inputTokens, output: outputTokens, total: inputTokens + outputTokens },
         httpStatus,
-        error: "MODEL_RESPONSE_NOT_JSON"
+        error: "MODEL_RESPONSE_TOOL_NOT_CALLED"
       };
     }
 
+    // toolBlock.input is already a parsed object — no JSON.parse needed.
+    // Raw response body is not stored. Only the structured input is returned.
     return {
       ok: true,
       provider: "anthropic",
       configMissing: null,
-      output: parsedOutput,
+      output: toolBlock.input,
       tokenCounts: { input: inputTokens, output: outputTokens, total: inputTokens + outputTokens },
       httpStatus,
       error: null
@@ -127,4 +174,11 @@ async function call({ promptBody, diagnosticId }) {
   }
 }
 
-module.exports = { call, checkConfig, REQUIRED_VARS, ANTHROPIC_ENDPOINT, DEFAULT_API_VERSION };
+module.exports = {
+  call,
+  checkConfig,
+  REQUIRED_VARS,
+  ANTHROPIC_ENDPOINT,
+  DEFAULT_API_VERSION,
+  DIAGNOSTIC_TOOL
+};
