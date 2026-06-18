@@ -834,6 +834,32 @@ No manuscript text, extracted content, prompt body, raw model response, send-now
 - No Opportunity creation is authorized.
 - Flow D activation is not authorized.
 
+## 28. PR #93 - Author Draft Dataverse Schema Confirmation
+
+PR #93 introduces the required Dataverse schema manifest and documentation for internal author-response draft persistence.
+
+### What changed
+
+- Author draft schema target remains the existing `jm1pub_editorialdiagnostic` record.
+- Entity set remains `jm1pub_editorialdiagnostics`.
+- Row identity remains `jm1pub_editorialdiagnosticid`.
+- Thirteen author-draft fields are documented as required before live writes.
+- Expected field types are documented.
+- Required safe values remain `INITIAL_DIAGNOSTIC_REVIEW_NEXT_STEP`, `DRAFT_ONLY`, `PENDING_HUMAN_APPROVAL`, `publishing@jmerrill.one`, future internal copy required `true`, and future Dataverse send log required `true`.
+- Live author-draft writes remain blocked until the fields are created or confirmed in the governed Dataverse environment.
+
+### Governance status
+
+- Schema confirmation only.
+- No send.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No author email was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+
 ## 26. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
