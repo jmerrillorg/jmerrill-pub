@@ -535,3 +535,44 @@ Decision updates may also set `jm1_humanreviewedby`, `jm1_humanreviewedon`, `jm1
 ### Non-activation boundary
 
 Human review decisions are internal-only at this stage. Author-facing communication remains a later governed phase. Any future author-facing system email must still copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
+## 18. PR #90 - Author Response Draft Preparation
+
+PR #90 introduces an internal-only author response draft preparation layer for Stage 0 diagnostic results that have been human-approved with `APPROVE_FOR_AUTHOR_DRAFT`.
+
+Draft preparation is not sending. The draft layer prepares a safe author-facing draft for Jackie/JMP internal review, editing, and later approval under a separate governed PR. It does not send email, call a mail API, create an Opportunity, activate Flow D, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+
+### Draft preconditions
+
+The draft builder may prepare a draft only when all conditions are true:
+
+- Human review decision is `APPROVE_FOR_AUTHOR_DRAFT`.
+- Review status is `APPROVED_FOR_AUTHOR_DRAFT`.
+- Diagnostic ID and intake reference are present and valid.
+- Safe diagnostic summary, risk flags, confidence, and `requiresHumanReview=true` are present.
+- Safe author name, author email, and project title are present.
+- No unsafe manuscript, prompt, raw model, send, Opportunity, Flow D, secret, token, key, or header fields are present.
+
+### Draft template
+
+The first supported internal template is `INITIAL_DIAGNOSTIC_REVIEW_NEXT_STEP`.
+
+The draft payload includes `sendStatus=DRAFT_ONLY`, `approvalStatus=PENDING_HUMAN_APPROVAL`, `internalVisibilityMailbox=publishing@jmerrill.one`, safe diagnostic identifiers, safe author/project fields, safe diagnostic summary/risk/confidence fields, and safe correlation/execution metadata if available.
+
+The draft body uses careful J Merrill Publishing language. It thanks the author, confirms receipt, says the project has completed an initial internal editorial review, avoids acceptance guarantees, avoids package or pricing recommendations, avoids saying AI made the decision, avoids "rejected", and states that a human team member will review before final next steps.
+
+### Non-send boundary
+
+PR #90 does not authorize:
+
+- Sending the draft
+- Creating a send event
+- Author-facing automation
+- Opportunity creation
+- Flow D activation
+- Diagnostic execution
+- Production activation
+
+Human approval remains required before any author-facing email. Any future send must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.

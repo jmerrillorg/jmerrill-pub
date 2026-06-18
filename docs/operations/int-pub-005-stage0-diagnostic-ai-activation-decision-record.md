@@ -762,6 +762,31 @@ PR #89 introduces an internal-only decision model for human review of persisted 
 - Human review decisions are internal-only at this stage.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 25. PR #90 - Author Response Draft Preparation
+
+PR #90 introduces an internal-only author response draft preparation layer for diagnostics approved with `APPROVE_FOR_AUTHOR_DRAFT`.
+
+### What changed
+
+- The first draft template is `INITIAL_DIAGNOSTIC_REVIEW_NEXT_STEP`.
+- Draft preparation requires approved human review status, safe diagnostic identifiers, safe diagnostic summary/risk/confidence fields, `requiresHumanReview=true`, safe author/project fields, and no unsafe fields.
+- Prepared drafts are marked `sendStatus=DRAFT_ONLY` and `approvalStatus=PENDING_HUMAN_APPROVAL`.
+- The draft includes `internalVisibilityMailbox=publishing@jmerrill.one` as the required future visibility mailbox.
+- The draft body uses careful J Merrill Publishing next-step language and avoids acceptance guarantees, package/pricing recommendations, manuscript quotes, and unsupported claims.
+
+### Governance status
+
+- Draft-only.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No author email was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Human approval remains required before any author-facing email.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
 ## 23. PR #87 - Diagnostic Result Persistence for Internal Review
 
 PR #87 introduces an internal diagnostic review persistence adapter for the safe review payload prepared by PR #86.
