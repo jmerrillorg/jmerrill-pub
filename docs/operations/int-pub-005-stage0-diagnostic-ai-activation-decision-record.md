@@ -822,6 +822,33 @@ PR #97 introduces an internal author draft review notification payload for draft
 - Flow D activation is not authorized.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 33. PR #98 - Internal Author Draft Review Notification Persistence and Delivery
+
+PR #98 introduces safe persistence and provider-injected internal delivery for author draft review notifications.
+
+### What changed
+
+- `AUTHOR_DRAFT_READY_FOR_REVIEW` notifications can be prepared for `jm1_executionlogs` as safe operational evidence.
+- Internal delivery can be attempted only through an injected internal mail provider.
+- The recipient is locked to `publishing@jmerrill.one`.
+- The author is blocked from To, CC, and BCC.
+- Internal delivery status uses `INTERNAL_NOTIFICATION_PREPARED`, `INTERNAL_NOTIFICATION_SENT`, or `INTERNAL_NOTIFICATION_FAILED`.
+- Author email status remains `AUTHOR_EMAIL_NOT_SENT`.
+- No live internal mail provider is hardwired by this PR.
+
+### Governance status
+
+- Internal review visibility only.
+- No author send.
+- No author-facing send event.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
 ## 22. PR #86 - Internal Diagnostic Result Review Layer
 
 PR #86 introduces an internal-only review payload builder for validated Stage 0 diagnostic results.

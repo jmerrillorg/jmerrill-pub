@@ -225,6 +225,8 @@ function buildAuthorDraftReviewNotification(input = {}) {
       draftBodyPreview: buildDraftBodyPreview(draft.draftBody || draft.draftBodyPreview || draft.safeDraftSummary),
       draftStatus: DRAFT_STATUS,
       approvalStatus: DRAFT_APPROVAL_STATUS,
+      futureSendRequiresInternalCopy: true,
+      futureSendRequiresDataverseLog: true,
       nextAction: NEXT_ACTION,
       internalReviewInstruction: "Review the prepared author-response draft before any author-facing send is considered.",
       notificationBody: buildNotificationBody({ authorName, projectTitle, intakeReferenceCode }),
