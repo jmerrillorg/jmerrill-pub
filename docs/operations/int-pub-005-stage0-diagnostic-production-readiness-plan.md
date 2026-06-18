@@ -680,6 +680,38 @@ The live persister updates an existing Editorial Diagnostic record when explicit
 
 ---
 
+## 23. PR #95 - Author Draft Human Approval Decision Model
+
+PR #95 introduces the internal human approval decision model for persisted author-response drafts.
+
+Human reviewers may make only these internal decisions while a draft is `PENDING_HUMAN_APPROVAL` and `DRAFT_ONLY`:
+
+- `APPROVE_FOR_SEND_PREPARATION`
+- `NEEDS_DRAFT_REVISION`
+- `REJECT_DRAFT`
+- `HOLD_DRAFT_REVIEW`
+
+### Status mapping
+
+| Decision | Internal approval status |
+|---|---|
+| `APPROVE_FOR_SEND_PREPARATION` | `APPROVED_FOR_SEND_PREPARATION` |
+| `NEEDS_DRAFT_REVISION` | `NEEDS_DRAFT_REVISION` |
+| `REJECT_DRAFT` | `DRAFT_REJECTED` |
+| `HOLD_DRAFT_REVIEW` | `PENDING_HUMAN_APPROVAL` |
+
+All decisions preserve `sendStatus=DRAFT_ONLY`.
+
+### Non-send boundary
+
+Approval for send preparation does not send the email, create a send event, create an Opportunity, activate Flow D, run a diagnostic, or authorize production automation.
+
+Reviewer notes are required when the decision is `NEEDS_DRAFT_REVISION` or `REJECT_DRAFT`. Notes are optional for `APPROVE_FOR_SEND_PREPARATION` and `HOLD_DRAFT_REVIEW`.
+
+Future author-facing communication remains a later governed phase. Any future send must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.

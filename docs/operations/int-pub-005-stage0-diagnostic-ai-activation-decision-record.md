@@ -738,6 +738,32 @@ PR #94 enables live Dataverse persistence for internal `DRAFT_ONLY` author-respo
 - No author email was sent.
 - No Opportunity creation is authorized.
 - Flow D activation is not authorized.
+
+## 30. PR #95 - Author Draft Human Approval Decision Model
+
+PR #95 introduces the internal human approval decision model for persisted author-response drafts.
+
+### What changed
+
+- Human reviewers may approve a draft for later send preparation, request draft revision, reject the draft, or hold the draft in review.
+- `APPROVE_FOR_SEND_PREPARATION` maps only to internal status `APPROVED_FOR_SEND_PREPARATION`.
+- `NEEDS_DRAFT_REVISION` maps to `NEEDS_DRAFT_REVISION`.
+- `REJECT_DRAFT` maps to `DRAFT_REJECTED`.
+- `HOLD_DRAFT_REVIEW` keeps `PENDING_HUMAN_APPROVAL`.
+- All decisions preserve `sendStatus=DRAFT_ONLY`.
+- Reviewer notes are required for revision and rejection decisions.
+
+### Governance status
+
+- Internal decision model only.
+- No send.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No author email was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
 - Queue eligibility is not permission to process a record.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
