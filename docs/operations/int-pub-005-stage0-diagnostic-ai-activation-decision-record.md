@@ -972,6 +972,31 @@ Milestone #5 introduces the governed author-facing response send boundary after 
 - Production activation remains unauthorized.
 - Author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 38. PR #102 - ACS Milestone 5 Email Relay Routes
+
+PR #102 introduces concrete ACS Email relay routes for Milestone #5 controlled testing.
+
+### What changed
+
+- Added `/api/send-internal-author-draft-review-notification`.
+- Added `/api/send-approved-author-response`.
+- Both routes require the existing relay key pattern.
+- Both routes use ACS Email only.
+- Sender must be `DoNotReply@email.jmerrill.one`.
+- Internal route recipient is locked to `publishing@jmerrill.one`.
+- Approved author response route requires `publishing@jmerrill.one` copy/internal visibility.
+- `@jmerrill.pub` is rejected as an active mailbox.
+
+### Governance status
+
+- No live internal notification was sent.
+- No live author email was sent.
+- No diagnostic run occurred.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Production activation remains unauthorized.
+- Controlled live testing still requires separate authorization.
+
 ## 22. PR #86 - Internal Diagnostic Result Review Layer
 
 PR #86 introduces an internal-only review payload builder for validated Stage 0 diagnostic results.

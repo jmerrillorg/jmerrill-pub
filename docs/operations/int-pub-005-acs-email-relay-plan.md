@@ -18,7 +18,7 @@ Validated in the JM1-Core Power Automate designer:
 
 ## Relay Contract
 
-Endpoint:
+Flow B acknowledgment endpoint:
 
 `POST /api/send-author-acknowledgment`
 
@@ -66,6 +66,130 @@ Error response shape:
   "reference": "JMP-INT-YYYYMM-XXXXXX"
 }
 ```
+
+## Milestone #5 Relay Routes
+
+PR #102 adds two ACS-backed Milestone #5 relay routes. These routes use the same relay authentication pattern and ACS sender configuration as the `/join` acknowledgment route.
+
+### Internal Author Draft Review Notification
+
+Endpoint:
+
+`POST /api/send-internal-author-draft-review-notification`
+
+Purpose:
+
+Send one internal-only notification that an author-response draft is ready for review.
+
+Recipient rules:
+
+- To: `publishing@jmerrill.one`
+- CC: empty
+- BCC: empty
+- The author must not appear in To, CC, BCC, or hidden provider recipients.
+- `@jmerrill.pub` is not an active mailbox and is rejected.
+
+Required request fields:
+
+```json
+{
+  "notificationType": "AUTHOR_DRAFT_READY_FOR_REVIEW",
+  "diagnosticId": "64e387e0-7e6a-f111-a826-00224820105b",
+  "intakeReferenceCode": "JMP-INT-202606-UFYG60",
+  "authorName": "Author",
+  "authorEmail": "author@example.com",
+  "projectTitle": "Project title",
+  "draftStatus": "DRAFT_ONLY",
+  "approvalStatus": "PENDING_HUMAN_APPROVAL",
+  "draftPreview": "Safe preview only.",
+  "nextAction": "Review author-response draft",
+  "recipient": "publishing@jmerrill.one"
+}
+```
+
+Successful safe response:
+
+```json
+{
+  "accepted": true,
+  "messageType": "AUTHOR_DRAFT_READY_FOR_REVIEW",
+  "deliveryStatus": "INTERNAL_NOTIFICATION_SENT",
+  "recipient": "publishing@jmerrill.one",
+  "intakeReferenceCode": "JMP-INT-202606-UFYG60",
+  "diagnosticId": "64e387e0-7e6a-f111-a826-00224820105b",
+  "provider": "acs-email",
+  "providerMessageId": "safe-provider-id"
+}
+```
+
+### Approved Author Response
+
+Endpoint:
+
+`POST /api/send-approved-author-response`
+
+Purpose:
+
+Send one approved author response after human approval and upstream Dataverse send-log preparation.
+
+Recipient rules:
+
+- To: approved author email only
+- CC/internal visibility: `publishing@jmerrill.one`
+- BCC: empty
+- `@jmerrill.pub` is not an active mailbox and is rejected.
+
+Required request fields:
+
+```json
+{
+  "messageType": "APPROVED_AUTHOR_RESPONSE",
+  "diagnosticId": "64e387e0-7e6a-f111-a826-00224820105b",
+  "intakeReferenceCode": "JMP-INT-202606-UFYG60",
+  "authorEmail": "author@example.com",
+  "authorName": "Author",
+  "projectTitle": "Project title",
+  "subject": "Next step for your J Merrill Publishing submission",
+  "body": "Approved author response body.",
+  "templateName": "INITIAL_DIAGNOSTIC_REVIEW_NEXT_STEP",
+  "approvedBy": "reviewer-id",
+  "approvedOn": "2026-06-18T12:00:00.000Z",
+  "internalVisibilityMailbox": "publishing@jmerrill.one",
+  "futureSendRequiresInternalCopy": true,
+  "futureSendRequiresDataverseLog": true,
+  "cc": ["publishing@jmerrill.one"]
+}
+```
+
+Successful safe response:
+
+```json
+{
+  "accepted": true,
+  "messageType": "APPROVED_AUTHOR_RESPONSE",
+  "deliveryStatus": "AUTHOR_RESPONSE_SENT",
+  "recipient": "author@example.com",
+  "internalVisibilityMailbox": "publishing@jmerrill.one",
+  "intakeReferenceCode": "JMP-INT-202606-UFYG60",
+  "diagnosticId": "64e387e0-7e6a-f111-a826-00224820105b",
+  "provider": "acs-email",
+  "providerMessageId": "safe-provider-id"
+}
+```
+
+Failure shape for Milestone #5 routes:
+
+```json
+{
+  "accepted": false,
+  "code": "ACS_RELAY_VALIDATION_FAILED",
+  "reason": "SAFE_REASON",
+  "intakeReferenceCode": "JMP-INT-202606-UFYG60",
+  "diagnosticId": "64e387e0-7e6a-f111-a826-00224820105b"
+}
+```
+
+Milestone #5 failure responses do not include full email body, manuscript text, prompt body, raw model response, secrets, tokens, keys, headers, ACS connection strings, or full provider responses.
 
 ## Security Model
 
@@ -215,4 +339,3 @@ Flow B test:
 4. Disable the Function App or remove the route if needed.
 5. Keep acknowledgment fields intact for audit continuity.
 6. Do not alter Flow A, `/join`, Contact, Lead, Opportunity, Stage 0, or loyalty-tier behavior.
-
