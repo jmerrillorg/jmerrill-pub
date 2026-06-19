@@ -5,9 +5,10 @@ const assert = require("node:assert/strict");
 const {
   PACKAGE_CODES,
   PACKAGE_CATALOG,
+  STRIPE_PACKAGE_MAPPINGS,
   PACKAGE_RECOMMENDATION_SOURCE,
   OPPORTUNITY_SOURCE,
-  PROPOSED_DATAVERSE_TARGETS,
+  MILESTONE6_DATAVERSE_TARGETS,
   PROCESSING_FEE_RATE,
   STAGE_1_BOUNDARY,
   BILLING_SOURCE_POLICY,
@@ -67,6 +68,25 @@ describe("Milestone 6 package catalog and recommendation rules", () => {
     assert.equal(PACKAGE_CATALOG[PACKAGE_CODES.PROFESSIONAL].costUsd, 4500);
     assert.equal(PACKAGE_CATALOG[PACKAGE_CODES.SIGNATURE].costUsd, 7500);
     assert.equal(PACKAGE_CATALOG[PACKAGE_CODES.CHILD].costUsd, 2495);
+  });
+
+  test("Stripe package mappings contain governed live one-time USD Products and Prices", () => {
+    assert.deepEqual(Object.keys(STRIPE_PACKAGE_MAPPINGS).sort(), Object.keys(PACKAGE_CATALOG).sort());
+
+    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.STARTER].productId, "prod_URbgo7mwC7qr6t");
+    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.STARTER].priceId, "price_1TSiTaJCiOVFpgYufee7GLQs");
+    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.PROFESSIONAL].productId, "prod_UjRnnUiTQgHlrm");
+    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.PROFESSIONAL].priceId, "price_1TjyuZJCiOVFpgYur0FWmcj7");
+    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.SIGNATURE].productId, "prod_UjRnIBF5yKgkFr");
+    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.SIGNATURE].priceId, "price_1TjyuaJCiOVFpgYu8FKjWqIL");
+    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.CHILD].productId, "prod_UjRnLS7vXkbdEh");
+    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.CHILD].priceId, "price_1TjyuaJCiOVFpgYuGJo5Ocwl");
+
+    Object.values(STRIPE_PACKAGE_MAPPINGS).forEach((mapping) => {
+      assert.equal(mapping.currency, "usd");
+      assert.equal(mapping.priceType, "one_time");
+      assert.equal(mapping.livemode, true);
+    });
   });
 
   test("alternative package follows governed rules", () => {
@@ -140,16 +160,16 @@ describe("Milestone 6 business source readiness", () => {
     assert.equal(result.readiness.blockers.includes(BLOCKING_STATUSES.packageSelectionMissing), true);
   });
 
-  test("after package selection, payment options are preparable only with Stripe mapping blocker visible", () => {
+  test("after package selection, payment options are preparable with governed Stripe mapping confirmed", () => {
     const result = buildMilestone6BusinessSourceReadiness(input({
       authorSelectedPackageCode: PACKAGE_CODES.PROFESSIONAL
     }));
 
     assert.equal(result.readiness.packageSelectionStatus, "PACKAGE_SELECTED");
     assert.equal(result.readiness.paymentOptionsPreparationStatus, "PAYMENT_OPTIONS_PREPARABLE_AFTER_MAPPING");
-    assert.equal(result.readiness.stripeProductMappingStatus, "STRIPE_MAPPING_REQUIRED");
-    assert.equal(result.readiness.stripePriceMappingStatus, "STRIPE_MAPPING_REQUIRED");
-    assert.equal(result.readiness.blockers.includes(BLOCKING_STATUSES.stripeMappingMissing), true);
+    assert.equal(result.readiness.stripeProductMappingStatus, "STRIPE_MAPPING_CONFIRMED");
+    assert.equal(result.readiness.stripePriceMappingStatus, "STRIPE_MAPPING_CONFIRMED");
+    assert.equal(result.readiness.blockers.includes(BLOCKING_STATUSES.stripeMappingMissing), false);
     assert.equal(result.readiness.paymentOptionsPreview.length, 5);
     assert.equal(result.readiness.paymentOptionsPreview.every((option) => option.processingFeeRate === PROCESSING_FEE_RATE), true);
     assert.equal(result.readiness.paymentOptionsPreview.every((option) => option.stripeLinkCreated === false), true);
@@ -163,7 +183,10 @@ describe("Milestone 6 business source readiness", () => {
       stripeMappings: {
         [PACKAGE_CODES.STARTER]: {
           productId: "prod_test_starter",
-          priceId: "price_test_starter_single"
+          priceId: "price_test_starter_single",
+          currency: "usd",
+          priceType: "one_time",
+          livemode: true
         }
       }
     }));
@@ -186,16 +209,17 @@ describe("Milestone 6 business source readiness", () => {
     assert.equal(result.readiness.liveActions.usesQboForNewLogic, false);
   });
 
-  test("Dataverse targets distinguish confirmed fields from proposed Milestone 6 schema", () => {
+  test("Dataverse targets include confirmed Milestone 6 schema fields", () => {
     const result = buildMilestone6BusinessSourceReadiness(input());
 
     assert.equal(result.readiness.dataverseTargets.confirmed.packageRecommendation.recommendedPackageField, "jm1pub_recommendedpackage");
     assert.equal(result.readiness.dataverseTargets.confirmed.packageOverride.field, "jm1pub_packageoverride");
     assert.equal(result.readiness.dataverseTargets.confirmed.opportunity.fields.packageRecommended, "jm1pub_packagerecommended");
-    assert.equal(PROPOSED_DATAVERSE_TARGETS.authorSelectedPackage.status, "PROPOSED");
-    assert.equal(PROPOSED_DATAVERSE_TARGETS.stripeProductMappingStatus.status, "PROPOSED");
-    assert.equal(PROPOSED_DATAVERSE_TARGETS.paymentOptionPreparationStatus.status, "PROPOSED");
-    assert.equal(result.readiness.blockers.includes(BLOCKING_STATUSES.sourceFieldsProposed), true);
+    assert.equal(MILESTONE6_DATAVERSE_TARGETS.authorSelectedPackage.status, "CONFIRMED_CREATED");
+    assert.equal(MILESTONE6_DATAVERSE_TARGETS.authorSelectedPackage.logicalName, "jm1_m6authorselectedpackagecode");
+    assert.equal(MILESTONE6_DATAVERSE_TARGETS.stripeProductMappingStatus.status, "CONFIRMED_CREATED");
+    assert.equal(MILESTONE6_DATAVERSE_TARGETS.paymentOptionPreparationStatus.status, "CONFIRMED_CREATED");
+    assert.equal(result.readiness.blockers.includes("MILESTONE_6_DATAVERSE_FIELDS_REQUIRE_SCHEMA_CONFIRMATION"), false);
   });
 });
 

@@ -43,6 +43,41 @@ const PACKAGE_CATALOG = Object.freeze({
   })
 });
 
+const STRIPE_PACKAGE_MAPPINGS = Object.freeze({
+  [PACKAGE_CODES.STARTER]: Object.freeze({
+    productId: "prod_URbgo7mwC7qr6t",
+    priceId: "price_1TSiTaJCiOVFpgYufee7GLQs",
+    currency: "usd",
+    unitAmount: 199900,
+    priceType: "one_time",
+    livemode: true
+  }),
+  [PACKAGE_CODES.PROFESSIONAL]: Object.freeze({
+    productId: "prod_UjRnnUiTQgHlrm",
+    priceId: "price_1TjyuZJCiOVFpgYur0FWmcj7",
+    currency: "usd",
+    unitAmount: 450000,
+    priceType: "one_time",
+    livemode: true
+  }),
+  [PACKAGE_CODES.SIGNATURE]: Object.freeze({
+    productId: "prod_UjRnIBF5yKgkFr",
+    priceId: "price_1TjyuaJCiOVFpgYu8FKjWqIL",
+    currency: "usd",
+    unitAmount: 750000,
+    priceType: "one_time",
+    livemode: true
+  }),
+  [PACKAGE_CODES.CHILD]: Object.freeze({
+    productId: "prod_UjRnLS7vXkbdEh",
+    priceId: "price_1TjyuaJCiOVFpgYuGJo5Ocwl",
+    currency: "usd",
+    unitAmount: 249500,
+    priceType: "one_time",
+    livemode: true
+  })
+});
+
 const PACKAGE_RECOMMENDATION_SOURCE = Object.freeze({
   tableLogicalName: "jm1pub_editorialdiagnostic",
   entitySet: "jm1pub_editorialdiagnostics",
@@ -74,56 +109,56 @@ const OPPORTUNITY_SOURCE = Object.freeze({
   })
 });
 
-const PROPOSED_DATAVERSE_TARGETS = Object.freeze({
+const MILESTONE6_DATAVERSE_TARGETS = Object.freeze({
   alternatePackage: Object.freeze({
     target: "jm1pub_editorialdiagnostic",
-    proposedLogicalName: "jm1_m6alternatepackagecode",
-    status: "PROPOSED"
+    logicalName: "jm1_m6alternatepackagecode",
+    status: "CONFIRMED_CREATED"
   }),
   authorSelectedPackage: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6authorselectedpackagecode",
-    status: "PROPOSED"
+    logicalName: "jm1_m6authorselectedpackagecode",
+    status: "CONFIRMED_CREATED"
   }),
   packageSelectionStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6packageselectionstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6packageselectionstatus",
+    status: "CONFIRMED_CREATED"
   }),
   stripeProductMappingStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6stripeproductmappingstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6stripeproductmappingstatus",
+    status: "CONFIRMED_CREATED"
   }),
   stripePriceMappingStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6stripepricemappingstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6stripepricemappingstatus",
+    status: "CONFIRMED_CREATED"
   }),
   paymentOptionPreparationStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6paymentoptionpreparationstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6paymentoptionpreparationstatus",
+    status: "CONFIRMED_CREATED"
   }),
   agreementPreparationStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6agreementpreparationstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6agreementpreparationstatus",
+    status: "CONFIRMED_CREATED"
   }),
   onboardingStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6onboardingstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6onboardingstatus",
+    status: "CONFIRMED_CREATED"
   }),
   opportunityUpdateStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6opportunityupdatestatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6opportunityupdatestatus",
+    status: "CONFIRMED_CREATED"
   }),
   businessCentralSalesEnterpriseHandoffStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6businesshandoffstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6businesshandoffstatus",
+    status: "CONFIRMED_CREATED"
   })
 });
 
@@ -167,8 +202,7 @@ const BILLING_SOURCE_POLICY = Object.freeze({
 
 const BLOCKING_STATUSES = Object.freeze({
   stripeMappingMissing: "STRIPE_PRODUCT_PRICE_MAPPING_REQUIRED",
-  packageSelectionMissing: "AUTHOR_PACKAGE_SELECTION_REQUIRED_FOR_PAYMENT_OPTIONS",
-  sourceFieldsProposed: "MILESTONE_6_DATAVERSE_FIELDS_REQUIRE_SCHEMA_CONFIRMATION"
+  packageSelectionMissing: "AUTHOR_PACKAGE_SELECTION_REQUIRED_FOR_PAYMENT_OPTIONS"
 });
 
 const SAFE_INPUT_FIELDS = Object.freeze([
@@ -318,7 +352,10 @@ function stripeMappingComplete(packageCode, stripeMappings = {}) {
   return Boolean(
     isPlainObject(packageMapping) &&
     normalizeString(packageMapping.productId) &&
-    normalizeString(packageMapping.priceId)
+    normalizeString(packageMapping.priceId) &&
+    normalizeString(packageMapping.currency) === "usd" &&
+    packageMapping.priceType === "one_time" &&
+    packageMapping.livemode === true
   );
 }
 
@@ -363,7 +400,8 @@ function buildMilestone6BusinessSourceReadiness(input = {}) {
   const packageSelectionStatus = authorSelectedPackageCode ? "PACKAGE_SELECTED" : "PACKAGE_SELECTION_PENDING";
   const selectedPackage = authorSelectedPackageCode ? PACKAGE_CATALOG[authorSelectedPackageCode] : null;
   const paymentOptionsAllowed = Boolean(selectedPackage);
-  const stripeMappingStatus = selectedPackage && stripeMappingComplete(selectedPackage.code, input.stripeMappings)
+  const stripeMappings = isPlainObject(input.stripeMappings) ? input.stripeMappings : STRIPE_PACKAGE_MAPPINGS;
+  const stripeMappingStatus = selectedPackage && stripeMappingComplete(selectedPackage.code, stripeMappings)
     ? "STRIPE_MAPPING_CONFIRMED"
     : "STRIPE_MAPPING_REQUIRED";
 
@@ -387,6 +425,7 @@ function buildMilestone6BusinessSourceReadiness(input = {}) {
       stripeMappingStatus,
       stripeProductMappingStatus: stripeMappingStatus,
       stripePriceMappingStatus: stripeMappingStatus,
+      stripePackageMappings: STRIPE_PACKAGE_MAPPINGS,
       taxHandlingStatus: "TAX_PENDING_ONBOARDING_ADDRESS_AND_GOVERNED_STRIPE_BC_SE_CONFIGURATION",
       billingSourcePolicy: BILLING_SOURCE_POLICY,
       agreementPreparationStatus: "AGREEMENT_PREPARATION_PENDING",
@@ -401,12 +440,11 @@ function buildMilestone6BusinessSourceReadiness(input = {}) {
             tableLogicalName: PACKAGE_RECOMMENDATION_SOURCE.tableLogicalName,
             field: PACKAGE_RECOMMENDATION_SOURCE.packageOverrideField
           },
-          opportunity: OPPORTUNITY_SOURCE
-        },
-        proposed: PROPOSED_DATAVERSE_TARGETS
+          opportunity: OPPORTUNITY_SOURCE,
+          milestone6: MILESTONE6_DATAVERSE_TARGETS
+        }
       },
       blockers: [
-        BLOCKING_STATUSES.sourceFieldsProposed,
         ...(paymentOptionsAllowed && stripeMappingStatus !== "STRIPE_MAPPING_CONFIRMED"
           ? [BLOCKING_STATUSES.stripeMappingMissing]
           : []),
@@ -432,9 +470,10 @@ function buildMilestone6BusinessSourceReadiness(input = {}) {
 module.exports = {
   PACKAGE_CODES,
   PACKAGE_CATALOG,
+  STRIPE_PACKAGE_MAPPINGS,
   PACKAGE_RECOMMENDATION_SOURCE,
   OPPORTUNITY_SOURCE,
-  PROPOSED_DATAVERSE_TARGETS,
+  MILESTONE6_DATAVERSE_TARGETS,
   PAYMENT_OPTIONS,
   PROCESSING_FEE_RATE,
   GATES,

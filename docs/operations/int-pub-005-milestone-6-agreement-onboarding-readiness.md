@@ -170,22 +170,34 @@ Confirmed relevant Editorial Diagnostic fields:
 | `jm1pub_offerrecommended` | Boolean | Offer recommendation signal |
 | `jm1pub_paymentplaneligible` | Boolean | Legacy/candidate payment-plan eligibility flag; not enough for Stripe plan logic |
 
+## Confirmed Milestone #6 Dataverse Targets
+
+The Milestone #6 schema targets were created and published in Dataverse on June 19, 2026, and added to the `JM1_Publishing` solution. These fields are status/source fields only; creating them does not authorize contract, invoice, payment-link, onboarding, Opportunity-write, Flow D, or production automation.
+
+| Need | Table | Logical Name | Status |
+| --- | --- | --- | --- |
+| Alternative package | `jm1pub_editorialdiagnostic` | `jm1_m6alternatepackagecode` | Confirmed-created |
+| Author-selected package | `opportunity` | `jm1_m6authorselectedpackagecode` | Confirmed-created |
+| Package selection status | `opportunity` | `jm1_m6packageselectionstatus` | Confirmed-created |
+| Stripe product mapping status | `opportunity` | `jm1_m6stripeproductmappingstatus` | Confirmed-created |
+| Stripe price mapping status | `opportunity` | `jm1_m6stripepricemappingstatus` | Confirmed-created |
+| Payment option preparation status | `opportunity` | `jm1_m6paymentoptionpreparationstatus` | Confirmed-created |
+| Agreement preparation status | `opportunity` | `jm1_m6agreementpreparationstatus` | Confirmed-created |
+| Onboarding status | `opportunity` | `jm1_m6onboardingstatus` | Confirmed-created |
+| Opportunity update status | `opportunity` | `jm1_m6opportunityupdatestatus` | Confirmed-created |
+| Business Central / Sales Enterprise handoff status | `opportunity` | `jm1_m6businesshandoffstatus` | Confirmed-created |
+
+Author package selection is stored on the existing active Opportunity. Package recommendation and override remain sourced from `jm1pub_editorialdiagnostic`. The existing Opportunity remains the business pipeline record; duplicate Opportunity creation is not allowed.
+
 ## Required Field/Rule Gaps
 
-Milestone #6 live-business completion is blocked until these source-of-truth items are confirmed or created:
+Milestone #6 Stripe Product/Price mapping is complete to governed readiness. Milestone #6 live-business action remains blocked until these source-of-truth items are confirmed:
 
 | Need | Required Governance Decision |
 | --- | --- |
-| Primary package recommendation | Which table/field is canonical after human review: diagnostic package fields, Opportunity `jm1pub_packagerecommended`, or another catalog-backed field |
-| Alternative package | Field or structured safe JSON target for recommended alternative package |
-| Author package selection | Canonical table/field for author-selected package/path and selection timestamp |
-| Stripe product/price mapping | Governed mapping from package codes to Stripe product and price IDs |
-| Stripe payment option preparation | Field/table for prepared payment-option metadata without live checkout/payment link creation |
-| Stripe payment handoff status | Field/table for handoff status such as `PAYMENT_OPTIONS_PREPARED`, `PAYMENT_LINK_PENDING_APPROVAL`, `PAYMENT_LINK_SENT` |
-| Onboarding status | Canonical field/table for `ONBOARDING_PENDING`, `ONBOARDING_REQUESTED`, `ONBOARDING_RECEIVED` |
-| Agreement preparation status | Canonical field/table for `AGREEMENT_PREPARATION_PENDING`, `AGREEMENT_DRAFT_PREPARED`, `AGREEMENT_SENT` |
-| Business Central / Sales Enterprise handoff | Whether Opportunity fields are sufficient or a Business Central/Sales Enterprise handoff table/status is required |
 | Contract/payment provider approval | Confirmed provider/process for agreement documents and Stripe payment execution |
+| Live author package selection capture | Human-approved path to write selected package/status to the existing Opportunity |
+| Live agreement/onboarding action | Human-approved action to prepare agreement/onboarding without starting production |
 
 ## Safe Milestone #6 Status Model
 
@@ -226,14 +238,14 @@ The source layer confirms:
 - Opportunity package text target: `jm1pub_packagerecommended`
 - duplicate Opportunity rule: update/use existing active Opportunity only
 - package catalog: the governed four-package catalog in this runbook
-- Stripe mapping status: required before any live payment option/link action
+- Stripe mapping status: complete for the four governed package SKUs
 - Stage 1 email boundary: no payment plans, processing fees, tax, Stripe links, invoice mechanics, or contract/payment pressure
 - Stage 2 trigger: only after author package selection or request for payment details
 - QBO status: retired legacy, not allowed for new Milestone #6 logic
 
-The source layer proposes these Dataverse targets for schema confirmation:
+The source layer confirms these Dataverse targets:
 
-| Need | Proposed Target | Proposed Logical Name |
+| Need | Target | Logical Name |
 | --- | --- | --- |
 | Alternative package | `jm1pub_editorialdiagnostic` | `jm1_m6alternatepackagecode` |
 | Author-selected package | `opportunity` | `jm1_m6authorselectedpackagecode` |
@@ -246,6 +258,107 @@ The source layer proposes these Dataverse targets for schema confirmation:
 | Opportunity update status | `opportunity` | `jm1_m6opportunityupdatestatus` |
 | Business Central / Sales Enterprise handoff status | `opportunity` | `jm1_m6businesshandoffstatus` |
 
-Milestone #6 is not yet live-business complete. The current controlled record has an existing active Opportunity, so duplicate Opportunity creation is not allowed. The next governed step is to confirm or create the proposed package selection, Stripe mapping, onboarding, agreement, and handoff fields before any live agreement/onboarding action.
+## Stripe Mapping Inspection
+
+Stripe CLI live-mode inspection and creation on June 19, 2026 confirmed the four governed package Product/Price pairs. These are Product and one-time USD Price mappings only; no payment links, checkout sessions, invoices, subscriptions, customers, charges, payment requests, or tax-setting changes were created.
+
+| Package Code | Package | Required Price | Stripe Product | Stripe Price | Status |
+| --- | --- | ---: | --- | --- | --- |
+| `JMP-PKG-STARTER` | Starter Publishing Package | `$1,999` | `prod_URbgo7mwC7qr6t` | `price_1TSiTaJCiOVFpgYufee7GLQs` | Confirmed |
+| `JMP-PKG-PRO` | Professional Publishing Package | `$4,500` | `prod_UjRnnUiTQgHlrm` | `price_1TjyuZJCiOVFpgYur0FWmcj7` | Confirmed |
+| `JMP-PKG-SIGNATURE` | Signature Publishing Partnership | `$7,500` | `prod_UjRnIBF5yKgkFr` | `price_1TjyuaJCiOVFpgYu8FKjWqIL` | Confirmed |
+| `JMP-PKG-CHILD` | Children's Package, author provides art | `$2,495` | `prod_UjRnLS7vXkbdEh` | `price_1TjyuaJCiOVFpgYuGJo5Ocwl` | Confirmed |
+
+All confirmed package Prices are live-mode, `usd`, and `one_time`. Do not create Stripe payment links, invoices, checkout sessions, subscriptions, installment schedules, customer changes, tax-setting changes, charges, or payment requests from this mapping.
+
+## Governed Live-Business Completion Evidence
+
+On June 19, 2026, Jackie authorized Milestone #6 agreement/onboarding readiness completion for the current controlled record only. The action updated the existing active Opportunity and the existing Editorial Diagnostic record, then created one safe `jm1_executionlog` evidence row.
+
+Persisted Dataverse evidence:
+
+| Evidence | Value |
+| --- | --- |
+| Opportunity | `2653fca9-eacd-4c44-b3ed-1764dd5d35aa` |
+| Editorial Diagnostic | `64e387e0-7e6a-f111-a826-00224820105b` |
+| Execution Log | `60ee2061-d76b-f111-a826-000d3a9eacee` |
+| Internal visibility mailbox | `publishing@jmerrill.one` |
+
+Persisted Opportunity readiness fields:
+
+| Field | Value |
+| --- | --- |
+| `jm1pub_packagerecommended` | `JMP-PKG-PRO` |
+| `jm1_m6authorselectedpackagecode` | blank; author selection pending |
+| `jm1_m6packageselectionstatus` | `PACKAGE_SELECTION_PENDING` |
+| `jm1_m6stripeproductmappingstatus` | `STRIPE_MAPPING_CONFIRMED` |
+| `jm1_m6stripepricemappingstatus` | `STRIPE_MAPPING_CONFIRMED` |
+| `jm1_m6paymentoptionpreparationstatus` | `PAYMENT_OPTIONS_PENDING_AUTHOR_SELECTION` |
+| `jm1_m6agreementpreparationstatus` | `AGREEMENT_PREPARATION_READY` |
+| `jm1_m6onboardingstatus` | `ONBOARDING_READY` |
+| `jm1_m6opportunityupdatestatus` | `OPPORTUNITY_UPDATED_MILESTONE_6` |
+| `jm1_m6businesshandoffstatus` | `BUSINESS_HANDOFF_READY` |
+
+Persisted Editorial Diagnostic readiness field:
+
+| Field | Value |
+| --- | --- |
+| `jm1_m6alternatepackagecode` | `JMP-PKG-STARTER` |
+
+The execution-log evidence records that the existing Opportunity was used, no duplicate Opportunity was created, Stripe Product/Price mapping was confirmed, and internal visibility was prepared for `publishing@jmerrill.one`.
+
+This completion does not send an author email, internal notification email, payment link, invoice, contract, checkout session, payment request, or onboarding automation. It does not activate Flow D, start production, assign ISBN, start editing/layout/cover/distribution/release work, or use QBO. Payment options remain blocked until author package selection or an author request for payment details.
+
+## Milestone #6B Author Choice Branching
+
+Milestone #6B pauses the move to Milestone #7 until the system can safely handle the author's reply to the editorial/package recommendation email. The first author-facing email remains editorial/package recommendation only. Money/payment-option communication is generated only after package selection or an author request for payment details.
+
+The implementation source is `azure-functions/diagnostic-ai-runner/src/author/milestone6AuthorChoicePath.js`.
+
+Supported author response branches:
+
+| Author Response | Package Selection Status | Payment Option Status | Agreement/Onboarding Status | Internal Visibility |
+| --- | --- | --- | --- | --- |
+| Selects suggested package | `PACKAGE_SELECTED` | `PAYMENT_OPTIONS_PREPARED_AFTER_PACKAGE_SELECTION` | Ready | Not required by branch |
+| Selects alternate package | `PACKAGE_SELECTED` | `PAYMENT_OPTIONS_PREPARED_AFTER_PACKAGE_SELECTION` | Ready | Not required by branch |
+| Requests meeting | `PACKAGE_SELECTION_PENDING` | `PAYMENT_OPTIONS_PENDING_AUTHOR_SELECTION` | Pending package selection | Prepare notification to `publishing@jmerrill.one` |
+| Requests payment options with selected package | `PACKAGE_SELECTED` | `PAYMENT_OPTIONS_PREPARED_AFTER_PACKAGE_SELECTION` | Ready | Not required by branch |
+| Requests payment options without selected package | blocked | blocked | blocked | Ask author to choose package/path first |
+| Needs custom quote or children's illustration quote | `PACKAGE_SELECTION_PENDING` | `PAYMENT_OPTIONS_BLOCKED_HUMAN_QUOTE_REQUIRED` | Human quote review required | Prepare notification to `publishing@jmerrill.one` |
+| Declines or pauses | `PACKAGE_SELECTION_HOLD` | `PAYMENT_OPTIONS_BLOCKED_AUTHOR_HOLD` | Hold | Prepare notification to `publishing@jmerrill.one` |
+| No response | `PACKAGE_SELECTION_NO_RESPONSE` | `PAYMENT_OPTIONS_PENDING_AUTHOR_SELECTION` | Pending follow-up | Prepare notification to `publishing@jmerrill.one` |
+
+Package selection payload behavior:
+
+- Suggested-package selection stores the governed recommended package on `opportunity.jm1_m6authorselectedpackagecode`.
+- Alternate-package selection stores the governed alternate package on `opportunity.jm1_m6authorselectedpackagecode`.
+- Meeting, custom quote, decline/hold, and no-response branches do not invent selected package values.
+- Payment-options requests fail closed unless a selected package is present.
+- All paths update/use the existing active Opportunity only; duplicate Opportunity creation is not allowed.
+
+Payment-option preparation behavior:
+
+- Single, 2-payment, and 4-payment options are available for every selected package.
+- 8-payment option is available when selected package total is at least `$1,000`.
+- 12-payment option is available when selected package total is at least `$2,000`.
+- Prepared payment-option data includes the 4% processing fee per transaction.
+- Prepared payment-option data may include safe Stripe Product/Price identifiers from the governed mapping.
+- Prepared payment-option data does not create Stripe payment links, checkout sessions, invoices, customers, subscriptions, charges, payment requests, or tax calculations.
+- QBO is not used.
+
+Milestone #6B safe Dataverse payloads may set:
+
+- `opportunity.jm1_m6authorselectedpackagecode`
+- `opportunity.jm1_m6packageselectionstatus`
+- `opportunity.jm1_m6stripeproductmappingstatus`
+- `opportunity.jm1_m6stripepricemappingstatus`
+- `opportunity.jm1_m6paymentoptionpreparationstatus`
+- `opportunity.jm1_m6agreementpreparationstatus`
+- `opportunity.jm1_m6onboardingstatus`
+- `opportunity.jm1_m6opportunityupdatestatus`
+- `opportunity.jm1_m6businesshandoffstatus`
+- one safe `jm1_executionlog` evidence payload when the branch is applied
+
+Milestone #6B still does not authorize Milestone #7 production, Flow D activation, ISBN assignment, editing, layout, cover design, distribution, release work, payment links, checkout sessions, invoices, customers, subscriptions, charges, contracts, payment requests, QBO logic, duplicate Opportunity creation, or `@jmerrill.pub` mailbox use.
 
 No production work is authorized by this plan.
