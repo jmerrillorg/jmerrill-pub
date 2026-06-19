@@ -31,6 +31,7 @@ const {
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
 const DELIVERY_INTENT = "INTERNAL_REVIEW_NOTIFICATION";
 const INTERNAL_NOTIFICATION_STATUS = Object.freeze({
+  DISABLED: "INTERNAL_NOTIFICATION_DISABLED",
   PREPARED: "INTERNAL_NOTIFICATION_PREPARED",
   SENT: "INTERNAL_NOTIFICATION_SENT",
   FAILED: "INTERNAL_NOTIFICATION_FAILED"
@@ -40,7 +41,10 @@ const AUTHOR_EMAIL_STATUS = "AUTHOR_EMAIL_NOT_SENT";
 const SAFE_PERSISTENCE_FIELDS = [
   "notification",
   "deliveryStatus",
-  "persistedAt"
+  "persistedAt",
+  "messageSubject",
+  "providerName",
+  "internalProviderMessageId"
 ];
 
 const FORBIDDEN_PERSISTENCE_FIELDS = [
@@ -195,6 +199,9 @@ function buildAuthorDraftReviewNotificationPersistenceRecord(input = {}) {
   const notification = input.notification;
   const persistedAt = normalizeString(input.persistedAt) || new Date().toISOString();
   const deliveryStatus = normalizeString(input.deliveryStatus || INTERNAL_NOTIFICATION_STATUS.PREPARED);
+  const messageSubject = normalizeString(input.messageSubject);
+  const providerName = normalizeString(input.providerName);
+  const internalProviderMessageId = normalizeString(input.internalProviderMessageId);
   const actionDescription = [
     `${NOTIFICATION_TYPE} for intake ${notification.intakeReferenceCode}.`,
     `Recipient ${INTERNAL_VISIBILITY_MAILBOX}.`,
@@ -203,6 +210,9 @@ function buildAuthorDraftReviewNotificationPersistenceRecord(input = {}) {
     `Author email status ${AUTHOR_EMAIL_STATUS}.`,
     `Draft status ${DRAFT_STATUS}.`,
     `Approval status ${DRAFT_APPROVAL_STATUS}.`,
+    messageSubject ? `Subject ${messageSubject}.` : "",
+    providerName ? `Provider ${providerName}.` : "",
+    internalProviderMessageId ? `Internal provider message ID ${internalProviderMessageId}.` : "",
     `Project ${normalizeString(notification.projectTitle) || "not provided"}.`,
     `Author ${normalizeString(notification.authorName) || "not provided"}.`,
     `Preview ${normalizeString(notification.draftBodyPreview)}.`,
@@ -241,6 +251,9 @@ function buildAuthorDraftReviewNotificationPersistenceRecord(input = {}) {
       draftBodyPreview: normalizeString(notification.draftBodyPreview),
       persistedAt,
       correlationId: normalizeString(notification.metadata?.correlationId) || null,
+      messageSubject: messageSubject || null,
+      providerName: providerName || null,
+      internalProviderMessageId: internalProviderMessageId || null,
       executionLogPayload
     }
   };

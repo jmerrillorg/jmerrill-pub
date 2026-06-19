@@ -799,6 +799,31 @@ Future author-facing sending remains a later governed phase. Any future send mus
 
 ---
 
+## 27. PR #99 - Governed Internal Mail Provider Configuration
+
+PR #99 introduces the governed internal mail provider configuration boundary for `AUTHOR_DRAFT_READY_FOR_REVIEW` notifications.
+
+Internal review notifications are disabled by default. Live internal delivery requires `JM1_INTERNAL_NOTIFICATIONS_ENABLED=true` and a governed provider configuration. This gate is separate from `JM1_AI_EXECUTION_ENABLED`, which remains closed for diagnostic execution.
+
+### Provider and recipient boundary
+
+- Internal notification recipient is locked to `publishing@jmerrill.one`.
+- The author cannot appear in To, CC, or BCC.
+- The only configured provider mode in this PR is an injected internal provider selected by `JM1_INTERNAL_NOTIFICATION_PROVIDER=injected`.
+- Sender and reply-to values must be internal `@jmerrill.one` addresses.
+- `@jmerrill.pub` is not allowed as an active internal notification mailbox.
+- When the internal notification gate is disabled, notification payloads can be prepared/logged but no live provider is called.
+
+### Logging and non-execution boundary
+
+PR #99 continues to use the PR #98 `jm1_executionlogs` safe persistence path. Logs may record `INTERNAL_NOTIFICATION_DISABLED`, `INTERNAL_NOTIFICATION_PREPARED`, `INTERNAL_NOTIFICATION_SENT`, or `INTERNAL_NOTIFICATION_FAILED`, plus safe subject, provider name, internal provider message ID when available, diagnostic ID, intake reference, and safe draft preview.
+
+PR #99 does not send author email, include the author in delivery recipients, create an author-facing send event, mark author email as sent, mark the draft as sent, create an Opportunity, activate Flow D, trigger follow-up automation, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+
+Future author-facing sending remains a later governed phase. Any future send must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.

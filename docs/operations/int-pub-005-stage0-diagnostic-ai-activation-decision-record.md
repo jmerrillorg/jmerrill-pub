@@ -849,6 +849,33 @@ PR #98 introduces safe persistence and provider-injected internal delivery for a
 - Flow D activation is not authorized.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 34. PR #99 - Governed Internal Mail Provider Configuration
+
+PR #99 introduces governed configuration for internal author draft review notification delivery.
+
+### What changed
+
+- Internal notification delivery is controlled by `JM1_INTERNAL_NOTIFICATIONS_ENABLED`.
+- Internal notifications are disabled by default unless the governed env flag is set to `true`.
+- The internal notification recipient is locked to `publishing@jmerrill.one`.
+- The author is blocked from To, CC, and BCC.
+- The internal notification gate is separate from `JM1_AI_EXECUTION_ENABLED`.
+- Provider configuration supports an injected internal provider boundary and requires internal `@jmerrill.one` sender/reply-to values.
+- Safe `jm1_executionlogs` entries may record disabled, prepared, sent, or failed internal notification status.
+
+### Governance status
+
+- Internal notification delivery only.
+- No author send.
+- No author-facing send event.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
 ## 22. PR #86 - Internal Diagnostic Result Review Layer
 
 PR #86 introduces an internal-only review payload builder for validated Stage 0 diagnostic results.
