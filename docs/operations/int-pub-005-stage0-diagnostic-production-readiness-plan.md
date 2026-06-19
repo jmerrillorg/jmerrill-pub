@@ -824,6 +824,41 @@ Future author-facing sending remains a later governed phase. Any future send mus
 
 ---
 
+## 28. PR #100 - Controlled Internal Notification Delivery Test
+
+PR #100 introduces a controlled one-record internal notification delivery test runner for `AUTHOR_DRAFT_READY_FOR_REVIEW`.
+
+The controlled test targets exactly one internal notification and does not scan queues, run diagnostics, process production records, create Opportunities, activate Flow D, or authorize production automation.
+
+### Controlled test boundary
+
+- Recipient remains locked to `publishing@jmerrill.one`.
+- The author is blocked from To, CC, and BCC.
+- `JM1_INTERNAL_NOTIFICATIONS_ENABLED` is the separate internal notification gate.
+- `JM1_AI_EXECUTION_ENABLED` remains separate and closed.
+- Safe synthetic/internal payloads are preferred until live record wiring is separately governed.
+- The runner refuses multiple notifications unless the input contains exactly one record.
+
+### PR #100 result
+
+Live internal delivery was not attempted in PR #100 because live internal provider configuration was not present in the Azure Function App settings.
+
+Observed gate/config state before the attempted live procedure:
+
+- `JM1_AI_EXECUTION_ENABLED=false`
+- `JM1_INTERNAL_NOTIFICATIONS_ENABLED` was not configured, which defaults to disabled.
+- No `JM1_INTERNAL_NOTIFICATION_*` provider settings were present.
+
+Because the provider was not configured, no internal email was sent and no gate was enabled. The internal notification gate remained disabled after the check.
+
+### Non-execution boundary
+
+PR #100 does not send author email, include the author in To/CC/BCC, create an author-facing send event, mark author email as sent, mark the draft as sent, create an Opportunity, activate Flow D, trigger follow-up automation, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+
+Future author-facing sending remains a later governed phase. Any future send must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
