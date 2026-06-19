@@ -72,7 +72,7 @@ const baseInput = Object.freeze({
   },
   commandCenterGateEnabled: false,
   dataverse: {
-    editorialStageTableExists: false
+    editorialStageTableExists: true
   },
   completedAt: "2026-06-19T16:00:00.000Z"
 });
@@ -121,16 +121,15 @@ function input(overrides = {}) {
 }
 
 describe("Milestone 7C editorial command center readiness gate", () => {
-  test("blocks live command center readiness while gate and editorial stage schema are missing", () => {
+  test("blocks live command center readiness while the command center gate is false", () => {
     const result = buildMilestone7cEditorialCommandCenter(input());
 
     assert.equal(result.ok, true);
     assert.equal(result.readiness.editorialGateName, EDITORIAL_GATE_NAME);
     assert.equal(result.readiness.commandCenterGateEnabled, false);
-    assert.equal(result.readiness.editorialStageTableAvailable, false);
+    assert.equal(result.readiness.editorialStageTableAvailable, true);
     assert.equal(result.readiness.commandCenterReady, false);
     assert.equal(result.readiness.blockers.includes(`${EDITORIAL_GATE_NAME}_FALSE`), true);
-    assert.equal(result.readiness.blockers.includes(`${EDITORIAL_STAGE_TABLE}_SCHEMA_NOT_CONFIRMED`), true);
     assert.deepEqual(result.taskPayloads, []);
   });
 
@@ -212,15 +211,22 @@ describe("Milestone 7C editorial body", () => {
     assert.equal(result.payloads.executionLogPayload.jm1_actiontype, EVENT_TYPE);
   });
 
-  test("records the missing editorial stage table as a schema plan instead of bypassing it", () => {
+  test("records the confirmed editorial stage table and solution-backed field map", () => {
     const result = buildMilestone7cEditorialCommandCenter(input());
 
     assert.equal(result.schemaPlan.table, EDITORIAL_STAGE_TABLE);
-    assert.equal(result.schemaPlan.currentStatus, "MISSING_IN_DATAVERSE");
+    assert.equal(result.schemaPlan.entitySetName, "jm1pub_editorialstages");
+    assert.equal(result.schemaPlan.primaryIdAttribute, "jm1pub_editorialstageid");
+    assert.equal(result.schemaPlan.primaryNameAttribute, "jm1pub_name");
+    assert.equal(result.schemaPlan.solutionUniqueName, "JM1_Publishing");
+    assert.equal(result.schemaPlan.solutionComponentConfirmed, true);
+    assert.equal(result.schemaPlan.currentStatus, "CONFIRMED_IN_DATAVERSE");
     assert.deepEqual(result.schemaPlan, EDITORIAL_STAGE_SCHEMA_PLAN);
-    assert.equal(result.schemaPlan.requiredBeforeLiveTrackerActivation, true);
+    assert.equal(result.schemaPlan.requiredBeforeLiveTrackerActivation, false);
     assert.equal(result.schemaPlan.fields.includes("jm1pub_stylesheeturl"), true);
-    assert.equal(result.schemaPlan.fields.includes("jm1pub_deliverableurl"), true);
+    assert.equal(result.schemaPlan.fields.includes("jm1pub_editorialdeliverableurl"), true);
+    assert.equal(result.schemaPlan.fields.includes("jm1pub_stagetype"), true);
+    assert.equal(result.schemaPlan.fields.includes("jm1pub_stagecompletedate"), true);
   });
 });
 
