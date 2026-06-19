@@ -4,7 +4,7 @@
 
 This pass accounts for the full `/Users/jmerrillone/Downloads/260619` canon folder before Milestone #9. The folder is not editorial-only. It governs agreement, payment, AI disclosure, editorial tracking, future editorial/marketing agents, cover validation, release lock, launch readiness, annual review, loyalty progression, package/service policy, editorial doctrine, strategy, marketing, and blog standards.
 
-Milestone #9 remains paused until pre-Milestone #9 blockers are resolved or explicitly reported.
+Milestone #9 launch/release readiness is now implemented as a governed readiness layer. Public launch/release activation remains separately gated and unauthorized.
 
 ## Current Pipeline State
 
@@ -17,7 +17,7 @@ Milestone #9 remains paused until pre-Milestone #9 blockers are resolved or expl
 | Milestone #7C | Complete to command-center readiness |
 | `jm1pub_editorialstage` | Created and confirmed |
 | Milestone #8 | Complete |
-| Milestone #9 | Not started |
+| Milestone #9 | Launch/release readiness implemented; public launch/release inactive |
 | Milestone #10 | Not started |
 
 ## Dataverse Schema Resolution
@@ -67,8 +67,8 @@ This pass does not enable any live/public execution gate.
 | `JMP-AGENT-BP08-EditorialAgent-v1_0.md` | Future supervised editorial execution agent | Milestone #7C future readiness | Scaffolded, not active; no autonomous editorial work or author delivery |
 | `JMP-FLOW-BP09-CoverValidation-v1_0.md` | Cover validation before production/distribution release | M7/M8/pre-M9 | Completion pass implemented; gate remains false until live activation |
 | `JMP-FLOW-BP10-ReleaseLock-v1_0.md` | Release lock before date commitments and downstream submissions | Pre-M9 | Completion pass implemented; gate remains false until live activation |
-| `JMP-FLOW-BP11-LaunchReadiness-v1_0.md` | Launch readiness check | Milestone #9 | Launch readiness model implemented behind BP-06/BP-09/BP-10 |
-| `JMP-AGENT-BP12-MarketingAgent-v1_0.md` | Future marketing agent support | M9 future readiness | Scaffolded, not active; no autonomous public campaign execution |
+| `JMP-FLOW-BP11-LaunchReadiness-v1_0.md` | Launch readiness check | Milestone #9 | Launch/release readiness implemented behind BP-06/BP-09/BP-10 and final approvals |
+| `JMP-AGENT-BP12-MarketingAgent-v1_0.md` | Future marketing agent support | M9 future readiness | Readiness scaffolded, not active; no autonomous public campaign execution |
 | `JMP-FLOW-BP14-BP15-J8-AnnualReview-LoyaltyProgression-v1_0.md` | Annual review and loyalty progression | Milestone #10 | M10 post-release/lifecycle source; not started |
 | `JMP-IncludedServices-NonTransferability-Clause-v1_0.md` | Included services, package, onboarding, agreement policy | Milestone #6 | Agreement/onboarding/package governance source; no contract automation here |
 | `jm1-author-book-marketing-SKILL.md` | Per-title author marketing kit and launch support | Milestone #9 | M9 launch support source; public scheduling remains gated and human-approved |
@@ -95,7 +95,7 @@ This pass does not enable any live/public execution gate.
 
 This pass did not:
 
-- start Milestone #9
+- start public Milestone #9 launch/release execution
 - set a public release date
 - submit to Ingram, CoreSource, KDP, retailers, or any distribution platform
 - send launch email
