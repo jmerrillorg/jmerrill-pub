@@ -191,11 +191,10 @@ Author package selection is stored on the existing active Opportunity. Package r
 
 ## Required Field/Rule Gaps
 
-Milestone #6 live-business completion is still blocked until these source-of-truth items are confirmed:
+Milestone #6 Stripe Product/Price mapping is complete to governed readiness. Milestone #6 live-business action remains blocked until these source-of-truth items are confirmed:
 
 | Need | Required Governance Decision |
 | --- | --- |
-| Stripe product/price mapping | Governed mapping from all package codes to confirmed Stripe product and price IDs |
 | Contract/payment provider approval | Confirmed provider/process for agreement documents and Stripe payment execution |
 | Live author package selection capture | Human-approved path to write selected package/status to the existing Opportunity |
 | Live agreement/onboarding action | Human-approved action to prepare agreement/onboarding without starting production |
@@ -239,7 +238,7 @@ The source layer confirms:
 - Opportunity package text target: `jm1pub_packagerecommended`
 - duplicate Opportunity rule: update/use existing active Opportunity only
 - package catalog: the governed four-package catalog in this runbook
-- Stripe mapping status: required before any live payment option/link action
+- Stripe mapping status: complete for the four governed package SKUs
 - Stage 1 email boundary: no payment plans, processing fees, tax, Stripe links, invoice mechanics, or contract/payment pressure
 - Stage 2 trigger: only after author package selection or request for payment details
 - QBO status: retired legacy, not allowed for new Milestone #6 logic
@@ -261,17 +260,17 @@ The source layer confirms these Dataverse targets:
 
 ## Stripe Mapping Inspection
 
-Read-only Stripe dashboard inspection on June 19, 2026 confirmed one package product/price pair:
+Stripe CLI live-mode inspection and creation on June 19, 2026 confirmed the four governed package Product/Price pairs. These are Product and one-time USD Price mappings only; no payment links, checkout sessions, invoices, subscriptions, customers, charges, payment requests, or tax-setting changes were created.
 
 | Package Code | Package | Required Price | Stripe Product | Stripe Price | Status |
 | --- | --- | ---: | --- | --- | --- |
 | `JMP-PKG-STARTER` | Starter Publishing Package | `$1,999` | `prod_URbgo7mwC7qr6t` | `price_1TSiTaJCiOVFpgYufee7GLQs` | Confirmed |
-| `JMP-PKG-PRO` | Professional Publishing Package | `$4,500` | Not found | Not found | Blocked |
-| `JMP-PKG-SIGNATURE` | Signature Publishing Partnership | `$7,500` | Not found | Not found | Blocked |
-| `JMP-PKG-CHILD` | Children's Package, author provides art | `$2,495` | Not found | Not found | Blocked |
+| `JMP-PKG-PRO` | Professional Publishing Package | `$4,500` | `prod_UjRnnUiTQgHlrm` | `price_1TjyuZJCiOVFpgYur0FWmcj7` | Confirmed |
+| `JMP-PKG-SIGNATURE` | Signature Publishing Partnership | `$7,500` | `prod_UjRnIBF5yKgkFr` | `price_1TjyuaJCiOVFpgYu8FKjWqIL` | Confirmed |
+| `JMP-PKG-CHILD` | Children's Package, author provides art | `$2,495` | `prod_UjRnLS7vXkbdEh` | `price_1TjyuaJCiOVFpgYuGJo5Ocwl` | Confirmed |
 
-Do not invent the missing product or price IDs. Do not create Stripe payment links, invoices, checkout sessions, subscriptions, installment schedules, or customer changes from this inspection.
+All confirmed package Prices are live-mode, `usd`, and `one_time`. Do not create Stripe payment links, invoices, checkout sessions, subscriptions, installment schedules, customer changes, tax-setting changes, charges, or payment requests from this mapping.
 
-Milestone #6 is not yet live-business complete. The current controlled record has an existing active Opportunity, so duplicate Opportunity creation is not allowed. The next governed step is to create or confirm the missing Stripe products/prices and then record the governed package-to-Stripe mapping before any live agreement/onboarding action.
+Milestone #6 is not yet live-business complete. The current controlled record has an existing active Opportunity, so duplicate Opportunity creation is not allowed. The next governed step is a separately authorized live package-selection/agreement/onboarding action path. Payment options remain blocked until author package selection.
 
 No production work is authorized by this plan.

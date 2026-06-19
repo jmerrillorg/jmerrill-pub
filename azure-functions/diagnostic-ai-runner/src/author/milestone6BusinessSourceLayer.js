@@ -43,6 +43,41 @@ const PACKAGE_CATALOG = Object.freeze({
   })
 });
 
+const STRIPE_PACKAGE_MAPPINGS = Object.freeze({
+  [PACKAGE_CODES.STARTER]: Object.freeze({
+    productId: "prod_URbgo7mwC7qr6t",
+    priceId: "price_1TSiTaJCiOVFpgYufee7GLQs",
+    currency: "usd",
+    unitAmount: 199900,
+    priceType: "one_time",
+    livemode: true
+  }),
+  [PACKAGE_CODES.PROFESSIONAL]: Object.freeze({
+    productId: "prod_UjRnnUiTQgHlrm",
+    priceId: "price_1TjyuZJCiOVFpgYur0FWmcj7",
+    currency: "usd",
+    unitAmount: 450000,
+    priceType: "one_time",
+    livemode: true
+  }),
+  [PACKAGE_CODES.SIGNATURE]: Object.freeze({
+    productId: "prod_UjRnIBF5yKgkFr",
+    priceId: "price_1TjyuaJCiOVFpgYu8FKjWqIL",
+    currency: "usd",
+    unitAmount: 750000,
+    priceType: "one_time",
+    livemode: true
+  }),
+  [PACKAGE_CODES.CHILD]: Object.freeze({
+    productId: "prod_UjRnLS7vXkbdEh",
+    priceId: "price_1TjyuaJCiOVFpgYuGJo5Ocwl",
+    currency: "usd",
+    unitAmount: 249500,
+    priceType: "one_time",
+    livemode: true
+  })
+});
+
 const PACKAGE_RECOMMENDATION_SOURCE = Object.freeze({
   tableLogicalName: "jm1pub_editorialdiagnostic",
   entitySet: "jm1pub_editorialdiagnostics",
@@ -317,7 +352,10 @@ function stripeMappingComplete(packageCode, stripeMappings = {}) {
   return Boolean(
     isPlainObject(packageMapping) &&
     normalizeString(packageMapping.productId) &&
-    normalizeString(packageMapping.priceId)
+    normalizeString(packageMapping.priceId) &&
+    normalizeString(packageMapping.currency) === "usd" &&
+    packageMapping.priceType === "one_time" &&
+    packageMapping.livemode === true
   );
 }
 
@@ -362,7 +400,8 @@ function buildMilestone6BusinessSourceReadiness(input = {}) {
   const packageSelectionStatus = authorSelectedPackageCode ? "PACKAGE_SELECTED" : "PACKAGE_SELECTION_PENDING";
   const selectedPackage = authorSelectedPackageCode ? PACKAGE_CATALOG[authorSelectedPackageCode] : null;
   const paymentOptionsAllowed = Boolean(selectedPackage);
-  const stripeMappingStatus = selectedPackage && stripeMappingComplete(selectedPackage.code, input.stripeMappings)
+  const stripeMappings = isPlainObject(input.stripeMappings) ? input.stripeMappings : STRIPE_PACKAGE_MAPPINGS;
+  const stripeMappingStatus = selectedPackage && stripeMappingComplete(selectedPackage.code, stripeMappings)
     ? "STRIPE_MAPPING_CONFIRMED"
     : "STRIPE_MAPPING_REQUIRED";
 
@@ -386,6 +425,7 @@ function buildMilestone6BusinessSourceReadiness(input = {}) {
       stripeMappingStatus,
       stripeProductMappingStatus: stripeMappingStatus,
       stripePriceMappingStatus: stripeMappingStatus,
+      stripePackageMappings: STRIPE_PACKAGE_MAPPINGS,
       taxHandlingStatus: "TAX_PENDING_ONBOARDING_ADDRESS_AND_GOVERNED_STRIPE_BC_SE_CONFIGURATION",
       billingSourcePolicy: BILLING_SOURCE_POLICY,
       agreementPreparationStatus: "AGREEMENT_PREPARATION_PENDING",
@@ -430,6 +470,7 @@ function buildMilestone6BusinessSourceReadiness(input = {}) {
 module.exports = {
   PACKAGE_CODES,
   PACKAGE_CATALOG,
+  STRIPE_PACKAGE_MAPPINGS,
   PACKAGE_RECOMMENDATION_SOURCE,
   OPPORTUNITY_SOURCE,
   MILESTONE6_DATAVERSE_TARGETS,
