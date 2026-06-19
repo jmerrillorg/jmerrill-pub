@@ -213,6 +213,39 @@ Do not use production-stage statuses such as `PRODUCTION_STARTED`, `FLOW_D_READY
 
 Milestone #5 is complete for the controlled record: the approved author response was sent, `publishing@jmerrill.one` had visibility, and safe Dataverse send-log evidence exists.
 
-Milestone #6 is not yet live-business complete. The current controlled record has an existing active Opportunity, so duplicate Opportunity creation is not allowed. The next governed step is to define or create the missing package selection, Stripe mapping, onboarding, agreement, and handoff fields/rules before any live agreement/onboarding action.
+The follow-on business-source implementation adds the no-side-effect source-layer module in `azure-functions/diagnostic-ai-runner/src/author/milestone6BusinessSourceLayer.js`.
+
+The source layer confirms:
+
+- package recommendation source: `jm1pub_editorialdiagnostic`
+- recommended package field: `jm1pub_recommendedpackage`
+- package override field: `jm1pub_packageoverride`
+- package override reason field: `jm1pub_packageoverridereason`
+- package rationale field: `jm1pub_packagerationale`
+- business pipeline source: existing `opportunity` row
+- Opportunity package text target: `jm1pub_packagerecommended`
+- duplicate Opportunity rule: update/use existing active Opportunity only
+- package catalog: the governed four-package catalog in this runbook
+- Stripe mapping status: required before any live payment option/link action
+- Stage 1 email boundary: no payment plans, processing fees, tax, Stripe links, invoice mechanics, or contract/payment pressure
+- Stage 2 trigger: only after author package selection or request for payment details
+- QBO status: retired legacy, not allowed for new Milestone #6 logic
+
+The source layer proposes these Dataverse targets for schema confirmation:
+
+| Need | Proposed Target | Proposed Logical Name |
+| --- | --- | --- |
+| Alternative package | `jm1pub_editorialdiagnostic` | `jm1_m6alternatepackagecode` |
+| Author-selected package | `opportunity` | `jm1_m6authorselectedpackagecode` |
+| Package selection status | `opportunity` | `jm1_m6packageselectionstatus` |
+| Stripe product mapping status | `opportunity` | `jm1_m6stripeproductmappingstatus` |
+| Stripe price mapping status | `opportunity` | `jm1_m6stripepricemappingstatus` |
+| Payment option preparation status | `opportunity` | `jm1_m6paymentoptionpreparationstatus` |
+| Agreement preparation status | `opportunity` | `jm1_m6agreementpreparationstatus` |
+| Onboarding status | `opportunity` | `jm1_m6onboardingstatus` |
+| Opportunity update status | `opportunity` | `jm1_m6opportunityupdatestatus` |
+| Business Central / Sales Enterprise handoff status | `opportunity` | `jm1_m6businesshandoffstatus` |
+
+Milestone #6 is not yet live-business complete. The current controlled record has an existing active Opportunity, so duplicate Opportunity creation is not allowed. The next governed step is to confirm or create the proposed package selection, Stripe mapping, onboarding, agreement, and handoff fields before any live agreement/onboarding action.
 
 No production work is authorized by this plan.
