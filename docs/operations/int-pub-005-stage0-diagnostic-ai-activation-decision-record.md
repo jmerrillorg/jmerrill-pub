@@ -914,6 +914,34 @@ Observed state:
 - Flow D activation is not authorized.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 36. PR #101 - Azure Internal Notification Provider Configuration
+
+PR #101 introduces Azure internal notification provider configuration readiness for the controlled internal author-draft review notification path.
+
+### What changed
+
+- A no-send internal notification readiness verifier was added.
+- Azure app settings requirements were documented for `func-jm1-diagnostic-ai-runner`.
+- `JM1_INTERNAL_NOTIFICATIONS_ENABLED` remains separate from `JM1_AI_EXECUTION_ENABLED`.
+- Internal notification readiness requires `JM1_AI_EXECUTION_ENABLED=false`.
+- Internal notification readiness requires `JM1_INTERNAL_NOTIFICATIONS_ENABLED=true`.
+- Approved provider mode remains `injected`.
+- Sender/from and reply-to must be internal `@jmerrill.one` mailboxes.
+- `@jmerrill.pub` is not an active mailbox for this workflow.
+- Recipient remains locked to `publishing@jmerrill.one`.
+
+### Governance status
+
+- Internal notification readiness only.
+- No live internal notification was sent.
+- No author send.
+- No author-facing output.
+- No diagnostic run occurred.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Production activation remains unauthorized.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
 ## 22. PR #86 - Internal Diagnostic Result Review Layer
 
 PR #86 introduces an internal-only review payload builder for validated Stage 0 diagnostic results.

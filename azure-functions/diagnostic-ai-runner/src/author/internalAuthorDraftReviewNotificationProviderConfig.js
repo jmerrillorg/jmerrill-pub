@@ -87,7 +87,7 @@ function getInternalNotificationProviderConfig(env = process.env) {
   if (!from || !isApprovedInternalAddress(from)) {
     return { ok: false, enabled: true, reason: "INTERNAL_NOTIFICATION_FROM_INVALID" };
   }
-  if (replyTo && !isApprovedInternalAddress(replyTo)) {
+  if (!replyTo || !isApprovedInternalAddress(replyTo)) {
     return { ok: false, enabled: true, reason: "INTERNAL_NOTIFICATION_REPLY_TO_INVALID" };
   }
 
@@ -97,7 +97,7 @@ function getInternalNotificationProviderConfig(env = process.env) {
     deliveryStatus: INTERNAL_NOTIFICATION_STATUS.PREPARED,
     providerName,
     from,
-    replyTo: replyTo || from
+    replyTo
   };
 }
 

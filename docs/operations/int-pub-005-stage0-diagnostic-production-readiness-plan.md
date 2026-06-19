@@ -859,6 +859,38 @@ Future author-facing sending remains a later governed phase. Any future send mus
 
 ---
 
+## 29. PR #101 - Azure Internal Notification Provider Configuration
+
+PR #101 introduces the Azure internal notification provider configuration path required before a governed one-notification internal delivery test can be authorized.
+
+This prepares configuration readiness only. Internal notifications remain disabled by default, and `JM1_INTERNAL_NOTIFICATIONS_ENABLED` stays separate from `JM1_AI_EXECUTION_ENABLED`.
+
+### Azure configuration boundary
+
+- Function App target: `func-jm1-diagnostic-ai-runner`.
+- Dataverse environment: `dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10`.
+- `JM1_AI_EXECUTION_ENABLED` must remain `false`.
+- `JM1_INTERNAL_NOTIFICATIONS_ENABLED` defaults to `false`.
+- Approved provider mode remains `injected`.
+- Sender/from must be an internal `@jmerrill.one` mailbox.
+- Reply-to must be an internal `@jmerrill.one` mailbox.
+- `@jmerrill.pub` is not an active mailbox for this workflow.
+- Recipient remains locked to `publishing@jmerrill.one`.
+
+### Readiness verification
+
+PR #101 adds a no-send readiness verification path. It can return `READY_FOR_INTERNAL_NOTIFICATION_TEST` when required app settings and recipient constraints are valid. It returns `INTERNAL_NOTIFICATION_CONFIG_INCOMPLETE` when gates or settings are missing or unsafe.
+
+The readiness path does not send email, call a provider, run diagnostics, create Opportunities, activate Flow D, or authorize production automation.
+
+### Non-execution boundary
+
+PR #101 sends no live internal notification, sends no author email, includes no author in To/CC/BCC, creates no author-facing send event, marks no draft or author email as sent, creates no Opportunity, activates no Flow D, triggers no follow-up automation, opens no AI execution gate, and runs no real manuscript diagnostic.
+
+The next step is a separately governed one-notification delivery test after Azure settings are confirmed. Production activation remains unauthorized.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
