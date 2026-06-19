@@ -74,56 +74,56 @@ const OPPORTUNITY_SOURCE = Object.freeze({
   })
 });
 
-const PROPOSED_DATAVERSE_TARGETS = Object.freeze({
+const MILESTONE6_DATAVERSE_TARGETS = Object.freeze({
   alternatePackage: Object.freeze({
     target: "jm1pub_editorialdiagnostic",
-    proposedLogicalName: "jm1_m6alternatepackagecode",
-    status: "PROPOSED"
+    logicalName: "jm1_m6alternatepackagecode",
+    status: "CONFIRMED_CREATED"
   }),
   authorSelectedPackage: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6authorselectedpackagecode",
-    status: "PROPOSED"
+    logicalName: "jm1_m6authorselectedpackagecode",
+    status: "CONFIRMED_CREATED"
   }),
   packageSelectionStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6packageselectionstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6packageselectionstatus",
+    status: "CONFIRMED_CREATED"
   }),
   stripeProductMappingStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6stripeproductmappingstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6stripeproductmappingstatus",
+    status: "CONFIRMED_CREATED"
   }),
   stripePriceMappingStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6stripepricemappingstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6stripepricemappingstatus",
+    status: "CONFIRMED_CREATED"
   }),
   paymentOptionPreparationStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6paymentoptionpreparationstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6paymentoptionpreparationstatus",
+    status: "CONFIRMED_CREATED"
   }),
   agreementPreparationStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6agreementpreparationstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6agreementpreparationstatus",
+    status: "CONFIRMED_CREATED"
   }),
   onboardingStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6onboardingstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6onboardingstatus",
+    status: "CONFIRMED_CREATED"
   }),
   opportunityUpdateStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6opportunityupdatestatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6opportunityupdatestatus",
+    status: "CONFIRMED_CREATED"
   }),
   businessCentralSalesEnterpriseHandoffStatus: Object.freeze({
     target: "opportunity",
-    proposedLogicalName: "jm1_m6businesshandoffstatus",
-    status: "PROPOSED"
+    logicalName: "jm1_m6businesshandoffstatus",
+    status: "CONFIRMED_CREATED"
   })
 });
 
@@ -167,8 +167,7 @@ const BILLING_SOURCE_POLICY = Object.freeze({
 
 const BLOCKING_STATUSES = Object.freeze({
   stripeMappingMissing: "STRIPE_PRODUCT_PRICE_MAPPING_REQUIRED",
-  packageSelectionMissing: "AUTHOR_PACKAGE_SELECTION_REQUIRED_FOR_PAYMENT_OPTIONS",
-  sourceFieldsProposed: "MILESTONE_6_DATAVERSE_FIELDS_REQUIRE_SCHEMA_CONFIRMATION"
+  packageSelectionMissing: "AUTHOR_PACKAGE_SELECTION_REQUIRED_FOR_PAYMENT_OPTIONS"
 });
 
 const SAFE_INPUT_FIELDS = Object.freeze([
@@ -401,12 +400,11 @@ function buildMilestone6BusinessSourceReadiness(input = {}) {
             tableLogicalName: PACKAGE_RECOMMENDATION_SOURCE.tableLogicalName,
             field: PACKAGE_RECOMMENDATION_SOURCE.packageOverrideField
           },
-          opportunity: OPPORTUNITY_SOURCE
-        },
-        proposed: PROPOSED_DATAVERSE_TARGETS
+          opportunity: OPPORTUNITY_SOURCE,
+          milestone6: MILESTONE6_DATAVERSE_TARGETS
+        }
       },
       blockers: [
-        BLOCKING_STATUSES.sourceFieldsProposed,
         ...(paymentOptionsAllowed && stripeMappingStatus !== "STRIPE_MAPPING_CONFIRMED"
           ? [BLOCKING_STATUSES.stripeMappingMissing]
           : []),
@@ -434,7 +432,7 @@ module.exports = {
   PACKAGE_CATALOG,
   PACKAGE_RECOMMENDATION_SOURCE,
   OPPORTUNITY_SOURCE,
-  PROPOSED_DATAVERSE_TARGETS,
+  MILESTONE6_DATAVERSE_TARGETS,
   PAYMENT_OPTIONS,
   PROCESSING_FEE_RATE,
   GATES,

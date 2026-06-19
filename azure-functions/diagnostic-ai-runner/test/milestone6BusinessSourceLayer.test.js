@@ -7,7 +7,7 @@ const {
   PACKAGE_CATALOG,
   PACKAGE_RECOMMENDATION_SOURCE,
   OPPORTUNITY_SOURCE,
-  PROPOSED_DATAVERSE_TARGETS,
+  MILESTONE6_DATAVERSE_TARGETS,
   PROCESSING_FEE_RATE,
   STAGE_1_BOUNDARY,
   BILLING_SOURCE_POLICY,
@@ -186,16 +186,17 @@ describe("Milestone 6 business source readiness", () => {
     assert.equal(result.readiness.liveActions.usesQboForNewLogic, false);
   });
 
-  test("Dataverse targets distinguish confirmed fields from proposed Milestone 6 schema", () => {
+  test("Dataverse targets include confirmed Milestone 6 schema fields", () => {
     const result = buildMilestone6BusinessSourceReadiness(input());
 
     assert.equal(result.readiness.dataverseTargets.confirmed.packageRecommendation.recommendedPackageField, "jm1pub_recommendedpackage");
     assert.equal(result.readiness.dataverseTargets.confirmed.packageOverride.field, "jm1pub_packageoverride");
     assert.equal(result.readiness.dataverseTargets.confirmed.opportunity.fields.packageRecommended, "jm1pub_packagerecommended");
-    assert.equal(PROPOSED_DATAVERSE_TARGETS.authorSelectedPackage.status, "PROPOSED");
-    assert.equal(PROPOSED_DATAVERSE_TARGETS.stripeProductMappingStatus.status, "PROPOSED");
-    assert.equal(PROPOSED_DATAVERSE_TARGETS.paymentOptionPreparationStatus.status, "PROPOSED");
-    assert.equal(result.readiness.blockers.includes(BLOCKING_STATUSES.sourceFieldsProposed), true);
+    assert.equal(MILESTONE6_DATAVERSE_TARGETS.authorSelectedPackage.status, "CONFIRMED_CREATED");
+    assert.equal(MILESTONE6_DATAVERSE_TARGETS.authorSelectedPackage.logicalName, "jm1_m6authorselectedpackagecode");
+    assert.equal(MILESTONE6_DATAVERSE_TARGETS.stripeProductMappingStatus.status, "CONFIRMED_CREATED");
+    assert.equal(MILESTONE6_DATAVERSE_TARGETS.paymentOptionPreparationStatus.status, "CONFIRMED_CREATED");
+    assert.equal(result.readiness.blockers.includes("MILESTONE_6_DATAVERSE_FIELDS_REQUIRE_SCHEMA_CONFIRMATION"), false);
   });
 });
 

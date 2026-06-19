@@ -170,22 +170,35 @@ Confirmed relevant Editorial Diagnostic fields:
 | `jm1pub_offerrecommended` | Boolean | Offer recommendation signal |
 | `jm1pub_paymentplaneligible` | Boolean | Legacy/candidate payment-plan eligibility flag; not enough for Stripe plan logic |
 
+## Confirmed Milestone #6 Dataverse Targets
+
+The Milestone #6 schema targets were created and published in Dataverse on June 19, 2026, and added to the `JM1_Publishing` solution. These fields are status/source fields only; creating them does not authorize contract, invoice, payment-link, onboarding, Opportunity-write, Flow D, or production automation.
+
+| Need | Table | Logical Name | Status |
+| --- | --- | --- | --- |
+| Alternative package | `jm1pub_editorialdiagnostic` | `jm1_m6alternatepackagecode` | Confirmed-created |
+| Author-selected package | `opportunity` | `jm1_m6authorselectedpackagecode` | Confirmed-created |
+| Package selection status | `opportunity` | `jm1_m6packageselectionstatus` | Confirmed-created |
+| Stripe product mapping status | `opportunity` | `jm1_m6stripeproductmappingstatus` | Confirmed-created |
+| Stripe price mapping status | `opportunity` | `jm1_m6stripepricemappingstatus` | Confirmed-created |
+| Payment option preparation status | `opportunity` | `jm1_m6paymentoptionpreparationstatus` | Confirmed-created |
+| Agreement preparation status | `opportunity` | `jm1_m6agreementpreparationstatus` | Confirmed-created |
+| Onboarding status | `opportunity` | `jm1_m6onboardingstatus` | Confirmed-created |
+| Opportunity update status | `opportunity` | `jm1_m6opportunityupdatestatus` | Confirmed-created |
+| Business Central / Sales Enterprise handoff status | `opportunity` | `jm1_m6businesshandoffstatus` | Confirmed-created |
+
+Author package selection is stored on the existing active Opportunity. Package recommendation and override remain sourced from `jm1pub_editorialdiagnostic`. The existing Opportunity remains the business pipeline record; duplicate Opportunity creation is not allowed.
+
 ## Required Field/Rule Gaps
 
-Milestone #6 live-business completion is blocked until these source-of-truth items are confirmed or created:
+Milestone #6 live-business completion is still blocked until these source-of-truth items are confirmed:
 
 | Need | Required Governance Decision |
 | --- | --- |
-| Primary package recommendation | Which table/field is canonical after human review: diagnostic package fields, Opportunity `jm1pub_packagerecommended`, or another catalog-backed field |
-| Alternative package | Field or structured safe JSON target for recommended alternative package |
-| Author package selection | Canonical table/field for author-selected package/path and selection timestamp |
-| Stripe product/price mapping | Governed mapping from package codes to Stripe product and price IDs |
-| Stripe payment option preparation | Field/table for prepared payment-option metadata without live checkout/payment link creation |
-| Stripe payment handoff status | Field/table for handoff status such as `PAYMENT_OPTIONS_PREPARED`, `PAYMENT_LINK_PENDING_APPROVAL`, `PAYMENT_LINK_SENT` |
-| Onboarding status | Canonical field/table for `ONBOARDING_PENDING`, `ONBOARDING_REQUESTED`, `ONBOARDING_RECEIVED` |
-| Agreement preparation status | Canonical field/table for `AGREEMENT_PREPARATION_PENDING`, `AGREEMENT_DRAFT_PREPARED`, `AGREEMENT_SENT` |
-| Business Central / Sales Enterprise handoff | Whether Opportunity fields are sufficient or a Business Central/Sales Enterprise handoff table/status is required |
+| Stripe product/price mapping | Governed mapping from all package codes to confirmed Stripe product and price IDs |
 | Contract/payment provider approval | Confirmed provider/process for agreement documents and Stripe payment execution |
+| Live author package selection capture | Human-approved path to write selected package/status to the existing Opportunity |
+| Live agreement/onboarding action | Human-approved action to prepare agreement/onboarding without starting production |
 
 ## Safe Milestone #6 Status Model
 
@@ -231,9 +244,9 @@ The source layer confirms:
 - Stage 2 trigger: only after author package selection or request for payment details
 - QBO status: retired legacy, not allowed for new Milestone #6 logic
 
-The source layer proposes these Dataverse targets for schema confirmation:
+The source layer confirms these Dataverse targets:
 
-| Need | Proposed Target | Proposed Logical Name |
+| Need | Target | Logical Name |
 | --- | --- | --- |
 | Alternative package | `jm1pub_editorialdiagnostic` | `jm1_m6alternatepackagecode` |
 | Author-selected package | `opportunity` | `jm1_m6authorselectedpackagecode` |
@@ -246,6 +259,19 @@ The source layer proposes these Dataverse targets for schema confirmation:
 | Opportunity update status | `opportunity` | `jm1_m6opportunityupdatestatus` |
 | Business Central / Sales Enterprise handoff status | `opportunity` | `jm1_m6businesshandoffstatus` |
 
-Milestone #6 is not yet live-business complete. The current controlled record has an existing active Opportunity, so duplicate Opportunity creation is not allowed. The next governed step is to confirm or create the proposed package selection, Stripe mapping, onboarding, agreement, and handoff fields before any live agreement/onboarding action.
+## Stripe Mapping Inspection
+
+Read-only Stripe dashboard inspection on June 19, 2026 confirmed one package product/price pair:
+
+| Package Code | Package | Required Price | Stripe Product | Stripe Price | Status |
+| --- | --- | ---: | --- | --- | --- |
+| `JMP-PKG-STARTER` | Starter Publishing Package | `$1,999` | `prod_URbgo7mwC7qr6t` | `price_1TSiTaJCiOVFpgYufee7GLQs` | Confirmed |
+| `JMP-PKG-PRO` | Professional Publishing Package | `$4,500` | Not found | Not found | Blocked |
+| `JMP-PKG-SIGNATURE` | Signature Publishing Partnership | `$7,500` | Not found | Not found | Blocked |
+| `JMP-PKG-CHILD` | Children's Package, author provides art | `$2,495` | Not found | Not found | Blocked |
+
+Do not invent the missing product or price IDs. Do not create Stripe payment links, invoices, checkout sessions, subscriptions, installment schedules, or customer changes from this inspection.
+
+Milestone #6 is not yet live-business complete. The current controlled record has an existing active Opportunity, so duplicate Opportunity creation is not allowed. The next governed step is to create or confirm the missing Stripe products/prices and then record the governed package-to-Stripe mapping before any live agreement/onboarding action.
 
 No production work is authorized by this plan.
