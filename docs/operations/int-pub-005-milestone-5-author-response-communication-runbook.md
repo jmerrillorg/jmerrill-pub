@@ -67,6 +67,28 @@ The internal route sends only to `publishing@jmerrill.one`, with no author To/CC
 
 No live send is authorized by the route implementation itself. Controlled live use still requires explicit authorization, correct gate values, safe payload preparation, and Dataverse logging readiness.
 
+## Diagnostic Runner ACS Relay Provider Settings
+
+The diagnostic runner uses the `acs-relay` provider mode to call the ACS relay routes. Required app settings for live controlled testing:
+
+```text
+JM1_INTERNAL_NOTIFICATIONS_ENABLED=false
+JM1_INTERNAL_NOTIFICATION_PROVIDER=acs-relay
+JM1_INTERNAL_NOTIFICATION_FROM=DoNotReply@email.jmerrill.one
+JM1_INTERNAL_NOTIFICATION_REPLY_TO=DoNotReply@email.jmerrill.one
+JM1_INTERNAL_NOTIFICATION_RELAY_URL=https://func-jm1-acs-email-relay.azurewebsites.net
+JM1_INTERNAL_NOTIFICATION_RELAY_KEY=<secure relay key>
+
+JM1_AUTHOR_RESPONSE_SEND_ENABLED=false
+JM1_AUTHOR_RESPONSE_SEND_PROVIDER=acs-relay
+JM1_AUTHOR_RESPONSE_SEND_FROM=DoNotReply@email.jmerrill.one
+JM1_AUTHOR_RESPONSE_SEND_REPLY_TO=DoNotReply@email.jmerrill.one
+JM1_AUTHOR_RESPONSE_SEND_RELAY_URL=https://func-jm1-acs-email-relay.azurewebsites.net
+JM1_AUTHOR_RESPONSE_SEND_RELAY_KEY=<secure relay key>
+```
+
+The relay key must be stored only in Azure app settings or an approved secret store. Do not commit it, print it, or place it in local settings files.
+
 ## Dataverse Send Logging
 
 Author-facing send events are logged to `jm1_executionlogs` with safe metadata only:

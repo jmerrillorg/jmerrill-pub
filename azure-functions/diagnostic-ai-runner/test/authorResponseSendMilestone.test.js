@@ -261,6 +261,64 @@ describe("author response provider boundary", () => {
     assertSafeFailure(result, "AUTHOR_RESPONSE_SEND_PROVIDER_REJECTED");
     assert.equal(result.deliveryStatus, AUTHOR_RESPONSE_SEND_STATUS.FAILED);
   });
+
+  test("enabled ACS relay config requires route URL and relay key", () => {
+    const missingUrl = getAuthorResponseSendProviderConfig(enabledEnv({
+      [ENV_VARS.provider]: PROVIDER.ACS_RELAY,
+      [ENV_VARS.relayUrl]: "",
+      [ENV_VARS.relayKey]: "SECRET_RELAY_KEY"
+    }));
+    assert.equal(missingUrl.ok, false);
+    assert.equal(missingUrl.reason, "AUTHOR_RESPONSE_SEND_RELAY_URL_MISSING");
+
+    const missingKey = getAuthorResponseSendProviderConfig(enabledEnv({
+      [ENV_VARS.provider]: PROVIDER.ACS_RELAY,
+      [ENV_VARS.relayUrl]: "https://func-jm1-acs-email-relay.azurewebsites.net"
+    }));
+    assert.equal(missingKey.ok, false);
+    assert.equal(missingKey.reason, "AUTHOR_RESPONSE_SEND_RELAY_KEY_MISSING");
+    assert.equal(JSON.stringify(missingKey).includes("SECRET"), false);
+  });
+
+  test("ACS relay provider posts safe approved author response payload", async () => {
+    const originalFetch = global.fetch;
+    const calls = [];
+    global.fetch = async (url, options) => {
+      calls.push({ url, options });
+      return {
+        ok: true,
+        async json() {
+          return {
+            accepted: true,
+            providerMessageId: "acs-author-response-message-id"
+          };
+        }
+      };
+    };
+
+    try {
+      const result = await sendConfiguredAuthorResponse({
+        input: { sendApproval: approval() },
+        env: enabledEnv({
+          [ENV_VARS.provider]: PROVIDER.ACS_RELAY,
+          [ENV_VARS.relayUrl]: "https://func-jm1-acs-email-relay.azurewebsites.net",
+          [ENV_VARS.relayKey]: "SECRET_RELAY_KEY"
+        })
+      });
+
+      assert.equal(result.ok, true);
+      assert.equal(result.providerMessageId, "acs-author-response-message-id");
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0].url.endsWith("/api/send-approved-author-response"), true);
+      const body = JSON.parse(calls[0].options.body);
+      assert.equal(body.messageType, "APPROVED_AUTHOR_RESPONSE");
+      assert.equal(body.authorEmail, sendPreparationRecord.authorEmail);
+      assert.deepEqual(body.cc, [INTERNAL_VISIBILITY_MAILBOX]);
+      assert.equal(JSON.stringify(result).includes("SECRET_RELAY_KEY"), false);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
 });
 
 describe("author response Dataverse send logging", () => {

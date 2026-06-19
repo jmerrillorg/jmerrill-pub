@@ -364,13 +364,71 @@ describe("internal notification provider config - safety", () => {
     assert.equal(serialized.includes("OPPORTUNITY_READY"), false);
   });
 
-  test("module exports no author-facing mail, Opportunity, Flow D, diagnostic run, or production activation path", () => {
+  test("enabled ACS relay config requires route URL and relay key", () => {
+    const missingUrl = getInternalNotificationProviderConfig(enabledEnv({
+      [ENV_VARS.provider]: PROVIDER.ACS_RELAY,
+      [ENV_VARS.relayUrl]: "",
+      [ENV_VARS.relayKey]: "SECRET_RELAY_KEY"
+    }));
+    assert.equal(missingUrl.ok, false);
+    assert.equal(missingUrl.reason, "INTERNAL_NOTIFICATION_RELAY_URL_MISSING");
+
+    const missingKey = getInternalNotificationProviderConfig(enabledEnv({
+      [ENV_VARS.provider]: PROVIDER.ACS_RELAY,
+      [ENV_VARS.relayUrl]: "https://func-jm1-acs-email-relay.azurewebsites.net"
+    }));
+    assert.equal(missingKey.ok, false);
+    assert.equal(missingKey.reason, "INTERNAL_NOTIFICATION_RELAY_KEY_MISSING");
+    assert.equal(JSON.stringify(missingKey).includes("SECRET"), false);
+  });
+
+  test("ACS relay provider posts safe internal notification payload", async () => {
+    const originalFetch = global.fetch;
+    const calls = [];
+    global.fetch = async (url, options) => {
+      calls.push({ url, options });
+      return {
+        ok: true,
+        async json() {
+          return {
+            accepted: true,
+            providerMessageId: "acs-internal-message-id"
+          };
+        }
+      };
+    };
+
+    try {
+      const result = await deliverConfiguredInternalAuthorDraftReviewNotification({
+        input: input(),
+        env: enabledEnv({
+          [ENV_VARS.provider]: PROVIDER.ACS_RELAY,
+          [ENV_VARS.relayUrl]: "https://func-jm1-acs-email-relay.azurewebsites.net",
+          [ENV_VARS.relayKey]: "SECRET_RELAY_KEY"
+        })
+      });
+
+      assert.equal(result.ok, true);
+      assert.equal(result.providerMessageId, "acs-internal-message-id");
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0].url.endsWith("/api/send-internal-author-draft-review-notification"), true);
+      const body = JSON.parse(calls[0].options.body);
+      assert.equal(body.notificationType, "AUTHOR_DRAFT_READY_FOR_REVIEW");
+      assert.equal(body.recipient, INTERNAL_VISIBILITY_MAILBOX);
+      assert.equal(body.authorEmail, baseDraftPayload.authorEmail);
+      assert.equal(body.draftPreview, "Thank you for sharing your work with J Merrill Publishing. This prepared draft is ready for human review.");
+      assert.equal(JSON.stringify(result).includes("SECRET_RELAY_KEY"), false);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  test("module exports no unapproved mail provider, Opportunity, Flow D, diagnostic run, or production activation path", () => {
     const config = require("../src/author/internalAuthorDraftReviewNotificationProviderConfig");
     const exportedNames = Object.keys(config).join(" ").toLowerCase();
 
     assert.equal(exportedNames.includes("gmail"), false);
     assert.equal(exportedNames.includes("outlook"), false);
-    assert.equal(exportedNames.includes("acs"), false);
     assert.equal(exportedNames.includes("sendgrid"), false);
     assert.equal(exportedNames.includes("graphmail"), false);
     assert.equal(exportedNames.includes("opportunity"), false);

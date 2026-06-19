@@ -15,11 +15,14 @@ const ENV_VARS = Object.freeze({
   enabled: "JM1_AUTHOR_RESPONSE_SEND_ENABLED",
   provider: "JM1_AUTHOR_RESPONSE_SEND_PROVIDER",
   from: "JM1_AUTHOR_RESPONSE_SEND_FROM",
-  replyTo: "JM1_AUTHOR_RESPONSE_SEND_REPLY_TO"
+  replyTo: "JM1_AUTHOR_RESPONSE_SEND_REPLY_TO",
+  relayUrl: "JM1_AUTHOR_RESPONSE_SEND_RELAY_URL",
+  relayKey: "JM1_AUTHOR_RESPONSE_SEND_RELAY_KEY"
 });
 
 const PROVIDER = Object.freeze({
-  INJECTED: "injected"
+  INJECTED: "injected",
+  ACS_RELAY: "acs-relay"
 });
 
 const CONFIG_ERROR_CODE = "AUTHOR_RESPONSE_SEND_PROVIDER_CONFIG_FAILED";
@@ -59,6 +62,8 @@ function getAuthorResponseSendProviderConfig(env = process.env) {
   const providerName = normalizeString(env[ENV_VARS.provider]).toLowerCase();
   const from = normalizeString(env[ENV_VARS.from]);
   const replyTo = normalizeString(env[ENV_VARS.replyTo]);
+  const relayUrl = normalizeString(env[ENV_VARS.relayUrl]);
+  const relayKeyConfigured = Boolean(normalizeString(env[ENV_VARS.relayKey]));
 
   if (!enabled) {
     return {
@@ -74,6 +79,8 @@ function getAuthorResponseSendProviderConfig(env = process.env) {
   if (!Object.values(PROVIDER).includes(providerName)) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_PROVIDER_UNSUPPORTED" };
   if (!from || !isApprovedInternalAddress(from)) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_FROM_INVALID" };
   if (!replyTo || !isApprovedInternalAddress(replyTo)) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_REPLY_TO_INVALID" };
+  if (providerName === PROVIDER.ACS_RELAY && !relayUrl) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_RELAY_URL_MISSING" };
+  if (providerName === PROVIDER.ACS_RELAY && !relayKeyConfigured) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_RELAY_KEY_MISSING" };
 
   return {
     ok: true,
@@ -81,11 +88,64 @@ function getAuthorResponseSendProviderConfig(env = process.env) {
     deliveryStatus: AUTHOR_RESPONSE_SEND_STATUS.PREPARED,
     providerName,
     from,
-    replyTo
+    replyTo,
+    relayUrl,
+    relayKeyConfigured
   };
 }
 
-function resolveAuthorResponseSendProvider(config, providers = {}) {
+function buildRelayUrl(baseUrl, route) {
+  const value = normalizeString(baseUrl).replace(/\/+$/, "");
+  if (value.endsWith(route)) return value;
+  return `${value}/${route}`;
+}
+
+async function postRelayJson(url, relayKey, payload) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-jm1-relay-key": relayKey
+    },
+    body: JSON.stringify(payload)
+  });
+
+  let body = {};
+  try {
+    body = await response.json();
+  } catch (_err) {
+    body = {};
+  }
+
+  if (!response.ok || body.accepted !== true) {
+    throw new Error("ACS_RELAY_REJECTED");
+  }
+
+  return body;
+}
+
+function buildAuthorResponseRelayPayload(email) {
+  const approval = email.sendApproval || {};
+  return {
+    messageType: "APPROVED_AUTHOR_RESPONSE",
+    diagnosticId: approval.diagnosticId,
+    intakeReferenceCode: approval.intakeReferenceCode,
+    authorEmail: approval.authorEmail,
+    authorName: approval.authorName,
+    projectTitle: approval.projectTitle,
+    subject: approval.draftSubject,
+    body: approval.draftBody,
+    templateName: approval.templateName,
+    approvedBy: approval.approvedBy,
+    approvedOn: approval.approvedOn,
+    internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
+    futureSendRequiresInternalCopy: true,
+    futureSendRequiresDataverseLog: true,
+    cc: [INTERNAL_VISIBILITY_MAILBOX]
+  };
+}
+
+function resolveAuthorResponseSendProvider(config, providers = {}, env = process.env) {
   if (!config?.enabled) return { ok: false, reason: "AUTHOR_RESPONSE_SEND_DISABLED" };
   if (config.providerName === PROVIDER.INJECTED) {
     const provider = providers[PROVIDER.INJECTED] || providers.injected || null;
@@ -93,6 +153,21 @@ function resolveAuthorResponseSendProvider(config, providers = {}) {
       return { ok: false, reason: "AUTHOR_RESPONSE_SEND_PROVIDER_MISSING" };
     }
     return { ok: true, provider };
+  }
+  if (config.providerName === PROVIDER.ACS_RELAY) {
+    return {
+      ok: true,
+      provider: {
+        async send(email) {
+          const result = await postRelayJson(
+            buildRelayUrl(config.relayUrl, "api/send-approved-author-response"),
+            env[ENV_VARS.relayKey],
+            buildAuthorResponseRelayPayload(email)
+          );
+          return { messageId: result.providerMessageId };
+        }
+      }
+    };
   }
   return { ok: false, reason: "AUTHOR_RESPONSE_SEND_PROVIDER_UNSUPPORTED" };
 }
@@ -159,7 +234,8 @@ function buildAuthorResponseEmail(input = {}, config = getAuthorResponseSendProv
       body: input.sendApproval.draftBody,
       templateName: input.sendApproval.templateName,
       providerName: config.providerName,
-      internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX
+      internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
+      sendApproval: input.sendApproval
     }
   };
 }
@@ -182,7 +258,7 @@ async function sendConfiguredAuthorResponse({
       intakeReferenceCode: input.sendApproval?.intakeReferenceCode || null
     };
   }
-  const providerResolution = resolveAuthorResponseSendProvider(config, providers);
+  const providerResolution = resolveAuthorResponseSendProvider(config, providers, env);
   if (!providerResolution.ok) return safeFailure(providerResolution.reason, input);
 
   try {
