@@ -876,6 +876,44 @@ PR #99 introduces governed configuration for internal author draft review notifi
 - Flow D activation is not authorized.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 35. PR #100 - Controlled Internal Notification Delivery Test
+
+PR #100 introduces and records the controlled internal notification delivery test boundary for `AUTHOR_DRAFT_READY_FOR_REVIEW`.
+
+### What changed
+
+- A controlled one-record internal notification test runner was added.
+- The runner refuses to operate when `JM1_AI_EXECUTION_ENABLED=true`.
+- The runner refuses multiple notification records.
+- Recipient remains locked to `publishing@jmerrill.one`.
+- The author is blocked from To, CC, and BCC.
+- The runner uses the PR #98/#99 internal notification delivery and safe `jm1_executionlogs` payload path.
+
+### Test result
+
+Live internal delivery was not attempted because live internal provider configuration was not present.
+
+Observed state:
+
+- `JM1_AI_EXECUTION_ENABLED=false`
+- `JM1_INTERNAL_NOTIFICATIONS_ENABLED` was not configured, which defaults to disabled
+- No `JM1_INTERNAL_NOTIFICATION_*` provider settings were present
+- Internal notification gate was not enabled
+- Gate therefore remained disabled after the check
+
+### Governance status
+
+- Controlled internal delivery test support only.
+- No author send.
+- No author-facing send event.
+- Production activation remains unauthorized.
+- `JM1_AI_EXECUTION_ENABLED=false`.
+- No diagnostic run occurred.
+- No author-facing output was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
 ## 22. PR #86 - Internal Diagnostic Result Review Layer
 
 PR #86 introduces an internal-only review payload builder for validated Stage 0 diagnostic results.
