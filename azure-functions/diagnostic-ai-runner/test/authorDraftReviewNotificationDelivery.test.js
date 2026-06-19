@@ -159,7 +159,7 @@ describe("internal author draft review notification mailer - valid delivery", ()
     assert.equal(result.email.body.includes("No author email has been sent."), true);
     assert.equal(result.email.body.includes("Next action: Review the prepared author-response draft"), true);
     assert.equal(result.email.body.includes("Author-facing send remains blocked"), true);
-    assert.equal(result.email.body.includes(baseDraftPayload.authorEmail), false);
+    assert.equal(result.email.body.includes(`Author Email (reference only): ${baseDraftPayload.authorEmail}`), true);
     assert.equal(result.email.body.includes("AUTHOR_EMAIL_SENT"), false);
     assert.equal(result.email.body.includes("SENT_TO_AUTHOR"), false);
   });
