@@ -139,26 +139,53 @@ Use existing tables where possible:
 
 ### `jm1pub_editorialstage` Confirmation
 
-The BP-07 canon defines `jm1pub_editorialstage` as the stage-state table for live editorial tracking. Azure Dataverse metadata inspection on June 19, 2026 returned:
+The BP-07 canon defines `jm1pub_editorialstage` as the stage-state table for live editorial tracking. It was created, published, and confirmed in Dataverse on June 19, 2026.
 
-- `EntityMetadata With Id = LogicalName='jm1pub_editorialstage' does not exist.`
+| Item | Value |
+| --- | --- |
+| Table logical name | `jm1pub_editorialstage` |
+| Schema name | `jm1pub_EditorialStage` |
+| Entity set | `jm1pub_editorialstages` |
+| Primary ID | `jm1pub_editorialstageid` |
+| Primary name | `jm1pub_name` |
+| Solution | `JM1_Publishing` |
+| Solution component | Confirmed |
 
-Therefore Milestone #7C records this as a schema readiness blocker, not a bypass. Before live BP-07 tracker activation, create or confirm:
+Confirmed fields:
 
 | Field | Purpose |
 | --- | --- |
-| `jm1pub_project` | Project lookup |
-| `jm1pub_stagetype` | Review, Developmental, Line, Copyedit, Proofread, Rewrite/Author Revision |
-| `jm1pub_stagestatus` | Not Started, In Progress, Plan Delivered, Plan Approved, Calibration Approved, On Hold, Complete |
+| `jm1pub_name` | Editorial stage record name |
+| `jm1pub_intakereference` | Intake reference |
+| `jm1pub_diagnosticid` | Diagnostic ID |
+| `jm1pub_opportunityreference` | Opportunity reference |
+| `jm1pub_publishingintakereference` | Publishing Intake reference |
+| `jm1pub_projecttitle` | Project/title |
+| `jm1pub_author` | Author label |
+| `jm1pub_selectedpackage` | Selected package |
+| `jm1pub_imprintpath` | Imprint/path |
+| `jm1pub_stagetype` | Review, Developmental, Line, Copyedit, Proofread, Rewrite/Author Revision, Hold/Blocked, Complete/Ready for Production Handoff |
+| `jm1pub_stagestatus` | Not Started, In Progress, Plan Delivered, Plan Approved, Calibration Approved, Author Revision Requested, Author Revision Received, On Hold/Blocked, Complete |
 | `jm1pub_phase` | Diagnosis or Execution |
+| `jm1pub_assignedownereditor` | Assigned owner/editor |
+| `jm1pub_duedate` | Due date |
+| `jm1pub_blockerstatus` | Blocker status |
+| `jm1pub_blockerreason` | Safe blocker reason/reference |
+| `jm1pub_authorrevisionrequired` | Author revision required |
+| `jm1pub_authorrevisionrequesteddate` | Author revision requested date |
+| `jm1pub_authorrevisionreceiveddate` | Author revision received date |
+| `jm1pub_stylesheeturl` | SharePoint style-sheet reference |
+| `jm1pub_editorialdeliverableurl` | SharePoint deliverable reference |
+| `jm1pub_finaleditorialapprovalstatus` | Final editorial approval status |
+| `jm1pub_productionhandoffapprovalstatus` | Production handoff approval status |
+| `jm1pub_internalvisibilitystatus` | Internal visibility status |
+| `jm1pub_executionlogcorrelationreference` | Execution log/correlation reference |
 | `jm1pub_voiceflag` | Voice-preservation hold |
 | `jm1pub_retentionfail` | Retention-rule hold |
 | `jm1pub_hardstopflag` | Hard-stop hold |
 | `jm1pub_flagnote` | Safe flag note/reference |
-| `jm1pub_deliverableurl` | SharePoint deliverable reference |
-| `jm1pub_stylesheeturl` | SharePoint style-sheet reference |
-| `jm1pub_startdate` | Stage start date |
-| `jm1pub_completedate` | Stage completion date |
+| `jm1pub_stagestartdate` | Stage start date |
+| `jm1pub_stagecompletedate` | Stage completion date |
 
 ## Editorial Agent Readiness
 
@@ -258,10 +285,13 @@ It does not:
 Gate:
 
 - `JM1_EDITORIAL_COMMAND_CENTER_ENABLED`
+- `JM1_EDITORIAL_STAGE_TRACKER_ENABLED`
 
 Default:
 
 - `false`
+
+Both gates remain false unless separately authorized. The command-center gate controls live workbench operation. The stage-tracker gate controls BP-07 transition processing.
 
 The gate is separate from:
 
@@ -290,4 +320,4 @@ The current controlled record remains:
 | Existing Opportunity | `2653fca9-eacd-4c44-b3ed-1764dd5d35aa` |
 | Opportunity name | `Publishing Intake - Establishing Glory: The Library` |
 
-Milestone #7C is system-readiness only. Live editorial work for a real author remains blocked until author-specific readiness is satisfied, the `jm1pub_editorialstage` schema is created/confirmed, human authorization is recorded, and the command center gate is explicitly enabled.
+Milestone #7C is system-readiness only. Live editorial work for a real author remains blocked until author-specific readiness is satisfied, human authorization is recorded, and the command center/stage-tracker gates are explicitly enabled.
