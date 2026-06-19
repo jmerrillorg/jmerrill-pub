@@ -776,6 +776,29 @@ Future author-facing sending remains a later governed phase. Any future send mus
 
 ---
 
+## 26. PR #98 - Internal Author Draft Review Notification Persistence and Delivery
+
+PR #98 introduces persistence and provider-injected internal delivery for `AUTHOR_DRAFT_READY_FOR_REVIEW` notifications.
+
+This is the first visible internal review touchpoint: J Merrill Publishing can receive or prepare a notification that a draft author response is ready for human review. It is not author-facing delivery.
+
+### Persistence and delivery boundary
+
+- Persistence target is the confirmed `jm1_executionlogs` operational log pattern.
+- The execution-log payload stores safe metadata only: event type, diagnostic ID, intake reference, `publishing@jmerrill.one`, delivery intent, internal delivery status, `DRAFT_ONLY`, `PENDING_HUMAN_APPROVAL`, safe author/project labels, and safe draft preview.
+- Internal notification delivery is locked to `publishing@jmerrill.one`.
+- The author must not appear in To, CC, or BCC.
+- Internal delivery uses an injected provider only. No live internal mail provider is hardwired by this PR.
+- If the provider is missing or rejects the send, the delivery path fails closed.
+
+### Non-execution boundary
+
+PR #98 does not send author email, send the author-response draft to the author, create an author-facing send event, mark author email as sent, mark the draft as sent, create an Opportunity, activate Flow D, trigger follow-up automation, run diagnostics, open `JM1_AI_EXECUTION_ENABLED`, or authorize production automation.
+
+Future author-facing sending remains a later governed phase. Any future send must copy or internally mirror to `publishing@jmerrill.one`, and the send event must be logged in Dataverse.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
