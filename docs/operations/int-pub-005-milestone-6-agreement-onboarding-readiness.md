@@ -271,6 +271,42 @@ Stripe CLI live-mode inspection and creation on June 19, 2026 confirmed the four
 
 All confirmed package Prices are live-mode, `usd`, and `one_time`. Do not create Stripe payment links, invoices, checkout sessions, subscriptions, installment schedules, customer changes, tax-setting changes, charges, or payment requests from this mapping.
 
-Milestone #6 is not yet live-business complete. The current controlled record has an existing active Opportunity, so duplicate Opportunity creation is not allowed. The next governed step is a separately authorized live package-selection/agreement/onboarding action path. Payment options remain blocked until author package selection.
+## Governed Live-Business Completion Evidence
+
+On June 19, 2026, Jackie authorized Milestone #6 agreement/onboarding readiness completion for the current controlled record only. The action updated the existing active Opportunity and the existing Editorial Diagnostic record, then created one safe `jm1_executionlog` evidence row.
+
+Persisted Dataverse evidence:
+
+| Evidence | Value |
+| --- | --- |
+| Opportunity | `2653fca9-eacd-4c44-b3ed-1764dd5d35aa` |
+| Editorial Diagnostic | `64e387e0-7e6a-f111-a826-00224820105b` |
+| Execution Log | `60ee2061-d76b-f111-a826-000d3a9eacee` |
+| Internal visibility mailbox | `publishing@jmerrill.one` |
+
+Persisted Opportunity readiness fields:
+
+| Field | Value |
+| --- | --- |
+| `jm1pub_packagerecommended` | `JMP-PKG-PRO` |
+| `jm1_m6authorselectedpackagecode` | blank; author selection pending |
+| `jm1_m6packageselectionstatus` | `PACKAGE_SELECTION_PENDING` |
+| `jm1_m6stripeproductmappingstatus` | `STRIPE_MAPPING_CONFIRMED` |
+| `jm1_m6stripepricemappingstatus` | `STRIPE_MAPPING_CONFIRMED` |
+| `jm1_m6paymentoptionpreparationstatus` | `PAYMENT_OPTIONS_PENDING_AUTHOR_SELECTION` |
+| `jm1_m6agreementpreparationstatus` | `AGREEMENT_PREPARATION_READY` |
+| `jm1_m6onboardingstatus` | `ONBOARDING_READY` |
+| `jm1_m6opportunityupdatestatus` | `OPPORTUNITY_UPDATED_MILESTONE_6` |
+| `jm1_m6businesshandoffstatus` | `BUSINESS_HANDOFF_READY` |
+
+Persisted Editorial Diagnostic readiness field:
+
+| Field | Value |
+| --- | --- |
+| `jm1_m6alternatepackagecode` | `JMP-PKG-STARTER` |
+
+The execution-log evidence records that the existing Opportunity was used, no duplicate Opportunity was created, Stripe Product/Price mapping was confirmed, and internal visibility was prepared for `publishing@jmerrill.one`.
+
+This completion does not send an author email, internal notification email, payment link, invoice, contract, checkout session, payment request, or onboarding automation. It does not activate Flow D, start production, assign ISBN, start editing/layout/cover/distribution/release work, or use QBO. Payment options remain blocked until author package selection or an author request for payment details.
 
 No production work is authorized by this plan.
