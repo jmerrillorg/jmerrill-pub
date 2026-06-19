@@ -62,12 +62,12 @@ This pass does not enable any live/public execution gate.
 | `JMP-PIPELINE-BLUEPRINT-v1_0.md` | J0-J8 doctrine/data/automation/execution map | All stages | Accounted for as sequencing authority through Milestone #10 |
 | `JMP-FLOW-BP04-AgreementExecution-v1_0.md` | Agreement execution and G1 evidence | Milestone #6 / pre-M9 | Already-completed milestone source; live contract sending remains separately governed |
 | `JMP-FLOW-BP05-ContractPaymentAccepted-v1_0.md` | Payment accepted, G2, project creation boundary | Milestone #6 / pre-M9 | Already-completed milestone source; no invoice/payment action in this pass |
-| `JMP-FLOW-BP06-AIDisclosureCapture-v1_0.md` | AI disclosure capture before AI-assisted production/editorial execution | Pre-M9 | Gate documented false; must be respected before AI-assisted editorial execution |
+| `JMP-FLOW-BP06-AIDisclosureCapture-v1_0.md` | AI disclosure capture before AI-assisted production/editorial execution | Pre-M9 | Completion pass implemented; gate remains false until live activation |
 | `JMP-FLOW-BP07-EditorialStageTracker-v1_0.md` | Editorial stage tracker, J3 event vocabulary, G3 exit | Milestone #7C | Schema-backed by `jm1pub_editorialstage`; stage tracker still gated false |
 | `JMP-AGENT-BP08-EditorialAgent-v1_0.md` | Future supervised editorial execution agent | Milestone #7C future readiness | Scaffolded, not active; no autonomous editorial work or author delivery |
-| `JMP-FLOW-BP09-CoverValidation-v1_0.md` | Cover validation before production/distribution release | M7/M8/pre-M9 | Gate documented false; must be respected before release readiness |
-| `JMP-FLOW-BP10-ReleaseLock-v1_0.md` | Release lock before date commitments and downstream submissions | Pre-M9 | Gate documented false; release lock must precede M9 launch/release |
-| `JMP-FLOW-BP11-LaunchReadiness-v1_0.md` | Launch readiness check | Milestone #9 | M9 source; not started |
+| `JMP-FLOW-BP09-CoverValidation-v1_0.md` | Cover validation before production/distribution release | M7/M8/pre-M9 | Completion pass implemented; gate remains false until live activation |
+| `JMP-FLOW-BP10-ReleaseLock-v1_0.md` | Release lock before date commitments and downstream submissions | Pre-M9 | Completion pass implemented; gate remains false until live activation |
+| `JMP-FLOW-BP11-LaunchReadiness-v1_0.md` | Launch readiness check | Milestone #9 | Launch readiness model implemented behind BP-06/BP-09/BP-10 |
 | `JMP-AGENT-BP12-MarketingAgent-v1_0.md` | Future marketing agent support | M9 future readiness | Scaffolded, not active; no autonomous public campaign execution |
 | `JMP-FLOW-BP14-BP15-J8-AnnualReview-LoyaltyProgression-v1_0.md` | Annual review and loyalty progression | Milestone #10 | M10 post-release/lifecycle source; not started |
 | `JMP-IncludedServices-NonTransferability-Clause-v1_0.md` | Included services, package, onboarding, agreement policy | Milestone #6 | Agreement/onboarding/package governance source; no contract automation here |
@@ -87,9 +87,9 @@ This pass does not enable any live/public execution gate.
 | Blocker | Status | Evidence |
 | --- | --- | --- |
 | `jm1pub_editorialstage` absent | Resolved | Table created/confirmed in `JM1_Publishing` |
-| BP-06 AI disclosure automation | Gate documented false | `JM1_AI_DISCLOSURE_CAPTURE_ENABLED=false`; must be addressed before AI-assisted editorial execution |
-| BP-09 cover validation | Gate documented false | `JM1_COVER_VALIDATION_ENABLED=false`; must be addressed before release readiness |
-| BP-10 release lock | Gate documented false | `JM1_RELEASE_LOCK_ENABLED=false`; must be addressed before M9 launch/release |
+| BP-06 AI disclosure automation | Completion pass implemented | `JM1_AI_DISCLOSURE_CAPTURE_ENABLED=false`; live activation remains separate |
+| BP-09 cover validation | Completion pass implemented | `JM1_COVER_VALIDATION_ENABLED=false`; live activation remains separate |
+| BP-10 release lock | Completion pass implemented | `JM1_RELEASE_LOCK_ENABLED=false`; live activation remains separate |
 
 ## Explicit Non-Actions
 
