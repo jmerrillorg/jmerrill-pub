@@ -5,7 +5,47 @@ const { DefaultAzureCredential } = require("@azure/identity");
 const ALLOWED_INTAKE_CHANNEL = "INT-PUB-005 /join";
 const DEFAULT_PROJECT_TITLE = "your book";
 const REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i;
+const DIAGNOSTIC_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_FIELD_LENGTH = 300;
+const MAX_BODY_LENGTH = 6000;
+const ACS_PROVIDER_NAME = "acs-email";
+const ACS_SENDER = "DoNotReply@email.jmerrill.one";
+const INTERNAL_VISIBILITY_MAILBOX = "publishing@jmerrill.one";
+const INTERNAL_NOTIFICATION_TYPE = "AUTHOR_DRAFT_READY_FOR_REVIEW";
+const APPROVED_AUTHOR_RESPONSE_TYPE = "APPROVED_AUTHOR_RESPONSE";
+const INTERNAL_NOTIFICATION_SENT = "INTERNAL_NOTIFICATION_SENT";
+const AUTHOR_RESPONSE_SENT = "AUTHOR_RESPONSE_SENT";
+const DRAFT_STATUS = "DRAFT_ONLY";
+const DRAFT_APPROVAL_STATUS = "PENDING_HUMAN_APPROVAL";
+
+const UNSAFE_FIELD_NAMES = new Set([
+  "manuscript",
+  "manuscriptText",
+  "extractedManuscriptContent",
+  "prompt",
+  "promptBody",
+  "rawModelOutput",
+  "rawModelResponse",
+  "opportunity",
+  "opportunityPayload",
+  "opportunityReady",
+  "flowD",
+  "flowDTrigger",
+  "flowDReady",
+  "secret",
+  "secrets",
+  "token",
+  "tokens",
+  "apiKey",
+  "key",
+  "keys",
+  "header",
+  "headers",
+  "authorization",
+  "cookie",
+  "cookies",
+  "connectionString"
+]);
 
 let emailClient;
 
@@ -40,12 +80,51 @@ function normalizeText(value) {
   return safeTrim(value).slice(0, MAX_FIELD_LENGTH);
 }
 
+function normalizeBody(value) {
+  return safeTrim(value).slice(0, MAX_BODY_LENGTH);
+}
+
 function isValidEmail(value) {
   if (!value || value.length > 254 || /[\r\n]/.test(value)) {
     return false;
   }
 
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function isJmerrillPubMailbox(value) {
+  return normalizeText(value).toLowerCase().endsWith("@jmerrill.pub");
+}
+
+function normalizeRecipients(value) {
+  if (value === undefined || value === null) {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => normalizeText(item).toLowerCase()).filter(Boolean);
+  }
+
+  const single = normalizeText(value).toLowerCase();
+  return single ? [single] : [];
+}
+
+function hasUnsafeField(value) {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  if (Array.isArray(value)) {
+    return value.some((item) => hasUnsafeField(item));
+  }
+
+  return Object.entries(value).some(([key, nestedValue]) => {
+    if (UNSAFE_FIELD_NAMES.has(key)) {
+      return true;
+    }
+
+    return hasUnsafeField(nestedValue);
+  });
 }
 
 function unauthorized(reference) {
@@ -77,6 +156,45 @@ function serverError(code, reference) {
       status: "error",
       code,
       reference
+    }
+  };
+}
+
+function milestoneValidationError(reason, payload = {}) {
+  return {
+    status: 400,
+    jsonBody: {
+      accepted: false,
+      code: "ACS_RELAY_VALIDATION_FAILED",
+      reason,
+      intakeReferenceCode: normalizeText(payload.intakeReferenceCode),
+      diagnosticId: normalizeText(payload.diagnosticId)
+    }
+  };
+}
+
+function milestoneUnauthorized(payload = {}) {
+  return {
+    status: 401,
+    jsonBody: {
+      accepted: false,
+      code: "UNAUTHORIZED",
+      reason: "UNAUTHORIZED",
+      intakeReferenceCode: normalizeText(payload.intakeReferenceCode),
+      diagnosticId: normalizeText(payload.diagnosticId)
+    }
+  };
+}
+
+function milestoneServerError(code, payload = {}) {
+  return {
+    status: 502,
+    jsonBody: {
+      accepted: false,
+      code,
+      reason: code,
+      intakeReferenceCode: normalizeText(payload.intakeReferenceCode),
+      diagnosticId: normalizeText(payload.diagnosticId)
     }
   };
 }
@@ -126,9 +244,9 @@ function validatePayload(payload) {
 function buildAcknowledgmentEmail(payload) {
   const senderAddress = safeTrim(process.env.ACS_EMAIL_SENDER);
 
-  if (!senderAddress) {
+  if (!senderAddress || senderAddress !== ACS_SENDER) {
     throw Object.assign(new Error("ACS sender is missing."), {
-      safeCode: "ACS_SENDER_MISSING"
+      safeCode: senderAddress ? "ACS_SENDER_INVALID" : "ACS_SENDER_MISSING"
     });
   }
 
@@ -168,6 +286,256 @@ function buildAcknowledgmentEmail(payload) {
       ]
     }
   };
+}
+
+function validateCommonMilestoneFields(payload) {
+  if (hasUnsafeField(payload)) {
+    return { ok: false, reason: "UNSAFE_FIELD_PRESENT" };
+  }
+
+  const intakeReferenceCode = normalizeText(payload.intakeReferenceCode);
+  const diagnosticId = normalizeText(payload.diagnosticId);
+
+  if (!intakeReferenceCode || !REFERENCE_PATTERN.test(intakeReferenceCode)) {
+    return { ok: false, reason: "INTAKE_REFERENCE_CODE_INVALID" };
+  }
+
+  if (!diagnosticId || !DIAGNOSTIC_ID_PATTERN.test(diagnosticId)) {
+    return { ok: false, reason: "DIAGNOSTIC_ID_INVALID" };
+  }
+
+  return { ok: true, intakeReferenceCode, diagnosticId };
+}
+
+function validateInternalNotificationPayload(payload = {}) {
+  const common = validateCommonMilestoneFields(payload);
+  if (!common.ok) return common;
+
+  const authorEmail = normalizeText(payload.authorEmail).toLowerCase();
+  const recipient = normalizeText(payload.recipient || payload.to).toLowerCase();
+  const to = normalizeRecipients(payload.to === undefined ? recipient : payload.to);
+  const cc = normalizeRecipients(payload.cc);
+  const bcc = normalizeRecipients(payload.bcc);
+  const allRecipients = [...to, ...cc, ...bcc];
+
+  if (normalizeText(payload.notificationType) !== INTERNAL_NOTIFICATION_TYPE) {
+    return { ok: false, reason: "NOTIFICATION_TYPE_INVALID" };
+  }
+
+  if (authorEmail && allRecipients.includes(authorEmail)) {
+    return { ok: false, reason: "AUTHOR_RECIPIENT_BLOCKED" };
+  }
+
+  if (recipient !== INTERNAL_VISIBILITY_MAILBOX || to.length !== 1 || to[0] !== INTERNAL_VISIBILITY_MAILBOX) {
+    return { ok: false, reason: "RECIPIENT_INVALID" };
+  }
+
+  if (cc.length > 0 || bcc.length > 0) {
+    return { ok: false, reason: "CC_BCC_NOT_ALLOWED" };
+  }
+
+  if (allRecipients.some(isJmerrillPubMailbox) || isJmerrillPubMailbox(authorEmail)) {
+    return { ok: false, reason: "JMERRILL_PUB_MAILBOX_NOT_ALLOWED" };
+  }
+
+  if (normalizeText(payload.draftStatus) !== DRAFT_STATUS) {
+    return { ok: false, reason: "DRAFT_STATUS_INVALID" };
+  }
+
+  if (normalizeText(payload.approvalStatus) !== DRAFT_APPROVAL_STATUS) {
+    return { ok: false, reason: "APPROVAL_STATUS_INVALID" };
+  }
+
+  const draftPreview = normalizeBody(payload.draftPreview);
+  if (!draftPreview) {
+    return { ok: false, reason: "DRAFT_PREVIEW_MISSING" };
+  }
+
+  return {
+    ok: true,
+    value: {
+      notificationType: INTERNAL_NOTIFICATION_TYPE,
+      diagnosticId: common.diagnosticId,
+      intakeReferenceCode: common.intakeReferenceCode,
+      authorName: normalizeText(payload.authorName),
+      authorEmail,
+      projectTitle: normalizeText(payload.projectTitle),
+      draftStatus: DRAFT_STATUS,
+      approvalStatus: DRAFT_APPROVAL_STATUS,
+      draftPreview,
+      nextAction: normalizeText(payload.nextAction) || "Review the prepared author-response draft before any author-facing send is considered.",
+      recipient: INTERNAL_VISIBILITY_MAILBOX
+    }
+  };
+}
+
+function validateApprovedAuthorResponsePayload(payload = {}) {
+  const common = validateCommonMilestoneFields(payload);
+  if (!common.ok) return common;
+
+  const authorEmail = normalizeText(payload.authorEmail).toLowerCase();
+  const to = normalizeRecipients(payload.to === undefined ? authorEmail : payload.to);
+  const cc = normalizeRecipients(payload.cc);
+  const bcc = normalizeRecipients(payload.bcc);
+  const internalVisibilityMailbox = normalizeText(payload.internalVisibilityMailbox).toLowerCase();
+  const allRecipients = [...to, ...cc, ...bcc, internalVisibilityMailbox].filter(Boolean);
+
+  if (normalizeText(payload.messageType) !== APPROVED_AUTHOR_RESPONSE_TYPE) {
+    return { ok: false, reason: "MESSAGE_TYPE_INVALID" };
+  }
+
+  if (!authorEmail || !isValidEmail(authorEmail)) {
+    return { ok: false, reason: "AUTHOR_EMAIL_INVALID" };
+  }
+
+  if (to.length !== 1 || to[0] !== authorEmail) {
+    return { ok: false, reason: "AUTHOR_RECIPIENT_INVALID" };
+  }
+
+  if (internalVisibilityMailbox !== INTERNAL_VISIBILITY_MAILBOX || !cc.includes(INTERNAL_VISIBILITY_MAILBOX)) {
+    return { ok: false, reason: "INTERNAL_VISIBILITY_REQUIRED" };
+  }
+
+  if (cc.some((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX)) {
+    return { ok: false, reason: "UNAPPROVED_RECIPIENT_PRESENT" };
+  }
+
+  if (bcc.length > 0) {
+    return { ok: false, reason: "BCC_NOT_ALLOWED" };
+  }
+
+  if (allRecipients.some(isJmerrillPubMailbox)) {
+    return { ok: false, reason: "JMERRILL_PUB_MAILBOX_NOT_ALLOWED" };
+  }
+
+  const subject = normalizeText(payload.subject);
+  const body = normalizeBody(payload.body);
+  if (!subject) {
+    return { ok: false, reason: "SUBJECT_MISSING" };
+  }
+
+  if (!body) {
+    return { ok: false, reason: "BODY_MISSING" };
+  }
+
+  if (!normalizeText(payload.approvedBy)) {
+    return { ok: false, reason: "APPROVED_BY_MISSING" };
+  }
+
+  if (!normalizeText(payload.approvedOn)) {
+    return { ok: false, reason: "APPROVED_ON_MISSING" };
+  }
+
+  if (payload.futureSendRequiresInternalCopy !== true) {
+    return { ok: false, reason: "FUTURE_INTERNAL_COPY_REQUIRED" };
+  }
+
+  if (payload.futureSendRequiresDataverseLog !== true) {
+    return { ok: false, reason: "FUTURE_DATAVERSE_SEND_LOG_REQUIRED" };
+  }
+
+  return {
+    ok: true,
+    value: {
+      messageType: APPROVED_AUTHOR_RESPONSE_TYPE,
+      diagnosticId: common.diagnosticId,
+      intakeReferenceCode: common.intakeReferenceCode,
+      authorEmail,
+      authorName: normalizeText(payload.authorName),
+      projectTitle: normalizeText(payload.projectTitle),
+      subject,
+      body,
+      templateName: normalizeText(payload.templateName),
+      approvedBy: normalizeText(payload.approvedBy),
+      approvedOn: normalizeText(payload.approvedOn),
+      internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX
+    }
+  };
+}
+
+function getAcsSenderAddress() {
+  const senderAddress = safeTrim(process.env.ACS_EMAIL_SENDER);
+
+  if (!senderAddress) {
+    throw Object.assign(new Error("ACS sender is missing."), {
+      safeCode: "ACS_SENDER_MISSING"
+    });
+  }
+
+  if (senderAddress !== ACS_SENDER || isJmerrillPubMailbox(senderAddress)) {
+    throw Object.assign(new Error("ACS sender is invalid."), {
+      safeCode: "ACS_SENDER_INVALID"
+    });
+  }
+
+  return senderAddress;
+}
+
+function buildInternalNotificationEmail(payload) {
+  const plainText = [
+    "Internal notification only.",
+    "",
+    "An author-response draft is ready for internal review.",
+    "",
+    `Author: ${payload.authorName || "not provided"}`,
+    `Author Email (reference only): ${payload.authorEmail || "not provided"}`,
+    `Project: ${payload.projectTitle || "not provided"}`,
+    `Intake Reference: ${payload.intakeReferenceCode}`,
+    `Diagnostic ID: ${payload.diagnosticId}`,
+    `Draft Status: ${payload.draftStatus}`,
+    `Approval Status: ${payload.approvalStatus}`,
+    "",
+    `Next action: ${payload.nextAction}`,
+    "",
+    "No author email has been sent.",
+    "",
+    `Safe preview: ${payload.draftPreview}`
+  ].join("\n");
+
+  return {
+    senderAddress: getAcsSenderAddress(),
+    content: {
+      subject: `Internal Review Needed - Author Draft Ready - ${payload.intakeReferenceCode}`,
+      plainText
+    },
+    recipients: {
+      to: [
+        {
+          address: INTERNAL_VISIBILITY_MAILBOX,
+          displayName: "J Merrill Publishing"
+        }
+      ]
+    }
+  };
+}
+
+function buildApprovedAuthorResponseEmail(payload) {
+  return {
+    senderAddress: getAcsSenderAddress(),
+    content: {
+      subject: payload.subject,
+      plainText: payload.body
+    },
+    recipients: {
+      to: [
+        {
+          address: payload.authorEmail,
+          displayName: payload.authorName || payload.authorEmail
+        }
+      ],
+      cc: [
+        {
+          address: INTERNAL_VISIBILITY_MAILBOX,
+          displayName: "J Merrill Publishing"
+        }
+      ]
+    }
+  };
+}
+
+async function sendAcsMessage(message) {
+  const poller = await getEmailClient().beginSend(message);
+  return getOperationId(poller);
 }
 
 function getOperationId(poller) {
@@ -250,6 +618,107 @@ app.http("send-author-acknowledgment", {
       context.error(`ACS relay send failed: ${code}; reference=${reference}`);
 
       return serverError(code, reference);
+    }
+  }
+});
+
+app.http("send-internal-author-draft-review-notification", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "send-internal-author-draft-review-notification",
+  handler: async (request, context) => {
+    let body = {};
+
+    if (!verifyRelayKey(request)) {
+      context.warn("ACS relay rejected Milestone 5 internal notification with invalid auth.");
+      return milestoneUnauthorized(body);
+    }
+
+    try {
+      body = await request.json();
+    } catch (_error) {
+      context.warn("ACS relay rejected malformed internal notification JSON.");
+      return milestoneValidationError("INVALID_JSON", body);
+    }
+
+    const validation = validateInternalNotificationPayload(body || {});
+    if (!validation.ok) {
+      context.warn(`ACS relay internal notification validation failed: ${validation.reason}; reference=${normalizeText(body?.intakeReferenceCode)}`);
+      return milestoneValidationError(validation.reason, body);
+    }
+
+    try {
+      const providerMessageId = await sendAcsMessage(buildInternalNotificationEmail(validation.value));
+      context.info(`ACS relay accepted internal notification; reference=${validation.value.intakeReferenceCode}`);
+
+      return {
+        status: 202,
+        jsonBody: {
+          accepted: true,
+          messageType: INTERNAL_NOTIFICATION_TYPE,
+          deliveryStatus: INTERNAL_NOTIFICATION_SENT,
+          recipient: INTERNAL_VISIBILITY_MAILBOX,
+          intakeReferenceCode: validation.value.intakeReferenceCode,
+          diagnosticId: validation.value.diagnosticId,
+          provider: ACS_PROVIDER_NAME,
+          providerMessageId
+        }
+      };
+    } catch (error) {
+      const code = safeErrorCode(error);
+      context.error(`ACS relay internal notification send failed: ${code}; reference=${validation.value.intakeReferenceCode}`);
+      return milestoneServerError(code, validation.value);
+    }
+  }
+});
+
+app.http("send-approved-author-response", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "send-approved-author-response",
+  handler: async (request, context) => {
+    let body = {};
+
+    if (!verifyRelayKey(request)) {
+      context.warn("ACS relay rejected approved author response with invalid auth.");
+      return milestoneUnauthorized(body);
+    }
+
+    try {
+      body = await request.json();
+    } catch (_error) {
+      context.warn("ACS relay rejected malformed author response JSON.");
+      return milestoneValidationError("INVALID_JSON", body);
+    }
+
+    const validation = validateApprovedAuthorResponsePayload(body || {});
+    if (!validation.ok) {
+      context.warn(`ACS relay author response validation failed: ${validation.reason}; reference=${normalizeText(body?.intakeReferenceCode)}`);
+      return milestoneValidationError(validation.reason, body);
+    }
+
+    try {
+      const providerMessageId = await sendAcsMessage(buildApprovedAuthorResponseEmail(validation.value));
+      context.info(`ACS relay accepted approved author response; reference=${validation.value.intakeReferenceCode}`);
+
+      return {
+        status: 202,
+        jsonBody: {
+          accepted: true,
+          messageType: APPROVED_AUTHOR_RESPONSE_TYPE,
+          deliveryStatus: AUTHOR_RESPONSE_SENT,
+          recipient: validation.value.authorEmail,
+          internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
+          intakeReferenceCode: validation.value.intakeReferenceCode,
+          diagnosticId: validation.value.diagnosticId,
+          provider: ACS_PROVIDER_NAME,
+          providerMessageId
+        }
+      };
+    } catch (error) {
+      const code = safeErrorCode(error);
+      context.error(`ACS relay approved author response send failed: ${code}; reference=${validation.value.intakeReferenceCode}`);
+      return milestoneServerError(code, validation.value);
     }
   }
 });

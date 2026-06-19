@@ -54,6 +54,19 @@ The author-facing provider boundary is disabled by default. When enabled for a s
 7. The provider must be explicit and governed.
 8. Dataverse send logging must be prepared before the send is treated as complete.
 
+## ACS Relay Routes
+
+PR #102 adds concrete ACS Email relay routes for Milestone #5 controlled testing:
+
+- `POST /api/send-internal-author-draft-review-notification`
+- `POST /api/send-approved-author-response`
+
+Both routes use `JM1_RELAY_API_KEY` with `x-jm1-relay-key` and send through ACS Email using `DoNotReply@email.jmerrill.one`.
+
+The internal route sends only to `publishing@jmerrill.one`, with no author To/CC/BCC. The approved author-response route sends only to the approved author email and copies or internally mirrors `publishing@jmerrill.one`.
+
+No live send is authorized by the route implementation itself. Controlled live use still requires explicit authorization, correct gate values, safe payload preparation, and Dataverse logging readiness.
+
 ## Dataverse Send Logging
 
 Author-facing send events are logged to `jm1_executionlogs` with safe metadata only:

@@ -931,6 +931,32 @@ Live Milestone #5 completion still requires an authorized controlled send with p
 
 ---
 
+## 31. PR #102 - ACS Milestone 5 Email Relay Routes
+
+PR #102 adds concrete ACS Email relay routes for Milestone #5 controlled testing:
+
+- `/api/send-internal-author-draft-review-notification`
+- `/api/send-approved-author-response`
+
+Both routes use the existing ACS relay authentication pattern with `JM1_RELAY_API_KEY`, ACS Email only, and sender `DoNotReply@email.jmerrill.one`.
+
+### Recipient rules
+
+- Internal draft-review notification sends only to `publishing@jmerrill.one`.
+- The author is never allowed in internal notification To, CC, BCC, or hidden provider recipients.
+- Approved author response sends only to the approved author email.
+- Approved author response must copy or internally mirror `publishing@jmerrill.one`.
+- BCC is empty.
+- `@jmerrill.pub` is rejected as an active mailbox.
+
+### Fail-closed boundary
+
+The routes reject wrong message type, invalid recipient, missing internal visibility, missing approval fields, missing subject/body, missing draft preview, unsafe manuscript text, prompt body, raw model response, Opportunity fields, Flow D trigger fields, secrets, tokens, keys, headers, invalid sender, missing ACS configuration, and provider rejection.
+
+No live internal notification or author email is sent by this PR. No Opportunity is created, Flow D is not activated, diagnostics are not run, and production activation remains unauthorized.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
