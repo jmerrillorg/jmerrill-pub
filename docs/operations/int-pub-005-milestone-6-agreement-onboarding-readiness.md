@@ -309,4 +309,56 @@ The execution-log evidence records that the existing Opportunity was used, no du
 
 This completion does not send an author email, internal notification email, payment link, invoice, contract, checkout session, payment request, or onboarding automation. It does not activate Flow D, start production, assign ISBN, start editing/layout/cover/distribution/release work, or use QBO. Payment options remain blocked until author package selection or an author request for payment details.
 
+## Milestone #6B Author Choice Branching
+
+Milestone #6B pauses the move to Milestone #7 until the system can safely handle the author's reply to the editorial/package recommendation email. The first author-facing email remains editorial/package recommendation only. Money/payment-option communication is generated only after package selection or an author request for payment details.
+
+The implementation source is `azure-functions/diagnostic-ai-runner/src/author/milestone6AuthorChoicePath.js`.
+
+Supported author response branches:
+
+| Author Response | Package Selection Status | Payment Option Status | Agreement/Onboarding Status | Internal Visibility |
+| --- | --- | --- | --- | --- |
+| Selects suggested package | `PACKAGE_SELECTED` | `PAYMENT_OPTIONS_PREPARED_AFTER_PACKAGE_SELECTION` | Ready | Not required by branch |
+| Selects alternate package | `PACKAGE_SELECTED` | `PAYMENT_OPTIONS_PREPARED_AFTER_PACKAGE_SELECTION` | Ready | Not required by branch |
+| Requests meeting | `PACKAGE_SELECTION_PENDING` | `PAYMENT_OPTIONS_PENDING_AUTHOR_SELECTION` | Pending package selection | Prepare notification to `publishing@jmerrill.one` |
+| Requests payment options with selected package | `PACKAGE_SELECTED` | `PAYMENT_OPTIONS_PREPARED_AFTER_PACKAGE_SELECTION` | Ready | Not required by branch |
+| Requests payment options without selected package | blocked | blocked | blocked | Ask author to choose package/path first |
+| Needs custom quote or children's illustration quote | `PACKAGE_SELECTION_PENDING` | `PAYMENT_OPTIONS_BLOCKED_HUMAN_QUOTE_REQUIRED` | Human quote review required | Prepare notification to `publishing@jmerrill.one` |
+| Declines or pauses | `PACKAGE_SELECTION_HOLD` | `PAYMENT_OPTIONS_BLOCKED_AUTHOR_HOLD` | Hold | Prepare notification to `publishing@jmerrill.one` |
+| No response | `PACKAGE_SELECTION_NO_RESPONSE` | `PAYMENT_OPTIONS_PENDING_AUTHOR_SELECTION` | Pending follow-up | Prepare notification to `publishing@jmerrill.one` |
+
+Package selection payload behavior:
+
+- Suggested-package selection stores the governed recommended package on `opportunity.jm1_m6authorselectedpackagecode`.
+- Alternate-package selection stores the governed alternate package on `opportunity.jm1_m6authorselectedpackagecode`.
+- Meeting, custom quote, decline/hold, and no-response branches do not invent selected package values.
+- Payment-options requests fail closed unless a selected package is present.
+- All paths update/use the existing active Opportunity only; duplicate Opportunity creation is not allowed.
+
+Payment-option preparation behavior:
+
+- Single, 2-payment, and 4-payment options are available for every selected package.
+- 8-payment option is available when selected package total is at least `$1,000`.
+- 12-payment option is available when selected package total is at least `$2,000`.
+- Prepared payment-option data includes the 4% processing fee per transaction.
+- Prepared payment-option data may include safe Stripe Product/Price identifiers from the governed mapping.
+- Prepared payment-option data does not create Stripe payment links, checkout sessions, invoices, customers, subscriptions, charges, payment requests, or tax calculations.
+- QBO is not used.
+
+Milestone #6B safe Dataverse payloads may set:
+
+- `opportunity.jm1_m6authorselectedpackagecode`
+- `opportunity.jm1_m6packageselectionstatus`
+- `opportunity.jm1_m6stripeproductmappingstatus`
+- `opportunity.jm1_m6stripepricemappingstatus`
+- `opportunity.jm1_m6paymentoptionpreparationstatus`
+- `opportunity.jm1_m6agreementpreparationstatus`
+- `opportunity.jm1_m6onboardingstatus`
+- `opportunity.jm1_m6opportunityupdatestatus`
+- `opportunity.jm1_m6businesshandoffstatus`
+- one safe `jm1_executionlog` evidence payload when the branch is applied
+
+Milestone #6B still does not authorize Milestone #7 production, Flow D activation, ISBN assignment, editing, layout, cover design, distribution, release work, payment links, checkout sessions, invoices, customers, subscriptions, charges, contracts, payment requests, QBO logic, duplicate Opportunity creation, or `@jmerrill.pub` mailbox use.
+
 No production work is authorized by this plan.
