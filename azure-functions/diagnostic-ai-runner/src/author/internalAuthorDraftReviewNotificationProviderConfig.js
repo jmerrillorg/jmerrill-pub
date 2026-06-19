@@ -27,11 +27,14 @@ const ENV_VARS = Object.freeze({
   enabled: "JM1_INTERNAL_NOTIFICATIONS_ENABLED",
   provider: "JM1_INTERNAL_NOTIFICATION_PROVIDER",
   from: "JM1_INTERNAL_NOTIFICATION_FROM",
-  replyTo: "JM1_INTERNAL_NOTIFICATION_REPLY_TO"
+  replyTo: "JM1_INTERNAL_NOTIFICATION_REPLY_TO",
+  relayUrl: "JM1_INTERNAL_NOTIFICATION_RELAY_URL",
+  relayKey: "JM1_INTERNAL_NOTIFICATION_RELAY_KEY"
 });
 
 const PROVIDER = Object.freeze({
-  INJECTED: "injected"
+  INJECTED: "injected",
+  ACS_RELAY: "acs-relay"
 });
 
 const CONFIG_ERROR_CODE = "INTERNAL_NOTIFICATION_PROVIDER_CONFIG_FAILED";
@@ -66,6 +69,8 @@ function getInternalNotificationProviderConfig(env = process.env) {
   const providerName = normalizeString(env[ENV_VARS.provider]).toLowerCase();
   const from = normalizeString(env[ENV_VARS.from]);
   const replyTo = normalizeString(env[ENV_VARS.replyTo]);
+  const relayUrl = normalizeString(env[ENV_VARS.relayUrl]);
+  const relayKeyConfigured = Boolean(normalizeString(env[ENV_VARS.relayKey]));
 
   if (!enabled) {
     return {
@@ -90,6 +95,12 @@ function getInternalNotificationProviderConfig(env = process.env) {
   if (!replyTo || !isApprovedInternalAddress(replyTo)) {
     return { ok: false, enabled: true, reason: "INTERNAL_NOTIFICATION_REPLY_TO_INVALID" };
   }
+  if (providerName === PROVIDER.ACS_RELAY && !relayUrl) {
+    return { ok: false, enabled: true, reason: "INTERNAL_NOTIFICATION_RELAY_URL_MISSING" };
+  }
+  if (providerName === PROVIDER.ACS_RELAY && !relayKeyConfigured) {
+    return { ok: false, enabled: true, reason: "INTERNAL_NOTIFICATION_RELAY_KEY_MISSING" };
+  }
 
   return {
     ok: true,
@@ -97,11 +108,60 @@ function getInternalNotificationProviderConfig(env = process.env) {
     deliveryStatus: INTERNAL_NOTIFICATION_STATUS.PREPARED,
     providerName,
     from,
-    replyTo
+    replyTo,
+    relayUrl,
+    relayKeyConfigured
   };
 }
 
-function resolveInternalNotificationProvider(config, providers = {}) {
+function buildRelayUrl(baseUrl, route) {
+  const value = normalizeString(baseUrl).replace(/\/+$/, "");
+  if (value.endsWith(route)) return value;
+  return `${value}/${route}`;
+}
+
+async function postRelayJson(url, relayKey, payload) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-jm1-relay-key": relayKey
+    },
+    body: JSON.stringify(payload)
+  });
+
+  let body = {};
+  try {
+    body = await response.json();
+  } catch (_err) {
+    body = {};
+  }
+
+  if (!response.ok || body.accepted !== true) {
+    throw new Error("ACS_RELAY_REJECTED");
+  }
+
+  return body;
+}
+
+function buildInternalRelayPayload(email) {
+  const notification = email.notification || {};
+  return {
+    notificationType: "AUTHOR_DRAFT_READY_FOR_REVIEW",
+    diagnosticId: notification.diagnosticId,
+    intakeReferenceCode: notification.intakeReferenceCode,
+    authorName: notification.authorName,
+    authorEmail: notification.authorEmail,
+    projectTitle: notification.projectTitle,
+    draftStatus: notification.draftStatus,
+    approvalStatus: notification.approvalStatus,
+    draftPreview: notification.draftBodyPreview || notification.safeDraftSummary,
+    nextAction: notification.internalReviewInstruction || "Review author-response draft",
+    recipient: INTERNAL_VISIBILITY_MAILBOX
+  };
+}
+
+function resolveInternalNotificationProvider(config, providers = {}, env = process.env) {
   if (!config?.enabled) return { ok: false, reason: "INTERNAL_NOTIFICATIONS_DISABLED" };
   if (config.providerName === PROVIDER.INJECTED) {
     const provider = providers[PROVIDER.INJECTED] || providers.injected || null;
@@ -109,6 +169,21 @@ function resolveInternalNotificationProvider(config, providers = {}) {
       return { ok: false, reason: "INTERNAL_MAIL_PROVIDER_MISSING" };
     }
     return { ok: true, provider };
+  }
+  if (config.providerName === PROVIDER.ACS_RELAY) {
+    return {
+      ok: true,
+      provider: {
+        async send(email) {
+          const result = await postRelayJson(
+            buildRelayUrl(config.relayUrl, "api/send-internal-author-draft-review-notification"),
+            env[ENV_VARS.relayKey],
+            buildInternalRelayPayload(email)
+          );
+          return { messageId: result.providerMessageId };
+        }
+      }
+    };
   }
   return { ok: false, reason: "INTERNAL_NOTIFICATION_PROVIDER_UNSUPPORTED" };
 }
@@ -183,7 +258,7 @@ async function deliverConfiguredInternalAuthorDraftReviewNotification({
     };
   }
 
-  const providerResolution = resolveInternalNotificationProvider(config, providers);
+  const providerResolution = resolveInternalNotificationProvider(config, providers, env);
   if (!providerResolution.ok) {
     const failedRecord = buildAuthorDraftReviewNotificationPersistenceRecord({
       notification: input.notification,
@@ -204,7 +279,8 @@ async function deliverConfiguredInternalAuthorDraftReviewNotification({
         ...email,
         from: config.from,
         replyTo: config.replyTo,
-        providerName: config.providerName
+        providerName: config.providerName,
+        notification: input.notification
       });
     }
   });

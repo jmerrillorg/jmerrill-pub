@@ -997,6 +997,28 @@ PR #102 introduces concrete ACS Email relay routes for Milestone #5 controlled t
 - Production activation remains unauthorized.
 - Controlled live testing still requires separate authorization.
 
+## 39. Diagnostic Runner ACS Relay Provider Wiring
+
+The diagnostic runner now supports provider mode `acs-relay` for Milestone #5 internal notification delivery and approved author-response delivery.
+
+### What changed
+
+- Internal notification provider can call `/api/send-internal-author-draft-review-notification`.
+- Author response provider can call `/api/send-approved-author-response`.
+- Relay URL and relay key settings are required before live delivery is possible.
+- Relay key settings are treated as secret configuration and are not returned or logged.
+
+### Governance status
+
+- `JM1_AI_EXECUTION_ENABLED` remains false.
+- `JM1_INTERNAL_NOTIFICATIONS_ENABLED` remains disabled by default.
+- `JM1_AUTHOR_RESPONSE_SEND_ENABLED` remains disabled by default.
+- No live internal notification was sent.
+- No live author email was sent.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Production activation remains unauthorized.
+
 ## 22. PR #86 - Internal Diagnostic Result Review Layer
 
 PR #86 introduces an internal-only review payload builder for validated Stage 0 diagnostic results.

@@ -957,6 +957,29 @@ No live internal notification or author email is sent by this PR. No Opportunity
 
 ---
 
+## 32. Diagnostic Runner ACS Relay Provider Wiring
+
+The diagnostic runner can call the ACS relay using provider mode `acs-relay`.
+
+Required app settings:
+
+- `JM1_INTERNAL_NOTIFICATION_PROVIDER=acs-relay`
+- `JM1_INTERNAL_NOTIFICATION_RELAY_URL=https://func-jm1-acs-email-relay.azurewebsites.net`
+- `JM1_INTERNAL_NOTIFICATION_RELAY_KEY` stored securely
+- `JM1_AUTHOR_RESPONSE_SEND_PROVIDER=acs-relay`
+- `JM1_AUTHOR_RESPONSE_SEND_RELAY_URL=https://func-jm1-acs-email-relay.azurewebsites.net`
+- `JM1_AUTHOR_RESPONSE_SEND_RELAY_KEY` stored securely
+
+Default gates remain closed:
+
+- `JM1_AI_EXECUTION_ENABLED=false`
+- `JM1_INTERNAL_NOTIFICATIONS_ENABLED=false`
+- `JM1_AUTHOR_RESPONSE_SEND_ENABLED=false`
+
+The runner fails closed if relay URL or relay key settings are missing. Relay keys must not be committed, logged, or printed.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
