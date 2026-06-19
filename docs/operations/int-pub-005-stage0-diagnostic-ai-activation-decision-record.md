@@ -942,6 +942,36 @@ PR #101 introduces Azure internal notification provider configuration readiness 
 - Production activation remains unauthorized.
 - Future author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
 
+## 37. Milestone #5 - Author Response / Next-Step Communication
+
+Milestone #5 introduces the governed author-facing response send boundary after internal review.
+
+### What changed
+
+- Author-send approval model added.
+- Supported decisions are `APPROVE_AUTHOR_SEND`, `NEEDS_AUTHOR_RESPONSE_REVISION`, `REJECT_AUTHOR_SEND`, and `HOLD_AUTHOR_SEND`.
+- Only `APPROVE_AUTHOR_SEND` may proceed toward sending.
+- Approval alone does not send email.
+- Author response provider boundary added with `JM1_AUTHOR_RESPONSE_SEND_ENABLED`.
+- Author response Dataverse send-log builder added for safe `jm1_executionlogs` metadata.
+- Milestone #5 runbook added.
+
+### Gate status
+
+- `JM1_AI_EXECUTION_ENABLED` remains separate and must remain `false`.
+- `JM1_AUTHOR_RESPONSE_SEND_ENABLED` defaults to `false`.
+- Author response sending remains impossible unless the author-send gate is exactly `true` and all approval, recipient, internal visibility, provider, and logging checks pass.
+
+### Governance status
+
+- No diagnostic run occurred.
+- No live author email was sent.
+- No author-facing output was sent without approval.
+- No Opportunity creation is authorized.
+- Flow D activation is not authorized.
+- Production activation remains unauthorized.
+- Author-facing system email must copy or internally mirror to `publishing@jmerrill.one` and log the send event in Dataverse.
+
 ## 22. PR #86 - Internal Diagnostic Result Review Layer
 
 PR #86 introduces an internal-only review payload builder for validated Stage 0 diagnostic results.

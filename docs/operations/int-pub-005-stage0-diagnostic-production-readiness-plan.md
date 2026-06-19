@@ -891,6 +891,46 @@ The next step is a separately governed one-notification delivery test after Azur
 
 ---
 
+## 30. Milestone #5 - Author Response / Next-Step Communication
+
+Milestone #5 adds the governed author-response communication boundary after internal review.
+
+### Capability introduced
+
+- Human author-send approval model.
+- Author-facing provider boundary controlled by `JM1_AUTHOR_RESPONSE_SEND_ENABLED`.
+- Safe Dataverse send-log record builder for `jm1_executionlogs`.
+- Milestone #5 runbook for internal notification, author approval, author send, logging, rollback, and boundaries.
+
+### Author-send gate
+
+`JM1_AUTHOR_RESPONSE_SEND_ENABLED` defaults to `false`. If the value is not exactly `true`, author response sending must not occur.
+
+When separately authorized and temporarily enabled, sending may proceed only if:
+
+- human decision is `APPROVE_AUTHOR_SEND`
+- reviewer ID and approval timestamp are present
+- author recipient is exactly the approved intake author email
+- `publishing@jmerrill.one` is copied or internally mirrored
+- sender/from and reply-to are approved internal `@jmerrill.one` mailboxes
+- `@jmerrill.pub` is not used as an active mailbox
+- Dataverse send logging is prepared
+- no unsafe content or provider secret is present
+
+### Status boundary
+
+Allowed statuses include `AUTHOR_RESPONSE_SEND_DISABLED`, `AUTHOR_RESPONSE_SEND_PREPARED`, `AUTHOR_RESPONSE_SEND_APPROVED`, `AUTHOR_RESPONSE_SENT`, `AUTHOR_RESPONSE_SEND_FAILED`, `AUTHOR_EMAIL_NOT_SENT`, `INTERNAL_VISIBILITY_SATISFIED`, and `DATAVERSE_SEND_LOG_CREATED`.
+
+Forbidden outcomes remain blocked: no `OPPORTUNITY_READY`, no `FLOW_D_READY`, no `PRODUCTION_READY`, and no `AUTO_SEND_READY`.
+
+### Non-execution boundary
+
+This milestone implementation sends no live author email without explicit authorization, runs no diagnostic, creates no Opportunity, activates no Flow D, triggers no onboarding or production automation, and does not authorize production activation.
+
+Live Milestone #5 completion still requires an authorized controlled send with provider configuration available, `publishing@jmerrill.one` visibility satisfied, and Dataverse send log confirmed.
+
+---
+
 ## 19. PR #91 - Author Draft Persistence for Human Approval
 
 PR #91 introduces an internal author-response draft persistence adapter for safe drafts prepared by PR #90.
