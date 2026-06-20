@@ -4,11 +4,14 @@ const { describe, test, beforeEach, afterEach } = require("node:test");
 const assert = require("node:assert/strict");
 const {
   writeMilestone6OpportunityUpdate,
+  writeMilestone6EvidenceOnlyLog,
   validateOpportunityPayload,
   buildMilestone6WriterExecutionLogPayload,
+  buildMilestone6EvidenceRecoveryLogPayload,
   OPPORTUNITY_GATE_NAME,
   ALLOWED_ENTITY_SET,
-  ALLOWED_OPPORTUNITY_FIELDS
+  ALLOWED_OPPORTUNITY_FIELDS,
+  EVIDENCE_RECOVERY_REASON
 } = require("../src/author/milestone6OpportunityWriter");
 
 const originalFetch = global.fetch;
@@ -455,5 +458,167 @@ describe("buildMilestone6WriterExecutionLogPayload — safe evidence only", () =
   test("jm1_flowrunid is null when correlationId absent", () => {
     const p = buildMilestone6WriterExecutionLogPayload(logInput({ correlationId: null }));
     assert.equal(p.jm1_flowrunid, null);
+  });
+});
+
+// ── writeMilestone6EvidenceOnlyLog — evidence-only recovery path ────────────
+
+function evidenceInput(overrides = {}) {
+  return {
+    diagnosticId: REAL_DIAGNOSTIC_ID,
+    intakeReferenceCode: REAL_INTAKE_REFERENCE,
+    opportunityId: REAL_OPPORTUNITY_ID,
+    selectedPackageCode: "JMP-PKG-PRO",
+    recommendedPackageCode: "JMP-PKG-PRO",
+    alternatePackageCode: "JMP-PKG-STARTER",
+    correlationId: "INT-PUB-005-M6-EVIDENCE-RECOVERY-TEST",
+    ...overrides
+  };
+}
+
+describe("writeMilestone6EvidenceOnlyLog — never touches Opportunity", () => {
+  test("module never imports patchDataverseRecord usage from this function — no PATCH call occurs", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    const calls = mockFetchSequence([okExecutionLogResponse()]);
+    await writeMilestone6EvidenceOnlyLog(evidenceInput(), FAKE_TOKEN_DEPS);
+    assert.equal(calls.length, 1, "exactly one network call must occur: the execution-log POST");
+    assert.equal(calls[0].options.method, "POST");
+    assert.ok(calls[0].url.includes("jm1_executionlogs"));
+    assert.ok(!calls[0].url.includes("opportunities"), "no Opportunity URL must ever be touched");
+  });
+
+  test("rejects when gate is absent (defaults closed), with zero network calls", async () => {
+    const calls = mockFetchSequence([okExecutionLogResponse()]);
+    const result = await writeMilestone6EvidenceOnlyLog(evidenceInput());
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "GATE_CLOSED");
+    assert.equal(calls.length, 0);
+  });
+
+  test("rejects malformed diagnosticId before any network call", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    const calls = mockFetchSequence([okExecutionLogResponse()]);
+    const result = await writeMilestone6EvidenceOnlyLog(evidenceInput({ diagnosticId: "not-a-guid" }));
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "DIAGNOSTIC_ID_INVALID");
+    assert.equal(calls.length, 0);
+  });
+
+  test("rejects malformed intakeReferenceCode before any network call", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    const calls = mockFetchSequence([okExecutionLogResponse()]);
+    const result = await writeMilestone6EvidenceOnlyLog(evidenceInput({ intakeReferenceCode: "not-valid" }));
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "INTAKE_REFERENCE_CODE_INVALID");
+    assert.equal(calls.length, 0);
+  });
+
+  test("rejects malformed opportunityId before any network call", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    const calls = mockFetchSequence([okExecutionLogResponse()]);
+    const result = await writeMilestone6EvidenceOnlyLog(evidenceInput({ opportunityId: "not-a-guid" }));
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "OPPORTUNITY_ID_INVALID");
+    assert.equal(calls.length, 0);
+  });
+
+  test("returns DATAVERSE_CONFIG_MISSING when env vars are absent", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    delete process.env.DATAVERSE_WEB_API_BASE_URL;
+    delete process.env.DATAVERSE_RESOURCE_URL;
+    const result = await writeMilestone6EvidenceOnlyLog(evidenceInput());
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "DATAVERSE_CONFIG_MISSING");
+  });
+
+  test("succeeds and returns the created execution-log record ID", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    mockFetchSequence([okExecutionLogResponse()]);
+    const result = await writeMilestone6EvidenceOnlyLog(evidenceInput(), FAKE_TOKEN_DEPS);
+    assert.equal(result.ok, true);
+    assert.equal(result.code, "MILESTONE_6_EVIDENCE_RECOVERY_LOGGED");
+    assert.equal(result.executionLog.created, true);
+    assert.equal(result.executionLog.id, "11111111-1111-1111-1111-111111111111");
+    assert.equal(result.diagnosticId, REAL_DIAGNOSTIC_ID);
+    assert.equal(result.opportunityId, REAL_OPPORTUNITY_ID);
+  });
+
+  test("reports failure code when the log write itself fails, with zero Opportunity exposure", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    mockFetchSequence([
+      { ok: false, status: 403, async json() { return { error: { message: "Create privilege missing" } }; } }
+    ]);
+    const result = await writeMilestone6EvidenceOnlyLog(evidenceInput(), FAKE_TOKEN_DEPS);
+    assert.equal(result.ok, false);
+    assert.equal(result.code, "MILESTONE_6_EVIDENCE_RECOVERY_LOG_FAILED");
+    assert.equal(result.executionLog.created, false);
+  });
+
+  test("all liveActions flags are false, including updatedOpportunity", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    mockFetchSequence([okExecutionLogResponse()]);
+    const result = await writeMilestone6EvidenceOnlyLog(evidenceInput(), FAKE_TOKEN_DEPS);
+    for (const [key, value] of Object.entries(result.liveActions)) {
+      assert.equal(value, false, `${key} must be false in the evidence-only path`);
+    }
+  });
+
+  test("module exports no Opportunity-patching dependency reachable from the evidence path", () => {
+    // Static guarantee: the evidence-only function's own source does not
+    // reference patchDataverseRecord or ALLOWED_OPPORTUNITY_FIELDS at all.
+    const fnSource = writeMilestone6EvidenceOnlyLog.toString();
+    assert.ok(!fnSource.includes("patchDataverseRecord"), "evidence-only path must never reference the PATCH function");
+  });
+});
+
+// ── buildMilestone6EvidenceRecoveryLogPayload — safety invariants ───────────
+
+describe("buildMilestone6EvidenceRecoveryLogPayload — safe evidence only", () => {
+  test("includes the evidence recovery reason constant", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    assert.ok(p.jm1_actiondescription.includes(EVIDENCE_RECOVERY_REASON));
+  });
+
+  test("states the Opportunity update result as SUCCEEDED", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    assert.ok(p.jm1_actiondescription.includes("Opportunity update result: SUCCEEDED"));
+  });
+
+  test("states that no Opportunity write occurs in this recovery path", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    assert.ok(p.jm1_actiondescription.toLowerCase().includes("no opportunity write occurs"));
+  });
+
+  test("includes intake reference, diagnostic ID, and Opportunity ID", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    assert.equal(p.jm1_sourcerecordid, REAL_DIAGNOSTIC_ID);
+    assert.ok(p.jm1_actiondescription.includes(REAL_INTAKE_REFERENCE));
+    assert.ok(p.jm1_actiondescription.includes(REAL_OPPORTUNITY_ID));
+  });
+
+  test("includes selected, recommended, and alternate package codes", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    assert.ok(p.jm1_actiondescription.includes("JMP-PKG-PRO"));
+    assert.ok(p.jm1_actiondescription.includes("JMP-PKG-STARTER"));
+  });
+
+  test("does not contain manuscript content, prompt instructions, or secret-like values", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    const all = JSON.stringify(p).toLowerCase();
+    assert.ok(!all.includes("you are a"));
+    assert.ok(!all.includes("bearer "));
+    assert.ok(!all.includes("sk-"));
+  });
+
+  test("actiondescription is truncated to 1000 chars", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(
+      evidenceInput({ alternatePackageCode: "X".repeat(2000), completedAt: "2026-06-20T13:00:00.000Z" })
+    );
+    assert.ok(p.jm1_actiondescription.length <= 1000);
+  });
+
+  test("jm1_actiontype is the dedicated evidence-recovery event type", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    assert.equal(p.jm1_actiontype, "MILESTONE_6_EVIDENCE_RECOVERY_LOG");
   });
 });
