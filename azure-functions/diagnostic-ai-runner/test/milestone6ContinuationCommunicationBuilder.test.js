@@ -12,7 +12,7 @@ const REAL_DIAGNOSTIC_ID = "64e387e0-7e6a-f111-a826-00224820105b";
 const REAL_INTAKE_REFERENCE = "JMP-INT-202606-UFYG60";
 
 const VALID_PAYMENT_OPTIONS = Object.freeze([
-  { payments: 1, totalPerInstallmentUsd: 4680.00 },
+  { payments: 1, totalPerInstallmentUsd: 4500.00 },
   { payments: 2, totalPerInstallmentUsd: 2340.00 },
   { payments: 4, totalPerInstallmentUsd: 1170.00 },
   { payments: 8, totalPerInstallmentUsd: 585.00 },
@@ -66,16 +66,29 @@ describe("buildMilestone6ContinuationCommunication — successful build", () => 
   test("body includes all five payment options with correct dollar amounts", () => {
     const result = buildMilestone6ContinuationCommunication(validInput());
     const body = result.sendApproval.draftBody;
-    assert.ok(body.includes("Single payment: $4,680.00"));
+    assert.ok(body.includes("Single payment: $4,500.00"));
     assert.ok(body.includes("2 payments: $2,340.00 each"));
     assert.ok(body.includes("4 payments: $1,170.00 each"));
     assert.ok(body.includes("8 payments: $585.00 each"));
     assert.ok(body.includes("12 payments: $390.00 each"));
   });
 
-  test("body discloses the 4% processing fee", () => {
+  test("body discloses the 4% processing fee scoped to multi-payment options only", () => {
     const result = buildMilestone6ContinuationCommunication(validInput());
-    assert.ok(result.sendApproval.draftBody.includes("4% processing fee"));
+    assert.ok(result.sendApproval.draftBody.includes(
+      "The 4% processing fee applies only to multi-payment options"
+    ));
+  });
+
+  test("body does not state the fee applies to the package/all options generally", () => {
+    const result = buildMilestone6ContinuationCommunication(validInput());
+    assert.ok(!result.sendApproval.draftBody.includes("including a 4% processing fee"));
+  });
+
+  test("single-payment amount does not include the 4% fee (matches package cost exactly)", () => {
+    const result = buildMilestone6ContinuationCommunication(validInput());
+    assert.ok(result.sendApproval.draftBody.includes("Single payment: $4,500.00"));
+    assert.ok(!result.sendApproval.draftBody.includes("Single payment: $4,680.00"));
   });
 
   test("body includes agreement/onboarding next-step language", () => {

@@ -83,7 +83,7 @@ function buildEmailBody({ authorName, projectTitle, packageDisplayName, paymentO
     "",
     `Thank you for confirming your publishing package for ${projectTitle}. We have you set up with the ${packageDisplayName}.`,
     "",
-    "Here are the payment options available for this package, including a 4% processing fee:",
+    "Here are the payment options available for this package. The 4% processing fee applies only to multi-payment options:",
     "",
     ...paymentOptionLines,
     "",

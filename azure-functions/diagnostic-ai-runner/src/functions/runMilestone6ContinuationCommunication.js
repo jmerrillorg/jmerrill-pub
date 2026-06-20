@@ -21,10 +21,12 @@ const AUTHORIZED_OPPORTUNITY_ID = "2653fca9-eacd-4c44-b3ed-1764dd5d35aa";
 const PROJECT_TITLE = "Establishing Glory: The Library";
 const SELECTED_PACKAGE_CODE = "JMP-PKG-PRO";
 
-// Fixed for this controlled activation — confirmed amounts, 4% processing
-// fee already applied. Not caller-supplied.
+// Fixed for this controlled activation — confirmed amounts. The single
+// payment is the package cost with no fee; the 4% processing fee applies
+// only to the multi-payment (2/4/8/12) options and is already applied to
+// those totals. Not caller-supplied.
 const PAYMENT_OPTIONS = Object.freeze([
-  { payments: 1, totalPerInstallmentUsd: 4680.00 },
+  { payments: 1, totalPerInstallmentUsd: 4500.00 },
   { payments: 2, totalPerInstallmentUsd: 2340.00 },
   { payments: 4, totalPerInstallmentUsd: 1170.00 },
   { payments: 8, totalPerInstallmentUsd: 585.00 },
