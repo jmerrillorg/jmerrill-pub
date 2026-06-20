@@ -450,14 +450,19 @@ describe("buildMilestone6WriterExecutionLogPayload — safe evidence only", () =
     assert.ok(p.jm1_actiondescription.length <= 1000);
   });
 
-  test("jm1_flowrunid is correlationId when present", () => {
+  test("does not include jm1_flowrunid — that field does not exist on jm1_executionlog", () => {
     const p = buildMilestone6WriterExecutionLogPayload(logInput());
-    assert.equal(p.jm1_flowrunid, "INT-PUB-005-M6-WRITER-TEST");
+    assert.ok(!("jm1_flowrunid" in p), "jm1_flowrunid must never be sent — confirmed absent from live entity metadata");
   });
 
-  test("jm1_flowrunid is null when correlationId absent", () => {
+  test("folds correlationId into jm1_actiondescription text when present", () => {
+    const p = buildMilestone6WriterExecutionLogPayload(logInput());
+    assert.ok(p.jm1_actiondescription.includes("INT-PUB-005-M6-WRITER-TEST"));
+  });
+
+  test("omits correlation ID text when correlationId is absent", () => {
     const p = buildMilestone6WriterExecutionLogPayload(logInput({ correlationId: null }));
-    assert.equal(p.jm1_flowrunid, null);
+    assert.ok(!p.jm1_actiondescription.includes("Correlation ID:"));
   });
 });
 
@@ -620,5 +625,221 @@ describe("buildMilestone6EvidenceRecoveryLogPayload — safe evidence only", () 
   test("jm1_actiontype is the dedicated evidence-recovery event type", () => {
     const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
     assert.equal(p.jm1_actiontype, "MILESTONE_6_EVIDENCE_RECOVERY_LOG");
+  });
+
+  test("does not include jm1_flowrunid — that field does not exist on jm1_executionlog", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    assert.ok(!("jm1_flowrunid" in p), "jm1_flowrunid must never be sent — confirmed absent from live entity metadata");
+  });
+
+  test("folds correlationId into jm1_actiondescription text when present", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    assert.ok(p.jm1_actiondescription.includes("INT-PUB-005-M6-EVIDENCE-RECOVERY-TEST"));
+  });
+});
+
+// ── jm1_executionlog schema conformance ──────────────────────────────────────
+//
+// Confirmed against live Dataverse entity metadata via EntityDefinitions
+// query against jm1_executionlog on 2026-06-20:
+//   ApplicationRequired: jm1_actiondescription, jm1_actiontype,
+//     jm1_agentname, jm1_bandlevel, jm1_executionstatus, jm1_startedon
+//   Primary name attribute: jm1_name (RequiredLevel: None, but populated
+//     for evidence legibility)
+//   SystemRequired (auto-populated by Dataverse, never set explicitly):
+//     ownerid, owneridtype, statecode, createdbyyominame, etc.
+//   jm1_flowrunid: CONFIRMED ABSENT from this entity's attribute list —
+//     sending it causes Dataverse to reject the entire POST. This was the
+//     actual root cause of both prior execution-log write failures.
+//   jm1_bandlevel picklist values: 835500000=Band 1, 835500001=Band 2,
+//     835500002=Band 3 (BAND_LEVEL.BAND_1 = 835500000 confirmed correct).
+//   jm1_executionstatus picklist values: 835500000=Pending,
+//     835500001=Success, 835500002=Failed, 835500003=Escalated
+//     (EXECUTION_STATUS.SUCCESS = 835500001 confirmed correct).
+
+const {
+  EXECUTION_LOG_FIELDS_USED,
+  EXECUTION_LOG_APPLICATION_REQUIRED_FIELDS,
+  classifyDataverseWriteError
+} = require("../src/author/milestone6OpportunityWriter");
+
+describe("jm1_executionlog schema conformance — confirmed against live metadata", () => {
+  test("EXECUTION_LOG_APPLICATION_REQUIRED_FIELDS matches the six confirmed ApplicationRequired fields", () => {
+    assert.deepEqual(
+      [...EXECUTION_LOG_APPLICATION_REQUIRED_FIELDS].sort(),
+      [
+        "jm1_actiondescription",
+        "jm1_actiontype",
+        "jm1_agentname",
+        "jm1_bandlevel",
+        "jm1_executionstatus",
+        "jm1_startedon"
+      ].sort()
+    );
+  });
+
+  test("buildMilestone6WriterExecutionLogPayload populates every ApplicationRequired field", () => {
+    const p = buildMilestone6WriterExecutionLogPayload({
+      diagnosticId: REAL_DIAGNOSTIC_ID,
+      intakeReferenceCode: REAL_INTAKE_REFERENCE,
+      opportunityId: REAL_OPPORTUNITY_ID,
+      selectedPackageCode: "JMP-PKG-PRO",
+      recommendedPackageCode: "JMP-PKG-PRO",
+      alternatePackageCode: "JMP-PKG-STARTER",
+      paymentOptionPreparationStatus: "PAYMENT_OPTIONS_READY_AFTER_PACKAGE_SELECTION",
+      agreementPreparationStatus: "AGREEMENT_PREPARATION_READY",
+      onboardingStatus: "ONBOARDING_READY",
+      correlationId: null,
+      completedAt: "2026-06-20T13:00:00.000Z"
+    });
+    for (const field of EXECUTION_LOG_APPLICATION_REQUIRED_FIELDS) {
+      assert.ok(field in p && p[field] !== null && p[field] !== undefined && p[field] !== "",
+        `${field} is ApplicationRequired on jm1_executionlog and must be populated`);
+    }
+  });
+
+  test("buildMilestone6EvidenceRecoveryLogPayload populates every ApplicationRequired field", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    for (const field of EXECUTION_LOG_APPLICATION_REQUIRED_FIELDS) {
+      assert.ok(field in p && p[field] !== null && p[field] !== undefined && p[field] !== "",
+        `${field} is ApplicationRequired on jm1_executionlog and must be populated`);
+    }
+  });
+
+  test("buildMilestone6WriterExecutionLogPayload only ever sends fields in EXECUTION_LOG_FIELDS_USED", () => {
+    const p = buildMilestone6WriterExecutionLogPayload({
+      diagnosticId: REAL_DIAGNOSTIC_ID,
+      intakeReferenceCode: REAL_INTAKE_REFERENCE,
+      opportunityId: REAL_OPPORTUNITY_ID,
+      selectedPackageCode: "JMP-PKG-PRO",
+      recommendedPackageCode: "JMP-PKG-PRO",
+      alternatePackageCode: "JMP-PKG-STARTER",
+      paymentOptionPreparationStatus: "PAYMENT_OPTIONS_READY_AFTER_PACKAGE_SELECTION",
+      agreementPreparationStatus: "AGREEMENT_PREPARATION_READY",
+      onboardingStatus: "ONBOARDING_READY",
+      correlationId: "x",
+      completedAt: "2026-06-20T13:00:00.000Z"
+    });
+    for (const key of Object.keys(p)) {
+      assert.ok(EXECUTION_LOG_FIELDS_USED.includes(key), `${key} is not in the confirmed-valid field list for jm1_executionlog`);
+    }
+  });
+
+  test("buildMilestone6EvidenceRecoveryLogPayload only ever sends fields in EXECUTION_LOG_FIELDS_USED", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    for (const key of Object.keys(p)) {
+      assert.ok(EXECUTION_LOG_FIELDS_USED.includes(key), `${key} is not in the confirmed-valid field list for jm1_executionlog`);
+    }
+  });
+
+  test("jm1_bandlevel uses the confirmed Band 1 picklist value", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    assert.equal(p.jm1_bandlevel, 835500000);
+  });
+
+  test("jm1_executionstatus uses the confirmed Success picklist value", () => {
+    const p = buildMilestone6EvidenceRecoveryLogPayload(evidenceInput({ completedAt: "2026-06-20T13:00:00.000Z" }));
+    assert.equal(p.jm1_executionstatus, 835500001);
+  });
+});
+
+// ── classifyDataverseWriteError — safe diagnostic classifier ────────────────
+
+describe("classifyDataverseWriteError — sanitized error reporting only", () => {
+  test("classifies HTTP 400 as INVALID_FIELD_OR_SCHEMA_MISMATCH", () => {
+    const r = classifyDataverseWriteError({ httpStatus: 400, dvCode: "0x80040203" });
+    assert.equal(r.category, "INVALID_FIELD_OR_SCHEMA_MISMATCH");
+    assert.equal(r.httpStatus, 400);
+    assert.equal(r.dvCode, "0x80040203");
+  });
+
+  test("classifies HTTP 403 as PERMISSION_DENIED", () => {
+    const r = classifyDataverseWriteError({ httpStatus: 403 });
+    assert.equal(r.category, "PERMISSION_DENIED");
+  });
+
+  test("classifies HTTP 401 as AUTH_FAILED", () => {
+    const r = classifyDataverseWriteError({ httpStatus: 401 });
+    assert.equal(r.category, "AUTH_FAILED");
+  });
+
+  test("classifies HTTP 404 as RECORD_OR_ENTITY_NOT_FOUND", () => {
+    const r = classifyDataverseWriteError({ httpStatus: 404 });
+    assert.equal(r.category, "RECORD_OR_ENTITY_NOT_FOUND");
+  });
+
+  test("classifies HTTP 412 as PRECONDITION_FAILED", () => {
+    const r = classifyDataverseWriteError({ httpStatus: 412 });
+    assert.equal(r.category, "PRECONDITION_FAILED");
+  });
+
+  test("classifies HTTP 5xx as DATAVERSE_SERVER_ERROR", () => {
+    assert.equal(classifyDataverseWriteError({ httpStatus: 500 }).category, "DATAVERSE_SERVER_ERROR");
+    assert.equal(classifyDataverseWriteError({ httpStatus: 503 }).category, "DATAVERSE_SERVER_ERROR");
+  });
+
+  test("classifies an unrecognized or missing status as UNKNOWN_WRITE_FAILURE", () => {
+    assert.equal(classifyDataverseWriteError({}).category, "UNKNOWN_WRITE_FAILURE");
+    assert.equal(classifyDataverseWriteError({ httpStatus: 418 }).category, "UNKNOWN_WRITE_FAILURE");
+  });
+
+  test("dvCode is null when absent", () => {
+    const r = classifyDataverseWriteError({ httpStatus: 400 });
+    assert.equal(r.dvCode, null);
+  });
+
+  test("never includes a message, body, headers, or token field", () => {
+    const r = classifyDataverseWriteError({ httpStatus: 400, dvCode: "X", message: "should not appear" });
+    const keys = Object.keys(r).sort();
+    assert.deepEqual(keys, ["category", "dvCode", "httpStatus"]);
+  });
+
+  test("output contains no manuscript text, prompt body, secrets, or bearer tokens even with a hostile error object", () => {
+    const r = classifyDataverseWriteError({
+      httpStatus: 400,
+      dvCode: "0x1",
+      message: "Bearer sk-secret-12345 you are a manuscript prompt body leak"
+    });
+    const serialized = JSON.stringify(r).toLowerCase();
+    assert.ok(!serialized.includes("bearer"));
+    assert.ok(!serialized.includes("sk-secret"));
+    assert.ok(!serialized.includes("manuscript"));
+    assert.ok(!serialized.includes("prompt body"));
+  });
+});
+
+// ── executionLog.diagnostics — wired into both writer functions ─────────────
+
+describe("executionLog.diagnostics — safe classification surfaced on failure", () => {
+  test("writeMilestone6EvidenceOnlyLog surfaces diagnostics on a 400-style schema mismatch", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    mockFetchSequence([
+      { ok: false, status: 400, async json() { return { error: { code: "0x80040203", message: "Resource not found for the segment 'jm1_flowrunid'." } }; } }
+    ]);
+    const result = await writeMilestone6EvidenceOnlyLog(evidenceInput(), FAKE_TOKEN_DEPS);
+    assert.equal(result.ok, false);
+    assert.equal(result.executionLog.diagnostics.httpStatus, 400);
+    assert.equal(result.executionLog.diagnostics.category, "INVALID_FIELD_OR_SCHEMA_MISMATCH");
+    assert.equal(result.executionLog.diagnostics.dvCode, "0x80040203");
+  });
+
+  test("diagnostics never leaks the raw error message text into the result", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    mockFetchSequence([
+      { ok: false, status: 400, async json() { return { error: { code: "0x80040203", message: "SENSITIVE_TEXT_MUST_NOT_APPEAR" } }; } }
+    ]);
+    const result = await writeMilestone6EvidenceOnlyLog(evidenceInput(), FAKE_TOKEN_DEPS);
+    assert.ok(!JSON.stringify(result).includes("SENSITIVE_TEXT_MUST_NOT_APPEAR"));
+  });
+
+  test("writeMilestone6OpportunityUpdate surfaces diagnostics when the execution-log write fails (Opportunity update still succeeds)", async () => {
+    process.env[OPPORTUNITY_GATE_NAME] = "true";
+    mockFetchSequence([
+      okPatchResponse(),
+      { ok: false, status: 403, async json() { return { error: { code: "0x80040220" } }; } }
+    ]);
+    const result = await writeMilestone6OpportunityUpdate(baseInput(), FAKE_TOKEN_DEPS);
+    assert.equal(result.ok, true, "Opportunity update success must stand even if log write fails");
+    assert.equal(result.executionLog.diagnostics.category, "PERMISSION_DENIED");
   });
 });
