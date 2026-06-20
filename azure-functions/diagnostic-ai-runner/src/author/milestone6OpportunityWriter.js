@@ -34,6 +34,9 @@ const OPPORTUNITY_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
 const MILESTONE6_WRITER_EVENT_TYPE = "MILESTONE_6_OPPORTUNITY_UPDATE_EXECUTED";
 const MILESTONE6_WRITER_MODEL_NAME = "milestone-6-opportunity-writer";
+const MILESTONE6_EVIDENCE_RECOVERY_EVENT_TYPE = "MILESTONE_6_EVIDENCE_RECOVERY_LOG";
+const MILESTONE6_EVIDENCE_RECOVERY_MODEL_NAME = "milestone-6-evidence-only-recovery";
+const EVIDENCE_RECOVERY_REASON = "OPPORTUNITY_PATCH_SUCCEEDED_EXECUTION_LOG_RETRY";
 
 // Fixed allowlist — the ONLY Opportunity fields this writer may ever PATCH.
 const ALLOWED_OPPORTUNITY_FIELDS = Object.freeze([
@@ -315,14 +318,187 @@ async function writeMilestone6OpportunityUpdate(input = {}, deps = {}) {
   };
 }
 
+/**
+ * Builds the safe jm1_executionlogs payload for an evidence-only recovery
+ * write. Used ONLY when an Opportunity PATCH already succeeded in a prior
+ * attempt and the execution-log write failed that time — this records the
+ * original success after the fact. Contains only safe metadata; no
+ * Opportunity write occurs anywhere in this path.
+ */
+function buildMilestone6EvidenceRecoveryLogPayload(input) {
+  const {
+    diagnosticId,
+    intakeReferenceCode,
+    opportunityId,
+    selectedPackageCode,
+    recommendedPackageCode,
+    alternatePackageCode,
+    correlationId,
+    completedAt
+  } = input;
+
+  const actionDescription = [
+    `Milestone 6 evidence-only recovery log for intake ${intakeReferenceCode}.`,
+    `Opportunity ${opportunityId} — no Opportunity write occurs in this recovery path; recorded here for evidence only.`,
+    `Recommended package ${recommendedPackageCode || "unknown"}.`,
+    alternatePackageCode ? `Alternate package ${alternatePackageCode}.` : "No alternate package.",
+    `Selected package ${selectedPackageCode || "unknown"}.`,
+    "Opportunity update result: SUCCEEDED.",
+    `Evidence recovery reason: ${EVIDENCE_RECOVERY_REASON}.`,
+    "Original activation attempt result: Opportunity PATCH succeeded, execution-log write failed.",
+    `Gate final state: false (${OPPORTUNITY_GATE_NAME}).`,
+    "Process: Milestone 6 Controlled Activation.",
+    "No payment link, checkout session, invoice, customer, subscription, charge, contract, author email, " +
+      "Flow D activation, production automation, ISBN assignment, distribution submission, launch/release, " +
+      "royalty setup, QBO logic, manuscript text, prompt body, raw model output, secrets, tokens, or headers stored."
+  ].join(" ");
+
+  return {
+    jm1_name: `M6-EVIDENCE-RECOVERY-${diagnosticId}`,
+    jm1_actiondescription: actionDescription.slice(0, 1000),
+    jm1_actiontype: MILESTONE6_EVIDENCE_RECOVERY_EVENT_TYPE,
+    jm1_agentname: AGENT_NAME,
+    jm1_agentmodel: MILESTONE6_EVIDENCE_RECOVERY_MODEL_NAME,
+    jm1_bandlevel: BAND_LEVEL.BAND_1,
+    jm1_executionstatus: EXECUTION_STATUS.SUCCESS,
+    jm1_startedon: completedAt,
+    jm1_completedon: completedAt,
+    jm1_sourceentity: SOURCE_ENTITY,
+    jm1_sourcerecordid: diagnosticId,
+    jm1_flowrunid: correlationId || null
+  };
+}
+
+/**
+ * Writes exactly one safe jm1_executionlogs evidence record documenting a
+ * Milestone #6 Opportunity update that already succeeded in a prior
+ * attempt. This function NEVER calls patchDataverseRecord and NEVER
+ * imports any Opportunity-write code path — it cannot touch the
+ * Opportunity entity even if called incorrectly.
+ *
+ * Still requires JM1_OPPORTUNITY_UPDATE_ENABLED="true" (the same gate used
+ * for the original activation) — reusing the existing, already-governed
+ * gate rather than introducing a new one for a one-time recovery write.
+ *
+ * @param {{
+ *   diagnosticId: string,
+ *   intakeReferenceCode: string,
+ *   opportunityId: string,
+ *   selectedPackageCode?: string,
+ *   recommendedPackageCode?: string,
+ *   alternatePackageCode?: string,
+ *   correlationId?: string|null
+ * }} input
+ * @param {{ getToken?: (resourceUrl: string) => Promise<string> }} [deps]
+ *   Test-only injection seam. Production callers must omit this.
+ * @returns {Promise<object>}
+ */
+async function writeMilestone6EvidenceOnlyLog(input = {}, deps = {}) {
+  const resolveToken = deps.getToken || getDataverseToken;
+  if (!isPlainObject(input)) return blocked("INVALID_INPUT");
+
+  const diagnosticId = normalizeString(input.diagnosticId);
+  const intakeReferenceCode = normalizeString(input.intakeReferenceCode);
+  const opportunityId = normalizeString(input.opportunityId);
+  const correlationId = normalizeString(input.correlationId) || null;
+  const selectedPackageCode = normalizeString(input.selectedPackageCode) || null;
+  const recommendedPackageCode = normalizeString(input.recommendedPackageCode) || null;
+  const alternatePackageCode = normalizeString(input.alternatePackageCode) || null;
+
+  if (!diagnosticId || !DIAGNOSTIC_ID_PATTERN.test(diagnosticId)) {
+    return blocked("DIAGNOSTIC_ID_INVALID");
+  }
+  if (!intakeReferenceCode || !INTAKE_REFERENCE_PATTERN.test(intakeReferenceCode)) {
+    return blocked("INTAKE_REFERENCE_CODE_INVALID");
+  }
+  if (!opportunityId || !OPPORTUNITY_ID_PATTERN.test(opportunityId)) {
+    return blocked("OPPORTUNITY_ID_INVALID");
+  }
+
+  if (!isGateOpen()) {
+    return blocked("GATE_CLOSED", { gate: OPPORTUNITY_GATE_NAME });
+  }
+
+  const apiBase = process.env.DATAVERSE_WEB_API_BASE_URL;
+  const resourceUrl = process.env.DATAVERSE_RESOURCE_URL;
+  if (!apiBase || !resourceUrl) {
+    return blocked("DATAVERSE_CONFIG_MISSING");
+  }
+
+  let token;
+  try {
+    token = await resolveToken(resourceUrl);
+  } catch (err) {
+    return blocked(err.safeCode || "DATAVERSE_AUTH_FAILED");
+  }
+
+  const completedAt = new Date().toISOString();
+  const executionLogPayload = buildMilestone6EvidenceRecoveryLogPayload({
+    diagnosticId,
+    intakeReferenceCode,
+    opportunityId,
+    selectedPackageCode,
+    recommendedPackageCode,
+    alternatePackageCode,
+    correlationId,
+    completedAt
+  });
+
+  let executionLog;
+  try {
+    const result = await postExecutionLogRecord(apiBase, token, executionLogPayload);
+    executionLog = { created: true, id: result.id, error: null };
+  } catch (err) {
+    executionLog = { created: false, id: null, error: err.safeCode || "DATAVERSE_WRITE_FAILED" };
+  }
+
+  return {
+    ok: executionLog.created,
+    code: executionLog.created ? "MILESTONE_6_EVIDENCE_RECOVERY_LOGGED" : "MILESTONE_6_EVIDENCE_RECOVERY_LOG_FAILED",
+    diagnosticId,
+    intakeReferenceCode,
+    opportunityId,
+    selectedPackageCode,
+    recommendedPackageCode,
+    alternatePackageCode,
+    executionLog,
+    gateUsed: OPPORTUNITY_GATE_NAME,
+    liveActions: {
+      updatedOpportunity: false,
+      createdOpportunity: false,
+      createdDuplicateOpportunity: false,
+      sendsAuthorEmail: false,
+      sendsInternalNotification: false,
+      createsPaymentLink: false,
+      createsCheckoutSession: false,
+      createsInvoice: false,
+      createsCustomer: false,
+      createsSubscription: false,
+      chargesCard: false,
+      sendsContract: false,
+      activatesFlowD: false,
+      startsProduction: false,
+      assignsIsbn: false,
+      submitsDistribution: false,
+      launchesRelease: false,
+      createsRoyaltySetup: false,
+      usesQboForNewLogic: false
+    }
+  };
+}
+
 module.exports = {
   writeMilestone6OpportunityUpdate,
+  writeMilestone6EvidenceOnlyLog,
   validateOpportunityPayload,
   buildMilestone6WriterExecutionLogPayload,
+  buildMilestone6EvidenceRecoveryLogPayload,
   OPPORTUNITY_GATE_NAME,
   ALLOWED_ENTITY_SET,
   ALLOWED_OPPORTUNITY_FIELDS,
   OPPORTUNITY_ID_PATTERN,
   EXECUTION_LOG_ENTITY_SET,
-  MILESTONE6_WRITER_EVENT_TYPE
+  MILESTONE6_WRITER_EVENT_TYPE,
+  MILESTONE6_EVIDENCE_RECOVERY_EVENT_TYPE,
+  EVIDENCE_RECOVERY_REASON
 };
