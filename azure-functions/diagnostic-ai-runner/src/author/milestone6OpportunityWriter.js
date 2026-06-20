@@ -51,6 +51,65 @@ const ALLOWED_OPPORTUNITY_FIELDS = Object.freeze([
   "jm1_m6businesshandoffstatus"
 ]);
 
+// Confirmed against live jm1_executionlog entity metadata (EntityDefinitions
+// query, 2026-06-20). These are the fields this module is allowed to write
+// to jm1_executionlogs. jm1_flowrunid is intentionally absent — it does not
+// exist on this entity; an earlier version of this module incorrectly sent
+// it, which caused Dataverse to reject the entire POST (the actual root
+// cause of the first two execution-log write failures, not a permission
+// issue). ApplicationRequired fields per metadata: jm1_actiondescription,
+// jm1_actiontype, jm1_agentname, jm1_bandlevel, jm1_executionstatus,
+// jm1_startedon — all are populated below. jm1_agentmodel, jm1_completedon,
+// jm1_sourceentity, jm1_sourcerecordid, jm1_name are optional but populated
+// for evidence quality. SystemRequired fields (ownerid, statecode, etc.)
+// are populated automatically by Dataverse and must not be set explicitly.
+const EXECUTION_LOG_FIELDS_USED = Object.freeze([
+  "jm1_name",
+  "jm1_actiondescription",
+  "jm1_actiontype",
+  "jm1_agentname",
+  "jm1_agentmodel",
+  "jm1_bandlevel",
+  "jm1_executionstatus",
+  "jm1_startedon",
+  "jm1_completedon",
+  "jm1_sourceentity",
+  "jm1_sourcerecordid"
+]);
+
+const EXECUTION_LOG_APPLICATION_REQUIRED_FIELDS = Object.freeze([
+  "jm1_actiondescription",
+  "jm1_actiontype",
+  "jm1_agentname",
+  "jm1_bandlevel",
+  "jm1_executionstatus",
+  "jm1_startedon"
+]);
+
+/**
+ * Categorizes a Dataverse write failure into a closed set of safe labels.
+ * Never includes the raw response body, headers, tokens, or secrets — only
+ * the HTTP status, Dataverse's own short error code (not message text), and
+ * a coarse category derived solely from the status code.
+ *
+ * @param {{ httpStatus?: number|null, dvCode?: string|number|null }} err
+ * @returns {{ httpStatus: number|null, dvCode: string|null, category: string }}
+ */
+function classifyDataverseWriteError(err) {
+  const httpStatus = typeof err?.httpStatus === "number" ? err.httpStatus : null;
+  const dvCode = err?.dvCode != null ? String(err.dvCode) : null;
+
+  let category = "UNKNOWN_WRITE_FAILURE";
+  if (httpStatus === 400) category = "INVALID_FIELD_OR_SCHEMA_MISMATCH";
+  else if (httpStatus === 401) category = "AUTH_FAILED";
+  else if (httpStatus === 403) category = "PERMISSION_DENIED";
+  else if (httpStatus === 404) category = "RECORD_OR_ENTITY_NOT_FOUND";
+  else if (httpStatus === 412) category = "PRECONDITION_FAILED";
+  else if (typeof httpStatus === "number" && httpStatus >= 500) category = "DATAVERSE_SERVER_ERROR";
+
+  return { httpStatus, dvCode, category };
+}
+
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -120,11 +179,15 @@ function buildMilestone6WriterExecutionLogPayload(input) {
     `Agreement preparation status ${agreementPreparationStatus || "unknown"}.`,
     `Onboarding status ${onboardingStatus || "unknown"}.`,
     `Gate used: ${OPPORTUNITY_GATE_NAME}.`,
+    correlationId ? `Correlation ID: ${correlationId}.` : null,
     "No payment link, checkout session, invoice, customer, subscription, charge, contract, author email, " +
       "Flow D activation, production automation, ISBN assignment, distribution submission, launch/release, " +
       "royalty setup, QBO logic, manuscript text, prompt body, raw model output, secrets, tokens, or headers stored."
-  ].join(" ");
+  ].filter(Boolean).join(" ");
 
+  // jm1_flowrunid does NOT exist on jm1_executionlog (confirmed against live
+  // entity metadata) — correlationId is folded into jm1_actiondescription
+  // text above instead of sent as a separate field.
   return {
     jm1_name: `M6-OPP-WRITE-${diagnosticId}`,
     jm1_actiondescription: actionDescription.slice(0, 1000),
@@ -136,8 +199,7 @@ function buildMilestone6WriterExecutionLogPayload(input) {
     jm1_startedon: completedAt,
     jm1_completedon: completedAt,
     jm1_sourceentity: SOURCE_ENTITY,
-    jm1_sourcerecordid: diagnosticId,
-    jm1_flowrunid: correlationId || null
+    jm1_sourcerecordid: diagnosticId
   };
 }
 
@@ -277,7 +339,12 @@ async function writeMilestone6OpportunityUpdate(input = {}, deps = {}) {
     const result = await postExecutionLogRecord(apiBase, token, executionLogPayload);
     executionLog = { created: true, id: result.id, error: null };
   } catch (err) {
-    executionLog = { created: false, id: null, error: err.safeCode || "DATAVERSE_WRITE_FAILED" };
+    executionLog = {
+      created: false,
+      id: null,
+      error: err.safeCode || "DATAVERSE_WRITE_FAILED",
+      diagnostics: classifyDataverseWriteError(err)
+    };
   }
 
   return {
@@ -348,11 +415,15 @@ function buildMilestone6EvidenceRecoveryLogPayload(input) {
     "Original activation attempt result: Opportunity PATCH succeeded, execution-log write failed.",
     `Gate final state: false (${OPPORTUNITY_GATE_NAME}).`,
     "Process: Milestone 6 Controlled Activation.",
+    correlationId ? `Correlation ID: ${correlationId}.` : null,
     "No payment link, checkout session, invoice, customer, subscription, charge, contract, author email, " +
       "Flow D activation, production automation, ISBN assignment, distribution submission, launch/release, " +
       "royalty setup, QBO logic, manuscript text, prompt body, raw model output, secrets, tokens, or headers stored."
-  ].join(" ");
+  ].filter(Boolean).join(" ");
 
+  // jm1_flowrunid does NOT exist on jm1_executionlog (confirmed against live
+  // entity metadata) — correlationId is folded into jm1_actiondescription
+  // text above instead of sent as a separate field.
   return {
     jm1_name: `M6-EVIDENCE-RECOVERY-${diagnosticId}`,
     jm1_actiondescription: actionDescription.slice(0, 1000),
@@ -364,8 +435,7 @@ function buildMilestone6EvidenceRecoveryLogPayload(input) {
     jm1_startedon: completedAt,
     jm1_completedon: completedAt,
     jm1_sourceentity: SOURCE_ENTITY,
-    jm1_sourcerecordid: diagnosticId,
-    jm1_flowrunid: correlationId || null
+    jm1_sourcerecordid: diagnosticId
   };
 }
 
@@ -449,7 +519,12 @@ async function writeMilestone6EvidenceOnlyLog(input = {}, deps = {}) {
     const result = await postExecutionLogRecord(apiBase, token, executionLogPayload);
     executionLog = { created: true, id: result.id, error: null };
   } catch (err) {
-    executionLog = { created: false, id: null, error: err.safeCode || "DATAVERSE_WRITE_FAILED" };
+    executionLog = {
+      created: false,
+      id: null,
+      error: err.safeCode || "DATAVERSE_WRITE_FAILED",
+      diagnostics: classifyDataverseWriteError(err)
+    };
   }
 
   return {
@@ -493,11 +568,14 @@ module.exports = {
   validateOpportunityPayload,
   buildMilestone6WriterExecutionLogPayload,
   buildMilestone6EvidenceRecoveryLogPayload,
+  classifyDataverseWriteError,
   OPPORTUNITY_GATE_NAME,
   ALLOWED_ENTITY_SET,
   ALLOWED_OPPORTUNITY_FIELDS,
   OPPORTUNITY_ID_PATTERN,
   EXECUTION_LOG_ENTITY_SET,
+  EXECUTION_LOG_FIELDS_USED,
+  EXECUTION_LOG_APPLICATION_REQUIRED_FIELDS,
   MILESTONE6_WRITER_EVENT_TYPE,
   MILESTONE6_EVIDENCE_RECOVERY_EVENT_TYPE,
   EVIDENCE_RECOVERY_REASON
