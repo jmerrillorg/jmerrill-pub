@@ -42,7 +42,7 @@ function emailLooksValid(value) {
 }
 
 function formatUsd(amountUsd) {
-  return `$${amountUsd.toFixed(2)}`;
+  return `$${amountUsd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 /**

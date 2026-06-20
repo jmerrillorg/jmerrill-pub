@@ -66,9 +66,9 @@ describe("buildMilestone6ContinuationCommunication — successful build", () => 
   test("body includes all five payment options with correct dollar amounts", () => {
     const result = buildMilestone6ContinuationCommunication(validInput());
     const body = result.sendApproval.draftBody;
-    assert.ok(body.includes("Single payment: $4680.00"));
-    assert.ok(body.includes("2 payments: $2340.00 each"));
-    assert.ok(body.includes("4 payments: $1170.00 each"));
+    assert.ok(body.includes("Single payment: $4,680.00"));
+    assert.ok(body.includes("2 payments: $2,340.00 each"));
+    assert.ok(body.includes("4 payments: $1,170.00 each"));
     assert.ok(body.includes("8 payments: $585.00 each"));
     assert.ok(body.includes("12 payments: $390.00 each"));
   });
