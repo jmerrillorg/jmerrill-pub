@@ -36,9 +36,27 @@ function isPlainObject(value) {
   return value != null && typeof value === "object" && !Array.isArray(value);
 }
 
+/**
+ * Approves an address whose domain is exactly jmerrill.one OR a subdomain
+ * of it (e.g. email.jmerrill.one — the standard pattern for an Azure
+ * Communication Services verified sending domain). Always rejects
+ * jmerrill.pub, including any subdomain of it, and rejects any domain
+ * that merely contains "jmerrill.one" as a substring without an actual
+ * domain/subdomain boundary (e.g. notjmerrill.one, jmerrill.one.evil.com).
+ */
 function isApprovedInternalAddress(value) {
   const address = normalizeString(value).toLowerCase();
-  return address.endsWith(APPROVED_INTERNAL_DOMAIN) && !address.endsWith("@jmerrill.pub");
+  const atIndex = address.lastIndexOf("@");
+  if (atIndex === -1) return false;
+
+  const domain = address.slice(atIndex + 1);
+  const approvedRoot = "jmerrill.one";
+  const forbiddenRoot = "jmerrill.pub";
+
+  const isApprovedDomain = domain === approvedRoot || domain.endsWith(`.${approvedRoot}`);
+  const isForbiddenDomain = domain === forbiddenRoot || domain.endsWith(`.${forbiddenRoot}`);
+
+  return isApprovedDomain && !isForbiddenDomain;
 }
 
 function emailLooksValid(value) {
@@ -289,6 +307,7 @@ module.exports = {
   validateAuthorResponseSendInput,
   buildAuthorResponseEmail,
   sendConfiguredAuthorResponse,
+  isApprovedInternalAddress,
   ENV_VARS,
   PROVIDER,
   CONFIG_ERROR_CODE,
