@@ -36,39 +36,96 @@ const PAYMENT_OPTION_PATTERNS = [
 const CALL_REQUEST_PATTERN = /\b(call|schedule|talk|phone|meeting|discuss|chat)\b/i;
 const HOLD_PATTERN = /\b(hold|pause|not\s*ready|need\s*more\s*time|decline|not\s*at\s*this\s*time|think\s*it\s*over)\b/i;
 
+// Lines matching any of these mark the start of quoted/prior thread content
+// (the original outbound email, an earlier reply, or a mail-client quote
+// header). Everything from the first matching line onward is discarded
+// before classification — only the author's own latest reply text above
+// that line is ever classified.
+const QUOTE_SEPARATOR_LINE_PATTERNS = [
+  /^from:\s/i,
+  /^sent:\s/i,
+  /^subject:\s/i,
+  /^to:\s/i,
+  /^on\s.+\s(wrote|said):\s*$/i,
+  /^-{2,}\s*original\s*message\s*-{2,}\s*$/i,
+  /^_{5,}\s*$/,
+  /^-{5,}\s*$/,
+  /^>{1,}/ // quoted-line marker (">", ">>", etc.) used by many mail clients
+];
+
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
 /**
+ * Isolates the author's latest, unquoted reply text by truncating the
+ * body at the first line that looks like a quote header, quoted-message
+ * separator, or quoted-line marker. If no such marker is found, returns
+ * the full (trimmed) text unchanged.
+ *
+ * Pure function — never logs or stores the input.
+ *
+ * @param {string} rawText
+ * @returns {string}
+ */
+function isolateLatestReplySegment(rawText) {
+  const text = normalizeString(rawText);
+  if (!text) return "";
+
+  const lines = text.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line && QUOTE_SEPARATOR_LINE_PATTERNS.some((p) => p.test(line))) {
+      return lines.slice(0, i).join("\n").trim();
+    }
+  }
+  return text;
+}
+
+/**
  * Classifies a publishing-mailbox reply into one of the CLASSIFICATION
- * values. Never logs, stores, or returns the input text.
+ * values. Classification is based ONLY on the author's latest, unquoted
+ * reply segment — quoted original-message content (including the full
+ * payment-option list from the outbound email) is stripped first via
+ * isolateLatestReplySegment and never influences the result.
+ *
+ * If the isolated reply segment matches more than one distinct payment
+ * option (genuine ambiguity, not quoting), this returns UNCLASSIFIED
+ * rather than guessing.
+ *
+ * Never logs, stores, or returns the input text.
  *
  * @param {string} replyText
  * @returns {{ classification: string }}
  */
 function classifyPublishingReply(replyText) {
-  const text = normalizeString(replyText);
+  const isolated = isolateLatestReplySegment(replyText);
 
-  if (!text) {
+  if (!isolated) {
     return { classification: CLASSIFICATION.UNCLASSIFIED };
   }
 
-  for (const { classification, patterns } of PAYMENT_OPTION_PATTERNS) {
-    if (patterns.some((p) => p.test(text))) {
-      return { classification };
-    }
+  const matchedOptions = PAYMENT_OPTION_PATTERNS.filter(({ patterns }) =>
+    patterns.some((p) => p.test(isolated))
+  );
+
+  if (matchedOptions.length === 1) {
+    return { classification: matchedOptions[0].classification };
+  }
+  if (matchedOptions.length > 1) {
+    // Genuine ambiguity in the author's own reply text — do not guess.
+    return { classification: CLASSIFICATION.UNCLASSIFIED };
   }
 
-  if (CALL_REQUEST_PATTERN.test(text)) {
+  if (CALL_REQUEST_PATTERN.test(isolated)) {
     return { classification: CLASSIFICATION.CALL_REQUESTED };
   }
 
-  if (HOLD_PATTERN.test(text)) {
+  if (HOLD_PATTERN.test(isolated)) {
     return { classification: CLASSIFICATION.HOLD };
   }
 
-  if (text.includes("?")) {
+  if (isolated.includes("?")) {
     return { classification: CLASSIFICATION.QUESTION };
   }
 
@@ -91,6 +148,7 @@ function getPaymentOptionDetails(classification) {
 
 module.exports = {
   classifyPublishingReply,
+  isolateLatestReplySegment,
   getPaymentOptionDetails,
   CLASSIFICATION,
   PAYMENT_OPTION_DETAILS
