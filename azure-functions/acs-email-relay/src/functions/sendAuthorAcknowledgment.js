@@ -516,6 +516,15 @@ function buildApprovedAuthorResponseEmail(payload) {
       subject: payload.subject,
       plainText: payload.body
     },
+    // A plain "Reply" (not "Reply All") only honors Reply-To, not Cc — so
+    // Reply-To must point to the internal visibility mailbox to guarantee
+    // replies are captured even when the author doesn't reply-all.
+    replyTo: [
+      {
+        address: INTERNAL_VISIBILITY_MAILBOX,
+        displayName: "J Merrill Publishing"
+      }
+    ],
     recipients: {
       to: [
         {

@@ -248,6 +248,41 @@ test("valid approved author response builds ACS email to author and copies publi
   assert.equal(email.content.subject, "Next step for your J Merrill Publishing submission");
 });
 
+test("approved author response sets Reply-To to publishing@jmerrill.one (captures plain Reply, not just Reply All)", () => {
+  const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
+  const result = validateApprovedAuthorResponsePayload(validAuthorResponsePayload());
+
+  const email = buildApprovedAuthorResponseEmail(result.value);
+  assert.ok(Array.isArray(email.replyTo));
+  assert.equal(email.replyTo.length, 1);
+  assert.equal(email.replyTo[0].address, "publishing@jmerrill.one");
+  assert.equal(email.replyTo[0].displayName, "J Merrill Publishing");
+});
+
+test("approved author response sender address remains DoNotReply@email.jmerrill.one", () => {
+  const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
+  const result = validateApprovedAuthorResponsePayload(validAuthorResponsePayload());
+
+  const email = buildApprovedAuthorResponseEmail(result.value);
+  assert.equal(email.senderAddress, "DoNotReply@email.jmerrill.one");
+});
+
+test("approved author response Reply-To is never the author's own address", () => {
+  const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
+  const result = validateApprovedAuthorResponsePayload(validAuthorResponsePayload());
+
+  const email = buildApprovedAuthorResponseEmail(result.value);
+  assert.notEqual(email.replyTo[0].address, "author@example.com");
+});
+
+test("approved author response Reply-To is never a @jmerrill.pub address", () => {
+  const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
+  const result = validateApprovedAuthorResponsePayload(validAuthorResponsePayload());
+
+  const email = buildApprovedAuthorResponseEmail(result.value);
+  assert.ok(!email.replyTo[0].address.toLowerCase().endsWith("@jmerrill.pub"));
+});
+
 test("approved author response rejects missing author email, To mismatch, missing copy, and BCC", () => {
   const { validateApprovedAuthorResponsePayload } = loadRelayModule();
 
