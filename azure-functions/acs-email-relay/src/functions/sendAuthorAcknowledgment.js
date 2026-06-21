@@ -10,6 +10,11 @@ const MAX_FIELD_LENGTH = 300;
 const MAX_BODY_LENGTH = 6000;
 const ACS_PROVIDER_NAME = "acs-email";
 const ACS_SENDER = "DoNotReply@email.jmerrill.one";
+// Dedicated sender for author-facing approved responses only (Milestone 6
+// continuation communication and beyond). Separate from ACS_SENDER, which
+// remains DoNotReply for the unrelated intake-acknowledgment and internal-
+// notification sends — those are unaffected by this change.
+const AUTHOR_RESPONSE_SENDER = "publishing@email.jmerrill.one";
 const INTERNAL_VISIBILITY_MAILBOX = "publishing@jmerrill.one";
 const INTERNAL_NOTIFICATION_TYPE = "AUTHOR_DRAFT_READY_FOR_REVIEW";
 const APPROVED_AUTHOR_RESPONSE_TYPE = "APPROVED_AUTHOR_RESPONSE";
@@ -471,6 +476,24 @@ function getAcsSenderAddress() {
   return senderAddress;
 }
 
+function getAuthorResponseSenderAddress() {
+  const senderAddress = safeTrim(process.env.ACS_AUTHOR_RESPONSE_EMAIL_SENDER);
+
+  if (!senderAddress) {
+    throw Object.assign(new Error("ACS author-response sender is missing."), {
+      safeCode: "ACS_AUTHOR_RESPONSE_SENDER_MISSING"
+    });
+  }
+
+  if (senderAddress !== AUTHOR_RESPONSE_SENDER || isJmerrillPubMailbox(senderAddress)) {
+    throw Object.assign(new Error("ACS author-response sender is invalid."), {
+      safeCode: "ACS_AUTHOR_RESPONSE_SENDER_INVALID"
+    });
+  }
+
+  return senderAddress;
+}
+
 function buildInternalNotificationEmail(payload) {
   const plainText = [
     "Internal notification only.",
@@ -511,7 +534,7 @@ function buildInternalNotificationEmail(payload) {
 
 function buildApprovedAuthorResponseEmail(payload) {
   return {
-    senderAddress: getAcsSenderAddress(),
+    senderAddress: getAuthorResponseSenderAddress(),
     content: {
       subject: payload.subject,
       plainText: payload.body

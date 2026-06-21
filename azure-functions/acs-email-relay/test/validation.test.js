@@ -6,6 +6,7 @@ const vm = require("node:vm");
 
 function loadRelayModule() {
   process.env.ACS_EMAIL_SENDER = "DoNotReply@email.jmerrill.one";
+  process.env.ACS_AUTHOR_RESPONSE_EMAIL_SENDER = "publishing@email.jmerrill.one";
 
   const routes = {};
   const filePath = path.join(
@@ -241,7 +242,7 @@ test("valid approved author response builds ACS email to author and copies publi
 
   assert.equal(result.ok, true);
   const email = buildApprovedAuthorResponseEmail(result.value);
-  assert.equal(email.senderAddress, "DoNotReply@email.jmerrill.one");
+  assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
   assert.equal(JSON.stringify(email.recipients.to.map((recipient) => recipient.address)), JSON.stringify(["author@example.com"]));
   assert.equal(JSON.stringify(email.recipients.cc.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
   assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
@@ -259,12 +260,21 @@ test("approved author response sets Reply-To to publishing@jmerrill.one (capture
   assert.equal(email.replyTo[0].displayName, "J Merrill Publishing");
 });
 
-test("approved author response sender address remains DoNotReply@email.jmerrill.one", () => {
+test("approved author response sender address is publishing@email.jmerrill.one", () => {
   const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
   const result = validateApprovedAuthorResponsePayload(validAuthorResponsePayload());
 
   const email = buildApprovedAuthorResponseEmail(result.value);
-  assert.equal(email.senderAddress, "DoNotReply@email.jmerrill.one");
+  assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
+});
+
+test("approved author response sender is never @jmerrill.pub or DoNotReply (different sender than acknowledgment/internal sends)", () => {
+  const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
+  const result = validateApprovedAuthorResponsePayload(validAuthorResponsePayload());
+
+  const email = buildApprovedAuthorResponseEmail(result.value);
+  assert.ok(!email.senderAddress.toLowerCase().endsWith("@jmerrill.pub"));
+  assert.notEqual(email.senderAddress, "DoNotReply@email.jmerrill.one");
 });
 
 test("approved author response Reply-To is never the author's own address", () => {
@@ -345,6 +355,20 @@ test("missing or invalid ACS sender fails safely", () => {
 
   process.env.ACS_EMAIL_SENDER = "publishing@jmerrill.pub";
   assert.throws(() => relay.buildInternalNotificationEmail(valid.value), /ACS sender is invalid/);
+});
+
+test("missing or invalid author-response ACS sender fails safely", () => {
+  const relay = loadRelayModule();
+  const valid = relay.validateApprovedAuthorResponsePayload(validAuthorResponsePayload());
+
+  process.env.ACS_AUTHOR_RESPONSE_EMAIL_SENDER = "";
+  assert.throws(() => relay.buildApprovedAuthorResponseEmail(valid.value), /ACS author-response sender is missing/);
+
+  process.env.ACS_AUTHOR_RESPONSE_EMAIL_SENDER = "publishing@jmerrill.pub";
+  assert.throws(() => relay.buildApprovedAuthorResponseEmail(valid.value), /ACS author-response sender is invalid/);
+
+  process.env.ACS_AUTHOR_RESPONSE_EMAIL_SENDER = "DoNotReply@email.jmerrill.one";
+  assert.throws(() => relay.buildApprovedAuthorResponseEmail(valid.value), /ACS author-response sender is invalid/);
 });
 
 test("routes are registered without changing acknowledgment route", () => {
