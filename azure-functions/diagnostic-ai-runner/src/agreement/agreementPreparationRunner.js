@@ -274,12 +274,38 @@ async function fillDocxBuffer(buffer, fillFn, fields) {
  */
 async function prepareAgreementDocumentPackage(input = {}, deps = {}) {
   if (!isPlainObject(input)) return blocked("INVALID_INPUT");
-  if (typeof deps.readTemplate !== "function" || typeof deps.writeOutput !== "function") {
-    return blocked("DEPS_MISSING_READ_OR_WRITE");
-  }
-  const resolveToken = deps.getToken || getDataverseToken;
 
   const diagnosticId = normalizeString(input.diagnosticId);
+
+  let readTemplate = deps.readTemplate;
+  let writeOutput = deps.writeOutput;
+  if (typeof readTemplate !== "function" || typeof writeOutput !== "function") {
+    // Local/dev mode reads the OneDrive canon directly when
+    // deps.localCanonPath is supplied; Azure/runtime mode reads from
+    // Blob Storage when deps.blobClientDeps is supplied. Generated
+    // output always goes to the separate generated-agreements path —
+    // never back into the template path, and never into the local
+    // canon folder.
+    if (deps.localCanonPath || deps.blobClientDeps) {
+      try {
+        const resolved = require("./agreementTemplateSource").resolveAgreementPrepDeps({
+          mode: deps.templateSourceMode,
+          diagnosticId,
+          localCanonPath: deps.localCanonPath,
+          blobClientDeps: deps.blobClientDeps
+        });
+        readTemplate = readTemplate || resolved.readTemplate;
+        writeOutput = writeOutput || resolved.writeOutput;
+      } catch (err) {
+        return blocked(err.safeCode || "TEMPLATE_SOURCE_RESOLUTION_FAILED");
+      }
+    }
+  }
+  if (typeof readTemplate !== "function" || typeof writeOutput !== "function") {
+    return blocked("DEPS_MISSING_READ_OR_WRITE");
+  }
+
+  const resolveToken = deps.getToken || getDataverseToken;
   const intakeReferenceCode = normalizeString(input.intakeReferenceCode);
   const opportunityId = normalizeString(input.opportunityId);
 
@@ -296,26 +322,26 @@ async function prepareAgreementDocumentPackage(input = {}, deps = {}) {
   const allDeferred = new Set();
 
   try {
-    const agreementBuf = await deps.readTemplate(TEMPLATE_NAME.PUBLISHING_AGREEMENT);
+    const agreementBuf = await readTemplate(TEMPLATE_NAME.PUBLISHING_AGREEMENT);
     const agreementResult = await fillDocxBuffer(agreementBuf, fillPublishingAgreement, fields);
     const agreementOutputName = `JMP_Publishing_Agreement_FILLED_${diagnosticId}.docx`;
-    const agreementOutputPath = await deps.writeOutput(agreementOutputName, agreementResult.buffer);
+    const agreementOutputPath = await writeOutput(agreementOutputName, agreementResult.buffer);
     documents.push({ sourceTemplate: TEMPLATE_NAME.PUBLISHING_AGREEMENT, outputPath: agreementOutputPath, filledFields: agreementResult.filledFields, unmatchedFields: agreementResult.unmatchedFields });
     agreementResult.deferredFields.forEach((f) => allDeferred.add(f));
 
-    const addendumBuf = await deps.readTemplate(TEMPLATE_NAME.PACKAGE_ADDENDUM);
+    const addendumBuf = await readTemplate(TEMPLATE_NAME.PACKAGE_ADDENDUM);
     const addendumResult = await fillDocxBuffer(addendumBuf, fillPackageAddendum, fields);
     const addendumOutputName = `JMP_Publishing_Package_Addendum_FILLED_${diagnosticId}.docx`;
-    const addendumOutputPath = await deps.writeOutput(addendumOutputName, addendumResult.buffer);
+    const addendumOutputPath = await writeOutput(addendumOutputName, addendumResult.buffer);
     documents.push({ sourceTemplate: TEMPLATE_NAME.PACKAGE_ADDENDUM, outputPath: addendumOutputPath, filledFields: addendumResult.filledFields, unmatchedFields: addendumResult.unmatchedFields });
     addendumResult.deferredFields.forEach((f) => allDeferred.add(f));
 
     let audiobookOutputPath = null;
     if (fields.audiobookIncluded) {
-      const audiobookBuf = await deps.readTemplate(TEMPLATE_NAME.AUDIOBOOK_ADDENDUM);
+      const audiobookBuf = await readTemplate(TEMPLATE_NAME.AUDIOBOOK_ADDENDUM);
       const audiobookResult = await fillDocxBuffer(audiobookBuf, fillAudiobookAddendum, fields);
       const audiobookOutputName = `JMP_Audiobook_Addendum_FILLED_${diagnosticId}.docx`;
-      audiobookOutputPath = await deps.writeOutput(audiobookOutputName, audiobookResult.buffer);
+      audiobookOutputPath = await writeOutput(audiobookOutputName, audiobookResult.buffer);
       documents.push({ sourceTemplate: TEMPLATE_NAME.AUDIOBOOK_ADDENDUM, outputPath: audiobookOutputPath, filledFields: audiobookResult.filledFields, unmatchedFields: audiobookResult.unmatchedFields });
       audiobookResult.deferredFields.forEach((f) => allDeferred.add(f));
     }
@@ -324,7 +350,7 @@ async function prepareAgreementDocumentPackage(input = {}, deps = {}) {
     if (fields.paymentSchedule.requiresScheduleAAttachment) {
       const scheduleABuffer = await generateScheduleADocument(fields);
       const scheduleAOutputName = `JMP_Schedule_A_Payment_Schedule_${diagnosticId}.docx`;
-      scheduleAOutputPath = await deps.writeOutput(scheduleAOutputName, scheduleABuffer);
+      scheduleAOutputPath = await writeOutput(scheduleAOutputName, scheduleABuffer);
       documents.push({ sourceTemplate: "GENERATED:ScheduleA", outputPath: scheduleAOutputPath, filledFields: [{ field: "paymentSchedule", value: `${fields.paymentSchedule.installments} installments` }], unmatchedFields: [] });
     }
 
