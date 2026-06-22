@@ -28,7 +28,9 @@ const VALIDATED_FIELDS = new Set([
   "jm1_diagnosticstructuredoutputjson",
   "jm1_diagnosticriskflags",
   "jm1_diagnosticexecutionerror",
-  "jm1_humanreviewnotes"
+  "jm1_humanreviewnotes",
+  "jm1pub_editorialfitsummary",
+  "jm1pub_editorialriskflags"
 ]);
 
 // ASCII and Unicode quotation mark patterns that bracket quoted content.
