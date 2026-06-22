@@ -16,3 +16,6 @@ pnpm-debug.log*
 azure-functions/acs-email-relay/local.settings.json
 azure-functions/acs-email-relay/local.settings.*.json
 !azure-functions/acs-email-relay/local.settings.example.json
+
+# Locally-generated, author-specific controlled-record output (never commit real legal/PII documents)
+.controlled-output/
