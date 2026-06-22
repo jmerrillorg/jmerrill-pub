@@ -108,6 +108,36 @@ function createGeneratedOutputBlobWriter(deps) {
 }
 
 /**
+ * Reads a previously-written generated output document back from Blob,
+ * scoped to generated-agreements/{diagnosticId}/ — never the template
+ * path. Used by the send path to attach already-prepared documents
+ * without needing local filesystem access.
+ *
+ * @param {{
+ *   downloadBlob: (blobName: string) => Promise<Buffer|null>,
+ *   diagnosticId: string, generatedPrefix?: string
+ * }} deps
+ * @returns {(name: string) => Promise<Buffer>}
+ */
+function createGeneratedOutputBlobReader(deps) {
+  const generatedPrefix = deps.generatedPrefix || DEFAULT_GENERATED_PREFIX;
+  const diagnosticId = deps.diagnosticId;
+
+  if (!diagnosticId) {
+    throw Object.assign(new Error("diagnosticId is required to scope the generated-output path"), { safeCode: "DIAGNOSTIC_ID_REQUIRED_FOR_GENERATED_OUTPUT" });
+  }
+
+  return async (name) => {
+    const blobName = `${generatedPrefix}${diagnosticId}/${name}`;
+    const buffer = await deps.downloadBlob(blobName);
+    if (!buffer) {
+      throw Object.assign(new Error(`Generated document '${name}' not found`), { safeCode: "GENERATED_DOCUMENT_NOT_FOUND" });
+    }
+    return buffer;
+  };
+}
+
+/**
  * Resolves the read/write dependency pair for prepareAgreementDocumentPackage
  * based on mode. Pure selection logic — the actual storage clients are
  * supplied by the caller (e.g. the HTTP wrapper, using managed identity
@@ -153,6 +183,7 @@ module.exports = {
   createLocalTemplateReader,
   createBlobTemplateReader,
   createGeneratedOutputBlobWriter,
+  createGeneratedOutputBlobReader,
   resolveAgreementPrepDeps,
   isUnderTemplatePrefix,
   DEFAULT_BLOB_CONTAINER,

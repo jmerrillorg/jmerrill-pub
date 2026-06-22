@@ -9,6 +9,7 @@ const {
   createLocalTemplateReader,
   createBlobTemplateReader,
   createGeneratedOutputBlobWriter,
+  createGeneratedOutputBlobReader,
   resolveAgreementPrepDeps,
   isUnderTemplatePrefix,
   DEFAULT_TEMPLATE_PREFIX
@@ -93,6 +94,28 @@ describe("createGeneratedOutputBlobWriter — path separation", () => {
       uploadBlob: async () => {}
     });
     await assert.rejects(() => writer("Filled.docx", Buffer.from("x")), (err) => err.safeCode === "GENERATED_OUTPUT_WOULD_OVERWRITE_TEMPLATE_PATH");
+  });
+});
+
+describe("createGeneratedOutputBlobReader", () => {
+  test("reads back from generated-agreements/{diagnosticId}/", async () => {
+    let requestedBlobName = null;
+    const reader = createGeneratedOutputBlobReader({
+      diagnosticId: "64e387e0-7e6a-f111-a826-00224820105b",
+      downloadBlob: async (name) => { requestedBlobName = name; return Buffer.from("filled content"); }
+    });
+    const buffer = await reader("Filled.docx");
+    assert.equal(requestedBlobName, "generated-agreements/64e387e0-7e6a-f111-a826-00224820105b/Filled.docx");
+    assert.equal(buffer.toString("utf8"), "filled content");
+  });
+
+  test("throws GENERATED_DOCUMENT_NOT_FOUND when the blob does not exist", async () => {
+    const reader = createGeneratedOutputBlobReader({ diagnosticId: "x", downloadBlob: async () => null });
+    await assert.rejects(() => reader("Missing.docx"), (err) => err.safeCode === "GENERATED_DOCUMENT_NOT_FOUND");
+  });
+
+  test("throws DIAGNOSTIC_ID_REQUIRED_FOR_GENERATED_OUTPUT when diagnosticId is missing", () => {
+    assert.throws(() => createGeneratedOutputBlobReader({ downloadBlob: async () => {} }), (err) => err.safeCode === "DIAGNOSTIC_ID_REQUIRED_FOR_GENERATED_OUTPUT");
   });
 });
 
