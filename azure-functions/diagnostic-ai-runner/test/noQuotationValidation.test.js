@@ -285,7 +285,11 @@ describe("validateNoQuotation — UNKNOWN_FIELD rule", () => {
       "jm1_diagnosticexecutionerror",
       "jm1_humanreviewnotes",
       "jm1pub_editorialfitsummary",
-      "jm1pub_editorialriskflags"
+      "jm1pub_editorialriskflags",
+      "jm1pub_authorfacingsummary",
+      "jm1pub_authorfacingstrengths",
+      "jm1pub_authorfacingsupportneeded",
+      "jm1pub_authorfacingnextsteps"
     ];
     assert.equal(VALIDATED_FIELDS.size, expected.length);
     for (const f of expected) {

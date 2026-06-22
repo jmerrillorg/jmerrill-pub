@@ -7,14 +7,17 @@ const {
   composePreContractEditorialReview,
   determineImprintRecommendation,
   mapAiReviewToImprintDecision,
+  buildInternalDiagnosticScorecard,
+  buildAuthorFacingScoringSummary,
   buildEditorialReviewExecutionLogPayload,
   GATE_NAME,
   MANUSCRIPT_WORK_TYPE,
   IMPRINT_OUTCOME,
-  HUMAN_REVIEW_REASON
+  HUMAN_REVIEW_REASON,
+  AGREEMENT_READINESS_STATUS
 } = require("../src/editorial/preContractEditorialReviewRunner");
 const { RECOMMENDED_IMPRINT, DIAGNOSTIC_STATUS } = require("../src/editorial/preContractEditorialReviewGate");
-const { IMPRINT_CODE, FIT_DECISION } = require("../src/editorial/manuscriptEditorialReviewProvider");
+const { IMPRINT_CODE, FIT_DECISION, SCORE_CATEGORY, AUTHOR_FACING_FIELD } = require("../src/editorial/manuscriptEditorialReviewProvider");
 
 const originalFetch = global.fetch;
 const originalEnv = {
@@ -34,12 +37,22 @@ function aiOutput(overrides = {}) {
   return {
     jm1pub_editorialfitsummary: "Practical nonfiction with a clear structure and consistent voice.",
     jm1pub_editorialriskflags: "None identified",
+    [SCORE_CATEGORY.MANUSCRIPT_FIT]: 8,
+    [SCORE_CATEGORY.PACKAGE_FIT]: 7,
+    [SCORE_CATEGORY.IMPRINT_FIT]: 8,
+    [SCORE_CATEGORY.EDITORIAL_READINESS]: 6,
+    [SCORE_CATEGORY.PRODUCTION_COMPLEXITY]: 3,
+    [SCORE_CATEGORY.AUDIENCE_MARKET_CLARITY]: 7,
     jm1pub_recommendedimprintcode: IMPRINT_CODE.JM_WORKS,
     jm1pub_imprintconfidence: 0.85,
     jm1pub_fitdecision: FIT_DECISION.GOOD_FIT,
     jm1pub_signaturecandidacy: false,
     jm1pub_rightsdisclosureflag: false,
     jm1pub_requireshumanreview: false,
+    [AUTHOR_FACING_FIELD.SUMMARY]: "We're excited to recommend the Professional Package with JM Works for your project.",
+    [AUTHOR_FACING_FIELD.STRENGTHS]: "Clear voice and well-organized chapters throughout.",
+    [AUTHOR_FACING_FIELD.SUPPORT_NEEDED]: "A developmental pass will help sharpen the middle section.",
+    [AUTHOR_FACING_FIELD.NEXT_STEPS]: "We'll move forward with your package selection and agreement next.",
     ...overrides
   };
 }
@@ -485,6 +498,8 @@ describe("buildEditorialReviewExecutionLogPayload — safe evidence only", () =>
         fitConfirmed: true,
         readyForAutoLock: true,
         humanReviewReason: null,
+        agreementReadinessStatus: AGREEMENT_READINESS_STATUS.READY_FOR_AGREEMENT,
+        internalScorecard: null,
         imprintResult: {
           outcome: IMPRINT_OUTCOME.AUTO_RECOMMENDED,
           recommendedImprintLabel: "JM Works",
@@ -534,5 +549,176 @@ describe("determineImprintRecommendation — Signature-signal short-circuit", ()
     const r = determineImprintRecommendation({ signatureReviewRequiredSignal: true });
     assert.equal(r.outcome, IMPRINT_OUTCOME.SIGNATURE_CANDIDATE);
     assert.equal(r.autoLock, false);
+  });
+});
+
+// ── Scoring requirements (manual standard: scoring is part of the
+// author-facing route explanation, not just imprint selection) ─────────────
+
+describe("1. Pre-contract review returns score categories", () => {
+  test("buildInternalDiagnosticScorecard returns all required categories plus an overall score", () => {
+    const scorecard = buildInternalDiagnosticScorecard(aiOutput());
+    assert.equal(scorecard.manuscriptFit, 8);
+    assert.equal(scorecard.packageFit, 7);
+    assert.equal(scorecard.imprintFit, 8);
+    assert.equal(scorecard.editorialReadiness, 6);
+    assert.equal(scorecard.productionComplexity, 3);
+    assert.equal(scorecard.audienceMarketClarity, 7);
+    assert.equal(scorecard.faithMissionAlignment, null);
+    assert.equal(scorecard.overallScore, 6.5);
+  });
+
+  test("a faith/mission-relevant work includes that score in the overall average", () => {
+    const scorecard = buildInternalDiagnosticScorecard(aiOutput({ [SCORE_CATEGORY.FAITH_MISSION_ALIGNMENT]: 10 }));
+    assert.equal(scorecard.faithMissionAlignment, 10);
+    // average of 8,7,8,6,3,7,10 = 49/7 = 7
+    assert.equal(scorecard.overallScore, 7);
+  });
+
+  test("the runner's return value exposes the internal scorecard for a content-aware run", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([diagnosticReadResponse(), patchResponse(), executionLogResponse()]);
+    const result = await runPreContractEditorialReview(baseInput(), reviewerDeps());
+    assert.ok(result.internalScorecard);
+    assert.equal(result.internalScorecard.manuscriptFit, 8);
+    assert.equal(result.internalScorecard.overallScore, 6.5);
+  });
+});
+
+describe("2. Author-facing scoring summary is generated", () => {
+  test("buildAuthorFacingScoringSummary returns the four required author-facing fields", () => {
+    const summary = buildAuthorFacingScoringSummary(aiOutput());
+    assert.equal(typeof summary.summary, "string");
+    assert.equal(typeof summary.strengths, "string");
+    assert.equal(typeof summary.supportNeeded, "string");
+    assert.equal(typeof summary.nextSteps, "string");
+    assert.ok(summary.summary.length > 0);
+  });
+
+  test("the runner's return value exposes the author-facing summary for a content-aware run", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([diagnosticReadResponse(), patchResponse(), executionLogResponse()]);
+    const result = await runPreContractEditorialReview(baseInput(), reviewerDeps());
+    assert.ok(result.authorFacingSummary);
+    assert.equal(result.authorFacingSummary.summary, aiOutput()[AUTHOR_FACING_FIELD.SUMMARY]);
+  });
+});
+
+describe("3. Internal-only diagnostic details are separated from the author-facing summary", () => {
+  test("the internal scorecard and the author-facing summary share no field names", () => {
+    const scorecard = buildInternalDiagnosticScorecard(aiOutput());
+    const summary = buildAuthorFacingScoringSummary(aiOutput());
+    const scorecardKeys = new Set(Object.keys(scorecard));
+    const summaryKeys = new Set(Object.keys(summary));
+    const intersection = [...scorecardKeys].filter((k) => summaryKeys.has(k));
+    assert.deepEqual(intersection, []);
+  });
+
+  test("the author-facing summary never contains internal risk-flag or score language", () => {
+    const summary = buildAuthorFacingScoringSummary(aiOutput({ jm1pub_editorialriskflags: "Pacing concerns; needs developmental pass" }));
+    assert.ok(!JSON.stringify(summary).includes("Pacing concerns"));
+  });
+
+  test("the internal scorecard never contains the author-facing strings", () => {
+    const scorecard = buildInternalDiagnosticScorecard(aiOutput());
+    assert.ok(!("summary" in scorecard));
+    assert.ok(!("nextSteps" in scorecard));
+  });
+});
+
+describe("4. Raw manuscript text is not logged", () => {
+  test("internal scorecard, author-facing summary, and execution log all omit the manuscript content", async () => {
+    process.env[GATE_NAME] = "true";
+    const calls = mockFetchSequence([diagnosticReadResponse(), patchResponse(), executionLogResponse()]);
+    const result = await runPreContractEditorialReview(baseInput(), reviewerDeps());
+    assert.ok(!JSON.stringify(result.internalScorecard).includes(FORBIDDEN_TEXT));
+    assert.ok(!JSON.stringify(result.authorFacingSummary).includes(FORBIDDEN_TEXT));
+    const logCall = calls[calls.length - 1];
+    assert.ok(!logCall.options.body.includes(FORBIDDEN_TEXT));
+  });
+});
+
+describe("5. Raw AI/model output is not author-facing", () => {
+  test("the author-facing summary contains only the four dedicated fields — never the raw tool output object", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([diagnosticReadResponse(), patchResponse(), executionLogResponse()]);
+    const result = await runPreContractEditorialReview(baseInput(), reviewerDeps());
+    const allowedKeys = new Set(["summary", "strengths", "supportNeeded", "nextSteps"]);
+    for (const key of Object.keys(result.authorFacingSummary)) {
+      assert.ok(allowedKeys.has(key), `unexpected key on author-facing summary: ${key}`);
+    }
+    // Internal-only fields must never leak into the author-facing object.
+    assert.ok(!("jm1pub_editorialriskflags" in result.authorFacingSummary));
+    assert.ok(!("aiConfidenceScore" in result.authorFacingSummary));
+  });
+});
+
+describe("6. Fit/package/imprint decisions are based on manuscript content plus metadata", () => {
+  test("genre/work-type metadata is passed to the reviewer as context alongside manuscript content", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([
+      diagnosticReadResponse({ jm1pub_worktype: MANUSCRIPT_WORK_TYPE.FULL_LENGTH_BOOK, jm1pub_genreconfirmed: "Self-Help" }),
+      patchResponse(),
+      executionLogResponse()
+    ]);
+    let capturedPrompt = null;
+    await runPreContractEditorialReview(baseInput(), {
+      getToken: async () => "fake",
+      extractManuscript: defaultExtractor(48246),
+      reviewManuscript: async ({ promptBody }) => { capturedPrompt = promptBody; return { ok: true, output: aiOutput() }; }
+    });
+    assert.ok(capturedPrompt.includes("Self-Help"));
+    assert.ok(capturedPrompt.includes("Full-length Book"));
+    assert.ok(capturedPrompt.includes(FORBIDDEN_TEXT)); // manuscript content also present
+  });
+});
+
+describe("7. Non-Signature route can auto-lock (with scoring present)", () => {
+  test("a confident JM Works recommendation auto-locks and carries a scorecard + author-facing summary", async () => {
+    process.env[GATE_NAME] = "true";
+    const calls = mockFetchSequence([diagnosticReadResponse(), patchResponse(), executionLogResponse()]);
+    const result = await runPreContractEditorialReview(baseInput(), reviewerDeps());
+    assert.equal(result.imprintAutoLocked, true);
+    assert.ok(result.internalScorecard);
+    assert.ok(result.authorFacingSummary);
+    const patchCall = calls.find((c) => c.options.method === "PATCH");
+    assert.equal(JSON.parse(patchCall.options.body).jm1pub_imprintlocked, true);
+  });
+});
+
+describe("8. Signature candidate routes to human review (scoring still produced where applicable)", () => {
+  test("signature candidacy from content review does not auto-lock, agreement readiness is blocked", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([diagnosticReadResponse(), patchResponse(), executionLogResponse()]);
+    const result = await runPreContractEditorialReview(baseInput(), reviewerDeps({ jm1pub_signaturecandidacy: true }));
+    assert.equal(result.imprintAutoLocked, false);
+    assert.equal(result.agreementReadinessStatus, AGREEMENT_READINESS_STATUS.BLOCKED_HUMAN_REVIEW_REQUIRED);
+  });
+});
+
+describe("9. Agreement generation remains blocked until scoring review and imprint lock are complete", () => {
+  test("a technical AI failure (no scoring produced) leaves agreementReadinessStatus blocked", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([diagnosticReadResponse(), patchResponse(), executionLogResponse()]);
+    const result = await runPreContractEditorialReview(baseInput(), {
+      getToken: async () => "fake",
+      extractManuscript: defaultExtractor(48246),
+      reviewManuscript: async () => ({ ok: false, output: null, error: "ANTHROPIC_HTTP_500" })
+    });
+    assert.equal(result.agreementReadinessStatus, AGREEMENT_READINESS_STATUS.BLOCKED_HUMAN_REVIEW_REQUIRED);
+    assert.equal(result.internalScorecard, null);
+    assert.equal(result.authorFacingSummary, null);
+  });
+});
+
+describe("10. Agreement generation can resume when scoring review is complete and a non-Signature imprint is locked", () => {
+  test("a completed, auto-locked, scored review reports READY_FOR_AGREEMENT", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([diagnosticReadResponse(), patchResponse(), executionLogResponse()]);
+    const result = await runPreContractEditorialReview(baseInput(), reviewerDeps());
+    assert.equal(result.agreementReadinessStatus, AGREEMENT_READINESS_STATUS.READY_FOR_AGREEMENT);
+    assert.equal(result.imprintAutoLocked, true);
+    assert.ok(result.internalScorecard);
+    assert.ok(result.authorFacingSummary);
   });
 });

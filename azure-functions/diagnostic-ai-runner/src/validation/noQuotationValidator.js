@@ -30,7 +30,11 @@ const VALIDATED_FIELDS = new Set([
   "jm1_diagnosticexecutionerror",
   "jm1_humanreviewnotes",
   "jm1pub_editorialfitsummary",
-  "jm1pub_editorialriskflags"
+  "jm1pub_editorialriskflags",
+  "jm1pub_authorfacingsummary",
+  "jm1pub_authorfacingstrengths",
+  "jm1pub_authorfacingsupportneeded",
+  "jm1pub_authorfacingnextsteps"
 ]);
 
 // ASCII and Unicode quotation mark patterns that bracket quoted content.
