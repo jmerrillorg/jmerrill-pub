@@ -283,7 +283,9 @@ describe("validateNoQuotation — UNKNOWN_FIELD rule", () => {
       "jm1_diagnosticstructuredoutputjson",
       "jm1_diagnosticriskflags",
       "jm1_diagnosticexecutionerror",
-      "jm1_humanreviewnotes"
+      "jm1_humanreviewnotes",
+      "jm1pub_editorialfitsummary",
+      "jm1pub_editorialriskflags"
     ];
     assert.equal(VALIDATED_FIELDS.size, expected.length);
     for (const f of expected) {
