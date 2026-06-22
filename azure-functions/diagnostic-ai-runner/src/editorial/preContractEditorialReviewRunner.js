@@ -140,6 +140,26 @@ const AI_IMPRINT_CODE_TO_RECOMMENDED_IMPRINT = Object.freeze({
   [editorialReviewProvider.IMPRINT_CODE.JM_VERSE]: RECOMMENDED_IMPRINT.JM_VERSE
 });
 
+const AGREEMENT_READINESS_STATUS = Object.freeze({
+  READY_FOR_AGREEMENT: "READY_FOR_AGREEMENT",
+  BLOCKED_HUMAN_REVIEW_REQUIRED: "BLOCKED_HUMAN_REVIEW_REQUIRED",
+  BLOCKED_PACKAGE_MISMATCH: "BLOCKED_PACKAGE_MISMATCH"
+});
+
+// Internal scorecard category keys exposed on the runner's return value
+// and execution-log evidence — distinct names from the AI tool's own
+// field names so callers cannot confuse "what the model returned" with
+// "the validated, structured scorecard this module produces."
+const SCORECARD_CATEGORY_LABEL = Object.freeze({
+  manuscriptFit: "Manuscript fit",
+  packageFit: "Package fit",
+  imprintFit: "Imprint fit",
+  editorialReadiness: "Editorial readiness",
+  productionComplexity: "Production complexity",
+  audienceMarketClarity: "Audience/market clarity",
+  faithMissionAlignment: "Faith/mission alignment"
+});
+
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -300,6 +320,69 @@ function mapAiReviewToImprintDecision(aiOutput) {
 }
 
 /**
+ * Builds the internal-only diagnostic scorecard from a schema-validated,
+ * no-quotation-validated AI review output. JMP/system use only — never
+ * included in any author-facing send. Pure — no I/O.
+ *
+ * @param {object} aiOutput — validated submit_precontract_editorial_review tool output
+ * @returns {{
+ *   manuscriptFit: number, packageFit: number, imprintFit: number,
+ *   editorialReadiness: number, productionComplexity: number,
+ *   audienceMarketClarity: number, faithMissionAlignment: number|null,
+ *   overallScore: number, riskFlags: string, signatureCandidacy: boolean,
+ *   requiresHumanReview: boolean, fitSummary: string
+ * }}
+ */
+function buildInternalDiagnosticScorecard(aiOutput) {
+  const { SCORE_CATEGORY } = editorialReviewProvider;
+  const categories = {
+    manuscriptFit: aiOutput[SCORE_CATEGORY.MANUSCRIPT_FIT],
+    packageFit: aiOutput[SCORE_CATEGORY.PACKAGE_FIT],
+    imprintFit: aiOutput[SCORE_CATEGORY.IMPRINT_FIT],
+    editorialReadiness: aiOutput[SCORE_CATEGORY.EDITORIAL_READINESS],
+    productionComplexity: aiOutput[SCORE_CATEGORY.PRODUCTION_COMPLEXITY],
+    audienceMarketClarity: aiOutput[SCORE_CATEGORY.AUDIENCE_MARKET_CLARITY],
+    faithMissionAlignment: aiOutput[SCORE_CATEGORY.FAITH_MISSION_ALIGNMENT] ?? null
+  };
+
+  const presentScores = Object.values(categories).filter((v) => typeof v === "number" && !Number.isNaN(v));
+  const overallScore = presentScores.length > 0
+    ? Math.round((presentScores.reduce((sum, v) => sum + v, 0) / presentScores.length) * 10) / 10
+    : null;
+
+  return {
+    ...categories,
+    overallScore,
+    riskFlags: aiOutput.jm1pub_editorialriskflags,
+    signatureCandidacy: aiOutput.jm1pub_signaturecandidacy === true,
+    requiresHumanReview: aiOutput.jm1pub_requireshumanreview === true,
+    fitSummary: aiOutput.jm1pub_editorialfitsummary
+  };
+}
+
+/**
+ * Builds the author-facing scoring summary from a schema-validated,
+ * no-quotation-validated AI review output. Contains ONLY the four
+ * dedicated author-facing fields — deliberately disjoint from the
+ * internal scorecard (buildInternalDiagnosticScorecard above) so the two
+ * can never be confused or merged. This summary is suitable for
+ * inclusion in author communication once SEPARATELY gated and sent — it
+ * is not sent by this module. Pure — no I/O.
+ *
+ * @param {object} aiOutput — validated submit_precontract_editorial_review tool output
+ * @returns {{ summary: string, strengths: string, supportNeeded: string, nextSteps: string }}
+ */
+function buildAuthorFacingScoringSummary(aiOutput) {
+  const { AUTHOR_FACING_FIELD } = editorialReviewProvider;
+  return {
+    summary: aiOutput[AUTHOR_FACING_FIELD.SUMMARY],
+    strengths: aiOutput[AUTHOR_FACING_FIELD.STRENGTHS],
+    supportNeeded: aiOutput[AUTHOR_FACING_FIELD.SUPPORT_NEEDED],
+    nextSteps: aiOutput[AUTHOR_FACING_FIELD.NEXT_STEPS]
+  };
+}
+
+/**
  * Pure composer — combines word-count/package-fit validation with an
  * already-resolved imprint decision (from either the Signature-signal
  * short-circuit or a content-aware AI review) into one overall
@@ -320,13 +403,22 @@ function composePreContractEditorialReview(input = {}) {
     ? HUMAN_REVIEW_REASON.PACKAGE_MISMATCH
     : imprintResult.humanReviewReason || null;
 
+  const agreementReadinessStatus = readyForAutoLock
+    ? AGREEMENT_READINESS_STATUS.READY_FOR_AGREEMENT
+    : (humanReviewReason === HUMAN_REVIEW_REASON.PACKAGE_MISMATCH
+      ? AGREEMENT_READINESS_STATUS.BLOCKED_PACKAGE_MISMATCH
+      : AGREEMENT_READINESS_STATUS.BLOCKED_HUMAN_REVIEW_REQUIRED);
+
   return {
     wordCountResult,
     imprintResult,
     fitConfirmed,
     readyForAutoLock,
     requiresHumanDecision,
-    humanReviewReason
+    humanReviewReason,
+    agreementReadinessStatus,
+    internalScorecard: input.internalScorecard ?? null,
+    authorFacingSummary: input.authorFacingSummary ?? null
   };
 }
 
@@ -359,12 +451,21 @@ async function postExecutionLogRecord(apiBase, token, payload) {
   };
 }
 
+function formatScorecardSummary(scorecard) {
+  if (!scorecard) return null;
+  const parts = Object.entries(SCORECARD_CATEGORY_LABEL)
+    .filter(([key]) => scorecard[key] != null)
+    .map(([key, label]) => `${label} ${scorecard[key]}/10`);
+  return `Scorecard (overall ${scorecard.overallScore}/10): ${parts.join(", ")}.`;
+}
+
 function buildEditorialReviewExecutionLogPayload({ diagnosticId, intakeReferenceCode, opportunityId, review, contentAwareReviewPerformed, completedAt }) {
   const actionDescription = [
     `Pre-contract editorial review performed by the pipeline for intake ${intakeReferenceCode}.`,
     `Opportunity ${opportunityId}. No Opportunity write occurs in this run.`,
     `Content-aware manuscript review performed: ${contentAwareReviewPerformed}.`,
     `Word count fit confirmed: ${review.fitConfirmed}.`,
+    `Agreement readiness: ${review.agreementReadinessStatus}.`,
     `Imprint outcome: ${review.imprintResult.outcome}.`,
     review.imprintResult.recommendedImprintLabel
       ? `Recommended imprint: ${review.imprintResult.recommendedImprintLabel} (confidence: ${review.imprintResult.confidence}).`
@@ -372,6 +473,8 @@ function buildEditorialReviewExecutionLogPayload({ diagnosticId, intakeReference
     review.readyForAutoLock ? "Imprint auto-locked by the pipeline." : `Imprint NOT auto-locked — requires human decision (${review.humanReviewReason}).`,
     review.imprintResult.editorialFitSummary ? `Fit summary: ${review.imprintResult.editorialFitSummary}.` : null,
     review.imprintResult.editorialRiskFlags ? `Risk flags: ${review.imprintResult.editorialRiskFlags}.` : null,
+    formatScorecardSummary(review.internalScorecard),
+    "Author-facing scoring summary generated and held internally pending separate send approval — not sent in this run.",
     "Word count source: MANUSCRIPT_FILE (not the /join intake estimate).",
     "No raw manuscript text, raw AI/model output, prompt body, secrets, tokens, or headers stored.",
     "No contract generated, no author-facing send, no Stripe/payment/production/distribution/launch/royalty/marketing action occurred."
@@ -514,6 +617,8 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
   const officialManuscriptWordCount = extractResult.metadata.wordCount;
 
   let imprintDecision;
+  let internalScorecard = null;
+  let authorFacingSummary = null;
   let contentAwareReviewPerformed = false;
 
   if (signatureReviewRequiredSignal) {
@@ -550,9 +655,14 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
           `Content-aware AI review output failed schema validation (${schemaResult.errors.join(", ")}) — requires human review.`
         );
       } else {
+        const { AUTHOR_FACING_FIELD } = editorialReviewProvider;
         const quotationResult = validateNoQuotation({
           jm1pub_editorialfitsummary: aiCallResult.output.jm1pub_editorialfitsummary,
-          jm1pub_editorialriskflags: aiCallResult.output.jm1pub_editorialriskflags
+          jm1pub_editorialriskflags: aiCallResult.output.jm1pub_editorialriskflags,
+          [AUTHOR_FACING_FIELD.SUMMARY]: aiCallResult.output[AUTHOR_FACING_FIELD.SUMMARY],
+          [AUTHOR_FACING_FIELD.STRENGTHS]: aiCallResult.output[AUTHOR_FACING_FIELD.STRENGTHS],
+          [AUTHOR_FACING_FIELD.SUPPORT_NEEDED]: aiCallResult.output[AUTHOR_FACING_FIELD.SUPPORT_NEEDED],
+          [AUTHOR_FACING_FIELD.NEXT_STEPS]: aiCallResult.output[AUTHOR_FACING_FIELD.NEXT_STEPS]
         });
         if (!quotationResult.valid) {
           imprintDecision = notAutoLockedDecision(
@@ -562,6 +672,8 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
           );
         } else {
           imprintDecision = mapAiReviewToImprintDecision(aiCallResult.output);
+          internalScorecard = buildInternalDiagnosticScorecard(aiCallResult.output);
+          authorFacingSummary = buildAuthorFacingScoringSummary(aiCallResult.output);
         }
       }
     }
@@ -571,7 +683,9 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
     selectedPackageCode,
     officialManuscriptWordCount,
     intakeEstimatedWordCount: null,
-    imprintDecision
+    imprintDecision,
+    internalScorecard,
+    authorFacingSummary
   });
 
   // Build the allowlisted PATCH payload for the Diagnostic record only.
@@ -635,6 +749,9 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
     imprintAutoLocked: review.readyForAutoLock,
     requiresHumanDecision: review.requiresHumanDecision,
     humanReviewReason: review.humanReviewReason,
+    agreementReadinessStatus: review.agreementReadinessStatus,
+    internalScorecard: review.internalScorecard,
+    authorFacingSummary: review.authorFacingSummary,
     diagnosticRecordEtag: patchResult.etag,
     fieldsUpdated: Object.keys(diagnosticPayload),
     executionLog,
@@ -661,6 +778,8 @@ module.exports = {
   composePreContractEditorialReview,
   determineImprintRecommendation,
   mapAiReviewToImprintDecision,
+  buildInternalDiagnosticScorecard,
+  buildAuthorFacingScoringSummary,
   buildEditorialReviewExecutionLogPayload,
   GATE_NAME,
   MANUSCRIPT_WORK_TYPE,
@@ -670,6 +789,8 @@ module.exports = {
   IMPRINT_OUTCOME,
   IMPRINT_CONFIDENCE,
   HUMAN_REVIEW_REASON,
+  AGREEMENT_READINESS_STATUS,
+  SCORECARD_CATEGORY_LABEL,
   IMPRINT_CONFIDENCE_AUTOLOCK_THRESHOLD,
   IMPRINT_CONFIDENCE_HIGH_THRESHOLD,
   AI_IMPRINT_CODE_TO_RECOMMENDED_IMPRINT,
