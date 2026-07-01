@@ -3,15 +3,20 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import {
+  audiobookInterestOptions,
   authorPhotoOnBackCoverOptions,
   bindingTypeOptions,
   coverFinishPreferenceOptions,
+  genreOptions,
   initialAuthorCopyNeedsOptions,
   interiorColorOptions,
+  manuscriptStatusOptions,
   paperTypePreferenceOptions,
   preferredPrintFormatOptions,
   preferredTrimSizeOptions,
+  publishingGoalOptions,
   type PublishingSelectOption,
+  w9StatusOptions,
 } from '@/lib/publishing/onboarding-production-options'
 
 type FieldOption = string | PublishingSelectOption | { label: string; value: string }
@@ -316,19 +321,7 @@ export const onboardingFields: Field[] = [
     label: 'Genre / category',
     type: 'select',
     required: true,
-    options: [
-      'Christian / Faith',
-      'Devotional',
-      'Inspirational',
-      'Biography / Memoir',
-      'Fiction',
-      'Business',
-      "Children's",
-      'Poetry',
-      'Academic',
-      'Trade',
-      'Other',
-    ],
+    options: genreOptions,
   },
   {
     name: 'imprint_preference',
@@ -358,7 +351,7 @@ export const onboardingFields: Field[] = [
     label: 'Manuscript status',
     type: 'select',
     required: true,
-    options: ['Idea / outline', 'In progress', 'Draft complete', 'Edited manuscript', 'Previously published'],
+    options: manuscriptStatusOptions,
   },
   { name: 'manuscriptLink', label: 'Manuscript file link', note: 'Use a private OneDrive, SharePoint, Google Drive, or Dropbox link if available.' },
   { name: 'supportingFilesLink', label: 'Supporting files link', note: 'Optional link for images, permissions, sample covers, forewords, endorsements, or supplemental files.' },
@@ -520,18 +513,7 @@ export const onboardingFields: Field[] = [
     label: 'Publishing goal',
     type: 'select',
     required: true,
-    options: [
-      'Build my personal brand',
-      'Share my story',
-      'Become a professional author',
-      'Publish and distribute my book',
-      'Grow my audience',
-      'Establish authority in my field',
-      'Create a legacy work',
-      'Launch a book-based business',
-      'Ministry / faith-based impact',
-      'Other',
-    ],
+    options: publishingGoalOptions,
   },
   {
     name: 'packageConfirmation',
@@ -557,12 +539,7 @@ export const onboardingFields: Field[] = [
     name: 'audiobookInterest',
     label: 'Audiobook interest',
     type: 'select',
-    options: [
-      'Not sure yet',
-      'Yes — Azure AI narration',
-      'Yes — human narration',
-      'No audiobook at this time',
-    ],
+    options: audiobookInterestOptions,
   },
   {
     name: 'acxAudiblePreference',
@@ -579,12 +556,7 @@ export const onboardingFields: Field[] = [
     name: 'w9Status',
     label: 'W-9 status',
     type: 'select',
-    options: [
-      'Not yet submitted',
-      'Ready to submit',
-      'Already submitted',
-      'Not applicable',
-    ],
+    options: w9StatusOptions,
   },
   {
     name: 'multiTitleIntent',
