@@ -18,7 +18,7 @@ Council review is closed. Implementation is active. Council re-engagement occurs
 |---|---|---|---|---|---|
 | OP-001 | SharePoint Workspace Lifecycle | Create and move author-first, title-aware SharePoint workspaces from inquiry through post-distribution | Complete / Operational | Publishing Team SharePoint; JM1-Core | Workspace lifecycle mapped; folder creation validated; workspace writeback fields now available |
 | OP-002 | Contract / Payment / Portal Activation | Establish the signed-agreement and first-payment gate that activates a project and author portal eligibility | Complete / Operational | OP-001; agreement status source; payment confirmation source | Controlled validation passed using Jackie-owned active project; activation bridge eligible; workspace moved to onboarding; portal status active |
-| OP-003 | Author Portal MVP | Provide author-facing approved project information after activation rules are satisfied | Implemented locally / Operational validation pending | OP-002 operational validation; portal surface; approved data display model | Portal shows approved status/tasks/files, milestone tracker, contact pathway, payment confirmation, file/version controls, and metadata readiness without becoming system of record |
+| OP-003 | Author Portal MVP | Provide author-facing approved project information after activation rules are satisfied | Complete / Operational | OP-002 operational validation; portal surface; approved data display model | Portal shows approved status/tasks/files, milestone tracker, contact pathway, payment confirmation, file/version controls, and metadata readiness without becoming system of record |
 | OP-004 | ISBN / LCCN / Copyright Registration Command Center | Manage registration tasks, identifiers, evidence, blockers, and approvals | Not Started | OP-003 or approved internal command center path | Registration tasks, statuses, evidence, and blockers are trackable |
 | OP-005 | Editorial Command Center | Run editorial workflow from manuscript intake through editorial approval | Not Started | OP-004; manuscript and editorial stage records | Editorial status, tasks, approvals, and files are operationally visible |
 | OP-006 | Cover Design Command Center | Coordinate cover design assets, status, approvals, and handoff | Not Started | OP-005 | Cover design workflow and approval state are trackable |
@@ -87,7 +87,7 @@ Only approval needs, exceptions, blockers, missed SLAs, author risk, payment iss
 
 OP-001 is the first recommended operational build because serious `/join` inquiries and accepted/current authors need a governed workspace lifecycle that mirrors the pipeline without duplicate folders and without making SharePoint the system of record.
 
-OP-001 and OP-002 have since been completed and validated as operational. OP-003 Author Portal MVP is implemented locally and pending deployment/live validation before being marked operational.
+OP-001, OP-002, and OP-003 have been completed and validated as operational. OP-004 Registration Command Center is the next PROGRAM-002 module.
 
 ## Current Blockers / Constraints
 
