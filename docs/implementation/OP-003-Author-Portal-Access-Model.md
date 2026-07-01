@@ -19,16 +19,33 @@ The portal now has a separate access scope from the author setup forms:
 
 ## Required Target Model
 
-Each author/project portal credential must be tied to one governed portal record. The minimum target record must identify:
+Each author portal credential must be tied to one governed author portal record. The author portal supports multiple title/project children. The minimum target record must identify:
 
 - Contact
-- title/project
+- Author Portal
+- one or more authorized title/project records
 - portal access status
 - hashed access token or code
 - expiration/rotation capability
 - last accessed timestamp
 
-The portal must render only data authorized for that Contact and title/project. Until that Dataverse read contract exists, OP-003 remains generic/read-only and must not expose private project data.
+The portal must render only data authorized for that Contact and the selected title/project child. Until that Dataverse read contract exists, OP-003 remains pre-contract, generic/read-only, and must not expose private project data.
+
+## Portal Lifecycle
+
+The corrected PROGRAM-002 lifecycle creates or updates the author portal after author acceptance and before contract generation:
+
+- New author: create one portal.
+- Returning author: add the accepted title to the existing portal.
+- Never create a second portal for the same author relationship.
+
+The pre-contract portal shows only:
+
+- Author Onboarding
+- Financial Setup
+- Royalty Setup
+
+After all three setup steps are complete, the system may generate the contract package and invoice/payment request, then display Sign Agreement and Submit Payment actions. The full active portal unlocks only after agreement is signed/active and payment is confirmed, or a publisher financial override is approved.
 
 ## Master/Admin Access
 
@@ -49,8 +66,9 @@ The implemented server helper supports author/project access records with this s
     "expiresOn": "2026-12-31T23:59:59Z",
     "accessCodeHash": "sha256-hash",
     "contactId": "contact-guid",
-    "titleId": "title-guid",
-    "projectId": "project-guid",
+    "authorPortalId": "portal-guid",
+    "titleIds": ["title-guid"],
+    "projectIds": ["project-guid"],
     "titleName": "Title"
   }
 ]
@@ -91,7 +109,8 @@ Minimum fields:
 | Portal Access Status | `jm1_portalaccessstatus` | Choice | Active, Disabled, Expired, Rotated |
 | Portal Last Accessed On | `jm1_portallastaccessedon` | DateTime | Updated only after authorized access logging is approved |
 | Portal Contact | existing Contact lookup | Lookup | Reuse existing Contact relationship when present |
-| Portal Title/Project | existing title/project lookup | Lookup | Reuse OP-002 project/title relationship when present |
+| Author Portal | existing portal lookup/table if present | Lookup | One portal per author relationship |
+| Portal Title/Project | existing title/project lookup or child table | Lookup / N:N | Supports multiple titles for returning authors |
 
 Admin/master override does not require a Dataverse field. It remains an app secret.
 

@@ -10,8 +10,11 @@ type GateResponse = {
   accessType?: 'admin' | 'author'
   portalContext?: {
     contactId?: string
+    authorPortalId?: string
     titleId?: string
+    titleIds?: string[]
     projectId?: string
+    projectIds?: string[]
     titleName?: string
   } | null
 }

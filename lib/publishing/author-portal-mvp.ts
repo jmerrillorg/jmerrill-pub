@@ -11,22 +11,22 @@ export type PortalTask = {
 }
 
 export const portalActivationSummary = {
-  authorRelationship: 'Activated publishing relationship',
-  titleRelationship: 'Title child record eligible for production readiness',
-  agreementStatus: 'Signed / completed',
-  firstPaymentStatus: 'Paid / confirmed',
-  portalStatus: 'Active',
+  authorRelationship: 'Accepted author relationship',
+  titleRelationship: 'Title child record pending contract package',
+  agreementStatus: 'Not generated until setup is complete',
+  firstPaymentStatus: 'Not requested until setup is complete',
+  portalStatus: 'Pre-contract intake',
   systemOfRecord: 'Dataverse',
   fileLayer: 'SharePoint',
 } as const
 
 export const portalMilestones = [
-  { label: 'Agreement', status: 'Complete', tone: 'complete' },
-  { label: 'First payment', status: 'Confirmed', tone: 'complete' },
-  { label: 'Portal', status: 'Active', tone: 'active' },
-  { label: 'Onboarding', status: 'Author action', tone: 'pending' },
-  { label: 'Production readiness', status: 'Staff review', tone: 'pending' },
-  { label: 'Registration', status: 'Next module', tone: 'locked' },
+  { label: 'Author accepts', status: 'Complete', tone: 'complete' },
+  { label: 'Portal invitation', status: 'Available', tone: 'active' },
+  { label: 'Author onboarding', status: 'Required', tone: 'pending' },
+  { label: 'Financial setup', status: 'Required', tone: 'pending' },
+  { label: 'Royalty setup', status: 'Required', tone: 'pending' },
+  { label: 'Contract + payment', status: 'Locked', tone: 'locked' },
 ] as const
 
 export const portalTasks: PortalTask[] = [
@@ -36,7 +36,7 @@ export const portalTasks: PortalTask[] = [
     owner: 'Author',
     status: 'Available',
     tone: 'active',
-    description: 'Confirm author identity, title metadata, manuscript status, production preferences, and marketing foundation.',
+    description: 'Confirm author identity, address, legal name, title metadata, manuscript status, production preferences, and marketing foundation.',
     href: '/author/onboarding',
   },
   {
@@ -54,46 +54,47 @@ export const portalTasks: PortalTask[] = [
     owner: 'Author',
     status: 'Available',
     tone: 'active',
-    description: 'Confirm title coverage, royalty contact, reporting preference, agreement status, and future dashboard readiness.',
+    description: 'Confirm title coverage, royalty contact, reporting preference, and future royalty dashboard readiness.',
     href: '/author/royalty-setup',
-  },
-  {
-    id: 'workspace-review',
-    label: 'Review project workspace',
-    owner: 'J Merrill Publishing',
-    status: 'Staff-managed',
-    tone: 'pending',
-    description: 'Project files remain in the governed SharePoint workspace. Staff will share approved links or requests as needed.',
-  },
-  {
-    id: 'metadata-readiness',
-    label: 'Confirm metadata readiness',
-    owner: 'J Merrill Publishing',
-    status: 'Pending review',
-    tone: 'pending',
-    description: 'Title metadata is reviewed before registration, production, distribution, and release readiness.',
   },
 ]
 
 export const portalFileControls = [
-  ['Approved documents only', 'The portal shows approved document status and file pathways, not raw manuscript storage.'],
-  ['Version protection', 'Production files, proofs, and metadata updates must follow staff-managed version control.'],
+  ['Pre-contract only', 'This portal opens before the contract package is generated so required author information can be collected first.'],
+  ['No private files', 'Files, proofs, manuscripts, and production documents remain hidden until active portal unlock is authorized.'],
   ['No sensitive uploads', 'Tax IDs, bank details, and signatures stay in approved secure systems, not website notes.'],
-  ['SharePoint remains file layer', 'The author/title workspace is the file home; Dataverse remains status authority.'],
+  ['Dataverse remains authority', 'Portal status reflects governed records; the portal does not become the source of truth.'],
 ] as const
 
 export const portalReadinessCards = [
-  ['Payment confirmation', 'Confirmed through OP-002 before portal activation. The portal does not create payment links.'],
-  ['Contact pathway', 'Authors can route questions to publishing@jmerrill.one while staff workflows remain authoritative.'],
-  ['Marketing signal', 'Author platform and launch inputs are captured through onboarding, but public marketing remains gated.'],
-  ['Royalty visibility', 'Future royalty statements remain hidden until live royalty generation is separately authorized.'],
+  ['Contract package', 'Generated only after Author Onboarding, Financial Setup, and Royalty Setup are complete.'],
+  ['Payment request', 'Generated only after the contract package is ready; no payment request is shown in pre-contract mode.'],
+  ['Active portal unlock', 'Dashboard, files, production, distribution, marketing, contracts, invoices, and royalties remain hidden until agreement and payment are complete.'],
+  ['Returning authors', 'Existing author portals receive new title children; onboarding updates are requested only when required.'],
 ] as const
 
 export const portalBoundaryRows = [
   ['System of record', 'Dataverse, not portal'],
-  ['File authority', 'SharePoint workspace'],
+  ['Visible modules', 'Onboarding, financial setup, royalty setup'],
   ['Payments', 'No payment request generated'],
   ['Contracts', 'No signing packet generated'],
-  ['Production', 'Not started by portal'],
-  ['Royalties', 'No live statements or payments'],
+  ['Dashboard', 'Hidden before active unlock'],
+  ['Files', 'Hidden before active unlock'],
+  ['Royalties', 'Hidden before active unlock'],
+] as const
+
+export const portalLockedModules = [
+  'Dashboard',
+  'Editorial',
+  'Cover',
+  'Layout',
+  'Files',
+  'Contracts',
+  'Royalties',
+  'Production',
+  'Distribution',
+  'Marketing',
+  'Messages',
+  'Timeline',
+  'Reports',
 ] as const

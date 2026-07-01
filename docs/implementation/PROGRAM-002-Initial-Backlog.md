@@ -17,8 +17,8 @@ Council review is closed. Implementation is active. Council re-engagement occurs
 | ID | Module | Objective | Status | Dependencies | Completion Standard |
 |---|---|---|---|---|---|
 | OP-001 | SharePoint Workspace Lifecycle | Create and move author-first, title-aware SharePoint workspaces from inquiry through post-distribution | Complete / Operational | Publishing Team SharePoint; JM1-Core | Workspace lifecycle mapped; folder creation validated; workspace writeback fields now available |
-| OP-002 | Contract / Payment / Portal Activation | Establish the signed-agreement and first-payment gate that activates a project and author portal eligibility | Complete / Operational | OP-001; agreement status source; payment confirmation source | Controlled validation passed using Jackie-owned active project; activation bridge eligible; workspace moved to onboarding; portal status active |
-| OP-003 | Author Portal MVP | Provide author-facing approved project information after activation rules are satisfied | Complete / Operational; access model correction in progress | OP-002 operational validation; portal surface; approved data display model | Portal shows approved generic/read-only status/tasks/files, milestone tracker, contact pathway, payment confirmation, file/version controls, and metadata readiness without becoming system of record; author/project-specific data requires Dataverse-backed access |
+| OP-002 | Contract / Payment / Portal Activation | Generate contract/payment actions after setup completion and unlock the active portal after signed/active agreement plus confirmed payment or publisher financial override | Complete / Operational; sequencing corrected | OP-003 pre-contract portal; agreement status source; payment confirmation source | Activation bridge eligible; workspace moved to onboarding/active state; active portal unlock occurs only after agreement/payment gate |
+| OP-003 | Author Portal MVP | Provide pre-contract author setup portal after author acceptance and before agreement/payment generation | Complete / Operational; access model correction in progress | Author acceptance; portal surface; approved pre-contract setup model | Portal shows only Author Onboarding, Financial Setup, and Royalty Setup until setup is complete; active dashboard/files/contracts/royalties remain hidden; author/project-specific data requires Dataverse-backed access |
 | OP-004 | ISBN / LCCN / Copyright Registration Command Center | Manage registration tasks, identifiers, evidence, blockers, and approvals | Not Started | OP-003 or approved internal command center path | Registration tasks, statuses, evidence, and blockers are trackable |
 | OP-005 | Editorial Command Center | Run editorial workflow from manuscript intake through editorial approval | Not Started | OP-004; manuscript and editorial stage records | Editorial status, tasks, approvals, and files are operationally visible |
 | OP-006 | Cover Design Command Center | Coordinate cover design assets, status, approvals, and handoff | Not Started | OP-005 | Cover design workflow and approval state are trackable |
@@ -30,12 +30,19 @@ Council review is closed. Implementation is active. Council re-engagement occurs
 
 ## Author Portal Trigger
 
-Author Portal creation is allowed only when both are true:
+Author Portal creation occurs after author acceptance and before contract generation:
 
-1. Agreement status = signed/completed
-2. First payment status = paid/confirmed
+1. New author: create one author portal.
+2. Returning author: add the accepted title to the existing author portal.
+3. Never create a second portal for the same author relationship.
 
-If either condition is missing, the portal remains inactive.
+The pre-contract portal is intentionally locked and shows only Author Onboarding, Financial Setup, and Royalty Setup. It must display:
+
+`Complete the steps below to begin your publishing journey.`
+
+After all three setup steps are complete, generate the contract package and invoice/payment request and show Sign Agreement and Submit Payment actions.
+
+When agreement is signed/active and payment is confirmed, or a publisher financial override is approved, OP-002 unlocks the active portal.
 
 Portal may display approved marketing module information only after the marketing module is live. The portal remains a display/action layer and must not become the system of record.
 
@@ -97,10 +104,10 @@ OP-001, OP-002, and OP-003 have been completed and validated as operational. OP-
 |---|---|---|
 | SharePoint connector write reauthentication | None | Resolved during OP-001 validation |
 | Missing Dataverse workspace fields | None | Resolved by OP-002 minimal Dataverse field build |
-| Live Stripe not approved | OP-002 payment automation and OP-003 portal payment confirmation | Manual payment confirmation may be used until live Stripe is authorized |
+| Live Stripe not approved | OP-002 payment request/payment confirmation | Submit Payment remains hidden until approved Stripe path is configured |
 | Business Central production not ready | OP-002/OP-003 accounting display | Do not show BC accounting summaries until production-ready |
 | Adobe Sign license/API entitlement | Agreement automation | Use approved manual/alternate agreement evidence path until entitlement is resolved |
-| Payment timing policy | Routine payment-link use | Default policy: signed agreement first, then payment link; Jackie may authorize exceptions |
+| Payment timing policy | Routine payment-link use | Contract/payment actions appear only after all three pre-contract setup steps are complete |
 | OP-002 controlled production validation | None | Complete; Jackie-owned active project validated with no synthetic records |
 | Marketing delayed until launch | All modules | Each module must capture marketing signal/handoff/dependency |
 | JM Signature public/application misuse | All modules | Publisher-only overlay; no public application path or paid upgrade |

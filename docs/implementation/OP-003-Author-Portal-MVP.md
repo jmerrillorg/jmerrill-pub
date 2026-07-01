@@ -10,7 +10,7 @@
 
 ## Purpose
 
-OP-003 provides the first author-facing portal display/action layer for activated J Merrill Publishing projects. It follows the PROGRAM-002 rule that author portal creation is allowed only after agreement status is signed/completed and first payment status is paid/confirmed.
+OP-003 provides the first author-facing portal display/action layer after author acceptance and before contract generation. This corrects the lifecycle dependency that the contract package needs author onboarding, financial setup, and royalty setup information before it can be generated.
 
 The portal is not a system of record.
 
@@ -21,16 +21,17 @@ The portal is not a system of record.
 - Author Portal MVP.
 - Relationship parent / title child language.
 - Controlled display layer.
-- Status dashboard.
-- Tasks.
-- Approved documents and file pathway messaging.
-- Payment confirmation display.
+- Pre-contract setup progress.
+- Author Onboarding action.
+- Financial Setup action.
+- Royalty Setup action.
+- Locked-module messaging.
 - Contact pathway to `publishing@jmerrill.one`.
-- Visual milestone tracker.
+- Pre-contract milestone tracker.
 - Warm welcome transition.
 - Humanized milestone communications.
-- File validation and version protection messaging.
-- Metadata readiness.
+- Private file/data boundary messaging.
+- Future active portal unlock boundary.
 
 ---
 
@@ -49,7 +50,7 @@ The portal is not a system of record.
 
 The MVP uses static read-only display data. This is intentional until a governed Dataverse read contract is approved.
 
-The Author Portal access model is documented in `OP-003-Author-Portal-Access-Model.md`. Author-specific portal access must be backed by Dataverse Contact + title/project authorization before private project data is displayed. Until then, OP-003 remains generic/read-only and the master access code is admin/private-preview only.
+The Author Portal access model is documented in `OP-003-Author-Portal-Access-Model.md`. Author-specific portal access must be backed by Dataverse Contact + title/project authorization before private project data is displayed. Until then, OP-003 remains pre-contract, generic/read-only, and the master access code is admin/private-preview only.
 
 System ownership remains:
 
@@ -81,6 +82,7 @@ OP-003 does not:
 - Display live Stripe details.
 - Display live royalty statements.
 - Display author/project-specific private data without author/project-specific authorization.
+- Show dashboard, editorial, cover, layout, files, contracts, royalties, production, distribution, marketing, messages, timeline, or reports before active portal unlock.
 
 ---
 
@@ -118,7 +120,7 @@ Live validation:
 
 - `/author` returned HTTP 200.
 - `/author/portal` returned HTTP 200.
-- `/author/portal` rendered the Author Portal MVP surface, milestone tracker, and metadata readiness content.
+- `/author/portal` rendered the Author Portal MVP surface, milestone tracker, and setup/readiness content.
 - Invalid access-code validation returned HTTP 401.
 
 Safety validation:
@@ -134,4 +136,4 @@ Safety validation:
 
 ## Next Work
 
-OP-004 is the next PROGRAM-002 module. Future OP-003 iterations may add author-specific data only after the governed identity model, Dataverse read model, row-level authorization, portal access fields, and portal data contract are approved.
+OP-002 active portal unlock is the next dependency to reconcile with the corrected lifecycle. OP-004 remains the next operational module after the portal lifecycle correction is merged and validated. Future OP-003 iterations may add author-specific data only after the governed identity model, Dataverse read model, row-level authorization, portal access fields, and portal data contract are approved.

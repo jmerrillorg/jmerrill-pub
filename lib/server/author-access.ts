@@ -12,8 +12,11 @@ export type AuthorPortalAccessResult =
       accessType: 'admin' | 'author'
       portalContext?: {
         contactId?: string
+        authorPortalId?: string
         titleId?: string
+        titleIds?: string[]
         projectId?: string
+        projectIds?: string[]
         titleName?: string
       }
     }
@@ -28,8 +31,11 @@ type ConfiguredPortalAccessRecord = {
   accessCode?: string
   accessCodeHash?: string
   contactId?: string
+  authorPortalId?: string
   titleId?: string
+  titleIds?: string[]
   projectId?: string
+  projectIds?: string[]
   titleName?: string
 }
 
@@ -82,8 +88,11 @@ export function validateAuthorPortalAccessCode(code: unknown): AuthorPortalAcces
     accessType: 'author',
     portalContext: {
       contactId: record.contactId,
+      authorPortalId: record.authorPortalId,
       titleId: record.titleId,
+      titleIds: record.titleIds,
       projectId: record.projectId,
+      projectIds: record.projectIds,
       titleName: record.titleName,
     },
   }

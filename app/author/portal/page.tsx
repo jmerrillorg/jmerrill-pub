@@ -7,6 +7,7 @@ import {
   portalActivationSummary,
   portalBoundaryRows,
   portalFileControls,
+  portalLockedModules,
   portalMilestones,
   portalReadinessCards,
   portalTasks,
@@ -15,7 +16,7 @@ import {
 
 export const metadata: Metadata = {
   title: 'Author Portal | J Merrill Publishing',
-  description: 'Private author portal MVP for activated J Merrill Publishing projects.',
+  description: 'Private pre-contract author portal for accepted J Merrill Publishing projects.',
   robots: {
     index: false,
     follow: false,
@@ -33,24 +34,25 @@ export default function AuthorPortalPage() {
   return (
     <AuthorPortalShell
       eyebrow="Author portal MVP"
-      title="Your activated project dashboard."
-      description="This private dashboard shows approved project status, next actions, file controls, metadata readiness, and support pathways after agreement and first-payment confirmation."
+      title="Complete the steps below to begin your publishing journey."
+      description="This private pre-contract portal collects the information needed to prepare your agreement package and first payment request. The full project portal unlocks only after agreement and payment requirements are complete."
     >
       <AuthorGate scope="portal">
         <div className="space-y-8">
           <section className="rounded-[32px] border border-blue-500/20 bg-blue-500/[0.06] p-7 sm:p-9">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
               <div>
-                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Activation status</p>
+                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Pre-contract portal</p>
                 <h2
                   className="mt-3 text-white"
                   style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '34px', fontWeight: 700, lineHeight: 1.12 }}
                 >
-                  Portal active after OP-002.
+                  Three setup steps unlock contract preparation.
                 </h2>
                 <p className="mt-3 max-w-[700px] text-[14px] font-light leading-[1.8] text-white/50">
-                  Agreement and first-payment confirmation activate portal eligibility. The portal is a display and action
-                  layer only; Dataverse remains the operational source of truth.
+                  Author Onboarding, Financial Setup, and Royalty Setup come before contract generation because the
+                  agreement package depends on the information collected here. Dataverse remains the operational source
+                  of truth.
                 </p>
               </div>
               <Link
@@ -74,11 +76,11 @@ export default function AuthorPortalPage() {
           <section className="rounded-[32px] border border-white/8 bg-white/[0.035] p-7 sm:p-9">
             <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Milestone tracker</p>
-                <h2 className="mt-3 text-[26px] font-semibold text-white">Relationship parent, title child.</h2>
+                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Progress</p>
+                <h2 className="mt-3 text-[26px] font-semibold text-white">Required setup before agreement.</h2>
               </div>
               <p className="max-w-[360px] text-[12px] leading-[1.7] text-white/32">
-                Registration and later production modules remain locked until their own OP gates are complete.
+                Contract signing and payment actions appear only after all three setup steps are complete.
               </p>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
@@ -118,14 +120,21 @@ export default function AuthorPortalPage() {
 
           <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="rounded-[32px] border border-white/8 bg-white/[0.035] p-7 sm:p-9">
-              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Files and metadata</p>
-              <h2 className="mt-3 text-[26px] font-semibold text-white">Approved files, protected versions.</h2>
+              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Locked until active portal</p>
+              <h2 className="mt-3 text-[26px] font-semibold text-white">Private project modules stay hidden.</h2>
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {portalFileControls.map(([heading, body]) => (
                   <div key={heading} className="rounded-2xl border border-white/8 bg-black/15 p-5">
                     <h3 className="text-[15px] font-semibold text-white">{heading}</h3>
                     <p className="mt-2 text-[13px] font-light leading-[1.7] text-white/38">{body}</p>
                   </div>
+                ))}
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {portalLockedModules.map((module) => (
+                  <span key={module} className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] text-white/35">
+                    {module}
+                  </span>
                 ))}
               </div>
             </div>
