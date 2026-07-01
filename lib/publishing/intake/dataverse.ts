@@ -2,6 +2,7 @@ import type { NormalizedPublishingIntake } from './schema'
 import {
   manuscriptTypeOptions,
   publishedBeforeOptions,
+  productionWorkTypeOptions,
   publishingIntakeActivationBlockers,
   publishingIntakeDataverseMapping,
 } from './dataverseMapping'
@@ -176,7 +177,8 @@ function buildPublishingIntakeDataversePayload(payload: NormalizedPublishingInta
     [columns.email]: payload.email,
     [columns.phone]: payload.phone,
     [columns.bookTitle]: payload.bookTitle,
-    [columns.workType]: manuscriptTypeOptions[payload.workType],
+    [columns.workType]: productionWorkTypeOptions[payload.workType],
+    [columns.manuscriptType]: manuscriptTypeOptions[payload.workType],
     [columns.genre]: payload.genre,
     [columns.wordCount]: payload.wordCount,
     [columns.manuscriptStatus]: payload.manuscriptStatus,
@@ -186,6 +188,7 @@ function buildPublishingIntakeDataversePayload(payload: NormalizedPublishingInta
     [columns.referralSource]: payload.referralSource,
     [columns.additionalNotes]: payload.additionalNotes,
     [columns.consent]: payload.consent,
+    [columns.consentTerms]: payload.consent,
     [columns.reference]: payload.reference,
     [columns.intakeChannel]: payload.intakeChannel,
     [columns.idempotencyKey]: payload.idempotencyKey,

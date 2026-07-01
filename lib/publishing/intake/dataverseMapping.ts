@@ -7,13 +7,15 @@ export const publishingIntakeDataverseMapping = {
     email: 'jm1_email',
     phone: 'jm1_mobilephone',
     bookTitle: 'jm1_projecttitle',
-    workType: 'jm1_manuscripttype',
+    workType: 'jm1_worktype',
+    manuscriptType: 'jm1_manuscripttype',
     wordCount: 'jm1_estimatedwordcount',
     manuscriptStatus: 'jm1_manuscriptstatusatintake',
     manuscriptUrl: 'jm1_manuscripturl',
     bookDescription: 'jm1_purpose',
     referralSource: 'jm1_referralsource',
     consent: 'jm1_consenttocontact',
+    consentTerms: 'jm1_consenttoterms',
 
     reference: 'jm1_intakereferencecode',
     genre: 'jm1_genresubject',
@@ -38,6 +40,17 @@ export const manuscriptTypeOptions = {
   'Workbook / Journal': 196650005,
   'Short Story Collection': 196650006,
   Other: 196650007,
+} as const
+
+export const productionWorkTypeOptions = {
+  'Full-length Book': 196650000,
+  Novella: 196650000,
+  "Children's Picture Book": 196650003,
+  'Poetry Collection': 196650000,
+  Devotional: 196650000,
+  'Workbook / Journal': 196650000,
+  'Short Story Collection': 196650000,
+  Other: 196650013,
 } as const
 
 export const publishedBeforeOptions = {

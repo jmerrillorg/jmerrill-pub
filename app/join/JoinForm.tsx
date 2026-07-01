@@ -219,7 +219,7 @@ export default function JoinForm() {
       wordCount: Number.parseInt(form.wordCount, 10),
       email: form.email.trim().toLowerCase(),
       phone: optional(form.phone),
-      manuscriptUrl: optional(form.manuscriptUrl),
+      manuscriptUrl: optionalUrl(form.manuscriptUrl),
       referralSource: optional(form.referralSource),
       additionalNotes: optional(form.additionalNotes),
     }
@@ -543,7 +543,7 @@ function validate(form: JoinFormState): Errors {
   }
 
   if (!form.manuscriptStatus) errors.manuscriptStatus = 'Select a manuscript status.'
-  if (form.manuscriptUrl.trim() && !isValidUrl(form.manuscriptUrl)) errors.manuscriptUrl = 'Enter a valid shareable URL.'
+  if (form.manuscriptUrl.trim() && !isPlaceholderUrl(form.manuscriptUrl) && !isValidUrl(form.manuscriptUrl)) errors.manuscriptUrl = 'Enter a valid shareable URL.'
   if (!form.publishedBefore) errors.publishedBefore = 'Select your publishing history.'
   if (!between(form.bookDescription, 50, 2000)) errors.bookDescription = 'Enter 50–2,000 characters.'
   if (form.additionalNotes.length > 1000) errors.additionalNotes = 'Use 1,000 characters or fewer.'
@@ -582,6 +582,16 @@ function isValidUrl(value: string) {
 function optional(value: string) {
   const trimmed = value.trim()
   return trimmed ? trimmed : undefined
+}
+
+function optionalUrl(value: string) {
+  const trimmed = value.trim()
+  if (!trimmed || isPlaceholderUrl(trimmed)) return undefined
+  return trimmed
+}
+
+function isPlaceholderUrl(value: string) {
+  return /^https?:\/\/\.{3}\/?$/i.test(value.trim())
 }
 
 function createUuid() {

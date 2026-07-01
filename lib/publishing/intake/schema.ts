@@ -117,6 +117,10 @@ export function validatePublishingIntakeBody(body: unknown): {
     errors.push({ field: 'email', message: 'Enter a valid email address.' })
   }
 
+  if (strings.manuscriptUrl && isPlaceholderUrl(strings.manuscriptUrl)) {
+    strings.manuscriptUrl = ''
+  }
+
   if (strings.manuscriptUrl && !isValidUrl(strings.manuscriptUrl)) {
     errors.push({ field: 'manuscriptUrl', message: 'Enter a valid shareable URL.' })
   }
@@ -223,6 +227,10 @@ function isValidUrl(value: string) {
   } catch {
     return false
   }
+}
+
+function isPlaceholderUrl(value: string) {
+  return /^https?:\/\/\.{3}\/?$/i.test(value.trim())
 }
 
 function dedupeErrors(errors: IntakeValidationError[]) {
