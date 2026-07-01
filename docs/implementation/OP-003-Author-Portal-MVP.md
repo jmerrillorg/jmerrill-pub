@@ -1,6 +1,6 @@
 # OP-003 - Author Portal MVP
 
-**Status:** Implemented locally  
+**Status:** OPERATIONAL
 **Operational scope:** Author Portal MVP  
 **Primary route:** `/author/portal`  
 **Date:** 2026-07-01  
@@ -99,6 +99,35 @@ git diff --check
 
 ---
 
+## Operational Certification
+
+OP-003 was deployed and validated operational on 2026-07-01.
+
+Deployment evidence:
+
+- PR #140 deployed successfully after one stale Azure Static Web Apps staging environment was removed.
+- Removed staging environment: `96`.
+- PR #140 merged with merge commit `3da8612be2533414ddb16302957d4e42b8521476`.
+- Main deployment completed successfully after merge.
+
+Live validation:
+
+- `/author` returned HTTP 200.
+- `/author/portal` returned HTTP 200.
+- `/author/portal` rendered the Author Portal MVP surface, milestone tracker, and metadata readiness content.
+- Invalid access-code validation returned HTTP 401.
+
+Safety validation:
+
+- No Dataverse writes were performed by OP-003 validation.
+- No Stripe activity occurred.
+- No Business Central posting occurred.
+- No royalty activity occurred.
+- No payment activity occurred.
+- No external communication was sent.
+
+---
+
 ## Next Work
 
-Future OP-003 iterations may add author-specific data only after the governed identity model, Dataverse read model, row-level authorization, and portal data contract are approved.
+OP-004 is the next PROGRAM-002 module. Future OP-003 iterations may add author-specific data only after the governed identity model, Dataverse read model, row-level authorization, and portal data contract are approved.

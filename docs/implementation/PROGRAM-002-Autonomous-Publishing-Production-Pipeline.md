@@ -33,7 +33,7 @@ OP-001 is complete/operational. OP-002 is complete/operational after controlled 
 Council disposition v1.0 is accepted:
 
 - OP-002 is the controlling gate. Completed 2026-07-01.
-- OP-003 scope is locked and is now the next build item.
+- OP-003 scope is locked and has been completed to operational readiness.
 - Marketing is part of every OP module.
 - JM Signature governance is locked as publisher-selected and invitation-only.
 - Executive dashboard behavior is exception-driven.
@@ -336,6 +336,7 @@ Operational completion means:
 | OP-001 SharePoint workspace lifecycle | Workspace and file operations | Complete / Operational |
 | Production Dataverse existing publishing solution | Intake and pipeline operations | Operational as-is |
 | OP-002 bridge fields | Activation and workspace writeback | Complete / Operational |
+| OP-003 Author Portal MVP | Author-facing activated-project display layer | Complete / Operational |
 | SharePoint write connector authentication | Automated folder creation and move | Restored |
 | Business Central production readiness | Live payment/accounting summaries | Not production-ready |
 | Stripe live approval | Live payment confirmation | Not authorized |
@@ -359,7 +360,7 @@ Operational completion means:
 
 1. OP-001 SharePoint Workspace Lifecycle
 2. OP-002 Contract / Payment / Portal Activation - complete / operational
-3. OP-003 Author Portal MVP - next
+3. OP-003 Author Portal MVP - complete / operational
 4. OP-004 Registration Command Center
 5. OP-005 Editorial Command Center
 6. OP-006 Cover Design Command Center
@@ -379,7 +380,7 @@ Reason:
 
 The intake/onboarding paths now work. The next operational need is to make sure serious `/join` inquiries and accepted/current authors have a governed workspace lifecycle that mirrors the pipeline without creating duplicate folders or making SharePoint the system of record.
 
-OP-001 has since been completed and validated as operational. OP-002 has also passed controlled operational validation. OP-003 Author Portal MVP is implemented locally and pending deployment/live validation before operational certification.
+OP-001 has since been completed and validated as operational. OP-002 has also passed controlled operational validation. OP-003 Author Portal MVP has been deployed and validated operational. OP-004 Registration Command Center is the next PROGRAM-002 module.
 
 ## Validation Requirements
 
