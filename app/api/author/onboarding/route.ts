@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
+  audiobookInterestOptions,
   authorPhotoOnBackCoverOptions,
   bindingTypeOptions,
   coverFinishPreferenceOptions,
-  getOptionLabel,
+  genreOptions,
   initialAuthorCopyNeedsOptions,
   interiorColorOptions,
+  manuscriptStatusOptions,
   paperTypePreferenceOptions,
   preferredPrintFormatOptions,
   preferredTrimSizeOptions,
+  publishingGoalOptions,
+  resolveOption,
+  w9StatusOptions,
 } from '@/lib/publishing/onboarding-production-options'
 import { requireAuthorAccess } from '@/lib/server/author-access'
 import { hasConfirmedNotificationDelivery, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
@@ -57,40 +62,60 @@ export async function POST(req: NextRequest) {
     const legalName = cleanString(body.legalName)
     const { firstName, lastName } = splitName(legalName)
     const email = cleanString(body.email)
-    const genre = cleanString(body.genre)
+    const genreOption = resolveOption(genreOptions, cleanString(body.genre))
+    const genreKey = genreOption.key
+    const genre = genreOption.label
     const bookTitle = cleanString(body.bookTitle)
     const subtitle = cleanString(body.subtitle)
-    const manuscriptStatus = cleanString(body.manuscriptStatus)
+    const manuscriptStatusOption = resolveOption(manuscriptStatusOptions, cleanString(body.manuscriptStatus))
+    const manuscriptStatusKey = manuscriptStatusOption.key
+    const manuscriptStatus = manuscriptStatusOption.label
     const recipient = 'publishing@jmerrill.one'
     const packageConfirmation = cleanString(body.packageConfirmation)
-    const audiobookInterest = cleanString(body.audiobookInterest)
+    const audiobookInterestOption = resolveOption(audiobookInterestOptions, cleanString(body.audiobookInterest))
+    const audiobookInterestKey = audiobookInterestOption.key
+    const audiobookInterest = audiobookInterestOption.label
     const acxAudiblePreference = cleanString(body.acxAudiblePreference)
-    const w9Status = cleanString(body.w9Status)
+    const w9StatusOption = resolveOption(w9StatusOptions, cleanString(body.w9Status))
+    const w9StatusKey = w9StatusOption.key
+    const w9Status = w9StatusOption.label
     const rightsHolderConfirmed = asBoolean(body.rightsHolderConfirmed)
+    const rightsHolderConfirmedKey = rightsHolderConfirmed ? 'confirmed' : 'not_confirmed'
     const multiTitleIntent = cleanString(body.multiTitleIntent)
     const message = cleanString(body.notes || body.authorIntentNotes)
-    const preferredPrintFormatKey = cleanString(body.preferredPrintFormat)
-    const preferredTrimSizeKey = cleanString(body.preferredTrimSize)
-    const interiorColorKey = cleanString(body.interiorColor)
-    const paperTypePreferenceKey = cleanString(body.paperTypePreference)
-    const bindingTypeKey = cleanString(body.bindingType)
-    const coverFinishPreferenceKey = cleanString(body.coverFinishPreference)
+    const publishingGoalOption = resolveOption(publishingGoalOptions, cleanString(body.publishingGoal))
+    const publishingGoalKey = publishingGoalOption.key
+    const publishingGoal = publishingGoalOption.label
+    const preferredPrintFormatOption = resolveOption(preferredPrintFormatOptions, cleanString(body.preferredPrintFormat))
+    const preferredPrintFormatKey = preferredPrintFormatOption.key
+    const preferredPrintFormat = preferredPrintFormatOption.label
+    const preferredTrimSizeOption = resolveOption(preferredTrimSizeOptions, cleanString(body.preferredTrimSize))
+    const preferredTrimSizeKey = preferredTrimSizeOption.key
+    const preferredTrimSize = preferredTrimSizeOption.label
+    const interiorColorOption = resolveOption(interiorColorOptions, cleanString(body.interiorColor))
+    const interiorColorKey = interiorColorOption.key
+    const interiorColor = interiorColorOption.label
+    const paperTypePreferenceOption = resolveOption(paperTypePreferenceOptions, cleanString(body.paperTypePreference))
+    const paperTypePreferenceKey = paperTypePreferenceOption.key
+    const paperTypePreference = paperTypePreferenceOption.label
+    const bindingTypeOption = resolveOption(bindingTypeOptions, cleanString(body.bindingType))
+    const bindingTypeKey = bindingTypeOption.key
+    const bindingType = bindingTypeOption.label
+    const coverFinishPreferenceOption = resolveOption(coverFinishPreferenceOptions, cleanString(body.coverFinishPreference))
+    const coverFinishPreferenceKey = coverFinishPreferenceOption.key
+    const coverFinishPreference = coverFinishPreferenceOption.label
     const backCoverCopy = cleanString(body.backCoverCopy)
     const backCoverAuthorBio = cleanString(body.backCoverAuthorBio)
-    const authorPhotoOnBackCoverKey = cleanString(body.authorPhotoOnBackCover)
+    const authorPhotoOnBackCoverOption = resolveOption(authorPhotoOnBackCoverOptions, cleanString(body.authorPhotoOnBackCover))
+    const authorPhotoOnBackCoverKey = authorPhotoOnBackCoverOption.key
+    const authorPhotoOnBackCover = authorPhotoOnBackCoverOption.label
     const coverEndorsements = cleanString(body.coverEndorsements)
     const retailPricePreference = cleanString(body.retailPricePreference)
-    const initialAuthorCopyNeedsKey = cleanString(body.initialAuthorCopyNeeds)
+    const initialAuthorCopyNeedsOption = resolveOption(initialAuthorCopyNeedsOptions, cleanString(body.initialAuthorCopyNeeds))
+    const initialAuthorCopyNeedsKey = initialAuthorCopyNeedsOption.key
+    const initialAuthorCopyNeeds = initialAuthorCopyNeedsOption.label
     const eventLaunchDeadline = cleanString(body.eventLaunchDeadline)
     const productionNotes = cleanString(body.productionNotes)
-    const preferredPrintFormat = getOptionLabel(preferredPrintFormatOptions, preferredPrintFormatKey)
-    const preferredTrimSize = getOptionLabel(preferredTrimSizeOptions, preferredTrimSizeKey)
-    const interiorColor = getOptionLabel(interiorColorOptions, interiorColorKey)
-    const paperTypePreference = getOptionLabel(paperTypePreferenceOptions, paperTypePreferenceKey)
-    const bindingType = getOptionLabel(bindingTypeOptions, bindingTypeKey)
-    const coverFinishPreference = getOptionLabel(coverFinishPreferenceOptions, coverFinishPreferenceKey)
-    const authorPhotoOnBackCover = getOptionLabel(authorPhotoOnBackCoverOptions, authorPhotoOnBackCoverKey)
-    const initialAuthorCopyNeeds = getOptionLabel(initialAuthorCopyNeedsOptions, initialAuthorCopyNeedsKey)
 
     const author = {
       firstName,
@@ -104,8 +129,10 @@ export async function POST(req: NextRequest) {
       title: bookTitle,
       subtitle,
       genre,
+      genreKey,
       estimatedWords: cleanString(body.estimatedWords) || null,
       manuscriptStatus,
+      manuscriptStatusKey,
       targetPublishDate: cleanString(body.targetPublishDate) || null,
       imprint: cleanString(body.imprint) || null,
     }
@@ -113,28 +140,38 @@ export async function POST(req: NextRequest) {
     const publishing = {
       packageConfirmation,
       audiobookInterest: audiobookInterest || null,
+      audiobookInterestKey: audiobookInterestKey || null,
       acxAudiblePreference: acxAudiblePreference || null,
       w9Status: w9Status || null,
+      w9StatusKey: w9StatusKey || null,
       rightsHolderConfirmed,
+      rightsHolderConfirmedKey,
       multiTitleIntent: multiTitleIntent || null,
     }
 
     const productionSpecifications = {
       preferredPrintFormat,
+      preferredPrintFormatLabel: preferredPrintFormat,
       preferredPrintFormatKey,
       preferredTrimSize,
+      preferredTrimSizeLabel: preferredTrimSize,
       preferredTrimSizeKey,
       interiorColor,
+      interiorColorLabel: interiorColor,
       interiorColorKey,
       paperTypePreference,
+      paperTypePreferenceLabel: paperTypePreference,
       paperTypePreferenceKey,
       bindingType,
+      bindingTypeLabel: bindingType,
       bindingTypeKey,
       coverFinishPreference: coverFinishPreference || null,
+      coverFinishPreferenceLabel: coverFinishPreference || null,
       coverFinishPreferenceKey: coverFinishPreferenceKey || null,
       backCoverCopy: backCoverCopy || null,
       backCoverAuthorBio: backCoverAuthorBio || null,
       authorPhotoOnBackCover: authorPhotoOnBackCover || null,
+      authorPhotoOnBackCoverLabel: authorPhotoOnBackCover || null,
       authorPhotoOnBackCoverKey: authorPhotoOnBackCoverKey || null,
       coverEndorsements: coverEndorsements || null,
       retailPricePreference: retailPricePreference || null,
@@ -149,7 +186,7 @@ export async function POST(req: NextRequest) {
       source: 'private-author-onboarding',
       division: 'publishing',
       divisionNumber: '01',
-      route: '/onboarding',
+      route: '/author/onboarding',
       recipient,
       accessCodeUsed: true,
       dataverseTarget: {
@@ -175,30 +212,42 @@ export async function POST(req: NextRequest) {
       mailingAddress: cleanString(body.mailingAddress),
       bookTitle,
       subtitle,
+      targetPublishDate: book.targetPublishDate,
       genre,
+      genreLabel: genre,
+      genreKey,
       targetAudience: cleanString(body.targetAudience),
       shortDescription: cleanString(body.shortDescription),
       longDescription: cleanString(body.longDescription),
       manuscriptStatus,
+      manuscriptStatusLabel: manuscriptStatus,
+      manuscriptStatusKey,
       manuscriptLink: cleanString(body.manuscriptLink),
       supportingFilesLink: cleanString(body.supportingFilesLink),
       editingLevelAcknowledgment: cleanString(body.editingLevelAcknowledgment),
       authorIntentNotes: cleanString(body.authorIntentNotes),
       preferredPrintFormat,
+      preferredPrintFormatLabel: preferredPrintFormat,
       preferredPrintFormatKey,
       preferredTrimSize,
+      preferredTrimSizeLabel: preferredTrimSize,
       preferredTrimSizeKey,
       interiorColor,
+      interiorColorLabel: interiorColor,
       interiorColorKey,
       paperTypePreference,
+      paperTypePreferenceLabel: paperTypePreference,
       paperTypePreferenceKey,
       bindingType,
+      bindingTypeLabel: bindingType,
       bindingTypeKey,
       coverFinishPreference: coverFinishPreference || null,
+      coverFinishPreferenceLabel: coverFinishPreference || null,
       coverFinishPreferenceKey: coverFinishPreferenceKey || null,
       backCoverCopy: backCoverCopy || null,
       backCoverAuthorBio: backCoverAuthorBio || null,
       authorPhotoOnBackCover: authorPhotoOnBackCover || null,
+      authorPhotoOnBackCoverLabel: authorPhotoOnBackCover || null,
       authorPhotoOnBackCoverKey: authorPhotoOnBackCoverKey || null,
       coverEndorsements: coverEndorsements || null,
       retailPricePreference: retailPricePreference || null,
@@ -207,6 +256,7 @@ export async function POST(req: NextRequest) {
       eventLaunchDeadline: eventLaunchDeadline || null,
       productionNotes: productionNotes || null,
       rightsHolderConfirmed,
+      rightsHolderConfirmedKey,
       originalWorkConfirmation: rightsHolderConfirmed,
       hasCoAuthors: cleanString(body.hasCoAuthors),
       coAuthorNames: cleanString(body.coAuthorNames),
@@ -214,12 +264,18 @@ export async function POST(req: NextRequest) {
       coverVision: cleanString(body.coverVision),
       referenceCovers: cleanString(body.referenceCovers),
       toneStylePreferences: cleanString(body.toneStylePreferences),
-      publishingGoal: cleanString(body.publishingGoal),
+      publishingGoal,
+      publishingGoalLabel: publishingGoal,
+      publishingGoalKey,
       packageConfirmation,
       packageInterest: packageConfirmation,
       audiobookInterest: audiobookInterest || null,
+      audiobookInterestLabel: audiobookInterest || null,
+      audiobookInterestKey: audiobookInterestKey || null,
       acxAudiblePreference: acxAudiblePreference || null,
       w9Status: w9Status || null,
+      w9StatusLabel: w9Status || null,
+      w9StatusKey: w9StatusKey || null,
       multiTitleIntent: multiTitleIntent || null,
       authorBio: cleanString(body.authorBio),
       authorPlatform: cleanString(body.authorPlatform),
@@ -240,7 +296,7 @@ export async function POST(req: NextRequest) {
       routeSpecificFlowUrl: onboardingFlowUrl,
       payload,
       notificationPreview: `${payload.authorName} submitted author onboarding for "${payload.bookTitle}".`,
-      internalClassification: deriveInternalClassification(genre),
+      internalClassification: deriveInternalClassification(genreKey),
     })
 
     if (!hasConfirmedNotificationDelivery(integration)) {
@@ -281,12 +337,12 @@ function splitName(fullName: string) {
   }
 }
 
-function deriveInternalClassification(genre: string): Jm1PubInternalClassification {
-  if (genre === "Children's") return 'Children'
-  if (genre === 'Poetry') return 'Poetry'
-  if (genre === 'Biography / Memoir') return 'Memoir'
-  if (genre === 'Fiction') return 'Fiction'
-  if (genre === 'Business') return 'Business'
-  if (genre === 'Christian / Faith' || genre === 'Devotional' || genre === 'Inspirational') return 'Ministry'
+function deriveInternalClassification(genreKey: string): Jm1PubInternalClassification {
+  if (genreKey === 'childrens') return 'Children'
+  if (genreKey === 'poetry') return 'Poetry'
+  if (genreKey === 'biography_memoir') return 'Memoir'
+  if (genreKey === 'fiction') return 'Fiction'
+  if (genreKey === 'business') return 'Business'
+  if (genreKey === 'christian_faith' || genreKey === 'devotional' || genreKey === 'inspirational') return 'Ministry'
   return 'Other'
 }

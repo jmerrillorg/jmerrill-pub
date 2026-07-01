@@ -3,6 +3,28 @@ export type PublishingSelectOption = {
   label: string
 }
 
+export const genreOptions: PublishingSelectOption[] = [
+  { key: 'christian_faith', label: 'Christian / Faith' },
+  { key: 'devotional', label: 'Devotional' },
+  { key: 'inspirational', label: 'Inspirational' },
+  { key: 'biography_memoir', label: 'Biography / Memoir' },
+  { key: 'fiction', label: 'Fiction' },
+  { key: 'business', label: 'Business' },
+  { key: 'childrens', label: "Children's" },
+  { key: 'poetry', label: 'Poetry' },
+  { key: 'academic', label: 'Academic' },
+  { key: 'trade', label: 'Trade' },
+  { key: 'other', label: 'Other' },
+]
+
+export const manuscriptStatusOptions: PublishingSelectOption[] = [
+  { key: 'idea_outline', label: 'Idea / outline' },
+  { key: 'in_progress', label: 'In progress' },
+  { key: 'draft_complete', label: 'Draft complete' },
+  { key: 'edited_manuscript', label: 'Edited manuscript' },
+  { key: 'previously_published', label: 'Previously published' },
+]
+
 export const preferredPrintFormatOptions: PublishingSelectOption[] = [
   { key: 'paperback_only', label: 'Paperback only' },
   { key: 'paperback_ebook', label: 'Paperback + eBook' },
@@ -62,6 +84,45 @@ export const initialAuthorCopyNeedsOptions: PublishingSelectOption[] = [
   { key: 'not_sure_yet', label: 'Not sure yet' },
 ]
 
+export const publishingGoalOptions: PublishingSelectOption[] = [
+  { key: 'build_personal_brand', label: 'Build my personal brand' },
+  { key: 'share_my_story', label: 'Share my story' },
+  { key: 'professional_author', label: 'Become a professional author' },
+  { key: 'publish_and_distribute', label: 'Publish and distribute my book' },
+  { key: 'grow_my_audience', label: 'Grow my audience' },
+  { key: 'establish_authority', label: 'Establish authority in my field' },
+  { key: 'legacy_work', label: 'Create a legacy work' },
+  { key: 'book_based_business', label: 'Launch a book-based business' },
+  { key: 'ministry_faith_impact', label: 'Ministry / faith-based impact' },
+  { key: 'other', label: 'Other' },
+]
+
+export const audiobookInterestOptions: PublishingSelectOption[] = [
+  { key: 'not_sure_yet', label: 'Not sure yet' },
+  { key: 'azure_ai_narration', label: 'Yes - Azure AI narration' },
+  { key: 'human_narration', label: 'Yes - human narration' },
+  { key: 'no_audiobook', label: 'No audiobook at this time' },
+]
+
+export const w9StatusOptions: PublishingSelectOption[] = [
+  { key: 'not_yet_submitted', label: 'Not yet submitted' },
+  { key: 'ready_to_submit', label: 'Ready to submit' },
+  { key: 'already_submitted', label: 'Already submitted' },
+  { key: 'not_applicable', label: 'Not applicable' },
+]
+
 export function getOptionLabel(options: PublishingSelectOption[], key: string) {
   return options.find((option) => option.key === key)?.label || ''
+}
+
+export function getOptionKey(options: PublishingSelectOption[], value: string) {
+  return options.find((option) => option.key === value || option.label === value)?.key || value
+}
+
+export function resolveOption(options: PublishingSelectOption[], value: string) {
+  const key = getOptionKey(options, value)
+  return {
+    key,
+    label: getOptionLabel(options, key) || value,
+  }
 }

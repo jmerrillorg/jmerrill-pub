@@ -44,12 +44,12 @@ const hubCards = [
     secondary: 'Author portal',
   },
   {
-    status: 'Future',
+    status: 'MVP',
     title: 'Author Portal',
-    body: 'Coming soon: author dashboard, royalty visibility, title status, and documents.',
-    href: '#author-portal',
-    cta: 'Portal roadmap',
-    secondary: 'Future',
+    body: 'Private dashboard for activated authors to review approved project status, tasks, files, metadata readiness, and contact pathways.',
+    href: '/author/portal',
+    cta: 'Open portal',
+    secondary: 'Activated projects',
   },
   {
     status: 'Live',
@@ -178,11 +178,11 @@ export default function AuthorHubPage() {
           >
             Built as a doorway now.
             <br />
-            <em className="not-italic italic text-blue-500">Ready for the dashboard next.</em>
+            <em className="not-italic italic text-blue-500">Portal MVP is live.</em>
           </h2>
           <p className="text-[15px] font-light text-white/40 leading-[1.75]">
-            When the author portal is built, this page can become the entry point for status, royalties, documents,
-            title metadata, and support routing.
+            The author portal is now the private entry point for activated projects after agreement and first-payment
+            confirmation. Dataverse, SharePoint, and approved staff workflows remain the systems of record.
           </p>
         </div>
 
