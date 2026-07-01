@@ -41,12 +41,15 @@ The portal is not a system of record.
 - Added `/author/portal`.
 - Updated `/author` to link the Author Portal card to `/author/portal`.
 - Reused the existing `AuthorGate` access-code control.
+- Split portal access into a stricter `portal` gate scope so the shared author setup form code is no longer treated as sufficient for author/project-specific portal access.
 - Added `lib/publishing/author-portal-mvp.ts` for read-only MVP display data.
 - Completed related author setup choice-mapping stabilization in the immediate OP-003 workflow neighborhood.
 
 ### Data Behavior
 
 The MVP uses static read-only display data. This is intentional until a governed Dataverse read contract is approved.
+
+The Author Portal access model is documented in `OP-003-Author-Portal-Access-Model.md`. Author-specific portal access must be backed by Dataverse Contact + title/project authorization before private project data is displayed. Until then, OP-003 remains generic/read-only and the master access code is admin/private-preview only.
 
 System ownership remains:
 
@@ -77,6 +80,7 @@ OP-003 does not:
 - Display live Business Central accounting summaries.
 - Display live Stripe details.
 - Display live royalty statements.
+- Display author/project-specific private data without author/project-specific authorization.
 
 ---
 
@@ -130,4 +134,4 @@ Safety validation:
 
 ## Next Work
 
-OP-004 is the next PROGRAM-002 module. Future OP-003 iterations may add author-specific data only after the governed identity model, Dataverse read model, row-level authorization, and portal data contract are approved.
+OP-004 is the next PROGRAM-002 module. Future OP-003 iterations may add author-specific data only after the governed identity model, Dataverse read model, row-level authorization, portal access fields, and portal data contract are approved.

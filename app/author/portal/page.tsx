@@ -36,7 +36,7 @@ export default function AuthorPortalPage() {
       title="Your activated project dashboard."
       description="This private dashboard shows approved project status, next actions, file controls, metadata readiness, and support pathways after agreement and first-payment confirmation."
     >
-      <AuthorGate>
+      <AuthorGate scope="portal">
         <div className="space-y-8">
           <section className="rounded-[32px] border border-blue-500/20 bg-blue-500/[0.06] p-7 sm:p-9">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">

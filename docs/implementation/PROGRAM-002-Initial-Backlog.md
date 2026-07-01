@@ -18,7 +18,7 @@ Council review is closed. Implementation is active. Council re-engagement occurs
 |---|---|---|---|---|---|
 | OP-001 | SharePoint Workspace Lifecycle | Create and move author-first, title-aware SharePoint workspaces from inquiry through post-distribution | Complete / Operational | Publishing Team SharePoint; JM1-Core | Workspace lifecycle mapped; folder creation validated; workspace writeback fields now available |
 | OP-002 | Contract / Payment / Portal Activation | Establish the signed-agreement and first-payment gate that activates a project and author portal eligibility | Complete / Operational | OP-001; agreement status source; payment confirmation source | Controlled validation passed using Jackie-owned active project; activation bridge eligible; workspace moved to onboarding; portal status active |
-| OP-003 | Author Portal MVP | Provide author-facing approved project information after activation rules are satisfied | Complete / Operational | OP-002 operational validation; portal surface; approved data display model | Portal shows approved status/tasks/files, milestone tracker, contact pathway, payment confirmation, file/version controls, and metadata readiness without becoming system of record |
+| OP-003 | Author Portal MVP | Provide author-facing approved project information after activation rules are satisfied | Complete / Operational; access model correction in progress | OP-002 operational validation; portal surface; approved data display model | Portal shows approved generic/read-only status/tasks/files, milestone tracker, contact pathway, payment confirmation, file/version controls, and metadata readiness without becoming system of record; author/project-specific data requires Dataverse-backed access |
 | OP-004 | ISBN / LCCN / Copyright Registration Command Center | Manage registration tasks, identifiers, evidence, blockers, and approvals | Not Started | OP-003 or approved internal command center path | Registration tasks, statuses, evidence, and blockers are trackable |
 | OP-005 | Editorial Command Center | Run editorial workflow from manuscript intake through editorial approval | Not Started | OP-004; manuscript and editorial stage records | Editorial status, tasks, approvals, and files are operationally visible |
 | OP-006 | Cover Design Command Center | Coordinate cover design assets, status, approvals, and handoff | Not Started | OP-005 | Cover design workflow and approval state are trackable |
@@ -38,6 +38,8 @@ Author Portal creation is allowed only when both are true:
 If either condition is missing, the portal remains inactive.
 
 Portal may display approved marketing module information only after the marketing module is live. The portal remains a display/action layer and must not become the system of record.
+
+Author Portal access must be author/project-specific before private project data is displayed. A master/admin access code may be retained for Jackie/admin review only and must remain in secure app settings.
 
 ## Workspace Lifecycle Dependency
 
@@ -103,6 +105,7 @@ OP-001, OP-002, and OP-003 have been completed and validated as operational. OP-
 | Marketing delayed until launch | All modules | Each module must capture marketing signal/handoff/dependency |
 | JM Signature public/application misuse | All modules | Publisher-only overlay; no public application path or paid upgrade |
 | Live royalty generation not approved | OP-011 | Royalty dashboard can remain planning/review-only until authorized |
+| Dataverse portal access fields not confirmed | OP-003 author-specific portal access | Website service-principal metadata inspection returned HTTP 403; inspect/reuse existing fields before schema changes |
 
 ## Capture Boundary
 
