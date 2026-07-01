@@ -52,8 +52,10 @@ function loadRelayModule() {
       buildAcknowledgmentEmail,
       safeErrorCode,
       validateInternalNotificationPayload,
+      validateJoinInternalNotificationPayload,
       validateApprovedAuthorResponsePayload,
       buildInternalNotificationEmail,
+      buildJoinInternalNotificationEmail,
       buildApprovedAuthorResponseEmail,
       milestoneValidationError,
       milestoneUnauthorized
@@ -167,6 +169,28 @@ function validAuthorResponsePayload(overrides = {}) {
   };
 }
 
+function validJoinInternalPayload(overrides = {}) {
+  return {
+    notificationType: "JOIN_INTAKE_RECEIVED",
+    reference: "JMP-INT-202607-DL2T20",
+    authorName: "Iyorwuese Hagher",
+    authorEmail: "hagher.hagher@example.com",
+    phone: "9376207856",
+    projectTitle: "The General's Will and Last Testament",
+    manuscriptType: "Full-length Book",
+    manuscriptStatus: "Complete",
+    intakeChannel: "INT-PUB-005 /join",
+    sharePointWorkspaceUrl: "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/example",
+    dataverseIntakeUrl: "https://jm1hq.crm.dynamics.com/main.aspx?pagetype=entityrecord&etn=jm1_publishingintake&id=49bb8498-5d75-f111-ab0f-7c1e525b15c2",
+    leadUrl: "https://jm1hq.crm.dynamics.com/main.aspx?pagetype=entityrecord&etn=lead&id=40e24584-6675-f111-ab0f-7c1e525b15c2",
+    contactUrl: "https://jm1hq.crm.dynamics.com/main.aspx?pagetype=entityrecord&etn=contact&id=c8c8747e-6675-f111-ab0f-6045bdd69678",
+    stageStatus: "Intake received",
+    nextAction: "Review the intake and confirm routing/workspace completion.",
+    recipient: "publishing@jmerrill.one",
+    ...overrides
+  };
+}
+
 function assertRejected(result, reason) {
   assert.equal(result.ok, false);
   assert.equal(result.reason, reason);
@@ -189,6 +213,45 @@ test("valid internal notification builds ACS email to publishing@jmerrill.one", 
   assert.match(email.content.subject, /JMP-INT-202606-UFYG60/);
   assert.match(email.content.plainText, /No author email has been sent\./);
   assert.equal(JSON.stringify(email.recipients).includes("author@example.com"), false);
+});
+
+test("valid /join internal notification builds ACS email to publishing@jmerrill.one", () => {
+  const { validateJoinInternalNotificationPayload, buildJoinInternalNotificationEmail } = loadRelayModule();
+  const result = validateJoinInternalNotificationPayload(validJoinInternalPayload());
+
+  assert.equal(result.ok, true);
+  const email = buildJoinInternalNotificationEmail(result.value);
+  assert.equal(email.senderAddress, "DoNotReply@email.jmerrill.one");
+  assert.equal(JSON.stringify(email.recipients.to.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
+  assert.equal(Object.hasOwn(email.recipients, "cc"), false);
+  assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
+  assert.match(email.content.subject, /JMP-INT-202607-DL2T20/);
+  assert.match(email.content.plainText, /new \/join publishing inquiry/i);
+  assert.match(email.content.plainText, /SharePoint Workspace:/);
+  assert.match(email.content.plainText, /Dataverse Intake:/);
+  assert.match(email.content.plainText, /No author-facing message was sent/);
+  assert.equal(JSON.stringify(email.recipients).includes("hagher.hagher@example.com"), false);
+});
+
+test("/join internal notification rejects wrong recipient, author recipient, and unsafe fields", () => {
+  const { validateJoinInternalNotificationPayload } = loadRelayModule();
+
+  assertRejected(
+    validateJoinInternalNotificationPayload(validJoinInternalPayload({ recipient: "ops@jmerrill.one" })),
+    "RECIPIENT_INVALID"
+  );
+  assertRejected(
+    validateJoinInternalNotificationPayload(validJoinInternalPayload({ to: ["hagher.hagher@example.com"] })),
+    "RECIPIENT_INVALID"
+  );
+  assertRejected(
+    validateJoinInternalNotificationPayload(validJoinInternalPayload({ cc: ["publishing@jmerrill.one"] })),
+    "CC_BCC_NOT_ALLOWED"
+  );
+  assertRejected(
+    validateJoinInternalNotificationPayload(validJoinInternalPayload({ manuscriptText: "SECRET MANUSCRIPT" })),
+    "UNSAFE_FIELD_PRESENT"
+  );
 });
 
 test("internal notification rejects wrong type and wrong recipient", () => {
@@ -376,5 +439,6 @@ test("routes are registered without changing acknowledgment route", () => {
 
   assert.equal(Boolean(routes["send-author-acknowledgment"]), true);
   assert.equal(Boolean(routes["send-internal-author-draft-review-notification"]), true);
+  assert.equal(Boolean(routes["send-join-internal-notification"]), true);
   assert.equal(Boolean(routes["send-approved-author-response"]), true);
 });

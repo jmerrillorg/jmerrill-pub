@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { enqueuePublishingIntakeDeadLetter } from '@/lib/publishing/intake/deadLetter'
 import { writePublishingIntakeWithRetry } from '@/lib/publishing/intake/dataverse'
 import { getIdempotencyReplay, rememberIdempotencyKey } from '@/lib/publishing/intake/idempotency'
+import { sendJoinInternalNotification } from '@/lib/publishing/intake/internalNotification'
 import { checkIntakeRateLimit, getClientIp } from '@/lib/publishing/intake/rateLimit'
 import { generateIntakeReference } from '@/lib/publishing/intake/reference'
 import {
@@ -148,6 +149,17 @@ async function handlePublishingIntakePost(req: NextRequest) {
   const dataverse = await writePublishingIntakeWithRetry(intake)
   if (dataverse.status === 'success' || dataverse.status === 'skipped') {
     rememberIdempotencyKey(intake.idempotencyKey, reference)
+    const notification = await sendJoinInternalNotification(
+      intake,
+      dataverse.status === 'success' ? { recordId: dataverse.recordId } : undefined,
+    )
+    if (notification.status !== 'sent') {
+      console.warn('Publishing intake internal notification did not send.', {
+        status: notification.status,
+        reason: notification.reason,
+        reference,
+      })
+    }
     return json({ status: 'received', reference }, 201, originResult.origin)
   }
 

@@ -10,7 +10,7 @@ import {
 export const CONFIRMED_DATAVERSE_MAPPING_REQUIRED = publishingIntakeDataverseMapping
 
 export type DataverseWriteResult =
-  | { status: 'success' }
+  | { status: 'success'; recordId?: string; entityUrl?: string }
   | { status: 'skipped'; reason: 'non_production_mapping_pending' }
   | { status: 'failed'; reason: string; retryable: boolean }
 
@@ -49,7 +49,8 @@ export async function writePublishingIntakeToDataverse(
     )
 
     if (response.status === 201 || response.status === 204) {
-      return { status: 'success' }
+      const entityUrl = response.headers.get('OData-EntityId') || undefined
+      return { status: 'success', entityUrl, recordId: extractDataverseRecordId(entityUrl) }
     }
 
     const errorBody = await safeResponseText(response)
@@ -207,6 +208,11 @@ function omitUndefined(values: Record<string, string | number | boolean | undefi
 
 function cleanUrl(value?: string) {
   return value?.trim().replace(/\/+$/, '')
+}
+
+function extractDataverseRecordId(entityUrl?: string) {
+  if (!entityUrl) return undefined
+  return entityUrl.match(/\(([0-9a-f-]{36})\)$/i)?.[1]
 }
 
 function isRetryableStatus(status: number) {

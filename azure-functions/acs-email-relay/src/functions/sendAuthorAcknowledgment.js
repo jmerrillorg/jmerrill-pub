@@ -17,8 +17,10 @@ const ACS_SENDER = "DoNotReply@email.jmerrill.one";
 const AUTHOR_RESPONSE_SENDER = "publishing@email.jmerrill.one";
 const INTERNAL_VISIBILITY_MAILBOX = "publishing@jmerrill.one";
 const INTERNAL_NOTIFICATION_TYPE = "AUTHOR_DRAFT_READY_FOR_REVIEW";
+const JOIN_INTERNAL_NOTIFICATION_TYPE = "JOIN_INTAKE_RECEIVED";
 const APPROVED_AUTHOR_RESPONSE_TYPE = "APPROVED_AUTHOR_RESPONSE";
 const INTERNAL_NOTIFICATION_SENT = "INTERNAL_NOTIFICATION_SENT";
+const JOIN_INTERNAL_NOTIFICATION_SENT = "JOIN_INTERNAL_NOTIFICATION_SENT";
 const AUTHOR_RESPONSE_SENT = "AUTHOR_RESPONSE_SENT";
 const DRAFT_STATUS = "DRAFT_ONLY";
 const DRAFT_APPROVAL_STATUS = "PENDING_HUMAN_APPROVAL";
@@ -374,6 +376,82 @@ function validateInternalNotificationPayload(payload = {}) {
   };
 }
 
+function validateJoinInternalNotificationPayload(payload = {}) {
+  if (hasUnsafeField(payload)) {
+    return { ok: false, reason: "UNSAFE_FIELD_PRESENT" };
+  }
+
+  const reference = normalizeText(payload.reference || payload.intakeReferenceCode);
+  const recipient = normalizeText(payload.recipient || payload.to).toLowerCase();
+  const to = normalizeRecipients(payload.to === undefined ? recipient : payload.to);
+  const cc = normalizeRecipients(payload.cc);
+  const bcc = normalizeRecipients(payload.bcc);
+  const authorEmail = normalizeText(payload.authorEmail || payload.email).toLowerCase();
+  const allRecipients = [...to, ...cc, ...bcc];
+
+  if (normalizeText(payload.notificationType) !== JOIN_INTERNAL_NOTIFICATION_TYPE) {
+    return { ok: false, reason: "NOTIFICATION_TYPE_INVALID", reference };
+  }
+
+  if (!reference || !REFERENCE_PATTERN.test(reference)) {
+    return { ok: false, reason: "INTAKE_REFERENCE_CODE_INVALID", reference };
+  }
+
+  if (recipient !== INTERNAL_VISIBILITY_MAILBOX || to.length !== 1 || to[0] !== INTERNAL_VISIBILITY_MAILBOX) {
+    return { ok: false, reason: "RECIPIENT_INVALID", reference };
+  }
+
+  if (cc.length > 0 || bcc.length > 0) {
+    return { ok: false, reason: "CC_BCC_NOT_ALLOWED", reference };
+  }
+
+  if (authorEmail && allRecipients.includes(authorEmail)) {
+    return { ok: false, reason: "AUTHOR_RECIPIENT_BLOCKED", reference };
+  }
+
+  if (allRecipients.some(isJmerrillPubMailbox) || isJmerrillPubMailbox(authorEmail)) {
+    return { ok: false, reason: "JMERRILL_PUB_MAILBOX_NOT_ALLOWED", reference };
+  }
+
+  if (!normalizeText(payload.authorName)) {
+    return { ok: false, reason: "AUTHOR_NAME_MISSING", reference };
+  }
+
+  if (authorEmail && !isValidEmail(authorEmail)) {
+    return { ok: false, reason: "AUTHOR_EMAIL_INVALID", reference };
+  }
+
+  if (!normalizeText(payload.projectTitle)) {
+    return { ok: false, reason: "PROJECT_TITLE_MISSING", reference };
+  }
+
+  if (safeTrim(payload.intakeChannel) !== ALLOWED_INTAKE_CHANNEL) {
+    return { ok: false, reason: "INVALID_INTAKE_CHANNEL", reference };
+  }
+
+  return {
+    ok: true,
+    value: {
+      notificationType: JOIN_INTERNAL_NOTIFICATION_TYPE,
+      reference,
+      authorName: normalizeText(payload.authorName),
+      authorEmail,
+      phone: normalizeText(payload.phone) || "not provided",
+      projectTitle: normalizeText(payload.projectTitle),
+      manuscriptType: normalizeText(payload.manuscriptType) || "not provided",
+      manuscriptStatus: normalizeText(payload.manuscriptStatus) || "not provided",
+      intakeChannel: ALLOWED_INTAKE_CHANNEL,
+      sharePointWorkspaceUrl: normalizeText(payload.sharePointWorkspaceUrl) || "pending workspace routing",
+      dataverseIntakeUrl: normalizeText(payload.dataverseIntakeUrl) || "not provided",
+      leadUrl: normalizeText(payload.leadUrl) || "pending router completion",
+      contactUrl: normalizeText(payload.contactUrl) || "pending router completion",
+      stageStatus: normalizeText(payload.stageStatus) || "Intake received",
+      nextAction: normalizeText(payload.nextAction) || "Review the new /join intake and confirm routing/workspace completion.",
+      recipient: INTERNAL_VISIBILITY_MAILBOX
+    }
+  };
+}
+
 function validateApprovedAuthorResponsePayload(payload = {}) {
   const common = validateCommonMilestoneFields(payload);
   if (!common.ok) return common;
@@ -519,6 +597,48 @@ function buildInternalNotificationEmail(payload) {
     senderAddress: getAcsSenderAddress(),
     content: {
       subject: `Internal Review Needed - Author Draft Ready - ${payload.intakeReferenceCode}`,
+      plainText
+    },
+    recipients: {
+      to: [
+        {
+          address: INTERNAL_VISIBILITY_MAILBOX,
+          displayName: "J Merrill Publishing"
+        }
+      ]
+    }
+  };
+}
+
+function buildJoinInternalNotificationEmail(payload) {
+  const plainText = [
+    "Internal notification only.",
+    "",
+    "A new /join publishing inquiry was received.",
+    "",
+    `Intake Reference: ${payload.reference}`,
+    `Author: ${payload.authorName}`,
+    `Book Title: ${payload.projectTitle}`,
+    `Email: ${payload.authorEmail || "not provided"}`,
+    `Phone: ${payload.phone}`,
+    `Manuscript Type: ${payload.manuscriptType}`,
+    `Manuscript Status: ${payload.manuscriptStatus}`,
+    `Stage/Status: ${payload.stageStatus}`,
+    "",
+    `SharePoint Workspace: ${payload.sharePointWorkspaceUrl}`,
+    `Dataverse Intake: ${payload.dataverseIntakeUrl}`,
+    `Lead: ${payload.leadUrl}`,
+    `Contact: ${payload.contactUrl}`,
+    "",
+    `Next action: ${payload.nextAction}`,
+    "",
+    "No author-facing message was sent by this internal notification."
+  ].join("\n");
+
+  return {
+    senderAddress: getAcsSenderAddress(),
+    content: {
+      subject: `New /join Intake - ${payload.reference} - ${payload.projectTitle}`,
       plainText
     },
     recipients: {
@@ -700,6 +820,59 @@ app.http("send-internal-author-draft-review-notification", {
       const code = safeErrorCode(error);
       context.error(`ACS relay internal notification send failed: ${code}; reference=${validation.value.intakeReferenceCode}`);
       return milestoneServerError(code, validation.value);
+    }
+  }
+});
+
+app.http("send-join-internal-notification", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "send-join-internal-notification",
+  handler: async (request, context) => {
+    let body = {};
+
+    if (!verifyRelayKey(request)) {
+      context.warn("ACS relay rejected /join internal notification with invalid auth.");
+      return milestoneUnauthorized(body);
+    }
+
+    try {
+      body = await request.json();
+    } catch (_error) {
+      context.warn("ACS relay rejected malformed /join internal notification JSON.");
+      return milestoneValidationError("INVALID_JSON", body);
+    }
+
+    const validation = validateJoinInternalNotificationPayload(body || {});
+    if (!validation.ok) {
+      context.warn(`ACS relay /join internal notification validation failed: ${validation.reason}; reference=${normalizeText(body?.reference || body?.intakeReferenceCode)}`);
+      return milestoneValidationError(validation.reason, {
+        intakeReferenceCode: validation.reference || body?.reference || body?.intakeReferenceCode
+      });
+    }
+
+    try {
+      const providerMessageId = await sendAcsMessage(buildJoinInternalNotificationEmail(validation.value));
+      context.info(`ACS relay accepted /join internal notification; reference=${validation.value.reference}`);
+
+      return {
+        status: 202,
+        jsonBody: {
+          accepted: true,
+          messageType: JOIN_INTERNAL_NOTIFICATION_TYPE,
+          deliveryStatus: JOIN_INTERNAL_NOTIFICATION_SENT,
+          recipient: INTERNAL_VISIBILITY_MAILBOX,
+          intakeReferenceCode: validation.value.reference,
+          provider: ACS_PROVIDER_NAME,
+          providerMessageId
+        }
+      };
+    } catch (error) {
+      const code = safeErrorCode(error);
+      context.error(`ACS relay /join internal notification send failed: ${code}; reference=${validation.value.reference}`);
+      return milestoneServerError(code, {
+        intakeReferenceCode: validation.value.reference
+      });
     }
   }
 });
