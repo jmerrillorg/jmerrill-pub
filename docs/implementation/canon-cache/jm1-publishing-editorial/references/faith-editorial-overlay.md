@@ -1,6 +1,7 @@
 # JM1 Editorial Overlays — Internal Doctrine
 
-**Status:** CANON-CANDIDATE — pending Jackie approval
+**Status:** CANON — approved by Jackie Smith, Jr., June 2026
+**Approval rulings:** §2.3.3 correction count disclosure = STANDARD for all street-lit engagements; §3.2 picture book figures (32pp / 500–700 words / 12–14 spreads) confirmed as JMP house figures
 **Version:** 1.0 (new file)
 **Contains:** Faith & Inspirational · Urban/Street-Lit Voice Preservation ·
 Children's Book Standard (JM Little)
@@ -173,7 +174,8 @@ done. This protocol prevents that:
    dialect ruling as a recorded decision ("'finna' — author's form,
    standardized across 14 instances"). Preservation documented as work
    reads as work — because it is.
-3. **Show the count.** State the number of mechanical corrections made.
+3. **Show the count (standard, all street-lit engagements).** State the
+   number of mechanical corrections made.
    An author who sees "212 corrections; voice preserved throughout" never
    wonders whether the editor was paying attention.
 4. **Calibration conversation for first-time authors** (line edit §1.3):
@@ -274,19 +276,15 @@ language about revision eligibility.
 | Item | Value |
 |---|---|
 | Reference | faith-editorial-overlay.md v1.0 |
-| Status | CANON-CANDIDATE — pending Jackie approval |
+| Status | **CANON — approved June 2026** |
 | Replaces | N/A (new file — first codification of the three overlays) |
 | Authority | Jackie Smith, Jr. — approval creates canon |
 | Visibility | **Internal only — never author-facing, never client-facing** |
 | Review cycle | On Scripture Display Governance change, knowledge.md revision, or first completed engagement under each overlay |
 
-**Items for Jackie to confirm:**
+**Confirmation items — RESOLVED at approval (June 2026):**
 
-1. **Correction count disclosure (§2.3.3).** Stating the mechanical
-   correction count in street-lit edit letters is codified from the
-   communication problem you described, not from a confirmed Damaged
-   practice. Confirm it as standard, or strike to optional.
-2. **Picture book conventions (§3.2).** The 32-page / ~500–700 word /
-   12–14 spread figures are industry-standard defaults. Confirm as JMP
-   house figures, or substitute JM Little's own production specs if
-   they differ.
+1. Correction count disclosure: STANDARD, not optional — applies to all
+   street-lit engagements.
+2. Picture book figures: 32 pages / 500–700 words / 12–14 spreads
+   confirmed as JMP house figures.
