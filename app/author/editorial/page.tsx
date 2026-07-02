@@ -4,6 +4,7 @@ import Link from 'next/link'
 import {
   editorialAuthorWorkspaceRows,
   editorialBoundaries,
+  editorialCanonSources,
   editorialDataverseSources,
   editorialHardStops,
   editorialStages,
@@ -138,6 +139,18 @@ export default function EditorialCommandCenterPage() {
 
         <section className="mb-8 grid gap-5 lg:grid-cols-2">
           <div className="rounded-[32px] border border-white/8 bg-white/[0.035] p-7">
+            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Canon source</p>
+            <div className="mt-5 space-y-4">
+              {editorialCanonSources.map(([label, value]) => (
+                <div key={label} className="border-b border-white/8 pb-4 last:border-b-0 last:pb-0">
+                  <h3 className="text-[14px] font-semibold text-white">{label}</h3>
+                  <p className="mt-1 text-[12px] leading-[1.65] text-white/38">{value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[32px] border border-white/8 bg-white/[0.035] p-7">
             <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Dataverse references</p>
             <div className="mt-5 space-y-4">
               {Object.entries(editorialDataverseSources).map(([label, source]) => (
@@ -151,7 +164,7 @@ export default function EditorialCommandCenterPage() {
             </div>
           </div>
 
-          <div className="rounded-[32px] border border-rose-300/15 bg-rose-400/[0.055] p-7">
+          <div className="rounded-[32px] border border-rose-300/15 bg-rose-400/[0.055] p-7 lg:col-span-2">
             <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-rose-100/70">Hard stops</p>
             <ul className="mt-4 space-y-2">
               {editorialHardStops.map((stop) => (
