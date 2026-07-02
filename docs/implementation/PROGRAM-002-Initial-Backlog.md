@@ -17,8 +17,8 @@ Council review is closed. Implementation is active. Council re-engagement occurs
 | ID | Module | Objective | Status | Dependencies | Completion Standard |
 |---|---|---|---|---|---|
 | OP-001 | SharePoint Workspace Lifecycle | Create and move author-first, title-aware SharePoint workspaces from inquiry through post-distribution | Complete / Operational | Publishing Team SharePoint; JM1-Core | Workspace lifecycle mapped; folder creation validated; workspace writeback fields now available |
-| OP-002 | Contract / Payment / Portal Activation | Generate contract/payment actions after setup completion and unlock the active portal after signed/active agreement plus confirmed payment or publisher financial override | Complete / Operational; sequencing corrected | OP-003 pre-contract portal; agreement status source; payment confirmation source | Activation bridge eligible; workspace moved to onboarding/active state; active portal unlock occurs only after agreement/payment gate |
-| OP-003 | Author Portal MVP | Provide pre-contract author setup portal after author acceptance and before agreement/payment generation | Complete / Operational; access model correction in progress | Author acceptance; portal surface; approved pre-contract setup model | Portal shows only Author Onboarding, Financial Setup, and Royalty Setup until setup is complete; active dashboard/files/contracts/royalties remain hidden; author/project-specific data requires Dataverse-backed access |
+| OP-002 | Contract / Payment / Workspace Activation | Generate contract/payment actions after setup completion and unlock the full workspace after signed/active agreement plus confirmed payment or publisher financial override | Complete / Operational; sequencing corrected | OP-003 pre-contract workspace; agreement status source; payment confirmation source | Activation bridge eligible; workspace moved to onboarding/active state; full workspace unlock occurs only after agreement/payment gate |
+| OP-003 | Author Workspace MVP | Provide pre-contract author setup workspace after author acceptance and before agreement/payment generation | Complete / Operational; Decision 3 canon correction applied | Author acceptance; workspace surface; approved pre-contract setup model | Workspace shows only Author Onboarding, Financial Setup, and Royalty Setup until setup is complete; full workspace remains hidden; author/project-specific data requires Dataverse-backed access |
 | OP-004 | ISBN / LCCN / Copyright Registration Command Center | Manage registration tasks, identifiers, evidence, blockers, and approvals | Not Started | OP-003 or approved internal command center path | Registration tasks, statuses, evidence, and blockers are trackable |
 | OP-005 | Editorial Command Center | Run editorial workflow from manuscript intake through editorial approval | Not Started | OP-004; manuscript and editorial stage records | Editorial status, tasks, approvals, and files are operationally visible |
 | OP-006 | Cover Design Command Center | Coordinate cover design assets, status, approvals, and handoff | Not Started | OP-005 | Cover design workflow and approval state are trackable |
@@ -28,25 +28,35 @@ Council review is closed. Implementation is active. Council re-engagement occurs
 | OP-010 | Marketing / Campaign Command Center | Manage positioning, campaign planning, launch assets, review/award tracking, outreach, performance summary, and relationship marketing opportunities | Not Started | OP-009 or approved parallel marketing intake path | Marketing is active throughout the pipeline and not delayed until launch |
 | OP-011 | Royalty / Relationship Dashboard | Provide ongoing royalty and author relationship visibility when live royalty operations are authorized | Not Started | OP-010; live royalty authorization for production statements | Ongoing relationship dashboard works without unauthorized payments or live royalty generation |
 
-## Author Portal Trigger
+## Author Workspace Trigger
 
-Author Portal creation occurs after author acceptance and before contract generation:
+Author Workspace creation occurs after author acceptance and before contract generation:
 
-1. New author: create one author portal.
-2. Returning author: add the accepted title to the existing author portal.
-3. Never create a second portal for the same author relationship.
+1. New author: create one Author Workspace.
+2. Returning author: add the accepted title to the existing Author Workspace.
+3. Never create a second workspace for the same author relationship.
 
-The pre-contract portal is intentionally locked and shows only Author Onboarding, Financial Setup, and Royalty Setup. It must display:
+The pre-contract workspace is intentionally locked and shows only Author Onboarding, Financial Setup, and Royalty Setup. It must display:
 
 `Complete the steps below to begin your publishing journey.`
 
 After all three setup steps are complete, generate the contract package and invoice/payment request and show Sign Agreement and Submit Payment actions.
 
-When agreement is signed/active and payment is confirmed, or a publisher financial override is approved, OP-002 unlocks the active portal.
+When agreement is signed/active and payment is confirmed, or a publisher financial override is approved, OP-002 unlocks the full workspace.
 
-Portal may display approved marketing module information only after the marketing module is live. The portal remains a display/action layer and must not become the system of record.
+Workspace may display approved marketing module information only after the marketing module is live. The workspace remains a display/action layer and must not become the system of record.
 
-Author Portal access must be author/project-specific before private project data is displayed. A master/admin access code may be retained for Jackie/admin review only and must remain in secure app settings.
+Author Workspace access must be author/project-specific before private project data is displayed. A master/admin access code may be retained for Jackie/admin review only and must remain in secure app settings.
+
+Security requirements:
+
+- Pre-contract workspace access must use a dedicated scope/role separate from shared form access.
+- Address, financial setup, and royalty setup fields require field-level protection before private data is surfaced.
+- Authors must authenticate before locked modules render.
+- No pre-contract sensitive data may appear in dashboards, reports, exports, or broad status summaries.
+- Where practical, workspace creation, view/edit, module completion, contract generation, and full unlock events write safe evidence to `jm1_executionlog`.
+
+If an accepted author does not convert, set Relationship State to `Prospect / Inactive Pursuit`. Prospect nurture cadence is bi-weekly, then monthly, then quarterly; birthday touchpoints are allowed. Prospect nurture remains separate from active-author communications and must use a warm relationship tone rather than a sales drip. No live nurture communications are authorized by this correction.
 
 ## Workspace Lifecycle Dependency
 
@@ -112,7 +122,7 @@ OP-001, OP-002, and OP-003 have been completed and validated as operational. OP-
 | Marketing delayed until launch | All modules | Each module must capture marketing signal/handoff/dependency |
 | JM Signature public/application misuse | All modules | Publisher-only overlay; no public application path or paid upgrade |
 | Live royalty generation not approved | OP-011 | Royalty dashboard can remain planning/review-only until authorized |
-| Dataverse portal credential fields missing | OP-003 author-specific portal access | Admin metadata inspection found reusable `opportunity.jm1_m6authorportalstatus`, Contact/project/title linkage fields; no JM1 portal credential/token hash/expires/last-access fields found |
+| Dataverse workspace credential fields missing | OP-003 author-specific workspace access | Admin metadata inspection found reusable `opportunity.jm1_m6authorportalstatus`, Contact/project/title linkage fields; no JM1 workspace credential/token hash/expires/last-access fields found |
 
 ## Capture Boundary
 
@@ -124,7 +134,7 @@ This capture/control update did not:
 - modify Business Central
 - connect Stripe
 - send communications
-- create author portals
+- create author workspaces
 - create SharePoint folders
 - commit or push
 

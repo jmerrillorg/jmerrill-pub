@@ -1,8 +1,8 @@
-# OP-003 - Author Portal Access Model
+# OP-003 - Author Workspace Access Model
 
 **Status:** Implementation safety fix complete; Dataverse-backed author-specific persistence pending minimal schema approval
 **Date:** 2026-07-01
-**Scope:** Author Portal access control
+**Scope:** Author Workspace access control
 
 ---
 
@@ -10,42 +10,42 @@
 
 Before this correction, `/author/portal` used the same shared access-code gate as the author setup forms. That model is acceptable only for an MVP/private preview because it does not identify a specific author, Contact, title, or project.
 
-The portal now has a separate access scope from the author setup forms:
+The workspace now has a separate access scope from the author setup forms:
 
 - Author setup forms keep the existing `forms` access scope.
-- `/author/portal` uses the stricter `portal` access scope.
-- The portal scope supports an admin-only master code and author/project-specific access records.
-- The portal no longer stores the submitted access code in browser session storage.
+- `/author/portal` uses the stricter `portal` access scope as the dedicated pre-contract workspace access role.
+- The workspace scope supports an admin-only master code and author/project-specific access records.
+- The workspace no longer stores the submitted access code in browser session storage.
 
 ## Required Target Model
 
-Each author portal credential must be tied to one governed author portal record. The author portal supports multiple title/project children. The minimum target record must identify:
+Each author workspace credential must be tied to one governed author workspace record. The author workspace supports multiple title/project children. The minimum target record must identify:
 
 - Contact
-- Author Portal
+- Author Workspace
 - one or more authorized title/project records
-- portal access status
+- workspace access status
 - hashed access token or code
 - expiration/rotation capability
 - last accessed timestamp
 
-The portal must render only data authorized for that Contact and the selected title/project child. Until that Dataverse read contract exists, OP-003 remains pre-contract, generic/read-only, and must not expose private project data.
+The workspace must render only data authorized for that Contact and the selected title/project child. Until that Dataverse read contract exists, OP-003 remains pre-contract, generic/read-only, and must not expose private project data.
 
-## Portal Lifecycle
+## Workspace Lifecycle
 
-The corrected PROGRAM-002 lifecycle creates or updates the author portal after author acceptance and before contract generation:
+The corrected PROGRAM-002 lifecycle creates or updates the Author Workspace after author acceptance and before contract generation:
 
-- New author: create one portal.
-- Returning author: add the accepted title to the existing portal.
-- Never create a second portal for the same author relationship.
+- New author: create one Author Workspace.
+- Returning author: add the accepted title to the existing Author Workspace.
+- Never create a second workspace for the same author relationship.
 
-The pre-contract portal shows only:
+The pre-contract workspace shows only:
 
 - Author Onboarding
 - Financial Setup
 - Royalty Setup
 
-After all three setup steps are complete, the system may generate the contract package and invoice/payment request, then display Sign Agreement and Submit Payment actions. The full active portal unlocks only after agreement is signed/active and payment is confirmed, or a publisher financial override is approved.
+After all three setup steps are complete, the system may generate the contract package and invoice/payment request, then display Sign Agreement and Submit Payment actions. The full active workspace unlocks only after agreement is signed/active and payment is confirmed, or a publisher financial override is approved.
 
 ## Master/Admin Access
 
@@ -53,11 +53,11 @@ Jackie/admin review must use a master access code stored only in secure configur
 
 - `AUTHOR_PORTAL_MASTER_ACCESS_CODE`
 
-Production portal access requires `AUTHOR_PORTAL_MASTER_ACCESS_CODE`. The existing `AUTHOR_ONBOARDING_ACCESS_CODE` remains scoped to author setup forms and must not be treated as a portal credential after this correction. The master code is admin-only behavior and must not be sent to authors.
+Production workspace access requires `AUTHOR_PORTAL_MASTER_ACCESS_CODE`. The existing `AUTHOR_ONBOARDING_ACCESS_CODE` remains scoped to author setup forms and must not be treated as a workspace credential after this correction. The master code is admin-only behavior and must not be sent to authors.
 
 ## Author-Specific Access Records
 
-The implemented server helper supports author/project access records with this safe shape:
+The implemented server helper supports author/project workspace access records with this safe shape:
 
 ```json
 [
@@ -86,7 +86,7 @@ Read-only metadata inspection was then completed through the authenticated JM1-C
 
 | Table | Existing field | Use |
 |---|---|---|
-| `opportunity` | `jm1_m6authorportalstatus` | Reuse for portal status / active unlock state |
+| `opportunity` | `jm1_m6authorportalstatus` | Reuse for workspace status / active unlock state |
 | `opportunity` | `parentcontactid` / `contactid` | Reuse for author Contact linkage where populated |
 | `opportunity` | `jm1_linkedproject` | Reuse for project linkage where populated |
 | `jm1pub_title` | `jm1_primaryauthor` / `jm1_author` | Reuse for title-to-author relationship where populated |
@@ -94,11 +94,11 @@ Read-only metadata inspection was then completed through the authenticated JM1-C
 
 Fields or tables not found:
 
-- no JM1 author portal table
-- no portal access token hash field
-- no portal access expiration field
-- no portal last-accessed field
-- no portal credential/status table supporting one author portal with multiple title children
+- no JM1 author workspace table
+- no workspace access token hash field
+- no workspace access expiration field
+- no workspace last-accessed field
+- no workspace credential/status table supporting one author workspace with multiple title children
 
 ## Proposed Minimal Dataverse Fields
 
@@ -107,27 +107,27 @@ Do not create duplicate concepts if equivalent fields already exist. Once metada
 Recommended table location:
 
 - New minimal table: `jm1_authorportalaccess`
-- Purpose: one author portal credential record per author portal/account, with child title/project authorization stored as safe references until a fuller portal data model is approved.
+- Purpose: one author workspace credential record per author workspace/account, with child title/project authorization stored as safe references until a fuller workspace data model is approved.
 
 Minimum fields:
 
 | Purpose | Proposed logical name | Type | Notes |
 |---|---|---|---|
-| Portal Access Name | `jm1_name` | Text | Human-readable internal name |
+| Workspace Access Name | `jm1_name` | Text | Human-readable internal name |
 | Contact | `jm1_contactid` | Lookup -> Contact | Required author identity |
 | Primary Opportunity / Project | `jm1_opportunityid` | Lookup -> Opportunity | Optional current accepted project |
 | Authorized Title IDs | `jm1_authorizedtitleids` | Text / JSON text | Bridge until formal title-child portal model exists |
 | Authorized Project IDs | `jm1_authorizedprojectids` | Text / JSON text | Bridge until formal project-child portal model exists |
-| Portal Access Token Hash | `jm1_portalaccesstokenhash` | Text | Stores hash only, not plain code |
-| Portal Access Expires On | `jm1_portalaccessexpireson` | DateTime | Enables rotation/expiration |
-| Portal Access Status | `jm1_portalaccessstatus` | Choice | Active, Disabled, Expired, Rotated |
-| Portal Last Accessed On | `jm1_portallastaccessedon` | DateTime | Updated only after authorized access logging is approved |
+| Workspace Access Token Hash | `jm1_portalaccesstokenhash` | Text | Stores hash only, not plain code |
+| Workspace Access Expires On | `jm1_portalaccessexpireson` | DateTime | Enables rotation/expiration |
+| Workspace Access Status | `jm1_portalaccessstatus` | Choice | Active, Disabled, Expired, Rotated |
+| Workspace Last Accessed On | `jm1_portallastaccessedon` | DateTime | Updated only after authorized access logging is approved |
 
 Admin/master override does not require a Dataverse field. It remains an app secret.
 
 ## Security Boundaries
 
-The portal must not display the following unless the request is authorized for the specific author/project or the admin master code:
+The workspace must not display the following unless the request is authorized for the specific author/project or the admin master code:
 
 - contracts
 - banking information
@@ -137,6 +137,13 @@ The portal must not display the following unless the request is authorized for t
 - project-specific private documents
 
 OP-003 currently remains safe because the deployed portal displays generic/read-only MVP data only.
+
+Additional required controls before private data is surfaced:
+
+- field-level protection for address, financial setup, and royalty setup data
+- no pre-contract sensitive data in dashboards, reports, exports, or broad status summaries
+- authenticated author/project context before locked modules render
+- safe `jm1_executionlog` evidence for workspace creation, view/edit, module completion, contract generation, and full workspace unlock where practical
 
 ## Validation Requirements
 
@@ -152,4 +159,4 @@ Before author-specific portal data goes live:
 
 ## Next Action
 
-Use existing `opportunity.jm1_m6authorportalstatus` for portal status where possible. Create no schema blindly. If Jackie authorizes schema work, create only the minimum `jm1_authorportalaccess` fields above, then wire `/author/portal` to read authorized records from Dataverse.
+Use existing `opportunity.jm1_m6authorportalstatus` for workspace status where possible. Create no schema blindly. If Jackie authorizes schema work, create only the minimum `jm1_authorportalaccess` fields above, then wire `/author/portal` to read authorized records from Dataverse.
