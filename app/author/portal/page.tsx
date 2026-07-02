@@ -7,7 +7,6 @@ import {
   portalActivationSummary,
   portalBoundaryRows,
   portalFileControls,
-  portalLockedModules,
   portalMilestones,
   portalReadinessCards,
   portalTasks,
@@ -128,13 +127,6 @@ export default function AuthorPortalPage() {
                     <h3 className="text-[15px] font-semibold text-white">{heading}</h3>
                     <p className="mt-2 text-[13px] font-light leading-[1.7] text-white/38">{body}</p>
                   </div>
-                ))}
-              </div>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {portalLockedModules.map((module) => (
-                  <span key={module} className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] text-white/35">
-                    {module}
-                  </span>
                 ))}
               </div>
             </div>
