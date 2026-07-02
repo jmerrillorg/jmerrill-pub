@@ -39,10 +39,19 @@ export const editorialSummary = {
   commandCenter: 'OP-005 Editorial',
   workflowState: 'Orchestration only',
   systemOfRecord: 'Dataverse',
-  doctrineSource: 'JM Editorial Doctrine',
+  doctrineSource: 'jm1-publishing-editorial-v2.skill',
   authorWorkspaceExposure: 'Stage, next action, safe summary only',
   nextGate: 'Cover Design Command Center',
 } as const
+
+export const editorialCanonSources = [
+  ['Editorial skill', 'jm1-publishing-editorial-v2.skill'],
+  ['Editorial Review / knowledge', 'references/knowledge.md'],
+  ['Developmental Editing', 'references/developmental-editing.md'],
+  ['Line Editing', 'references/line-editing.md'],
+  ['Copyediting', 'references/copyediting.md'],
+  ['Proofreading', 'references/proofreading.md'],
+] as const
 
 export const editorialStyleGuides = [
   'CMoS',
@@ -87,28 +96,28 @@ export const editorialStages: EditorialStage[] = [
     label: 'Stage 4 Developmental Editing',
     status: 'Approved canon',
     tone: 'pending',
-    description: 'Invoke approved Developmental Editing doctrine; hard-stop re-trigger remains active.',
+    description: 'Invoke references/developmental-editing.md from the v2 editorial skill; hard-stop re-trigger remains active.',
   },
   {
     id: 'stage-5-line',
     label: 'Stage 5 Line Editing',
     status: 'Approved canon',
     tone: 'pending',
-    description: 'Invoke approved Line Editing doctrine; carry forward Stage 3 style guide unless publisher override is logged.',
+    description: 'Invoke references/line-editing.md from the v2 editorial skill; carry forward Stage 3 style guide unless publisher override is logged.',
   },
   {
     id: 'stage-6-copyedit',
     label: 'Stage 6 Copyediting',
     status: 'Approved canon',
     tone: 'pending',
-    description: 'Invoke approved Copyediting doctrine; maintain style guide and JM Signature guard.',
+    description: 'Invoke references/copyediting.md from the v2 editorial skill; maintain style guide and JM Signature guard.',
   },
   {
     id: 'stage-7a-manuscript-proofread',
     label: 'Stage 7a Manuscript Proofread',
     status: 'Approved canon',
     tone: 'pending',
-    description: 'Invoke approved manuscript proofread doctrine before OP-007 interior layout handoff.',
+    description: 'Invoke references/proofreading.md before OP-007 interior layout handoff.',
   },
   {
     id: 'op-007-handoff',
@@ -122,7 +131,7 @@ export const editorialStages: EditorialStage[] = [
     label: 'Stage 7b Production Proofread',
     status: 'Re-entry tracked',
     tone: 'pending',
-    description: 'Re-enter editorial proofing after layout/proof files exist; hard-stop re-trigger remains active.',
+    description: 'Re-enter references/proofreading.md after layout/proof files exist; hard-stop re-trigger remains active.',
   },
   {
     id: 'stage-8-handoff',

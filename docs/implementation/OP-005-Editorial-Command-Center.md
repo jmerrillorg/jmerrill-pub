@@ -1,6 +1,6 @@
 # OP-005 - Editorial Command Center
 
-**Status:** IMPLEMENTED / PENDING DEPLOYMENT VALIDATION  
+**Status:** IMPLEMENTED / CANON SOURCE CORRECTION IN PROGRESS
 **Program:** PROGRAM-002 Autonomous Publishing Production Pipeline  
 **Date:** 2026-07-02  
 **Module:** OP-005 Editorial Command Center
@@ -29,6 +29,23 @@ Confirmed `jm1pub_editorialstage` fields include stage type/status, phase, assig
 Confirmed `jm1pub_title` anchor fields include title name, primary author, author, project, imprint, genre, lifecycle stage, ISBN references, stage/status, current manuscript, target publication date, and project manager.
 
 ## Approved Canon Handoff
+
+The earlier thin OP-005 Stage 4-7b session handoff is superseded. OP-005 now uses the real SharePoint canon package:
+
+`ImplementationHQ / Architecture / 00_CANON / Publishing / Skills / jm1-publishing-editorial`
+
+Required local source files were refreshed into:
+
+`docs/implementation/canon-cache/jm1-publishing-editorial`
+
+The active source package is `jm1-publishing-editorial-v2.skill`, which contains:
+
+- `references/developmental-editing.md`
+- `references/line-editing.md`
+- `references/copyediting.md`
+- `references/proofreading.md`
+
+The active references folder contains `JM1-PUB-Editorial-Knowledge-v1.0.md` and `developmental-editing.md`. The v2 skill package is the source for line editing, copyediting, and proofreading references.
 
 OP-005 uses the approved editorial canon handoff:
 
@@ -61,7 +78,12 @@ The approved style guide roster contains exactly 14 guides:
 13. MHRA
 14. Oxford
 
-SharePoint connector search did not locate `JM1-PUB-Editorial-Knowledge-v1.0` by exact title or broad editorial/style-guide queries on 2026-07-02. The repo-side OP-005 record and website model now reflect the corrected 14-guide roster. The SharePoint canon file remains a follow-up unless its exact path is provided or it appears in connector search.
+The live OneDrive/SharePoint knowledge files were updated on 2026-07-02:
+
+- `JM1-PUB-Editorial-Knowledge-v1.0.md`
+- `JM1-PUB-Editorial-Knowledge-v1.0 (1).md`
+
+The repo-side OP-005 record and website model also reflect the corrected 14-guide roster.
 
 ## Internal Style Overlays
 
@@ -71,7 +93,7 @@ The three internal overlays remain tracked:
 - Urban / Street-Lit Voice Preservation
 - Children's Book Standard
 
-Current repo evidence references the overlay source as `faith-editorial-overlay.md` and describes it as governing internal faith/street-lit/children's editorial overlays. The exact SharePoint overlay file locations were not found during this pass and remain follow-up discovery items. Overlay names remain internal-only and are not author-facing.
+SharePoint search found `faith-editorial-overlay.md` in `Architecture / 06_Session_Archive`, not in the active `references` folder. The file was cached locally for implementation awareness, but active-canon placement remains a follow-up. Overlay names remain internal-only and are not author-facing.
 
 ## Orchestration Behavior
 
