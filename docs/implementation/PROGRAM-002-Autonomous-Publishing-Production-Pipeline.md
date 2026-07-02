@@ -414,7 +414,7 @@ Operational completion means:
 | Live Stripe not authorized | Payment request/payment confirmation from Stripe | Submit Payment action remains hidden until approved Stripe path is configured |
 | Marketing must not be delayed until launch | All modules | Capture marketing signal/handoff/dependency in each OP module |
 | JM Signature must not become public or purchasable | Intake, review, contract, marketing, executive dashboard | Treat as publisher-only governance overlay |
-| Distribution/launch/royalty automation gates remain closed until readiness gates are satisfied | OP-008 through OP-011 | Keep later-stage automation gated |
+| Production/distribution/marketing/royalty automation gates remain closed until readiness gates are satisfied and separately authorized | OP-008 through OP-011 | Keep later-stage automation gated |
 | Live royalty generation not authorized | Royalty statements in workspace | Hide royalty statements until separately approved |
 
 ## Recommended Build Order
@@ -423,13 +423,13 @@ Operational completion means:
 2. OP-003 Author Workspace MVP - complete / operational as pre-contract setup workspace
 3. OP-002 Contract / Payment / Workspace Activation - complete / operational as post-agreement/payment full workspace unlock
 4. OP-004 Registration Command Center - complete / operational
-5. OP-005 Editorial Command Center - implemented / pending deployment validation
-6. OP-006 Cover Design Command Center
-7. OP-007 Interior Layout Command Center
-8. OP-008 Distribution Command Center
-9. OP-009 Launch / Metadata / Retail Readiness Command Center
-10. OP-010 Marketing / Campaign Command Center
-11. OP-011 Royalty / Relationship Dashboard
+5. OP-005 Editorial Command Center - complete / operational
+6. OP-006 Cover Design Command Center - complete / operational
+7. OP-007 Interior Layout Command Center - complete / operational
+8. OP-008 Production Readiness / Distribution Gate - complete / operational
+9. OP-009 Distribution Command Center - complete / operational
+10. OP-010 Marketing / Campaign Command Center - complete / operational
+11. OP-011 Royalty / Relationship / Author Success Command Center - complete / operational
 
 JM Signature remains an overlay. Do not move it ahead of the core production machine.
 
@@ -441,7 +441,7 @@ Reason:
 
 The intake/onboarding paths now work. The next operational need is to make sure serious `/join` inquiries and accepted/current authors have a governed workspace lifecycle that mirrors the pipeline without creating duplicate folders or making SharePoint the system of record.
 
-OP-001 has since been completed and validated as operational. OP-002 has also passed controlled operational validation. OP-003 Author Workspace MVP has been deployed and validated operational. OP-004 Registration Command Center has been deployed and validated operational. OP-005 Editorial Command Center has been implemented as a read-only orchestration layer pending deployment validation.
+OP-001 has since been completed and validated as operational. OP-002 has also passed controlled operational validation. OP-003 Author Workspace MVP has been deployed and validated operational. OP-004 Registration Command Center has been deployed and validated operational. OP-005 Editorial Command Center has been deployed and validated operational. OP-006 through OP-011 now provide read-only operational readiness surfaces for cover, layout, production readiness, distribution, marketing, and author success while preserving all live-action gates.
 
 ## Validation Requirements
 
