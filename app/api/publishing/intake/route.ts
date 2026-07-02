@@ -219,59 +219,41 @@ async function handlePublishingIntakePost(req: NextRequest) {
           reference,
           recordId: dataverse.recordId,
         })
-
-        return json(
-          buildErrorResponse('sharepoint_workspace_failed', workspace.reason, reference),
-          502,
-          originResult.origin,
-        )
-      }
-
-      const workspaceWriteback = await markPublishingIntakeWorkspaceCreated(dataverse.recordId, workspace)
-      if (workspaceWriteback.status !== 'success') {
-        console.warn('Publishing intake workspace writeback did not complete.', {
-          status: workspaceWriteback.status,
-          reason: workspaceWriteback.reason,
-          reference,
-        })
-      }
-
-      if (workspace.status === 'uploaded') {
-        acknowledgmentIntake = { ...intake, manuscriptUrl: workspace.manuscriptUrl }
-        const manuscriptWriteback = await markPublishingIntakeManuscriptReceived(dataverse.recordId, {
-          manuscriptUrl: workspace.manuscriptUrl,
-        })
-
-        if (manuscriptWriteback.status !== 'success') {
-          console.error('Publishing intake manuscript writeback failed after upload.', {
-            status: manuscriptWriteback.status,
-            reason: manuscriptWriteback.reason,
+      } else {
+        const workspaceWriteback = await markPublishingIntakeWorkspaceCreated(dataverse.recordId, workspace)
+        if (workspaceWriteback.status !== 'success') {
+          console.warn('Publishing intake workspace writeback did not complete.', {
+            status: workspaceWriteback.status,
+            reason: workspaceWriteback.reason,
             reference,
           })
-
-          return json(
-            buildErrorResponse('manuscript_writeback_failed', manuscriptWriteback.reason, reference),
-            502,
-            originResult.origin,
-          )
         }
-      } else if (submittedManuscriptUrl) {
-        const manuscriptWriteback = await markPublishingIntakeManuscriptReceived(dataverse.recordId, {
-          manuscriptUrl: submittedManuscriptUrl,
-        })
 
-        if (manuscriptWriteback.status !== 'success') {
-          console.error('Publishing intake manuscript link writeback failed.', {
-            status: manuscriptWriteback.status,
-            reason: manuscriptWriteback.reason,
-            reference,
+        if (workspace.status === 'uploaded') {
+          acknowledgmentIntake = { ...intake, manuscriptUrl: workspace.manuscriptUrl }
+          const manuscriptWriteback = await markPublishingIntakeManuscriptReceived(dataverse.recordId, {
+            manuscriptUrl: workspace.manuscriptUrl,
           })
 
-          return json(
-            buildErrorResponse('manuscript_writeback_failed', manuscriptWriteback.reason, reference),
-            502,
-            originResult.origin,
-          )
+          if (manuscriptWriteback.status !== 'success') {
+            console.error('Publishing intake manuscript writeback failed after upload.', {
+              status: manuscriptWriteback.status,
+              reason: manuscriptWriteback.reason,
+              reference,
+            })
+          }
+        } else if (submittedManuscriptUrl) {
+          const manuscriptWriteback = await markPublishingIntakeManuscriptReceived(dataverse.recordId, {
+            manuscriptUrl: submittedManuscriptUrl,
+          })
+
+          if (manuscriptWriteback.status !== 'success') {
+            console.error('Publishing intake manuscript link writeback failed.', {
+              status: manuscriptWriteback.status,
+              reason: manuscriptWriteback.reason,
+              reference,
+            })
+          }
         }
       }
     }
