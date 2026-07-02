@@ -169,37 +169,21 @@ async function handlePublishingIntakePost(req: NextRequest) {
 
     const acknowledgment = await sendJoinAuthorAcknowledgment(intake)
     if (acknowledgment.status !== 'sent') {
-      console.error('Publishing intake author acknowledgment did not send.', {
+      console.warn('Publishing intake direct author acknowledgment did not send; leaving Flow B fallback pending.', {
         status: acknowledgment.status,
         reason: acknowledgment.reason,
         reference,
       })
-
-      return json(
-        buildErrorResponse('author_acknowledgment_failed', sanitizeDiagnosticDetail(acknowledgment.reason), reference),
-        acknowledgment.status === 'skipped' ? 500 : 502,
-        originResult.origin,
-      )
     }
 
-    if (dataverse.status === 'success') {
+    if (acknowledgment.status === 'sent' && dataverse.status === 'success') {
       const acknowledgmentWriteback = await markPublishingIntakeAcknowledgmentSent(dataverse.recordId)
       if (acknowledgmentWriteback.status !== 'success') {
-        console.error('Publishing intake author acknowledgment writeback did not complete.', {
+        console.warn('Publishing intake author acknowledgment writeback did not complete; Flow B may still evaluate the row.', {
           status: acknowledgmentWriteback.status,
           reason: acknowledgmentWriteback.reason,
           reference,
         })
-
-        return json(
-          buildErrorResponse(
-            'author_acknowledgment_writeback_failed',
-            sanitizeDiagnosticDetail(acknowledgmentWriteback.reason),
-            reference,
-          ),
-          acknowledgmentWriteback.status === 'skipped' ? 500 : 502,
-          originResult.origin,
-        )
       }
     }
 
