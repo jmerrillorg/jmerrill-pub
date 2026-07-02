@@ -52,6 +52,14 @@ const hubCards = [
     secondary: 'Pre-contract setup',
   },
   {
+    status: 'Operational',
+    title: 'Registration Command Center',
+    body: 'Controlled readiness view for ISBN, copyright, LCCN, BISAC/category, metadata, checklist, blockers, and registration evidence.',
+    href: '/author/registration',
+    cta: 'Open registration',
+    secondary: 'OP-004',
+  },
+  {
     status: 'Live',
     title: 'Books Catalog',
     body: 'Browse the full JMP catalog. Your title will appear here once it is live in distribution.',
