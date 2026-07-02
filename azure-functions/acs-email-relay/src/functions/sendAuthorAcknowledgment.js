@@ -219,6 +219,7 @@ function validatePayload(payload) {
   const firstName = normalizeText(payload.firstName);
   const projectTitle = normalizeText(payload.projectTitle) || DEFAULT_PROJECT_TITLE;
   const intakeChannel = safeTrim(payload.intakeChannel);
+  const manuscriptUrl = normalizeBody(payload.manuscriptUrl);
 
   if (!reference || !REFERENCE_PATTERN.test(reference)) {
     return { ok: false, code: "INVALID_REFERENCE", reference };
@@ -243,7 +244,8 @@ function validatePayload(payload) {
       to,
       firstName,
       projectTitle,
-      intakeChannel
+      intakeChannel,
+      hasManuscriptLink: Boolean(manuscriptUrl)
     }
   };
 }
@@ -258,6 +260,17 @@ function buildAcknowledgmentEmail(payload) {
   }
 
   const subject = `We received your publishing inquiry — ${payload.reference}`;
+  const manuscriptCopy = payload.hasManuscriptLink
+    ? [
+        "We received your manuscript link with your inquiry. Our Editorial Review Team will begin evaluating the material you provided and the story details you shared.",
+        "",
+        "If we need anything else before review can continue, we will let you know."
+      ]
+    : [
+        "We did not receive a manuscript link with your inquiry.",
+        "",
+        "Please reply with a shareable manuscript link when it is ready. Editorial review will begin as soon as we receive access to the manuscript."
+      ];
   const plainText = [
     `Good day ${payload.firstName},`,
     "",
@@ -266,6 +279,8 @@ function buildAcknowledgmentEmail(payload) {
     `We received your inquiry for ${payload.projectTitle}, and your reference number is:`,
     "",
     payload.reference,
+    "",
+    ...manuscriptCopy,
     "",
     "Your book is more than a project. It carries your story, your voice, and the people you hope to reach. Our team will review the details you shared and follow up within 7–10 business days with the next right step.",
     "",
