@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { enqueuePublishingIntakeDeadLetter } from '@/lib/publishing/intake/deadLetter'
 import { sendJoinAuthorAcknowledgment } from '@/lib/publishing/intake/authorAcknowledgment'
-import { writePublishingIntakeWithRetry } from '@/lib/publishing/intake/dataverse'
+import {
+  markPublishingIntakeAcknowledgmentSent,
+  writePublishingIntakeWithRetry,
+} from '@/lib/publishing/intake/dataverse'
 import { getIdempotencyReplay, rememberIdempotencyKey } from '@/lib/publishing/intake/idempotency'
 import { sendJoinInternalNotification } from '@/lib/publishing/intake/internalNotification'
 import { checkIntakeRateLimit, getClientIp } from '@/lib/publishing/intake/rateLimit'
@@ -31,6 +34,7 @@ type IntakeErrorCode =
   | 'dataverse_write_failed'
   | 'dead_letter_failed'
   | 'author_acknowledgment_failed'
+  | 'author_acknowledgment_writeback_failed'
   | 'unexpected_exception'
 
 type IntakeErrorResponse = {
@@ -176,6 +180,27 @@ async function handlePublishingIntakePost(req: NextRequest) {
         acknowledgment.status === 'skipped' ? 500 : 502,
         originResult.origin,
       )
+    }
+
+    if (dataverse.status === 'success') {
+      const acknowledgmentWriteback = await markPublishingIntakeAcknowledgmentSent(dataverse.recordId)
+      if (acknowledgmentWriteback.status !== 'success') {
+        console.error('Publishing intake author acknowledgment writeback did not complete.', {
+          status: acknowledgmentWriteback.status,
+          reason: acknowledgmentWriteback.reason,
+          reference,
+        })
+
+        return json(
+          buildErrorResponse(
+            'author_acknowledgment_writeback_failed',
+            sanitizeDiagnosticDetail(acknowledgmentWriteback.reason),
+            reference,
+          ),
+          acknowledgmentWriteback.status === 'skipped' ? 500 : 502,
+          originResult.origin,
+        )
+      }
     }
 
     return json({ status: 'received', reference }, 201, originResult.origin)
