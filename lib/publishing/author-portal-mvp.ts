@@ -61,7 +61,7 @@ export const portalTasks: PortalTask[] = [
 
 export const portalFileControls = [
   ['Pre-contract only', 'This portal opens before the contract package is generated so required author information can be collected first.'],
-  ['No private files', 'Files, proofs, manuscripts, and production documents remain hidden until active portal unlock is authorized.'],
+  ['No private project materials', 'Private project materials remain hidden until active portal unlock is authorized.'],
   ['No sensitive uploads', 'Tax IDs, bank details, and signatures stay in approved secure systems, not website notes.'],
   ['Dataverse remains authority', 'Portal status reflects governed records; the portal does not become the source of truth.'],
 ] as const
@@ -69,7 +69,7 @@ export const portalFileControls = [
 export const portalReadinessCards = [
   ['Contract package', 'Generated only after Author Onboarding, Financial Setup, and Royalty Setup are complete.'],
   ['Payment request', 'Generated only after the contract package is ready; no payment request is shown in pre-contract mode.'],
-  ['Active portal unlock', 'Dashboard, files, production, distribution, marketing, contracts, invoices, and royalties remain hidden until agreement and payment are complete.'],
+  ['Active portal unlock', 'Additional project modules remain hidden until agreement and payment are complete.'],
   ['Returning authors', 'Existing author portals receive new title children; onboarding updates are requested only when required.'],
 ] as const
 
@@ -77,24 +77,7 @@ export const portalBoundaryRows = [
   ['System of record', 'Dataverse, not portal'],
   ['Visible modules', 'Onboarding, financial setup, royalty setup'],
   ['Payments', 'No payment request generated'],
-  ['Contracts', 'No signing packet generated'],
-  ['Dashboard', 'Hidden before active unlock'],
-  ['Files', 'Hidden before active unlock'],
-  ['Royalties', 'Hidden before active unlock'],
-] as const
-
-export const portalLockedModules = [
-  'Dashboard',
-  'Editorial',
-  'Cover',
-  'Layout',
-  'Files',
-  'Contracts',
-  'Royalties',
-  'Production',
-  'Distribution',
-  'Marketing',
-  'Messages',
-  'Timeline',
-  'Reports',
+  ['Agreement actions', 'No signing packet generated'],
+  ['Project workspace', 'Hidden before active unlock'],
+  ['Financial records', 'Hidden before active unlock'],
 ] as const
