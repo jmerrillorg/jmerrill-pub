@@ -99,6 +99,7 @@ export const nav = {
     { label: 'Services',        href: '/services' },
     { label: 'Books',           href: '/books' },
     { label: 'Authors',         href: '/authors' },
+    { label: 'Author Hub',      href: '/author' },
     { label: 'About',           href: '/about' },
   ],
   partner: {
@@ -238,6 +239,7 @@ export const footerLinks = {
   startHere: [
     { label: 'Publish With Us',          href: '/publishing' },
     { label: 'How It Works',             href: '/author-journey' },
+    { label: 'Author Hub',               href: '/author' },
     { label: 'Join the Family',          href: '/join' },
     { label: 'Schedule a Consultation',  href: 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled' },
   ],

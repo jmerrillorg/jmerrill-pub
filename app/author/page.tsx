@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Author Hub | J Merrill Publishing',
-  description: 'Private author and staff hub for J Merrill Publishing forms, workspace links, Q&A, and author operations.',
+  description: 'Public entry hub for J Merrill Publishing authors.',
   robots: {
     index: false,
     follow: false,
@@ -20,100 +20,12 @@ const hubCards = [
     secondary: 'Private intake',
   },
   {
-    status: 'Controlled',
-    title: 'Author Onboarding',
-    body: 'Structured author, title, manuscript, rights, design, and marketing foundation intake for approved or invited projects.',
-    href: '/author/onboarding',
-    cta: 'Open onboarding',
-    secondary: 'Controlled setup',
-  },
-  {
-    status: 'Controlled',
-    title: 'Financial Setup',
-    body: 'Gated payee, tax-document status, payment preference, and secure follow-up routing for active authors.',
-    href: '/author/financial-setup',
-    cta: 'Open financial setup',
-    secondary: 'Royalty readiness',
-  },
-  {
-    status: 'Controlled',
-    title: 'Royalty Setup',
-    body: 'Gated title coverage, reporting preference, royalty contact, agreement status, and future dashboard readiness.',
-    href: '/author/royalty-setup',
-    cta: 'Open royalty setup',
-    secondary: 'Author workspace',
-  },
-  {
-    status: 'MVP',
+    status: 'Secure',
     title: 'Author Workspace',
-    body: 'Private pre-contract workspace for accepted authors to complete onboarding, financial setup, and royalty setup before agreement and payment actions appear.',
+    body: 'Secure workspace access for invited authors. Project-specific setup, status, files, contracts, and royalty information stay behind this gate.',
     href: '/author/portal',
     cta: 'Open workspace',
-    secondary: 'Pre-contract setup',
-  },
-  {
-    status: 'Operational',
-    title: 'Registration Command Center',
-    body: 'Controlled readiness view for ISBN, copyright, LCCN, BISAC/category, metadata, checklist, blockers, and registration evidence.',
-    href: '/author/registration',
-    cta: 'Open registration',
-    secondary: 'OP-004',
-  },
-  {
-    status: 'Operational',
-    title: 'Editorial Command Center',
-    body: 'Controlled editorial orchestration for imprint confirmation, Editorial Review, stage routing, style-guide carry-forward, approvals, and safe handoffs.',
-    href: '/author/editorial',
-    cta: 'Open editorial',
-    secondary: 'OP-005',
-  },
-  {
-    status: 'Operational',
-    title: 'Cover Design Command Center',
-    body: 'Controlled cover readiness for briefs, market fit, BP-09 validation, approvals, final file posture, and safe handoffs.',
-    href: '/author/cover',
-    cta: 'Open cover',
-    secondary: 'OP-006',
-  },
-  {
-    status: 'Operational',
-    title: 'Interior Layout Command Center',
-    body: 'Controlled layout readiness for trim/specs, proof cycles, correction tracking, Stage 7b re-entry, and production file handoff.',
-    href: '/author/layout',
-    cta: 'Open layout',
-    secondary: 'OP-007',
-  },
-  {
-    status: 'Operational',
-    title: 'Production Readiness / Distribution Gate',
-    body: 'Controlled readiness gate for final metadata, files, BP-06, BP-09, BP-10, and publisher approval before distribution.',
-    href: '/author/production-readiness',
-    cta: 'Open production gate',
-    secondary: 'OP-008',
-  },
-  {
-    status: 'Operational',
-    title: 'Distribution Command Center',
-    body: 'Controlled distribution readiness for metadata, channels, file candidates, retailer/library posture, blockers, and approvals.',
-    href: '/author/distribution-command',
-    cta: 'Open distribution',
-    secondary: 'OP-009',
-  },
-  {
-    status: 'Operational',
-    title: 'Marketing Command Center',
-    body: 'Controlled Publishing Marketing readiness for positioning, launch kit, reviews, awards, outreach, calendar, and approvals.',
-    href: '/author/marketing',
-    cta: 'Open marketing',
-    secondary: 'OP-010',
-  },
-  {
-    status: 'Operational',
-    title: 'Author Success Command Center',
-    body: 'Controlled relationship and royalty-readiness visibility for author support, catalog health, annual review posture, and future-title opportunities.',
-    href: '/author/author-success',
-    cta: 'Open author success',
-    secondary: 'OP-011',
+    secondary: 'Private access',
   },
   {
     status: 'Live',
@@ -123,12 +35,6 @@ const hubCards = [
     cta: 'Browse titles',
     secondary: 'Live',
   },
-] as const
-
-const supportLinks = [
-  { label: 'Authors Directory', href: '/authors' },
-  { label: 'Publishing Services', href: '/services' },
-  { label: 'Contact Publishing', href: '/contact' },
 ] as const
 
 export default function AuthorHubPage() {
@@ -165,7 +71,7 @@ export default function AuthorHubPage() {
             <em className="not-italic italic text-blue-500">home base.</em>
           </h1>
           <p className="text-[16px] font-light text-white/45 leading-[1.75]">
-            Everything related to your book, your royalties, and your journey with J Merrill Publishing.
+            Start a publishing inquiry, enter your secure Author Workspace, or browse the J Merrill Publishing catalog.
           </p>
         </section>
 
@@ -175,32 +81,22 @@ export default function AuthorHubPage() {
               className="text-[11px] font-medium tracking-[0.12em] uppercase text-blue-300 mb-4"
               style={{ fontFamily: "'DM Mono', monospace" }}
             >
-              New authors
+              Public entry
             </p>
             <p className="mb-4 text-[15px] font-light text-white/65">
-              New authors: complete these steps in order.
+              Author- and title-specific material stays inside the secured Author Workspace.
             </p>
-            <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
-              {[
-                'Step 1 — Author Onboarding',
-                'Step 2 — Financial Setup',
-                'Step 3 — Royalty Setup',
-              ].map((step, index) => (
-                <div key={step} className="inline-flex items-center gap-3 rounded-full border border-white/8 bg-white/[0.03] px-4 py-2.5">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500 text-[11px] font-semibold text-white">
-                    {index + 1}
-                  </span>
-                  <span className="text-[13px] font-light text-white/70">{step}</span>
-                </div>
-              ))}
-            </div>
+            <p className="text-[13px] font-light leading-[1.75] text-white/42">
+              Setup, editorial, cover, layout, distribution, marketing, files, contracts, royalty, and project status
+              modules require workspace authorization before they render.
+            </p>
           </div>
           <p className="mt-4 text-[13px] font-light text-white/35 text-center">
-            Controlled routes are for active and invited authors only. Questions? Contact publishing@jmerrill.one
+            Questions? Contact publishing@jmerrill.one
           </p>
         </section>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-3">
           {hubCards.map((card) => (
             <div key={card.title} className="bg-white/[0.04] border border-white/8 rounded-3xl p-8">
               <p
@@ -242,43 +138,13 @@ export default function AuthorHubPage() {
           >
             Built as a doorway now.
             <br />
-            <em className="not-italic italic text-blue-500">Workspace MVP is live.</em>
+            <em className="not-italic italic text-blue-500">Private work stays private.</em>
           </h2>
           <p className="text-[15px] font-light text-white/40 leading-[1.75]">
-            The author workspace is now the private pre-contract entry point after author acceptance. It collects the
-            information needed for agreement and payment preparation before the active project dashboard unlocks.
-            Dataverse, SharePoint, and approved staff workflows remain the systems of record.
+            This public hub does not expose title-specific status, files, contracts, financial setup, royalties, or
+            production command centers. Those surfaces remain behind secure Author Workspace access.
           </p>
         </div>
-
-        <section className="bg-white/[0.04] border border-white/8 rounded-3xl p-8 sm:p-10">
-          <p
-            className="text-[11px] font-medium tracking-[0.12em] uppercase text-blue-400/70 mb-2"
-            style={{ fontFamily: "'DM Mono', monospace" }}
-          >
-            Support Links
-          </p>
-          <h2
-            className="text-white mb-3"
-            style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '28px', fontWeight: 700, lineHeight: 1.15 }}
-          >
-            Additional publishing routes.
-          </h2>
-          <p className="text-[14px] font-light leading-[1.8] text-white/45 mb-6">
-            These stay available as supporting references while the author dashboard and operational routing continue to mature.
-          </p>
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            {supportLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="inline-flex items-center gap-2 text-[13px] text-blue-400 border-b border-blue-400/30 pb-px hover:border-blue-400 transition-colors"
-              >
-                {link.label} →
-              </Link>
-            ))}
-          </div>
-        </section>
       </div>
     </div>
   )
