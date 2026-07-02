@@ -1,6 +1,6 @@
 # OP-003 - Author Portal Access Model
 
-**Status:** Implementation safety fix complete; Dataverse-backed author-specific persistence pending field confirmation
+**Status:** Implementation safety fix complete; Dataverse-backed author-specific persistence pending minimal schema approval
 **Date:** 2026-07-01
 **Scope:** Author Portal access control
 
@@ -80,16 +80,25 @@ Plain `accessCode` values are accepted only outside production for local validat
 
 ## Dataverse Field Inspection
 
-Read-only metadata inspection was attempted from the website service-principal path. The token request succeeded, but metadata reads returned HTTP `403` for:
+Read-only metadata inspection was attempted from the website service-principal path. The token request succeeded, but metadata reads returned HTTP `403` for table metadata. This means the deployed website app identity still does not have metadata-read permission and should not be used as an admin inspection identity.
 
-- `contact`
-- `opportunity`
-- `jm1pub_title`
-- `jm1pub_authoragreement`
-- `jm1_publishingintake`
-- `jm1pub_submission`
+Read-only metadata inspection was then completed through the authenticated JM1-Core admin context. Existing reusable fields found:
 
-Result: existing portal/access fields could not be confirmed from live metadata in this pass.
+| Table | Existing field | Use |
+|---|---|---|
+| `opportunity` | `jm1_m6authorportalstatus` | Reuse for portal status / active unlock state |
+| `opportunity` | `parentcontactid` / `contactid` | Reuse for author Contact linkage where populated |
+| `opportunity` | `jm1_linkedproject` | Reuse for project linkage where populated |
+| `jm1pub_title` | `jm1_primaryauthor` / `jm1_author` | Reuse for title-to-author relationship where populated |
+| `jm1pub_title` | `jm1_project` | Reuse for title-to-project relationship where populated |
+
+Fields or tables not found:
+
+- no JM1 author portal table
+- no portal access token hash field
+- no portal access expiration field
+- no portal last-accessed field
+- no portal credential/status table supporting one author portal with multiple title children
 
 ## Proposed Minimal Dataverse Fields
 
@@ -97,20 +106,22 @@ Do not create duplicate concepts if equivalent fields already exist. Once metada
 
 Recommended table location:
 
-- Preferred: title/project portal access table if one already exists.
-- Acceptable minimal path: `jm1pub_title` or the active project/title record used by OP-002 portal activation.
+- New minimal table: `jm1_authorportalaccess`
+- Purpose: one author portal credential record per author portal/account, with child title/project authorization stored as safe references until a fuller portal data model is approved.
 
 Minimum fields:
 
 | Purpose | Proposed logical name | Type | Notes |
 |---|---|---|---|
+| Portal Access Name | `jm1_name` | Text | Human-readable internal name |
+| Contact | `jm1_contactid` | Lookup -> Contact | Required author identity |
+| Primary Opportunity / Project | `jm1_opportunityid` | Lookup -> Opportunity | Optional current accepted project |
+| Authorized Title IDs | `jm1_authorizedtitleids` | Text / JSON text | Bridge until formal title-child portal model exists |
+| Authorized Project IDs | `jm1_authorizedprojectids` | Text / JSON text | Bridge until formal project-child portal model exists |
 | Portal Access Token Hash | `jm1_portalaccesstokenhash` | Text | Stores hash only, not plain code |
 | Portal Access Expires On | `jm1_portalaccessexpireson` | DateTime | Enables rotation/expiration |
 | Portal Access Status | `jm1_portalaccessstatus` | Choice | Active, Disabled, Expired, Rotated |
 | Portal Last Accessed On | `jm1_portallastaccessedon` | DateTime | Updated only after authorized access logging is approved |
-| Portal Contact | existing Contact lookup | Lookup | Reuse existing Contact relationship when present |
-| Author Portal | existing portal lookup/table if present | Lookup | One portal per author relationship |
-| Portal Title/Project | existing title/project lookup or child table | Lookup / N:N | Supports multiple titles for returning authors |
 
 Admin/master override does not require a Dataverse field. It remains an app secret.
 
@@ -141,4 +152,4 @@ Before author-specific portal data goes live:
 
 ## Next Action
 
-Resolve the Dataverse metadata permission blocker, inspect the existing OP-002/portal field map, then either reuse existing fields or create the minimal missing fields through the governed Dataverse schema process.
+Use existing `opportunity.jm1_m6authorportalstatus` for portal status where possible. Create no schema blindly. If Jackie authorizes schema work, create only the minimum `jm1_authorportalaccess` fields above, then wire `/author/portal` to read authorized records from Dataverse.

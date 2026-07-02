@@ -112,7 +112,7 @@ OP-001, OP-002, and OP-003 have been completed and validated as operational. OP-
 | Marketing delayed until launch | All modules | Each module must capture marketing signal/handoff/dependency |
 | JM Signature public/application misuse | All modules | Publisher-only overlay; no public application path or paid upgrade |
 | Live royalty generation not approved | OP-011 | Royalty dashboard can remain planning/review-only until authorized |
-| Dataverse portal access fields not confirmed | OP-003 author-specific portal access | Website service-principal metadata inspection returned HTTP 403; inspect/reuse existing fields before schema changes |
+| Dataverse portal credential fields missing | OP-003 author-specific portal access | Admin metadata inspection found reusable `opportunity.jm1_m6authorportalstatus`, Contact/project/title linkage fields; no JM1 portal credential/token hash/expires/last-access fields found |
 
 ## Capture Boundary
 
