@@ -3,10 +3,19 @@ import { enqueuePublishingIntakeDeadLetter } from '@/lib/publishing/intake/deadL
 import { sendJoinAuthorAcknowledgment } from '@/lib/publishing/intake/authorAcknowledgment'
 import {
   markPublishingIntakeAcknowledgmentSent,
+  markPublishingIntakeManuscriptReceived,
+  markPublishingIntakeWorkspaceCreated,
   writePublishingIntakeWithRetry,
 } from '@/lib/publishing/intake/dataverse'
 import { getIdempotencyReplay, rememberIdempotencyKey } from '@/lib/publishing/intake/idempotency'
 import { sendJoinInternalNotification } from '@/lib/publishing/intake/internalNotification'
+import {
+  ensureInquiryWorkspace,
+  uploadManuscriptToInquiryWorkspace,
+  validateManuscriptUploadCandidate,
+  verifyShareableManuscriptLink,
+  type ManuscriptUploadCandidate,
+} from '@/lib/publishing/intake/manuscriptUpload'
 import { checkIntakeRateLimit, getClientIp } from '@/lib/publishing/intake/rateLimit'
 import { generateIntakeReference } from '@/lib/publishing/intake/reference'
 import {
@@ -35,6 +44,9 @@ type IntakeErrorCode =
   | 'dead_letter_failed'
   | 'author_acknowledgment_failed'
   | 'author_acknowledgment_writeback_failed'
+  | 'sharepoint_workspace_failed'
+  | 'manuscript_upload_failed'
+  | 'manuscript_writeback_failed'
   | 'unexpected_exception'
 
 type IntakeErrorResponse = {
@@ -77,6 +89,11 @@ export async function POST(req: NextRequest) {
   }
 }
 
+type ParsedIntakeRequest = {
+  body: Record<string, unknown>
+  manuscriptFile: ManuscriptUploadCandidate | null
+}
+
 async function handlePublishingIntakePost(req: NextRequest) {
   const origin = req.headers.get('origin')
   const originResult = validateOrigin(origin)
@@ -88,22 +105,24 @@ async function handlePublishingIntakePost(req: NextRequest) {
     )
   }
 
-  let body: unknown
+  let parsedRequest: ParsedIntakeRequest
 
   try {
-    body = await req.json()
+    parsedRequest = await parseIntakeRequest(req)
   } catch {
     return json(
       {
         status: 'invalid',
         code: 'validation_failed',
-        errors: [{ field: 'request', message: 'Invalid JSON request body.' }],
+        errors: [{ field: 'request', message: 'Invalid request body.' }],
       },
       400,
       originResult.origin,
     )
   }
 
+  const body = parsedRequest.body
+  const manuscriptFile = parsedRequest.manuscriptFile
   const token = extractTurnstileToken(body)
   const ip = getClientIp(req.headers)
   const turnstile = await verifyTurnstileToken(token, ip)
@@ -144,6 +163,37 @@ async function handlePublishingIntakePost(req: NextRequest) {
     )
   }
 
+  if (manuscriptFile) {
+    const uploadValidation = validateManuscriptUploadCandidate(manuscriptFile)
+    if (!uploadValidation.ok) {
+      return json(
+        {
+          status: 'invalid',
+          code: 'validation_failed',
+          errors: [{ field: 'manuscriptFile', message: uploadValidation.message }],
+        },
+        400,
+        originResult.origin,
+      )
+    }
+  }
+
+  const submittedManuscriptUrl = validation.data.manuscriptUrl
+  if (submittedManuscriptUrl && !manuscriptFile) {
+    const linkVerification = await verifyShareableManuscriptLink(submittedManuscriptUrl)
+    if (linkVerification.status !== 'usable') {
+      return json(
+        {
+          status: 'invalid',
+          code: 'validation_failed',
+          errors: [{ field: 'manuscriptUrl', message: manuscriptLinkError(linkVerification.reason) }],
+        },
+        400,
+        originResult.origin,
+      )
+    }
+  }
+
   const replay = getIdempotencyReplay(validation.data.idempotencyKey)
   if (replay) {
     return json({ status: 'duplicate' }, 409, originResult.origin)
@@ -155,8 +205,79 @@ async function handlePublishingIntakePost(req: NextRequest) {
   const dataverse = await writePublishingIntakeWithRetry(intake)
   if (dataverse.status === 'success' || dataverse.status === 'skipped') {
     rememberIdempotencyKey(intake.idempotencyKey, reference)
+
+    let acknowledgmentIntake = intake
+
+    if (dataverse.status === 'success') {
+      const workspace = manuscriptFile
+        ? await uploadManuscriptToInquiryWorkspace(intake, manuscriptFile)
+        : await ensureInquiryWorkspace(intake)
+
+      if (workspace.status === 'failed' || workspace.status === 'skipped') {
+        console.error('Publishing intake SharePoint workspace step failed.', {
+          reason: workspace.reason,
+          reference,
+          recordId: dataverse.recordId,
+        })
+
+        return json(
+          buildErrorResponse('sharepoint_workspace_failed', workspace.reason, reference),
+          502,
+          originResult.origin,
+        )
+      }
+
+      const workspaceWriteback = await markPublishingIntakeWorkspaceCreated(dataverse.recordId, workspace)
+      if (workspaceWriteback.status !== 'success') {
+        console.warn('Publishing intake workspace writeback did not complete.', {
+          status: workspaceWriteback.status,
+          reason: workspaceWriteback.reason,
+          reference,
+        })
+      }
+
+      if (workspace.status === 'uploaded') {
+        acknowledgmentIntake = { ...intake, manuscriptUrl: workspace.manuscriptUrl }
+        const manuscriptWriteback = await markPublishingIntakeManuscriptReceived(dataverse.recordId, {
+          manuscriptUrl: workspace.manuscriptUrl,
+        })
+
+        if (manuscriptWriteback.status !== 'success') {
+          console.error('Publishing intake manuscript writeback failed after upload.', {
+            status: manuscriptWriteback.status,
+            reason: manuscriptWriteback.reason,
+            reference,
+          })
+
+          return json(
+            buildErrorResponse('manuscript_writeback_failed', manuscriptWriteback.reason, reference),
+            502,
+            originResult.origin,
+          )
+        }
+      } else if (submittedManuscriptUrl) {
+        const manuscriptWriteback = await markPublishingIntakeManuscriptReceived(dataverse.recordId, {
+          manuscriptUrl: submittedManuscriptUrl,
+        })
+
+        if (manuscriptWriteback.status !== 'success') {
+          console.error('Publishing intake manuscript link writeback failed.', {
+            status: manuscriptWriteback.status,
+            reason: manuscriptWriteback.reason,
+            reference,
+          })
+
+          return json(
+            buildErrorResponse('manuscript_writeback_failed', manuscriptWriteback.reason, reference),
+            502,
+            originResult.origin,
+          )
+        }
+      }
+    }
+
     const notification = await sendJoinInternalNotification(
-      intake,
+      acknowledgmentIntake,
       dataverse.status === 'success' ? { recordId: dataverse.recordId } : undefined,
     )
     if (notification.status !== 'sent') {
@@ -167,7 +288,7 @@ async function handlePublishingIntakePost(req: NextRequest) {
       })
     }
 
-    const acknowledgment = await sendJoinAuthorAcknowledgment(intake)
+    const acknowledgment = await sendJoinAuthorAcknowledgment(acknowledgmentIntake)
     if (acknowledgment.status !== 'sent') {
       console.warn('Publishing intake direct author acknowledgment did not send; leaving Flow B fallback pending.', {
         status: acknowledgment.status,
@@ -216,6 +337,56 @@ async function handlePublishingIntakePost(req: NextRequest) {
   )
 }
 
+async function parseIntakeRequest(req: NextRequest): Promise<ParsedIntakeRequest> {
+  const contentType = req.headers.get('content-type') || ''
+
+  if (contentType.includes('multipart/form-data')) {
+    const formData = await req.formData()
+    const body: Record<string, unknown> = {}
+    let manuscriptFile: ManuscriptUploadCandidate | null = null
+
+    for (const [key, value] of formData.entries()) {
+      if (key === 'manuscriptFile' && isFileLike(value) && value.size > 0) {
+        manuscriptFile = {
+          fileName: value.name,
+          contentType: value.type,
+          size: value.size,
+          bytes: await value.arrayBuffer(),
+        }
+        continue
+      }
+
+      if (typeof value === 'string') {
+        body[key] = coerceMultipartValue(key, value)
+      }
+    }
+
+    return { body, manuscriptFile }
+  }
+
+  const body = await req.json()
+  if (!isRecord(body)) throw new Error('invalid_json_body')
+  return { body, manuscriptFile: null }
+}
+
+function coerceMultipartValue(key: string, value: string): unknown {
+  if (key === 'wordCount') return Number.parseInt(value, 10)
+  if (key === 'consent') return value === 'true'
+  return value
+}
+
+function isFileLike(value: FormDataEntryValue): value is File {
+  return typeof value === 'object' &&
+    value !== null &&
+    'arrayBuffer' in value &&
+    'name' in value &&
+    'size' in value
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
 function json(
   body: IntakeResponseBody,
   status: number,
@@ -235,6 +406,14 @@ function extractTurnstileToken(body: unknown) {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) return ''
   const value = (body as Record<string, unknown>).turnstileToken
   return typeof value === 'string' ? value : ''
+}
+
+function manuscriptLinkError(reason: string) {
+  if (reason === 'link_check_timeout') {
+    return 'We could not confirm this manuscript link before the request timed out. Please upload the file or provide a reachable share link.'
+  }
+
+  return 'Provide a reachable manuscript link, or upload a .docx, .doc, or .pdf file.'
 }
 
 function buildErrorResponse(code: IntakeErrorCode, detail: string, reference?: string): IntakeErrorResponse {
