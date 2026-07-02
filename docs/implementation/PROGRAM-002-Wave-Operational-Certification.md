@@ -1,6 +1,6 @@
 # PROGRAM-002 Wave Operational Certification
 
-**Status:** Local validation passed / pending PR deployment validation  
+**Status:** Complete / Operational
 **Program:** PROGRAM-002 Autonomous Publishing Production Pipeline  
 **Wave:** OP-004 through OP-011 readiness and command-center completion  
 **Date:** 2026-07-02
@@ -65,17 +65,17 @@ Local validation results:
 | `git diff --check` | Passed | No whitespace errors |
 | Secret scan | Passed with known benign matches | Matches were code variable names and existing documentation references, not secret values |
 | `npm test -- --runInBand` | Not available | Root `package.json` does not define a `test` script |
-| Deployment validation | Pending | Requires PR merge and Azure Static Web Apps production deployment |
-| Live route validation | Pending | Requires production deployment |
-| SharePoint sync verification | Pending | To be completed after deployment validation |
+| Deployment validation | Passed | PR #151 merged; Azure Static Web Apps production deployment succeeded |
+| Live route validation | Passed | `/author`, `/author/cover`, `/author/layout`, `/author/production-readiness`, `/author/distribution-command`, `/author/marketing`, and `/author/author-success` returned HTTP 200 with expected boundary content |
+| SharePoint sync verification | Pending | To be completed after final certification update |
 
 ## Deployment
 
-Pending PR merge and Azure Static Web Apps production deployment.
+PR #151 merged and Azure Static Web Apps production deployment succeeded on 2026-07-02. Live route validation passed for the Author Hub and OP-006 through OP-011 command centers.
 
 ## SharePoint Sync
 
-Pending post-deployment documentation sync using per-file conflict handling. Newer SharePoint files must not be overwritten.
+Pending final SharePoint sync after this certification update. Sync must use per-file conflict handling. Newer SharePoint files must not be overwritten.
 
 ## Deferred Enhancements
 
