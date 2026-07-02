@@ -23,8 +23,29 @@ Local OneDrive path used:
 | `references/line-editing.md` | `jm1-publishing-editorial-v2.skill` package |
 | `references/copyediting.md` | `jm1-publishing-editorial-v2.skill` package |
 | `references/proofreading.md` | `jm1-publishing-editorial-v2.skill` package |
+| `references/line-copyedit-proof.md` | Active OneDrive canon reference, reconciled from attached file |
 | `references/knowledge.md` | `JM1-PUB-Editorial-Knowledge-v1.0.md`, updated to corrected 14-guide roster |
-| `references/faith-editorial-overlay.md` | SharePoint Architecture `06_Session_Archive` discovery result; active references folder did not contain this file |
+| `references/faith-editorial-overlay.md` | Active OneDrive canon reference, reconciled from attached file |
+
+## Attachment Reconciliation
+
+On 2026-07-02, Jackie supplied:
+
+- `faith-editorial-overlay.md`
+- `line-copyedit-proof.md`
+
+Both files were byte-identical to the active OneDrive canon references under:
+
+`Implementation HQ - Architecture/00_CANON/Publishing/Skills/jm1-publishing-editorial/references`
+
+Hashes:
+
+| File | SHA-256 | Result |
+|---|---|---|
+| `faith-editorial-overlay.md` | `e2bbec632c242673a85a567187cb0894eb799c1dc842fcf42fe7666205fde20c` | Identical to active canon |
+| `line-copyedit-proof.md` | `cfd93cd4250102da91d8449035a0494365d9b6deb395e9f860797b2898ed9fc4` | Identical to active canon |
+
+Local implementation cache was refreshed to match these active canon files. OP-005 runtime did not require changes because it already references `jm1-publishing-editorial-v2.skill` and the approved stage references.
 
 ## Style Guide Correction
 
