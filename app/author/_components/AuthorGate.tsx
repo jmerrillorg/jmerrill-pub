@@ -2,15 +2,34 @@
 
 import { useEffect, useState } from 'react'
 
-export function AuthorGate({ children }: { children: React.ReactNode }) {
+type AuthorGateScope = 'forms' | 'portal'
+
+type GateResponse = {
+  success?: boolean
+  error?: string
+  accessType?: 'admin' | 'author'
+  portalContext?: {
+    contactId?: string
+    authorPortalId?: string
+    titleId?: string
+    titleIds?: string[]
+    projectId?: string
+    projectIds?: string[]
+    titleName?: string
+  } | null
+}
+
+export function AuthorGate({ children, scope = 'forms' }: { children: React.ReactNode; scope?: AuthorGateScope }) {
   const [code, setCode] = useState('')
   const [unlocked, setUnlocked] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const storageKey = scope === 'portal' ? 'jmp-author-portal-unlocked' : 'jmp-author-onboarding-unlocked'
+  const contextKey = scope === 'portal' ? 'jmp-author-portal-context' : 'jmp-author-onboarding-context'
 
   useEffect(() => {
-    setUnlocked(sessionStorage.getItem('jmp-author-onboarding-unlocked') === 'true')
-  }, [])
+    setUnlocked(sessionStorage.getItem(storageKey) === 'true')
+  }, [storageKey])
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -21,12 +40,15 @@ export function AuthorGate({ children }: { children: React.ReactNode }) {
       const response = await fetch('/api/author/gate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code, scope }),
       })
-      const data = await response.json()
+      const data = (await response.json()) as GateResponse
       if (!response.ok) throw new Error(data.error || 'Invalid access code.')
-      sessionStorage.setItem('jmp-author-onboarding-unlocked', 'true')
-      sessionStorage.setItem('jmp-author-onboarding-access-code', code)
+      sessionStorage.setItem(storageKey, 'true')
+      sessionStorage.setItem(contextKey, JSON.stringify({
+        accessType: data.accessType || (scope === 'portal' ? 'author' : 'forms'),
+        portalContext: data.portalContext || null,
+      }))
       setUnlocked(true)
     } catch (err: any) {
       setError(err.message || 'Unable to validate access code.')

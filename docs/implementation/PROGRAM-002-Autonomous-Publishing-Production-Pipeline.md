@@ -28,12 +28,12 @@ Canonical pipeline distinction:
 - `/join` starts the full publishing movement for new/prospective authors.
 - `/author/onboarding` is a downstream production-spec step for accepted/current authors.
 
-OP-001 is complete/operational. OP-002 is complete/operational after controlled validation on 2026-07-01 using Jackie Smith Jr's real active publishing project, `Establishing Glory: The Library`.
+OP-001 is complete/operational. OP-002 remains operational as the post-agreement/post-payment activation bridge, but its sequencing has been corrected: author portal creation now occurs before contract generation so required author information can be collected first.
 
 Council disposition v1.0 is accepted:
 
-- OP-002 is the controlling gate. Completed 2026-07-01.
-- OP-003 scope is locked and has been completed to operational readiness.
+- OP-003 Author Portal now opens after author acceptance and before contract generation.
+- OP-002 is the active-portal unlock gate after agreement is signed/active and payment is confirmed or publisher override is approved.
 - Marketing is part of every OP module.
 - JM Signature governance is locked as publisher-selected and invitation-only.
 - Executive dashboard behavior is exception-driven.
@@ -53,8 +53,8 @@ PROGRAM-002 includes the operational modules needed to run J Merrill Publishing 
 
 1. Intake / Diagnostic Command Center
 2. Author Workspace Lifecycle
-3. Contract / Payment / Portal Activation Command Center
-4. Author Portal
+3. Author Portal
+4. Contract / Payment / Portal Activation Command Center
 5. ISBN / LCCN / Copyright Registration Command Center
 6. Editorial Command Center
 7. Cover Design Command Center
@@ -91,26 +91,33 @@ This capture/control task does not authorize:
 flowchart TD
     A["/join inquiry"] --> B["Intake / Diagnostic Command Center"]
     B --> C["Author Workspace Lifecycle"]
-    C --> D["Publisher Review / Decision"]
-    D --> E["Contract / Payment / Portal Activation"]
-    E --> F["Author Portal"]
-    F --> G["Registration"]
-    G --> H["Editorial"]
-    H --> I["Cover Design"]
-    I --> J["Interior Layout"]
-    J --> K["Proofing / Author Approval"]
-    K --> L["Distribution"]
-    L --> M["Launch / Metadata / Retail Readiness"]
-    M --> N["Marketing / Campaign Command Center"]
-    N --> O["Royalty Command Center"]
-    O --> P["Ongoing Author Relationship"]
-    P --> Q["Executive Pipeline Dashboard"]
+    C --> D["Publisher Recommendation"]
+    D --> E["Publisher Decision"]
+    E --> F["Package Presented"]
+    F --> G["Author Accepts"]
+    G --> H["Author Portal Created or Existing Portal Updated"]
+    H --> I["Portal Invitation Sent"]
+    I --> J["Pre-Contract Portal: Onboarding + Financial + Royalty Setup"]
+    J --> K["Generate Contract Package + Invoice / Payment Request"]
+    K --> L["Sign Agreement + Submit Payment"]
+    L --> M["OP-002 Active Portal Unlock"]
+    M --> N["Registration"]
+    N --> O["Editorial"]
+    O --> P["Cover Design"]
+    P --> Q["Interior Layout"]
+    Q --> S["Proofing / Author Approval"]
+    S --> T["Distribution"]
+    T --> U["Launch / Metadata / Retail Readiness"]
+    U --> V["Marketing / Campaign Command Center"]
+    V --> W["Royalty Command Center"]
+    W --> X["Ongoing Author Relationship"]
+    X --> Y["Executive Pipeline Dashboard"]
     R["JM Signature Governance Overlay"] -. "publisher-only imprint governance" .-> B
-    R -. "publisher-only imprint governance" .-> D
     R -. "publisher-only imprint governance" .-> E
-    R -. "publisher-only imprint governance" .-> H
-    R -. "publisher-only imprint governance" .-> N
-    R -. "publisher-only imprint governance" .-> Q
+    R -. "publisher-only imprint governance" .-> K
+    R -. "publisher-only imprint governance" .-> O
+    R -. "publisher-only imprint governance" .-> V
+    R -. "publisher-only imprint governance" .-> Y
 ```
 
 ## Marketing Throughout Pipeline Rule
@@ -198,12 +205,49 @@ Everything else should continue quietly through the operational workflow.
 
 ## Author Portal Rule
 
-Create the Author Portal only when both conditions are true:
+Create or update the Author Portal after the author accepts the publisher recommendation/package:
 
-- Agreement status = signed/completed
-- First payment status = paid/confirmed
+- New author: create one author portal.
+- Returning author: add the new title to the existing author portal.
+- Never create a second portal for the same author relationship.
 
-The portal may display approved information from:
+The pre-contract portal is intentionally locked. Only these modules are visible:
+
+- Author Onboarding
+- Financial Setup
+- Royalty Setup
+
+The pre-contract portal must clearly display:
+
+`Complete the steps below to begin your publishing journey.`
+
+All other modules are hidden until active portal unlock:
+
+- Dashboard
+- Editorial
+- Cover
+- Layout
+- Files
+- Contracts
+- Royalties
+- Production
+- Distribution
+- Marketing
+- Messages
+- Timeline
+- Reports
+
+After Author Onboarding, Financial Setup, and Royalty Setup are complete, the system may generate the contract package and invoice/payment request, then display:
+
+- Sign Agreement (SignNow)
+- Submit Payment (Stripe)
+
+When both conditions are true, OP-002 active portal unlock runs:
+
+- Agreement = Signed/Active
+- Payment = Confirmed, or approved publisher financial override
+
+The active portal may display approved information from:
 
 - Dataverse: author, title, project status, tasks, milestones
 - SharePoint: files, proofs, documents
@@ -216,24 +260,23 @@ The portal must not become the system of record.
 
 ## OP-003 Scope Lock
 
-OP-003 begins only after OP-002 successfully completes controlled production validation.
+OP-003 begins after author acceptance and before contract generation. OP-002 no longer creates the portal; OP-002 unlocks the active portal after signed/active agreement and confirmed payment or approved publisher financial override.
 
 OP-003 scope is locked to:
 
 - Author Portal
 - Relationship Parent / Title Child
-- controlled display layer
-- status dashboard
-- tasks
-- approved documents
-- payment confirmation
+- controlled pre-contract display layer
+- author onboarding action
+- financial setup action
+- royalty setup action
+- locked module messaging
 - contact pathway
-- visual milestone tracker
+- pre-contract progress tracker
 - warm welcome transition
 - humanized milestone communications
-- file validation
-- version protection
-- metadata readiness
+- hidden file/private data boundaries
+- future active portal unlock boundary
 
 No additional OP-003 scope may be added without executive approval.
 
@@ -271,15 +314,16 @@ Publishing payment/accounting posture:
 - Business Central becomes the financial system of record.
 - QBO is not the forward operating source.
 
-No production start until both are true:
+No active portal unlock or production start until both are true:
 
 - Agreement status = signed/completed
 - First payment status = paid/confirmed
 
-Recommended payment policy:
+Payment and contract policy:
 
-- Default: signed agreement first, then payment link.
-- Exception: Jackie may authorize payment link before signature case-by-case.
+- Contract package and invoice/payment request are generated only after Author Onboarding, Financial Setup, and Royalty Setup are complete.
+- Sign Agreement and Submit Payment actions appear only after those pre-contract setup steps are complete.
+- Production remains locked until agreement is signed/active and payment is confirmed or publisher financial override is approved.
 
 OP-002 bridge fields:
 
@@ -335,8 +379,8 @@ Operational completion means:
 | PROGRAM-001 certified foundation | All PROGRAM-002 modules | Complete |
 | OP-001 SharePoint workspace lifecycle | Workspace and file operations | Complete / Operational |
 | Production Dataverse existing publishing solution | Intake and pipeline operations | Operational as-is |
-| OP-002 bridge fields | Activation and workspace writeback | Complete / Operational |
-| OP-003 Author Portal MVP | Author-facing activated-project display layer | Complete / Operational |
+| OP-002 bridge fields | Active portal unlock and workspace writeback after agreement/payment | Complete / Operational; sequencing corrected |
+| OP-003 Author Portal MVP | Author-facing pre-contract setup layer after author acceptance | Complete / Operational; access model correction in progress |
 | SharePoint write connector authentication | Automated folder creation and move | Restored |
 | Business Central production readiness | Live payment/accounting summaries | Not production-ready |
 | Stripe live approval | Live payment confirmation | Not authorized |
@@ -350,7 +394,7 @@ Operational completion means:
 | Adobe Sign license/API entitlement blocked | Automated agreement execution | Continue approved manual/alternate agreement evidence path until entitlement is resolved |
 | Payment timing policy must be locked before routine live use | Routine payment links | Default is signed agreement first, then payment link; Jackie may authorize exceptions |
 | Business Central migration is a parallel financial dependency | Live accounting summaries and postings | Do not block intake/onboarding or active title movement; keep accounting display gated |
-| Live Stripe not authorized | Payment confirmation from Stripe | Portal activation can require manual payment confirmation until live Stripe is approved |
+| Live Stripe not authorized | Payment request/payment confirmation from Stripe | Submit Payment action remains hidden until approved Stripe path is configured |
 | Marketing must not be delayed until launch | All modules | Capture marketing signal/handoff/dependency in each OP module |
 | JM Signature must not become public or purchasable | Intake, review, contract, marketing, executive dashboard | Treat as publisher-only governance overlay |
 | Distribution/launch/royalty automation gates remain closed until readiness gates are satisfied | OP-008 through OP-011 | Keep later-stage automation gated |
@@ -359,8 +403,8 @@ Operational completion means:
 ## Recommended Build Order
 
 1. OP-001 SharePoint Workspace Lifecycle
-2. OP-002 Contract / Payment / Portal Activation - complete / operational
-3. OP-003 Author Portal MVP - complete / operational
+2. OP-003 Author Portal MVP - complete / operational as pre-contract setup portal
+3. OP-002 Contract / Payment / Portal Activation - complete / operational as post-agreement/payment active portal unlock
 4. OP-004 Registration Command Center
 5. OP-005 Editorial Command Center
 6. OP-006 Cover Design Command Center
