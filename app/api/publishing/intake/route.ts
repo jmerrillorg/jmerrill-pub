@@ -209,85 +209,101 @@ async function handlePublishingIntakePost(req: NextRequest) {
     let acknowledgmentIntake = intake
 
     if (dataverse.status === 'success') {
-      const workspace = manuscriptFile
-        ? await uploadManuscriptToInquiryWorkspace(intake, manuscriptFile)
-        : await ensureInquiryWorkspace(intake)
+      try {
+        const workspace = manuscriptFile
+          ? await uploadManuscriptToInquiryWorkspace(intake, manuscriptFile)
+          : await ensureInquiryWorkspace(intake)
 
-      if (workspace.status === 'failed' || workspace.status === 'skipped') {
-        console.error('Publishing intake SharePoint workspace step failed.', {
-          reason: workspace.reason,
+        if (workspace.status === 'failed' || workspace.status === 'skipped') {
+          console.error('Publishing intake SharePoint workspace step failed after intake acceptance.', {
+            reason: workspace.reason,
+            reference,
+            recordId: dataverse.recordId,
+          })
+        } else {
+          const workspaceWriteback = await markPublishingIntakeWorkspaceCreated(dataverse.recordId, workspace)
+          if (workspaceWriteback.status !== 'success') {
+            console.warn('Publishing intake workspace writeback did not complete after intake acceptance.', {
+              status: workspaceWriteback.status,
+              reason: workspaceWriteback.reason,
+              reference,
+            })
+          }
+
+          if (workspace.status === 'uploaded') {
+            acknowledgmentIntake = { ...intake, manuscriptUrl: workspace.manuscriptUrl }
+            const manuscriptWriteback = await markPublishingIntakeManuscriptReceived(dataverse.recordId, {
+              manuscriptUrl: workspace.manuscriptUrl,
+            })
+
+            if (manuscriptWriteback.status !== 'success') {
+              console.error('Publishing intake manuscript writeback failed after intake acceptance.', {
+                status: manuscriptWriteback.status,
+                reason: manuscriptWriteback.reason,
+                reference,
+              })
+            }
+          } else if (submittedManuscriptUrl) {
+            const manuscriptWriteback = await markPublishingIntakeManuscriptReceived(dataverse.recordId, {
+              manuscriptUrl: submittedManuscriptUrl,
+            })
+
+            if (manuscriptWriteback.status !== 'success') {
+              console.error('Publishing intake manuscript link writeback failed after intake acceptance.', {
+                status: manuscriptWriteback.status,
+                reason: manuscriptWriteback.reason,
+                reference,
+              })
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Publishing intake workspace/upload step threw after Dataverse accepted the row.', {
+          reason: error instanceof Error ? error.name : 'unknown',
           reference,
           recordId: dataverse.recordId,
         })
-      } else {
-        const workspaceWriteback = await markPublishingIntakeWorkspaceCreated(dataverse.recordId, workspace)
-        if (workspaceWriteback.status !== 'success') {
-          console.warn('Publishing intake workspace writeback did not complete.', {
-            status: workspaceWriteback.status,
-            reason: workspaceWriteback.reason,
-            reference,
-          })
-        }
-
-        if (workspace.status === 'uploaded') {
-          acknowledgmentIntake = { ...intake, manuscriptUrl: workspace.manuscriptUrl }
-          const manuscriptWriteback = await markPublishingIntakeManuscriptReceived(dataverse.recordId, {
-            manuscriptUrl: workspace.manuscriptUrl,
-          })
-
-          if (manuscriptWriteback.status !== 'success') {
-            console.error('Publishing intake manuscript writeback failed after upload.', {
-              status: manuscriptWriteback.status,
-              reason: manuscriptWriteback.reason,
-              reference,
-            })
-          }
-        } else if (submittedManuscriptUrl) {
-          const manuscriptWriteback = await markPublishingIntakeManuscriptReceived(dataverse.recordId, {
-            manuscriptUrl: submittedManuscriptUrl,
-          })
-
-          if (manuscriptWriteback.status !== 'success') {
-            console.error('Publishing intake manuscript link writeback failed.', {
-              status: manuscriptWriteback.status,
-              reason: manuscriptWriteback.reason,
-              reference,
-            })
-          }
-        }
       }
     }
 
-    const notification = await sendJoinInternalNotification(
-      acknowledgmentIntake,
-      dataverse.status === 'success' ? { recordId: dataverse.recordId } : undefined,
-    )
-    if (notification.status !== 'sent') {
-      console.warn('Publishing intake internal notification did not send.', {
-        status: notification.status,
-        reason: notification.reason,
-        reference,
-      })
-    }
-
-    const acknowledgment = await sendJoinAuthorAcknowledgment(acknowledgmentIntake)
-    if (acknowledgment.status !== 'sent') {
-      console.warn('Publishing intake direct author acknowledgment did not send; leaving Flow B fallback pending.', {
-        status: acknowledgment.status,
-        reason: acknowledgment.reason,
-        reference,
-      })
-    }
-
-    if (acknowledgment.status === 'sent' && dataverse.status === 'success') {
-      const acknowledgmentWriteback = await markPublishingIntakeAcknowledgmentSent(dataverse.recordId)
-      if (acknowledgmentWriteback.status !== 'success') {
-        console.warn('Publishing intake author acknowledgment writeback did not complete; Flow B may still evaluate the row.', {
-          status: acknowledgmentWriteback.status,
-          reason: acknowledgmentWriteback.reason,
+    try {
+      const notification = await sendJoinInternalNotification(
+        acknowledgmentIntake,
+        dataverse.status === 'success' ? { recordId: dataverse.recordId } : undefined,
+      )
+      if (notification.status !== 'sent') {
+        console.warn('Publishing intake internal notification did not send after intake acceptance.', {
+          status: notification.status,
+          reason: notification.reason,
           reference,
         })
       }
+
+      const acknowledgment = await sendJoinAuthorAcknowledgment(acknowledgmentIntake)
+      if (acknowledgment.status !== 'sent') {
+        console.warn('Publishing intake direct author acknowledgment did not send after intake acceptance; leaving Flow B fallback pending.', {
+          status: acknowledgment.status,
+          reason: acknowledgment.reason,
+          reference,
+        })
+      }
+
+      if (acknowledgment.status === 'sent' && dataverse.status === 'success') {
+        const acknowledgmentWriteback = await markPublishingIntakeAcknowledgmentSent(dataverse.recordId)
+        if (acknowledgmentWriteback.status !== 'success') {
+          console.warn('Publishing intake author acknowledgment writeback did not complete after intake acceptance; Flow B may still evaluate the row.', {
+            status: acknowledgmentWriteback.status,
+            reason: acknowledgmentWriteback.reason,
+            reference,
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Publishing intake notification/acknowledgment step threw after Dataverse accepted the row.', {
+        reason: error instanceof Error ? error.name : 'unknown',
+        reference,
+        recordId: dataverse.status === 'success' ? dataverse.recordId : undefined,
+      })
     }
 
     return json({ status: 'received', reference }, 201, originResult.origin)
