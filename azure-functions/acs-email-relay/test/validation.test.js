@@ -113,6 +113,43 @@ test("uses explicit project title fallback", () => {
   assert.match(email.content.plainText, /your book/);
 });
 
+test("acknowledgment confirms editorial review when manuscript link is present", () => {
+  const { validatePayload, buildAcknowledgmentEmail } = loadRelayModule();
+
+  const result = validatePayload({
+    reference: "JMP-INT-202606-ABC123",
+    to: "author@example.com",
+    firstName: "Jackie",
+    projectTitle: "Test Book",
+    intakeChannel: "INT-PUB-005 /join",
+    manuscriptUrl: "https://example.com/manuscript.pdf"
+  });
+
+  assert.equal(result.ok, true);
+  const email = buildAcknowledgmentEmail(result.value);
+  assert.match(email.content.plainText, /We received your manuscript link/);
+  assert.match(email.content.plainText, /Editorial Review Team will begin evaluating/);
+  assert.doesNotMatch(email.content.plainText, /We did not receive a manuscript link/);
+});
+
+test("acknowledgment asks for manuscript link when missing", () => {
+  const { validatePayload, buildAcknowledgmentEmail } = loadRelayModule();
+
+  const result = validatePayload({
+    reference: "JMP-INT-202606-ABC123",
+    to: "author@example.com",
+    firstName: "Jackie",
+    projectTitle: "Test Book",
+    intakeChannel: "INT-PUB-005 /join"
+  });
+
+  assert.equal(result.ok, true);
+  const email = buildAcknowledgmentEmail(result.value);
+  assert.match(email.content.plainText, /We did not receive a manuscript link/);
+  assert.match(email.content.plainText, /Editorial review will begin as soon as we receive access/);
+  assert.doesNotMatch(email.content.plainText, /We received your manuscript link/);
+});
+
 test("does not include reply-to by default", () => {
   const { validatePayload, buildAcknowledgmentEmail } = loadRelayModule();
 

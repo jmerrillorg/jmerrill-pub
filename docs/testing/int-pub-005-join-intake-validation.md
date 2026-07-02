@@ -197,7 +197,8 @@ Diagnostic interpretation:
 ## Manual Dataverse Verification Checklist
 
 - Confirm exactly one Publishing Intake row is created per successful submission.
-- Confirm no Contact, Lead, Opportunity, execution log, acknowledgment email, loyalty-tier logic, Stage 0 diagnostic, or Power Automate Flow A behavior is triggered by the website.
+- Confirm no Contact, Lead, Opportunity, execution log, loyalty-tier logic, Stage 0 diagnostic, or Power Automate Flow A behavior is triggered by the website.
+- Confirm the website sends one author acknowledgment through the ACS relay after the intake row is written.
 - Confirm `jm1_name` is populated as `JMP-INT-YYYYMM-XXXXXX — [Book Title]`.
 - Confirm `jm1_intakereferencecode` matches the API response reference.
 - Confirm `jm1_idempotencykey` stores the submitted idempotency key.
@@ -211,11 +212,11 @@ Current idempotency memory is process-local. It is acceptable for first activati
 
 ## Dataverse Boundary
 
-The website/API writes only one row to `jm1_publishingintakes`. It does not create or match Contacts, Leads, Opportunities, acknowledgments, loyalty-tier records, execution logs, Stage 0 diagnostics, or downstream Power Automate behavior.
+The website/API writes only one row to `jm1_publishingintakes`. It does not create or match Contacts, Leads, Opportunities, loyalty-tier records, execution logs, Stage 0 diagnostics, or downstream Power Automate behavior. The website/API does send the required author acknowledgment through the governed ACS relay after the intake row is accepted.
 
-## Flow B - Author Acknowledgment Email
+## Author Acknowledgment Email
 
-Flow B is the governed acknowledgment process for validated INT-PUB-005 intake rows after Flow A has processed the Publishing Intake record.
+The author acknowledgment is a required customer-facing completion step after a successful INT-PUB-005 `/join` intake. The website/API now calls the ACS relay after the Publishing Intake row is written and the internal notification branch is attempted. Flow B remains documented as the original governed Power Automate branch, but the website relay call is the active P1 repair path when Flow B does not reliably fire.
 
 - Flow name: `INT-PUB-005 Author Acknowledgment Email`
 - Flow link: https://make.powerapps.com/environments/dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10/solutions/e0991664-1b94-f011-b4cc-7ced8d1cd64f/objects/cloudflows/ecbfd3a1-5368-f111-a826-00224820105b
@@ -224,6 +225,19 @@ Flow B is the governed acknowledgment process for validated INT-PUB-005 intake r
 - Relay endpoint: `https://func-jm1-acs-email-relay.azurewebsites.net/api/send-author-acknowledgment`
 - Relay key handling: `jm1_INTPUB005RelayApiKey` resolves through a Power Platform secret environment variable backed by Azure Key Vault secret `jm1-int-pub-005-relay-api-key`
 - Sender: `DoNotReply@email.jmerrill.one`
+
+Website repair path:
+
+- `/api/publishing/intake` writes the Publishing Intake row.
+- `/api/publishing/intake` sends the internal publishing notification through `send-join-internal-notification`.
+- `/api/publishing/intake` sends the author acknowledgment through `send-author-acknowledgment`.
+- The website uses dedicated author-acknowledgment relay settings when present and otherwise reuses the existing secure join internal-notification relay URL/key.
+- The author acknowledgment is treated as required. If the relay cannot be called, the API returns a safe `author_acknowledgment_failed` response with the intake reference for operational follow-up.
+
+Conditional copy:
+
+- If `manuscriptUrl` is present, the acknowledgment confirms the manuscript link was received and that Editorial Review will begin from the provided material.
+- If `manuscriptUrl` is missing, the acknowledgment confirms the inquiry was received and asks the author to reply with a shareable manuscript link before Editorial Review can begin.
 
 Validated controlled test:
 
@@ -247,7 +261,7 @@ Boundaries:
 - No Opportunity was created.
 - No Stage 0 diagnostic was created by Flow B.
 - No historical rows were processed.
-- No website changes or Flow A changes were made for Flow B.
+- Flow A behavior is unchanged.
 - No fallback email provider was used.
 
 Execution Log integration for Flow B was deferred because the schema was not fully confirmed. The Publishing Intake acknowledgment fields are the source of truth for this pass.

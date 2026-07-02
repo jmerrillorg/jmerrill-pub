@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { enqueuePublishingIntakeDeadLetter } from '@/lib/publishing/intake/deadLetter'
+import { sendJoinAuthorAcknowledgment } from '@/lib/publishing/intake/authorAcknowledgment'
 import { writePublishingIntakeWithRetry } from '@/lib/publishing/intake/dataverse'
 import { getIdempotencyReplay, rememberIdempotencyKey } from '@/lib/publishing/intake/idempotency'
 import { sendJoinInternalNotification } from '@/lib/publishing/intake/internalNotification'
@@ -29,6 +30,7 @@ type IntakeErrorCode =
   | 'dataverse_token_failed'
   | 'dataverse_write_failed'
   | 'dead_letter_failed'
+  | 'author_acknowledgment_failed'
   | 'unexpected_exception'
 
 type IntakeErrorResponse = {
@@ -160,6 +162,22 @@ async function handlePublishingIntakePost(req: NextRequest) {
         reference,
       })
     }
+
+    const acknowledgment = await sendJoinAuthorAcknowledgment(intake)
+    if (acknowledgment.status !== 'sent') {
+      console.error('Publishing intake author acknowledgment did not send.', {
+        status: acknowledgment.status,
+        reason: acknowledgment.reason,
+        reference,
+      })
+
+      return json(
+        buildErrorResponse('author_acknowledgment_failed', sanitizeDiagnosticDetail(acknowledgment.reason), reference),
+        acknowledgment.status === 'skipped' ? 500 : 502,
+        originResult.origin,
+      )
+    }
+
     return json({ status: 'received', reference }, 201, originResult.origin)
   }
 
