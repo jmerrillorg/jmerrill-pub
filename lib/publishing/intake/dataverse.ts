@@ -20,6 +20,7 @@ export type DataverseUpdateResult =
   | { status: 'failed'; reason: string; retryable: boolean }
 
 const ACKNOWLEDGMENT_STATUS_SENT = 835500001
+const WORKSPACE_STATUS_CREATED = 835513001
 
 export async function writePublishingIntakeToDataverse(
   payload: NormalizedPublishingIntake,
@@ -179,6 +180,103 @@ export async function markPublishingIntakeAcknowledgmentSent(
     return {
       status: 'failed',
       reason: `dataverse_ack_writeback_exception:${errorReason}`,
+      retryable: true,
+    }
+  }
+}
+
+export async function markPublishingIntakeWorkspaceCreated(
+  recordId: string | undefined,
+  workspace: { workspaceUrl: string; workspaceFolderId: string },
+): Promise<DataverseUpdateResult> {
+  if (!recordId) return { status: 'skipped', reason: 'missing_record_id' }
+
+  return updatePublishingIntakeRecord(recordId, {
+    jm1_workspacestatus: WORKSPACE_STATUS_CREATED,
+    jm1_sharepointworkspaceurl: workspace.workspaceUrl,
+    jm1_sharepointworkspacefolderid: workspace.workspaceFolderId,
+  }, 'workspace_writeback')
+}
+
+export async function markPublishingIntakeManuscriptReceived(
+  recordId: string | undefined,
+  manuscript: { manuscriptUrl: string },
+): Promise<DataverseUpdateResult> {
+  if (!recordId) return { status: 'skipped', reason: 'missing_record_id' }
+
+  return updatePublishingIntakeRecord(recordId, {
+    jm1_manuscriptreceived: true,
+    jm1_manuscripturl: manuscript.manuscriptUrl,
+  }, 'manuscript_writeback')
+}
+
+async function updatePublishingIntakeRecord(
+  recordId: string,
+  values: Record<string, string | number | boolean | null>,
+  operation: string,
+): Promise<DataverseUpdateResult> {
+  const config = getDataverseConfig()
+
+  if (!config.ok) {
+    if (process.env.NODE_ENV !== 'production') {
+      return { status: 'skipped', reason: 'non_production_mapping_pending' }
+    }
+
+    return {
+      status: 'failed',
+      reason: `dataverse_configuration_missing: ${config.missing.join(', ')}`,
+      retryable: false,
+    }
+  }
+
+  try {
+    const accessToken = await getDataverseAccessToken(config.value)
+    const response = await fetch(
+      `${config.value.webApiBaseUrl}/${config.value.entitySet}(${recordId})`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'OData-MaxVersion': '4.0',
+          'OData-Version': '4.0',
+          'If-Match': '*',
+        },
+        body: JSON.stringify(values),
+      },
+    )
+
+    if (response.status === 204) return { status: 'success' }
+
+    const errorBody = await safeResponseText(response)
+    const dataverseError = summarizeDataverseError(errorBody)
+    console.error('Publishing intake Dataverse update failed.', {
+      operation,
+      status: response.status,
+      errorCode: dataverseError.code,
+      errorMessage: dataverseError.message,
+      recordId,
+      entitySet: config.value.entitySet,
+    })
+
+    return {
+      status: 'failed',
+      reason: `dataverse_${operation}_failed:${response.status}:${dataverseError.code}`,
+      retryable: isRetryableStatus(response.status),
+    }
+  } catch (error) {
+    const errorReason = summarizeWriteException(error)
+    console.error('Publishing intake Dataverse update exception.', {
+      operation,
+      reason: errorReason,
+      recordId,
+      entitySet: config.value.entitySet,
+    })
+
+    return {
+      status: 'failed',
+      reason: `dataverse_${operation}_exception:${errorReason}`,
       retryable: true,
     }
   }

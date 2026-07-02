@@ -49,7 +49,8 @@ type JoinFormState = {
   idempotencyKey: string
 }
 
-type Errors = Partial<Record<keyof JoinFormState, string>>
+type JoinFormErrorField = keyof JoinFormState | 'manuscriptFile'
+type Errors = Partial<Record<JoinFormErrorField, string>>
 
 const initialForm: JoinFormState = {
   firstName: '',
@@ -73,9 +74,12 @@ const initialForm: JoinFormState = {
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const buildTimeSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || ''
+const allowedManuscriptExtensions = ['.docx', '.doc', '.pdf']
+const maxManuscriptFileBytes = 25 * 1024 * 1024
 
 export default function JoinForm() {
   const [form, setForm] = useState<JoinFormState>(initialForm)
+  const [manuscriptFile, setManuscriptFile] = useState<File | null>(null)
   const [touched, setTouched] = useState<Partial<Record<keyof JoinFormState, boolean>>>({})
   const [errors, setErrors] = useState<Errors>({})
   const [status, setStatus] = useState<Status>('idle')
@@ -88,7 +92,7 @@ export default function JoinForm() {
   const turnstileRef = useRef<HTMLDivElement | null>(null)
   const widgetIdRef = useRef<string>()
 
-  const allErrors = useMemo(() => validate(form), [form])
+  const allErrors = useMemo(() => validate(form, manuscriptFile), [form, manuscriptFile])
   const canSubmit = Object.keys(allErrors).length === 0 && status !== 'submitting' && verificationConfigStatus === 'ready'
 
   useEffect(() => {
@@ -184,13 +188,21 @@ export default function JoinForm() {
 
   const markTouched = (field: keyof JoinFormState) => () => {
     setTouched((current) => ({ ...current, [field]: true }))
-    setErrors(validate(form))
+    setErrors(validate(form, manuscriptFile))
+  }
+
+  const setFile = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null
+    setManuscriptFile(file)
+    setErrors(validate(form, file))
+    setStatus('idle')
+    setServerMessage('')
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
-    const nextErrors = validate(form)
+    const nextErrors = validate(form, manuscriptFile)
     setErrors(nextErrors)
     setTouched({
       firstName: true,
@@ -225,11 +237,18 @@ export default function JoinForm() {
     }
 
     try {
-      const res = await fetch('/api/publishing/intake', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+      const request = manuscriptFile
+        ? {
+            method: 'POST',
+            body: buildMultipartPayload(payload, manuscriptFile),
+          }
+        : {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }
+
+      const res = await fetch('/api/publishing/intake', request)
 
       const data = await res.json()
 
@@ -261,7 +280,7 @@ export default function JoinForm() {
         const serverErrors: Errors = {}
         for (const item of data.errors) {
           if (typeof item.field === 'string' && typeof item.message === 'string') {
-            serverErrors[item.field as keyof JoinFormState] = item.message
+            serverErrors[item.field as JoinFormErrorField] = item.message
           }
         }
         setErrors(serverErrors)
@@ -369,10 +388,34 @@ export default function JoinForm() {
             label="Manuscript link"
             name="manuscriptUrl"
             error={visibleError('manuscriptUrl', touched, errors)}
-            helper="A shareable link, such as OneDrive, Google Drive, or Dropbox. You can also provide this later."
+            helper="A reachable OneDrive, Google Drive, or Dropbox link. You may use this instead of a file upload."
           >
             <input id="manuscriptUrl" name="manuscriptUrl" type="url" value={form.manuscriptUrl} onChange={set('manuscriptUrl')} onBlur={markTouched('manuscriptUrl')} className={fieldClass(Boolean(visibleError('manuscriptUrl', touched, errors)))} placeholder="https://..." />
           </Field>
+
+          <div>
+            <label htmlFor="manuscriptFile" className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.1em] text-white/70">
+              Manuscript file
+            </label>
+            <input
+              id="manuscriptFile"
+              name="manuscriptFile"
+              type="file"
+              accept=".docx,.doc,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/pdf"
+              onChange={setFile}
+              className={`${fieldClass(Boolean(errors.manuscriptFile))} file:mr-4 file:rounded-full file:border-0 file:bg-blue-500 file:px-4 file:py-2 file:text-[12px] file:font-semibold file:text-white hover:file:bg-blue-600`}
+            />
+            {!errors.manuscriptFile && (
+              <p className="mt-1.5 text-[11px] leading-[1.6] text-white/55">
+                Optional. Upload .docx, .doc, or .pdf up to 25 MB. .doc files may need cleanup; PDFs are review-only.
+              </p>
+            )}
+            {errors.manuscriptFile && (
+              <p className="mt-1.5 text-[12px] text-red-200" role="alert">
+                {errors.manuscriptFile}
+              </p>
+            )}
+          </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Have you published before?" name="publishedBefore" required error={visibleError('publishedBefore', touched, errors)}>
@@ -418,7 +461,7 @@ export default function JoinForm() {
                 className="mt-1 accent-blue-500"
               />
               <span className="text-[13px] leading-[1.7] text-white/75">
-                I give J Merrill Publishing permission to review my inquiry and contact me about my book. I understand this form does not collect payment data, SSN, banking information, or file uploads.
+                I give J Merrill Publishing permission to review my inquiry and any manuscript file or link I provide, and to contact me about my book. I understand this form does not collect payment data, SSN, or banking information.
               </span>
             </label>
           </Field>
@@ -527,7 +570,7 @@ function Panel({ children }: { children: ReactNode }) {
   )
 }
 
-function validate(form: JoinFormState): Errors {
+function validate(form: JoinFormState, manuscriptFile: File | null): Errors {
   const errors: Errors = {}
 
   if (!between(form.firstName, 1, 60)) errors.firstName = 'Enter a first name, 60 characters or fewer.'
@@ -547,6 +590,16 @@ function validate(form: JoinFormState): Errors {
   if (!form.publishedBefore) errors.publishedBefore = 'Select your publishing history.'
   if (!between(form.bookDescription, 50, 2000)) errors.bookDescription = 'Enter 50–2,000 characters.'
   if (form.additionalNotes.length > 1000) errors.additionalNotes = 'Use 1,000 characters or fewer.'
+  if (manuscriptFile) {
+    const extension = manuscriptFile.name.toLowerCase().match(/\.[^.]+$/)?.[0] || ''
+    if (!allowedManuscriptExtensions.includes(extension)) {
+      errors.manuscriptFile = 'Upload a .docx, .doc, or .pdf manuscript file.'
+    } else if (manuscriptFile.size <= 0) {
+      errors.manuscriptFile = 'Upload a non-empty manuscript file.'
+    } else if (manuscriptFile.size > maxManuscriptFileBytes) {
+      errors.manuscriptFile = 'Upload a manuscript file smaller than 25 MB.'
+    }
+  }
   if (!form.consent) errors.consent = 'Consent is required.'
   if (!form.turnstileToken) errors.turnstileToken = 'Complete the verification challenge.'
 
@@ -588,6 +641,18 @@ function optionalUrl(value: string) {
   const trimmed = value.trim()
   if (!trimmed || isPlaceholderUrl(trimmed)) return undefined
   return trimmed
+}
+
+function buildMultipartPayload(payload: Record<string, unknown>, manuscriptFile: File) {
+  const formData = new FormData()
+
+  for (const [key, value] of Object.entries(payload)) {
+    if (value === undefined || value === null) continue
+    formData.append(key, String(value))
+  }
+
+  formData.append('manuscriptFile', manuscriptFile)
+  return formData
 }
 
 function isPlaceholderUrl(value: string) {
