@@ -119,8 +119,8 @@ export default function AuthorPortalPage() {
 
           <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="rounded-[32px] border border-white/8 bg-white/[0.035] p-7 sm:p-9">
-              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Locked until active portal</p>
-              <h2 className="mt-3 text-[26px] font-semibold text-white">Private project modules stay hidden.</h2>
+              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Active portal boundary</p>
+              <h2 className="mt-3 text-[26px] font-semibold text-white">Only setup actions are available.</h2>
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {portalFileControls.map(([heading, body]) => (
                   <div key={heading} className="rounded-2xl border border-white/8 bg-black/15 p-5">

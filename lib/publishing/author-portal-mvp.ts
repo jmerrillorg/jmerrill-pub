@@ -78,6 +78,6 @@ export const portalBoundaryRows = [
   ['Visible modules', 'Onboarding, financial setup, royalty setup'],
   ['Payments', 'No payment request generated'],
   ['Agreement actions', 'No signing packet generated'],
-  ['Project workspace', 'Hidden before active unlock'],
-  ['Financial records', 'Hidden before active unlock'],
+  ['Project workspace', 'Unavailable before active unlock'],
+  ['Financial records', 'Unavailable before active unlock'],
 ] as const
