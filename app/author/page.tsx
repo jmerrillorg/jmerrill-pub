@@ -60,6 +60,14 @@ const hubCards = [
     secondary: 'OP-004',
   },
   {
+    status: 'Operationalizing',
+    title: 'Editorial Command Center',
+    body: 'Controlled editorial orchestration for imprint confirmation, Editorial Review, stage routing, style-guide carry-forward, approvals, and safe handoffs.',
+    href: '/author/editorial',
+    cta: 'Open editorial',
+    secondary: 'OP-005',
+  },
+  {
     status: 'Live',
     title: 'Books Catalog',
     body: 'Browse the full JMP catalog. Your title will appear here once it is live in distribution.',

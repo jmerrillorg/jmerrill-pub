@@ -423,7 +423,7 @@ Operational completion means:
 2. OP-003 Author Workspace MVP - complete / operational as pre-contract setup workspace
 3. OP-002 Contract / Payment / Workspace Activation - complete / operational as post-agreement/payment full workspace unlock
 4. OP-004 Registration Command Center - complete / operational
-5. OP-005 Editorial Command Center
+5. OP-005 Editorial Command Center - implemented / pending deployment validation
 6. OP-006 Cover Design Command Center
 7. OP-007 Interior Layout Command Center
 8. OP-008 Distribution Command Center
@@ -441,7 +441,7 @@ Reason:
 
 The intake/onboarding paths now work. The next operational need is to make sure serious `/join` inquiries and accepted/current authors have a governed workspace lifecycle that mirrors the pipeline without creating duplicate folders or making SharePoint the system of record.
 
-OP-001 has since been completed and validated as operational. OP-002 has also passed controlled operational validation. OP-003 Author Workspace MVP has been deployed and validated operational. OP-004 Registration Command Center has been deployed and validated operational. OP-005 Editorial Command Center is next in Wave 2.
+OP-001 has since been completed and validated as operational. OP-002 has also passed controlled operational validation. OP-003 Author Workspace MVP has been deployed and validated operational. OP-004 Registration Command Center has been deployed and validated operational. OP-005 Editorial Command Center has been implemented as a read-only orchestration layer pending deployment validation.
 
 ## Validation Requirements
 

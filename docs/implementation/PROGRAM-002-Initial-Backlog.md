@@ -20,7 +20,7 @@ Council review is closed. Implementation is active. Council re-engagement occurs
 | OP-002 | Contract / Payment / Workspace Activation | Generate contract/payment actions after setup completion and unlock the full workspace after signed/active agreement plus confirmed payment or publisher financial override | Complete / Operational; sequencing corrected | OP-003 pre-contract workspace; agreement status source; payment confirmation source | Activation bridge eligible; workspace moved to onboarding/active state; full workspace unlock occurs only after agreement/payment gate |
 | OP-003 | Author Workspace MVP | Provide pre-contract author setup workspace after author acceptance and before agreement/payment generation | Complete / Operational; Decision 3 canon correction applied | Author acceptance; workspace surface; approved pre-contract setup model | Workspace shows only Author Onboarding, Financial Setup, and Royalty Setup until setup is complete; full workspace remains hidden; author/project-specific data requires Dataverse-backed access |
 | OP-004 | ISBN / LCCN / Copyright Registration Command Center | Manage registration tasks, identifiers, evidence, blockers, and approvals | Complete / Operational | OP-003 or approved internal command center path | Registration tasks, statuses, evidence, and blockers are trackable |
-| OP-005 | Editorial Command Center | Run editorial workflow from manuscript intake through editorial approval | Not Started | OP-004; manuscript and editorial stage records | Editorial status, tasks, approvals, and files are operationally visible |
+| OP-005 | Editorial Command Center | Run editorial workflow from manuscript intake through editorial approval | Implemented / Pending Deployment Validation | OP-004; manuscript and editorial stage records | Editorial status, tasks, approvals, and files are operationally visible |
 | OP-006 | Cover Design Command Center | Coordinate cover design assets, status, approvals, and handoff | Not Started | OP-005 | Cover design workflow and approval state are trackable |
 | OP-007 | Interior Layout Command Center | Coordinate interior layout, proof readiness, and production file handoff | Not Started | OP-006 | Interior layout workflow and production files are trackable |
 | OP-008 | Distribution Command Center | Manage distribution readiness, metadata, files, and channel status | Not Started | OP-007 | Distribution status and blockers are visible before launch |
@@ -106,7 +106,7 @@ Only approval needs, exceptions, blockers, missed SLAs, author risk, payment iss
 
 OP-001 is the first recommended operational build because serious `/join` inquiries and accepted/current authors need a governed workspace lifecycle that mirrors the pipeline without duplicate folders and without making SharePoint the system of record.
 
-OP-001, OP-002, and OP-003 have been completed and validated as operational. OP-004 Registration Command Center has been deployed and validated operational. OP-005 Editorial Command Center is next in Wave 2.
+OP-001, OP-002, and OP-003 have been completed and validated as operational. OP-004 Registration Command Center has been deployed and validated operational. OP-005 Editorial Command Center has been implemented as a read-only orchestration layer pending deployment validation.
 
 ## Current Blockers / Constraints
 
