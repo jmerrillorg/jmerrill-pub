@@ -15,7 +15,7 @@ export const portalActivationSummary = {
   titleRelationship: 'Title child record pending contract package',
   agreementStatus: 'Not generated until setup is complete',
   firstPaymentStatus: 'Not requested until setup is complete',
-  portalStatus: 'Pre-contract intake',
+  workspaceStatus: 'Pre-contract intake',
   systemOfRecord: 'Dataverse',
   fileLayer: 'SharePoint',
 } as const
@@ -36,7 +36,7 @@ export const portalTasks: PortalTask[] = [
     owner: 'Author',
     status: 'Available',
     tone: 'active',
-    description: 'Confirm author identity, address, legal name, title metadata, manuscript status, production preferences, and marketing foundation.',
+    description: 'Confirm author identity, address, legal name, title metadata, manuscript status, project preferences, and marketing foundation.',
     href: '/author/onboarding',
   },
   {
@@ -60,17 +60,17 @@ export const portalTasks: PortalTask[] = [
 ]
 
 export const portalFileControls = [
-  ['Pre-contract only', 'This portal opens before the contract package is generated so required author information can be collected first.'],
-  ['No private project materials', 'Private project materials remain hidden until active portal unlock is authorized.'],
+  ['Pre-contract only', 'This workspace opens before the contract package is generated so required author information can be collected first.'],
+  ['No private project materials', 'Private project materials remain hidden until full workspace unlock is authorized.'],
   ['No sensitive uploads', 'Tax IDs, bank details, and signatures stay in approved secure systems, not website notes.'],
-  ['Dataverse remains authority', 'Portal status reflects governed records; the portal does not become the source of truth.'],
+  ['Dataverse remains authority', 'Workspace status reflects governed records; the website does not become the source of truth.'],
 ] as const
 
 export const portalReadinessCards = [
   ['Contract package', 'Generated only after Author Onboarding, Financial Setup, and Royalty Setup are complete.'],
   ['Payment request', 'Generated only after the contract package is ready; no payment request is shown in pre-contract mode.'],
-  ['Active portal unlock', 'Additional project modules remain hidden until agreement and payment are complete.'],
-  ['Returning authors', 'Existing author portals receive new title children; onboarding updates are requested only when required.'],
+  ['Full workspace unlock', 'Additional project modules remain hidden until agreement and payment are complete.'],
+  ['Returning authors', 'Existing author workspaces receive new title children; onboarding updates are requested only when required.'],
 ] as const
 
 export const portalBoundaryRows = [
@@ -78,6 +78,6 @@ export const portalBoundaryRows = [
   ['Visible modules', 'Onboarding, financial setup, royalty setup'],
   ['Payments', 'No payment request generated'],
   ['Agreement actions', 'No signing packet generated'],
-  ['Project workspace', 'Unavailable before active unlock'],
-  ['Financial records', 'Unavailable before active unlock'],
+  ['Project workspace', 'Unavailable before full workspace unlock'],
+  ['Financial records', 'Unavailable before full workspace unlock'],
 ] as const

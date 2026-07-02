@@ -28,12 +28,12 @@ Canonical pipeline distinction:
 - `/join` starts the full publishing movement for new/prospective authors.
 - `/author/onboarding` is a downstream production-spec step for accepted/current authors.
 
-OP-001 is complete/operational. OP-002 remains operational as the post-agreement/post-payment activation bridge, but its sequencing has been corrected: author portal creation now occurs before contract generation so required author information can be collected first.
+OP-001 is complete/operational. OP-002 remains operational as the post-agreement/post-payment activation bridge, but its sequencing has been corrected: Author Workspace creation now occurs before contract generation so required author information can be collected first.
 
 Council disposition v1.0 is accepted:
 
-- OP-003 Author Portal now opens after author acceptance and before contract generation.
-- OP-002 is the active-portal unlock gate after agreement is signed/active and payment is confirmed or publisher override is approved.
+- OP-003 Author Workspace now opens after author acceptance and before contract generation.
+- OP-002 is the full-workspace unlock gate after agreement is signed/active and payment is confirmed or publisher override is approved.
 - Marketing is part of every OP module.
 - JM Signature governance is locked as publisher-selected and invitation-only.
 - Executive dashboard behavior is exception-driven.
@@ -53,8 +53,8 @@ PROGRAM-002 includes the operational modules needed to run J Merrill Publishing 
 
 1. Intake / Diagnostic Command Center
 2. Author Workspace Lifecycle
-3. Author Portal
-4. Contract / Payment / Portal Activation Command Center
+3. Author Workspace
+4. Contract / Payment / Workspace Activation Command Center
 5. ISBN / LCCN / Copyright Registration Command Center
 6. Editorial Command Center
 7. Cover Design Command Center
@@ -80,7 +80,7 @@ This capture/control task does not authorize:
 - modifying Business Central
 - connecting Stripe
 - sending author emails
-- creating author portals
+- creating author workspaces
 - creating SharePoint folders
 - changing live website behavior
 - committing or pushing repository changes
@@ -95,12 +95,12 @@ flowchart TD
     D --> E["Publisher Decision"]
     E --> F["Package Presented"]
     F --> G["Author Accepts"]
-    G --> H["Author Portal Created or Existing Portal Updated"]
-    H --> I["Portal Invitation Sent"]
-    I --> J["Pre-Contract Portal: Onboarding + Financial + Royalty Setup"]
+    G --> H["Author Workspace Created or Existing Workspace Updated"]
+    H --> I["Workspace Invitation Sent"]
+    I --> J["Pre-Contract Workspace: Onboarding + Financial + Royalty Setup"]
     J --> K["Generate Contract Package + Invoice / Payment Request"]
     K --> L["Sign Agreement + Submit Payment"]
-    L --> M["OP-002 Active Portal Unlock"]
+    L --> M["OP-002 Full Workspace Unlock"]
     M --> N["Registration"]
     N --> O["Editorial"]
     O --> P["Cover Design"]
@@ -203,25 +203,25 @@ If the answer is yes, the workflow should be redesigned. The platform should sur
 
 Everything else should continue quietly through the operational workflow.
 
-## Author Portal Rule
+## Author Workspace Rule
 
-Create or update the Author Portal after the author accepts the publisher recommendation/package:
+Create or update the Author Workspace after the author accepts the publisher recommendation/package:
 
-- New author: create one author portal.
-- Returning author: add the new title to the existing author portal.
-- Never create a second portal for the same author relationship.
+- New author: create one Author Workspace.
+- Returning author: add the new title to the existing Author Workspace.
+- Never create a second workspace for the same author relationship.
 
-The pre-contract portal is intentionally locked. Only these modules are visible:
+The pre-contract workspace is intentionally locked. Only these modules are visible:
 
 - Author Onboarding
 - Financial Setup
 - Royalty Setup
 
-The pre-contract portal must clearly display:
+The pre-contract workspace must clearly display:
 
 `Complete the steps below to begin your publishing journey.`
 
-All other modules are hidden until active portal unlock:
+All other modules are hidden until full workspace unlock:
 
 - Dashboard
 - Editorial
@@ -242,12 +242,12 @@ After Author Onboarding, Financial Setup, and Royalty Setup are complete, the sy
 - Sign Agreement (SignNow)
 - Submit Payment (Stripe)
 
-When both conditions are true, OP-002 active portal unlock runs:
+When both conditions are true, OP-002 full workspace unlock runs:
 
 - Agreement = Signed/Active
 - Payment = Confirmed, or approved publisher financial override
 
-The active portal may display approved information from:
+The active workspace may display approved information from:
 
 - Dataverse: author, title, project status, tasks, milestones
 - SharePoint: files, proofs, documents
@@ -256,15 +256,32 @@ The active portal may display approved information from:
 - Royalty engine: statements only when live royalty generation is approved
 - Marketing module: approved launch plan, campaign tasks, assets, review/award tracking, and campaign milestones only when the marketing module is live
 
-The portal must not become the system of record.
+The workspace must not become the system of record.
+
+Security requirements:
+
+- Use a dedicated pre-contract workspace access scope/role, separate from shared author setup form access.
+- Protect address, financial setup, and royalty setup fields at field level before private data is surfaced.
+- Require author authentication before locked modules render.
+- Keep pre-contract sensitive data out of dashboards, reports, exports, and broad status summaries.
+- Log workspace creation, view/edit, module completion, contract generation, and full workspace unlock events to `jm1_executionlog` where practical.
+
+Prospect nurture rule:
+
+- If the author does not convert, set Relationship State to `Prospect / Inactive Pursuit`.
+- Cadence is bi-weekly, then monthly, then quarterly.
+- Birthday touchpoints are allowed.
+- Prospect nurture remains separate from active-author communications.
+- Tone must remain warm and relationship-oriented, not sales-drip language.
+- No live nurture communications are authorized by the OP-003 correction.
 
 ## OP-003 Scope Lock
 
-OP-003 begins after author acceptance and before contract generation. OP-002 no longer creates the portal; OP-002 unlocks the active portal after signed/active agreement and confirmed payment or approved publisher financial override.
+OP-003 begins after author acceptance and before contract generation. OP-002 no longer creates the workspace; OP-002 unlocks the full workspace after signed/active agreement and confirmed payment or approved publisher financial override.
 
 OP-003 scope is locked to:
 
-- Author Portal
+- Author Workspace
 - Relationship Parent / Title Child
 - controlled pre-contract display layer
 - author onboarding action
@@ -276,7 +293,7 @@ OP-003 scope is locked to:
 - warm welcome transition
 - humanized milestone communications
 - hidden file/private data boundaries
-- future active portal unlock boundary
+- future full workspace unlock boundary
 
 No additional OP-003 scope may be added without executive approval.
 
@@ -286,8 +303,8 @@ No additional OP-003 scope may be added without executive approval.
 - SharePoint is the file/workspace layer.
 - Stripe is the payment collection layer.
 - Business Central is the financial/accounting system of record.
-- Author Portal is a display/action layer only.
-- The portal must not become the system of record.
+- Author Workspace is a display/action layer only.
+- The workspace must not become the system of record.
 
 ## SharePoint Workspace Rule
 
@@ -314,7 +331,7 @@ Publishing payment/accounting posture:
 - Business Central becomes the financial system of record.
 - QBO is not the forward operating source.
 
-No active portal unlock or production start until both are true:
+No full workspace unlock or production start until both are true:
 
 - Agreement status = signed/completed
 - First payment status = paid/confirmed
@@ -369,7 +386,7 @@ Operational completion means:
 | Stripe | Approved online payment collection and payment confirmation when live connection is approved | Author/title master data, accounting ledger |
 | Royalty Engine | Royalty calculation and statements when live generation is approved | Live payments without authorization |
 | Marketing Module | Positioning, campaign plan, launch calendar, campaign assets, review/award tracking, performance summary | Operational stage authority, accounting truth |
-| Author Portal | Controlled author-facing view into approved data | System of record |
+| Author Workspace | Controlled author-facing view into approved data | System of record |
 | Executive Pipeline Dashboard | Exceptions, approvals, blockers, missed SLAs, author risk, payment issues, production issues | Exhaustive activity feed |
 
 ## Dependencies
@@ -379,13 +396,13 @@ Operational completion means:
 | PROGRAM-001 certified foundation | All PROGRAM-002 modules | Complete |
 | OP-001 SharePoint workspace lifecycle | Workspace and file operations | Complete / Operational |
 | Production Dataverse existing publishing solution | Intake and pipeline operations | Operational as-is |
-| OP-002 bridge fields | Active portal unlock and workspace writeback after agreement/payment | Complete / Operational; sequencing corrected |
-| OP-003 Author Portal MVP | Author-facing pre-contract setup layer after author acceptance | Complete / Operational; access model correction in progress |
+| OP-002 bridge fields | Full workspace unlock and workspace writeback after agreement/payment | Complete / Operational; sequencing corrected |
+| OP-003 Author Workspace MVP | Author-facing pre-contract setup layer after author acceptance | Complete / Operational; Decision 3 canon correction applied |
 | SharePoint write connector authentication | Automated folder creation and move | Restored |
 | Business Central production readiness | Live payment/accounting summaries | Not production-ready |
 | Stripe live approval | Live payment confirmation | Not authorized |
 | Adobe Sign license/API entitlement | Automated agreement execution | Blocked |
-| Live royalty generation approval | Portal statement display and live royalty operations | Not authorized |
+| Live royalty generation approval | Workspace statement display and live royalty operations | Not authorized |
 
 ## Known Blockers / Constraints
 
@@ -398,13 +415,13 @@ Operational completion means:
 | Marketing must not be delayed until launch | All modules | Capture marketing signal/handoff/dependency in each OP module |
 | JM Signature must not become public or purchasable | Intake, review, contract, marketing, executive dashboard | Treat as publisher-only governance overlay |
 | Distribution/launch/royalty automation gates remain closed until readiness gates are satisfied | OP-008 through OP-011 | Keep later-stage automation gated |
-| Live royalty generation not authorized | Royalty statements in portal | Hide royalty statements until separately approved |
+| Live royalty generation not authorized | Royalty statements in workspace | Hide royalty statements until separately approved |
 
 ## Recommended Build Order
 
 1. OP-001 SharePoint Workspace Lifecycle
-2. OP-003 Author Portal MVP - complete / operational as pre-contract setup portal
-3. OP-002 Contract / Payment / Portal Activation - complete / operational as post-agreement/payment active portal unlock
+2. OP-003 Author Workspace MVP - complete / operational as pre-contract setup workspace
+3. OP-002 Contract / Payment / Workspace Activation - complete / operational as post-agreement/payment full workspace unlock
 4. OP-004 Registration Command Center
 5. OP-005 Editorial Command Center
 6. OP-006 Cover Design Command Center
@@ -424,7 +441,7 @@ Reason:
 
 The intake/onboarding paths now work. The next operational need is to make sure serious `/join` inquiries and accepted/current authors have a governed workspace lifecycle that mirrors the pipeline without creating duplicate folders or making SharePoint the system of record.
 
-OP-001 has since been completed and validated as operational. OP-002 has also passed controlled operational validation. OP-003 Author Portal MVP has been deployed and validated operational. OP-004 Registration Command Center is the next PROGRAM-002 module.
+OP-001 has since been completed and validated as operational. OP-002 has also passed controlled operational validation. OP-003 Author Workspace MVP has been deployed and validated operational. OP-004 Registration Command Center is the next PROGRAM-002 module.
 
 ## Validation Requirements
 

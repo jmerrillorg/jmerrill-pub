@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Author Hub | J Merrill Publishing',
-  description: 'Private author and staff hub for J Merrill Publishing forms, portal links, Q&A, and author operations.',
+  description: 'Private author and staff hub for J Merrill Publishing forms, workspace links, Q&A, and author operations.',
   robots: {
     index: false,
     follow: false,
@@ -41,14 +41,14 @@ const hubCards = [
     body: 'Gated title coverage, reporting preference, royalty contact, agreement status, and future dashboard readiness.',
     href: '/author/royalty-setup',
     cta: 'Open royalty setup',
-    secondary: 'Author portal',
+    secondary: 'Author workspace',
   },
   {
     status: 'MVP',
-    title: 'Author Portal',
-    body: 'Private pre-contract doorway for accepted authors to complete onboarding, financial setup, and royalty setup before agreement and payment actions appear.',
+    title: 'Author Workspace',
+    body: 'Private pre-contract workspace for accepted authors to complete onboarding, financial setup, and royalty setup before agreement and payment actions appear.',
     href: '/author/portal',
-    cta: 'Open portal',
+    cta: 'Open workspace',
     secondary: 'Pre-contract setup',
   },
   {
@@ -165,7 +165,7 @@ export default function AuthorHubPage() {
           ))}
         </div>
 
-        <div className="my-16 text-center max-w-[860px] mx-auto" id="author-portal">
+        <div className="my-16 text-center max-w-[860px] mx-auto" id="author-workspace">
           <h2
             className="text-white mb-4"
             style={{
@@ -178,10 +178,10 @@ export default function AuthorHubPage() {
           >
             Built as a doorway now.
             <br />
-            <em className="not-italic italic text-blue-500">Portal MVP is live.</em>
+            <em className="not-italic italic text-blue-500">Workspace MVP is live.</em>
           </h2>
           <p className="text-[15px] font-light text-white/40 leading-[1.75]">
-            The author portal is now the private pre-contract entry point after author acceptance. It collects the
+            The author workspace is now the private pre-contract entry point after author acceptance. It collects the
             information needed for agreement and payment preparation before the active project dashboard unlocks.
             Dataverse, SharePoint, and approved staff workflows remain the systems of record.
           </p>

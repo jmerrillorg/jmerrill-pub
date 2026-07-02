@@ -14,8 +14,8 @@ import {
 } from '@/lib/publishing/author-portal-mvp'
 
 export const metadata: Metadata = {
-  title: 'Author Portal | J Merrill Publishing',
-  description: 'Private pre-contract author portal for accepted J Merrill Publishing projects.',
+  title: 'Author Workspace | J Merrill Publishing',
+  description: 'Private pre-contract author workspace for accepted J Merrill Publishing projects.',
   robots: {
     index: false,
     follow: false,
@@ -32,16 +32,16 @@ const toneClasses: Record<PortalStatusTone, string> = {
 export default function AuthorPortalPage() {
   return (
     <AuthorPortalShell
-      eyebrow="Author portal MVP"
+      eyebrow="Author workspace MVP"
       title="Complete the steps below to begin your publishing journey."
-      description="This private pre-contract portal collects the information needed to prepare your agreement package and first payment request. The full project portal unlocks only after agreement and payment requirements are complete."
+      description="This private pre-contract workspace collects the information needed to prepare your agreement package and first payment request. The full workspace unlocks only after agreement and payment requirements are complete."
     >
       <AuthorGate scope="portal">
         <div className="space-y-8">
           <section className="rounded-[32px] border border-blue-500/20 bg-blue-500/[0.06] p-7 sm:p-9">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
               <div>
-                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Pre-contract portal</p>
+                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Pre-contract workspace</p>
                 <h2
                   className="mt-3 text-white"
                   style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '34px', fontWeight: 700, lineHeight: 1.12 }}
@@ -119,7 +119,7 @@ export default function AuthorPortalPage() {
 
           <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="rounded-[32px] border border-white/8 bg-white/[0.035] p-7 sm:p-9">
-              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Active portal boundary</p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Active workspace boundary</p>
               <h2 className="mt-3 text-[26px] font-semibold text-white">Only setup actions are available.</h2>
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {portalFileControls.map(([heading, body]) => (
