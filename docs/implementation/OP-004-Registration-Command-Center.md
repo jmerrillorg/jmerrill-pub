@@ -1,6 +1,6 @@
 # OP-004 - Registration Command Center
 
-**Status:** Operational candidate
+**Status:** OPERATIONAL
 **Operational scope:** Registration readiness command center
 **Primary route:** `/author/registration`
 **Date:** 2026-07-02
@@ -108,11 +108,26 @@ Additional operational checks:
 
 ## Certification Notes
 
-OP-004 can be marked operational after:
+OP-004 was deployed and validated operational on 2026-07-02.
 
-- PR checks pass.
-- Azure Static Web Apps production deployment succeeds.
-- Live `/author` and `/author/registration` validation pass.
-- Documentation is synchronized to SharePoint.
+Deployment evidence:
 
-OP-005 Editorial Command Center begins only after OP-004 certification unless a true governance exception appears.
+- PR #146 merged with merge commit `b4757ebc3c3761938f8000bd9654ee113e4d5c6b`.
+- Azure Static Web Apps production deployment completed successfully.
+
+Live validation:
+
+- `/author` returned HTTP 200 and displayed the Registration Command Center link.
+- `/author/registration` returned HTTP 200.
+- ISBN, copyright, LCCN, BISAC/category, metadata readiness, checklist, status tracking, and safety boundaries rendered.
+
+Safety validation:
+
+- No Dataverse writes occurred.
+- No ISBN assignment occurred.
+- No copyright filing occurred.
+- No LCCN submission occurred.
+- No metadata submission occurred.
+- No Stripe, Business Central, royalty, author payment, or external communication activity occurred.
+
+OP-005 Editorial Command Center is the next Wave 2 module. OP-005 must remain an orchestration layer and must not create generic editorial methodology.
