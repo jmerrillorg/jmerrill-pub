@@ -14,6 +14,13 @@ export type DataverseWriteResult =
   | { status: 'skipped'; reason: 'non_production_mapping_pending' }
   | { status: 'failed'; reason: string; retryable: boolean }
 
+export type DataverseUpdateResult =
+  | { status: 'success' }
+  | { status: 'skipped'; reason: 'non_production_mapping_pending' | 'missing_record_id' }
+  | { status: 'failed'; reason: string; retryable: boolean }
+
+const ACKNOWLEDGMENT_STATUS_SENT = 835500001
+
 export async function writePublishingIntakeToDataverse(
   payload: NormalizedPublishingIntake,
 ): Promise<DataverseWriteResult> {
@@ -97,6 +104,84 @@ export async function writePublishingIntakeWithRetry(payload: NormalizedPublishi
   }
 
   return lastResult
+}
+
+export async function markPublishingIntakeAcknowledgmentSent(
+  recordId: string | undefined,
+  sentAt = new Date().toISOString(),
+): Promise<DataverseUpdateResult> {
+  if (!recordId) return { status: 'skipped', reason: 'missing_record_id' }
+
+  const config = getDataverseConfig()
+
+  if (!config.ok) {
+    if (process.env.NODE_ENV !== 'production') {
+      return { status: 'skipped', reason: 'non_production_mapping_pending' }
+    }
+
+    return {
+      status: 'failed',
+      reason: `dataverse_configuration_missing: ${config.missing.join(', ')}`,
+      retryable: false,
+    }
+  }
+
+  try {
+    const accessToken = await getDataverseAccessToken(config.value)
+    const response = await fetch(
+      `${config.value.webApiBaseUrl}/${config.value.entitySet}(${recordId})`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'OData-MaxVersion': '4.0',
+          'OData-Version': '4.0',
+          'If-Match': '*',
+        },
+        body: JSON.stringify({
+          jm1_acknowledgmentsent: true,
+          jm1_acknowledgmentstatus: ACKNOWLEDGMENT_STATUS_SENT,
+          jm1_acknowledgmentsenton: sentAt,
+          jm1_acknowledgmentlastattempton: sentAt,
+          jm1_acknowledgmentattemptcount: 1,
+          jm1_acknowledgmenterror: null,
+        }),
+      },
+    )
+
+    if (response.status === 204) return { status: 'success' }
+
+    const errorBody = await safeResponseText(response)
+    const dataverseError = summarizeDataverseError(errorBody)
+    console.error('Publishing intake acknowledgment writeback failed.', {
+      status: response.status,
+      errorCode: dataverseError.code,
+      errorMessage: dataverseError.message,
+      recordId,
+      entitySet: config.value.entitySet,
+    })
+
+    return {
+      status: 'failed',
+      reason: `dataverse_ack_writeback_failed:${response.status}:${dataverseError.code}`,
+      retryable: isRetryableStatus(response.status),
+    }
+  } catch (error) {
+    const errorReason = summarizeWriteException(error)
+    console.error('Publishing intake acknowledgment writeback exception.', {
+      reason: errorReason,
+      recordId,
+      entitySet: config.value.entitySet,
+    })
+
+    return {
+      status: 'failed',
+      reason: `dataverse_ack_writeback_exception:${errorReason}`,
+      retryable: true,
+    }
+  }
 }
 
 function wait(ms: number) {

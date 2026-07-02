@@ -132,7 +132,7 @@ test("acknowledgment confirms editorial review when manuscript link is present",
   assert.doesNotMatch(email.content.plainText, /We did not receive a manuscript link/);
 });
 
-test("acknowledgment asks for manuscript link when missing", () => {
+test("acknowledgment asks for manuscript file or link when missing", () => {
   const { validatePayload, buildAcknowledgmentEmail } = loadRelayModule();
 
   const result = validatePayload({
@@ -145,7 +145,8 @@ test("acknowledgment asks for manuscript link when missing", () => {
 
   assert.equal(result.ok, true);
   const email = buildAcknowledgmentEmail(result.value);
-  assert.match(email.content.plainText, /We did not receive a manuscript link/);
+  assert.match(email.content.plainText, /We did not receive a manuscript file or shareable manuscript link/);
+  assert.match(email.content.plainText, /reply with your manuscript attached or with a shareable manuscript link/);
   assert.match(email.content.plainText, /Editorial review will begin as soon as we receive access/);
   assert.doesNotMatch(email.content.plainText, /We received your manuscript link/);
 });

@@ -267,9 +267,9 @@ function buildAcknowledgmentEmail(payload) {
         "If we need anything else before review can continue, we will let you know."
       ]
     : [
-        "We did not receive a manuscript link with your inquiry.",
+        "We did not receive a manuscript file or shareable manuscript link with your inquiry.",
         "",
-        "Please reply with a shareable manuscript link when it is ready. Editorial review will begin as soon as we receive access to the manuscript."
+        "Please reply with your manuscript attached or with a shareable manuscript link when it is ready. Editorial review will begin as soon as we receive access to the manuscript."
       ];
   const plainText = [
     `Good day ${payload.firstName},`,
