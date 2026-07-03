@@ -19,6 +19,7 @@ const { getDataverseToken } = require("../dataverse/authorDraftPersistenceClient
 
 const DIAGNOSTIC_ENTITY_SET = "jm1pub_editorialdiagnostics";
 const INTAKE_ENTITY_SET = "jm1_publishingintakes";
+const INTAKE_REFERENCE_FIELD = "jm1_intakereferencecode";
 
 function safeTrim(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -82,9 +83,9 @@ async function validateRecordBinding({ diagnosticId, intakeReferenceCode }) {
   const intake = await getJson(
     apiBase,
     token,
-    `${INTAKE_ENTITY_SET}(${intakeId})?$select=jm1_referencecode`
+    `${INTAKE_ENTITY_SET}(${intakeId})?$select=${INTAKE_REFERENCE_FIELD}`
   );
-  const actualReference = safeTrim(intake.jm1_referencecode).toUpperCase();
+  const actualReference = safeTrim(intake[INTAKE_REFERENCE_FIELD]).toUpperCase();
   if (!actualReference || actualReference !== intakeReferenceCode.toUpperCase()) {
     return { ok: false, status: 403, code: "INTAKE_REFERENCE_MISMATCH" };
   }

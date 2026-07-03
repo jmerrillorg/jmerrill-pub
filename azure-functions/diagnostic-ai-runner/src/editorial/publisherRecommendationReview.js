@@ -29,6 +29,16 @@ const INTAKE_ENTITY_SET = "jm1_publishingintakes";
 const CONTACT_ENTITY_SET = "contacts";
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
 
+const INTAKE_FIELD = Object.freeze({
+  referenceCode: "jm1_intakereferencecode",
+  firstName: "jm1_firstname",
+  lastName: "jm1_lastname",
+  email: "jm1_email",
+  projectTitle: "jm1_projecttitle",
+  manuscriptType: "jm1_manuscripttype",
+  manuscriptUrl: "jm1_manuscripturl"
+});
+
 const RECOMMENDED_PACKAGE_LABELS = Object.freeze({
   196650000: "JMP-PKG-STARTER / Starter Publishing Package",
   196650001: "JMP-PKG-PRO / Professional Publishing Package",
@@ -145,7 +155,7 @@ async function readDiagnosticContext({ apiBase, token, diagnosticId, intakeRefer
     intake = await getJson(
       apiBase,
       token,
-      `${INTAKE_ENTITY_SET}(${intakeId})?$select=jm1_referencecode,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_manuscripttype,jm1_manuscripturl`
+      `${INTAKE_ENTITY_SET}(${intakeId})?$select=${Object.values(INTAKE_FIELD).join(",")}`
     );
   }
   if (contactId) {
@@ -156,7 +166,7 @@ async function readDiagnosticContext({ apiBase, token, diagnosticId, intakeRefer
     );
   }
 
-  const referenceFromIntake = normalizeString(intake.jm1_referencecode);
+  const referenceFromIntake = normalizeString(intake[INTAKE_FIELD.referenceCode]);
   if (intakeReferenceCode && referenceFromIntake && referenceFromIntake.toUpperCase() !== intakeReferenceCode.toUpperCase()) {
     return { ok: false, reason: "INTAKE_REFERENCE_MISMATCH" };
   }
@@ -234,10 +244,10 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
   const { diagnostic, intake, contact, executionLog } = context;
   const logSummary = parseLogDescription(executionLog?.jm1_actiondescription);
   const authorName = normalizeString(contact.fullname) ||
-    [contact.firstname || intake.jm1_firstname, contact.lastname || intake.jm1_lastname].map(normalizeString).filter(Boolean).join(" ") ||
+    [contact.firstname || intake[INTAKE_FIELD.firstName], contact.lastname || intake[INTAKE_FIELD.lastName]].map(normalizeString).filter(Boolean).join(" ") ||
     "Author";
-  const authorEmail = normalizeString(contact.emailaddress1 || intake.jm1_email);
-  const projectTitle = normalizeString(intake.jm1_projecttitle) || "your manuscript";
+  const authorEmail = normalizeString(contact.emailaddress1 || intake[INTAKE_FIELD.email]);
+  const projectTitle = normalizeString(intake[INTAKE_FIELD.projectTitle]) || "your manuscript";
   const packageValue = diagnostic.jm1pub_recommendedpackage;
   const packageCode = logSummary.recommendedPackageCode || PACKAGE_CODES_BY_VALUE[packageValue] || null;
   const packageLabel = RECOMMENDED_PACKAGE_LABELS[packageValue] || packageCode || "Recommendation pending";
