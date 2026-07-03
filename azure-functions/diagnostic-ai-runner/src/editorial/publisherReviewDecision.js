@@ -283,7 +283,7 @@ function buildPublisherDecisionExecutionLogPayload({ diagnosticId, intakeReferen
  * a Publisher-capacity decision.
  *
  * @param {{
- *   diagnosticId: string, intakeReferenceCode: string, opportunityId: string,
+ *   diagnosticId: string, intakeReferenceCode: string, opportunityId?: string,
  *   decisionOption: string, recommendedImprint?: number|null,
  *   lockImprint?: boolean, notes?: string|null
  * }} input
@@ -303,7 +303,6 @@ async function recordPublisherReviewDecision(input = {}, deps = {}) {
 
   if (!diagnosticId || !DIAGNOSTIC_ID_PATTERN.test(diagnosticId)) return blocked("DIAGNOSTIC_ID_INVALID");
   if (!intakeReferenceCode || !INTAKE_REFERENCE_PATTERN.test(intakeReferenceCode)) return blocked("INTAKE_REFERENCE_CODE_INVALID");
-  if (!opportunityId) return blocked("OPPORTUNITY_ID_MISSING");
   if (!Object.values(PUBLISHER_DECISION_OPTION).includes(decisionOption)) return blocked("DECISION_OPTION_INVALID");
 
   const requiresImprint = OPTIONS_REQUIRING_IMPRINT.includes(decisionOption);
