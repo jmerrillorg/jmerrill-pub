@@ -134,7 +134,8 @@ app.http("run-editorial-review-now", {
     const result = await runPrePackageEditorialReview({
       diagnosticId,
       intakeReferenceCode,
-      opportunityId
+      opportunityId,
+      forceRerun: body.forceRerun === true
     });
 
     context.info(
