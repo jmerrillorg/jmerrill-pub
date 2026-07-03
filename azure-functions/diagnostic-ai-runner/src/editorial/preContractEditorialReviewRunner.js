@@ -53,11 +53,13 @@ const { DIAGNOSTIC_STATUS, RECOMMENDED_IMPRINT, RECOMMENDED_IMPRINT_LABELS } = r
 const editorialReviewProvider = require("./manuscriptEditorialReviewProvider");
 const { validateEditorialReviewSchema } = require("./manuscriptEditorialReviewSchemaValidator");
 const { validateNoQuotation } = require("../validation/noQuotationValidator");
+const { PACKAGE_CODES, resolveAlternativePackage } = require("../author/milestone6BusinessSourceLayer");
 
 const GATE_NAME = "JM1_PRE_CONTRACT_EDITORIAL_REVIEW_RUN_ENABLED";
 const DIAGNOSTIC_ENTITY_SET = "jm1pub_editorialdiagnostics";
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
 const EVENT_TYPE = "PRE_CONTRACT_EDITORIAL_REVIEW_PERFORMED";
+const PRE_PACKAGE_EVENT_TYPE = "PRE_PACKAGE_EDITORIAL_REVIEW_PERFORMED";
 const AGENT_MODEL_NAME = "pre-contract-editorial-review-runner";
 
 // Below this, an AI-recommended imprint is not auto-locked — routed to
@@ -108,6 +110,10 @@ const PACKAGE_CODE_TO_RECOMMENDED_PACKAGE = Object.freeze({
   "JMP-PKG-STARTER": RECOMMENDED_PACKAGE.STARTER,
   "JMP-PKG-PRO": RECOMMENDED_PACKAGE.PROFESSIONAL,
   "JMP-PKG-SIGNATURE": RECOMMENDED_PACKAGE.SIGNATURE_PACKAGE
+});
+
+const PRE_PACKAGE_REVIEW_STATUS = Object.freeze({
+  PUBLISHER_APPROVAL_REQUIRED: "Publisher Approval Required"
 });
 
 const IMPRINT_OUTCOME = Object.freeze({
@@ -422,6 +428,82 @@ function composePreContractEditorialReview(input = {}) {
   };
 }
 
+function recommendPackageFromEditorialReview({
+  officialManuscriptWordCount,
+  workType,
+  imprintDecision,
+  internalScorecard
+} = {}) {
+  if (workType === MANUSCRIPT_WORK_TYPE.CHILDRENS_PICTURE_BOOK) {
+    return {
+      packageCode: PACKAGE_CODES.CHILD,
+      alternatePackageCode: null,
+      reason: "Children's picture book work type maps to the governed Children's Package when author-provided art is confirmed by Publisher review.",
+      publisherReviewRequired: true
+    };
+  }
+
+  if (imprintDecision?.outcome === IMPRINT_OUTCOME.SIGNATURE_CANDIDATE) {
+    return {
+      packageCode: PACKAGE_CODES.SIGNATURE,
+      alternatePackageCode: PACKAGE_CODES.PROFESSIONAL,
+      reason: "Signature candidacy requires Publisher review; Signature is the proposed package with Professional as governed alternate.",
+      publisherReviewRequired: true
+    };
+  }
+
+  const complexity = internalScorecard?.productionComplexity;
+  if (typeof officialManuscriptWordCount === "number" && officialManuscriptWordCount <= 50000 && !(typeof complexity === "number" && complexity >= 7)) {
+    return {
+      packageCode: PACKAGE_CODES.STARTER,
+      alternatePackageCode: resolveAlternativePackage(PACKAGE_CODES.STARTER),
+      reason: "Manuscript-derived word count is within Starter scope and production complexity is not high.",
+      publisherReviewRequired: true
+    };
+  }
+
+  return {
+    packageCode: PACKAGE_CODES.PROFESSIONAL,
+    alternatePackageCode: resolveAlternativePackage(PACKAGE_CODES.PROFESSIONAL),
+    reason: "Professional is the default governed recommendation for full editorial support before author package selection.",
+    publisherReviewRequired: true
+  };
+}
+
+function composePrePackageEditorialReview(input = {}) {
+  const imprintResult = input.imprintDecision;
+  const packageRecommendation = recommendPackageFromEditorialReview({
+    officialManuscriptWordCount: input.officialManuscriptWordCount,
+    workType: input.workType,
+    imprintDecision: imprintResult,
+    internalScorecard: input.internalScorecard
+  });
+
+  return {
+    wordCountResult: {
+      ok: typeof input.officialManuscriptWordCount === "number" && Number.isInteger(input.officialManuscriptWordCount),
+      officialManuscriptWordCount: input.officialManuscriptWordCount ?? null,
+      wordCountSource: "MANUSCRIPT_FILE",
+      selectedPackageCode: null,
+      packageWordLimit: null,
+      withinPackageScope: null,
+      packageMismatch: false
+    },
+    imprintResult,
+    fitConfirmed: imprintResult?.aiFitDecision === editorialReviewProvider.FIT_DECISION.GOOD_FIT,
+    readyForAutoLock: false,
+    requiresHumanDecision: true,
+    humanReviewReason: imprintResult?.humanReviewReason || "PUBLISHER_APPROVAL_REQUIRED",
+    agreementReadinessStatus: AGREEMENT_READINESS_STATUS.BLOCKED_HUMAN_REVIEW_REQUIRED,
+    reviewRunStatus: PRE_PACKAGE_REVIEW_STATUS.PUBLISHER_APPROVAL_REQUIRED,
+    recommendedPackageCode: packageRecommendation.packageCode,
+    alternatePackageCode: packageRecommendation.alternatePackageCode,
+    packageRecommendationReason: packageRecommendation.reason,
+    internalScorecard: input.internalScorecard ?? null,
+    authorFacingSummary: input.authorFacingSummary ?? null
+  };
+}
+
 async function postExecutionLogRecord(apiBase, token, payload) {
   const url = `${apiBase.replace(/\/$/, "")}/${EXECUTION_LOG_ENTITY_SET}`;
   const response = await fetch(url, {
@@ -459,14 +541,16 @@ function formatScorecardSummary(scorecard) {
   return `Scorecard (overall ${scorecard.overallScore}/10): ${parts.join(", ")}.`;
 }
 
-function buildEditorialReviewExecutionLogPayload({ diagnosticId, intakeReferenceCode, opportunityId, review, contentAwareReviewPerformed, completedAt }) {
+function buildEditorialReviewExecutionLogPayload({ diagnosticId, intakeReferenceCode, opportunityId, review, contentAwareReviewPerformed, completedAt, mode = "preContract" }) {
   const actionDescription = [
-    `Pre-contract editorial review performed by the pipeline for intake ${intakeReferenceCode}.`,
-    `Opportunity ${opportunityId}. No Opportunity write occurs in this run.`,
+    `${mode === "prePackage" ? "Pre-package" : "Pre-contract"} editorial review performed by the pipeline for intake ${intakeReferenceCode}.`,
+    opportunityId ? `Opportunity ${opportunityId}. No Opportunity write occurs in this run.` : "No Opportunity was required or updated in this run.",
     `Content-aware manuscript review performed: ${contentAwareReviewPerformed}.`,
     `Word count fit confirmed: ${review.fitConfirmed}.`,
     `Agreement readiness: ${review.agreementReadinessStatus}.`,
     `Imprint outcome: ${review.imprintResult.outcome}.`,
+    review.recommendedPackageCode ? `Recommended package: ${review.recommendedPackageCode}.` : null,
+    review.alternatePackageCode ? `Alternate package: ${review.alternatePackageCode}.` : null,
     review.imprintResult.recommendedImprintLabel
       ? `Recommended imprint: ${review.imprintResult.recommendedImprintLabel} (confidence: ${review.imprintResult.confidence}).`
       : "No imprint auto-recommended.",
@@ -483,7 +567,7 @@ function buildEditorialReviewExecutionLogPayload({ diagnosticId, intakeReference
   return {
     jm1_name: `PRE-CONTRACT-EDITORIAL-REVIEW-${diagnosticId}`,
     jm1_actiondescription: actionDescription.slice(0, 1000),
-    jm1_actiontype: EVENT_TYPE,
+    jm1_actiontype: mode === "prePackage" ? PRE_PACKAGE_EVENT_TYPE : EVENT_TYPE,
     jm1_agentname: AGENT_NAME,
     jm1_agentmodel: AGENT_MODEL_NAME,
     jm1_bandlevel: BAND_LEVEL.BAND_1,
@@ -513,10 +597,12 @@ function buildEditorialReviewExecutionLogPayload({ diagnosticId, intakeReference
  * @param {{ getToken?: Function, extractManuscript?: Function, reviewManuscript?: Function }} [deps]
  * @returns {Promise<object>}
  */
-async function runPreContractEditorialReview(input = {}, deps = {}) {
+async function runEditorialReviewCore(input = {}, deps = {}, options = {}) {
   const resolveToken = deps.getToken || getDataverseToken;
   const resolveExtract = deps.extractManuscript || fetchAndExtractManuscript;
   const resolveReview = deps.reviewManuscript || editorialReviewProvider.call;
+  const requireOpportunityAndPackage = options.requireOpportunityAndPackage === true;
+  const prePackageMode = options.mode === "prePackage";
 
   if (!isPlainObject(input)) return blocked("INVALID_INPUT");
 
@@ -527,8 +613,8 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
 
   if (!diagnosticId || !DIAGNOSTIC_ID_PATTERN.test(diagnosticId)) return blocked("DIAGNOSTIC_ID_INVALID");
   if (!intakeReferenceCode || !INTAKE_REFERENCE_PATTERN.test(intakeReferenceCode)) return blocked("INTAKE_REFERENCE_CODE_INVALID");
-  if (!opportunityId) return blocked("OPPORTUNITY_ID_MISSING");
-  if (!selectedPackageCode) return blocked("SELECTED_PACKAGE_CODE_MISSING");
+  if (requireOpportunityAndPackage && !opportunityId) return blocked("OPPORTUNITY_ID_MISSING");
+  if (requireOpportunityAndPackage && !selectedPackageCode) return blocked("SELECTED_PACKAGE_CODE_MISSING");
 
   if (!isGateOpen()) return blocked("GATE_CLOSED", { gate: GATE_NAME });
 
@@ -551,6 +637,9 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
       "jm1pub_worktype",
       "jm1pub_genreconfirmed",
       "jm1pub_signaturereviewrequired",
+      "jm1pub_recommendedimprint",
+      "jm1pub_recommendedpackage",
+      "jm1pub_diagnosticstatus",
       "jm1_manuscriptasseturl",
       "jm1_manuscriptfiletype",
       "_jm1pub_publishingintake_value"
@@ -571,14 +660,24 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
   let workType = diagnosticFields.jm1pub_worktype ?? null;
   const genreConfirmed = normalizeString(diagnosticFields.jm1pub_genreconfirmed) || null;
   const signatureReviewRequiredSignal = diagnosticFields.jm1pub_signaturereviewrequired === true;
-  const manuscriptUrl = diagnosticFields.jm1_manuscriptasseturl;
-  const fileTypeHint = diagnosticFields.jm1_manuscriptfiletype ? `.${diagnosticFields.jm1_manuscriptfiletype}` : null;
+  let manuscriptUrl = diagnosticFields.jm1_manuscriptasseturl;
+  let fileTypeHint = diagnosticFields.jm1_manuscriptfiletype ? `.${diagnosticFields.jm1_manuscriptfiletype}` : null;
   const intakeId = diagnosticFields._jm1pub_publishingintake_value || null;
+  const alreadyHasRecommendation = prePackageMode &&
+    (diagnosticFields.jm1pub_recommendedimprint != null || diagnosticFields.jm1pub_recommendedpackage != null);
+  if (alreadyHasRecommendation && input.forceRerun !== true) {
+    return blocked("EDITORIAL_REVIEW_ALREADY_HAS_RECOMMENDATION", {
+      diagnosticId,
+      intakeReferenceCode,
+      authorRecommendationSent: false
+    });
+  }
 
   let workTypeSourcedFromIntakeFallback = false;
-  if (workType == null && intakeId) {
+  if ((workType == null || (prePackageMode && !manuscriptUrl)) && intakeId) {
     try {
-      const intakeUrl = `${apiBase.replace(/\/$/, "")}/jm1_publishingintakes(${intakeId})?$select=jm1_manuscripttype`;
+      const intakeSelect = prePackageMode ? "jm1_manuscripttype,jm1_manuscripturl" : "jm1_manuscripttype";
+      const intakeUrl = `${apiBase.replace(/\/$/, "")}/jm1_publishingintakes(${intakeId})?$select=${intakeSelect}`;
       const intakeResponse = await fetch(intakeUrl, {
         method: "GET",
         headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json", "OData-MaxVersion": "4.0", "OData-Version": "4.0" }
@@ -589,9 +688,16 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
           workType = intakeBody.jm1_manuscripttype;
           workTypeSourcedFromIntakeFallback = true;
         }
+        if (prePackageMode && !manuscriptUrl && normalizeString(intakeBody.jm1_manuscripturl)) {
+          manuscriptUrl = intakeBody.jm1_manuscripturl;
+          const path = new URL(manuscriptUrl).pathname.toLowerCase();
+          if (!fileTypeHint) {
+            fileTypeHint = path.endsWith(".pdf") ? ".pdf" : path.endsWith(".doc") ? ".doc" : ".docx";
+          }
+        }
       }
     } catch {
-      // Fallback read failure is non-fatal — workType simply remains null.
+      // Fallback read failure is non-fatal — fields simply remain unset.
     }
   }
 
@@ -679,18 +785,35 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
     }
   }
 
-  const review = composePreContractEditorialReview({
-    selectedPackageCode,
-    officialManuscriptWordCount,
-    intakeEstimatedWordCount: null,
-    imprintDecision,
-    internalScorecard,
-    authorFacingSummary
-  });
+  const review = prePackageMode
+    ? composePrePackageEditorialReview({
+      officialManuscriptWordCount,
+      workType,
+      imprintDecision,
+      internalScorecard,
+      authorFacingSummary
+    })
+    : composePreContractEditorialReview({
+      selectedPackageCode,
+      officialManuscriptWordCount,
+      intakeEstimatedWordCount: null,
+      imprintDecision,
+      internalScorecard,
+      authorFacingSummary
+    });
 
   // Build the allowlisted PATCH payload for the Diagnostic record only.
   const diagnosticPayload = {};
-  if (review.readyForAutoLock) {
+  if (prePackageMode) {
+    diagnosticPayload.jm1pub_diagnosticstatus = DIAGNOSTIC_STATUS.AWAITING_JACKIE_REVIEW;
+    diagnosticPayload.jm1pub_imprintlocked = false;
+    if (review.imprintResult.recommendedImprint != null) {
+      diagnosticPayload.jm1pub_recommendedimprint = review.imprintResult.recommendedImprint;
+    }
+    if (review.imprintResult.outcome === IMPRINT_OUTCOME.SIGNATURE_CANDIDATE) {
+      diagnosticPayload.jm1pub_signaturereviewrequired = true;
+    }
+  } else if (review.readyForAutoLock) {
     diagnosticPayload.jm1pub_diagnosticstatus = DIAGNOSTIC_STATUS.COMPLETE;
     diagnosticPayload.jm1pub_recommendedimprint = review.imprintResult.recommendedImprint;
     diagnosticPayload.jm1pub_imprintlocked = true;
@@ -702,8 +825,11 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
       diagnosticPayload.jm1pub_signaturereviewrequired = true;
     }
   }
-  if (review.fitConfirmed && selectedPackageCode in PACKAGE_CODE_TO_RECOMMENDED_PACKAGE) {
+  if (!prePackageMode && review.fitConfirmed && selectedPackageCode in PACKAGE_CODE_TO_RECOMMENDED_PACKAGE) {
     diagnosticPayload.jm1pub_recommendedpackage = PACKAGE_CODE_TO_RECOMMENDED_PACKAGE[selectedPackageCode];
+  }
+  if (prePackageMode && review.recommendedPackageCode in PACKAGE_CODE_TO_RECOMMENDED_PACKAGE) {
+    diagnosticPayload.jm1pub_recommendedpackage = PACKAGE_CODE_TO_RECOMMENDED_PACKAGE[review.recommendedPackageCode];
   }
   if (workTypeSourcedFromIntakeFallback && workType != null) {
     diagnosticPayload.jm1pub_worktype = workType;
@@ -718,7 +844,7 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
 
   const completedAt = new Date().toISOString();
   const executionLogPayload = buildEditorialReviewExecutionLogPayload({
-    diagnosticId, intakeReferenceCode, opportunityId, review, contentAwareReviewPerformed, completedAt
+    diagnosticId, intakeReferenceCode, opportunityId, review, contentAwareReviewPerformed, completedAt, mode: prePackageMode ? "prePackage" : "preContract"
   });
 
   let executionLog;
@@ -731,10 +857,10 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
 
   return {
     ok: true,
-    code: review.readyForAutoLock ? "PRE_CONTRACT_EDITORIAL_REVIEW_AUTO_LOCKED" : "PRE_CONTRACT_EDITORIAL_REVIEW_REQUIRES_HUMAN_DECISION",
+    code: prePackageMode ? "PRE_PACKAGE_EDITORIAL_REVIEW_PUBLISHER_APPROVAL_REQUIRED" : (review.readyForAutoLock ? "PRE_CONTRACT_EDITORIAL_REVIEW_AUTO_LOCKED" : "PRE_CONTRACT_EDITORIAL_REVIEW_REQUIRES_HUMAN_DECISION"),
     diagnosticId,
     intakeReferenceCode,
-    opportunityId,
+    opportunityId: opportunityId || null,
     officialManuscriptWordCount,
     wordCountSource: "MANUSCRIPT_FILE",
     contentAwareReviewPerformed,
@@ -750,6 +876,12 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
     requiresHumanDecision: review.requiresHumanDecision,
     humanReviewReason: review.humanReviewReason,
     agreementReadinessStatus: review.agreementReadinessStatus,
+    reviewRunStatus: review.reviewRunStatus || null,
+    recommendedPackageCode: review.recommendedPackageCode || null,
+    alternatePackageCode: review.alternatePackageCode || null,
+    packageRecommendationReason: review.packageRecommendationReason || null,
+    publisherApprovalRequired: prePackageMode ? true : review.requiresHumanDecision,
+    authorRecommendationSent: false,
     internalScorecard: review.internalScorecard,
     authorFacingSummary: review.authorFacingSummary,
     diagnosticRecordEtag: patchResult.etag,
@@ -773,9 +905,20 @@ async function runPreContractEditorialReview(input = {}, deps = {}) {
   };
 }
 
+async function runPreContractEditorialReview(input = {}, deps = {}) {
+  return runEditorialReviewCore(input, deps, { mode: "preContract", requireOpportunityAndPackage: true });
+}
+
+async function runPrePackageEditorialReview(input = {}, deps = {}) {
+  return runEditorialReviewCore(input, deps, { mode: "prePackage", requireOpportunityAndPackage: false });
+}
+
 module.exports = {
   runPreContractEditorialReview,
+  runPrePackageEditorialReview,
   composePreContractEditorialReview,
+  composePrePackageEditorialReview,
+  recommendPackageFromEditorialReview,
   determineImprintRecommendation,
   mapAiReviewToImprintDecision,
   buildInternalDiagnosticScorecard,
@@ -790,9 +933,11 @@ module.exports = {
   IMPRINT_CONFIDENCE,
   HUMAN_REVIEW_REASON,
   AGREEMENT_READINESS_STATUS,
+  PRE_PACKAGE_REVIEW_STATUS,
   SCORECARD_CATEGORY_LABEL,
   IMPRINT_CONFIDENCE_AUTOLOCK_THRESHOLD,
   IMPRINT_CONFIDENCE_HIGH_THRESHOLD,
   AI_IMPRINT_CODE_TO_RECOMMENDED_IMPRINT,
-  EVENT_TYPE
+  EVENT_TYPE,
+  PRE_PACKAGE_EVENT_TYPE
 };

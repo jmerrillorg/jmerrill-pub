@@ -312,13 +312,45 @@ The SharePoint workspace is created at serious `/join` inquiry under:
 
 `01_Pre-Pipeline/00_Inquiry`
 
-The workspace moves through the existing lifecycle:
+The SharePoint workspace location represents the project's last successfully completed governance gate, not the stage currently being attempted.
+
+Do not move a folder when work begins. Move the folder only after the current stage's exit gate is complete and logged.
+
+Folder movement occurs only after:
+
+1. Dataverse stage/status is updated.
+2. The required approval/gate is satisfied.
+3. `jm1_executionlog` records the transition where practical.
+4. The workspace move completes successfully.
+5. Dataverse workspace URL, folder ID, and stage fields are updated.
+
+Initial movement logic:
+
+- `00_Inquiry` remains active while intake, manuscript receipt, and Editorial Review are pending or running.
+- Move from `00_Inquiry` to `01_Manuscript_Review` only after Editorial Review is complete, Publisher review is complete, and the recommendation is approved/sent.
+- Move from `01_Manuscript_Review` to the next production stage only after author acceptance, agreement/payment gates, and production activation are satisfied.
+- Continue the same exit-gate pattern for Cover, Layout, Distribution, Marketing, and Author Success.
+
+The workspace moves through the existing lifecycle only after exit gates:
 
 `01_Pre-Pipeline` -> `02_Active-Pipeline` -> post-distribution / ongoing relationship
 
-Do not create duplicate folders.
+Do not create duplicate folders. Do not delete old folders. Do not move folders without Dataverse update and safe transition evidence.
 
 The SharePoint workspace must mirror the pipeline but must not become the authority for stage/status. Dataverse remains the stage/status authority.
+
+### Workspace Movement Validation Checklist
+
+Before any workspace movement:
+
+- Confirm Dataverse stage/status has been advanced to the completed gate.
+- Confirm the stage exit approval/gate is satisfied.
+- Confirm no duplicate workspace exists.
+- Confirm the source workspace still points to the current Dataverse record.
+- Record transition evidence in `jm1_executionlog` where practical.
+- Move the existing workspace; do not create a replacement workspace.
+- Write the new SharePoint workspace URL/folder ID/stage fields back to Dataverse.
+- Confirm author-facing workspace visibility does not expose the next stage before its gate is satisfied.
 
 ## Payment / Production-Start Rule
 

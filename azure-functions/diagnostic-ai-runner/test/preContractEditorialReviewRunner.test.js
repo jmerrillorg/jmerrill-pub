@@ -4,7 +4,9 @@ const { describe, test, beforeEach, afterEach } = require("node:test");
 const assert = require("node:assert/strict");
 const {
   runPreContractEditorialReview,
+  runPrePackageEditorialReview,
   composePreContractEditorialReview,
+  composePrePackageEditorialReview,
   determineImprintRecommendation,
   mapAiReviewToImprintDecision,
   buildInternalDiagnosticScorecard,
@@ -14,7 +16,8 @@ const {
   MANUSCRIPT_WORK_TYPE,
   IMPRINT_OUTCOME,
   HUMAN_REVIEW_REASON,
-  AGREEMENT_READINESS_STATUS
+  AGREEMENT_READINESS_STATUS,
+  PRE_PACKAGE_REVIEW_STATUS
 } = require("../src/editorial/preContractEditorialReviewRunner");
 const { RECOMMENDED_IMPRINT, DIAGNOSTIC_STATUS } = require("../src/editorial/preContractEditorialReviewGate");
 const { IMPRINT_CODE, FIT_DECISION, SCORE_CATEGORY, AUTHOR_FACING_FIELD } = require("../src/editorial/manuscriptEditorialReviewProvider");
@@ -126,8 +129,8 @@ function diagnosticReadResponse(fields = {}) {
   });
 }
 
-function intakeReadResponse(manuscriptType) {
-  return jsonResponse({ jm1_manuscripttype: manuscriptType });
+function intakeReadResponse(manuscriptType, overrides = {}) {
+  return jsonResponse({ jm1_manuscripttype: manuscriptType, ...overrides });
 }
 
 function patchResponse() {
@@ -482,6 +485,86 @@ describe("runPreContractEditorialReview — intake fallback for work type", () =
     const patchCall = calls.find((c) => c.options.method === "PATCH");
     const patchBody = JSON.parse(patchCall.options.body);
     assert.equal(patchBody.jm1pub_worktype, MANUSCRIPT_WORK_TYPE.DEVOTIONAL);
+  });
+});
+
+// ── runPrePackageEditorialReview — pre-package lifecycle orchestration ──────
+
+describe("runPrePackageEditorialReview — pre-package Editorial Review", () => {
+  test("does not require opportunityId or selectedPackageCode before package recommendation", async () => {
+    process.env[GATE_NAME] = "true";
+    const calls = mockFetchSequence([
+      diagnosticReadResponse({ jm1pub_worktype: MANUSCRIPT_WORK_TYPE.FULL_LENGTH_BOOK }),
+      patchResponse(),
+      executionLogResponse()
+    ]);
+
+    const result = await runPrePackageEditorialReview(
+      baseInput({ opportunityId: "", selectedPackageCode: "" }),
+      reviewerDeps()
+    );
+
+    assert.equal(result.ok, true);
+    assert.equal(result.code, "PRE_PACKAGE_EDITORIAL_REVIEW_PUBLISHER_APPROVAL_REQUIRED");
+    assert.equal(result.opportunityId, null);
+    assert.equal(result.reviewRunStatus, PRE_PACKAGE_REVIEW_STATUS.PUBLISHER_APPROVAL_REQUIRED);
+    assert.equal(result.publisherApprovalRequired, true);
+    assert.equal(result.authorRecommendationSent, false);
+    assert.equal(result.recommendedPackageCode, "JMP-PKG-STARTER");
+    assert.equal(result.alternatePackageCode, null);
+
+    const patchCall = calls.find((c) => c.options.method === "PATCH");
+    const patchBody = JSON.parse(patchCall.options.body);
+    assert.equal(patchBody.jm1pub_diagnosticstatus, DIAGNOSTIC_STATUS.AWAITING_JACKIE_REVIEW);
+    assert.equal(patchBody.jm1pub_imprintlocked, false);
+    assert.equal(patchBody.jm1pub_recommendedpackage, 196650000);
+  });
+
+  test("falls back to the intake manuscript URL when the diagnostic asset URL is not populated", async () => {
+    process.env[GATE_NAME] = "true";
+    const calls = mockFetchSequence([
+      diagnosticReadResponse({ jm1_manuscriptasseturl: null, jm1_manuscriptfiletype: null }),
+      intakeReadResponse(MANUSCRIPT_WORK_TYPE.FULL_LENGTH_BOOK, {
+        jm1_manuscripturl: "https://contoso.sharepoint.com/Shared%20Documents/The%20Intentional%20Leader.docx"
+      }),
+      patchResponse(),
+      executionLogResponse()
+    ]);
+
+    let extractedUrl = null;
+    const result = await runPrePackageEditorialReview(
+      baseInput({ opportunityId: "", selectedPackageCode: "" }),
+      reviewerDeps({}, {
+        extractManuscript: async (url) => {
+          extractedUrl = url;
+          return defaultExtractor(48246)();
+        }
+      })
+    );
+
+    assert.equal(result.ok, true);
+    assert.equal(extractedUrl, "https://contoso.sharepoint.com/Shared%20Documents/The%20Intentional%20Leader.docx");
+    assert.equal(result.liveActions.readIntakeRecord, true);
+
+    const patchCall = calls.find((c) => c.options.method === "PATCH");
+    const patchBody = JSON.parse(patchCall.options.body);
+    assert.equal(patchBody.jm1pub_worktype, MANUSCRIPT_WORK_TYPE.FULL_LENGTH_BOOK);
+  });
+
+  test("blocks duplicate pre-package review when recommendation fields already exist", async () => {
+    process.env[GATE_NAME] = "true";
+    const calls = mockFetchSequence([
+      diagnosticReadResponse({ jm1pub_recommendedpackage: 196650001 })
+    ]);
+
+    const result = await runPrePackageEditorialReview(
+      baseInput({ opportunityId: "", selectedPackageCode: "" }),
+      reviewerDeps()
+    );
+
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "EDITORIAL_REVIEW_ALREADY_HAS_RECOMMENDATION");
+    assert.equal(calls.length, 1);
   });
 });
 
