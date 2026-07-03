@@ -64,10 +64,14 @@ OP-001 is the workspace foundation:
 
 - Initial workspace location: `01_Pre-Pipeline/00_Inquiry`
 - Folder model: author-first and title-aware
-- Folder movement: move the same workspace through stages
+- Folder movement: move the same workspace through stages only after stage exit gates are complete
 - No duplicate folders
 - SharePoint write authentication has been restored and Dataverse workspace fields are now available
 - Dataverse remains the stage/status authority
+
+Workspace location represents the last successfully completed governance gate, not the stage currently being attempted. `00_Inquiry` remains active while intake, manuscript receipt, and Editorial Review are pending or running. The workspace moves from `00_Inquiry` to `01_Manuscript_Review` only after Editorial Review is complete, Publisher review is complete, and the recommendation is approved/sent. Movement to production-stage folders waits until author acceptance, agreement/payment gates, and production activation are satisfied.
+
+Every movement must confirm Dataverse status update, required gate/approval, `jm1_executionlog` transition evidence where practical, successful SharePoint move, and Dataverse workspace URL/folder ID/stage writeback.
 
 ## Marketing Throughout Pipeline
 
