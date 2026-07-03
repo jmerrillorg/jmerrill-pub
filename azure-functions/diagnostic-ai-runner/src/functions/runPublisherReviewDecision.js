@@ -15,10 +15,10 @@
 
 const { app } = require("@azure/functions");
 const { recordPublisherReviewDecision } = require("../editorial/publisherReviewDecision");
+const { getDataverseToken } = require("../dataverse/authorDraftPersistenceClient");
 
-const AUTHORIZED_DIAGNOSTIC_ID = "64e387e0-7e6a-f111-a826-00224820105b";
-const AUTHORIZED_INTAKE_REFERENCE_CODE = "JMP-INT-202606-UFYG60";
-const AUTHORIZED_OPPORTUNITY_ID = "2653fca9-eacd-4c44-b3ed-1764dd5d35aa";
+const DIAGNOSTIC_ENTITY_SET = "jm1pub_editorialdiagnostics";
+const INTAKE_ENTITY_SET = "jm1_publishingintakes";
 
 function safeTrim(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -40,6 +40,56 @@ function recordNotAuthorized() {
 
 function confirmationRequired() {
   return { status: 400, jsonBody: { status: "error", code: "CONFIRM_PUBLISHER_REVIEW_DECISION_FLAG_REQUIRED" } };
+}
+
+async function getJson(apiBase, token, path) {
+  const response = await fetch(`${apiBase.replace(/\/$/, "")}/${path}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/json",
+      "OData-MaxVersion": "4.0",
+      "OData-Version": "4.0"
+    }
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw Object.assign(new Error("Dataverse read failed"), {
+      safeCode: "DATAVERSE_READ_FAILED",
+      httpStatus: response.status,
+      dvCode: body?.error?.code || null
+    });
+  }
+  return body;
+}
+
+async function validateRecordBinding({ diagnosticId, intakeReferenceCode }) {
+  const apiBase = process.env.DATAVERSE_WEB_API_BASE_URL;
+  const resourceUrl = process.env.DATAVERSE_RESOURCE_URL;
+  if (!apiBase || !resourceUrl) {
+    return { ok: false, status: 503, code: "DATAVERSE_CONFIG_MISSING" };
+  }
+
+  const token = await getDataverseToken(resourceUrl);
+  const diagnostic = await getJson(
+    apiBase,
+    token,
+    `${DIAGNOSTIC_ENTITY_SET}(${diagnosticId})?$select=jm1pub_diagnosticstatus,_jm1pub_publishingintake_value`
+  );
+  const intakeId = diagnostic._jm1pub_publishingintake_value;
+  if (!intakeId) return { ok: false, status: 403, code: "DIAGNOSTIC_INTAKE_LINK_MISSING" };
+
+  const intake = await getJson(
+    apiBase,
+    token,
+    `${INTAKE_ENTITY_SET}(${intakeId})?$select=jm1_referencecode`
+  );
+  const actualReference = safeTrim(intake.jm1_referencecode).toUpperCase();
+  if (!actualReference || actualReference !== intakeReferenceCode.toUpperCase()) {
+    return { ok: false, status: 403, code: "INTAKE_REFERENCE_MISMATCH" };
+  }
+
+  return { ok: true };
 }
 
 app.http("run-publisher-review-decision", {
@@ -72,13 +122,16 @@ app.http("run-publisher-review-decision", {
       return confirmationRequired();
     }
 
-    const matches =
-      diagnosticId.toLowerCase() === AUTHORIZED_DIAGNOSTIC_ID.toLowerCase() &&
-      intakeReferenceCode.toUpperCase() === AUTHORIZED_INTAKE_REFERENCE_CODE.toUpperCase() &&
-      opportunityId.toLowerCase() === AUTHORIZED_OPPORTUNITY_ID.toLowerCase();
+    let binding;
+    try {
+      binding = await validateRecordBinding({ diagnosticId, intakeReferenceCode });
+    } catch (err) {
+      context.warn(`Publisher review decision record binding check failed: ${err.safeCode || "DATAVERSE_READ_FAILED"}`);
+      return { status: 503, jsonBody: { status: "error", code: err.safeCode || "DATAVERSE_READ_FAILED" } };
+    }
 
-    if (!matches) {
-      context.warn("Publisher review decision rejected: record does not match the one authorized controlled record.");
+    if (!binding.ok) {
+      context.warn(`Publisher review decision rejected: ${binding.code}`);
       return recordNotAuthorized();
     }
 
