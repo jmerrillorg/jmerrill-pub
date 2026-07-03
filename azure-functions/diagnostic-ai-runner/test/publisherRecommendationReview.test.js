@@ -17,8 +17,8 @@ function context(overrides = {}) {
     diagnostic: {
       jm1pub_diagnosticstatus: 196650004,
       jm1pub_recommendedpackage: 196650001,
-      jm1pub_recommendedimprint: null,
-      jm1pub_imprintlocked: false,
+      jm1pub_recommendedimprint: 835500000,
+      jm1pub_imprintlocked: true,
       jm1pub_signaturereviewrequired: false,
       jm1pub_worktype: 196650000,
       jm1pub_genreconfirmed: "Executive Devotional",
@@ -49,7 +49,7 @@ function context(overrides = {}) {
       jm1_name: "PRE-CONTRACT-EDITORIAL-REVIEW-18cb5c53-6076-f111-ab0f-000d3a9eacee",
       jm1_actiontype: "PRE_PACKAGE_EDITORIAL_REVIEW_PERFORMED",
       createdon: "2026-07-03T01:23:41Z",
-      jm1_actiondescription: "Pre-package editorial review performed by the pipeline for intake JMP-INT-202607-0W5PTQ. Content-aware manuscript review performed: true. Word count fit confirmed: false. Agreement readiness: BLOCKED_HUMAN_REVIEW_REQUIRED. Imprint outcome: NEEDS_HUMAN_REVIEW. Recommended package: JMP-PKG-PRO. Alternate package: JMP-PKG-STARTER. No imprint auto-recommended. Imprint NOT auto-locked — requires human decision (AI_REVIEW_TECHNICAL_FAILURE). Author-facing scoring summary generated and held internally pending separate send approval — not sent in this run.",
+      jm1_actiondescription: "Pre-package editorial review performed by the pipeline for intake JMP-INT-202607-0W5PTQ. Content-aware manuscript review performed: true. Word count fit confirmed: true. Agreement readiness: READY_FOR_AGREEMENT. Imprint outcome: AUTO_RECOMMENDED. Recommended package: JMP-PKG-PRO. Alternate package: JMP-PKG-STARTER. Recommended imprint: J Merrill Publishing (confidence: HIGH). Imprint auto-locked by the pipeline. Author-facing scoring summary generated for governed automatic recommendation send; internal scores remain hidden.",
       ...overrides.executionLog
     }
   };
@@ -59,9 +59,9 @@ describe("parseLogDescription", () => {
   test("extracts safe package, alternate, and readiness fields", () => {
     const summary = parseLogDescription(context().executionLog.jm1_actiondescription);
     assert.equal(summary.contentAwareReviewPerformed, true);
-    assert.equal(summary.wordCountFitConfirmed, false);
-    assert.equal(summary.agreementReadiness, "BLOCKED_HUMAN_REVIEW_REQUIRED");
-    assert.equal(summary.imprintOutcome, "NEEDS_HUMAN_REVIEW");
+    assert.equal(summary.wordCountFitConfirmed, true);
+    assert.equal(summary.agreementReadiness, "READY_FOR_AGREEMENT");
+    assert.equal(summary.imprintOutcome, "AUTO_RECOMMENDED");
     assert.equal(summary.recommendedPackageCode, "JMP-PKG-PRO");
     assert.equal(summary.alternatePackageCode, "JMP-PKG-STARTER");
     assert.equal(summary.authorFacingSummaryGenerated, true);
@@ -69,19 +69,31 @@ describe("parseLogDescription", () => {
 });
 
 describe("buildRecommendationView", () => {
-  test("surfaces the publisher recommendation and all three actions", () => {
+  test("surfaces the standard recommendation without default publisher actions", () => {
     const view = buildRecommendationView(context(), {
       diagnosticId: DIAGNOSTIC_ID,
       intakeReferenceCode: INTAKE_REFERENCE
     });
     assert.equal(view.recommendedPackage.code, "JMP-PKG-PRO");
     assert.equal(view.recommendedPackage.label, "JMP-PKG-PRO / Professional Publishing Package");
-    assert.equal(view.imprintRecommendation.status, "Publisher confirmation required");
-    assert.equal(view.editorialPathRecommendation.status, "Publisher Approval Required");
+    assert.equal(view.editorialPathRecommendation.status, "Recommendation Ready");
     assert.deepEqual(view.flags, ["none"]);
+    assert.deepEqual(view.actions, []);
+  });
+
+  test("surfaces Publisher Review Required only for named exception cases", () => {
+    const view = buildRecommendationView(context({
+      diagnostic: { jm1pub_signaturereviewrequired: true },
+      executionLog: {
+        jm1_actiondescription: "Pre-package editorial review performed by the pipeline for intake JMP-INT-202607-0W5PTQ. Agreement readiness: BLOCKED_HUMAN_REVIEW_REQUIRED. Imprint outcome: SIGNATURE_CANDIDATE. Recommended package: JMP-PKG-SIGNATURE. Alternate package: JMP-PKG-PRO. Imprint NOT auto-locked — requires human decision (SIGNATURE_CANDIDATE_DETECTED)."
+      }
+    }), {
+      diagnosticId: DIAGNOSTIC_ID,
+      intakeReferenceCode: INTAKE_REFERENCE
+    });
+    assert.equal(view.editorialPathRecommendation.status, "Publisher Review Required");
+    assert.equal(view.editorialPathRecommendation.reason, "JM Signature Candidate");
     assert.ok(view.actions.includes("Approve & Send Recommendation"));
-    assert.ok(view.actions.includes("Override Recommendation"));
-    assert.ok(view.actions.includes("Hold / Needs Review"));
   });
 
   test("author-facing draft is present but not sent", () => {

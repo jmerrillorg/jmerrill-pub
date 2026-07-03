@@ -14,6 +14,8 @@ The vision is a manuscript entering the platform and, with appropriate human app
 
 This program is operational, not theoretical. Each module must reach working production usefulness before the next module starts.
 
+OP-000 is the official adoption/recovery/catalog certification entry point for existing J Merrill Publishing titles. Legacy, active, and published titles do not restart `/join`; they are certified into PROGRAM-002 at their current governance state.
+
 ## Current State
 
 The core blocker stack is closed:
@@ -51,6 +53,7 @@ Build to operational completion one module at a time. No broad architecture loop
 
 PROGRAM-002 includes the operational modules needed to run J Merrill Publishing from author inquiry through ongoing relationship management:
 
+0. Pipeline Adoption / Recovery / Catalog Certification
 1. Intake / Diagnostic Command Center
 2. Author Workspace Lifecycle
 3. Author Workspace
@@ -90,10 +93,13 @@ This capture/control task does not authorize:
 ```mermaid
 flowchart TD
     A["/join inquiry"] --> B["Intake / Diagnostic Command Center"]
+    Z["OP-000 legacy/active/published title adoption"] --> C
     B --> C["Author Workspace Lifecycle"]
-    C --> D["Publisher Recommendation"]
-    D --> E["Publisher Decision"]
-    E --> F["Package Presented"]
+    C --> D["Editorial Review + classification engine"]
+    D --> E{"Exception?"}
+    E -->|"No"| F["Recommendation Sent"]
+    E -->|"Yes"| G0["Publisher Review Required"]
+    G0 --> F
     F --> G["Author Accepts"]
     G --> H["Author Workspace Created or Existing Workspace Updated"]
     H --> I["Workspace Invitation Sent"]
@@ -113,7 +119,7 @@ flowchart TD
     W --> X["Ongoing Author Relationship"]
     X --> Y["Executive Pipeline Dashboard"]
     R["JM Signature Governance Overlay"] -. "publisher-only imprint governance" .-> B
-    R -. "publisher-only imprint governance" .-> E
+    R -. "exception-only imprint governance" .-> E
     R -. "publisher-only imprint governance" .-> K
     R -. "publisher-only imprint governance" .-> O
     R -. "publisher-only imprint governance" .-> V
@@ -138,7 +144,7 @@ Required marketing touchpoints:
 | Stage | Marketing Signal / Dependency |
 |---|---|
 | Intake / Diagnostic | Positioning signal, audience, comparable titles, author platform, market category, reader promise |
-| Publisher Review | Commercial opportunity, cultural relevance, campaign potential, author visibility, prestige/trade potential |
+| Publisher Review Exception | Commercial opportunity, cultural relevance, campaign potential, author visibility, prestige/trade potential |
 | Contract / Onboarding | Author marketing questionnaire, platform assets, media history, endorsements, speaking opportunities |
 | Editorial | Message clarity, reader promise, audience alignment, positioning language |
 | Cover / Interior | Market fit, genre expectation, prestige posture, campaign usability |
@@ -202,6 +208,31 @@ If the answer is yes, the workflow should be redesigned. The platform should sur
 - production issue
 
 Everything else should continue quietly through the operational workflow.
+
+## Publisher-Certified Automation Doctrine
+
+Publisher-certified automation applies when a decision is governed by approved JM1 doctrine and historically accepted by Jackie in the overwhelming majority of cases.
+
+The platform should automatically execute governed decisions such as imprint assignment, metadata validation, workflow routing, stage certification, and standard package recommendation.
+
+Publisher Review is exception-driven. It occurs only for:
+
+- hard-stop flag
+- legal concern
+- rights concern
+- ethical concern
+- AI confidence below approved threshold
+- doctrine conflict
+- Publisher override requested
+- potential JM Signature candidate
+
+Standard OP-005 path:
+
+`Editorial Review -> Classification Engine -> Package Recommendation -> Alternate Package -> Imprint Assigned -> Recommendation Sent -> Await Author Response`
+
+Exception OP-005 path:
+
+`Editorial Review -> Exception Detected -> Publisher Review Required -> Exception Resolved -> Recommendation Sent or Hold`
 
 ## Author Workspace Rule
 

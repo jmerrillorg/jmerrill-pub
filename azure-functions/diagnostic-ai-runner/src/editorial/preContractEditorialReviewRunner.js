@@ -113,7 +113,21 @@ const PACKAGE_CODE_TO_RECOMMENDED_PACKAGE = Object.freeze({
 });
 
 const PRE_PACKAGE_REVIEW_STATUS = Object.freeze({
-  PUBLISHER_APPROVAL_REQUIRED: "Publisher Approval Required"
+  RECOMMENDATION_READY_TO_SEND: "Recommendation Ready To Send",
+  RECOMMENDATION_SENT: "Recommendation Sent",
+  AWAITING_AUTHOR_RESPONSE: "Awaiting Author Response",
+  PUBLISHER_REVIEW_REQUIRED: "Publisher Review Required"
+});
+
+const PUBLISHER_REVIEW_REASON = Object.freeze({
+  JM_SIGNATURE_CANDIDATE: "JM Signature Candidate",
+  HARD_STOP: "Hard Stop",
+  LEGAL_REVIEW: "Legal Review",
+  RIGHTS_REVIEW: "Rights Review",
+  ETHICS_REVIEW: "Ethics Review",
+  CONFIDENCE_REVIEW: "Confidence Review",
+  PUBLISHER_OVERRIDE_REQUESTED: "Publisher Override Requested",
+  DOCTRINE_CONFLICT: "Doctrine Conflict"
 });
 
 const IMPRINT_OUTCOME = Object.freeze({
@@ -439,7 +453,8 @@ function recommendPackageFromEditorialReview({
       packageCode: PACKAGE_CODES.CHILD,
       alternatePackageCode: null,
       reason: "Children's picture book work type maps to the governed Children's Package when author-provided art is confirmed by Publisher review.",
-      publisherReviewRequired: true
+      publisherReviewRequired: true,
+      publisherReviewReason: PUBLISHER_REVIEW_REASON.DOCTRINE_CONFLICT
     };
   }
 
@@ -448,7 +463,8 @@ function recommendPackageFromEditorialReview({
       packageCode: PACKAGE_CODES.SIGNATURE,
       alternatePackageCode: PACKAGE_CODES.PROFESSIONAL,
       reason: "Signature candidacy requires Publisher review; Signature is the proposed package with Professional as governed alternate.",
-      publisherReviewRequired: true
+      publisherReviewRequired: true,
+      publisherReviewReason: PUBLISHER_REVIEW_REASON.JM_SIGNATURE_CANDIDATE
     };
   }
 
@@ -458,7 +474,8 @@ function recommendPackageFromEditorialReview({
       packageCode: PACKAGE_CODES.STARTER,
       alternatePackageCode: resolveAlternativePackage(PACKAGE_CODES.STARTER),
       reason: "Manuscript-derived word count is within Starter scope and production complexity is not high.",
-      publisherReviewRequired: true
+      publisherReviewRequired: false,
+      publisherReviewReason: null
     };
   }
 
@@ -466,7 +483,8 @@ function recommendPackageFromEditorialReview({
     packageCode: PACKAGE_CODES.PROFESSIONAL,
     alternatePackageCode: resolveAlternativePackage(PACKAGE_CODES.PROFESSIONAL),
     reason: "Professional is the default governed recommendation for full editorial support before author package selection.",
-    publisherReviewRequired: true
+    publisherReviewRequired: false,
+    publisherReviewReason: null
   };
 }
 
@@ -478,6 +496,22 @@ function composePrePackageEditorialReview(input = {}) {
     imprintDecision: imprintResult,
     internalScorecard: input.internalScorecard
   });
+
+  const publisherReviewReasonByHumanReason = {
+    [HUMAN_REVIEW_REASON.SIGNATURE_SIGNAL_PREEXISTING]: PUBLISHER_REVIEW_REASON.JM_SIGNATURE_CANDIDATE,
+    [HUMAN_REVIEW_REASON.SIGNATURE_CANDIDATE_DETECTED]: PUBLISHER_REVIEW_REASON.JM_SIGNATURE_CANDIDATE,
+    [HUMAN_REVIEW_REASON.LOW_CONFIDENCE]: PUBLISHER_REVIEW_REASON.CONFIDENCE_REVIEW,
+    [HUMAN_REVIEW_REASON.RIGHTS_OR_DISCLOSURE_RISK]: PUBLISHER_REVIEW_REASON.RIGHTS_REVIEW,
+    [HUMAN_REVIEW_REASON.NOT_A_FIT_OR_RISK_FLAGGED]: PUBLISHER_REVIEW_REASON.HARD_STOP,
+    [HUMAN_REVIEW_REASON.AMBIGUOUS_AFTER_CONTENT_REVIEW]: PUBLISHER_REVIEW_REASON.CONFIDENCE_REVIEW,
+    [HUMAN_REVIEW_REASON.AI_REVIEW_TECHNICAL_FAILURE]: PUBLISHER_REVIEW_REASON.CONFIDENCE_REVIEW,
+    [HUMAN_REVIEW_REASON.PACKAGE_MISMATCH]: PUBLISHER_REVIEW_REASON.DOCTRINE_CONFLICT
+  };
+  const publisherReviewReason =
+    packageRecommendation.publisherReviewReason ||
+    (imprintResult?.requiresHumanDecision ? publisherReviewReasonByHumanReason[imprintResult.humanReviewReason] : null) ||
+    null;
+  const publisherReviewRequired = Boolean(publisherReviewReason);
 
   return {
     wordCountResult: {
@@ -491,11 +525,17 @@ function composePrePackageEditorialReview(input = {}) {
     },
     imprintResult,
     fitConfirmed: imprintResult?.aiFitDecision === editorialReviewProvider.FIT_DECISION.GOOD_FIT,
-    readyForAutoLock: false,
-    requiresHumanDecision: true,
-    humanReviewReason: imprintResult?.humanReviewReason || "PUBLISHER_APPROVAL_REQUIRED",
-    agreementReadinessStatus: AGREEMENT_READINESS_STATUS.BLOCKED_HUMAN_REVIEW_REQUIRED,
-    reviewRunStatus: PRE_PACKAGE_REVIEW_STATUS.PUBLISHER_APPROVAL_REQUIRED,
+    readyForAutoLock: !publisherReviewRequired && imprintResult?.autoLock === true,
+    requiresHumanDecision: publisherReviewRequired,
+    humanReviewReason: imprintResult?.humanReviewReason || (publisherReviewRequired ? "PUBLISHER_REVIEW_REQUIRED" : null),
+    publisherReviewRequired,
+    publisherReviewReason,
+    agreementReadinessStatus: publisherReviewRequired
+      ? AGREEMENT_READINESS_STATUS.BLOCKED_HUMAN_REVIEW_REQUIRED
+      : AGREEMENT_READINESS_STATUS.READY_FOR_AGREEMENT,
+    reviewRunStatus: publisherReviewRequired
+      ? PRE_PACKAGE_REVIEW_STATUS.PUBLISHER_REVIEW_REQUIRED
+      : PRE_PACKAGE_REVIEW_STATUS.RECOMMENDATION_READY_TO_SEND,
     recommendedPackageCode: packageRecommendation.packageCode,
     alternatePackageCode: packageRecommendation.alternatePackageCode,
     packageRecommendationReason: packageRecommendation.reason,
@@ -558,7 +598,9 @@ function buildEditorialReviewExecutionLogPayload({ diagnosticId, intakeReference
     review.imprintResult.editorialFitSummary ? `Fit summary: ${review.imprintResult.editorialFitSummary}.` : null,
     review.imprintResult.editorialRiskFlags ? `Risk flags: ${review.imprintResult.editorialRiskFlags}.` : null,
     formatScorecardSummary(review.internalScorecard),
-    "Author-facing scoring summary generated and held internally pending separate send approval — not sent in this run.",
+    mode === "prePackage" && !review.publisherReviewRequired
+      ? "Author-facing scoring summary generated for governed automatic recommendation send; internal scores remain hidden."
+      : "Author-facing scoring summary generated and held internally pending exception review/send approval — not sent in this run.",
     "Word count source: MANUSCRIPT_FILE (not the /join intake estimate).",
     "No raw manuscript text, raw AI/model output, prompt body, secrets, tokens, or headers stored.",
     "No contract generated, no author-facing send, no Stripe/payment/production/distribution/launch/royalty/marketing action occurred."
@@ -805,8 +847,10 @@ async function runEditorialReviewCore(input = {}, deps = {}, options = {}) {
   // Build the allowlisted PATCH payload for the Diagnostic record only.
   const diagnosticPayload = {};
   if (prePackageMode) {
-    diagnosticPayload.jm1pub_diagnosticstatus = DIAGNOSTIC_STATUS.AWAITING_JACKIE_REVIEW;
-    diagnosticPayload.jm1pub_imprintlocked = false;
+    diagnosticPayload.jm1pub_diagnosticstatus = review.publisherReviewRequired
+      ? DIAGNOSTIC_STATUS.AWAITING_JACKIE_REVIEW
+      : DIAGNOSTIC_STATUS.COMPLETE;
+    diagnosticPayload.jm1pub_imprintlocked = review.readyForAutoLock;
     if (review.imprintResult.recommendedImprint != null) {
       diagnosticPayload.jm1pub_recommendedimprint = review.imprintResult.recommendedImprint;
     }
@@ -857,7 +901,9 @@ async function runEditorialReviewCore(input = {}, deps = {}, options = {}) {
 
   return {
     ok: true,
-    code: prePackageMode ? "PRE_PACKAGE_EDITORIAL_REVIEW_PUBLISHER_APPROVAL_REQUIRED" : (review.readyForAutoLock ? "PRE_CONTRACT_EDITORIAL_REVIEW_AUTO_LOCKED" : "PRE_CONTRACT_EDITORIAL_REVIEW_REQUIRES_HUMAN_DECISION"),
+    code: prePackageMode
+      ? (review.publisherReviewRequired ? "PRE_PACKAGE_EDITORIAL_REVIEW_PUBLISHER_REVIEW_REQUIRED" : "PRE_PACKAGE_EDITORIAL_REVIEW_RECOMMENDATION_READY")
+      : (review.readyForAutoLock ? "PRE_CONTRACT_EDITORIAL_REVIEW_AUTO_LOCKED" : "PRE_CONTRACT_EDITORIAL_REVIEW_REQUIRES_HUMAN_DECISION"),
     diagnosticId,
     intakeReferenceCode,
     opportunityId: opportunityId || null,
@@ -880,7 +926,9 @@ async function runEditorialReviewCore(input = {}, deps = {}, options = {}) {
     recommendedPackageCode: review.recommendedPackageCode || null,
     alternatePackageCode: review.alternatePackageCode || null,
     packageRecommendationReason: review.packageRecommendationReason || null,
-    publisherApprovalRequired: prePackageMode ? true : review.requiresHumanDecision,
+    publisherApprovalRequired: false,
+    publisherReviewRequired: prePackageMode ? review.publisherReviewRequired : review.requiresHumanDecision,
+    publisherReviewReason: review.publisherReviewReason || null,
     authorRecommendationSent: false,
     internalScorecard: review.internalScorecard,
     authorFacingSummary: review.authorFacingSummary,
@@ -934,6 +982,7 @@ module.exports = {
   HUMAN_REVIEW_REASON,
   AGREEMENT_READINESS_STATUS,
   PRE_PACKAGE_REVIEW_STATUS,
+  PUBLISHER_REVIEW_REASON,
   SCORECARD_CATEGORY_LABEL,
   IMPRINT_CONFIDENCE_AUTOLOCK_THRESHOLD,
   IMPRINT_CONFIDENCE_HIGH_THRESHOLD,

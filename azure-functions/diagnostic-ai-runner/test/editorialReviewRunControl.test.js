@@ -68,10 +68,10 @@ describe("editorial review run control readiness", () => {
     assert.match(result.missing.join(","), /manuscriptReceived/);
   });
 
-  test("blocks duplicate runs once Publisher Approval Required exists", () => {
+  test("blocks duplicate runs once Publisher Review Required exists", () => {
     const result = evaluateEditorialReviewReadiness({
       ...READY_RECORD,
-      reviewRunStatus: REVIEW_RUN_STATUS.PUBLISHER_APPROVAL_REQUIRED
+      reviewRunStatus: REVIEW_RUN_STATUS.PUBLISHER_REVIEW_REQUIRED
     });
     assert.equal(result.ready, false);
     assert.equal(result.status, REVIEW_RUN_STATUS.HOLD_EXCEPTION);
@@ -147,6 +147,7 @@ describe("workspace movement gate", () => {
     const result = evaluateWorkspaceMovementGate({
       ...MOVEMENT_RECORD,
       editorialReviewComplete: false,
+      publisherReviewRequired: true,
       publisherReviewComplete: false,
       recommendationApprovedOrSent: false
     });
@@ -158,7 +159,19 @@ describe("workspace movement gate", () => {
     assert.ok(result.blocking.includes("RECOMMENDATION_NOT_APPROVED_OR_SENT"));
   });
 
-  test("allows movement to 01_Manuscript_Review only after all exit-gate prerequisites are satisfied", () => {
+  test("allows movement to 01_Manuscript_Review after recommendation is sent when no exception review was required", () => {
+    const result = evaluateWorkspaceMovementGate({
+      ...MOVEMENT_RECORD,
+      publisherReviewRequired: false,
+      publisherReviewComplete: false
+    });
+    assert.equal(result.moveAllowed, true);
+    assert.equal(result.status, WORKSPACE_MOVEMENT_STATUS.READY_TO_MOVE);
+    assert.deepEqual(result.blocking, []);
+    assert.deepEqual(result.missing, []);
+  });
+
+  test("allows movement to 01_Manuscript_Review only after exception review prerequisites are satisfied", () => {
     const result = evaluateWorkspaceMovementGate(MOVEMENT_RECORD);
     assert.equal(result.moveAllowed, true);
     assert.equal(result.status, WORKSPACE_MOVEMENT_STATUS.READY_TO_MOVE);

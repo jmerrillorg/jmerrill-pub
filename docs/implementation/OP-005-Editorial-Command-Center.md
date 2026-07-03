@@ -110,6 +110,29 @@ OP-005 represents:
 9. Stage 7b Production Proofread re-entry.
 10. Stage 8 handoff.
 
+## Exception-Driven Publisher Review
+
+OP-005 follows Publisher-certified automation. Standard Editorial Review outcomes do not stop for default Publisher approval.
+
+Standard path:
+
+`Editorial Review -> Classification Engine -> Package Recommendation -> Alternate Package -> Imprint Assigned -> Recommendation Sent -> Await Author Response`
+
+Publisher Review appears only for named exception cases:
+
+- JM Signature Candidate
+- Hard Stop
+- Legal Review
+- Rights Review
+- Ethics Review
+- Confidence Review
+- Publisher Override Requested
+- Doctrine Conflict
+
+For a no-exception result, OP-005 may automatically lock the imprint, persist the package recommendation and alternate package, generate the author-facing recommendation draft, send the recommendation email through the approved author-response provider, log safe evidence, and leave the SharePoint workspace in `01_Pre-Pipeline/00_Inquiry` until author acceptance.
+
+For an exception result, OP-005 routes to `Publisher Review Required`, records the reason, and does not send the author recommendation automatically.
+
 Stage 7a to OP-007 to Stage 7b is represented explicitly:
 
 `Stage 7a Manuscript Proofread -> OP-007 Interior Layout Command Center -> Stage 7b Production Proofread -> Stage 8 handoff`
