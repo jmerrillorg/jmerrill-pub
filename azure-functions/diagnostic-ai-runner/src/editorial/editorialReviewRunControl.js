@@ -18,8 +18,9 @@ const REVIEW_RUN_STATUS = Object.freeze({
   READY_FOR_EDITORIAL_REVIEW: "Ready for Editorial Review",
   SCHEDULED: "Scheduled",
   RUNNING: "Running",
-  PUBLISHER_APPROVAL_REQUIRED: "Publisher Approval Required",
+  PUBLISHER_REVIEW_REQUIRED: "Publisher Review Required",
   RECOMMENDATION_SENT: "Recommendation Sent",
+  AWAITING_AUTHOR_RESPONSE: "Awaiting Author Response",
   HOLD_EXCEPTION: "Hold / Exception"
 });
 
@@ -29,7 +30,9 @@ const REVIEW_RUN_ACTION = Object.freeze({
   RUN_NOW_REQUESTED: "EDITORIAL_REVIEW_RUN_NOW_REQUESTED",
   RUN_STARTED: "EDITORIAL_REVIEW_RUN_STARTED",
   RUN_BLOCKED: "EDITORIAL_REVIEW_RUN_BLOCKED",
-  PUBLISHER_APPROVAL_REQUIRED: "EDITORIAL_REVIEW_PUBLISHER_APPROVAL_REQUIRED"
+  PUBLISHER_REVIEW_REQUIRED: "EDITORIAL_REVIEW_PUBLISHER_REVIEW_REQUIRED",
+  RECOMMENDATION_SENT: "EDITORIAL_REVIEW_RECOMMENDATION_SENT",
+  AUTHOR_AWAITING_RESPONSE: "AUTHOR_AWAITING_RESPONSE"
 });
 
 const WORKSPACE_STAGE = Object.freeze({
@@ -49,8 +52,9 @@ const READY_DIAGNOSTIC_STATUSES = new Set([
 
 const TERMINAL_OR_ACTIVE_STATUSES = new Set([
   REVIEW_RUN_STATUS.RUNNING,
-  REVIEW_RUN_STATUS.PUBLISHER_APPROVAL_REQUIRED,
-  REVIEW_RUN_STATUS.RECOMMENDATION_SENT
+  REVIEW_RUN_STATUS.PUBLISHER_REVIEW_REQUIRED,
+  REVIEW_RUN_STATUS.RECOMMENDATION_SENT,
+  REVIEW_RUN_STATUS.AWAITING_AUTHOR_RESPONSE
 ]);
 
 function normalizeString(value) {
@@ -204,7 +208,7 @@ function evaluateWorkspaceMovementGate(record = {}) {
   if (record.editorialReviewComplete !== true) {
     blocking.push("EDITORIAL_REVIEW_NOT_COMPLETE");
   }
-  if (record.publisherReviewComplete !== true) {
+  if (record.publisherReviewRequired === true && record.publisherReviewComplete !== true) {
     blocking.push("PUBLISHER_REVIEW_NOT_COMPLETE");
   }
   if (record.recommendationApprovedOrSent !== true) {
@@ -243,7 +247,7 @@ function evaluateWorkspaceMovementGate(record = {}) {
     blocking,
     requiredExitGate: [
       "Editorial Review complete",
-      "Publisher review complete",
+      "Publisher review complete only when exception review was required",
       "Recommendation approved/sent",
       "Dataverse status updated",
       "Transition logged where practical",

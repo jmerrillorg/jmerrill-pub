@@ -505,19 +505,41 @@ describe("runPrePackageEditorialReview — pre-package Editorial Review", () => 
     );
 
     assert.equal(result.ok, true);
-    assert.equal(result.code, "PRE_PACKAGE_EDITORIAL_REVIEW_PUBLISHER_APPROVAL_REQUIRED");
+    assert.equal(result.code, "PRE_PACKAGE_EDITORIAL_REVIEW_RECOMMENDATION_READY");
     assert.equal(result.opportunityId, null);
-    assert.equal(result.reviewRunStatus, PRE_PACKAGE_REVIEW_STATUS.PUBLISHER_APPROVAL_REQUIRED);
-    assert.equal(result.publisherApprovalRequired, true);
+    assert.equal(result.reviewRunStatus, PRE_PACKAGE_REVIEW_STATUS.RECOMMENDATION_READY_TO_SEND);
+    assert.equal(result.publisherApprovalRequired, false);
+    assert.equal(result.publisherReviewRequired, false);
     assert.equal(result.authorRecommendationSent, false);
     assert.equal(result.recommendedPackageCode, "JMP-PKG-STARTER");
     assert.equal(result.alternatePackageCode, null);
 
     const patchCall = calls.find((c) => c.options.method === "PATCH");
     const patchBody = JSON.parse(patchCall.options.body);
-    assert.equal(patchBody.jm1pub_diagnosticstatus, DIAGNOSTIC_STATUS.AWAITING_JACKIE_REVIEW);
-    assert.equal(patchBody.jm1pub_imprintlocked, false);
+    assert.equal(patchBody.jm1pub_diagnosticstatus, DIAGNOSTIC_STATUS.COMPLETE);
+    assert.equal(patchBody.jm1pub_imprintlocked, true);
     assert.equal(patchBody.jm1pub_recommendedpackage, 196650000);
+  });
+
+  test("routes JM Signature candidates to Publisher Review Required with a named reason", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([
+      diagnosticReadResponse({ jm1pub_worktype: MANUSCRIPT_WORK_TYPE.FULL_LENGTH_BOOK }),
+      patchResponse(),
+      executionLogResponse()
+    ]);
+
+    const result = await runPrePackageEditorialReview(
+      baseInput({ opportunityId: "", selectedPackageCode: "" }),
+      reviewerDeps({ jm1pub_signaturecandidacy: true })
+    );
+
+    assert.equal(result.ok, true);
+    assert.equal(result.code, "PRE_PACKAGE_EDITORIAL_REVIEW_PUBLISHER_REVIEW_REQUIRED");
+    assert.equal(result.reviewRunStatus, PRE_PACKAGE_REVIEW_STATUS.PUBLISHER_REVIEW_REQUIRED);
+    assert.equal(result.publisherReviewRequired, true);
+    assert.equal(result.publisherReviewReason, "JM Signature Candidate");
+    assert.equal(result.authorRecommendationSent, false);
   });
 
   test("falls back to the intake manuscript URL when the diagnostic asset URL is not populated", async () => {

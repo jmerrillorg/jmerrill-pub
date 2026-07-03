@@ -21,7 +21,7 @@ Folder movement occurs only after:
 ## Initial Movement Logic
 
 - `00_Inquiry` remains active while intake, manuscript receipt, and Editorial Review are pending or running.
-- Move from `00_Inquiry` to `01_Manuscript_Review` only after Editorial Review is complete, Publisher review is complete, and the recommendation is approved/sent.
+- Move from `00_Inquiry` to `01_Manuscript_Review` only after Editorial Review is complete, any required exception Publisher review is complete, and the recommendation is sent.
 - Move from `01_Manuscript_Review` to the next production stage only after author acceptance, agreement/payment gates, and production activation are satisfied.
 - Continue the same exit-gate pattern for Cover, Layout, Distribution, Marketing, and Author Success.
 
@@ -51,7 +51,7 @@ Before any workspace movement:
 
 OP-005 exposes a testable workspace movement gate evaluator for the Editorial Review exit. Automation should call this evaluator before invoking any SharePoint move operation.
 
-The evaluator must return `Ready To Move` before moving from `00_Inquiry` to `01_Manuscript_Review`. It returns `Hold Current Stage` while Editorial Review is running or waiting for Publisher approval, and `Movement Complete` only after SharePoint move plus Dataverse workspace writeback both succeed.
+The evaluator must return `Ready To Move` before moving from `00_Inquiry` to `01_Manuscript_Review`. It returns `Hold Current Stage` while Editorial Review is running, while a named Publisher Review exception is unresolved, or while the recommendation has not been sent. It returns `Movement Complete` only after SharePoint move plus Dataverse workspace writeback both succeed.
 
 ## Certified Reference Check
 
@@ -59,4 +59,4 @@ Reference `JMP-INT-202607-0W5PTQ` remains correctly located under:
 
 `01_Pre-Pipeline/00_Inquiry`
 
-Reason: Editorial Review is Awaiting Jackie Review. The Editorial Review exit gate has not completed, Publisher review is not complete, and the recommendation has not been approved/sent.
+Reason: the Editorial Review exit gate has not completed until either the standard recommendation has been sent or any named Publisher Review exception has been resolved and the recommendation is sent.

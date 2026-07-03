@@ -16,11 +16,12 @@ Council review is closed. Implementation is active. Council re-engagement occurs
 
 | ID | Module | Objective | Status | Dependencies | Completion Standard |
 |---|---|---|---|---|---|
+| OP-000 | Pipeline Adoption / Recovery / Catalog Certification | Adopt legacy, active, and published titles into PROGRAM-002 without forcing lifecycle restart | Operational design candidate | Existing JMP title/catalog evidence; Author/Title/Workspace sources | Existing titles can be certified, linked to workspaces, assigned relationship state, imprint-certified, and resumed at the correct gate without duplicate workspaces, contracts, royalties, or production work |
 | OP-001 | SharePoint Workspace Lifecycle | Create and move author-first, title-aware SharePoint workspaces from inquiry through post-distribution | Complete / Operational | Publishing Team SharePoint; JM1-Core | Workspace lifecycle mapped; folder creation validated; workspace writeback fields now available |
 | OP-002 | Contract / Payment / Workspace Activation | Generate contract/payment actions after setup completion and unlock the full workspace after signed/active agreement plus confirmed payment or publisher financial override | Complete / Operational; sequencing corrected | OP-003 pre-contract workspace; agreement status source; payment confirmation source | Activation bridge eligible; workspace moved to onboarding/active state; full workspace unlock occurs only after agreement/payment gate |
 | OP-003 | Author Workspace MVP | Provide pre-contract author setup workspace after author acceptance and before agreement/payment generation | Complete / Operational; Decision 3 canon correction applied | Author acceptance; workspace surface; approved pre-contract setup model | Workspace shows only Author Onboarding, Financial Setup, and Royalty Setup until setup is complete; full workspace remains hidden; author/project-specific data requires Dataverse-backed access |
 | OP-004 | ISBN / LCCN / Copyright Registration Command Center | Manage registration tasks, identifiers, evidence, blockers, and approvals | Complete / Operational | OP-003 or approved internal command center path | Registration tasks, statuses, evidence, and blockers are trackable |
-| OP-005 | Editorial Command Center | Run editorial workflow from manuscript intake through editorial approval | Complete / Operational | OP-004; manuscript and editorial stage records | Editorial status, tasks, approvals, and files are operationally visible |
+| OP-005 | Editorial Command Center | Run editorial workflow from manuscript intake through exception-driven recommendation send and editorial approval | Complete / Operational; exception-driven automation correction underway | OP-004; manuscript and editorial stage records | Standard Editorial Review path sends recommendation automatically; named exceptions route to Publisher Review Required; editorial status, tasks, approvals, and files are operationally visible |
 | OP-006 | Cover Design Command Center | Coordinate cover design assets, status, approvals, and handoff | Complete / Operational | OP-005 | Cover design workflow and approval state are trackable without live vendor, distribution, or release action |
 | OP-007 | Interior Layout Command Center | Coordinate interior layout, proof readiness, and production file handoff | Complete / Operational | OP-006; Stage 7a manuscript proofread | Interior layout workflow, proof cycles, Stage 7b re-entry, and production file readiness are trackable |
 | OP-008 | Production Readiness / Distribution Gate | Confirm final metadata, files, BP-06, BP-09, BP-10, release lock, and publisher approval before distribution preparation | Complete / Operational | OP-007; BP-06; BP-09; BP-10 | Production readiness and distribution gate state are visible without submission, launch, or release action |
@@ -69,7 +70,7 @@ OP-001 is the workspace foundation:
 - SharePoint write authentication has been restored and Dataverse workspace fields are now available
 - Dataverse remains the stage/status authority
 
-Workspace location represents the last successfully completed governance gate, not the stage currently being attempted. `00_Inquiry` remains active while intake, manuscript receipt, and Editorial Review are pending or running. The workspace moves from `00_Inquiry` to `01_Manuscript_Review` only after Editorial Review is complete, Publisher review is complete, and the recommendation is approved/sent. Movement to production-stage folders waits until author acceptance, agreement/payment gates, and production activation are satisfied.
+Workspace location represents the last successfully completed governance gate, not the stage currently being attempted. `00_Inquiry` remains active while intake, manuscript receipt, and Editorial Review are pending or running. The workspace moves from `00_Inquiry` to `01_Manuscript_Review` only after Editorial Review is complete, any required exception Publisher Review is complete, and the recommendation is sent. Movement to production-stage folders waits until author acceptance, agreement/payment gates, and production activation are satisfied.
 
 Every movement must confirm Dataverse status update, required gate/approval, `jm1_executionlog` transition evidence where practical, successful SharePoint move, and Dataverse workspace URL/folder ID/stage writeback.
 
@@ -97,6 +98,26 @@ JM Signature is publisher-selected, invitation-only, not purchasable, not packag
 AI may flag `Potential JM Signature Candidate`; Publisher decides.
 
 JM Signature is captured as a governance overlay now. It is not moved ahead of the core production machine. Each OP module must answer whether it needs JM Signature-specific governance.
+
+## OP-000 Adoption / Recovery / Catalog Certification
+
+OP-000 is the entry point for legacy, active, and published titles entering PROGRAM-002.
+
+Tracks:
+
+- Track A: Active Pipeline Adoption for titles already in Editorial, Production, Distribution, or Marketing.
+- Track B: Published Author Workspace Adoption for distributed titles and authors already receiving royalties.
+- Track C: Catalog Certification for metadata, ISBNs, files, contracts, royalty terms, distribution, marketing assets, production assets, author relationship, workspace, execution history, imprint, and JM Signature review.
+
+OP-000 never requires legacy titles to restart `/join`, never repeats completed production work, and never duplicates workspaces, contracts, or royalty records.
+
+## Publisher-Certified Automation
+
+Publisher Review is exception-driven, not the default path.
+
+Standard OP-005 results automatically lock the imprint, persist recommended package and alternate package, generate and send the author recommendation, and await author response.
+
+Publisher Review is required only for named exceptions: JM Signature Candidate, Hard Stop, Legal Review, Rights Review, Ethics Review, Confidence Review, Publisher Override Requested, or Doctrine Conflict.
 
 ## Management by Exception
 

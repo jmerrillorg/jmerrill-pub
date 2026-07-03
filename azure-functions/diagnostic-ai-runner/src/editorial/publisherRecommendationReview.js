@@ -4,10 +4,10 @@
  * Publisher Recommendation review surface for PROGRAM-002.
  *
  * This module reads the existing pre-package Editorial Review result,
- * prepares a safe Publisher-facing review packet, and can persist a draft
- * author recommendation for later human approval. It does not send email,
- * create Opportunities, generate agreements, touch Stripe/BC/royalties, move
- * SharePoint folders, or start production.
+ * prepares a safe Publisher-facing review packet for exception cases, and
+ * can persist a draft author recommendation. It does not create Opportunities,
+ * generate agreements, touch Stripe/BC/royalties, move SharePoint folders, or
+ * start production.
  */
 
 const { createAuthorDraftDataverseClient } = require("../dataverse/authorDraftPersistenceClient");
@@ -72,6 +72,17 @@ const PUBLISHER_ACTION = Object.freeze({
   APPROVE_SEND: "Approve & Send Recommendation",
   OVERRIDE: "Override Recommendation",
   HOLD: "Hold / Needs Review"
+});
+
+const PUBLISHER_REVIEW_REASON_LABELS = Object.freeze({
+  SIGNATURE_SIGNAL_PREEXISTING: "JM Signature Candidate",
+  SIGNATURE_CANDIDATE_DETECTED: "JM Signature Candidate",
+  LOW_CONFIDENCE: "Confidence Review",
+  RIGHTS_OR_DISCLOSURE_RISK: "Rights Review",
+  NOT_A_FIT_OR_RISK_FLAGGED: "Hard Stop",
+  AMBIGUOUS_AFTER_CONTENT_REVIEW: "Confidence Review",
+  AI_REVIEW_TECHNICAL_FAILURE: "Confidence Review",
+  PACKAGE_MISMATCH: "Doctrine Conflict"
 });
 
 function normalizeString(value) {
@@ -214,7 +225,7 @@ function buildPackageRationale({ diagnostic, logSummary }) {
   const pieces = [
     `${code} is recommended because the manuscript is a substantial full-length work and needs a professional editorial path before agreement/onboarding.`,
     alternate ? `${alternate} remains the lower-scope alternative if Jackie chooses a narrower starting path.` : null,
-    "Payment options, contracts, production, and workspace movement remain blocked until Publisher approval and later lifecycle gates."
+    "Payment options, contracts, production, and workspace movement remain blocked until author acceptance and later lifecycle gates."
   ].filter(Boolean);
   return pieces.join(" ");
 }
@@ -230,10 +241,10 @@ function buildAuthorRecommendationDraftBody({ authorName, projectTitle, packageL
       : "If you would like to talk through scope before deciding, we can discuss the best path together.",
     "",
     imprintLabel
-      ? `The imprint recommendation for this project is ${imprintLabel}, pending final publisher confirmation.`
-      : "The imprint recommendation is still being held for final publisher confirmation.",
+      ? `The imprint recommendation for this project is ${imprintLabel}.`
+      : "If an imprint question remains, we will address it before agreement preparation.",
     "",
-    "The next step is a publisher conversation or reply confirming how you would like to proceed. We will not move into agreement, payment, or production until you are ready and the required steps are complete.",
+    "The next step is a publisher conversation or reply confirming how you would like to proceed. You may accept this recommendation, request a different package, or send questions before agreement/payment steps begin.",
     "",
     "Warmly,",
     "J Merrill Publishing"
@@ -264,6 +275,14 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
     signatureReviewRequired: diagnostic.jm1pub_signaturereviewrequired === true
   };
   const flagList = Object.entries(flags).filter(([, value]) => value).map(([key]) => key);
+  const publisherReviewReason = flags.signatureReviewRequired
+    ? "JM Signature Candidate"
+    : (flagList.includes("hardStop") ? "Hard Stop" :
+      flagList.includes("legal") ? "Legal Review" :
+        flagList.includes("rightsConcern") || flagList.includes("permissionsRequired") || flagList.includes("thirdPartyContentDetected") ? "Rights Review" :
+          flagList.includes("ethics") ? "Ethics Review" :
+            PUBLISHER_REVIEW_REASON_LABELS[logSummary.humanReviewReason] || null);
+  const publisherReviewRequired = Boolean(publisherReviewReason);
   const packageRationale = buildPackageRationale({ diagnostic, logSummary });
   const authorDraft = {
     subject: `Publishing recommendation for ${projectTitle}`,
@@ -286,9 +305,7 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
     dataverse: {
       diagnosticEntity: DIAGNOSTIC_ENTITY_SET,
       diagnosticStatus: diagnostic.jm1pub_diagnosticstatus,
-      diagnosticStatusLabel: diagnostic.jm1pub_diagnosticstatus === DIAGNOSTIC_STATUS.AWAITING_JACKIE_REVIEW
-        ? "Publisher Approval Required"
-        : "Not currently awaiting publisher approval"
+      diagnosticStatusLabel: publisherReviewRequired ? "Publisher Review Required" : "Recommendation Ready/Sent"
     },
     author: { name: authorName, email: authorEmail || null },
     project: {
@@ -307,21 +324,24 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
       label: imprintLabel,
       dataverseValue: diagnostic.jm1pub_recommendedimprint ?? null,
       locked: diagnostic.jm1pub_imprintlocked === true,
-      status: imprintLabel ? "Recommended" : "Publisher confirmation required"
+      status: imprintLabel ? (diagnostic.jm1pub_imprintlocked === true ? "Assigned and locked" : "Recommended") : "Exception review required"
     },
     editorialPathRecommendation: {
-      status: "Publisher Approval Required",
-      nextStep: "Jackie reviews, approves/sends, overrides, or holds for review.",
-      agreementReadiness: logSummary.agreementReadiness || "BLOCKED_HUMAN_REVIEW_REQUIRED"
+      status: publisherReviewRequired ? "Publisher Review Required" : "Recommendation Ready",
+      reason: publisherReviewReason,
+      nextStep: publisherReviewRequired
+        ? "Jackie resolves the exception, overrides, or holds for review."
+        : "Author recommendation may send automatically under publisher-certified automation.",
+      agreementReadiness: logSummary.agreementReadiness || (publisherReviewRequired ? "BLOCKED_HUMAN_REVIEW_REQUIRED" : "READY_FOR_AGREEMENT")
     },
     packageOptionsRationale: packageRationale,
     flags: flagList.length > 0 ? flagList : ["none"],
     authorFacingRecommendationDraft: authorDraft,
-    actions: [
+    actions: publisherReviewRequired ? [
       PUBLISHER_ACTION.APPROVE_SEND,
       PUBLISHER_ACTION.OVERRIDE,
       PUBLISHER_ACTION.HOLD
-    ],
+    ] : [],
     executionLog: executionLog ? {
       id: executionLog.jm1_executionlogid,
       name: executionLog.jm1_name,
