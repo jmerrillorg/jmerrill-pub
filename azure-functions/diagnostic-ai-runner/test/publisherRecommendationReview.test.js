@@ -32,7 +32,7 @@ function context(overrides = {}) {
       ...overrides.diagnostic
     },
     intake: {
-      jm1_referencecode: INTAKE_REFERENCE,
+      jm1_intakereferencecode: INTAKE_REFERENCE,
       jm1_firstname: "Jackie",
       jm1_lastname: "Smith Jr",
       jm1_email: "author@example.com",
