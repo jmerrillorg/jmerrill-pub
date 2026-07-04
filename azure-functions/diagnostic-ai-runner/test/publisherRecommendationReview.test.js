@@ -75,7 +75,10 @@ describe("buildRecommendationView", () => {
       intakeReferenceCode: INTAKE_REFERENCE
     });
     assert.equal(view.recommendedPackage.code, "JMP-PKG-PRO");
-    assert.equal(view.recommendedPackage.label, "JMP-PKG-PRO / Professional Publishing Package");
+    assert.equal(view.recommendedPackage.label, "Professional Publishing Package");
+    assert.equal(view.recommendedPackage.price, "$4,500");
+    assert.equal(view.alternatePackage.name, "Starter Publishing Package");
+    assert.equal(view.alternatePackage.price, "$1,999");
     assert.equal(view.editorialPathRecommendation.status, "Recommendation Ready");
     assert.deepEqual(view.flags, ["none"]);
     assert.deepEqual(view.actions, []);
@@ -104,7 +107,29 @@ describe("buildRecommendationView", () => {
     assert.equal(view.authorFacingRecommendationDraft.sendStatus, "DRAFT_ONLY");
     assert.equal(view.authorFacingRecommendationDraft.approvalStatus, "PENDING_HUMAN_APPROVAL");
     assert.ok(view.authorFacingRecommendationDraft.body.includes("Professional Publishing Package"));
+    assert.ok(view.authorFacingRecommendationDraft.body.includes("$4,500"));
+    assert.ok(view.authorFacingRecommendationDraft.body.includes("Starter Publishing Package"));
+    assert.ok(view.authorFacingRecommendationDraft.body.includes("$1,999"));
     assert.ok(!JSON.stringify(view).includes("sendNow"));
+  });
+
+  test("author-facing Why-First draft uses first name, hides SKUs, and excludes payment mechanics", () => {
+    const view = buildRecommendationView(context(), {
+      diagnosticId: DIAGNOSTIC_ID,
+      intakeReferenceCode: INTAKE_REFERENCE
+    });
+    const body = view.authorFacingRecommendationDraft.body;
+
+    assert.match(body, /^Hello Jackie,/);
+    assert.match(body, /editorial why/i);
+    assert.match(body, /The Intentional Leader/);
+    assert.match(body, /Executive Devotional/);
+    assert.match(body, /Professional Publishing Package at \$4,500/);
+    assert.match(body, /Starter Publishing Package at \$1,999/);
+    assert.match(body, /To move forward, simply reply to this email with your preferred package\./);
+    assert.equal(body.includes("JMP-PKG-"), false);
+    assert.equal(/Stripe|payment link|invoice|credit card|SignNow|workspace access code/i.test(body), false);
+    assert.equal(/\|.+\|/.test(body), false);
   });
 });
 
