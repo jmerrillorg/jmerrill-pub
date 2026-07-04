@@ -25,13 +25,14 @@ const ACTION = Object.freeze({
   APPROVE_SEND: "APPROVE_SEND_RECOMMENDATION",
   OVERRIDE: "OVERRIDE_RECOMMENDATION",
   HOLD: "HOLD_NEEDS_REVIEW",
-  RESEND_WHY_FIRST: "RESEND_WHY_FIRST_RECOMMENDATION"
+  RESEND_WHY_FIRST: "RESEND_WHY_FIRST_RECOMMENDATION",
+  RESEND_EDITORIAL_RECOMMENDATION_LETTER: "RESEND_EDITORIAL_RECOMMENDATION_LETTER"
 });
 
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
 const RESEND_EVENT = Object.freeze({
   SUPERSEDED: "AUTHOR_RECOMMENDATION_SUPERSEDED",
-  REPLACEMENT_SENT: "AUTHOR_RECOMMENDATION_REPLACEMENT_SENT"
+  REPLACEMENT_SENT: "EDITORIAL_RECOMMENDATION_LETTER_REPLACEMENT_SENT"
 });
 
 function safeTrim(value) {
@@ -161,7 +162,7 @@ function buildRecommendationResendEventPayload({
       "No manuscript text, prompt body, raw model output, secrets, tokens, or headers stored."
     ].join(" ").slice(0, 1000),
     jm1_agentname: AGENT_NAME,
-    jm1_agentmodel: "publisher-recommendation-why-first-resend",
+    jm1_agentmodel: "editorial-recommendation-letter-resend",
     jm1_bandlevel: BAND_LEVEL.BAND_1,
     jm1_executionstatus: EXECUTION_STATUS.SUCCESS,
     jm1_startedon: occurredAt,
@@ -217,7 +218,7 @@ app.http("run-publisher-recommendation-action", {
     if (!approvedBy) {
       return { status: 400, jsonBody: { status: "error", code: "APPROVED_BY_MISSING" } };
     }
-    if (action === ACTION.RESEND_WHY_FIRST) {
+    if (action === ACTION.RESEND_WHY_FIRST || action === ACTION.RESEND_EDITORIAL_RECOMMENDATION_LETTER) {
       const result = await runPublisherRecommendationAction({
         diagnosticId,
         intakeReferenceCode,
@@ -378,7 +379,9 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
   if (!confirmAction) return blocked("CONFIRM_PUBLISHER_RECOMMENDATION_ACTION_REQUIRED", { diagnosticId, intakeReferenceCode });
   if (!Object.values(ACTION).includes(action)) return blocked("PUBLISHER_RECOMMENDATION_ACTION_UNSUPPORTED", { diagnosticId, intakeReferenceCode });
   if (!approvedBy) return blocked("APPROVED_BY_MISSING", { diagnosticId, intakeReferenceCode });
-  if (action !== ACTION.RESEND_WHY_FIRST) return blocked("USE_HTTP_HANDLER_FOR_LEGACY_ACTIONS", { diagnosticId, intakeReferenceCode });
+  if (action !== ACTION.RESEND_WHY_FIRST && action !== ACTION.RESEND_EDITORIAL_RECOMMENDATION_LETTER) {
+    return blocked("USE_HTTP_HANDLER_FOR_LEGACY_ACTIONS", { diagnosticId, intakeReferenceCode });
+  }
   if (!confirmSend) return blocked("CONFIRM_REPLACEMENT_SEND_REQUIRED", { diagnosticId, intakeReferenceCode });
 
   const prepareDraft = deps.prepareDraft || preparePublisherRecommendationDraft;
@@ -396,7 +399,7 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
   const sendApproval = toSendApproval({
     view: draftResult.view,
     approvedBy,
-    templateName: "WHY_FIRST_RECOMMENDATION_V1"
+    templateName: "EDITORIAL_RECOMMENDATION_LETTER_V1"
   });
 
   const superseded = await persistResendEvent({

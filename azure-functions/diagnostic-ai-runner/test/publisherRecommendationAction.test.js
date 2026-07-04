@@ -27,19 +27,33 @@ function draftResult() {
         title: "The Intentional Leader"
       },
       authorFacingRecommendationDraft: {
-        subject: "Publishing recommendation for The Intentional Leader",
+        subject: "Editorial Recommendation Letter for The Intentional Leader",
         body: [
-          "Hello Jackie,",
+          "J Merrill Publishing",
+          "Editorial Recommendation Letter",
           "",
-          "Thank you for trusting J Merrill Publishing with The Intentional Leader. Before we talk about contracts or payment, I want to start with the editorial why.",
+          "Good day, Jackie,",
           "",
-          "Our recommendation is the Professional Publishing Package at $4,500.",
+          "Before we ever ask an author to invest in us, we first invest in understanding their manuscript.",
           "",
-          "A narrower alternative is the Starter Publishing Package at $1,999.",
+          "Editorial Review Summary",
           "",
-          "To move forward, simply reply to this email with your preferred package. Once we receive your confirmation, we'll prepare your Author Workspace and guide you through the next steps."
+          "Our Recommendation",
+          "",
+          "Professional Publishing Package",
+          "$4,500",
+          "",
+          "Another Publishing Path",
+          "",
+          "Starter Publishing Package at $1,999 is another publishing path you may consider.",
+          "",
+          "If you're ready to begin your publishing journey with J Merrill Publishing, simply reply to this email with your preferred package.",
+          "",
+          "As soon as we receive your confirmation, we'll prepare your Author Workspace and guide you through the next steps together.",
+          "",
+          "The J Merrill Publishing Team"
         ].join("\n"),
-        templateName: "AUTHOR_RESPONSE_DRAFT_V1",
+        templateName: "EDITORIAL_RECOMMENDATION_LETTER_V1",
         internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX
       }
     }
@@ -52,7 +66,7 @@ describe("publisher recommendation replacement resend", () => {
       eventType: RESEND_EVENT.SUPERSEDED,
       diagnosticId: DIAGNOSTIC_ID,
       intakeReferenceCode: INTAKE_REFERENCE,
-      subject: "Publishing recommendation for The Intentional Leader",
+      subject: "Editorial Recommendation Letter for The Intentional Leader",
       approvedBy: "jackie"
     });
 
@@ -62,7 +76,7 @@ describe("publisher recommendation replacement resend", () => {
     assert.equal(/secret|token|header|prompt body|manuscript text/i.test(payload.jm1_actiondescription), true);
   });
 
-  test("sends exactly one Why-First replacement and logs superseded plus replacement events", async () => {
+  test("sends exactly one Editorial Recommendation Letter replacement and logs superseded plus replacement events", async () => {
     const events = [];
     const sends = [];
     const sendLogs = [];
@@ -70,7 +84,7 @@ describe("publisher recommendation replacement resend", () => {
     const result = await runPublisherRecommendationAction({
       diagnosticId: DIAGNOSTIC_ID,
       intakeReferenceCode: INTAKE_REFERENCE,
-      action: ACTION.RESEND_WHY_FIRST,
+      action: ACTION.RESEND_EDITORIAL_RECOMMENDATION_LETTER,
       approvedBy: "jackie",
       confirmAction: true,
       confirmSend: true
@@ -102,12 +116,14 @@ describe("publisher recommendation replacement resend", () => {
     assert.equal(result.authorRecommendationSent, true);
     assert.deepEqual(events, [
       "AUTHOR_RECOMMENDATION_SUPERSEDED",
-      "AUTHOR_RECOMMENDATION_REPLACEMENT_SENT"
+      "EDITORIAL_RECOMMENDATION_LETTER_REPLACEMENT_SENT"
     ]);
     assert.equal(sends.length, 1);
     assert.equal(sendLogs.length, 1);
-    assert.equal(sends[0].templateName, "WHY_FIRST_RECOMMENDATION_V1");
+    assert.equal(sends[0].templateName, "EDITORIAL_RECOMMENDATION_LETTER_V1");
+    assert.match(sends[0].draftBody, /Editorial Recommendation Letter/);
+    assert.match(sends[0].draftBody, /Before we ever ask an author to invest in us/);
     assert.equal(sends[0].draftBody.includes("JMP-PKG-"), false);
-    assert.equal(/Stripe|payment link|invoice|credit card|SignNow/i.test(sends[0].draftBody), false);
+    assert.equal(/Stripe|payment link|invoice|credit card|SignNow|workspace access code/i.test(sends[0].draftBody), false);
   });
 });

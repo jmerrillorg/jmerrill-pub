@@ -26,6 +26,11 @@ const { DIAGNOSTIC_ID_PATTERN, INTAKE_REFERENCE_PATTERN } = require("../queue/di
 
 const PERSISTENCE_ERROR_CODE = "AUTHOR_DRAFT_PERSISTENCE_FAILED";
 const WRITE_ERROR_CODE = "AUTHOR_DRAFT_PERSISTENCE_FAILED";
+const EDITORIAL_RECOMMENDATION_LETTER_TEMPLATE = "EDITORIAL_RECOMMENDATION_LETTER_V1";
+const ALLOWED_TEMPLATE_NAMES = Object.freeze([
+  TEMPLATE_NAME,
+  EDITORIAL_RECOMMENDATION_LETTER_TEMPLATE
+]);
 
 const FORBIDDEN_DRAFT_PERSISTENCE_FIELDS = [
   ...AUTHOR_DRAFT_UNMAPPED_UNSAFE_FIELDS
@@ -165,7 +170,7 @@ function validateAuthorDraftPayload(draftPayload) {
   if (!draftBody) {
     return { ok: false, reason: "DRAFT_BODY_MISSING" };
   }
-  if (templateName !== TEMPLATE_NAME) {
+  if (!ALLOWED_TEMPLATE_NAMES.includes(templateName)) {
     return { ok: false, reason: "TEMPLATE_NAME_INVALID" };
   }
   if (draftPayload.sendStatus !== DRAFT_STATUS) {
@@ -270,7 +275,7 @@ async function persistAuthorResponseDraft(input = {}) {
       persisted: true,
       diagnosticId: draftRecord.diagnosticId,
       intakeReferenceCode: draftRecord.intakeReferenceCode,
-      templateName: TEMPLATE_NAME,
+      templateName: draftRecord.templateName,
       sendStatus: DRAFT_STATUS,
       approvalStatus: DRAFT_APPROVAL_STATUS,
       internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
@@ -294,5 +299,7 @@ module.exports = {
   SAFE_DRAFT_FIELDS,
   FORBIDDEN_DRAFT_PERSISTENCE_FIELDS,
   PERSISTENCE_ERROR_CODE,
-  WRITE_ERROR_CODE
+  WRITE_ERROR_CODE,
+  EDITORIAL_RECOMMENDATION_LETTER_TEMPLATE,
+  ALLOWED_TEMPLATE_NAMES
 };
