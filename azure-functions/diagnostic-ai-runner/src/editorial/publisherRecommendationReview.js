@@ -268,10 +268,15 @@ function packageDetailsFrom({ packageCode, packageValue }) {
   return code ? PACKAGE_DETAILS_BY_CODE[code] || null : null;
 }
 
+function indefiniteArticleFor(value) {
+  const text = normalizeString(value);
+  return /^[aeiou]/i.test(text) ? "an" : "a";
+}
+
 function buildWhyFirstEditorialSummary({ projectTitle, workType, genre, wordCount, imprintLabel }) {
   const details = [
     workType ? `a ${workType.toLowerCase()}` : "a book-length manuscript",
-    genre ? `with a ${genre} focus` : null,
+    genre ? `with ${indefiniteArticleFor(genre)} ${genre} focus` : null,
     typeof wordCount === "number" ? `at approximately ${wordCount.toLocaleString("en-US")} words` : null
   ].filter(Boolean).join(" ");
 
