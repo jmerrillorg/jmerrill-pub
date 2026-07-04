@@ -124,6 +124,7 @@ describe("buildRecommendationView", () => {
     assert.match(body, /editorial why/i);
     assert.match(body, /The Intentional Leader/);
     assert.match(body, /Executive Devotional/);
+    assert.match(body, /with an Executive Devotional focus/);
     assert.match(body, /Professional Publishing Package at \$4,500/);
     assert.match(body, /Starter Publishing Package at \$1,999/);
     assert.match(body, /To move forward, simply reply to this email with your preferred package\./);
