@@ -113,23 +113,36 @@ describe("buildRecommendationView", () => {
     assert.ok(!JSON.stringify(view).includes("sendNow"));
   });
 
-  test("author-facing Why-First draft uses first name, hides SKUs, and excludes payment mechanics", () => {
+  test("author-facing Editorial Recommendation Letter uses canon structure, first name, and safe recommendation fields", () => {
     const view = buildRecommendationView(context(), {
       diagnosticId: DIAGNOSTIC_ID,
       intakeReferenceCode: INTAKE_REFERENCE
     });
     const body = view.authorFacingRecommendationDraft.body;
 
-    assert.match(body, /^Hello Jackie,/);
-    assert.match(body, /editorial why/i);
+    assert.equal(view.authorFacingRecommendationDraft.subject, "Editorial Recommendation Letter for The Intentional Leader");
+    assert.equal(view.authorFacingRecommendationDraft.templateName, "EDITORIAL_RECOMMENDATION_LETTER_V1");
+    assert.match(body, /^J Merrill Publishing\nEditorial Recommendation Letter/);
+    assert.match(body, /Good day, Jackie,/);
+    assert.match(body, /Before we ever ask an author to invest in us, we first invest in understanding their manuscript\./);
+    assert.match(body, /Every book we receive is reviewed with one goal in mind/);
+    assert.match(body, /Editorial Review Summary/);
     assert.match(body, /The Intentional Leader/);
     assert.match(body, /Executive Devotional/);
     assert.match(body, /with an Executive Devotional focus/);
-    assert.match(body, /Professional Publishing Package at \$4,500/);
+    assert.match(body, /Our Recommendation/);
+    assert.match(body, /Professional Publishing Package\n\$4,500/);
+    assert.match(body, /Developmental editing, line editing, copyediting, and optional AI audiobook production/);
+    assert.match(body, /Another Publishing Path/);
     assert.match(body, /Starter Publishing Package at \$1,999/);
-    assert.match(body, /To move forward, simply reply to this email with your preferred package\./);
+    assert.match(body, /Recommended Imprint/);
+    assert.match(body, /Ready to Move Forward\?/);
+    assert.match(body, /If you're ready to begin your publishing journey with J Merrill Publishing, simply reply to this email with your preferred package\./);
+    assert.match(body, /As soon as we receive your confirmation, we'll prepare your Author Workspace and guide you through the next steps together\./);
+    assert.match(body, /The J Merrill Publishing Team/);
+    assert.ok(view.authorWorkspaceArtifact.body.includes("Editorial Recommendation Letter"));
     assert.equal(body.includes("JMP-PKG-"), false);
-    assert.equal(/Stripe|payment link|invoice|credit card|SignNow|workspace access code/i.test(body), false);
+    assert.equal(/Stripe|payment link|invoice|credit card|SignNow|workspace access code|onboarding checklist|financing/i.test(body), false);
     assert.equal(/\|.+\|/.test(body), false);
   });
 });
