@@ -8,16 +8,30 @@ const {
   preparePublisherRecommendationDraft
 } = require("../editorial/publisherRecommendationReview");
 const { sendConfiguredAuthorResponse } = require("../author/authorResponseSendProviderConfig");
+const { persistAuthorResponseSendLog } = require("../author/authorResponseSendPersister");
 const {
   buildAuthorDraftApprovalUpdate,
   AUTHOR_DRAFT_APPROVAL_DECISION
 } = require("../author/authorDraftApprovalDecisionModel");
 const { ENTITY_SET } = require("../author/authorDraftFieldMap");
+const {
+  AGENT_NAME,
+  BAND_LEVEL,
+  EXECUTION_STATUS,
+  SOURCE_ENTITY
+} = require("../dataverse/metadataWriter");
 
 const ACTION = Object.freeze({
   APPROVE_SEND: "APPROVE_SEND_RECOMMENDATION",
   OVERRIDE: "OVERRIDE_RECOMMENDATION",
-  HOLD: "HOLD_NEEDS_REVIEW"
+  HOLD: "HOLD_NEEDS_REVIEW",
+  RESEND_WHY_FIRST: "RESEND_WHY_FIRST_RECOMMENDATION"
+});
+
+const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
+const RESEND_EVENT = Object.freeze({
+  SUPERSEDED: "AUTHOR_RECOMMENDATION_SUPERSEDED",
+  REPLACEMENT_SENT: "AUTHOR_RECOMMENDATION_REPLACEMENT_SENT"
 });
 
 function safeTrim(value) {
@@ -38,7 +52,7 @@ function blocked(reason, extra = {}) {
   return { ok: false, code: "PUBLISHER_RECOMMENDATION_ACTION_BLOCKED", reason, ...extra };
 }
 
-function toSendApproval({ view, approvedBy }) {
+function toSendApproval({ view, approvedBy, templateName = null }) {
   return {
     diagnosticId: view.diagnosticId,
     intakeReferenceCode: view.intakeReferenceCode,
@@ -48,7 +62,7 @@ function toSendApproval({ view, approvedBy }) {
     internalVisibilityMailbox: view.authorFacingRecommendationDraft.internalVisibilityMailbox,
     draftSubject: view.authorFacingRecommendationDraft.subject,
     draftBody: view.authorFacingRecommendationDraft.body,
-    templateName: view.authorFacingRecommendationDraft.templateName,
+    templateName: templateName || view.authorFacingRecommendationDraft.templateName,
     decision: "APPROVE_AUTHOR_SEND",
     sendApproved: true,
     approvedBy,
@@ -92,6 +106,82 @@ async function persistApprovalDecision({ diagnosticId, approvalUpdate, token }) 
   return patchDataverseRecord(apiBase, token, ENTITY_SET, diagnosticId, approvalUpdate.dataverseUpdatePayload);
 }
 
+function createDataverseCreateClient() {
+  return {
+    async createRecord(entitySet, payload) {
+      const apiBase = process.env.DATAVERSE_WEB_API_BASE_URL;
+      const resourceUrl = process.env.DATAVERSE_RESOURCE_URL;
+      if (!apiBase || !resourceUrl) {
+        throw Object.assign(new Error("Dataverse configuration missing"), {
+          safeCode: "DATAVERSE_CONFIG_MISSING"
+        });
+      }
+      const token = await getDataverseToken(resourceUrl);
+      const response = await fetch(`${apiBase.replace(/\/$/, "")}/${entitySet}`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "OData-MaxVersion": "4.0",
+          "OData-Version": "4.0",
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw Object.assign(new Error(`Dataverse create failed: HTTP ${response.status}`), {
+          safeCode: "DATAVERSE_WRITE_FAILED",
+          httpStatus: response.status
+        });
+      }
+      return { id: result.jm1_executionlogid || result.id || null };
+    }
+  };
+}
+
+function buildRecommendationResendEventPayload({
+  eventType,
+  diagnosticId,
+  intakeReferenceCode,
+  subject,
+  approvedBy,
+  occurredAt = new Date().toISOString()
+}) {
+  return {
+    jm1_name: `${eventType}-${diagnosticId}`,
+    jm1_actiontype: eventType,
+    jm1_actiondescription: [
+      `${eventType} for intake ${intakeReferenceCode}.`,
+      `Subject ${safeTrim(subject)}.`,
+      `Approved by ${safeTrim(approvedBy)}.`,
+      "Prior recommendation/email supersession and replacement send evidence only.",
+      "Workflow remains Awaiting Author Response.",
+      "No package recommendation change. No editorial review change. No Opportunity, Stripe, Business Central, royalty, payment, contract, production, distribution, launch, or marketing action occurred.",
+      "No manuscript text, prompt body, raw model output, secrets, tokens, or headers stored."
+    ].join(" ").slice(0, 1000),
+    jm1_agentname: AGENT_NAME,
+    jm1_agentmodel: "publisher-recommendation-why-first-resend",
+    jm1_bandlevel: BAND_LEVEL.BAND_1,
+    jm1_executionstatus: EXECUTION_STATUS.SUCCESS,
+    jm1_startedon: occurredAt,
+    jm1_completedon: occurredAt,
+    jm1_sourceentity: SOURCE_ENTITY,
+    jm1_sourcerecordid: diagnosticId
+  };
+}
+
+async function persistRecommendationResendEvent(input = {}, dataverseClient = createDataverseCreateClient()) {
+  const payload = buildRecommendationResendEventPayload(input);
+  const result = await dataverseClient.createRecord(EXECUTION_LOG_ENTITY_SET, payload);
+  return {
+    ok: true,
+    entitySet: EXECUTION_LOG_ENTITY_SET,
+    id: safeTrim(result?.id) || null,
+    eventType: input.eventType
+  };
+}
+
 app.http("run-publisher-recommendation-action", {
   methods: ["POST"],
   authLevel: "anonymous",
@@ -126,6 +216,20 @@ app.http("run-publisher-recommendation-action", {
     }
     if (!approvedBy) {
       return { status: 400, jsonBody: { status: "error", code: "APPROVED_BY_MISSING" } };
+    }
+    if (action === ACTION.RESEND_WHY_FIRST) {
+      const result = await runPublisherRecommendationAction({
+        diagnosticId,
+        intakeReferenceCode,
+        action,
+        approvedBy,
+        confirmAction,
+        confirmSend
+      });
+      return {
+        status: result.ok ? 200 : 422,
+        jsonBody: result
+      };
     }
 
     const draftResult = await preparePublisherRecommendationDraft({ diagnosticId, intakeReferenceCode }, deps);
@@ -236,6 +340,15 @@ app.http("run-publisher-recommendation-action", {
       `Publisher recommendation send attempted; diagnosticId=${diagnosticId}; ok=${sendResult.ok}; code=${sendResult.code || sendResult.reason}; providerCalled=${sendResult.providerCalled === true}`
     );
 
+    const logResult = sendResult.ok && sendResult.deliveryStatus === "AUTHOR_RESPONSE_SENT"
+      ? await persistAuthorResponseSendLog({
+        sendApproval,
+        deliveryResult: sendResult,
+        providerName: sendResult.providerName,
+        providerMessageId: sendResult.providerMessageId
+      }, createDataverseCreateClient())
+      : null;
+
     return {
       status: sendResult.ok && sendResult.deliveryStatus === "AUTHOR_RESPONSE_SENT" ? 200 : 422,
       jsonBody: {
@@ -246,6 +359,7 @@ app.http("run-publisher-recommendation-action", {
         intakeReferenceCode,
         deliveryStatus: sendResult.deliveryStatus || null,
         internalVisibilityStatus: sendResult.internalVisibilityStatus || null,
+        dataverseSendLogStatus: logResult?.dataverseSendLogStatus || logResult?.reason || null,
         providerMessageId: sendResult.providerMessageId || null,
         authorRecommendationSent: sendResult.deliveryStatus === "AUTHOR_RESPONSE_SENT"
       }
@@ -253,4 +367,97 @@ app.http("run-publisher-recommendation-action", {
   }
 });
 
-module.exports = {};
+async function runPublisherRecommendationAction(input = {}, deps = {}) {
+  const diagnosticId = safeTrim(input.diagnosticId);
+  const intakeReferenceCode = safeTrim(input.intakeReferenceCode);
+  const action = safeTrim(input.action).toUpperCase();
+  const approvedBy = safeTrim(input.approvedBy || input.reviewerId);
+  const confirmAction = input.confirmAction === true;
+  const confirmSend = input.confirmSend === true;
+
+  if (!confirmAction) return blocked("CONFIRM_PUBLISHER_RECOMMENDATION_ACTION_REQUIRED", { diagnosticId, intakeReferenceCode });
+  if (!Object.values(ACTION).includes(action)) return blocked("PUBLISHER_RECOMMENDATION_ACTION_UNSUPPORTED", { diagnosticId, intakeReferenceCode });
+  if (!approvedBy) return blocked("APPROVED_BY_MISSING", { diagnosticId, intakeReferenceCode });
+  if (action !== ACTION.RESEND_WHY_FIRST) return blocked("USE_HTTP_HANDLER_FOR_LEGACY_ACTIONS", { diagnosticId, intakeReferenceCode });
+  if (!confirmSend) return blocked("CONFIRM_REPLACEMENT_SEND_REQUIRED", { diagnosticId, intakeReferenceCode });
+
+  const prepareDraft = deps.prepareDraft || preparePublisherRecommendationDraft;
+  const sendResponse = deps.sendResponse || sendConfiguredAuthorResponse;
+  const persistSendLog = deps.persistSendLog || persistAuthorResponseSendLog;
+  const persistResendEvent = deps.persistResendEvent || persistRecommendationResendEvent;
+  const dataverseClient = deps.dataverseClient || createDataverseCreateClient();
+
+  const draftResult = await prepareDraft({ diagnosticId, intakeReferenceCode }, {
+    getToken: getDataverseToken,
+    ...(deps.prepareDraftDeps || {})
+  });
+  if (!draftResult.ok) return draftResult;
+
+  const sendApproval = toSendApproval({
+    view: draftResult.view,
+    approvedBy,
+    templateName: "WHY_FIRST_RECOMMENDATION_V1"
+  });
+
+  const superseded = await persistResendEvent({
+    eventType: RESEND_EVENT.SUPERSEDED,
+    diagnosticId,
+    intakeReferenceCode,
+    subject: sendApproval.draftSubject,
+    approvedBy
+  }, dataverseClient);
+
+  const sendResult = await sendResponse({ input: { sendApproval } });
+  if (!sendResult.ok || sendResult.deliveryStatus !== "AUTHOR_RESPONSE_SENT") {
+    return {
+      ok: false,
+      code: "PUBLISHER_RECOMMENDATION_REPLACEMENT_SEND_BLOCKED",
+      reason: sendResult.reason || sendResult.code || "AUTHOR_RESPONSE_SEND_FAILED",
+      diagnosticId,
+      intakeReferenceCode,
+      supersededEventId: superseded.id || null,
+      deliveryStatus: sendResult.deliveryStatus || null,
+      authorRecommendationSent: false
+    };
+  }
+
+  const sendLog = await persistSendLog({
+    sendApproval,
+    deliveryResult: sendResult,
+    providerName: sendResult.providerName,
+    providerMessageId: sendResult.providerMessageId
+  }, dataverseClient);
+
+  const replacement = await persistResendEvent({
+    eventType: RESEND_EVENT.REPLACEMENT_SENT,
+    diagnosticId,
+    intakeReferenceCode,
+    subject: sendApproval.draftSubject,
+    approvedBy
+  }, dataverseClient);
+
+  return {
+    ok: true,
+    code: "PUBLISHER_RECOMMENDATION_REPLACEMENT_SENT",
+    diagnosticId,
+    intakeReferenceCode,
+    subject: sendApproval.draftSubject,
+    renderedBody: sendApproval.draftBody,
+    deliveryStatus: sendResult.deliveryStatus,
+    internalVisibilityStatus: sendResult.internalVisibilityStatus || null,
+    providerMessageId: sendResult.providerMessageId || null,
+    supersededEventId: superseded.id || null,
+    replacementEventId: replacement.id || null,
+    dataverseSendLogStatus: sendLog.dataverseSendLogStatus || sendLog.reason || null,
+    authorRecommendationSent: true,
+    workflowStatus: "Awaiting Author Response"
+  };
+}
+
+module.exports = {
+  ACTION,
+  RESEND_EVENT,
+  runPublisherRecommendationAction,
+  buildRecommendationResendEventPayload,
+  persistRecommendationResendEvent
+};

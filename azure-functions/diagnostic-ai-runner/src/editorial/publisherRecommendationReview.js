@@ -40,9 +40,9 @@ const INTAKE_FIELD = Object.freeze({
 });
 
 const RECOMMENDED_PACKAGE_LABELS = Object.freeze({
-  196650000: "JMP-PKG-STARTER / Starter Publishing Package",
-  196650001: "JMP-PKG-PRO / Professional Publishing Package",
-  196650002: "JMP-PKG-SIGNATURE / Signature Publishing Partnership",
+  196650000: "Starter Publishing Package",
+  196650001: "Professional Publishing Package",
+  196650002: "Signature Publishing Partnership",
   196650003: "JM Prestige Standard",
   196650004: "JM Prestige Premium",
   196650005: "Editorial Evaluation Only",
@@ -55,6 +55,29 @@ const PACKAGE_CODES_BY_VALUE = Object.freeze({
   196650000: "JMP-PKG-STARTER",
   196650001: "JMP-PKG-PRO",
   196650002: "JMP-PKG-SIGNATURE"
+});
+
+const PACKAGE_DETAILS_BY_CODE = Object.freeze({
+  "JMP-PKG-STARTER": {
+    name: "Starter Publishing Package",
+    price: "$1,999",
+    shortDifference: "Starter keeps the path lean: a focused publishing foundation for authors who want a smaller first step."
+  },
+  "JMP-PKG-PRO": {
+    name: "Professional Publishing Package",
+    price: "$4,500",
+    shortDifference: "Professional gives the manuscript a fuller editorial and production path, which better fits a substantial leadership/devotional book."
+  },
+  "JMP-PKG-SIGNATURE": {
+    name: "Signature Publishing Partnership",
+    price: "$7,500",
+    shortDifference: "Signature is reserved for selected partnership titles that need expanded publisher positioning and a higher-touch launch path."
+  },
+  "JMP-PKG-CHILD": {
+    name: "Children's Package, author provides art",
+    price: "$2,495",
+    shortDifference: "Children's Package is only for children's books where the author supplies usable art."
+  }
 });
 
 const WORK_TYPE_LABELS = Object.freeze({
@@ -222,29 +245,77 @@ function parseLogDescription(description) {
 function buildPackageRationale({ diagnostic, logSummary }) {
   const code = logSummary.recommendedPackageCode || PACKAGE_CODES_BY_VALUE[diagnostic.jm1pub_recommendedpackage] || "unknown";
   const alternate = logSummary.alternatePackageCode || (code === "JMP-PKG-PRO" ? "JMP-PKG-STARTER" : null);
+  const primary = PACKAGE_DETAILS_BY_CODE[code];
+  const alternative = PACKAGE_DETAILS_BY_CODE[alternate];
   const pieces = [
-    `${code} is recommended because the manuscript is a substantial full-length work and needs a professional editorial path before agreement/onboarding.`,
-    alternate ? `${alternate} remains the lower-scope alternative if Jackie chooses a narrower starting path.` : null,
+    primary
+      ? `${primary.name} is recommended because the manuscript is a substantial full-length work and needs a professional editorial path before agreement/onboarding.`
+      : `${code} is recommended because the manuscript needs a governed publishing path before agreement/onboarding.`,
+    alternative ? `${alternative.name} remains the lower-scope alternative if Jackie chooses a narrower starting path.` : null,
     "Payment options, contracts, production, and workspace movement remain blocked until author acceptance and later lifecycle gates."
   ].filter(Boolean);
   return pieces.join(" ");
 }
 
-function buildAuthorRecommendationDraftBody({ authorName, projectTitle, packageLabel, alternatePackageCode, imprintLabel }) {
+function firstNameFrom(value) {
+  const text = normalizeString(value);
+  if (!text) return "there";
+  return text.split(/\s+/)[0].replace(/[,.]+$/, "") || "there";
+}
+
+function packageDetailsFrom({ packageCode, packageValue }) {
+  const code = normalizeString(packageCode) || PACKAGE_CODES_BY_VALUE[packageValue] || null;
+  return code ? PACKAGE_DETAILS_BY_CODE[code] || null : null;
+}
+
+function buildWhyFirstEditorialSummary({ projectTitle, workType, genre, wordCount, imprintLabel }) {
+  const details = [
+    workType ? `a ${workType.toLowerCase()}` : "a book-length manuscript",
+    genre ? `with a ${genre} focus` : null,
+    typeof wordCount === "number" ? `at approximately ${wordCount.toLocaleString("en-US")} words` : null
+  ].filter(Boolean).join(" ");
+
   return [
-    `Hello ${authorName},`,
+    `We reviewed ${projectTitle} as ${details}.`,
+    imprintLabel ? `The project fits best under the ${imprintLabel} imprint.` : null,
+    "The manuscript shows enough substance for a serious publishing path, and it will benefit from a structured editorial and production process before the later business steps begin."
+  ].filter(Boolean).join(" ");
+}
+
+function buildAuthorRecommendationDraftBody({
+  authorName,
+  projectTitle,
+  recommendedPackage,
+  alternatePackage,
+  imprintLabel,
+  workType,
+  genre,
+  wordCount
+}) {
+  const greetingName = firstNameFrom(authorName);
+  const editorialSummary = buildWhyFirstEditorialSummary({ projectTitle, workType, genre, wordCount, imprintLabel });
+  const recommendation = recommendedPackage || {
+    name: "Professional Publishing Package",
+    price: "$4,500",
+    shortDifference: "Professional gives the manuscript a fuller editorial and production path."
+  };
+  const alternate = alternatePackage || null;
+  return [
+    `Hello ${greetingName},`,
     "",
-    `Thank you for giving J Merrill Publishing the opportunity to review ${projectTitle}. We have completed our initial editorial review and believe the best next publishing path is the ${packageLabel}.`,
+    `Thank you for trusting J Merrill Publishing with ${projectTitle}. I want to start with the editorial why: your manuscript needs a publishing path that gives the idea room to mature while keeping the next steps clear and governed.`,
     "",
-    alternatePackageCode
-      ? `If you would like a narrower starting point, we can also discuss ${alternatePackageCode} as an alternative path.`
-      : "If you would like to talk through scope before deciding, we can discuss the best path together.",
+    editorialSummary,
     "",
-    imprintLabel
-      ? `The imprint recommendation for this project is ${imprintLabel}.`
-      : "If an imprint question remains, we will address it before agreement preparation.",
+    `Our recommendation is the ${recommendation.name} at ${recommendation.price}. This is the strongest fit because it gives the manuscript a fuller editorial and production path instead of treating it as a quick setup project.`,
     "",
-    "The next step is a publisher conversation or reply confirming how you would like to proceed. You may accept this recommendation, request a different package, or send questions before agreement/payment steps begin.",
+    alternate
+      ? `A narrower alternative is the ${alternate.name} at ${alternate.price}. The main difference is scope: ${recommendation.shortDifference} ${alternate.shortDifference}`
+      : "If you would like a narrower starting point, we can talk through the available scope before you choose.",
+    "",
+    "This message is only the editorial recommendation and package path for your decision.",
+    "",
+    "To move forward, simply reply to this email with your preferred package. Once we receive your confirmation, we'll prepare your Author Workspace and guide you through the next steps.",
     "",
     "Warmly,",
     "J Merrill Publishing"
@@ -261,7 +332,9 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
   const projectTitle = normalizeString(intake[INTAKE_FIELD.projectTitle]) || "your manuscript";
   const packageValue = diagnostic.jm1pub_recommendedpackage;
   const packageCode = logSummary.recommendedPackageCode || PACKAGE_CODES_BY_VALUE[packageValue] || null;
-  const packageLabel = RECOMMENDED_PACKAGE_LABELS[packageValue] || packageCode || "Recommendation pending";
+  const packageLabel = RECOMMENDED_PACKAGE_LABELS[packageValue] || packageDetailsFrom({ packageCode })?.name || "Recommendation pending";
+  const recommendedPackageDetails = packageDetailsFrom({ packageCode, packageValue });
+  const alternatePackageDetails = packageDetailsFrom({ packageCode: logSummary.alternatePackageCode });
   const imprintLabel = diagnostic.jm1pub_recommendedimprint != null
     ? RECOMMENDED_IMPRINT_LABELS[diagnostic.jm1pub_recommendedimprint] || String(diagnostic.jm1pub_recommendedimprint)
     : null;
@@ -289,9 +362,12 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
     body: buildAuthorRecommendationDraftBody({
       authorName,
       projectTitle,
-      packageLabel,
-      alternatePackageCode: logSummary.alternatePackageCode,
-      imprintLabel
+      recommendedPackage: recommendedPackageDetails,
+      alternatePackage: alternatePackageDetails,
+      imprintLabel,
+      workType: WORK_TYPE_LABELS[diagnostic.jm1pub_worktype] || null,
+      genre: normalizeString(diagnostic.jm1pub_genreconfirmed) || null,
+      wordCount: diagnostic.jm1pub_manuscriptwordcount ?? null
     }),
     templateName: TEMPLATE_NAME,
     sendStatus: DRAFT_STATUS,
@@ -318,8 +394,16 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
     recommendedPackage: {
       code: packageCode,
       label: packageLabel,
+      name: recommendedPackageDetails?.name || packageLabel,
+      price: recommendedPackageDetails?.price || null,
       dataverseValue: packageValue ?? null
     },
+    alternatePackage: alternatePackageDetails ? {
+      code: logSummary.alternatePackageCode,
+      name: alternatePackageDetails.name,
+      price: alternatePackageDetails.price,
+      difference: alternatePackageDetails.shortDifference
+    } : null,
     imprintRecommendation: {
       label: imprintLabel,
       dataverseValue: diagnostic.jm1pub_recommendedimprint ?? null,
