@@ -1,5 +1,4 @@
 const STRIPE_API_BASE = 'https://api.stripe.com'
-const STRIPE_V2_VERSION = '2026-06-24.dahlia'
 
 export const COMMISSIONING_REFERENCE = 'JMP-INT-202607-0W5PTQ'
 export const COMMISSIONING_TITLE = 'The Intentional Leader'
@@ -37,66 +36,33 @@ export function assertCommissioningReference(reference: string) {
 }
 
 export async function createRecipientAccount() {
-  const body = {
-    contact_email: process.env.JM1_STRIPE_COMMISSIONING_AUTHOR_EMAIL || 'publishing@jmerrill.one',
-    display_name: COMMISSIONING_TITLE,
-    dashboard: 'full',
-    identity: {
-      country: 'us',
-      entity_type: 'individual',
-    },
-    configuration: {
-      recipient: {
-        capabilities: {
-          stripe_balance: {
-            stripe_transfers: {
-              requested: true,
-            },
-          },
-        },
-      },
-    },
-    defaults: {
-      currency: 'usd',
-      responsibilities: {
-        fees_collector: 'stripe',
-        losses_collector: 'stripe',
-      },
-      locales: ['en-US'],
-    },
-    metadata: {
-      jm1_division: 'publishing',
-      jm1_reference: COMMISSIONING_REFERENCE,
-      jm1_title: COMMISSIONING_TITLE,
-      jm1_source: 'PROGRAM-002 commissioning',
-    },
-    include: ['configuration.recipient', 'identity', 'requirements'],
-  }
-
-  return stripeJson('/v2/core/accounts', body, {
-    apiVersion: STRIPE_V2_VERSION,
+  return stripeForm('/v1/accounts', new URLSearchParams({
+    type: 'standard',
+    country: 'US',
+    email: process.env.JM1_STRIPE_COMMISSIONING_AUTHOR_EMAIL || 'publishing@jmerrill.one',
+    business_type: 'individual',
+    'business_profile[name]': COMMISSIONING_TITLE,
+    'capabilities[transfers][requested]': 'true',
+    'metadata[jm1_division]': 'publishing',
+    'metadata[jm1_reference]': COMMISSIONING_REFERENCE,
+    'metadata[jm1_title]': COMMISSIONING_TITLE,
+    'metadata[jm1_source]': 'PROGRAM-002 commissioning',
+  }), {
     idempotencyKey: `jm1-connect-account-${COMMISSIONING_REFERENCE}`,
+    keyType: 'connect',
   })
 }
 
 export async function createRecipientAccountLink(accountId: string) {
-  return stripeJson('/v2/core/account_links', {
+  return stripeForm('/v1/account_links', new URLSearchParams({
     account: accountId,
-    use_case: {
-      type: 'account_onboarding',
-      account_onboarding: {
-        configurations: ['recipient'],
-        collection_options: {
-          fields: 'eventually_due',
-          future_requirements: 'include',
-        },
-        refresh_url: 'https://jmerrill.pub/author/financial-setup',
-        return_url: 'https://jmerrill.pub/author/portal?stripe=returned',
-      },
-    },
-  }, {
-    apiVersion: STRIPE_V2_VERSION,
+    type: 'account_onboarding',
+    refresh_url: 'https://jmerrill.pub/author/financial-setup',
+    return_url: 'https://jmerrill.pub/author/portal?stripe=returned',
+    'collection_options[fields]': 'eventually_due',
+  }), {
     idempotencyKey: `jm1-connect-account-link-${COMMISSIONING_REFERENCE}-${Date.now()}`,
+    keyType: 'connect',
   })
 }
 
@@ -122,20 +88,11 @@ export async function createCommissioningCheckoutSession() {
     'metadata[jm1_commissioning_override]': 'true',
   }), {
     idempotencyKey: `jm1-commissioning-checkout-${COMMISSIONING_REFERENCE}`,
+    keyType: 'checkout',
   })
 }
 
-async function stripeJson(path: string, body: Record<string, any>, options: { apiVersion?: string; idempotencyKey?: string } = {}) {
-  const response = await fetch(`${STRIPE_API_BASE}${path}`, {
-    method: 'POST',
-    headers: stripeHeaders({ contentType: 'application/json', ...options }),
-    body: JSON.stringify(body),
-  })
-
-  return handleStripeResponse(response)
-}
-
-async function stripeForm(path: string, body: URLSearchParams, options: { idempotencyKey?: string } = {}) {
+async function stripeForm(path: string, body: URLSearchParams, options: { idempotencyKey?: string; keyType: StripeKeyType }) {
   const response = await fetch(`${STRIPE_API_BASE}${path}`, {
     method: 'POST',
     headers: stripeHeaders({ contentType: 'application/x-www-form-urlencoded', ...options }),
@@ -145,9 +102,20 @@ async function stripeForm(path: string, body: URLSearchParams, options: { idempo
   return handleStripeResponse(response)
 }
 
-function stripeHeaders(options: { contentType: string; apiVersion?: string; idempotencyKey?: string }) {
-  const secret = process.env.STRIPE_SECRET_KEY || process.env.JM1_STRIPE_SECRET_KEY || ''
-  if (!secret) throw new Error('stripe_secret_missing')
+type StripeKeyType = 'connect' | 'checkout'
+
+function getStripeSecret(keyType: StripeKeyType) {
+  const primary = keyType === 'connect'
+    ? process.env.STRIPE_CONNECT_SECRET_KEY
+    : process.env.STRIPE_CHECKOUT_SECRET_KEY
+  const fallback = process.env.STRIPE_SECRET_KEY || process.env.JM1_STRIPE_SECRET_KEY
+  const secret = primary || fallback || ''
+  if (!secret) throw new Error(`stripe_${keyType}_secret_missing`)
+  return secret
+}
+
+function stripeHeaders(options: { contentType: string; apiVersion?: string; idempotencyKey?: string; keyType: StripeKeyType }) {
+  const secret = getStripeSecret(options.keyType)
 
   return {
     Authorization: `Bearer ${secret}`,
