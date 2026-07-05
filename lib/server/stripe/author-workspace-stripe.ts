@@ -42,6 +42,7 @@ export async function createRecipientAccount() {
     email: process.env.JM1_STRIPE_COMMISSIONING_AUTHOR_EMAIL || 'publishing@jmerrill.one',
     business_type: 'individual',
     'business_profile[name]': COMMISSIONING_TITLE,
+    'capabilities[card_payments][requested]': 'true',
     'capabilities[transfers][requested]': 'true',
     'metadata[jm1_division]': 'publishing',
     'metadata[jm1_reference]': COMMISSIONING_REFERENCE,
