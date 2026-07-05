@@ -17,18 +17,18 @@ export default function AuthorRoyaltySetupPage() {
   return (
     <AuthorPortalShell
       eyebrow="Royalty setup"
-      title="Royalty setup for active titles."
-      description="This private intake captures title coverage, reporting preferences, royalty contacts, and agreement status so author growth infrastructure can scale cleanly."
+      title="Confirm royalty preferences."
+      description="Tell us how royalty reporting and related author details should be handled for your publishing project."
     >
-      <AuthorGate>
+      <AuthorGate scope="portal">
         <AuthorSetupForm
           endpoint="/api/author/royalty-setup"
           fields={royaltyFields}
           submitLabel="Submit royalty setup"
           successTitle="Your royalty setup has been received."
           successMessage="A notification has been sent to publishing@jmerrill.one. Your reporting preferences will be applied when your royalty cycle begins."
-          successDetails={['Your Author Hub setup is complete.']}
-          successLink={{ href: '/author', label: 'Return to Author Hub' }}
+          successDetails={['Your pre-contract workspace setup is complete.']}
+          successLink={{ href: '/author/portal', label: 'Return to Author Workspace' }}
         />
       </AuthorGate>
     </AuthorPortalShell>

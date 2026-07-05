@@ -26,6 +26,7 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
   const [submitting, setSubmitting] = useState(false)
   const storageKey = scope === 'portal' ? 'jmp-author-portal-unlocked' : 'jmp-author-onboarding-unlocked'
   const contextKey = scope === 'portal' ? 'jmp-author-portal-context' : 'jmp-author-onboarding-context'
+  const codeKey = scope === 'portal' ? 'jmp-author-portal-access-code' : 'jmp-author-onboarding-access-code'
 
   useEffect(() => {
     setUnlocked(sessionStorage.getItem(storageKey) === 'true')
@@ -45,6 +46,7 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
       const data = (await response.json()) as GateResponse
       if (!response.ok) throw new Error(data.error || 'Invalid access code.')
       sessionStorage.setItem(storageKey, 'true')
+      sessionStorage.setItem(codeKey, code)
       sessionStorage.setItem(contextKey, JSON.stringify({
         accessType: data.accessType || (scope === 'portal' ? 'author' : 'forms'),
         portalContext: data.portalContext || null,
