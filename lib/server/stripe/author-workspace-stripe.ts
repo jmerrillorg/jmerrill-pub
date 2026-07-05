@@ -2,9 +2,9 @@ const STRIPE_API_BASE = 'https://api.stripe.com'
 
 export const COMMISSIONING_REFERENCE = 'JMP-INT-202607-0W5PTQ'
 export const COMMISSIONING_TITLE = 'The Intentional Leader'
-export const COMMISSIONING_PACKAGE_CODE = 'JMP-PKG-PRO'
-export const COMMISSIONING_PACKAGE_NAME = 'Professional Publishing Package'
-export const COMMISSIONING_STANDARD_AMOUNT_CENTS = 450000
+export const COMMISSIONING_PACKAGE_CODE = 'JMP-PKG-PREMIER'
+export const COMMISSIONING_PACKAGE_NAME = 'Premier Publishing Package'
+export const COMMISSIONING_STANDARD_AMOUNT_CENTS = 750000
 export const COMMISSIONING_AMOUNT_CENTS = 100
 
 type StripeResponse = {
