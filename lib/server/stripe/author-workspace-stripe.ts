@@ -69,6 +69,7 @@ export async function createRecipientAccountLink(accountId: string) {
 export async function createCommissioningCheckoutSession() {
   return stripeForm('/v1/checkout/sessions', new URLSearchParams({
     mode: 'payment',
+    client_reference_id: COMMISSIONING_REFERENCE,
     success_url: 'https://jmerrill.pub/author/portal?payment=success',
     cancel_url: 'https://jmerrill.pub/author/portal?payment=cancelled',
     'line_items[0][quantity]': '1',

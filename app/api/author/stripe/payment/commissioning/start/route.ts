@@ -28,6 +28,20 @@ export async function POST(req: NextRequest) {
     const session = await createCommissioningCheckoutSession()
     if (!session.id || !session.url) throw new Error('stripe_checkout_session_missing_url')
 
+    let overrideLog = { created: false, id: null as string | null, detail: 'not_written' }
+    try {
+      overrideLog = await writeSafeExecutionLog({
+        name: `COMMISSIONING-PRICE-OVERRIDE-${COMMISSIONING_REFERENCE}`,
+        actionType: 'COMMISSIONING_PRICE_OVERRIDE_APPLIED',
+        description:
+          `Commissioning-only $${(COMMISSIONING_AMOUNT_CENTS / 100).toFixed(2)} payment override applied for ${COMMISSIONING_REFERENCE}. Standard package remains ${COMMISSIONING_PACKAGE_CODE} (${COMMISSIONING_PACKAGE_NAME}) at $${(COMMISSIONING_STANDARD_AMOUNT_CENTS / 100).toFixed(2)}. The override is blocked for every other title/reference. No payment link, invoice, subscription, Business Central posting, royalty generation, author payment, production, distribution, or workspace movement occurred.`,
+        sourceEntity: 'jm1pub_submission',
+        sourceRecordId: COMMISSIONING_REFERENCE,
+      })
+    } catch {
+      overrideLog = { created: false, id: null, detail: 'execution_log_write_failed' }
+    }
+
     let executionLog = { created: false, id: null as string | null, detail: 'not_written' }
     try {
       executionLog = await writeSafeExecutionLog({
@@ -53,6 +67,7 @@ export async function POST(req: NextRequest) {
       checkoutSessionId: session.id,
       checkoutUrl: session.url,
       paymentStatus: session.payment_status || 'unpaid',
+      overrideLog,
       executionLog,
     })
   } catch (error: any) {
