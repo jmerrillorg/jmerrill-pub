@@ -32,7 +32,7 @@ describe("generateSimplifiedPackageAddendumDocument", () => {
     assert.ok(text.includes("8 payments of $585.00"));
   });
 
-  test("never mentions Starter, Signature, or Children's package names", async () => {
+  test("never mentions Starter, Premier, or Children's package names", async () => {
     const content = buildPackageSpecificAddendumSections("JMP-PKG-PRO");
     const buffer = await generateSimplifiedPackageAddendumDocument({
       title: "x", authorLegalName: "y", contractDate: "2026-06-22",
@@ -40,7 +40,7 @@ describe("generateSimplifiedPackageAddendumDocument", () => {
     });
     const text = await extractText(buffer);
     assert.ok(!text.includes("Starter Publishing Package"));
-    assert.ok(!text.includes("Signature Publishing Partnership"));
+    assert.ok(!text.includes("Premier Publishing Package"));
     assert.ok(!text.includes("Children's Book Publishing Package"));
   });
 });

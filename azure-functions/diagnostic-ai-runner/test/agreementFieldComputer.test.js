@@ -64,6 +64,21 @@ describe("computeAgreementFields — audiobook inclusion", () => {
     assert.equal(r.audiobookIncluded, true);
   });
 
+  test("Premier Package supports the commissioning title's large manuscript scope", () => {
+    const r = computeAgreementFields(baseInput({
+      title: "The Intentional Leader",
+      officialManuscriptWordCount: 165482,
+      selectedPackageCode: "JMP-PKG-PREMIER",
+      paymentOption: "SINGLE"
+    }));
+    assert.equal(r.ok, true);
+    assert.equal(r.packageLabel, "Premier Publishing Package (JMP-PKG-PREMIER)");
+    assert.equal(r.packageFeeUsd, 7500.00);
+    assert.equal(r.packageFeeFormatted, "$7,500.00");
+    assert.deepEqual(r.complimentaryCopies, { paperback: 15, hardcover: 4, ebook: 1 });
+    assert.equal(r.paymentSchedule.totalFormatted, "$7,500.00");
+  });
+
   test("a package without audiobookIncluded defined is rejected rather than silently assumed", () => {
     const r = computeAgreementFields(baseInput({ selectedPackageCode: "JMP-PKG-STARTER" }));
     assert.equal(r.ok, false);

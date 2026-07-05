@@ -88,7 +88,7 @@ describe("buildRecommendationView", () => {
     const view = buildRecommendationView(context({
       diagnostic: { jm1pub_signaturereviewrequired: true },
       executionLog: {
-        jm1_actiondescription: "Pre-package editorial review performed by the pipeline for intake JMP-INT-202607-0W5PTQ. Agreement readiness: BLOCKED_HUMAN_REVIEW_REQUIRED. Imprint outcome: SIGNATURE_CANDIDATE. Recommended package: JMP-PKG-SIGNATURE. Alternate package: JMP-PKG-PRO. Imprint NOT auto-locked — requires human decision (SIGNATURE_CANDIDATE_DETECTED)."
+        jm1_actiondescription: "Pre-package editorial review performed by the pipeline for intake JMP-INT-202607-0W5PTQ. Agreement readiness: BLOCKED_HUMAN_REVIEW_REQUIRED. Imprint outcome: SIGNATURE_CANDIDATE. Recommended package: JMP-PKG-PREMIER. Alternate package: JMP-PKG-PRO. Imprint NOT auto-locked — requires human decision (SIGNATURE_CANDIDATE_DETECTED)."
       }
     }), {
       diagnosticId: DIAGNOSTIC_ID,

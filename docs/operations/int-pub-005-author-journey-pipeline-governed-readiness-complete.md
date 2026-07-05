@@ -104,7 +104,7 @@ All 4 packages confirmed mapped consistently in `src/author/milestone6BusinessSo
 |---|---|---|
 | JMP-PKG-STARTER | `prod_URbgo7mwC7qr6t` | `price_1TSiTaJCiOVFpgYufee7GLQs` |
 | JMP-PKG-PRO | `prod_UjRnnUiTQgHlrm` | `price_1TjyuZJCiOVFpgYur0FWmcj7` |
-| JMP-PKG-SIGNATURE | `prod_UjRnIBF5yKgkFr` | `price_1TjyuaJCiOVFpgYu8FKjWqIL` |
+| JMP-PKG-PREMIER | `prod_UjRnIBF5yKgkFr` | `price_1TjyuaJCiOVFpgYu8FKjWqIL` |
 | JMP-PKG-CHILD | `prod_UjRnLS7vXkbdEh` | `price_1TjyuaJCiOVFpgYuGJo5Ocwl` |
 
 No mismatches found between source, tests, and documentation.

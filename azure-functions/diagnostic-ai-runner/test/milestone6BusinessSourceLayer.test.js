@@ -60,13 +60,13 @@ describe("Milestone 6 package catalog and recommendation rules", () => {
   test("catalog contains only governed core package codes and costs", () => {
     assert.deepEqual(Object.keys(PACKAGE_CATALOG).sort(), [
       "JMP-PKG-CHILD",
+      "JMP-PKG-PREMIER",
       "JMP-PKG-PRO",
-      "JMP-PKG-SIGNATURE",
       "JMP-PKG-STARTER"
     ]);
     assert.equal(PACKAGE_CATALOG[PACKAGE_CODES.STARTER].costUsd, 1999);
     assert.equal(PACKAGE_CATALOG[PACKAGE_CODES.PROFESSIONAL].costUsd, 4500);
-    assert.equal(PACKAGE_CATALOG[PACKAGE_CODES.SIGNATURE].costUsd, 7500);
+    assert.equal(PACKAGE_CATALOG[PACKAGE_CODES.PREMIER].costUsd, 7500);
     assert.equal(PACKAGE_CATALOG[PACKAGE_CODES.CHILD].costUsd, 2495);
   });
 
@@ -77,8 +77,8 @@ describe("Milestone 6 package catalog and recommendation rules", () => {
     assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.STARTER].priceId, "price_1TSiTaJCiOVFpgYufee7GLQs");
     assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.PROFESSIONAL].productId, "prod_UjRnnUiTQgHlrm");
     assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.PROFESSIONAL].priceId, "price_1TjyuZJCiOVFpgYur0FWmcj7");
-    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.SIGNATURE].productId, "prod_UjRnIBF5yKgkFr");
-    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.SIGNATURE].priceId, "price_1TjyuaJCiOVFpgYu8FKjWqIL");
+    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.PREMIER].productId, "prod_UjRnIBF5yKgkFr");
+    assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.PREMIER].priceId, "price_1TjyuaJCiOVFpgYu8FKjWqIL");
     assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.CHILD].productId, "prod_UjRnLS7vXkbdEh");
     assert.equal(STRIPE_PACKAGE_MAPPINGS[PACKAGE_CODES.CHILD].priceId, "price_1TjyuaJCiOVFpgYuGJo5Ocwl");
 
@@ -92,7 +92,7 @@ describe("Milestone 6 package catalog and recommendation rules", () => {
   test("alternative package follows governed rules", () => {
     assert.equal(resolveAlternativePackage(PACKAGE_CODES.STARTER), null);
     assert.equal(resolveAlternativePackage(PACKAGE_CODES.PROFESSIONAL), PACKAGE_CODES.STARTER);
-    assert.equal(resolveAlternativePackage(PACKAGE_CODES.SIGNATURE), PACKAGE_CODES.PROFESSIONAL);
+    assert.equal(resolveAlternativePackage(PACKAGE_CODES.PREMIER), PACKAGE_CODES.PROFESSIONAL);
     assert.equal(resolveAlternativePackage(PACKAGE_CODES.CHILD), null);
   });
 
@@ -100,12 +100,12 @@ describe("Milestone 6 package catalog and recommendation rules", () => {
     const result = resolveRecommendedPackage({
       diagnosticPackage: {
         recommendedPackage: PACKAGE_CODES.STARTER,
-        packageOverride: PACKAGE_CODES.SIGNATURE
+        packageOverride: PACKAGE_CODES.PREMIER
       }
     });
 
     assert.equal(result.ok, true);
-    assert.equal(result.packageCode, PACKAGE_CODES.SIGNATURE);
+    assert.equal(result.packageCode, PACKAGE_CODES.PREMIER);
     assert.equal(result.source, PACKAGE_RECOMMENDATION_SOURCE.packageOverrideField);
   });
 

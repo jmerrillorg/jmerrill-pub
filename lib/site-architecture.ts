@@ -116,7 +116,7 @@ export const relationshipPages: SitePage[] = [
     href: '/packages',
     eyebrow: 'Commercial Layer',
     description:
-      'Structured Starter, Professional, and Signature publishing packages with premium delivery and clear scope.',
+      'Structured Starter, Professional, and Premier publishing packages with clear scope and author-first fit.',
     audience: 'Authors choosing the right investment tier.',
     status: 'Live',
     ctaLabel: 'Compare packages',

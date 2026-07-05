@@ -14,49 +14,49 @@ export const metadata: Metadata = {
 const bookingUrl = 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled'
 
 const matrix = [
-  { feature: 'BASICS', starter: '', pro: '', sig: '', head: true },
-  { feature: 'Price', starter: '$1,999', pro: '$4,500', sig: '$7,500' },
-  { feature: 'Word count', starter: 'Up to 50K', pro: 'Up to 75K', sig: 'Up to 100K' },
-  { feature: 'Primary format', starter: 'PB + eBook', pro: 'PB + eBook', sig: 'PB + HC + eBook' },
-  { feature: 'Author Profile Page', starter: '✓', pro: '✓', sig: '✓' },
-  { feature: 'ISBN assignment', starter: '✓', pro: '✓', sig: '✓' },
-  { feature: 'Distribution setup', starter: '✓', pro: '✓', sig: '✓' },
-  { feature: 'Copyright registration', starter: '—', pro: '✓', sig: '✓' },
-  { feature: 'Library of Congress', starter: '—', pro: '✓', sig: '✓' },
-  { feature: 'Delivery (standard)', starter: '8–10 weeks', pro: '10–12 weeks', sig: '12–14 weeks' },
-  { feature: 'EDITORIAL', starter: '', pro: '', sig: '', head: true },
-  { feature: 'Editorial review', starter: '✓', pro: '✓', sig: '✓' },
-  { feature: 'Light line editing', starter: '✓', pro: '—', sig: '—' },
-  { feature: 'Full line editing', starter: '—', pro: '✓', sig: '✓' },
-  { feature: 'Copy editing', starter: '✓', pro: '✓', sig: '✓' },
-  { feature: 'Proofreading', starter: '✓', pro: '✓', sig: '✓' },
-  { feature: 'Structural editorial review', starter: '—', pro: '✓', sig: '✓' },
-  { feature: 'Developmental guidance', starter: '—', pro: '—', sig: '✓' },
-  { feature: 'Editorial consultation', starter: '—', pro: '—', sig: '✓' },
-  { feature: 'DESIGN', starter: '', pro: '', sig: '', head: true },
-  { feature: 'Cover design', starter: 'Professional', pro: 'Enhanced', sig: 'Premium' },
-  { feature: 'Interior layout', starter: 'Standard', pro: 'Advanced', sig: 'Advanced' },
-  { feature: 'eBook conversion', starter: '✓', pro: '✓', sig: '✓' },
-  { feature: 'Hardcover edition', starter: '—', pro: 'Optional add-on', sig: '✓' },
-  { feature: 'Metadata optimization', starter: 'Basic', pro: 'Advanced', sig: 'Advanced' },
-  { feature: 'LAUNCH & MARKETING', starter: '', pro: '', sig: '', head: true },
-  { feature: 'Launch planning session', starter: '—', pro: '✓', sig: '✓' },
-  { feature: 'Marketing guidance', starter: '—', pro: '✓', sig: '✓' },
-  { feature: 'Full marketing strategy', starter: '—', pro: '—', sig: '✓' },
-  { feature: 'Author strategy consultation', starter: '—', pro: '—', sig: '✓' },
-  { feature: 'Ongoing publishing support', starter: '—', pro: '—', sig: '✓' },
-  { feature: 'CONSULTATIONS', starter: '', pro: '', sig: '', head: true },
-  { feature: 'Publishing consultation', starter: '30 min × 1', pro: '60 min × 1', sig: '60 min × 2' },
-  { feature: 'Dedicated consultant', starter: '—', pro: '—', sig: '✓' },
-  { feature: 'DISTRIBUTION', starter: '', pro: '', sig: '', head: true },
-  { feature: 'Ingram Content setup', starter: '✓', pro: '✓', sig: '✓' },
-  { feature: 'Digital distribution', starter: '✓', pro: '✓', sig: '✓' },
-  { feature: 'BISAC / metadata', starter: 'Basic', pro: 'Advanced', sig: 'Advanced' },
-  { feature: 'Library distribution', starter: 'Add-on', pro: 'Add-on', sig: 'Add-on' },
-  { feature: 'AUDIOBOOK', starter: '', pro: '', sig: '', head: true },
-  { feature: 'Audiobook', starter: 'Add-on ($699)', pro: 'AI narration included', sig: 'AI narration included' },
-  { feature: 'AUTHOR COPIES', starter: '', pro: '', sig: '', head: true },
-  { feature: 'Complimentary paperbacks', starter: '5 copies', pro: '10 copies', sig: '15 copies' },
+  { feature: 'BASICS', starter: '', pro: '', premier: '', head: true },
+  { feature: 'Price', starter: '$1,999', pro: '$4,500', premier: '$7,500' },
+  { feature: 'Word count', starter: 'Up to 50K', pro: 'Up to 75K', premier: 'Large/complex' },
+  { feature: 'Primary format', starter: 'PB + eBook', pro: 'PB + eBook', premier: 'PB + HC + eBook' },
+  { feature: 'Author Profile Page', starter: '✓', pro: '✓', premier: '✓' },
+  { feature: 'ISBN assignment', starter: '✓', pro: '✓', premier: '✓' },
+  { feature: 'Distribution setup', starter: '✓', pro: '✓', premier: '✓' },
+  { feature: 'Copyright registration', starter: '—', pro: '✓', premier: '✓' },
+  { feature: 'Library of Congress', starter: '—', pro: '✓', premier: '✓' },
+  { feature: 'Delivery (standard)', starter: '8–10 weeks', pro: '10–12 weeks', premier: '12–16 weeks' },
+  { feature: 'EDITORIAL', starter: '', pro: '', premier: '', head: true },
+  { feature: 'Editorial review', starter: '✓', pro: '✓', premier: '✓' },
+  { feature: 'Light line editing', starter: '✓', pro: '—', premier: '—' },
+  { feature: 'Full line editing', starter: '—', pro: '✓', premier: '✓' },
+  { feature: 'Copy editing', starter: '✓', pro: '✓', premier: '✓' },
+  { feature: 'Proofreading', starter: '✓', pro: '✓', premier: '✓' },
+  { feature: 'Structural editorial review', starter: '—', pro: '✓', premier: '✓' },
+  { feature: 'Developmental guidance', starter: '—', pro: '—', premier: '✓' },
+  { feature: 'Editorial consultation', starter: '—', pro: '—', premier: '✓' },
+  { feature: 'DESIGN', starter: '', pro: '', premier: '', head: true },
+  { feature: 'Cover design', starter: 'Professional', pro: 'Enhanced', premier: 'Premium' },
+  { feature: 'Interior layout', starter: 'Standard', pro: 'Advanced', premier: 'Advanced' },
+  { feature: 'eBook conversion', starter: '✓', pro: '✓', premier: '✓' },
+  { feature: 'Hardcover edition', starter: '—', pro: 'Optional add-on', premier: '✓' },
+  { feature: 'Metadata optimization', starter: 'Basic', pro: 'Advanced', premier: 'Advanced' },
+  { feature: 'LAUNCH & MARKETING', starter: '', pro: '', premier: '', head: true },
+  { feature: 'Launch planning session', starter: '—', pro: '✓', premier: '✓' },
+  { feature: 'Marketing guidance', starter: '—', pro: '✓', premier: '✓' },
+  { feature: 'Extended launch planning', starter: '—', pro: '—', premier: '✓' },
+  { feature: 'Author strategy consultation', starter: '—', pro: '—', premier: '✓' },
+  { feature: 'Extended production planning', starter: '—', pro: '—', premier: '✓' },
+  { feature: 'CONSULTATIONS', starter: '', pro: '', premier: '', head: true },
+  { feature: 'Publishing consultation', starter: '30 min × 1', pro: '60 min × 1', premier: '60 min × 2' },
+  { feature: 'Dedicated consultant', starter: '—', pro: '—', premier: '✓' },
+  { feature: 'DISTRIBUTION', starter: '', pro: '', premier: '', head: true },
+  { feature: 'Ingram Content setup', starter: '✓', pro: '✓', premier: '✓' },
+  { feature: 'Digital distribution', starter: '✓', pro: '✓', premier: '✓' },
+  { feature: 'BISAC / metadata', starter: 'Basic', pro: 'Advanced', premier: 'Advanced' },
+  { feature: 'Library distribution', starter: 'Add-on', pro: 'Add-on', premier: 'Add-on' },
+  { feature: 'AUDIOBOOK', starter: '', pro: '', premier: '', head: true },
+  { feature: 'Audiobook', starter: 'Add-on ($699)', pro: 'AI narration included', premier: 'AI narration included' },
+  { feature: 'AUTHOR COPIES', starter: '', pro: '', premier: '', head: true },
+  { feature: 'Complimentary paperbacks', starter: '5 copies', pro: '10 copies', premier: '15 copies' },
 ]
 
 const paymentOptions = [
@@ -83,7 +83,7 @@ const paymentOptions = [
     ],
   },
   {
-    package: 'Signature',
+    package: 'Premier',
     base: '$7,500',
     rows: [
       { option: 'Pay in Full (7% off)', perPayment: '$6,975', total: '$6,975' },
@@ -125,10 +125,10 @@ const packageGuidance: Record<
     href: '/packages#compare',
     badge: 'Most Popular',
   },
-  Signature: {
+  Premier: {
     summary:
-      'A selective publishing path for works that require elevated positioning, expanded guidance, hardcover/prestige presentation, or a higher-touch publishing relationship.',
-    ctaLabel: 'Apply for Signature',
+      'A selective publishing path for works that require expanded editorial care, production planning, and a larger-scope publishing path.',
+    ctaLabel: 'Explore Premier',
     href: '/join',
   },
 }
@@ -136,7 +136,7 @@ const packageGuidance: Record<
 const decisionGuide = [
   'Choose Starter if your manuscript is ready and you need a focused professional path.',
   'Choose Professional if you need deeper editorial, design, and launch support.',
-  'Apply for Signature if the work needs elevated positioning, prestige presentation, or expanded guidance.',
+  'Explore Premier if the work is large, complex, or needs expanded editorial and production planning.',
 ]
 
 export default function PackagesPage() {
@@ -218,7 +218,9 @@ export default function PackagesPage() {
                 <div className="mt-2 text-[44px] font-bold leading-none text-white">
                   ${pkg.price.toLocaleString()}
                 </div>
-                <p className="mt-1 text-[12px] text-white/30">Up to {pkg.wordLimit} words</p>
+                <p className="mt-1 text-[12px] text-white/30">
+                  {pkg.tier === 'Premier' ? pkg.wordLimit : `Up to ${pkg.wordLimit} words`}
+                </p>
                 <p className="mt-5 text-[14px] font-light leading-[1.8] text-white/70">{details.summary}</p>
                 <div className="mt-6 h-px bg-white/8" />
                 <ul className="mt-6 flex flex-1 flex-col gap-3">
@@ -273,7 +275,7 @@ export default function PackagesPage() {
           <div className="rounded-2xl border border-gray-200 overflow-hidden">
             <div className="grid grid-cols-[1fr_160px_160px_160px] bg-charcoal">
               <div className="p-4 text-[13px] font-semibold text-white/60">Feature</div>
-              {['Starter', 'Professional', 'Signature'].map((tier) => (
+              {['Starter', 'Professional', 'Premier'].map((tier) => (
                 <div key={tier} className="p-4 text-center">
                   <div className="text-[14px] font-semibold text-white">{tier}</div>
                 </div>
@@ -299,7 +301,7 @@ export default function PackagesPage() {
                   }`}
                 >
                   <div className="p-3.5 px-4 text-[14px] text-gray-600">{row.feature}</div>
-                  {[row.starter, row.pro, row.sig].map((value, valueIndex) => (
+                  {[row.starter, row.pro, row.premier].map((value, valueIndex) => (
                     <div key={valueIndex} className="p-3.5 text-center">
                       <span
                         className={`text-[13px] font-medium ${

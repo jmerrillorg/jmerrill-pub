@@ -171,9 +171,9 @@ export function PackagesSection() {
               >
                 {pkg.sku}
               </div>
-              {pkg.tier === 'Signature' && (
+              {pkg.tier === 'Premier' && (
                 <div className="text-[11px] text-blue-400 mb-3 uppercase tracking-[0.1em]" style={{ fontFamily: "'DM Mono', monospace" }}>
-                  Selective publishing path
+                  Larger-scope publishing path
                 </div>
               )}
               <div
@@ -193,14 +193,14 @@ export function PackagesSection() {
                 className="text-[11px] text-white/30 mb-9"
                 style={{ fontFamily: "'DM Mono', monospace" }}
               >
-                Up to {pkg.wordLimit} words
+                {pkg.tier === 'Premier' ? pkg.wordLimit : `Up to ${pkg.wordLimit} words`}
               </div>
               <p className="text-[13px] font-light text-white/45 leading-[1.7] mb-6">
                 {pkg.tier === 'Starter'
                   ? 'A clear starting point for authors who need professional structure, polish, and a guided way into publishing.'
                   : pkg.tier === 'Professional'
                     ? 'A stronger publishing path for authors who want deeper editorial support, broader production care, and a more developed release.'
-                    : 'A selective publishing path for works that require elevated positioning, expanded guidance, or prestige presentation.'}
+                    : 'A larger-scope publishing path for works that require expanded editorial care, production planning, or complex production support.'}
               </p>
               <div className="w-full h-px bg-white/8 mb-7" />
               <ul className="flex flex-col gap-3 flex-1 mb-10">
@@ -223,7 +223,7 @@ export function PackagesSection() {
                   ? 'Explore Starter'
                   : pkg.tier === 'Professional'
                     ? 'Explore Professional'
-                    : 'Apply for Signature'}
+                    : 'Explore Premier'}
               </Link>
             </div>
           ))}

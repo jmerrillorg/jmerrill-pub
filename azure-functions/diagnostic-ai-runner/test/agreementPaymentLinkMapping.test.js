@@ -71,7 +71,7 @@ describe("computeInstallmentStripeAmount — never invents a mapping for an unre
 });
 
 describe("computeInstallmentStripeAmount — all four packages resolve to their already-confirmed mapping", () => {
-  test("STARTER, SIGNATURE, CHILD all resolve without modification", () => {
+  test("STARTER, PROFESSIONAL, PREMIER, CHILD all resolve without modification", () => {
     for (const code of Object.values(PACKAGE_CODES)) {
       const result = computeInstallmentStripeAmount({ packageCode: code, paymentOptionCode: "SINGLE_PAYMENT" });
       assert.equal(result.ok, true, `${code} should resolve`);

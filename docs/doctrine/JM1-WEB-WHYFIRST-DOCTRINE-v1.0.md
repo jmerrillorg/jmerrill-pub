@@ -209,7 +209,7 @@ One doctrine, one spine, one three-altitude test, one copy discipline. Each JM1 
 3. **Why authors choose JMP** — the trust beat. The single reconciled **125+ titles** count lives here, with years in business and Ingram reach, in author-ownership language.
 4. **How publishing works** — one merged journey (Discover · Edit · Design · Distribute · Grow), replacing all three current process diagrams.
 5. **Find Your Publishing Path** — the Pathfinder tool, carrying the warm "what are you writing?" tone; this is where finer-grained intent and genre live.
-6. **Publishing Packages** — three tiers, guided CTAs; Signature positioned as publisher-selected prestige, never a commercial top tier.
+6. **Publishing Packages** — three tiers, guided CTAs; Premier positioned as the larger-scope package for complex manuscripts. JM Signature remains an imprint, not a package.
 7. **Featured Books** — six titles, link to the full catalog. The homepage is not the catalog.
 8. **Final CTA** — warm invitation language ("Tell Us About Your Book" / "Talk With Our Publishing Team").
 

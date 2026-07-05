@@ -35,12 +35,31 @@ const PACKAGE_CONTENT = Object.freeze({
     complimentaryCopies: Object.freeze({ paperback: 10, hardcover: 2, ebook: 1 }),
     audiobookIncluded: true,
     estimatedDelivery: "10-12 weeks from manuscript receipt (audiobook: +2-3 weeks)"
+  }),
+  "JMP-PKG-PREMIER": Object.freeze({
+    packageLabel: "Premier Publishing Package (JMP-PKG-PREMIER)",
+    includedServices: Object.freeze([
+      "Extended developmental editing + line editing + copy editing + proofreading for large or complex manuscripts",
+      "Expanded editorial planning and production scope coordination",
+      "Premium cover design and hardcover edition support",
+      "Advanced interior layout & typography for complex structure",
+      "eBook conversion (EPUB via Ingram Content)",
+      "ISBN assignment",
+      "Ingram Content distribution setup",
+      "Advanced metadata optimization",
+      "Author profile page",
+      "Extended launch planning and marketing guidance",
+      "AI audiobook production (included — no additional fee)"
+    ]),
+    complimentaryCopies: Object.freeze({ paperback: 15, hardcover: 4, ebook: 1 }),
+    audiobookIncluded: true,
+    estimatedDelivery: "12-16 weeks from manuscript receipt; final timeline depends on editorial and production complexity"
   })
 });
 
 const EXCLUDED_PACKAGE_LABELS = Object.freeze([
   "Starter Publishing Package",
-  "Signature Publishing Partnership",
+  "Premier Publishing Package",
   "Children's Book Publishing Package"
 ]);
 

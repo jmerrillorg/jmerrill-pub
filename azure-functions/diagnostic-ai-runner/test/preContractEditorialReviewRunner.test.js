@@ -7,6 +7,7 @@ const {
   runPrePackageEditorialReview,
   composePreContractEditorialReview,
   composePrePackageEditorialReview,
+  recommendPackageFromEditorialReview,
   determineImprintRecommendation,
   mapAiReviewToImprintDecision,
   buildInternalDiagnosticScorecard,
@@ -247,6 +248,32 @@ describe("composePreContractEditorialReview", () => {
     assert.equal(r.fitConfirmed, false);
     assert.equal(r.readyForAutoLock, false);
     assert.equal(r.humanReviewReason, HUMAN_REVIEW_REASON.PACKAGE_MISMATCH);
+  });
+});
+
+describe("recommendPackageFromEditorialReview", () => {
+  test("routes approximately 140,000+ word manuscripts to Premier with Professional as alternate", () => {
+    const result = recommendPackageFromEditorialReview({
+      officialManuscriptWordCount: 165482,
+      workType: MANUSCRIPT_WORK_TYPE.FULL_LENGTH_BOOK,
+      imprintDecision: mapAiReviewToImprintDecision(aiOutput())
+    });
+
+    assert.equal(result.packageCode, "JMP-PKG-PREMIER");
+    assert.equal(result.alternatePackageCode, "JMP-PKG-PRO");
+    assert.equal(result.publisherReviewRequired, false);
+  });
+
+  test("routes high production-complexity manuscripts to Premier even below 140,000 words", () => {
+    const result = recommendPackageFromEditorialReview({
+      officialManuscriptWordCount: 80000,
+      workType: MANUSCRIPT_WORK_TYPE.FULL_LENGTH_BOOK,
+      imprintDecision: mapAiReviewToImprintDecision(aiOutput()),
+      internalScorecard: { productionComplexity: 8 }
+    });
+
+    assert.equal(result.packageCode, "JMP-PKG-PREMIER");
+    assert.equal(result.alternatePackageCode, "JMP-PKG-PRO");
   });
 });
 

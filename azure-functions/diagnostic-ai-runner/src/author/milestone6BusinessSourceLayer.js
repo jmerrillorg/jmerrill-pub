@@ -16,7 +16,7 @@ const INTERNAL_VISIBILITY_MAILBOX = "publishing@jmerrill.one";
 const PACKAGE_CODES = Object.freeze({
   STARTER: "JMP-PKG-STARTER",
   PROFESSIONAL: "JMP-PKG-PRO",
-  SIGNATURE: "JMP-PKG-SIGNATURE",
+  PREMIER: "JMP-PKG-PREMIER",
   CHILD: "JMP-PKG-CHILD"
 });
 
@@ -31,9 +31,9 @@ const PACKAGE_CATALOG = Object.freeze({
     name: "Professional Publishing Package",
     costUsd: 4500
   }),
-  [PACKAGE_CODES.SIGNATURE]: Object.freeze({
-    code: PACKAGE_CODES.SIGNATURE,
-    name: "Signature Publishing Partnership",
+  [PACKAGE_CODES.PREMIER]: Object.freeze({
+    code: PACKAGE_CODES.PREMIER,
+    name: "Premier Publishing Package",
     costUsd: 7500
   }),
   [PACKAGE_CODES.CHILD]: Object.freeze({
@@ -60,7 +60,7 @@ const STRIPE_PACKAGE_MAPPINGS = Object.freeze({
     priceType: "one_time",
     livemode: true
   }),
-  [PACKAGE_CODES.SIGNATURE]: Object.freeze({
+  [PACKAGE_CODES.PREMIER]: Object.freeze({
     productId: "prod_UjRnIBF5yKgkFr",
     priceId: "price_1TjyuaJCiOVFpgYu8FKjWqIL",
     currency: "usd",
@@ -294,7 +294,7 @@ function resolveAlternativePackage(primaryPackageCode) {
   const packageCode = normalizePackageCode(primaryPackageCode);
   if (packageCode === PACKAGE_CODES.STARTER) return null;
   if (packageCode === PACKAGE_CODES.PROFESSIONAL) return PACKAGE_CODES.STARTER;
-  if (packageCode === PACKAGE_CODES.SIGNATURE) return PACKAGE_CODES.PROFESSIONAL;
+  if (packageCode === PACKAGE_CODES.PREMIER) return PACKAGE_CODES.PROFESSIONAL;
   if (packageCode === PACKAGE_CODES.CHILD) return null;
   return null;
 }

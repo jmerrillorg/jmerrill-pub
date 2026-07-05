@@ -24,7 +24,7 @@ Provide a JSON response with EXACTLY this structure (no other text):
   "distributionReadiness": <"Ready" | "Nearly Ready" | "Needs Preparation">,
   "primaryInsight": "<one sentence, specific to their genre/goal, max 20 words>",
   "recommendation": "<one concrete next step, max 25 words>",
-  "packageSuggestion": <"Starter" | "Professional" | "Signature">,
+  "packageSuggestion": <"Starter" | "Professional" | "Premier">,
   "packageReason": "<why this package, max 15 words>"
 }`
 

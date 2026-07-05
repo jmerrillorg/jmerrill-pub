@@ -259,13 +259,13 @@ JMP offers clear publishing paths so authors can choose the right level of suppo
 **Recommended CTA**  
 - Starter: `Explore Starter`
 - Professional: `Explore Professional`
-- Signature: `Apply for Signature`
+- Premier: `Explore Premier`
 
 **Priority level**  
 `P1`
 
 **Codex implementation notes**  
-Signature should be framed as selective/prestige rather than just the most expensive option. Fit language matters more than matrix density at the top of the page.
+Premier should be framed as larger-scope editorial and production care rather than just the most expensive option. Fit language matters more than matrix density at the top of the page.
 
 **Risk notes**  
 If this page stays price-first, authors may sort themselves purely by budget instead of by publishing need and long-term goals.

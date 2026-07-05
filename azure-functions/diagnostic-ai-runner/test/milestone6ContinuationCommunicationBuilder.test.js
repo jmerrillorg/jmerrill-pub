@@ -236,7 +236,7 @@ describe("PACKAGE_DISPLAY_NAMES — all four governed packages mapped", () => {
   test("contains all four package codes", () => {
     assert.equal(PACKAGE_DISPLAY_NAMES["JMP-PKG-STARTER"], "Starter Publishing Package");
     assert.equal(PACKAGE_DISPLAY_NAMES["JMP-PKG-PRO"], "Professional Publishing Package");
-    assert.equal(PACKAGE_DISPLAY_NAMES["JMP-PKG-SIGNATURE"], "Signature Publishing Package");
+    assert.equal(PACKAGE_DISPLAY_NAMES["JMP-PKG-PREMIER"], "Premier Publishing Package");
     assert.equal(PACKAGE_DISPLAY_NAMES["JMP-PKG-CHILD"], "Children's Publishing Package");
   });
 });

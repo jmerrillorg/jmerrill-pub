@@ -50,11 +50,16 @@ describe("generateSimplifiedAgreementPacket — gate enforcement and validation"
     assert.equal(result.reason, "FIELD_COMPUTATION_FAILED");
   });
 
-  test("rejects a package without a defined content model (computeAgreementFields itself rejects first, since complimentaryCopies/audiobookIncluded are also only defined for JMP-PKG-PRO)", async () => {
+  test("generates the Premier package content model for large or complex manuscripts", async () => {
     process.env[GATE_NAME] = "true";
-    const result = await generateSimplifiedAgreementPacket(controlledInput({ selectedPackageCode: "JMP-PKG-SIGNATURE" }));
-    assert.equal(result.ok, false);
-    assert.equal(result.reason, "FIELD_COMPUTATION_FAILED");
+    const result = await generateSimplifiedAgreementPacket(controlledInput({
+      selectedPackageCode: "JMP-PKG-PREMIER",
+      officialManuscriptWordCount: 165482
+    }));
+    assert.equal(result.ok, true);
+    assert.equal(result.fields.packageLabel, "Premier Publishing Package (JMP-PKG-PREMIER)");
+    assert.equal(result.fields.packageFeeFormatted, "$7,500.00");
+    assert.deepEqual(result.fields.complimentaryCopies, { paperback: 15, hardcover: 4, ebook: 1 });
   });
 });
 

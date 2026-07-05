@@ -79,13 +79,14 @@ describe("verifyManuscriptWordCount — package scope validation", () => {
     assert.equal(result.packageMismatch, true);
   });
 
-  test("JMP-PKG-SIGNATURE allows up to 100,000 words", () => {
-    assert.equal(PACKAGE_WORD_LIMITS["JMP-PKG-SIGNATURE"], 100000);
+  test("JMP-PKG-PREMIER is uncapped for large/complex manuscript validation", () => {
+    assert.equal(PACKAGE_WORD_LIMITS["JMP-PKG-PREMIER"], null);
     const result = verifyManuscriptWordCount({
-      selectedPackageCode: "JMP-PKG-SIGNATURE",
-      officialManuscriptWordCount: 100000
+      selectedPackageCode: "JMP-PKG-PREMIER",
+      officialManuscriptWordCount: 165482
     });
-    assert.equal(result.withinPackageScope, true);
+    assert.equal(result.withinPackageScope, null);
+    assert.equal(result.packageMismatch, false);
   });
 
   test("JMP-PKG-CHILD has no stated word limit in the canon documents — not invented", () => {
