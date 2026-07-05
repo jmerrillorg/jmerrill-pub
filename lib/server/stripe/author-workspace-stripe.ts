@@ -49,7 +49,7 @@ export async function createRecipientAccount() {
     'metadata[jm1_title]': COMMISSIONING_TITLE,
     'metadata[jm1_source]': 'PROGRAM-002 commissioning',
   }), {
-    idempotencyKey: `jm1-connect-account-${COMMISSIONING_REFERENCE}`,
+    idempotencyKey: `jm1-connect-account-${COMMISSIONING_REFERENCE}-capabilities-v2`,
     keyType: 'connect',
   })
 }
