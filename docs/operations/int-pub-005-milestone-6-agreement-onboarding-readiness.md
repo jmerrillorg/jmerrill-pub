@@ -78,7 +78,7 @@ The package catalog/reference guide is the package source of truth for Milestone
 | --- | --- | ---: |
 | `JMP-PKG-STARTER` | Starter Publishing Package | `$1,999` |
 | `JMP-PKG-PRO` | Professional Publishing Package | `$4,500` |
-| `JMP-PKG-SIGNATURE` | Signature Publishing Partnership | `$7,500` |
+| `JMP-PKG-PREMIER` | Premier Publishing Package | `$7,500` |
 | `JMP-PKG-CHILD` | Children's Package, author provides art | `$2,495` |
 
 Package recommendation rules:
@@ -86,7 +86,7 @@ Package recommendation rules:
 1. Recommend one primary package.
 2. If recommended package is Starter, do not offer a lower alternative.
 3. If recommended package is Professional, offer Starter as the alternative.
-4. If recommended package is Signature, offer Professional as the alternative.
+4. If recommended package is Premier, offer Professional as the alternative.
 5. If the project is a children's project with author-supplied illustrations, recommend Children's Package.
 6. If the project is a children's project that needs illustrations, flag for human quote/add-on review.
 7. Do not recommend pending-partner SKUs.
@@ -266,7 +266,7 @@ Stripe CLI live-mode inspection and creation on June 19, 2026 confirmed the four
 | --- | --- | ---: | --- | --- | --- |
 | `JMP-PKG-STARTER` | Starter Publishing Package | `$1,999` | `prod_URbgo7mwC7qr6t` | `price_1TSiTaJCiOVFpgYufee7GLQs` | Confirmed |
 | `JMP-PKG-PRO` | Professional Publishing Package | `$4,500` | `prod_UjRnnUiTQgHlrm` | `price_1TjyuZJCiOVFpgYur0FWmcj7` | Confirmed |
-| `JMP-PKG-SIGNATURE` | Signature Publishing Partnership | `$7,500` | `prod_UjRnIBF5yKgkFr` | `price_1TjyuaJCiOVFpgYu8FKjWqIL` | Confirmed |
+| `JMP-PKG-PREMIER` | Premier Publishing Package | `$7,500` | `prod_UjRnIBF5yKgkFr` | `price_1TjyuaJCiOVFpgYu8FKjWqIL` | Confirmed |
 | `JMP-PKG-CHILD` | Children's Package, author provides art | `$2,495` | `prod_UjRnLS7vXkbdEh` | `price_1TjyuaJCiOVFpgYuGJo5Ocwl` | Confirmed |
 
 All confirmed package Prices are live-mode, `usd`, and `one_time`. Do not create Stripe payment links, invoices, checkout sessions, subscriptions, installment schedules, customer changes, tax-setting changes, charges, or payment requests from this mapping.

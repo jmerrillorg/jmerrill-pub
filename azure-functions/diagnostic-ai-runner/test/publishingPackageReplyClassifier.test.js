@@ -21,12 +21,21 @@ describe("classifyPackageReply", () => {
     assert.equal(result.selectedPackage.code, "JMP-PKG-STARTER");
   });
 
-  test("quoted original recommendation does not select both packages", () => {
+  test("classifies Premier package selection", () => {
+    const result = classifyPackageReply("Premier Publishing Package is the right fit for this project.");
+    assert.equal(result.classification, PACKAGE_REPLY_CLASSIFICATION.PREMIER);
+    assert.equal(result.selectedPackage.code, "JMP-PKG-PREMIER");
+    assert.equal(result.selectedPackage.name, "Premier Publishing Package");
+    assert.equal(result.selectedPackage.price, "$7,500");
+  });
+
+  test("quoted original recommendation does not select multiple packages", () => {
     const result = classifyPackageReply([
       "Professional works for me.",
       "",
       "From: J Merrill Publishing",
       "Professional Publishing Package",
+      "Premier Publishing Package",
       "Starter Publishing Package"
     ].join("\n"));
 
@@ -35,7 +44,7 @@ describe("classifyPackageReply", () => {
   });
 
   test("ambiguous current reply fails closed", () => {
-    const result = classifyPackageReply("I am deciding between Professional and Starter.");
+    const result = classifyPackageReply("I am deciding between Professional and Premier.");
     assert.equal(result.classification, PACKAGE_REPLY_CLASSIFICATION.UNCLASSIFIED);
     assert.equal(result.selectedPackage, null);
   });

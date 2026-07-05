@@ -14,7 +14,7 @@ describe("buildPackageSpecificAddendumSections — JMP-PKG-PRO", () => {
     assert.equal(result.audiobookIncluded, true);
   });
 
-  test("excludes the Starter, Signature, and Children's package sections", () => {
+  test("excludes the Starter, Premier, and Children's package sections", () => {
     const result = buildPackageSpecificAddendumSections("JMP-PKG-PRO");
     for (const label of EXCLUDED_PACKAGE_LABELS) {
       assert.ok(result.excludedSections.includes(label));
@@ -34,10 +34,12 @@ describe("buildPackageSpecificAddendumSections — JMP-PKG-PRO", () => {
 });
 
 describe("buildPackageSpecificAddendumSections — undefined content", () => {
-  test("returns ok:false rather than inventing content for a package without a defined content model", () => {
-    const result = buildPackageSpecificAddendumSections("JMP-PKG-SIGNATURE");
-    assert.equal(result.ok, false);
-    assert.equal(result.error, "PACKAGE_CONTENT_NOT_DEFINED");
+  test("returns Premier content for the restored third package", () => {
+    const result = buildPackageSpecificAddendumSections("JMP-PKG-PREMIER");
+    assert.equal(result.ok, true);
+    assert.equal(result.packageLabel, "Premier Publishing Package (JMP-PKG-PREMIER)");
+    assert.ok(result.includedServices.some((service) => service.includes("large or complex manuscripts")));
+    assert.deepEqual(result.complimentaryCopies, { paperback: 15, hardcover: 4, ebook: 1 });
   });
 
   test("returns ok:false for an unrecognized package code", () => {

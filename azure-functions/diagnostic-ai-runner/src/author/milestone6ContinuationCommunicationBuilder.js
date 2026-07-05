@@ -24,7 +24,7 @@ const PROCESSING_FEE_RATE = 0.04;
 const PACKAGE_DISPLAY_NAMES = Object.freeze({
   "JMP-PKG-STARTER": "Starter Publishing Package",
   "JMP-PKG-PRO": "Professional Publishing Package",
-  "JMP-PKG-SIGNATURE": "Signature Publishing Package",
+  "JMP-PKG-PREMIER": "Premier Publishing Package",
   "JMP-PKG-CHILD": "Children's Publishing Package"
 });
 

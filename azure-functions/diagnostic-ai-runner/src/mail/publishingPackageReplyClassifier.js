@@ -9,6 +9,7 @@
 
 const PACKAGE_REPLY_CLASSIFICATION = Object.freeze({
   PROFESSIONAL: "PROFESSIONAL_PACKAGE_SELECTED",
+  PREMIER: "PREMIER_PACKAGE_SELECTED",
   STARTER: "STARTER_PACKAGE_SELECTED",
   CALL_REQUESTED: "CALL_REQUESTED",
   QUESTION: "QUESTION",
@@ -21,6 +22,11 @@ const SELECTED_PACKAGE_BY_CLASSIFICATION = Object.freeze({
     code: "JMP-PKG-PRO",
     name: "Professional Publishing Package",
     price: "$4,500"
+  },
+  [PACKAGE_REPLY_CLASSIFICATION.PREMIER]: {
+    code: "JMP-PKG-PREMIER",
+    name: "Premier Publishing Package",
+    price: "$7,500"
   },
   [PACKAGE_REPLY_CLASSIFICATION.STARTER]: {
     code: "JMP-PKG-STARTER",
@@ -64,22 +70,30 @@ function classifyPackageReply(replyText) {
   if (!isolated) return { classification: PACKAGE_REPLY_CLASSIFICATION.UNCLASSIFIED, selectedPackage: null };
 
   const professional = /\b(professional|pro\s+package|professional\s+publishing\s+package)\b/i.test(isolated);
+  const premier = /\b(premier|premier\s+publishing\s+package)\b/i.test(isolated);
   const starter = /\b(starter|starter\s+publishing\s+package)\b/i.test(isolated);
+  const selectedCount = [professional, premier, starter].filter(Boolean).length;
 
-  if (professional && !starter) {
+  if (selectedCount > 1) {
+    return { classification: PACKAGE_REPLY_CLASSIFICATION.UNCLASSIFIED, selectedPackage: null };
+  }
+  if (professional) {
     return {
       classification: PACKAGE_REPLY_CLASSIFICATION.PROFESSIONAL,
       selectedPackage: SELECTED_PACKAGE_BY_CLASSIFICATION[PACKAGE_REPLY_CLASSIFICATION.PROFESSIONAL]
     };
   }
-  if (starter && !professional) {
+  if (premier) {
+    return {
+      classification: PACKAGE_REPLY_CLASSIFICATION.PREMIER,
+      selectedPackage: SELECTED_PACKAGE_BY_CLASSIFICATION[PACKAGE_REPLY_CLASSIFICATION.PREMIER]
+    };
+  }
+  if (starter) {
     return {
       classification: PACKAGE_REPLY_CLASSIFICATION.STARTER,
       selectedPackage: SELECTED_PACKAGE_BY_CLASSIFICATION[PACKAGE_REPLY_CLASSIFICATION.STARTER]
     };
-  }
-  if (professional && starter) {
-    return { classification: PACKAGE_REPLY_CLASSIFICATION.UNCLASSIFIED, selectedPackage: null };
   }
   if (/\b(call|schedule|talk|phone|meeting|discuss|chat)\b/i.test(isolated)) {
     return { classification: PACKAGE_REPLY_CLASSIFICATION.CALL_REQUESTED, selectedPackage: null };

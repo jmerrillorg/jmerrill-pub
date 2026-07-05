@@ -123,8 +123,8 @@ Finding Category: **Moderate Improvement Opportunity**
 Strengths:
 
 - The page now leads with fit and guidance rather than only price.
-- Starter, Professional, and Signature are framed as paths for different author needs.
-- Signature is positioned as selective and elevated, not merely the highest price.
+- Starter, Professional, and Premier are framed as paths for different author needs.
+- Premier is positioned as the larger-scope path, not merely the highest price.
 - Existing package detail is useful for serious buyers and should remain available.
 
 Weaknesses:

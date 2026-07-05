@@ -27,20 +27,26 @@ const PACKAGE_INFO = Object.freeze({
     complimentaryCopies: { paperback: 10, hardcover: 2, ebook: 1 },
     audiobookIncluded: true
   },
-  "JMP-PKG-SIGNATURE": { label: "Signature Publishing Partnership (JMP-PKG-SIGNATURE)", fee: 7500.00, wordLimit: 100000 },
+  "JMP-PKG-PREMIER": {
+    label: "Premier Publishing Package (JMP-PKG-PREMIER)",
+    fee: 7500.00,
+    wordLimit: null,
+    complimentaryCopies: { paperback: 15, hardcover: 4, ebook: 1 },
+    audiobookIncluded: true
+  },
   "JMP-PKG-CHILD": { label: "Children's Book Publishing Package (JMP-PKG-CHILD)", fee: 2495.00, wordLimit: null }
 });
 
-// Per-installment amount and total fee-inclusive amount for each
-// payment option, confirmed against the controlled record's already
-// established Milestone 6 payment-option capture logic (4% processing
-// fee applies to every multi-payment option; single payment has none).
+// Per-installment count for each payment option. Multi-payment totals
+// include the confirmed 4% processing fee. Amounts are computed from
+// the selected package fee so Premier does not inherit Professional's
+// $4,500 payment schedule.
 const PAYMENT_OPTION_INFO = Object.freeze({
-  SINGLE: { installments: 1, perInstallmentUsd: 4500.00, feeApplies: false },
-  TWO_PAYMENTS: { installments: 2, perInstallmentUsd: 2340.00, feeApplies: true },
-  FOUR_PAYMENTS: { installments: 4, perInstallmentUsd: 1170.00, feeApplies: true },
-  EIGHT_PAYMENTS: { installments: 8, perInstallmentUsd: 585.00, feeApplies: true },
-  TWELVE_PAYMENTS: { installments: 12, perInstallmentUsd: 390.00, feeApplies: true }
+  SINGLE: { installments: 1, feeApplies: false },
+  TWO_PAYMENTS: { installments: 2, feeApplies: true },
+  FOUR_PAYMENTS: { installments: 4, feeApplies: true },
+  EIGHT_PAYMENTS: { installments: 8, feeApplies: true },
+  TWELVE_PAYMENTS: { installments: 12, feeApplies: true }
 });
 
 const MANUSCRIPT_DEADLINE_TEXT = "Manuscript received prior to agreement preparation";
@@ -113,12 +119,13 @@ function computeAgreementFields(input = {}) {
       audiobookIncluded: null, paymentSchedule: null };
   }
 
-  const totalUsd = Math.round(paymentInfo.installments * paymentInfo.perInstallmentUsd * 100) / 100;
+  const totalUsd = Math.round(packageInfo.fee * (paymentInfo.feeApplies ? 1.04 : 1) * 100) / 100;
+  const perInstallmentUsd = Math.round((totalUsd / paymentInfo.installments) * 100) / 100;
   const requiresScheduleAAttachment = paymentInfo.installments > 3;
 
   const rows = Array.from({ length: paymentInfo.installments }, (_, i) => ({
     paymentNumber: i + 1,
-    amountFormatted: formatUsd(paymentInfo.perInstallmentUsd),
+    amountFormatted: formatUsd(perInstallmentUsd),
     dueDateNote: i === 0
       ? "Due at signing / upon first payment — Author determines the start date by making this payment. Production begins upon receipt."
       : "Due on the same calendar day each period following the first payment."
@@ -141,8 +148,8 @@ function computeAgreementFields(input = {}) {
     audiobookIncluded: packageInfo.audiobookIncluded === true,
     paymentSchedule: {
       installments: paymentInfo.installments,
-      perInstallmentUsd: paymentInfo.perInstallmentUsd,
-      perInstallmentFormatted: formatUsd(paymentInfo.perInstallmentUsd),
+      perInstallmentUsd,
+      perInstallmentFormatted: formatUsd(perInstallmentUsd),
       totalUsd,
       totalFormatted: formatUsd(totalUsd),
       feeApplies: paymentInfo.feeApplies,

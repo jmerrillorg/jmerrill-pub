@@ -111,10 +111,10 @@ describe("Milestone 6B author package-selection branches", () => {
 
     const selected = buildMilestone6AuthorChoicePath(input({
       authorChoiceType: AUTHOR_CHOICE_TYPES.REQUEST_PAYMENT_OPTIONS,
-      authorSelectedPackageCode: PACKAGE_CODES.SIGNATURE
+      authorSelectedPackageCode: PACKAGE_CODES.PREMIER
     }));
     assert.equal(selected.ok, true);
-    assert.equal(selected.selectedPackage.code, PACKAGE_CODES.SIGNATURE);
+    assert.equal(selected.selectedPackage.code, PACKAGE_CODES.PREMIER);
     assert.equal(selected.branch.paymentOptionPreparationStatus, STATUS.paymentOptionsPrepared);
     assert.equal(selected.paymentOptions.length, 5);
   });

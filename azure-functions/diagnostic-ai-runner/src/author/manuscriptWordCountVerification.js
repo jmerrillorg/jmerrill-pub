@@ -19,14 +19,14 @@
  * elsewhere.
  */
 
-// Word-count ceilings confirmed from the canonical Publishing Package
-// Addendum (JMP_Publishing_Package_Addendum_v3.docx), Section 1: Package
-// Selection. JMP-PKG-CHILD has no stated word ceiling in that document —
-// left null rather than invented.
+// Word-count ceilings. Premier is intentionally uncapped here: it exists
+// for large and/or complex manuscripts requiring extended editorial and
+// production scope, with editorial complexity as the primary factor.
+// JMP-PKG-CHILD has no stated word ceiling — left null rather than invented.
 const PACKAGE_WORD_LIMITS = Object.freeze({
   "JMP-PKG-STARTER": 50000,
   "JMP-PKG-PRO": 75000,
-  "JMP-PKG-SIGNATURE": 100000,
+  "JMP-PKG-PREMIER": null,
   "JMP-PKG-CHILD": null
 });
 

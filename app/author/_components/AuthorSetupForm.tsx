@@ -523,7 +523,7 @@ export const onboardingFields: Field[] = [
     options: [
       'Starter Publishing Package',
       'Professional Publishing Package',
-      'Signature Publishing Package',
+      'Premier Publishing Package',
       'JM Prestige / Publishing Partner',
       'Custom Bundle / Special Agreement',
       'Not sure yet',

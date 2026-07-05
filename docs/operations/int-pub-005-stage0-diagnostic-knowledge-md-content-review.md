@@ -275,15 +275,15 @@ The agent must return one of the following values or `null`:
 |---|---|---|---|
 | `Starter` | JMP-PKG-STARTER | ≤50,000 words | First-time authors with a mostly clean manuscript; lighter editorial investment |
 | `Professional` | JMP-PKG-PRO | ≤75,000 words | Authors seeking stronger editorial polish and market positioning |
-| `Signature` | JMP-PKG-SIGNATURE | ≤100,000 words | Legacy authors, ministry leaders, authors investing in long-term platform |
+| `Premier` | JMP-PKG-PREMIER | Large and/or complex manuscripts; approximately 140,000+ words is a signal, not a sole determinant | Manuscripts requiring substantially greater editorial and production effort |
 | `Children's` | JMP-PKG-CHILD | N/A | JM Little submissions; author supplies or commissions illustrations |
 | `null` | — | — | Insufficient information to recommend a category; Jackie to determine |
 
-Note on JM Signature imprint vs. Signature package: `JMP-PKG-SIGNATURE` is a publishing
+Note on JM Signature imprint vs. Premier package: `JMP-PKG-PREMIER` is a publishing
 package available to any qualifying author. `JM Signature` imprint is publisher-invited only
-with dual authorization per BP-07. A work recommended for the Signature package does not
+with dual authorization per BP-07. A work recommended for the Premier package does not
 automatically qualify for the JM Signature imprint. Set `signatureReviewRequired = true` only
-for imprint consideration, not for Signature package selection.
+for imprint consideration, not for Premier package selection.
 
 ---
 
@@ -490,7 +490,7 @@ characterization of the nature of the misalignment (without quoting the author).
 
 ### timelineFit
 Compatibility of author's implied or stated timeline with JM1 Publishing's production schedule.
-Reference delivery timelines: Starter 8–10 weeks; Pro 10–12 weeks; Signature 12–14 weeks;
+Reference delivery timelines: Starter 8–10 weeks; Pro 10–12 weeks; Premier 12–16 weeks;
 audiobook +2–3 weeks; rush production available via JMP-OPS-RUSH (+25%).
 
 | Value | Meaning |

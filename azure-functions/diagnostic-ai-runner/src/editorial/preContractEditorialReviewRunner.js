@@ -97,7 +97,7 @@ const MANUSCRIPT_WORK_TYPE_LABELS = Object.freeze({
 const RECOMMENDED_PACKAGE = Object.freeze({
   STARTER: 196650000,
   PROFESSIONAL: 196650001,
-  SIGNATURE_PACKAGE: 196650002,
+  PREMIER_PACKAGE: 196650002,
   JM_PRESTIGE_STANDARD: 196650003,
   JM_PRESTIGE_PREMIUM: 196650004,
   EDITORIAL_EVALUATION_ONLY: 196650005,
@@ -109,7 +109,7 @@ const RECOMMENDED_PACKAGE = Object.freeze({
 const PACKAGE_CODE_TO_RECOMMENDED_PACKAGE = Object.freeze({
   "JMP-PKG-STARTER": RECOMMENDED_PACKAGE.STARTER,
   "JMP-PKG-PRO": RECOMMENDED_PACKAGE.PROFESSIONAL,
-  "JMP-PKG-SIGNATURE": RECOMMENDED_PACKAGE.SIGNATURE_PACKAGE
+  "JMP-PKG-PREMIER": RECOMMENDED_PACKAGE.PREMIER_PACKAGE
 });
 
 const PRE_PACKAGE_REVIEW_STATUS = Object.freeze({
@@ -460,15 +460,28 @@ function recommendPackageFromEditorialReview({
 
   if (imprintDecision?.outcome === IMPRINT_OUTCOME.SIGNATURE_CANDIDATE) {
     return {
-      packageCode: PACKAGE_CODES.SIGNATURE,
+      packageCode: PACKAGE_CODES.PREMIER,
       alternatePackageCode: PACKAGE_CODES.PROFESSIONAL,
-      reason: "Signature candidacy requires Publisher review; Signature is the proposed package with Professional as governed alternate.",
+      reason: "JM Signature imprint candidacy requires Publisher review; Premier is the proposed package with Professional as governed alternate.",
       publisherReviewRequired: true,
       publisherReviewReason: PUBLISHER_REVIEW_REASON.JM_SIGNATURE_CANDIDATE
     };
   }
 
   const complexity = internalScorecard?.productionComplexity;
+  if (
+    (typeof officialManuscriptWordCount === "number" && officialManuscriptWordCount >= 140000) ||
+    (typeof complexity === "number" && complexity >= 8)
+  ) {
+    return {
+      packageCode: PACKAGE_CODES.PREMIER,
+      alternatePackageCode: resolveAlternativePackage(PACKAGE_CODES.PREMIER),
+      reason: "Premier is recommended for large and/or complex manuscripts requiring expanded editorial and production scope.",
+      publisherReviewRequired: false,
+      publisherReviewReason: null
+    };
+  }
+
   if (typeof officialManuscriptWordCount === "number" && officialManuscriptWordCount <= 50000 && !(typeof complexity === "number" && complexity >= 7)) {
     return {
       packageCode: PACKAGE_CODES.STARTER,

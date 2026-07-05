@@ -348,21 +348,21 @@ Future recommendation:
 - Keep `/packages` as "Packages" or "Publishing Paths."
 - Keep `/services` lower-priority or footer-level unless data shows high demand.
 
-### 5.3 `/publishing-partner` vs Signature package
+### 5.3 `/publishing-partner` vs Premier package
 
 Current distinction:
 
 - `/publishing-partner` explains JM Prestige / selective publishing partner path.
-- Signature appears as a package tier.
+- Premier appears as a package tier.
 
 Risk:
 
-- Authors may perceive Prestige, Signature, and Publishing Partner as overlapping premium offers.
+- Authors may perceive Prestige, Premier, and Publishing Partner as overlapping premium offers.
 
 Future recommendation:
 
 - Keep `/publishing-partner` out of primary header until its role is clearly defined as a selective pathway.
-- Link it contextually from Signature and packages pages.
+- Link it contextually from Premier and packages pages.
 
 ### 5.4 `/authors` vs `/memberships`
 
@@ -414,7 +414,7 @@ Future recommendation:
 
 5. `/publishing-partner`
    - Reason: Important selective pathway.
-   - Suggested future placement: Contextual from `/packages`, `/publishing`, and Signature CTAs rather than primary header.
+   - Suggested future placement: Contextual from `/packages`, `/publishing`, and Premier CTAs rather than primary header.
 
 ## 7. Pages That Should Be Less Prominent
 

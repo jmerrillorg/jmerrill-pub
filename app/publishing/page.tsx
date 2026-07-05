@@ -128,14 +128,14 @@ const packageCopy: Record<
     href: '/packages',
     badge: 'Most Popular',
   },
-  Signature: {
-    summary: 'A selective path for works that need elevated positioning, expanded guidance, or prestige presentation without losing the author at the center.',
+  Premier: {
+    summary: 'A larger-scope path for works that need expanded editorial care, production planning, or a more complex publishing journey without losing the author at the center.',
     bullets: [
-      'Elevated positioning for high-potential work',
+      'Extended editorial and production planning',
       'Expanded guidance across the publishing path',
-      'Selective support for books that need more than a standard release',
+      'Support for books that need more than a standard full-service release',
     ],
-    ctaLabel: 'Apply for Signature',
+    ctaLabel: 'Explore Premier',
     href: '/join',
   },
 }

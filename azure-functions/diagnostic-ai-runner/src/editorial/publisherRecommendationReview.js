@@ -42,7 +42,7 @@ const INTAKE_FIELD = Object.freeze({
 const RECOMMENDED_PACKAGE_LABELS = Object.freeze({
   196650000: "Starter Publishing Package",
   196650001: "Professional Publishing Package",
-  196650002: "Signature Publishing Partnership",
+  196650002: "Premier Publishing Package",
   196650003: "JM Prestige Standard",
   196650004: "JM Prestige Premium",
   196650005: "Editorial Evaluation Only",
@@ -54,7 +54,7 @@ const RECOMMENDED_PACKAGE_LABELS = Object.freeze({
 const PACKAGE_CODES_BY_VALUE = Object.freeze({
   196650000: "JMP-PKG-STARTER",
   196650001: "JMP-PKG-PRO",
-  196650002: "JMP-PKG-SIGNATURE"
+  196650002: "JMP-PKG-PREMIER"
 });
 
 const PACKAGE_DETAILS_BY_CODE = Object.freeze({
@@ -68,10 +68,10 @@ const PACKAGE_DETAILS_BY_CODE = Object.freeze({
     price: "$4,500",
     shortDifference: "Professional gives the manuscript a fuller editorial and production path, which better fits a substantial leadership/devotional book."
   },
-  "JMP-PKG-SIGNATURE": {
-    name: "Signature Publishing Partnership",
+  "JMP-PKG-PREMIER": {
+    name: "Premier Publishing Package",
     price: "$7,500",
-    shortDifference: "Signature is reserved for selected partnership titles that need expanded publisher positioning and a higher-touch launch path."
+    shortDifference: "Premier gives large or complex manuscripts expanded editorial, production, and planning scope."
   },
   "JMP-PKG-CHILD": {
     name: "Children's Package, author provides art",
@@ -276,8 +276,8 @@ function buildRecommendedServicesLine(packageCode) {
   if (packageCode === "JMP-PKG-PRO") {
     return "Developmental editing, line editing, copyediting, and optional AI audiobook production are the services that most influenced this recommendation.";
   }
-  if (packageCode === "JMP-PKG-SIGNATURE") {
-    return "Expanded publisher positioning, developmental editing, line editing, copyediting, and a higher-touch launch path are the services that most influenced this recommendation.";
+  if (packageCode === "JMP-PKG-PREMIER") {
+    return "Extended developmental editing, line editing, copyediting, production planning, and a larger-scope publishing path are the services that most influenced this recommendation.";
   }
   if (packageCode === "JMP-PKG-STARTER") {
     return "A focused publishing foundation, copyediting support, and a lean production path are the services that most influenced this recommendation.";
@@ -292,8 +292,8 @@ function buildPackageWhy({ packageCode, recommendation, projectTitle }) {
   if (packageCode === "JMP-PKG-PRO") {
     return `${recommendation.name} is the strongest fit because ${projectTitle} needs more than a quick publishing setup; it needs a fuller editorial and production path that can help the manuscript mature without losing its message.`;
   }
-  if (packageCode === "JMP-PKG-SIGNATURE") {
-    return `${recommendation.name} is the strongest fit when a manuscript needs expanded publisher positioning and a higher-touch path from editorial preparation through launch readiness.`;
+  if (packageCode === "JMP-PKG-PREMIER") {
+    return `${recommendation.name} is the strongest fit when a large or complex manuscript needs expanded editorial and production planning beyond the standard full-service path.`;
   }
   if (packageCode === "JMP-PKG-STARTER") {
     return `${recommendation.name} is the strongest fit when a manuscript is ready for a focused publishing foundation and a leaner first step into publication.`;
