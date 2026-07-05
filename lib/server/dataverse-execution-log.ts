@@ -7,6 +7,14 @@ const BAND_LEVEL = {
   BAND_1: 835500000,
 } as const
 
+const FIRST_PAYMENT_STATUS = {
+  PAID_CONFIRMED: 835510002,
+} as const
+
+const FIRST_PAYMENT_CONFIRMATION_SOURCE = {
+  STRIPE_LIVE_APPROVED: 835511002,
+} as const
+
 type DataverseConfig = {
   apiBase: string
   resourceUrl: string
@@ -50,9 +58,9 @@ export async function updateCommissioningOpportunityPaymentStatus(input: {
       Prefer: 'return=minimal',
     },
     body: JSON.stringify({
-      jm1_m6firstpaymentstatus: input.status === 'confirmed' ? 'PAYMENT_CONFIRMED' : input.status,
+      jm1_m6firstpaymentstatus: FIRST_PAYMENT_STATUS.PAID_CONFIRMED,
       jm1_m6firstpaymentconfirmedon: confirmedOn,
-      jm1_m6firstpaymentconfirmationsource: input.source,
+      jm1_m6firstpaymentconfirmationsource: FIRST_PAYMENT_CONFIRMATION_SOURCE.STRIPE_LIVE_APPROVED,
     }),
   })
 
