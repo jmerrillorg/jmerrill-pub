@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { AuthorGate } from '../_components/AuthorGate'
 import { AuthorPortalShell } from '../_components/AuthorPortalShell'
+import { StripeWorkspaceActions } from '../_components/StripeWorkspaceActions'
 
 export const metadata: Metadata = {
   title: 'Author Workspace | J Merrill Publishing',
@@ -54,6 +55,13 @@ export default function AuthorPortalPage() {
           <p className="mt-7 text-[13px] font-light leading-[1.8] text-white/45">
             Additional publishing tools will unlock after your agreement is signed and your initial payment is confirmed.
           </p>
+          <div className="mt-7 border-t border-white/10 pt-7">
+            <h2 className="text-[18px] font-semibold text-white">Payment & royalty connection</h2>
+            <p className="mt-2 text-[13px] font-light leading-[1.8] text-white/45">
+              Stripe handles the secure setup. Do not enter bank, tax, or card details directly in this workspace.
+            </p>
+            <StripeWorkspaceActions />
+          </div>
         </section>
       </AuthorGate>
     </AuthorPortalShell>
