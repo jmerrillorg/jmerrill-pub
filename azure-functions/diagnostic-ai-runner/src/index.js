@@ -13,3 +13,4 @@ require("./functions/runPublisherRecommendationAction");
 require("./functions/runPublisherReviewDecision");
 require("./functions/runPublishingMailboxReplyCheck");
 require("./functions/runStage0Diagnostic");
+require("./functions/signNowWebhook");
