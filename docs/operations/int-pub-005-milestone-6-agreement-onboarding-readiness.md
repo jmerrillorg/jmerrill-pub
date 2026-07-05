@@ -139,7 +139,7 @@ Confirmed tables/entity sets:
 | `jm1pub_editorialdiagnostic` | `jm1pub_editorialdiagnostics` | Stage 0 diagnostic and review record |
 | `opportunity` | `opportunities` | Sales Enterprise Opportunity |
 | `jm1_publishingtask` | `jm1_publishingtasks` | Candidate onboarding/action task table |
-| `jm1pub_contract` | `jm1pub_contracts` | Candidate publishing contract table |
+| `jm1pub_contract` | `jm1pub_contracts` | Canonical merged publishing contract/agreement table for IS-004; see `docs/implementation/IS-004-Agreement-Domain-Reconciliation.md` |
 | `jm1_executionlog` | `jm1_executionlogs` | Safe operational evidence |
 
 Confirmed relevant Opportunity fields:
