@@ -16,6 +16,7 @@ import {
   w9StatusOptions,
 } from '@/lib/publishing/onboarding-production-options'
 import { requireAuthorAccess } from '@/lib/server/author-access'
+import { writeAuthorOnboardingDataverseFallback } from '@/lib/server/author-onboarding-dataverse'
 import { hasConfirmedNotificationDelivery, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
@@ -300,10 +301,25 @@ export async function POST(req: NextRequest) {
     })
 
     if (!hasConfirmedNotificationDelivery(integration)) {
+      const fallback = await writeAuthorOnboardingDataverseFallback(payload, integration.ingestion.detail)
+      if (fallback.status === 'success') {
+        return NextResponse.json({
+          success: true,
+          integration,
+          dataverseFallback: {
+            status: fallback.status,
+            submissionId: fallback.submissionId,
+            executionLogId: fallback.executionLogId,
+            detail: fallback.detail,
+          },
+        })
+      }
+
       return NextResponse.json(
         {
           error: 'We could not submit your onboarding form at this time. Please try again or contact publishing@jmerrill.one.',
           integration,
+          dataverseFallback: fallback,
         },
         { status: 502 },
       )
