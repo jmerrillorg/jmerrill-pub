@@ -53,6 +53,7 @@ export function validateAuthorAccessCode(code: unknown) {
 export function requireAuthorAccess(req: NextRequest) {
   const code = req.headers.get('x-author-access-code')
   if (validateAuthorAccessCode(code)) return null
+  if (validateAuthorPortalAccessCode(code).success) return null
 
   return NextResponse.json(
     {

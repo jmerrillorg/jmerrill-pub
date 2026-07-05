@@ -17,18 +17,18 @@ export default function AuthorOnboardingPage() {
   return (
     <AuthorPortalShell
       eyebrow="Author onboarding"
-      title="Welcome to your author setup."
-      description="This private intake gives J Merrill Publishing the core author, title, manuscript, and platform details needed to move from inquiry into a structured publishing relationship."
+      title="Complete author onboarding."
+      description="Confirm your author details, mailing address, and book information so we can prepare your publishing agreement."
     >
-      <AuthorGate>
+      <AuthorGate scope="portal">
         <AuthorSetupForm
           endpoint="/api/author/onboarding"
           fields={onboardingFields}
           submitLabel="Submit onboarding"
           successTitle="Your onboarding intake has been received."
           successMessage="A notification has been sent to publishing@jmerrill.one. You can expect a follow-up within 1–2 business days."
-          successDetails={['Next step: complete Financial Setup using the Author Hub.']}
-          successLink={{ href: '/author', label: 'Return to Author Hub' }}
+          successDetails={['Next step: complete Payment & Royalty Setup in your Author Workspace.']}
+          successLink={{ href: '/author/portal', label: 'Return to Author Workspace' }}
           failureMessage="We could not submit your onboarding form at this time. Please try again or contact publishing@jmerrill.one."
         />
       </AuthorGate>
