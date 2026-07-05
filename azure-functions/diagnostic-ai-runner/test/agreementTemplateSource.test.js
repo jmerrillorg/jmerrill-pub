@@ -10,9 +10,11 @@ const {
   createBlobTemplateReader,
   createGeneratedOutputBlobWriter,
   createGeneratedOutputBlobReader,
+  createPublisherSignatureBlobReader,
   resolveAgreementPrepDeps,
   isUnderTemplatePrefix,
-  DEFAULT_TEMPLATE_PREFIX
+  DEFAULT_TEMPLATE_PREFIX,
+  DEFAULT_PUBLISHER_SIGNATURE_BLOB_NAME
 } = require("../src/agreement/agreementTemplateSource");
 const { computeSha256 } = require("../src/agreement/templateHasher");
 
@@ -119,6 +121,23 @@ describe("createGeneratedOutputBlobReader", () => {
   });
 });
 
+describe("createPublisherSignatureBlobReader", () => {
+  test("reads the governed publisher signature asset from the default blob path", async () => {
+    let requestedBlobName = null;
+    const reader = createPublisherSignatureBlobReader({
+      downloadBlob: async (name) => { requestedBlobName = name; return Buffer.from("signature"); }
+    });
+    const buffer = await reader();
+    assert.equal(requestedBlobName, DEFAULT_PUBLISHER_SIGNATURE_BLOB_NAME);
+    assert.equal(buffer.toString("utf8"), "signature");
+  });
+
+  test("throws PUBLISHER_SIGNATURE_ASSET_NOT_FOUND when the asset is missing", async () => {
+    const reader = createPublisherSignatureBlobReader({ downloadBlob: async () => null });
+    await assert.rejects(() => reader(), (err) => err.safeCode === "PUBLISHER_SIGNATURE_ASSET_NOT_FOUND");
+  });
+});
+
 describe("isUnderTemplatePrefix", () => {
   test("detects a path under the template prefix", () => {
     assert.equal(isUnderTemplatePrefix(`${DEFAULT_TEMPLATE_PREFIX}foo.docx`, DEFAULT_TEMPLATE_PREFIX), true);
@@ -160,17 +179,21 @@ describe("resolveAgreementPrepDeps — mode selection", () => {
   test("blob mode resolves a blob reader and a generated-output writer", async () => {
     const correctHash = computeSha256(Buffer.from("template content"));
     const manifest = JSON.stringify({ files: [{ name: "Test.docx", sha256: correctHash }] });
-    const { readTemplate, writeOutput } = resolveAgreementPrepDeps({
+    const { readTemplate, writeOutput, readPublisherSignatureAsset } = resolveAgreementPrepDeps({
       mode: "blob",
       diagnosticId: "abc",
       blobClientDeps: {
-        downloadBlob: async (name) => name.endsWith("manifest.json") ? Buffer.from(manifest) : Buffer.from("template content"),
+        downloadBlob: async (name) => {
+          if (name === DEFAULT_PUBLISHER_SIGNATURE_BLOB_NAME) return Buffer.from("signature");
+          return name.endsWith("manifest.json") ? Buffer.from(manifest) : Buffer.from("template content");
+        },
         uploadBlob: async () => {}
       }
     });
     const buffer = await readTemplate("Test.docx");
     assert.equal(buffer.toString("utf8"), "template content");
     assert.equal(typeof writeOutput, "function");
+    assert.equal((await readPublisherSignatureAsset()).toString("utf8"), "signature");
   });
 
   test("blob mode throws BLOB_CLIENT_DEPS_REQUIRED when blobClientDeps is missing", () => {

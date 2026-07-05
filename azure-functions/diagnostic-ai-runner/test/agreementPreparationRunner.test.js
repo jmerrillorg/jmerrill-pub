@@ -5,6 +5,7 @@ const assert = require("node:assert/strict");
 const JSZip = require("jszip");
 const {
   prepareAgreementDocumentPackage,
+  applyPublisherSignatureToAgreementBuffer,
   fillPublishingAgreement,
   fillPackageAddendum,
   fillAudiobookAddendum,
@@ -25,6 +26,7 @@ const REAL_DIAGNOSTIC_ID = "64e387e0-7e6a-f111-a826-00224820105b";
 const REAL_INTAKE_REFERENCE = "JMP-INT-202606-UFYG60";
 const REAL_OPPORTUNITY_ID = "2653fca9-eacd-4c44-b3ed-1764dd5d35aa";
 const FORBIDDEN_TEXT = "This text must never appear in any output document or execution log.";
+const PNG_SIGNATURE_BYTES = Buffer.from("89504e470d0a1a0a0000000d49484452", "hex");
 
 beforeEach(() => {
   delete process.env[GATE_NAME];
@@ -63,11 +65,25 @@ async function buildMinimalDocx(documentXml) {
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
+function publishingAgreementTemplateXml(extraXml = "") {
+  return [
+    extraXml,
+    "<w:p><w:r><w:t>Publisher</w:t></w:r></w:p>",
+    "<w:p><w:r><w:t>J Merrill Publishing, Inc.</w:t></w:r></w:p>",
+    "<w:p><w:r><w:t>By: _______________________</w:t></w:r></w:p>",
+    "<w:p><w:r><w:t>Jackie Smith, Jr., CEO</w:t></w:r></w:p>",
+    "<w:p><w:r><w:t>Date: _____________________</w:t></w:r></w:p>",
+    "<w:p><w:r><w:t>Author</w:t></w:r></w:p>",
+    "<w:p><w:r><w:t>Signature: </w:t></w:r><w:r><w:t>_____________________</w:t></w:r></w:p>"
+  ].join("");
+}
+
 function fakeDeps(templateXmlByName, { writes = [] } = {}) {
   return {
     getToken: async () => "fake-token",
     readTemplate: async (name) => buildMinimalDocx(templateXmlByName[name] || "<w:document/>"),
-    writeOutput: async (name, buffer) => { writes.push({ name, size: buffer.length }); return `/controlled/output/${name}`; }
+    writeOutput: async (name, buffer) => { writes.push({ name, size: buffer.length, buffer }); return `/controlled/output/${name}`; },
+    publisherSignatureAssetBuffer: PNG_SIGNATURE_BYTES
   };
 }
 
@@ -93,6 +109,35 @@ describe("fillPublishingAgreement", () => {
     assert.ok(r.xml.includes("[City, State ZIP]"));
     assert.deepEqual(r.deferredFields, ["address", "cityStateZip"]);
     assert.equal(r.unmatchedFields.length, 0);
+  });
+});
+
+describe("applyPublisherSignatureToAgreementBuffer", () => {
+  test("embeds the governed publisher signature into the Publisher block only", async () => {
+    const docx = await buildMinimalDocx([
+      "<w:p><w:r><w:t>Publisher</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>J Merrill Publishing, Inc.</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>By: _______________________</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>Jackie Smith, Jr., CEO</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>Date: _____________________</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>Author</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>Signature: </w:t></w:r><w:r><w:t>_____________________</w:t></w:r></w:p>"
+    ].join(""));
+    const result = await applyPublisherSignatureToAgreementBuffer(docx, PNG_SIGNATURE_BYTES, { contractDate: "2026-07-05" });
+    assert.equal(result.applied, true);
+
+    const zip = await JSZip.loadAsync(result.buffer);
+    const xml = await zip.file("word/document.xml").async("string");
+    const rels = await zip.file("word/_rels/document.xml.rels").async("string");
+    const contentTypes = await zip.file("[Content_Types].xml").async("string");
+
+    assert.ok(xml.includes("Publisher Signature"));
+    assert.ok(xml.includes("Date: 2026-07-05"));
+    assert.ok(xml.includes("Signature: "), "author signature label remains present");
+    assert.ok(xml.includes("_____________________"), "author signature blank remains present");
+    assert.ok(rels.includes("jm1-publisher-signature.png"));
+    assert.ok(contentTypes.includes('Extension="png"'));
+    assert.ok(zip.file("word/media/jm1-publisher-signature.png"));
   });
 });
 
@@ -191,7 +236,7 @@ describe("prepareAgreementDocumentPackage — produces the expected document set
     mockFetchAlwaysOk();
     const writes = [];
     const deps = fakeDeps({
-      [TEMPLATE_NAME.PUBLISHING_AGREEMENT]: "<w:t>[Author Legal Name]</w:t><w:t>[Book Title]</w:t><w:t>[Effective Date]</w:t>",
+      [TEMPLATE_NAME.PUBLISHING_AGREEMENT]: publishingAgreementTemplateXml("<w:t>[Author Legal Name]</w:t><w:t>[Book Title]</w:t><w:t>[Effective Date]</w:t>"),
       [TEMPLATE_NAME.PACKAGE_ADDENDUM]: "<w:t>[Date]</w:t><w:t>COMPLIMENTARY COPIES</w:t>",
       [TEMPLATE_NAME.AUDIOBOOK_ADDENDUM]: "<w:t>[Date]</w:t>"
     }, { writes });
@@ -210,7 +255,7 @@ describe("prepareAgreementDocumentPackage — produces the expected document set
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     const deps = fakeDeps({
-      [TEMPLATE_NAME.PUBLISHING_AGREEMENT]: "<w:t>[Author Legal Name]</w:t>",
+      [TEMPLATE_NAME.PUBLISHING_AGREEMENT]: publishingAgreementTemplateXml("<w:t>[Author Legal Name]</w:t>"),
       [TEMPLATE_NAME.PACKAGE_ADDENDUM]: "<w:t>COMPLIMENTARY COPIES</w:t>",
       [TEMPLATE_NAME.AUDIOBOOK_ADDENDUM]: "<w:t>[Date]</w:t>"
     });
@@ -226,7 +271,7 @@ describe("prepareAgreementDocumentPackage — never sends, never touches the Opp
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     const deps = fakeDeps({
-      [TEMPLATE_NAME.PUBLISHING_AGREEMENT]: "<w:t>[Author Legal Name]</w:t>",
+      [TEMPLATE_NAME.PUBLISHING_AGREEMENT]: publishingAgreementTemplateXml("<w:t>[Author Legal Name]</w:t>"),
       [TEMPLATE_NAME.PACKAGE_ADDENDUM]: "<w:t>COMPLIMENTARY COPIES</w:t>",
       [TEMPLATE_NAME.AUDIOBOOK_ADDENDUM]: "<w:t>[Date]</w:t>"
     });
@@ -251,7 +296,7 @@ describe("prepareAgreementDocumentPackage — never logs raw manuscript text or 
       return jsonOkResponse({ jm1_executionlogid: "99999999-9999-9999-9999-999999999999" });
     };
     const deps = fakeDeps({
-      [TEMPLATE_NAME.PUBLISHING_AGREEMENT]: `<w:t>[Author Legal Name]</w:t><w:t>${FORBIDDEN_TEXT}</w:t>`,
+      [TEMPLATE_NAME.PUBLISHING_AGREEMENT]: publishingAgreementTemplateXml(`<w:t>[Author Legal Name]</w:t><w:t>${FORBIDDEN_TEXT}</w:t>`),
       [TEMPLATE_NAME.PACKAGE_ADDENDUM]: "<w:t>COMPLIMENTARY COPIES</w:t>",
       [TEMPLATE_NAME.AUDIOBOOK_ADDENDUM]: "<w:t>[Date]</w:t>"
     });

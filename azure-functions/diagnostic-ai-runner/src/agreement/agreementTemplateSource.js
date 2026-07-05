@@ -26,6 +26,7 @@ const { computeSha256 } = require("./templateHasher");
 const DEFAULT_BLOB_CONTAINER = "publishing";
 const DEFAULT_TEMPLATE_PREFIX = "agreement-templates/JMP_Complete_Agreement_Stack_v1/";
 const DEFAULT_GENERATED_PREFIX = "generated-agreements/";
+const DEFAULT_PUBLISHER_SIGNATURE_BLOB_NAME = "agreement-assets/publisher-signature/signature-navy.png";
 
 function isUnderTemplatePrefix(blobName, templatePrefix) {
   return blobName.startsWith(templatePrefix);
@@ -137,6 +138,18 @@ function createGeneratedOutputBlobReader(deps) {
   };
 }
 
+function createPublisherSignatureBlobReader(deps) {
+  const blobName = deps.publisherSignatureBlobName || process.env.JM1_PUBLISHER_SIGNATURE_BLOB_NAME || DEFAULT_PUBLISHER_SIGNATURE_BLOB_NAME;
+
+  return async () => {
+    const buffer = await deps.downloadBlob(blobName);
+    if (!buffer) {
+      throw Object.assign(new Error("Publisher signature asset not found in Blob Storage"), { safeCode: "PUBLISHER_SIGNATURE_ASSET_NOT_FOUND" });
+    }
+    return buffer;
+  };
+}
+
 /**
  * Resolves the read/write dependency pair for prepareAgreementDocumentPackage
  * based on mode. Pure selection logic — the actual storage clients are
@@ -149,7 +162,7 @@ function createGeneratedOutputBlobReader(deps) {
  *   localCanonPath?: string,
  *   blobClientDeps?: { downloadBlob: Function, uploadBlob: Function }
  * }} input
- * @returns {{ readTemplate: Function, writeOutput: Function }}
+ * @returns {{ readTemplate: Function, writeOutput: Function, readPublisherSignatureAsset?: Function }}
  */
 function resolveAgreementPrepDeps(input = {}) {
   const mode = input.mode || (typeof process.env.JM1_AGREEMENT_TEMPLATE_SOURCE === "string" ? process.env.JM1_AGREEMENT_TEMPLATE_SOURCE : "blob");
@@ -166,6 +179,9 @@ function resolveAgreementPrepDeps(input = {}) {
       // the local canon folder.
       writeOutput: input.blobClientDeps
         ? createGeneratedOutputBlobWriter({ ...input.blobClientDeps, diagnosticId: input.diagnosticId })
+        : undefined,
+      readPublisherSignatureAsset: input.blobClientDeps
+        ? createPublisherSignatureBlobReader(input.blobClientDeps)
         : undefined
     };
   }
@@ -175,7 +191,8 @@ function resolveAgreementPrepDeps(input = {}) {
   }
   return {
     readTemplate: createBlobTemplateReader(input.blobClientDeps),
-    writeOutput: createGeneratedOutputBlobWriter({ ...input.blobClientDeps, diagnosticId: input.diagnosticId })
+    writeOutput: createGeneratedOutputBlobWriter({ ...input.blobClientDeps, diagnosticId: input.diagnosticId }),
+    readPublisherSignatureAsset: createPublisherSignatureBlobReader(input.blobClientDeps)
   };
 }
 
@@ -184,9 +201,11 @@ module.exports = {
   createBlobTemplateReader,
   createGeneratedOutputBlobWriter,
   createGeneratedOutputBlobReader,
+  createPublisherSignatureBlobReader,
   resolveAgreementPrepDeps,
   isUnderTemplatePrefix,
   DEFAULT_BLOB_CONTAINER,
   DEFAULT_TEMPLATE_PREFIX,
-  DEFAULT_GENERATED_PREFIX
+  DEFAULT_GENERATED_PREFIX,
+  DEFAULT_PUBLISHER_SIGNATURE_BLOB_NAME
 };

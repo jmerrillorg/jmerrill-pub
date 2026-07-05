@@ -29,6 +29,7 @@
  */
 
 const JSZip = require("jszip");
+const fs = require("node:fs/promises");
 const { replaceBracketPlaceholder, replaceBlankAfterLabel } = require("./agreementDocumentFiller");
 const { computeAgreementFields } = require("./agreementFieldComputer");
 const { generateScheduleADocument } = require("./scheduleAGenerator");
@@ -67,6 +68,150 @@ function blocked(reason, extra = {}) {
 
 function wordCountDisplay(fields) {
   return `${fields.officialManuscriptWordCount.toLocaleString("en-US")} (manuscript-derived)`;
+}
+
+function escapeXmlAttr(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function ensurePngContentType(contentTypesXml) {
+  if (contentTypesXml.includes('Extension="png"')) return contentTypesXml;
+  return contentTypesXml.replace(
+    "</Types>",
+    '<Default Extension="png" ContentType="image/png"/></Types>'
+  );
+}
+
+function nextRelationshipId(relsXml) {
+  const ids = Array.from(relsXml.matchAll(/Id="rId(\d+)"/g)).map((match) => Number(match[1]));
+  const next = ids.length ? Math.max(...ids) + 1 : 1;
+  return `rId${next}`;
+}
+
+function appendImageRelationship(relsXml, relId, target) {
+  const relationship = `<Relationship Id="${escapeXmlAttr(relId)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="${escapeXmlAttr(target)}"/>`;
+  return relsXml.replace("</Relationships>", `${relationship}</Relationships>`);
+}
+
+function buildPublisherSignatureDrawing(relId, { widthEmu = 2057400, heightEmu = 726900 } = {}) {
+  const name = "J Merrill Publishing publisher signature";
+  return [
+    "<w:r>",
+    "<w:drawing>",
+    '<wp:inline distT="0" distB="0" distL="0" distR="0">',
+    `<wp:extent cx="${widthEmu}" cy="${heightEmu}"/>`,
+    '<wp:effectExtent l="0" t="0" r="0" b="0"/>',
+    '<wp:docPr id="91001" name="Publisher Signature" descr="J Merrill Publishing publisher signature"/>',
+    '<wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr>',
+    '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">',
+    '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+    '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+    '<pic:nvPicPr><pic:cNvPr id="91002" name="publisher-signature.png"/><pic:cNvPicPr/></pic:nvPicPr>',
+    '<pic:blipFill>',
+    `<a:blip r:embed="${escapeXmlAttr(relId)}"/>`,
+    '<a:stretch><a:fillRect/></a:stretch>',
+    '</pic:blipFill>',
+    '<pic:spPr>',
+    '<a:xfrm><a:off x="0" y="0"/>',
+    `<a:ext cx="${widthEmu}" cy="${heightEmu}"/>`,
+    '</a:xfrm>',
+    '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>',
+    '</pic:spPr>',
+    '</pic:pic>',
+    '</a:graphicData>',
+    '</a:graphic>',
+    '</wp:inline>',
+    '</w:drawing>',
+    "</w:r>"
+  ].join("");
+}
+
+function replacePublisherSignatureLine(xml, relId) {
+  const publisherIndex = xml.indexOf("<w:t>Publisher</w:t>");
+  const authorIndex = xml.indexOf("<w:t>Author</w:t>", publisherIndex);
+  if (publisherIndex === -1 || authorIndex === -1) {
+    return { xml, inserted: false };
+  }
+  const before = xml.slice(0, publisherIndex);
+  const block = xml.slice(publisherIndex, authorIndex);
+  const after = xml.slice(authorIndex);
+  const linePattern = /<w:p\b[^>]*>[\s\S]*?<w:t>By: _{3,}<\/w:t>[\s\S]*?<\/w:p>/;
+  const match = block.match(linePattern);
+  if (!match) {
+    return { xml, inserted: false };
+  }
+  const replacement = [
+    '<w:p>',
+    '<w:r><w:t xml:space="preserve">By: </w:t></w:r>',
+    buildPublisherSignatureDrawing(relId),
+    '</w:p>'
+  ].join("");
+  return { xml: before + block.replace(linePattern, replacement) + after, inserted: true };
+}
+
+function replacePublisherDateLine(xml, contractDate) {
+  const publisherIndex = xml.indexOf("<w:t>Publisher</w:t>");
+  const authorIndex = xml.indexOf("<w:t>Author</w:t>", publisherIndex);
+  if (publisherIndex === -1 || authorIndex === -1) {
+    return { xml, filled: false };
+  }
+  const before = xml.slice(0, publisherIndex);
+  const block = xml.slice(publisherIndex, authorIndex);
+  const after = xml.slice(authorIndex);
+  const updated = block.replace(/<w:t>Date: _{3,}<\/w:t>/, `<w:t>Date: ${escapeXmlAttr(contractDate)}</w:t>`);
+  return { xml: before + updated + after, filled: updated !== block };
+}
+
+async function applyPublisherSignatureToAgreementBuffer(buffer, signaturePngBuffer, fields) {
+  if (!Buffer.isBuffer(signaturePngBuffer) || signaturePngBuffer.length === 0) {
+    return { buffer, applied: false, reason: "PUBLISHER_SIGNATURE_ASSET_MISSING" };
+  }
+  const zip = await JSZip.loadAsync(buffer);
+  const documentXmlPath = "word/document.xml";
+  const relsPath = "word/_rels/document.xml.rels";
+  const contentTypesPath = "[Content_Types].xml";
+  const mediaPath = "word/media/jm1-publisher-signature.png";
+  const mediaTarget = "media/jm1-publisher-signature.png";
+  const originalXml = await zip.file(documentXmlPath).async("string");
+  const relsXml = zip.file(relsPath) ? await zip.file(relsPath).async("string") : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+  const contentTypesXml = zip.file(contentTypesPath) ? await zip.file(contentTypesPath).async("string") : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>';
+  const relId = nextRelationshipId(relsXml);
+
+  const signatureResult = replacePublisherSignatureLine(originalXml, relId);
+  if (!signatureResult.inserted) {
+    return { buffer, applied: false, reason: "PUBLISHER_SIGNATURE_LINE_NOT_FOUND" };
+  }
+  const dateResult = replacePublisherDateLine(signatureResult.xml, fields.contractDate);
+
+  zip.file(documentXmlPath, dateResult.xml);
+  zip.file(relsPath, appendImageRelationship(relsXml, relId, mediaTarget));
+  zip.file(contentTypesPath, ensurePngContentType(contentTypesXml));
+  zip.file(mediaPath, signaturePngBuffer);
+
+  const outputBuffer = await zip.generateAsync({ type: "nodebuffer" });
+  return {
+    buffer: outputBuffer,
+    applied: true,
+    reason: null,
+    relId,
+    publisherDateFilled: dateResult.filled
+  };
+}
+
+async function resolvePublisherSignatureAsset(deps = {}) {
+  if (Buffer.isBuffer(deps.publisherSignatureAssetBuffer)) {
+    return deps.publisherSignatureAssetBuffer;
+  }
+  if (typeof deps.readPublisherSignatureAsset === "function") {
+    return deps.readPublisherSignatureAsset();
+  }
+  const signaturePath = normalizeString(deps.publisherSignatureAssetPath || process.env.JM1_PUBLISHER_SIGNATURE_ASSET_PATH);
+  if (!signaturePath) return null;
+  return fs.readFile(signaturePath);
 }
 
 /**
@@ -267,7 +412,10 @@ async function fillDocxBuffer(buffer, fillFn, fields) {
  * @param {{
  *   getToken?: Function,
  *   readTemplate: (templateName: string) => Promise<Buffer>,
- *   writeOutput: (outputName: string, buffer: Buffer) => Promise<string>
+ *   writeOutput: (outputName: string, buffer: Buffer) => Promise<string>,
+ *   readPublisherSignatureAsset?: () => Promise<Buffer>,
+ *   publisherSignatureAssetBuffer?: Buffer,
+ *   publisherSignatureAssetPath?: string
  * }} deps — readTemplate/writeOutput are required; the caller controls
  *   where templates come from and where outputs are written.
  * @returns {Promise<object>}
@@ -279,6 +427,7 @@ async function prepareAgreementDocumentPackage(input = {}, deps = {}) {
 
   let readTemplate = deps.readTemplate;
   let writeOutput = deps.writeOutput;
+  let readPublisherSignatureAsset = deps.readPublisherSignatureAsset;
   if (typeof readTemplate !== "function" || typeof writeOutput !== "function") {
     // Local/dev mode reads the OneDrive canon directly when
     // deps.localCanonPath is supplied; Azure/runtime mode reads from
@@ -296,6 +445,7 @@ async function prepareAgreementDocumentPackage(input = {}, deps = {}) {
         });
         readTemplate = readTemplate || resolved.readTemplate;
         writeOutput = writeOutput || resolved.writeOutput;
+        readPublisherSignatureAsset = readPublisherSignatureAsset || resolved.readPublisherSignatureAsset;
       } catch (err) {
         return blocked(err.safeCode || "TEMPLATE_SOURCE_RESOLUTION_FAILED");
       }
@@ -324,9 +474,27 @@ async function prepareAgreementDocumentPackage(input = {}, deps = {}) {
   try {
     const agreementBuf = await readTemplate(TEMPLATE_NAME.PUBLISHING_AGREEMENT);
     const agreementResult = await fillDocxBuffer(agreementBuf, fillPublishingAgreement, fields);
+    const publisherSignatureBuffer = await resolvePublisherSignatureAsset({ ...deps, readPublisherSignatureAsset });
+    const publisherSignatureResult = await applyPublisherSignatureToAgreementBuffer(
+      agreementResult.buffer,
+      publisherSignatureBuffer,
+      fields
+    );
+    if (!publisherSignatureResult.applied) {
+      return blocked(publisherSignatureResult.reason || "PUBLISHER_SIGNATURE_NOT_APPLIED");
+    }
     const agreementOutputName = `JMP_Publishing_Agreement_FILLED_${diagnosticId}.docx`;
-    const agreementOutputPath = await writeOutput(agreementOutputName, agreementResult.buffer);
-    documents.push({ sourceTemplate: TEMPLATE_NAME.PUBLISHING_AGREEMENT, outputPath: agreementOutputPath, filledFields: agreementResult.filledFields, unmatchedFields: agreementResult.unmatchedFields });
+    const agreementOutputPath = await writeOutput(agreementOutputName, publisherSignatureResult.buffer);
+    documents.push({
+      sourceTemplate: TEMPLATE_NAME.PUBLISHING_AGREEMENT,
+      outputPath: agreementOutputPath,
+      filledFields: [
+        ...agreementResult.filledFields,
+        { field: "publisherSignature", value: "governed asset reference applied" },
+        { field: "publisherSignatureDate", value: fields.contractDate }
+      ],
+      unmatchedFields: agreementResult.unmatchedFields
+    });
     agreementResult.deferredFields.forEach((f) => allDeferred.add(f));
 
     const addendumBuf = await readTemplate(TEMPLATE_NAME.PACKAGE_ADDENDUM);
@@ -460,6 +628,7 @@ async function postExecutionLogRecord(apiBase, token, payload) {
 
 module.exports = {
   prepareAgreementDocumentPackage,
+  applyPublisherSignatureToAgreementBuffer,
   fillPublishingAgreement,
   fillPackageAddendum,
   fillAudiobookAddendum,
