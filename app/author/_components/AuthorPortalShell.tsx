@@ -57,8 +57,8 @@ export function AuthorPortalShell({
           <aside className="space-y-4">
             {[
               ['01', 'Need help?', 'Email publishing@jmerrill.one if you have questions while completing your setup.'],
-              ['02', 'Use your invitation code', 'Your code keeps this workspace private while you complete the requested steps.'],
-              ['03', 'Take your time', 'You can return to your workspace and finish the setup steps when you are ready.'],
+              ['02', 'Use your invitation code', 'Your code keeps this workspace private while your book moves through publishing.'],
+              ['03', 'Check back anytime', 'You can return here to see where your project stands and what needs your attention.'],
             ].map(([number, heading, body]) => (
               <div key={number} className="rounded-3xl border border-white/8 bg-white/[0.035] p-6">
                 <div className="font-mono text-[11px] text-blue-400">{number}</div>

@@ -3,64 +3,64 @@ import Link from 'next/link'
 
 import { AuthorGate } from '../_components/AuthorGate'
 import { AuthorPortalShell } from '../_components/AuthorPortalShell'
-import { StripeWorkspaceActions } from '../_components/StripeWorkspaceActions'
+import { authorWorkspaceModules, commissioningTitle } from '@/lib/publishing/author-workspace-modules'
 
 export const metadata: Metadata = {
   title: 'Author Workspace | J Merrill Publishing',
-  description: 'Private pre-contract author workspace for accepted J Merrill Publishing projects.',
+  description: 'Private author workspace for active J Merrill Publishing projects.',
   robots: {
     index: false,
     follow: false,
   },
 }
 
-const setupSteps = [
-  {
-    label: 'Author Onboarding',
-    description: 'Confirm your author details, mailing address, and book information.',
-    href: '/author/onboarding',
-  },
-  {
-    label: 'Payment & Royalty Setup',
-    description: 'Securely connect Stripe so payments and royalties can be handled safely.',
-    href: '/author/financial-setup',
-  },
-]
-
 export default function AuthorPortalPage() {
   return (
     <AuthorPortalShell
       eyebrow="Author Workspace"
-      title="Your Author Workspace is ready."
-      description="Complete these setup steps so we can prepare your publishing agreement and begin your publishing journey."
+      title="Welcome to your publishing workspace."
+      description="Track the next steps for your book, review requests from J Merrill Publishing, and see what is coming next as your project moves through production."
     >
       <AuthorGate scope="portal">
-        <section className="rounded-[32px] border border-blue-500/20 bg-blue-500/[0.06] p-7 sm:p-9">
+        <section className="space-y-6">
+          <div className="rounded-[32px] border border-blue-500/20 bg-blue-500/[0.06] p-7 sm:p-9">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Active project</p>
+                <h2 className="mt-3 text-[28px] font-semibold text-white">{commissioningTitle.title}</h2>
+                <p className="mt-2 text-[14px] font-light leading-[1.75] text-white/52">{commissioningTitle.packageName}</p>
+              </div>
+              <div className="rounded-2xl border border-rose-300/15 bg-rose-400/[0.06] px-5 py-4">
+                <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-rose-100/70">Distribution status</p>
+                <p className="mt-2 text-[14px] font-semibold text-white">{commissioningTitle.distributionStatus}</p>
+              </div>
+            </div>
+            <p className="mt-7 text-[14px] font-light leading-[1.85] text-white/50">
+              Your agreement and initial setup are complete. The workspace is now open for the active publishing path.
+              Public release, retailer submission, preorder, and distribution actions remain on hold during commissioning.
+            </p>
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2">
-            {setupSteps.map((step, index) => (
+            {authorWorkspaceModules.map((module) => (
               <Link
-                key={step.label}
-                href={step.href}
+                key={module.id}
+                href={module.href}
                 className="group rounded-[28px] border border-white/8 bg-white/[0.045] p-6 transition-colors hover:border-blue-300/40 hover:bg-blue-500/[0.08]"
               >
-                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Step {index + 1}</span>
-                <h2 className="mt-4 text-[22px] font-semibold text-white">{step.label}</h2>
-                <p className="mt-3 text-[14px] font-light leading-[1.75] text-white/52">{step.description}</p>
+                <div className="flex items-start justify-between gap-4">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">{module.eyebrow}</span>
+                  <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] uppercase tracking-[0.1em] text-white/45">
+                    {module.status}
+                  </span>
+                </div>
+                <h2 className="mt-4 text-[22px] font-semibold text-white">{module.title}</h2>
+                <p className="mt-3 text-[14px] font-light leading-[1.75] text-white/52">{module.summary}</p>
                 <span className="mt-6 inline-flex text-[13px] font-semibold text-blue-300 transition-colors group-hover:text-blue-100">
-                  Open step →
+                  Open module →
                 </span>
               </Link>
             ))}
-          </div>
-          <p className="mt-7 text-[13px] font-light leading-[1.8] text-white/45">
-            Additional publishing tools will unlock after your agreement is signed and your initial payment is confirmed.
-          </p>
-          <div className="mt-7 border-t border-white/10 pt-7">
-            <h2 className="text-[18px] font-semibold text-white">Payment & royalty connection</h2>
-            <p className="mt-2 text-[13px] font-light leading-[1.8] text-white/45">
-              Stripe handles the secure setup. Do not enter bank, tax, or card details directly in this workspace.
-            </p>
-            <StripeWorkspaceActions />
           </div>
         </section>
       </AuthorGate>

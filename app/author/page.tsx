@@ -142,7 +142,7 @@ export default function AuthorHubPage() {
           </h2>
           <p className="text-[15px] font-light text-white/40 leading-[1.75]">
             This public hub does not expose title-specific status, files, contracts, financial setup, royalties, or
-            production command centers. Those surfaces remain behind secure Author Workspace access.
+            production modules. Those surfaces remain behind secure Author Workspace access.
           </p>
         </div>
       </div>

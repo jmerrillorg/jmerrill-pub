@@ -3,11 +3,11 @@ import type { Metadata } from 'next'
 import { AuthorWorkspaceModulePage } from '@/app/author/_components/AuthorWorkspaceModulePage'
 import { getAuthorWorkspaceModule } from '@/lib/publishing/author-workspace-modules'
 
-const workspaceModule = getAuthorWorkspaceModule('production')!
+const workspaceModule = getAuthorWorkspaceModule('royalties')!
 
 export const metadata: Metadata = {
-  title: `Registration | Author Workspace | J Merrill Publishing`,
-  description: 'Title registration preparation is handled as part of production readiness for your publishing project.',
+  title: `${workspaceModule.title} | Author Workspace | J Merrill Publishing`,
+  description: workspaceModule.summary,
   robots: {
     index: false,
     follow: false,
