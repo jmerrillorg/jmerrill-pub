@@ -101,6 +101,24 @@ Generated document evidence:
 | `JMP-Publishing-Agreement-The-Intentional-Leader-JMP-INT-202607-0W5PTQ.docx` | `1002e42333ef17d429988cb5f725f7d76c26ecf208da5007daf44b7ecd6288c0` |
 | `JMP-Premier-Package-Commissioning-Addendum-The-Intentional-Leader-JMP-INT-202607-0W5PTQ.docx` | `aa40010c8ef38ef60d337ffb9c0ab84e9c40347c958a21871645e5884a2bc6bb` |
 
+### Publisher Signature Standard
+
+The standard publishing agreement generation path embeds the approved J Merrill Publishing publisher signature during document generation. The signature is not hardcoded into the Word template. It is loaded from the governed publisher-signature asset reference and inserted into the Publisher `By:` line in the generated agreement output.
+
+Runtime asset reference:
+
+- Blob container: `publishing`
+- Blob path: `agreement-assets/publisher-signature/signature-navy.png`
+- Function app setting: `JM1_PUBLISHER_SIGNATURE_BLOB_NAME`
+
+The template remains the legal source document. Replacing the publisher signature in the future requires replacing the governed asset, not editing agreement templates. Manual publisher signature should be required only for negotiated custom agreements, legal exceptions, publisher override, or explicit Jackie instruction.
+
+Current commissioning evidence:
+
+| Document | SHA-256 |
+| --- | --- |
+| `JMP-Publishing-Agreement-The-Intentional-Leader-JMP-INT-202607-0W5PTQ-PUBLISHER-SIGNED.docx` | `d599167f1659e19aa9b262e2e0d48d6237704d0fa1da0776ed884dfc96174424` |
+
 The generated agreement documents were prepared from live Dataverse/contact values:
 
 - Author: Jackie Smith Jr

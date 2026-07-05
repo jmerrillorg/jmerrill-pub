@@ -1,17 +1,19 @@
 import type { Metadata } from 'next'
 
-import { PublishingCommandCenterPage } from '@/app/author/_components/PublishingCommandCenterPage'
-import { waveCommandCenters } from '@/lib/publishing/program-002-command-centers'
+import { AuthorWorkspaceModulePage } from '@/app/author/_components/AuthorWorkspaceModulePage'
+import { getAuthorWorkspaceModule } from '@/lib/publishing/author-workspace-modules'
+
+const workspaceModule = getAuthorWorkspaceModule('distribution')!
 
 export const metadata: Metadata = {
-  title: 'Distribution Command Center | J Merrill Publishing',
-  description: 'Governed distribution readiness command center for J Merrill Publishing titles.',
+  title: `${workspaceModule.title} | Author Workspace | J Merrill Publishing`,
+  description: workspaceModule.summary,
   robots: {
     index: false,
     follow: false,
   },
 }
 
-export default function DistributionCommandCenterPage() {
-  return <PublishingCommandCenterPage center={waveCommandCenters.distribution} />
+export default function Page() {
+  return <AuthorWorkspaceModulePage module={workspaceModule} />
 }

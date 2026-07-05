@@ -8,15 +8,25 @@
  * create Opportunities, activate Flow D, run diagnostics, or open gates.
  */
 
-const { DefaultAzureCredential } = require("@azure/identity");
+const { ClientSecretCredential, DefaultAzureCredential } = require("@azure/identity");
 const { ENTITY_SET, ROW_IDENTITY } = require("../author/authorDraftFieldMap");
 
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function isConfiguredSecret(value) {
+  const normalized = normalizeString(value);
+  return Boolean(normalized && !normalized.toLowerCase().includes("set-before-use"));
+}
+
 async function getDataverseToken(resourceUrl) {
-  const credential = new DefaultAzureCredential();
+  const tenantId = normalizeString(process.env.DATAVERSE_TENANT_ID);
+  const clientId = normalizeString(process.env.DATAVERSE_CLIENT_ID);
+  const clientSecret = normalizeString(process.env.DATAVERSE_CLIENT_SECRET);
+  const credential = isConfiguredSecret(tenantId) && isConfiguredSecret(clientId) && isConfiguredSecret(clientSecret)
+    ? new ClientSecretCredential(tenantId, clientId, clientSecret)
+    : new DefaultAzureCredential();
   const tokenResponse = await credential.getToken(`${resourceUrl}/.default`);
   if (!tokenResponse || !tokenResponse.token) {
     throw Object.assign(new Error("Failed to acquire Dataverse token"), {

@@ -69,10 +69,10 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
           className="mt-3 text-white"
           style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '30px', fontWeight: 700, lineHeight: 1.15 }}
         >
-          Author setup is private.
+          Your Author Workspace is private.
         </h2>
         <p className="mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/40">
-          Enter the access code provided by J Merrill Publishing to continue. Financial and royalty intake are separated from general onboarding for privacy and operational control.
+          Enter the access code provided by J Merrill Publishing to continue. This keeps your project details and next steps available only to you and our publishing team.
         </p>
       </div>
 

@@ -269,7 +269,7 @@ export function AuthorSetupForm({
 
       <div className="mt-8 flex flex-col gap-4 border-t border-white/8 pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-[520px] text-[12px] leading-[1.7] text-white/28">
-          Submissions are prepared for Dataverse routing and operational notification to publishing@jmerrill.one. Do not enter full SSNs or bank account numbers in this form.
+          This form helps us prepare your publishing project. Do not enter full SSNs, bank account numbers, or card details here.
         </p>
         <button
           type="submit"
@@ -307,7 +307,7 @@ export const onboardingFields: Field[] = [
     kind: 'section',
     name: 'section-book-metadata',
     label: 'Section 2 - Book metadata',
-    note: 'Core title metadata that can later map to Dataverse title records, catalog pages, sell sheets, and distribution prep.',
+    note: 'Core book details that help us prepare your catalog copy, sales materials, and future distribution review.',
   },
   { name: 'bookTitle', label: 'Book title', required: true },
   { name: 'subtitle', label: 'Subtitle' },
@@ -344,7 +344,7 @@ export const onboardingFields: Field[] = [
     kind: 'section',
     name: 'section-manuscript-intake',
     label: 'Section 3 - Manuscript intake',
-    note: 'For now, use secure file links instead of direct upload. This keeps the website stable while SharePoint/Dataverse intake is prepared.',
+    note: 'Use a private file link if you need to share updated manuscript material with the publishing team.',
   },
   {
     name: 'manuscriptStatus',
@@ -353,7 +353,7 @@ export const onboardingFields: Field[] = [
     required: true,
     options: manuscriptStatusOptions,
   },
-  { name: 'manuscriptLink', label: 'Manuscript file link', note: 'Use a private OneDrive, SharePoint, Google Drive, or Dropbox link if available.' },
+  { name: 'manuscriptLink', label: 'Manuscript file link', note: 'Use a private OneDrive, Google Drive, Dropbox, or another private file link link if available.' },
   { name: 'supportingFilesLink', label: 'Supporting files link', note: 'Optional link for images, permissions, sample covers, forewords, endorsements, or supplemental files.' },
   {
     name: 'editingLevelAcknowledgment',
@@ -643,7 +643,7 @@ export const royaltyFields: Field[] = [
     kind: 'section',
     name: 'section-royalty-readiness',
     label: 'Gated royalty setup',
-    note: 'This captures reporting and title-coverage preferences for future Dataverse and Power BI royalty infrastructure.',
+    note: 'This captures your reporting preferences for future royalty statements and title coverage.',
   },
   { name: 'authorName', label: 'Author name', required: true },
   { name: 'email', label: 'Email', type: 'email', required: true },
