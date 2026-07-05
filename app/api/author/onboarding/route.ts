@@ -107,12 +107,18 @@ export async function POST(req: NextRequest) {
     const coverFinishPreference = coverFinishPreferenceOption.label
     const backCoverCopy = cleanString(body.backCoverCopy)
     const backCoverAuthorBio = cleanString(body.backCoverAuthorBio)
-    const authorPhotoOnBackCoverOption = resolveOption(authorPhotoOnBackCoverOptions, cleanString(body.authorPhotoOnBackCover))
+    const authorPhotoOnBackCoverOption = resolveOption(
+      authorPhotoOnBackCoverOptions,
+      cleanString(body.authorPhotoOnBackCover) || 'recommend_best_option',
+    )
     const authorPhotoOnBackCoverKey = authorPhotoOnBackCoverOption.key
     const authorPhotoOnBackCover = authorPhotoOnBackCoverOption.label
     const coverEndorsements = cleanString(body.coverEndorsements)
     const retailPricePreference = cleanString(body.retailPricePreference)
-    const initialAuthorCopyNeedsOption = resolveOption(initialAuthorCopyNeedsOptions, cleanString(body.initialAuthorCopyNeeds))
+    const initialAuthorCopyNeedsOption = resolveOption(
+      initialAuthorCopyNeedsOptions,
+      cleanString(body.initialAuthorCopyNeeds) || 'not_sure_yet',
+    )
     const initialAuthorCopyNeedsKey = initialAuthorCopyNeedsOption.key
     const initialAuthorCopyNeeds = initialAuthorCopyNeedsOption.label
     const eventLaunchDeadline = cleanString(body.eventLaunchDeadline)
