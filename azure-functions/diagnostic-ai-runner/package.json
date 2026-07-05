@@ -2,7 +2,7 @@
   "name": "jm1-diagnostic-ai-runner",
   "version": "1.0.0",
   "private": true,
-  "main": "src/functions/*.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "func start",
     "lint": "node --check src/functions/runStage0Diagnostic.js src/dataverse/client.js",
