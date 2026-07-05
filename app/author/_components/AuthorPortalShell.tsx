@@ -56,9 +56,9 @@ export function AuthorPortalShell({
           <div>{children}</div>
           <aside className="space-y-4">
             {[
-              ['01', 'Private author intake', 'These routes are intentionally separate from the public Join form and are not linked in public navigation.'],
-              ['02', 'Dataverse ready', 'Submissions are shaped for future Power Automate and Dataverse ingestion.'],
-              ['03', 'Notification routed', 'Operational notifications are routed to publishing@jmerrill.one when a sender is configured.'],
+              ['01', 'Need help?', 'Email publishing@jmerrill.one if you have questions while completing your setup.'],
+              ['02', 'Use your invitation code', 'Your code keeps this workspace private while you complete the requested steps.'],
+              ['03', 'Take your time', 'You can return to your workspace and finish the setup steps when you are ready.'],
             ].map(([number, heading, body]) => (
               <div key={number} className="rounded-3xl border border-white/8 bg-white/[0.035] p-6">
                 <div className="font-mono text-[11px] text-blue-400">{number}</div>
