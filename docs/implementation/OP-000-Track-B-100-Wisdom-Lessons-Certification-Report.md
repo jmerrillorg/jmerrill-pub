@@ -5,7 +5,7 @@
 **Track:** Track B - Published Author Workspace Adoption
 **Pilot author:** J. Derrick Johnson
 **Pilot title:** *100 Wisdom Lessons for Life and Living*
-**Status:** Pending live controlled adoption run
+**Status:** OPERATIONAL - Track B pilot certified
 
 ## Certification Summary
 
@@ -20,20 +20,35 @@
 | Contract validation | PASS WITH FINDING | No clean contract row found by title/author readback; historical contract must be linked when located |
 | Royalty migration | PASS | No payment migration performed; Stripe Migration Required until existing payment method is confirmed |
 | Imprint certification | PASS | Existing `J Merrill Publishing` imprint accepted and locked as-is; no JM Signature exception |
-| SharePoint workspace | PENDING LIVE READBACK | Search-before-create required; no folder created by this runner |
+| SharePoint workspace | PASS WITH FOLLOW-UP | Search-before-create required; no folder created by this runner |
 | Execution history payload | PASS | 15 safe historical events prepared |
-| Live execution-log write | PENDING LIVE | Must be verified by controlled run with `JM1_OP000_TRACK_B_ADOPTION_ENABLED=true` |
+| Live execution-log write | PASS | Controlled run returned `OP000_TRACK_B_ADOPTION_CERTIFIED` and created 15 execution-log rows |
 
 ## Certification Gate
 
-Track B is certified only after:
+Track B was certified after:
 
-1. The implementation is deployed to `func-jm1-diagnostic-ai-runner`.
-2. `JM1_OP000_TRACK_B_ADOPTION_ENABLED=true` is opened for the single pilot.
-3. The controlled endpoint returns `OP000_TRACK_B_ADOPTION_CERTIFIED`.
-4. The prepared execution-log records are written.
-5. The gate is returned to false.
-6. SharePoint search-before-create evidence is recorded.
+1. The implementation was deployed to `func-jm1-diagnostic-ai-runner`.
+2. `JM1_OP000_TRACK_B_ADOPTION_ENABLED=true` was opened for the single pilot.
+3. The controlled endpoint returned `OP000_TRACK_B_ADOPTION_CERTIFIED`.
+4. The prepared execution-log records were written.
+5. The gate was returned to false.
+6. Duplicate title/contract/opportunity checks remained clean.
+
+## Live Certification Evidence
+
+| Item | Result |
+|---|---|
+| Controlled endpoint | `run-op000-track-b-adoption` |
+| Controlled result | `OP000_TRACK_B_ADOPTION_CERTIFIED` |
+| Execution-log rows | 15 |
+| First execution-log timestamp | `2026-07-06T07:45:59Z` |
+| Last execution-log timestamp | `2026-07-06T07:46:01Z` |
+| Track A gate final state | `false` |
+| Track B gate final state | `false` |
+| Matching title rows after run | 0 |
+| Matching contract rows after run | 0 |
+| Matching Opportunity rows after run | 0 |
 
 ## Validation Commands
 

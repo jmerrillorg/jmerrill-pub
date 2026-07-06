@@ -1,6 +1,6 @@
 # OP-000 - Pipeline Adoption, Recovery & Catalog Certification
 
-**Status:** Phase II authorized — Track A certified; Track B pilot implementation candidate for *100 Wisdom Lessons for Life and Living*
+**Status:** Phase II authorized — Track A certified; Track B certified for *100 Wisdom Lessons for Life and Living*
 **Operational scope:** Governed entry point for legacy, active, and published J Merrill Publishing titles entering PROGRAM-002
 **Authority:** PROGRAM-002; Council Disposition v1.0; PROGRAM-002 Author Workspace Onboarding Scope Note v1.0 (CANON, approved 2026-07-03)
 **Continuity:** Cody reached usage limits; Jackie authorized Cece to continue this build
@@ -81,7 +81,7 @@ For already-distributed titles and authors currently receiving royalties.
 5. **Show only what's missing.** After import, the workspace displays gaps (e.g., no payment preference on file) rather than re-running any onboarding step that already has data.
 
 **Validation subjects:** `data/books.json` (122 real catalogued titles) is the adoption source of record for this track. Two concrete cases:
-- *100 Wisdom Lessons for Life and Living* (J. Derrick Johnson, imprint J Merrill Publishing) — standard published-title adoption with populated ISBNs across all four formats. Jackie authorized this as the first Track B pilot after Track A certification. This pilot proves Published Author Workspace adoption only; it does not force `/join`, pre-contract onboarding, agreement regeneration, Stripe migration, royalty migration, production restart, or catalog-wide adoption.
+- *100 Wisdom Lessons for Life and Living* (J. Derrick Johnson, imprint J Merrill Publishing) — standard published-title adoption with populated ISBNs across all four formats. Jackie authorized this as the first Track B pilot after Track A certification, and the controlled run is now certified. This pilot proves Published Author Workspace adoption only; it does not force `/join`, pre-contract onboarding, agreement regeneration, Stripe migration, royalty migration, production restart, or catalog-wide adoption.
 - *A Portrait of Paradise* (Iyorwuese Hagher, imprint **JM Signature**) — already carries the JM Signature imprint in the live catalog with no governed dual-authorization record behind it. This is the real case that exercises the JM Signature exception path under Track C below: OP-000 does not strip the imprint, and does not treat it as pre-certified either. It is certified as an **Imprint Certification exception** requiring Publisher review (see Imprint Certification), logged as such rather than silently accepted.
 
 ---
