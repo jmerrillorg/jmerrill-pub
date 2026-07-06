@@ -1762,5 +1762,17 @@
       "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
       "notes": ""
     }
-  ]
+  ],
+  "status": "PROVISIONAL / INVALID FOR GOVERNANCE",
+  "invalidatedAt": "2026-07-06",
+  "invalidationReason": "Derived from data/books.json, which is legacy evidence only and not author/title authority.",
+  "doNotUseFor": [
+    "publisher decisions",
+    "author/title identity decisions",
+    "Enterprise Health calculations",
+    "Stripe migration",
+    "contract reconciliation",
+    "royalty decisions"
+  ],
+  "replacementArtifact": "docs/implementation/EOP-001-Author-Title-Source-of-Truth-Gap-Report.md"
 }

@@ -2,12 +2,12 @@
 
 **Program:** PROGRAM-002 - Autonomous Publishing Production Pipeline  
 **Optimization Program:** EOP-001  
-**Status:** Active - Workstream 1 Ready For Publisher Decisions  
+**Status:** Active - Source-of-truth correction required before Workstream 1 continues
 **Date:** 2026-07-06  
 
 ## Mission
 
-Enterprise Adoption is closed. PROGRAM-002 now covers the full J Merrill Publishing catalog. EOP-001 shifts the operating rhythm from migration to optimization: improving quality, completeness, reconciliation, and operational maturity inside the PROGRAM-002 system.
+Enterprise Adoption is closed as an adoption milestone. EOP-001 shifts the operating rhythm from migration to optimization, but Workstream 1 is paused until the author/title roster is rebuilt from governed sources instead of legacy catalog evidence.
 
 ## KPI Transition
 
@@ -17,7 +17,7 @@ Enterprise Coverage is retired as the primary KPI because it is complete at 100%
 
 | Order | Workstream | Status | Boundary |
 | --- | --- | --- | --- |
-| 1 | Publisher Imprint Review | Ready for Publisher decisions | Jackie must approve/lock each remaining imprint review item. |
+| 1 | Publisher Imprint Review | Paused | Rebuild author/title source from Dataverse before Publisher decisions continue. |
 | 2 | JM Signature Review | Queued | Do not begin until the prior workstream is complete or Jackie authorizes parallel execution. |
 | 3 | Contract Reconciliation | Queued | Do not begin until the prior workstream is complete or Jackie authorizes parallel execution. |
 | 4 | Stripe Migration | Queued | Do not begin until the prior workstream is complete or Jackie authorizes parallel execution. |

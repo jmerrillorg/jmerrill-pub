@@ -2,8 +2,14 @@
 
 **Program:** EOP-001 - JM Publishing Enterprise Optimization Program  
 **Workstream:** 1 - Publisher Imprint Review  
-**Status:** Blocked pending Jackie Publisher decisions  
+**Status:** PAUSED - INVALID FOR GOVERNANCE UNTIL AUTHOR/TITLE SOURCE IS CORRECTED
 **Date:** 2026-07-06  
+
+## Governance Hold
+
+Jackie paused EOP-001 Workstream 1 on 2026-07-06 because the supporting author/title roster was derived from `data/books.json`. `books.json` is legacy evidence only, not source-of-truth authority.
+
+Do not use this packet to make Publisher imprint decisions until the title/author relationship source is rebuilt from governed Dataverse and corroborating evidence. See `EOP-001-Author-Title-Source-of-Truth-Gap-Report.md`.
 
 ## Objective
 

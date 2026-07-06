@@ -1,13 +1,21 @@
-# EOP-001 Published Author Roster
+# EOP-001 Published Author Roster - INVALID FOR GOVERNANCE
 
 **Program:** PROGRAM-002  
 **Mode:** Enterprise Optimization  
-**Status:** Author roster verified from catalog source  
+**Status:** PROVISIONAL / INVALID FOR GOVERNANCE
 **Date:** 2026-07-06  
+
+## Governance Invalidation
+
+Jackie rejected this roster as an authoritative source on 2026-07-06 because it was derived from `data/books.json`. `books.json` is legacy evidence only, not author/title authority.
+
+This artifact must not be used to make publisher decisions, author/title identity decisions, Stripe migration decisions, contract reconciliation decisions, royalty decisions, or Enterprise Health calculations.
+
+Use `EOP-001-Author-Title-Source-of-Truth-Gap-Report.md` instead.
 
 ## Source Verification
 
-The authoritative 71-author count is calculated from unique normalized values in the `author` field of `data/books.json`. The catalog contains 122 title records. Cross-check against `data/enterprise-imprint-canonization.json` found 122 matching title IDs and 0 title/author mismatches.
+The rejected 71-author count was calculated from unique normalized values in the `author` field of `data/books.json`. The catalog contains 122 title records. Cross-check against `data/enterprise-imprint-canonization.json` found 122 matching title IDs and 0 title/author mismatches, but that does not make either file authoritative for author/title identity.
 
 OP-000 adoption did not create or update Contact records during catalog adoption. Therefore Dataverse Contact matches are not asserted in this roster unless separately proven by controlled Contact reconciliation.
 

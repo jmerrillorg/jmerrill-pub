@@ -1,17 +1,17 @@
 {
   "generatedAt": "2026-07-06T13:14:20.241Z",
   "program": "EOP-001",
-  "status": "Enterprise Optimization Active",
+  "status": "Enterprise Optimization Active - Source-of-truth correction required",
   "totals": {
     "catalogTitles": 122,
     "adoptedTitles": 122,
-    "publishedAuthors": 71,
+    "publishedAuthors": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
     "activeAuthorWorkspaces": 72,
     "publisherImprintReview": 43,
     "jmSignatureReview": 1,
     "contractReconciliation": 122,
-    "stripeMigration": 71,
-    "royaltyReadiness": 71
+    "stripeMigration": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
+    "royaltyReadiness": "PROVISIONAL_FROM_LEGACY_EVIDENCE"
   },
   "healthMetrics": [
     {
@@ -37,17 +37,17 @@
     },
     {
       "metric": "Stripe Ready",
-      "value": "0.00%",
+      "value": "Provisional",
       "numerator": 0,
-      "denominator": 71,
-      "note": "No Stripe migration started during Enterprise Adoption."
+      "denominator": "provisional",
+      "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
     },
     {
       "metric": "Royalty Ready",
-      "value": "0.00%",
+      "value": "Provisional",
       "numerator": 0,
-      "denominator": 71,
-      "note": "Royalty automation commissioning is a later workstream."
+      "denominator": "provisional",
+      "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
     },
     {
       "metric": "Metadata Complete",
@@ -65,10 +65,10 @@
     },
     {
       "metric": "Author Success Active",
-      "value": "0.00%",
+      "value": "Provisional",
       "numerator": 0,
-      "denominator": 71,
-      "note": "Author Success is operationally available but not activated catalog-wide."
+      "denominator": "provisional",
+      "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
     }
   ],
   "overallEnterpriseHealth": "41.47%",
@@ -608,5 +608,15 @@
     "Contract Reconciliation",
     "Stripe Migration",
     "Royalty Automation"
-  ]
+  ],
+  "authorRosterStatus": "PROVISIONAL / INVALID FOR GOVERNANCE until rebuilt from Dataverse Contact/title relationships",
+  "invalidatedMetrics": [
+    "publishedAuthors",
+    "stripeMigration",
+    "royaltyReadiness",
+    "Author Success Active denominator",
+    "Workstream 1 author/title pairings"
+  ],
+  "sourceOfTruthGapReport": "docs/implementation/EOP-001-Author-Title-Source-of-Truth-Gap-Report.md",
+  "publisherReviewStatus": "PAUSED until Dataverse author/title roster is rebuilt"
 }
