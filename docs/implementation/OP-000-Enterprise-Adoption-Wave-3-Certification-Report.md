@@ -11,7 +11,7 @@
 
 OP-000 Enterprise Adoption Wave 3 adopted 10 additional published author/title records into PROGRAM-002 coverage using the certified adoption methodology and the Enterprise Imprint Canonization recommendation set.
 
-`books.json` was not used as imprint authority. Historical published imprint values were preserved as evidence only. Eight titles were auto-locked from canonized `LOCKED` recommendations; two titles were adopted with Publisher Review Pending imprint status because their canonized decision is `LOW CONFIDENCE`.
+`books.json` was not used as imprint authority. Historical published imprint values were preserved as evidence only. Eight titles were auto-locked from canonized `LOCKED` recommendations; two titles initially required Publisher review because their canonized decision was `LOW CONFIDENCE`. Jackie later approved both Wave 3 imprint decisions, and those PROGRAM-002 certified imprints are now locked.
 
 ## Certified Authors And Titles
 
@@ -25,8 +25,8 @@ OP-000 Enterprise Adoption Wave 3 adopted 10 additional published author/title r
 | 6 | M A Grayson | *Mirror of Refining Insight* | J Merrill Publishing | Locked | Published Author Workspace | Certified |
 | 7 | Mack Hughley | *When a Thug Meets Jesus* | J Merrill Publishing | Locked | Published Author Workspace | Certified |
 | 8 | TJ Mars | *Hop, Hop, Hop* | JM Little | Locked | Published Author Workspace | Certified |
-| 9 | Adrean Young | *Naughty Tales* | JM Works | Publisher Review Pending | Published Author Workspace | Certified |
-| 10 | Bishop Thomas Johnson | *God's Word For This World* | J Merrill Publishing | Publisher Review Pending | Published Author Workspace | Certified |
+| 9 | Adrean Young | *Naughty Tales* | JM Works | Publisher Approved / Locked | Published Author Workspace | Certified |
+| 10 | Bishop Thomas Johnson | *God's Word For This World* | J Merrill Publishing | Publisher Approved / Locked | Published Author Workspace | Certified |
 
 ## Before / After Metrics
 
@@ -56,12 +56,12 @@ Each Wave 3 title has 10 distinct OP000 execution-log events in `jm1_executionlo
 | `naughty-tales` | 10 | 10 |
 | `god-s-word-for-this-world` | 10 | 10 |
 
-## Exceptions
+## Publisher Decisions Applied
 
-| Title | Author | Exception |
+| Title | Author | Decision | Execution-Log Evidence |
 |---|---|---|
-| *Naughty Tales* | Adrean Young | Imprint remains Publisher Review Pending because canon decision is `LOW CONFIDENCE`. |
-| *God's Word For This World* | Bishop Thomas Johnson | Imprint remains Publisher Review Pending because canon decision is `LOW CONFIDENCE`. |
+| *Naughty Tales* | Adrean Young | Certified PROGRAM-002 imprint: JM Works | `IMPRINT_PUBLISHER_APPROVED`; `IMPRINT_LOCKED` |
+| *God's Word For This World* | Bishop Thomas Johnson | Certified PROGRAM-002 imprint: J Merrill Publishing | `IMPRINT_PUBLISHER_APPROVED`; `IMPRINT_LOCKED` |
 
 ## Deferred Reconciliation
 
@@ -70,7 +70,7 @@ Each Wave 3 title has 10 distinct OP000 execution-log events in `jm1_executionlo
 | Contract reconciliation deferred | 10 | Historical status: Signed / Exists - Location Pending Reconciliation |
 | Stripe migration required | 10 | No Stripe onboarding started |
 | Missing imprint | 0 | No missing-imprint titles adopted in Wave 3 |
-| Publisher imprint review pending | 2 | Low-confidence canonized imprint decisions |
+| Publisher imprint review pending | 0 | Resolved by Jackie-approved Wave 3 imprint decisions |
 
 ## Duplicate Validation
 
