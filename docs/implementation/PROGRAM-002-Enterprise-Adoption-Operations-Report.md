@@ -23,6 +23,7 @@ PROGRAM-002 is operational. Phase I is certified, Phase I.5 is stabilized, OP-00
   - 59 published authors remaining.
 - Certified Alice V Pryor / *According to Mark* as the first post-pilot coverage increase.
 - Certified OP-000 Enterprise Adoption Wave 1 for 10 additional published authors.
+- Certified OP-000 Enterprise Adoption Wave 2 for 10 additional published authors.
 
 ## Adoption Model Now in Force
 
@@ -41,19 +42,19 @@ The adoption process must reuse existing workspace, SharePoint folders, contract
 | Area | Current State |
 |---|---|
 | Total catalog titles | 122 |
-| Catalog titles adopted | 12 |
-| Published authors adopted | 12 |
-| Active Author Workspaces certified | 13 |
-| Contracts linked | 0 confirmed; 10 marked Signed / Exists - Location Pending Reconciliation |
+| Catalog titles adopted | 22 |
+| Published authors adopted | 22 |
+| Active Author Workspaces certified | 23 |
+| Contracts linked | 0 confirmed; 20 marked Signed / Exists - Location Pending Reconciliation |
 | Stripe-ready authors | 0 confirmed |
 | Royalty-ready authors | 0 confirmed |
-| Enterprise Coverage | 9.84% |
+| Enterprise Coverage | 18.03% |
 
 ## Operational Boundaries Preserved
 
 This movement did not:
 
-- adopt additional titles beyond the certified Track B pilot;
+- adopt additional titles beyond the authorized Wave 2 scope;
 - migrate royalties;
 - move money;
 - touch Stripe;
@@ -67,7 +68,7 @@ This movement did not:
 
 ## Next Concrete Action
 
-Run the next controlled Enterprise Adoption wave beginning with **Wayne Pounds / Number 23 and Me**:
+Run the next controlled Enterprise Adoption wave from the remaining clean single-title queue:
 
 1. Search Dataverse for Contact/title/contract records.
 2. Search SharePoint for existing workspace/assets.

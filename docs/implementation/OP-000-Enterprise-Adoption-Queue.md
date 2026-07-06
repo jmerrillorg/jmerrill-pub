@@ -26,6 +26,16 @@ Enterprise Adoption proceeds one author at a time. Each adoption discovers, vali
 | Dean Wilson | 1 | Published Author Workspace | Certified |
 | Deanna Jones | 1 | Published Author Workspace | Certified |
 | Donjia Walls | 1 | Published Author Workspace | Certified |
+| Wayne Pounds | 1 | Published Author Workspace | Certified |
+| Essence Unique | 1 | Published Author Workspace | Certified |
+| Johnson Settles | 1 | Published Author Workspace | Certified |
+| Earline Neal | 1 | Published Author Workspace | Certified |
+| Shana Byrd | 1 | Published Author Workspace | Certified |
+| Mildred Beard | 1 | Published Author Workspace | Certified |
+| Natasha Gilchrist | 1 | Published Author Workspace | Certified |
+| Randall Beverly | 1 | Published Author Workspace | Certified |
+| Shecara Norris | 1 | Published Author Workspace | Certified |
+| Sylvia Benson | 1 | Published Author Workspace | Certified |
 
 ## Recommended Adoption Order
 
@@ -39,9 +49,6 @@ Priority is based on operational value and migration simplicity:
 
 | Author | Titles | Title(s) | Imprint(s) | Contracts | Workspace | Current Payment Method | Stripe Readiness | Relationship State | Priority | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
-| Earline Neal | 1 | Ordinary People Searching for Greatness | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Essence Unique | 1 | Your Brain Has Too Much What, Mommy?? | JM Little | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Johnson Settles | 1 | 7 Step Jumpstart to Becoming Your Best Self | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Juanita Travis | 1 | Rhyming It up with Church Stuff | JM Little | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Karen Hill | 1 | The Great Hair Restart | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Kiena Hughley | 1 | Your Peace Is a Priority | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
@@ -49,14 +56,7 @@ Priority is based on operational value and migration simplicity:
 | Lisa Clark | 1 | Let Me Tell You About It | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | M A Grayson | 1 | Mirror of Refining Insight | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Mack Hughley | 1 | When a Thug Meets Jesus | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Mildred Beard | 1 | Hodge Podge of Life | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Natasha Gilchrist | 1 | Pretty Wings | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Randall Beverly | 1 | The Hood | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Shana Byrd | 1 | Focus, Trust, and Follow | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Shecara Norris | 1 | A Blended Family | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Sylvia Benson | 1 | The Master's Piece | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | TJ Mars | 1 | Hop, Hop, Hop | JM Little | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Wayne Pounds | 1 | Number 23 and Me | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Adrean Young | 1 | Naughty Tales | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title genre cleanup |
 | Bishop Thomas Johnson | 1 | God's Word For This World | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title genre cleanup |
 | Cheryl Cook | 1 | The Fight for the Promiseland | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title genre cleanup |
@@ -101,4 +101,4 @@ Priority is based on operational value and migration simplicity:
 
 ## Next Adoption Recommendation
 
-Run **OP-000 Enterprise Adoption Wave 2** next unless a deployment or validation blocker appears. The wave adopts 10 selected single-title, non-Signature authors; see `OP-000-Enterprise-Adoption-Wave-2-Plan.md`.
+Run the next controlled Enterprise Adoption wave from the remaining clean single-title queue. Recommended starting candidates: Juanita Travis, Karen Hill, Kiena Hughley, Leslie Banks, Lisa Clark, M A Grayson, Mack Hughley, TJ Mars, Adrean Young, and Bishop Thomas Johnson.
