@@ -3,8 +3,8 @@
 /**
  * HTTP wiring for OP-000 Track B published author workspace adoption.
  *
- * This endpoint is intentionally narrow: it accepts only the authorized
- * 100 Wisdom Lessons / J. Derrick Johnson pilot and writes safe historical
+ * This endpoint is intentionally narrow: it accepts only the currently
+ * allowlisted Track B Enterprise Adoption records and writes safe historical
  * execution-log evidence only when JM1_OP000_TRACK_B_ADOPTION_ENABLED is
  * open. It does not create or update Contact, Lead, Opportunity, Contract,
  * payment, royalty, workspace, production, distribution, or communication

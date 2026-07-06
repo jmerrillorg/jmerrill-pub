@@ -9,22 +9,42 @@ const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
 const OP000_TRACK_B_AGENT_MODEL = "program-002-op000-track-b-published-author-adoption";
 const TRACK_B_SOURCE_ENTITY = "catalog_title";
 
-const TRACK_B_PILOT = Object.freeze({
-  titleId: "100-wisdom-lessons-for-life-and-living",
-  title: "100 Wisdom Lessons for Life and Living",
-  authorName: "J. Derrick Johnson",
-  imprint: "J Merrill Publishing",
-  genre: "",
-  isbnPaperback: "978-1-961475-57-1",
-  isbnHardcover: "978-1-961475-58-8",
-  isbnEbook: "978-1-961475-59-5",
-  isbnAudiobook: "978-1-961475-60-1",
-  formats: ["Paperback", "Hardcover", "eBook", "Audiobook"],
-  relationshipState: "Active Author",
-  workspaceMode: "Published Author Workspace",
-  currentStage: "Published / Post-Distribution Author Relationship",
-  adoptionSource: "Legacy JMP Import"
-});
+const TRACK_B_ADOPTION_CANDIDATES = Object.freeze([
+  Object.freeze({
+    titleId: "100-wisdom-lessons-for-life-and-living",
+    title: "100 Wisdom Lessons for Life and Living",
+    authorName: "J. Derrick Johnson",
+    imprint: "J Merrill Publishing",
+    genre: "",
+    isbnPaperback: "978-1-961475-57-1",
+    isbnHardcover: "978-1-961475-58-8",
+    isbnEbook: "978-1-961475-59-5",
+    isbnAudiobook: "978-1-961475-60-1",
+    formats: ["Paperback", "Hardcover", "eBook", "Audiobook"],
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "according-to-mark",
+    title: "According to Mark",
+    authorName: "Alice V Pryor",
+    imprint: "J Merrill Publishing",
+    genre: "Faith",
+    isbnPaperback: "978-1-954414-54-9",
+    isbnHardcover: "978-1-961475-00-7",
+    isbnEbook: "978-1-954414-53-2",
+    isbnAudiobook: "",
+    formats: ["Paperback", "Hardcover", "eBook"],
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  })
+]);
+
+const TRACK_B_PILOT = TRACK_B_ADOPTION_CANDIDATES[0];
 
 const HISTORICAL_EVENTS = Object.freeze([
   ["OP000_TRACK_B_ADOPTION_STARTED", "OP-000 Track B adoption started for a published author/title."],
@@ -57,10 +77,17 @@ function isGateOpen() {
 }
 
 function isAuthorizedTrackBPilot(input) {
+  return Boolean(resolveTrackBCandidate(input));
+}
+
+function resolveTrackBCandidate(input) {
   return (
-    normalizeTitle(input?.title) === normalizeTitle(TRACK_B_PILOT.title) &&
-    normalizeString(input?.titleId).toLowerCase() === TRACK_B_PILOT.titleId &&
-    normalizeTitle(input?.authorName) === normalizeTitle(TRACK_B_PILOT.authorName)
+    TRACK_B_ADOPTION_CANDIDATES.find(
+      (candidate) =>
+        normalizeTitle(input?.title) === normalizeTitle(candidate.title) &&
+        normalizeString(input?.titleId).toLowerCase() === candidate.titleId &&
+        normalizeTitle(input?.authorName) === normalizeTitle(candidate.authorName)
+    ) || null
   );
 }
 
@@ -99,7 +126,12 @@ function classifyTrackBImprint(input) {
 
 function buildTrackBAdoptionPacket(input = {}) {
   const completedAt = normalizeString(input.completedAt) || new Date().toISOString();
-  const imprint = classifyTrackBImprint(TRACK_B_PILOT);
+  const candidate = resolveTrackBCandidate(input) || TRACK_B_PILOT;
+  const imprint = classifyTrackBImprint(candidate);
+  const contactFinding =
+    candidate.titleId === TRACK_B_PILOT.titleId
+      ? "Needs exact Contact confirmation; Dataverse has similar Johnson/Derrick records but no clean title-bound match in the pilot evidence."
+      : "Needs exact Contact confirmation through the governed author-linking step; no duplicate Contact may be created by this runner.";
 
   return {
     status: "OP000_TRACK_B_ADOPTION_READY",
@@ -107,10 +139,10 @@ function buildTrackBAdoptionPacket(input = {}) {
     source: "Legacy JMP catalog + published-title evidence",
     certifiedBy: "Jackie Smith Jr.",
     certifiedAt: completedAt,
-    record: { ...TRACK_B_PILOT },
+    record: { ...candidate },
     relationship: {
-      state: TRACK_B_PILOT.relationshipState,
-      workspaceMode: TRACK_B_PILOT.workspaceMode,
+      state: candidate.relationshipState,
+      workspaceMode: candidate.workspaceMode,
       onboardingTreatment: "Do not force /join, pre-contract onboarding, agreement setup, payment setup, or Stripe onboarding for already-published authors."
     },
     imprint,
@@ -122,30 +154,30 @@ function buildTrackBAdoptionPacket(input = {}) {
       duplicatePrevention: "Match by title ID, ISBNs, author identity, and existing folder evidence before creating anything."
     },
     enterpriseAuthorMap: {
-      contact: "Needs exact Contact confirmation; Dataverse has similar Johnson/Derrick records but no clean title-bound match in the pilot evidence.",
+      contact: contactFinding,
       authorStatus: "Published author; set/confirm jm1pub_isauthor only through the governed contact-linking step.",
-      relationshipState: TRACK_B_PILOT.relationshipState,
-      workspaceMode: TRACK_B_PILOT.workspaceMode,
-      titles: [TRACK_B_PILOT.title],
+      relationshipState: candidate.relationshipState,
+      workspaceMode: candidate.workspaceMode,
+      titles: [candidate.title],
       contracts: "Reuse/link historical contract if found; do not regenerate.",
       paymentMethod: "Existing royalty payment method continues until a separate Stripe migration initiative.",
       stripeStatus: "Stripe Migration Required unless an existing Connect account is confirmed.",
       sharePointWorkspace: "Search-before-create required.",
-      imprint: TRACK_B_PILOT.imprint,
+      imprint: candidate.imprint,
       executionHistory: "Historical certification events only; no claim that work happened today."
     },
     existingEvidence: {
       catalog: {
-        titleId: TRACK_B_PILOT.titleId,
-        title: TRACK_B_PILOT.title,
-        authorName: TRACK_B_PILOT.authorName,
-        imprint: TRACK_B_PILOT.imprint,
-        formats: TRACK_B_PILOT.formats,
+        titleId: candidate.titleId,
+        title: candidate.title,
+        authorName: candidate.authorName,
+        imprint: candidate.imprint,
+        formats: candidate.formats,
         isbns: {
-          paperback: TRACK_B_PILOT.isbnPaperback,
-          hardcover: TRACK_B_PILOT.isbnHardcover,
-          ebook: TRACK_B_PILOT.isbnEbook,
-          audiobook: TRACK_B_PILOT.isbnAudiobook
+          paperback: candidate.isbnPaperback,
+          hardcover: candidate.isbnHardcover,
+          ebook: candidate.isbnEbook,
+          audiobook: candidate.isbnAudiobook
         }
       },
       dataverseReadback: {
@@ -246,11 +278,12 @@ async function postExecutionLogRecord(apiBase, token, payload) {
 }
 
 async function runTrackBAdoption(input = {}, deps = {}) {
-  if (!isAuthorizedTrackBPilot(input)) {
+  const candidate = resolveTrackBCandidate(input);
+  if (!candidate) {
     return { ok: false, code: "OP000_TRACK_B_ADOPTION_BLOCKED", reason: "PILOT_RECORD_NOT_AUTHORIZED" };
   }
 
-  const packet = buildTrackBAdoptionPacket(input);
+  const packet = buildTrackBAdoptionPacket({ ...candidate, completedAt: input.completedAt });
 
   if (!isGateOpen()) {
     return { ok: false, code: "OP000_TRACK_B_ADOPTION_BLOCKED", reason: "GATE_CLOSED", packet };
@@ -317,8 +350,10 @@ async function runTrackBAdoption(input = {}, deps = {}) {
 
 module.exports = {
   OP000_TRACK_B_GATE_NAME,
+  TRACK_B_ADOPTION_CANDIDATES,
   TRACK_B_PILOT,
   HISTORICAL_EVENTS,
+  resolveTrackBCandidate,
   isAuthorizedTrackBPilot,
   classifyTrackBImprint,
   buildTrackBAdoptionPacket,
