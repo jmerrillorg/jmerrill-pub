@@ -53,8 +53,10 @@ describe("OP-000 Track B adoption", () => {
   });
 
   it("authorizes only allowlisted Track B adoption records", () => {
+    assert.equal(TRACK_B_ADOPTION_CANDIDATES.length, 12);
     assert.equal(isAuthorizedTrackBPilot(TRACK_B_PILOT), true);
     assert.equal(isAuthorizedTrackBPilot(TRACK_B_ADOPTION_CANDIDATES[1]), true);
+    assert.equal(isAuthorizedTrackBPilot(TRACK_B_ADOPTION_CANDIDATES.at(-1)), true);
     assert.equal(resolveTrackBCandidate(TRACK_B_ADOPTION_CANDIDATES[1]).title, "According to Mark");
 
     assert.equal(
@@ -137,7 +139,7 @@ describe("OP-000 Track B adoption", () => {
     assert.equal(packet.enterpriseAuthorMap.relationshipState, "Active Author");
     assert.equal(packet.enterpriseAuthorMap.workspaceMode, "Published Author Workspace");
     assert.equal(packet.enterpriseAuthorMap.stripeStatus, "Stripe Migration Required unless an existing Connect account is confirmed.");
-    assert.match(packet.enterpriseAuthorMap.contracts, /Reuse\/link historical contract/i);
+    assert.match(packet.enterpriseAuthorMap.contracts, /Signed \/ Exists - Location Pending Reconciliation/i);
   });
 
   it("builds safe execution-log payloads only", () => {
@@ -146,7 +148,7 @@ describe("OP-000 Track B adoption", () => {
     const keys = Object.keys(payload).sort();
 
     assert.deepEqual(keys, [...REQUIRED_LOG_FIELDS].sort());
-    assert.equal(payload.jm1_actiontype, "OP000_TRACK_B_ADOPTION_STARTED");
+    assert.equal(payload.jm1_actiontype, "OP000_WAVE_ADOPTION_STARTED");
     assert.equal(payload.jm1_sourcerecordid, TRACK_B_PILOT.titleId);
     assert.doesNotMatch(JSON.stringify(payload), /requestpayload|responsepayload|bank|tax|royalty statement|secret|token|header/i);
   });

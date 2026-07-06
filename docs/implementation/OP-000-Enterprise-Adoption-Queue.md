@@ -101,4 +101,4 @@ Priority is based on operational value and migration simplicity:
 
 ## Next Adoption Recommendation
 
-Adopt **Ashanti Flemister / Pieces of Me All Over the Place** next unless Jackie chooses a different operational priority. This is now the cleanest next case because it is a single-title, non-Signature, high-priority published-author adoption with no obvious catalog conflict in `data/books.json`.
+Run **OP-000 Enterprise Adoption Wave 1** next unless a deployment or validation blocker appears. The wave adopts 10 selected single-title, non-Signature authors; see `OP-000-Enterprise-Adoption-Wave-1-Plan.md`.

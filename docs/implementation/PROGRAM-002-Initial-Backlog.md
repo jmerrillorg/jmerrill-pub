@@ -78,7 +78,7 @@ Every movement must confirm Dataverse status update, required gate/approval, `jm
 
 **Phase II pilots:** Jackie authorized OP-000 Track A for *Establishing Glory: The Library* (`JMP-INT-202606-UFYG60`, diagnostic `64e387e0-7e6a-f111-a826-00224820105b`, existing Opportunity `2653fca9-eacd-4c44-b3ed-1764dd5d35aa`), and Track A is certified. Jackie then authorized OP-000 Track B for one published author/title: *100 Wisdom Lessons for Life and Living* by J. Derrick Johnson. Track B is certified for Published Author Workspace adoption only.
 
-**Enterprise Adoption Operations:** After Track A and Track B certification, OP-000 is no longer a pilot-only module. The active operating metric is Enterprise Coverage. See `PROGRAM-002-Enterprise-Coverage-Dashboard.md` and `OP-000-Enterprise-Adoption-Queue.md`. Alice V Pryor / *According to Mark* is certified as the first post-pilot coverage increase. The next recommended adoption is Ashanti Flemister / *Pieces of Me All Over the Place* unless discovery reveals a true blocker or Jackie selects a different priority.
+**Enterprise Adoption Operations:** After Track A and Track B certification, OP-000 is no longer a pilot-only module. The active operating metric is Enterprise Coverage. See `PROGRAM-002-Enterprise-Coverage-Dashboard.md` and `OP-000-Enterprise-Adoption-Queue.md`. Alice V Pryor / *According to Mark* is certified as the first post-pilot coverage increase. Wave 1 is authorized for 10 selected single-title, non-Signature published authors; see `OP-000-Enterprise-Adoption-Wave-1-Plan.md`.
 
 ## Marketing Throughout Pipeline
 
