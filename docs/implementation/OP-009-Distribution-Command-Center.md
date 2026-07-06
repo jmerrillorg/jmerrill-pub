@@ -34,5 +34,5 @@ OP-009 provides governed distribution readiness tracking for channel scope, meta
 ## Evidence
 
 - Route: `/author/distribution-command`
-- Data model: `lib/publishing/program-002-command-centers.ts`
-- UI component: `app/author/_components/PublishingCommandCenterPage.tsx`
+- Data model: `lib/publishing/author-workspace-modules.ts`
+- UI component: `app/author/_components/AuthorWorkspaceModulePage.tsx`

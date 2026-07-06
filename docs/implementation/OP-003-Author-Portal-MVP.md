@@ -52,7 +52,7 @@ Canonical lifecycle:
 - Updated `/author` to link the Author Workspace card to `/author/portal`.
 - Reused the existing `AuthorGate` access-code control.
 - Split workspace access into a stricter `portal` gate scope so the shared author setup form code is no longer treated as sufficient for author/project-specific workspace access. This is the dedicated pre-contract workspace access scope for OP-003.
-- Added `lib/publishing/author-portal-mvp.ts` for read-only MVP display data.
+- Added the Author Workspace module model now maintained in `lib/publishing/author-workspace-modules.ts`.
 - Completed related author setup choice-mapping stabilization in the immediate OP-003 workflow neighborhood.
 
 ### Data Behavior

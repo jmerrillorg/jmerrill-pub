@@ -35,5 +35,5 @@ OP-011 provides governed relationship and royalty-readiness visibility for autho
 ## Evidence
 
 - Route: `/author/author-success`
-- Data model: `lib/publishing/program-002-command-centers.ts`
-- UI component: `app/author/_components/PublishingCommandCenterPage.tsx`
+- Data model: `lib/publishing/author-workspace-modules.ts`
+- UI component: `app/author/_components/AuthorWorkspaceModulePage.tsx`
