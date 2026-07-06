@@ -16,6 +16,16 @@ Enterprise Adoption proceeds one author at a time. Each adoption discovers, vali
 |---|---:|---|---|
 | J. Derrick Johnson | 1 | Published Author Workspace | Certified |
 | Alice V Pryor | 1 | Published Author Workspace | Certified |
+| Ashanti Flemister | 1 | Published Author Workspace | Certified |
+| Baily Cunningham | 1 | Published Author Workspace | Certified |
+| Brandyn McElroy | 1 | Published Author Workspace | Certified |
+| Cynthia Sloan | 1 | Published Author Workspace | Certified |
+| Christina Chislom | 1 | Published Author Workspace | Certified |
+| Darlene Carson | 1 | Published Author Workspace | Certified |
+| David Williams | 1 | Published Author Workspace | Certified |
+| Dean Wilson | 1 | Published Author Workspace | Certified |
+| Deanna Jones | 1 | Published Author Workspace | Certified |
+| Donjia Walls | 1 | Published Author Workspace | Certified |
 
 ## Recommended Adoption Order
 
@@ -29,16 +39,6 @@ Priority is based on operational value and migration simplicity:
 
 | Author | Titles | Title(s) | Imprint(s) | Contracts | Workspace | Current Payment Method | Stripe Readiness | Relationship State | Priority | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
-| Ashanti Flemister | 1 | Pieces of Me All Over the Place | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Baily Cunningham | 1 | Melodies From Heaven | JM Verse | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Brandyn McElroy | 1 | Support Beyond the Cycle | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Christina Chislom | 1 | Come Out of Hiding | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Cynthia Sloan | 1 | Speech Therapy Works! | JM Little | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Darlene Carson | 1 | SHE | JM Verse | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| David Williams | 1 | Words of A Troubled Soul | JM Verse | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Dean Wilson | 1 | Warrior's Breed | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Deanna Jones | 1 | Life after Detour | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Donjia Walls | 1 | 27 Days to Overcoming Depression | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Earline Neal | 1 | Ordinary People Searching for Greatness | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Essence Unique | 1 | Your Brain Has Too Much What, Mommy?? | JM Little | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Johnson Settles | 1 | 7 Step Jumpstart to Becoming Your Best Self | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
@@ -101,4 +101,4 @@ Priority is based on operational value and migration simplicity:
 
 ## Next Adoption Recommendation
 
-Run **OP-000 Enterprise Adoption Wave 1** next unless a deployment or validation blocker appears. The wave adopts 10 selected single-title, non-Signature authors; see `OP-000-Enterprise-Adoption-Wave-1-Plan.md`.
+Run the next controlled Enterprise Adoption wave starting with **Wayne Pounds / Number 23 and Me**, **Essence Unique / Your Brain Has Too Much What, Mommy??**, and **Johnson Settles / 7 Step Jumpstart to Becoming Your Best Self** unless Jackie selects a different operational priority.
