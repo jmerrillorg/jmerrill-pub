@@ -101,4 +101,4 @@ Priority is based on operational value and migration simplicity:
 
 ## Next Adoption Recommendation
 
-Run the next controlled Enterprise Adoption wave starting with **Wayne Pounds / Number 23 and Me**, **Essence Unique / Your Brain Has Too Much What, Mommy??**, and **Johnson Settles / 7 Step Jumpstart to Becoming Your Best Self** unless Jackie selects a different operational priority.
+Run **OP-000 Enterprise Adoption Wave 2** next unless a deployment or validation blocker appears. The wave adopts 10 selected single-title, non-Signature authors; see `OP-000-Enterprise-Adoption-Wave-2-Plan.md`.

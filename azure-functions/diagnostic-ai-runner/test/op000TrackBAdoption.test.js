@@ -53,7 +53,7 @@ describe("OP-000 Track B adoption", () => {
   });
 
   it("authorizes only allowlisted Track B adoption records", () => {
-    assert.equal(TRACK_B_ADOPTION_CANDIDATES.length, 12);
+    assert.equal(TRACK_B_ADOPTION_CANDIDATES.length, 22);
     assert.equal(isAuthorizedTrackBPilot(TRACK_B_PILOT), true);
     assert.equal(isAuthorizedTrackBPilot(TRACK_B_ADOPTION_CANDIDATES[1]), true);
     assert.equal(isAuthorizedTrackBPilot(TRACK_B_ADOPTION_CANDIDATES.at(-1)), true);
