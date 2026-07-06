@@ -8,6 +8,8 @@ require("./functions/runMilestone6ContinuationCommunication");
 require("./functions/runMilestone6EvidenceRecoveryLog");
 require("./functions/runMilestone6OpportunityUpdate");
 require("./functions/runMilestone6PaymentOptionCapture");
+require("./functions/runOp000TrackAAdoption");
+require("./functions/runOp000TrackBAdoption");
 require("./functions/runPreContractEditorialReview");
 require("./functions/runPublisherRecommendationAction");
 require("./functions/runPublisherReviewDecision");
