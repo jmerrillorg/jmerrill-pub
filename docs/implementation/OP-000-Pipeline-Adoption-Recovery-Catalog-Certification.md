@@ -1,6 +1,6 @@
 # OP-000 - Pipeline Adoption, Recovery & Catalog Certification
 
-**Status:** Phase II authorized — Track A certified; Track B certified for *100 Wisdom Lessons for Life and Living*
+**Status:** Enterprise Adoption Operations active — Track A certified; Track B certified for *100 Wisdom Lessons for Life and Living*
 **Operational scope:** Governed entry point for legacy, active, and published J Merrill Publishing titles entering PROGRAM-002
 **Authority:** PROGRAM-002; Council Disposition v1.0; PROGRAM-002 Author Workspace Onboarding Scope Note v1.0 (CANON, approved 2026-07-03)
 **Continuity:** Cody reached usage limits; Jackie authorized Cece to continue this build
@@ -16,6 +16,22 @@ Every OP module in PROGRAM-002, and every BP/Milestone gate in the parallel INT-
 OP-000 is that path. It is a prerequisite adoption/certification gate, not a normal sequential build module — the same role `IB-000-1` through `IB-000-9` ("Gate 0 — Governance Gate") already play for the Business Central/Stripe migration track, applied here to catalog adoption instead of licensing/entitlement decisions.
 
 OP-000 does not re-run production work, does not force existing authors or titles back through `/join`, and does not pause or compete with the live commissioning of *The Intentional Leader*.
+
+## Enterprise Adoption Operations
+
+After Track A and Track B certification, OP-000 is an operational adoption capability. Each completed adoption permanently increases PROGRAM-002 Enterprise Coverage.
+
+The primary KPI is **Enterprise Coverage**, tracked in `PROGRAM-002-Enterprise-Coverage-Dashboard.md`. The active working queue is `OP-000-Enterprise-Adoption-Queue.md`.
+
+Enterprise Adoption proceeds one author at a time:
+
+1. Discover existing records and assets.
+2. Validate evidence.
+3. Link existing Contact/title/contract/workspace data.
+4. Certify historical execution state.
+5. Continue to the next author.
+
+The first Enterprise Adoption baseline is 122 catalog titles, 71 catalog authors, 1 adopted catalog title, and 1 adopted published author. The next recommended author is Alice V Pryor / *According to Mark* because the title is a clean single-title, non-Signature adoption candidate.
 
 ---
 

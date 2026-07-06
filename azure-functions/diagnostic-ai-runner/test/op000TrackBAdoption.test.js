@@ -5,8 +5,10 @@ const { describe, it, beforeEach, afterEach } = require("node:test");
 
 const {
   OP000_TRACK_B_GATE_NAME,
+  TRACK_B_ADOPTION_CANDIDATES,
   TRACK_B_PILOT,
   HISTORICAL_EVENTS,
+  resolveTrackBCandidate,
   isAuthorizedTrackBPilot,
   classifyTrackBImprint,
   buildTrackBAdoptionPacket,
@@ -50,8 +52,10 @@ describe("OP-000 Track B adoption", () => {
     else process.env.DATAVERSE_RESOURCE_URL = priorResourceUrl;
   });
 
-  it("authorizes only the 100 Wisdom Lessons Track B pilot", () => {
+  it("authorizes only allowlisted Track B adoption records", () => {
     assert.equal(isAuthorizedTrackBPilot(TRACK_B_PILOT), true);
+    assert.equal(isAuthorizedTrackBPilot(TRACK_B_ADOPTION_CANDIDATES[1]), true);
+    assert.equal(resolveTrackBCandidate(TRACK_B_ADOPTION_CANDIDATES[1]).title, "According to Mark");
 
     assert.equal(
       isAuthorizedTrackBPilot({
@@ -68,6 +72,18 @@ describe("OP-000 Track B adoption", () => {
       }),
       false
     );
+  });
+
+  it("builds an adoption packet for the selected allowlisted title", () => {
+    const packet = buildTrackBAdoptionPacket({
+      ...TRACK_B_ADOPTION_CANDIDATES[1],
+      completedAt: "2026-07-06T12:00:00.000Z"
+    });
+
+    assert.equal(packet.record.title, "According to Mark");
+    assert.equal(packet.record.authorName, "Alice V Pryor");
+    assert.equal(packet.imprint.lockStatus, "Locked");
+    assert.equal(packet.existingEvidence.catalog.isbns.hardcover, "978-1-961475-00-7");
   });
 
   it("locks the existing non-Signature imprint without inventing genre data", () => {
@@ -170,5 +186,26 @@ describe("OP-000 Track B adoption", () => {
       HISTORICAL_EVENTS.map(([eventType]) => eventType)
     );
     assert.equal(result.executionLogs.every((log) => log.created), true);
+  });
+
+  it("writes the selected allowlisted title when gated", async () => {
+    process.env[OP000_TRACK_B_GATE_NAME] = "true";
+
+    const writes = [];
+    const result = await runTrackBAdoption(
+      { ...TRACK_B_ADOPTION_CANDIDATES[1], completedAt: "2026-07-06T12:00:00.000Z" },
+      {
+        getToken: async () => "token",
+        postExecutionLogRecord: async (_apiBase, _token, payload) => {
+          writes.push(payload);
+          return { id: `alice-${writes.length}` };
+        }
+      }
+    );
+
+    assert.equal(result.ok, true);
+    assert.equal(result.packet.record.title, "According to Mark");
+    assert.equal(writes.length, HISTORICAL_EVENTS.length);
+    assert.equal(writes.every((payload) => payload.jm1_sourcerecordid === "according-to-mark"), true);
   });
 });
