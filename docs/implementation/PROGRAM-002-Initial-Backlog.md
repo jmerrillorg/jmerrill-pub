@@ -82,6 +82,8 @@ Every movement must confirm Dataverse status update, required gate/approval, `jm
 
 **Enterprise Imprint Canonization:** `books.json` is no longer authoritative for imprint assignment. It remains legacy evidence only. The full catalog was re-evaluated against current JM1 Publishing canon on 2026-07-06; future OP-000 waves use `data/enterprise-imprint-canonization.json` and `Enterprise-Imprint-Canonization-Report.md` for imprint recommendation, lock, and review decisions.
 
+**Wave 3:** OP-000 Enterprise Adoption Wave 3 certified 10 additional published author/title records using the Enterprise Imprint Canonization recommendation set; see `OP-000-Enterprise-Adoption-Wave-3-Plan.md` and `OP-000-Enterprise-Adoption-Wave-3-Certification-Report.md`.
+
 ## Marketing Throughout Pipeline
 
 Marketing is a through-line across the pipeline, not a launch-only activity. Each OP module must identify any marketing signal, handoff, or dependency.

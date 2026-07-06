@@ -24,6 +24,7 @@ PROGRAM-002 is operational. Phase I is certified, Phase I.5 is stabilized, OP-00
 - Certified Alice V Pryor / *According to Mark* as the first post-pilot coverage increase.
 - Certified OP-000 Enterprise Adoption Wave 1 for 10 additional published authors.
 - Certified OP-000 Enterprise Adoption Wave 2 for 10 additional published authors.
+- Certified OP-000 Enterprise Adoption Wave 3 for 10 additional published authors/titles using the Enterprise Imprint Canonization recommendation set.
 
 ## Adoption Model Now in Force
 
@@ -42,13 +43,13 @@ The adoption process must reuse existing workspace, SharePoint folders, contract
 | Area | Current State |
 |---|---|
 | Total catalog titles | 122 |
-| Catalog titles adopted | 22 |
-| Published authors adopted | 22 |
-| Active Author Workspaces certified | 23 |
-| Contracts linked | 0 confirmed; 20 marked Signed / Exists - Location Pending Reconciliation |
+| Catalog titles adopted | 32 |
+| Published authors adopted | 32 |
+| Active Author Workspaces certified | 33 |
+| Contracts linked | 0 confirmed; 30 marked Signed / Exists - Location Pending Reconciliation |
 | Stripe-ready authors | 0 confirmed |
 | Royalty-ready authors | 0 confirmed |
-| Enterprise Coverage | 18.03% |
+| Enterprise Coverage | 26.23% |
 
 ## Operational Boundaries Preserved
 
