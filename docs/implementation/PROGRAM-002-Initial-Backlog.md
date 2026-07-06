@@ -80,6 +80,8 @@ Every movement must confirm Dataverse status update, required gate/approval, `jm
 
 **Enterprise Adoption Operations:** After Track A and Track B certification, OP-000 is no longer a pilot-only module. The active operating metric is Enterprise Coverage. See `PROGRAM-002-Enterprise-Coverage-Dashboard.md` and `OP-000-Enterprise-Adoption-Queue.md`. Alice V Pryor / *According to Mark* is certified as the first post-pilot coverage increase. Wave 1 certified 10 additional single-title, non-Signature published authors. Wave 2 certified 10 additional low-risk published authors; see `OP-000-Enterprise-Adoption-Wave-2-Plan.md` and `OP-000-Enterprise-Adoption-Wave-2-Certification-Report.md`.
 
+**Enterprise Imprint Canonization:** `books.json` is no longer authoritative for imprint assignment. It remains legacy evidence only. The full catalog was re-evaluated against current JM1 Publishing canon on 2026-07-06; future OP-000 waves use `data/enterprise-imprint-canonization.json` and `Enterprise-Imprint-Canonization-Report.md` for imprint recommendation, lock, and review decisions.
+
 ## Marketing Throughout Pipeline
 
 Marketing is a through-line across the pipeline, not a launch-only activity. Each OP module must identify any marketing signal, handoff, or dependency.

@@ -38,6 +38,8 @@
 
 Enterprise Coverage is now measured by catalog titles adopted into PROGRAM-002, not by pilot completion. Track A and Track B proved the method; each subsequent adoption should increase the adopted-title count, published-author count, workspace count, contract-link count, and migration-readiness count as evidence becomes available.
 
+Imprint coverage is governed separately by the Enterprise Imprint Canonization Initiative. Current published imprint values remain historical evidence, but future OP-000 adoption waves must use `data/enterprise-imprint-canonization.json` for the canon-certified imprint recommendation and review decision.
+
 ## Current Operating Rhythm
 
 1. Select the next author from the Enterprise Adoption Queue.
