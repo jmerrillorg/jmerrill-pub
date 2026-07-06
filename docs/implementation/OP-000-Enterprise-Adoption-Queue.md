@@ -38,6 +38,16 @@ Imprint assignment for adoption is now governed by the Enterprise Imprint Canoni
 | Randall Beverly | 1 | Published Author Workspace | Certified |
 | Shecara Norris | 1 | Published Author Workspace | Certified |
 | Sylvia Benson | 1 | Published Author Workspace | Certified |
+| Juanita Travis | 1 | Published Author Workspace | Certified |
+| Karen Hill | 1 | Published Author Workspace | Certified |
+| Kiena Hughley | 1 | Published Author Workspace | Certified |
+| Leslie Banks | 1 | Published Author Workspace | Certified |
+| Lisa Clark | 1 | Published Author Workspace | Certified |
+| M A Grayson | 1 | Published Author Workspace | Certified |
+| Mack Hughley | 1 | Published Author Workspace | Certified |
+| TJ Mars | 1 | Published Author Workspace | Certified |
+| Adrean Young | 1 | Published Author Workspace | Certified; imprint review pending |
+| Bishop Thomas Johnson | 1 | Published Author Workspace | Certified; imprint review pending |
 
 ## Recommended Adoption Order
 
@@ -51,16 +61,6 @@ Priority is based on operational value and migration simplicity:
 
 | Author | Titles | Title(s) | Imprint(s) | Contracts | Workspace | Current Payment Method | Stripe Readiness | Relationship State | Priority | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
-| Juanita Travis | 1 | Rhyming It up with Church Stuff | JM Little | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Karen Hill | 1 | The Great Hair Restart | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Kiena Hughley | 1 | Your Peace Is a Priority | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Leslie Banks | 1 | Uncomfortable Conversations with God | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Lisa Clark | 1 | Let Me Tell You About It | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| M A Grayson | 1 | Mirror of Refining Insight | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Mack Hughley | 1 | When a Thug Meets Jesus | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| TJ Mars | 1 | Hop, Hop, Hop | JM Little | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
-| Adrean Young | 1 | Naughty Tales | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title genre cleanup |
-| Bishop Thomas Johnson | 1 | God's Word For This World | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title genre cleanup |
 | Cheryl Cook | 1 | The Fight for the Promiseland | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title genre cleanup |
 | Dennis Brown | 1 | Love Is An Action Word | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title genre cleanup |
 | Dr. Will Harris | 1 | Music Ministry Unplugged | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title genre cleanup |
@@ -103,4 +103,4 @@ Priority is based on operational value and migration simplicity:
 
 ## Next Adoption Recommendation
 
-Run the next controlled Enterprise Adoption wave from the remaining clean single-title queue. Recommended starting candidates: Juanita Travis, Karen Hill, Kiena Hughley, Leslie Banks, Lisa Clark, M A Grayson, Mack Hughley, TJ Mars, Adrean Young, and Bishop Thomas Johnson.
+Run the next controlled Enterprise Adoption wave from the remaining queue using `data/enterprise-imprint-canonization.json` for the PROGRAM-002 imprint recommendation. Prefer remaining `LOCKED` recommendations before adding additional Publisher Review Pending titles.
