@@ -1,0 +1,3142 @@
+{
+  "generatedAt": "2026-07-06T12:42:02.672Z",
+  "summary": {
+    "totalCatalogTitles": 122,
+    "totalAuthors": 71,
+    "processedThisPass": 90,
+    "certifiedImprintDistribution": {
+      "J Merrill Publishing": 81,
+      "JM Works": 23,
+      "JM Signature": 1,
+      "JM Little": 12,
+      "JM Verse": 3,
+      "Unresolved": 2
+    }
+  },
+  "processedThisPass": [
+    {
+      "id": "365-days-of-transparency",
+      "title": "365 Days Of Transparency",
+      "author": "Daphanny Baker",
+      "genre": "Devotional",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-92-1",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Devotional",
+        "text signal: devotional, devotion",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "a-little-bit-of-everything",
+      "title": "A Little Bit of Everything",
+      "author": "Carolyn Booker-Pierce",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-39-6",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "a-portrait-of-paradise",
+      "title": "A Portrait of Paradise",
+      "author": "Iyorwuese Hagher",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-65-6",
+      "currentImprint": "JM Signature",
+      "recommendedImprint": "JM Signature",
+      "confidence": 0.5,
+      "decision": "JM SIGNATURE REVIEW",
+      "reasoning": [
+        "JM Signature is invitation-only and cannot be auto-locked.",
+        "text signal: portrait of paradise",
+        "legacy imprint agrees: JM Signature"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "a-principal-s-tale",
+      "title": "A Principal's Tale",
+      "author": "Shelley McIntosh",
+      "genre": "Memoir",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-66-2",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
+        "genre signal: Memoir",
+        "text signal: memoir",
+        "legacy imprint agrees: JM Works"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "a-truebies-guide-part-1",
+      "title": "A Truebies Guide, Part 1",
+      "author": "Carolyn Booker-Pierce",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-62-4",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "a-truebies-guide-part-2",
+      "title": "A Truebies Guide, Part 2",
+      "author": "Carolyn Booker-Pierce",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-32-7",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "abortion",
+      "title": "Abortion!",
+      "author": "Toni Kleckley",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-00-6",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "aligned",
+      "title": "Aligned!",
+      "author": "Alesia True Corpening",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-06-8",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "almost-happy",
+      "title": "Almost Happy",
+      "author": "Jaylonna Stevette",
+      "genre": "Inspirational",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook",
+        "Audiobook"
+      ],
+      "isbn": "978-1-954414-58-7",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Inspirational",
+        "text signal: inspirational, inspiration"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "are-you-sure-that-you-are-ready",
+      "title": "Are You Sure That You Are Ready?",
+      "author": "Ericka Thornton",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-20-4",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "because-the-lord-is-my-shepherd",
+      "title": "Because the Lord Is My Shepherd",
+      "author": "Rodney Waller",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-44-0",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.36,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "bee-careful",
+      "title": "BEE Careful",
+      "author": "Deborah Eiland",
+      "genre": "Children's",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-72-3",
+      "currentImprint": "JM Little",
+      "recommendedImprint": "JM Little",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
+        "genre signal: Children's",
+        "text signal: children, child",
+        "legacy imprint agrees: JM Little"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "biblical-prescriptions-for-life-s-troubles",
+      "title": "Biblical Prescriptions for Life's Troubles",
+      "author": "Terry Stephens",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-89-1",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith, biblical",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "bodacious",
+      "title": "Bodacious",
+      "author": "Nathaniel Short",
+      "genre": "Inspirational",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-04-4",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Inspirational",
+        "text signal: inspirational, inspiration"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "connected",
+      "title": "Connected!",
+      "author": "Alesia True Corpening",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-16-7",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "conquer-your-fears-and-win",
+      "title": "Conquer Your Fears and Win",
+      "author": "Gloria Patterson",
+      "genre": "Self-Help",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-46-4",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
+        "genre signal: Self-Help",
+        "text signal: self",
+        "legacy imprint agrees: JM Works"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "damaged",
+      "title": "Damaged",
+      "author": "Taye Knox",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-70-0",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.24,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Works."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "delicious-ideas",
+      "title": "Delicious Ideas!",
+      "author": "Pamela Smith",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-33-5",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "department-of-the-air-force-mission-driven-leadership",
+      "title": "Department of the Air Force: Mission Driven Leadership",
+      "author": "Jackie Smith, Jr.",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-68-7",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "destined-to-break-the-curse",
+      "title": "Destined to Break the Curse",
+      "author": "Sean Smith, Sr.",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-34-1",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "destined-to-break-the-curse-devotional",
+      "title": "Destined to Break the Curse Devotional",
+      "author": "Sean Smith, Sr.",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-18-1",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.36,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "discipline-and-direction",
+      "title": "Discipline and Direction",
+      "author": "Terry Stephens",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-91-4",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "divinely-inspired",
+      "title": "Divinely Inspired",
+      "author": "Tekisha Wimbush",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-17-5",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "establishing-glory",
+      "title": "Establishing Glory",
+      "author": "Jackie Smith, Jr.",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook",
+        "Audiobook"
+      ],
+      "isbn": "978-1-950719-00-6",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "establishing-glory-2",
+      "title": "Establishing Glory 2",
+      "author": "Jackie Smith, Jr.",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-03-7",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "establishing-glory-3",
+      "title": "Establishing Glory 3",
+      "author": "Jackie Smith, Jr.",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-13-6",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "for-what-it-s-worth",
+      "title": "For What It's Worth",
+      "author": "Ericka Thornton",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-72-3",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "from-stylist-to-ceo",
+      "title": "From Stylist to CEO",
+      "author": "Kelli Milligan Stammen",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-23-6",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.24,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Works."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "getting-back-2-happy",
+      "title": "Getting Back 2 Happy",
+      "author": "Jaylonna Stevette",
+      "genre": "Inspirational",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-42-6",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Inspirational",
+        "text signal: inspirational, inspiration"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+      "author": "Carolyn Booker-Pierce",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-40-2",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "god-s-business-plan",
+      "title": "God's Business Plan",
+      "author": "Terry Stephens",
+      "genre": "Faith",
+      "format": "eBook",
+      "formats": [
+        "eBook"
+      ],
+      "isbn": "978-1-961475-08-3",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith, god",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "god-s-nudge",
+      "title": "God's Nudge",
+      "author": "Tekisha Wimbush",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-88-4",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith, god",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "grandmothers-educating-minds",
+      "title": "Grandmothers Educating Minds",
+      "author": "Toni Kleckley",
+      "genre": "Inspirational",
+      "format": "Paperback",
+      "formats": [
+        "Paperback"
+      ],
+      "isbn": "978-1-954414-21-1",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Inspirational",
+        "text signal: inspirational, inspiration"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "grandmothers-educating-minds-2nd-edition",
+      "title": "Grandmothers Educating Minds, 2nd Edition",
+      "author": "M. Darlene Carson",
+      "genre": "",
+      "format": "eBook",
+      "formats": [
+        "eBook"
+      ],
+      "isbn": "978-1-954414-20-4",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "have-you-considered-my-servant",
+      "title": "Have You Considered My Servant?",
+      "author": "Obadiah E. Harris",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-31-1",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.24,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "help-god-i-am-the-collection",
+      "title": "Help God, I Am - The Collection",
+      "author": "Cheryl Travis",
+      "genre": "Devotional",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-35-8",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.96,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Devotional",
+        "text signal: god, devotional, devotion",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "help-god-i-am-afraid",
+      "title": "Help God, I Am Afraid",
+      "author": "Cheryl Travis",
+      "genre": "Devotional",
+      "format": "Hardcover",
+      "formats": [
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-16-7",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.96,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Devotional",
+        "text signal: god, devotional, devotion",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "help-god-i-am-angry",
+      "title": "Help God, I Am Angry",
+      "author": "Cheryl Travis",
+      "genre": "Devotional",
+      "format": "Hardcover",
+      "formats": [
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-24-2",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.96,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Devotional",
+        "text signal: god, devotional, devotion",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "help-god-i-am-confused",
+      "title": "Help God, I Am Confused",
+      "author": "Cheryl Travis",
+      "genre": "Devotional",
+      "format": "Hardcover",
+      "formats": [
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-78-5",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.96,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Devotional",
+        "text signal: god, devotional, devotion",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "help-god-i-am-hurt",
+      "title": "Help God, I Am Hurt",
+      "author": "Cheryl Travis",
+      "genre": "Devotional",
+      "format": "Hardcover",
+      "formats": [
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-30-3",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.96,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Devotional",
+        "text signal: god, devotional, devotion",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "help-god-i-am-lonely",
+      "title": "Help God, I Am Lonely",
+      "author": "Cheryl Travis",
+      "genre": "Devotional",
+      "format": "Hardcover",
+      "formats": [
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-82-2",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.96,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Devotional",
+        "text signal: god, devotional, devotion",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "help-god-i-am-lost",
+      "title": "Help God, I Am Lost",
+      "author": "Cheryl Travis",
+      "genre": "Devotional",
+      "format": "Hardcover",
+      "formats": [
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-70-9",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.96,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Devotional",
+        "text signal: god, devotional, devotion",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "help-god-i-am-sad",
+      "title": "Help God, I Am Sad",
+      "author": "Cheryl Travis",
+      "genre": "Devotional",
+      "format": "Hardcover",
+      "formats": [
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-76-1",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.96,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Devotional",
+        "text signal: god, devotional, devotion",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "i-am-my-worst-enemy",
+      "title": "I Am My Worst Enemy!",
+      "author": "Maurché Reed",
+      "genre": "Self-Help",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-54-9",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
+        "genre signal: Self-Help",
+        "text signal: self",
+        "legacy imprint agrees: JM Works"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "inner-peace-through-life-s-storms",
+      "title": "Inner Peace Through Life's Storms",
+      "author": "Rosetta Perry",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-49-6",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "inspirations-from-god",
+      "title": "Inspirations from God",
+      "author": "Edith Clay",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-80-8",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.96,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith, god, inspiration",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "jalen-becomes-a-big-brother",
+      "title": "Jalen Becomes a Big Brother",
+      "author": "Deborah Eiland",
+      "genre": "Children's",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-40-3",
+      "currentImprint": "JM Little",
+      "recommendedImprint": "JM Little",
+      "confidence": 0.96,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
+        "genre signal: Children's",
+        "text signal: children, child, big brother, jalen",
+        "legacy imprint agrees: JM Little"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "jewels-by-lady-j",
+      "title": "Jewels by Lady J",
+      "author": "Janet Stephens",
+      "genre": "Inspirational",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-28-0",
+      "currentImprint": "JM Verse",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Inspirational",
+        "text signal: inspirational, inspiration"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "just-what-i-needed",
+      "title": "Just What I Needed",
+      "author": "Gloria Patterson",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-86-0",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "kingdom-equipment-101",
+      "title": "Kingdom Equipment 101",
+      "author": "Terry Stephens",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-77-8",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith, kingdom",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "lady-daphanny-s-altar",
+      "title": "Lady Daphanny's Altar",
+      "author": "Daphanny Baker",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-09-0",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "love-is-an-action-word",
+      "title": "Love Is An Action Word",
+      "author": "Dennis Brown",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-98-3",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "love-lucy",
+      "title": "Love Lucy",
+      "author": "Diane Johnson",
+      "genre": "Fiction",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-94-5",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
+        "genre signal: Fiction",
+        "text signal: fiction, love",
+        "legacy imprint agrees: JM Works"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "love-of-my-life",
+      "title": "Love of My Life",
+      "author": "Thaddues Smith",
+      "genre": "Inspirational",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-27-3",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Inspirational",
+        "text signal: inspirational, inspiration"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "loving-the-addict",
+      "title": "Loving the Addict",
+      "author": "Carolyn Booker-Pierce",
+      "genre": "Self-Help",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-57-0",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
+        "genre signal: Self-Help",
+        "text signal: self, addict",
+        "legacy imprint agrees: JM Works"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "memoir-of-a-black-christian-nationalist",
+      "title": "Memoir of a Black Christian Nationalist",
+      "author": "Shelley McIntosh",
+      "genre": "Memoir",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook",
+        "Audiobook"
+      ],
+      "isbn": "978-1-954414-19-8",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
+        "genre signal: Memoir",
+        "text signal: memoir",
+        "legacy imprint agrees: JM Works"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "more-than-a-village",
+      "title": "More Than A Village",
+      "author": "Shelley McIntosh",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-14-3",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "music-ministry-unplugged",
+      "title": "Music Ministry Unplugged",
+      "author": "Dr. Will Harris",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-72-4",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.24,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "my-abc-s",
+      "title": "My ABC's",
+      "author": "Jaylonna Stevette",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-46-4",
+      "currentImprint": "JM Little",
+      "recommendedImprint": "JM Little",
+      "confidence": 0.24,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Little."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "never-give-up-on-love",
+      "title": "Never Give Up On Love",
+      "author": "Pamela Smith",
+      "genre": "Inspirational",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-52-5",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Inspirational",
+        "text signal: inspirational, inspiration"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "one-soul",
+      "title": "One Soul",
+      "author": "Veronica Brown",
+      "genre": "Inspirational",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-60-0",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Inspirational",
+        "text signal: inspirational, inspiration"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "peaches-can-do-it",
+      "title": "Peaches Can Do It!",
+      "author": "Daphanny Baker",
+      "genre": "Children's",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-47-2",
+      "currentImprint": "JM Little",
+      "recommendedImprint": "JM Little",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
+        "genre signal: Children's",
+        "text signal: children, child",
+        "legacy imprint agrees: JM Little"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "seasons-of-life",
+      "title": "Seasons of Life",
+      "author": "Diane Johnson",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-06-9",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "taylor-made",
+      "title": "Taylor Made",
+      "author": "Eryonna Barrino",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook",
+        "Audiobook"
+      ],
+      "isbn": "978-1-961475-21-2",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Works."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-celestial-advantage",
+      "title": "The Celestial Advantage",
+      "author": "Obadiah E. Harris",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-08-2",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith, celestial",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-doctrine-of-last-things",
+      "title": "The Doctrine of Last Things",
+      "author": "Lyle Goddard",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-44-0",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-essence-of-life-love-letters-to-christ",
+      "title": "The Essence of Life, Love Letters to Christ",
+      "author": "Janet Stephens",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-21-1",
+      "currentImprint": "JM Verse",
+      "recommendedImprint": "JM Verse",
+      "confidence": 0.24,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Verse."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-fight-for-the-promiseland",
+      "title": "The Fight for the Promiseland",
+      "author": "Cheryl Cook",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-63-2",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-flame",
+      "title": "The Flame",
+      "author": "Veronica Brown",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-11-3",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-girl-with-the-ebony-locs-and-the-three-bears",
+      "title": "The Girl with the Ebony Locs and the Three Bears",
+      "author": "Deborah Eiland",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-06-8",
+      "currentImprint": "JM Little",
+      "recommendedImprint": "JM Little",
+      "confidence": 0.24,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Little."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-healed-me",
+      "title": "The Healed Me",
+      "author": "Maurché Reed",
+      "genre": "Inspirational",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-62-4",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Inspirational",
+        "text signal: inspirational, inspiration"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-i-am-in-me",
+      "title": "The I Am in Me",
+      "author": "Tekisha Wimbush",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-50-1",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-i-am-in-me-part-2",
+      "title": "The I Am in Me Part 2",
+      "author": "Edith Clay",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback"
+      ],
+      "isbn": "978-1-954414-52-5",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-journey",
+      "title": "The Journey",
+      "author": "Rosetta Perry",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-29-7",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-little-girl-with-the-plow",
+      "title": "The Little Girl with the Plow!",
+      "author": "Deborah Eiland",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-33-4",
+      "currentImprint": "JM Little",
+      "recommendedImprint": "JM Little",
+      "confidence": 0.36,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Little."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-messenger",
+      "title": "The Messenger",
+      "author": "Daphanny Baker",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-15-1",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-messenger-2",
+      "title": "The Messenger 2",
+      "author": "Thaddues Smith",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-61-8",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-never-before-told-story-of-the-gelatin-monster",
+      "title": "The Never Before Told Story of the Gelatin Monster",
+      "author": "Maurché Reed",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-64-8",
+      "currentImprint": "JM Little",
+      "recommendedImprint": "JM Little",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Little."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-paper-champ",
+      "title": "The Paper Champ",
+      "author": "Kurt Broadnax",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-53-3",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.24,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Works."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-princess-and-the-black-eyed-pea",
+      "title": "The Princess and the Black-Eyed Pea",
+      "author": "Deborah Eiland",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-69-3",
+      "currentImprint": "JM Little",
+      "recommendedImprint": "JM Little",
+      "confidence": 0.24,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Little."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-release-of-the-spirit",
+      "title": "The Release of the Spirit",
+      "author": "Lyle Goddard",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-950719-64-8",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.84,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith, spirit",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-sun-the-shadow-and-the-silence",
+      "title": "The Sun, the Shadow, and the Silence",
+      "author": "Nicky Williams",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-55-7",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "understanding-the-misunderstood",
+      "title": "Understanding the Misunderstood",
+      "author": "Tia Benincase",
+      "genre": "",
+      "format": "Hardcover",
+      "formats": [
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-02-0",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "war-mother",
+      "title": "War Mother",
+      "author": "Winter Dockery",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-38-0",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: JM Works."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "warriors-and-angels",
+      "title": "Warriors and Angels",
+      "author": "Shelley McIntosh",
+      "genre": "Faith",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-51-9",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
+        "genre signal: Faith",
+        "text signal: faith",
+        "legacy imprint agrees: J Merrill Publishing"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "when-zuri-came-to-earth",
+      "title": "When Zuri Came to Earth",
+      "author": "Jaylonna Stevette",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-99-1",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "why-faith-works-for-some-and-not-for-others",
+      "title": "Why Faith Works For Some And Not For Others",
+      "author": "Nathaniel Short",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-25-9",
+      "currentImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.24,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint retained as evidence only: J Merrill Publishing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "you-re-still-not-crazy",
+      "title": "You're Still Not Crazy",
+      "author": "Carolyn Booker-Pierce",
+      "genre": "Self-Help",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-954414-23-5",
+      "currentImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.72,
+      "decision": "LOCKED",
+      "reasoning": [
+        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
+        "genre signal: Self-Help",
+        "text signal: self",
+        "legacy imprint agrees: JM Works"
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Genre/BISAC surrogate",
+        "Current published imprint as evidence",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "girl-did-you-know",
+      "title": "Girl, Did You Know...?",
+      "author": "Kimberly Reeder",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-74-8",
+      "currentImprint": "Missing",
+      "recommendedImprint": "Unresolved",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint is missing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Legacy metadata as evidence"
+      ]
+    },
+    {
+      "id": "the-conquest-of-azenga",
+      "title": "The Conquest of Azenga",
+      "author": "Iyorwuese Hagher",
+      "genre": "",
+      "format": "Paperback",
+      "formats": [
+        "Paperback",
+        "Hardcover",
+        "eBook"
+      ],
+      "isbn": "978-1-961475-76-2",
+      "currentImprint": "Missing",
+      "recommendedImprint": "Unresolved",
+      "confidence": 0.2,
+      "decision": "LOW CONFIDENCE",
+      "reasoning": [
+        "Insufficient available evidence for canon-certified automation.",
+        "Legacy imprint is missing."
+      ],
+      "evidenceUsed": [
+        "Title",
+        "Legacy metadata as evidence"
+      ]
+    }
+  ],
+  "exceptions": [
+    {
+      "id": "a-little-bit-of-everything",
+      "title": "A Little Bit of Everything",
+      "author": "Carolyn Booker-Pierce",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "a-portrait-of-paradise",
+      "title": "A Portrait of Paradise",
+      "author": "Iyorwuese Hagher",
+      "exception": "JM Signature review required",
+      "certifiedImprint": "JM Signature"
+    },
+    {
+      "id": "a-truebies-guide-part-1",
+      "title": "A Truebies Guide, Part 1",
+      "author": "Carolyn Booker-Pierce",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "a-truebies-guide-part-2",
+      "title": "A Truebies Guide, Part 2",
+      "author": "Carolyn Booker-Pierce",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "abortion",
+      "title": "Abortion!",
+      "author": "Toni Kleckley",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "aligned",
+      "title": "Aligned!",
+      "author": "Alesia True Corpening",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "because-the-lord-is-my-shepherd",
+      "title": "Because the Lord Is My Shepherd",
+      "author": "Rodney Waller",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "connected",
+      "title": "Connected!",
+      "author": "Alesia True Corpening",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "damaged",
+      "title": "Damaged",
+      "author": "Taye Knox",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Works"
+    },
+    {
+      "id": "delicious-ideas",
+      "title": "Delicious Ideas!",
+      "author": "Pamela Smith",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "department-of-the-air-force-mission-driven-leadership",
+      "title": "Department of the Air Force: Mission Driven Leadership",
+      "author": "Jackie Smith, Jr.",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "destined-to-break-the-curse-devotional",
+      "title": "Destined to Break the Curse Devotional",
+      "author": "Sean Smith, Sr.",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "divinely-inspired",
+      "title": "Divinely Inspired",
+      "author": "Tekisha Wimbush",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "for-what-it-s-worth",
+      "title": "For What It's Worth",
+      "author": "Ericka Thornton",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "from-stylist-to-ceo",
+      "title": "From Stylist to CEO",
+      "author": "Kelli Milligan Stammen",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Works"
+    },
+    {
+      "id": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+      "author": "Carolyn Booker-Pierce",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "grandmothers-educating-minds-2nd-edition",
+      "title": "Grandmothers Educating Minds, 2nd Edition",
+      "author": "M. Darlene Carson",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "have-you-considered-my-servant",
+      "title": "Have You Considered My Servant?",
+      "author": "Obadiah E. Harris",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "inner-peace-through-life-s-storms",
+      "title": "Inner Peace Through Life's Storms",
+      "author": "Rosetta Perry",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "just-what-i-needed",
+      "title": "Just What I Needed",
+      "author": "Gloria Patterson",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "love-is-an-action-word",
+      "title": "Love Is An Action Word",
+      "author": "Dennis Brown",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "more-than-a-village",
+      "title": "More Than A Village",
+      "author": "Shelley McIntosh",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "music-ministry-unplugged",
+      "title": "Music Ministry Unplugged",
+      "author": "Dr. Will Harris",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "my-abc-s",
+      "title": "My ABC's",
+      "author": "Jaylonna Stevette",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Little"
+    },
+    {
+      "id": "seasons-of-life",
+      "title": "Seasons of Life",
+      "author": "Diane Johnson",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "taylor-made",
+      "title": "Taylor Made",
+      "author": "Eryonna Barrino",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Works"
+    },
+    {
+      "id": "the-doctrine-of-last-things",
+      "title": "The Doctrine of Last Things",
+      "author": "Lyle Goddard",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "the-essence-of-life-love-letters-to-christ",
+      "title": "The Essence of Life, Love Letters to Christ",
+      "author": "Janet Stephens",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Verse"
+    },
+    {
+      "id": "the-fight-for-the-promiseland",
+      "title": "The Fight for the Promiseland",
+      "author": "Cheryl Cook",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "the-flame",
+      "title": "The Flame",
+      "author": "Veronica Brown",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "the-girl-with-the-ebony-locs-and-the-three-bears",
+      "title": "The Girl with the Ebony Locs and the Three Bears",
+      "author": "Deborah Eiland",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Little"
+    },
+    {
+      "id": "the-i-am-in-me-part-2",
+      "title": "The I Am in Me Part 2",
+      "author": "Edith Clay",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "the-little-girl-with-the-plow",
+      "title": "The Little Girl with the Plow!",
+      "author": "Deborah Eiland",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Little"
+    },
+    {
+      "id": "the-messenger-2",
+      "title": "The Messenger 2",
+      "author": "Thaddues Smith",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "the-never-before-told-story-of-the-gelatin-monster",
+      "title": "The Never Before Told Story of the Gelatin Monster",
+      "author": "Maurché Reed",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Little"
+    },
+    {
+      "id": "the-paper-champ",
+      "title": "The Paper Champ",
+      "author": "Kurt Broadnax",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Works"
+    },
+    {
+      "id": "the-princess-and-the-black-eyed-pea",
+      "title": "The Princess and the Black-Eyed Pea",
+      "author": "Deborah Eiland",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Little"
+    },
+    {
+      "id": "the-sun-the-shadow-and-the-silence",
+      "title": "The Sun, the Shadow, and the Silence",
+      "author": "Nicky Williams",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "understanding-the-misunderstood",
+      "title": "Understanding the Misunderstood",
+      "author": "Tia Benincase",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "war-mother",
+      "title": "War Mother",
+      "author": "Winter Dockery",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Works"
+    },
+    {
+      "id": "when-zuri-came-to-earth",
+      "title": "When Zuri Came to Earth",
+      "author": "Jaylonna Stevette",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "why-faith-works-for-some-and-not-for-others",
+      "title": "Why Faith Works For Some And Not For Others",
+      "author": "Nathaniel Short",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "girl-did-you-know",
+      "title": "Girl, Did You Know...?",
+      "author": "Kimberly Reeder",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "Unresolved"
+    },
+    {
+      "id": "the-conquest-of-azenga",
+      "title": "The Conquest of Azenga",
+      "author": "Iyorwuese Hagher",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "Unresolved"
+    }
+  ],
+  "publisherReview": [
+    {
+      "id": "a-little-bit-of-everything",
+      "title": "A Little Bit of Everything",
+      "author": "Carolyn Booker-Pierce",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "a-truebies-guide-part-1",
+      "title": "A Truebies Guide, Part 1",
+      "author": "Carolyn Booker-Pierce",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "a-truebies-guide-part-2",
+      "title": "A Truebies Guide, Part 2",
+      "author": "Carolyn Booker-Pierce",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "abortion",
+      "title": "Abortion!",
+      "author": "Toni Kleckley",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "aligned",
+      "title": "Aligned!",
+      "author": "Alesia True Corpening",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "because-the-lord-is-my-shepherd",
+      "title": "Because the Lord Is My Shepherd",
+      "author": "Rodney Waller",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "connected",
+      "title": "Connected!",
+      "author": "Alesia True Corpening",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "damaged",
+      "title": "Damaged",
+      "author": "Taye Knox",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Works",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Works"
+    },
+    {
+      "id": "delicious-ideas",
+      "title": "Delicious Ideas!",
+      "author": "Pamela Smith",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "department-of-the-air-force-mission-driven-leadership",
+      "title": "Department of the Air Force: Mission Driven Leadership",
+      "author": "Jackie Smith, Jr.",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "destined-to-break-the-curse-devotional",
+      "title": "Destined to Break the Curse Devotional",
+      "author": "Sean Smith, Sr.",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "divinely-inspired",
+      "title": "Divinely Inspired",
+      "author": "Tekisha Wimbush",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "for-what-it-s-worth",
+      "title": "For What It's Worth",
+      "author": "Ericka Thornton",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "from-stylist-to-ceo",
+      "title": "From Stylist to CEO",
+      "author": "Kelli Milligan Stammen",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Works",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Works"
+    },
+    {
+      "id": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+      "author": "Carolyn Booker-Pierce",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "grandmothers-educating-minds-2nd-edition",
+      "title": "Grandmothers Educating Minds, 2nd Edition",
+      "author": "M. Darlene Carson",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "have-you-considered-my-servant",
+      "title": "Have You Considered My Servant?",
+      "author": "Obadiah E. Harris",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "inner-peace-through-life-s-storms",
+      "title": "Inner Peace Through Life's Storms",
+      "author": "Rosetta Perry",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "just-what-i-needed",
+      "title": "Just What I Needed",
+      "author": "Gloria Patterson",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "love-is-an-action-word",
+      "title": "Love Is An Action Word",
+      "author": "Dennis Brown",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "more-than-a-village",
+      "title": "More Than A Village",
+      "author": "Shelley McIntosh",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "music-ministry-unplugged",
+      "title": "Music Ministry Unplugged",
+      "author": "Dr. Will Harris",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "my-abc-s",
+      "title": "My ABC's",
+      "author": "Jaylonna Stevette",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Little",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Little"
+    },
+    {
+      "id": "seasons-of-life",
+      "title": "Seasons of Life",
+      "author": "Diane Johnson",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "taylor-made",
+      "title": "Taylor Made",
+      "author": "Eryonna Barrino",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Works",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Works"
+    },
+    {
+      "id": "the-doctrine-of-last-things",
+      "title": "The Doctrine of Last Things",
+      "author": "Lyle Goddard",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "the-essence-of-life-love-letters-to-christ",
+      "title": "The Essence of Life, Love Letters to Christ",
+      "author": "Janet Stephens",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Verse",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Verse"
+    },
+    {
+      "id": "the-fight-for-the-promiseland",
+      "title": "The Fight for the Promiseland",
+      "author": "Cheryl Cook",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "the-flame",
+      "title": "The Flame",
+      "author": "Veronica Brown",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "the-girl-with-the-ebony-locs-and-the-three-bears",
+      "title": "The Girl with the Ebony Locs and the Three Bears",
+      "author": "Deborah Eiland",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Little",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Little"
+    },
+    {
+      "id": "the-i-am-in-me-part-2",
+      "title": "The I Am in Me Part 2",
+      "author": "Edith Clay",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "the-little-girl-with-the-plow",
+      "title": "The Little Girl with the Plow!",
+      "author": "Deborah Eiland",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Little",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Little"
+    },
+    {
+      "id": "the-messenger-2",
+      "title": "The Messenger 2",
+      "author": "Thaddues Smith",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "the-never-before-told-story-of-the-gelatin-monster",
+      "title": "The Never Before Told Story of the Gelatin Monster",
+      "author": "Maurché Reed",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Little",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Little"
+    },
+    {
+      "id": "the-paper-champ",
+      "title": "The Paper Champ",
+      "author": "Kurt Broadnax",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Works",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Works"
+    },
+    {
+      "id": "the-princess-and-the-black-eyed-pea",
+      "title": "The Princess and the Black-Eyed Pea",
+      "author": "Deborah Eiland",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Little",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Little"
+    },
+    {
+      "id": "the-sun-the-shadow-and-the-silence",
+      "title": "The Sun, the Shadow, and the Silence",
+      "author": "Nicky Williams",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "understanding-the-misunderstood",
+      "title": "Understanding the Misunderstood",
+      "author": "Tia Benincase",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "war-mother",
+      "title": "War Mother",
+      "author": "Winter Dockery",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "JM Works",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "JM Works"
+    },
+    {
+      "id": "when-zuri-came-to-earth",
+      "title": "When Zuri Came to Earth",
+      "author": "Jaylonna Stevette",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "why-faith-works-for-some-and-not-for-others",
+      "title": "Why Faith Works For Some And Not For Others",
+      "author": "Nathaniel Short",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "J Merrill Publishing",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "J Merrill Publishing"
+    },
+    {
+      "id": "girl-did-you-know",
+      "title": "Girl, Did You Know...?",
+      "author": "Kimberly Reeder",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "Unresolved",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "Unresolved"
+    },
+    {
+      "id": "the-conquest-of-azenga",
+      "title": "The Conquest of Azenga",
+      "author": "Iyorwuese Hagher",
+      "exception": "Publisher imprint review required",
+      "certifiedImprint": "Unresolved",
+      "reason": "Canonized imprint confidence below auto-lock threshold.",
+      "recommendedImprint": "Unresolved"
+    }
+  ],
+  "jmSignature": [
+    {
+      "id": "a-portrait-of-paradise",
+      "title": "A Portrait of Paradise",
+      "author": "Iyorwuese Hagher",
+      "exception": "JM Signature review required",
+      "certifiedImprint": "JM Signature",
+      "reason": "JM Signature is invitation-only and requires Publisher review."
+    }
+  ],
+  "publisherApprovedImprints": [
+    {
+      "id": "naughty-tales",
+      "imprint": "JM Works"
+    },
+    {
+      "id": "god-s-word-for-this-world",
+      "imprint": "J Merrill Publishing"
+    }
+  ],
+  "certifiedProductionWriteSummary": {
+    "written": 904,
+    "skippedExisting": 0,
+    "note": "Certified production write pass completed before final report refresh; later report-only refreshes do not create duplicate execution-log rows."
+  },
+  "writeSummary": {
+    "attempted": false,
+    "written": 0,
+    "skippedExisting": 0
+  }
+}

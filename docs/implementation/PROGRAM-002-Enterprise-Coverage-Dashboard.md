@@ -2,7 +2,7 @@
 
 **Program:** PROGRAM-002 - Autonomous Publishing Production Pipeline
 **Mode:** Enterprise Adoption Operations
-**Status:** Active baseline - Wave 3 certified
+**Status:** Enterprise Adoption Complete
 **Date:** 2026-07-06
 **Primary KPI:** Enterprise Coverage
 
@@ -11,36 +11,36 @@
 | Metric | Current Value | Source / Notes |
 |---|---:|---|
 | Total catalog titles | 122 | `data/books.json` |
-| Catalog titles adopted into PROGRAM-002 | 32 | Track B certified: 2 prior adopted titles plus Wave 1, Wave 2, and Wave 3 |
+| Catalog titles adopted into PROGRAM-002 | 122 | Enterprise Adoption completion pass certified all remaining eligible catalog titles |
 | Active pipeline titles adopted | 1 | Track A certified: *Establishing Glory: The Library* |
 | Published authors in catalog | 71 | Unique author names in `data/books.json` |
-| Published authors adopted | 32 | J. Derrick Johnson; Alice V Pryor; Wave 1, Wave 2, and Wave 3 authors |
-| Active Author Workspaces certified | 33 | One Active Author Workspace; thirty-two Published Author Workspaces |
-| Contracts linked | 0 confirmed | 30 Wave 1/Wave 2/Wave 3 contracts marked Signed / Exists - Location Pending Reconciliation |
+| Published authors adopted | 71 | All catalog authors adopted into PROGRAM-002 coverage |
+| Active Author Workspaces certified | 72 | One Active Author Workspace; seventy-one Published Author Workspaces |
+| Contracts linked | 0 confirmed | 122 catalog title contracts marked Signed / Exists - Location Pending Reconciliation |
 | Stripe-ready authors | 0 confirmed | Stripe migration is flagged, not performed automatically |
 | Royalty-ready authors | 0 confirmed | Royalty migration is explicitly deferred |
-| OP-000 remaining catalog titles | 90 | Total catalog titles minus adopted Track B catalog titles |
-| OP-000 remaining published authors | 39 | Total catalog authors minus adopted published authors |
-| Enterprise Coverage % | 26.23% | 32 adopted catalog titles / 122 catalog titles |
+| OP-000 remaining catalog titles | 0 | Enterprise Adoption complete |
+| OP-000 remaining published authors | 0 | Enterprise Adoption complete |
+| Enterprise Coverage % | 100% | 122 adopted catalog titles / 122 catalog titles |
 
 ## Coverage by Imprint
 
-| Imprint | Catalog Titles | Adopted Titles | Remaining | Notes |
-|---|---:|---:|---:|---|
-| J Merrill Publishing | 67 | 11 | 56 | PROGRAM-002 canonized imprint coverage; includes one Wave 3 Publisher Review Pending title |
-| JM Works | 35 | 15 | 20 | PROGRAM-002 canonized imprint coverage; includes one Wave 3 Publisher Review Pending title |
-| JM Little | 12 | 4 | 8 | PROGRAM-002 canonized imprint coverage |
-| JM Verse | 5 | 3 | 2 | Standard adoption path |
-| JM Signature | 1 | 0 | 1 | Publisher review required; never auto-lock |
-| Missing imprint | 2 | 0 | 2 | Catalog hygiene required before certification |
+| Certified PROGRAM-002 Imprint | Adopted Titles | Remaining Adoption | Notes |
+|---|---:|---:|---|
+| J Merrill Publishing | 81 | 0 | Includes low-confidence records requiring Publisher review before imprint lock |
+| JM Works | 23 | 0 | Includes low-confidence records requiring Publisher review before imprint lock |
+| JM Little | 12 | 0 | Certified PROGRAM-002 imprint coverage |
+| JM Verse | 3 | 0 | Certified PROGRAM-002 imprint coverage |
+| JM Signature | 1 | 0 | Publisher review required; never auto-lock |
+| Unresolved | 2 | 0 | Adopted with Publisher imprint review required |
 
 ## Operational Interpretation
 
-Enterprise Coverage is now measured by catalog titles adopted into PROGRAM-002, not by pilot completion. Track A and Track B proved the method; each subsequent adoption should increase the adopted-title count, published-author count, workspace count, contract-link count, and migration-readiness count as evidence becomes available.
+Enterprise Coverage is now measured by catalog titles adopted into PROGRAM-002, not by pilot completion. Track A, Track B, Waves 1-3, and the completion pass certified the adoption method across the full catalog. Remaining work is reconciliation, not adoption: Publisher imprint review, JM Signature review, contract file reconciliation, Stripe migration, royalty readiness, and future title-specific cleanup.
 
 Imprint coverage is governed separately by the Enterprise Imprint Canonization Initiative. Current published imprint values remain historical evidence, but future OP-000 adoption waves must use `data/enterprise-imprint-canonization.json` for the canon-certified imprint recommendation and review decision.
 
-## Current Operating Rhythm
+## Completed Operating Rhythm
 
 1. Select the next author from the Enterprise Adoption Queue.
 2. Discover existing Contact, title, contract, workspace, royalty, distribution, and asset evidence.
@@ -50,11 +50,13 @@ Imprint coverage is governed separately by the Enterprise Imprint Canonization I
 6. Certify the author/title.
 7. Update this dashboard and continue to the next author.
 
-## Next Recommended Adoption
+## Next Recommended Movement
 
-| Rank | Author | Title | Reason |
-|---:|---|---|---|
-| 1 | Wave 4 | Next remaining clean candidates | Continue coverage using the certified method and canonized imprint recommendations |
+| Rank | Movement | Reason |
+|---:|---|---|
+| 1 | Publisher imprint review queue | Resolve low-confidence and unresolved certified imprint items now that adoption coverage is complete |
+| 2 | Contract reconciliation | Locate/link historical contract evidence for adopted catalog titles |
+| 3 | Stripe migration planning | Migrate authors only when payment/royalty onboarding is scheduled and authorized |
 
 ## Current Constraints
 
