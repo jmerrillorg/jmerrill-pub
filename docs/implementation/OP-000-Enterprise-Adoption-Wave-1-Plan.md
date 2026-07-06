@@ -3,7 +3,7 @@
 **Program:** PROGRAM-002  
 **Mode:** Enterprise Adoption Operations  
 **Wave:** Wave 1  
-**Status:** Ready for controlled run after deployment  
+**Status:** Certified
 **Date:** 2026-07-06  
 
 ## Authority
@@ -60,7 +60,7 @@ Wave 1 does not:
 - start production or distribution;
 - run catalog-wide adoption.
 
-## Expected Coverage Impact
+## Certified Coverage Impact
 
 | Metric | Before Wave 1 | After Wave 1 |
 |---|---:|---:|
@@ -70,3 +70,20 @@ Wave 1 does not:
 | OP-000 remaining catalog titles | 120 | 110 |
 | OP-000 remaining published authors | 69 | 59 |
 | Enterprise Coverage | 1.64% | 9.84% |
+
+## Live Run Evidence
+
+| Author | Title | Result | Execution Logs |
+|---|---|---|---:|
+| Ashanti Flemister | *Pieces of Me All Over the Place* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 |
+| Baily Cunningham | *Melodies From Heaven* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 |
+| Brandyn McElroy | *Support Beyond the Cycle* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 |
+| Cynthia Sloan | *Speech Therapy Works!* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 |
+| Christina Chislom | *Come Out of Hiding* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 |
+| Darlene Carson | *SHE* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 |
+| David Williams | *Words of A Troubled Soul* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 |
+| Dean Wilson | *Warrior's Breed* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 |
+| Deanna Jones | *Life after Detour* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 |
+| Donjia Walls | *27 Days to Overcoming Depression* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 |
+
+Total Wave 1 execution-log rows: 100.

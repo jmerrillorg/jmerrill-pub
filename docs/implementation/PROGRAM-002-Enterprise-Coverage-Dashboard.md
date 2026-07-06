@@ -11,26 +11,26 @@
 | Metric | Current Value | Source / Notes |
 |---|---:|---|
 | Total catalog titles | 122 | `data/books.json` |
-| Catalog titles adopted into PROGRAM-002 | 2 | Track B certified: *100 Wisdom Lessons for Life and Living*; *According to Mark* |
+| Catalog titles adopted into PROGRAM-002 | 12 | Track B certified: 2 prior adopted titles plus 10 Wave 1 titles |
 | Active pipeline titles adopted | 1 | Track A certified: *Establishing Glory: The Library* |
 | Published authors in catalog | 71 | Unique author names in `data/books.json` |
-| Published authors adopted | 2 | J. Derrick Johnson; Alice V Pryor |
-| Active Author Workspaces certified | 3 | One Active Author Workspace; two Published Author Workspaces |
-| Contracts linked | 0 confirmed | Historical contracts require search/link during each author adoption |
+| Published authors adopted | 12 | J. Derrick Johnson; Alice V Pryor; 10 Wave 1 authors |
+| Active Author Workspaces certified | 13 | One Active Author Workspace; twelve Published Author Workspaces |
+| Contracts linked | 0 confirmed | 10 Wave 1 contracts marked Signed / Exists - Location Pending Reconciliation |
 | Stripe-ready authors | 0 confirmed | Stripe migration is flagged, not performed automatically |
 | Royalty-ready authors | 0 confirmed | Royalty migration is explicitly deferred |
-| OP-000 remaining catalog titles | 120 | Total catalog titles minus adopted Track B catalog titles |
-| OP-000 remaining published authors | 69 | Total catalog authors minus adopted published authors |
-| Enterprise Coverage % | 1.64% | 2 adopted catalog titles / 122 catalog titles |
+| OP-000 remaining catalog titles | 110 | Total catalog titles minus adopted Track B catalog titles |
+| OP-000 remaining published authors | 59 | Total catalog authors minus adopted published authors |
+| Enterprise Coverage % | 9.84% | 12 adopted catalog titles / 122 catalog titles |
 
 ## Coverage by Imprint
 
 | Imprint | Catalog Titles | Adopted Titles | Remaining | Notes |
 |---|---:|---:|---:|---|
-| J Merrill Publishing | 67 | 2 | 65 | Standard adoption path unless metadata conflicts appear |
-| JM Works | 35 | 0 | 35 | Standard adoption path |
-| JM Little | 12 | 0 | 12 | Standard adoption path with children's-book metadata review |
-| JM Verse | 5 | 0 | 5 | Standard adoption path |
+| J Merrill Publishing | 67 | 4 | 63 | Standard adoption path unless metadata conflicts appear |
+| JM Works | 35 | 5 | 30 | Standard adoption path |
+| JM Little | 12 | 1 | 11 | Standard adoption path with children's-book metadata review |
+| JM Verse | 5 | 3 | 2 | Standard adoption path |
 | JM Signature | 1 | 0 | 1 | Publisher review required; never auto-lock |
 | Missing imprint | 2 | 0 | 2 | Catalog hygiene required before certification |
 
@@ -52,7 +52,9 @@ Enterprise Coverage is now measured by catalog titles adopted into PROGRAM-002, 
 
 | Rank | Author | Title | Reason |
 |---:|---|---|---|
-| 1 | Wave 1 | 10 selected single-title authors | Authorized controlled wave; see `OP-000-Enterprise-Adoption-Wave-1-Plan.md` |
+| 1 | Wayne Pounds | *Number 23 and Me* | Single-title author, clean metadata, non-Signature imprint |
+| 2 | Essence Unique | *Your Brain Has Too Much What, Mommy??* | Single-title author, clean metadata, non-Signature imprint |
+| 3 | Johnson Settles | *7 Step Jumpstart to Becoming Your Best Self* | Single-title author, clean metadata, non-Signature imprint |
 
 ## Current Constraints
 
