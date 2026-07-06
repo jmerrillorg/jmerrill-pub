@@ -69,7 +69,7 @@ Canonical decisions:
 - `jm1pub_assetmarketplace` is the marketplace/distribution presence for a specific asset.
 - PAM uses `jm1pub_contract` as the only agreement / contract basis for this model.
 - PAM does not replace `jm1pub_title`; it extends the model below it.
-- PAM schema belongs in `IS-008-Publishing-Asset-Registry-Specification.md`, not as an IS-001 amendment.
+- PAM schema belongs in `IS-009-Publishing-Asset-Registry-Specification.md`, not as an IS-001 amendment.
 
 ## File Storage Doctrine
 
@@ -123,7 +123,7 @@ Examples:
 - Workbook
 - Revised edition
 
-Core fields are specified in IS-008.
+Core fields are specified in IS-009.
 
 ### New: `jm1pub_assetmarketplace`
 
@@ -136,7 +136,7 @@ Examples:
 - ACX audiobook listing
 - Apple Books eBook listing
 
-Core fields are specified in IS-008.
+Core fields are specified in IS-009.
 
 ## Asset Health Model
 
@@ -240,7 +240,6 @@ Calculate asset health and produce the first enterprise asset health dashboard.
 | Decision | Owner | Status |
 | --- | --- | --- |
 | Confirm final Dataverse publisher prefix and solution container for PAM tables | Jackie + Cody | Pending |
-| Resolve local numbering collision with the existing OP-000 IS-008 documents, if Jackie wants unique global IS numbering | Jackie | Pending |
 | Approve asset health score threshold and dashboard weighting | Jackie | Pending |
 | Approve file movement/consolidation after registry references are staged | Jackie | Pending |
 | Approve royalty-rule migration and live royalty automation separately | Jackie | Pending |

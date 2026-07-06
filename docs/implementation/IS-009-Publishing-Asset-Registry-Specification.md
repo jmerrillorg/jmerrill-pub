@@ -1,4 +1,4 @@
-# IS-008 - Publishing Asset Registry Specification
+# IS-009 - Publishing Asset Registry Specification
 
 **Program:** PAM-001 - Publishing Asset Management  
 **Status:** Draft implementation specification; do not deploy schema yet  
@@ -290,7 +290,6 @@ Recommended key:
 
 | Blocker | Reason |
 | --- | --- |
-| Existing local OP-000 documents already use IS-008 naming | Jackie may need to decide whether PAM keeps IS-008 as requested or whether the OP-000 schema should be renumbered/archived to avoid two IS-008 meanings. |
 | Final Dataverse solution container not selected | Required before build packaging. |
 | `jm1pub_title` live field inventory must be read before extensions | Avoid duplicate or conflicting fields. |
 | Asset health threshold not approved | Needed before automated health flags become operational. |
