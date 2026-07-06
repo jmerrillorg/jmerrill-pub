@@ -4,8 +4,8 @@
 **Phase:** Phase II - OP-000 Pipeline Adoption, Recovery & Catalog Certification
 **Track:** Track A - Active Pipeline Adoption
 **Pilot title:** *Establishing Glory: The Library*
-**Status:** Implementation candidate; ready for governed deployment and controlled adoption run
-**Date:** 2026-07-05
+**Status:** OPERATIONAL - Track A pilot certified
+**Date:** 2026-07-06
 
 ## Objective
 
@@ -56,7 +56,7 @@ This pilot proves the OP-000 adoption method:
 
 ## Create-Only-Missing Rule
 
-The OP-000 Track A runner does not create or duplicate:
+The OP-000 Track A runner did not create or duplicate:
 
 - Contact
 - Lead
@@ -69,7 +69,7 @@ The OP-000 Track A runner does not create or duplicate:
 - Royalty record
 - Author/public communication
 
-The pilot writes safe historical execution evidence only when the dedicated gate `JM1_OP000_ADOPTION_ENABLED` is open.
+The pilot writes safe historical execution evidence only when the dedicated gate `JM1_OP000_ADOPTION_ENABLED` is open. During certification, the gate was opened for the single controlled run and returned to false immediately afterward.
 
 ## Runner
 
@@ -95,4 +95,4 @@ No author-facing, payment, royalty, Business Central, Stripe, production, distri
 
 ## Pilot Status
 
-Track A is ready for governed deployment and one controlled adoption run. Track B, Track C, and catalog-wide adoption remain blocked until this pilot is certified.
+Track A is certified for *Establishing Glory: The Library* only. The controlled adoption endpoint returned `OP000_TRACK_A_ADOPTION_CERTIFIED`, 12 execution-log rows were created, and SharePoint workspace/assets were verified. Track B, Track C, and catalog-wide adoption remain blocked until separately authorized.
