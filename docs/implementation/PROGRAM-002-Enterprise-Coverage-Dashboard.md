@@ -52,11 +52,7 @@ Enterprise Coverage is now measured by catalog titles adopted into PROGRAM-002, 
 
 | Rank | Author | Title | Reason |
 |---:|---|---|---|
-| 1 | Ashanti Flemister | *Pieces of Me All Over the Place* | Single-title author, clean metadata, non-Signature imprint |
-| 2 | Baily Cunningham | *Melodies From Heaven* | Single-title author, clean metadata, non-Signature imprint |
-| 3 | Brandyn McElroy | *Support Beyond the Cycle* | Single-title author, clean metadata, non-Signature imprint |
-| 4 | Cynthia Sloan | *Speech Therapy Works!* | Single-title author, clean metadata, non-Signature imprint |
-| 5 | Christina Chislom | *Come Out of Hiding* | Single-title author, clean metadata, non-Signature imprint |
+| 1 | Wave 1 | 10 selected single-title authors | Authorized controlled wave; see `OP-000-Enterprise-Adoption-Wave-1-Plan.md` |
 
 ## Current Constraints
 
