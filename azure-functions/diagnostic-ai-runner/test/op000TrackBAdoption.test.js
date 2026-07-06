@@ -53,7 +53,7 @@ describe("OP-000 Track B adoption", () => {
   });
 
   it("authorizes only allowlisted Track B adoption records", () => {
-    assert.equal(TRACK_B_ADOPTION_CANDIDATES.length, 22);
+    assert.equal(TRACK_B_ADOPTION_CANDIDATES.length, 32);
     assert.equal(isAuthorizedTrackBPilot(TRACK_B_PILOT), true);
     assert.equal(isAuthorizedTrackBPilot(TRACK_B_ADOPTION_CANDIDATES[1]), true);
     assert.equal(isAuthorizedTrackBPilot(TRACK_B_ADOPTION_CANDIDATES.at(-1)), true);
@@ -103,6 +103,27 @@ describe("OP-000 Track B adoption", () => {
 
     assert.equal(imprint.lockStatus, "Publisher Review Pending");
     assert.equal(imprint.jmSignatureCandidate, true);
+  });
+
+  it("uses canonized imprint recommendations instead of legacy imprint authority", () => {
+    const candidate = TRACK_B_ADOPTION_CANDIDATES.find((record) => record.titleId === "mirror-of-refining-insight");
+    const imprint = classifyTrackBImprint(candidate);
+
+    assert.equal(candidate.imprint, "JM Works");
+    assert.equal(imprint.currentPublishedImprint, "JM Works");
+    assert.equal(imprint.imprint, "J Merrill Publishing");
+    assert.equal(imprint.lockStatus, "Locked");
+    assert.equal(imprint.canonDecision, "LOCKED");
+  });
+
+  it("flags canonized low-confidence imprints without blocking adoption", () => {
+    const candidate = TRACK_B_ADOPTION_CANDIDATES.find((record) => record.titleId === "naughty-tales");
+    const imprint = classifyTrackBImprint(candidate);
+
+    assert.equal(imprint.imprint, "JM Works");
+    assert.equal(imprint.lockStatus, "Publisher Review Pending");
+    assert.equal(imprint.jmSignatureCandidate, false);
+    assert.equal(imprint.canonDecision, "LOW CONFIDENCE");
   });
 
   it("builds a published author workspace packet with no live side effects", () => {

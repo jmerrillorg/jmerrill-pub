@@ -361,6 +361,196 @@ const TRACK_B_ADOPTION_CANDIDATES = Object.freeze([
     workspaceMode: "Published Author Workspace",
     currentStage: "Published / Post-Distribution Author Relationship",
     adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "rhyming-it-up-with-church-stuff",
+    title: "Rhyming It up with Church Stuff",
+    authorName: "Juanita Travis",
+    imprint: "JM Little",
+    genre: "Children's",
+    isbnPaperback: "978-1-961475-43-4",
+    isbnHardcover: "",
+    isbnEbook: "978-1-961475-44-1",
+    isbnAudiobook: "",
+    formats: ["Paperback", "eBook"],
+    canonRecommendedImprint: "JM Little",
+    canonDecision: "LOCKED",
+    canonConfidence: 0.84,
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "the-great-hair-restart",
+    title: "The Great Hair Restart",
+    authorName: "Karen Hill",
+    imprint: "JM Works",
+    genre: "Self-Help",
+    isbnPaperback: "978-1-961475-13-7",
+    isbnHardcover: "978-1-961475-14-4",
+    isbnEbook: "978-1-961475-12-0",
+    isbnAudiobook: "",
+    formats: ["Paperback", "Hardcover", "eBook"],
+    canonRecommendedImprint: "JM Works",
+    canonDecision: "LOCKED",
+    canonConfidence: 0.84,
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "your-peace-is-a-priority",
+    title: "Your Peace Is a Priority",
+    authorName: "Kiena Hughley",
+    imprint: "J Merrill Publishing",
+    genre: "Devotional",
+    isbnPaperback: "978-1-961475-45-8",
+    isbnHardcover: "",
+    isbnEbook: "978-1-961475-46-5",
+    isbnAudiobook: "",
+    formats: ["Paperback", "eBook"],
+    canonRecommendedImprint: "J Merrill Publishing",
+    canonDecision: "LOCKED",
+    canonConfidence: 0.84,
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "uncomfortable-conversations-with-god",
+    title: "Uncomfortable Conversations with God",
+    authorName: "Leslie Banks",
+    imprint: "J Merrill Publishing",
+    genre: "Faith",
+    isbnPaperback: "",
+    isbnHardcover: "",
+    isbnEbook: "978-1-950719-11-2",
+    isbnAudiobook: "",
+    formats: ["eBook"],
+    canonRecommendedImprint: "J Merrill Publishing",
+    canonDecision: "LOCKED",
+    canonConfidence: 0.84,
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "let-me-tell-you-about-it",
+    title: "Let Me Tell You About It",
+    authorName: "Lisa Clark",
+    imprint: "JM Works",
+    genre: "Memoir",
+    isbnPaperback: "978-1-954414-98-3",
+    isbnHardcover: "",
+    isbnEbook: "978-1-954414-99-0",
+    isbnAudiobook: "",
+    formats: ["Paperback", "eBook"],
+    canonRecommendedImprint: "JM Works",
+    canonDecision: "LOCKED",
+    canonConfidence: 0.72,
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "mirror-of-refining-insight",
+    title: "Mirror of Refining Insight",
+    authorName: "M A Grayson",
+    imprint: "JM Works",
+    genre: "Inspirational",
+    isbnPaperback: "978-1-954414-37-2",
+    isbnHardcover: "978-1-954414-97-6",
+    isbnEbook: "978-1-954414-36-5",
+    isbnAudiobook: "",
+    formats: ["Paperback", "Hardcover", "eBook"],
+    canonRecommendedImprint: "J Merrill Publishing",
+    canonDecision: "LOCKED",
+    canonConfidence: 0.72,
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "when-a-thug-meets-jesus",
+    title: "When a Thug Meets Jesus",
+    authorName: "Mack Hughley",
+    imprint: "J Merrill Publishing",
+    genre: "Faith",
+    isbnPaperback: "978-1-961475-97-7",
+    isbnHardcover: "",
+    isbnEbook: "978-1-961475-98-4",
+    isbnAudiobook: "",
+    formats: ["Paperback", "eBook"],
+    canonRecommendedImprint: "J Merrill Publishing",
+    canonDecision: "LOCKED",
+    canonConfidence: 0.84,
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "hop-hop-hop",
+    title: "Hop, Hop, Hop",
+    authorName: "TJ Mars",
+    imprint: "JM Little",
+    genre: "Children's",
+    isbnPaperback: "978-1-954414-10-5",
+    isbnHardcover: "",
+    isbnEbook: "978-1-954414-09-9",
+    isbnAudiobook: "",
+    formats: ["Paperback", "eBook"],
+    canonRecommendedImprint: "JM Little",
+    canonDecision: "LOCKED",
+    canonConfidence: 0.96,
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "naughty-tales",
+    title: "Naughty Tales",
+    authorName: "Adrean Young",
+    imprint: "JM Works",
+    genre: "",
+    isbnPaperback: "978-1-954414-84-6",
+    isbnHardcover: "",
+    isbnEbook: "978-1-954414-85-3",
+    isbnAudiobook: "",
+    formats: ["Paperback", "eBook"],
+    canonRecommendedImprint: "JM Works",
+    canonDecision: "LOW CONFIDENCE",
+    canonConfidence: 0.24,
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
+  }),
+  Object.freeze({
+    titleId: "god-s-word-for-this-world",
+    title: "God's Word For This World",
+    authorName: "Bishop Thomas Johnson",
+    imprint: "J Merrill Publishing",
+    genre: "",
+    isbnPaperback: "978-1-954414-41-9",
+    isbnHardcover: "",
+    isbnEbook: "978-1-954414-40-2",
+    isbnAudiobook: "",
+    formats: ["Paperback", "eBook"],
+    canonRecommendedImprint: "J Merrill Publishing",
+    canonDecision: "LOW CONFIDENCE",
+    canonConfidence: 0.24,
+    relationshipState: "Active Author",
+    workspaceMode: "Published Author Workspace",
+    currentStage: "Published / Post-Distribution Author Relationship",
+    adoptionSource: "Legacy JMP Import"
   })
 ]);
 
@@ -371,8 +561,8 @@ const HISTORICAL_EVENTS = Object.freeze([
   ["OP000_AUTHOR_ADOPTED", "Published author adopted into PROGRAM-002 relationship coverage."],
   ["OP000_TITLE_ADOPTED", "Published title adopted into PROGRAM-002 title coverage without restarting the lifecycle."],
   ["OP000_WORKSPACE_LINKED_OR_CREATED", "Published Author Workspace mode certified; SharePoint workspace search/link remains governed and non-duplicative."],
-  ["OP000_IMPRINT_ASSIGNED", "Existing catalog imprint assigned from Legacy JMP evidence."],
-  ["OP000_IMPRINT_LOCKED", "Existing non-Signature imprint accepted and locked as-is from catalog evidence."],
+  ["OP000_IMPRINT_ASSIGNED", "Canonized imprint recommendation assigned; legacy imprint treated as evidence only."],
+  ["OP000_IMPRINT_LOCKED", "Canonized non-Signature imprint lock/review status applied according to Enterprise Imprint Canonization."],
   ["OP000_CONTRACT_RECONCILIATION_DEFERRED", "Historical contract status set to Signed / Exists - Location Pending Reconciliation."],
   ["OP000_STRIPE_MIGRATION_FLAGGED", "Stripe Migration Required until an existing Connect account is confirmed."],
   ["OP000_AUTHOR_WORKSPACE_CERTIFIED", "Published Author Workspace certified with My Books visibility and pre-contract onboarding hidden."],
@@ -408,27 +598,55 @@ function resolveTrackBCandidate(input) {
 
 function classifyTrackBImprint(input) {
   const recordedImprint = normalizeString(input?.imprint) || TRACK_B_PILOT.imprint;
+  const canonRecommendedImprint = normalizeString(input?.canonRecommendedImprint);
+  const canonDecision = normalizeString(input?.canonDecision);
+  const canonConfidence = Number(input?.canonConfidence);
   const genre = normalizeString(input?.genre);
-  const isSignature = recordedImprint.toLowerCase() === "jm signature";
+  const recommendedImprint = canonRecommendedImprint || recordedImprint;
+  const isSignature = recommendedImprint.toLowerCase() === "jm signature";
 
   if (isSignature) {
     return {
-      imprint: recordedImprint,
-      confidence: 0.5,
+      imprint: recommendedImprint,
+      currentPublishedImprint: recordedImprint,
+      confidence: Number.isFinite(canonConfidence) ? canonConfidence : 0.5,
       lockStatus: "Publisher Review Pending",
       jmSignatureCandidate: true,
+      canonDecision: canonDecision || "JM SIGNATURE REVIEW",
       basis: [
-        "Recorded imprint is JM Signature.",
+        "Canonized imprint recommendation is JM Signature.",
         "JM Signature is invitation-only and must not auto-lock without Publisher dual authorization."
+      ]
+    };
+  }
+
+  if (canonRecommendedImprint) {
+    const autoLocked = canonDecision === "LOCKED";
+    return {
+      imprint: canonRecommendedImprint,
+      currentPublishedImprint: recordedImprint,
+      confidence: Number.isFinite(canonConfidence) ? canonConfidence : 0.71,
+      lockStatus: autoLocked ? "Locked" : "Publisher Review Pending",
+      jmSignatureCandidate: false,
+      canonDecision: canonDecision || "UNKNOWN",
+      basis: [
+        `Canonized recommended imprint: ${canonRecommendedImprint}.`,
+        `Current published imprint evidence: ${recordedImprint}.`,
+        `Enterprise Imprint Canonization decision: ${canonDecision || "UNKNOWN"}.`,
+        autoLocked
+          ? "Publisher-Certified threshold met; imprint may be auto-locked for PROGRAM-002."
+          : "Publisher review required; preserve historical imprint and do not auto-lock PROGRAM-002 imprint."
       ]
     };
   }
 
   return {
     imprint: recordedImprint,
+    currentPublishedImprint: recordedImprint,
     confidence: genre ? 0.82 : 0.71,
     lockStatus: "Locked",
     jmSignatureCandidate: false,
+    canonDecision: "LEGACY_PRE_CANONIZATION_CANDIDATE",
     basis: [
       `Recorded imprint: ${recordedImprint}.`,
       genre
@@ -478,7 +696,9 @@ function buildTrackBAdoptionPacket(input = {}) {
       paymentMethod: "Existing royalty payment method continues until a separate Stripe migration initiative.",
       stripeStatus: "Stripe Migration Required unless an existing Connect account is confirmed.",
       sharePointWorkspace: "Search-before-create required.",
-      imprint: candidate.imprint,
+      currentPublishedImprint: candidate.imprint,
+      program002ImprintRecommendation: imprint.imprint,
+      imprintLockStatus: imprint.lockStatus,
       executionHistory: "Historical certification events only; no claim that work happened today."
     },
     existingEvidence: {
