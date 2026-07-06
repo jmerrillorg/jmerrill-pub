@@ -10,6 +10,8 @@
 
 Enterprise Adoption proceeds one author at a time. Each adoption discovers, validates, links, certifies, and then continues. OP-000 does not recreate history, does not force published authors through `/join`, does not regenerate contracts, does not migrate royalties automatically, and does not create duplicate workspaces.
 
+Imprint assignment for adoption is now governed by the Enterprise Imprint Canonization Initiative. `books.json` imprint values are legacy evidence only. Use `data/enterprise-imprint-canonization.json` and `Enterprise-Imprint-Canonization-Report.md` for the canon-certified imprint recommendation, lock/review decision, and Publisher review status.
+
 ## Completed Adoption
 
 | Author | Titles Adopted | Workspace Mode | Status |
