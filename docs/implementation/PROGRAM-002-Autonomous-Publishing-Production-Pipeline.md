@@ -237,6 +237,22 @@ OP-003 scope is locked to:
 
 No additional OP-003 scope may be added without executive approval.
 
+## OP-000 Pipeline Adoption & Catalog Certification Overlay
+
+OP-000 is a prerequisite adoption/certification gate — not a sequential build module — that brings legacy, active, and already-published J Merrill Publishing titles into PROGRAM-002's system of record. It runs alongside live commissioning (e.g. *The Intentional Leader*) without interrupting it, and never routes an existing author or title back through `/join`.
+
+Three tracks, full detail in `OP-000-Pipeline-Adoption-Recovery-Catalog-Certification.md`:
+
+- **Track A — Active Pipeline Adoption:** titles currently in Editorial, Production, Distribution, or Marketing. Adopt current stage, verify evidence, link/create workspace, backfill history, certify completed stages, resume at current gate.
+- **Track B — Published Author Workspace Adoption:** already-distributed titles and authors on royalties. Import existing data without forcing onboarding; set Relationship State = Active Author; Workspace Mode = Published Author Workspace.
+- **Track C — Catalog Certification:** certify every title's metadata, ISBNs, files, contracts, royalty terms, distribution, marketing/production assets, author relationship, workspace, execution history, imprint, and JM Signature review.
+
+OP-000 introduces `jm1pub_relationshipstate` as a new Contact field (Active Author / Legacy Author / Inactive / Prospective) — distinct from the existing `jm1pub_authorstatus` administrative status and the `jm1_loyaltytier` title-count tier, both of which also use the word "Legacy" for unrelated meanings. Schema detail is in `IS-008-Pipeline-Adoption-Certification-Schema.md`.
+
+OP-000's Legacy Execution History writes to `jm1_executionlog` — the same table `PROGRAM-002-Author-Workspace-Onboarding-Scope-Note-v1.0.md` (CANON) already establishes as the live execution/audit log for Author Workspace onboarding events. Track B's Published Author Workspace mode is a third Author Workspace (portal) state alongside that Scope Note's Pre-Contract/Full phases — it presents the Full Workspace module set directly for already-published authors rather than re-running Pre-Contract onboarding.
+
+Imprint Certification under Track C reuses the existing genre-based classification already live in `deriveImprint()`/`normalizeRequestedImprint()` (`app/api/join/route.ts`) and auto-locks the imprint only on high-confidence, non-conflicting classification. JM Signature never auto-locks under any path, consistent with the JM Signature Governance Overlay above.
+
 ## System-of-Record Rule
 
 - Dataverse is the operational publishing system of record.
@@ -259,6 +275,8 @@ The workspace moves through the existing lifecycle:
 Do not create duplicate folders.
 
 The SharePoint workspace must mirror the pipeline but must not become the authority for stage/status. Dataverse remains the stage/status authority.
+
+**OP-000 adoption addendum:** the above lifecycle assumes a fresh `/join` inquiry. Titles adopted through OP-000 Track A already have a workspace at some later lifecycle position — link the existing folder, never create a duplicate, and never reset it back to `01_Pre-Pipeline/00_Inquiry`. Titles adopted through Track B (already-distributed, no `/join` origin) get a workspace created directly at the post-distribution/ongoing-relationship position, in **Published Author Workspace** mode (`jm1pub_workspacemode`), since there is no inquiry to record. Author Workspace creation for every adopted author still follows the "import first, show only what's missing" rule — adoption never forces an author through onboarding steps that already have data on file.
 
 ## Payment / Production-Start Rule
 
@@ -357,6 +375,7 @@ Operational completion means:
 
 ## Recommended Build Order
 
+0. OP-000 Pipeline Adoption, Recovery & Catalog Certification - prerequisite gate; runs alongside commissioning, does not block it
 1. OP-001 SharePoint Workspace Lifecycle
 2. OP-002 Contract / Payment / Portal Activation - complete / operational
 3. OP-003 Author Portal MVP - next
@@ -411,6 +430,8 @@ PROGRAM-002 capture/control setup is complete when:
 PROGRAM-002 council review is closed.
 
 Implementation is active.
+
+OP-000 Pipeline Adoption, Recovery & Catalog Certification is authorized as the PROGRAM-002 Phase II entry gate. Jackie authorized one Track A pilot title, *Establishing Glory: The Library* (`JMP-INT-202606-UFYG60`), to prove adoption before Track B, Track C, or catalog-wide movement begins. Architecture, schema specification, deployment planning, pilot planning, and the Track A adoption runner are ready for governed deployment and a controlled adoption run. See `OP-000-Pipeline-Adoption-Recovery-Catalog-Certification.md`, `OP-000-Pilot-Execution-Plan-Establishing-Glory.md`, `OP-000-Track-A-Establishing-Glory-Pilot-Adoption-Report.md`, `OP-000-Track-A-Establishing-Glory-Certification-Report.md`, and `OP-000-Deployment-Risks-And-Approval-Gate.md`.
 
 Next council engagement occurs only upon completion of a major operational milestone, a material architectural decision, an operational blocker requiring executive review, or Jackie request.
 

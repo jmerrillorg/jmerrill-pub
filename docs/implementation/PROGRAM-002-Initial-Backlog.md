@@ -16,6 +16,7 @@ Council review is closed. Implementation is active. Council re-engagement occurs
 
 | ID | Module | Objective | Status | Dependencies | Completion Standard |
 |---|---|---|---|---|---|
+| OP-000 | Pipeline Adoption, Recovery & Catalog Certification | Adopt legacy/active/published titles into PROGRAM-002's system of record without forcing `/join` or interrupting live commissioning | Phase II authorized / Track A pilot implementation candidate | None (prerequisite gate; first pilot limited to *Establishing Glory: The Library*) | Track A pilot writes safe historical execution evidence; imprint certified and locked (or exception-flagged); no duplicate workspace/contract/royalty record created; Track B/C remain deferred until Track A certification |
 | OP-001 | SharePoint Workspace Lifecycle | Create and move author-first, title-aware SharePoint workspaces from inquiry through post-distribution | Complete / Operational | Publishing Team SharePoint; JM1-Core | Workspace lifecycle mapped; folder creation validated; workspace writeback fields now available |
 | OP-002 | Contract / Payment / Portal Activation | Establish the signed-agreement and first-payment gate that activates a project and author portal eligibility | Complete / Operational | OP-001; agreement status source; payment confirmation source | Controlled validation passed using Jackie-owned active project; activation bridge eligible; workspace moved to onboarding; portal status active |
 | OP-003 | Author Portal MVP | Provide author-facing approved project information after activation rules are satisfied | Implemented locally / Operational validation pending | OP-002 operational validation; portal surface; approved data display model | Portal shows approved status/tasks/files, milestone tracker, contact pathway, payment confirmation, file/version controls, and metadata readiness without becoming system of record |
@@ -49,6 +50,10 @@ OP-001 is the workspace foundation:
 - No duplicate folders
 - SharePoint write authentication has been restored and Dataverse workspace fields are now available
 - Dataverse remains the stage/status authority
+
+**OP-000 addendum:** OP-001's model above is anchored at a fresh `/join` inquiry. OP-000 covers the case OP-001 doesn't: titles and authors that are already active or already published have no `/join`-originated workspace to move. OP-000 links the existing workspace where one already exists (never duplicating it) or creates one directly at the title's actual current lifecycle position — post-distribution/ongoing-relationship for Track B, whatever the true current stage is for Track A. Dataverse remains the stage/status authority in both cases; see `OP-000-Pipeline-Adoption-Recovery-Catalog-Certification.md`.
+
+**Phase II pilot:** Jackie authorized OP-000 Track A for one title only: *Establishing Glory: The Library* (`JMP-INT-202606-UFYG60`, diagnostic `64e387e0-7e6a-f111-a826-00224820105b`, existing Opportunity `2653fca9-eacd-4c44-b3ed-1764dd5d35aa`). Track B, Track C, and catalog-wide adoption must not begin until this Track A pilot is certified.
 
 ## Marketing Throughout Pipeline
 
