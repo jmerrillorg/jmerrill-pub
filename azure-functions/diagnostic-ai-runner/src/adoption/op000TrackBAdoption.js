@@ -367,7 +367,7 @@ const TRACK_B_ADOPTION_CANDIDATES = Object.freeze([
 const TRACK_B_PILOT = TRACK_B_ADOPTION_CANDIDATES[0];
 
 const HISTORICAL_EVENTS = Object.freeze([
-  ["OP000_WAVE_ADOPTION_STARTED", "OP-000 Enterprise Adoption Wave 1 adoption started for a published author/title."],
+  ["OP000_WAVE_ADOPTION_STARTED", "OP-000 Enterprise Adoption adoption started for a published author/title."],
   ["OP000_AUTHOR_ADOPTED", "Published author adopted into PROGRAM-002 relationship coverage."],
   ["OP000_TITLE_ADOPTED", "Published title adopted into PROGRAM-002 title coverage without restarting the lifecycle."],
   ["OP000_WORKSPACE_LINKED_OR_CREATED", "Published Author Workspace mode certified; SharePoint workspace search/link remains governed and non-duplicative."],
@@ -376,7 +376,7 @@ const HISTORICAL_EVENTS = Object.freeze([
   ["OP000_CONTRACT_RECONCILIATION_DEFERRED", "Historical contract status set to Signed / Exists - Location Pending Reconciliation."],
   ["OP000_STRIPE_MIGRATION_FLAGGED", "Stripe Migration Required until an existing Connect account is confirmed."],
   ["OP000_AUTHOR_WORKSPACE_CERTIFIED", "Published Author Workspace certified with My Books visibility and pre-contract onboarding hidden."],
-  ["OP000_WAVE_ADOPTION_CERTIFIED", "OP-000 Enterprise Adoption Wave 1 adoption certified for this author/title."]
+  ["OP000_WAVE_ADOPTION_CERTIFIED", "OP-000 Enterprise Adoption adoption certified for this author/title."]
 ]);
 
 function normalizeString(value) {
