@@ -14,26 +14,26 @@ const hubCards = [
   {
     status: 'Live',
     title: 'Join the Family',
-    body: 'The public inquiry form for new authors, manuscript review requests, and first conversations.',
+    body: 'Tell us about your book, your goals, and where you are in the publishing journey.',
     href: '/join',
-    cta: 'Start inquiry',
-    secondary: 'Private intake',
+    cta: 'Start here',
+    secondary: 'New authors',
   },
   {
     status: 'Secure',
     title: 'Author Workspace',
-    body: 'Secure workspace access for invited authors. Project-specific setup, status, files, contracts, and royalty information stay behind this gate.',
+    body: 'For invited authors with a private access code. Your next steps stay inside your workspace.',
     href: '/author/portal',
     cta: 'Open workspace',
-    secondary: 'Private access',
+    secondary: 'Invitation only',
   },
   {
     status: 'Live',
     title: 'Books Catalog',
-    body: 'Browse the full JMP catalog. Your title will appear here once it is live in distribution.',
+    body: 'Browse published J Merrill Publishing titles and discover the work already in the world.',
     href: '/books',
     cta: 'Browse titles',
-    secondary: 'Live',
+    secondary: 'Public catalog',
   },
 ] as const
 
@@ -75,27 +75,6 @@ export default function AuthorHubPage() {
           </p>
         </section>
 
-        <section className="max-w-[980px] mx-auto mb-10">
-          <div className="rounded-3xl border border-blue-500/15 bg-blue-500/[0.06] px-6 py-5">
-            <p
-              className="text-[11px] font-medium tracking-[0.12em] uppercase text-blue-300 mb-4"
-              style={{ fontFamily: "'DM Mono', monospace" }}
-            >
-              Public entry
-            </p>
-            <p className="mb-4 text-[15px] font-light text-white/65">
-              Author- and title-specific material stays inside the secured Author Workspace.
-            </p>
-            <p className="text-[13px] font-light leading-[1.75] text-white/42">
-              Setup, editorial, cover, layout, distribution, marketing, files, contracts, royalty, and project status
-              modules require workspace authorization before they render.
-            </p>
-          </div>
-          <p className="mt-4 text-[13px] font-light text-white/35 text-center">
-            Questions? Contact publishing@jmerrill.one
-          </p>
-        </section>
-
         <div className="grid gap-6 lg:grid-cols-3">
           {hubCards.map((card) => (
             <div key={card.title} className="bg-white/[0.04] border border-white/8 rounded-3xl p-8">
@@ -125,7 +104,7 @@ export default function AuthorHubPage() {
           ))}
         </div>
 
-        <div className="my-16 text-center max-w-[860px] mx-auto" id="author-workspace">
+        <div className="my-16 text-center max-w-[760px] mx-auto" id="author-workspace">
           <h2
             className="text-white mb-4"
             style={{
@@ -136,14 +115,15 @@ export default function AuthorHubPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            Built as a doorway now.
+            Private by design.
             <br />
-            <em className="not-italic italic text-blue-500">Private work stays private.</em>
+            <em className="not-italic italic text-blue-500">Simple when you arrive.</em>
           </h2>
           <p className="text-[15px] font-light text-white/40 leading-[1.75]">
-            This public hub does not expose title-specific status, files, contracts, financial setup, royalties, or
-            production modules. Those surfaces remain behind secure Author Workspace access.
+            If you already have an invitation code, your workspace will guide you to the next step. If you are new to
+            J Merrill Publishing, start with Join the Family.
           </p>
+          <p className="mt-4 text-[13px] font-light text-white/35">Questions? Contact publishing@jmerrill.one</p>
         </div>
       </div>
     </div>

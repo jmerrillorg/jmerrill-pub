@@ -32,7 +32,7 @@ The command center is a display and coordination layer. It is not a system of re
 
 - Added `/author/registration`.
 - Added the Registration Command Center card to `/author`.
-- Added `lib/publishing/registration-command-center.ts` for static, governed, read-only OP-004 display data.
+- Registration now uses the shared Author Workspace module surface. No separate static command-center data file remains active for this route.
 
 ### Readiness Model
 

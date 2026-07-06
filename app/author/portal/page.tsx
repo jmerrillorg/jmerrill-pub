@@ -19,7 +19,7 @@ export default function AuthorPortalPage() {
     <AuthorPortalShell
       eyebrow="Author Workspace"
       title="Welcome to your publishing workspace."
-      description="Track the next steps for your book, review requests from J Merrill Publishing, and see what is coming next as your project moves through production."
+      description="See what needs your attention now, what J Merrill Publishing is preparing next, and where your book stands in the publishing journey."
     >
       <AuthorGate scope="portal">
         <section className="space-y-6">
@@ -31,13 +31,13 @@ export default function AuthorPortalPage() {
                 <p className="mt-2 text-[14px] font-light leading-[1.75] text-white/52">{commissioningTitle.packageName}</p>
               </div>
               <div className="rounded-2xl border border-rose-300/15 bg-rose-400/[0.06] px-5 py-4">
-                <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-rose-100/70">Distribution status</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-rose-100/70">Release status</p>
                 <p className="mt-2 text-[14px] font-semibold text-white">{commissioningTitle.distributionStatus}</p>
               </div>
             </div>
             <p className="mt-7 text-[14px] font-light leading-[1.85] text-white/50">
               Your agreement and initial setup are complete. The workspace is now open for the active publishing path.
-              Public release, retailer submission, preorder, and distribution actions remain on hold during commissioning.
+              Public release, retailer submission, preorder, and distribution actions remain paused until release approval.
             </p>
           </div>
 

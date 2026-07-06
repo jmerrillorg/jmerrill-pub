@@ -20,7 +20,7 @@ export const commissioningTitle = {
   reference: 'JMP-INT-202607-0W5PTQ',
   packageName: 'Premier Publishing Package',
   workspaceStatus: 'Active publishing workspace',
-  distributionStatus: 'Commissioning Hold',
+  distributionStatus: 'Release held for approval',
 } as const
 
 export const authorWorkspaceModules: readonly AuthorWorkspaceModule[] = [
@@ -100,19 +100,19 @@ export const authorWorkspaceModules: readonly AuthorWorkspaceModule[] = [
     href: '/author/distribution-command',
     title: 'Distribution',
     eyebrow: 'Release preparation',
-    status: 'Commissioning Hold',
+    status: 'Release held',
     tone: 'hold',
-    summary: 'Distribution preparation can be reviewed, but this commissioning title will not be submitted or released publicly from this step.',
+    summary: 'Distribution preparation can be reviewed, but no public release action will happen until J Merrill Publishing approves the release.',
     whyItMatters: 'Distribution readiness makes sure the metadata, files, formats, and channel plan are correct before any public release action.',
     currentFocus: 'Holding before any retailer, printer, preorder, or public availability action.',
-    nextStep: 'No author action is needed while the title remains on Commissioning Hold.',
+    nextStep: 'No author action is needed while release approval is pending.',
     checklist: [
       'Metadata readiness',
       'Print and ebook readiness',
       'Channel preparation',
       'Publisher release authorization',
     ],
-    note: 'No retailer submission, public listing, Ingram submission, preorder, or public release occurs during Commissioning Hold.',
+    note: 'No retailer submission, public listing, preorder, or public release occurs until release approval is complete.',
   },
   {
     id: 'marketing',

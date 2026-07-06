@@ -36,5 +36,5 @@ OP-006 provides a governed cover design readiness surface for title production. 
 ## Evidence
 
 - Route: `/author/cover`
-- Data model: `lib/publishing/program-002-command-centers.ts`
-- UI component: `app/author/_components/PublishingCommandCenterPage.tsx`
+- Data model: `lib/publishing/author-workspace-modules.ts`
+- UI component: `app/author/_components/AuthorWorkspaceModulePage.tsx`

@@ -35,5 +35,5 @@ OP-008 provides the governed production readiness and distribution gate. It conf
 ## Evidence
 
 - Route: `/author/production-readiness`
-- Data model: `lib/publishing/program-002-command-centers.ts`
-- UI component: `app/author/_components/PublishingCommandCenterPage.tsx`
+- Data model: `lib/publishing/author-workspace-modules.ts`
+- UI component: `app/author/_components/AuthorWorkspaceModulePage.tsx`

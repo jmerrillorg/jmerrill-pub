@@ -199,7 +199,8 @@ Execution logs must not include manuscript text, prompt body, raw model output, 
 Implemented files:
 
 - `app/author/editorial/page.tsx`
-- `lib/publishing/editorial-command-center.ts`
+- `lib/publishing/author-workspace-modules.ts`
+- `app/author/_components/AuthorWorkspaceModulePage.tsx`
 - `app/author/page.tsx`
 
 The website surface is read-only. It does not create Dataverse records, mutate editorial stages, send communications, run diagnostics, rewrite manuscripts, start production, or trigger downstream automation.

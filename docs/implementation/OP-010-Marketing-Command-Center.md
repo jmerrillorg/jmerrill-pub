@@ -38,5 +38,5 @@ OP-010 is the canonical title-level marketing readiness surface. It captures:
 ## Evidence
 
 - Route: `/author/marketing`
-- Data model: `lib/publishing/program-002-command-centers.ts`
-- UI component: `app/author/_components/PublishingCommandCenterPage.tsx`
+- Data model: `lib/publishing/author-workspace-modules.ts`
+- UI component: `app/author/_components/AuthorWorkspaceModulePage.tsx`

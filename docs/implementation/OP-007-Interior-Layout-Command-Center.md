@@ -35,5 +35,5 @@ OP-007 provides a governed interior layout readiness surface. It tracks Stage 7a
 ## Evidence
 
 - Route: `/author/layout`
-- Data model: `lib/publishing/program-002-command-centers.ts`
-- UI component: `app/author/_components/PublishingCommandCenterPage.tsx`
+- Data model: `lib/publishing/author-workspace-modules.ts`
+- UI component: `app/author/_components/AuthorWorkspaceModulePage.tsx`
