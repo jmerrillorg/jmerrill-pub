@@ -14,14 +14,15 @@ PROGRAM-002 is operational. Phase I is certified, Phase I.5 is stabilized, OP-00
 - Established Enterprise Coverage as the primary operational KPI.
 - Created the first Enterprise Coverage Dashboard.
 - Created the Enterprise Adoption Queue from `data/books.json`.
-- Confirmed the current baseline:
+- Confirmed the current baseline after the first Enterprise Adoption Operations run:
   - 122 catalog titles.
   - 71 catalog authors.
-  - 1 adopted catalog title.
-  - 1 adopted published author.
-  - 121 catalog titles remaining.
-  - 70 published authors remaining.
-- Identified the next recommended adoption candidate: Alice V Pryor / *According to Mark*.
+  - 2 adopted catalog titles.
+  - 2 adopted published authors.
+  - 120 catalog titles remaining.
+  - 69 published authors remaining.
+- Certified Alice V Pryor / *According to Mark* as the first post-pilot coverage increase.
+- Identified the next recommended adoption candidate: Ashanti Flemister / *Pieces of Me All Over the Place*.
 
 ## Adoption Model Now in Force
 
@@ -40,13 +41,13 @@ The adoption process must reuse existing workspace, SharePoint folders, contract
 | Area | Current State |
 |---|---|
 | Total catalog titles | 122 |
-| Catalog titles adopted | 1 |
-| Published authors adopted | 1 |
-| Active Author Workspaces certified | 2 |
+| Catalog titles adopted | 2 |
+| Published authors adopted | 2 |
+| Active Author Workspaces certified | 3 |
 | Contracts linked | 0 confirmed |
 | Stripe-ready authors | 0 confirmed |
 | Royalty-ready authors | 0 confirmed |
-| Enterprise Coverage | 0.82% |
+| Enterprise Coverage | 1.64% |
 
 ## Operational Boundaries Preserved
 
@@ -66,7 +67,7 @@ This movement did not:
 
 ## Next Concrete Action
 
-Run the next single-author Enterprise Adoption for **Alice V Pryor / According to Mark**:
+Run the next single-author Enterprise Adoption for **Ashanti Flemister / Pieces of Me All Over the Place**:
 
 1. Search Dataverse for Contact/title/contract records.
 2. Search SharePoint for existing workspace/assets.

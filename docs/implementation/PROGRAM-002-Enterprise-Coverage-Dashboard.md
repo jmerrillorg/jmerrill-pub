@@ -11,23 +11,23 @@
 | Metric | Current Value | Source / Notes |
 |---|---:|---|
 | Total catalog titles | 122 | `data/books.json` |
-| Catalog titles adopted into PROGRAM-002 | 1 | Track B certified: *100 Wisdom Lessons for Life and Living* |
+| Catalog titles adopted into PROGRAM-002 | 2 | Track B certified: *100 Wisdom Lessons for Life and Living*; *According to Mark* |
 | Active pipeline titles adopted | 1 | Track A certified: *Establishing Glory: The Library* |
 | Published authors in catalog | 71 | Unique author names in `data/books.json` |
-| Published authors adopted | 1 | J. Derrick Johnson |
-| Active Author Workspaces certified | 2 | One Active Author Workspace; one Published Author Workspace |
+| Published authors adopted | 2 | J. Derrick Johnson; Alice V Pryor |
+| Active Author Workspaces certified | 3 | One Active Author Workspace; two Published Author Workspaces |
 | Contracts linked | 0 confirmed | Historical contracts require search/link during each author adoption |
 | Stripe-ready authors | 0 confirmed | Stripe migration is flagged, not performed automatically |
 | Royalty-ready authors | 0 confirmed | Royalty migration is explicitly deferred |
-| OP-000 remaining catalog titles | 121 | Total catalog titles minus Track B adopted title |
-| OP-000 remaining published authors | 70 | Total catalog authors minus J. Derrick Johnson |
-| Enterprise Coverage % | 0.82% | 1 adopted catalog title / 122 catalog titles |
+| OP-000 remaining catalog titles | 120 | Total catalog titles minus adopted Track B catalog titles |
+| OP-000 remaining published authors | 69 | Total catalog authors minus adopted published authors |
+| Enterprise Coverage % | 1.64% | 2 adopted catalog titles / 122 catalog titles |
 
 ## Coverage by Imprint
 
 | Imprint | Catalog Titles | Adopted Titles | Remaining | Notes |
 |---|---:|---:|---:|---|
-| J Merrill Publishing | 67 | 1 | 66 | Standard adoption path unless metadata conflicts appear |
+| J Merrill Publishing | 67 | 2 | 65 | Standard adoption path unless metadata conflicts appear |
 | JM Works | 35 | 0 | 35 | Standard adoption path |
 | JM Little | 12 | 0 | 12 | Standard adoption path with children's-book metadata review |
 | JM Verse | 5 | 0 | 5 | Standard adoption path |
@@ -52,11 +52,11 @@ Enterprise Coverage is now measured by catalog titles adopted into PROGRAM-002, 
 
 | Rank | Author | Title | Reason |
 |---:|---|---|---|
-| 1 | Alice V Pryor | *According to Mark* | Single-title author, clean metadata, non-Signature imprint |
-| 2 | Ashanti Flemister | *Pieces of Me All Over the Place* | Single-title author, clean metadata, non-Signature imprint |
-| 3 | Baily Cunningham | *Melodies From Heaven* | Single-title author, clean metadata, non-Signature imprint |
-| 4 | Brandyn McElroy | *Support Beyond the Cycle* | Single-title author, clean metadata, non-Signature imprint |
-| 5 | Cynthia Sloan | *Speech Therapy Works!* | Single-title author, clean metadata, non-Signature imprint |
+| 1 | Ashanti Flemister | *Pieces of Me All Over the Place* | Single-title author, clean metadata, non-Signature imprint |
+| 2 | Baily Cunningham | *Melodies From Heaven* | Single-title author, clean metadata, non-Signature imprint |
+| 3 | Brandyn McElroy | *Support Beyond the Cycle* | Single-title author, clean metadata, non-Signature imprint |
+| 4 | Cynthia Sloan | *Speech Therapy Works!* | Single-title author, clean metadata, non-Signature imprint |
+| 5 | Christina Chislom | *Come Out of Hiding* | Single-title author, clean metadata, non-Signature imprint |
 
 ## Current Constraints
 

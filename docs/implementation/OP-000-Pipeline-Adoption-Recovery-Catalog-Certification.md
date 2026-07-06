@@ -31,7 +31,7 @@ Enterprise Adoption proceeds one author at a time:
 4. Certify historical execution state.
 5. Continue to the next author.
 
-The first Enterprise Adoption baseline is 122 catalog titles, 71 catalog authors, 1 adopted catalog title, and 1 adopted published author. The next recommended author is Alice V Pryor / *According to Mark* because the title is a clean single-title, non-Signature adoption candidate.
+The first Enterprise Adoption baseline was 122 catalog titles, 71 catalog authors, 1 adopted catalog title, and 1 adopted published author. Alice V Pryor / *According to Mark* is now certified as the first post-pilot Enterprise Adoption Operations coverage increase, bringing coverage to 2 adopted catalog titles and 2 adopted published authors. The next recommended author is Ashanti Flemister / *Pieces of Me All Over the Place* because the title is a clean single-title, non-Signature adoption candidate.
 
 ---
 
