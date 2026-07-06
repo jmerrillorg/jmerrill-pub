@@ -52,9 +52,7 @@ Enterprise Coverage is now measured by catalog titles adopted into PROGRAM-002, 
 
 | Rank | Author | Title | Reason |
 |---:|---|---|---|
-| 1 | Wayne Pounds | *Number 23 and Me* | Single-title author, clean metadata, non-Signature imprint |
-| 2 | Essence Unique | *Your Brain Has Too Much What, Mommy??* | Single-title author, clean metadata, non-Signature imprint |
-| 3 | Johnson Settles | *7 Step Jumpstart to Becoming Your Best Self* | Single-title author, clean metadata, non-Signature imprint |
+| 1 | Wave 2 | 10 selected single-title authors | Authorized controlled wave; see `OP-000-Enterprise-Adoption-Wave-2-Plan.md` |
 
 ## Current Constraints
 
