@@ -15,6 +15,7 @@ Enterprise Adoption proceeds one author at a time. Each adoption discovers, vali
 | Author | Titles Adopted | Workspace Mode | Status |
 |---|---:|---|---|
 | J. Derrick Johnson | 1 | Published Author Workspace | Certified |
+| Alice V Pryor | 1 | Published Author Workspace | Certified |
 
 ## Recommended Adoption Order
 
@@ -28,7 +29,6 @@ Priority is based on operational value and migration simplicity:
 
 | Author | Titles | Title(s) | Imprint(s) | Contracts | Workspace | Current Payment Method | Stripe Readiness | Relationship State | Priority | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
-| Alice V Pryor | 1 | According to Mark | J Merrill Publishing | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Ashanti Flemister | 1 | Pieces of Me All Over the Place | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Baily Cunningham | 1 | Melodies From Heaven | JM Verse | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
 | Brandyn McElroy | 1 | Support Beyond the Cycle | JM Works | Contract/link search required | Workspace search required | Existing/unknown; validate before migration | Stripe Migration Required unless existing Connect confirmed | Published Author | High | single-title clean metadata |
@@ -101,4 +101,4 @@ Priority is based on operational value and migration simplicity:
 
 ## Next Adoption Recommendation
 
-Adopt **Alice V Pryor / According to Mark** next unless Jackie chooses a different operational priority. This is the cleanest next case because it is a single-title, non-Signature, high-priority published-author adoption with no obvious catalog conflict in `data/books.json`.
+Adopt **Ashanti Flemister / Pieces of Me All Over the Place** next unless Jackie chooses a different operational priority. This is now the cleanest next case because it is a single-title, non-Signature, high-priority published-author adoption with no obvious catalog conflict in `data/books.json`.

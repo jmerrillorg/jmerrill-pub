@@ -59,7 +59,7 @@ const HISTORICAL_EVENTS = Object.freeze([
   ["OP000_COVER_APPROVED_LEGACY", "Cover approval certified from legacy published-title status."],
   ["OP000_PRODUCTION_COMPLETED_LEGACY", "Production completion certified from legacy published-title status."],
   ["OP000_DISTRIBUTION_COMPLETED_LEGACY", "Distribution completion certified from multi-format published catalog evidence."],
-  ["OP000_IMPRINT_LOCKED", "Existing non-Signature imprint accepted and locked as-is because catalog genre is blank."],
+  ["OP000_IMPRINT_LOCKED", "Existing non-Signature imprint accepted and locked as-is from catalog evidence."],
   ["OP000_CATALOG_HYGIENE_REVIEWED", "Direct catalog hygiene reviewed for the pilot title; no enterprise-wide cleanup started."],
   ["OP000_TRACK_B_ADOPTION_CERTIFIED", "OP-000 Track B pilot adoption certified for the published author workspace method."]
 ]);
