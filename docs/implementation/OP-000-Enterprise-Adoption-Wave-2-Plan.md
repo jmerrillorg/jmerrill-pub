@@ -1,10 +1,10 @@
 # OP-000 Enterprise Adoption Wave 2 Plan
 
-**Program:** PROGRAM-002  
-**Mode:** Enterprise Adoption Operations  
-**Wave:** Wave 2  
-**Status:** Ready for controlled run after deployment  
-**Date:** 2026-07-06  
+**Program:** PROGRAM-002
+**Mode:** Enterprise Adoption Operations
+**Wave:** Wave 2
+**Status:** Certified
+**Date:** 2026-07-06
 
 ## Authority
 
@@ -40,6 +40,29 @@ These authors are single-title, non-Signature published-author adoptions with re
 | OP-000 remaining published authors | 59 | 49 |
 | Enterprise Coverage | 9.84% | 18.03% |
 
+## Certification Evidence
+
+Wave 2 was executed through the governed `run-op000-track-b-adoption` endpoint after PR #196 and PR #197 were merged and `func-jm1-diagnostic-ai-runner` was redeployed.
+
+| Author | Title | Endpoint Result | Dataverse Evidence |
+|---|---|---|---|
+| Wayne Pounds | *Number 23 and Me* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 OP000 execution-log events |
+| Essence Unique | *Your Brain Has Too Much What, Mommy??* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 OP000 execution-log events |
+| Johnson Settles | *7 Step Jumpstart to Becoming Your Best Self* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 OP000 execution-log events |
+| Earline Neal | *Ordinary People Searching for Greatness* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 OP000 execution-log events |
+| Shana Byrd | *Focus, Trust, and Follow* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 OP000 execution-log events |
+| Mildred Beard | *Hodge Podge of Life* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 OP000 execution-log events |
+| Natasha Gilchrist | *Pretty Wings* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 OP000 execution-log events |
+| Randall Beverly | *The Hood* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 OP000 execution-log events |
+| Shecara Norris | *A Blended Family* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 OP000 execution-log events |
+| Sylvia Benson | *The Master's Piece* | `OP000_TRACK_B_ADOPTION_CERTIFIED` | 10 OP000 execution-log events |
+
+Total evidence written: 100 OP000 execution-log events.
+
 ## Safety Boundaries
 
 Wave 2 does not run `/join`, send author/customer communications, regenerate contracts, request signatures, start Stripe onboarding, touch royalty payments, touch Business Central, create payments, create duplicate workspaces, start production/distribution, or run catalog-wide adoption.
+
+## Gate State
+
+`JM1_OP000_TRACK_B_ADOPTION_ENABLED=false` after certification. `JM1_OP000_ADOPTION_ENABLED=false` after certification.
