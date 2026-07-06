@@ -1,6 +1,6 @@
 # OP-000 Track A Validation Summary - Establishing Glory: The Library
 
-**Status:** Implementation validation complete; live controlled adoption pending
+**Status:** OPERATIONAL - live controlled adoption certified
 **Title:** *Establishing Glory: The Library*
 **Reference:** `JMP-INT-202606-UFYG60`
 
@@ -37,7 +37,7 @@
 |---|---|
 | Existing Opportunity | Known: `2653fca9-eacd-4c44-b3ed-1764dd5d35aa` |
 | Execution-log payload | Validated in unit tests |
-| Live execution-log write | Pending controlled run |
+| Live execution-log write | PASS - 12 rows created by the controlled adoption run |
 | Contact/Lead/Opportunity create | Not reachable from OP-000 runner |
 | Contract/payment/royalty write | Not reachable from OP-000 runner |
 
@@ -46,8 +46,20 @@
 | Item | Status |
 |---|---|
 | Workspace duplicate prevention | Required; match by Opportunity/intake/diagnostic identity |
-| Existing workspace readback | Pending controlled run |
+| Existing workspace readback | PASS - active workspace verified in SharePoint |
 | Workspace movement | Not performed by OP-000 adoption |
+
+Verified workspace:
+
+`02_Active-Pipeline/01_Onboarding/Smith, Jackie Establishing Glory- The Library`
+
+Verified manuscript/file evidence:
+
+- `02-MANUSCRIPT/240711 Establishing Glory.docx`
+- `02-MANUSCRIPT/230922 Establishing Glory.docx`
+- `Establishing Glory - The Library/Apple Books`
+- `Establishing Glory - The Library/Generic`
+- `Establishing Glory - The Library/Kindle`
 
 ## Duplicate Validation
 
@@ -69,4 +81,4 @@ The pilot must not match *Establishing Glory: The Library* against already-publi
 
 ## Remaining Jackie Decisions
 
-None for the implementation candidate. Jackie review is required only if live readback discovers missing source-of-truth evidence, workspace ambiguity, duplicate risk, or a JM Signature imprint exception.
+None for the certified Track A pilot. Jackie review remains required before Track B, Track C, or catalog-wide adoption begins.

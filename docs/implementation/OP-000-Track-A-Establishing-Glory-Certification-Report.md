@@ -5,7 +5,7 @@
 **Pilot title:** *Establishing Glory: The Library*
 **Reference:** `JMP-INT-202606-UFYG60`
 **Diagnostic ID:** `64e387e0-7e6a-f111-a826-00224820105b`
-**Status:** Pending live controlled adoption run
+**Status:** OPERATIONAL - Track A pilot certified
 
 ## Certification Summary
 
@@ -13,24 +13,24 @@
 |---|---|---|
 | Record identity | PASS | Matched by intake, diagnostic ID, and Opportunity ID, not title-string similarity |
 | Duplicate prevention | PASS | Runner cannot create Contact, Lead, Opportunity, Contract, workspace, payment, royalty, production, or distribution records |
-| Imprint classification | PASS | `J Merrill Publishing`; not a JM Signature candidate |
+| Imprint classification | PASS | `JM Works`; not a JM Signature candidate |
 | Relationship State | PASS | `Active Author` |
 | Workspace Mode | PASS | `Active Author Workspace` |
 | Execution history payload | PASS | Historical certification events prepared; no claim that old work happened today |
-| SharePoint workspace readback | PENDING LIVE | Must be verified during controlled operational run |
-| Dataverse execution-log write | PENDING LIVE | Must be verified by controlled run with `JM1_OP000_ADOPTION_ENABLED=true` |
+| SharePoint workspace readback | PASS | Existing workspace verified at `02_Active-Pipeline/01_Onboarding/Smith, Jackie Establishing Glory- The Library`; no duplicate workspace created |
+| Dataverse execution-log write | PASS | Controlled run returned `OP000_TRACK_A_ADOPTION_CERTIFIED` and created 12 execution-log rows |
 | Contracts/payment/production/distribution | PASS | No live action performed by OP-000 runner |
 
 ## Certification Gate
 
-OP-000 Track A is certified only after:
+OP-000 Track A was certified after:
 
-1. The implementation is deployed.
-2. The gate is opened for the single Track A pilot.
-3. The controlled adoption endpoint returns `OP000_TRACK_A_ADOPTION_CERTIFIED`.
-4. The prepared execution-log records are written.
-5. SharePoint/Dataverse readback confirms no duplicate workspace or record creation.
-6. The gate is returned to false.
+1. The implementation was deployed to `func-jm1-diagnostic-ai-runner`.
+2. The gate was opened for the single Track A pilot.
+3. The controlled adoption endpoint returned `OP000_TRACK_A_ADOPTION_CERTIFIED`.
+4. The prepared execution-log records were written.
+5. SharePoint readback confirmed existing workspace and manuscript/distribution assets.
+6. The gate was returned to false.
 
 ## Current Technical State
 
@@ -40,8 +40,8 @@ OP-000 Track A is certified only after:
 | HTTP runner | Implemented |
 | Unit tests | Implemented |
 | Documentation | Implemented |
-| Production deployment | Pending |
-| Controlled live adoption run | Pending |
+| Production deployment | Complete |
+| Controlled live adoption run | Complete |
 
 ## Validation Commands
 
@@ -55,4 +55,4 @@ The implementation must pass:
 
 ## Certification Outcome
 
-OP-000 Track A is not yet marked operational in this report. It is ready for deployment and a single controlled adoption run for *Establishing Glory: The Library*.
+OP-000 Track A is operational for the first pilot title. The adoption path is certified for *Establishing Glory: The Library* only; Track B, Track C, and catalog-wide adoption remain deferred until separately authorized.

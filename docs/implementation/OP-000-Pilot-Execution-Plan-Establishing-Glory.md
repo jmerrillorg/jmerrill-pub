@@ -1,6 +1,6 @@
 # OP-000 — First Pilot Execution Plan: *Establishing Glory: The Library* (Track A)
 
-**Status:** Phase II Track A pilot authorized — implementation candidate, pending governed deployment and controlled adoption run
+**Status:** Phase II Track A pilot certified — OPERATIONAL for *Establishing Glory: The Library*
 **Authority:** OP-000; IS-008 Deployment Package; OP-000 Pilot Adoption Plan (Candidate 1); Jackie's authorization to begin PROGRAM-002 Phase II with this one-title pilot (2026-07-05)
 **Owner:** Jackie Smith Jr.
 **Plan Owner:** Cece
@@ -26,7 +26,7 @@ This plan extracts and finalizes Pilot Candidate 1 from `OP-000-Pilot-Adoption-P
 | Diagnostic AI pilot history | 4 controlled attempts (PRs #77, #79, #81, #82); attempt 4 (2026-06-18) passed schema/no-quotation validation, internal-only "Needs Human Review" result | `int-pub-005-real-manuscript-pilot-attempt-4.md` |
 | Milestone 7/7C/8 readiness | System-ready; live human-gated stages (editorial, distribution) not yet opened for this record | `int-pub-005-milestone-7c-editorial-command-center.md`, `int-pub-005-milestone-8-distribution-setup-readiness.md` |
 | OP-002 validation | Used as Jackie's real active project to pass OP-002 controlled validation, 2026-07-01 | `PROGRAM-002-Autonomous-Publishing-Production-Pipeline.md` |
-| Current SharePoint workspace | Not yet confirmed present/absent — to be checked during pre-pilot verification, not assumed here | — |
+| Current SharePoint workspace | Verified at `02_Active-Pipeline/01_Onboarding/Smith, Jackie Establishing Glory- The Library` | SharePoint readback, 2026-07-06 |
 | Current `jm1pub_relationshipstate` | Not applicable — field does not exist yet (IS-008 not deployed) | — |
 | Current `jm1pub_workspacemode` | Not applicable — field does not exist yet | — |
 | Current `jm1pub_adoptiontrack` / `certificationstatus` / `imprintlockstatus` | Not applicable — fields do not exist yet | — |
@@ -35,7 +35,7 @@ This plan extracts and finalizes Pilot Candidate 1 from `OP-000-Pilot-Adoption-P
 
 ---
 
-## 2. Expected Adopted State (after pilot execution — not yet true)
+## 2. Certified Adopted State
 
 Adoption follows Track A (Active Pipeline Adoption): adopt current stage, verify evidence, link/create workspace, backfill history, certify completed stages, resume at current gate. Applied to this title's actual current position (post-intake, pre-Editorial-command-center-activation — not yet in Editorial/Cover/Distribution in the OP-004-011 sense):
 
@@ -43,7 +43,7 @@ Adoption follows Track A (Active Pipeline Adoption): adopt current stage, verify
 |---|---|
 | Adopt current state | `jm1pub_adoptiontrack = Track A - Active Pipeline Adoption`, `jm1pub_adoptionsource = Native PROGRAM-002` (entered through `/join`, not a legacy import) |
 | Verify evidence | Manuscript status `Complete` + diagnostic attempt history are sufficient evidence for the stages actually completed (intake, diagnostic). Downstream stages (editorial, distribution) have no evidence yet because they have not run — expected as Certification Exceptions, not failures. |
-| Create/link workspace | See §5 |
+| Create/link workspace | Existing workspace verified and reused; no duplicate created |
 | Create history | See §6 |
 | Certify completed stages | Intake and diagnostic stages certified; Editorial/Cover/Distribution logged as open Certification Exceptions pending actual completion |
 | Resume at current gate | Title re-enters the normal OP-004–OP-011 flow at its true current position (Opportunity step `2-Develop`) — OP-000 does not restart it at intake |
@@ -66,11 +66,21 @@ This is distinct from `Published Author Workspace`, which remains the Track B mo
 
 ---
 
-## 5. Expected SharePoint Result
+## 5. Certified SharePoint Result
 
-Since this title entered through a real `/join` inquiry (intake reference `JMP-INT-202606-UFYG60`), a SharePoint workspace is expected to already exist somewhere in the `01_Pre-Pipeline` → `02_Active-Pipeline` lifecycle.
+SharePoint readback confirmed the existing active workspace:
 
-Expected pilot action: **link** the existing folder at its current lifecycle position — never create a duplicate, never reset it to `01_Pre-Pipeline/00_Inquiry`. If pre-pilot verification finds no folder exists (a real possibility, not assumed either way), that is a pilot finding to report to Jackie, not something the pilot silently resolves by creating one.
+`02_Active-Pipeline/01_Onboarding/Smith, Jackie Establishing Glory- The Library`
+
+The workspace contains expected title/manuscript evidence, including:
+
+- `02-MANUSCRIPT/240711 Establishing Glory.docx`
+- `02-MANUSCRIPT/230922 Establishing Glory.docx`
+- `Establishing Glory - The Library/Apple Books`
+- `Establishing Glory - The Library/Generic`
+- `Establishing Glory - The Library/Kindle`
+
+OP-000 did not create, duplicate, or move this workspace.
 
 Dataverse remains the stage/status authority throughout — the SharePoint result is a link/verification action, not a source of truth.
 
@@ -99,7 +109,7 @@ These events are historical certification evidence. They do not claim that the c
 
 ---
 
-## 7. Expected Certification Outcome
+## 7. Certification Outcome
 
 | Certification Item | Expected Result |
 |---|---|
@@ -112,12 +122,12 @@ These events are historical certification evidence. They do not claim that the c
 | Marketing assets | Not started — open Certification Exception |
 | Production assets | Not started — open Certification Exception |
 | Author relationship | Certifiable — real, confirmed Contact |
-| Workspace | Certifiable pending §5 link confirmation |
+| Workspace | Certified — existing workspace verified and reused |
 | Execution history | Certifiable — backfilled per §6, honestly reflecting actual progress |
 | Imprint | Certifiable and auto-locked — `JM Works`, high confidence, non-Signature |
 | JM Signature review | Not applicable — imprint is not JM Signature, no dual-authorization question arises |
 
-**Overall OP-000 Track A expected result: `Certified for Active Pipeline Adoption`** — this certifies the adoption path and existing evidence. It does not certify that all downstream publishing work is complete.
+**Overall OP-000 Track A result: `Certified for Active Pipeline Adoption`** — this certifies the adoption path and existing evidence. It does not certify that all downstream publishing work is complete.
 
 ---
 
