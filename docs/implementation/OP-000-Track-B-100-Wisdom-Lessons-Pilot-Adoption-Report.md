@@ -7,7 +7,7 @@
 **Pilot author:** J. Derrick Johnson
 **Pilot title:** *100 Wisdom Lessons for Life and Living*
 **Title ID:** `100-wisdom-lessons-for-life-and-living`
-**Status:** Implementation candidate; ready for governed deployment and controlled Track B adoption run
+**Status:** OPERATIONAL - Track B pilot certified
 
 ## Purpose
 
@@ -173,6 +173,18 @@ The Track B runner cannot create or update:
 
 It writes only safe historical execution-log evidence when `JM1_OP000_TRACK_B_ADOPTION_ENABLED=true`.
 
+## Live Controlled Run
+
+| Item | Result |
+|---|---|
+| Deployment | PASS - `func-jm1-diagnostic-ai-runner` remote build/deploy completed and indexed `run-op000-track-b-adoption` |
+| Gate opened | PASS - `JM1_OP000_TRACK_B_ADOPTION_ENABLED=true` for the controlled run only |
+| Endpoint result | PASS - `OP000_TRACK_B_ADOPTION_CERTIFIED` |
+| Execution logs | PASS - 15 `jm1_executionlog` rows written |
+| Gate closed | PASS - `JM1_OP000_TRACK_B_ADOPTION_ENABLED=false` after run |
+| Duplicate title/contract/opportunity check | PASS - no matching Dataverse title, contract, or Opportunity rows were created by the runner |
+| Live side effects | PASS - no Contact, Lead, Opportunity, Contract, payment, royalty, workspace, production, distribution, or email action performed |
+
 ## Outcome
 
-Track B is ready for deployment and one controlled adoption run for *100 Wisdom Lessons for Life and Living*. The run certifies the published-author adoption method and exposes the remaining identity/workspace/contract-linking steps without broad catalog migration.
+Track B is certified for the first published-author pilot, *100 Wisdom Lessons for Life and Living*. The run certified the published-author adoption method and exposed the remaining identity/workspace/contract-linking steps without broad catalog migration.
