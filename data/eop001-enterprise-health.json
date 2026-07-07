@@ -1,13 +1,13 @@
 {
   "generatedAt": "2026-07-06T13:14:20.241Z",
   "program": "EOP-001",
-  "status": "Enterprise Optimization Active - Publisher Master Imprint Register Applied",
+  "status": "Enterprise Optimization Active - Full Publisher Master Imprint Register Applied",
   "totals": {
     "catalogTitles": 122,
     "adoptedTitles": 122,
     "publishedAuthors": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
     "activeAuthorWorkspaces": 72,
-    "publisherImprintReview": 20,
+    "publisherImprintReview": 14,
     "jmSignatureReview": 0,
     "contractReconciliation": 122,
     "stripeMigration": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
@@ -23,10 +23,10 @@
     },
     {
       "metric": "Imprint Certified",
-      "value": "83.61%",
-      "numerator": 102,
+      "value": "88.52%",
+      "numerator": 108,
       "denominator": 122,
-      "note": "Catalog titles with LOCKED certified imprints after Publisher Master Imprint Register update."
+      "note": "Catalog titles with LOCKED certified imprints after Full Publisher Master Imprint Register update."
     },
     {
       "metric": "Contracts Linked",
@@ -54,7 +54,7 @@
       "value": "98.36%",
       "numerator": 120,
       "denominator": 122,
-      "note": "Publisher Master Register added pending manuscript, author reconciliation, and title-anchor queues."
+      "note": "Full Publisher Master Register applied; remaining rows are pending manuscript, author reconciliation, or title-anchor reconciliation."
     },
     {
       "metric": "Workspace Complete",
@@ -71,20 +71,8 @@
       "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
     }
   ],
-  "overallEnterpriseHealth": "67.12%",
+  "overallEnterpriseHealth": "68.49%",
   "publisherReviewQueue": [
-    {
-      "id": "a-little-bit-of-everything",
-      "title": "A Little Bit of Everything",
-      "author": "Carolyn Booker-Pierce",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "LOW CONFIDENCE",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
     {
       "id": "abortion",
       "title": "Abortion!",
@@ -116,18 +104,6 @@
       "currentPublishedImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "LOW CONFIDENCE",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "destined-to-break-the-curse-devotional",
-      "title": "Destined to Break the Curse Devotional",
-      "author": "Sean Smith, Sr.",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.36,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
       "decisionRequired": "LOW CONFIDENCE",
       "proposedDecision": "Pending publisher/master register follow-up",
@@ -170,18 +146,6 @@
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
-      "id": "just-what-i-needed",
-      "title": "Just What I Needed",
-      "author": "Gloria Patterson",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "LOW CONFIDENCE",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
       "id": "loving-the-addict",
       "title": "Loving the Addict",
       "author": "Carolyn Booker-Pierce",
@@ -218,42 +182,6 @@
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
-      "id": "the-essence-of-life-love-letters-to-christ",
-      "title": "The Essence of Life, Love Letters to Christ",
-      "author": "Janet Stephens",
-      "currentPublishedImprint": "JM Verse",
-      "recommendedImprint": "JM Verse",
-      "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Verse.",
-      "decisionRequired": "LOW CONFIDENCE",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "the-i-am-in-me-part-2",
-      "title": "The I Am in Me Part 2",
-      "author": "Edith Clay",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "LOW CONFIDENCE",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "the-never-before-told-story-of-the-gelatin-monster",
-      "title": "The Never Before Told Story of the Gelatin Monster",
-      "author": "Maurché Reed",
-      "currentPublishedImprint": "JM Little",
-      "recommendedImprint": "JM Little",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Little.",
-      "decisionRequired": "LOW CONFIDENCE",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
       "id": "the-paper-champ",
       "title": "The Paper Champ",
       "author": "Kurt Broadnax",
@@ -261,7 +189,7 @@
       "recommendedImprint": "JM Works",
       "confidence": 0.24,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Works.",
-      "decisionRequired": "LOW CONFIDENCE",
+      "decisionRequired": "AUTHOR_RECONCILIATION_REQUIRED",
       "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
@@ -273,7 +201,7 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "LOW CONFIDENCE",
+      "decisionRequired": "AUTHOR_RECONCILIATION_REQUIRED",
       "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
@@ -297,7 +225,7 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "LOW CONFIDENCE",
+      "decisionRequired": "AUTHOR_RECONCILIATION_REQUIRED",
       "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
@@ -352,5 +280,13 @@
     "authorReconciliationRequired": 3,
     "noProgramTitleAnchor": 4,
     "pairingEventsPrepared": 11
+  },
+  "publisherMasterImprintRegisterFull": {
+    "applied": 107,
+    "pendingManuscriptReview": 9,
+    "authorReconciliationRequired": 3,
+    "assetEditionRegistered": 1,
+    "noProgramTitleAnchor": 5,
+    "eventsPrepared": 8
   }
 }
