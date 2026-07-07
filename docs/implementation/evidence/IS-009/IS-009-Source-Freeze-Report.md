@@ -1,6 +1,6 @@
 # IS-009 Source Freeze Report
 
-**Generated:** 2026-07-07T02:08:52.929Z
+**Generated:** 2026-07-07T02:59:35.343Z
 **Scope:** Read-only source file freeze for PAM / IS-009 build readiness.
 
 | Source | Size Bytes | Bytes Read | SHA-256 | Modified At | Status |

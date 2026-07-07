@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-07T02:08:52.929Z",
+  "generatedAt": "2026-07-07T02:59:35.343Z",
   "sourceDirectory": "/Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/Implementation HQ - Documents/General",
   "sourceFreeze": [
     {
@@ -3152,10 +3152,625 @@
       {
         "logicalName": "jm1pub_contract",
         "label": "jm1pub_contract",
-        "exists": false,
-        "readStatus": 404,
-        "errorCode": "0x80060888",
-        "errorMessage": "EntityMetadata With Id = LogicalName='jm1pub_contract' does not exist."
+        "exists": true,
+        "entity": {
+          "logicalName": "jm1pub_contract",
+          "schemaName": "jm1pub_Contract",
+          "entitySetName": "jm1pub_contracts",
+          "ownershipType": "UserOwned",
+          "isCustomEntity": true,
+          "displayName": "Contract"
+        },
+        "attributes": [
+          {
+            "logicalName": "createdby",
+            "schemaName": "CreatedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyname",
+            "schemaName": "CreatedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyyominame",
+            "schemaName": "CreatedByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdon",
+            "schemaName": "CreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfby",
+            "schemaName": "CreatedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyname",
+            "schemaName": "CreatedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyyominame",
+            "schemaName": "CreatedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "exchangerate",
+            "schemaName": "ExchangeRate",
+            "type": "Decimal",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "importsequencenumber",
+            "schemaName": "ImportSequenceNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_agreementsenton",
+            "schemaName": "jm1pub_AgreementSentOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_commissioningtransactionamount",
+            "schemaName": "jm1pub_CommissioningTransactionAmount",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_commissioningtransactionamount_base",
+            "schemaName": "jm1pub_commissioningtransactionamount_Base",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_contractid",
+            "schemaName": "jm1pub_ContractId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": true,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_contractname",
+            "schemaName": "jm1pub_ContractName",
+            "type": "String",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": true
+          },
+          {
+            "logicalName": "jm1pub_contracttype",
+            "schemaName": "jm1pub_ContractType",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_contracttypename",
+            "schemaName": "jm1pub_contracttypeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_docurl",
+            "schemaName": "jm1pub_DocUrl",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_esignprovider",
+            "schemaName": "jm1pub_EsignProvider",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_esignprovidername",
+            "schemaName": "jm1pub_esignproviderName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_paymentpath",
+            "schemaName": "jm1pub_PaymentPath",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_provideragreementid",
+            "schemaName": "jm1pub_ProviderAgreementId",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_providerinviteid",
+            "schemaName": "jm1pub_ProviderInviteId",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_providerstatus",
+            "schemaName": "jm1pub_ProviderStatus",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_royaltypercent",
+            "schemaName": "jm1pub_RoyaltyPercent",
+            "type": "Decimal",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_selectedpackagecode",
+            "schemaName": "jm1pub_SelectedPackageCode",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_signeddate",
+            "schemaName": "jm1pub_SignedDate",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_standardpackageprice",
+            "schemaName": "jm1pub_StandardPackagePrice",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_standardpackageprice_base",
+            "schemaName": "jm1pub_standardpackageprice_Base",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_status",
+            "schemaName": "jm1pub_Status",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_statusname",
+            "schemaName": "jm1pub_statusName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_templateversionreference",
+            "schemaName": "jm1pub_TemplateVersionReference",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_title",
+            "schemaName": "jm1pub_Title",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_titlename",
+            "schemaName": "jm1pub_TitleName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedby",
+            "schemaName": "ModifiedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyname",
+            "schemaName": "ModifiedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyyominame",
+            "schemaName": "ModifiedByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedon",
+            "schemaName": "ModifiedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfby",
+            "schemaName": "ModifiedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyname",
+            "schemaName": "ModifiedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyyominame",
+            "schemaName": "ModifiedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "overriddencreatedon",
+            "schemaName": "OverriddenCreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "ownerid",
+            "schemaName": "OwnerId",
+            "type": "Owner",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridname",
+            "schemaName": "OwnerIdName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridtype",
+            "schemaName": "OwnerIdType",
+            "type": "EntityName",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridyominame",
+            "schemaName": "OwnerIdYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunit",
+            "schemaName": "OwningBusinessUnit",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunitname",
+            "schemaName": "OwningBusinessUnitName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningteam",
+            "schemaName": "OwningTeam",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owninguser",
+            "schemaName": "OwningUser",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecode",
+            "schemaName": "statecode",
+            "type": "State",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecodename",
+            "schemaName": "statecodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscode",
+            "schemaName": "statuscode",
+            "type": "Status",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscodename",
+            "schemaName": "statuscodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "timezoneruleversionnumber",
+            "schemaName": "TimeZoneRuleVersionNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "transactioncurrencyid",
+            "schemaName": "TransactionCurrencyId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "transactioncurrencyidname",
+            "schemaName": "TransactionCurrencyIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "utcconversiontimezonecode",
+            "schemaName": "UTCConversionTimeZoneCode",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "versionnumber",
+            "schemaName": "VersionNumber",
+            "type": "BigInt",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          }
+        ],
+        "attributeReadError": null,
+        "manyToOneRelationships": [
+          {
+            "MetadataId": "88c16869-ae79-f111-ab0f-000d3a592730",
+            "SchemaName": "TransactionCurrency_jm1pub_Contract",
+            "ReferencedAttribute": "transactioncurrencyid",
+            "ReferencedEntity": "transactioncurrency",
+            "ReferencingAttribute": "transactioncurrencyid",
+            "ReferencingEntity": "jm1pub_contract"
+          },
+          {
+            "MetadataId": "29635591-ae79-f111-ab0f-000d3a592730",
+            "SchemaName": "jm1pub_title_contract",
+            "ReferencedAttribute": "jm1pub_titleid",
+            "ReferencedEntity": "jm1pub_title",
+            "ReferencingAttribute": "jm1pub_title",
+            "ReferencingEntity": "jm1pub_contract"
+          },
+          {
+            "MetadataId": "7b4bf49e-ad79-f111-ab0f-000d3a592730",
+            "SchemaName": "lk_jm1pub_contract_createdby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdby",
+            "ReferencingEntity": "jm1pub_contract"
+          },
+          {
+            "MetadataId": "814bf49e-ad79-f111-ab0f-000d3a592730",
+            "SchemaName": "lk_jm1pub_contract_createdonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdonbehalfby",
+            "ReferencingEntity": "jm1pub_contract"
+          },
+          {
+            "MetadataId": "874bf49e-ad79-f111-ab0f-000d3a592730",
+            "SchemaName": "lk_jm1pub_contract_modifiedby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedby",
+            "ReferencingEntity": "jm1pub_contract"
+          },
+          {
+            "MetadataId": "8d4bf49e-ad79-f111-ab0f-000d3a592730",
+            "SchemaName": "lk_jm1pub_contract_modifiedonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedonbehalfby",
+            "ReferencingEntity": "jm1pub_contract"
+          },
+          {
+            "MetadataId": "9f4bf49e-ad79-f111-ab0f-000d3a592730",
+            "SchemaName": "user_jm1pub_contract",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "owninguser",
+            "ReferencingEntity": "jm1pub_contract"
+          },
+          {
+            "MetadataId": "a64bf49e-ad79-f111-ab0f-000d3a592730",
+            "SchemaName": "team_jm1pub_contract",
+            "ReferencedAttribute": "teamid",
+            "ReferencedEntity": "team",
+            "ReferencingAttribute": "owningteam",
+            "ReferencingEntity": "jm1pub_contract"
+          },
+          {
+            "MetadataId": "ab4bf49e-ad79-f111-ab0f-000d3a592730",
+            "SchemaName": "owner_jm1pub_contract",
+            "ReferencedAttribute": "ownerid",
+            "ReferencedEntity": "owner",
+            "ReferencingAttribute": "ownerid",
+            "ReferencingEntity": "jm1pub_contract"
+          },
+          {
+            "MetadataId": "af4bf49e-ad79-f111-ab0f-000d3a592730",
+            "SchemaName": "business_unit_jm1pub_contract",
+            "ReferencedAttribute": "businessunitid",
+            "ReferencedEntity": "businessunit",
+            "ReferencingAttribute": "owningbusinessunit",
+            "ReferencingEntity": "jm1pub_contract"
+          }
+        ],
+        "relationshipReadError": null,
+        "keys": [],
+        "keyReadError": null
       },
       {
         "logicalName": "jm1pub_title",
@@ -3239,6 +3854,51 @@
             "type": "Integer",
             "requiredLevel": "None",
             "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assetregistrylastverifiedon",
+            "schemaName": "jm1pub_AssetRegistryLastVerifiedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assetregistrystatus",
+            "schemaName": "jm1pub_AssetRegistryStatus",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assetregistrystatusname",
+            "schemaName": "jm1pub_assetregistrystatusName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_certifiedimprint",
+            "schemaName": "jm1pub_CertifiedImprint",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_certifiedimprintname",
+            "schemaName": "jm1pub_certifiedimprintName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
             "isPrimaryId": false,
             "isPrimaryName": false
           },
@@ -3542,26 +4202,1880 @@
       {
         "logicalName": "jm1_executionlog",
         "label": "jm1_executionlog",
-        "exists": false,
-        "readStatus": 404,
-        "errorCode": "0x80060888",
-        "errorMessage": "EntityMetadata With Id = LogicalName='jm1_executionlog' does not exist."
+        "exists": true,
+        "entity": {
+          "logicalName": "jm1_executionlog",
+          "schemaName": "jm1_ExecutionLog",
+          "entitySetName": "jm1_executionlogs",
+          "ownershipType": "UserOwned",
+          "isCustomEntity": true,
+          "displayName": "Execution Log"
+        },
+        "attributes": [
+          {
+            "logicalName": "createdby",
+            "schemaName": "CreatedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyname",
+            "schemaName": "CreatedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyyominame",
+            "schemaName": "CreatedByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdon",
+            "schemaName": "CreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfby",
+            "schemaName": "CreatedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyname",
+            "schemaName": "CreatedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyyominame",
+            "schemaName": "CreatedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "importsequencenumber",
+            "schemaName": "ImportSequenceNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_actiondescription",
+            "schemaName": "jm1_ActionDescription",
+            "type": "Memo",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_actiontype",
+            "schemaName": "jm1_ActionType",
+            "type": "String",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_agentmodel",
+            "schemaName": "jm1_AgentModel",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_agentname",
+            "schemaName": "jm1_AgentName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_approvaltimestamp",
+            "schemaName": "jm1_ApprovalTimestamp",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_bandlevel",
+            "schemaName": "jm1_BandLevel",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_bandlevelname",
+            "schemaName": "jm1_bandlevelName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_completedon",
+            "schemaName": "jm1_CompletedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_errordetail",
+            "schemaName": "jm1_ErrorDetail",
+            "type": "Memo",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_executionlogid",
+            "schemaName": "jm1_ExecutionLogId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": true,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_executionstatus",
+            "schemaName": "jm1_ExecutionStatus",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_executionstatusname",
+            "schemaName": "jm1_executionstatusName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_humanapprovedby",
+            "schemaName": "jm1_HumanApprovedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_humanapprovedbyname",
+            "schemaName": "jm1_HumanApprovedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_humanapprovedbyyominame",
+            "schemaName": "jm1_HumanApprovedByYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_name",
+            "schemaName": "jm1_Name",
+            "type": "String",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": true
+          },
+          {
+            "logicalName": "jm1_sourceentity",
+            "schemaName": "jm1_SourceEntity",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_sourcerecordid",
+            "schemaName": "jm1_SourceRecordId",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1_startedon",
+            "schemaName": "jm1_StartedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedby",
+            "schemaName": "ModifiedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyname",
+            "schemaName": "ModifiedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyyominame",
+            "schemaName": "ModifiedByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedon",
+            "schemaName": "ModifiedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfby",
+            "schemaName": "ModifiedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyname",
+            "schemaName": "ModifiedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyyominame",
+            "schemaName": "ModifiedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "overriddencreatedon",
+            "schemaName": "OverriddenCreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "ownerid",
+            "schemaName": "OwnerId",
+            "type": "Owner",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridname",
+            "schemaName": "OwnerIdName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridtype",
+            "schemaName": "OwnerIdType",
+            "type": "EntityName",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridyominame",
+            "schemaName": "OwnerIdYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunit",
+            "schemaName": "OwningBusinessUnit",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunitname",
+            "schemaName": "OwningBusinessUnitName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningteam",
+            "schemaName": "OwningTeam",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owninguser",
+            "schemaName": "OwningUser",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecode",
+            "schemaName": "statecode",
+            "type": "State",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecodename",
+            "schemaName": "statecodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscode",
+            "schemaName": "statuscode",
+            "type": "Status",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscodename",
+            "schemaName": "statuscodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "timezoneruleversionnumber",
+            "schemaName": "TimeZoneRuleVersionNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "utcconversiontimezonecode",
+            "schemaName": "UTCConversionTimeZoneCode",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "versionnumber",
+            "schemaName": "VersionNumber",
+            "type": "BigInt",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          }
+        ],
+        "attributeReadError": null,
+        "manyToOneRelationships": [
+          {
+            "MetadataId": "08f7cccc-ae79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "jm1_systemuser_executionlog_humanapprovedby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "jm1_humanapprovedby",
+            "ReferencingEntity": "jm1_executionlog"
+          },
+          {
+            "MetadataId": "f97ac5d1-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "lk_jm1_executionlog_createdby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdby",
+            "ReferencingEntity": "jm1_executionlog"
+          },
+          {
+            "MetadataId": "ff7ac5d1-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "lk_jm1_executionlog_createdonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdonbehalfby",
+            "ReferencingEntity": "jm1_executionlog"
+          },
+          {
+            "MetadataId": "057bc5d1-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "lk_jm1_executionlog_modifiedby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedby",
+            "ReferencingEntity": "jm1_executionlog"
+          },
+          {
+            "MetadataId": "0b7bc5d1-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "lk_jm1_executionlog_modifiedonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedonbehalfby",
+            "ReferencingEntity": "jm1_executionlog"
+          },
+          {
+            "MetadataId": "1d7bc5d1-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "user_jm1_executionlog",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "owninguser",
+            "ReferencingEntity": "jm1_executionlog"
+          },
+          {
+            "MetadataId": "247bc5d1-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "team_jm1_executionlog",
+            "ReferencedAttribute": "teamid",
+            "ReferencedEntity": "team",
+            "ReferencingAttribute": "owningteam",
+            "ReferencingEntity": "jm1_executionlog"
+          },
+          {
+            "MetadataId": "297bc5d1-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "owner_jm1_executionlog",
+            "ReferencedAttribute": "ownerid",
+            "ReferencedEntity": "owner",
+            "ReferencingAttribute": "ownerid",
+            "ReferencingEntity": "jm1_executionlog"
+          },
+          {
+            "MetadataId": "2d7bc5d1-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "business_unit_jm1_executionlog",
+            "ReferencedAttribute": "businessunitid",
+            "ReferencedEntity": "businessunit",
+            "ReferencingAttribute": "owningbusinessunit",
+            "ReferencingEntity": "jm1_executionlog"
+          }
+        ],
+        "relationshipReadError": null,
+        "keys": [],
+        "keyReadError": null
       },
       {
         "logicalName": "jm1pub_publishingasset",
         "label": "jm1pub_publishingasset conflict check",
-        "exists": false,
-        "readStatus": 404,
-        "errorCode": "0x80060888",
-        "errorMessage": "EntityMetadata With Id = LogicalName='jm1pub_publishingasset' does not exist."
+        "exists": true,
+        "entity": {
+          "logicalName": "jm1pub_publishingasset",
+          "schemaName": "jm1pub_PublishingAsset",
+          "entitySetName": "jm1pub_publishingassets",
+          "ownershipType": "UserOwned",
+          "isCustomEntity": true,
+          "displayName": "Publishing Asset"
+        },
+        "attributes": [
+          {
+            "logicalName": "createdby",
+            "schemaName": "CreatedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyname",
+            "schemaName": "CreatedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyyominame",
+            "schemaName": "CreatedByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdon",
+            "schemaName": "CreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfby",
+            "schemaName": "CreatedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyname",
+            "schemaName": "CreatedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyyominame",
+            "schemaName": "CreatedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "exchangerate",
+            "schemaName": "ExchangeRate",
+            "type": "Decimal",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "importsequencenumber",
+            "schemaName": "ImportSequenceNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_acxproductid",
+            "schemaName": "jm1pub_AcxProductId",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_asin",
+            "schemaName": "jm1pub_Asin",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assetformat",
+            "schemaName": "jm1pub_AssetFormat",
+            "type": "Picklist",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assetformatname",
+            "schemaName": "jm1pub_assetformatName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assethealthscore",
+            "schemaName": "jm1pub_AssetHealthScore",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assethealthstatus",
+            "schemaName": "jm1pub_AssetHealthStatus",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assethealthstatusname",
+            "schemaName": "jm1pub_assethealthstatusName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assetstatus",
+            "schemaName": "jm1pub_AssetStatus",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assetstatusname",
+            "schemaName": "jm1pub_assetstatusName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_audiofilereference",
+            "schemaName": "jm1pub_AudioFileReference",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_contractid",
+            "schemaName": "jm1pub_ContractId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_contractidname",
+            "schemaName": "jm1pub_ContractIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_coresourceid",
+            "schemaName": "jm1pub_CoreSourceId",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_coverfilereference",
+            "schemaName": "jm1pub_CoverFileReference",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_currency",
+            "schemaName": "jm1pub_Currency",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_distributionstatus",
+            "schemaName": "jm1pub_DistributionStatus",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_distributionstatusname",
+            "schemaName": "jm1pub_distributionstatusName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_editionlabel",
+            "schemaName": "jm1pub_EditionLabel",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_evidencepath",
+            "schemaName": "jm1pub_EvidencePath",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_evidencesource",
+            "schemaName": "jm1pub_EvidenceSource",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_exceptionreason",
+            "schemaName": "jm1pub_ExceptionReason",
+            "type": "Memo",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_filepackagereference",
+            "schemaName": "jm1pub_FilePackageReference",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_interiorfilereference",
+            "schemaName": "jm1pub_InteriorFileReference",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_isbn13",
+            "schemaName": "jm1pub_Isbn13",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_iscurrentedition",
+            "schemaName": "jm1pub_IsCurrentEdition",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_iscurrenteditionname",
+            "schemaName": "jm1pub_iscurrenteditionName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_lastverifiedon",
+            "schemaName": "jm1pub_LastVerifiedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_lsiid",
+            "schemaName": "jm1pub_LsiId",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_metadatastatus",
+            "schemaName": "jm1pub_MetadataStatus",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_metadatastatusname",
+            "schemaName": "jm1pub_metadatastatusName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_name",
+            "schemaName": "jm1pub_Name",
+            "type": "String",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": true
+          },
+          {
+            "logicalName": "jm1pub_normalizedisbn",
+            "schemaName": "jm1pub_NormalizedIsbn",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_publicationdate",
+            "schemaName": "jm1pub_PublicationDate",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_publishingassetid",
+            "schemaName": "jm1pub_PublishingAssetId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": true,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_retailprice",
+            "schemaName": "jm1pub_RetailPrice",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_retailprice_base",
+            "schemaName": "jm1pub_retailprice_Base",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_returnable",
+            "schemaName": "jm1pub_Returnable",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_returnablename",
+            "schemaName": "jm1pub_returnableName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_titleid",
+            "schemaName": "jm1pub_TitleId",
+            "type": "Lookup",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_titleidname",
+            "schemaName": "jm1pub_TitleIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_tradediscount",
+            "schemaName": "jm1pub_TradeDiscount",
+            "type": "Decimal",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedby",
+            "schemaName": "ModifiedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyname",
+            "schemaName": "ModifiedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyyominame",
+            "schemaName": "ModifiedByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedon",
+            "schemaName": "ModifiedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfby",
+            "schemaName": "ModifiedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyname",
+            "schemaName": "ModifiedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyyominame",
+            "schemaName": "ModifiedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "overriddencreatedon",
+            "schemaName": "OverriddenCreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "ownerid",
+            "schemaName": "OwnerId",
+            "type": "Owner",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridname",
+            "schemaName": "OwnerIdName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridtype",
+            "schemaName": "OwnerIdType",
+            "type": "EntityName",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridyominame",
+            "schemaName": "OwnerIdYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunit",
+            "schemaName": "OwningBusinessUnit",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunitname",
+            "schemaName": "OwningBusinessUnitName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningteam",
+            "schemaName": "OwningTeam",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owninguser",
+            "schemaName": "OwningUser",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecode",
+            "schemaName": "statecode",
+            "type": "State",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecodename",
+            "schemaName": "statecodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscode",
+            "schemaName": "statuscode",
+            "type": "Status",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscodename",
+            "schemaName": "statuscodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "timezoneruleversionnumber",
+            "schemaName": "TimeZoneRuleVersionNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "transactioncurrencyid",
+            "schemaName": "TransactionCurrencyId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "transactioncurrencyidname",
+            "schemaName": "TransactionCurrencyIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "utcconversiontimezonecode",
+            "schemaName": "UTCConversionTimeZoneCode",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "versionnumber",
+            "schemaName": "VersionNumber",
+            "type": "BigInt",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          }
+        ],
+        "attributeReadError": null,
+        "manyToOneRelationships": [
+          {
+            "MetadataId": "dd974b1b-af79-f111-ab0f-6045bd001af0",
+            "SchemaName": "TransactionCurrency_jm1pub_PublishingAsset",
+            "ReferencedAttribute": "transactioncurrencyid",
+            "ReferencedEntity": "transactioncurrency",
+            "ReferencingAttribute": "transactioncurrencyid",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          },
+          {
+            "MetadataId": "4819cde0-ae79-f111-ab0f-6045bd001af0",
+            "SchemaName": "jm1pub_title_publishingasset",
+            "ReferencedAttribute": "jm1pub_titleid",
+            "ReferencedEntity": "jm1pub_title",
+            "ReferencingAttribute": "jm1pub_titleid",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          },
+          {
+            "MetadataId": "bea5f5e5-ae79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "jm1pub_contract_publishingasset",
+            "ReferencedAttribute": "jm1pub_contractid",
+            "ReferencedEntity": "jm1pub_contract",
+            "ReferencingAttribute": "jm1pub_contractid",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          },
+          {
+            "MetadataId": "ae55f0ea-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "lk_jm1pub_publishingasset_createdby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdby",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          },
+          {
+            "MetadataId": "b455f0ea-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "lk_jm1pub_publishingasset_createdonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdonbehalfby",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          },
+          {
+            "MetadataId": "ba55f0ea-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "lk_jm1pub_publishingasset_modifiedby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedby",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          },
+          {
+            "MetadataId": "c055f0ea-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "lk_jm1pub_publishingasset_modifiedonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedonbehalfby",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          },
+          {
+            "MetadataId": "d255f0ea-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "user_jm1pub_publishingasset",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "owninguser",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          },
+          {
+            "MetadataId": "d955f0ea-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "team_jm1pub_publishingasset",
+            "ReferencedAttribute": "teamid",
+            "ReferencedEntity": "team",
+            "ReferencingAttribute": "owningteam",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          },
+          {
+            "MetadataId": "de55f0ea-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "owner_jm1pub_publishingasset",
+            "ReferencedAttribute": "ownerid",
+            "ReferencedEntity": "owner",
+            "ReferencingAttribute": "ownerid",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          },
+          {
+            "MetadataId": "e255f0ea-ad79-f111-ab0f-000d3a5a2f1f",
+            "SchemaName": "business_unit_jm1pub_publishingasset",
+            "ReferencedAttribute": "businessunitid",
+            "ReferencedEntity": "businessunit",
+            "ReferencingAttribute": "owningbusinessunit",
+            "ReferencingEntity": "jm1pub_publishingasset"
+          }
+        ],
+        "relationshipReadError": null,
+        "keys": [],
+        "keyReadError": null
       },
       {
         "logicalName": "jm1pub_assetmarketplace",
         "label": "jm1pub_assetmarketplace conflict check",
-        "exists": false,
-        "readStatus": 404,
-        "errorCode": "0x80060888",
-        "errorMessage": "EntityMetadata With Id = LogicalName='jm1pub_assetmarketplace' does not exist."
+        "exists": true,
+        "entity": {
+          "logicalName": "jm1pub_assetmarketplace",
+          "schemaName": "jm1pub_AssetMarketplace",
+          "entitySetName": "jm1pub_assetmarketplaces",
+          "ownershipType": "UserOwned",
+          "isCustomEntity": true,
+          "displayName": "Asset Marketplace"
+        },
+        "attributes": [
+          {
+            "logicalName": "createdby",
+            "schemaName": "CreatedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyname",
+            "schemaName": "CreatedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyyominame",
+            "schemaName": "CreatedByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdon",
+            "schemaName": "CreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfby",
+            "schemaName": "CreatedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyname",
+            "schemaName": "CreatedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyyominame",
+            "schemaName": "CreatedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "exchangerate",
+            "schemaName": "ExchangeRate",
+            "type": "Decimal",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "importsequencenumber",
+            "schemaName": "ImportSequenceNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_assetmarketplaceid",
+            "schemaName": "jm1pub_AssetMarketplaceId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": true,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_currency",
+            "schemaName": "jm1pub_Currency",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_evidencesource",
+            "schemaName": "jm1pub_EvidenceSource",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_exceptionreason",
+            "schemaName": "jm1pub_ExceptionReason",
+            "type": "Memo",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_lastverifiedon",
+            "schemaName": "jm1pub_LastVerifiedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_listedprice",
+            "schemaName": "jm1pub_ListedPrice",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_listedprice_base",
+            "schemaName": "jm1pub_listedprice_Base",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_listingurl",
+            "schemaName": "jm1pub_ListingUrl",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_marketplace",
+            "schemaName": "jm1pub_Marketplace",
+            "type": "Picklist",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_marketplaceidentifier",
+            "schemaName": "jm1pub_MarketplaceIdentifier",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_marketplacename",
+            "schemaName": "jm1pub_marketplaceName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_marketplacestatus",
+            "schemaName": "jm1pub_MarketplaceStatus",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_marketplacestatusname",
+            "schemaName": "jm1pub_marketplacestatusName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_name",
+            "schemaName": "jm1pub_Name",
+            "type": "String",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": true
+          },
+          {
+            "logicalName": "jm1pub_publishingassetid",
+            "schemaName": "jm1pub_PublishingAssetId",
+            "type": "Lookup",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_publishingassetidname",
+            "schemaName": "jm1pub_PublishingAssetIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedby",
+            "schemaName": "ModifiedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyname",
+            "schemaName": "ModifiedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyyominame",
+            "schemaName": "ModifiedByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedon",
+            "schemaName": "ModifiedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfby",
+            "schemaName": "ModifiedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyname",
+            "schemaName": "ModifiedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyyominame",
+            "schemaName": "ModifiedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "overriddencreatedon",
+            "schemaName": "OverriddenCreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "ownerid",
+            "schemaName": "OwnerId",
+            "type": "Owner",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridname",
+            "schemaName": "OwnerIdName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridtype",
+            "schemaName": "OwnerIdType",
+            "type": "EntityName",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridyominame",
+            "schemaName": "OwnerIdYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunit",
+            "schemaName": "OwningBusinessUnit",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunitname",
+            "schemaName": "OwningBusinessUnitName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningteam",
+            "schemaName": "OwningTeam",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owninguser",
+            "schemaName": "OwningUser",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecode",
+            "schemaName": "statecode",
+            "type": "State",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecodename",
+            "schemaName": "statecodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscode",
+            "schemaName": "statuscode",
+            "type": "Status",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscodename",
+            "schemaName": "statuscodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "timezoneruleversionnumber",
+            "schemaName": "TimeZoneRuleVersionNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "transactioncurrencyid",
+            "schemaName": "TransactionCurrencyId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "transactioncurrencyidname",
+            "schemaName": "TransactionCurrencyIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "utcconversiontimezonecode",
+            "schemaName": "UTCConversionTimeZoneCode",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "versionnumber",
+            "schemaName": "VersionNumber",
+            "type": "BigInt",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          }
+        ],
+        "attributeReadError": null,
+        "manyToOneRelationships": [
+          {
+            "MetadataId": "5f1d3231-ae79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "lk_jm1pub_assetmarketplace_createdby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdby",
+            "ReferencingEntity": "jm1pub_assetmarketplace"
+          },
+          {
+            "MetadataId": "651d3231-ae79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "lk_jm1pub_assetmarketplace_createdonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdonbehalfby",
+            "ReferencingEntity": "jm1pub_assetmarketplace"
+          },
+          {
+            "MetadataId": "6b1d3231-ae79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "lk_jm1pub_assetmarketplace_modifiedby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedby",
+            "ReferencingEntity": "jm1pub_assetmarketplace"
+          },
+          {
+            "MetadataId": "711d3231-ae79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "lk_jm1pub_assetmarketplace_modifiedonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedonbehalfby",
+            "ReferencingEntity": "jm1pub_assetmarketplace"
+          },
+          {
+            "MetadataId": "831d3231-ae79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "user_jm1pub_assetmarketplace",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "owninguser",
+            "ReferencingEntity": "jm1pub_assetmarketplace"
+          },
+          {
+            "MetadataId": "8a1d3231-ae79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "team_jm1pub_assetmarketplace",
+            "ReferencedAttribute": "teamid",
+            "ReferencedEntity": "team",
+            "ReferencingAttribute": "owningteam",
+            "ReferencingEntity": "jm1pub_assetmarketplace"
+          },
+          {
+            "MetadataId": "8f1d3231-ae79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "owner_jm1pub_assetmarketplace",
+            "ReferencedAttribute": "ownerid",
+            "ReferencedEntity": "owner",
+            "ReferencingAttribute": "ownerid",
+            "ReferencingEntity": "jm1pub_assetmarketplace"
+          },
+          {
+            "MetadataId": "931d3231-ae79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "business_unit_jm1pub_assetmarketplace",
+            "ReferencedAttribute": "businessunitid",
+            "ReferencedEntity": "businessunit",
+            "ReferencingAttribute": "owningbusinessunit",
+            "ReferencingEntity": "jm1pub_assetmarketplace"
+          },
+          {
+            "MetadataId": "6b8a6a91-af79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "jm1pub_publishingasset_assetmarketplace",
+            "ReferencedAttribute": "jm1pub_publishingassetid",
+            "ReferencedEntity": "jm1pub_publishingasset",
+            "ReferencingAttribute": "jm1pub_publishingassetid",
+            "ReferencingEntity": "jm1pub_assetmarketplace"
+          },
+          {
+            "MetadataId": "2a50e1a5-af79-f111-ab0e-7ced8d6f5566",
+            "SchemaName": "TransactionCurrency_jm1pub_AssetMarketplace",
+            "ReferencedAttribute": "transactioncurrencyid",
+            "ReferencedEntity": "transactioncurrency",
+            "ReferencingAttribute": "transactioncurrencyid",
+            "ReferencingEntity": "jm1pub_assetmarketplace"
+          }
+        ],
+        "relationshipReadError": null,
+        "keys": [],
+        "keyReadError": null
       }
     ]
   }

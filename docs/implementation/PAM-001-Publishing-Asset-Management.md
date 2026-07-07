@@ -1,10 +1,10 @@
 # PAM-001 - Publishing Asset Management
 
-**Classification:** Enterprise Foundation Program  
-**Status:** CANON-CANDIDATE - Jackie-approved direction, pending final canon promotion  
-**Primary Home:** Implementation HQ / JM1 Publishing / PAM  
-**Authority:** CANON-CANDIDATE v1.2; Architecture Packet LOCKED 2026-06-27; DO-001 CANON; Jackie correction 2026-07-06  
-**Approval Authority:** Jackie Smith Jr.  
+**Classification:** Enterprise Foundation Program
+**Status:** CANON - JM1-Dev foundation operational; migration staging operational
+**Primary Home:** Implementation HQ / JM1 Publishing / PAM
+**Authority:** CANON-CANDIDATE v1.2; Architecture Packet LOCKED 2026-06-27; DO-001 CANON; Jackie correction 2026-07-06; Jackie canon promotion and IS-009 build authorization
+**Approval Authority:** Jackie Smith Jr.
 **Doctrine:** Model output is recommendation. Jackie approval creates canon. Logged execution creates operational truth.
 
 ## Mission
@@ -158,6 +158,20 @@ Asset Health Score should be calculated after the registry is populated. A missi
 
 Create the canonical asset registry model and populate staged registry records from governed migration sources.
 
+Current operational state:
+
+- JM1-Dev baseline remediated with canonical `jm1pub_contract` and `jm1_executionlog`.
+- IS-009 tables deployed:
+  - `jm1pub_publishingasset`
+  - `jm1pub_assetmarketplace`
+- Migration staging engine operational:
+  - `scripts/is009_stage_registry.py`
+  - `data/is009-publishing-asset-staging.json`
+- Staging health engine operational:
+  - `scripts/is009_assess_registry_health.py`
+  - `data/is009-publishing-asset-health.json`
+  - `docs/implementation/PAM-001-Enterprise-Asset-Registry-Dashboard.md`
+
 ### PAM-002 - Backlist Consolidation
 
 Inventory and reconcile legacy backlist, active-project, and pre-pipeline folders into the asset registry without moving files until separately approved.
@@ -235,21 +249,21 @@ Calculate asset health and produce the first enterprise asset health dashboard.
 | `PAM_EDITION_SUPERSEDED` | Prior edition marked non-current |
 | `PAM_ASSET_RETIRED` | Asset marked retired |
 
-## Open Decisions Before Build
+## Open Decisions Before Import / Promotion
 
 | Decision | Owner | Status |
 | --- | --- | --- |
-| Confirm final Dataverse publisher prefix and solution container for PAM tables | Jackie + Cody | Pending |
+| Confirm production promotion path and service-principal metadata access | Jackie + Cody | Pending |
 | Approve asset health score threshold and dashboard weighting | Jackie | Pending |
+| Approve duplicate title/format/edition handling before import | Jackie | Pending |
 | Approve file movement/consolidation after registry references are staged | Jackie | Pending |
 | Approve royalty-rule migration and live royalty automation separately | Jackie | Pending |
 
 ## Current Boundaries
 
-This canon candidate does not:
+This canon does not:
 
-- Deploy schema
-- Modify Dataverse
+- Import source data into Dataverse without a controlled import pass
 - Move SharePoint/backlist files
 - Update `books.json`
 - Run OP-000 adoption

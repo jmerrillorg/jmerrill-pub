@@ -1,10 +1,10 @@
 # IS-009 - Publishing Asset Registry Specification
 
-**Program:** PAM-001 - Publishing Asset Management  
-**Status:** Draft implementation specification; do not deploy schema yet  
-**Authority:** Jackie-approved PAM-001 architecture correction, 2026-07-06  
-**Scope:** Dataverse schema specification for Publishing Asset Registry only  
-**Boundaries:** No Dataverse modification, no file movement, no royalty/payment activity
+**Program:** PAM-001 - Publishing Asset Management
+**Status:** Approved for PAM build; JM1-Dev schema deployed and validated
+**Authority:** Jackie-approved PAM-001 architecture correction, 2026-07-06
+**Scope:** Dataverse schema specification for Publishing Asset Registry only
+**Boundaries:** Dev schema only; no file movement, no source data import, no royalty/payment activity
 
 ## 1. Purpose
 
@@ -49,6 +49,13 @@ This specification is intentionally separate from IS-001. PAM adds a missing ass
 | --- | --- |
 | `jm1pub_publishingasset` | Format / edition / ISBN-bearing asset |
 | `jm1pub_assetmarketplace` | Marketplace/distribution presence per asset |
+
+Build status:
+
+- `jm1pub_publishingasset` deployed to JM1-Dev.
+- `jm1pub_assetmarketplace` deployed to JM1-Dev.
+- `jm1pub_contract` and `jm1_executionlog` baseline gaps remediated in JM1-Dev under canonical logical names.
+- SharePoint remains the governed file layer; Dataverse stores references and metadata only.
 
 ### Future/Deferred Tables
 
@@ -273,6 +280,33 @@ Recommended key:
 13. Flag unresolved identity/contract/marketplace exceptions.
 14. Calculate first asset health baseline.
 
+Current staging status:
+
+- Migration staging engine completed source candidate generation.
+- Staging health engine completed registry readiness assessment.
+- No records were imported into Dataverse.
+- No SharePoint files were moved.
+
+Staging outputs:
+
+- `data/is009-publishing-asset-staging.json`
+- `data/is009-publishing-asset-health.json`
+- `docs/implementation/evidence/IS-009/is009-migration-staging-summary.md`
+- `docs/implementation/PAM-001-Enterprise-Asset-Registry-Dashboard.md`
+
+Current candidate counts:
+
+| Candidate | Count |
+| --- | ---: |
+| Title candidates | 162 |
+| Publishing asset candidates | 295 |
+| Asset marketplace candidates | 537 |
+| Assets with ISBN | 293 |
+| Assets without ISBN | 2 |
+| Duplicate ISBNs with conflicting titles | 0 |
+| Titles missing author evidence | 26 |
+| Marketplace candidates missing identifier | 52 |
+
 ## 9. Validation Checklist
 
 - `jm1pub_contract` remains the only agreement / contract basis for this model.
@@ -286,12 +320,38 @@ Recommended key:
 - No files are moved.
 - No schema is deployed until separately authorized.
 
-## 10. Open Blockers
+## 10. Remaining Decisions / Blockers
 
 | Blocker | Reason |
 | --- | --- |
-| Final Dataverse solution container not selected | Required before build packaging. |
-| `jm1pub_title` live field inventory must be read before extensions | Avoid duplicate or conflicting fields. |
 | Asset health threshold not approved | Needed before automated health flags become operational. |
 | File consolidation approval not granted | Plan stores references only; no SharePoint movement. |
 | Royalty-rule migration not authorized | PAM can link future royalty rules but does not create royalty automation. |
+| Service-principal metadata access | Delegated Azure CLI metadata access completed build/readback; service-principal path still needs hardening for unattended automation. |
+
+## 11. Build Evidence
+
+Deployment evidence:
+
+- `scripts/is009_deploy_schema.mjs`
+- `docs/implementation/evidence/IS-009/is009-schema-deployment-evidence.json`
+- `docs/implementation/evidence/IS-009/is009-readiness-evidence.json`
+- `docs/implementation/IS-009-Dataverse-Live-Inventory-Summary.md`
+
+Final readback confirmed:
+
+- Existing canonical tables: Contact, `jm1pub_contract`, `jm1pub_title`, `jm1_executionlog`
+- New PAM tables: `jm1pub_publishingasset`, `jm1pub_assetmarketplace`
+- Required relationships:
+  - `jm1pub_publishingasset.jm1pub_titleid`
+  - `jm1pub_publishingasset.jm1pub_contractid`
+  - `jm1pub_assetmarketplace.jm1pub_publishingassetid`
+
+Migration/health evidence:
+
+- `scripts/is009_stage_registry.py`
+- `scripts/is009_assess_registry_health.py`
+- `data/is009-publishing-asset-staging.json`
+- `data/is009-publishing-asset-health.json`
+- `docs/implementation/evidence/IS-009/is009-migration-staging-summary.md`
+- `docs/implementation/PAM-001-Enterprise-Asset-Registry-Dashboard.md`

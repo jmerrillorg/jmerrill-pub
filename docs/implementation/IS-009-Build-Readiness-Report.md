@@ -1,14 +1,14 @@
 # IS-009 - Build Readiness Report
 
-**Program:** PAM-001 - Publishing Asset Management  
-**Specification:** `IS-009-Publishing-Asset-Registry-Specification.md`  
-**Status:** Readiness prepared; build not authorized  
-**Generated:** 2026-07-06 / 2026-07-07 UTC evidence timestamp  
-**Boundary:** No schema deployment, no Dataverse modification, no file movement, no data import, no royalty/payment activity  
+**Program:** PAM-001 - Publishing Asset Management
+**Specification:** `IS-009-Publishing-Asset-Registry-Specification.md`
+**Status:** Build readiness complete; Dev schema deployed and validated
+**Generated:** 2026-07-06 / 2026-07-07 UTC evidence timestamp
+**Boundary:** JM1-Dev schema deployment only; no file movement, no data import, no royalty/payment activity
 
 ## Executive Summary
 
-IS-009 build planning is materially advanced but not yet ready for schema build authorization.
+IS-009 build planning is complete and the authorized JM1-Dev build has been deployed.
 
 Completed:
 
@@ -17,23 +17,31 @@ Completed:
 - Schema deployment plan was prepared.
 - Migration validation checklist was prepared.
 - Jackie-only blockers were identified.
+- Migration staging engine was built and run.
+- Registry health/readiness engine was built and run.
 
 Completed after access repair:
 
 - Live Dataverse metadata inventory was completed with a delegated Azure CLI Dataverse token against JM1-Dev / `org52409ff2.crm.dynamics.com`.
 - Proposed IS-009 table conflict check was completed.
 
-Blocked before build:
+Resolved during build:
 
-- `jm1pub_contract` is canonical but does not exist in JM1-Dev under that logical name.
-- `jm1_executionlog` does not exist in JM1-Dev under that logical name.
-- The client-credential/app-setting Dataverse token path still fails with `dataverse_token_failed:400`; delegated Azure CLI access was used for readiness inventory only.
+- `jm1pub_contract` was seeded into JM1-Dev under the canonical logical name.
+- `jm1_executionlog` was seeded into JM1-Dev under the canonical logical name.
+- `jm1pub_publishingasset` was created in JM1-Dev.
+- `jm1pub_assetmarketplace` was created in JM1-Dev.
+- Required PAM fields and lookup relationships were created and validated by metadata readback.
+
+Known remaining platform note:
+
+- The client-credential/app-setting Dataverse token path previously failed with `dataverse_token_failed:400`; delegated Azure CLI access was used for readiness/build inventory. Service-principal automation hardening remains a follow-up before unattended production promotion.
 
 Recommendation:
 
-- Do not authorize IS-009 schema build yet.
-- Resolve the JM1-Dev baseline dependency for `jm1pub_contract` and `jm1_executionlog`, or explicitly approve how IS-009 should proceed without those canon dependencies present.
-- Repair service-principal/client-credential metadata access before relying on automation for future inventory runs.
+- Treat IS-009 Dev schema build as complete.
+- Proceed to migration-engine staging/validation against frozen source files.
+- Repair service-principal/client-credential metadata access before relying on unattended automation for future inventory runs.
 
 ## 1. Source Freeze Report
 
@@ -97,16 +105,16 @@ App settings confirmed by name only:
 - `DATAVERSE_RESOURCE_URL`
 - `DATAVERSE_WEB_API_BASE_URL`
 
-Inventory summary:
+Inventory summary after authorized build:
 
 | Logical Name | Result | Entity Set | Attributes | Relationships | Keys |
 | --- | --- | --- | ---: | ---: | ---: |
 | `contact` | Exists | `contacts` | 320 | 20 | 0 |
-| `jm1pub_contract` | Missing | - | 0 | 0 | 0 |
-| `jm1pub_title` | Exists | `jm1pub_titles` | 33 | 8 | 0 |
-| `jm1_executionlog` | Missing | - | 0 | 0 | 0 |
-| `jm1pub_publishingasset` | Missing | - | 0 | 0 | 0 |
-| `jm1pub_assetmarketplace` | Missing | - | 0 | 0 | 0 |
+| `jm1pub_contract` | Exists | `jm1pub_contracts` | 58 | Readback validated | 0 |
+| `jm1pub_title` | Exists | `jm1pub_titles` | 38 | Readback validated | 0 |
+| `jm1_executionlog` | Exists | `jm1_executionlogs` | 50 | Readback validated | 0 |
+| `jm1pub_publishingasset` | Exists | `jm1pub_publishingassets` | 75 | Readback validated | 0 |
+| `jm1pub_assetmarketplace` | Exists | `jm1pub_assetmarketplaces` | 50 | Readback validated | 0 |
 
 Nearby table findings:
 
@@ -116,19 +124,94 @@ Nearby table findings:
 
 ## 3. Schema Conflict Check
 
-Conflict check result:
+Conflict check result after authorized build:
 
 | Proposed Artifact | Conflict Question | Status |
 | --- | --- | --- |
-| `jm1pub_publishingasset` table | Does a table with this logical name already exist? | No existing conflict found |
-| `jm1pub_assetmarketplace` table | Does a table with this logical name already exist? | No existing conflict found |
-| `jm1pub_title.jm1pub_assetregistrystatus` | Does equivalent status field already exist? | Missing; no conflict found |
-| `jm1pub_title.jm1pub_assetregistrylastverifiedon` | Does equivalent Last Verified field already exist? | Missing; no conflict found |
-| `jm1pub_title.jm1pub_certifiedimprint` | Does equivalent certified imprint field already exist? | Missing; no conflict found |
-| `jm1pub_publishingasset` -> `jm1pub_contract` lookup | Can contract lookup be created? | Blocked until `jm1pub_contract` exists in JM1-Dev |
-| Execution logging | Can PAM use `jm1_executionlog`? | Blocked until `jm1_executionlog` exists or Jackie approves `jm1_executionevent` as this environment's proof layer |
+| `jm1pub_publishingasset` table | Does a table with this logical name already exist? | Created and validated |
+| `jm1pub_assetmarketplace` table | Does a table with this logical name already exist? | Created and validated |
+| `jm1pub_title.jm1pub_assetregistrystatus` | Does equivalent status field already exist? | Created and validated |
+| `jm1pub_title.jm1pub_assetregistrylastverifiedon` | Does equivalent Last Verified field already exist? | Created and validated |
+| `jm1pub_title.jm1pub_certifiedimprint` | Does equivalent certified imprint field already exist? | Created and validated |
+| `jm1pub_publishingasset` -> `jm1pub_contract` lookup | Can contract lookup be created? | Created and validated |
+| Execution logging | Can PAM use `jm1_executionlog`? | `jm1_executionlog` created and validated |
 
-Do not create schema until the contract/log baseline dependency is resolved.
+No logical-name conflicts remain in JM1-Dev for the IS-009 schema.
+
+## 3.1 Build Evidence
+
+Build artifacts:
+
+- `scripts/is009_deploy_schema.mjs`
+- `docs/implementation/evidence/IS-009/is009-schema-deployment-evidence.json`
+- `docs/implementation/evidence/IS-009/is009-readiness-evidence.json`
+- `artifacts/is009-baseline/JM1_PAM_BaselinePrerequisites_unmanaged.zip`
+
+Baseline package hash:
+
+- `JM1_PAM_BaselinePrerequisites_unmanaged.zip`
+- SHA-256: `1ae8fe8bf8ac30ee7c7fc7d011e8816c8e283fd96d749dc9cde0813c66ea624f`
+
+Important finding:
+
+- The filtered Core solution import failed because it pulled Sales/Opportunity package dependencies plus AI/editorial dependencies.
+- To preserve canon without importing those broad packages, JM1-Dev was seeded with same-logical-name baseline components from canon/Core metadata:
+  - `jm1pub_contract`
+  - `jm1_executionlog`
+- This is not a substitution with `jm1_executionevent`; PAM continues to use `jm1_executionlog`.
+
+Readback validation passed for:
+
+- `jm1pub_contract.jm1pub_title`
+- `jm1_executionlog.jm1_actiontype`
+- `jm1_executionlog.jm1_executionstatus`
+- `jm1pub_title.jm1pub_certifiedimprint`
+- `jm1pub_title.jm1pub_assetregistrystatus`
+- `jm1pub_publishingasset.jm1pub_titleid`
+- `jm1pub_publishingasset.jm1pub_contractid`
+- `jm1pub_publishingasset.jm1pub_assetformat`
+- `jm1pub_assetmarketplace.jm1pub_publishingassetid`
+- `jm1pub_assetmarketplace.jm1pub_marketplace`
+
+## 3.2 Migration Engine Evidence
+
+Staging engine:
+
+- Script: `scripts/is009_stage_registry.py`
+- Output: `data/is009-publishing-asset-staging.json`
+- Summary: `docs/implementation/evidence/IS-009/is009-migration-staging-summary.md`
+
+Staging result:
+
+| Metric | Value |
+| --- | ---: |
+| Title candidates | 162 |
+| Publishing asset candidates | 295 |
+| Asset marketplace candidates | 537 |
+| Assets with ISBN | 293 |
+| Assets without ISBN | 2 |
+| Marketplace candidates missing identifier | 52 |
+| Duplicate ISBNs with conflicting titles | 0 |
+| Titles missing author evidence | 26 |
+
+Health engine:
+
+- Script: `scripts/is009_assess_registry_health.py`
+- Output: `data/is009-publishing-asset-health.json`
+- Dashboard: `docs/implementation/PAM-001-Enterprise-Asset-Registry-Dashboard.md`
+
+Health result:
+
+| Metric | Value |
+| --- | ---: |
+| Assets with title link | 100.0% |
+| Assets with ISBN | 99.32% |
+| Assets with author evidence | 63.39% |
+| Assets with format | 100.0% |
+| Marketplace rows with identifier | 90.32% |
+| Duplicate ISBN conflicts | 0 |
+
+No source data was imported into Dataverse during staging/health assessment.
 
 ## 4. Schema Deployment Plan
 
@@ -139,19 +222,19 @@ Target approach:
 3. SHA-256 the baseline export and store evidence.
 4. Complete live metadata inventory.
 5. Reconcile proposed IS-009 fields against live inventory.
-6. Build in Dev only after Jackie authorizes schema build.
-7. Create or reuse `jm1pub_publishingasset`.
-8. Create or reuse `jm1pub_assetmarketplace`.
-9. Add only missing `jm1pub_title` fields if no equivalent fields exist.
-10. Add relationships:
+6. Build in Dev only after Jackie authorizes schema build. Completed.
+7. Create or reuse `jm1pub_publishingasset`. Completed.
+8. Create or reuse `jm1pub_assetmarketplace`. Completed.
+9. Add only missing `jm1pub_title` fields if no equivalent fields exist. Completed.
+10. Add relationships. Completed:
     - `jm1pub_publishingasset` -> `jm1pub_title`
     - `jm1pub_publishingasset` -> `jm1pub_contract`
     - `jm1pub_assetmarketplace` -> `jm1pub_publishingasset`
-11. Add choice sets.
-12. Add alternate keys only if live data/null behavior supports them.
-13. Publish customizations.
-14. Validate table readback, field readback, relationship readback, and choice values.
-15. Package deployment evidence.
+11. Add choice sets. Completed as local choices.
+12. Add alternate keys only if live data/null behavior supports them. Deferred until migration duplicate profile is known.
+13. Publish customizations. Completed.
+14. Validate table readback, field readback, relationship readback, and choice values. Completed.
+15. Package deployment evidence. Completed.
 
 Rollback plan:
 
@@ -242,14 +325,11 @@ Post-import:
 - File references point to SharePoint evidence and do not move files.
 - Exceptions are captured for missing format, missing title, conflicting title/ISBN, and missing marketplace identifiers.
 
-## 7. Jackie-Only Blockers
+## 7. Remaining Jackie-Only Blockers / Decisions
 
 | Blocker | Required Decision |
 | --- | --- |
-| `jm1pub_contract` missing in JM1-Dev | Decide whether to seed/import the canonical contract table before IS-009 build or select another authorized target environment. |
-| `jm1_executionlog` missing in JM1-Dev | Decide whether to seed/import the canonical execution log table, or approve `jm1_executionevent` as the Dev readiness proof layer for IS-009. |
-| Client-credential metadata access still failing | Decide whether to repair the service principal/app setting values for automation use. Delegated Azure CLI access completed the readiness inventory but is not an automation credential. |
-| Final solution container | Select solution name/publisher/target environment for PAM build. |
+| Client-credential metadata access still failing | Repair the service principal/app setting values before unattended automation/promotion. Delegated Azure CLI access completed readiness/build inventory but is not an automation credential. |
 | Asset health threshold | Approve score threshold and weighting before health automation. |
 | Title/format duplicate rules | Decide how to handle similar editions, revised editions, and title variants. |
 | Contract evidence ambiguity | Decide how strict evidence must be before linking a contract to title/assets. |
@@ -258,16 +338,11 @@ Post-import:
 
 ## 8. Readiness Recommendation
 
-IS-009 is not yet ready for schema build authorization.
+IS-009 Dev schema build is operationally ready for migration-engine staging.
 
 Recommended next step:
 
-1. Resolve the missing `jm1pub_contract` and `jm1_executionlog` baseline dependency in JM1-Dev, or select a target environment where those canon tables exist.
-2. Repair client-credential metadata access for repeatable automation, or explicitly approve delegated Azure CLI inventory as sufficient for build planning.
-3. Rerun the readiness script after baseline repair.
-4. Then request build authorization.
-
-Baseline remediation plan:
-
-- See `IS-009-JM1-Dev-Baseline-Remediation-Plan.md`.
-- Recommendation: create a minimal filtered `JM1_PAM_BaselinePrerequisites` solution from JM1-Core and import only the required `jm1pub_contract` and `jm1_executionlog` metadata/dependencies into JM1-Dev before IS-009 build.
+1. Build migration staging/validation scripts from the frozen workbook, Bowker, Ingram/LSI, and asset listing sources.
+2. Produce staged source profiles without importing production data.
+3. Validate title/ISBN/format/marketplace matching rules.
+4. Use staged exceptions to finalize duplicate/health thresholds before any broad data import.

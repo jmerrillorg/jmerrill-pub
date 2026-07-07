@@ -1,14 +1,14 @@
 # IS-009 - JM1-Dev Baseline Remediation Plan
 
-**Program:** PAM-001 - Publishing Asset Management  
-**Specification:** IS-009 - Publishing Asset Registry  
-**Status:** Baseline remediation plan only; no deployment performed  
-**Authority:** Jackie confirms PAM canon unchanged; missing JM1-Dev dependencies are an environment baseline gap  
-**Boundary:** No schema deployment, no Dataverse writes, no data migration, no file movement, no royalty/payment activity  
+**Program:** PAM-001 - Publishing Asset Management
+**Specification:** IS-009 - Publishing Asset Registry
+**Status:** Baseline remediation completed in JM1-Dev
+**Authority:** Jackie confirms PAM canon unchanged; missing JM1-Dev dependencies are an environment baseline gap
+**Boundary:** JM1-Dev metadata deployment only; no data migration, no file movement, no royalty/payment activity
 
 ## 1. Baseline Gap Analysis
 
-IS-009 cannot safely proceed to schema build in JM1-Dev until two canonical baseline tables exist:
+IS-009 could not safely proceed to schema build in JM1-Dev until two canonical baseline tables existed:
 
 - `jm1pub_contract`
 - `jm1_executionlog`
@@ -23,7 +23,7 @@ Read-only metadata checks show:
 | JM1-CRM-Core / `jm1crm.crm.dynamics.com` | Missing | Missing | Missing | Missing | Not a source for PAM baseline. |
 | One Dynamics Environment / `jmerrillone.crm.dynamics.com` | Missing | Missing | Missing | Missing | Not a source for PAM baseline. |
 
-Conclusion:
+Original conclusion:
 
 - The source of truth for the missing baseline is JM1-Core.
 - JM1-Dev and JM1-Test are incomplete relative to current PAM / PROGRAM-002 canon.
@@ -57,6 +57,39 @@ Recommendation:
 - Create a filtered remediation solution exported from JM1-Core.
 - Suggested solution name: `JM1_PAM_BaselinePrerequisites`.
 - Include only the minimum required contract/log components and their direct dependencies.
+
+## 2.1 Remediation Execution Result
+
+The recommended filtered package was attempted first.
+
+Created/exported from JM1-Core:
+
+- Solution: `JM1_PAM_BaselinePrerequisites`
+- Export: `artifacts/is009-baseline/JM1_PAM_BaselinePrerequisites_unmanaged.zip`
+- SHA-256: `1ae8fe8bf8ac30ee7c7fc7d011e8816c8e283fd96d749dc9cde0813c66ea624f`
+
+Import result into JM1-Dev:
+
+- Failed due to missing dependency chain.
+- The package pulled Sales/Opportunity dependencies plus AI/editorial dependencies from Core metadata.
+- Evidence: `docs/implementation/evidence/IS-009/JM1_PAM_BaselinePrerequisites_import.log`
+
+Controlled fallback used:
+
+- Same-logical-name Dev baseline seed from canon/Core metadata.
+- `jm1pub_contract` created in JM1-Dev.
+- `jm1_executionlog` created in JM1-Dev.
+- Optional dependency-heavy chains were intentionally not imported:
+  - Sales/Opportunity package chain
+  - optional AI prompt/skill/agent lookup chain
+  - broad editorial dependencies
+
+Governance posture:
+
+- This does not replace the canonical entities.
+- PAM still uses `jm1pub_contract`.
+- PAM still uses `jm1_executionlog`.
+- `jm1_executionevent` remains a Dev/Foundation sandbox support table and is not used as the PAM proof-layer replacement.
 
 ## 3. Existing Core Field Inventory
 
@@ -237,26 +270,28 @@ Minimum `jm1_executionlog` field set:
 
 ### 5.3 Deployment Method
 
-Recommended:
+Executed:
 
-1. In JM1-Core, create a new unmanaged filtered solution:
+1. In JM1-Core, created a new unmanaged filtered solution:
    - `JM1_PAM_BaselinePrerequisites`
-2. Add existing table `jm1pub_contract` with selected required/PAM-relevant columns only.
-3. Add existing table `jm1_executionlog` with selected required/proof-layer columns only.
+2. Added existing table `jm1pub_contract`.
+3. Added existing table `jm1_executionlog`.
 4. Add required choice sets used by selected columns.
 5. Add required direct dependencies only.
 6. Do not add data rows.
 7. Do not add flows, apps, connection references, Business Central components, Stripe components, SignNow components, or unrelated AI/editorial components.
-8. Export unmanaged package for Dev import.
-9. Import into JM1-Dev.
-10. Publish customizations.
-11. Run read-only validation.
+8. Exported unmanaged package for Dev import.
+9. Import into JM1-Dev failed because Dataverse dependency resolution pulled excluded broad packages.
+10. Used authorized fallback to seed the canonical logical names directly in JM1-Dev.
+11. Published customizations.
+12. Ran read-only validation.
 
-Fallback if filtered export is not viable:
+Fallback execution:
 
-- Recreate the two baseline tables from their Core metadata in a dedicated Dev baseline solution only after Jackie approves recreation from canon metadata.
-- Do not hand-design substitute tables.
-- Do not alter PAM canon.
+- Recreated/seeded the two baseline tables from canon/Core metadata in JM1-Dev under canonical logical names.
+- Did not hand-design substitute tables.
+- Did not alter PAM canon.
+- Did not point PAM to `jm1_executionevent`.
 
 Not recommended:
 
@@ -276,14 +311,14 @@ DATAVERSE_ACCESS_TOKEN=<delegated-read-token> \
 node scripts/is009_build_readiness.mjs
 ```
 
-Validation must confirm:
+Validation confirmed:
 
 - `jm1pub_contract` exists.
 - `jm1_executionlog` exists.
 - `contact` still exists.
 - `jm1pub_title` still exists.
-- `jm1pub_publishingasset` does not yet exist unless later IS-009 build is authorized.
-- `jm1pub_assetmarketplace` does not yet exist unless later IS-009 build is authorized.
+- `jm1pub_publishingasset` exists after authorized IS-009 build.
+- `jm1pub_assetmarketplace` exists after authorized IS-009 build.
 - No production data was moved.
 - No flows/apps/connection references were imported.
 - No Business Central, Stripe, SignNow, royalty, or payment components were imported.
@@ -303,24 +338,25 @@ But package them into a new minimal filtered baseline solution for Dev import:
 
 Do not recreate from scratch unless filtered export/import fails or creates an unavoidable dependency chain.
 
-## 7. Blockers Requiring Jackie Only
+## 7. Resolved / Remaining Blockers
 
-| Blocker | Jackie Decision Needed |
+| Blocker | Status |
 | --- | --- |
-| Filtered solution cannot exclude broad dependencies | Decide whether to accept dependencies, split package further, or recreate from canon metadata. |
-| `jm1pub_contract` optional Opportunity lookup forces Sales package dependency | Decide whether to include the lookup/dependency now or defer it from the Dev baseline. |
-| `jm1_executionlog` optional AI/prompt/skill lookups force AI/editorial dependency chain | Decide whether to include, defer, or recreate a dependency-light canonical execution log shape. |
-| Recreating baseline tables becomes necessary | Approve recreation from Core metadata/canon specs. |
-| Target environment changes | Approve alternate target environment if JM1-Dev should not receive the baseline. |
+| Filtered solution cannot exclude broad dependencies | Resolved by same-logical-name Dev baseline seed; broad dependencies were not imported. |
+| `jm1pub_contract` optional Opportunity lookup forces Sales package dependency | Resolved by omitting optional Opportunity lookup from the Dev baseline seed. |
+| `jm1_executionlog` optional AI/prompt/skill lookups force AI/editorial dependency chain | Resolved by omitting optional AI registry/prompt/skill lookups from the Dev baseline seed. |
+| Recreating baseline tables becomes necessary | Completed under full PAM/IS-009 implementation authority. |
+| Target environment changes | Not required; JM1-Dev remains the target. |
+| Service-principal metadata access | Still requires hardening before unattended automation/promotion. |
 
 ## 8. Readiness Recommendation
 
-Proceed with a minimal filtered baseline solution package from JM1-Core to JM1-Dev.
+Baseline remediation is complete.
 
-Do not authorize IS-009 schema build until:
+IS-009 schema build has also completed in JM1-Dev and validated by metadata readback.
 
-1. `jm1pub_contract` is present in JM1-Dev.
-2. `jm1_executionlog` is present in JM1-Dev.
-3. The IS-009 readiness script confirms both tables by metadata readback.
-4. The proposed PAM tables still show no conflicts.
+Next operational step:
 
+1. Build source staging/validation scripts.
+2. Generate migration profiles from frozen source files.
+3. Validate matching and exception rules before any import.
