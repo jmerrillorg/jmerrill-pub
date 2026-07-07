@@ -20,6 +20,7 @@
 
 | Metric | Value |
 | --- | ---: |
+| Intellectual Works represented | 162 |
 | Titles created | 113 |
 | Titles reused | 49 |
 | Titles updated | 49 |
@@ -102,3 +103,5 @@ Operational health threshold:
 
 - `docs/implementation/evidence/IS-009/is009-registry-import-evidence.json`
 - `docs/implementation/evidence/IS-009/is009-registry-operational-validation.json`
+- `docs/implementation/PAM-001-Operational-Certification-Report.md`
+- `docs/implementation/JM-Publishing-Enterprise-Command-Center.md`
