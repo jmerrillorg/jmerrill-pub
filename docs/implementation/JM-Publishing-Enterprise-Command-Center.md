@@ -23,8 +23,8 @@ J Merrill Publishing is operating inside PROGRAM-002 with Enterprise Adoption co
 
 | Metric | Value | Count | Status |
 | --- | ---: | --- | --- |
-| Existing Enterprise Health baseline | 64.84% | composite | Active, Batch 1 complete |
-| Imprint Certified | 75.41% | 92/122 | Active queue |
+| Existing Enterprise Health baseline | 67.12% | composite | Active, Master Register applied |
+| Imprint Certified | 83.61% | 102/122 | Active queue |
 | Metadata Complete | 98.36% | 120/122 | Strong |
 | Workspace Complete | 100.00% | 72/72 | Certified |
 | Contracts Linked | 0.00% | 0/122 | Reconciliation queue |
@@ -68,8 +68,8 @@ J Merrill Publishing is operating inside PROGRAM-002 with Enterprise Adoption co
 
 | Queue | Count / Status | Next Action |
 | --- | ---: | --- |
-| Publisher Imprint Review | 29 | Continue remaining Publisher queue |
-| JM Signature Review | 1 | Publisher decision for A Portrait of Paradise |
+| Publisher Imprint Review | 20 | Resolve pending manuscript, author reconciliation, and title-anchor queues |
+| JM Signature Review | 0 | Cleared by Publisher Master Register |
 | Contract Reconciliation | 122 | Locate/link historical agreements |
 | Stripe Migration | 71 / provisional | Validate canonical author roster, then migrate |
 | Royalty Readiness | 71 / provisional | Prepare after Stripe/contact/title readiness |
@@ -109,6 +109,6 @@ Rationale:
 | Production promotion path | Decide when JM1-Dev PAM registry should be promoted beyond Dev |
 | PAM-002 file movement | Approve any SharePoint/backlist consolidation or movement |
 | JM Signature review | Decide A Portrait of Paradise imprint status |
-| Imprint review cleanup | Continue remaining Publisher queue and decide A Portrait of Paradise |
+| Imprint review cleanup | Resolve 9 pending manuscript/imprint rows, 3 author reconciliation rows, and 4 title-anchor rows |
 | Contract evidence standard | Decide acceptable evidence threshold for linking historical contracts |
 | Royalty automation go-live | Separate approval before live royalty calculations/payments |

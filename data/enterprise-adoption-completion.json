@@ -3393,5 +3393,588 @@
       "IMPRINT_PUBLISHER_APPROVED",
       "IMPRINT_LOCKED"
     ]
+  },
+  "publisherMasterImprintRegister": {
+    "source": "Jackie Publisher Master Imprint Register Update",
+    "updatedAt": "2026-07-07T00:00:00-04:00",
+    "rows": [
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Carolyn Booker-Pierce",
+        "sourceTitle": "Abortion!",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "abortion",
+        "matchedCatalogTitle": "Abortion!",
+        "matchedCatalogAuthor": "Toni Kleckley",
+        "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Carolyn Booker-Pierce",
+        "sourceTitle": "Because the Lord Is My Shepherd",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "because-the-lord-is-my-shepherd",
+        "matchedCatalogTitle": "Because the Lord Is My Shepherd",
+        "matchedCatalogAuthor": "Rodney Waller",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Because the Lord Is My Shepherd",
+          "author": "Rodney Waller",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Agape International Cathedral",
+        "sourceTitle": "Delicious Ideas!",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "delicious-ideas",
+        "matchedCatalogTitle": "Delicious Ideas!",
+        "matchedCatalogAuthor": "Pamela Smith",
+        "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Sean Smith, Sr.",
+        "sourceTitle": "Destined to Break the Curse",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "destined-to-break-the-curse",
+        "matchedCatalogTitle": "Destined to Break the Curse",
+        "matchedCatalogAuthor": "Sean Smith, Sr.",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Destined to Break the Curse",
+          "author": "Sean Smith, Sr.",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOCKED"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Karen Hill",
+        "sourceTitle": "From Stylist to CEO",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "from-stylist-to-ceo",
+        "matchedCatalogTitle": "From Stylist to CEO",
+        "matchedCatalogAuthor": "Kelli Milligan Stammen",
+        "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Carolyn Booker-Pierce",
+        "sourceTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+        "matchedCatalogTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+        "matchedCatalogAuthor": "Carolyn Booker-Pierce",
+        "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Jaylonna Stevette",
+        "sourceTitle": "Have You Considered My Servant?",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "have-you-considered-my-servant",
+        "matchedCatalogTitle": "Have You Considered My Servant?",
+        "matchedCatalogAuthor": "Obadiah E. Harris",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Have You Considered My Servant?",
+          "author": "Obadiah E. Harris",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "KD Heard",
+        "sourceTitle": "Inner Peace Through Life's Storms",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "inner-peace-through-life-s-storms",
+        "matchedCatalogTitle": "Inner Peace Through Life's Storms",
+        "matchedCatalogAuthor": "Rosetta Perry",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Inner Peace Through Life's Storms",
+          "author": "Rosetta Perry",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Deborah Eiland",
+        "sourceTitle": "Jalen Becomes a Big Brother",
+        "sourceImprintLabel": "Little",
+        "normalizedImprint": "JM Little",
+        "matchedCatalogId": "jalen-becomes-a-big-brother",
+        "matchedCatalogTitle": "Jalen Becomes a Big Brother",
+        "matchedCatalogAuthor": "Deborah Eiland",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Jalen Becomes a Big Brother",
+          "author": "Deborah Eiland",
+          "recommendedImprint": "JM Little",
+          "decision": "LOCKED"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Carolyn Booker-Pierce",
+        "sourceTitle": "Loving the Addict",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "loving-the-addict",
+        "matchedCatalogTitle": "Loving the Addict",
+        "matchedCatalogAuthor": "Carolyn Booker-Pierce",
+        "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Carolyn Booker-Pierce",
+        "sourceTitle": "More Than a Village",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "more-than-a-village",
+        "matchedCatalogTitle": "More Than A Village",
+        "matchedCatalogAuthor": "Shelley McIntosh",
+        "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Jaylonna Stevette",
+        "sourceTitle": "Naughty Tales",
+        "sourceImprintLabel": "Works",
+        "normalizedImprint": "JM Works",
+        "matchedCatalogId": "naughty-tales",
+        "matchedCatalogTitle": "Naughty Tales",
+        "matchedCatalogAuthor": "Adrean Young",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Naughty Tales",
+          "author": "Adrean Young",
+          "recommendedImprint": "JM Works",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Junaita Travis",
+        "sourceTitle": "Rhyming It up with Church Stuff",
+        "sourceImprintLabel": "Verse",
+        "normalizedImprint": "JM Verse",
+        "matchedCatalogId": "rhyming-it-up-with-church-stuff",
+        "matchedCatalogTitle": "Rhyming It up with Church Stuff",
+        "matchedCatalogAuthor": "Juanita Travis",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Rhyming It up with Church Stuff",
+          "author": "Juanita Travis",
+          "recommendedImprint": "JM Little",
+          "decision": "LOCKED"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Will Harris",
+        "sourceTitle": "Taylor Made",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "taylor-made",
+        "matchedCatalogTitle": "Taylor Made",
+        "matchedCatalogAuthor": "Eryonna Barrino",
+        "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Dennis Brown",
+        "sourceTitle": "The Flame",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "the-flame",
+        "matchedCatalogTitle": "The Flame",
+        "matchedCatalogAuthor": "Veronica Brown",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "The Flame",
+          "author": "Veronica Brown",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": ".",
+        "sourceTitle": "The Paper Champ",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "the-paper-champ",
+        "matchedCatalogTitle": "The Paper Champ",
+        "matchedCatalogAuthor": "Kurt Broadnax",
+        "status": "AUTHOR_RECONCILIATION_REQUIRED",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Lyle Goddard",
+        "sourceTitle": "The Release of the Spirit",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "the-release-of-the-spirit",
+        "matchedCatalogTitle": "The Release of the Spirit",
+        "matchedCatalogAuthor": "Lyle Goddard",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "The Release of the Spirit",
+          "author": "Lyle Goddard",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOCKED"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": ".",
+        "sourceTitle": "The Sun, the Shadow, and the Silence",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "the-sun-the-shadow-and-the-silence",
+        "matchedCatalogTitle": "The Sun, the Shadow, and the Silence",
+        "matchedCatalogAuthor": "Nicky Williams",
+        "status": "AUTHOR_RECONCILIATION_REQUIRED",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Winter Dockery",
+        "sourceTitle": "War Mother",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "war-mother",
+        "matchedCatalogTitle": "War Mother",
+        "matchedCatalogAuthor": "Winter Dockery",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "War Mother",
+          "author": "Winter Dockery",
+          "recommendedImprint": "JM Works",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Shelley McIntosh",
+        "sourceTitle": "Warriors and Angels",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "warriors-and-angels",
+        "matchedCatalogTitle": "Warriors and Angels",
+        "matchedCatalogAuthor": "Shelley McIntosh",
+        "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": ".",
+        "sourceTitle": "When Zuri Came to Earth",
+        "sourceImprintLabel": "Little",
+        "normalizedImprint": "JM Little",
+        "matchedCatalogId": "when-zuri-came-to-earth",
+        "matchedCatalogTitle": "When Zuri Came to Earth",
+        "matchedCatalogAuthor": "Jaylonna Stevette",
+        "status": "AUTHOR_RECONCILIATION_REQUIRED",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Rodney Waller",
+        "sourceTitle": "Why Faith Works for Some and Not for Others",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "why-faith-works-for-some-and-not-for-others",
+        "matchedCatalogTitle": "Why Faith Works For Some And Not For Others",
+        "matchedCatalogAuthor": "Nathaniel Short",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Why Faith Works For Some And Not For Others",
+          "author": "Nathaniel Short",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Carolyn Booker-Pierce",
+        "sourceTitle": "You're Still Not Crazy",
+        "sourceImprintLabel": "",
+        "normalizedImprint": "PENDING",
+        "matchedCatalogId": "you-re-still-not-crazy",
+        "matchedCatalogTitle": "You're Still Not Crazy",
+        "matchedCatalogAuthor": "Carolyn Booker-Pierce",
+        "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Kiena Hughley",
+        "sourceTitle": "Your Peace Is a Priority",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "your-peace-is-a-priority",
+        "matchedCatalogTitle": "Your Peace Is a Priority",
+        "matchedCatalogAuthor": "Kiena Hughley",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Your Peace Is a Priority",
+          "author": "Kiena Hughley",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOCKED"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Lisa Taylor",
+        "sourceTitle": "Damaged",
+        "sourceImprintLabel": "Works",
+        "normalizedImprint": "JM Works",
+        "matchedCatalogId": "damaged",
+        "matchedCatalogTitle": "Damaged",
+        "matchedCatalogAuthor": "Taye Knox",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Damaged",
+          "author": "Taye Knox",
+          "recommendedImprint": "JM Works",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Kimberly Reeder",
+        "sourceTitle": "Girl, Did You Know...?",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "girl-did-you-know",
+        "matchedCatalogTitle": "Girl, Did You Know...?",
+        "matchedCatalogAuthor": "Kimberly Reeder",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Girl, Did You Know...?",
+          "author": "Kimberly Reeder",
+          "recommendedImprint": "Unresolved",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "j. Derrick Johnson",
+        "sourceTitle": "101 Wisdom Lessons for Life and Living",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "100-wisdom-lessons-for-life-and-living",
+        "matchedCatalogTitle": "100 Wisdom Lessons for Life and Living",
+        "matchedCatalogAuthor": "J. Derrick Johnson",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "100 Wisdom Lessons for Life and Living",
+          "author": "J. Derrick Johnson",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Will Harris",
+        "sourceTitle": "Music Ministry Unplugged",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "music-ministry-unplugged",
+        "matchedCatalogTitle": "Music Ministry Unplugged",
+        "matchedCatalogAuthor": "Dr. Will Harris",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Music Ministry Unplugged",
+          "author": "Dr. Will Harris",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Iyorwuese Hagher",
+        "sourceTitle": "The Conquest of Azenga",
+        "sourceImprintLabel": "Signature",
+        "normalizedImprint": "JM Signature",
+        "matchedCatalogId": "the-conquest-of-azenga",
+        "matchedCatalogTitle": "The Conquest of Azenga",
+        "matchedCatalogAuthor": "Iyorwuese Hagher",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "The Conquest of Azenga",
+          "author": "Iyorwuese Hagher",
+          "recommendedImprint": "Unresolved",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Iyorwuese Hagher",
+        "sourceTitle": "A Portrait of Paradise",
+        "sourceImprintLabel": "Signature",
+        "normalizedImprint": "JM Signature",
+        "matchedCatalogId": "a-portrait-of-paradise",
+        "matchedCatalogTitle": "A Portrait of Paradise",
+        "matchedCatalogAuthor": "Iyorwuese Hagher",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "A Portrait of Paradise",
+          "author": "Iyorwuese Hagher",
+          "recommendedImprint": "JM Signature",
+          "decision": "JM SIGNATURE REVIEW"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Cheryl Cook",
+        "sourceTitle": "The Fight for the Promiseland",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "the-fight-for-the-promiseland",
+        "matchedCatalogTitle": "The Fight for the Promiseland",
+        "matchedCatalogAuthor": "Cheryl Cook",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "The Fight for the Promiseland",
+          "author": "Cheryl Cook",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Daphanny Baker",
+        "sourceTitle": "The Messenger 2",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": "the-messenger-2",
+        "matchedCatalogTitle": "The Messenger 2",
+        "matchedCatalogAuthor": "Thaddues Smith",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "The Messenger 2",
+          "author": "Thaddues Smith",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE"
+        }
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Permelia Smith",
+        "sourceTitle": "The Tithe Is the Lord’s",
+        "sourceImprintLabel": "JMP",
+        "normalizedImprint": "J Merrill Publishing",
+        "matchedCatalogId": null,
+        "matchedCatalogTitle": null,
+        "matchedCatalogAuthor": null,
+        "status": "NO_PROGRAM_TITLE_ANCHOR",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Sean Crowley",
+        "sourceTitle": "The Shift",
+        "sourceImprintLabel": "Signature",
+        "normalizedImprint": "JM Signature",
+        "matchedCatalogId": null,
+        "matchedCatalogTitle": null,
+        "matchedCatalogAuthor": null,
+        "status": "NO_PROGRAM_TITLE_ANCHOR",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Sean Crowley",
+        "sourceTitle": "Strategies for Success",
+        "sourceImprintLabel": "Works",
+        "normalizedImprint": "JM Works",
+        "matchedCatalogId": null,
+        "matchedCatalogTitle": null,
+        "matchedCatalogAuthor": null,
+        "status": "NO_PROGRAM_TITLE_ANCHOR",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Sean Crowley",
+        "sourceTitle": "Exemplars of Excellence",
+        "sourceImprintLabel": "Works",
+        "normalizedImprint": "JM Works",
+        "matchedCatalogId": null,
+        "matchedCatalogTitle": null,
+        "matchedCatalogAuthor": null,
+        "status": "NO_PROGRAM_TITLE_ANCHOR",
+        "appliedAt": "2026-07-07T00:00:00-04:00"
+      },
+      {
+        "source": "Jackie Publisher Master Imprint Register Update",
+        "sourceAuthor": "Daphanny Baker",
+        "sourceTitle": "Peaches Can Do It",
+        "sourceImprintLabel": "Little",
+        "normalizedImprint": "JM Little",
+        "matchedCatalogId": "peaches-can-do-it",
+        "matchedCatalogTitle": "Peaches Can Do It!",
+        "matchedCatalogAuthor": "Daphanny Baker",
+        "status": "PUBLISHER_CERTIFIED",
+        "appliedAt": "2026-07-07T00:00:00-04:00",
+        "prior": {
+          "title": "Peaches Can Do It!",
+          "author": "Daphanny Baker",
+          "recommendedImprint": "JM Little",
+          "decision": "LOCKED"
+        }
+      }
+    ],
+    "summary": {
+      "totalRows": 37,
+      "applied": 21,
+      "pendingManuscriptReview": 9,
+      "authorReconciliationRequired": 3,
+      "noProgramTitleAnchor": 4
+    }
   }
 }

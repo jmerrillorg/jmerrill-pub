@@ -1,14 +1,14 @@
 {
   "generatedAt": "2026-07-06T13:14:20.241Z",
   "program": "EOP-001",
-  "status": "Enterprise Optimization Active - Publisher Imprint Batch 1 Complete",
+  "status": "Enterprise Optimization Active - Publisher Master Imprint Register Applied",
   "totals": {
     "catalogTitles": 122,
     "adoptedTitles": 122,
     "publishedAuthors": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
     "activeAuthorWorkspaces": 72,
-    "publisherImprintReview": 29,
-    "jmSignatureReview": 1,
+    "publisherImprintReview": 20,
+    "jmSignatureReview": 0,
     "contractReconciliation": 122,
     "stripeMigration": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
     "royaltyReadiness": "PROVISIONAL_FROM_LEGACY_EVIDENCE"
@@ -23,10 +23,10 @@
     },
     {
       "metric": "Imprint Certified",
-      "value": "75.41%",
-      "numerator": 92,
+      "value": "83.61%",
+      "numerator": 102,
       "denominator": 122,
-      "note": "Locked/certified imprints after Publisher Batch 1 final overrides."
+      "note": "Catalog titles with LOCKED certified imprints after Publisher Master Imprint Register update."
     },
     {
       "metric": "Contracts Linked",
@@ -54,7 +54,7 @@
       "value": "98.36%",
       "numerator": 120,
       "denominator": 122,
-      "note": "Two catalog titles remain unresolved for imprint metadata evidence outside Batch 1; Batch 1 exceptions are complete."
+      "note": "Publisher Master Register added pending manuscript, author reconciliation, and title-anchor queues."
     },
     {
       "metric": "Workspace Complete",
@@ -71,7 +71,7 @@
       "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
     }
   ],
-  "overallEnterpriseHealth": "64.84%",
+  "overallEnterpriseHealth": "67.12%",
   "publisherReviewQueue": [
     {
       "id": "a-little-bit-of-everything",
@@ -81,8 +81,8 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -93,32 +93,8 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "because-the-lord-is-my-shepherd",
-      "title": "Because the Lord Is My Shepherd",
-      "author": "Rodney Waller",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.36,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "damaged",
-      "title": "Damaged",
-      "author": "Taye Knox",
-      "currentPublishedImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Works.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Works",
+      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -129,8 +105,8 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -141,8 +117,8 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -153,8 +129,8 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.36,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -165,8 +141,8 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -177,20 +153,8 @@
       "recommendedImprint": "JM Works",
       "confidence": 0.24,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Works.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Works",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "girl-did-you-know",
-      "title": "Girl, Did You Know...?",
-      "author": "Kimberly Reeder",
-      "currentPublishedImprint": "Missing",
-      "recommendedImprint": "Unresolved",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint is missing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Publisher override required; do not lock Unresolved",
+      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -201,32 +165,8 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "have-you-considered-my-servant",
-      "title": "Have You Considered My Servant?",
-      "author": "Obadiah E. Harris",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "inner-peace-through-life-s-storms",
-      "title": "Inner Peace Through Life's Storms",
-      "author": "Rosetta Perry",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -237,8 +177,20 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
+      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
+    },
+    {
+      "id": "loving-the-addict",
+      "title": "Loving the Addict",
+      "author": "Carolyn Booker-Pierce",
+      "currentPublishedImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.84,
+      "reasoning": "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.; genre signal: Self-Help; text signal: self, addict; legacy imprint agrees: JM Works",
+      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -249,20 +201,8 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "music-ministry-unplugged",
-      "title": "Music Ministry Unplugged",
-      "author": "Dr. Will Harris",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -273,20 +213,8 @@
       "recommendedImprint": "JM Works",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Works.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Works",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "the-conquest-of-azenga",
-      "title": "The Conquest of Azenga",
-      "author": "Iyorwuese Hagher",
-      "currentPublishedImprint": "Missing",
-      "recommendedImprint": "Unresolved",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint is missing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Publisher override required; do not lock Unresolved",
+      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -297,32 +225,8 @@
       "recommendedImprint": "JM Verse",
       "confidence": 0.24,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Verse.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Verse",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "the-fight-for-the-promiseland",
-      "title": "The Fight for the Promiseland",
-      "author": "Cheryl Cook",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "the-flame",
-      "title": "The Flame",
-      "author": "Veronica Brown",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -333,20 +237,8 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "the-messenger-2",
-      "title": "The Messenger 2",
-      "author": "Thaddues Smith",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -357,8 +249,8 @@
       "recommendedImprint": "JM Little",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Little.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Little",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -369,8 +261,8 @@
       "recommendedImprint": "JM Works",
       "confidence": 0.24,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Works.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Works",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -381,20 +273,20 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
-      "id": "war-mother",
-      "title": "War Mother",
-      "author": "Winter Dockery",
-      "currentPublishedImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Works.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Works",
+      "id": "warriors-and-angels",
+      "title": "Warriors and Angels",
+      "author": "Shelley McIntosh",
+      "currentPublishedImprint": "J Merrill Publishing",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 0.72,
+      "reasoning": "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.; genre signal: Faith; text signal: faith; legacy imprint agrees: J Merrill Publishing",
+      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -405,35 +297,24 @@
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "decisionRequired": "LOW CONFIDENCE",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
-      "id": "why-faith-works-for-some-and-not-for-others",
-      "title": "Why Faith Works For Some And Not For Others",
-      "author": "Nathaniel Short",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
+      "id": "you-re-still-not-crazy",
+      "title": "You're Still Not Crazy",
+      "author": "Carolyn Booker-Pierce",
+      "currentPublishedImprint": "JM Works",
+      "recommendedImprint": "JM Works",
+      "confidence": 0.72,
+      "reasoning": "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.; genre signal: Self-Help; text signal: self; legacy imprint agrees: JM Works",
+      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "proposedDecision": "Pending publisher/master register follow-up",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     }
   ],
-  "jmSignatureQueue": [
-    {
-      "id": "a-portrait-of-paradise",
-      "title": "A Portrait of Paradise",
-      "author": "Iyorwuese Hagher",
-      "currentPublishedImprint": "JM Signature",
-      "recommendedImprint": "JM Signature",
-      "confidence": 0.5,
-      "reasoning": "JM Signature is invitation-only and cannot be auto-locked.; text signal: portrait of paradise; legacy imprint agrees: JM Signature",
-      "decisionRequired": "Publisher JM Signature decision required"
-    }
-  ],
+  "jmSignatureQueue": [],
   "optimizationOrder": [
     "Publisher Imprint Review",
     "JM Signature Review",
@@ -464,5 +345,12 @@
     "titleOverridesApplied": 2,
     "assetEditionOverridesApplied": 1,
     "source": "Jackie Publisher Manual Assignment - Batch 1 Final Override"
+  },
+  "publisherMasterImprintRegister": {
+    "applied": 21,
+    "pendingManuscriptReview": 9,
+    "authorReconciliationRequired": 3,
+    "noProgramTitleAnchor": 4,
+    "pairingEventsPrepared": 11
   }
 }

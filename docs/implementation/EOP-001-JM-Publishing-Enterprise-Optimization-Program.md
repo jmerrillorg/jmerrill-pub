@@ -2,12 +2,12 @@
 
 **Program:** PROGRAM-002 - Autonomous Publishing Production Pipeline  
 **Optimization Program:** EOP-001  
-**Status:** Active - Publisher Imprint Batch 1 complete
+**Status:** Active - Publisher Master Imprint Register applied
 **Date:** 2026-07-06  
 
 ## Mission
 
-Enterprise Adoption is closed as an adoption milestone. EOP-001 shifts the operating rhythm from migration to optimization. Workstream 1 has applied Jackie Publisher Manual Assignment Batch 1 for exact normalized title+author matches, source-confirmed reconciliation items, and final Publisher overrides.
+Enterprise Adoption is closed as an adoption milestone. EOP-001 shifts the operating rhythm from migration to optimization. Workstream 1 has applied Jackie Publisher Master Imprint Register updates as Publisher truth while preserving historical published imprint fields as evidence.
 
 ## KPI Transition
 
@@ -17,7 +17,7 @@ Enterprise Coverage is retired as the primary KPI because it is complete at 100%
 
 | Order | Workstream | Status | Boundary |
 | --- | --- | --- | --- |
-| 1 | Publisher Imprint Review | Batch 1 complete | Continue remaining Publisher queue and separate JM Signature review. |
+| 1 | Publisher Imprint Review | Master Register applied | Resolve remaining pending manuscript, author reconciliation, and title-anchor queues. |
 | 2 | JM Signature Review | Queued | Do not begin until the prior workstream is complete or Jackie authorizes parallel execution. |
 | 3 | Contract Reconciliation | Queued | Do not begin until the prior workstream is complete or Jackie authorizes parallel execution. |
 | 4 | Stripe Migration | Queued | Do not begin until the prior workstream is complete or Jackie authorizes parallel execution. |
@@ -27,8 +27,8 @@ Enterprise Coverage is retired as the primary KPI because it is complete at 100%
 
 | Queue | Count |
 | --- | --- |
-| Publisher Imprint Review | 29 |
-| JM Signature Review | 1 |
+| Publisher Imprint Review | 20 |
+| JM Signature Review | 0 |
 | Contract Reconciliation | 122 |
 | Stripe Migration | 71 |
 | Royalty Readiness | 71 |
