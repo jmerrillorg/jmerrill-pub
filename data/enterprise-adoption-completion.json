@@ -5,11 +5,11 @@
     "totalAuthors": 71,
     "processedThisPass": 90,
     "certifiedImprintDistribution": {
-      "J Merrill Publishing": 85,
+      "J Merrill Publishing": 83,
       "JM Works": 18,
       "JM Signature": 1,
       "JM Little": 12,
-      "JM Verse": 4,
+      "JM Verse": 6,
       "Unresolved": 2
     }
   },
@@ -3126,14 +3126,39 @@
       "source": "Jackie Publisher Manual Assignment - Batch 1"
     },
     {
+      "id": "7-step-jumpstart-to-becoming-your-best-self",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
       "id": "a-principal-s-tale",
       "imprint": "JM Works",
       "source": "Jackie Publisher Manual Assignment - Batch 1"
     },
     {
+      "id": "a-truebies-guide-part-2",
+      "imprint": "JM Works",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
+      "id": "aligned",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
       "id": "bee-careful",
       "imprint": "JM Little",
       "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "come-out-of-hiding",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
+      "id": "connected",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
     },
     {
       "id": "focus-trust-and-follow",
@@ -3142,12 +3167,23 @@
     },
     {
       "id": "god-s-word-for-this-world",
-      "imprint": "J Merrill Publishing"
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
+      "id": "grandmothers-educating-minds-2nd-edition",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
     },
     {
       "id": "hodge-podge-of-life",
       "imprint": "J Merrill Publishing",
       "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "hop-hop-hop",
+      "imprint": "JM Little",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
     },
     {
       "id": "inspirations-from-god",
@@ -3170,14 +3206,34 @@
       "source": "Jackie Publisher Manual Assignment - Batch 1"
     },
     {
+      "id": "love-is-an-action-word",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
       "id": "love-lucy",
       "imprint": "J Merrill Publishing",
       "source": "Jackie Publisher Manual Assignment - Batch 1"
     },
     {
+      "id": "melodies-from-heaven",
+      "imprint": "JM Verse",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
       "id": "memoir-of-a-black-christian-nationalist",
       "imprint": "J Merrill Publishing",
       "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "mirror-of-refining-insight",
+      "imprint": "JM Verse",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
+      "id": "my-abc-s",
+      "imprint": "JM Little",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
     },
     {
       "id": "naughty-tales",
@@ -3199,6 +3255,11 @@
       "source": "Jackie Publisher Manual Assignment - Batch 1"
     },
     {
+      "id": "seasons-of-life",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
       "id": "she",
       "imprint": "J Merrill Publishing",
       "source": "Jackie Publisher Manual Assignment - Batch 1"
@@ -3207,6 +3268,16 @@
       "id": "support-beyond-the-cycle",
       "imprint": "J Merrill Publishing",
       "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "the-celestial-advantage",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
+      "id": "the-doctrine-of-last-things",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
     },
     {
       "id": "the-girl-with-the-ebony-locs-and-the-three-bears",
@@ -3222,6 +3293,16 @@
       "id": "the-hood",
       "imprint": "JM Verse",
       "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "the-little-girl-with-the-plow",
+      "imprint": "JM Little",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
+    },
+    {
+      "id": "the-master-s-piece",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
     },
     {
       "id": "the-messenger",
@@ -3268,6 +3349,15 @@
     "source": "Jackie Publisher Manual Assignment - Batch 1",
     "matchedAndLocked": 25,
     "reconciliationRequired": 20,
+    "eventsPrepared": [
+      "IMPRINT_PUBLISHER_APPROVED",
+      "IMPRINT_LOCKED"
+    ]
+  },
+  "publisherImprintBatch1Reconciliation": {
+    "source": "Publisher-source reconciliation: MONTHLY REPORTING 2026 workbook, Total Asset Listing, PAM staging evidence",
+    "resolved": 17,
+    "unresolved": 3,
     "eventsPrepared": [
       "IMPRINT_PUBLISHER_APPROVED",
       "IMPRINT_LOCKED"

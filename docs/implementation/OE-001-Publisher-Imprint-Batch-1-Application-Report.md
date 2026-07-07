@@ -18,7 +18,7 @@ Normalization allowed only punctuation, case, diacritics, and repeated-spacing d
 | --- | ---: |
 | Batch rows received | 45 |
 | Titles matched and locked | 25 |
-| Titles requiring reconciliation | 20 |
+| Titles requiring reconciliation | 20 originally; 17 resolved in reconciliation pass |
 | Execution-log event payloads prepared | 50 |
 | Dataverse write status | Not attempted in this local session; no reachable Dataverse write environment variables were present |
 
@@ -101,6 +101,10 @@ Dataverse writeback was not attempted from this local session because no reachab
 
 - `data/oe001-publisher-imprint-batch-1-execution-log-payloads.json`
 
+## Reconciliation Update
+
+See `OE-001-Publisher-Imprint-Batch-1-Reconciliation-Report.md`. Seventeen of the 20 exceptions were source-confirmed and applied. Three remain for Jackie review.
+
 ## Next Publisher Action
 
-Jackie should confirm the 20 reconciliation items before they are locked. After confirmation, Cody can apply those remaining assignments and write the same execution-log event pair for each approved match.
+Jackie should decide the three remaining reconciliation exceptions before they are locked. After confirmation, Cody can apply those remaining assignments and write the same execution-log event pair for each approved match.

@@ -129,7 +129,7 @@
     {
       "id": "7-step-jumpstart-to-becoming-your-best-self",
       "title": "7 Step Jumpstart to Becoming Your Best Self",
-      "author": "Johnson Settles",
+      "author": "Ericka Johnson Settles",
       "genre": "Self-Help",
       "format": "Paperback",
       "formats": [
@@ -138,21 +138,38 @@
       ],
       "isbn": "978-1-954414-74-7",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Self-Help",
         "text signal: self",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title '7 Step Jumpstart to Becoming Your Best Self', canonical author 'Ericka Johnson Settles', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 POD: title with author Johnson Settles, Ericka",
+          "MONTHLY REPORTING 2026 AUTHOR: Ericka Johnson Settles master/aliases"
+        ]
+      }
     },
     {
       "id": "a-blended-family",
@@ -302,7 +319,7 @@
     {
       "id": "a-truebies-guide-part-2",
       "title": "A Truebies Guide, Part 2",
-      "author": "Carolyn Booker-Pierce",
+      "author": "Alesia Corpening",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -311,18 +328,35 @@
       ],
       "isbn": "978-1-950719-32-7",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation TITLE_VARIANT_CONFIRMED: canonical title 'A Truebies Guide, Part 2', canonical author 'Alesia Corpening', certified imprint 'JM Works'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "TITLE_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 POD/POD-Report: A Truebies Guide, Part 2 by Alesia Corpening",
+          "Total Asset Listing: A Truebies Guide, Part 2 contributor Alesia Corpening"
+        ]
+      }
     },
     {
       "id": "abortion",
@@ -381,7 +415,7 @@
     {
       "id": "aligned",
       "title": "Aligned!",
-      "author": "Alesia True Corpening",
+      "author": "Dennis Brown",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -392,16 +426,33 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Aligned!', canonical author 'Dennis Brown', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 POD: Aligned!: Unlocking the DNA of Authentic Faith by Brown, Dennis E.",
+          "MONTHLY REPORTING 2026 AUTHOR: Dennis Brown aliases"
+        ]
+      }
     },
     {
       "id": "almost-happy",
@@ -598,19 +649,36 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Come Out of Hiding', canonical author 'Christina Chislom', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "Total Asset Listing: Come Out Of Hiding contributor Christina Chislom",
+          "MONTHLY REPORTING 2026 POD: Come Out Of Hiding by Chislom, Christina"
+        ]
+      }
     },
     {
       "id": "connected",
       "title": "Connected!",
-      "author": "Alesia True Corpening",
+      "author": "Dennis Brown",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -621,16 +689,33 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Connected!', canonical author 'Dennis Brown', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "Total Asset Listing: Connected! contributor Dennis E. Brown",
+          "MONTHLY REPORTING 2026 POD-Report: Connected! by Dennis Brown"
+        ]
+      }
     },
     {
       "id": "conquer-your-fears-and-win",
@@ -1133,7 +1218,7 @@
     {
       "id": "god-s-word-for-this-world",
       "title": "God's Word For This World",
-      "author": "Bishop Thomas Johnson",
+      "author": "Thomas Johnson, Sr.",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -1144,16 +1229,33 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'God's Word For This World', canonical author 'Thomas Johnson, Sr.', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 POD/POD-Report: God's Word For This World by Thomas Johnson",
+          "MONTHLY REPORTING 2026 AUTHOR: Thomas Johnson, Sr. alias"
+        ]
+      }
     },
     {
       "id": "grandmothers-educating-minds",
@@ -1184,7 +1286,7 @@
     {
       "id": "grandmothers-educating-minds-2nd-edition",
       "title": "Grandmothers Educating Minds, 2nd Edition",
-      "author": "M. Darlene Carson",
+      "author": "Toni Kleckley",
       "genre": "",
       "format": "eBook",
       "formats": [
@@ -1194,16 +1296,33 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Grandmothers Educating Minds, 2nd Edition', canonical author 'Toni Kleckley', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 POD: Grandmothers Educating Minds, 2nd Edition by Kleckley, Toni",
+          "MONTHLY REPORTING 2026 AUTHOR: Toni Kleckley aliases"
+        ]
+      }
     },
     {
       "id": "have-you-considered-my-servant",
@@ -1497,7 +1616,7 @@
     {
       "id": "hop-hop-hop",
       "title": "Hop, Hop, Hop",
-      "author": "TJ Mars",
+      "author": "Tawonna Mars",
       "genre": "Children's",
       "format": "Paperback",
       "formats": [
@@ -1513,14 +1632,32 @@
         "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
         "genre signal: Children's",
         "text signal: children, child, hop",
-        "legacy imprint agrees: JM Little"
+        "legacy imprint agrees: JM Little",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Hop, Hop, Hop', canonical author 'Tawonna Mars', certified imprint 'JM Little'."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 EBOOK-Report: Hop, Hop, Hop by Tawonna Mars",
+          "Total Asset Listing: Hop, Hop, Hop contributor TJ Mars",
+          "MONTHLY REPORTING 2026 AUTHOR: Tawonna Mars master with TJ Mars aliases"
+        ]
+      }
     },
     {
       "id": "i-am-my-worst-enemy",
@@ -1848,7 +1985,7 @@
     {
       "id": "love-is-an-action-word",
       "title": "Love Is An Action Word",
-      "author": "Dennis Brown",
+      "author": "Kurt Broadnax",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -1859,16 +1996,33 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Love Is An Action Word', canonical author 'Kurt Broadnax', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 POD/POD-Report: Love Is An Action Word by Kurt Broadnax",
+          "Total Asset Listing: Love Is An Action Word contributor Kurt Broadnax"
+        ]
+      }
     },
     {
       "id": "love-lucy",
@@ -1968,8 +2122,8 @@
     },
     {
       "id": "melodies-from-heaven",
-      "title": "Melodies From Heaven",
-      "author": "Baily Cunningham",
+      "title": "Melodies from Heaven",
+      "author": "Bailey Cunningham",
       "genre": "Faith",
       "format": "Paperback",
       "formats": [
@@ -1978,20 +2132,37 @@
       ],
       "isbn": "978-1-950719-74-7",
       "currentImprint": "JM Verse",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Verse",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
-        "text signal: faith, heaven"
+        "text signal: faith, heaven",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Melodies from Heaven', canonical author 'Bailey Cunningham', certified imprint 'JM Verse'."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 AUTHOR: Bailey Cunningham master with Bailey Marie aliases",
+          "Total Asset Listing: Melodies from Heaven contributor Bailey Marie"
+        ]
+      }
     },
     {
       "id": "memoir-of-a-black-christian-nationalist",
@@ -2038,7 +2209,7 @@
     {
       "id": "mirror-of-refining-insight",
       "title": "Mirror of Refining Insight",
-      "author": "M A Grayson",
+      "author": "Marvin Grayson",
       "genre": "Inspirational",
       "format": "Paperback",
       "formats": [
@@ -2048,20 +2219,37 @@
       ],
       "isbn": "978-1-954414-37-2",
       "currentImprint": "JM Works",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Verse",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Mirror of Refining Insight', canonical author 'Marvin Grayson', certified imprint 'JM Verse'."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 AUTHOR: Marvin Grayson master with M. A. Grayson aliases",
+          "MONTHLY REPORTING 2026 POD: Mirror of Refining Insight by Grayson, M. A."
+        ]
+      }
     },
     {
       "id": "more-than-a-village",
@@ -2115,8 +2303,8 @@
     },
     {
       "id": "my-abc-s",
-      "title": "My ABC's",
-      "author": "Jaylonna Stevette",
+      "title": "My ABCs",
+      "author": "Christy Grogg",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2127,16 +2315,33 @@
       "currentImprint": "JM Little",
       "recommendedImprint": "JM Little",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Little."
+        "Legacy imprint retained as evidence only: JM Little.",
+        "Batch 1 reconciliation TITLE_VARIANT_CONFIRMED: canonical title 'My ABCs', canonical author 'Christy Grogg', certified imprint 'JM Little'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "TITLE_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 POD/POD-Report: My ABCs by Christy Grogg",
+          "Total Asset Listing: My ABCs contributor Christy Grogg"
+        ]
+      }
     },
     {
       "id": "naughty-tales",
@@ -2423,7 +2628,7 @@
     {
       "id": "seasons-of-life",
       "title": "Seasons of Life",
-      "author": "Diane Johnson",
+      "author": "Kurt Broadnax",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2434,16 +2639,33 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Seasons of Life', canonical author 'Kurt Broadnax', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 EBOOK: Seasons of Life by Kurt Broadnax",
+          "Total Asset Listing: Seasons of Life contributor Kurt Broadnax"
+        ]
+      }
     },
     {
       "id": "she",
@@ -2598,19 +2820,36 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, celestial",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'The Celestial Advantage', canonical author 'Obadiah E. Harris', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "Total Asset Listing: The Celestial Advantage contributor Obadiah E Harris",
+          "MONTHLY REPORTING 2026 AUTHOR: Obadiah Harris aliases"
+        ]
+      }
     },
     {
       "id": "the-doctrine-of-last-things",
       "title": "The Doctrine of Last Things",
-      "author": "Lyle Goddard",
+      "author": "Obadiah E. Harris",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2621,16 +2860,33 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation TITLE_VARIANT_CONFIRMED: canonical title 'The Doctrine of Last Things', canonical author 'Obadiah E. Harris', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "TITLE_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 EBOOK: The Doctrine of Last Things by Obadiah E. Harris",
+          "MONTHLY REPORTING 2026 ISBN: The Doctrine of Last Things"
+        ]
+      }
     },
     {
       "id": "the-essence-of-life-love-letters-to-christ",
@@ -2936,7 +3192,7 @@
     {
       "id": "the-little-girl-with-the-plow",
       "title": "The Little Girl with the Plow!",
-      "author": "Deborah Eiland",
+      "author": "Christina Chislom",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2947,16 +3203,33 @@
       "currentImprint": "JM Little",
       "recommendedImprint": "JM Little",
       "confidence": 0.36,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Little."
+        "Legacy imprint retained as evidence only: JM Little.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'The Little Girl with the Plow!', canonical author 'Christina Chislom', certified imprint 'JM Little'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "AUTHOR_VARIANT_CONFIRMED",
+        "evidence": [
+          "Total Asset Listing: The Little Girl with the Plow! contributor Christina Chislom",
+          "MONTHLY REPORTING 2026 ISBN: The Little Girl with the Plow!"
+        ]
+      }
     },
     {
       "id": "the-master-s-piece",
@@ -2978,14 +3251,31 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Batch 1 reconciliation TITLE_VARIANT_CONFIRMED: canonical title 'The Master's Piece', canonical author 'Sylvia Benson', certified imprint 'J Merrill Publishing'."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "TITLE_VARIANT_CONFIRMED",
+        "evidence": [
+          "MONTHLY REPORTING 2026 POD: The Master's Piece by Benson, Sylvia",
+          "MONTHLY REPORTING 2026 EBOOK: The Masterís Piece by Sylvia Benson"
+        ]
+      }
     },
     {
       "id": "the-messenger",

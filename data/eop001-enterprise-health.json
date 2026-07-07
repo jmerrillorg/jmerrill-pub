@@ -1,13 +1,13 @@
 {
   "generatedAt": "2026-07-06T13:14:20.241Z",
   "program": "EOP-001",
-  "status": "Enterprise Optimization Active - Publisher Imprint Batch 1 Applied",
+  "status": "Enterprise Optimization Active - Publisher Imprint Batch 1 Reconciled",
   "totals": {
     "catalogTitles": 122,
     "adoptedTitles": 122,
     "publishedAuthors": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
     "activeAuthorWorkspaces": 72,
-    "publisherImprintReview": 40,
+    "publisherImprintReview": 31,
     "jmSignatureReview": 1,
     "contractReconciliation": 122,
     "stripeMigration": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
@@ -23,10 +23,10 @@
     },
     {
       "metric": "Imprint Certified",
-      "value": "66.39%",
-      "numerator": 81,
+      "value": "73.77%",
+      "numerator": 90,
       "denominator": 122,
-      "note": "Locked/certified imprints after Publisher Batch 1 exact-match approvals."
+      "note": "Locked/certified imprints after Publisher Batch 1 reconciliation."
     },
     {
       "metric": "Contracts Linked",
@@ -54,7 +54,7 @@
       "value": "98.36%",
       "numerator": 120,
       "denominator": 122,
-      "note": "Two titles remain unresolved for imprint metadata evidence; Batch 1 identity reconciliation remains separate."
+      "note": "Two titles remain unresolved for imprint metadata evidence; 3 Batch 1 reconciliation exceptions require Jackie review."
     },
     {
       "metric": "Workspace Complete",
@@ -71,7 +71,7 @@
       "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
     }
   ],
-  "overallEnterpriseHealth": "62.33%",
+  "overallEnterpriseHealth": "64.38%",
   "publisherReviewQueue": [
     {
       "id": "a-little-bit-of-everything",
@@ -98,33 +98,9 @@
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
-      "id": "a-truebies-guide-part-2",
-      "title": "A Truebies Guide, Part 2",
-      "author": "Carolyn Booker-Pierce",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
       "id": "abortion",
       "title": "Abortion!",
       "author": "Toni Kleckley",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "aligned",
-      "title": "Aligned!",
-      "author": "Alesia True Corpening",
       "currentPublishedImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
@@ -140,18 +116,6 @@
       "currentPublishedImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.36,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "connected",
-      "title": "Connected!",
-      "author": "Alesia True Corpening",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
       "decisionRequired": "Publisher imprint decision required",
       "proposedDecision": "Approve and lock J Merrill Publishing",
@@ -266,18 +230,6 @@
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
-      "id": "grandmothers-educating-minds-2nd-edition",
-      "title": "Grandmothers Educating Minds, 2nd Edition",
-      "author": "M. Darlene Carson",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
       "id": "have-you-considered-my-servant",
       "title": "Have You Considered My Servant?",
       "author": "Obadiah E. Harris",
@@ -314,18 +266,6 @@
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
-      "id": "love-is-an-action-word",
-      "title": "Love Is An Action Word",
-      "author": "Dennis Brown",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
       "id": "more-than-a-village",
       "title": "More Than A Village",
       "author": "Shelley McIntosh",
@@ -344,30 +284,6 @@
       "currentPublishedImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "my-abc-s",
-      "title": "My ABC's",
-      "author": "Jaylonna Stevette",
-      "currentPublishedImprint": "JM Little",
-      "recommendedImprint": "JM Little",
-      "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Little.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Little",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "seasons-of-life",
-      "title": "Seasons of Life",
-      "author": "Diane Johnson",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
       "decisionRequired": "Publisher imprint decision required",
       "proposedDecision": "Approve and lock J Merrill Publishing",
@@ -395,18 +311,6 @@
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint is missing.",
       "decisionRequired": "Publisher imprint decision required",
       "proposedDecision": "Publisher override required; do not lock Unresolved",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "the-doctrine-of-last-things",
-      "title": "The Doctrine of Last Things",
-      "author": "Lyle Goddard",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -455,18 +359,6 @@
       "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
       "decisionRequired": "Publisher imprint decision required",
       "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "the-little-girl-with-the-plow",
-      "title": "The Little Girl with the Plow!",
-      "author": "Deborah Eiland",
-      "currentPublishedImprint": "JM Little",
-      "recommendedImprint": "JM Little",
-      "confidence": 0.36,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Little.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Little",
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
@@ -581,10 +473,15 @@
     "Author Success Active denominator"
   ],
   "sourceOfTruthGapReport": "docs/implementation/EOP-001-Author-Title-Source-of-Truth-Gap-Report.md",
-  "publisherReviewStatus": "PUBLISHER_DECISION_GATE - Batch 1 applied for exact matches; reconciliation required for unmatched Publisher assignments.",
+  "publisherReviewStatus": "PUBLISHER_DECISION_GATE - Batch 1 reconciliation applied for confirmed source-backed matches; 3 exceptions require Jackie review.",
   "publisherImprintBatch1": {
     "matchedAndLocked": 25,
     "reconciliationRequired": 20,
     "source": "Jackie Publisher Manual Assignment - Batch 1"
+  },
+  "publisherImprintBatch1Reconciliation": {
+    "resolved": 17,
+    "unresolved": 3,
+    "source": "Publisher-source reconciliation: MONTHLY REPORTING 2026 workbook, Total Asset Listing, PAM staging evidence"
   }
 }
