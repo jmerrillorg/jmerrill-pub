@@ -1,7 +1,7 @@
 # PAM-001 - Enterprise Asset Registry Dashboard
 
-**Generated:** 2026-07-07T03:06:11Z
-**Status:** Staging dashboard; no Dataverse import performed
+**Generated:** 2026-07-07T03:36:06Z
+**Status:** Operational registry dashboard for JM1-Dev
 
 ## Build State
 
@@ -10,32 +10,59 @@
 | JM1-Dev baseline | Complete |
 | IS-009 schema | Deployed and validated |
 | Migration staging engine | Operational |
-| Registry health engine | Operational for staging |
-| Dataverse import | Not started |
+| Registry health engine | Operational |
+| Dataverse import | Complete in JM1-Dev |
+| Reconciliation queue | Active |
 | SharePoint file movement | Not started |
 | Royalty/payment activity | Not touched |
 
-## Registry Staging Metrics
+## Registry Import Metrics
 
 | Metric | Value |
 | --- | ---: |
-| Title candidates | 162 |
-| Publishing asset candidates | 295 |
-| Marketplace candidates | 537 |
-| Assets with title link | 100.0% |
-| Assets with ISBN | 99.32% |
-| Assets with author evidence | 63.39% |
-| Assets with format | 100.0% |
-| Marketplace rows with identifier | 90.32% |
-| Duplicate ISBN conflicts | 0 |
+| Titles created | 113 |
+| Titles reused | 49 |
+| Titles updated | 49 |
+| Publishing assets created | 295 |
+| Publishing assets reused | 0 |
+| Marketplace records created | 522 |
+| Marketplace records reused | 15 |
+| Execution-log events written | 2 |
+| Duplicate Publishing Asset names | 0 |
+| Duplicate normalized ISBN observations | 0 |
 
-## Exception Queue
+## Registry Health
 
-| Exception | Count |
+| Metric | Value |
 | --- | ---: |
-| MISSING_AUTHOR | 108 |
-| MISSING_ISBN | 2 |
-| MISSING_MARKETPLACE_IDENTIFIER | 52 |
+| Asset Health: Healthy | 295 |
+| Asset Confidence: High | 148 |
+| Asset Confidence: Reconciliation Required | 147 |
+| Author Evidence: Confirmed | 187 |
+| Author Evidence: Unknown / Pending Reconciliation | 108 |
+| Marketplace Identifier: Confirmed | 470 |
+| Marketplace Identifier: Pending Identification | 52 |
+
+Operational health threshold:
+
+- 95-100: Healthy
+- 85-94: Operational / Good
+- 70-84: Needs Attention
+- Below 70: Action Required
+- Operationally healthy threshold: 85
+
+## Reconciliation Queue
+
+| Queue | Count |
+| --- | ---: |
+| Publishing assets requiring reconciliation | 147 |
+| Marketplace records requiring reconciliation | 52 |
+
+| Reason | Count |
+| --- | ---: |
+| Author evidence unknown / pending reconciliation | 108 |
+| Marketplace identifier pending | 89 |
+| Missing ISBN | 2 |
 
 ## Marketplace Distribution
 
@@ -66,7 +93,12 @@
 
 ## Next Actions
 
-1. Review exception queues before import.
-2. Approve asset health threshold and duplicate title/format/edition rules.
-3. Harden service-principal metadata access before unattended automation.
-4. Run controlled import only after validation approval.
+1. Work the reconciliation queue without blocking registry operations.
+2. Harden service-principal metadata access before unattended automation/promotion.
+3. Decide production promotion path after JM1-Dev acceptance.
+4. Keep SharePoint file movement, royalties, and payments outside PAM until separately authorized.
+
+## Evidence
+
+- `docs/implementation/evidence/IS-009/is009-registry-import-evidence.json`
+- `docs/implementation/evidence/IS-009/is009-registry-operational-validation.json`

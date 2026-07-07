@@ -539,6 +539,11 @@ for (const field of [
   ['jm1pub_lastverifiedon', dateTimeField('jm1pub_LastVerifiedOn', 'Last Verified On')],
   ['jm1pub_assethealthscore', integerField('jm1pub_AssetHealthScore', 'Asset Health Score')],
   ['jm1pub_assethealthstatus', picklistField('jm1pub_AssetHealthStatus', 'Asset Health Status', ['Healthy', 'Needs Review', 'Incomplete', 'Blocked'])],
+  ['jm1pub_assetconfidencescore', integerField('jm1pub_AssetConfidenceScore', 'Asset Confidence Score')],
+  ['jm1pub_assetconfidencestatus', picklistField('jm1pub_AssetConfidenceStatus', 'Asset Confidence Status', ['High', 'Good', 'Medium', 'Low', 'Reconciliation Required'])],
+  ['jm1pub_authorevidencestatus', picklistField('jm1pub_AuthorEvidenceStatus', 'Author Evidence Status', ['Confirmed', 'Unknown / Pending Reconciliation', 'Conflicting Evidence'])],
+  ['jm1pub_reconciliationrequired', boolField('jm1pub_ReconciliationRequired', 'Reconciliation Required')],
+  ['jm1pub_reconciliationreason', memoField('jm1pub_ReconciliationReason', 'Reconciliation Reason')],
   ['jm1pub_exceptionreason', memoField('jm1pub_ExceptionReason', 'Exception Reason')],
 ]) {
   await ensureAttribute('jm1pub_publishingasset', { logicalName: field[0], metadata: field[1] });
@@ -562,6 +567,11 @@ for (const field of [
   ['jm1pub_currency', stringField('jm1pub_Currency', 'Currency', 3)],
   ['jm1pub_lastverifiedon', dateTimeField('jm1pub_LastVerifiedOn', 'Last Verified On')],
   ['jm1pub_evidencesource', stringField('jm1pub_EvidenceSource', 'Evidence Source', 200)],
+  ['jm1pub_marketplaceidentifierstatus', picklistField('jm1pub_MarketplaceIdentifierStatus', 'Marketplace Identifier Status', ['Confirmed', 'Pending Identification', 'Conflicting Evidence'])],
+  ['jm1pub_assetconfidencescore', integerField('jm1pub_AssetConfidenceScore', 'Asset Confidence Score')],
+  ['jm1pub_assetconfidencestatus', picklistField('jm1pub_AssetConfidenceStatus', 'Asset Confidence Status', ['High', 'Good', 'Medium', 'Low', 'Reconciliation Required'])],
+  ['jm1pub_reconciliationrequired', boolField('jm1pub_ReconciliationRequired', 'Reconciliation Required')],
+  ['jm1pub_reconciliationreason', memoField('jm1pub_ReconciliationReason', 'Reconciliation Reason')],
   ['jm1pub_exceptionreason', memoField('jm1pub_ExceptionReason', 'Exception Reason')],
 ]) {
   await ensureAttribute('jm1pub_assetmarketplace', { logicalName: field[0], metadata: field[1] });

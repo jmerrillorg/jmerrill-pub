@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-07T02:59:24.530Z",
+  "generatedAt": "2026-07-07T03:27:40.790Z",
   "apiBase": "https://org52409ff2.crm.dynamics.com/api/data/v9.2",
   "solutionUniqueName": "JM1_PAM_AssetRegistry",
   "actions": [
@@ -374,35 +374,77 @@
       "type": "field",
       "table": "jm1pub_publishingasset",
       "name": "jm1pub_lastverifiedon",
-      "status": "created"
-    },
-    {
-      "type": "solution-component",
-      "name": "jm1pub_publishingasset.jm1pub_lastverifiedon",
-      "componentType": 2,
-      "status": "added"
+      "status": "exists"
     },
     {
       "type": "field",
       "table": "jm1pub_publishingasset",
       "name": "jm1pub_assethealthscore",
-      "status": "created"
-    },
-    {
-      "type": "solution-component",
-      "name": "jm1pub_publishingasset.jm1pub_assethealthscore",
-      "componentType": 2,
-      "status": "added"
+      "status": "exists"
     },
     {
       "type": "field",
       "table": "jm1pub_publishingasset",
       "name": "jm1pub_assethealthstatus",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_assetconfidencescore",
       "status": "created"
     },
     {
       "type": "solution-component",
-      "name": "jm1pub_publishingasset.jm1pub_assethealthstatus",
+      "name": "jm1pub_publishingasset.jm1pub_assetconfidencescore",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_assetconfidencestatus",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_publishingasset.jm1pub_assetconfidencestatus",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_authorevidencestatus",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_publishingasset.jm1pub_authorevidencestatus",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_reconciliationrequired",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_publishingasset.jm1pub_reconciliationrequired",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_reconciliationreason",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_publishingasset.jm1pub_reconciliationreason",
       "componentType": 2,
       "status": "added"
     },
@@ -410,113 +452,119 @@
       "type": "field",
       "table": "jm1pub_publishingasset",
       "name": "jm1pub_exceptionreason",
-      "status": "created"
-    },
-    {
-      "type": "solution-component",
-      "name": "jm1pub_publishingasset.jm1pub_exceptionreason",
-      "componentType": 2,
-      "status": "added"
+      "status": "exists"
     },
     {
       "type": "lookup",
       "table": "jm1pub_assetmarketplace",
       "name": "jm1pub_publishingassetid",
-      "status": "created"
+      "status": "exists"
     },
     {
       "type": "field",
       "table": "jm1pub_assetmarketplace",
       "name": "jm1pub_marketplace",
-      "status": "created"
-    },
-    {
-      "type": "solution-component",
-      "name": "jm1pub_assetmarketplace.jm1pub_marketplace",
-      "componentType": 2,
-      "status": "added"
+      "status": "exists"
     },
     {
       "type": "field",
       "table": "jm1pub_assetmarketplace",
       "name": "jm1pub_marketplacestatus",
-      "status": "created"
-    },
-    {
-      "type": "solution-component",
-      "name": "jm1pub_assetmarketplace.jm1pub_marketplacestatus",
-      "componentType": 2,
-      "status": "added"
+      "status": "exists"
     },
     {
       "type": "field",
       "table": "jm1pub_assetmarketplace",
       "name": "jm1pub_marketplaceidentifier",
-      "status": "created"
-    },
-    {
-      "type": "solution-component",
-      "name": "jm1pub_assetmarketplace.jm1pub_marketplaceidentifier",
-      "componentType": 2,
-      "status": "added"
+      "status": "exists"
     },
     {
       "type": "field",
       "table": "jm1pub_assetmarketplace",
       "name": "jm1pub_listingurl",
-      "status": "created"
-    },
-    {
-      "type": "solution-component",
-      "name": "jm1pub_assetmarketplace.jm1pub_listingurl",
-      "componentType": 2,
-      "status": "added"
+      "status": "exists"
     },
     {
       "type": "field",
       "table": "jm1pub_assetmarketplace",
       "name": "jm1pub_listedprice",
-      "status": "created"
-    },
-    {
-      "type": "solution-component",
-      "name": "jm1pub_assetmarketplace.jm1pub_listedprice",
-      "componentType": 2,
-      "status": "added"
+      "status": "exists"
     },
     {
       "type": "field",
       "table": "jm1pub_assetmarketplace",
       "name": "jm1pub_currency",
-      "status": "created"
-    },
-    {
-      "type": "solution-component",
-      "name": "jm1pub_assetmarketplace.jm1pub_currency",
-      "componentType": 2,
-      "status": "added"
+      "status": "exists"
     },
     {
       "type": "field",
       "table": "jm1pub_assetmarketplace",
       "name": "jm1pub_lastverifiedon",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_evidencesource",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_marketplaceidentifierstatus",
       "status": "created"
     },
     {
       "type": "solution-component",
-      "name": "jm1pub_assetmarketplace.jm1pub_lastverifiedon",
+      "name": "jm1pub_assetmarketplace.jm1pub_marketplaceidentifierstatus",
       "componentType": 2,
       "status": "added"
     },
     {
       "type": "field",
       "table": "jm1pub_assetmarketplace",
-      "name": "jm1pub_evidencesource",
+      "name": "jm1pub_assetconfidencescore",
       "status": "created"
     },
     {
       "type": "solution-component",
-      "name": "jm1pub_assetmarketplace.jm1pub_evidencesource",
+      "name": "jm1pub_assetmarketplace.jm1pub_assetconfidencescore",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_assetconfidencestatus",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_assetmarketplace.jm1pub_assetconfidencestatus",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_reconciliationrequired",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_assetmarketplace.jm1pub_reconciliationrequired",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_reconciliationreason",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_assetmarketplace.jm1pub_reconciliationreason",
       "componentType": 2,
       "status": "added"
     },
@@ -524,13 +572,7 @@
       "type": "field",
       "table": "jm1pub_assetmarketplace",
       "name": "jm1pub_exceptionreason",
-      "status": "created"
-    },
-    {
-      "type": "solution-component",
-      "name": "jm1pub_assetmarketplace.jm1pub_exceptionreason",
-      "componentType": 2,
-      "status": "added"
+      "status": "exists"
     },
     {
       "type": "publish",

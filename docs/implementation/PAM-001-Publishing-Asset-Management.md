@@ -1,7 +1,7 @@
 # PAM-001 - Publishing Asset Management
 
 **Classification:** Enterprise Foundation Program
-**Status:** CANON - JM1-Dev foundation operational; migration staging operational
+**Status:** CANON - JM1-Dev Publishing Asset Registry operational
 **Primary Home:** Implementation HQ / JM1 Publishing / PAM
 **Authority:** CANON-CANDIDATE v1.2; Architecture Packet LOCKED 2026-06-27; DO-001 CANON; Jackie correction 2026-07-06; Jackie canon promotion and IS-009 build authorization
 **Approval Authority:** Jackie Smith Jr.
@@ -152,6 +152,24 @@ Every publishing asset should receive a health assessment across these dimension
 
 Asset Health Score should be calculated after the registry is populated. A missing dimension should flag the asset for review rather than block the registry from capturing known evidence.
 
+Approved health thresholds:
+
+| Score | Status |
+| ---: | --- |
+| 95-100 | Healthy |
+| 85-94 | Operational / Good |
+| 70-84 | Needs Attention |
+| Below 70 | Action Required |
+
+Operationally healthy threshold: 85.
+
+Asset Confidence is tracked separately from Asset Health:
+
+- Asset Health measures completeness/readiness.
+- Asset Confidence measures trust in identity matching and source evidence.
+
+Missing author evidence and missing marketplace identifiers do not block import. They lower confidence and create reconciliation flags.
+
 ## PAM Workstreams
 
 ### PAM-001 - Publishing Asset Registry
@@ -167,10 +185,24 @@ Current operational state:
 - Migration staging engine operational:
   - `scripts/is009_stage_registry.py`
   - `data/is009-publishing-asset-staging.json`
-- Staging health engine operational:
+- Registry import operational:
+  - `scripts/is009_import_registry.mjs`
+  - `docs/implementation/evidence/IS-009/is009-registry-import-evidence.json`
+- Registry health/validation engine operational:
   - `scripts/is009_assess_registry_health.py`
+  - `scripts/is009_validate_registry_import.mjs`
   - `data/is009-publishing-asset-health.json`
   - `docs/implementation/PAM-001-Enterprise-Asset-Registry-Dashboard.md`
+
+Current JM1-Dev registry:
+
+- 295 Publishing Asset records created.
+- 522 Asset Marketplace records created.
+- 15 marketplace records reused.
+- 2 `jm1_executionlog` events written.
+- Active reconciliation queue:
+  - 147 publishing assets
+  - 52 marketplace records
 
 ### PAM-002 - Backlist Consolidation
 
@@ -254,8 +286,8 @@ Calculate asset health and produce the first enterprise asset health dashboard.
 | Decision | Owner | Status |
 | --- | --- | --- |
 | Confirm production promotion path and service-principal metadata access | Jackie + Cody | Pending |
-| Approve asset health score threshold and dashboard weighting | Jackie | Pending |
-| Approve duplicate title/format/edition handling before import | Jackie | Pending |
+| Asset health score threshold and dashboard weighting | Jackie | Approved for operational readiness |
+| Duplicate title/format/edition handling before import | Jackie | Approved for operational readiness |
 | Approve file movement/consolidation after registry references are staged | Jackie | Pending |
 | Approve royalty-rule migration and live royalty automation separately | Jackie | Pending |
 
@@ -263,7 +295,7 @@ Calculate asset health and produce the first enterprise asset health dashboard.
 
 This canon does not:
 
-- Import source data into Dataverse without a controlled import pass
+- Modify production Dataverse
 - Move SharePoint/backlist files
 - Update `books.json`
 - Run OP-000 adoption

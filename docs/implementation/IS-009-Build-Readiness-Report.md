@@ -2,7 +2,7 @@
 
 **Program:** PAM-001 - Publishing Asset Management
 **Specification:** `IS-009-Publishing-Asset-Registry-Specification.md`
-**Status:** Build readiness complete; Dev schema deployed and validated
+**Status:** Build readiness complete; Dev registry operational
 **Generated:** 2026-07-06 / 2026-07-07 UTC evidence timestamp
 **Boundary:** JM1-Dev schema deployment only; no file movement, no data import, no royalty/payment activity
 
@@ -19,6 +19,8 @@ Completed:
 - Jackie-only blockers were identified.
 - Migration staging engine was built and run.
 - Registry health/readiness engine was built and run.
+- Registry import engine was built and run.
+- Operational Dataverse readback validation was completed.
 
 Completed after access repair:
 
@@ -211,7 +213,52 @@ Health result:
 | Marketplace rows with identifier | 90.32% |
 | Duplicate ISBN conflicts | 0 |
 
-No source data was imported into Dataverse during staging/health assessment.
+## 3.3 Registry Import / Operational Readback
+
+Import engine:
+
+- Script: `scripts/is009_import_registry.mjs`
+- Evidence: `docs/implementation/evidence/IS-009/is009-registry-import-evidence.json`
+
+Operational validation:
+
+- Script: `scripts/is009_validate_registry_import.mjs`
+- Evidence: `docs/implementation/evidence/IS-009/is009-registry-operational-validation.json`
+
+Import/readback result:
+
+| Metric | Count |
+| --- | ---: |
+| Titles created | 113 |
+| Titles reused | 49 |
+| Titles updated | 49 |
+| Publishing assets created/read back | 295 |
+| Marketplace records created | 522 |
+| Marketplace records reused | 15 |
+| Execution-log events written/read back | 2 |
+| Duplicate Publishing Asset names | 0 |
+| Duplicate normalized ISBN observations | 0 |
+
+Health/confidence result:
+
+| Metric | Count |
+| --- | ---: |
+| Asset Health: Healthy | 295 |
+| Asset Confidence: High | 148 |
+| Asset Confidence: Reconciliation Required | 147 |
+| Author Evidence: Confirmed | 187 |
+| Author Evidence: Unknown / Pending Reconciliation | 108 |
+| Marketplace Identifier: Confirmed | 470 |
+| Marketplace Identifier: Pending Identification | 52 |
+
+Reconciliation queue:
+
+| Queue | Count |
+| --- | ---: |
+| Publishing assets requiring reconciliation | 147 |
+| Marketplace records requiring reconciliation | 52 |
+
+No SharePoint files were moved. No royalties, payments, Business Central postings, or author communications were touched.
 
 ## 4. Schema Deployment Plan
 
@@ -338,11 +385,11 @@ Post-import:
 
 ## 8. Readiness Recommendation
 
-IS-009 Dev schema build is operationally ready for migration-engine staging.
+IS-009 Publishing Asset Registry is operational in JM1-Dev.
 
 Recommended next step:
 
-1. Build migration staging/validation scripts from the frozen workbook, Bowker, Ingram/LSI, and asset listing sources.
-2. Produce staged source profiles without importing production data.
-3. Validate title/ISBN/format/marketplace matching rules.
-4. Use staged exceptions to finalize duplicate/health thresholds before any broad data import.
+1. Work the reconciliation queue for unknown author evidence, pending marketplace identifiers, and missing ISBNs.
+2. Harden service-principal metadata access before unattended automation or promotion.
+3. Decide production promotion path after JM1-Dev acceptance.
+4. Keep SharePoint file movement, royalties, payments, and Business Central outside PAM until separately authorized.

@@ -1,7 +1,7 @@
 # IS-009 - Publishing Asset Registry Specification
 
 **Program:** PAM-001 - Publishing Asset Management
-**Status:** Approved for PAM build; JM1-Dev schema deployed and validated
+**Status:** Approved for PAM build; JM1-Dev registry operational
 **Authority:** Jackie-approved PAM-001 architecture correction, 2026-07-06
 **Scope:** Dataverse schema specification for Publishing Asset Registry only
 **Boundaries:** Dev schema only; no file movement, no source data import, no royalty/payment activity
@@ -284,7 +284,7 @@ Current staging status:
 
 - Migration staging engine completed source candidate generation.
 - Staging health engine completed registry readiness assessment.
-- No records were imported into Dataverse.
+- Controlled registry import completed in JM1-Dev.
 - No SharePoint files were moved.
 
 Staging outputs:
@@ -293,6 +293,8 @@ Staging outputs:
 - `data/is009-publishing-asset-health.json`
 - `docs/implementation/evidence/IS-009/is009-migration-staging-summary.md`
 - `docs/implementation/PAM-001-Enterprise-Asset-Registry-Dashboard.md`
+- `docs/implementation/evidence/IS-009/is009-registry-import-evidence.json`
+- `docs/implementation/evidence/IS-009/is009-registry-operational-validation.json`
 
 Current candidate counts:
 
@@ -306,6 +308,27 @@ Current candidate counts:
 | Duplicate ISBNs with conflicting titles | 0 |
 | Titles missing author evidence | 26 |
 | Marketplace candidates missing identifier | 52 |
+
+Import/readback result:
+
+| Result | Count |
+| --- | ---: |
+| Titles created | 113 |
+| Titles reused | 49 |
+| Titles updated | 49 |
+| Publishing assets created | 295 |
+| Marketplace records created | 522 |
+| Marketplace records reused | 15 |
+| Execution-log events written | 2 |
+| Publishing assets requiring reconciliation | 147 |
+| Marketplace records requiring reconciliation | 52 |
+
+Duplicate rule applied:
+
+- Duplicate title names are not errors.
+- One Intellectual Work may have many Publishing Assets.
+- Publishing Asset uniqueness is governed by Title + Edition + Format + ISBN where ISBN is present.
+- No duplicate Publishing Asset names or duplicate normalized ISBN observations were found in JM1-Dev validation after import.
 
 ## 9. Validation Checklist
 
@@ -355,3 +378,7 @@ Migration/health evidence:
 - `data/is009-publishing-asset-health.json`
 - `docs/implementation/evidence/IS-009/is009-migration-staging-summary.md`
 - `docs/implementation/PAM-001-Enterprise-Asset-Registry-Dashboard.md`
+- `scripts/is009_import_registry.mjs`
+- `scripts/is009_validate_registry_import.mjs`
+- `docs/implementation/evidence/IS-009/is009-registry-import-evidence.json`
+- `docs/implementation/evidence/IS-009/is009-registry-operational-validation.json`
