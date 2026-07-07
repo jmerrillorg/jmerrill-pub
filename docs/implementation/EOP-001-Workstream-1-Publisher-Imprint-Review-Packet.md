@@ -2,14 +2,14 @@
 
 **Program:** EOP-001 - JM Publishing Enterprise Optimization Program  
 **Workstream:** 1 - Publisher Imprint Review  
-**Status:** PAUSED - INVALID FOR GOVERNANCE UNTIL AUTHOR/TITLE SOURCE IS CORRECTED
+**Status:** SUPERSEDED BY OE-001 DECISION PACKET
 **Date:** 2026-07-06  
 
-## Governance Hold
+## Superseded Status
 
-Jackie paused EOP-001 Workstream 1 on 2026-07-06 because the supporting author/title roster was derived from `data/books.json`. `books.json` is legacy evidence only, not source-of-truth authority.
+This packet is retained as historical evidence only.
 
-Do not use this packet to make Publisher imprint decisions until the title/author relationship source is rebuilt from governed Dataverse and corroborating evidence. See `EOP-001-Author-Title-Source-of-Truth-Gap-Report.md`.
+Use `OE-001-Publisher-Imprint-Certification-Decision-Packet.md` for the current Operational Excellence Workstream 1 Publisher decision gate. `books.json` remains legacy evidence only and must not govern imprint certification.
 
 ## Objective
 

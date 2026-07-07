@@ -2,12 +2,12 @@
 
 **Program:** PROGRAM-002 - Autonomous Publishing Production Pipeline  
 **Optimization Program:** EOP-001  
-**Status:** Active - Source-of-truth correction required before Workstream 1 continues
+**Status:** Active - Operational Excellence transition in progress
 **Date:** 2026-07-06  
 
 ## Mission
 
-Enterprise Adoption is closed as an adoption milestone. EOP-001 shifts the operating rhythm from migration to optimization, but Workstream 1 is paused until the author/title roster is rebuilt from governed sources instead of legacy catalog evidence.
+Enterprise Adoption is closed as an adoption milestone. EOP-001 shifts the operating rhythm from migration to optimization. Workstream 1 is now at the Publisher decision gate through the Operational Excellence decision packet.
 
 ## KPI Transition
 
@@ -17,7 +17,7 @@ Enterprise Coverage is retired as the primary KPI because it is complete at 100%
 
 | Order | Workstream | Status | Boundary |
 | --- | --- | --- | --- |
-| 1 | Publisher Imprint Review | Paused | Rebuild author/title source from Dataverse before Publisher decisions continue. |
+| 1 | Publisher Imprint Review | Publisher Decision Gate | Use OE-001 decision packet; approve grouped recommendations and individual exceptions before lock/certify writeback. |
 | 2 | JM Signature Review | Queued | Do not begin until the prior workstream is complete or Jackie authorizes parallel execution. |
 | 3 | Contract Reconciliation | Queued | Do not begin until the prior workstream is complete or Jackie authorizes parallel execution. |
 | 4 | Stripe Migration | Queued | Do not begin until the prior workstream is complete or Jackie authorizes parallel execution. |

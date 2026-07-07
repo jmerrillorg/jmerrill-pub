@@ -1,7 +1,7 @@
 {
   "generatedAt": "2026-07-06T13:14:20.241Z",
   "program": "EOP-001",
-  "status": "Enterprise Optimization Active - Source-of-truth correction required",
+  "status": "Enterprise Optimization Active - Operational Excellence Workstream 1 at Publisher Decision Gate",
   "totals": {
     "catalogTitles": 122,
     "adoptedTitles": 122,
@@ -609,14 +609,13 @@
     "Stripe Migration",
     "Royalty Automation"
   ],
-  "authorRosterStatus": "PROVISIONAL / INVALID FOR GOVERNANCE until rebuilt from Dataverse Contact/title relationships",
+  "authorRosterStatus": "PROVISIONAL for author-count, Stripe, royalty, and Author Success denominators; title-level imprint certification may proceed from EOP/PAM title queue.",
   "invalidatedMetrics": [
     "publishedAuthors",
     "stripeMigration",
     "royaltyReadiness",
-    "Author Success Active denominator",
-    "Workstream 1 author/title pairings"
+    "Author Success Active denominator"
   ],
   "sourceOfTruthGapReport": "docs/implementation/EOP-001-Author-Title-Source-of-Truth-Gap-Report.md",
-  "publisherReviewStatus": "PAUSED until Dataverse author/title roster is rebuilt"
+  "publisherReviewStatus": "PUBLISHER_DECISION_GATE - use OE-001-Publisher-Imprint-Certification-Decision-Packet.md"
 }

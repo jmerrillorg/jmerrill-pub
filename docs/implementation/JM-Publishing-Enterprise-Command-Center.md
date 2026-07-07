@@ -68,7 +68,7 @@ J Merrill Publishing is operating inside PROGRAM-002 with Enterprise Adoption co
 
 | Queue | Count / Status | Next Action |
 | --- | ---: | --- |
-| Publisher Imprint Review | 43 | EOP-001 cleanup |
+| Publisher Imprint Review | 43 | Publisher decision gate via OE-001 packet |
 | JM Signature Review | 1 | Publisher decision for A Portrait of Paradise |
 | Contract Reconciliation | 122 | Locate/link historical agreements |
 | Stripe Migration | 71 / provisional | Validate canonical author roster, then migrate |
@@ -109,6 +109,6 @@ Rationale:
 | Production promotion path | Decide when JM1-Dev PAM registry should be promoted beyond Dev |
 | PAM-002 file movement | Approve any SharePoint/backlist consolidation or movement |
 | JM Signature review | Decide A Portrait of Paradise imprint status |
-| Imprint review cleanup | Approve/lock remaining Publisher review imprints |
+| Imprint review cleanup | Approve Groups A-D and decide two unresolved titles plus A Portrait of Paradise |
 | Contract evidence standard | Decide acceptable evidence threshold for linking historical contracts |
 | Royalty automation go-live | Separate approval before live royalty calculations/payments |
