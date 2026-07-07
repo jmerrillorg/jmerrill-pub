@@ -1,0 +1,243 @@
+{
+  "generatedAt": "2026-07-07T03:30:19.692Z",
+  "apiBase": "https://org52409ff2.crm.dynamics.com/api/data/v9.2",
+  "stagingGeneratedAt": "2026-07-07T03:05:25Z",
+  "counts": {
+    "titlesCreated": 113,
+    "titlesReused": 49,
+    "titlesUpdated": 49,
+    "assetsCreated": 295,
+    "assetsReused": 0,
+    "marketplacesCreated": 522,
+    "marketplacesReused": 15,
+    "executionLogsCreated": 2
+  },
+  "duplicatePrevention": {
+    "assetKeysSeen": 295,
+    "duplicateAssetKeysSkipped": 0,
+    "marketplaceKeysSeen": 537,
+    "duplicateMarketplaceKeysSkipped": 0
+  },
+  "reconciliation": {
+    "assetsRequiringReconciliation": 147,
+    "marketplacesRequiringReconciliation": 52,
+    "reasons": {
+      "Author evidence unknown / pending reconciliation": 108,
+      "Marketplace identifier pending": 89,
+      "Missing ISBN": 2
+    }
+  },
+  "samples": {
+    "assetsCreated": [
+      {
+        "name": "Establishing Glory: The Praise and Worship Handbook (2nd Edition) - Standard Edition - Audiobook - 0172577",
+        "id": "c8e05744-b479-f111-ab0e-7ced8d6f5566"
+      },
+      {
+        "name": "The Celestial Advantage - Standard Edition - Audiobook - 0232184",
+        "id": "c9e05744-b479-f111-ab0e-7ced8d6f5566"
+      },
+      {
+        "name": "Getting Back 2 Happy: The Chronicles of Tabby (Unabridged) - Standard Edition - Audiobook - 0259191",
+        "id": "4ef0cc46-b479-f111-ab0f-000d3a592730"
+      },
+      {
+        "name": "Establishing Glory: The Praise and Worship Handbook - Standard Edition - Paperback - 1981006001",
+        "id": "cde05744-b479-f111-ab0e-7ced8d6f5566"
+      },
+      {
+        "name": "Uncomfortable Conversations with God - Standard Edition - Paperback - 9780578523712",
+        "id": "68f00b48-b479-f111-ab0f-000d3a5a2f1f"
+      },
+      {
+        "name": "God’s Business Plan - Standard Edition - Paperback - 9780985263126",
+        "id": "52f0cc46-b479-f111-ab0f-000d3a592730"
+      },
+      {
+        "name": "God’s Business Plan - Standard Edition - eBook - 9780985263133",
+        "id": "d3e05744-b479-f111-ab0e-7ced8d6f5566"
+      },
+      {
+        "name": "Establishing Glory: The Relationship Handbook - Standard Edition - Paperback - 9781731131775",
+        "id": "d5e05744-b479-f111-ab0e-7ced8d6f5566"
+      },
+      {
+        "name": "27 Days to Overcoming Depression - Standard Edition - eBook - 9781735425031",
+        "id": "53f0cc46-b479-f111-ab0f-000d3a592730"
+      },
+      {
+        "name": "27 Days To Overcoming Depression - Standard Edition - Paperback - 9781735428031",
+        "id": "d6e05744-b479-f111-ab0e-7ced8d6f5566"
+      }
+    ],
+    "marketplacesCreated": [
+      {
+        "name": "Establishing Glory: The Praise and Worship Handbook (2nd Edition) - Publisher Registry - 0172577",
+        "id": "ca170f86-b479-f111-ab0f-000d3a592730"
+      },
+      {
+        "name": "The Celestial Advantage - Publisher Registry - 0232184",
+        "id": "d8854688-b479-f111-ab0f-6045bd001af0"
+      },
+      {
+        "name": "Getting Back 2 Happy: The Chronicles of Tabby (Unabridged) - Publisher Registry - 0259191",
+        "id": "73dcc287-b479-f111-ab0e-7ced8d6f5566"
+      },
+      {
+        "name": "Establishing Glory: The Praise and Worship Handbook - Publisher Registry - 1981006001",
+        "id": "df854688-b479-f111-ab0f-6045bd001af0"
+      },
+      {
+        "name": "Uncomfortable Conversations with God - Publisher Registry - 9780578523712",
+        "id": "cb170f86-b479-f111-ab0f-000d3a592730"
+      },
+      {
+        "name": "God’s Business Plan - LS-United States - 985263121",
+        "id": "e0854688-b479-f111-ab0f-6045bd001af0"
+      },
+      {
+        "name": "God’s Business Plan - Publisher Registry - 9780985263126",
+        "id": "e1854688-b479-f111-ab0f-6045bd001af0"
+      },
+      {
+        "name": "God’s Business Plan - Perlego - Pending ID",
+        "id": "cd170f86-b479-f111-ab0f-000d3a592730"
+      },
+      {
+        "name": "God’s Business Plan - Proquest LLC - Pending ID",
+        "id": "cf170f86-b479-f111-ab0f-000d3a592730"
+      },
+      {
+        "name": "God’s Business Plan - Publisher Registry - 9780985263133",
+        "id": "e8854688-b479-f111-ab0f-6045bd001af0"
+      }
+    ],
+    "reconciliation": [
+      {
+        "type": "asset",
+        "key": "0172577",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "0232184",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "0259191",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "1981006001",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9780578523712",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9780985263133",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "type": "asset",
+        "key": "9781731131775",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781735425031",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719020",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719051",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719082",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719105",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719112",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719129",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719150",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719167",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719242",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719259",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719273",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719297",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719303",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719310",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719341",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719358",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "type": "asset",
+        "key": "9781950719389",
+        "reason": "Author evidence unknown / pending reconciliation"
+      }
+    ]
+  }
+}

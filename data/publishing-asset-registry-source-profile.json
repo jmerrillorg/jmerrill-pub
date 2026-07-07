@@ -1,0 +1,985 @@
+{
+  "sourceFiles": {
+    "ISBN": {
+      "rows": 411,
+      "cols": 14,
+      "columns": [
+        "ISBN13",
+        "Title",
+        "Format",
+        "Status",
+        "ISBN",
+        "KINDLE",
+        "Published",
+        "List Price",
+        "Cost",
+        "0.4",
+        "New ",
+        "AUTHOR COPY",
+        "Contract",
+        "House"
+      ]
+    },
+    "AUTHOR": {
+      "rows": 93,
+      "cols": 5,
+      "columns": [
+        "POD",
+        "eBook",
+        "Amazon",
+        "ACX",
+        "MasterName"
+      ]
+    },
+    "DATES": {
+      "rows": 108,
+      "cols": 5,
+      "columns": [
+        "PODDate",
+        "eBookDate",
+        "AmazonDate",
+        "ACX",
+        "MasterDate"
+      ]
+    },
+    "POD": {
+      "rows": 32073,
+      "cols": 95,
+      "columns": [
+        "publisher_number",
+        "publisher_name",
+        "isbn",
+        "sku",
+        "Full ISBN",
+        "Title",
+        "author",
+        "page_count",
+        "binding_type",
+        "book_type_id",
+        "List Price (USD)",
+        "wholesale_discount_%",
+        "PTD_Quantity",
+        "PTD_avg_list_price",
+        "PTD_extended_list",
+        "PTD_avg_discount_%",
+        "PTD_extended_discount",
+        "PTD_avg_wholesale_price",
+        "PTD_extended_wholesale",
+        "PTD_avg_print_charge",
+        "PTD_extended_print_charge",
+        "PTD_gross_pub_comp",
+        "PTD_extended_adjustments",
+        "PTD_extended_recovery",
+        "PTD_pub_comp",
+        "YTD_quantity",
+        "YTD_avg_list_price",
+        "YTD_extended_list_price",
+        "YTD_avg_discount_%",
+        "YTD_extended_discount",
+        "YTD_avg_wholesale_price",
+        "YTD_extended_wholesale",
+        "YTD_avg_print_charge",
+        "YTD_extended_print_charge",
+        "YTD_gross_pub_comp",
+        "YTD_extended_adjustments",
+        "YTD_extended_recovery",
+        "YTD_pub_comp",
+        "deferral_balance",
+        "reporting_currency_code",
+        "period_name",
+        "original_deferral_amount",
+        "PTD_return_quantity",
+        "PTD_return_wholesale",
+        "PTD_return_charge",
+        "PTD_return_total",
+        "YTD_return_quantity",
+        "YTD_return_wholesale",
+        "YTD_return_charge",
+        "YTD_return_total",
+        "PTD_net_quantity",
+        "PTD_net_wholesale",
+        "PTD_net_pub_comp",
+        "YTD_net_quantity",
+        "YTD_net_wholesale",
+        "YTD_net_pub_comp",
+        "returns_flag_value",
+        "nonreturnable_date",
+        "title_status_flag_value",
+        "cancelled_date",
+        "publisher_imprint",
+        "customer_flexfield1",
+        "customer_flexfield2",
+        "customer_flexfield3",
+        "customer_flexfield4",
+        "customer_flexfield5",
+        "isbn_13",
+        "PTD_wholesale_tax",
+        "PTD_print_charge_tax",
+        "PTD_return_wholesale_tax",
+        "PTD_return_charge_tax",
+        "YTD_wholesale_tax",
+        "YTD_print_charge_tax",
+        "YTD_return_wholesale_tax",
+        "YTD_return_charge_tax",
+        "Marketplace",
+        "sales_category",
+        "Ptd_global_distribution_fee",
+        "Ptd_global_distribution_fee_tax",
+        "Ytd_global_distribution_fee",
+        "Ytd_global_distribution_fee_tax",
+        "MasterDate",
+        "Author Name",
+        "JM Fee",
+        "Total Fees",
+        "Royalty (1)",
+        "Age",
+        "Contracts",
+        "Lifetime Qty",
+        "Royalty (2)",
+        "Royalty 3",
+        "Royalty (4)",
+        "Author Royalty",
+        "Discount (%)",
+        "Royal Pymt"
+      ]
+    },
+    "LINK": {
+      "rows": 789,
+      "cols": 27,
+      "columns": [
+        "publisher_number",
+        "publisher_name",
+        "link_name",
+        "isbn",
+        "sku",
+        "parent_isbn",
+        "title",
+        "author",
+        "page_count",
+        "binding_type",
+        "book_type_id",
+        "quantity_sold",
+        "purchase_price",
+        "extended_purchase_price",
+        "print_charge",
+        "share_and_sell_print_fulfillment_fee",
+        "net_pubcomp",
+        "reporting_currency_code",
+        "period_name",
+        "YTD_quantity_sold",
+        "YTD_extended_purchase_price",
+        "YTD_print_charge",
+        "YTD_share_and_sell_print_fulfillment_fee",
+        "YTD_net_pubcomp",
+        "publisher_imprint",
+        "sales_date",
+        "Royalty Payment"
+      ]
+    },
+    "EBOOK": {
+      "rows": 995,
+      "cols": 80,
+      "columns": [
+        "ReportID",
+        "ReportDateTime",
+        "MessageFunction",
+        "SalesReportType",
+        "ReportPeriodFrom",
+        "ReportPeriodTo",
+        "ReportDate",
+        "ReportingPriceType",
+        "ReportingCurrency",
+        "ClassOfTrade/Sale",
+        "SalesTerritory",
+        "LineItemID#",
+        "SubAgentID#",
+        "Marketplace",
+        "TransactionDateTime",
+        "AgentsTransactionID#",
+        "LineItemReferenceType",
+        "LineItemReferenceID#",
+        "LineItemReferenceDateTime",
+        "MainProductID#Type",
+        "Full ISBN",
+        "AlternativeProductID#Type",
+        "AlternativeProductID#",
+        "Title",
+        "ProductAuthor(s)",
+        "ProductDescription",
+        "PublisherID#",
+        "PublisherName",
+        "ImprintName",
+        "ProductFormat",
+        "DeviceType",
+        "GrossSoldQuantity",
+        "ReturnedRefundedQuantity",
+        "Net Quantity Sold",
+        "NonSaleQuantity",
+        "NonSaleDisposalType",
+        "ClassOfTradeSale",
+        "SalesTerritory.1",
+        "List Price (USD)",
+        "PriceType",
+        "PriceCurrency",
+        "CommissionDiscountPercentage",
+        "GrossSoldValue",
+        "ReturnedRefundedValue",
+        "NetValueBeforeFees",
+        "FeeType1",
+        "FeeAmount1",
+        "FeeSource1",
+        "FeeType2",
+        "FeeAmount2",
+        "FeeSource2",
+        "FeeType3",
+        "FeeAmount3",
+        "FeeSource3",
+        "ProceedsOfSaleDuePublisher",
+        "TotalNumberOfLineItems",
+        "TotalGrossSoldQuantity",
+        "TotalReturnedRefundedQuantity",
+        "TotalNetSoldQuantity",
+        "TotalNonSaleQuantity",
+        "TotalGrossSoldValue",
+        "TotalReturnedRefundedValue",
+        "TotalNetSoldValueBeforeFees",
+        "TotalFeesOfAllTypes",
+        "TotalProceedsDueToPublisher",
+        "Ebook Sales Models",
+        "MasterDate",
+        "Author Name",
+        "JM Fee",
+        "Total Fees",
+        "Royalty (1)",
+        "Age",
+        "Contracts",
+        "Lifetime Qty",
+        "Royalty (2)",
+        "Royalty 3",
+        "Royalty (4)",
+        "Author Royalty",
+        "Royalty Pymt",
+        "Discount (%)"
+      ]
+    },
+    "AMAZON": {
+      "rows": 2992,
+      "cols": 28,
+      "columns": [
+        "Title",
+        "Author",
+        "ASIN/ISBN",
+        "Marketplace",
+        "Units Sold",
+        "Units Refunded",
+        "Net Quantity Sold",
+        "Discount (%)",
+        "Payout Plan",
+        "Currency",
+        "List Price (USD)",
+        "Avg. Offer Price without tax",
+        "Avg. File Size (MB)",
+        "Avg. Delivery/Manufacturing cost",
+        "Royalty",
+        "MasterDate",
+        "Author Name",
+        "JM Fee",
+        "Total Fees",
+        "Royalty (1)",
+        "Age",
+        "Contracts",
+        "Lifetime Qty",
+        "Royalty (2)",
+        "Royalty 3",
+        "Royalty (4)",
+        "Royalty Pymt",
+        "Author Royalty"
+      ]
+    },
+    "ACX": {
+      "rows": 739,
+      "cols": 21,
+      "columns": [
+        "Date",
+        "Royalty Earner",
+        "Product ID",
+        "Author",
+        "Title",
+        "Digital ISBN",
+        "Net Units AL",
+        "Net Royalties Earned AL",
+        "Net Units ALOP",
+        "Net Royalties Earned ALOP",
+        "Net Units ALC",
+        "Net Royalties Earned ALC",
+        "Listening Minutes OD",
+        "Net Royalties Earned OD",
+        "Net Units",
+        "Listening Minutes",
+        "Net Royalties Earned",
+        "Adjustments",
+        "Recoupments",
+        "Net Royalties",
+        "Royalty Pymt"
+      ]
+    },
+    "POD-Report": {
+      "rows": 64,
+      "cols": 9,
+      "columns": [
+        "MasterDate",
+        "(Multiple Items)",
+        "Unnamed: 2",
+        "Unnamed: 3",
+        "Unnamed: 4",
+        "Unnamed: 5",
+        "Unnamed: 6",
+        "Unnamed: 7",
+        "Unnamed: 8"
+      ]
+    },
+    "EBOOK-Report": {
+      "rows": 17,
+      "cols": 10,
+      "columns": [
+        "MasterDate",
+        "(Multiple Items)",
+        "Unnamed: 2",
+        "Unnamed: 3",
+        "Unnamed: 4",
+        "Unnamed: 5",
+        "Unnamed: 6",
+        "Unnamed: 7",
+        "Unnamed: 8",
+        "Unnamed: 9"
+      ]
+    },
+    "AMAZON-Report": {
+      "rows": 5,
+      "cols": 9,
+      "columns": [
+        "MasterDate",
+        "2026-04-01 00:00:00",
+        "Unnamed: 2",
+        "Unnamed: 3",
+        "Unnamed: 4",
+        "Unnamed: 5",
+        "Unnamed: 6",
+        "Unnamed: 7",
+        "Unnamed: 8"
+      ]
+    },
+    "ACX-Report": {
+      "rows": 4,
+      "cols": 5,
+      "columns": [
+        "Date",
+        "2026-04-01 00:00:00",
+        "Unnamed: 2",
+        "Unnamed: 3",
+        "Unnamed: 4"
+      ]
+    },
+    "Shipping": {
+      "rows": 16,
+      "cols": 22,
+      "columns": [
+        "Order Qty",
+        " Original ",
+        " Adjustment ",
+        " Service Level ",
+        " Extended Amount ",
+        " Profit ",
+        "Unnamed: 6",
+        "Unnamed: 7",
+        "Payment Options",
+        "Unnamed: 9",
+        "Unnamed: 10",
+        "Payment Options.1",
+        "Unnamed: 12",
+        "price",
+        "discount",
+        " wholesale ",
+        "distribution",
+        "qty",
+        "subtotal",
+        "fees",
+        "royalty",
+        "after first year"
+      ]
+    }
+  },
+  "supportFiles": {
+    "Total_Asset_Listing_20260706_0831.xlsx": {
+      "rows": 260,
+      "cols": 18,
+      "columns": [
+        "Title Group ID",
+        "Title",
+        "Isbn",
+        "Alt IDs",
+        "Asset Type",
+        "Publisher",
+        "Imprint",
+        "Earliest Ingestion Date",
+        "Latest Content Ingestion Date",
+        "Pub Date",
+        "UK Pub Date",
+        "On Sale Date",
+        "Edition Description",
+        "Asset Version",
+        "Contributor",
+        "Is Distributable",
+        "Total Mb",
+        "TIMS Title Code"
+      ]
+    },
+    "IS report.csv": {
+      "rows": 233
+    },
+    "LSI report.csv": {
+      "rows": 5
+    }
+  },
+  "recordsWithIdentifiers": 2369,
+  "uniqueIdentifiers": 625,
+  "channelCounts": {
+    "ISBN registry": 871,
+    "POD/Ingram": 579,
+    "POD link": 3,
+    "Amazon/KDP": 4,
+    "ACX": 4,
+    "CoreSource asset": 260,
+    "Ingram/LSI proof": 248,
+    "Bowker": 400
+  },
+  "sourceCounts": {
+    "ISBN": 871,
+    "POD": 579,
+    "LINK": 3,
+    "AMAZON": 4,
+    "ACX": 4,
+    "Total Asset Listing": 260,
+    "IS report.csv": 233,
+    "LSI report.csv": 15,
+    "prefix-9781950719.csv": 100,
+    "prefix-9781954414.csv": 100,
+    "prefix-9781961475.csv": 100,
+    "prefix-9781969418.csv": 100
+  },
+  "duplicateIsbnAcrossSourcesCount": 412,
+  "conflictingTitlesByIsbnCount": 132,
+  "conflictingTitlesByIsbnSample": [
+    {
+      "isbn": "9780578523712",
+      "titles": [
+        "Uncomfortable Conversations with God",
+        "Uncomfortable Conversations with God: 31 Day Journal and Reflections"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN"
+      ]
+    },
+    {
+      "isbn": "9780985263126",
+      "titles": [
+        "God's Business Plan",
+        "God\u2019s Business Plan"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN"
+      ]
+    },
+    {
+      "isbn": "9781735428031",
+      "titles": [
+        "27 Days To Overcoming Depression",
+        "27 Days to Overcoming Depression"
+      ],
+      "sources": [
+        "ISBN",
+        "Total Asset Listing"
+      ]
+    },
+    {
+      "isbn": "9781792313707",
+      "titles": [
+        "Come Out Of Hiding: Activating Deliverance",
+        "Come Out of Hiding"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN"
+      ]
+    },
+    {
+      "isbn": "9781950719006",
+      "titles": [
+        "Establishing Glory",
+        "Establishing Glory: The Praise and Worship Handbook (2nd Edition)"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719013",
+      "titles": [
+        "Establishing Glory",
+        "Establishing Glory: The Praise and Worship Handbook (2nd Edition)"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719020",
+      "titles": [
+        "Establishing Glory",
+        "Establishing Glory: The Praise and Worship Handbook (2nd Edition)"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719037",
+      "titles": [
+        "Establishing Glory 2",
+        "Establishing Glory 2: The Relationship Handbook (2nd Edition)"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719044",
+      "titles": [
+        "Establishing Glory 2",
+        "Establishing Glory 2: The Relationship Handbook (2nd Edition)"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719051",
+      "titles": [
+        "Establishing Glory 2",
+        "Establishing Glory 2: The Relationship Handbook (2nd Edition)"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719112",
+      "titles": [
+        "Uncomfortable Conversations with God",
+        "Uncomfortable Conversations with God: 31 Day Journal and Reflections"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719136",
+      "titles": [
+        "Establishing Glory 3",
+        "Establishing Glory 3: The Marriage Handbook"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719143",
+      "titles": [
+        "Establishing Glory 3",
+        "Establishing Glory 3: The Marriage Handbook"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719150",
+      "titles": [
+        "Establishing Glory 3",
+        "Establishing Glory 3: The Marriage Handbook"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719181",
+      "titles": [
+        "Destined To Break The Curse Devotional",
+        "Destined to Break the Curse Devotional"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719198",
+      "titles": [
+        "Destined To Break The Curse Devotional",
+        "Destined to Break the Curse Devotional"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719204",
+      "titles": [
+        "Are You Sure That You Are Ready?",
+        "Are You Sure That You Are Ready?: A Guide for Vendors"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719211",
+      "titles": [
+        "The Essence of Life, Love Letters to Christ",
+        "The Essence of Life, Love Letters to Christ: Poems of Life and Love from the Pages of the Heart"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719228",
+      "titles": [
+        "Are You Sure That You Are Ready?",
+        "Are You Sure That You Are Ready?: A Guide for Vendors"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719235",
+      "titles": [
+        "The Essence of Life, Love Letters to Christ",
+        "The Essence of Life, Love Letters to Christ: Poems of Life and Love from the Pages of the Heart"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719266",
+      "titles": [
+        "Come Out Of Hiding",
+        "Come Out Of Hiding: Activating Deliverance",
+        "Come Out of Hiding"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719273",
+      "titles": [
+        "Jewels by Lady J",
+        "Jewels by Lady J: A Book of Daily Devotion and Reflection One Day at a Time"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719280",
+      "titles": [
+        "Jewels by Lady J",
+        "Jewels by Lady J: A Book of Daily Devotion and Reflection One Day at a Time"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719297",
+      "titles": [
+        "Jewels by Lady J",
+        "Jewels by Lady J: A Book of Daily Devotion and Reflection One Day at a Time"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719341",
+      "titles": [
+        "Destined to Break the Curse",
+        "Destined to Break the Curse: The Autobiography of Sean Smith, Sr."
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719358",
+      "titles": [
+        "Destined to Break the Curse",
+        "Destined to Break the Curse: The Autobiography of Sean Smith, Sr."
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719389",
+      "titles": [
+        "Life After Detour: First Hand Advice to Empower Teen Parents",
+        "Life after Detour"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719396",
+      "titles": [
+        "Life After Detour",
+        "Life After Detour: First Hand Advice to Empower Teen Parents",
+        "Life after Detour"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719402",
+      "titles": [
+        "Girl, You're Not Crazy. You're Dealing With a Narcissist",
+        "Girl, You're Not Crazy. You're Dealing with a Narcissist"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "prefix-9781950719.csv"
+      ]
+    },
+    {
+      "isbn": "9781950719419",
+      "titles": [
+        "Girl, You're Not Crazy. You're Dealing With a Narcissist",
+        "Girl, You're Not Crazy. You're Dealing with a Narcissist"
+      ],
+      "sources": [
+        "IS report.csv",
+        "ISBN",
+        "Total Asset Listing",
+        "prefix-9781950719.csv"
+      ]
+    }
+  ],
+  "duplicateIsbnRegistryRows": [],
+  "missingIsbnRegistryRows": [],
+  "authorAliasConflicts": [],
+  "legacyWebsiteCatalogCompare": {
+    "legacyNotInWorkbookRegistryCount": 0,
+    "workbookRegistryNotLegacyCount": 289,
+    "legacyNotInWorkbookRegistrySample": [],
+    "workbookRegistryNotLegacySample": [
+      "1981006001",
+      "9780578523712",
+      "9780985263126",
+      "9780985263133",
+      "9781731131775",
+      "9781735425031",
+      "9781792313707",
+      "9781950719013",
+      "9781950719020",
+      "9781950719044",
+      "9781950719051",
+      "9781950719075",
+      "9781950719099",
+      "9781950719129",
+      "9781950719143",
+      "9781950719150",
+      "9781950719174",
+      "9781950719198",
+      "9781950719228",
+      "9781950719235",
+      "9781950719259",
+      "9781950719273",
+      "9781950719297",
+      "9781950719310",
+      "9781950719334",
+      "9781950719358",
+      "9781950719365",
+      "9781950719372",
+      "9781950719396",
+      "9781950719419"
+    ]
+  },
+  "detailedQuality": {
+    "isbnSheetRows": 411,
+    "isbnSheetMissingISBN": 0,
+    "isbnSheetDuplicateISBN": 0,
+    "isbnSheetMissingTitle": 140,
+    "isbnSheetDuplicateTitleNames": 154,
+    "isbnSheetMissingFormat": 140,
+    "isbnSheetMissingStatus": 140,
+    "isbnSheetMissingListPrice": 2,
+    "reportTitleSourcesUniqueCounts": {
+      "POD": 72,
+      "LINK": 1,
+      "EBOOK": 36,
+      "AMAZON": 4,
+      "ACX": 2,
+      "Total Asset Listing": 89,
+      "IS report.csv": 114,
+      "LSI report.csv": 4
+    },
+    "titlesInReportsNotWorkbookISBNCount": 59,
+    "titlesInWorkbookISBNNotReportsCount": 17,
+    "titlesInReportsNotWorkbookISBNSample": [
+      "100 wisdom lessons for life and living",
+      "27 days to overcoming depression debunking all the lies",
+      "a portrait of paradise",
+      "a principal s tale a self determined leader",
+      "abortion george and giovanna",
+      "according to mark the gospel of jesus christ begins",
+      "aligned unlocking the dna of authentic faith",
+      "almost happy the chronicles of tabby",
+      "are you sure that you are ready a guide for vendors",
+      "because the lord is my shepherd psalm 23 and me",
+      "bodacious controversial and provocative",
+      "come out of hiding activating deliverance",
+      "connected unlocking the dna of authentic prayer 2nd edition",
+      "damaged",
+      "delicious ideas the legacy cookbook",
+      "department of the air force mission driven leadership",
+      "destined to break the curse the autobiography of sean smith sr",
+      "discipline and direction god s leadership style",
+      "divinely inspired trauma triumphed",
+      "establishing glory 2 the relationship handbook 2nd edition",
+      "establishing glory 3 the marriage handbook",
+      "establishing glory the relationship collection",
+      "getting back 2 happy the chronicles of tabby",
+      "girl did you know",
+      "girl did you know a journey of healing truth and god s restoration",
+      "grandmothers educating minds 2nd edition",
+      "have you considered my servant when you feel like job",
+      "inspirations from god god is gooood",
+      "jewels by lady j a book of daily devotion and reflection one day at a time",
+      "just what i needed daily devotional",
+      "kingdom equipment 101 tools for kingdom purpose",
+      "lady daphanny s altar my prayer for you today is",
+      "life after detour first hand advice to empower teen parents",
+      "loving the addict while taking care of yourself first",
+      "memoir of a black christian nationalist seeds of liberation",
+      "memoir of a black christian nationalist seeds of liberation unabridged",
+      "mirror of refining insight an introspective look at pursuing your purpose",
+      "more than a village raising black men in america",
+      "music ministry unplugged",
+      "music ministry unplugged real lessons for those who lead and serve in music ministry",
+      "my abcs",
+      "she an expose of her insufficiencies",
+      "speech therapy works juliana s story",
+      "taylor made my life my story",
+      "the conquest of azenga",
+      "the essence of life love letters to christ poems of life and love from the pages of the heart",
+      "the fight for the promiseland",
+      "the fight for the promiseland battle strategies for victorious people",
+      "the great hair restart the journal",
+      "the great hair restart the ultimate guide to resetting your natural hair journey with confidence"
+    ],
+    "titlesInWorkbookISBNNotReportsSample": [
+      "a truebies guide part 1",
+      "according to mark",
+      "aligned",
+      "destined to break the curse",
+      "establishing glory the praise and worship handbook",
+      "establishing glory the relationship handbook",
+      "from stylist to ceo",
+      "grandmothers educating minds",
+      "inner peace through life s storms",
+      "kingdom equipment 101",
+      "my abc s",
+      "naughty tales",
+      "the flame",
+      "the i am in me part 2",
+      "the journey",
+      "when zuri came to earth",
+      "why faith works for some and not for others"
+    ],
+    "PODMissingAuthorRows": 31880,
+    "LINKMissingAuthorRows": 788,
+    "AMAZONMissingAuthorRows": 2988,
+    "ACXMissingAuthorRows": 735,
+    "AMAZONMissingASIN/ISBNRowsWithTitle": 0,
+    "ACXMissingProduct IDRowsWithTitle": 0,
+    "ACXMissingDigital ISBNRowsWithTitle": 4,
+    "IS report.csvMissingImprintRows": 0,
+    "LSI report.csvMissingImprintRows": 0
+  }
+}

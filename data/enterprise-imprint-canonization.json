@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-06T11:51:14.143Z",
+  "generatedAt": "2026-07-07T00:00:00-04:00",
   "summary": {
     "totalTitlesReviewed": 122,
     "currentImprintDistribution": {
@@ -25,17 +25,19 @@
     },
     "titlesAutomaticallyLocked": 74,
     "titlesRequiringPublisherReview": 47,
-    "jmSignatureCandidates": 1,
+    "jmSignatureCandidates": 0,
     "missingMetadata": 47,
     "missingManuscripts": 122,
     "titlesLackingSufficientEvidence": 47,
-    "averageConfidence": 0.58
+    "averageConfidence": 0.58,
+    "automaticallyLocked": 122,
+    "publisherReviewRequired": 0
   },
   "titles": [
     {
       "id": "100-wisdom-lessons-for-life-and-living",
-      "title": "100 Wisdom Lessons for Life and Living",
-      "author": "J. Derrick Johnson",
+      "title": "101 Wisdom Lessons for Life and Living",
+      "author": "j. Derrick Johnson",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -48,16 +50,31 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for '101 Wisdom Lessons for Life and Living' by j. Derrick Johnson.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for '101 Wisdom Lessons for Life and Living' by j. Derrick Johnson.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for '101 Wisdom Lessons for Life and Living' by j. Derrick Johnson."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "27-days-to-overcoming-depression",
@@ -70,25 +87,39 @@
       ],
       "isbn": "978-1-961475-36-6",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.84,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Self-Help",
         "text signal: self, depression",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for '27 Days to Overcoming Depression' by Donjia Walls.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for '27 Days to Overcoming Depression' by Donjia Walls."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "365-days-of-transparency",
-      "title": "365 Days Of Transparency",
+      "title": "365 Days of Transparency",
       "author": "Daphanny Baker",
       "genre": "Devotional",
       "format": "Paperback",
@@ -105,19 +136,34 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for '365 Days of Transparency' by Daphanny Baker.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for '365 Days of Transparency' by Daphanny Baker."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "7-step-jumpstart-to-becoming-your-best-self",
       "title": "7 Step Jumpstart to Becoming Your Best Self",
-      "author": "Johnson Settles",
+      "author": "Ericka Johnson-Settles",
       "genre": "Self-Help",
       "format": "Paperback",
       "formats": [
@@ -126,21 +172,36 @@
       ],
       "isbn": "978-1-954414-74-7",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Self-Help",
         "text signal: self",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title '7 Step Jumpstart to Becoming Your Best Self', canonical author 'Ericka Johnson Settles', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for '7 Step Jumpstart to Becoming Your Best Self' by Ericka Johnson-Settles.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for '7 Step Jumpstart to Becoming Your Best Self' by Ericka Johnson-Settles."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "a-blended-family",
@@ -155,25 +216,39 @@
       ],
       "isbn": "978-1-954414-12-9",
       "currentImprint": "JM Works",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Little",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'A Blended Family' by Shecara Norris.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'A Blended Family' by Shecara Norris."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "a-little-bit-of-everything",
       "title": "A Little Bit of Everything",
-      "author": "Carolyn Booker-Pierce",
+      "author": "Eryonna Noelle",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -184,16 +259,30 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'A Little Bit of Everything' by Eryonna Noelle.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'A Little Bit of Everything' by Eryonna Noelle."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "a-portrait-of-paradise",
@@ -210,17 +299,32 @@
       "currentImprint": "JM Signature",
       "recommendedImprint": "JM Signature",
       "confidence": 0.5,
-      "decision": "JM SIGNATURE REVIEW",
+      "decision": "LOCKED",
       "reasoning": [
         "JM Signature is invitation-only and cannot be auto-locked.",
         "text signal: portrait of paradise",
-        "legacy imprint agrees: JM Signature"
+        "legacy imprint agrees: JM Signature",
+        "Publisher Master Imprint Register certified 'JM Signature' for 'A Portrait of Paradise' by Iyorwuese Hagher.",
+        "Full Publisher Master Imprint Register certified 'JM Signature' for 'A Portrait of Paradise' by Iyorwuese Hagher.",
+        "Full Publisher Master Imprint Register certified 'JM Signature' for 'A Portrait of Paradise' by Iyorwuese Hagher."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Signature",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "a-principal-s-tale",
@@ -241,19 +345,34 @@
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: JM Works.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'A Principal's Tale' by Shelley McIntosh.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'A Principal's Tale' by Shelley McIntosh."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "a-truebies-guide-part-1",
-      "title": "A Truebies Guide, Part 1",
-      "author": "Carolyn Booker-Pierce",
+      "title": "A Trubie's Guide Pt. 1",
+      "author": "Alesia Corpening",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -262,23 +381,38 @@
       ],
       "isbn": "978-1-950719-62-4",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 publisher override: canonical title 'A Trubie's Guide Pt. 1', canonical author 'Alesia Corpening', certified imprint 'JM Works'.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'A Trubie's Guide Pt. 1' by Alesia Corpening.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'A Trubie's Guide Pt. 1' by Alesia Corpening."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "a-truebies-guide-part-2",
-      "title": "A Truebies Guide, Part 2",
-      "author": "Carolyn Booker-Pierce",
+      "title": "A Trubie's Guide Pt. 2",
+      "author": "Alesia Corpening",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -287,18 +421,33 @@
       ],
       "isbn": "978-1-950719-32-7",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation TITLE_VARIANT_CONFIRMED: canonical title 'A Truebies Guide, Part 2', canonical author 'Alesia Corpening', certified imprint 'JM Works'.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'A Trubie's Guide Pt. 2' by Alesia Corpening.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'A Trubie's Guide Pt. 2' by Alesia Corpening."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "abortion",
@@ -313,22 +462,45 @@
       "isbn": "978-1-954414-00-6",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Carolyn Booker-Pierce",
+      "publisherMasterRegisterTitle": "Abortion!",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Carolyn Booker-Pierce",
+        "canonicalTitle": "Abortion!",
+        "prior": {
+          "title": "Abortion!",
+          "author": "Toni Kleckley",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
+      }
     },
     {
       "id": "according-to-mark",
       "title": "According to Mark",
-      "author": "Alice V Pryor",
+      "author": "Alice V. Pryor",
       "genre": "Faith",
       "format": "Paperback",
       "formats": [
@@ -345,19 +517,33 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'According to Mark' by Alice V. Pryor.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'According to Mark' by Alice V. Pryor."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "aligned",
       "title": "Aligned!",
-      "author": "Alesia True Corpening",
+      "author": "Dennis Brown",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -368,16 +554,31 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Aligned!', canonical author 'Dennis Brown', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Aligned!' by Dennis Brown.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Aligned!' by Dennis Brown."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "almost-happy",
@@ -392,20 +593,34 @@
       ],
       "isbn": "978-1-954414-58-7",
       "currentImprint": "JM Works",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Almost Happy' by Jaylonna Stevette.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Almost Happy' by Jaylonna Stevette."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "are-you-sure-that-you-are-ready",
@@ -426,19 +641,33 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Are You Sure That You Are Ready?' by Ericka Thornton.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Are You Sure That You Are Ready?' by Ericka Thornton."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "because-the-lord-is-my-shepherd",
       "title": "Because the Lord Is My Shepherd",
-      "author": "Rodney Waller",
+      "author": "Carolyn Booker-Pierce",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -449,16 +678,31 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.36,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Because the Lord Is My Shepherd' by Carolyn Booker-Pierce.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Because the Lord Is My Shepherd' by Carolyn Booker-Pierce.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Because the Lord Is My Shepherd' by Carolyn Booker-Pierce."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "bee-careful",
@@ -480,14 +724,29 @@
         "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
         "genre signal: Children's",
         "text signal: children, child",
-        "legacy imprint agrees: JM Little"
+        "legacy imprint agrees: JM Little",
+        "Publisher-certified Batch 1 imprint assignment: JM Little.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'BEE Careful' by Deborah Eiland.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'BEE Careful' by Deborah Eiland."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "biblical-prescriptions-for-life-s-troubles",
@@ -508,14 +767,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, biblical",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Biblical Prescriptions for Life's Troubles' by Terry Stephens.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Biblical Prescriptions for Life's Troubles' by Terry Stephens."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "bodacious",
@@ -535,19 +808,33 @@
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Bodacious' by Nathaniel Short.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Bodacious' by Nathaniel Short."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "come-out-of-hiding",
       "title": "Come Out of Hiding",
-      "author": "Christina Chislom",
+      "author": "Chistina Chislom",
       "genre": "Faith",
       "format": "eBook",
       "formats": [
@@ -562,19 +849,34 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Come Out of Hiding', canonical author 'Christina Chislom', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Come Out of Hiding' by Chistina Chislom.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Come Out of Hiding' by Chistina Chislom."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "connected",
-      "title": "Connected!",
-      "author": "Alesia True Corpening",
+      "title": "Connected",
+      "author": "Dennis Brown",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -585,16 +887,31 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Connected!', canonical author 'Dennis Brown', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Connected' by Dennis Brown.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Connected' by Dennis Brown."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "conquer-your-fears-and-win",
@@ -609,26 +926,40 @@
       ],
       "isbn": "978-1-950719-46-4",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Self-Help",
         "text signal: self",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Conquer Your Fears and Win' by Gloria Patterson.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Conquer Your Fears and Win' by Gloria Patterson."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "damaged",
       "title": "Damaged",
-      "author": "Taye Knox",
+      "author": "Lisa Taylor",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -639,16 +970,31 @@
       "currentImprint": "JM Works",
       "recommendedImprint": "JM Works",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Works."
+        "Legacy imprint retained as evidence only: JM Works.",
+        "Publisher Master Imprint Register certified 'JM Works' for 'Damaged' by Lisa Taylor.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Damaged' by Lisa Taylor.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Damaged' by Lisa Taylor."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "delicious-ideas",
@@ -664,17 +1010,40 @@
       "isbn": "978-1-961475-33-5",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Agape International Cathedral",
+      "publisherMasterRegisterTitle": "Delicious Ideas!",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Agape International Cathedral",
+        "canonicalTitle": "Delicious Ideas!",
+        "prior": {
+          "title": "Delicious Ideas!",
+          "author": "Pamela Smith",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
+      }
     },
     {
       "id": "department-of-the-air-force-mission-driven-leadership",
@@ -688,18 +1057,43 @@
       ],
       "isbn": "978-1-961475-68-7",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "JM Works",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register final correction certified JM Works as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Final Corrections"
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain",
+      "publisherMasterRegisterTitle": "Department of the Air Force: Mission Driven Leadership",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Final Corrections",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "JM Works",
+        "canonicalAuthor": "Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain",
+        "canonicalTitle": "Department of the Air Force: Mission Driven Leadership",
+        "prior": {
+          "title": "Department of the Air Force: Mission Driven Leadership",
+          "author": "Jackie Smith, Jr.",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE",
+          "publisherCertifiedImprint": null
+        }
+      }
     },
     {
       "id": "destined-to-break-the-curse",
@@ -720,18 +1114,33 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Destined to Break the Curse' by Sean Smith, Sr..",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Destined to Break the Curse' by Sean Smith, Sr..",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Destined to Break the Curse' by Sean Smith, Sr.."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "destined-to-break-the-curse-devotional",
-      "title": "Destined to Break the Curse Devotional",
+      "title": "Destined to Break the Curse: Devotional",
       "author": "Sean Smith, Sr.",
       "genre": "",
       "format": "Paperback",
@@ -743,16 +1152,30 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.36,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Destined to Break the Curse: Devotional' by Sean Smith, Sr..",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Destined to Break the Curse: Devotional' by Sean Smith, Sr.."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "discipline-and-direction",
@@ -773,14 +1196,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Discipline and Direction' by Terry Stephens.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Discipline and Direction' by Terry Stephens."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "divinely-inspired",
@@ -795,22 +1232,47 @@
       ],
       "isbn": "978-1-961475-17-5",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "JM Verse",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register final correction certified JM Verse as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Final Corrections"
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Regina Scales",
+      "publisherMasterRegisterTitle": "Divinely Inspired",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Final Corrections",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "JM Verse",
+        "canonicalAuthor": "Regina Scales",
+        "canonicalTitle": "Divinely Inspired",
+        "prior": {
+          "title": "Divinely Inspired",
+          "author": "Tekisha Wimbush",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE",
+          "publisherCertifiedImprint": null
+        }
+      }
     },
     {
       "id": "establishing-glory",
-      "title": "Establishing Glory",
+      "title": "Establishing Glory: The Praise and Worship Handbook (2nd Edition)",
       "author": "Jackie Smith, Jr.",
       "genre": "Faith",
       "format": "Paperback",
@@ -829,18 +1291,32 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Establishing Glory: The Praise and Worship Handbook (2nd Edition)' by Jackie Smith, Jr..",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Establishing Glory: The Praise and Worship Handbook (2nd Edition)' by Jackie Smith, Jr.."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "establishing-glory-2",
-      "title": "Establishing Glory 2",
+      "title": "Establishing Glory 2: The Relationship Handbook (2nd Edition)",
       "author": "Jackie Smith, Jr.",
       "genre": "Faith",
       "format": "Paperback",
@@ -858,18 +1334,32 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Establishing Glory 2: The Relationship Handbook (2nd Edition)' by Jackie Smith, Jr..",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Establishing Glory 2: The Relationship Handbook (2nd Edition)' by Jackie Smith, Jr.."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "establishing-glory-3",
-      "title": "Establishing Glory 3",
+      "title": "Establishing Glory 3: The Marriage Handbook",
       "author": "Jackie Smith, Jr.",
       "genre": "Faith",
       "format": "Paperback",
@@ -887,14 +1377,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Establishing Glory 3: The Marriage Handbook' by Jackie Smith, Jr..",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Establishing Glory 3: The Marriage Handbook' by Jackie Smith, Jr.."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "focus-trust-and-follow",
@@ -915,19 +1419,34 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Focus, Trust, and Follow' by Shana Byrd.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Focus, Trust, and Follow' by Shana Byrd."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "for-what-it-s-worth",
       "title": "For What It's Worth",
-      "author": "Ericka Thornton",
+      "author": "Kelli Milligan Stammen",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -936,18 +1455,33 @@
       ],
       "isbn": "978-1-950719-72-3",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 publisher override: canonical title 'For What It's Worth', canonical author 'Kelli Milligan Stammen', certified imprint 'JM Works'.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'For What It's Worth' by Kelli Milligan Stammen.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'For What It's Worth' by Kelli Milligan Stammen."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "from-stylist-to-ceo",
@@ -962,18 +1496,41 @@
       ],
       "isbn": "978-1-961475-23-6",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Works."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Karen Hill",
+      "publisherMasterRegisterTitle": "From Stylist to CEO",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Karen Hill",
+        "canonicalTitle": "From Stylist to CEO",
+        "prior": {
+          "title": "From Stylist to CEO",
+          "author": "Kelli Milligan Stammen",
+          "recommendedImprint": "JM Works",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
+      }
     },
     {
       "id": "getting-back-2-happy",
@@ -987,20 +1544,34 @@
       ],
       "isbn": "978-1-950719-42-6",
       "currentImprint": "JM Works",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Getting Back 2 Happy' by Jaylonna Stevette.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Getting Back 2 Happy' by Jaylonna Stevette."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
@@ -1015,17 +1586,40 @@
       "isbn": "978-1-950719-40-2",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Carolyn Booker-Pierce",
+      "publisherMasterRegisterTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Carolyn Booker-Pierce",
+        "canonicalTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+        "prior": {
+          "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+          "author": "Carolyn Booker-Pierce",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
+      }
     },
     {
       "id": "god-s-business-plan",
@@ -1045,18 +1639,32 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, god",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'God's Business Plan' by Terry Stephens.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'God's Business Plan' by Terry Stephens."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "god-s-nudge",
-      "title": "God's Nudge",
+      "title": "God’s Nudge",
       "author": "Tekisha Wimbush",
       "genre": "Faith",
       "format": "Paperback",
@@ -1073,19 +1681,32 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, god",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'God’s Nudge' by Tekisha Wimbush."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "god-s-word-for-this-world",
-      "title": "God's Word For This World",
-      "author": "Bishop Thomas Johnson",
+      "title": "God’s Word For This World",
+      "author": "Thomas Johnson, Sr.",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -1096,16 +1717,30 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'God's Word For This World', canonical author 'Thomas Johnson, Sr.', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'God’s Word For This World' by Thomas Johnson, Sr.."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "grandmothers-educating-minds",
@@ -1136,7 +1771,7 @@
     {
       "id": "grandmothers-educating-minds-2nd-edition",
       "title": "Grandmothers Educating Minds, 2nd Edition",
-      "author": "M. Darlene Carson",
+      "author": "Toni Kleckley",
       "genre": "",
       "format": "eBook",
       "formats": [
@@ -1146,21 +1781,36 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Grandmothers Educating Minds, 2nd Edition', canonical author 'Toni Kleckley', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Grandmothers Educating Minds, 2nd Edition' by Toni Kleckley.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Grandmothers Educating Minds, 2nd Edition' by Toni Kleckley."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "have-you-considered-my-servant",
       "title": "Have You Considered My Servant?",
-      "author": "Obadiah E. Harris",
+      "author": "Jaylonna Stevette",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -1169,22 +1819,47 @@
       ],
       "isbn": "978-1-961475-31-1",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "JM Works",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register final correction certified JM Works as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Final Corrections"
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Final Corrections",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "JM Works",
+        "canonicalAuthor": "Jaylonna Stevette",
+        "canonicalTitle": "Have You Considered My Servant?",
+        "prior": {
+          "title": "Have You Considered My Servant?",
+          "author": "Jaylonna Stevette",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOCKED",
+          "publisherCertifiedImprint": "J Merrill Publishing"
+        }
+      },
+      "publisherMasterRegisterAuthor": "Jaylonna Stevette",
+      "publisherMasterRegisterTitle": "Have You Considered My Servant?"
     },
     {
       "id": "help-god-i-am-the-collection",
-      "title": "Help God, I Am - The Collection",
+      "title": "Help God, I Am: The Collection",
       "author": "Cheryl Travis",
       "genre": "Devotional",
       "format": "Paperback",
@@ -1201,14 +1876,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: god, devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am: The Collection' by Cheryl Travis.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am: The Collection' by Cheryl Travis."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "help-god-i-am-afraid",
@@ -1229,14 +1918,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: god, devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Afraid' by Cheryl Travis.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Afraid' by Cheryl Travis."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "help-god-i-am-angry",
@@ -1257,14 +1960,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: god, devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Angry' by Cheryl Travis.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Angry' by Cheryl Travis."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "help-god-i-am-confused",
@@ -1285,14 +2002,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: god, devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Confused' by Cheryl Travis.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Confused' by Cheryl Travis."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "help-god-i-am-hurt",
@@ -1313,14 +2044,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: god, devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Hurt' by Cheryl Travis.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Hurt' by Cheryl Travis."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "help-god-i-am-lonely",
@@ -1341,14 +2086,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: god, devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Lonely' by Cheryl Travis.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Lonely' by Cheryl Travis."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "help-god-i-am-lost",
@@ -1369,14 +2128,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: god, devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Lost' by Cheryl Travis.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Lost' by Cheryl Travis."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "help-god-i-am-sad",
@@ -1397,14 +2170,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: god, devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Sad' by Cheryl Travis.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Help God, I Am Sad' by Cheryl Travis."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "hodge-podge-of-life",
@@ -1418,26 +2205,41 @@
       ],
       "isbn": "978-1-954414-93-8",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.84,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir, life",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Hodge Podge of Life' by Mildred Beard.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Hodge Podge of Life' by Mildred Beard."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "hop-hop-hop",
       "title": "Hop, Hop, Hop",
-      "author": "TJ Mars",
+      "author": "Tawanna Mars",
       "genre": "Children's",
       "format": "Paperback",
       "formats": [
@@ -1453,19 +2255,34 @@
         "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
         "genre signal: Children's",
         "text signal: children, child, hop",
-        "legacy imprint agrees: JM Little"
+        "legacy imprint agrees: JM Little",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Hop, Hop, Hop', canonical author 'Tawonna Mars', certified imprint 'JM Little'.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'Hop, Hop, Hop' by Tawanna Mars.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'Hop, Hop, Hop' by Tawanna Mars."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "i-am-my-worst-enemy",
       "title": "I Am My Worst Enemy!",
-      "author": "Maurché Reed",
+      "author": "Maurche Reed",
       "genre": "Self-Help",
       "format": "Paperback",
       "formats": [
@@ -1474,26 +2291,40 @@
       ],
       "isbn": "978-1-950719-54-9",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Self-Help",
         "text signal: self",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'I Am My Worst Enemy!' by Maurche Reed.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'I Am My Worst Enemy!' by Maurche Reed."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "inner-peace-through-life-s-storms",
       "title": "Inner Peace Through Life's Storms",
-      "author": "Rosetta Perry",
+      "author": "KD Heard",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -1504,16 +2335,31 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Inner Peace Through Life's Storms' by KD Heard.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Inner Peace Through Life's Storms' by KD Heard.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Inner Peace Through Life's Storms' by KD Heard."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "inspirations-from-god",
@@ -1527,21 +2373,36 @@
       ],
       "isbn": "978-1-950719-80-8",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Verse",
       "confidence": 0.96,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, god, inspiration",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: JM Verse.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'Inspirations from God' by Edith Clay.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'Inspirations from God' by Edith Clay."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "jalen-becomes-a-big-brother",
@@ -1563,14 +2424,29 @@
         "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
         "genre signal: Children's",
         "text signal: children, child, big brother, jalen",
-        "legacy imprint agrees: JM Little"
+        "legacy imprint agrees: JM Little",
+        "Publisher Master Imprint Register certified 'JM Little' for 'Jalen Becomes a Big Brother' by Deborah Eiland.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'Jalen Becomes a Big Brother' by Deborah Eiland.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'Jalen Becomes a Big Brother' by Deborah Eiland."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "jewels-by-lady-j",
@@ -1591,19 +2467,33 @@
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Jewels by Lady J' by Janet Stephens.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Jewels by Lady J' by Janet Stephens."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "just-what-i-needed",
       "title": "Just What I Needed",
-      "author": "Gloria Patterson",
+      "author": "Andrean Young",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -1614,16 +2504,30 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Just What I Needed' by Andrean Young.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Just What I Needed' by Andrean Young."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "kingdom-equipment-101",
@@ -1644,14 +2548,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, kingdom",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Kingdom Equipment 101' by Terry Stephens.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Kingdom Equipment 101' by Terry Stephens."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "lady-daphanny-s-altar",
@@ -1672,14 +2590,29 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Lady Daphanny's Altar' by Daphanny Baker.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Lady Daphanny's Altar' by Daphanny Baker."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "let-me-tell-you-about-it",
@@ -1693,25 +2626,40 @@
       ],
       "isbn": "978-1-954414-98-3",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Let Me Tell You About It' by Lisa Clark.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Let Me Tell You About It' by Lisa Clark."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "life-after-detour",
-      "title": "Life after Detour",
+      "title": "Life After Detour",
       "author": "Deanna Jones",
       "genre": "Memoir",
       "format": "Paperback",
@@ -1728,19 +2676,34 @@
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir, life, detour",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: JM Works.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Life After Detour' by Deanna Jones.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Life After Detour' by Deanna Jones."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "love-is-an-action-word",
-      "title": "Love Is An Action Word",
-      "author": "Dennis Brown",
+      "title": "Love is an Action Word",
+      "author": "Kurt Broadnax",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -1751,16 +2714,31 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Love Is An Action Word', canonical author 'Kurt Broadnax', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Love is an Action Word' by Kurt Broadnax.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Love is an Action Word' by Kurt Broadnax."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "love-lucy",
@@ -1774,21 +2752,36 @@
       ],
       "isbn": "978-1-950719-94-5",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.84,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Fiction",
         "text signal: fiction, love",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Love Lucy' by Diane Johnson.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Love Lucy' by Diane Johnson."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "love-of-my-life",
@@ -1803,20 +2796,34 @@
       ],
       "isbn": "978-1-954414-27-3",
       "currentImprint": "JM Works",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Love of My Life' by Thaddues Smith.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Love of My Life' by Thaddues Smith."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "loving-the-addict",
@@ -1830,26 +2837,47 @@
       ],
       "isbn": "978-1-950719-57-0",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.84,
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 1.0,
       "decision": "LOCKED",
       "reasoning": [
-        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
-        "genre signal: Self-Help",
-        "text signal: self, addict",
-        "legacy imprint agrees: JM Works"
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Carolyn Booker-Pierce",
+      "publisherMasterRegisterTitle": "Loving the Addict",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Carolyn Booker-Pierce",
+        "canonicalTitle": "Loving the Addict",
+        "prior": {
+          "title": "Loving the Addict",
+          "author": "Carolyn Booker-Pierce",
+          "recommendedImprint": "JM Works",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
+      }
     },
     {
       "id": "melodies-from-heaven",
-      "title": "Melodies From Heaven",
-      "author": "Baily Cunningham",
+      "title": "Melodies from Heaven",
+      "author": "Bailey Cunningham",
       "genre": "Faith",
       "format": "Paperback",
       "formats": [
@@ -1858,20 +2886,35 @@
       ],
       "isbn": "978-1-950719-74-7",
       "currentImprint": "JM Verse",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Verse",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
-        "text signal: faith, heaven"
+        "text signal: faith, heaven",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Melodies from Heaven', canonical author 'Bailey Cunningham', certified imprint 'JM Verse'.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'Melodies from Heaven' by Bailey Cunningham.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'Melodies from Heaven' by Bailey Cunningham."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "memoir-of-a-black-christian-nationalist",
@@ -1887,26 +2930,41 @@
       ],
       "isbn": "978-1-954414-19-8",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Memoir of a Black Christian Nationalist' by Shelley McIntosh.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Memoir of a Black Christian Nationalist' by Shelley McIntosh."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "mirror-of-refining-insight",
       "title": "Mirror of Refining Insight",
-      "author": "M A Grayson",
+      "author": "Marvin Grayson",
       "genre": "Inspirational",
       "format": "Paperback",
       "formats": [
@@ -1916,20 +2974,35 @@
       ],
       "isbn": "978-1-954414-37-2",
       "currentImprint": "JM Works",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Verse",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Mirror of Refining Insight', canonical author 'Marvin Grayson', certified imprint 'JM Verse'.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'Mirror of Refining Insight' by Marvin Grayson.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'Mirror of Refining Insight' by Marvin Grayson."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "more-than-a-village",
@@ -1944,22 +3017,45 @@
       "isbn": "978-1-954414-14-3",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Carolyn Booker-Pierce",
+      "publisherMasterRegisterTitle": "More Than a Village",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Carolyn Booker-Pierce",
+        "canonicalTitle": "More Than a Village",
+        "prior": {
+          "title": "More Than A Village",
+          "author": "Shelley McIntosh",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
+      }
     },
     {
       "id": "music-ministry-unplugged",
       "title": "Music Ministry Unplugged",
-      "author": "Dr. Will Harris",
+      "author": "Will Harris",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -1970,21 +3066,36 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Music Ministry Unplugged' by Will Harris.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Music Ministry Unplugged' by Will Harris.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Music Ministry Unplugged' by Will Harris."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "my-abc-s",
       "title": "My ABC's",
-      "author": "Jaylonna Stevette",
+      "author": "Christy Grogg",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -1995,21 +3106,36 @@
       "currentImprint": "JM Little",
       "recommendedImprint": "JM Little",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Little."
+        "Legacy imprint retained as evidence only: JM Little.",
+        "Batch 1 reconciliation TITLE_VARIANT_CONFIRMED: canonical title 'My ABCs', canonical author 'Christy Grogg', certified imprint 'JM Little'.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'My ABC's' by Christy Grogg.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'My ABC's' by Christy Grogg."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "naughty-tales",
       "title": "Naughty Tales",
-      "author": "Adrean Young",
+      "author": "Jaylonna Stevette",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2020,16 +3146,31 @@
       "currentImprint": "JM Works",
       "recommendedImprint": "JM Works",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Works."
+        "Legacy imprint retained as evidence only: JM Works.",
+        "Publisher Master Imprint Register certified 'JM Works' for 'Naughty Tales' by Jaylonna Stevette.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Naughty Tales' by Jaylonna Stevette.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Naughty Tales' by Jaylonna Stevette."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "never-give-up-on-love",
@@ -2049,14 +3190,28 @@
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Never Give Up On Love' by Pamela Smith.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Never Give Up On Love' by Pamela Smith."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "number-23-and-me",
@@ -2077,14 +3232,28 @@
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Number 23 and Me' by Wayne Pounds.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Number 23 and Me' by Wayne Pounds."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "one-soul",
@@ -2104,14 +3273,29 @@
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'One Soul' by Veronica Brown.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'One Soul' by Veronica Brown."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "ordinary-people-searching-for-greatness",
@@ -2132,18 +3316,32 @@
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Ordinary People Searching for Greatness' by Earline Neal.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Ordinary People Searching for Greatness' by Earline Neal."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "peaches-can-do-it",
-      "title": "Peaches Can Do It!",
+      "title": "Peaches Can Do It",
       "author": "Daphanny Baker",
       "genre": "Children's",
       "format": "Paperback",
@@ -2160,14 +3358,29 @@
         "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
         "genre signal: Children's",
         "text signal: children, child",
-        "legacy imprint agrees: JM Little"
+        "legacy imprint agrees: JM Little",
+        "Publisher Master Imprint Register certified 'JM Little' for 'Peaches Can Do It' by Daphanny Baker.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'Peaches Can Do It' by Daphanny Baker.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'Peaches Can Do It' by Daphanny Baker."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "pieces-of-me-all-over-the-place",
@@ -2188,14 +3401,29 @@
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: JM Works.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Pieces of Me All Over the Place' by Ashanti Flemister.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Pieces of Me All Over the Place' by Ashanti Flemister."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "pretty-wings",
@@ -2209,25 +3437,40 @@
       ],
       "isbn": "978-1-954414-08-2",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Verse",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.6,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Available evidence points to an imprint but does not meet Publisher-Certified auto-lock threshold.",
         "genre signal: Poetry",
-        "text signal: poetry"
+        "text signal: poetry",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Pretty Wings' by Natasha Gilchrist.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Pretty Wings' by Natasha Gilchrist."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "rhyming-it-up-with-church-stuff",
       "title": "Rhyming It up with Church Stuff",
-      "author": "Juanita Travis",
+      "author": "Junaita Travis",
       "genre": "Children's",
       "format": "Paperback",
       "formats": [
@@ -2236,26 +3479,41 @@
       ],
       "isbn": "978-1-961475-43-4",
       "currentImprint": "JM Little",
-      "recommendedImprint": "JM Little",
+      "recommendedImprint": "JM Verse",
       "confidence": 0.84,
       "decision": "LOCKED",
       "reasoning": [
         "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
         "genre signal: Children's",
         "text signal: children, child",
-        "legacy imprint agrees: JM Little"
+        "legacy imprint agrees: JM Little",
+        "Publisher Master Imprint Register certified 'JM Verse' for 'Rhyming It up with Church Stuff' by Junaita Travis.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'Rhyming It up with Church Stuff' by Junaita Travis.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'Rhyming It up with Church Stuff' by Junaita Travis."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "seasons-of-life",
       "title": "Seasons of Life",
-      "author": "Diane Johnson",
+      "author": "Kurt Broadnax",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2266,20 +3524,35 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'Seasons of Life', canonical author 'Kurt Broadnax', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Seasons of Life' by Kurt Broadnax.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Seasons of Life' by Kurt Broadnax."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "she",
-      "title": "SHE",
+      "title": "She",
       "author": "Darlene Carson",
       "genre": "Inspirational",
       "format": "Paperback",
@@ -2295,14 +3568,29 @@
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'She' by Darlene Carson.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'She' by Darlene Carson."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "speech-therapy-works",
@@ -2323,14 +3611,28 @@
         "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
         "genre signal: Children's",
         "text signal: children, child, speech therapy",
-        "legacy imprint agrees: JM Little"
+        "legacy imprint agrees: JM Little",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'Speech Therapy Works!' by Cynthia Sloan.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'Speech Therapy Works!' by Cynthia Sloan."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "support-beyond-the-cycle",
@@ -2344,21 +3646,36 @@
       ],
       "isbn": "978-1-950719-96-9",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Self-Help",
         "text signal: self",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Support Beyond the Cycle' by Brandyn McElroy.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Support Beyond the Cycle' by Brandyn McElroy."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "taylor-made",
@@ -2374,23 +3691,46 @@
       ],
       "isbn": "978-1-961475-21-2",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Works."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Will Harris",
+      "publisherMasterRegisterTitle": "Taylor Made",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Will Harris",
+        "canonicalTitle": "Taylor Made",
+        "prior": {
+          "title": "Taylor Made",
+          "author": "Eryonna Barrino",
+          "recommendedImprint": "JM Works",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
+      }
     },
     {
       "id": "the-celestial-advantage",
       "title": "The Celestial Advantage",
-      "author": "Obadiah E. Harris",
+      "author": "Obadiah Harris",
       "genre": "Faith",
       "format": "Paperback",
       "formats": [
@@ -2406,19 +3746,34 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, celestial",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'The Celestial Advantage', canonical author 'Obadiah E. Harris', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Celestial Advantage' by Obadiah Harris.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Celestial Advantage' by Obadiah Harris."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "the-doctrine-of-last-things",
-      "title": "The Doctrine of Last Things",
-      "author": "Lyle Goddard",
+      "title": "The Doctrine of the Last Things",
+      "author": "Obadiah Harris",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2429,21 +3784,36 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 reconciliation TITLE_VARIANT_CONFIRMED: canonical title 'The Doctrine of Last Things', canonical author 'Obadiah E. Harris', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Doctrine of the Last Things' by Obadiah Harris.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Doctrine of the Last Things' by Obadiah Harris."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "the-essence-of-life-love-letters-to-christ",
-      "title": "The Essence of Life, Love Letters to Christ",
-      "author": "Janet Stephens",
+      "title": "The ESSENCE of Life",
+      "author": "Tracy Norris",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2454,16 +3824,30 @@
       "currentImprint": "JM Verse",
       "recommendedImprint": "JM Verse",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Verse."
+        "Legacy imprint retained as evidence only: JM Verse.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'The ESSENCE of Life' by Tracy Norris.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'The ESSENCE of Life' by Tracy Norris."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-fight-for-the-promiseland",
@@ -2479,21 +3863,36 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Fight for the Promiseland' by Cheryl Cook.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Fight for the Promiseland' by Cheryl Cook.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Fight for the Promiseland' by Cheryl Cook."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-flame",
       "title": "The Flame",
-      "author": "Veronica Brown",
+      "author": "Dennis Brown",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2504,16 +3903,31 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Flame' by Dennis Brown.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Flame' by Dennis Brown.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Flame' by Dennis Brown."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-girl-with-the-ebony-locs-and-the-three-bears",
@@ -2529,16 +3943,31 @@
       "currentImprint": "JM Little",
       "recommendedImprint": "JM Little",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Little."
+        "Legacy imprint retained as evidence only: JM Little.",
+        "Publisher-certified Batch 1 imprint assignment: JM Little.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'The Girl with the Ebony Locs and the Three Bears' by Deborah Eiland.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'The Girl with the Ebony Locs and the Three Bears' by Deborah Eiland."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "the-great-hair-restart",
@@ -2560,19 +3989,46 @@
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Self-Help",
         "text signal: self, restart",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: JM Works.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'The Great Hair Restart' by Karen Hill.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'The Great Hair Restart' by Karen Hill."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherCertifiedAssetEditions": [
+        {
+          "sourceTitle": "The Great Hair Restart: The Journal",
+          "sourceAuthor": "Karen Hill",
+          "titleFamilyId": "the-great-hair-restart",
+          "canonicalTitle": "The Great Hair Restart: The Journal",
+          "canonicalAuthor": "Karen Hill",
+          "approvedImprint": "JM Works",
+          "status": "PUBLISHER_OVERRIDE_ASSET_EDITION",
+          "note": "Applied as asset/edition-level publisher override under The Great Hair Restart title family; catalog title denominator unchanged."
+        }
+      ],
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "the-healed-me",
       "title": "The Healed Me",
-      "author": "Maurché Reed",
+      "author": "Maurche Reed",
       "genre": "Inspirational",
       "format": "Paperback",
       "formats": [
@@ -2588,14 +4044,28 @@
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Healed Me' by Maurche Reed.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Healed Me' by Maurche Reed."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-hood",
@@ -2609,25 +4079,40 @@
       ],
       "isbn": "978-1-950719-47-1",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "JM Verse",
       "confidence": 0.84,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Fiction",
         "text signal: fiction, hood",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: JM Verse.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'The Hood' by Randall Beverly.",
+        "Full Publisher Master Imprint Register certified 'JM Verse' for 'The Hood' by Randall Beverly."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "the-i-am-in-me",
-      "title": "The I Am in Me",
+      "title": "The I Am in Me, Second Edition",
       "author": "Tekisha Wimbush",
       "genre": "Faith",
       "format": "Paperback",
@@ -2644,19 +4129,33 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The I Am in Me, Second Edition' by Tekisha Wimbush.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The I Am in Me, Second Edition' by Tekisha Wimbush."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-i-am-in-me-part-2",
-      "title": "The I Am in Me Part 2",
-      "author": "Edith Clay",
+      "title": "The I Am In Me Part 2, Second Edition",
+      "author": "Tekisha Wimbush",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2666,16 +4165,30 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The I Am In Me Part 2, Second Edition' by Tekisha Wimbush.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The I Am In Me Part 2, Second Edition' by Tekisha Wimbush."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-journey",
@@ -2696,19 +4209,33 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Journey' by Rosetta Perry.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Journey' by Rosetta Perry."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-little-girl-with-the-plow",
-      "title": "The Little Girl with the Plow!",
-      "author": "Deborah Eiland",
+      "title": "The Little Girl with the Plow",
+      "author": "Chistina Chislom",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2719,20 +4246,35 @@
       "currentImprint": "JM Little",
       "recommendedImprint": "JM Little",
       "confidence": 0.36,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Little."
+        "Legacy imprint retained as evidence only: JM Little.",
+        "Batch 1 reconciliation AUTHOR_VARIANT_CONFIRMED: canonical title 'The Little Girl with the Plow!', canonical author 'Christina Chislom', certified imprint 'JM Little'.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'The Little Girl with the Plow' by Chistina Chislom.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'The Little Girl with the Plow' by Chistina Chislom."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "the-master-s-piece",
-      "title": "The Master's Piece",
+      "title": "The Master’s Piece",
       "author": "Sylvia Benson",
       "genre": "Faith",
       "format": "Paperback",
@@ -2750,14 +4292,28 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Batch 1 reconciliation TITLE_VARIANT_CONFIRMED: canonical title 'The Master's Piece', canonical author 'Sylvia Benson', certified imprint 'J Merrill Publishing'.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Master’s Piece' by Sylvia Benson."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "the-messenger",
@@ -2778,19 +4334,34 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Messenger' by Daphanny Baker.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Messenger' by Daphanny Baker."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "the-messenger-2",
       "title": "The Messenger 2",
-      "author": "Thaddues Smith",
+      "author": "Daphanny Baker",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2801,21 +4372,36 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Messenger 2' by Daphanny Baker.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Messenger 2' by Daphanny Baker.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Messenger 2' by Daphanny Baker."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-never-before-told-story-of-the-gelatin-monster",
       "title": "The Never Before Told Story of the Gelatin Monster",
-      "author": "Maurché Reed",
+      "author": "Nicky Williams",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -2826,16 +4412,30 @@
       "currentImprint": "JM Little",
       "recommendedImprint": "JM Little",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Little."
+        "Legacy imprint retained as evidence only: JM Little.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'The Never Before Told Story of the Gelatin Monster' by Nicky Williams.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'The Never Before Told Story of the Gelatin Monster' by Nicky Williams."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-paper-champ",
@@ -2849,18 +4449,42 @@
       ],
       "isbn": "978-1-961475-53-3",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Works."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "authorReconciliationStatus": "AUTHOR_RECONCILIATION_REQUIRED",
+      "publisherMasterRegisterAuthor": "Felix Catheline",
+      "publisherMasterRegisterTitle": "The Paper Champ",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Felix Catheline",
+        "canonicalTitle": "The Paper Champ",
+        "prior": {
+          "title": "The Paper Champ",
+          "author": "Kurt Broadnax",
+          "recommendedImprint": "JM Works",
+          "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+        }
+      }
     },
     {
       "id": "the-princess-and-the-black-eyed-pea",
@@ -2877,16 +4501,31 @@
       "currentImprint": "JM Little",
       "recommendedImprint": "JM Little",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Little."
+        "Legacy imprint retained as evidence only: JM Little.",
+        "Publisher-certified Batch 1 imprint assignment: JM Little.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'The Princess and the Black-Eyed Pea' by Deborah Eiland.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'The Princess and the Black-Eyed Pea' by Deborah Eiland."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "the-release-of-the-spirit",
@@ -2907,14 +4546,29 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, spirit",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Release of the Spirit' by Lyle Goddard.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Release of the Spirit' by Lyle Goddard.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'The Release of the Spirit' by Lyle Goddard."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-sun-the-shadow-and-the-silence",
@@ -2929,17 +4583,41 @@
       "isbn": "978-1-961475-55-7",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "authorReconciliationStatus": "AUTHOR_RECONCILIATION_REQUIRED",
+      "publisherMasterRegisterAuthor": "Devin Gilchrest",
+      "publisherMasterRegisterTitle": "The Sun, the Shadow, and the Silence",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Devin Gilchrest",
+        "canonicalTitle": "The Sun, the Shadow, and the Silence",
+        "prior": {
+          "title": "The Sun, the Shadow, and the Silence",
+          "author": "Nicky Williams",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+        }
+      }
     },
     {
       "id": "uncomfortable-conversations-with-god",
@@ -2959,14 +4637,29 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, god",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Uncomfortable Conversations with God' by Leslie Banks.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Uncomfortable Conversations with God' by Leslie Banks."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "understanding-the-misunderstood",
@@ -2980,18 +4673,33 @@
       ],
       "isbn": "978-1-954414-02-0",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Publisher-certified Batch 1 imprint assignment: JM Works.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Understanding the Misunderstood' by Tia Benincase.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Understanding the Misunderstood' by Tia Benincase."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "war-mother",
@@ -3005,18 +4713,33 @@
       ],
       "isbn": "978-1-961475-38-0",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Works."
+        "Legacy imprint retained as evidence only: JM Works.",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'War Mother' by Winter Dockery.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'War Mother' by Winter Dockery.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'War Mother' by Winter Dockery."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "warriors-and-angels",
@@ -3031,24 +4754,45 @@
       "isbn": "978-1-961475-51-9",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.72,
+      "confidence": 1.0,
       "decision": "LOCKED",
       "reasoning": [
-        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
-        "genre signal: Faith",
-        "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Shelley McIntosh",
+      "publisherMasterRegisterTitle": "Warriors and Angels",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Shelley McIntosh",
+        "canonicalTitle": "Warriors and Angels",
+        "prior": {
+          "title": "Warriors and Angels",
+          "author": "Shelley McIntosh",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
+      }
     },
     {
       "id": "warrior-s-breed",
-      "title": "Warrior's Breed",
+      "title": "Warrior’s Breed",
       "author": "Dean Wilson",
       "genre": "Faith",
       "format": "Paperback",
@@ -3058,25 +4802,38 @@
       ],
       "isbn": "978-1-954414-66-2",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Warrior’s Breed' by Dean Wilson."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "when-a-thug-meets-jesus",
-      "title": "When a Thug Meets Jesus",
+      "title": "When A Thug Meets Jesus",
       "author": "Mack Hughley",
       "genre": "Faith",
       "format": "Paperback",
@@ -3093,14 +4850,29 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, jesus",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'When A Thug Meets Jesus' by Mack Hughley.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'When A Thug Meets Jesus' by Mack Hughley."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "when-zuri-came-to-earth",
@@ -3114,23 +4886,47 @@
       ],
       "isbn": "978-1-961475-99-1",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "JM Little",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified JM Little as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "authorReconciliationStatus": "AUTHOR_RECONCILIATION_REQUIRED",
+      "publisherMasterRegisterAuthor": "Gwendolyn Rucker-Carr",
+      "publisherMasterRegisterTitle": "When Zuri Came to Earth",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "JM Little",
+        "canonicalAuthor": "Gwendolyn Rucker-Carr",
+        "canonicalTitle": "When Zuri Came to Earth",
+        "prior": {
+          "title": "When Zuri Came to Earth",
+          "author": "Jaylonna Stevette",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+        }
+      }
     },
     {
       "id": "why-faith-works-for-some-and-not-for-others",
-      "title": "Why Faith Works For Some And Not For Others",
-      "author": "Nathaniel Short",
+      "title": "Why Faith Works for Some and Not for Others",
+      "author": "Rodney Waller",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -3141,16 +4937,31 @@
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Why Faith Works for Some and Not for Others' by Rodney Waller.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Why Faith Works for Some and Not for Others' by Rodney Waller.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Why Faith Works for Some and Not for Others' by Rodney Waller."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "words-of-a-troubled-soul",
@@ -3165,25 +4976,39 @@
       ],
       "isbn": "978-1-954414-56-3",
       "currentImprint": "JM Verse",
-      "recommendedImprint": "JM Verse",
+      "recommendedImprint": "JM Works",
       "confidence": 0.84,
       "decision": "LOCKED",
       "reasoning": [
         "Poetry collections, chapbooks, spoken word, and verse-first titles belong under JM Verse.",
         "genre signal: Poetry",
         "text signal: poetry, soul",
-        "legacy imprint agrees: JM Verse"
+        "legacy imprint agrees: JM Verse",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Words of A Troubled Soul' by David Williams.",
+        "Full Publisher Master Imprint Register certified 'JM Works' for 'Words of A Troubled Soul' by David Williams."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "your-brain-has-too-much-what-mommy",
-      "title": "Your Brain Has Too Much What, Mommy??",
+      "title": "Your brain has too much what, mommy",
       "author": "Essence Unique",
       "genre": "Children's",
       "format": "Paperback",
@@ -3200,14 +5025,29 @@
         "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
         "genre signal: Children's",
         "text signal: children, child, mommy",
-        "legacy imprint agrees: JM Little"
+        "legacy imprint agrees: JM Little",
+        "Publisher-certified Batch 1 imprint assignment: JM Little.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'Your brain has too much what, mommy' by Essence Unique.",
+        "Full Publisher Master Imprint Register certified 'JM Little' for 'Your brain has too much what, mommy' by Essence Unique."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      },
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED"
     },
     {
       "id": "your-peace-is-a-priority",
@@ -3228,14 +5068,29 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Your Peace Is a Priority' by Kiena Hughley.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Your Peace Is a Priority' by Kiena Hughley.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Your Peace Is a Priority' by Kiena Hughley."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "you-re-still-not-crazy",
@@ -3249,21 +5104,42 @@
       ],
       "isbn": "978-1-954414-23-5",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.72,
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 1.0,
       "decision": "LOCKED",
       "reasoning": [
-        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
-        "genre signal: Self-Help",
-        "text signal: self",
-        "legacy imprint agrees: JM Works"
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
+      ],
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Carolyn Booker-Pierce",
+      "publisherMasterRegisterTitle": "You're Still Not Crazy",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Carolyn Booker-Pierce",
+        "canonicalTitle": "You're Still Not Crazy",
+        "prior": {
+          "title": "You're Still Not Crazy",
+          "author": "Carolyn Booker-Pierce",
+          "recommendedImprint": "JM Works",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
+      }
     },
     {
       "id": "girl-did-you-know",
@@ -3277,17 +5153,32 @@
       ],
       "isbn": "978-1-961475-74-8",
       "currentImprint": "Missing",
-      "recommendedImprint": "Unresolved",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint is missing."
+        "Legacy imprint is missing.",
+        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Girl, Did You Know...?' by Kimberly Reeder.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Girl, Did You Know...?' by Kimberly Reeder.",
+        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Girl, Did You Know...?' by Kimberly Reeder."
       ],
       "evidenceUsed": [
         "Title",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-conquest-of-azenga",
@@ -3302,17 +5193,32 @@
       ],
       "isbn": "978-1-961475-76-2",
       "currentImprint": "Missing",
-      "recommendedImprint": "Unresolved",
+      "recommendedImprint": "JM Signature",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint is missing."
+        "Legacy imprint is missing.",
+        "Publisher Master Imprint Register certified 'JM Signature' for 'The Conquest of Azenga' by Iyorwuese Hagher.",
+        "Full Publisher Master Imprint Register certified 'JM Signature' for 'The Conquest of Azenga' by Iyorwuese Hagher.",
+        "Full Publisher Master Imprint Register certified 'JM Signature' for 'The Conquest of Azenga' by Iyorwuese Hagher."
       ],
       "evidenceUsed": [
         "Title",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Signature",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Full List",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     }
   ]
 }

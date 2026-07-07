@@ -1,0 +1,582 @@
+{
+  "generatedAt": "2026-07-07T03:27:40.790Z",
+  "apiBase": "https://org52409ff2.crm.dynamics.com/api/data/v9.2",
+  "solutionUniqueName": "JM1_PAM_AssetRegistry",
+  "actions": [
+    {
+      "type": "solution",
+      "name": "JM1_PAM_AssetRegistry",
+      "status": "exists"
+    },
+    {
+      "type": "table",
+      "name": "jm1pub_contract",
+      "status": "exists"
+    },
+    {
+      "type": "table",
+      "name": "jm1_executionlog",
+      "status": "exists"
+    },
+    {
+      "type": "table",
+      "name": "jm1pub_publishingasset",
+      "status": "exists"
+    },
+    {
+      "type": "table",
+      "name": "jm1pub_assetmarketplace",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_contracttype",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_status",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_docurl",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_esignprovider",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_agreementsenton",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_signeddate",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_provideragreementid",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_providerinviteid",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_providerstatus",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_templateversionreference",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_selectedpackagecode",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_standardpackageprice",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_commissioningtransactionamount",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_paymentpath",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_royaltypercent",
+      "status": "exists"
+    },
+    {
+      "type": "lookup",
+      "table": "jm1pub_contract",
+      "name": "jm1pub_title",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_actiondescription",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_actiontype",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_agentname",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_agentmodel",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_bandlevel",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_executionstatus",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_startedon",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_completedon",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_sourceentity",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_sourcerecordid",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_errordetail",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1_executionlog",
+      "name": "jm1_approvaltimestamp",
+      "status": "exists"
+    },
+    {
+      "type": "lookup",
+      "table": "jm1_executionlog",
+      "name": "jm1_humanapprovedby",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_certifiedimprint",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_assetregistrystatus",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_assetregistrylastverifiedon",
+      "status": "exists"
+    },
+    {
+      "type": "lookup",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_titleid",
+      "status": "exists"
+    },
+    {
+      "type": "lookup",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_contractid",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_assetformat",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_editionlabel",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_iscurrentedition",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_isbn13",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_normalizedisbn",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_asin",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_acxproductid",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_lsiid",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_coresourceid",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_publicationdate",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_retailprice",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_currency",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_tradediscount",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_returnable",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_distributionstatus",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_assetstatus",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_metadatastatus",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_filepackagereference",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_coverfilereference",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_interiorfilereference",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_audiofilereference",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_evidencesource",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_evidencepath",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_lastverifiedon",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_assethealthscore",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_assethealthstatus",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_assetconfidencescore",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_publishingasset.jm1pub_assetconfidencescore",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_assetconfidencestatus",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_publishingasset.jm1pub_assetconfidencestatus",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_authorevidencestatus",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_publishingasset.jm1pub_authorevidencestatus",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_reconciliationrequired",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_publishingasset.jm1pub_reconciliationrequired",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_reconciliationreason",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_publishingasset.jm1pub_reconciliationreason",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_exceptionreason",
+      "status": "exists"
+    },
+    {
+      "type": "lookup",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_publishingassetid",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_marketplace",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_marketplacestatus",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_marketplaceidentifier",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_listingurl",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_listedprice",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_currency",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_lastverifiedon",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_evidencesource",
+      "status": "exists"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_marketplaceidentifierstatus",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_assetmarketplace.jm1pub_marketplaceidentifierstatus",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_assetconfidencescore",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_assetmarketplace.jm1pub_assetconfidencescore",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_assetconfidencestatus",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_assetmarketplace.jm1pub_assetconfidencestatus",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_reconciliationrequired",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_assetmarketplace.jm1pub_reconciliationrequired",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_reconciliationreason",
+      "status": "created"
+    },
+    {
+      "type": "solution-component",
+      "name": "jm1pub_assetmarketplace.jm1pub_reconciliationreason",
+      "componentType": 2,
+      "status": "added"
+    },
+    {
+      "type": "field",
+      "table": "jm1pub_assetmarketplace",
+      "name": "jm1pub_exceptionreason",
+      "status": "exists"
+    },
+    {
+      "type": "publish",
+      "status": "completed"
+    }
+  ]
+}

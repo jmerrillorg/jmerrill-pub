@@ -1,0 +1,138 @@
+{
+  "generatedAt": "2026-07-07T00:00:00-04:00",
+  "program": "EOP-001",
+  "status": "Enterprise Optimization Active - Full Publisher Master Imprint Register Applied",
+  "totals": {
+    "catalogTitles": 122,
+    "adoptedTitles": 122,
+    "publishedAuthors": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
+    "activeAuthorWorkspaces": 72,
+    "publisherImprintReview": 0,
+    "jmSignatureReview": 0,
+    "contractReconciliation": 122,
+    "stripeMigration": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
+    "royaltyReadiness": "PROVISIONAL_FROM_LEGACY_EVIDENCE"
+  },
+  "healthMetrics": [
+    {
+      "metric": "Coverage",
+      "value": "100.00%",
+      "numerator": 122,
+      "denominator": 122,
+      "note": "Enterprise Adoption complete; retained as historical baseline, no longer the primary KPI."
+    },
+    {
+      "metric": "Imprint Certified",
+      "value": "100.00%",
+      "numerator": 122,
+      "denominator": 122,
+      "note": "All catalog titles have LOCKED certified imprints after Publisher Master Imprint Register final corrections."
+    },
+    {
+      "metric": "Contracts Linked",
+      "value": "0.00%",
+      "numerator": 0,
+      "denominator": 122,
+      "note": "Historical contracts are marked Signed / Exists - Location Pending Reconciliation."
+    },
+    {
+      "metric": "Stripe Ready",
+      "value": "Provisional",
+      "numerator": 0,
+      "denominator": "provisional",
+      "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
+    },
+    {
+      "metric": "Royalty Ready",
+      "value": "Provisional",
+      "numerator": 0,
+      "denominator": "provisional",
+      "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
+    },
+    {
+      "metric": "Metadata Complete",
+      "value": "98.36%",
+      "numerator": 120,
+      "denominator": 122,
+      "note": "Metadata completeness remains separate from imprint certification; remaining gaps are title/asset-anchor and canonical roster hygiene items, not Publisher imprint review."
+    },
+    {
+      "metric": "Workspace Complete",
+      "value": "100.00%",
+      "numerator": 72,
+      "denominator": 72,
+      "note": "All adopted authors/titles have PROGRAM-002 workspace coverage."
+    },
+    {
+      "metric": "Author Success Active",
+      "value": "Provisional",
+      "numerator": 0,
+      "denominator": "provisional",
+      "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
+    }
+  ],
+  "overallEnterpriseHealth": "79.67%",
+  "publisherReviewQueue": [],
+  "jmSignatureQueue": [],
+  "optimizationOrder": [
+    "Publisher Imprint Review",
+    "JM Signature Review",
+    "Contract Reconciliation",
+    "Stripe Migration",
+    "Royalty Automation"
+  ],
+  "authorRosterStatus": "PROVISIONAL for author-count, Stripe, royalty, and Author Success denominators; title-level imprint certification may proceed from EOP/PAM title queue.",
+  "invalidatedMetrics": [
+    "publishedAuthors",
+    "stripeMigration",
+    "royaltyReadiness",
+    "Author Success Active denominator"
+  ],
+  "sourceOfTruthGapReport": "docs/implementation/EOP-001-Author-Title-Source-of-Truth-Gap-Report.md",
+  "publisherReviewStatus": "PUBLISHER_DECISION_GATE - Batch 1 complete; continue remaining Publisher queue and JM Signature review.",
+  "publisherImprintBatch1": {
+    "matchedAndLocked": 25,
+    "reconciliationRequired": 20,
+    "source": "Jackie Publisher Manual Assignment - Batch 1"
+  },
+  "publisherImprintBatch1Reconciliation": {
+    "resolved": 17,
+    "unresolved": 3,
+    "source": "Publisher-source reconciliation: MONTHLY REPORTING 2026 workbook, Total Asset Listing, PAM staging evidence"
+  },
+  "publisherImprintBatch1FinalOverrides": {
+    "titleOverridesApplied": 2,
+    "assetEditionOverridesApplied": 1,
+    "source": "Jackie Publisher Manual Assignment - Batch 1 Final Override"
+  },
+  "publisherMasterImprintRegister": {
+    "applied": 21,
+    "pendingManuscriptReview": 9,
+    "authorReconciliationRequired": 3,
+    "noProgramTitleAnchor": 4,
+    "pairingEventsPrepared": 11
+  },
+  "publisherMasterImprintRegisterFull": {
+    "applied": 107,
+    "pendingManuscriptReview": 9,
+    "authorReconciliationRequired": 3,
+    "assetEditionRegistered": 1,
+    "noProgramTitleAnchor": 5,
+    "eventsPrepared": 8
+  },
+  "publisherMasterImprintRegisterBatch3": {
+    "source": "Jackie Publisher Master Imprint Register Batch 3",
+    "appliedAt": "2026-07-07T00:00:00-04:00",
+    "appliedCount": 14,
+    "remainingPublisherReviewQueue": 2,
+    "remainingManuscriptReviewQueue": 0,
+    "remainingAuthorReconciliationQueue": 0
+  },
+  "publisherMasterImprintRegisterFinalCorrections": {
+    "source": "Jackie Publisher Master Imprint Register Final Corrections",
+    "appliedAt": "2026-07-07T00:00:00-04:00",
+    "appliedCount": 3,
+    "remainingPublisherReviewQueue": 0,
+    "remainingJmSignatureReviewQueue": 0
+  }
+}

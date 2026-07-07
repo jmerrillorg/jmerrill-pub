@@ -1,0 +1,132 @@
+{
+  "generatedAt": "2026-07-07T03:06:11Z",
+  "sourceStagingGeneratedAt": "2026-07-07T03:05:25Z",
+  "scope": "PAM-001 / IS-009 staging health; no Dataverse import performed",
+  "counts": {
+    "titleCandidates": 162,
+    "publishingAssetCandidates": 295,
+    "assetMarketplaceCandidates": 537
+  },
+  "readiness": {
+    "assetsWithTitleLinkPct": 100.0,
+    "assetsWithIsbnPct": 99.32,
+    "assetsWithAuthorPct": 63.39,
+    "assetsWithFormatPct": 100.0,
+    "marketplaceRowsWithIdentifierPct": 90.32,
+    "duplicateIsbnConflictCount": 0
+  },
+  "distributions": {
+    "assetFormat": {
+      "Audiobook": 9,
+      "Hardcover": 33,
+      "Paperback": 170,
+      "eBook": 83
+    },
+    "marketplace": {
+      "ACX": 2,
+      "Amazon Digital Services, Inc": 8,
+      "Amazon KDP": 4,
+      "Apple Inc.": 5,
+      "CoreSource": 110,
+      "Global - Germany": 11,
+      "Global - Singapore": 1,
+      "Google Inc": 1,
+      "INaudio, LLC": 2,
+      "Kobo Books": 1,
+      "LS-United Kingdom": 5,
+      "LS-United States": 80,
+      "Libri GmbH": 1,
+      "Midwest Tape LLC": 25,
+      "OverDrive, Inc.": 2,
+      "Perlego": 1,
+      "Proquest LLC": 2,
+      "Publisher Registry": 271,
+      "Scribd Inc.": 1,
+      "Speechify, Inc": 2,
+      "Taylor Made: My Life, My Story, 9781961475212": 1,
+      "eBooks.com": 1
+    },
+    "metadataStatus": {
+      "Complete": 293,
+      "Incomplete": 2
+    }
+  },
+  "exceptions": {
+    "assetExceptionCounts": {
+      "MISSING_AUTHOR": 108,
+      "MISSING_ISBN": 2
+    },
+    "marketplaceExceptionCounts": {
+      "MISSING_MARKETPLACE_IDENTIFIER": 52
+    },
+    "assetExceptionSamples": {
+      "MISSING_AUTHOR": [
+        "0172577",
+        "0232184",
+        "0259191",
+        "1981006001",
+        "9780578523712",
+        "9781731131775",
+        "9781735425031",
+        "9781950719020",
+        "9781950719051",
+        "9781950719082",
+        "9781950719105",
+        "9781950719150",
+        "9781950719167",
+        "9781950719242",
+        "9781950719297",
+        "9781950719303",
+        "9781950719341",
+        "9781950719358",
+        "9781950719389",
+        "9781950719426",
+        "9781950719471",
+        "9781950719549",
+        "9781950719600",
+        "9781950719617",
+        "9781950719624"
+      ],
+      "MISSING_ISBN": [
+        "getting back 2 happy the chronicles of tabby unabridged|audiobook|bk_acx0_259191",
+        "memoir of a black christian nationalist seeds of liberation unabridged|audiobook|bk_acx0_442308"
+      ]
+    },
+    "marketplaceExceptionSamples": {
+      "MISSING_MARKETPLACE_IDENTIFIER": [
+        "9780985263133|perlego|",
+        "9780985263133|proquest llc|",
+        "9781950719112|midwest tape llc|",
+        "9781950719129|apple inc.|",
+        "9781950719129|google inc|",
+        "9781950719129|midwest tape llc|",
+        "9781950719259|midwest tape llc|",
+        "9781950719273|midwest tape llc|",
+        "9781950719310|midwest tape llc|",
+        "9781950719419|apple inc.|",
+        "9781950719419|kobo books|",
+        "9781950719419|midwest tape llc|",
+        "9781950719419|speechify, inc|",
+        "9781950719457|midwest tape llc|",
+        "9781950719501|midwest tape llc|",
+        "9781950719556|midwest tape llc|",
+        "9781950719556|speechify, inc|",
+        "9781950719631|midwest tape llc|",
+        "9781950719631|scribd inc.|",
+        "9781950719655|midwest tape llc|",
+        "9781950719693|midwest tape llc|",
+        "9781950719754|midwest tape llc|",
+        "9781950719778|midwest tape llc|",
+        "9781950719877|proquest llc|",
+        "9781954414099|midwest tape llc|"
+      ]
+    }
+  },
+  "status": {
+    "schema": "DEPLOYED_TO_JM1_DEV",
+    "migrationEngine": "OPERATIONAL_STAGING_ONLY",
+    "healthEngine": "OPERATIONAL_STAGING_ONLY",
+    "dataverseImport": "NOT_STARTED",
+    "assetHealthThreshold": "PENDING_JACKIE_DECISION"
+  }
+}

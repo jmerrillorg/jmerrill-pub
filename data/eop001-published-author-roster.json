@@ -1,0 +1,1778 @@
+{
+  "generatedAt": "2026-07-06T13:24:36.501Z",
+  "sourceOfCount": "Unique normalized author names from data/books.json author field",
+  "totalCatalogTitles": 122,
+  "totalPublishedAuthors": 71,
+  "titleAuthorMismatchCount": 0,
+  "roster": [
+    {
+      "normalizedAuthorName": "Adrean Young",
+      "sourceTitles": [
+        {
+          "id": "naughty-tales",
+          "title": "Naughty Tales",
+          "isbn": "978-1-954414-84-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Alesia True Corpening",
+      "sourceTitles": [
+        {
+          "id": "aligned",
+          "title": "Aligned!",
+          "isbn": "978-1-954414-06-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "connected",
+          "title": "Connected!",
+          "isbn": "978-1-954414-16-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Alice V Pryor",
+      "sourceTitles": [
+        {
+          "id": "according-to-mark",
+          "title": "According to Mark",
+          "isbn": "978-1-954414-54-9",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Ashanti Flemister",
+      "sourceTitles": [
+        {
+          "id": "pieces-of-me-all-over-the-place",
+          "title": "Pieces of Me All Over the Place",
+          "isbn": "978-1-950719-68-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Baily Cunningham",
+      "sourceTitles": [
+        {
+          "id": "melodies-from-heaven",
+          "title": "Melodies From Heaven",
+          "isbn": "978-1-950719-74-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Bishop Thomas Johnson",
+      "sourceTitles": [
+        {
+          "id": "god-s-word-for-this-world",
+          "title": "God's Word For This World",
+          "isbn": "978-1-954414-41-9",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Brandyn McElroy",
+      "sourceTitles": [
+        {
+          "id": "support-beyond-the-cycle",
+          "title": "Support Beyond the Cycle",
+          "isbn": "978-1-950719-96-9",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Carolyn Booker-Pierce",
+      "sourceTitles": [
+        {
+          "id": "a-little-bit-of-everything",
+          "title": "A Little Bit of Everything",
+          "isbn": "978-1-954414-39-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "a-truebies-guide-part-1",
+          "title": "A Truebies Guide, Part 1",
+          "isbn": "978-1-950719-62-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "a-truebies-guide-part-2",
+          "title": "A Truebies Guide, Part 2",
+          "isbn": "978-1-950719-32-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+          "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+          "isbn": "978-1-950719-40-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "loving-the-addict",
+          "title": "Loving the Addict",
+          "isbn": "978-1-950719-57-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "you-re-still-not-crazy",
+          "title": "You're Still Not Crazy",
+          "isbn": "978-1-954414-23-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Cheryl Cook",
+      "sourceTitles": [
+        {
+          "id": "the-fight-for-the-promiseland",
+          "title": "The Fight for the Promiseland",
+          "isbn": "978-1-961475-63-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Cheryl Travis",
+      "sourceTitles": [
+        {
+          "id": "help-god-i-am-the-collection",
+          "title": "Help God, I Am - The Collection",
+          "isbn": "978-1-954414-35-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "help-god-i-am-afraid",
+          "title": "Help God, I Am Afraid",
+          "isbn": "978-1-950719-16-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "help-god-i-am-angry",
+          "title": "Help God, I Am Angry",
+          "isbn": "978-1-950719-24-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "help-god-i-am-confused",
+          "title": "Help God, I Am Confused",
+          "isbn": "978-1-950719-78-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "help-god-i-am-hurt",
+          "title": "Help God, I Am Hurt",
+          "isbn": "978-1-950719-30-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "help-god-i-am-lonely",
+          "title": "Help God, I Am Lonely",
+          "isbn": "978-1-950719-82-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "help-god-i-am-lost",
+          "title": "Help God, I Am Lost",
+          "isbn": "978-1-950719-70-9",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "help-god-i-am-sad",
+          "title": "Help God, I Am Sad",
+          "isbn": "978-1-950719-76-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Christina Chislom",
+      "sourceTitles": [
+        {
+          "id": "come-out-of-hiding",
+          "title": "Come Out of Hiding",
+          "isbn": "978-1-950719-26-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Cynthia Sloan",
+      "sourceTitles": [
+        {
+          "id": "speech-therapy-works",
+          "title": "Speech Therapy Works!",
+          "isbn": "978-1-950719-56-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Daphanny Baker",
+      "sourceTitles": [
+        {
+          "id": "365-days-of-transparency",
+          "title": "365 Days Of Transparency",
+          "isbn": "978-1-950719-92-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "lady-daphanny-s-altar",
+          "title": "Lady Daphanny's Altar",
+          "isbn": "978-1-961475-09-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "peaches-can-do-it",
+          "title": "Peaches Can Do It!",
+          "isbn": "978-1-961475-47-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-messenger",
+          "title": "The Messenger",
+          "isbn": "978-1-961475-15-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Darlene Carson",
+      "sourceTitles": [
+        {
+          "id": "she",
+          "title": "SHE",
+          "isbn": "978-1-950719-90-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": "Possible human identity review with M. Darlene Carson due similar name family; catalog treats as separate normalized author."
+    },
+    {
+      "normalizedAuthorName": "David Williams",
+      "sourceTitles": [
+        {
+          "id": "words-of-a-troubled-soul",
+          "title": "Words of A Troubled Soul",
+          "isbn": "978-1-954414-56-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Dean Wilson",
+      "sourceTitles": [
+        {
+          "id": "warrior-s-breed",
+          "title": "Warrior's Breed",
+          "isbn": "978-1-954414-66-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Deanna Jones",
+      "sourceTitles": [
+        {
+          "id": "life-after-detour",
+          "title": "Life after Detour",
+          "isbn": "978-1-950719-38-9",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Deborah Eiland",
+      "sourceTitles": [
+        {
+          "id": "bee-careful",
+          "title": "BEE Careful",
+          "isbn": "978-1-954414-72-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "jalen-becomes-a-big-brother",
+          "title": "Jalen Becomes a Big Brother",
+          "isbn": "978-1-961475-40-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-girl-with-the-ebony-locs-and-the-three-bears",
+          "title": "The Girl with the Ebony Locs and the Three Bears",
+          "isbn": "978-1-950719-06-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-little-girl-with-the-plow",
+          "title": "The Little Girl with the Plow!",
+          "isbn": "978-1-954414-33-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-princess-and-the-black-eyed-pea",
+          "title": "The Princess and the Black-Eyed Pea",
+          "isbn": "978-1-954414-69-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Dennis Brown",
+      "sourceTitles": [
+        {
+          "id": "love-is-an-action-word",
+          "title": "Love Is An Action Word",
+          "isbn": "978-1-950719-98-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Diane Johnson",
+      "sourceTitles": [
+        {
+          "id": "love-lucy",
+          "title": "Love Lucy",
+          "isbn": "978-1-950719-94-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "seasons-of-life",
+          "title": "Seasons of Life",
+          "isbn": "978-1-961475-06-9",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Donjia Walls",
+      "sourceTitles": [
+        {
+          "id": "27-days-to-overcoming-depression",
+          "title": "27 Days to Overcoming Depression",
+          "isbn": "978-1-961475-36-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Dr. Will Harris",
+      "sourceTitles": [
+        {
+          "id": "music-ministry-unplugged",
+          "title": "Music Ministry Unplugged",
+          "isbn": "978-1-961475-72-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Earline Neal",
+      "sourceTitles": [
+        {
+          "id": "ordinary-people-searching-for-greatness",
+          "title": "Ordinary People Searching for Greatness",
+          "isbn": "978-1-954414-86-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Edith Clay",
+      "sourceTitles": [
+        {
+          "id": "inspirations-from-god",
+          "title": "Inspirations from God",
+          "isbn": "978-1-950719-80-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-i-am-in-me-part-2",
+          "title": "The I Am in Me Part 2",
+          "isbn": "978-1-954414-52-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Ericka Thornton",
+      "sourceTitles": [
+        {
+          "id": "are-you-sure-that-you-are-ready",
+          "title": "Are You Sure That You Are Ready?",
+          "isbn": "978-1-950719-20-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "for-what-it-s-worth",
+          "title": "For What It's Worth",
+          "isbn": "978-1-950719-72-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Eryonna Barrino",
+      "sourceTitles": [
+        {
+          "id": "taylor-made",
+          "title": "Taylor Made",
+          "isbn": "978-1-961475-21-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Essence Unique",
+      "sourceTitles": [
+        {
+          "id": "your-brain-has-too-much-what-mommy",
+          "title": "Your Brain Has Too Much What, Mommy??",
+          "isbn": "978-1-954414-78-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Gloria Patterson",
+      "sourceTitles": [
+        {
+          "id": "conquer-your-fears-and-win",
+          "title": "Conquer Your Fears and Win",
+          "isbn": "978-1-950719-46-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "just-what-i-needed",
+          "title": "Just What I Needed",
+          "isbn": "978-1-950719-86-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Iyorwuese Hagher",
+      "sourceTitles": [
+        {
+          "id": "a-portrait-of-paradise",
+          "title": "A Portrait of Paradise",
+          "isbn": "978-1-961475-65-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-conquest-of-azenga",
+          "title": "The Conquest of Azenga",
+          "isbn": "978-1-961475-76-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": "Includes one JM Signature review title and one unresolved/missing-imprint title; publisher review required."
+    },
+    {
+      "normalizedAuthorName": "J. Derrick Johnson",
+      "sourceTitles": [
+        {
+          "id": "100-wisdom-lessons-for-life-and-living",
+          "title": "100 Wisdom Lessons for Life and Living",
+          "isbn": "978-1-961475-57-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": "Track B evidence found similar Johnson/Derrick contacts; exact title-bound Contact was not confirmed."
+    },
+    {
+      "normalizedAuthorName": "Jackie Smith, Jr.",
+      "sourceTitles": [
+        {
+          "id": "department-of-the-air-force-mission-driven-leadership",
+          "title": "Department of the Air Force: Mission Driven Leadership",
+          "isbn": "978-1-961475-68-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "establishing-glory",
+          "title": "Establishing Glory",
+          "isbn": "978-1-950719-00-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "establishing-glory-2",
+          "title": "Establishing Glory 2",
+          "isbn": "978-1-950719-03-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "establishing-glory-3",
+          "title": "Establishing Glory 3",
+          "isbn": "978-1-950719-13-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Janet Stephens",
+      "sourceTitles": [
+        {
+          "id": "jewels-by-lady-j",
+          "title": "Jewels by Lady J",
+          "isbn": "978-1-950719-28-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-essence-of-life-love-letters-to-christ",
+          "title": "The Essence of Life, Love Letters to Christ",
+          "isbn": "978-1-950719-21-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Jaylonna Stevette",
+      "sourceTitles": [
+        {
+          "id": "almost-happy",
+          "title": "Almost Happy",
+          "isbn": "978-1-954414-58-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "getting-back-2-happy",
+          "title": "Getting Back 2 Happy",
+          "isbn": "978-1-950719-42-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "my-abc-s",
+          "title": "My ABC's",
+          "isbn": "978-1-954414-46-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "when-zuri-came-to-earth",
+          "title": "When Zuri Came to Earth",
+          "isbn": "978-1-961475-99-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Johnson Settles",
+      "sourceTitles": [
+        {
+          "id": "7-step-jumpstart-to-becoming-your-best-self",
+          "title": "7 Step Jumpstart to Becoming Your Best Self",
+          "isbn": "978-1-954414-74-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Juanita Travis",
+      "sourceTitles": [
+        {
+          "id": "rhyming-it-up-with-church-stuff",
+          "title": "Rhyming It up with Church Stuff",
+          "isbn": "978-1-961475-43-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Karen Hill",
+      "sourceTitles": [
+        {
+          "id": "the-great-hair-restart",
+          "title": "The Great Hair Restart",
+          "isbn": "978-1-961475-13-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Kelli Milligan Stammen",
+      "sourceTitles": [
+        {
+          "id": "from-stylist-to-ceo",
+          "title": "From Stylist to CEO",
+          "isbn": "978-1-961475-23-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Kiena Hughley",
+      "sourceTitles": [
+        {
+          "id": "your-peace-is-a-priority",
+          "title": "Your Peace Is a Priority",
+          "isbn": "978-1-961475-45-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Kimberly Reeder",
+      "sourceTitles": [
+        {
+          "id": "girl-did-you-know",
+          "title": "Girl, Did You Know...?",
+          "isbn": "978-1-961475-74-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": "Title has missing historical imprint; publisher override required before certified imprint lock."
+    },
+    {
+      "normalizedAuthorName": "Kurt Broadnax",
+      "sourceTitles": [
+        {
+          "id": "the-paper-champ",
+          "title": "The Paper Champ",
+          "isbn": "978-1-961475-53-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Leslie Banks",
+      "sourceTitles": [
+        {
+          "id": "uncomfortable-conversations-with-god",
+          "title": "Uncomfortable Conversations with God",
+          "isbn": "978-1-950719-11-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Lisa Clark",
+      "sourceTitles": [
+        {
+          "id": "let-me-tell-you-about-it",
+          "title": "Let Me Tell You About It",
+          "isbn": "978-1-954414-98-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Lyle Goddard",
+      "sourceTitles": [
+        {
+          "id": "the-doctrine-of-last-things",
+          "title": "The Doctrine of Last Things",
+          "isbn": "978-1-954414-44-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-release-of-the-spirit",
+          "title": "The Release of the Spirit",
+          "isbn": "978-1-950719-64-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "M A Grayson",
+      "sourceTitles": [
+        {
+          "id": "mirror-of-refining-insight",
+          "title": "Mirror of Refining Insight",
+          "isbn": "978-1-954414-37-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "M. Darlene Carson",
+      "sourceTitles": [
+        {
+          "id": "grandmothers-educating-minds-2nd-edition",
+          "title": "Grandmothers Educating Minds, 2nd Edition",
+          "isbn": "978-1-954414-20-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": "Possible human identity review with Darlene Carson due similar name family; catalog treats as separate normalized author."
+    },
+    {
+      "normalizedAuthorName": "Mack Hughley",
+      "sourceTitles": [
+        {
+          "id": "when-a-thug-meets-jesus",
+          "title": "When a Thug Meets Jesus",
+          "isbn": "978-1-961475-97-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Maurché Reed",
+      "sourceTitles": [
+        {
+          "id": "i-am-my-worst-enemy",
+          "title": "I Am My Worst Enemy!",
+          "isbn": "978-1-950719-54-9",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-healed-me",
+          "title": "The Healed Me",
+          "isbn": "978-1-954414-62-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-never-before-told-story-of-the-gelatin-monster",
+          "title": "The Never Before Told Story of the Gelatin Monster",
+          "isbn": "978-1-954414-64-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Mildred Beard",
+      "sourceTitles": [
+        {
+          "id": "hodge-podge-of-life",
+          "title": "Hodge Podge of Life",
+          "isbn": "978-1-954414-93-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Natasha Gilchrist",
+      "sourceTitles": [
+        {
+          "id": "pretty-wings",
+          "title": "Pretty Wings",
+          "isbn": "978-1-954414-08-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Nathaniel Short",
+      "sourceTitles": [
+        {
+          "id": "bodacious",
+          "title": "Bodacious",
+          "isbn": "978-1-954414-04-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "why-faith-works-for-some-and-not-for-others",
+          "title": "Why Faith Works For Some And Not For Others",
+          "isbn": "978-1-954414-25-9",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Nicky Williams",
+      "sourceTitles": [
+        {
+          "id": "the-sun-the-shadow-and-the-silence",
+          "title": "The Sun, the Shadow, and the Silence",
+          "isbn": "978-1-961475-55-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Obadiah E. Harris",
+      "sourceTitles": [
+        {
+          "id": "have-you-considered-my-servant",
+          "title": "Have You Considered My Servant?",
+          "isbn": "978-1-961475-31-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-celestial-advantage",
+          "title": "The Celestial Advantage",
+          "isbn": "978-1-950719-08-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Pamela Smith",
+      "sourceTitles": [
+        {
+          "id": "delicious-ideas",
+          "title": "Delicious Ideas!",
+          "isbn": "978-1-961475-33-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "never-give-up-on-love",
+          "title": "Never Give Up On Love",
+          "isbn": "978-1-950719-52-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Randall Beverly",
+      "sourceTitles": [
+        {
+          "id": "the-hood",
+          "title": "The Hood",
+          "isbn": "978-1-950719-47-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Rodney Waller",
+      "sourceTitles": [
+        {
+          "id": "because-the-lord-is-my-shepherd",
+          "title": "Because the Lord Is My Shepherd",
+          "isbn": "978-1-950719-44-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Rosetta Perry",
+      "sourceTitles": [
+        {
+          "id": "inner-peace-through-life-s-storms",
+          "title": "Inner Peace Through Life's Storms",
+          "isbn": "978-1-961475-49-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-journey",
+          "title": "The Journey",
+          "isbn": "978-1-954414-29-7",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Sean Smith, Sr.",
+      "sourceTitles": [
+        {
+          "id": "destined-to-break-the-curse",
+          "title": "Destined to Break the Curse",
+          "isbn": "978-1-950719-34-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "destined-to-break-the-curse-devotional",
+          "title": "Destined to Break the Curse Devotional",
+          "isbn": "978-1-950719-18-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Shana Byrd",
+      "sourceTitles": [
+        {
+          "id": "focus-trust-and-follow",
+          "title": "Focus, Trust, and Follow",
+          "isbn": "978-1-950719-49-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Shecara Norris",
+      "sourceTitles": [
+        {
+          "id": "a-blended-family",
+          "title": "A Blended Family",
+          "isbn": "978-1-954414-12-9",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Shelley McIntosh",
+      "sourceTitles": [
+        {
+          "id": "a-principal-s-tale",
+          "title": "A Principal's Tale",
+          "isbn": "978-1-950719-66-2",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "memoir-of-a-black-christian-nationalist",
+          "title": "Memoir of a Black Christian Nationalist",
+          "isbn": "978-1-954414-19-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "more-than-a-village",
+          "title": "More Than A Village",
+          "isbn": "978-1-954414-14-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "warriors-and-angels",
+          "title": "Warriors and Angels",
+          "isbn": "978-1-961475-51-9",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Sylvia Benson",
+      "sourceTitles": [
+        {
+          "id": "the-master-s-piece",
+          "title": "The Master's Piece",
+          "isbn": "978-1-954414-48-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Taye Knox",
+      "sourceTitles": [
+        {
+          "id": "damaged",
+          "title": "Damaged",
+          "isbn": "978-1-961475-70-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Tekisha Wimbush",
+      "sourceTitles": [
+        {
+          "id": "divinely-inspired",
+          "title": "Divinely Inspired",
+          "isbn": "978-1-961475-17-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "god-s-nudge",
+          "title": "God's Nudge",
+          "isbn": "978-1-950719-88-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-i-am-in-me",
+          "title": "The I Am in Me",
+          "isbn": "978-1-954414-50-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Terry Stephens",
+      "sourceTitles": [
+        {
+          "id": "biblical-prescriptions-for-life-s-troubles",
+          "title": "Biblical Prescriptions for Life's Troubles",
+          "isbn": "978-1-954414-89-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "discipline-and-direction",
+          "title": "Discipline and Direction",
+          "isbn": "978-1-954414-91-4",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "god-s-business-plan",
+          "title": "God's Business Plan",
+          "isbn": "978-1-961475-08-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "kingdom-equipment-101",
+          "title": "Kingdom Equipment 101",
+          "isbn": "978-1-954414-77-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Thaddues Smith",
+      "sourceTitles": [
+        {
+          "id": "love-of-my-life",
+          "title": "Love of My Life",
+          "isbn": "978-1-954414-27-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-messenger-2",
+          "title": "The Messenger 2",
+          "isbn": "978-1-961475-61-8",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Tia Benincase",
+      "sourceTitles": [
+        {
+          "id": "understanding-the-misunderstood",
+          "title": "Understanding the Misunderstood",
+          "isbn": "978-1-954414-02-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "TJ Mars",
+      "sourceTitles": [
+        {
+          "id": "hop-hop-hop",
+          "title": "Hop, Hop, Hop",
+          "isbn": "978-1-954414-10-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Toni Kleckley",
+      "sourceTitles": [
+        {
+          "id": "abortion",
+          "title": "Abortion!",
+          "isbn": "978-1-954414-00-6",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "grandmothers-educating-minds",
+          "title": "Grandmothers Educating Minds",
+          "isbn": "978-1-954414-21-1",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Veronica Brown",
+      "sourceTitles": [
+        {
+          "id": "one-soul",
+          "title": "One Soul",
+          "isbn": "978-1-950719-60-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        },
+        {
+          "id": "the-flame",
+          "title": "The Flame",
+          "isbn": "978-1-961475-11-3",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Wayne Pounds",
+      "sourceTitles": [
+        {
+          "id": "number-23-and-me",
+          "title": "Number 23 and Me",
+          "isbn": "978-1-950719-10-5",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    },
+    {
+      "normalizedAuthorName": "Winter Dockery",
+      "sourceTitles": [
+        {
+          "id": "war-mother",
+          "title": "War Mother",
+          "isbn": "978-1-961475-38-0",
+          "catalogSource": "data/books.json",
+          "canonSource": "data/enterprise-imprint-canonization.json",
+          "canonAuthorMatch": true
+        }
+      ],
+      "dataverseContactMatch": "Not confirmed by OP-000 catalog adoption evidence",
+      "workspaceStatus": "Published Author Workspace certified",
+      "adoptionStatus": "Adopted into PROGRAM-002 coverage",
+      "stripeMigrationStatus": "Stripe Migration Required",
+      "contractReconciliationStatus": "Signed / Exists - Location Pending Reconciliation",
+      "notes": ""
+    }
+  ],
+  "status": "PROVISIONAL / INVALID FOR GOVERNANCE",
+  "invalidatedAt": "2026-07-06",
+  "invalidationReason": "Derived from data/books.json, which is legacy evidence only and not author/title authority.",
+  "doNotUseFor": [
+    "publisher decisions",
+    "author/title identity decisions",
+    "Enterprise Health calculations",
+    "Stripe migration",
+    "contract reconciliation",
+    "royalty decisions"
+  ],
+  "replacementArtifact": "docs/implementation/EOP-001-Author-Title-Source-of-Truth-Gap-Report.md"
+}
