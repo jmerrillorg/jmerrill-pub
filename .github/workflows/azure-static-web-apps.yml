@@ -25,6 +25,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Guard catalog runtime source
+        run: node scripts/check-catalog-runtime-source.mjs
+
       - name: Build and Deploy
         id: builddeploy
         uses: azure/static-web-apps-deploy@latest
