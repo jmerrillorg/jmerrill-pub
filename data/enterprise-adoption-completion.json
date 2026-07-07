@@ -5,11 +5,11 @@
     "totalAuthors": 71,
     "processedThisPass": 90,
     "certifiedImprintDistribution": {
-      "J Merrill Publishing": 81,
-      "JM Works": 23,
+      "J Merrill Publishing": 85,
+      "JM Works": 18,
       "JM Signature": 1,
       "JM Little": 12,
-      "JM Verse": 3,
+      "JM Verse": 4,
       "Unresolved": 2
     }
   },
@@ -3121,12 +3121,137 @@
   ],
   "publisherApprovedImprints": [
     {
-      "id": "naughty-tales",
-      "imprint": "JM Works"
+      "id": "365-days-of-transparency",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "a-principal-s-tale",
+      "imprint": "JM Works",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "bee-careful",
+      "imprint": "JM Little",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "focus-trust-and-follow",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
     },
     {
       "id": "god-s-word-for-this-world",
       "imprint": "J Merrill Publishing"
+    },
+    {
+      "id": "hodge-podge-of-life",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "inspirations-from-god",
+      "imprint": "JM Verse",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "lady-daphanny-s-altar",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "let-me-tell-you-about-it",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "life-after-detour",
+      "imprint": "JM Works",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "love-lucy",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "memoir-of-a-black-christian-nationalist",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "naughty-tales",
+      "imprint": "JM Works"
+    },
+    {
+      "id": "one-soul",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "pieces-of-me-all-over-the-place",
+      "imprint": "JM Works",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "pretty-wings",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "she",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "support-beyond-the-cycle",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "the-girl-with-the-ebony-locs-and-the-three-bears",
+      "imprint": "JM Little",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "the-great-hair-restart",
+      "imprint": "JM Works",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "the-hood",
+      "imprint": "JM Verse",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "the-messenger",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "the-princess-and-the-black-eyed-pea",
+      "imprint": "JM Little",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "uncomfortable-conversations-with-god",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "understanding-the-misunderstood",
+      "imprint": "JM Works",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "when-a-thug-meets-jesus",
+      "imprint": "J Merrill Publishing",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "your-brain-has-too-much-what-mommy",
+      "imprint": "JM Little",
+      "source": "Jackie Publisher Manual Assignment - Batch 1"
     }
   ],
   "certifiedProductionWriteSummary": {
@@ -3138,5 +3263,14 @@
     "attempted": false,
     "written": 0,
     "skippedExisting": 0
+  },
+  "publisherImprintBatch1": {
+    "source": "Jackie Publisher Manual Assignment - Batch 1",
+    "matchedAndLocked": 25,
+    "reconciliationRequired": 20,
+    "eventsPrepared": [
+      "IMPRINT_PUBLISHER_APPROVED",
+      "IMPRINT_LOCKED"
+    ]
   }
 }

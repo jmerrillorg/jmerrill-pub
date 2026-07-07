@@ -23,8 +23,8 @@ J Merrill Publishing is operating inside PROGRAM-002 with Enterprise Adoption co
 
 | Metric | Value | Count | Status |
 | --- | ---: | --- | --- |
-| Existing Enterprise Health baseline | 41.47% | composite | Active, source-of-truth correction required |
-| Imprint Certified | 63.93% | 78/122 | Active queue |
+| Existing Enterprise Health baseline | 62.33% | composite | Active, Batch 1 partially applied |
+| Imprint Certified | 66.39% | 81/122 | Active queue |
 | Metadata Complete | 98.36% | 120/122 | Strong |
 | Workspace Complete | 100.00% | 72/72 | Certified |
 | Contracts Linked | 0.00% | 0/122 | Reconciliation queue |
@@ -68,7 +68,7 @@ J Merrill Publishing is operating inside PROGRAM-002 with Enterprise Adoption co
 
 | Queue | Count / Status | Next Action |
 | --- | ---: | --- |
-| Publisher Imprint Review | 43 | Publisher decision gate via OE-001 packet |
+| Publisher Imprint Review | 40 | Batch 1 reconciliation via OE-001 report |
 | JM Signature Review | 1 | Publisher decision for A Portrait of Paradise |
 | Contract Reconciliation | 122 | Locate/link historical agreements |
 | Stripe Migration | 71 / provisional | Validate canonical author roster, then migrate |
@@ -109,6 +109,6 @@ Rationale:
 | Production promotion path | Decide when JM1-Dev PAM registry should be promoted beyond Dev |
 | PAM-002 file movement | Approve any SharePoint/backlist consolidation or movement |
 | JM Signature review | Decide A Portrait of Paradise imprint status |
-| Imprint review cleanup | Approve Groups A-D and decide two unresolved titles plus A Portrait of Paradise |
+| Imprint review cleanup | Resolve 20 Batch 1 reconciliation items, remaining Publisher queue, and A Portrait of Paradise |
 | Contract evidence standard | Decide acceptable evidence threshold for linking historical contracts |
 | Royalty automation go-live | Separate approval before live royalty calculations/payments |

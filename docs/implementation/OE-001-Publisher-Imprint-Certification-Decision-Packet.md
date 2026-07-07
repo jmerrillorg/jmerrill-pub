@@ -1,14 +1,14 @@
 # OE-001 - Publisher Imprint Certification Decision Packet
 
-**Initiative:** JM Publishing Operational Excellence  
-**Workstream:** 1 - Publisher Imprint Certification  
-**Status:** Publisher Decision Gate  
-**Date:** 2026-07-07  
-**Primary Sources:** PAM-001 / EOP-001 title-level imprint queue, Enterprise Imprint Canonization output, PROGRAM-002 adoption state  
+**Initiative:** JM Publishing Operational Excellence
+**Workstream:** 1 - Publisher Imprint Certification
+**Status:** Batch 1 Partially Applied - Reconciliation Gate
+**Date:** 2026-07-07
+**Primary Sources:** PAM-001 / EOP-001 title-level imprint queue, Enterprise Imprint Canonization output, PROGRAM-002 adoption state
 
 ## Executive Summary
 
-Workstream 1 is ready for Publisher decisions. The remaining queue contains 43 Publisher-review titles plus 1 JM Signature review title.
+Workstream 1 received Jackie Publisher Manual Assignment Batch 1. Exact normalized title+author matches were applied and locked in the local governed artifacts. Rows with author/title ambiguity remain at reconciliation gate.
 
 This packet does not use `books.json` as governing authority. Legacy catalog values remain evidence only. The decision set below is title-level imprint certification for PROGRAM-002; it should not overwrite historical published imprint fields unless a separate schema explicitly separates historical imprint from certified PROGRAM-002 imprint.
 
@@ -24,11 +24,23 @@ After Jackie approves a decision, the operational path is:
 
 No contracts, royalties, Stripe, Business Central, production, distribution, or author communications are touched by this workstream.
 
-## Grouped Publisher Recommendations
+## Batch 1 Status
+
+| Result | Count |
+| --- | ---: |
+| Publisher rows received | 45 |
+| Matched and locked | 25 |
+| Reconciliation required | 20 |
+| Publisher Review queue remaining | 40 |
+| JM Signature review remaining | 1 |
+
+See `OE-001-Publisher-Imprint-Batch-1-Application-Report.md` for the applied title list and reconciliation notes.
+
+## Remaining Grouped Publisher Recommendations
 
 ### Group A - Approve and Lock J Merrill Publishing
 
-**Count:** 30 titles  
+**Count:** 30 titles
 **Proposed decision:** Certify the recommended imprint as `J Merrill Publishing` for all listed titles.
 
 | Title | Author | Current Published Imprint | Confidence |
@@ -66,7 +78,7 @@ No contracts, royalties, Stripe, Business Central, production, distribution, or 
 
 ### Group B - Approve and Lock JM Little
 
-**Count:** 5 titles  
+**Count:** 5 titles
 **Proposed decision:** Certify the recommended imprint as `JM Little` for all listed titles.
 
 | Title | Author | Current Published Imprint | Confidence |
@@ -79,7 +91,7 @@ No contracts, royalties, Stripe, Business Central, production, distribution, or 
 
 ### Group C - Approve and Lock JM Works
 
-**Count:** 5 titles  
+**Count:** 5 titles
 **Proposed decision:** Certify the recommended imprint as `JM Works` for all listed titles.
 
 | Title | Author | Current Published Imprint | Confidence |
@@ -92,7 +104,7 @@ No contracts, royalties, Stripe, Business Central, production, distribution, or 
 
 ### Group D - Approve and Lock JM Verse
 
-**Count:** 1 title  
+**Count:** 1 title
 **Proposed decision:** Certify the recommended imprint as `JM Verse`.
 
 | Title | Author | Current Published Imprint | Confidence |

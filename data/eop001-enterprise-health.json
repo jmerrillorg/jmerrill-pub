@@ -1,13 +1,13 @@
 {
   "generatedAt": "2026-07-06T13:14:20.241Z",
   "program": "EOP-001",
-  "status": "Enterprise Optimization Active - Operational Excellence Workstream 1 at Publisher Decision Gate",
+  "status": "Enterprise Optimization Active - Publisher Imprint Batch 1 Applied",
   "totals": {
     "catalogTitles": 122,
     "adoptedTitles": 122,
     "publishedAuthors": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
     "activeAuthorWorkspaces": 72,
-    "publisherImprintReview": 43,
+    "publisherImprintReview": 40,
     "jmSignatureReview": 1,
     "contractReconciliation": 122,
     "stripeMigration": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
@@ -23,10 +23,10 @@
     },
     {
       "metric": "Imprint Certified",
-      "value": "63.93%",
-      "numerator": 78,
+      "value": "66.39%",
+      "numerator": 81,
       "denominator": 122,
-      "note": "Locked/certified imprints after auto-locks and Wave 3 Publisher decisions."
+      "note": "Locked/certified imprints after Publisher Batch 1 exact-match approvals."
     },
     {
       "metric": "Contracts Linked",
@@ -54,7 +54,7 @@
       "value": "98.36%",
       "numerator": 120,
       "denominator": 122,
-      "note": "Two titles remain unresolved for imprint metadata evidence."
+      "note": "Two titles remain unresolved for imprint metadata evidence; Batch 1 identity reconciliation remains separate."
     },
     {
       "metric": "Workspace Complete",
@@ -71,7 +71,7 @@
       "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
     }
   ],
-  "overallEnterpriseHealth": "41.47%",
+  "overallEnterpriseHealth": "62.33%",
   "publisherReviewQueue": [
     {
       "id": "a-little-bit-of-everything",
@@ -446,18 +446,6 @@
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
-      "id": "the-girl-with-the-ebony-locs-and-the-three-bears",
-      "title": "The Girl with the Ebony Locs and the Three Bears",
-      "author": "Deborah Eiland",
-      "currentPublishedImprint": "JM Little",
-      "recommendedImprint": "JM Little",
-      "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Little.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Little",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
       "id": "the-i-am-in-me-part-2",
       "title": "The I Am in Me Part 2",
       "author": "Edith Clay",
@@ -518,33 +506,9 @@
       "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
     },
     {
-      "id": "the-princess-and-the-black-eyed-pea",
-      "title": "The Princess and the Black-Eyed Pea",
-      "author": "Deborah Eiland",
-      "currentPublishedImprint": "JM Little",
-      "recommendedImprint": "JM Little",
-      "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Little.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock JM Little",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
       "id": "the-sun-the-shadow-and-the-silence",
       "title": "The Sun, the Shadow, and the Silence",
       "author": "Nicky Williams",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "understanding-the-misunderstood",
-      "title": "Understanding the Misunderstood",
-      "author": "Tia Benincase",
       "currentPublishedImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
@@ -617,5 +581,10 @@
     "Author Success Active denominator"
   ],
   "sourceOfTruthGapReport": "docs/implementation/EOP-001-Author-Title-Source-of-Truth-Gap-Report.md",
-  "publisherReviewStatus": "PUBLISHER_DECISION_GATE - use OE-001-Publisher-Imprint-Certification-Decision-Packet.md"
+  "publisherReviewStatus": "PUBLISHER_DECISION_GATE - Batch 1 applied for exact matches; reconciliation required for unmatched Publisher assignments.",
+  "publisherImprintBatch1": {
+    "matchedAndLocked": 25,
+    "reconciliationRequired": 20,
+    "source": "Jackie Publisher Manual Assignment - Batch 1"
+  }
 }

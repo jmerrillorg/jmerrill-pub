@@ -105,14 +105,26 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Devotional",
         "text signal: devotional, devotion",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "7-step-jumpstart-to-becoming-your-best-self",
@@ -241,14 +253,26 @@
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: JM Works."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "a-truebies-guide-part-1",
@@ -480,14 +504,26 @@
         "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
         "genre signal: Children's",
         "text signal: children, child",
-        "legacy imprint agrees: JM Little"
+        "legacy imprint agrees: JM Little",
+        "Publisher-certified Batch 1 imprint assignment: JM Little."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "biblical-prescriptions-for-life-s-troubles",
@@ -915,14 +951,26 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "for-what-it-s-worth",
@@ -1418,21 +1466,33 @@
       ],
       "isbn": "978-1-954414-93-8",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.84,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir, life",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "hop-hop-hop",
@@ -1527,21 +1587,33 @@
       ],
       "isbn": "978-1-950719-80-8",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Verse",
       "confidence": 0.96,
       "decision": "LOCKED",
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, god, inspiration",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: JM Verse."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "jalen-becomes-a-big-brother",
@@ -1672,14 +1744,26 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "let-me-tell-you-about-it",
@@ -1693,21 +1777,33 @@
       ],
       "isbn": "978-1-954414-98-3",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "life-after-detour",
@@ -1728,14 +1824,26 @@
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir, life, detour",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: JM Works."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "love-is-an-action-word",
@@ -1774,21 +1882,33 @@
       ],
       "isbn": "978-1-950719-94-5",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.84,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Fiction",
         "text signal: fiction, love",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "love-of-my-life",
@@ -1887,21 +2007,33 @@
       ],
       "isbn": "978-1-954414-19-8",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "mirror-of-refining-insight",
@@ -2104,14 +2236,26 @@
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "ordinary-people-searching-for-greatness",
@@ -2188,14 +2332,26 @@
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Memoir",
         "text signal: memoir",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: JM Works."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "pretty-wings",
@@ -2209,20 +2365,32 @@
       ],
       "isbn": "978-1-954414-08-2",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Verse",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.6,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Available evidence points to an imprint but does not meet Publisher-Certified auto-lock threshold.",
         "genre signal: Poetry",
-        "text signal: poetry"
+        "text signal: poetry",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "rhyming-it-up-with-church-stuff",
@@ -2295,14 +2463,26 @@
       "reasoning": [
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Inspirational",
-        "text signal: inspirational, inspiration"
+        "text signal: inspirational, inspiration",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "speech-therapy-works",
@@ -2344,21 +2524,33 @@
       ],
       "isbn": "978-1-950719-96-9",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.72,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Self-Help",
         "text signal: self",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "taylor-made",
@@ -2529,16 +2721,28 @@
       "currentImprint": "JM Little",
       "recommendedImprint": "JM Little",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Little."
+        "Legacy imprint retained as evidence only: JM Little.",
+        "Publisher-certified Batch 1 imprint assignment: JM Little."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-great-hair-restart",
@@ -2560,14 +2764,26 @@
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Self-Help",
         "text signal: self, restart",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: JM Works."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-healed-me",
@@ -2609,21 +2825,33 @@
       ],
       "isbn": "978-1-950719-47-1",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
+      "recommendedImprint": "JM Verse",
       "confidence": 0.84,
       "decision": "LOCKED",
       "reasoning": [
         "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
         "genre signal: Fiction",
         "text signal: fiction, hood",
-        "legacy imprint agrees: JM Works"
+        "legacy imprint agrees: JM Works",
+        "Publisher-certified Batch 1 imprint assignment: JM Verse."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-i-am-in-me",
@@ -2778,14 +3006,26 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-messenger-2",
@@ -2877,16 +3117,28 @@
       "currentImprint": "JM Little",
       "recommendedImprint": "JM Little",
       "confidence": 0.24,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Little."
+        "Legacy imprint retained as evidence only: JM Little.",
+        "Publisher-certified Batch 1 imprint assignment: JM Little."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "the-release-of-the-spirit",
@@ -2959,14 +3211,26 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, god",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "understanding-the-misunderstood",
@@ -2980,18 +3244,30 @@
       ],
       "isbn": "978-1-954414-02-0",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Publisher-certified Batch 1 imprint assignment: JM Works."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "war-mother",
@@ -3093,14 +3369,26 @@
         "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
         "genre signal: Faith",
         "text signal: faith, jesus",
-        "legacy imprint agrees: J Merrill Publishing"
+        "legacy imprint agrees: J Merrill Publishing",
+        "Publisher-certified Batch 1 imprint assignment: J Merrill Publishing."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "when-zuri-came-to-earth",
@@ -3200,14 +3488,26 @@
         "Children's content for roughly ages 0-12, including picture books, early readers, and middle grade, belongs under JM Little.",
         "genre signal: Children's",
         "text signal: children, child, mommy",
-        "legacy imprint agrees: JM Little"
+        "legacy imprint agrees: JM Little",
+        "Publisher-certified Batch 1 imprint assignment: JM Little."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Little",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true
+      }
     },
     {
       "id": "your-peace-is-a-priority",
