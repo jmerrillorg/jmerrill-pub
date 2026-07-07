@@ -922,5 +922,71 @@
     "jm1_actiondescription": "IMPRINT_LOCKED: Batch 1 reconciliation certified PROGRAM-002 imprint 'J Merrill Publishing' for canonical title 'The Master's Piece' by Sylvia Benson. Historical published imprint preserved. Status: TITLE_VARIANT_CONFIRMED.",
     "jm1_startedon": "2026-07-07T00:00:00-04:00",
     "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-IMPRINT_PUBLISHER_APPROVED-a-truebies-guide-part-1",
+    "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "a-truebies-guide-part-1",
+    "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Jackie Publisher override certified PROGRAM-002/PAM imprint 'JM Works' for 'A Trubie's Guide Pt. 1' by Alesia Corpening. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-IMPRINT_LOCKED-a-truebies-guide-part-1",
+    "jm1_actiontype": "IMPRINT_LOCKED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "a-truebies-guide-part-1",
+    "jm1_actiondescription": "IMPRINT_LOCKED: Jackie Publisher override certified PROGRAM-002/PAM imprint 'JM Works' for 'A Trubie's Guide Pt. 1' by Alesia Corpening. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-IMPRINT_PUBLISHER_APPROVED-for-what-it-s-worth",
+    "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "for-what-it-s-worth",
+    "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Jackie Publisher override certified PROGRAM-002/PAM imprint 'JM Works' for 'For What It's Worth' by Kelli Milligan Stammen. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-IMPRINT_LOCKED-for-what-it-s-worth",
+    "jm1_actiontype": "IMPRINT_LOCKED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "for-what-it-s-worth",
+    "jm1_actiondescription": "IMPRINT_LOCKED: Jackie Publisher override certified PROGRAM-002/PAM imprint 'JM Works' for 'For What It's Worth' by Kelli Milligan Stammen. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-IMPRINT_PUBLISHER_APPROVED-the-great-hair-restart-journal",
+    "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "publishing_asset_edition",
+    "jm1_sourcerecordid": "the-great-hair-restart-journal",
+    "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Jackie Publisher override certified PROGRAM-002/PAM imprint 'JM Works' for 'The Great Hair Restart: The Journal' by Karen Hill. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-IMPRINT_LOCKED-the-great-hair-restart-journal",
+    "jm1_actiontype": "IMPRINT_LOCKED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "publishing_asset_edition",
+    "jm1_sourcerecordid": "the-great-hair-restart-journal",
+    "jm1_actiondescription": "IMPRINT_LOCKED: Jackie Publisher override certified PROGRAM-002/PAM imprint 'JM Works' for 'The Great Hair Restart: The Journal' by Karen Hill. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
   }
 ]

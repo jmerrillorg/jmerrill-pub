@@ -1,0 +1,36 @@
+{
+  "source": "Jackie Publisher Manual Assignment - Batch 1 Final Override",
+  "appliedAt": "2026-07-07T00:00:00-04:00",
+  "titleOverridesApplied": [
+    {
+      "sourceTitle": "A Trubie's Guide Pt. 1",
+      "sourceAuthor": "Alesia Corpening",
+      "id": "a-truebies-guide-part-1",
+      "canonicalTitle": "A Trubie's Guide Pt. 1",
+      "canonicalAuthor": "Alesia Corpening",
+      "approvedImprint": "JM Works",
+      "status": "PUBLISHER_OVERRIDE"
+    },
+    {
+      "sourceTitle": "For What It's Worth",
+      "sourceAuthor": "Kelli Milligan Stammen",
+      "id": "for-what-it-s-worth",
+      "canonicalTitle": "For What It's Worth",
+      "canonicalAuthor": "Kelli Milligan Stammen",
+      "approvedImprint": "JM Works",
+      "status": "PUBLISHER_OVERRIDE"
+    }
+  ],
+  "assetEditionOverrideApplied": {
+    "sourceTitle": "The Great Hair Restart: The Journal",
+    "sourceAuthor": "Karen Hill",
+    "titleFamilyId": "the-great-hair-restart",
+    "canonicalTitle": "The Great Hair Restart: The Journal",
+    "canonicalAuthor": "Karen Hill",
+    "approvedImprint": "JM Works",
+    "status": "PUBLISHER_OVERRIDE_ASSET_EDITION",
+    "note": "Applied as asset/edition-level publisher override under The Great Hair Restart title family; catalog title denominator unchanged."
+  },
+  "remainingBatch1Unresolved": 0,
+  "dataverseWriteStatus": "NOT_ATTEMPTED_NO_REACHABLE_DATAVERSE_ENVIRONMENT_IN_LOCAL_SESSION"
+}

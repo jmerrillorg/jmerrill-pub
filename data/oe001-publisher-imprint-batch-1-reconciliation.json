@@ -225,30 +225,44 @@
       ]
     }
   ],
-  "unresolved": [
-    {
-      "sourceTitle": "A Trubie's Guide Pt. 1",
-      "sourceAuthor": "Alesia Corpening",
-      "approvedImprint": "JM Works",
-      "status": "NEEDS_JACKIE_REVIEW",
-      "reason": "Workbook ISBN sheet confirms A Truebies Guide, Part 1 title and AUTHOR sheet confirms Alesia Corpening aliases, but this pass did not find a direct title-author row tying Part 1 to Alesia Corpening."
-    },
-    {
-      "sourceTitle": "For What It's Worth",
-      "sourceAuthor": "Kelli Milligan Stammen",
-      "approvedImprint": "JM Works",
-      "status": "NEEDS_JACKIE_REVIEW",
-      "reason": "Workbook ISBN sheet confirms the title and AUTHOR sheet confirms Kelli Milligan Stammen aliases, but this pass did not find a direct title-author row tying the title to Kelli Milligan Stammen."
-    },
-    {
-      "sourceTitle": "The Great Hair Restart: The Journal",
-      "sourceAuthor": "Karen Hill",
-      "approvedImprint": "JM Works",
-      "status": "NEEDS_JACKIE_REVIEW",
-      "reason": "MONTHLY REPORTING POD confirms The Great Hair Restart: The Journal by Karen Hill, but no existing PROGRAM-002 title record/id was found for the Journal edition; this likely requires asset/title relationship reconciliation before certification."
-    }
-  ],
+  "unresolved": [],
   "resolvedCount": 17,
-  "unresolvedCount": 3,
-  "dataverseWriteStatus": "NOT_ATTEMPTED_NO_REACHABLE_DATAVERSE_ENVIRONMENT_IN_LOCAL_SESSION"
+  "unresolvedCount": 0,
+  "dataverseWriteStatus": "NOT_ATTEMPTED_NO_REACHABLE_DATAVERSE_ENVIRONMENT_IN_LOCAL_SESSION",
+  "publisherOverridesApplied": {
+    "appliedAt": "2026-07-07T00:00:00-04:00",
+    "resolved": [
+      {
+        "sourceTitle": "A Trubie's Guide Pt. 1",
+        "sourceAuthor": "Alesia Corpening",
+        "id": "a-truebies-guide-part-1",
+        "canonicalTitle": "A Trubie's Guide Pt. 1",
+        "canonicalAuthor": "Alesia Corpening",
+        "approvedImprint": "JM Works",
+        "status": "PUBLISHER_OVERRIDE"
+      },
+      {
+        "sourceTitle": "For What It's Worth",
+        "sourceAuthor": "Kelli Milligan Stammen",
+        "id": "for-what-it-s-worth",
+        "canonicalTitle": "For What It's Worth",
+        "canonicalAuthor": "Kelli Milligan Stammen",
+        "approvedImprint": "JM Works",
+        "status": "PUBLISHER_OVERRIDE"
+      },
+      {
+        "sourceTitle": "The Great Hair Restart: The Journal",
+        "sourceAuthor": "Karen Hill",
+        "titleFamilyId": "the-great-hair-restart",
+        "canonicalTitle": "The Great Hair Restart: The Journal",
+        "canonicalAuthor": "Karen Hill",
+        "approvedImprint": "JM Works",
+        "status": "PUBLISHER_OVERRIDE_ASSET_EDITION",
+        "note": "Applied as asset/edition-level publisher override under The Great Hair Restart title family; catalog title denominator unchanged."
+      }
+    ],
+    "remainingUnresolved": [],
+    "resolvedCount": 3,
+    "remainingUnresolvedCount": 0
+  }
 }

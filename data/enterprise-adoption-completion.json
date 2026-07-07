@@ -5,8 +5,8 @@
     "totalAuthors": 71,
     "processedThisPass": 90,
     "certifiedImprintDistribution": {
-      "J Merrill Publishing": 83,
-      "JM Works": 18,
+      "J Merrill Publishing": 81,
+      "JM Works": 20,
       "JM Signature": 1,
       "JM Little": 12,
       "JM Verse": 6,
@@ -3136,6 +3136,11 @@
       "source": "Jackie Publisher Manual Assignment - Batch 1"
     },
     {
+      "id": "a-truebies-guide-part-1",
+      "imprint": "JM Works",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Override"
+    },
+    {
       "id": "a-truebies-guide-part-2",
       "imprint": "JM Works",
       "source": "Jackie Publisher Manual Assignment - Batch 1 Reconciliation"
@@ -3164,6 +3169,11 @@
       "id": "focus-trust-and-follow",
       "imprint": "J Merrill Publishing",
       "source": "Jackie Publisher Manual Assignment - Batch 1"
+    },
+    {
+      "id": "for-what-it-s-worth",
+      "imprint": "JM Works",
+      "source": "Jackie Publisher Manual Assignment - Batch 1 Override"
     },
     {
       "id": "god-s-word-for-this-world",
@@ -3358,6 +3368,27 @@
     "source": "Publisher-source reconciliation: MONTHLY REPORTING 2026 workbook, Total Asset Listing, PAM staging evidence",
     "resolved": 17,
     "unresolved": 3,
+    "eventsPrepared": [
+      "IMPRINT_PUBLISHER_APPROVED",
+      "IMPRINT_LOCKED"
+    ]
+  },
+  "publisherApprovedAssetEditionImprints": [
+    {
+      "sourceTitle": "The Great Hair Restart: The Journal",
+      "sourceAuthor": "Karen Hill",
+      "titleFamilyId": "the-great-hair-restart",
+      "canonicalTitle": "The Great Hair Restart: The Journal",
+      "canonicalAuthor": "Karen Hill",
+      "approvedImprint": "JM Works",
+      "status": "PUBLISHER_OVERRIDE_ASSET_EDITION",
+      "note": "Applied as asset/edition-level publisher override under The Great Hair Restart title family; catalog title denominator unchanged."
+    }
+  ],
+  "publisherImprintBatch1FinalOverrides": {
+    "source": "Jackie Publisher Manual Assignment - Batch 1 Final Override",
+    "titleOverridesApplied": 2,
+    "assetEditionOverridesApplied": 1,
     "eventsPrepared": [
       "IMPRINT_PUBLISHER_APPROVED",
       "IMPRINT_LOCKED"

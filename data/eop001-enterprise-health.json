@@ -1,13 +1,13 @@
 {
   "generatedAt": "2026-07-06T13:14:20.241Z",
   "program": "EOP-001",
-  "status": "Enterprise Optimization Active - Publisher Imprint Batch 1 Reconciled",
+  "status": "Enterprise Optimization Active - Publisher Imprint Batch 1 Complete",
   "totals": {
     "catalogTitles": 122,
     "adoptedTitles": 122,
     "publishedAuthors": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
     "activeAuthorWorkspaces": 72,
-    "publisherImprintReview": 31,
+    "publisherImprintReview": 29,
     "jmSignatureReview": 1,
     "contractReconciliation": 122,
     "stripeMigration": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
@@ -23,10 +23,10 @@
     },
     {
       "metric": "Imprint Certified",
-      "value": "73.77%",
-      "numerator": 90,
+      "value": "75.41%",
+      "numerator": 92,
       "denominator": 122,
-      "note": "Locked/certified imprints after Publisher Batch 1 reconciliation."
+      "note": "Locked/certified imprints after Publisher Batch 1 final overrides."
     },
     {
       "metric": "Contracts Linked",
@@ -54,7 +54,7 @@
       "value": "98.36%",
       "numerator": 120,
       "denominator": 122,
-      "note": "Two titles remain unresolved for imprint metadata evidence; 3 Batch 1 reconciliation exceptions require Jackie review."
+      "note": "Two catalog titles remain unresolved for imprint metadata evidence outside Batch 1; Batch 1 exceptions are complete."
     },
     {
       "metric": "Workspace Complete",
@@ -71,23 +71,11 @@
       "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
     }
   ],
-  "overallEnterpriseHealth": "64.38%",
+  "overallEnterpriseHealth": "64.84%",
   "publisherReviewQueue": [
     {
       "id": "a-little-bit-of-everything",
       "title": "A Little Bit of Everything",
-      "author": "Carolyn Booker-Pierce",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "a-truebies-guide-part-1",
-      "title": "A Truebies Guide, Part 1",
       "author": "Carolyn Booker-Pierce",
       "currentPublishedImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
@@ -173,18 +161,6 @@
       "id": "divinely-inspired",
       "title": "Divinely Inspired",
       "author": "Tekisha Wimbush",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "Publisher imprint decision required",
-      "proposedDecision": "Approve and lock J Merrill Publishing",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "for-what-it-s-worth",
-      "title": "For What It's Worth",
-      "author": "Ericka Thornton",
       "currentPublishedImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
       "confidence": 0.2,
@@ -473,7 +449,7 @@
     "Author Success Active denominator"
   ],
   "sourceOfTruthGapReport": "docs/implementation/EOP-001-Author-Title-Source-of-Truth-Gap-Report.md",
-  "publisherReviewStatus": "PUBLISHER_DECISION_GATE - Batch 1 reconciliation applied for confirmed source-backed matches; 3 exceptions require Jackie review.",
+  "publisherReviewStatus": "PUBLISHER_DECISION_GATE - Batch 1 complete; continue remaining Publisher queue and JM Signature review.",
   "publisherImprintBatch1": {
     "matchedAndLocked": 25,
     "reconciliationRequired": 20,
@@ -483,5 +459,10 @@
     "resolved": 17,
     "unresolved": 3,
     "source": "Publisher-source reconciliation: MONTHLY REPORTING 2026 workbook, Total Asset Listing, PAM staging evidence"
+  },
+  "publisherImprintBatch1FinalOverrides": {
+    "titleOverridesApplied": 2,
+    "assetEditionOverridesApplied": 1,
+    "source": "Jackie Publisher Manual Assignment - Batch 1 Final Override"
   }
 }

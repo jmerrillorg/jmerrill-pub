@@ -293,8 +293,8 @@
     },
     {
       "id": "a-truebies-guide-part-1",
-      "title": "A Truebies Guide, Part 1",
-      "author": "Carolyn Booker-Pierce",
+      "title": "A Trubie's Guide Pt. 1",
+      "author": "Alesia Corpening",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -303,18 +303,31 @@
       ],
       "isbn": "978-1-950719-62-4",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 publisher override: canonical title 'A Trubie's Guide Pt. 1', canonical author 'Alesia Corpening', certified imprint 'JM Works'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Override",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "PUBLISHER_OVERRIDE"
+      }
     },
     {
       "id": "a-truebies-guide-part-2",
@@ -1060,7 +1073,7 @@
     {
       "id": "for-what-it-s-worth",
       "title": "For What It's Worth",
-      "author": "Ericka Thornton",
+      "author": "Kelli Milligan Stammen",
       "genre": "",
       "format": "Paperback",
       "formats": [
@@ -1069,18 +1082,31 @@
       ],
       "isbn": "978-1-950719-72-3",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
+      "recommendedImprint": "JM Works",
       "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "decision": "LOCKED",
       "reasoning": [
         "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Legacy imprint retained as evidence only: J Merrill Publishing.",
+        "Batch 1 publisher override: canonical title 'For What It's Worth', canonical author 'Kelli Milligan Stammen', certified imprint 'JM Works'."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
         "Legacy metadata as evidence"
-      ]
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Manual Assignment - Batch 1 Override",
+        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "reconciliationStatus": "PUBLISHER_OVERRIDE"
+      }
     },
     {
       "id": "from-stylist-to-ceo",
@@ -3039,7 +3065,19 @@
           "IMPRINT_LOCKED"
         ],
         "preserveHistoricalPublishedImprint": true
-      }
+      },
+      "publisherCertifiedAssetEditions": [
+        {
+          "sourceTitle": "The Great Hair Restart: The Journal",
+          "sourceAuthor": "Karen Hill",
+          "titleFamilyId": "the-great-hair-restart",
+          "canonicalTitle": "The Great Hair Restart: The Journal",
+          "canonicalAuthor": "Karen Hill",
+          "approvedImprint": "JM Works",
+          "status": "PUBLISHER_OVERRIDE_ASSET_EDITION",
+          "note": "Applied as asset/edition-level publisher override under The Great Hair Restart title family; catalog title denominator unchanged."
+        }
+      ]
     },
     {
       "id": "the-healed-me",
