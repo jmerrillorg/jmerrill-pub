@@ -74,6 +74,7 @@ Inventory evidence:
 
 - `docs/implementation/evidence/IS-009/is009-readiness-evidence.json`
 - `docs/implementation/IS-009-Dataverse-Live-Inventory-Summary.md`
+- `docs/implementation/IS-009-JM1-Dev-Baseline-Remediation-Plan.md`
 
 Current result:
 
@@ -265,3 +266,8 @@ Recommended next step:
 2. Repair client-credential metadata access for repeatable automation, or explicitly approve delegated Azure CLI inventory as sufficient for build planning.
 3. Rerun the readiness script after baseline repair.
 4. Then request build authorization.
+
+Baseline remediation plan:
+
+- See `IS-009-JM1-Dev-Baseline-Remediation-Plan.md`.
+- Recommendation: create a minimal filtered `JM1_PAM_BaselinePrerequisites` solution from JM1-Core and import only the required `jm1pub_contract` and `jm1_executionlog` metadata/dependencies into JM1-Dev before IS-009 build.
