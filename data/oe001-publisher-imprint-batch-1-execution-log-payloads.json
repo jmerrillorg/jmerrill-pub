@@ -4541,5 +4541,104 @@
     "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Tithe Is the Lord's' by Permelia Smith. Historical published imprint preserved.",
     "jm1_startedon": "2026-07-07T00:00:00-04:00",
     "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-FINAL-IMPRINT_PUBLISHER_APPROVED-divinely-inspired",
+    "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "divinely-inspired",
+    "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Verse' for 'Divinely Inspired' by Regina Scales. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-FINAL-IMPRINT_LOCKED-divinely-inspired",
+    "jm1_actiontype": "IMPRINT_LOCKED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "divinely-inspired",
+    "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Verse' for 'Divinely Inspired' by Regina Scales. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-FINAL-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-divinely-inspired",
+    "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "divinely-inspired",
+    "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Verse' for 'Divinely Inspired' by Regina Scales. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-FINAL-IMPRINT_PUBLISHER_APPROVED-have-you-considered-my-servant",
+    "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "have-you-considered-my-servant",
+    "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Have You Considered My Servant?' by Jaylonna Stevette. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-FINAL-IMPRINT_LOCKED-have-you-considered-my-servant",
+    "jm1_actiontype": "IMPRINT_LOCKED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "have-you-considered-my-servant",
+    "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Have You Considered My Servant?' by Jaylonna Stevette. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-FINAL-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-have-you-considered-my-servant",
+    "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "have-you-considered-my-servant",
+    "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Have You Considered My Servant?' by Jaylonna Stevette. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-FINAL-IMPRINT_PUBLISHER_APPROVED-department-of-the-air-force-mission-driven-leadership",
+    "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "department-of-the-air-force-mission-driven-leadership",
+    "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Department of the Air Force: Mission Driven Leadership' by Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-FINAL-IMPRINT_LOCKED-department-of-the-air-force-mission-driven-leadership",
+    "jm1_actiontype": "IMPRINT_LOCKED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "department-of-the-air-force-mission-driven-leadership",
+    "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Department of the Air Force: Mission Driven Leadership' by Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
+  },
+  {
+    "jm1_name": "OE001-FINAL-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-department-of-the-air-force-mission-driven-leadership",
+    "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+    "jm1_agentname": "Cody Prime",
+    "jm1_agentmodel": "jm-publishing-operational-excellence",
+    "jm1_sourceentity": "catalog_title",
+    "jm1_sourcerecordid": "department-of-the-air-force-mission-driven-leadership",
+    "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Department of the Air Force: Mission Driven Leadership' by Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain. Historical published imprint preserved.",
+    "jm1_startedon": "2026-07-07T00:00:00-04:00",
+    "jm1_completedon": "2026-07-07T00:00:00-04:00"
   }
 ]

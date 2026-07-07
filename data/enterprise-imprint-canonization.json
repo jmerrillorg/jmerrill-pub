@@ -30,8 +30,8 @@
     "missingManuscripts": 122,
     "titlesLackingSufficientEvidence": 47,
     "averageConfidence": 0.58,
-    "automaticallyLocked": 120,
-    "publisherReviewRequired": 2
+    "automaticallyLocked": 122,
+    "publisherReviewRequired": 0
   },
   "titles": [
     {
@@ -1057,18 +1057,43 @@
       ],
       "isbn": "978-1-961475-68-7",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "JM Works",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register final correction certified JM Works as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Final Corrections"
+      ],
+      "publisherCertifiedImprint": "JM Works",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain",
+      "publisherMasterRegisterTitle": "Department of the Air Force: Mission Driven Leadership",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Final Corrections",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "JM Works",
+        "canonicalAuthor": "Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain",
+        "canonicalTitle": "Department of the Air Force: Mission Driven Leadership",
+        "prior": {
+          "title": "Department of the Air Force: Mission Driven Leadership",
+          "author": "Jackie Smith, Jr.",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE",
+          "publisherCertifiedImprint": null
+        }
+      }
     },
     {
       "id": "destined-to-break-the-curse",
@@ -1207,18 +1232,43 @@
       ],
       "isbn": "978-1-961475-17-5",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "JM Verse",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register final correction certified JM Verse as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
-      ]
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Final Corrections"
+      ],
+      "publisherCertifiedImprint": "JM Verse",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherMasterRegisterAuthor": "Regina Scales",
+      "publisherMasterRegisterTitle": "Divinely Inspired",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Final Corrections",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "JM Verse",
+        "canonicalAuthor": "Regina Scales",
+        "canonicalTitle": "Divinely Inspired",
+        "prior": {
+          "title": "Divinely Inspired",
+          "author": "Tekisha Wimbush",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOW CONFIDENCE",
+          "publisherCertifiedImprint": null
+        }
+      }
     },
     {
       "id": "establishing-glory",
@@ -1769,33 +1819,43 @@
       ],
       "isbn": "978-1-961475-31-1",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.24,
+      "recommendedImprint": "JM Works",
+      "confidence": 1.0,
       "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing.",
-        "Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Have You Considered My Servant?' by Jaylonna Stevette.",
-        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Have You Considered My Servant?' by Jaylonna Stevette.",
-        "Full Publisher Master Imprint Register certified 'J Merrill Publishing' for 'Have You Considered My Servant?' by Jaylonna Stevette."
+        "Publisher Master Imprint Register final correction certified JM Works as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Final Corrections"
       ],
-      "publisherCertifiedImprint": "J Merrill Publishing",
+      "publisherCertifiedImprint": "JM Works",
       "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
       "publisherCertification": {
         "status": "PUBLISHER_CERTIFIED",
-        "source": "Jackie Publisher Master Imprint Register Full List",
-        "certifiedAt": "2026-07-07T00:00:00-04:00",
+        "source": "Jackie Publisher Master Imprint Register Final Corrections",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
         "events": [
           "IMPRINT_PUBLISHER_APPROVED",
-          "IMPRINT_LOCKED"
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
         ],
-        "preserveHistoricalPublishedImprint": true
-      }
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "JM Works",
+        "canonicalAuthor": "Jaylonna Stevette",
+        "canonicalTitle": "Have You Considered My Servant?",
+        "prior": {
+          "title": "Have You Considered My Servant?",
+          "author": "Jaylonna Stevette",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "LOCKED",
+          "publisherCertifiedImprint": "J Merrill Publishing"
+        }
+      },
+      "publisherMasterRegisterAuthor": "Jaylonna Stevette",
+      "publisherMasterRegisterTitle": "Have You Considered My Servant?"
     },
     {
       "id": "help-god-i-am-the-collection",

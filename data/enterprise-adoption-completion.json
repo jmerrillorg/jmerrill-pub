@@ -6138,5 +6138,10 @@
     "source": "Jackie Publisher Master Imprint Register Batch 3",
     "appliedAt": "2026-07-07T00:00:00-04:00",
     "remainingPublisherReviewQueue": 2
+  },
+  "publisherMasterImprintRegisterFinalCorrections": {
+    "source": "Jackie Publisher Master Imprint Register Final Corrections",
+    "appliedAt": "2026-07-07T00:00:00-04:00",
+    "remainingPublisherReviewQueue": 0
   }
 }

@@ -1683,11 +1683,11 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Final Corrections",
       "sourceAuthor": "Jaylonna Stevette",
       "sourceTitle": "Have You Considered My Servant?",
-      "sourceImprintLabel": "JMP",
-      "normalizedImprint": "J Merrill Publishing",
+      "sourceImprintLabel": "JM Works",
+      "normalizedImprint": "JM Works",
       "matchedCatalogId": "have-you-considered-my-servant",
       "matchedCatalogTitle": "Have You Considered My Servant?",
       "matchedCatalogAuthor": "Jaylonna Stevette",
@@ -1697,7 +1697,8 @@
         "title": "Have You Considered My Servant?",
         "author": "Jaylonna Stevette",
         "recommendedImprint": "J Merrill Publishing",
-        "decision": "LOCKED"
+        "decision": "LOCKED",
+        "publisherCertifiedImprint": "J Merrill Publishing"
       }
     },
     {
@@ -2214,6 +2215,44 @@
         "author": "Daphanny Baker",
         "recommendedImprint": "JM Little",
         "decision": "LOCKED"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Final Corrections",
+      "sourceAuthor": "Regina Scales",
+      "sourceTitle": "Divinely Inspired",
+      "sourceImprintLabel": "JM Verse",
+      "normalizedImprint": "JM Verse",
+      "matchedCatalogId": "divinely-inspired",
+      "matchedCatalogTitle": "Divinely Inspired",
+      "matchedCatalogAuthor": "Tekisha Wimbush",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Divinely Inspired",
+        "author": "Tekisha Wimbush",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "LOW CONFIDENCE",
+        "publisherCertifiedImprint": null
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Final Corrections",
+      "sourceAuthor": "Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain",
+      "sourceTitle": "Department of the Air Force: Mission Driven Leadership",
+      "sourceImprintLabel": "JM Works",
+      "normalizedImprint": "JM Works",
+      "matchedCatalogId": "department-of-the-air-force-mission-driven-leadership",
+      "matchedCatalogTitle": "Department of the Air Force: Mission Driven Leadership",
+      "matchedCatalogAuthor": "Jackie Smith, Jr.",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Department of the Air Force: Mission Driven Leadership",
+        "author": "Jackie Smith, Jr.",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "LOW CONFIDENCE",
+        "publisherCertifiedImprint": null
       }
     }
   ],
@@ -3804,24 +3843,6 @@
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Jaylonna Stevette",
-      "sourceTitle": "Have You Considered My Servant?",
-      "sourceImprintLabel": "JMP",
-      "normalizedImprint": "J Merrill Publishing",
-      "matchedCatalogId": "have-you-considered-my-servant",
-      "matchedCatalogTitle": "Have You Considered My Servant?",
-      "matchedCatalogAuthor": "Jaylonna Stevette",
-      "status": "PUBLISHER_CERTIFIED",
-      "appliedAt": "2026-07-07T00:00:00-04:00",
-      "prior": {
-        "title": "Have You Considered My Servant?",
-        "author": "Jaylonna Stevette",
-        "recommendedImprint": "J Merrill Publishing",
-        "decision": "LOCKED"
-      }
-    },
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
       "sourceAuthor": "KD Heard",
       "sourceTitle": "Inner Peace Through Life's Storms",
       "sourceImprintLabel": "JMP",
@@ -4358,6 +4379,63 @@
         "author": "Carolyn Booker-Pierce",
         "recommendedImprint": "JM Works",
         "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Final Corrections",
+      "sourceAuthor": "Regina Scales",
+      "sourceTitle": "Divinely Inspired",
+      "sourceImprintLabel": "JM Verse",
+      "normalizedImprint": "JM Verse",
+      "matchedCatalogId": "divinely-inspired",
+      "matchedCatalogTitle": "Divinely Inspired",
+      "matchedCatalogAuthor": "Tekisha Wimbush",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Divinely Inspired",
+        "author": "Tekisha Wimbush",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "LOW CONFIDENCE",
+        "publisherCertifiedImprint": null
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Final Corrections",
+      "sourceAuthor": "Jaylonna Stevette",
+      "sourceTitle": "Have You Considered My Servant?",
+      "sourceImprintLabel": "JM Works",
+      "normalizedImprint": "JM Works",
+      "matchedCatalogId": "have-you-considered-my-servant",
+      "matchedCatalogTitle": "Have You Considered My Servant?",
+      "matchedCatalogAuthor": "Jaylonna Stevette",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Have You Considered My Servant?",
+        "author": "Jaylonna Stevette",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "LOCKED",
+        "publisherCertifiedImprint": "J Merrill Publishing"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Final Corrections",
+      "sourceAuthor": "Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain",
+      "sourceTitle": "Department of the Air Force: Mission Driven Leadership",
+      "sourceImprintLabel": "JM Works",
+      "normalizedImprint": "JM Works",
+      "matchedCatalogId": "department-of-the-air-force-mission-driven-leadership",
+      "matchedCatalogTitle": "Department of the Air Force: Mission Driven Leadership",
+      "matchedCatalogAuthor": "Jackie Smith, Jr.",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Department of the Air Force: Mission Driven Leadership",
+        "author": "Jackie Smith, Jr.",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "LOW CONFIDENCE",
+        "publisherCertifiedImprint": null
       }
     }
   ],
@@ -4989,12 +5067,111 @@
       "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Tithe Is the Lord's' by Permelia Smith. Historical published imprint preserved.",
       "jm1_startedon": "2026-07-07T00:00:00-04:00",
       "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-FINAL-IMPRINT_PUBLISHER_APPROVED-divinely-inspired",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "divinely-inspired",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Verse' for 'Divinely Inspired' by Regina Scales. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-FINAL-IMPRINT_LOCKED-divinely-inspired",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "divinely-inspired",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Verse' for 'Divinely Inspired' by Regina Scales. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-FINAL-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-divinely-inspired",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "divinely-inspired",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Verse' for 'Divinely Inspired' by Regina Scales. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-FINAL-IMPRINT_PUBLISHER_APPROVED-have-you-considered-my-servant",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "have-you-considered-my-servant",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Have You Considered My Servant?' by Jaylonna Stevette. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-FINAL-IMPRINT_LOCKED-have-you-considered-my-servant",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "have-you-considered-my-servant",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Have You Considered My Servant?' by Jaylonna Stevette. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-FINAL-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-have-you-considered-my-servant",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "have-you-considered-my-servant",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Have You Considered My Servant?' by Jaylonna Stevette. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-FINAL-IMPRINT_PUBLISHER_APPROVED-department-of-the-air-force-mission-driven-leadership",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "department-of-the-air-force-mission-driven-leadership",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Department of the Air Force: Mission Driven Leadership' by Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-FINAL-IMPRINT_LOCKED-department-of-the-air-force-mission-driven-leadership",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "department-of-the-air-force-mission-driven-leadership",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Department of the Air Force: Mission Driven Leadership' by Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-FINAL-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-department-of-the-air-force-mission-driven-leadership",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "department-of-the-air-force-mission-driven-leadership",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register final correction certified PROGRAM-002/PAM imprint 'JM Works' for 'Department of the Air Force: Mission Driven Leadership' by Andrew Bowens, Lenetta Banks Williams, Jamichael Hill Beard, Anthony Cain. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
     }
   ],
   "dataverseWriteStatus": "NOT_ATTEMPTED_NO_REACHABLE_DATAVERSE_ENVIRONMENT_IN_LOCAL_SESSION",
   "summary": {
-    "totalRows": 125,
-    "applied": 119,
+    "totalRows": 127,
+    "applied": 121,
     "pendingManuscriptReview": 0,
     "authorReconciliationRequired": 0,
     "assetEditionRegistered": 1,
@@ -5006,5 +5183,11 @@
     "appliedCount": 14,
     "catalogTitleDecisionsApplied": 12,
     "titleAnchorRowsResolved": 2
+  },
+  "publisherMasterImprintRegisterFinalCorrections": {
+    "source": "Jackie Publisher Master Imprint Register Final Corrections",
+    "appliedAt": "2026-07-07T00:00:00-04:00",
+    "appliedCount": 3,
+    "remainingPublisherReviewQueue": 0
   }
 }

@@ -7,7 +7,7 @@
     "adoptedTitles": 122,
     "publishedAuthors": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
     "activeAuthorWorkspaces": 72,
-    "publisherImprintReview": 2,
+    "publisherImprintReview": 0,
     "jmSignatureReview": 0,
     "contractReconciliation": 122,
     "stripeMigration": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
@@ -23,10 +23,10 @@
     },
     {
       "metric": "Imprint Certified",
-      "value": "98.36%",
-      "numerator": 120,
+      "value": "100.00%",
+      "numerator": 122,
       "denominator": 122,
-      "note": "Catalog titles with LOCKED certified imprints after Publisher Master Imprint Register Batch 3."
+      "note": "All catalog titles have LOCKED certified imprints after Publisher Master Imprint Register final corrections."
     },
     {
       "metric": "Contracts Linked",
@@ -71,21 +71,8 @@
       "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
     }
   ],
-  "overallEnterpriseHealth": "79.34%",
-  "publisherReviewQueue": [
-    {
-      "title": "Department of the Air Force: Mission Driven Leadership",
-      "author": "Jackie Smith, Jr.",
-      "decision": "LOW CONFIDENCE",
-      "recommendedImprint": "J Merrill Publishing"
-    },
-    {
-      "title": "Divinely Inspired",
-      "author": "Tekisha Wimbush",
-      "decision": "LOW CONFIDENCE",
-      "recommendedImprint": "J Merrill Publishing"
-    }
-  ],
+  "overallEnterpriseHealth": "79.67%",
+  "publisherReviewQueue": [],
   "jmSignatureQueue": [],
   "optimizationOrder": [
     "Publisher Imprint Review",
@@ -140,5 +127,12 @@
     "remainingPublisherReviewQueue": 2,
     "remainingManuscriptReviewQueue": 0,
     "remainingAuthorReconciliationQueue": 0
+  },
+  "publisherMasterImprintRegisterFinalCorrections": {
+    "source": "Jackie Publisher Master Imprint Register Final Corrections",
+    "appliedAt": "2026-07-07T00:00:00-04:00",
+    "appliedCount": 3,
+    "remainingPublisherReviewQueue": 0,
+    "remainingJmSignatureReviewQueue": 0
   }
 }
