@@ -399,10 +399,10 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Jackie Smith, Jr.",
       "sourceTitle": "Establishing Glory: The Relationship Collection",
-      "sourceImprintLabel": "JMP",
+      "sourceImprintLabel": "J Merrill Publishing",
       "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": null,
       "matchedCatalogTitle": null,
@@ -1575,16 +1575,22 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Carolyn Booker-Pierce",
       "sourceTitle": "Abortion!",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "abortion",
       "matchedCatalogTitle": "Abortion!",
       "matchedCatalogAuthor": "Toni Kleckley",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Abortion!",
+        "author": "Toni Kleckley",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -1605,16 +1611,22 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Agape International Cathedral",
       "sourceTitle": "Delicious Ideas!",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "delicious-ideas",
       "matchedCatalogTitle": "Delicious Ideas!",
       "matchedCatalogAuthor": "Pamela Smith",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Delicious Ideas!",
+        "author": "Pamela Smith",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -1635,28 +1647,40 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Karen Hill",
       "sourceTitle": "From Stylist to CEO",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "from-stylist-to-ceo",
       "matchedCatalogTitle": "From Stylist to CEO",
       "matchedCatalogAuthor": "Kelli Milligan Stammen",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "From Stylist to CEO",
+        "author": "Kelli Milligan Stammen",
+        "recommendedImprint": "JM Works",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Carolyn Booker-Pierce",
       "sourceTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
       "matchedCatalogTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
       "matchedCatalogAuthor": "Carolyn Booker-Pierce",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+        "author": "Carolyn Booker-Pierce",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -1713,28 +1737,40 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Carolyn Booker-Pierce",
       "sourceTitle": "Loving the Addict",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "loving-the-addict",
       "matchedCatalogTitle": "Loving the Addict",
       "matchedCatalogAuthor": "Carolyn Booker-Pierce",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Loving the Addict",
+        "author": "Carolyn Booker-Pierce",
+        "recommendedImprint": "JM Works",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Carolyn Booker-Pierce",
       "sourceTitle": "More Than a Village",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "more-than-a-village",
       "matchedCatalogTitle": "More Than A Village",
       "matchedCatalogAuthor": "Shelley McIntosh",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "More Than A Village",
+        "author": "Shelley McIntosh",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -1773,16 +1809,22 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Will Harris",
       "sourceTitle": "Taylor Made",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "taylor-made",
       "matchedCatalogTitle": "Taylor Made",
       "matchedCatalogAuthor": "Eryonna Barrino",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Taylor Made",
+        "author": "Eryonna Barrino",
+        "recommendedImprint": "JM Works",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -1803,16 +1845,22 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": ".",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Felix Catheline",
       "sourceTitle": "The Paper Champ",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "the-paper-champ",
       "matchedCatalogTitle": "The Paper Champ",
       "matchedCatalogAuthor": "Kurt Broadnax",
-      "status": "AUTHOR_RECONCILIATION_REQUIRED",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "The Paper Champ",
+        "author": "Kurt Broadnax",
+        "recommendedImprint": "JM Works",
+        "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+      }
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -1833,16 +1881,22 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": ".",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Devin Gilchrest",
       "sourceTitle": "The Sun, the Shadow, and the Silence",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "the-sun-the-shadow-and-the-silence",
       "matchedCatalogTitle": "The Sun, the Shadow, and the Silence",
       "matchedCatalogAuthor": "Nicky Williams",
-      "status": "AUTHOR_RECONCILIATION_REQUIRED",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "The Sun, the Shadow, and the Silence",
+        "author": "Nicky Williams",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+      }
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -1863,28 +1917,40 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Shelley McIntosh",
       "sourceTitle": "Warriors and Angels",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "warriors-and-angels",
       "matchedCatalogTitle": "Warriors and Angels",
       "matchedCatalogAuthor": "Shelley McIntosh",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "Warriors and Angels",
+        "author": "Shelley McIntosh",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": ".",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Gwendolyn Rucker-Carr",
       "sourceTitle": "When Zuri Came to Earth",
-      "sourceImprintLabel": "Little",
+      "sourceImprintLabel": "JM Little",
       "normalizedImprint": "JM Little",
       "matchedCatalogId": "when-zuri-came-to-earth",
       "matchedCatalogTitle": "When Zuri Came to Earth",
       "matchedCatalogAuthor": "Jaylonna Stevette",
-      "status": "AUTHOR_RECONCILIATION_REQUIRED",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "When Zuri Came to Earth",
+        "author": "Jaylonna Stevette",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+      }
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -1905,16 +1971,22 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Carolyn Booker-Pierce",
       "sourceTitle": "You're Still Not Crazy",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
       "matchedCatalogId": "you-re-still-not-crazy",
       "matchedCatalogTitle": "You're Still Not Crazy",
       "matchedCatalogAuthor": "Carolyn Booker-Pierce",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "prior": {
+        "title": "You're Still Not Crazy",
+        "author": "Carolyn Booker-Pierce",
+        "recommendedImprint": "JM Works",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -2079,16 +2151,16 @@
       }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
       "sourceAuthor": "Permelia Smith",
-      "sourceTitle": "The Tithe Is the Lord’s",
-      "sourceImprintLabel": "JMP",
+      "sourceTitle": "The Tithe Is the Lord's",
+      "sourceImprintLabel": "J Merrill Publishing",
       "normalizedImprint": "J Merrill Publishing",
+      "status": "NO_PROGRAM_TITLE_ANCHOR",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
       "matchedCatalogId": null,
       "matchedCatalogTitle": null,
-      "matchedCatalogAuthor": null,
-      "status": "NO_PROGRAM_TITLE_ANCHOR",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "matchedCatalogAuthor": null
     },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -4071,156 +4143,226 @@
         "recommendedImprint": "JM Little",
         "decision": "LOCKED"
       }
-    }
-  ],
-  "pendingManuscriptReview": [
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Carolyn Booker-Pierce",
-      "sourceTitle": "Abortion!",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
-      "matchedCatalogId": "abortion",
-      "matchedCatalogTitle": "Abortion!",
-      "matchedCatalogAuthor": "Toni Kleckley",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Agape International Cathedral",
-      "sourceTitle": "Delicious Ideas!",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
-      "matchedCatalogId": "delicious-ideas",
-      "matchedCatalogTitle": "Delicious Ideas!",
-      "matchedCatalogAuthor": "Pamela Smith",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    },
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Karen Hill",
-      "sourceTitle": "From Stylist to CEO",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
-      "matchedCatalogId": "from-stylist-to-ceo",
-      "matchedCatalogTitle": "From Stylist to CEO",
-      "matchedCatalogAuthor": "Kelli Milligan Stammen",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    },
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Carolyn Booker-Pierce",
-      "sourceTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
-      "matchedCatalogId": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
-      "matchedCatalogTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
-      "matchedCatalogAuthor": "Carolyn Booker-Pierce",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    },
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Carolyn Booker-Pierce",
-      "sourceTitle": "Loving the Addict",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
-      "matchedCatalogId": "loving-the-addict",
-      "matchedCatalogTitle": "Loving the Addict",
-      "matchedCatalogAuthor": "Carolyn Booker-Pierce",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    },
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Carolyn Booker-Pierce",
-      "sourceTitle": "More Than a Village",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
-      "matchedCatalogId": "more-than-a-village",
-      "matchedCatalogTitle": "More Than A Village",
-      "matchedCatalogAuthor": "Shelley McIntosh",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    },
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Will Harris",
-      "sourceTitle": "Taylor Made",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
-      "matchedCatalogId": "taylor-made",
-      "matchedCatalogTitle": "Taylor Made",
-      "matchedCatalogAuthor": "Eryonna Barrino",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    },
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Shelley McIntosh",
-      "sourceTitle": "Warriors and Angels",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
-      "matchedCatalogId": "warriors-and-angels",
-      "matchedCatalogTitle": "Warriors and Angels",
-      "matchedCatalogAuthor": "Shelley McIntosh",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    },
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Carolyn Booker-Pierce",
-      "sourceTitle": "You're Still Not Crazy",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
-      "matchedCatalogId": "you-re-still-not-crazy",
-      "matchedCatalogTitle": "You're Still Not Crazy",
-      "matchedCatalogAuthor": "Carolyn Booker-Pierce",
-      "status": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    }
-  ],
-  "authorReconciliationRequired": [
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": ".",
-      "sourceTitle": "The Paper Champ",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
-      "matchedCatalogId": "the-paper-champ",
-      "matchedCatalogTitle": "The Paper Champ",
-      "matchedCatalogAuthor": "Kurt Broadnax",
-      "status": "AUTHOR_RECONCILIATION_REQUIRED",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    },
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": ".",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Devin Gilchrest",
       "sourceTitle": "The Sun, the Shadow, and the Silence",
-      "sourceImprintLabel": "",
-      "normalizedImprint": "PENDING",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
       "matchedCatalogId": "the-sun-the-shadow-and-the-silence",
       "matchedCatalogTitle": "The Sun, the Shadow, and the Silence",
       "matchedCatalogAuthor": "Nicky Williams",
-      "status": "AUTHOR_RECONCILIATION_REQUIRED",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "prior": {
+        "title": "The Sun, the Shadow, and the Silence",
+        "author": "Nicky Williams",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+      }
     },
     {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": ".",
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Felix Catheline",
+      "sourceTitle": "The Paper Champ",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": "the-paper-champ",
+      "matchedCatalogTitle": "The Paper Champ",
+      "matchedCatalogAuthor": "Kurt Broadnax",
+      "prior": {
+        "title": "The Paper Champ",
+        "author": "Kurt Broadnax",
+        "recommendedImprint": "JM Works",
+        "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Gwendolyn Rucker-Carr",
       "sourceTitle": "When Zuri Came to Earth",
-      "sourceImprintLabel": "Little",
+      "sourceImprintLabel": "JM Little",
       "normalizedImprint": "JM Little",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
       "matchedCatalogId": "when-zuri-came-to-earth",
       "matchedCatalogTitle": "When Zuri Came to Earth",
       "matchedCatalogAuthor": "Jaylonna Stevette",
-      "status": "AUTHOR_RECONCILIATION_REQUIRED",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
+      "prior": {
+        "title": "When Zuri Came to Earth",
+        "author": "Jaylonna Stevette",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Carolyn Booker-Pierce",
+      "sourceTitle": "Abortion!",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": "abortion",
+      "matchedCatalogTitle": "Abortion!",
+      "matchedCatalogAuthor": "Toni Kleckley",
+      "prior": {
+        "title": "Abortion!",
+        "author": "Toni Kleckley",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Agape International Cathedral",
+      "sourceTitle": "Delicious Ideas!",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": "delicious-ideas",
+      "matchedCatalogTitle": "Delicious Ideas!",
+      "matchedCatalogAuthor": "Pamela Smith",
+      "prior": {
+        "title": "Delicious Ideas!",
+        "author": "Pamela Smith",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Karen Hill",
+      "sourceTitle": "From Stylist to CEO",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": "from-stylist-to-ceo",
+      "matchedCatalogTitle": "From Stylist to CEO",
+      "matchedCatalogAuthor": "Kelli Milligan Stammen",
+      "prior": {
+        "title": "From Stylist to CEO",
+        "author": "Kelli Milligan Stammen",
+        "recommendedImprint": "JM Works",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Carolyn Booker-Pierce",
+      "sourceTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "matchedCatalogTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+      "matchedCatalogAuthor": "Carolyn Booker-Pierce",
+      "prior": {
+        "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+        "author": "Carolyn Booker-Pierce",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Carolyn Booker-Pierce",
+      "sourceTitle": "Loving the Addict",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": "loving-the-addict",
+      "matchedCatalogTitle": "Loving the Addict",
+      "matchedCatalogAuthor": "Carolyn Booker-Pierce",
+      "prior": {
+        "title": "Loving the Addict",
+        "author": "Carolyn Booker-Pierce",
+        "recommendedImprint": "JM Works",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Carolyn Booker-Pierce",
+      "sourceTitle": "More Than a Village",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": "more-than-a-village",
+      "matchedCatalogTitle": "More Than A Village",
+      "matchedCatalogAuthor": "Shelley McIntosh",
+      "prior": {
+        "title": "More Than A Village",
+        "author": "Shelley McIntosh",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Will Harris",
+      "sourceTitle": "Taylor Made",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": "taylor-made",
+      "matchedCatalogTitle": "Taylor Made",
+      "matchedCatalogAuthor": "Eryonna Barrino",
+      "prior": {
+        "title": "Taylor Made",
+        "author": "Eryonna Barrino",
+        "recommendedImprint": "JM Works",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Shelley McIntosh",
+      "sourceTitle": "Warriors and Angels",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": "warriors-and-angels",
+      "matchedCatalogTitle": "Warriors and Angels",
+      "matchedCatalogAuthor": "Shelley McIntosh",
+      "prior": {
+        "title": "Warriors and Angels",
+        "author": "Shelley McIntosh",
+        "recommendedImprint": "J Merrill Publishing",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Carolyn Booker-Pierce",
+      "sourceTitle": "You're Still Not Crazy",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "PUBLISHER_CERTIFIED",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": "you-re-still-not-crazy",
+      "matchedCatalogTitle": "You're Still Not Crazy",
+      "matchedCatalogAuthor": "Carolyn Booker-Pierce",
+      "prior": {
+        "title": "You're Still Not Crazy",
+        "author": "Carolyn Booker-Pierce",
+        "recommendedImprint": "JM Works",
+        "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+      }
     }
   ],
+  "pendingManuscriptReview": [],
+  "authorReconciliationRequired": [],
   "assetEditionRegistered": [
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
@@ -4236,30 +4378,6 @@
     }
   ],
   "noProgramTitleAnchor": [
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Jackie Smith, Jr.",
-      "sourceTitle": "Establishing Glory: The Relationship Collection",
-      "sourceImprintLabel": "JMP",
-      "normalizedImprint": "J Merrill Publishing",
-      "matchedCatalogId": null,
-      "matchedCatalogTitle": null,
-      "matchedCatalogAuthor": null,
-      "status": "NO_PROGRAM_TITLE_ANCHOR",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    },
-    {
-      "source": "Jackie Publisher Master Imprint Register Full List",
-      "sourceAuthor": "Permelia Smith",
-      "sourceTitle": "The Tithe Is the Lord’s",
-      "sourceImprintLabel": "JMP",
-      "normalizedImprint": "J Merrill Publishing",
-      "matchedCatalogId": null,
-      "matchedCatalogTitle": null,
-      "matchedCatalogAuthor": null,
-      "status": "NO_PROGRAM_TITLE_ANCHOR",
-      "appliedAt": "2026-07-07T00:00:00-04:00"
-    },
     {
       "source": "Jackie Publisher Master Imprint Register Full List",
       "sourceAuthor": "Sean Crowley",
@@ -4295,6 +4413,30 @@
       "matchedCatalogAuthor": null,
       "status": "NO_PROGRAM_TITLE_ANCHOR",
       "appliedAt": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Jackie Smith, Jr.",
+      "sourceTitle": "Establishing Glory: The Relationship Collection",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "NO_PROGRAM_TITLE_ANCHOR",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": null,
+      "matchedCatalogTitle": null,
+      "matchedCatalogAuthor": null
+    },
+    {
+      "source": "Jackie Publisher Master Imprint Register Batch 3",
+      "sourceAuthor": "Permelia Smith",
+      "sourceTitle": "The Tithe Is the Lord's",
+      "sourceImprintLabel": "J Merrill Publishing",
+      "normalizedImprint": "J Merrill Publishing",
+      "status": "NO_PROGRAM_TITLE_ANCHOR",
+      "appliedAt": "2026-07-07T00:00:00-04:00",
+      "matchedCatalogId": null,
+      "matchedCatalogTitle": null,
+      "matchedCatalogAuthor": null
     }
   ],
   "executionLogEventsPrepared": [
@@ -4385,15 +4527,484 @@
       "jm1_actiondescription": "IMPRINT_LOCKED: Full Publisher Master Imprint Register certified PROGRAM-002/PAM imprint 'JM Works' for 'Warrior’s Breed' by Dean Wilson. Historical published imprint preserved.",
       "jm1_startedon": "2026-07-07T00:00:00-04:00",
       "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-the-sun-the-shadow-and-the-silence",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "the-sun-the-shadow-and-the-silence",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Sun, the Shadow, and the Silence' by Devin Gilchrest. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-the-sun-the-shadow-and-the-silence",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "the-sun-the-shadow-and-the-silence",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Sun, the Shadow, and the Silence' by Devin Gilchrest. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-the-sun-the-shadow-and-the-silence",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "the-sun-the-shadow-and-the-silence",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Sun, the Shadow, and the Silence' by Devin Gilchrest. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-the-paper-champ",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "the-paper-champ",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Paper Champ' by Felix Catheline. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-the-paper-champ",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "the-paper-champ",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Paper Champ' by Felix Catheline. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-the-paper-champ",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "the-paper-champ",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Paper Champ' by Felix Catheline. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-when-zuri-came-to-earth",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "when-zuri-came-to-earth",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'JM Little' for 'When Zuri Came to Earth' by Gwendolyn Rucker-Carr. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-when-zuri-came-to-earth",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "when-zuri-came-to-earth",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'JM Little' for 'When Zuri Came to Earth' by Gwendolyn Rucker-Carr. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-when-zuri-came-to-earth",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "when-zuri-came-to-earth",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'JM Little' for 'When Zuri Came to Earth' by Gwendolyn Rucker-Carr. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-abortion",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "abortion",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Abortion!' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-abortion",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "abortion",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Abortion!' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-abortion",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "abortion",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Abortion!' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-delicious-ideas",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "delicious-ideas",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Delicious Ideas!' by Agape International Cathedral. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-delicious-ideas",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "delicious-ideas",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Delicious Ideas!' by Agape International Cathedral. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-delicious-ideas",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "delicious-ideas",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Delicious Ideas!' by Agape International Cathedral. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-from-stylist-to-ceo",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "from-stylist-to-ceo",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'From Stylist to CEO' by Karen Hill. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-from-stylist-to-ceo",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "from-stylist-to-ceo",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'From Stylist to CEO' by Karen Hill. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-from-stylist-to-ceo",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "from-stylist-to-ceo",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'From Stylist to CEO' by Karen Hill. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Girl, You're Not Crazy. You're Dealing with a Narcissist' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Girl, You're Not Crazy. You're Dealing with a Narcissist' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Girl, You're Not Crazy. You're Dealing with a Narcissist' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-loving-the-addict",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "loving-the-addict",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Loving the Addict' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-loving-the-addict",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "loving-the-addict",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Loving the Addict' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-loving-the-addict",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "loving-the-addict",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Loving the Addict' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-more-than-a-village",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "more-than-a-village",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'More Than a Village' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-more-than-a-village",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "more-than-a-village",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'More Than a Village' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-more-than-a-village",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "more-than-a-village",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'More Than a Village' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-taylor-made",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "taylor-made",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Taylor Made' by Will Harris. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-taylor-made",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "taylor-made",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Taylor Made' by Will Harris. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-taylor-made",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "taylor-made",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Taylor Made' by Will Harris. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-warriors-and-angels",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "warriors-and-angels",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Warriors and Angels' by Shelley McIntosh. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-warriors-and-angels",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "warriors-and-angels",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Warriors and Angels' by Shelley McIntosh. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-warriors-and-angels",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "warriors-and-angels",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Warriors and Angels' by Shelley McIntosh. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-you-re-still-not-crazy",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "you-re-still-not-crazy",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'You're Still Not Crazy' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-you-re-still-not-crazy",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "you-re-still-not-crazy",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'You're Still Not Crazy' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-you-re-still-not-crazy",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "catalog_title",
+      "jm1_sourcerecordid": "you-re-still-not-crazy",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'You're Still Not Crazy' by Carolyn Booker-Pierce. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-establishing-glory-the-relationship-collection",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "publisher_master_imprint_register",
+      "jm1_sourcerecordid": "establishing-glory-the-relationship-collection",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Establishing Glory: The Relationship Collection' by Jackie Smith, Jr.. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-establishing-glory-the-relationship-collection",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "publisher_master_imprint_register",
+      "jm1_sourcerecordid": "establishing-glory-the-relationship-collection",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Establishing Glory: The Relationship Collection' by Jackie Smith, Jr.. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-establishing-glory-the-relationship-collection",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "publisher_master_imprint_register",
+      "jm1_sourcerecordid": "establishing-glory-the-relationship-collection",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'Establishing Glory: The Relationship Collection' by Jackie Smith, Jr.. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_PUBLISHER_APPROVED-the-tithe-is-the-lord-s",
+      "jm1_actiontype": "IMPRINT_PUBLISHER_APPROVED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "publisher_master_imprint_register",
+      "jm1_sourcerecordid": "the-tithe-is-the-lord-s",
+      "jm1_actiondescription": "IMPRINT_PUBLISHER_APPROVED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Tithe Is the Lord's' by Permelia Smith. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-IMPRINT_LOCKED-the-tithe-is-the-lord-s",
+      "jm1_actiontype": "IMPRINT_LOCKED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "publisher_master_imprint_register",
+      "jm1_sourcerecordid": "the-tithe-is-the-lord-s",
+      "jm1_actiondescription": "IMPRINT_LOCKED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Tithe Is the Lord's' by Permelia Smith. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
+    },
+    {
+      "jm1_name": "OE001-BATCH3-AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED-the-tithe-is-the-lord-s",
+      "jm1_actiontype": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED",
+      "jm1_agentname": "Cody Prime",
+      "jm1_agentmodel": "jm-publishing-operational-excellence",
+      "jm1_sourceentity": "publisher_master_imprint_register",
+      "jm1_sourcerecordid": "the-tithe-is-the-lord-s",
+      "jm1_actiondescription": "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED: Publisher Master Imprint Register Batch 3 certified PROGRAM-002/PAM imprint 'J Merrill Publishing' for 'The Tithe Is the Lord's' by Permelia Smith. Historical published imprint preserved.",
+      "jm1_startedon": "2026-07-07T00:00:00-04:00",
+      "jm1_completedon": "2026-07-07T00:00:00-04:00"
     }
   ],
   "dataverseWriteStatus": "NOT_ATTEMPTED_NO_REACHABLE_DATAVERSE_ENVIRONMENT_IN_LOCAL_SESSION",
   "summary": {
     "totalRows": 125,
-    "applied": 107,
-    "pendingManuscriptReview": 9,
-    "authorReconciliationRequired": 3,
+    "applied": 119,
+    "pendingManuscriptReview": 0,
+    "authorReconciliationRequired": 0,
     "assetEditionRegistered": 1,
     "noProgramTitleAnchor": 5
+  },
+  "publisherMasterImprintRegisterBatch3": {
+    "source": "Jackie Publisher Master Imprint Register Batch 3",
+    "appliedAt": "2026-07-07T00:00:00-04:00",
+    "appliedCount": 14,
+    "catalogTitleDecisionsApplied": 12,
+    "titleAnchorRowsResolved": 2
   }
 }

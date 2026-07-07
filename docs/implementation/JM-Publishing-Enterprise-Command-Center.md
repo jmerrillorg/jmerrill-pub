@@ -23,8 +23,8 @@ J Merrill Publishing is operating inside PROGRAM-002 with Enterprise Adoption co
 
 | Metric | Value | Count | Status |
 | --- | ---: | --- | --- |
-| Existing Enterprise Health baseline | 68.49% | composite | Active, Full Master Register applied |
-| Imprint Certified | 88.52% | 108/122 | Active queue |
+| Existing Enterprise Health baseline | 79.34% | composite | Active, Batch 3 applied |
+| Imprint Certified | 98.36% | 120/122 | Active queue |
 | Metadata Complete | 98.36% | 120/122 | Strong |
 | Workspace Complete | 100.00% | 72/72 | Certified |
 | Contracts Linked | 0.00% | 0/122 | Reconciliation queue |
@@ -68,7 +68,7 @@ J Merrill Publishing is operating inside PROGRAM-002 with Enterprise Adoption co
 
 | Queue | Count / Status | Next Action |
 | --- | ---: | --- |
-| Publisher Imprint Review | 14 | Resolve pending manuscript, author reconciliation, and title-anchor queues |
+| Publisher Imprint Review | 2 | Resolve remaining low-confidence catalog rows |
 | JM Signature Review | 0 | Cleared by Publisher Master Register |
 | Contract Reconciliation | 122 | Locate/link historical agreements |
 | Stripe Migration | 71 / provisional | Validate canonical author roster, then migrate |
@@ -109,6 +109,6 @@ Rationale:
 | Production promotion path | Decide when JM1-Dev PAM registry should be promoted beyond Dev |
 | PAM-002 file movement | Approve any SharePoint/backlist consolidation or movement |
 | JM Signature review | Decide A Portrait of Paradise imprint status |
-| Imprint review cleanup | Resolve 9 pending manuscript/imprint rows, 3 author reconciliation rows, and 5 title-anchor rows |
+| Imprint review cleanup | Resolve 2 low-confidence catalog rows and 5 title-anchor rows |
 | Contract evidence standard | Decide acceptable evidence threshold for linking historical contracts |
 | Royalty automation go-live | Separate approval before live royalty calculations/payments |

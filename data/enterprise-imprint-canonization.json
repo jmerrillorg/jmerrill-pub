@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-06T11:51:14.143Z",
+  "generatedAt": "2026-07-07T00:00:00-04:00",
   "summary": {
     "totalTitlesReviewed": 122,
     "currentImprintDistribution": {
@@ -25,11 +25,13 @@
     },
     "titlesAutomaticallyLocked": 74,
     "titlesRequiringPublisherReview": 47,
-    "jmSignatureCandidates": 1,
+    "jmSignatureCandidates": 0,
     "missingMetadata": 47,
     "missingManuscripts": 122,
     "titlesLackingSufficientEvidence": 47,
-    "averageConfidence": 0.58
+    "averageConfidence": 0.58,
+    "automaticallyLocked": 120,
+    "publisherReviewRequired": 2
   },
   "titles": [
     {
@@ -460,28 +462,39 @@
       "isbn": "978-1-954414-00-6",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
-      "publisherMasterRegisterStatus": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
       "publisherMasterRegisterAuthor": "Carolyn Booker-Pierce",
       "publisherMasterRegisterTitle": "Abortion!",
       "publisherCertification": {
-        "status": "PENDING_MANUSCRIPT_REVIEW",
-        "source": "Jackie Publisher Master Imprint Register Full List",
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
         "updatedAt": "2026-07-07T00:00:00-04:00",
         "events": [
-          "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
         ],
-        "preserveHistoricalPublishedImprint": true
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Carolyn Booker-Pierce",
+        "canonicalTitle": "Abortion!",
+        "prior": {
+          "title": "Abortion!",
+          "author": "Toni Kleckley",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
       }
     },
     {
@@ -997,28 +1010,39 @@
       "isbn": "978-1-961475-33-5",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
-      "publisherMasterRegisterStatus": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
       "publisherMasterRegisterAuthor": "Agape International Cathedral",
       "publisherMasterRegisterTitle": "Delicious Ideas!",
       "publisherCertification": {
-        "status": "PENDING_MANUSCRIPT_REVIEW",
-        "source": "Jackie Publisher Master Imprint Register Full List",
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
         "updatedAt": "2026-07-07T00:00:00-04:00",
         "events": [
-          "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
         ],
-        "preserveHistoricalPublishedImprint": true
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Agape International Cathedral",
+        "canonicalTitle": "Delicious Ideas!",
+        "prior": {
+          "title": "Delicious Ideas!",
+          "author": "Pamela Smith",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
       }
     },
     {
@@ -1422,29 +1446,40 @@
       ],
       "isbn": "978-1-961475-23-6",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.24,
-      "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Works."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
-      "publisherMasterRegisterStatus": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
       "publisherMasterRegisterAuthor": "Karen Hill",
       "publisherMasterRegisterTitle": "From Stylist to CEO",
       "publisherCertification": {
-        "status": "PENDING_MANUSCRIPT_REVIEW",
-        "source": "Jackie Publisher Master Imprint Register Full List",
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
         "updatedAt": "2026-07-07T00:00:00-04:00",
         "events": [
-          "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
         ],
-        "preserveHistoricalPublishedImprint": true
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Karen Hill",
+        "canonicalTitle": "From Stylist to CEO",
+        "prior": {
+          "title": "From Stylist to CEO",
+          "author": "Kelli Milligan Stammen",
+          "recommendedImprint": "JM Works",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
       }
     },
     {
@@ -1501,28 +1536,39 @@
       "isbn": "978-1-950719-40-2",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
-      "publisherMasterRegisterStatus": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
       "publisherMasterRegisterAuthor": "Carolyn Booker-Pierce",
       "publisherMasterRegisterTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
       "publisherCertification": {
-        "status": "PENDING_MANUSCRIPT_REVIEW",
-        "source": "Jackie Publisher Master Imprint Register Full List",
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
         "updatedAt": "2026-07-07T00:00:00-04:00",
         "events": [
-          "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
         ],
-        "preserveHistoricalPublishedImprint": true
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Carolyn Booker-Pierce",
+        "canonicalTitle": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+        "prior": {
+          "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+          "author": "Carolyn Booker-Pierce",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
       }
     },
     {
@@ -2731,32 +2777,41 @@
       ],
       "isbn": "978-1-950719-57-0",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.84,
-      "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
-        "genre signal: Self-Help",
-        "text signal: self, addict",
-        "legacy imprint agrees: JM Works"
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
-      "publisherMasterRegisterStatus": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
       "publisherMasterRegisterAuthor": "Carolyn Booker-Pierce",
       "publisherMasterRegisterTitle": "Loving the Addict",
       "publisherCertification": {
-        "status": "PENDING_MANUSCRIPT_REVIEW",
-        "source": "Jackie Publisher Master Imprint Register Full List",
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
         "updatedAt": "2026-07-07T00:00:00-04:00",
         "events": [
-          "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
         ],
-        "preserveHistoricalPublishedImprint": true
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Carolyn Booker-Pierce",
+        "canonicalTitle": "Loving the Addict",
+        "prior": {
+          "title": "Loving the Addict",
+          "author": "Carolyn Booker-Pierce",
+          "recommendedImprint": "JM Works",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
       }
     },
     {
@@ -2902,28 +2957,39 @@
       "isbn": "978-1-954414-14-3",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
-      "publisherMasterRegisterStatus": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
       "publisherMasterRegisterAuthor": "Carolyn Booker-Pierce",
       "publisherMasterRegisterTitle": "More Than a Village",
       "publisherCertification": {
-        "status": "PENDING_MANUSCRIPT_REVIEW",
-        "source": "Jackie Publisher Master Imprint Register Full List",
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
         "updatedAt": "2026-07-07T00:00:00-04:00",
         "events": [
-          "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
         ],
-        "preserveHistoricalPublishedImprint": true
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Carolyn Booker-Pierce",
+        "canonicalTitle": "More Than a Village",
+        "prior": {
+          "title": "More Than A Village",
+          "author": "Shelley McIntosh",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
       }
     },
     {
@@ -3565,29 +3631,40 @@
       ],
       "isbn": "978-1-961475-21-2",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.2,
-      "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Works."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
-      "publisherMasterRegisterStatus": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
       "publisherMasterRegisterAuthor": "Will Harris",
       "publisherMasterRegisterTitle": "Taylor Made",
       "publisherCertification": {
-        "status": "PENDING_MANUSCRIPT_REVIEW",
-        "source": "Jackie Publisher Master Imprint Register Full List",
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
         "updatedAt": "2026-07-07T00:00:00-04:00",
         "events": [
-          "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
         ],
-        "preserveHistoricalPublishedImprint": true
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Will Harris",
+        "canonicalTitle": "Taylor Made",
+        "prior": {
+          "title": "Taylor Made",
+          "author": "Eryonna Barrino",
+          "recommendedImprint": "JM Works",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
       }
     },
     {
@@ -4312,22 +4389,42 @@
       ],
       "isbn": "978-1-961475-53-3",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.24,
-      "decision": "AUTHOR_RECONCILIATION_REQUIRED",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: JM Works."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
       "authorReconciliationStatus": "AUTHOR_RECONCILIATION_REQUIRED",
-      "publisherMasterRegisterAuthor": ".",
+      "publisherMasterRegisterAuthor": "Felix Catheline",
       "publisherMasterRegisterTitle": "The Paper Champ",
-      "publisherMasterRegisterStatus": "AUTHOR_RECONCILIATION_REQUIRED"
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Felix Catheline",
+        "canonicalTitle": "The Paper Champ",
+        "prior": {
+          "title": "The Paper Champ",
+          "author": "Kurt Broadnax",
+          "recommendedImprint": "JM Works",
+          "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+        }
+      }
     },
     {
       "id": "the-princess-and-the-black-eyed-pea",
@@ -4426,21 +4523,41 @@
       "isbn": "978-1-961475-55-7",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "AUTHOR_RECONCILIATION_REQUIRED",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
       "authorReconciliationStatus": "AUTHOR_RECONCILIATION_REQUIRED",
-      "publisherMasterRegisterAuthor": ".",
+      "publisherMasterRegisterAuthor": "Devin Gilchrest",
       "publisherMasterRegisterTitle": "The Sun, the Shadow, and the Silence",
-      "publisherMasterRegisterStatus": "AUTHOR_RECONCILIATION_REQUIRED"
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Devin Gilchrest",
+        "canonicalTitle": "The Sun, the Shadow, and the Silence",
+        "prior": {
+          "title": "The Sun, the Shadow, and the Silence",
+          "author": "Nicky Williams",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+        }
+      }
     },
     {
       "id": "uncomfortable-conversations-with-god",
@@ -4577,31 +4694,40 @@
       "isbn": "978-1-961475-51-9",
       "currentImprint": "J Merrill Publishing",
       "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.72,
-      "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.",
-        "genre signal: Faith",
-        "text signal: faith",
-        "legacy imprint agrees: J Merrill Publishing"
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
-      "publisherMasterRegisterStatus": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
       "publisherMasterRegisterAuthor": "Shelley McIntosh",
       "publisherMasterRegisterTitle": "Warriors and Angels",
       "publisherCertification": {
-        "status": "PENDING_MANUSCRIPT_REVIEW",
-        "source": "Jackie Publisher Master Imprint Register Full List",
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
         "updatedAt": "2026-07-07T00:00:00-04:00",
         "events": [
-          "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
         ],
-        "preserveHistoricalPublishedImprint": true
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Shelley McIntosh",
+        "canonicalTitle": "Warriors and Angels",
+        "prior": {
+          "title": "Warriors and Angels",
+          "author": "Shelley McIntosh",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
       }
     },
     {
@@ -4700,22 +4826,42 @@
       ],
       "isbn": "978-1-961475-99-1",
       "currentImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "decision": "AUTHOR_RECONCILIATION_REQUIRED",
+      "recommendedImprint": "JM Little",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "Insufficient available evidence for canon-certified automation.",
-        "Legacy imprint retained as evidence only: J Merrill Publishing."
+        "Publisher Master Imprint Register Batch 3 certified JM Little as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
       "authorReconciliationStatus": "AUTHOR_RECONCILIATION_REQUIRED",
-      "publisherMasterRegisterAuthor": ".",
+      "publisherMasterRegisterAuthor": "Gwendolyn Rucker-Carr",
       "publisherMasterRegisterTitle": "When Zuri Came to Earth",
-      "publisherMasterRegisterStatus": "AUTHOR_RECONCILIATION_REQUIRED"
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
+      "publisherCertification": {
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
+        "updatedAt": "2026-07-07T00:00:00-04:00",
+        "events": [
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
+        ],
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "JM Little",
+        "canonicalAuthor": "Gwendolyn Rucker-Carr",
+        "canonicalTitle": "When Zuri Came to Earth",
+        "prior": {
+          "title": "When Zuri Came to Earth",
+          "author": "Jaylonna Stevette",
+          "recommendedImprint": "J Merrill Publishing",
+          "decision": "AUTHOR_RECONCILIATION_REQUIRED"
+        }
+      }
     },
     {
       "id": "why-faith-works-for-some-and-not-for-others",
@@ -4898,32 +5044,41 @@
       ],
       "isbn": "978-1-954414-23-5",
       "currentImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.72,
-      "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "recommendedImprint": "J Merrill Publishing",
+      "confidence": 1.0,
+      "decision": "LOCKED",
       "reasoning": [
-        "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.",
-        "genre signal: Self-Help",
-        "text signal: self",
-        "legacy imprint agrees: JM Works"
+        "Publisher Master Imprint Register Batch 3 certified J Merrill Publishing as PROGRAM-002/PAM imprint."
       ],
       "evidenceUsed": [
         "Title",
         "Genre/BISAC surrogate",
         "Current published imprint as evidence",
-        "Legacy metadata as evidence"
+        "Legacy metadata as evidence",
+        "Publisher Master Imprint Register Batch 3"
       ],
-      "publisherMasterRegisterStatus": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
+      "publisherMasterRegisterStatus": "PUBLISHER_CERTIFIED",
       "publisherMasterRegisterAuthor": "Carolyn Booker-Pierce",
       "publisherMasterRegisterTitle": "You're Still Not Crazy",
       "publisherCertification": {
-        "status": "PENDING_MANUSCRIPT_REVIEW",
-        "source": "Jackie Publisher Master Imprint Register Full List",
+        "status": "PUBLISHER_CERTIFIED",
+        "source": "Jackie Publisher Master Imprint Register Batch 3",
         "updatedAt": "2026-07-07T00:00:00-04:00",
         "events": [
-          "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+          "IMPRINT_PUBLISHER_APPROVED",
+          "IMPRINT_LOCKED",
+          "AUTHOR_TITLE_PAIRING_PUBLISHER_CONFIRMED"
         ],
-        "preserveHistoricalPublishedImprint": true
+        "preserveHistoricalPublishedImprint": true,
+        "certifiedImprint": "J Merrill Publishing",
+        "canonicalAuthor": "Carolyn Booker-Pierce",
+        "canonicalTitle": "You're Still Not Crazy",
+        "prior": {
+          "title": "You're Still Not Crazy",
+          "author": "Carolyn Booker-Pierce",
+          "recommendedImprint": "JM Works",
+          "decision": "IMPRINT_PENDING_MANUSCRIPT_REVIEW"
+        }
       }
     },
     {

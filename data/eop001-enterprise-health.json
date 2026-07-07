@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-06T13:14:20.241Z",
+  "generatedAt": "2026-07-07T00:00:00-04:00",
   "program": "EOP-001",
   "status": "Enterprise Optimization Active - Full Publisher Master Imprint Register Applied",
   "totals": {
@@ -7,7 +7,7 @@
     "adoptedTitles": 122,
     "publishedAuthors": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
     "activeAuthorWorkspaces": 72,
-    "publisherImprintReview": 14,
+    "publisherImprintReview": 2,
     "jmSignatureReview": 0,
     "contractReconciliation": 122,
     "stripeMigration": "PROVISIONAL_FROM_LEGACY_EVIDENCE",
@@ -23,10 +23,10 @@
     },
     {
       "metric": "Imprint Certified",
-      "value": "88.52%",
-      "numerator": 108,
+      "value": "98.36%",
+      "numerator": 120,
       "denominator": 122,
-      "note": "Catalog titles with LOCKED certified imprints after Full Publisher Master Imprint Register update."
+      "note": "Catalog titles with LOCKED certified imprints after Publisher Master Imprint Register Batch 3."
     },
     {
       "metric": "Contracts Linked",
@@ -71,175 +71,19 @@
       "note": "Requires canonical Dataverse Contact/title roster before denominator is trusted."
     }
   ],
-  "overallEnterpriseHealth": "68.49%",
+  "overallEnterpriseHealth": "79.34%",
   "publisherReviewQueue": [
     {
-      "id": "abortion",
-      "title": "Abortion!",
-      "author": "Toni Kleckley",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "delicious-ideas",
-      "title": "Delicious Ideas!",
-      "author": "Pamela Smith",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "department-of-the-air-force-mission-driven-leadership",
       "title": "Department of the Air Force: Mission Driven Leadership",
       "author": "Jackie Smith, Jr.",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "LOW CONFIDENCE",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
+      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "J Merrill Publishing"
     },
     {
-      "id": "divinely-inspired",
       "title": "Divinely Inspired",
       "author": "Tekisha Wimbush",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "LOW CONFIDENCE",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "from-stylist-to-ceo",
-      "title": "From Stylist to CEO",
-      "author": "Kelli Milligan Stammen",
-      "currentPublishedImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Works.",
-      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
-      "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
-      "author": "Carolyn Booker-Pierce",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "loving-the-addict",
-      "title": "Loving the Addict",
-      "author": "Carolyn Booker-Pierce",
-      "currentPublishedImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.84,
-      "reasoning": "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.; genre signal: Self-Help; text signal: self, addict; legacy imprint agrees: JM Works",
-      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "more-than-a-village",
-      "title": "More Than A Village",
-      "author": "Shelley McIntosh",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "taylor-made",
-      "title": "Taylor Made",
-      "author": "Eryonna Barrino",
-      "currentPublishedImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Works.",
-      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "the-paper-champ",
-      "title": "The Paper Champ",
-      "author": "Kurt Broadnax",
-      "currentPublishedImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.24,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: JM Works.",
-      "decisionRequired": "AUTHOR_RECONCILIATION_REQUIRED",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "the-sun-the-shadow-and-the-silence",
-      "title": "The Sun, the Shadow, and the Silence",
-      "author": "Nicky Williams",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "AUTHOR_RECONCILIATION_REQUIRED",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "warriors-and-angels",
-      "title": "Warriors and Angels",
-      "author": "Shelley McIntosh",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.72,
-      "reasoning": "Faith-based, faith-adjacent, devotional, ministry-centered, and inspirational work belongs under the flagship faith/inspiration imprint.; genre signal: Faith; text signal: faith; legacy imprint agrees: J Merrill Publishing",
-      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "when-zuri-came-to-earth",
-      "title": "When Zuri Came to Earth",
-      "author": "Jaylonna Stevette",
-      "currentPublishedImprint": "J Merrill Publishing",
-      "recommendedImprint": "J Merrill Publishing",
-      "confidence": 0.2,
-      "reasoning": "Insufficient available evidence for canon-certified automation.; Legacy imprint retained as evidence only: J Merrill Publishing.",
-      "decisionRequired": "AUTHOR_RECONCILIATION_REQUIRED",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
-    },
-    {
-      "id": "you-re-still-not-crazy",
-      "title": "You're Still Not Crazy",
-      "author": "Carolyn Booker-Pierce",
-      "currentPublishedImprint": "JM Works",
-      "recommendedImprint": "JM Works",
-      "confidence": 0.72,
-      "reasoning": "General trade fiction, nonfiction, memoir, self-help, and broad-market titles belong under JM Works unless faith, children, verse, or Signature doctrine overrides.; genre signal: Self-Help; text signal: self; legacy imprint agrees: JM Works",
-      "decisionRequired": "IMPRINT_PENDING_MANUSCRIPT_REVIEW",
-      "proposedDecision": "Pending publisher/master register follow-up",
-      "executionLogOnApproval": "IMPRINT_PUBLISHER_APPROVED; IMPRINT_LOCKED"
+      "decision": "LOW CONFIDENCE",
+      "recommendedImprint": "J Merrill Publishing"
     }
   ],
   "jmSignatureQueue": [],
@@ -288,5 +132,13 @@
     "assetEditionRegistered": 1,
     "noProgramTitleAnchor": 5,
     "eventsPrepared": 8
+  },
+  "publisherMasterImprintRegisterBatch3": {
+    "source": "Jackie Publisher Master Imprint Register Batch 3",
+    "appliedAt": "2026-07-07T00:00:00-04:00",
+    "appliedCount": 14,
+    "remainingPublisherReviewQueue": 2,
+    "remainingManuscriptReviewQueue": 0,
+    "remainingAuthorReconciliationQueue": 0
   }
 }
