@@ -73,14 +73,20 @@ function dataverseConfig() {
   const apiBase = cleanUrl(
     process.env.DATAVERSE_WEB_API_BASE_URL || (environmentUrl ? `${environmentUrl}/api/data/v9.2` : ''),
   )
+  const accessToken = process.env.DATAVERSE_ACCESS_TOKEN || ''
   const config = {
     tenantId: process.env.DATAVERSE_TENANT_ID || '',
     clientId: process.env.DATAVERSE_CLIENT_ID || '',
     clientSecret: process.env.DATAVERSE_CLIENT_SECRET || '',
     resourceUrl,
     apiBase,
+    accessToken,
   }
-  const missing = Object.entries(config)
+  const requiredKeys = accessToken
+    ? ['resourceUrl', 'apiBase', 'accessToken']
+    : ['tenantId', 'clientId', 'clientSecret', 'resourceUrl', 'apiBase']
+  const missing = requiredKeys
+    .map((key) => [key, config[key]])
     .filter(([, value]) => !value)
     .map(([key]) => key)
   return { ok: missing.length === 0, missing, value: config }
@@ -139,7 +145,7 @@ async function inventoryDataverse() {
     }
   }
 
-  const accessToken = await token(config.value)
+  const accessToken = config.value.accessToken || (await token(config.value))
   const tables = []
   for (const target of targetTables) {
     const entity = await dvGet(
@@ -191,6 +197,7 @@ async function inventoryDataverse() {
 
   return {
     status: 'READ',
+    authMode: config.value.accessToken ? 'provided_access_token' : 'client_credentials',
     apiBase: config.value.apiBase.replace(/https:\/\/([^/]+).*/, 'https://$1/api/data/v9.2'),
     tables,
   }

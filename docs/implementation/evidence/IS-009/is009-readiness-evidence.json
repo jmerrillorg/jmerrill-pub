@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-07T02:00:59.211Z",
+  "generatedAt": "2026-07-07T02:08:52.929Z",
   "sourceDirectory": "/Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/Implementation HQ - Documents/General",
   "sourceFreeze": [
     {
@@ -84,8 +84,3485 @@
     }
   ],
   "dataverseInventory": {
-    "status": "FAILED",
-    "error": "dataverse_token_failed:400",
-    "tables": []
+    "status": "READ",
+    "authMode": "provided_access_token",
+    "apiBase": "https://org52409ff2.crm.dynamics.com/api/data/v9.2",
+    "tables": [
+      {
+        "logicalName": "contact",
+        "label": "Contact",
+        "exists": true,
+        "entity": {
+          "logicalName": "contact",
+          "schemaName": "Contact",
+          "entitySetName": "contacts",
+          "ownershipType": "UserOwned",
+          "isCustomEntity": false,
+          "displayName": "Contact"
+        },
+        "attributes": [
+          {
+            "logicalName": "accountid",
+            "schemaName": "AccountId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "accountidname",
+            "schemaName": "AccountIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "accountidyominame",
+            "schemaName": "AccountIdYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "accountrolecode",
+            "schemaName": "AccountRoleCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "accountrolecodename",
+            "schemaName": "AccountRoleCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_addressid",
+            "schemaName": "Address1_AddressId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": true,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_addresstypecode",
+            "schemaName": "Address1_AddressTypeCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_addresstypecodename",
+            "schemaName": "Address1_AddressTypeCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_city",
+            "schemaName": "Address1_City",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_composite",
+            "schemaName": "Address1_Composite",
+            "type": "Memo",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_country",
+            "schemaName": "Address1_Country",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_county",
+            "schemaName": "Address1_County",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_fax",
+            "schemaName": "Address1_Fax",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_freighttermscode",
+            "schemaName": "Address1_FreightTermsCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_freighttermscodename",
+            "schemaName": "Address1_FreightTermsCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_latitude",
+            "schemaName": "Address1_Latitude",
+            "type": "Double",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_line1",
+            "schemaName": "Address1_Line1",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_line2",
+            "schemaName": "Address1_Line2",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_line3",
+            "schemaName": "Address1_Line3",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_longitude",
+            "schemaName": "Address1_Longitude",
+            "type": "Double",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_name",
+            "schemaName": "Address1_Name",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_postalcode",
+            "schemaName": "Address1_PostalCode",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_postofficebox",
+            "schemaName": "Address1_PostOfficeBox",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_primarycontactname",
+            "schemaName": "Address1_PrimaryContactName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_shippingmethodcode",
+            "schemaName": "Address1_ShippingMethodCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_shippingmethodcodename",
+            "schemaName": "Address1_ShippingMethodCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_stateorprovince",
+            "schemaName": "Address1_StateOrProvince",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_telephone1",
+            "schemaName": "Address1_Telephone1",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_telephone2",
+            "schemaName": "Address1_Telephone2",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_telephone3",
+            "schemaName": "Address1_Telephone3",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_upszone",
+            "schemaName": "Address1_UPSZone",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address1_utcoffset",
+            "schemaName": "Address1_UTCOffset",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_addressid",
+            "schemaName": "Address2_AddressId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": true,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_addresstypecode",
+            "schemaName": "Address2_AddressTypeCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_addresstypecodename",
+            "schemaName": "Address2_AddressTypeCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_city",
+            "schemaName": "Address2_City",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_composite",
+            "schemaName": "Address2_Composite",
+            "type": "Memo",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_country",
+            "schemaName": "Address2_Country",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_county",
+            "schemaName": "Address2_County",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_fax",
+            "schemaName": "Address2_Fax",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_freighttermscode",
+            "schemaName": "Address2_FreightTermsCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_freighttermscodename",
+            "schemaName": "Address2_FreightTermsCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_latitude",
+            "schemaName": "Address2_Latitude",
+            "type": "Double",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_line1",
+            "schemaName": "Address2_Line1",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_line2",
+            "schemaName": "Address2_Line2",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_line3",
+            "schemaName": "Address2_Line3",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_longitude",
+            "schemaName": "Address2_Longitude",
+            "type": "Double",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_name",
+            "schemaName": "Address2_Name",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_postalcode",
+            "schemaName": "Address2_PostalCode",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_postofficebox",
+            "schemaName": "Address2_PostOfficeBox",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_primarycontactname",
+            "schemaName": "Address2_PrimaryContactName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_shippingmethodcode",
+            "schemaName": "Address2_ShippingMethodCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_shippingmethodcodename",
+            "schemaName": "Address2_ShippingMethodCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_stateorprovince",
+            "schemaName": "Address2_StateOrProvince",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_telephone1",
+            "schemaName": "Address2_Telephone1",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_telephone2",
+            "schemaName": "Address2_Telephone2",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_telephone3",
+            "schemaName": "Address2_Telephone3",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_upszone",
+            "schemaName": "Address2_UPSZone",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address2_utcoffset",
+            "schemaName": "Address2_UTCOffset",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_addressid",
+            "schemaName": "Address3_AddressId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": true,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_addresstypecode",
+            "schemaName": "Address3_AddressTypeCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_addresstypecodename",
+            "schemaName": "Address3_AddressTypeCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_city",
+            "schemaName": "Address3_City",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_composite",
+            "schemaName": "Address3_Composite",
+            "type": "Memo",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_country",
+            "schemaName": "Address3_Country",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_county",
+            "schemaName": "Address3_County",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_fax",
+            "schemaName": "Address3_Fax",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_freighttermscode",
+            "schemaName": "Address3_FreightTermsCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_freighttermscodename",
+            "schemaName": "Address3_FreightTermsCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_latitude",
+            "schemaName": "Address3_Latitude",
+            "type": "Double",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_line1",
+            "schemaName": "Address3_Line1",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_line2",
+            "schemaName": "Address3_Line2",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_line3",
+            "schemaName": "Address3_Line3",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_longitude",
+            "schemaName": "Address3_Longitude",
+            "type": "Double",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_name",
+            "schemaName": "Address3_Name",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_postalcode",
+            "schemaName": "Address3_PostalCode",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_postofficebox",
+            "schemaName": "Address3_PostOfficeBox",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_primarycontactname",
+            "schemaName": "Address3_PrimaryContactName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_shippingmethodcode",
+            "schemaName": "Address3_ShippingMethodCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_shippingmethodcodename",
+            "schemaName": "Address3_ShippingMethodCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_stateorprovince",
+            "schemaName": "Address3_StateOrProvince",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_telephone1",
+            "schemaName": "Address3_Telephone1",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_telephone2",
+            "schemaName": "Address3_Telephone2",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_telephone3",
+            "schemaName": "Address3_Telephone3",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_upszone",
+            "schemaName": "Address3_UPSZone",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "address3_utcoffset",
+            "schemaName": "Address3_UTCOffset",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_confirmremovepassword",
+            "schemaName": "adx_ConfirmRemovePassword",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_confirmremovepasswordname",
+            "schemaName": "adx_confirmremovepasswordName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_createdbyipaddress",
+            "schemaName": "Adx_CreatedByIPAddress",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_createdbyusername",
+            "schemaName": "Adx_CreatedByUsername",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_accessfailedcount",
+            "schemaName": "adx_identity_accessfailedcount",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_emailaddress1confirmed",
+            "schemaName": "adx_identity_emailaddress1confirmed",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_emailaddress1confirmedname",
+            "schemaName": "adx_identity_emailaddress1confirmedName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_lastsuccessfullogin",
+            "schemaName": "adx_identity_lastsuccessfullogin",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_locallogindisabled",
+            "schemaName": "adx_identity_locallogindisabled",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_locallogindisabledname",
+            "schemaName": "adx_identity_locallogindisabledName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_lockoutenabled",
+            "schemaName": "adx_identity_lockoutenabled",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_lockoutenabledname",
+            "schemaName": "adx_identity_lockoutenabledName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_lockoutenddate",
+            "schemaName": "adx_identity_lockoutenddate",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_logonenabled",
+            "schemaName": "adx_identity_logonenabled",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_logonenabledname",
+            "schemaName": "adx_identity_logonenabledName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_mobilephoneconfirmed",
+            "schemaName": "adx_identity_mobilephoneconfirmed",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_mobilephoneconfirmedname",
+            "schemaName": "adx_identity_mobilephoneconfirmedName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_newpassword",
+            "schemaName": "adx_identity_newpassword",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_passwordhash",
+            "schemaName": "adx_identity_passwordhash",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_securitystamp",
+            "schemaName": "adx_identity_securitystamp",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_twofactorenabled",
+            "schemaName": "adx_identity_twofactorenabled",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_twofactorenabledname",
+            "schemaName": "adx_identity_twofactorenabledName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_identity_username",
+            "schemaName": "adx_identity_username",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_modifiedbyipaddress",
+            "schemaName": "Adx_ModifiedByIPAddress",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_modifiedbyusername",
+            "schemaName": "Adx_ModifiedByUsername",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_organizationname",
+            "schemaName": "Adx_OrganizationName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_preferredlcid",
+            "schemaName": "adx_preferredlcid",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_profilealert",
+            "schemaName": "adx_profilealert",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_profilealertdate",
+            "schemaName": "adx_profilealertdate",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_profilealertinstructions",
+            "schemaName": "adx_profilealertinstructions",
+            "type": "Memo",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_profilealertname",
+            "schemaName": "adx_profilealertName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_profileisanonymous",
+            "schemaName": "Adx_ProfileIsAnonymous",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_profileisanonymousname",
+            "schemaName": "adx_profileisanonymousName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_profilelastactivity",
+            "schemaName": "Adx_ProfileLastActivity",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_profilemodifiedon",
+            "schemaName": "adx_profilemodifiedon",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_publicprofilecopy",
+            "schemaName": "adx_PublicProfileCopy",
+            "type": "Memo",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "adx_timezone",
+            "schemaName": "Adx_TimeZone",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "aging30",
+            "schemaName": "Aging30",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "aging30_base",
+            "schemaName": "Aging30_Base",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "aging60",
+            "schemaName": "Aging60",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "aging60_base",
+            "schemaName": "Aging60_Base",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "aging90",
+            "schemaName": "Aging90",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "aging90_base",
+            "schemaName": "Aging90_Base",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "anniversary",
+            "schemaName": "Anniversary",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "annualincome",
+            "schemaName": "AnnualIncome",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "annualincome_base",
+            "schemaName": "AnnualIncome_Base",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "assistantname",
+            "schemaName": "AssistantName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "assistantphone",
+            "schemaName": "AssistantPhone",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "birthdate",
+            "schemaName": "BirthDate",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "business2",
+            "schemaName": "Business2",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "callback",
+            "schemaName": "Callback",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "childrensnames",
+            "schemaName": "ChildrensNames",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "company",
+            "schemaName": "Company",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "contactid",
+            "schemaName": "ContactId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": true,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdby",
+            "schemaName": "CreatedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyexternalparty",
+            "schemaName": "CreatedByExternalParty",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyexternalpartyname",
+            "schemaName": "CreatedByExternalPartyName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyexternalpartyyominame",
+            "schemaName": "CreatedByExternalPartyYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyname",
+            "schemaName": "CreatedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyyominame",
+            "schemaName": "CreatedByYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdon",
+            "schemaName": "CreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfby",
+            "schemaName": "CreatedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyname",
+            "schemaName": "CreatedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyyominame",
+            "schemaName": "CreatedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "creditlimit",
+            "schemaName": "CreditLimit",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "creditlimit_base",
+            "schemaName": "CreditLimit_Base",
+            "type": "Money",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "creditonhold",
+            "schemaName": "CreditOnHold",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "creditonholdname",
+            "schemaName": "CreditOnHoldName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "customersizecode",
+            "schemaName": "CustomerSizeCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "customersizecodename",
+            "schemaName": "CustomerSizeCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "customertypecode",
+            "schemaName": "CustomerTypeCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "customertypecodename",
+            "schemaName": "CustomerTypeCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "department",
+            "schemaName": "Department",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "description",
+            "schemaName": "Description",
+            "type": "Memo",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotbulkemail",
+            "schemaName": "DoNotBulkEMail",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotbulkemailname",
+            "schemaName": "DoNotBulkEMailName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotbulkpostalmail",
+            "schemaName": "DoNotBulkPostalMail",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotbulkpostalmailname",
+            "schemaName": "DoNotBulkPostalMailName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotemail",
+            "schemaName": "DoNotEMail",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotemailname",
+            "schemaName": "DoNotEMailName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotfax",
+            "schemaName": "DoNotFax",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotfaxname",
+            "schemaName": "DoNotFaxName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotphone",
+            "schemaName": "DoNotPhone",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotphonename",
+            "schemaName": "DoNotPhoneName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotpostalmail",
+            "schemaName": "DoNotPostalMail",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotpostalmailname",
+            "schemaName": "DoNotPostalMailName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotsendmarketingmaterialname",
+            "schemaName": "DoNotSendMarketingMaterialName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "donotsendmm",
+            "schemaName": "DoNotSendMM",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "educationcode",
+            "schemaName": "EducationCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "educationcodename",
+            "schemaName": "EducationCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "emailaddress1",
+            "schemaName": "EMailAddress1",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "emailaddress2",
+            "schemaName": "EMailAddress2",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "emailaddress3",
+            "schemaName": "EMailAddress3",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "employeeid",
+            "schemaName": "EmployeeId",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "entityimage",
+            "schemaName": "EntityImage",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "entityimage_timestamp",
+            "schemaName": "EntityImage_Timestamp",
+            "type": "BigInt",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "entityimage_url",
+            "schemaName": "EntityImage_URL",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "entityimageid",
+            "schemaName": "EntityImageId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "exchangerate",
+            "schemaName": "ExchangeRate",
+            "type": "Decimal",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "externaluseridentifier",
+            "schemaName": "ExternalUserIdentifier",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "familystatuscode",
+            "schemaName": "FamilyStatusCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "familystatuscodename",
+            "schemaName": "FamilyStatusCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "fax",
+            "schemaName": "Fax",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "firstname",
+            "schemaName": "FirstName",
+            "type": "String",
+            "requiredLevel": "Recommended",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "followemail",
+            "schemaName": "FollowEmail",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "followemailname",
+            "schemaName": "FollowEmailName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "ftpsiteurl",
+            "schemaName": "FtpSiteUrl",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "fullname",
+            "schemaName": "FullName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": true
+          },
+          {
+            "logicalName": "gendercode",
+            "schemaName": "GenderCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "gendercodename",
+            "schemaName": "GenderCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "governmentid",
+            "schemaName": "GovernmentId",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "haschildrencode",
+            "schemaName": "HasChildrenCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "haschildrencodename",
+            "schemaName": "HasChildrenCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "home2",
+            "schemaName": "Home2",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "importsequencenumber",
+            "schemaName": "ImportSequenceNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "isautocreate",
+            "schemaName": "IsAutoCreate",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "isbackofficecustomer",
+            "schemaName": "IsBackofficeCustomer",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "isbackofficecustomername",
+            "schemaName": "IsBackofficeCustomerName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "isprivate",
+            "schemaName": "IsPrivate",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "isprivatename",
+            "schemaName": "IsPrivateName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_authorstatus",
+            "schemaName": "jm1pub_AuthorStatus",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_authorstatusname",
+            "schemaName": "jm1pub_authorstatusName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_billcomvendorid",
+            "schemaName": "jm1pub_BillComVendorId",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_is1099required",
+            "schemaName": "jm1pub_Is1099Required",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_is1099requiredname",
+            "schemaName": "jm1pub_is1099requiredName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_stripeaccountid",
+            "schemaName": "jm1pub_StripeAccountId",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_stripekycstatus",
+            "schemaName": "jm1pub_StripeKycStatus",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_stripekycstatusname",
+            "schemaName": "jm1pub_stripekycstatusName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_stripeonboardingcompletedon",
+            "schemaName": "jm1pub_StripeOnboardingCompletedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jobtitle",
+            "schemaName": "JobTitle",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "lastname",
+            "schemaName": "LastName",
+            "type": "String",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "lastonholdtime",
+            "schemaName": "LastOnHoldTime",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "lastusedincampaign",
+            "schemaName": "LastUsedInCampaign",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "leadsourcecode",
+            "schemaName": "LeadSourceCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "leadsourcecodename",
+            "schemaName": "LeadSourceCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "managername",
+            "schemaName": "ManagerName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "managerphone",
+            "schemaName": "ManagerPhone",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "marketingonly",
+            "schemaName": "MarketingOnly",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "marketingonlyname",
+            "schemaName": "MarketingOnlyName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "mastercontactidname",
+            "schemaName": "MasterContactIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "mastercontactidyominame",
+            "schemaName": "MasterContactIdYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "masterid",
+            "schemaName": "MasterId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "merged",
+            "schemaName": "Merged",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "mergedname",
+            "schemaName": "MergedName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "middlename",
+            "schemaName": "MiddleName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "mobilephone",
+            "schemaName": "MobilePhone",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedby",
+            "schemaName": "ModifiedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyexternalparty",
+            "schemaName": "ModifiedByExternalParty",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyexternalpartyname",
+            "schemaName": "ModifiedByExternalPartyName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyexternalpartyyominame",
+            "schemaName": "ModifiedByExternalPartyYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyname",
+            "schemaName": "ModifiedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyyominame",
+            "schemaName": "ModifiedByYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedon",
+            "schemaName": "ModifiedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfby",
+            "schemaName": "ModifiedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyname",
+            "schemaName": "ModifiedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyyominame",
+            "schemaName": "ModifiedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "msa_managingpartnerid",
+            "schemaName": "msa_managingpartnerid",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "msa_managingpartneridname",
+            "schemaName": "msa_managingpartneridName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "msa_managingpartneridyominame",
+            "schemaName": "msa_managingpartneridYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "msdyn_disablewebtracking",
+            "schemaName": "msdyn_disablewebtracking",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "msdyn_disablewebtrackingname",
+            "schemaName": "msdyn_disablewebtrackingName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "msdyn_isminor",
+            "schemaName": "msdyn_isminor",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "msdyn_isminorname",
+            "schemaName": "msdyn_isminorName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "msdyn_isminorwithparentalconsent",
+            "schemaName": "msdyn_isminorwithparentalconsent",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "msdyn_isminorwithparentalconsentname",
+            "schemaName": "msdyn_isminorwithparentalconsentName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "msdyn_portaltermsagreementdate",
+            "schemaName": "msdyn_portaltermsagreementdate",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "mspp_userpreferredlcid",
+            "schemaName": "mspp_userpreferredlcid",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "mspp_userpreferredlcidname",
+            "schemaName": "mspp_userpreferredlcidName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "nickname",
+            "schemaName": "NickName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "numberofchildren",
+            "schemaName": "NumberOfChildren",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "onholdtime",
+            "schemaName": "OnHoldTime",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "overriddencreatedon",
+            "schemaName": "OverriddenCreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "ownerid",
+            "schemaName": "OwnerId",
+            "type": "Owner",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridname",
+            "schemaName": "OwnerIdName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridtype",
+            "schemaName": "OwnerIdType",
+            "type": "EntityName",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridyominame",
+            "schemaName": "OwnerIdYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunit",
+            "schemaName": "OwningBusinessUnit",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunitname",
+            "schemaName": "OwningBusinessUnitName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningteam",
+            "schemaName": "OwningTeam",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owninguser",
+            "schemaName": "OwningUser",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "pager",
+            "schemaName": "Pager",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "parentcontactid",
+            "schemaName": "ParentContactId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "parentcontactidname",
+            "schemaName": "ParentContactIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "parentcontactidyominame",
+            "schemaName": "ParentContactIdYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "parentcustomerid",
+            "schemaName": "ParentCustomerId",
+            "type": "Customer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "parentcustomeridname",
+            "schemaName": "ParentCustomerIdName",
+            "type": "String",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "parentcustomeridtype",
+            "schemaName": "ParentCustomerIdType",
+            "type": "EntityName",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "parentcustomeridyominame",
+            "schemaName": "ParentCustomerIdYomiName",
+            "type": "String",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "participatesinworkflow",
+            "schemaName": "ParticipatesInWorkflow",
+            "type": "Boolean",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "participatesinworkflowname",
+            "schemaName": "ParticipatesInWorkflowName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "paymenttermscode",
+            "schemaName": "PaymentTermsCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "paymenttermscodename",
+            "schemaName": "PaymentTermsCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "preferredappointmentdaycode",
+            "schemaName": "PreferredAppointmentDayCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "preferredappointmentdaycodename",
+            "schemaName": "PreferredAppointmentDayCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "preferredappointmenttimecode",
+            "schemaName": "PreferredAppointmentTimeCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "preferredappointmenttimecodename",
+            "schemaName": "PreferredAppointmentTimeCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "preferredcontactmethodcode",
+            "schemaName": "PreferredContactMethodCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "preferredcontactmethodcodename",
+            "schemaName": "PreferredContactMethodCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "preferredsystemuserid",
+            "schemaName": "PreferredSystemUserId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "preferredsystemuseridname",
+            "schemaName": "PreferredSystemUserIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "preferredsystemuseridyominame",
+            "schemaName": "PreferredSystemUserIdYomiName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "processid",
+            "schemaName": "ProcessId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "salutation",
+            "schemaName": "Salutation",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "shippingmethodcode",
+            "schemaName": "ShippingMethodCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "shippingmethodcodename",
+            "schemaName": "ShippingMethodCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "slaid",
+            "schemaName": "SLAId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "slainvokedid",
+            "schemaName": "SLAInvokedId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "slainvokedidname",
+            "schemaName": "SLAInvokedIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "slaname",
+            "schemaName": "SLAName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "spousesname",
+            "schemaName": "SpousesName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "stageid",
+            "schemaName": "StageId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecode",
+            "schemaName": "StateCode",
+            "type": "State",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecodename",
+            "schemaName": "StateCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscode",
+            "schemaName": "StatusCode",
+            "type": "Status",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscodename",
+            "schemaName": "StatusCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "subscriptionid",
+            "schemaName": "SubscriptionId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "suffix",
+            "schemaName": "Suffix",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "telephone1",
+            "schemaName": "Telephone1",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "telephone2",
+            "schemaName": "Telephone2",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "telephone3",
+            "schemaName": "Telephone3",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "territorycode",
+            "schemaName": "TerritoryCode",
+            "type": "Picklist",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "territorycodename",
+            "schemaName": "TerritoryCodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "timespentbymeonemailandmeetings",
+            "schemaName": "TimeSpentByMeOnEmailAndMeetings",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "timezoneruleversionnumber",
+            "schemaName": "TimeZoneRuleVersionNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "transactioncurrencyid",
+            "schemaName": "TransactionCurrencyId",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "transactioncurrencyidname",
+            "schemaName": "TransactionCurrencyIdName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "traversedpath",
+            "schemaName": "TraversedPath",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "utcconversiontimezonecode",
+            "schemaName": "UTCConversionTimeZoneCode",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "versionnumber",
+            "schemaName": "VersionNumber",
+            "type": "BigInt",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "websiteurl",
+            "schemaName": "WebSiteUrl",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "yomifirstname",
+            "schemaName": "YomiFirstName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "yomifullname",
+            "schemaName": "YomiFullName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "yomilastname",
+            "schemaName": "YomiLastName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "yomimiddlename",
+            "schemaName": "YomiMiddleName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          }
+        ],
+        "attributeReadError": null,
+        "manyToOneRelationships": [
+          {
+            "MetadataId": "92b8a900-0846-497c-b933-66ebb85f221f",
+            "SchemaName": "lk_contactbase_createdby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdby",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "9e281b16-261a-4f84-9d21-8a9e5c2f9b32",
+            "SchemaName": "business_unit_contacts",
+            "ReferencedAttribute": "businessunitid",
+            "ReferencedEntity": "businessunit",
+            "ReferencingAttribute": "owningbusinessunit",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "5efcc234-dd3d-434a-8ff2-b75a6d45fd76",
+            "SchemaName": "contact_owning_user",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "owninguser",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "f1ac2439-67a4-431b-a0c9-ed6e4f7e3592",
+            "SchemaName": "lk_contactbase_modifiedby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedby",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "3133d33c-024a-4717-ad3f-ab82d072890d",
+            "SchemaName": "system_user_contacts",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "preferredsystemuserid",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "7963763d-3366-44bf-ad4e-48b169b99bf9",
+            "SchemaName": "manualsla_contact",
+            "ReferencedAttribute": "slaid",
+            "ReferencedEntity": "sla",
+            "ReferencingAttribute": "slaid",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "47ddb456-9fc9-45e3-a7f5-e188f439548c",
+            "SchemaName": "lk_contact_entityimage",
+            "ReferencedAttribute": "imagedescriptorid",
+            "ReferencedEntity": "imagedescriptor",
+            "ReferencingAttribute": "entityimageid",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "25baba5a-a186-4288-9e2b-c5448b42aadf",
+            "SchemaName": "owner_contacts",
+            "ReferencedAttribute": "ownerid",
+            "ReferencedEntity": "owner",
+            "ReferencingAttribute": "ownerid",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "9963355c-3021-4833-8640-f57495e7d931",
+            "SchemaName": "lk_externalparty_contact_modifiedby",
+            "ReferencedAttribute": "externalpartyid",
+            "ReferencedEntity": "externalparty",
+            "ReferencingAttribute": "modifiedbyexternalparty",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "74f99e62-1db3-4a67-8f52-a31fa1d2f1ed",
+            "SchemaName": "team_contacts",
+            "ReferencedAttribute": "teamid",
+            "ReferencedEntity": "team",
+            "ReferencingAttribute": "owningteam",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "df70b587-2164-433a-a551-e577fcb1c644",
+            "SchemaName": "contact_customer_contacts",
+            "ReferencedAttribute": "contactid",
+            "ReferencedEntity": "contact",
+            "ReferencingAttribute": "parentcustomerid",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "8b568c8c-92bf-40c8-b2e7-889d5990de95",
+            "SchemaName": "lk_externalparty_contact_createdby",
+            "ReferencedAttribute": "externalpartyid",
+            "ReferencedEntity": "externalparty",
+            "ReferencingAttribute": "createdbyexternalparty",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "7150de8c-1ac6-f011-bbd2-000d3a307e8c",
+            "SchemaName": "msa_contact_managingpartner",
+            "ReferencedAttribute": "accountid",
+            "ReferencedEntity": "account",
+            "ReferencingAttribute": "msa_managingpartnerid",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "d4f6089d-a596-4a74-923b-0d8b81830477",
+            "SchemaName": "processstage_contact",
+            "ReferencedAttribute": "processstageid",
+            "ReferencedEntity": "processstage",
+            "ReferencingAttribute": "stageid",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "3d9d9ea6-d826-46c6-b5ab-5f4e021650ba",
+            "SchemaName": "lk_contact_modifiedonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedonbehalfby",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "b080b5b1-af56-4270-8d9a-c93c163ea019",
+            "SchemaName": "transactioncurrency_contact",
+            "ReferencedAttribute": "transactioncurrencyid",
+            "ReferencedEntity": "transactioncurrency",
+            "ReferencingAttribute": "transactioncurrencyid",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "1e0456c8-2d10-46c1-8816-40cadb29a952",
+            "SchemaName": "sla_contact",
+            "ReferencedAttribute": "slaid",
+            "ReferencedEntity": "sla",
+            "ReferencingAttribute": "slainvokedid",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "b39af6d6-8fdc-473a-add2-52ce18134c65",
+            "SchemaName": "contact_master_contact",
+            "ReferencedAttribute": "contactid",
+            "ReferencedEntity": "contact",
+            "ReferencingAttribute": "masterid",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "add8aff4-5375-4042-bb3d-4ace67a17ab1",
+            "SchemaName": "lk_contact_createdonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdonbehalfby",
+            "ReferencingEntity": "contact"
+          },
+          {
+            "MetadataId": "dc9b80f8-c781-46d8-9fd6-a3b610836975",
+            "SchemaName": "contact_customer_accounts",
+            "ReferencedAttribute": "accountid",
+            "ReferencedEntity": "account",
+            "ReferencingAttribute": "parentcustomerid",
+            "ReferencingEntity": "contact"
+          }
+        ],
+        "relationshipReadError": null,
+        "keys": [],
+        "keyReadError": null
+      },
+      {
+        "logicalName": "jm1pub_contract",
+        "label": "jm1pub_contract",
+        "exists": false,
+        "readStatus": 404,
+        "errorCode": "0x80060888",
+        "errorMessage": "EntityMetadata With Id = LogicalName='jm1pub_contract' does not exist."
+      },
+      {
+        "logicalName": "jm1pub_title",
+        "label": "jm1pub_title",
+        "exists": true,
+        "entity": {
+          "logicalName": "jm1pub_title",
+          "schemaName": "jm1pub_Title",
+          "entitySetName": "jm1pub_titles",
+          "ownershipType": "UserOwned",
+          "isCustomEntity": true,
+          "displayName": "Title"
+        },
+        "attributes": [
+          {
+            "logicalName": "createdby",
+            "schemaName": "CreatedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyname",
+            "schemaName": "CreatedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdbyyominame",
+            "schemaName": "CreatedByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdon",
+            "schemaName": "CreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfby",
+            "schemaName": "CreatedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyname",
+            "schemaName": "CreatedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "createdonbehalfbyyominame",
+            "schemaName": "CreatedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "importsequencenumber",
+            "schemaName": "ImportSequenceNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_titleid",
+            "schemaName": "jm1pub_TitleId",
+            "type": "Uniqueidentifier",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": true,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "jm1pub_titlename",
+            "schemaName": "jm1pub_TitleName",
+            "type": "String",
+            "requiredLevel": "ApplicationRequired",
+            "isCustomAttribute": true,
+            "isPrimaryId": false,
+            "isPrimaryName": true
+          },
+          {
+            "logicalName": "modifiedby",
+            "schemaName": "ModifiedBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyname",
+            "schemaName": "ModifiedByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedbyyominame",
+            "schemaName": "ModifiedByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedon",
+            "schemaName": "ModifiedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfby",
+            "schemaName": "ModifiedOnBehalfBy",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyname",
+            "schemaName": "ModifiedOnBehalfByName",
+            "type": "String",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "modifiedonbehalfbyyominame",
+            "schemaName": "ModifiedOnBehalfByYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "overriddencreatedon",
+            "schemaName": "OverriddenCreatedOn",
+            "type": "DateTime",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "ownerid",
+            "schemaName": "OwnerId",
+            "type": "Owner",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridname",
+            "schemaName": "OwnerIdName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridtype",
+            "schemaName": "OwnerIdType",
+            "type": "EntityName",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owneridyominame",
+            "schemaName": "OwnerIdYomiName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunit",
+            "schemaName": "OwningBusinessUnit",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningbusinessunitname",
+            "schemaName": "OwningBusinessUnitName",
+            "type": "String",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owningteam",
+            "schemaName": "OwningTeam",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "owninguser",
+            "schemaName": "OwningUser",
+            "type": "Lookup",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecode",
+            "schemaName": "statecode",
+            "type": "State",
+            "requiredLevel": "SystemRequired",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statecodename",
+            "schemaName": "statecodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscode",
+            "schemaName": "statuscode",
+            "type": "Status",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "statuscodename",
+            "schemaName": "statuscodeName",
+            "type": "Virtual",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "timezoneruleversionnumber",
+            "schemaName": "TimeZoneRuleVersionNumber",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "utcconversiontimezonecode",
+            "schemaName": "UTCConversionTimeZoneCode",
+            "type": "Integer",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          },
+          {
+            "logicalName": "versionnumber",
+            "schemaName": "VersionNumber",
+            "type": "BigInt",
+            "requiredLevel": "None",
+            "isCustomAttribute": false,
+            "isPrimaryId": false,
+            "isPrimaryName": false
+          }
+        ],
+        "attributeReadError": null,
+        "manyToOneRelationships": [
+          {
+            "MetadataId": "6696160d-4f73-f111-ab0f-000d3a592730",
+            "SchemaName": "lk_jm1pub_title_createdby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdby",
+            "ReferencingEntity": "jm1pub_title"
+          },
+          {
+            "MetadataId": "6c96160d-4f73-f111-ab0f-000d3a592730",
+            "SchemaName": "lk_jm1pub_title_createdonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "createdonbehalfby",
+            "ReferencingEntity": "jm1pub_title"
+          },
+          {
+            "MetadataId": "7296160d-4f73-f111-ab0f-000d3a592730",
+            "SchemaName": "lk_jm1pub_title_modifiedby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedby",
+            "ReferencingEntity": "jm1pub_title"
+          },
+          {
+            "MetadataId": "7896160d-4f73-f111-ab0f-000d3a592730",
+            "SchemaName": "lk_jm1pub_title_modifiedonbehalfby",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "modifiedonbehalfby",
+            "ReferencingEntity": "jm1pub_title"
+          },
+          {
+            "MetadataId": "8a96160d-4f73-f111-ab0f-000d3a592730",
+            "SchemaName": "user_jm1pub_title",
+            "ReferencedAttribute": "systemuserid",
+            "ReferencedEntity": "systemuser",
+            "ReferencingAttribute": "owninguser",
+            "ReferencingEntity": "jm1pub_title"
+          },
+          {
+            "MetadataId": "9196160d-4f73-f111-ab0f-000d3a592730",
+            "SchemaName": "team_jm1pub_title",
+            "ReferencedAttribute": "teamid",
+            "ReferencedEntity": "team",
+            "ReferencingAttribute": "owningteam",
+            "ReferencingEntity": "jm1pub_title"
+          },
+          {
+            "MetadataId": "9696160d-4f73-f111-ab0f-000d3a592730",
+            "SchemaName": "owner_jm1pub_title",
+            "ReferencedAttribute": "ownerid",
+            "ReferencedEntity": "owner",
+            "ReferencingAttribute": "ownerid",
+            "ReferencingEntity": "jm1pub_title"
+          },
+          {
+            "MetadataId": "9a96160d-4f73-f111-ab0f-000d3a592730",
+            "SchemaName": "business_unit_jm1pub_title",
+            "ReferencedAttribute": "businessunitid",
+            "ReferencedEntity": "businessunit",
+            "ReferencingAttribute": "owningbusinessunit",
+            "ReferencingEntity": "jm1pub_title"
+          }
+        ],
+        "relationshipReadError": null,
+        "keys": [],
+        "keyReadError": null
+      },
+      {
+        "logicalName": "jm1_executionlog",
+        "label": "jm1_executionlog",
+        "exists": false,
+        "readStatus": 404,
+        "errorCode": "0x80060888",
+        "errorMessage": "EntityMetadata With Id = LogicalName='jm1_executionlog' does not exist."
+      },
+      {
+        "logicalName": "jm1pub_publishingasset",
+        "label": "jm1pub_publishingasset conflict check",
+        "exists": false,
+        "readStatus": 404,
+        "errorCode": "0x80060888",
+        "errorMessage": "EntityMetadata With Id = LogicalName='jm1pub_publishingasset' does not exist."
+      },
+      {
+        "logicalName": "jm1pub_assetmarketplace",
+        "label": "jm1pub_assetmarketplace conflict check",
+        "exists": false,
+        "readStatus": 404,
+        "errorCode": "0x80060888",
+        "errorMessage": "EntityMetadata With Id = LogicalName='jm1pub_assetmarketplace' does not exist."
+      }
+    ]
   }
 }

@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-IS-009 build planning is partially ready.
+IS-009 build planning is materially advanced but not yet ready for schema build authorization.
 
 Completed:
 
@@ -18,15 +18,22 @@ Completed:
 - Migration validation checklist was prepared.
 - Jackie-only blockers were identified.
 
-Blocked:
+Completed after access repair:
 
-- Live Dataverse field inventory could not be completed from this workstation because local metadata-read authentication failed with `dataverse_token_failed:400`.
-- Azure app setting names for Dataverse are present on the publishing Static Web App and diagnostic runner, but the local read-only metadata script could not acquire a Dataverse token. No setting values or secrets were printed or stored.
+- Live Dataverse metadata inventory was completed with a delegated Azure CLI Dataverse token against JM1-Dev / `org52409ff2.crm.dynamics.com`.
+- Proposed IS-009 table conflict check was completed.
+
+Blocked before build:
+
+- `jm1pub_contract` is canonical but does not exist in JM1-Dev under that logical name.
+- `jm1_executionlog` does not exist in JM1-Dev under that logical name.
+- The client-credential/app-setting Dataverse token path still fails with `dataverse_token_failed:400`; delegated Azure CLI access was used for readiness inventory only.
 
 Recommendation:
 
 - Do not authorize IS-009 schema build yet.
-- Resolve Dataverse metadata-read credential access first, then rerun `scripts/is009_build_readiness.mjs`.
+- Resolve the JM1-Dev baseline dependency for `jm1pub_contract` and `jm1_executionlog`, or explicitly approve how IS-009 should proceed without those canon dependencies present.
+- Repair service-principal/client-credential metadata access before relying on automation for future inventory runs.
 
 ## 1. Source Freeze Report
 
@@ -63,14 +70,21 @@ Required inventory targets:
 - conflict check for `jm1pub_publishingasset`
 - conflict check for `jm1pub_assetmarketplace`
 
+Inventory evidence:
+
+- `docs/implementation/evidence/IS-009/is009-readiness-evidence.json`
+- `docs/implementation/IS-009-Dataverse-Live-Inventory-Summary.md`
+
 Current result:
 
 | Item | Result |
 | --- | --- |
+| Environment | JM1-Dev / `org52409ff2.crm.dynamics.com` |
 | Publishing Static Web App Dataverse setting names | Present by name only |
 | Diagnostic runner Dataverse setting names | Present by name only |
-| Local metadata token acquisition | Failed: `dataverse_token_failed:400` |
-| Metadata inventory completed | No |
+| Client-credential metadata token acquisition | Failed: `dataverse_token_failed:400` |
+| Delegated Azure CLI metadata token acquisition | Succeeded |
+| Metadata inventory completed | Yes |
 | Secrets exposed | No |
 | Dataverse modified | No |
 
@@ -82,43 +96,38 @@ App settings confirmed by name only:
 - `DATAVERSE_RESOURCE_URL`
 - `DATAVERSE_WEB_API_BASE_URL`
 
-Required next action:
+Inventory summary:
 
-1. Provide or repair a valid read-only metadata credential path for Dataverse.
-2. Rerun:
+| Logical Name | Result | Entity Set | Attributes | Relationships | Keys |
+| --- | --- | --- | ---: | ---: | ---: |
+| `contact` | Exists | `contacts` | 320 | 20 | 0 |
+| `jm1pub_contract` | Missing | - | 0 | 0 | 0 |
+| `jm1pub_title` | Exists | `jm1pub_titles` | 33 | 8 | 0 |
+| `jm1_executionlog` | Missing | - | 0 | 0 | 0 |
+| `jm1pub_publishingasset` | Missing | - | 0 | 0 | 0 |
+| `jm1pub_assetmarketplace` | Missing | - | 0 | 0 | 0 |
 
-```bash
-node scripts/is009_build_readiness.mjs
-```
+Nearby table findings:
 
-3. Confirm whether the following logical tables exist:
-
-- `contact`
-- `jm1pub_contract`
-- `jm1pub_title`
-- `jm1_executionlog`
-- `jm1pub_publishingasset`
-- `jm1pub_assetmarketplace`
-
-4. Export fields, relationships, choice values, alternate keys, and security notes for each existing table.
+- `jm1_executionevent` exists.
+- `jm1pub_titleownership` exists.
+- No `contract` logical-name match was found in JM1-Dev metadata discovery.
 
 ## 3. Schema Conflict Check
 
-Conflict check is incomplete until Dataverse metadata inventory succeeds.
-
-Pending conflict questions:
+Conflict check result:
 
 | Proposed Artifact | Conflict Question | Status |
 | --- | --- | --- |
-| `jm1pub_publishingasset` table | Does a table with this logical name already exist? | Blocked by metadata access |
-| `jm1pub_assetmarketplace` table | Does a table with this logical name already exist? | Blocked by metadata access |
-| `jm1pub_title.jm1pub_assetregistrystatus` | Does equivalent status field already exist? | Blocked by metadata access |
-| `jm1pub_title.jm1pub_assetregistrylastverifiedon` | Does equivalent Last Verified field already exist? | Blocked by metadata access |
-| `jm1pub_title.jm1pub_certifiedimprint` | Does equivalent certified imprint field already exist? | Blocked by metadata access |
-| Choice sets | Do proposed values collide with existing publisher choices? | Blocked by metadata access |
-| Alternate keys | Are proposed keys compatible with existing nullable data? | Blocked by metadata access |
+| `jm1pub_publishingasset` table | Does a table with this logical name already exist? | No existing conflict found |
+| `jm1pub_assetmarketplace` table | Does a table with this logical name already exist? | No existing conflict found |
+| `jm1pub_title.jm1pub_assetregistrystatus` | Does equivalent status field already exist? | Missing; no conflict found |
+| `jm1pub_title.jm1pub_assetregistrylastverifiedon` | Does equivalent Last Verified field already exist? | Missing; no conflict found |
+| `jm1pub_title.jm1pub_certifiedimprint` | Does equivalent certified imprint field already exist? | Missing; no conflict found |
+| `jm1pub_publishingasset` -> `jm1pub_contract` lookup | Can contract lookup be created? | Blocked until `jm1pub_contract` exists in JM1-Dev |
+| Execution logging | Can PAM use `jm1_executionlog`? | Blocked until `jm1_executionlog` exists or Jackie approves `jm1_executionevent` as this environment's proof layer |
 
-Do not create schema until this conflict check is complete.
+Do not create schema until the contract/log baseline dependency is resolved.
 
 ## 4. Schema Deployment Plan
 
@@ -236,7 +245,9 @@ Post-import:
 
 | Blocker | Required Decision |
 | --- | --- |
-| Dataverse metadata-read credential failure | Decide whether to repair the service principal/app setting values, provide a read-only metadata credential, or run inventory from an authorized environment. |
+| `jm1pub_contract` missing in JM1-Dev | Decide whether to seed/import the canonical contract table before IS-009 build or select another authorized target environment. |
+| `jm1_executionlog` missing in JM1-Dev | Decide whether to seed/import the canonical execution log table, or approve `jm1_executionevent` as the Dev readiness proof layer for IS-009. |
+| Client-credential metadata access still failing | Decide whether to repair the service principal/app setting values for automation use. Delegated Azure CLI access completed the readiness inventory but is not an automation credential. |
 | Final solution container | Select solution name/publisher/target environment for PAM build. |
 | Asset health threshold | Approve score threshold and weighting before health automation. |
 | Title/format duplicate rules | Decide how to handle similar editions, revised editions, and title variants. |
@@ -250,9 +261,7 @@ IS-009 is not yet ready for schema build authorization.
 
 Recommended next step:
 
-1. Resolve Dataverse metadata-read authentication.
-2. Rerun the readiness script.
-3. Complete the live field inventory and conflict check.
-4. Update this report with actual table/field readback.
-5. Then request build authorization.
-
+1. Resolve the missing `jm1pub_contract` and `jm1_executionlog` baseline dependency in JM1-Dev, or select a target environment where those canon tables exist.
+2. Repair client-credential metadata access for repeatable automation, or explicitly approve delegated Azure CLI inventory as sufficient for build planning.
+3. Rerun the readiness script after baseline repair.
+4. Then request build authorization.
