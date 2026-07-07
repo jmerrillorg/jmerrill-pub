@@ -5,13 +5,16 @@
     "totalAuthors": 71,
     "processedThisPass": 90,
     "certifiedImprintDistribution": {
-      "J Merrill Publishing": 81,
-      "JM Works": 20,
-      "JM Signature": 1,
-      "JM Little": 12,
-      "JM Verse": 6,
-      "Unresolved": 2
-    }
+      "J Merrill Publishing": 82,
+      "JM Little": 13,
+      "JM Signature": 2,
+      "JM Works": 18,
+      "JM Verse": 7
+    },
+    "unresolvedImprints": 0,
+    "imprintCertification": "122/122",
+    "publisherReviewQueue": 0,
+    "jmSignatureReviewQueue": 0
   },
   "processedThisPass": [
     {

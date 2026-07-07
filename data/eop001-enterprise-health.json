@@ -54,7 +54,7 @@
       "value": "98.36%",
       "numerator": 120,
       "denominator": 122,
-      "note": "Full Publisher Master Register applied; remaining rows are pending manuscript, author reconciliation, or title-anchor reconciliation."
+      "note": "Metadata completeness remains separate from imprint certification; remaining gaps are title/asset-anchor and canonical roster hygiene items, not Publisher imprint review."
     },
     {
       "metric": "Workspace Complete",
