@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-08T11:47:27.724Z",
+  "generatedAt": "2026-07-08T12:56:35.615Z",
   "apiBase": "https://jm1hq.crm.dynamics.com/api/data/v9.2",
   "source": "Jackie Publisher Master Imprint Register Full List",
   "counts": {
@@ -10,12 +10,34 @@
     "contactFieldsExisting": 3,
     "lookupsCreated": 0,
     "lookupsExisting": 0,
-    "titlesCreated": 121,
-    "titlesUpdated": 0,
-    "titlesHidden": 13
+    "titlesCreated": 4,
+    "titlesUpdated": 117,
+    "titlesHidden": 76
   },
   "samples": {
     "created": [
+      {
+        "id": "7e000573-cc7a-f111-ab0f-7c1e525b15c2",
+        "title": "God’s Nudge",
+        "slug": "god-s-nudge"
+      },
+      {
+        "id": "c2ed8074-cc7a-f111-ab0f-6045bdd69435",
+        "title": "God’s Word For This World",
+        "slug": "god-s-word-for-this-world"
+      },
+      {
+        "id": "733cd77a-cc7a-f111-ab0f-6045bdd69678",
+        "title": "The Master’s Piece",
+        "slug": "the-master-s-piece"
+      },
+      {
+        "id": "fec27b7a-cc7a-f111-ab0f-6045bdd69435",
+        "title": "Warrior’s Breed",
+        "slug": "warrior-s-breed"
+      }
+    ],
+    "updated": [
       {
         "id": "69b21fc6-c27a-f111-ab0f-000d3a14673b",
         "title": "365 Days of Transparency",
@@ -117,7 +139,6 @@
         "slug": "establishing-glory-2"
       }
     ],
-    "updated": [],
     "hidden": [
       {
         "id": "036f60f3-9630-f111-88b4-000d3a14673b",
@@ -140,36 +161,64 @@
         "title": "Test Case: Force AI execution 2"
       },
       {
-        "id": "d8dc87a3-8d3a-f111-88b5-00224820105b",
-        "title": "Test Case 1"
+        "id": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "The Master's Piece"
       },
       {
-        "id": "d7d1f88c-e23d-f111-88b5-00224820105b",
-        "title": "Case B — Medium data"
+        "id": "d4f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "More Than A Village"
       },
       {
-        "id": "f1908dc9-5775-f111-ab0f-6045bdd69435",
-        "title": "Establishing Glory: The Library"
+        "id": "6e27c7bc-c37a-f111-ab0f-000d3a14673b",
+        "title": "27 Days to Overcoming Depression: Debunking All the Lies"
       },
       {
-        "id": "b3776854-1d3e-f111-88b5-6045bdd69678",
-        "title": "Test 1 — High Confidence"
+        "id": "6f27c7bc-c37a-f111-ab0f-000d3a14673b",
+        "title": "A Principal's Tale: A Self-Determined Leader"
       },
       {
-        "id": "aafe5815-1f3e-f111-88b5-6045bdd69738",
-        "title": "Test 2 — Mid Confidence"
+        "id": "7742c1c2-c37a-f111-ab0f-000d3a14673b",
+        "title": "Abortion!: George and Giovanna"
       },
       {
-        "id": "df36aeb3-8d3a-f111-88b5-7c1e525b15c2",
-        "title": "Test Case 2"
+        "id": "7942c1c2-c37a-f111-ab0f-000d3a14673b",
+        "title": "Because the Lord is My Shepherd: Psalm 23 and Me"
       },
       {
-        "id": "b2838072-e23d-f111-88b5-7c1e525b15c2",
-        "title": "todays's new title"
+        "id": "8642c1c2-c37a-f111-ab0f-000d3a14673b",
+        "title": "Bodacious: Controversial and Provocative"
       },
       {
-        "id": "f7e76384-e43d-f111-88b5-7c1e525b15c2",
-        "title": "Test Case: Force AI execution"
+        "id": "8742c1c2-c37a-f111-ab0f-000d3a14673b",
+        "title": "Connected!: Unlocking the DNA of Authentic Prayer - 2nd Edition"
+      },
+      {
+        "id": "9242c1c2-c37a-f111-ab0f-000d3a14673b",
+        "title": "Establishing Glory"
+      },
+      {
+        "id": "9342c1c2-c37a-f111-ab0f-000d3a14673b",
+        "title": "Establishing Glory 2"
+      },
+      {
+        "id": "9542c1c2-c37a-f111-ab0f-000d3a14673b",
+        "title": "Getting Back 2 Happy: The Chronicles of Tabby (Unabridged)"
+      },
+      {
+        "id": "9d42c1c2-c37a-f111-ab0f-000d3a14673b",
+        "title": "Grandmothers Educating Minds"
+      },
+      {
+        "id": "1159fcc8-c37a-f111-ab0f-000d3a14673b",
+        "title": "Memoir of a Black Christian Nationalist: Seeds of Liberation (Unabridged)"
+      },
+      {
+        "id": "1759fcc8-c37a-f111-ab0f-000d3a14673b",
+        "title": "More Than A Village: Raising Black Men in America"
+      },
+      {
+        "id": "f96286cf-c37a-f111-ab0f-000d3a14673b",
+        "title": "The Doctrine of Last Things"
       }
     ]
   }

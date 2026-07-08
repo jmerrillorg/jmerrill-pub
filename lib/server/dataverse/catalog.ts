@@ -343,7 +343,10 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
           },
         ]
       : [],
-    certifiedImprint: stringField(row, 'jm1pub_certifiedimprint') || 'J Merrill Publishing',
+    certifiedImprint:
+      stringField(row, 'jm1pub_certifiedimprint@OData.Community.Display.V1.FormattedValue') ||
+      stringField(row, 'jm1pub_certifiedimprint') ||
+      'J Merrill Publishing',
     genre: stringField(row, 'jm1pub_genre') || 'General Interest',
     publicationStatus: stringField(row, 'jm1pub_publicationstatus'),
     releaseDate,

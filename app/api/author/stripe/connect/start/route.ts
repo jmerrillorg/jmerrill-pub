@@ -22,10 +22,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const account = await createRecipientAccount()
-    if (!account.id) throw new Error('stripe_account_missing_id')
+    const body = await req.json().catch(() => ({}))
+    const existingStripeAccountId = typeof body?.stripeAccountId === 'string' ? body.stripeAccountId.trim() : ''
+    const accountId = existingStripeAccountId || (await createRecipientAccount()).id
+    if (!accountId) throw new Error('stripe_account_missing_id')
 
-    const link = await createRecipientAccountLink(account.id)
+    const link = await createRecipientAccountLink(accountId)
     if (!link.url) throw new Error('stripe_account_link_missing_url')
 
     let executionLog = { created: false, id: null as string | null, detail: 'not_written' }
@@ -46,7 +48,7 @@ export async function POST(req: NextRequest) {
       success: true,
       mode: getStripeMode(),
       reference: COMMISSIONING_REFERENCE,
-      stripeAccountId: account.id,
+      stripeAccountId: accountId,
       onboardingUrl: link.url,
       expiresAt: link.expires_at || null,
       executionLog,

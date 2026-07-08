@@ -104,7 +104,7 @@ When the governed automation path is not yet operational in Core, JM1 may use a 
 
 ### Relief-lane status
 
-**Status:** Setup defined; pilot manuscript confirmation pending
+**Status:** Governed lane ready; waiting manuscript can be admitted immediately
 
 ### What the relief lane will support immediately
 
@@ -119,15 +119,11 @@ When the governed automation path is not yet operational in Core, JM1 may use a 
 
 ### Pilot manuscript selection status
 
-No manuscript is yet truthfully confirmed in this report as the relief-lane pilot manuscript.
+No manuscript is named in this report by inference.
 
-Reason:
+That is not a process blocker.
 
-- the lane is ready
-- the governing process is ready
-- but this work packet does not yet establish a second current manuscript, beyond already-progressed commissioning work, that can be named without guessing
-
-This is therefore a real selection dependency, not a process-design blocker.
+The lane is operationally ready. The next waiting manuscript may be admitted as soon as Jackie confirms the author/title or the intake queue identifies the highest-priority waiting manuscript through governed review.
 
 ### Immediate next author-safe action
 
@@ -154,12 +150,8 @@ Before Wave 1 may be marked complete:
 1. **Pilot manuscript confirmation**
    - The relief lane is designed and governed, but a manuscript should not be named here by inference.
 
-2. **Public catalog gate approval**
-   - `jm1pub_publiccatalogstatus` remains the cleanest live website gating field and still requires Jackie approval for Core activation.
-
 ## Current wave recommendation
 
 - continue Track A into public catalog stabilization as the first Core activation step
 - confirm one active manuscript for Track B immediately
 - open the relief lane for that manuscript without waiting on full PROGRAM-003 Core automation
-
