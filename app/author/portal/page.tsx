@@ -12,6 +12,8 @@ import {
   portalTasks,
   type PortalStatusTone,
 } from '@/lib/publishing/author-portal-mvp'
+import { buildWorkspaceEditorialModule } from '@/lib/program003/editorial-command'
+import { getEditorialRecordForAsset, getProgram003PilotAssetId } from '@/lib/program003/dataverse'
 
 export const metadata: Metadata = {
   title: 'Author Portal | J Merrill Publishing',
@@ -30,6 +32,21 @@ const toneClasses: Record<PortalStatusTone, string> = {
 }
 
 export default function AuthorPortalPage() {
+  const editorialRecordPromise = getProgram003PilotAssetId()
+    ? getEditorialRecordForAsset(getProgram003PilotAssetId())
+    : Promise.resolve(null)
+
+  return <AuthorPortalPageInner editorialRecordPromise={editorialRecordPromise} />
+}
+
+async function AuthorPortalPageInner({
+  editorialRecordPromise,
+}: {
+  editorialRecordPromise: Promise<Awaited<ReturnType<typeof getEditorialRecordForAsset>>>
+}) {
+  const editorialRecord = await editorialRecordPromise
+  const editorialModule = editorialRecord ? buildWorkspaceEditorialModule(editorialRecord) : null
+
   return (
     <AuthorPortalShell
       eyebrow="Author portal MVP"
@@ -116,6 +133,92 @@ export default function AuthorPortalPage() {
             ))}
           </section>
 
+          <section className="rounded-[32px] border border-white/8 bg-white/[0.035] p-7 sm:p-9">
+            {editorialModule ? (
+              <>
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                  <div>
+                    <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Editorial</p>
+                    <h2 className="mt-3 text-[26px] font-semibold text-white">{editorialModule.stageLabel}</h2>
+                    <p className="mt-3 max-w-[760px] text-[14px] font-light leading-[1.8] text-white/45">
+                      {editorialModule.stageSummary}
+                    </p>
+                  </div>
+                  <div className={`rounded-full border px-4 py-2 text-[11px] uppercase tracking-[0.1em] ${toneClasses[editorialHealthTone(editorialModule.healthStatus)]}`}>
+                    {editorialModule.healthStatus}
+                  </div>
+                </div>
+
+                <div className="mt-7 grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+                  <div className="rounded-2xl border border-white/8 bg-black/15 p-5">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/30">Next step</p>
+                    <h3 className="mt-3 text-[18px] font-semibold text-white">{editorialModule.nextActionLabel}</h3>
+                    <p className="mt-2 text-[13px] leading-[1.7] text-white/38">
+                      {editorialModule.nextActionDueOn
+                        ? `Target response by ${formatDate(editorialModule.nextActionDueOn)}.`
+                        : 'We will let you know as soon as the next review package is ready.'}
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/8 bg-black/15 p-5">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/30">Approval gates</p>
+                    <div className="mt-4 space-y-3">
+                      {editorialModule.pendingApprovals.map((approval) => (
+                        <div key={approval.gateCode} className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[12px] font-medium text-white/80">{approval.label}</span>
+                            <span className={`rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.1em] ${toneClasses[approvalTone(approval.status)]}`}>
+                              {approval.status}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-[12px] leading-[1.7] text-white/38">{approval.domain} approval</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-7 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                  <div className="rounded-2xl border border-white/8 bg-black/15 p-5">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/30">Current deliverables</p>
+                    <div className="mt-4 space-y-3">
+                      {editorialModule.deliverables.map((deliverable) => (
+                        <div key={deliverable.fileName} className="flex items-start justify-between gap-4 border-b border-white/8 pb-3 last:border-b-0 last:pb-0">
+                          <div>
+                            <p className="text-[13px] font-medium text-white/78">{deliverable.artifactType}</p>
+                            <p className="mt-1 text-[12px] text-white/34">{deliverable.fileName}</p>
+                          </div>
+                          <span className={`rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.1em] ${toneClasses[artifactTone(deliverable.status)]}`}>
+                            {deliverable.status}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/8 bg-black/15 p-5">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/30">Editorial timeline</p>
+                    <div className="mt-4 space-y-3">
+                      {editorialModule.timeline.map((entry) => (
+                        <div key={entry.label} className="flex items-center justify-between gap-4 border-b border-white/8 pb-3 last:border-b-0 last:pb-0">
+                          <div>
+                            <p className="text-[13px] font-medium text-white/78">{entry.label}</p>
+                            <p className="mt-1 text-[12px] text-white/34">{entry.status}</p>
+                          </div>
+                          <span className="text-[12px] text-white/34">{entry.date ? formatDate(entry.date) : 'Pending'}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 p-5 text-[13px] leading-[1.7] text-amber-100">
+                Editorial Command is now reading from JM1-Core. No live editorial record is available yet for the configured pilot asset.
+              </div>
+            )}
+          </section>
+
           <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="rounded-[32px] border border-white/8 bg-white/[0.035] p-7 sm:p-9">
               <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Files and metadata</p>
@@ -161,4 +264,39 @@ export default function AuthorPortalPage() {
 
 function formatLabel(value: string) {
   return value.replace(/([A-Z])/g, ' $1').trim()
+}
+
+function editorialHealthTone(status: 'Healthy' | 'Watch' | 'At Risk' | 'Blocked'): PortalStatusTone {
+  switch (status) {
+    case 'Healthy':
+      return 'complete'
+    case 'Watch':
+      return 'pending'
+    case 'At Risk':
+      return 'pending'
+    case 'Blocked':
+      return 'locked'
+  }
+}
+
+function approvalTone(status: string): PortalStatusTone {
+  if (status === 'Approved') return 'complete'
+  if (status === 'Ready for Author Review' || status === 'Awaiting Author Response') return 'active'
+  if (status === 'Held' || status === 'Cancelled') return 'locked'
+  return 'pending'
+}
+
+function artifactTone(status: string): PortalStatusTone {
+  if (status === 'Approved') return 'complete'
+  if (status === 'Delivered') return 'active'
+  if (status === 'Superseded' || status === 'Archived') return 'locked'
+  return 'pending'
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(value))
 }
