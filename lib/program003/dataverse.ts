@@ -1,5 +1,3 @@
-import { execFileSync } from 'node:child_process'
-
 import type {
   EditorialApprovalGateRecord,
   EditorialArtifactRecord,
@@ -67,35 +65,44 @@ export function getProgram003PilotAssetId() {
 type DataverseConfig = {
   resourceUrl: string
   webApiBaseUrl: string
-  bearerToken: string
+  tenantId: string
+  clientId: string
+  clientSecret: string
 }
 
 function getDataverseConfig(): DataverseConfig | null {
-  const resourceUrl = (process.env.DATAVERSE_RESOURCE_URL || DEFAULT_RESOURCE_URL).replace(/\/+$/, '')
+  const environmentUrl = process.env.DATAVERSE_ENVIRONMENT_URL?.trim()
+  const resourceUrl = (process.env.DATAVERSE_RESOURCE_URL || environmentUrl || DEFAULT_RESOURCE_URL).replace(/\/+$/, '')
   const webApiBaseUrl = (
     process.env.DATAVERSE_WEB_API_BASE_URL ||
     `${resourceUrl}/api/data/v9.2`
   ).replace(/\/+$/, '')
+  const tenantId = process.env.DATAVERSE_TENANT_ID?.trim() || ''
+  const clientId = process.env.DATAVERSE_CLIENT_ID?.trim() || ''
+  const clientSecret = process.env.DATAVERSE_CLIENT_SECRET?.trim() || ''
 
-  try {
-    return {
-      resourceUrl,
-      webApiBaseUrl,
-      bearerToken: getBearerToken(resourceUrl),
-    }
-  } catch {
+  if (!tenantId || !clientId || !clientSecret) {
     return null
+  }
+
+  return {
+    resourceUrl,
+    webApiBaseUrl,
+    tenantId,
+    clientId,
+    clientSecret,
   }
 }
 
 async function queryDataverse(config: DataverseConfig, entitySet: string, publishingAssetId: string) {
+  const token = await getBearerToken(config)
   const params = new URLSearchParams({
     $filter: `_jm1pub_publishingassetid_value eq ${publishingAssetId}`,
     $top: '200',
   })
   const response = await fetch(`${config.webApiBaseUrl}/${entitySet}?${params.toString()}`, {
     headers: {
-      Authorization: `Bearer ${config.bearerToken}`,
+      Authorization: `Bearer ${token}`,
       Accept: 'application/json',
       Prefer: `odata.include-annotations="${ODATA_ANNOTATION}"`,
       'OData-MaxVersion': '4.0',
@@ -307,10 +314,30 @@ function mapHealthStatus(label: string): EditorialStageRecord['healthStatus'] {
   }
 }
 
-function getBearerToken(resourceUrl: string) {
-  return execFileSync(
-    '/opt/homebrew/bin/az',
-    ['account', 'get-access-token', '--resource', resourceUrl, '--query', 'accessToken', '-o', 'tsv'],
-    { encoding: 'utf8' },
-  ).trim()
+async function getBearerToken(config: DataverseConfig) {
+  const response = await fetch(`https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/token`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: config.clientId,
+      client_secret: config.clientSecret,
+      scope: `${config.resourceUrl}/.default`,
+    }),
+  })
+
+  const json = await response.json().catch(() => null)
+  const token =
+    json && typeof json === 'object' && 'access_token' in json && typeof json.access_token === 'string'
+      ? json.access_token
+      : ''
+
+  if (!response.ok || !token) {
+    throw new Error(`program003_dataverse_token_failed:${response.status}`)
+  }
+
+  return token
 }
