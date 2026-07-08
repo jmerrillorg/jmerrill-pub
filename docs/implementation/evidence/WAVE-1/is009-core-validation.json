@@ -1,0 +1,272 @@
+{
+  "generatedAt": "2026-07-08T12:09:41.305Z",
+  "apiBase": "https://jm1hq.crm.dynamics.com/api/data/v9.2",
+  "importEvidenceGeneratedAt": "2026-07-08T12:07:31.651Z",
+  "dataverse": {
+    "publishingAssetsRead": 295,
+    "assetMarketplacesRead": 522,
+    "executionLogsRead": 2
+  },
+  "importedThisRun": {
+    "titlesCreated": 0,
+    "titlesReused": 162,
+    "titlesUpdated": 162,
+    "assetsCreated": 0,
+    "assetsReused": 295,
+    "marketplacesCreated": 0,
+    "marketplacesReused": 537,
+    "executionLogsCreated": 2
+  },
+  "duplicateValidation": {
+    "duplicatePublishingAssetNames": 0,
+    "duplicateNormalizedIsbnsObserved": 0,
+    "note": "Duplicate ISBN observations can represent rerun/reuse or prior records; import duplicate prevention skipped duplicate staged asset keys."
+  },
+  "healthDistribution": {
+    "100000000": 295
+  },
+  "confidenceDistribution": {
+    "100000000": 148,
+    "100000004": 147
+  },
+  "authorEvidenceDistribution": {
+    "100000000": 187,
+    "100000001": 108
+  },
+  "marketplaceIdentifierDistribution": {
+    "100000000": 470,
+    "100000001": 52
+  },
+  "marketplaceConfidenceDistribution": {
+    "100000000": 470,
+    "100000004": 52
+  },
+  "reconciliationQueue": {
+    "assets": 147,
+    "marketplaces": 52,
+    "sampleAssets": [
+      {
+        "id": "701251ca-c47a-f111-ab0f-000d3a14673b",
+        "name": "Establishing Glory: The Praise and Worship Handbook (2nd Edition) - Standard Edition - Audiobook - 0172577",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "3d2d53d0-c47a-f111-ab0f-000d3a14673b",
+        "name": "God’s Business Plan - Standard Edition - eBook - 9780985263133",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "422d53d0-c47a-f111-ab0f-000d3a14673b",
+        "name": "Establishing Glory 2 - Standard Edition - Hardcover - 9781950719051",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "462d53d0-c47a-f111-ab0f-000d3a14673b",
+        "name": "Uncomfortable Conversations with God - Standard Edition - eBook - 9781950719112",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "4c2d53d0-c47a-f111-ab0f-000d3a14673b",
+        "name": "Help God, I Am Angry - Standard Edition - eBook - 9781950719259",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "4d2d53d0-c47a-f111-ab0f-000d3a14673b",
+        "name": "Jewels by Lady J - Standard Edition - Hardcover - 9781950719297",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "f7dd59dc-c47a-f111-ab0f-000d3a14673b",
+        "name": "Help God, I Am Confused - Standard Edition - eBook - 9781950719778",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "fddd59dc-c47a-f111-ab0f-000d3a14673b",
+        "name": "Establishing Glory - Standard Edition - Paperback - 9781950719846",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "e1557be2-c47a-f111-ab0f-000d3a14673b",
+        "name": "The Journey - Standard Edition - eBook - 9781954414280",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "eb557be2-c47a-f111-ab0f-000d3a14673b",
+        "name": "A Blended Family - Standard Edition - Hardcover - 9781954414426",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "08567be2-c47a-f111-ab0f-000d3a14673b",
+        "name": "Almost Happy - Standard Edition - eBook - 9781954414570",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "0d567be2-c47a-f111-ab0f-000d3a14673b",
+        "name": "The Healed Me - Standard Edition - Paperback - 9781954414624",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "aae9cbe8-c47a-f111-ab0f-000d3a14673b",
+        "name": "Kingdom Equipment 101 - Standard Edition - Paperback - 9781954414761",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "b0e9cbe8-c47a-f111-ab0f-000d3a14673b",
+        "name": "Kingdom Equipment 101 - Standard Edition - Paperback - 9781954414778",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "bde9cbe8-c47a-f111-ab0f-000d3a14673b",
+        "name": "According to Mark - Standard Edition - Hardcover - 9781961475007",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "bee9cbe8-c47a-f111-ab0f-000d3a14673b",
+        "name": "Establishing Glory - Standard Edition - Paperback - 9781961475052",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "78fcf8ee-c47a-f111-ab0f-000d3a14673b",
+        "name": "From Stylist to CEO - Standard Edition - Paperback - 9781961475250",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "84fcf8ee-c47a-f111-ab0f-000d3a14673b",
+        "name": "Have You Considered My Servant? - Standard Edition - Paperback - 9781961475311",
+        "reason": "Author evidence unknown / pending reconciliation"
+      },
+      {
+        "id": "eb3e34f5-c47a-f111-ab0f-000d3a14673b",
+        "name": "The Messenger 2 - Standard Edition - eBook - 9781961475625",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "4e319ccf-c47a-f111-ab0f-000d3a1a9efa",
+        "name": "Getting Back 2 Happy: The Chronicles of Tabby (Unabridged) - Standard Edition - Audiobook - 0259191",
+        "reason": "Author evidence unknown / pending reconciliation"
+      }
+    ],
+    "sampleMarketplaces": [
+      {
+        "id": "090c34fb-c47a-f111-ab0f-000d3a14673b",
+        "name": "Number 23 and Me - Midwest Tape LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "fe675701-c57a-f111-ab0f-000d3a14673b",
+        "name": "Girl, You're Not Crazy. You're Dealing With a Narcissist - Midwest Tape LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "33540b14-c57a-f111-ab0f-000d3a14673b",
+        "name": "Almost Happy - INaudio, LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "a0fa0665-c57a-f111-ab0f-000d3a14673b",
+        "name": "The Great Hair Restart - Libri GmbH - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "cb64fc70-c57a-f111-ab0f-000d3a14673b",
+        "name": "Warriors and Angels - Amazon Digital Services, Inc - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "d864fc70-c57a-f111-ab0f-000d3a14673b",
+        "name": "100 Wisdom Lessons for Life and Living - Amazon Digital Services, Inc - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "db64fc70-c57a-f111-ab0f-000d3a14673b",
+        "name": "The Messenger 2 - Apple Inc. - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "74a1f0fb-c47a-f111-ab0f-000d3a1a9efa",
+        "name": "Number 23 and Me - Google Inc - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "78893a02-c57a-f111-ab0f-000d3a1a9efa",
+        "name": "Speech Therapy Works! - Midwest Tape LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "a35cab0f-c57a-f111-ab0f-000d3a1a9efa",
+        "name": "You're Still Not Crazy - Midwest Tape LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "f422e9ff-c47a-f111-ab0f-000d3a9eacee",
+        "name": "Help God, I Am Hurt - Midwest Tape LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "b6f20206-c57a-f111-ab0f-000d3a9eacee",
+        "name": "The Release of the Spirit - Midwest Tape LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "c4b2790c-c57a-f111-ab0f-000d3a9eacee",
+        "name": "Memoir of a Black Christian Nationalist - Midwest Tape LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "739f9719-c57a-f111-ab0f-000d3a9eacee",
+        "name": "Biblical Prescriptions For Life's Troubles - Amazon Digital Services, Inc - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "e191dc02-c57a-f111-ab0f-00224820105b",
+        "name": "Focus, Trust, & Follow - Midwest Tape LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "fee6d408-c57a-f111-ab0f-00224820105b",
+        "name": "Help God, I Am Sad - Midwest Tape LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "d3e7d408-c57a-f111-ab0f-00224820105b",
+        "name": "God's Nudge - Proquest LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "a0940b0f-c57a-f111-ab0f-00224820105b",
+        "name": "Hop, Hop, Hop - Midwest Tape LLC - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "204c8e15-c57a-f111-ab0f-00224820105b",
+        "name": "Almost Happy - OverDrive, Inc. - Pending ID",
+        "reason": "Marketplace identifier pending"
+      },
+      {
+        "id": "7580d96d-c57a-f111-ab0f-00224820105b",
+        "name": "Warriors and Angels - OverDrive, Inc. - Pending ID",
+        "reason": "Marketplace identifier pending"
+      }
+    ]
+  },
+  "executionLogEvidence": [
+    {
+      "id": "adcd9dc3-c57a-f111-ab0f-6045bdd69435",
+      "actionType": "PAM_REGISTRY_IMPORT_COMPLETED",
+      "status": null,
+      "startedOn": "2026-07-08T12:07:31Z"
+    },
+    {
+      "id": "3b1231c2-c57a-f111-ab0f-6045bdd69678",
+      "actionType": "PAM_RECONCILIATION_QUEUE_GENERATED",
+      "status": null,
+      "startedOn": "2026-07-08T12:07:31Z"
+    }
+  ],
+  "operationalReadiness": {
+    "schema": "READY",
+    "import": "READY",
+    "reconciliation": "ACTIVE_QUEUE",
+    "executionLogging": "READY"
+  }
+}

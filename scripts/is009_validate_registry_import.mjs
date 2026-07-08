@@ -9,11 +9,14 @@ const token = process.env.DATAVERSE_ACCESS_TOKEN;
 const evidencePath =
   process.env.IS009_VALIDATION_EVIDENCE ||
   'docs/implementation/evidence/IS-009/is009-registry-operational-validation.json';
+const importEvidencePath =
+  process.env.IS009_IMPORT_EVIDENCE ||
+  'docs/implementation/evidence/IS-009/is009-registry-import-evidence.json';
 
 if (!token) throw new Error('DATAVERSE_ACCESS_TOKEN is required.');
 
 const importEvidence = JSON.parse(
-  readFileSync('docs/implementation/evidence/IS-009/is009-registry-import-evidence.json', 'utf8'),
+  readFileSync(importEvidencePath, 'utf8'),
 );
 
 async function request(path, options = {}) {
@@ -113,6 +116,9 @@ const duplicateIsbn = duplicateCount(assets, (row) => row.jm1pub_normalizedisbn)
 const duplicateAssetName = duplicateCount(assets, (row) => row.jm1pub_name);
 const reconciliationAssets = assets.filter((row) => row.jm1pub_reconciliationrequired);
 const reconciliationMarketplaces = marketplaces.filter((row) => row.jm1pub_reconciliationrequired);
+const totalAssetsHandled = (importEvidence.counts.assetsCreated || 0) + (importEvidence.counts.assetsReused || 0);
+const totalMarketplacesHandled =
+  (importEvidence.counts.marketplacesCreated || 0) + (importEvidence.counts.marketplacesReused || 0);
 
 const validation = {
   generatedAt: new Date().toISOString(),
@@ -156,7 +162,7 @@ const validation = {
   })),
   operationalReadiness: {
     schema: 'READY',
-    import: importEvidence.counts.assetsCreated > 0 && importEvidence.counts.marketplacesCreated > 0 ? 'READY' : 'CHECK',
+    import: totalAssetsHandled >= assets.length && totalMarketplacesHandled >= marketplaces.length ? 'READY' : 'CHECK',
     reconciliation: reconciliationAssets.length || reconciliationMarketplaces.length ? 'ACTIVE_QUEUE' : 'NO_QUEUE',
     executionLogging: pamLogs.length >= 2 ? 'READY' : 'CHECK',
   },

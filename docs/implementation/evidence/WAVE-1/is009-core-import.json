@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-07-08T12:07:31.651Z",
+  "apiBase": "https://jm1hq.crm.dynamics.com/api/data/v9.2",
+  "stagingGeneratedAt": "2026-07-07T03:05:25Z",
+  "counts": {
+    "titlesCreated": 0,
+    "titlesReused": 162,
+    "titlesUpdated": 162,
+    "assetsCreated": 0,
+    "assetsReused": 295,
+    "marketplacesCreated": 0,
+    "marketplacesReused": 537,
+    "executionLogsCreated": 2
+  },
+  "duplicatePrevention": {
+    "assetKeysSeen": 295,
+    "duplicateAssetKeysSkipped": 0,
+    "marketplaceKeysSeen": 537,
+    "duplicateMarketplaceKeysSkipped": 0
+  },
+  "reconciliation": {
+    "assetsRequiringReconciliation": 0,
+    "marketplacesRequiringReconciliation": 0,
+    "reasons": {}
+  },
+  "samples": {
+    "assetsCreated": [],
+    "marketplacesCreated": [],
+    "reconciliation": []
+  }
+}
