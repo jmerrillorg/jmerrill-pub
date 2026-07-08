@@ -40,8 +40,7 @@ const TITLE_SELECT = [
   'jm1pub_subtitle',
   'jm1pub_authordisplayname',
   'jm1pub_authorname',
-  '_jm1pub_author_value',
-  '_jm1pub_author_value@OData.Community.Display.V1.FormattedValue',
+  '_jm1_author_value',
   'jm1pub_shortdescription',
   'jm1pub_longdescription',
   'jm1pub_certifiedimprint',
@@ -199,17 +198,13 @@ export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadRe
 }
 
 export async function listTitlesByCertifiedImprint(imprint: string): Promise<CatalogReadResult<CatalogTitleSummary[]>> {
-  return withCatalogRead(async (config, token) => {
-    const safeImprint = escapeODataString(imprint)
-    const rows = await dataverseGetCollection(config, token, config.titleEntitySet, {
-      select: TITLE_SELECT,
-      filter: `${PUBLIC_CATALOG_FILTER} and jm1pub_certifiedimprint eq '${safeImprint}'`,
-      orderby: 'jm1pub_titlename asc',
-    })
+  const titlesResult = await listPublicCatalogTitles()
+  if (!titlesResult.ok) return titlesResult
 
-    const related = await loadRelatedCatalogData(config, token, rows)
-    return rows.map((row) => buildTitleSummary(row, related))
-  })
+  return {
+    ok: true,
+    data: titlesResult.data.filter((title) => title.certifiedImprint === imprint),
+  }
 }
 
 export async function getCatalogStats(): Promise<CatalogReadResult<CatalogStats>> {
@@ -329,7 +324,7 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
   const year = numberField(row, 'jm1pub_publicationyear')
   const title = stringField(row, 'jm1pub_titlename') || stringField(row, 'jm1pub_name')
   const authorDisplayName = resolveAuthorDisplayName(row)
-  const authorLookupId = stringField(row, '_jm1pub_author_value')
+  const authorLookupId = stringField(row, '_jm1_author_value')
 
   return {
     id,
@@ -502,7 +497,7 @@ async function dataverseGetCollectionByLookup(
   const rows: DataverseRecord[] = []
 
   for (const chunk of chunkArray(ids, 25)) {
-    const filter = chunk.map((id) => `${lookupField} eq ${id}`).join(' or ')
+    const filter = chunk.map((id) => `${lookupField} eq ${formatGuidLiteral(id)}`).join(' or ')
     const page = await dataverseGetCollection(config, token, entitySet, { select, filter })
     rows.push(...page)
   }
@@ -582,7 +577,7 @@ function resolveAuthorDisplayName(row: DataverseRecord) {
   return (
     stringField(row, 'jm1pub_authordisplayname') ||
     stringField(row, 'jm1pub_authorname') ||
-    stringField(row, '_jm1pub_author_value@OData.Community.Display.V1.FormattedValue')
+    stringField(row, '_jm1_author_value@OData.Community.Display.V1.FormattedValue')
   )
 }
 
@@ -615,6 +610,10 @@ function cleanUrl(value?: string) {
 
 function escapeODataString(value: string) {
   return value.replace(/'/g, "''")
+}
+
+function formatGuidLiteral(value: string) {
+  return `${value}`
 }
 
 function slugify(value: string) {
