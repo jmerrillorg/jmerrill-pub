@@ -15,7 +15,7 @@ type DataverseCatalogConfig = {
   clientId: string
   clientSecret: string
   resourceUrl: string
-  environmentUrl: string
+  environmentUrl?: string
   webApiBaseUrl: string
   titleEntitySet: string
   assetEntitySet: string
@@ -328,6 +328,10 @@ async function withCatalogRead<T>(
 ): Promise<CatalogReadResult<T>> {
   const config = getCatalogConfig()
   if (!config.ok) {
+    console.error('Dataverse catalog configuration missing.', {
+      error: 'dataverse_catalog_configuration_missing',
+      missingConfig: config.missing,
+    })
     return {
       ok: false,
       error: 'dataverse_catalog_configuration_missing',
@@ -339,6 +343,7 @@ async function withCatalogRead<T>(
     const token = await getDataverseAccessToken(config.value)
     return { ok: true, data: await read(config.value, token) }
   } catch (error) {
+    console.error('Dataverse catalog read failed.', summarizeError(error))
     return { ok: false, error: summarizeError(error) }
   }
 }
@@ -364,7 +369,19 @@ function getCatalogConfig(): { ok: true; value: DataverseCatalogConfig } | { ok:
     contactEntitySet: process.env.DATAVERSE_CATALOG_CONTACT_ENTITY_SET || DEFAULT_ENTITY_SETS.contacts,
   }
 
-  const missing = Object.entries(config)
+  const requiredConfig = {
+    tenantId: config.tenantId,
+    clientId: config.clientId,
+    clientSecret: config.clientSecret,
+    resourceUrl: config.resourceUrl,
+    webApiBaseUrl: config.webApiBaseUrl,
+    titleEntitySet: config.titleEntitySet,
+    assetEntitySet: config.assetEntitySet,
+    marketplaceEntitySet: config.marketplaceEntitySet,
+    contactEntitySet: config.contactEntitySet,
+  }
+
+  const missing = Object.entries(requiredConfig)
     .filter(([, value]) => !value)
     .map(([key]) => key)
 
