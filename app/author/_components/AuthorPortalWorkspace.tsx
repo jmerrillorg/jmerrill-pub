@@ -47,7 +47,12 @@ export function AuthorPortalWorkspace() {
         setState('ready')
       } catch (err) {
         if (!mounted) return
-        setError(err instanceof Error ? err.message : 'We could not load your workspace right now.')
+        const message = err instanceof Error ? err.message : ''
+        setError(
+          message && message !== 'Failed to fetch'
+            ? message
+            : 'We could not load your workspace right now. Please try again or contact publishing@jmerrill.one.',
+        )
         setState('error')
       }
     }

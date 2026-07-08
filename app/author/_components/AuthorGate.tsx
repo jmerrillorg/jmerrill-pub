@@ -64,7 +64,12 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
       }))
       setUnlocked(true)
     } catch (err: any) {
-      setError(err.message || 'Unable to validate access code.')
+      const message = err instanceof Error ? err.message : ''
+      setError(
+        message && message !== 'Failed to fetch'
+          ? message
+          : 'We could not open your workspace right now. Please try again or contact publishing@jmerrill.one.',
+      )
     } finally {
       setSubmitting(false)
     }

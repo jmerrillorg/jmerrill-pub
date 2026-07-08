@@ -102,10 +102,13 @@ export async function createAuthorPortalGateResponse({
   }
 
   const sessionValue = createAuthorPortalSession(grant)
-  const context = await resolveAuthorPortalContext(readAuthorPortalSession(sessionValue), {
-    intakeReference: requestedReference || grant.intakeReference,
+  const response = NextResponse.json({
+    success: true,
+    portalContext: {
+      intakeReference: requestedReference || grant.intakeReference,
+      scope: grant.scope,
+    },
   })
-  const response = NextResponse.json({ success: true, context })
 
   response.cookies.set(getAuthorPortalCookieName(), sessionValue, {
     httpOnly: true,
