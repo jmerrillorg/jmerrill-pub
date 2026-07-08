@@ -1,7 +1,7 @@
 # PROGRAM-003 - Editorial Pilot Relief Lane
 
 **Classification:** Interim governed pilot runbook  
-**Status:** Active setup draft  
+**Status:** Ready for immediate governed use
 **Authority:** Jackie authorization for Editorial Command Pilot Relief Lane during Wave 1 Core Activation  
 **Date:** 2026-07-08
 
@@ -19,6 +19,12 @@ It is a controlled relief lane that:
 - uses Dataverse where live capability already exists
 - preserves mandatory author approval gates
 - creates evidence that can later migrate into full PROGRAM-003 records
+
+Wave 1 rule:
+
+- the lane may be opened immediately for one waiting manuscript
+- the first live movement remains governed even if PROGRAM-003 automation is still frozen
+- every artifact must terminate in Core truth or in a clearly labeled `TEMPORARY-PILOT-EVIDENCE` package until Core implementation resumes
 
 ## Relief-Lane Rule
 

@@ -361,8 +361,8 @@ async function findTitleByName(title) {
 }
 
 function mapRow(row) {
-  const title = clean(row.matchedCatalogTitle || row.sourceTitle);
-  const author = clean(row.matchedCatalogAuthor || row.sourceAuthor);
+  const title = clean(row.sourceTitle || row.matchedCatalogTitle);
+  const author = clean(row.sourceAuthor || row.matchedCatalogAuthor);
   const slug = clean(row.matchedCatalogId);
   return {
     title,

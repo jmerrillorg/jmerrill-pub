@@ -18,6 +18,7 @@ export type AuthorPortalAccessResult =
         projectId?: string
         projectIds?: string[]
         titleName?: string
+        stripeAccountId?: string
       }
     }
   | {
@@ -37,6 +38,7 @@ type ConfiguredPortalAccessRecord = {
   projectId?: string
   projectIds?: string[]
   titleName?: string
+  stripeAccountId?: string
 }
 
 export function getExpectedAuthorAccessCode() {
@@ -95,6 +97,7 @@ export function validateAuthorPortalAccessCode(code: unknown): AuthorPortalAcces
       projectId: record.projectId,
       projectIds: record.projectIds,
       titleName: record.titleName,
+      stripeAccountId: record.stripeAccountId,
     },
   }
 }
