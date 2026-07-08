@@ -127,56 +127,58 @@ export async function getPublicCatalogTitleBySlug(slug: string): Promise<Catalog
 
 export async function listPublicAuthors(): Promise<CatalogReadResult<CatalogAuthorSummary[]>> {
   return withCatalogRead(async (config, token) => {
-    const rows = await dataverseGetCollection(config, token, config.contactEntitySet, {
-      select: CONTACT_SELECT,
-      filter: 'statecode eq 0 and jm1pub_isauthor eq true',
-      orderby: 'fullname asc',
-    })
+    const [contactRows, titleRows] = await Promise.all([
+      dataverseGetCollection(config, token, config.contactEntitySet, {
+        select: CONTACT_SELECT,
+        filter: 'statecode eq 0 and jm1pub_isauthor eq true',
+        orderby: 'fullname asc',
+      }).catch(() => []),
+      dataverseGetCollection(config, token, config.titleEntitySet, {
+        select: TITLE_SELECT,
+        filter: 'statecode eq 0',
+        orderby: 'jm1pub_name asc',
+      }),
+    ])
 
-    return rows.map((row) => ({
-      contactId: stringField(row, 'contactid'),
-      slug: stringField(row, 'jm1pub_publicslug') || slugify(stringField(row, 'fullname')),
-      name: stringField(row, 'fullname'),
-      shortBio: stringField(row, 'jm1pub_publicauthorbio'),
-      photoUrl: stringField(row, 'jm1pub_authorphoto'),
-      titleCount: 0,
-      genres: [],
-      imprints: [],
-    }))
+    const titles = await Promise.all(titleRows.map((row) => buildTitleSummary(config, token, row)))
+    return buildAuthorSummaries(contactRows, titles)
   })
 }
 
 export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadResult<CatalogAuthorDetail | null>> {
   return withCatalogRead(async (config, token) => {
-    const safeSlug = escapeODataString(slug)
-    const rows = await dataverseGetCollection(config, token, config.contactEntitySet, {
-      select: CONTACT_SELECT,
-      filter: `statecode eq 0 and jm1pub_isauthor eq true and jm1pub_publicslug eq '${safeSlug}'`,
-      top: 1,
+    const [contactRows, titleRows] = await Promise.all([
+      dataverseGetCollection(config, token, config.contactEntitySet, {
+        select: CONTACT_SELECT,
+        filter: 'statecode eq 0 and jm1pub_isauthor eq true',
+        orderby: 'fullname asc',
+      }).catch(() => []),
+      dataverseGetCollection(config, token, config.titleEntitySet, {
+        select: TITLE_SELECT,
+        filter: 'statecode eq 0',
+        orderby: 'jm1pub_name asc',
+      }),
+    ])
+
+    const titles = await Promise.all(titleRows.map((row) => buildTitleSummary(config, token, row)))
+    const summaries = buildAuthorSummaries(contactRows, titles)
+    const summary = summaries.find((author) => author.slug === slug)
+    if (!summary) return null
+
+    const authorTitles = titles.filter((title) => title.authors.some((author) => author.slug === summary.slug))
+    const contact = contactRows.find((row) => {
+      const publicSlug = stringField(row, 'jm1pub_publicslug') || slugify(stringField(row, 'fullname'))
+      return publicSlug === summary.slug
     })
-
-    const row = rows[0]
-    if (!row) return null
-
-    const summary: CatalogAuthorSummary = {
-      contactId: stringField(row, 'contactid'),
-      slug: stringField(row, 'jm1pub_publicslug') || slugify(stringField(row, 'fullname')),
-      name: stringField(row, 'fullname'),
-      shortBio: stringField(row, 'jm1pub_publicauthorbio'),
-      photoUrl: stringField(row, 'jm1pub_authorphoto'),
-      titleCount: 0,
-      genres: [],
-      imprints: [],
-    }
 
     return {
       ...summary,
-      longBio: summary.shortBio,
-      location: [stringField(row, 'address1_city'), stringField(row, 'address1_stateorprovince')]
-        .filter(Boolean)
-        .join(', '),
-      specialties: [],
-      titles: [],
+      longBio: contact ? stringField(contact, 'jm1pub_publicauthorbio') || summary.shortBio : summary.shortBio,
+      location: contact
+        ? [stringField(contact, 'address1_city'), stringField(contact, 'address1_stateorprovince')].filter(Boolean).join(', ')
+        : '',
+      specialties: summary.genres,
+      titles: authorTitles,
     }
   })
 }
@@ -214,6 +216,52 @@ export async function getCatalogStats(): Promise<CatalogReadResult<CatalogStats>
       lastUpdated: new Date().toISOString(),
     }
   })
+}
+
+
+function buildAuthorSummaries(contactRows: DataverseRecord[], titles: CatalogTitleSummary[]): CatalogAuthorSummary[] {
+  const bySlug = new Map<string, CatalogAuthorSummary>()
+
+  for (const row of contactRows) {
+    const name = stringField(row, 'fullname')
+    if (!name) continue
+    const slug = stringField(row, 'jm1pub_publicslug') || slugify(name)
+    bySlug.set(slug, {
+      contactId: stringField(row, 'contactid'),
+      slug,
+      name,
+      shortBio: stringField(row, 'jm1pub_publicauthorbio') || 'J Merrill Publishing author family.',
+      photoUrl: stringField(row, 'jm1pub_authorphoto'),
+      titleCount: 0,
+      genres: [],
+      imprints: [],
+    })
+  }
+
+  for (const title of titles) {
+    for (const link of title.authors) {
+      if (!link.name) continue
+      const slug = link.slug || slugify(link.name)
+      const current = bySlug.get(slug) || {
+        contactId: link.contactId,
+        slug,
+        name: link.name,
+        shortBio: 'J Merrill Publishing author family.',
+        photoUrl: '',
+        titleCount: 0,
+        genres: [],
+        imprints: [],
+      }
+      current.titleCount += 1
+      current.genres = Array.from(new Set([...current.genres, title.genre].filter(Boolean))).sort()
+      current.imprints = Array.from(new Set([...current.imprints, title.certifiedImprint].filter(Boolean))).sort()
+      bySlug.set(slug, current)
+    }
+  }
+
+  return Array.from(bySlug.values())
+    .filter((author) => author.titleCount > 0 || author.contactId)
+    .sort((a, b) => a.name.localeCompare(b.name))
 }
 
 async function buildTitleSummary(

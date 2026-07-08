@@ -1,8 +1,17 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import type { AuthorRecord } from '@/lib/content'
 
-export function AuthorCard({ author }: { author: AuthorRecord }) {
+export type AuthorCardRecord = {
+  slug: string
+  name: string
+  photoUrl: string
+  location: string
+  shortBio: string
+  titleCount: number
+  specialties: string[]
+}
+
+export function AuthorCard({ author }: { author: AuthorCardRecord }) {
   return (
     <Link
       href={`/authors/${author.slug}`}

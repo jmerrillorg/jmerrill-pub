@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { PageHero } from '@/components/site/PageHero'
 import { PageSection } from '@/components/site/PageSection'
 import { AuthorCard } from '@/components/content/AuthorCard'
 import { BookCard } from '@/components/content/BookCard'
 import { CTASection } from '@/components/content/CTASection'
 import { NewsletterSignup } from '@/components/content/NewsletterSignup'
-import { bookCatalog, publicAuthorCatalog } from '@/lib/content'
+import { catalogAuthorToCardRecord, catalogTitleToBookCardRecord } from '@/lib/catalog/display'
+import { listPublicAuthors, listPublicCatalogTitles } from '@/lib/server/dataverse/catalog'
 
 export const metadata: Metadata = {
   title: 'Authors',
@@ -13,7 +15,42 @@ export const metadata: Metadata = {
     'Meet the authors in the J Merrill Publishing family and explore the books, voices, and stories behind the work.',
 }
 
-export default function AuthorsPage() {
+export const dynamic = 'force-dynamic'
+
+function CatalogUnavailable() {
+  return (
+    <PageSection
+      eyebrow="Author Directory"
+      title={
+        <>
+          The author directory is
+          <br />
+          <em className="not-italic italic text-blue-500">being refreshed.</em>
+        </>
+      }
+      description="Author profiles are served from the J Merrill Publishing enterprise records system. Please check back soon or contact us if you need help finding an author."
+    >
+      <div className="flex flex-wrap gap-3">
+        <Link href="/contact" className="rounded-full bg-blue-500 px-7 py-3 text-[13px] font-semibold text-white transition-colors hover:bg-blue-600">
+          Contact J Merrill Publishing
+        </Link>
+        <Link href="/books" className="rounded-full border border-gray-300 px-7 py-3 text-[13px] text-gray-600 transition-all hover:border-blue-500 hover:text-blue-500">
+          Browse Books
+        </Link>
+      </div>
+    </PageSection>
+  )
+}
+
+export default async function AuthorsPage() {
+  const [authorsResult, titlesResult] = await Promise.all([
+    listPublicAuthors(),
+    listPublicCatalogTitles(),
+  ])
+  const authors = authorsResult.ok ? authorsResult.data : []
+  const featuredTitles = titlesResult.ok ? titlesResult.data.slice(0, 4) : []
+  const unavailable = !authorsResult.ok
+
   return (
     <div className="pt-[76px]">
       <PageHero
@@ -57,23 +94,27 @@ export default function AuthorsPage() {
         </div>
       </PageSection>
 
-      <PageSection
-        eyebrow="Author Directory"
-        title={
-          <>
-            Real authors.
-            <br />
-            <em className="not-italic italic text-blue-500">Real books.</em>
-          </>
-        }
-        description="Explore the authors whose books are part of the J Merrill Publishing family. Their profiles connect readers to the people behind the work and give every title a visible home."
-      >
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {publicAuthorCatalog.map((author) => (
-            <AuthorCard key={author.slug} author={author} />
-          ))}
-        </div>
-      </PageSection>
+      {unavailable ? (
+        <CatalogUnavailable />
+      ) : (
+        <PageSection
+          eyebrow="Author Directory"
+          title={
+            <>
+              Real authors.
+              <br />
+              <em className="not-italic italic text-blue-500">Real books.</em>
+            </>
+          }
+          description="Explore the authors whose books are part of the J Merrill Publishing family. Their profiles connect readers to the people behind the work and give every title a visible home."
+        >
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {authors.map((author) => (
+              <AuthorCard key={author.slug} author={catalogAuthorToCardRecord(author)} />
+            ))}
+          </div>
+        </PageSection>
+      )}
 
       <PageSection
         eyebrow="Why This Matters"
@@ -116,11 +157,17 @@ export default function AuthorsPage() {
         }
         description="Some authors publish one important work. Others build a catalog over time. Some expand into speaking, ministry, education, business, or community impact. However the journey grows, the author remains at the center."
       >
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {bookCatalog.slice(0, 4).map((book) => (
-            <BookCard key={book.id} book={book} compact />
-          ))}
-        </div>
+        {featuredTitles.length > 0 ? (
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {featuredTitles.map((book) => (
+              <BookCard key={book.id} book={catalogTitleToBookCardRecord(book)} compact />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-[28px] border border-gray-200 bg-[#F8FAFD] px-6 py-8 text-[15px] font-light text-gray-500">
+            Featured catalog titles are temporarily unavailable while the enterprise catalog refreshes.
+          </div>
+        )}
       </PageSection>
 
       <CTASection

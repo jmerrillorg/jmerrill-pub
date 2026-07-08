@@ -3,15 +3,17 @@ import { BookCard } from '@/components/content/BookCard'
 import { PageHero } from '@/components/site/PageHero'
 import { PageSection } from '@/components/site/PageSection'
 import { ReaderSignupForm } from '@/components/readers/ReaderSignupForm'
-import type { BookRecord } from '@/lib/content'
+import type { BookCardRecord } from '@/components/content/BookCard'
 import type { ImprintStrategy } from '@/data/imprints'
 
 export function ImprintDetailTemplate({
   imprint,
   featuredBooks,
+  catalogUnavailable = false,
 }: {
   imprint: ImprintStrategy
-  featuredBooks: BookRecord[]
+  featuredBooks: BookCardRecord[]
+  catalogUnavailable?: boolean
 }) {
   return (
     <div className="pt-[76px]">
@@ -83,7 +85,11 @@ export function ImprintDetailTemplate({
         description="Each imprint page is prepared to hold richer reader-facing discovery, title clustering, and future Dataverse-driven merchandising."
         surface="dark"
       >
-        {featuredBooks.length > 0 ? (
+        {catalogUnavailable ? (
+          <div className="rounded-[28px] border border-white/10 bg-white/[0.03] px-6 py-8 text-[15px] font-light text-white/45">
+            Featured titles are temporarily unavailable while the enterprise catalog refreshes.
+          </div>
+        ) : featuredBooks.length > 0 ? (
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {featuredBooks.map((book) => (
               <BookCard key={book.id} book={book} compact />

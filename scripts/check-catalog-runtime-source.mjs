@@ -4,10 +4,6 @@ import { execFileSync } from 'node:child_process'
 
 const repoRoot = resolve(new URL('..', import.meta.url).pathname)
 const runtimeRoots = ['app', 'components', 'lib']
-const transitionalAllowlist = new Set([
-  'lib/content.ts',
-])
-
 const patterns = [
   /from\s+['"]@\/data\/books\.json['"]/,
   /from\s+['"]\.\.?\/.*data\/books\.json['"]/,
@@ -28,10 +24,7 @@ for (const file of files) {
   const source = readFileSync(absolute, 'utf8')
   if (!patterns.some((pattern) => pattern.test(source))) continue
 
-  const relativePath = relative(repoRoot, absolute)
-  if (transitionalAllowlist.has(relativePath)) continue
-
-  violations.push(relativePath)
+  violations.push(relative(repoRoot, absolute))
 }
 
 if (violations.length > 0) {

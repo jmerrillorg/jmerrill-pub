@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { CTASection } from '@/components/content/CTASection'
 import { PageHero } from '@/components/site/PageHero'
 import { PageSection } from '@/components/site/PageSection'
-import { serviceCatalog } from '@/lib/content'
+import { serviceCatalog } from '@/lib/marketing-content'
 
 export const metadata: Metadata = {
   title: 'Publishing Support for Every Stage of the Book | J Merrill Publishing',

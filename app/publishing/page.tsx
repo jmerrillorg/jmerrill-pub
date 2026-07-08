@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { CTASection } from '@/components/content/CTASection'
 import { PageHero } from '@/components/site/PageHero'
 import { PageSection } from '@/components/site/PageSection'
-import { publishingPackages } from '@/lib/content'
+import { publishingPackages } from '@/lib/marketing-content'
 
 export const metadata: Metadata = {
   title: 'Publishing',

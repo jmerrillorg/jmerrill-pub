@@ -34,6 +34,7 @@ export type BookCardRecord = {
   shortDescription: string
   formats: string[]
   availablePurchaseLinks: Array<{ retailer: string; label: string; href: string }>
+  displayYear?: string
 }
 
 export function BookCard({ book, compact = false }: { book: BookCardRecord; compact?: boolean }) {
