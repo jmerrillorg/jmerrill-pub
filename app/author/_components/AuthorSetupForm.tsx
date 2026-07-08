@@ -141,12 +141,17 @@ export function AuthorSetupForm({
         },
         body: JSON.stringify(values),
       })
-      const data = await response.json()
+      const data = await safeReadJson(response)
       if (!response.ok) throw new Error(data.error || 'Submission failed.')
       setStatus('success')
     } catch (err: any) {
       setStatus('error')
-      setError(err.message || failureMessage || 'Something went wrong. Please try again.')
+      const message = typeof err?.message === 'string' ? err.message : ''
+      setError(
+        message && message !== 'Failed to fetch'
+          ? message
+          : failureMessage || 'Something went wrong. Please try again.',
+      )
     }
   }
 
@@ -281,6 +286,17 @@ export function AuthorSetupForm({
       </div>
     </form>
   )
+}
+
+async function safeReadJson(response: Response) {
+  const text = await response.text()
+  if (!text) return {}
+
+  try {
+    return JSON.parse(text) as { error?: string; success?: boolean }
+  } catch {
+    return {}
+  }
 }
 
 export const onboardingFields: Field[] = [
