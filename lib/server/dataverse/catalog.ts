@@ -270,7 +270,7 @@ function buildAuthorSummaries(contactRows: DataverseRecord[], titles: CatalogTit
   }
 
   return Array.from(bySlug.values())
-    .filter((author) => author.titleCount > 0 || author.contactId)
+    .filter((author) => author.titleCount > 0)
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 
