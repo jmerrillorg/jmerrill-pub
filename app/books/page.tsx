@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import BooksClient from './BooksClient'
-import { bookCatalog, imprintCatalog } from '@/lib/content'
+import { listPublicCatalogTitles } from '@/lib/server/dataverse/catalog'
 import { CTASection } from '@/components/content/CTASection'
 
 export const metadata: Metadata = {
@@ -11,7 +11,13 @@ export const metadata: Metadata = {
     'Browse books from the J Merrill Publishing family and explore the authors, imprints, and voices behind the work.',
 }
 
-export default function BooksPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function BooksPage() {
+  const catalogResult = await listPublicCatalogTitles()
+  const books = catalogResult.ok ? catalogResult.data : []
+  const imprints = Array.from(new Set(books.map((book) => book.certifiedImprint).filter(Boolean))).sort()
+
   return (
     <div className="pt-[76px]">
       <section className="relative overflow-hidden border-b border-white/5 bg-[#070710] px-6 py-20 sm:px-12">
@@ -53,7 +59,7 @@ export default function BooksPage() {
           <div className="mt-8 flex flex-wrap gap-3">
             {[
               '125+ titles',
-              `${imprintCatalog.length} official imprints`,
+              imprints.length ? `${imprints.length} official imprints` : 'Official imprints',
               'Real authors and visible book pages',
             ].map((item) => (
               <div
@@ -75,7 +81,7 @@ export default function BooksPage() {
           </div>
         }
       >
-        <BooksClient />
+        <BooksClient books={books} imprints={imprints} unavailable={!catalogResult.ok} />
       </Suspense>
 
       <section className="border-t border-white/5 bg-[#0F1C2E] px-6 py-16 sm:px-12">

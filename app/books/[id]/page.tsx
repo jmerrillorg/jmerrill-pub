@@ -4,18 +4,26 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { BookCard } from '@/components/content/BookCard'
 import { CTASection } from '@/components/content/CTASection'
-import { getAuthorBySlug, getBookById, getBooksByAuthorSlug, getBooksByImprint, getBooksBySeries, bookCatalog } from '@/lib/content'
+import { catalogAuthorDisplayName, catalogTitleToBookCardRecord } from '@/lib/catalog/display'
+import type { CatalogTitleDetail } from '@/lib/catalog/types'
+import { getPublicCatalogTitleBySlug } from '@/lib/server/dataverse/catalog'
 import { getImprintStrategyByLabel } from '@/data/imprints'
 
 type Props = { params: { id: string } }
 
-function ContributorByline({ id, contributors }: { id: string; contributors: Array<{ name: string; slug: string | null; hasProfile: boolean }> }) {
+export const dynamic = 'force-dynamic'
+
+function ContributorByline({ book }: { book: CatalogTitleDetail }) {
+  const contributors = book.authors.length
+    ? book.authors
+    : [{ name: catalogAuthorDisplayName(book), slug: '', contactId: '', role: 'Author', primary: true }]
+
   return (
     <>
       {contributors.map((contributor, index) => (
-        <span key={`${id}-${contributor.name}-${index}`}>
+        <span key={`${book.id}-${contributor.name}-${index}`}>
           {index > 0 ? (index === contributors.length - 1 ? ' and ' : ', ') : null}
-          {contributor.hasProfile && contributor.slug ? (
+          {contributor.slug ? (
             <Link href={`/authors/${contributor.slug}`} className="transition-colors hover:text-blue-400">
               {contributor.name}
             </Link>
@@ -28,39 +36,63 @@ function ContributorByline({ id, contributors }: { id: string; contributors: Arr
   )
 }
 
-export async function generateStaticParams() {
-  return bookCatalog.map((book) => ({ id: book.id }))
+function CatalogUnavailable() {
+  return (
+    <div className="min-h-screen bg-[#070710] pt-[76px]">
+      <div className="mx-auto max-w-[820px] px-6 py-24 text-center sm:px-12">
+        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-blue-400">Catalog temporarily unavailable</div>
+        <h1 className="text-white" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(32px,5vw,56px)', fontWeight: 700 }}>
+          This title page is being refreshed.
+        </h1>
+        <p className="mx-auto mt-5 max-w-[620px] text-[15px] font-light leading-[1.8] text-white/45">
+          Book details are served from J Merrill Publishing enterprise records. Please return to the catalog or contact us if you need help with a specific title.
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link href="/books" className="rounded-full bg-blue-500 px-7 py-3 text-[13px] font-semibold text-white transition-colors hover:bg-blue-600">
+            Back to Catalog
+          </Link>
+          <Link href="/contact" className="rounded-full border border-white/15 px-7 py-3 text-[13px] text-white/60 transition-all hover:border-blue-500 hover:text-blue-400">
+            Contact Us
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const book = getBookById(params.id)
-  if (!book) return { title: 'Book Not Found' }
+  const result = await getPublicCatalogTitleBySlug(params.id)
+  if (!result.ok) {
+    return {
+      title: 'Book Catalog Temporarily Unavailable',
+      description: 'J Merrill Publishing book details are temporarily unavailable.',
+    }
+  }
+  if (!result.data) return { title: 'Book Not Found' }
 
+  const book = result.data
   return {
-    title: `${book.title} by ${book.authorName}`,
-    description: book.shortDescription,
+    title: `${book.title} by ${catalogAuthorDisplayName(book)}`,
+    description: book.shortDescription || `Book details for ${book.title} from J Merrill Publishing.`,
   }
 }
 
-export default function BookPage({ params }: Props) {
-  const book = getBookById(params.id)
-  if (!book) notFound()
-  const coverIsRemote = book.coverUrl.startsWith('http')
-  const readerImprint = getImprintStrategyByLabel(book.imprint)
+export default async function BookPage({ params }: Props) {
+  const result = await getPublicCatalogTitleBySlug(params.id)
+  if (!result.ok) return <CatalogUnavailable />
+  if (!result.data) notFound()
 
-  const author = book.authorSlug ? getAuthorBySlug(book.authorSlug) : undefined
-  const relatedBySeries = book.series ? getBooksBySeries(book.series).filter((item) => item.id !== book.id).slice(0, 4) : []
-  const relatedByAuthor = book.authorSlug
-    ? getBooksByAuthorSlug(book.authorSlug).filter((item) => item.id !== book.id).slice(0, 4)
-    : []
-  const relatedByImprint =
-    relatedByAuthor.length > 0
-      ? []
-      : getBooksByImprint(book.imprint).filter((item) => item.id !== book.id).slice(0, 4)
+  const book = result.data
+  const bookCard = catalogTitleToBookCardRecord(book)
+  const authorName = catalogAuthorDisplayName(book)
+  const authorSlug = book.authors[0]?.slug || ''
+  const coverIsRemote = Boolean(book.coverUrl?.startsWith('http'))
+  const readerImprint = getImprintStrategyByLabel(book.certifiedImprint)
   const isbnDisplay =
     book.isbnByFormat.length > 1
       ? book.isbnByFormat.map((item) => `${item.format}: ${item.isbn}`).join(' · ')
-      : book.isbn || book.isbnByFormat[0]?.isbn || 'Catalog record pending'
+      : book.primaryIsbn || book.isbnByFormat[0]?.isbn || 'Catalog record pending'
+  const primaryFormat = book.formats[0] || 'Catalog format pending'
 
   return (
     <div className="min-h-screen bg-[#070710] pt-[76px]">
@@ -106,7 +138,7 @@ export default function BookPage({ params }: Props) {
                   >
                     {book.title}
                   </div>
-                  <div className="mt-2 text-[14px] text-white/45">{book.authorName}</div>
+                  <div className="mt-2 text-[14px] text-white/45">{authorName}</div>
                 </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
@@ -125,20 +157,20 @@ export default function BookPage({ params }: Props) {
             </div>
 
             <div className="mt-5 flex flex-col gap-3">
-              {book.availablePurchaseLinks.length > 0 ? (
-                book.availablePurchaseLinks.map((link) => (
+              {book.purchaseLinks.length > 0 ? (
+                book.purchaseLinks.map((link) => (
                   <a
-                    key={link.retailer}
+                    key={`${link.retailer}-${link.href}`}
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`block rounded-full py-3.5 text-center text-[13px] font-semibold uppercase tracking-[0.04em] transition-colors ${
-                      link.retailer === 'amazon'
+                      link.retailer.toLowerCase().includes('amazon')
                         ? 'bg-blue-500 text-white hover:bg-blue-600'
                         : 'border border-white/10 bg-white/5 text-white/70 hover:border-blue-500/40 hover:text-blue-300'
                     }`}
                   >
-                    {link.label}
+                    {link.label || link.retailer || 'View listing'}
                   </a>
                 ))
               ) : (
@@ -149,23 +181,23 @@ export default function BookPage({ params }: Props) {
                   Ask about this title
                 </Link>
               )}
-              {book.authorSlug ? (
+              {authorSlug ? (
                 <Link
-                  href={`/authors/${book.authorSlug}`}
+                  href={`/authors/${authorSlug}`}
                   className="block rounded-full border border-white/10 py-3 text-center text-[13px] font-medium text-white/40 transition-all hover:border-blue-500/40 hover:text-blue-400"
                 >
                   View author profile
                 </Link>
               ) : (
                 <div className="rounded-full border border-white/10 py-3 text-center text-[13px] font-medium text-white/25">
-                  Collaborative title
+                  J Merrill Publishing author family
                 </div>
               )}
               {readerImprint ? (
                 <Link
                   href={{
                     pathname: '/readers',
-                    query: { imprint: readerImprint.slug, book: book.id, title: book.title },
+                    query: { imprint: readerImprint.slug, book: book.slug || book.id, title: book.title },
                   }}
                   className="block rounded-full border border-white/10 py-3 text-center text-[13px] font-medium text-white/40 transition-all hover:border-blue-500/40 hover:text-blue-400"
                 >
@@ -178,7 +210,7 @@ export default function BookPage({ params }: Props) {
           <main>
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-              <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-blue-400">{book.imprint}</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-blue-400">{book.certifiedImprint || 'J Merrill Publishing'}</span>
             </div>
 
             <h1
@@ -194,7 +226,7 @@ export default function BookPage({ params }: Props) {
 
             <div className="mt-3 flex flex-wrap items-center gap-3 text-[16px] text-white/45">
               <span>by</span>
-              <ContributorByline id={book.id} contributors={book.contributors} />
+              <ContributorByline book={book} />
             </div>
 
             {book.series ? (
@@ -204,34 +236,20 @@ export default function BookPage({ params }: Props) {
                   <span className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-blue-300">
                     {book.series}
                   </span>
-                  {book.seriesOrder ? (
-                    <span className="text-white/35">Book {book.seriesOrder}</span>
-                  ) : null}
+                  {book.seriesOrder ? <span className="text-white/35">Book {book.seriesOrder}</span> : null}
                 </div>
-                {relatedBySeries.length > 0 ? (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {relatedBySeries.map((item) => (
-                      <Link
-                        key={item.id}
-                        href={`/books/${item.id}`}
-                        className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[12px] text-white/45 transition-all hover:border-blue-500/30 hover:text-blue-300"
-                      >
-                        {item.seriesOrder ? `${item.seriesOrder}. ` : ''}
-                        {item.title}
-                      </Link>
-                    ))}
-                  </div>
-                ) : null}
               </div>
             ) : null}
 
-            <p className="mt-8 max-w-[760px] text-[18px] font-light leading-[1.8] text-white/55">{book.shortDescription}</p>
+            <p className="mt-8 max-w-[760px] text-[18px] font-light leading-[1.8] text-white/55">
+              {book.shortDescription || 'Description pending.'}
+            </p>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {[
-                { label: 'Genre', value: book.genre },
-                { label: book.releaseDate ? 'Release date' : 'Catalog year', value: book.releaseDateDisplay || book.displayYear },
-                { label: 'Primary format', value: book.primaryFormat },
+                { label: 'Genre', value: book.genre || 'General Interest' },
+                { label: book.releaseDate ? 'Release date' : 'Catalog year', value: book.releaseDate || book.displayYear },
+                { label: 'Primary format', value: primaryFormat },
                 { label: book.isbnByFormat.length > 1 ? 'ISBNs' : 'ISBN', value: isbnDisplay },
               ].map((item) => (
                 <div key={item.label} className="rounded-xl border border-white/6 bg-white/[0.03] px-4 py-4">
@@ -247,59 +265,44 @@ export default function BookPage({ params }: Props) {
                   <span className="block h-px w-8 bg-blue-500" />
                   <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-blue-400">About the title</span>
                 </div>
-                <p className="text-[15px] font-light leading-[1.9] text-white/55">{book.longDescription}</p>
+                <p className="text-[15px] font-light leading-[1.9] text-white/55">
+                  {book.longDescription || book.shortDescription || 'Full title description pending.'}
+                </p>
 
-                {book.keywords.length > 0 && (
+                {book.keywords.length > 0 ? (
                   <div className="mt-8">
                     <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-white/20">Keywords & categories</div>
                     <div className="flex flex-wrap gap-2">
-                      {book.categories.concat(book.keywords.slice(0, 8)).map((item) => (
+                      {book.keywords.slice(0, 12).map((item) => (
                         <span key={item} className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1.5 text-[11px] text-white/35">
                           {item}
                         </span>
                       ))}
                     </div>
                   </div>
-                )}
+                ) : null}
               </section>
 
               <section className="rounded-[28px] border border-white/8 bg-white/[0.03] p-8">
-                <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.12em] text-blue-400">
-                  {book.authorSlug ? 'About the author' : 'About the contributors'}
-                </div>
+                <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.12em] text-blue-400">About the author</div>
                 <div className="flex items-center gap-4">
                   <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-blue-500/20 bg-blue-500/10">
-                    {author?.photoUrl ? (
-                      <Image src={author.photoUrl} alt={author.name} fill className="object-cover" sizes="64px" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-[22px] font-semibold text-blue-400">
-                        {book.authorName.charAt(0)}
-                      </div>
-                    )}
+                    <div className="flex h-full w-full items-center justify-center text-[22px] font-semibold text-blue-400">
+                      {authorName.charAt(0)}
+                    </div>
                   </div>
                   <div>
-                    <div
-                      className="text-white"
-                      style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '24px', fontWeight: 700 }}
-                    >
-                      {book.authorName}
+                    <div className="text-white" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '24px', fontWeight: 700 }}>
+                      {authorName}
                     </div>
-                    <div className="text-[12px] text-white/30">{author?.location || 'J Merrill Publishing author family'}</div>
+                    <div className="text-[12px] text-white/30">J Merrill Publishing author family</div>
                   </div>
                 </div>
                 <p className="mt-5 text-[14px] font-light leading-[1.8] text-white/45">
-                  {author?.longBio || book.authorBio}
+                  Author profile details are maintained in the J Merrill Publishing author records and will appear as the public profile is completed.
                 </p>
-                {book.retailerLastVerifiedAt ? (
-                  <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.1em] text-white/20">
-                    Retailer metadata verified {book.retailerLastVerifiedAt}
-                  </div>
-                ) : null}
-                {book.authorSlug ? (
-                  <Link
-                    href={`/authors/${book.authorSlug}`}
-                    className="mt-6 inline-flex text-[13px] font-medium text-blue-400 transition-colors hover:text-blue-300"
-                  >
+                {authorSlug ? (
+                  <Link href={`/authors/${authorSlug}`} className="mt-6 inline-flex text-[13px] font-medium text-blue-400 transition-colors hover:text-blue-300">
                     Explore full author profile -&gt;
                   </Link>
                 ) : null}
@@ -308,21 +311,19 @@ export default function BookPage({ params }: Props) {
           </main>
         </div>
 
-        {(relatedByAuthor.length > 0 || relatedByImprint.length > 0) && (
+        {book.relatedTitles.length > 0 ? (
           <section className="mt-20 border-t border-white/5 pt-16">
             <div className="mb-8 flex items-center gap-3">
               <span className="block h-px w-8 bg-blue-500" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-blue-400">
-                {relatedByAuthor.length > 0 ? `More from ${book.authorName}` : `More from ${book.imprint}`}
-              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-blue-400">More from {book.certifiedImprint}</span>
             </div>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              {(relatedByAuthor.length > 0 ? relatedByAuthor : relatedByImprint).map((item) => (
-                <BookCard key={item.id} book={item} compact />
+              {book.relatedTitles.map((item) => (
+                <BookCard key={item.id} book={catalogTitleToBookCardRecord(item)} compact />
               ))}
             </div>
           </section>
-        )}
+        ) : null}
       </div>
 
       <CTASection

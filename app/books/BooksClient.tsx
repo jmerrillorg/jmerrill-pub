@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { BookCard } from '@/components/content/BookCard'
-import { bookCatalog, imprintCatalog } from '@/lib/content'
+import { catalogTitleToBookCardRecord, catalogAuthorDisplayName } from '@/lib/catalog/display'
+import type { CatalogTitleSummary } from '@/lib/catalog/types'
 
 const FORMAT_OPTIONS = ['All Formats', 'Paperback', 'Hardcover', 'eBook', 'Audiobook']
-const GENRE_OPTIONS = ['All Genres', ...Array.from(new Set(bookCatalog.map((book) => book.genre))).sort()]
 
 const LEGACY_IMPRINT_ALIASES: Record<string, string> = {
   faith: 'JM Works',
@@ -25,21 +25,36 @@ function slugify(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 }
 
-const IMPRINT_OPTIONS = [
-  { id: 'all', label: 'All Imprints', name: '' },
-  ...imprintCatalog.map((imprint) => ({ id: slugify(imprint), label: imprint, name: imprint })),
-]
-
-function resolveImprintParam(value: string | null) {
-  if (!value || value === 'all') return 'all'
-  const legacy = LEGACY_IMPRINT_ALIASES[value]
-  if (legacy) return slugify(legacy)
-  const match = IMPRINT_OPTIONS.find((option) => option.id === value || option.name === value)
-  return match ? match.id : 'all'
+function buildImprintOptions(imprints: string[]) {
+  return [
+    { id: 'all', label: 'All Imprints', name: '' },
+    ...imprints.map((imprint) => ({ id: slugify(imprint), label: imprint, name: imprint })),
+  ]
 }
 
-export default function BooksClient() {
+function buildGenreOptions(books: CatalogTitleSummary[]) {
+  return ['All Genres', ...Array.from(new Set(books.map((book) => book.genre).filter(Boolean))).sort()]
+}
+
+type BooksClientProps = {
+  books: CatalogTitleSummary[]
+  imprints: string[]
+  unavailable?: boolean
+}
+
+export default function BooksClient({ books, imprints, unavailable = false }: BooksClientProps) {
   const searchParams = useSearchParams()
+  const imprintOptions = useMemo(() => buildImprintOptions(imprints), [imprints])
+  const genreOptions = useMemo(() => buildGenreOptions(books), [books])
+
+  const resolveImprintParam = useCallback((value: string | null) => {
+    if (!value || value === 'all') return 'all'
+    const legacy = LEGACY_IMPRINT_ALIASES[value]
+    if (legacy) return slugify(legacy)
+    const match = imprintOptions.find((option) => option.id === value || option.name === value)
+    return match ? match.id : 'all'
+  }, [imprintOptions])
+
   const [imprint, setImprint] = useState(resolveImprintParam(searchParams.get('imprint')))
   const [genre, setGenre] = useState('All Genres')
   const [format, setFormat] = useState('All Formats')
@@ -50,32 +65,32 @@ export default function BooksClient() {
   useEffect(() => {
     setImprint(resolveImprintParam(searchParams.get('imprint')))
     setShowCount(36)
-  }, [searchParams])
+  }, [searchParams, resolveImprintParam])
 
-  const activeImprint = IMPRINT_OPTIONS.find((option) => option.id === imprint)
+  const activeImprint = imprintOptions.find((option) => option.id === imprint)
 
   const filtered = useMemo(() => {
-    return bookCatalog.filter((book) => {
-      if (activeImprint?.name && book.imprint !== activeImprint.name) return false
+    return books.filter((book) => {
+      const authorName = catalogAuthorDisplayName(book)
+      if (activeImprint?.name && book.certifiedImprint !== activeImprint.name) return false
       if (genre !== 'All Genres' && book.genre !== genre) return false
       if (format !== 'All Formats' && !book.formats.includes(format as never)) return false
       if (
         search &&
         !book.title.toLowerCase().includes(search.toLowerCase()) &&
-        !book.authorName.toLowerCase().includes(search.toLowerCase())
+        !authorName.toLowerCase().includes(search.toLowerCase())
       ) {
         return false
       }
       return true
     })
-  }, [activeImprint?.name, format, genre, search])
+  }, [activeImprint?.name, books, format, genre, search])
 
   const displayed = filtered.slice(0, showCount)
   const isDefaultView = !activeImprint?.name && genre === 'All Genres' && format === 'All Formats' && !search
 
   const counts = useMemo(() => {
     const countMap: Record<string, string | number> = { all: '125+' }
-    // Imprint-level counts are intentionally omitted — use 125+ marketing label only
     return countMap
   }, [])
 
@@ -87,6 +102,30 @@ export default function BooksClient() {
 
   const fieldBase =
     'rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-[13px] text-white placeholder:text-white/25 transition-colors focus:border-blue-500 focus:outline-none'
+
+  if (unavailable) {
+    return (
+      <div className="min-h-[420px] bg-[#070710] px-6 py-20 sm:px-12">
+        <div className="mx-auto max-w-[760px] rounded-[28px] border border-white/8 bg-white/[0.03] p-8 text-center">
+          <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-blue-400">Catalog temporarily unavailable</div>
+          <h2 className="text-white" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(28px,4vw,44px)', fontWeight: 700 }}>
+            The book catalog is being refreshed.
+          </h2>
+          <p className="mx-auto mt-4 max-w-[560px] text-[15px] font-light leading-[1.8] text-white/45">
+            The J Merrill Publishing catalog is served from the enterprise records system. Please check back soon or contact us if you need help finding a title.
+          </p>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
+            <Link href="/contact" className="rounded-full bg-blue-500 px-7 py-3 text-[13px] font-semibold text-white transition-colors hover:bg-blue-600">
+              Contact J Merrill Publishing
+            </Link>
+            <Link href="/join" className="rounded-full border border-white/15 px-7 py-3 text-[13px] text-white/60 transition-all hover:border-blue-500 hover:text-blue-400">
+              Tell Us About Your Book
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#070710]">
@@ -100,7 +139,7 @@ export default function BooksClient() {
 
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap gap-2">
-              {IMPRINT_OPTIONS.map((option) => (
+              {imprintOptions.map((option) => (
                 <button
                   key={option.id}
                   onClick={() => {
@@ -150,7 +189,7 @@ export default function BooksClient() {
           <div className="flex flex-wrap items-center gap-3">
             <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/20">Filter:</span>
             <div className="flex flex-wrap gap-1.5">
-              {GENRE_OPTIONS.map((option) => (
+              {genreOptions.map((option) => (
                 <button
                   key={option}
                   onClick={() => setGenre(option)}
@@ -214,7 +253,7 @@ export default function BooksClient() {
         ) : view === 'grid' ? (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
             {displayed.map((book) => (
-              <BookCard key={book.id} book={book} compact />
+              <BookCard key={book.id} book={catalogTitleToBookCardRecord(book)} compact />
             ))}
           </div>
         ) : (
@@ -222,7 +261,7 @@ export default function BooksClient() {
             {displayed.map((book) => (
               <Link
                 key={book.id}
-                href={`/books/${book.id}`}
+                href={`/books/${book.slug || book.id}`}
                 className="grid grid-cols-[1fr_auto] items-center gap-4 rounded-xl px-3 py-4 transition-colors hover:bg-white/[0.02]"
               >
                 <div className="flex items-center gap-4">
@@ -231,12 +270,12 @@ export default function BooksClient() {
                     <div className="text-[15px] font-semibold text-white transition-colors hover:text-blue-400" style={{ fontFamily: "'Libre Baskerville', serif" }}>
                       {book.title}
                     </div>
-                    <div className="mt-0.5 text-[12px] text-white/35">{book.authorName}</div>
+                    <div className="mt-0.5 text-[12px] text-white/35">{catalogAuthorDisplayName(book)}</div>
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-end gap-2">
                   <span className="rounded-full border border-white/10 px-2 py-0.5 text-[10px] text-white/35">
-                    {book.imprint}
+                    {book.certifiedImprint}
                   </span>
                   <span className="text-[10px] text-white/20">{book.genre}</span>
                   {book.formats.map((item) => (

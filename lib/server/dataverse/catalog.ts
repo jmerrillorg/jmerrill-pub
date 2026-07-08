@@ -37,6 +37,9 @@ const TITLE_SELECT = [
   'jm1pub_name',
   'jm1pub_slug',
   'jm1pub_subtitle',
+  'jm1pub_authordisplayname',
+  'jm1pub_authorname',
+  '_jm1pub_author_value',
   'jm1pub_shortdescription',
   'jm1pub_longdescription',
   'jm1pub_certifiedimprint',
@@ -79,7 +82,7 @@ export async function listPublicCatalogTitles(): Promise<CatalogReadResult<Catal
   return withCatalogRead(async (config, token) => {
     const titleRows = await dataverseGetCollection(config, token, config.titleEntitySet, {
       select: TITLE_SELECT,
-      filter: "statecode eq 0 and jm1pub_publicationstatus ne 'Hidden'",
+      filter: 'statecode eq 0',
       orderby: 'jm1pub_name asc',
     })
 
@@ -237,14 +240,26 @@ async function buildTitleSummary(
   const releaseDate = dateField(row, 'jm1pub_releasedate')
   const year = numberField(row, 'jm1pub_publicationyear')
   const title = stringField(row, 'jm1pub_name')
+  const authorDisplayName = resolveAuthorDisplayName(row)
+  const authorLookupId = stringField(row, '_jm1pub_author_value')
 
   return {
     id,
     slug: stringField(row, 'jm1pub_slug') || slugify(title),
     title,
     subtitle: stringField(row, 'jm1pub_subtitle'),
-    authorDisplayName: '',
-    authors: [],
+    authorDisplayName,
+    authors: authorDisplayName
+      ? [
+          {
+            contactId: authorLookupId,
+            slug: slugify(authorDisplayName),
+            name: authorDisplayName,
+            role: 'Author',
+            primary: true,
+          },
+        ]
+      : [],
     certifiedImprint: stringField(row, 'jm1pub_certifiedimprint'),
     genre: stringField(row, 'jm1pub_genre') || 'General Interest',
     publicationStatus: stringField(row, 'jm1pub_publicationstatus'),
@@ -412,6 +427,14 @@ function buildKeywords(summary: CatalogTitleSummary) {
         .map((word) => word.toLowerCase())
         .filter((word) => word.length > 2),
     ),
+  )
+}
+
+function resolveAuthorDisplayName(row: DataverseRecord) {
+  return (
+    stringField(row, 'jm1pub_authordisplayname') ||
+    stringField(row, 'jm1pub_authorname') ||
+    stringField(row, '_jm1pub_author_value@OData.Community.Display.V1.FormattedValue')
   )
 }
 
