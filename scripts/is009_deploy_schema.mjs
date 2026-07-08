@@ -19,6 +19,10 @@ if (!token) {
 
 const actions = [];
 
+function log(message) {
+  console.error(`[is009-core-schema] ${message}`);
+}
+
 function label(value) {
   return {
     LocalizedLabels: [{ Label: value, LanguageCode: 1033 }],
@@ -80,6 +84,7 @@ async function getSolution(uniqueName) {
 async function ensureSolution() {
   const existing = await getSolution(solutionUniqueName);
   if (existing) {
+    log(`solution exists: ${solutionUniqueName}`);
     actions.push({ type: 'solution', name: solutionUniqueName, status: 'exists' });
     return existing;
   }
@@ -100,6 +105,7 @@ async function ensureSolution() {
   });
 
   actions.push({ type: 'solution', name: solutionUniqueName, status: 'created' });
+  log(`solution created: ${solutionUniqueName}`);
   return getSolution(solutionUniqueName);
 }
 
@@ -158,10 +164,12 @@ async function ensureEntity({
 }) {
   const existing = await getEntity(logicalName);
   if (existing) {
+    log(`table exists: ${logicalName}`);
     actions.push({ type: 'table', name: logicalName, status: 'exists' });
     return existing;
   }
 
+  log(`creating table: ${logicalName}`);
   await request('/EntityDefinitions', {
     method: 'POST',
     body: JSON.stringify({
@@ -189,6 +197,7 @@ async function ensureEntity({
   });
 
   const created = await waitForEntity(logicalName);
+  log(`table created: ${logicalName}`);
   actions.push({ type: 'table', name: logicalName, status: 'created' });
   await addSolutionComponent(1, created.MetadataId, logicalName);
   return created;
@@ -207,16 +216,25 @@ async function ensureAttribute(entityLogicalName, attribute) {
   const logicalName = attribute.logicalName;
   const existing = await getAttribute(entityLogicalName, logicalName);
   if (existing) {
+    log(`field exists: ${entityLogicalName}.${logicalName}`);
     actions.push({ type: 'field', table: entityLogicalName, name: logicalName, status: 'exists' });
     return existing;
   }
 
-  await request(`/EntityDefinitions(LogicalName='${entityLogicalName}')/Attributes`, {
-    method: 'POST',
-    body: JSON.stringify(attribute.metadata),
-  });
+  log(`creating field: ${entityLogicalName}.${logicalName}`);
+  try {
+    await request(`/EntityDefinitions(LogicalName='${entityLogicalName}')/Attributes`, {
+      method: 'POST',
+      body: JSON.stringify(attribute.metadata),
+    });
+  } catch (error) {
+    const message = String(error.message || error);
+    if (!message.includes('already exists')) throw error;
+    log(`field create raced with existing metadata: ${entityLogicalName}.${logicalName}`);
+  }
 
   const created = await waitForAttribute(entityLogicalName, logicalName);
+  log(`field created: ${entityLogicalName}.${logicalName}`);
   actions.push({ type: 'field', table: entityLogicalName, name: logicalName, status: 'created' });
   await addSolutionComponent(2, created.MetadataId, `${entityLogicalName}.${logicalName}`);
   return created;
@@ -350,49 +368,60 @@ async function ensureLookup({
   const logicalName = schemaName.toLowerCase();
   const existing = await getAttribute(referencingEntity, logicalName);
   if (existing) {
+    log(`lookup exists: ${referencingEntity}.${logicalName}`);
     actions.push({ type: 'lookup', table: referencingEntity, name: logicalName, status: 'exists' });
     return existing;
   }
 
-  await request('/RelationshipDefinitions', {
-    method: 'POST',
-    body: JSON.stringify({
-      '@odata.type': 'Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata',
-      SchemaName: relationshipSchemaName,
-      ReferencedEntity: referencedEntity,
-      ReferencingEntity: referencingEntity,
-      AssociatedMenuConfiguration: {
-        Behavior: 'UseLabel',
-        Group: 'Details',
-        Label: label(displayName),
-        Order: 10000,
-      },
-      CascadeConfiguration: {
-        Assign: 'NoCascade',
-        Delete: 'RemoveLink',
-        Archive: 'RemoveLink',
-        Merge: 'Cascade',
-        Reparent: 'NoCascade',
-        Share: 'NoCascade',
-        Unshare: 'NoCascade',
-        RollupView: 'NoCascade',
-      },
-      Lookup: {
-        '@odata.type': 'Microsoft.Dynamics.CRM.LookupAttributeMetadata',
-        SchemaName: schemaName,
-        DisplayName: label(displayName),
-        RequiredLevel: required(requiredLevel),
-      },
-    }),
-  });
+  log(`creating lookup: ${referencingEntity}.${logicalName}`);
+  try {
+    await request('/RelationshipDefinitions', {
+      method: 'POST',
+      body: JSON.stringify({
+        '@odata.type': 'Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata',
+        SchemaName: relationshipSchemaName,
+        ReferencedEntity: referencedEntity,
+        ReferencingEntity: referencingEntity,
+        AssociatedMenuConfiguration: {
+          Behavior: 'UseLabel',
+          Group: 'Details',
+          Label: label(displayName),
+          Order: 10000,
+        },
+        CascadeConfiguration: {
+          Assign: 'NoCascade',
+          Delete: 'RemoveLink',
+          Archive: 'RemoveLink',
+          Merge: 'Cascade',
+          Reparent: 'NoCascade',
+          Share: 'NoCascade',
+          Unshare: 'NoCascade',
+          RollupView: 'NoCascade',
+        },
+        Lookup: {
+          '@odata.type': 'Microsoft.Dynamics.CRM.LookupAttributeMetadata',
+          SchemaName: schemaName,
+          DisplayName: label(displayName),
+          RequiredLevel: required(requiredLevel),
+        },
+      }),
+    });
+  } catch (error) {
+    const message = String(error.message || error);
+    if (!message.includes('already exists')) throw error;
+    log(`lookup create raced with existing metadata: ${referencingEntity}.${logicalName}`);
+  }
 
   const created = await waitForAttribute(referencingEntity, logicalName);
+  log(`lookup created: ${referencingEntity}.${logicalName}`);
   actions.push({ type: 'lookup', table: referencingEntity, name: logicalName, status: 'created' });
   return created;
 }
 
 async function publish() {
+  log('publishing customizations');
   await request('/PublishAllXml', { method: 'POST', body: JSON.stringify({}) });
+  log('publish completed');
   actions.push({ type: 'publish', status: 'completed' });
 }
 

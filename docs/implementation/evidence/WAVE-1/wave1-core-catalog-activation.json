@@ -1,0 +1,176 @@
+{
+  "generatedAt": "2026-07-08T11:47:27.724Z",
+  "apiBase": "https://jm1hq.crm.dynamics.com/api/data/v9.2",
+  "source": "Jackie Publisher Master Imprint Register Full List",
+  "counts": {
+    "registerRows": 121,
+    "titleFieldsCreated": 0,
+    "titleFieldsExisting": 15,
+    "contactFieldsCreated": 0,
+    "contactFieldsExisting": 3,
+    "lookupsCreated": 0,
+    "lookupsExisting": 0,
+    "titlesCreated": 121,
+    "titlesUpdated": 0,
+    "titlesHidden": 13
+  },
+  "samples": {
+    "created": [
+      {
+        "id": "69b21fc6-c27a-f111-ab0f-000d3a14673b",
+        "title": "365 Days of Transparency",
+        "slug": "365-days-of-transparency"
+      },
+      {
+        "id": "3e09d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "7 Step Jumpstart to Becoming Your Best Self",
+        "slug": "7-step-jumpstart-to-becoming-your-best-self"
+      },
+      {
+        "id": "6f8904ca-c27a-f111-ab0f-6045bdd69738",
+        "title": "A Blended Family",
+        "slug": "a-blended-family"
+      },
+      {
+        "id": "778904ca-c27a-f111-ab0f-6045bdd69738",
+        "title": "A Little Bit of Everything",
+        "slug": "a-little-bit-of-everything"
+      },
+      {
+        "id": "841a04cd-c27a-f111-ab0f-000d3a14673b",
+        "title": "A Principal's Tale",
+        "slug": "a-principal-s-tale"
+      },
+      {
+        "id": "3f09d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "A Trubie's Guide Pt. 1",
+        "slug": "a-truebies-guide-part-1"
+      },
+      {
+        "id": "848904ca-c27a-f111-ab0f-6045bdd69738",
+        "title": "A Trubie's Guide Pt. 2",
+        "slug": "a-truebies-guide-part-2"
+      },
+      {
+        "id": "79064bcd-c27a-f111-ab0f-00224820105b",
+        "title": "According to Mark",
+        "slug": "according-to-mark"
+      },
+      {
+        "id": "7a064bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Aligned!",
+        "slug": "aligned"
+      },
+      {
+        "id": "7b064bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Almost Happy",
+        "slug": "almost-happy"
+      },
+      {
+        "id": "4009d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "Are You Sure That You Are Ready?",
+        "slug": "are-you-sure-that-you-are-ready"
+      },
+      {
+        "id": "998797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "BEE Careful",
+        "slug": "bee-careful"
+      },
+      {
+        "id": "928904ca-c27a-f111-ab0f-6045bdd69738",
+        "title": "Biblical Prescriptions for Life's Troubles",
+        "slug": "biblical-prescriptions-for-life-s-troubles"
+      },
+      {
+        "id": "901a04cd-c27a-f111-ab0f-000d3a14673b",
+        "title": "Bodacious",
+        "slug": "bodacious"
+      },
+      {
+        "id": "938904ca-c27a-f111-ab0f-6045bdd69738",
+        "title": "Come Out of Hiding",
+        "slug": "come-out-of-hiding"
+      },
+      {
+        "id": "911a04cd-c27a-f111-ab0f-000d3a14673b",
+        "title": "Connected",
+        "slug": "connected"
+      },
+      {
+        "id": "9a8797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Conquer Your Fears and Win",
+        "slug": "conquer-your-fears-and-win"
+      },
+      {
+        "id": "9b8797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Destined to Break the Curse: Devotional",
+        "slug": "destined-to-break-the-curse-devotional"
+      },
+      {
+        "id": "80064bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Discipline and Direction",
+        "slug": "discipline-and-direction"
+      },
+      {
+        "id": "fb3174cd-c27a-f111-ab0f-6045bdd69435",
+        "title": "Establishing Glory 2: The Relationship Handbook (2nd Edition)",
+        "slug": "establishing-glory-2"
+      }
+    ],
+    "updated": [],
+    "hidden": [
+      {
+        "id": "036f60f3-9630-f111-88b4-000d3a14673b",
+        "title": "Test Case 3"
+      },
+      {
+        "id": "849589ee-f83a-f111-88b5-000d3a14673b",
+        "title": "Test Auto"
+      },
+      {
+        "id": "64a73a58-fa3a-f111-88b5-000d3a14673b",
+        "title": "Test Auto 2"
+      },
+      {
+        "id": "faae4193-e23d-f111-88b5-000d3a14673b",
+        "title": "Case C — Weak data"
+      },
+      {
+        "id": "6599139e-e43d-f111-88b5-000d3a14673b",
+        "title": "Test Case: Force AI execution 2"
+      },
+      {
+        "id": "d8dc87a3-8d3a-f111-88b5-00224820105b",
+        "title": "Test Case 1"
+      },
+      {
+        "id": "d7d1f88c-e23d-f111-88b5-00224820105b",
+        "title": "Case B — Medium data"
+      },
+      {
+        "id": "f1908dc9-5775-f111-ab0f-6045bdd69435",
+        "title": "Establishing Glory: The Library"
+      },
+      {
+        "id": "b3776854-1d3e-f111-88b5-6045bdd69678",
+        "title": "Test 1 — High Confidence"
+      },
+      {
+        "id": "aafe5815-1f3e-f111-88b5-6045bdd69738",
+        "title": "Test 2 — Mid Confidence"
+      },
+      {
+        "id": "df36aeb3-8d3a-f111-88b5-7c1e525b15c2",
+        "title": "Test Case 2"
+      },
+      {
+        "id": "b2838072-e23d-f111-88b5-7c1e525b15c2",
+        "title": "todays's new title"
+      },
+      {
+        "id": "f7e76384-e43d-f111-88b5-7c1e525b15c2",
+        "title": "Test Case: Force AI execution"
+      }
+    ]
+  }
+}

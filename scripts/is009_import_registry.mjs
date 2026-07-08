@@ -10,6 +10,7 @@ const stagingPath = process.env.IS009_STAGING_PATH || 'data/is009-publishing-ass
 const evidencePath =
   process.env.IS009_IMPORT_EVIDENCE ||
   'docs/implementation/evidence/IS-009/is009-registry-import-evidence.json';
+const progressEvery = Number(process.env.IS009_PROGRESS_EVERY || '25');
 
 if (!token) throw new Error('DATAVERSE_ACCESS_TOKEN is required.');
 
@@ -140,6 +141,10 @@ const evidence = {
     reconciliation: [],
   },
 };
+
+function log(message) {
+  console.error(`[is009-core-import] ${message}`);
+}
 
 function clean(value) {
   if (value === null || value === undefined) return '';
@@ -374,8 +379,6 @@ async function createExecutionLog(actionType, description, sourceEntity = 'is009
       jm1_actiontype: actionType,
       jm1_actiondescription: description,
       jm1_agentname: 'Cody Prime',
-      jm1_bandlevel: OPTION.bandLevel.Automation,
-      jm1_executionstatus: OPTION.executionStatus.Succeeded,
       jm1_startedon: now,
       jm1_completedon: new Date().toISOString(),
       jm1_sourceentity: sourceEntity,
@@ -386,6 +389,7 @@ async function createExecutionLog(actionType, description, sourceEntity = 'is009
 }
 
 const titleIdByKey = new Map();
+let processedTitles = 0;
 for (const title of staging.titleCandidates) {
   if (!title.title) continue;
   const existing = await findTitleByName(title.title);
@@ -399,6 +403,10 @@ for (const title of staging.titleCandidates) {
     evidence.counts.titlesCreated += 1;
     titleIdByKey.set(title.normalizedTitle, created.jm1pub_titleid);
   }
+  processedTitles += 1;
+  if (processedTitles % progressEvery === 0) {
+    log(`titles processed: ${processedTitles}/${staging.titleCandidates.length}`);
+  }
 }
 
 const marketplacesByAssetKey = new Map();
@@ -410,6 +418,7 @@ for (const row of staging.assetMarketplaceCandidates) {
 
 const assetIdByKey = new Map();
 const seenAssetKeys = new Set();
+let processedAssets = 0;
 
 for (const asset of staging.publishingAssetCandidates) {
   const titleId = titleIdByKey.get(asset.titleKey);
@@ -483,9 +492,14 @@ for (const asset of staging.publishingAssetCandidates) {
   if (evidence.samples.assetsCreated.length < 10) {
     evidence.samples.assetsCreated.push({ name, id: created.jm1pub_publishingassetid });
   }
+  processedAssets += 1;
+  if (processedAssets % progressEvery === 0) {
+    log(`assets processed: ${processedAssets}/${staging.publishingAssetCandidates.length}`);
+  }
 }
 
 const seenMarketplaceKeys = new Set();
+let processedMarketplaces = 0;
 for (const row of staging.assetMarketplaceCandidates) {
   const assetId = assetIdByKey.get(row.assetKey);
   if (!assetId) continue;
@@ -544,6 +558,10 @@ for (const row of staging.assetMarketplaceCandidates) {
   if (evidence.samples.marketplacesCreated.length < 10) {
     evidence.samples.marketplacesCreated.push({ name, id: created.jm1pub_assetmarketplaceid });
   }
+  processedMarketplaces += 1;
+  if (processedMarketplaces % progressEvery === 0) {
+    log(`marketplaces processed: ${processedMarketplaces}/${staging.assetMarketplaceCandidates.length}`);
+  }
 }
 
 await createExecutionLog(
@@ -553,6 +571,10 @@ await createExecutionLog(
 await createExecutionLog(
   'PAM_RECONCILIATION_QUEUE_GENERATED',
   `Generated reconciliation queue: ${evidence.reconciliation.assetsRequiringReconciliation} asset flags and ${evidence.reconciliation.marketplacesRequiringReconciliation} marketplace flags.`,
+);
+
+log(
+  `import complete: titles created ${evidence.counts.titlesCreated}, assets created ${evidence.counts.assetsCreated}, marketplaces created ${evidence.counts.marketplacesCreated}`,
 );
 
 mkdirSync(evidencePath.split('/').slice(0, -1).join('/'), { recursive: true });
