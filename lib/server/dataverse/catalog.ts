@@ -1,9 +1,6 @@
 import type {
   CatalogAuthorDetail,
   CatalogAuthorSummary,
-  CatalogFormat,
-  CatalogFormatIsbn,
-  CatalogPurchaseLink,
   CatalogReadResult,
   CatalogStats,
   CatalogTitleDetail,
@@ -18,64 +15,25 @@ type DataverseCatalogConfig = {
   environmentUrl?: string
   webApiBaseUrl: string
   titleEntitySet: string
-  assetEntitySet: string
-  marketplaceEntitySet: string
-  contactEntitySet: string
 }
 
 type DataverseRecord = Record<string, unknown>
 
 const DEFAULT_ENTITY_SETS = {
   titles: 'jm1pub_titles',
-  assets: 'jm1pub_publishingassets',
-  marketplaces: 'jm1pub_assetmarketplaces',
-  contacts: 'contacts',
 }
 
 const TITLE_SELECT = [
   'jm1pub_titleid',
-  'jm1pub_name',
-  'jm1pub_slug',
-  'jm1pub_subtitle',
-  'jm1pub_authordisplayname',
-  'jm1pub_authorname',
-  '_jm1pub_author_value',
-  'jm1pub_shortdescription',
-  'jm1pub_longdescription',
-  'jm1pub_certifiedimprint',
-  'jm1pub_genre',
-  'jm1pub_publicationstatus',
-  'jm1pub_releasedate',
-  'jm1pub_publicationyear',
-  'jm1pub_series',
-  'jm1pub_seriesorder',
-]
-
-const ASSET_SELECT = [
-  'jm1pub_publishingassetid',
-  'jm1pub_name',
-  'jm1pub_assetformat',
-  'jm1pub_isbn13',
-  'jm1pub_coverurl',
-  'jm1pub_assetstatus',
-]
-
-const MARKETPLACE_SELECT = [
-  'jm1pub_assetmarketplaceid',
-  'jm1pub_marketplace',
-  'jm1pub_marketplaceidentifier',
-  'jm1pub_listingurl',
-  'jm1pub_marketplacestatus',
-]
-
-const CONTACT_SELECT = [
-  'contactid',
-  'fullname',
-  'jm1pub_publicslug',
-  'jm1pub_publicauthorbio',
-  'jm1pub_authorphoto',
-  'address1_city',
-  'address1_stateorprovince',
+  'jm1pub_titlename',
+  'jm1pub_imprint',
+  '_jm1_primaryauthor_value',
+  'jm1_summary',
+  'jm1_subtitle',
+  'jm1_slug',
+  'jm1_releasedate',
+  'jm1_genre',
+  'jm1pub_status',
 ]
 
 export async function listPublicCatalogTitles(): Promise<CatalogReadResult<CatalogTitleSummary[]>> {
@@ -83,43 +41,37 @@ export async function listPublicCatalogTitles(): Promise<CatalogReadResult<Catal
     const titleRows = await dataverseGetCollection(config, token, config.titleEntitySet, {
       select: TITLE_SELECT,
       filter: 'statecode eq 0',
-      orderby: 'jm1pub_name asc',
+      orderby: 'jm1pub_titlename asc',
     })
 
-    const summaries = await Promise.all(titleRows.map((row) => buildTitleSummary(config, token, row)))
+    const summaries = titleRows.map((row) => buildTitleSummary(row))
     return summaries.filter((title) => title.title)
   })
 }
 
 export async function getPublicCatalogTitleBySlug(slug: string): Promise<CatalogReadResult<CatalogTitleDetail | null>> {
   return withCatalogRead(async (config, token) => {
-    const safeSlug = escapeODataString(slug)
     const titleRows = await dataverseGetCollection(config, token, config.titleEntitySet, {
       select: TITLE_SELECT,
-      filter: `statecode eq 0 and jm1pub_slug eq '${safeSlug}'`,
-      top: 1,
+      filter: 'statecode eq 0',
+      orderby: 'jm1pub_titlename asc',
     })
 
-    const row = titleRows[0]
-    if (!row) return null
+    const summaries = titleRows.map((row) => buildTitleSummary(row))
+    const summary = summaries.find((title) => title.slug === slug || title.id === slug)
+    if (!summary) return null
 
-    const summary = await buildTitleSummary(config, token, row)
-    const relatedResult = await listTitlesByCertifiedImprint(summary.certifiedImprint)
-    const relatedTitles = relatedResult.ok
-      ? relatedResult.data.filter((title) => title.id !== summary.id).slice(0, 4)
-      : []
+    const relatedTitles = summaries
+      .filter((title) => title.id !== summary.id && title.certifiedImprint === summary.certifiedImprint)
+      .slice(0, 4)
 
     return {
       ...summary,
-      longDescription: stringField(row, 'jm1pub_longdescription'),
-      series: stringField(row, 'jm1pub_series'),
-      seriesOrder: numberField(row, 'jm1pub_seriesorder'),
+      longDescription: stringField(titleRows.find((row) => stringField(row, 'jm1pub_titleid') === summary.id) || {}, 'jm1_summary'),
+      series: '',
+      seriesOrder: null,
       keywords: buildKeywords(summary),
-      marketplaceIdentifiers: summary.purchaseLinks.map((link) => ({
-        marketplace: link.retailer,
-        identifier: '',
-        status: link.marketplaceStatus,
-      })),
+      marketplaceIdentifiers: [],
       relatedTitles,
     }
   })
@@ -127,56 +79,36 @@ export async function getPublicCatalogTitleBySlug(slug: string): Promise<Catalog
 
 export async function listPublicAuthors(): Promise<CatalogReadResult<CatalogAuthorSummary[]>> {
   return withCatalogRead(async (config, token) => {
-    const [contactRows, titleRows] = await Promise.all([
-      dataverseGetCollection(config, token, config.contactEntitySet, {
-        select: CONTACT_SELECT,
-        filter: 'statecode eq 0 and jm1pub_isauthor eq true',
-        orderby: 'fullname asc',
-      }).catch(() => []),
-      dataverseGetCollection(config, token, config.titleEntitySet, {
-        select: TITLE_SELECT,
-        filter: 'statecode eq 0',
-        orderby: 'jm1pub_name asc',
-      }),
-    ])
+    const titleRows = await dataverseGetCollection(config, token, config.titleEntitySet, {
+      select: TITLE_SELECT,
+      filter: 'statecode eq 0',
+      orderby: 'jm1pub_titlename asc',
+    })
 
-    const titles = await Promise.all(titleRows.map((row) => buildTitleSummary(config, token, row)))
-    return buildAuthorSummaries(contactRows, titles)
+    const titles = titleRows.map((row) => buildTitleSummary(row))
+    return buildAuthorSummaries(titles)
   })
 }
 
 export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadResult<CatalogAuthorDetail | null>> {
   return withCatalogRead(async (config, token) => {
-    const [contactRows, titleRows] = await Promise.all([
-      dataverseGetCollection(config, token, config.contactEntitySet, {
-        select: CONTACT_SELECT,
-        filter: 'statecode eq 0 and jm1pub_isauthor eq true',
-        orderby: 'fullname asc',
-      }).catch(() => []),
-      dataverseGetCollection(config, token, config.titleEntitySet, {
-        select: TITLE_SELECT,
-        filter: 'statecode eq 0',
-        orderby: 'jm1pub_name asc',
-      }),
-    ])
+    const titleRows = await dataverseGetCollection(config, token, config.titleEntitySet, {
+      select: TITLE_SELECT,
+      filter: 'statecode eq 0',
+      orderby: 'jm1pub_titlename asc',
+    })
 
-    const titles = await Promise.all(titleRows.map((row) => buildTitleSummary(config, token, row)))
-    const summaries = buildAuthorSummaries(contactRows, titles)
+    const titles = titleRows.map((row) => buildTitleSummary(row))
+    const summaries = buildAuthorSummaries(titles)
     const summary = summaries.find((author) => author.slug === slug)
     if (!summary) return null
 
     const authorTitles = titles.filter((title) => title.authors.some((author) => author.slug === summary.slug))
-    const contact = contactRows.find((row) => {
-      const publicSlug = stringField(row, 'jm1pub_publicslug') || slugify(stringField(row, 'fullname'))
-      return publicSlug === summary.slug
-    })
 
     return {
       ...summary,
-      longBio: contact ? stringField(contact, 'jm1pub_publicauthorbio') || summary.shortBio : summary.shortBio,
-      location: contact
-        ? [stringField(contact, 'address1_city'), stringField(contact, 'address1_stateorprovince')].filter(Boolean).join(', ')
-        : '',
+      longBio: summary.shortBio,
+      location: '',
       specialties: summary.genres,
       titles: authorTitles,
     }
@@ -185,58 +117,39 @@ export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadRe
 
 export async function listTitlesByCertifiedImprint(imprint: string): Promise<CatalogReadResult<CatalogTitleSummary[]>> {
   return withCatalogRead(async (config, token) => {
-    const safeImprint = escapeODataString(imprint)
     const rows = await dataverseGetCollection(config, token, config.titleEntitySet, {
       select: TITLE_SELECT,
-      filter: `statecode eq 0 and jm1pub_certifiedimprint eq '${safeImprint}'`,
-      orderby: 'jm1pub_name asc',
+      filter: 'statecode eq 0',
+      orderby: 'jm1pub_titlename asc',
     })
 
-    return Promise.all(rows.map((row) => buildTitleSummary(config, token, row)))
+    return rows
+      .map((row) => buildTitleSummary(row))
+      .filter((title) => title.certifiedImprint === imprint)
   })
 }
 
 export async function getCatalogStats(): Promise<CatalogReadResult<CatalogStats>> {
   return withCatalogRead(async (config, token) => {
-    const [titles, authors] = await Promise.all([
-      dataverseGetCollection(config, token, config.titleEntitySet, {
-        select: ['jm1pub_titleid', 'jm1pub_certifiedimprint'],
-        filter: 'statecode eq 0',
-      }),
-      dataverseGetCollection(config, token, config.contactEntitySet, {
-        select: ['contactid'],
-        filter: 'statecode eq 0 and jm1pub_isauthor eq true',
-      }),
-    ])
+    const titleRows = await dataverseGetCollection(config, token, config.titleEntitySet, {
+      select: TITLE_SELECT,
+      filter: 'statecode eq 0',
+    })
+    const titles = titleRows.map((row) => buildTitleSummary(row))
+    const authors = buildAuthorSummaries(titles)
 
     return {
       totalTitles: titles.length,
       activeAuthors: authors.length,
-      imprintCount: new Set(titles.map((title) => stringField(title, 'jm1pub_certifiedimprint')).filter(Boolean)).size,
+      imprintCount: new Set(titles.map((title) => title.certifiedImprint).filter(Boolean)).size,
       lastUpdated: new Date().toISOString(),
     }
   })
 }
 
 
-function buildAuthorSummaries(contactRows: DataverseRecord[], titles: CatalogTitleSummary[]): CatalogAuthorSummary[] {
+function buildAuthorSummaries(titles: CatalogTitleSummary[]): CatalogAuthorSummary[] {
   const bySlug = new Map<string, CatalogAuthorSummary>()
-
-  for (const row of contactRows) {
-    const name = stringField(row, 'fullname')
-    if (!name) continue
-    const slug = stringField(row, 'jm1pub_publicslug') || slugify(name)
-    bySlug.set(slug, {
-      contactId: stringField(row, 'contactid'),
-      slug,
-      name,
-      shortBio: stringField(row, 'jm1pub_publicauthorbio') || 'J Merrill Publishing author family.',
-      photoUrl: stringField(row, 'jm1pub_authorphoto'),
-      titleCount: 0,
-      genres: [],
-      imprints: [],
-    })
-  }
 
   for (const title of titles) {
     for (const link of title.authors) {
@@ -260,42 +173,21 @@ function buildAuthorSummaries(contactRows: DataverseRecord[], titles: CatalogTit
   }
 
   return Array.from(bySlug.values())
-    .filter((author) => author.titleCount > 0 || author.contactId)
+    .filter((author) => author.titleCount > 0)
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 
-async function buildTitleSummary(
-  config: DataverseCatalogConfig,
-  token: string,
-  row: DataverseRecord,
-): Promise<CatalogTitleSummary> {
-  const id = stringField(row, 'jm1pub_titleid')
-  const [assets, marketplaces] = id
-    ? await Promise.all([
-        dataverseGetCollection(config, token, config.assetEntitySet, {
-          select: ASSET_SELECT,
-          filter: `_jm1pub_title_value eq ${id}`,
-        }).catch(() => []),
-        dataverseGetCollection(config, token, config.marketplaceEntitySet, {
-          select: MARKETPLACE_SELECT,
-          filter: `_jm1pub_title_value eq ${id}`,
-        }).catch(() => []),
-      ])
-    : [[], []]
-
-  const formatIsbns = assets.map(mapAssetFormatIsbn).filter((asset) => asset.isbn)
-  const purchaseLinks = marketplaces.map(mapMarketplaceLink).filter((link) => link.href)
-  const releaseDate = dateField(row, 'jm1pub_releasedate')
-  const year = numberField(row, 'jm1pub_publicationyear')
-  const title = stringField(row, 'jm1pub_name')
+function buildTitleSummary(row: DataverseRecord): CatalogTitleSummary {
+  const title = stringField(row, 'jm1pub_titlename')
+  const releaseDate = dateField(row, 'jm1_releasedate')
   const authorDisplayName = resolveAuthorDisplayName(row)
-  const authorLookupId = stringField(row, '_jm1pub_author_value')
+  const authorLookupId = stringField(row, '_jm1_primaryauthor_value')
 
   return {
-    id,
-    slug: stringField(row, 'jm1pub_slug') || slugify(title),
+    id: stringField(row, 'jm1pub_titleid'),
+    slug: stringField(row, 'jm1_slug') || slugify(title),
     title,
-    subtitle: stringField(row, 'jm1pub_subtitle'),
+    subtitle: stringField(row, 'jm1_subtitle'),
     authorDisplayName,
     authors: authorDisplayName
       ? [
@@ -308,18 +200,26 @@ async function buildTitleSummary(
           },
         ]
       : [],
-    certifiedImprint: stringField(row, 'jm1pub_certifiedimprint'),
-    genre: stringField(row, 'jm1pub_genre') || 'General Interest',
-    publicationStatus: stringField(row, 'jm1pub_publicationstatus'),
+    certifiedImprint:
+      stringField(row, 'jm1pub_imprint@OData.Community.Display.V1.FormattedValue') ||
+      stringField(row, 'jm1pub_imprint') ||
+      'J Merrill Publishing',
+    genre:
+      stringField(row, 'jm1_genre@OData.Community.Display.V1.FormattedValue') ||
+      stringField(row, 'jm1_genre') ||
+      'General Interest',
+    publicationStatus:
+      stringField(row, 'jm1pub_status@OData.Community.Display.V1.FormattedValue') ||
+      stringField(row, 'jm1pub_status'),
     releaseDate,
-    displayYear: releaseDate ? releaseDate.slice(0, 4) : year ? String(year) : 'Catalog',
-    formats: normalizeFormats(formatIsbns),
-    primaryIsbn: formatIsbns[0]?.isbn || '',
-    isbnByFormat: formatIsbns,
-    coverUrl: firstString(assets, 'jm1pub_coverurl'),
-    shortDescription: stringField(row, 'jm1pub_shortdescription'),
-    purchaseLinks,
-    marketplaceStatus: purchaseLinks[0]?.marketplaceStatus || '',
+    displayYear: releaseDate ? releaseDate.slice(0, 4) : 'Catalog',
+    formats: ['Other'],
+    primaryIsbn: '',
+    isbnByFormat: [],
+    coverUrl: '',
+    shortDescription: stringField(row, 'jm1_summary'),
+    purchaseLinks: [],
+    marketplaceStatus: '',
   }
 }
 
@@ -364,9 +264,6 @@ function getCatalogConfig(): { ok: true; value: DataverseCatalogConfig } | { ok:
     environmentUrl,
     webApiBaseUrl,
     titleEntitySet: process.env.DATAVERSE_CATALOG_TITLE_ENTITY_SET || DEFAULT_ENTITY_SETS.titles,
-    assetEntitySet: process.env.DATAVERSE_CATALOG_ASSET_ENTITY_SET || DEFAULT_ENTITY_SETS.assets,
-    marketplaceEntitySet: process.env.DATAVERSE_CATALOG_MARKETPLACE_ENTITY_SET || DEFAULT_ENTITY_SETS.marketplaces,
-    contactEntitySet: process.env.DATAVERSE_CATALOG_CONTACT_ENTITY_SET || DEFAULT_ENTITY_SETS.contacts,
   }
 
   const requiredConfig = {
@@ -376,9 +273,6 @@ function getCatalogConfig(): { ok: true; value: DataverseCatalogConfig } | { ok:
     resourceUrl: config.resourceUrl,
     webApiBaseUrl: config.webApiBaseUrl,
     titleEntitySet: config.titleEntitySet,
-    assetEntitySet: config.assetEntitySet,
-    marketplaceEntitySet: config.marketplaceEntitySet,
-    contactEntitySet: config.contactEntitySet,
   }
 
   const missing = Object.entries(requiredConfig)
@@ -449,40 +343,6 @@ async function dataverseGetCollection(
   const json = await response.json()
   return isRecord(json) && Array.isArray(json.value) ? (json.value as DataverseRecord[]) : []
 }
-
-function mapAssetFormatIsbn(row: DataverseRecord): CatalogFormatIsbn {
-  return {
-    assetId: stringField(row, 'jm1pub_publishingassetid'),
-    format: normalizeFormat(stringField(row, 'jm1pub_assetformat')),
-    isbn: stringField(row, 'jm1pub_isbn13'),
-    assetStatus: stringField(row, 'jm1pub_assetstatus'),
-  }
-}
-
-function mapMarketplaceLink(row: DataverseRecord): CatalogPurchaseLink {
-  const marketplace = stringField(row, 'jm1pub_marketplace')
-  return {
-    retailer: marketplace,
-    label: marketplace,
-    href: stringField(row, 'jm1pub_listingurl'),
-    marketplaceStatus: stringField(row, 'jm1pub_marketplacestatus'),
-  }
-}
-
-function normalizeFormats(items: CatalogFormatIsbn[]): CatalogFormat[] {
-  const formats = items.map((item) => item.format).filter(Boolean)
-  return Array.from(new Set(formats.length ? formats : ['Other']))
-}
-
-function normalizeFormat(value: string): CatalogFormat {
-  const normalized = value.toLowerCase()
-  if (normalized.includes('paperback')) return 'Paperback'
-  if (normalized.includes('hardcover')) return 'Hardcover'
-  if (normalized.includes('ebook') || normalized.includes('e-book')) return 'eBook'
-  if (normalized.includes('audio')) return 'Audiobook'
-  return 'Other'
-}
-
 function buildKeywords(summary: CatalogTitleSummary) {
   return Array.from(
     new Set(
@@ -497,9 +357,9 @@ function buildKeywords(summary: CatalogTitleSummary) {
 
 function resolveAuthorDisplayName(row: DataverseRecord) {
   return (
-    stringField(row, 'jm1pub_authordisplayname') ||
-    stringField(row, 'jm1pub_authorname') ||
-    stringField(row, '_jm1pub_author_value@OData.Community.Display.V1.FormattedValue')
+    stringField(row, '_jm1_primaryauthor_value@OData.Community.Display.V1.FormattedValue') ||
+    stringField(row, '_jm1_author_value@OData.Community.Display.V1.FormattedValue') ||
+    stringField(row, '_jm1pub_authoraccount_value@OData.Community.Display.V1.FormattedValue')
   )
 }
 
@@ -508,30 +368,13 @@ function stringField(row: DataverseRecord, key: string) {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-function numberField(row: DataverseRecord, key: string) {
-  const value = row[key]
-  return typeof value === 'number' && Number.isFinite(value) ? value : null
-}
-
 function dateField(row: DataverseRecord, key: string) {
   const value = stringField(row, key)
   return /^\d{4}-\d{2}-\d{2}/.test(value) ? value.slice(0, 10) : ''
 }
 
-function firstString(rows: DataverseRecord[], key: string) {
-  for (const row of rows) {
-    const value = stringField(row, key)
-    if (value) return value
-  }
-  return ''
-}
-
 function cleanUrl(value?: string) {
   return value?.trim().replace(/\/+$/, '')
-}
-
-function escapeODataString(value: string) {
-  return value.replace(/'/g, "''")
 }
 
 function slugify(value: string) {
