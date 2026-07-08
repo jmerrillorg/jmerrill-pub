@@ -38,10 +38,21 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
     setError('')
 
     try {
+      const search = new URLSearchParams(window.location.search)
+      const requestedReference =
+        search.get('reference') ||
+        search.get('ref') ||
+        search.get('intakeReference') ||
+        ''
+
       const response = await fetch('/api/author/gate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, scope }),
+        body: JSON.stringify({
+          code,
+          scope,
+          reference: requestedReference || undefined,
+        }),
       })
       const data = (await response.json()) as GateResponse
       if (!response.ok) throw new Error(data.error || 'Invalid access code.')

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateAuthorAccessCode, validateAuthorPortalAccessCode, type AuthorAccessScope } from '@/lib/server/author-access'
+
+import { validateAuthorAccessCode, type AuthorAccessScope } from '@/lib/server/author-access'
+import { createAuthorPortalGateResponse } from '@/lib/server/author-portal-context'
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,18 +10,14 @@ export async function POST(req: NextRequest) {
     const scope: AuthorAccessScope = body.scope === 'portal' ? 'portal' : 'forms'
 
     if (scope === 'portal') {
-      const result = validateAuthorPortalAccessCode(code)
-      if (!result.success) {
-        return NextResponse.json(
-          { error: 'Invalid access code.' },
-          { status: 401 },
-        )
-      }
-
-      return NextResponse.json({
-        success: true,
-        accessType: result.accessType,
-        portalContext: result.portalContext || null,
+      return createAuthorPortalGateResponse({
+        code,
+        requestedReference:
+          typeof body.reference === 'string'
+            ? body.reference.trim()
+            : typeof body.intakeReference === 'string'
+              ? body.intakeReference.trim()
+              : undefined,
       })
     }
 
