@@ -31,6 +31,12 @@ jobs:
       - name: Build and Deploy
         id: builddeploy
         uses: azure/static-web-apps-deploy@latest
+        env:
+          DATAVERSE_TENANT_ID: ${{ secrets.DATAVERSE_TENANT_ID }}
+          DATAVERSE_CLIENT_ID: ${{ secrets.DATAVERSE_CLIENT_ID }}
+          DATAVERSE_CLIENT_SECRET: ${{ secrets.DATAVERSE_CLIENT_SECRET }}
+          DATAVERSE_RESOURCE_URL: ${{ secrets.DATAVERSE_RESOURCE_URL }}
+          DATAVERSE_WEB_API_BASE_URL: ${{ secrets.DATAVERSE_WEB_API_BASE_URL }}
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
