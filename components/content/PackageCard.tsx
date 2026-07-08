@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { PublishingPackageRecord } from '@/lib/content'
+import type { PublishingPackageRecord } from '@/lib/marketing-content'
 
 export function PackageCard({ pkg, dark = false }: { pkg: PublishingPackageRecord; dark?: boolean }) {
   return (

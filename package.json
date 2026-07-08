@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit --incremental false"
+    "type-check": "tsc --noEmit --incremental false",
+    "catalog-source-guard": "node scripts/check-catalog-runtime-source.mjs"
   },
   "dependencies": {
     "next": "^14.2.0",

@@ -4,27 +4,54 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { CTASection } from '@/components/content/CTASection'
 import { BookCard } from '@/components/content/BookCard'
-import { authorCatalog, getAuthorBySlug } from '@/lib/content'
+import { catalogTitleToBookCardRecord } from '@/lib/catalog/display'
+import { getPublicAuthorBySlug } from '@/lib/server/dataverse/catalog'
 
 type Props = { params: { slug: string } }
 
-export async function generateStaticParams() {
-  return authorCatalog.map((author) => ({ slug: author.slug }))
+export const dynamic = 'force-dynamic'
+
+function AuthorUnavailable() {
+  return (
+    <div className="min-h-screen bg-[#070710] pt-[76px]">
+      <div className="mx-auto max-w-[820px] px-6 py-24 text-center sm:px-12">
+        <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-blue-400">Author profile temporarily unavailable</div>
+        <h1 className="text-white" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(32px,5vw,56px)', fontWeight: 700 }}>
+          This author profile is being refreshed.
+        </h1>
+        <p className="mx-auto mt-5 max-w-[620px] text-[15px] font-light leading-[1.8] text-white/45">
+          Author profiles are served from J Merrill Publishing enterprise records. Please return to the directory or contact us if you need help with a specific author.
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link href="/authors" className="rounded-full bg-blue-500 px-7 py-3 text-[13px] font-semibold text-white transition-colors hover:bg-blue-600">
+            Back to Authors
+          </Link>
+          <Link href="/contact" className="rounded-full border border-white/15 px-7 py-3 text-[13px] text-white/60 transition-all hover:border-blue-500 hover:text-blue-400">
+            Contact Us
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const author = getAuthorBySlug(params.slug)
-  if (!author) return { title: 'Author Not Found' }
+  const result = await getPublicAuthorBySlug(params.slug)
+  if (!result.ok) return { title: 'Author Profile Temporarily Unavailable' }
+  if (!result.data) return { title: 'Author Not Found' }
 
   return {
-    title: author.name,
-    description: author.shortBio,
+    title: result.data.name,
+    description: result.data.shortBio,
   }
 }
 
-export default function AuthorProfilePage({ params }: Props) {
-  const author = getAuthorBySlug(params.slug)
-  if (!author) notFound()
+export default async function AuthorProfilePage({ params }: Props) {
+  const result = await getPublicAuthorBySlug(params.slug)
+  if (!result.ok) return <AuthorUnavailable />
+  if (!result.data) notFound()
+
+  const author = result.data
 
   return (
     <div className="pt-[76px]">
@@ -41,7 +68,7 @@ export default function AuthorProfilePage({ params }: Props) {
           <div className="mt-10 grid gap-12 lg:grid-cols-[280px_1fr] lg:items-center">
             <div className="relative h-[320px] overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.03]">
               {author.photoUrl ? (
-                <Image src={author.photoUrl} alt={author.name} fill className="object-cover" sizes="280px" />
+                <Image src={author.photoUrl} alt={author.name} fill className="object-cover" sizes="280px" unoptimized={author.photoUrl.startsWith('http')} />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-[72px] font-semibold text-blue-400">
                   {author.name.charAt(0)}
@@ -60,14 +87,16 @@ export default function AuthorProfilePage({ params }: Props) {
               >
                 {author.name}
               </h1>
-              <p className="mt-5 max-w-[760px] text-[18px] font-light leading-[1.8] text-white/50">{author.longBio}</p>
+              <p className="mt-5 max-w-[760px] text-[18px] font-light leading-[1.8] text-white/50">
+                {author.longBio || author.shortBio || 'J Merrill Publishing author family.'}
+              </p>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
                   { label: 'Titles in catalog', value: String(author.titleCount) },
                   { label: 'Primary genres', value: author.genres.slice(0, 2).join(', ') || 'Publishing catalog' },
-                  { label: 'Imprints', value: author.imprints.slice(0, 2).join(', ') },
-                  { label: 'Location', value: author.location },
+                  { label: 'Imprints', value: author.imprints.slice(0, 2).join(', ') || 'J Merrill Publishing' },
+                  { label: 'Location', value: author.location || 'J Merrill Publishing author family' },
                 ].map((item) => (
                   <div key={item.label} className="rounded-xl border border-white/8 bg-white/[0.03] px-4 py-4">
                     <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.1em] text-white/20">{item.label}</div>
@@ -98,15 +127,21 @@ export default function AuthorProfilePage({ params }: Props) {
               </h2>
             </div>
             <blockquote className="rounded-[24px] border border-gray-200 bg-[#F7F8FA] p-6 text-[15px] font-light leading-[1.8] text-gray-500">
-              “{author.featuredQuote}”
+              “Every author page should make the person behind the work visible.”
             </blockquote>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {author.books.map((book) => (
-              <BookCard key={book.id} book={book} compact />
-            ))}
-          </div>
+          {author.titles.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {author.titles.map((book) => (
+                <BookCard key={book.id} book={catalogTitleToBookCardRecord(book)} compact />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[28px] border border-gray-200 bg-[#F7F8FA] px-6 py-8 text-[15px] font-light text-gray-500">
+              Public title records for this author are being refreshed.
+            </div>
+          )}
         </div>
       </section>
 

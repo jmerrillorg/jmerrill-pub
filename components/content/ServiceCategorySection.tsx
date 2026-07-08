@@ -1,4 +1,4 @@
-import type { ServiceCategoryRecord } from '@/lib/content'
+import type { ServiceCategoryRecord } from '@/lib/marketing-content'
 
 export function ServiceCategorySection({ category }: { category: ServiceCategoryRecord }) {
   return (

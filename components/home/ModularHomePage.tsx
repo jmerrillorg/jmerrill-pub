@@ -1,4 +1,6 @@
 import { HeroSection } from '@/components/sections/HeroSection'
+import { catalogTitleToBookCardRecord } from '@/lib/catalog/display'
+import { listPublicCatalogTitles } from '@/lib/server/dataverse/catalog'
 import {
   PackagesSection,
   ClosingCTA,
@@ -11,7 +13,10 @@ import {
   BookAnalyzerSection,
 } from '@/components/sections/UpgradedSections'
 
-export function ModularHomePage() {
+export async function ModularHomePage() {
+  const catalogResult = await listPublicCatalogTitles()
+  const featuredTitles = catalogResult.ok ? catalogResult.data.slice(0, 12).map(catalogTitleToBookCardRecord) : []
+
   return (
     <>
       <HeroSection />
@@ -20,7 +25,7 @@ export function ModularHomePage() {
       <HowPublishingWorksSection />
       <BookAnalyzerSection />
       <PackagesSection />
-      <FeaturedTitlesSection />
+      <FeaturedTitlesSection titles={featuredTitles} unavailable={!catalogResult.ok} />
       <ClosingCTA />
     </>
   )

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { bookCatalog, imprintCatalog } from '@/lib/content'
+import type { BookCardRecord } from '@/components/content/BookCard'
 import { imprints } from '@/lib/tokens'
 
 // ─────────────────────────────────────────────────────────────
@@ -353,17 +353,18 @@ export function PublishingSystemSection() {
 // ─────────────────────────────────────────────────────────────
 // FIX 2: FEATURED TITLES — sorted desc by year w/ imprint badges + filter
 // ─────────────────────────────────────────────────────────────
-export function FeaturedTitlesSection() {
+export function FeaturedTitlesSection({ titles, unavailable = false }: { titles: BookCardRecord[]; unavailable?: boolean }) {
   const [activeImprint, setActiveImprint] = useState<string>('all')
   const [showCount, setShowCount] = useState(6)
 
+  const imprints = Array.from(new Set(titles.map((book) => book.imprint).filter(Boolean))).sort()
   const imprintIdToName = Object.fromEntries(
-    imprintCatalog.map((imprint) => [imprint.toLowerCase().replace(/[^a-z0-9]+/g, '-'), imprint]),
+    imprints.map((imprintName) => [imprintName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''), imprintName]),
   ) as Record<string, string>
 
   const filtered = activeImprint === 'all'
-    ? bookCatalog
-    : bookCatalog.filter((book) => book.imprint === imprintIdToName[activeImprint])
+    ? titles
+    : titles.filter((book) => book.imprint === imprintIdToName[activeImprint])
 
   const displayed = filtered.slice(0, showCount)
 
@@ -377,9 +378,9 @@ export function FeaturedTitlesSection() {
 
   const filters = [
     { id: 'all', label: 'All Titles', count: '125+', showCount: true },
-    ...imprintCatalog.map((imprint) => ({
-      id: imprint.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-      label: imprint,
+    ...imprints.map((imprintName) => ({
+      id: imprintName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+      label: imprintName,
       count: '',
       showCount: false,
     })),
@@ -428,6 +429,11 @@ export function FeaturedTitlesSection() {
         </div>
 
         {/* Cover wall */}
+        {unavailable ? (
+          <div className="rounded-[28px] border border-white/10 bg-white/[0.03] px-6 py-8 text-[15px] font-light text-white/45">
+            Featured books are temporarily unavailable while the enterprise catalog refreshes.
+          </div>
+        ) : (
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 reveal reveal-delay-1">
           {displayed.map((book, i) => {
             const colorClass = imprintColors[book.imprint] || 'bg-white/10 text-white/40 border-white/15'
@@ -502,6 +508,7 @@ export function FeaturedTitlesSection() {
             )
           })}
         </div>
+        )}
 
         <div className="flex items-center justify-center gap-4 mt-8">
           <p className="text-[13px] text-white/25">

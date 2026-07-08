@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { ModularHomePage } from '@/components/home/ModularHomePage'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'J Merrill Publishing, Inc. — Your Words. Your Legacy. Your Rights.',
   description:

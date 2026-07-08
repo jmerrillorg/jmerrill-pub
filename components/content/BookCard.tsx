@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import type { BookRecord } from '@/lib/content'
 import { getImprintStrategyByLabel } from '@/data/imprints'
 
 const IMPRINT_STYLES: Record<string, { pill: string; gradient: string }> = {
@@ -26,7 +25,19 @@ const IMPRINT_STYLES: Record<string, { pill: string; gradient: string }> = {
   },
 }
 
-export function BookCard({ book, compact = false }: { book: BookRecord; compact?: boolean }) {
+export type BookCardRecord = {
+  id: string
+  title: string
+  authorName: string
+  imprint: string
+  coverUrl: string
+  shortDescription: string
+  formats: string[]
+  availablePurchaseLinks: Array<{ retailer: string; label: string; href: string }>
+  displayYear?: string
+}
+
+export function BookCard({ book, compact = false }: { book: BookCardRecord; compact?: boolean }) {
   const style = IMPRINT_STYLES[book.imprint] || {
     pill: 'border-blue-700/30 bg-blue-950/60 text-blue-200',
     gradient: 'linear-gradient(145deg,#0F1C2E,#070710)',
