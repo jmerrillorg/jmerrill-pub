@@ -86,7 +86,18 @@ export function AuthorPortalWorkspace() {
         setState('ready')
       } catch (err) {
         if (!mounted) return
-        setError(err instanceof Error ? err.message : 'We could not load your workspace right now.')
+        if (bootstrap) {
+          setContext(bootstrap)
+          setState('ready')
+          return
+        }
+
+        const message = err instanceof Error ? err.message : ''
+        setError(
+          message && message !== 'Failed to fetch'
+            ? message
+            : 'We could not load your workspace right now. Please try again or contact publishing@jmerrill.one.',
+        )
         setState('error')
       }
     }
@@ -136,7 +147,7 @@ export function AuthorPortalWorkspace() {
   const multipleProjects = context.projects.length > 1
   const selectedProject = findProjectForSelection(context, selectedParams) || context.currentProject
   const selectedEditorial =
-    selectedProject.workspaceState === 'active_editorial' &&
+    isEditorialWorkspaceState(selectedProject.workspaceState) &&
     selectedProject.key === context.currentProject.key &&
     context.editorial
       ? context.editorial
@@ -155,6 +166,21 @@ export function AuthorPortalWorkspace() {
         <p className="mt-3 max-w-[760px] text-[14px] font-light leading-[1.8] text-white/55">
           We opened the workspace for your current project instead of starting a brand-new author setup.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.08em] text-white/45">
+          <span className="rounded-full border border-white/10 px-3 py-1">{context.relationship.classificationStatus}</span>
+          <span className="rounded-full border border-white/10 px-3 py-1">
+            Relationship {relationshipActivationLabel(context.relationship.activationStatus)}
+          </span>
+          <span className="rounded-full border border-white/10 px-3 py-1">
+            Author profile {context.relationship.authorProfileStatus}
+          </span>
+          <span className="rounded-full border border-white/10 px-3 py-1">
+            Stripe {context.relationship.stripeConnectStatus}
+          </span>
+          <span className="rounded-full border border-white/10 px-3 py-1">
+            Tax profile {context.relationship.taxStatus}
+          </span>
+        </div>
         <div className="mt-6 rounded-3xl border border-white/10 bg-black/15 p-5">
           <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Current project</p>
           <h3 className="mt-2 text-[20px] font-semibold text-white">{selectedProject.title}</h3>
@@ -165,6 +191,11 @@ export function AuthorPortalWorkspace() {
           {selectedProject.pendingApprovalLabel ? (
             <p className="mt-2 text-[12px] uppercase tracking-[0.08em] text-amber-200/85">
               Pending approval: {selectedProject.pendingApprovalLabel}
+            </p>
+          ) : null}
+          {!selectedEditorial && selectedProject.contractStatusInternal ? (
+            <p className="mt-2 text-[12px] leading-[1.7] text-white/35">
+              Historical title / legacy project
             </p>
           ) : null}
         </div>
@@ -230,12 +261,12 @@ export function AuthorPortalWorkspace() {
                     : 'border-white/8 bg-black/15 hover:border-blue-300/30 hover:bg-blue-500/[0.06]'
                 }`}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="text-[14px] font-medium text-white/85">{project.title}</div>
-                  <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.08em] text-white/55">
-                    {project.workspaceState === 'active_editorial' ? 'Active' : 'Setup'}
-                  </span>
-                </div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="text-[14px] font-medium text-white/85">{project.title}</div>
+                <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.08em] text-white/55">
+                    {projectStateBadge(project.workspaceState)}
+                </span>
+              </div>
                 <div className="mt-2 text-[12px] text-white/40">{project.statusLabel}</div>
                 {project.nextActionLabel ? (
                   <div className="mt-2 text-[12px] leading-[1.6] text-blue-200/80">{project.nextActionLabel}</div>
@@ -245,6 +276,11 @@ export function AuthorPortalWorkspace() {
                     Pending approval: {project.pendingApprovalLabel}
                   </div>
                 ) : null}
+                {project.workspaceState === 'published_legacy' ? (
+                  <div className="mt-2 text-[11px] uppercase tracking-[0.08em] text-white/45">
+                    Historical title / legacy project
+                  </div>
+                ) : null}
               </Link>
             ))}
           </div>
@@ -252,6 +288,19 @@ export function AuthorPortalWorkspace() {
       </section>
     </div>
   )
+}
+
+function relationshipActivationLabel(
+  status: AuthorPortalContext['relationship']['activationStatus'],
+) {
+  switch (status) {
+    case 'activated':
+      return 'Activated'
+    case 'validated':
+      return 'Validated'
+    default:
+      return 'Pending Validation'
+  }
 }
 
 function findProjectForSelection(
@@ -369,5 +418,30 @@ async function safeReadJson(response: Response) {
     return JSON.parse(text) as { context?: AuthorPortalContext; error?: string }
   } catch {
     return null
+  }
+}
+
+function isEditorialWorkspaceState(state: AuthorPortalContext['projects'][number]['workspaceState']) {
+  return (
+    state === 'editorial_review' ||
+    state === 'editorial_in_progress' ||
+    state === 'production_in_progress' ||
+    state === 'distribution_release_pending'
+  )
+}
+
+function projectStateBadge(state: AuthorPortalContext['projects'][number]['workspaceState']) {
+  switch (state) {
+    case 'editorial_review':
+    case 'editorial_in_progress':
+    case 'production_in_progress':
+    case 'distribution_release_pending':
+      return 'Active'
+    case 'published_legacy':
+      return 'Legacy'
+    case 'archived':
+      return 'Archived'
+    default:
+      return 'Setup'
   }
 }

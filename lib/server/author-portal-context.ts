@@ -28,7 +28,16 @@ export type AuthorPortalProjectSummary = {
   statusLabel: string
   nextActionLabel?: string
   pendingApprovalLabel?: string
-  workspaceState: 'pre_contract' | 'active_editorial'
+  contractStatusInternal?: string
+  workspaceState:
+    | 'pre_contract_setup'
+    | 'awaiting_governed_action'
+    | 'editorial_review'
+    | 'editorial_in_progress'
+    | 'production_in_progress'
+    | 'distribution_release_pending'
+    | 'published_legacy'
+    | 'archived'
 }
 
 export type AuthorPortalContext = {
@@ -45,6 +54,15 @@ export type AuthorPortalContext = {
     isReturningAuthor: boolean
     relationshipState?: string
     workspaceMode?: string
+  }
+  relationship: {
+    classificationStatus: 'Invited Project Relationship' | 'Grandfathered' | 'Grandfathered - Activated'
+    activationStatus: 'pending_validation' | 'validated' | 'activated'
+    authorProfileStatus: 'complete' | 'incomplete'
+    stripeConnectStatus: 'complete' | 'missing' | 'unknown'
+    taxStatus: 'complete' | 'missing' | 'unknown'
+    payoutProfileStatus: 'complete' | 'missing' | 'unknown'
+    contractStatusInternal?: string
   }
   currentProject: AuthorPortalProjectSummary
   projects: AuthorPortalProjectSummary[]
@@ -79,7 +97,8 @@ type ResolvedProjectRow = {
   summary?: string
   nextActionLabel?: string
   pendingApprovalLabel?: string
-  workspaceState: 'pre_contract' | 'active_editorial'
+  contractStatusInternal?: string
+  workspaceState: AuthorPortalProjectSummary['workspaceState']
 }
 
 export async function createAuthorPortalGateResponse({
@@ -102,13 +121,10 @@ export async function createAuthorPortalGateResponse({
   }
 
   const sessionValue = createAuthorPortalSession(grant)
-  const response = NextResponse.json({
-    success: true,
-    portalContext: {
-      intakeReference: requestedReference || grant.intakeReference,
-      scope: grant.scope,
-    },
+  const context = await resolveAuthorPortalContext(readAuthorPortalSession(sessionValue), {
+    intakeReference: requestedReference || grant.intakeReference,
   })
+  const response = NextResponse.json({ success: true, context })
 
   response.cookies.set(getAuthorPortalCookieName(), sessionValue, {
     httpOnly: true,
@@ -246,14 +262,27 @@ export async function resolveAuthorPortalContext(
       Boolean(contact) &&
       (relatedOpportunities.length > 0 || relatedIntakes.length > 1)
 
-    const hasRelationshipSetup = isReturningAuthor || Boolean(contact)
-    const hasPaymentRoyaltySetup = isReturningAuthor || Boolean(contact)
+    const relationshipProfileComplete = Boolean(
+      stringValue(contact?.fullname) && stringValue(contact?.emailaddress1),
+    )
+    const relationshipStripeComplete = isReturningAuthor
+    const relationshipTaxComplete = isReturningAuthor
+    const relationshipPayoutComplete = isReturningAuthor
+    const contractSatisfied = isReturningAuthor
+    const relationshipActivated =
+      isReturningAuthor &&
+      relationshipProfileComplete &&
+      relationshipStripeComplete &&
+      relationshipTaxComplete &&
+      relationshipPayoutComplete
 
     const tasks = buildPortalTaskState({
-      isReturningAuthor: hasRelationshipSetup,
-      hasEditorialWorkspace: hasRelationshipSetup,
-      hasContract: hasPaymentRoyaltySetup,
-      hasStripeAccount: hasPaymentRoyaltySetup,
+      relationshipProfileComplete,
+      relationshipStripeComplete,
+      relationshipTaxComplete,
+      relationshipPayoutComplete,
+      contractSatisfied,
+      currentProjectState: currentProject.workspaceState,
     })
 
     return {
@@ -274,12 +303,31 @@ export async function resolveAuthorPortalContext(
         relationshipState: isReturningAuthor ? 'Active Author' : '',
         workspaceMode: isReturningAuthor ? 'Standard Pipeline Workspace' : '',
       },
+      relationship: {
+        classificationStatus: isReturningAuthor
+          ? relationshipActivated
+            ? 'Grandfathered - Activated'
+            : 'Grandfathered'
+          : 'Invited Project Relationship',
+        activationStatus: isReturningAuthor
+          ? relationshipActivated
+            ? 'activated'
+            : 'validated'
+          : 'pending_validation',
+        authorProfileStatus: relationshipProfileComplete ? 'complete' : 'incomplete',
+        stripeConnectStatus: relationshipStripeComplete ? 'complete' : 'unknown',
+        taxStatus: relationshipTaxComplete ? 'complete' : 'unknown',
+        payoutProfileStatus: relationshipPayoutComplete ? 'complete' : 'unknown',
+        contractStatusInternal: isReturningAuthor
+          ? 'Signed / Exists - Location Pending Reconciliation'
+          : undefined,
+      },
       currentProject,
       projects,
       selectedProjectKey: currentProject.key,
       tasks,
       editorial:
-        currentProject.workspaceState === 'active_editorial'
+        isEditorialWorkspaceState(currentProject.workspaceState)
           ? {
               stageLabel: currentProject.statusLabel.split(' - ')[0] || 'Editorial Review',
               stageStatus: currentProject.statusLabel.split(' - ')[1] || 'In Progress',
@@ -413,7 +461,15 @@ async function buildProjectSummaries(
         undefined,
       nextActionLabel: stringValue(summary?.jm1pub_nextactionlabel) || undefined,
       pendingApprovalLabel: pendingGate ? dataverseFormatted(pendingGate, 'jm1pub_gatestatus', '') : undefined,
-      workspaceState: asset && stage ? 'active_editorial' : 'pre_contract',
+      contractStatusInternal:
+        title && !asset ? 'Signed / Exists - Location Pending Reconciliation' : undefined,
+      workspaceState: inferWorkspaceState({
+        hasOpportunity: Boolean(dataverseLookupId(opportunity, 'opportunityid')),
+        hasTitle: Boolean(dataverseLookupId(title || {}, 'jm1pub_titleid')),
+        hasAsset: Boolean(dataverseLookupId(asset || {}, 'jm1pub_publishingassetid')),
+        stageLabel: stage ? dataverseFormatted(stage, 'jm1pub_stagetype', 'Editorial Review') : undefined,
+        stageStatus: stage ? dataverseFormatted(stage, 'jm1pub_stagestatus', 'In Progress') : undefined,
+      }),
     })
 
     projects.push(row)
@@ -450,12 +506,19 @@ async function buildProjectSummaries(
       titleId: dataverseLookupId(title || {}, 'jm1pub_titleid') || undefined,
       publishingAssetId: dataverseLookupId(asset || {}, 'jm1pub_publishingassetid') || undefined,
       nextActionLabel:
-        asset || title
-          ? 'Open this project to review the current stage and next required step.'
-          : 'This project is linked to your author relationship and is waiting for the next governed action.',
-      workspaceState: asset ? 'active_editorial' : 'pre_contract',
-      stageLabel: asset ? 'Active Project' : undefined,
-      stageStatus: asset ? 'In Progress' : undefined,
+        asset
+          ? 'This historical title is linked to your author relationship and is waiting for the next governed action.'
+          : title
+            ? 'This project is linked to your author relationship and is waiting for the next governed action.'
+            : 'This project is linked to your author relationship and is waiting for the next governed action.',
+      contractStatusInternal: title ? 'Signed / Exists - Location Pending Reconciliation' : undefined,
+      workspaceState: inferWorkspaceState({
+        hasOpportunity: false,
+        hasTitle: Boolean(dataverseLookupId(title || {}, 'jm1pub_titleid')),
+        hasAsset: Boolean(dataverseLookupId(asset || {}, 'jm1pub_publishingassetid')),
+      }),
+      stageLabel: undefined,
+      stageStatus: undefined,
     })
 
     projects.push(row)
@@ -467,7 +530,7 @@ async function buildProjectSummaries(
         opportunityId: dataverseLookupId(scopedOpportunity || {}, 'opportunityid') || session.opportunityId,
         title: session.title || stringValue(intake?.jm1_projecttitle) || 'Current project',
         intakeReference: requestedReference || stringValue(intake?.jm1_intakereferencecode) || session.intakeReference || '',
-        workspaceState: 'pre_contract',
+        workspaceState: 'pre_contract_setup',
       }),
     )
   }
@@ -477,9 +540,7 @@ async function buildProjectSummaries(
 
 function normalizeProjectRow(row: ResolvedProjectRow): AuthorPortalProjectSummary {
   const statusLabel =
-    row.workspaceState === 'active_editorial'
-      ? `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'In Progress'}`
-      : 'Pre-Contract Setup'
+    buildWorkspaceStatusLabel(row)
 
   return {
     key:
@@ -493,9 +554,9 @@ function normalizeProjectRow(row: ResolvedProjectRow): AuthorPortalProjectSummar
     titleId: row.titleId,
     publishingAssetId: row.publishingAssetId,
     statusLabel,
+    contractStatusInternal: row.contractStatusInternal,
     nextActionLabel:
-      row.nextActionLabel ||
-      (row.workspaceState === 'pre_contract' ? 'Complete the remaining setup steps for this project.' : row.summary),
+      row.nextActionLabel || defaultNextActionLabel(row),
     pendingApprovalLabel:
       row.pendingApprovalLabel && row.pendingApprovalLabel !== 'Not Ready' ? row.pendingApprovalLabel : undefined,
     workspaceState: row.workspaceState,
@@ -524,7 +585,7 @@ function buildFallbackProject(session: AuthorPortalSession, requestedReference: 
     opportunityId: session.opportunityId,
     statusLabel: 'Pre-Contract Setup',
     nextActionLabel: 'Complete the remaining setup steps for this project.',
-    workspaceState: 'pre_contract',
+    workspaceState: 'pre_contract_setup',
   }
 }
 
@@ -538,21 +599,21 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
       stageLabel: 'Editorial Review',
       stageStatus: 'In Progress',
       nextActionLabel: 'Editorial review is already underway for this title.',
-      workspaceState: 'active_editorial',
+      workspaceState: 'editorial_in_progress',
     }),
     normalizeProjectRow({
       title: 'The Long Watch',
-      intakeReference: 'JMP-INT-LONGWATCH',
-      nextActionLabel: 'Review the current intake and proposal status for this title.',
-      workspaceState: 'pre_contract',
+      intakeReference: 'JMP-INT-202607-6R2MPZ',
+      nextActionLabel: 'This project is linked to your author relationship and is waiting for the next governed action.',
+      contractStatusInternal: 'Signed / Exists - Location Pending Reconciliation',
+      workspaceState: 'awaiting_governed_action',
     }),
     normalizeProjectRow({
       title: 'Establishing Glory: The Library',
-      intakeReference: 'JMP-INT-EGLIBRARY',
-      nextActionLabel: 'This title is already operating as an active project.',
-      workspaceState: 'active_editorial',
-      stageLabel: 'Active Project',
-      stageStatus: 'In Progress',
+      intakeReference: 'JMP-INT-202606-UFYG6O',
+      nextActionLabel: 'This historical title is linked to your author relationship and remains available in your workspace.',
+      contractStatusInternal: 'Signed / Exists - Location Pending Reconciliation',
+      workspaceState: 'published_legacy',
     }),
   ]
 
@@ -573,6 +634,15 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
       relationshipState: 'Active Author',
       workspaceMode: 'Standard Pipeline Workspace',
     },
+    relationship: {
+      classificationStatus: 'Grandfathered - Activated',
+      activationStatus: 'activated',
+      authorProfileStatus: 'complete',
+      stripeConnectStatus: 'complete',
+      taxStatus: 'complete',
+      payoutProfileStatus: 'complete',
+      contractStatusInternal: 'Signed / Exists - Location Pending Reconciliation',
+    },
     currentProject,
     projects,
     selectedProjectKey: currentProject.key,
@@ -581,7 +651,7 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
       paymentRoyaltyRequired: false,
     },
     editorial:
-      currentProject.workspaceState === 'active_editorial'
+      isEditorialWorkspaceState(currentProject.workspaceState)
         ? {
             stageLabel: currentProject.statusLabel.split(' - ')[0] || 'Editorial Review',
             stageStatus: currentProject.statusLabel.split(' - ')[1] || 'In Progress',
@@ -642,8 +712,86 @@ function collapseProjects(projects: AuthorPortalProjectSummary[], requestedRefer
 function projectPriority(project: AuthorPortalProjectSummary, requestedReference: string) {
   let score = 0
   if (project.intakeReference && project.intakeReference === requestedReference) score += 8
-  if (project.workspaceState === 'active_editorial') score += 4
+  if (isEditorialWorkspaceState(project.workspaceState)) score += 4
   if (project.publishingAssetId) score += 2
   if (project.opportunityId) score += 1
   return score
+}
+
+function isEditorialWorkspaceState(state: AuthorPortalProjectSummary['workspaceState']) {
+  return (
+    state === 'editorial_review' ||
+    state === 'editorial_in_progress' ||
+    state === 'production_in_progress' ||
+    state === 'distribution_release_pending'
+  )
+}
+
+function inferWorkspaceState({
+  hasOpportunity,
+  hasTitle,
+  hasAsset,
+  stageLabel,
+  stageStatus,
+}: {
+  hasOpportunity: boolean
+  hasTitle: boolean
+  hasAsset: boolean
+  stageLabel?: string
+  stageStatus?: string
+}): AuthorPortalProjectSummary['workspaceState'] {
+  const normalizedStageLabel = normalizeWorkspaceText(stageLabel)
+  const normalizedStageStatus = normalizeWorkspaceText(stageStatus)
+
+  if (normalizedStageLabel.includes('production')) return 'production_in_progress'
+  if (normalizedStageLabel.includes('distribution') || normalizedStageLabel.includes('release')) {
+    return 'distribution_release_pending'
+  }
+  if (normalizedStageLabel.includes('review')) return 'editorial_review'
+  if (hasAsset && normalizedStageStatus.includes('progress')) return 'editorial_in_progress'
+  if (hasOpportunity) return 'pre_contract_setup'
+  if (hasTitle || hasAsset) return 'published_legacy'
+  return 'awaiting_governed_action'
+}
+
+function buildWorkspaceStatusLabel(row: ResolvedProjectRow) {
+  switch (row.workspaceState) {
+    case 'pre_contract_setup':
+      return 'Pre-Contract Setup'
+    case 'awaiting_governed_action':
+      return 'Awaiting Governed Action'
+    case 'editorial_review':
+      return `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Ready'}`
+    case 'editorial_in_progress':
+      return `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'In Progress'}`
+    case 'production_in_progress':
+      return 'Production In Progress'
+    case 'distribution_release_pending':
+      return 'Distribution / Release Pending'
+    case 'published_legacy':
+      return 'Published / Legacy'
+    case 'archived':
+      return 'Archived'
+    default:
+      return 'Awaiting Governed Action'
+  }
+}
+
+function defaultNextActionLabel(row: ResolvedProjectRow) {
+  switch (row.workspaceState) {
+    case 'pre_contract_setup':
+      return 'Complete the remaining setup steps for this project.'
+    case 'awaiting_governed_action':
+      return 'This project is linked to your author relationship and is waiting for the next governed action.'
+    case 'published_legacy':
+      return 'This historical title is linked to your author relationship and remains available in your workspace.'
+    case 'archived':
+      return 'This project is archived and remains available as historical record.'
+    default:
+      return row.summary
+  }
+}
+
+function normalizeWorkspaceText(value?: string) {
+  return value?.trim().toLowerCase() || ''
 }
