@@ -187,18 +187,39 @@ export function readAuthorPortalSession(value: string | undefined) {
 }
 
 export function buildPortalTaskState({
-  isReturningAuthor,
-  hasEditorialWorkspace,
-  hasContract,
-  hasStripeAccount,
+  relationshipProfileComplete,
+  relationshipStripeComplete,
+  relationshipTaxComplete,
+  relationshipPayoutComplete,
+  contractSatisfied,
+  currentProjectState,
 }: {
-  isReturningAuthor: boolean
-  hasEditorialWorkspace: boolean
-  hasContract: boolean
-  hasStripeAccount: boolean
+  relationshipProfileComplete: boolean
+  relationshipStripeComplete: boolean
+  relationshipTaxComplete: boolean
+  relationshipPayoutComplete: boolean
+  contractSatisfied: boolean
+  currentProjectState:
+    | 'pre_contract_setup'
+    | 'awaiting_governed_action'
+    | 'editorial_review'
+    | 'editorial_in_progress'
+    | 'production_in_progress'
+    | 'distribution_release_pending'
+    | 'published_legacy'
+    | 'archived'
 }) {
-  const authorProfileRequired = !isReturningAuthor && !hasEditorialWorkspace
-  const paymentRoyaltyRequired = !hasEditorialWorkspace && (!hasContract || !hasStripeAccount)
+  const relationshipReadyForSetupSuppression =
+    relationshipProfileComplete &&
+    (relationshipStripeComplete || relationshipTaxComplete || relationshipPayoutComplete || contractSatisfied)
+
+  const authorProfileRequired =
+    currentProjectState === 'pre_contract_setup' && !relationshipProfileComplete
+
+  const paymentRoyaltyRequired =
+    currentProjectState === 'pre_contract_setup' &&
+    !relationshipReadyForSetupSuppression &&
+    (!relationshipStripeComplete || !relationshipTaxComplete || !relationshipPayoutComplete)
 
   return {
     authorProfileRequired,
