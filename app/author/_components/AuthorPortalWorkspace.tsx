@@ -1,17 +1,18 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 import type { AuthorPortalContext } from '@/lib/server/author-portal-context'
 
 type LoadState = 'loading' | 'ready' | 'error'
-const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jmp-author-portal-bootstrap-context'
+const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jm1_author_portal_bootstrap_context'
 const PORTAL_BOOTSTRAP_MAX_AGE_MS = 5 * 60 * 1000
 
 export function AuthorPortalWorkspace() {
   const searchParams = useSearchParams()
+  const selectedParams = useMemo(() => buildProjectParams(searchParams), [searchParams])
   const [state, setState] = useState<LoadState>('loading')
   const [context, setContext] = useState<AuthorPortalContext | null>(null)
   const [error, setError] = useState('')
@@ -20,19 +21,20 @@ export function AuthorPortalWorkspace() {
     let mounted = true
 
     async function load() {
-      const params = buildProjectParams(searchParams)
-      const bootstrap = consumeBootstrapContext(params)
-
+      const bootstrap = consumeBootstrapContext(selectedParams)
       if (bootstrap && mounted) {
         setContext(bootstrap)
         setState('ready')
       }
 
       try {
+        const params = selectedParams
         const selectedProjectLoad = await loadWorkspaceContext(params)
 
         let resolved = selectedProjectLoad
 
+        // If a project-specific selection fails, recover gracefully by falling back
+        // to the base relationship workspace instead of trapping the author in an error state.
         if (!selectedProjectLoad.ok && params.hasScopedSelection) {
           const fallbackLoad = await loadWorkspaceContext({
             reference: undefined,
@@ -42,9 +44,33 @@ export function AuthorPortalWorkspace() {
             hasScopedSelection: false,
           })
 
-          if (fallbackLoad.ok) {
+          if (fallbackLoad.ok && fallbackLoad.context) {
             resolved = fallbackLoad
-            window.history.replaceState({}, '', '/author/portal')
+            const matchedProject = findProjectForSelection(fallbackLoad.context, params)
+            if (!matchedProject) {
+              window.history.replaceState({}, '', '/author/portal')
+            }
+          }
+        }
+
+        if (resolved.ok && resolved.context && params.hasScopedSelection) {
+          const matchedProject = findProjectForSelection(resolved.context, params)
+          if (!matchedProject) {
+            const fallbackLoad = await loadWorkspaceContext({
+              reference: undefined,
+              opportunityId: undefined,
+              titleId: undefined,
+              publishingAssetId: undefined,
+              hasScopedSelection: false,
+            })
+
+            if (fallbackLoad.ok && fallbackLoad.context) {
+              resolved = fallbackLoad
+              const fallbackMatch = findProjectForSelection(fallbackLoad.context, params)
+              if (!fallbackMatch) {
+                window.history.replaceState({}, '', '/author/portal')
+              }
+            }
           }
         }
 
@@ -60,12 +86,7 @@ export function AuthorPortalWorkspace() {
         setState('ready')
       } catch (err) {
         if (!mounted) return
-        const message = err instanceof Error ? err.message : ''
-        setError(
-          message && message !== 'Failed to fetch'
-            ? message
-            : 'We could not load your workspace right now. Please try again or contact publishing@jmerrill.one.',
-        )
+        setError(err instanceof Error ? err.message : 'We could not load your workspace right now.')
         setState('error')
       }
     }
@@ -75,7 +96,7 @@ export function AuthorPortalWorkspace() {
     return () => {
       mounted = false
     }
-  }, [searchParams])
+  }, [searchParams, selectedParams])
 
   if (state === 'loading') {
     return (
@@ -113,6 +134,13 @@ export function AuthorPortalWorkspace() {
   ].filter((step) => step.visible)
 
   const multipleProjects = context.projects.length > 1
+  const selectedProject = findProjectForSelection(context, selectedParams) || context.currentProject
+  const selectedEditorial =
+    selectedProject.workspaceState === 'active_editorial' &&
+    selectedProject.key === context.currentProject.key &&
+    context.editorial
+      ? context.editorial
+      : null
 
   return (
     <div className="space-y-8">
@@ -129,14 +157,14 @@ export function AuthorPortalWorkspace() {
         </p>
         <div className="mt-6 rounded-3xl border border-white/10 bg-black/15 p-5">
           <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Current project</p>
-          <h3 className="mt-2 text-[20px] font-semibold text-white">{context.currentProject.title}</h3>
-          <p className="mt-2 text-[13px] leading-[1.7] text-white/45">{context.currentProject.statusLabel}</p>
-          {context.currentProject.nextActionLabel ? (
-            <p className="mt-2 text-[13px] leading-[1.7] text-blue-200/85">{context.currentProject.nextActionLabel}</p>
+          <h3 className="mt-2 text-[20px] font-semibold text-white">{selectedProject.title}</h3>
+          <p className="mt-2 text-[13px] leading-[1.7] text-white/45">{selectedProject.statusLabel}</p>
+          {selectedProject.nextActionLabel ? (
+            <p className="mt-2 text-[13px] leading-[1.7] text-blue-200/85">{selectedProject.nextActionLabel}</p>
           ) : null}
-          {context.currentProject.pendingApprovalLabel ? (
+          {selectedProject.pendingApprovalLabel ? (
             <p className="mt-2 text-[12px] uppercase tracking-[0.08em] text-amber-200/85">
-              Pending approval: {context.currentProject.pendingApprovalLabel}
+              Pending approval: {selectedProject.pendingApprovalLabel}
             </p>
           ) : null}
         </div>
@@ -168,19 +196,20 @@ export function AuthorPortalWorkspace() {
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="rounded-[28px] border border-white/8 bg-white/[0.04] p-6">
           <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Project status</p>
-          {context.editorial ? (
+          {selectedEditorial ? (
             <>
-              <h3 className="mt-3 text-[20px] font-semibold text-white">{context.editorial.stageLabel}</h3>
-              <p className="mt-2 text-[13px] leading-[1.7] text-white/50">{context.editorial.summary}</p>
+              <h3 className="mt-3 text-[20px] font-semibold text-white">{selectedEditorial.stageLabel}</h3>
+              <p className="mt-2 text-[13px] leading-[1.7] text-white/50">{selectedEditorial.summary}</p>
               <p className="mt-3 text-[12px] uppercase tracking-[0.08em] text-blue-200/85">
-                {context.editorial.stageStatus}
+                {selectedEditorial.stageStatus}
               </p>
             </>
           ) : (
             <>
-              <h3 className="mt-3 text-[20px] font-semibold text-white">{context.currentProject.statusLabel}</h3>
+              <h3 className="mt-3 text-[20px] font-semibold text-white">{selectedProject.statusLabel}</h3>
               <p className="mt-2 text-[13px] leading-[1.7] text-white/50">
-                This workspace stays focused on what your project needs next.
+                {selectedProject.nextActionLabel ||
+                  'This project is linked to your author relationship and is waiting for the next governed action.'}
               </p>
             </>
           )}
@@ -196,7 +225,7 @@ export function AuthorPortalWorkspace() {
                 key={project.key}
                 href={buildProjectHref(project)}
                 className={`block rounded-2xl border p-4 transition-colors ${
-                  project.key === context.selectedProjectKey
+                  project.key === selectedProject.key
                     ? 'border-blue-400/35 bg-blue-500/[0.10]'
                     : 'border-white/8 bg-black/15 hover:border-blue-300/30 hover:bg-blue-500/[0.06]'
                 }`}
@@ -225,6 +254,19 @@ export function AuthorPortalWorkspace() {
   )
 }
 
+function findProjectForSelection(
+  context: AuthorPortalContext,
+  params: ReturnType<typeof buildProjectParams>,
+) {
+  return (
+    context.projects.find((project) => params.publishingAssetId && project.publishingAssetId === params.publishingAssetId) ||
+    context.projects.find((project) => params.opportunityId && project.opportunityId === params.opportunityId) ||
+    context.projects.find((project) => params.titleId && project.titleId === params.titleId) ||
+    context.projects.find((project) => params.reference && project.intakeReference === params.reference) ||
+    null
+  )
+}
+
 function consumeBootstrapContext(params: ReturnType<typeof buildProjectParams>) {
   if (typeof window === 'undefined') return null
 
@@ -237,19 +279,18 @@ function consumeBootstrapContext(params: ReturnType<typeof buildProjectParams>) 
       context?: AuthorPortalContext
     }
 
-    const savedAt = Number(parsed.savedAt || 0)
-    const age = Date.now() - savedAt
-
-    if (!parsed.context || !Number.isFinite(savedAt) || age < 0 || age > PORTAL_BOOTSTRAP_MAX_AGE_MS) {
+    const age = Date.now() - Number(parsed.savedAt || 0)
+    if (!parsed.context || !Number.isFinite(age) || age < 0 || age > PORTAL_BOOTSTRAP_MAX_AGE_MS) {
       sessionStorage.removeItem(PORTAL_BOOTSTRAP_CONTEXT_KEY)
       return null
     }
 
-    if (params.hasScopedSelection && !matchesScopedSelection(parsed.context, params)) {
+    const context = parsed.context
+    if (params.hasScopedSelection && !matchesScopedSelection(context, params)) {
       return null
     }
 
-    return parsed.context
+    return context
   } catch {
     sessionStorage.removeItem(PORTAL_BOOTSTRAP_CONTEXT_KEY)
     return null
