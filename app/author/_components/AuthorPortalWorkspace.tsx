@@ -7,6 +7,8 @@ import { useSearchParams } from 'next/navigation'
 import type { AuthorPortalContext } from '@/lib/server/author-portal-context'
 
 type LoadState = 'loading' | 'ready' | 'error'
+const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jmp-author-portal-bootstrap-context'
+const PORTAL_BOOTSTRAP_MAX_AGE_MS = 5 * 60 * 1000
 
 export function AuthorPortalWorkspace() {
   const searchParams = useSearchParams()
@@ -18,8 +20,15 @@ export function AuthorPortalWorkspace() {
     let mounted = true
 
     async function load() {
+      const params = buildProjectParams(searchParams)
+      const bootstrap = consumeBootstrapContext(params)
+
+      if (bootstrap && mounted) {
+        setContext(bootstrap)
+        setState('ready')
+      }
+
       try {
-        const params = buildProjectParams(searchParams)
         const selectedProjectLoad = await loadWorkspaceContext(params)
 
         let resolved = selectedProjectLoad
@@ -40,6 +49,9 @@ export function AuthorPortalWorkspace() {
         }
 
         if (!resolved.ok || !resolved.context) {
+          if (bootstrap && mounted) {
+            return
+          }
           throw new Error(resolved.error || 'We could not load your workspace right now.')
         }
 
@@ -213,6 +225,37 @@ export function AuthorPortalWorkspace() {
   )
 }
 
+function consumeBootstrapContext(params: ReturnType<typeof buildProjectParams>) {
+  if (typeof window === 'undefined') return null
+
+  const raw = sessionStorage.getItem(PORTAL_BOOTSTRAP_CONTEXT_KEY)
+  if (!raw) return null
+
+  try {
+    const parsed = JSON.parse(raw) as {
+      savedAt?: number
+      context?: AuthorPortalContext
+    }
+
+    const savedAt = Number(parsed.savedAt || 0)
+    const age = Date.now() - savedAt
+
+    if (!parsed.context || !Number.isFinite(savedAt) || age < 0 || age > PORTAL_BOOTSTRAP_MAX_AGE_MS) {
+      sessionStorage.removeItem(PORTAL_BOOTSTRAP_CONTEXT_KEY)
+      return null
+    }
+
+    if (params.hasScopedSelection && !matchesScopedSelection(parsed.context, params)) {
+      return null
+    }
+
+    return parsed.context
+  } catch {
+    sessionStorage.removeItem(PORTAL_BOOTSTRAP_CONTEXT_KEY)
+    return null
+  }
+}
+
 function buildProjectHref(project: AuthorPortalContext['projects'][number]) {
   const params = new URLSearchParams()
   if (project.intakeReference) params.set('reference', project.intakeReference)
@@ -235,6 +278,20 @@ function buildProjectParams(searchParams: ReturnType<typeof useSearchParams>) {
     publishingAssetId,
     hasScopedSelection: Boolean(reference || opportunityId || titleId || publishingAssetId),
   }
+}
+
+function matchesScopedSelection(
+  context: AuthorPortalContext,
+  params: ReturnType<typeof buildProjectParams>,
+) {
+  const project = context.currentProject
+
+  return (
+    (!params.reference || project.intakeReference === params.reference) &&
+    (!params.opportunityId || project.opportunityId === params.opportunityId) &&
+    (!params.titleId || project.titleId === params.titleId) &&
+    (!params.publishingAssetId || project.publishingAssetId === params.publishingAssetId)
+  )
 }
 
 async function loadWorkspaceContext(params: {
