@@ -19,31 +19,32 @@ export function AuthorPortalWorkspace() {
 
     async function load() {
       try {
-        const params = new URLSearchParams()
-        const reference = searchParams.get('reference') || searchParams.get('ref')
-        const opportunityId = searchParams.get('opportunityId')
-        const titleId = searchParams.get('titleId')
-        const publishingAssetId = searchParams.get('publishingAssetId')
+        const params = buildProjectParams(searchParams)
+        const selectedProjectLoad = await loadWorkspaceContext(params)
 
-        if (reference) params.set('reference', reference)
-        if (opportunityId) params.set('opportunityId', opportunityId)
-        if (titleId) params.set('titleId', titleId)
-        if (publishingAssetId) params.set('publishingAssetId', publishingAssetId)
+        let resolved = selectedProjectLoad
 
-        const response = await fetch(`/api/author/context${params.toString() ? `?${params.toString()}` : ''}`, {
-          cache: 'no-store',
-        })
-        const data = await safeReadJson(response)
+        if (!selectedProjectLoad.ok && params.hasScopedSelection) {
+          const fallbackLoad = await loadWorkspaceContext({
+            reference: undefined,
+            opportunityId: undefined,
+            titleId: undefined,
+            publishingAssetId: undefined,
+            hasScopedSelection: false,
+          })
 
-        if (!response.ok) {
-          throw new Error(data?.error || 'We could not load your workspace right now.')
+          if (fallbackLoad.ok) {
+            resolved = fallbackLoad
+            window.history.replaceState({}, '', '/author/portal')
+          }
         }
-        if (!data?.context) {
-          throw new Error('We could not load your workspace right now.')
+
+        if (!resolved.ok || !resolved.context) {
+          throw new Error(resolved.error || 'We could not load your workspace right now.')
         }
 
         if (!mounted) return
-        setContext(data.context)
+        setContext(resolved.context)
         setState('ready')
       } catch (err) {
         if (!mounted) return
@@ -219,6 +220,47 @@ function buildProjectHref(project: AuthorPortalContext['projects'][number]) {
   if (project.titleId) params.set('titleId', project.titleId)
   if (project.publishingAssetId) params.set('publishingAssetId', project.publishingAssetId)
   return `/author/portal${params.toString() ? `?${params.toString()}` : ''}`
+}
+
+function buildProjectParams(searchParams: ReturnType<typeof useSearchParams>) {
+  const reference = searchParams.get('reference') || searchParams.get('ref') || undefined
+  const opportunityId = searchParams.get('opportunityId') || undefined
+  const titleId = searchParams.get('titleId') || undefined
+  const publishingAssetId = searchParams.get('publishingAssetId') || undefined
+
+  return {
+    reference,
+    opportunityId,
+    titleId,
+    publishingAssetId,
+    hasScopedSelection: Boolean(reference || opportunityId || titleId || publishingAssetId),
+  }
+}
+
+async function loadWorkspaceContext(params: {
+  reference?: string
+  opportunityId?: string
+  titleId?: string
+  publishingAssetId?: string
+  hasScopedSelection: boolean
+}) {
+  const query = new URLSearchParams()
+  if (params.reference) query.set('reference', params.reference)
+  if (params.opportunityId) query.set('opportunityId', params.opportunityId)
+  if (params.titleId) query.set('titleId', params.titleId)
+  if (params.publishingAssetId) query.set('publishingAssetId', params.publishingAssetId)
+
+  const response = await fetch(`/api/author/context${query.toString() ? `?${query.toString()}` : ''}`, {
+    cache: 'no-store',
+  })
+  const data = await safeReadJson(response)
+
+  return {
+    ok: response.ok && Boolean(data?.context),
+    status: response.status,
+    error: data?.error,
+    context: data?.context || null,
+  }
 }
 
 async function safeReadJson(response: Response) {
