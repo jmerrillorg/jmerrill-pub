@@ -8,6 +8,7 @@ type GateResponse = {
   success?: boolean
   error?: string
   accessType?: 'admin' | 'author'
+  context?: unknown
   portalContext?: {
     contactId?: string
     authorPortalId?: string
@@ -26,6 +27,8 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
   const [submitting, setSubmitting] = useState(false)
   const storageKey = scope === 'portal' ? 'jmp-author-portal-unlocked' : 'jmp-author-onboarding-unlocked'
   const contextKey = scope === 'portal' ? 'jmp-author-portal-context' : 'jmp-author-onboarding-context'
+  const bootstrapContextKey =
+    scope === 'portal' ? 'jmp-author-portal-bootstrap-context' : 'jmp-author-onboarding-bootstrap-context'
   const codeKey = scope === 'portal' ? 'jmp-author-portal-access-code' : 'jmp-author-onboarding-access-code'
 
   useEffect(() => {
@@ -48,6 +51,7 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
 
       sessionStorage.removeItem(storageKey)
       sessionStorage.removeItem(contextKey)
+      sessionStorage.removeItem(bootstrapContextKey)
       sessionStorage.removeItem(codeKey)
       if (mounted) setUnlocked(false)
     }
@@ -57,7 +61,7 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
     return () => {
       mounted = false
     }
-  }, [codeKey, contextKey, scope, storageKey])
+  }, [bootstrapContextKey, codeKey, contextKey, scope, storageKey])
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -83,7 +87,8 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
       })
       const data = (await response.json()) as GateResponse
       if (!response.ok) throw new Error(data.error || 'Invalid access code.')
-      const ready = await verifyWorkspaceContext(scope)
+      const hasBootstrapContext = Boolean(data.context)
+      const ready = hasBootstrapContext ? true : await verifyWorkspaceContext(scope)
       if (!ready) {
         throw new Error('We could not open your workspace right now. Please try again or contact publishing@jmerrill.one.')
       }
@@ -97,6 +102,15 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
           portalContext: data.portalContext || null,
         }),
       )
+      if (data.context) {
+        sessionStorage.setItem(
+          bootstrapContextKey,
+          JSON.stringify({
+            savedAt: Date.now(),
+            context: data.context,
+          }),
+        )
+      }
       setUnlocked(true)
     } catch (err: any) {
       const message = err instanceof Error ? err.message : ''
