@@ -29,8 +29,35 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
   const codeKey = scope === 'portal' ? 'jmp-author-portal-access-code' : 'jmp-author-onboarding-access-code'
 
   useEffect(() => {
-    setUnlocked(sessionStorage.getItem(storageKey) === 'true')
-  }, [storageKey])
+    let mounted = true
+
+    async function verifyExistingSession() {
+      if (sessionStorage.getItem(storageKey) !== 'true') return
+
+      try {
+        const ready = await verifyWorkspaceContext(scope)
+        if (!mounted) return
+
+        if (ready) {
+          setUnlocked(true)
+          return
+        }
+      } catch {
+        // fall through to clear stale session markers
+      }
+
+      sessionStorage.removeItem(storageKey)
+      sessionStorage.removeItem(contextKey)
+      sessionStorage.removeItem(codeKey)
+      if (mounted) setUnlocked(false)
+    }
+
+    void verifyExistingSession()
+
+    return () => {
+      mounted = false
+    }
+  }, [codeKey, contextKey, scope, storageKey])
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -56,12 +83,20 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
       })
       const data = (await response.json()) as GateResponse
       if (!response.ok) throw new Error(data.error || 'Invalid access code.')
+      const ready = await verifyWorkspaceContext(scope)
+      if (!ready) {
+        throw new Error('We could not open your workspace right now. Please try again or contact publishing@jmerrill.one.')
+      }
+
       sessionStorage.setItem(storageKey, 'true')
       sessionStorage.setItem(codeKey, code)
-      sessionStorage.setItem(contextKey, JSON.stringify({
-        accessType: data.accessType || (scope === 'portal' ? 'author' : 'forms'),
-        portalContext: data.portalContext || null,
-      }))
+      sessionStorage.setItem(
+        contextKey,
+        JSON.stringify({
+          accessType: data.accessType || (scope === 'portal' ? 'author' : 'forms'),
+          portalContext: data.portalContext || null,
+        }),
+      )
       setUnlocked(true)
     } catch (err: any) {
       const message = err instanceof Error ? err.message : ''
@@ -117,4 +152,27 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
       ) : null}
     </div>
   )
+}
+
+async function verifyWorkspaceContext(scope: AuthorGateScope) {
+  if (scope !== 'portal') return true
+
+  for (const delayMs of [0, 250, 500, 1000]) {
+    if (delayMs > 0) {
+      await new Promise((resolve) => window.setTimeout(resolve, delayMs))
+    }
+
+    try {
+      const response = await fetch('/api/author/context', { cache: 'no-store' })
+      if (response.ok) return true
+
+      if (response.status !== 401) {
+        return false
+      }
+    } catch {
+      // retry a couple of times before failing the unlock
+    }
+  }
+
+  return false
 }
