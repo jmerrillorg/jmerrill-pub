@@ -219,6 +219,7 @@ export function buildPortalTaskState({
     | 'pre_contract_setup'
     | 'awaiting_governed_action'
     | 'editorial_review'
+    | 'developmental_editing'
     | 'editorial_in_progress'
     | 'production_in_progress'
     | 'distribution_release_pending'

@@ -2,6 +2,7 @@ export type AuthorPortalWorkspaceState =
   | 'pre_contract_setup'
   | 'awaiting_governed_action'
   | 'editorial_review'
+  | 'developmental_editing'
   | 'editorial_in_progress'
   | 'production_in_progress'
   | 'distribution_release_pending'
@@ -41,6 +42,19 @@ export function buildEditorialDisplayState({
       stageStatus: stageStatus?.trim() || 'In Progress',
       summary: summary?.trim() || 'Editorial work is currently underway.',
       nextActionLabel,
+    }
+  }
+
+  if (workspaceState === 'developmental_editing') {
+    return {
+      stageLabel: stageLabel?.trim() || 'Developmental Editing',
+      stageStatus: stageStatus?.trim() || 'Not Started',
+      summary:
+        summary?.trim() ||
+        'Developmental planning is being prepared for Volume I of the approved quarterly series.',
+      nextActionLabel:
+        nextActionLabel?.trim() ||
+        'No action is required from you at this time. We will update you when the developmental plan is ready for review.',
     }
   }
 
