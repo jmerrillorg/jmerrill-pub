@@ -131,14 +131,7 @@ export async function createAuthorPortalGateResponse({
     intakeReference: requestedReference || grant.intakeReference,
   })
   const response = NextResponse.json({ success: true, context })
-
-  response.cookies.set(getAuthorPortalCookieName(), sessionValue, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 8,
-  })
+  setAuthorPortalSessionCookie(response, sessionValue)
 
   return response
 }
@@ -369,14 +362,70 @@ export async function resolveAuthorPortalContext(
 
 export function clearAuthorPortalSession() {
   const response = NextResponse.json({ success: true })
-  response.cookies.set(getAuthorPortalCookieName(), '', {
+  clearAuthorPortalSessionCookie(response)
+  return response
+}
+
+function setAuthorPortalSessionCookie(response: NextResponse, value: string) {
+  const cookieName = getAuthorPortalCookieName()
+  const secure = process.env.NODE_ENV === 'production'
+
+  response.cookies.set(cookieName, value, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 60 * 60 * 8,
+  })
+
+  response.headers.append(
+    'Set-Cookie',
+    buildCookieHeader(cookieName, value, {
+      secure,
+      maxAge: 60 * 60 * 8,
+    }),
+  )
+}
+
+function clearAuthorPortalSessionCookie(response: NextResponse) {
+  const cookieName = getAuthorPortalCookieName()
+  const secure = process.env.NODE_ENV === 'production'
+
+  response.cookies.set(cookieName, '', {
+    httpOnly: true,
+    secure,
     sameSite: 'lax',
     path: '/',
     maxAge: 0,
   })
-  return response
+
+  response.headers.append(
+    'Set-Cookie',
+    buildCookieHeader(cookieName, '', {
+      secure,
+      maxAge: 0,
+    }),
+  )
+}
+
+function buildCookieHeader(
+  name: string,
+  value: string,
+  { secure, maxAge }: { secure: boolean; maxAge: number },
+) {
+  const parts = [
+    `${name}=${encodeURIComponent(value)}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+    `Max-Age=${maxAge}`,
+  ]
+
+  if (secure) {
+    parts.push('Secure')
+  }
+
+  return parts.join('; ')
 }
 
 async function buildProjectSummaries(
