@@ -164,12 +164,15 @@ export function AuthorPortalWorkspace() {
           {context.author.firstName ? `Welcome back, ${context.author.firstName}.` : 'Welcome back.'}
         </h2>
         <p className="mt-3 max-w-[760px] text-[14px] font-light leading-[1.8] text-white/55">
-          We opened the workspace for your current project instead of starting a brand-new author setup.
+          We opened your author relationship and linked projects so you can see truthful status without restarting your publishing path.
         </p>
         <div className="mt-4 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.08em] text-white/45">
           <span className="rounded-full border border-white/10 px-3 py-1">{context.relationship.classificationStatus}</span>
           <span className="rounded-full border border-white/10 px-3 py-1">
             Relationship {relationshipActivationLabel(context.relationship.activationStatus)}
+          </span>
+          <span className="rounded-full border border-white/10 px-3 py-1">
+            Health {relationshipHealthLabel(context.relationship.operationalHealthStatus)}
           </span>
           <span className="rounded-full border border-white/10 px-3 py-1">
             Author profile {context.relationship.authorProfileStatus}
@@ -203,7 +206,7 @@ export function AuthorPortalWorkspace() {
 
       {steps.length > 0 ? (
         <section className="space-y-4">
-          <h3 className="text-[22px] font-semibold text-white">Complete these next steps.</h3>
+          <h3 className="text-[22px] font-semibold text-white">Relationship items to review.</h3>
           <div className="grid gap-4 md:grid-cols-2">
             {steps.map((step) => (
               <div key={step.label} className="rounded-[28px] border border-white/8 bg-white/[0.04] p-6">
@@ -219,7 +222,7 @@ export function AuthorPortalWorkspace() {
             ))}
           </div>
           <p className="text-[13px] font-light leading-[1.7] text-white/35">
-            Additional publishing tools will unlock after your agreement is signed and your initial payment is confirmed.
+            Official approvals and time-sensitive publishing decisions continue through email while this center matures as a reliable operating dashboard.
           </p>
         </section>
       ) : null}
@@ -240,7 +243,7 @@ export function AuthorPortalWorkspace() {
               <h3 className="mt-3 text-[20px] font-semibold text-white">{selectedProject.statusLabel}</h3>
               <p className="mt-2 text-[13px] leading-[1.7] text-white/50">
                 {selectedProject.nextActionLabel ||
-                  'This project is linked to your author relationship and is waiting for the next governed action.'}
+                  'This project is linked to your author relationship and is waiting for the next governed publishing action.'}
               </p>
             </>
           )}
@@ -300,6 +303,19 @@ function relationshipActivationLabel(
       return 'Validated'
     default:
       return 'Pending Validation'
+  }
+}
+
+function relationshipHealthLabel(
+  status: AuthorPortalContext['relationship']['operationalHealthStatus'],
+) {
+  switch (status) {
+    case 'healthy':
+      return 'Healthy'
+    case 'verified':
+      return 'Verified'
+    default:
+      return 'Activated'
   }
 }
 

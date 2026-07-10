@@ -17,6 +17,11 @@ import {
   getDataverseServerConfig,
   stringValue,
 } from './dataverse-server'
+import {
+  buildEditorialDisplayState,
+  normalizeWorkspaceText,
+  type AuthorPortalWorkspaceState,
+} from './author-portal-status'
 
 export type AuthorPortalProjectSummary = {
   key: string
@@ -29,15 +34,7 @@ export type AuthorPortalProjectSummary = {
   nextActionLabel?: string
   pendingApprovalLabel?: string
   contractStatusInternal?: string
-  workspaceState:
-    | 'pre_contract_setup'
-    | 'awaiting_governed_action'
-    | 'editorial_review'
-    | 'editorial_in_progress'
-    | 'production_in_progress'
-    | 'distribution_release_pending'
-    | 'published_legacy'
-    | 'archived'
+  workspaceState: AuthorPortalWorkspaceState
 }
 
 export type AuthorPortalContext = {
@@ -58,6 +55,7 @@ export type AuthorPortalContext = {
   relationship: {
     classificationStatus: 'Invited Project Relationship' | 'Grandfathered' | 'Grandfathered - Activated'
     activationStatus: 'pending_validation' | 'validated' | 'activated'
+    operationalHealthStatus: 'activated' | 'verified' | 'healthy'
     authorProfileStatus: 'complete' | 'incomplete'
     stripeConnectStatus: 'complete' | 'missing' | 'unknown'
     taxStatus: 'complete' | 'missing' | 'unknown'
@@ -99,6 +97,13 @@ type ResolvedProjectRow = {
   pendingApprovalLabel?: string
   contractStatusInternal?: string
   workspaceState: AuthorPortalProjectSummary['workspaceState']
+}
+
+type RelationshipBackedTitleRow = {
+  titleId?: string
+  title: string
+  authorName?: string
+  intakeReference?: string
 }
 
 export async function createAuthorPortalGateResponse({
@@ -246,12 +251,15 @@ export async function resolveAuthorPortalContext(
           ? [intake]
           : []
 
+    const relationshipBackedTitles = await getRelationshipBackedTitles(config, contact)
+
     const projects = await buildProjectSummaries(config, {
       requestedReference,
       scopedOpportunity,
       intake,
       relatedIntakes,
       relatedOpportunities,
+      relationshipBackedTitles,
       session,
       overrides,
     })
@@ -260,7 +268,9 @@ export async function resolveAuthorPortalContext(
 
     const isReturningAuthor =
       Boolean(contact) &&
-      (relatedOpportunities.length > 0 || relatedIntakes.length > 1)
+      (relatedOpportunities.length > 0 ||
+        relatedIntakes.length > 1 ||
+        relationshipBackedTitles.length > 0)
 
     const relationshipProfileComplete = Boolean(
       stringValue(contact?.fullname) && stringValue(contact?.emailaddress1),
@@ -275,6 +285,14 @@ export async function resolveAuthorPortalContext(
       relationshipStripeComplete &&
       relationshipTaxComplete &&
       relationshipPayoutComplete
+    const relationshipVerified =
+      relationshipActivated &&
+      currentProject.workspaceState !== 'pre_contract_setup' &&
+      !currentProject.contractStatusInternal
+    const relationshipHealthy =
+      relationshipVerified &&
+      projects.every((project) => !project.contractStatusInternal) &&
+      projects.every((project) => project.workspaceState !== 'pre_contract_setup')
 
     const tasks = buildPortalTaskState({
       relationshipProfileComplete,
@@ -314,6 +332,11 @@ export async function resolveAuthorPortalContext(
             ? 'activated'
             : 'validated'
           : 'pending_validation',
+        operationalHealthStatus: relationshipHealthy
+          ? 'healthy'
+          : relationshipVerified
+            ? 'verified'
+            : 'activated',
         authorProfileStatus: relationshipProfileComplete ? 'complete' : 'incomplete',
         stripeConnectStatus: relationshipStripeComplete ? 'complete' : 'unknown',
         taxStatus: relationshipTaxComplete ? 'complete' : 'unknown',
@@ -328,12 +351,13 @@ export async function resolveAuthorPortalContext(
       tasks,
       editorial:
         isEditorialWorkspaceState(currentProject.workspaceState)
-          ? {
-              stageLabel: currentProject.statusLabel.split(' - ')[0] || 'Editorial Review',
-              stageStatus: currentProject.statusLabel.split(' - ')[1] || 'In Progress',
-              summary: currentProject.nextActionLabel || 'Your editorial work is in progress.',
+          ? buildEditorialDisplayState({
+              workspaceState: currentProject.workspaceState,
+              stageLabel: getProjectStageLabel(currentProject),
+              stageStatus: getProjectStageStatus(currentProject),
+              summary: currentProject.nextActionLabel,
               nextActionLabel: currentProject.nextActionLabel,
-            }
+            })
           : null,
     }
   } catch (error) {
@@ -362,6 +386,7 @@ async function buildProjectSummaries(
     intake,
     relatedIntakes,
     relatedOpportunities,
+    relationshipBackedTitles,
     session,
     overrides,
   }: {
@@ -370,6 +395,7 @@ async function buildProjectSummaries(
     intake: Record<string, unknown> | null
     relatedIntakes: Record<string, unknown>[]
     relatedOpportunities: Record<string, unknown>[]
+    relationshipBackedTitles: RelationshipBackedTitleRow[]
     session: AuthorPortalSession
     overrides: ResolveOverrides
   },
@@ -453,8 +479,8 @@ async function buildProjectSummaries(
       publishingAssetId: dataverseLookupId(asset || {}, 'jm1pub_publishingassetid') || overrides.publishingAssetId,
       title: projectTitle,
       intakeReference,
-      stageLabel: stage ? dataverseFormatted(stage, 'jm1pub_stagetype', 'Editorial Review') : undefined,
-      stageStatus: stage ? dataverseFormatted(stage, 'jm1pub_stagestatus', 'In Progress') : undefined,
+      stageLabel: stage ? dataverseFormatted(stage, 'jm1pub_stagetype', '') : undefined,
+      stageStatus: stage ? dataverseFormatted(stage, 'jm1pub_stagestatus', '') : undefined,
       summary:
         stringValue(summary?.jm1pub_summarybody) ||
         stringValue(stage?.jm1pub_authorsafesummary) ||
@@ -467,8 +493,8 @@ async function buildProjectSummaries(
         hasOpportunity: Boolean(dataverseLookupId(opportunity, 'opportunityid')),
         hasTitle: Boolean(dataverseLookupId(title || {}, 'jm1pub_titleid')),
         hasAsset: Boolean(dataverseLookupId(asset || {}, 'jm1pub_publishingassetid')),
-        stageLabel: stage ? dataverseFormatted(stage, 'jm1pub_stagetype', 'Editorial Review') : undefined,
-        stageStatus: stage ? dataverseFormatted(stage, 'jm1pub_stagestatus', 'In Progress') : undefined,
+        stageLabel: stage ? dataverseFormatted(stage, 'jm1pub_stagetype', '') : undefined,
+        stageStatus: stage ? dataverseFormatted(stage, 'jm1pub_stagestatus', '') : undefined,
       }),
     })
 
@@ -522,6 +548,83 @@ async function buildProjectSummaries(
     })
 
     projects.push(row)
+  }
+
+  for (const relationshipTitle of relationshipBackedTitles) {
+    const title =
+      (relationshipTitle.titleId
+        ? await dataverseFirst(config, 'jm1pub_titles', {
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname',
+            $filter: `jm1pub_titleid eq ${relationshipTitle.titleId}`,
+          })
+        : null) ||
+      (relationshipTitle.title
+        ? await dataverseFirst(config, 'jm1pub_titles', {
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname',
+            $filter: `jm1pub_titlename eq '${escapeODataText(relationshipTitle.title)}'`,
+          })
+        : null)
+
+    if (!title) continue
+
+    const asset = await dataverseFirst(config, 'jm1pub_publishingassets', {
+      $select: 'jm1pub_publishingassetid,jm1pub_name,_jm1pub_titleid_value',
+      $filter: `_jm1pub_titleid_value eq ${dataverseLookupId(title, 'jm1pub_titleid')}`,
+    })
+
+    const stage = asset
+      ? await dataverseFirst(config, 'jm1pub_editorialstages', {
+          $select:
+            'jm1pub_editorialstageid,jm1pub_authorsafesummary,jm1pub_stagestatus,jm1pub_stagetype,createdon',
+          $filter: `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
+          $orderby: 'createdon desc',
+        })
+      : null
+
+    const summary = asset
+      ? await dataverseFirst(config, 'jm1pub_editorialsummaries', {
+          $select:
+            'jm1pub_editorialsummaryid,jm1pub_summarybody,jm1pub_nextactionlabel,jm1pub_summarystatus,createdon',
+          $filter: `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
+          $orderby: 'createdon desc',
+        })
+      : null
+
+    const pendingGate = asset
+      ? await dataverseFirst(config, 'jm1pub_editorialapprovalgates', {
+          $select: 'jm1pub_editorialapprovalgateid,jm1pub_gatecode,jm1pub_gatestatus,createdon',
+          $filter: `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
+          $orderby: 'createdon desc',
+        })
+      : null
+
+    projects.push(
+      normalizeProjectRow({
+        title: stringValue(title.jm1pub_titlename) || relationshipTitle.title,
+        intakeReference: relationshipTitle.intakeReference || '',
+        titleId: dataverseLookupId(title, 'jm1pub_titleid'),
+        publishingAssetId: dataverseLookupId(asset || {}, 'jm1pub_publishingassetid') || undefined,
+        stageLabel: stage ? dataverseFormatted(stage, 'jm1pub_stagetype', '') : undefined,
+        stageStatus: stage ? dataverseFormatted(stage, 'jm1pub_stagestatus', '') : undefined,
+        summary:
+          stringValue(summary?.jm1pub_summarybody) ||
+          stringValue(stage?.jm1pub_authorsafesummary) ||
+          undefined,
+        nextActionLabel: stringValue(summary?.jm1pub_nextactionlabel) || undefined,
+        pendingApprovalLabel: pendingGate ? dataverseFormatted(pendingGate, 'jm1pub_gatestatus', '') : undefined,
+        contractStatusInternal:
+          dataverseLookupId(title, 'jm1pub_titleid') && !asset
+            ? 'Signed / Exists - Location Pending Reconciliation'
+            : undefined,
+        workspaceState: inferWorkspaceState({
+          hasOpportunity: false,
+          hasTitle: true,
+          hasAsset: Boolean(dataverseLookupId(asset || {}, 'jm1pub_publishingassetid')),
+          stageLabel: stage ? dataverseFormatted(stage, 'jm1pub_stagetype', '') : undefined,
+          stageStatus: stage ? dataverseFormatted(stage, 'jm1pub_stagestatus', '') : undefined,
+        }),
+      }),
+    )
   }
 
   if (projects.length === 0) {
@@ -637,6 +740,7 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
     relationship: {
       classificationStatus: 'Grandfathered - Activated',
       activationStatus: 'activated',
+      operationalHealthStatus: 'activated',
       authorProfileStatus: 'complete',
       stripeConnectStatus: 'complete',
       taxStatus: 'complete',
@@ -652,17 +756,50 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
     },
     editorial:
       isEditorialWorkspaceState(currentProject.workspaceState)
-        ? {
-            stageLabel: currentProject.statusLabel.split(' - ')[0] || 'Editorial Review',
-            stageStatus: currentProject.statusLabel.split(' - ')[1] || 'In Progress',
+        ? buildEditorialDisplayState({
+            workspaceState: currentProject.workspaceState,
+            stageLabel: getProjectStageLabel(currentProject),
+            stageStatus: getProjectStageStatus(currentProject),
             summary:
               currentProject.title === 'The Intentional Leader'
                 ? 'Your manuscript is already in Editorial Review. We will share the next decision step as soon as it is ready.'
                 : 'This title is already active in your author relationship.',
             nextActionLabel: currentProject.nextActionLabel,
-          }
+          })
         : null,
   }
+}
+
+async function getRelationshipBackedTitles(
+  config: NonNullable<ReturnType<typeof getDataverseServerConfig>>,
+  contact: Record<string, unknown> | null,
+): Promise<RelationshipBackedTitleRow[]> {
+  const contactId = dataverseLookupId(contact || {}, 'contactid')
+  const fullName = stringValue(contact?.fullname)
+  if (!contactId || !fullName) return []
+
+  const relationships = await dataverseList(config, 'jm1_relationships', {
+    $select: 'jm1_relationshipid,_jm1_fromcontact_value,jm1_relationshiptype,jm1_status',
+    $filter: `_jm1_fromcontact_value eq ${contactId}`,
+    $top: '25',
+  })
+
+  if (relationships.length === 0) return []
+
+  const titles = await dataverseList(config, 'jm1pub_titles', {
+    $select:
+      'jm1pub_titleid,jm1pub_titlename,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_slug',
+    $filter: `jm1pub_authorname eq '${escapeODataText(fullName)}' or jm1pub_authordisplayname eq '${escapeODataText(fullName)}'`,
+    $orderby: 'jm1pub_titlename asc',
+    $top: '50',
+  })
+
+  return titles.map((title) => ({
+    titleId: dataverseLookupId(title, 'jm1pub_titleid'),
+    title: stringValue(title.jm1pub_titlename),
+    authorName:
+      stringValue(title.jm1pub_authordisplayname) || stringValue(title.jm1pub_authorname) || fullName,
+  }))
 }
 
 function deriveTitleFromOpportunityName(value: string) {
@@ -727,6 +864,16 @@ function isEditorialWorkspaceState(state: AuthorPortalProjectSummary['workspaceS
   )
 }
 
+function getProjectStageLabel(project: AuthorPortalProjectSummary) {
+  const [label] = project.statusLabel.split(' - ')
+  return label?.trim() || undefined
+}
+
+function getProjectStageStatus(project: AuthorPortalProjectSummary) {
+  const [, status] = project.statusLabel.split(' - ')
+  return status?.trim() || undefined
+}
+
 function inferWorkspaceState({
   hasOpportunity,
   hasTitle,
@@ -747,8 +894,10 @@ function inferWorkspaceState({
   if (normalizedStageLabel.includes('distribution') || normalizedStageLabel.includes('release')) {
     return 'distribution_release_pending'
   }
+  if (hasAsset && (normalizedStageStatus === 'in progress' || normalizedStageStatus === 'active')) {
+    return 'editorial_in_progress'
+  }
   if (normalizedStageLabel.includes('review')) return 'editorial_review'
-  if (hasAsset && normalizedStageStatus.includes('progress')) return 'editorial_in_progress'
   if (hasOpportunity) return 'pre_contract_setup'
   if (hasTitle || hasAsset) return 'published_legacy'
   return 'awaiting_governed_action'
@@ -761,9 +910,9 @@ function buildWorkspaceStatusLabel(row: ResolvedProjectRow) {
     case 'awaiting_governed_action':
       return 'Awaiting Governed Action'
     case 'editorial_review':
-      return `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Ready'}`
+      return `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
     case 'editorial_in_progress':
-      return `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'In Progress'}`
+      return `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
     case 'production_in_progress':
       return 'Production In Progress'
     case 'distribution_release_pending':
@@ -790,8 +939,4 @@ function defaultNextActionLabel(row: ResolvedProjectRow) {
     default:
       return row.summary
   }
-}
-
-function normalizeWorkspaceText(value?: string) {
-  return value?.trim().toLowerCase() || ''
 }
