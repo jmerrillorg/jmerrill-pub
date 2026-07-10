@@ -1,0 +1,26 @@
+SYNTHETIC STAGE 0 DIAGNOSTIC TEST FIXTURE
+==========================================
+This file is a synthetic test fixture for the INT-PUB-005 Stage 0 Diagnostic
+extraction scaffold. It contains no real manuscript content, no author PII,
+no proprietary editorial material, and no real submission data.
+
+This fixture exists solely to verify that the extraction module correctly:
+- Reads a UTF-8 text file from a buffer
+- Counts characters, words, and lines
+- Calculates a SHA-256 hash of the raw bytes
+- Returns safe metadata only (no file content in the response)
+
+Section One: Sample prose for word-count verification
+------------------------------------------------------
+The quick brown fox jumps over the lazy dog. This sentence contains
+every letter of the English alphabet and is commonly used as a typographic
+sample. It serves no editorial purpose here beyond providing word tokens
+for the extraction word-count test.
+
+Section Two: Additional padding for line-count verification
+-----------------------------------------------------------
+Line A
+Line B
+Line C
+
+END OF SYNTHETIC FIXTURE
