@@ -47,6 +47,16 @@ jobs:
           AUTHOR_PORTAL_MASTER_ACCESS_CODE=${AUTHOR_PORTAL_MASTER_ACCESS_CODE}
           AUTHOR_PORTAL_SESSION_SECRET=${AUTHOR_PORTAL_SESSION_SECRET}
           EOF
+          cat > lib/server/author-portal-access.generated.ts <<EOF
+          export const GENERATED_AUTHOR_PORTAL_ACCESS = {
+            onboardingAccessCode: ${AUTHOR_ONBOARDING_ACCESS_CODE@Q},
+            accessCodePepper: ${AUTHOR_PORTAL_ACCESS_CODE_PEPPER@Q},
+            accessRecordsJson: ${AUTHOR_PORTAL_ACCESS_RECORDS_JSON@Q},
+            accessRegistryJson: ${AUTHOR_PORTAL_ACCESS_REGISTRY_JSON@Q},
+            masterAccessCode: ${AUTHOR_PORTAL_MASTER_ACCESS_CODE@Q},
+            sessionSecret: ${AUTHOR_PORTAL_SESSION_SECRET@Q},
+          } as const
+          EOF
 
       - name: Build and Deploy
         id: builddeploy
