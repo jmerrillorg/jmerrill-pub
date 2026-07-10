@@ -20,7 +20,7 @@ export default function AuthorPortalPage() {
       title="Your Author Operating Center is ready."
       description="View your current publishing relationship, linked projects, and next expected actions in one place."
     >
-      <AuthorGate>
+      <AuthorGate scope="portal">
         <AuthorPortalWorkspace />
       </AuthorGate>
     </AuthorPortalShell>
