@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { validateAuthorAccessCode, type AuthorAccessScope } from '@/lib/server/author-access'
+import { getAuthorPortalAccessDiagnostics } from '@/lib/server/author-portal-access'
 import { createAuthorPortalGateResponse } from '@/lib/server/author-portal-context'
 
 export async function POST(req: NextRequest) {
@@ -22,18 +23,35 @@ export async function POST(req: NextRequest) {
     }
 
     if (!validateAuthorAccessCode(code)) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Invalid access code.' },
         { status: 401 },
       )
+      response.headers.set('x-author-gate-diag', buildAuthorGateDiagHeader())
+      return response
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Author onboarding gate error:', error)
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Unable to validate access code.' },
       { status: 500 },
     )
+    response.headers.set('x-author-gate-diag', buildAuthorGateDiagHeader())
+    return response
   }
+}
+
+function buildAuthorGateDiagHeader() {
+  const diagnostics = getAuthorPortalAccessDiagnostics()
+  return [
+    `src=${diagnostics.registrySource}`,
+    `grants=${diagnostics.grantCount}`,
+    `active=${diagnostics.activeGrantCount}`,
+    `master=${diagnostics.masterCodeConfigured ? 1 : 0}`,
+    `onboarding=${diagnostics.onboardingCodeConfigured ? 1 : 0}`,
+    `pepper=${diagnostics.pepperConfigured ? 1 : 0}`,
+    `session=${diagnostics.sessionSecretConfigured ? 1 : 0}`,
+  ].join(';')
 }

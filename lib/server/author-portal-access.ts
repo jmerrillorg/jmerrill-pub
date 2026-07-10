@@ -89,6 +89,24 @@ export function getAuthorPortalAccessGrants(): AuthorPortalAccessGrant[] {
   ] satisfies AuthorPortalAccessGrant[]
 }
 
+export function getAuthorPortalAccessDiagnostics() {
+  const grants = getAuthorPortalAccessGrants()
+  const registrySource = resolveAuthorPortalAccessRegistrySource()
+  const activeGrantCount = grants.filter(
+    (entry) => isGrantActive(entry) && !isExpired(entry.expiresAt),
+  ).length
+
+  return {
+    registrySource,
+    grantCount: grants.length,
+    activeGrantCount,
+    masterCodeConfigured: Boolean(getMasterAccessCode()),
+    onboardingCodeConfigured: Boolean(getOnboardingAccessCode()),
+    pepperConfigured: Boolean(getAccessCodePepper()),
+    sessionSecretConfigured: Boolean(getSessionSecret()),
+  }
+}
+
 export function resolveAuthorPortalAccessGrant({
   code,
   requestedReference,
@@ -365,6 +383,14 @@ function getAuthorPortalAccessRegistryJson() {
     process.env.AUTHOR_PORTAL_ACCESS_RECORDS_JSON ||
     GENERATED_AUTHOR_PORTAL_ACCESS.accessRecordsJson
   )
+}
+
+function resolveAuthorPortalAccessRegistrySource() {
+  if (process.env.AUTHOR_PORTAL_ACCESS_REGISTRY_JSON) return 'env_registry'
+  if (GENERATED_AUTHOR_PORTAL_ACCESS.accessRegistryJson) return 'generated_registry'
+  if (process.env.AUTHOR_PORTAL_ACCESS_RECORDS_JSON) return 'env_records'
+  if (GENERATED_AUTHOR_PORTAL_ACCESS.accessRecordsJson) return 'generated_records'
+  return 'none'
 }
 
 function getOnboardingAccessCode() {
