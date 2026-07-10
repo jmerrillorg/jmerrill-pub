@@ -17,6 +17,7 @@
  */
 
 const { DefaultAzureCredential } = require("@azure/identity");
+const { trackDependency } = require("../observability/dependencyTelemetry");
 
 // Dataverse picklist constants — match Dataverse option set values exactly
 const MODEL_PROVIDER = { AZURE_OPENAI: 835500000 };
@@ -199,7 +200,8 @@ async function postDataverseRecord(apiBase, token, entitySet, payload) {
  *   executionLog: {created: boolean, id: string|null, error: string|null}
  * }>}
  */
-async function writeMetadata(input) {
+async function writeMetadata(input, options = {}) {
+  const telemetry = options.telemetry || null;
   const apiBase = process.env.DATAVERSE_WEB_API_BASE_URL;
   const resourceUrl = process.env.DATAVERSE_RESOURCE_URL;
 
@@ -225,7 +227,22 @@ async function writeMetadata(input) {
   let executionLogResult = { created: false, id: null, error: null };
   try {
     const execPayload = buildExecutionLogPayload(input, null);
-    const result = await postDataverseRecord(apiBase, token, "jm1_executionlogs", execPayload);
+    const result = await trackDependency(
+      telemetry,
+      {
+        name: "Dataverse Execution Log Write",
+        target: resourceUrl,
+        data: "jm1_executionlogs:POST",
+        dependencyTypeName: "Dataverse",
+        properties: {
+          entitySet: "jm1_executionlogs",
+          executionMode: input.executionMode
+        },
+        isSuccess: () => true,
+        getResultCode: () => "201"
+      },
+      () => postDataverseRecord(apiBase, token, "jm1_executionlogs", execPayload)
+    );
     executionLogResult = { created: true, id: result.id, error: null };
   } catch (err) {
     executionLogResult = { created: false, id: null, error: err.safeCode || "DATAVERSE_WRITE_FAILED" };
@@ -235,7 +252,22 @@ async function writeMetadata(input) {
   let aiRequestLogResult = { created: false, id: null, error: null };
   try {
     const aiPayload = buildAiRequestLogPayload(input);
-    const result = await postDataverseRecord(apiBase, token, "jm1_airequestlogs", aiPayload);
+    const result = await trackDependency(
+      telemetry,
+      {
+        name: "Dataverse AI Request Log Write",
+        target: resourceUrl,
+        data: "jm1_airequestlogs:POST",
+        dependencyTypeName: "Dataverse",
+        properties: {
+          entitySet: "jm1_airequestlogs",
+          executionMode: input.executionMode
+        },
+        isSuccess: () => true,
+        getResultCode: () => "201"
+      },
+      () => postDataverseRecord(apiBase, token, "jm1_airequestlogs", aiPayload)
+    );
     aiRequestLogResult = { created: true, id: result.id, error: null };
   } catch (err) {
     aiRequestLogResult = { created: false, id: null, error: err.safeCode || "DATAVERSE_WRITE_FAILED" };

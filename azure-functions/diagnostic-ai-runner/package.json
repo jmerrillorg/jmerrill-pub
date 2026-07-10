@@ -12,6 +12,7 @@
     "@azure/functions": "^4.7.0",
     "@azure/identity": "^4.5.0",
     "@azure/storage-blob": "^12.32.0",
+    "applicationinsights": "^2.9.8",
     "docx": "^9.7.1",
     "jszip": "^3.10.1",
     "mammoth": "^1.12.0"

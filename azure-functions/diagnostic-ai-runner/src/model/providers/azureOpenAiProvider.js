@@ -8,6 +8,8 @@
  * Returns a normalized result shape shared by all providers.
  */
 
+const { trackDependency } = require("../../observability/dependencyTelemetry");
+
 const REQUIRED_VARS = [
   "AZURE_OPENAI_ENDPOINT",
   "AZURE_OPENAI_API_VERSION",
@@ -19,7 +21,7 @@ function checkConfig() {
   return missing.length === 0 ? null : missing;
 }
 
-async function call({ promptBody, diagnosticId }) {
+async function call({ promptBody, diagnosticId, telemetry = null }) {
   const missingConfig = checkConfig();
   if (missingConfig) {
     return {
@@ -52,14 +54,30 @@ async function call({ promptBody, diagnosticId }) {
     const credential = new DefaultAzureCredential();
     const tokenResult = await credential.getToken("https://cognitiveservices.azure.com/.default");
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${tokenResult.token}`
+    const response = await trackDependency(
+      telemetry,
+      {
+        name: "Azure OpenAI Chat Completion",
+        target: endpoint,
+        data: `${deployment}:chat/completions`,
+        dependencyTypeName: "Azure OpenAI",
+        properties: {
+          provider: "azure-openai",
+          deployment,
+          diagnosticId
+        },
+        isSuccess: (result) => result.ok,
+        getResultCode: (result) => String(result.status)
       },
-      body: JSON.stringify(requestBody)
-    });
+      () => fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${tokenResult.token}`
+        },
+        body: JSON.stringify(requestBody)
+      })
+    );
 
     httpStatus = response.status;
     const responseBody = await response.json();

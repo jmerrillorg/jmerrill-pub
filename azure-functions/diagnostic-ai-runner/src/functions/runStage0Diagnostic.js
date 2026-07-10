@@ -1,6 +1,4 @@
 const { app } = require("@azure/functions");
-const path = require("node:path");
-const fs = require("node:fs");
 const { verifyKnowledgeBlob } = require("../blob/knowledgeReader");
 const { extractManuscript } = require("../extraction/manuscriptExtractor");
 const { fetchAndExtractManuscript } = require("../extraction/pilotContentExtractor");
@@ -13,6 +11,15 @@ const { writeMetadata } = require("../dataverse/metadataWriter");
 const { checkAiExecutionGate, getGateState } = require("../activation/aiExecutionGate");
 const { callModel } = require("../model/modelCaller");
 const { resolveProvider } = require("../model/providerRouter");
+const {
+  ALLOWED_CONTROLLED_FIXTURES,
+  loadControlledFixtureBuffer
+} = require("../controlled/fixtureRegistry");
+const {
+  CONTROLLED_EXECUTION_TYPE,
+  authorizeControlledSyntheticExecution
+} = require("../controlled/executionAuthorization");
+const { resolveGovernedPromptTemplate } = require("../dataverse/promptTemplateReader");
 
 // CONTRACT_TEST_MODE=false — Jackie Approval 1 granted 2026-06-17.
 // Controlled synthetic real-AI test only. No real manuscripts. No production use.
@@ -190,7 +197,7 @@ app.http("run-stage0-diagnostic", {
         `Controlled AI test requested; diagnosticId=${diagnosticId}; gate.permitted=${gate.permitted}; gate.reason=${gate.reason}`
       );
 
-      const providerResolution = resolveProvider();
+      const providerResolution = resolveProvider({ executionType: CONTROLLED_EXECUTION_TYPE });
 
       if (!gate.permitted) {
         return {
@@ -218,13 +225,36 @@ app.http("run-stage0-diagnostic", {
 
       // Gate is open — run the controlled synthetic AI test.
       const aiFixture = typeof body.syntheticFixture === "string" ? body.syntheticFixture.toLowerCase() : "txt";
-      const ALLOWED_AI_FIXTURES = ["txt", "docx"];
-      if (!ALLOWED_AI_FIXTURES.includes(aiFixture)) {
+      if (!ALLOWED_CONTROLLED_FIXTURES.includes(aiFixture)) {
         return validationError("INVALID_SYNTHETIC_FIXTURE", diagnosticId);
       }
 
+      const controlledAuthorization = authorizeControlledSyntheticExecution({
+        fixtureType: aiFixture,
+        runnerKeyVerified: true
+      });
+
+      if (!controlledAuthorization.permitted) {
+        return {
+          status: controlledAuthorization.code === "UNAUTHORIZED" ? 401 : 403,
+          jsonBody: {
+            status: "error",
+            code: controlledAuthorization.code,
+            diagnosticId,
+            failedStage: "authorization"
+          }
+        };
+      }
+
+      const telemetry = {
+        context,
+        correlationId: correlationId || diagnosticId,
+        diagnosticId,
+        executionType: CONTROLLED_EXECUTION_TYPE
+      };
+
       // Stage 1: Knowledge verification
-      const knowledgeMeta = await verifyKnowledgeBlob();
+      const knowledgeMeta = await verifyKnowledgeBlob({ telemetry });
       if (!knowledgeMeta.reachable || !knowledgeMeta.hashMatched) {
         return {
           status: 503,
@@ -233,12 +263,19 @@ app.http("run-stage0-diagnostic", {
       }
 
       // Stage 2: Synthetic extraction only — no real manuscript
-      const aiFixturePath = path.join(__dirname, "..", "..", "test", "fixtures", `synthetic-stage0.${aiFixture}`);
       let aiFileBuffer;
       try {
-        aiFileBuffer = fs.readFileSync(aiFixturePath);
-      } catch {
-        return { status: 503, jsonBody: { status: "error", code: "CONTROLLED_AI_FIXTURE_NOT_FOUND", diagnosticId, failedStage: "extraction" } };
+        aiFileBuffer = loadControlledFixtureBuffer(aiFixture).fileBuffer;
+      } catch (error) {
+        return {
+          status: 503,
+          jsonBody: {
+            status: "error",
+            code: error.safeCode || "CONTROLLED_AI_FIXTURE_NOT_FOUND",
+            diagnosticId,
+            failedStage: "extraction"
+          }
+        };
       }
 
       const aiExtractionResult = await extractManuscript(`.${aiFixture}`, aiFileBuffer);
@@ -249,8 +286,25 @@ app.http("run-stage0-diagnostic", {
       // Stage 3: Build prompt — never returned, never logged, never stored
       const knowledgeContent = knowledgeMeta.content || "";
       const syntheticContentPlaceholder = `[SYNTHETIC FIXTURE: ${aiFixture.toUpperCase()} — ${aiExtractionResult.wordCount} words — contract-test only — not a real manuscript]`;
-      const promptKey = process.env.JM1_PROMPT_KEY || "jm1-prompt-pub-stage0-diagnostic";
-      const promptVersion = process.env.JM1_PROMPT_VERSION || "PUB-STAGE0-DIAGNOSTIC-V1";
+      const promptResolution = await resolveGovernedPromptTemplate({
+        executionType: CONTROLLED_EXECUTION_TYPE,
+        telemetry
+      });
+
+      if (!promptResolution.ok) {
+        return {
+          status: 503,
+          jsonBody: {
+            status: "error",
+            code: promptResolution.error || "PROMPT_TEMPLATE_NOT_GOVERNED",
+            diagnosticId,
+            failedStage: "promptResolution"
+          }
+        };
+      }
+
+      const promptKey = promptResolution.promptKey;
+      const promptVersion = promptResolution.promptVersion;
 
       const promptBody = [
         knowledgeContent,
@@ -274,7 +328,9 @@ app.http("run-stage0-diagnostic", {
         promptBody,
         diagnosticId,
         promptKey,
-        promptVersion
+        promptVersion,
+        executionType: CONTROLLED_EXECUTION_TYPE,
+        telemetry
       });
       const responseTimestamp = new Date().toISOString();
 
@@ -290,7 +346,7 @@ app.http("run-stage0-diagnostic", {
         const metadataInputFail = {
           diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
           executionMode: "controlled-ai-test",
-          modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+          modelDeploymentAlias: promptResolution.modelDeploymentAlias || process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
           promptKey, promptVersion,
           confidence: null,
           requiresHumanReview: true,
@@ -298,7 +354,7 @@ app.http("run-stage0-diagnostic", {
           requestTimestamp, responseTimestamp,
           errorCode, errorMessage: modelResult.error
         };
-        await writeMetadata(metadataInputFail);
+        await writeMetadata(metadataInputFail, { telemetry });
 
         return {
           status: 503,
@@ -335,7 +391,7 @@ app.http("run-stage0-diagnostic", {
         const metadataInputViolation = {
           diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
           executionMode: "controlled-ai-test",
-          modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+          modelDeploymentAlias: promptResolution.modelDeploymentAlias || process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
           promptKey, promptVersion,
           confidence: null,
           requiresHumanReview: true,
@@ -344,7 +400,7 @@ app.http("run-stage0-diagnostic", {
           errorCode: "OUTPUT_QUOTATION_VIOLATION",
           errorMessage: `${aiValidation.violations.length} violation(s) in model output`
         };
-        await writeMetadata(metadataInputViolation);
+        await writeMetadata(metadataInputViolation, { telemetry });
 
         return {
           status: 422,
@@ -368,7 +424,7 @@ app.http("run-stage0-diagnostic", {
       const metadataInputSuccess = {
         diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
         executionMode: "controlled-ai-test",
-        modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+        modelDeploymentAlias: promptResolution.modelDeploymentAlias || process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
         promptKey, promptVersion,
         confidence,
         requiresHumanReview: true,
@@ -378,7 +434,7 @@ app.http("run-stage0-diagnostic", {
         errorMessage: null
       };
 
-      const aiWriteResult = await writeMetadata(metadataInputSuccess);
+      const aiWriteResult = await writeMetadata(metadataInputSuccess, { telemetry });
 
       context.info(
         `Controlled AI test complete; diagnosticId=${diagnosticId}; routing=${aiRoutingDecision.routingBasis}; aiRequestLog.created=${aiWriteResult.aiRequestLog.created}; executionLog.created=${aiWriteResult.executionLog.created}`
@@ -813,13 +869,12 @@ app.http("run-stage0-diagnostic", {
         }
 
         const fixtureName = `synthetic-stage0.${syntheticFixture}`;
-        const fixturePath = path.join(__dirname, "..", "..", "test", "fixtures", fixtureName);
 
         let fileBuffer;
         try {
-          fileBuffer = fs.readFileSync(fixturePath);
+          fileBuffer = loadControlledFixtureBuffer(syntheticFixture).fileBuffer;
         } catch {
-          context.error(`Extraction verify: fixture not found at ${fixturePath}`);
+          context.error(`Extraction verify: fixture not found for ${fixtureName}`);
           return { status: 503, jsonBody: { status: "error", code: "FIXTURE_NOT_FOUND", diagnosticId } };
         }
 
@@ -990,10 +1045,9 @@ app.http("run-stage0-diagnostic", {
           return validationError("INVALID_SYNTHETIC_FIXTURE", diagnosticId);
         }
 
-        const fixturePath = path.join(__dirname, "..", "..", "test", "fixtures", `synthetic-stage0.${e2eFixture}`);
         let fileBuffer;
         try {
-          fileBuffer = fs.readFileSync(fixturePath);
+          fileBuffer = loadControlledFixtureBuffer(e2eFixture).fileBuffer;
         } catch {
           return { status: 503, jsonBody: { status: "error", code: "E2E_FIXTURE_NOT_FOUND", diagnosticId, failedStage: "extraction" } };
         }

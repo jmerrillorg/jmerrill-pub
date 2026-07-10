@@ -15,12 +15,21 @@
  */
 
 const SUPPORTED_PROVIDERS = Object.freeze(["azure-openai", "anthropic"]);
+const CONTROLLED_ALLOWED_PROVIDER = "azure-openai";
 
 /**
  * Resolves the provider from the JM1_AI_PROVIDER env var.
  * @returns {{ ok: boolean, provider: string|null, error: string|null }}
  */
-function resolveProvider() {
+function resolveProvider({ executionType } = {}) {
+  if (executionType === "CONTROLLED_SYNTHETIC_DIAGNOSTIC") {
+    return {
+      ok: true,
+      provider: CONTROLLED_ALLOWED_PROVIDER,
+      error: null
+    };
+  }
+
   const raw = process.env.JM1_AI_PROVIDER;
 
   if (!raw || !raw.trim()) {
@@ -43,8 +52,8 @@ function resolveProvider() {
  * @param {{ promptBody: string, diagnosticId: string }} params
  * @returns {Promise<object>}
  */
-async function routeToProvider({ promptBody, diagnosticId }) {
-  const resolution = resolveProvider();
+async function routeToProvider({ promptBody, diagnosticId, executionType, telemetry = null }) {
+  const resolution = resolveProvider({ executionType });
 
   if (!resolution.ok) {
     return {
@@ -61,11 +70,11 @@ async function routeToProvider({ promptBody, diagnosticId }) {
   switch (resolution.provider) {
     case "anthropic": {
       const { call } = require("./providers/anthropicProvider");
-      return call({ promptBody, diagnosticId });
+      return call({ promptBody, diagnosticId, telemetry });
     }
     case "azure-openai": {
       const { call } = require("./providers/azureOpenAiProvider");
-      return call({ promptBody, diagnosticId });
+      return call({ promptBody, diagnosticId, telemetry });
     }
     default:
       // Unreachable given SUPPORTED_PROVIDERS check above, but must not fall through silently.
