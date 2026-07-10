@@ -1,4 +1,5 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
+import { GENERATED_AUTHOR_PORTAL_ACCESS } from './author-portal-access.generated'
 
 export type AuthorPortalAccessGrant = {
   code: string
@@ -53,13 +54,10 @@ export function parseAuthorPortalAccessRegistry(raw: string | undefined) {
 }
 
 export function getAuthorPortalAccessGrants(): AuthorPortalAccessGrant[] {
-  const registry = parseAuthorPortalAccessRegistry(
-    process.env.AUTHOR_PORTAL_ACCESS_REGISTRY_JSON || process.env.AUTHOR_PORTAL_ACCESS_RECORDS_JSON,
-  )
+  const registry = parseAuthorPortalAccessRegistry(getAuthorPortalAccessRegistryJson())
   if (registry.length) return registry
 
-  const legacyCode =
-    process.env.AUTHOR_ONBOARDING_ACCESS_CODE?.trim() || process.env.AUTHOR_PORTAL_MASTER_ACCESS_CODE?.trim()
+  const legacyCode = getOnboardingAccessCode() || getMasterAccessCode()
   if (!legacyCode) {
     if (process.env.NODE_ENV === 'development') {
       return [
@@ -316,7 +314,7 @@ function grantMatchesCode(grant: AuthorPortalAccessGrant, code: string) {
 
 function hashPortalCode(code: string) {
   return createHash('sha256')
-    .update(`${process.env.AUTHOR_PORTAL_ACCESS_CODE_PEPPER?.trim() || ''}${code}`)
+    .update(`${getAccessCodePepper()}${code}`)
     .digest('hex')
 }
 
@@ -325,15 +323,15 @@ function isMasterPortalAccessCode(code: string) {
   if (!trimmedCode) return false
 
   return (
-    constantTimeEqual(trimmedCode, process.env.AUTHOR_PORTAL_MASTER_ACCESS_CODE?.trim() || '') ||
-    constantTimeEqual(trimmedCode, process.env.AUTHOR_ONBOARDING_ACCESS_CODE?.trim() || '') ||
+    constantTimeEqual(trimmedCode, getMasterAccessCode()) ||
+    constantTimeEqual(trimmedCode, getOnboardingAccessCode()) ||
     (process.env.NODE_ENV === 'development' && constantTimeEqual(trimmedCode, LOCAL_TEST_PORTAL_CODE))
   )
 }
 
 function buildMasterPortalFallbackGrant(requestedReference?: string): AuthorPortalAccessGrant {
   return {
-    code: process.env.AUTHOR_PORTAL_MASTER_ACCESS_CODE?.trim() || process.env.AUTHOR_ONBOARDING_ACCESS_CODE?.trim() || '',
+    code: getMasterAccessCode() || getOnboardingAccessCode() || '',
     intakeReference:
       requestedReference ||
       process.env.AUTHOR_PORTAL_DEFAULT_REFERENCE?.trim() ||
@@ -352,12 +350,37 @@ function buildMasterPortalFallbackGrant(requestedReference?: string): AuthorPort
 
 function getPortalSessionSecret() {
   return (
-    process.env.AUTHOR_PORTAL_SESSION_SECRET?.trim() ||
-    process.env.AUTHOR_PORTAL_ACCESS_CODE_PEPPER?.trim() ||
-    process.env.AUTHOR_ONBOARDING_ACCESS_CODE?.trim() ||
-    process.env.AUTHOR_PORTAL_MASTER_ACCESS_CODE?.trim() ||
+    getSessionSecret() ||
+    getAccessCodePepper() ||
+    getOnboardingAccessCode() ||
+    getMasterAccessCode() ||
     'jm1-author-portal-session'
   )
+}
+
+function getAuthorPortalAccessRegistryJson() {
+  return (
+    process.env.AUTHOR_PORTAL_ACCESS_REGISTRY_JSON ||
+    GENERATED_AUTHOR_PORTAL_ACCESS.accessRegistryJson ||
+    process.env.AUTHOR_PORTAL_ACCESS_RECORDS_JSON ||
+    GENERATED_AUTHOR_PORTAL_ACCESS.accessRecordsJson
+  )
+}
+
+function getOnboardingAccessCode() {
+  return process.env.AUTHOR_ONBOARDING_ACCESS_CODE?.trim() || GENERATED_AUTHOR_PORTAL_ACCESS.onboardingAccessCode || ''
+}
+
+function getMasterAccessCode() {
+  return process.env.AUTHOR_PORTAL_MASTER_ACCESS_CODE?.trim() || GENERATED_AUTHOR_PORTAL_ACCESS.masterAccessCode || ''
+}
+
+function getAccessCodePepper() {
+  return process.env.AUTHOR_PORTAL_ACCESS_CODE_PEPPER?.trim() || GENERATED_AUTHOR_PORTAL_ACCESS.accessCodePepper || ''
+}
+
+function getSessionSecret() {
+  return process.env.AUTHOR_PORTAL_SESSION_SECRET?.trim() || GENERATED_AUTHOR_PORTAL_ACCESS.sessionSecret || ''
 }
 
 function constantTimeEqual(left: string, right: string) {
