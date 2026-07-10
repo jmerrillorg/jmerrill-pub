@@ -1,5 +1,5 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
-import { GENERATED_AUTHOR_PORTAL_ACCESS } from './author-portal-access.generated.ts'
+import { GENERATED_AUTHOR_PORTAL_ACCESS } from './author-portal-access.generated'
 
 export type AuthorPortalAccessGrant = {
   code: string
