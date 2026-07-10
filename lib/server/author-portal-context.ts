@@ -31,6 +31,7 @@ export type AuthorPortalProjectSummary = {
   titleId?: string
   publishingAssetId?: string
   statusLabel: string
+  summary?: string
   nextActionLabel?: string
   pendingApprovalLabel?: string
   contractStatusInternal?: string
@@ -355,7 +356,7 @@ export async function resolveAuthorPortalContext(
               workspaceState: currentProject.workspaceState,
               stageLabel: getProjectStageLabel(currentProject),
               stageStatus: getProjectStageStatus(currentProject),
-              summary: currentProject.nextActionLabel,
+              summary: currentProject.summary,
               nextActionLabel: currentProject.nextActionLabel,
             })
           : null,
@@ -657,6 +658,7 @@ function normalizeProjectRow(row: ResolvedProjectRow): AuthorPortalProjectSummar
     titleId: row.titleId,
     publishingAssetId: row.publishingAssetId,
     statusLabel,
+    summary: row.summary || defaultProjectSummary(row),
     contractStatusInternal: row.contractStatusInternal,
     nextActionLabel:
       row.nextActionLabel || defaultNextActionLabel(row),
@@ -858,6 +860,7 @@ function projectPriority(project: AuthorPortalProjectSummary, requestedReference
 function isEditorialWorkspaceState(state: AuthorPortalProjectSummary['workspaceState']) {
   return (
     state === 'editorial_review' ||
+    state === 'developmental_editing' ||
     state === 'editorial_in_progress' ||
     state === 'production_in_progress' ||
     state === 'distribution_release_pending'
@@ -874,7 +877,7 @@ function getProjectStageStatus(project: AuthorPortalProjectSummary) {
   return status?.trim() || undefined
 }
 
-function inferWorkspaceState({
+export function inferWorkspaceState({
   hasOpportunity,
   hasTitle,
   hasAsset,
@@ -889,6 +892,27 @@ function inferWorkspaceState({
 }): AuthorPortalProjectSummary['workspaceState'] {
   const normalizedStageLabel = normalizeWorkspaceText(stageLabel)
   const normalizedStageStatus = normalizeWorkspaceText(stageStatus)
+  const hasActiveEditorialCommission =
+    hasAsset &&
+    Boolean(normalizedStageLabel) &&
+    [
+      'not started',
+      'in progress',
+      'active',
+      'plan delivered',
+      'plan approved',
+      'calibration approved',
+      'author revision requested',
+      'author revision received',
+      'complete',
+    ].includes(normalizedStageStatus)
+
+  if (normalizedStageLabel.includes('hold') || normalizedStageLabel.includes('block')) {
+    return 'awaiting_governed_action'
+  }
+  if (normalizedStageLabel.includes('archive') || normalizedStageStatus.includes('archive')) {
+    return 'archived'
+  }
 
   if (normalizedStageLabel.includes('production')) return 'production_in_progress'
   if (normalizedStageLabel.includes('distribution') || normalizedStageLabel.includes('release')) {
@@ -897,9 +921,13 @@ function inferWorkspaceState({
   if (hasAsset && (normalizedStageStatus === 'in progress' || normalizedStageStatus === 'active')) {
     return 'editorial_in_progress'
   }
+  if (normalizedStageLabel.includes('developmental')) {
+    return 'developmental_editing'
+  }
   if (normalizedStageLabel.includes('review')) return 'editorial_review'
-  if (hasOpportunity) return 'pre_contract_setup'
+  if (hasActiveEditorialCommission) return 'editorial_review'
   if (hasTitle || hasAsset) return 'published_legacy'
+  if (hasOpportunity) return 'pre_contract_setup'
   return 'awaiting_governed_action'
 }
 
@@ -911,6 +939,8 @@ function buildWorkspaceStatusLabel(row: ResolvedProjectRow) {
       return 'Awaiting Governed Action'
     case 'editorial_review':
       return `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
+    case 'developmental_editing':
+      return `${row.stageLabel || 'Developmental Editing'} - ${row.stageStatus || 'Not Started'}`
     case 'editorial_in_progress':
       return `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
     case 'production_in_progress':
@@ -930,12 +960,23 @@ function defaultNextActionLabel(row: ResolvedProjectRow) {
   switch (row.workspaceState) {
     case 'pre_contract_setup':
       return 'Complete the remaining setup steps for this project.'
+    case 'developmental_editing':
+      return 'No action is required from you at this time. We will update you when the developmental plan is ready for review.'
     case 'awaiting_governed_action':
       return 'This project is linked to your author relationship and is waiting for the next governed action.'
     case 'published_legacy':
       return 'This historical title is linked to your author relationship and remains available in your workspace.'
     case 'archived':
       return 'This project is archived and remains available as historical record.'
+    default:
+      return row.summary
+  }
+}
+
+function defaultProjectSummary(row: ResolvedProjectRow) {
+  switch (row.workspaceState) {
+    case 'developmental_editing':
+      return 'Developmental planning is being prepared for Volume I of the approved quarterly series.'
     default:
       return row.summary
   }
