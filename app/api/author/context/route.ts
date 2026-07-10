@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 
 import { getAuthorPortalContextFromCookies } from '@/lib/server/author-portal-context'
 
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const context = await getAuthorPortalContextFromCookies({
