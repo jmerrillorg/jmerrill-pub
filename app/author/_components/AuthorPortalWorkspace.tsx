@@ -29,7 +29,22 @@ export function AuthorPortalWorkspace() {
 
       try {
         const params = selectedParams
-        const selectedProjectLoad = await loadWorkspaceContext(params)
+        let selectedProjectLoad
+
+        try {
+          selectedProjectLoad = await loadWorkspaceContext(params)
+        } catch (loadError) {
+          if (!params.hasScopedSelection) {
+            throw loadError
+          }
+
+          selectedProjectLoad = {
+            ok: false,
+            status: 0,
+            error: loadError instanceof Error ? loadError.message : 'Scoped workspace load failed.',
+            context: null,
+          }
+        }
 
         let resolved = selectedProjectLoad
 
