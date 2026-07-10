@@ -5,8 +5,8 @@ import { AuthorPortalShell } from '../_components/AuthorPortalShell'
 import { AuthorPortalWorkspace } from '../_components/AuthorPortalWorkspace'
 
 export const metadata: Metadata = {
-  title: 'Author Workspace | J Merrill Publishing',
-  description: 'Private author workspace for active J Merrill Publishing projects.',
+  title: 'Author Operating Center | J Merrill Publishing',
+  description: 'Private author operating center for J Merrill Publishing projects.',
   robots: {
     index: false,
     follow: false,
@@ -16,11 +16,11 @@ export const metadata: Metadata = {
 export default function AuthorPortalPage() {
   return (
     <AuthorPortalShell
-      eyebrow="Author Workspace"
-      title="Your Author Workspace is ready."
-      description="Complete these setup steps so we can prepare your publishing agreement and begin your publishing journey."
+      eyebrow="Author Operating Center"
+      title="Your Author Operating Center is ready."
+      description="View your current publishing relationship, linked projects, and next expected actions in one place."
     >
-      <AuthorGate scope="portal">
+      <AuthorGate>
         <AuthorPortalWorkspace />
       </AuthorGate>
     </AuthorPortalShell>
