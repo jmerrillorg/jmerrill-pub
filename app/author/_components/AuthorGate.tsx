@@ -28,7 +28,7 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
   const storageKey = scope === 'portal' ? 'jmp-author-portal-unlocked' : 'jmp-author-onboarding-unlocked'
   const contextKey = scope === 'portal' ? 'jmp-author-portal-context' : 'jmp-author-onboarding-context'
   const bootstrapContextKey =
-    scope === 'portal' ? 'jmp-author-portal-bootstrap-context' : 'jmp-author-onboarding-bootstrap-context'
+    scope === 'portal' ? 'jm1_author_portal_bootstrap_context' : 'jm1_author_onboarding_bootstrap_context'
   const codeKey = scope === 'portal' ? 'jmp-author-portal-access-code' : 'jmp-author-onboarding-access-code'
 
   useEffect(() => {
