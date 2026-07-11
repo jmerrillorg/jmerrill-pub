@@ -4,8 +4,9 @@
  * Provider abstraction unit tests.
  *
  * Verifies:
- * - JM1_AI_PROVIDER drives provider selection
- * - Unknown/missing provider returns typed errors without silent fallthrough
+ * - governed deployment alias drives provider selection
+ * - legacy env override is explicit, not silent
+ * - unknown/missing route returns typed errors without silent fallthrough
  * - Azure OpenAI provider config validation
  * - Anthropic provider config validation and typed error codes
  * - Dual gate still blocks all providers when closed
@@ -21,6 +22,7 @@ const assert = require("node:assert/strict");
 
 const { resolveProvider, routeToProvider, SUPPORTED_PROVIDERS } = require("../src/model/providerRouter");
 const { callModel } = require("../src/model/modelCaller");
+const { LEGACY_PROVIDER_OVERRIDE_ENV } = require("../src/model/governedRouteRegistry");
 const { checkConfig: checkAzureConfig, REQUIRED_VARS: AZURE_REQUIRED_VARS } = require("../src/model/providers/azureOpenAiProvider");
 const { checkConfig: checkAnthropicConfig, REQUIRED_VARS: ANTHROPIC_REQUIRED_VARS, ANTHROPIC_ENDPOINT, DIAGNOSTIC_TOOL } = require("../src/model/providers/anthropicProvider");
 const { GATE_REASON } = require("../src/activation/aiExecutionGate");
@@ -57,85 +59,73 @@ describe("SUPPORTED_PROVIDERS", () => {
     assert.ok(SUPPORTED_PROVIDERS.includes("azure-openai"));
   });
 
-  test("contains anthropic", () => {
-    assert.ok(SUPPORTED_PROVIDERS.includes("anthropic"));
+  test("contains microsoft-foundry-claude", () => {
+    assert.ok(SUPPORTED_PROVIDERS.includes("microsoft-foundry-claude"));
+  });
+
+  test("contains anthropic-direct", () => {
+    assert.ok(SUPPORTED_PROVIDERS.includes("anthropic-direct"));
   });
 
   test("does not contain unexpected providers", () => {
     for (const p of SUPPORTED_PROVIDERS) {
-      assert.ok(["azure-openai", "anthropic"].includes(p), `unexpected provider: ${p}`);
+      assert.ok(
+        ["azure-openai", "microsoft-foundry-claude", "anthropic-direct"].includes(p),
+        `unexpected provider: ${p}`
+      );
     }
   });
 });
 
 // ── resolveProvider ───────────────────────────────────────────────────────────
 
-describe("resolveProvider — provider selection from JM1_AI_PROVIDER", () => {
-  test("resolves azure-openai", () => {
-    withEnv({ JM1_AI_PROVIDER: "azure-openai" }, () => {
-      const r = resolveProvider();
-      assert.equal(r.ok, true);
-      assert.equal(r.provider, "azure-openai");
-      assert.equal(r.error, null);
-    });
+describe("resolveProvider — governed route selection", () => {
+  test("resolves azure-openai from governed diagnostic alias", () => {
+    const r = resolveProvider({ modelDeploymentAlias: "jm1-pub-diagnostic-primary" });
+    assert.equal(r.ok, true);
+    assert.equal(r.provider, "azure-openai");
+    assert.equal(r.error, null);
   });
 
-  test("resolves anthropic", () => {
-    withEnv({ JM1_AI_PROVIDER: "anthropic" }, () => {
-      const r = resolveProvider();
-      assert.equal(r.ok, true);
-      assert.equal(r.provider, "anthropic");
-      assert.equal(r.error, null);
-    });
+  test("uncertified Foundry route fails closed without fallback", () => {
+    const r = resolveProvider({ modelDeploymentAlias: "jm1-editorial-devline-primary" });
+    assert.equal(r.ok, false);
+    assert.equal(r.provider, "microsoft-foundry-claude");
+    assert.equal(r.error, "AI_ROUTE_NOT_CERTIFIED");
   });
 
-  test("is case-insensitive", () => {
-    withEnv({ JM1_AI_PROVIDER: "Anthropic" }, () => {
-      const r = resolveProvider();
-      assert.equal(r.ok, true);
-      assert.equal(r.provider, "anthropic");
+  test("uncertified Foundry route falls back explicitly when allowed", () => {
+    const r = resolveProvider({
+      modelDeploymentAlias: "jm1-editorial-devline-primary",
+      allowFallback: true
     });
+    assert.equal(r.ok, true);
+    assert.equal(r.provider, "azure-openai");
+    assert.equal(r.route.fallbackFromAlias, "jm1-editorial-devline-primary");
   });
 
-  test("returns AI_PROVIDER_NOT_CONFIGURED when env var is absent", () => {
-    withEnv({ JM1_AI_PROVIDER: undefined }, () => {
+  test("returns AI_ROUTE_ALIAS_MISSING when alias is absent and legacy override is closed", () => {
+    withEnv({ JM1_AI_PROVIDER: undefined, [LEGACY_PROVIDER_OVERRIDE_ENV]: "false" }, () => {
       const r = resolveProvider();
       assert.equal(r.ok, false);
-      assert.equal(r.error, "AI_PROVIDER_NOT_CONFIGURED");
+      assert.equal(r.error, "AI_ROUTE_ALIAS_MISSING");
       assert.equal(r.provider, null);
     });
   });
 
-  test("returns AI_PROVIDER_NOT_CONFIGURED when env var is empty string", () => {
-    withEnv({ JM1_AI_PROVIDER: "" }, () => {
+  test("legacy provider override is case-insensitive and explicit", () => {
+    withEnv({ JM1_AI_PROVIDER: "Anthropic", [LEGACY_PROVIDER_OVERRIDE_ENV]: "true" }, () => {
       const r = resolveProvider();
-      assert.equal(r.ok, false);
-      assert.equal(r.error, "AI_PROVIDER_NOT_CONFIGURED");
+      assert.equal(r.ok, true);
+      assert.equal(r.provider, "anthropic-direct");
     });
   });
 
-  test("returns AI_PROVIDER_UNSUPPORTED for unknown provider value", () => {
-    withEnv({ JM1_AI_PROVIDER: "openai-direct" }, () => {
+  test("legacy provider override still returns typed unsupported errors", () => {
+    withEnv({ JM1_AI_PROVIDER: "gpt-4", [LEGACY_PROVIDER_OVERRIDE_ENV]: "true" }, () => {
       const r = resolveProvider();
       assert.equal(r.ok, false);
       assert.equal(r.error, "AI_PROVIDER_UNSUPPORTED");
-      assert.equal(r.provider, "openai-direct");
-    });
-  });
-
-  test("returns AI_PROVIDER_UNSUPPORTED for gpt-4 (unsupported alias)", () => {
-    withEnv({ JM1_AI_PROVIDER: "gpt-4" }, () => {
-      const r = resolveProvider();
-      assert.equal(r.ok, false);
-      assert.equal(r.error, "AI_PROVIDER_UNSUPPORTED");
-    });
-  });
-
-  test("does not fall through silently on unsupported provider", () => {
-    withEnv({ JM1_AI_PROVIDER: "foundry" }, () => {
-      const r = resolveProvider();
-      assert.equal(r.ok, false);
-      assert.ok(r.error, "must return a typed error for unsupported provider");
     });
   });
 });
@@ -415,25 +405,28 @@ describe("Anthropic provider — DIAGNOSTIC_TOOL schema contract", () => {
 // ── routeToProvider ───────────────────────────────────────────────────────────
 
 describe("routeToProvider — provider routing errors (no live calls)", () => {
-  test("returns AI_PROVIDER_NOT_CONFIGURED when JM1_AI_PROVIDER absent", async () => {
-    await withEnv({ JM1_AI_PROVIDER: undefined }, async () => {
+  test("returns AI_ROUTE_ALIAS_MISSING when governed alias is absent", async () => {
+    await withEnv({ JM1_AI_PROVIDER: undefined, [LEGACY_PROVIDER_OVERRIDE_ENV]: "false" }, async () => {
       const result = await routeToProvider({ promptBody: "test", diagnosticId: "test-id" });
       assert.equal(result.ok, false);
-      assert.equal(result.error, "AI_PROVIDER_NOT_CONFIGURED");
+      assert.equal(result.error, "AI_ROUTE_ALIAS_MISSING");
     });
   });
 
-  test("returns AI_PROVIDER_UNSUPPORTED for unknown provider", async () => {
-    await withEnv({ JM1_AI_PROVIDER: "foundry-direct" }, async () => {
-      const result = await routeToProvider({ promptBody: "test", diagnosticId: "test-id" });
-      assert.equal(result.ok, false);
-      assert.equal(result.error, "AI_PROVIDER_UNSUPPORTED");
+  test("returns AI_ROUTE_NOT_CERTIFIED for uncertified Foundry route without explicit fallback", async () => {
+    const result = await routeToProvider({
+      promptBody: "test",
+      diagnosticId: "test-id",
+      modelDeploymentAlias: "jm1-editorial-devline-primary"
     });
+      assert.equal(result.ok, false);
+      assert.equal(result.error, "AI_ROUTE_NOT_CERTIFIED");
   });
 
-  test("routes to Anthropic config check (no HTTP call — key missing)", async () => {
+  test("legacy override routes to Anthropic config check (no HTTP call — key missing)", async () => {
     await withEnv({
       JM1_AI_PROVIDER: "anthropic",
+      [LEGACY_PROVIDER_OVERRIDE_ENV]: "true",
       ANTHROPIC_API_KEY: undefined,
       ANTHROPIC_MODEL: "claude-sonnet-4-6"
     }, async () => {
@@ -445,14 +438,18 @@ describe("routeToProvider — provider routing errors (no live calls)", () => {
     });
   });
 
-  test("routes to Azure config check (no HTTP call — config missing)", async () => {
+  test("governed diagnostic alias routes to Azure config check (no HTTP call — config missing)", async () => {
     await withEnv({
-      JM1_AI_PROVIDER: "azure-openai",
+      JM1_AI_PROVIDER: "anthropic",
       AZURE_OPENAI_ENDPOINT: undefined,
       AZURE_OPENAI_API_VERSION: undefined,
       AZURE_OPENAI_DEPLOYMENT_NAME: undefined
     }, async () => {
-      const result = await routeToProvider({ promptBody: "test", diagnosticId: "test-id" });
+      const result = await routeToProvider({
+        promptBody: "test",
+        diagnosticId: "test-id",
+        modelDeploymentAlias: "jm1-pub-diagnostic-primary"
+      });
       assert.equal(result.ok, false);
       assert.equal(result.provider, "azure-openai");
       assert.ok(result.error.includes("AZURE_OPENAI_CONFIG_MISSING"),
@@ -461,11 +458,13 @@ describe("routeToProvider — provider routing errors (no live calls)", () => {
   });
 
   test("provider field in routing error result never contains secret values", async () => {
-    await withEnv({ JM1_AI_PROVIDER: "foundry-direct" }, async () => {
-      const result = await routeToProvider({ promptBody: "SECRET_PROMPT", diagnosticId: "test" });
+    const result = await routeToProvider({
+      promptBody: "SECRET_PROMPT",
+      diagnosticId: "test",
+      modelDeploymentAlias: "jm1-editorial-devline-primary"
+    });
       const resultStr = JSON.stringify(result);
       assert.ok(!resultStr.includes("SECRET_PROMPT"), "prompt body must not appear in error result");
-    });
   });
 });
 
@@ -545,6 +544,7 @@ describe("callModel — dual gate enforcement (no live calls)", () => {
     await withEnv({
       JM1_AI_EXECUTION_ENABLED: "true",
       JM1_AI_PROVIDER: "anthropic",
+      [LEGACY_PROVIDER_OVERRIDE_ENV]: "true",
       ANTHROPIC_API_KEY: undefined,
       ANTHROPIC_MODEL: "claude-sonnet-4-6"
     }, async () => {
@@ -564,7 +564,6 @@ describe("callModel — dual gate enforcement (no live calls)", () => {
   test("when gate passes, routes to provider (Azure config error — no HTTP call)", async () => {
     await withEnv({
       JM1_AI_EXECUTION_ENABLED: "true",
-      JM1_AI_PROVIDER: "azure-openai",
       AZURE_OPENAI_ENDPOINT: undefined,
       AZURE_OPENAI_API_VERSION: undefined,
       AZURE_OPENAI_DEPLOYMENT_NAME: undefined
@@ -574,7 +573,8 @@ describe("callModel — dual gate enforcement (no live calls)", () => {
         promptBody: "test",
         diagnosticId: "test-id",
         promptKey: "test-key",
-        promptVersion: "V1"
+        promptVersion: "V1",
+        modelDeploymentAlias: "jm1-pub-diagnostic-primary"
       });
       assert.equal(result.gateBlocked, false);
       assert.equal(result.provider, "azure-openai");
@@ -582,10 +582,11 @@ describe("callModel — dual gate enforcement (no live calls)", () => {
     });
   });
 
-  test("when gate passes and provider not configured, returns AI_PROVIDER_NOT_CONFIGURED", async () => {
+  test("when gate passes and governed alias is missing, returns AI_ROUTE_ALIAS_MISSING", async () => {
     await withEnv({
       JM1_AI_EXECUTION_ENABLED: "true",
-      JM1_AI_PROVIDER: undefined
+      JM1_AI_PROVIDER: undefined,
+      [LEGACY_PROVIDER_OVERRIDE_ENV]: "false"
     }, async () => {
       const result = await callModel({
         contractTestMode: false,
@@ -595,7 +596,7 @@ describe("callModel — dual gate enforcement (no live calls)", () => {
         promptVersion: "V1"
       });
       assert.equal(result.gateBlocked, false);
-      assert.equal(result.error, "AI_PROVIDER_NOT_CONFIGURED");
+      assert.equal(result.error, "AI_ROUTE_ALIAS_MISSING");
     });
   });
 });
