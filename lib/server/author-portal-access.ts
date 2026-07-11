@@ -317,15 +317,21 @@ function signPortalPayload(payload: string) {
 }
 
 function grantMatchesCode(grant: AuthorPortalAccessGrant, code: string) {
-  const trimmedCode = code.trim()
-  if (!trimmedCode) return false
+  const candidates = buildPortalCodeCandidates(code)
+  if (candidates.length === 0) return false
 
-  if (grant.code && constantTimeEqual(trimmedCode, grant.code)) {
+  if (
+    grant.code &&
+    buildPortalCodeCandidates(grant.code).some((storedCandidate) =>
+      candidates.some((candidate) => constantTimeEqual(candidate, storedCandidate)),
+    )
+  ) {
     return true
   }
 
   if (grant.accessCodeHash) {
-    return constantTimeEqual(hashPortalCode(trimmedCode), grant.accessCodeHash)
+    const accessCodeHash = grant.accessCodeHash
+    return candidates.some((candidate) => constantTimeEqual(hashPortalCode(candidate), accessCodeHash))
   }
 
   return false
@@ -338,14 +344,16 @@ function hashPortalCode(code: string) {
 }
 
 function isMasterPortalAccessCode(code: string) {
-  const trimmedCode = code.trim()
-  if (!trimmedCode) return false
+  const candidates = buildPortalCodeCandidates(code)
+  if (candidates.length === 0) return false
 
-  return (
-    constantTimeEqual(trimmedCode, getMasterAccessCode()) ||
-    constantTimeEqual(trimmedCode, getOnboardingAccessCode()) ||
-    (process.env.NODE_ENV === 'development' && constantTimeEqual(trimmedCode, LOCAL_TEST_PORTAL_CODE))
-  )
+  return [
+    getMasterAccessCode(),
+    getOnboardingAccessCode(),
+    process.env.NODE_ENV === 'development' ? LOCAL_TEST_PORTAL_CODE : '',
+  ]
+    .flatMap((storedCode) => buildPortalCodeCandidates(storedCode))
+    .some((storedCandidate) => candidates.some((candidate) => constantTimeEqual(candidate, storedCandidate)))
 }
 
 function buildMasterPortalFallbackGrant(requestedReference?: string): AuthorPortalAccessGrant {
@@ -415,4 +423,15 @@ function constantTimeEqual(left: string, right: string) {
   const rightBuffer = Buffer.from(right)
   if (leftBuffer.length !== rightBuffer.length) return false
   return timingSafeEqual(leftBuffer, rightBuffer)
+}
+
+function buildPortalCodeCandidates(value: string) {
+  const trimmed = value.trim()
+  if (!trimmed) return []
+
+  const normalizedWhitespace = trimmed.replace(/\s+/g, '')
+  const upper = normalizedWhitespace.toUpperCase()
+  const compact = upper.replace(/[^A-Z0-9]/g, '')
+
+  return Array.from(new Set([trimmed, normalizedWhitespace, upper, compact].filter(Boolean)))
 }
