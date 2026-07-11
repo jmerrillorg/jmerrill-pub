@@ -4,6 +4,7 @@ import { GENERATED_AUTHOR_PORTAL_ACCESS } from './author-portal-access.generated
 export type AuthorPortalAccessGrant = {
   code: string
   accessCodeHash?: string
+  accessCodeVersion?: 'activation-code-v1' | 'activation-code-v2'
   status?: string
   intakeReference?: string
   projectIds?: string[]
@@ -33,6 +34,8 @@ const DEFAULT_REFERENCE = 'JMP-INT-202607-0W5PTQ'
 const DEFAULT_TITLE = 'The Intentional Leader'
 const COOKIE_NAME = 'jm1_author_portal_session'
 const LOCAL_TEST_PORTAL_CODE = 'JMP-PORTAL-ADMIN-2026'
+const ACTIVATION_CODE_V1 = 'activation-code-v1'
+const ACTIVATION_CODE_V2 = 'activation-code-v2'
 
 export function getAuthorPortalCookieName() {
   return COOKIE_NAME
@@ -268,6 +271,10 @@ function normalizeGrant(entry: unknown): AuthorPortalAccessGrant | null {
   return {
     code,
     accessCodeHash,
+    accessCodeVersion:
+      record.accessCodeVersion === ACTIVATION_CODE_V1 || record.accessCodeVersion === ACTIVATION_CODE_V2
+        ? record.accessCodeVersion
+        : undefined,
     status: optionalString(record.status),
     intakeReference,
     projectIds,
@@ -317,21 +324,21 @@ function signPortalPayload(payload: string) {
 }
 
 function grantMatchesCode(grant: AuthorPortalAccessGrant, code: string) {
-  const candidates = buildPortalCodeCandidates(code)
-  if (candidates.length === 0) return false
+  const candidateForms = buildActivationCodeForms(code)
+  if (candidateForms.length === 0) return false
 
   if (
     grant.code &&
-    buildPortalCodeCandidates(grant.code).some((storedCandidate) =>
-      candidates.some((candidate) => constantTimeEqual(candidate, storedCandidate)),
+    buildActivationCodeForms(grant.code).some((storedForm) =>
+      candidateForms.some((candidateForm) => constantTimeEqual(candidateForm, storedForm)),
     )
   ) {
     return true
   }
 
   if (grant.accessCodeHash) {
-    const accessCodeHash = grant.accessCodeHash
-    return candidates.some((candidate) => constantTimeEqual(hashPortalCode(candidate), accessCodeHash))
+    const allowedForms = resolveGrantHashForms(grant, candidateForms)
+    return allowedForms.some((candidateForm) => constantTimeEqual(hashPortalCode(candidateForm), grant.accessCodeHash!))
   }
 
   return false
@@ -344,16 +351,16 @@ function hashPortalCode(code: string) {
 }
 
 function isMasterPortalAccessCode(code: string) {
-  const candidates = buildPortalCodeCandidates(code)
-  if (candidates.length === 0) return false
+  const candidateForms = buildActivationCodeForms(code)
+  if (candidateForms.length === 0) return false
 
   return [
     getMasterAccessCode(),
     getOnboardingAccessCode(),
     process.env.NODE_ENV === 'development' ? LOCAL_TEST_PORTAL_CODE : '',
   ]
-    .flatMap((storedCode) => buildPortalCodeCandidates(storedCode))
-    .some((storedCandidate) => candidates.some((candidate) => constantTimeEqual(candidate, storedCandidate)))
+    .flatMap((storedCode) => buildActivationCodeForms(storedCode))
+    .some((storedForm) => candidateForms.some((candidateForm) => constantTimeEqual(candidateForm, storedForm)))
 }
 
 function buildMasterPortalFallbackGrant(requestedReference?: string): AuthorPortalAccessGrant {
@@ -425,13 +432,41 @@ function constantTimeEqual(left: string, right: string) {
   return timingSafeEqual(leftBuffer, rightBuffer)
 }
 
-function buildPortalCodeCandidates(value: string) {
+function buildActivationCodeForms(value: string) {
   const trimmed = value.trim()
   if (!trimmed) return []
 
-  const normalizedWhitespace = trimmed.replace(/\s+/g, '')
-  const upper = normalizedWhitespace.toUpperCase()
-  const compact = upper.replace(/[^A-Z0-9]/g, '')
+  if (!/^[A-Za-z0-9\s-]+$/.test(trimmed)) return []
 
-  return Array.from(new Set([trimmed, normalizedWhitespace, upper, compact].filter(Boolean)))
+  const canonical = trimmed
+    .toUpperCase()
+    .replace(/\s+/g, '')
+    .replace(/-/g, '')
+  if (!canonical) return []
+
+  return Array.from(new Set([formatLegacyActivationCode(canonical), canonical]))
+}
+
+function formatLegacyActivationCode(canonical: string) {
+  const prefixed = canonical.match(/^([A-Z]{3})([A-Z0-9]{4,})$/)
+  if (prefixed) {
+    const [, prefix, remainder] = prefixed
+    const tail = remainder.match(/.{1,4}/g)?.join('-') || remainder
+    return `${prefix}-${tail}`
+  }
+
+  return canonical.match(/.{1,4}/g)?.join('-') || canonical
+}
+
+function resolveGrantHashForms(grant: AuthorPortalAccessGrant, candidateForms: string[]) {
+  const preferredVersion = grant.accessCodeVersion
+  if (preferredVersion === ACTIVATION_CODE_V2) {
+    return candidateForms.filter((form) => !form.includes('-'))
+  }
+
+  if (preferredVersion === ACTIVATION_CODE_V1) {
+    return candidateForms.filter((form) => form.includes('-'))
+  }
+
+  return candidateForms
 }
