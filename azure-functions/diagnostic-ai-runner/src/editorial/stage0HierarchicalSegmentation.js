@@ -33,8 +33,8 @@ const MONTH_TO_QUARTER = Object.freeze({
 });
 
 const ENTRY_HEADER_REGEX = new RegExp(
-  `^(${MONTHS.map((month) => month[0].toUpperCase() + month.slice(1)).join("|")})\\s+(\\d{1,2})(?:\\b|\\s*$)`,
-  "gm"
+  `^(${MONTHS.join("|")})\\s+(\\d{1,2})\\s*$`,
+  "gim"
 );
 
 function normalizeText(text) {
@@ -47,6 +47,15 @@ function quarterForMonth(month) {
 
 function estimateTokenCount(text) {
   return Math.max(1, Math.ceil(String(text || "").length / 4));
+}
+
+function canonicalizeMonth(month) {
+  const normalized = String(month || "").trim().toLowerCase();
+  if (!MONTHS.includes(normalized)) {
+    return String(month || "").trim();
+  }
+
+  return normalized[0].toUpperCase() + normalized.slice(1);
 }
 
 function buildSegmentId({ manuscriptArtifactId, manuscriptHash, entryDate, ordinal }) {
@@ -99,7 +108,7 @@ function extractSegments({ manuscriptArtifactId, manuscriptHash, manuscriptConte
     const start = match.index;
     const end = index + 1 < matches.length ? matches[index + 1].index : normalized.length;
     const rawText = normalized.slice(start, end).trim();
-    const monthName = String(match[1] || "").trim();
+    const monthName = canonicalizeMonth(match[1]);
     const day = String(match[2] || "").padStart(2, "0");
     const monthKey = monthName.toLowerCase();
     const entryDate = `${monthName} ${Number(match[2])}`;

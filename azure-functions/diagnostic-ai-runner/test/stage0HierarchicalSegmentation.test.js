@@ -30,6 +30,26 @@ Psalm 23:1
 This is the last governed entry in the partial manuscript.
 `;
 
+const UPPERCASE_MANUSCRIPT = `
+Cover Page
+
+JANUARY 1
+Begin Here
+Proverbs 1:1
+This is the first devotional entry with enough words to create a stable segment.
+
+SOUL DIVE - JANUARY 1
+Prompting material that must remain inside the January 1 segment.
+
+FEBRUARY 29 is a rare day.
+This prose sentence must not become a devotional header.
+
+JANUARY 2
+Stay Ready
+James 1:2
+This is the second devotional entry with enough words to stay intact.
+`;
+
 describe("stage0 hierarchical segmentation", () => {
   test("extracts dated devotional entries in order and recognizes partial year scope", () => {
     const result = extractSegments({
@@ -64,6 +84,23 @@ describe("stage0 hierarchical segmentation", () => {
     assert.deepEqual(
       first.segments.map((segment) => segment.segmentId),
       second.segments.map((segment) => segment.segmentId)
+    );
+  });
+
+  test("matches standalone uppercase month-day headers without treating prose mentions as entries", () => {
+    const result = extractSegments({
+      manuscriptArtifactId: "artifact-2",
+      manuscriptHash: "hash-2",
+      manuscriptContent: UPPERCASE_MANUSCRIPT
+    });
+
+    assert.equal(result.manifest.entryCount, 2);
+    assert.equal(result.segments[0].entryDate, "January 1");
+    assert.equal(result.segments[1].entryDate, "January 2");
+    assert.match(result.segments[0].content, /SOUL DIVE - JANUARY 1/);
+    assert.doesNotMatch(
+      result.segments.map((segment) => segment.entryDate).join(" | "),
+      /February 29/
     );
   });
 });
