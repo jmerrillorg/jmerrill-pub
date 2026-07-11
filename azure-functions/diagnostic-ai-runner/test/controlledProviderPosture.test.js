@@ -29,10 +29,11 @@ function withEnv(vars, fn) {
 }
 
 describe("controlled provider posture", () => {
-  test("controlled synthetic execution forces azure-openai even when default provider is anthropic", () => {
+  test("controlled synthetic execution resolves the governed azure fallback route", () => {
     withEnv({ JM1_AI_PROVIDER: "anthropic" }, () => {
       const result = resolveProvider({
-        executionType: "CONTROLLED_SYNTHETIC_DIAGNOSTIC"
+        executionType: "CONTROLLED_SYNTHETIC_DIAGNOSTIC",
+        modelDeploymentAlias: "jm1-pub-diagnostic-primary"
       });
       assert.equal(result.ok, true);
       assert.equal(result.error, null);
@@ -40,13 +41,15 @@ describe("controlled provider posture", () => {
     });
   });
 
-  test("controlled synthetic execution accepts azure-openai", () => {
+  test("controlled synthetic execution keeps the registry-selected alias visible", () => {
     withEnv({ JM1_AI_PROVIDER: "azure-openai" }, () => {
       const result = resolveProvider({
-        executionType: "CONTROLLED_SYNTHETIC_DIAGNOSTIC"
+        executionType: "CONTROLLED_SYNTHETIC_DIAGNOSTIC",
+        modelDeploymentAlias: "jm1-pub-diagnostic-primary"
       });
       assert.equal(result.ok, true);
       assert.equal(result.provider, "azure-openai");
+      assert.equal(result.route.deploymentAlias, "jm1-pub-diagnostic-primary");
     });
   });
 });

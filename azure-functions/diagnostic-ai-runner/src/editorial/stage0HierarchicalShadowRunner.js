@@ -191,6 +191,14 @@ async function executeHierarchicalShadowDiagnostic({
       promptKey: assembled.metadata.promptKey,
       promptVersion: promptVersion,
       executionType: "JMP_EDITORIAL_SHADOW_DIAGNOSTIC",
+      editorialTransaction: "GPAT-001",
+      gpatId: "GPAT-001",
+      modelDeploymentAlias: modelResolution.selectedModel.deploymentAlias,
+      selectedStyleGuides: [
+        ...(guideSelection.styleGuideIds || []),
+        ...(guideSelection.companionGuideIds || [])
+      ],
+      allowFallback: true,
       telemetry: {
         ...telemetry,
         correlationId: childCorrelationId
@@ -259,6 +267,14 @@ async function executeHierarchicalShadowDiagnostic({
     promptKey: finalPrompt.metadata.promptKey,
     promptVersion,
     executionType: "JMP_EDITORIAL_SHADOW_DIAGNOSTIC",
+    editorialTransaction: "GPAT-001",
+    gpatId: "GPAT-001",
+    modelDeploymentAlias: modelResolution.selectedModel.deploymentAlias,
+    selectedStyleGuides: [
+      ...(guideSelection.styleGuideIds || []),
+      ...(guideSelection.companionGuideIds || [])
+    ],
+    allowFallback: true,
     telemetry
   });
 

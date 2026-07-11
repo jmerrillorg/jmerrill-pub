@@ -38,6 +38,7 @@ const SOURCE_SYSTEM = "jm1-diagnostic-ai-runner";
  *   intakeReferenceCode: string,
  *   correlationId: string|null,
  *   executionMode: string,
+ *   modelProvider?: string|null,
  *   modelDeploymentAlias: string,
  *   promptKey: string,
  *   promptVersion: string,
@@ -68,7 +69,6 @@ function buildAiRequestLogPayload(input) {
     jm1_agentversion: AGENT_VERSION,
     jm1_airequestid: input.correlationId || input.diagnosticId,
     jm1_modeldeployment: input.modelDeploymentAlias,
-    jm1_modelprovider: MODEL_PROVIDER.AZURE_OPENAI,
     jm1_promptname: input.promptKey,
     jm1_promptversion: input.promptVersion,
     jm1_requeststatus: failed ? REQUEST_STATUS.FAILED : REQUEST_STATUS.COMPLETED,
@@ -88,6 +88,10 @@ function buildAiRequestLogPayload(input) {
     // jm1_responsepayload: NOT SET — AI model output prohibited
     // jm1_airecommendation: NOT SET — AI model output prohibited
   };
+
+  if (!input.modelProvider || input.modelProvider === "azure-openai") {
+    payload.jm1_modelprovider = MODEL_PROVIDER.AZURE_OPENAI;
+  }
 
   if (typeof input.confidence === "number") {
     payload.jm1_confidence = input.confidence;
@@ -114,7 +118,7 @@ function buildExecutionLogPayload(input, aiRequestLogId) {
 
   const payload = {
     jm1_name: `EXEC-${input.diagnosticId}-${input.executionMode}`,
-    jm1_actiondescription: `Stage 0 Diagnostic Runner — ${input.executionMode} execution for intake ${input.intakeReferenceCode}. No manuscript text stored. No prompt body stored.`,
+    jm1_actiondescription: `Stage 0 Diagnostic Runner — ${input.executionMode} execution for intake ${input.intakeReferenceCode}. Provider=${input.modelProvider || "unknown"}. No manuscript text stored. No prompt body stored.`,
     jm1_actiontype: "Stage0DiagnosticRun",
     jm1_agentname: AGENT_NAME,
     jm1_agentmodel: input.modelDeploymentAlias,

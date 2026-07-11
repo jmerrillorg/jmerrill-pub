@@ -10,7 +10,6 @@ const { routeDiagnosticResult } = require("../routing/confidenceRouter");
 const { writeMetadata } = require("../dataverse/metadataWriter");
 const { checkAiExecutionGate, getGateState } = require("../activation/aiExecutionGate");
 const { callModel } = require("../model/modelCaller");
-const { resolveProvider } = require("../model/providerRouter");
 const {
   ALLOWED_CONTROLLED_FIXTURES,
   loadControlledFixtureBuffer
@@ -213,8 +212,6 @@ app.http("run-stage0-diagnostic", {
         `Controlled AI test requested; diagnosticId=${diagnosticId}; gate.permitted=${gate.permitted}; gate.reason=${gate.reason}`
       );
 
-      const providerResolution = resolveProvider({ executionType: CONTROLLED_EXECUTION_TYPE });
-
       if (!gate.permitted) {
         return {
           status: 200,
@@ -231,8 +228,8 @@ app.http("run-stage0-diagnostic", {
               aiExecutionEnabled: gateState.aiExecutionEnabled
             },
             provider: {
-              configured: providerResolution.ok,
-              name: providerResolution.provider || null
+              configured: null,
+              name: null
             },
             message: `Controlled AI test gate is closed: ${gate.reason}. No model call attempted. No manuscript processed.`
           }
@@ -346,6 +343,10 @@ app.http("run-stage0-diagnostic", {
         promptKey,
         promptVersion,
         executionType: CONTROLLED_EXECUTION_TYPE,
+        editorialTransaction: "GPAT-001",
+        gpatId: "GPAT-001",
+        modelDeploymentAlias: promptResolution.modelDeploymentAlias,
+        allowFallback: true,
         telemetry
       });
       const responseTimestamp = new Date().toISOString();
@@ -800,7 +801,11 @@ app.http("run-stage0-diagnostic", {
         diagnosticId,
         promptKey,
         promptVersion,
-        executionType: null,
+        executionType: shadowMode ? SHADOW_EXECUTION_TYPE : "REAL_MANUSCRIPT_PILOT",
+        editorialTransaction: "GPAT-001",
+        gpatId: "GPAT-001",
+        modelDeploymentAlias: promptResolution.modelDeploymentAlias,
+        allowFallback: true,
         telemetry
       });
       const responseTimestamp = new Date().toISOString();

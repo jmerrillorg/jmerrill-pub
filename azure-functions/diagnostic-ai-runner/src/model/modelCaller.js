@@ -37,7 +37,20 @@ const { routeToProvider } = require("./providerRouter");
  *   error: string|null
  * }>}
  */
-async function callModel({ contractTestMode, promptBody, diagnosticId, promptKey, promptVersion, executionType = null, telemetry = null }) {
+async function callModel({
+  contractTestMode,
+  promptBody,
+  diagnosticId,
+  promptKey,
+  promptVersion,
+  executionType = null,
+  editorialTransaction = null,
+  gpatId = null,
+  modelDeploymentAlias = null,
+  selectedStyleGuides = [],
+  allowFallback = false,
+  telemetry = null
+}) {
   const gate = checkAiExecutionGate(contractTestMode);
 
   if (!gate.permitted) {
@@ -54,13 +67,26 @@ async function callModel({ contractTestMode, promptBody, diagnosticId, promptKey
     };
   }
 
-  const result = await routeToProvider({ promptBody, diagnosticId, executionType, telemetry });
+  const result = await routeToProvider({
+    promptBody,
+    diagnosticId,
+    executionType,
+    editorialTransaction,
+    gpatId,
+    modelDeploymentAlias,
+    promptKey,
+    promptVersion,
+    selectedStyleGuides,
+    allowFallback,
+    telemetry
+  });
 
   return {
     ok: result.ok,
     gateBlocked: false,
     gateReason: null,
     provider: result.provider,
+    route: result.route || null,
     configMissing: result.configMissing || null,
     output: result.output,
     tokenCounts: result.tokenCounts || { input: 0, output: 0, total: 0 },

@@ -6,9 +6,9 @@ const DIAGNOSTIC_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-
 const REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i;
 const CORRELATION_ID_PATTERN = /^[0-9a-zA-Z_-]{1,100}$/;
 
-// Pilot allowlist — mirrors constants in runStage0Diagnostic.js
-const AUTHORIZED_PILOT_DIAGNOSTIC_ID  = "64e387e0-7e6a-f111-a826-00224820105b";
-const AUTHORIZED_PILOT_REFERENCE_CODE = "JMP-INT-202606-UFYG60";
+// Governed real-manuscript authorization — mirrors runStage0Diagnostic.js
+const DEFAULT_AUTHORIZED_PILOT_DIAGNOSTIC_ID  = "64e387e0-7e6a-f111-a826-00224820105b";
+const DEFAULT_AUTHORIZED_PILOT_REFERENCE_CODE = "JMP-INT-202606-UFYG60";
 
 const VALID_DIAGNOSTIC_ID = "6490a7de-b868-f111-a826-000d3a14673b";
 const VALID_REFERENCE = "JMP-INT-240601-TESTAUTH";
@@ -81,30 +81,38 @@ describe("correlationId validation", () => {
 // ---------------------------------------------------------------------------
 
 describe("pilot authorization guard", () => {
-  function pilotGuard(diagnosticId, intakeReferenceCode) {
-    const idMatch  = diagnosticId.toLowerCase()       === AUTHORIZED_PILOT_DIAGNOSTIC_ID;
-    const refMatch = intakeReferenceCode.toUpperCase() === AUTHORIZED_PILOT_REFERENCE_CODE;
+  function getAuthorizedRealManuscriptTarget(env = {}) {
+    return {
+      diagnosticId: (env.JM1_REAL_MANUSCRIPT_DIAGNOSTIC_ID || DEFAULT_AUTHORIZED_PILOT_DIAGNOSTIC_ID).trim().toLowerCase(),
+      intakeReferenceCode: (env.JM1_REAL_MANUSCRIPT_REFERENCE_CODE || DEFAULT_AUTHORIZED_PILOT_REFERENCE_CODE).trim().toUpperCase(),
+    };
+  }
+
+  function pilotGuard(diagnosticId, intakeReferenceCode, env = {}) {
+    const authorizedTarget = getAuthorizedRealManuscriptTarget(env);
+    const idMatch  = diagnosticId.toLowerCase() === authorizedTarget.diagnosticId;
+    const refMatch = intakeReferenceCode.toUpperCase() === authorizedTarget.intakeReferenceCode;
     return idMatch && refMatch;
   }
 
   it("authorizes the one approved pilot record", () => {
-    assert.ok(pilotGuard(AUTHORIZED_PILOT_DIAGNOSTIC_ID, AUTHORIZED_PILOT_REFERENCE_CODE));
+    assert.ok(pilotGuard(DEFAULT_AUTHORIZED_PILOT_DIAGNOSTIC_ID, DEFAULT_AUTHORIZED_PILOT_REFERENCE_CODE));
   });
 
   it("authorizes regardless of diagnosticId letter case", () => {
-    assert.ok(pilotGuard(AUTHORIZED_PILOT_DIAGNOSTIC_ID.toUpperCase(), AUTHORIZED_PILOT_REFERENCE_CODE));
+    assert.ok(pilotGuard(DEFAULT_AUTHORIZED_PILOT_DIAGNOSTIC_ID.toUpperCase(), DEFAULT_AUTHORIZED_PILOT_REFERENCE_CODE));
   });
 
   it("authorizes regardless of intakeReferenceCode letter case", () => {
-    assert.ok(pilotGuard(AUTHORIZED_PILOT_DIAGNOSTIC_ID, AUTHORIZED_PILOT_REFERENCE_CODE.toLowerCase()));
+    assert.ok(pilotGuard(DEFAULT_AUTHORIZED_PILOT_DIAGNOSTIC_ID, DEFAULT_AUTHORIZED_PILOT_REFERENCE_CODE.toLowerCase()));
   });
 
   it("blocks when diagnosticId does not match", () => {
-    assert.ok(!pilotGuard("00000000-0000-0000-0000-000000000000", AUTHORIZED_PILOT_REFERENCE_CODE));
+    assert.ok(!pilotGuard("00000000-0000-0000-0000-000000000000", DEFAULT_AUTHORIZED_PILOT_REFERENCE_CODE));
   });
 
   it("blocks when intakeReferenceCode does not match", () => {
-    assert.ok(!pilotGuard(AUTHORIZED_PILOT_DIAGNOSTIC_ID, "JMP-INT-202606-WRONG1"));
+    assert.ok(!pilotGuard(DEFAULT_AUTHORIZED_PILOT_DIAGNOSTIC_ID, "JMP-INT-202606-WRONG1"));
   });
 
   it("blocks when both values are wrong", () => {
@@ -112,18 +120,31 @@ describe("pilot authorization guard", () => {
   });
 
   it("blocks an empty diagnosticId", () => {
-    assert.ok(!pilotGuard("", AUTHORIZED_PILOT_REFERENCE_CODE));
+    assert.ok(!pilotGuard("", DEFAULT_AUTHORIZED_PILOT_REFERENCE_CODE));
   });
 
   it("blocks an empty intakeReferenceCode", () => {
-    assert.ok(!pilotGuard(AUTHORIZED_PILOT_DIAGNOSTIC_ID, ""));
+    assert.ok(!pilotGuard(DEFAULT_AUTHORIZED_PILOT_DIAGNOSTIC_ID, ""));
   });
 
-  it("authorized diagnosticId matches the Approval 2 pilot record exactly", () => {
-    assert.equal(AUTHORIZED_PILOT_DIAGNOSTIC_ID, "64e387e0-7e6a-f111-a826-00224820105b");
+  it("uses configured governed real-manuscript target when provided", () => {
+    assert.ok(
+      pilotGuard(
+        "18CB5C53-6076-F111-AB0F-000D3A9EACEE",
+        "jmp-int-202607-0w5ptq",
+        {
+          JM1_REAL_MANUSCRIPT_DIAGNOSTIC_ID: "18cb5c53-6076-f111-ab0f-000d3a9eacee",
+          JM1_REAL_MANUSCRIPT_REFERENCE_CODE: "JMP-INT-202607-0W5PTQ",
+        }
+      )
+    );
   });
 
-  it("authorized intakeReferenceCode matches the Approval 2 pilot intake exactly", () => {
-    assert.equal(AUTHORIZED_PILOT_REFERENCE_CODE, "JMP-INT-202606-UFYG60");
+  it("default authorized diagnosticId matches the original Approval 2 pilot record exactly", () => {
+    assert.equal(DEFAULT_AUTHORIZED_PILOT_DIAGNOSTIC_ID, "64e387e0-7e6a-f111-a826-00224820105b");
+  });
+
+  it("default authorized intakeReferenceCode matches the original Approval 2 pilot intake exactly", () => {
+    assert.equal(DEFAULT_AUTHORIZED_PILOT_REFERENCE_CODE, "JMP-INT-202606-UFYG60");
   });
 });

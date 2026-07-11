@@ -3,55 +3,62 @@
 /**
  * Provider router for the Stage 0 Diagnostic AI Runner.
  *
- * Resolves provider from JM1_AI_PROVIDER env var and delegates to the
+ * Resolves provider from the governed route registry and delegates to the
  * appropriate provider module. Never falls through silently — unknown or
  * missing provider values return typed errors.
- *
- * Supported providers:
- *   azure-openai  — Azure OpenAI via MSI (DefaultAzureCredential)
- *   anthropic     — Anthropic Messages API via ANTHROPIC_API_KEY
- *
- * Preferred for INT-PUB-005 REV / Intake Editorial Review: anthropic (Claude Sonnet)
  */
 
-const SUPPORTED_PROVIDERS = Object.freeze(["azure-openai", "anthropic"]);
-const CONTROLLED_ALLOWED_PROVIDER = "azure-openai";
-const SHADOW_ALLOWED_PROVIDER = "azure-openai";
+const {
+  PROVIDERS,
+  resolveGovernedRoute
+} = require("./governedRouteRegistry");
+
+const SUPPORTED_PROVIDERS = Object.freeze([
+  PROVIDERS.AZURE_OPENAI,
+  PROVIDERS.MICROSOFT_FOUNDRY_CLAUDE,
+  PROVIDERS.ANTHROPIC_DIRECT
+]);
 
 /**
- * Resolves the provider from the JM1_AI_PROVIDER env var.
- * @returns {{ ok: boolean, provider: string|null, error: string|null }}
+ * Resolves the governed route and resulting provider.
+ * @returns {{ ok: boolean, provider: string|null, error: string|null, route?: object|null }}
  */
-function resolveProvider({ executionType } = {}) {
-  if (executionType === "CONTROLLED_SYNTHETIC_DIAGNOSTIC") {
+function resolveProvider({
+  executionType,
+  editorialTransaction = null,
+  gpatId = null,
+  modelDeploymentAlias = null,
+  promptKey = null,
+  promptVersion = null,
+  selectedStyleGuides = [],
+  allowFallback = false
+} = {}) {
+  const routeResolution = resolveGovernedRoute({
+    executionType,
+    editorialTransaction,
+    gpatId,
+    modelDeploymentAlias,
+    promptKey,
+    promptVersion,
+    selectedStyleGuides,
+    allowFallback
+  });
+
+  if (!routeResolution.ok) {
     return {
-      ok: true,
-      provider: CONTROLLED_ALLOWED_PROVIDER,
-      error: null
+      ok: false,
+      provider: routeResolution.route?.provider || null,
+      route: routeResolution.route || null,
+      error: routeResolution.error || "AI_ROUTE_NOT_RESOLVED"
     };
   }
 
-  if (executionType === "JMP_EDITORIAL_SHADOW_DIAGNOSTIC") {
-    return {
-      ok: true,
-      provider: SHADOW_ALLOWED_PROVIDER,
-      error: null
-    };
-  }
-
-  const raw = process.env.JM1_AI_PROVIDER;
-
-  if (!raw || !raw.trim()) {
-    return { ok: false, provider: null, error: "AI_PROVIDER_NOT_CONFIGURED" };
-  }
-
-  const normalized = raw.trim().toLowerCase();
-
-  if (!SUPPORTED_PROVIDERS.includes(normalized)) {
-    return { ok: false, provider: normalized, error: "AI_PROVIDER_UNSUPPORTED" };
-  }
-
-  return { ok: true, provider: normalized, error: null };
+  return {
+    ok: true,
+    provider: routeResolution.route.provider,
+    route: routeResolution.route,
+    error: null
+  };
 }
 
 /**
@@ -61,13 +68,35 @@ function resolveProvider({ executionType } = {}) {
  * @param {{ promptBody: string, diagnosticId: string }} params
  * @returns {Promise<object>}
  */
-async function routeToProvider({ promptBody, diagnosticId, executionType, telemetry = null }) {
-  const resolution = resolveProvider({ executionType });
+async function routeToProvider({
+  promptBody,
+  diagnosticId,
+  executionType,
+  editorialTransaction = null,
+  gpatId = null,
+  modelDeploymentAlias = null,
+  promptKey = null,
+  promptVersion = null,
+  selectedStyleGuides = [],
+  allowFallback = false,
+  telemetry = null
+}) {
+  const resolution = resolveProvider({
+    executionType,
+    editorialTransaction,
+    gpatId,
+    modelDeploymentAlias,
+    promptKey,
+    promptVersion,
+    selectedStyleGuides,
+    allowFallback
+  });
 
   if (!resolution.ok) {
     return {
       ok: false,
       provider: resolution.provider,
+      route: resolution.route || null,
       configMissing: null,
       output: null,
       tokenCounts: { input: 0, output: 0, total: 0 },
@@ -77,19 +106,24 @@ async function routeToProvider({ promptBody, diagnosticId, executionType, teleme
   }
 
   switch (resolution.provider) {
-    case "anthropic": {
+    case PROVIDERS.ANTHROPIC_DIRECT: {
       const { call } = require("./providers/anthropicProvider");
-      return call({ promptBody, diagnosticId, telemetry });
+      return call({ promptBody, diagnosticId, telemetry, route: resolution.route });
     }
-    case "azure-openai": {
+    case PROVIDERS.AZURE_OPENAI: {
       const { call } = require("./providers/azureOpenAiProvider");
-      return call({ promptBody, diagnosticId, telemetry });
+      return call({ promptBody, diagnosticId, telemetry, route: resolution.route });
+    }
+    case PROVIDERS.MICROSOFT_FOUNDRY_CLAUDE: {
+      const { call } = require("./providers/microsoftFoundryClaudeProvider");
+      return call({ promptBody, diagnosticId, telemetry, route: resolution.route });
     }
     default:
       // Unreachable given SUPPORTED_PROVIDERS check above, but must not fall through silently.
       return {
         ok: false,
         provider: resolution.provider,
+        route: resolution.route || null,
         configMissing: null,
         output: null,
         tokenCounts: { input: 0, output: 0, total: 0 },
