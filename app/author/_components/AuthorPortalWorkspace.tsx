@@ -476,6 +476,7 @@ async function safeReadJson(response: Response) {
 function isEditorialWorkspaceState(state: AuthorPortalContext['projects'][number]['workspaceState']) {
   return (
     state === 'editorial_review' ||
+    state === 'developmental_editing' ||
     state === 'editorial_in_progress' ||
     state === 'production_in_progress' ||
     state === 'distribution_release_pending'
@@ -485,6 +486,7 @@ function isEditorialWorkspaceState(state: AuthorPortalContext['projects'][number
 function projectStateBadge(state: AuthorPortalContext['projects'][number]['workspaceState']) {
   switch (state) {
     case 'editorial_review':
+    case 'developmental_editing':
     case 'editorial_in_progress':
     case 'production_in_progress':
     case 'distribution_release_pending':
