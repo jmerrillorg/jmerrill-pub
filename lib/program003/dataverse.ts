@@ -127,6 +127,7 @@ function mapStage(row: DataverseValue): EditorialStageRecord {
     stageSequence: numberish(row.jm1pub_stagesequence),
     assignedEditor: stringish(row.jm1pub_assignedownereditor || row.jm1pub_assignededitorid),
     governingStyleGuide: stringish(row.jm1pub_governingstyleguide),
+    inheritedImprint: stringish(row.jm1pub_imprintpath),
     healthStatus: mapHealthStatus(formatted(row, 'jm1pub_healthstatus', 'Watch')),
     authorSafeSummary: stringish(row.jm1pub_authorsafesummary || row.jm1pub_projecttitle),
     startedOn: stringish(row.jm1pub_stagestartdate || row.jm1pub_startedon),

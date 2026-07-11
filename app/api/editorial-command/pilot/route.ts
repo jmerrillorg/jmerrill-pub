@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { buildWorkspaceEditorialModule } from '@/lib/program003/editorial-command'
+import { buildDevelopmentalReviewPackage, buildWorkspaceEditorialModule } from '@/lib/program003/editorial-command'
 import { getEditorialRecordForAsset, getProgram003PilotAssetId } from '@/lib/program003/dataverse'
 
 export const runtime = 'nodejs'
@@ -36,6 +36,7 @@ export async function GET() {
       generatedAt: new Date().toISOString(),
       record,
       workspaceModule: buildWorkspaceEditorialModule(record),
+      developmentalReviewPackage: buildDevelopmentalReviewPackage(record),
     },
     {
       headers: {
