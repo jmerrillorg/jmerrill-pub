@@ -3,6 +3,8 @@
 **Status:** CANON — approved by Jackie Smith, Jr., June 2026
 **Approval rulings:** calibration block (§1.3) confirmed as written; deity pronoun house default (§2.3.4) ruled CAPITALIZE when author states no preference
 **Version:** 1.0 (replaces three stubs)
+**Effective date:** 2026-07-11
+**Supersession:** immutable published canon; substantive changes require version increment and synchronized publication
 **Source doctrine:** Damaged copyedit, Ch. 24–38 + Epilogue (street-lit
 voice preservation; CMOS compliance without voice erasure) · Kimberly
 Reeder line edit, Ch. 1–5 (first-time author line editing experience) ·

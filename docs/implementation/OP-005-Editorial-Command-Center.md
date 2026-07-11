@@ -1,6 +1,6 @@
 # OP-005 - Editorial Command Center
 
-**Status:** IMPLEMENTED / CANON SOURCE CORRECTION IN PROGRESS
+**Status:** IMPLEMENTED / CANON RECONCILIATION UPDATED
 **Program:** PROGRAM-002 Autonomous Publishing Production Pipeline  
 **Date:** 2026-07-02  
 **Module:** OP-005 Editorial Command Center
@@ -45,7 +45,12 @@ The active source package is `jm1-publishing-editorial-v2.skill`, which contains
 - `references/copyediting.md`
 - `references/proofreading.md`
 
-The active references folder contains `JM1-PUB-Editorial-Knowledge-v1.0.md` and `developmental-editing.md`. The v2 skill package is the source for line editing, copyediting, and proofreading references.
+The current governing upload for this movement is:
+
+- `JM1-PUB-Editorial-Knowledge-v1.0`
+- `faith-editorial-overlay.md v1.0`
+
+Repo implementation now treats those uploaded files as governing authority and uses the canon cache only as a reconciled mirror.
 
 OP-005 uses the approved editorial canon handoff:
 
@@ -61,7 +66,7 @@ OP-005 uses the approved editorial canon handoff:
 
 ## Corrected Style Guide Matrix
 
-The approved style guide roster contains exactly 14 guides:
+The approved external style guide roster contains exactly 14 guides:
 
 1. CMoS
 2. APA
@@ -78,12 +83,7 @@ The approved style guide roster contains exactly 14 guides:
 13. MHRA
 14. Oxford
 
-The live OneDrive/SharePoint knowledge files were updated on 2026-07-02:
-
-- `JM1-PUB-Editorial-Knowledge-v1.0.md`
-- `JM1-PUB-Editorial-Knowledge-v1.0 (1).md`
-
-The repo-side OP-005 record and website model also reflect the corrected 14-guide roster.
+The Project Style Sheet is a separate internal JMP layer initialized during Editorial Review and carried through Developmental, Line, Copy, Proof, and Archive. It is not an external guide.
 
 ## Internal Style Overlays
 
@@ -93,7 +93,7 @@ The three internal overlays remain tracked:
 - Urban / Street-Lit Voice Preservation
 - Children's Book Standard
 
-SharePoint search found `faith-editorial-overlay.md` in `Architecture / 06_Session_Archive`, not in the active `references` folder. The file was cached locally for implementation awareness, but active-canon placement remains a follow-up. Overlay names remain internal-only and are not author-facing.
+Overlay names remain internal-only and are never author-facing. Author-facing projections must reject overlay labels, doctrine labels, overlay IDs, model reasoning, and prompt references.
 
 ## Orchestration Behavior
 

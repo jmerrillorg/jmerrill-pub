@@ -1,7 +1,10 @@
 # Developmental Editing
 
-**Status:** CANON-CANDIDATE - Operational Proof Pending  
-**Applies to:** PROGRAM-003 Developmental Editing stage inside the Editorial Command Center  
+**Status:** CANON-CANDIDATE - Operational Proof Pending
+**Version:** v1.0-operational-proof
+**Effective date:** 2026-07-11
+**Supersession:** replaces thin developmental stubs for active implementation purposes; future substantive changes require version increment and synchronized publication
+**Applies to:** PROGRAM-003 Developmental Editing stage inside the Editorial Command Center
 **Current controlled proof title:** *The Intentional Leader* - Volume I
 
 ## 1. Purpose
@@ -130,6 +133,12 @@ Developmental Editing inherits approved upstream values for:
 
 These values are inherited, not re-derived.
 
+The JMP Project Style Sheet initializes during Editorial Review and follows the manuscript through:
+
+`Editorial Review -> Developmental -> Line -> Copy -> Proof -> Archive`
+
+It is an internal project layer, not one of the 14 external guides.
+
 ## 14. Author-Voice Protection
 
 The author's cadence, devotional tone, and stated purpose must remain primary. Developmental guidance may strengthen the delivery of that voice but may not flatten it into generic publisher prose.
@@ -168,6 +177,13 @@ Each governed package retains provenance references for:
 - human reviewer
 - publisher approver
 
+## 18A. Scripture and Readability
+
+- Scripture handling remains translation-aware with KJV as the house baseline.
+- Non-KJV quotation requires explicit publisher direction and rights awareness.
+- Readability is governed by method, not by hard-coded Lexile alone.
+- Supported readability methods include Lexile, grade level, named provider, score, assessment date, and vocabulary rulings.
+
 ## 19. Delivery Standard
 
 Email remains the official transactional channel for author decisions. The Author Operating Center may mirror truthful status only when the released artifact exists and is author-accessible.
@@ -175,6 +191,20 @@ Email remains the official transactional channel for author decisions. The Autho
 ## 20. Author Response Handling
 
 Author responses must map to the correct package version and approval gate. No later package or stage may overwrite the recorded decision for the current package.
+
+## 20A. Correction Count Standard
+
+Mechanical correction count must be deterministic and report:
+
+- recurring rule
+- corrected instances
+- preserved voice
+- preserved dialect
+- preserved cadence
+
+Author-safe summary form:
+
+`We corrected X mechanical instances across Y recurring editorial patterns while intentionally preserving the manuscript's voice.`
 
 ## 21. Revision Receipt
 

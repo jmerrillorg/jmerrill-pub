@@ -1,9 +1,9 @@
 # PROGRAM-003A Editorial Model Routing and 14-Style-Guide Governance
 
-**Classification:** Operational routing foundation  
-**Status:** Implemented foundation slice; live preferred-model execution still blocked by deployment gap  
-**Authority:** Jackie  
-**Date:** 2026-07-10  
+**Classification:** Operational routing foundation
+**Status:** Reconciled to governing canon
+**Authority:** Jackie
+**Date:** 2026-07-10
 
 ## Executive Read
 
@@ -83,22 +83,24 @@ Requested verification results:
 
 ## 4. Numbered Inventory of the 14 Canonical Style Guides
 
-**Governed source:** [knowledge.md](/Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/Implementation%20HQ%20-%20Architecture/00_CANON/Publishing/Skills/jm1-publishing-editorial/references/knowledge.md) Section 3, version `JM1-PUB-Editorial-Knowledge-v1.1`.
+**Governed source:** [knowledge.md](/Volumes/UsersExternal/_INBOX/md/knowledge.md) plus explicit Jackie roster ruling dated 2026-07-11.
 
 1. `JMP-SG-CMOS` — Chicago Manual of Style
-2. `JMP-SG-PUBLISHER-STYLESHEET` — Publisher Style Sheet
-3. `JMP-SG-APA` — APA Style
-4. `JMP-SG-MLA` — MLA Handbook
-5. `JMP-SG-AMA` — AMA Manual of Style
-6. `JMP-SG-AP` — Associated Press Stylebook
-7. `JMP-SG-IEEE` — IEEE Editorial Style Manual
+2. `JMP-SG-APA` — APA Style
+3. `JMP-SG-MLA` — MLA Handbook
+4. `JMP-SG-AP` — Associated Press Stylebook
+5. `JMP-SG-HARVARD` — Harvard Referencing
+6. `JMP-SG-TURABIAN` — Turabian
+7. `JMP-SG-AMA` — AMA Manual of Style
 8. `JMP-SG-ACS` — ACS Style Guide
-9. `JMP-SG-AIP` — AIP Style Manual
-10. `JMP-SG-CSE` — CSE Manual
-11. `JMP-SG-ISO` — ISO Editorial Conventions
-12. `JMP-SG-BLUEBOOK` — The Bluebook
-13. `JMP-SG-OSCOLA` — OSCOLA
-14. `JMP-SG-AGLC` — Australian Guide to Legal Citation
+9. `JMP-SG-BLUEBOOK` — The Bluebook
+10. `JMP-SG-IEEE` — IEEE Editorial Style Manual
+11. `JMP-SG-CSE` — CSE Manual
+12. `JMP-SG-GPO` — U.S. Government Publishing Office Style Manual
+13. `JMP-SG-MHRA` — MHRA Style Guide
+14. `JMP-SG-OXFORD` — Oxford Style
+
+The Project Style Sheet remains an internal lifecycle artifact, not one of the 14 external guides.
 
 ### Important note on editions
 
@@ -115,14 +117,17 @@ That is enough to route truthfully, but not enough to claim edition-specific cit
 | Manuscript class | Primary guide | Secondary guide |
 |---|---|---|
 | Trade fiction / trade nonfiction | CMoS | None |
-| Children's | CMoS | Publisher Style Sheet |
+| Children's | CMoS | Project Style Sheet lifecycle applies internally |
 | Poetry | CMoS | Poet's established form is advisory, not part of the 14-guide canon |
 | Social sciences / education / psychology | APA | CMoS |
 | Humanities / literature | MLA | CMoS |
 | Medical / health | AMA | CMoS |
 | Journalism / media | AP | CMoS |
-| Technical / scientific | IEEE / ACS / AIP / CSE / ISO | CMoS |
-| Legal / institutional | Bluebook / OSCOLA / AGLC | CMoS or government style as applicable |
+| Technical / scientific | IEEE / ACS / CSE | CMoS |
+| Legal / institutional | Bluebook | Government style as applicable |
+| Public sector / government | GPO | CMoS |
+| Academic humanities / thesis | Turabian | CMoS |
+| International academic / UK-facing | Harvard / MHRA / Oxford | CMoS |
 
 ## 6. Precedence and Conflict Rules
 
