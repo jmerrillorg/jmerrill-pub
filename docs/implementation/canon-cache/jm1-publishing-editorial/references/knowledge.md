@@ -1,6 +1,6 @@
 # JM1-PUB-Editorial-Knowledge-v1.0
 **J Merrill Publishing, Inc. — Editorial Review GPT Knowledge Document**
-Status: CANON | Version: 1.0 | April 2026
+Status: CANON | Version: 1.0 | Effective date: 2026-07-11 | Supersession: immutable published canon; substantive changes require version increment and synchronized publication
 
 This document is attached to the Editorial Review GPT as a reference knowledge file.
 It contains imprint definitions, scoring weight guidance, style guide matrix, and compliance detail.

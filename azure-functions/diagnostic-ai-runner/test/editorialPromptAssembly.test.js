@@ -44,7 +44,7 @@ describe("editorial prompt assembly", () => {
     assert.ok(assembled.promptHash);
     assert.ok(assembled.promptBody.includes("Chicago Manual of Style"));
     assert.ok(assembled.promptBody.includes("JMP Developmental Editing — Reference"));
-    assert.ok(assembled.promptBody.includes("JMP Editorial Overlays — Faith & Inspirational"));
+    assert.ok(assembled.promptBody.includes("JMP Editorial Overlays — Internal Doctrine"));
     assert.equal(assembled.metadata.selectedGuideIds.includes("JMP-SG-APA"), false);
   });
 });

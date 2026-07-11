@@ -3,6 +3,8 @@
 **Status:** CANON — approved by Jackie Smith, Jr., June 2026
 **Approval rulings:** §2.3.3 correction count disclosure = STANDARD for all street-lit engagements; §3.2 picture book figures (32pp / 500–700 words / 12–14 spreads) confirmed as JMP house figures
 **Version:** 1.0 (new file)
+**Effective date:** 2026-07-11
+**Supersession:** immutable published canon; substantive changes require version increment and synchronized publication
 **Contains:** Faith & Inspirational · Urban/Street-Lit Voice Preservation ·
 Children's Book Standard (JM Little)
 **Source doctrine:** Scripture Display Governance (canon) · Damaged

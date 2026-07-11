@@ -35,7 +35,8 @@ describe("editorial guide selector", () => {
 
     assert.equal(result.ok, true);
     assert.equal(result.selectedPrimaryGuide.id, "JMP-SG-CMOS");
-    assert.ok(result.styleGuideIds.includes("JMP-SG-PUBLISHER-STYLESHEET"));
+    assert.equal(result.projectStyleSheetPolicy.required, true);
+    assert.equal(result.projectStyleSheetPolicy.sheet.canonicalName, "JMP Project Style Sheet");
   });
 
   test("selects AMA with CMoS fallback for medical health manuscripts", () => {
@@ -70,5 +71,30 @@ describe("editorial guide selector", () => {
 
     assert.equal(result.ok, false);
     assert.ok(result.conflicts.includes("EDITORIAL_STAGE_REQUIRED"));
+  });
+
+  test("selects Turabian for thesis-like humanities work", () => {
+    const result = selectStyleGuides({
+      manuscriptType: "academic_humanities",
+      genre: "thesis",
+      editorialStage: "developmental_editing"
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.selectedPrimaryGuide.id, "JMP-SG-TURABIAN");
+    assert.deepEqual(result.styleGuideIds, ["JMP-SG-TURABIAN", "JMP-SG-CMOS"]);
+  });
+
+  test("selects Harvard by default for UK-facing academic work", () => {
+    const result = selectStyleGuides({
+      manuscriptType: "international_academic",
+      audience: "adult",
+      language: "english",
+      genre: "uk-facing",
+      editorialStage: "copy_editing"
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.selectedPrimaryGuide.id, "JMP-SG-HARVARD");
   });
 });
