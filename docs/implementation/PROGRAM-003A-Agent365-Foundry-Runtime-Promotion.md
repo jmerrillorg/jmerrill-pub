@@ -1,6 +1,6 @@
 ## PROGRAM-003A Agent365 / Foundry Runtime Promotion
 
-Status: Promotion materially proven on 2026-07-10
+Status: Promotion materially proven on 2026-07-10; GPAT-001 Shadow Mode active
 
 Purpose
 - Promote the existing governance model into live runtime behavior without redesigning the enterprise architecture.
@@ -49,6 +49,11 @@ Controlled proof reference
 - See: `PROGRAM-003A-Controlled-Production-Proof.md`
 - Correlation ID: `PROGRAM003A-FOUNDRY-PROOF-20260710-01`
 
+Shadow-mode evidence reference
+- First real-manuscript shadow invocation completed against a governed production manuscript without changing author-facing or workflow truth
+- Result: runtime succeeded through governed layers, but the single-shot manuscript request failed with HTTP `400` before substantive editorial reasoning because the payload exceeded the practical request limit
+- Disposition: Shadow Mode remains active; remediation is required in the input architecture rather than in governance, audit, or permission controls
+
 Business boundary preserved
 - The A2 approval slice for The Intentional Leader was not reopened
 - Developmental Editing remains the live business lane
@@ -56,9 +61,11 @@ Business boundary preserved
 
 Remaining completion items
 - Source-control reconciliation into one governed PR from the relevant runtime files
+- hierarchical manuscript-analysis path for GPAT-001 shadow execution
+- rerun of the governed real-manuscript shadow evaluation using hierarchical analysis
 - fresh authenticated browser validation showing The Intentional Leader as `Developmental Editing / In Progress`
 - final deployment evidence for the truth guard / operating-center runtime if not already captured in this slice
 
 Readiness decision
 - Agent 365 governance plus Azure runtime execution is proven enough to support the first governed publishing transaction path.
-- Remaining work is reconciliation and live UI confirmation, not architectural uncertainty.
+- Remaining work is transaction remediation, comparison evidence, and live UI confirmation, not architectural uncertainty.

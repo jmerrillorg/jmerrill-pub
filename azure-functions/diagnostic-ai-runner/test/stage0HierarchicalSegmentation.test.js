@@ -1,0 +1,69 @@
+"use strict";
+
+const { describe, test } = require("node:test");
+const assert = require("node:assert/strict");
+
+const { extractSegments } = require("../src/editorial/stage0HierarchicalSegmentation");
+
+const SAMPLE_MANUSCRIPT = `
+Front Matter Title
+By Example Author
+
+January 1
+Begin Here
+Proverbs 1:1
+This is the first devotional entry with enough words to create a stable segment.
+
+January 2
+Stay Ready
+James 1:2
+This is the second devotional entry with enough words to stay intact.
+
+March 31
+Move Forward
+Romans 12:1
+This is the closing quarter entry for testing the quarterly grouping logic.
+
+August 11
+Keep Going
+Psalm 23:1
+This is the last governed entry in the partial manuscript.
+`;
+
+describe("stage0 hierarchical segmentation", () => {
+  test("extracts dated devotional entries in order and recognizes partial year scope", () => {
+    const result = extractSegments({
+      manuscriptArtifactId: "artifact-1",
+      manuscriptHash: "hash-1",
+      manuscriptContent: SAMPLE_MANUSCRIPT
+    });
+
+    assert.equal(result.manifest.entryCount, 4);
+    assert.equal(result.segments[0].entryDate, "January 1");
+    assert.equal(result.segments[1].entryDate, "January 2");
+    assert.equal(result.segments[2].entryDate, "March 31");
+    assert.equal(result.segments[3].entryDate, "August 11");
+    assert.equal(result.segments[0].quarter, "Q1");
+    assert.equal(result.segments[3].quarter, "Q3");
+    assert.equal(result.manifest.partialYearRecognized, true);
+    assert.ok(result.frontMatter.includes("Front Matter Title"));
+  });
+
+  test("produces stable segment ids for the same source content", () => {
+    const first = extractSegments({
+      manuscriptArtifactId: "artifact-1",
+      manuscriptHash: "hash-1",
+      manuscriptContent: SAMPLE_MANUSCRIPT
+    });
+    const second = extractSegments({
+      manuscriptArtifactId: "artifact-1",
+      manuscriptHash: "hash-1",
+      manuscriptContent: SAMPLE_MANUSCRIPT
+    });
+
+    assert.deepEqual(
+      first.segments.map((segment) => segment.segmentId),
+      second.segments.map((segment) => segment.segmentId)
+    );
+  });
+});

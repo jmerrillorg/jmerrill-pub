@@ -21,6 +21,7 @@ const {
   authorizeControlledSyntheticExecution
 } = require("../controlled/executionAuthorization");
 const { resolveGovernedPromptTemplate } = require("../dataverse/promptTemplateReader");
+const { executeHierarchicalShadowDiagnostic } = require("../editorial/stage0HierarchicalShadowRunner");
 
 // CONTRACT_TEST_MODE=false — Jackie Approval 1 granted 2026-06-17.
 // Controlled synthetic real-AI test only. No real manuscripts. No production use.
@@ -623,10 +624,145 @@ app.http("run-stage0-diagnostic", {
         `Pilot stage 3 extraction OK; diagnosticId=${diagnosticId}; fileType=${extractResult.metadata.fileType}; wordCount=${extractResult.metadata.wordCount}`
       );
 
+      const requestTimestamp = new Date().toISOString();
+
+      if (shadowMode) {
+        const hierarchicalResult = await executeHierarchicalShadowDiagnostic({
+          manuscriptArtifactId: body.manuscriptArtifactId || "unknown-manuscript-artifact",
+          manuscriptHash: extractResult.metadata.sha256,
+          manuscriptContent: extractResult.content,
+          callModel,
+          diagnosticId,
+          correlationId: correlationId || diagnosticId,
+          telemetry,
+          titleContext: {
+            title: body.title || "The Intentional Leader",
+            publishingAssetId: body.publishingAssetId || null,
+            editorialStage: "Editorial Diagnostic",
+            imprint: body.imprint || "J_MERRILL_PUBLISHING",
+            manuscriptType: body.manuscriptType || "trade_nonfiction",
+            genre: body.genre || "devotional",
+            subgenre: body.subgenre || "leadership",
+            audience: body.audience || "adult",
+            format: body.format || "devotional"
+          }
+        });
+        extractResult.content = null;
+
+        const responseTimestamp = new Date().toISOString();
+        if (!hierarchicalResult.ok) {
+          const metadataFail = {
+            diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
+            executionMode,
+            modelDeploymentAlias: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+            promptKey: "jm1-prompt-pub-stage0-hierarchical-section",
+            promptVersion: "PUB-STAGE0-HIERARCHICAL-V1",
+            confidence: null,
+            requiresHumanReview: true,
+            tokenCounts: null,
+            requestTimestamp, responseTimestamp,
+            errorCode: hierarchicalResult.code,
+            errorMessage: hierarchicalResult.code
+          };
+          await writeMetadata(metadataFail, { telemetry });
+
+          return {
+            status: 503,
+            jsonBody: {
+              status: "error",
+              code: hierarchicalResult.code,
+              diagnosticId,
+              failedStage: "hierarchicalShadowDiagnostic",
+              segmentation: {
+                entryCount: hierarchicalResult.segmentation?.manifest?.entryCount || 0,
+                partialYearRecognized: hierarchicalResult.segmentation?.manifest?.partialYearRecognized || false
+              },
+              plan: hierarchicalResult.plan ? {
+                batchCount: hierarchicalResult.plan.batchCount,
+                estimatedInputTokens: hierarchicalResult.plan.estimatedInputTokens,
+                estimatedOutputTokens: hierarchicalResult.plan.estimatedOutputTokens,
+                estimatedModelCalls: hierarchicalResult.plan.estimatedModelCalls,
+                estimatedCostUsd: hierarchicalResult.estimatedCostUsd || hierarchicalResult.plan.estimatedCostUsd || null
+              } : null,
+              message: "Hierarchical shadow diagnostic did not complete."
+            }
+          };
+        }
+
+        const confidence = typeof hierarchicalResult.finalOutput.jm1_confidence === "number"
+          ? hierarchicalResult.finalOutput.jm1_confidence
+          : null;
+        const routingDecision = routeDiagnosticResult({ confidence, requiresHumanReview: true });
+        const metadataSuccess = {
+          diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
+          executionMode,
+          modelDeploymentAlias: hierarchicalResult.modelResolution?.selectedModel?.deploymentAlias || process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+          promptKey: "jm1-prompt-pub-stage0-hierarchical-final",
+          promptVersion: "PUB-STAGE0-HIERARCHICAL-V1",
+          confidence,
+          requiresHumanReview: true,
+          tokenCounts: hierarchicalResult.finalTokenCounts,
+          requestTimestamp, responseTimestamp,
+          errorCode: null,
+          errorMessage: null
+        };
+        const writeResult = await writeMetadata(metadataSuccess, { telemetry });
+
+        return {
+          status: 202,
+          jsonBody: {
+            status: "accepted",
+            mode: "real-manuscript-pilot",
+            diagnosticId,
+            intakeReferenceCode,
+            correlationId,
+            gate: { permitted: true, reason: gate.reason },
+            pipeline: {
+              legacyGate: { excluded: false },
+              knowledge: { reachable: knowledgeMeta.reachable, hashMatched: knowledgeMeta.hashMatched, byteLength: knowledgeMeta.byteLength },
+              assetGate: {
+                approvedForDiagnostic: recordResult.assetGate.approvedForDiagnostic,
+                assetStatus: recordResult.assetGate.assetStatus,
+                filename: recordResult.assetGate.filename,
+                fileTypeHint: recordResult.assetGate.fileTypeHint
+              },
+              manuscriptRead: {
+                ok: true,
+                fileType: extractResult.metadata.fileType,
+                byteLength: extractResult.metadata.byteLength,
+                wordCount: extractResult.metadata.wordCount,
+                sha256: extractResult.metadata.sha256,
+                contentReturned: false
+              },
+              segmentation: {
+                entryCount: hierarchicalResult.segmentation.manifest.entryCount,
+                partialYearRecognized: hierarchicalResult.segmentation.manifest.partialYearRecognized
+              },
+              hierarchicalPlan: {
+                batchCount: hierarchicalResult.plan.batchCount,
+                estimatedInputTokens: hierarchicalResult.plan.estimatedInputTokens,
+                estimatedOutputTokens: hierarchicalResult.plan.estimatedOutputTokens,
+                estimatedModelCalls: hierarchicalResult.plan.estimatedModelCalls,
+                estimatedCostUsd: hierarchicalResult.plan.estimatedCostUsd,
+                estimatedDurationMs: hierarchicalResult.plan.estimatedDurationMs
+              },
+              batchResults: hierarchicalResult.batchResults,
+              monthlySyntheses: hierarchicalResult.monthlySyntheses.map((item) => ({ month: item.month, findingIds: item.findingIds })),
+              quarterlySyntheses: hierarchicalResult.quarterlySyntheses.map((item) => ({ quarter: item.quarter, contributingFindingIds: item.contributingFindingIds })),
+              confidenceRouting: { status: routingDecision.status, statusLabel: routingDecision.statusLabel, requiresHumanReview: true, lowConfidenceNote: routingDecision.lowConfidenceNote, routingBasis: routingDecision.routingBasis },
+              metadataWrites: { aiRequestLog: { created: writeResult.aiRequestLog.created, id: writeResult.aiRequestLog.id }, executionLog: { created: writeResult.executionLog.created, id: writeResult.executionLog.id } }
+            },
+            diagnosticOutput: hierarchicalResult.finalOutput,
+            requiresHumanReview: true,
+            message: "Hierarchical real manuscript shadow diagnostic complete. Internal evidence only. No author-facing action taken."
+          }
+        };
+      }
+
       // Stage 4: Build prompt — content and promptBody never logged, never stored, never returned
       const knowledgeContent = knowledgeMeta.content || "";
       const promptResolution = await resolveGovernedPromptTemplate({
-        executionType: shadowMode ? SHADOW_EXECUTION_TYPE : "REAL_MANUSCRIPT_PILOT",
+        executionType: "REAL_MANUSCRIPT_PILOT",
         telemetry
       });
 
@@ -658,14 +794,13 @@ app.http("run-stage0-diagnostic", {
       );
 
       // Stage 5: Model call
-      const requestTimestamp = new Date().toISOString();
       const modelResult = await callModel({
         contractTestMode: CONTRACT_TEST_MODE,
         promptBody,
         diagnosticId,
         promptKey,
         promptVersion,
-        executionType: shadowMode ? SHADOW_EXECUTION_TYPE : null,
+        executionType: null,
         telemetry
       });
       const responseTimestamp = new Date().toISOString();

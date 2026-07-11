@@ -93,7 +93,7 @@ Implementation ownership is closed. Future PROGRAM-003 work routes through opera
 | Evidence truth | SharePoint |
 | Primary proving ground | J Merrill Publishing |
 | First certification transaction | `GPAT-001 Stage 0 Editorial Diagnostic` |
-| Current GPAT target state | Controlled Test proven; Shadow Mode pending |
+| Current GPAT target state | Shadow Mode Active |
 | Prompt authority | `jm1pub_aiprompttemplates` |
 | AI audit truth | `jm1_airequestlog` |
 | Operational proof truth | `jm1_executionlog` |
@@ -107,8 +107,8 @@ Implementation ownership is closed. Future PROGRAM-003 work routes through opera
 | --- | --- |
 | GPATs identified | 7 initial candidates |
 | GPATs in Design | 6 |
-| GPATs in Controlled Test | 1 (`GPAT-001`) |
-| GPATs in Shadow Mode | 0 |
+| GPATs in Controlled Test | 1 completed entry (`GPAT-001`) |
+| GPATs in Shadow Mode | 1 active (`GPAT-001`) |
 | GPATs in Assisted Production | 0 |
 | GPATs in Certified Production | 0 |
 | GPATs in Agentic Production | 0 |
@@ -116,16 +116,16 @@ Implementation ownership is closed. Future PROGRAM-003 work routes through opera
 | Certification criteria pass rate | Pending final GPAT-001 matrix |
 | Active prompt versions | 1 governed prompt path currently proven for GPAT-001 |
 | Active runtime identities | 1 permanent governed publishing runtime identity proven |
-| AI requests by GPAT | `GPAT-001` controlled proof evidence present |
+| AI requests by GPAT | `GPAT-001` controlled proof and first real shadow attempt evidence present |
 | Human approval/override rate | Pending shadow and assisted-production evidence |
 | Failure/retry rate | Pending normalized GPAT reporting |
 | Average latency | Pending normalized GPAT reporting |
 | Token usage | Controlled proof recorded for GPAT-001 |
 | Estimated cost | Pending normalized GPAT reporting |
-| Hallucination/grounding exception rate | Pending shadow evaluation |
+| Hallucination/grounding exception rate | Pending completed hierarchical shadow evaluation |
 | Last certification date | None — no GPAT certified yet |
-| Next review due | GPAT-001 shadow evaluation and criteria reconciliation |
-| Open security/governance exceptions | SWA deployment-lane defect tracked separately; GPAT-001 shadow evidence pending |
+| Next review due | GPAT-001 hierarchical shadow rerun and criteria reconciliation |
+| Open security/governance exceptions | SWA deployment-lane defect tracked separately; GPAT-001 input-architecture remediation in progress |
 
 ## Next Movement
 

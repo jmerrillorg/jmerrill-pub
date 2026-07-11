@@ -63,3 +63,26 @@ Safety boundary preserved
 Conclusion
 - The first governed Foundry transaction completed end to end through:
   governed request -> governed prompt resolution -> Azure OpenAI execution -> JM1-Core audit writeback -> dependency telemetry
+
+## GPAT-001 Shadow Mode State
+
+### Current maturity truth
+
+- GPAT: `GPAT-001 - Stage 0 Editorial Diagnostic`
+- Controlled Test: complete
+- Shadow Mode: active
+- Runtime status: proven
+- Editorial evaluation status: remediation in progress
+
+### First real-manuscript shadow evidence
+
+- governed manuscript source validated
+- request reached all governed runtime layers
+- fallback remained disabled
+- prompt resolution remained governed
+- no unauthorized gate, stage, portal, or author-facing mutation occurred
+- model call failed with HTTP `400` because the single-shot manuscript payload exceeded the practical request limit before substantive editorial reasoning
+
+### Disposition
+
+This failure remains part of GPAT-001 certification evidence. It is a Shadow Mode result, not a reason to classify Shadow Mode as pending.
