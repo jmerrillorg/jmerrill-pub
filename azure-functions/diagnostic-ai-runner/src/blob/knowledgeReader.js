@@ -15,6 +15,7 @@
 const { BlobClient } = require("@azure/storage-blob");
 const { DefaultAzureCredential } = require("@azure/identity");
 const { createHash } = require("node:crypto");
+const { trackDependency } = require("../observability/dependencyTelemetry");
 
 /**
  * Reads knowledge.md and verifies its SHA-256 against the expected value.
@@ -31,7 +32,8 @@ const { createHash } = require("node:crypto");
  *   error: string|null
  * }>}
  */
-async function verifyKnowledgeBlob() {
+async function verifyKnowledgeBlob(options = {}) {
+  const telemetry = options.telemetry || null;
   const blobUrl = process.env.KNOWLEDGE_BLOB_URL;
   const expectedHash = process.env.KNOWLEDGE_BLOB_SHA256;
 
@@ -67,7 +69,21 @@ async function verifyKnowledgeBlob() {
     const credential = new DefaultAzureCredential();
     const blobClient = new BlobClient(blobUrl, credential);
 
-    const downloadResponse = await blobClient.download();
+    const downloadResponse = await trackDependency(
+      telemetry,
+      {
+        name: "Blob Knowledge Read",
+        target: blobUrl,
+        data: "knowledge.md:download",
+        dependencyTypeName: "Azure Blob",
+        properties: {
+          blobUrl
+        },
+        isSuccess: () => true,
+        getResultCode: () => "OK"
+      },
+      () => blobClient.download()
+    );
     const etag = downloadResponse.etag || null;
     const lastModified = downloadResponse.lastModified
       ? downloadResponse.lastModified.toISOString()

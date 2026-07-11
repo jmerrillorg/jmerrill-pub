@@ -19,6 +19,7 @@
  */
 
 const { DefaultAzureCredential } = require("@azure/identity");
+const { trackDependency } = require("../observability/dependencyTelemetry");
 
 // Confirmed Power Apps schema — Power Apps 2026-06-17
 const ASSET_GATE_COLUMNS = {
@@ -87,7 +88,8 @@ function normalizeFileTypeHint(raw) {
  *   }
  * }>}
  */
-async function readDiagnosticRecord(diagnosticId) {
+async function readDiagnosticRecord(diagnosticId, options = {}) {
+  const telemetry = options.telemetry || null;
   const apiBase = process.env.DATAVERSE_WEB_API_BASE_URL;
   const resourceUrl = process.env.DATAVERSE_RESOURCE_URL;
 
@@ -117,15 +119,29 @@ async function readDiagnosticRecord(diagnosticId) {
 
   let response;
   try {
-    response = await fetch(recordUrl, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Accept": "application/json",
-        "OData-MaxVersion": "4.0",
-        "OData-Version": "4.0"
-      }
-    });
+    response = await trackDependency(
+      telemetry,
+      {
+        name: "Dataverse Diagnostic Record Read",
+        target: resourceUrl,
+        data: `${getEntitySet()}:GET`,
+        dependencyTypeName: "Dataverse",
+        properties: {
+          diagnosticId
+        },
+        isSuccess: (result) => result.ok,
+        getResultCode: (result) => String(result.status)
+      },
+      () => fetch(recordUrl, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json",
+          "OData-MaxVersion": "4.0",
+          "OData-Version": "4.0"
+        }
+      })
+    );
   } catch {
     return { ok: false, code: "DATAVERSE_READ_NETWORK_FAILED", manuscriptUrl: null, assetGate: emptyGate };
   }

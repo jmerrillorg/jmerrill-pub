@@ -126,4 +126,74 @@ describe("prompt template reader", () => {
       global.fetch = originalFetch;
     }
   });
+
+  test("Dataverse read failure stays visible when controlled fallback is closed", async () => {
+    const originalFetch = global.fetch;
+    global.fetch = async () => ({
+      ok: false,
+      status: 403,
+      json: async () => ({
+        error: { code: "0x80040220" }
+      })
+    });
+
+    try {
+      await withEnvAsync({
+        DATAVERSE_WEB_API_BASE_URL: "https://example.crm.dynamics.com/api/data/v9.2/",
+        DATAVERSE_RESOURCE_URL: "https://example.crm.dynamics.com",
+        [CONTROLLED_PROMPT_FALLBACK_ALLOWED_ENV]: "false"
+      }, async () => {
+        const identity = require("@azure/identity");
+        const original = identity.DefaultAzureCredential.prototype.getToken;
+        identity.DefaultAzureCredential.prototype.getToken = async () => ({ token: "token" });
+        try {
+          const result = await resolveGovernedPromptTemplate({
+            executionType: CONTROLLED_EXECUTION_TYPE
+          });
+          assert.equal(result.ok, false);
+          assert.equal(result.source, "dataverse");
+          assert.equal(result.effectiveState, "read-failed");
+          assert.equal(result.error, "0x80040220");
+        } finally {
+          identity.DefaultAzureCredential.prototype.getToken = original;
+        }
+      });
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  test("missing prompt row does not imply fallback when fallback is closed", async () => {
+    const originalFetch = global.fetch;
+    global.fetch = async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ value: [] })
+    });
+
+    try {
+      await withEnvAsync({
+        DATAVERSE_WEB_API_BASE_URL: "https://example.crm.dynamics.com/api/data/v9.2/",
+        DATAVERSE_RESOURCE_URL: "https://example.crm.dynamics.com",
+        [CONTROLLED_PROMPT_FALLBACK_ALLOWED_ENV]: "false"
+      }, async () => {
+        const identity = require("@azure/identity");
+        const original = identity.DefaultAzureCredential.prototype.getToken;
+        identity.DefaultAzureCredential.prototype.getToken = async () => ({ token: "token" });
+        try {
+          const result = await resolveGovernedPromptTemplate({
+            executionType: CONTROLLED_EXECUTION_TYPE
+          });
+          assert.equal(result.ok, false);
+          assert.equal(result.source, "dataverse");
+          assert.equal(result.effectiveState, "missing");
+          assert.equal(result.error, "PROMPT_TEMPLATE_NOT_FOUND");
+        } finally {
+          identity.DefaultAzureCredential.prototype.getToken = original;
+        }
+      });
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
 });

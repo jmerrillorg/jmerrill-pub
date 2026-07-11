@@ -37,7 +37,7 @@ const { routeToProvider } = require("./providerRouter");
  *   error: string|null
  * }>}
  */
-async function callModel({ contractTestMode, promptBody, diagnosticId, promptKey, promptVersion, executionType = null }) {
+async function callModel({ contractTestMode, promptBody, diagnosticId, promptKey, promptVersion, executionType = null, telemetry = null }) {
   const gate = checkAiExecutionGate(contractTestMode);
 
   if (!gate.permitted) {
@@ -54,7 +54,7 @@ async function callModel({ contractTestMode, promptBody, diagnosticId, promptKey
     };
   }
 
-  const result = await routeToProvider({ promptBody, diagnosticId, executionType });
+  const result = await routeToProvider({ promptBody, diagnosticId, executionType, telemetry });
 
   return {
     ok: result.ok,

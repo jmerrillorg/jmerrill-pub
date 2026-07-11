@@ -6,6 +6,7 @@ const {
   CONTROLLED_PROMPT_FALLBACK_ALLOWED_ENV,
   CONTROLLED_PROMPT_INACTIVE_ALLOWED_ENV
 } = require("../controlled/executionAuthorization");
+const { trackDependency } = require("../observability/dependencyTelemetry");
 
 const DEFAULT_PROMPT_KEY = "jm1-prompt-pub-stage0-diagnostic";
 const DEFAULT_PROMPT_VERSION = "PUB-STAGE0-DIAGNOSTIC-V1";
@@ -43,6 +44,23 @@ function buildFallbackPromptResolution(executionType) {
   };
 }
 
+function buildPromptResolutionError({ promptKey, promptVersion, row, effectiveState, error }) {
+  return {
+    ok: false,
+    source: "dataverse",
+    promptRecordId: row?.jm1pub_aiprompttemplateid || null,
+    promptKey: normalizeString(row?.jm1pub_promptkey) || promptKey,
+    promptName: normalizeString(row?.jm1pub_promptname) || "Stage 0 Editorial Diagnostic",
+    promptVersion: normalizeString(row?.jm1pub_promptversion) || promptVersion,
+    modelDeploymentAlias:
+      normalizeString(row?.jm1pub_modeldeploymentalias) ||
+      DEFAULT_MODEL_DEPLOYMENT_ALIAS,
+    active: false,
+    effectiveState,
+    error
+  };
+}
+
 async function getDataverseToken(resourceUrl) {
   const credential = new DefaultAzureCredential();
   const tokenResponse = await credential.getToken(`${resourceUrl}/.default`);
@@ -54,7 +72,7 @@ async function getDataverseToken(resourceUrl) {
   return tokenResponse.token;
 }
 
-async function fetchPromptTemplateRows({ promptKey, promptVersion }) {
+async function fetchPromptTemplateRows({ promptKey, promptVersion, telemetry = null }) {
   const apiBase = normalizeString(process.env.DATAVERSE_WEB_API_BASE_URL);
   const resourceUrl = normalizeString(process.env.DATAVERSE_RESOURCE_URL);
 
@@ -73,15 +91,30 @@ async function fetchPromptTemplateRows({ promptKey, promptVersion }) {
     `?$select=jm1pub_aiprompttemplateid,jm1pub_promptkey,jm1pub_promptname,jm1pub_promptversion,jm1pub_modeldeploymentalias,jm1pub_active,statecode` +
     `&$filter=${encodeURIComponent(filterParts.join(" and "))}`;
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "OData-MaxVersion": "4.0",
-      "OData-Version": "4.0",
-      Accept: "application/json"
-    }
-  });
+  const response = await trackDependency(
+    telemetry,
+    {
+      name: "Dataverse Prompt Template Read",
+      target: resourceUrl,
+      data: `${ENTITY_SET}:GET`,
+      dependencyTypeName: "Dataverse",
+      properties: {
+        promptKey,
+        promptVersion: promptVersion || null
+      },
+      isSuccess: (result) => result.ok,
+      getResultCode: (result) => String(result.status)
+    },
+    () => fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "OData-MaxVersion": "4.0",
+        "OData-Version": "4.0",
+        Accept: "application/json"
+      }
+    })
+  );
 
   const body = await response.json().catch(() => ({}));
 
@@ -107,25 +140,45 @@ function choosePromptTemplateRow(rows) {
   return activeRow || rows[0];
 }
 
-async function resolveGovernedPromptTemplate({ executionType }) {
+async function resolveGovernedPromptTemplate({ executionType, telemetry = null }) {
   const promptKey = process.env.JM1_PROMPT_KEY || DEFAULT_PROMPT_KEY;
   const promptVersion = process.env.JM1_PROMPT_VERSION || DEFAULT_PROMPT_VERSION;
 
   let rowsResult;
   try {
-    rowsResult = await fetchPromptTemplateRows({ promptKey, promptVersion });
+    rowsResult = await fetchPromptTemplateRows({ promptKey, promptVersion, telemetry });
   } catch (error) {
     rowsResult = { ok: false, error: error.safeCode || "PROMPT_TEMPLATE_READ_FAILED" };
   }
 
   if (!rowsResult.ok) {
-    return buildFallbackPromptResolution(executionType);
+    if (isEnvTrue(CONTROLLED_PROMPT_FALLBACK_ALLOWED_ENV)) {
+      return buildFallbackPromptResolution(executionType);
+    }
+
+    return buildPromptResolutionError({
+      promptKey,
+      promptVersion,
+      row: null,
+      effectiveState: "read-failed",
+      error: rowsResult.error || "PROMPT_TEMPLATE_READ_FAILED"
+    });
   }
 
   const row = choosePromptTemplateRow(rowsResult.rows);
 
   if (!row) {
-    return buildFallbackPromptResolution(executionType);
+    if (isEnvTrue(CONTROLLED_PROMPT_FALLBACK_ALLOWED_ENV)) {
+      return buildFallbackPromptResolution(executionType);
+    }
+
+    return buildPromptResolutionError({
+      promptKey,
+      promptVersion,
+      row: null,
+      effectiveState: "missing",
+      error: "PROMPT_TEMPLATE_NOT_FOUND"
+    });
   }
 
   const active = row.jm1pub_active === true && row.statecode === 0;
@@ -134,20 +187,13 @@ async function resolveGovernedPromptTemplate({ executionType }) {
     isEnvTrue(CONTROLLED_PROMPT_INACTIVE_ALLOWED_ENV);
 
   if (!active && !inactiveAllowed) {
-    return {
-      ok: false,
-      source: "dataverse",
-      promptRecordId: row.jm1pub_aiprompttemplateid || null,
-      promptKey: normalizeString(row.jm1pub_promptkey) || promptKey,
-      promptName: normalizeString(row.jm1pub_promptname) || "Stage 0 Editorial Diagnostic",
-      promptVersion: normalizeString(row.jm1pub_promptversion) || promptVersion,
-      modelDeploymentAlias:
-        normalizeString(row.jm1pub_modeldeploymentalias) ||
-        DEFAULT_MODEL_DEPLOYMENT_ALIAS,
-      active: false,
+    return buildPromptResolutionError({
+      promptKey,
+      promptVersion,
+      row,
       effectiveState: "inactive",
       error: "PROMPT_TEMPLATE_INACTIVE"
-    };
+    });
   }
 
   return {

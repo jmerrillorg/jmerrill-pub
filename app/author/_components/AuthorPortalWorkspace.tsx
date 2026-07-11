@@ -167,6 +167,10 @@ export function AuthorPortalWorkspace() {
     context.editorial
       ? context.editorial
       : null
+  const showPublisherProgress =
+    isEditorialWorkspaceState(selectedProject.workspaceState) &&
+    !selectedProject.pendingApprovalLabel &&
+    Boolean(selectedProject.summary || selectedProject.nextActionLabel)
 
   return (
     <div className="space-y-8">
@@ -203,7 +207,24 @@ export function AuthorPortalWorkspace() {
           <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Current project</p>
           <h3 className="mt-2 text-[20px] font-semibold text-white">{selectedProject.title}</h3>
           <p className="mt-2 text-[13px] leading-[1.7] text-white/45">{selectedProject.statusLabel}</p>
-          {selectedProject.nextActionLabel ? (
+          {showPublisherProgress ? (
+            <div className="mt-4 space-y-3">
+              {selectedProject.summary ? (
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">
+                    Current Activity
+                  </p>
+                  <p className="mt-1 text-[13px] leading-[1.7] text-white/60">{selectedProject.summary}</p>
+                </div>
+              ) : null}
+              {selectedProject.nextActionLabel ? (
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Next Step</p>
+                  <p className="mt-1 text-[13px] leading-[1.7] text-blue-200/85">{selectedProject.nextActionLabel}</p>
+                </div>
+              ) : null}
+            </div>
+          ) : selectedProject.nextActionLabel ? (
             <p className="mt-2 text-[13px] leading-[1.7] text-blue-200/85">{selectedProject.nextActionLabel}</p>
           ) : null}
           {selectedProject.pendingApprovalLabel ? (
