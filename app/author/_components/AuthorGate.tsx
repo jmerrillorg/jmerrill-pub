@@ -4,64 +4,53 @@ import { useEffect, useState } from 'react'
 
 type AuthorGateScope = 'forms' | 'portal'
 
-type GateResponse = {
-  success?: boolean
-  error?: string
-  accessType?: 'admin' | 'author'
-  context?: unknown
-  portalContext?: {
-    contactId?: string
-    authorPortalId?: string
-    titleId?: string
-    titleIds?: string[]
-    projectId?: string
-    projectIds?: string[]
-    titleName?: string
-  } | null
-}
+const PORTAL_UNLOCKED_KEY = 'jmp-author-onboarding-unlocked'
+const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jm1_author_portal_bootstrap_context'
 
-export function AuthorGate({ children, scope = 'forms' }: { children: React.ReactNode; scope?: AuthorGateScope }) {
+export function AuthorGate({
+  children,
+  scope = 'portal',
+}: {
+  children: React.ReactNode
+  scope?: AuthorGateScope
+}) {
   const [code, setCode] = useState('')
   const [unlocked, setUnlocked] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const storageKey = scope === 'portal' ? 'jmp-author-portal-unlocked' : 'jmp-author-onboarding-unlocked'
-  const contextKey = scope === 'portal' ? 'jmp-author-portal-context' : 'jmp-author-onboarding-context'
+  const unlockedKey = scope === 'portal' ? PORTAL_UNLOCKED_KEY : 'jmp-author-onboarding-unlocked'
   const bootstrapContextKey =
-    scope === 'portal' ? 'jm1_author_portal_bootstrap_context' : 'jm1_author_onboarding_bootstrap_context'
-  const codeKey = scope === 'portal' ? 'jmp-author-portal-access-code' : 'jmp-author-onboarding-access-code'
+    scope === 'portal' ? PORTAL_BOOTSTRAP_CONTEXT_KEY : 'jm1_author_onboarding_bootstrap_context'
 
   useEffect(() => {
-    let mounted = true
-
-    async function verifyExistingSession() {
-      if (sessionStorage.getItem(storageKey) !== 'true') return
-
-      try {
-        const ready = await verifyWorkspaceContext(scope)
-        if (!mounted) return
-
-        if (ready) {
-          setUnlocked(true)
-          return
-        }
-      } catch {
-        // fall through to clear stale session markers
-      }
-
-      sessionStorage.removeItem(storageKey)
-      sessionStorage.removeItem(contextKey)
-      sessionStorage.removeItem(bootstrapContextKey)
-      sessionStorage.removeItem(codeKey)
-      if (mounted) setUnlocked(false)
+    const cached = sessionStorage.getItem(unlockedKey) === 'true'
+    if (cached) {
+      setUnlocked(true)
+      return
     }
 
-    void verifyExistingSession()
+    let mounted = true
+
+    async function checkSession() {
+      try {
+        const endpoint = scope === 'portal' ? '/api/author/context' : '/api/author/context'
+        const response = await fetch(endpoint, { cache: 'no-store' })
+        if (!mounted) return
+        if (response.ok) {
+          sessionStorage.setItem(unlockedKey, 'true')
+          setUnlocked(true)
+        }
+      } catch {
+        // Ignore passive session checks.
+      }
+    }
+
+    void checkSession()
 
     return () => {
       mounted = false
     }
-  }, [bootstrapContextKey, codeKey, contextKey, scope, storageKey])
+  }, [scope, unlockedKey])
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -69,40 +58,20 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
     setError('')
 
     try {
-      const search = new URLSearchParams(window.location.search)
-      const requestedReference =
-        search.get('reference') ||
-        search.get('ref') ||
-        search.get('intakeReference') ||
-        ''
-
+      const params = new URLSearchParams(window.location.search)
       const response = await fetch('/api/author/gate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code,
           scope,
-          reference: requestedReference || undefined,
+          reference: params.get('reference') || params.get('ref') || '',
         }),
       })
-      const data = (await response.json()) as GateResponse
+      const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Invalid access code.')
-      const hasBootstrapContext = Boolean(data.context)
-      const ready = hasBootstrapContext ? true : await verifyWorkspaceContext(scope)
-      if (!ready) {
-        throw new Error('We could not open your workspace right now. Please try again or contact publishing@jmerrill.one.')
-      }
-
-      sessionStorage.setItem(storageKey, 'true')
-      sessionStorage.setItem(codeKey, code)
-      sessionStorage.setItem(
-        contextKey,
-        JSON.stringify({
-          accessType: data.accessType || (scope === 'portal' ? 'author' : 'forms'),
-          portalContext: data.portalContext || null,
-        }),
-      )
-      if (data.context) {
+      sessionStorage.setItem(unlockedKey, 'true')
+      if (data?.context) {
         sessionStorage.setItem(
           bootstrapContextKey,
           JSON.stringify({
@@ -113,12 +82,7 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
       }
       setUnlocked(true)
     } catch (err: any) {
-      const message = err instanceof Error ? err.message : ''
-      setError(
-        message && message !== 'Failed to fetch'
-          ? message
-          : 'We could not open your workspace right now. Please try again or contact publishing@jmerrill.one.',
-      )
+      setError(err.message || 'Unable to validate access code.')
     } finally {
       setSubmitting(false)
     }
@@ -134,10 +98,10 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
           className="mt-3 text-white"
           style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '30px', fontWeight: 700, lineHeight: 1.15 }}
         >
-          Your Author Workspace is private.
+          Your Author Operating Center is private.
         </h2>
         <p className="mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/40">
-          Enter the access code provided by J Merrill Publishing to continue. This keeps your project details and next steps available only to you and our publishing team.
+          Enter the secure activation code provided by J Merrill Publishing to continue. This temporary credential is used only to open your protected author space.
         </p>
       </div>
 
@@ -146,7 +110,7 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
           type="password"
           value={code}
           onChange={(event) => setCode(event.target.value)}
-          placeholder="Access code"
+          placeholder="Activation code"
           className="min-h-[52px] flex-1 rounded-2xl border border-white/10 bg-white/5 px-5 text-[14px] text-white outline-none transition-colors placeholder:text-white/20 focus:border-blue-500"
           required
         />
@@ -164,29 +128,10 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
           {error}
         </p>
       ) : null}
+
+      <p className="mt-4 text-[12px] leading-[1.7] text-white/35">
+        If you are returning and need help getting back in, please contact publishing@jmerrill.one so we can restore access through the governed recovery path.
+      </p>
     </div>
   )
-}
-
-async function verifyWorkspaceContext(scope: AuthorGateScope) {
-  if (scope !== 'portal') return true
-
-  for (const delayMs of [0, 250, 500, 1000]) {
-    if (delayMs > 0) {
-      await new Promise((resolve) => window.setTimeout(resolve, delayMs))
-    }
-
-    try {
-      const response = await fetch('/api/author/context', { cache: 'no-store' })
-      if (response.ok) return true
-
-      if (response.status !== 401) {
-        return false
-      }
-    } catch {
-      // retry a couple of times before failing the unlock
-    }
-  }
-
-  return false
 }
