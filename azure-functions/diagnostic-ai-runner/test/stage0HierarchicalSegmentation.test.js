@@ -48,6 +48,14 @@ JANUARY 2
 Stay Ready
 James 1:2
 This is the second devotional entry with enough words to stay intact.
+
+📘 MARCH 1
+Move Forward
+Romans 12:1
+This is the first icon-prefixed entry and it should still become a segment.
+
+🌌 SOUL DIVE — MARCH 1
+Prompting material that must remain inside the March 1 segment.
 `;
 
 describe("stage0 hierarchical segmentation", () => {
@@ -94,10 +102,12 @@ describe("stage0 hierarchical segmentation", () => {
       manuscriptContent: UPPERCASE_MANUSCRIPT
     });
 
-    assert.equal(result.manifest.entryCount, 2);
+    assert.equal(result.manifest.entryCount, 3);
     assert.equal(result.segments[0].entryDate, "January 1");
     assert.equal(result.segments[1].entryDate, "January 2");
+    assert.equal(result.segments[2].entryDate, "March 1");
     assert.match(result.segments[0].content, /SOUL DIVE - JANUARY 1/);
+    assert.match(result.segments[2].content, /SOUL DIVE — MARCH 1/);
     assert.doesNotMatch(
       result.segments.map((segment) => segment.entryDate).join(" | "),
       /February 29/

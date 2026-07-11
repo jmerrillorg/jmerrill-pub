@@ -33,7 +33,7 @@ const MONTH_TO_QUARTER = Object.freeze({
 });
 
 const ENTRY_HEADER_REGEX = new RegExp(
-  `^(${MONTHS.join("|")})\\s+(\\d{1,2})\\s*$`,
+  `^[^\\p{L}\\p{N}\\n]*\\s*(${MONTHS.join("|")})\\s+(\\d{1,2})\\s*$`,
   "gim"
 );
 
