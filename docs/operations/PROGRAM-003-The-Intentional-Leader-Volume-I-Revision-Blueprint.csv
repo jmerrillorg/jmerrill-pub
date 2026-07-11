@@ -1,0 +1,11 @@
+action_id,sequence,priority,action,rationale,linked_letter_anchor,linked_manuscript_anchor,dependency,author_decision_required,completion_state,later_stage_classification
+DEV-BP-001,1,High,Expand selected short January entries,Opening month needs fuller devotional weight,DEV-LET-PAC-003,DEV-COM-002,None,no,Not Started,Developmental
+DEV-BP-002,2,High,Add clearer January connective bridges,Foundation month should feel cumulative,DEV-LET-TRN-005,DEV-COM-003,DEV-BP-001,no,Not Started,Developmental
+DEV-BP-003,3,High,Differentiate February hinge entries,Emotional center is rich but same-key in places,DEV-LET-PAC-003,DEV-COM-004,None,no,Not Started,Developmental
+DEV-BP-004,4,High,Trim or sharpen late-February repetitions,Depth should remain without tonal blur,DEV-LET-REP-004,DEV-COM-005,DEV-BP-003,no,Not Started,Developmental
+DEV-BP-005,5,Medium,Clarify March stewardship sequence,Leadership concepts need clearer internal contour,DEV-LET-REP-004,DEV-COM-006,None,no,Not Started,Developmental
+DEV-BP-006,6,High,Shape March 28-31 as completion and threshold,Volume I should close quietly complete and expectant,DEV-LET-TRN-005,DEV-COM-008,DEV-BP-005,yes,Not Started,Developmental
+DEV-BP-007,7,Medium,Retain Leap Day reflection with special labeling,Preserve uniqueness without restructuring the volume,DEV-LET-REC-006,DEV-COM-009,DEV-BP-004,yes,Not Started,Author-facing package
+DEV-BP-008,8,Medium,Preserve paired devotional and Soul Dive rhythm,Companion layer is a strength and not redundant,DEV-LET-STR-001,DEV-COM-010,None,no,Not Started,Developmental
+DEV-BP-009,9,Medium,Strengthen month-boundary bridges,Quarterly progression should be visible at the seams,DEV-LET-ARC-002,DEV-COM-012,DEV-BP-002,no,Not Started,Developmental
+DEV-BP-010,10,High,Maintain diagnostic-only boundary,Developmental package must not drift into line editing or copyediting,DEV-LET-AUT-007,DEV-COM-013,None,no,In Force,Governance

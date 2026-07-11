@@ -1,0 +1,9 @@
+crossref_id,package_version,source_component,source_anchor,target_component,target_anchor,relationship_type,issue_category,sequence,label,integrity_status,validation_timestamp
+DEV-XREF-001,v1.0-operational-proof,Editorial Letter,DEV-LET-STR-001,Working Manuscript,DEV-COM-001,directs-to,Strengths,1,Opening strengths to January foundation cluster,Valid,2026-07-11T00:00:00Z
+DEV-XREF-002,v1.0-operational-proof,Editorial Letter,DEV-LET-ARC-002,Working Manuscript,DEV-COM-004,explains,Quarterly Arc,2,Quarterly arc to February hinge cluster,Valid,2026-07-11T00:00:00Z
+DEV-XREF-003,v1.0-operational-proof,Editorial Letter,DEV-LET-PAC-003,Revision Blueprint,DEV-BP-003,supports,Pacing,3,Pacing observations to February differentiation action,Valid,2026-07-11T00:00:00Z
+DEV-XREF-004,v1.0-operational-proof,Revision Blueprint,DEV-BP-001,Working Manuscript,DEV-COM-002,supports,Entry Length,4,January expansion action to short-entry anchors,Valid,2026-07-11T00:00:00Z
+DEV-XREF-005,v1.0-operational-proof,Revision Blueprint,DEV-BP-006,Working Manuscript,DEV-COM-008,supports,Closing Movement,5,Threshold action to March 28-31 closing anchors,Valid,2026-07-11T00:00:00Z
+DEV-XREF-006,v1.0-operational-proof,Publisher Recommendation,DEV-REC-001,Editorial Letter,DEV-LET-REC-006,derived-from,Disposition,6,Publisher disposition to letter recommendation,Valid,2026-07-11T00:00:00Z
+DEV-XREF-007,v1.0-operational-proof,Publisher Recommendation,DEV-REC-002,Revision Blueprint,DEV-BP-006,supports,Quarter-End Closure,7,Closing disposition to threshold blueprint action,Valid,2026-07-11T00:00:00Z
+DEV-XREF-008,v1.0-operational-proof,Editorial Letter,DEV-LET-REP-004,Working Manuscript,DEV-COM-006,explains,Repetition,8,Repetition findings to March stewardship cluster,Valid,2026-07-11T00:00:00Z
