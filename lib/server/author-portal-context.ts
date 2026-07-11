@@ -96,8 +96,25 @@ type ResolvedProjectRow = {
   summary?: string
   nextActionLabel?: string
   pendingApprovalLabel?: string
+  authorActionAvailable?: boolean
+  authorDecisionOutstanding?: boolean
+  authorDecision?: string
+  gateStatus?: string
+  releasedArtifactExists?: boolean
+  releasePublished?: boolean
   contractStatusInternal?: string
   workspaceState: AuthorPortalProjectSummary['workspaceState']
+}
+
+type AuthorActionEvidence = {
+  authorActionAvailable: boolean
+  authorDecisionOutstanding: boolean
+  releasedArtifactExists: boolean
+  releasePublished: boolean
+  authorDecision?: string
+  gateStatus?: string
+  authorResponseReceived: boolean
+  nextStageAuthorized: boolean
 }
 
 type RelationshipBackedTitleRow = {
@@ -499,21 +516,39 @@ async function buildProjectSummaries(
       : null
 
     const summary = asset
-      ? await dataverseFirst(config, 'jm1pub_editorialsummaries', {
+      ? pickAuthorFacingSummary(
+          await dataverseList(config, 'jm1pub_editorialsummaries', {
           $select:
-            'jm1pub_editorialsummaryid,jm1pub_summarybody,jm1pub_nextactionlabel,jm1pub_summarystatus,createdon',
+            'jm1pub_editorialsummaryid,jm1pub_summaryheadline,jm1pub_summarybody,jm1pub_nextactionlabel,jm1pub_summarystatus,jm1pub_publishedtoworkspaceon,_jm1pub_sourceartifactid_value,_jm1pub_editorialapprovalgateid_value,createdon',
           $filter: `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
+          $orderby: 'createdon desc',
+          $top: '5',
+        }),
+        )
+      : null
+
+    const summaryGateId = dataverseLookupId(summary || {}, '_jm1pub_editorialapprovalgateid_value')
+    const pendingGate = asset
+      ? await dataverseFirst(config, 'jm1pub_editorialapprovalgates', {
+          $select:
+            'jm1pub_editorialapprovalgateid,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authorresponsesummary,jm1pub_authordecisionon,jm1pub_authordecisionsource,jm1pub_nextstageauthorized,_jm1pub_deliverableartifactid_value,createdon',
+          $filter: summaryGateId
+            ? `jm1pub_editorialapprovalgateid eq ${summaryGateId}`
+            : `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
           $orderby: 'createdon desc',
         })
       : null
 
-    const pendingGate = asset
-      ? await dataverseFirst(config, 'jm1pub_editorialapprovalgates', {
-          $select: 'jm1pub_editorialapprovalgateid,jm1pub_gatecode,jm1pub_gatestatus,createdon',
-          $filter: `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
-          $orderby: 'createdon desc',
-        })
-      : null
+    const authorActionEvidence = resolveAuthorActionEvidence({
+      summaryStatus: dataverseFormatted(summary || {}, 'jm1pub_summarystatus', ''),
+      publishedToWorkspaceOn: stringValue(summary?.jm1pub_publishedtoworkspaceon),
+      sourceArtifactId: dataverseLookupId(summary || {}, '_jm1pub_sourceartifactid_value'),
+      deliverableArtifactId: dataverseLookupId(pendingGate || {}, '_jm1pub_deliverableartifactid_value'),
+      gateStatus: dataverseFormatted(pendingGate || {}, 'jm1pub_gatestatus', ''),
+      authorDecision: dataverseFormatted(pendingGate || {}, 'jm1pub_authordecision', ''),
+      authorDecisionOn: stringValue(pendingGate?.jm1pub_authordecisionon),
+      nextStageAuthorized: Boolean(pendingGate?.jm1pub_nextstageauthorized),
+    })
 
     const intakeReference =
       inferReferenceFromName(stringValue(opportunity.name)) ||
@@ -523,7 +558,7 @@ async function buildProjectSummaries(
       stringValue(matchedIntake?.jm1_intakereferencecode) ||
       ''
 
-    const row = normalizeProjectRow({
+    const row = projectSummaryFromResolvedRow({
       opportunityId: dataverseLookupId(opportunity, 'opportunityid'),
       titleId: dataverseLookupId(title || {}, 'jm1pub_titleid') || overrides.titleId,
       publishingAssetId: dataverseLookupId(asset || {}, 'jm1pub_publishingassetid') || overrides.publishingAssetId,
@@ -535,8 +570,15 @@ async function buildProjectSummaries(
         stringValue(summary?.jm1pub_summarybody) ||
         stringValue(stage?.jm1pub_authorsafesummary) ||
         undefined,
-      nextActionLabel: stringValue(summary?.jm1pub_nextactionlabel) || undefined,
-      pendingApprovalLabel: pendingGate ? dataverseFormatted(pendingGate, 'jm1pub_gatestatus', '') : undefined,
+      nextActionLabel: authorActionEvidence.authorActionAvailable ? stringValue(summary?.jm1pub_nextactionlabel) || undefined : undefined,
+      pendingApprovalLabel:
+        authorActionEvidence.authorActionAvailable && pendingGate ? dataverseFormatted(pendingGate, 'jm1pub_gatestatus', '') : undefined,
+      authorActionAvailable: authorActionEvidence.authorActionAvailable,
+      authorDecisionOutstanding: authorActionEvidence.authorDecisionOutstanding,
+      authorDecision: authorActionEvidence.authorDecision,
+      gateStatus: authorActionEvidence.gateStatus,
+      releasedArtifactExists: authorActionEvidence.releasedArtifactExists,
+      releasePublished: authorActionEvidence.releasePublished,
       contractStatusInternal:
         title && !asset ? 'Signed / Exists - Location Pending Reconciliation' : undefined,
       workspaceState: inferWorkspaceState({
@@ -576,7 +618,7 @@ async function buildProjectSummaries(
         })
       : null
 
-    const row = normalizeProjectRow({
+    const row = projectSummaryFromResolvedRow({
       title: projectTitle,
       intakeReference,
       titleId: dataverseLookupId(title || {}, 'jm1pub_titleid') || undefined,
@@ -632,24 +674,42 @@ async function buildProjectSummaries(
       : null
 
     const summary = asset
-      ? await dataverseFirst(config, 'jm1pub_editorialsummaries', {
+      ? pickAuthorFacingSummary(
+          await dataverseList(config, 'jm1pub_editorialsummaries', {
           $select:
-            'jm1pub_editorialsummaryid,jm1pub_summarybody,jm1pub_nextactionlabel,jm1pub_summarystatus,createdon',
+            'jm1pub_editorialsummaryid,jm1pub_summaryheadline,jm1pub_summarybody,jm1pub_nextactionlabel,jm1pub_summarystatus,jm1pub_publishedtoworkspaceon,_jm1pub_sourceartifactid_value,_jm1pub_editorialapprovalgateid_value,createdon',
           $filter: `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
           $orderby: 'createdon desc',
-        })
+          $top: '5',
+        }),
+        )
       : null
 
+    const summaryGateId = dataverseLookupId(summary || {}, '_jm1pub_editorialapprovalgateid_value')
     const pendingGate = asset
       ? await dataverseFirst(config, 'jm1pub_editorialapprovalgates', {
-          $select: 'jm1pub_editorialapprovalgateid,jm1pub_gatecode,jm1pub_gatestatus,createdon',
-          $filter: `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
+          $select:
+            'jm1pub_editorialapprovalgateid,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authorresponsesummary,jm1pub_authordecisionon,jm1pub_authordecisionsource,jm1pub_nextstageauthorized,_jm1pub_deliverableartifactid_value,createdon',
+          $filter: summaryGateId
+            ? `jm1pub_editorialapprovalgateid eq ${summaryGateId}`
+            : `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
           $orderby: 'createdon desc',
         })
       : null
 
+    const authorActionEvidence = resolveAuthorActionEvidence({
+      summaryStatus: dataverseFormatted(summary || {}, 'jm1pub_summarystatus', ''),
+      publishedToWorkspaceOn: stringValue(summary?.jm1pub_publishedtoworkspaceon),
+      sourceArtifactId: dataverseLookupId(summary || {}, '_jm1pub_sourceartifactid_value'),
+      deliverableArtifactId: dataverseLookupId(pendingGate || {}, '_jm1pub_deliverableartifactid_value'),
+      gateStatus: dataverseFormatted(pendingGate || {}, 'jm1pub_gatestatus', ''),
+      authorDecision: dataverseFormatted(pendingGate || {}, 'jm1pub_authordecision', ''),
+      authorDecisionOn: stringValue(pendingGate?.jm1pub_authordecisionon),
+      nextStageAuthorized: Boolean(pendingGate?.jm1pub_nextstageauthorized),
+    })
+
     projects.push(
-      normalizeProjectRow({
+      projectSummaryFromResolvedRow({
         title: stringValue(title.jm1pub_titlename) || relationshipTitle.title,
         intakeReference: relationshipTitle.intakeReference || '',
         titleId: dataverseLookupId(title, 'jm1pub_titleid'),
@@ -660,8 +720,15 @@ async function buildProjectSummaries(
           stringValue(summary?.jm1pub_summarybody) ||
           stringValue(stage?.jm1pub_authorsafesummary) ||
           undefined,
-        nextActionLabel: stringValue(summary?.jm1pub_nextactionlabel) || undefined,
-        pendingApprovalLabel: pendingGate ? dataverseFormatted(pendingGate, 'jm1pub_gatestatus', '') : undefined,
+        nextActionLabel: authorActionEvidence.authorActionAvailable ? stringValue(summary?.jm1pub_nextactionlabel) || undefined : undefined,
+        pendingApprovalLabel:
+          authorActionEvidence.authorActionAvailable && pendingGate ? dataverseFormatted(pendingGate, 'jm1pub_gatestatus', '') : undefined,
+        authorActionAvailable: authorActionEvidence.authorActionAvailable,
+        authorDecisionOutstanding: authorActionEvidence.authorDecisionOutstanding,
+        authorDecision: authorActionEvidence.authorDecision,
+        gateStatus: authorActionEvidence.gateStatus,
+        releasedArtifactExists: authorActionEvidence.releasedArtifactExists,
+        releasePublished: authorActionEvidence.releasePublished,
         contractStatusInternal:
           dataverseLookupId(title, 'jm1pub_titleid') && !asset
             ? 'Signed / Exists - Location Pending Reconciliation'
@@ -679,7 +746,7 @@ async function buildProjectSummaries(
 
   if (projects.length === 0) {
     projects.push(
-      normalizeProjectRow({
+      projectSummaryFromResolvedRow({
         opportunityId: dataverseLookupId(scopedOpportunity || {}, 'opportunityid') || session.opportunityId,
         title: session.title || stringValue(intake?.jm1_projecttitle) || 'Current project',
         intakeReference: requestedReference || stringValue(intake?.jm1_intakereferencecode) || session.intakeReference || '',
@@ -691,9 +758,49 @@ async function buildProjectSummaries(
   return collapseProjects(projects, requestedReference)
 }
 
-function normalizeProjectRow(row: ResolvedProjectRow): AuthorPortalProjectSummary {
+export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPortalProjectSummary {
   const statusLabel =
     buildWorkspaceStatusLabel(row)
+  const authorActionAvailable = row.authorActionAvailable === true
+  const authorDecisionOutstanding = row.authorDecisionOutstanding === true
+  const normalizedAuthorDecision = normalizeWorkspaceText(row.authorDecision)
+  const normalizedGateStatus = normalizeWorkspaceText(row.gateStatus)
+  const releasedArtifactExists = row.releasedArtifactExists === true
+  const releasePublished = row.releasePublished === true
+  const livePublisherProgressVisible =
+    releasedArtifactExists &&
+    releasePublished &&
+    !authorActionAvailable &&
+    (normalizedGateStatus === 'approved' ||
+      normalizedAuthorDecision === 'approve' ||
+      normalizedGateStatus === 'in progress' ||
+      normalizedGateStatus === 'complete')
+  const responseReceivedAwaitingPublisherProcessing =
+    releasedArtifactExists &&
+    releasePublished &&
+    !authorActionAvailable &&
+    !livePublisherProgressVisible &&
+    (normalizedGateStatus === 'response received' || normalizedGateStatus === 'publisher processing')
+  const changesRequested =
+    releasedArtifactExists &&
+    releasePublished &&
+    !authorActionAvailable &&
+    (normalizedAuthorDecision === 'approve with requested changes' ||
+      normalizedAuthorDecision === 'changes requested' ||
+      normalizedGateStatus === 'returned for revision')
+  const discussionRequested =
+    releasedArtifactExists &&
+    releasePublished &&
+    !authorActionAvailable &&
+    (normalizedAuthorDecision === 'request a discussion before proceeding' ||
+      normalizedAuthorDecision === 'discussion requested')
+  const decisionDeferred =
+    releasedArtifactExists &&
+    releasePublished &&
+    !authorActionAvailable &&
+    (normalizedAuthorDecision === 'take more time before making this decision' ||
+      normalizedAuthorDecision === 'decision deferred' ||
+      normalizedAuthorDecision === 'defer')
 
   return {
     key:
@@ -707,12 +814,32 @@ function normalizeProjectRow(row: ResolvedProjectRow): AuthorPortalProjectSummar
     titleId: row.titleId,
     publishingAssetId: row.publishingAssetId,
     statusLabel,
-    summary: row.summary || defaultProjectSummary(row),
+    summary:
+      authorActionAvailable
+        ? row.summary || defaultProjectSummary(row)
+        : livePublisherProgressVisible || responseReceivedAwaitingPublisherProcessing
+          ? row.summary || defaultProjectSummary(row)
+          : changesRequested || discussionRequested || decisionDeferred
+            ? row.summary || defaultProjectSummary(row)
+            : authorDecisionOutstanding
+              ? row.summary || defaultProjectSummary(row)
+              : defaultProjectSummary(row),
     contractStatusInternal: row.contractStatusInternal,
     nextActionLabel:
-      row.nextActionLabel || defaultNextActionLabel(row),
+      (authorActionAvailable ||
+      livePublisherProgressVisible ||
+      responseReceivedAwaitingPublisherProcessing ||
+      changesRequested ||
+      discussionRequested ||
+      decisionDeferred ||
+      !authorDecisionOutstanding
+        ? row.nextActionLabel
+        : undefined) ||
+      defaultNextActionLabel(row),
     pendingApprovalLabel:
-      row.pendingApprovalLabel && row.pendingApprovalLabel !== 'Not Ready' ? row.pendingApprovalLabel : undefined,
+      authorActionAvailable && row.pendingApprovalLabel && row.pendingApprovalLabel !== 'Not Ready'
+        ? row.pendingApprovalLabel
+        : undefined,
     workspaceState: row.workspaceState,
   }
 }
@@ -745,7 +872,7 @@ function buildFallbackProject(session: AuthorPortalSession, requestedReference: 
 
 function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides: ResolveOverrides): AuthorPortalContext {
   const projects = [
-    normalizeProjectRow({
+    projectSummaryFromResolvedRow({
       title: 'The Intentional Leader',
       intakeReference: 'JMP-INT-202607-0W5PTQ',
       opportunityId: session.opportunityId,
@@ -755,14 +882,14 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
       nextActionLabel: 'Editorial review is already underway for this title.',
       workspaceState: 'editorial_in_progress',
     }),
-    normalizeProjectRow({
+    projectSummaryFromResolvedRow({
       title: 'The Long Watch',
       intakeReference: 'JMP-INT-202607-6R2MPZ',
       nextActionLabel: 'This project is linked to your author relationship and is waiting for the next governed action.',
       contractStatusInternal: 'Signed / Exists - Location Pending Reconciliation',
       workspaceState: 'awaiting_governed_action',
     }),
-    normalizeProjectRow({
+    projectSummaryFromResolvedRow({
       title: 'Establishing Glory: The Library',
       intakeReference: 'JMP-INT-202606-UFYG6O',
       nextActionLabel: 'This historical title is linked to your author relationship and remains available in your workspace.',
@@ -967,13 +1094,13 @@ export function inferWorkspaceState({
   if (normalizedStageLabel.includes('distribution') || normalizedStageLabel.includes('release')) {
     return 'distribution_release_pending'
   }
-  if (hasAsset && (normalizedStageStatus === 'in progress' || normalizedStageStatus === 'active')) {
-    return 'editorial_in_progress'
-  }
   if (normalizedStageLabel.includes('developmental')) {
     return 'developmental_editing'
   }
   if (normalizedStageLabel.includes('review')) return 'editorial_review'
+  if (hasAsset && (normalizedStageStatus === 'in progress' || normalizedStageStatus === 'active')) {
+    return 'editorial_in_progress'
+  }
   if (hasActiveEditorialCommission) return 'editorial_review'
   if (hasTitle || hasAsset) return 'published_legacy'
   if (hasOpportunity) return 'pre_contract_setup'
@@ -981,17 +1108,19 @@ export function inferWorkspaceState({
 }
 
 function buildWorkspaceStatusLabel(row: ResolvedProjectRow) {
+  const stageLabel = canonicalStageLabel(row.stageLabel)
+
   switch (row.workspaceState) {
     case 'pre_contract_setup':
       return 'Pre-Contract Setup'
     case 'awaiting_governed_action':
       return 'Awaiting Governed Action'
     case 'editorial_review':
-      return `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
+      return `${stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
     case 'developmental_editing':
-      return `${row.stageLabel || 'Developmental Editing'} - ${row.stageStatus || 'Not Started'}`
+      return `${stageLabel || 'Developmental Editing'} - ${row.stageStatus || 'Not Started'}`
     case 'editorial_in_progress':
-      return `${row.stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
+      return `${stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
     case 'production_in_progress':
       return 'Production In Progress'
     case 'distribution_release_pending':
@@ -1005,12 +1134,59 @@ function buildWorkspaceStatusLabel(row: ResolvedProjectRow) {
   }
 }
 
+function canonicalStageLabel(value?: string) {
+  const normalized = normalizeWorkspaceText(value)
+  if (normalized === 'developmental') return 'Developmental Editing'
+  if (normalized === 'review') return 'Editorial Review'
+  return value?.trim() || ''
+}
+
 function defaultNextActionLabel(row: ResolvedProjectRow) {
+  const normalizedAuthorDecision = normalizeWorkspaceText(row.authorDecision)
+  const normalizedGateStatus = normalizeWorkspaceText(row.gateStatus)
+  const releasedArtifactExists = row.releasedArtifactExists === true
+  const releasePublished = row.releasePublished === true
+  const releasedForAuthor = releasedArtifactExists && releasePublished
+
   switch (row.workspaceState) {
     case 'pre_contract_setup':
       return 'Complete the remaining setup steps for this project.'
     case 'developmental_editing':
-      return 'No action is required from you at this time. We will update you when the developmental plan is ready for review.'
+      if (
+        releasedForAuthor &&
+        (normalizedGateStatus === 'approved' || normalizedAuthorDecision === 'approve')
+      ) {
+        return 'No action is required from you at this time. We will contact you if your input is needed during the developmental process.'
+      }
+      if (
+        releasedForAuthor &&
+        (normalizedAuthorDecision === 'approve with requested changes' ||
+          normalizedAuthorDecision === 'changes requested' ||
+          normalizedGateStatus === 'returned for revision')
+      ) {
+        return 'We received your requested changes and are reviewing them now.'
+      }
+      if (
+        releasedForAuthor &&
+        (normalizedAuthorDecision === 'request a discussion before proceeding' ||
+          normalizedAuthorDecision === 'discussion requested')
+      ) {
+        return 'We received your request for a discussion and will coordinate next steps by email.'
+      }
+      if (
+        releasedForAuthor &&
+        (normalizedAuthorDecision === 'take more time before making this decision' ||
+          normalizedAuthorDecision === 'decision deferred' ||
+          normalizedAuthorDecision === 'defer')
+      ) {
+        return 'Take the time you need. We will continue to hold your recommendation package for you.'
+      }
+      if (releasedForAuthor && normalizedGateStatus === 'response received') {
+        return 'We received your response and are updating your project now.'
+      }
+      return row.authorDecisionOutstanding
+        ? 'Review the recommendation and respond through the official email communication.'
+        : 'No action is required from you at this time. We will update you when the developmental plan is ready for review.'
     case 'awaiting_governed_action':
       return 'This project is linked to your author relationship and is waiting for the next governed action.'
     case 'published_legacy':
@@ -1023,10 +1199,121 @@ function defaultNextActionLabel(row: ResolvedProjectRow) {
 }
 
 function defaultProjectSummary(row: ResolvedProjectRow) {
+  const normalizedAuthorDecision = normalizeWorkspaceText(row.authorDecision)
+  const normalizedGateStatus = normalizeWorkspaceText(row.gateStatus)
+  const releasedArtifactExists = row.releasedArtifactExists === true
+  const releasePublished = row.releasePublished === true
+  const releasedForAuthor = releasedArtifactExists && releasePublished
+
   switch (row.workspaceState) {
     case 'developmental_editing':
-      return 'Developmental planning is being prepared for Volume I of the approved quarterly series.'
+      if (
+        releasedForAuthor &&
+        (normalizedGateStatus === 'approved' || normalizedAuthorDecision === 'approve')
+      ) {
+        return 'Developmental work on Volume I is underway.'
+      }
+      if (
+        releasedForAuthor &&
+        (normalizedAuthorDecision === 'approve with requested changes' ||
+          normalizedAuthorDecision === 'changes requested' ||
+          normalizedGateStatus === 'returned for revision')
+      ) {
+        return 'We received your requested changes and are reviewing them before developmental work continues.'
+      }
+      if (
+        releasedForAuthor &&
+        (normalizedAuthorDecision === 'request a discussion before proceeding' ||
+          normalizedAuthorDecision === 'discussion requested')
+      ) {
+        return 'We received your request for a discussion and are arranging the next conversation.'
+      }
+      if (
+        releasedForAuthor &&
+        (normalizedAuthorDecision === 'take more time before making this decision' ||
+          normalizedAuthorDecision === 'decision deferred' ||
+          normalizedAuthorDecision === 'defer')
+      ) {
+        return 'Your recommendation package remains available while you take the time you need to decide.'
+      }
+      if (releasedForAuthor && normalizedGateStatus === 'response received') {
+        return 'We received your response and are processing it now.'
+      }
+      return row.authorDecisionOutstanding
+        ? 'Your developmental recommendation for Volume I is ready for review.'
+        : 'Developmental planning is being prepared for Volume I of the approved quarterly series.'
     default:
       return row.summary
+  }
+}
+
+function pickAuthorFacingSummary(rows: Record<string, unknown>[]) {
+  if (rows.length === 0) return null
+
+  const publishedRows = rows
+    .filter(
+      (row) =>
+        normalizeWorkspaceText(dataverseFormatted(row, 'jm1pub_summarystatus', '')) === 'published to workspace' &&
+        Boolean(stringValue(row.jm1pub_publishedtoworkspaceon)),
+    )
+    .sort((a, b) =>
+      stringValue(b.jm1pub_publishedtoworkspaceon).localeCompare(stringValue(a.jm1pub_publishedtoworkspaceon)),
+    )
+
+  if (publishedRows.length > 0) {
+    return publishedRows[0]
+  }
+
+  return rows[0]
+}
+
+function resolveAuthorActionEvidence({
+  summaryStatus,
+  publishedToWorkspaceOn,
+  sourceArtifactId,
+  deliverableArtifactId,
+  gateStatus,
+  authorDecision,
+  authorDecisionOn,
+  nextStageAuthorized,
+}: {
+  summaryStatus?: string
+  publishedToWorkspaceOn?: string
+  sourceArtifactId?: string
+  deliverableArtifactId?: string
+  gateStatus?: string
+  authorDecision?: string
+  authorDecisionOn?: string
+  nextStageAuthorized?: boolean
+}): AuthorActionEvidence {
+  const normalizedSummaryStatus = normalizeWorkspaceText(summaryStatus)
+  const normalizedGateStatus = normalizeWorkspaceText(gateStatus)
+  const normalizedAuthorDecision = normalizeWorkspaceText(authorDecision)
+  const artifactExists = Boolean(sourceArtifactId || deliverableArtifactId)
+  const artifactReleased =
+    normalizedSummaryStatus === 'published to workspace' && Boolean(publishedToWorkspaceOn)
+  const authorResponded =
+    Boolean(authorDecisionOn) ||
+    Boolean(normalizedAuthorDecision) ||
+    normalizedGateStatus === 'approved' ||
+    normalizedGateStatus === 'returned for revision' ||
+    normalizedGateStatus === 'cancelled' ||
+    nextStageAuthorized === true
+  const authorDecisionOutstanding =
+    artifactExists &&
+    artifactReleased &&
+    !authorResponded &&
+    (normalizedGateStatus === 'ready for author review' ||
+      normalizedGateStatus === 'awaiting author response')
+
+  return {
+    releasedArtifactExists: artifactExists,
+    releasePublished: artifactReleased,
+    authorDecisionOutstanding,
+    authorDecision: authorDecision?.trim() || undefined,
+    gateStatus: gateStatus?.trim() || undefined,
+    authorResponseReceived: authorResponded,
+    nextStageAuthorized: nextStageAuthorized === true,
+    authorActionAvailable: artifactExists && artifactReleased && authorDecisionOutstanding,
   }
 }
