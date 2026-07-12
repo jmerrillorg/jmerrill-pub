@@ -89,7 +89,7 @@ export function AuthorGate({
   }
 
   if (unlocked) return <>{children}</>
-  const signInUrl = '/api/auth/signin/azure-ad?callbackUrl=%2Fauthor%2Fportal'
+  const signInUrl = '/api/auth/signin?callbackUrl=%2Fauthor%2Fportal'
 
   return (
     <div className="rounded-[32px] border border-white/8 bg-white/[0.04] p-8 backdrop-blur">

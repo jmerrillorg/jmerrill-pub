@@ -1,11 +1,16 @@
 import { getServerSession, type NextAuthOptions } from 'next-auth'
 import AzureADProvider from 'next-auth/providers/azure-ad'
+import AzureADB2CProvider from 'next-auth/providers/azure-ad-b2c'
 
 import { getDataverseServerConfig, dataverseFirst } from './dataverse-server'
 
 function getRequiredEnv(name: string) {
   const value = process.env[name]?.trim()
   return value || ''
+}
+
+function getOptionalEnv(name: string) {
+  return process.env[name]?.trim() || ''
 }
 
 export async function isAuthorizedAuthorEmail(email?: string | null) {
@@ -96,18 +101,43 @@ async function resolveAuthorizedAuthorEmail({
   return ''
 }
 
+function buildAuthorIdentityProvider() {
+  const clientId = getRequiredEnv('AUTHOR_OPERATING_CENTER_CLIENT_ID')
+  const clientSecret = getRequiredEnv('AUTHOR_OPERATING_CENTER_CLIENT_SECRET')
+  const tenantId = getRequiredEnv('AUTHOR_OPERATING_CENTER_TENANT_ID')
+  const authMode = getOptionalEnv('AUTHOR_OPERATING_CENTER_AUTH_MODE').toLowerCase()
+  const issuer = getOptionalEnv('AUTHOR_OPERATING_CENTER_ISSUER')
+  const primaryUserFlow = getOptionalEnv('AUTHOR_OPERATING_CENTER_PRIMARY_USER_FLOW')
+
+  const useExternalIdLocalAccount =
+    authMode === 'external-id-local' ||
+    Boolean(primaryUserFlow) ||
+    issuer.includes('b2clogin.com') ||
+    issuer.includes('ciamlogin.com')
+
+  if (useExternalIdLocalAccount) {
+    return AzureADB2CProvider({
+      clientId,
+      clientSecret,
+      tenantId,
+      ...(primaryUserFlow ? { primaryUserFlow } : {}),
+      ...(issuer ? { issuer } : {}),
+    })
+  }
+
+  return AzureADProvider({
+    clientId,
+    clientSecret,
+    tenantId,
+  })
+}
+
 export const authorAuthOptions: NextAuthOptions = {
   secret: getRequiredEnv('AUTH_SECRET'),
   session: {
     strategy: 'jwt',
   },
-  providers: [
-    AzureADProvider({
-      clientId: getRequiredEnv('AUTHOR_OPERATING_CENTER_CLIENT_ID'),
-      clientSecret: getRequiredEnv('AUTHOR_OPERATING_CENTER_CLIENT_SECRET'),
-      tenantId: getRequiredEnv('AUTHOR_OPERATING_CENTER_TENANT_ID'),
-    }),
-  ],
+  providers: [buildAuthorIdentityProvider()],
   callbacks: {
     async signIn({ profile, user }) {
       return Boolean(
