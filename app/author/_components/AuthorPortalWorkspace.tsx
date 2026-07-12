@@ -3,12 +3,19 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 
 import type { AuthorPortalContext } from '@/lib/server/author-portal-context'
 
 type LoadState = 'loading' | 'ready' | 'error'
 const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jm1_author_portal_bootstrap_context'
 const PORTAL_BOOTSTRAP_MAX_AGE_MS = 5 * 60 * 1000
+const PORTAL_UNLOCKED_KEY = 'jmp-author-onboarding-unlocked'
+
+function clearAuthorSessionState() {
+  sessionStorage.removeItem(PORTAL_UNLOCKED_KEY)
+  sessionStorage.removeItem(PORTAL_BOOTSTRAP_CONTEXT_KEY)
+}
 
 export function AuthorPortalWorkspace() {
   const searchParams = useSearchParams()
@@ -16,6 +23,7 @@ export function AuthorPortalWorkspace() {
   const [state, setState] = useState<LoadState>('loading')
   const [context, setContext] = useState<AuthorPortalContext | null>(null)
   const [error, setError] = useState('')
+  const [signingOut, setSigningOut] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -172,10 +180,36 @@ export function AuthorPortalWorkspace() {
     !selectedProject.pendingApprovalLabel &&
     Boolean(selectedProject.summary || selectedProject.nextActionLabel)
 
+  async function handleSignOut() {
+    setSigningOut(true)
+    clearAuthorSessionState()
+
+    try {
+      await fetch('/api/author/logout', {
+        method: 'POST',
+        cache: 'no-store',
+      })
+    } catch {
+      // Continue through durable sign-out even if the legacy session clear fails.
+    }
+
+    await signOut({ callbackUrl: '/author/portal' })
+  }
+
   return (
     <div className="space-y-8">
       <section className="rounded-[32px] border border-blue-500/20 bg-blue-500/[0.06] p-7 sm:p-9">
-        <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Welcome back</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Welcome back</p>
+          <button
+            type="button"
+            onClick={() => void handleSignOut()}
+            disabled={signingOut}
+            className="inline-flex min-h-[42px] items-center justify-center rounded-full border border-white/10 px-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/70 transition-colors hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {signingOut ? 'Signing out...' : 'Sign out'}
+          </button>
+        </div>
         <h2
           className="mt-3 text-white"
           style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '32px', fontWeight: 700, lineHeight: 1.1 }}
