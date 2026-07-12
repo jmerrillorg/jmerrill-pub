@@ -173,6 +173,24 @@ export async function getAuthorPortalContextFromCookies(overrides?: ResolveOverr
   return resolveAuthorPortalContext(session, overrides)
 }
 
+export async function getAuthorPortalContextFromAuthorEmail(
+  email: string,
+  overrides?: ResolveOverrides,
+) {
+  const normalizedEmail = email.trim().toLowerCase()
+  if (!normalizedEmail) return null
+
+  return resolveAuthorPortalContext(
+    {
+      v: 1,
+      contactEmail: normalizedEmail,
+      scope: 'relationship',
+      issuedAt: new Date().toISOString(),
+    },
+    overrides,
+  )
+}
+
 export async function resolveAuthorPortalContext(
   session: AuthorPortalSession | null,
   overrides: ResolveOverrides = {},

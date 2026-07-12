@@ -89,6 +89,7 @@ export function AuthorGate({
   }
 
   if (unlocked) return <>{children}</>
+  const signInUrl = '/api/auth/signin/azure-ad?callbackUrl=%2Fauthor%2Fportal'
 
   return (
     <div className="rounded-[32px] border border-white/8 bg-white/[0.04] p-8 backdrop-blur">
@@ -101,8 +102,20 @@ export function AuthorGate({
           Your Author Operating Center is private.
         </h2>
         <p className="mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/40">
-          Enter the secure activation code provided by J Merrill Publishing to continue. This temporary credential is used only to open your protected author space.
+          Sign in with your secure author account if it has already been activated. If you are setting up access for the first time or need governed recovery, use the activation code provided by J Merrill Publishing.
         </p>
+      </div>
+
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <a
+          href={signInUrl}
+          className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-blue-500 px-7 text-[13px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.35)] transition-all hover:-translate-y-0.5 hover:bg-blue-600"
+        >
+          Sign in
+        </a>
+        <div className="text-[12px] leading-[1.7] text-white/35">
+          Use your author-owned sign-in for routine access. Activation codes remain available only for first-time setup and governed recovery.
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:flex-row">
@@ -130,7 +143,7 @@ export function AuthorGate({
       ) : null}
 
       <p className="mt-4 text-[12px] leading-[1.7] text-white/35">
-        If you are returning and need help getting back in, please contact publishing@jmerrill.one so we can restore access through the governed recovery path.
+        If you need help with password recovery or secure access restoration, please contact publishing@jmerrill.one so we can use the governed recovery path.
       </p>
     </div>
   )
