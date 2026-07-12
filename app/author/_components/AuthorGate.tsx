@@ -7,6 +7,8 @@ type AuthorGateScope = 'forms' | 'portal'
 
 const PORTAL_UNLOCKED_KEY = 'jmp-author-onboarding-unlocked'
 const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jm1_author_portal_bootstrap_context'
+const AUTHOR_GATE_RECOVERY_ATTEMPTS = 4
+const AUTHOR_GATE_RECOVERY_DELAY_MS = 1200
 
 export function AuthorGate({
   children,
@@ -34,10 +36,9 @@ export function AuthorGate({
 
     async function checkSession() {
       try {
-        const endpoint = scope === 'portal' ? '/api/author/context' : '/api/author/context'
-        const response = await fetch(endpoint, { cache: 'no-store' })
+        const response = await tryRecoverAuthorSession()
         if (!mounted) return
-        if (response.ok) {
+        if (response?.ok) {
           sessionStorage.setItem(unlockedKey, 'true')
           setUnlocked(true)
         }
@@ -62,6 +63,7 @@ export function AuthorGate({
       const params = new URLSearchParams(window.location.search)
       const response = await fetch('/api/author/gate', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code,
@@ -83,6 +85,13 @@ export function AuthorGate({
       }
       setUnlocked(true)
     } catch (err: any) {
+      const recovered = await tryRecoverAuthorSession(window.location.search)
+      if (recovered?.ok) {
+        sessionStorage.setItem(unlockedKey, 'true')
+        setUnlocked(true)
+        return
+      }
+
       setError(err.message || 'Unable to validate access code.')
     } finally {
       setSubmitting(false)
@@ -148,4 +157,27 @@ export function AuthorGate({
       </p>
     </div>
   )
+}
+
+async function tryRecoverAuthorSession(search = '') {
+  const suffix = search || ''
+
+  for (let attempt = 0; attempt < AUTHOR_GATE_RECOVERY_ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetch(`/api/author/context${suffix}`, {
+        cache: 'no-store',
+        credentials: 'same-origin',
+      })
+
+      if (response.ok) {
+        return response
+      }
+    } catch {
+      // Keep retrying while the browser settles cross-request cookies.
+    }
+
+    await new Promise((resolve) => window.setTimeout(resolve, AUTHOR_GATE_RECOVERY_DELAY_MS))
+  }
+
+  return null
 }
