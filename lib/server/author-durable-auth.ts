@@ -1,8 +1,8 @@
 import { getServerSession, type NextAuthOptions } from 'next-auth'
 import AzureADProvider from 'next-auth/providers/azure-ad'
-import AzureADB2CProvider from 'next-auth/providers/azure-ad-b2c'
 
 import { getDataverseServerConfig, dataverseFirst } from './dataverse-server'
+import { AUTHOR_OPERATING_CENTER_PROVIDER_ID } from '../author-durable-auth-shared'
 
 function getRequiredEnv(name: string) {
   const value = process.env[name]?.trim()
@@ -11,6 +11,16 @@ function getRequiredEnv(name: string) {
 
 function getOptionalEnv(name: string) {
   return process.env[name]?.trim() || ''
+}
+
+const AUTHOR_OPERATING_CENTER_CIAM_TENANT_NAME = 'jm1authorid'
+
+function buildAuthorOperatingCenterCiamIssuer(tenantId: string) {
+  return `https://${tenantId}.ciamlogin.com/${tenantId}/v2.0`
+}
+
+function buildAuthorOperatingCenterCiamWellKnown(tenantId: string) {
+  return `https://${AUTHOR_OPERATING_CENTER_CIAM_TENANT_NAME}.ciamlogin.com/${tenantId}/v2.0/.well-known/openid-configuration`
 }
 
 export async function isAuthorizedAuthorEmail(email?: string | null) {
@@ -101,27 +111,80 @@ async function resolveAuthorizedAuthorEmail({
   return ''
 }
 
+type AuthorIdentityProfile = Record<string, unknown> & {
+  sub?: string
+  oid?: string
+  name?: string
+  given_name?: string
+  family_name?: string
+}
+
+function buildAuthorOperatingCenterCiamProvider({
+  clientId,
+  clientSecret,
+  tenantId,
+  issuer,
+  wellKnown,
+}: {
+  clientId: string
+  clientSecret: string
+  tenantId: string
+  issuer?: string
+  wellKnown?: string
+}): any {
+  return {
+    id: AUTHOR_OPERATING_CENTER_PROVIDER_ID,
+    name: 'JM1 Author Sign-In',
+    type: 'oauth' as const,
+    idToken: true,
+    checks: ['pkce', 'state', 'nonce'] as const,
+    clientId,
+    clientSecret,
+    issuer: issuer || buildAuthorOperatingCenterCiamIssuer(tenantId),
+    wellKnown: wellKnown || buildAuthorOperatingCenterCiamWellKnown(tenantId),
+    authorization: {
+      params: {
+        scope: 'openid profile email offline_access',
+      },
+    },
+    profile(profile: AuthorIdentityProfile) {
+      const emailCandidates = collectIdentityEmailCandidates({
+        profile: profile as Record<string, unknown>,
+      })
+
+      return {
+        id: profile.sub || profile.oid || clientId,
+        name:
+          profile.name ||
+          [profile.given_name, profile.family_name].filter(Boolean).join(' ') ||
+          emailCandidates[0] ||
+          'JM1 Author',
+        email: emailCandidates[0] || null,
+        image: null,
+      }
+    },
+  }
+}
+
 function buildAuthorIdentityProvider() {
   const clientId = getRequiredEnv('AUTHOR_OPERATING_CENTER_CLIENT_ID')
   const clientSecret = getRequiredEnv('AUTHOR_OPERATING_CENTER_CLIENT_SECRET')
   const tenantId = getRequiredEnv('AUTHOR_OPERATING_CENTER_TENANT_ID')
   const authMode = getOptionalEnv('AUTHOR_OPERATING_CENTER_AUTH_MODE').toLowerCase()
   const issuer = getOptionalEnv('AUTHOR_OPERATING_CENTER_ISSUER')
-  const primaryUserFlow = getOptionalEnv('AUTHOR_OPERATING_CENTER_PRIMARY_USER_FLOW')
+  const wellKnown = getOptionalEnv('AUTHOR_OPERATING_CENTER_WELLKNOWN')
 
   const useExternalIdLocalAccount =
     authMode === 'external-id-local' ||
-    Boolean(primaryUserFlow) ||
-    issuer.includes('b2clogin.com') ||
     issuer.includes('ciamlogin.com')
 
   if (useExternalIdLocalAccount) {
-    return AzureADB2CProvider({
+    return buildAuthorOperatingCenterCiamProvider({
       clientId,
       clientSecret,
       tenantId,
-      ...(primaryUserFlow ? { primaryUserFlow } : {}),
-      ...(issuer ? { issuer } : {}),
+      issuer,
+      wellKnown,
     })
   }
 

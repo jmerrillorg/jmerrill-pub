@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { AUTHOR_OPERATING_CENTER_PROVIDER_ID } from '@/lib/author-durable-auth-shared'
 
 type AuthorGateScope = 'forms' | 'portal'
 
@@ -89,7 +90,7 @@ export function AuthorGate({
   }
 
   if (unlocked) return <>{children}</>
-  const signInUrl = '/api/auth/signin?callbackUrl=%2Fauthor%2Fportal'
+  const signInUrl = `/api/auth/signin/${AUTHOR_OPERATING_CENTER_PROVIDER_ID}?callbackUrl=%2Fauthor%2Fportal`
 
   return (
     <div className="rounded-[32px] border border-white/8 bg-white/[0.04] p-8 backdrop-blur">
