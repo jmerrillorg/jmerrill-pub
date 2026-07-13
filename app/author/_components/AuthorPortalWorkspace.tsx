@@ -266,6 +266,22 @@ export function AuthorPortalWorkspace() {
               Pending approval: {selectedProject.pendingApprovalLabel}
             </p>
           ) : null}
+          {selectedProject.artifacts?.length ? (
+            <div className="mt-5 border-t border-white/10 pt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Package components</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {selectedProject.artifacts.map((artifact) => (
+                  <a
+                    key={artifact.id}
+                    href={artifact.href}
+                    className="rounded-full border border-blue-400/25 px-3 py-2 text-[12px] font-semibold text-blue-200 transition-colors hover:border-blue-300 hover:text-white"
+                  >
+                    Download {artifact.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : null}
           {!selectedEditorial && selectedProject.contractStatusInternal ? (
             <p className="mt-2 text-[12px] leading-[1.7] text-white/35">
               Historical title / legacy project

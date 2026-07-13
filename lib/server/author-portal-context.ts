@@ -34,8 +34,17 @@ export type AuthorPortalProjectSummary = {
   summary?: string
   nextActionLabel?: string
   pendingApprovalLabel?: string
+  artifacts?: AuthorPortalArtifact[]
   contractStatusInternal?: string
   workspaceState: AuthorPortalWorkspaceState
+}
+
+export type AuthorPortalArtifact = {
+  id: string
+  label: string
+  filename: string
+  typeLabel: string
+  href: string
 }
 
 export type AuthorPortalContext = {
@@ -96,6 +105,7 @@ type ResolvedProjectRow = {
   summary?: string
   nextActionLabel?: string
   pendingApprovalLabel?: string
+  artifacts?: AuthorPortalArtifact[]
   authorActionAvailable?: boolean
   authorDecisionOutstanding?: boolean
   authorDecision?: string
@@ -557,6 +567,10 @@ async function buildProjectSummaries(
         })
       : null
 
+    const artifacts = asset
+      ? await getAuthorFacingEditorialArtifacts(config, dataverseLookupId(asset, 'jm1pub_publishingassetid'))
+      : []
+
     const authorActionEvidence = resolveAuthorActionEvidence({
       summaryStatus: dataverseFormatted(summary || {}, 'jm1pub_summarystatus', ''),
       publishedToWorkspaceOn: stringValue(summary?.jm1pub_publishedtoworkspaceon),
@@ -591,6 +605,7 @@ async function buildProjectSummaries(
       nextActionLabel: authorActionEvidence.authorActionAvailable ? stringValue(summary?.jm1pub_nextactionlabel) || undefined : undefined,
       pendingApprovalLabel:
         authorActionEvidence.authorActionAvailable && pendingGate ? dataverseFormatted(pendingGate, 'jm1pub_gatestatus', '') : undefined,
+      artifacts,
       authorActionAvailable: authorActionEvidence.authorActionAvailable,
       authorDecisionOutstanding: authorActionEvidence.authorDecisionOutstanding,
       authorDecision: authorActionEvidence.authorDecision,
@@ -715,6 +730,10 @@ async function buildProjectSummaries(
         })
       : null
 
+    const artifacts = asset
+      ? await getAuthorFacingEditorialArtifacts(config, dataverseLookupId(asset, 'jm1pub_publishingassetid'))
+      : []
+
     const authorActionEvidence = resolveAuthorActionEvidence({
       summaryStatus: dataverseFormatted(summary || {}, 'jm1pub_summarystatus', ''),
       publishedToWorkspaceOn: stringValue(summary?.jm1pub_publishedtoworkspaceon),
@@ -741,6 +760,7 @@ async function buildProjectSummaries(
         nextActionLabel: authorActionEvidence.authorActionAvailable ? stringValue(summary?.jm1pub_nextactionlabel) || undefined : undefined,
         pendingApprovalLabel:
           authorActionEvidence.authorActionAvailable && pendingGate ? dataverseFormatted(pendingGate, 'jm1pub_gatestatus', '') : undefined,
+        artifacts,
         authorActionAvailable: authorActionEvidence.authorActionAvailable,
         authorDecisionOutstanding: authorActionEvidence.authorDecisionOutstanding,
         authorDecision: authorActionEvidence.authorDecision,
@@ -858,6 +878,7 @@ export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPo
       authorActionAvailable && row.pendingApprovalLabel && row.pendingApprovalLabel !== 'Not Ready'
         ? row.pendingApprovalLabel
         : undefined,
+    artifacts: row.artifacts,
     workspaceState: row.workspaceState,
   }
 }
@@ -1283,6 +1304,54 @@ function pickAuthorFacingSummary(rows: Record<string, unknown>[]) {
   }
 
   return rows[0]
+}
+
+async function getAuthorFacingEditorialArtifacts(
+  config: NonNullable<ReturnType<typeof getDataverseServerConfig>>,
+  publishingAssetId: string,
+): Promise<AuthorPortalArtifact[]> {
+  if (!publishingAssetId) return []
+
+  const rows = await dataverseList(config, 'jm1pub_editorialartifacts', {
+    $select:
+      'jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_repositoryitemid,jm1pub_repositorydriveid,jm1pub_deliveredon,createdon',
+    $filter: `_jm1pub_publishingassetid_value eq ${publishingAssetId} and jm1pub_visibility eq 196650000 and jm1pub_artifactstatus eq 196650002`,
+    $orderby: 'jm1pub_deliveredon desc,createdon desc',
+    $top: '8',
+  })
+
+  return rows
+    .map((row) => {
+      const id = dataverseLookupId(row, 'jm1pub_editorialartifactid')
+      const filename = stringValue(row.jm1pub_filename)
+      const typeLabel = dataverseFormatted(row, 'jm1pub_artifacttype', '') || stringValue(row.jm1pub_editorialartifactname)
+      const label = authorArtifactLabel(typeLabel, filename, stringValue(row.jm1pub_editorialartifactname))
+
+      if (!id || !filename || !stringValue(row.jm1pub_repositoryitemid) || !stringValue(row.jm1pub_repositorydriveid)) {
+        return null
+      }
+
+      return {
+        id,
+        label,
+        filename,
+        typeLabel,
+        href: `/api/author/artifacts/${id}/download`,
+      }
+    })
+    .filter((artifact): artifact is AuthorPortalArtifact => artifact !== null)
+}
+
+function authorArtifactLabel(typeLabel: string, filename: string, name: string) {
+  const normalized = normalizeWorkspaceText(`${typeLabel} ${filename} ${name}`)
+
+  if (normalized.includes('working manuscript')) return 'Editorial Working Manuscript'
+  if (normalized.includes('revision blueprint')) return 'Revision Blueprint'
+  if (normalized.includes('developmental review package') || normalized.includes('author delivery pdf')) {
+    return 'Developmental Review Summary'
+  }
+
+  return typeLabel || 'Editorial Package'
 }
 
 function resolveAuthorActionEvidence({
