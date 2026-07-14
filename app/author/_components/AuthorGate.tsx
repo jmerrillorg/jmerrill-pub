@@ -40,6 +40,7 @@ export function AuthorGate({
         if (!mounted) return
         if (response?.ok) {
           sessionStorage.setItem(unlockedKey, 'true')
+          await storeBootstrapContext(response, bootstrapContextKey)
           setUnlocked(true)
         }
       } catch {
@@ -52,7 +53,7 @@ export function AuthorGate({
     return () => {
       mounted = false
     }
-  }, [scope, unlockedKey])
+  }, [scope, unlockedKey, bootstrapContextKey])
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -88,6 +89,7 @@ export function AuthorGate({
       const recovered = await tryRecoverAuthorSession(window.location.search)
       if (recovered?.ok) {
         sessionStorage.setItem(unlockedKey, 'true')
+        await storeBootstrapContext(recovered, bootstrapContextKey)
         setUnlocked(true)
         return
       }
@@ -180,4 +182,21 @@ async function tryRecoverAuthorSession(search = '') {
   }
 
   return null
+}
+
+async function storeBootstrapContext(response: Response, storageKey: string) {
+  try {
+    const data = (await response.clone().json()) as { context?: unknown }
+    if (!data?.context) return
+
+    sessionStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        savedAt: Date.now(),
+        context: data.context,
+      }),
+    )
+  } catch {
+    // The workspace can still load directly if the bootstrap payload is unavailable.
+  }
 }
