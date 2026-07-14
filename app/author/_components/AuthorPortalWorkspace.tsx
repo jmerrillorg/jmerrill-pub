@@ -11,6 +11,8 @@ type LoadState = 'loading' | 'ready' | 'error'
 const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jm1_author_portal_bootstrap_context'
 const PORTAL_BOOTSTRAP_MAX_AGE_MS = 5 * 60 * 1000
 const PORTAL_UNLOCKED_KEY = 'jmp-author-onboarding-unlocked'
+const WORKSPACE_CONTEXT_ATTEMPTS = 4
+const WORKSPACE_CONTEXT_RETRY_DELAY_MS = 1200
 
 function clearAuthorSessionState() {
   sessionStorage.removeItem(PORTAL_UNLOCKED_KEY)
@@ -499,17 +501,49 @@ async function loadWorkspaceContext(params: {
   if (params.titleId) query.set('titleId', params.titleId)
   if (params.publishingAssetId) query.set('publishingAssetId', params.publishingAssetId)
 
-  const response = await fetch(`/api/author/context${query.toString() ? `?${query.toString()}` : ''}`, {
-    cache: 'no-store',
-  })
-  const data = await safeReadJson(response)
+  let lastResult: {
+    ok: boolean
+    status: number
+    error?: string
+    context: AuthorPortalContext | null
+  } | null = null
 
-  return {
-    ok: response.ok && Boolean(data?.context),
-    status: response.status,
-    error: data?.error,
-    context: data?.context || null,
+  for (let attempt = 0; attempt < WORKSPACE_CONTEXT_ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetch(`/api/author/context${query.toString() ? `?${query.toString()}` : ''}`, {
+        cache: 'no-store',
+        credentials: 'same-origin',
+      })
+      const data = await safeReadJson(response)
+
+      lastResult = {
+        ok: response.ok && Boolean(data?.context),
+        status: response.status,
+        error: data?.error,
+        context: data?.context || null,
+      }
+
+      if (lastResult.ok) return lastResult
+    } catch (error) {
+      lastResult = {
+        ok: false,
+        status: 0,
+        error: error instanceof Error ? error.message : 'Workspace context request failed.',
+        context: null,
+      }
+    }
+
+    await new Promise((resolve) => window.setTimeout(resolve, WORKSPACE_CONTEXT_RETRY_DELAY_MS))
   }
+
+  return (
+    lastResult || {
+      ok: false,
+      status: 0,
+      error: 'Workspace context request failed.',
+      context: null,
+    }
+  )
 }
 
 async function safeReadJson(response: Response) {
