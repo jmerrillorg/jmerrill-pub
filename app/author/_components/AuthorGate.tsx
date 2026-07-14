@@ -7,7 +7,7 @@ type AuthorGateScope = 'forms' | 'portal'
 
 const PORTAL_UNLOCKED_KEY = 'jmp-author-onboarding-unlocked'
 const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jm1_author_portal_bootstrap_context'
-const AUTHOR_GATE_RECOVERY_ATTEMPTS = 4
+const AUTHOR_GATE_RECOVERY_ATTEMPTS = 10
 const AUTHOR_GATE_RECOVERY_DELAY_MS = 1200
 
 export function AuthorGate({
@@ -21,6 +21,7 @@ export function AuthorGate({
   const [unlocked, setUnlocked] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(false)
   const unlockedKey = scope === 'portal' ? PORTAL_UNLOCKED_KEY : 'jmp-author-onboarding-unlocked'
   const bootstrapContextKey =
     scope === 'portal' ? PORTAL_BOOTSTRAP_CONTEXT_KEY : 'jm1_author_onboarding_bootstrap_context'
@@ -35,6 +36,7 @@ export function AuthorGate({
     let mounted = true
 
     async function checkSession() {
+      setCheckingSession(true)
       try {
         const response = await tryRecoverAuthorSession()
         if (!mounted) return
@@ -42,9 +44,12 @@ export function AuthorGate({
           sessionStorage.setItem(unlockedKey, 'true')
           await storeBootstrapContext(response, bootstrapContextKey)
           setUnlocked(true)
+          return
         }
       } catch {
         // Ignore passive session checks.
+      } finally {
+        if (mounted) setCheckingSession(false)
       }
     }
 
@@ -101,6 +106,14 @@ export function AuthorGate({
   }
 
   if (unlocked) return <>{children}</>
+  if (checkingSession) {
+    return (
+      <div className="rounded-[32px] border border-white/8 bg-white/[0.04] p-8 text-[14px] leading-[1.8] text-white/55">
+        Opening your Author Operating Center...
+      </div>
+    )
+  }
+
   const signInUrl = `/api/auth/signin/${AUTHOR_OPERATING_CENTER_PROVIDER_ID}?callbackUrl=%2Fauthor%2Fportal`
 
   return (
