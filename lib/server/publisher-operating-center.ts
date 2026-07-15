@@ -46,7 +46,7 @@ export type PublisherQueueItem = {
   latestExecutionEvidence?: string
   sharePointLink?: string
   authorizedActions: Array<{
-    id: 'initialize_publisher_intake_review' | 'view_only'
+    id: 'initialize_publisher_intake_review' | 'place_evidence_hold' | 'view_only'
     label: string
     entryConditions: string[]
     authorFacingConsequence: string
@@ -181,6 +181,50 @@ export async function initializePublisherIntakeReview(input: {
   }
 }
 
+export async function placePublisherEvidenceHold(input: {
+  intakeId: string
+  operatorEmail: string
+  correlationId?: string
+}) {
+  const config = getDataverseServerConfig()
+  if (!config) throw new Error('dataverse_config_missing')
+
+  const intake = await dataverseFirst(config, 'jm1_publishingintakes', {
+    $select:
+      'jm1_publishingintakeid,jm1_intakereferencecode,jm1_projecttitle,jm1_manuscripturl,jm1_manuscriptreceived,_jm1_linkedcontact_value',
+    $filter: `jm1_publishingintakeid eq ${input.intakeId}`,
+  })
+
+  if (!intake) throw new Error('intake_not_found')
+  if (!dataverseLookupId(intake, '_jm1_linkedcontact_value')) throw new Error('intake_missing_contact')
+  if (intake.jm1_manuscriptreceived === true || stringValue(intake.jm1_manuscripturl)) {
+    throw new Error('intake_has_manuscript_evidence')
+  }
+
+  const correlationId =
+    input.correlationId || `POC-HOLD-${String(intake.jm1_intakereferencecode || input.intakeId)}-${Date.now()}`
+
+  const logId = await writePublisherExecutionLog(config, {
+    actionType: 'PUBLISHER_INTAKE_EVIDENCE_HOLD_PLACED',
+    name: `PUBLISHER_INTAKE_EVIDENCE_HOLD_PLACED - ${String(intake.jm1_projecttitle || input.intakeId)}`,
+    description: [
+      `Publisher Operating Center placed intake evidence hold for ${String(intake.jm1_projecttitle || input.intakeId)}.`,
+      `Intake ${String(intake.jm1_intakereferencecode || input.intakeId)}.`,
+      `Operator ${input.operatorEmail}.`,
+      `Correlation ${correlationId}.`,
+      'No author communication sent.',
+    ].join(' '),
+    sourceEntity: 'jm1_publishingintake',
+    sourceRecordId: input.intakeId,
+  })
+
+  return {
+    correlationId,
+    intakeId: input.intakeId,
+    executionLogId: extractId(logId),
+  }
+}
+
 async function getRecentIntakes(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1_publishingintakes', {
     $select:
@@ -253,6 +297,8 @@ function buildQueueItem(
   const recommendedNextAction =
     currentBlocker === 'Ready for publisher intake review'
       ? 'Initialize publisher intake review'
+      : currentBlocker === 'Manuscript evidence is missing' && hasContact
+        ? 'Place intake on evidence hold'
       : currentBlocker
 
   return {
@@ -276,7 +322,11 @@ function buildQueueItem(
     submissionDate: stringValue(intake.createdon),
     currentBlocker,
     recommendedNextAction,
-    actionOwner: currentBlocker === 'Ready for publisher intake review' ? 'publisher' : 'system',
+    actionOwner:
+      currentBlocker === 'Ready for publisher intake review' ||
+      (currentBlocker === 'Manuscript evidence is missing' && hasContact)
+        ? 'publisher'
+        : 'system',
     holdReason: currentBlocker === 'Ready for publisher intake review' ? '' : currentBlocker,
     ageDays: ageDays(stringValue(intake.createdon)),
     duplicateRisk: titleId ? 'Existing title match found' : 'No title match found',
@@ -294,6 +344,15 @@ function buildQueueItem(
               authorFacingConsequence: 'None. This is an internal publisher movement.',
             },
           ]
+        : currentBlocker === 'Manuscript evidence is missing' && hasContact
+          ? [
+              {
+                id: 'place_evidence_hold',
+                label: 'Place evidence hold',
+                entryConditions: ['Linked contact exists', 'Manuscript evidence is missing'],
+                authorFacingConsequence: 'None. This records the internal evidence hold without contacting the author.',
+              },
+            ]
         : [
             {
               id: 'view_only',
@@ -349,8 +408,10 @@ async function findOrCreateAsset(config: DataverseServerConfig, intake: Datavers
   if (existing) return { id: stringValue(existing.jm1pub_publishingassetid), created: false }
 
   const manuscriptUrl = stringValue(intake.jm1_manuscripturl)
+  const titleName = stringValue(intake.jm1_proposedtitle) || 'Publishing asset'
   const entityId = await dataverseCreate(config, 'jm1pub_publishingassets', {
     'jm1pub_titleid@odata.bind': `/jm1pub_titles(${titleId})`,
+    jm1pub_name: titleName,
     jm1pub_assetformat: ASSET_FORMAT_OTHER,
     jm1pub_assetstatus: ASSET_STATUS_STAGED,
     jm1pub_distributionstatus: DISTRIBUTION_STATUS_DRAFT,
