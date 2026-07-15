@@ -1,10 +1,14 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { signIn, signOut } from 'next-auth/react'
 
 import { PUBLISHER_OPERATING_CENTER_PROVIDER_ID } from '@/lib/author-durable-auth-shared'
-import type { PublisherOperatingCenterSnapshot, PublisherQueueItem } from '@/lib/server/publisher-operating-center'
+import type {
+  PublisherOperatingCenterSnapshot,
+  PublisherQueueItem,
+  PublisherWorkloadItem,
+} from '@/lib/server/publisher-operating-center'
 
 type Props = {
   initialSnapshot: PublisherOperatingCenterSnapshot | null
@@ -31,6 +35,8 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     if (filter === 'editorial') return items.filter((item) => item.currentStage === 'Editorial')
     return items
   }, [filter, snapshot])
+
+  const workload = snapshot?.queues.workload || []
 
   async function refresh() {
     const response = await fetch('/api/publisher/operating-center', { cache: 'no-store' })
@@ -133,6 +139,10 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               'Avg queue age': snapshot.metrics.averageQueueAgeDays,
               'Due today': snapshot.metrics.publisherActionsDueToday,
               'Moved this week': snapshot.metrics.assetsMovedThisWeek,
+              'Awaiting dev': snapshot.metrics.titlesAwaitingDevelopmentalEditing,
+              'In line edit': snapshot.metrics.titlesInLineEditing,
+              'Guard holds': snapshot.metrics.packagesHeldByReadinessGuard,
+              'Capacity warnings': snapshot.metrics.downstreamCapacityWarnings,
             }).map(([label, value]) => (
               <div key={label} className="border border-white/10 bg-white/[0.035] p-4">
                 <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">{label}</p>
@@ -140,6 +150,59 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               </div>
             ))}
         </div>
+
+        <section className="mt-8 border border-blue-300/20 bg-blue-950/15 p-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">
+                Master Workload
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold">Editorial workload and asset readiness</h2>
+              <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
+                Core-backed workload states, next actions, owners, package readiness, and downstream capacity warnings.
+                Author-facing assets are held when manuscript state does not support release.
+              </p>
+            </div>
+            <Badge
+              label={
+                snapshot && snapshot.metrics.packagesHeldByReadinessGuard > 0
+                  ? `${snapshot.metrics.packagesHeldByReadinessGuard} guard watch`
+                  : 'Readiness guard clear'
+              }
+              tone={snapshot && snapshot.metrics.packagesHeldByReadinessGuard > 0 ? 'amber' : 'blue'}
+            />
+          </div>
+
+          <div className="mt-5 overflow-x-auto">
+            <table className="min-w-[1100px] w-full border-collapse text-left text-[12px]">
+              <thead className="border-b border-white/10 text-white/42">
+                <tr>
+                  <Th>Title</Th>
+                  <Th>State</Th>
+                  <Th>Capability</Th>
+                  <Th>Owner</Th>
+                  <Th>Next action</Th>
+                  <Th>Package</Th>
+                  <Th>Guard</Th>
+                  <Th>Target</Th>
+                  <Th>Age</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {workload.map((item) => (
+                  <WorkloadRow key={item.key} item={item} />
+                ))}
+                {workload.length === 0 && (
+                  <tr>
+                    <td className="px-3 py-5 text-white/45" colSpan={9}>
+                      No active workload records were returned from Core.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         <div className="mt-6 flex flex-wrap gap-2">
           {[
@@ -260,6 +323,46 @@ function Info({ label, value }: { label: string; value: string }) {
       <p className="mt-2 break-words text-[13px] leading-5 text-white/75">{value}</p>
     </div>
   )
+}
+
+function WorkloadRow({ item }: { item: PublisherWorkloadItem }) {
+  return (
+    <tr className="border-b border-white/10 align-top">
+      <Td>
+        <span className="block font-semibold text-white">{item.title}</span>
+        <span className="mt-1 block text-white/40">{item.author}</span>
+      </Td>
+      <Td>
+        <span className="block text-white/80">{item.workloadState}</span>
+        <span className="mt-1 block text-white/38">{item.editorialStage}</span>
+      </Td>
+      <Td>{item.activeCapability}</Td>
+      <Td>{item.currentOwner}</Td>
+      <Td>
+        <span className="block max-w-[240px] leading-5">{item.nextAction}</span>
+        {item.downstreamCapacityRisk !== 'none' && (
+          <span className="mt-2 inline-flex rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-amber-100">
+            Capacity {item.downstreamCapacityRisk}
+          </span>
+        )}
+      </Td>
+      <Td>{item.packageReadiness}</Td>
+      <Td>
+        <Badge label={item.readinessGuard.status} tone={item.readinessGuard.status === 'pass' ? 'blue' : 'amber'} />
+        <span className="mt-2 block max-w-[220px] leading-5 text-white/45">{item.readinessGuard.message}</span>
+      </Td>
+      <Td>{item.targetDate}</Td>
+      <Td>{item.ageDays}d</Td>
+    </tr>
+  )
+}
+
+function Th({ children }: { children: ReactNode }) {
+  return <th className="px-3 py-3 font-mono text-[10px] font-normal uppercase tracking-[0.14em]">{children}</th>
+}
+
+function Td({ children }: { children: ReactNode }) {
+  return <td className="px-3 py-4 leading-5 text-white/64">{children}</td>
 }
 
 function Badge({ label, tone = 'neutral' }: { label: string; tone?: 'neutral' | 'blue' | 'amber' }) {
