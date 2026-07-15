@@ -287,12 +287,7 @@ export const authorAuthOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ account, profile, user }) {
       if (account?.provider === PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
-        return Boolean(
-          getAuthorizedPublisherIdentity({
-            profile: profile as Record<string, unknown> | undefined,
-            user,
-          }),
-        )
+        return true
       }
 
       return Boolean(
@@ -353,6 +348,11 @@ export async function getDurableAuthorSession() {
 
 export async function getPublisherOperatingCenterSession() {
   const session = await getServerSession(authorAuthOptions)
-  if ((session?.user as { role?: string } | undefined)?.role !== 'publisher') return null
-  return session
+  const role = (session?.user as { role?: string } | undefined)?.role
+  if (role === 'publisher') return session
+
+  const email = session?.user?.email?.trim().toLowerCase()
+  if (email && getAllowedPublisherEmails().has(email)) return session
+
+  return null
 }
