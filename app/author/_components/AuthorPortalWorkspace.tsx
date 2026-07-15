@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 
 import type { AuthorPortalContext } from '@/lib/server/author-portal-context'
 
 type LoadState = 'loading' | 'ready' | 'error'
+type MarketingSaveState = 'idle' | 'saving' | 'saved' | 'error'
 const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jm1_author_portal_bootstrap_context'
 const PORTAL_BOOTSTRAP_MAX_AGE_MS = 5 * 60 * 1000
 const PORTAL_UNLOCKED_KEY = 'jmp-author-onboarding-unlocked'
@@ -26,6 +27,15 @@ export function AuthorPortalWorkspace() {
   const [context, setContext] = useState<AuthorPortalContext | null>(null)
   const [error, setError] = useState('')
   const [signingOut, setSigningOut] = useState(false)
+  const [marketingSaveState, setMarketingSaveState] = useState<MarketingSaveState>('idle')
+  const [marketingMessage, setMarketingMessage] = useState('')
+  const [marketingForm, setMarketingForm] = useState({
+    authorBio: '',
+    website: '',
+    facebook: '',
+    instagram: '',
+    xTwitter: '',
+  })
 
   useEffect(() => {
     let mounted = true
@@ -133,6 +143,42 @@ export function AuthorPortalWorkspace() {
       mounted = false
     }
   }, [searchParams, selectedParams])
+
+  useEffect(() => {
+    if (!context?.author.marketingProfile) return
+    setMarketingForm({
+      authorBio: context.author.marketingProfile.authorBio || '',
+      website: context.author.marketingProfile.website || '',
+      facebook: context.author.marketingProfile.facebook || '',
+      instagram: context.author.marketingProfile.instagram || '',
+      xTwitter: context.author.marketingProfile.xTwitter || '',
+    })
+  }, [context?.author.contactId, context?.author.marketingProfile])
+
+  async function submitMarketingProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setMarketingSaveState('saving')
+    setMarketingMessage('')
+
+    try {
+      const response = await fetch('/api/author/marketing-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(marketingForm),
+      })
+      const data = (await safeReadJson(response)) as { message?: string; error?: string } | null
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'We could not save your marketing profile right now.')
+      }
+
+      setMarketingSaveState('saved')
+      setMarketingMessage(data?.message || 'Marketing profile saved for publishing team review.')
+    } catch (err) {
+      setMarketingSaveState('error')
+      setMarketingMessage(err instanceof Error ? err.message : 'We could not save your marketing profile right now.')
+    }
+  }
 
   if (state === 'loading') {
     return (
@@ -315,6 +361,76 @@ export function AuthorPortalWorkspace() {
         </section>
       ) : null}
 
+      <section className="rounded-[28px] border border-white/8 bg-white/[0.04] p-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Author marketing profile</p>
+            <h3 className="mt-2 text-[20px] font-semibold text-white">Public author details</h3>
+            <p className="mt-2 max-w-[760px] text-[13px] font-light leading-[1.75] text-white/50">
+              Share the author bio and public links you want the publishing team to review for future marketing and launch materials.
+            </p>
+          </div>
+          <span className="rounded-full border border-blue-400/25 px-3 py-1.5 text-[10px] uppercase tracking-[0.08em] text-blue-200">
+            Relationship-level
+          </span>
+        </div>
+        <form className="mt-5 space-y-4" onSubmit={submitMarketingProfile}>
+          <label className="block">
+            <span className="text-[12px] font-semibold text-white/70">Author bio</span>
+            <textarea
+              value={marketingForm.authorBio}
+              onChange={(event) =>
+                setMarketingForm((current) => ({ ...current, authorBio: event.target.value }))
+              }
+              rows={5}
+              maxLength={2000}
+              className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-[14px] leading-[1.7] text-white outline-none transition-colors placeholder:text-white/25 focus:border-blue-300/60"
+              placeholder="Add or update the public author bio."
+            />
+          </label>
+          <div className="grid gap-4 md:grid-cols-2">
+            <MarketingInput
+              label="Website"
+              value={marketingForm.website}
+              onChange={(value) => setMarketingForm((current) => ({ ...current, website: value }))}
+            />
+            <MarketingInput
+              label="Facebook"
+              value={marketingForm.facebook}
+              onChange={(value) => setMarketingForm((current) => ({ ...current, facebook: value }))}
+            />
+            <MarketingInput
+              label="Instagram"
+              value={marketingForm.instagram}
+              onChange={(value) => setMarketingForm((current) => ({ ...current, instagram: value }))}
+            />
+            <MarketingInput
+              label="X / Twitter"
+              value={marketingForm.xTwitter}
+              onChange={(value) => setMarketingForm((current) => ({ ...current, xTwitter: value }))}
+            />
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <button
+              type="submit"
+              disabled={marketingSaveState === 'saving'}
+              className="inline-flex w-fit items-center rounded-full bg-blue-500 px-5 py-2.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-blue-400 disabled:cursor-not-allowed disabled:bg-blue-500/45"
+            >
+              {marketingSaveState === 'saving' ? 'Saving...' : 'Save for review'}
+            </button>
+            {marketingMessage ? (
+              <p
+                className={`text-[13px] leading-[1.6] ${
+                  marketingSaveState === 'error' ? 'text-amber-100' : 'text-blue-100'
+                }`}
+              >
+                {marketingMessage}
+              </p>
+            ) : null}
+          </div>
+        </form>
+      </section>
+
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="rounded-[28px] border border-white/8 bg-white/[0.04] p-6">
           <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Project status</p>
@@ -378,6 +494,29 @@ export function AuthorPortalWorkspace() {
         </div>
       </section>
     </div>
+  )
+}
+
+function MarketingInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <label className="block">
+      <span className="text-[12px] font-semibold text-white/70">{label}</span>
+      <input
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        maxLength={2000}
+        className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-[14px] text-white outline-none transition-colors placeholder:text-white/25 focus:border-blue-300/60"
+        placeholder={`Add ${label.toLowerCase()}`}
+      />
+    </label>
   )
 }
 

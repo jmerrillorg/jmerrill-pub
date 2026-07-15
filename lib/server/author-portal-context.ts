@@ -61,6 +61,13 @@ export type AuthorPortalContext = {
     isReturningAuthor: boolean
     relationshipState?: string
     workspaceMode?: string
+    marketingProfile?: {
+      authorBio: string
+      website: string
+      facebook: string
+      instagram: string
+      xTwitter: string
+    }
   }
   relationship: {
     classificationStatus: 'Invited Project Relationship' | 'Grandfathered' | 'Grandfathered - Activated'
@@ -246,19 +253,22 @@ export async function resolveAuthorPortalContext(
     const contact =
       (session.contactId
         ? await dataverseFirst(config, 'contacts', {
-            $select: 'contactid,fullname,firstname,lastname,emailaddress1',
+            $select:
+              'contactid,fullname,firstname,lastname,emailaddress1,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
             $filter: `contactid eq ${session.contactId}`,
           })
         : null) ||
       (dataverseLookupId(scopedOpportunity || {}, '_parentcontactid_value')
         ? await dataverseFirst(config, 'contacts', {
-            $select: 'contactid,fullname,firstname,lastname,emailaddress1',
+            $select:
+              'contactid,fullname,firstname,lastname,emailaddress1,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
             $filter: `contactid eq ${dataverseLookupId(scopedOpportunity || {}, '_parentcontactid_value')}`,
           })
         : null) ||
       (session.contactEmail || stringValue(intake?.jm1_email)
         ? await dataverseFirst(config, 'contacts', {
-            $select: 'contactid,fullname,firstname,lastname,emailaddress1',
+            $select:
+              'contactid,fullname,firstname,lastname,emailaddress1,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
             $filter: `emailaddress1 eq '${escapeODataText(session.contactEmail || stringValue(intake?.jm1_email))}'`,
           })
         : null)
@@ -359,6 +369,7 @@ export async function resolveAuthorPortalContext(
         isReturningAuthor,
         relationshipState: isReturningAuthor ? 'Active Author' : '',
         workspaceMode: isReturningAuthor ? 'Standard Pipeline Workspace' : '',
+        marketingProfile: buildMarketingProfile(contact || {}),
       },
       relationship: {
         classificationStatus: isReturningAuthor
@@ -953,6 +964,13 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
       isReturningAuthor: true,
       relationshipState: 'Active Author',
       workspaceMode: 'Standard Pipeline Workspace',
+      marketingProfile: {
+        authorBio: '',
+        website: '',
+        facebook: '',
+        instagram: '',
+        xTwitter: '',
+      },
     },
     relationship: {
       classificationStatus: 'Grandfathered - Activated',
@@ -1283,6 +1301,16 @@ function defaultProjectSummary(row: ResolvedProjectRow) {
         : 'Developmental planning is being prepared for Volume I of the approved quarterly series.'
     default:
       return row.summary
+  }
+}
+
+function buildMarketingProfile(contact: Record<string, unknown>) {
+  return {
+    authorBio: stringValue(contact.jm1pub_publicauthorbio) || stringValue(contact.jm1pub_authorbio),
+    website: stringValue(contact.jm1pub_authorwebsite),
+    facebook: stringValue(contact.jm1pub_authorfacebook),
+    instagram: stringValue(contact.jm1pub_authorinstagram),
+    xTwitter: stringValue(contact.jm1pub_authorxtwitter),
   }
 }
 
