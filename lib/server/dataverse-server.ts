@@ -74,6 +74,59 @@ export async function dataverseFirst(
   return rows[0] || null
 }
 
+export async function dataverseCreate(
+  config: DataverseServerConfig,
+  entitySet: string,
+  payload: Record<string, unknown>,
+) {
+  const token = await getDataverseAccessToken(config)
+  const response = await fetch(`${config.webApiBaseUrl}/${entitySet}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'OData-MaxVersion': '4.0',
+      'OData-Version': '4.0',
+    },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    const text = await safeResponseText(response)
+    throw new Error(`dataverse_create_failed:${entitySet}:${response.status}:${text.slice(0, 200)}`)
+  }
+
+  return response.headers.get('OData-EntityId') || ''
+}
+
+export async function dataversePatch(
+  config: DataverseServerConfig,
+  entitySet: string,
+  id: string,
+  payload: Record<string, unknown>,
+) {
+  const token = await getDataverseAccessToken(config)
+  const response = await fetch(`${config.webApiBaseUrl}/${entitySet}(${id})`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'OData-MaxVersion': '4.0',
+      'OData-Version': '4.0',
+    },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+  })
+
+  if (!response.ok) {
+    const text = await safeResponseText(response)
+    throw new Error(`dataverse_patch_failed:${entitySet}:${response.status}:${text.slice(0, 200)}`)
+  }
+}
+
 export function dataverseFormatted(row: DataverseRow, logicalName: string, fallback = '') {
   return stringValue(row[`${logicalName}@${ODATA_ANNOTATION}`]) || fallback
 }
