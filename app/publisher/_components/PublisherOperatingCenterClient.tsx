@@ -45,7 +45,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'initialize_publisher_intake_review',
+        action: item.authorizedActions[0]?.id,
         intakeId: item.intakeId,
       }),
     })
@@ -210,7 +210,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                 <p className="text-[12px] leading-6 text-white/46">
                   Author-facing consequence: {item.authorizedActions[0]?.authorFacingConsequence || 'None.'}
                 </p>
-                {item.authorizedActions[0]?.id === 'initialize_publisher_intake_review' && (
+                {['initialize_publisher_intake_review', 'place_evidence_hold'].includes(item.authorizedActions[0]?.id || '') && (
                   <button
                     type="button"
                     onClick={() => void runAction(item)}
