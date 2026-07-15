@@ -408,9 +408,9 @@ async function findOrCreateAsset(config: DataverseServerConfig, intake: Datavers
   if (existing) return { id: stringValue(existing.jm1pub_publishingassetid), created: false }
 
   const manuscriptUrl = stringValue(intake.jm1_manuscripturl)
-  const titleName = stringValue(intake.jm1_proposedtitle) || 'Publishing asset'
+  const titleName = stringValue(intake.jm1_projecttitle) || 'Publishing asset'
   const entityId = await dataverseCreate(config, 'jm1pub_publishingassets', {
-    'jm1pub_titleid@odata.bind': `/jm1pub_titles(${titleId})`,
+    'jm1pub_TitleId@odata.bind': `/jm1pub_titles(${titleId})`,
     jm1pub_name: titleName,
     jm1pub_assetformat: ASSET_FORMAT_OTHER,
     jm1pub_assetstatus: ASSET_STATUS_STAGED,
