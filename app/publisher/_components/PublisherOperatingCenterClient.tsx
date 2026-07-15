@@ -38,14 +38,14 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     setSnapshot((await response.json()) as PublisherOperatingCenterSnapshot)
   }
 
-  async function runAction(item: PublisherQueueItem) {
-    setActionState({ itemKey: item.key, status: 'running', message: 'Running governed action...' })
+  async function runAction(item: PublisherQueueItem, actionId: string) {
+    setActionState({ itemKey: `${item.key}:${actionId}`, status: 'running', message: 'Running governed action...' })
 
     const response = await fetch('/api/publisher/operating-center/actions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: item.authorizedActions[0]?.id,
+        action: actionId,
         intakeId: item.intakeId,
       }),
     })
@@ -53,14 +53,14 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     const payload = (await response.json().catch(() => null)) as { error?: string } | null
     if (!response.ok) {
       setActionState({
-        itemKey: item.key,
+        itemKey: `${item.key}:${actionId}`,
         status: 'error',
         message: payload?.error || 'The governed action did not complete.',
       })
       return
     }
 
-    setActionState({ itemKey: item.key, status: 'complete', message: 'Governed action completed and logged.' })
+    setActionState({ itemKey: `${item.key}:${actionId}`, status: 'complete', message: 'Governed action completed and logged.' })
     await refresh()
   }
 
@@ -129,6 +129,9 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               'Unlinked assets': snapshot.metrics.unlinkedAssets,
               'Publisher actions': snapshot.metrics.publisherActionsPending,
               'Editorial queue': snapshot.metrics.editorialReviewQueue,
+              'On hold': snapshot.metrics.assetsOnHold,
+              'Avg queue age': snapshot.metrics.averageQueueAgeDays,
+              'Due today': snapshot.metrics.publisherActionsDueToday,
               'Moved this week': snapshot.metrics.assetsMovedThisWeek,
             }).map(([label, value]) => (
               <div key={label} className="border border-white/10 bg-white/[0.035] p-4">
@@ -183,7 +186,8 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                 <Info label="Contact" value={item.contactId || 'Missing'} />
                 <Info label="Title ID" value={item.titleId || 'Not created'} />
                 <Info label="Asset ID" value={item.assetId || 'Not created'} />
-                <Info label="Age" value={`${item.ageDays} day${item.ageDays === 1 ? '' : 's'}`} />
+                <Info label="Age" value={`${item.ageDays} day${item.ageDays === 1 ? '' : 's'} · ${item.ageBucket}`} />
+                <Info label="Queue state" value={item.overdueState} />
                 <Info label="Editorial" value={item.editorialStage} />
                 <Info label="Capability" value={item.capability} />
                 <Info label="Current blocker" value={item.currentBlocker} />
@@ -208,23 +212,29 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-[12px] leading-6 text-white/46">
-                  Author-facing consequence: {item.authorizedActions[0]?.authorFacingConsequence || 'None.'}
+                  Author-facing consequence: {item.authorizedActions.find((action) => action.id !== 'view_only')?.authorFacingConsequence || 'None.'}
                 </p>
-                {['initialize_publisher_intake_review', 'place_evidence_hold'].includes(item.authorizedActions[0]?.id || '') && (
-                  <button
-                    type="button"
-                    onClick={() => void runAction(item)}
-                    disabled={actionState.itemKey === item.key && actionState.status === 'running'}
-                    className="min-h-[42px] rounded-full bg-blue-500 px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {actionState.itemKey === item.key && actionState.status === 'running'
-                      ? 'Running...'
-                      : item.authorizedActions[0].label}
-                  </button>
-                )}
+                <div className="flex flex-wrap gap-2">
+                  {item.authorizedActions
+                    .filter((action) => action.id !== 'view_only')
+                    .map((action) => {
+                      const stateKey = `${item.key}:${action.id}`
+                      return (
+                        <button
+                          key={action.id}
+                          type="button"
+                          onClick={() => void runAction(item, action.id)}
+                          disabled={actionState.itemKey === stateKey && actionState.status === 'running'}
+                          className="min-h-[42px] rounded-full bg-blue-500 px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {actionState.itemKey === stateKey && actionState.status === 'running' ? 'Running...' : action.label}
+                        </button>
+                      )
+                    })}
+                </div>
               </div>
 
-              {actionState.itemKey === item.key && actionState.message && (
+              {actionState.itemKey.startsWith(`${item.key}:`) && actionState.message && (
                 <p
                   className={`mt-4 border px-4 py-3 text-[13px] ${
                     actionState.status === 'error'
