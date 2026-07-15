@@ -2,7 +2,10 @@ import { getServerSession, type NextAuthOptions } from 'next-auth'
 import AzureADProvider from 'next-auth/providers/azure-ad'
 
 import { getDataverseServerConfig, dataverseFirst } from './dataverse-server'
-import { AUTHOR_OPERATING_CENTER_PROVIDER_ID } from '../author-durable-auth-shared'
+import {
+  AUTHOR_OPERATING_CENTER_PROVIDER_ID,
+  PUBLISHER_OPERATING_CENTER_PROVIDER_ID,
+} from '../author-durable-auth-shared'
 
 function getRequiredEnv(name: string) {
   const value = process.env[name]?.trim()
@@ -195,14 +198,66 @@ function buildAuthorIdentityProvider() {
   })
 }
 
+function buildPublisherIdentityProvider() {
+  const clientId = getOptionalEnv('PUBLISHER_OPERATING_CENTER_CLIENT_ID')
+  const clientSecret = getOptionalEnv('PUBLISHER_OPERATING_CENTER_CLIENT_SECRET')
+  const tenantId = getOptionalEnv('PUBLISHER_OPERATING_CENTER_TENANT_ID')
+
+  if (!clientId || !clientSecret || !tenantId) return null
+
+  return AzureADProvider({
+    id: PUBLISHER_OPERATING_CENTER_PROVIDER_ID,
+    name: 'JM1 Publisher Sign-In',
+    clientId,
+    clientSecret,
+    tenantId,
+  })
+}
+
+function getAllowedPublisherEmails() {
+  return new Set(
+    (process.env.PUBLISHER_OPERATING_CENTER_ALLOWED_EMAILS || 'jm1-admin@jmerrill.one')
+      .split(',')
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean),
+  )
+}
+
+function getAuthorizedPublisherEmail({
+  profile,
+  user,
+  token,
+}: {
+  profile?: Record<string, unknown>
+  user?: { email?: string | null } | null
+  token?: { email?: unknown } | null
+}) {
+  const candidates = collectIdentityEmailCandidates({ profile, user, token })
+  const allowed = getAllowedPublisherEmails()
+  return candidates.find((candidate) => allowed.has(candidate)) || ''
+}
+
+const providers = [buildAuthorIdentityProvider(), buildPublisherIdentityProvider()].filter(Boolean) as NonNullable<
+  NextAuthOptions['providers']
+>
+
 export const authorAuthOptions: NextAuthOptions = {
   secret: getRequiredEnv('AUTH_SECRET'),
   session: {
     strategy: 'jwt',
   },
-  providers: [buildAuthorIdentityProvider()],
+  providers,
   callbacks: {
-    async signIn({ profile, user }) {
+    async signIn({ account, profile, user }) {
+      if (account?.provider === PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
+        return Boolean(
+          getAuthorizedPublisherEmail({
+            profile: profile as Record<string, unknown> | undefined,
+            user,
+          }),
+        )
+      }
+
       return Boolean(
         await resolveAuthorizedAuthorEmail({
           profile: profile as Record<string, unknown> | undefined,
@@ -210,10 +265,25 @@ export const authorAuthOptions: NextAuthOptions = {
         }),
       )
     },
-    async jwt({ token, profile, user }) {
+    async jwt({ token, account, profile, user }) {
+      if (account?.provider === PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
+        const email = getAuthorizedPublisherEmail({
+          profile: profile as Record<string, unknown> | undefined,
+          user,
+          token,
+        })
+        if (email) {
+          token.email = email
+          token.role = 'publisher'
+          token.provider = PUBLISHER_OPERATING_CENTER_PROVIDER_ID
+        }
+        return token
+      }
+
       const existingEmail = typeof token.email === 'string' ? token.email.trim().toLowerCase() : ''
-      if (existingEmail) {
+      if (existingEmail && token.provider !== PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
         token.email = existingEmail
+        token.role = token.role || 'author'
         return token
       }
 
@@ -224,11 +294,15 @@ export const authorAuthOptions: NextAuthOptions = {
       })
 
       if (email) token.email = email
+      if (email) token.role = 'author'
       return token
     },
     async session({ session, token }) {
       if (session.user && typeof token.email === 'string') {
         session.user.email = token.email
+      }
+      if (session.user && typeof token.role === 'string') {
+        ;(session.user as { role?: string }).role = token.role
       }
       return session
     },
@@ -237,4 +311,10 @@ export const authorAuthOptions: NextAuthOptions = {
 
 export async function getDurableAuthorSession() {
   return getServerSession(authorAuthOptions)
+}
+
+export async function getPublisherOperatingCenterSession() {
+  const session = await getServerSession(authorAuthOptions)
+  if ((session?.user as { role?: string } | undefined)?.role !== 'publisher') return null
+  return session
 }
