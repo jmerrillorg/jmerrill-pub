@@ -70,6 +70,54 @@ export type PublisherQueueItem = {
   }>
 }
 
+export type PublisherWorkloadState =
+  | 'Editorial Review'
+  | 'Developmental Editing - Not Started'
+  | 'Developmental Editing - In Progress'
+  | 'Developmental Editing - Author Review'
+  | 'Line Editing - Not Started'
+  | 'Line Editing - In Progress'
+  | 'Line Editing - Internal QA'
+  | 'Line Editing - Author Review'
+  | 'Copyediting Ready'
+  | 'Copyediting In Progress'
+  | 'Proofreading Ready'
+  | 'Production Ready'
+  | 'Blocked'
+  | 'External Hold'
+
+export type PublisherWorkloadItem = {
+  key: string
+  title: string
+  author: string
+  contactId: string
+  relationshipId: string
+  intake: string
+  titleId: string
+  assetId: string
+  pipelineStage: string
+  editorialStage: string
+  editorialSubstage: string
+  workloadState: PublisherWorkloadState
+  activeCapability: string
+  currentOwner: 'Cody' | 'Jackie' | 'Author' | 'External'
+  nextAction: string
+  targetDate: string
+  ageDays: number
+  authorAction: string
+  publisherAction: string
+  internalQaState: string
+  packageReadiness: string
+  holdReason: string
+  restartCondition: string
+  downstreamCapacityRisk: 'none' | 'watch' | 'blocked'
+  readinessGuard: {
+    status: 'pass' | 'watch' | 'blocked'
+    message: string
+  }
+  latestExecutionEvidence: string
+}
+
 export type PublisherOperatingCenterSnapshot = {
   generatedAt: string
   status: 'core-live' | 'unavailable'
@@ -94,10 +142,18 @@ export type PublisherOperatingCenterSnapshot = {
     publisherActionsDueToday: number
     assetsMovedToday: number
     assetsMovedThisWeek: number
+    titlesAwaitingDevelopmentalEditing: number
+    titlesInDevelopmentalEditing: number
+    titlesAwaitingLineEditing: number
+    titlesInLineEditing: number
+    titlesAwaitingCopyediting: number
+    packagesHeldByReadinessGuard: number
+    downstreamCapacityWarnings: number
   }
   queues: {
     enterprise: PublisherQueueItem[]
     proofAssets: PublisherQueueItem[]
+    workload: PublisherWorkloadItem[]
   }
 }
 
@@ -114,7 +170,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
         authorization: 'Internal Entra workforce allowlist',
       },
       metrics: emptyMetrics(),
-      queues: { enterprise: [], proofAssets: [] },
+      queues: { enterprise: [], proofAssets: [], workload: [] },
     }
   }
 
@@ -138,6 +194,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       ),
     )
     .slice(0, 2)
+  const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, logs)
 
   return {
     generatedAt: new Date().toISOString(),
@@ -146,10 +203,11 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       role: 'Publisher',
       authorization: 'Internal Entra workforce allowlist',
     },
-    metrics: buildMetrics(queue, logs),
+    metrics: buildMetrics(queue, logs, workload),
     queues: {
       enterprise: queue,
       proofAssets,
+      workload,
     },
   }
 }
@@ -467,7 +525,7 @@ async function getRecentAssets(config: DataverseServerConfig) {
 async function getRecentEditorialStages(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1pub_editorialstages', {
     $select:
-      'jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_stagesequence,_jm1pub_publishingassetid_value,createdon,modifiedon',
+      'jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_stagesequence,jm1pub_authorsafesummary,_jm1pub_titleid_value,_jm1pub_publishingassetid_value,_jm1pub_contactid_value,createdon,modifiedon',
     $orderby: 'createdon desc',
     $top: '250',
   })
@@ -573,6 +631,252 @@ function buildQueueItem(
     sharePointLink: sourceLocation,
     authorizedActions,
   }
+}
+
+function buildWorkloadItems(
+  titles: DataverseRow[],
+  assets: DataverseRow[],
+  editorialStages: DataverseRow[],
+  intakes: DataverseRow[],
+  logs: DataverseRow[],
+): PublisherWorkloadItem[] {
+  return titles
+    .map((title) => {
+      const titleId = stringValue(title.jm1pub_titleid)
+      const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name)
+      const titleAssets = assets.filter((asset) => dataverseLookupId(asset, '_jm1pub_titleid_value') === titleId)
+      const asset = titleAssets[0]
+      const assetId = stringValue(asset?.jm1pub_publishingassetid)
+      const stages = editorialStages
+        .filter(
+          (stage) =>
+            dataverseLookupId(stage, '_jm1pub_titleid_value') === titleId ||
+            (assetId && dataverseLookupId(stage, '_jm1pub_publishingassetid_value') === assetId),
+        )
+        .sort((a, b) => Number(b.jm1pub_stagesequence || 0) - Number(a.jm1pub_stagesequence || 0))
+      const latestStage = stages[0]
+      const stageType = dataverseFormatted(latestStage || {}, 'jm1pub_stagetype') || ''
+      const stageStatus = dataverseFormatted(latestStage || {}, 'jm1pub_stagestatus') || ''
+      const pipelineStage = dataverseFormatted(title, 'jm1pub_stage') || 'Unstaged'
+      const intake = intakes.find((row) => normalizeTitle(stringValue(row.jm1_projecttitle || row.jm1_name)) === normalizeTitle(titleName))
+      const latestLog = findLatestLogForWorkload(logs, titleId, assetId, stages)
+      const workloadState = deriveWorkloadState({ pipelineStage, stageType, stageStatus, hasAsset: Boolean(assetId) })
+      const capability = deriveCapability(workloadState)
+      const risk = deriveDownstreamRisk(workloadState, titleName)
+      const guard = deriveReadinessGuard(workloadState, latestStage, latestLog)
+      const owner = deriveOwner(workloadState, guard.status)
+      const ageBase = stringValue(latestStage?.modifiedon || latestStage?.createdon || title.modifiedon || title.createdon)
+
+      return {
+        key: titleId,
+        title: titleName,
+        author: stringValue(title.jm1pub_authorname) || dataverseFormatted(title, '_jm1_author_value') || 'Author pending',
+        contactId:
+          dataverseLookupId(latestStage || {}, '_jm1pub_contactid_value') ||
+          dataverseLookupId(title, '_jm1_author_value') ||
+          dataverseLookupId(intake || {}, '_jm1_linkedcontact_value'),
+        relationshipId: '',
+        intake: stringValue(intake?.jm1_intakereferencecode || intake?.jm1_publishingintakeid),
+        titleId,
+        assetId,
+        pipelineStage,
+        editorialStage: latestStage ? stringValue(latestStage.jm1pub_name) : 'Not initialized',
+        editorialSubstage: stageStatus || 'Not Started',
+        workloadState,
+        activeCapability: capability,
+        currentOwner: owner,
+        nextAction: deriveNextAction(workloadState, titleName),
+        targetDate: deriveTargetDate(workloadState),
+        ageDays: ageDays(ageBase),
+        authorAction: deriveAuthorAction(workloadState, guard.status),
+        publisherAction: derivePublisherAction(workloadState),
+        internalQaState: deriveInternalQaState(workloadState),
+        packageReadiness: derivePackageReadiness(workloadState, guard.status),
+        holdReason: guard.status === 'blocked' ? guard.message : '',
+        restartCondition: deriveRestartCondition(workloadState, guard.status),
+        downstreamCapacityRisk: risk,
+        readinessGuard: guard,
+        latestExecutionEvidence: latestLog
+          ? `${stringValue(latestLog.jm1_actiontype)} (${stringValue(latestLog.jm1_executionlogid)})`
+          : 'No recent execution evidence found',
+      }
+    })
+    .filter((item) => item.title && isActiveWorkloadItem(item))
+    .sort((a, b) => workloadPriority(a) - workloadPriority(b) || b.ageDays - a.ageDays)
+}
+
+function findLatestLogForWorkload(
+  logs: DataverseRow[],
+  titleId: string,
+  assetId: string,
+  stages: DataverseRow[],
+) {
+  const stageIds = new Set(stages.map((stage) => stringValue(stage.jm1pub_editorialstageid)).filter(Boolean))
+  return logs.find((log) => {
+    const recordId = stringValue(log.jm1_sourcerecordid)
+    return recordId === titleId || recordId === assetId || stageIds.has(recordId)
+  })
+}
+
+function deriveWorkloadState(input: {
+  pipelineStage: string
+  stageType: string
+  stageStatus: string
+  hasAsset: boolean
+}): PublisherWorkloadState {
+  if (!input.hasAsset) return 'Blocked'
+  const type = input.stageType.toLowerCase()
+  const status = input.stageStatus.toLowerCase()
+  if (type.includes('line')) {
+    if (status.includes('author')) return 'Line Editing - Author Review'
+    if (status.includes('qa')) return 'Line Editing - Internal QA'
+    if (status.includes('progress')) return 'Line Editing - In Progress'
+    return 'Line Editing - Not Started'
+  }
+  if (type.includes('developmental')) {
+    if (status.includes('author')) return 'Developmental Editing - Author Review'
+    if (status.includes('progress')) return 'Developmental Editing - In Progress'
+    return 'Developmental Editing - Not Started'
+  }
+  if (type.includes('copy')) return status.includes('progress') ? 'Copyediting In Progress' : 'Copyediting Ready'
+  if (type.includes('proof')) return 'Proofreading Ready'
+  if (type.includes('production')) return 'Production Ready'
+  if (input.pipelineStage.toLowerCase().includes('editorial')) return 'Editorial Review'
+  if (input.pipelineStage.toLowerCase().includes('ongoing')) return 'External Hold'
+  return 'Blocked'
+}
+
+function deriveCapability(state: PublisherWorkloadState) {
+  if (state.startsWith('Developmental')) return 'CAP-001 Developmental Editing'
+  if (state.startsWith('Line')) return 'CAP-002 Line Editing'
+  if (state.startsWith('Copy')) return 'CAP-003 Copyediting'
+  if (state.startsWith('Proof')) return 'CAP-004 Proofreading'
+  if (state === 'Production Ready') return 'Production'
+  return 'Editorial Review'
+}
+
+function deriveNextAction(state: PublisherWorkloadState, title: string) {
+  if (title === 'The Intentional Leader') return 'Complete full Volume I Line Editing package and QA'
+  switch (state) {
+    case 'Editorial Review':
+      return 'Complete Editorial Review and assign next governed stage'
+    case 'Developmental Editing - Not Started':
+      return 'Prepare Developmental plan without releasing author package until capacity guard passes'
+    case 'Developmental Editing - In Progress':
+      return 'Continue Developmental Editing and internal QA'
+    case 'Developmental Editing - Author Review':
+      return 'Await author response'
+    case 'Line Editing - In Progress':
+      return 'Complete line edit, QA, and package draft'
+    case 'Line Editing - Internal QA':
+      return 'Complete internal QA'
+    case 'Line Editing - Author Review':
+      return 'Await author response'
+    case 'Copyediting Ready':
+      return 'Hold until CAP-002 exit is complete'
+    case 'External Hold':
+      return 'Resolve external evidence or publisher judgment hold'
+    default:
+      return 'Resolve blocker before movement'
+  }
+}
+
+function deriveTargetDate(state: PublisherWorkloadState) {
+  const days =
+    state === 'Line Editing - In Progress' ? 3 : state === 'Editorial Review' ? 2 : state.includes('Developmental') ? 5 : 7
+  const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+  return date.toISOString().slice(0, 10)
+}
+
+function deriveAuthorAction(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
+  if (guardStatus === 'blocked') return 'None - publisher readiness guard active'
+  if (state.includes('Author Review')) return 'Review released package and respond through governed channel'
+  return 'None'
+}
+
+function derivePublisherAction(state: PublisherWorkloadState) {
+  if (state === 'Editorial Review') return 'Complete Editorial Review'
+  if (state.startsWith('Developmental')) return 'Prepare or continue Developmental package'
+  if (state.startsWith('Line')) return 'Complete Line Editing package'
+  if (state === 'Copyediting Ready') return 'Confirm Line Editing exit before Copyediting'
+  return 'Resolve current blocker'
+}
+
+function deriveInternalQaState(state: PublisherWorkloadState) {
+  if (state.includes('Internal QA')) return 'In QA'
+  if (state === 'Line Editing - In Progress' || state.includes('Developmental')) return 'Pending'
+  if (state.includes('Author Review') || state === 'Copyediting Ready' || state === 'Production Ready') return 'Passed or not required'
+  return 'Not started'
+}
+
+function derivePackageReadiness(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
+  if (guardStatus === 'blocked') return 'Held by readiness guard'
+  if (state.includes('Author Review')) return 'Released to author'
+  if (state.includes('In Progress') || state.includes('Not Started')) return 'Not ready'
+  if (state.includes('Internal QA')) return 'Internal QA'
+  return 'Pending'
+}
+
+function deriveRestartCondition(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
+  if (guardStatus === 'blocked') return 'Correct manuscript-stage/package mismatch'
+  if (state === 'External Hold') return 'Resolve external evidence hold'
+  if (state === 'Blocked') return 'Reconcile title, asset, and stage evidence'
+  return 'No restart required'
+}
+
+function deriveDownstreamRisk(state: PublisherWorkloadState, title: string): PublisherWorkloadItem['downstreamCapacityRisk'] {
+  if (title === 'The Intentional Leader') return 'watch'
+  if (state.startsWith('Developmental')) return 'watch'
+  if (state === 'Copyediting Ready' || state === 'Production Ready') return 'blocked'
+  return 'none'
+}
+
+function deriveReadinessGuard(
+  state: PublisherWorkloadState,
+  stage: DataverseRow | undefined,
+  latestLog: DataverseRow | undefined,
+): PublisherWorkloadItem['readinessGuard'] {
+  const summary = stringValue(stage?.jm1pub_authorsafesummary).toLowerCase()
+  const latestAction = stringValue(latestLog?.jm1_actiontype)
+  if (summary.includes('package') && !state.includes('Author Review') && !latestAction.includes('AUTHOR_PACKAGE')) {
+    return {
+      status: 'watch',
+      message: 'Author-facing package language exists; confirm it matches current manuscript state before release.',
+    }
+  }
+  if ((state === 'Copyediting Ready' || state === 'Production Ready') && !latestAction.includes('CAP002')) {
+    return {
+      status: 'blocked',
+      message: 'Downstream readiness requires completed upstream editorial evidence.',
+    }
+  }
+  return {
+    status: 'pass',
+    message: 'Author-facing readiness is consistent with governed stage state.',
+  }
+}
+
+function deriveOwner(
+  state: PublisherWorkloadState,
+  guardStatus: 'pass' | 'watch' | 'blocked',
+): PublisherWorkloadItem['currentOwner'] {
+  if (guardStatus === 'blocked') return 'Cody'
+  if (state.includes('Author Review')) return 'Author'
+  if (state === 'External Hold') return 'External'
+  return 'Cody'
+}
+
+function isActiveWorkloadItem(item: PublisherWorkloadItem) {
+  return ['Editorial', 'Ongoing Relationship', 'Production'].includes(item.pipelineStage) || item.editorialStage !== 'Not initialized'
+}
+
+function workloadPriority(item: PublisherWorkloadItem) {
+  if (item.title === 'The Intentional Leader') return 0
+  if (item.workloadState === 'Line Editing - In Progress') return 1
+  if (item.workloadState === 'Editorial Review') return 2
+  if (item.workloadState.startsWith('Developmental')) return 3
+  if (item.downstreamCapacityRisk === 'blocked') return 4
+  return 5
 }
 
 function deriveBlocker(input: {
@@ -775,7 +1079,7 @@ async function writePublisherExecutionLog(
   })
 }
 
-function buildMetrics(queue: PublisherQueueItem[], logs: DataverseRow[]) {
+function buildMetrics(queue: PublisherQueueItem[], logs: DataverseRow[], workload: PublisherWorkloadItem[]) {
   const today = new Date().toISOString().slice(0, 10)
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
   const waitingQueue = queue.filter((item) => item.actionOwner !== 'author')
@@ -802,6 +1106,14 @@ function buildMetrics(queue: PublisherQueueItem[], logs: DataverseRow[]) {
     publisherActionsDueToday: queue.filter((item) => item.actionOwner === 'publisher' && item.ageDays >= 3).length,
     assetsMovedToday: logs.filter((log) => stringValue(log.createdon).startsWith(today)).length,
     assetsMovedThisWeek: logs.filter((log) => new Date(stringValue(log.createdon)).getTime() >= weekAgo).length,
+    titlesAwaitingDevelopmentalEditing: workload.filter((item) => item.workloadState === 'Developmental Editing - Not Started')
+      .length,
+    titlesInDevelopmentalEditing: workload.filter((item) => item.workloadState === 'Developmental Editing - In Progress').length,
+    titlesAwaitingLineEditing: workload.filter((item) => item.workloadState === 'Line Editing - Not Started').length,
+    titlesInLineEditing: workload.filter((item) => item.workloadState === 'Line Editing - In Progress').length,
+    titlesAwaitingCopyediting: workload.filter((item) => item.workloadState === 'Copyediting Ready').length,
+    packagesHeldByReadinessGuard: workload.filter((item) => item.readinessGuard.status !== 'pass').length,
+    downstreamCapacityWarnings: workload.filter((item) => item.downstreamCapacityRisk !== 'none').length,
   }
 }
 
@@ -823,6 +1135,13 @@ function emptyMetrics(): PublisherOperatingCenterSnapshot['metrics'] {
     publisherActionsDueToday: 0,
     assetsMovedToday: 0,
     assetsMovedThisWeek: 0,
+    titlesAwaitingDevelopmentalEditing: 0,
+    titlesInDevelopmentalEditing: 0,
+    titlesAwaitingLineEditing: 0,
+    titlesInLineEditing: 0,
+    titlesAwaitingCopyediting: 0,
+    packagesHeldByReadinessGuard: 0,
+    downstreamCapacityWarnings: 0,
   }
 }
 
