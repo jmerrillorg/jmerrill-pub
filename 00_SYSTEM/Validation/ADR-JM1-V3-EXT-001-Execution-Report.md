@@ -1,5 +1,5 @@
 ---
-Status: COMPLETE PENDING ACCEPTANCE EVENT WRITE
+Status: COMPLETE
 Classification: Spec-only
 Production Implementation Authorized: No
 Created: 2026-07-15
@@ -18,7 +18,8 @@ last_verified_date: 2026-07-15
 | Archived v0.3 path | `99_ARCHIVE/00_SYSTEM/Architecture/ADR/ADR-JM1-V3-EXT-001-v0.3.md` — authentic supplied inbox version archived; no prior repository-history version found |
 | Branch | `codex/adr-v04-accepted` |
 | PR / merge | Not opened in this local continuation unless repository governance later requires it |
-| Governance log event | Pending post-commit write; final record ID to be added in the continuation evidence commit |
+| Governance log event | `ADR_ACCEPTED` written to `jm1_executionlog`; record ID `f33dab99-1880-f111-ab0f-00224820105b` |
+| Repository content commit | `aa529793e7c7970b39fa464c29e0f5878cf47779` |
 
 ## B. Source Blocker Resolution
 
@@ -102,6 +103,8 @@ Tenant-validation gaps remain non-blocking for this spec-only package because An
 
 ## H. Truthful Completion Statement
 
-COMPLETE for the authorized spec-only ADR acceptance continuation once the post-commit ADR acceptance event is written and reconciled into this report.
+COMPLETE for the authorized spec-only ADR acceptance continuation.
+
+ADR acceptance was logged to JM1-Core as `ADR_ACCEPTED`, execution-log record `f33dab99-1880-f111-ab0f-00224820105b`, linked to prior package-preparation event `5baebb78-1480-f111-ab0f-7c1e525b15c2`.
 
 No JM1-Core tables, production schemas, production flows, agents, cross-pillar data views, AIC data integrations, or Annex A authority promotion were created or changed.
