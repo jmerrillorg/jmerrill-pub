@@ -94,6 +94,23 @@ function collectIdentityEmailCandidates({
   return [...candidates]
 }
 
+function collectIdentityObjectIdCandidates({
+  profile,
+  token,
+}: {
+  profile?: Record<string, unknown>
+  token?: { oid?: unknown; sub?: unknown } | null
+}) {
+  return [
+    getProfileValue(profile, 'oid'),
+    getProfileValue(profile, 'sub'),
+    typeof token?.oid === 'string' ? token.oid.trim() : '',
+    typeof token?.sub === 'string' ? token.sub.trim() : '',
+  ]
+    .filter(Boolean)
+    .map((value) => value.toLowerCase())
+}
+
 async function resolveAuthorizedAuthorEmail({
   profile,
   user,
@@ -223,18 +240,38 @@ function getAllowedPublisherEmails() {
   )
 }
 
-function getAuthorizedPublisherEmail({
+function getAllowedPublisherObjectIds() {
+  return new Set(
+    (process.env.PUBLISHER_OPERATING_CENTER_ALLOWED_OBJECT_IDS || '')
+      .split(',')
+      .map((id) => id.trim().toLowerCase())
+      .filter(Boolean),
+  )
+}
+
+function getAuthorizedPublisherIdentity({
   profile,
   user,
   token,
 }: {
   profile?: Record<string, unknown>
   user?: { email?: string | null } | null
-  token?: { email?: unknown } | null
+  token?: { email?: unknown; oid?: unknown; sub?: unknown } | null
 }) {
   const candidates = collectIdentityEmailCandidates({ profile, user, token })
   const allowed = getAllowedPublisherEmails()
-  return candidates.find((candidate) => allowed.has(candidate)) || ''
+  const email = candidates.find((candidate) => allowed.has(candidate)) || ''
+  if (email) return { email }
+
+  const objectIds = collectIdentityObjectIdCandidates({ profile, token })
+  const allowedObjectIds = getAllowedPublisherObjectIds()
+  const objectId = objectIds.find((candidate) => allowedObjectIds.has(candidate)) || ''
+  if (!objectId) return null
+
+  return {
+    email: candidates[0] || [...allowed][0] || '',
+    objectId,
+  }
 }
 
 const providers = [buildAuthorIdentityProvider(), buildPublisherIdentityProvider()].filter(Boolean) as NonNullable<
@@ -251,7 +288,7 @@ export const authorAuthOptions: NextAuthOptions = {
     async signIn({ account, profile, user }) {
       if (account?.provider === PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
         return Boolean(
-          getAuthorizedPublisherEmail({
+          getAuthorizedPublisherIdentity({
             profile: profile as Record<string, unknown> | undefined,
             user,
           }),
@@ -267,15 +304,16 @@ export const authorAuthOptions: NextAuthOptions = {
     },
     async jwt({ token, account, profile, user }) {
       if (account?.provider === PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
-        const email = getAuthorizedPublisherEmail({
+        const identity = getAuthorizedPublisherIdentity({
           profile: profile as Record<string, unknown> | undefined,
           user,
-          token,
+          token: token as { email?: unknown; oid?: unknown; sub?: unknown },
         })
-        if (email) {
-          token.email = email
+        if (identity?.email) {
+          token.email = identity.email
           token.role = 'publisher'
           token.provider = PUBLISHER_OPERATING_CENTER_PROVIDER_ID
+          if (identity.objectId) token.publisherObjectId = identity.objectId
         }
         return token
       }
