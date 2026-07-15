@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { NextResponse } from 'next/server'
 
 import {
@@ -47,6 +49,26 @@ export async function POST(request: Request) {
 
   const payload = sanitizePayload((await request.json().catch(() => null)) as MarketingProfilePayload | null)
   const contactId = context.author.contactId
+  const idempotencyKey = buildIdempotencyKey(contactId, payload)
+  const priorSubmission = await dataverseFirst(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiondescription,createdon',
+    $filter:
+      `jm1_actiontype eq 'CAP011_MARKETING_PROFILE_SUBMITTED' and ` +
+      `jm1_sourcerecordid eq '${contactId}' and ` +
+      `contains(jm1_actiondescription,'Idempotency: ${idempotencyKey}')`,
+    $orderby: 'createdon desc',
+  })
+
+  if (priorSubmission) {
+    return NextResponse.json({
+      success: true,
+      idempotent: true,
+      changedFields: [],
+      correlationId: `CAP011-MARKETING-PROFILE-IDEMPOTENT-${contactId}`,
+      message: 'Marketing profile submission was already received.',
+    })
+  }
+
   const current = await dataverseFirst(config, 'contacts', {
     $select:
       'contactid,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
@@ -78,8 +100,8 @@ export async function POST(request: Request) {
     jm1_actiontype: 'CAP011_MARKETING_PROFILE_SUBMITTED',
     jm1_actiondescription:
       changedFields.length > 0
-        ? `Author marketing profile submitted through the Author Operating Center. Changed fields: ${changedFields.join(', ')}. Correlation: ${correlationId}.`
-        : `Author marketing profile submitted through the Author Operating Center with no changed fields. Correlation: ${correlationId}.`,
+        ? `Author marketing profile submitted through the Author Operating Center. Changed fields: ${changedFields.join(', ')}. Idempotency: ${idempotencyKey}. Correlation: ${correlationId}.`
+        : `Author marketing profile submitted through the Author Operating Center with no changed fields. Idempotency: ${idempotencyKey}. Correlation: ${correlationId}.`,
     jm1_executionstatus: SUCCESS_STATUS,
     jm1_agentname: 'Author Operating Center',
     jm1_startedon: now,
@@ -104,6 +126,10 @@ function sanitizePayload(payload: MarketingProfilePayload | null) {
     instagram: cleanText(payload?.instagram),
     xTwitter: cleanText(payload?.xTwitter),
   }
+}
+
+function buildIdempotencyKey(contactId: string, payload: ReturnType<typeof sanitizePayload>) {
+  return createHash('sha256').update(`${contactId}:${JSON.stringify(payload)}`).digest('hex')
 }
 
 function cleanText(value: unknown) {
