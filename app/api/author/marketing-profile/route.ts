@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 
-import { getAuthorPortalContextFromCookies } from '@/lib/server/author-portal-context'
+import {
+  getAuthorPortalContextFromAuthorEmail,
+  getAuthorPortalContextFromCookies,
+} from '@/lib/server/author-portal-context'
+import { getDurableAuthorSession } from '@/lib/server/author-durable-auth'
 import {
   dataverseCreate,
   dataverseFirst,
@@ -24,7 +28,14 @@ type MarketingProfilePayload = {
 }
 
 export async function POST(request: Request) {
-  const context = await getAuthorPortalContextFromCookies()
+  const context =
+    (await getAuthorPortalContextFromCookies()) ||
+    (await getDurableAuthorSession().then((session) => {
+      const email = session?.user?.email
+      if (!email) return null
+      return getAuthorPortalContextFromAuthorEmail(email)
+    }))
+
   if (!context?.author.contactId) {
     return NextResponse.json({ error: 'Author workspace session not found.' }, { status: 401 })
   }
