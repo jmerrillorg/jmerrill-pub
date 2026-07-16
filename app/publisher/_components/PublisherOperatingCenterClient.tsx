@@ -158,8 +158,9 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               'Moved this week': snapshot.metrics.assetsMovedThisWeek,
               'Awaiting dev': snapshot.metrics.titlesAwaitingDevelopmentalEditing,
               'In line edit': snapshot.metrics.titlesInLineEditing,
-              'Guard holds': snapshot.metrics.packagesHeldByReadinessGuard,
-              'Capacity warnings': snapshot.metrics.downstreamCapacityWarnings,
+              'Dependency holds': snapshot.metrics.packagesHeldByReadinessGuard,
+              'Workload advisories': snapshot.metrics.workloadAdvisories,
+              'Author reviews': snapshot.metrics.authorReviewBacklog,
               'Active pipeline': snapshot.metrics.portfolioActivePipeline,
               'Published catalog': snapshot.metrics.portfolioPublishedCatalog,
               'External holds': snapshot.metrics.portfolioExternalHold,
@@ -181,7 +182,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               </p>
               <h2 className="mt-2 text-2xl font-semibold">Lifecycle portfolio views</h2>
               <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
-                Published catalog titles are separated from active editorial workload so capacity warnings and package guards apply only to current governed work.
+                Published catalog titles are separated from active editorial workload so workload advisories apply only to current governed work.
               </p>
             </div>
             <Badge
@@ -250,15 +251,15 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               </p>
               <h2 className="mt-2 text-2xl font-semibold">Editorial workload and asset readiness</h2>
               <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
-                Core-backed workload states, next actions, owners, package readiness, and downstream capacity warnings.
-                Author-facing assets are held when manuscript state does not support release.
+                Core-backed workload states, next actions, owners, package readiness, workload level, and true dependency holds.
+                Workload volume informs priority and dates; it does not block valid stage movement.
               </p>
             </div>
             <Badge
               label={
                 snapshot && snapshot.metrics.packagesHeldByReadinessGuard > 0
-                  ? `${snapshot.metrics.packagesHeldByReadinessGuard} guard watch`
-                  : 'Readiness guard clear'
+                  ? `${snapshot.metrics.packagesHeldByReadinessGuard} dependency hold`
+                  : 'No dependency holds'
               }
               tone={snapshot && snapshot.metrics.packagesHeldByReadinessGuard > 0 ? 'amber' : 'blue'}
             />
@@ -272,9 +273,10 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                   <Th>State</Th>
                   <Th>Capability</Th>
                   <Th>Owner</Th>
+                  <Th>Workload</Th>
                   <Th>Next action</Th>
                   <Th>Package</Th>
-                  <Th>Guard</Th>
+                  <Th>Dependency</Th>
                   <Th>Target</Th>
                   <Th>Age</Th>
                 </tr>
@@ -285,7 +287,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                 ))}
                 {workload.length === 0 && (
                   <tr>
-                    <td className="px-3 py-5 text-white/45" colSpan={9}>
+                    <td className="px-3 py-5 text-white/45" colSpan={10}>
                       No active workload records were returned from Core.
                     </td>
                   </tr>
@@ -300,7 +302,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
             ['all', 'All assets'],
             ['proof', 'Proof assets'],
             ['publisher', 'Publisher action'],
-            ['blocked', 'Blocked'],
+            ['blocked', 'Dependency Holds'],
             ['editorial', 'Editorial'],
           ].map(([id, label]) => (
             <button
@@ -469,12 +471,12 @@ function WorkloadRow({ item }: { item: PublisherWorkloadItem }) {
       <Td>{item.activeCapability}</Td>
       <Td>{item.currentOwner}</Td>
       <Td>
+        <Badge label={workloadLabel(item.workloadLevel)} tone={workloadTone(item.workloadLevel)} />
+        <span className="mt-2 block text-white/38">Queue #{item.queuePosition}</span>
+        <span className="mt-1 block text-white/38">{item.downstreamQueueSize} peer item{item.downstreamQueueSize === 1 ? '' : 's'}</span>
+      </Td>
+      <Td>
         <span className="block max-w-[240px] leading-5">{item.nextAction}</span>
-        {item.downstreamCapacityRisk !== 'none' && (
-          <span className="mt-2 inline-flex rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-amber-100">
-            Capacity {item.downstreamCapacityRisk}
-          </span>
-        )}
       </Td>
       <Td>{item.packageReadiness}</Td>
       <Td>
@@ -485,6 +487,29 @@ function WorkloadRow({ item }: { item: PublisherWorkloadItem }) {
       <Td>{item.ageDays}d</Td>
     </tr>
   )
+}
+
+function workloadLabel(level: PublisherWorkloadItem['workloadLevel']) {
+  switch (level) {
+    case 'available':
+      return 'Available'
+    case 'normal':
+      return 'Normal Load'
+    case 'elevated':
+      return 'Elevated Load'
+    case 'high':
+      return 'High Load'
+    case 'overdue-risk':
+      return 'Overdue Risk'
+    case 'resource-attention':
+      return 'Resource Attention'
+  }
+}
+
+function workloadTone(level: PublisherWorkloadItem['workloadLevel']): 'neutral' | 'blue' | 'amber' {
+  if (level === 'available' || level === 'normal') return 'blue'
+  if (level === 'resource-attention' || level === 'overdue-risk') return 'amber'
+  return 'neutral'
 }
 
 function Th({ children }: { children: ReactNode }) {
