@@ -3,6 +3,7 @@ export type AuthorPortalWorkspaceState =
   | 'awaiting_governed_action'
   | 'editorial_review'
   | 'developmental_editing'
+  | 'line_editing'
   | 'editorial_in_progress'
   | 'production_in_progress'
   | 'distribution_release_pending'
@@ -55,6 +56,25 @@ export function buildEditorialDisplayState({
       nextActionLabel:
         nextActionLabel?.trim() ||
         'No action is required from you at this time. We will update you when the developmental plan is ready for review.',
+    }
+  }
+
+  if (workspaceState === 'line_editing') {
+    const authorReview =
+      normalizedStatus === 'author review' ||
+      normalizeWorkspaceText(summary).includes('author review') ||
+      normalizeWorkspaceText(summary).includes('sent by email') ||
+      normalizeWorkspaceText(nextActionLabel).includes('review the line-edited manuscript')
+
+    return {
+      stageLabel: stageLabel?.trim() || 'Line Editing',
+      stageStatus: authorReview ? 'Author Review' : stageStatus?.trim() || 'In Progress',
+      summary:
+        summary?.trim() ||
+        'Your Volume I line editing review package for The Intentional Leader has been sent by email and is ready for your review.',
+      nextActionLabel:
+        nextActionLabel?.trim() ||
+        'Please review the line-edited manuscript and reply to the publishing team with your approval, bounded corrections, a discussion request, or a pause request.',
     }
   }
 
