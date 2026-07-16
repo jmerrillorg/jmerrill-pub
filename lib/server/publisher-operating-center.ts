@@ -83,6 +83,7 @@ export type PublisherWorkloadState =
   | 'Copyediting Ready'
   | 'Copyediting In Progress'
   | 'Copyediting - Release Decision Ready'
+  | 'Copyediting - Author Review'
   | 'Proofreading Ready'
   | 'Production Ready'
   | 'Blocked'
@@ -789,6 +790,16 @@ function deriveWorkloadState(input: {
   }
   if (type.includes('copy')) {
     if (
+      status.includes('author') ||
+      summary.includes('author review') ||
+      summary.includes('ready for your review') ||
+      summary.includes('sent by email') ||
+      latestAction.includes('cap003_author_package_delivered') ||
+      latestAction.includes('cap003_author_review_opened')
+    ) {
+      return 'Copyediting - Author Review'
+    }
+    if (
       status.includes('complete') ||
       summary.includes('internally complete') ||
       latestAction.includes('cap003_author_package_ready') ||
@@ -818,7 +829,7 @@ function deriveCapability(state: PublisherWorkloadState) {
 function deriveNextAction(state: PublisherWorkloadState, title: string) {
   if (
     title === 'The Intentional Leader' &&
-    !['Line Editing - Author Review', 'Copyediting - Release Decision Ready'].includes(state)
+    !['Line Editing - Author Review', 'Copyediting - Release Decision Ready', 'Copyediting - Author Review'].includes(state)
   ) {
     return 'Complete full Volume I Line Editing package and QA'
   }
@@ -845,6 +856,8 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
       return 'Complete Copyediting pass, QA, and internal package draft'
     case 'Copyediting - Release Decision Ready':
       return 'Jackie release decision required before author-facing Copyediting package is sent; Proofreading remains blocked'
+    case 'Copyediting - Author Review':
+      return 'Await author response; Proofreading remains blocked'
     case 'External Hold':
       return 'Resolve external evidence or publisher judgment hold'
     default:
@@ -873,6 +886,7 @@ function deriveAuthorAction(state: PublisherWorkloadState, guardStatus: 'pass' |
   if (guardStatus === 'blocked') return 'None - publisher readiness guard active'
   if (state === 'Line Editing - Author Review') return 'Review and approve Line Editing package'
   if (state === 'Copyediting - Release Decision Ready') return 'None - publisher release decision pending'
+  if (state === 'Copyediting - Author Review') return 'Review and approve Copyediting package'
   if (state.includes('Author Review')) return 'Review released package and respond through governed channel'
   return 'None'
 }
@@ -886,6 +900,7 @@ function derivePublisherAction(state: PublisherWorkloadState) {
   if (state === 'Copyediting Ready') return 'Confirm Line Editing exit before Copyediting'
   if (state === 'Copyediting In Progress') return 'Complete Copyediting package'
   if (state === 'Copyediting - Release Decision Ready') return 'Review and approve release of the Copyediting package'
+  if (state === 'Copyediting - Author Review') return 'Await author response'
   return 'Resolve current blocker'
 }
 
@@ -894,6 +909,7 @@ function deriveInternalQaState(state: PublisherWorkloadState) {
   if (state === 'Line Editing - Author Review') return 'PASS'
   if (state === 'Line Editing - Release Decision Ready') return 'Passed'
   if (state === 'Copyediting - Release Decision Ready') return 'PASS'
+  if (state === 'Copyediting - Author Review') return 'PASS'
   if (state === 'Line Editing - In Progress' || state.includes('Developmental')) return 'Pending'
   if (state.includes('Author Review') || state === 'Copyediting Ready' || state === 'Production Ready') return 'Passed or not required'
   return 'Not started'
@@ -914,6 +930,7 @@ function deriveRestartCondition(state: PublisherWorkloadState, guardStatus: 'pas
   if (guardStatus === 'blocked') return 'Correct manuscript-stage/package mismatch'
   if (state === 'Line Editing - Author Review') return 'Copyediting blocked until author approval gate is recorded'
   if (state === 'Copyediting - Release Decision Ready') return 'No restart required; Proofreading remains blocked until publisher release decision'
+  if (state === 'Copyediting - Author Review') return 'No restart required; Proofreading remains blocked until author response'
   if (state === 'External Hold') return 'Resolve external evidence hold'
   if (state === 'Blocked') return 'Reconcile title, asset, and stage evidence'
   return 'No restart required'
@@ -922,6 +939,7 @@ function deriveRestartCondition(state: PublisherWorkloadState, guardStatus: 'pas
 function deriveDownstreamRisk(state: PublisherWorkloadState, title: string): PublisherWorkloadItem['downstreamCapacityRisk'] {
   if (state === 'Line Editing - Author Review') return 'blocked'
   if (state === 'Copyediting - Release Decision Ready') return 'watch'
+  if (state === 'Copyediting - Author Review') return 'blocked'
   if (title === 'The Intentional Leader') return 'watch'
   if (state.startsWith('Developmental')) return 'watch'
   if (state === 'Copyediting Ready' || state === 'Production Ready') return 'blocked'
@@ -972,6 +990,7 @@ function workloadPriority(item: PublisherWorkloadItem) {
   if (item.title === 'The Intentional Leader') return 0
   if (item.workloadState === 'Line Editing - Release Decision Ready') return 0
   if (item.workloadState === 'Copyediting - Release Decision Ready') return 0
+  if (item.workloadState === 'Copyediting - Author Review') return 0
   if (item.workloadState === 'Line Editing - In Progress') return 1
   if (item.workloadState === 'Editorial Review') return 2
   if (item.workloadState.startsWith('Developmental')) return 3
@@ -984,6 +1003,7 @@ function deriveQueueBlocker(workloadState: PublisherWorkloadState | undefined, f
   if (workloadState === 'Line Editing - Author Review') return 'Author Line Editing response pending'
   if (workloadState === 'Copyediting In Progress') return 'Copyediting in progress'
   if (workloadState === 'Copyediting - Release Decision Ready') return 'Copyediting package release decision ready'
+  if (workloadState === 'Copyediting - Author Review') return 'Author Copyediting response pending'
   if (workloadState === 'Developmental Editing - Author Review') return 'Author Developmental Editing response pending'
   if (workloadState === 'Developmental Editing - In Progress') return 'Developmental Editing in progress'
   return fallback

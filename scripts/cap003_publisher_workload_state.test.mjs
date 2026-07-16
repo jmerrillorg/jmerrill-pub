@@ -23,10 +23,21 @@ const expectations = [
       deriveWorkloadStateBody.includes("latestAction.includes('cap003_author_package_ready')"),
   },
   {
-    name: 'The Intentional Leader no longer receives stale Line Editing next action after Copyediting completion',
+    name: 'released Copyediting package resolves to author review before release-ready fallback',
+    ok:
+      source.includes("'Copyediting - Author Review'") &&
+      deriveWorkloadStateBody.indexOf("return 'Copyediting - Author Review'") > -1 &&
+      deriveWorkloadStateBody.indexOf("return 'Copyediting - Author Review'") <
+        deriveWorkloadStateBody.indexOf("return 'Copyediting - Release Decision Ready'") &&
+      deriveWorkloadStateBody.includes("latestAction.includes('cap003_author_package_delivered')") &&
+      deriveWorkloadStateBody.includes("latestAction.includes('cap003_author_review_opened')"),
+  },
+  {
+    name: 'The Intentional Leader no longer receives stale Line Editing next action after Copyediting release',
     ok:
       deriveNextActionBody.includes("'Copyediting - Release Decision Ready'") &&
-      deriveNextActionBody.includes('Jackie release decision required before author-facing Copyediting package is sent'),
+      deriveNextActionBody.includes("'Copyediting - Author Review'") &&
+      deriveNextActionBody.includes('Await author response; Proofreading remains blocked'),
   },
   {
     name: 'completed Copyediting is not blocked by CAP-002 readiness guard',
@@ -39,8 +50,16 @@ const expectations = [
     ok: source.includes("state === 'Line Editing - Release Decision Ready' || state === 'Copyediting - Release Decision Ready'"),
   },
   {
-    name: 'Proofreading remains blocked until Copyediting release decision',
-    ok: source.includes('Proofreading remains blocked until publisher release decision'),
+    name: 'released Copyediting package ownership shifts to Author',
+    ok:
+      source.includes("if (state.includes('Author Review')) return 'Author'") &&
+      source.includes("if (state === 'Copyediting - Author Review') return 'Await author response'"),
+  },
+  {
+    name: 'Proofreading remains blocked until Copyediting author response',
+    ok:
+      source.includes('Proofreading remains blocked until publisher release decision') &&
+      source.includes('Proofreading remains blocked until author response'),
   },
 ]
 
