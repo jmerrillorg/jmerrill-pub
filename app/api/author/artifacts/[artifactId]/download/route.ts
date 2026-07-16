@@ -33,9 +33,13 @@ export async function GET(
     return NextResponse.json({ error: 'Author workspace session not found.' }, { status: 401 })
   }
 
+  const visibleArtifact = context.projects
+    .flatMap((project) => project.artifacts || [])
+    .find((artifact) => artifact.id === artifactId)
+
   const artifact = await dataverseFirst(config, 'jm1pub_editorialartifacts', {
     $select:
-      'jm1pub_editorialartifactid,jm1pub_filename,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_repositorydriveid,jm1pub_repositoryitemid,_jm1pub_publishingassetid_value',
+      'jm1pub_editorialartifactid,jm1pub_filename,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_fileextension,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_publishingassetid_value,_jm1pub_editorialstageid_value',
     $filter: `jm1pub_editorialartifactid eq ${artifactId}`,
   })
 
@@ -47,8 +51,10 @@ export async function GET(
   const authorized = context.projects.some((project) => project.publishingAssetId === publishingAssetId)
   const delivered = dataverseFormatted(artifact, 'jm1pub_artifactstatus', '') === 'Delivered'
   const authorFacing = dataverseFormatted(artifact, 'jm1pub_visibility', '') === 'Author Facing'
+  const currentApproved = Boolean(artifact.jm1pub_iscurrentapproved)
+  const notSuperseded = !stringValue(artifact.jm1pub_supersededon)
 
-  if (!authorized || !delivered || !authorFacing) {
+  if (!authorized || !visibleArtifact || !delivered || !authorFacing || !currentApproved || !notSuperseded) {
     return NextResponse.json({ error: 'Artifact not found.' }, { status: 404 })
   }
 
@@ -75,14 +81,17 @@ export async function GET(
     return NextResponse.json({ error: 'Artifact file could not be loaded.' }, { status: 502 })
   }
 
-  const contentType = response.headers.get('content-type') || 'application/octet-stream'
   const body = await response.arrayBuffer()
+  const contentType = contentTypeForFilename(filename)
+  const encodedFilename = encodeURIComponent(filename)
 
   return new NextResponse(body, {
     headers: {
       'Content-Type': contentType,
-      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodedFilename}`,
       'Cache-Control': 'private, no-store',
+      'Content-Length': String(body.byteLength),
+      'X-Content-Type-Options': 'nosniff',
     },
   })
 }
@@ -124,4 +133,14 @@ function isGuid(value: string) {
 
 function sanitizeDownloadFilename(value: string) {
   return value.replace(/[\r\n"\\/]/g, '-').slice(0, 180) || 'editorial-artifact'
+}
+
+function contentTypeForFilename(filename: string) {
+  const lower = filename.toLowerCase()
+  if (lower.endsWith('.docx')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  if (lower.endsWith('.pdf')) return 'application/pdf'
+  if (lower.endsWith('.xlsx')) return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  if (lower.endsWith('.doc')) return 'application/msword'
+  if (lower.endsWith('.txt')) return 'text/plain; charset=utf-8'
+  return 'application/octet-stream'
 }

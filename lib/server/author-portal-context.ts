@@ -578,10 +578,6 @@ async function buildProjectSummaries(
         })
       : null
 
-    const artifacts = asset
-      ? await getAuthorFacingEditorialArtifacts(config, dataverseLookupId(asset, 'jm1pub_publishingassetid'))
-      : []
-
     const authorActionEvidence = resolveAuthorActionEvidence({
       summaryStatus: dataverseFormatted(summary || {}, 'jm1pub_summarystatus', ''),
       publishedToWorkspaceOn: stringValue(summary?.jm1pub_publishedtoworkspaceon),
@@ -592,6 +588,17 @@ async function buildProjectSummaries(
       authorDecisionOn: stringValue(pendingGate?.jm1pub_authordecisionon),
       nextStageAuthorized: Boolean(pendingGate?.jm1pub_nextstageauthorized),
     })
+
+    const artifacts =
+      asset && authorActionEvidence.authorActionAvailable
+        ? await getAuthorFacingEditorialArtifacts(config, {
+            publishingAssetId: dataverseLookupId(asset, 'jm1pub_publishingassetid'),
+            activeStageId: dataverseLookupId(stage || {}, 'jm1pub_editorialstageid'),
+            activeGateId: dataverseLookupId(pendingGate || {}, 'jm1pub_editorialapprovalgateid'),
+            sourceArtifactId: dataverseLookupId(summary || {}, '_jm1pub_sourceartifactid_value'),
+            deliverableArtifactId: dataverseLookupId(pendingGate || {}, '_jm1pub_deliverableartifactid_value'),
+          })
+        : []
 
     const intakeReference =
       inferReferenceFromName(stringValue(opportunity.name)) ||
@@ -741,10 +748,6 @@ async function buildProjectSummaries(
         })
       : null
 
-    const artifacts = asset
-      ? await getAuthorFacingEditorialArtifacts(config, dataverseLookupId(asset, 'jm1pub_publishingassetid'))
-      : []
-
     const authorActionEvidence = resolveAuthorActionEvidence({
       summaryStatus: dataverseFormatted(summary || {}, 'jm1pub_summarystatus', ''),
       publishedToWorkspaceOn: stringValue(summary?.jm1pub_publishedtoworkspaceon),
@@ -755,6 +758,17 @@ async function buildProjectSummaries(
       authorDecisionOn: stringValue(pendingGate?.jm1pub_authordecisionon),
       nextStageAuthorized: Boolean(pendingGate?.jm1pub_nextstageauthorized),
     })
+
+    const artifacts =
+      asset && authorActionEvidence.authorActionAvailable
+        ? await getAuthorFacingEditorialArtifacts(config, {
+            publishingAssetId: dataverseLookupId(asset, 'jm1pub_publishingassetid'),
+            activeStageId: dataverseLookupId(stage || {}, 'jm1pub_editorialstageid'),
+            activeGateId: dataverseLookupId(pendingGate || {}, 'jm1pub_editorialapprovalgateid'),
+            sourceArtifactId: dataverseLookupId(summary || {}, '_jm1pub_sourceartifactid_value'),
+            deliverableArtifactId: dataverseLookupId(pendingGate || {}, '_jm1pub_deliverableartifactid_value'),
+          })
+        : []
 
     projects.push(
       projectSummaryFromResolvedRow({
@@ -1353,19 +1367,51 @@ function pickAuthorFacingSummary(rows: Record<string, unknown>[]) {
 
 async function getAuthorFacingEditorialArtifacts(
   config: NonNullable<ReturnType<typeof getDataverseServerConfig>>,
-  publishingAssetId: string,
+  {
+    publishingAssetId,
+    activeStageId,
+    activeGateId,
+    sourceArtifactId,
+    deliverableArtifactId,
+  }: {
+    publishingAssetId: string
+    activeStageId?: string
+    activeGateId?: string
+    sourceArtifactId?: string
+    deliverableArtifactId?: string
+  },
 ): Promise<AuthorPortalArtifact[]> {
-  if (!publishingAssetId) return []
+  if (!publishingAssetId || !activeStageId) return []
+
+  const activeArtifactIds = new Set([sourceArtifactId, deliverableArtifactId].filter(Boolean))
 
   const rows = await dataverseList(config, 'jm1pub_editorialartifacts', {
     $select:
-      'jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_repositoryitemid,jm1pub_repositorydriveid,jm1pub_deliveredon,createdon',
-    $filter: `_jm1pub_publishingassetid_value eq ${publishingAssetId} and jm1pub_visibility eq 196650000 and jm1pub_artifactstatus eq 196650002`,
+      'jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_repositoryitemid,jm1pub_repositorydriveid,jm1pub_deliveredon,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_editorialstageid_value,_jm1pub_editorialapprovalgateid_value,createdon',
+    $filter:
+      `_jm1pub_publishingassetid_value eq ${publishingAssetId} ` +
+      `and _jm1pub_editorialstageid_value eq ${activeStageId} ` +
+      `and jm1pub_visibility eq 196650000 ` +
+      `and jm1pub_artifactstatus eq 196650002 ` +
+      `and jm1pub_iscurrentapproved eq true`,
     $orderby: 'jm1pub_deliveredon desc,createdon desc',
     $top: '8',
   })
 
   return rows
+    .filter((row) => {
+      if (stringValue(row.jm1pub_supersededon)) return false
+
+      const artifactId = dataverseLookupId(row, 'jm1pub_editorialartifactid')
+      const artifactGateId = dataverseLookupId(row, '_jm1pub_editorialapprovalgateid_value')
+
+      if (activeArtifactIds.has(artifactId)) return true
+      if (activeGateId && artifactGateId === activeGateId) return true
+
+      // Current packages often include companion files with the same active stage
+      // but no gate lookup. Keep those visible only while their stage is active.
+      return !artifactGateId
+    })
     .map((row) => {
       const id = dataverseLookupId(row, 'jm1pub_editorialartifactid')
       const filename = stringValue(row.jm1pub_filename)
@@ -1391,6 +1437,11 @@ function authorArtifactLabel(typeLabel: string, filename: string, name: string) 
   const normalized = normalizeWorkspaceText(`${typeLabel} ${filename} ${name}`)
 
   if (normalized.includes('working manuscript')) return 'Editorial Working Manuscript'
+  if (normalized.includes('copyedited') || normalized.includes('copyedit')) {
+    if (normalized.includes('manuscript') || filename.toLowerCase().endsWith('.docx')) return 'Copyedited Manuscript'
+    return 'Copyedit Package'
+  }
+  if (normalized.includes('line edited') || normalized.includes('line-edit')) return 'Line Editing Package'
   if (normalized.includes('revision blueprint')) return 'Revision Blueprint'
   if (normalized.includes('developmental review package') || normalized.includes('author delivery pdf')) {
     return 'Developmental Review Summary'
