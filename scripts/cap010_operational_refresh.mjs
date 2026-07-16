@@ -91,6 +91,7 @@ const dashboard = {
     notificationSent: eventCounts.AUTHOR_NOTIFICATION_SENT || 0,
     packageDelivered: (eventCounts.AUTHOR_PACKAGE_DELIVERED || 0) + (eventCounts.DEVELOPMENTAL_AUTHOR_PACKAGE_RELEASED || 0),
   },
+  throughput: buildThroughputSnapshot(editorialRows, gateRows, eventCounts),
   wave2Closure: buildWave2Closure(registryRows, capabilitySignals, stageCounts, eventCounts),
   publisherActions: {
     editorialStageRows: editorialRows.map((row) => ({
@@ -214,9 +215,60 @@ function buildWave2Closure(registryRows, capabilitySignals, stageCounts, eventCo
       staleDataWarning: 'Refresh reads latest 250 execution-log rows plus live title/stage/gate rows; older events may be outside the read window.',
       refreshCoverage: 'CAP maturity, proof assets, author actions, publisher actions, dependency holds, financial/catalog/identity/marketing states, execution failures, catalog stage counts.',
       publisherRoutingState: 'PUBLISHER_ROLE_ROUTING_REMEDIATED and PUBLISHER_AUTHENTICATED_MASTER_WORKSPACE_PROVEN recorded during Wave 3 routing proof.',
-      copyeditingState: 'CAP-003 Copyediting internally complete; Jackie release decision pending; Proofreading blocked.',
+      copyeditingState: copyeditingStateFromEvents(eventCounts),
     },
   }
+}
+
+function buildThroughputSnapshot(editorialRows, gateRows, eventCounts) {
+  const trackedTitles = [
+    'The Intentional Leader',
+    'Before You Were Born',
+    'The General',
+    'The Long Watch',
+    'Establishing Glory',
+  ]
+  const trackedStages = editorialRows
+    .filter((row) => trackedTitles.some((title) => text(row.jm1pub_name).toLowerCase().includes(title.toLowerCase())))
+    .map((row) => {
+      const gate = gateRows.find((candidate) => text(candidate.jm1pub_editorialapprovalgatename).toLowerCase().includes(text(row.jm1pub_name).toLowerCase().replace(/^.* - /, '')))
+      return {
+        id: row.jm1pub_editorialstageid,
+        name: text(row.jm1pub_name),
+        type: text(row['jm1pub_stagetype@OData.Community.Display.V1.FormattedValue']) || text(row.jm1pub_stagetype),
+        status: text(row['jm1pub_stagestatus@OData.Community.Display.V1.FormattedValue']) || text(row.jm1pub_stagestatus),
+        modifiedon: row.modifiedon,
+        gateStatus: gate
+          ? text(gate['jm1pub_gatestatus@OData.Community.Display.V1.FormattedValue']) || text(gate.jm1pub_gatestatus)
+          : '',
+      }
+    })
+
+  const activeOrWaiting = trackedStages.filter((row) => !/complete|approved/i.test(`${row.status} ${row.gateStatus}`)).length
+  const authorResponsePending =
+    (eventCounts.CAP003_AUTHOR_REVIEW_OPENED || 0) > 0 && (eventCounts.CAP003_COPYEDITING_AUTHOR_RESPONSE_RECEIVED || 0) === 0
+
+  return {
+    trackedStageRows: trackedStages,
+    activeOrWaiting,
+    authorResponsePending,
+    productionQueueReady: 0,
+    proofreadingQueueReady: authorResponsePending ? 0 : undefined,
+    currentBottleneck: authorResponsePending
+      ? 'Copyediting author response for The Intentional Leader'
+      : 'Editorial throughput balancing across active titles',
+    projectedNextBottleneck: 'Proofreading and Production runway must be ready before Copyediting approvals arrive.',
+  }
+}
+
+function copyeditingStateFromEvents(eventCounts) {
+  if ((eventCounts.CAP003_AUTHOR_REVIEW_OPENED || 0) > 0) {
+    return 'CAP-003 Copyediting package released; author review is open; Proofreading blocked until governed author response.'
+  }
+  if ((eventCounts.CAP003_AUTHOR_PACKAGE_DELIVERED || 0) > 0) {
+    return 'CAP-003 Copyediting package delivered; author review pending; Proofreading blocked.'
+  }
+  return 'CAP-003 Copyediting internally complete; Jackie release decision pending; Proofreading blocked.'
 }
 
 function evidenceFor(cap, capabilitySignals, stageCounts, eventCounts) {
