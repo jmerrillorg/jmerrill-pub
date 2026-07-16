@@ -228,7 +228,6 @@ export function AuthorPortalWorkspace() {
     },
   ].filter((step) => step.visible)
 
-  const multipleProjects = context.projects.length > 1
   const selectedProject = findProjectForSelection(context, selectedParams) || context.currentProject
   const selectedEditorial =
     isEditorialWorkspaceState(selectedProject.workspaceState) &&
@@ -467,45 +466,85 @@ export function AuthorPortalWorkspace() {
         </div>
 
         <div className="rounded-[28px] border border-white/8 bg-white/[0.04] p-6">
-          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">
-            {multipleProjects ? 'Your assets and projects' : 'Your project'}
-          </p>
-          <div className="mt-4 space-y-3">
-            {context.projects.map((project) => (
-              <Link
-                key={project.key}
-                href={buildProjectHref(project)}
-                className={`block rounded-2xl border p-4 transition-colors ${
-                  project.key === selectedProject.key
-                    ? 'border-blue-400/35 bg-blue-500/[0.10]'
-                    : 'border-white/8 bg-black/15 hover:border-blue-300/30 hover:bg-blue-500/[0.06]'
-                }`}
-              >
-              <div className="flex items-start justify-between gap-3">
-                <div className="text-[14px] font-medium text-white/85">{project.title}</div>
-                <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.08em] text-white/55">
-                    {projectStateBadge(project.workspaceState)}
-                </span>
-              </div>
-                <div className="mt-2 text-[12px] text-white/40">{project.statusLabel}</div>
-                {project.nextActionLabel ? (
-                  <div className="mt-2 text-[12px] leading-[1.6] text-blue-200/80">{project.nextActionLabel}</div>
-                ) : null}
-                {project.pendingApprovalLabel ? (
-                  <div className="mt-2 text-[11px] uppercase tracking-[0.08em] text-amber-200/80">
-                    Pending approval: {project.pendingApprovalLabel}
-                  </div>
-                ) : null}
-                {project.workspaceState === 'published_legacy' ? (
-                  <div className="mt-2 text-[11px] uppercase tracking-[0.08em] text-white/45">
-                    Historical title / legacy project
-                  </div>
-                ) : null}
-              </Link>
-            ))}
+          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">My Library</p>
+          <div className="mt-4 space-y-5">
+            <LibraryGroup
+              title="Projects In Progress"
+              projects={context.library.projectsInProgress}
+              selectedProjectKey={selectedProject.key}
+            />
+            <LibraryGroup
+              title="Published Books"
+              projects={context.library.publishedBooks}
+              selectedProjectKey={selectedProject.key}
+            />
+            {context.library.archivedTitles.length ? (
+              <LibraryGroup
+                title="Archived Titles"
+                projects={context.library.archivedTitles}
+                selectedProjectKey={selectedProject.key}
+              />
+            ) : null}
+            {!context.library.projectsInProgress.length && !context.library.publishedBooks.length ? (
+              <p className="text-[13px] leading-6 text-white/45">
+                No linked J Merrill Publishing titles were returned for this relationship.
+              </p>
+            ) : null}
           </div>
         </div>
       </section>
+    </div>
+  )
+}
+
+function LibraryGroup({
+  title,
+  projects,
+  selectedProjectKey,
+}: {
+  title: string
+  projects: AuthorPortalContext['projects']
+  selectedProjectKey: string
+}) {
+  if (!projects.length) return null
+
+  return (
+    <div>
+      <h4 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-white/55">{title}</h4>
+      <div className="mt-3 space-y-3">
+        {projects.map((project) => (
+          <Link
+            key={project.key}
+            href={buildProjectHref(project)}
+            className={`block rounded-2xl border p-4 transition-colors ${
+              project.key === selectedProjectKey
+                ? 'border-blue-400/35 bg-blue-500/[0.10]'
+                : 'border-white/8 bg-black/15 hover:border-blue-300/30 hover:bg-blue-500/[0.06]'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="text-[14px] font-medium text-white/85">{project.title}</div>
+              <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.08em] text-white/55">
+                {project.portfolioLabel || projectStateBadge(project.workspaceState)}
+              </span>
+            </div>
+            <div className="mt-2 text-[12px] text-white/40">{project.statusLabel}</div>
+            {project.portfolioState === 'published_catalog' ? (
+              <div className="mt-2 space-y-1 text-[12px] leading-[1.6] text-white/45">
+                <div>Catalog status: {project.catalogStatus || 'Published catalog'}</div>
+                <div>Formats: {project.activeFormats?.join(', ') || 'Format details pending'}</div>
+              </div>
+            ) : project.nextActionLabel ? (
+              <div className="mt-2 text-[12px] leading-[1.6] text-blue-200/80">{project.nextActionLabel}</div>
+            ) : null}
+            {project.pendingApprovalLabel ? (
+              <div className="mt-2 text-[11px] uppercase tracking-[0.08em] text-amber-200/80">
+                Pending approval: {project.pendingApprovalLabel}
+              </div>
+            ) : null}
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }

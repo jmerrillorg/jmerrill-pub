@@ -9,6 +9,13 @@ import {
   stringValue,
   type DataverseServerConfig,
 } from './dataverse-server'
+import {
+  classifyTitlePortfolio,
+  isActivePipeline,
+  portfolioBadge,
+  type CatalogPortfolioClassification,
+  type CatalogPortfolioState,
+} from './catalog-portfolio'
 
 const TITLE_STAGE_EDITORIAL = 100000006
 const ASSET_STATUS_STAGED = 100000000
@@ -121,6 +128,26 @@ export type PublisherWorkloadItem = {
   latestExecutionEvidence: string
 }
 
+export type PublisherPortfolioItem = {
+  key: string
+  title: string
+  author: string
+  titleId: string
+  assetIds: string[]
+  portfolioState: CatalogPortfolioState
+  portfolioLabel: string
+  pipelineStage: string
+  catalogStatus: string
+  publicationStatus: string
+  distributionStatus: string
+  activeFormats: string[]
+  isbn13s: string[]
+  evidence: string[]
+  confidence: 'high' | 'medium' | 'low'
+  exceptionReason?: string
+  nextAction: string
+}
+
 export type PublisherOperatingCenterSnapshot = {
   generatedAt: string
   status: 'core-live' | 'unavailable'
@@ -153,11 +180,24 @@ export type PublisherOperatingCenterSnapshot = {
     titlesAwaitingCopyeditingRelease: number
     packagesHeldByReadinessGuard: number
     downstreamCapacityWarnings: number
+    portfolioActivePipeline: number
+    portfolioPublishedCatalog: number
+    portfolioExternalHold: number
+    portfolioArchiveHistorical: number
+    portfolioReconciliationRequired: number
+    publishedCatalogMissingIsbn: number
+    publishedCatalogMissingAuthor: number
   }
   queues: {
     enterprise: PublisherQueueItem[]
     proofAssets: PublisherQueueItem[]
     workload: PublisherWorkloadItem[]
+    portfolio: PublisherPortfolioItem[]
+    activePipeline: PublisherPortfolioItem[]
+    publishedCatalog: PublisherPortfolioItem[]
+    externalHolds: PublisherPortfolioItem[]
+    archiveHistorical: PublisherPortfolioItem[]
+    reconciliationRequired: PublisherPortfolioItem[]
   }
 }
 
@@ -174,7 +214,17 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
         authorization: 'Internal Entra workforce allowlist',
       },
       metrics: emptyMetrics(),
-      queues: { enterprise: [], proofAssets: [], workload: [] },
+      queues: {
+        enterprise: [],
+        proofAssets: [],
+        workload: [],
+        portfolio: [],
+        activePipeline: [],
+        publishedCatalog: [],
+        externalHolds: [],
+        archiveHistorical: [],
+        reconciliationRequired: [],
+      },
     }
   }
 
@@ -198,7 +248,8 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       ),
     )
     .slice(0, 2)
-  const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, logs)
+  const portfolio = buildPortfolioItems(titles, assets, editorialStages)
+  const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, logs, portfolio)
 
   return {
     generatedAt: new Date().toISOString(),
@@ -207,11 +258,17 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       role: 'Publisher',
       authorization: 'Internal Entra workforce allowlist',
     },
-    metrics: buildMetrics(queue, logs, workload),
+    metrics: buildMetrics(queue, logs, workload, portfolio),
     queues: {
       enterprise: queue,
       proofAssets,
       workload,
+      portfolio,
+      activePipeline: portfolio.filter((item) => item.portfolioState === 'active_pipeline'),
+      publishedCatalog: portfolio.filter((item) => item.portfolioState === 'published_catalog'),
+      externalHolds: portfolio.filter((item) => item.portfolioState === 'external_hold'),
+      archiveHistorical: portfolio.filter((item) => item.portfolioState === 'archive_historical'),
+      reconciliationRequired: portfolio.filter((item) => item.portfolioState === 'reconciliation_required'),
     },
   }
 }
@@ -669,10 +726,13 @@ function buildWorkloadItems(
   editorialStages: DataverseRow[],
   intakes: DataverseRow[],
   logs: DataverseRow[],
+  portfolio: PublisherPortfolioItem[],
 ): PublisherWorkloadItem[] {
   return titles
     .map((title) => {
       const titleId = stringValue(title.jm1pub_titleid)
+      const portfolioItem = portfolio.find((item) => item.titleId === titleId)
+      if (!portfolioItem || portfolioItem.portfolioState !== 'active_pipeline') return null
       const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name)
       const titleAssets = assets.filter((asset) => dataverseLookupId(asset, '_jm1pub_titleid_value') === titleId)
       const asset = titleAssets[0]
@@ -738,8 +798,83 @@ function buildWorkloadItems(
           : 'No recent execution evidence found',
       }
     })
-    .filter((item) => item.title && isActiveWorkloadItem(item))
+    .filter((item): item is PublisherWorkloadItem => Boolean(item && item.title && isActiveWorkloadItem(item)))
     .sort((a, b) => workloadPriority(a) - workloadPriority(b) || b.ageDays - a.ageDays)
+}
+
+function buildPortfolioItems(
+  titles: DataverseRow[],
+  assets: DataverseRow[],
+  editorialStages: DataverseRow[],
+): PublisherPortfolioItem[] {
+  return titles
+    .map((title) => {
+      const titleId = stringValue(title.jm1pub_titleid)
+      const titleAssets = assets.filter((asset) => dataverseLookupId(asset, '_jm1pub_titleid_value') === titleId)
+      const classification = classifyTitlePortfolio({
+        title,
+        assets: titleAssets,
+        stages: editorialStages,
+      })
+      const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name) || '(Untitled)'
+
+      return {
+        key: titleId || normalizeTitle(titleName),
+        title: titleName,
+        author:
+          stringValue(title.jm1pub_authorname) ||
+          stringValue(title.jm1pub_authordisplayname) ||
+          dataverseFormatted(title, '_jm1_author_value') ||
+          'Author pending',
+        titleId,
+        assetIds: titleAssets.map((asset) => stringValue(asset.jm1pub_publishingassetid)).filter(Boolean),
+        portfolioState: classification.state,
+        portfolioLabel: classification.label,
+        pipelineStage: dataverseFormatted(title, 'jm1pub_stage') || 'Unstaged',
+        catalogStatus: classification.catalogStatus || 'Unknown',
+        publicationStatus: classification.publicationStatus || '',
+        distributionStatus: classification.distributionStatus || 'Unknown',
+        activeFormats: classification.activeFormats,
+        isbn13s: classification.isbn13s,
+        evidence: classification.evidence,
+        confidence: classification.confidence,
+        exceptionReason: classification.exceptionReason,
+        nextAction: derivePortfolioNextAction(classification),
+      }
+    })
+    .sort((a, b) => portfolioSortOrder(a) - portfolioSortOrder(b) || a.title.localeCompare(b.title))
+}
+
+function derivePortfolioNextAction(classification: CatalogPortfolioClassification) {
+  switch (classification.state) {
+    case 'active_pipeline':
+      return 'Manage through Active Pipeline workload controls'
+    case 'published_catalog':
+      return 'Maintain catalog metadata, distribution, marketing, and royalty readiness'
+    case 'external_hold':
+      return classification.exceptionReason || 'Resolve external dependency before movement'
+    case 'archive_historical':
+      return 'Preserve as historical evidence unless a governed restore/reopen is approved'
+    default:
+      return classification.exceptionReason || 'Reconcile missing catalog identity or lifecycle evidence'
+  }
+}
+
+function portfolioSortOrder(item: PublisherPortfolioItem) {
+  switch (item.portfolioState) {
+    case 'active_pipeline':
+      return 0
+    case 'published_catalog':
+      return 1
+    case 'external_hold':
+      return 2
+    case 'reconciliation_required':
+      return 3
+    case 'archive_historical':
+      return 4
+    default:
+      return 9
+  }
 }
 
 function findLatestLogForWorkload(
@@ -1209,7 +1344,12 @@ async function writePublisherExecutionLog(
   })
 }
 
-function buildMetrics(queue: PublisherQueueItem[], logs: DataverseRow[], workload: PublisherWorkloadItem[]) {
+function buildMetrics(
+  queue: PublisherQueueItem[],
+  logs: DataverseRow[],
+  workload: PublisherWorkloadItem[],
+  portfolio: PublisherPortfolioItem[],
+) {
   const today = new Date().toISOString().slice(0, 10)
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
   const waitingQueue = queue.filter((item) => item.actionOwner !== 'author')
@@ -1246,6 +1386,17 @@ function buildMetrics(queue: PublisherQueueItem[], logs: DataverseRow[], workloa
       .length,
     packagesHeldByReadinessGuard: workload.filter((item) => item.readinessGuard.status !== 'pass').length,
     downstreamCapacityWarnings: workload.filter((item) => item.downstreamCapacityRisk !== 'none').length,
+    portfolioActivePipeline: portfolio.filter((item) => item.portfolioState === 'active_pipeline').length,
+    portfolioPublishedCatalog: portfolio.filter((item) => item.portfolioState === 'published_catalog').length,
+    portfolioExternalHold: portfolio.filter((item) => item.portfolioState === 'external_hold').length,
+    portfolioArchiveHistorical: portfolio.filter((item) => item.portfolioState === 'archive_historical').length,
+    portfolioReconciliationRequired: portfolio.filter((item) => item.portfolioState === 'reconciliation_required').length,
+    publishedCatalogMissingIsbn: portfolio.filter(
+      (item) => item.portfolioState === 'published_catalog' && item.isbn13s.length === 0,
+    ).length,
+    publishedCatalogMissingAuthor: portfolio.filter(
+      (item) => item.portfolioState === 'published_catalog' && item.author === 'Author pending',
+    ).length,
   }
 }
 
@@ -1275,6 +1426,13 @@ function emptyMetrics(): PublisherOperatingCenterSnapshot['metrics'] {
     titlesAwaitingCopyeditingRelease: 0,
     packagesHeldByReadinessGuard: 0,
     downstreamCapacityWarnings: 0,
+    portfolioActivePipeline: 0,
+    portfolioPublishedCatalog: 0,
+    portfolioExternalHold: 0,
+    portfolioArchiveHistorical: 0,
+    portfolioReconciliationRequired: 0,
+    publishedCatalogMissingIsbn: 0,
+    publishedCatalogMissingAuthor: 0,
   }
 }
 
