@@ -23,6 +23,13 @@ const expectations = [
     ok: route.includes("status: 'server-error'") && route.includes('correlationId: correlationSeed'),
   },
   {
+    name: 'route falls back to durable author session when legacy portal cookie resolution fails',
+    ok:
+      route.includes('getAuthorPortalContextFromCookies().catch(() => null)') &&
+      route.includes('getDurableAuthorSession()') &&
+      route.includes('getAuthorPortalContextFromAuthorEmail(email)'),
+  },
+  {
     name: 'client does not surface raw Failed to fetch',
     ok: workspace.includes("message === 'Failed to fetch'") && workspace.includes('We could not reach the publishing system.'),
   },
