@@ -1,0 +1,4 @@
+exception_id,category,classification,description,owner,status,author_impact
+CAP003-EX-001,production/proofreading watch,DEFER TO PROOFREADING,Emoji section markers retained pending production design treatment.,Publisher / Production,Open for downstream proof,None before release decision.
+CAP003-EX-002,voice preservation,RETAINED INTENTIONAL USAGE,1434 short fragments/list lines reviewed and retained as devotional cadence or section structure.,Copyediting,Closed internally,None.
+CAP003-EX-003,scripture/citation,PROOFREADING WATCH,179 scripture/reference lines reviewed for em-dash pattern; final punctuation to be rechecked in proof.,Proofreading,Open downstream,None before release decision.

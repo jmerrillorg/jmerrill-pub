@@ -1,0 +1,173 @@
+{
+  "ok": true,
+  "correlationId": "CAP003-COPYEDIT-2026-07-16T05-32-03-572Z",
+  "beforeStage": {
+    "id": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+    "name": "Copyediting - The Intentional Leader, Volume I",
+    "status": "Not Started",
+    "statusValue": 100000000,
+    "start": null,
+    "complete": null,
+    "authorSafeSummary": "Copyediting is ready to begin. No action is required from you at this time.",
+    "publisherReviewRequired": false,
+    "currentArtifactCount": 1,
+    "correlationId": "CAP002-LINE-APPROVAL-2026-07-16T04-25-01-293Z"
+  },
+  "afterStage": {
+    "id": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+    "name": "Copyediting - The Intentional Leader, Volume I",
+    "status": "Complete",
+    "statusValue": 100000008,
+    "start": "2026-07-16T05:32:03Z",
+    "complete": "2026-07-16T05:32:03Z",
+    "authorSafeSummary": "Copyediting for Volume I is internally complete. No author action is required until the publishing team releases the copyediting review package.",
+    "publisherReviewRequired": true,
+    "currentArtifactCount": 11,
+    "correlationId": "CAP003-COPYEDIT-2026-07-16T05-32-03-572Z"
+  },
+  "createdEvents": [
+    {
+      "eventType": "PUBLISHER_ROLE_ROUTING_REMEDIATED",
+      "id": "b8b67aab-d780-f111-ab0f-00224820105b",
+      "createdon": "2026-07-16T05:32:05Z"
+    },
+    {
+      "eventType": "PUBLISHER_AUTHENTICATED_MASTER_WORKSPACE_PROVEN",
+      "id": "33cf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "createdon": "2026-07-16T05:32:05Z"
+    },
+    {
+      "eventType": "CAP003_COPYEDITING_STARTED",
+      "id": "c908f1a7-d780-f111-ab0e-6045bdd9ab12",
+      "createdon": "2026-07-16T05:32:05Z"
+    },
+    {
+      "eventType": "CAP003_CONTROLLED_SAMPLE_COMPLETED",
+      "id": "37cf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "createdon": "2026-07-16T05:32:06Z"
+    },
+    {
+      "eventType": "CAP003_FULL_COPYEDIT_COMPLETED",
+      "id": "d2fcdfa8-d780-f111-ab0f-000d3a14673b",
+      "createdon": "2026-07-16T05:32:06Z"
+    },
+    {
+      "eventType": "CAP003_CORRECTION_LEDGER_COMPLETED",
+      "id": "d4fcdfa8-d780-f111-ab0f-000d3a14673b",
+      "createdon": "2026-07-16T05:32:06Z"
+    },
+    {
+      "eventType": "CAP003_PROJECT_STYLE_SHEET_UPDATED",
+      "id": "d6fcdfa8-d780-f111-ab0f-000d3a14673b",
+      "createdon": "2026-07-16T05:32:06Z"
+    },
+    {
+      "eventType": "CAP003_INTERNAL_PUBLISHER_QA_COMPLETED",
+      "id": "3dcf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "createdon": "2026-07-16T05:32:06Z"
+    },
+    {
+      "eventType": "CAP003_AUTHOR_PACKAGE_READY",
+      "id": "25b77aab-d780-f111-ab0f-00224820105b",
+      "createdon": "2026-07-16T05:32:07Z"
+    },
+    {
+      "eventType": "CAP010_PUBLISHER_ROUTING_AND_COPYEDIT_REFRESH_COMPLETED",
+      "id": "3ecf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "createdon": "2026-07-16T05:32:07Z"
+    }
+  ],
+  "readbackLogCount": 10,
+  "readbackLogs": [
+    {
+      "@odata.etag": "W/\"38855531\"",
+      "jm1_executionlogid": "25b77aab-d780-f111-ab0f-00224820105b",
+      "jm1_name": "CAP003_AUTHOR_PACKAGE_READY - The Intentional Leader, Volume I",
+      "jm1_sourcerecordid": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+      "jm1_actiontype": "CAP003_AUTHOR_PACKAGE_READY",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/16/2026 5:32 AM",
+      "createdon": "2026-07-16T05:32:07Z"
+    },
+    {
+      "@odata.etag": "W/\"38855533\"",
+      "jm1_executionlogid": "3ecf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "jm1_name": "CAP010_PUBLISHER_ROUTING_AND_COPYEDIT_REFRESH_COMPLETED - The Intentional Leader, Volume I",
+      "jm1_sourcerecordid": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+      "jm1_actiontype": "CAP010_PUBLISHER_ROUTING_AND_COPYEDIT_REFRESH_COMPLETED",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/16/2026 5:32 AM",
+      "createdon": "2026-07-16T05:32:07Z"
+    },
+    {
+      "@odata.etag": "W/\"38855522\"",
+      "jm1_executionlogid": "d2fcdfa8-d780-f111-ab0f-000d3a14673b",
+      "jm1_name": "CAP003_FULL_COPYEDIT_COMPLETED - The Intentional Leader, Volume I",
+      "jm1_sourcerecordid": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+      "jm1_actiontype": "CAP003_FULL_COPYEDIT_COMPLETED",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/16/2026 5:32 AM",
+      "createdon": "2026-07-16T05:32:06Z"
+    },
+    {
+      "@odata.etag": "W/\"38855525\"",
+      "jm1_executionlogid": "d4fcdfa8-d780-f111-ab0f-000d3a14673b",
+      "jm1_name": "CAP003_CORRECTION_LEDGER_COMPLETED - The Intentional Leader, Volume I",
+      "jm1_sourcerecordid": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+      "jm1_actiontype": "CAP003_CORRECTION_LEDGER_COMPLETED",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/16/2026 5:32 AM",
+      "createdon": "2026-07-16T05:32:06Z"
+    },
+    {
+      "@odata.etag": "W/\"38855527\"",
+      "jm1_executionlogid": "d6fcdfa8-d780-f111-ab0f-000d3a14673b",
+      "jm1_name": "CAP003_PROJECT_STYLE_SHEET_UPDATED - The Intentional Leader, Volume I",
+      "jm1_sourcerecordid": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+      "jm1_actiontype": "CAP003_PROJECT_STYLE_SHEET_UPDATED",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/16/2026 5:32 AM",
+      "createdon": "2026-07-16T05:32:06Z"
+    },
+    {
+      "@odata.etag": "W/\"38855520\"",
+      "jm1_executionlogid": "37cf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "jm1_name": "CAP003_CONTROLLED_SAMPLE_COMPLETED - The Intentional Leader, Volume I",
+      "jm1_sourcerecordid": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+      "jm1_actiontype": "CAP003_CONTROLLED_SAMPLE_COMPLETED",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/16/2026 5:32 AM",
+      "createdon": "2026-07-16T05:32:06Z"
+    },
+    {
+      "@odata.etag": "W/\"38855529\"",
+      "jm1_executionlogid": "3dcf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "jm1_name": "CAP003_INTERNAL_PUBLISHER_QA_COMPLETED - The Intentional Leader, Volume I",
+      "jm1_sourcerecordid": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+      "jm1_actiontype": "CAP003_INTERNAL_PUBLISHER_QA_COMPLETED",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/16/2026 5:32 AM",
+      "createdon": "2026-07-16T05:32:06Z"
+    },
+    {
+      "@odata.etag": "W/\"38855512\"",
+      "jm1_executionlogid": "b8b67aab-d780-f111-ab0f-00224820105b",
+      "jm1_name": "PUBLISHER_ROLE_ROUTING_REMEDIATED - The Intentional Leader, Volume I",
+      "jm1_sourcerecordid": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+      "jm1_actiontype": "PUBLISHER_ROLE_ROUTING_REMEDIATED",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/16/2026 5:32 AM",
+      "createdon": "2026-07-16T05:32:05Z"
+    },
+    {
+      "@odata.etag": "W/\"38855517\"",
+      "jm1_executionlogid": "c908f1a7-d780-f111-ab0e-6045bdd9ab12",
+      "jm1_name": "CAP003_COPYEDITING_STARTED - The Intentional Leader, Volume I",
+      "jm1_sourcerecordid": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+      "jm1_actiontype": "CAP003_COPYEDITING_STARTED",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/16/2026 5:32 AM",
+      "createdon": "2026-07-16T05:32:05Z"
+    },
+    {
+      "@odata.etag": "W/\"38855514\"",
+      "jm1_executionlogid": "33cf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "jm1_name": "PUBLISHER_AUTHENTICATED_MASTER_WORKSPACE_PROVEN - The Intentional Leader, Volume I",
+      "jm1_sourcerecordid": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+      "jm1_actiontype": "PUBLISHER_AUTHENTICATED_MASTER_WORKSPACE_PROVEN",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/16/2026 5:32 AM",
+      "createdon": "2026-07-16T05:32:05Z"
+    }
+  ]
+}
