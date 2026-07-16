@@ -665,6 +665,7 @@ function buildWorkloadItems(
         pipelineStage,
         stageType,
         stageStatus,
+        stageSummary: stringValue(latestStage?.jm1pub_authorsafesummary),
         hasAsset: Boolean(assetId),
         latestAction: stringValue(latestLog?.jm1_actiontype),
       })
@@ -729,15 +730,23 @@ function deriveWorkloadState(input: {
   pipelineStage: string
   stageType: string
   stageStatus: string
+  stageSummary?: string
   hasAsset: boolean
   latestAction?: string
 }): PublisherWorkloadState {
   if (!input.hasAsset) return 'Blocked'
   const type = input.stageType.toLowerCase()
   const status = input.stageStatus.toLowerCase()
+  const summary = input.stageSummary?.toLowerCase() || ''
   const latestAction = input.latestAction?.toLowerCase() || ''
   if (type.includes('line')) {
-    if (status.includes('author') || latestAction.includes('cap002_author_package_delivered')) {
+    if (
+      status.includes('author') ||
+      summary.includes('author review') ||
+      summary.includes('delivered to the author') ||
+      summary.includes('copyediting is blocked') ||
+      latestAction.includes('cap002_author_package_delivered')
+    ) {
       return 'Line Editing - Author Review'
     }
     if (status.includes('qa')) return 'Line Editing - Internal QA'
@@ -799,7 +808,9 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
 
 function deriveTargetDate(state: PublisherWorkloadState) {
   const days =
-    state === 'Line Editing - In Progress'
+    state === 'Line Editing - Author Review'
+      ? 7
+      : state === 'Line Editing - In Progress'
       ? 3
       : state === 'Line Editing - Release Decision Ready'
         ? 1
@@ -814,6 +825,7 @@ function deriveTargetDate(state: PublisherWorkloadState) {
 
 function deriveAuthorAction(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
   if (guardStatus === 'blocked') return 'None - publisher readiness guard active'
+  if (state === 'Line Editing - Author Review') return 'Review and approve Line Editing package'
   if (state.includes('Author Review')) return 'Review released package and respond through governed channel'
   return 'None'
 }
@@ -830,6 +842,7 @@ function derivePublisherAction(state: PublisherWorkloadState) {
 
 function deriveInternalQaState(state: PublisherWorkloadState) {
   if (state.includes('Internal QA')) return 'In QA'
+  if (state === 'Line Editing - Author Review') return 'PASS'
   if (state === 'Line Editing - Release Decision Ready') return 'Passed'
   if (state === 'Line Editing - In Progress' || state.includes('Developmental')) return 'Pending'
   if (state.includes('Author Review') || state === 'Copyediting Ready' || state === 'Production Ready') return 'Passed or not required'
@@ -838,6 +851,7 @@ function deriveInternalQaState(state: PublisherWorkloadState) {
 
 function derivePackageReadiness(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
   if (guardStatus === 'blocked') return 'Held by readiness guard'
+  if (state === 'Line Editing - Author Review') return 'Delivered'
   if (state.includes('Author Review')) return 'Released to author'
   if (state === 'Line Editing - Release Decision Ready') return 'Ready for Jackie release decision'
   if (state.includes('In Progress') || state.includes('Not Started')) return 'Not ready'
@@ -847,12 +861,14 @@ function derivePackageReadiness(state: PublisherWorkloadState, guardStatus: 'pas
 
 function deriveRestartCondition(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
   if (guardStatus === 'blocked') return 'Correct manuscript-stage/package mismatch'
+  if (state === 'Line Editing - Author Review') return 'Copyediting blocked until author approval gate is recorded'
   if (state === 'External Hold') return 'Resolve external evidence hold'
   if (state === 'Blocked') return 'Reconcile title, asset, and stage evidence'
   return 'No restart required'
 }
 
 function deriveDownstreamRisk(state: PublisherWorkloadState, title: string): PublisherWorkloadItem['downstreamCapacityRisk'] {
+  if (state === 'Line Editing - Author Review') return 'blocked'
   if (title === 'The Intentional Leader') return 'watch'
   if (state.startsWith('Developmental')) return 'watch'
   if (state === 'Copyediting Ready' || state === 'Production Ready') return 'blocked'
