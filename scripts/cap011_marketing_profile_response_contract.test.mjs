@@ -30,6 +30,14 @@ const expectations = [
     name: 'client sends credentials and blocks duplicate clicks while saving',
     ok: workspace.includes("credentials: 'same-origin'") && workspace.includes("if (marketingSaveState === 'saving') return"),
   },
+  {
+    name: 'client falls back when fetch exists but throws',
+    ok:
+      workspace.includes('} catch {') &&
+      workspace.includes("typeof window.XMLHttpRequest === 'function'") &&
+      workspace.includes('return submitMarketingProfileWithXhr(body)') &&
+      workspace.includes('return submitMarketingProfileWithForm(payload)'),
+  },
 ]
 
 const failures = expectations.filter((expectation) => !expectation.ok)

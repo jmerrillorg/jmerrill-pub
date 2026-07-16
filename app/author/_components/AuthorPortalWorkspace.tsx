@@ -719,17 +719,25 @@ async function submitMarketingProfileRequest(payload: {
   const body = JSON.stringify(payload)
 
   if (typeof window.fetch === 'function') {
-    const response = await window.fetch('/api/author/marketing-profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body,
-    })
+    try {
+      const response = await window.fetch('/api/author/marketing-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body,
+      })
 
-    return {
-      ok: response.ok,
-      status: response.status,
-      data: (await safeReadJson(response)) as MarketingProfileResponse | null,
+      return {
+        ok: response.ok,
+        status: response.status,
+        data: (await safeReadJson(response)) as MarketingProfileResponse | null,
+      }
+    } catch {
+      if (typeof window.XMLHttpRequest === 'function') {
+        return submitMarketingProfileWithXhr(body)
+      }
+
+      return submitMarketingProfileWithForm(payload)
     }
   }
 
