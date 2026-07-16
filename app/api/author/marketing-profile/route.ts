@@ -31,6 +31,7 @@ type MarketingProfilePayload = {
 
 export async function POST(request: Request) {
   const correlationSeed = `CAP011-MARKETING-PROFILE-${Date.now()}`
+  const recoveryRequest = request.clone()
 
   try {
     const context =
@@ -155,6 +156,9 @@ export async function POST(request: Request) {
       message: 'Marketing profile saved for publishing team review.',
     })
   } catch {
+    const recovered = await recoverMarketingProfileSubmission(recoveryRequest, correlationSeed)
+    if (recovered) return recovered
+
     return NextResponse.json(
       {
         ok: false,
@@ -166,6 +170,61 @@ export async function POST(request: Request) {
       { status: 500 },
     )
   }
+}
+
+async function recoverMarketingProfileSubmission(request: Request, correlationId: string) {
+  try {
+    const session = await getDurableAuthorSession()
+    const email = session?.user?.email
+    if (!email) return null
+
+    const context = await getAuthorPortalContextFromAuthorEmail(email).catch(() => null)
+    if (!context?.author.contactId) return null
+
+    const config = getDataverseServerConfig()
+    if (!config) return null
+
+    const payload = sanitizePayload(await readMarketingProfilePayload(request))
+    const contactId = context.author.contactId
+    const idempotencyKey = buildIdempotencyKey(contactId, payload)
+    const priorSubmission = await findPriorSubmission(config, contactId, idempotencyKey).catch(() => null)
+
+    if (priorSubmission) {
+      return NextResponse.json({
+        ok: true,
+        status: 'already-submitted',
+        idempotent: true,
+        changedFields: [],
+        correlationId,
+        message: 'Your marketing profile submission was already received.',
+      })
+    }
+
+    const current = await dataverseFirst(config, 'contacts', {
+      $select:
+        'contactid,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
+      $filter: `contactid eq ${contactId}`,
+    }).catch(() => null)
+
+    if (current && marketingProfileMatchesContact(current, payload)) {
+      return NextResponse.json(
+        {
+          ok: true,
+          status: 'submitted-review-pending',
+          idempotent: false,
+          changedFields: [],
+          correlationId,
+          message:
+            'Your marketing profile was saved. The publishing team still needs to complete one internal review step.',
+        },
+        { status: 202 },
+      )
+    }
+  } catch {
+    return null
+  }
+
+  return null
 }
 
 function sanitizePayload(payload: MarketingProfilePayload | null) {
@@ -226,4 +285,16 @@ function setIfChanged(update: Record<string, string>, current: Record<string, un
   if (value && value !== stringValue(current[field])) {
     update[field] = value
   }
+}
+
+function marketingProfileMatchesContact(current: Record<string, unknown>, payload: ReturnType<typeof sanitizePayload>) {
+  return (
+    (!payload.authorBio ||
+      (payload.authorBio === stringValue(current.jm1pub_authorbio) &&
+        payload.authorBio === stringValue(current.jm1pub_publicauthorbio))) &&
+    (!payload.website || payload.website === stringValue(current.jm1pub_authorwebsite)) &&
+    (!payload.facebook || payload.facebook === stringValue(current.jm1pub_authorfacebook)) &&
+    (!payload.instagram || payload.instagram === stringValue(current.jm1pub_authorinstagram)) &&
+    (!payload.xTwitter || payload.xTwitter === stringValue(current.jm1pub_authorxtwitter))
+  )
 }
