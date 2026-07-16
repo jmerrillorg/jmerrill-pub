@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const payload = sanitizePayload((await request.json().catch(() => null)) as MarketingProfilePayload | null)
+    const payload = sanitizePayload(await readMarketingProfilePayload(request))
     const contactId = context.author.contactId
     const idempotencyKey = buildIdempotencyKey(contactId, payload)
     const priorSubmission = await findPriorSubmission(config, contactId, idempotencyKey)
@@ -176,6 +176,30 @@ function sanitizePayload(payload: MarketingProfilePayload | null) {
     instagram: cleanText(payload?.instagram),
     xTwitter: cleanText(payload?.xTwitter),
   }
+}
+
+async function readMarketingProfilePayload(request: Request) {
+  const contentType = request.headers.get('content-type') || ''
+
+  if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
+    const form = await request.formData().catch(() => null)
+    if (!form) return null
+
+    return {
+      authorBio: formValue(form, 'authorBio'),
+      website: formValue(form, 'website'),
+      facebook: formValue(form, 'facebook'),
+      instagram: formValue(form, 'instagram'),
+      xTwitter: formValue(form, 'xTwitter'),
+    }
+  }
+
+  return (await request.json().catch(() => null)) as MarketingProfilePayload | null
+}
+
+function formValue(form: FormData, name: keyof MarketingProfilePayload) {
+  const value = form.get(name)
+  return typeof value === 'string' ? value : ''
 }
 
 function buildIdempotencyKey(contactId: string, payload: ReturnType<typeof sanitizePayload>) {
