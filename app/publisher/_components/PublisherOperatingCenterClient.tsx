@@ -116,6 +116,12 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
             >
               Refresh
             </button>
+            <a
+              href="/author/portal?view=author"
+              className="inline-flex min-h-[40px] items-center rounded-full border border-white/10 px-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/60"
+            >
+              Switch to Author View
+            </a>
             <button
               type="button"
               onClick={() => void signOut({ callbackUrl: '/publisher/operating-center' })}
