@@ -1094,6 +1094,7 @@ function isEditorialWorkspaceState(state: AuthorPortalProjectSummary['workspaceS
   return (
     state === 'editorial_review' ||
     state === 'developmental_editing' ||
+    state === 'line_editing' ||
     state === 'editorial_in_progress' ||
     state === 'production_in_progress' ||
     state === 'distribution_release_pending'
@@ -1154,6 +1155,9 @@ export function inferWorkspaceState({
   if (normalizedStageLabel.includes('developmental')) {
     return 'developmental_editing'
   }
+  if (normalizedStageLabel.includes('line')) {
+    return 'line_editing'
+  }
   if (normalizedStageLabel.includes('review')) return 'editorial_review'
   if (hasAsset && (normalizedStageStatus === 'in progress' || normalizedStageStatus === 'active')) {
     return 'editorial_in_progress'
@@ -1176,6 +1180,10 @@ function buildWorkspaceStatusLabel(row: ResolvedProjectRow) {
       return `${stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
     case 'developmental_editing':
       return `${stageLabel || 'Developmental Editing'} - ${row.stageStatus || 'Not Started'}`
+    case 'line_editing':
+      return `${stageLabel || 'Line Editing'} - ${
+        row.authorDecisionOutstanding ? 'Author Review' : row.stageStatus || 'In Progress'
+      }`
     case 'editorial_in_progress':
       return `${stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
     case 'production_in_progress':
@@ -1194,6 +1202,7 @@ function buildWorkspaceStatusLabel(row: ResolvedProjectRow) {
 function canonicalStageLabel(value?: string) {
   const normalized = normalizeWorkspaceText(value)
   if (normalized === 'developmental') return 'Developmental Editing'
+  if (normalized === 'line') return 'Line Editing'
   if (normalized === 'review') return 'Editorial Review'
   return value?.trim() || ''
 }
@@ -1244,6 +1253,10 @@ function defaultNextActionLabel(row: ResolvedProjectRow) {
       return row.authorDecisionOutstanding
         ? 'Review the recommendation and respond through the official email communication.'
         : 'No action is required from you at this time. We will update you when the developmental plan is ready for review.'
+    case 'line_editing':
+      return row.authorDecisionOutstanding
+        ? 'Please review the line-edited manuscript and reply to the publishing team with your approval, bounded corrections, a discussion request, or a pause request.'
+        : 'No action is required from you at this time. Copyediting will not begin until the Line Editing approval gate is complete.'
     case 'awaiting_governed_action':
       return 'This project is linked to your author relationship and is waiting for the next governed action.'
     case 'published_legacy':
@@ -1299,6 +1312,10 @@ function defaultProjectSummary(row: ResolvedProjectRow) {
       return row.authorDecisionOutstanding
         ? 'Your developmental recommendation for Volume I is ready for review.'
         : 'Developmental planning is being prepared for Volume I of the approved quarterly series.'
+    case 'line_editing':
+      return row.authorDecisionOutstanding
+        ? 'Your Volume I line editing review package for The Intentional Leader has been sent by email and is ready for your review.'
+        : 'Line Editing remains active. Copyediting will not begin until the author approval gate is complete.'
     default:
       return row.summary
   }
