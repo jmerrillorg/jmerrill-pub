@@ -49,8 +49,12 @@ const expectations = [
     ok:
       workspace.includes('} catch {') &&
       workspace.includes("typeof window.XMLHttpRequest === 'function'") &&
-      workspace.includes('return submitMarketingProfileWithXhr(body)') &&
+      workspace.includes('return submitMarketingProfileWithXhr(body).catch(() => submitMarketingProfileWithForm(payload))') &&
       workspace.includes('return submitMarketingProfileWithForm(payload)'),
+  },
+  {
+    name: 'client allows slow production fallback responses to complete',
+    ok: workspace.includes('request.timeout = 30000') && workspace.includes('}, 30000)'),
   },
 ]
 
