@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
   try {
     const context =
-      (await getAuthorPortalContextFromCookies()) ||
+      (await getAuthorPortalContextFromCookies().catch(() => null)) ||
       (await getDurableAuthorSession()
         .then((session) => {
           const email = session?.user?.email
