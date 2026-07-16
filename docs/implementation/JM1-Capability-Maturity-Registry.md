@@ -16,7 +16,7 @@ Generated: 2026-07-14
 | CAP | Capability | Current Maturity / State | Proof Asset | Owner | Current Priority | Next Promotion Criterion |
 |---|---|---|---|---|---|---|
 | CAP-001 | Developmental Editing | Level 2 - Provisionally Certified / Controlled Production Active | The Intentional Leader, Volume I | Jackie / JM1 Publishing | Active proof asset | Level 3 candidate only after second controlled project, automated source-lock/package checks, and operational defect recovery proof |
-| CAP-002 | Line Editing | Controlled Initialization Complete - External Author Developmental Exit Hold | The Intentional Leader, Volume I after Developmental exit | Jackie / Editorial | Hold | Developmental exit formally satisfied; then begin bounded line-editing proof from locked source package without author-facing movement |
+| CAP-002 | Line Editing | Level 1 Proof - Full Volume I Line Editing internally complete; publisher release decision ready | The Intentional Leader, Volume I | Jackie / Editorial | Active release decision | Jackie release decision on the author-facing Line Editing package; after approval, release package through governed author communication without starting Copyediting |
 | CAP-003 | Copyediting | Level 0 - future | The Intentional Leader, Volume I | Jackie / Editorial | Future | CAP-002 proof |
 | CAP-004 | Proofreading | Level 0 - future | Typeset proof of The Intentional Leader | Jackie / Editorial | Future | CAP-003 proof |
 | CAP-005 | Production and Prepress | Level 0 - future | The Intentional Leader | Jackie / Production | Future | Editorial completion and production package |
@@ -31,4 +31,4 @@ Generated: 2026-07-14
 
 | Capability | Proof Asset | Evidence Package | Pending Decision | Restart Conditions | Prohibited Actions | Next Active Capability |
 |---|---|---|---|---|---|---|
-| CAP-002 Line Editing | The Intentional Leader, Volume I | CAP-002 locked source package, project style sheet, and 80-item intake queue | External author developmental exit / stage-completion boundary before substantive Line Editing | Developmental exit formally satisfied and bounded sample authorized | No sentence editing, Line Editing stage activation, or author action surfacing before exit gate exists | CAP-011 Author Marketing and Launch Operations |
+| CAP-002 Line Editing | The Intentional Leader, Volume I | CAP-002 line-edited working manuscript, render proof, style sheet, 80-item disposition ledger, traceability map, internal QA, SharePoint filing manifest, Core stage readback, and POC release-decision display | Jackie publisher release decision before author-facing package is sent | Jackie approves, changes, or holds the Line Editing release package | No author-facing release, Copyediting start, or author action surfacing before Jackie release approval | CAP-002 author release / then CAP-003 Copyediting readiness |
