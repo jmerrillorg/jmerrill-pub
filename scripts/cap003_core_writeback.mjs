@@ -61,7 +61,7 @@ const eventDefinitions = [
   ['CAP003_FULL_COPYEDIT_COMPLETED', `Full Volume I Copyediting completed. Daily entries ${qa.coverage.daily_entries}; Soul Dive entries ${qa.coverage.soul_dive_entries}; corrections ${qa.corrections.total}; output checksum ${manifest.output_sha256}.`],
   ['CAP003_CORRECTION_LEDGER_COMPLETED', `Copyediting correction ledger completed with ${qa.corrections.total} tracked correction(s), zero author queries, and zero factual/rights flags requiring decision.`],
   ['CAP003_PROJECT_STYLE_SHEET_UPDATED', `Project Style Sheet updated for Copyediting-enforced decisions, retained voice exceptions, scripture/citation watch items, and proofreading watch items. Artifact: ${manifest.project_style_sheet}.`],
-  ['CAP003_INTERNAL_PUBLISHER_QA_COMPLETED', `Internal Publisher QA completed with result ${qa.result}. Proofreading remains blocked; author-facing release is not authorized until Jackie decision.`],
+  ['CAP003_INTERNAL_PUBLISHER_QA_COMPLETED', `Internal Publisher QA completed with result ${qa.result}. Proofreading awaits the required Jackie decision; author-facing release is not authorized until Jackie decision.`],
   ['CAP003_AUTHOR_PACKAGE_READY', 'Author-facing Copyediting package draft prepared internally for Jackie release decision. No author notification sent and no author task surfaced.'],
   ['CAP010_PUBLISHER_ROUTING_AND_COPYEDIT_REFRESH_COMPLETED', 'CAP-010 refresh updated from live routing proof and CAP-003 evidence package. Publisher routing health and Copyediting release-decision metrics refreshed.'],
 ]

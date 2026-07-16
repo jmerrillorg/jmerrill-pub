@@ -120,7 +120,9 @@ export type PublisherWorkloadItem = {
   packageReadiness: string
   holdReason: string
   restartCondition: string
-  downstreamCapacityRisk: 'none' | 'watch' | 'blocked'
+  workloadLevel: 'available' | 'normal' | 'elevated' | 'high' | 'overdue-risk' | 'resource-attention'
+  queuePosition: number
+  downstreamQueueSize: number
   readinessGuard: {
     status: 'pass' | 'watch' | 'blocked'
     message: string
@@ -179,7 +181,10 @@ export type PublisherOperatingCenterSnapshot = {
     titlesAwaitingCopyediting: number
     titlesAwaitingCopyeditingRelease: number
     packagesHeldByReadinessGuard: number
-    downstreamCapacityWarnings: number
+    workloadAdvisories: number
+    activeInstancesByCapability: Record<string, number>
+    authorReviewBacklog: number
+    oldestWorkloadItem: string
     portfolioActivePipeline: number
     portfolioPublishedCatalog: number
     portfolioExternalHold: number
@@ -728,7 +733,7 @@ function buildWorkloadItems(
   logs: DataverseRow[],
   portfolio: PublisherPortfolioItem[],
 ): PublisherWorkloadItem[] {
-  return titles
+  const draftItems = titles
     .map((title) => {
       const titleId = stringValue(title.jm1pub_titleid)
       const portfolioItem = portfolio.find((item) => item.titleId === titleId)
@@ -759,10 +764,10 @@ function buildWorkloadItems(
         latestAction: stringValue(latestLog?.jm1_actiontype),
       })
       const capability = deriveCapability(workloadState)
-      const risk = deriveDownstreamRisk(workloadState, titleName)
       const guard = deriveReadinessGuard(workloadState, latestStage, latestLog)
       const owner = deriveOwner(workloadState, guard.status)
       const ageBase = stringValue(latestStage?.modifiedon || latestStage?.createdon || title.modifiedon || title.createdon)
+      const age = ageDays(ageBase)
 
       return {
         key: titleId,
@@ -784,14 +789,16 @@ function buildWorkloadItems(
         currentOwner: owner,
         nextAction: deriveNextAction(workloadState, titleName),
         targetDate: deriveTargetDate(workloadState),
-        ageDays: ageDays(ageBase),
+        ageDays: age,
         authorAction: deriveAuthorAction(workloadState, guard.status),
         publisherAction: derivePublisherAction(workloadState),
         internalQaState: deriveInternalQaState(workloadState),
         packageReadiness: derivePackageReadiness(workloadState, guard.status),
         holdReason: guard.status === 'blocked' ? guard.message : '',
         restartCondition: deriveRestartCondition(workloadState, guard.status),
-        downstreamCapacityRisk: risk,
+        workloadLevel: deriveWorkloadLevel(workloadState, age),
+        queuePosition: 0,
+        downstreamQueueSize: 0,
         readinessGuard: guard,
         latestExecutionEvidence: latestLog
           ? `${stringValue(latestLog.jm1_actiontype)} (${stringValue(latestLog.jm1_executionlogid)})`
@@ -800,6 +807,13 @@ function buildWorkloadItems(
     })
     .filter((item): item is PublisherWorkloadItem => Boolean(item && item.title && isActiveWorkloadItem(item)))
     .sort((a, b) => workloadPriority(a) - workloadPriority(b) || b.ageDays - a.ageDays)
+
+  const activeByCapability = countWorkloadByCapability(draftItems)
+  return draftItems.map((item, index) => ({
+    ...item,
+    queuePosition: index + 1,
+    downstreamQueueSize: Math.max((activeByCapability[item.activeCapability] || 1) - 1, 0),
+  }))
 }
 
 function buildPortfolioItems(
@@ -972,7 +986,7 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
     case 'Editorial Review':
       return 'Complete Editorial Review and assign next governed stage'
     case 'Developmental Editing - Not Started':
-      return 'Prepare Developmental plan without releasing author package until capacity guard passes'
+      return 'Begin Developmental Editing when title entry criteria are satisfied; set priority, owner, and target date'
     case 'Developmental Editing - In Progress':
       return 'Continue Developmental Editing and internal QA'
     case 'Developmental Editing - Author Review':
@@ -990,9 +1004,9 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
     case 'Copyediting In Progress':
       return 'Complete Copyediting pass, QA, and internal package draft'
     case 'Copyediting - Release Decision Ready':
-      return 'Jackie release decision required before author-facing Copyediting package is sent; Proofreading remains blocked'
+      return 'Jackie release decision required before author-facing Copyediting package is sent; Proofreading awaits release decision'
     case 'Copyediting - Author Review':
-      return 'Await author response; Proofreading remains blocked'
+      return 'Await author response; Proofreading awaits author approval'
     case 'External Hold':
       return 'Resolve external evidence or publisher judgment hold'
     default:
@@ -1018,7 +1032,7 @@ function deriveTargetDate(state: PublisherWorkloadState) {
 }
 
 function deriveAuthorAction(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
-  if (guardStatus === 'blocked') return 'None - publisher readiness guard active'
+  if (guardStatus === 'blocked') return 'None - title-specific dependency hold active'
   if (state === 'Line Editing - Author Review') return 'Review and approve Line Editing package'
   if (state === 'Copyediting - Release Decision Ready') return 'None - publisher release decision pending'
   if (state === 'Copyediting - Author Review') return 'Review and approve Copyediting package'
@@ -1051,7 +1065,7 @@ function deriveInternalQaState(state: PublisherWorkloadState) {
 }
 
 function derivePackageReadiness(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
-  if (guardStatus === 'blocked') return 'Held by readiness guard'
+  if (guardStatus === 'blocked') return 'Held by title-specific dependency'
   if (state === 'Line Editing - Author Review') return 'Delivered'
   if (state.includes('Author Review')) return 'Released to author'
   if (state === 'Line Editing - Release Decision Ready') return 'Ready for Jackie release decision'
@@ -1064,21 +1078,24 @@ function derivePackageReadiness(state: PublisherWorkloadState, guardStatus: 'pas
 function deriveRestartCondition(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
   if (guardStatus === 'blocked') return 'Correct manuscript-stage/package mismatch'
   if (state === 'Line Editing - Author Review') return 'Copyediting blocked until author approval gate is recorded'
-  if (state === 'Copyediting - Release Decision Ready') return 'No restart required; Proofreading remains blocked until publisher release decision'
-  if (state === 'Copyediting - Author Review') return 'No restart required; Proofreading remains blocked until author response'
+  if (state === 'Copyediting - Release Decision Ready') return 'No restart required; Proofreading awaits publisher release decision'
+  if (state === 'Copyediting - Author Review') return 'No restart required; Proofreading awaits author response'
   if (state === 'External Hold') return 'Resolve external evidence hold'
   if (state === 'Blocked') return 'Reconcile title, asset, and stage evidence'
   return 'No restart required'
 }
 
-function deriveDownstreamRisk(state: PublisherWorkloadState, title: string): PublisherWorkloadItem['downstreamCapacityRisk'] {
-  if (state === 'Line Editing - Author Review') return 'blocked'
-  if (state === 'Copyediting - Release Decision Ready') return 'watch'
-  if (state === 'Copyediting - Author Review') return 'blocked'
-  if (title === 'The Intentional Leader') return 'watch'
-  if (state.startsWith('Developmental')) return 'watch'
-  if (state === 'Copyediting Ready' || state === 'Production Ready') return 'blocked'
-  return 'none'
+function deriveWorkloadLevel(
+  state: PublisherWorkloadState,
+  ageDaysValue: number,
+): PublisherWorkloadItem['workloadLevel'] {
+  if (ageDaysValue > 14) return 'resource-attention'
+  if (ageDaysValue > 7) return 'overdue-risk'
+  if (state.includes('Author Review')) return 'normal'
+  if (state.includes('In Progress')) return 'elevated'
+  if (state.includes('Not Started') || state === 'Editorial Review' || state === 'Copyediting Ready') return 'normal'
+  if (state === 'Production Ready' || state === 'Proofreading Ready') return 'high'
+  return 'available'
 }
 
 function deriveReadinessGuard(
@@ -1129,8 +1146,14 @@ function workloadPriority(item: PublisherWorkloadItem) {
   if (item.workloadState === 'Line Editing - In Progress') return 1
   if (item.workloadState === 'Editorial Review') return 2
   if (item.workloadState.startsWith('Developmental')) return 3
-  if (item.downstreamCapacityRisk === 'blocked') return 4
   return 5
+}
+
+function countWorkloadByCapability(items: PublisherWorkloadItem[]) {
+  return items.reduce<Record<string, number>>((counts, item) => {
+    counts[item.activeCapability] = (counts[item.activeCapability] || 0) + 1
+    return counts
+  }, {})
 }
 
 function deriveQueueBlocker(workloadState: PublisherWorkloadState | undefined, fallback: string) {
@@ -1384,8 +1407,13 @@ function buildMetrics(
     titlesAwaitingCopyediting: workload.filter((item) => item.workloadState === 'Copyediting Ready').length,
     titlesAwaitingCopyeditingRelease: workload.filter((item) => item.workloadState === 'Copyediting - Release Decision Ready')
       .length,
-    packagesHeldByReadinessGuard: workload.filter((item) => item.readinessGuard.status !== 'pass').length,
-    downstreamCapacityWarnings: workload.filter((item) => item.downstreamCapacityRisk !== 'none').length,
+    packagesHeldByReadinessGuard: workload.filter((item) => item.readinessGuard.status === 'blocked').length,
+    workloadAdvisories: workload.filter((item) => !['available', 'normal'].includes(item.workloadLevel)).length,
+    activeInstancesByCapability: countWorkloadByCapability(workload),
+    authorReviewBacklog: workload.filter((item) => item.workloadState.includes('Author Review')).length,
+    oldestWorkloadItem: workload.length
+      ? `${[...workload].sort((a, b) => b.ageDays - a.ageDays)[0].title} (${[...workload].sort((a, b) => b.ageDays - a.ageDays)[0].ageDays}d)`
+      : 'None',
     portfolioActivePipeline: portfolio.filter((item) => item.portfolioState === 'active_pipeline').length,
     portfolioPublishedCatalog: portfolio.filter((item) => item.portfolioState === 'published_catalog').length,
     portfolioExternalHold: portfolio.filter((item) => item.portfolioState === 'external_hold').length,
@@ -1425,7 +1453,10 @@ function emptyMetrics(): PublisherOperatingCenterSnapshot['metrics'] {
     titlesAwaitingCopyediting: 0,
     titlesAwaitingCopyeditingRelease: 0,
     packagesHeldByReadinessGuard: 0,
-    downstreamCapacityWarnings: 0,
+    workloadAdvisories: 0,
+    activeInstancesByCapability: {},
+    authorReviewBacklog: 0,
+    oldestWorkloadItem: 'None',
     portfolioActivePipeline: 0,
     portfolioPublishedCatalog: 0,
     portfolioExternalHold: 0,

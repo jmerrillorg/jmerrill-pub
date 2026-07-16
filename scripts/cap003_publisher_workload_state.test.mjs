@@ -37,7 +37,7 @@ const expectations = [
     ok:
       deriveNextActionBody.includes("'Copyediting - Release Decision Ready'") &&
       deriveNextActionBody.includes("'Copyediting - Author Review'") &&
-      deriveNextActionBody.includes('Await author response; Proofreading remains blocked'),
+      deriveNextActionBody.includes('Await author response; Proofreading awaits author approval'),
   },
   {
     name: 'completed Copyediting is not blocked by CAP-002 readiness guard',
@@ -56,10 +56,11 @@ const expectations = [
       source.includes("if (state === 'Copyediting - Author Review') return 'Await author response'"),
   },
   {
-    name: 'Proofreading remains blocked until Copyediting author response',
+    name: 'Proofreading waits on Copyediting author response without capacity blockade language',
     ok:
-      source.includes('Proofreading remains blocked until publisher release decision') &&
-      source.includes('Proofreading remains blocked until author response'),
+      source.includes('Proofreading awaits publisher release decision') &&
+      source.includes('Proofreading awaits author response') &&
+      !deriveNextActionBody.includes('capacity guard passes'),
   },
 ]
 

@@ -263,12 +263,12 @@ function buildThroughputSnapshot(editorialRows, gateRows, eventCounts) {
 
 function copyeditingStateFromEvents(eventCounts) {
   if ((eventCounts.CAP003_AUTHOR_REVIEW_OPENED || 0) > 0) {
-    return 'CAP-003 Copyediting package released; author review is open; Proofreading blocked until governed author response.'
+    return 'CAP-003 Copyediting package released; author review is open; Proofreading awaits governed author response.'
   }
   if ((eventCounts.CAP003_AUTHOR_PACKAGE_DELIVERED || 0) > 0) {
-    return 'CAP-003 Copyediting package delivered; author review pending; Proofreading blocked.'
+    return 'CAP-003 Copyediting package delivered; author review pending; Proofreading awaits author response.'
   }
-  return 'CAP-003 Copyediting internally complete; Jackie release decision pending; Proofreading blocked.'
+  return 'CAP-003 Copyediting internally complete; Jackie release decision pending; Proofreading awaits publisher release decision.'
 }
 
 function evidenceFor(cap, capabilitySignals, stageCounts, eventCounts) {
