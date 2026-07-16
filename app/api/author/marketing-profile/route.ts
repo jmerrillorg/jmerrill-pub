@@ -174,11 +174,16 @@ export async function POST(request: Request) {
 
 async function recoverMarketingProfileSubmission(request: Request, correlationId: string) {
   try {
-    const session = await getDurableAuthorSession()
-    const email = session?.user?.email
-    if (!email) return null
+    const context =
+      (await getAuthorPortalContextFromCookies().catch(() => null)) ||
+      (await getDurableAuthorSession()
+        .then((session) => {
+          const email = session?.user?.email
+          if (!email) return null
+          return getAuthorPortalContextFromAuthorEmail(email)
+        })
+        .catch(() => null))
 
-    const context = await getAuthorPortalContextFromAuthorEmail(email).catch(() => null)
     if (!context?.author.contactId) return null
 
     const config = getDataverseServerConfig()
