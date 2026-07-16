@@ -17,6 +17,11 @@ type MarketingProfileResponse = {
   error?: string
   correlationId?: string
 }
+type MarketingProfileRequestResult = {
+  ok: boolean
+  status: number
+  data: MarketingProfileResponse | null
+}
 const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jm1_author_portal_bootstrap_context'
 const PORTAL_BOOTSTRAP_MAX_AGE_MS = 5 * 60 * 1000
 const PORTAL_UNLOCKED_KEY = 'jmp-author-onboarding-unlocked'
@@ -171,13 +176,8 @@ export function AuthorPortalWorkspace() {
     setMarketingMessage('')
 
     try {
-      const response = await fetch('/api/author/marketing-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify(marketingForm),
-      })
-      const data = (await safeReadJson(response)) as MarketingProfileResponse | null
+      const response = await submitMarketingProfileRequest(marketingForm)
+      const data = response.data
 
       if (!response.ok) {
         setMarketingSaveState('error')
@@ -704,6 +704,65 @@ async function safeReadJson(response: Response) {
 
   try {
     return JSON.parse(text) as { context?: AuthorPortalContext; error?: string }
+  } catch {
+    return null
+  }
+}
+
+async function submitMarketingProfileRequest(payload: {
+  authorBio: string
+  website: string
+  facebook: string
+  instagram: string
+  xTwitter: string
+}): Promise<MarketingProfileRequestResult> {
+  const body = JSON.stringify(payload)
+
+  if (typeof window.fetch === 'function') {
+    const response = await window.fetch('/api/author/marketing-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body,
+    })
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      data: (await safeReadJson(response)) as MarketingProfileResponse | null,
+    }
+  }
+
+  return submitMarketingProfileWithXhr(body)
+}
+
+function submitMarketingProfileWithXhr(body: string): Promise<MarketingProfileRequestResult> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest()
+    request.open('POST', '/api/author/marketing-profile')
+    request.setRequestHeader('Content-Type', 'application/json')
+    request.withCredentials = true
+    request.timeout = 15000
+
+    request.onload = () => {
+      resolve({
+        ok: request.status >= 200 && request.status < 300,
+        status: request.status,
+        data: parseMarketingProfileResponse(request.responseText),
+      })
+    }
+
+    request.onerror = () => reject(new Error('Marketing profile request failed.'))
+    request.ontimeout = () => reject(new Error('Marketing profile request timed out.'))
+    request.send(body)
+  })
+}
+
+function parseMarketingProfileResponse(text: string) {
+  if (!text) return null
+
+  try {
+    return JSON.parse(text) as MarketingProfileResponse
   } catch {
     return null
   }
