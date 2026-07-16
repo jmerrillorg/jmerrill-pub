@@ -733,7 +733,11 @@ async function submitMarketingProfileRequest(payload: {
     }
   }
 
-  return submitMarketingProfileWithXhr(body)
+  if (typeof window.XMLHttpRequest === 'function') {
+    return submitMarketingProfileWithXhr(body)
+  }
+
+  return submitMarketingProfileWithForm(payload)
 }
 
 function submitMarketingProfileWithXhr(body: string): Promise<MarketingProfileRequestResult> {
@@ -766,6 +770,58 @@ function parseMarketingProfileResponse(text: string) {
   } catch {
     return null
   }
+}
+
+function submitMarketingProfileWithForm(payload: {
+  authorBio: string
+  website: string
+  facebook: string
+  instagram: string
+  xTwitter: string
+}): Promise<MarketingProfileRequestResult> {
+  return new Promise((resolve, reject) => {
+    const frameName = `jm1-marketing-profile-${Date.now()}`
+    const iframe = document.createElement('iframe')
+    iframe.name = frameName
+    iframe.style.display = 'none'
+
+    const form = document.createElement('form')
+    form.method = 'POST'
+    form.action = '/api/author/marketing-profile'
+    form.target = frameName
+    form.style.display = 'none'
+
+    for (const [name, value] of Object.entries(payload)) {
+      const input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = name
+      input.value = value
+      form.appendChild(input)
+    }
+
+    const cleanup = window.setTimeout(() => {
+      iframe.remove()
+      form.remove()
+      reject(new Error('Marketing profile request timed out.'))
+    }, 15000)
+
+    iframe.onload = () => {
+      window.clearTimeout(cleanup)
+      const text = iframe.contentDocument?.body?.innerText || iframe.contentDocument?.body?.textContent || ''
+      iframe.remove()
+      form.remove()
+      const data = parseMarketingProfileResponse(text)
+      resolve({
+        ok: Boolean(data?.ok),
+        status: data?.ok ? 200 : 500,
+        data,
+      })
+    }
+
+    document.body.appendChild(iframe)
+    document.body.appendChild(form)
+    form.submit()
+  })
 }
 
 function marketingSuccessMessage(data: MarketingProfileResponse | null) {
