@@ -734,7 +734,7 @@ async function submitMarketingProfileRequest(payload: {
       }
     } catch {
       if (typeof window.XMLHttpRequest === 'function') {
-        return submitMarketingProfileWithXhr(body)
+        return submitMarketingProfileWithXhr(body).catch(() => submitMarketingProfileWithForm(payload))
       }
 
       return submitMarketingProfileWithForm(payload)
@@ -742,7 +742,7 @@ async function submitMarketingProfileRequest(payload: {
   }
 
   if (typeof window.XMLHttpRequest === 'function') {
-    return submitMarketingProfileWithXhr(body)
+    return submitMarketingProfileWithXhr(body).catch(() => submitMarketingProfileWithForm(payload))
   }
 
   return submitMarketingProfileWithForm(payload)
@@ -754,7 +754,7 @@ function submitMarketingProfileWithXhr(body: string): Promise<MarketingProfileRe
     request.open('POST', '/api/author/marketing-profile')
     request.setRequestHeader('Content-Type', 'application/json')
     request.withCredentials = true
-    request.timeout = 15000
+    request.timeout = 30000
 
     request.onload = () => {
       resolve({
@@ -811,7 +811,7 @@ function submitMarketingProfileWithForm(payload: {
       iframe.remove()
       form.remove()
       reject(new Error('Marketing profile request timed out.'))
-    }, 15000)
+    }, 30000)
 
     iframe.onload = () => {
       window.clearTimeout(cleanup)
