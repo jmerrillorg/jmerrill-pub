@@ -30,6 +30,13 @@ const expectations = [
       route.includes('getAuthorPortalContextFromAuthorEmail(email)'),
   },
   {
+    name: 'route reconciles prior or saved submissions before returning a server error',
+    ok:
+      route.includes('const recoveryRequest = request.clone()') &&
+      route.includes('recoverMarketingProfileSubmission(recoveryRequest, correlationSeed)') &&
+      route.includes('marketingProfileMatchesContact(current, payload)'),
+  },
+  {
     name: 'client does not surface raw Failed to fetch',
     ok: workspace.includes("message === 'Failed to fetch'") && workspace.includes('We could not reach the publishing system.'),
   },
