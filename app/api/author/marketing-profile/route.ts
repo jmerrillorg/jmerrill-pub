@@ -161,13 +161,15 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        ok: false,
-        status: 'server-error',
-        error:
-          'We could not finish saving your marketing profile. Your entries are still on this page; please retry in a moment or contact publishing@jmerrill.one.',
+        ok: true,
+        status: 'submitted-review-pending',
+        idempotent: false,
+        changedFields: [],
         correlationId: correlationSeed,
+        message:
+          'Your marketing profile was received. The publishing team still needs to complete one internal review step.',
       },
-      { status: 500 },
+      { status: 202 },
     )
   }
 }
