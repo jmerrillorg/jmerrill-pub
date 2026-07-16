@@ -582,16 +582,41 @@ function buildQueueItem(
   const latestActionType = stringValue(log?.jm1_actiontype)
   const hasEvidenceHold = latestActionType === 'PUBLISHER_INTAKE_EVIDENCE_HOLD_PLACED' && !hasManuscript
   const hasEditorialStage = Boolean(editorialStage) || latestActionType === 'PUBLISHER_EDITORIAL_REVIEW_INITIALIZED'
-  const currentBlocker = deriveBlocker({
-    hasManuscript,
-    hasContact,
-    titleId,
-    assetId: stringValue(asset?.jm1pub_publishingassetid),
-    hasEvidenceHold,
-    hasEditorialStage,
-  })
+  const editorialWorkloadState = editorialStage
+    ? deriveWorkloadState({
+        pipelineStage: currentStage,
+        stageType: dataverseFormatted(editorialStage, 'jm1pub_stagetype') || '',
+        stageStatus: dataverseFormatted(editorialStage, 'jm1pub_stagestatus') || '',
+        stageSummary: stringValue(editorialStage.jm1pub_authorsafesummary),
+        hasAsset: Boolean(asset?.jm1pub_publishingassetid),
+        latestAction: latestActionType,
+      })
+    : undefined
+  const currentBlocker = deriveQueueBlocker(
+    editorialWorkloadState,
+    deriveBlocker({
+      hasManuscript,
+      hasContact,
+      titleId,
+      assetId: stringValue(asset?.jm1pub_publishingassetid),
+      hasEvidenceHold,
+      hasEditorialStage,
+    }),
+  )
   const authorizedActions = buildAuthorizedActions(currentBlocker, hasContact)
-  const recommendedNextAction = authorizedActions.find((action) => action.id !== 'view_only')?.label || currentBlocker
+  const recommendedNextAction =
+    editorialWorkloadState && currentBlocker !== 'Ready for next editorial scheduling decision'
+      ? deriveNextAction(editorialWorkloadState, titleName)
+      : authorizedActions.find((action) => action.id !== 'view_only')?.label || currentBlocker
+  const actionOwner = currentBlocker.includes('release decision ready')
+    ? 'publisher'
+    : currentBlocker.includes('response pending')
+      ? 'author'
+      : currentBlocker.includes('in progress')
+        ? 'system'
+        : authorizedActions.some((action) => action.id !== 'view_only')
+          ? 'publisher'
+          : 'system'
   const daysOld = ageDays(stringValue(intake.createdon))
 
   return {
@@ -614,15 +639,16 @@ function buildQueueItem(
       : currentStage === 'Editorial'
         ? 'Editorial Review readiness'
         : 'Not initialized',
-    capability: currentStage === 'Editorial' || editorialStage ? 'CAP-001 / Editorial Intake' : 'Publisher Intake',
+    capability: editorialWorkloadState
+      ? deriveCapability(editorialWorkloadState)
+      : currentStage === 'Editorial' || editorialStage
+        ? 'CAP-001 / Editorial Intake'
+        : 'Publisher Intake',
     sourceLocation,
     submissionDate: stringValue(intake.createdon),
     currentBlocker,
     recommendedNextAction,
-    actionOwner:
-      authorizedActions.some((action) => action.id !== 'view_only')
-        ? 'publisher'
-        : 'system',
+    actionOwner,
     holdReason: currentBlocker === 'Ready for publisher intake review' ? '' : currentBlocker,
     ageDays: daysOld,
     ageBucket: ageBucket(daysOld),
@@ -951,6 +977,16 @@ function workloadPriority(item: PublisherWorkloadItem) {
   if (item.workloadState.startsWith('Developmental')) return 3
   if (item.downstreamCapacityRisk === 'blocked') return 4
   return 5
+}
+
+function deriveQueueBlocker(workloadState: PublisherWorkloadState | undefined, fallback: string) {
+  if (workloadState === 'Line Editing - Release Decision Ready') return 'Line Editing package release decision ready'
+  if (workloadState === 'Line Editing - Author Review') return 'Author Line Editing response pending'
+  if (workloadState === 'Copyediting In Progress') return 'Copyediting in progress'
+  if (workloadState === 'Copyediting - Release Decision Ready') return 'Copyediting package release decision ready'
+  if (workloadState === 'Developmental Editing - Author Review') return 'Author Developmental Editing response pending'
+  if (workloadState === 'Developmental Editing - In Progress') return 'Developmental Editing in progress'
+  return fallback
 }
 
 function deriveBlocker(input: {
