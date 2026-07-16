@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-07-13T11:35:17.385Z",
+  "stage": "Developmental Editing - Volume I",
+  "businessStatus": "In Progress",
+  "authorApprovalScope": [
+    "Overall developmental direction for Volume I",
+    "Closing posture for Volume I",
+    "Treatment of February 29 - Hidden Grace"
+  ],
+  "sources": [
+    {
+      "path": "/tmp/jm1-intentional-working/JMP-INT-202607-0W5PTQ - The Intentional Leader.docx",
+      "exists": true,
+      "file": "JMP-INT-202607-0W5PTQ - The Intentional Leader.docx",
+      "sha256": "701c16b72ff107603f0c09acd264434e97146b93b80ba4f175fb7bdbe3515d06"
+    },
+    {
+      "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-Editorial-Working-Manuscript.docx",
+      "exists": true,
+      "file": "2026-07-13-The-Intentional-Leader-Volume-I-Editorial-Working-Manuscript.docx",
+      "sha256": "7dd2d554a7cbc1c1f099602ee2236c9d94c4b8cc1d21a19ea6e0ebb8e63aafbc"
+    },
+    {
+      "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-Expanded-Revision-Blueprint.csv",
+      "exists": true,
+      "file": "2026-07-13-The-Intentional-Leader-Volume-I-Expanded-Revision-Blueprint.csv",
+      "sha256": "1e3152f18db220131c44b6920d63392d6d24034b4f60161566c0df160baac462"
+    },
+    {
+      "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-Working-Manuscript-Cross-References.csv",
+      "exists": true,
+      "file": "2026-07-13-The-Intentional-Leader-Volume-I-Working-Manuscript-Cross-References.csv",
+      "sha256": "52345efed780f1a4c2f69e943699f978ca83cab0d540246986bd2cee021d7ff8"
+    },
+    {
+      "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-Working-Manuscript-Validation.json",
+      "exists": true,
+      "file": "2026-07-13-The-Intentional-Leader-Volume-I-Working-Manuscript-Validation.json",
+      "sha256": "8aec899aa4338646a7281eb7427ee2f82f744fb1a45ce4286f0c3348f96cc735"
+    },
+    {
+      "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/PROGRAM-003-The-Intentional-Leader-Volume-I-Developmental-Review-Package-Release-Preview.md",
+      "exists": true,
+      "file": "PROGRAM-003-The-Intentional-Leader-Volume-I-Developmental-Review-Package-Release-Preview.md",
+      "sha256": "6ad6f35178f51fea43ad9d09eb5bef004d52e1efc35f8607115eb4dedb8f4998"
+    },
+    {
+      "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/PROGRAM-003-The-Intentional-Leader-Volume-I-Author-Review-Package-Final.md",
+      "exists": true,
+      "file": "PROGRAM-003-The-Intentional-Leader-Volume-I-Author-Review-Package-Final.md",
+      "sha256": "3374d29d6e7eac47bccae99a1aa2c994d2c42f577b972fae33968dbcae3fee41"
+    }
+  ]
+}
