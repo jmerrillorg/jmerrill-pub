@@ -78,6 +78,7 @@ export type PublisherWorkloadState =
   | 'Line Editing - Not Started'
   | 'Line Editing - In Progress'
   | 'Line Editing - Internal QA'
+  | 'Line Editing - Release Decision Ready'
   | 'Line Editing - Author Review'
   | 'Copyediting Ready'
   | 'Copyediting In Progress'
@@ -730,6 +731,7 @@ function deriveWorkloadState(input: {
   if (type.includes('line')) {
     if (status.includes('author')) return 'Line Editing - Author Review'
     if (status.includes('qa')) return 'Line Editing - Internal QA'
+    if (status.includes('delivered') || status.includes('complete')) return 'Line Editing - Release Decision Ready'
     if (status.includes('progress')) return 'Line Editing - In Progress'
     return 'Line Editing - Not Started'
   }
@@ -770,6 +772,8 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
       return 'Complete line edit, QA, and package draft'
     case 'Line Editing - Internal QA':
       return 'Complete internal QA'
+    case 'Line Editing - Release Decision Ready':
+      return 'Jackie release decision required before author-facing Line Editing package is sent'
     case 'Line Editing - Author Review':
       return 'Await author response'
     case 'Copyediting Ready':
@@ -783,7 +787,15 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
 
 function deriveTargetDate(state: PublisherWorkloadState) {
   const days =
-    state === 'Line Editing - In Progress' ? 3 : state === 'Editorial Review' ? 2 : state.includes('Developmental') ? 5 : 7
+    state === 'Line Editing - In Progress'
+      ? 3
+      : state === 'Line Editing - Release Decision Ready'
+        ? 1
+        : state === 'Editorial Review'
+          ? 2
+          : state.includes('Developmental')
+            ? 5
+            : 7
   const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
   return date.toISOString().slice(0, 10)
 }
@@ -797,6 +809,7 @@ function deriveAuthorAction(state: PublisherWorkloadState, guardStatus: 'pass' |
 function derivePublisherAction(state: PublisherWorkloadState) {
   if (state === 'Editorial Review') return 'Complete Editorial Review'
   if (state.startsWith('Developmental')) return 'Prepare or continue Developmental package'
+  if (state === 'Line Editing - Release Decision Ready') return 'Review and approve release of the Line Editing package'
   if (state.startsWith('Line')) return 'Complete Line Editing package'
   if (state === 'Copyediting Ready') return 'Confirm Line Editing exit before Copyediting'
   return 'Resolve current blocker'
@@ -804,6 +817,7 @@ function derivePublisherAction(state: PublisherWorkloadState) {
 
 function deriveInternalQaState(state: PublisherWorkloadState) {
   if (state.includes('Internal QA')) return 'In QA'
+  if (state === 'Line Editing - Release Decision Ready') return 'Passed'
   if (state === 'Line Editing - In Progress' || state.includes('Developmental')) return 'Pending'
   if (state.includes('Author Review') || state === 'Copyediting Ready' || state === 'Production Ready') return 'Passed or not required'
   return 'Not started'
@@ -812,6 +826,7 @@ function deriveInternalQaState(state: PublisherWorkloadState) {
 function derivePackageReadiness(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
   if (guardStatus === 'blocked') return 'Held by readiness guard'
   if (state.includes('Author Review')) return 'Released to author'
+  if (state === 'Line Editing - Release Decision Ready') return 'Ready for Jackie release decision'
   if (state.includes('In Progress') || state.includes('Not Started')) return 'Not ready'
   if (state.includes('Internal QA')) return 'Internal QA'
   return 'Pending'
@@ -861,6 +876,7 @@ function deriveOwner(
   guardStatus: 'pass' | 'watch' | 'blocked',
 ): PublisherWorkloadItem['currentOwner'] {
   if (guardStatus === 'blocked') return 'Cody'
+  if (state === 'Line Editing - Release Decision Ready') return 'Jackie'
   if (state.includes('Author Review')) return 'Author'
   if (state === 'External Hold') return 'External'
   return 'Cody'
@@ -872,6 +888,7 @@ function isActiveWorkloadItem(item: PublisherWorkloadItem) {
 
 function workloadPriority(item: PublisherWorkloadItem) {
   if (item.title === 'The Intentional Leader') return 0
+  if (item.workloadState === 'Line Editing - Release Decision Ready') return 0
   if (item.workloadState === 'Line Editing - In Progress') return 1
   if (item.workloadState === 'Editorial Review') return 2
   if (item.workloadState.startsWith('Developmental')) return 3
