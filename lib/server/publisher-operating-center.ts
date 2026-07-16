@@ -1543,7 +1543,9 @@ function buildPublisherToday(input: {
       (item) =>
         item.portfolioState !== 'published_catalog' ||
         item.dependency.includes('ISBN') ||
-        item.nextAction.includes('metadata') ||
+        item.dependency.toLowerCase().includes('missing') ||
+        item.dependency.toLowerCase().includes('mismatch') ||
+        item.dependency.toLowerCase().includes('exception') ||
         item.nextAction.includes('Reconcile'),
     ),
   ).slice(0, 18)
