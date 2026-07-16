@@ -82,6 +82,7 @@ export type PublisherWorkloadState =
   | 'Line Editing - Author Review'
   | 'Copyediting Ready'
   | 'Copyediting In Progress'
+  | 'Copyediting - Release Decision Ready'
   | 'Proofreading Ready'
   | 'Production Ready'
   | 'Blocked'
@@ -148,6 +149,7 @@ export type PublisherOperatingCenterSnapshot = {
     titlesAwaitingLineEditing: number
     titlesInLineEditing: number
     titlesAwaitingCopyediting: number
+    titlesAwaitingCopyeditingRelease: number
     packagesHeldByReadinessGuard: number
     downstreamCapacityWarnings: number
   }
@@ -759,7 +761,18 @@ function deriveWorkloadState(input: {
     if (status.includes('progress')) return 'Developmental Editing - In Progress'
     return 'Developmental Editing - Not Started'
   }
-  if (type.includes('copy')) return status.includes('progress') ? 'Copyediting In Progress' : 'Copyediting Ready'
+  if (type.includes('copy')) {
+    if (
+      status.includes('complete') ||
+      summary.includes('internally complete') ||
+      latestAction.includes('cap003_author_package_ready') ||
+      latestAction.includes('cap003_internal_publisher_qa_completed')
+    ) {
+      return 'Copyediting - Release Decision Ready'
+    }
+    if (status.includes('progress')) return 'Copyediting In Progress'
+    return 'Copyediting Ready'
+  }
   if (type.includes('proof')) return 'Proofreading Ready'
   if (type.includes('production')) return 'Production Ready'
   if (input.pipelineStage.toLowerCase().includes('editorial')) return 'Editorial Review'
@@ -777,7 +790,10 @@ function deriveCapability(state: PublisherWorkloadState) {
 }
 
 function deriveNextAction(state: PublisherWorkloadState, title: string) {
-  if (title === 'The Intentional Leader' && state !== 'Line Editing - Author Review') {
+  if (
+    title === 'The Intentional Leader' &&
+    !['Line Editing - Author Review', 'Copyediting - Release Decision Ready'].includes(state)
+  ) {
     return 'Complete full Volume I Line Editing package and QA'
   }
   switch (state) {
@@ -799,6 +815,10 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
       return 'Await author response'
     case 'Copyediting Ready':
       return 'Hold until CAP-002 exit is complete'
+    case 'Copyediting In Progress':
+      return 'Complete Copyediting pass, QA, and internal package draft'
+    case 'Copyediting - Release Decision Ready':
+      return 'Jackie release decision required before author-facing Copyediting package is sent; Proofreading remains blocked'
     case 'External Hold':
       return 'Resolve external evidence or publisher judgment hold'
     default:
@@ -826,6 +846,7 @@ function deriveTargetDate(state: PublisherWorkloadState) {
 function deriveAuthorAction(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
   if (guardStatus === 'blocked') return 'None - publisher readiness guard active'
   if (state === 'Line Editing - Author Review') return 'Review and approve Line Editing package'
+  if (state === 'Copyediting - Release Decision Ready') return 'None - publisher release decision pending'
   if (state.includes('Author Review')) return 'Review released package and respond through governed channel'
   return 'None'
 }
@@ -837,6 +858,8 @@ function derivePublisherAction(state: PublisherWorkloadState) {
   if (state === 'Line Editing - Author Review') return 'Await author response'
   if (state.startsWith('Line')) return 'Complete Line Editing package'
   if (state === 'Copyediting Ready') return 'Confirm Line Editing exit before Copyediting'
+  if (state === 'Copyediting In Progress') return 'Complete Copyediting package'
+  if (state === 'Copyediting - Release Decision Ready') return 'Review and approve release of the Copyediting package'
   return 'Resolve current blocker'
 }
 
@@ -844,6 +867,7 @@ function deriveInternalQaState(state: PublisherWorkloadState) {
   if (state.includes('Internal QA')) return 'In QA'
   if (state === 'Line Editing - Author Review') return 'PASS'
   if (state === 'Line Editing - Release Decision Ready') return 'Passed'
+  if (state === 'Copyediting - Release Decision Ready') return 'PASS'
   if (state === 'Line Editing - In Progress' || state.includes('Developmental')) return 'Pending'
   if (state.includes('Author Review') || state === 'Copyediting Ready' || state === 'Production Ready') return 'Passed or not required'
   return 'Not started'
@@ -854,6 +878,7 @@ function derivePackageReadiness(state: PublisherWorkloadState, guardStatus: 'pas
   if (state === 'Line Editing - Author Review') return 'Delivered'
   if (state.includes('Author Review')) return 'Released to author'
   if (state === 'Line Editing - Release Decision Ready') return 'Ready for Jackie release decision'
+  if (state === 'Copyediting - Release Decision Ready') return 'Ready for Jackie release decision'
   if (state.includes('In Progress') || state.includes('Not Started')) return 'Not ready'
   if (state.includes('Internal QA')) return 'Internal QA'
   return 'Pending'
@@ -862,6 +887,7 @@ function derivePackageReadiness(state: PublisherWorkloadState, guardStatus: 'pas
 function deriveRestartCondition(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
   if (guardStatus === 'blocked') return 'Correct manuscript-stage/package mismatch'
   if (state === 'Line Editing - Author Review') return 'Copyediting blocked until author approval gate is recorded'
+  if (state === 'Copyediting - Release Decision Ready') return 'No restart required; Proofreading remains blocked until publisher release decision'
   if (state === 'External Hold') return 'Resolve external evidence hold'
   if (state === 'Blocked') return 'Reconcile title, asset, and stage evidence'
   return 'No restart required'
@@ -869,6 +895,7 @@ function deriveRestartCondition(state: PublisherWorkloadState, guardStatus: 'pas
 
 function deriveDownstreamRisk(state: PublisherWorkloadState, title: string): PublisherWorkloadItem['downstreamCapacityRisk'] {
   if (state === 'Line Editing - Author Review') return 'blocked'
+  if (state === 'Copyediting - Release Decision Ready') return 'watch'
   if (title === 'The Intentional Leader') return 'watch'
   if (state.startsWith('Developmental')) return 'watch'
   if (state === 'Copyediting Ready' || state === 'Production Ready') return 'blocked'
@@ -905,7 +932,7 @@ function deriveOwner(
   guardStatus: 'pass' | 'watch' | 'blocked',
 ): PublisherWorkloadItem['currentOwner'] {
   if (guardStatus === 'blocked') return 'Cody'
-  if (state === 'Line Editing - Release Decision Ready') return 'Jackie'
+  if (state === 'Line Editing - Release Decision Ready' || state === 'Copyediting - Release Decision Ready') return 'Jackie'
   if (state.includes('Author Review')) return 'Author'
   if (state === 'External Hold') return 'External'
   return 'Cody'
@@ -918,6 +945,7 @@ function isActiveWorkloadItem(item: PublisherWorkloadItem) {
 function workloadPriority(item: PublisherWorkloadItem) {
   if (item.title === 'The Intentional Leader') return 0
   if (item.workloadState === 'Line Editing - Release Decision Ready') return 0
+  if (item.workloadState === 'Copyediting - Release Decision Ready') return 0
   if (item.workloadState === 'Line Editing - In Progress') return 1
   if (item.workloadState === 'Editorial Review') return 2
   if (item.workloadState.startsWith('Developmental')) return 3
@@ -1158,6 +1186,8 @@ function buildMetrics(queue: PublisherQueueItem[], logs: DataverseRow[], workloa
     titlesAwaitingLineEditing: workload.filter((item) => item.workloadState === 'Line Editing - Not Started').length,
     titlesInLineEditing: workload.filter((item) => item.workloadState === 'Line Editing - In Progress').length,
     titlesAwaitingCopyediting: workload.filter((item) => item.workloadState === 'Copyediting Ready').length,
+    titlesAwaitingCopyeditingRelease: workload.filter((item) => item.workloadState === 'Copyediting - Release Decision Ready')
+      .length,
     packagesHeldByReadinessGuard: workload.filter((item) => item.readinessGuard.status !== 'pass').length,
     downstreamCapacityWarnings: workload.filter((item) => item.downstreamCapacityRisk !== 'none').length,
   }
@@ -1186,6 +1216,7 @@ function emptyMetrics(): PublisherOperatingCenterSnapshot['metrics'] {
     titlesAwaitingLineEditing: 0,
     titlesInLineEditing: 0,
     titlesAwaitingCopyediting: 0,
+    titlesAwaitingCopyeditingRelease: 0,
     packagesHeldByReadinessGuard: 0,
     downstreamCapacityWarnings: 0,
   }

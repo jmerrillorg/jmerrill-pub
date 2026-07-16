@@ -60,6 +60,7 @@ const stageCounts = countBy(
 const capabilitySignals = {
   CAP001: eventCount(eventCounts, ['AUTHOR_APPROVAL_RECEIVED', 'AUTHOR_PACKAGE_DELIVERED', 'DEVELOPMENTAL_AUTHOR_PACKAGE_RELEASED']),
   CAP002: executionRows.filter((row) => containsAny(row, ['CAP002', 'LINE_EDITING_READY', 'LINE_EDITING_HANDOFF_CREATED', 'LINE_EDITING'])).length,
+  CAP003: executionRows.filter((row) => containsAny(row, ['CAP003', 'COPYEDIT', 'COPYEDITING'])).length,
   CAP007: executionRows.filter((row) => containsAny(row, ['CAP007_', 'ROYALTY'])).length,
   CAP008: executionRows.filter((row) => containsAny(row, ['CAP008', 'AUTHOR_IDENTITY', 'CIAM', 'DURABLE'])).length,
   CAP009: executionRows.filter((row) => containsAny(row, ['CAP009', 'LANE_A_STAMPED', 'LANE_B_STAMPED', 'LANE_C_STAMPED', 'JM1PUB_STAGE_STAMPED'])).length,
@@ -121,8 +122,8 @@ const dashboard = {
   })),
 }
 
-const jsonPath = resolve(generatedDir, '2026-07-14-CAP-010-Operational-Refresh.json')
-const mdPath = resolve(generatedDir, '2026-07-14-CAP-010-Operational-Refresh.md')
+const jsonPath = resolve(generatedDir, '2026-07-16-CAP-010-Publisher-Routing-And-Copyedit-Refresh.json')
+const mdPath = resolve(generatedDir, '2026-07-16-CAP-010-Publisher-Routing-And-Copyedit-Refresh.md')
 writeFileSync(jsonPath, `${JSON.stringify(dashboard, null, 2)}\n`)
 writeFileSync(mdPath, renderMarkdown(dashboard))
 
@@ -166,13 +167,13 @@ ${Object.entries(data.authorActions).map(([key, value]) => `| ${key} | ${value} 
 
 ${data.governanceHolds.map((row) => `- ${row.cap}: ${row.state}`).join('\n') || '- None detected'}
 
-## Wave 2 Closure Coverage
+## Publisher Routing and Copyediting Coverage
 
 | Capability | Exit State | Current Evidence | Remaining Dependency |
 |---|---|---|---|
 ${data.wave2Closure.capabilities.map((row) => `| ${row.cap} | ${row.exitState} | ${row.evidence} | ${row.remainingDependency} |`).join('\n')}
 
-## Wave 2 Operational Views
+## Current Operational Views
 
 - Proof assets tracked: ${data.wave2Closure.summary.proofAssetsTracked}
 - Dependency holds: ${data.wave2Closure.summary.dependencyHolds}
@@ -191,7 +192,7 @@ ${data.recentExecutionFailures.map((row) => `- ${row.createdon}: ${text(row.jm1_
 
 function buildWave2Closure(registryRows, capabilitySignals, stageCounts, eventCounts) {
   const byCap = Object.fromEntries(registryRows.map((row) => [row.cap, row]))
-  const capabilities = ['CAP-002', 'CAP-007', 'CAP-008', 'CAP-009', 'CAP-010', 'CAP-011'].map((cap) => {
+  const capabilities = ['CAP-002', 'CAP-003', 'CAP-007', 'CAP-008', 'CAP-009', 'CAP-010', 'CAP-011'].map((cap) => {
     const registry = byCap[cap]
     return {
       cap,
@@ -212,6 +213,8 @@ function buildWave2Closure(registryRows, capabilitySignals, stageCounts, eventCo
       marketingProofState: byCap['CAP-011']?.state || 'Not registered',
       staleDataWarning: 'Refresh reads latest 250 execution-log rows plus live title/stage/gate rows; older events may be outside the read window.',
       refreshCoverage: 'CAP maturity, proof assets, author actions, publisher actions, dependency holds, financial/catalog/identity/marketing states, execution failures, catalog stage counts.',
+      publisherRoutingState: 'PUBLISHER_ROLE_ROUTING_REMEDIATED and PUBLISHER_AUTHENTICATED_MASTER_WORKSPACE_PROVEN recorded during Wave 3 routing proof.',
+      copyeditingState: 'CAP-003 Copyediting internally complete; Jackie release decision pending; Proofreading blocked.',
     },
   }
 }
@@ -220,6 +223,8 @@ function evidenceFor(cap, capabilitySignals, stageCounts, eventCounts) {
   switch (cap) {
     case 'CAP-002':
       return `${capabilitySignals.CAP002} Core signal(s); source package/style sheet/intake queue events included if inside read window`
+    case 'CAP-003':
+      return `${capabilitySignals.CAP003} Core signal(s); Copyediting stage, correction ledger, QA, package-readiness, and publisher-routing proof events included if inside read window`
     case 'CAP-007':
       return `${capabilitySignals.CAP007} Core signal(s); royalty statement proof event count ${eventCounts.CAP007_ROYALTY_STATEMENT_PROOF_COMPLETED || 0}`
     case 'CAP-008':
@@ -227,7 +232,7 @@ function evidenceFor(cap, capabilitySignals, stageCounts, eventCounts) {
     case 'CAP-009':
       return `${capabilitySignals.CAP009} catalog governance signal(s); blank titles ${stageCounts['(blank)'] || 0}; approved bibliographic safe-write execution event count ${eventCounts.CAP009_BIBLIOGRAPHIC_SAFE_WRITE_EXECUTED || 0}; reconciliation event count ${eventCounts.CAP009_BIBLIOGRAPHIC_SAFE_WRITE_RECONCILED || 0}`
     case 'CAP-010':
-      return 'This refresh generated machine-readable and human-readable Wave 2 coverage'
+      return 'This refresh generated machine-readable and human-readable publisher-routing and copyediting coverage'
     case 'CAP-011':
       return `${capabilitySignals.CAP011} Core signal(s); production deployment, authenticated submission, Core execution logging, unauthenticated rejection, idempotency proof, and project-switching continuity proven`
     default:

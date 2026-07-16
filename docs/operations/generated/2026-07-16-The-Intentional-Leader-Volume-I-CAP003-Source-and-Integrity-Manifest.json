@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-07-16T05:24:56.284619+00:00",
+  "publishing_asset_id": "c9dc862e-da7a-f111-ab0f-000d3a14673b",
+  "copyediting_stage_id": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+  "copyediting_entry_artifact_id": "04f0a44b-ce80-f111-ab0f-000d3a14673b",
+  "source_manuscript": "/private/tmp/jmerrill-pub-cap003/docs/operations/generated/2026-07-15-The-Intentional-Leader-Volume-I-Line-Edited-Working-Manuscript.docx",
+  "source_sha256": "de463f3ae262bf46df865145adf59f9823f5bfe28bf271ee2e5eb570a72f221b",
+  "expected_source_sha256": "de463f3ae262bf46df865145adf59f9823f5bfe28bf271ee2e5eb570a72f221b",
+  "output_manuscript": "/private/tmp/jmerrill-pub-cap003/docs/operations/generated/2026-07-16-The-Intentional-Leader-Volume-I-Copyedited-Working-Manuscript.docx",
+  "output_sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+  "correction_ledger": "/private/tmp/jmerrill-pub-cap003/docs/operations/generated/2026-07-16-The-Intentional-Leader-Volume-I-CAP003-Correction-Ledger.csv",
+  "project_style_sheet": "/private/tmp/jmerrill-pub-cap003/docs/operations/generated/2026-07-16-The-Intentional-Leader-Volume-I-Project-Style-Sheet-Copyediting.md",
+  "integrity_result": "PASS"
+}

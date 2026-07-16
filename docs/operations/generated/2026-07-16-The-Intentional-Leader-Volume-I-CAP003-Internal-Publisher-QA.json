@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-07-16T05:24:56.284619+00:00",
+  "result": "PASS",
+  "stage": "Copyediting",
+  "stage_status": "Internally Complete - Release Decision Ready",
+  "source_sha256": "de463f3ae262bf46df865145adf59f9823f5bfe28bf271ee2e5eb570a72f221b",
+  "output_sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+  "coverage": {
+    "paragraphs_processed": 7887,
+    "daily_entries": 91,
+    "soul_dive_entries": 91
+  },
+  "corrections": {
+    "total": 1,
+    "by_category": {
+      "grammar": 1
+    },
+    "by_severity": {
+      "medium": 1
+    }
+  },
+  "author_queries": 0,
+  "factual_consistency_flags_requiring_decision": 0,
+  "proofreading_blocked": true,
+  "author_facing_release_authorized": false,
+  "checks": {
+    "no_developmental_restructuring": "PASS",
+    "no_unauthorized_line_editing_rewrite": "PASS",
+    "no_silent_content_removal": "PASS",
+    "source_preserved": "PASS",
+    "internal_author_separation": "PASS"
+  }
+}

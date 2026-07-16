@@ -1,0 +1,506 @@
+{
+  "generatedAt": "2026-07-16T05:40:26.633Z",
+  "source": "JM1-Core Dataverse + local capability registry",
+  "core": {
+    "resourceUrl": "https://jm1hq.crm.dynamics.com",
+    "apiBase": "https://jm1hq.crm.dynamics.com/api/data/v9.2",
+    "executionLogRowsRead": 250,
+    "titleRowsRead": 202,
+    "editorialStageRowsRead": 10,
+    "approvalGateRowsRead": 4
+  },
+  "registry": [
+    {
+      "cap": "CAP-001",
+      "capability": "Developmental Editing",
+      "state": "Level 2 - Provisionally Certified / Controlled Production Active",
+      "proofAsset": "The Intentional Leader, Volume I",
+      "owner": "Jackie / JM1 Publishing",
+      "currentPriority": "Active proof asset",
+      "nextPromotionCriterion": "Level 3 candidate only after second controlled project, automated source-lock/package checks, and operational defect recovery proof"
+    },
+    {
+      "cap": "CAP-002",
+      "capability": "Line Editing",
+      "state": "Level 1 Proof - Author-approved Volume I Line Editing complete; Copyediting authorized and started",
+      "proofAsset": "The Intentional Leader, Volume I",
+      "owner": "Jackie / Editorial",
+      "currentPriority": "Complete for proof asset",
+      "nextPromotionCriterion": "Reuse on next title after CAP-002 package release/approval path remains stable across a second proof asset"
+    },
+    {
+      "cap": "CAP-003",
+      "capability": "Copyediting",
+      "state": "Level 1 Proof - Full Volume I Copyediting internally complete; publisher release decision ready",
+      "proofAsset": "The Intentional Leader, Volume I",
+      "owner": "Jackie / Editorial",
+      "currentPriority": "Active release decision",
+      "nextPromotionCriterion": "Jackie release decision on the author-facing Copyediting package; after approval, release package through governed author communication without starting Proofreading"
+    },
+    {
+      "cap": "CAP-004",
+      "capability": "Proofreading",
+      "state": "Level 0 - future",
+      "proofAsset": "Typeset proof of The Intentional Leader",
+      "owner": "Jackie / Editorial",
+      "currentPriority": "Future",
+      "nextPromotionCriterion": "CAP-003 proof"
+    },
+    {
+      "cap": "CAP-005",
+      "capability": "Production and Prepress",
+      "state": "Level 0 - future",
+      "proofAsset": "The Intentional Leader",
+      "owner": "Jackie / Production",
+      "currentPriority": "Future",
+      "nextPromotionCriterion": "Editorial completion and production package"
+    },
+    {
+      "cap": "CAP-006",
+      "capability": "Distribution Operations",
+      "state": "Level 0 - future",
+      "proofAsset": "The Intentional Leader",
+      "owner": "Jackie / Distribution",
+      "currentPriority": "Future",
+      "nextPromotionCriterion": "Production proof and metadata/distribution readiness"
+    },
+    {
+      "cap": "CAP-007",
+      "capability": "Financial and Royalty Operations",
+      "state": "Level 1 Proof - non-posting royalty statement proof complete; opening-balance external evidence hold; BC foundation readback still bounded by finance/tooling evidence",
+      "proofAsset": "BC sandbox and synthetic royalty proof",
+      "owner": "Jackie / Finance",
+      "currentPriority": "Primary",
+      "nextPromotionCriterion": "External bank/QBO/Bill.com evidence, BC foundation readback completion, real governed royalty statement proof, Stripe/payout reconciliation proof"
+    },
+    {
+      "cap": "CAP-008",
+      "capability": "Author Identity and Experience",
+      "state": "Level 2 Candidate - password recovery/reset, fresh sign-in, logout, Core authorization, and project switching proven; explicit administrative session revocation remains hardening",
+      "proofAsset": "chosen2k7@gmail.com and controlled author validation",
+      "owner": "Jackie / Identity",
+      "currentPriority": "Hardening",
+      "nextPromotionCriterion": "Complete explicit session-revocation proof if required for Level 2 certification; old-password rejection was not independently tested by Cody because private password values were not handled"
+    },
+    {
+      "cap": "CAP-009",
+      "capability": "Bibliographic Identity and Catalog Governance",
+      "state": "Safe Write Executed - governed app-only credential restored; Establishing Glory: The Library stamped Editorial with Core readback",
+      "proofAsset": "Lane A/B/C stage backfill and Establishing Glory lineage",
+      "owner": "Jackie / Catalog",
+      "currentPriority": "Controlled proof complete",
+      "nextPromotionCriterion": "Broader catalog lineage/alias/identifier writes remain future governed packages only; 34 blank-stage/unknown titles remain excluded until separately approved"
+    },
+    {
+      "cap": "CAP-010",
+      "capability": "Enterprise Command",
+      "state": "Operational Enterprise Command - Wave 2 Coverage Proven",
+      "proofAsset": "JM1-Core, execution logs, registry, QA artifacts, and refresh outputs",
+      "owner": "Jackie / Enterprise Ops",
+      "currentPriority": "Active",
+      "nextPromotionCriterion": "Promote operational refresh to governed dashboard surface and add scheduled/automated refresh"
+    },
+    {
+      "cap": "CAP-011",
+      "capability": "Author Marketing and Launch Operations",
+      "state": "Level 1 Controlled Proof Complete - production form, durable session, security rejection, Core execution logging, retry/idempotency, and project switching proven",
+      "proofAsset": "Author Operating Center marketing profile",
+      "owner": "Jackie / Marketing",
+      "currentPriority": "Controlled proof complete",
+      "nextPromotionCriterion": "Invalid project-scoped URL stayed in loading state without exposing unauthorized data; retain as UX hardening, not a Level 1 blocker"
+    }
+  ],
+  "capabilitySignals": {
+    "CAP001": 0,
+    "CAP002": 23,
+    "CAP003": 17,
+    "CAP007": 8,
+    "CAP008": 6,
+    "CAP009": 146,
+    "CAP011": 8
+  },
+  "catalogHealth": {
+    "titleStageCounts": {
+      "Archive": 39,
+      "Inquiry": 3,
+      "Backlist/Published": 117,
+      "(blank)": 34,
+      "Production": 2,
+      "Ongoing Relationship": 3,
+      "Editorial": 4
+    },
+    "blankStageTitles": 34,
+    "stampedCatalogRows": 142
+  },
+  "authorActions": {
+    "approvalReceived": 0,
+    "notificationSent": 0,
+    "packageDelivered": 0
+  },
+  "wave2Closure": {
+    "capabilities": [
+      {
+        "cap": "CAP-002",
+        "exitState": "Level 1 Proof - Author-approved Volume I Line Editing complete; Copyediting authorized and started",
+        "evidence": "23 Core signal(s); source package/style sheet/intake queue events included if inside read window",
+        "remainingDependency": "Reuse on next title after CAP-002 package release/approval path remains stable across a second proof asset"
+      },
+      {
+        "cap": "CAP-003",
+        "exitState": "Level 1 Proof - Full Volume I Copyediting internally complete; publisher release decision ready",
+        "evidence": "17 Core signal(s); Copyediting stage, correction ledger, QA, package-readiness, and publisher-routing proof events included if inside read window",
+        "remainingDependency": "Jackie release decision on the author-facing Copyediting package; after approval, release package through governed author communication without starting Proofreading"
+      },
+      {
+        "cap": "CAP-007",
+        "exitState": "Level 1 Proof - non-posting royalty statement proof complete; opening-balance external evidence hold; BC foundation readback still bounded by finance/tooling evidence",
+        "evidence": "8 Core signal(s); royalty statement proof event count 1",
+        "remainingDependency": "External bank/QBO/Bill.com evidence, BC foundation readback completion, real governed royalty statement proof, Stripe/payout reconciliation proof"
+      },
+      {
+        "cap": "CAP-008",
+        "exitState": "Level 2 Candidate - password recovery/reset, fresh sign-in, logout, Core authorization, and project switching proven; explicit administrative session revocation remains hardening",
+        "evidence": "6 Core signal(s); password recovery/reset, fresh sign-in, logout, Core authorization, and project switching evidence recorded",
+        "remainingDependency": "Complete explicit session-revocation proof if required for Level 2 certification; old-password rejection was not independently tested by Cody because private password values were not handled"
+      },
+      {
+        "cap": "CAP-009",
+        "exitState": "Safe Write Executed - governed app-only credential restored; Establishing Glory: The Library stamped Editorial with Core readback",
+        "evidence": "146 catalog governance signal(s); blank titles 34; approved bibliographic safe-write execution event count 1; reconciliation event count 1",
+        "remainingDependency": "Broader catalog lineage/alias/identifier writes remain future governed packages only; 34 blank-stage/unknown titles remain excluded until separately approved"
+      },
+      {
+        "cap": "CAP-010",
+        "exitState": "Operational Enterprise Command - Wave 2 Coverage Proven",
+        "evidence": "This refresh generated machine-readable and human-readable publisher-routing and copyediting coverage",
+        "remainingDependency": "Promote operational refresh to governed dashboard surface and add scheduled/automated refresh"
+      },
+      {
+        "cap": "CAP-011",
+        "exitState": "Level 1 Controlled Proof Complete - production form, durable session, security rejection, Core execution logging, retry/idempotency, and project switching proven",
+        "evidence": "8 Core signal(s); production deployment, authenticated submission, Core execution logging, unauthenticated rejection, idempotency proof, and project-switching continuity proven",
+        "remainingDependency": "Invalid project-scoped URL stayed in loading state without exposing unauthorized data; retain as UX hardening, not a Level 1 blocker"
+      }
+    ],
+    "summary": {
+      "proofAssetsTracked": "The Intentional Leader Volume I; synthetic CAP-007 royalty proof; Lane A/B/C stage backfill; Author Operating Center marketing profile slice",
+      "dependencyHolds": 1,
+      "financialModuleState": "Level 1 Proof - non-posting royalty statement proof complete; opening-balance external evidence hold; BC foundation readback still bounded by finance/tooling evidence",
+      "identityRecoveryState": "Level 2 Candidate - password recovery/reset, fresh sign-in, logout, Core authorization, and project switching proven; explicit administrative session revocation remains hardening",
+      "catalogWriteState": "Safe Write Executed - governed app-only credential restored; Establishing Glory: The Library stamped Editorial with Core readback",
+      "marketingProofState": "Level 1 Controlled Proof Complete - production form, durable session, security rejection, Core execution logging, retry/idempotency, and project switching proven",
+      "staleDataWarning": "Refresh reads latest 250 execution-log rows plus live title/stage/gate rows; older events may be outside the read window.",
+      "refreshCoverage": "CAP maturity, proof assets, author actions, publisher actions, dependency holds, financial/catalog/identity/marketing states, execution failures, catalog stage counts.",
+      "publisherRoutingState": "PUBLISHER_ROLE_ROUTING_REMEDIATED and PUBLISHER_AUTHENTICATED_MASTER_WORKSPACE_PROVEN recorded during Wave 3 routing proof.",
+      "copyeditingState": "CAP-003 Copyediting internally complete; Jackie release decision pending; Proofreading blocked."
+    }
+  },
+  "publisherActions": {
+    "editorialStageRows": [
+      {
+        "id": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+        "name": "Copyediting - The Intentional Leader, Volume I",
+        "status": "Complete",
+        "modifiedon": "2026-07-16T05:32:04Z"
+      },
+      {
+        "id": "a7713ff3-1e80-f111-ab0f-6045bdd69678",
+        "name": "Line Editing - The Intentional Leader, Volume I",
+        "status": "Complete",
+        "modifiedon": "2026-07-16T04:25:04Z"
+      },
+      {
+        "id": "8face475-8f80-f111-ab0f-00224820105b",
+        "name": "Editorial Review - The Long Watch",
+        "status": "In Progress",
+        "modifiedon": "2026-07-15T20:55:10Z"
+      },
+      {
+        "id": "c2799c31-8f80-f111-ab0f-00224820105b",
+        "name": "Developmental Editing - The General’s Will and Last Testament",
+        "status": "Not Started",
+        "modifiedon": "2026-07-15T20:53:21Z"
+      },
+      {
+        "id": "88189235-8f80-f111-ab0f-6045bdd69435",
+        "name": "Developmental Editing - Before You Were Born",
+        "status": "Not Started",
+        "modifiedon": "2026-07-15T20:53:20Z"
+      },
+      {
+        "id": "24817d5a-4d80-f111-ab0f-6045bdd69435",
+        "name": "Editorial Review - The General’s Will and Last Testament",
+        "status": "Complete",
+        "modifiedon": "2026-07-15T20:52:20Z"
+      },
+      {
+        "id": "a20ec2b3-4d80-f111-ab0f-6045bdd69435",
+        "name": "Editorial Review - Establishing Glory: The Library",
+        "status": "Complete",
+        "modifiedon": "2026-07-15T20:52:20Z"
+      },
+      {
+        "id": "624a5e5f-4d80-f111-ab0f-6045bdd69738",
+        "name": "Editorial Review - Before You Were Born",
+        "status": "Complete",
+        "modifiedon": "2026-07-15T20:52:19Z"
+      },
+      {
+        "id": "d8dc4dd3-fb7b-f111-ab0f-6045bdd69435",
+        "name": "Developmental Editing - The Intentional Leader, Volume I",
+        "status": "Complete",
+        "modifiedon": "2026-07-15T07:30:17Z"
+      },
+      {
+        "id": "cbdc862e-da7a-f111-ab0f-000d3a14673b",
+        "name": "Editorial Review - The Intentional Leader",
+        "status": "Complete",
+        "modifiedon": "2026-07-10T01:08:14Z"
+      }
+    ],
+    "approvalGates": [
+      {
+        "id": "b4b734a6-bd80-f111-ab0f-00224820105b",
+        "name": "A3 Line Editing Completion - The Intentional Leader Volume I",
+        "status": "Approved",
+        "decision": "Approve",
+        "modifiedon": "2026-07-16T04:25:02Z"
+      },
+      {
+        "id": "b1c48e1d-e57d-f111-ab0f-00224820105b",
+        "name": "A2 Developmental Review Package - The Intentional Leader, Volume I",
+        "status": "Approved",
+        "decision": "Approve",
+        "modifiedon": "2026-07-15T07:25:16Z"
+      },
+      {
+        "id": "899ef3cd-fb7b-f111-ab0f-7c1e525b15c2",
+        "name": "A2 Developmental Completion - The Intentional Leader, Volume I",
+        "status": "Approved",
+        "decision": "Approve",
+        "modifiedon": "2026-07-10T21:23:08Z"
+      },
+      {
+        "id": "67396131-da7a-f111-ab0f-00224820105b",
+        "name": "A1 Editorial Review Acceptance - The Intentional Leader",
+        "status": "Publisher Override",
+        "decision": "",
+        "modifiedon": "2026-07-10T01:08:14Z"
+      }
+    ]
+  },
+  "governanceHolds": [
+    {
+      "cap": "CAP-003",
+      "capability": "Copyediting",
+      "state": "Level 1 Proof - Full Volume I Copyediting internally complete; publisher release decision ready",
+      "proofAsset": "The Intentional Leader, Volume I",
+      "owner": "Jackie / Editorial",
+      "currentPriority": "Active release decision",
+      "nextPromotionCriterion": "Jackie release decision on the author-facing Copyediting package; after approval, release package through governed author communication without starting Proofreading"
+    },
+    {
+      "cap": "CAP-007",
+      "capability": "Financial and Royalty Operations",
+      "state": "Level 1 Proof - non-posting royalty statement proof complete; opening-balance external evidence hold; BC foundation readback still bounded by finance/tooling evidence",
+      "proofAsset": "BC sandbox and synthetic royalty proof",
+      "owner": "Jackie / Finance",
+      "currentPriority": "Primary",
+      "nextPromotionCriterion": "External bank/QBO/Bill.com evidence, BC foundation readback completion, real governed royalty statement proof, Stripe/payout reconciliation proof"
+    }
+  ],
+  "decisionReadyCapabilities": [
+    {
+      "cap": "CAP-002",
+      "capability": "Line Editing",
+      "state": "Level 1 Proof - Author-approved Volume I Line Editing complete; Copyediting authorized and started",
+      "proofAsset": "The Intentional Leader, Volume I",
+      "owner": "Jackie / Editorial",
+      "currentPriority": "Complete for proof asset",
+      "nextPromotionCriterion": "Reuse on next title after CAP-002 package release/approval path remains stable across a second proof asset"
+    },
+    {
+      "cap": "CAP-003",
+      "capability": "Copyediting",
+      "state": "Level 1 Proof - Full Volume I Copyediting internally complete; publisher release decision ready",
+      "proofAsset": "The Intentional Leader, Volume I",
+      "owner": "Jackie / Editorial",
+      "currentPriority": "Active release decision",
+      "nextPromotionCriterion": "Jackie release decision on the author-facing Copyediting package; after approval, release package through governed author communication without starting Proofreading"
+    }
+  ],
+  "recentExecutionFailures": [
+    {
+      "@odata.etag": "W/\"38838502\"",
+      "jm1_executionlogid": "729d40df-1280-f111-ab0f-00224820105b",
+      "jm1_name": "CAP011_LEVEL1_CONTROLLED_PROOF_COMPLETE - Author marketing profile",
+      "jm1_sourcerecordid": "d38aa56a-882a-f111-88b4-6045bdd69678",
+      "jm1_actiondescription": "CAP-011 production proof completed on jmerrill.pub. Evidence: PR #253 merge 885d803b deployed marketing form; PR #254 merge 4e03e55 deployed durable-session route; PR #255 merge 5c8881a deployed idempotency guard. Unauthenticated POST to /api/author/marketing-profile returned 401. Authenticated AOC rendered marketing profile form and authorized projects. Controlled no-change author submission wrote Core execution log 45009d2b-1280-f111-ab0f-000d3a14673b. Retry/idempotency proof found exactly one log for hash 0ac5960d82e88d59b2b755af84e92d6b207c52c8db0aa82cd3b81af7ac1d0a2f. Project switching rendered Establishing Glory and The Long Watch without workspace error. Invalid project-scoped portal URL did not expose unauthorized project, but remained in loading state and is retained as UX hardening note. Correlation: CAP011_CONTROLLED_PROOF-5f11d54c-e3f1-4ce2-ab30-1d08db325267.",
+      "jm1_actiontype": "CAP011_LEVEL1_CONTROLLED_PROOF_COMPLETE",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/15/2026 6:03 AM",
+      "createdon": "2026-07-15T06:03:23Z"
+    },
+    {
+      "@odata.etag": "W/\"38834105\"",
+      "jm1_executionlogid": "d432642e-e87f-f111-ab0f-000d3a14673b",
+      "jm1_name": "CAP009_BIBLIOGRAPHIC_SAFE_WRITE_BLOCKED - Establishing Glory The Library",
+      "jm1_sourcerecordid": "f1908dc9-5775-f111-ab0f-6045bdd69435",
+      "jm1_actiondescription": "Approved bibliographic safe-write manifest prepared, but PATCH to jm1pub_title f1908dc9-5775-f111-ab0f-6045bdd69435 failed for current app identity due to missing prvWritejm1pub_Title. Key Vault search did not locate a JM1-PUB-INTAKE-WEBAPI Dataverse credential. Correlation: CAP009_SAFE_WRITE_BLOCKED-0474f69a-ba55-4498-8c0f-f4d11840755d.",
+      "jm1_actiontype": "CAP009_BIBLIOGRAPHIC_SAFE_WRITE_BLOCKED",
+      "createdon@OData.Community.Display.V1.FormattedValue": "7/15/2026 12:57 AM",
+      "createdon": "2026-07-15T00:57:47Z"
+    }
+  ],
+  "recentExecutionLogs": [
+    {
+      "id": "25b77aab-d780-f111-ab0f-00224820105b",
+      "event": "CAP003_AUTHOR_PACKAGE_READY",
+      "createdon": "2026-07-16T05:32:07Z",
+      "sourceRecordId": "cf06664b-ce80-f111-ab0f-7c1e525b15c2"
+    },
+    {
+      "id": "3ecf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "event": "CAP010_PUBLISHER_ROUTING_AND_COPYEDIT_REFRESH_COMPLETED",
+      "createdon": "2026-07-16T05:32:07Z",
+      "sourceRecordId": "cf06664b-ce80-f111-ab0f-7c1e525b15c2"
+    },
+    {
+      "id": "d2fcdfa8-d780-f111-ab0f-000d3a14673b",
+      "event": "CAP003_FULL_COPYEDIT_COMPLETED",
+      "createdon": "2026-07-16T05:32:06Z",
+      "sourceRecordId": "cf06664b-ce80-f111-ab0f-7c1e525b15c2"
+    },
+    {
+      "id": "d4fcdfa8-d780-f111-ab0f-000d3a14673b",
+      "event": "CAP003_CORRECTION_LEDGER_COMPLETED",
+      "createdon": "2026-07-16T05:32:06Z",
+      "sourceRecordId": "cf06664b-ce80-f111-ab0f-7c1e525b15c2"
+    },
+    {
+      "id": "d6fcdfa8-d780-f111-ab0f-000d3a14673b",
+      "event": "CAP003_PROJECT_STYLE_SHEET_UPDATED",
+      "createdon": "2026-07-16T05:32:06Z",
+      "sourceRecordId": "cf06664b-ce80-f111-ab0f-7c1e525b15c2"
+    },
+    {
+      "id": "37cf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "event": "CAP003_CONTROLLED_SAMPLE_COMPLETED",
+      "createdon": "2026-07-16T05:32:06Z",
+      "sourceRecordId": "cf06664b-ce80-f111-ab0f-7c1e525b15c2"
+    },
+    {
+      "id": "3dcf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "event": "CAP003_INTERNAL_PUBLISHER_QA_COMPLETED",
+      "createdon": "2026-07-16T05:32:06Z",
+      "sourceRecordId": "cf06664b-ce80-f111-ab0f-7c1e525b15c2"
+    },
+    {
+      "id": "b8b67aab-d780-f111-ab0f-00224820105b",
+      "event": "PUBLISHER_ROLE_ROUTING_REMEDIATED",
+      "createdon": "2026-07-16T05:32:05Z",
+      "sourceRecordId": "cf06664b-ce80-f111-ab0f-7c1e525b15c2"
+    },
+    {
+      "id": "c908f1a7-d780-f111-ab0e-6045bdd9ab12",
+      "event": "CAP003_COPYEDITING_STARTED",
+      "createdon": "2026-07-16T05:32:05Z",
+      "sourceRecordId": "cf06664b-ce80-f111-ab0f-7c1e525b15c2"
+    },
+    {
+      "id": "33cf30a9-d780-f111-ab0f-7c1e525b15c2",
+      "event": "PUBLISHER_AUTHENTICATED_MASTER_WORKSPACE_PROVEN",
+      "createdon": "2026-07-16T05:32:05Z",
+      "sourceRecordId": "cf06664b-ce80-f111-ab0f-7c1e525b15c2"
+    },
+    {
+      "id": "67d5c257-d180-f111-ab0f-00224820105b",
+      "event": "CAP011_MARKETING_PROFILE_PRODUCTION_REMEDIATED",
+      "createdon": "2026-07-16T04:46:49Z",
+      "sourceRecordId": "d38aa56a-882a-f111-88b4-6045bdd69678"
+    },
+    {
+      "id": "3ee02756-d180-f111-ab0f-6045bdd69678",
+      "event": "CAP011_MARKETING_PROFILE_FAILURE_RECONCILED",
+      "createdon": "2026-07-16T04:46:49Z",
+      "sourceRecordId": "d38aa56a-882a-f111-88b4-6045bdd69678"
+    },
+    {
+      "id": "ea24ae4c-ce80-f111-ab0f-00224820105b",
+      "event": "CAP003_COPYEDITING_ENTRY_PACKAGE_CREATED",
+      "createdon": "2026-07-16T04:25:07Z",
+      "sourceRecordId": "c9dc862e-da7a-f111-ab0f-000d3a14673b"
+    },
+    {
+      "id": "c4fcbe4e-ce80-f111-ab0f-6045bdd69678",
+      "event": "CAP010_LINE_EDITING_AUTHOR_RESPONSE_REFRESH_COMPLETED",
+      "createdon": "2026-07-16T04:25:07Z",
+      "sourceRecordId": "c9dc862e-da7a-f111-ab0f-000d3a14673b"
+    },
+    {
+      "id": "549c7651-ce80-f111-ab0f-7c1e525b15c2",
+      "event": "CAP003_COPYEDITING_READY",
+      "createdon": "2026-07-16T04:25:07Z",
+      "sourceRecordId": "c9dc862e-da7a-f111-ab0f-000d3a14673b"
+    },
+    {
+      "id": "c3fcbe4e-ce80-f111-ab0f-6045bdd69678",
+      "event": "CAP002_LINE_EDITING_EXIT_COMPLETED",
+      "createdon": "2026-07-16T04:25:06Z",
+      "sourceRecordId": "c9dc862e-da7a-f111-ab0f-000d3a14673b"
+    },
+    {
+      "id": "4f9c7651-ce80-f111-ab0f-7c1e525b15c2",
+      "event": "CAP002_AUTHOR_APPROVAL_RECORDED",
+      "createdon": "2026-07-16T04:25:06Z",
+      "sourceRecordId": "c9dc862e-da7a-f111-ab0f-000d3a14673b"
+    },
+    {
+      "id": "4b9c7651-ce80-f111-ab0f-7c1e525b15c2",
+      "event": "CAP002_AUTHOR_RESPONSE_RECEIVED",
+      "createdon": "2026-07-16T04:25:05Z",
+      "sourceRecordId": "c9dc862e-da7a-f111-ab0f-000d3a14673b"
+    },
+    {
+      "id": "24225ecd-cc80-f111-ab0f-6045bdd69435",
+      "event": "CAP011_MARKETING_PROFILE_SUBMITTED",
+      "createdon": "2026-07-16T04:14:21Z",
+      "sourceRecordId": "d38aa56a-882a-f111-88b4-6045bdd69678"
+    },
+    {
+      "id": "8ea33bd5-bd80-f111-ab0f-00224820105b",
+      "event": "CAP010_LINE_EDITING_RELEASE_REFRESH_COMPLETED",
+      "createdon": "2026-07-16T02:27:04Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "81a9d1a5-bd80-f111-ab0f-000d3a14673b",
+      "event": "CAP002_AUTHOR_REVIEW_OPENED",
+      "createdon": "2026-07-16T02:25:50Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "b6b734a6-bd80-f111-ab0f-00224820105b",
+      "event": "CAP002_AUTHOR_RELEASE_APPROVED",
+      "createdon": "2026-07-16T02:25:50Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "b7b734a6-bd80-f111-ab0f-00224820105b",
+      "event": "CAP002_AUTHOR_PACKAGE_DELIVERED",
+      "createdon": "2026-07-16T02:25:50Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "207cc943-b780-f111-ab0f-7c1e525b15c2",
+      "event": "CAP010_PRIORITY1_WORKLOAD_REFRESH_COMPLETED",
+      "createdon": "2026-07-16T01:40:10Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "7d0f3fbc-b680-f111-ab0f-7c1e525b15c2",
+      "event": "PUBLISHER_MISSING_INFORMATION_REQUEST_PREPARED",
+      "createdon": "2026-07-16T01:36:18Z",
+      "sourceRecordId": "f42a9474-1f76-f111-ab0f-6045bdd69738"
+    }
+  ]
+}
