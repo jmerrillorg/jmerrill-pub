@@ -6,6 +6,7 @@ import { signIn, signOut } from 'next-auth/react'
 import { PUBLISHER_OPERATING_CENTER_PROVIDER_ID } from '@/lib/author-durable-auth-shared'
 import type {
   PublisherOperatingCenterSnapshot,
+  PublisherPortfolioItem,
   PublisherQueueItem,
   PublisherWorkloadItem,
 } from '@/lib/server/publisher-operating-center'
@@ -26,6 +27,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
   const [snapshot, setSnapshot] = useState(initialSnapshot)
   const [actionState, setActionState] = useState<ActionState>({ itemKey: '', status: 'idle', message: '' })
   const [filter, setFilter] = useState('all')
+  const [portfolioView, setPortfolioView] = useState('active')
 
   const queue = useMemo(() => {
     const items = snapshot?.queues.enterprise || []
@@ -37,6 +39,15 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
   }, [filter, snapshot])
 
   const workload = snapshot?.queues.workload || []
+  const portfolio = useMemo(() => {
+    if (!snapshot) return []
+    if (portfolioView === 'published') return snapshot.queues.publishedCatalog
+    if (portfolioView === 'external') return snapshot.queues.externalHolds
+    if (portfolioView === 'archive') return snapshot.queues.archiveHistorical
+    if (portfolioView === 'all') return snapshot.queues.portfolio
+    if (portfolioView === 'reconcile') return snapshot.queues.reconciliationRequired
+    return snapshot.queues.activePipeline
+  }, [portfolioView, snapshot])
 
   async function refresh() {
     const response = await fetch('/api/publisher/operating-center', { cache: 'no-store' })
@@ -149,6 +160,11 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               'In line edit': snapshot.metrics.titlesInLineEditing,
               'Guard holds': snapshot.metrics.packagesHeldByReadinessGuard,
               'Capacity warnings': snapshot.metrics.downstreamCapacityWarnings,
+              'Active pipeline': snapshot.metrics.portfolioActivePipeline,
+              'Published catalog': snapshot.metrics.portfolioPublishedCatalog,
+              'External holds': snapshot.metrics.portfolioExternalHold,
+              'Archive': snapshot.metrics.portfolioArchiveHistorical,
+              'Reconcile': snapshot.metrics.portfolioReconciliationRequired,
             }).map(([label, value]) => (
               <div key={label} className="border border-white/10 bg-white/[0.035] p-4">
                 <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">{label}</p>
@@ -156,6 +172,75 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               </div>
             ))}
         </div>
+
+        <section className="mt-8 border border-white/10 bg-white/[0.035] p-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">
+                Catalog Portfolio
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold">Lifecycle portfolio views</h2>
+              <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
+                Published catalog titles are separated from active editorial workload so capacity warnings and package guards apply only to current governed work.
+              </p>
+            </div>
+            <Badge
+              label={`${snapshot?.metrics.portfolioPublishedCatalog || 0} published`}
+              tone="blue"
+            />
+          </div>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            {[
+              ['active', 'Active Pipeline'],
+              ['published', 'Published Catalog'],
+              ['external', 'External Holds'],
+              ['archive', 'Archive / Historical'],
+              ['reconcile', 'Reconciliation Required'],
+              ['all', 'All Titles'],
+            ].map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setPortfolioView(id)}
+                className={`min-h-[38px] rounded-full border px-4 text-[12px] font-semibold uppercase tracking-[0.08em] ${
+                  portfolioView === id
+                    ? 'border-blue-400 bg-blue-500/20 text-blue-100'
+                    : 'border-white/10 bg-white/[0.03] text-white/50'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-5 overflow-x-auto">
+            <table className="min-w-[1180px] w-full border-collapse text-left text-[12px]">
+              <thead className="border-b border-white/10 text-white/42">
+                <tr>
+                  <Th>Title</Th>
+                  <Th>Portfolio</Th>
+                  <Th>Stage / Catalog</Th>
+                  <Th>Formats / ISBN</Th>
+                  <Th>Evidence</Th>
+                  <Th>Next action</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {portfolio.map((item) => (
+                  <PortfolioRow key={item.key} item={item} />
+                ))}
+                {portfolio.length === 0 && (
+                  <tr>
+                    <td className="px-3 py-5 text-white/45" colSpan={6}>
+                      No titles are currently classified in this portfolio view.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         <section className="mt-8 border border-blue-300/20 bg-blue-950/15 p-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -328,6 +413,45 @@ function Info({ label, value }: { label: string; value: string }) {
       <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">{label}</p>
       <p className="mt-2 break-words text-[13px] leading-5 text-white/75">{value}</p>
     </div>
+  )
+}
+
+function PortfolioRow({ item }: { item: PublisherPortfolioItem }) {
+  const tone =
+    item.portfolioState === 'active_pipeline'
+      ? 'blue'
+      : item.portfolioState === 'published_catalog'
+        ? 'neutral'
+        : item.portfolioState === 'reconciliation_required'
+          ? 'amber'
+          : 'neutral'
+
+  return (
+    <tr className="border-b border-white/10 align-top">
+      <Td>
+        <span className="block font-semibold text-white">{item.title}</span>
+        <span className="mt-1 block text-white/40">{item.author}</span>
+      </Td>
+      <Td>
+        <Badge label={item.portfolioLabel} tone={tone} />
+        <span className="mt-2 block text-white/38">{item.confidence} confidence</span>
+      </Td>
+      <Td>
+        <span className="block text-white/75">{item.pipelineStage}</span>
+        <span className="mt-1 block text-white/38">{item.catalogStatus}</span>
+        {item.distributionStatus ? <span className="mt-1 block text-white/38">{item.distributionStatus}</span> : null}
+      </Td>
+      <Td>
+        <span className="block">{item.activeFormats.join(', ') || 'Format pending'}</span>
+        <span className="mt-1 block text-white/38">{item.isbn13s.join(', ') || 'ISBN pending'}</span>
+      </Td>
+      <Td>
+        <span className="block max-w-[300px] leading-5">{item.evidence.slice(0, 3).join('; ') || item.exceptionReason}</span>
+      </Td>
+      <Td>
+        <span className="block max-w-[260px] leading-5">{item.nextAction}</span>
+      </Td>
+    </tr>
   )
 }
 

@@ -22,6 +22,10 @@ import {
   normalizeWorkspaceText,
   type AuthorPortalWorkspaceState,
 } from './author-portal-status'
+import {
+  classifyTitlePortfolio,
+  type CatalogPortfolioState,
+} from './catalog-portfolio'
 
 export type AuthorPortalProjectSummary = {
   key: string
@@ -36,6 +40,12 @@ export type AuthorPortalProjectSummary = {
   pendingApprovalLabel?: string
   artifacts?: AuthorPortalArtifact[]
   contractStatusInternal?: string
+  portfolioState?: CatalogPortfolioState
+  portfolioLabel?: string
+  catalogStatus?: string
+  distributionStatus?: string
+  activeFormats?: string[]
+  isbn13s?: string[]
   workspaceState: AuthorPortalWorkspaceState
 }
 
@@ -81,6 +91,11 @@ export type AuthorPortalContext = {
   }
   currentProject: AuthorPortalProjectSummary
   projects: AuthorPortalProjectSummary[]
+  library: {
+    projectsInProgress: AuthorPortalProjectSummary[]
+    publishedBooks: AuthorPortalProjectSummary[]
+    archivedTitles: AuthorPortalProjectSummary[]
+  }
   selectedProjectKey: string
   tasks: {
     authorProfileRequired: boolean
@@ -120,6 +135,12 @@ type ResolvedProjectRow = {
   releasedArtifactExists?: boolean
   releasePublished?: boolean
   contractStatusInternal?: string
+  portfolioState?: CatalogPortfolioState
+  portfolioLabel?: string
+  catalogStatus?: string
+  distributionStatus?: string
+  activeFormats?: string[]
+  isbn13s?: string[]
   workspaceState: AuthorPortalProjectSummary['workspaceState']
 }
 
@@ -397,6 +418,7 @@ export async function resolveAuthorPortalContext(
       },
       currentProject,
       projects,
+      library: buildAuthorLibrary(projects),
       selectedProjectKey: currentProject.key,
       tasks,
       editorial:
@@ -520,13 +542,13 @@ async function buildProjectSummaries(
     const title =
       (overrides.titleId
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
             $filter: `jm1pub_titleid eq ${overrides.titleId}`,
           })
         : null) ||
       (projectTitle
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
             $filter: `jm1pub_titlename eq '${escapeODataText(projectTitle)}'`,
           })
         : null)
@@ -534,13 +556,13 @@ async function buildProjectSummaries(
     const asset =
       (overrides.publishingAssetId
         ? await dataverseFirst(config, 'jm1pub_publishingassets', {
-            $select: 'jm1pub_publishingassetid,jm1pub_name,_jm1pub_titleid_value',
+            $select: 'jm1pub_publishingassetid,jm1pub_name,jm1pub_assetformat,jm1pub_distributionstatus,jm1pub_isbn13,_jm1pub_titleid_value',
             $filter: `jm1pub_publishingassetid eq ${overrides.publishingAssetId}`,
           })
         : null) ||
       (title
         ? await dataverseFirst(config, 'jm1pub_publishingassets', {
-            $select: 'jm1pub_publishingassetid,jm1pub_name,_jm1pub_titleid_value',
+            $select: 'jm1pub_publishingassetid,jm1pub_name,jm1pub_assetformat,jm1pub_distributionstatus,jm1pub_isbn13,_jm1pub_titleid_value',
             $filter: `_jm1pub_titleid_value eq ${dataverseLookupId(title, 'jm1pub_titleid')}`,
           })
         : null)
@@ -632,6 +654,7 @@ async function buildProjectSummaries(
       releasePublished: authorActionEvidence.releasePublished,
       contractStatusInternal:
         title && !asset ? 'Signed / Exists - Location Pending Reconciliation' : undefined,
+      ...authorPortfolioFields(title, asset ? [asset] : [], stage ? [stage] : []),
       workspaceState: inferWorkspaceState({
         hasOpportunity: Boolean(dataverseLookupId(opportunity, 'opportunityid')),
         hasTitle: Boolean(dataverseLookupId(title || {}, 'jm1pub_titleid')),
@@ -651,20 +674,20 @@ async function buildProjectSummaries(
     const title =
       (overrides.titleId && projectTitle === session.title
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
             $filter: `jm1pub_titleid eq ${overrides.titleId}`,
           })
         : null) ||
       (projectTitle
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
             $filter: `jm1pub_titlename eq '${escapeODataText(projectTitle)}'`,
           })
         : null)
 
     const asset = title
       ? await dataverseFirst(config, 'jm1pub_publishingassets', {
-          $select: 'jm1pub_publishingassetid,jm1pub_name,_jm1pub_titleid_value',
+          $select: 'jm1pub_publishingassetid,jm1pub_name,jm1pub_assetformat,jm1pub_distributionstatus,jm1pub_isbn13,_jm1pub_titleid_value',
           $filter: `_jm1pub_titleid_value eq ${dataverseLookupId(title, 'jm1pub_titleid')}`,
         })
       : null
@@ -681,6 +704,7 @@ async function buildProjectSummaries(
             ? 'This project is linked to your author relationship and is waiting for the next governed action.'
             : 'This project is linked to your author relationship and is waiting for the next governed action.',
       contractStatusInternal: title ? 'Signed / Exists - Location Pending Reconciliation' : undefined,
+      ...authorPortfolioFields(title, asset ? [asset] : [], []),
       workspaceState: inferWorkspaceState({
         hasOpportunity: false,
         hasTitle: Boolean(dataverseLookupId(title || {}, 'jm1pub_titleid')),
@@ -697,13 +721,13 @@ async function buildProjectSummaries(
     const title =
       (relationshipTitle.titleId
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
             $filter: `jm1pub_titleid eq ${relationshipTitle.titleId}`,
           })
         : null) ||
       (relationshipTitle.title
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
             $filter: `jm1pub_titlename eq '${escapeODataText(relationshipTitle.title)}'`,
           })
         : null)
@@ -711,7 +735,7 @@ async function buildProjectSummaries(
     if (!title) continue
 
     const asset = await dataverseFirst(config, 'jm1pub_publishingassets', {
-      $select: 'jm1pub_publishingassetid,jm1pub_name,_jm1pub_titleid_value',
+      $select: 'jm1pub_publishingassetid,jm1pub_name,jm1pub_assetformat,jm1pub_distributionstatus,jm1pub_isbn13,_jm1pub_titleid_value',
       $filter: `_jm1pub_titleid_value eq ${dataverseLookupId(title, 'jm1pub_titleid')}`,
     })
 
@@ -796,6 +820,7 @@ async function buildProjectSummaries(
           dataverseLookupId(title, 'jm1pub_titleid') && !asset
             ? 'Signed / Exists - Location Pending Reconciliation'
             : undefined,
+        ...authorPortfolioFields(title, asset ? [asset] : [], stage ? [stage] : []),
         workspaceState: inferWorkspaceState({
           hasOpportunity: false,
           hasTitle: true,
@@ -904,6 +929,12 @@ export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPo
         ? row.pendingApprovalLabel
         : undefined,
     artifacts: row.artifacts,
+    portfolioState: row.portfolioState,
+    portfolioLabel: row.portfolioLabel,
+    catalogStatus: row.catalogStatus,
+    distributionStatus: row.distributionStatus,
+    activeFormats: row.activeFormats,
+    isbn13s: row.isbn13s,
     workspaceState: row.workspaceState,
   }
 }
@@ -918,8 +949,44 @@ function selectCurrentProject(
     projects.find((project) => overrides.opportunityId && project.opportunityId === overrides.opportunityId) ||
     projects.find((project) => overrides.titleId && project.titleId === overrides.titleId) ||
     projects.find((project) => requestedReference && project.intakeReference === requestedReference) ||
-    projects[0]
+    [...projects].sort(projectDefaultSelectionPriority)[0]
   )
+}
+
+function buildAuthorLibrary(projects: AuthorPortalProjectSummary[]): AuthorPortalContext['library'] {
+  return {
+    projectsInProgress: projects.filter(
+      (project) =>
+        project.portfolioState === 'active_pipeline' ||
+        project.portfolioState === 'external_hold' ||
+        isEditorialWorkspaceState(project.workspaceState),
+    ),
+    publishedBooks: projects.filter(
+      (project) => project.portfolioState === 'published_catalog' || project.workspaceState === 'published_legacy',
+    ),
+    archivedTitles: projects.filter(
+      (project) => project.portfolioState === 'archive_historical' || project.workspaceState === 'archived',
+    ),
+  }
+}
+
+function projectDefaultSelectionPriority(
+  a: AuthorPortalProjectSummary,
+  b: AuthorPortalProjectSummary,
+) {
+  return projectDefaultScore(b) - projectDefaultScore(a)
+}
+
+function projectDefaultScore(project: AuthorPortalProjectSummary) {
+  let score = 0
+  if (project.pendingApprovalLabel) score += 100
+  if (project.artifacts?.length) score += 80
+  if (project.portfolioState === 'active_pipeline') score += 50
+  if (isEditorialWorkspaceState(project.workspaceState)) score += 40
+  if (project.nextActionLabel) score += 10
+  if (project.portfolioState === 'published_catalog' || project.workspaceState === 'published_legacy') score -= 20
+  if (project.portfolioState === 'archive_historical' || project.workspaceState === 'archived') score -= 50
+  return score
 }
 
 function buildFallbackProject(session: AuthorPortalSession, requestedReference: string): AuthorPortalProjectSummary {
@@ -931,6 +998,32 @@ function buildFallbackProject(session: AuthorPortalSession, requestedReference: 
     statusLabel: 'Pre-Contract Setup',
     nextActionLabel: 'Complete the remaining setup steps for this project.',
     workspaceState: 'pre_contract_setup',
+  }
+}
+
+function authorPortfolioFields(
+  title: Record<string, unknown> | null,
+  assets: Record<string, unknown>[],
+  stages: Record<string, unknown>[],
+): Pick<
+  ResolvedProjectRow,
+  'portfolioState' | 'portfolioLabel' | 'catalogStatus' | 'distributionStatus' | 'activeFormats' | 'isbn13s'
+> {
+  if (!title) return {}
+
+  const classification = classifyTitlePortfolio({
+    title,
+    assets,
+    stages,
+  })
+
+  return {
+    portfolioState: classification.state,
+    portfolioLabel: classification.label,
+    catalogStatus: classification.catalogStatus,
+    distributionStatus: classification.distributionStatus,
+    activeFormats: classification.activeFormats,
+    isbn13s: classification.isbn13s,
   }
 }
 
@@ -998,6 +1091,7 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
     },
     currentProject,
     projects,
+    library: buildAuthorLibrary(projects),
     selectedProjectKey: currentProject.key,
     tasks: {
       authorProfileRequired: false,
@@ -1436,11 +1530,11 @@ async function getAuthorFacingEditorialArtifacts(
 function authorArtifactLabel(typeLabel: string, filename: string, name: string) {
   const normalized = normalizeWorkspaceText(`${typeLabel} ${filename} ${name}`)
 
-  if (normalized.includes('working manuscript')) return 'Editorial Working Manuscript'
   if (normalized.includes('copyedited') || normalized.includes('copyedit')) {
     if (normalized.includes('manuscript') || filename.toLowerCase().endsWith('.docx')) return 'Copyedited Manuscript'
     return 'Copyedit Package'
   }
+  if (normalized.includes('working manuscript')) return 'Editorial Working Manuscript'
   if (normalized.includes('line edited') || normalized.includes('line-edit')) return 'Line Editing Package'
   if (normalized.includes('revision blueprint')) return 'Revision Blueprint'
   if (normalized.includes('developmental review package') || normalized.includes('author delivery pdf')) {
