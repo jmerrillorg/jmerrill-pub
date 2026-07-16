@@ -1600,7 +1600,13 @@ function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
     targetDate: '',
     ageDays: item.ageDays,
     severity: item.overdueState === 'stalled' || item.overdueState === 'overdue' ? 'urgent' : item.overdueState === 'watch' ? 'watch' : 'info',
-    packageState: item.currentBlocker.includes('package') ? 'Package decision pending' : 'No active author package',
+    packageState:
+      item.currentBlocker.toLowerCase().includes('response pending') ||
+      item.currentBlocker.toLowerCase().includes('author review')
+        ? 'Released to author'
+        : item.currentBlocker.includes('package')
+          ? 'Package decision pending'
+          : 'No active author package',
     qaState: 'Not applicable',
     dependency: item.holdReason || item.currentBlocker,
     evidenceLinks: item.sharePointLink ? [{ label: 'Source evidence', href: item.sharePointLink }] : [],
@@ -1747,13 +1753,40 @@ function prioritizeTodayItems(items: PublisherTodayItem[]) {
 }
 
 function dedupeTodayItems(items: PublisherTodayItem[]) {
-  const seen = new Set<string>()
-  return items.filter((item) => {
-    const key = `${item.recordId || item.titleId}:${item.editorialStage}:${item.owner}`
-    if (seen.has(key)) return false
-    seen.add(key)
-    return true
-  })
+  const byKey = new Map<string, PublisherTodayItem>()
+  for (const item of items) {
+    const key = [
+      normalizeTitle(item.title),
+      item.owner,
+      normalizeTodayStage(item.editorialStage),
+      normalizeTodayStage(item.nextAction),
+    ].join(':')
+    const existing = byKey.get(key)
+    if (!existing || todayItemSpecificity(item) > todayItemSpecificity(existing)) {
+      byKey.set(key, item)
+    }
+  }
+  return [...byKey.values()]
+}
+
+function normalizeTodayStage(value: string) {
+  const normalized = value.toLowerCase()
+  if (normalized.includes('copy')) return 'copyediting'
+  if (normalized.includes('line')) return 'line-editing'
+  if (normalized.includes('developmental')) return 'developmental-editing'
+  if (normalized.includes('proof')) return 'proofreading'
+  if (normalized.includes('editorial')) return 'editorial-review'
+  if (normalized.includes('catalog')) return 'catalog'
+  return normalized.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48)
+}
+
+function todayItemSpecificity(item: PublisherTodayItem) {
+  return (
+    (item.key.startsWith('workload:') ? 100 : 0) +
+    (item.packageState !== 'No active author package' ? 20 : 0) +
+    (item.recordId ? 10 : 0) +
+    (item.lastMovement !== 'No recent execution evidence found' ? 5 : 0)
+  )
 }
 
 function emptyPublisherToday(): PublisherTodaySnapshot {
