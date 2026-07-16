@@ -62,6 +62,15 @@ const expectations = [
       source.includes('Proofreading awaits author response') &&
       !deriveNextActionBody.includes('capacity guard passes'),
   },
+  {
+    name: 'approved Copyediting exit moves The Intentional Leader to Proofreading Ready publisher action',
+    ok:
+      deriveNextActionBody.includes("'Proofreading Ready'") &&
+      deriveNextActionBody.includes('Begin CAP-004 Proofreading when authorized') &&
+      source.includes('Prepare/start CAP-004 Proofreading when authorized') &&
+      source.includes('Copyediting exit is complete') &&
+      !deriveNextActionBody.includes("!['Line Editing - Author Review', 'Copyediting - Release Decision Ready', 'Copyediting - Author Review'].includes(state)"),
+  },
 ]
 
 const failures = expectations.filter((expectation) => !expectation.ok)

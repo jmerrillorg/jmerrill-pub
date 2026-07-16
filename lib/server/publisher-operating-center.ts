@@ -1044,7 +1044,12 @@ function deriveCapability(state: PublisherWorkloadState) {
 function deriveNextAction(state: PublisherWorkloadState, title: string) {
   if (
     title === 'The Intentional Leader' &&
-    !['Line Editing - Author Review', 'Copyediting - Release Decision Ready', 'Copyediting - Author Review'].includes(state)
+    ![
+      'Line Editing - Author Review',
+      'Copyediting - Release Decision Ready',
+      'Copyediting - Author Review',
+      'Proofreading Ready',
+    ].includes(state)
   ) {
     return 'Complete full Volume I Line Editing package and QA'
   }
@@ -1073,6 +1078,8 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
       return 'Jackie release decision required before author-facing Copyediting package is sent; Proofreading awaits release decision'
     case 'Copyediting - Author Review':
       return 'Await author response; Proofreading awaits author approval'
+    case 'Proofreading Ready':
+      return 'Begin CAP-004 Proofreading when authorized'
     case 'External Hold':
       return 'Resolve external evidence or publisher judgment hold'
     default:
@@ -1102,6 +1109,7 @@ function deriveAuthorAction(state: PublisherWorkloadState, guardStatus: 'pass' |
   if (state === 'Line Editing - Author Review') return 'Review and approve Line Editing package'
   if (state === 'Copyediting - Release Decision Ready') return 'None - publisher release decision pending'
   if (state === 'Copyediting - Author Review') return 'Review and approve Copyediting package'
+  if (state === 'Proofreading Ready') return 'None'
   if (state.includes('Author Review')) return 'Review released package and respond through governed channel'
   return 'None'
 }
@@ -1116,6 +1124,7 @@ function derivePublisherAction(state: PublisherWorkloadState) {
   if (state === 'Copyediting In Progress') return 'Complete Copyediting package'
   if (state === 'Copyediting - Release Decision Ready') return 'Review and approve release of the Copyediting package'
   if (state === 'Copyediting - Author Review') return 'Await author response'
+  if (state === 'Proofreading Ready') return 'Prepare/start CAP-004 Proofreading when authorized'
   return 'Resolve current blocker'
 }
 
@@ -1146,6 +1155,7 @@ function deriveRestartCondition(state: PublisherWorkloadState, guardStatus: 'pas
   if (state === 'Line Editing - Author Review') return 'Copyediting blocked until author approval gate is recorded'
   if (state === 'Copyediting - Release Decision Ready') return 'No restart required; Proofreading awaits publisher release decision'
   if (state === 'Copyediting - Author Review') return 'No restart required; Proofreading awaits author response'
+  if (state === 'Proofreading Ready') return 'No restart required; Copyediting exit is complete'
   if (state === 'External Hold') return 'Resolve external evidence hold'
   if (state === 'Blocked') return 'Reconcile title, asset, and stage evidence'
   return 'No restart required'
