@@ -1,0 +1,147 @@
+{
+  "ok": true,
+  "actorIdentity": "jm1-admin@jmerrill.one",
+  "coverArtifact": {
+    "id": "aa74c2b0-bc80-f111-ab0f-6045bdd69738"
+  },
+  "manuscriptArtifact": {
+    "id": "59bb14b2-bc80-f111-ab0f-7c1e525b15c2"
+  },
+  "gate": {
+    "id": "b4b734a6-bd80-f111-ab0f-00224820105b",
+    "action": "created"
+  },
+  "summary": {
+    "id": "84535da8-bd80-f111-ab0e-6045bdd9ab12",
+    "action": "created"
+  },
+  "events": [
+    {
+      "event": "CAP002_AUTHOR_RELEASE_APPROVED",
+      "action": "created",
+      "id": "b6b734a6-bd80-f111-ab0f-00224820105b",
+      "createdon": "2026-07-16T02:25:50Z"
+    },
+    {
+      "event": "CAP002_AUTHOR_PACKAGE_DELIVERED",
+      "action": "created",
+      "id": "b7b734a6-bd80-f111-ab0f-00224820105b",
+      "createdon": "2026-07-16T02:25:50Z"
+    },
+    {
+      "event": "CAP002_AUTHOR_REVIEW_OPENED",
+      "action": "created",
+      "id": "81a9d1a5-bd80-f111-ab0f-000d3a14673b",
+      "createdon": "2026-07-16T02:25:50Z"
+    }
+  ],
+  "readback": {
+    "stage": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialstages(jm1pub_editorialstageid,jm1pub_name,jm1pub_stagestatus,jm1pub_authorsafesummary,modifiedon)/$entity",
+      "@odata.etag": "W/\"38851916\"",
+      "jm1pub_authorsafesummary": "Line Editing is in Author Review. The Volume I line editing package has been delivered to the author, and Copyediting is blocked until author approval is received.",
+      "jm1pub_editorialstageid": "a7713ff3-1e80-f111-ab0f-6045bdd69678",
+      "jm1pub_name": "Line Editing - The Intentional Leader, Volume I",
+      "modifiedon@OData.Community.Display.V1.FormattedValue": "7/15/2026 10:25 PM",
+      "modifiedon": "2026-07-16T02:25:50Z",
+      "jm1pub_stagestatus@OData.Community.Display.V1.FormattedValue": "Plan Delivered",
+      "jm1pub_stagestatus": 100000002
+    },
+    "gate": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialapprovalgates(jm1pub_editorialapprovalgateid,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_nextstageauthorized,_jm1pub_deliverableartifactid_value,modifiedon)/$entity",
+      "@odata.etag": "W/\"38851908\"",
+      "modifiedon@OData.Community.Display.V1.FormattedValue": "7/15/2026 10:25 PM",
+      "modifiedon": "2026-07-16T02:25:48Z",
+      "jm1pub_editorialapprovalgateid": "b4b734a6-bd80-f111-ab0f-00224820105b",
+      "jm1pub_gatestatus@OData.Community.Display.V1.FormattedValue": "Awaiting Author Response",
+      "jm1pub_gatestatus": 196650002,
+      "_organizationid_value": "9dafb403-b493-f011-a700-000d3a106f37",
+      "_jm1pub_deliverableartifactid_value@OData.Community.Display.V1.FormattedValue": "Line-Edited Working Manuscript - The Intentional Leader Volume I",
+      "_jm1pub_deliverableartifactid_value": "59bb14b2-bc80-f111-ab0f-7c1e525b15c2",
+      "jm1pub_gatecode@OData.Community.Display.V1.FormattedValue": "A3 Line Editing Completion",
+      "jm1pub_gatecode": 196650002,
+      "jm1pub_nextstageauthorized@OData.Community.Display.V1.FormattedValue": "No",
+      "jm1pub_nextstageauthorized": false
+    },
+    "summary": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialsummaries(jm1pub_editorialsummaryid,jm1pub_summaryheadline,jm1pub_summarybody,jm1pub_nextactionlabel,jm1pub_summarystatus,jm1pub_publishedtoworkspaceon,_jm1pub_sourceartifactid_value,_jm1pub_editorialapprovalgateid_value,modifiedon)/$entity",
+      "@odata.etag": "W/\"38851914\"",
+      "jm1pub_summarystatus@OData.Community.Display.V1.FormattedValue": "Published to Workspace",
+      "jm1pub_summarystatus": 196650002,
+      "_jm1pub_sourceartifactid_value@OData.Community.Display.V1.FormattedValue": "Line Edit Package - The Intentional Leader Volume I",
+      "_jm1pub_sourceartifactid_value": "aa74c2b0-bc80-f111-ab0f-6045bdd69738",
+      "modifiedon@OData.Community.Display.V1.FormattedValue": "7/15/2026 10:25 PM",
+      "modifiedon": "2026-07-16T02:25:49Z",
+      "jm1pub_summaryheadline": "Volume I Line Editing Review Package Ready",
+      "jm1pub_summarybody": "Your Volume I line editing review package for The Intentional Leader has been sent by email and is ready for your review. Copyediting will not begin until your author approval is received and recorded.",
+      "jm1pub_nextactionlabel": "Please review the line-edited manuscript and reply to the publishing team with your approval, bounded corrections, a discussion request, or a pause request.",
+      "_organizationid_value": "9dafb403-b493-f011-a700-000d3a106f37",
+      "jm1pub_publishedtoworkspaceon@OData.Community.Display.V1.FormattedValue": "7/15/2026 10:14 PM",
+      "jm1pub_publishedtoworkspaceon": "2026-07-16T02:14:41Z",
+      "_jm1pub_editorialapprovalgateid_value@OData.Community.Display.V1.FormattedValue": "A3 Line Editing Completion - The Intentional Leader Volume I",
+      "_jm1pub_editorialapprovalgateid_value": "b4b734a6-bd80-f111-ab0f-00224820105b",
+      "jm1pub_editorialsummaryid": "84535da8-bd80-f111-ab0e-6045bdd9ab12"
+    },
+    "artifacts": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialartifacts(jm1pub_editorialartifactid,jm1pub_filename,jm1pub_artifacttype,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_repositoryitemid,jm1pub_deliveredon)",
+      "value": [
+        {
+          "@odata.etag": "W/\"38851911\"",
+          "jm1pub_deliveredon@OData.Community.Display.V1.FormattedValue": "7/15/2026 10:14 PM",
+          "jm1pub_deliveredon": "2026-07-16T02:14:41Z",
+          "jm1pub_editorialartifactid": "aa74c2b0-bc80-f111-ab0f-6045bdd69738",
+          "jm1pub_filename": "2026-07-16-The-Intentional-Leader-Volume-I-Line-Editing-Author-Review-Cover-Note.pdf",
+          "jm1pub_visibility@OData.Community.Display.V1.FormattedValue": "Author Facing",
+          "jm1pub_visibility": 196650000,
+          "jm1pub_repositoryitemid": "01DF3SEQOBMO2IROAH3BG2Z4JRZCEAVBVN",
+          "jm1pub_artifactstatus@OData.Community.Display.V1.FormattedValue": "Delivered",
+          "jm1pub_artifactstatus": 196650002,
+          "jm1pub_artifacttype@OData.Community.Display.V1.FormattedValue": "Line Edit Package",
+          "jm1pub_artifacttype": 196650005
+        },
+        {
+          "@odata.etag": "W/\"38851912\"",
+          "jm1pub_deliveredon@OData.Community.Display.V1.FormattedValue": "7/15/2026 10:14 PM",
+          "jm1pub_deliveredon": "2026-07-16T02:14:41Z",
+          "jm1pub_editorialartifactid": "59bb14b2-bc80-f111-ab0f-7c1e525b15c2",
+          "jm1pub_filename": "2026-07-15-The-Intentional-Leader-Volume-I-Line-Edited-Working-Manuscript.docx",
+          "jm1pub_visibility@OData.Community.Display.V1.FormattedValue": "Author Facing",
+          "jm1pub_visibility": 196650000,
+          "jm1pub_repositoryitemid": "01DF3SEQOXV7XTAFSVSRBYOD6EAGARNH3W",
+          "jm1pub_artifactstatus@OData.Community.Display.V1.FormattedValue": "Delivered",
+          "jm1pub_artifactstatus": 196650002,
+          "jm1pub_artifacttype@OData.Community.Display.V1.FormattedValue": "Manuscript Review Copy",
+          "jm1pub_artifacttype": 196650000
+        },
+        {
+          "@odata.etag": "W/\"37659621\"",
+          "jm1pub_deliveredon@OData.Community.Display.V1.FormattedValue": "7/13/2026 12:55 AM",
+          "jm1pub_deliveredon": "2026-07-13T04:55:49Z",
+          "jm1pub_editorialartifactid": "61af771e-777e-f111-ab0f-00224820105b",
+          "jm1pub_filename": "2026-07-13 - The Intentional Leader - Volume I Editorial Working Manuscript.docx",
+          "jm1pub_visibility@OData.Community.Display.V1.FormattedValue": "Author Facing",
+          "jm1pub_visibility": 196650000,
+          "jm1pub_repositoryitemid": "01DF3SEQING7NUIXVFOVGLMNXHI766ON3H",
+          "jm1pub_artifactstatus@OData.Community.Display.V1.FormattedValue": "Delivered",
+          "jm1pub_artifactstatus": 196650002,
+          "jm1pub_artifacttype@OData.Community.Display.V1.FormattedValue": "Manuscript Review Copy",
+          "jm1pub_artifacttype": 196650000
+        },
+        {
+          "@odata.etag": "W/\"37657147\"",
+          "jm1pub_deliveredon@OData.Community.Display.V1.FormattedValue": "7/12/2026 11:53 PM",
+          "jm1pub_deliveredon": "2026-07-13T03:53:56Z",
+          "jm1pub_editorialartifactid": "ba84f61b-e57d-f111-ab0f-7c1e525b15c2",
+          "jm1pub_filename": "2026-07-12-The-Intentional-Leader-Volume-I-Developmental-Review-Package-Author-Delivery.pdf",
+          "jm1pub_visibility@OData.Community.Display.V1.FormattedValue": "Author Facing",
+          "jm1pub_visibility": 196650000,
+          "jm1pub_repositoryitemid": "01DF3SEQMWRPGO4JKFTJEIVRL6SABQ3Q3O",
+          "jm1pub_artifactstatus@OData.Community.Display.V1.FormattedValue": "Delivered",
+          "jm1pub_artifactstatus": 196650002,
+          "jm1pub_artifacttype@OData.Community.Display.V1.FormattedValue": "Developmental Edit Package",
+          "jm1pub_artifacttype": 196650003
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "checkedAt": "2026-07-16T02:04:29.315Z",
+  "items": [
+    {
+      "name": "2026-07-16-The-Intentional-Leader-Volume-I-Line-Editing-Author-Review-Cover-Note.pdf",
+      "id": "01DF3SEQOBMO2IROAH3BG2Z4JRZCEAVBVN",
+      "size": 2837,
+      "downloadedBytes": 2837,
+      "sha256": "a28c1c9d172c37150f09018b5ea68dd27f34ad183840ddb56f88acd023893f3c",
+      "matchesLocal": true
+    },
+    {
+      "name": "2026-07-15-The-Intentional-Leader-Volume-I-Line-Edited-Working-Manuscript.docx",
+      "id": "01DF3SEQOXV7XTAFSVSRBYOD6EAGARNH3W",
+      "size": 466215,
+      "downloadedBytes": 466215,
+      "sha256": "de463f3ae262bf46df865145adf59f9823f5bfe28bf271ee2e5eb570a72f221b",
+      "matchesLocal": true
+    }
+  ]
+}
