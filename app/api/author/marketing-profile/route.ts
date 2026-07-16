@@ -30,92 +30,142 @@ type MarketingProfilePayload = {
 }
 
 export async function POST(request: Request) {
-  const context =
-    (await getAuthorPortalContextFromCookies()) ||
-    (await getDurableAuthorSession().then((session) => {
-      const email = session?.user?.email
-      if (!email) return null
-      return getAuthorPortalContextFromAuthorEmail(email)
-    }))
+  const correlationSeed = `CAP011-MARKETING-PROFILE-${Date.now()}`
 
-  if (!context?.author.contactId) {
-    return NextResponse.json({ error: 'Author workspace session not found.' }, { status: 401 })
-  }
+  try {
+    const context =
+      (await getAuthorPortalContextFromCookies()) ||
+      (await getDurableAuthorSession()
+        .then((session) => {
+          const email = session?.user?.email
+          if (!email) return null
+          return getAuthorPortalContextFromAuthorEmail(email)
+        })
+        .catch(() => null))
 
-  const config = getDataverseServerConfig()
-  if (!config) {
-    return NextResponse.json({ error: 'Author marketing profile is not available right now.' }, { status: 503 })
-  }
+    if (!context?.author.contactId) {
+      return NextResponse.json(
+        {
+          ok: false,
+          status: 'authentication-required',
+          error: 'Your author session has expired. Please sign in again, then retry.',
+        },
+        { status: 401 },
+      )
+    }
 
-  const payload = sanitizePayload((await request.json().catch(() => null)) as MarketingProfilePayload | null)
-  const contactId = context.author.contactId
-  const idempotencyKey = buildIdempotencyKey(contactId, payload)
-  const priorSubmission = await dataverseFirst(config, 'jm1_executionlogs', {
-    $select: 'jm1_executionlogid,jm1_actiondescription,createdon',
-    $filter:
-      `jm1_actiontype eq 'CAP011_MARKETING_PROFILE_SUBMITTED' and ` +
-      `jm1_sourcerecordid eq '${contactId}' and ` +
-      `contains(jm1_actiondescription,'Idempotency: ${idempotencyKey}')`,
-    $orderby: 'createdon desc',
-  })
+    const config = getDataverseServerConfig()
+    if (!config) {
+      return NextResponse.json(
+        {
+          ok: false,
+          status: 'temporarily-unavailable',
+          error: 'Author marketing profile is not available right now. Please try again later.',
+          correlationId: correlationSeed,
+        },
+        { status: 503 },
+      )
+    }
 
-  if (priorSubmission) {
-    return NextResponse.json({
-      success: true,
-      idempotent: true,
-      changedFields: [],
-      correlationId: `CAP011-MARKETING-PROFILE-IDEMPOTENT-${contactId}`,
-      message: 'Marketing profile submission was already received.',
+    const payload = sanitizePayload((await request.json().catch(() => null)) as MarketingProfilePayload | null)
+    const contactId = context.author.contactId
+    const idempotencyKey = buildIdempotencyKey(contactId, payload)
+    const priorSubmission = await findPriorSubmission(config, contactId, idempotencyKey)
+
+    if (priorSubmission) {
+      return NextResponse.json({
+        ok: true,
+        status: 'already-submitted',
+        idempotent: true,
+        changedFields: [],
+        correlationId: `CAP011-MARKETING-PROFILE-IDEMPOTENT-${contactId}`,
+        message: 'Your marketing profile submission was already received.',
+      })
+    }
+
+    const current = await dataverseFirst(config, 'contacts', {
+      $select:
+        'contactid,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
+      $filter: `contactid eq ${contactId}`,
     })
+
+    if (!current) {
+      return NextResponse.json(
+        {
+          ok: false,
+          status: 'not-found',
+          error: 'Author profile could not be resolved. Please contact publishing@jmerrill.one.',
+        },
+        { status: 404 },
+      )
+    }
+
+    const update: Record<string, string> = {}
+    setIfChanged(update, current, 'jm1pub_authorbio', payload.authorBio)
+    setIfChanged(update, current, 'jm1pub_publicauthorbio', payload.authorBio)
+    setIfChanged(update, current, 'jm1pub_authorwebsite', payload.website)
+    setIfChanged(update, current, 'jm1pub_authorfacebook', payload.facebook)
+    setIfChanged(update, current, 'jm1pub_authorinstagram', payload.instagram)
+    setIfChanged(update, current, 'jm1pub_authorxtwitter', payload.xTwitter)
+
+    if (Object.keys(update).length > 0) {
+      await dataversePatch(config, 'contacts', contactId, update)
+    }
+
+    const now = new Date().toISOString()
+    const correlationId = `CAP011-MARKETING-PROFILE-${contactId}-${Date.now()}`
+    const changedFields = Object.keys(update)
+
+    try {
+      await dataverseCreate(config, 'jm1_executionlogs', {
+        jm1_name: `CAP011_MARKETING_PROFILE_SUBMITTED - ${context.author.name || context.author.email}`,
+        jm1_actiontype: 'CAP011_MARKETING_PROFILE_SUBMITTED',
+        jm1_actiondescription:
+          changedFields.length > 0
+            ? `Author marketing profile submitted through the Author Operating Center. Changed fields: ${changedFields.join(', ')}. Idempotency: ${idempotencyKey}. Correlation: ${correlationId}.`
+            : `Author marketing profile submitted through the Author Operating Center with no changed fields. Idempotency: ${idempotencyKey}. Correlation: ${correlationId}.`,
+        jm1_executionstatus: SUCCESS_STATUS,
+        jm1_agentname: 'Author Operating Center',
+        jm1_startedon: now,
+        jm1_completedon: now,
+        jm1_sourceentity: 'contact',
+        jm1_sourcerecordid: contactId,
+      })
+    } catch {
+      return NextResponse.json(
+        {
+          ok: true,
+          status: 'submitted-review-pending',
+          idempotent: false,
+          changedFields,
+          correlationId,
+          message:
+            'Your marketing profile was saved. The publishing team still needs to complete one internal review step.',
+        },
+        { status: 202 },
+      )
+    }
+
+    return NextResponse.json({
+      ok: true,
+      status: 'submitted',
+      idempotent: false,
+      changedFields,
+      correlationId,
+      message: 'Marketing profile saved for publishing team review.',
+    })
+  } catch {
+    return NextResponse.json(
+      {
+        ok: false,
+        status: 'server-error',
+        error:
+          'We could not finish saving your marketing profile. Your entries are still on this page; please retry in a moment or contact publishing@jmerrill.one.',
+        correlationId: correlationSeed,
+      },
+      { status: 500 },
+    )
   }
-
-  const current = await dataverseFirst(config, 'contacts', {
-    $select:
-      'contactid,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
-    $filter: `contactid eq ${contactId}`,
-  })
-
-  if (!current) {
-    return NextResponse.json({ error: 'Author profile could not be resolved.' }, { status: 404 })
-  }
-
-  const update: Record<string, string> = {}
-  setIfChanged(update, current, 'jm1pub_authorbio', payload.authorBio)
-  setIfChanged(update, current, 'jm1pub_publicauthorbio', payload.authorBio)
-  setIfChanged(update, current, 'jm1pub_authorwebsite', payload.website)
-  setIfChanged(update, current, 'jm1pub_authorfacebook', payload.facebook)
-  setIfChanged(update, current, 'jm1pub_authorinstagram', payload.instagram)
-  setIfChanged(update, current, 'jm1pub_authorxtwitter', payload.xTwitter)
-
-  if (Object.keys(update).length > 0) {
-    await dataversePatch(config, 'contacts', contactId, update)
-  }
-
-  const now = new Date().toISOString()
-  const correlationId = `CAP011-MARKETING-PROFILE-${contactId}-${Date.now()}`
-  const changedFields = Object.keys(update)
-
-  await dataverseCreate(config, 'jm1_executionlogs', {
-    jm1_name: `CAP011_MARKETING_PROFILE_SUBMITTED - ${context.author.name || context.author.email}`,
-    jm1_actiontype: 'CAP011_MARKETING_PROFILE_SUBMITTED',
-    jm1_actiondescription:
-      changedFields.length > 0
-        ? `Author marketing profile submitted through the Author Operating Center. Changed fields: ${changedFields.join(', ')}. Idempotency: ${idempotencyKey}. Correlation: ${correlationId}.`
-        : `Author marketing profile submitted through the Author Operating Center with no changed fields. Idempotency: ${idempotencyKey}. Correlation: ${correlationId}.`,
-    jm1_executionstatus: SUCCESS_STATUS,
-    jm1_agentname: 'Author Operating Center',
-    jm1_startedon: now,
-    jm1_completedon: now,
-    jm1_sourceentity: 'contact',
-    jm1_sourcerecordid: contactId,
-  })
-
-  return NextResponse.json({
-    success: true,
-    changedFields,
-    correlationId,
-    message: 'Marketing profile saved for publishing team review.',
-  })
 }
 
 function sanitizePayload(payload: MarketingProfilePayload | null) {
@@ -130,6 +180,17 @@ function sanitizePayload(payload: MarketingProfilePayload | null) {
 
 function buildIdempotencyKey(contactId: string, payload: ReturnType<typeof sanitizePayload>) {
   return createHash('sha256').update(`${contactId}:${JSON.stringify(payload)}`).digest('hex')
+}
+
+async function findPriorSubmission(config: NonNullable<ReturnType<typeof getDataverseServerConfig>>, contactId: string, idempotencyKey: string) {
+  return dataverseFirst(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiondescription,createdon',
+    $filter:
+      `jm1_actiontype eq 'CAP011_MARKETING_PROFILE_SUBMITTED' and ` +
+      `jm1_sourcerecordid eq '${contactId}' and ` +
+      `contains(jm1_actiondescription,'Idempotency: ${idempotencyKey}')`,
+    $orderby: 'createdon desc',
+  })
 }
 
 function cleanText(value: unknown) {

@@ -9,6 +9,14 @@ import type { AuthorPortalContext } from '@/lib/server/author-portal-context'
 
 type LoadState = 'loading' | 'ready' | 'error'
 type MarketingSaveState = 'idle' | 'saving' | 'saved' | 'error'
+type MarketingProfileResponse = {
+  ok?: boolean
+  status?: string
+  idempotent?: boolean
+  message?: string
+  error?: string
+  correlationId?: string
+}
 const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jm1_author_portal_bootstrap_context'
 const PORTAL_BOOTSTRAP_MAX_AGE_MS = 5 * 60 * 1000
 const PORTAL_UNLOCKED_KEY = 'jmp-author-onboarding-unlocked'
@@ -157,6 +165,8 @@ export function AuthorPortalWorkspace() {
 
   async function submitMarketingProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (marketingSaveState === 'saving') return
+
     setMarketingSaveState('saving')
     setMarketingMessage('')
 
@@ -164,19 +174,22 @@ export function AuthorPortalWorkspace() {
       const response = await fetch('/api/author/marketing-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify(marketingForm),
       })
-      const data = (await safeReadJson(response)) as { message?: string; error?: string } | null
+      const data = (await safeReadJson(response)) as MarketingProfileResponse | null
 
       if (!response.ok) {
-        throw new Error(data?.error || 'We could not save your marketing profile right now.')
+        setMarketingSaveState('error')
+        setMarketingMessage(marketingErrorMessage(response.status, data))
+        return
       }
 
       setMarketingSaveState('saved')
-      setMarketingMessage(data?.message || 'Marketing profile saved for publishing team review.')
+      setMarketingMessage(marketingSuccessMessage(data))
     } catch (err) {
       setMarketingSaveState('error')
-      setMarketingMessage(err instanceof Error ? err.message : 'We could not save your marketing profile right now.')
+      setMarketingMessage(marketingNetworkErrorMessage(err))
     }
   }
 
@@ -694,6 +707,46 @@ async function safeReadJson(response: Response) {
   } catch {
     return null
   }
+}
+
+function marketingSuccessMessage(data: MarketingProfileResponse | null) {
+  if (data?.status === 'already-submitted') {
+    return data.message || 'Your marketing profile submission was already received.'
+  }
+
+  if (data?.status === 'submitted-review-pending') {
+    return data.message || 'Your marketing profile was saved. The publishing team still has one internal review step to complete.'
+  }
+
+  return data?.message || 'Marketing profile saved for publishing team review.'
+}
+
+function marketingErrorMessage(status: number, data: MarketingProfileResponse | null) {
+  const suffix = data?.correlationId ? ` Reference: ${data.correlationId}.` : ''
+
+  if (status === 401) {
+    return `${data?.error || 'Your author session has expired. Please sign in again, then retry.'}${suffix}`
+  }
+
+  if (status === 403) {
+    return `${data?.error || 'This author profile is not available to this signed-in account.'}${suffix}`
+  }
+
+  if (status === 400) {
+    return `${data?.error || 'Please review the highlighted profile details and try again.'}${suffix}`
+  }
+
+  return `${data?.error || 'We could not finish saving your marketing profile. Your entries are still on this page; please retry in a moment or contact publishing@jmerrill.one.'}${suffix}`
+}
+
+function marketingNetworkErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : ''
+
+  if (message === 'Failed to fetch' || !message) {
+    return 'We could not reach the publishing system. Your entries are still on this page; please retry in a moment.'
+  }
+
+  return 'We could not finish saving your marketing profile. Your entries are still on this page; please retry in a moment.'
 }
 
 function isEditorialWorkspaceState(state: AuthorPortalContext['projects'][number]['workspaceState']) {
