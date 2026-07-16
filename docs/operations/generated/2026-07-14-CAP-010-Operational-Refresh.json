@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-07-15T06:22:40.759Z",
+  "generatedAt": "2026-07-16T01:42:33.750Z",
   "source": "JM1-Core Dataverse + local capability registry",
   "core": {
     "resourceUrl": "https://jm1hq.crm.dynamics.com",
     "apiBase": "https://jm1hq.crm.dynamics.com/api/data/v9.2",
     "executionLogRowsRead": 250,
-    "titleRowsRead": 200,
-    "editorialStageRowsRead": 2,
+    "titleRowsRead": 202,
+    "editorialStageRowsRead": 9,
     "approvalGateRowsRead": 3
   },
   "registry": [
@@ -22,11 +22,11 @@
     {
       "cap": "CAP-002",
       "capability": "Line Editing",
-      "state": "Controlled Initialization Complete - External Author Developmental Exit Hold",
-      "proofAsset": "The Intentional Leader, Volume I after Developmental exit",
+      "state": "Level 1 Proof - Full Volume I Line Editing internally complete; publisher release decision ready",
+      "proofAsset": "The Intentional Leader, Volume I",
       "owner": "Jackie / Editorial",
-      "currentPriority": "Hold",
-      "nextPromotionCriterion": "Developmental exit formally satisfied; then begin bounded line-editing proof from locked source package without author-facing movement"
+      "currentPriority": "Active release decision",
+      "nextPromotionCriterion": "Jackie release decision on the author-facing Line Editing package; after approval, release package through governed author communication without starting Copyediting"
     },
     {
       "cap": "CAP-003",
@@ -111,9 +111,9 @@
     }
   ],
   "capabilitySignals": {
-    "CAP001": 4,
-    "CAP002": 5,
-    "CAP007": 7,
+    "CAP001": 1,
+    "CAP002": 15,
+    "CAP007": 8,
     "CAP008": 6,
     "CAP009": 166,
     "CAP011": 5
@@ -126,28 +126,28 @@
       "(blank)": 34,
       "Production": 2,
       "Ongoing Relationship": 3,
-      "Editorial": 2
+      "Editorial": 4
     },
     "blankStageTitles": 34,
     "stampedCatalogRows": 162
   },
   "authorActions": {
-    "approvalReceived": 2,
-    "notificationSent": 2,
-    "packageDelivered": 2
+    "approvalReceived": 1,
+    "notificationSent": 0,
+    "packageDelivered": 0
   },
   "wave2Closure": {
     "capabilities": [
       {
         "cap": "CAP-002",
-        "exitState": "Controlled Initialization Complete - External Author Developmental Exit Hold",
-        "evidence": "5 Core signal(s); source package/style sheet/intake queue events included if inside read window",
-        "remainingDependency": "Developmental exit formally satisfied; then begin bounded line-editing proof from locked source package without author-facing movement"
+        "exitState": "Level 1 Proof - Full Volume I Line Editing internally complete; publisher release decision ready",
+        "evidence": "15 Core signal(s); source package/style sheet/intake queue events included if inside read window",
+        "remainingDependency": "Jackie release decision on the author-facing Line Editing package; after approval, release package through governed author communication without starting Copyediting"
       },
       {
         "cap": "CAP-007",
         "exitState": "Level 1 Proof - non-posting royalty statement proof complete; opening-balance external evidence hold; BC foundation readback still bounded by finance/tooling evidence",
-        "evidence": "7 Core signal(s); royalty statement proof event count 1",
+        "evidence": "8 Core signal(s); royalty statement proof event count 1",
         "remainingDependency": "External bank/QBO/Bill.com evidence, BC foundation readback completion, real governed royalty statement proof, Stripe/payout reconciliation proof"
       },
       {
@@ -177,7 +177,7 @@
     ],
     "summary": {
       "proofAssetsTracked": "The Intentional Leader Volume I; synthetic CAP-007 royalty proof; Lane A/B/C stage backfill; Author Operating Center marketing profile slice",
-      "dependencyHolds": 2,
+      "dependencyHolds": 1,
       "financialModuleState": "Level 1 Proof - non-posting royalty statement proof complete; opening-balance external evidence hold; BC foundation readback still bounded by finance/tooling evidence",
       "identityRecoveryState": "Level 2 Candidate - password recovery/reset, fresh sign-in, logout, Core authorization, and project switching proven; explicit administrative session revocation remains hardening",
       "catalogWriteState": "Safe Write Executed - governed app-only credential restored; Establishing Glory: The Library stamped Editorial with Core readback",
@@ -189,10 +189,52 @@
   "publisherActions": {
     "editorialStageRows": [
       {
+        "id": "a7713ff3-1e80-f111-ab0f-6045bdd69678",
+        "name": "Line Editing - The Intentional Leader, Volume I",
+        "status": "Plan Delivered",
+        "modifiedon": "2026-07-16T00:31:48Z"
+      },
+      {
+        "id": "8face475-8f80-f111-ab0f-00224820105b",
+        "name": "Editorial Review - The Long Watch",
+        "status": "In Progress",
+        "modifiedon": "2026-07-15T20:55:10Z"
+      },
+      {
+        "id": "c2799c31-8f80-f111-ab0f-00224820105b",
+        "name": "Developmental Editing - The General’s Will and Last Testament",
+        "status": "Not Started",
+        "modifiedon": "2026-07-15T20:53:21Z"
+      },
+      {
+        "id": "88189235-8f80-f111-ab0f-6045bdd69435",
+        "name": "Developmental Editing - Before You Were Born",
+        "status": "Not Started",
+        "modifiedon": "2026-07-15T20:53:20Z"
+      },
+      {
+        "id": "24817d5a-4d80-f111-ab0f-6045bdd69435",
+        "name": "Editorial Review - The General’s Will and Last Testament",
+        "status": "Complete",
+        "modifiedon": "2026-07-15T20:52:20Z"
+      },
+      {
+        "id": "a20ec2b3-4d80-f111-ab0f-6045bdd69435",
+        "name": "Editorial Review - Establishing Glory: The Library",
+        "status": "Complete",
+        "modifiedon": "2026-07-15T20:52:20Z"
+      },
+      {
+        "id": "624a5e5f-4d80-f111-ab0f-6045bdd69738",
+        "name": "Editorial Review - Before You Were Born",
+        "status": "Complete",
+        "modifiedon": "2026-07-15T20:52:19Z"
+      },
+      {
         "id": "d8dc4dd3-fb7b-f111-ab0f-6045bdd69435",
         "name": "Developmental Editing - The Intentional Leader, Volume I",
-        "status": "In Progress",
-        "modifiedon": "2026-07-13T03:54:35Z"
+        "status": "Complete",
+        "modifiedon": "2026-07-15T07:30:17Z"
       },
       {
         "id": "cbdc862e-da7a-f111-ab0f-000d3a14673b",
@@ -207,7 +249,7 @@
         "name": "A2 Developmental Review Package - The Intentional Leader, Volume I",
         "status": "Approved",
         "decision": "Approve",
-        "modifiedon": "2026-07-13T09:55:21Z"
+        "modifiedon": "2026-07-15T07:25:16Z"
       },
       {
         "id": "899ef3cd-fb7b-f111-ab0f-7c1e525b15c2",
@@ -229,11 +271,11 @@
     {
       "cap": "CAP-002",
       "capability": "Line Editing",
-      "state": "Controlled Initialization Complete - External Author Developmental Exit Hold",
-      "proofAsset": "The Intentional Leader, Volume I after Developmental exit",
+      "state": "Level 1 Proof - Full Volume I Line Editing internally complete; publisher release decision ready",
+      "proofAsset": "The Intentional Leader, Volume I",
       "owner": "Jackie / Editorial",
-      "currentPriority": "Hold",
-      "nextPromotionCriterion": "Developmental exit formally satisfied; then begin bounded line-editing proof from locked source package without author-facing movement"
+      "currentPriority": "Active release decision",
+      "nextPromotionCriterion": "Jackie release decision on the author-facing Line Editing package; after approval, release package through governed author communication without starting Copyediting"
     },
     {
       "cap": "CAP-007",
@@ -245,7 +287,17 @@
       "nextPromotionCriterion": "External bank/QBO/Bill.com evidence, BC foundation readback completion, real governed royalty statement proof, Stripe/payout reconciliation proof"
     }
   ],
-  "decisionReadyCapabilities": [],
+  "decisionReadyCapabilities": [
+    {
+      "cap": "CAP-002",
+      "capability": "Line Editing",
+      "state": "Level 1 Proof - Full Volume I Line Editing internally complete; publisher release decision ready",
+      "proofAsset": "The Intentional Leader, Volume I",
+      "owner": "Jackie / Editorial",
+      "currentPriority": "Active release decision",
+      "nextPromotionCriterion": "Jackie release decision on the author-facing Line Editing package; after approval, release package through governed author communication without starting Copyediting"
+    }
+  ],
   "recentExecutionFailures": [
     {
       "@odata.etag": "W/\"38838502\"",
@@ -270,154 +322,154 @@
   ],
   "recentExecutionLogs": [
     {
-      "id": "5baebb78-1480-f111-ab0f-7c1e525b15c2",
-      "event": "GOVERNANCE_ARTIFACT_PACKAGE_PREPARED",
-      "createdon": "2026-07-15T06:14:44Z",
-      "sourceRecordId": "ADR-JM1-V3-EXT-001-v0.4-spec-package"
+      "id": "207cc943-b780-f111-ab0f-7c1e525b15c2",
+      "event": "CAP010_PRIORITY1_WORKLOAD_REFRESH_COMPLETED",
+      "createdon": "2026-07-16T01:40:10Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
     },
     {
-      "id": "729d40df-1280-f111-ab0f-00224820105b",
-      "event": "CAP011_LEVEL1_CONTROLLED_PROOF_COMPLETE",
-      "createdon": "2026-07-15T06:03:23Z",
+      "id": "7d0f3fbc-b680-f111-ab0f-7c1e525b15c2",
+      "event": "PUBLISHER_MISSING_INFORMATION_REQUEST_PREPARED",
+      "createdon": "2026-07-16T01:36:18Z",
+      "sourceRecordId": "f42a9474-1f76-f111-ab0f-6045bdd69738"
+    },
+    {
+      "id": "fda3c295-b480-f111-ab0e-6045bdd9ab12",
+      "event": "CAP002_SHAREPOINT_EVIDENCE_FILED",
+      "createdon": "2026-07-16T01:20:53Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "79a0916d-ad80-f111-ab0f-00224820105b",
+      "event": "CAP002_AUTHOR_PACKAGE_READY",
+      "createdon": "2026-07-16T00:29:45Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "ed4a6a6f-ad80-f111-ab0f-6045bdd69435",
+      "event": "CAP002_PROJECT_STYLE_SHEET_UPDATED",
+      "createdon": "2026-07-16T00:29:45Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "917eb16b-ad80-f111-ab0f-7c1e525b15c2",
+      "event": "CAP002_INTERNAL_PUBLISHER_QA_COMPLETED",
+      "createdon": "2026-07-16T00:29:45Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "78a0916d-ad80-f111-ab0f-00224820105b",
+      "event": "CAP002_INTAKE_QUEUE_DISPOSITION_COMPLETED",
+      "createdon": "2026-07-16T00:29:44Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "8f7eb16b-ad80-f111-ab0f-7c1e525b15c2",
+      "event": "CAP002_FULL_LINE_EDIT_COMPLETED",
+      "createdon": "2026-07-16T00:29:44Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "ea3b8225-a980-f111-ab0f-000d3a14673b",
+      "event": "CAP010_PIPELINE_COLLISION_REFRESH_COMPLETED",
+      "createdon": "2026-07-15T23:59:06Z",
+      "sourceRecordId": "PR-267"
+    },
+    {
+      "id": "f69b2b29-a980-f111-ab0f-00224820105b",
+      "event": "AUTHOR_ASSET_READINESS_GUARD_ACTIVATED",
+      "createdon": "2026-07-15T23:59:06Z",
+      "sourceRecordId": "PR-267"
+    },
+    {
+      "id": "dfe3c722-a980-f111-ab0f-00224820105b",
+      "event": "EDITORIAL_WORKLOAD_CONTROL_ACTIVATED",
+      "createdon": "2026-07-15T23:59:04Z",
+      "sourceRecordId": "PR-267"
+    },
+    {
+      "id": "b4090227-a980-f111-ab0e-6045bdd9ab12",
+      "event": "PUBLISHER_OPERATING_CENTER_MASTER_VIEW_ACTIVATED",
+      "createdon": "2026-07-15T23:59:02Z",
+      "sourceRecordId": "PR-267"
+    },
+    {
+      "id": "f7f20721-a980-f111-ab0f-7c1e525b15c2",
+      "event": "UNIFIED_ENTERPRISE_EXECUTION_ACTIVATED",
+      "createdon": "2026-07-15T23:59:02Z",
+      "sourceRecordId": "PR-267"
+    },
+    {
+      "id": "dedeff0e-9180-f111-ab0f-00224820105b",
+      "event": "COUNCIL_APPROVAL_PACKAGE_PREPARED",
+      "createdon": "2026-07-15T21:06:41Z",
+      "sourceRecordId": "265"
+    },
+    {
+      "id": "6c179808-9080-f111-ab0f-00224820105b",
+      "event": "WAVE3_SPRINT2_COMPLETED",
+      "createdon": "2026-07-15T20:59:20Z",
+      "sourceRecordId": "wave3-sprint2"
+    },
+    {
+      "id": "38534b0b-9080-f111-ab0f-6045bdd69435",
+      "event": "PUBLISHER_OC_SECURITY_ROLE_REMEDIATED",
+      "createdon": "2026-07-15T20:59:19Z",
+      "sourceRecordId": "c7c5364c-5476-f111-ab0f-00224820105b"
+    },
+    {
+      "id": "b8759107-9080-f111-ab0f-7c1e525b15c2",
+      "event": "LONGWATCH_CONTACT_LINKED",
+      "createdon": "2026-07-15T20:59:19Z",
       "sourceRecordId": "d38aa56a-882a-f111-88b4-6045bdd69678"
     },
     {
-      "id": "45009d2b-1280-f111-ab0f-000d3a14673b",
-      "event": "CAP011_MARKETING_PROFILE_SUBMITTED",
-      "createdon": "2026-07-15T05:58:17Z",
-      "sourceRecordId": "d38aa56a-882a-f111-88b4-6045bdd69678"
+      "id": "c3759107-9080-f111-ab0f-7c1e525b15c2",
+      "event": "LONGWATCH_ASSET_EVIDENCE_REGISTERED",
+      "createdon": "2026-07-15T20:59:19Z",
+      "sourceRecordId": "0b30451e-be7b-f111-ab0f-7c1e525b15c2"
     },
     {
-      "id": "ff5d474f-1080-f111-ab0f-00224820105b",
-      "event": "CAP009_BIBLIOGRAPHIC_SAFE_WRITE_EXECUTED",
-      "createdon": "2026-07-15T05:44:57Z",
-      "sourceRecordId": "f1908dc9-5775-f111-ab0f-6045bdd69435"
+      "id": "09ad2a99-8f80-f111-ab0f-000d3a14673b",
+      "event": "CAP001_INSTANCE_INITIALIZED",
+      "createdon": "2026-07-15T20:56:12Z",
+      "sourceRecordId": "c2799c31-8f80-f111-ab0f-00224820105b"
     },
     {
-      "id": "d432642e-e87f-f111-ab0f-000d3a14673b",
-      "event": "CAP009_BIBLIOGRAPHIC_SAFE_WRITE_BLOCKED",
-      "createdon": "2026-07-15T00:57:47Z",
-      "sourceRecordId": "f1908dc9-5775-f111-ab0f-6045bdd69435"
+      "id": "8513d39b-8f80-f111-ab0f-00224820105b",
+      "event": "EDITORIAL_REVIEW_COMPLETED",
+      "createdon": "2026-07-15T20:56:12Z",
+      "sourceRecordId": "a20ec2b3-4d80-f111-ab0f-6045bdd69435"
     },
     {
-      "id": "ea9af302-e67f-f111-ab0f-00224820105b",
-      "event": "CAP008_LEVEL2_CANDIDATE_READY",
-      "createdon": "2026-07-15T00:42:17Z",
-      "sourceRecordId": "CAP-008"
+      "id": "2962539a-8f80-f111-ab0e-6045bdd9ab12",
+      "event": "EDITORIAL_REVIEW_COMPLETED",
+      "createdon": "2026-07-15T20:56:12Z",
+      "sourceRecordId": "24817d5a-4d80-f111-ab0f-6045bdd69435"
     },
     {
-      "id": "92a14a02-e67f-f111-ab0f-7c1e525b15c2",
-      "event": "CAP008_LOGOUT_AND_SESSION_TERMINATION_PROVEN",
-      "createdon": "2026-07-15T00:42:17Z",
-      "sourceRecordId": "CAP-008"
+      "id": "2a62539a-8f80-f111-ab0e-6045bdd9ab12",
+      "event": "CAP010_EDITORIAL_THROUGHPUT_REFRESH_COMPLETED",
+      "createdon": "2026-07-15T20:56:12Z",
+      "sourceRecordId": "wave3-sprint2"
     },
     {
-      "id": "2ea5c206-e67f-f111-ab0f-000d3a14673b",
-      "event": "CAP008_PASSWORD_RESET_PROVEN",
-      "createdon": "2026-07-15T00:42:16Z",
-      "sourceRecordId": "CAP-008"
+      "id": "8413d39b-8f80-f111-ab0f-00224820105b",
+      "event": "CAP001_INSTANCE_INITIALIZED",
+      "createdon": "2026-07-15T20:56:11Z",
+      "sourceRecordId": "88189235-8f80-f111-ab0f-6045bdd69435"
     },
     {
-      "id": "fc029fd3-c07f-f111-ab0f-7c1e525b15c2",
-      "event": "CAP010_WAVE2_OPERATIONAL_REFRESH_COMPLETED",
-      "createdon": "2026-07-14T20:16:06Z",
-      "sourceRecordId": "Wave-2"
+      "id": "9effa69a-8f80-f111-ab0f-6045bdd69435",
+      "event": "EDITORIAL_REVIEW_COMPLETED",
+      "createdon": "2026-07-15T20:56:11Z",
+      "sourceRecordId": "624a5e5f-4d80-f111-ab0f-6045bdd69738"
     },
     {
-      "id": "a6c00da4-c07f-f111-ab0e-7ced8dd6e259",
-      "event": "CAP008_HUMAN_CREDENTIAL_HOLD",
-      "createdon": "2026-07-14T20:14:39Z",
-      "sourceRecordId": "CAP-008"
-    },
-    {
-      "id": "1f8a8f1c-be7f-f111-ab0f-000d3a14673b",
-      "event": "CAP010_WAVE2_OPERATIONAL_REFRESH_COMPLETED",
-      "createdon": "2026-07-14T19:56:34Z",
-      "sourceRecordId": "CAP-010"
-    },
-    {
-      "id": "f7ee1eb5-bd7f-f111-ab0f-00224820105b",
-      "event": "CAP002_PROJECT_STYLE_SHEET_CREATED",
-      "createdon": "2026-07-14T19:53:46Z",
-      "sourceRecordId": "c9dc862e-da7a-f111-ab0f-000d3a14673b"
-    },
-    {
-      "id": "f8ee1eb5-bd7f-f111-ab0f-00224820105b",
-      "event": "CAP007_ROYALTY_STATEMENT_PROOF_COMPLETED",
-      "createdon": "2026-07-14T19:53:46Z",
-      "sourceRecordId": "CAP-007"
-    },
-    {
-      "id": "f9ee1eb5-bd7f-f111-ab0f-00224820105b",
-      "event": "CAP009_BIBLIOGRAPHIC_SAFE_WRITE_RECONCILED",
-      "createdon": "2026-07-14T19:53:46Z",
-      "sourceRecordId": "CAP-009"
-    },
-    {
-      "id": "7a6112b7-bd7f-f111-ab0f-7c1e525b15c2",
-      "event": "CAP002_INTAKE_QUEUE_VALIDATED",
-      "createdon": "2026-07-14T19:53:46Z",
-      "sourceRecordId": "c9dc862e-da7a-f111-ab0f-000d3a14673b"
-    },
-    {
-      "id": "7c9823b3-bd7f-f111-ab0e-7ced8dd6e259",
-      "event": "CAP002_CONTROLLED_INITIALIZATION_COMPLETED",
-      "createdon": "2026-07-14T19:53:46Z",
-      "sourceRecordId": "c9dc862e-da7a-f111-ab0f-000d3a14673b"
-    },
-    {
-      "id": "eaee1eb5-bd7f-f111-ab0f-00224820105b",
-      "event": "CAP002_SOURCE_PACKAGE_LOCKED",
-      "createdon": "2026-07-14T19:53:45Z",
-      "sourceRecordId": "c9dc862e-da7a-f111-ab0f-000d3a14673b"
-    },
-    {
-      "id": "733f9479-af7f-f111-ab0f-7c1e525b15c2",
-      "event": "CAP007_ROYALTY_CONTROLLED_PROOF_COMPLETED",
-      "createdon": "2026-07-14T18:11:53Z",
-      "sourceRecordId": "CAP-WAVE2"
-    },
-    {
-      "id": "3e918a7c-af7f-f111-ab0e-7ced8dd6e259",
-      "event": "CAP010_OPERATIONAL_REFRESH_COMPLETED",
-      "createdon": "2026-07-14T18:11:52Z",
-      "sourceRecordId": "CAP-WAVE2"
-    },
-    {
-      "id": "5cae09c0-7b7f-f111-ab0f-6045bdd69678",
-      "event": "ENTERPRISE_CAPABILITY_WAVE1_CLOSED",
-      "createdon": "2026-07-14T12:01:39Z",
-      "sourceRecordId": "JM1 Enterprise Modernization Wave 1"
-    },
-    {
-      "id": "539460c1-7b7f-f111-ab0f-7c1e525b15c2",
-      "event": "CAP010_METRICS_REFRESH_COMPLETED",
-      "createdon": "2026-07-14T12:01:38Z",
-      "sourceRecordId": "CAP-010"
-    },
-    {
-      "id": "cd37087e-7b7f-f111-ab0f-000d3a14673b",
-      "event": "CAP007_ROYALTY_CONTROLLED_PROOF_COMPLETED",
-      "createdon": "2026-07-14T11:59:49Z",
-      "sourceRecordId": "CAP-007"
-    },
-    {
-      "id": "308cd7e2-757f-f111-ab0f-000d3a14673b",
-      "event": "CAP007_OPENING_BALANCE_EVIDENCE_HOLD",
-      "createdon": "2026-07-14T11:19:33Z",
-      "sourceRecordId": "CAP-007"
-    },
-    {
-      "id": "b33fb92f-3b7f-f111-ab0f-7c1e525b15c2",
-      "event": "CAP011_GATE1_PROOF_COMPLETED",
-      "createdon": "2026-07-14T04:19:28Z",
-      "sourceRecordId": "CAP-011"
-    },
-    {
-      "id": "331fa395-3a7f-f111-ab0f-000d3a14673b",
-      "event": "CAP007_OPENING_BALANCE_EVIDENCE_COMPLETED",
-      "createdon": "2026-07-14T04:15:07Z",
-      "sourceRecordId": "OB-20260701"
+      "id": "9c92dd96-8f80-f111-ab0f-6045bdd69738",
+      "event": "LONGWATCH_EDITORIAL_REVIEW_INITIALIZED",
+      "createdon": "2026-07-15T20:56:11Z",
+      "sourceRecordId": "8face475-8f80-f111-ab0f-00224820105b"
     }
   ]
 }
