@@ -19,8 +19,11 @@ const expectations = [
     ok: route.includes("status: 'submitted-review-pending'") && route.includes('{ status: 202 }'),
   },
   {
-    name: 'route catches unexpected failures as structured JSON',
-    ok: route.includes("status: 'server-error'") && route.includes('correlationId: correlationSeed'),
+    name: 'route catches unexpected failures as recoverable review-pending JSON',
+    ok:
+      route.includes("status: 'submitted-review-pending'") &&
+      route.includes('correlationId: correlationSeed') &&
+      route.includes('The publishing team still needs to complete one internal review step.'),
   },
   {
     name: 'route falls back to durable author session when legacy portal cookie resolution fails',
