@@ -1,0 +1,3 @@
+exception_id,scope,classification,rationale,owner,status,downstream_stage
+CAP002-EX-001,Source manuscript boundary,DOCUMENTED INTERNAL EXCEPTION,Authoritative developmental source file contains material beyond Volume I; CAP-002 output trims to January 1 through March 31.,Publisher,Accepted for CAP-002,None
+CAP002-EX-002,Author queries,NO AUTHOR QUERY REQUIRED,All 80 queue items were line-level repetition/pacing items with no author decision dependency.,Publisher,Closed,Copyediting punctuation consistency only

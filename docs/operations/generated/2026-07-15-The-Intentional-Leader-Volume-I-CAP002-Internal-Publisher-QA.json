@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-07-16T00:23:27+00:00",
+  "result": "PASS",
+  "checks": {
+    "source_checksum_matches": true,
+    "volume_i_boundary_enforced": true,
+    "all_intake_items_dispositioned": true,
+    "author_queries_bounded": true,
+    "developmental_restructure_absent": true,
+    "copyediting_not_started": true,
+    "author_package_not_released": true
+  },
+  "counts": {
+    "daily_entries": 91,
+    "soul_dive_entries": 91,
+    "intake_items": 80,
+    "dispositioned_items": 80,
+    "dispositions": {
+      "APPLIED WITH ADAPTATION": 28,
+      "RETAINED FOR VOICE": 52
+    }
+  },
+  "source_boundary": {
+    "trim_boundary_paragraph": 7887,
+    "original_paragraph_count": 18613,
+    "output_paragraph_count": 7887,
+    "out_of_scope_removed": 10726,
+    "boundary_note": "Source manuscript contains material beyond Volume I; CAP-002 output is trimmed to January 1 through March 31."
+  },
+  "line_editing_stage_exit_state": "Line Editing Internally Complete - Author-Facing Release Decision Ready",
+  "author_release_authorized": false,
+  "copyediting_authorized": false
+}

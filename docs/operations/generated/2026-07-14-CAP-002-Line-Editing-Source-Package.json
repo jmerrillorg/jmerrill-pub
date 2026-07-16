@@ -1,0 +1,159 @@
+{
+  "generatedAt": "2026-07-14T19:52:43.056Z",
+  "capability": "CAP-002",
+  "packageName": "The Intentional Leader Volume I Line Editing Source Package",
+  "proofAsset": "The Intentional Leader, Volume I",
+  "status": "controlled_initialization_complete_external_author_developmental_exit_hold",
+  "sourceFiles": {
+    "finalDevelopmentalManuscript": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-Revised-Internal-Developmental-Manuscript.docx",
+    "lineEditingIntakeQueue": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-CAP-001-Line-Editing-Intake-Queue-The-Intentional-Leader-Volume-I.csv",
+    "developmentalSourceLock": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-EEP002-Volume-I-Source-Lock.json",
+    "finalInternalPublisherQa": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-EEP-004-Final-Internal-Publisher-QA.json"
+  },
+  "manuscript": {
+    "filename": "2026-07-13-The-Intentional-Leader-Volume-I-Revised-Internal-Developmental-Manuscript.docx",
+    "sha256": "04a4e64ac93cc7f2afea131d24564d7dd3b4951ceda7bf49cbf1cc7b5769a0a2",
+    "sourceLock": {
+      "generatedAt": "2026-07-13T11:35:17.385Z",
+      "stage": "Developmental Editing - Volume I",
+      "businessStatus": "In Progress",
+      "authorApprovalScope": [
+        "Overall developmental direction for Volume I",
+        "Closing posture for Volume I",
+        "Treatment of February 29 - Hidden Grace"
+      ],
+      "sources": [
+        {
+          "path": "/tmp/jm1-intentional-working/JMP-INT-202607-0W5PTQ - The Intentional Leader.docx",
+          "exists": true,
+          "file": "JMP-INT-202607-0W5PTQ - The Intentional Leader.docx",
+          "sha256": "701c16b72ff107603f0c09acd264434e97146b93b80ba4f175fb7bdbe3515d06"
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-Editorial-Working-Manuscript.docx",
+          "exists": true,
+          "file": "2026-07-13-The-Intentional-Leader-Volume-I-Editorial-Working-Manuscript.docx",
+          "sha256": "7dd2d554a7cbc1c1f099602ee2236c9d94c4b8cc1d21a19ea6e0ebb8e63aafbc"
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-Expanded-Revision-Blueprint.csv",
+          "exists": true,
+          "file": "2026-07-13-The-Intentional-Leader-Volume-I-Expanded-Revision-Blueprint.csv",
+          "sha256": "1e3152f18db220131c44b6920d63392d6d24034b4f60161566c0df160baac462"
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-Working-Manuscript-Cross-References.csv",
+          "exists": true,
+          "file": "2026-07-13-The-Intentional-Leader-Volume-I-Working-Manuscript-Cross-References.csv",
+          "sha256": "52345efed780f1a4c2f69e943699f978ca83cab0d540246986bd2cee021d7ff8"
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-Working-Manuscript-Validation.json",
+          "exists": true,
+          "file": "2026-07-13-The-Intentional-Leader-Volume-I-Working-Manuscript-Validation.json",
+          "sha256": "8aec899aa4338646a7281eb7427ee2f82f744fb1a45ce4286f0c3348f96cc735"
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/PROGRAM-003-The-Intentional-Leader-Volume-I-Developmental-Review-Package-Release-Preview.md",
+          "exists": true,
+          "file": "PROGRAM-003-The-Intentional-Leader-Volume-I-Developmental-Review-Package-Release-Preview.md",
+          "sha256": "6ad6f35178f51fea43ad9d09eb5bef004d52e1efc35f8607115eb4dedb8f4998"
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/PROGRAM-003-The-Intentional-Leader-Volume-I-Author-Review-Package-Final.md",
+          "exists": true,
+          "file": "PROGRAM-003-The-Intentional-Leader-Volume-I-Author-Review-Package-Final.md",
+          "sha256": "3374d29d6e7eac47bccae99a1aa2c994d2c42f577b972fae33968dbcae3fee41"
+        }
+      ]
+    }
+  },
+  "authorApprovedDevelopmentalDirection": [
+    "Overall developmental direction for Volume I approved by author",
+    "Closing posture for Volume I approved by author",
+    "Treatment of February 29 - Hidden Grace approved by author"
+  ],
+  "styleGuide": {
+    "governingExternalStyleGuide": "Chicago Manual of Style, current edition, unless JM1 editorial canon or author voice requires a documented exception.",
+    "scriptureAndCitationTreatment": "OPEN - LINE EDITOR OBSERVATION REQUIRED",
+    "projectSpecificStyleDecisions": [
+      "Preserve daily devotional structure.",
+      "Preserve author voice and reflective cadence.",
+      "Do not reopen the approved quarterly Volume I structure.",
+      "Differentiate repeated Soul Dive companion phrasing without structural rewriting.",
+      "Maintain January through March Volume I boundary."
+    ],
+    "authorVoiceNotes": [
+      "Reflective, pastoral, emotionally direct, and developmental.",
+      "Prefer clarity and cadence improvements over compression that flattens voice.",
+      "Protect spiritual and leadership vocabulary unless a line-level clarity issue is evident."
+    ],
+    "terminologyAndCapitalization": [
+      "The Intentional Leader",
+      "Volume I",
+      "Soul Dive",
+      "February 29 - Hidden Grace",
+      "OPEN - LINE EDITOR OBSERVATION REQUIRED for all unlisted recurring terms."
+    ],
+    "knownExceptions": [
+      "80 Soul Dive repetition/differentiation items are queued for line-level rhythm and phrasing calibration.",
+      "No developmental dependency remains open in the intake queue.",
+      "No author decision is required before controlled initialization."
+    ],
+    "prohibitedEditorialDrift": [
+      "Do not begin copyediting.",
+      "Do not reopen developmental structure.",
+      "Do not alter theological meaning.",
+      "Do not convert author voice into generic devotional prose.",
+      "Do not create author-facing tasks from internal line-editing queue items."
+    ]
+  },
+  "intakeQueue": {
+    "itemCount": 80,
+    "unresolvedDevelopmentalDependencies": 0,
+    "authorDecisionRequired": 0,
+    "status": "validated"
+  },
+  "qa": {
+    "generatedAt": "2026-07-13T13:38:22.886909+00:00",
+    "result": "PASS",
+    "scope": "EEP-004 publisher exception reduction and author package finalization",
+    "sourceRetainedExceptions": 118,
+    "updatedClassification": {
+      "CLOSED AFTER FOCUSED PUBLISHER REDUCTION REVIEW": 34,
+      "PRESERVE CURRENT DEVELOPMENTAL TREATMENT": 4,
+      "DEFERRED TO LINE EDITING": 80
+    },
+    "updatedLedgerDispositionCounts": {
+      "CLOSED AFTER FOCUSED PUBLISHER REVIEW": 34,
+      "RESOLVED BY APPROVED DIRECTION": 39,
+      "APPLIED": 24,
+      "RESOLVED BY PUBLISHER DECISION - PRESERVE": 4,
+      "DEFERRED TO LINE EDITING": 80,
+      "NOT APPLICABLE - DOCUMENTED": 1
+    },
+    "authorFacingReleaseAuthorized": false,
+    "lineEditingStarted": false,
+    "stageAdvanced": false,
+    "remainingPublisherExceptionsRequiringJackie": 0,
+    "remainingAuthorClarificationsRequired": 0,
+    "evidence": {
+      "updatedClassification": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-EEP-004-Publisher-Exception-Classification-Updated.csv",
+      "updatedLedger": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-EEP-004-Updated-Comment-Disposition-Ledger.csv",
+      "revisedManuscript": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/generated/2026-07-13-The-Intentional-Leader-Volume-I-Revised-Internal-Developmental-Manuscript.docx"
+    }
+  },
+  "coreAndSharePointReferences": {
+    "publishingAssetId": "c9dc862e-da7a-f111-ab0f-000d3a14673b",
+    "developmentalStageId": "d8dc4dd3-fb7b-f111-ab0f-6045bdd69435",
+    "approvalGateId": "b1c48e1d-e57d-f111-ab0f-00224820105b",
+    "authorDecisionArtifactId": "61af771e-777e-f111-ab0f-00224820105b",
+    "sharePointEvidence": "Existing governed developmental package and manuscript evidence; repository path should be resolved by driveItem id during production promotion."
+  },
+  "executionEvents": [
+    "CAP002_SOURCE_PACKAGE_LOCKED",
+    "CAP002_PROJECT_STYLE_SHEET_CREATED",
+    "CAP002_INTAKE_QUEUE_VALIDATED",
+    "CAP002_CONTROLLED_INITIALIZATION_COMPLETED"
+  ]
+}
