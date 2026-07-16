@@ -1,6 +1,11 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
-import { requireAuthorAccess, resolveAuthorPortalContext } from '@/lib/server/author-portal-context'
+import {
+  getAuthorPortalContextFromAuthorEmail,
+  requireAuthorAccess,
+  resolveAuthorPortalContext,
+} from '@/lib/server/author-portal-context'
+import { getDurableAuthorSession } from '@/lib/server/author-durable-auth'
 import {
   dataverseFirst,
   dataverseFormatted,
@@ -16,7 +21,6 @@ export async function GET(
   { params }: { params: { artifactId: string } },
 ) {
   const access = requireAuthorAccess(req)
-  if ('unauthorized' in access) return access.unauthorized
 
   const artifactId = params.artifactId?.trim()
   if (!artifactId || !isGuid(artifactId)) {
@@ -28,9 +32,20 @@ export async function GET(
     return NextResponse.json({ error: 'Author artifact access is not configured.' }, { status: 503 })
   }
 
-  const context = await resolveAuthorPortalContext(access.session)
+  const legacySession = 'session' in access ? access.session : null
+  const context =
+    legacySession
+      ? await resolveAuthorPortalContext(legacySession)
+      : await getDurableAuthorSession().then((session) => {
+          const email = session?.user?.email
+          if (!email) return null
+          return getAuthorPortalContextFromAuthorEmail(email)
+        })
+
   if (!context) {
-    return NextResponse.json({ error: 'Author workspace session not found.' }, { status: 401 })
+    return 'unauthorized' in access
+      ? access.unauthorized
+      : NextResponse.json({ error: 'Author workspace session not found.' }, { status: 401 })
   }
 
   const visibleArtifact = context.projects
