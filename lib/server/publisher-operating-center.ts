@@ -150,6 +150,60 @@ export type PublisherPortfolioItem = {
   nextAction: string
 }
 
+export type PublisherTodayItem = {
+  key: string
+  recordId: string
+  titleId: string
+  title: string
+  author: string
+  portfolioState: string
+  pipelineStage: string
+  editorialStage: string
+  substage: string
+  owner: 'Jackie' | 'Author' | 'Cody' | 'System' | 'External'
+  nextAction: string
+  targetDate: string
+  ageDays: number
+  severity: 'info' | 'watch' | 'urgent'
+  packageState: string
+  qaState: string
+  dependency: string
+  evidenceLinks: Array<{
+    label: string
+    href: string
+  }>
+  allowedActions: Array<{
+    id: PublisherActionId
+    label: string
+  }>
+  lastMovement: string
+}
+
+export type PublisherTodaySnapshot = {
+  generatedAt: string
+  publisherIdentity: {
+    role: 'Publisher'
+    authorization: 'Internal Entra workforce allowlist'
+  }
+  summary: {
+    jackieActionsDueToday: number
+    authorResponsesPending: number
+    activeEditorialTitles: number
+    productionReadyTitles: number
+    failedTransitions: number
+    overdueItems: number
+    assetsMovedToday: number
+    catalogExceptions: number
+  }
+  waitingForJackie: PublisherTodayItem[]
+  waitingForAuthors: PublisherTodayItem[]
+  activeEditorial: PublisherTodayItem[]
+  productionQueue: PublisherTodayItem[]
+  distributionCatalogQueue: PublisherTodayItem[]
+  alerts: PublisherTodayItem[]
+  recentMovements: PublisherTodayItem[]
+}
+
 export type PublisherOperatingCenterSnapshot = {
   generatedAt: string
   status: 'core-live' | 'unavailable'
@@ -204,6 +258,7 @@ export type PublisherOperatingCenterSnapshot = {
     archiveHistorical: PublisherPortfolioItem[]
     reconciliationRequired: PublisherPortfolioItem[]
   }
+  today: PublisherTodaySnapshot
 }
 
 type DataverseRow = Record<string, unknown>
@@ -230,6 +285,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
         archiveHistorical: [],
         reconciliationRequired: [],
       },
+      today: emptyPublisherToday(),
     }
   }
 
@@ -255,15 +311,24 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     .slice(0, 2)
   const portfolio = buildPortfolioItems(titles, assets, editorialStages)
   const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, logs, portfolio)
+  const metrics = buildMetrics(queue, logs, workload, portfolio)
+  const today = buildPublisherToday({
+    generatedAt: new Date().toISOString(),
+    queue,
+    workload,
+    portfolio,
+    logs,
+    metrics,
+  })
 
   return {
-    generatedAt: new Date().toISOString(),
+    generatedAt: today.generatedAt,
     status: 'core-live',
     operator: {
       role: 'Publisher',
       authorization: 'Internal Entra workforce allowlist',
     },
-    metrics: buildMetrics(queue, logs, workload, portfolio),
+    metrics,
     queues: {
       enterprise: queue,
       proofAssets,
@@ -275,6 +340,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       archiveHistorical: portfolio.filter((item) => item.portfolioState === 'archive_historical'),
       reconciliationRequired: portfolio.filter((item) => item.portfolioState === 'reconciliation_required'),
     },
+    today,
   }
 }
 
@@ -1425,6 +1491,295 @@ function buildMetrics(
     publishedCatalogMissingAuthor: portfolio.filter(
       (item) => item.portfolioState === 'published_catalog' && item.author === 'Author pending',
     ).length,
+  }
+}
+
+function buildPublisherToday(input: {
+  generatedAt: string
+  queue: PublisherQueueItem[]
+  workload: PublisherWorkloadItem[]
+  portfolio: PublisherPortfolioItem[]
+  logs: DataverseRow[]
+  metrics: PublisherOperatingCenterSnapshot['metrics']
+}): PublisherTodaySnapshot {
+  const workloadTodayItems = input.workload.map(workloadToTodayItem)
+  const queueTodayItems = input.queue.map(queueToTodayItem)
+  const portfolioTodayItems = input.portfolio.map(portfolioToTodayItem)
+  const failedLogItems = input.logs
+    .filter((log) => isOpenFailureLog(log))
+    .map((log) => logToAlertTodayItem(log))
+
+  const waitingForJackie = prioritizeTodayItems([
+    ...workloadTodayItems.filter((item) => item.owner === 'Jackie'),
+    ...queueTodayItems.filter((item) => item.owner === 'Jackie'),
+  ]).slice(0, 12)
+
+  const waitingForAuthors = prioritizeTodayItems([
+    ...workloadTodayItems.filter((item) => item.owner === 'Author'),
+    ...queueTodayItems.filter((item) => item.owner === 'Author'),
+  ]).slice(0, 12)
+
+  const activeEditorial = prioritizeTodayItems(
+    workloadTodayItems.filter((item) =>
+      ['Editorial Review', 'Developmental Editing', 'Line Editing', 'Copyediting', 'Proofreading'].some((stage) =>
+        `${item.editorialStage} ${item.pipelineStage} ${item.nextAction}`.includes(stage),
+      ),
+    ),
+  ).slice(0, 18)
+
+  const productionQueue = prioritizeTodayItems(
+    workloadTodayItems.filter(
+      (item) =>
+        item.editorialStage.includes('Proofreading') ||
+        item.editorialStage.includes('Production') ||
+        item.nextAction.includes('Proofreading') ||
+        item.dependency.includes('Proofreading') ||
+        item.packageState.includes('Proofreading'),
+    ),
+  ).slice(0, 12)
+
+  const distributionCatalogQueue = prioritizeTodayItems(
+    portfolioTodayItems.filter(
+      (item) =>
+        item.portfolioState !== 'published_catalog' ||
+        item.dependency.includes('ISBN') ||
+        item.nextAction.includes('metadata') ||
+        item.nextAction.includes('Reconcile'),
+    ),
+  ).slice(0, 18)
+
+  const alerts = prioritizeTodayItems([
+    ...failedLogItems,
+    ...workloadTodayItems.filter((item) => item.severity === 'urgent' || item.dependency.toLowerCase().includes('blocked')),
+    ...queueTodayItems.filter((item) => item.severity === 'urgent'),
+  ]).slice(0, 12)
+
+  const recentMovements = input.logs.slice(0, 12).map(logToMovementTodayItem)
+
+  return {
+    generatedAt: input.generatedAt,
+    publisherIdentity: {
+      role: 'Publisher',
+      authorization: 'Internal Entra workforce allowlist',
+    },
+    summary: {
+      jackieActionsDueToday: waitingForJackie.length,
+      authorResponsesPending: waitingForAuthors.length,
+      activeEditorialTitles: activeEditorial.length,
+      productionReadyTitles: productionQueue.length,
+      failedTransitions: alerts.filter((item) => item.severity === 'urgent').length,
+      overdueItems: [...waitingForJackie, ...waitingForAuthors, ...activeEditorial].filter((item) => item.ageDays > 7)
+        .length,
+      assetsMovedToday: input.metrics.assetsMovedToday,
+      catalogExceptions: distributionCatalogQueue.length,
+    },
+    waitingForJackie,
+    waitingForAuthors,
+    activeEditorial,
+    productionQueue,
+    distributionCatalogQueue,
+    alerts,
+    recentMovements,
+  }
+}
+
+function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
+  const owner = item.actionOwner === 'publisher' ? 'Jackie' : item.actionOwner === 'author' ? 'Author' : 'System'
+  return {
+    key: `queue:${item.key}`,
+    recordId: item.intakeId,
+    titleId: item.titleId || '',
+    title: item.title,
+    author: item.authorName || item.authorEmail || 'Author pending',
+    portfolioState: 'active_pipeline',
+    pipelineStage: item.currentStage,
+    editorialStage: item.editorialStage,
+    substage: item.currentBlocker,
+    owner,
+    nextAction: item.recommendedNextAction,
+    targetDate: '',
+    ageDays: item.ageDays,
+    severity: item.overdueState === 'stalled' || item.overdueState === 'overdue' ? 'urgent' : item.overdueState === 'watch' ? 'watch' : 'info',
+    packageState: item.currentBlocker.includes('package') ? 'Package decision pending' : 'No active author package',
+    qaState: 'Not applicable',
+    dependency: item.holdReason || item.currentBlocker,
+    evidenceLinks: item.sharePointLink ? [{ label: 'Source evidence', href: item.sharePointLink }] : [],
+    allowedActions: item.authorizedActions
+      .filter((action) => action.id !== 'view_only')
+      .map((action) => ({ id: action.id, label: action.label })),
+    lastMovement: item.latestExecutionEvidence || 'No recent execution evidence found',
+  }
+}
+
+function workloadToTodayItem(item: PublisherWorkloadItem): PublisherTodayItem {
+  const owner =
+    item.currentOwner === 'Jackie'
+      ? 'Jackie'
+      : item.currentOwner === 'Author'
+        ? 'Author'
+        : item.currentOwner === 'External'
+          ? 'External'
+          : 'Cody'
+
+  return {
+    key: `workload:${item.key}`,
+    recordId: item.assetId || item.titleId,
+    titleId: item.titleId,
+    title: item.title,
+    author: item.author,
+    portfolioState: 'active_pipeline',
+    pipelineStage: item.pipelineStage,
+    editorialStage: item.workloadState,
+    substage: item.editorialSubstage,
+    owner,
+    nextAction: item.nextAction,
+    targetDate: item.targetDate,
+    ageDays: item.ageDays,
+    severity:
+      item.readinessGuard.status === 'blocked' || item.workloadLevel === 'resource-attention'
+        ? 'urgent'
+        : item.workloadLevel === 'overdue-risk' || item.readinessGuard.status === 'watch'
+          ? 'watch'
+          : 'info',
+    packageState: item.packageReadiness,
+    qaState: item.internalQaState,
+    dependency: item.holdReason || item.readinessGuard.message,
+    evidenceLinks: [],
+    allowedActions: [],
+    lastMovement: item.latestExecutionEvidence,
+  }
+}
+
+function portfolioToTodayItem(item: PublisherPortfolioItem): PublisherTodayItem {
+  return {
+    key: `portfolio:${item.key}`,
+    recordId: item.assetIds[0] || item.titleId,
+    titleId: item.titleId,
+    title: item.title,
+    author: item.author,
+    portfolioState: item.portfolioState,
+    pipelineStage: item.pipelineStage,
+    editorialStage: item.portfolioLabel,
+    substage: item.catalogStatus,
+    owner: item.portfolioState === 'reconciliation_required' ? 'Jackie' : 'Cody',
+    nextAction: item.nextAction,
+    targetDate: '',
+    ageDays: 0,
+    severity: item.portfolioState === 'reconciliation_required' ? 'watch' : 'info',
+    packageState: 'Not applicable',
+    qaState: item.confidence,
+    dependency: item.exceptionReason || item.evidence.slice(0, 2).join('; ') || 'No active exception',
+    evidenceLinks: [],
+    allowedActions: [],
+    lastMovement: item.evidence[0] || 'Portfolio classification read from Core-backed title and asset evidence',
+  }
+}
+
+function logToAlertTodayItem(log: DataverseRow): PublisherTodayItem {
+  const actionType = stringValue(log.jm1_actiontype || log.jm1_name)
+  const recordId = stringValue(log.jm1_sourcerecordid || log.jm1_executionlogid)
+  return {
+    key: `alert:${stringValue(log.jm1_executionlogid)}`,
+    recordId,
+    titleId: '',
+    title: actionType,
+    author: 'Internal',
+    portfolioState: 'alert',
+    pipelineStage: 'Operational Alert',
+    editorialStage: 'Failed Transition',
+    substage: actionType,
+    owner: 'Cody',
+    nextAction: 'Review failure evidence and retry only when entry criteria are satisfied',
+    targetDate: '',
+    ageDays: ageDays(stringValue(log.createdon)),
+    severity: 'urgent',
+    packageState: 'Not applicable',
+    qaState: 'Failed',
+    dependency: `Execution log ${stringValue(log.jm1_executionlogid)}`,
+    evidenceLinks: [],
+    allowedActions: [],
+    lastMovement: `${actionType} (${stringValue(log.jm1_executionlogid)})`,
+  }
+}
+
+function logToMovementTodayItem(log: DataverseRow): PublisherTodayItem {
+  const actionType = stringValue(log.jm1_actiontype || log.jm1_name) || 'Execution event'
+  const recordId = stringValue(log.jm1_sourcerecordid || log.jm1_executionlogid)
+  return {
+    key: `movement:${stringValue(log.jm1_executionlogid)}`,
+    recordId,
+    titleId: '',
+    title: actionType,
+    author: 'Internal',
+    portfolioState: 'movement',
+    pipelineStage: 'Recent Movement',
+    editorialStage: actionType,
+    substage: stringValue(log.createdon),
+    owner: 'System',
+    nextAction: 'See current section for next valid action',
+    targetDate: '',
+    ageDays: ageDays(stringValue(log.createdon)),
+    severity: isOpenFailureLog(log) ? 'urgent' : 'info',
+    packageState: 'Evidence logged',
+    qaState: 'Readback',
+    dependency: stringValue(log.jm1_sourceentity),
+    evidenceLinks: [],
+    allowedActions: [],
+    lastMovement: `${actionType} (${stringValue(log.jm1_executionlogid)})`,
+  }
+}
+
+function isOpenFailureLog(log: DataverseRow) {
+  const value = `${stringValue(log.jm1_actiontype)} ${stringValue(log.jm1_name)}`.toLowerCase()
+  return value.includes('failed') || value.includes('failure') || value.includes('exception')
+}
+
+function prioritizeTodayItems(items: PublisherTodayItem[]) {
+  const severityRank = { urgent: 0, watch: 1, info: 2 }
+  const ownerRank = { Jackie: 0, Author: 1, Cody: 2, System: 3, External: 4 }
+  return [...dedupeTodayItems(items)].sort(
+    (a, b) =>
+      severityRank[a.severity] - severityRank[b.severity] ||
+      ownerRank[a.owner] - ownerRank[b.owner] ||
+      b.ageDays - a.ageDays ||
+      a.title.localeCompare(b.title),
+  )
+}
+
+function dedupeTodayItems(items: PublisherTodayItem[]) {
+  const seen = new Set<string>()
+  return items.filter((item) => {
+    const key = `${item.recordId || item.titleId}:${item.editorialStage}:${item.owner}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
+function emptyPublisherToday(): PublisherTodaySnapshot {
+  return {
+    generatedAt: new Date().toISOString(),
+    publisherIdentity: {
+      role: 'Publisher',
+      authorization: 'Internal Entra workforce allowlist',
+    },
+    summary: {
+      jackieActionsDueToday: 0,
+      authorResponsesPending: 0,
+      activeEditorialTitles: 0,
+      productionReadyTitles: 0,
+      failedTransitions: 0,
+      overdueItems: 0,
+      assetsMovedToday: 0,
+      catalogExceptions: 0,
+    },
+    waitingForJackie: [],
+    waitingForAuthors: [],
+    activeEditorial: [],
+    productionQueue: [],
+    distributionCatalogQueue: [],
+    alerts: [],
+    recentMovements: [],
   }
 }
 

@@ -8,6 +8,7 @@ import type {
   PublisherOperatingCenterSnapshot,
   PublisherPortfolioItem,
   PublisherQueueItem,
+  PublisherTodayItem,
   PublisherWorkloadItem,
 } from '@/lib/server/publisher-operating-center'
 
@@ -113,9 +114,10 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-8 sm:px-8 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-blue-300">Publisher Operating Center</p>
-            <h1 className="mt-3 font-display text-4xl leading-tight md:text-6xl">Enterprise publishing queue</h1>
+            <h1 className="mt-3 font-display text-4xl leading-tight md:text-6xl">Publisher Today</h1>
             <p className="mt-4 max-w-3xl text-[14px] leading-7 text-white/60">
-              Internal surface for Core-backed asset visibility, bounded publisher actions, and execution evidence.
+              Daily Core-backed operating surface for what needs Jackie, what needs authors, what is moving, what is blocked,
+              and what changed.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -145,6 +147,91 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
+        {snapshot && (
+          <section className="border border-blue-300/20 bg-blue-950/15 p-5">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Daily Summary</p>
+                <h2 className="mt-2 text-2xl font-semibold">What needs attention today?</h2>
+                <p className="mt-2 text-[12px] text-white/45">Generated {formatDateTime(snapshot.today.generatedAt)}</p>
+              </div>
+              <Badge label={snapshot.status === 'core-live' ? 'JM1-Core live' : 'Core unavailable'} tone={snapshot.status === 'core-live' ? 'blue' : 'amber'} />
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                ['Jackie actions', snapshot.today.summary.jackieActionsDueToday, 'waiting-jackie'],
+                ['Author responses', snapshot.today.summary.authorResponsesPending, 'waiting-authors'],
+                ['Active editorial', snapshot.today.summary.activeEditorialTitles, 'active-editorial'],
+                ['Production runway', snapshot.today.summary.productionReadyTitles, 'production-queue'],
+                ['Failed transitions', snapshot.today.summary.failedTransitions, 'alerts'],
+                ['Overdue items', snapshot.today.summary.overdueItems, 'alerts'],
+                ['Moved today', snapshot.today.summary.assetsMovedToday, 'recent-movements'],
+                ['Catalog exceptions', snapshot.today.summary.catalogExceptions, 'catalog-queue'],
+              ].map(([label, value, href]) => (
+                <a key={label} href={`#${href}`} className="border border-white/10 bg-black/20 p-4 transition hover:border-blue-300/40">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">{label}</p>
+                  <p className="mt-3 text-3xl font-semibold">{value}</p>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {snapshot && (
+          <section className="mt-6 grid gap-5">
+            <TodaySection
+              id="waiting-jackie"
+              title="Waiting for Jackie"
+              eyebrow="Publisher authority"
+              empty="No publisher-only decisions are waiting right now."
+              items={snapshot.today.waitingForJackie}
+            />
+            <TodaySection
+              id="waiting-authors"
+              title="Waiting for Authors"
+              eyebrow="Author action"
+              empty="No author-owned action is waiting right now."
+              items={snapshot.today.waitingForAuthors}
+            />
+            <TodaySection
+              id="active-editorial"
+              title="Active Editorial"
+              eyebrow="Manuscripts moving"
+              empty="No active editorial items were returned from Core."
+              items={snapshot.today.activeEditorial}
+            />
+            <TodaySection
+              id="production-queue"
+              title="Production Queue"
+              eyebrow="Downstream runway"
+              empty="No title is authorized for production movement right now."
+              items={snapshot.today.productionQueue}
+            />
+            <TodaySection
+              id="catalog-queue"
+              title="Distribution and Catalog Queue"
+              eyebrow="Exceptions only"
+              empty="No actionable catalog or distribution exceptions are waiting right now."
+              items={snapshot.today.distributionCatalogQueue}
+            />
+            <TodaySection
+              id="alerts"
+              title="Alerts and Failed Transitions"
+              eyebrow="Exception first"
+              empty="No unresolved failed transitions were found in the current read window."
+              items={snapshot.today.alerts}
+            />
+            <TodaySection
+              id="recent-movements"
+              title="Recently Moved Assets"
+              eyebrow="Today and this week"
+              empty="No recent movement was found in the current execution-log read window."
+              items={snapshot.today.recentMovements}
+            />
+          </section>
+        )}
+
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {snapshot &&
             Object.entries({
@@ -418,6 +505,93 @@ function Info({ label, value }: { label: string; value: string }) {
   )
 }
 
+function TodaySection({
+  id,
+  eyebrow,
+  title,
+  empty,
+  items,
+}: {
+  id: string
+  eyebrow: string
+  title: string
+  empty: string
+  items: PublisherTodayItem[]
+}) {
+  return (
+    <section id={id} className="scroll-mt-6 border border-white/10 bg-white/[0.035] p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">{eyebrow}</p>
+          <h2 className="mt-2 text-2xl font-semibold">{title}</h2>
+        </div>
+        <Badge label={`${items.length} item${items.length === 1 ? '' : 's'}`} tone={items.some((item) => item.severity === 'urgent') ? 'amber' : 'blue'} />
+      </div>
+
+      <div className="mt-5 grid gap-3 lg:grid-cols-2">
+        {items.map((item) => (
+          <TodayCard key={item.key} item={item} />
+        ))}
+        {items.length === 0 && (
+          <div className="border border-white/10 bg-black/15 p-4 text-[13px] leading-6 text-white/48">{empty}</div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+function TodayCard({ item }: { item: PublisherTodayItem }) {
+  return (
+    <article className="border border-white/10 bg-black/15 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">{item.pipelineStage}</p>
+          <h3 className="mt-2 text-lg font-semibold leading-6 text-white">{item.title}</h3>
+          <p className="mt-1 text-[12px] text-white/45">{item.author}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Badge label={item.owner} tone={item.owner === 'Jackie' ? 'amber' : item.owner === 'Author' ? 'blue' : 'neutral'} />
+          <Badge label={item.severity} tone={item.severity === 'urgent' ? 'amber' : item.severity === 'watch' ? 'neutral' : 'blue'} />
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <Info label="Stage" value={`${item.editorialStage}${item.substage ? ` · ${item.substage}` : ''}`} />
+        <Info label="Next action" value={item.nextAction || 'No action returned'} />
+        <Info label="Package" value={item.packageState || 'Not applicable'} />
+        <Info label="Dependency" value={item.dependency || 'None'} />
+        <Info label="QA" value={item.qaState || 'Not set'} />
+        <Info label="Age / Target" value={`${item.ageDays}d${item.targetDate ? ` · ${item.targetDate}` : ''}`} />
+      </div>
+
+      <p className="mt-4 border-t border-white/10 pt-3 text-[12px] leading-5 text-white/42">
+        Last movement: {item.lastMovement || 'No recent execution evidence found.'}
+      </p>
+
+      {(item.allowedActions.length > 0 || item.evidenceLinks.length > 0) && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {item.allowedActions.map((action) => (
+            <span key={action.id} className="rounded-full border border-blue-300/25 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-blue-100">
+              {action.label}
+            </span>
+          ))}
+          {item.evidenceLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full border border-white/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/55"
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      )}
+    </article>
+  )
+}
+
 function PortfolioRow({ item }: { item: PublisherPortfolioItem }) {
   const tone =
     item.portfolioState === 'active_pipeline'
@@ -532,4 +706,18 @@ function Badge({ label, tone = 'neutral' }: { label: string; tone?: 'neutral' | 
       {label}
     </span>
   )
+}
+
+function formatDateTime(value: string) {
+  if (!value) return 'not generated'
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(new Date(value))
+  } catch {
+    return value
+  }
 }
