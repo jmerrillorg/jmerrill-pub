@@ -1,0 +1,207 @@
+{
+  "generatedAt": "2026-07-16T10:03:34.790Z",
+  "source": "JM1-Core live read via governed Azure CLI Dataverse token",
+  "lanes": {
+    "laneA": {
+      "asset": "The Intentional Leader, Volume I",
+      "state": "Copyediting Author Review",
+      "proofreading": "Not Started / blocked until author response",
+      "core": [
+        {
+          "stage": "Copyediting - The Intentional Leader, Volume I",
+          "type": "Copyedit",
+          "status": "Complete",
+          "summary": "Your Volume I copyediting review package for The Intentional Leader has been sent by email and is ready for your review.",
+          "modified": "2026-07-16T07:49:37Z",
+          "gate": {
+            "name": "A4 Copyediting Completion - The Intentional Leader Volume I",
+            "status": "Awaiting Author Response",
+            "nextStageAuthorized": false
+          },
+          "latestEvent": {
+            "event": "CAP010_COPYEDITING_RELEASE_REFRESH_COMPLETED",
+            "id": "0f7a893a-ec80-f111-ab0f-7c1e525b15c2",
+            "created": "2026-07-16T07:59:18Z"
+          }
+        },
+        {
+          "stage": "Line Editing - The Intentional Leader, Volume I",
+          "type": "Line",
+          "status": "Complete",
+          "summary": "Line Editing for Volume I is complete. Copyediting is ready to begin; no action is required from you at this time.",
+          "modified": "2026-07-16T04:25:04Z",
+          "gate": {
+            "name": "A3 Line Editing Completion - The Intentional Leader Volume I",
+            "status": "Approved",
+            "nextStageAuthorized": true
+          },
+          "latestEvent": {
+            "event": "CAP010_LINE_EDITING_RELEASE_REFRESH_COMPLETED",
+            "id": "8ea33bd5-bd80-f111-ab0f-00224820105b",
+            "created": "2026-07-16T02:27:04Z"
+          }
+        },
+        {
+          "stage": "Developmental Editing - The Intentional Leader, Volume I",
+          "type": "Developmental",
+          "status": "Complete",
+          "summary": "Developmental Editing for Volume I is complete. Line editing has begun; no action is required from you at this time.",
+          "modified": "2026-07-15T07:30:17Z",
+          "gate": {
+            "name": "A2 Developmental Review Package - The Intentional Leader, Volume I",
+            "status": "Approved",
+            "nextStageAuthorized": true
+          },
+          "latestEvent": {
+            "event": "DEVELOPMENTAL_EXIT_COMPLETED",
+            "id": "1f2a30f2-1e80-f111-ab0f-000d3a14673b",
+            "created": "2026-07-15T07:29:46Z"
+          }
+        },
+        {
+          "stage": "Editorial Review - The Intentional Leader",
+          "type": "Review",
+          "status": "Complete",
+          "summary": "Editorial Review is complete.",
+          "modified": "2026-07-10T01:08:14Z",
+          "gate": {
+            "name": "A1 Editorial Review Acceptance - The Intentional Leader",
+            "status": "Publisher Override",
+            "nextStageAuthorized": true
+          },
+          "latestEvent": null
+        }
+      ]
+    },
+    "laneB": {
+      "assets": [
+        "Before You Were Born",
+        "The General’s Will and Last Testament",
+        "The Long Watch",
+        "Establishing Glory: The Library"
+      ],
+      "core": {
+        "beforeYouWereBorn": [
+          {
+            "stage": "Developmental Editing - Before You Were Born",
+            "type": "Developmental",
+            "status": "Not Started",
+            "summary": "Developmental Editing has been initialized as the next internal stage. No author action is required until the developmental plan is prepared for review.",
+            "modified": "2026-07-15T20:53:20Z",
+            "gate": null,
+            "latestEvent": {
+              "event": "CAP001_INSTANCE_INITIALIZED",
+              "id": "8413d39b-8f80-f111-ab0f-00224820105b",
+              "created": "2026-07-15T20:56:11Z"
+            }
+          },
+          {
+            "stage": "Editorial Review - Before You Were Born",
+            "type": "Review",
+            "status": "Complete",
+            "summary": "Editorial Review is complete. Developmental Editing has been identified as the next recommended stage. No author action is required at this time.",
+            "modified": "2026-07-15T20:52:19Z",
+            "gate": null,
+            "latestEvent": {
+              "event": "EDITORIAL_REVIEW_COMPLETED",
+              "id": "9effa69a-8f80-f111-ab0f-6045bdd69435",
+              "created": "2026-07-15T20:56:11Z"
+            }
+          }
+        ],
+        "generalsWill": [
+          {
+            "stage": "Developmental Editing - The General’s Will and Last Testament",
+            "type": "Developmental",
+            "status": "Not Started",
+            "summary": "Developmental Editing has been initialized as the next internal stage. No author action is required until the developmental plan is prepared for review.",
+            "modified": "2026-07-15T20:53:21Z",
+            "gate": null,
+            "latestEvent": {
+              "event": "CAP001_INSTANCE_INITIALIZED",
+              "id": "09ad2a99-8f80-f111-ab0f-000d3a14673b",
+              "created": "2026-07-15T20:56:12Z"
+            }
+          },
+          {
+            "stage": "Editorial Review - The General’s Will and Last Testament",
+            "type": "Review",
+            "status": "Complete",
+            "summary": "Editorial Review is complete. Developmental Editing has been identified as the next recommended stage. No author action is required at this time.",
+            "modified": "2026-07-15T20:52:20Z",
+            "gate": null,
+            "latestEvent": {
+              "event": "EDITORIAL_REVIEW_COMPLETED",
+              "id": "2962539a-8f80-f111-ab0e-6045bdd9ab12",
+              "created": "2026-07-15T20:56:12Z"
+            }
+          }
+        ],
+        "longWatch": [
+          {
+            "stage": "Editorial Review - The Long Watch",
+            "type": "Review",
+            "status": "In Progress",
+            "summary": "Editorial Review has been initialized. No author action is required at this time.",
+            "modified": "2026-07-15T20:55:10Z",
+            "gate": null,
+            "latestEvent": {
+              "event": "LONGWATCH_EDITORIAL_REVIEW_INITIALIZED",
+              "id": "9c92dd96-8f80-f111-ab0f-6045bdd69738",
+              "created": "2026-07-15T20:56:11Z"
+            }
+          }
+        ],
+        "establishingGlory": [
+          {
+            "stage": "Editorial Review - Establishing Glory: The Library",
+            "type": "Review",
+            "status": "Complete",
+            "summary": "Editorial Review is complete. The publishing team is reconciling the current compilation path before assigning the next editorial stage. No author action is required at this time.",
+            "modified": "2026-07-15T20:52:20Z",
+            "gate": null,
+            "latestEvent": {
+              "event": "EDITORIAL_REVIEW_COMPLETED",
+              "id": "8513d39b-8f80-f111-ab0f-00224820105b",
+              "created": "2026-07-15T20:56:12Z"
+            }
+          }
+        ]
+      }
+    },
+    "laneC": {
+      "publisherOperatingCenter": "Production deployed through PR #285; release-ready stale state corrected to Copyediting Author Review when CAP003 author package delivery/open events exist."
+    },
+    "laneD": {
+      "productionDistribution": "Initialized as runway focus; CAP-004 Proofreading readiness only; no Proofreading started."
+    }
+  },
+  "bottleneck": {
+    "current": "Copyediting author response for The Intentional Leader; Proofreading cannot start until A4 author response is recorded.",
+    "projectedNext": "Proofreading and Production runway. CAP-004/CAP-005 must be ready before author approval arrives.",
+    "recommendedBalancingAction": "Prepare CAP-004 source package, standards, correction model, QA, evidence, and metrics while CAP-001 work continues on the other live titles."
+  },
+  "throughput": {
+    "trackedTitles": 5,
+    "liveEditorialStageRows": 10,
+    "coreTitleStageCounts": {
+      "Archive": 39,
+      "Inquiry": 3,
+      "Backlist/Published": 117,
+      "(blank)": 34,
+      "Production": 2,
+      "Ongoing Relationship": 3,
+      "Editorial": 4
+    },
+    "recentEventCounts": {
+      "CAP003_AUTHOR_REVIEW_OPENED": 1,
+      "CAP010_COPYEDITING_RELEASE_REFRESH_COMPLETED": 1,
+      "CAP001_INSTANCE_INITIALIZED": 2,
+      "EDITORIAL_REVIEW_COMPLETED": 4,
+      "LONGWATCH_EDITORIAL_REVIEW_INITIALIZED": 1
+    }
+  },
+  "remainingJackieDecisions": [
+    "Respond to/record the author Copyediting decision when received; no Proofreading authorization before that gate."
+  ]
+}
