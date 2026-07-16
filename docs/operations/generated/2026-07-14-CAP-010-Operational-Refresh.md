@@ -1,6 +1,6 @@
 # CAP-010 Operational Refresh
 
-Generated: 2026-07-16T01:42:33.750Z
+Generated: 2026-07-16T02:26:18.618Z
 
 Source: JM1-Core Dataverse + local capability registry
 
@@ -11,17 +11,17 @@ Source: JM1-Core Dataverse + local capability registry
 | Execution log rows read | 250 |
 | Title rows read | 202 |
 | Editorial stage rows read | 9 |
-| Approval gate rows read | 3 |
+| Approval gate rows read | 4 |
 
 ## Capability Signals
 
 | Capability | Core signal count |
 |---|---:|
 | CAP001 | 1 |
-| CAP002 | 15 |
+| CAP002 | 18 |
 | CAP007 | 8 |
 | CAP008 | 6 |
-| CAP009 | 166 |
+| CAP009 | 164 |
 | CAP011 | 5 |
 
 ## Catalog Health
@@ -53,10 +53,10 @@ Source: JM1-Core Dataverse + local capability registry
 
 | Capability | Exit State | Current Evidence | Remaining Dependency |
 |---|---|---|---|
-| CAP-002 | Level 1 Proof - Full Volume I Line Editing internally complete; publisher release decision ready | 15 Core signal(s); source package/style sheet/intake queue events included if inside read window | Jackie release decision on the author-facing Line Editing package; after approval, release package through governed author communication without starting Copyediting |
+| CAP-002 | Level 1 Proof - Full Volume I Line Editing internally complete; publisher release decision ready | 18 Core signal(s); source package/style sheet/intake queue events included if inside read window | Jackie release decision on the author-facing Line Editing package; after approval, release package through governed author communication without starting Copyediting |
 | CAP-007 | Level 1 Proof - non-posting royalty statement proof complete; opening-balance external evidence hold; BC foundation readback still bounded by finance/tooling evidence | 8 Core signal(s); royalty statement proof event count 1 | External bank/QBO/Bill.com evidence, BC foundation readback completion, real governed royalty statement proof, Stripe/payout reconciliation proof |
 | CAP-008 | Level 2 Candidate - password recovery/reset, fresh sign-in, logout, Core authorization, and project switching proven; explicit administrative session revocation remains hardening | 6 Core signal(s); password recovery/reset, fresh sign-in, logout, Core authorization, and project switching evidence recorded | Complete explicit session-revocation proof if required for Level 2 certification; old-password rejection was not independently tested by Cody because private password values were not handled |
-| CAP-009 | Safe Write Executed - governed app-only credential restored; Establishing Glory: The Library stamped Editorial with Core readback | 166 catalog governance signal(s); blank titles 34; approved bibliographic safe-write execution event count 1; reconciliation event count 1 | Broader catalog lineage/alias/identifier writes remain future governed packages only; 34 blank-stage/unknown titles remain excluded until separately approved |
+| CAP-009 | Safe Write Executed - governed app-only credential restored; Establishing Glory: The Library stamped Editorial with Core readback | 164 catalog governance signal(s); blank titles 34; approved bibliographic safe-write execution event count 1; reconciliation event count 1 | Broader catalog lineage/alias/identifier writes remain future governed packages only; 34 blank-stage/unknown titles remain excluded until separately approved |
 | CAP-010 | Operational Enterprise Command - Wave 2 Coverage Proven | This refresh generated machine-readable and human-readable Wave 2 coverage | Promote operational refresh to governed dashboard surface and add scheduled/automated refresh |
 | CAP-011 | Level 1 Controlled Proof Complete - production form, durable session, security rejection, Core execution logging, retry/idempotency, and project switching proven | 5 Core signal(s); production deployment, authenticated submission, Core execution logging, unauthenticated rejection, idempotency proof, and project-switching continuity proven | Invalid project-scoped URL stayed in loading state without exposing unauthorized data; retain as UX hardening, not a Level 1 blocker |
 

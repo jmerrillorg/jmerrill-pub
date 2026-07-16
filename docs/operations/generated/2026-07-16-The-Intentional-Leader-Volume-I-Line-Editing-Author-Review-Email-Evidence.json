@@ -1,0 +1,27 @@
+{
+  "sentAt": "2026-07-16T02:14:41.688Z",
+  "provider": "acs-email",
+  "sender": "publishing@email.jmerrill.one",
+  "replyTo": "publishing@jmerrill.one",
+  "recipient": "chosen2k7@gmail.com",
+  "cc": "publishing@jmerrill.one",
+  "subject": "Volume I Line Editing Review Package - The Intentional Leader",
+  "deliveryResult": {
+    "id": "fb7f1908-1919-4645-a5a2-56e1ddf46eb0",
+    "status": "Succeeded",
+    "error": null
+  },
+  "providerMessageId": "fb7f1908-1919-4645-a5a2-56e1ddf46eb0",
+  "attachments": [
+    {
+      "name": "2026-07-16-The-Intentional-Leader-Volume-I-Line-Editing-Author-Review-Cover-Note.pdf",
+      "contentType": "application/pdf",
+      "sha256": "a28c1c9d172c37150f09018b5ea68dd27f34ad183840ddb56f88acd023893f3c"
+    },
+    {
+      "name": "2026-07-15-The-Intentional-Leader-Volume-I-Line-Edited-Working-Manuscript.docx",
+      "contentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "sha256": "de463f3ae262bf46df865145adf59f9823f5bfe28bf271ee2e5eb570a72f221b"
+    }
+  ]
+}

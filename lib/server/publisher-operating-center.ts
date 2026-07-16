@@ -661,7 +661,13 @@ function buildWorkloadItems(
       const pipelineStage = dataverseFormatted(title, 'jm1pub_stage') || 'Unstaged'
       const intake = intakes.find((row) => normalizeTitle(stringValue(row.jm1_projecttitle || row.jm1_name)) === normalizeTitle(titleName))
       const latestLog = findLatestLogForWorkload(logs, titleId, assetId, stages)
-      const workloadState = deriveWorkloadState({ pipelineStage, stageType, stageStatus, hasAsset: Boolean(assetId) })
+      const workloadState = deriveWorkloadState({
+        pipelineStage,
+        stageType,
+        stageStatus,
+        hasAsset: Boolean(assetId),
+        latestAction: stringValue(latestLog?.jm1_actiontype),
+      })
       const capability = deriveCapability(workloadState)
       const risk = deriveDownstreamRisk(workloadState, titleName)
       const guard = deriveReadinessGuard(workloadState, latestStage, latestLog)
@@ -682,7 +688,7 @@ function buildWorkloadItems(
         assetId,
         pipelineStage,
         editorialStage: latestStage ? stringValue(latestStage.jm1pub_name) : 'Not initialized',
-        editorialSubstage: stageStatus || 'Not Started',
+        editorialSubstage: workloadState === 'Line Editing - Author Review' ? 'Author Review' : stageStatus || 'Not Started',
         workloadState,
         activeCapability: capability,
         currentOwner: owner,
@@ -724,12 +730,16 @@ function deriveWorkloadState(input: {
   stageType: string
   stageStatus: string
   hasAsset: boolean
+  latestAction?: string
 }): PublisherWorkloadState {
   if (!input.hasAsset) return 'Blocked'
   const type = input.stageType.toLowerCase()
   const status = input.stageStatus.toLowerCase()
+  const latestAction = input.latestAction?.toLowerCase() || ''
   if (type.includes('line')) {
-    if (status.includes('author')) return 'Line Editing - Author Review'
+    if (status.includes('author') || latestAction.includes('cap002_author_package_delivered')) {
+      return 'Line Editing - Author Review'
+    }
     if (status.includes('qa')) return 'Line Editing - Internal QA'
     if (status.includes('delivered') || status.includes('complete')) return 'Line Editing - Release Decision Ready'
     if (status.includes('progress')) return 'Line Editing - In Progress'
@@ -758,7 +768,9 @@ function deriveCapability(state: PublisherWorkloadState) {
 }
 
 function deriveNextAction(state: PublisherWorkloadState, title: string) {
-  if (title === 'The Intentional Leader') return 'Complete full Volume I Line Editing package and QA'
+  if (title === 'The Intentional Leader' && state !== 'Line Editing - Author Review') {
+    return 'Complete full Volume I Line Editing package and QA'
+  }
   switch (state) {
     case 'Editorial Review':
       return 'Complete Editorial Review and assign next governed stage'
@@ -810,6 +822,7 @@ function derivePublisherAction(state: PublisherWorkloadState) {
   if (state === 'Editorial Review') return 'Complete Editorial Review'
   if (state.startsWith('Developmental')) return 'Prepare or continue Developmental package'
   if (state === 'Line Editing - Release Decision Ready') return 'Review and approve release of the Line Editing package'
+  if (state === 'Line Editing - Author Review') return 'Await author response'
   if (state.startsWith('Line')) return 'Complete Line Editing package'
   if (state === 'Copyediting Ready') return 'Confirm Line Editing exit before Copyediting'
   return 'Resolve current blocker'

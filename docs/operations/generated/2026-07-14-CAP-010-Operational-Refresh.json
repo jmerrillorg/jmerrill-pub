@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-16T01:42:33.750Z",
+  "generatedAt": "2026-07-16T02:26:18.618Z",
   "source": "JM1-Core Dataverse + local capability registry",
   "core": {
     "resourceUrl": "https://jm1hq.crm.dynamics.com",
@@ -7,7 +7,7 @@
     "executionLogRowsRead": 250,
     "titleRowsRead": 202,
     "editorialStageRowsRead": 9,
-    "approvalGateRowsRead": 3
+    "approvalGateRowsRead": 4
   },
   "registry": [
     {
@@ -112,10 +112,10 @@
   ],
   "capabilitySignals": {
     "CAP001": 1,
-    "CAP002": 15,
+    "CAP002": 18,
     "CAP007": 8,
     "CAP008": 6,
-    "CAP009": 166,
+    "CAP009": 164,
     "CAP011": 5
   },
   "catalogHealth": {
@@ -129,7 +129,7 @@
       "Editorial": 4
     },
     "blankStageTitles": 34,
-    "stampedCatalogRows": 162
+    "stampedCatalogRows": 160
   },
   "authorActions": {
     "approvalReceived": 1,
@@ -141,7 +141,7 @@
       {
         "cap": "CAP-002",
         "exitState": "Level 1 Proof - Full Volume I Line Editing internally complete; publisher release decision ready",
-        "evidence": "15 Core signal(s); source package/style sheet/intake queue events included if inside read window",
+        "evidence": "18 Core signal(s); source package/style sheet/intake queue events included if inside read window",
         "remainingDependency": "Jackie release decision on the author-facing Line Editing package; after approval, release package through governed author communication without starting Copyediting"
       },
       {
@@ -159,7 +159,7 @@
       {
         "cap": "CAP-009",
         "exitState": "Safe Write Executed - governed app-only credential restored; Establishing Glory: The Library stamped Editorial with Core readback",
-        "evidence": "166 catalog governance signal(s); blank titles 34; approved bibliographic safe-write execution event count 1; reconciliation event count 1",
+        "evidence": "164 catalog governance signal(s); blank titles 34; approved bibliographic safe-write execution event count 1; reconciliation event count 1",
         "remainingDependency": "Broader catalog lineage/alias/identifier writes remain future governed packages only; 34 blank-stage/unknown titles remain excluded until separately approved"
       },
       {
@@ -192,7 +192,7 @@
         "id": "a7713ff3-1e80-f111-ab0f-6045bdd69678",
         "name": "Line Editing - The Intentional Leader, Volume I",
         "status": "Plan Delivered",
-        "modifiedon": "2026-07-16T00:31:48Z"
+        "modifiedon": "2026-07-16T02:25:50Z"
       },
       {
         "id": "8face475-8f80-f111-ab0f-00224820105b",
@@ -244,6 +244,13 @@
       }
     ],
     "approvalGates": [
+      {
+        "id": "b4b734a6-bd80-f111-ab0f-00224820105b",
+        "name": "A3 Line Editing Completion - The Intentional Leader Volume I",
+        "status": "Awaiting Author Response",
+        "decision": "",
+        "modifiedon": "2026-07-16T02:25:48Z"
+      },
       {
         "id": "b1c48e1d-e57d-f111-ab0f-00224820105b",
         "name": "A2 Developmental Review Package - The Intentional Leader, Volume I",
@@ -321,6 +328,24 @@
     }
   ],
   "recentExecutionLogs": [
+    {
+      "id": "81a9d1a5-bd80-f111-ab0f-000d3a14673b",
+      "event": "CAP002_AUTHOR_REVIEW_OPENED",
+      "createdon": "2026-07-16T02:25:50Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "b6b734a6-bd80-f111-ab0f-00224820105b",
+      "event": "CAP002_AUTHOR_RELEASE_APPROVED",
+      "createdon": "2026-07-16T02:25:50Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
+    {
+      "id": "b7b734a6-bd80-f111-ab0f-00224820105b",
+      "event": "CAP002_AUTHOR_PACKAGE_DELIVERED",
+      "createdon": "2026-07-16T02:25:50Z",
+      "sourceRecordId": "a7713ff3-1e80-f111-ab0f-6045bdd69678"
+    },
     {
       "id": "207cc943-b780-f111-ab0f-7c1e525b15c2",
       "event": "CAP010_PRIORITY1_WORKLOAD_REFRESH_COMPLETED",
@@ -452,24 +477,6 @@
       "event": "CAP010_EDITORIAL_THROUGHPUT_REFRESH_COMPLETED",
       "createdon": "2026-07-15T20:56:12Z",
       "sourceRecordId": "wave3-sprint2"
-    },
-    {
-      "id": "8413d39b-8f80-f111-ab0f-00224820105b",
-      "event": "CAP001_INSTANCE_INITIALIZED",
-      "createdon": "2026-07-15T20:56:11Z",
-      "sourceRecordId": "88189235-8f80-f111-ab0f-6045bdd69435"
-    },
-    {
-      "id": "9effa69a-8f80-f111-ab0f-6045bdd69435",
-      "event": "EDITORIAL_REVIEW_COMPLETED",
-      "createdon": "2026-07-15T20:56:11Z",
-      "sourceRecordId": "624a5e5f-4d80-f111-ab0f-6045bdd69738"
-    },
-    {
-      "id": "9c92dd96-8f80-f111-ab0f-6045bdd69738",
-      "event": "LONGWATCH_EDITORIAL_REVIEW_INITIALIZED",
-      "createdon": "2026-07-15T20:56:11Z",
-      "sourceRecordId": "8face475-8f80-f111-ab0f-00224820105b"
     }
   ]
 }
