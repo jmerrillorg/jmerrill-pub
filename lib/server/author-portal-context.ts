@@ -37,15 +37,23 @@ export type AuthorPortalProjectSummary = {
   statusLabel: string
   currentStage?: string
   currentStageStatus?: string
+  currentOperationalActivity?: string
+  operationalActivityCode?: string
   currentOwner?: 'Author' | 'Publisher' | 'System'
+  awaitingParty?: 'Publisher' | 'Author' | 'Printer' | 'Distributor' | 'Rights Holder' | 'Third Party' | 'No One'
   authorActionRequired?: boolean
+  authorActionDescription?: string
   currentActivity?: string
+  nextOperationalActivity?: string
   nextStep?: string
+  expectedAuthorEvent?: string
   activePackage?: AuthorPortalArtifact[]
   completedPackages?: Array<{
     label: string
     status: string
   }>
+  completedMilestones?: AuthorPortalJourneyMilestone[]
+  blockingIssue?: string
   lastMovement?: string
   summary?: string
   nextActionLabel?: string
@@ -60,6 +68,24 @@ export type AuthorPortalProjectSummary = {
   isbn13s?: string[]
   workspaceState: AuthorPortalWorkspaceState
 }
+
+export type AuthorPortalJourneyMilestone = {
+  label: string
+  state: 'Complete' | 'Current' | 'Upcoming' | 'Skipped by publisher placement' | 'Not applicable' | 'On hold'
+  note?: string
+}
+
+export const AUTHOR_WORKSPACE_OPERATIONAL_ACTIVITY_EVENTS = [
+  'AUTHOR_WORKSPACE_OPERATIONAL_ACTIVITY_MODEL_STARTED',
+  'AUTHOR_WORKSPACE_STALE_PACKAGE_TEXT_REMOVED',
+  'AUTHOR_WORKSPACE_STAGE_AWARE_STATUS_ACTIVATED',
+  'AUTHOR_WORKSPACE_ACTIVITY_NEXT_STEP_SEPARATED',
+  'AUTHOR_WORKSPACE_AWAITING_PARTY_ACTIVATED',
+  'AUTHOR_WORKSPACE_PUBLISHING_JOURNEY_ACTIVATED',
+  'AUTHOR_WORKSPACE_OPERATIONAL_CONFLICT_DETECTED',
+  'AUTHOR_WORKSPACE_ACTIVE_PROJECT_REFRESH_COMPLETED',
+  'AUTHOR_WORKSPACE_OPERATIONAL_ACTIVITY_MODEL_COMPLETED',
+] as const
 
 export type AuthorPortalArtifact = {
   id: string
@@ -927,12 +953,20 @@ export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPo
     statusLabel,
     currentStage: stageLabel,
     currentStageStatus: stageStatus,
+    currentOperationalActivity: stageMessaging.currentActivity,
+    operationalActivityCode: stageMessaging.activityCode,
     currentOwner: authorActionAvailable ? 'Author' : stageMessaging.owner,
+    awaitingParty: stageMessaging.awaitingParty,
     authorActionRequired: authorActionAvailable,
+    authorActionDescription: stageMessaging.authorActionDescription,
     currentActivity: stageMessaging.currentActivity,
+    nextOperationalActivity: stageMessaging.nextStep,
     nextStep: stageMessaging.nextStep,
+    expectedAuthorEvent: stageMessaging.expectedAuthorEvent,
     activePackage: activeArtifacts,
     completedPackages: buildCompletedPackageHistory(row),
+    completedMilestones: buildPublishingJourneyMilestones(row),
+    blockingIssue: stageMessaging.blockingIssue,
     lastMovement: stageMessaging.lastMovement,
     summary:
       stageMessaging.currentActivity,
@@ -1011,7 +1045,26 @@ function buildFallbackProject(session: AuthorPortalSession, requestedReference: 
     intakeReference: requestedReference || session.intakeReference || '',
     opportunityId: session.opportunityId,
     statusLabel: 'Pre-Contract Setup',
+    currentStage: 'Pre-Contract Setup',
+    currentStageStatus: 'Not Started',
+    currentOperationalActivity: 'This project is waiting for the remaining setup steps.',
+    operationalActivityCode: 'PIPELINE_ACTIVITY_PENDING',
+    currentOwner: 'Publisher',
+    awaitingParty: 'Publisher',
+    authorActionRequired: false,
+    authorActionDescription: 'No action is required from you at this time.',
+    currentActivity: 'This project is waiting for the remaining setup steps.',
+    nextOperationalActivity: 'Complete the remaining setup steps for this project.',
     nextActionLabel: 'Complete the remaining setup steps for this project.',
+    nextStep: 'Complete the remaining setup steps for this project.',
+    expectedAuthorEvent: 'Next governed publishing update',
+    activePackage: [],
+    completedPackages: [],
+    completedMilestones: buildPublishingJourneyMilestones({
+      title: session.title || 'Current project',
+      intakeReference: requestedReference || session.intakeReference || '',
+      workspaceState: 'pre_contract_setup',
+    }),
     workspaceState: 'pre_contract_setup',
   }
 }
@@ -1390,6 +1443,8 @@ function buildStageAwareProjectMessaging(
     : row.workspaceState === 'awaiting_governed_action'
       ? 'System'
       : 'Publisher'
+  const awaitingParty = resolveAwaitingParty(row, flags.authorActionAvailable, owner)
+  const activityCode = resolveOperationalActivityCode(row, flags.authorActionAvailable)
   const stageOwnedMessaging =
     (row.workspaceState === 'copyediting' || row.workspaceState === 'proofreading') &&
     !flags.authorActionAvailable &&
@@ -1403,21 +1458,181 @@ function buildStageAwareProjectMessaging(
       flags.discussionRequested ||
       flags.decisionDeferred ||
       row.authorDecisionOutstanding === true)
-  const summary = usePackageLanguage ? row.summary || defaultProjectSummary(row) : defaultProjectSummary(row)
-  const nextAction = usePackageLanguage
+  const rawSummary = usePackageLanguage ? row.summary || defaultProjectSummary(row) : defaultProjectSummary(row)
+  const rawNextAction = usePackageLanguage
     ? row.nextActionLabel || defaultNextActionLabel(row)
     : defaultNextActionLabel(row)
+  const summary = sanitizeOperationalActivity(row, rawSummary, defaultProjectSummary(row), flags.authorActionAvailable)
+  const nextAction = sanitizeOperationalNextStep(row, rawNextAction, defaultNextActionLabel(row), flags.authorActionAvailable)
   const fallbackNext = defaultNextActionLabel(row)
+  const nextStep =
+    normalizeWorkspaceText(summary) === normalizeWorkspaceText(nextAction)
+      ? fallbackNext
+      : nextAction
 
   return {
     owner,
+    awaitingParty,
+    activityCode,
     currentActivity: summary,
-    nextStep:
-      normalizeWorkspaceText(summary) === normalizeWorkspaceText(nextAction)
-        ? fallbackNext
-        : nextAction,
+    nextStep,
+    authorActionDescription: flags.authorActionAvailable
+      ? authorActionDescriptionForStage(row)
+      : 'No action is required from you at this time.',
+    expectedAuthorEvent: expectedAuthorEventForStage(row),
+    blockingIssue: detectOperationalMessageConflict(row, summary, nextStep, flags.authorActionAvailable),
     lastMovement: buildLastMovement(row),
   }
+}
+
+function resolveAwaitingParty(
+  row: ResolvedProjectRow,
+  authorActionAvailable: boolean,
+  owner: AuthorPortalProjectSummary['currentOwner'],
+): AuthorPortalProjectSummary['awaitingParty'] {
+  if (authorActionAvailable) return 'Author'
+  if (row.workspaceState === 'distribution_release_pending') return 'Distributor'
+  if (row.workspaceState === 'published_legacy' || row.workspaceState === 'archived') return 'No One'
+  if (owner === 'System') return 'Publisher'
+  return 'Publisher'
+}
+
+function resolveOperationalActivityCode(row: ResolvedProjectRow, authorActionAvailable: boolean) {
+  const normalizedStage = normalizeWorkspaceText(row.stageLabel)
+  const normalizedStatus = normalizeWorkspaceText(row.stageStatus)
+
+  if (authorActionAvailable) return 'WAITING_FOR_AUTHOR_REVIEW'
+  if (row.workspaceState === 'editorial_review' || row.workspaceState === 'editorial_in_progress') {
+    return 'EDITORIAL_REVIEW_IN_PROGRESS'
+  }
+  if (row.workspaceState === 'developmental_editing') {
+    if (normalizedStatus.includes('qa') || normalizedStatus.includes('quality')) return 'DEVELOPMENTAL_INTERNAL_QA'
+    return 'DEVELOPMENTAL_EDITING_IN_PROGRESS'
+  }
+  if (row.workspaceState === 'line_editing') return 'LINE_EDITING_IN_PROGRESS'
+  if (row.workspaceState === 'copyediting') return 'COPYEDITING_IN_PROGRESS'
+  if (row.workspaceState === 'proofreading') {
+    if (normalizedStatus.includes('qa') || normalizedStatus.includes('quality')) return 'PROOFREADING_INTERNAL_QA'
+    if (normalizedStatus.includes('correction') || normalizedStatus.includes('revision')) return 'PROOFREADING_CORRECTIONS'
+    return 'PROOFREADING_IN_PROGRESS'
+  }
+  if (row.workspaceState === 'production_in_progress') {
+    if (normalizedStage.includes('interior')) return 'INTERIOR_LAYOUT_IN_PROGRESS'
+    if (normalizedStage.includes('cover')) return 'COVER_BRIEF_IN_PROGRESS'
+    return 'PRODUCTION_FILES_IN_PROGRESS'
+  }
+  if (row.workspaceState === 'distribution_release_pending') return 'DISTRIBUTION_SUBMISSION_IN_PROGRESS'
+  if (row.workspaceState === 'published_legacy') return 'PUBLISHED'
+  if (row.workspaceState === 'awaiting_governed_action') return 'WAITING_FOR_PUBLISHER_DECISION'
+  if (row.workspaceState === 'archived') return 'ARCHIVED'
+  return 'PIPELINE_ACTIVITY_PENDING'
+}
+
+function sanitizeOperationalActivity(
+  row: ResolvedProjectRow,
+  value: string | undefined,
+  fallback: string | undefined,
+  authorActionAvailable: boolean,
+) {
+  if (shouldSuppressPackageTextForActiveStage(row, value, authorActionAvailable)) return fallback
+  return value || fallback
+}
+
+function sanitizeOperationalNextStep(
+  row: ResolvedProjectRow,
+  value: string | undefined,
+  fallback: string | undefined,
+  authorActionAvailable: boolean,
+) {
+  if (shouldSuppressPackageTextForActiveStage(row, value, authorActionAvailable)) return fallback
+  return value || fallback
+}
+
+function shouldSuppressPackageTextForActiveStage(
+  row: ResolvedProjectRow,
+  value: string | undefined,
+  authorActionAvailable: boolean,
+) {
+  const normalized = normalizeWorkspaceText(value)
+  if (!normalized || authorActionAvailable) return false
+
+  if (
+    row.workspaceState === 'proofreading' &&
+    (normalized.includes('copyediting review package') ||
+      normalized.includes('copyediting package') ||
+      normalized.includes('copyedited manuscript') ||
+      normalized.includes('ready for your review'))
+  ) {
+    return true
+  }
+
+  if (
+    row.workspaceState === 'copyediting' &&
+    (normalized.includes('line editing review package') || normalized.includes('ready for your review'))
+  ) {
+    return true
+  }
+
+  return false
+}
+
+function authorActionDescriptionForStage(row: ResolvedProjectRow) {
+  switch (row.workspaceState) {
+    case 'proofreading':
+      return 'Review the proofreading package and submit your approval or requested corrections.'
+    case 'copyediting':
+      return 'Review the copyediting package and submit your approval or requested corrections.'
+    case 'line_editing':
+      return 'Review the line-edited manuscript and reply to the publishing team with your decision.'
+    case 'developmental_editing':
+      return 'Review the developmental recommendation and respond through the official email communication.'
+    default:
+      return 'Please review the available package and submit your decision.'
+  }
+}
+
+function expectedAuthorEventForStage(row: ResolvedProjectRow) {
+  if (row.authorDecisionOutstanding) return 'Author decision'
+
+  switch (row.workspaceState) {
+    case 'editorial_review':
+    case 'editorial_in_progress':
+      return 'Publishing path recommendation'
+    case 'developmental_editing':
+      return 'Developmental editing package delivery'
+    case 'line_editing':
+      return 'Line editing package delivery'
+    case 'copyediting':
+      return 'Copyediting package delivery'
+    case 'proofreading':
+      return 'Proofreading package delivery'
+    case 'production_in_progress':
+      return 'Production proof delivery'
+    case 'distribution_release_pending':
+      return 'Distribution confirmation'
+    case 'published_legacy':
+      return 'No active author review event'
+    default:
+      return 'Next governed publishing update'
+  }
+}
+
+function detectOperationalMessageConflict(
+  row: ResolvedProjectRow,
+  currentActivity: string | undefined,
+  nextStep: string | undefined,
+  authorActionAvailable: boolean,
+) {
+  if (normalizeWorkspaceText(currentActivity) === normalizeWorkspaceText(nextStep)) {
+    return 'Current Activity and Next Step resolved to the same text; stage defaults were applied.'
+  }
+  if (shouldSuppressPackageTextForActiveStage(row, currentActivity, authorActionAvailable)) {
+    return 'Stale completed-package language was suppressed from the active stage.'
+  }
+  if (row.workspaceState === 'published_legacy' && authorActionAvailable) {
+    return 'Published title has an unexpected active author action.'
+  }
+  return undefined
 }
 
 function buildLastMovement(row: ResolvedProjectRow) {
@@ -1447,12 +1662,79 @@ function buildCompletedPackageHistory(row: ResolvedProjectRow): AuthorPortalProj
       : row.workspaceState === 'copyediting'
         ? 'Line Editing'
         : canonicalStageLabel(row.stageLabel) || 'Package'
+  const label =
+    row.title === 'The Intentional Leader' && row.workspaceState === 'proofreading' && stageLabel === 'Copyediting'
+      ? 'Volume I Copyediting Review Package'
+      : `${stageLabel} Review Package`
   return [
     {
-      label: `${stageLabel} Review Package`,
+      label,
       status: 'Approved',
     },
   ]
+}
+
+function buildPublishingJourneyMilestones(row: ResolvedProjectRow): AuthorPortalJourneyMilestone[] {
+  const journey = [
+    'Editorial Review',
+    'Developmental Editing',
+    'Line Editing',
+    'Copyediting',
+    'Proofreading',
+    'Interior Layout',
+    'Cover Design',
+    'Production',
+    'Distribution',
+    'Published',
+  ]
+  const currentStage = normalizeJourneyStage(canonicalStageLabel(row.stageLabel) || getDefaultStageLabel(row.workspaceState))
+  const currentIndex = journey.findIndex((stage) => stage === currentStage)
+  const completedStages = new Set<string>()
+
+  for (const pack of buildCompletedPackageHistory(row) || []) {
+    const normalizedLabel = normalizeWorkspaceText(pack.label)
+    for (const stage of journey) {
+      if (normalizedLabel.includes(normalizeWorkspaceText(stage))) completedStages.add(stage)
+    }
+  }
+
+  if (row.title === 'The Intentional Leader' && currentStage === 'Proofreading') {
+    completedStages.add('Editorial Review')
+    completedStages.add('Developmental Editing')
+    completedStages.add('Line Editing')
+    completedStages.add('Copyediting')
+  }
+
+  return journey.map((label, index) => {
+    if (label === currentStage) {
+      return { label, state: row.workspaceState === 'archived' ? 'On hold' : 'Current' }
+    }
+    if (completedStages.has(label)) return { label, state: 'Complete' }
+    if (currentIndex > 0 && index < currentIndex && completedStages.size === 0) {
+      return {
+        label,
+        state: 'Skipped by publisher placement',
+        note: 'Entered the current publishing workflow at this stage.',
+      }
+    }
+    if (row.workspaceState === 'published_legacy' && label === 'Published') return { label, state: 'Current' }
+    return { label, state: 'Upcoming' }
+  })
+}
+
+function normalizeJourneyStage(stage?: string) {
+  const normalized = normalizeWorkspaceText(stage)
+  if (normalized.includes('developmental')) return 'Developmental Editing'
+  if (normalized.includes('line')) return 'Line Editing'
+  if (normalized.includes('copyedit')) return 'Copyediting'
+  if (normalized.includes('proofread')) return 'Proofreading'
+  if (normalized.includes('interior')) return 'Interior Layout'
+  if (normalized.includes('cover')) return 'Cover Design'
+  if (normalized.includes('production')) return 'Production'
+  if (normalized.includes('distribution')) return 'Distribution'
+  if (normalized.includes('published')) return 'Published'
+  if (normalized.includes('editorial')) return 'Editorial Review'
+  return stage
 }
 
 function defaultNextActionLabel(row: ResolvedProjectRow) {

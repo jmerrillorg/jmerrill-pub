@@ -12,12 +12,20 @@ const expectations = [
     ok:
       contextSource.includes('currentStage?: string') &&
       contextSource.includes('currentStageStatus?: string') &&
+      contextSource.includes('currentOperationalActivity?: string') &&
+      contextSource.includes('operationalActivityCode?: string') &&
       contextSource.includes("currentOwner?: 'Author' | 'Publisher' | 'System'") &&
+      contextSource.includes("awaitingParty?: 'Publisher' | 'Author' | 'Printer'") &&
       contextSource.includes('authorActionRequired?: boolean') &&
+      contextSource.includes('authorActionDescription?: string') &&
       contextSource.includes('currentActivity?: string') &&
+      contextSource.includes('nextOperationalActivity?: string') &&
       contextSource.includes('nextStep?: string') &&
+      contextSource.includes('expectedAuthorEvent?: string') &&
       contextSource.includes('activePackage?: AuthorPortalArtifact[]') &&
-      contextSource.includes('completedPackages?: Array<'),
+      contextSource.includes('completedPackages?: Array<') &&
+      contextSource.includes('completedMilestones?: AuthorPortalJourneyMilestone[]') &&
+      contextSource.includes('blockingIssue?: string'),
   },
   {
     name: 'Proofreading has a canonical workspace state and public label',
@@ -48,22 +56,42 @@ const expectations = [
     ok:
       contextSource.includes('const activeArtifacts = authorActionAvailable ? row.artifacts : []') &&
       contextSource.includes('completedPackages: buildCompletedPackageHistory(row)') &&
+      contextSource.includes('activePackage: activeArtifacts') &&
       contextSource.includes("row.workspaceState === 'proofreading'") &&
       contextSource.includes("? 'Copyediting'") &&
+      contextSource.includes('Volume I Copyediting Review Package') &&
       workspaceSource.includes('Completed packages') &&
-      workspaceSource.includes('Package components'),
+      workspaceSource.includes('Active package'),
   },
   {
     name: 'author workspace shows no author action for publisher-owned work',
     ok:
-      workspaceSource.includes('selectedProject.authorActionRequired === false') &&
+      workspaceSource.includes('selectedProject.authorActionDescription') &&
       workspaceSource.includes('No action is required from you at this time.'),
   },
   {
     name: 'current activity and next step render from separate fields',
     ok:
-      workspaceSource.includes('selectedProject.currentActivity || selectedProject.summary') &&
-      workspaceSource.includes('selectedProject.nextStep || selectedProject.nextActionLabel'),
+      workspaceSource.includes('selectedProject.currentOperationalActivity || selectedProject.currentActivity || selectedProject.summary') &&
+      workspaceSource.includes('selectedProject.nextOperationalActivity || selectedProject.nextStep || selectedProject.nextActionLabel'),
+  },
+  {
+    name: 'author workspace labels the operational surface as publishing journey',
+    ok:
+      workspaceSource.includes('Your Publishing Journey') &&
+      workspaceSource.includes('Current Stage') &&
+      workspaceSource.includes('Awaiting') &&
+      workspaceSource.includes('Author Action') &&
+      workspaceSource.includes('Publishing journey'),
+  },
+  {
+    name: 'operational read model defines stage-aware conflict prevention',
+    ok:
+      contextSource.includes('sanitizeOperationalActivity') &&
+      contextSource.includes('sanitizeOperationalNextStep') &&
+      contextSource.includes('shouldSuppressPackageTextForActiveStage') &&
+      contextSource.includes('detectOperationalMessageConflict') &&
+      contextSource.includes('Stale completed-package language was suppressed from the active stage.'),
   },
   {
     name: 'Copyediting review package text is no longer a Proofreading default',
