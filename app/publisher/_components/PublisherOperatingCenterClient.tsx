@@ -5,6 +5,7 @@ import { signIn, signOut } from 'next-auth/react'
 
 import { PUBLISHER_OPERATING_CENTER_PROVIDER_ID } from '@/lib/author-durable-auth-shared'
 import type {
+  PublisherAuthorResponseQueueItem,
   PublisherOperatingCenterSnapshot,
   PublisherPortfolioItem,
   PublisherQueueItem,
@@ -79,6 +80,40 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     }
 
     setActionState({ itemKey: `${item.key}:${actionId}`, status: 'complete', message: 'Governed action completed and logged.' })
+    await refresh()
+  }
+
+  async function runAuthorResponseAction(item: PublisherAuthorResponseQueueItem, actionId: string) {
+    setActionState({
+      itemKey: `${item.key}:${actionId}`,
+      status: 'running',
+      message: 'Recording author-response action...',
+    })
+
+    const response = await fetch('/api/publisher/operating-center/actions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: actionId,
+        gateId: item.gateId,
+      }),
+    })
+
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null
+    if (!response.ok) {
+      setActionState({
+        itemKey: `${item.key}:${actionId}`,
+        status: 'error',
+        message: payload?.error || 'The author-response action did not complete.',
+      })
+      return
+    }
+
+    setActionState({
+      itemKey: `${item.key}:${actionId}`,
+      status: 'complete',
+      message: 'Author-response action recorded and logged.',
+    })
     await refresh()
   }
 
@@ -179,6 +214,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
             <div className="mt-5 flex flex-wrap gap-2">
               {[
                 ['#waiting-jackie', 'Publisher Today'],
+                ['#author-responses', 'Author Responses'],
                 ['#active-pipeline', 'Active Pipeline'],
                 ['#production-command', 'Production'],
                 ['#catalog-queue', 'Published Catalog'],
@@ -215,6 +251,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               empty="No author-owned action is waiting right now."
               items={snapshot.today.waitingForAuthors}
             />
+            <AuthorResponsesSection items={snapshot.authorResponses} actionState={actionState} onAction={runAuthorResponseAction} />
             <TodaySection
               id="active-editorial"
               title="Active Editorial"
@@ -677,6 +714,101 @@ function TodaySection({
   )
 }
 
+function AuthorResponsesSection({
+  items,
+  actionState,
+  onAction,
+}: {
+  items: PublisherAuthorResponseQueueItem[]
+  actionState: ActionState
+  onAction: (item: PublisherAuthorResponseQueueItem, actionId: string) => void
+}) {
+  return (
+    <section id="author-responses" className="scroll-mt-6 border border-white/10 bg-white/[0.035] p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Author decision processing</p>
+          <h2 className="mt-2 text-2xl font-semibold">Author Responses</h2>
+        </div>
+        <Badge
+          label={`${items.filter((item) => item.processingStatus !== 'PROCESSED').length} open`}
+          tone={items.some((item) => item.processingStatus === 'STALE — SLA BREACH') ? 'amber' : 'blue'}
+        />
+      </div>
+
+      <div className="mt-5 overflow-x-auto">
+        <table className="min-w-[1280px] w-full border-collapse text-left text-[12px]">
+          <thead className="border-b border-white/10 text-white/42">
+            <tr>
+              <Th>Author / Title</Th>
+              <Th>Stage / Package</Th>
+              <Th>Received</Th>
+              <Th>Decision</Th>
+              <Th>Status</Th>
+              <Th>Age</Th>
+              <Th>Failed Step</Th>
+              <Th>Next Action</Th>
+              <Th>Actions</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.key} className="border-b border-white/10 align-top">
+                <Td>
+                  <span className="block font-semibold text-white">{item.title}</span>
+                  <span className="mt-1 block text-white/40">{item.author}</span>
+                </Td>
+                <Td>{item.stagePackage || 'Package pending'}</Td>
+                <Td>{formatDateTime(item.responseReceived)}</Td>
+                <Td>{item.classifiedDecision}</Td>
+                <Td>{item.processingStatus}</Td>
+                <Td>{formatResponseAge(item.ageMinutes)}</Td>
+                <Td>{item.failedStep}</Td>
+                <Td>{item.nextAction}</Td>
+                <Td>
+                  <div className="flex flex-wrap gap-2">
+                    {item.allowedActions.map((action) => (
+                      <button
+                        type="button"
+                        key={action.id}
+                        disabled={actionState.status === 'running'}
+                        onClick={() => onAction(item, action.id)}
+                        className="rounded-full border border-blue-300/25 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-blue-100"
+                      >
+                        {action.label}
+                      </button>
+                    ))}
+                  </div>
+                  {actionState.itemKey.startsWith(`${item.key}:`) && (
+                    <p
+                      className={`mt-2 text-[11px] ${
+                        actionState.status === 'error'
+                          ? 'text-rose-200'
+                          : actionState.status === 'complete'
+                            ? 'text-emerald-200'
+                            : 'text-white/45'
+                      }`}
+                    >
+                      {actionState.message}
+                    </p>
+                  )}
+                </Td>
+              </tr>
+            ))}
+            {items.length === 0 && (
+              <tr>
+                <td className="px-3 py-5 text-white/45" colSpan={9}>
+                  No author responses were returned from active or recently active review gates.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )
+}
+
 function TodayCard({ item }: { item: PublisherTodayItem }) {
   return (
     <article className="border border-white/10 bg-black/15 p-4">
@@ -727,6 +859,13 @@ function TodayCard({ item }: { item: PublisherTodayItem }) {
       )}
     </article>
   )
+}
+
+function formatResponseAge(minutes: number) {
+  if (minutes < 60) return `${minutes}m`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 48) return `${hours}h`
+  return `${Math.floor(hours / 24)}d`
 }
 
 function PortfolioRow({ item }: { item: PublisherPortfolioItem }) {

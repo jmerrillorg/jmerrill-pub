@@ -9,6 +9,7 @@ const combined = `${server}\n${client}`
 const requiredSections = [
   'Waiting for Jackie',
   'Waiting for Authors',
+  'Author Responses',
   'Active Editorial',
   'Production Queue',
   'Distribution and Catalog Queue',
@@ -23,6 +24,7 @@ const expectations = [
     name: 'publisher snapshot exposes Publisher Today data contract',
     ok:
       server.includes('export type PublisherTodaySnapshot') &&
+      server.includes('export type PublisherAuthorResponseQueueItem') &&
       server.includes('generatedAt') &&
       server.includes('publisherIdentity') &&
       server.includes('waitingForJackie: PublisherTodayItem[]') &&
@@ -48,6 +50,16 @@ const expectations = [
       requiredSections.every((section) => client.includes(section)) &&
       client.indexOf('What needs attention today?') < client.indexOf('Catalog Portfolio') &&
       client.includes('TodaySection'),
+  },
+  {
+    name: 'author responses queue exposes SLA and recovery controls',
+    ok:
+      server.includes('buildAuthorResponseQueue') &&
+      server.includes('STALE — SLA BREACH') &&
+      server.includes('authorResponseToTodayItem') &&
+      client.includes('AuthorResponsesSection') &&
+      server.includes('Reconcile Response') &&
+      server.includes('Retry Failed Transition'),
   },
   {
     name: 'catalog queue remains exception-oriented rather than dumping all published titles into daily work',
