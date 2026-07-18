@@ -35,6 +35,18 @@ export type AuthorPortalProjectSummary = {
   titleId?: string
   publishingAssetId?: string
   statusLabel: string
+  currentStage?: string
+  currentStageStatus?: string
+  currentOwner?: 'Author' | 'Publisher' | 'System'
+  authorActionRequired?: boolean
+  currentActivity?: string
+  nextStep?: string
+  activePackage?: AuthorPortalArtifact[]
+  completedPackages?: Array<{
+    label: string
+    status: string
+  }>
+  lastMovement?: string
   summary?: string
   nextActionLabel?: string
   pendingApprovalLabel?: string
@@ -849,6 +861,8 @@ async function buildProjectSummaries(
 export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPortalProjectSummary {
   const statusLabel =
     buildWorkspaceStatusLabel(row)
+  const stageLabel = canonicalStageLabel(row.stageLabel) || getDefaultStageLabel(row.workspaceState)
+  const stageStatus = canonicalStageStatus(row.stageStatus, row)
   const authorActionAvailable = row.authorActionAvailable === true
   const authorDecisionOutstanding = row.authorDecisionOutstanding === true
   const normalizedAuthorDecision = normalizeWorkspaceText(row.authorDecision)
@@ -889,6 +903,15 @@ export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPo
     (normalizedAuthorDecision === 'take more time before making this decision' ||
       normalizedAuthorDecision === 'decision deferred' ||
       normalizedAuthorDecision === 'defer')
+  const stageMessaging = buildStageAwareProjectMessaging(row, {
+    authorActionAvailable,
+    livePublisherProgressVisible,
+    responseReceivedAwaitingPublisherProcessing,
+    changesRequested,
+    discussionRequested,
+    decisionDeferred,
+  })
+  const activeArtifacts = authorActionAvailable ? row.artifacts : []
 
   return {
     key:
@@ -902,33 +925,25 @@ export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPo
     titleId: row.titleId,
     publishingAssetId: row.publishingAssetId,
     statusLabel,
+    currentStage: stageLabel,
+    currentStageStatus: stageStatus,
+    currentOwner: authorActionAvailable ? 'Author' : stageMessaging.owner,
+    authorActionRequired: authorActionAvailable,
+    currentActivity: stageMessaging.currentActivity,
+    nextStep: stageMessaging.nextStep,
+    activePackage: activeArtifacts,
+    completedPackages: buildCompletedPackageHistory(row),
+    lastMovement: stageMessaging.lastMovement,
     summary:
-      authorActionAvailable
-        ? row.summary || defaultProjectSummary(row)
-        : livePublisherProgressVisible || responseReceivedAwaitingPublisherProcessing
-          ? row.summary || defaultProjectSummary(row)
-          : changesRequested || discussionRequested || decisionDeferred
-            ? row.summary || defaultProjectSummary(row)
-            : authorDecisionOutstanding
-              ? row.summary || defaultProjectSummary(row)
-              : defaultProjectSummary(row),
+      stageMessaging.currentActivity,
     contractStatusInternal: row.contractStatusInternal,
     nextActionLabel:
-      (authorActionAvailable ||
-      livePublisherProgressVisible ||
-      responseReceivedAwaitingPublisherProcessing ||
-      changesRequested ||
-      discussionRequested ||
-      decisionDeferred ||
-      !authorDecisionOutstanding
-        ? row.nextActionLabel
-        : undefined) ||
-      defaultNextActionLabel(row),
+      stageMessaging.nextStep,
     pendingApprovalLabel:
       authorActionAvailable && row.pendingApprovalLabel && row.pendingApprovalLabel !== 'Not Ready'
         ? row.pendingApprovalLabel
         : undefined,
-    artifacts: row.artifacts,
+    artifacts: activeArtifacts,
     portfolioState: row.portfolioState,
     portfolioLabel: row.portfolioLabel,
     catalogStatus: row.catalogStatus,
@@ -1203,6 +1218,8 @@ function isEditorialWorkspaceState(state: AuthorPortalProjectSummary['workspaceS
     state === 'editorial_review' ||
     state === 'developmental_editing' ||
     state === 'line_editing' ||
+    state === 'copyediting' ||
+    state === 'proofreading' ||
     state === 'editorial_in_progress' ||
     state === 'production_in_progress' ||
     state === 'distribution_release_pending'
@@ -1263,6 +1280,12 @@ export function inferWorkspaceState({
   if (normalizedStageLabel.includes('developmental')) {
     return 'developmental_editing'
   }
+  if (normalizedStageLabel.includes('copyedit')) {
+    return 'copyediting'
+  }
+  if (normalizedStageLabel.includes('proofread')) {
+    return 'proofreading'
+  }
   if (normalizedStageLabel.includes('line')) {
     return 'line_editing'
   }
@@ -1292,6 +1315,10 @@ function buildWorkspaceStatusLabel(row: ResolvedProjectRow) {
       return `${stageLabel || 'Line Editing'} - ${
         row.authorDecisionOutstanding ? 'Author Review' : row.stageStatus || 'In Progress'
       }`
+    case 'copyediting':
+      return `${stageLabel || 'Copyediting'} — ${row.authorDecisionOutstanding ? 'Author Review' : row.stageStatus || 'In Progress'}`
+    case 'proofreading':
+      return `${stageLabel || 'Proofreading'} — ${row.authorDecisionOutstanding ? 'Author Review' : row.stageStatus || 'In Progress'}`
     case 'editorial_in_progress':
       return `${stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
     case 'production_in_progress':
@@ -1311,8 +1338,121 @@ function canonicalStageLabel(value?: string) {
   const normalized = normalizeWorkspaceText(value)
   if (normalized === 'developmental') return 'Developmental Editing'
   if (normalized === 'line') return 'Line Editing'
+  if (normalized === 'copyedit' || normalized === 'copyediting') return 'Copyediting'
+  if (normalized === 'proofread' || normalized === 'proofreading') return 'Proofreading'
   if (normalized === 'review') return 'Editorial Review'
   return value?.trim() || ''
+}
+
+function canonicalStageStatus(value: string | undefined, row: ResolvedProjectRow) {
+  if (row.authorDecisionOutstanding) return 'Author Review'
+  const normalized = normalizeWorkspaceText(value)
+  if (!normalized) return 'Not Started'
+  if (normalized === 'active') return 'In Progress'
+  return value?.trim() || 'Not Started'
+}
+
+function getDefaultStageLabel(state: AuthorPortalWorkspaceState) {
+  switch (state) {
+    case 'developmental_editing':
+      return 'Developmental Editing'
+    case 'line_editing':
+      return 'Line Editing'
+    case 'copyediting':
+      return 'Copyediting'
+    case 'proofreading':
+      return 'Proofreading'
+    case 'editorial_review':
+    case 'editorial_in_progress':
+      return 'Editorial Review'
+    case 'production_in_progress':
+      return 'Production'
+    case 'distribution_release_pending':
+      return 'Distribution'
+    default:
+      return undefined
+  }
+}
+
+function buildStageAwareProjectMessaging(
+  row: ResolvedProjectRow,
+  flags: {
+    authorActionAvailable: boolean
+    livePublisherProgressVisible: boolean
+    responseReceivedAwaitingPublisherProcessing: boolean
+    changesRequested: boolean
+    discussionRequested: boolean
+    decisionDeferred: boolean
+  },
+) {
+  const owner: AuthorPortalProjectSummary['currentOwner'] = flags.authorActionAvailable
+    ? 'Author'
+    : row.workspaceState === 'awaiting_governed_action'
+      ? 'System'
+      : 'Publisher'
+  const stageOwnedMessaging =
+    (row.workspaceState === 'copyediting' || row.workspaceState === 'proofreading') &&
+    !flags.authorActionAvailable &&
+    row.authorDecisionOutstanding !== true
+  const usePackageLanguage =
+    !stageOwnedMessaging &&
+    (flags.authorActionAvailable ||
+      flags.livePublisherProgressVisible ||
+      flags.responseReceivedAwaitingPublisherProcessing ||
+      flags.changesRequested ||
+      flags.discussionRequested ||
+      flags.decisionDeferred ||
+      row.authorDecisionOutstanding === true)
+  const summary = usePackageLanguage ? row.summary || defaultProjectSummary(row) : defaultProjectSummary(row)
+  const nextAction = usePackageLanguage
+    ? row.nextActionLabel || defaultNextActionLabel(row)
+    : defaultNextActionLabel(row)
+  const fallbackNext = defaultNextActionLabel(row)
+
+  return {
+    owner,
+    currentActivity: summary,
+    nextStep:
+      normalizeWorkspaceText(summary) === normalizeWorkspaceText(nextAction)
+        ? fallbackNext
+        : nextAction,
+    lastMovement: buildLastMovement(row),
+  }
+}
+
+function buildLastMovement(row: ResolvedProjectRow) {
+  if (row.authorDecisionOutstanding) return 'Author review package released.'
+  if (row.authorDecision) return `Author decision recorded: ${row.authorDecision}.`
+  if (row.stageStatus) return `${canonicalStageLabel(row.stageLabel) || 'Project'} ${row.stageStatus}.`
+  return 'Project linked to author relationship.'
+}
+
+function buildCompletedPackageHistory(row: ResolvedProjectRow): AuthorPortalProjectSummary['completedPackages'] {
+  const normalizedAuthorDecision = normalizeWorkspaceText(row.authorDecision)
+  const normalizedGateStatus = normalizeWorkspaceText(row.gateStatus)
+  const releasedForAuthor = row.releasedArtifactExists === true && row.releasePublished === true
+
+  if (
+    !releasedForAuthor ||
+    row.authorActionAvailable ||
+    row.authorDecisionOutstanding ||
+    (normalizedGateStatus !== 'approved' && normalizedAuthorDecision !== 'approve')
+  ) {
+    return []
+  }
+
+  const stageLabel =
+    row.workspaceState === 'proofreading'
+      ? 'Copyediting'
+      : row.workspaceState === 'copyediting'
+        ? 'Line Editing'
+        : canonicalStageLabel(row.stageLabel) || 'Package'
+  return [
+    {
+      label: `${stageLabel} Review Package`,
+      status: 'Approved',
+    },
+  ]
 }
 
 function defaultNextActionLabel(row: ResolvedProjectRow) {
@@ -1365,6 +1505,29 @@ function defaultNextActionLabel(row: ResolvedProjectRow) {
       return row.authorDecisionOutstanding
         ? 'Please review the line-edited manuscript and reply to the publishing team with your approval, bounded corrections, a discussion request, or a pause request.'
         : 'No action is required from you at this time. Copyediting will not begin until the Line Editing approval gate is complete.'
+    case 'copyediting':
+      return row.authorDecisionOutstanding
+        ? 'Review the package and submit your approval or requested corrections.'
+        : 'No action is required from you at this time. We will update you when the next publishing step is ready.'
+    case 'proofreading':
+      if (normalizeWorkspaceText(row.stageStatus).includes('author review') || row.authorDecisionOutstanding) {
+        return 'Review the package and submit your approval or requested corrections.'
+      }
+      if (
+        normalizeWorkspaceText(row.stageStatus).includes('qa') ||
+        normalizeWorkspaceText(row.stageStatus).includes('quality')
+      ) {
+        return 'Your proofreading package will be released after the quality review is complete.'
+      }
+      if (
+        normalizeWorkspaceText(row.stageStatus).includes('correction') ||
+        normalizeWorkspaceText(row.stageStatus).includes('revision')
+      ) {
+        return 'We will confirm the corrected manuscript and prepare it for production.'
+      }
+      return row.title === 'The Intentional Leader'
+        ? 'We will complete internal quality review and send your proofreading package when it is ready for your review.'
+        : 'After internal quality review, your proofreading package will be sent to you for review.'
     case 'awaiting_governed_action':
       return 'This project is linked to your author relationship and is waiting for the next governed action.'
     case 'published_legacy':
@@ -1424,6 +1587,29 @@ function defaultProjectSummary(row: ResolvedProjectRow) {
       return row.authorDecisionOutstanding
         ? 'Your Volume I line editing review package for The Intentional Leader has been sent by email and is ready for your review.'
         : 'Line Editing remains active. Copyediting will not begin until the author approval gate is complete.'
+    case 'copyediting':
+      return row.authorDecisionOutstanding
+        ? 'Your copyediting package is ready for your review.'
+        : 'The publishing team is copyediting your approved manuscript.'
+    case 'proofreading':
+      if (normalizeWorkspaceText(row.stageStatus).includes('author review') || row.authorDecisionOutstanding) {
+        return 'Your proofreading package is ready for your review.'
+      }
+      if (
+        normalizeWorkspaceText(row.stageStatus).includes('qa') ||
+        normalizeWorkspaceText(row.stageStatus).includes('quality')
+      ) {
+        return 'The publishing team is completing the internal quality review of your proofread manuscript.'
+      }
+      if (
+        normalizeWorkspaceText(row.stageStatus).includes('correction') ||
+        normalizeWorkspaceText(row.stageStatus).includes('revision')
+      ) {
+        return 'The publishing team is applying the approved proofreading corrections.'
+      }
+      return row.title === 'The Intentional Leader'
+        ? 'The publishing team is proofreading your approved Volume I manuscript.'
+        : 'The publishing team is proofreading your approved manuscript.'
     default:
       return row.summary
   }

@@ -224,6 +224,8 @@ export function buildPortalTaskState({
     | 'editorial_review'
     | 'developmental_editing'
     | 'line_editing'
+    | 'copyediting'
+    | 'proofreading'
     | 'editorial_in_progress'
     | 'production_in_progress'
     | 'distribution_release_pending'
