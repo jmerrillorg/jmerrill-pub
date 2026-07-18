@@ -315,6 +315,17 @@ export type PublisherRoyaltyDecisionCard = {
   }>
 }
 
+export type PublisherRoyaltyMonthlyCloseItem = {
+  month: string
+  status: string
+  waitingFor: string[]
+  sources: Array<{
+    label: string
+    state: string
+    detail: string
+  }>
+}
+
 export type PublisherRoyaltyReviewQueue = {
   manifestRows: number
   loadedRows: number
@@ -326,6 +337,17 @@ export type PublisherRoyaltyReviewQueue = {
   draftStatements: number
   decisionPackagePath: string
   decisionCards: PublisherRoyaltyDecisionCard[]
+  monthlyClose: {
+    latestAcxMonthAvailable: string
+    spreadsheetStatus: string
+    automation: {
+      ingram: string
+      kdp: string
+      acx: string
+      directSales: string
+    }
+    months: PublisherRoyaltyMonthlyCloseItem[]
+  }
 }
 
 export type PublisherOperatingCenterSnapshot = {
@@ -2532,6 +2554,7 @@ function readRoyaltyReviewQueue(): PublisherRoyaltyReviewQueue {
   const paymentRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Payment-Final-Classification.csv')
   const statementRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Draft-Statement-Set.csv')
   const decisionCards = readRoyaltyDecisionCards()
+  const monthlyClose = readRoyaltyMonthlyClose()
   return {
     manifestRows: manifestRows.length,
     loadedRows: manifestRows.filter((row) => row.finalStatus === 'LOADED — DRAFT STATEMENT').length,
@@ -2543,6 +2566,42 @@ function readRoyaltyReviewQueue(): PublisherRoyaltyReviewQueue {
     draftStatements: statementRows.length,
     decisionPackagePath: 'docs/operations/generated/2026-07-17-JM1-2026-Royalty-Jackie-Decision-Package.csv',
     decisionCards,
+    monthlyClose,
+  }
+}
+
+function readRoyaltyMonthlyClose(): PublisherRoyaltyReviewQueue['monthlyClose'] {
+  try {
+    const raw = readFileSync(
+      join(process.cwd(), 'docs/operations/generated', '2026-07-18-JM1-2026-Royalty-Monthly-Close.json'),
+      'utf8',
+    )
+    const parsed = JSON.parse(raw) as PublisherRoyaltyReviewQueue['monthlyClose'] & {
+      months?: PublisherRoyaltyMonthlyCloseItem[]
+    }
+    return {
+      latestAcxMonthAvailable: stringValue(parsed.latestAcxMonthAvailable),
+      spreadsheetStatus: stringValue(parsed.spreadsheetStatus),
+      automation: {
+        ingram: stringValue(parsed.automation?.ingram),
+        kdp: stringValue(parsed.automation?.kdp),
+        acx: stringValue(parsed.automation?.acx),
+        directSales: stringValue(parsed.automation?.directSales),
+      },
+      months: Array.isArray(parsed.months) ? parsed.months : [],
+    }
+  } catch {
+    return {
+      latestAcxMonthAvailable: '',
+      spreadsheetStatus: '',
+      automation: {
+        ingram: '',
+        kdp: '',
+        acx: '',
+        directSales: '',
+      },
+      months: [],
+    }
   }
 }
 

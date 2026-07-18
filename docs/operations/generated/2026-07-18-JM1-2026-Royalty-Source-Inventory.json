@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-07-18T10:12:00-04:00",
+  "site": "https://jmerrillfoundation.sharepoint.com/sites/publishing",
+  "root": "04_Financials/2026",
+  "hashNote": "SharePoint connector exposed quickXorHash for file inventory. SHA-256 must be calculated during raw-file import/download before calculation rows are loaded.",
+  "months": [
+    {
+      "month": "January",
+      "folder": "04_Financials/2026/01",
+      "status": "Source Present — File Import Pending",
+      "files": [
+        {"name":"Electronic Share & Sell Ecommerce Report for 9118734 (US-USD).xls","source":"Direct / Share & Sell","reportType":"Ecommerce","account":"9118734","currency":"USD","size":799,"quickXorHash":"chATFIDnrZbO3POJRmebIDHYFwM=","classification":"READY TO IMPORT"},
+        {"name":"Ingram eBook Agency Comp Report for 6116305 (USD).xls","source":"Ingram","reportType":"eBook Agency","account":"6116305","currency":"USD","size":1745,"quickXorHash":"fXQyqsfTVAZ6THUqcQwge+4gV+o=","classification":"READY TO IMPORT"},
+        {"name":"Ingram eBook Wholesale Comp Report for 6116305 (USD).xls","source":"Ingram","reportType":"eBook Wholesale","account":"6116305","currency":"USD","size":7012,"quickXorHash":"ipHChheKbMwHEI3MFmfkxZnSXWE=","classification":"READY TO IMPORT"},
+        {"name":"KDP_Prior_Month_Royalties-2026-01-01-271390fc-d862-4ad9-9ffe-81bec00a5463.xlsx","source":"KDP","reportType":"Prior Months Royalties","account":"","currency":"","size":17741,"quickXorHash":"yMyXH6v3n3N/z2M9FldBOJPlB4Q=","classification":"READY TO IMPORT"},
+        {"name":"LSI Global Connect Sales Compensation Report for 9118734 (USD).xls","source":"Lightning Source / Ingram","reportType":"Global Connect Sales","account":"9118734","currency":"USD","size":5289,"quickXorHash":"L67EC8tTIWv26MvB306s0mO49Bg=","classification":"READY TO IMPORT"},
+        {"name":"LSI POD Wholesale Comp Report for 9118734 (UK-GBP).xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale UK","account":"9118734","currency":"GBP","size":4345,"quickXorHash":"K0eGzmizulrtFKoQUtWW/0KAA0c=","classification":"READY TO IMPORT"},
+        {"name":"LSI POD Wholesale Comp Report for 9118734 (US-USD).xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale US","account":"9118734","currency":"USD","size":25751,"quickXorHash":"9mUaoLeUifRt+GrLS12L4nGanps=","classification":"SOURCE UPDATED"},
+        {"name":"LSI POD Wholesale Comp Report for 9118734 (US-USD)-B.xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale US","account":"9118734","currency":"USD","size":27318,"quickXorHash":"sqixzzPBeMOmUWemQzW60weoG78=","classification":"DUPLICATE_OR_ALTERNATE_VERSION"},
+        {"name":"Royalty_ACCT_Jackie_Smith_Jr_67095_ACX_MONTHLY_Jan_2026 (1).xlsx","source":"ACX","reportType":"Monthly Earnings Statement","account":"67095","currency":"","size":56067,"quickXorHash":"43gFxx0smSeoHsF4R0Iq5lFhHDE=","classification":"READY TO IMPORT"}
+      ]
+    },
+    {
+      "month": "February",
+      "folder": "04_Financials/2026/02",
+      "status": "Source Present — File Import Pending",
+      "files": [
+        {"name":"Ingram eBook Wholesale Comp Report for 6116305 (USD).xls","source":"Ingram","reportType":"eBook Wholesale","account":"6116305","currency":"USD","size":41008,"quickXorHash":"VayRxqukJ4mQnlq8W5twq9Ax9XU=","classification":"READY TO IMPORT"},
+        {"name":"KDP_Prior_Month_Royalties-2026-02-01-1266bad0-2b77-4dbb-944d-5e140b4a719f.xlsx","source":"KDP","reportType":"Prior Months Royalties","account":"","currency":"","size":17178,"quickXorHash":"WXZGM00PxzWnihZwoOZRBGC0mWQ=","classification":"READY TO IMPORT"},
+        {"name":"LSI POD Wholesale Comp Report for 9118734 (UK-GBP).xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale UK","account":"9118734","currency":"GBP","size":2051,"quickXorHash":"3qZLuWyJxPhWX6P2zQuvCzYx1gc=","classification":"READY TO IMPORT"},
+        {"name":"LSI POD Wholesale Comp Report for 9118734 (US-USD).xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale US","account":"9118734","currency":"USD","size":5744,"quickXorHash":"fg+8wD3NecmJG79bCd6zwbltdRc=","classification":"READY TO IMPORT"},
+        {"name":"Royalty_ACCT_Jackie_Smith_Jr_67095_ACX_MONTHLY_Feb_2026 (1).xlsx","source":"ACX","reportType":"Monthly Earnings Statement","account":"67095","currency":"","size":56252,"quickXorHash":"gclxjJF+sbdUbSmIaAwTBMK1Ymo=","classification":"READY TO IMPORT"}
+      ]
+    },
+    {
+      "month": "March",
+      "folder": "04_Financials/2026/03",
+      "status": "Source Present — File Import Pending",
+      "files": [
+        {"name":"Ingram eBook Agency Comp Report for 6116305 (USD).xls","source":"Ingram","reportType":"eBook Agency","account":"6116305","currency":"USD","size":2301,"quickXorHash":"KIZsbNm0S+jMyCPQevVG0zPzIus=","classification":"READY TO IMPORT"},
+        {"name":"Ingram eBook Wholesale Comp Report for 6116305 (USD).xls","source":"Ingram","reportType":"eBook Wholesale","account":"6116305","currency":"USD","size":4079,"quickXorHash":"gRfOQ2R3CHBFSeVbi3LK3BbYpFA=","classification":"READY TO IMPORT"},
+        {"name":"KDP_Prior_Month_Royalties-2026-03-01-77622d9e-e6f8-4455-859b-e7698c501e84.xlsx","source":"KDP","reportType":"Prior Months Royalties","account":"","currency":"","size":17155,"quickXorHash":"k64puaoStSfGwVIA90PmVBwcgkc=","classification":"READY TO IMPORT"},
+        {"name":"LSI POD Wholesale Comp Report for 9118734 (US-USD).xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale US","account":"9118734","currency":"USD","size":7692,"quickXorHash":"1AjNlv89dkxtLL6oA1xsMb6YlJI=","classification":"READY TO IMPORT"},
+        {"name":"Royalty_ACCT_Jackie_Smith_Jr_67095_ACX_MONTHLY_Mar_2026 (1).xlsx","source":"ACX","reportType":"Monthly Earnings Statement","account":"67095","currency":"","size":56224,"quickXorHash":"rAfO0GrMrco3wadyYey3jxIVULI=","classification":"READY TO_IMPORT"}
+      ]
+    },
+    {
+      "month": "April",
+      "folder": "04_Financials/2026/04",
+      "status": "Statement Evidence Imported — Source File Provenance Pending",
+      "files": [
+        {"name":"Ingram eBook Wholesale Comp Report for 6116305 (USD).xls","source":"Ingram","reportType":"eBook Wholesale","account":"6116305","currency":"USD","size":2325,"quickXorHash":"eLSTzHlNE66q/9wVPzjXSKfgdIo=","classification":"READY TO IMPORT"},
+        {"name":"KDP_Prior_Month_Royalties-2026-04-01-0e7c5c8c-45ac-4425-abc3-ca57ab9db1c8.xlsx","source":"KDP","reportType":"Prior Months Royalties","account":"","currency":"","size":17664,"quickXorHash":"Nflar3lwGV89UXfk4bPaee3g0ks=","classification":"READY TO IMPORT"},
+        {"name":"Lightning Source AR Invoice for (6116305) - (J Merrill Publishing, Inc.)","source":"Lightning Source / Ingram","reportType":"AR Invoice Evidence","account":"6116305","currency":"","size":2182,"quickXorHash":"A+RYV5zun/Y21KEa7ng9tMhI3hE=","classification":"EVIDENCE_ONLY"},
+        {"name":"LSI POD Wholesale Comp Report for 9118734 (US-USD).xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale US","account":"9118734","currency":"USD","size":10815,"quickXorHash":"yyWvCWZCivlDJ/+kRi2tQJJk848=","classification":"READY TO IMPORT"},
+        {"name":"Royalty_ACCT_Jackie_Smith_Jr_67095_ACX_MONTHLY_Apr_2026 (1).xlsx","source":"ACX","reportType":"Monthly Earnings Statement","account":"67095","currency":"","size":56152,"quickXorHash":"xdIW1zYAuMrCGBjAOrEY4CpePwo=","classification":"READY TO IMPORT"}
+      ]
+    },
+    {
+      "month": "May",
+      "folder": "04_Financials/2026/05",
+      "status": "Statement Evidence Imported — ACX Missing or Not Yet Available",
+      "files": [
+        {"name":"Ingram eBook Wholesale Comp Report for 6116305 (USD).xls","source":"Ingram","reportType":"eBook Wholesale","account":"6116305","currency":"USD","size":4694,"quickXorHash":"zWqsSo2a7sCGDhsVJlIydYLcXmI=","classification":"READY TO IMPORT"},
+        {"name":"KDP_Prior_Month_Royalties-2026-05-01-73435e9f-7aa8-467e-99c1-dd2a11b67b09.xlsx","source":"KDP","reportType":"Prior Months Royalties","account":"","currency":"","size":17155,"quickXorHash":"9Lg59vWzUTlHkKu94YQTpwFbR5g=","classification":"READY TO IMPORT"},
+        {"name":"LSI Global Connect Sales Compensation Report for 6116305 (USD).xls","source":"Lightning Source / Ingram","reportType":"Global Connect Sales","account":"6116305","currency":"USD","size":2065,"quickXorHash":"SI//RmMx9jUtJr3UsKj2xsQ4Ubc=","classification":"READY TO IMPORT"},
+        {"name":"LSI Global Connect Sales Compensation Report for 9118734 (USD).xls","source":"Lightning Source / Ingram","reportType":"Global Connect Sales","account":"9118734","currency":"USD","size":2572,"quickXorHash":"7oCWFYvkg4OUz4m1w5vHUJ2sVkM=","classification":"READY TO IMPORT"},
+        {"name":"LSI POD Wholesale Comp Report for 6116305 (US-USD).xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale US","account":"6116305","currency":"USD","size":2678,"quickXorHash":"Otvqj/+XznoceqinWe82KdIqQ1g=","classification":"READY TO IMPORT"},
+        {"name":"LSI POD Wholesale Comp Report for 9118734 (US-USD).xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale US","account":"9118734","currency":"USD","size":15212,"quickXorHash":"Jo4rVlwyHLgNxyAQmMqBg26/3qg=","classification":"READY TO IMPORT"}
+      ]
+    },
+    {
+      "month": "June",
+      "folder": "04_Financials/2026/06",
+      "status": "Waiting on Sources",
+      "files": [
+        {"name":"Ingram eBook Agency Comp Report for 6116305 (USD).xls","source":"Ingram","reportType":"eBook Agency","account":"6116305","currency":"USD","size":2830,"quickXorHash":"QaFz5hrNoZsKqlBZwSNTYSSO//w=","classification":"READY TO IMPORT"},
+        {"name":"Ingram eBook Wholesale Comp Report for 6116305 (USD).xls","source":"Ingram","reportType":"eBook Wholesale","account":"6116305","currency":"USD","size":4706,"quickXorHash":"O1EsF3nEoAW3nCgRwFzExgo8obU=","classification":"READY TO IMPORT"},
+        {"name":"LSI Global Connect Sales Compensation Report for 9118734 (USD).xls","source":"Lightning Source / Ingram","reportType":"Global Connect Sales","account":"9118734","currency":"USD","size":3605,"quickXorHash":"YLx1YoRc4c08mquNleJ9mNwzoUA=","classification":"READY TO IMPORT"},
+        {"name":"LSI POD Wholesale Comp Report for 6116305 (US-USD).xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale US","account":"6116305","currency":"USD","size":3273,"quickXorHash":"ZcQ6QUhOgYPrsWDvevGnxSfs9qM=","classification":"READY TO IMPORT"},
+        {"name":"LSI POD Wholesale Comp Report for 9118734 (US-USD).xls","source":"Lightning Source / Ingram","reportType":"POD Wholesale US","account":"9118734","currency":"USD","size":30115,"quickXorHash":"+HykMsyEO+wo6uidVOyN7OWgZzM=","classification":"READY TO IMPORT"}
+      ],
+      "missingSources": ["KDP Prior Months Royalties", "ACX monthly statement if published", "Direct Sales payment/source evidence"]
+    }
+  ],
+  "rootFiles": [
+    {"name":"JM_Publishing_Royalty_Reports_April_May_2026.xlsx","source":"Publisher workbook","classification":"ALREADY USED AS APRIL/MAY STATEMENT EVIDENCE"},
+    {"name":"MONTHLY REPORTING 2026(1).xlsx","source":"Historical spreadsheet","classification":"RETIRED_REFERENCE_ONLY"}
+  ]
+}
