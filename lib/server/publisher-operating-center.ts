@@ -288,6 +288,8 @@ export type PublisherProductionReadinessItem = {
   sourceFiles: string
   rightsEvidence: string
   sharePointParent: string
+  productionProjectId?: string
+  productionTaskId?: string
   allowedInteriorActions: Array<{
     id: PublisherActionId
     label: string
@@ -449,7 +451,8 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     }
   }
 
-  const [intakes, titles, assets, editorialStages, approvalGates, opportunities, logs] = await Promise.all([
+  const [intakes, titles, assets, editorialStages, approvalGates, opportunities, logs, productionProjects, productionTasks] =
+    await Promise.all([
     getRecentIntakes(config),
     getRecentTitles(config),
     getRecentAssets(config),
@@ -457,6 +460,8 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     getRecentApprovalGates(config),
     getRecentOpportunities(config),
     getRecentExecutionLogs(config),
+    getRecentProductionProjects(config),
+    getRecentProductionTasks(config),
   ])
 
   const queue = intakes
@@ -472,7 +477,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     .slice(0, 2)
   const portfolio = buildPortfolioItems(titles, assets, editorialStages)
   const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, logs, portfolio)
-  const productionCommand = buildProductionCommand(workload, portfolio)
+  const productionCommand = buildProductionCommand(workload, portfolio, productionProjects, productionTasks)
   const authorResponses = buildAuthorResponseQueue(approvalGates, editorialStages, titles, logs)
   const metrics = buildMetrics(queue, logs, workload, portfolio)
   const today = buildPublisherToday({
@@ -969,6 +974,24 @@ async function getRecentExecutionLogs(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1_executionlogs', {
     $select: 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription,jm1_sourceentity,jm1_sourcerecordid,createdon',
     $orderby: 'createdon desc',
+    $top: '100',
+  })
+}
+
+async function getRecentProductionProjects(config: DataverseServerConfig) {
+  return dataverseList(config, 'jm1_productionprojects', {
+    $select:
+      'jm1_productionprojectid,jm1_name,jm1_productiontype,jm1_status,jm1_fileslocation,_jm1_title_value,createdon,modifiedon',
+    $orderby: 'modifiedon desc',
+    $top: '100',
+  })
+}
+
+async function getRecentProductionTasks(config: DataverseServerConfig) {
+  return dataverseList(config, 'jm1_productiontasks', {
+    $select:
+      'jm1_productiontaskid,jm1_taskname,jm1_status,jm1_priority,jm1_assignedto,jm1_duedate,createdon,modifiedon',
+    $orderby: 'modifiedon desc',
     $top: '100',
   })
 }
@@ -2037,6 +2060,8 @@ function portfolioToTodayItem(item: PublisherPortfolioItem): PublisherTodayItem 
 function buildProductionCommand(
   workload: PublisherWorkloadItem[],
   portfolio: PublisherPortfolioItem[],
+  productionProjects: DataverseRow[],
+  productionTasks: DataverseRow[],
 ): PublisherOperatingCenterSnapshot['productionCommand'] {
   const activeTitles = workload.length
     ? workload
@@ -2077,7 +2102,9 @@ function buildProductionCommand(
           latestExecutionEvidence: 'Portfolio read model',
         }))
 
-  const derived = activeTitles.map(productionReadinessFromWorkload)
+  const derived = activeTitles.map((item) =>
+    productionReadinessFromWorkload(item, productionProjects, productionTasks),
+  )
   return {
     interiorQueue: derived,
     coverQueue: derived,
@@ -2085,18 +2112,43 @@ function buildProductionCommand(
   }
 }
 
-function productionReadinessFromWorkload(item: PublisherWorkloadItem): PublisherProductionReadinessItem {
+function productionReadinessFromWorkload(
+  item: PublisherWorkloadItem,
+  productionProjects: DataverseRow[],
+  productionTasks: DataverseRow[],
+): PublisherProductionReadinessItem {
   const state = `${item.workloadState} ${item.editorialStage} ${item.pipelineStage}`
   const isIntentionalLeader = normalizeTitle(item.title).includes('intentional leader')
+  const titleProjects = productionProjects.filter((project) => dataverseLookupId(project, '_jm1_title_value') === item.titleId)
+  const coverProject = titleProjects.find((project) =>
+    (dataverseFormatted(project, 'jm1_productiontype') || '').toLowerCase().includes('cover'),
+  )
+  const interiorProject = titleProjects.find((project) =>
+    (dataverseFormatted(project, 'jm1_productiontype') || '').toLowerCase().includes('interior'),
+  )
+  const coverTask = productionTasks.find((task) =>
+    normalizeTitle(stringValue(task.jm1_taskname)).includes(normalizeTitle(item.title)) &&
+    normalizeTitle(stringValue(task.jm1_taskname)).includes('cover'),
+  )
+  const interiorTask = productionTasks.find((task) =>
+    normalizeTitle(stringValue(task.jm1_taskname)).includes(normalizeTitle(item.title)) &&
+    normalizeTitle(stringValue(task.jm1_taskname)).includes('interior'),
+  )
+  const coverProjectStatus = dataverseFormatted(coverProject || {}, 'jm1_status')
+  const interiorProjectStatus = dataverseFormatted(interiorProject || {}, 'jm1_status')
   const productionReady = state.includes('Proofreading Ready') || state.includes('Production Ready')
   const proofingBlocked =
     state.includes('Copyediting') || state.includes('Line Editing') || state.includes('Developmental Editing')
-  const interiorReadiness: PublisherProductionReadinessItem['interiorReadiness'] = productionReady
+  const interiorReadiness: PublisherProductionReadinessItem['interiorReadiness'] = interiorProject
+    ? 'READY — STARTED'
+    : productionReady
     ? 'READY — AWAITING PUBLISHER START'
     : proofingBlocked || state.includes('Proofreading In Progress')
       ? 'BLOCKED — PROOFREADING'
       : 'BLOCKED — FINAL MANUSCRIPT'
-  const coverReadiness: PublisherProductionReadinessItem['coverReadiness'] = isIntentionalLeader
+  const coverReadiness: PublisherProductionReadinessItem['coverReadiness'] = coverProject
+    ? 'CREATIVE BRIEF IN PROGRESS'
+    : isIntentionalLeader
     ? 'READY FOR CREATIVE BRIEF'
     : state.includes('Developmental Editing')
       ? 'BLOCKED — COPY'
@@ -2109,14 +2161,26 @@ function productionReadinessFromWorkload(item: PublisherWorkloadItem): Publisher
     title: item.title,
     author: item.author,
     editorialState: item.workloadState,
-    interiorState: productionReady ? 'Interior Layout — Ready' : 'Interior Layout — Not Started',
-    coverState: isIntentionalLeader ? 'Cover Design — Ready for Creative Brief' : 'Cover Design — Not Started',
+    interiorState: interiorProject
+      ? `Interior Layout — ${interiorProjectStatus || 'In Progress'}`
+      : productionReady
+        ? 'Interior Layout — Ready'
+        : 'Interior Layout — Not Started',
+    coverState: coverProject
+      ? `Cover Design — ${coverProjectStatus || 'In Progress'}`
+      : isIntentionalLeader
+        ? 'Cover Design — Ready for Creative Brief'
+        : 'Cover Design — Not Started',
     interiorReadiness,
     coverReadiness,
-    nextInteriorAction: productionReady
+    nextInteriorAction: interiorProject
+      ? 'Continue Interior Layout execution through the active production project.'
+      : productionReady
       ? 'Begin Interior Layout after production intake package is confirmed.'
       : 'Wait for final approved proofread manuscript or approved production exception.',
-    nextCoverAction: isIntentionalLeader
+    nextCoverAction: coverProject
+      ? 'Continue the governed cover creative brief; full wrap waits for final page count and printer template.'
+      : isIntentionalLeader
       ? 'Create governed cover creative brief; full wrap waits for final page count.'
       : 'Confirm stable title copy, metadata, visual direction, and rights evidence.',
     sourceFiles: productionReady
@@ -2125,6 +2189,8 @@ function productionReadinessFromWorkload(item: PublisherWorkloadItem): Publisher
     rightsEvidence:
       'Document source, license, ownership, print/digital rights, modification rights, and AI provenance before author review.',
     sharePointParent: productionReady ? '01_Titles/06_Production' : 'Current governed stage folder until production entry.',
+    productionProjectId: stringValue(coverProject?.jm1_productionprojectid || interiorProject?.jm1_productionprojectid),
+    productionTaskId: stringValue(coverTask?.jm1_productiontaskid || interiorTask?.jm1_productiontaskid),
     allowedInteriorActions: interiorReadiness === 'READY — AWAITING PUBLISHER START'
       ? [{ id: 'begin_interior_layout', label: 'Begin Interior Layout' }]
       : [],
@@ -2138,8 +2204,8 @@ function productionToTodayItem(item: PublisherProductionReadinessItem, lane: 'in
   const readiness = lane === 'cover' ? item.coverReadiness : item.interiorReadiness
   return {
     key: `production:${lane}:${item.key}`,
-    recordId: item.key,
-    titleId: item.key,
+    recordId: item.productionProjectId || item.productionTaskId || item.key,
+    titleId: item.titleId || item.key,
     title: item.title,
     author: item.author,
     portfolioState: 'active_pipeline',
@@ -2156,7 +2222,9 @@ function productionToTodayItem(item: PublisherProductionReadinessItem, lane: 'in
     dependency: readiness,
     evidenceLinks: [],
     allowedActions: lane === 'cover' ? item.allowedCoverActions : item.allowedInteriorActions,
-    lastMovement: 'Production Command readiness evaluation',
+    lastMovement: item.productionProjectId
+      ? `Production project ${item.productionProjectId}`
+      : 'Production Command readiness evaluation',
   }
 }
 
