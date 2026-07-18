@@ -8,7 +8,9 @@ import type {
   PublisherAuthorResponseQueueItem,
   PublisherOperatingCenterSnapshot,
   PublisherPortfolioItem,
+  PublisherProductionReadinessItem,
   PublisherQueueItem,
+  PublisherRoyaltyDecisionCard,
   PublisherTodayItem,
   PublisherWorkloadItem,
 } from '@/lib/server/publisher-operating-center'
@@ -80,6 +82,42 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     }
 
     setActionState({ itemKey: `${item.key}:${actionId}`, status: 'complete', message: 'Governed action completed and logged.' })
+    await refresh()
+  }
+
+  async function runScopedAction(input: {
+    key: string
+    actionId: string
+    titleId?: string
+    decisionKey?: string
+  }) {
+    setActionState({ itemKey: `${input.key}:${input.actionId}`, status: 'running', message: 'Running governed action...' })
+
+    const response = await fetch('/api/publisher/operating-center/actions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: input.actionId,
+        titleId: input.titleId,
+        decisionKey: input.decisionKey,
+      }),
+    })
+
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null
+    if (!response.ok) {
+      setActionState({
+        itemKey: `${input.key}:${input.actionId}`,
+        status: 'error',
+        message: payload?.error || 'Publisher action failed.',
+      })
+      return
+    }
+
+    setActionState({
+      itemKey: `${input.key}:${input.actionId}`,
+      status: 'complete',
+      message: 'Governed action recorded.',
+    })
     await refresh()
   }
 
@@ -414,6 +452,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                     <Th>Cover</Th>
                     <Th>Next Production Action</Th>
                     <Th>SharePoint Parent</Th>
+                    <Th>Actions</Th>
                   </tr>
                 </thead>
                 <tbody>
@@ -437,11 +476,14 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                         <span className="mt-2 block text-white/38">{item.nextCoverAction}</span>
                       </Td>
                       <Td>{item.sharePointParent}</Td>
+                      <Td>
+                        <ProductionActions item={item} actionState={actionState} runScopedAction={runScopedAction} />
+                      </Td>
                     </tr>
                   ))}
                   {snapshot.productionCommand.interiorQueue.length === 0 && (
                     <tr>
-                      <td className="px-3 py-5 text-white/45" colSpan={6}>
+                      <td className="px-3 py-5 text-white/45" colSpan={7}>
                         No active production candidates were returned from Core.
                       </td>
                     </tr>
@@ -483,6 +525,22 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               <Info label="Unresolved payments" value={String(snapshot.royalties.unresolvedPayments)} />
               <Info label="Decision package" value={snapshot.royalties.decisionPackagePath} />
             </div>
+            <div className="mt-5 grid gap-3 lg:grid-cols-2">
+              {snapshot.royalties.decisionCards.slice(0, 12).map((decision) => (
+                <RoyaltyDecisionCardView
+                  key={decision.key}
+                  decision={decision}
+                  actionState={actionState}
+                  runScopedAction={runScopedAction}
+                />
+              ))}
+            </div>
+            {snapshot.royalties.decisionCards.length > 12 && (
+              <p className="mt-3 text-[12px] text-white/45">
+                Showing the first 12 of {snapshot.royalties.decisionCards.length} decision cards. The full package remains
+                available in the governed decision file.
+              </p>
+            )}
           </section>
         )}
 
@@ -667,6 +725,103 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
         </div>
       </section>
     </main>
+  )
+}
+
+function ProductionActions({
+  item,
+  actionState,
+  runScopedAction,
+}: {
+  item: PublisherProductionReadinessItem
+  actionState: ActionState
+  runScopedAction: (input: { key: string; actionId: string; titleId?: string; decisionKey?: string }) => Promise<void>
+}) {
+  const actions = [...item.allowedInteriorActions, ...item.allowedCoverActions]
+  if (!actions.length) return <span className="text-[12px] text-white/35">No action available</span>
+
+  return (
+    <div className="flex min-w-[160px] flex-col gap-2">
+      {actions.map((action) => {
+        const stateKey = `${item.key}:${action.id}`
+        return (
+          <button
+            key={action.id}
+            type="button"
+            onClick={() => void runScopedAction({ key: item.key, actionId: action.id, titleId: item.titleId })}
+            disabled={actionState.itemKey === stateKey && actionState.status === 'running'}
+            className="min-h-[36px] rounded-full bg-blue-500 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {actionState.itemKey === stateKey && actionState.status === 'running' ? 'Running...' : action.label}
+          </button>
+        )
+      })}
+      {actionState.itemKey.startsWith(`${item.key}:`) && actionState.message && (
+        <span
+          className={`text-[11px] ${
+            actionState.status === 'error' ? 'text-red-100' : 'text-blue-100'
+          }`}
+        >
+          {actionState.message}
+        </span>
+      )}
+    </div>
+  )
+}
+
+function RoyaltyDecisionCardView({
+  decision,
+  actionState,
+  runScopedAction,
+}: {
+  decision: PublisherRoyaltyDecisionCard
+  actionState: ActionState
+  runScopedAction: (input: { key: string; actionId: string; titleId?: string; decisionKey?: string }) => Promise<void>
+}) {
+  const action = decision.allowedActions[0]
+  return (
+    <article className="border border-white/10 bg-black/15 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-amber-200">{decision.decisionType}</p>
+          <h3 className="mt-2 text-[15px] font-semibold text-white">{decision.author || 'Author pending'}</h3>
+          <p className="mt-1 text-[13px] leading-5 text-white/55">{decision.title || 'Title pending'}</p>
+        </div>
+        <Badge label={decision.amountAffected ? `$${decision.amountAffected}` : 'No amount'} tone="amber" />
+      </div>
+      <div className="mt-3 grid gap-2">
+        <Info label="Period" value={decision.reportingPeriod} />
+        <Info label="Evidence" value={decision.evidence} />
+        <Info label="Recommended decision" value={decision.recommendedDecision} />
+        <Info label="Alternatives" value={decision.alternatives} />
+        <Info label="Downstream effect" value={decision.downstreamEffect} />
+      </div>
+      {action && (
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={() =>
+              void runScopedAction({
+                key: decision.key,
+                actionId: action.id,
+                decisionKey: decision.key,
+              })
+            }
+            disabled={actionState.itemKey === `${decision.key}:${action.id}` && actionState.status === 'running'}
+            className="min-h-[36px] rounded-full bg-blue-500 px-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {actionState.itemKey === `${decision.key}:${action.id}` && actionState.status === 'running'
+              ? 'Running...'
+              : action.label}
+          </button>
+          {actionState.itemKey.startsWith(`${decision.key}:`) && actionState.message && (
+            <p className={`mt-2 text-[12px] ${actionState.status === 'error' ? 'text-red-100' : 'text-blue-100'}`}>
+              {actionState.message}
+            </p>
+          )}
+        </div>
+      )}
+    </article>
   )
 }
 

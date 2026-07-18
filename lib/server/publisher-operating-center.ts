@@ -250,21 +250,23 @@ export type PublisherAuthorResponseQueueItem = {
 
 export type PublisherProductionReadinessItem = {
   key: string
+  titleId: string
+  assetId: string
   title: string
   author: string
   editorialState: string
   interiorState: string
   coverState: string
   interiorReadiness:
-    | 'READY FOR INTERIOR LAYOUT'
+    | 'READY — STARTED'
+    | 'READY — AWAITING PUBLISHER START'
     | 'ALREADY IN INTERIOR LAYOUT — PLACE AT CURRENT STATE'
     | 'BLOCKED — FINAL MANUSCRIPT'
     | 'BLOCKED — PROOFREADING'
-    | 'BLOCKED — TRIM/FORMAT DECISION'
-    | 'BLOCKED — IMAGES'
-    | 'BLOCKED — ISBN/METADATA'
-    | 'BLOCKED — PUBLISHER DECISION'
-    | 'NOT YET ELIGIBLE'
+    | 'BLOCKED — PRODUCTION SPECIFICATIONS'
+    | 'BLOCKED — IMAGES OR RIGHTS'
+    | 'BLOCKED — ISBN OR METADATA'
+    | 'BLOCKED — JACKIE DECISION'
   coverReadiness:
     | 'READY FOR CREATIVE BRIEF'
     | 'CREATIVE BRIEF IN PROGRESS'
@@ -286,6 +288,31 @@ export type PublisherProductionReadinessItem = {
   sourceFiles: string
   rightsEvidence: string
   sharePointParent: string
+  allowedInteriorActions: Array<{
+    id: PublisherActionId
+    label: string
+  }>
+  allowedCoverActions: Array<{
+    id: PublisherActionId
+    label: string
+  }>
+}
+
+export type PublisherRoyaltyDecisionCard = {
+  key: string
+  decisionType: string
+  author: string
+  title: string
+  reportingPeriod: string
+  amountAffected: string
+  evidence: string
+  recommendedDecision: string
+  alternatives: string
+  downstreamEffect: string
+  allowedActions: Array<{
+    id: PublisherActionId
+    label: string
+  }>
 }
 
 export type PublisherRoyaltyReviewQueue = {
@@ -298,6 +325,7 @@ export type PublisherRoyaltyReviewQueue = {
   unresolvedPayments: number
   draftStatements: number
   decisionPackagePath: string
+  decisionCards: PublisherRoyaltyDecisionCard[]
 }
 
 export type PublisherOperatingCenterSnapshot = {
@@ -728,6 +756,75 @@ export async function logPublisherOperationalAction(input: {
 
   return {
     intakeId: input.intakeId,
+    executionLogId: extractId(logId),
+  }
+}
+
+export async function logPublisherTitleScopedAction(input: {
+  titleId: string
+  operatorEmail: string
+  action: Extract<PublisherActionId, 'place_asset_in_pipeline' | 'begin_interior_layout' | 'begin_cover_design'>
+}) {
+  const config = getDataverseServerConfig()
+  if (!config) throw new Error('dataverse_config_missing')
+
+  const title = await dataverseFirst(config, 'jm1pub_titles', {
+    $select: 'jm1pub_titleid,jm1pub_name,jm1pub_stage,jm1pub_status',
+    $filter: `jm1pub_titleid eq ${input.titleId}`,
+  })
+  if (!title) throw new Error('title_not_found')
+
+  const actionType = publisherActionToEvent(input.action)
+  const titleName = stringValue(title.jm1pub_name || input.titleId)
+  const currentStage = dataverseFormatted(title, 'jm1pub_stage') || stringValue(title.jm1pub_stage)
+  const currentStatus = dataverseFormatted(title, 'jm1pub_status') || stringValue(title.jm1pub_status)
+  const logId = await writePublisherExecutionLog(config, {
+    actionType,
+    name: `${actionType} - ${titleName}`,
+    description: [
+      `Publisher Operating Center recorded title-scoped action ${input.action} for ${titleName}.`,
+      `Current Core title state was ${currentStage || 'unspecified'} / ${currentStatus || 'unspecified'}.`,
+      `Operator ${input.operatorEmail}.`,
+      'This action records publisher movement or readiness only; it does not fabricate prior-stage completion.',
+      'No author communication sent.',
+    ].join(' '),
+    sourceEntity: 'jm1pub_title',
+    sourceRecordId: input.titleId,
+  })
+
+  return {
+    titleId: input.titleId,
+    executionLogId: extractId(logId),
+  }
+}
+
+export async function logPublisherRoyaltyDecisionReview(input: {
+  decisionKey: string
+  operatorEmail: string
+}) {
+  const config = getDataverseServerConfig()
+  if (!config) throw new Error('dataverse_config_missing')
+
+  const decision = readRoyaltyDecisionCards().find((card) => card.key === input.decisionKey)
+  if (!decision) throw new Error('royalty_decision_not_found')
+
+  const actionType = publisherActionToEvent('review_royalty_statement')
+  const logId = await writePublisherExecutionLog(config, {
+    actionType,
+    name: `${actionType} - ${decision.author || '2026 royalty decision'}`,
+    description: [
+      `Publisher Operating Center opened royalty decision ${decision.key}.`,
+      `Decision type ${decision.decisionType}.`,
+      `Author ${decision.author || 'unspecified'}; title ${decision.title || 'unspecified'}; amount ${decision.amountAffected || 'unspecified'}.`,
+      `Operator ${input.operatorEmail}.`,
+      'No statement was emailed, paid, posted, or published.',
+    ].join(' '),
+    sourceEntity: 'royalty_decision_package',
+    sourceRecordId: input.decisionKey,
+  })
+
+  return {
+    decisionKey: input.decisionKey,
     executionLogId: extractId(logId),
   }
 }
@@ -1972,24 +2069,28 @@ function productionReadinessFromWorkload(item: PublisherWorkloadItem): Publisher
   const productionReady = state.includes('Proofreading Ready') || state.includes('Production Ready')
   const proofingBlocked =
     state.includes('Copyediting') || state.includes('Line Editing') || state.includes('Developmental Editing')
+  const interiorReadiness: PublisherProductionReadinessItem['interiorReadiness'] = productionReady
+    ? 'READY — AWAITING PUBLISHER START'
+    : proofingBlocked || state.includes('Proofreading In Progress')
+      ? 'BLOCKED — PROOFREADING'
+      : 'BLOCKED — FINAL MANUSCRIPT'
+  const coverReadiness: PublisherProductionReadinessItem['coverReadiness'] = isIntentionalLeader
+    ? 'READY FOR CREATIVE BRIEF'
+    : state.includes('Developmental Editing')
+      ? 'BLOCKED — COPY'
+      : 'BLOCKED — PUBLISHER DECISION'
 
   return {
     key: item.key,
+    titleId: item.titleId,
+    assetId: item.assetId,
     title: item.title,
     author: item.author,
     editorialState: item.workloadState,
     interiorState: productionReady ? 'Interior Layout — Ready' : 'Interior Layout — Not Started',
     coverState: isIntentionalLeader ? 'Cover Design — Ready for Creative Brief' : 'Cover Design — Not Started',
-    interiorReadiness: productionReady
-      ? 'READY FOR INTERIOR LAYOUT'
-      : proofingBlocked
-        ? 'BLOCKED — PROOFREADING'
-        : 'NOT YET ELIGIBLE',
-    coverReadiness: isIntentionalLeader
-      ? 'READY FOR CREATIVE BRIEF'
-      : state.includes('Developmental Editing')
-        ? 'BLOCKED — COPY'
-        : 'BLOCKED — PUBLISHER DECISION',
+    interiorReadiness,
+    coverReadiness,
     nextInteriorAction: productionReady
       ? 'Begin Interior Layout after production intake package is confirmed.'
       : 'Wait for final approved proofread manuscript or approved production exception.',
@@ -2002,6 +2103,12 @@ function productionReadinessFromWorkload(item: PublisherWorkloadItem): Publisher
     rightsEvidence:
       'Document source, license, ownership, print/digital rights, modification rights, and AI provenance before author review.',
     sharePointParent: productionReady ? '01_Titles/06_Production' : 'Current governed stage folder until production entry.',
+    allowedInteriorActions: interiorReadiness === 'READY — AWAITING PUBLISHER START'
+      ? [{ id: 'begin_interior_layout', label: 'Begin Interior Layout' }]
+      : [],
+    allowedCoverActions: coverReadiness === 'READY FOR CREATIVE BRIEF'
+      ? [{ id: 'begin_cover_design', label: 'Begin Cover Brief' }]
+      : [],
   }
 }
 
@@ -2026,14 +2133,7 @@ function productionToTodayItem(item: PublisherProductionReadinessItem, lane: 'in
     qaState: 'Not started',
     dependency: readiness,
     evidenceLinks: [],
-    allowedActions: readiness.startsWith('READY')
-      ? [
-          {
-            id: lane === 'cover' ? 'begin_cover_design' : 'begin_interior_layout',
-            label: lane === 'cover' ? 'Begin Cover Design' : 'Begin Interior Layout',
-          },
-        ]
-      : [],
+    allowedActions: lane === 'cover' ? item.allowedCoverActions : item.allowedInteriorActions,
     lastMovement: 'Production Command readiness evaluation',
   }
 }
@@ -2431,6 +2531,7 @@ function readRoyaltyReviewQueue(): PublisherRoyaltyReviewQueue {
   const manifestRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Manifest-Final-Status.csv')
   const paymentRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Payment-Final-Classification.csv')
   const statementRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Draft-Statement-Set.csv')
+  const decisionCards = readRoyaltyDecisionCards()
   return {
     manifestRows: manifestRows.length,
     loadedRows: manifestRows.filter((row) => row.finalStatus === 'LOADED — DRAFT STATEMENT').length,
@@ -2441,7 +2542,32 @@ function readRoyaltyReviewQueue(): PublisherRoyaltyReviewQueue {
     unresolvedPayments: paymentRows.filter((row) => row.finalPaymentStatus === 'UNRESOLVED — JACKIE DECISION').length,
     draftStatements: statementRows.length,
     decisionPackagePath: 'docs/operations/generated/2026-07-17-JM1-2026-Royalty-Jackie-Decision-Package.csv',
+    decisionCards,
   }
+}
+
+function readRoyaltyDecisionCards(): PublisherRoyaltyDecisionCard[] {
+  return readCsvRows('2026-07-17-JM1-2026-Royalty-Jackie-Decision-Package.csv')
+    .map((row, index): PublisherRoyaltyDecisionCard => {
+      const decisionType = stringValue(row.decisionType)
+      const manifestRowNumber = stringValue(row.manifestRowNumber)
+      const author = stringValue(row.author)
+      const title = stringValue(row.title)
+      return {
+        key: `royalty-decision-${manifestRowNumber || index + 1}`,
+        decisionType,
+        author,
+        title,
+        reportingPeriod: '2026 available royalty evidence',
+        amountAffected: stringValue(row.amountAffected),
+        evidence: manifestRowNumber ? `Manifest row ${manifestRowNumber}; consolidated royalty decision package.` : 'Consolidated royalty decision package.',
+        recommendedDecision: stringValue(row.recommendedAction),
+        alternatives: stringValue(row.alternatives),
+        downstreamEffect: stringValue(row.consequence),
+        allowedActions: [{ id: 'review_royalty_statement', label: 'Open Review' }],
+      }
+    })
+    .filter((card) => card.decisionType || card.author || card.title)
 }
 
 function readCsvRows(fileName: string) {
