@@ -7,6 +7,8 @@ import {
   initializePublisherIntakeReview,
   logPublisherAuthorResponseAction,
   logPublisherOperationalAction,
+  logPublisherRoyaltyDecisionReview,
+  logPublisherTitleScopedAction,
   placePublisherEvidenceHold,
   verifyPublisherManuscript,
   type PublisherActionId,
@@ -43,7 +45,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Publisher session not found.' }, { status: 401 })
   }
 
-  const body = (await req.json().catch(() => null)) as { action?: string; intakeId?: string; gateId?: string } | null
+  const body = (await req.json().catch(() => null)) as {
+    action?: string
+    intakeId?: string
+    gateId?: string
+    titleId?: string
+    decisionKey?: string
+  } | null
   const action = body?.action === 'initialize_publisher_intake_review' ? 'review_intake' : body?.action
   if (!body || !SUPPORTED_ACTIONS.includes(action as PublisherActionId)) {
     return NextResponse.json({ error: 'Unsupported publisher action.' }, { status: 400 })
@@ -97,6 +105,39 @@ export async function POST(req: Request) {
         if (!body.gateId) return NextResponse.json({ error: 'Approval gate id is required.' }, { status: 400 })
         result = await logPublisherAuthorResponseAction({
           gateId: body.gateId,
+          operatorEmail: session.user.email,
+          action: publisherAction,
+        })
+        break
+      case 'place_asset_in_pipeline':
+      case 'begin_interior_layout':
+      case 'begin_cover_design':
+        if (body.titleId) {
+          result = await logPublisherTitleScopedAction({
+            titleId: body.titleId,
+            operatorEmail: session.user.email,
+            action: publisherAction,
+          })
+          break
+        }
+        if (!body.intakeId) return NextResponse.json({ error: 'Intake id or title id is required.' }, { status: 400 })
+        result = await logPublisherOperationalAction({
+          intakeId: body.intakeId,
+          operatorEmail: session.user.email,
+          action: publisherAction,
+        })
+        break
+      case 'review_royalty_statement':
+        if (body.decisionKey) {
+          result = await logPublisherRoyaltyDecisionReview({
+            decisionKey: body.decisionKey,
+            operatorEmail: session.user.email,
+          })
+          break
+        }
+        if (!body.intakeId) return NextResponse.json({ error: 'Intake id or royalty decision key is required.' }, { status: 400 })
+        result = await logPublisherOperationalAction({
+          intakeId: body.intakeId,
           operatorEmail: session.user.email,
           action: publisherAction,
         })
