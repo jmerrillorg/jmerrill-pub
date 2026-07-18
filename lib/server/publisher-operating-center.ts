@@ -9,6 +9,8 @@ import {
   stringValue,
   type DataverseServerConfig,
 } from './dataverse-server'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import {
   classifyTitlePortfolio,
   isActivePipeline,
@@ -32,6 +34,11 @@ export type PublisherActionId =
   | 'verify_manuscript'
   | 'initialize_editorial_review'
   | 'initialize_developmental_editing'
+  | 'place_asset_in_pipeline'
+  | 'advance_stage'
+  | 'begin_interior_layout'
+  | 'begin_cover_design'
+  | 'review_royalty_statement'
   | 'request_missing_information'
   | 'return_for_correction'
   | 'place_evidence_hold'
@@ -204,6 +211,58 @@ export type PublisherTodaySnapshot = {
   recentMovements: PublisherTodayItem[]
 }
 
+export type PublisherProductionReadinessItem = {
+  key: string
+  title: string
+  author: string
+  editorialState: string
+  interiorState: string
+  coverState: string
+  interiorReadiness:
+    | 'READY FOR INTERIOR LAYOUT'
+    | 'ALREADY IN INTERIOR LAYOUT — PLACE AT CURRENT STATE'
+    | 'BLOCKED — FINAL MANUSCRIPT'
+    | 'BLOCKED — PROOFREADING'
+    | 'BLOCKED — TRIM/FORMAT DECISION'
+    | 'BLOCKED — IMAGES'
+    | 'BLOCKED — ISBN/METADATA'
+    | 'BLOCKED — PUBLISHER DECISION'
+    | 'NOT YET ELIGIBLE'
+  coverReadiness:
+    | 'READY FOR CREATIVE BRIEF'
+    | 'CREATIVE BRIEF IN PROGRESS'
+    | 'READY FOR CONCEPTS'
+    | 'CONCEPTS IN PROGRESS'
+    | 'INTERNAL REVIEW'
+    | 'AUTHOR REVIEW'
+    | 'FRONT COVER APPROVED'
+    | 'WAITING FOR PAGE COUNT'
+    | 'FULL WRAP IN PROGRESS'
+    | 'FULL WRAP APPROVED'
+    | 'BLOCKED — COPY'
+    | 'BLOCKED — IMAGERY'
+    | 'BLOCKED — RIGHTS'
+    | 'BLOCKED — TRIM/FORMAT'
+    | 'BLOCKED — PUBLISHER DECISION'
+  nextInteriorAction: string
+  nextCoverAction: string
+  sourceFiles: string
+  rightsEvidence: string
+  sharePointParent: string
+}
+
+export type PublisherRoyaltyReviewQueue = {
+  manifestRows: number
+  loadedRows: number
+  identityHolds: number
+  titleHolds: number
+  paymentRows: number
+  paymentAllocationUnknown: number
+  unresolvedPayments: number
+  draftStatements: number
+  decisionPackagePath: string
+}
+
 export type PublisherOperatingCenterSnapshot = {
   generatedAt: string
   status: 'core-live' | 'unavailable'
@@ -258,6 +317,12 @@ export type PublisherOperatingCenterSnapshot = {
     archiveHistorical: PublisherPortfolioItem[]
     reconciliationRequired: PublisherPortfolioItem[]
   }
+  productionCommand: {
+    interiorQueue: PublisherProductionReadinessItem[]
+    coverQueue: PublisherProductionReadinessItem[]
+    sharePointDesign: string[]
+  }
+  royalties: PublisherRoyaltyReviewQueue
   today: PublisherTodaySnapshot
 }
 
@@ -285,6 +350,12 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
         archiveHistorical: [],
         reconciliationRequired: [],
       },
+      productionCommand: {
+        interiorQueue: [],
+        coverQueue: [],
+        sharePointDesign: productionSharePointDesign(),
+      },
+      royalties: readRoyaltyReviewQueue(),
       today: emptyPublisherToday(),
     }
   }
@@ -311,12 +382,15 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     .slice(0, 2)
   const portfolio = buildPortfolioItems(titles, assets, editorialStages)
   const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, logs, portfolio)
+  const productionCommand = buildProductionCommand(workload, portfolio)
   const metrics = buildMetrics(queue, logs, workload, portfolio)
   const today = buildPublisherToday({
     generatedAt: new Date().toISOString(),
     queue,
     workload,
     portfolio,
+    productionCommand,
+    royalties: readRoyaltyReviewQueue(),
     logs,
     metrics,
   })
@@ -340,6 +414,8 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       archiveHistorical: portfolio.filter((item) => item.portfolioState === 'archive_historical'),
       reconciliationRequired: portfolio.filter((item) => item.portfolioState === 'reconciliation_required'),
     },
+    productionCommand,
+    royalties: readRoyaltyReviewQueue(),
     today,
   }
 }
@@ -1509,6 +1585,8 @@ function buildPublisherToday(input: {
   queue: PublisherQueueItem[]
   workload: PublisherWorkloadItem[]
   portfolio: PublisherPortfolioItem[]
+  productionCommand: PublisherOperatingCenterSnapshot['productionCommand']
+  royalties: PublisherRoyaltyReviewQueue
   logs: DataverseRow[]
   metrics: PublisherOperatingCenterSnapshot['metrics']
 }): PublisherTodaySnapshot {
@@ -1538,14 +1616,20 @@ function buildPublisherToday(input: {
   ).slice(0, 18)
 
   const productionQueue = prioritizeTodayItems(
-    workloadTodayItems.filter(
-      (item) =>
-        item.editorialStage.includes('Proofreading') ||
-        item.editorialStage.includes('Production') ||
-        item.nextAction.includes('Proofreading') ||
-        item.dependency.includes('Proofreading') ||
-        item.packageState.includes('Proofreading'),
-    ),
+    [
+      ...workloadTodayItems.filter(
+        (item) =>
+          item.editorialStage.includes('Proofreading') ||
+          item.editorialStage.includes('Production') ||
+          item.nextAction.includes('Proofreading') ||
+          item.dependency.includes('Proofreading') ||
+          item.packageState.includes('Proofreading'),
+      ),
+      ...input.productionCommand.interiorQueue.map((item) => productionToTodayItem(item)),
+      ...input.productionCommand.coverQueue
+        .filter((item) => item.coverReadiness !== 'BLOCKED — COPY')
+        .map((item) => productionToTodayItem(item, 'cover')),
+    ],
   ).slice(0, 12)
 
   const distributionCatalogQueue = prioritizeTodayItems(
@@ -1564,6 +1648,9 @@ function buildPublisherToday(input: {
     ...failedLogItems,
     ...workloadTodayItems.filter((item) => item.severity === 'urgent' || item.dependency.toLowerCase().includes('blocked')),
     ...queueTodayItems.filter((item) => item.severity === 'urgent'),
+    ...(input.royalties.identityHolds + input.royalties.titleHolds + input.royalties.unresolvedPayments > 0
+      ? [royaltyDecisionTodayItem(input.royalties)]
+      : []),
   ]).slice(0, 12)
 
   const recentMovements = input.logs.slice(0, 12).map(logToMovementTodayItem)
@@ -1690,6 +1777,164 @@ function portfolioToTodayItem(item: PublisherPortfolioItem): PublisherTodayItem 
     evidenceLinks: [],
     allowedActions: [],
     lastMovement: item.evidence[0] || 'Portfolio classification read from Core-backed title and asset evidence',
+  }
+}
+
+function buildProductionCommand(
+  workload: PublisherWorkloadItem[],
+  portfolio: PublisherPortfolioItem[],
+): PublisherOperatingCenterSnapshot['productionCommand'] {
+  const activeTitles = workload.length
+    ? workload
+    : portfolio
+        .filter((item) => item.portfolioState === 'active_pipeline')
+        .slice(0, 25)
+        .map((item): PublisherWorkloadItem => ({
+          key: item.key,
+          title: item.title,
+          author: item.author,
+          contactId: '',
+          relationshipId: '',
+          intake: '',
+          titleId: item.titleId,
+          assetId: item.assetIds[0] || '',
+          pipelineStage: item.pipelineStage,
+          editorialStage: item.pipelineStage,
+          editorialSubstage: '',
+          workloadState: 'Blocked',
+          activeCapability: 'Portfolio Placement',
+          currentOwner: 'Jackie',
+          nextAction: item.nextAction,
+          targetDate: '',
+          ageDays: 0,
+          authorAction: '',
+          publisherAction: item.nextAction,
+          internalQaState: '',
+          packageReadiness: '',
+          holdReason: item.exceptionReason || '',
+          restartCondition: item.nextAction,
+          workloadLevel: 'normal',
+          queuePosition: 0,
+          downstreamQueueSize: 0,
+          readinessGuard: {
+            status: item.exceptionReason ? 'blocked' : 'watch',
+            message: item.exceptionReason || 'Portfolio-derived production posture requires publisher confirmation.',
+          },
+          latestExecutionEvidence: 'Portfolio read model',
+        }))
+
+  const derived = activeTitles.map(productionReadinessFromWorkload)
+  return {
+    interiorQueue: derived,
+    coverQueue: derived,
+    sharePointDesign: productionSharePointDesign(),
+  }
+}
+
+function productionReadinessFromWorkload(item: PublisherWorkloadItem): PublisherProductionReadinessItem {
+  const state = `${item.workloadState} ${item.editorialStage} ${item.pipelineStage}`
+  const isIntentionalLeader = normalizeTitle(item.title).includes('intentional leader')
+  const productionReady = state.includes('Proofreading Ready') || state.includes('Production Ready')
+  const proofingBlocked =
+    state.includes('Copyediting') || state.includes('Line Editing') || state.includes('Developmental Editing')
+
+  return {
+    key: item.key,
+    title: item.title,
+    author: item.author,
+    editorialState: item.workloadState,
+    interiorState: productionReady ? 'Interior Layout — Ready' : 'Interior Layout — Not Started',
+    coverState: isIntentionalLeader ? 'Cover Design — Ready for Creative Brief' : 'Cover Design — Not Started',
+    interiorReadiness: productionReady
+      ? 'READY FOR INTERIOR LAYOUT'
+      : proofingBlocked
+        ? 'BLOCKED — PROOFREADING'
+        : 'NOT YET ELIGIBLE',
+    coverReadiness: isIntentionalLeader
+      ? 'READY FOR CREATIVE BRIEF'
+      : state.includes('Developmental Editing')
+        ? 'BLOCKED — COPY'
+        : 'BLOCKED — PUBLISHER DECISION',
+    nextInteriorAction: productionReady
+      ? 'Begin Interior Layout after production intake package is confirmed.'
+      : 'Wait for final approved proofread manuscript or approved production exception.',
+    nextCoverAction: isIntentionalLeader
+      ? 'Create governed cover creative brief; full wrap waits for final page count.'
+      : 'Confirm stable title copy, metadata, visual direction, and rights evidence.',
+    sourceFiles: productionReady
+      ? 'Final editorial manuscript and production source package required before proof generation.'
+      : 'Final print-ready manuscript source is not yet approved.',
+    rightsEvidence:
+      'Document source, license, ownership, print/digital rights, modification rights, and AI provenance before author review.',
+    sharePointParent: productionReady ? '01_Titles/06_Production' : 'Current governed stage folder until production entry.',
+  }
+}
+
+function productionToTodayItem(item: PublisherProductionReadinessItem, lane: 'interior' | 'cover' = 'interior'): PublisherTodayItem {
+  const readiness = lane === 'cover' ? item.coverReadiness : item.interiorReadiness
+  return {
+    key: `production:${lane}:${item.key}`,
+    recordId: item.key,
+    titleId: item.key,
+    title: item.title,
+    author: item.author,
+    portfolioState: 'active_pipeline',
+    pipelineStage: lane === 'cover' ? 'Cover Design' : 'Interior Layout',
+    editorialStage: item.editorialState,
+    substage: readiness,
+    owner: readiness.startsWith('READY') ? 'Jackie' : 'System',
+    nextAction: lane === 'cover' ? item.nextCoverAction : item.nextInteriorAction,
+    targetDate: '',
+    ageDays: 0,
+    severity: readiness.startsWith('READY') ? 'watch' : 'info',
+    packageState: lane === 'cover' ? item.coverState : item.interiorState,
+    qaState: 'Not started',
+    dependency: readiness,
+    evidenceLinks: [],
+    allowedActions: readiness.startsWith('READY')
+      ? [
+          {
+            id: lane === 'cover' ? 'begin_cover_design' : 'begin_interior_layout',
+            label: lane === 'cover' ? 'Begin Cover Design' : 'Begin Interior Layout',
+          },
+        ]
+      : [],
+    lastMovement: 'Production Command readiness evaluation',
+  }
+}
+
+function royaltyDecisionTodayItem(royalties: PublisherRoyaltyReviewQueue): PublisherTodayItem {
+  return {
+    key: 'royalties:2026-decision-package',
+    recordId: '2026-royalty-backlog',
+    titleId: '',
+    title: '2026 Royalty Decision Package',
+    author: 'Multiple authors',
+    portfolioState: 'royalty_review',
+    pipelineStage: 'Royalties',
+    editorialStage: 'Draft Statements — Internal Review',
+    substage: 'Publisher decision package ready',
+    owner: 'Jackie',
+    nextAction: 'Review identity, title, and payment-allocation decisions before statements are approved.',
+    targetDate: '',
+    ageDays: 0,
+    severity: 'urgent',
+    packageState: `${royalties.draftStatements} draft statements; ${royalties.loadedRows} loaded rows`,
+    qaState: 'Internal review required',
+    dependency: `${royalties.identityHolds} identity holds; ${royalties.titleHolds} title holds; ${royalties.unresolvedPayments} unresolved payments`,
+    evidenceLinks: [
+      {
+        label: 'Decision package',
+        href: `/${royalties.decisionPackagePath}`,
+      },
+    ],
+    allowedActions: [
+      {
+        id: 'review_royalty_statement',
+        label: 'Review Royalty Statement',
+      },
+    ],
+    lastMovement: 'ROYALTY_BACKLOG_COMPLETION_SPRINT_COMPLETED',
   }
 }
 
@@ -1867,6 +2112,73 @@ function emptyMetrics(): PublisherOperatingCenterSnapshot['metrics'] {
   }
 }
 
+function readRoyaltyReviewQueue(): PublisherRoyaltyReviewQueue {
+  const manifestRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Manifest-Final-Status.csv')
+  const paymentRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Payment-Final-Classification.csv')
+  const statementRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Draft-Statement-Set.csv')
+  return {
+    manifestRows: manifestRows.length,
+    loadedRows: manifestRows.filter((row) => row.finalStatus === 'LOADED — DRAFT STATEMENT').length,
+    identityHolds: manifestRows.filter((row) => row.finalStatus === 'HELD — JACKIE IDENTITY DECISION').length,
+    titleHolds: manifestRows.filter((row) => row.finalStatus === 'HELD — JACKIE TITLE DECISION').length,
+    paymentRows: paymentRows.length,
+    paymentAllocationUnknown: paymentRows.filter((row) => row.finalPaymentStatus?.includes('ALLOCATION UNKNOWN')).length,
+    unresolvedPayments: paymentRows.filter((row) => row.finalPaymentStatus === 'UNRESOLVED — JACKIE DECISION').length,
+    draftStatements: statementRows.length,
+    decisionPackagePath: 'docs/operations/generated/2026-07-17-JM1-2026-Royalty-Jackie-Decision-Package.csv',
+  }
+}
+
+function readCsvRows(fileName: string) {
+  try {
+    const file = readFileSync(join(process.cwd(), 'docs/operations/generated', fileName), 'utf8')
+    const [headerLine, ...lines] = file.split(/\r?\n/).filter(Boolean)
+    const headers = splitCsvLine(headerLine)
+    return lines.map((line) => {
+      const cells = splitCsvLine(line)
+      return Object.fromEntries(headers.map((header, index) => [header, cells[index] || '']))
+    })
+  } catch {
+    return []
+  }
+}
+
+function splitCsvLine(line: string) {
+  const cells: string[] = []
+  let current = ''
+  let quoted = false
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index]
+    const next = line[index + 1]
+    if (char === '"' && quoted && next === '"') {
+      current += '"'
+      index += 1
+    } else if (char === '"') {
+      quoted = !quoted
+    } else if (char === ',' && !quoted) {
+      cells.push(current)
+      current = ''
+    } else {
+      current += char
+    }
+  }
+  cells.push(current)
+  return cells
+}
+
+function productionSharePointDesign() {
+  return [
+    '01_Titles/05_Proofreading',
+    '01_Titles/06_Production/01_Interior-Layout',
+    '01_Titles/06_Production/02_Cover-Design',
+    '01_Titles/06_Production/03_Author-Proofs',
+    '01_Titles/06_Production/04_Final-Print-Files',
+    '01_Titles/06_Production/05_Production-QA',
+    '01_Titles/07_Distribution',
+    '01_Titles/08_Published-Catalog',
+  ]
+}
+
 function ageBucket(days: number): PublisherQueueItem['ageBucket'] {
   if (days <= 2) return '0-2 days'
   if (days <= 7) return '3-7 days'
@@ -1885,6 +2197,16 @@ function overdueState(days: number, blocker: string): PublisherQueueItem['overdu
 
 function publisherActionToEvent(action: PublisherActionId) {
   switch (action) {
+    case 'place_asset_in_pipeline':
+      return 'PUBLISHER_PIPELINE_STAGE_PLACEMENT'
+    case 'advance_stage':
+      return 'PUBLISHER_STAGE_ADVANCEMENT_REQUESTED'
+    case 'begin_interior_layout':
+      return 'INTERIOR_LAYOUT_STARTED'
+    case 'begin_cover_design':
+      return 'COVER_CREATIVE_BRIEF_STARTED'
+    case 'review_royalty_statement':
+      return 'ROYALTY_DRAFT_STATEMENT_REVIEW_REQUESTED'
     case 'initialize_developmental_editing':
       return 'PUBLISHER_DEVELOPMENTAL_EDITING_INITIALIZATION_RECORDED'
     case 'request_missing_information':

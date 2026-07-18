@@ -175,6 +175,27 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                 </a>
               ))}
             </div>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              {[
+                ['#waiting-jackie', 'Publisher Today'],
+                ['#active-pipeline', 'Active Pipeline'],
+                ['#production-command', 'Production'],
+                ['#catalog-queue', 'Published Catalog'],
+                ['#author-portfolio', 'Authors'],
+                ['#royalties', 'Royalties'],
+                ['#invitations', 'Invitations'],
+                ['#alerts', 'Exceptions'],
+              ].map(([href, label]) => (
+                <a
+                  key={href}
+                  href={href}
+                  className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/55 transition hover:border-blue-300/40 hover:text-blue-100"
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
           </section>
         )}
 
@@ -261,7 +282,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
             ))}
         </div>
 
-        <section className="mt-8 border border-white/10 bg-white/[0.035] p-5">
+        <section id="active-pipeline" className="mt-8 border border-white/10 bg-white/[0.035] p-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">
@@ -328,6 +349,122 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               </tbody>
             </table>
           </div>
+        </section>
+
+        {snapshot && (
+          <section id="production-command" className="mt-8 border border-blue-300/20 bg-blue-950/15 p-5">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">
+                  Production Command
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold">Interior Layout and Cover Design</h2>
+                <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
+                  Interior Layout and Cover Design are concurrent governed waves. Cover concept work may begin with stable
+                  metadata and rights evidence; full wrap waits for page count and printer template.
+                </p>
+              </div>
+              <Badge label={`${snapshot.productionCommand.interiorQueue.length} production candidates`} tone="blue" />
+            </div>
+
+            <div className="mt-5 overflow-x-auto">
+              <table className="min-w-[1180px] w-full border-collapse text-left text-[12px]">
+                <thead className="border-b border-white/10 text-white/42">
+                  <tr>
+                    <Th>Title</Th>
+                    <Th>Editorial State</Th>
+                    <Th>Interior</Th>
+                    <Th>Cover</Th>
+                    <Th>Next Production Action</Th>
+                    <Th>SharePoint Parent</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {snapshot.productionCommand.interiorQueue.map((item) => (
+                    <tr key={item.key} className="border-b border-white/10 align-top">
+                      <Td>
+                        <span className="block font-semibold text-white">{item.title}</span>
+                        <span className="mt-1 block text-white/40">{item.author}</span>
+                      </Td>
+                      <Td>{item.editorialState}</Td>
+                      <Td>
+                        <span className="block text-white/75">{item.interiorState}</span>
+                        <span className="mt-1 block text-amber-100">{item.interiorReadiness}</span>
+                      </Td>
+                      <Td>
+                        <span className="block text-white/75">{item.coverState}</span>
+                        <span className="mt-1 block text-blue-100">{item.coverReadiness}</span>
+                      </Td>
+                      <Td>
+                        <span className="block">{item.nextInteriorAction}</span>
+                        <span className="mt-2 block text-white/38">{item.nextCoverAction}</span>
+                      </Td>
+                      <Td>{item.sharePointParent}</Td>
+                    </tr>
+                  ))}
+                  {snapshot.productionCommand.interiorQueue.length === 0 && (
+                    <tr>
+                      <td className="px-3 py-5 text-white/45" colSpan={6}>
+                        No active production candidates were returned from Core.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-5 grid gap-2 md:grid-cols-2">
+              {snapshot.productionCommand.sharePointDesign.map((path) => (
+                <code key={path} className="border border-white/10 bg-black/20 px-3 py-2 text-[12px] text-white/60">
+                  {path}
+                </code>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {snapshot && (
+          <section id="royalties" className="mt-8 border border-white/10 bg-white/[0.035] p-5">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Royalties</p>
+                <h2 className="mt-2 text-2xl font-semibold">2026 statement review queue</h2>
+                <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
+                  The consolidated royalty decision package is available as a publisher review queue. Statements remain draft
+                  internal review until identity, title, and payment decisions close.
+                </p>
+              </div>
+              <Badge label={`${snapshot.royalties.draftStatements} draft statements`} tone="amber" />
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Info label="Manifest rows" value={String(snapshot.royalties.manifestRows)} />
+              <Info label="Loaded rows" value={String(snapshot.royalties.loadedRows)} />
+              <Info label="Identity holds" value={String(snapshot.royalties.identityHolds)} />
+              <Info label="Title holds" value={String(snapshot.royalties.titleHolds)} />
+              <Info label="Payment rows" value={String(snapshot.royalties.paymentRows)} />
+              <Info label="Allocation unknown" value={String(snapshot.royalties.paymentAllocationUnknown)} />
+              <Info label="Unresolved payments" value={String(snapshot.royalties.unresolvedPayments)} />
+              <Info label="Decision package" value={snapshot.royalties.decisionPackagePath} />
+            </div>
+          </section>
+        )}
+
+        <section id="author-portfolio" className="mt-8 border border-white/10 bg-white/[0.035] p-5">
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Authors and Invitations</p>
+          <h2 className="mt-2 text-2xl font-semibold">Portfolio preview and invitation readiness</h2>
+          <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
+            Publisher actions cover portfolio preview, active/backlist placement, contact resolution, email update approval,
+            new-contact approval, pilot invitation readiness, and mass invitation lockout pending separate approval.
+          </p>
+        </section>
+
+        <section id="invitations" className="mt-6 border border-white/10 bg-white/[0.035] p-5">
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Invitations</p>
+          <h2 className="mt-2 text-2xl font-semibold">Pilot invitation controls</h2>
+          <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
+            Pilot invitations may be prepared and sent when author identity and portfolio preview are approved. Mass invitation
+            remains locked and is not authorized by this release.
+          </p>
         </section>
 
         <section className="mt-8 border border-blue-300/20 bg-blue-950/15 p-5">
