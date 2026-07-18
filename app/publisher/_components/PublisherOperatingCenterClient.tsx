@@ -526,6 +526,42 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               <Info label="Unresolved payments" value={String(snapshot.royalties.unresolvedPayments)} />
               <Info label="Decision package" value={snapshot.royalties.decisionPackagePath} />
             </div>
+            <div className="mt-6 border border-blue-300/20 bg-blue-950/15 p-4">
+              <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">
+                    Monthly Close
+                  </p>
+                  <h3 className="mt-2 text-xl font-semibold">2026 source checklist</h3>
+                  <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
+                    Royalty close now tracks governed source files before import. The legacy spreadsheet is retained as
+                    historical reference only.
+                  </p>
+                </div>
+                <Badge
+                  label={
+                    snapshot.royalties.monthlyClose.latestAcxMonthAvailable
+                      ? `ACX through ${snapshot.royalties.monthlyClose.latestAcxMonthAvailable}`
+                      : 'ACX status pending'
+                  }
+                  tone="blue"
+                />
+              </div>
+              <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                {snapshot.royalties.monthlyClose.months.map((month) => (
+                  <MonthlyCloseCard key={month.month} month={month} />
+                ))}
+              </div>
+              <div className="mt-4 grid gap-3 lg:grid-cols-4">
+                <Info label="Ingram automation" value={snapshot.royalties.monthlyClose.automation.ingram || 'Pending'} />
+                <Info label="KDP import" value={snapshot.royalties.monthlyClose.automation.kdp || 'Pending'} />
+                <Info label="ACX import" value={snapshot.royalties.monthlyClose.automation.acx || 'Pending'} />
+                <Info label="Direct sales" value={snapshot.royalties.monthlyClose.automation.directSales || 'Pending'} />
+              </div>
+              <p className="mt-3 text-[12px] text-white/45">
+                {snapshot.royalties.monthlyClose.spreadsheetStatus || 'Spreadsheet status pending.'}
+              </p>
+            </div>
             <div className="mt-5 grid gap-3 lg:grid-cols-2">
               {snapshot.royalties.decisionCards.slice(0, 12).map((decision) => (
                 <RoyaltyDecisionCardView
@@ -726,6 +762,37 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
         </div>
       </section>
     </main>
+  )
+}
+
+function MonthlyCloseCard({
+  month,
+}: {
+  month: PublisherOperatingCenterSnapshot['royalties']['monthlyClose']['months'][number]
+}) {
+  const tone = month.status.toLowerCase().includes('waiting') ? 'amber' : 'blue'
+  return (
+    <article className="border border-white/10 bg-black/15 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h4 className="text-[16px] font-semibold text-white">{month.month}</h4>
+          <p className="mt-1 text-[12px] leading-5 text-white/50">{month.status}</p>
+        </div>
+        <Badge label={month.waitingFor.length ? `${month.waitingFor.length} waiting` : 'No open waits'} tone={tone} />
+      </div>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        {month.sources.map((source) => (
+          <div key={`${month.month}:${source.label}`} className="border border-white/10 bg-white/[0.03] p-2">
+            <p className="text-[12px] font-semibold text-white/75">{source.label}</p>
+            <p className="mt-1 text-[11px] uppercase tracking-[0.08em] text-blue-100">{source.state}</p>
+            <p className="mt-1 text-[11px] leading-4 text-white/42">{source.detail}</p>
+          </div>
+        ))}
+      </div>
+      {month.waitingFor.length > 0 && (
+        <p className="mt-3 text-[12px] leading-5 text-amber-100">Waiting: {month.waitingFor.join('; ')}</p>
+      )}
+    </article>
   )
 }
 

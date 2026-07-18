@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-07-18T10:14:00-04:00",
+  "archiveRoot": "04_Financials/2026",
+  "operatingModel": "Source files -> JM1 Import -> Royalty Tables -> Draft Statements -> Publisher Approval -> Author Statements -> Payments",
+  "spreadsheetStatus": "Retired reference only; not the recurring operating source.",
+  "latestAcxMonthAvailable": "April",
+  "months": [
+    {
+      "month": "January",
+      "status": "Source Present — Awaiting File-Level Import",
+      "sources": [
+        {"label":"LSI POD US","state":"Present","detail":"POD Wholesale 9118734 US-USD"},
+        {"label":"LSI POD UK","state":"Present","detail":"POD Wholesale 9118734 UK-GBP"},
+        {"label":"LSI eBook Wholesale","state":"Present","detail":"Ingram eBook Wholesale 6116305 USD"},
+        {"label":"LSI eBook Agency","state":"Present","detail":"Ingram eBook Agency 6116305 USD"},
+        {"label":"KDP","state":"Present","detail":"Prior Months Royalties Jan 2026"},
+        {"label":"ACX","state":"Present","detail":"Monthly ACX Jan 2026"},
+        {"label":"Direct Sales","state":"Present","detail":"Share & Sell Ecommerce 9118734 US-USD"}
+      ],
+      "waitingFor": ["File-level SHA-256/import provenance", "January LSI POD US duplicate/updated-source review"]
+    },
+    {
+      "month": "February",
+      "status": "Source Present — Awaiting File-Level Import",
+      "sources": [
+        {"label":"LSI POD US","state":"Present","detail":"POD Wholesale 9118734 US-USD"},
+        {"label":"LSI POD UK","state":"Present","detail":"POD Wholesale 9118734 UK-GBP"},
+        {"label":"LSI eBook Wholesale","state":"Present","detail":"Ingram eBook Wholesale 6116305 USD"},
+        {"label":"LSI eBook Agency","state":"Not Found","detail":"No February agency file in archive"},
+        {"label":"KDP","state":"Present","detail":"Prior Months Royalties Feb 2026"},
+        {"label":"ACX","state":"Present","detail":"Monthly ACX Feb 2026"},
+        {"label":"Direct Sales","state":"Not Found","detail":"No direct sales file in folder"}
+      ],
+      "waitingFor": ["File-level SHA-256/import provenance", "Confirm whether agency/direct reports were not issued or are missing"]
+    },
+    {
+      "month": "March",
+      "status": "Source Present — Awaiting File-Level Import",
+      "sources": [
+        {"label":"LSI POD US","state":"Present","detail":"POD Wholesale 9118734 US-USD"},
+        {"label":"LSI POD UK","state":"Not Found","detail":"No March UK POD file in archive"},
+        {"label":"LSI eBook Wholesale","state":"Present","detail":"Ingram eBook Wholesale 6116305 USD"},
+        {"label":"LSI eBook Agency","state":"Present","detail":"Ingram eBook Agency 6116305 USD"},
+        {"label":"KDP","state":"Present","detail":"Prior Months Royalties Mar 2026"},
+        {"label":"ACX","state":"Present","detail":"Monthly ACX Mar 2026"},
+        {"label":"Direct Sales","state":"Not Found","detail":"No direct sales file in folder"}
+      ],
+      "waitingFor": ["File-level SHA-256/import provenance", "Confirm whether UK POD/direct reports were not issued or are missing"]
+    },
+    {
+      "month": "April",
+      "status": "Draft Statements Exist — Source Provenance Pending",
+      "sources": [
+        {"label":"LSI POD US","state":"Present","detail":"POD Wholesale 9118734 US-USD"},
+        {"label":"LSI POD UK","state":"Not Found","detail":"No April UK POD file in archive"},
+        {"label":"LSI eBook Wholesale","state":"Present","detail":"Ingram eBook Wholesale 6116305 USD"},
+        {"label":"LSI eBook Agency","state":"Not Found","detail":"No April agency file in archive"},
+        {"label":"KDP","state":"Present","detail":"Prior Months Royalties Apr 2026"},
+        {"label":"ACX","state":"Present","detail":"Monthly ACX Apr 2026"},
+        {"label":"Direct Sales","state":"Evidence Only","detail":"Lightning Source AR invoice present"}
+      ],
+      "waitingFor": ["File-level SHA-256/source-file provenance backfill into loaded April royalty rows"]
+    },
+    {
+      "month": "May",
+      "status": "Draft Statements Exist — Waiting on ACX/Source Provenance",
+      "sources": [
+        {"label":"LSI POD US","state":"Present","detail":"POD Wholesale 6116305 and 9118734 US-USD"},
+        {"label":"LSI POD UK","state":"Not Found","detail":"No May UK POD file in archive"},
+        {"label":"LSI eBook Wholesale","state":"Present","detail":"Ingram eBook Wholesale 6116305 USD"},
+        {"label":"LSI eBook Agency","state":"Not Found","detail":"No May agency file in archive"},
+        {"label":"KDP","state":"Present","detail":"Prior Months Royalties May 2026"},
+        {"label":"ACX","state":"Known Unavailable / Not Found","detail":"Latest archive ACX month is April"},
+        {"label":"Direct Sales","state":"Not Found","detail":"No direct sales file in folder"}
+      ],
+      "waitingFor": ["ACX May if published", "File-level SHA-256/source-file provenance backfill"]
+    },
+    {
+      "month": "June",
+      "status": "Waiting on Sources",
+      "sources": [
+        {"label":"LSI POD US","state":"Present","detail":"POD Wholesale 6116305 and 9118734 US-USD"},
+        {"label":"LSI POD UK","state":"Not Found","detail":"No June UK POD file in archive"},
+        {"label":"LSI eBook Wholesale","state":"Present","detail":"Ingram eBook Wholesale 6116305 USD"},
+        {"label":"LSI eBook Agency","state":"Present","detail":"Ingram eBook Agency 6116305 USD"},
+        {"label":"KDP","state":"Upload Required","detail":"June KDP report not in archive"},
+        {"label":"ACX","state":"Known Unavailable / Not Found","detail":"Latest archive ACX month is April"},
+        {"label":"Direct Sales","state":"Pending","detail":"No June direct sales file in archive"}
+      ],
+      "waitingFor": ["KDP June controlled upload", "Direct Sales June evidence", "ACX latest available refresh when published"]
+    }
+  ],
+  "automation": {
+    "ingram": "Archive source files present; production email attachment ingestion still requires mailbox listener/import implementation before automatic file-level import can be marked operational.",
+    "kdp": "Controlled monthly upload required.",
+    "acx": "Controlled latest-available upload required; latest archived ACX month is April.",
+    "directSales": "Controlled upload or Share & Sell archive recognition required."
+  }
+}
