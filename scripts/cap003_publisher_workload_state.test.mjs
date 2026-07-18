@@ -63,13 +63,32 @@ const expectations = [
       !deriveNextActionBody.includes('capacity guard passes'),
   },
   {
-    name: 'approved Copyediting exit moves The Intentional Leader to Proofreading Ready publisher action',
+    name: 'approved Copyediting exit can move to Proofreading Ready before Proofreading begins',
     ok:
       deriveNextActionBody.includes("'Proofreading Ready'") &&
       deriveNextActionBody.includes('Begin CAP-004 Proofreading when authorized') &&
       source.includes('Prepare/start CAP-004 Proofreading when authorized') &&
       source.includes('Copyediting exit is complete') &&
       !deriveNextActionBody.includes("!['Line Editing - Author Review', 'Copyediting - Release Decision Ready', 'Copyediting - Author Review'].includes(state)"),
+  },
+  {
+    name: 'active Proofreading stage renders as in-progress work rather than stale ready state',
+    ok:
+      deriveWorkloadStateBody.includes("return 'Proofreading In Progress'") &&
+      deriveNextActionBody.includes("'Proofreading In Progress'") &&
+      deriveNextActionBody.includes('Continue Proofreading pass and internal QA') &&
+      source.includes("if (state === 'Proofreading In Progress') return 'Continue Proofreading pass and internal QA'") &&
+      source.includes("if (state === 'Proofreading In Progress') return 'Not yet released'") &&
+      source.includes("if (state === 'Proofreading In Progress') return 'No restart required; Proofreading is underway'"),
+  },
+  {
+    name: 'Publisher Operating Center exposes author response queue and recovery actions',
+    ok:
+      source.includes('export type PublisherAuthorResponseQueueItem') &&
+      source.includes('buildAuthorResponseQueue') &&
+      source.includes('AUTHOR_RESPONSE_RECONCILE_REQUESTED') &&
+      source.includes('AUTHOR_RESPONSE_FAILED_TRANSITION_RETRY_REQUESTED') &&
+      source.includes('STALE — SLA BREACH'),
   },
 ]
 

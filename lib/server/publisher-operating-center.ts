@@ -39,6 +39,12 @@ export type PublisherActionId =
   | 'begin_interior_layout'
   | 'begin_cover_design'
   | 'review_royalty_statement'
+  | 'view_thread'
+  | 'confirm_classification'
+  | 'change_classification'
+  | 'reconcile_response'
+  | 'retry_failed_transition'
+  | 'mark_non_decision_message'
   | 'request_missing_information'
   | 'return_for_correction'
   | 'place_evidence_hold'
@@ -99,6 +105,9 @@ export type PublisherWorkloadState =
   | 'Copyediting - Release Decision Ready'
   | 'Copyediting - Author Review'
   | 'Proofreading Ready'
+  | 'Proofreading In Progress'
+  | 'Proofreading - Internal QA'
+  | 'Proofreading - Author Review'
   | 'Production Ready'
   | 'Blocked'
   | 'External Hold'
@@ -209,6 +218,34 @@ export type PublisherTodaySnapshot = {
   distributionCatalogQueue: PublisherTodayItem[]
   alerts: PublisherTodayItem[]
   recentMovements: PublisherTodayItem[]
+}
+
+export type PublisherAuthorResponseQueueItem = {
+  key: string
+  author: string
+  title: string
+  stagePackage: string
+  responseReceived: string
+  classifiedDecision:
+    | 'APPROVED WITHOUT CHANGES'
+    | 'APPROVED WITH CORRECTIONS'
+    | 'CORRECTIONS REQUESTED'
+    | 'CLARIFICATION REQUESTED'
+    | 'PAUSE REQUESTED'
+    | 'AMBIGUOUS — HUMAN REVIEW'
+  processingStatus: 'PROCESSED' | 'PROCESSING' | 'AMBIGUOUS — REVIEW' | 'FAILED — RETRY AVAILABLE' | 'STALE — SLA BREACH'
+  ageMinutes: number
+  failedStep: string
+  nextAction: string
+  threadEvidence: string
+  gateId: string
+  stageId: string
+  packageId: string
+  messageId: string
+  allowedActions: Array<{
+    id: PublisherActionId
+    label: string
+  }>
 }
 
 export type PublisherProductionReadinessItem = {
@@ -322,6 +359,7 @@ export type PublisherOperatingCenterSnapshot = {
     coverQueue: PublisherProductionReadinessItem[]
     sharePointDesign: string[]
   }
+  authorResponses: PublisherAuthorResponseQueueItem[]
   royalties: PublisherRoyaltyReviewQueue
   today: PublisherTodaySnapshot
 }
@@ -355,16 +393,18 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
         coverQueue: [],
         sharePointDesign: productionSharePointDesign(),
       },
+      authorResponses: [],
       royalties: readRoyaltyReviewQueue(),
       today: emptyPublisherToday(),
     }
   }
 
-  const [intakes, titles, assets, editorialStages, opportunities, logs] = await Promise.all([
+  const [intakes, titles, assets, editorialStages, approvalGates, opportunities, logs] = await Promise.all([
     getRecentIntakes(config),
     getRecentTitles(config),
     getRecentAssets(config),
     getRecentEditorialStages(config),
+    getRecentApprovalGates(config),
     getRecentOpportunities(config),
     getRecentExecutionLogs(config),
   ])
@@ -383,6 +423,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
   const portfolio = buildPortfolioItems(titles, assets, editorialStages)
   const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, logs, portfolio)
   const productionCommand = buildProductionCommand(workload, portfolio)
+  const authorResponses = buildAuthorResponseQueue(approvalGates, editorialStages, titles, logs)
   const metrics = buildMetrics(queue, logs, workload, portfolio)
   const today = buildPublisherToday({
     generatedAt: new Date().toISOString(),
@@ -390,6 +431,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     workload,
     portfolio,
     productionCommand,
+    authorResponses,
     royalties: readRoyaltyReviewQueue(),
     logs,
     metrics,
@@ -415,6 +457,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       reconciliationRequired: portfolio.filter((item) => item.portfolioState === 'reconciliation_required'),
     },
     productionCommand,
+    authorResponses,
     royalties: readRoyaltyReviewQueue(),
     today,
   }
@@ -689,6 +732,52 @@ export async function logPublisherOperationalAction(input: {
   }
 }
 
+export async function logPublisherAuthorResponseAction(input: {
+  gateId: string
+  operatorEmail: string
+  action: Extract<
+    PublisherActionId,
+    | 'view_thread'
+    | 'confirm_classification'
+    | 'change_classification'
+    | 'reconcile_response'
+    | 'retry_failed_transition'
+    | 'mark_non_decision_message'
+  >
+}) {
+  const config = getDataverseServerConfig()
+  if (!config) throw new Error('dataverse_config_missing')
+
+  const gate = await dataverseFirst(config, 'jm1pub_editorialapprovalgates', {
+    $select:
+      'jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value',
+    $filter: `jm1pub_editorialapprovalgateid eq ${input.gateId}`,
+  })
+  if (!gate) throw new Error('author_response_gate_not_found')
+
+  const actionType = publisherActionToEvent(input.action)
+  const logId = await writePublisherExecutionLog(config, {
+    actionType,
+    name: `${actionType} - ${String(gate.jm1pub_editorialapprovalgatename || input.gateId)}`,
+    description: [
+      `Publisher Operating Center recorded author-response action ${input.action}.`,
+      `Gate ${String(gate.jm1pub_gatecode || gate.jm1pub_editorialapprovalgatename || input.gateId)}.`,
+      `Gate status ${dataverseFormatted(gate, 'jm1pub_gatestatus') || String(gate.jm1pub_gatestatus || 'Unknown')}.`,
+      `Decision ${dataverseFormatted(gate, 'jm1pub_authordecision') || String(gate.jm1pub_authordecision || 'Unknown')}.`,
+      `Decision timestamp ${String(gate.jm1pub_authordecisionon || 'Unknown')}.`,
+      `Operator ${input.operatorEmail}.`,
+      'No author communication sent.',
+    ].join(' '),
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: input.gateId,
+  })
+
+  return {
+    gateId: input.gateId,
+    executionLogId: extractId(logId),
+  }
+}
+
 async function getPublisherIntakeForAction(config: DataverseServerConfig, intakeId: string) {
   const intake = await dataverseFirst(config, 'jm1_publishingintakes', {
     $select:
@@ -739,6 +828,15 @@ async function getRecentEditorialStages(config: DataverseServerConfig) {
   })
 }
 
+async function getRecentApprovalGates(config: DataverseServerConfig) {
+  return dataverseList(config, 'jm1pub_editorialapprovalgates', {
+    $select:
+      'jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authorresponsesummary,jm1pub_authordecisionon,jm1pub_authordecisionsource,jm1pub_nextstageauthorized,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,createdon,modifiedon',
+    $orderby: 'modifiedon desc',
+    $top: '100',
+  })
+}
+
 async function getRecentOpportunities(config: DataverseServerConfig) {
   return dataverseList(config, 'opportunities', {
     $select:
@@ -750,7 +848,7 @@ async function getRecentOpportunities(config: DataverseServerConfig) {
 
 async function getRecentExecutionLogs(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1_executionlogs', {
-    $select: 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_sourceentity,jm1_sourcerecordid,createdon',
+    $select: 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription,jm1_sourceentity,jm1_sourcerecordid,createdon',
     $orderby: 'createdon desc',
     $top: '100',
   })
@@ -1101,7 +1199,20 @@ function deriveWorkloadState(input: {
     if (status.includes('progress')) return 'Copyediting In Progress'
     return 'Copyediting Ready'
   }
-  if (type.includes('proof')) return 'Proofreading Ready'
+  if (type.includes('proof')) {
+    if (
+      status.includes('author') ||
+      summary.includes('author review') ||
+      summary.includes('ready for your review') ||
+      summary.includes('sent by email')
+    ) {
+      return 'Proofreading - Author Review'
+    }
+    if (status.includes('qa')) return 'Proofreading - Internal QA'
+    if (status.includes('progress')) return 'Proofreading In Progress'
+    if (status.includes('complete')) return 'Production Ready'
+    return 'Proofreading Ready'
+  }
   if (type.includes('production')) return 'Production Ready'
   if (input.pipelineStage.toLowerCase().includes('editorial')) return 'Editorial Review'
   if (input.pipelineStage.toLowerCase().includes('ongoing')) return 'External Hold'
@@ -1125,6 +1236,9 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
       'Copyediting - Release Decision Ready',
       'Copyediting - Author Review',
       'Proofreading Ready',
+      'Proofreading In Progress',
+      'Proofreading - Internal QA',
+      'Proofreading - Author Review',
     ].includes(state)
   ) {
     return 'Complete full Volume I Line Editing package and QA'
@@ -1156,6 +1270,12 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
       return 'Await author response; Proofreading awaits author approval'
     case 'Proofreading Ready':
       return 'Begin CAP-004 Proofreading when authorized'
+    case 'Proofreading In Progress':
+      return 'Continue Proofreading pass and internal QA'
+    case 'Proofreading - Internal QA':
+      return 'Complete Proofreading internal QA'
+    case 'Proofreading - Author Review':
+      return 'Await author Proofreading response'
     case 'External Hold':
       return 'Resolve external evidence or publisher judgment hold'
     default:
@@ -1185,7 +1305,10 @@ function deriveAuthorAction(state: PublisherWorkloadState, guardStatus: 'pass' |
   if (state === 'Line Editing - Author Review') return 'Review and approve Line Editing package'
   if (state === 'Copyediting - Release Decision Ready') return 'None - publisher release decision pending'
   if (state === 'Copyediting - Author Review') return 'Review and approve Copyediting package'
-  if (state === 'Proofreading Ready') return 'None'
+  if (state === 'Proofreading Ready' || state === 'Proofreading In Progress' || state === 'Proofreading - Internal QA') {
+    return 'None'
+  }
+  if (state === 'Proofreading - Author Review') return 'Review and approve Proofreading package'
   if (state.includes('Author Review')) return 'Review released package and respond through governed channel'
   return 'None'
 }
@@ -1201,11 +1324,15 @@ function derivePublisherAction(state: PublisherWorkloadState) {
   if (state === 'Copyediting - Release Decision Ready') return 'Review and approve release of the Copyediting package'
   if (state === 'Copyediting - Author Review') return 'Await author response'
   if (state === 'Proofreading Ready') return 'Prepare/start CAP-004 Proofreading when authorized'
+  if (state === 'Proofreading In Progress') return 'Continue Proofreading pass and internal QA'
+  if (state === 'Proofreading - Internal QA') return 'Complete Proofreading QA and prepare package'
+  if (state === 'Proofreading - Author Review') return 'Await author response'
   return 'Resolve current blocker'
 }
 
 function deriveInternalQaState(state: PublisherWorkloadState) {
   if (state.includes('Internal QA')) return 'In QA'
+  if (state === 'Proofreading In Progress') return 'Pending'
   if (state === 'Line Editing - Author Review') return 'PASS'
   if (state === 'Line Editing - Release Decision Ready') return 'Passed'
   if (state === 'Copyediting - Release Decision Ready') return 'PASS'
@@ -1218,6 +1345,7 @@ function deriveInternalQaState(state: PublisherWorkloadState) {
 function derivePackageReadiness(state: PublisherWorkloadState, guardStatus: 'pass' | 'watch' | 'blocked') {
   if (guardStatus === 'blocked') return 'Held by title-specific dependency'
   if (state === 'Line Editing - Author Review') return 'Delivered'
+  if (state === 'Proofreading In Progress') return 'Not yet released'
   if (state.includes('Author Review')) return 'Released to author'
   if (state === 'Line Editing - Release Decision Ready') return 'Ready for Jackie release decision'
   if (state === 'Copyediting - Release Decision Ready') return 'Ready for Jackie release decision'
@@ -1232,6 +1360,9 @@ function deriveRestartCondition(state: PublisherWorkloadState, guardStatus: 'pas
   if (state === 'Copyediting - Release Decision Ready') return 'No restart required; Proofreading awaits publisher release decision'
   if (state === 'Copyediting - Author Review') return 'No restart required; Proofreading awaits author response'
   if (state === 'Proofreading Ready') return 'No restart required; Copyediting exit is complete'
+  if (state === 'Proofreading In Progress') return 'No restart required; Proofreading is underway'
+  if (state === 'Proofreading - Internal QA') return 'No restart required; Proofreading QA is underway'
+  if (state === 'Proofreading - Author Review') return 'No restart required; Proofreading package is with author'
   if (state === 'External Hold') return 'Resolve external evidence hold'
   if (state === 'Blocked') return 'Reconcile title, asset, and stage evidence'
   return 'No restart required'
@@ -1586,6 +1717,7 @@ function buildPublisherToday(input: {
   workload: PublisherWorkloadItem[]
   portfolio: PublisherPortfolioItem[]
   productionCommand: PublisherOperatingCenterSnapshot['productionCommand']
+  authorResponses: PublisherAuthorResponseQueueItem[]
   royalties: PublisherRoyaltyReviewQueue
   logs: DataverseRow[]
   metrics: PublisherOperatingCenterSnapshot['metrics']
@@ -1646,6 +1778,9 @@ function buildPublisherToday(input: {
 
   const alerts = prioritizeTodayItems([
     ...failedLogItems,
+    ...input.authorResponses
+      .filter((item) => item.processingStatus !== 'PROCESSED')
+      .map(authorResponseToTodayItem),
     ...workloadTodayItems.filter((item) => item.severity === 'urgent' || item.dependency.toLowerCase().includes('blocked')),
     ...queueTodayItems.filter((item) => item.severity === 'urgent'),
     ...(input.royalties.identityHolds + input.royalties.titleHolds + input.royalties.unresolvedPayments > 0
@@ -1938,6 +2073,186 @@ function royaltyDecisionTodayItem(royalties: PublisherRoyaltyReviewQueue): Publi
   }
 }
 
+function buildAuthorResponseQueue(
+  gates: DataverseRow[],
+  stages: DataverseRow[],
+  titles: DataverseRow[],
+  logs: DataverseRow[],
+): PublisherAuthorResponseQueueItem[] {
+  const processedActions: PublisherAuthorResponseQueueItem['allowedActions'] = [{ id: 'view_thread', label: 'View Thread' }]
+  const recoveryActions: PublisherAuthorResponseQueueItem['allowedActions'] = [
+    { id: 'view_thread', label: 'View Thread' },
+    { id: 'confirm_classification', label: 'Confirm Classification' },
+    { id: 'change_classification', label: 'Change Classification' },
+    { id: 'reconcile_response', label: 'Reconcile Response' },
+    { id: 'retry_failed_transition', label: 'Retry Failed Transition' },
+    { id: 'mark_non_decision_message', label: 'Mark Non-Decision Message' },
+  ]
+
+  return gates
+    .filter((gate) => {
+      const summary = stringValue(gate.jm1pub_authorresponsesummary)
+      return Boolean(gate.jm1pub_authordecisionon || summary.match(/\b(author replied|outlook message|message id|approved|response received)\b/i))
+    })
+    .map((gate) => {
+      const gateId = stringValue(gate.jm1pub_editorialapprovalgateid)
+      const stageId = dataverseLookupId(gate, '_jm1pub_editorialstageid_value')
+      const titleId = dataverseLookupId(gate, '_jm1pub_titleid_value')
+      const packageId = dataverseLookupId(gate, '_jm1pub_deliverableartifactid_value')
+      const stage = stages.find((candidate) => stringValue(candidate.jm1pub_editorialstageid) === stageId)
+      const stageSequence = Number(stage?.jm1pub_stagesequence || 0)
+      const downstreamStage = stages.find((candidate) => {
+        const candidateTitleId = dataverseLookupId(candidate, '_jm1pub_titleid_value')
+        const candidateSequence = Number(candidate.jm1pub_stagesequence || 0)
+        const candidateStatus = dataverseFormatted(candidate, 'jm1pub_stagestatus').toLowerCase()
+        return (
+          candidateTitleId === titleId &&
+          candidateSequence > stageSequence &&
+          (candidateStatus.includes('progress') || candidateStatus.includes('complete') || candidateStatus.includes('author'))
+        )
+      })
+      const title = titles.find((candidate) => stringValue(candidate.jm1pub_titleid) === titleId)
+      const summary = stringValue(gate.jm1pub_authorresponsesummary)
+      const gateStatus = dataverseFormatted(gate, 'jm1pub_gatestatus') || stringValue(gate.jm1pub_gatestatus)
+      const authorDecision = dataverseFormatted(gate, 'jm1pub_authordecision') || stringValue(gate.jm1pub_authordecision)
+      const decisionOn = stringValue(gate.jm1pub_authordecisionon || gate.modifiedon || gate.createdon)
+      const modifiedOn = stringValue(gate.modifiedon || decisionOn)
+      const ageMinutes = ageMinutesSince(decisionOn || modifiedOn)
+      const classifiedDecision = classifyAuthorDecision(authorDecision, summary)
+      const transitionLog = logs.find((log) => {
+        const type = stringValue(log.jm1_actiontype)
+        const source = stringValue(log.jm1_sourcerecordid)
+        const detail = stringValue(log.jm1_actiondescription)
+        return (
+          source === gateId ||
+          (stageId && source === stageId) ||
+          detail.includes(gateId) ||
+          type.includes('STAGE_TRANSITION') ||
+          type.includes('PROOFREADING_STARTED') ||
+          type.includes('CAP004_PROOFREADING_STARTED')
+        )
+      })
+      const processingStatus = deriveAuthorResponseProcessingStatus(gateStatus, classifiedDecision, transitionLog || downstreamStage)
+      const failedStep = deriveAuthorResponseFailedStep(gateStatus, transitionLog, processingStatus)
+      const stagePackage = [
+        dataverseFormatted(gate, 'jm1pub_gatecode') || stringValue(gate.jm1pub_gatecode),
+        stringValue(gate.jm1pub_editorialapprovalgatename),
+      ]
+        .filter(Boolean)
+        .join(' · ')
+
+      return {
+        key: gateId,
+        author: dataverseFormatted(gate, '_jm1pub_titleid_value') ? stringValue(title?.jm1pub_authorname) || 'Author' : 'Author',
+        title:
+          stringValue(title?.jm1pub_titlename || title?.jm1pub_name) ||
+          dataverseFormatted(gate, '_jm1pub_titleid_value') ||
+          'Title pending',
+        stagePackage,
+        responseReceived: decisionOn,
+        classifiedDecision,
+        processingStatus,
+        ageMinutes,
+        failedStep,
+        nextAction:
+          processingStatus === 'PROCESSED'
+            ? 'No action required; response has been applied.'
+            : processingStatus === 'AMBIGUOUS — REVIEW'
+              ? 'Confirm the response classification before movement.'
+              : 'Reconcile response and retry the failed transition.',
+        threadEvidence: stringValue(gate.jm1pub_authordecisionsource) || extractThreadEvidence(summary),
+        gateId,
+        stageId,
+        packageId,
+        messageId: extractOutlookMessageId(summary),
+        allowedActions: processingStatus === 'PROCESSED' ? processedActions : recoveryActions,
+      }
+    })
+    .sort((a, b) => Date.parse(b.responseReceived || '') - Date.parse(a.responseReceived || ''))
+    .slice(0, 25)
+}
+
+function classifyAuthorDecision(
+  formattedDecision: string,
+  summary: string,
+): PublisherAuthorResponseQueueItem['classifiedDecision'] {
+  const text = `${formattedDecision} ${summary}`.toLowerCase()
+  if (text.includes('pause')) return 'PAUSE REQUESTED'
+  if (text.includes('clarification') || text.includes('question')) return 'CLARIFICATION REQUESTED'
+  if (text.includes('correction') || text.includes('changes requested') || text.includes('requested changes')) {
+    return text.includes('approve') ? 'APPROVED WITH CORRECTIONS' : 'CORRECTIONS REQUESTED'
+  }
+  if (text.includes('approve') || text.includes('approved') || text.includes('i approve') || text.includes('looks good')) {
+    return 'APPROVED WITHOUT CHANGES'
+  }
+  return 'AMBIGUOUS — HUMAN REVIEW'
+}
+
+function deriveAuthorResponseProcessingStatus(
+  gateStatus: string,
+  decision: PublisherAuthorResponseQueueItem['classifiedDecision'],
+  transitionLog: DataverseRow | undefined,
+): PublisherAuthorResponseQueueItem['processingStatus'] {
+  const status = gateStatus.toLowerCase()
+  if (decision === 'AMBIGUOUS — HUMAN REVIEW') return 'AMBIGUOUS — REVIEW'
+  if (status.includes('approved') && transitionLog) return 'PROCESSED'
+  if (status.includes('approved')) return 'STALE — SLA BREACH'
+  if (status.includes('response received') || status.includes('publisher processing')) return 'PROCESSING'
+  return 'FAILED — RETRY AVAILABLE'
+}
+
+function deriveAuthorResponseFailedStep(
+  gateStatus: string,
+  transitionLog: DataverseRow | undefined,
+  processingStatus: PublisherAuthorResponseQueueItem['processingStatus'],
+) {
+  if (processingStatus === 'PROCESSED') return 'None'
+  if (processingStatus === 'AMBIGUOUS — REVIEW') return 'Classification requires publisher confirmation'
+  if (gateStatus.toLowerCase().includes('approved') && !transitionLog) return 'GATE UPDATED — STAGE NOT ADVANCED'
+  return 'READ MODEL REFRESHED — UI CACHE STALE or downstream transition retry required'
+}
+
+function authorResponseToTodayItem(item: PublisherAuthorResponseQueueItem): PublisherTodayItem {
+  return {
+    key: `author-response:${item.key}`,
+    recordId: item.gateId,
+    titleId: item.gateId,
+    title: item.title,
+    author: item.author,
+    portfolioState: 'author_response',
+    pipelineStage: 'Author Response',
+    editorialStage: item.stagePackage,
+    substage: item.classifiedDecision,
+    owner: item.processingStatus === 'AMBIGUOUS — REVIEW' ? 'Jackie' : 'Cody',
+    nextAction: item.nextAction,
+    targetDate: '',
+    ageDays: Math.floor(item.ageMinutes / 1440),
+    severity: item.processingStatus === 'STALE — SLA BREACH' ? 'urgent' : 'watch',
+    packageState: item.processingStatus,
+    qaState: 'Response processing',
+    dependency: item.failedStep,
+    evidenceLinks: [],
+    allowedActions: item.allowedActions,
+    lastMovement: item.threadEvidence || item.responseReceived,
+  }
+}
+
+function extractOutlookMessageId(summary: string) {
+  const match = summary.match(/Outlook message ID:\s*([^.\s]+(?:={0,2}))/i)
+  return match?.[1] || ''
+}
+
+function extractThreadEvidence(summary: string) {
+  const match = summary.match(/Thread evidence:\s*([^.;]+)/i)
+  return match?.[1] || 'Governed author response evidence'
+}
+
+function ageMinutesSince(value: string) {
+  const time = Date.parse(value)
+  if (!Number.isFinite(time)) return 0
+  return Math.max(0, Math.floor((Date.now() - time) / 60000))
+}
+
 function logToAlertTodayItem(log: DataverseRow): PublisherTodayItem {
   const actionType = stringValue(log.jm1_actiontype || log.jm1_name)
   const recordId = stringValue(log.jm1_sourcerecordid || log.jm1_executionlogid)
@@ -2207,6 +2522,18 @@ function publisherActionToEvent(action: PublisherActionId) {
       return 'COVER_CREATIVE_BRIEF_STARTED'
     case 'review_royalty_statement':
       return 'ROYALTY_DRAFT_STATEMENT_REVIEW_REQUESTED'
+    case 'view_thread':
+      return 'AUTHOR_RESPONSE_THREAD_VIEWED'
+    case 'confirm_classification':
+      return 'AUTHOR_RESPONSE_CLASSIFICATION_CONFIRMED'
+    case 'change_classification':
+      return 'AUTHOR_RESPONSE_CLASSIFICATION_CHANGE_REQUESTED'
+    case 'reconcile_response':
+      return 'AUTHOR_RESPONSE_RECONCILE_REQUESTED'
+    case 'retry_failed_transition':
+      return 'AUTHOR_RESPONSE_FAILED_TRANSITION_RETRY_REQUESTED'
+    case 'mark_non_decision_message':
+      return 'AUTHOR_RESPONSE_MARKED_NON_DECISION'
     case 'initialize_developmental_editing':
       return 'PUBLISHER_DEVELOPMENTAL_EDITING_INITIALIZATION_RECORDED'
     case 'request_missing_information':
