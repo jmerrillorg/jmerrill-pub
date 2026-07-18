@@ -408,15 +408,16 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                   <Th>Formats / ISBN</Th>
                   <Th>Evidence</Th>
                   <Th>Next action</Th>
+                  <Th>Actions</Th>
                 </tr>
               </thead>
               <tbody>
                 {portfolio.map((item) => (
-                  <PortfolioRow key={item.key} item={item} />
+                  <PortfolioRow key={item.key} item={item} actionState={actionState} runScopedAction={runScopedAction} />
                 ))}
                 {portfolio.length === 0 && (
                   <tr>
-                    <td className="px-3 py-5 text-white/45" colSpan={6}>
+                    <td className="px-3 py-5 text-white/45" colSpan={7}>
                       No titles are currently classified in this portfolio view.
                     </td>
                   </tr>
@@ -1023,7 +1024,15 @@ function formatResponseAge(minutes: number) {
   return `${Math.floor(hours / 24)}d`
 }
 
-function PortfolioRow({ item }: { item: PublisherPortfolioItem }) {
+function PortfolioRow({
+  item,
+  actionState,
+  runScopedAction,
+}: {
+  item: PublisherPortfolioItem
+  actionState: ActionState
+  runScopedAction: (input: { key: string; actionId: string; titleId?: string; decisionKey?: string }) => Promise<void>
+}) {
   const tone =
     item.portfolioState === 'active_pipeline'
       ? 'blue'
@@ -1058,7 +1067,50 @@ function PortfolioRow({ item }: { item: PublisherPortfolioItem }) {
       <Td>
         <span className="block max-w-[260px] leading-5">{item.nextAction}</span>
       </Td>
+      <Td>
+        <PortfolioPlacementAction item={item} actionState={actionState} runScopedAction={runScopedAction} />
+      </Td>
     </tr>
+  )
+}
+
+function PortfolioPlacementAction({
+  item,
+  actionState,
+  runScopedAction,
+}: {
+  item: PublisherPortfolioItem
+  actionState: ActionState
+  runScopedAction: (input: { key: string; actionId: string; titleId?: string; decisionKey?: string }) => Promise<void>
+}) {
+  const canPlace =
+    Boolean(item.titleId) &&
+    (item.portfolioState === 'active_pipeline' || item.portfolioState === 'reconciliation_required')
+  const stateKey = `${item.key}:place_asset_in_pipeline`
+  if (!canPlace) return <span className="text-[12px] text-white/35">Read-only</span>
+
+  return (
+    <div className="flex min-w-[170px] flex-col gap-2">
+      <button
+        type="button"
+        onClick={() =>
+          void runScopedAction({
+            key: item.key,
+            actionId: 'place_asset_in_pipeline',
+            titleId: item.titleId,
+          })
+        }
+        disabled={actionState.itemKey === stateKey && actionState.status === 'running'}
+        className="min-h-[36px] rounded-full bg-blue-500 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {actionState.itemKey === stateKey && actionState.status === 'running' ? 'Running...' : 'Place Asset in Pipeline'}
+      </button>
+      {actionState.itemKey === stateKey && actionState.message && (
+        <span className={`text-[11px] ${actionState.status === 'error' ? 'text-red-100' : 'text-blue-100'}`}>
+          {actionState.message}
+        </span>
+      )}
+    </div>
   )
 }
 
