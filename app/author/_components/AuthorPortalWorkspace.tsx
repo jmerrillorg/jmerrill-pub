@@ -301,20 +301,29 @@ export function AuthorPortalWorkspace() {
           <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Current project</p>
           <h3 className="mt-2 text-[20px] font-semibold text-white">{selectedProject.title}</h3>
           <p className="mt-2 text-[13px] leading-[1.7] text-white/45">{selectedProject.statusLabel}</p>
+          {selectedProject.authorActionRequired === false ? (
+            <p className="mt-2 text-[12px] uppercase tracking-[0.08em] text-white/40">
+              No action is required from you at this time.
+            </p>
+          ) : null}
           {showPublisherProgress ? (
             <div className="mt-4 space-y-3">
-              {selectedProject.summary ? (
+              {selectedProject.currentActivity || selectedProject.summary ? (
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">
                     Current Activity
                   </p>
-                  <p className="mt-1 text-[13px] leading-[1.7] text-white/60">{selectedProject.summary}</p>
+                  <p className="mt-1 text-[13px] leading-[1.7] text-white/60">
+                    {selectedProject.currentActivity || selectedProject.summary}
+                  </p>
                 </div>
               ) : null}
-              {selectedProject.nextActionLabel ? (
+              {selectedProject.nextStep || selectedProject.nextActionLabel ? (
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Next Step</p>
-                  <p className="mt-1 text-[13px] leading-[1.7] text-blue-200/85">{selectedProject.nextActionLabel}</p>
+                  <p className="mt-1 text-[13px] leading-[1.7] text-blue-200/85">
+                    {selectedProject.nextStep || selectedProject.nextActionLabel}
+                  </p>
                 </div>
               ) : null}
             </div>
@@ -338,6 +347,21 @@ export function AuthorPortalWorkspace() {
                   >
                     Download {artifact.label}
                   </a>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {selectedProject.completedPackages?.length ? (
+            <div className="mt-5 border-t border-white/10 pt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Completed packages</p>
+              <div className="mt-3 space-y-2">
+                {selectedProject.completedPackages.map((pack) => (
+                  <div
+                    key={`${pack.label}-${pack.status}`}
+                    className="rounded-2xl border border-white/8 bg-black/15 px-4 py-3 text-[12px] leading-[1.6] text-white/55"
+                  >
+                    {pack.label} — {pack.status}
+                  </div>
                 ))}
               </div>
             </div>
