@@ -237,8 +237,13 @@ export function AuthorPortalWorkspace() {
       : null
   const showPublisherProgress =
     isEditorialWorkspaceState(selectedProject.workspaceState) &&
-    !selectedProject.pendingApprovalLabel &&
-    Boolean(selectedProject.summary || selectedProject.nextActionLabel)
+    Boolean(
+      selectedProject.currentActivity ||
+        selectedProject.currentOperationalActivity ||
+        selectedProject.summary ||
+        selectedProject.nextStep ||
+        selectedProject.nextActionLabel,
+    )
 
   async function handleSignOut() {
     setSigningOut(true)
@@ -298,34 +303,39 @@ export function AuthorPortalWorkspace() {
           </span>
         </div>
         <div className="mt-6 rounded-3xl border border-white/10 bg-black/15 p-5">
-          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Current project</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Your Publishing Journey</p>
           <h3 className="mt-2 text-[20px] font-semibold text-white">{selectedProject.title}</h3>
-          <p className="mt-2 text-[13px] leading-[1.7] text-white/45">{selectedProject.statusLabel}</p>
-          {selectedProject.authorActionRequired === false ? (
-            <p className="mt-2 text-[12px] uppercase tracking-[0.08em] text-white/40">
-              No action is required from you at this time.
-            </p>
-          ) : null}
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <AuthorProjectField
+              label="Current Stage"
+              value={
+                selectedProject.currentStage && selectedProject.currentStageStatus
+                  ? `${selectedProject.currentStage} — ${selectedProject.currentStageStatus}`
+                  : selectedProject.statusLabel
+              }
+            />
+            <AuthorProjectField label="Awaiting" value={selectedProject.awaitingParty || 'Publisher'} />
+          </div>
           {showPublisherProgress ? (
-            <div className="mt-4 space-y-3">
-              {selectedProject.currentActivity || selectedProject.summary ? (
-                <div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">
-                    Current Activity
-                  </p>
-                  <p className="mt-1 text-[13px] leading-[1.7] text-white/60">
-                    {selectedProject.currentActivity || selectedProject.summary}
-                  </p>
-                </div>
-              ) : null}
-              {selectedProject.nextStep || selectedProject.nextActionLabel ? (
-                <div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Next Step</p>
-                  <p className="mt-1 text-[13px] leading-[1.7] text-blue-200/85">
-                    {selectedProject.nextStep || selectedProject.nextActionLabel}
-                  </p>
-                </div>
-              ) : null}
+            <div className="mt-4 grid gap-3">
+              <AuthorProjectField
+                label="Current Activity"
+                value={selectedProject.currentOperationalActivity || selectedProject.currentActivity || selectedProject.summary}
+              />
+              <AuthorProjectField
+                label="Author Action"
+                value={
+                  selectedProject.authorActionDescription ||
+                  (selectedProject.authorActionRequired
+                    ? 'Please review the available package and submit your decision.'
+                    : 'No action is required from you at this time.')
+                }
+              />
+              <AuthorProjectField
+                label="Next Step"
+                value={selectedProject.nextOperationalActivity || selectedProject.nextStep || selectedProject.nextActionLabel}
+                emphasis
+              />
             </div>
           ) : selectedProject.nextActionLabel ? (
             <p className="mt-2 text-[13px] leading-[1.7] text-blue-200/85">{selectedProject.nextActionLabel}</p>
@@ -335,11 +345,11 @@ export function AuthorPortalWorkspace() {
               Pending approval: {selectedProject.pendingApprovalLabel}
             </p>
           ) : null}
-          {selectedProject.artifacts?.length ? (
+          {selectedProject.activePackage?.length ? (
             <div className="mt-5 border-t border-white/10 pt-4">
-              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Package components</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Active package</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                {selectedProject.artifacts.map((artifact) => (
+                {selectedProject.activePackage.map((artifact) => (
                   <a
                     key={artifact.id}
                     href={artifact.href}
@@ -347,6 +357,25 @@ export function AuthorPortalWorkspace() {
                   >
                     Download {artifact.label}
                   </a>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {selectedProject.completedMilestones?.length ? (
+            <div className="mt-5 border-t border-white/10 pt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Publishing journey</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {selectedProject.completedMilestones.map((milestone) => (
+                  <div
+                    key={`${milestone.label}-${milestone.state}`}
+                    className="min-h-[72px] rounded-2xl border border-white/8 bg-black/15 px-4 py-3"
+                  >
+                    <p className="text-[12px] font-semibold leading-[1.4] text-white/70">{milestone.label}</p>
+                    <p className="mt-1 text-[11px] leading-[1.4] text-white/42">{milestone.state}</p>
+                    {milestone.note ? (
+                      <p className="mt-1 text-[11px] leading-[1.4] text-white/35">{milestone.note}</p>
+                    ) : null}
+                  </div>
                 ))}
               </div>
             </div>
@@ -593,6 +622,25 @@ function MarketingInput({
         placeholder={`Add ${label.toLowerCase()}`}
       />
     </label>
+  )
+}
+
+function AuthorProjectField({
+  label,
+  value,
+  emphasis = false,
+}: {
+  label: string
+  value?: string
+  emphasis?: boolean
+}) {
+  if (!value) return null
+
+  return (
+    <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
+      <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">{label}</p>
+      <p className={`mt-1 text-[13px] leading-[1.7] ${emphasis ? 'text-blue-200/85' : 'text-white/60'}`}>{value}</p>
+    </div>
   )
 }
 
