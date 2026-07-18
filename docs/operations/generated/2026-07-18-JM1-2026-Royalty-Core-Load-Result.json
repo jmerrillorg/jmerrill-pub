@@ -1,0 +1,929 @@
+{
+  "generatedAt": "2026-07-18T11:54:59.170Z",
+  "statements": [
+    {
+      "period": "2026-01",
+      "action": "created",
+      "id": "73a83573-9f82-f111-ab0f-000d3a14673b"
+    },
+    {
+      "period": "2026-02",
+      "action": "created",
+      "id": "5155ec6f-9f82-f111-ab0f-6045bdd69678"
+    },
+    {
+      "period": "2026-03",
+      "action": "created",
+      "id": "56ac3f75-9f82-f111-ab0f-00224820105b"
+    },
+    {
+      "period": "2026-04",
+      "action": "created",
+      "id": "8ba83573-9f82-f111-ab0f-000d3a14673b"
+    },
+    {
+      "period": "2026-05",
+      "action": "created",
+      "id": "57ac3f75-9f82-f111-ab0f-00224820105b"
+    },
+    {
+      "period": "2026-06",
+      "action": "created",
+      "id": "59ac3f75-9f82-f111-ab0f-00224820105b"
+    }
+  ],
+  "results": [
+    {
+      "lineItem": "SRC-47e80b86f79c1ced71728b4d475092950c713a12804c3c4b",
+      "action": "created",
+      "id": "5aac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "60137ed6-c27a-f111-ab0f-6045bdd69738",
+      "net": 12.44,
+      "sourceFile": "Electronic Share & Sell Ecommerce Report for 9118734 (US-USD).xls"
+    },
+    {
+      "lineItem": "SRC-5c88254246c7b29e783da864a073625ab5689340669e9fbf",
+      "action": "created",
+      "id": "a5a83573-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Agency Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-6aa4a1c7513ece334c9f2bc71bb0699f9a56958e9184a36b",
+      "action": "created",
+      "id": "a6a83573-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "7f67a4c3-c37a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-1acb051cbcf4d4ac8e822fb89362a17095939d67e29bfbcf",
+      "action": "created",
+      "id": "d22a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "7f67a4c3-c37a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-b150149e27f24a73b5a4a47555d8b27c7d66d9f0149f97c8",
+      "action": "created",
+      "id": "5bac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "6309d7cb-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-1fd4f4e16632cd1c46f6012fdeb64096c73e8101fb1507bb",
+      "action": "created",
+      "id": "5cac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "841a04cd-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-b06c54ca68c6a25037552ec0f68e6e35fcdc3ad2bca8a3ab",
+      "action": "created",
+      "id": "5dac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-a30b44be7fc734972293775f9595a98f06d3821ba68f9ad4",
+      "action": "created",
+      "id": "d32a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "7b064bcd-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-af2aba2d1e9ac2ca7750a00fa69c0ec64d8b3720700d4e7c",
+      "action": "created",
+      "id": "5eac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-f9af8d71b451d83a4d822afa622e09425b5e256bea329ead",
+      "action": "created",
+      "id": "5fac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "9242c1c2-c37a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-d1a6ff5d724f34e657351f6ea6bef2cb33dfd982b22482f3",
+      "action": "created",
+      "id": "c0a83573-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "d9f603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-45b2b26057eb1fb97cc6a07e2705a6a89f0ceeff1cd8e31f",
+      "action": "created",
+      "id": "d42a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "d9f603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-0bc533facf5f09a545686ce36f124a4c8bba132c91913c5a",
+      "action": "created",
+      "id": "d52a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "7f67a4c3-c37a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-6a23db1ebe3d0baf6526cd63529b38770ffbc0e1f1593f6b",
+      "action": "created",
+      "id": "c4d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "c9f603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-d9b2fd102807087581cfa2427f51be5a303ffe74eaf500be",
+      "action": "created",
+      "id": "64ac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "c9f603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-eb949d878965594fa3ee4904a7d684b336ad80e422e0a8a7",
+      "action": "created",
+      "id": "d0a83573-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "865f72d0-c27a-f111-ab0f-6045bdd69738",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-4dec230cb7c47ba544ca88fe0def2d07da443af084604c7d",
+      "action": "created",
+      "id": "c6d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "865f72d0-c27a-f111-ab0f-6045bdd69738",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-bd421ca73044b4ab87ab5d73749b3ea15aee78f8d19babd4",
+      "action": "created",
+      "id": "6bac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "6309d7cb-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-11d0ed27f248ab993ffa7d6e59092331e3e40215ceec5ae7",
+      "action": "created",
+      "id": "6cac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "6309d7cb-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-0cc2dd61eeddde01b97b5e0dd11c6411bd1cbe720841b9aa",
+      "action": "created",
+      "id": "6dac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "6309d7cb-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-4d1dd6fb013dbb21c011c3b67476472e0a787e36d483b2f1",
+      "action": "created",
+      "id": "d62a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "6309d7cb-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-acae62b005f086b34f0a4661cc46b3fb1b377cba7e9aed17",
+      "action": "created",
+      "id": "d5a83573-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "a5084bcd-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-3751c40ae42a2f64fe51d5c985447f43acd96d7d90dc888d",
+      "action": "created",
+      "id": "d0d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "343274cd-c27a-f111-ab0f-6045bdd69435",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-79547a105438b12c05d846823299ea41baf2be35ac531339",
+      "action": "created",
+      "id": "d8a83573-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-b6b1008d2b534b5adcab323e558d9257fa11a48a1aac62f9",
+      "action": "created",
+      "id": "d1d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-f176e9ffd157d27cefda875e7fbd6f1e035a8309cffbf8d8",
+      "action": "created",
+      "id": "e1a83573-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-7a03647d6d4c5b45789531e1ea486295b04f4305fb694816",
+      "action": "created",
+      "id": "75ac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-ab4d7e33ebb21af10395fe61cfe4752df0053f2e92d20667",
+      "action": "created",
+      "id": "d2d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-0697ddad6060851acb941a0430293ea5b96149b03e23169e",
+      "action": "created",
+      "id": "76ac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-9a7ae1a942ba8f0960706970179ec5f93b8ff670a70c05e2",
+      "action": "created",
+      "id": "d72a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-565a76eb5c79161a73e79e325b1aa233469f8020138ef8c6",
+      "action": "created",
+      "id": "d82a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-d622f217d59e993b5d5138d87a383f0087037a6866aa24c2",
+      "action": "created",
+      "id": "da2a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-10ce5fa641c30dba29f393ae1800c96ebf78c272c93bbbaa",
+      "action": "created",
+      "id": "d3d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-97277acc288ea92f8aebf08e898f460d8d74e4bc41019864",
+      "action": "created",
+      "id": "606f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-d83c6e32bd670fc763726115074efc35edb035d9f7943392",
+      "action": "created",
+      "id": "db2a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-904f4c236040af84b4ee41d49a3196eb3ab9656ff82c9b69",
+      "action": "created",
+      "id": "646f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-4454fa2a43f0efbfafe6a8e81aaec6a12ae07752a038e35d",
+      "action": "created",
+      "id": "77ac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-8874a47d847c87c2cdff5ec39a5e39eb7c8bd814858a380a",
+      "action": "created",
+      "id": "6d6f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-1b5f112b922954390baecbed35f36cfa64796113541b2c1a",
+      "action": "created",
+      "id": "796f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-a001e543e0a37be44b78de26027ee065bf44dd3f4a295289",
+      "action": "created",
+      "id": "d4d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-d24257d162964ffbb973e943c05e27014285c7e5042b6191",
+      "action": "created",
+      "id": "8b6f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-2b866b1fbdbc54af35a48bd77015bfe73ed5988463ae93ec",
+      "action": "created",
+      "id": "916f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-e59219650106d714925032ed29a84f79a9a4291e27d688a5",
+      "action": "created",
+      "id": "986f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "9b4b00d4-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-b43c0341262cf45a84a4457cb2c5009acd7d528a2f74d26b",
+      "action": "created",
+      "id": "9e6f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "9b4b00d4-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-7a76d42cb2f0de7e7c738d064ad610d008e1ab938de97ab1",
+      "action": "created",
+      "id": "dc2a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "161405c7-c37a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-bf701e385369c71caf03b544aae765c9459ebd69025ef842",
+      "action": "created",
+      "id": "78ac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "bff603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-0134f0a04c956fd5c7a7f0116dc1166a8bab70c15e618f66",
+      "action": "created",
+      "id": "79ac3f75-9f82-f111-ab0f-00224820105b",
+      "titleId": "d7f603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-7fd0622fe9f9e91eae2c302393cff66e9ef4d82f97045bfe",
+      "action": "created",
+      "id": "a56f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "d7f603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-af2a94ada969da0b3bff7ba8fa9be8c30d49a82b3114b931",
+      "action": "created",
+      "id": "a76f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "d7f603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-a194c91220409a612723f2e10f73662fb01bc5be2eacc28d",
+      "action": "created",
+      "id": "dd2a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "841a04cd-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-f08593d60e456e751613f023de80986dbbf58a3e1a15e409",
+      "action": "created",
+      "id": "de2a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-99dd12e3614cf1e19eb19775976cde3f1969ba748597913b",
+      "action": "created",
+      "id": "d6d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-e248d2bb6f74995401a8849ce6a06f802311df5fe92001e3",
+      "action": "created",
+      "id": "df2a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-3711cc6f2f81924d733eab91faa36659912c34fda96193bc",
+      "action": "created",
+      "id": "b16f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-4d0a45b54d15d4372cf599809f244507525d07e155a6a250",
+      "action": "created",
+      "id": "e02a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-b7616f9e70ee8397cdcc92a7ad391c332197eeb94e894641",
+      "action": "created",
+      "id": "f0d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-f27723b084df22d367250b6348a17fc60ce49b5b6c474f95",
+      "action": "created",
+      "id": "e12a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-588fa2a640925796438cc9ea43afe9ccdd6d21ef19bf5846",
+      "action": "created",
+      "id": "f0a6907b-9f82-f111-ab0f-00224820105b",
+      "titleId": "6509d7cb-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-9aaa19e9b21c68d6ee52d99a3292031f5771db63c4aaa7cb",
+      "action": "created",
+      "id": "f7d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "99064bcd-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-10ef69bda174e6ece789877fe8ec298b158b065af1648654",
+      "action": "created",
+      "id": "f8d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "99064bcd-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-923b8ea95e867d395d5e8334b7b2a72257e972bb6c9783d0",
+      "action": "created",
+      "id": "f9d3e975-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "99064bcd-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-384f6eff065cf87453a84990d47c912d98dc9e7a6f6a82c3",
+      "action": "created",
+      "id": "cb6f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "99064bcd-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-f42e6e5c8b79b56c810e2a5ae3a0c7ca50e04ec9587d96bd",
+      "action": "created",
+      "id": "cc6f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-c4b920044002dbe4869eff2a4e09a07ff34e004ef25177e3",
+      "action": "created",
+      "id": "f1a6907b-9f82-f111-ab0f-00224820105b",
+      "titleId": "564797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-baa637f08800cf1ee937a5c871976dcbd986f0ade055f6e6",
+      "action": "created",
+      "id": "e32a7476-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "564797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-e64af1fe113ecbf4ee9625d3f4c65465b922589878459ee5",
+      "action": "created",
+      "id": "92f5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "6f8904ca-c27a-f111-ab0f-6045bdd69738",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-eeac3375dcdc8716e4c8c3bf922760fcde8991d9cb865852",
+      "action": "created",
+      "id": "93f5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "903274cd-c27a-f111-ab0f-6045bdd69435",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-98262f50567d636be084b55f53fe7acc45b77f2702416ace",
+      "action": "created",
+      "id": "f2a6907b-9f82-f111-ab0f-00224820105b",
+      "titleId": "604797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-b5a43fea3772712065f2801e41dcd8c46325ba8443e32ccb",
+      "action": "created",
+      "id": "94f5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "b73274cd-c27a-f111-ab0f-6045bdd69435",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-e643dfe694896ba6d209b45fcda34b3c334657fa56077fc4",
+      "action": "created",
+      "id": "cd6f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "7f67a4c3-c37a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-2d7858adb1542d93da2f1353b0e63ac445fa830978aec3f7",
+      "action": "created",
+      "id": "f3a6907b-9f82-f111-ab0f-00224820105b",
+      "titleId": "7f67a4c3-c37a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-0b9a2a6f4807dc3f02e38614c5e61a4e1caf6536dfc1b4cd",
+      "action": "created",
+      "id": "d06f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-612f26fd7c404e647fe13429b4a0aeb8bd3c3e27cb561e54",
+      "action": "created",
+      "id": "f4a6907b-9f82-f111-ab0f-00224820105b",
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-3a55d8f48078654b24b7615d247a237730d29c906ad1451f",
+      "action": "created",
+      "id": "95f5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-9ec2c1849211e18a8ebccf981f40e6f89fb7ca0b57958edb",
+      "action": "created",
+      "id": "3750297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-725612672229ce361f5bce934234bcaf933eff51297c2e7f",
+      "action": "created",
+      "id": "df6f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-8357b55d681c75bd43542d0ccd08f2e43e401ebc8ee65472",
+      "action": "created",
+      "id": "3850297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "60137ed6-c27a-f111-ab0f-6045bdd69738",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-ba59459a162cc6884530ae7760bcdf390827265540651395",
+      "action": "created",
+      "id": "96f5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "c70f6fd3-c27a-f111-ab0f-6045bdd69435",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-2fe474266abdf74bb19e08c0e54cb52a413bf7737426a051",
+      "action": "created",
+      "id": "97f5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "d9f603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-76daa420e088ad180c5909aaa85278254fc1ec09218d3403",
+      "action": "created",
+      "id": "3950297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "62137ed6-c27a-f111-ab0f-6045bdd69738",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-a16dece409349d1fa471e535bc0bbf4fa278f3745af2cca5",
+      "action": "created",
+      "id": "9af5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Agency Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-9759c337d4c797bdcee8bfc15dad1c0de034b5a7046138e2",
+      "action": "created",
+      "id": "3a50297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "7b064bcd-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Agency Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-a30f45110d3356e0c478d1846a7274927ab97db574d99959",
+      "action": "created",
+      "id": "9cf5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-3c445af0753eb7db5509f7e28ff1cff605ee930c20b5d6dd",
+      "action": "created",
+      "id": "ec6f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "bff603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-ff53f99f3318fb07949ce574615cf7e6a7ab0a3dec419eaa",
+      "action": "created",
+      "id": "f16f3079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "a74b00d4-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-1dc8eb23a1d170f28c3b7e8de8cae535adf8c0c793ed02a4",
+      "action": "created",
+      "id": "3b50297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-5d212a22d99acd113e180e365748b6beee3cc4893e8f1bc9",
+      "action": "created",
+      "id": "3c50297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-da2dd16226834318eafe61fd01c512331476bb097253aef9",
+      "action": "created",
+      "id": "3d50297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "f96286cf-c37a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-a4bfbd4068bbe4450d0f7817432aa0a7517d678cc1bd31b9",
+      "action": "created",
+      "id": "3e50297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-ceac0b8f8f5dd1823c6b38c744ae09b0e9c2652a794ba848",
+      "action": "created",
+      "id": "f7a6907b-9f82-f111-ab0f-00224820105b",
+      "titleId": "564797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-94a6d66ed6b6342aef9bc4c99f9fe94f9710ad2606b463bc",
+      "action": "created",
+      "id": "05703079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "7b064bcd-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-19f9bf63d786d27b55ce4165c4fd4169c05e70c9442b612f",
+      "action": "created",
+      "id": "08703079-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "928904ca-c27a-f111-ab0f-6045bdd69738",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-3f32da2b9a51ff42f38cb624438737af3aac2ac28be38a4f",
+      "action": "created",
+      "id": "b3f5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-0a950f5252cebca66111aeccf8837ed695a494fc516c0274",
+      "action": "created",
+      "id": "b7f5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-0fbf2441d24dddd00447f6ac25c6fc2dc064dea6c21323c1",
+      "action": "created",
+      "id": "f8a6907b-9f82-f111-ab0f-00224820105b",
+      "titleId": "66137ed6-c27a-f111-ab0f-6045bdd69738",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-cf25f601fc6545c0edb6de1efbbe0a3e7d387f9097e17484",
+      "action": "created",
+      "id": "3f50297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "865f72d0-c27a-f111-ab0f-6045bdd69738",
+      "net": 0,
+      "sourceFile": "Ingram eBook Agency Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-d167ecbb89c18483f44760edb55a0a466d0e37b43324b533",
+      "action": "created",
+      "id": "bff5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "554797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Agency Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-af88d4c4be338cd8252fa77cd9678f2970aaaab22183d116",
+      "action": "created",
+      "id": "f9a6907b-9f82-f111-ab0f-00224820105b",
+      "titleId": "69137ed6-c27a-f111-ab0f-6045bdd69738",
+      "net": 0,
+      "sourceFile": "Ingram eBook Agency Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-dd3eb1e0b6b7cac359444b7786d1042d59d6ef54ad6e59a1",
+      "action": "created",
+      "id": "faa6907b-9f82-f111-ab0f-00224820105b",
+      "titleId": "bff603d3-c27a-f111-ab0f-000d3a14673b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-0393d2a443127be2a7ff64ede0b3cb38daccceeb5819ee3c",
+      "action": "created",
+      "id": "4050297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-4a36fa7c34b82353acce3e62d03ad0c70ee43c40de473567",
+      "action": "created",
+      "id": "6211817f-9f82-f111-ab0f-000d3a14673b",
+      "titleId": "6509d7cb-c27a-f111-ab0f-6045bdd69678",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-632eb608052813fa09219f8b1f9190de7ca056e2a820f6d6",
+      "action": "created",
+      "id": "c0f5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "a74b00d4-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-7c9df9e62deec3cd5ceb627f032c805a15528f7ce19ac8b5",
+      "action": "created",
+      "id": "c1f5417c-9f82-f111-ab0f-6045bdd69678",
+      "titleId": "7b064bcd-c27a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    },
+    {
+      "lineItem": "SRC-1ce02478db85ff54877696f60f9c40cf675460a487d095fb",
+      "action": "created",
+      "id": "4150297d-9f82-f111-ab0f-7c1e525b15c2",
+      "titleId": "34926ac0-c37a-f111-ab0f-00224820105b",
+      "net": 0,
+      "sourceFile": "Ingram eBook Wholesale Comp Report for 6116305 (USD).xls"
+    }
+  ],
+  "created": 104,
+  "existing": 0,
+  "heldTitle": 193,
+  "executionLog": {
+    "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1_executionlogs/$entity",
+    "@odata.etag": "W/\"39016097\"",
+    "jm1_executionstatus@OData.Community.Display.V1.FormattedValue": "Success",
+    "jm1_executionstatus": 835500001,
+    "jm1_errordetail": null,
+    "modifiedon@OData.Community.Display.V1.FormattedValue": "7/18/2026 11:56 AM",
+    "modifiedon": "2026-07-18T11:56:08Z",
+    "_owninguser_value": "b7d26c09-9a7c-f111-ab0f-7c1e525b15c2",
+    "jm1_executionlogid": "3f6823a9-9f82-f111-ab0f-7c1e525b15c2",
+    "jm1_name": "ROYALTY_SOURCE_ROWS_IMPORTED - 2026 monthly close",
+    "overriddencreatedon": null,
+    "jm1_sourcerecordid": "2026-royalty-source-monthly-close",
+    "importsequencenumber": null,
+    "jm1_approvaltimestamp": null,
+    "_modifiedonbehalfby_value": null,
+    "jm1_sourceentity": "jm1pub_royaltyline",
+    "jm1_agentmodel": "GPT-5 Codex",
+    "statecode@OData.Community.Display.V1.FormattedValue": "Active",
+    "statecode": 0,
+    "_jm1_agentregistry_value": null,
+    "jm1_actiondescription": "Imported/readback 104 matched royalty source rows; 193 normalized rows remain held for title decisions. Source files hashed and monthly close states refreshed.",
+    "versionnumber@OData.Community.Display.V1.FormattedValue": "39,016,097",
+    "versionnumber": 39016097,
+    "utcconversiontimezonecode": null,
+    "jm1_actiontype": "ROYALTY_SOURCE_ROWS_IMPORTED",
+    "_jm1_prompttemplate_value": null,
+    "_createdonbehalfby_value": null,
+    "_modifiedby_value@OData.Community.Display.V1.FormattedValue": "JM1-INFRA-PAM JM1-INFRA-PAM-Automation",
+    "_modifiedby_value": "b7d26c09-9a7c-f111-ab0f-7c1e525b15c2",
+    "createdon@OData.Community.Display.V1.FormattedValue": "7/18/2026 11:56 AM",
+    "createdon": "2026-07-18T11:56:08Z",
+    "_owningbusinessunit_value@OData.Community.Display.V1.FormattedValue": "JM1 Headquarters",
+    "_owningbusinessunit_value": "b589d1e7-e690-f011-b4cc-7c1e525b3eb3",
+    "jm1_startedon@OData.Community.Display.V1.FormattedValue": "7/18/2026 11:56 AM",
+    "jm1_startedon": "2026-07-18T11:56:08Z",
+    "_jm1_humanapprovedby_value": null,
+    "statuscode@OData.Community.Display.V1.FormattedValue": "Active",
+    "statuscode": 1,
+    "jm1_completedon@OData.Community.Display.V1.FormattedValue": "7/18/2026 11:56 AM",
+    "jm1_completedon": "2026-07-18T11:56:08Z",
+    "jm1_agentname": "Cody Prime",
+    "_ownerid_value@OData.Community.Display.V1.FormattedValue": "JM1-INFRA-PAM JM1-INFRA-PAM-Automation",
+    "_ownerid_value": "b7d26c09-9a7c-f111-ab0f-7c1e525b15c2",
+    "_owningteam_value": null,
+    "_createdby_value@OData.Community.Display.V1.FormattedValue": "JM1-INFRA-PAM JM1-INFRA-PAM-Automation",
+    "_createdby_value": "b7d26c09-9a7c-f111-ab0f-7c1e525b15c2",
+    "jm1_bandlevel@OData.Community.Display.V1.FormattedValue": "Band 1",
+    "jm1_bandlevel": 835500000,
+    "_jm1_skill_value": null,
+    "timezoneruleversionnumber@OData.Community.Display.V1.FormattedValue": "4",
+    "timezoneruleversionnumber": 4
+  },
+  "readback": {
+    "sourceRows": 104,
+    "netTotal": 12.44
+  }
+}

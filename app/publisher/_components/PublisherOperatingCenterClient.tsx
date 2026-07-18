@@ -32,6 +32,11 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
   const [actionState, setActionState] = useState<ActionState>({ itemKey: '', status: 'idle', message: '' })
   const [filter, setFilter] = useState('all')
   const [portfolioView, setPortfolioView] = useState('active')
+  const [royaltyImport, setRoyaltyImport] = useState({
+    sourceSystem: 'KDP',
+    reportingMonth: '2026-06',
+    noActivity: false,
+  })
 
   const queue = useMemo(() => {
     const items = snapshot?.queues.enterprise || []
@@ -117,6 +122,37 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
       itemKey: `${input.key}:${input.actionId}`,
       status: 'complete',
       message: 'Governed action recorded.',
+    })
+    await refresh()
+  }
+
+  async function submitRoyaltyImport(formData: FormData) {
+    const sourceSystem = String(formData.get('sourceSystem') || '')
+    const reportingMonth = String(formData.get('reportingMonth') || '')
+    setActionState({
+      itemKey: `royalty-import:${sourceSystem}:${reportingMonth}`,
+      status: 'running',
+      message: 'Recording royalty source...',
+    })
+
+    const response = await fetch('/api/publisher/royalties/import', {
+      method: 'POST',
+      body: formData,
+    })
+    const payload = (await response.json().catch(() => null)) as { error?: string; state?: string } | null
+    if (!response.ok) {
+      setActionState({
+        itemKey: `royalty-import:${sourceSystem}:${reportingMonth}`,
+        status: 'error',
+        message: payload?.error || 'Royalty source import did not complete.',
+      })
+      return
+    }
+
+    setActionState({
+      itemKey: `royalty-import:${sourceSystem}:${reportingMonth}`,
+      status: 'complete',
+      message: payload?.state ? `Royalty source recorded: ${payload.state}.` : 'Royalty source recorded.',
     })
     await refresh()
   }
@@ -558,6 +594,64 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                 <Info label="ACX import" value={snapshot.royalties.monthlyClose.automation.acx || 'Pending'} />
                 <Info label="Direct sales" value={snapshot.royalties.monthlyClose.automation.directSales || 'Pending'} />
               </div>
+              <form
+                className="mt-5 grid gap-3 border border-white/10 bg-black/20 p-4 lg:grid-cols-[1fr_1fr_1fr_auto]"
+                action={(formData) => {
+                  formData.set('sourceSystem', royaltyImport.sourceSystem)
+                  formData.set('reportingMonth', royaltyImport.reportingMonth)
+                  formData.set('noActivity', royaltyImport.noActivity ? 'true' : 'false')
+                  void submitRoyaltyImport(formData)
+                }}
+              >
+                <label className="text-[12px] text-white/55">
+                  <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">Source</span>
+                  <select
+                    value={royaltyImport.sourceSystem}
+                    onChange={(event) => setRoyaltyImport((current) => ({ ...current, sourceSystem: event.target.value }))}
+                    className="min-h-[40px] w-full border border-white/10 bg-[#071323] px-3 text-white"
+                  >
+                    <option value="KDP">KDP</option>
+                    <option value="ACX">ACX</option>
+                    <option value="DIRECT_SALES">Direct Sales</option>
+                    <option value="INGRAM">Ingram</option>
+                  </select>
+                </label>
+                <label className="text-[12px] text-white/55">
+                  <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">Month</span>
+                  <input
+                    type="month"
+                    value={royaltyImport.reportingMonth}
+                    onChange={(event) => setRoyaltyImport((current) => ({ ...current, reportingMonth: event.target.value }))}
+                    className="min-h-[40px] w-full border border-white/10 bg-[#071323] px-3 text-white"
+                  />
+                </label>
+                <label className="text-[12px] text-white/55">
+                  <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">Report</span>
+                  <input
+                    type="file"
+                    name="file"
+                    disabled={royaltyImport.noActivity}
+                    className="block min-h-[40px] w-full border border-white/10 bg-[#071323] px-3 py-2 text-[12px] text-white/60"
+                  />
+                </label>
+                <div className="flex flex-col justify-end gap-2">
+                  <label className="flex items-center gap-2 text-[12px] text-white/55">
+                    <input
+                      type="checkbox"
+                      checked={royaltyImport.noActivity}
+                      onChange={(event) => setRoyaltyImport((current) => ({ ...current, noActivity: event.target.checked }))}
+                    />
+                    No activity
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={actionState.status === 'running'}
+                    className="min-h-[40px] border border-blue-400/30 px-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-blue-200 disabled:opacity-50"
+                  >
+                    Record Source
+                  </button>
+                </div>
+              </form>
               <p className="mt-3 text-[12px] text-white/45">
                 {snapshot.royalties.monthlyClose.spreadsheetStatus || 'Spreadsheet status pending.'}
               </p>
