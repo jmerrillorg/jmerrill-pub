@@ -1,0 +1,52 @@
+{
+  "title": "The Intentional Leader, Volume I",
+  "stage": "Proofreading",
+  "status": "PASS",
+  "generatedAt": "2026-07-19T00:33:54Z",
+  "source": "docs/operations/generated/2026-07-16-The-Intentional-Leader-Volume-I-Copyedited-Working-Manuscript.docx",
+  "proofreadManuscript": "docs/operations/generated/2026-07-19-The-Intentional-Leader-Volume-I-Proofread-Manuscript.docx",
+  "sourceSha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+  "proofreadSha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+  "manuscriptChangedDuringProofPass": false,
+  "checks": {
+    "docxZipValid": true,
+    "checksumCaptured": true,
+    "chapterAndReadingIntegrity": "PASS - paragraph, word, and date-heading counts captured for layout handoff.",
+    "styleConsistency": "PASS WITH LAYOUT WATCH ITEMS - copyediting style sheet watch items retained for design import.",
+    "citationsScriptureAndFormatting": "PASS WITH LAYOUT WATCH ITEMS - no automated high-risk scripture/citation defect detected; final typography review remains part of layout/proof cycle.",
+    "staleInternalMarkers": "PASS"
+  },
+  "sourceStats": {
+    "paragraphs": 7887,
+    "nonemptyParagraphs": 6918,
+    "wordCount": 66638,
+    "monthDayHeadings": 44,
+    "todoMarkers": 0,
+    "literalMarkdownEmphasisMarkers": 0,
+    "doubleSpaces": 0,
+    "spacesBeforePunctuation": 0,
+    "zipValid": true,
+    "sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+    "sizeBytes": 466220
+  },
+  "proofreadStats": {
+    "paragraphs": 7887,
+    "nonemptyParagraphs": 6918,
+    "wordCount": 66638,
+    "monthDayHeadings": 44,
+    "todoMarkers": 0,
+    "literalMarkdownEmphasisMarkers": 0,
+    "doubleSpaces": 0,
+    "spacesBeforePunctuation": 0,
+    "zipValid": true,
+    "sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+    "sizeBytes": 466220
+  },
+  "publisherExceptions": [],
+  "layoutWatchItems": [
+    "Confirm emoji marker treatment in designed layout.",
+    "Confirm scripture/citation punctuation after design import.",
+    "Confirm heading/date consistency in final proof.",
+    "Confirm retained fragments are intentional and not typesetting artifacts."
+  ]
+}
