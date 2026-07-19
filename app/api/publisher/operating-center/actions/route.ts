@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 
 import { getPublisherOperatingCenterSession } from '@/lib/server/author-durable-auth'
 import {
+  processProofreadingApprovalEvent,
+  sendProofreadingNotification,
+  type ApprovalTransitionPayload,
+} from '@/lib/server/publishing-orchestrator'
+import {
   clearPublisherEvidenceHold,
   initializePublisherEditorialReview,
   initializePublisherIntakeReview,
@@ -26,6 +31,8 @@ const SUPPORTED_ACTIONS: PublisherActionId[] = [
   'begin_interior_layout',
   'begin_cover_design',
   'review_royalty_statement',
+  'send_proofreading_notification',
+  'process_proofreading_approval',
   'view_thread',
   'confirm_classification',
   'change_classification',
@@ -51,6 +58,7 @@ export async function POST(req: Request) {
     gateId?: string
     titleId?: string
     decisionKey?: string
+    approvalEvent?: ApprovalTransitionPayload
   } | null
   const action = body?.action === 'initialize_publisher_intake_review' ? 'review_intake' : body?.action
   if (!body || !SUPPORTED_ACTIONS.includes(action as PublisherActionId)) {
@@ -141,6 +149,17 @@ export async function POST(req: Request) {
           operatorEmail: session.user.email,
           action: publisherAction,
         })
+        break
+      case 'send_proofreading_notification':
+        if (!body.gateId) return NextResponse.json({ error: 'Approval gate id is required.' }, { status: 400 })
+        result = await sendProofreadingNotification({
+          gateId: body.gateId,
+          operatorEmail: session.user.email,
+        })
+        break
+      case 'process_proofreading_approval':
+        if (!body.approvalEvent) return NextResponse.json({ error: 'Approval event payload is required.' }, { status: 400 })
+        result = await processProofreadingApprovalEvent(body.approvalEvent)
         break
       default:
         if (!body.intakeId) return NextResponse.json({ error: 'Intake id is required.' }, { status: 400 })
