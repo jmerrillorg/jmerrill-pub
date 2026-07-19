@@ -84,6 +84,8 @@ const expectations = [
   {
     name: 'delivered Proofreading plan resolves to author review ownership',
     ok:
+      source.includes("dataverseFormatted(editorialStage, 'jm1pub_stagetype') || stringValue(editorialStage.jm1pub_name)") &&
+      source.includes("dataverseFormatted(latestStage || {}, 'jm1pub_stagetype') || stringValue(latestStage?.jm1pub_name)") &&
       deriveWorkloadStateBody.includes("status.includes('plan delivered')") &&
       deriveWorkloadStateBody.includes("latestAction.includes('proofreading_author_package_released')") &&
       deriveNextActionBody.includes("'Proofreading - Author Review'") &&
