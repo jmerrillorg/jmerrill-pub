@@ -1,10 +1,11 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 const consumer = readFileSync('lib/server/approval-event-consumer.ts', 'utf8')
 const route = readFileSync('app/api/publishing/orchestration/approval-events/route.ts', 'utf8')
 const publisherRoute = readFileSync('app/api/publisher/operating-center/actions/route.ts', 'utf8')
 const publisher = readFileSync('lib/server/publisher-operating-center.ts', 'utf8')
-const workflow = readFileSync('.github/workflows/approval-event-consumer.yml', 'utf8')
+const functionWrapper = readFileSync('azure-functions/diagnostic-ai-runner/src/functions/runApprovalEventConsumer.js', 'utf8')
+const functionConsumer = readFileSync('azure-functions/diagnostic-ai-runner/src/orchestration/approvalEventConsumer.js', 'utf8')
 
 const checks = [
   {
@@ -60,12 +61,21 @@ const checks = [
       !route.includes('getPublisherOperatingCenterSession'),
   },
   {
-    name: 'scheduled runtime invokes deployed consumer without Codex session',
+    name: 'scheduled runtime is Azure Functions, not GitHub Actions or a Cody session',
     ok:
-      workflow.includes("cron: '*/5 * * * *'") &&
-      workflow.includes('JM1_ORCHESTRATION_WORKER_URL') &&
-      workflow.includes('JM1_ORCHESTRATION_WORKER_KEY') &&
-      workflow.includes('/approval-events') === false,
+      !existsSync('.github/workflows/approval-event-consumer.yml') &&
+      functionWrapper.includes('app.timer("run-approval-event-consumer"') &&
+      functionWrapper.includes('schedule: "0 */5 * * * *"') &&
+      functionConsumer.includes('JM1 Azure Function Approval Event Consumer') &&
+      functionConsumer.includes('func-jm1-diagnostic-ai-runner application identity'),
+  },
+  {
+    name: 'manual invocation is separated as administrative replay',
+    ok:
+      functionWrapper.includes('run-approval-event-consumer-admin-replay') &&
+      functionWrapper.includes('ADMIN_REPLAY_REQUIRES_ORIGINAL_EVENT_ID_AND_REASON') &&
+      functionWrapper.includes('triggerSource: "ADMIN_RETRY"') &&
+      functionConsumer.includes('No Publisher Center action, GitHub Action, Cody session, or manual API request is required for the normal path'),
   },
   {
     name: 'publisher approval endpoint is administrative replay only',
