@@ -553,6 +553,14 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               <Badge label={`${snapshot.royalties.draftStatements} draft statements`} tone="amber" />
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Info label="Source files evaluated" value={String(snapshot.royalties.acceptedBaseline.sourceFilesEvaluated)} />
+              <Info label="Imported files" value={String(snapshot.royalties.acceptedBaseline.sourceFilesImported)} />
+              <Info label="Normalized rows" value={String(snapshot.royalties.acceptedBaseline.normalizedRows)} />
+              <Info label="Held rows" value={String(snapshot.royalties.acceptedBaseline.heldRows)} />
+              <Info label="Decision groups" value={String(snapshot.royalties.decisionSummary.decisionGroups)} />
+              <Info label="Affected dollars" value={`$${snapshot.royalties.decisionSummary.affectedDollars.toFixed(2)}`} />
+              <Info label="January POD US -B" value={snapshot.royalties.acceptedBaseline.januaryPodUsBDisposition} />
+              <Info label="Rows released today" value={String(snapshot.royalties.decisionSummary.rowsReleasedToday)} />
               <Info label="Manifest rows" value={String(snapshot.royalties.manifestRows)} />
               <Info label="Loaded rows" value={String(snapshot.royalties.loadedRows)} />
               <Info label="Identity holds" value={String(snapshot.royalties.identityHolds)} />
@@ -654,6 +662,9 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               </form>
               <p className="mt-3 text-[12px] text-white/45">
                 {snapshot.royalties.monthlyClose.spreadsheetStatus || 'Spreadsheet status pending.'}
+              </p>
+              <p className="mt-2 text-[12px] leading-6 text-white/45">
+                {snapshot.royalties.monthlyClose.generatedReportPolicy}
               </p>
             </div>
             <div className="mt-5 grid gap-3 lg:grid-cols-2">
@@ -952,7 +963,16 @@ function RoyaltyDecisionCardView({
         <Badge label={decision.amountAffected ? `$${decision.amountAffected}` : 'No amount'} tone="amber" />
       </div>
       <div className="mt-3 grid gap-2">
+        <Info label="Source" value={`${decision.sourceSystem} · ${decision.sourceFile}`} />
         <Info label="Period" value={decision.reportingPeriod} />
+        <Info label="Account / currency" value={[decision.account, decision.currency].filter(Boolean).join(' / ')} />
+        <Info label="Identifier" value={decision.identifier || 'Identifier pending'} />
+        <Info label="Format" value={decision.format} />
+        <Info label="Affected rows" value={`${decision.affectedRows} row(s); ${decision.unitCount} unit(s)`} />
+        <Info label="Financial impact" value={decision.financialImpact} />
+        <Info label="Confidence" value={decision.confidence} />
+        <Info label="Matching basis" value={decision.matchingBasis} />
+        <Info label="Prior matching" value={decision.priorMatchingDecisions} />
         <Info label="Evidence" value={decision.evidence} />
         <Info label="Recommended decision" value={decision.recommendedDecision} />
         <Info label="Alternatives" value={decision.alternatives} />

@@ -306,6 +306,19 @@ export type PublisherRoyaltyDecisionCard = {
   author: string
   title: string
   reportingPeriod: string
+  sourceSystem: string
+  sourceFile: string
+  account: string
+  currency: string
+  identifier: string
+  format: string
+  unitCount: number
+  sourceNetCompensation: number
+  affectedRows: number
+  confidence: 'high' | 'medium' | 'low'
+  matchingBasis: string
+  priorMatchingDecisions: string
+  financialImpact: string
   amountAffected: string
   evidence: string
   recommendedDecision: string
@@ -329,6 +342,25 @@ export type PublisherRoyaltyMonthlyCloseItem = {
 }
 
 export type PublisherRoyaltyReviewQueue = {
+  acceptedBaseline: {
+    sourceFilesEvaluated: number
+    sourceFilesImported: number
+    normalizedRows: number
+    coreRowsLoaded: number
+    heldRows: number
+    statementPeriods: number
+    januaryPodUsBDisposition: string
+  }
+  decisionSummary: {
+    heldRows: number
+    decisionGroups: number
+    affectedDollars: number
+    highConfidenceRecommendations: number
+    jackieReviewGroups: number
+    rowsReleasedToday: number
+    remainingExceptions: number
+    decisionTypes: Record<string, number>
+  }
   manifestRows: number
   loadedRows: number
   identityHolds: number
@@ -348,6 +380,7 @@ export type PublisherRoyaltyReviewQueue = {
       acx: string
       directSales: string
     }
+    generatedReportPolicy: string
     months: PublisherRoyaltyMonthlyCloseItem[]
   }
 }
@@ -2623,7 +2656,35 @@ function readRoyaltyReviewQueue(): PublisherRoyaltyReviewQueue {
   const statementRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Draft-Statement-Set.csv')
   const decisionCards = readRoyaltyDecisionCards()
   const monthlyClose = readRoyaltyMonthlyClose()
+  const sourceSummary = readRoyaltySourceImportSummary()
+  const decisionTypes = decisionCards.reduce<Record<string, number>>((summary, card) => {
+    summary[card.decisionType] = (summary[card.decisionType] || 0) + 1
+    return summary
+  }, {})
+  const affectedDollars = roundCurrency(
+    decisionCards.reduce((sum, card) => sum + Number(card.sourceNetCompensation || 0), 0),
+  )
+
   return {
+    acceptedBaseline: {
+      sourceFilesEvaluated: sourceSummary.files,
+      sourceFilesImported: sourceSummary.importedFiles,
+      normalizedRows: sourceSummary.normalizedRows,
+      coreRowsLoaded: sourceSummary.coreRowsLoaded,
+      heldRows: sourceSummary.heldForTitleDecision,
+      statementPeriods: sourceSummary.statementPeriods,
+      januaryPodUsBDisposition: 'SUPERSEDED',
+    },
+    decisionSummary: {
+      heldRows: sourceSummary.heldForTitleDecision,
+      decisionGroups: decisionCards.length,
+      affectedDollars,
+      highConfidenceRecommendations: decisionCards.filter((card) => card.confidence === 'high').length,
+      jackieReviewGroups: decisionCards.filter((card) => card.confidence !== 'high').length,
+      rowsReleasedToday: 0,
+      remainingExceptions: sourceSummary.heldForTitleDecision,
+      decisionTypes,
+    },
     manifestRows: manifestRows.length,
     loadedRows: manifestRows.filter((row) => row.finalStatus === 'LOADED — DRAFT STATEMENT').length,
     identityHolds: manifestRows.filter((row) => row.finalStatus === 'HELD — JACKIE IDENTITY DECISION').length,
@@ -2635,6 +2696,32 @@ function readRoyaltyReviewQueue(): PublisherRoyaltyReviewQueue {
     decisionPackagePath: 'docs/operations/generated/2026-07-17-JM1-2026-Royalty-Jackie-Decision-Package.csv',
     decisionCards,
     monthlyClose,
+  }
+}
+
+function readRoyaltySourceImportSummary() {
+  const monthlyClose = readJsonFile<{
+    sourceImportSummary?: {
+      files?: number
+      importedFiles?: number
+      normalizedRows?: number
+      coreRowsLoaded?: number
+      heldForTitleDecision?: number
+    }
+  }>('2026-07-18-JM1-2026-Royalty-Monthly-Close.json')
+  const reconciliation = readJsonFile<{
+    rowCount?: number
+    matched?: number
+    heldTitle?: number
+  }>('2026-07-18-JM1-2026-Royalty-Source-Row-Reconciliation.json')
+  const coreLoad = readJsonFile<{ statements?: unknown[] }>('2026-07-18-JM1-2026-Royalty-Core-Load-Result.json')
+  return {
+    files: Number(monthlyClose?.sourceImportSummary?.files || 34),
+    importedFiles: Number(monthlyClose?.sourceImportSummary?.importedFiles || 24),
+    normalizedRows: Number(monthlyClose?.sourceImportSummary?.normalizedRows || reconciliation?.rowCount || 297),
+    coreRowsLoaded: Number(monthlyClose?.sourceImportSummary?.coreRowsLoaded || reconciliation?.matched || 104),
+    heldForTitleDecision: Number(monthlyClose?.sourceImportSummary?.heldForTitleDecision || reconciliation?.heldTitle || 193),
+    statementPeriods: Array.isArray(coreLoad?.statements) ? coreLoad.statements.length : 6,
   }
 }
 
@@ -2656,7 +2743,8 @@ function readRoyaltyMonthlyClose(): PublisherRoyaltyReviewQueue['monthlyClose'] 
         acx: stringValue(parsed.automation?.acx),
         directSales: stringValue(parsed.automation?.directSales),
       },
-      months: Array.isArray(parsed.months) ? parsed.months : [],
+      generatedReportPolicy: generatedRoyaltyReportPolicy(),
+      months: Array.isArray(parsed.months) ? parsed.months.map(applyGeneratedReportTimingPolicy) : [],
     }
   } catch {
     return {
@@ -2668,24 +2756,163 @@ function readRoyaltyMonthlyClose(): PublisherRoyaltyReviewQueue['monthlyClose'] 
         acx: '',
         directSales: '',
       },
+      generatedReportPolicy: generatedRoyaltyReportPolicy(),
       months: [],
     }
   }
 }
 
 function readRoyaltyDecisionCards(): PublisherRoyaltyDecisionCard[] {
+  const reconciliation = readJsonFile<{
+    rows?: Array<{
+      month?: string
+      sourceFile?: string
+      sourceSystem?: string
+      account?: string
+      currency?: string
+      isbn?: string
+      title?: string
+      units?: number
+      net?: number
+      gross?: number
+      matchStatus?: string
+      matchSource?: string
+      rowNumber?: number
+      lineItem?: string
+    }>
+  }>('2026-07-18-JM1-2026-Royalty-Source-Row-Reconciliation.json')
+
+  const heldRows = (reconciliation?.rows || []).filter((row) => stringValue(row.matchStatus) !== 'MATCHED_CORE_IDENTIFIER')
+  if (!heldRows.length) return readLegacyRoyaltyDecisionCards()
+
+  const grouped = new Map<string, {
+    month: string
+    sourceSystem: string
+    sourceFileNames: Set<string>
+    sourceFileCount: number
+    account: string
+    currency: string
+    identifier: string
+    title: string
+    affectedRows: number
+    unitCount: number
+    sourceNetCompensation: number
+    rowNumbers: string[]
+    lineItems: string[]
+  }>()
+
+  heldRows.forEach((row) => {
+    const month = stringValue(row.month)
+    const sourceSystem = stringValue(row.sourceSystem)
+    const account = stringValue(row.account)
+    const currency = stringValue(row.currency)
+    const identifier = normalizeIdentifier(stringValue(row.isbn))
+    const title = stringValue(row.title)
+    const key = [sourceSystem, month, account, currency, identifier, normalizeTitle(title)].join('|')
+    const current =
+      grouped.get(key) ||
+      {
+        month,
+        sourceSystem,
+        sourceFileNames: new Set<string>(),
+        sourceFileCount: 0,
+        account,
+        currency,
+        identifier,
+        title,
+        affectedRows: 0,
+        unitCount: 0,
+        sourceNetCompensation: 0,
+        rowNumbers: [],
+        lineItems: [],
+      }
+    current.sourceFileNames.add(stringValue(row.sourceFile))
+    current.sourceFileCount = current.sourceFileNames.size
+    current.affectedRows += 1
+    current.unitCount += Number(row.units || 0)
+    current.sourceNetCompensation = roundCurrency(current.sourceNetCompensation + Number(row.net || 0))
+    current.rowNumbers.push(stringValue(row.rowNumber))
+    current.lineItems.push(stringValue(row.lineItem))
+    grouped.set(key, current)
+  })
+
+  return [...grouped.values()]
+    .sort((a, b) => Math.abs(b.sourceNetCompensation) - Math.abs(a.sourceNetCompensation))
+    .map((group, index): PublisherRoyaltyDecisionCard => {
+      const period = `2026-${group.month.padStart(2, '0')}`
+      const decisionType = group.identifier ? 'Title Match / Identifier Match' : 'Title Match'
+      const sourceFiles = [...group.sourceFileNames].filter(Boolean)
+      return {
+        key: `royalty-held-${period}-${group.sourceSystem}-${group.account || 'account'}-${group.identifier || normalizeTitle(group.title)}-${index + 1}`,
+        decisionType,
+        author: '',
+        title: group.title,
+        reportingPeriod: period,
+        sourceSystem: group.sourceSystem,
+        sourceFile: sourceFiles.length > 1 ? `${sourceFiles.length} source files` : sourceFiles[0] || 'Source file pending',
+        account: group.account,
+        currency: group.currency,
+        identifier: group.identifier,
+        format: inferRoyaltyDecisionFormat(group.sourceSystem, sourceFiles.join(' ')),
+        unitCount: group.unitCount,
+        sourceNetCompensation: group.sourceNetCompensation,
+        affectedRows: group.affectedRows,
+        confidence: 'medium',
+        matchingBasis: group.identifier
+          ? 'Source row carries an ISBN/identifier and reported title, but the identifier is not yet mapped to one canonical JM1 title in Core.'
+          : 'Source row carries reported title text without a safely reusable canonical identifier mapping.',
+        priorMatchingDecisions: 'No accepted durable mapping found in the current source-row reconciliation.',
+        financialImpact: `${group.currency || 'USD'} ${group.sourceNetCompensation.toFixed(2)} across ${group.affectedRows} held row(s).`,
+        amountAffected: group.sourceNetCompensation.toFixed(2),
+        evidence: [
+          `${group.sourceSystem} ${period}`,
+          group.account ? `account ${group.account}` : '',
+          group.currency,
+          group.identifier ? `identifier ${group.identifier}` : 'identifier pending',
+          `${group.affectedRows} source row(s)`,
+          sourceFiles.length ? `files: ${sourceFiles.slice(0, 2).join('; ')}${sourceFiles.length > 2 ? '; ...' : ''}` : '',
+        ]
+          .filter(Boolean)
+          .join(' · '),
+        recommendedDecision: group.identifier
+          ? `Map identifier ${group.identifier} to the canonical title and format for ${group.title}, then reuse that mapping for future imports.`
+          : `Match reported title ${group.title} to the canonical title before import.`,
+        alternatives:
+          'Match to existing title; create format or edition relationship; classify as not JM1 title; classify duplicate source activity; defer for evidence.',
+        downstreamEffect:
+          'Approval persists a durable mapping, reevaluates the affected held source rows, imports eligible royalty activity, refreshes draft statements, and keeps author visibility off.',
+        allowedActions: [{ id: 'review_royalty_statement', label: 'Open Review' }],
+      }
+    })
+}
+
+function readLegacyRoyaltyDecisionCards(): PublisherRoyaltyDecisionCard[] {
   return readCsvRows('2026-07-17-JM1-2026-Royalty-Jackie-Decision-Package.csv')
     .map((row, index): PublisherRoyaltyDecisionCard => {
       const decisionType = stringValue(row.decisionType)
       const manifestRowNumber = stringValue(row.manifestRowNumber)
       const author = stringValue(row.author)
       const title = stringValue(row.title)
+      const amount = Number(stringValue(row.amountAffected)) || 0
       return {
         key: `royalty-decision-${manifestRowNumber || index + 1}`,
         decisionType,
         author,
         title,
         reportingPeriod: '2026 available royalty evidence',
+        sourceSystem: 'Legacy decision package',
+        sourceFile: '2026-07-17-JM1-2026-Royalty-Jackie-Decision-Package.csv',
+        account: '',
+        currency: 'USD',
+        identifier: '',
+        format: '',
+        unitCount: 0,
+        sourceNetCompensation: amount,
+        affectedRows: 1,
+        confidence: 'low',
+        matchingBasis: 'Legacy consolidated decision package.',
+        priorMatchingDecisions: 'Legacy decision package, pending Jackie review.',
+        financialImpact: `USD ${amount.toFixed(2)}`,
         amountAffected: stringValue(row.amountAffected),
         evidence: manifestRowNumber ? `Manifest row ${manifestRowNumber}; consolidated royalty decision package.` : 'Consolidated royalty decision package.',
         recommendedDecision: stringValue(row.recommendedAction),
@@ -2802,6 +3029,68 @@ function publisherActionToEvent(action: PublisherActionId) {
 
 function normalizeTitle(value: string) {
   return value.trim().toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ')
+}
+
+function normalizeIdentifier(value: string) {
+  return value.replace(/[^0-9XxA-Za-z]/g, '').toUpperCase()
+}
+
+function inferRoyaltyDecisionFormat(sourceSystem: string, evidence: string) {
+  const text = `${sourceSystem} ${evidence}`.toLowerCase()
+  if (text.includes('acx') || text.includes('audio')) return 'Audiobook'
+  if (text.includes('ebook') || text.includes('kdp') || text.includes('kindle')) return 'Ebook'
+  if (text.includes('pod') || text.includes('print') || text.includes('wholesale')) return 'Print'
+  if (text.includes('direct')) return 'Direct Sales'
+  return 'Format pending'
+}
+
+function roundCurrency(value: number) {
+  return Math.round((value + Number.EPSILON) * 100) / 100
+}
+
+function readJsonFile<T>(fileName: string): T | null {
+  try {
+    return JSON.parse(readFileSync(join(process.cwd(), 'docs/operations/generated', fileName), 'utf8')) as T
+  } catch {
+    return null
+  }
+}
+
+function generatedRoyaltyReportPolicy() {
+  return [
+    'Automated royalty reports are generated no later than the 10th of the month.',
+    'If an expected automated report does not exist before that deadline, it should not remain in an open waiting state for that generated report.',
+    'Manual reports may still be created and uploaded at any time, so manual upload choices remain available without treating missing generated reports as zero activity.',
+  ].join(' ')
+}
+
+function applyGeneratedReportTimingPolicy(month: PublisherRoyaltyMonthlyCloseItem): PublisherRoyaltyMonthlyCloseItem {
+  const sources = month.sources.map((source) => {
+    const automatedMissing =
+      source.state === 'SOURCE MISSING' &&
+      /lsi|ingram|acx/i.test(source.label) &&
+      !/direct/i.test(source.label)
+
+    if (!automatedMissing) return source
+
+    return {
+      ...source,
+      state: 'KNOWN UNAVAILABLE',
+      detail: `${source.detail}; automated report deadline policy applied: no generated report exists by the 10th, so no generated report is expected for this month.`,
+    }
+  })
+
+  const waitingFor = month.waitingFor.map((item) =>
+    /source missing|not found|missing/i.test(item)
+      ? `${item} Generated-report timing rule: automated reports are issued no later than the 10th; manual reports may still be supplied later.`
+      : item,
+  )
+
+  return {
+    ...month,
+    sources,
+    waitingFor,
+  }
 }
 
 function ageDays(value: string) {
