@@ -52,6 +52,45 @@ export type PublisherActionId =
   | 'retry_failed_operation'
   | 'view_only'
 
+export type PublisherExecutionMode =
+  | 'AUTOMATIC_EVENT_DRIVEN'
+  | 'AUTOMATIC_SCHEDULED'
+  | 'SYSTEM_ACTION_MANUALLY_TRIGGERED'
+  | 'PUBLISHER_MANUAL'
+  | 'CODY_ASSISTED_BRIDGE'
+  | 'CODY_ENGINEERING_ONLY'
+  | 'EXTERNAL_PARTY'
+  | 'NOT_IMPLEMENTED'
+
+export type PublisherExecutionState =
+  | 'NOT_TRIGGERED'
+  | 'QUEUED'
+  | 'EXECUTING'
+  | 'VALIDATING'
+  | 'COMPLETED'
+  | 'EXCEPTION'
+  | 'WAITING_FOR_HUMAN'
+  | 'WAITING_FOR_EXTERNAL_PARTY'
+
+export type PublisherExecutionOwner =
+  | 'JM1 Automation'
+  | 'Publisher'
+  | 'Author'
+  | 'External'
+  | 'Cody Bridge'
+  | 'Engineering'
+  | 'Not Implemented'
+
+export type PublisherRuntimeCostCategory =
+  | 'Codex interactive/model'
+  | 'Azure OpenAI/Foundry'
+  | 'Power Automate'
+  | 'Azure compute'
+  | 'Dataverse/API'
+  | 'GitHub Actions'
+  | 'No variable model cost'
+  | 'Unknown'
+
 export type PublisherQueueItem = {
   key: string
   intakeId: string
@@ -75,6 +114,17 @@ export type PublisherQueueItem = {
   currentBlocker: string
   recommendedNextAction: string
   actionOwner: 'publisher' | 'author' | 'system' | 'external'
+  executionMode: PublisherExecutionMode
+  executionState: PublisherExecutionState
+  businessOwner: 'Publisher' | 'Author' | 'External' | 'System'
+  executionOwner: PublisherExecutionOwner
+  runtime: string
+  runtimeCostCategory: PublisherRuntimeCostCategory
+  awaiting: string
+  lastTrigger: string
+  lastExecution: string
+  expectedDuration: string
+  exactBlocker: string
   holdReason: string
   ageDays: number
   ageBucket: '0-2 days' | '3-7 days' | '8-14 days' | '15-30 days' | 'Over 30 days'
@@ -126,7 +176,18 @@ export type PublisherWorkloadItem = {
   editorialSubstage: string
   workloadState: PublisherWorkloadState
   activeCapability: string
-  currentOwner: 'Cody' | 'Jackie' | 'Author' | 'External'
+  currentOwner: 'Publisher' | 'Jackie' | 'Author' | 'External' | 'System'
+  executionMode: PublisherExecutionMode
+  executionState: PublisherExecutionState
+  businessOwner: 'Publisher' | 'Author' | 'External' | 'System'
+  executionOwner: PublisherExecutionOwner
+  runtime: string
+  runtimeCostCategory: PublisherRuntimeCostCategory
+  awaiting: string
+  lastTrigger: string
+  lastExecution: string
+  expectedDuration: string
+  exactBlocker: string
   nextAction: string
   targetDate: string
   ageDays: number
@@ -176,7 +237,24 @@ export type PublisherTodayItem = {
   pipelineStage: string
   editorialStage: string
   substage: string
-  owner: 'Jackie' | 'Author' | 'Cody' | 'System' | 'External'
+  owner:
+    | 'Jackie'
+    | 'Author'
+    | 'JM1 Automation'
+    | 'Publisher'
+    | 'External'
+    | 'Cody Bridge'
+    | 'Engineering'
+    | 'Not Implemented'
+  businessOwner: 'Publisher' | 'Author' | 'External' | 'System'
+  executionOwner: PublisherExecutionOwner
+  executionMode: PublisherExecutionMode
+  executionState: PublisherExecutionState
+  runtime: string
+  awaiting: string
+  lastTrigger: string
+  expectedDuration: string
+  exactBlocker: string
   nextAction: string
   targetDate: string
   ageDays: number
@@ -1143,6 +1221,12 @@ function buildQueueItem(
         : authorizedActions.some((action) => action.id !== 'view_only')
           ? 'publisher'
           : 'system'
+  const execution = deriveQueueExecutionModel({
+    actionOwner,
+    currentBlocker,
+    hasAuthorizedAction: authorizedActions.some((action) => action.id !== 'view_only'),
+    latestExecutionEvidence: log ? `${stringValue(log.jm1_actiontype)} (${stringValue(log.jm1_executionlogid)})` : '',
+  })
   const daysOld = ageDays(stringValue(intake.createdon))
 
   return {
@@ -1175,6 +1259,17 @@ function buildQueueItem(
     currentBlocker,
     recommendedNextAction,
     actionOwner,
+    executionMode: execution.executionMode,
+    executionState: execution.executionState,
+    businessOwner: execution.businessOwner,
+    executionOwner: execution.executionOwner,
+    runtime: execution.runtime,
+    runtimeCostCategory: execution.runtimeCostCategory,
+    awaiting: execution.awaiting,
+    lastTrigger: execution.lastTrigger,
+    lastExecution: execution.lastExecution,
+    expectedDuration: execution.expectedDuration,
+    exactBlocker: execution.exactBlocker,
     holdReason: currentBlocker === 'Ready for publisher intake review' ? '' : currentBlocker,
     ageDays: daysOld,
     ageBucket: ageBucket(daysOld),
@@ -1229,6 +1324,14 @@ function buildWorkloadItems(
       const capability = deriveCapability(workloadState)
       const guard = deriveReadinessGuard(workloadState, latestStage, latestLog)
       const owner = deriveOwner(workloadState, guard.status)
+      const execution = deriveWorkloadExecutionModel({
+        state: workloadState,
+        guardStatus: guard.status,
+        guardMessage: guard.message,
+        latestExecutionEvidence: latestLog
+          ? `${stringValue(latestLog.jm1_actiontype)} (${stringValue(latestLog.jm1_executionlogid)})`
+          : 'No recent execution evidence found',
+      })
       const ageBase = stringValue(latestStage?.modifiedon || latestStage?.createdon || title.modifiedon || title.createdon)
       const age = ageDays(ageBase)
 
@@ -1250,6 +1353,17 @@ function buildWorkloadItems(
         workloadState,
         activeCapability: capability,
         currentOwner: owner,
+        executionMode: execution.executionMode,
+        executionState: execution.executionState,
+        businessOwner: execution.businessOwner,
+        executionOwner: execution.executionOwner,
+        runtime: execution.runtime,
+        runtimeCostCategory: execution.runtimeCostCategory,
+        awaiting: execution.awaiting,
+        lastTrigger: execution.lastTrigger,
+        lastExecution: execution.lastExecution,
+        expectedDuration: execution.expectedDuration,
+        exactBlocker: execution.exactBlocker,
         nextAction: deriveNextAction(workloadState, titleName),
         targetDate: deriveTargetDate(workloadState),
         ageDays: age,
@@ -1633,11 +1747,229 @@ function deriveOwner(
   state: PublisherWorkloadState,
   guardStatus: 'pass' | 'watch' | 'blocked',
 ): PublisherWorkloadItem['currentOwner'] {
-  if (guardStatus === 'blocked') return 'Cody'
+  if (guardStatus === 'blocked') return 'Publisher'
   if (state === 'Line Editing - Release Decision Ready' || state === 'Copyediting - Release Decision Ready') return 'Jackie'
   if (state.includes('Author Review')) return 'Author'
   if (state === 'External Hold') return 'External'
-  return 'Cody'
+  return 'Publisher'
+}
+
+function deriveQueueExecutionModel(input: {
+  actionOwner: PublisherQueueItem['actionOwner']
+  currentBlocker: string
+  hasAuthorizedAction: boolean
+  latestExecutionEvidence: string
+}): Pick<
+  PublisherQueueItem,
+  | 'executionMode'
+  | 'executionState'
+  | 'businessOwner'
+  | 'executionOwner'
+  | 'runtime'
+  | 'runtimeCostCategory'
+  | 'awaiting'
+  | 'lastTrigger'
+  | 'lastExecution'
+  | 'expectedDuration'
+  | 'exactBlocker'
+> {
+  if (input.actionOwner === 'author') {
+    return {
+      executionMode: 'EXTERNAL_PARTY',
+      executionState: 'WAITING_FOR_EXTERNAL_PARTY',
+      businessOwner: 'Author',
+      executionOwner: 'Author',
+      runtime: 'Governed email thread and Author Operating Center response surface',
+      runtimeCostCategory: 'No variable model cost',
+      awaiting: 'Author',
+      lastTrigger: 'Author package release',
+      lastExecution: input.latestExecutionEvidence || 'No recent execution evidence found',
+      expectedDuration: 'Author dependent',
+      exactBlocker: input.currentBlocker,
+    }
+  }
+  if (input.hasAuthorizedAction && input.actionOwner === 'publisher') {
+    return {
+      executionMode: 'SYSTEM_ACTION_MANUALLY_TRIGGERED',
+      executionState: 'WAITING_FOR_HUMAN',
+      businessOwner: 'Publisher',
+      executionOwner: 'Publisher',
+      runtime: 'Publisher Operating Center bounded action API',
+      runtimeCostCategory: 'Dataverse/API',
+      awaiting: 'Publisher',
+      lastTrigger: 'Publisher action pending',
+      lastExecution: input.latestExecutionEvidence || 'No recent execution evidence found',
+      expectedDuration: 'Immediate after publisher trigger',
+      exactBlocker: input.currentBlocker,
+    }
+  }
+  if (input.actionOwner === 'system') {
+    return {
+      executionMode: 'SYSTEM_ACTION_MANUALLY_TRIGGERED',
+      executionState: input.currentBlocker.toLowerCase().includes('in progress') ? 'EXECUTING' : 'QUEUED',
+      businessOwner: 'System',
+      executionOwner: 'JM1 Automation',
+      runtime: 'Deployed Publisher Operating Center read model and bounded API',
+      runtimeCostCategory: 'Dataverse/API',
+      awaiting: input.currentBlocker.toLowerCase().includes('in progress') ? 'System runtime' : 'Prerequisites',
+      lastTrigger: 'Core state refresh',
+      lastExecution: input.latestExecutionEvidence || 'No recent execution evidence found',
+      expectedDuration: 'Runtime dependent',
+      exactBlocker: input.currentBlocker,
+    }
+  }
+  return {
+    executionMode: 'EXTERNAL_PARTY',
+    executionState: 'WAITING_FOR_EXTERNAL_PARTY',
+    businessOwner: 'External',
+    executionOwner: 'External',
+    runtime: 'External party or source system',
+    runtimeCostCategory: 'No variable model cost',
+    awaiting: 'External party',
+    lastTrigger: 'External dependency identified',
+    lastExecution: input.latestExecutionEvidence || 'No recent execution evidence found',
+    expectedDuration: 'External dependent',
+    exactBlocker: input.currentBlocker,
+  }
+}
+
+function deriveWorkloadExecutionModel(input: {
+  state: PublisherWorkloadState
+  guardStatus: 'pass' | 'watch' | 'blocked'
+  guardMessage: string
+  latestExecutionEvidence: string
+}): Pick<
+  PublisherWorkloadItem,
+  | 'executionMode'
+  | 'executionState'
+  | 'businessOwner'
+  | 'executionOwner'
+  | 'runtime'
+  | 'runtimeCostCategory'
+  | 'awaiting'
+  | 'lastTrigger'
+  | 'lastExecution'
+  | 'expectedDuration'
+  | 'exactBlocker'
+> {
+  if (input.guardStatus === 'blocked') {
+    return {
+      executionMode: 'CODY_ENGINEERING_ONLY',
+      executionState: 'EXCEPTION',
+      businessOwner: 'Publisher',
+      executionOwner: 'Engineering',
+      runtime: 'Engineering remediation only; no business-stage movement authorized by this state',
+      runtimeCostCategory: 'Codex interactive/model',
+      awaiting: 'Engineering remediation',
+      lastTrigger: 'Readiness guard exception',
+      lastExecution: input.latestExecutionEvidence,
+      expectedDuration: 'Exception dependent',
+      exactBlocker: input.guardMessage,
+    }
+  }
+  if (input.state.includes('Author Review')) {
+    return {
+      executionMode: 'EXTERNAL_PARTY',
+      executionState: 'WAITING_FOR_EXTERNAL_PARTY',
+      businessOwner: 'Author',
+      executionOwner: 'Author',
+      runtime: 'Governed email thread and Author Operating Center review surface',
+      runtimeCostCategory: 'No variable model cost',
+      awaiting: 'Author',
+      lastTrigger: 'Author package release',
+      lastExecution: input.latestExecutionEvidence,
+      expectedDuration: 'Author dependent',
+      exactBlocker: deriveNextAction(input.state, ''),
+    }
+  }
+  if (input.state === 'Line Editing - Release Decision Ready' || input.state === 'Copyediting - Release Decision Ready') {
+    return {
+      executionMode: 'SYSTEM_ACTION_MANUALLY_TRIGGERED',
+      executionState: 'WAITING_FOR_HUMAN',
+      businessOwner: 'Publisher',
+      executionOwner: 'Publisher',
+      runtime: 'Publisher Operating Center release action',
+      runtimeCostCategory: 'Dataverse/API',
+      awaiting: 'Jackie',
+      lastTrigger: 'Package ready evidence',
+      lastExecution: input.latestExecutionEvidence,
+      expectedDuration: 'Immediate after publisher release decision',
+      exactBlocker: deriveNextAction(input.state, ''),
+    }
+  }
+  if (input.state === 'Proofreading In Progress' || input.state === 'Proofreading - Internal QA') {
+    return {
+      executionMode: 'CODY_ASSISTED_BRIDGE',
+      executionState: 'EXECUTING',
+      businessOwner: 'Publisher',
+      executionOwner: 'Cody Bridge',
+      runtime: 'Cody-assisted editorial bridge until CAP-004 proofreading runtime is deployed',
+      runtimeCostCategory: 'Codex interactive/model',
+      awaiting: 'Cody-assisted bridge',
+      lastTrigger: 'Publisher-approved proofreading start',
+      lastExecution: input.latestExecutionEvidence,
+      expectedDuration: 'Bridge dependent',
+      exactBlocker: 'Permanent Proofreading runtime not yet commissioned; current work uses controlled bridge execution.',
+    }
+  }
+  if (input.state === 'Developmental Editing - In Progress' || input.state === 'Line Editing - In Progress') {
+    return {
+      executionMode: 'CODY_ASSISTED_BRIDGE',
+      executionState: 'EXECUTING',
+      businessOwner: 'Publisher',
+      executionOwner: 'Cody Bridge',
+      runtime: 'Cody-assisted editorial bridge until the capability runtime is commissioned',
+      runtimeCostCategory: 'Codex interactive/model',
+      awaiting: 'Cody-assisted bridge',
+      lastTrigger: 'Publisher-approved stage start',
+      lastExecution: input.latestExecutionEvidence,
+      expectedDuration: 'Bridge dependent',
+      exactBlocker: 'Permanent editorial execution runtime not yet commissioned for this active stage.',
+    }
+  }
+  if (input.state === 'Editorial Review') {
+    return {
+      executionMode: 'CODY_ASSISTED_BRIDGE',
+      executionState: 'QUEUED',
+      businessOwner: 'Publisher',
+      executionOwner: 'Cody Bridge',
+      runtime: 'Cody-assisted editorial review bridge until event-driven Stage 0 runtime is promoted',
+      runtimeCostCategory: 'Codex interactive/model',
+      awaiting: 'Cody-assisted bridge',
+      lastTrigger: 'Core editorial stage active',
+      lastExecution: input.latestExecutionEvidence,
+      expectedDuration: 'Bridge dependent',
+      exactBlocker: 'Permanent Editorial Review runtime not yet commissioned for this title.',
+    }
+  }
+  if (input.state === 'External Hold') {
+    return {
+      executionMode: 'EXTERNAL_PARTY',
+      executionState: 'WAITING_FOR_EXTERNAL_PARTY',
+      businessOwner: 'External',
+      executionOwner: 'External',
+      runtime: 'External source or party',
+      runtimeCostCategory: 'No variable model cost',
+      awaiting: 'External party',
+      lastTrigger: 'External hold identified',
+      lastExecution: input.latestExecutionEvidence,
+      expectedDuration: 'External dependent',
+      exactBlocker: deriveNextAction(input.state, ''),
+    }
+  }
+  return {
+    executionMode: 'SYSTEM_ACTION_MANUALLY_TRIGGERED',
+    executionState: input.state.includes('Ready') || input.state.includes('Not Started') ? 'NOT_TRIGGERED' : 'QUEUED',
+    businessOwner: 'Publisher',
+    executionOwner: 'Publisher',
+    runtime: 'Publisher Operating Center bounded action',
+    runtimeCostCategory: 'Dataverse/API',
+    awaiting: 'Publisher',
+    lastTrigger: 'Core state refresh',
+    lastExecution: input.latestExecutionEvidence,
+    expectedDuration: 'Immediate after publisher trigger',
+    exactBlocker: deriveNextAction(input.state, ''),
+  }
 }
 
 function isActiveWorkloadItem(item: PublisherWorkloadItem) {
@@ -2041,7 +2373,7 @@ function buildPublisherToday(input: {
 }
 
 function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
-  const owner = item.actionOwner === 'publisher' ? 'Jackie' : item.actionOwner === 'author' ? 'Author' : 'System'
+  const owner = item.actionOwner === 'publisher' ? 'Jackie' : item.executionOwner
   return {
     key: `queue:${item.key}`,
     recordId: item.intakeId,
@@ -2053,6 +2385,15 @@ function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
     editorialStage: item.editorialStage,
     substage: item.currentBlocker,
     owner,
+    businessOwner: item.businessOwner,
+    executionOwner: item.executionOwner,
+    executionMode: item.executionMode,
+    executionState: item.executionState,
+    runtime: item.runtime,
+    awaiting: item.awaiting,
+    lastTrigger: item.lastTrigger,
+    expectedDuration: item.expectedDuration,
+    exactBlocker: item.exactBlocker,
     nextAction: item.recommendedNextAction,
     targetDate: '',
     ageDays: item.ageDays,
@@ -2082,7 +2423,7 @@ function workloadToTodayItem(item: PublisherWorkloadItem): PublisherTodayItem {
         ? 'Author'
         : item.currentOwner === 'External'
           ? 'External'
-          : 'Cody'
+          : item.executionOwner
 
   return {
     key: `workload:${item.key}`,
@@ -2095,6 +2436,15 @@ function workloadToTodayItem(item: PublisherWorkloadItem): PublisherTodayItem {
     editorialStage: item.workloadState,
     substage: item.editorialSubstage,
     owner,
+    businessOwner: item.businessOwner,
+    executionOwner: item.executionOwner,
+    executionMode: item.executionMode,
+    executionState: item.executionState,
+    runtime: item.runtime,
+    awaiting: item.awaiting,
+    lastTrigger: item.lastTrigger,
+    expectedDuration: item.expectedDuration,
+    exactBlocker: item.exactBlocker,
     nextAction: item.nextAction,
     targetDate: item.targetDate,
     ageDays: item.ageDays,
@@ -2114,6 +2464,7 @@ function workloadToTodayItem(item: PublisherWorkloadItem): PublisherTodayItem {
 }
 
 function portfolioToTodayItem(item: PublisherPortfolioItem): PublisherTodayItem {
+  const requiresPublisher = item.portfolioState === 'reconciliation_required'
   return {
     key: `portfolio:${item.key}`,
     recordId: item.assetIds[0] || item.titleId,
@@ -2124,7 +2475,16 @@ function portfolioToTodayItem(item: PublisherPortfolioItem): PublisherTodayItem 
     pipelineStage: item.pipelineStage,
     editorialStage: item.portfolioLabel,
     substage: item.catalogStatus,
-    owner: item.portfolioState === 'reconciliation_required' ? 'Jackie' : 'Cody',
+    owner: requiresPublisher ? 'Jackie' : 'JM1 Automation',
+    businessOwner: requiresPublisher ? 'Publisher' : 'System',
+    executionOwner: requiresPublisher ? 'Publisher' : 'JM1 Automation',
+    executionMode: requiresPublisher ? 'PUBLISHER_MANUAL' : 'AUTOMATIC_SCHEDULED',
+    executionState: requiresPublisher ? 'WAITING_FOR_HUMAN' : 'COMPLETED',
+    runtime: 'Publisher Operating Center catalog portfolio read model',
+    awaiting: requiresPublisher ? 'Jackie' : 'None',
+    lastTrigger: 'Core catalog portfolio refresh',
+    expectedDuration: 'Read model refresh',
+    exactBlocker: requiresPublisher ? item.nextAction : 'No active exception',
     nextAction: item.nextAction,
     targetDate: '',
     ageDays: 0,
@@ -2164,6 +2524,17 @@ function buildProductionCommand(
           workloadState: 'Blocked',
           activeCapability: 'Portfolio Placement',
           currentOwner: 'Jackie',
+          executionMode: 'PUBLISHER_MANUAL',
+          executionState: 'WAITING_FOR_HUMAN',
+          businessOwner: 'Publisher',
+          executionOwner: 'Publisher',
+          runtime: 'Publisher Operating Center manual portfolio placement',
+          runtimeCostCategory: 'Dataverse/API',
+          awaiting: 'Jackie',
+          lastTrigger: 'Portfolio read model fallback',
+          lastExecution: 'Portfolio read model',
+          expectedDuration: 'Immediate after publisher placement decision',
+          exactBlocker: item.nextAction,
           nextAction: item.nextAction,
           targetDate: '',
           ageDays: 0,
@@ -2283,6 +2654,7 @@ function productionReadinessFromWorkload(
 
 function productionToTodayItem(item: PublisherProductionReadinessItem, lane: 'interior' | 'cover' = 'interior'): PublisherTodayItem {
   const readiness = lane === 'cover' ? item.coverReadiness : item.interiorReadiness
+  const readyForPublisher = readiness.startsWith('READY')
   return {
     key: `production:${lane}:${item.key}`,
     recordId: item.productionProjectId || item.productionTaskId || item.key,
@@ -2293,7 +2665,16 @@ function productionToTodayItem(item: PublisherProductionReadinessItem, lane: 'in
     pipelineStage: lane === 'cover' ? 'Cover Design' : 'Interior Layout',
     editorialStage: item.editorialState,
     substage: readiness,
-    owner: readiness.startsWith('READY') ? 'Jackie' : 'System',
+    owner: readyForPublisher ? 'Jackie' : 'JM1 Automation',
+    businessOwner: readyForPublisher ? 'Publisher' : 'System',
+    executionOwner: readyForPublisher ? 'Publisher' : 'JM1 Automation',
+    executionMode: readyForPublisher ? 'SYSTEM_ACTION_MANUALLY_TRIGGERED' : 'AUTOMATIC_SCHEDULED',
+    executionState: readyForPublisher ? 'WAITING_FOR_HUMAN' : 'COMPLETED',
+    runtime: 'Publisher Operating Center production readiness read model',
+    awaiting: readyForPublisher ? 'Jackie' : 'Prerequisites',
+    lastTrigger: 'Production readiness refresh',
+    expectedDuration: readyForPublisher ? 'Immediate after publisher trigger' : 'Read model refresh',
+    exactBlocker: readiness,
     nextAction: lane === 'cover' ? item.nextCoverAction : item.nextInteriorAction,
     targetDate: '',
     ageDays: 0,
@@ -2321,6 +2702,15 @@ function royaltyDecisionTodayItem(royalties: PublisherRoyaltyReviewQueue): Publi
     editorialStage: 'Draft Statements — Internal Review',
     substage: 'Publisher decision package ready',
     owner: 'Jackie',
+    businessOwner: 'Publisher',
+    executionOwner: 'Publisher',
+    executionMode: 'PUBLISHER_MANUAL',
+    executionState: 'WAITING_FOR_HUMAN',
+    runtime: 'Publisher Operating Center royalty decision queue',
+    awaiting: 'Jackie',
+    lastTrigger: 'Royalty ingestion and decision package refresh',
+    expectedDuration: 'Publisher dependent',
+    exactBlocker: `${royalties.identityHolds} identity holds; ${royalties.titleHolds} title holds; ${royalties.unresolvedPayments} unresolved payments`,
     nextAction: 'Review identity, title, and payment-allocation decisions before statements are approved.',
     targetDate: '',
     ageDays: 0,
@@ -2484,6 +2874,8 @@ function deriveAuthorResponseFailedStep(
 }
 
 function authorResponseToTodayItem(item: PublisherAuthorResponseQueueItem): PublisherTodayItem {
+  const needsJackie = item.processingStatus === 'AMBIGUOUS — REVIEW'
+  const isException = item.processingStatus === 'FAILED — RETRY AVAILABLE' || item.processingStatus === 'STALE — SLA BREACH'
   return {
     key: `author-response:${item.key}`,
     recordId: item.gateId,
@@ -2494,7 +2886,20 @@ function authorResponseToTodayItem(item: PublisherAuthorResponseQueueItem): Publ
     pipelineStage: 'Author Response',
     editorialStage: item.stagePackage,
     substage: item.classifiedDecision,
-    owner: item.processingStatus === 'AMBIGUOUS — REVIEW' ? 'Jackie' : 'Cody',
+    owner: needsJackie ? 'Jackie' : isException ? 'Cody Bridge' : 'JM1 Automation',
+    businessOwner: needsJackie ? 'Publisher' : 'System',
+    executionOwner: needsJackie ? 'Publisher' : isException ? 'Cody Bridge' : 'JM1 Automation',
+    executionMode: needsJackie ? 'PUBLISHER_MANUAL' : isException ? 'CODY_ASSISTED_BRIDGE' : 'AUTOMATIC_EVENT_DRIVEN',
+    executionState: needsJackie ? 'WAITING_FOR_HUMAN' : isException ? 'EXCEPTION' : 'COMPLETED',
+    runtime: needsJackie
+      ? 'Publisher Operating Center author-response review'
+      : isException
+        ? 'Cody-assisted bridge required to remediate author-response processing'
+        : 'Author response processing read model',
+    awaiting: needsJackie ? 'Jackie' : isException ? 'Cody-assisted bridge' : 'None',
+    lastTrigger: 'Governed author email response',
+    expectedDuration: needsJackie ? 'Publisher dependent' : isException ? 'Bridge dependent' : 'Within 5 minutes',
+    exactBlocker: item.failedStep,
     nextAction: item.nextAction,
     targetDate: '',
     ageDays: Math.floor(item.ageMinutes / 1440),
@@ -2537,7 +2942,16 @@ function logToAlertTodayItem(log: DataverseRow): PublisherTodayItem {
     pipelineStage: 'Operational Alert',
     editorialStage: 'Failed Transition',
     substage: actionType,
-    owner: 'Cody',
+    owner: 'Engineering',
+    businessOwner: 'System',
+    executionOwner: 'Engineering',
+    executionMode: 'CODY_ENGINEERING_ONLY',
+    executionState: 'EXCEPTION',
+    runtime: 'Engineering remediation lane for failed execution evidence',
+    awaiting: 'Engineering remediation',
+    lastTrigger: 'Failure execution log',
+    expectedDuration: 'Exception dependent',
+    exactBlocker: `Execution log ${stringValue(log.jm1_executionlogid)}`,
     nextAction: 'Review failure evidence and retry only when entry criteria are satisfied',
     targetDate: '',
     ageDays: ageDays(stringValue(log.createdon)),
@@ -2564,7 +2978,16 @@ function logToMovementTodayItem(log: DataverseRow): PublisherTodayItem {
     pipelineStage: 'Recent Movement',
     editorialStage: actionType,
     substage: stringValue(log.createdon),
-    owner: 'System',
+    owner: 'JM1 Automation',
+    businessOwner: 'System',
+    executionOwner: 'JM1 Automation',
+    executionMode: 'AUTOMATIC_SCHEDULED',
+    executionState: 'COMPLETED',
+    runtime: 'Publisher Today execution-log readback',
+    awaiting: 'None',
+    lastTrigger: 'Execution-log refresh',
+    expectedDuration: 'Read model refresh',
+    exactBlocker: 'None',
     nextAction: 'See current section for next valid action',
     targetDate: '',
     ageDays: ageDays(stringValue(log.createdon)),
@@ -2585,7 +3008,17 @@ function isOpenFailureLog(log: DataverseRow) {
 
 function prioritizeTodayItems(items: PublisherTodayItem[]) {
   const severityRank = { urgent: 0, watch: 1, info: 2 }
-  const ownerRank = { Jackie: 0, Author: 1, Cody: 2, System: 3, External: 4 }
+  const ownerRank = {
+    Jackie: 0,
+    Author: 1,
+    Publisher: 2,
+    'Cody Bridge': 3,
+    Engineering: 4,
+    'JM1 Automation': 5,
+    System: 6,
+    External: 7,
+    'Not Implemented': 8,
+  }
   return [...dedupeTodayItems(items)].sort(
     (a, b) =>
       severityRank[a.severity] - severityRank[b.severity] ||
