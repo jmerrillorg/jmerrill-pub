@@ -39,6 +39,8 @@ export type PublisherActionId =
   | 'begin_interior_layout'
   | 'begin_cover_design'
   | 'review_royalty_statement'
+  | 'send_proofreading_notification'
+  | 'process_proofreading_approval'
   | 'view_thread'
   | 'confirm_classification'
   | 'change_classification'
@@ -70,6 +72,7 @@ export type PublisherExecutionState =
   | 'COMPLETED'
   | 'EXCEPTION'
   | 'WAITING_FOR_HUMAN'
+  | 'WAITING_FOR_SYSTEM'
   | 'WAITING_FOR_EXTERNAL_PARTY'
 
 export type PublisherExecutionOwner =
@@ -1902,13 +1905,13 @@ function deriveWorkloadExecutionModel(input: {
   }
   if (input.state === 'Proofreading - Notification Pending') {
     return {
-      executionMode: 'SYSTEM_ACTION_MANUALLY_TRIGGERED',
-      executionState: 'QUEUED',
+      executionMode: 'AUTOMATIC_EVENT_DRIVEN',
+      executionState: 'WAITING_FOR_SYSTEM',
       businessOwner: 'Publisher',
       executionOwner: 'JM1 Automation',
-      runtime: 'Proofreading package notification workflow and governed publishing email relay',
+      runtime: 'JM1 Publishing Orchestrator notification transaction and ACS email relay',
       runtimeCostCategory: 'Azure compute',
-      awaiting: 'Notification workflow',
+      awaiting: 'JM1 Automation',
       lastTrigger: 'Proofreading package ready',
       lastExecution: input.latestExecutionEvidence,
       expectedDuration: 'Immediate retry until sent or exceptioned',
