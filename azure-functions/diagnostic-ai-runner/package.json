@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "func start",
-    "lint": "node --check src/functions/runStage0Diagnostic.js src/dataverse/client.js",
+    "lint": "node --check src/functions/runStage0Diagnostic.js src/dataverse/client.js src/functions/runApprovalEventConsumer.js src/orchestration/approvalEventConsumer.js",
     "test": "node --test"
   },
   "dependencies": {
