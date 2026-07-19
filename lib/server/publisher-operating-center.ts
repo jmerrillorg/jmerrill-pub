@@ -1539,9 +1539,12 @@ function deriveWorkloadState(input: {
   if (type.includes('proof')) {
     if (
       status.includes('author') ||
+      status.includes('plan delivered') ||
       summary.includes('author review') ||
       summary.includes('ready for your review') ||
-      summary.includes('sent by email')
+      summary.includes('sent by email') ||
+      latestAction.includes('proofreading_author_package_released') ||
+      latestAction.includes('cap004_author_package_released')
     ) {
       return 'Proofreading - Author Review'
     }

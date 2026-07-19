@@ -82,6 +82,15 @@ const expectations = [
       source.includes("if (state === 'Proofreading In Progress') return 'No restart required; Proofreading is underway'"),
   },
   {
+    name: 'delivered Proofreading plan resolves to author review ownership',
+    ok:
+      deriveWorkloadStateBody.includes("status.includes('plan delivered')") &&
+      deriveWorkloadStateBody.includes("latestAction.includes('proofreading_author_package_released')") &&
+      deriveNextActionBody.includes("'Proofreading - Author Review'") &&
+      deriveNextActionBody.includes('Await author Proofreading response') &&
+      source.includes("if (state.includes('Author Review')) return 'Author'"),
+  },
+  {
     name: 'Publisher Operating Center exposes author response queue and recovery actions',
     ok:
       source.includes('export type PublisherAuthorResponseQueueItem') &&
