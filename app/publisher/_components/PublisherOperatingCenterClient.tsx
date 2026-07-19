@@ -794,7 +794,9 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                   <Th>Title</Th>
                   <Th>State</Th>
                   <Th>Capability</Th>
-                  <Th>Owner</Th>
+                  <Th>Business Owner</Th>
+                  <Th>Execution Owner</Th>
+                  <Th>Execution State</Th>
                   <Th>Workload</Th>
                   <Th>Next action</Th>
                   <Th>Package</Th>
@@ -809,7 +811,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                 ))}
                 {workload.length === 0 && (
                   <tr>
-                    <td className="px-3 py-5 text-white/45" colSpan={10}>
+                    <td className="px-3 py-5 text-white/45" colSpan={12}>
                       No active workload records were returned from Core.
                     </td>
                   </tr>
@@ -1282,16 +1284,19 @@ function TodayCard({ item }: { item: PublisherTodayItem }) {
           <p className="mt-1 text-[12px] text-white/45">{item.author}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Badge label={item.owner} tone={item.owner === 'Jackie' ? 'amber' : item.owner === 'Author' ? 'blue' : 'neutral'} />
+          <Badge label={executionOwnerLabel(item.owner)} tone={ownerTone(item.owner)} />
           <Badge label={item.severity} tone={item.severity === 'urgent' ? 'amber' : item.severity === 'watch' ? 'neutral' : 'blue'} />
         </div>
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <Info label="Stage" value={`${item.editorialStage}${item.substage ? ` · ${item.substage}` : ''}`} />
+        <Info label="Execution" value={`${item.executionMode} · ${item.executionState}`} />
+        <Info label="Runtime" value={item.runtime || 'Not classified'} />
+        <Info label="Awaiting" value={item.awaiting || 'None'} />
         <Info label="Next action" value={item.nextAction || 'No action returned'} />
         <Info label="Package" value={item.packageState || 'Not applicable'} />
-        <Info label="Dependency" value={item.dependency || 'None'} />
+        <Info label="Exact blocker" value={item.exactBlocker || item.dependency || 'None'} />
         <Info label="QA" value={item.qaState || 'Not set'} />
         <Info label="Age / Target" value={`${item.ageDays}d${item.targetDate ? ` · ${item.targetDate}` : ''}`} />
       </div>
@@ -1433,7 +1438,15 @@ function WorkloadRow({ item }: { item: PublisherWorkloadItem }) {
         <span className="mt-1 block text-white/38">{item.editorialStage}</span>
       </Td>
       <Td>{item.activeCapability}</Td>
-      <Td>{item.currentOwner}</Td>
+      <Td>{item.businessOwner}</Td>
+      <Td>
+        <Badge label={executionOwnerLabel(item.executionOwner)} tone={ownerTone(item.executionOwner)} />
+        <span className="mt-2 block max-w-[220px] leading-5 text-white/38">{item.runtime}</span>
+      </Td>
+      <Td>
+        <Badge label={item.executionState} tone={item.executionState === 'EXCEPTION' ? 'amber' : item.executionState === 'EXECUTING' ? 'blue' : 'neutral'} />
+        <span className="mt-2 block max-w-[220px] leading-5 text-white/38">{item.executionMode}</span>
+      </Td>
       <Td>
         <Badge label={workloadLabel(item.workloadLevel)} tone={workloadTone(item.workloadLevel)} />
         <span className="mt-2 block text-white/38">Queue #{item.queuePosition}</span>
@@ -1445,7 +1458,7 @@ function WorkloadRow({ item }: { item: PublisherWorkloadItem }) {
       <Td>{item.packageReadiness}</Td>
       <Td>
         <Badge label={item.readinessGuard.status} tone={item.readinessGuard.status === 'pass' ? 'blue' : 'amber'} />
-        <span className="mt-2 block max-w-[220px] leading-5 text-white/45">{item.readinessGuard.message}</span>
+        <span className="mt-2 block max-w-[220px] leading-5 text-white/45">{item.exactBlocker || item.readinessGuard.message}</span>
       </Td>
       <Td>{item.targetDate}</Td>
       <Td>{item.ageDays}d</Td>
@@ -1473,6 +1486,19 @@ function workloadLabel(level: PublisherWorkloadItem['workloadLevel']) {
 function workloadTone(level: PublisherWorkloadItem['workloadLevel']): 'neutral' | 'blue' | 'amber' {
   if (level === 'available' || level === 'normal') return 'blue'
   if (level === 'resource-attention' || level === 'overdue-risk') return 'amber'
+  return 'neutral'
+}
+
+function executionOwnerLabel(owner: string) {
+  if (owner === 'JM1 Automation') return 'JM1 AUTOMATION'
+  if (owner === 'Cody Bridge') return 'CODY BRIDGE'
+  return owner
+}
+
+function ownerTone(owner: string): 'neutral' | 'blue' | 'amber' {
+  if (owner === 'Jackie' || owner === 'Publisher') return 'amber'
+  if (owner === 'Author' || owner === 'JM1 Automation') return 'blue'
+  if (owner === 'Cody Bridge' || owner === 'Engineering') return 'amber'
   return 'neutral'
 }
 
