@@ -1,0 +1,26 @@
+name: JM1 Approval Event Consumer
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  consume-approval-events:
+    name: Consume approval events
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Invoke deployed approval event consumer
+        env:
+          WORKER_URL: ${{ secrets.JM1_ORCHESTRATION_WORKER_URL }}
+          WORKER_KEY: ${{ secrets.JM1_ORCHESTRATION_WORKER_KEY }}
+        run: |
+          test -n "$WORKER_URL"
+          test -n "$WORKER_KEY"
+          curl --fail-with-body \
+            --request POST \
+            --header "content-type: application/json" \
+            --header "x-jm1-orchestration-worker-key: $WORKER_KEY" \
+            --data '{"triggerSource":"SCHEDULED_WORKER","maxEvents":10}' \
+            "$WORKER_URL"
