@@ -47,6 +47,11 @@ export type AuthorPortalProjectSummary = {
   nextOperationalActivity?: string
   nextStep?: string
   expectedAuthorEvent?: string
+  packagePreparationState?: 'NOT_PREPARED' | 'PREPARED'
+  packageReleaseState?: 'NOT_RELEASED' | 'RELEASED'
+  notificationState?: 'NOT_STARTED' | 'QUEUED' | 'SENT' | 'FAILED'
+  authorAccessState?: 'HIDDEN' | 'AVAILABLE'
+  authorGateState?: 'CLOSED' | 'OPEN'
   activePackage?: AuthorPortalArtifact[]
   completedPackages?: Array<{
     label: string
@@ -182,6 +187,7 @@ type ResolvedProjectRow = {
   notificationCompleted?: boolean
   releasedArtifactExists?: boolean
   releasePublished?: boolean
+  notificationFailed?: boolean
   lastUpdated?: string
   contractStatusInternal?: string
   portfolioState?: CatalogPortfolioState
@@ -203,6 +209,7 @@ type AuthorActionEvidence = {
   authorResponseReceived: boolean
   nextStageAuthorized: boolean
   notificationCompleted: boolean
+  notificationFailed: boolean
 }
 
 type RelationshipBackedTitleRow = {
@@ -969,7 +976,8 @@ export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPo
     decisionDeferred,
   })
   const packageReadyNotificationPending = isPackageReadyNotificationPending(row)
-  const activeArtifacts = authorActionAvailable || packageReadyNotificationPending ? row.artifacts : []
+  const activeArtifacts = authorActionAvailable ? row.artifacts : []
+  const visibilityState = resolvePackageVisibilityState(row, authorActionAvailable)
 
   return {
     key:
@@ -991,6 +999,11 @@ export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPo
     awaitingParty: stageMessaging.awaitingParty,
     authorActionRequired: authorActionAvailable,
     authorActionDescription: stageMessaging.authorActionDescription,
+    packagePreparationState: visibilityState.packagePreparationState,
+    packageReleaseState: visibilityState.packageReleaseState,
+    notificationState: visibilityState.notificationState,
+    authorAccessState: visibilityState.authorAccessState,
+    authorGateState: visibilityState.authorGateState,
     currentActivity: stageMessaging.currentActivity,
     nextOperationalActivity: stageMessaging.nextStep,
     nextStep: stageMessaging.nextStep,
@@ -1440,7 +1453,7 @@ function canonicalStageLabel(value?: string) {
 }
 
 function canonicalStageStatus(value: string | undefined, row: ResolvedProjectRow) {
-  if (isPackageReadyNotificationPending(row)) return 'Package Ready - Notification Pending'
+  if (isPackageReadyNotificationPending(row)) return 'Notification Pending'
   if (row.authorDecisionOutstanding) return 'Author Review'
   const normalized = normalizeWorkspaceText(value)
   if (!normalized) return 'Not Started'
@@ -1653,6 +1666,28 @@ function shouldSuppressPackageTextForActiveStage(
   return false
 }
 
+function resolvePackageVisibilityState(row: ResolvedProjectRow, authorActionAvailable: boolean) {
+  const notificationPending = isPackageReadyNotificationPending(row)
+  const releasedArtifactExists = row.releasedArtifactExists === true
+  const releasePublished = row.releasePublished === true
+  const notificationFailed = row.notificationFailed === true
+
+  return {
+    packagePreparationState: releasedArtifactExists ? ('PREPARED' as const) : ('NOT_PREPARED' as const),
+    packageReleaseState: authorActionAvailable ? ('RELEASED' as const) : ('NOT_RELEASED' as const),
+    notificationState:
+      row.notificationCompleted === true
+        ? ('SENT' as const)
+        : notificationFailed
+          ? ('FAILED' as const)
+          : notificationPending && releasePublished
+            ? ('QUEUED' as const)
+            : ('NOT_STARTED' as const),
+    authorAccessState: authorActionAvailable ? ('AVAILABLE' as const) : ('HIDDEN' as const),
+    authorGateState: authorActionAvailable ? ('OPEN' as const) : ('CLOSED' as const),
+  }
+}
+
 function authorActionDescriptionForStage(row: ResolvedProjectRow) {
   switch (row.workspaceState) {
     case 'proofreading':
@@ -1701,13 +1736,30 @@ function detectOperationalMessageConflict(
   nextStep: string | undefined,
   authorActionAvailable: boolean,
 ) {
+  const visibilityState = resolvePackageVisibilityState(row, authorActionAvailable)
+  const normalizedActivity = normalizeWorkspaceText(currentActivity)
   if (normalizeWorkspaceText(currentActivity) === normalizeWorkspaceText(nextStep)) {
     return 'Current Activity and Next Step resolved to the same text; stage defaults were applied.'
+  }
+  if (visibilityState.notificationState !== 'SENT' && normalizedActivity.includes('ready for review')) {
+    return 'Notification is not complete, so author-review language was suppressed.'
+  }
+  if (visibilityState.authorGateState === 'CLOSED' && visibilityState.authorAccessState === 'AVAILABLE') {
+    return 'Author package visibility conflicted with a closed author gate.'
+  }
+  if (!authorActionAvailable && normalizedActivity.includes('review the')) {
+    return 'Author-review instruction conflicted with publisher-owned work.'
+  }
+  if (visibilityState.packageReleaseState === 'NOT_RELEASED' && visibilityState.authorAccessState === 'AVAILABLE') {
+    return 'Package access conflicted with unreleased package state.'
+  }
+  if (visibilityState.notificationState === 'SENT' && visibilityState.authorGateState === 'CLOSED') {
+    return 'Notification was sent but the author gate is still closed.'
   }
   if (shouldSuppressPackageTextForActiveStage(row, currentActivity, authorActionAvailable)) {
     return 'Stale completed-package language was suppressed from the active stage.'
   }
-  if (!authorActionAvailable && normalizeWorkspaceText(currentActivity).includes('package is ready')) {
+  if (!authorActionAvailable && normalizedActivity.includes('package is ready')) {
     return 'Active package language was suppressed because no open author package is available.'
   }
   if (authorActionAvailable && row.releasedArtifactExists !== true) {
@@ -1723,7 +1775,7 @@ function detectOperationalMessageConflict(
 }
 
 function buildLastMovement(row: ResolvedProjectRow) {
-  if (isPackageReadyNotificationPending(row)) return 'Proofreading package prepared; notification pending.'
+  if (isPackageReadyNotificationPending(row)) return 'Proofreading package prepared; author notification pending.'
   if (row.authorDecisionOutstanding) return 'Author review package released.'
   if (row.authorDecision) return `Author decision recorded: ${row.authorDecision}.`
   if (row.stageStatus) return `${canonicalStageLabel(row.stageLabel) || 'Project'} ${row.stageStatus}.`
@@ -1908,10 +1960,10 @@ function defaultNextActionLabel(row: ResolvedProjectRow) {
         : 'No action is required from you at this time. We will update you when the next publishing step is ready.'
     case 'proofreading':
       if (isPackageReadyNotificationPending(row)) {
-        return 'No action is required from you at this time. We will notify you by email when your proofreading package is ready for your response.'
+        return 'We will email you when the package is officially released for review.'
       }
       if (normalizeWorkspaceText(row.stageStatus).includes('author review') || row.authorDecisionOutstanding) {
-        return 'Review the package and submit your approval or requested corrections.'
+        return 'After we receive your response, the publishing team will complete any approved corrections or move your manuscript into production.'
       }
       if (
         normalizeWorkspaceText(row.stageStatus).includes('qa') ||
@@ -2010,7 +2062,7 @@ function defaultProjectSummary(row: ResolvedProjectRow) {
         : 'The publishing team is copyediting your approved manuscript.'
     case 'proofreading':
       if (isPackageReadyNotificationPending(row)) {
-        return 'Your proofreading package has been prepared and is awaiting publishing notification.'
+        return 'The publishing team has completed your proofreading package and is preparing the review notification.'
       }
       if (normalizeWorkspaceText(row.stageStatus).includes('author review') || row.authorDecisionOutstanding) {
         return 'Your proofreading package is ready for your review.'
@@ -2200,6 +2252,12 @@ function resolveAuthorActionEvidence({
   const artifactReleased =
     normalizedSummaryStatus === 'published to workspace' && Boolean(publishedToWorkspaceOn)
   const notificationCompleted = hasAuthorNotificationEvidence(notificationEvidence || '')
+  const normalizedNotificationEvidence = normalizeWorkspaceText(notificationEvidence)
+  const notificationFailed =
+    normalizedNotificationEvidence.includes('notification failed') ||
+    normalizedNotificationEvidence.includes('notification blocked') ||
+    normalizedNotificationEvidence.includes('send error') ||
+    normalizedNotificationEvidence.includes('mailbox send error')
   const authorResponded =
     Boolean(authorDecisionOn) ||
     Boolean(normalizedAuthorDecision) ||
@@ -2222,6 +2280,7 @@ function resolveAuthorActionEvidence({
     authorDecision: authorDecision?.trim() || undefined,
     gateStatus: gateStatus?.trim() || undefined,
     notificationCompleted,
+    notificationFailed,
     authorResponseReceived: authorResponded,
     nextStageAuthorized: nextStageAuthorized === true,
     authorActionAvailable: artifactExists && artifactReleased && authorDecisionOutstanding,
