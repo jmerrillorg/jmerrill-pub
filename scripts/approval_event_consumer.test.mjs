@@ -39,6 +39,8 @@ const checks = [
     ok:
       consumer.includes('EDITORIAL_APPROVAL_EVENT_CLAIMED') &&
       consumer.includes("findExecutionLog(config, 'EDITORIAL_APPROVAL_EVENT_CONSUMED', event.idempotencyKey)") &&
+      consumer.includes("findExecutionLog(config, 'EDITORIAL_APPROVAL_EVENT_BLOCKED', blockerKey)") &&
+      consumer.includes('payload_missing_required_reference_already_dead_lettered') &&
       consumer.includes("outcome: 'IDEMPOTENT'") &&
       consumer.includes('approval_event_already_consumed'),
   },

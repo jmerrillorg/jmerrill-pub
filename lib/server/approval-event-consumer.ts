@@ -51,10 +51,25 @@ export async function runAutomaticApprovalEventConsumer(input: {
     const event = await buildApprovalEventFromGate(config, gate, input.triggerSource || 'SCHEDULED_WORKER')
     if (!event) {
       const gateId = stringValue(gate.jm1pub_editorialapprovalgateid)
+      const blockerKey = `approval-event-blocked:${gateId}:payload_missing_required_reference`
+      const existingBlocker = await findExecutionLog(config, 'EDITORIAL_APPROVAL_EVENT_BLOCKED', blockerKey)
+      if (existingBlocker) {
+        results.push({
+          eventId: '',
+          gateId,
+          titleId: dataverseLookupId(gate, '_jm1pub_titleid_value'),
+          stageId: dataverseLookupId(gate, '_jm1pub_editorialstageid_value'),
+          eventType: 'EDITORIAL_STAGE_APPROVED',
+          outcome: 'IDEMPOTENT',
+          detail: 'payload_missing_required_reference_already_dead_lettered',
+          executionLogIds: [stringValue(existingBlocker.jm1_executionlogid)],
+        })
+        continue
+      }
       const logId = await writeLog(config, {
         actionType: 'EDITORIAL_APPROVAL_EVENT_BLOCKED',
         name: `EDITORIAL_APPROVAL_EVENT_BLOCKED - ${gateId}`,
-        description: `Approval gate could not produce a valid event payload. Gate remains queued for exact remediation. Trigger ${input.triggerSource || 'SCHEDULED_WORKER'}.`,
+        description: `Approval gate could not produce a valid event payload. Gate is dead-lettered for exact remediation instead of repeated automatic retries. Trigger ${input.triggerSource || 'SCHEDULED_WORKER'}. Idempotency: ${blockerKey}.`,
         sourceEntity: 'jm1pub_editorialapprovalgate',
         sourceRecordId: gateId,
         failed: true,
