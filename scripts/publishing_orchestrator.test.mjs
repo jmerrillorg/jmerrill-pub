@@ -17,7 +17,10 @@ const checks = [
   {
     name: 'successful proofreading notification opens author gate only after ACS acceptance',
     ok:
+      orchestrator.includes("actionType: 'PROOFREADING_NOTIFICATION_TRANSACTION_STARTED'") &&
+      orchestrator.includes("actionType: 'PROOFREADING_PACKAGE_ACCESS_VALIDATED'") &&
       orchestrator.includes("actionType: 'PROOFREADING_NOTIFICATION_SENT'") &&
+      orchestrator.includes("actionType: 'PROOFREADING_COMMUNICATION_EVIDENCE_RECORDED'") &&
       orchestrator.includes('send-approved-author-response') &&
       orchestrator.includes('jm1pub_gatestatus: GATE_STATUS_AWAITING_AUTHOR_RESPONSE') &&
       orchestrator.includes('Provider message ID'),
@@ -25,9 +28,26 @@ const checks = [
   {
     name: 'failed proofreading notification remains blocked without author clock',
     ok:
-      orchestrator.includes("actionType: 'PROOFREADING_NOTIFICATION_BLOCKED'") &&
+      orchestrator.includes("actionType: 'PROOFREADING_NOTIFICATION_TRANSACTION_FAILED'") &&
       orchestrator.includes('Proofreading notification remains pending') &&
       orchestrator.includes('A5 author-response gate must not be treated as live'),
+  },
+  {
+    name: 'communication evidence and surface refresh are required before completion',
+    ok:
+      orchestrator.includes("actionType: 'PROOFREADING_AUTHOR_RESPONSE_GATE_ACTIVATED'") &&
+      orchestrator.includes("actionType: 'AUTHOR_WORKSPACE_NOTIFICATION_STATE_REFRESHED'") &&
+      orchestrator.includes("actionType: 'PUBLISHER_TODAY_NOTIFICATION_STATE_REFRESHED'") &&
+      orchestrator.includes("actionType: 'PROOFREADING_NOTIFICATION_TRANSACTION_COMPLETED'") &&
+      orchestrator.includes('Communication state NOTIFICATION_SENT'),
+  },
+  {
+    name: 'future package-ready events invoke notification automation without Cody instruction',
+    ok:
+      orchestrator.includes('export async function handleAuthorReviewPackageReadyForRelease') &&
+      orchestrator.includes("'AUTHOR_REVIEW_PACKAGE_READY_FOR_RELEASE'") &&
+      orchestrator.includes("actionType: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_AUTOMATION_COMMISSIONED'") &&
+      orchestrator.includes('Execution owner JM1 Automation'),
   },
   {
     name: 'genuine proofreading approval event starts handler with author approval trigger',
@@ -42,6 +62,14 @@ const checks = [
       orchestrator.includes("findExecutionLog(config, 'INTERIOR_LAYOUT_AUTOSTARTED', payload.idempotencyKey)") &&
       orchestrator.includes("status: 'idempotent'") &&
       orchestrator.includes('idempotencyKey: payload.idempotencyKey'),
+  },
+  {
+    name: 'duplicate package-ready trigger does not resend existing accepted notification',
+    ok:
+      orchestrator.includes('findNotificationEvidence(config, input.gateId, artifactId, idempotencyKey)') &&
+      orchestrator.includes("jm1_actiontype eq 'PROOFREADING_NOTIFICATION_SENT'") &&
+      orchestrator.includes('current-proofreading-artifact') &&
+      orchestrator.includes('ACS relay returned HTTP 202 accepted'),
   },
   {
     name: 'correction request does not start interior layout',
