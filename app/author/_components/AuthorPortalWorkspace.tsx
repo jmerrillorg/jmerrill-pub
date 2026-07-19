@@ -315,6 +315,9 @@ export function AuthorPortalWorkspace() {
               }
             />
             <AuthorProjectField label="Awaiting" value={selectedProject.awaitingParty || 'Publisher'} />
+            {selectedProject.lastUpdated ? (
+              <AuthorProjectField label="Last Updated" value={formatAuthorWorkspaceDate(selectedProject.lastUpdated)} />
+            ) : null}
           </div>
           {showPublisherProgress ? (
             <div className="mt-4 grid gap-3">
@@ -357,6 +360,38 @@ export function AuthorPortalWorkspace() {
                   >
                     Download {artifact.label}
                   </a>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {selectedProject.currentMilestones?.length ? (
+            <div className="mt-5 border-t border-white/10 pt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Current activities</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {selectedProject.currentMilestones.map((milestone) => (
+                  <div
+                    key={`${milestone.label}-${milestone.note || milestone.state}`}
+                    className="rounded-2xl border border-blue-400/15 bg-blue-400/[0.05] px-4 py-3 text-[12px] leading-[1.6] text-blue-100/75"
+                  >
+                    <span className="font-semibold text-blue-100">{milestone.label}</span>
+                    {milestone.note ? <span className="block text-blue-100/55">{milestone.note}</span> : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {selectedProject.upcomingMilestones?.length ? (
+            <div className="mt-5 border-t border-white/10 pt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-white/35">Upcoming milestones</p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {selectedProject.upcomingMilestones.slice(0, 4).map((milestone) => (
+                  <div
+                    key={`${milestone.label}-${milestone.note || milestone.state}`}
+                    className="rounded-2xl border border-white/8 bg-black/15 px-4 py-3 text-[12px] leading-[1.6] text-white/50"
+                  >
+                    <span className="font-semibold text-white/65">{milestone.label}</span>
+                    {milestone.note ? <span className="block text-white/38">{milestone.note}</span> : null}
+                  </div>
                 ))}
               </div>
             </div>
@@ -983,10 +1018,24 @@ function marketingNetworkErrorMessage(error: unknown) {
   return 'We could not finish saving your marketing profile. Your entries are still on this page; please retry in a moment.'
 }
 
+function formatAuthorWorkspaceDate(value: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date)
+}
+
 function isEditorialWorkspaceState(state: AuthorPortalContext['projects'][number]['workspaceState']) {
   return (
     state === 'editorial_review' ||
     state === 'developmental_editing' ||
+    state === 'line_editing' ||
+    state === 'copyediting' ||
+    state === 'proofreading' ||
     state === 'editorial_in_progress' ||
     state === 'production_in_progress' ||
     state === 'distribution_release_pending'
@@ -997,6 +1046,9 @@ function projectStateBadge(state: AuthorPortalContext['projects'][number]['works
   switch (state) {
     case 'editorial_review':
     case 'developmental_editing':
+    case 'line_editing':
+    case 'copyediting':
+    case 'proofreading':
     case 'editorial_in_progress':
     case 'production_in_progress':
     case 'distribution_release_pending':
