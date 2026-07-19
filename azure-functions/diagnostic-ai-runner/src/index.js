@@ -3,6 +3,7 @@
 require("./functions/getPublisherRecommendationReview");
 require("./functions/runAgreementPackageSend");
 require("./functions/runApprovalEventConsumer");
+require("./functions/runAuthorReviewResponseConsumer");
 require("./functions/runEditorialReviewNow");
 require("./functions/runIntentionalLeaderAuthorResponse");
 require("./functions/runMilestone6ContinuationCommunication");
