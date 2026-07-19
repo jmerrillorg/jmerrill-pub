@@ -58,7 +58,7 @@ const expectations = [
     name: 'completed packages are not active artifacts',
     ok:
       contextSource.includes('const packageReadyNotificationPending = isPackageReadyNotificationPending(row)') &&
-      contextSource.includes('const activeArtifacts = authorActionAvailable || packageReadyNotificationPending ? row.artifacts : []') &&
+      contextSource.includes('const activeArtifacts = authorActionAvailable ? row.artifacts : []') &&
       contextSource.includes('completedPackages: buildCompletedPackageHistory(row)') &&
       contextSource.includes('activePackage: activeArtifacts') &&
       contextSource.includes('currentMilestones: milestones.filter') &&
@@ -76,11 +76,23 @@ const expectations = [
     ok:
       contextSource.includes('notificationCompleted') &&
       contextSource.includes('function isPackageReadyNotificationPending') &&
-      contextSource.includes("return 'Package Ready - Notification Pending'") &&
-      contextSource.includes('Your proofreading package has been prepared and is awaiting publishing notification.') &&
-      contextSource.includes('No action is required from you at this time. We will notify you by email when your proofreading package is ready for your response.') &&
+      contextSource.includes("return 'Notification Pending'") &&
+      contextSource.includes('The publishing team has completed your proofreading package and is preparing the review notification.') &&
+      contextSource.includes('We will email you when the package is officially released for review.') &&
       contextSource.includes('PROOFREADING_PACKAGE_NOTIFICATION_PENDING') &&
-      contextSource.includes('Proofreading package prepared; notification pending.'),
+      contextSource.includes('Proofreading package prepared; author notification pending.'),
+  },
+  {
+    name: 'notification-pending packages expose separate hidden package states',
+    ok:
+      contextSource.includes('packagePreparationState?:') &&
+      contextSource.includes('packageReleaseState?:') &&
+      contextSource.includes('notificationState?:') &&
+      contextSource.includes('authorAccessState?:') &&
+      contextSource.includes('authorGateState?:') &&
+      contextSource.includes('function resolvePackageVisibilityState') &&
+      contextSource.includes("authorAccessState: authorActionAvailable ? ('AVAILABLE' as const) : ('HIDDEN' as const)") &&
+      contextSource.includes("authorGateState: authorActionAvailable ? ('OPEN' as const) : ('CLOSED' as const)"),
   },
   {
     name: 'author workspace shows no author action for publisher-owned work',
@@ -113,6 +125,8 @@ const expectations = [
       contextSource.includes('sanitizeOperationalNextStep') &&
       contextSource.includes('shouldSuppressPackageTextForActiveStage') &&
       contextSource.includes('detectOperationalMessageConflict') &&
+      contextSource.includes('Notification is not complete, so author-review language was suppressed.') &&
+      contextSource.includes('Author package visibility conflicted with a closed author gate.') &&
       contextSource.includes('Stale completed-package language was suppressed from the active stage.'),
   },
   {

@@ -10,7 +10,17 @@ const expectations = [
     name: 'author artifacts require an active author action',
     ok:
       contextSource.includes('authorActionEvidence.authorActionAvailable') &&
-      contextSource.includes('getAuthorFacingEditorialArtifacts(config, {'),
+      contextSource.includes('getAuthorFacingEditorialArtifacts(config, {') &&
+      contextSource.includes('const activeArtifacts = authorActionAvailable ? row.artifacts : []') &&
+      contextSource.includes('authorAccessState: authorActionAvailable ?'),
+  },
+  {
+    name: 'notification pending hides prepared package downloads',
+    ok:
+      contextSource.includes('function isPackageReadyNotificationPending') &&
+      contextSource.includes("return 'Notification Pending'") &&
+      contextSource.includes("authorAccessState: authorActionAvailable ? ('AVAILABLE' as const) : ('HIDDEN' as const)") &&
+      contextSource.includes("authorGateState: authorActionAvailable ? ('OPEN' as const) : ('CLOSED' as const)"),
   },
   {
     name: 'artifact query is scoped to current active editorial stage',
