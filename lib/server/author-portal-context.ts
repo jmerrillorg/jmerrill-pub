@@ -179,6 +179,7 @@ type ResolvedProjectRow = {
   authorDecisionOutstanding?: boolean
   authorDecision?: string
   gateStatus?: string
+  notificationCompleted?: boolean
   releasedArtifactExists?: boolean
   releasePublished?: boolean
   lastUpdated?: string
@@ -201,6 +202,7 @@ type AuthorActionEvidence = {
   gateStatus?: string
   authorResponseReceived: boolean
   nextStageAuthorized: boolean
+  notificationCompleted: boolean
 }
 
 type RelationshipBackedTitleRow = {
@@ -656,11 +658,14 @@ async function buildProjectSummaries(
       gateStatus: dataverseFormatted(pendingGate || {}, 'jm1pub_gatestatus', ''),
       authorDecision: dataverseFormatted(pendingGate || {}, 'jm1pub_authordecision', ''),
       authorDecisionOn: stringValue(pendingGate?.jm1pub_authordecisionon),
+      notificationEvidence: `${stringValue(pendingGate?.jm1pub_authorresponsesummary)} ${stringValue(
+        pendingGate?.jm1pub_authordecisionsource,
+      )}`,
       nextStageAuthorized: Boolean(pendingGate?.jm1pub_nextstageauthorized),
     })
 
     const artifacts =
-      asset && authorActionEvidence.authorActionAvailable
+      asset && authorActionEvidence.releasedArtifactExists && authorActionEvidence.releasePublished
         ? await getAuthorFacingEditorialArtifacts(config, {
             publishingAssetId: dataverseLookupId(asset, 'jm1pub_publishingassetid'),
             activeStageId: dataverseLookupId(stage || {}, 'jm1pub_editorialstageid'),
@@ -698,6 +703,7 @@ async function buildProjectSummaries(
       authorDecisionOutstanding: authorActionEvidence.authorDecisionOutstanding,
       authorDecision: authorActionEvidence.authorDecision,
       gateStatus: authorActionEvidence.gateStatus,
+      notificationCompleted: authorActionEvidence.notificationCompleted,
       releasedArtifactExists: authorActionEvidence.releasedArtifactExists,
       releasePublished: authorActionEvidence.releasePublished,
       lastUpdated:
@@ -833,11 +839,14 @@ async function buildProjectSummaries(
       gateStatus: dataverseFormatted(pendingGate || {}, 'jm1pub_gatestatus', ''),
       authorDecision: dataverseFormatted(pendingGate || {}, 'jm1pub_authordecision', ''),
       authorDecisionOn: stringValue(pendingGate?.jm1pub_authordecisionon),
+      notificationEvidence: `${stringValue(pendingGate?.jm1pub_authorresponsesummary)} ${stringValue(
+        pendingGate?.jm1pub_authordecisionsource,
+      )}`,
       nextStageAuthorized: Boolean(pendingGate?.jm1pub_nextstageauthorized),
     })
 
     const artifacts =
-      asset && authorActionEvidence.authorActionAvailable
+      asset && authorActionEvidence.releasedArtifactExists && authorActionEvidence.releasePublished
         ? await getAuthorFacingEditorialArtifacts(config, {
             publishingAssetId: dataverseLookupId(asset, 'jm1pub_publishingassetid'),
             activeStageId: dataverseLookupId(stage || {}, 'jm1pub_editorialstageid'),
@@ -867,6 +876,7 @@ async function buildProjectSummaries(
         authorDecisionOutstanding: authorActionEvidence.authorDecisionOutstanding,
         authorDecision: authorActionEvidence.authorDecision,
         gateStatus: authorActionEvidence.gateStatus,
+        notificationCompleted: authorActionEvidence.notificationCompleted,
         releasedArtifactExists: authorActionEvidence.releasedArtifactExists,
         releasePublished: authorActionEvidence.releasePublished,
         lastUpdated:
@@ -958,7 +968,8 @@ export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPo
     discussionRequested,
     decisionDeferred,
   })
-  const activeArtifacts = authorActionAvailable ? row.artifacts : []
+  const packageReadyNotificationPending = isPackageReadyNotificationPending(row)
+  const activeArtifacts = authorActionAvailable || packageReadyNotificationPending ? row.artifacts : []
 
   return {
     key:
@@ -1380,6 +1391,7 @@ export function inferWorkspaceState({
 
 function buildWorkspaceStatusLabel(row: ResolvedProjectRow) {
   const stageLabel = canonicalStageLabel(row.stageLabel)
+  const stageStatus = canonicalStageStatus(row.stageStatus, row)
 
   switch (row.workspaceState) {
     case 'pre_contract_setup':
@@ -1397,7 +1409,7 @@ function buildWorkspaceStatusLabel(row: ResolvedProjectRow) {
     case 'copyediting':
       return `${stageLabel || 'Copyediting'} — ${row.authorDecisionOutstanding ? 'Author Review' : row.stageStatus || 'In Progress'}`
     case 'proofreading':
-      return `${stageLabel || 'Proofreading'} — ${row.authorDecisionOutstanding ? 'Author Review' : row.stageStatus || 'In Progress'}`
+      return `${stageLabel || 'Proofreading'} — ${stageStatus || 'In Progress'}`
     case 'editorial_in_progress':
       return `${stageLabel || 'Editorial Review'} - ${row.stageStatus || 'Not Started'}`
     case 'production_in_progress':
@@ -1428,11 +1440,38 @@ function canonicalStageLabel(value?: string) {
 }
 
 function canonicalStageStatus(value: string | undefined, row: ResolvedProjectRow) {
+  if (isPackageReadyNotificationPending(row)) return 'Package Ready - Notification Pending'
   if (row.authorDecisionOutstanding) return 'Author Review'
   const normalized = normalizeWorkspaceText(value)
   if (!normalized) return 'Not Started'
   if (normalized === 'active') return 'In Progress'
   return value?.trim() || 'Not Started'
+}
+
+function hasAuthorNotificationEvidence(value: string) {
+  const normalized = normalizeWorkspaceText(value)
+  return (
+    normalized.includes('notification sent') ||
+    normalized.includes('author notification sent') ||
+    normalized.includes('email sent') ||
+    normalized.includes('sent by email') ||
+    normalized.includes('delivery confirmed') ||
+    normalized.includes('provider accepted') ||
+    normalized.includes('acs accepted') ||
+    normalized.includes('message id')
+  )
+}
+
+function isPackageReadyNotificationPending(row: ResolvedProjectRow) {
+  return (
+    row.releasedArtifactExists === true &&
+    row.releasePublished === true &&
+    row.notificationCompleted !== true &&
+    row.authorDecisionOutstanding !== true &&
+    row.authorDecision === undefined &&
+    (normalizeWorkspaceText(row.gateStatus) === 'ready for author review' ||
+      normalizeWorkspaceText(row.gateStatus) === 'awaiting author response')
+  )
 }
 
 function getDefaultStageLabel(state: AuthorPortalWorkspaceState) {
@@ -1549,6 +1588,7 @@ function resolveOperationalActivityCode(row: ResolvedProjectRow, authorActionAva
   if (row.workspaceState === 'line_editing') return 'LINE_EDITING_IN_PROGRESS'
   if (row.workspaceState === 'copyediting') return 'COPYEDITING_IN_PROGRESS'
   if (row.workspaceState === 'proofreading') {
+    if (isPackageReadyNotificationPending(row)) return 'PROOFREADING_PACKAGE_NOTIFICATION_PENDING'
     if (normalizedStatus.includes('qa') || normalizedStatus.includes('quality')) return 'PROOFREADING_INTERNAL_QA'
     if (normalizedStatus.includes('correction') || normalizedStatus.includes('revision')) return 'PROOFREADING_CORRECTIONS'
     return 'PROOFREADING_IN_PROGRESS'
@@ -1642,6 +1682,7 @@ function expectedAuthorEventForStage(row: ResolvedProjectRow) {
     case 'copyediting':
       return 'Copyediting package delivery'
     case 'proofreading':
+      if (isPackageReadyNotificationPending(row)) return 'Proofreading package notification'
       return 'Proofreading package delivery'
     case 'production_in_progress':
       return 'Production proof delivery'
@@ -1682,6 +1723,7 @@ function detectOperationalMessageConflict(
 }
 
 function buildLastMovement(row: ResolvedProjectRow) {
+  if (isPackageReadyNotificationPending(row)) return 'Proofreading package prepared; notification pending.'
   if (row.authorDecisionOutstanding) return 'Author review package released.'
   if (row.authorDecision) return `Author decision recorded: ${row.authorDecision}.`
   if (row.stageStatus) return `${canonicalStageLabel(row.stageLabel) || 'Project'} ${row.stageStatus}.`
@@ -1865,6 +1907,9 @@ function defaultNextActionLabel(row: ResolvedProjectRow) {
         ? 'Review the package and submit your approval or requested corrections.'
         : 'No action is required from you at this time. We will update you when the next publishing step is ready.'
     case 'proofreading':
+      if (isPackageReadyNotificationPending(row)) {
+        return 'No action is required from you at this time. We will notify you by email when your proofreading package is ready for your response.'
+      }
       if (normalizeWorkspaceText(row.stageStatus).includes('author review') || row.authorDecisionOutstanding) {
         return 'Review the package and submit your approval or requested corrections.'
       }
@@ -1964,6 +2009,9 @@ function defaultProjectSummary(row: ResolvedProjectRow) {
         ? 'Your copyediting package is ready for your review.'
         : 'The publishing team is copyediting your approved manuscript.'
     case 'proofreading':
+      if (isPackageReadyNotificationPending(row)) {
+        return 'Your proofreading package has been prepared and is awaiting publishing notification.'
+      }
       if (normalizeWorkspaceText(row.stageStatus).includes('author review') || row.authorDecisionOutstanding) {
         return 'Your proofreading package is ready for your review.'
       }
@@ -2132,6 +2180,7 @@ function resolveAuthorActionEvidence({
   gateStatus,
   authorDecision,
   authorDecisionOn,
+  notificationEvidence,
   nextStageAuthorized,
 }: {
   summaryStatus?: string
@@ -2141,6 +2190,7 @@ function resolveAuthorActionEvidence({
   gateStatus?: string
   authorDecision?: string
   authorDecisionOn?: string
+  notificationEvidence?: string
   nextStageAuthorized?: boolean
 }): AuthorActionEvidence {
   const normalizedSummaryStatus = normalizeWorkspaceText(summaryStatus)
@@ -2149,6 +2199,7 @@ function resolveAuthorActionEvidence({
   const artifactExists = Boolean(sourceArtifactId || deliverableArtifactId)
   const artifactReleased =
     normalizedSummaryStatus === 'published to workspace' && Boolean(publishedToWorkspaceOn)
+  const notificationCompleted = hasAuthorNotificationEvidence(notificationEvidence || '')
   const authorResponded =
     Boolean(authorDecisionOn) ||
     Boolean(normalizedAuthorDecision) ||
@@ -2159,6 +2210,7 @@ function resolveAuthorActionEvidence({
   const authorDecisionOutstanding =
     artifactExists &&
     artifactReleased &&
+    notificationCompleted &&
     !authorResponded &&
     (normalizedGateStatus === 'ready for author review' ||
       normalizedGateStatus === 'awaiting author response')
@@ -2169,6 +2221,7 @@ function resolveAuthorActionEvidence({
     authorDecisionOutstanding,
     authorDecision: authorDecision?.trim() || undefined,
     gateStatus: gateStatus?.trim() || undefined,
+    notificationCompleted,
     authorResponseReceived: authorResponded,
     nextStageAuthorized: nextStageAuthorized === true,
     authorActionAvailable: artifactExists && artifactReleased && authorDecisionOutstanding,

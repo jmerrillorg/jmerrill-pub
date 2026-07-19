@@ -57,7 +57,8 @@ const expectations = [
   {
     name: 'completed packages are not active artifacts',
     ok:
-      contextSource.includes('const activeArtifacts = authorActionAvailable ? row.artifacts : []') &&
+      contextSource.includes('const packageReadyNotificationPending = isPackageReadyNotificationPending(row)') &&
+      contextSource.includes('const activeArtifacts = authorActionAvailable || packageReadyNotificationPending ? row.artifacts : []') &&
       contextSource.includes('completedPackages: buildCompletedPackageHistory(row)') &&
       contextSource.includes('activePackage: activeArtifacts') &&
       contextSource.includes('currentMilestones: milestones.filter') &&
@@ -69,6 +70,17 @@ const expectations = [
       contextSource.includes('Copyediting Review Package') &&
       workspaceSource.includes('Completed packages') &&
       workspaceSource.includes('Active package'),
+  },
+  {
+    name: 'Proofreading package ready without notification is not an active author response task',
+    ok:
+      contextSource.includes('notificationCompleted') &&
+      contextSource.includes('function isPackageReadyNotificationPending') &&
+      contextSource.includes("return 'Package Ready - Notification Pending'") &&
+      contextSource.includes('Your proofreading package has been prepared and is awaiting publishing notification.') &&
+      contextSource.includes('No action is required from you at this time. We will notify you by email when your proofreading package is ready for your response.') &&
+      contextSource.includes('PROOFREADING_PACKAGE_NOTIFICATION_PENDING') &&
+      contextSource.includes('Proofreading package prepared; notification pending.'),
   },
   {
     name: 'author workspace shows no author action for publisher-owned work',
