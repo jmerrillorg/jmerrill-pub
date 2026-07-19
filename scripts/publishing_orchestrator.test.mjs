@@ -15,15 +15,13 @@ const checks = [
       publisher.includes('Proofreading package notification has not been sent or logged'),
   },
   {
-    name: 'successful proofreading notification opens author gate only after ACS acceptance',
+    name: 'proofreading notification must pass canonical attachment policy before send',
     ok:
       orchestrator.includes("actionType: 'PROOFREADING_NOTIFICATION_TRANSACTION_STARTED'") &&
-      orchestrator.includes("actionType: 'PROOFREADING_PACKAGE_ACCESS_VALIDATED'") &&
-      orchestrator.includes("actionType: 'PROOFREADING_NOTIFICATION_SENT'") &&
-      orchestrator.includes("actionType: 'PROOFREADING_COMMUNICATION_EVIDENCE_RECORDED'") &&
-      orchestrator.includes('send-approved-author-response') &&
-      orchestrator.includes('jm1pub_gatestatus: GATE_STATUS_AWAITING_AUTHOR_RESPONSE') &&
-      orchestrator.includes('Provider message ID'),
+      orchestrator.includes('AUTHOR_PACKAGE_NOTIFICATION_EVENTS.attachmentsValidated') &&
+      orchestrator.includes('validateAuthorPackageNotification({') &&
+      orchestrator.includes('Workspace link alone does not satisfy') &&
+      orchestrator.includes('return notificationBlocked(config, input.gateId, input.correlationId, validation.blocker)'),
   },
   {
     name: 'failed proofreading notification remains blocked without author clock',
@@ -38,7 +36,7 @@ const checks = [
       orchestrator.includes("actionType: 'PROOFREADING_AUTHOR_RESPONSE_GATE_ACTIVATED'") &&
       orchestrator.includes("actionType: 'AUTHOR_WORKSPACE_NOTIFICATION_STATE_REFRESHED'") &&
       orchestrator.includes("actionType: 'PUBLISHER_TODAY_NOTIFICATION_STATE_REFRESHED'") &&
-      orchestrator.includes("actionType: 'PROOFREADING_NOTIFICATION_TRANSACTION_COMPLETED'") &&
+      orchestrator.includes("actionType: AUTHOR_PACKAGE_NOTIFICATION_EVENTS.transactionCompleted") &&
       orchestrator.includes('Communication state NOTIFICATION_SENT'),
   },
   {
@@ -46,7 +44,7 @@ const checks = [
     ok:
       orchestrator.includes('export async function handleAuthorReviewPackageReadyForRelease') &&
       orchestrator.includes("'AUTHOR_REVIEW_PACKAGE_READY_FOR_RELEASE'") &&
-      orchestrator.includes("actionType: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_AUTOMATION_COMMISSIONED'") &&
+      orchestrator.includes('AUTHOR_PACKAGE_NOTIFICATION_EVENTS.engineCommissioned') &&
       orchestrator.includes('Execution owner JM1 Automation'),
   },
   {

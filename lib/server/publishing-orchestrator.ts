@@ -9,6 +9,13 @@ import {
   stringValue,
   type DataverseServerConfig,
 } from './dataverse-server'
+import {
+  AUTHOR_PACKAGE_NOTIFICATION_EVENTS,
+  AUTHOR_PACKAGE_NOTIFICATION_POLICIES,
+  buildAuthorPackageNotificationIdempotencyKey,
+  validateAuthorPackageNotification,
+  type AuthorReviewPackageType,
+} from './author-package-notification-engine'
 
 const EXECUTION_STATUS_SUCCESS = 835500001
 const EXECUTION_STATUS_FAILED = 835500002
@@ -103,6 +110,8 @@ export async function handleAuthorReviewPackageReadyForRelease(input: Notificati
 
 export async function sendProofreadingNotification(input: NotificationInput): Promise<OrchestrationResult> {
   const config = requireDataverseConfig()
+  const stageCode: AuthorReviewPackageType = 'PROOFREADING_REVIEW'
+  const attachmentPolicy = AUTHOR_PACKAGE_NOTIFICATION_POLICIES[stageCode]
   const gate = await getGate(config, input.gateId)
   const stageId = dataverseLookupId(gate, '_jm1pub_editorialstageid_value')
   const titleId = dataverseLookupId(gate, '_jm1pub_titleid_value')
@@ -123,7 +132,14 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
   }
 
   const checksum = extractChecksum(stringValue(artifact.jm1pub_sha256 || artifact.jm1pub_notes))
-  const idempotencyKey = `proofreading-notification:${titleId}:${input.gateId}:${artifactId}:${checksum || 'checksum-pending'}`
+  const idempotencyKey = buildAuthorPackageNotificationIdempotencyKey({
+    titleId,
+    stageCode,
+    gateId: input.gateId,
+    packageId: artifactId,
+    packageVersion: 'current',
+    packageChecksum: checksum,
+  })
   const existing = await findNotificationEvidence(config, input.gateId, artifactId, idempotencyKey)
   if (existing) {
     return {
@@ -145,17 +161,64 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
     sourceRecordId: input.gateId,
   })
 
-  const accessLog = await writeLog(config, {
-    actionType: 'PROOFREADING_PACKAGE_ACCESS_VALIDATED',
-    name: `PROOFREADING_PACKAGE_ACCESS_VALIDATED - ${titleName}`,
+  await writeLog(config, {
+    actionType: AUTHOR_PACKAGE_NOTIFICATION_EVENTS.audited,
+    name: `AUTHOR_PACKAGE_NOTIFICATION_AUDITED - ${titleName}`,
     description: [
-      `Manuscript artifact ${artifactId} exists and package reference is gate-linked.`,
+      `Canonical notification engine input prepared for ${stageCode}.`,
+      `Required attachment roles: ${attachmentPolicy.attachmentsRequired.join(', ')}.`,
+      `Title ${titleId}; stage ${stageId}; gate ${input.gateId}; package ${artifactId}; checksum ${checksum || 'not-recorded'}.`,
+      `Operator ${input.operatorEmail}. Idempotency: ${idempotencyKey}.`,
+    ].join(' '),
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: input.gateId,
+  })
+
+  const accessLog = await writeLog(config, {
+    actionType: AUTHOR_PACKAGE_NOTIFICATION_EVENTS.attachmentsValidated,
+    name: `AUTHOR_PACKAGE_REQUIRED_ATTACHMENTS_VALIDATED - ${titleName}`,
+    description: [
+      `Package artifact ${artifactId} exists and package reference is gate-linked.`,
       `Repository item ${stringValue(artifact.jm1pub_repositoryitemid) || 'not-recorded'}; path ${stringValue(artifact.jm1pub_repositorypath) || 'not-recorded'}.`,
+      `Attachment policy requires ${attachmentPolicy.attachmentsRequired.join(', ')} before gate activation can be marked complete.`,
       `Author recipient resolved from Core as ${authorEmail}. Idempotency: ${idempotencyKey}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: input.gateId,
   })
+
+  const validation = validateAuthorPackageNotification({
+    titleId,
+    authorId: dataverseLookupId(stage, '_jm1pub_contactid_value') || dataverseLookupId(title, '_jm1_author_value') || authorEmail,
+    stageCode,
+    gateId: input.gateId,
+    packageId: artifactId,
+    packageVersion: 'current',
+    packageArtifactIds: [artifactId],
+    requiredAttachmentArtifactIds: [artifactId],
+    workspaceAccessLocation: stringValue(artifact.jm1pub_repositoryitemid || artifact.jm1pub_repositorypath),
+    notificationTemplateId: 'PROOFREADING_AUTHOR_REVIEW_NOTIFICATION',
+    recipientPolicy: {
+      from: APPROVED_SENDER,
+      to: authorEmail,
+      cc: [INTERNAL_VISIBILITY_MAILBOX],
+    },
+    correlationId: input.correlationId || idempotencyKey,
+    idempotencyKey,
+    attachments: [],
+    packageChecksum: checksum,
+  })
+  if (!validation.ok && validation.blocker?.includes('REQUIRED_ATTACHMENT_MISSING')) {
+    await writeLog(config, {
+      actionType: AUTHOR_PACKAGE_NOTIFICATION_EVENTS.incompleteDetected,
+      name: `AUTHOR_PACKAGE_NOTIFICATION_INCOMPLETE_DETECTED - ${titleName}`,
+      description: `${validation.blocker}. Workspace link alone does not satisfy ${stageCode} attachment policy. Idempotency: ${idempotencyKey}.`,
+      sourceEntity: 'jm1pub_editorialapprovalgate',
+      sourceRecordId: input.gateId,
+      failed: true,
+    })
+    return notificationBlocked(config, input.gateId, input.correlationId, validation.blocker)
+  }
 
   const relayKey = process.env.JM1_AUTHOR_RESPONSE_SEND_RELAY_KEY || process.env.JM1_RELAY_API_KEY
   if (!relayKey) {
@@ -273,16 +336,23 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
       sourceRecordId: input.gateId,
     }),
     writeLog(config, {
-      actionType: 'PROOFREADING_NOTIFICATION_TRANSACTION_COMPLETED',
-      name: `PROOFREADING_NOTIFICATION_TRANSACTION_COMPLETED - ${titleName}`,
+      actionType: AUTHOR_PACKAGE_NOTIFICATION_EVENTS.transactionCompleted,
+      name: `AUTHOR_PACKAGE_NOTIFICATION_TRANSACTION_COMPLETED - ${titleName}`,
       description: `Package validated, notification accepted, communication evidence recorded, A5 gate activated, and operating surfaces refreshed. Idempotency: ${idempotencyKey}.`,
       sourceEntity: 'jm1pub_editorialapprovalgate',
       sourceRecordId: input.gateId,
     }),
     writeLog(config, {
-      actionType: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_AUTOMATION_COMMISSIONED',
-      name: `AUTHOR_REVIEW_PACKAGE_NOTIFICATION_AUTOMATION_COMMISSIONED - ${titleName}`,
-      description: `Future AUTHOR_REVIEW_PACKAGE_READY_FOR_RELEASE events invoke this notification transaction without a new Cody instruction after cadence and approval rules pass. Execution owner JM1 Automation. Idempotency: ${idempotencyKey}.`,
+      actionType: AUTHOR_PACKAGE_NOTIFICATION_EVENTS.engineCommissioned,
+      name: `AUTHOR_PACKAGE_NOTIFICATION_ENGINE_COMMISSIONED - ${titleName}`,
+      description: `Future author-review package events invoke the canonical notification engine without stage-specific send logic after cadence and approval rules pass. Execution owner JM1 Automation. Idempotency: ${idempotencyKey}.`,
+      sourceEntity: 'jm1pub_editorialapprovalgate',
+      sourceRecordId: input.gateId,
+    }),
+    writeLog(config, {
+      actionType: AUTHOR_PACKAGE_NOTIFICATION_EVENTS.templateUnified,
+      name: `AUTHOR_PACKAGE_NOTIFICATION_TEMPLATE_UNIFIED - ${titleName}`,
+      description: `Email, Author Workspace, Publisher Today, gate timing, and attachment policy now resolve through shared package/stage configuration for ${stageCode}. Idempotency: ${idempotencyKey}.`,
       sourceEntity: 'jm1pub_editorialapprovalgate',
       sourceRecordId: input.gateId,
     }),
