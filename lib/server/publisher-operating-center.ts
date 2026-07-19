@@ -2800,8 +2800,8 @@ function buildAuthorResponseQueue(
     { id: 'view_thread', label: 'View Thread' },
     { id: 'confirm_classification', label: 'Confirm Classification' },
     { id: 'change_classification', label: 'Change Classification' },
-    { id: 'reconcile_response', label: 'Reconcile Response' },
-    { id: 'retry_failed_transition', label: 'Retry Failed Transition' },
+    { id: 'reconcile_response', label: 'Inspect Response Evidence' },
+    { id: 'retry_failed_transition', label: 'Admin Retry Event' },
     { id: 'mark_non_decision_message', label: 'Mark Non-Decision Message' },
   ]
 
@@ -2875,7 +2875,7 @@ function buildAuthorResponseQueue(
             ? 'No action required; response has been applied.'
             : processingStatus === 'AMBIGUOUS — REVIEW'
               ? 'Confirm the response classification before movement.'
-              : 'Reconcile response and retry the failed transition.',
+              : 'Automatic consumer will retry; use admin replay only with the original event and reason.',
         threadEvidence: stringValue(gate.jm1pub_authordecisionsource) || extractThreadEvidence(summary),
         gateId,
         stageId,
@@ -2949,9 +2949,9 @@ function authorResponseToTodayItem(item: PublisherAuthorResponseQueueItem): Publ
     runtime: needsJackie
       ? 'Publisher Operating Center author-response review'
       : isException
-        ? 'Cody-assisted bridge required to remediate author-response processing'
-        : 'Author response processing read model',
-    awaiting: needsJackie ? 'Jackie' : isException ? 'Cody-assisted bridge' : 'None',
+        ? 'Automatic approval event consumer with administrative replay controls'
+        : 'Automatic approval event consumer',
+    awaiting: needsJackie ? 'Jackie' : isException ? 'JM1 Automation retry / publisher admin replay if exhausted' : 'None',
     lastTrigger: 'Governed author email response',
     expectedDuration: needsJackie ? 'Publisher dependent' : isException ? 'Bridge dependent' : 'Within 5 minutes',
     exactBlocker: item.failedStep,

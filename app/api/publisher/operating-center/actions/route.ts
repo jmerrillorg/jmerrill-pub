@@ -59,6 +59,10 @@ export async function POST(req: Request) {
     titleId?: string
     decisionKey?: string
     approvalEvent?: ApprovalTransitionPayload
+    adminReplay?: {
+      originalEventId?: string
+      reason?: string
+    }
   } | null
   const action = body?.action === 'initialize_publisher_intake_review' ? 'review_intake' : body?.action
   if (!body || !SUPPORTED_ACTIONS.includes(action as PublisherActionId)) {
@@ -158,6 +162,15 @@ export async function POST(req: Request) {
         })
         break
       case 'process_proofreading_approval':
+        if (!body.adminReplay?.originalEventId || !body.adminReplay.reason) {
+          return NextResponse.json(
+            {
+              error:
+                'Proofreading approval processing is automatic. Publisher actions may only perform ADMIN_REPLAY or ADMIN_RETRY with the original event id and reason.',
+            },
+            { status: 400 },
+          )
+        }
         if (!body.approvalEvent) return NextResponse.json({ error: 'Approval event payload is required.' }, { status: 400 })
         result = await processProofreadingApprovalEvent(body.approvalEvent)
         break
