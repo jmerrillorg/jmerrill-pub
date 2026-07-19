@@ -68,6 +68,16 @@ const checks = [
       ].every((event) => engine.includes(event)),
   },
   {
+    name: 'author package notification validates canonical From, Reply-To, and CC policy',
+    pass: () =>
+      engine.includes('AUTHOR_PUBLISHING_COMMUNICATION_POLICY') &&
+      engine.includes('validateAuthorNotificationHeaders') &&
+      engine.includes('AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_MISSING') &&
+      engine.includes('AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_NOT_CANONICAL') &&
+      engine.includes('AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_DOMAIN_NOT_RECEIVING_MAIL') &&
+      orchestrator.includes('replyTo: CANONICAL_REPLY_TO'),
+  },
+  {
     name: 'ACS sender supports real attachments instead of link-only notification',
     pass: () =>
       engine.includes('EmailClient') &&
