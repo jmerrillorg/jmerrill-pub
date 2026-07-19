@@ -13,6 +13,14 @@ export const AUTHOR_PACKAGE_NOTIFICATION_EVENTS = {
   nextStageAutostartArmed: 'AUTHOR_NEXT_STAGE_AUTOSTART_ARMED',
 } as const
 
+export const AUTHOR_PUBLISHING_COMMUNICATION_POLICY = {
+  transactionalFromAddress: 'publishing@email.jmerrill.one',
+  transactionalFromName: 'J Merrill Publishing',
+  canonicalReplyTo: 'publishing@jmerrill.one',
+  publishingArchiveCc: 'publishing@jmerrill.one',
+  monitoredReplyMailbox: 'publishing@jmerrill.one',
+} as const
+
 export type AuthorReviewPackageType =
   | 'DEVELOPMENTAL_EDITING_REVIEW'
   | 'LINE_EDITING_REVIEW'
@@ -113,6 +121,7 @@ export type AuthorPackageNotificationInput = {
   recipientPolicy: {
     from: string
     to: string
+    replyTo: string
     cc: string[]
   }
   correlationId: string
@@ -177,6 +186,8 @@ export function validateAuthorPackageNotification(input: AuthorPackageNotificati
   if (policy.emailRequired && !input.recipientPolicy.to) {
     return blocked('AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - AUTHOR_EMAIL_MISSING')
   }
+  const headerValidation = validateAuthorNotificationHeaders(input.recipientPolicy)
+  if (!headerValidation.ok) return blocked(headerValidation.blocker)
 
   const attachmentsByRole = new Map(input.attachments.map((attachment) => [attachment.role, attachment]))
   const missingRole = policy.attachmentsRequired.find((role) => !attachmentsByRole.get(role))
@@ -204,6 +215,34 @@ export function validateAuthorPackageNotification(input: AuthorPackageNotificati
     attachmentValidationResult: 'valid',
     authorAccessResult: 'valid',
   }
+}
+
+export function validateAuthorNotificationHeaders(input: {
+  from: string
+  to: string
+  replyTo?: string
+  cc: string[]
+}): { ok: true } | { ok: false; blocker: string } {
+  const from = input.from.trim().toLowerCase()
+  const replyTo = (input.replyTo || '').trim().toLowerCase()
+  const cc = input.cc.map((address) => address.trim().toLowerCase())
+
+  if (from !== AUTHOR_PUBLISHING_COMMUNICATION_POLICY.transactionalFromAddress) {
+    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - SENDER_NOT_APPROVED' }
+  }
+  if (!replyTo) {
+    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_MISSING' }
+  }
+  if (replyTo !== AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo) {
+    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_NOT_CANONICAL' }
+  }
+  if (replyTo.endsWith('@email.jmerrill.one')) {
+    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_DOMAIN_NOT_RECEIVING_MAIL' }
+  }
+  if (!cc.includes(AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCc)) {
+    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_ARCHIVE_CC_MISSING' }
+  }
+  return { ok: true }
 }
 
 export function buildAuthorReviewNotificationCopy(input: {
@@ -251,14 +290,24 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
   connectionString: string
   from: string
   to: string
+  replyTo: string
   cc: string[]
   subject: string
   textBody: string
   attachments: GovernedPackageAttachment[]
 }) {
+  const headerValidation = validateAuthorNotificationHeaders({
+    from: input.from,
+    to: input.to,
+    replyTo: input.replyTo,
+    cc: input.cc,
+  })
+  if (!headerValidation.ok) throw new Error(headerValidation.blocker)
+
   const client = new EmailClient(input.connectionString)
   const message: EmailMessage = {
     senderAddress: input.from,
+    replyTo: [{ address: input.replyTo, displayName: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.transactionalFromName }],
     content: {
       subject: input.subject,
       plainText: input.textBody,
