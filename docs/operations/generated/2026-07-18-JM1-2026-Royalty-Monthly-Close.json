@@ -31,13 +31,13 @@
         },
         {
           "label": "KDP",
-          "state": "IMPORTED — RECONCILED",
-          "detail": "Prior Months Royalties Jan 2026"
+          "state": "PARSER ACTIVATED — IMPORT VALIDATION READY",
+          "detail": "Prior Months Royalties Jan 2026; controlled upload parser active"
         },
         {
           "label": "ACX",
-          "state": "IMPORTED — RECONCILED",
-          "detail": "Monthly ACX Jan 2026"
+          "state": "PARSER ACTIVATED — IMPORT VALIDATION READY",
+          "detail": "Monthly ACX Jan 2026; controlled upload parser active"
         },
         {
           "label": "Direct Sales",
@@ -75,13 +75,13 @@
         },
         {
           "label": "KDP",
-          "state": "IMPORTED — RECONCILED",
-          "detail": "Prior Months Royalties Feb 2026"
+          "state": "PARSER ACTIVATED — IMPORT VALIDATION READY",
+          "detail": "Prior Months Royalties Feb 2026; controlled upload parser active"
         },
         {
           "label": "ACX",
-          "state": "IMPORTED — RECONCILED",
-          "detail": "Monthly ACX Feb 2026"
+          "state": "PARSER ACTIVATED — IMPORT VALIDATION READY",
+          "detail": "Monthly ACX Feb 2026; controlled upload parser active"
         },
         {
           "label": "Direct Sales",
@@ -89,7 +89,9 @@
           "detail": "No direct sales file in folder"
         }
       ],
-      "waitingFor": []
+      "waitingFor": [
+        "KDP/ACX files are present and parser-ready; final row import requires controlled upload/import execution."
+      ]
     },
     {
       "month": "March",
@@ -117,13 +119,13 @@
         },
         {
           "label": "KDP",
-          "state": "IMPORTED — RECONCILED",
-          "detail": "Prior Months Royalties Mar 2026"
+          "state": "PARSER ACTIVATED — IMPORT VALIDATION READY",
+          "detail": "Prior Months Royalties Mar 2026; controlled upload parser active"
         },
         {
           "label": "ACX",
-          "state": "IMPORTED — RECONCILED",
-          "detail": "Monthly ACX Mar 2026"
+          "state": "PARSER ACTIVATED — IMPORT VALIDATION READY",
+          "detail": "Monthly ACX Mar 2026; controlled upload parser active"
         },
         {
           "label": "Direct Sales",
@@ -131,7 +133,9 @@
           "detail": "No direct sales file in folder"
         }
       ],
-      "waitingFor": []
+      "waitingFor": [
+        "KDP/ACX files are present and parser-ready; final row import requires controlled upload/import execution."
+      ]
     },
     {
       "month": "April",
@@ -159,21 +163,24 @@
         },
         {
           "label": "KDP",
-          "state": "IMPORTED — RECONCILED",
-          "detail": "Prior Months Royalties Apr 2026"
+          "state": "PARSER ACTIVATED — IMPORT VALIDATION READY",
+          "detail": "Prior Months Royalties Apr 2026; controlled upload parser active"
         },
         {
           "label": "ACX",
-          "state": "IMPORTED — RECONCILED",
-          "detail": "Monthly ACX Apr 2026"
+          "state": "PARSER ACTIVATED — IMPORT VALIDATION READY",
+          "detail": "Monthly ACX Apr 2026; controlled upload parser active"
         },
         {
           "label": "Direct Sales",
-          "state": "RECEIVED — NOT PROCESSED",
-          "detail": "Lightning Source AR invoice present"
+          "state": "SOURCE MISSING",
+          "detail": "Lightning Source AR invoice retained as audit evidence; not a direct-sales import source"
         }
       ],
-      "waitingFor": []
+      "waitingFor": [
+        "KDP/ACX files are present and parser-ready; final row import requires controlled upload/import execution.",
+        "Lightning Source AR invoice is evidence-only, not direct-sales source activity."
+      ]
     },
     {
       "month": "May",
@@ -201,8 +208,8 @@
         },
         {
           "label": "KDP",
-          "state": "IMPORTED — RECONCILED",
-          "detail": "Prior Months Royalties May 2026"
+          "state": "PARSER ACTIVATED — IMPORT VALIDATION READY",
+          "detail": "Prior Months Royalties May 2026; controlled upload parser active"
         },
         {
           "label": "ACX",
@@ -215,11 +222,13 @@
           "detail": "No direct sales file in folder"
         }
       ],
-      "waitingFor": []
+      "waitingFor": [
+        "May KDP file is present and parser-ready; final row import requires controlled upload/import execution."
+      ]
     },
     {
       "month": "June",
-      "status": "IMPORTED — RECONCILED",
+      "status": "IMPORTED — EXCEPTIONS",
       "sources": [
         {
           "label": "LSI POD US",
@@ -266,7 +275,10 @@
     "ingram": "Mailbox/archive source handling activated for Ingram report families; January-June archive files hashed, deduped, and imported where title identifiers resolved.",
     "kdp": "Controlled upload route active. January-May KDP files retained as source evidence; June KDP remains UPLOAD REQUIRED.",
     "acx": "Controlled upload route active. January-April ACX files retained as latest available source evidence; May/June are KNOWN UNAVAILABLE unless newer source is delivered.",
-    "directSales": "Controlled upload/no-activity route active. January Share & Sell source imported; June requires direct-sales upload or no-activity confirmation."
+    "directSales": "Controlled upload/no-activity route active. January Share & Sell source imported; June requires direct-sales upload or no-activity confirmation.",
+    "kdpUpload": "Controlled KDP upload route parses XLS/XLSX/CSV/TSV, records source totals, and dedupes by source hash. June source remains upload-required.",
+    "acxUpload": "Controlled ACX upload route parses multi-sheet XLS/XLSX workbooks, records source totals, and dedupes by source hash. Latest available archive source remains April.",
+    "directSalesUpload": "Controlled Direct Sales upload/no-activity route parses governed templates, records source totals, and dedupes by source hash."
   },
   "sourceImportSummary": {
     "files": 34,
