@@ -66,7 +66,9 @@ async function getGraphToken(deps = {}) {
  */
 async function fetchRecentInboxMessages(token, afterIso) {
   const filter = encodeURIComponent(`receivedDateTime ge ${afterIso}`);
-  const select = encodeURIComponent("subject,from,receivedDateTime,bodyPreview,body,conversationId");
+  const select = encodeURIComponent(
+    "id,internetMessageId,subject,from,toRecipients,ccRecipients,receivedDateTime,bodyPreview,body,conversationId"
+  );
   const url =
     `${GRAPH_BASE}/users/${encodeURIComponent(PUBLISHING_MAILBOX)}/mailFolders/inbox/messages` +
     `?$filter=${filter}&$select=${select}&$orderby=receivedDateTime desc&$top=${MAX_MESSAGES_FETCHED}`;
@@ -149,12 +151,23 @@ async function readPublishingMailboxReply(input = {}, deps = {}) {
   const senderAddress = normalizeString(latest.from?.emailAddress?.address).toLowerCase() || null;
   const receivedDateTime = normalizeString(latest.receivedDateTime) || null;
   const bodyText = normalizeString(latest.body?.content) || normalizeString(latest.bodyPreview) || "";
+  const toRecipients = Array.isArray(latest.toRecipients)
+    ? latest.toRecipients.map((r) => normalizeString(r?.emailAddress?.address).toLowerCase()).filter(Boolean)
+    : [];
+  const ccRecipients = Array.isArray(latest.ccRecipients)
+    ? latest.ccRecipients.map((r) => normalizeString(r?.emailAddress?.address).toLowerCase()).filter(Boolean)
+    : [];
 
   return {
     ok: true,
     code: "REPLY_FOUND",
     found: true,
+    inboundMessageId: normalizeString(latest.id) || null,
+    internetMessageId: normalizeString(latest.internetMessageId) || null,
+    conversationId: normalizeString(latest.conversationId) || null,
     senderAddress,
+    toRecipients,
+    ccRecipients,
     receivedDateTime,
     bodyText
   };

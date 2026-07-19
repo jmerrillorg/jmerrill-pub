@@ -208,7 +208,19 @@ describe("readPublishingMailboxReply — safety invariants", () => {
     mockFetchSequence([graphMessagesResponse([message()])]);
     const result = await readPublishingMailboxReply({ subjectContains: SUBJECT, afterIso: AFTER_ISO }, FAKE_TOKEN_DEPS);
     const keys = Object.keys(result).sort();
-    assert.deepEqual(keys, ["bodyText", "code", "found", "ok", "receivedDateTime", "senderAddress"]);
+    assert.deepEqual(keys, [
+      "bodyText",
+      "ccRecipients",
+      "code",
+      "conversationId",
+      "found",
+      "inboundMessageId",
+      "internetMessageId",
+      "ok",
+      "receivedDateTime",
+      "senderAddress",
+      "toRecipients"
+    ]);
   });
 
   test("never logs or includes Authorization header value in the result", async () => {
