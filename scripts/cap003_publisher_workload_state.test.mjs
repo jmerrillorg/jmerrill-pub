@@ -82,12 +82,25 @@ const expectations = [
       source.includes("if (state === 'Proofreading In Progress') return 'No restart required; Proofreading is underway'"),
   },
   {
-    name: 'delivered Proofreading plan resolves to author review ownership',
+    name: 'Proofreading package release without notification remains notification pending',
     ok:
       source.includes("`${dataverseFormatted(editorialStage, 'jm1pub_stagetype')} ${stringValue(editorialStage.jm1pub_name)}`") &&
       source.includes("`${dataverseFormatted(latestStage || {}, 'jm1pub_stagetype')} ${stringValue(latestStage?.jm1pub_name)}`") &&
       deriveWorkloadStateBody.includes("status.includes('plan delivered')") &&
       deriveWorkloadStateBody.includes("latestAction.includes('proofreading_author_package_released')") &&
+      deriveWorkloadStateBody.includes("return notificationCompleted ? 'Proofreading - Author Review' : 'Proofreading - Notification Pending'") &&
+      deriveNextActionBody.includes("'Proofreading - Notification Pending'") &&
+      deriveNextActionBody.includes('Send and log the Proofreading package notification before opening the author-response gate') &&
+      source.includes("if (workloadState === 'Proofreading - Notification Pending') return 'Proofreading package notification pending'") &&
+      source.includes('Proofreading package notification has not been sent or logged; author-response gate is not live.') &&
+      source.includes("if (state === 'Proofreading - Notification Pending') return 'None - package notification pending'"),
+  },
+  {
+    name: 'Proofreading author review requires notification evidence',
+    ok:
+      deriveWorkloadStateBody.includes('const notificationCompleted = hasAuthorNotificationEvidence') &&
+      source.includes('function hasAuthorNotificationEvidence') &&
+      source.includes("latestAction.includes('proofreading_author_notification_sent')") &&
       deriveNextActionBody.includes("'Proofreading - Author Review'") &&
       deriveNextActionBody.includes('Await author Proofreading response') &&
       source.includes("if (workloadState === 'Proofreading - Author Review') return 'Author Proofreading response pending'") &&

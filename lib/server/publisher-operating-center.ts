@@ -157,6 +157,7 @@ export type PublisherWorkloadState =
   | 'Proofreading Ready'
   | 'Proofreading In Progress'
   | 'Proofreading - Internal QA'
+  | 'Proofreading - Notification Pending'
   | 'Proofreading - Author Review'
   | 'Production Ready'
   | 'Blocked'
@@ -1537,16 +1538,24 @@ function deriveWorkloadState(input: {
     return 'Copyediting Ready'
   }
   if (type.includes('proof')) {
+    const notificationCompleted = hasAuthorNotificationEvidence(`${summary} ${latestAction}`)
     if (
       status.includes('author') ||
+      summary.includes('sent by email') ||
+      latestAction.includes('proofreading_author_notification_sent') ||
+      latestAction.includes('cap004_author_notification_sent') ||
+      latestAction.includes('author_notification_sent')
+    ) {
+      return 'Proofreading - Author Review'
+    }
+    if (
       status.includes('plan delivered') ||
       summary.includes('author review') ||
       summary.includes('ready for your review') ||
-      summary.includes('sent by email') ||
       latestAction.includes('proofreading_author_package_released') ||
       latestAction.includes('cap004_author_package_released')
     ) {
-      return 'Proofreading - Author Review'
+      return notificationCompleted ? 'Proofreading - Author Review' : 'Proofreading - Notification Pending'
     }
     if (status.includes('qa')) return 'Proofreading - Internal QA'
     if (status.includes('progress')) return 'Proofreading In Progress'
@@ -1568,6 +1577,20 @@ function deriveCapability(state: PublisherWorkloadState) {
   return 'Editorial Review'
 }
 
+function hasAuthorNotificationEvidence(value: string) {
+  const normalized = value.toLowerCase()
+  return (
+    normalized.includes('notification sent') ||
+    normalized.includes('author notification sent') ||
+    normalized.includes('email sent') ||
+    normalized.includes('sent by email') ||
+    normalized.includes('delivery confirmed') ||
+    normalized.includes('provider accepted') ||
+    normalized.includes('acs accepted') ||
+    normalized.includes('message id')
+  )
+}
+
 function deriveNextAction(state: PublisherWorkloadState, title: string) {
   if (
     title === 'The Intentional Leader' &&
@@ -1578,6 +1601,7 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
       'Proofreading Ready',
       'Proofreading In Progress',
       'Proofreading - Internal QA',
+      'Proofreading - Notification Pending',
       'Proofreading - Author Review',
     ].includes(state)
   ) {
@@ -1614,6 +1638,8 @@ function deriveNextAction(state: PublisherWorkloadState, title: string) {
       return 'Continue Proofreading pass and internal QA'
     case 'Proofreading - Internal QA':
       return 'Complete Proofreading internal QA'
+    case 'Proofreading - Notification Pending':
+      return 'Send and log the Proofreading package notification before opening the author-response gate'
     case 'Proofreading - Author Review':
       return 'Await author Proofreading response'
     case 'External Hold':
@@ -1648,6 +1674,7 @@ function deriveAuthorAction(state: PublisherWorkloadState, guardStatus: 'pass' |
   if (state === 'Proofreading Ready' || state === 'Proofreading In Progress' || state === 'Proofreading - Internal QA') {
     return 'None'
   }
+  if (state === 'Proofreading - Notification Pending') return 'None - package notification pending'
   if (state === 'Proofreading - Author Review') return 'Review and approve Proofreading package'
   if (state.includes('Author Review')) return 'Review released package and respond through governed channel'
   return 'None'
@@ -1666,6 +1693,7 @@ function derivePublisherAction(state: PublisherWorkloadState) {
   if (state === 'Proofreading Ready') return 'Prepare/start CAP-004 Proofreading when authorized'
   if (state === 'Proofreading In Progress') return 'Continue Proofreading pass and internal QA'
   if (state === 'Proofreading - Internal QA') return 'Complete Proofreading QA and prepare package'
+  if (state === 'Proofreading - Notification Pending') return 'Send Proofreading package notification and confirm delivery'
   if (state === 'Proofreading - Author Review') return 'Await author response'
   return 'Resolve current blocker'
 }
@@ -1686,6 +1714,7 @@ function derivePackageReadiness(state: PublisherWorkloadState, guardStatus: 'pas
   if (guardStatus === 'blocked') return 'Held by title-specific dependency'
   if (state === 'Line Editing - Author Review') return 'Delivered'
   if (state === 'Proofreading In Progress') return 'Not yet released'
+  if (state === 'Proofreading - Notification Pending') return 'Ready - notification pending'
   if (state.includes('Author Review')) return 'Released to author'
   if (state === 'Line Editing - Release Decision Ready') return 'Ready for Jackie release decision'
   if (state === 'Copyediting - Release Decision Ready') return 'Ready for Jackie release decision'
@@ -1702,6 +1731,7 @@ function deriveRestartCondition(state: PublisherWorkloadState, guardStatus: 'pas
   if (state === 'Proofreading Ready') return 'No restart required; Copyediting exit is complete'
   if (state === 'Proofreading In Progress') return 'No restart required; Proofreading is underway'
   if (state === 'Proofreading - Internal QA') return 'No restart required; Proofreading QA is underway'
+  if (state === 'Proofreading - Notification Pending') return 'No restart required; send and log package notification'
   if (state === 'Proofreading - Author Review') return 'No restart required; Proofreading package is with author'
   if (state === 'External Hold') return 'Resolve external evidence hold'
   if (state === 'Blocked') return 'Reconcile title, asset, and stage evidence'
@@ -1870,6 +1900,21 @@ function deriveWorkloadExecutionModel(input: {
       exactBlocker: input.guardMessage,
     }
   }
+  if (input.state === 'Proofreading - Notification Pending') {
+    return {
+      executionMode: 'SYSTEM_ACTION_MANUALLY_TRIGGERED',
+      executionState: 'QUEUED',
+      businessOwner: 'Publisher',
+      executionOwner: 'JM1 Automation',
+      runtime: 'Proofreading package notification workflow and governed publishing email relay',
+      runtimeCostCategory: 'Azure compute',
+      awaiting: 'Notification workflow',
+      lastTrigger: 'Proofreading package ready',
+      lastExecution: input.latestExecutionEvidence,
+      expectedDuration: 'Immediate retry until sent or exceptioned',
+      exactBlocker: 'Proofreading package notification has not been sent or logged; author-response gate is not live.',
+    }
+  }
   if (input.state.includes('Author Review')) {
     return {
       executionMode: 'EXTERNAL_PARTY',
@@ -2003,6 +2048,7 @@ function deriveQueueBlocker(workloadState: PublisherWorkloadState | undefined, f
   if (workloadState === 'Copyediting In Progress') return 'Copyediting in progress'
   if (workloadState === 'Copyediting - Release Decision Ready') return 'Copyediting package release decision ready'
   if (workloadState === 'Copyediting - Author Review') return 'Author Copyediting response pending'
+  if (workloadState === 'Proofreading - Notification Pending') return 'Proofreading package notification pending'
   if (workloadState === 'Proofreading - Author Review') return 'Author Proofreading response pending'
   if (workloadState === 'Proofreading In Progress') return 'Proofreading in progress'
   if (workloadState === 'Proofreading - Internal QA') return 'Proofreading internal QA in progress'
