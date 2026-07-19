@@ -91,6 +91,14 @@ type NotificationInput = {
   gateId: string
   operatorEmail: string
   correlationId?: string
+  triggerSource?: 'AUTHOR_REVIEW_PACKAGE_READY_FOR_RELEASE' | 'SYSTEM_EVENT' | 'SCHEDULED_RELEASE' | 'CODY_ASSISTED_BRIDGE'
+}
+
+export async function handleAuthorReviewPackageReadyForRelease(input: NotificationInput): Promise<OrchestrationResult> {
+  return sendProofreadingNotification({
+    ...input,
+    triggerSource: input.triggerSource || 'AUTHOR_REVIEW_PACKAGE_READY_FOR_RELEASE',
+  })
 }
 
 export async function sendProofreadingNotification(input: NotificationInput): Promise<OrchestrationResult> {
@@ -114,8 +122,9 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
     return notificationBlocked(config, input.gateId, input.correlationId, 'PROOFREADING_NOTIFICATION_BLOCKED - AUTHOR_EMAIL_MISSING')
   }
 
-  const idempotencyKey = `proofreading-notification:${input.gateId}:${artifactId}`
-  const existing = await findExecutionLog(config, 'PROOFREADING_NOTIFICATION_SENT', idempotencyKey)
+  const checksum = extractChecksum(stringValue(artifact.jm1pub_sha256 || artifact.jm1pub_notes))
+  const idempotencyKey = `proofreading-notification:${titleId}:${input.gateId}:${artifactId}:${checksum || 'checksum-pending'}`
+  const existing = await findNotificationEvidence(config, input.gateId, artifactId, idempotencyKey)
   if (existing) {
     return {
       status: 'idempotent',
@@ -124,13 +133,25 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
     }
   }
 
-  await writeLog(config, {
-    actionType: 'PROOFREADING_NOTIFICATION_REMEDIATION_STARTED',
-    name: `PROOFREADING_NOTIFICATION_REMEDIATION_STARTED - ${titleName}`,
+  const startedLog = await writeLog(config, {
+    actionType: 'PROOFREADING_NOTIFICATION_TRANSACTION_STARTED',
+    name: `PROOFREADING_NOTIFICATION_TRANSACTION_STARTED - ${titleName}`,
     description: [
-      `Proofreading package was visible before notification evidence existed. Idempotency: ${idempotencyKey}.`,
-      `Operator ${input.operatorEmail}.`,
-      `Gate ${input.gateId}.`,
+      `Trigger ${input.triggerSource || 'CODY_ASSISTED_BRIDGE'}.`,
+      `Title ${titleId}; stage ${stageId}; gate ${input.gateId}; packageArtifact ${artifactId}; checksum ${checksum || 'not-recorded'}.`,
+      `Operator ${input.operatorEmail}. Idempotency: ${idempotencyKey}.`,
+    ].join(' '),
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: input.gateId,
+  })
+
+  const accessLog = await writeLog(config, {
+    actionType: 'PROOFREADING_PACKAGE_ACCESS_VALIDATED',
+    name: `PROOFREADING_PACKAGE_ACCESS_VALIDATED - ${titleName}`,
+    description: [
+      `Manuscript artifact ${artifactId} exists and package reference is gate-linked.`,
+      `Repository item ${stringValue(artifact.jm1pub_repositoryitemid) || 'not-recorded'}; path ${stringValue(artifact.jm1pub_repositorypath) || 'not-recorded'}.`,
+      `Author recipient resolved from Core as ${authorEmail}. Idempotency: ${idempotencyKey}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: input.gateId,
@@ -191,6 +212,26 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
       ? `Provider message ID ${providerMessageId}.`
       : 'ACS relay accepted the send but did not return a provider message ID in the response.'
 
+  const sentLog = await writeLog(config, {
+    actionType: 'PROOFREADING_NOTIFICATION_SENT',
+    name: `PROOFREADING_NOTIFICATION_SENT - ${titleName}`,
+    description: `Proofreading notification sent from ${APPROVED_SENDER} to ${authorEmail} with CC ${INTERNAL_VISIBILITY_MAILBOX}. Subject "${payload.subject}". ${providerEvidenceText} Idempotency: ${idempotencyKey}.`,
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: input.gateId,
+  })
+
+  const evidenceLog = await writeLog(config, {
+    actionType: 'PROOFREADING_COMMUNICATION_EVIDENCE_RECORDED',
+    name: `PROOFREADING_COMMUNICATION_EVIDENCE_RECORDED - ${titleName}`,
+    description: [
+      `Communication state NOTIFICATION_SENT.`,
+      `sender=${APPROVED_SENDER}; recipient=${authorEmail}; cc=${INTERNAL_VISIBILITY_MAILBOX}; messageId=${providerMessageId}; sentAt=${now}.`,
+      `titleId=${titleId}; stageId=${stageId}; gateId=${input.gateId}; packageArtifactIds=${artifactId}; packageChecksum=${checksum || 'not-recorded'}. Idempotency: ${idempotencyKey}.`,
+    ].join(' '),
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: input.gateId,
+  })
+
   await Promise.all([
     dataversePatch(config, 'jm1pub_editorialapprovalgates', input.gateId, {
       jm1pub_gatestatus: GATE_STATUS_AWAITING_AUTHOR_RESPONSE,
@@ -211,23 +252,37 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
 
   const logIds = await Promise.all([
     writeLog(config, {
-      actionType: 'PROOFREADING_NOTIFICATION_SENT',
-      name: `PROOFREADING_NOTIFICATION_SENT - ${titleName}`,
-      description: `Proofreading notification sent from ${APPROVED_SENDER} to governed author email with CC ${INTERNAL_VISIBILITY_MAILBOX}. ${providerEvidenceText} Idempotency: ${idempotencyKey}.`,
-      sourceEntity: 'jm1pub_editorialapprovalgate',
-      sourceRecordId: input.gateId,
-    }),
-    writeLog(config, {
-      actionType: 'PROOFREADING_AUTHOR_GATE_ACTIVATED',
-      name: `PROOFREADING_AUTHOR_GATE_ACTIVATED - ${titleName}`,
+      actionType: 'PROOFREADING_AUTHOR_RESPONSE_GATE_ACTIVATED',
+      name: `PROOFREADING_AUTHOR_RESPONSE_GATE_ACTIVATED - ${titleName}`,
       description: `A5 author-response gate activated only after notification delivery was accepted. Idempotency: ${idempotencyKey}.`,
       sourceEntity: 'jm1pub_editorialapprovalgate',
       sourceRecordId: input.gateId,
     }),
     writeLog(config, {
-      actionType: 'PUBLISHER_TODAY_AUTOMATIC_TRANSITION_REFRESHED',
-      name: `PUBLISHER_TODAY_AUTOMATIC_TRANSITION_REFRESHED - ${titleName}`,
-      description: `Publisher Today can now show Proofreading Author Review because notification evidence exists. Idempotency: ${idempotencyKey}.`,
+      actionType: 'AUTHOR_WORKSPACE_NOTIFICATION_STATE_REFRESHED',
+      name: `AUTHOR_WORKSPACE_NOTIFICATION_STATE_REFRESHED - ${titleName}`,
+      description: `Author Workspace can now show Proofreading Author Review because notification evidence exists. Idempotency: ${idempotencyKey}.`,
+      sourceEntity: 'jm1pub_editorialapprovalgate',
+      sourceRecordId: input.gateId,
+    }),
+    writeLog(config, {
+      actionType: 'PUBLISHER_TODAY_NOTIFICATION_STATE_REFRESHED',
+      name: `PUBLISHER_TODAY_NOTIFICATION_STATE_REFRESHED - ${titleName}`,
+      description: `Publisher Today notification-pending exception cleared; awaiting party is Author. Idempotency: ${idempotencyKey}.`,
+      sourceEntity: 'jm1pub_editorialapprovalgate',
+      sourceRecordId: input.gateId,
+    }),
+    writeLog(config, {
+      actionType: 'PROOFREADING_NOTIFICATION_TRANSACTION_COMPLETED',
+      name: `PROOFREADING_NOTIFICATION_TRANSACTION_COMPLETED - ${titleName}`,
+      description: `Package validated, notification accepted, communication evidence recorded, A5 gate activated, and operating surfaces refreshed. Idempotency: ${idempotencyKey}.`,
+      sourceEntity: 'jm1pub_editorialapprovalgate',
+      sourceRecordId: input.gateId,
+    }),
+    writeLog(config, {
+      actionType: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_AUTOMATION_COMMISSIONED',
+      name: `AUTHOR_REVIEW_PACKAGE_NOTIFICATION_AUTOMATION_COMMISSIONED - ${titleName}`,
+      description: `Future AUTHOR_REVIEW_PACKAGE_READY_FOR_RELEASE events invoke this notification transaction without a new Cody instruction after cadence and approval rules pass. Execution owner JM1 Automation. Idempotency: ${idempotencyKey}.`,
       sourceEntity: 'jm1pub_editorialapprovalgate',
       sourceRecordId: input.gateId,
     }),
@@ -238,7 +293,7 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
     gateId: input.gateId,
     providerMessageId,
     providerEvidenceStatus,
-    executionLogIds: logIds.map(extractId),
+    executionLogIds: [startedLog, accessLog, sentLog, evidenceLog, ...logIds].map(extractId),
   }
 }
 
@@ -463,7 +518,7 @@ async function notificationBlocked(
   blocker: string,
 ): Promise<OrchestrationResult> {
   const logId = await writeLog(config, {
-    actionType: 'PROOFREADING_NOTIFICATION_BLOCKED',
+    actionType: 'PROOFREADING_NOTIFICATION_TRANSACTION_FAILED',
     name: blocker.slice(0, 200),
     description: `${blocker}. Proofreading notification remains pending; A5 author-response gate must not be treated as live. Correlation ${correlationId || gateId}.`,
     sourceEntity: 'jm1pub_editorialapprovalgate',
@@ -626,6 +681,22 @@ async function findExecutionLog(config: DataverseServerConfig, actionType: strin
   return dataverseFirst(config, 'jm1_executionlogs', {
     $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription,createdon',
     $filter: `jm1_actiontype eq '${actionType}' and contains(jm1_actiondescription,'${escapeODataText(idempotencyKey)}')`,
+    $orderby: 'createdon desc',
+  })
+}
+
+async function findNotificationEvidence(config: DataverseServerConfig, gateId: string, artifactId: string, idempotencyKey: string) {
+  const exact = await dataverseFirst(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription,createdon',
+    $filter:
+      `(jm1_actiontype eq 'PROOFREADING_NOTIFICATION_SENT' or jm1_actiontype eq 'PROOFREADING_COMMUNICATION_EVIDENCE_RECORDED') and contains(jm1_actiondescription,'${escapeODataText(idempotencyKey)}')`,
+    $orderby: 'createdon desc',
+  })
+  if (exact) return exact
+  return dataverseFirst(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription,createdon',
+    $filter:
+      `jm1_sourcerecordid eq '${gateId}' and jm1_actiontype eq 'PROOFREADING_NOTIFICATION_SENT' and (contains(jm1_actiondescription,'${escapeODataText(artifactId)}') or contains(jm1_actiondescription,'current-proofreading-artifact') or contains(jm1_actiondescription,'ACS relay returned HTTP 202 accepted'))`,
     $orderby: 'createdon desc',
   })
 }
