@@ -561,6 +561,9 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               <Info label="Affected dollars" value={`$${snapshot.royalties.decisionSummary.affectedDollars.toFixed(2)}`} />
               <Info label="January POD US -B" value={snapshot.royalties.acceptedBaseline.januaryPodUsBDisposition} />
               <Info label="Rows released today" value={String(snapshot.royalties.decisionSummary.rowsReleasedToday)} />
+              <Info label="Statements ready" value={String(snapshot.royalties.decisionSummary.statementReadyForReview)} />
+              <Info label="Statement exceptions" value={String(snapshot.royalties.decisionSummary.statementExceptions)} />
+              <Info label="Missing source actions" value={String(snapshot.royalties.decisionSummary.missingSourceActions)} />
               <Info label="Manifest rows" value={String(snapshot.royalties.manifestRows)} />
               <Info label="Loaded rows" value={String(snapshot.royalties.loadedRows)} />
               <Info label="Identity holds" value={String(snapshot.royalties.identityHolds)} />
@@ -666,7 +669,65 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               <p className="mt-2 text-[12px] leading-6 text-white/45">
                 {snapshot.royalties.monthlyClose.generatedReportPolicy}
               </p>
+              {snapshot.royalties.monthlyClose.missingSourceActions.length > 0 && (
+                <div className="mt-4 border border-amber-300/20 bg-amber-950/10 p-3">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-amber-200">
+                    Missing source actions
+                  </p>
+                  <div className="mt-3 grid gap-2 lg:grid-cols-2">
+                    {snapshot.royalties.monthlyClose.missingSourceActions.map((action) => (
+                      <Info
+                        key={`${action.month}-${action.source}`}
+                        label={`${action.month} · ${action.source}`}
+                        value={`${action.action} (${action.state})`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
+            {snapshot.royalties.decisionPackages.length > 0 && (
+              <div className="mt-5 border border-white/10 bg-black/15 p-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-amber-200">
+                      Publisher decision packages
+                    </p>
+                    <h3 className="mt-2 text-xl font-semibold">Reusable mapping approvals</h3>
+                  </div>
+                  <Badge label={`${snapshot.royalties.decisionPackages.length} package(s)`} tone="amber" />
+                </div>
+                <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                  {snapshot.royalties.decisionPackages.slice(0, 8).map((decisionPackage) => (
+                    <RoyaltyDecisionPackageView key={decisionPackage.packageKey} decisionPackage={decisionPackage} />
+                  ))}
+                </div>
+                {snapshot.royalties.decisionPackages.length > 8 && (
+                  <p className="mt-3 text-[12px] text-white/45">
+                    Showing the first 8 of {snapshot.royalties.decisionPackages.length} packages. The full reviewable
+                    package is in the governed CSV/JSON evidence.
+                  </p>
+                )}
+              </div>
+            )}
+            {snapshot.royalties.statementQueue.length > 0 && (
+              <div className="mt-5 border border-white/10 bg-black/15 p-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-200">
+                      Statement readiness
+                    </p>
+                    <h3 className="mt-2 text-xl font-semibold">Draft statements remain internal</h3>
+                  </div>
+                  <Badge label="No author visibility" tone="blue" />
+                </div>
+                <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                  {snapshot.royalties.statementQueue.map((statement) => (
+                    <RoyaltyStatementQueueView key={statement.period} statement={statement} />
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="mt-5 grid gap-3 lg:grid-cols-2">
               {snapshot.royalties.decisionCards.slice(0, 12).map((decision) => (
                 <RoyaltyDecisionCardView
@@ -1003,6 +1064,71 @@ function RoyaltyDecisionCardView({
           )}
         </div>
       )}
+    </article>
+  )
+}
+
+function RoyaltyDecisionPackageView({
+  decisionPackage,
+}: {
+  decisionPackage: PublisherOperatingCenterSnapshot['royalties']['decisionPackages'][number]
+}) {
+  return (
+    <article className="border border-white/10 bg-black/15 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-amber-200">
+            {decisionPackage.packageKey}
+          </p>
+          <h4 className="mt-2 text-[15px] font-semibold text-white">{decisionPackage.reportedTitle}</h4>
+          <p className="mt-1 text-[12px] leading-5 text-white/55">
+            {decisionPackage.identifiers.length
+              ? decisionPackage.identifiers.join(', ')
+              : 'Identifier pending'}
+          </p>
+        </div>
+        <Badge label={`$${decisionPackage.financialImpact.toFixed(2)}`} tone="amber" />
+      </div>
+      <div className="mt-3 grid gap-2">
+        <Info label="Rows / units" value={`${decisionPackage.affectedRows} row(s); ${decisionPackage.units} unit(s)`} />
+        <Info label="Periods" value={decisionPackage.statementPeriods.join(', ')} />
+        <Info label="Sources" value={decisionPackage.sourceSystems.join(', ')} />
+        <Info label="Confidence" value={decisionPackage.confidence} />
+        <Info label="Canonical title" value={decisionPackage.canonicalTitleStatus} />
+        <Info label="Rightsholder" value={decisionPackage.authorRightsholderStatus} />
+        <Info label="Royalty rule" value={decisionPackage.royaltyRuleStatus} />
+        <Info label="Recommended decision" value={decisionPackage.recommendedDecision} />
+        <Info label="Reusable impact" value={decisionPackage.reusableMappingImpact} />
+      </div>
+    </article>
+  )
+}
+
+function RoyaltyStatementQueueView({
+  statement,
+}: {
+  statement: PublisherOperatingCenterSnapshot['royalties']['statementQueue'][number]
+}) {
+  const tone = statement.status.includes('Ready') ? 'blue' : 'amber'
+  return (
+    <article className="border border-white/10 bg-black/15 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-200">{statement.period}</p>
+          <h4 className="mt-2 text-[15px] font-semibold text-white">{statement.status}</h4>
+          <p className="mt-1 text-[12px] leading-5 text-white/55">{statement.statementId}</p>
+        </div>
+        <Badge label={statement.status.includes('Ready') ? 'Ready' : 'Exceptions'} tone={tone} />
+      </div>
+      <div className="mt-3 grid gap-2">
+        <Info label="Matched rows" value={String(statement.matchedSourceRows)} />
+        <Info label="Held rows" value={String(statement.heldRows)} />
+        <Info label="Loaded net" value={`$${statement.sourceNetCompensation.toFixed(2)}`} />
+        <Info label="Held net" value={`$${statement.heldNetCompensation.toFixed(2)}`} />
+        <Info label="Payment evidence" value={`${statement.paymentEvidenceRows} row(s); ${statement.paymentAllocationUnknown} allocation unknown`} />
+        <Info label="Provenance" value={statement.provenanceStatus} />
+        <Info label="Blocker" value={statement.readinessBlocker} />
+      </div>
     </article>
   )
 }

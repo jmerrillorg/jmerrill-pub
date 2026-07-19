@@ -330,6 +330,43 @@ export type PublisherRoyaltyDecisionCard = {
   }>
 }
 
+export type PublisherRoyaltyDecisionPackage = {
+  packageKey: string
+  reportedTitle: string
+  identifiers: string[]
+  statementPeriods: string[]
+  sourceSystems: string[]
+  sourceFiles: string[]
+  accounts: string[]
+  currencies: string[]
+  affectedRows: number
+  units: number
+  financialImpact: number
+  confidence: 'high' | 'medium' | 'low'
+  recommendedDecision: string
+  canonicalTitleStatus: string
+  authorRightsholderStatus: string
+  royaltyRuleStatus: string
+  reusableMappingImpact: string
+  downstreamEffect: string
+  approvalState: string
+}
+
+export type PublisherRoyaltyStatementQueueItem = {
+  period: string
+  statementId: string
+  status: string
+  matchedSourceRows: number
+  heldRows: number
+  paymentEvidenceRows: number
+  paymentAllocationUnknown: number
+  unresolvedPayments: number
+  sourceNetCompensation: number
+  heldNetCompensation: number
+  provenanceStatus: string
+  readinessBlocker: string
+}
+
 export type PublisherRoyaltyMonthlyCloseItem = {
   month: string
   status: string
@@ -359,6 +396,9 @@ export type PublisherRoyaltyReviewQueue = {
     jackieReviewGroups: number
     rowsReleasedToday: number
     remainingExceptions: number
+    statementReadyForReview: number
+    statementExceptions: number
+    missingSourceActions: number
     decisionTypes: Record<string, number>
   }
   manifestRows: number
@@ -371,6 +411,8 @@ export type PublisherRoyaltyReviewQueue = {
   draftStatements: number
   decisionPackagePath: string
   decisionCards: PublisherRoyaltyDecisionCard[]
+  decisionPackages: PublisherRoyaltyDecisionPackage[]
+  statementQueue: PublisherRoyaltyStatementQueueItem[]
   monthlyClose: {
     latestAcxMonthAvailable: string
     spreadsheetStatus: string
@@ -381,6 +423,12 @@ export type PublisherRoyaltyReviewQueue = {
       directSales: string
     }
     generatedReportPolicy: string
+    missingSourceActions: Array<{
+      month: string
+      source: string
+      action: string
+      state: string
+    }>
     months: PublisherRoyaltyMonthlyCloseItem[]
   }
 }
@@ -2654,6 +2702,7 @@ function readRoyaltyReviewQueue(): PublisherRoyaltyReviewQueue {
   const manifestRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Manifest-Final-Status.csv')
   const paymentRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Payment-Final-Classification.csv')
   const statementRows = readCsvRows('2026-07-17-JM1-2026-Royalty-Draft-Statement-Set.csv')
+  const wave2 = readRoyaltyWave2DecisionPackage()
   const decisionCards = readRoyaltyDecisionCards()
   const monthlyClose = readRoyaltyMonthlyClose()
   const sourceSummary = readRoyaltySourceImportSummary()
@@ -2683,6 +2732,9 @@ function readRoyaltyReviewQueue(): PublisherRoyaltyReviewQueue {
       jackieReviewGroups: decisionCards.filter((card) => card.confidence !== 'high').length,
       rowsReleasedToday: 0,
       remainingExceptions: sourceSummary.heldForTitleDecision,
+      statementReadyForReview: wave2?.summary?.statementReadiness?.readyForJackieReview || 0,
+      statementExceptions: wave2?.summary?.statementReadiness?.exceptions || 0,
+      missingSourceActions: wave2?.monthlyClose?.missingSourceActions?.length || monthlyClose.missingSourceActions.length,
       decisionTypes,
     },
     manifestRows: manifestRows.length,
@@ -2693,10 +2745,30 @@ function readRoyaltyReviewQueue(): PublisherRoyaltyReviewQueue {
     paymentAllocationUnknown: paymentRows.filter((row) => row.finalPaymentStatus?.includes('ALLOCATION UNKNOWN')).length,
     unresolvedPayments: paymentRows.filter((row) => row.finalPaymentStatus === 'UNRESOLVED — JACKIE DECISION').length,
     draftStatements: statementRows.length,
-    decisionPackagePath: 'docs/operations/generated/2026-07-17-JM1-2026-Royalty-Jackie-Decision-Package.csv',
+    decisionPackagePath: wave2
+      ? 'docs/operations/generated/2026-07-19-JM1-Royalty-Operations-Wave2-Decision-Packages.csv'
+      : 'docs/operations/generated/2026-07-17-JM1-2026-Royalty-Jackie-Decision-Package.csv',
     decisionCards,
+    decisionPackages: wave2?.packages || [],
+    statementQueue: wave2?.statements || [],
     monthlyClose,
   }
+}
+
+function readRoyaltyWave2DecisionPackage() {
+  return readJsonFile<{
+    summary?: {
+      statementReadiness?: {
+        readyForJackieReview?: number
+        exceptions?: number
+      }
+    }
+    packages?: PublisherRoyaltyDecisionPackage[]
+    statements?: PublisherRoyaltyStatementQueueItem[]
+    monthlyClose?: {
+      missingSourceActions?: PublisherRoyaltyReviewQueue['monthlyClose']['missingSourceActions']
+    }
+  }>('2026-07-19-JM1-Royalty-Operations-Wave2-Decision-Packages.json')
 }
 
 function readRoyaltySourceImportSummary() {
@@ -2744,6 +2816,7 @@ function readRoyaltyMonthlyClose(): PublisherRoyaltyReviewQueue['monthlyClose'] 
         directSales: stringValue(parsed.automation?.directSales),
       },
       generatedReportPolicy: generatedRoyaltyReportPolicy(),
+      missingSourceActions: readRoyaltyWave2DecisionPackage()?.monthlyClose?.missingSourceActions || deriveRoyaltyMissingSourceActions(parsed.months || []),
       months: Array.isArray(parsed.months) ? parsed.months.map(applyGeneratedReportTimingPolicy) : [],
     }
   } catch {
@@ -2757,9 +2830,26 @@ function readRoyaltyMonthlyClose(): PublisherRoyaltyReviewQueue['monthlyClose'] 
         directSales: '',
       },
       generatedReportPolicy: generatedRoyaltyReportPolicy(),
+      missingSourceActions: [],
       months: [],
     }
   }
+}
+
+function deriveRoyaltyMissingSourceActions(months: PublisherRoyaltyMonthlyCloseItem[]) {
+  return months.flatMap((month) =>
+    month.sources
+      .filter((source) => source.state === 'UPLOAD REQUIRED')
+      .map((source) => ({
+        month: month.month,
+        source: source.label,
+        action:
+          source.label === 'Direct Sales'
+            ? 'Upload Direct Sales or Confirm No Activity'
+            : `Upload ${source.label} source report`,
+        state: source.state,
+      })),
+  )
 }
 
 function readRoyaltyDecisionCards(): PublisherRoyaltyDecisionCard[] {
