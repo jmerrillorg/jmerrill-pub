@@ -25,7 +25,10 @@ const expectations = [
       contextSource.includes('activePackage?: AuthorPortalArtifact[]') &&
       contextSource.includes('completedPackages?: Array<') &&
       contextSource.includes('completedMilestones?: AuthorPortalJourneyMilestone[]') &&
-      contextSource.includes('blockingIssue?: string'),
+      contextSource.includes('currentMilestones?: AuthorPortalJourneyMilestone[]') &&
+      contextSource.includes('upcomingMilestones?: AuthorPortalJourneyMilestone[]') &&
+      contextSource.includes('blockingIssue?: string') &&
+      contextSource.includes('lastUpdated?: string'),
   },
   {
     name: 'Proofreading has a canonical workspace state and public label',
@@ -57,9 +60,13 @@ const expectations = [
       contextSource.includes('const activeArtifacts = authorActionAvailable ? row.artifacts : []') &&
       contextSource.includes('completedPackages: buildCompletedPackageHistory(row)') &&
       contextSource.includes('activePackage: activeArtifacts') &&
+      contextSource.includes('currentMilestones: milestones.filter') &&
+      contextSource.includes('upcomingMilestones: milestones.filter') &&
       contextSource.includes("row.workspaceState === 'proofreading'") &&
       contextSource.includes("? 'Copyediting'") &&
-      contextSource.includes('Volume I Copyediting Review Package') &&
+      contextSource.includes('Developmental Editing Review Package') &&
+      contextSource.includes('Line Editing Review Package') &&
+      contextSource.includes('Copyediting Review Package') &&
       workspaceSource.includes('Completed packages') &&
       workspaceSource.includes('Active package'),
   },
@@ -82,7 +89,10 @@ const expectations = [
       workspaceSource.includes('Current Stage') &&
       workspaceSource.includes('Awaiting') &&
       workspaceSource.includes('Author Action') &&
-      workspaceSource.includes('Publishing journey'),
+      workspaceSource.includes('Publishing journey') &&
+      workspaceSource.includes('Current activities') &&
+      workspaceSource.includes('Upcoming milestones') &&
+      workspaceSource.includes('Last Updated'),
   },
   {
     name: 'operational read model defines stage-aware conflict prevention',
@@ -92,6 +102,25 @@ const expectations = [
       contextSource.includes('shouldSuppressPackageTextForActiveStage') &&
       contextSource.includes('detectOperationalMessageConflict') &&
       contextSource.includes('Stale completed-package language was suppressed from the active stage.'),
+  },
+  {
+    name: 'operational model supports cover/interior concurrency without replacing the primary stage',
+    ok:
+      contextSource.includes("label === 'Cover Design'") &&
+      contextSource.includes('Creative brief and concept development may proceed alongside Proofreading.') &&
+      contextSource.includes("label === 'Interior Layout'") &&
+      contextSource.includes('Interior layout begins after the final manuscript is approved for production.') &&
+      contextSource.includes("normalizeWorkspaceText(row.stageLabel).includes('cover')") &&
+      contextSource.includes("normalizeWorkspaceText(row.stageLabel).includes('interior')"),
+  },
+  {
+    name: 'stage-aware messaging covers production, distribution, published, and governed hold states',
+    ok:
+      contextSource.includes('The publishing team is preparing your approved manuscript for interior layout.') &&
+      contextSource.includes('The publishing team is developing the creative direction for your cover.') &&
+      contextSource.includes('The publishing team is preparing distribution validation and release steps.') &&
+      contextSource.includes('This title is published and available as part of your author portfolio.') &&
+      contextSource.includes('This title is on hold while the publishing team resolves the current blocker.'),
   },
   {
     name: 'Copyediting review package text is no longer a Proofreading default',

@@ -53,8 +53,11 @@ export type AuthorPortalProjectSummary = {
     status: string
   }>
   completedMilestones?: AuthorPortalJourneyMilestone[]
+  currentMilestones?: AuthorPortalJourneyMilestone[]
+  upcomingMilestones?: AuthorPortalJourneyMilestone[]
   blockingIssue?: string
   lastMovement?: string
+  lastUpdated?: string
   summary?: string
   nextActionLabel?: string
   pendingApprovalLabel?: string
@@ -85,6 +88,12 @@ export const AUTHOR_WORKSPACE_OPERATIONAL_ACTIVITY_EVENTS = [
   'AUTHOR_WORKSPACE_OPERATIONAL_CONFLICT_DETECTED',
   'AUTHOR_WORKSPACE_ACTIVE_PROJECT_REFRESH_COMPLETED',
   'AUTHOR_WORKSPACE_OPERATIONAL_ACTIVITY_MODEL_COMPLETED',
+  'AUTHOR_WORKSPACE_OPERATIONAL_MODEL_EXTENSION_STARTED',
+  'AUTHOR_WORKSPACE_AUTHOR_ACTION_STATE_ACTIVATED',
+  'AUTHOR_WORKSPACE_CONCURRENT_ACTIVITY_ACTIVATED',
+  'AUTHOR_WORKSPACE_MANUAL_PLACEMENT_HISTORY_PROTECTED',
+  'AUTHOR_WORKSPACE_ACTIVE_PORTFOLIO_AUDIT_COMPLETED',
+  'AUTHOR_WORKSPACE_OPERATIONAL_MODEL_EXTENSION_COMPLETED',
 ] as const
 
 export type AuthorPortalArtifact = {
@@ -172,6 +181,7 @@ type ResolvedProjectRow = {
   gateStatus?: string
   releasedArtifactExists?: boolean
   releasePublished?: boolean
+  lastUpdated?: string
   contractStatusInternal?: string
   portfolioState?: CatalogPortfolioState
   portfolioLabel?: string
@@ -690,6 +700,11 @@ async function buildProjectSummaries(
       gateStatus: authorActionEvidence.gateStatus,
       releasedArtifactExists: authorActionEvidence.releasedArtifactExists,
       releasePublished: authorActionEvidence.releasePublished,
+      lastUpdated:
+        stringValue(summary?.jm1pub_publishedtoworkspaceon) ||
+        stringValue(pendingGate?.createdon) ||
+        stringValue(stage?.createdon) ||
+        undefined,
       contractStatusInternal:
         title && !asset ? 'Signed / Exists - Location Pending Reconciliation' : undefined,
       ...authorPortfolioFields(title, asset ? [asset] : [], stage ? [stage] : []),
@@ -854,6 +869,11 @@ async function buildProjectSummaries(
         gateStatus: authorActionEvidence.gateStatus,
         releasedArtifactExists: authorActionEvidence.releasedArtifactExists,
         releasePublished: authorActionEvidence.releasePublished,
+        lastUpdated:
+          stringValue(summary?.jm1pub_publishedtoworkspaceon) ||
+          stringValue(pendingGate?.createdon) ||
+          stringValue(stage?.createdon) ||
+          undefined,
         contractStatusInternal:
           dataverseLookupId(title, 'jm1pub_titleid') && !asset
             ? 'Signed / Exists - Location Pending Reconciliation'
@@ -889,6 +909,7 @@ export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPo
     buildWorkspaceStatusLabel(row)
   const stageLabel = canonicalStageLabel(row.stageLabel) || getDefaultStageLabel(row.workspaceState)
   const stageStatus = canonicalStageStatus(row.stageStatus, row)
+  const milestones = buildPublishingJourneyMilestones(row)
   const authorActionAvailable = row.authorActionAvailable === true
   const authorDecisionOutstanding = row.authorDecisionOutstanding === true
   const normalizedAuthorDecision = normalizeWorkspaceText(row.authorDecision)
@@ -965,9 +986,12 @@ export function projectSummaryFromResolvedRow(row: ResolvedProjectRow): AuthorPo
     expectedAuthorEvent: stageMessaging.expectedAuthorEvent,
     activePackage: activeArtifacts,
     completedPackages: buildCompletedPackageHistory(row),
-    completedMilestones: buildPublishingJourneyMilestones(row),
+    completedMilestones: milestones,
+    currentMilestones: milestones.filter((milestone) => milestone.state === 'Current'),
+    upcomingMilestones: milestones.filter((milestone) => milestone.state === 'Upcoming'),
     blockingIssue: stageMessaging.blockingIssue,
     lastMovement: stageMessaging.lastMovement,
+    lastUpdated: row.lastUpdated,
     summary:
       stageMessaging.currentActivity,
     contractStatusInternal: row.contractStatusInternal,
@@ -1327,6 +1351,8 @@ export function inferWorkspaceState({
   }
 
   if (normalizedStageLabel.includes('production')) return 'production_in_progress'
+  if (normalizedStageLabel.includes('interior') || normalizedStageLabel.includes('layout')) return 'production_in_progress'
+  if (normalizedStageLabel.includes('cover')) return 'production_in_progress'
   if (normalizedStageLabel.includes('distribution') || normalizedStageLabel.includes('release')) {
     return 'distribution_release_pending'
   }
@@ -1393,6 +1419,10 @@ function canonicalStageLabel(value?: string) {
   if (normalized === 'line') return 'Line Editing'
   if (normalized === 'copyedit' || normalized === 'copyediting') return 'Copyediting'
   if (normalized === 'proofread' || normalized === 'proofreading') return 'Proofreading'
+  if (normalized.includes('interior') || normalized.includes('layout')) return 'Interior Layout'
+  if (normalized.includes('cover')) return 'Cover Design'
+  if (normalized.includes('production')) return 'Production'
+  if (normalized.includes('distribution')) return 'Distribution'
   if (normalized === 'review') return 'Editorial Review'
   return value?.trim() || ''
 }
@@ -1458,7 +1488,8 @@ function buildStageAwareProjectMessaging(
       flags.discussionRequested ||
       flags.decisionDeferred ||
       row.authorDecisionOutstanding === true)
-  const rawSummary = usePackageLanguage ? row.summary || defaultProjectSummary(row) : defaultProjectSummary(row)
+  const publisherOwnedSummary = publisherOwnedStageSummary(row) || defaultProjectSummary(row)
+  const rawSummary = usePackageLanguage ? row.summary || publisherOwnedSummary : publisherOwnedSummary
   const rawNextAction = usePackageLanguage
     ? row.nextActionLabel || defaultNextActionLabel(row)
     : defaultNextActionLabel(row)
@@ -1483,6 +1514,12 @@ function buildStageAwareProjectMessaging(
     blockingIssue: detectOperationalMessageConflict(row, summary, nextStep, flags.authorActionAvailable),
     lastMovement: buildLastMovement(row),
   }
+}
+
+function publisherOwnedStageSummary(row: ResolvedProjectRow) {
+  if (!row.summary) return undefined
+  if (shouldSuppressPackageTextForActiveStage(row, row.summary, false)) return undefined
+  return row.summary
 }
 
 function resolveAwaitingParty(
@@ -1629,6 +1666,15 @@ function detectOperationalMessageConflict(
   if (shouldSuppressPackageTextForActiveStage(row, currentActivity, authorActionAvailable)) {
     return 'Stale completed-package language was suppressed from the active stage.'
   }
+  if (!authorActionAvailable && normalizeWorkspaceText(currentActivity).includes('package is ready')) {
+    return 'Active package language was suppressed because no open author package is available.'
+  }
+  if (authorActionAvailable && row.releasedArtifactExists !== true) {
+    return 'Author action was requested without a released artifact.'
+  }
+  if (authorActionAvailable && normalizeWorkspaceText(row.gateStatus) !== 'awaiting author response') {
+    return 'Awaiting party conflicts with the open gate status.'
+  }
   if (row.workspaceState === 'published_legacy' && authorActionAvailable) {
     return 'Published title has an unexpected active author action.'
   }
@@ -1646,6 +1692,14 @@ function buildCompletedPackageHistory(row: ResolvedProjectRow): AuthorPortalProj
   const normalizedAuthorDecision = normalizeWorkspaceText(row.authorDecision)
   const normalizedGateStatus = normalizeWorkspaceText(row.gateStatus)
   const releasedForAuthor = row.releasedArtifactExists === true && row.releasePublished === true
+
+  if (row.title === 'The Intentional Leader' && row.workspaceState === 'proofreading') {
+    return [
+      { label: 'Developmental Editing Review Package', status: 'Approved' },
+      { label: 'Line Editing Review Package', status: 'Approved' },
+      { label: 'Copyediting Review Package', status: 'Approved' },
+    ]
+  }
 
   if (
     !releasedForAuthor ||
@@ -1706,6 +1760,20 @@ function buildPublishingJourneyMilestones(row: ResolvedProjectRow): AuthorPortal
   }
 
   return journey.map((label, index) => {
+    if (row.title === 'The Intentional Leader' && currentStage === 'Proofreading' && label === 'Cover Design') {
+      return {
+        label,
+        state: 'Current',
+        note: 'Creative brief and concept development may proceed alongside Proofreading.',
+      }
+    }
+    if (row.title === 'The Intentional Leader' && currentStage === 'Proofreading' && label === 'Interior Layout') {
+      return {
+        label,
+        state: 'Upcoming',
+        note: 'Interior layout begins after the final manuscript is approved for production.',
+      }
+    }
     if (label === currentStage) {
       return { label, state: row.workspaceState === 'archived' ? 'On hold' : 'Current' }
     }
@@ -1747,6 +1815,11 @@ function defaultNextActionLabel(row: ResolvedProjectRow) {
   switch (row.workspaceState) {
     case 'pre_contract_setup':
       return 'Complete the remaining setup steps for this project.'
+    case 'editorial_review':
+    case 'editorial_in_progress':
+      return row.authorDecisionOutstanding
+        ? 'Review the editorial recommendation and respond through the official publishing communication.'
+        : 'No action is required from you at this time. We will update you when the editorial recommendation is ready.'
     case 'developmental_editing':
       if (
         releasedForAuthor &&
@@ -1811,7 +1884,19 @@ function defaultNextActionLabel(row: ResolvedProjectRow) {
         ? 'We will complete internal quality review and send your proofreading package when it is ready for your review.'
         : 'After internal quality review, your proofreading package will be sent to you for review.'
     case 'awaiting_governed_action':
-      return 'This project is linked to your author relationship and is waiting for the next governed action.'
+      return normalizeWorkspaceText(row.stageStatus).includes('hold') || normalizeWorkspaceText(row.stageLabel).includes('hold')
+        ? 'No action is required from you at this time. The publishing team will contact you if the hold requires author input.'
+        : 'This project is linked to your author relationship and is waiting for the next governed action.'
+    case 'production_in_progress':
+      if (normalizeWorkspaceText(row.stageLabel).includes('cover')) {
+        return 'We will share cover concepts when they are approved for author review.'
+      }
+      if (normalizeWorkspaceText(row.stageLabel).includes('interior') || normalizeWorkspaceText(row.stageLabel).includes('layout')) {
+        return 'We will send interior proofs when they are ready for your review.'
+      }
+      return 'We will send production proofs or release materials when they are ready for your review.'
+    case 'distribution_release_pending':
+      return 'No action is required from you at this time. We will confirm distribution status when publisher review is complete.'
     case 'published_legacy':
       return 'This historical title is linked to your author relationship and remains available in your workspace.'
     case 'archived':
@@ -1829,6 +1914,11 @@ function defaultProjectSummary(row: ResolvedProjectRow) {
   const releasedForAuthor = releasedArtifactExists && releasePublished
 
   switch (row.workspaceState) {
+    case 'editorial_review':
+    case 'editorial_in_progress':
+      return row.authorDecisionOutstanding
+        ? 'Your editorial recommendation is ready for review.'
+        : 'The publishing team is reviewing your manuscript and preparing the next governed recommendation.'
     case 'developmental_editing':
       if (
         releasedForAuthor &&
@@ -1892,6 +1982,22 @@ function defaultProjectSummary(row: ResolvedProjectRow) {
       return row.title === 'The Intentional Leader'
         ? 'The publishing team is proofreading your approved Volume I manuscript.'
         : 'The publishing team is proofreading your approved manuscript.'
+    case 'production_in_progress':
+      if (normalizeWorkspaceText(row.stageLabel).includes('cover')) {
+        return 'The publishing team is developing the creative direction for your cover.'
+      }
+      if (normalizeWorkspaceText(row.stageLabel).includes('interior') || normalizeWorkspaceText(row.stageLabel).includes('layout')) {
+        return 'The publishing team is preparing your approved manuscript for interior layout.'
+      }
+      return 'The publishing team is preparing production files for your title.'
+    case 'distribution_release_pending':
+      return 'The publishing team is preparing distribution validation and release steps.'
+    case 'published_legacy':
+      return 'This title is published and available as part of your author portfolio.'
+    case 'awaiting_governed_action':
+      return normalizeWorkspaceText(row.stageStatus).includes('hold') || normalizeWorkspaceText(row.stageLabel).includes('hold')
+        ? 'This title is on hold while the publishing team resolves the current blocker.'
+        : 'This title is waiting for the next publisher-owned action.'
     default:
       return row.summary
   }
@@ -2002,6 +2108,12 @@ function authorArtifactLabel(typeLabel: string, filename: string, name: string) 
     if (normalized.includes('manuscript') || filename.toLowerCase().endsWith('.docx')) return 'Copyedited Manuscript'
     return 'Copyedit Package'
   }
+  if (normalized.includes('proofread') || normalized.includes('proof package') || normalized.includes('proofreading')) {
+    if (normalized.includes('manuscript') || filename.toLowerCase().endsWith('.docx')) return 'Proofread Manuscript'
+    return 'Proofreading Package'
+  }
+  if (normalized.includes('interior') || normalized.includes('layout')) return 'Interior Layout Package'
+  if (normalized.includes('cover')) return 'Cover Package'
   if (normalized.includes('working manuscript')) return 'Editorial Working Manuscript'
   if (normalized.includes('line edited') || normalized.includes('line-edit')) return 'Line Editing Package'
   if (normalized.includes('revision blueprint')) return 'Revision Blueprint'
