@@ -1189,7 +1189,7 @@ function buildQueueItem(
   const editorialWorkloadState = editorialStage
     ? deriveWorkloadState({
         pipelineStage: currentStage,
-        stageType: dataverseFormatted(editorialStage, 'jm1pub_stagetype') || '',
+        stageType: dataverseFormatted(editorialStage, 'jm1pub_stagetype') || stringValue(editorialStage.jm1pub_name),
         stageStatus: dataverseFormatted(editorialStage, 'jm1pub_stagestatus') || '',
         stageSummary: stringValue(editorialStage.jm1pub_authorsafesummary),
         hasAsset: Boolean(asset?.jm1pub_publishingassetid),
@@ -1308,7 +1308,7 @@ function buildWorkloadItems(
         )
         .sort((a, b) => Number(b.jm1pub_stagesequence || 0) - Number(a.jm1pub_stagesequence || 0))
       const latestStage = stages[0]
-      const stageType = dataverseFormatted(latestStage || {}, 'jm1pub_stagetype') || ''
+      const stageType = dataverseFormatted(latestStage || {}, 'jm1pub_stagetype') || stringValue(latestStage?.jm1pub_name)
       const stageStatus = dataverseFormatted(latestStage || {}, 'jm1pub_stagestatus') || ''
       const pipelineStage = dataverseFormatted(title, 'jm1pub_stage') || 'Unstaged'
       const intake = intakes.find((row) => normalizeTitle(stringValue(row.jm1_projecttitle || row.jm1_name)) === normalizeTitle(titleName))
