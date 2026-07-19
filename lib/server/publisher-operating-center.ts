@@ -2003,6 +2003,9 @@ function deriveQueueBlocker(workloadState: PublisherWorkloadState | undefined, f
   if (workloadState === 'Copyediting In Progress') return 'Copyediting in progress'
   if (workloadState === 'Copyediting - Release Decision Ready') return 'Copyediting package release decision ready'
   if (workloadState === 'Copyediting - Author Review') return 'Author Copyediting response pending'
+  if (workloadState === 'Proofreading - Author Review') return 'Author Proofreading response pending'
+  if (workloadState === 'Proofreading In Progress') return 'Proofreading in progress'
+  if (workloadState === 'Proofreading - Internal QA') return 'Proofreading internal QA in progress'
   if (workloadState === 'Developmental Editing - Author Review') return 'Author Developmental Editing response pending'
   if (workloadState === 'Developmental Editing - In Progress') return 'Developmental Editing in progress'
   return fallback

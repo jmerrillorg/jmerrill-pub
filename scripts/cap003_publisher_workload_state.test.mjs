@@ -90,6 +90,7 @@ const expectations = [
       deriveWorkloadStateBody.includes("latestAction.includes('proofreading_author_package_released')") &&
       deriveNextActionBody.includes("'Proofreading - Author Review'") &&
       deriveNextActionBody.includes('Await author Proofreading response') &&
+      source.includes("if (workloadState === 'Proofreading - Author Review') return 'Author Proofreading response pending'") &&
       source.includes("if (state.includes('Author Review')) return 'Author'"),
   },
   {
