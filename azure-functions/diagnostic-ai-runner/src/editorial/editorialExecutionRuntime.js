@@ -578,7 +578,15 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
       safeCode: `${stageCode}_BLOCKED — SOURCE_GRAPH_IDENTITY_MISSING`
     });
   }
-  const sourceBuffer = await graphRequest(`drives/${driveId}/items/${itemId}/content`);
+  const sourceBuffer = await graphRequest(`drives/${driveId}/items/${itemId}/content`).catch((error) => {
+    if (error.status === 403) {
+      throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_ACCESS_DENIED_FOR_JM1_AUTOMATION` });
+    }
+    if (error.status === 404) {
+      throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_FILE_NOT_FOUND` });
+    }
+    throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_DOWNLOAD_FAILED` });
+  });
   const actualSha = crypto.createHash("sha256").update(sourceBuffer).digest("hex");
   const expectedSha = normalizeString(sourceArtifact.jm1pub_sha256);
   if (expectedSha && actualSha !== expectedSha) {
@@ -586,7 +594,15 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
       safeCode: `${stageCode}_BLOCKED — SOURCE_CHECKSUM_MISMATCH`
     });
   }
-  const sourceItem = await graphRequest(`drives/${driveId}/items/${itemId}?$select=id,name,parentReference,size,webUrl`);
+  const sourceItem = await graphRequest(`drives/${driveId}/items/${itemId}?$select=id,name,parentReference,size,webUrl`).catch((error) => {
+    if (error.status === 403) {
+      throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_METADATA_ACCESS_DENIED_FOR_JM1_AUTOMATION` });
+    }
+    if (error.status === 404) {
+      throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_METADATA_NOT_FOUND` });
+    }
+    throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_METADATA_READ_FAILED` });
+  });
   const parentId = normalizeString(sourceItem?.parentReference?.id);
   if (!parentId) {
     throw Object.assign(new Error("Source parent folder missing"), {
