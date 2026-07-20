@@ -1,0 +1,106 @@
+import { readFileSync } from 'node:fs'
+
+const catalog = readFileSync('lib/commercial/catalog.ts', 'utf8')
+const packagesPage = readFileSync('app/packages/page.tsx', 'utf8')
+const tokens = readFileSync('lib/tokens.ts', 'utf8')
+
+const checks = [
+  {
+    name: 'product form option set has exactly eight values and no PF-05C',
+    pass: () =>
+      [
+        "'PF-01'",
+        "'PF-02'",
+        "'PF-03'",
+        "'PF-04'",
+        "'PF-05'",
+        "'PF-06'",
+        "'PF-07'",
+        "'PF-08'",
+      ].every((code) => catalog.includes(code)) &&
+      !catalog.includes('PF-05C') &&
+      catalog.includes('productForms.length === 8'),
+  },
+  {
+    name: 'large print complexity and audiobook narration method are attributes',
+    pass: () =>
+      catalog.includes('complexity: Standard / Complex') &&
+      catalog.includes('narrationmethod: AI / Human Single-Voice / Human Multi-Voice'),
+  },
+  {
+    name: 'package prices and slot counts match Matrix v1.1',
+    pass: () =>
+      catalog.includes("sku: 'JMP-PKG-STARTER'") &&
+      catalog.includes('amount: 1999') &&
+      catalog.includes('editionSlots: 2') &&
+      catalog.includes("sku: 'JMP-PKG-PRO'") &&
+      catalog.includes('amount: 4500') &&
+      catalog.includes('editionSlots: 3') &&
+      catalog.includes("sku: 'JMP-PKG-PREMIER'") &&
+      catalog.includes('amount: 7500') &&
+      catalog.includes('editionSlots: 4'),
+  },
+  {
+    name: 'pricing rules include approved add-ons, premiums, AI overage, and quote-only human narration',
+    pass: () =>
+      catalog.includes("sku: 'JMP-EDT-LP-CPLX'") &&
+      catalog.includes('amount: 600') &&
+      catalog.includes('amount: 250') &&
+      catalog.includes("sku: 'JMP-ACC-EPUB-ENH'") &&
+      catalog.includes('amount: 1000') &&
+      catalog.includes('amount: 650') &&
+      catalog.includes("sku: 'JMP-AUD-SYNTH-STD'") &&
+      catalog.includes('amount: 500') &&
+      catalog.includes("sku: 'JMP-AUD-SYNTH-STD-OVR'") &&
+      catalog.includes('amount: 50') &&
+      catalog.includes("sku: 'JMP-AUD-HUMAN-SV'") &&
+      catalog.includes('starting quote-required human single-voice narration'),
+  },
+  {
+    name: 'traditional track bills author at zero without changing SKU identity',
+    pass: () =>
+      catalog.includes("if (input.publishingTrack === 'Traditional') return 0") &&
+      catalog.includes('return input.listAmount'),
+  },
+  {
+    name: 'program-only PF-07/PF-08 cannot consume package slots',
+    pass: () =>
+      catalog.includes("productForm: 'PF-07'") &&
+      catalog.includes('slotEligible: false') &&
+      catalog.includes("productForm: 'PF-08'") &&
+      catalog.includes('slotViolations.length === 0'),
+  },
+  {
+    name: 'webtoon pricing remains non-public and provisional',
+    pass: () =>
+      catalog.includes("sku: 'JMP-GFX-WEBTOON-PILOT'") &&
+      catalog.includes('public: false') &&
+      catalog.includes('provisional: true') &&
+      catalog.includes("sku: 'JMP-GFX-WEBTOON-12'") &&
+      packagesPage.includes('Provisional webtoon pricing is intentionally not published.') &&
+      !packagesPage.includes('$1,200') &&
+      !packagesPage.includes('$850'),
+  },
+  {
+    name: 'public website no longer exposes stale AI narration $699 price',
+    pass: () =>
+      !tokens.includes('$699') &&
+      !packagesPage.includes('$699') &&
+      tokens.includes('AI narration from $500 through 8 finished hours'),
+  },
+  {
+    name: 'public page consumes the commercial matrix instead of duplicating edition and program lists',
+    pass: () =>
+      packagesPage.includes("from '@/lib/commercial/catalog'") &&
+      packagesPage.includes('editionCatalogDefinitions') &&
+      packagesPage.includes('publishingPrograms') &&
+      packagesPage.includes('priceRules'),
+  },
+]
+
+const failures = checks.filter((check) => !check.pass())
+for (const check of checks) {
+  console.log(`${failures.includes(check) ? 'FAIL' : 'PASS'} ${check.name}`)
+}
+
+if (failures.length) process.exit(1)

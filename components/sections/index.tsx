@@ -193,7 +193,7 @@ export function PackagesSection() {
                 className="text-[11px] text-white/30 mb-9"
                 style={{ fontFamily: "'DM Mono', monospace" }}
               >
-                {pkg.tier === 'Premier' ? pkg.wordLimit : `Up to ${pkg.wordLimit} words`}
+                {pkg.editionSlots} edition slots
               </div>
               <p className="text-[13px] font-light text-white/45 leading-[1.7] mb-6">
                 {pkg.tier === 'Starter'

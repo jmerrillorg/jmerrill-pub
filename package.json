@@ -12,7 +12,8 @@
     "catalog-source-guard": "node scripts/check-catalog-runtime-source.mjs",
     "author-auth-guard": "node scripts/check-author-operating-center-auth.mjs",
     "royalty-import-guard": "node scripts/check-royalty-import-route.mjs",
-    "workflow-engine-guard": "node scripts/check-canonical-workflow-engine-declarations.mjs"
+    "workflow-engine-guard": "node scripts/check-canonical-workflow-engine-declarations.mjs",
+    "commercial-architecture-guard": "node scripts/commercial_architecture_guard.test.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",

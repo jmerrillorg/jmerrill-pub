@@ -1,3 +1,5 @@
+import { packages as commercialPackages } from './commercial/catalog'
+
 // ─────────────────────────────────────────────────────────────
 // lib/tokens.ts
 // J Merrill One — Design Token System
@@ -121,65 +123,34 @@ export const nav = {
 } as const
 
 // ── PACKAGES ──────────────────────────────────────────────────
-export const packages = [
-  {
-    sku:        'JMP-PKG-STARTER',
-    tier:       'Starter',
-    price:      1999,
-    wordLimit:  '50,000',
-    featured:   false,
-    features: [
-      'Editorial review + copy editing + proofreading',
-      'Professional cover design',
-      'Interior layout & typesetting',
-      'ISBN assignment',
-      'Ingram Content distribution',
-      'Author Profile Page — included',
-      '30-minute publishing consultation',
-      '5 complimentary paperback copies',
-    ],
-  },
-  {
-    sku:        'JMP-PKG-PRO',
-    tier:       'Professional',
-    price:      4500,
-    wordLimit:  '75,000',
-    featured:   true,
-    features: [
-      'Full line editing + copy editing + proofreading',
-      'Enhanced cover design — front, back, spine',
-      'Advanced interior layout & typography',
-      'ISBN + Copyright + Library of Congress',
-      'Advanced metadata optimization',
-      'Launch planning session + marketing guidance',
-      '60-minute strategy consultation',
-      '10 complimentary paperback copies',
-    ],
-  },
-  {
-    sku:        'JMP-PKG-PREMIER',
-    tier:       'Premier',
-    price:      7500,
-    wordLimit:  'Large / complex manuscripts',
-    featured:   false,
-    features: [
-      'Extended developmental guidance + full editorial suite',
-      'Premium cover design + hardcover edition support',
-      'Advanced layout + distribution planning',
-      'Extended marketing launch planning',
-      'Two 60-minute strategy consultations',
-      'Dedicated publishing consultant',
-      'Extended production planning',
-      '15 complimentary paperback copies',
-    ],
-  },
-] as const
+// Source: JMP Package, Edition, Program, Pricing & SKU Matrix v1.1.
+export const packages = commercialPackages.map((pkg) => ({
+  sku: pkg.sku,
+  tier: pkg.tier,
+  price: pkg.price.amount,
+  wordLimit:
+    pkg.sku === 'JMP-PKG-STARTER'
+      ? 'Scope reviewed during fit'
+      : pkg.sku === 'JMP-PKG-PRO'
+        ? 'Expanded scope reviewed during fit'
+        : 'Large / complex manuscripts',
+  editionSlots: pkg.editionSlots,
+  audiobookPolicy: pkg.audiobookPolicy,
+  featured: pkg.featured,
+  features: [
+    `${pkg.editionSlots} edition slots — author's choice from eligible formats`,
+    pkg.audiobookPolicy,
+    'Editorial, production, distribution, and launch scope resolved by governed package fit',
+    'Standard ebooks are born-accessible whenever selected or purchased',
+    'Premium editions and add-ons resolve from governed Price Rule records',
+  ],
+}))
 
 // ── SERVICE CATEGORIES ────────────────────────────────────────
 export const serviceCategories = [
   { num: '01', icon: '✏️', title: 'Editorial Services',           body: 'Developmental, line, copy editing, proofreading, manuscript evaluation, AI sensitivity reading, and co-author coordination.' },
   { num: '02', icon: '🎨', title: 'Design & Production',          body: 'Cover design, interior layout, eBook conversion, hardcover formatting, large print, devotional formatting, and illustrated books.' },
-  { num: '03', icon: '🎙️', title: 'Audiobook Production',         body: 'AI narration from $699 or professional studio narration. Distributed through our Ingram Content partnership and leading audiobook channels.' },
+  { num: '03', icon: '🎙️', title: 'Audiobook Production',         body: 'AI narration from $500 through 8 finished hours, with human narration quoted per finished hour. Distributed through approved audiobook channels.' },
   { num: '04', icon: '🤖', title: 'AI Publishing Intelligence',   body: 'Manuscript analysis, metadata optimization, AI marketing kits, sensitivity reading, and cover concept ideation.' },
   { num: '05', icon: '📣', title: 'Marketing & Launch',           body: 'Launch strategy, ARC campaigns, Amazon ads, press releases, BookTok video packages, and complete launch programs.' },
   { num: '06', icon: '⛪', title: 'Faith Market Distribution',    body: 'CBA positioning, church bookstore placement, Bible study kit creation, ministry bulk licensing, and conference sales.' },
