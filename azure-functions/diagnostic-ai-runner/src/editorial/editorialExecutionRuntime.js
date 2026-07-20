@@ -113,6 +113,9 @@ async function getDataverseToken(resourceUrl) {
 }
 
 async function getGraphToken() {
+  if (typeof getGraphToken.override === "function") {
+    return getGraphToken.override();
+  }
   const credential = new DefaultAzureCredential();
   const tokenResponse = await credential.getToken("https://graph.microsoft.com/.default");
   if (!tokenResponse?.token) {
@@ -193,6 +196,9 @@ async function writeLog(client, input) {
 }
 
 async function graphRequest(path, options = {}) {
+  if (typeof graphRequest.override === "function") {
+    return graphRequest.override(path, options);
+  }
   const response = await fetch(`${GRAPH_BASE}/${path.replace(/^\//, "")}`, {
     ...options,
     headers: {
@@ -243,7 +249,7 @@ async function findSourceArtifact(client, stage) {
   const stageId = normalizeString(stage.jm1pub_editorialstageid);
   const rows = await client.list("jm1pub_editorialartifacts", {
     $select:
-      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_sha256,jm1pub_repositoryitemid,jm1pub_repositorypath,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_iscurrentapproved,createdon,modifiedon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value",
+      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_sha256,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_repositorypath,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_iscurrentapproved,createdon,modifiedon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value",
     $filter:
       `_jm1pub_titleid_value eq ${titleId} and (` +
       `_jm1pub_editorialstageid_value eq ${stageId} or jm1pub_iscurrentapproved eq true or jm1pub_repositorypath ne null` +
@@ -273,6 +279,24 @@ async function findSourceArtifact(client, stage) {
   );
 }
 
+function extractExistingExactBlocker(stage) {
+  const summary = normalizeString(stage?.jm1pub_internaloperationalsummary);
+  const match = summary.match(/\b([A-Z][A-Z0-9_]+_BLOCKED\s+—\s+[^.]+)/);
+  return match?.[1] || "";
+}
+
+async function findArtifactByName(client, stage, artifactName) {
+  const rows = await client.list("jm1pub_editorialartifacts", {
+    $select: "jm1pub_editorialartifactid,jm1pub_editorialartifactname",
+    $filter:
+      `_jm1pub_titleid_value eq ${normalizeString(stage._jm1pub_titleid_value)} and ` +
+      `_jm1pub_editorialstageid_value eq ${normalizeString(stage.jm1pub_editorialstageid)} and ` +
+      `jm1pub_editorialartifactname eq '${escapeODataText(artifactName)}'`,
+    $top: "1"
+  }).catch(() => []);
+  return rows[0] || null;
+}
+
 function buildExactBlocker(stageCode, sourceArtifact) {
   if (!sourceArtifact) return EXECUTOR_POLICIES[stageCode].exactMissingSourceBlocker;
   if (!normalizeString(sourceArtifact.jm1pub_sha256)) return `${stageCode}_BLOCKED — SOURCE_CHECKSUM_MISSING`;
@@ -280,6 +304,15 @@ function buildExactBlocker(stageCode, sourceArtifact) {
     return `${stageCode}_BLOCKED — SOURCE_LOCATION_MISSING`;
   }
   return "";
+}
+
+async function extractSourceText(sourceBuffer, stageCode) {
+  if (typeof extractSourceText.override === "function") {
+    return extractSourceText.override(sourceBuffer, stageCode);
+  }
+  return mammoth.extractRawText({ buffer: sourceBuffer }).catch((error) => {
+    throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_TEXT_EXTRACTION_FAILED` });
+  });
 }
 
 async function claimStageTask(client, stage, stageCode, correlationId) {
@@ -338,6 +371,59 @@ function summarizeExtractedText(text) {
   };
 }
 
+function analyzeManuscriptText(text) {
+  const paragraphs = text
+    .split(/\n{2,}/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const headings = paragraphs
+    .filter((part) => {
+      const words = part.split(/\s+/).length;
+      return words <= 14 && part.length <= 120 && /[A-Za-z]/.test(part);
+    })
+    .slice(0, 30);
+  const longParagraphs = paragraphs
+    .map((part, index) => ({ index: index + 1, words: part.split(/\s+/).length, preview: part.slice(0, 160) }))
+    .filter((item) => item.words >= 140)
+    .slice(0, 12);
+  const sentences = text
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+  const longSentences = sentences
+    .map((sentence, index) => ({ index: index + 1, words: sentence.split(/\s+/).length, preview: sentence.slice(0, 180) }))
+    .filter((item) => item.words >= 45)
+    .slice(0, 12);
+  const wordCounts = new Map();
+  for (const word of text.toLowerCase().match(/\b[a-z][a-z'-]{4,}\b/g) || []) {
+    if (["therefore", "because", "about", "which", "their", "would", "could", "should", "through"].includes(word)) continue;
+    wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
+  }
+  const repeatedTerms = [...wordCounts.entries()]
+    .filter(([, count]) => count >= 12)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 15)
+    .map(([term, count]) => ({ term, count }));
+  return {
+    headings,
+    longParagraphs,
+    longSentences,
+    repeatedTerms,
+    paragraphCount: paragraphs.length,
+    sentenceCount: sentences.length
+  };
+}
+
+function markdownTable(rows, columns) {
+  if (!rows.length) return "_None found in this pass._";
+  return [
+    `| ${columns.map((column) => column.label).join(" | ")} |`,
+    `| ${columns.map(() => "---").join(" | ")} |`,
+    ...rows.map((row) => `| ${columns.map((column) => normalizeString(String(row[column.key] ?? "")).replace(/\|/g, "\\|")).join(" | ")} |`)
+  ].join("\n");
+}
+
 function outputDefinitions(stageCode) {
   if (stageCode === "EDITORIAL_REVIEW") {
     return ["Editorial Assessment", "Recommended Editorial Path", "Scope and Risk Register", "Editorial Review QA Evidence"];
@@ -355,6 +441,7 @@ function outputDefinitions(stageCode) {
 
 function buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extractedText, correlationId) {
   const stats = summarizeExtractedText(extractedText);
+  const analysis = analyzeManuscriptText(extractedText);
   const base = [
     `# ${outputName} - ${stage.jm1pub_name}`,
     "",
@@ -372,18 +459,47 @@ function buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extra
     return [
       ...base,
       "## Editorial Assessment",
-      "The governed manuscript source was downloaded, checksum-validated, text-extracted, and accepted for editorial assessment.",
+      "The governed manuscript source was downloaded, checksum-validated, text-extracted, and assessed for structure, sequence, readability risk, and editorial-path readiness.",
       "",
       "## Recommended Editorial Path",
-      "Proceed to publisher editorial-path decision, with Developmental Editing recommended before line-level editing unless publisher review overrides the path.",
+      analysis.longParagraphs.length || analysis.longSentences.length
+        ? "Proceed to Developmental Editing before line-level editing. The manuscript shows structure/readability items that should be addressed before copyediting."
+        : "Proceed to publisher editorial-path decision. Developmental Editing remains recommended unless publisher review determines that the manuscript may move directly to line-level editing.",
       "",
       "## Scope",
-      "Structure, sequence, audience fit, manuscript readiness, rights-sensitive material, and risk review.",
+      "Structure, sequence, audience fit, manuscript readiness, rights-sensitive material, repetition/continuity indicators, and author-voice preservation.",
       "",
-      "## Risks",
+      "## Detected Structure Signals",
+      markdownTable(analysis.headings.map((heading, index) => ({ index: index + 1, heading })), [
+        { key: "index", label: "#" },
+        { key: "heading", label: "Candidate heading / section marker" }
+      ]),
+      "",
+      "## Readability Watchlist",
+      markdownTable(analysis.longParagraphs, [
+        { key: "index", label: "Paragraph" },
+        { key: "words", label: "Words" },
+        { key: "preview", label: "Preview" }
+      ]),
+      "",
+      "## Sentence-Level Watchlist",
+      markdownTable(analysis.longSentences, [
+        { key: "index", label: "Sentence" },
+        { key: "words", label: "Words" },
+        { key: "preview", label: "Preview" }
+      ]),
+      "",
+      "## Repetition Candidates",
+      markdownTable(analysis.repeatedTerms, [
+        { key: "term", label: "Term" },
+        { key: "count", label: "Count" }
+      ]),
+      "",
+      "## Editorial Risks",
       "- Confirm final canonical manuscript edition before downstream editing.",
-      "- Preserve author voice and intentional theological or historical language.",
+      "- Preserve author voice and intentional theological, historical, or regional language.",
       "- Route rights-sensitive quoted material for publisher review before package release.",
+      "- Resolve long paragraph and long sentence candidates during Developmental Editing or Line Editing as appropriate.",
       "",
       "## Manuscript Readiness Finding",
       "READY_FOR_PUBLISHER_EDITORIAL_PATH_DECISION",
@@ -396,16 +512,51 @@ function buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extra
   return [
     ...base,
     "## Developmental Editing Output",
-    "Developmental Editing has begun against the governed source manuscript. This artifact records the governed content pass inputs, structural observations, and package prerequisites.",
+    "Developmental Editing has begun against the governed source manuscript. This artifact records the governed content pass inputs, manuscript structure signals, edit priorities, and package prerequisites. It is not an author-facing release package.",
     "",
     "## Developmental Memo",
-    "Initial priorities: clarify through-line, preserve author voice, confirm chapter sequence, isolate publisher sensitivity review items, and maintain a controlled change ledger.",
+    [
+      "Initial priorities:",
+      "- Clarify the through-line and reader promise.",
+      "- Preserve author voice and intentional style.",
+      "- Confirm chapter/section sequence before line-level editing.",
+      "- Split or restructure long paragraph candidates where pacing or comprehension requires it.",
+      "- Review long sentence candidates for clarity while avoiding voice flattening.",
+      "- Isolate publisher sensitivity, rights, or legal review items before author-facing package release."
+    ].join("\n"),
+    "",
+    "## Detected Structure Signals",
+    markdownTable(analysis.headings.map((heading, index) => ({ index: index + 1, heading })), [
+      { key: "index", label: "#" },
+      { key: "heading", label: "Candidate heading / section marker" }
+    ]),
+    "",
+    "## Developmental Work Queue",
+    markdownTable(analysis.longParagraphs, [
+      { key: "index", label: "Paragraph" },
+      { key: "words", label: "Words" },
+      { key: "preview", label: "Developmental issue candidate" }
+    ]),
+    "",
+    "## Line-Level Deferral Queue",
+    markdownTable(analysis.longSentences, [
+      { key: "index", label: "Sentence" },
+      { key: "words", label: "Words" },
+      { key: "preview", label: "Candidate" }
+    ]),
+    "",
+    "## Continuity / Repetition Candidates",
+    markdownTable(analysis.repeatedTerms, [
+      { key: "term", label: "Term" },
+      { key: "count", label: "Count" }
+    ]),
     "",
     "## Change Ledger",
     "- Source manuscript checksum validated before editing.",
     "- Working manuscript pass opened under JM1 Automation.",
-    "- No author-facing package released in this cycle.",
-    "- No stage advancement occurred before QA/package/cadence completion.",
+    "- Structural/readability candidates extracted from the actual manuscript text.",
+    "- No author-facing package released until stage completion, QA, cadence, and Package Engine policy are satisfied.",
+    "- No stage advancement occurred before output and QA evidence.",
     "",
     "## QA Evidence",
     "Source checksum matched, file was readable, text extraction completed, and output is linked to the active editorial stage.",
@@ -442,9 +593,7 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
       safeCode: `${stageCode}_BLOCKED — SOURCE_PARENT_FOLDER_MISSING`
     });
   }
-  const extracted = await mammoth.extractRawText({ buffer: sourceBuffer }).catch((error) => {
-    throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_TEXT_EXTRACTION_FAILED` });
-  });
+  const extracted = await extractSourceText(sourceBuffer, stageCode);
   const outputs = [];
   for (const outputName of outputDefinitions(stageCode)) {
     const filename = `${new Date().toISOString().slice(0, 10)}-${stage.jm1pub_name.replace(/[^a-zA-Z0-9]+/g, "-")}-${outputName.replace(/[^a-zA-Z0-9]+/g, "-")}.md`;
@@ -475,7 +624,13 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
     if (normalizeString(stage._jm1pub_publishingassetid_value)) {
       artifactPayload["Jm1pub_Publishingassetid@odata.bind"] = `/jm1pub_publishingassets(${stage._jm1pub_publishingassetid_value})`;
     }
-    const artifactId = await client.create("jm1pub_editorialartifacts", artifactPayload);
+    const existing = await findArtifactByName(client, stage, artifactName);
+    let artifactId = existing?.jm1pub_editorialartifactid;
+    if (artifactId) {
+      await client.patch("jm1pub_editorialartifacts", artifactId, artifactPayload);
+    } else {
+      artifactId = await client.create("jm1pub_editorialartifacts", artifactPayload);
+    }
     outputs.push({ outputName, artifactId, itemId: uploaded.id });
   }
   return outputs;
@@ -505,9 +660,12 @@ async function processStage(client, stage, correlationId) {
   }
   const claim = await claimStageTask(client, stage, stageCode, correlationId);
   const sourceArtifact = await findSourceArtifact(client, stage);
-  const exactBlocker = buildExactBlocker(stageCode, sourceArtifact);
+  const preservedExactBlocker = !sourceArtifact ? extractExistingExactBlocker(stage) : "";
+  const exactBlocker = preservedExactBlocker || buildExactBlocker(stageCode, sourceArtifact);
   if (exactBlocker) {
-    const blocked = await recordBlockedTask(client, stage, stageCode, exactBlocker, correlationId);
+    const blocked = preservedExactBlocker
+      ? { idempotent: true, logId: null, idempotencyKey: "preserved-existing-exact-blocker" }
+      : await recordBlockedTask(client, stage, stageCode, exactBlocker, correlationId);
     return {
       stageId: stage.jm1pub_editorialstageid,
       titleId: stage._jm1pub_titleid_value,
@@ -518,7 +676,7 @@ async function processStage(client, stage, correlationId) {
       blocked
     };
   }
-  const idempotencyKey = `editorial-runtime:output-ready:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
+  const idempotencyKey = `editorial-runtime:output-ready-v2:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
   const existing = await findExecutionLog(client, "ACTIVE_EDITORIAL_OUTPUT_CREATED", idempotencyKey);
   if (existing) {
     return {
@@ -616,7 +774,9 @@ module.exports = {
   STAGE_STATUS,
   STAGE_TYPES,
   buildExactBlocker,
+  extractSourceText,
   findSourceArtifact,
+  graphRequest,
   normalizeStageCode,
   runEditorialExecutionRuntime
 };
