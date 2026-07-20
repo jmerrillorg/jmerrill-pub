@@ -17,7 +17,7 @@ function normalizeString(value) {
 
 function isConfiguredSecret(value) {
   const normalized = normalizeString(value);
-  return Boolean(normalized && !normalized.toLowerCase().includes("set-before-use"));
+  return Boolean(normalized && !/^\(.*\)$/.test(normalized) && !normalized.toLowerCase().includes("set-before-use"));
 }
 
 async function getDataverseToken(resourceUrl) {

@@ -18,6 +18,14 @@ function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function normalizeConfiguredSecret(value) {
+  const normalized = normalizeString(value);
+  if (!normalized) return "";
+  if (/^\(.*\)$/.test(normalized)) return "";
+  if (normalized.toLowerCase().includes("set-before-use")) return "";
+  return normalized;
+}
+
 function lookupId(row, name) {
   return normalizeString(row?.[name]);
 }
@@ -66,8 +74,8 @@ function requireDataverseConfig() {
 async function getDataverseToken(resourceUrl) {
   const { ClientSecretCredential, DefaultAzureCredential } = require("@azure/identity");
   const tenantId = normalizeString(process.env.DATAVERSE_TENANT_ID);
-  const clientId = normalizeString(process.env.DATAVERSE_CLIENT_ID);
-  const clientSecret = normalizeString(process.env.DATAVERSE_CLIENT_SECRET);
+  const clientId = normalizeConfiguredSecret(process.env.DATAVERSE_CLIENT_ID);
+  const clientSecret = normalizeConfiguredSecret(process.env.DATAVERSE_CLIENT_SECRET);
   const credential =
     tenantId && clientId && clientSecret
       ? new ClientSecretCredential(tenantId, clientId, clientSecret)
@@ -454,7 +462,7 @@ async function runAutomaticApprovalEventConsumer(input = {}, deps = {}) {
 
   return {
     runtimeName: "JM1 Azure Function Approval Event Consumer",
-    deploymentEnvironment: "jm1-ed-functions",
+    deploymentEnvironment: "func-jm1-diagnostic-ai-runner",
     triggerType: "Azure Functions timer",
     schedule: "0 */5 * * * *",
     queue: "Dataverse editorial approval gates plus execution-log claim records",
@@ -474,5 +482,6 @@ module.exports = {
   runAutomaticApprovalEventConsumer,
   buildApprovalEventFromGate,
   consumeApprovalEvent,
-  createDataverseClient
+  createDataverseClient,
+  normalizeConfiguredSecret
 };
