@@ -189,7 +189,7 @@ async function getStage(client, stageId) {
 
 async function getTitle(client, titleId) {
   const title = await client.first("jm1pub_titles", {
-    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,jm1pub_trimsize",
+    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname",
     $filter: `jm1pub_titleid eq ${titleId}`
   });
   if (!title) throw Object.assign(new Error("approval_event_title_not_found"), { safeCode: "APPROVAL_TITLE_NOT_FOUND" });
