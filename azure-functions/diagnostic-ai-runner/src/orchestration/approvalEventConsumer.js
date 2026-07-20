@@ -287,6 +287,7 @@ async function transitionBlocked(client, event, blocker) {
 }
 
 async function findOrCreateInteriorLayoutProject(client, input) {
+  const filesLocation = normalizeString(input.artifactReference || input.artifactPath).slice(0, 100);
   const existing = await client.first("jm1_productionprojects", {
     $select: "jm1_productionprojectid,jm1_name,jm1_productiontype,jm1_status,_jm1_title_value",
     $filter: `_jm1_title_value eq ${input.titleId} and jm1_productiontype eq ${PRODUCTION_TYPE_INTERIOR_LAYOUT}`
@@ -294,7 +295,7 @@ async function findOrCreateInteriorLayoutProject(client, input) {
   if (existing?.jm1_productionprojectid) {
     await client.patch("jm1_productionprojects", existing.jm1_productionprojectid, {
       jm1_status: PRODUCTION_PROJECT_STATUS_IN_PROGRESS,
-      jm1_fileslocation: input.artifactPath
+      jm1_fileslocation: filesLocation
     });
     return existing.jm1_productionprojectid;
   }
@@ -302,7 +303,7 @@ async function findOrCreateInteriorLayoutProject(client, input) {
     jm1_name: `Interior Layout - ${input.titleName}`,
     jm1_productiontype: PRODUCTION_TYPE_INTERIOR_LAYOUT,
     jm1_status: PRODUCTION_PROJECT_STATUS_IN_PROGRESS,
-    jm1_fileslocation: input.artifactPath,
+    jm1_fileslocation: filesLocation,
     "jm1_Title@odata.bind": `/jm1pub_titles(${input.titleId})`
   });
 }
@@ -372,7 +373,8 @@ async function consumeProofreadingApprovalEvent(client, event) {
   const projectId = await findOrCreateInteriorLayoutProject(client, {
     titleId: event.titleId,
     titleName,
-    artifactPath: normalizeString(artifact.jm1pub_repositorypath)
+    artifactPath: normalizeString(artifact.jm1pub_repositorypath),
+    artifactReference: `artifact:${event.approvedArtifactId};item:${normalizeString(artifact.jm1pub_repositoryitemid)}`
   });
   const taskId = await findOrCreateInteriorLayoutTask(client, {
     titleName,

@@ -449,6 +449,7 @@ export async function processProofreadingApprovalEvent(payload: ApprovalTransiti
     titleId: payload.titleId,
     titleName,
     artifactPath: stringValue(artifact.jm1pub_repositorypath),
+    artifactReference: `artifact:${payload.approvedArtifactId};item:${stringValue(artifact.jm1pub_repositoryitemid)}`,
   })
   const taskId = await findOrCreateInteriorLayoutTask(config, {
     titleName,
@@ -637,8 +638,9 @@ async function routeProofreadingCorrections(config: DataverseServerConfig, paylo
 
 async function findOrCreateInteriorLayoutProject(
   config: DataverseServerConfig,
-  input: { titleId: string; titleName: string; artifactPath: string },
+  input: { titleId: string; titleName: string; artifactPath: string; artifactReference?: string },
 ) {
+  const filesLocation = stringValue(input.artifactReference || input.artifactPath).slice(0, 100)
   const existing = await dataverseFirst(config, 'jm1_productionprojects', {
     $select: 'jm1_productionprojectid,jm1_name,jm1_productiontype,jm1_status,_jm1_title_value',
     $filter: `_jm1_title_value eq ${input.titleId} and jm1_productiontype eq ${PRODUCTION_TYPE_INTERIOR_LAYOUT}`,
@@ -646,7 +648,7 @@ async function findOrCreateInteriorLayoutProject(
   if (existing) {
     await dataversePatch(config, 'jm1_productionprojects', stringValue(existing.jm1_productionprojectid), {
       jm1_status: PRODUCTION_PROJECT_STATUS_IN_PROGRESS,
-      jm1_fileslocation: input.artifactPath,
+      jm1_fileslocation: filesLocation,
     })
     return stringValue(existing.jm1_productionprojectid)
   }
@@ -656,7 +658,7 @@ async function findOrCreateInteriorLayoutProject(
       jm1_name: `Interior Layout - ${input.titleName}`,
       jm1_productiontype: PRODUCTION_TYPE_INTERIOR_LAYOUT,
       jm1_status: PRODUCTION_PROJECT_STATUS_IN_PROGRESS,
-      jm1_fileslocation: input.artifactPath,
+      jm1_fileslocation: filesLocation,
       'jm1_Title@odata.bind': `/jm1pub_titles(${input.titleId})`,
     }),
   )
