@@ -13,9 +13,27 @@ const EXECUTION_STATUS = { SUCCESS: 835500001, FAILED: 835500002 };
 const BAND_LEVEL_1 = 835500000;
 const AUTHOR_DECISION_APPROVE = 196650000;
 const AUTHOR_DECISION_REQUEST_REVISION = 196650001;
+const RESPONSE_STATES = Object.freeze({
+  DISCOVERED: "DISCOVERED",
+  CLAIMED: "CLAIMED",
+  CORRELATED: "CORRELATED",
+  CLASSIFIED: "CLASSIFIED",
+  PERSISTED: "PERSISTED",
+  COMPLETED: "COMPLETED",
+  BLOCKED: "BLOCKED",
+  DEAD_LETTERED: "DEAD_LETTERED"
+});
 
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeConfiguredSecret(value) {
+  const normalized = normalizeString(value);
+  if (!normalized) return "";
+  if (/^\(.*\)$/.test(normalized)) return "";
+  if (normalized.toLowerCase().includes("set-before-use")) return "";
+  return normalized;
 }
 
 function escapeODataText(value) {
@@ -43,8 +61,8 @@ function requireDataverseConfig() {
 async function getDataverseToken(resourceUrl) {
   const { ClientSecretCredential, DefaultAzureCredential } = require("@azure/identity");
   const tenantId = normalizeString(process.env.DATAVERSE_TENANT_ID);
-  const clientId = normalizeString(process.env.DATAVERSE_CLIENT_ID);
-  const clientSecret = normalizeString(process.env.DATAVERSE_CLIENT_SECRET);
+  const clientId = normalizeConfiguredSecret(process.env.DATAVERSE_CLIENT_ID);
+  const clientSecret = normalizeConfiguredSecret(process.env.DATAVERSE_CLIENT_SECRET);
   const credential =
     tenantId && clientId && clientSecret
       ? new ClientSecretCredential(tenantId, clientId, clientSecret)
@@ -107,10 +125,12 @@ function createDataverseClient(config, deps = {}) {
 
 function classifyAuthorReviewResponse(text) {
   const normalized = normalizeString(text).toLowerCase();
-  if (/^(approved|approve|i approve|i approve!|approved!|yes approved)\b/.test(normalized)) return "APPROVED_WITHOUT_CHANGES";
-  if (/\b(corrections?|changes?|revise|revision|fix)\b/.test(normalized)) return "CORRECTIONS_REQUESTED";
-  if (/\?|\b(question|clarify|discussion|call)\b/.test(normalized)) return "QUESTION_OR_CLARIFICATION";
-  return "UNCLASSIFIED";
+  if (/^(thank you|thanks|received|got it|i will review|will review|looking now)\b/.test(normalized)) return "ACKNOWLEDGMENT_ONLY";
+  if (/^(approved with minor corrections|approve with minor corrections|i approve with minor corrections)\b/.test(normalized)) return "APPROVE_WITH_MINOR_CORRECTIONS";
+  if (/^(approved|approve|i approve|i approve!|approved!|yes approved)\b/.test(normalized)) return "APPROVE";
+  if (/\b(corrections?|changes?|revise|revision|fix)\b/.test(normalized)) return "REQUEST_CORRECTIONS";
+  if (/\?|\b(question|clarify|discussion|call)\b/.test(normalized)) return "QUESTION";
+  return "AMBIGUOUS";
 }
 
 async function writeLog(client, input) {
@@ -137,6 +157,40 @@ async function findExecutionLog(client, actionType, idempotencyKey) {
   });
 }
 
+async function findAnyExecutionLog(client, actionTypes, idempotencyKey) {
+  for (const actionType of actionTypes) {
+    const found = await findExecutionLog(client, actionType, idempotencyKey);
+    if (found) return found;
+  }
+  return null;
+}
+
+async function writeStateLog(client, { state, gateId, inboundMessageId, idempotencyKey, description, failed = false }) {
+  return writeLog(client, {
+    actionType: `AUTHOR_INBOUND_MESSAGE_${state}`,
+    name: `AUTHOR_INBOUND_MESSAGE_${state} - ${gateId}`,
+    description:
+      `${description} State=${state}; inboundMessageId=${inboundMessageId}; monitoredMailbox=${PUBLISHING_MAILBOX}; ` +
+      `Idempotency: ${idempotencyKey}.`,
+    sourceEntity: "jm1pub_editorialapprovalgate",
+    sourceRecordId: gateId,
+    failed
+  });
+}
+
+function durableInboundMessageId(reply) {
+  return (
+    normalizeString(reply.internetMessageId) ||
+    normalizeString(reply.inboundMessageId) ||
+    `${normalizeString(reply.senderAddress).toLowerCase() || "unknown"}:${normalizeString(reply.receivedDateTime) || "unknown"}`
+  );
+}
+
+function compactDecisionSource(inboundMessageId) {
+  const normalized = normalizeString(inboundMessageId).replace(/[<>\s]/g, "");
+  return `inbound:${PUBLISHING_MAILBOX}:${normalized.slice(0, 44)}`;
+}
+
 async function findOpenAuthorReviewGates(client, maxGates) {
   return client.list("jm1pub_editorialapprovalgates", {
     $select:
@@ -160,14 +214,53 @@ async function processGateReply(client, gate, deps, triggerSource) {
   const reply = await (deps.readReply || readPublishingMailboxReply)({ subjectContains, afterIso }, deps);
   if (!reply.ok || !reply.found) return { gateId, outcome: "NO_REPLY_FOUND", detail: reply.reason || reply.code || "no_match" };
 
-  const inboundMessageId = normalizeString(reply.inboundMessageId) || `${reply.senderAddress || "unknown"}:${reply.receivedDateTime || "unknown"}`;
+  const inboundMessageId = durableInboundMessageId(reply);
   const idempotencyKey = stableIdempotencyKey(gateId, inboundMessageId);
-  const existing = await findExecutionLog(client, "AUTHOR_RESPONSE_INBOUND_CORRELATED", idempotencyKey);
+  const existing = await findAnyExecutionLog(
+    client,
+    [
+      "AUTHOR_INBOUND_MESSAGE_COMPLETED",
+      "AUTHOR_APPROVAL_PERSISTED",
+      "AUTHOR_CORRECTIONS_REQUESTED",
+      "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW",
+      "AUTHOR_RESPONSE_ACKNOWLEDGMENT_RECORDED"
+    ],
+    idempotencyKey
+  );
   if (existing) return { gateId, outcome: "IDEMPOTENT", detail: "inbound_response_already_processed", executionLogIds: [existing.jm1_executionlogid] };
 
+  const discoveredLog = await writeStateLog(client, {
+    state: RESPONSE_STATES.DISCOVERED,
+    gateId,
+    inboundMessageId,
+    idempotencyKey,
+    description: `Candidate author response discovered by ${triggerSource}; internetMessageId=${reply.internetMessageId || "unknown"}; conversation=${reply.conversationId || "unknown"}.`
+  });
+  const claimedLog = await writeStateLog(client, {
+    state: RESPONSE_STATES.CLAIMED,
+    gateId,
+    inboundMessageId,
+    idempotencyKey,
+    description: "Inbound response claim recorded before classification. Duplicate listener deliveries use the same immutable message identity."
+  });
+  const correlatedLog = await writeStateLog(client, {
+    state: RESPONSE_STATES.CORRELATED,
+    gateId,
+    inboundMessageId,
+    idempotencyKey,
+    description: `Inbound response correlated with CORRELATED_HIGH_CONFIDENCE; subjectProbe="${subjectContains}".`
+  });
   const classification = classifyAuthorReviewResponse(reply.bodyText || "");
   const receivedAt = normalizeString(reply.receivedDateTime) || new Date().toISOString();
-  const source = `inbound:${PUBLISHING_MAILBOX}:${inboundMessageId}`;
+  const source = compactDecisionSource(inboundMessageId);
+  const classifiedLog = await writeStateLog(client, {
+    state: RESPONSE_STATES.CLASSIFIED,
+    gateId,
+    inboundMessageId,
+    idempotencyKey,
+    description: `Author response classified as ${classification}; deterministic rules applied; trigger=${triggerSource}.`,
+    failed: classification === "AMBIGUOUS"
+  });
   const correlationLog = await writeLog(client, {
     actionType: "AUTHOR_RESPONSE_INBOUND_CORRELATED",
     name: `AUTHOR_RESPONSE_INBOUND_CORRELATED - ${gateId}`,
@@ -178,49 +271,107 @@ async function processGateReply(client, gate, deps, triggerSource) {
     sourceRecordId: gateId
   });
 
-  if (classification === "APPROVED_WITHOUT_CHANGES") {
+  if (classification === "APPROVE") {
     await client.patch("jm1pub_editorialapprovalgates", gateId, {
       jm1pub_authordecision: AUTHOR_DECISION_APPROVE,
       jm1pub_authordecisionon: receivedAt,
       jm1pub_authordecisionsource: source,
       jm1pub_authorresponsesummary: "Author approved without changes through monitored publishing mailbox. Automatic approval-event consumer will process the next governed movement."
     });
+    const persistedLog = await writeStateLog(client, {
+      state: RESPONSE_STATES.PERSISTED,
+      gateId,
+      inboundMessageId,
+      idempotencyKey,
+      description: "Author approval decision persisted to the canonical gate path; approval consumer will independently discover the eligible gate."
+    });
     const approvalLog = await writeLog(client, {
-      actionType: "AUTHOR_RESPONSE_APPROVAL_PERSISTED",
-      name: `AUTHOR_RESPONSE_APPROVAL_PERSISTED - ${gateId}`,
+      actionType: "AUTHOR_APPROVAL_PERSISTED",
+      name: `AUTHOR_APPROVAL_PERSISTED - ${gateId}`,
       description: `Author approval persisted from monitored mailbox response; approval event is now eligible for the durable approval consumer. Idempotency: ${idempotencyKey}.`,
       sourceEntity: "jm1pub_editorialapprovalgate",
       sourceRecordId: gateId
     });
-    return { gateId, outcome: "APPROVAL_PERSISTED", detail: "approval_ready_for_approval_event_consumer", executionLogIds: [correlationLog, approvalLog] };
+    const completedLog = await writeStateLog(client, {
+      state: RESPONSE_STATES.COMPLETED,
+      gateId,
+      inboundMessageId,
+      idempotencyKey,
+      description: "Inbound listener completed its responsibility after durable response and decision persistence. It did not call the transition handler."
+    });
+    return {
+      gateId,
+      outcome: "APPROVAL_PERSISTED",
+      detail: "approval_ready_for_approval_event_consumer",
+      processingState: RESPONSE_STATES.COMPLETED,
+      executionLogIds: [discoveredLog, claimedLog, correlatedLog, classifiedLog, correlationLog, persistedLog, approvalLog, completedLog]
+    };
   }
 
-  if (classification === "CORRECTIONS_REQUESTED") {
+  if (classification === "REQUEST_CORRECTIONS") {
     await client.patch("jm1pub_editorialapprovalgates", gateId, {
       jm1pub_authordecision: AUTHOR_DECISION_REQUEST_REVISION,
       jm1pub_authordecisionon: receivedAt,
       jm1pub_authordecisionsource: source,
       jm1pub_authorresponsesummary: "Author requested proofreading corrections through monitored publishing mailbox. Awaiting returns to Publisher/JM1 Automation."
     });
+    const persistedLog = await writeStateLog(client, {
+      state: RESPONSE_STATES.PERSISTED,
+      gateId,
+      inboundMessageId,
+      idempotencyKey,
+      description: "Author correction request persisted to the canonical gate path. No approval event is emitted."
+    });
     const correctionLog = await writeLog(client, {
-      actionType: "AUTHOR_RESPONSE_CORRECTIONS_PERSISTED",
-      name: `AUTHOR_RESPONSE_CORRECTIONS_PERSISTED - ${gateId}`,
+      actionType: "AUTHOR_CORRECTIONS_REQUESTED",
+      name: `AUTHOR_CORRECTIONS_REQUESTED - ${gateId}`,
       description: `Author correction request persisted from monitored mailbox response. No Interior Layout autostart is allowed. Idempotency: ${idempotencyKey}.`,
       sourceEntity: "jm1pub_editorialapprovalgate",
       sourceRecordId: gateId
     });
-    return { gateId, outcome: "CORRECTIONS_PERSISTED", detail: "corrections_ready_for_publisher_runtime", executionLogIds: [correlationLog, correctionLog] };
+    const completedLog = await writeStateLog(client, {
+      state: RESPONSE_STATES.COMPLETED,
+      gateId,
+      inboundMessageId,
+      idempotencyKey,
+      description: "Inbound listener completed correction-response persistence. It did not call the transition handler."
+    });
+    return {
+      gateId,
+      outcome: "CORRECTIONS_PERSISTED",
+      detail: "corrections_ready_for_publisher_runtime",
+      processingState: RESPONSE_STATES.COMPLETED,
+      executionLogIds: [discoveredLog, claimedLog, correlatedLog, classifiedLog, correlationLog, persistedLog, correctionLog, completedLog]
+    };
   }
 
+  const terminalState = classification === "ACKNOWLEDGMENT_ONLY" ? RESPONSE_STATES.COMPLETED : RESPONSE_STATES.BLOCKED;
+  const terminalLog = await writeStateLog(client, {
+    state: terminalState,
+    gateId,
+    inboundMessageId,
+    idempotencyKey,
+    description:
+      classification === "ACKNOWLEDGMENT_ONLY"
+        ? "Acknowledgment-only response preserved; A5 remains open and no approval event is emitted."
+        : `Classification ${classification} requires publisher review before gate movement.`,
+    failed: classification !== "ACKNOWLEDGMENT_ONLY"
+  });
   const reviewLog = await writeLog(client, {
-    actionType: "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW",
-    name: `AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW - ${gateId}`,
+    actionType: classification === "ACKNOWLEDGMENT_ONLY" ? "AUTHOR_RESPONSE_ACKNOWLEDGMENT_RECORDED" : "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW",
+    name: `${classification === "ACKNOWLEDGMENT_ONLY" ? "AUTHOR_RESPONSE_ACKNOWLEDGMENT_RECORDED" : "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW"} - ${gateId}`,
     description: `Author response reached monitored mailbox but classification=${classification}; publisher review required. Idempotency: ${idempotencyKey}.`,
     sourceEntity: "jm1pub_editorialapprovalgate",
     sourceRecordId: gateId,
-    failed: classification === "UNCLASSIFIED"
+    failed: classification !== "ACKNOWLEDGMENT_ONLY"
   });
-  return { gateId, outcome: "PUBLISHER_REVIEW_REQUIRED", detail: classification, executionLogIds: [correlationLog, reviewLog] };
+  return {
+    gateId,
+    outcome: classification === "ACKNOWLEDGMENT_ONLY" ? "ACKNOWLEDGMENT_RECORDED" : "PUBLISHER_REVIEW_REQUIRED",
+    detail: classification,
+    processingState: terminalState,
+    executionLogIds: [discoveredLog, claimedLog, correlatedLog, classifiedLog, correlationLog, terminalLog, reviewLog]
+  };
 }
 
 async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
@@ -231,7 +382,7 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
   for (const gate of gates) results.push(await processGateReply(client, gate, deps, triggerSource));
   return {
     runtimeName: "JM1 Author Review Response Consumer",
-    deploymentEnvironment: "jm1-ed-functions",
+    deploymentEnvironment: "func-jm1-diagnostic-ai-runner",
     triggerType: "Azure Functions timer",
     schedule: "0 */5 * * * *",
     monitoredMailbox: PUBLISHING_MAILBOX,
@@ -251,5 +402,7 @@ module.exports = {
   runAuthorReviewResponseConsumer,
   classifyAuthorReviewResponse,
   stableIdempotencyKey,
-  createDataverseClient
+  createDataverseClient,
+  normalizeConfiguredSecret,
+  compactDecisionSource
 };
