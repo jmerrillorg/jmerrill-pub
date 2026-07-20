@@ -168,6 +168,8 @@ const programRows = publishingPrograms
       sku: program.sku,
       label: program.label,
       price,
+      availability: program.salesAvailability === 'inquiry_only' ? 'Inquiry only' : 'Available',
+      cta: program.permittedCtas[0] || 'Contact Publishing',
     }
   })
 
@@ -442,6 +444,12 @@ export default function PackagesPage() {
               <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-blue-400">{program.sku}</div>
               <h3 className="mt-2 text-[20px] font-semibold text-white">{program.label}</h3>
               <p className="mt-3 text-[14px] font-light text-white/60">{program.price}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="rounded-full bg-white/10 px-3 py-1 text-[12px] text-white/55">{program.availability}</span>
+                <Link href="/join" className="rounded-full bg-blue-500 px-3 py-1 text-[12px] font-semibold text-white hover:bg-blue-600">
+                  {program.cta}
+                </Link>
+              </div>
             </div>
           ))}
         </div>

@@ -8,6 +8,10 @@ import {
   nav,
 } from '@/lib/tokens'
 
+// Engine: Workspace Rendering Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 // ─────────────────────────────────────────
 // SECTION KICKER
 // ─────────────────────────────────────────

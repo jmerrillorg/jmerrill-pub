@@ -1,10 +1,47 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 const catalog = readFileSync('lib/commercial/catalog.ts', 'utf8')
 const packagesPage = readFileSync('app/packages/page.tsx', 'utf8')
 const tokens = readFileSync('lib/tokens.ts', 'utf8')
+const dataverseExportPath = 'data/commercial/dataverse-commercial-catalog-export.json'
+
+function dataverseDivergenceCheck() {
+  if (!existsSync(dataverseExportPath)) {
+    return { ok: true, mode: 'pending-export' }
+  }
+
+  const exportJson = JSON.parse(readFileSync(dataverseExportPath, 'utf8'))
+  const requiredSkus = [
+    ['JMP-PKG-STARTER', 1999],
+    ['JMP-PKG-PRO', 4500],
+    ['JMP-PKG-PREMIER', 7500],
+    ['JMP-EDT-PB-STD', 350],
+    ['JMP-EDT-HC-STD', 350],
+    ['JMP-EDT-EB-STD', 350],
+    ['JMP-EDT-LP-STD', 350],
+    ['JMP-EDT-LP-CPLX', 600],
+    ['JMP-ACC-EPUB-ENH', 1000],
+    ['JMP-AUD-SYNTH-STD', 500],
+    ['JMP-SER-DIGITAL-06', 600],
+    ['JMP-SER-DIGITAL-12', 1000],
+    ['JMP-INT-EPUB3-STD', 1500],
+  ]
+  const rows = Array.isArray(exportJson.priceRules) ? exportJson.priceRules : []
+  const missing = requiredSkus.filter(([sku, amount]) => {
+    return !rows.some((row) => row.sku === sku && Number(row.amount) === amount)
+  })
+  return { ok: missing.length === 0, mode: 'export-checked', missing }
+}
 
 const checks = [
+  {
+    name: 'catalog.ts is labeled as a derived projection with transition metadata',
+    pass: () =>
+      catalog.includes('commercialProjectionMetadata') &&
+      catalog.includes('seed_matrix_projection') &&
+      catalog.includes('Dataverse Price Rule and commercial catalog records') &&
+      !catalog.includes('canonical commercial source'),
+  },
   {
     name: 'product form option set has exactly eight values and no PF-05C',
     pass: () =>
@@ -69,6 +106,24 @@ const checks = [
       catalog.includes('slotEligible: false') &&
       catalog.includes("productForm: 'PF-08'") &&
       catalog.includes('slotViolations.length === 0'),
+  },
+  {
+    name: 'Dataverse divergence check is armed for post-Slice-2 export',
+    pass: () => dataverseDivergenceCheck().ok,
+  },
+  {
+    name: 'legal-pending public programs are inquiry-only and never immediate checkout',
+    pass: () =>
+      ['JMP-SER-DIGITAL-06', 'JMP-SER-DIGITAL-12', 'JMP-AUD-FIRST-DEV', 'JMP-INT-EPUB3-STD'].every((sku) =>
+        catalog.includes(`sku: '${sku}'`),
+      ) &&
+      catalog.includes("salesAvailability: 'inquiry_only'") &&
+      catalog.includes("legalStatus: 'legal_language_pending'") &&
+      catalog.includes("commercialPriceStatus: 'approved'") &&
+      packagesPage.includes('Inquiry only') &&
+      !packagesPage.includes('Buy Now') &&
+      !packagesPage.includes('Add to Package') &&
+      !packagesPage.includes('Checkout'),
   },
   {
     name: 'webtoon pricing remains non-public and provisional',

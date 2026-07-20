@@ -2,15 +2,15 @@
 
 Source: `JMP_Package_Edition_Program_Pricing_SKU_Matrix_v1.1.docx`
 
-Status: implementation source and validation guard activated in repository. Live Dataverse and Business Central promotion remains gated by ALM/package approval.
+Status: derived projection and validation guard activated in repository. Dataverse is the operational system of record once Slice 2 is deployed. Live Dataverse and Business Central promotion remains gated by ALM/package approval.
 
 ## Dataverse Component Inventory
 
 | Component | Purpose | Implementation disposition |
 |---|---|---|
-| Publishing Package | Starter, Professional, Premier package records | Canonical source in `lib/commercial/catalog.ts`; Dataverse table/seed promotion pending solution deployment |
-| Edition Catalog Definition | Product-form catalog level, not title instance | Canonical source activated; table/seed promotion pending |
-| Publishing Program | Serialization, audio-first, interactive, custom, provisional GFX | Canonical source activated; public/private flags enforced |
+| Publishing Package | Starter, Professional, Premier package records | Derived projection in `lib/commercial/catalog.ts`; Dataverse table/seed promotion pending solution deployment |
+| Edition Catalog Definition | Product-form catalog level, not title instance | Derived projection activated; table/seed promotion pending |
+| Publishing Program | Serialization, audio-first, interactive, custom, provisional GFX | Derived projection activated; public/private and inquiry-only flags enforced |
 | Package Edition Entitlement | Package slot count and eligible edition rules | Guarded by canonical package and edition definitions |
 | Package Included Service | Included services by package | Canonical service statements activated for public copy; detailed service table pending solution promotion |
 | Premium Upcharge Rule | In-slot premium rules for complex large print and complex accessibility | Canonical price rules activated |
@@ -81,4 +81,3 @@ Exactly eight values are active in source:
 | Custom browser/custom work | Quote/SOW | Quote/SOW Item | SOW only |
 
 Funding track controls payer and invoice responsibility. It does not change SKU identity.
-

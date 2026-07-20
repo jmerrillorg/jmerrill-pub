@@ -6,13 +6,20 @@ Canonical source: `JMP_Package_Edition_Program_Pricing_SKU_Matrix_v1.1.docx`
 
 ## Summary
 
-The Matrix v1.1 package, edition, program, pricing, and SKU architecture has been activated in repository source as a canonical commercial architecture module with validation guards and public catalog mapping. Production promotion to live Dataverse schema, Business Central items, and executable contract schedules remains gated.
+The Matrix v1.1 package, edition, program, pricing, and SKU architecture has been activated in repository source as a transitional derived website projection with validation guards and public catalog mapping. Dataverse is the future operational system of record. Production promotion to live Dataverse schema, Business Central items, and executable contract schedules remains gated.
 
 ## Schema and Relationship Evidence
 
 Canonical source file:
 
 - `lib/commercial/catalog.ts`
+
+Projection metadata:
+
+- Current hierarchy: Matrix v1.1 approved seed -> derived website projection -> rendering
+- Post-Slice-2 hierarchy: Dataverse Price Rule and commercial catalog records -> generated/validated website projection -> rendering
+- Source status: `seed_matrix_projection`
+- Future divergence check: armed for `data/commercial/dataverse-commercial-catalog-export.json`
 
 The source defines:
 
@@ -89,6 +96,16 @@ Public catalog does not expose:
 - implementation status
 - Council commentary
 
+Legal-pending programs now render as inquiry-only:
+
+- Serialized Release
+- Audio-First Origination
+- Interactive EPUB 3
+- Custom Browser-Based Edition
+- Custom Scoped Work
+
+Permitted public actions are consultation/inquiry/scope requests only. Immediate checkout, Buy Now, Add to Package, automated contract acceptance, and automated production commitment are prohibited.
+
 ## Contract Schedule Mapping
 
 Evidence file:
@@ -134,15 +151,19 @@ The guard verifies:
 
 ## Execution-Log Evidence
 
-Edition lifecycle event types are defined in source:
+Edition lifecycle event types are specified in:
+
+- `docs/operations/generated/2026-07-20-JMP-Edition-Lifecycle-Executionlog-Event-Specification.md`
+
+Event types:
 
 - `TITLE_EDITION_CREATED`
 - `TITLE_EDITION_STATUS_TRANSITIONED`
-- `TITLE_EDITION_VALIDATION_GATE_INITIATED`
-- `TITLE_EDITION_VALIDATION_GATE_PASSED`
-- `TITLE_EDITION_VALIDATION_GATE_FAILED`
-- `TITLE_EDITION_DISTRIBUTION_SUBMITTED`
-- `TITLE_EDITION_DISTRIBUTOR_ACCEPTANCE_RECEIVED`
+- `EDITION_VALIDATION_GATE_INITIATED`
+- `EDITION_VALIDATION_GATE_PASSED`
+- `EDITION_VALIDATION_GATE_FAILED`
+- `EDITION_DISTRIBUTION_SUBMITTED`
+- `EDITION_DISTRIBUTOR_ACCEPTED`
 - `TITLE_EDITION_LIVE`
 - `TITLE_EDITION_RETIRED`
 
@@ -168,4 +189,3 @@ No live Dataverse, BC, distribution, contract, or financial posting change was m
 - Human-in-the-loop validation gate must be enforced before ENH/CPLX editions move to live distribution.
 
 Final boundary: production promotion requires final evidence package and explicit Jackie approval. This activation implements the canonical architecture source, guardrails, website mapping, and schedule/crosswalk evidence only.
-

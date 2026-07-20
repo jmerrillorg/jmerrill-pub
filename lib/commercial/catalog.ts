@@ -3,6 +3,38 @@ export type MoneyAmount = {
   currency: 'USD'
 }
 
+export type ProjectionSourceStatus = 'seed_matrix_projection' | 'dataverse_projection'
+export type SalesAvailability = 'public' | 'inquiry_only' | 'non_public'
+export type LegalStatus = 'approved' | 'legal_language_pending' | 'provisional_validation_required'
+export type CommercialPriceStatus = 'approved' | 'provisional' | 'quote_required'
+
+export const commercialProjectionMetadata = {
+  projectionName: 'JMP commercial website projection',
+  projectionStatus: 'seed_matrix_projection',
+  schemaVersion: 'commercial-projection.v1',
+  sourceArtifact: 'JMP_Package_Edition_Program_Pricing_SKU_Matrix_v1.1.docx',
+  sourceVersion: 'Matrix v1.1',
+  sourceHierarchyNow: 'Matrix v1.1 approved seed -> derived website projection -> rendering',
+  sourceHierarchyAfterDataverseDeployment:
+    'Dataverse Price Rule and commercial catalog records -> generated/validated website projection -> rendering',
+  approvalStatus: 'Jackie-approved seed; Dataverse operational source pending Slice 2',
+  generatedAt: '2026-07-20T00:49:54Z',
+  validatedAt: '2026-07-20T00:49:54Z',
+  sourceHash: null,
+} as const satisfies {
+  projectionName: string
+  projectionStatus: ProjectionSourceStatus
+  schemaVersion: string
+  sourceArtifact: string
+  sourceVersion: string
+  sourceHierarchyNow: string
+  sourceHierarchyAfterDataverseDeployment: string
+  approvalStatus: string
+  generatedAt: string
+  validatedAt: string
+  sourceHash: string | null
+}
+
 export type ProductFormCode =
   | 'PF-01'
   | 'PF-02'
@@ -199,15 +231,90 @@ export const priceRules = [
 }[]
 
 export const publishingPrograms = [
-  { sku: 'JMP-SER-DIGITAL-06', label: 'Serialized Release — 6 installments', public: true },
-  { sku: 'JMP-SER-DIGITAL-12', label: 'Serialized Release — 12 installments', public: true },
-  { sku: 'JMP-AUD-FIRST-DEV', label: 'Audio-First Origination', public: true },
-  { sku: 'JMP-GFX-WEBTOON-PILOT', label: 'Webtoon Pilot Episode', public: false, provisional: true },
-  { sku: 'JMP-GFX-WEBTOON-12', label: 'Webtoon Season — 12 episodes', public: false, provisional: true },
-  { sku: 'JMP-INT-EPUB3-STD', label: 'Interactive EPUB 3 Edition', public: true },
-  { sku: 'JMP-INT-WEB-CUSTOM', label: 'Custom Browser-Based Edition', public: true },
-  { sku: 'JMP-CUS-SOW', label: 'Custom Scoped Work', public: true },
-] as const
+  {
+    sku: 'JMP-SER-DIGITAL-06',
+    label: 'Serialized Release — 6 installments',
+    public: true,
+    salesAvailability: 'inquiry_only',
+    legalStatus: 'legal_language_pending',
+    commercialPriceStatus: 'approved',
+    permittedCtas: ['Request a Consultation', 'Discuss This Program', 'Begin an Inquiry'],
+  },
+  {
+    sku: 'JMP-SER-DIGITAL-12',
+    label: 'Serialized Release — 12 installments',
+    public: true,
+    salesAvailability: 'inquiry_only',
+    legalStatus: 'legal_language_pending',
+    commercialPriceStatus: 'approved',
+    permittedCtas: ['Request a Consultation', 'Discuss This Program', 'Begin an Inquiry'],
+  },
+  {
+    sku: 'JMP-AUD-FIRST-DEV',
+    label: 'Audio-First Origination',
+    public: true,
+    salesAvailability: 'inquiry_only',
+    legalStatus: 'legal_language_pending',
+    commercialPriceStatus: 'approved',
+    permittedCtas: ['Request a Consultation', 'Request a Custom Scope', 'Begin an Inquiry'],
+  },
+  {
+    sku: 'JMP-GFX-WEBTOON-PILOT',
+    label: 'Webtoon Pilot Episode',
+    public: false,
+    provisional: true,
+    salesAvailability: 'non_public',
+    legalStatus: 'provisional_validation_required',
+    commercialPriceStatus: 'provisional',
+    permittedCtas: [],
+  },
+  {
+    sku: 'JMP-GFX-WEBTOON-12',
+    label: 'Webtoon Season — 12 episodes',
+    public: false,
+    provisional: true,
+    salesAvailability: 'non_public',
+    legalStatus: 'provisional_validation_required',
+    commercialPriceStatus: 'provisional',
+    permittedCtas: [],
+  },
+  {
+    sku: 'JMP-INT-EPUB3-STD',
+    label: 'Interactive EPUB 3 Edition',
+    public: true,
+    salesAvailability: 'inquiry_only',
+    legalStatus: 'legal_language_pending',
+    commercialPriceStatus: 'approved',
+    permittedCtas: ['Discuss This Program', 'Request a Custom Scope', 'Begin an Inquiry'],
+  },
+  {
+    sku: 'JMP-INT-WEB-CUSTOM',
+    label: 'Custom Browser-Based Edition',
+    public: true,
+    salesAvailability: 'inquiry_only',
+    legalStatus: 'legal_language_pending',
+    commercialPriceStatus: 'quote_required',
+    permittedCtas: ['Request a Custom Scope', 'Contact Publishing', 'Begin an Inquiry'],
+  },
+  {
+    sku: 'JMP-CUS-SOW',
+    label: 'Custom Scoped Work',
+    public: true,
+    salesAvailability: 'inquiry_only',
+    legalStatus: 'legal_language_pending',
+    commercialPriceStatus: 'quote_required',
+    permittedCtas: ['Request a Custom Scope', 'Contact Publishing', 'Begin an Inquiry'],
+  },
+] as const satisfies readonly {
+  sku: string
+  label: string
+  public: boolean
+  provisional?: boolean
+  salesAvailability: SalesAvailability
+  legalStatus: LegalStatus
+  commercialPriceStatus: CommercialPriceStatus
+  permittedCtas: readonly string[]
+}[]
 
 export const commercialTables = [
   'Publishing Package',
@@ -251,11 +358,11 @@ export const titleEditionRequiredFields = [
 export const executionEventTypes = [
   'TITLE_EDITION_CREATED',
   'TITLE_EDITION_STATUS_TRANSITIONED',
-  'TITLE_EDITION_VALIDATION_GATE_INITIATED',
-  'TITLE_EDITION_VALIDATION_GATE_PASSED',
-  'TITLE_EDITION_VALIDATION_GATE_FAILED',
-  'TITLE_EDITION_DISTRIBUTION_SUBMITTED',
-  'TITLE_EDITION_DISTRIBUTOR_ACCEPTANCE_RECEIVED',
+  'EDITION_VALIDATION_GATE_INITIATED',
+  'EDITION_VALIDATION_GATE_PASSED',
+  'EDITION_VALIDATION_GATE_FAILED',
+  'EDITION_DISTRIBUTION_SUBMITTED',
+  'EDITION_DISTRIBUTOR_ACCEPTED',
   'TITLE_EDITION_LIVE',
   'TITLE_EDITION_RETIRED',
 ] as const
