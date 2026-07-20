@@ -293,7 +293,7 @@ export const publishingPrograms = [
     public: true,
     salesAvailability: 'inquiry_only',
     legalStatus: 'legal_language_pending',
-    commercialPriceStatus: 'quote_required',
+    commercialPriceStatus: 'approved',
     permittedCtas: ['Request a Custom Scope', 'Contact Publishing', 'Begin an Inquiry'],
   },
   {
@@ -302,7 +302,7 @@ export const publishingPrograms = [
     public: true,
     salesAvailability: 'inquiry_only',
     legalStatus: 'legal_language_pending',
-    commercialPriceStatus: 'quote_required',
+    commercialPriceStatus: 'approved',
     permittedCtas: ['Request a Custom Scope', 'Contact Publishing', 'Begin an Inquiry'],
   },
 ] as const satisfies readonly {

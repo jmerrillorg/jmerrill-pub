@@ -2,7 +2,7 @@
 
 Authority: Jackie Smith, Jr.
 
-Canonical source: `JMP_Package_Edition_Program_Pricing_SKU_Matrix_v1.1.docx`
+Approved seed source: `JMP_Package_Edition_Program_Pricing_SKU_Matrix_v1.1.docx`
 
 ## Summary
 
@@ -10,7 +10,7 @@ The Matrix v1.1 package, edition, program, pricing, and SKU architecture has bee
 
 ## Schema and Relationship Evidence
 
-Canonical source file:
+Derived website projection file:
 
 - `lib/commercial/catalog.ts`
 
