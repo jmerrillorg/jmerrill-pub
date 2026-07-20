@@ -37,6 +37,21 @@ const ACTIVE_STAGE_STATUSES = new Set([
 
 const COMPLETED_STAGE_STATUSES = new Set(['complete', 'completed', 'delivered', 'approved'])
 
+const TEST_TITLE_PATTERNS = [
+  /^test\b/i,
+  /^case [bc]\b/i,
+  /^author_/i,
+  /^editorial_/i,
+  /^proofreading_/i,
+  /^package_/i,
+  /^active_/i,
+  /^jm1_/i,
+]
+
+export function isProductionTitleContaminant(titleName: string) {
+  return TEST_TITLE_PATTERNS.some((pattern) => pattern.test(titleName.trim()))
+}
+
 export function classifyTitlePortfolio({
   title,
   assets,
@@ -63,6 +78,22 @@ export function classifyTitlePortfolio({
   const assetFormats = unique(assets.map((asset) => formatted(asset, 'jm1pub_assetformat')).filter(Boolean))
   const isbn13s = unique(assetsWithIsbn.map((asset) => stringValue(asset.jm1pub_isbn13)).filter(Boolean))
   const evidence: string[] = []
+
+  if (isProductionTitleContaminant(titleName)) {
+    return {
+      state: 'reconciliation_required',
+      label: 'Production Test Contamination',
+      evidence: [`Rejected from active title population: ${titleName}`],
+      confidence: 'high',
+      exceptionReason:
+        'Record matches a test fixture or execution-event naming pattern and must not be returned as a canonical title.',
+      catalogStatus: publicCatalogStatus,
+      distributionStatus: distributionStatuses.join(', '),
+      publicationStatus,
+      activeFormats: assetFormats,
+      isbn13s,
+    }
+  }
 
   if (titleStage) evidence.push(`title stage: ${titleStage}`)
   if (publicCatalogStatus) evidence.push(`public catalog status: ${publicCatalogStatus}`)

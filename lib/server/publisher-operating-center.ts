@@ -1950,47 +1950,47 @@ function deriveWorkloadExecutionModel(input: {
   }
   if (input.state === 'Proofreading In Progress' || input.state === 'Proofreading - Internal QA') {
     return {
-      executionMode: 'CODY_ASSISTED_BRIDGE',
-      executionState: 'EXECUTING',
+      executionMode: 'AUTOMATIC_SCHEDULED',
+      executionState: input.state === 'Proofreading - Internal QA' ? 'VALIDATING' : 'EXECUTING',
       businessOwner: 'Publisher',
-      executionOwner: 'Cody Bridge',
-      runtime: 'Cody-assisted editorial bridge until CAP-004 proofreading runtime is deployed',
-      runtimeCostCategory: 'Codex interactive/model',
-      awaiting: 'Cody-assisted bridge',
+      executionOwner: 'JM1 Automation',
+      runtime: 'JM1 Editorial Execution Runtime - Proofreading executor',
+      runtimeCostCategory: 'Azure compute',
+      awaiting: 'JM1 Automation',
       lastTrigger: 'Publisher-approved proofreading start',
       lastExecution: input.latestExecutionEvidence,
-      expectedDuration: 'Bridge dependent',
-      exactBlocker: 'Permanent Proofreading runtime not yet commissioned; current work uses controlled bridge execution.',
+      expectedDuration: 'Runtime SLA controlled',
+      exactBlocker: deriveNextAction(input.state, '') || 'Proofreading executor is responsible for next output, QA, or exact exception.',
     }
   }
   if (input.state === 'Developmental Editing - In Progress' || input.state === 'Line Editing - In Progress') {
     return {
-      executionMode: 'CODY_ASSISTED_BRIDGE',
+      executionMode: 'AUTOMATIC_SCHEDULED',
       executionState: 'EXECUTING',
       businessOwner: 'Publisher',
-      executionOwner: 'Cody Bridge',
-      runtime: 'Cody-assisted editorial bridge until the capability runtime is commissioned',
-      runtimeCostCategory: 'Codex interactive/model',
-      awaiting: 'Cody-assisted bridge',
+      executionOwner: 'JM1 Automation',
+      runtime: 'JM1 Editorial Execution Runtime - editorial executor',
+      runtimeCostCategory: 'Azure compute',
+      awaiting: 'JM1 Automation',
       lastTrigger: 'Publisher-approved stage start',
       lastExecution: input.latestExecutionEvidence,
-      expectedDuration: 'Bridge dependent',
-      exactBlocker: 'Permanent editorial execution runtime not yet commissioned for this active stage.',
+      expectedDuration: 'Runtime SLA controlled',
+      exactBlocker: deriveNextAction(input.state, '') || 'Editorial executor is responsible for next output, QA, or exact exception.',
     }
   }
   if (input.state === 'Editorial Review') {
     return {
-      executionMode: 'CODY_ASSISTED_BRIDGE',
+      executionMode: 'AUTOMATIC_SCHEDULED',
       executionState: 'QUEUED',
       businessOwner: 'Publisher',
-      executionOwner: 'Cody Bridge',
-      runtime: 'Cody-assisted editorial review bridge until event-driven Stage 0 runtime is promoted',
-      runtimeCostCategory: 'Codex interactive/model',
-      awaiting: 'Cody-assisted bridge',
+      executionOwner: 'JM1 Automation',
+      runtime: 'JM1 Editorial Execution Runtime - Editorial Review executor',
+      runtimeCostCategory: 'Azure compute',
+      awaiting: 'JM1 Automation',
       lastTrigger: 'Core editorial stage active',
       lastExecution: input.latestExecutionEvidence,
-      expectedDuration: 'Bridge dependent',
-      exactBlocker: 'Permanent Editorial Review runtime not yet commissioned for this title.',
+      expectedDuration: 'Runtime SLA controlled',
+      exactBlocker: 'Editorial Review executor is responsible for assessment output, QA, or exact exception.',
     }
   }
   if (input.state === 'External Hold') {
