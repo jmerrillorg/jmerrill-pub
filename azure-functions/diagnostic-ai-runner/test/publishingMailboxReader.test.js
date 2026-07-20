@@ -2,7 +2,12 @@
 
 const { describe, test, beforeEach, afterEach } = require("node:test");
 const assert = require("node:assert/strict");
-const { readPublishingMailboxReply, GATE_NAME, PUBLISHING_MAILBOX } = require("../src/mail/publishingMailboxReader");
+const {
+  readPublishingMailboxReply,
+  GATE_NAME,
+  PUBLISHING_MAILBOX,
+  extractAuthorReplyText
+} = require("../src/mail/publishingMailboxReader");
 
 const originalFetch = global.fetch;
 const originalEnv = { [GATE_NAME]: process.env[GATE_NAME] };
@@ -48,6 +53,8 @@ function message(overrides = {}) {
   return {
     subject: "Next steps for Establishing Glory: The Library — Professional Publishing Package",
     from: { emailAddress: { address: "chosen2k7@gmail.com", name: "Jackie Smith Jr" } },
+    toRecipients: [{ emailAddress: { address: PUBLISHING_MAILBOX, name: "J Merrill Publishing" } }],
+    ccRecipients: [],
     receivedDateTime: "2026-06-21T02:00:00Z",
     bodyPreview: "8 payments",
     body: { content: "8 payments", contentType: "text" },
@@ -113,6 +120,62 @@ describe("readPublishingMailboxReply — mailbox scope", () => {
     const calls = mockFetchSequence([graphMessagesResponse([message()])]);
     await readPublishingMailboxReply({ subjectContains: SUBJECT, afterIso: AFTER_ISO }, FAKE_TOKEN_DEPS);
     assert.equal(calls[0].options.method, "GET");
+  });
+});
+
+describe("readPublishingMailboxReply — author-response filtering", () => {
+  test("ignores outbound publishing copies even when the subject and body mention corrections", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([
+      graphMessagesResponse([
+        message({
+          id: "outbound-copy",
+          internetMessageId: "<outbound-copy@example>",
+          subject: "Reply Requested: Proofreading Review Package - The Intentional Leader",
+          from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
+          toRecipients: [{ emailAddress: { address: "chosen2k7@gmail.com" } }],
+          ccRecipients: [{ emailAddress: { address: PUBLISHING_MAILBOX } }],
+          receivedDateTime: "2026-07-19T23:16:51Z",
+          body: { content: "Please resend your approval, requested corrections, or question." },
+          conversationId: "conv"
+        })
+      ])
+    ]);
+    const result = await readPublishingMailboxReply({ subjectContains: "Proofreading Review Package", afterIso: AFTER_ISO }, FAKE_TOKEN_DEPS);
+
+    assert.equal(result.ok, true);
+    assert.equal(result.found, false);
+    assert.equal(result.code, "NO_MATCHING_REPLY_FOUND");
+  });
+
+  test("ignores quoted-only self replies", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([
+      graphMessagesResponse([
+        message({
+          id: "self-reply",
+          internetMessageId: "<self-reply@example>",
+          subject: "Re: Reply Requested: Proofreading Review Package - The Intentional Leader",
+          from: { emailAddress: { address: PUBLISHING_MAILBOX } },
+          toRecipients: [{ emailAddress: { address: PUBLISHING_MAILBOX } }],
+          ccRecipients: [],
+          receivedDateTime: "2026-07-20T07:01:28Z",
+          body: { content: "From: J Merrill Publishing <publishing@email.jmerrill.one>\nPlease resend your approval, requested corrections, or question." },
+          conversationId: "conv"
+        })
+      ])
+    ]);
+    const result = await readPublishingMailboxReply({ subjectContains: "Proofreading Review Package", afterIso: AFTER_ISO }, FAKE_TOKEN_DEPS);
+
+    assert.equal(result.ok, true);
+    assert.equal(result.found, false);
+  });
+
+  test("extracts only the author's text above quoted history", () => {
+    assert.equal(
+      extractAuthorReplyText("I approve!\n\nFrom: J Merrill Publishing <publishing@email.jmerrill.one>\nPlease review."),
+      "I approve!"
+    );
   });
 });
 

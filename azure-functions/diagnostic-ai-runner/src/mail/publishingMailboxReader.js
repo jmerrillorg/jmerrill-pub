@@ -34,6 +34,10 @@ const PUBLISHING_MAILBOX = "publishing@jmerrill.one";
 const GRAPH_SCOPE = "https://graph.microsoft.com/.default";
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 const MAX_MESSAGES_FETCHED = 25;
+const INTERNAL_PUBLISHING_SENDERS = Object.freeze([
+  "publishing@email.jmerrill.one",
+  "publishing@jmerrill.one"
+]);
 
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -45,6 +49,30 @@ function isGateOpen() {
 
 function blocked(reason, extra = {}) {
   return { ok: false, code: "PUBLISHING_MAILBOX_READ_BLOCKED", reason, ...extra };
+}
+
+function normalizeRecipients(value) {
+  return Array.isArray(value)
+    ? value.map((r) => normalizeString(r?.emailAddress?.address).toLowerCase()).filter(Boolean)
+    : [];
+}
+
+function isInternalPublishingSender(address) {
+  return INTERNAL_PUBLISHING_SENDERS.includes(normalizeString(address).toLowerCase());
+}
+
+function extractAuthorReplyText(bodyText) {
+  const text = normalizeString(bodyText);
+  if (!text) return "";
+  const lines = text.split(/\r?\n/);
+  const replyLines = [];
+  for (const line of lines) {
+    if (/^\s*from:\s+/i.test(line)) break;
+    if (/^\s*on .+ wrote:\s*$/i.test(line)) break;
+    if (/^\s*-{2,}\s*original message\s*-{2,}\s*$/i.test(line)) break;
+    replyLines.push(line);
+  }
+  return normalizeString(replyLines.join("\n"));
 }
 
 async function getGraphToken(deps = {}) {
@@ -140,23 +168,35 @@ async function readPublishingMailboxReply(input = {}, deps = {}) {
   }
 
   const subjectLower = subjectContains.toLowerCase();
-  const matches = messages.filter((m) => normalizeString(m.subject).toLowerCase().includes(subjectLower));
+  const candidates = messages
+    .map((m) => {
+      const senderAddress = normalizeString(m.from?.emailAddress?.address).toLowerCase();
+      const toRecipients = normalizeRecipients(m.toRecipients);
+      const ccRecipients = normalizeRecipients(m.ccRecipients);
+      const bodyText = normalizeString(m.body?.content) || normalizeString(m.bodyPreview) || "";
+      const authorReplyText = extractAuthorReplyText(bodyText);
+      return {
+        raw: m,
+        senderAddress,
+        toRecipients,
+        ccRecipients,
+        authorReplyText
+      };
+    })
+    .filter((m) => normalizeString(m.raw.subject).toLowerCase().includes(subjectLower))
+    .filter((m) => !isInternalPublishingSender(m.senderAddress))
+    .filter((m) => m.toRecipients.includes(PUBLISHING_MAILBOX))
+    .filter((m) => Boolean(m.authorReplyText));
 
-  if (matches.length === 0) {
+  if (candidates.length === 0) {
     return { ok: true, code: "NO_MATCHING_REPLY_FOUND", found: false, senderAddress: null, receivedDateTime: null, bodyText: null };
   }
 
   // Most recent match — messages were already ordered desc by receivedDateTime.
-  const latest = matches[0];
-  const senderAddress = normalizeString(latest.from?.emailAddress?.address).toLowerCase() || null;
+  const latestCandidate = candidates[0];
+  const latest = latestCandidate.raw;
+  const senderAddress = latestCandidate.senderAddress || null;
   const receivedDateTime = normalizeString(latest.receivedDateTime) || null;
-  const bodyText = normalizeString(latest.body?.content) || normalizeString(latest.bodyPreview) || "";
-  const toRecipients = Array.isArray(latest.toRecipients)
-    ? latest.toRecipients.map((r) => normalizeString(r?.emailAddress?.address).toLowerCase()).filter(Boolean)
-    : [];
-  const ccRecipients = Array.isArray(latest.ccRecipients)
-    ? latest.ccRecipients.map((r) => normalizeString(r?.emailAddress?.address).toLowerCase()).filter(Boolean)
-    : [];
 
   return {
     ok: true,
@@ -166,10 +206,10 @@ async function readPublishingMailboxReply(input = {}, deps = {}) {
     internetMessageId: normalizeString(latest.internetMessageId) || null,
     conversationId: normalizeString(latest.conversationId) || null,
     senderAddress,
-    toRecipients,
-    ccRecipients,
+    toRecipients: latestCandidate.toRecipients,
+    ccRecipients: latestCandidate.ccRecipients,
     receivedDateTime,
-    bodyText
+    bodyText: latestCandidate.authorReplyText
   };
 }
 
@@ -177,5 +217,7 @@ module.exports = {
   readPublishingMailboxReply,
   GATE_NAME,
   PUBLISHING_MAILBOX,
-  MAX_MESSAGES_FETCHED
+  MAX_MESSAGES_FETCHED,
+  INTERNAL_PUBLISHING_SENDERS,
+  extractAuthorReplyText
 };
