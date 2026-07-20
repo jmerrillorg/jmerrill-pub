@@ -251,7 +251,26 @@ async function findSourceArtifact(client, stage) {
     $orderby: "modifiedon desc",
     $top: "20"
   }).catch(() => []);
-  return rows.find((row) => normalizeString(row.jm1pub_repositoryitemid || row.jm1pub_repositorypath || row.jm1pub_sha256)) || null;
+  const candidates = rows.filter((row) => normalizeString(row.jm1pub_repositoryitemid || row.jm1pub_repositorypath || row.jm1pub_sha256));
+  return (
+    candidates.find((row) => {
+      const name = normalizeString(row.jm1pub_editorialartifactname).toLowerCase();
+      const filename = normalizeString(row.jm1pub_filename).toLowerCase();
+      return (
+        row.jm1pub_iscurrentapproved === true &&
+        (name.includes("governed source manuscript") ||
+          name.includes("source manuscript") ||
+          name.includes("manuscript review copy") ||
+          filename.endsWith(".docx") ||
+          filename.endsWith(".doc"))
+      );
+    }) ||
+    candidates.find((row) => {
+      const filename = normalizeString(row.jm1pub_filename).toLowerCase();
+      return row.jm1pub_iscurrentapproved === true && !filename.endsWith(".md") && !filename.endsWith(".pdf");
+    }) ||
+    null
+  );
 }
 
 function buildExactBlocker(stageCode, sourceArtifact) {
@@ -597,6 +616,7 @@ module.exports = {
   STAGE_STATUS,
   STAGE_TYPES,
   buildExactBlocker,
+  findSourceArtifact,
   normalizeStageCode,
   runEditorialExecutionRuntime
 };

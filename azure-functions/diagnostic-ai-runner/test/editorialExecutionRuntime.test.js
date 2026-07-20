@@ -6,6 +6,7 @@ const test = require("node:test");
 const {
   EXECUTOR_POLICIES,
   buildExactBlocker,
+  findSourceArtifact,
   normalizeStageCode,
   runEditorialExecutionRuntime
 } = require("../src/editorial/editorialExecutionRuntime");
@@ -74,4 +75,33 @@ test("runtime claims active tasks and records exact blockers instead of generic 
   assert.equal(logs.some((log) => log.jm1_actiontype === "ACTIVE_EDITORIAL_TASK_CLAIMED"), true);
   assert.equal(logs.some((log) => log.jm1_actiontype === "ACTIVE_EDITORIAL_OUTPUT_BLOCKED"), true);
   assert.equal(patches[0].payload.jm1pub_internaloperationalsummary.includes("SOURCE_ARTIFACT_MISSING"), true);
+});
+
+test("source selection ignores generated runtime output artifacts", async () => {
+  const client = {
+    async list(entitySet) {
+      assert.equal(entitySet, "jm1pub_editorialartifacts");
+      return [
+        {
+          jm1pub_editorialartifactid: "qa-output",
+          jm1pub_editorialartifactname: "Editorial Review QA Evidence - The Long Watch",
+          jm1pub_filename: "2026-07-20-The-Long-Watch-Editorial-Review-QA-Evidence.md",
+          jm1pub_repositoryitemid: "output-item",
+          jm1pub_iscurrentapproved: false
+        },
+        {
+          jm1pub_editorialartifactid: "source-manuscript",
+          jm1pub_editorialartifactname: "Governed Source Manuscript - The Long Watch",
+          jm1pub_filename: "The Long Watch.docx",
+          jm1pub_repositoryitemid: "source-item",
+          jm1pub_iscurrentapproved: true
+        }
+      ];
+    }
+  };
+  const selected = await findSourceArtifact(client, {
+    jm1pub_editorialstageid: "stage-1",
+    _jm1pub_titleid_value: "title-1"
+  });
+  assert.equal(selected.jm1pub_editorialartifactid, "source-manuscript");
 });
