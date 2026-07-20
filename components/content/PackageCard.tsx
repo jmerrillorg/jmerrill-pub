@@ -31,7 +31,9 @@ export function PackageCard({ pkg, dark = false }: { pkg: PublishingPackageRecor
       <div className={`mt-2 text-[44px] font-bold leading-none ${dark ? 'text-white' : 'text-charcoal'}`}>
         ${pkg.price.toLocaleString()}
       </div>
-      <p className={`mt-1 text-[12px] ${dark ? 'text-white/30' : 'text-gray-400'}`}>Up to {pkg.wordLimit} words</p>
+      <p className={`mt-1 text-[12px] ${dark ? 'text-white/30' : 'text-gray-400'}`}>
+        {pkg.editionSlots} edition slots
+      </p>
       <p className={`mt-5 text-[14px] font-light leading-[1.8] ${dark ? 'text-white/50' : 'text-gray-500'}`}>
         {pkg.summary}
       </p>

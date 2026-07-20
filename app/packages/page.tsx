@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { CTASection } from '@/components/content/CTASection'
 import { PageHero } from '@/components/site/PageHero'
 import { PageSection } from '@/components/site/PageSection'
+import { editionCatalogDefinitions, priceRules, publishingPrograms } from '@/lib/commercial/catalog'
 import { packages } from '@/lib/tokens'
 
 export const metadata: Metadata = {
@@ -16,8 +17,8 @@ const bookingUrl = 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.
 const matrix = [
   { feature: 'BASICS', starter: '', pro: '', premier: '', head: true },
   { feature: 'Price', starter: '$1,999', pro: '$4,500', premier: '$7,500' },
-  { feature: 'Word count', starter: 'Up to 50K', pro: 'Up to 75K', premier: 'Large/complex' },
-  { feature: 'Primary format', starter: 'PB + eBook', pro: 'PB + eBook', premier: 'PB + HC + eBook' },
+  { feature: 'Edition slots', starter: '2 choices', pro: '3 choices', premier: '4 choices' },
+  { feature: 'Primary format', starter: 'Author choice', pro: 'Author choice', premier: 'Author choice' },
   { feature: 'Author Profile Page', starter: '✓', pro: '✓', premier: '✓' },
   { feature: 'ISBN assignment', starter: '✓', pro: '✓', premier: '✓' },
   { feature: 'Distribution setup', starter: '✓', pro: '✓', premier: '✓' },
@@ -54,7 +55,7 @@ const matrix = [
   { feature: 'BISAC / metadata', starter: 'Basic', pro: 'Advanced', premier: 'Advanced' },
   { feature: 'Library distribution', starter: 'Add-on', pro: 'Add-on', premier: 'Add-on' },
   { feature: 'AUDIOBOOK', starter: '', pro: '', premier: '', head: true },
-  { feature: 'Audiobook', starter: 'Add-on ($699)', pro: 'AI narration included', premier: 'AI narration included' },
+  { feature: 'Audiobook', starter: 'Separate line item', pro: 'Separate line item', premier: 'AI narration included through 8 PFH' },
   { feature: 'AUTHOR COPIES', starter: '', pro: '', premier: '', head: true },
   { feature: 'Complimentary paperbacks', starter: '5 copies', pro: '10 copies', premier: '15 copies' },
 ]
@@ -139,6 +140,39 @@ const decisionGuide = [
   'Explore Premier if the work is large, complex, or needs expanded editorial and production planning.',
 ]
 
+const formatRows = editionCatalogDefinitions
+  .filter((edition) => edition.public)
+  .map((edition) => ({
+    sku: edition.sku,
+    label: edition.label,
+    slot: edition.slotEligible ? 'Slot eligible' : 'Program only',
+    price:
+      edition.addOnPrice && edition.inSlotPremium
+        ? `$${edition.addOnPrice.amount.toLocaleString()} add-on / $${edition.inSlotPremium.amount.toLocaleString()} in-slot premium`
+        : edition.addOnPrice
+          ? `$${edition.addOnPrice.amount.toLocaleString()} add-on`
+          : 'Program pricing',
+  }))
+
+const programRows = publishingPrograms
+  .filter((program) => program.public)
+  .map((program) => {
+    const rule = priceRules.find((priceRule) => priceRule.sku === program.sku)
+    const price =
+      !rule || rule.amount === null
+        ? 'Custom SOW'
+        : rule.method === 'unit'
+          ? `Starting at $${rule.amount.toLocaleString()}/${rule.unit || 'unit'}`
+          : `Starting at $${rule.amount.toLocaleString()}`
+    return {
+      sku: program.sku,
+      label: program.label,
+      price,
+      availability: program.salesAvailability === 'inquiry_only' ? 'Inquiry only' : 'Available',
+      cta: program.permittedCtas[0] || 'Contact Publishing',
+    }
+  })
+
 export default function PackagesPage() {
   return (
     <div className="pt-[76px]">
@@ -218,9 +252,7 @@ export default function PackagesPage() {
                 <div className="mt-2 text-[44px] font-bold leading-none text-white">
                   ${pkg.price.toLocaleString()}
                 </div>
-                <p className="mt-1 text-[12px] text-white/30">
-                  {pkg.tier === 'Premier' ? pkg.wordLimit : `Up to ${pkg.wordLimit} words`}
-                </p>
+                <p className="mt-1 text-[12px] text-white/30">{pkg.editionSlots} edition slots</p>
                 <p className="mt-5 text-[14px] font-light leading-[1.8] text-white/70">{details.summary}</p>
                 <div className="mt-6 h-px bg-white/8" />
                 <ul className="mt-6 flex flex-1 flex-col gap-3">
@@ -360,6 +392,63 @@ export default function PackagesPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </PageSection>
+
+      <PageSection
+        eyebrow="Formats & Editions"
+        title={
+          <>
+            Choose the formats
+            <br />
+            <em className="not-italic italic text-blue-500">your readers need.</em>
+          </>
+        }
+        description="Package slots are author-selected from the eligible edition list. Premium editions may be selected into a slot with the governed premium, while program-only formats move through a separate scoped production path."
+      >
+        <div className="grid gap-4 lg:grid-cols-2">
+          {formatRows.map((format) => (
+            <div key={format.sku} className="rounded-[22px] border border-gray-200 bg-[#F7F8FA] p-6">
+              <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-blue-500">{format.sku}</div>
+              <h3 className="mt-2 text-[20px] font-semibold text-charcoal">{format.label}</h3>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="rounded-full bg-white px-3 py-1 text-[12px] text-gray-500">{format.slot}</span>
+                <span className="rounded-full bg-white px-3 py-1 text-[12px] text-gray-500">{format.price}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 max-w-[860px] text-[14px] font-light leading-[1.8] text-gray-500">
+          Standard ebooks are produced as born-accessible EPUB files whenever selected or purchased. Complex-content accessibility editions are reserved for books that require advanced remediation, testing, or conformance evidence.
+        </p>
+      </PageSection>
+
+      <PageSection
+        eyebrow="Publishing Programs"
+        title={
+          <>
+            Add specialized programs
+            <br />
+            <em className="not-italic italic text-blue-500">when the book calls for them.</em>
+          </>
+        }
+        description="Programs are separate governed paths for serialized releases, audio-first work, interactive editions, and custom scoped work. Provisional webtoon pricing is intentionally not published."
+        surface="dark"
+      >
+        <div className="grid gap-4 lg:grid-cols-2">
+          {programRows.map((program) => (
+            <div key={program.sku} className="rounded-[22px] border border-white/10 bg-white/[0.03] p-6">
+              <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-blue-400">{program.sku}</div>
+              <h3 className="mt-2 text-[20px] font-semibold text-white">{program.label}</h3>
+              <p className="mt-3 text-[14px] font-light text-white/60">{program.price}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="rounded-full bg-white/10 px-3 py-1 text-[12px] text-white/55">{program.availability}</span>
+                <Link href="/join" className="rounded-full bg-blue-500 px-3 py-1 text-[12px] font-semibold text-white hover:bg-blue-600">
+                  {program.cta}
+                </Link>
               </div>
             </div>
           ))}
