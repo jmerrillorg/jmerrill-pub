@@ -17,6 +17,25 @@ Every `jm1_executionlog` edition-lifecycle event must preserve:
 - `result`
 - `exception_or_failure_detail`
 
+## Required Event Payload Contract
+
+Every lifecycle event definition below uses the same required payload shape:
+
+```text
+event_type
+title_id
+title_edition_id
+prior_state
+resulting_state
+execution_source
+actor_or_service_principal
+correlation_id
+occurred_on
+evidence_reference
+result
+exception_or_failure_detail
+```
+
 ## Event Definitions
 
 | Event type | Required | Retry permitted | Idempotency protection | Notes |
@@ -38,4 +57,3 @@ Every `jm1_executionlog` edition-lifecycle event must preserve:
 - Failed validation and failed distribution attempts must preserve exact failure detail.
 - A duplicate event with the same idempotency key must read back the original event rather than create another record.
 - Human-in-the-loop validation is mandatory before ENH/CPLX editions transition to live distribution.
-

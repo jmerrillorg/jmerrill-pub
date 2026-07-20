@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from 'node:fs'
 const catalog = readFileSync('lib/commercial/catalog.ts', 'utf8')
 const packagesPage = readFileSync('app/packages/page.tsx', 'utf8')
 const tokens = readFileSync('lib/tokens.ts', 'utf8')
+const activationReport = readFileSync('docs/operations/generated/2026-07-20-JMP-Commercial-Architecture-Activation-Report.md', 'utf8')
+const lifecycleSpec = readFileSync('docs/operations/generated/2026-07-20-JMP-Edition-Lifecycle-Executionlog-Event-Specification.md', 'utf8')
 const dataverseExportPath = 'data/commercial/dataverse-commercial-catalog-export.json'
 
 function dataverseDivergenceCheck() {
@@ -40,7 +42,8 @@ const checks = [
       catalog.includes('commercialProjectionMetadata') &&
       catalog.includes('seed_matrix_projection') &&
       catalog.includes('Dataverse Price Rule and commercial catalog records') &&
-      !catalog.includes('canonical commercial source'),
+      !catalog.toLowerCase().includes('canonical commercial source') &&
+      !activationReport.toLowerCase().includes('canonical source'),
   },
   {
     name: 'product form option set has exactly eight values and no PF-05C',
@@ -112,14 +115,15 @@ const checks = [
     pass: () => dataverseDivergenceCheck().ok,
   },
   {
-    name: 'legal-pending public programs are inquiry-only and never immediate checkout',
+    name: 'legal-pending public programs are inquiry-only, commercially approved, and never immediate checkout',
     pass: () =>
-      ['JMP-SER-DIGITAL-06', 'JMP-SER-DIGITAL-12', 'JMP-AUD-FIRST-DEV', 'JMP-INT-EPUB3-STD'].every((sku) =>
+      ['JMP-SER-DIGITAL-06', 'JMP-SER-DIGITAL-12', 'JMP-AUD-FIRST-DEV', 'JMP-INT-EPUB3-STD', 'JMP-INT-WEB-CUSTOM', 'JMP-CUS-SOW'].every((sku) =>
         catalog.includes(`sku: '${sku}'`),
       ) &&
       catalog.includes("salesAvailability: 'inquiry_only'") &&
       catalog.includes("legalStatus: 'legal_language_pending'") &&
       catalog.includes("commercialPriceStatus: 'approved'") &&
+      !catalog.includes("legalStatus: 'legal_language_pending',\n    commercialPriceStatus: 'quote_required'") &&
       packagesPage.includes('Inquiry only') &&
       !packagesPage.includes('Buy Now') &&
       !packagesPage.includes('Add to Package') &&
@@ -150,6 +154,27 @@ const checks = [
       packagesPage.includes('editionCatalogDefinitions') &&
       packagesPage.includes('publishingPrograms') &&
       packagesPage.includes('priceRules'),
+  },
+  {
+    name: 'edition lifecycle execution-log specification declares required fields and idempotency policy',
+    pass: () =>
+      [
+        'event_type',
+        'title_id',
+        'title_edition_id',
+        'prior_state',
+        'resulting_state',
+        'execution_source',
+        'actor_or_service_principal',
+        'correlation_id',
+        'occurred_on',
+        'evidence_reference',
+        'result',
+        'exception_or_failure_detail',
+        'TITLE_EDITION_CREATED',
+        'TITLE_EDITION_RETIRED',
+        'Idempotency protection',
+      ].every((term) => lifecycleSpec.includes(term)),
   },
 ]
 
