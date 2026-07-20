@@ -7,6 +7,7 @@
  */
 
 const { readPublishingMailboxReply, PUBLISHING_MAILBOX } = require("../mail/publishingMailboxReader");
+const { createHash } = require("node:crypto");
 
 const EXECUTION_STATUS = { SUCCESS: 835500001, FAILED: 835500002 };
 const BAND_LEVEL_1 = 835500000;
@@ -23,6 +24,11 @@ function escapeODataText(value) {
 
 function extractId(entityUrl) {
   return normalizeString(entityUrl).match(/\(([0-9a-f-]{36})\)$/i)?.[1] || normalizeString(entityUrl);
+}
+
+function stableIdempotencyKey(gateId, inboundMessageId) {
+  const digest = createHash("sha256").update(`${gateId}:${inboundMessageId}`).digest("hex").slice(0, 24);
+  return `author-review-response:${digest}`;
 }
 
 function requireDataverseConfig() {
@@ -155,7 +161,7 @@ async function processGateReply(client, gate, deps, triggerSource) {
   if (!reply.ok || !reply.found) return { gateId, outcome: "NO_REPLY_FOUND", detail: reply.reason || reply.code || "no_match" };
 
   const inboundMessageId = normalizeString(reply.inboundMessageId) || `${reply.senderAddress || "unknown"}:${reply.receivedDateTime || "unknown"}`;
-  const idempotencyKey = `author-review-response:${gateId}:${inboundMessageId}`;
+  const idempotencyKey = stableIdempotencyKey(gateId, inboundMessageId);
   const existing = await findExecutionLog(client, "AUTHOR_RESPONSE_INBOUND_CORRELATED", idempotencyKey);
   if (existing) return { gateId, outcome: "IDEMPOTENT", detail: "inbound_response_already_processed", executionLogIds: [existing.jm1_executionlogid] };
 
@@ -244,5 +250,6 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
 module.exports = {
   runAuthorReviewResponseConsumer,
   classifyAuthorReviewResponse,
+  stableIdempotencyKey,
   createDataverseClient
 };

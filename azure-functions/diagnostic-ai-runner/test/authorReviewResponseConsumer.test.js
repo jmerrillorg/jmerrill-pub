@@ -6,7 +6,8 @@ const test = require("node:test");
 
 const {
   classifyAuthorReviewResponse,
-  runAuthorReviewResponseConsumer
+  runAuthorReviewResponseConsumer,
+  stableIdempotencyKey
 } = require("../src/orchestration/authorReviewResponseConsumer");
 
 const gateId = "be079017-0983-f111-ab0f-000d3a14673b";
@@ -97,6 +98,35 @@ test("correction response does not approve or start the next stage", async () =>
   assert.equal(result.processed, 1);
   assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "AUTHOR_RESPONSE_CORRECTIONS_PERSISTED"));
   assert.ok(!client.calls.created.some((call) => call.entitySet === "jm1_productionprojects"));
+});
+
+test("publishing sender copy is ignored and cannot be classified as author corrections", async () => {
+  const client = createMockClient();
+  const result = await runAuthorReviewResponseConsumer(
+    { maxGates: 1 },
+    {
+      client,
+      readReply: async () => ({
+        ok: true,
+        found: false,
+        code: "NO_MATCHING_REPLY_FOUND",
+        senderAddress: null,
+        receivedDateTime: null,
+        bodyText: null
+      })
+    }
+  );
+
+  assert.equal(result.processed, 0);
+  assert.equal(client.calls.created.length, 0);
+  assert.equal(client.calls.patched.length, 0);
+});
+
+test("short idempotency keys fit in execution-log descriptions", () => {
+  const longInboundMessageId = "<202607192316.50583b1d164e479790f039ac90815e15-OBZG6ZD4IFBVGRKNIFEUYLLQOJXWILRUMVQWCYJVMYZS2YZQGBSS2NDBMZQS2YLFGRRC2MZYGE3DSMLBGEZDKYZUPRZW25DQ@microsoft.com>";
+  const key = stableIdempotencyKey(gateId, longInboundMessageId);
+  assert.match(key, /^author-review-response:[a-f0-9]{24}$/);
+  assert.ok(key.length < 60);
 });
 
 test("source text documents no Publisher button or Cody session in the normal path", () => {
