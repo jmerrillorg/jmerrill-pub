@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * Engine: Inbound Communications Engine
+ * Reusable? Y
+ * Stage-specific exception? N
+ */
+
 const { readPublishingMailboxReply, PUBLISHING_MAILBOX } = require("../mail/publishingMailboxReader");
 
 const EXECUTION_STATUS = { SUCCESS: 835500001, FAILED: 835500002 };

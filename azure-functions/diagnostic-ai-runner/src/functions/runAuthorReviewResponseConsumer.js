@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * Engine: Inbound Communications Engine
+ * Reusable? Y
+ * Stage-specific exception? N
+ */
+
 const { app } = require("@azure/functions");
 const { runAuthorReviewResponseConsumer } = require("../orchestration/authorReviewResponseConsumer");
 
