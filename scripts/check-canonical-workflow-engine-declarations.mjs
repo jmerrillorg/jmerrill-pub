@@ -13,6 +13,15 @@ const ENGINE_SENSITIVE_PATHS = [
 const STAGE_OR_WORKFLOW_PATTERN =
   /\b(Developmental|Line Editing|Copyediting|Proofreading|Interior Layout|Cover Design|Production Proof|author[- ]review|Author Review|package|notification|gate activation|Publisher Today|Current Activity|Next Step|author action)\b/i
 
+const PACKAGE_ENGINE_BYPASS_PATTERN =
+  /\b(package manifest|package qa|required artifacts|artifact selection|active package|completed package|superseded package|package version|ready for release|author review package|package assembly|assemble package)\b/i
+
+const PACKAGE_ENGINE_MODULE = 'lib/server/author-review-package-engine.ts'
+const PACKAGE_ENGINE_INTEGRATION_MODULES = new Set([
+  PACKAGE_ENGINE_MODULE,
+  'lib/server/author-package-notification-engine.ts',
+])
+
 const ALLOWED_ENGINES = new Set([
   'Stage Transition Engine',
   'Notification Engine',
@@ -71,6 +80,16 @@ for (const path of changedFiles()) {
   if (!meta.exception) failures.push(`${path}: missing "Stage-specific exception? Y/N" declaration`)
   if (meta.exception === 'Y' && !/Approved exception:/i.test(content)) {
     failures.push(`${path}: stage-specific exception requires "Approved exception:" rationale`)
+  }
+
+  const usesCanonicalPackageEngine =
+    PACKAGE_ENGINE_INTEGRATION_MODULES.has(path) || /author-review-package-engine/.test(content)
+  if (
+    PACKAGE_ENGINE_BYPASS_PATTERN.test(content) &&
+    !usesCanonicalPackageEngine &&
+    !(meta.engine === 'Package Engine' && meta.exception === 'N')
+  ) {
+    failures.push(`${path}: package-sensitive logic must use the canonical Package Engine or declare an approved exception`)
   }
 }
 
