@@ -204,5 +204,6 @@
       "skus": [],
       "error": "Command failed: unzip -p /Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/Implementation HQ - Architecture/00_CANON/Publishing/JMP_Products_Services_Catalog_v2.1_CANON-CANDIDATE.docx word/document.xml"
     }
-  }
+  },
+  "sourceReconciliationQualification": "The final worksheet contains 120 unique records derived from the accessible 104-row reconciliation worksheet, Matrix v1.1, and the 16 explicitly identified additions. The separate CANON-CANDIDATE source was not independently reparsed in this slice; therefore, no claim is made that additional unnumbered or differently coded services cannot exist there."
 }

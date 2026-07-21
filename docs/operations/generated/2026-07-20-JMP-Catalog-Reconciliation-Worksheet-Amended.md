@@ -59,3 +59,4 @@ No Jackie ruling was filled in. No migration, retirement, repricing, renaming, c
 - Full legacy catalog DOCX was locally readable and yielded 104 unique SKU codes.
 - Matrix v1.1 DOCX was locally readable and yielded 22 governing SKU codes.
 - The canon-candidate OneDrive DOCX path was present but not locally materialized as a readable DOCX zip during this run, so the amendment uses the prior 104-row worksheet as the established parsed canon-candidate/legacy reconciliation surface rather than inventing an unreadable source count.
+- Source-reconciliation qualification: The final worksheet contains 120 unique records derived from the accessible 104-row reconciliation worksheet, Matrix v1.1, and the 16 explicitly identified additions. The separate CANON-CANDIDATE source was not independently reparsed in this slice; therefore, no claim is made that additional unnumbered or differently coded services cannot exist there.
