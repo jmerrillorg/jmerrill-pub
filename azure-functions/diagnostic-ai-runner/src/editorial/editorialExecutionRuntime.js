@@ -200,6 +200,7 @@ async function graphRequest(path, options = {}) {
   if (typeof graphRequest.override === "function") {
     return graphRequest.override(path, options);
   }
+  const endpoint = `${GRAPH_BASE}/${path.replace(/^\//, "")}`;
   const response = await fetch(`${GRAPH_BASE}/${path.replace(/^\//, "")}`, {
     ...options,
     headers: {
@@ -210,14 +211,64 @@ async function graphRequest(path, options = {}) {
   });
   if (!response.ok) {
     const text = await response.text().catch(() => "");
-    throw Object.assign(new Error(`Graph request failed: HTTP ${response.status} ${text}`), {
-      safeCode: "GRAPH_REQUEST_FAILED",
-      status: response.status
+    let body = null;
+    try {
+      body = text ? JSON.parse(text) : null;
+    } catch {
+      body = null;
+    }
+    const graphCode = normalizeString(body?.error?.code);
+    const requestId =
+      normalizeString(body?.error?.innerError?.["request-id"]) ||
+      normalizeString(body?.error?.innerError?.requestId) ||
+      normalizeString(response.headers.get("request-id")) ||
+      normalizeString(response.headers.get("client-request-id"));
+    const safeCode = classifyGraphFailure({ status: response.status, graphCode, path, method: options.method || "GET" });
+    const details = {
+      safeCode,
+      status: response.status,
+      graphCode,
+      requestId,
+      endpoint,
+      path,
+      method: options.method || "GET"
+    };
+    throw Object.assign(new Error(`Graph request failed: ${JSON.stringify(details)}`), {
+      ...details,
+      body: body || text
     });
   }
   if (response.status === 204) return null;
   const contentType = response.headers.get("content-type") || "";
   return contentType.includes("application/json") ? response.json() : Buffer.from(await response.arrayBuffer());
+}
+
+function classifyGraphFailure(input) {
+  const path = normalizeString(input.path).toLowerCase();
+  const graphCode = normalizeString(input.graphCode).toLowerCase();
+  const status = Number(input.status);
+  if (status === 401 || graphCode.includes("invalidauthenticationtoken")) return "GRAPH_TOKEN_SCOPE_INSUFFICIENT";
+  if (status === 403 || graphCode.includes("accessdenied")) return "GRAPH_SITE_ACCESS_DENIED";
+  if (status === 404 && path.includes("/drives/") && !path.includes("/items/")) return "GRAPH_DRIVE_NOT_FOUND";
+  if (status === 404 && path.includes("/items/")) return "GRAPH_ITEM_NOT_FOUND";
+  if (status === 408 || graphCode.includes("timeout")) return "GRAPH_TIMEOUT";
+  if (status === 429 || graphCode.includes("throttl")) return "GRAPH_THROTTLED";
+  if (path.includes("/content")) return input.method === "PUT" ? "GRAPH_CONTENT_STREAM_FAILED" : "GRAPH_DOWNLOAD_FAILED";
+  if (status === 404 && path.includes(":")) return "GRAPH_SHAREPOINT_PATH_STALE";
+  return "GRAPH_REQUEST_FAILED";
+}
+
+function graphFailureDetail(error, sourceArtifact = {}) {
+  return [
+    error.safeCode || "GRAPH_REQUEST_FAILED",
+    `status=${error.status || "unknown"}`,
+    `graphCode=${error.graphCode || "unknown"}`,
+    `requestId=${error.requestId || "unknown"}`,
+    `endpoint=${error.endpoint || "unknown"}`,
+    `driveId=${sourceArtifact.jm1pub_repositorydriveid || "unknown"}`,
+    `itemId=${sourceArtifact.jm1pub_repositoryitemid || "unknown"}`,
+    `path=${sourceArtifact.jm1pub_repositorypath || "unknown"}`
+  ].join("; ");
 }
 
 async function findExecutionLog(client, actionType, idempotencyKey) {
@@ -430,7 +481,13 @@ function outputDefinitions(stageCode) {
     return ["Editorial Assessment", "Recommended Editorial Path", "Scope and Risk Register", "Editorial Review QA Evidence"];
   }
   if (stageCode === "DEVELOPMENTAL_EDITING") {
-    return ["Developmentally Edited Manuscript", "Developmental Memo", "Change Ledger", "Developmental QA Evidence"];
+    return [
+      "Developmentally Edited Manuscript",
+      "Developmental Memo",
+      "Developmental Review Instructions",
+      "Change Ledger",
+      "Developmental QA Evidence"
+    ];
   }
   return EXECUTOR_POLICIES[stageCode].outputRoles.map((role) =>
     role
@@ -540,6 +597,43 @@ async function buildDevelopmentalRevisionDocx(stage, stageCode, sourceArtifact, 
   });
 
   return Packer.toBuffer(doc);
+}
+
+async function buildSimpleEditorialDocx(stage, stageCode, sourceArtifact, outputName, extractedText, correlationId) {
+  const content = buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extractedText, correlationId);
+  const children = content
+    .split(/\n+/)
+    .map((line) => normalizeString(line))
+    .filter(Boolean)
+    .map((line) => {
+      if (line.startsWith("# ")) return paragraphFromText(line.replace(/^#\s+/, ""), { heading: HeadingLevel.HEADING_1 });
+      if (line.startsWith("## ")) return paragraphFromText(line.replace(/^##\s+/, ""), { heading: HeadingLevel.HEADING_2 });
+      return paragraphFromText(line.replace(/^- /, "• "));
+    });
+  const doc = new Document({
+    styles: { default: { document: { run: { font: "Arial", size: 22 } } } },
+    sections: [{ children }]
+  });
+  return Packer.toBuffer(doc);
+}
+
+function buildReviewInstructionsText(stage, stageCode, sourceArtifact, correlationId) {
+  return [
+    `Review Instructions - ${stage.jm1pub_name}`,
+    "",
+    "Generated by: JM1 Automation",
+    `Stage: ${stageCode}`,
+    `Generated at: ${new Date().toISOString()}`,
+    `Source artifact: ${sourceArtifact.jm1pub_editorialartifactid}`,
+    `Source checksum: ${sourceArtifact.jm1pub_sha256}`,
+    `Correlation: ${correlationId}`,
+    "",
+    "Instructions",
+    "1. Review the developmentally edited manuscript artifact and the developmental memo together.",
+    "2. Confirm publisher-sensitive, rights, legal, or doctrinal notes before any author-facing release.",
+    "3. Do not release an author package until Package Engine QA, cadence policy, and notification policy all pass.",
+    "4. Preserve author voice; high-risk recommendations must remain reviewable rather than silently applied."
+  ].join("\n");
 }
 
 function buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extractedText, correlationId) {
@@ -681,14 +775,17 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
       safeCode: `${stageCode}_BLOCKED — SOURCE_GRAPH_IDENTITY_MISSING`
     });
   }
+  const sourceItem = await graphRequest(`drives/${driveId}/items/${itemId}?$select=id,name,parentReference,size,webUrl`).catch((error) => {
+    throw Object.assign(error, {
+      safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_METADATA_READ_FAILED"}`,
+      graphDetail: graphFailureDetail(error, sourceArtifact)
+    });
+  });
   const sourceBuffer = await graphRequest(`drives/${driveId}/items/${itemId}/content`).catch((error) => {
-    if (error.status === 403) {
-      throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_ACCESS_DENIED_FOR_JM1_AUTOMATION` });
-    }
-    if (error.status === 404) {
-      throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_FILE_NOT_FOUND` });
-    }
-    throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_DOWNLOAD_FAILED` });
+    throw Object.assign(error, {
+      safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_DOWNLOAD_FAILED"}`,
+      graphDetail: graphFailureDetail(error, sourceArtifact)
+    });
   });
   const actualSha = crypto.createHash("sha256").update(sourceBuffer).digest("hex");
   const expectedSha = normalizeString(sourceArtifact.jm1pub_sha256);
@@ -697,15 +794,6 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
       safeCode: `${stageCode}_BLOCKED — SOURCE_CHECKSUM_MISMATCH`
     });
   }
-  const sourceItem = await graphRequest(`drives/${driveId}/items/${itemId}?$select=id,name,parentReference,size,webUrl`).catch((error) => {
-    if (error.status === 403) {
-      throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_METADATA_ACCESS_DENIED_FOR_JM1_AUTOMATION` });
-    }
-    if (error.status === 404) {
-      throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_METADATA_NOT_FOUND` });
-    }
-    throw Object.assign(error, { safeCode: `${stageCode}_BLOCKED — SOURCE_METADATA_READ_FAILED` });
-  });
   const parentId = normalizeString(sourceItem?.parentReference?.id);
   if (!parentId) {
     throw Object.assign(new Error("Source parent folder missing"), {
@@ -717,18 +805,34 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
   for (const outputName of outputDefinitions(stageCode)) {
     const isDevelopmentalManuscript =
       stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Developmentally Edited Manuscript";
-    const extension = isDevelopmentalManuscript ? "docx" : "md";
-    const contentType = isDevelopmentalManuscript
+    const isDevelopmentalMemo = stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Developmental Memo";
+    const isReviewInstructions = outputName.toLowerCase().includes("review instructions");
+    const extension = isDevelopmentalManuscript || isDevelopmentalMemo ? "docx" : isReviewInstructions ? "txt" : "md";
+    const contentType = isDevelopmentalManuscript || isDevelopmentalMemo
       ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      : isReviewInstructions
+        ? "text/plain"
       : "text/markdown";
     const filename = `${new Date().toISOString().slice(0, 10)}-${stage.jm1pub_name.replace(/[^a-zA-Z0-9]+/g, "-")}-${outputName.replace(/[^a-zA-Z0-9]+/g, "-")}.${extension}`;
     const body = isDevelopmentalManuscript
       ? await buildDevelopmentalRevisionDocx(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId)
-      : Buffer.from(buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId), "utf8");
+      : isDevelopmentalMemo
+        ? await buildSimpleEditorialDocx(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId)
+        : Buffer.from(
+            isReviewInstructions
+              ? buildReviewInstructionsText(stage, stageCode, sourceArtifact, correlationId)
+              : buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId),
+            "utf8"
+          );
     const uploaded = await graphRequest(`drives/${driveId}/items/${parentId}:/${encodeURIComponent(filename)}:/content`, {
       method: "PUT",
       headers: { "Content-Type": contentType },
       body
+    }).catch((error) => {
+      throw Object.assign(error, {
+        safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_CONTENT_STREAM_FAILED"}`,
+        graphDetail: graphFailureDetail(error, sourceArtifact)
+      });
     });
     const artifactName = `${outputName} - ${stage.jm1pub_name}`;
     const artifactPayload = {
@@ -759,9 +863,182 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
     } else {
       artifactId = await client.create("jm1pub_editorialartifacts", artifactPayload);
     }
-    outputs.push({ outputName, artifactId, itemId: uploaded.id });
+    outputs.push({
+      outputName,
+      artifactId,
+      itemId: uploaded.id,
+      filename: uploaded.name || filename,
+      extension,
+      contentType,
+      size: uploaded.size || body.length,
+      sha256: artifactPayload.jm1pub_sha256
+    });
   }
   return outputs;
+}
+
+function packageRoleForOutput(outputName) {
+  const normalized = normalizeString(outputName).toLowerCase();
+  if (normalized.includes("developmentally edited manuscript")) return "editedManuscript";
+  if (normalized.includes("developmental memo")) return "developmentalMemo";
+  if (normalized.includes("review instructions")) return "reviewInstructions";
+  if (normalized.includes("editorial assessment")) return "assessment";
+  if (normalized.includes("recommended editorial path")) return "recommendedEditorialPath";
+  return "";
+}
+
+function requiredPackageRoles(stageCode) {
+  if (stageCode === "DEVELOPMENTAL_EDITING") return ["editedManuscript", "developmentalMemo", "reviewInstructions"];
+  if (stageCode === "EDITORIAL_REVIEW") return ["assessment", "recommendedEditorialPath", "reviewInstructions"];
+  return [];
+}
+
+function allowedMimeForRole(role) {
+  if (role === "editedManuscript" || role === "developmentalMemo") {
+    return ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/pdf"];
+  }
+  if (role === "reviewInstructions") return ["text/plain", "application/pdf"];
+  if (role === "assessment" || role === "recommendedEditorialPath") return ["application/json", "application/pdf"];
+  return [];
+}
+
+function packageChecksum(input) {
+  return crypto.createHash("sha256").update(JSON.stringify(input)).digest("hex");
+}
+
+async function createPackageManifestArtifact(client, stage, stageCode, sourceArtifact, outputs, correlationId) {
+  const requiredRoles = requiredPackageRoles(stageCode);
+  if (!requiredRoles.length) return { skipped: true, reason: "PACKAGE_POLICY_NOT_CONFIGURED_FOR_STAGE" };
+  const artifacts = outputs
+    .map((output) => ({ ...output, role: packageRoleForOutput(output.outputName) }))
+    .filter((output) => output.role);
+  const failures = [];
+  for (const role of requiredRoles) {
+    const artifact = artifacts.find((item) => item.role === role);
+    if (!artifact) {
+      failures.push(`PACKAGE_QA_FAILED — REQUIRED_ARTIFACT_MISSING:${role}`);
+      continue;
+    }
+    const allowed = allowedMimeForRole(role);
+    if (allowed.length && !allowed.includes(artifact.contentType)) {
+      failures.push(`PACKAGE_QA_FAILED — INVALID_FILE_TYPE:${role}:${artifact.contentType}`);
+    }
+    if (!normalizeString(artifact.sha256)) {
+      failures.push(`PACKAGE_QA_FAILED — CHECKSUM_MISMATCH:${role}:checksum-missing`);
+    }
+  }
+  const packageId = `pkg-${stage.jm1pub_editorialstageid}-${stageCode.toLowerCase().replace(/_/g, "-")}-v1`;
+  const manifestId = `manifest-${packageId}`;
+  const manifest = {
+    packageId,
+    titleId: stage._jm1pub_titleid_value,
+    authorId: null,
+    stageId: stage.jm1pub_editorialstageid,
+    stageCode,
+    gateId: null,
+    packageVersion: "v1",
+    manifestVersion: "1.0",
+    sourceArtifactIds: [sourceArtifact.jm1pub_editorialartifactid],
+    artifacts: artifacts.map((artifact) => ({
+      artifactRole: artifact.role,
+      artifactId: artifact.artifactId,
+      filename: artifact.filename,
+      mimeType: artifact.contentType,
+      fileSize: artifact.size,
+      checksum: artifact.sha256,
+      sourceVersion: "v1",
+      createdAt: new Date().toISOString(),
+      authorVisible: requiredRoles.includes(artifact.role),
+      emailAttachment: requiredRoles.includes(artifact.role),
+      workspaceDownload: requiredRoles.includes(artifact.role)
+    }))
+  };
+  manifest.packageChecksum = packageChecksum({
+    packageId: manifest.packageId,
+    titleId: manifest.titleId,
+    stageId: manifest.stageId,
+    stageCode: manifest.stageCode,
+    packageVersion: manifest.packageVersion,
+    artifacts: manifest.artifacts
+  });
+  const manifestBody = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
+  const driveId = normalizeString(sourceArtifact.jm1pub_repositorydriveid);
+  const itemId = normalizeString(sourceArtifact.jm1pub_repositoryitemid);
+  const sourceItem = await graphRequest(`drives/${driveId}/items/${itemId}?$select=id,parentReference`).catch((error) => {
+    throw Object.assign(error, {
+      safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_METADATA_READ_FAILED"}`,
+      graphDetail: graphFailureDetail(error, sourceArtifact)
+    });
+  });
+  const parentId = normalizeString(sourceItem?.parentReference?.id);
+  const filename = `${new Date().toISOString().slice(0, 10)}-${stage.jm1pub_name.replace(/[^a-zA-Z0-9]+/g, "-")}-Package-Manifest.json`;
+  const uploaded = await graphRequest(`drives/${driveId}/items/${parentId}:/${encodeURIComponent(filename)}:/content`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: manifestBody
+  }).catch((error) => {
+    throw Object.assign(error, {
+      safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_CONTENT_STREAM_FAILED"}`,
+      graphDetail: graphFailureDetail(error, sourceArtifact)
+    });
+  });
+  const artifactPayload = {
+    jm1pub_editorialartifactname: `Package Manifest - ${stage.jm1pub_name}`,
+    jm1pub_filename: uploaded.name || filename,
+    jm1pub_fileextension: "json",
+    jm1pub_filesizebytes: uploaded.size || manifestBody.length,
+    jm1pub_repositorydriveid: driveId,
+    jm1pub_repositoryitemid: uploaded.id,
+    jm1pub_repositorypath: uploaded.webUrl,
+    jm1pub_sha256: crypto.createHash("sha256").update(manifestBody).digest("hex"),
+    jm1pub_artifactstatus: 196650002,
+    jm1pub_visibility: 196650001,
+    jm1pub_iscurrentapproved: false,
+    jm1pub_notes: `Canonical Package Engine manifest handoff for ${packageId}. Package checksum ${manifest.packageChecksum}.`,
+    "Jm1pub_Titleid@odata.bind": `/jm1pub_titles(${stage._jm1pub_titleid_value})`,
+    "Jm1pub_Editorialstageid@odata.bind": `/jm1pub_editorialstages(${stage.jm1pub_editorialstageid})`
+  };
+  if (normalizeString(stage._jm1pub_publishingassetid_value)) {
+    artifactPayload["Jm1pub_Publishingassetid@odata.bind"] = `/jm1pub_publishingassets(${stage._jm1pub_publishingassetid_value})`;
+  }
+  const existing = await findArtifactByName(client, stage, artifactPayload.jm1pub_editorialartifactname);
+  let manifestArtifactId = existing?.jm1pub_editorialartifactid;
+  if (manifestArtifactId) {
+    await client.patch("jm1pub_editorialartifacts", manifestArtifactId, artifactPayload);
+  } else {
+    manifestArtifactId = await client.create("jm1pub_editorialartifacts", artifactPayload);
+  }
+  const qaStatus = failures.length ? "QA_FAILED" : "READY_INTERNAL";
+  const cadenceStatus = failures.length ? "CADENCE_HOLD" : "CADENCE_HOLD";
+  const events = [
+    { actionType: "PACKAGE_MANIFEST_CREATED", detail: `Package ${packageId}; manifest artifact ${manifestArtifactId}; checksum ${manifest.packageChecksum}.` },
+    failures.length
+      ? { actionType: "PACKAGE_QA_FAILED", detail: failures.join("; ") }
+      : { actionType: "PACKAGE_QA_COMPLETED", detail: `Required package artifacts validated: ${requiredRoles.join(", ")}.` },
+    {
+      actionType: "PACKAGE_CADENCE_SCHEDULED",
+      detail: `${cadenceStatus}: author release held until stage completion and cadence authorization.`
+    }
+  ];
+  for (const event of events) {
+    const idempotencyKey = `package-engine:${event.actionType}:${stage.jm1pub_editorialstageid}:${manifest.packageChecksum}:v1`;
+    const existingLog = await findExecutionLog(client, event.actionType, idempotencyKey);
+    if (existingLog) continue;
+    await writeLog(client, {
+      name: `${event.actionType} - ${stage.jm1pub_name}`,
+      actionType: event.actionType,
+      description: `${event.detail} Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
+      sourceEntity: "jm1pub_editorialstage",
+      sourceRecordId: stage.jm1pub_editorialstageid
+    });
+  }
+  return {
+    packageId,
+    manifestArtifactId,
+    packageChecksum: manifest.packageChecksum,
+    qaStatus,
+    cadenceStatus
+  };
 }
 
 async function recordSourceExecutionReadiness(client, stage, stageCode, sourceArtifact, correlationId) {
@@ -863,7 +1140,7 @@ async function processStage(client, stage, correlationId) {
   }
   await recordSourceExecutionReadiness(client, stage, stageCode, sourceArtifact, correlationId);
   await recordLegacyOutputScopeClarification(client, stage, stageCode, sourceArtifact, correlationId);
-  const idempotencyKey = `editorial-runtime:output-ready-v3:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
+  const idempotencyKey = `editorial-runtime:output-ready-v4:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
   const existing = await findExecutionLog(client, "ACTIVE_EDITORIAL_OUTPUT_CREATED", idempotencyKey);
   if (existing) {
     return {
@@ -912,6 +1189,23 @@ async function processStage(client, stage, correlationId) {
     sourceEntity: "jm1pub_editorialstage",
     sourceRecordId: stage.jm1pub_editorialstageid
   });
+  let packageHandoff = null;
+  try {
+    packageHandoff = await createPackageManifestArtifact(client, stage, stageCode, sourceArtifact, outputs, correlationId);
+  } catch (error) {
+    const exact = error.safeCode || `${stageCode}_BLOCKED — PACKAGE_ENGINE_HANDOFF_FAILED`;
+    await recordBlockedTask(client, stage, stageCode, exact, correlationId);
+    packageHandoff = { status: "EXCEPTION", exactBlocker: exact, graphDetail: error.graphDetail };
+  }
+  if (packageHandoff && !packageHandoff.skipped) {
+    await client.patch("jm1pub_editorialstages", stage.jm1pub_editorialstageid, {
+      jm1pub_internaloperationalsummary:
+        packageHandoff.status === "EXCEPTION"
+          ? `EXCEPTION — ${packageHandoff.exactBlocker}${packageHandoff.graphDetail ? `. ${packageHandoff.graphDetail}` : ""}`
+          : `PACKAGE_PREPARATION: Package Engine handoff completed for ${packageHandoff.packageId}; manifest ${packageHandoff.manifestArtifactId}; package checksum ${packageHandoff.packageChecksum}; QA ${packageHandoff.qaStatus}; cadence ${packageHandoff.cadenceStatus}.`,
+      jm1pub_authorsafesummary: "Editorial work is in progress internally. No author action is required at this time."
+    });
+  }
   return {
     stageId: stage.jm1pub_editorialstageid,
     titleId: stage._jm1pub_titleid_value,
@@ -920,7 +1214,8 @@ async function processStage(client, stage, correlationId) {
     sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
     outputs,
     outputLogId,
-    qaLogId
+    qaLogId,
+    packageHandoff
   };
 }
 
@@ -961,6 +1256,7 @@ module.exports = {
   STAGE_STATUS,
   STAGE_TYPES,
   buildExactBlocker,
+  classifyGraphFailure,
   extractSourceText,
   findSourceArtifact,
   graphRequest,

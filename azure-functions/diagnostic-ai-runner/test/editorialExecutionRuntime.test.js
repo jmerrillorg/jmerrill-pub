@@ -6,6 +6,7 @@ const test = require("node:test");
 const {
   EXECUTOR_POLICIES,
   buildExactBlocker,
+  classifyGraphFailure,
   extractSourceText,
   findSourceArtifact,
   graphRequest,
@@ -35,6 +36,13 @@ test("stage names normalize to canonical executor codes", () => {
 test("missing source artifact becomes an exact stage-specific blocker", () => {
   assert.equal(buildExactBlocker("EDITORIAL_REVIEW", null), "EDITORIAL_REVIEW_BLOCKED — SOURCE_ARTIFACT_MISSING");
   assert.equal(buildExactBlocker("DEVELOPMENTAL_EDITING", null), "DEVELOPMENTAL_EDITING_BLOCKED — SOURCE_ARTIFACT_MISSING");
+});
+
+test("graph failures are classified without the generic Graph blocker", () => {
+  assert.equal(classifyGraphFailure({ status: 403, graphCode: "accessDenied", path: "drives/drive/items/item/content" }), "GRAPH_SITE_ACCESS_DENIED");
+  assert.equal(classifyGraphFailure({ status: 404, graphCode: "itemNotFound", path: "drives/drive/items/item/content" }), "GRAPH_ITEM_NOT_FOUND");
+  assert.equal(classifyGraphFailure({ status: 429, graphCode: "tooManyRequests", path: "drives/drive/items/item/content" }), "GRAPH_THROTTLED");
+  assert.equal(classifyGraphFailure({ status: 401, graphCode: "InvalidAuthenticationToken", path: "drives/drive/items/item" }), "GRAPH_TOKEN_SCOPE_INSUFFICIENT");
 });
 
 test("runtime claims active tasks and records exact blockers instead of generic runtime holds", async () => {
@@ -116,7 +124,7 @@ test("runtime materializes outputs by updating existing artifact records", async
   const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
   graphRequest.override = async (path, options = {}) => {
     if (path.endsWith("/content") && !options.method) return sourceBuffer;
-    if (path.includes("?$select=id,name,parentReference,size,webUrl")) {
+    if (path.includes("?$select=id,name,parentReference,size,webUrl") || path.includes("?$select=id,parentReference")) {
       return { id: "source-item", parentReference: { id: "parent-folder" }, webUrl: "https://sharepoint/source.docx" };
     }
     if (options.method === "PUT") {
@@ -198,7 +206,7 @@ test("developmental editing materializes a package-grade manuscript docx artifac
   const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
   graphRequest.override = async (path, options = {}) => {
     if (path.endsWith("/content") && !options.method) return sourceBuffer;
-    if (path.includes("?$select=id,name,parentReference,size,webUrl")) {
+    if (path.includes("?$select=id,name,parentReference,size,webUrl") || path.includes("?$select=id,parentReference")) {
       return { id: "source-item", parentReference: { id: "parent-folder" }, webUrl: "https://sharepoint/source.docx" };
     }
     if (options.method === "PUT") {
@@ -265,11 +273,31 @@ test("developmental editing materializes a package-grade manuscript docx artifac
       item.entitySet === "jm1pub_editorialartifacts" &&
       item.payload.jm1pub_editorialartifactname.startsWith("Developmentally Edited Manuscript")
     );
+    const memo = created.find((item) =>
+      item.entitySet === "jm1pub_editorialartifacts" &&
+      item.payload.jm1pub_editorialartifactname.startsWith("Developmental Memo")
+    );
+    const instructions = created.find((item) =>
+      item.entitySet === "jm1pub_editorialartifacts" &&
+      item.payload.jm1pub_editorialartifactname.startsWith("Developmental Review Instructions")
+    );
+    const manifest = created.find((item) =>
+      item.entitySet === "jm1pub_editorialartifacts" &&
+      item.payload.jm1pub_editorialartifactname.startsWith("Package Manifest")
+    );
     assert.ok(manuscript);
     assert.equal(manuscript.payload.jm1pub_fileextension, "docx");
+    assert.ok(memo);
+    assert.equal(memo.payload.jm1pub_fileextension, "docx");
+    assert.ok(instructions);
+    assert.equal(instructions.payload.jm1pub_fileextension, "txt");
+    assert.ok(manifest);
+    assert.equal(manifest.payload.jm1pub_fileextension, "json");
     assert.ok(manuscript.payload.jm1pub_sha256);
     assert.equal(logs.some((log) => log.jm1_actiontype === "EDITORIAL_SOURCE_VALIDATED"), true);
     assert.equal(logs.some((log) => log.jm1_actiontype === "ACTIVE_EDITORIAL_OUTPUT_CREATED"), true);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "PACKAGE_MANIFEST_CREATED"), true);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "PACKAGE_QA_COMPLETED"), true);
   } finally {
     graphRequest.override = null;
     extractSourceText.override = null;
