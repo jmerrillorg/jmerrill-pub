@@ -881,6 +881,8 @@ function packageRoleForOutput(outputName) {
   const normalized = normalizeString(outputName).toLowerCase();
   if (normalized.includes("developmentally edited manuscript")) return "editedManuscript";
   if (normalized.includes("developmental memo")) return "developmentalMemo";
+  if (normalized.includes("change ledger")) return "changeLedger";
+  if (normalized.includes("author-query") || normalized.includes("author query")) return "authorQueryList";
   if (normalized.includes("review instructions")) return "reviewInstructions";
   if (normalized.includes("editorial assessment")) return "assessment";
   if (normalized.includes("recommended editorial path")) return "recommendedEditorialPath";
@@ -890,7 +892,7 @@ function packageRoleForOutput(outputName) {
 }
 
 function requiredPackageRoles(stageCode) {
-  if (stageCode === "DEVELOPMENTAL_EDITING") return ["editedManuscript", "developmentalMemo", "reviewInstructions"];
+  if (stageCode === "DEVELOPMENTAL_EDITING") return ["editedManuscript", "developmentalMemo", "changeLedger", "reviewInstructions"];
   if (stageCode === "EDITORIAL_REVIEW") return ["assessment", "recommendedEditorialPath", "riskRegister", "qaEvidence"];
   return [];
 }
@@ -900,6 +902,7 @@ function allowedMimeForRole(role) {
     return ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/pdf"];
   }
   if (role === "reviewInstructions") return ["text/plain", "application/pdf"];
+  if (role === "changeLedger" || role === "authorQueryList") return ["text/markdown", "text/plain", "application/json", "application/pdf"];
   if (role === "assessment" || role === "recommendedEditorialPath" || role === "riskRegister" || role === "qaEvidence") {
     return ["text/markdown", "application/json", "application/pdf"];
   }
@@ -931,7 +934,7 @@ function packageChecksum(input) {
   return crypto.createHash("sha256").update(JSON.stringify(input)).digest("hex");
 }
 
-async function createPackageManifestArtifact(client, stage, stageCode, sourceArtifact, outputs, correlationId) {
+async function createPackageManifestArtifact(client, stage, stageCode, sourceArtifact, outputs, correlationId, options = {}) {
   const requiredRoles = requiredPackageRoles(stageCode);
   if (!requiredRoles.length) return { skipped: true, reason: "PACKAGE_POLICY_NOT_CONFIGURED_FOR_STAGE" };
   const deliveryPolicy = packageDeliveryPolicy(stageCode);
@@ -953,7 +956,8 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
       failures.push(`PACKAGE_QA_FAILED — CHECKSUM_MISMATCH:${role}:checksum-missing`);
     }
   }
-  const packageId = `pkg-${stage.jm1pub_editorialstageid}-${stageCode.toLowerCase().replace(/_/g, "-")}-v1`;
+  const packageVersion = normalizeString(options.packageVersion) || "v1";
+  const packageId = `pkg-${stage.jm1pub_editorialstageid}-${stageCode.toLowerCase().replace(/_/g, "-")}-${packageVersion}`;
   const manifestId = `manifest-${packageId}`;
   const manifest = {
     packageId,
@@ -962,7 +966,7 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
     stageId: stage.jm1pub_editorialstageid,
     stageCode,
     gateId: null,
-    packageVersion: "v1",
+    packageVersion,
     manifestVersion: "1.0",
     packageAudience: deliveryPolicy.audience,
     notificationPolicy: deliveryPolicy.notificationPolicy,
@@ -976,7 +980,7 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
       mimeType: artifact.contentType,
       fileSize: artifact.size,
       checksum: artifact.sha256,
-      sourceVersion: "v1",
+      sourceVersion: packageVersion,
       createdAt: new Date().toISOString(),
       authorVisible: deliveryPolicy.audience === "AUTHOR" && requiredRoles.includes(artifact.role),
       emailAttachment: deliveryPolicy.audience === "AUTHOR" && requiredRoles.includes(artifact.role),
@@ -1001,7 +1005,7 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
     });
   });
   const parentId = normalizeString(sourceItem?.parentReference?.id);
-  const filename = `${new Date().toISOString().slice(0, 10)}-${stage.jm1pub_name.replace(/[^a-zA-Z0-9]+/g, "-")}-Package-Manifest.json`;
+  const filename = `${new Date().toISOString().slice(0, 10)}-${stage.jm1pub_name.replace(/[^a-zA-Z0-9]+/g, "-")}-Package-Manifest-${packageVersion}.json`;
   const uploaded = await graphRequest(`drives/${driveId}/items/${parentId}:/${encodeURIComponent(filename)}:/content`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -1013,7 +1017,8 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
     });
   });
   const artifactPayload = {
-    jm1pub_editorialartifactname: `Package Manifest - ${stage.jm1pub_name}`,
+    jm1pub_editorialartifactname:
+      packageVersion === "v1" ? `Package Manifest - ${stage.jm1pub_name}` : `Package Manifest ${packageVersion} - ${stage.jm1pub_name}`,
     jm1pub_filename: uploaded.name || filename,
     jm1pub_fileextension: "json",
     jm1pub_filesizebytes: uploaded.size || manifestBody.length,
@@ -1024,7 +1029,9 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
     jm1pub_artifactstatus: 196650002,
     jm1pub_visibility: 196650001,
     jm1pub_iscurrentapproved: false,
-    jm1pub_notes: `Canonical Package Engine manifest handoff for ${packageId}. Package checksum ${manifest.packageChecksum}.`,
+    jm1pub_notes:
+      `Canonical Package Engine manifest handoff for ${packageId}. Package checksum ${manifest.packageChecksum}.` +
+      (options.retryReason ? ` Retry reason: ${options.retryReason}.` : ""),
     "Jm1pub_Titleid@odata.bind": `/jm1pub_titles(${stage._jm1pub_titleid_value})`,
     "Jm1pub_Editorialstageid@odata.bind": `/jm1pub_editorialstages(${stage.jm1pub_editorialstageid})`
   };
@@ -1051,7 +1058,7 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
     }
   ];
   for (const event of events) {
-    const idempotencyKey = `package-engine:${event.actionType}:${stage.jm1pub_editorialstageid}:${manifest.packageChecksum}:v1`;
+    const idempotencyKey = `package-engine:${event.actionType}:${stage.jm1pub_editorialstageid}:${manifest.packageChecksum}:${packageVersion}`;
     const existingLog = await findExecutionLog(client, event.actionType, idempotencyKey);
     if (existingLog) continue;
     await writeLog(client, {
@@ -1064,6 +1071,7 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
   }
   return {
     packageId,
+    packageVersion,
     manifestArtifactId,
     packageChecksum: manifest.packageChecksum,
     qaStatus,
@@ -1289,11 +1297,22 @@ module.exports = {
   EXECUTOR_POLICIES,
   STAGE_STATUS,
   STAGE_TYPES,
+  allowedMimeForRole,
   buildExactBlocker,
   classifyGraphFailure,
+  createDataverseClient,
+  createPackageManifestArtifact,
   extractSourceText,
+  findArtifactByName,
+  findExecutionLog,
   findSourceArtifact,
   graphRequest,
   normalizeStageCode,
+  packageChecksum,
+  packageDeliveryPolicy,
+  packageRoleForOutput,
+  requiredPackageRoles,
+  requireDataverseConfig,
+  writeLog,
   runEditorialExecutionRuntime
 };
