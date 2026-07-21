@@ -5,7 +5,14 @@ import { readFileSync } from 'node:fs'
 const server = readFileSync('lib/server/publisher-operating-center.ts', 'utf8')
 const client = readFileSync('app/publisher/_components/PublisherOperatingCenterClient.tsx', 'utf8')
 const inventory = JSON.parse(readFileSync('data/publisher-runtime-ownership/process-inventory.json', 'utf8'))
+const gapRegister = JSON.parse(
+  readFileSync('data/publisher-runtime-ownership/event-driven-runtime-gap-register.json', 'utf8'),
+)
 const report = readFileSync('docs/operations/generated/2026-07-19-JM1-Production-Runtime-Ownership-Audit.md', 'utf8')
+const correctionReport = readFileSync(
+  'docs/operations/generated/2026-07-19-JM1-Event-Driven-Runtime-Correction-Report.md',
+  'utf8',
+)
 
 const requiredModes = [
   'AUTOMATIC_EVENT_DRIVEN',
@@ -117,6 +124,52 @@ const expectations = [
         'Author Workspace refresh',
         'SharePoint stage synchronization',
       ].every((name) => inventory.processes.some((process) => process.name === name)),
+  },
+  {
+    name: 'event-driven loop requires automatic next-stage runtime after author approval',
+    ok:
+      gapRegister.governingPrinciple.includes('automatically triggers the next authorized stage') &&
+      gapRegister.autonomousEditorialLoop.includes('Next-stage runtime starts automatically') &&
+      gapRegister.autonomousEditorialLoop.includes('Human-cadence release timer begins') &&
+      correctionReport.includes('Author approval -> next-stage runtime automatically executes'),
+  },
+  {
+    name: 'cadence policy separates immediate execution from author-facing release',
+    ok:
+      gapRegister.cadencePolicy.principle.includes('Execution starts immediately') &&
+      gapRegister.cadencePolicy.configurableInputs.includes('wordCount') &&
+      gapRegister.cadencePolicy.bands.length === 6 &&
+      correctionReport.includes('Execution starts immediately after authorization. Cadence controls author-facing delivery'),
+  },
+  {
+    name: 'editorial executors are not certified merely because stage records exist',
+    ok:
+      gapRegister.executorCertification
+        .filter((item) =>
+          ['Developmental Editing', 'Line Editing', 'Copyediting', 'Proofreading'].includes(item.capability),
+        )
+        .every((item) => item.certificationState === 'BRIDGE_NOT_CERTIFIED') &&
+      correctionReport.includes('a stage record, dashboard card, package, or transition log is not the same as a commissioned production executor'),
+  },
+  {
+    name: 'marketing, ebook, identifier, distribution, audiobook, and picture-book branches are attached',
+    ok:
+      gapRegister.marketingTriggers.some((item) => item.trigger === 'Developmental Editing approved') &&
+      gapRegister.productionDistributionBranches.some((item) => item.branch === 'Ebook generation') &&
+      gapRegister.productionDistributionBranches.some((item) => item.branch === 'ISBN assignment') &&
+      gapRegister.productionDistributionBranches.some((item) => item.branch === 'Distribution routing') &&
+      gapRegister.productionDistributionBranches.some((item) => item.branch === 'Audiobook') &&
+      gapRegister.productionDistributionBranches.some((item) => item.branch === 'Children and picture books'),
+  },
+  {
+    name: 'six-book distributor assumption is blocked pending commercial and API revalidation',
+    ok:
+      gapRegister.blockedAssumptions.some(
+        (item) =>
+          item.assumption.includes('PublishDrive') &&
+          item.status === 'REVERIFY_BEFORE_IMPLEMENTATION',
+      ) &&
+      correctionReport.includes('six-book distributor assumption must not be implemented'),
   },
 ]
 
