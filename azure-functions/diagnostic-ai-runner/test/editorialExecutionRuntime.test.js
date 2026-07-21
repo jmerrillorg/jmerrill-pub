@@ -187,6 +187,16 @@ test("runtime materializes outputs by updating existing artifact records", async
     assert.equal(created.length, 0);
     assert.equal(patched.some((item) => item.entitySet === "jm1pub_editorialartifacts" && item.id === "existing-artifact"), true);
     assert.equal(logs.some((log) => log.jm1_actiontype === "ACTIVE_EDITORIAL_OUTPUT_CREATED"), true);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "PACKAGE_MANIFEST_CREATED"), true);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "PACKAGE_QA_COMPLETED"), true);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "PACKAGE_QA_FAILED"), false);
+    assert.equal(
+      logs.some((log) =>
+        log.jm1_actiontype === "PACKAGE_CADENCE_SCHEDULED" &&
+        log.jm1_actiondescription.includes("publisher-facing Editorial Review decision package")
+      ),
+      true
+    );
   } finally {
     graphRequest.override = null;
     extractSourceText.override = null;

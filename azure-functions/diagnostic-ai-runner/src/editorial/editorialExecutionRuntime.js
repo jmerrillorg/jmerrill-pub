@@ -884,12 +884,14 @@ function packageRoleForOutput(outputName) {
   if (normalized.includes("review instructions")) return "reviewInstructions";
   if (normalized.includes("editorial assessment")) return "assessment";
   if (normalized.includes("recommended editorial path")) return "recommendedEditorialPath";
+  if (normalized.includes("scope and risk")) return "riskRegister";
+  if (normalized.includes("qa evidence")) return "qaEvidence";
   return "";
 }
 
 function requiredPackageRoles(stageCode) {
   if (stageCode === "DEVELOPMENTAL_EDITING") return ["editedManuscript", "developmentalMemo", "reviewInstructions"];
-  if (stageCode === "EDITORIAL_REVIEW") return ["assessment", "recommendedEditorialPath", "reviewInstructions"];
+  if (stageCode === "EDITORIAL_REVIEW") return ["assessment", "recommendedEditorialPath", "riskRegister", "qaEvidence"];
   return [];
 }
 
@@ -898,8 +900,31 @@ function allowedMimeForRole(role) {
     return ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/pdf"];
   }
   if (role === "reviewInstructions") return ["text/plain", "application/pdf"];
-  if (role === "assessment" || role === "recommendedEditorialPath") return ["application/json", "application/pdf"];
+  if (role === "assessment" || role === "recommendedEditorialPath" || role === "riskRegister" || role === "qaEvidence") {
+    return ["text/markdown", "application/json", "application/pdf"];
+  }
   return [];
+}
+
+function packageDeliveryPolicy(stageCode) {
+  if (stageCode === "EDITORIAL_REVIEW") {
+    return {
+      audience: "PUBLISHER",
+      notificationPolicy: "NOT_REQUIRED_PUBLISHER_FACING",
+      workspaceVisibility: "HIDDEN_FROM_AUTHOR",
+      cadenceStatus: "READY_INTERNAL",
+      cadenceDetail: "CADENCE_NOT_REQUIRED: publisher-facing Editorial Review decision package; no author release scheduled.",
+      nextGovernedAction: "Publisher editorial-path decision or automatic stage routing under approved policy."
+    };
+  }
+  return {
+    audience: "AUTHOR",
+    notificationPolicy: "AUTHOR_REVIEW_AFTER_STAGE_COMPLETION_AND_CADENCE",
+    workspaceVisibility: "VISIBLE_AFTER_COMPLETE_NOTIFICATION",
+    cadenceStatus: "CADENCE_HOLD",
+    cadenceDetail: "CADENCE_HOLD: author release held until stage completion and cadence authorization.",
+    nextGovernedAction: "Canonical author package release after stage QA and cadence authorization."
+  };
 }
 
 function packageChecksum(input) {
@@ -909,6 +934,7 @@ function packageChecksum(input) {
 async function createPackageManifestArtifact(client, stage, stageCode, sourceArtifact, outputs, correlationId) {
   const requiredRoles = requiredPackageRoles(stageCode);
   if (!requiredRoles.length) return { skipped: true, reason: "PACKAGE_POLICY_NOT_CONFIGURED_FOR_STAGE" };
+  const deliveryPolicy = packageDeliveryPolicy(stageCode);
   const artifacts = outputs
     .map((output) => ({ ...output, role: packageRoleForOutput(output.outputName) }))
     .filter((output) => output.role);
@@ -938,6 +964,10 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
     gateId: null,
     packageVersion: "v1",
     manifestVersion: "1.0",
+    packageAudience: deliveryPolicy.audience,
+    notificationPolicy: deliveryPolicy.notificationPolicy,
+    workspaceVisibility: deliveryPolicy.workspaceVisibility,
+    nextGovernedAction: deliveryPolicy.nextGovernedAction,
     sourceArtifactIds: [sourceArtifact.jm1pub_editorialartifactid],
     artifacts: artifacts.map((artifact) => ({
       artifactRole: artifact.role,
@@ -948,9 +978,9 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
       checksum: artifact.sha256,
       sourceVersion: "v1",
       createdAt: new Date().toISOString(),
-      authorVisible: requiredRoles.includes(artifact.role),
-      emailAttachment: requiredRoles.includes(artifact.role),
-      workspaceDownload: requiredRoles.includes(artifact.role)
+      authorVisible: deliveryPolicy.audience === "AUTHOR" && requiredRoles.includes(artifact.role),
+      emailAttachment: deliveryPolicy.audience === "AUTHOR" && requiredRoles.includes(artifact.role),
+      workspaceDownload: deliveryPolicy.audience === "AUTHOR" && requiredRoles.includes(artifact.role)
     }))
   };
   manifest.packageChecksum = packageChecksum({
@@ -1009,7 +1039,7 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
     manifestArtifactId = await client.create("jm1pub_editorialartifacts", artifactPayload);
   }
   const qaStatus = failures.length ? "QA_FAILED" : "READY_INTERNAL";
-  const cadenceStatus = failures.length ? "CADENCE_HOLD" : "CADENCE_HOLD";
+  const cadenceStatus = failures.length ? "CADENCE_HOLD" : deliveryPolicy.cadenceStatus;
   const events = [
     { actionType: "PACKAGE_MANIFEST_CREATED", detail: `Package ${packageId}; manifest artifact ${manifestArtifactId}; checksum ${manifest.packageChecksum}.` },
     failures.length
@@ -1017,7 +1047,7 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
       : { actionType: "PACKAGE_QA_COMPLETED", detail: `Required package artifacts validated: ${requiredRoles.join(", ")}.` },
     {
       actionType: "PACKAGE_CADENCE_SCHEDULED",
-      detail: `${cadenceStatus}: author release held until stage completion and cadence authorization.`
+      detail: deliveryPolicy.cadenceDetail
     }
   ];
   for (const event of events) {
@@ -1037,7 +1067,10 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
     manifestArtifactId,
     packageChecksum: manifest.packageChecksum,
     qaStatus,
-    cadenceStatus
+    cadenceStatus,
+    notificationPolicy: deliveryPolicy.notificationPolicy,
+    workspaceVisibility: deliveryPolicy.workspaceVisibility,
+    nextGovernedAction: deliveryPolicy.nextGovernedAction
   };
 }
 
@@ -1140,7 +1173,8 @@ async function processStage(client, stage, correlationId) {
   }
   await recordSourceExecutionReadiness(client, stage, stageCode, sourceArtifact, correlationId);
   await recordLegacyOutputScopeClarification(client, stage, stageCode, sourceArtifact, correlationId);
-  const idempotencyKey = `editorial-runtime:output-ready-v4:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
+  const outputReadyVersion = stageCode === "EDITORIAL_REVIEW" ? "v5" : "v4";
+  const idempotencyKey = `editorial-runtime:output-ready-${outputReadyVersion}:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
   const existing = await findExecutionLog(client, "ACTIVE_EDITORIAL_OUTPUT_CREATED", idempotencyKey);
   if (existing) {
     return {
@@ -1202,7 +1236,7 @@ async function processStage(client, stage, correlationId) {
       jm1pub_internaloperationalsummary:
         packageHandoff.status === "EXCEPTION"
           ? `EXCEPTION — ${packageHandoff.exactBlocker}${packageHandoff.graphDetail ? `. ${packageHandoff.graphDetail}` : ""}`
-          : `PACKAGE_PREPARATION: Package Engine handoff completed for ${packageHandoff.packageId}; manifest ${packageHandoff.manifestArtifactId}; package checksum ${packageHandoff.packageChecksum}; QA ${packageHandoff.qaStatus}; cadence ${packageHandoff.cadenceStatus}.`,
+          : `PACKAGE_PREPARATION: Package Engine handoff completed for ${packageHandoff.packageId}; manifest ${packageHandoff.manifestArtifactId}; package checksum ${packageHandoff.packageChecksum}; QA ${packageHandoff.qaStatus}; cadence ${packageHandoff.cadenceStatus}; notification ${packageHandoff.notificationPolicy}; workspace ${packageHandoff.workspaceVisibility}. Next governed action: ${packageHandoff.nextGovernedAction}`,
       jm1pub_authorsafesummary: "Editorial work is in progress internally. No author action is required at this time."
     });
   }
