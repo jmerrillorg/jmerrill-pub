@@ -9,6 +9,7 @@ import type {
   CatalogTitleDetail,
   CatalogTitleSummary,
 } from '@/lib/catalog/types'
+import { bookRetailerEnrichmentOverrides } from '@/data/book-retailer-enrichment-overrides'
 
 type DataverseCatalogConfig = {
   tenantId: string
@@ -323,12 +324,14 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
   const releaseDate = dateField(row, 'jm1pub_releasedate')
   const year = numberField(row, 'jm1pub_publicationyear')
   const title = stringField(row, 'jm1pub_titlename') || stringField(row, 'jm1pub_name')
+  const slug = stringField(row, 'jm1pub_slug') || slugify(title)
   const authorDisplayName = resolveAuthorDisplayName(row)
   const authorLookupId = stringField(row, '_jm1_author_value')
+  const retailerCoverUrl = bookRetailerEnrichmentOverrides[slug]?.retailerCoverUrl?.trim() || ''
 
   return {
     id,
-    slug: stringField(row, 'jm1pub_slug') || slugify(title),
+    slug,
     title,
     subtitle: stringField(row, 'jm1pub_subtitle'),
     authorDisplayName,
@@ -354,7 +357,7 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
     formats: normalizeFormats(formatIsbns),
     primaryIsbn: formatIsbns[0]?.isbn || '',
     isbnByFormat: formatIsbns,
-    coverUrl: firstString(assets, 'jm1pub_coverurl'),
+    coverUrl: firstString(assets, 'jm1pub_coverurl') || retailerCoverUrl,
     shortDescription: stringField(row, 'jm1pub_shortdescription'),
     purchaseLinks,
     marketplaceStatus: purchaseLinks[0]?.marketplaceStatus || '',
