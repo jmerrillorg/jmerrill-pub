@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getClientIp } from '@/lib/publishing/intake/rateLimit'
+import { verifyTurnstileToken } from '@/lib/publishing/intake/turnstile'
 import { hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
@@ -23,6 +25,18 @@ const OFFICIAL_JOIN_IMPRINTS: JoinImprint[] = [
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
+
+    const turnstile = await verifyTurnstileToken(cleanString(body.turnstileToken), getClientIp(req.headers))
+    if (!turnstile.ok) {
+      console.warn('Join form blocked by Turnstile.', {
+        reason: turnstile.reason,
+      })
+
+      return NextResponse.json(
+        { error: 'Please complete the verification challenge and try again.' },
+        { status: 400 },
+      )
+    }
 
     // Validate required fields
     const required = ['firstName', 'lastName', 'email', 'bookTitle', 'genre', 'goal', 'workType', 'manuscriptStatus']
@@ -114,6 +128,7 @@ export async function POST(req: NextRequest) {
       estimatedWordCount: wordCount,
       estimatedWords: cleanString(body.wordCount) || null,
       imprint: deriveImprint(genre, cleanString(body.imprint)),
+      signatureInterestRequested: requestedSignatureInterest(cleanString(body.imprint)),
 
       goals: goal,
       goal,
@@ -230,18 +245,28 @@ function deriveImprint(genre: string, requestedImprint = ''): JoinImprint {
   return 'J Merrill Publishing'
 }
 
+// JM Signature is publisher-invitation-only and never author-selected (PROGRAM-002
+// JM Signature Governance Overlay). It must never be resolved from submitted form
+// input, so it's excluded here even though it's an official imprint value elsewhere.
 function normalizeRequestedImprint(imprint: string): JoinImprint | null {
+  if (imprint === 'JM Signature' || imprint === 'Signature') return null
+
   if (OFFICIAL_JOIN_IMPRINTS.includes(imprint as JoinImprint)) {
     return imprint as JoinImprint
   }
 
-  if (imprint === 'Signature') return 'JM Signature'
   if (imprint === 'Little') return 'JM Little'
   if (imprint === 'Verse') return 'JM Verse'
   if (imprint === 'Works') return 'JM Works'
   if (imprint === 'Publishing') return 'J Merrill Publishing'
 
   return null
+}
+
+// Signal-only: surfaces requested-Signature interest for Publisher review without
+// ever letting submitted input assign the imprint directly.
+function requestedSignatureInterest(requestedImprint: string): boolean {
+  return requestedImprint === 'JM Signature' || requestedImprint === 'Signature'
 }
 
 function deriveInternalClassification(genre: string): Jm1PubInternalClassification {
