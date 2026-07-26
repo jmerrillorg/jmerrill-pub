@@ -1,0 +1,19 @@
+Exception,Domain,Severity,Blocks PR?,Blocks merge?,Blocks production?,Owner,Required action,Type
+PR336 merge state is DIRTY,Repository / GitHub,High,Yes,Yes,Yes,Cody / reviewer,Resolve or review merge conflicts against main without blind rebase; keep PR draft until clean,CODY_EXECUTABLE_WORK
+No CI checks reported for PR336,Repository / CI,High,Yes,Yes,Yes,GitHub / Cody,Wait for checks to appear or inspect workflow trigger/policy; all required checks must pass,EXTERNAL_DEPENDENCY
+AUTHOR_PORTAL_SESSION_SECRET preflight not yet proven in CI,Security / Azure,High,Yes,Yes,Yes,Jackie admin / GitHub admin,Confirm secret exists and PR workflow preflight passes without exposing value,ADMINISTRATOR_ACTION
+Preview deployment not yet reported,Azure Static Web Apps,High,Yes,Yes,Yes,GitHub / Azure,Confirm PR preview deployment succeeds and logs contain no secret,EXTERNAL_DEPENDENCY
+PROGRAM-004 canonical reference sync pending,Dataverse / Traceability,Medium,No,No,No,Cody with governed credential,Write one jm1_executionlog reference event when Dataverse write path is available,CODY_EXECUTABLE_WORK
+Controlled onboarding proof blocked,Dataverse / Power Automate,High,No,No,Yes,Jackie / Power Automate owner,Authorize flow/field alignment or approved temporary test exception before controlled submission,JACKIE_DECISION
+Manuscript-status display harmonization incomplete,Dataverse / UX,Medium,No,No,Yes,Cody / Jackie,Validate display labels and downstream consumption after canonical field alignment,CODY_EXECUTABLE_WORK
+Managed identity proof incomplete for SharePoint manuscript path,Azure Functions / SharePoint,Medium,No,No,Yes,Cody / Azure admin,Prove Graph/managed-identity manuscript access path for deployment target,ADMINISTRATOR_ACTION
+Bookshop HTTP 403 / JM1-owned cover assets unresolved,Catalog / Assets,Medium,No,No,Yes,Cody / Jackie,Resolve allowed asset source or preserve fallback policy for restricted external assets,EXTERNAL_DEPENDENCY
+Cynthia Sloan Contact not uniquely resolved,Stripe / Dataverse Contact,High,No,No,Yes,Jackie,Confirm or create canonical Contact and approved email,JACKIE_DECISION
+Carolyn Booker-Pierce Contact not uniquely resolved,Stripe / Dataverse Contact,High,No,No,Yes,Jackie,Confirm or create canonical Contact and approved email,JACKIE_DECISION
+Stripe pilot invitations not ready,Stripe Connect,High,No,No,Yes,Jackie / Cody,Approve wording; deploy pilot-specific route and safe status fields before any invitation,JACKIE_DECISION
+Stripe payout not authorized,Stripe Connect / Finance,Critical,No,No,Yes,Jackie,Do not certify payout until explicit authorization and evidence exist,JACKIE_DECISION
+Business Central configuration incomplete,Business Central,High,No,No,Yes,Jackie / finance admin,"Complete sandbox posture, posting setup, periods, dimensions, opening-balance decisions, and migration proof",ADMINISTRATOR_ACTION
+Agent 365 unconfirmed,Microsoft capability,Medium,No,No,Yes,Jackie / Microsoft admin,Approve and execute no-write entitlement/lifecycle proof before runtime claims,JACKIE_DECISION
+PROGRAM-003 handoff/supersession docs unresolved,Documentation,Low,No,No,No,Cody / Jackie,Classify as separate documentation workstream before carrying forward,DEFERRED_IMPROVEMENT
+Turnstile and JM Signature join deltas unresolved,Publishing intake,Medium,No,No,Yes,Cody / Jackie,Keep separate from security PR until exact value and validation are established,SEPARATE_WORKSTREAM
+.codex-tmp deferred cleanup,Repository hygiene,Low,No,No,No,Cody / Jackie,"Keep untracked until SharePoint readability, Dataverse sync/defer, and checksum preservation conditions are met",DEFERRED_IMPROVEMENT
