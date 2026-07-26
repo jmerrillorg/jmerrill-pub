@@ -16,6 +16,7 @@ import {
   w9StatusOptions,
 } from '@/lib/publishing/onboarding-production-options'
 import { requireAuthorAccess } from '@/lib/server/author-access'
+import { getAuthorPortalContextFromCookies } from '@/lib/server/author-portal-context'
 import { hasConfirmedNotificationDelivery, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
@@ -24,15 +25,13 @@ export async function POST(req: NextRequest) {
     const unauthorized = requireAuthorAccess(req)
     if (unauthorized) return unauthorized
 
-    const onboardingFlowUrl = process.env.POWER_AUTOMATE_AUTHOR_ONBOARDING_URL
-    if (!onboardingFlowUrl) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Author onboarding integration is not configured.',
-        },
-        { status: 500 },
-      )
+    const context = await getAuthorPortalContextFromCookies()
+    if (context && !context.tasks.authorProfileRequired) {
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: 'author_profile_already_on_file',
+      })
     }
 
     const body = await req.json()
@@ -293,7 +292,7 @@ export async function POST(req: NextRequest) {
       route: '/author/onboarding',
       source: 'private-author-onboarding',
       subject: `Author onboarding submitted: ${payload.authorName}`,
-      routeSpecificFlowUrl: onboardingFlowUrl,
+      routeSpecificFlowUrl: process.env.POWER_AUTOMATE_AUTHOR_ONBOARDING_URL,
       payload,
       notificationPreview: `${payload.authorName} submitted author onboarding for "${payload.bookTitle}".`,
       internalClassification: deriveInternalClassification(genreKey),

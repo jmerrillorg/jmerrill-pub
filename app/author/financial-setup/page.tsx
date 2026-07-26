@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { AuthorGate } from '../_components/AuthorGate'
 import { AuthorPortalShell } from '../_components/AuthorPortalShell'
+import { AuthorTaskGate } from '../_components/AuthorTaskGate'
 import { AuthorSetupForm, financialFields } from '../_components/AuthorSetupForm'
 
 export const metadata: Metadata = {
@@ -16,20 +17,25 @@ export const metadata: Metadata = {
 export default function AuthorFinancialSetupPage() {
   return (
     <AuthorPortalShell
-      eyebrow="Financial setup"
-      title="Financial setup for author records."
-      description="This private intake separates payee, payment preference, and tax-document coordination from general onboarding so sensitive author operations stay structured and controlled."
+      eyebrow="Payment & Royalty Setup"
+      title="Connect payment and royalty setup."
+      description="Securely connect Stripe so payments and royalties can be handled safely."
     >
       <AuthorGate>
-        <AuthorSetupForm
-          endpoint="/api/author/financial-setup"
-          fields={financialFields}
-          submitLabel="Submit financial setup"
-          successTitle="Your financial setup has been received."
-          successMessage="A notification has been sent to publishing@jmerrill.one. If a W-9 or secure payment link is needed, you will receive a follow-up email within 2 business days."
-          successDetails={['Next step: complete Royalty Setup using the Author Hub.']}
-          successLink={{ href: '/author', label: 'Return to Author Hub' }}
-        />
+        <AuthorTaskGate
+          task="paymentRoyaltyRequired"
+          completedTitle="Your payment and royalty setup is already in place."
+          completedBody="This workspace is already operating inside your existing author relationship, so we are not asking you to repeat financial setup."
+        >
+          <AuthorSetupForm
+            endpoint="/api/author/financial-setup"
+            fields={financialFields}
+            submitLabel="Submit setup"
+            successTitle="Your payment and royalty setup has been received."
+            successMessage="A notification has been sent to publishing@jmerrill.one. If a secure follow-up is needed, you will receive it directly."
+            successLink={{ href: '/author/portal', label: 'Return to workspace' }}
+          />
+        </AuthorTaskGate>
       </AuthorGate>
     </AuthorPortalShell>
   )

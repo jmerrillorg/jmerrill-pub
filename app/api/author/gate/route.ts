@@ -1,36 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateAuthorAccessCode, validateAuthorPortalAccessCode, type AuthorAccessScope } from '@/lib/server/author-access'
+
+import { createAuthorPortalGateResponse } from '@/lib/server/author-portal-context'
+
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const code = String(body.code || '').trim()
-    const scope: AuthorAccessScope = body.scope === 'portal' ? 'portal' : 'forms'
-
-    if (scope === 'portal') {
-      const result = validateAuthorPortalAccessCode(code)
-      if (!result.success) {
-        return NextResponse.json(
-          { error: 'Invalid access code.' },
-          { status: 401 },
-        )
-      }
-
-      return NextResponse.json({
-        success: true,
-        accessType: result.accessType,
-        portalContext: result.portalContext || null,
-      })
-    }
-
-    if (!validateAuthorAccessCode(code)) {
-      return NextResponse.json(
-        { error: 'Invalid access code.' },
-        { status: 401 },
-      )
-    }
-
-    return NextResponse.json({ success: true })
+    const requestedReference = String(body.reference || body.intakeReference || '').trim()
+    return createAuthorPortalGateResponse({ code, requestedReference })
   } catch (error) {
     console.error('Author onboarding gate error:', error)
     return NextResponse.json(

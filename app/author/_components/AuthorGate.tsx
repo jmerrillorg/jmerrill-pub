@@ -2,34 +2,43 @@
 
 import { useEffect, useState } from 'react'
 
-type AuthorGateScope = 'forms' | 'portal'
+const PORTAL_UNLOCKED_KEY = 'jmp-author-onboarding-unlocked'
+const PORTAL_BOOTSTRAP_CONTEXT_KEY = 'jm1_author_portal_bootstrap_context'
 
-type GateResponse = {
-  success?: boolean
-  error?: string
-  accessType?: 'admin' | 'author'
-  portalContext?: {
-    contactId?: string
-    authorPortalId?: string
-    titleId?: string
-    titleIds?: string[]
-    projectId?: string
-    projectIds?: string[]
-    titleName?: string
-  } | null
-}
-
-export function AuthorGate({ children, scope = 'forms' }: { children: React.ReactNode; scope?: AuthorGateScope }) {
+export function AuthorGate({ children }: { children: React.ReactNode }) {
   const [code, setCode] = useState('')
   const [unlocked, setUnlocked] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const storageKey = scope === 'portal' ? 'jmp-author-portal-unlocked' : 'jmp-author-onboarding-unlocked'
-  const contextKey = scope === 'portal' ? 'jmp-author-portal-context' : 'jmp-author-onboarding-context'
 
   useEffect(() => {
-    setUnlocked(sessionStorage.getItem(storageKey) === 'true')
-  }, [storageKey])
+    const cached = sessionStorage.getItem(PORTAL_UNLOCKED_KEY) === 'true'
+    if (cached) {
+      setUnlocked(true)
+      return
+    }
+
+    let mounted = true
+
+    async function checkSession() {
+      try {
+        const response = await fetch('/api/author/context', { cache: 'no-store' })
+        if (!mounted) return
+        if (response.ok) {
+          sessionStorage.setItem(PORTAL_UNLOCKED_KEY, 'true')
+          setUnlocked(true)
+        }
+      } catch {
+        // Ignore passive session checks.
+      }
+    }
+
+    void checkSession()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -37,18 +46,27 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
     setError('')
 
     try {
+      const params = new URLSearchParams(window.location.search)
       const response = await fetch('/api/author/gate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, scope }),
+        body: JSON.stringify({
+          code,
+          reference: params.get('reference') || params.get('ref') || '',
+        }),
       })
-      const data = (await response.json()) as GateResponse
+      const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Invalid access code.')
-      sessionStorage.setItem(storageKey, 'true')
-      sessionStorage.setItem(contextKey, JSON.stringify({
-        accessType: data.accessType || (scope === 'portal' ? 'author' : 'forms'),
-        portalContext: data.portalContext || null,
-      }))
+      sessionStorage.setItem(PORTAL_UNLOCKED_KEY, 'true')
+      if (data?.context) {
+        sessionStorage.setItem(
+          PORTAL_BOOTSTRAP_CONTEXT_KEY,
+          JSON.stringify({
+            savedAt: Date.now(),
+            context: data.context,
+          }),
+        )
+      }
       setUnlocked(true)
     } catch (err: any) {
       setError(err.message || 'Unable to validate access code.')
@@ -67,10 +85,10 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
           className="mt-3 text-white"
           style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '30px', fontWeight: 700, lineHeight: 1.15 }}
         >
-          Author setup is private.
+          Your Author Operating Center is private.
         </h2>
         <p className="mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/40">
-          Enter the access code provided by J Merrill Publishing to continue. Financial and royalty intake are separated from general onboarding for privacy and operational control.
+          Enter the secure activation code provided by J Merrill Publishing to continue. This temporary credential is used only to open your protected author space.
         </p>
       </div>
 
@@ -79,7 +97,7 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
           type="password"
           value={code}
           onChange={(event) => setCode(event.target.value)}
-          placeholder="Access code"
+          placeholder="Activation code"
           className="min-h-[52px] flex-1 rounded-2xl border border-white/10 bg-white/5 px-5 text-[14px] text-white outline-none transition-colors placeholder:text-white/20 focus:border-blue-500"
           required
         />
@@ -97,6 +115,10 @@ export function AuthorGate({ children, scope = 'forms' }: { children: React.Reac
           {error}
         </p>
       ) : null}
+
+      <p className="mt-4 text-[12px] leading-[1.7] text-white/35">
+        If you are returning and need help getting back in, please contact publishing@jmerrill.one so we can restore access through the governed recovery path.
+      </p>
     </div>
   )
 }

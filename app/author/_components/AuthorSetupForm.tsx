@@ -137,12 +137,12 @@ export function AuthorSetupForm({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-author-access-code': sessionStorage.getItem('jmp-author-onboarding-access-code') || '',
         },
         body: JSON.stringify(values),
       })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Submission failed.')
+      const text = await response.text()
+      const data = text ? safeParseJson(text) : null
+      if (!response.ok) throw new Error(data?.error || failureMessage || `Submission failed (${response.status}).`)
       setStatus('success')
     } catch (err: any) {
       setStatus('error')
@@ -281,6 +281,14 @@ export function AuthorSetupForm({
       </div>
     </form>
   )
+}
+
+function safeParseJson(text: string) {
+  try {
+    return JSON.parse(text) as { error?: string }
+  } catch {
+    return null
+  }
 }
 
 export const onboardingFields: Field[] = [
