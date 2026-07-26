@@ -1,5 +1,9 @@
 "use strict";
 
+// Engine: Production Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 const ARCHITECTURE_REGISTRY_VERSION = "JM1_ARCHITECTURE_REGISTRY_V1_0";
 
 const GOVERNANCE_STATES = Object.freeze(["BACKLOG", "HELD", "APPROVED", "ACTIVE", "RETIRED"]);

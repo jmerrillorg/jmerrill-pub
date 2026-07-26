@@ -1,5 +1,9 @@
 "use strict";
 
+// Engine: Production Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 const PIPELINE_VERSION = "JM1_PRODUCTION_PIPELINE_V2_0";
 
 const PRODUCTION_TAXONOMY = Object.freeze([

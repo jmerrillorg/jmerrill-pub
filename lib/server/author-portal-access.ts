@@ -1,3 +1,6 @@
+// Engine: Identity & Access Engine
+// Reusable? Y
+// Stage-specific exception? N
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
 import { GENERATED_AUTHOR_PORTAL_ACCESS } from './author-portal-access.generated'
 
