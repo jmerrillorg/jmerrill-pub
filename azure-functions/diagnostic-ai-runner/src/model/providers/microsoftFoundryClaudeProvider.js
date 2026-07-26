@@ -1,13 +1,6 @@
 "use strict";
 
-/**
- * Azure OpenAI provider for the Stage 0 Diagnostic AI Runner.
- *
- * Uses DefaultAzureCredential (MSI) — no API keys stored or logged.
- * Never stores prompt body, raw response, or manuscript text.
- * Returns a normalized result shape shared by all providers.
- */
-
+const { DefaultAzureCredential } = require("@azure/identity");
 const { trackDependency } = require("../../observability/dependencyTelemetry");
 const {
   fetchWithRetry,
@@ -15,36 +8,36 @@ const {
   parseStructuredJsonObject
 } = require("../providerSupport");
 
-const REQUIRED_VARS = [
-  "AZURE_OPENAI_ENDPOINT",
-  "AZURE_OPENAI_API_VERSION",
-  "AZURE_OPENAI_DEPLOYMENT_NAME"
-];
+const REQUIRED_VARS = ["AZURE_FOUNDRY_ENDPOINT"];
+const DEFAULT_API_VERSION = "2024-10-21";
+const TOKEN_SCOPE = "https://ai.azure.com/.default";
 
-function checkConfig() {
-  const missing = REQUIRED_VARS.filter(v => !process.env[v]);
+function checkConfig(route = {}) {
+  const missing = REQUIRED_VARS.filter((name) => !process.env[name]);
+  if (!route.deploymentName) {
+    missing.push("ROUTE_DEPLOYMENT_NAME");
+  }
   return missing.length === 0 ? null : missing;
 }
 
-async function call({ promptBody, diagnosticId, telemetry = null, route = null }) {
-  const missingConfig = checkConfig();
+async function call({ promptBody, diagnosticId, telemetry = null, route }) {
+  const missingConfig = checkConfig(route);
   if (missingConfig) {
     return {
       ok: false,
-      provider: "azure-openai",
-      configMissing: missingConfig.map(() => "AZURE_OPENAI_CONFIG_MISSING"),
+      provider: "microsoft-foundry-claude",
+      configMissing: missingConfig.map(() => "MICROSOFT_FOUNDRY_CONFIG_MISSING"),
       output: null,
       tokenCounts: { input: 0, output: 0, total: 0 },
       httpStatus: null,
-      error: `AZURE_OPENAI_CONFIG_MISSING: ${missingConfig.join(", ")}`
+      error: `MICROSOFT_FOUNDRY_CONFIG_MISSING: ${missingConfig.join(", ")}`
     };
   }
 
-  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
-  const apiVersion = process.env.AZURE_OPENAI_API_VERSION;
-  const deployment = route?.deploymentName || process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
+  const endpoint = process.env.AZURE_FOUNDRY_ENDPOINT.replace(/\/$/, "");
+  const apiVersion = process.env.AZURE_FOUNDRY_API_VERSION || DEFAULT_API_VERSION;
+  const deployment = route.deploymentName;
   const url = `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=${apiVersion}`;
-
   const requestBody = {
     messages: [{ role: "user", content: promptBody }],
     temperature: 0.2,
@@ -55,22 +48,23 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
   let httpStatus = null;
 
   try {
-    const { DefaultAzureCredential } = require("@azure/identity");
     const credential = new DefaultAzureCredential();
-    const tokenResult = await credential.getToken("https://cognitiveservices.azure.com/.default");
+    const tokenResult = await credential.getToken(TOKEN_SCOPE);
+    const runtimeOptions = getProviderRuntimeOptions("AZURE_FOUNDRY");
 
-    const runtimeOptions = getProviderRuntimeOptions("AZURE_OPENAI");
     const response = await trackDependency(
       telemetry,
       {
-        name: "Azure OpenAI Chat Completion",
+        name: "Microsoft Foundry Claude Chat Completion",
         target: endpoint,
         data: `${deployment}:chat/completions`,
-        dependencyTypeName: "Azure OpenAI",
+        dependencyTypeName: "Microsoft Foundry",
         properties: {
-          provider: "azure-openai",
+          provider: "microsoft-foundry-claude",
           deployment,
-          diagnosticId
+          diagnosticId,
+          model: route.model || "claude-sonnet-5",
+          version: route.version || null
         },
         isSuccess: (result) => result.ok,
         getResultCode: (result) => String(result.status)
@@ -85,7 +79,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${tokenResult.token}`
+            Authorization: `Bearer ${tokenResult.token}`
           },
           body: JSON.stringify(requestBody),
           signal
@@ -94,28 +88,27 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
     );
 
     httpStatus = response.status;
-    const responseBody = await response.json();
+    const responseBody = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       return {
         ok: false,
-        provider: "azure-openai",
+        provider: "microsoft-foundry-claude",
         configMissing: null,
         output: null,
         tokenCounts: { input: 0, output: 0, total: 0 },
         httpStatus,
-        error: `AZURE_OPENAI_HTTP_${httpStatus}`
+        error: `MICROSOFT_FOUNDRY_HTTP_${httpStatus}`
       };
     }
 
     const content = responseBody?.choices?.[0]?.message?.content;
     const usage = responseBody?.usage || {};
-
-    const parsedOutput = parseStructuredJsonObject(content);
-    if (!parsedOutput.ok) {
+    const parsed = parseStructuredJsonObject(content);
+    if (!parsed.ok) {
       return {
         ok: false,
-        provider: "azure-openai",
+        provider: "microsoft-foundry-claude",
         configMissing: null,
         output: null,
         tokenCounts: {
@@ -124,15 +117,15 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
           total: usage.total_tokens || 0
         },
         httpStatus,
-        error: parsedOutput.error
+        error: parsed.error
       };
     }
 
     return {
       ok: true,
-      provider: "azure-openai",
+      provider: "microsoft-foundry-claude",
       configMissing: null,
-      output: parsedOutput.value,
+      output: parsed.value,
       tokenCounts: {
         input: usage.prompt_tokens || 0,
         output: usage.completion_tokens || 0,
@@ -140,19 +133,25 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
       },
       httpStatus,
       error: null,
-      responseClassification: parsedOutput.classification
+      responseClassification: parsed.classification
     };
-  } catch (err) {
+  } catch (error) {
     return {
       ok: false,
-      provider: "azure-openai",
+      provider: "microsoft-foundry-claude",
       configMissing: null,
       output: null,
       tokenCounts: { input: 0, output: 0, total: 0 },
       httpStatus,
-      error: `MODEL_CALL_EXCEPTION: ${String(err.message || err).slice(0, 200)}`
+      error: `MODEL_CALL_EXCEPTION: ${String(error.message || error).slice(0, 200)}`
     };
   }
 }
 
-module.exports = { call, checkConfig, REQUIRED_VARS };
+module.exports = {
+  DEFAULT_API_VERSION,
+  REQUIRED_VARS,
+  TOKEN_SCOPE,
+  call,
+  checkConfig
+};

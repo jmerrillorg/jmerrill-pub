@@ -25,6 +25,7 @@
 const { createHash } = require("node:crypto");
 const { DefaultAzureCredential } = require("@azure/identity");
 const mammoth = require("mammoth");
+const { trackDependency } = require("../observability/dependencyTelemetry");
 
 const MAX_DOWNLOAD_BYTES = 10 * 1024 * 1024;
 const MIN_WORD_COUNT = 100;
@@ -75,7 +76,7 @@ function encodeShareUrl(url) {
  * @param {string} manuscriptUrl — SharePoint URL (not logged)
  * @returns {Promise<Response>}
  */
-async function fetchViaGraph(manuscriptUrl) {
+async function fetchViaGraph(manuscriptUrl, telemetry = null) {
   const credential = new DefaultAzureCredential();
   const tokenResponse = await credential.getToken(GRAPH_SCOPE);
   if (!tokenResponse || !tokenResponse.token) {
@@ -87,12 +88,26 @@ async function fetchViaGraph(manuscriptUrl) {
   const encodedUrl = encodeShareUrl(manuscriptUrl);
   const graphEndpoint = `${GRAPH_SHARES_BASE}/${encodedUrl}/driveItem/content`;
 
-  return fetch(graphEndpoint, {
-    method: "GET",
-    headers: { "Authorization": `Bearer ${tokenResponse.token}` },
-    signal: AbortSignal.timeout(30000),
-    redirect: "follow"
-  });
+  return trackDependency(
+    telemetry,
+    {
+      name: "Graph Manuscript Read",
+      target: "https://graph.microsoft.com",
+      data: "driveItem/content:GET",
+      dependencyTypeName: "Microsoft Graph",
+      properties: {
+        source: "sharepoint-manuscript"
+      },
+      isSuccess: (result) => result.ok,
+      getResultCode: (result) => String(result.status)
+    },
+    () => fetch(graphEndpoint, {
+      method: "GET",
+      headers: { "Authorization": `Bearer ${tokenResponse.token}` },
+      signal: AbortSignal.timeout(30000),
+      redirect: "follow"
+    })
+  );
 }
 
 /**
@@ -122,7 +137,7 @@ async function fetchViaGraph(manuscriptUrl) {
  *   }
  * }>}
  */
-async function fetchAndExtractManuscript(manuscriptUrl, { fileTypeHint = null } = {}) {
+async function fetchAndExtractManuscript(manuscriptUrl, { fileTypeHint = null, telemetry = null } = {}) {
   const emptyMeta = { fileType: null, byteLength: null, wordCount: null, charCount: null, sha256: null, downloadMethod: null };
 
   const useGraph = isSharePointUrl(manuscriptUrl);
@@ -132,12 +147,26 @@ async function fetchAndExtractManuscript(manuscriptUrl, { fileTypeHint = null } 
   let response;
   try {
     if (useGraph) {
-      response = await fetchViaGraph(manuscriptUrl);
+      response = await fetchViaGraph(manuscriptUrl, telemetry);
     } else {
-      response = await fetch(manuscriptUrl, {
-        method: "GET",
-        signal: AbortSignal.timeout(30000)
-      });
+      response = await trackDependency(
+        telemetry,
+        {
+          name: "Direct Manuscript Read",
+          target: manuscriptUrl,
+          data: "manuscript:GET",
+          dependencyTypeName: "HTTP",
+          properties: {
+            source: "direct-manuscript"
+          },
+          isSuccess: (result) => result.ok,
+          getResultCode: (result) => String(result.status)
+        },
+        () => fetch(manuscriptUrl, {
+          method: "GET",
+          signal: AbortSignal.timeout(30000)
+        })
+      );
     }
   } catch (err) {
     const code = err.safeCode

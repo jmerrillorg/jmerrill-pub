@@ -17,6 +17,7 @@
  */
 
 const { DefaultAzureCredential } = require("@azure/identity");
+const { trackDependency } = require("../observability/dependencyTelemetry");
 
 // Dataverse picklist constants — match Dataverse option set values exactly
 const MODEL_PROVIDER = { AZURE_OPENAI: 835500000 };
@@ -37,6 +38,7 @@ const SOURCE_SYSTEM = "jm1-diagnostic-ai-runner";
  *   intakeReferenceCode: string,
  *   correlationId: string|null,
  *   executionMode: string,
+ *   modelProvider?: string|null,
  *   modelDeploymentAlias: string,
  *   promptKey: string,
  *   promptVersion: string,
@@ -67,7 +69,6 @@ function buildAiRequestLogPayload(input) {
     jm1_agentversion: AGENT_VERSION,
     jm1_airequestid: input.correlationId || input.diagnosticId,
     jm1_modeldeployment: input.modelDeploymentAlias,
-    jm1_modelprovider: MODEL_PROVIDER.AZURE_OPENAI,
     jm1_promptname: input.promptKey,
     jm1_promptversion: input.promptVersion,
     jm1_requeststatus: failed ? REQUEST_STATUS.FAILED : REQUEST_STATUS.COMPLETED,
@@ -87,6 +88,10 @@ function buildAiRequestLogPayload(input) {
     // jm1_responsepayload: NOT SET — AI model output prohibited
     // jm1_airecommendation: NOT SET — AI model output prohibited
   };
+
+  if (!input.modelProvider || input.modelProvider === "azure-openai") {
+    payload.jm1_modelprovider = MODEL_PROVIDER.AZURE_OPENAI;
+  }
 
   if (typeof input.confidence === "number") {
     payload.jm1_confidence = input.confidence;
@@ -113,7 +118,7 @@ function buildExecutionLogPayload(input, aiRequestLogId) {
 
   const payload = {
     jm1_name: `EXEC-${input.diagnosticId}-${input.executionMode}`,
-    jm1_actiondescription: `Stage 0 Diagnostic Runner — ${input.executionMode} execution for intake ${input.intakeReferenceCode}. No manuscript text stored. No prompt body stored.`,
+    jm1_actiondescription: `Stage 0 Diagnostic Runner — ${input.executionMode} execution for intake ${input.intakeReferenceCode}. Provider=${input.modelProvider || "unknown"}. No manuscript text stored. No prompt body stored.`,
     jm1_actiontype: "Stage0DiagnosticRun",
     jm1_agentname: AGENT_NAME,
     jm1_agentmodel: input.modelDeploymentAlias,
@@ -199,7 +204,8 @@ async function postDataverseRecord(apiBase, token, entitySet, payload) {
  *   executionLog: {created: boolean, id: string|null, error: string|null}
  * }>}
  */
-async function writeMetadata(input) {
+async function writeMetadata(input, options = {}) {
+  const telemetry = options.telemetry || null;
   const apiBase = process.env.DATAVERSE_WEB_API_BASE_URL;
   const resourceUrl = process.env.DATAVERSE_RESOURCE_URL;
 
@@ -225,7 +231,22 @@ async function writeMetadata(input) {
   let executionLogResult = { created: false, id: null, error: null };
   try {
     const execPayload = buildExecutionLogPayload(input, null);
-    const result = await postDataverseRecord(apiBase, token, "jm1_executionlogs", execPayload);
+    const result = await trackDependency(
+      telemetry,
+      {
+        name: "Dataverse Execution Log Write",
+        target: resourceUrl,
+        data: "jm1_executionlogs:POST",
+        dependencyTypeName: "Dataverse",
+        properties: {
+          entitySet: "jm1_executionlogs",
+          executionMode: input.executionMode
+        },
+        isSuccess: () => true,
+        getResultCode: () => "201"
+      },
+      () => postDataverseRecord(apiBase, token, "jm1_executionlogs", execPayload)
+    );
     executionLogResult = { created: true, id: result.id, error: null };
   } catch (err) {
     executionLogResult = { created: false, id: null, error: err.safeCode || "DATAVERSE_WRITE_FAILED" };
@@ -235,7 +256,22 @@ async function writeMetadata(input) {
   let aiRequestLogResult = { created: false, id: null, error: null };
   try {
     const aiPayload = buildAiRequestLogPayload(input);
-    const result = await postDataverseRecord(apiBase, token, "jm1_airequestlogs", aiPayload);
+    const result = await trackDependency(
+      telemetry,
+      {
+        name: "Dataverse AI Request Log Write",
+        target: resourceUrl,
+        data: "jm1_airequestlogs:POST",
+        dependencyTypeName: "Dataverse",
+        properties: {
+          entitySet: "jm1_airequestlogs",
+          executionMode: input.executionMode
+        },
+        isSuccess: () => true,
+        getResultCode: () => "201"
+      },
+      () => postDataverseRecord(apiBase, token, "jm1_airequestlogs", aiPayload)
+    );
     aiRequestLogResult = { created: true, id: result.id, error: null };
   } catch (err) {
     aiRequestLogResult = { created: false, id: null, error: err.safeCode || "DATAVERSE_WRITE_FAILED" };

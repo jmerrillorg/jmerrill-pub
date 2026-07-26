@@ -1,5 +1,7 @@
 .git*
 .vscode
+.next
+.DS_Store
 local.settings.json
 test
 node_modules
