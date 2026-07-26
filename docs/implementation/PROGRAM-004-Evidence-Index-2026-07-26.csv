@@ -1,0 +1,20 @@
+Evidence ID,Source,Path or record,Reference SHA,What it proves,Status
+EV-001,origin/main,docs/implementation/PROGRAM-002-Phase-I-Commissioning-Report.md,7bbcb9fa,Phase I certified baseline through Active Publishing workspace unlock and Commissioning Hold,Current
+EV-002,origin/main,docs/implementation/PROGRAM-002-Phase-I-Executive-Summary.md,7bbcb9fa,Executive certification and preserved no-release/no-payment/no-BC boundaries,Current
+EV-003,origin/main,docs/implementation/PROGRAM-002-Full-Author-Workspace-Production-Pipeline-Commissioning.md,7bbcb9fa,"Full author workspace, SharePoint, Dataverse, Stripe, SignNow, execution-log commissioning proof",Current
+EV-004,origin/main,docs/implementation/PROGRAM-002-Phase-II-Readiness-Report.md,7bbcb9fa,OP-000 readiness gates and explicit non-authorized production actions,Current
+EV-005,origin/main,docs/implementation/PROGRAM-003A-Agent365-Foundry-Runtime-Promotion.md,7bbcb9fa,Foundry/Azure runtime promotion evidence and Agent 365 boundary,Current
+EV-006,origin/main,docs/implementation/JM1-Capability-Maturity-Registry.md,7bbcb9fa,Capability maturity and governance holds,Current
+EV-007,origin/main,lib/server/dataverse/catalog.ts,7bbcb9fa,Catalog cover fallback source after repair,Current
+EV-008,origin/main,scripts/dataverse_catalog_cover_projection.test.mjs,7bbcb9fa,Catalog cover projection regression test,Current
+EV-009,origin/main,app/api/author/stripe/connect/start/route.ts,7bbcb9fa,Stripe Connect onboarding route evidence,Current
+EV-010,origin/main,app/api/author/stripe/payment/commissioning/start/route.ts,7bbcb9fa,Commissioning payment route evidence,Current
+EV-011,origin/main,app/api/author/stripe/webhook/route.ts,7bbcb9fa,Stripe webhook route evidence,Current
+EV-012,clean reconciliation branch,8eb2087 Reconstruct author operating center,2e372e9e,Author Operating Center reconstructed source batch,Clean branch
+EV-013,clean reconciliation branch,01079cc Reconstruct diagnostic runner governed routing,2e372e9e,Diagnostic runner governed route/contract reconstruction,Clean branch
+EV-014,clean reconciliation branch,dcc0d28 Reconstruct publisher operating center,2e372e9e,Publisher Operating Center reconstruction,Clean branch
+EV-015,clean reconciliation branch,d3b40da Reconstruct publishing intake onboarding safeguards,2e372e9e,Publishing intake/onboarding reconstruction,Clean branch
+EV-016,current package,PROGRAM-004-Requirement-Reconciliation-Register-2026-07-26.csv,this documentation package,Requirement-by-requirement package reconciliation,Generated now
+EV-017,current package,PROGRAM-004-Microsoft-Capability-Utilization-Matrix-2026-07-26.csv,this documentation package,Microsoft capability utilization matrix,Generated now
+EV-018,current package,PROGRAM-004-Productization-Readiness-Register-2026-07-26.csv,this documentation package,Productization readiness register,Generated now
+EV-019,current package,PROGRAM-004-Jackie-Action-Register-2026-07-26.csv,this documentation package,Jackie action register,Generated now
