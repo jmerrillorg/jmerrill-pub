@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit --incremental false"
+    "type-check": "tsc --noEmit --incremental false",
+    "workflow-engine-guard": "node scripts/workflow_engine_guard.mjs"
   },
   "dependencies": {
     "next": "^14.2.0",
