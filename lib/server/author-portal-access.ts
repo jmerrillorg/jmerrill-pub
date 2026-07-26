@@ -32,6 +32,28 @@ const DEFAULT_REFERENCE = 'JMP-INT-202607-0W5PTQ'
 const DEFAULT_TITLE = 'The Intentional Leader'
 const COOKIE_NAME = 'jm1_author_portal_session'
 const LOCAL_TEST_PORTAL_CODE = 'JMP-PORTAL-ADMIN-2026'
+const FORMER_PORTAL_SESSION_FALLBACK = 'jm1-author-portal-session'
+const MIN_PORTAL_SESSION_SECRET_BYTES = 32
+const PLACEHOLDER_PORTAL_SESSION_SECRETS = new Set([
+  'changeme',
+  'change-me',
+  'replace-me',
+  'placeholder',
+  'secret',
+  'password',
+  'author-portal-session-secret',
+  'your-secret-here',
+  'todo',
+])
+
+let warnedMissingDevelopmentSecret = false
+
+export class AuthorPortalSessionConfigurationError extends Error {
+  constructor(message = 'Author portal session configuration is unavailable.') {
+    super(message)
+    this.name = 'AuthorPortalSessionConfigurationError'
+  }
+}
 
 export function getAuthorPortalCookieName() {
   return COOKIE_NAME
@@ -174,7 +196,15 @@ export function readAuthorPortalSession(value: string | undefined) {
   const [encodedPayload, signature] = value.split('.')
   if (!encodedPayload || !signature) return null
 
-  const expected = signPortalPayload(encodedPayload)
+  let expected: string
+  try {
+    expected = signPortalPayload(encodedPayload)
+  } catch (error) {
+    if (error instanceof AuthorPortalSessionConfigurationError) {
+      return null
+    }
+    throw error
+  }
   if (!constantTimeEqual(signature, expected)) return null
 
   try {
@@ -360,13 +390,36 @@ function buildMasterPortalFallbackGrant(requestedReference?: string): AuthorPort
 }
 
 function getPortalSessionSecret() {
-  return (
-    process.env.AUTHOR_PORTAL_SESSION_SECRET?.trim() ||
-    process.env.AUTHOR_PORTAL_ACCESS_CODE_PEPPER?.trim() ||
-    process.env.AUTHOR_ONBOARDING_ACCESS_CODE?.trim() ||
-    process.env.AUTHOR_PORTAL_MASTER_ACCESS_CODE?.trim() ||
-    'jm1-author-portal-session'
-  )
+  const secret = process.env.AUTHOR_PORTAL_SESSION_SECRET?.trim()
+  if (secret) {
+    assertStrongPortalSessionSecret(secret)
+    return secret
+  }
+
+  if (process.env.NODE_ENV === 'development' && !warnedMissingDevelopmentSecret) {
+    warnedMissingDevelopmentSecret = true
+    console.warn('AUTHOR_PORTAL_SESSION_SECRET is required for author portal session signing.')
+  }
+
+  throw new AuthorPortalSessionConfigurationError()
+}
+
+function assertStrongPortalSessionSecret(secret: string) {
+  const normalized = secret.trim()
+  const normalizedLower = normalized.toLowerCase()
+  if (
+    !normalized ||
+    normalized === FORMER_PORTAL_SESSION_FALLBACK ||
+    PLACEHOLDER_PORTAL_SESSION_SECRETS.has(normalizedLower) ||
+    Buffer.byteLength(normalized, 'utf8') < MIN_PORTAL_SESSION_SECRET_BYTES ||
+    countUniqueCharacters(normalized) < 12
+  ) {
+    throw new AuthorPortalSessionConfigurationError()
+  }
+}
+
+function countUniqueCharacters(value: string) {
+  return new Set(value).size
 }
 
 function constantTimeEqual(left: string, right: string) {
