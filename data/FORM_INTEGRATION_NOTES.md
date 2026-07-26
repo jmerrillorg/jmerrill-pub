@@ -6,6 +6,7 @@ Internal operational note for J Merrill Publishing form routing.
 
 - `/join` remains the public "Join the Family" inquiry form.
 - `/api/join` routes submissions through the shared website form integration layer.
+- `/join` is the new/prospective author intake lane and must not be collapsed into `/author/onboarding`.
 - Publisher-facing notifications are addressed to `publishing@jmerrill.one` by default.
 
 ## Private author onboarding routes
@@ -15,6 +16,8 @@ Internal operational note for J Merrill Publishing form routing.
 - `/author/royalty-setup`
 
 These routes are not listed in public navigation or the sitemap. They use a lightweight access-code gate and should be treated as private operational intake, not account-level authentication.
+
+`/author/onboarding` is the current/accepted author production-spec lane. It is not the INT-PUB-005 `/join` intake lane.
 
 ## Azure environment variables
 
@@ -44,6 +47,16 @@ Every route-specific Power Automate flow should follow this sequence:
 6. Return HTTP response to website.
 
 `jm1pub_submission` is the first-write audit anchor for every intake flow.
+
+For `/author/onboarding`, Power Automate must read submitted form values from the nested canonical payload:
+
+- `triggerBody()?['payload']?['bookTitle']`
+- `triggerBody()?['payload']?['preferredPrintFormat']`
+- `triggerBody()?['payload']?['rightsHolderConfirmed']`
+
+Do not read submitted form values from the root trigger body. Expressions like `triggerBody()['bookTitle']` are legacy/incorrect for this envelope.
+
+Live validation on 2026-06-23 confirmed the canonical `/author/onboarding` flow writes first to Dataverse entity set `jm1pub_submissions`. The `jm1pub_rawpayload` column has a confirmed 2,000-character maximum, so the flow stores `string(triggerBody()?['payload'])` truncated to 2,000 characters. Without this bound, the route-specific flow can return `502 NoResponse` after Dataverse rejects the row.
 
 ## Endpoint strategy
 
@@ -126,6 +139,16 @@ The shared notification flow can continue reading nested values from `payload`, 
 - `triggerBody()?['payload']?['formType']`
 - `triggerBody()?['payload']?['submittedAt']`
 - `triggerBody()?['payload']?['internalClassification']?['value']`
+
+For controlled `/author/onboarding` fields, the canonical field value is a stable key. Human-readable labels are supplied separately as `*Label` fields where needed. Power Automate must map the stable key to the confirmed Dataverse integer before writing Choice columns. Do not write display labels into Dataverse Choice columns.
+
+Canonical `/author/onboarding` mapping reference:
+
+- `docs/dataverse/publishing-author-onboarding-choice-mapping.md`
+
+Canonical flow cleanup/status reference:
+
+- `docs/operations/publishing-intake-onboarding-stabilization-2026-06-23.md`
 
 ## Internal classification canon
 
