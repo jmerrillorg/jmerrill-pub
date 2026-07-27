@@ -12,7 +12,7 @@ const checks = [
       engine.includes('AUTHOR_PUBLISHING_COMMUNICATION_POLICY') &&
       engine.includes("transactionalFromAddress: 'publishing@email.jmerrill.one'") &&
       engine.includes("canonicalReplyTo: 'publishing@jmerrill.one'") &&
-      engine.includes("publishingArchiveCc: 'publishing@jmerrill.one'") &&
+      engine.includes("publishingArchiveCopy: 'publishing@jmerrill.one'") &&
       engine.includes("monitoredReplyMailbox: 'publishing@jmerrill.one'"),
   },
   {
@@ -39,11 +39,12 @@ const checks = [
       relayTests.includes('approved author response sets Reply-To to publishing@jmerrill.one'),
   },
   {
-    name: 'archive CC remains required for author-facing communication evidence',
+    name: 'hidden archive BCC remains required for author-facing communication evidence',
     pass: () =>
-      engine.includes('AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_ARCHIVE_CC_MISSING') &&
-      orchestrator.includes('cc: [INTERNAL_VISIBILITY_MAILBOX]') &&
-      relay.includes('cc: ['),
+      engine.includes('AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_ARCHIVE_BCC_MISSING') &&
+      orchestrator.includes('bcc: [INTERNAL_VISIBILITY_MAILBOX]') &&
+      relay.includes('bcc: [') &&
+      relay.includes('VISIBLE_ARCHIVE_COPY_NOT_ALLOWED'),
   },
 ]
 

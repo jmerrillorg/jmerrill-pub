@@ -17,7 +17,7 @@ export const AUTHOR_PUBLISHING_COMMUNICATION_POLICY = {
   transactionalFromAddress: 'publishing@email.jmerrill.one',
   transactionalFromName: 'J Merrill Publishing',
   canonicalReplyTo: 'publishing@jmerrill.one',
-  publishingArchiveCc: 'publishing@jmerrill.one',
+  publishingArchiveCopy: 'publishing@jmerrill.one',
   monitoredReplyMailbox: 'publishing@jmerrill.one',
 } as const
 
@@ -122,7 +122,7 @@ export type AuthorPackageNotificationInput = {
     from: string
     to: string
     replyTo: string
-    cc: string[]
+    bcc: string[]
   }
   correlationId: string
   idempotencyKey: string
@@ -221,11 +221,11 @@ export function validateAuthorNotificationHeaders(input: {
   from: string
   to: string
   replyTo?: string
-  cc: string[]
+  bcc: string[]
 }): { ok: true } | { ok: false; blocker: string } {
   const from = input.from.trim().toLowerCase()
   const replyTo = (input.replyTo || '').trim().toLowerCase()
-  const cc = input.cc.map((address) => address.trim().toLowerCase())
+  const bcc = input.bcc.map((address) => address.trim().toLowerCase())
 
   if (from !== AUTHOR_PUBLISHING_COMMUNICATION_POLICY.transactionalFromAddress) {
     return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - SENDER_NOT_APPROVED' }
@@ -239,8 +239,8 @@ export function validateAuthorNotificationHeaders(input: {
   if (replyTo.endsWith('@email.jmerrill.one')) {
     return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_DOMAIN_NOT_RECEIVING_MAIL' }
   }
-  if (!cc.includes(AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCc)) {
-    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_ARCHIVE_CC_MISSING' }
+  if (!bcc.includes(AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy)) {
+    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_ARCHIVE_BCC_MISSING' }
   }
   return { ok: true }
 }
@@ -291,7 +291,7 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
   from: string
   to: string
   replyTo: string
-  cc: string[]
+  bcc: string[]
   subject: string
   textBody: string
   attachments: GovernedPackageAttachment[]
@@ -300,7 +300,7 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
     from: input.from,
     to: input.to,
     replyTo: input.replyTo,
-    cc: input.cc,
+    bcc: input.bcc,
   })
   if (!headerValidation.ok) throw new Error(headerValidation.blocker)
 
@@ -314,7 +314,7 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
     },
     recipients: {
       to: [{ address: input.to }],
-      cc: input.cc.map((address) => ({ address })),
+      bcc: input.bcc.map((address) => ({ address })),
     },
     attachments: input.attachments.map((attachment): EmailAttachment => ({
       name: attachment.fileName,

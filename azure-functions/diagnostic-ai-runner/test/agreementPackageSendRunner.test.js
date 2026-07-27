@@ -228,18 +228,20 @@ describe("sendAgreementPackage — updates existing Opportunity fields (no new s
   });
 });
 
-describe("sendAgreementPackage — sender/replyTo/cc match the approved publishing identity", () => {
-  test("sender, replyTo, and cc are fixed and correct", async () => {
+describe("sendAgreementPackage — sender/replyTo/hidden archive match the approved publishing identity", () => {
+  test("sender, replyTo, and bcc archive are fixed and correct", async () => {
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     let capturedMessage = null;
     const deps = await fakeDeps({ sendEmail: async (msg) => { capturedMessage = msg; return { providerMessageId: "x" }; } });
     const result = await sendAgreementPackage(controlledInput(), deps);
-    assert.equal(capturedMessage.cc, INTERNAL_VISIBILITY_MAILBOX);
+    assert.equal(capturedMessage.cc, undefined);
+    assert.equal(capturedMessage.bcc, INTERNAL_VISIBILITY_MAILBOX);
     assert.equal(capturedMessage.replyTo, INTERNAL_VISIBILITY_MAILBOX);
     assert.equal(result.sender, "publishing@email.jmerrill.one");
     assert.equal(result.replyTo, INTERNAL_VISIBILITY_MAILBOX);
-    assert.equal(result.cc, INTERNAL_VISIBILITY_MAILBOX);
+    assert.equal(result.archiveCopy, INTERNAL_VISIBILITY_MAILBOX);
+    assert.equal(result.archiveVisibility, "hidden");
   });
 });
 

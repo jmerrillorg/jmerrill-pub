@@ -564,7 +564,7 @@ export function buildNotificationInputFromPackage(input: {
       from: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.transactionalFromAddress,
       to: input.recipientEmail,
       replyTo: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo,
-      cc: [AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCc],
+      bcc: [AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy],
     },
     correlationId: input.pkg.correlationId,
     idempotencyKey: `package-release:${input.pkg.idempotencyKey}`,

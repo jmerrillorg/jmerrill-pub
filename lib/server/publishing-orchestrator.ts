@@ -39,7 +39,7 @@ const PRODUCTION_TASK_PRIORITY_HIGH = 835500002
 const APPROVED_AUTHOR_RESPONSE_MESSAGE_TYPE = 'APPROVED_AUTHOR_RESPONSE'
 const RELAY_URL = 'https://func-jm1-acs-email-relay.azurewebsites.net'
 const APPROVED_SENDER = AUTHOR_PUBLISHING_COMMUNICATION_POLICY.transactionalFromAddress
-const INTERNAL_VISIBILITY_MAILBOX = AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCc
+const INTERNAL_VISIBILITY_MAILBOX = AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy
 const CANONICAL_REPLY_TO = AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo
 
 export type ApprovalTransitionPayload = {
@@ -204,7 +204,7 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
       from: APPROVED_SENDER,
       to: authorEmail,
       replyTo: CANONICAL_REPLY_TO,
-      cc: [INTERNAL_VISIBILITY_MAILBOX],
+      bcc: [INTERNAL_VISIBILITY_MAILBOX],
     },
     correlationId: input.correlationId || idempotencyKey,
     idempotencyKey,
@@ -255,7 +255,7 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
     replyTo: CANONICAL_REPLY_TO,
     futureSendRequiresInternalCopy: true,
     futureSendRequiresDataverseLog: true,
-    cc: [INTERNAL_VISIBILITY_MAILBOX],
+    bcc: [INTERNAL_VISIBILITY_MAILBOX],
   }
 
   const relayResponse = await fetch(`${RELAY_URL}/api/send-approved-author-response`, {
@@ -282,7 +282,7 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
   const sentLog = await writeLog(config, {
     actionType: 'PROOFREADING_NOTIFICATION_SENT',
     name: `PROOFREADING_NOTIFICATION_SENT - ${titleName}`,
-    description: `Proofreading notification sent from ${APPROVED_SENDER} to ${authorEmail} with Reply-To ${CANONICAL_REPLY_TO} and CC ${INTERNAL_VISIBILITY_MAILBOX}. Subject "${payload.subject}". ${providerEvidenceText} Idempotency: ${idempotencyKey}.`,
+    description: `Proofreading notification sent from ${APPROVED_SENDER} to ${authorEmail} with Reply-To ${CANONICAL_REPLY_TO} and hidden archive copy to ${INTERNAL_VISIBILITY_MAILBOX}. Subject "${payload.subject}". ${providerEvidenceText} Idempotency: ${idempotencyKey}.`,
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: input.gateId,
   })
@@ -292,7 +292,7 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
     name: `PROOFREADING_COMMUNICATION_EVIDENCE_RECORDED - ${titleName}`,
     description: [
       `Communication state NOTIFICATION_SENT.`,
-      `sender=${APPROVED_SENDER}; replyTo=${CANONICAL_REPLY_TO}; recipient=${authorEmail}; cc=${INTERNAL_VISIBILITY_MAILBOX}; messageId=${providerMessageId}; sentAt=${now}.`,
+      `sender=${APPROVED_SENDER}; replyTo=${CANONICAL_REPLY_TO}; recipient=${authorEmail}; archiveCopy=${INTERNAL_VISIBILITY_MAILBOX}; archiveVisibility=hidden; messageId=${providerMessageId}; sentAt=${now}.`,
       `titleId=${titleId}; stageId=${stageId}; gateId=${input.gateId}; packageArtifactIds=${artifactId}; packageChecksum=${checksum || 'not-recorded'}. Idempotency: ${idempotencyKey}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
@@ -311,7 +311,7 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
     dataversePatch(config, 'jm1pub_editorialstages', stageId, {
       jm1pub_stagestatus: 100000002,
       jm1pub_authorsafesummary: 'Your proofreading package is ready for review.',
-      jm1pub_internaloperationalsummary: `Proofreading notification sent from ${APPROVED_SENDER}, copied to ${INTERNAL_VISIBILITY_MAILBOX}. ${providerEvidenceText}`,
+      jm1pub_internaloperationalsummary: `Proofreading notification sent from ${APPROVED_SENDER}, hidden archive copy to ${INTERNAL_VISIBILITY_MAILBOX}. ${providerEvidenceText}`,
       jm1pub_currentgatecount: 1,
       jm1pub_correlationid: input.correlationId || idempotencyKey,
     }),

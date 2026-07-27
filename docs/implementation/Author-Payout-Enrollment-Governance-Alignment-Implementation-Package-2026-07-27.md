@@ -180,6 +180,20 @@ Execution events:
 
 No event may contain an Account Link URL, access code, token, secret, bank detail, or full tax-identification value.
 
+## Publishing Email Canon
+
+Canonical publishing enrollment messages must use:
+
+```text
+From: publishing@email.jmerrill.one
+Reply-To: publishing@jmerrill.one
+Governed archival copy: publishing@jmerrill.one
+```
+
+The Reply-To header and archival copy are mandatory. The archival copy must use BCC or an approved non-author-visible mechanism, with duplicate archival delivery suppressed when `publishing@jmerrill.one` is already the primary recipient. These controls must be set by the outbound publishing mail component and must not rely on mailbox forwarding, Exchange aliases, user mailbox rules, author knowledge, or manual operator intervention.
+
+Author-facing messages may include a transient Stripe Account Link only for the intended author delivery. Archival copies, retrospective archive copies, Dataverse records, execution logs, evidence files, and internal documentation must redact the link as `[TRANSIENT ACCOUNT LINK REDACTED]`.
+
 ## Operator Runbook
 
 1. Confirm the author is canonical in Dataverse and linked to the governed publishing relationship.
@@ -190,41 +204,39 @@ No event may contain an Account Link URL, access code, token, secret, bank detai
 6. Create a Standard account only when no governed account ID exists.
 7. Generate a Stripe-hosted Account Link only for authenticated Author Operating Center use.
 8. Do not copy Account Link URLs into Dataverse, evidence, logs, email, chat, or documents.
-9. Retrieve and record non-sensitive enrollment/readiness status.
-10. Escalate requirements that need author action through approved support messaging.
-11. Do not initiate payments from enrollment status.
-12. Route payout execution to the future governed Business Central payment-instruction design.
+9. Send outbound enrollment support messages only through the governed publishing email component with canonical From, Reply-To, archival copy, and correlation ID.
+10. Retrieve and record non-sensitive enrollment/readiness status.
+11. Escalate requirements that need author action through approved support messaging.
+12. Do not initiate payments from enrollment status.
+13. Route payout execution to the future governed Business Central payment-instruction design.
 
 ## Pilot Readiness
 
 | Author | Current status | Required next step |
 | --- | --- | --- |
-| Rosetta Perry | EXISTING PILOT ACCOUNT / REUSE REQUIRED / NO AUTHOR LINK DELIVERY | Read-only Stripe status review by authorized admin, then Jackie author-facing delivery approval |
-| Cynthia Sloan | READY_FOR_INTERNAL_STRIPE_PROOF after narrowed implementation review | Bounded internal proof only; no link delivery |
-| Carolyn Booker-Pierce | BLOCKED_TITLE_RECONCILIATION_REQUIRED | Resolve title discrepancy before account creation |
+| Rosetta Perry | INVITED / EXISTING PILOT ACCOUNT REUSED / ACTION REQUIRED | Monitor non-sensitive Stripe status; regenerate link only through governed support workflow if needed |
+| Cynthia Sloan | INVITED / STANDARD ACCOUNT CREATED / ACTION REQUIRED | Monitor non-sensitive Stripe status; regenerate link only through governed support workflow if needed |
+| Carolyn Booker-Pierce | INVITED / STANDARD ACCOUNT CREATED / ACTION REQUIRED / SIX TITLES CANONICAL | Monitor non-sensitive Stripe status; regenerate link only through governed support workflow if needed |
 
 ## Carolyn Booker-Pierce Title Reconciliation
 
-Five titles validated by Publisher Master Imprint Register Batch 3:
+Six canonical pilot titles now control Carolyn's Author Payout Enrollment relationship:
 
 1. Abortion!
-2. Girl, You're Not Crazy. You're Dealing with a Narcissist
-3. Loving the Addict
-4. More Than a Village
-5. You're Still Not Crazy
-
-Previously expected additional title:
-
-- Because the Lord Is My Shepherd
+2. Because the Lord Is My Shepherd
+3. Girl, You're Not Crazy. You're Dealing with a Narcissist
+4. Loving the Addict
+5. More Than a Village
+6. You're Still Not Crazy
 
 Discrepancy cause:
 
-Earlier enterprise adoption evidence also listed Carolyn relationship evidence for A Little Bit of Everything, A Truebies Guide Part 1, and A Truebies Guide Part 2. The current five-title expectation aligns to the later Publisher Master Imprint Register Batch 3 locked set, but the royalty manifest still contains a title-decision row for Because the Lord is My Shepherd: Psalm 23 and Me. That additional title is not in the Batch 3 five-title locked set and requires Jackie relationship decision before Carolyn internal Stripe proof.
+Jackie's supplied ISBN-title-author register superseded stale historical inference and confirmed Because the Lord Is My Shepherd as Carolyn Booker-Pierce. Earlier references linking Carolyn to A Little Bit of Everything, A Truebies Guide Part 1, or A Truebies Guide Part 2 are superseded by the register.
 
 Corrected canonical relationship count:
 
-- Current locked Batch 3 count: 5
-- Carolyn Stripe proof count: blocked until Because the Lord Is My Shepherd is classified as included, excluded, duplicate/variant, retired, or assigned to another canonical author.
+- Current pilot count: 6
+- Carolyn Stripe proof blocker: closed
 
 ## Gates
 

@@ -211,6 +211,8 @@ test('complete package release hands off to canonical notification engine', () =
   })
   assert.equal(validateAuthorPackageNotification(notification).ok, true)
   assert.equal(notification.recipientPolicy.replyTo, 'publishing@jmerrill.one')
+  assert.deepEqual(notification.recipientPolicy.bcc, ['publishing@jmerrill.one'])
+  assert.equal('cc' in notification.recipientPolicy, false)
 })
 
 test('workspace visibility follows package status', () => {

@@ -70,7 +70,7 @@ function validPayload(overrides = {}) {
     intakeReferenceCode: "JMP-INT-202606-UFYG60",
     to: "chosen2k7@gmail.com",
     toDisplayName: "Jackie Smith Jr.",
-    cc: "publishing@jmerrill.one",
+    bcc: "publishing@jmerrill.one",
     replyTo: "publishing@jmerrill.one",
     subject: "Agreement package for Establishing Glory: The Library",
     bodyText: "Hi Jackie, attached is your agreement package for review and signature.",
@@ -93,11 +93,15 @@ test("rejects a recipient at @jmerrill.pub", () => {
   assert.equal(result.reason, "JMERRILL_PUB_MAILBOX_NOT_ALLOWED");
 });
 
-test("rejects when cc is not the internal visibility mailbox", () => {
+test("rejects visible archive copies and requires internal visibility bcc", () => {
   const { validateAgreementPackageSendPayload } = loadAgreementPackageModule();
   const result = validateAgreementPackageSendPayload(validPayload({ cc: "someone-else@jmerrill.one" }));
   assert.equal(result.ok, false);
-  assert.equal(result.reason, "CC_MUST_BE_INTERNAL_VISIBILITY_MAILBOX");
+  assert.equal(result.reason, "VISIBLE_ARCHIVE_COPY_NOT_ALLOWED");
+
+  const missingBcc = validateAgreementPackageSendPayload(validPayload({ bcc: "" }));
+  assert.equal(missingBcc.ok, false);
+  assert.equal(missingBcc.reason, "BCC_MUST_BE_INTERNAL_VISIBILITY_MAILBOX");
 });
 
 test("rejects when replyTo is not the internal visibility mailbox", () => {
@@ -167,7 +171,7 @@ test("validateAttachments — rejects missing attachment content", () => {
   assert.equal(result.reason, "ATTACHMENT_CONTENT_MISSING");
 });
 
-test("buildAgreementPackageSendEmail — sender, replyTo, cc, and attachments are correct", () => {
+test("buildAgreementPackageSendEmail — sender, replyTo, hidden archive bcc, and attachments are correct", () => {
   const { validateAgreementPackageSendPayload, buildAgreementPackageSendEmail } = loadAgreementPackageModule();
   const validation = validateAgreementPackageSendPayload(validPayload());
   const email = buildAgreementPackageSendEmail(validation.value);
@@ -175,16 +179,17 @@ test("buildAgreementPackageSendEmail — sender, replyTo, cc, and attachments ar
   assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
   assert.equal(email.replyTo[0].address, "publishing@jmerrill.one");
   assert.equal(email.recipients.to[0].address, "chosen2k7@gmail.com");
-  assert.equal(email.recipients.cc[0].address, "publishing@jmerrill.one");
+  assert.equal(email.recipients.cc, undefined);
+  assert.equal(email.recipients.bcc[0].address, "publishing@jmerrill.one");
   assert.equal(email.attachments.length, 4);
   assert.ok(email.attachments.every((a) => a.contentType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
 });
 
-test("buildAgreementPackageSendEmail — never includes a bcc", () => {
+test("buildAgreementPackageSendEmail — never exposes the archive copy through cc", () => {
   const { validateAgreementPackageSendPayload, buildAgreementPackageSendEmail } = loadAgreementPackageModule();
   const validation = validateAgreementPackageSendPayload(validPayload());
   const email = buildAgreementPackageSendEmail(validation.value);
-  assert.equal(email.recipients.bcc, undefined);
+  assert.equal(email.recipients.cc, undefined);
 });
 
 test("the route is registered as send-agreement-package, POST only, anonymous authLevel (relay key is the real gate)", () => {
