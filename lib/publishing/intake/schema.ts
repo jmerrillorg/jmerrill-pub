@@ -47,6 +47,9 @@ export type NormalizedPublishingIntake = PublishingIntakeInput & {
   formType: 'publishing-intake'
   division: 'publishing'
   divisionNumber: '01'
+  manuscriptReceived?: boolean
+  workspaceUrl?: string
+  workspaceFolderId?: string
 }
 
 type FieldSpec = {
