@@ -296,7 +296,7 @@ export function AuthorPortalWorkspace() {
             Author profile {context.relationship.authorProfileStatus}
           </span>
           <span className="rounded-full border border-white/10 px-3 py-1">
-            Stripe {context.relationship.stripeConnectStatus}
+            Payout enrollment {context.relationship.stripeConnectStatus}
           </span>
           <span className="rounded-full border border-white/10 px-3 py-1">
             Tax profile {context.relationship.taxStatus}
