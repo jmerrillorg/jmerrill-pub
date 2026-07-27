@@ -1,6 +1,10 @@
 "use strict";
 
 /**
+ * Engine: Stage Transition Engine
+ * Reusable? Y
+ * Stage-specific exception? N
+ *
  * Editorial Review run control for PROGRAM-002.
  *
  * This module owns readiness, scheduling, duplicate prevention, and
@@ -47,6 +51,7 @@ const WORKSPACE_MOVEMENT_STATUS = Object.freeze({
 });
 
 const READY_DIAGNOSTIC_STATUSES = new Set([
+  DIAGNOSTIC_STATUS.PENDING,
   DIAGNOSTIC_STATUS.AWAITING_JACKIE_REVIEW
 ]);
 
@@ -105,7 +110,7 @@ function evaluateEditorialReviewReadiness(record = {}) {
   if (!isUsableHttpsUrl(workspaceUrl)) missing.push("workspaceUrl");
 
   if (!READY_DIAGNOSTIC_STATUSES.has(diagnosticStatus)) {
-    blocking.push("DIAGNOSTIC_NOT_AWAITING_PUBLISHER_REVIEW");
+    blocking.push("DIAGNOSTIC_NOT_READY_FOR_EDITORIAL_REVIEW");
   }
   if (TERMINAL_OR_ACTIVE_STATUSES.has(currentRunStatus)) {
     blocking.push("EDITORIAL_REVIEW_ALREADY_RUNNING_OR_COMPLETE");

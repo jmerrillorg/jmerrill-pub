@@ -1,10 +1,18 @@
+// Engine: Stage Transition Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 import { NextRequest, NextResponse } from 'next/server'
 import {
   classifyRecoverableFailure,
   enqueuePublishingIntakeDeadLetter,
   enqueuePublishingIntakeRecovery,
 } from '@/lib/publishing/intake/deadLetter'
-import { writePublishingIntakeWithRetry } from '@/lib/publishing/intake/dataverse'
+import { sendJoinAuthorAcknowledgment } from '@/lib/publishing/intake/authorAcknowledgment'
+import {
+  markPublishingIntakeAcknowledgmentSent,
+  writePublishingIntakeWithRetry,
+} from '@/lib/publishing/intake/dataverse'
 import { getIdempotencyReplay, rememberIdempotencyKey } from '@/lib/publishing/intake/idempotency'
 import { sendJoinInternalNotification } from '@/lib/publishing/intake/internalNotification'
 import {
@@ -23,6 +31,7 @@ import {
 } from '@/lib/publishing/intake/schema'
 import { maskEmail, maskName } from '@/lib/publishing/intake/sanitize'
 import { verifyTurnstileToken } from '@/lib/publishing/intake/turnstile'
+import { autoInitializeOutsideInquiryEditorialReview } from '@/lib/server/publisher-operating-center'
 
 export const dynamic = 'force-dynamic'
 
@@ -285,6 +294,97 @@ async function handlePublishingIntakePost(req: NextRequest) {
         recoveryStatus: recovery.status,
         reference,
       })
+    }
+
+    const acknowledgment = await sendJoinAuthorAcknowledgment(acceptedIntake)
+    if (acknowledgment.status !== 'sent') {
+      const acknowledgmentFailure = acknowledgment.status === 'failed'
+        ? acknowledgment.reason
+        : `acknowledgment_${acknowledgment.reason}`
+      const recovery = await enqueuePublishingIntakeRecovery({
+        intakeReference: acceptedIntake.reference,
+        dataverseRecordId: dataverse.status === 'success' ? dataverse.recordId : undefined,
+        workspaceFolderId: acceptedIntake.workspaceFolderId,
+        correlationId: acceptedIntake.idempotencyKey,
+        failedOperationType: 'AUTHOR_ACKNOWLEDGMENT',
+        failureClassification: classifyRecoverableFailure(acknowledgmentFailure),
+        safeErrorCode: acknowledgmentFailure,
+      })
+
+      console.warn('Publishing intake author acknowledgment did not send after intake acceptance.', {
+        status: acknowledgment.status,
+        reason: acknowledgment.reason,
+        recoveryStatus: recovery.status,
+        reference,
+      })
+    } else if (dataverse.status === 'success') {
+      const acknowledgmentWriteback = await markPublishingIntakeAcknowledgmentSent(dataverse.recordId)
+      if (acknowledgmentWriteback.status !== 'success') {
+        const writebackFailure = acknowledgmentWriteback.status === 'failed'
+          ? acknowledgmentWriteback.reason
+          : `acknowledgment_writeback_${acknowledgmentWriteback.reason}`
+        const recovery = await enqueuePublishingIntakeRecovery({
+          intakeReference: acceptedIntake.reference,
+          dataverseRecordId: dataverse.recordId,
+          workspaceFolderId: acceptedIntake.workspaceFolderId,
+          correlationId: acceptedIntake.idempotencyKey,
+          failedOperationType: 'ACKNOWLEDGMENT_WRITEBACK',
+          failureClassification: classifyRecoverableFailure(writebackFailure),
+          safeErrorCode: writebackFailure,
+        })
+
+        console.warn('Publishing intake author acknowledgment writeback did not complete after intake acceptance.', {
+          status: acknowledgmentWriteback.status,
+          reason: acknowledgmentWriteback.reason,
+          recoveryStatus: recovery.status,
+          reference,
+        })
+      }
+    }
+
+    if (dataverse.status === 'success' && dataverse.recordId) {
+      try {
+        const orchestration = await autoInitializeOutsideInquiryEditorialReview({
+          intakeId: dataverse.recordId,
+          correlationId: acceptedIntake.idempotencyKey,
+        })
+
+        if (orchestration.status !== 'dispatched') {
+          const recovery = await enqueuePublishingIntakeRecovery({
+            intakeReference: acceptedIntake.reference,
+            dataverseRecordId: dataverse.recordId,
+            workspaceFolderId: acceptedIntake.workspaceFolderId,
+            correlationId: acceptedIntake.idempotencyKey,
+            failedOperationType: 'PIPELINE_ORCHESTRATION',
+            failureClassification: classifyRecoverableFailure(`orchestration_${orchestration.blocker}`),
+            safeErrorCode: `orchestration_${orchestration.blocker}`,
+          })
+
+          console.warn('Publishing intake orchestration did not complete after intake acceptance.', {
+            status: orchestration.status,
+            blocker: orchestration.blocker,
+            recoveryStatus: recovery.status,
+            reference,
+          })
+        }
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : 'unknown'
+        const recovery = await enqueuePublishingIntakeRecovery({
+          intakeReference: acceptedIntake.reference,
+          dataverseRecordId: dataverse.recordId,
+          workspaceFolderId: acceptedIntake.workspaceFolderId,
+          correlationId: acceptedIntake.idempotencyKey,
+          failedOperationType: 'PIPELINE_ORCHESTRATION',
+          failureClassification: classifyRecoverableFailure(`orchestration_exception:${reason}`),
+          safeErrorCode: `orchestration_exception:${reason}`,
+        })
+
+        console.warn('Publishing intake orchestration threw after intake acceptance.', {
+          reason: error instanceof Error ? error.name : 'unknown',
+          recoveryStatus: recovery.status,
+          reference,
+        })
+      }
     }
 
     return json({ status: 'received', reference }, 201, originResult.origin)

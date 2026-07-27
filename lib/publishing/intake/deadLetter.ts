@@ -23,6 +23,7 @@ export type PublishingIntakeRecoveryOperation =
   | 'PUBLISHING_NOTIFICATION'
   | 'AUTHOR_ACKNOWLEDGMENT'
   | 'ACKNOWLEDGMENT_WRITEBACK'
+  | 'PIPELINE_ORCHESTRATION'
   | 'MANUSCRIPT_WRITEBACK'
   | 'WORKSPACE_WRITEBACK'
   | 'EXECUTION_LOG_WRITE'
@@ -151,6 +152,7 @@ export function buildPublishingIntakeRecoveryMessage(
 export function classifyRecoverableFailure(reason: string): PublishingIntakeFailureClassification {
   if (reason.startsWith('dataverse_ack_writeback_')) return 'STATUS_WRITEBACK_FAILED'
   if (reason.startsWith('dataverse_write_')) return 'DATAVERSE_ENRICHMENT_FAILED'
+  if (reason.includes('orchestration') || reason.includes('autostart') || reason.includes('diagnostic')) return 'DATAVERSE_ENRICHMENT_FAILED'
   if (reason.startsWith('sharepoint_') || reason.startsWith('manuscript_')) return 'SHAREPOINT_SECONDARY_SETUP_FAILED'
   if (reason.startsWith('relay_') || reason.includes('notification')) return 'PUBLISHING_NOTIFICATION_FAILED'
   if (reason.includes('execution_log')) return 'EXECUTION_LOG_WRITE_FAILED'
