@@ -70,18 +70,6 @@ type InquiryWorkspaceContext = {
 
 const GRAPH_BASE_URL = 'https://graph.microsoft.com/v1.0'
 const MAX_MANUSCRIPT_UPLOAD_BYTES = 25 * 1024 * 1024
-const WORKSPACE_SUBFOLDERS = [
-  '00_Admin',
-  '01_Manuscript',
-  '02_Editorial',
-  '03_Design',
-  '04_Production',
-  '05_Distribution',
-  '06_Marketing',
-  '07_Legal-Rights',
-  '08_Archive',
-] as const
-
 const ORIGINAL_MANUSCRIPT_FOLDER = '01_Manuscript/Original'
 
 const EXTENSION_FLAGS: Record<ManuscriptFileExtension, ManuscriptReviewFlag> = {
@@ -296,13 +284,6 @@ async function getDriveByName(token: string, siteId: string, driveName: string):
   return { id: drive.id, webUrl: typeof drive.webUrl === 'string' ? drive.webUrl : undefined }
 }
 
-async function ensureWorkspaceSubfolders(token: string, driveId: string, workspacePath: string) {
-  for (const subfolder of WORKSPACE_SUBFOLDERS) {
-    await ensureFolderPath(token, driveId, `${workspacePath}/${subfolder}`)
-  }
-  await ensureFolderPath(token, driveId, `${workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}`)
-}
-
 async function ensureInquiryWorkspaceContext(
   intake: NormalizedPublishingIntake,
   config: GraphConfig,
@@ -313,7 +294,6 @@ async function ensureInquiryWorkspaceContext(
   const workspaceFolderName = buildWorkspaceFolderName(intake)
   const workspacePath = `${config.inquiryRootPath}/${workspaceFolderName}`
   const workspace = await ensureFolderPath(token, drive.id, workspacePath)
-  await ensureWorkspaceSubfolders(token, drive.id, workspacePath)
 
   return {
     token,
