@@ -202,7 +202,7 @@ function validAuthorResponsePayload(overrides = {}) {
     internalVisibilityMailbox: "publishing@jmerrill.one",
     futureSendRequiresInternalCopy: true,
     futureSendRequiresDataverseLog: true,
-    cc: ["publishing@jmerrill.one"],
+    bcc: ["publishing@jmerrill.one"],
     ...overrides
   };
 }
@@ -337,7 +337,7 @@ test("internal notification rejects CC/BCC, @jmerrill.pub, missing preview, and 
   }
 });
 
-test("valid approved author response builds ACS email to author and copies publishing mailbox", () => {
+test("valid approved author response builds ACS email to author and hidden archive copy to publishing mailbox", () => {
   const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
   const result = validateApprovedAuthorResponsePayload(validAuthorResponsePayload());
 
@@ -345,8 +345,8 @@ test("valid approved author response builds ACS email to author and copies publi
   const email = buildApprovedAuthorResponseEmail(result.value);
   assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
   assert.equal(JSON.stringify(email.recipients.to.map((recipient) => recipient.address)), JSON.stringify(["author@example.com"]));
-  assert.equal(JSON.stringify(email.recipients.cc.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
-  assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
+  assert.equal(Object.hasOwn(email.recipients, "cc"), false);
+  assert.equal(JSON.stringify(email.recipients.bcc.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
   assert.equal(email.content.subject, "Next step for your J Merrill Publishing submission");
 });
 
@@ -394,13 +394,14 @@ test("approved author response Reply-To is never a @jmerrill.pub address", () =>
   assert.ok(!email.replyTo[0].address.toLowerCase().endsWith("@jmerrill.pub"));
 });
 
-test("approved author response rejects missing author email, To mismatch, missing copy, and BCC", () => {
+test("approved author response rejects missing author email, To mismatch, missing copy, and visible archive copy", () => {
   const { validateApprovedAuthorResponsePayload } = loadRelayModule();
 
   assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ authorEmail: "" })), "AUTHOR_EMAIL_INVALID");
   assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ to: "other@example.com" })), "AUTHOR_RECIPIENT_INVALID");
-  assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ cc: [] })), "INTERNAL_VISIBILITY_REQUIRED");
-  assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ bcc: ["audit@example.com"] })), "BCC_NOT_ALLOWED");
+  assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ bcc: [] })), "INTERNAL_VISIBILITY_REQUIRED");
+  assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ cc: ["publishing@jmerrill.one"] })), "VISIBLE_ARCHIVE_COPY_NOT_ALLOWED");
+  assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ bcc: ["audit@example.com"] })), "INTERNAL_VISIBILITY_REQUIRED");
 });
 
 test("approved author response rejects @jmerrill.pub, missing approval fields, subject/body, and log requirement", () => {

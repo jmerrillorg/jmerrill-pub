@@ -17,7 +17,8 @@ test('governed publishing email sets canonical From, Reply-To, and archival copy
 
   assert.equal(draft.from, 'publishing@email.jmerrill.one')
   assert.equal(draft.replyTo, 'publishing@jmerrill.one')
-  assert.deepEqual(draft.cc, ['publishing@jmerrill.one'])
+  assert.deepEqual(draft.bcc, ['publishing@jmerrill.one'])
+  assert.equal(draft.cc, undefined)
   assert.equal(canon.validatePublishingOutboundEmail(draft).ok, true)
 })
 
@@ -27,7 +28,7 @@ test('Reply-To is mandatory and cannot rely on alias, forwarding, or operator kn
       ...base,
       from: 'publishing@email.jmerrill.one',
       replyTo: '',
-      cc: ['publishing@jmerrill.one'],
+      bcc: ['publishing@jmerrill.one'],
     }),
     { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - REPLY_TO_MISSING' },
   )
@@ -37,7 +38,7 @@ test('Reply-To is mandatory and cannot rely on alias, forwarding, or operator kn
       ...base,
       from: 'publishing@email.jmerrill.one',
       replyTo: 'publishing@email.jmerrill.one',
-      cc: ['publishing@jmerrill.one'],
+      bcc: ['publishing@jmerrill.one'],
     }),
     { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - REPLY_TO_NOT_CANONICAL' },
   )
@@ -49,7 +50,7 @@ test('archival copy is mandatory and author receives one invitation recipient on
       ...base,
       from: 'publishing@email.jmerrill.one',
       replyTo: 'publishing@jmerrill.one',
-      cc: [],
+      bcc: [],
     }),
     { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - ARCHIVE_COPY_MISSING' },
   )
@@ -60,10 +61,30 @@ test('archival copy is mandatory and author receives one invitation recipient on
       to: ['author@example.com', 'second-author@example.com'],
       from: 'publishing@email.jmerrill.one',
       replyTo: 'publishing@jmerrill.one',
-      cc: ['publishing@jmerrill.one'],
+      bcc: ['publishing@jmerrill.one'],
     }),
     { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - AUTHOR_RECIPIENT_COUNT_INVALID' },
   )
+})
+
+test('archive copy is hidden and duplicate archive delivery is suppressed', () => {
+  assert.deepEqual(
+    canon.validatePublishingOutboundEmail({
+      ...base,
+      from: 'publishing@email.jmerrill.one',
+      replyTo: 'publishing@jmerrill.one',
+      cc: ['publishing@jmerrill.one'],
+    }),
+    { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - ARCHIVE_COPY_VISIBLE' },
+  )
+
+  const internalOnly = canon.buildGovernedPublishingEmail({
+    ...base,
+    to: ['publishing@jmerrill.one'],
+  })
+
+  assert.deepEqual(internalOnly.bcc, [])
+  assert.equal(canon.validatePublishingOutboundEmail(internalOnly).ok, true)
 })
 
 test('archive copy redacts transient Account Link URLs and retains correlation', () => {

@@ -53,9 +53,9 @@ Enrollment must not include:
 
 ## Enrollment Communications Canon
 
-Author Payout Enrollment email must comply with JM1-COM-001. For publishing enrollment messages, the canonical author-facing sender is `publishing@email.jmerrill.one`, the mandatory Reply-To is `publishing@jmerrill.one`, and `publishing@jmerrill.one` must receive a governed archival copy. This control must be enforced by the outbound mail component and must not rely on mailbox forwarding, Exchange aliases, user mailbox rules, author knowledge, or manual operator intervention.
+Author Payout Enrollment email must comply with JM1-COM-001. For publishing enrollment messages, the canonical author-facing sender is `publishing@email.jmerrill.one`, the mandatory Reply-To is `publishing@jmerrill.one`, and `publishing@jmerrill.one` must receive a governed archival copy through BCC or an approved non-author-visible mechanism. This control must be enforced by the outbound mail component and must not rely on mailbox forwarding, Exchange aliases, user mailbox rules, author knowledge, or manual operator intervention.
 
-Account Links may exist transiently in the intended author-facing email at send time. They must not be retained in Dataverse, execution logs, evidence files, internal documents, or support notes. Retrospective archive copies and durable evidence must replace Account Links with `[TRANSIENT ACCOUNT LINK REDACTED]`.
+Account Links may exist transiently in the intended author-facing email at send time. They must not be retained in Dataverse, execution logs, evidence files, internal documents, support notes, or archival copies. Retrospective archive copies and durable evidence must replace Account Links with `[TRANSIENT ACCOUNT LINK REDACTED]`.
 
 ## Monthly Processing
 

@@ -201,11 +201,13 @@ function validateAgreementPackageSendPayload(payload = {}) {
 
   const to = normalizeText(payload.to).toLowerCase();
   const cc = normalizeText(payload.cc).toLowerCase();
+  const bcc = normalizeText(payload.bcc).toLowerCase();
   const replyTo = normalizeText(payload.replyTo).toLowerCase();
 
   if (!to || !isValidEmail(to)) return { ok: false, reason: "TO_INVALID" };
   if (isJmerrillPubMailbox(to)) return { ok: false, reason: "JMERRILL_PUB_MAILBOX_NOT_ALLOWED" };
-  if (cc !== INTERNAL_VISIBILITY_MAILBOX) return { ok: false, reason: "CC_MUST_BE_INTERNAL_VISIBILITY_MAILBOX" };
+  if (cc) return { ok: false, reason: "VISIBLE_ARCHIVE_COPY_NOT_ALLOWED" };
+  if (bcc !== INTERNAL_VISIBILITY_MAILBOX) return { ok: false, reason: "BCC_MUST_BE_INTERNAL_VISIBILITY_MAILBOX" };
   if (replyTo !== INTERNAL_VISIBILITY_MAILBOX) return { ok: false, reason: "REPLY_TO_MUST_BE_INTERNAL_VISIBILITY_MAILBOX" };
 
   const subject = normalizeText(payload.subject);
@@ -251,7 +253,7 @@ function buildAgreementPackageSendEmail(value) {
       to: [
         { address: value.to, displayName: value.toDisplayName }
       ],
-      cc: [
+      bcc: [
         { address: INTERNAL_VISIBILITY_MAILBOX, displayName: SENDER_DISPLAY_NAME }
       ]
     },

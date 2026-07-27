@@ -36,11 +36,11 @@ From: publishing@email.jmerrill.one
 Reply-To: publishing@jmerrill.one
 ```
 
-The Reply-To header is mandatory. `publishing@jmerrill.one` must also receive a governed archival copy through application-level CC/BCC, approved transport-level journaling, or another governed copy path that is proven before production use.
+The Reply-To header is mandatory. `publishing@jmerrill.one` must also receive a governed archival copy through application-level BCC, approved transport-level journaling, or another governed non-author-visible copy path that is proven before production use. Duplicate archival delivery must be suppressed when `publishing@jmerrill.one` is already the primary recipient.
 
 ## Account Link and Sensitive-Data Boundary
 
-Transient Account Links may be included only in the intended author-facing message when the author-facing workflow is authorized. Account Links must not be written to Dataverse, execution logs, durable evidence files, internal documents, or support notes.
+Transient Account Links may be included only in the intended author-facing message when the author-facing workflow is authorized. Account Links must not be written to Dataverse, execution logs, durable evidence files, internal documents, support notes, or archival copies.
 
 Retrospective archive copies and durable evidence must replace live transient links with:
 
@@ -58,5 +58,6 @@ Outbound communication tests must fail if:
 - Reply-To is missing;
 - Reply-To is not the monitored operational mailbox;
 - the archival copy is missing;
+- the archive recipient is visible to the external recipient;
 - more than one author-facing recipient receives a single invitation;
 - a transient Account Link enters durable evidence or logs.

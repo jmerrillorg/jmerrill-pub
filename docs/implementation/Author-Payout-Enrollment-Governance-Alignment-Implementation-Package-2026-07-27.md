@@ -190,9 +190,9 @@ Reply-To: publishing@jmerrill.one
 Governed archival copy: publishing@jmerrill.one
 ```
 
-The Reply-To header and archival copy are mandatory. They must be set by the outbound publishing mail component and must not rely on mailbox forwarding, Exchange aliases, user mailbox rules, author knowledge, or manual operator intervention.
+The Reply-To header and archival copy are mandatory. The archival copy must use BCC or an approved non-author-visible mechanism, with duplicate archival delivery suppressed when `publishing@jmerrill.one` is already the primary recipient. These controls must be set by the outbound publishing mail component and must not rely on mailbox forwarding, Exchange aliases, user mailbox rules, author knowledge, or manual operator intervention.
 
-Author-facing messages may include a transient Stripe Account Link only for the intended author delivery. Retrospective archive copies, Dataverse records, execution logs, evidence files, and internal documentation must redact the link as `[TRANSIENT ACCOUNT LINK REDACTED]`.
+Author-facing messages may include a transient Stripe Account Link only for the intended author delivery. Archival copies, retrospective archive copies, Dataverse records, execution logs, evidence files, and internal documentation must redact the link as `[TRANSIENT ACCOUNT LINK REDACTED]`.
 
 ## Operator Runbook
 

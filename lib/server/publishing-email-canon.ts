@@ -46,25 +46,31 @@ export function validatePublishingOutboundEmail(input: PublishingOutboundEmailDr
   const replyTo = normalizeAddress(input.replyTo || '')
   const cc = normalizeList(input.cc)
   const bcc = normalizeList(input.bcc)
-  const archive = PUBLISHING_EMAIL_CANON.archiveCopy
+  const archive = normalizeAddress(PUBLISHING_EMAIL_CANON.archiveCopy)
+  const archiveIsPrimaryRecipient = to.includes(archive)
 
   if (from !== PUBLISHING_EMAIL_CANON.outboundFrom) return { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - FROM_NOT_CANONICAL' }
   if (!replyTo) return { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - REPLY_TO_MISSING' }
   if (replyTo !== PUBLISHING_EMAIL_CANON.replyTo) return { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - REPLY_TO_NOT_CANONICAL' }
   if (to.length !== 1) return { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - AUTHOR_RECIPIENT_COUNT_INVALID' }
-  if (to.includes(archive)) return { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - ARCHIVE_NOT_AUTHOR_RECIPIENT' }
-  if (!cc.includes(archive) && !bcc.includes(archive)) return { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - ARCHIVE_COPY_MISSING' }
+  if (cc.includes(archive)) return { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - ARCHIVE_COPY_VISIBLE' }
+  if (!archiveIsPrimaryRecipient && !bcc.includes(archive)) return { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - ARCHIVE_COPY_MISSING' }
+  if (archiveIsPrimaryRecipient && bcc.includes(archive)) return { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - DUPLICATE_ARCHIVE_COPY' }
   if (!input.correlationId.trim()) return { ok: false, blocker: 'PUBLISHING_EMAIL_BLOCKED - CORRELATION_ID_MISSING' }
   return { ok: true }
 }
 
-export function buildGovernedPublishingEmail(input: Omit<PublishingOutboundEmailDraft, 'from' | 'replyTo' | 'cc'> & { cc?: string[] }) {
-  const cc = Array.from(new Set([...normalizeList(input.cc), PUBLISHING_EMAIL_CANON.archiveCopy]))
+export function buildGovernedPublishingEmail(input: Omit<PublishingOutboundEmailDraft, 'from' | 'replyTo' | 'bcc'> & { bcc?: string[] }) {
+  const to = normalizeList(input.to)
+  const archive = normalizeAddress(PUBLISHING_EMAIL_CANON.archiveCopy)
+  const bcc = to.includes(archive)
+    ? normalizeList(input.bcc).filter((recipient) => recipient !== archive)
+    : Array.from(new Set([...normalizeList(input.bcc), archive]))
   const draft: PublishingOutboundEmailDraft = {
     ...input,
     from: PUBLISHING_EMAIL_CANON.outboundFrom,
     replyTo: PUBLISHING_EMAIL_CANON.replyTo,
-    cc,
+    bcc,
   }
   const validation = validatePublishingOutboundEmail(draft)
   if (!validation.ok) throw new Error(validation.blocker)

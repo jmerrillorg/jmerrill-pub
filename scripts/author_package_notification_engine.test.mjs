@@ -68,7 +68,7 @@ const checks = [
       ].every((event) => engine.includes(event)),
   },
   {
-    name: 'author package notification validates canonical From, Reply-To, and CC policy',
+    name: 'author package notification validates canonical From, Reply-To, and hidden archive policy',
     pass: () =>
       engine.includes('AUTHOR_PUBLISHING_COMMUNICATION_POLICY') &&
       engine.includes('validateAuthorNotificationHeaders') &&

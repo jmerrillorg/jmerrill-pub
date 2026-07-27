@@ -159,7 +159,7 @@ function buildAuthorResponseRelayPayload(email) {
     internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
     futureSendRequiresInternalCopy: true,
     futureSendRequiresDataverseLog: true,
-    cc: [INTERNAL_VISIBILITY_MAILBOX]
+    bcc: [INTERNAL_VISIBILITY_MAILBOX]
   };
 }
 
@@ -197,8 +197,8 @@ function validateAuthorResponseSendInput(input = {}) {
   const approval = input.sendApproval;
   const authorEmail = normalizeString(approval.authorEmail);
   const to = Array.isArray(input.to) ? input.to.map(normalizeString).filter(Boolean) : [normalizeString(input.to || authorEmail)].filter(Boolean);
-  const cc = Array.isArray(input.cc) ? input.cc.map(normalizeString).filter(Boolean) : [normalizeString(input.cc || INTERNAL_VISIBILITY_MAILBOX)].filter(Boolean);
-  const bcc = Array.isArray(input.bcc) ? input.bcc.map(normalizeString).filter(Boolean) : [normalizeString(input.bcc)].filter(Boolean);
+  const cc = Array.isArray(input.cc) ? input.cc.map(normalizeString).filter(Boolean) : [normalizeString(input.cc)].filter(Boolean);
+  const bcc = Array.isArray(input.bcc) ? input.bcc.map(normalizeString).filter(Boolean) : [normalizeString(input.bcc || INTERNAL_VISIBILITY_MAILBOX)].filter(Boolean);
 
   if (approval.sendApproved !== true || normalizeString(approval.decision) !== "APPROVE_AUTHOR_SEND") {
     return { ok: false, reason: "AUTHOR_SEND_NOT_APPROVED" };
@@ -207,10 +207,10 @@ function validateAuthorResponseSendInput(input = {}) {
   if (to.length !== 1 || to[0].toLowerCase() !== authorEmail.toLowerCase()) {
     return { ok: false, reason: "AUTHOR_RECIPIENT_INVALID" };
   }
-  if (!cc.includes(INTERNAL_VISIBILITY_MAILBOX) || bcc.length > 0) {
+  if (cc.length > 0 || !bcc.includes(INTERNAL_VISIBILITY_MAILBOX)) {
     return { ok: false, reason: "INTERNAL_VISIBILITY_REQUIRED" };
   }
-  if (cc.some((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX)) {
+  if (bcc.some((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX)) {
     return { ok: false, reason: "UNAPPROVED_RECIPIENT_PRESENT" };
   }
   if (to.concat(cc, bcc).some((recipient) => recipient.toLowerCase().endsWith("@jmerrill.pub"))) {
@@ -244,8 +244,8 @@ function buildAuthorResponseEmail(input = {}, config = getAuthorResponseSendProv
     deliveryStatus: AUTHOR_RESPONSE_SEND_STATUS.PREPARED,
     email: {
       to: validation.to,
-      cc: validation.cc,
-      bcc: [],
+      cc: [],
+      bcc: validation.bcc,
       from: config.from,
       replyTo: config.replyTo,
       subject: input.sendApproval.draftSubject,

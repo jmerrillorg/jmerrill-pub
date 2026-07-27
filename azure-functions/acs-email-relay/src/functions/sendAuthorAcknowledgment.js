@@ -490,16 +490,16 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
     return { ok: false, reason: "AUTHOR_RECIPIENT_INVALID" };
   }
 
-  if (internalVisibilityMailbox !== INTERNAL_VISIBILITY_MAILBOX || !cc.includes(INTERNAL_VISIBILITY_MAILBOX)) {
+  if (internalVisibilityMailbox !== INTERNAL_VISIBILITY_MAILBOX || !bcc.includes(INTERNAL_VISIBILITY_MAILBOX)) {
     return { ok: false, reason: "INTERNAL_VISIBILITY_REQUIRED" };
   }
 
-  if (cc.some((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX)) {
-    return { ok: false, reason: "UNAPPROVED_RECIPIENT_PRESENT" };
+  if (cc.length > 0) {
+    return { ok: false, reason: "VISIBLE_ARCHIVE_COPY_NOT_ALLOWED" };
   }
 
-  if (bcc.length > 0) {
-    return { ok: false, reason: "BCC_NOT_ALLOWED" };
+  if (bcc.some((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX)) {
+    return { ok: false, reason: "UNAPPROVED_RECIPIENT_PRESENT" };
   }
 
   if (allRecipients.some(isJmerrillPubMailbox)) {
@@ -690,7 +690,7 @@ function buildApprovedAuthorResponseEmail(payload) {
           displayName: payload.authorName || payload.authorEmail
         }
       ],
-      cc: [
+      bcc: [
         {
           address: INTERNAL_VISIBILITY_MAILBOX,
           displayName: "J Merrill Publishing"
