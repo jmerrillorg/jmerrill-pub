@@ -53,7 +53,7 @@ Optional dead-letter variables:
 - `AZURE_STORAGE_CONNECTION_STRING`
 - `INTAKE_DEADLETTER_QUEUE_NAME`
 
-The current dead-letter adapter returns `not_configured` when these settings are absent. If they are present, the adapter remains explicit and fails with `dead_letter_adapter_not_implemented_without_azure_storage_sdk` until an approved queue implementation is added.
+The dead-letter adapter returns `not_configured` when these settings are absent. When configured, it writes identifier-only `JM1_PUBLISHING_INTAKE_DEAD_LETTER_V1` messages to the approved Azure Storage Queue.
 
 ## Local Validation Without Exposing Secrets
 
@@ -157,8 +157,9 @@ Choice values are mapped to Dataverse numeric option values:
 - Turnstile failure returns `400` before rate limit, validation, idempotency, or adapter writes.
 - Replaying the same idempotency key within 24 hours after a received submission returns `409` with `status: "duplicate"`.
 - Dataverse retryable failures are retried up to two additional times with backoff.
-- If Dataverse fails and dead-letter is successfully enqueued, the API still returns a server-side failure response; `201` is reserved for Dataverse create success.
+- If Dataverse fails before the durable receipt boundary, the API still returns a server-side failure response; `201` is reserved for Dataverse create success or non-production mapping skip.
 - If Dataverse fails and dead-letter is not configured or enqueue fails, production returns a server-side failure response with `status: "error"`.
+- If internal publishing notification fails after the durable Dataverse intake boundary, the API returns `201` and enqueues a sanitized downstream recovery message where configured.
 - Client-visible errors do not expose PII or Dataverse internals.
 
 ## Safe Troubleshooting Diagnostics
@@ -205,6 +206,23 @@ Diagnostic interpretation:
 - Confirm `jm1_consenttimestamp` is an ISO server receipt timestamp.
 - Confirm optional blank fields are omitted or blank, not filled with placeholder text.
 - Confirm the application user is `JM1-PUB-INTAKE-WEBAPI` with the `JM1 Publishing Intake API - Create Only` role.
+
+## Dead-Letter Resilience
+
+The recovery queue is a downstream resilience path, not a replacement for the public intake route. The message contract is governed by:
+
+- `docs/operations/JM1-PUB-Intake-Resilience-Standard.md`
+- `docs/operations/JM1-PUB-Join-Intake-Recovery-Runbook.md`
+- `docs/operations/JM1-PUB-Intake-Dead-Letter-Message-Contract.md`
+- `docs/operations/JM1-PUB-Intake-Alerting-and-Operator-Ownership.md`
+
+Required regression guard:
+
+```bash
+node --test scripts/intake_deadletter_resilience.test.mjs
+```
+
+The dead-letter message must not include manuscript content, raw request payloads, Turnstile tokens, author-sensitive full details, secrets, cookies, or reusable SharePoint URLs.
 
 ## Idempotency Note
 
