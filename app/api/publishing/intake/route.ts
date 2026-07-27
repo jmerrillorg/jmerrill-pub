@@ -266,44 +266,20 @@ async function handlePublishingIntakePost(req: NextRequest) {
       }
     }
 
-    try {
-      const notification = await sendJoinInternalNotification(
-        acknowledgmentIntake,
-        dataverse.status === 'success' ? { recordId: dataverse.recordId } : undefined,
-      )
-      if (notification.status !== 'sent') {
-        console.warn('Publishing intake internal notification did not send after intake acceptance.', {
-          status: notification.status,
-          reason: notification.reason,
-          reference,
-        })
-      }
-
-      const acknowledgment = await sendJoinAuthorAcknowledgment(acknowledgmentIntake)
-      if (acknowledgment.status !== 'sent') {
-        console.warn('Publishing intake direct author acknowledgment did not send after intake acceptance; leaving Flow B fallback pending.', {
-          status: acknowledgment.status,
-          reason: acknowledgment.reason,
-          reference,
-        })
-      }
-
-      if (acknowledgment.status === 'sent' && dataverse.status === 'success') {
-        const acknowledgmentWriteback = await markPublishingIntakeAcknowledgmentSent(dataverse.recordId)
-        if (acknowledgmentWriteback.status !== 'success') {
-          console.warn('Publishing intake author acknowledgment writeback did not complete after intake acceptance; Flow B may still evaluate the row.', {
-            status: acknowledgmentWriteback.status,
-            reason: acknowledgmentWriteback.reason,
-            reference,
-          })
-        }
-      }
-    } catch (error) {
-      console.error('Publishing intake notification/acknowledgment step threw after Dataverse accepted the row.', {
-        reason: error instanceof Error ? error.name : 'unknown',
+    const notification = await sendJoinInternalNotification(
+      acknowledgmentIntake,
+      dataverse.status === 'success' ? { recordId: dataverse.recordId } : undefined,
+    )
+    if (notification.status !== 'sent') {
+      console.warn('Publishing intake internal notification did not send after intake acceptance.', {
+        status: notification.status,
+        reason: notification.reason,
         reference,
-        recordId: dataverse.status === 'success' ? dataverse.recordId : undefined,
       })
+    }
+
+    if (dataverse.status === 'success') {
+      void completeAuthorAcknowledgmentAfterResponse(acknowledgmentIntake, dataverse.recordId, reference)
     }
 
     return json({ status: 'received', reference }, 201, originResult.origin)
@@ -450,6 +426,39 @@ function buildFailureDiagnostics(reason: string): {
   }
 
   return { code: 'dead_letter_failed', detail, httpStatus: 500 }
+}
+
+async function completeAuthorAcknowledgmentAfterResponse(
+  intake: ReturnType<typeof createNormalizedPublishingIntake>,
+  recordId: string | undefined,
+  reference: string,
+) {
+  try {
+    const acknowledgment = await sendJoinAuthorAcknowledgment(intake)
+    if (acknowledgment.status !== 'sent') {
+      console.warn('Publishing intake direct author acknowledgment did not send after intake acceptance; leaving Flow B fallback pending.', {
+        status: acknowledgment.status,
+        reason: acknowledgment.reason,
+        reference,
+      })
+      return
+    }
+
+    const acknowledgmentWriteback = await markPublishingIntakeAcknowledgmentSent(recordId)
+    if (acknowledgmentWriteback.status !== 'success') {
+      console.warn('Publishing intake author acknowledgment writeback did not complete after intake acceptance; Flow B may still evaluate the row.', {
+        status: acknowledgmentWriteback.status,
+        reason: acknowledgmentWriteback.reason,
+        reference,
+      })
+    }
+  } catch (error) {
+    console.error('Publishing intake author acknowledgment step threw after intake acceptance.', {
+      reason: error instanceof Error ? error.name : 'unknown',
+      reference,
+      recordId,
+    })
+  }
 }
 
 function sanitizeDiagnosticDetail(value: string) {
