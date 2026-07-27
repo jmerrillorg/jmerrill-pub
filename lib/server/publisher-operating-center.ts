@@ -839,21 +839,24 @@ export async function initializePublisherEditorialReview(input: {
   const title = await findOrCreateTitle(config, intake)
   const asset = await findOrCreateAsset(config, intake, title.id)
   const stage = await findOrCreateEditorialReviewStage(config, intake, title, asset.id, correlationId)
+  const existingLog = await findPublisherExecutionLog(config, 'PUBLISHER_EDITORIAL_REVIEW_INITIALIZED', input.intakeId)
 
-  await writePublisherExecutionLog(config, {
-    actionType: 'PUBLISHER_EDITORIAL_REVIEW_INITIALIZED',
-    name: `PUBLISHER_EDITORIAL_REVIEW_INITIALIZED - ${title.name}`,
-    description: [
-      `Publisher Operating Center initialized Editorial Review for ${title.name}.`,
-      `Intake ${String(intake.jm1_intakereferencecode || input.intakeId)}.`,
-      `Title ${title.id}; asset ${asset.id}; stage ${stage.id}.`,
-      `Operator ${input.operatorEmail}.`,
-      `Correlation ${correlationId}.`,
-      'No author communication sent.',
-    ].join(' '),
-    sourceEntity: 'jm1_publishingintake',
-    sourceRecordId: input.intakeId,
-  })
+  if (!existingLog) {
+    await writePublisherExecutionLog(config, {
+      actionType: 'PUBLISHER_EDITORIAL_REVIEW_INITIALIZED',
+      name: `PUBLISHER_EDITORIAL_REVIEW_INITIALIZED - ${title.name}`,
+      description: [
+        `Publisher Operating Center initialized Editorial Review for ${title.name}.`,
+        `Intake ${String(intake.jm1_intakereferencecode || input.intakeId)}.`,
+        `Title ${title.id}; asset ${asset.id}; stage ${stage.id}.`,
+        `Operator ${input.operatorEmail}.`,
+        `Correlation ${correlationId}.`,
+        'No author communication sent.',
+      ].join(' '),
+      sourceEntity: 'jm1_publishingintake',
+      sourceRecordId: input.intakeId,
+    })
+  }
 
   return {
     correlationId,
@@ -862,6 +865,60 @@ export async function initializePublisherEditorialReview(input: {
     assetId: asset.id,
     editorialStageId: stage.id,
     stageCreated: stage.created,
+    executionLogCreated: !existingLog,
+  }
+}
+
+export async function autoInitializeOutsideInquiryEditorialReview(input: {
+  intakeId: string
+  correlationId?: string
+}) {
+  const config = getDataverseServerConfig()
+  if (!config) throw new Error('dataverse_config_missing')
+
+  const intake = await getPublisherIntakeForAction(config, input.intakeId)
+  const intakeChannel = stringValue(intake.jm1_intakechannel)
+  if (intakeChannel && intakeChannel !== 'INT-PUB-005 /join') {
+    return {
+      status: 'blocked' as const,
+      blocker: 'unsupported_intake_channel',
+      intakeId: input.intakeId,
+    }
+  }
+
+  if (!stringValue(intake.jm1_projecttitle)) {
+    return {
+      status: 'blocked' as const,
+      blocker: 'intake_missing_title',
+      intakeId: input.intakeId,
+    }
+  }
+
+  if (!dataverseLookupId(intake, '_jm1_linkedcontact_value')) {
+    return {
+      status: 'blocked' as const,
+      blocker: 'intake_missing_contact',
+      intakeId: input.intakeId,
+    }
+  }
+
+  if (intake.jm1_manuscriptreceived !== true && !stringValue(intake.jm1_manuscripturl || intake.jm1_submissionurl)) {
+    return {
+      status: 'blocked' as const,
+      blocker: 'intake_missing_manuscript_evidence',
+      intakeId: input.intakeId,
+    }
+  }
+
+  const result = await initializePublisherEditorialReview({
+    intakeId: input.intakeId,
+    operatorEmail: 'JM1 Automation',
+    correlationId: input.correlationId || `AUTO-EDITORIAL-${String(intake.jm1_intakereferencecode || input.intakeId)}-${Date.now()}`,
+  })
+
+  return {
+    status: 'initialized' as const,
+    ...result,
   }
 }
 
@@ -1068,7 +1125,7 @@ export async function logPublisherAuthorResponseAction(input: {
 async function getPublisherIntakeForAction(config: DataverseServerConfig, intakeId: string) {
   const intake = await dataverseFirst(config, 'jm1_publishingintakes', {
     $select:
-      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_workspacestatus,jm1_stage0handoffstatus,_jm1_linkedcontact_value,_jm1_opportunity_value,createdon,modifiedon',
+      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_intakechannel,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_workspacestatus,jm1_stage0handoffstatus,_jm1_linkedcontact_value,_jm1_opportunity_value,createdon,modifiedon',
     $filter: `jm1_publishingintakeid eq ${intakeId}`,
   })
   if (!intake) throw new Error('intake_not_found')
@@ -1222,9 +1279,11 @@ function buildQueueItem(
       ? 'author'
       : currentBlocker.includes('in progress')
         ? 'system'
-        : authorizedActions.some((action) => action.id !== 'view_only')
-          ? 'publisher'
-          : 'system'
+        : currentBlocker === 'Ready for publisher intake review' && hasContact && hasManuscript
+          ? 'system'
+          : authorizedActions.some((action) => action.id !== 'view_only')
+            ? 'publisher'
+            : 'system'
   const execution = deriveQueueExecutionModel({
     actionOwner,
     currentBlocker,
@@ -1841,7 +1900,7 @@ function deriveQueueExecutionModel(input: {
   }
   if (input.actionOwner === 'system') {
     return {
-      executionMode: 'SYSTEM_ACTION_MANUALLY_TRIGGERED',
+      executionMode: 'AUTOMATIC_SCHEDULED',
       executionState: input.currentBlocker.toLowerCase().includes('in progress') ? 'EXECUTING' : 'QUEUED',
       businessOwner: 'System',
       executionOwner: 'JM1 Automation',
@@ -2257,6 +2316,13 @@ async function writePublisherExecutionLog(
     jm1_completedon: new Date().toISOString(),
     jm1_sourceentity: input.sourceEntity,
     jm1_sourcerecordid: input.sourceRecordId,
+  })
+}
+
+async function findPublisherExecutionLog(config: DataverseServerConfig, actionType: string, sourceRecordId: string) {
+  return dataverseFirst(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiontype,jm1_sourcerecordid',
+    $filter: `jm1_actiontype eq '${escapeODataText(actionType)}' and jm1_sourcerecordid eq '${escapeODataText(sourceRecordId)}'`,
   })
 }
 

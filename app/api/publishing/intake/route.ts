@@ -4,7 +4,11 @@ import {
   enqueuePublishingIntakeDeadLetter,
   enqueuePublishingIntakeRecovery,
 } from '@/lib/publishing/intake/deadLetter'
-import { writePublishingIntakeWithRetry } from '@/lib/publishing/intake/dataverse'
+import { sendJoinAuthorAcknowledgment } from '@/lib/publishing/intake/authorAcknowledgment'
+import {
+  markPublishingIntakeAcknowledgmentSent,
+  writePublishingIntakeWithRetry,
+} from '@/lib/publishing/intake/dataverse'
 import { getIdempotencyReplay, rememberIdempotencyKey } from '@/lib/publishing/intake/idempotency'
 import { sendJoinInternalNotification } from '@/lib/publishing/intake/internalNotification'
 import {
@@ -285,6 +289,52 @@ async function handlePublishingIntakePost(req: NextRequest) {
         recoveryStatus: recovery.status,
         reference,
       })
+    }
+
+    const acknowledgment = await sendJoinAuthorAcknowledgment(acceptedIntake)
+    if (acknowledgment.status !== 'sent') {
+      const acknowledgmentFailure = acknowledgment.status === 'failed'
+        ? acknowledgment.reason
+        : `acknowledgment_${acknowledgment.reason}`
+      const recovery = await enqueuePublishingIntakeRecovery({
+        intakeReference: acceptedIntake.reference,
+        dataverseRecordId: dataverse.status === 'success' ? dataverse.recordId : undefined,
+        workspaceFolderId: acceptedIntake.workspaceFolderId,
+        correlationId: acceptedIntake.idempotencyKey,
+        failedOperationType: 'AUTHOR_ACKNOWLEDGMENT',
+        failureClassification: classifyRecoverableFailure(acknowledgmentFailure),
+        safeErrorCode: acknowledgmentFailure,
+      })
+
+      console.warn('Publishing intake author acknowledgment did not send after intake acceptance.', {
+        status: acknowledgment.status,
+        reason: acknowledgment.reason,
+        recoveryStatus: recovery.status,
+        reference,
+      })
+    } else if (dataverse.status === 'success') {
+      const acknowledgmentWriteback = await markPublishingIntakeAcknowledgmentSent(dataverse.recordId)
+      if (acknowledgmentWriteback.status !== 'success') {
+        const writebackFailure = acknowledgmentWriteback.status === 'failed'
+          ? acknowledgmentWriteback.reason
+          : `acknowledgment_writeback_${acknowledgmentWriteback.reason}`
+        const recovery = await enqueuePublishingIntakeRecovery({
+          intakeReference: acceptedIntake.reference,
+          dataverseRecordId: dataverse.recordId,
+          workspaceFolderId: acceptedIntake.workspaceFolderId,
+          correlationId: acceptedIntake.idempotencyKey,
+          failedOperationType: 'ACKNOWLEDGMENT_WRITEBACK',
+          failureClassification: classifyRecoverableFailure(writebackFailure),
+          safeErrorCode: writebackFailure,
+        })
+
+        console.warn('Publishing intake author acknowledgment writeback did not complete after intake acceptance.', {
+          status: acknowledgmentWriteback.status,
+          reason: acknowledgmentWriteback.reason,
+          recoveryStatus: recovery.status,
+          reference,
+        })
+      }
     }
 
     return json({ status: 'received', reference }, 201, originResult.origin)
