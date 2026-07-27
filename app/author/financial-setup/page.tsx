@@ -6,8 +6,8 @@ import { StripeConnectSetupCard } from '../_components/StripeConnectSetupCard'
 import { getAuthorPortalContextFromCookies } from '@/lib/server/author-portal-context'
 
 export const metadata: Metadata = {
-  title: 'Payment & Royalty Setup | J Merrill Publishing',
-  description: 'Private Stripe setup for J Merrill Publishing authors.',
+  title: 'Author Payout Enrollment | J Merrill Publishing',
+  description: 'Private author payout enrollment for J Merrill Publishing authors.',
   robots: {
     index: false,
     follow: false,
@@ -20,9 +20,9 @@ export default async function AuthorFinancialSetupPage() {
 
   return (
     <AuthorPortalShell
-      eyebrow="Payment & Royalty Setup"
-      title="Connect Stripe for payment and royalties."
-      description="Securely connect Stripe so agreement payment and future royalty handling can be managed safely."
+      eyebrow="Author Payout Enrollment"
+      title="Set up future payment readiness."
+      description="Securely provide Stripe with identity, tax, and banking details for future J Merrill Publishing payments. Enrollment does not mean a payment is due, approved, or scheduled."
     >
       <AuthorGate scope="portal">
         {paymentSetupAlreadyComplete ? (
@@ -32,10 +32,10 @@ export default async function AuthorFinancialSetupPage() {
               className="text-white"
               style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '30px', fontWeight: 700 }}
             >
-              Payment and royalty setup is already in place.
+              Author Payout Enrollment is already in place.
             </h2>
             <p className="mx-auto mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/45">
-              This author relationship already has the required setup on file. Return to your workspace to continue with the correct project and current stage.
+              This author relationship already has enrollment status on file. Return to your workspace to continue with the correct project and current stage.
             </p>
             <div className="mt-7">
               <a
