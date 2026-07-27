@@ -118,6 +118,33 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = {
   }
 }
 
+resource slotConfigNames 'Microsoft.Web/sites/config@2023-12-01' = {
+  parent: webApp
+  name: 'slotConfigNames'
+  properties: {
+    appSettingNames: [
+      'JM1_ENVIRONMENT'
+      'JM1_RELEASE_SHA'
+      'NEXTAUTH_URL'
+      'AUTH_SECRET'
+      'NEXTAUTH_SECRET'
+      'AUTHOR_PORTAL_SESSION_SECRET'
+      'AUTHOR_PORTAL_ACCESS_CODE_PEPPER'
+      'AUTHOR_PORTAL_ACCESS_REGISTRY_JSON'
+      'AUTHOR_PORTAL_MASTER_ACCESS_CODE'
+      'TURNSTILE_SITE_KEY'
+      'NEXT_PUBLIC_TURNSTILE_SITE_KEY'
+      'TURNSTILE_SECRET_KEY'
+      'INTAKE_ALLOWED_ORIGINS'
+      'AZURE_STORAGE_CONNECTION_STRING'
+      'INTAKE_DEADLETTER_QUEUE_NAME'
+      'STRIPE_CONNECT_SECRET_KEY'
+      'STRIPE_CHECKOUT_SECRET_KEY'
+      'STRIPE_WEBHOOK_SECRET'
+    ]
+  }
+}
+
 resource webDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   name: diagnosticSettingName
   scope: webApp

@@ -69,6 +69,8 @@ Additional governed secret created for App Service durable auth:
 
 Both `AUTH_SECRET` and `NEXTAUTH_SECRET` reference `AUTH-SECRET`.
 
+Slot-specific settings are governed through the App Service `slotConfigNames` resource so later slot-swap work does not silently exchange staging and production runtime values.
+
 Payment gate:
 
 - `JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED=false`
