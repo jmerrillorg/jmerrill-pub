@@ -1,3 +1,7 @@
+// Engine: Stage Transition Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 import { NextRequest, NextResponse } from 'next/server'
 import {
   classifyRecoverableFailure,
@@ -27,6 +31,7 @@ import {
 } from '@/lib/publishing/intake/schema'
 import { maskEmail, maskName } from '@/lib/publishing/intake/sanitize'
 import { verifyTurnstileToken } from '@/lib/publishing/intake/turnstile'
+import { autoInitializeOutsideInquiryEditorialReview } from '@/lib/server/publisher-operating-center'
 
 export const dynamic = 'force-dynamic'
 
@@ -331,6 +336,51 @@ async function handlePublishingIntakePost(req: NextRequest) {
         console.warn('Publishing intake author acknowledgment writeback did not complete after intake acceptance.', {
           status: acknowledgmentWriteback.status,
           reason: acknowledgmentWriteback.reason,
+          recoveryStatus: recovery.status,
+          reference,
+        })
+      }
+    }
+
+    if (dataverse.status === 'success' && dataverse.recordId) {
+      try {
+        const orchestration = await autoInitializeOutsideInquiryEditorialReview({
+          intakeId: dataverse.recordId,
+          correlationId: acceptedIntake.idempotencyKey,
+        })
+
+        if (orchestration.status !== 'dispatched') {
+          const recovery = await enqueuePublishingIntakeRecovery({
+            intakeReference: acceptedIntake.reference,
+            dataverseRecordId: dataverse.recordId,
+            workspaceFolderId: acceptedIntake.workspaceFolderId,
+            correlationId: acceptedIntake.idempotencyKey,
+            failedOperationType: 'PIPELINE_ORCHESTRATION',
+            failureClassification: classifyRecoverableFailure(`orchestration_${orchestration.blocker}`),
+            safeErrorCode: `orchestration_${orchestration.blocker}`,
+          })
+
+          console.warn('Publishing intake orchestration did not complete after intake acceptance.', {
+            status: orchestration.status,
+            blocker: orchestration.blocker,
+            recoveryStatus: recovery.status,
+            reference,
+          })
+        }
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : 'unknown'
+        const recovery = await enqueuePublishingIntakeRecovery({
+          intakeReference: acceptedIntake.reference,
+          dataverseRecordId: dataverse.recordId,
+          workspaceFolderId: acceptedIntake.workspaceFolderId,
+          correlationId: acceptedIntake.idempotencyKey,
+          failedOperationType: 'PIPELINE_ORCHESTRATION',
+          failureClassification: classifyRecoverableFailure(`orchestration_exception:${reason}`),
+          safeErrorCode: `orchestration_exception:${reason}`,
+        })
+
+        console.warn('Publishing intake orchestration threw after intake acceptance.', {
+          reason: error instanceof Error ? error.name : 'unknown',
           recoveryStatus: recovery.status,
           reference,
         })
