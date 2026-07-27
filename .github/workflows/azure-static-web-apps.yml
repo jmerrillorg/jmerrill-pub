@@ -28,6 +28,25 @@ jobs:
       - name: Guard catalog runtime source
         run: node scripts/check-catalog-runtime-source.mjs
 
+      - name: Verify author portal session secret
+        shell: bash
+        env:
+          AUTHOR_PORTAL_SESSION_SECRET: ${{ secrets.AUTHOR_PORTAL_SESSION_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${AUTHOR_PORTAL_SESSION_SECRET:-}" ]; then
+            echo "AUTHOR_PORTAL_SESSION_SECRET is required for author portal session signing." >&2
+            exit 1
+          fi
+          if [ "$AUTHOR_PORTAL_SESSION_SECRET" = "jm1-author-portal-session" ]; then
+            echo "AUTHOR_PORTAL_SESSION_SECRET must not use the former static fallback." >&2
+            exit 1
+          fi
+          if [ "${#AUTHOR_PORTAL_SESSION_SECRET}" -lt 32 ]; then
+            echo "AUTHOR_PORTAL_SESSION_SECRET must be at least 32 characters." >&2
+            exit 1
+          fi
+
       - name: Prepare author gate build environment
         shell: bash
         env:

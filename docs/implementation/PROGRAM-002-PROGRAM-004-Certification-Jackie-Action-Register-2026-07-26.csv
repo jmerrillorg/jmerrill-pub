@@ -1,0 +1,16 @@
+Action ID,Exact Jackie action,Why required,Blocks PR?,Blocks merge?,Blocks production?,What resumes
+JCA-001,Decide that PR #336 to main is the authoritative route and PR #335 should later close as superseded,Prevents dual active promotion paths and pilot/main ambiguity,No,No,No,Final PR disposition after PR #336 is healthy
+JCA-002,Confirm or create GitHub Actions secret AUTHOR_PORTAL_SESSION_SECRET for the target repository/environment,Security preflight cannot pass without governed secret,Yes,Yes,Yes,CI preflight and Static Web Apps preview validation
+JCA-003,Review PR #336 merge-state resolution plan before any conflict reconstruction,GitHub reports DIRTY and prior rebase attempt exposed broad conflicts,Yes,Yes,Yes,PR readiness without unnecessary force-push/rebase risk
+JCA-004,Approve Power Automate/Dataverse manuscript-status alignment path,Controlled onboarding proof is unsafe while current field meanings conflict,No,No,Yes,End-to-end author onboarding proof
+JCA-005,Confirm or create canonical Cynthia Sloan Contact and approved email,Stripe pilot identity cannot be inferred from fragments,No,No,Yes,Cynthia pilot preparation
+JCA-006,Confirm or create canonical Carolyn Booker-Pierce Contact and approved email,Stripe pilot identity cannot be inferred from fragments,No,No,Yes,Carolyn pilot preparation
+JCA-007,Approve Stripe pilot invitation wording,Author-facing communication requires business approval,No,No,Yes,Pilot invitations after route/schema/internal proof
+JCA-008,Approve non-sensitive Stripe Contact status fields or alternate safe writeback target,Current Contact metadata lacks required pilot status fields,No,No,Yes,Stripe pilot account/link internal proof
+JCA-009,Keep payout disabled until explicit payout authorization and proof exist,Pilot approval is onboarding-validation only,No,No,Yes,Future payout workstream only
+JCA-010,Assign Business Central owner for sandbox/posting/opening-balance/dimensions decisions,Production finance posture is not certified,No,No,Yes,Business Central migration readiness
+JCA-011,Approve or reject no-write Agent 365 entitlement/lifecycle proof,Agent 365 remains unconfirmed without entitlement and operational evidence,No,No,Yes,Agent 365 certification path
+JCA-012,Approve PROGRAM-004 Dataverse canonical-reference sync or formal deferment,Traceability authority remains open as sync-only item,No,No,No,Closure of PROGRAM-004_CANONICAL_REFERENCE_SYNC_PENDING
+JCA-013,Confirm timing for .codex-tmp/program004-implementation-hq cleanup review,Temporary copies must remain until readability/sync/checksum conditions are met,No,No,No,Controlled cleanup proposal
+JCA-014,Decide whether Turnstile/JM Signature deltas should enter a separate workstream,They are excluded from PR #336 security/deployment scope,No,No,No,Separate intake hardening review
+JCA-015,Decide PROGRAM-003 handoff/supersession documentation disposition,Open documentation item should not mix into PR #336,No,No,No,Separate documentation workstream or formal supersession

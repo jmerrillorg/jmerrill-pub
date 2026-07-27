@@ -1,0 +1,36 @@
+Evidence ID,Domain,Source,Path or reference,What it proves,Status
+CE-001,Repository,Local git,branch codex/program-002-op000-track-a-reconciliation @ 90d71e31ec7541c03a31752aa9f57d61f277cc62,Certification branch and HEAD,Current
+CE-002,Repository,origin/main,7bbcb9fa111cb364628d0cb64ea6baf83f84f215,Main branch baseline,Current
+CE-003,Repository,origin/codex/program-002-op000-track-a-pilot,4e33a55f2e38e02c029cabf3d40617563e6fde79,Pilot branch baseline,Current
+CE-004,GitHub,PR #335,https://github.com/jmerrillorg/jmerrill-pub/pull/335,Draft PR to pilot is clean but intermediate,Current
+CE-005,GitHub,PR #336,https://github.com/jmerrillorg/jmerrill-pub/pull/336,Draft PR to main is authoritative but dirty/no checks,Current
+CE-006,Repository,git cherry -v origin/main HEAD,4e33a55 marked '-' and eight intended commits marked '+',Patch-equivalent base commit classification,Current
+CE-007,Repository,git diff --stat origin/main...HEAD,93 files changed 12934 insertions 832 deletions,Effective PR #336 diff scope,Current
+CE-008,Repository,git status --short,?? .codex-tmp/,.codex-tmp is untracked and unstaged,Current
+CE-009,Security,lib/server/author-portal-access.ts,getPortalSessionSecret and assertStrongPortalSessionSecret,Session secret fails closed and rejects weak/former fallback values,Current branch
+CE-010,Security,scripts/program002_author_portal_access.test.mjs,Author Portal session hardening tests,Security behavior coverage,Current branch
+CE-011,Deployment,.github/workflows/azure-static-web-apps.yml,Verify author portal session secret step and deploy env injection,Secret preflight and non-exposing GitHub secret reference,Current branch
+CE-012,PROGRAM-002,origin/main,docs/implementation/PROGRAM-002-Phase-I-Commissioning-Report.md,Phase I commissioned baseline through Commissioning Hold,Current
+CE-013,PROGRAM-002,origin/main,docs/implementation/PROGRAM-002-Phase-I-Executive-Summary.md,No release/no payment/no BC boundaries,Current
+CE-014,Author Workspace,origin/main,docs/implementation/PROGRAM-002-Full-Author-Workspace-Production-Pipeline-Commissioning.md,Author workspace and production pipeline commissioned to hold,Current
+CE-015,PROGRAM-002,origin/main,docs/implementation/PROGRAM-002-Phase-II-Readiness-Report.md,Phase II readiness and non-authorized actions,Current
+CE-016,Azure AI / Foundry,origin/main,docs/implementation/PROGRAM-003A-Agent365-Foundry-Runtime-Promotion.md,Foundry runtime proof and Agent 365 boundary,Current
+CE-017,Capability,origin/main,docs/implementation/JM1-Capability-Maturity-Registry.md,Capability maturity and governance holds,Current
+CE-018,PROGRAM-004,current branch,docs/implementation/PROGRAM-004-Commissioning-Microsoft-Productization-Delta-Report-2026-07-26.md,Consolidated PROGRAM-004 reconciliation package,Current branch
+CE-019,PROGRAM-004,current branch,docs/implementation/PROGRAM-004-Microsoft-Capability-Utilization-Matrix-2026-07-26.csv,Microsoft utilization matrix,Current branch
+CE-020,PROGRAM-004,current branch,docs/implementation/PROGRAM-004-Productization-Readiness-Register-2026-07-26.csv,Productization readiness register,Current branch
+CE-021,PROGRAM-004,current branch,docs/implementation/PROGRAM-004-Requirement-Reconciliation-Register-2026-07-26.csv,Requirement reconciliation register,Current branch
+CE-022,PROGRAM-004,current branch,docs/implementation/PROGRAM-004-Jackie-Action-Register-2026-07-26.csv,Jackie action register,Current branch
+CE-023,PROGRAM-004,current branch,docs/implementation/PROGRAM-004-Evidence-Index-2026-07-26.csv,PROGRAM-004 evidence index,Current branch
+CE-024,SharePoint authority,local temp mirror,.codex-tmp/program004-implementation-hq/PROGRAM-004-Implementation-HQ-Canonical-Migration-Manifest.json,Implementation HQ item IDs paths sizes metadata and local SHA-256 values,Temporary uncommitted evidence
+CE-025,SharePoint authority,local temp mirror,.codex-tmp/program004-implementation-hq/PROGRAM-004-Implementation-HQ-Repository-Designation.json,Repository designation and authority order,Temporary uncommitted evidence
+CE-026,SharePoint authority,UsersExternal,/Volumes/UsersExternal/JM1/_EVIDENCE/PROGRAM-004/v1.0/,18-file continuity mirror,External governed mirror
+CE-027,Dataverse traceability,UsersExternal,/Volumes/UsersExternal/JM1/_EVIDENCE/PROGRAM-004/v1.0/06_Execution_Logs/PROGRAM004-execution-log-reference-index.csv,PROGRAM-004 jm1_executionlog reference index,External governed mirror
+CE-028,Stripe,UsersExternal,/Volumes/UsersExternal/JM1/_EVIDENCE/PROGRAM-004/v1.0/05_Exception_Closure/2026-07-25-Stripe-Connect-Pilot-Readiness-Register.json,Stripe pilot approval and author Contact readiness,External governed mirror
+CE-029,Stripe,UsersExternal,/Volumes/UsersExternal/JM1/_EVIDENCE/PROGRAM-004/v1.0/05_Exception_Closure/2026-07-25-Stripe-Connect-Platform-Account-Readback.json,Stripe platform account safe readback,External governed mirror
+CE-030,Stripe,UsersExternal,/Volumes/UsersExternal/JM1/_EVIDENCE/PROGRAM-004/v1.0/05_Exception_Closure/PROGRAM-004-Stripe-Connect-Pilot-and-AIC-Planning-Center-Delta-2026-07-25.md,Stripe pilot and AIC planning center delta,External governed mirror
+CE-031,Dataverse / Power Automate,UsersExternal,/Volumes/UsersExternal/JM1/_EVIDENCE/PROGRAM-004/v1.0/05_Exception_Closure/PROGRAM-004-Author-Onboarding-Choice-Mapping-and-Evidence-Recovery-Delta-2026-07-25.md,Onboarding choice mapping and controlled proof blocker,External governed mirror
+CE-032,Business Central,current branch,docs/implementation/PROGRAM-004-Microsoft-Capability-Utilization-Matrix-2026-07-26.csv,Business Central held/unverified posture,Current branch
+CE-033,Publisher Operating Center,current branch,lib/server/publisher-operating-center.ts,Reconstructed operator action and Dataverse execution-log integration,Current branch
+CE-034,Author Operating Center,current branch,lib/server/author-portal-context.ts,Author context isolation and Dataverse-backed workspace context,Current branch
+CE-035,Diagnostic runner,current branch,azure-functions/diagnostic-ai-runner/test,Diagnostic runner governed routing tests,Current branch
