@@ -79,7 +79,7 @@ jobs:
 
       - name: Build and Deploy
         id: builddeploy
-        uses: azure/static-web-apps-deploy@latest
+        uses: azure/static-web-apps-deploy@v1
         env:
           AUTHOR_ONBOARDING_ACCESS_CODE: ${{ secrets.AUTHOR_ONBOARDING_ACCESS_CODE }}
           AUTHOR_PORTAL_ACCESS_CODE_PEPPER: ${{ secrets.AUTHOR_PORTAL_ACCESS_CODE_PEPPER }}
@@ -100,6 +100,24 @@ jobs:
           api_location: ""
           output_location: ""
 
+      - name: JM1-INFRA-005 Production Health Gate
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          JM1_PRODUCTION_HEALTH_BASE_URL: https://jmerrill.pub
+          JM1_PRODUCTION_HEALTH_DURATION_SECONDS: "600"
+          JM1_PRODUCTION_HEALTH_INTERVAL_SECONDS: "30"
+          JM1_PRODUCTION_HEALTH_TIMEOUT_MS: "20000"
+          JM1_PRODUCTION_HEALTH_EVIDENCE_PATH: deployment-evidence/production-health-gate.json
+        run: node scripts/production_health_gate.mjs
+
+      - name: Preserve JM1-INFRA-005 Deployment Evidence
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: jm1-infra-005-production-health
+          path: deployment-evidence/
+          if-no-files-found: error
+
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
@@ -109,7 +127,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Close Pull Request Deployment
-        uses: azure/static-web-apps-deploy@latest
+        uses: azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: close
