@@ -51,6 +51,12 @@ Enrollment must not include:
 - automatic payment after enrollment;
 - payment triggered by `details_submitted=true` or `payouts_enabled=true`.
 
+## Enrollment Communications Canon
+
+Author Payout Enrollment email must comply with JM1-COM-001. For publishing enrollment messages, the canonical author-facing sender is `publishing@email.jmerrill.one`, the mandatory Reply-To is `publishing@jmerrill.one`, and `publishing@jmerrill.one` must receive a governed archival copy. This control must be enforced by the outbound mail component and must not rely on mailbox forwarding, Exchange aliases, user mailbox rules, author knowledge, or manual operator intervention.
+
+Account Links may exist transiently in the intended author-facing email at send time. They must not be retained in Dataverse, execution logs, evidence files, internal documents, or support notes. Retrospective archive copies and durable evidence must replace Account Links with `[TRANSIENT ACCOUNT LINK REDACTED]`.
+
 ## Monthly Processing
 
 Frequency: MONTHLY.
@@ -186,9 +192,11 @@ Pilot order:
 2. Cynthia Sloan
 3. Carolyn Booker-Pierce
 
-Rosetta's existing connected account must be reused. Cynthia remains ready for internal proof only after narrowed implementation review. Carolyn remains blocked until title relationship reconciliation is resolved.
+Rosetta's existing connected account must be reused. Cynthia and Carolyn may use new Standard connected accounts only when no governed connected account exists. Carolyn's canonical pilot-title blocker is closed with six approved titles: Abortion!, Because the Lord Is My Shepherd, Girl, You're Not Crazy. You're Dealing with a Narcissist, Loving the Addict, More Than a Village, and You're Still Not Crazy.
 
-First author-facing enrollment-link delivery requires Jackie approval after review of:
+The three-author pilot invitation delivery was approved for Rosetta Perry, Cynthia Sloan, and Carolyn Booker-Pierce. Broad rollout remains separately gated.
+
+Future first-wave or broad author-facing enrollment-link delivery requires Jackie approval after review of:
 
 - narrowed implementation;
 - author-facing copy;
