@@ -57,6 +57,13 @@ test('eligible complete outside inquiries are not rendered as manual publisher r
   )
 })
 
+test('Untitled is treated as a valid provisional title, not missing metadata', () => {
+  assert.match(publisher, /PROVISIONAL_TITLE_NAMES = new Set\(\['untitled'\]\)/)
+  assert.match(publisher, /isProvisionalTitleName\(titleName\)/)
+  assert.match(publisher, /Provisional title accepted for publisher intake review/)
+  assert.doesNotMatch(publisher, /titleName === 'Untitled'[\s\S]+Publisher Review Required/)
+})
+
 test('fresh Stage 0 diagnostic handoffs are eligible for automated editorial review execution', () => {
   assert.match(runControl, /DIAGNOSTIC_STATUS\.PENDING/)
   assert.match(runControl, /DIAGNOSTIC_STATUS\.AWAITING_JACKIE_REVIEW/)
