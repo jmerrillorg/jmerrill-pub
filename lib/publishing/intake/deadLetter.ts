@@ -1,16 +1,96 @@
 import { createHmac } from 'crypto'
 import type { NormalizedPublishingIntake } from './schema'
 
+export type PublishingIntakeFailureClassification =
+  | 'DATAVERSE_ENRICHMENT_FAILED'
+  | 'SHAREPOINT_SECONDARY_SETUP_FAILED'
+  | 'PUBLISHING_NOTIFICATION_FAILED'
+  | 'EXECUTION_LOG_WRITE_FAILED'
+  | 'STATUS_WRITEBACK_FAILED'
+  | 'TRANSIENT_MICROSOFT_DEPENDENCY_FAILURE'
+  | 'UNKNOWN_RECOVERABLE_FAILURE'
+
+export type NonRecoverablePublishingIntakeFailure =
+  | 'INVALID_TURNSTILE'
+  | 'UNSUPPORTED_FILE'
+  | 'MISSING_REQUIRED_FIELD'
+  | 'INVALID_FILE_SIZE'
+  | 'MALFORMED_REQUEST'
+  | 'DUPLICATE_IDEMPOTENCY_KEY'
+
+export type PublishingIntakeRecoveryOperation =
+  | 'DATAVERSE_INTAKE_CREATE'
+  | 'PUBLISHING_NOTIFICATION'
+  | 'AUTHOR_ACKNOWLEDGMENT'
+  | 'ACKNOWLEDGMENT_WRITEBACK'
+  | 'MANUSCRIPT_WRITEBACK'
+  | 'WORKSPACE_WRITEBACK'
+  | 'EXECUTION_LOG_WRITE'
+
+export type PublishingIntakeRecoveryMessage = {
+  schema: 'JM1_PUBLISHING_INTAKE_DEAD_LETTER_V1'
+  intakeReference: string
+  dataverseRecordId?: string
+  contactId?: string
+  sharePointItemId?: string
+  sharePointDriveItemId?: string
+  workspaceFolderId?: string
+  correlationId: string
+  failedOperationType: PublishingIntakeRecoveryOperation
+  failureClassification: PublishingIntakeFailureClassification
+  retryCount: number
+  maxRetryCount: number
+  firstFailureAt: string
+  latestFailureAt: string
+  sourceDeploymentSha: string
+  safeErrorCode: string
+  environment: string
+}
+
+export type PublishingIntakeRecoveryInput = {
+  intakeReference: string
+  dataverseRecordId?: string
+  contactId?: string
+  sharePointItemId?: string
+  sharePointDriveItemId?: string
+  workspaceFolderId?: string
+  correlationId?: string
+  failedOperationType: PublishingIntakeRecoveryOperation
+  failureClassification: PublishingIntakeFailureClassification
+  retryCount?: number
+  firstFailureAt?: string
+  latestFailureAt?: string
+  sourceDeploymentSha?: string
+  safeErrorCode: string
+  environment?: string
+}
+
 export type DeadLetterResult =
-  | { status: 'enqueued' }
+  | { status: 'enqueued'; message: PublishingIntakeRecoveryMessage }
   | { status: 'not_configured' }
   | { status: 'failed'; reason: string }
+
+export const DEAD_LETTER_MAX_QUEUE_RETRIES = 5
 
 export async function enqueuePublishingIntakeDeadLetter(
   payload: NormalizedPublishingIntake,
   reason: string,
 ): Promise<DeadLetterResult> {
+  return enqueuePublishingIntakeRecovery({
+    intakeReference: payload.reference,
+    correlationId: payload.idempotencyKey,
+    failedOperationType: 'DATAVERSE_INTAKE_CREATE',
+    failureClassification: classifyRecoverableFailure(reason),
+    workspaceFolderId: payload.workspaceFolderId,
+    safeErrorCode: reason,
+  })
+}
+
+export async function enqueuePublishingIntakeRecovery(
+  input: PublishingIntakeRecoveryInput,
+): Promise<DeadLetterResult> {
   const config = getQueueConfig()
+  const message = buildPublishingIntakeRecoveryMessage(input)
 
   if (!config) {
     return { status: 'not_configured' }
@@ -18,7 +98,7 @@ export async function enqueuePublishingIntakeDeadLetter(
 
   try {
     const url = buildQueueMessagesUrl(config)
-    const body = buildQueueMessageBody(payload, reason)
+    const body = buildQueueMessageBody(message)
     const headers = buildQueueHeaders(config, body)
     const response = await fetch(url, {
       method: 'POST',
@@ -27,7 +107,7 @@ export async function enqueuePublishingIntakeDeadLetter(
     })
 
     if (response.status === 201) {
-      return { status: 'enqueued' }
+      return { status: 'enqueued', message }
     }
 
     return {
@@ -40,6 +120,54 @@ export async function enqueuePublishingIntakeDeadLetter(
       reason: `dead_letter_enqueue_exception:${error instanceof Error ? error.name : 'unknown'}`,
     }
   }
+}
+
+export function buildPublishingIntakeRecoveryMessage(
+  input: PublishingIntakeRecoveryInput,
+  now = new Date(),
+): PublishingIntakeRecoveryMessage {
+  const latestFailureAt = input.latestFailureAt || now.toISOString()
+  return {
+    schema: 'JM1_PUBLISHING_INTAKE_DEAD_LETTER_V1',
+    intakeReference: input.intakeReference,
+    ...(input.dataverseRecordId ? { dataverseRecordId: input.dataverseRecordId } : {}),
+    ...(input.contactId ? { contactId: input.contactId } : {}),
+    ...(input.sharePointItemId ? { sharePointItemId: input.sharePointItemId } : {}),
+    ...(input.sharePointDriveItemId ? { sharePointDriveItemId: input.sharePointDriveItemId } : {}),
+    ...(input.workspaceFolderId ? { workspaceFolderId: input.workspaceFolderId } : {}),
+    correlationId: input.correlationId || input.intakeReference,
+    failedOperationType: input.failedOperationType,
+    failureClassification: input.failureClassification,
+    retryCount: input.retryCount ?? 0,
+    maxRetryCount: DEAD_LETTER_MAX_QUEUE_RETRIES,
+    firstFailureAt: input.firstFailureAt || latestFailureAt,
+    latestFailureAt,
+    sourceDeploymentSha: input.sourceDeploymentSha || currentDeploymentSha(),
+    safeErrorCode: sanitizeSafeErrorCode(input.safeErrorCode),
+    environment: input.environment || currentEnvironment(),
+  }
+}
+
+export function classifyRecoverableFailure(reason: string): PublishingIntakeFailureClassification {
+  if (reason.startsWith('dataverse_ack_writeback_')) return 'STATUS_WRITEBACK_FAILED'
+  if (reason.startsWith('dataverse_write_')) return 'DATAVERSE_ENRICHMENT_FAILED'
+  if (reason.startsWith('sharepoint_') || reason.startsWith('manuscript_')) return 'SHAREPOINT_SECONDARY_SETUP_FAILED'
+  if (reason.startsWith('relay_') || reason.includes('notification')) return 'PUBLISHING_NOTIFICATION_FAILED'
+  if (reason.includes('execution_log')) return 'EXECUTION_LOG_WRITE_FAILED'
+  if (reason.includes('timeout') || reason.includes('429') || reason.includes('503')) return 'TRANSIENT_MICROSOFT_DEPENDENCY_FAILURE'
+  return 'UNKNOWN_RECOVERABLE_FAILURE'
+}
+
+export function sanitizeSafeErrorCode(reason: string) {
+  return reason
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[redacted-email]')
+    .replace(/\+?\d[\d\s().-]{7,}\d/g, '[redacted-phone]')
+    .replace(/Bearer\s+[A-Za-z0-9._~+/=-]+/gi, 'Bearer [redacted-token]')
+    .replace(/secret[=:][^,;\s]+/gi, 'secret=[redacted-secret]')
+    .replace(/https?:\/\/[^\s"']+/gi, '[redacted-url]')
+    .replace(/[A-Za-z]:\\[^\s"']+/g, '[redacted-path]')
+    .replace(/\/Users\/[^\s"']+/g, '[redacted-path]')
+    .slice(0, 160)
 }
 
 type QueueConfig = {
@@ -95,15 +223,7 @@ function buildQueueMessagesUrl(config: QueueConfig) {
   return `${base}?${search.toString()}`
 }
 
-function buildQueueMessageBody(payload: NormalizedPublishingIntake, reason: string) {
-  const { turnstileToken: _turnstileToken, ...recoverablePayload } = payload
-  const message = {
-    reason,
-    reference: payload.reference,
-    failedAt: new Date().toISOString(),
-    payload: recoverablePayload,
-  }
-
+export function buildQueueMessageBody(message: PublishingIntakeRecoveryMessage) {
   return `<QueueMessage><MessageText>${Buffer.from(JSON.stringify(message), 'utf8').toString('base64')}</MessageText></QueueMessage>`
 }
 
@@ -160,4 +280,16 @@ function buildSharedKeyAuthorization(
     .digest('base64')
 
   return `SharedKey ${config.accountName}:${signature}`
+}
+
+function currentDeploymentSha() {
+  return (
+    process.env.JM1_RELEASE_SHA ||
+    process.env.GITHUB_SHA ||
+    'unknown'
+  ).slice(0, 80)
+}
+
+function currentEnvironment() {
+  return process.env.JM1_ENVIRONMENT || process.env.NODE_ENV || 'unknown'
 }

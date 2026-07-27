@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { enqueuePublishingIntakeDeadLetter } from '@/lib/publishing/intake/deadLetter'
+import {
+  classifyRecoverableFailure,
+  enqueuePublishingIntakeDeadLetter,
+  enqueuePublishingIntakeRecovery,
+} from '@/lib/publishing/intake/deadLetter'
 import { writePublishingIntakeWithRetry } from '@/lib/publishing/intake/dataverse'
 import { getIdempotencyReplay, rememberIdempotencyKey } from '@/lib/publishing/intake/idempotency'
 import { sendJoinInternalNotification } from '@/lib/publishing/intake/internalNotification'
@@ -262,9 +266,23 @@ async function handlePublishingIntakePost(req: NextRequest) {
       dataverse.status === 'success' ? { recordId: dataverse.recordId } : undefined,
     )
     if (notification.status !== 'sent') {
+      const notificationFailure = notification.status === 'failed'
+        ? notification.reason
+        : `notification_${notification.reason}`
+      const recovery = await enqueuePublishingIntakeRecovery({
+        intakeReference: acceptedIntake.reference,
+        dataverseRecordId: dataverse.status === 'success' ? dataverse.recordId : undefined,
+        workspaceFolderId: acceptedIntake.workspaceFolderId,
+        correlationId: acceptedIntake.idempotencyKey,
+        failedOperationType: 'PUBLISHING_NOTIFICATION',
+        failureClassification: classifyRecoverableFailure(notificationFailure),
+        safeErrorCode: notificationFailure,
+      })
+
       console.warn('Publishing intake internal notification did not send after intake acceptance.', {
         status: notification.status,
         reason: notification.reason,
+        recoveryStatus: recovery.status,
         reference,
       })
     }
@@ -272,9 +290,9 @@ async function handlePublishingIntakePost(req: NextRequest) {
     return json({ status: 'received', reference }, 201, originResult.origin)
   }
 
-  const deadLetter = await enqueuePublishingIntakeDeadLetter(intake, dataverse.reason)
+  const deadLetter = await enqueuePublishingIntakeDeadLetter(acceptedIntake, dataverse.reason)
   if (deadLetter.status === 'enqueued') {
-    console.error('Publishing intake Dataverse write failed; payload dead-lettered.', {
+    console.error('Publishing intake Dataverse write failed; recovery message enqueued.', {
       reason: dataverse.reason,
       reference,
       firstName: maskName(intake.firstName),
