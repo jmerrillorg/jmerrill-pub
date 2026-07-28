@@ -33,6 +33,7 @@ const STAGE_TYPE_REVIEW = 100000000
 const STAGE_STATUS_IN_PROGRESS = 100000001
 const HEALTH_HEALTHY = 196650000
 const DIAGNOSTIC_STATUS_PENDING = 196650000
+const PROVISIONAL_TITLE_NAMES = new Set(['untitled'])
 
 export type PublisherActionId =
   | 'review_intake'
@@ -2205,6 +2206,10 @@ function deriveBlocker(input: {
   return 'Ready for next editorial scheduling decision'
 }
 
+function isProvisionalTitleName(value: string) {
+  return PROVISIONAL_TITLE_NAMES.has(value.trim().toLowerCase())
+}
+
 function buildAuthorizedActions(currentBlocker: string, hasContact: boolean): PublisherQueueItem['authorizedActions'] {
   if (currentBlocker === 'Ready for publisher intake review') {
     return [
@@ -2269,6 +2274,9 @@ function buildAuthorizedActions(currentBlocker: string, hasContact: boolean): Pu
 async function findOrCreateTitle(config: DataverseServerConfig, intake: DataverseRow) {
   const titleName = stringValue(intake.jm1_projecttitle)
   const authorName = [stringValue(intake.jm1_firstname), stringValue(intake.jm1_lastname)].filter(Boolean).join(' ')
+  const titlePublicationStatus = isProvisionalTitleName(titleName)
+    ? 'Provisional title accepted for publisher intake review'
+    : 'Publisher intake review initialized'
   const escaped = escapeODataText(titleName)
   const existing = await dataverseFirst(config, 'jm1pub_titles', {
     $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_stage',
@@ -2289,7 +2297,7 @@ async function findOrCreateTitle(config: DataverseServerConfig, intake: Datavers
     jm1pub_titlename: titleName,
     jm1pub_authorname: authorName,
     jm1pub_stage: TITLE_STAGE_EDITORIAL,
-    jm1pub_publicationstatus: 'Publisher intake review initialized',
+    jm1pub_publicationstatus: titlePublicationStatus,
   })
 
   return { id: extractId(entityId), name: titleName, created: true }
