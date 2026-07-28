@@ -141,6 +141,9 @@ resource slotConfigNames 'Microsoft.Web/sites/config@2023-12-01' = {
       'STRIPE_CONNECT_SECRET_KEY'
       'STRIPE_CHECKOUT_SECRET_KEY'
       'STRIPE_WEBHOOK_SECRET'
+      'JM1_DIAGNOSTIC_RUNNER_KEY'
+      'JM1_DIAGNOSTIC_RUNNER_URL'
+      'JM1_ORCHESTRATION_WORKER_KEY'
     ]
   }
 }
@@ -263,6 +266,8 @@ func appSettings(appInsightsConnectionString string, vaultUri string, slotEnviro
   setting('JM1_STRIPE_MODE', 'live', false)
   setting('JM1_STRIPE_CONNECT_ENABLED', 'true', false)
   setting('JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED', 'false', false)
+  setting('JM1_DIAGNOSTIC_RUNNER_URL', 'https://func-jm1-diagnostic-ai-runner.azurewebsites.net', true)
+  setting('JM1_DIAGNOSTIC_RUNNER_KEY', kvRef('jm1-int-pub-005-diagnostic-runner-key'), true)
   setting('JM1_ORCHESTRATION_WORKER_KEY', kvRef('JM1-ORCHESTRATION-WORKER-KEY'), true)
 ]
 

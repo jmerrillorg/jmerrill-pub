@@ -1,8 +1,9 @@
 # JM1-INFRA-006 Phase 2 App Service Staging Report
 
 Date: 2026-07-27
+Updated: 2026-07-28
 
-Status: PARTIALLY COMPLETE - APP SERVICE FOUNDATION PROVISIONED; POSITIVE SYNTHETIC BUSINESS-PATH PROOFS PENDING
+Status: BLOCKED - APP SERVICE STAGING SOURCE AND WORKER ROUTE REFRESHED; POSITIVE SYNTHETIC BUSINESS-PATH PROOFS BLOCKED BY TURNSTILE HOSTNAME CONFIGURATION AND MISSING AUTHOR SYNTHETIC FIXTURE
 
 ## Baseline
 
@@ -10,6 +11,7 @@ Status: PARTIALLY COMPLETE - APP SERVICE FOUNDATION PROVISIONED; POSITIVE SYNTHE
 - Foundation source commit: `b436068d6c8887884d1c2de5210972326b314d7a`
 - Merge commit to `main`: `854df94baba0dd2c9cc206796c98c52995bbc718`
 - Static Web Apps production runtime: retained and verified healthy
+- Current production source authority before staging refresh: `f3f2a9fc96627fc23327e58b7eddbe6f50365a93`
 - DNS cutover: not executed
 - Static Web Apps retirement: not authorized and not performed
 
@@ -41,12 +43,16 @@ Infrastructure deployments:
 
 Application deployment:
 
-- Active Kudu deployment: `e1dd1e88-28a7-4577-a9fe-999e23c0b696`
+- Previous active Kudu deployment: `e1dd1e88-28a7-4577-a9fe-999e23c0b696`
+- Refreshed Kudu deployment: `c4b25195-6eb5-4c0c-9360-ead6f5e0eb28`
 - Artifact type: Next.js standalone App Service package
-- Artifact SHA-256: `e425e3eb3cd3c3f45e644bcfe1480f664a0afe586d96d1733cbfd7b1b7b26c0a`
+- Previous artifact SHA-256: `e425e3eb3cd3c3f45e644bcfe1480f664a0afe586d96d1733cbfd7b1b7b26c0a`
+- Refreshed artifact SHA-256: `b7ba6bbe7938ccf158d6b02288386ed160fb0f0616030f7329b980ac707614c1`
 - Startup command: `node server.js`
 
 The initial full `node_modules` deployment started with `npm start` and failed under App Service Linux because platform module relocation broke the `next` executable path. The corrected App Service packaging uses Next standalone output and starts from `server.js`.
+
+The 2026-07-28 refresh deployed a standalone artifact rebuilt from the PR branch after merging current `origin/main` at `f3f2a9fc96627fc23327e58b7eddbe6f50365a93`. An initial CLI deployment left Kudu in an incomplete `Receiving changes` state, so the same verified zip was deployed through Kudu async zipdeploy. Kudu marked deployment `c4b25195-6eb5-4c0c-9360-ead6f5e0eb28` successful and active.
 
 ## Identity And Configuration
 
@@ -71,6 +77,14 @@ Both `AUTH_SECRET` and `NEXTAUTH_SECRET` reference `AUTH-SECRET`.
 
 Slot-specific settings are governed through the App Service `slotConfigNames` resource so later slot-swap work does not silently exchange staging and production runtime values.
 
+Post-refresh orchestration settings:
+
+- `JM1_DIAGNOSTIC_RUNNER_URL`: configured as a slot-sticky non-secret App Service setting.
+- `JM1_DIAGNOSTIC_RUNNER_KEY`: configured as a slot-sticky Key Vault reference to `jm1-int-pub-005-diagnostic-runner-key`.
+- `JM1_ORCHESTRATION_WORKER_KEY`: configured as a slot-sticky Key Vault reference to `JM1-ORCHESTRATION-WORKER-KEY`.
+- The App Service staging slot identity already has Key Vault Secrets User access to `jm1-core-vault`.
+- Worker-key alignment was verified without exposing the value.
+
 Payment gate:
 
 - `JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED=false`
@@ -85,6 +99,7 @@ Public runtime:
 - `/join`: 200
 - `/api/publishing/intake/config`: 200
 - `/favicon.ico`: 200
+- `/api/publishing/orchestration/intake-autostart`: deployed and indexed under the refreshed standalone artifact.
 
 Health stability:
 
@@ -102,17 +117,21 @@ Publishing intake:
 
 - Intake configuration endpoint: 200
 - Invalid Turnstile: controlled 400 with `turnstile_verification_failed`
-- Positive synthetic intake proof: pending; requires browser Turnstile execution and governed synthetic manuscript fixture
-- Duplicate-idempotency proof: pending; depends on positive synthetic intake
-- Notification delivery proof: pending; depends on positive synthetic intake
+- Unauthenticated worker call to `/api/publishing/orchestration/intake-autostart`: 401
+- Authenticated worker call with malformed intake ID: 400 with `invalid_intake_id`
+- Positive synthetic intake proof: blocked. Browser Turnstile execution on `https://app-jm1-pub-prod-staging.azurewebsites.net/join` produced Cloudflare Turnstile client error `110200`, documented by Cloudflare as domain not authorized. The staging hostname must be authorized on the current widget or a staging-specific governed Turnstile widget must be configured before a real token-bearing `/join` submission can be completed.
+- Duplicate-idempotency proof: blocked by positive synthetic intake proof.
+- Notification delivery proof: blocked by positive synthetic intake proof.
 
 Author Operating Center:
 
 - Unauthenticated context fail-closed: pass
 - Former-fallback forged session: pass for author context
-- Valid synthetic author session: pending; requires governed synthetic access registry and author fixture
-- Own artifact download: pending; requires governed synthetic artifact fixture
-- Cross-author artifact denial: pending; requires governed paired synthetic artifact fixture
+- Staging session secret and access settings: configured through Key Vault references.
+- Current access registry shape: one active non-synthetic grant; no preview/synthetic grant available.
+- Valid synthetic author session: blocked pending governed synthetic access registry and author fixture.
+- Own artifact download: blocked pending governed synthetic artifact fixture.
+- Cross-author artifact denial: blocked pending governed paired synthetic artifact fixture.
 
 ## Monitoring
 
@@ -126,7 +145,7 @@ Metric alerts:
 - `alert-jm1-pub-appsvc-http5xx`: severity 2, total `Http5xx > 5` over 5 minutes, evaluated every 1 minute
 - `alert-jm1-pub-appsvc-response-time`: severity 3, average `AverageResponseTime > 10` seconds over 5 minutes, evaluated every 1 minute
 
-Additional health-endpoint and dependency-specific alerts should be added before cutover after final synthetic business-path certification is complete.
+Additional health-endpoint and dependency-specific alerts should be added before cutover after final synthetic business-path certification is complete. The current metric alerts cover HTTP 5xx and response time only.
 
 ## Rollback
 
@@ -144,10 +163,11 @@ Additional health-endpoint and dependency-specific alerts should be added before
 
 ## Exceptions
 
-The App Service foundation and runtime shell are working, but full staging certification is not complete because the positive synthetic business-path proofs were not completed:
+The App Service foundation and refreshed runtime shell are working, but full staging certification is blocked because the positive synthetic business-path proofs cannot be completed until the required external staging fixtures/configuration are available:
 
-1. Valid `/join` synthetic intake through Turnstile, Dataverse, SharePoint, notification, and idempotency.
-2. Valid synthetic Author Operating Center session and artifact access pair proving own-artifact success and cross-author denial.
+1. Turnstile hostname authorization for `app-jm1-pub-prod-staging.azurewebsites.net` or a staging-specific governed Turnstile site/secret pair.
+2. Valid `/join` synthetic intake through Turnstile, Dataverse, SharePoint, notification, and idempotency after Turnstile is corrected.
+3. Governed synthetic Author Operating Center session and artifact access pair proving own-artifact success and cross-author denial.
 
 These are runtime certification gates, not reasons to change DNS or cut over production traffic.
 
@@ -157,10 +177,11 @@ Recommendation: NO-GO for production cutover.
 
 Required before cutover authorization:
 
-1. Complete governed positive synthetic `/join` intake proof on App Service staging.
-2. Complete governed synthetic Author Operating Center session and artifact proof on App Service staging.
-3. Expand monitoring to health/dependency-specific alerts.
-4. Preserve final non-sensitive evidence.
-5. Jackie explicitly authorizes DNS/cutover timing after reviewing the completed certification package.
+1. Authorize the App Service staging hostname in Cloudflare Turnstile hostname management, or configure a staging-specific governed Turnstile site/secret pair.
+2. Complete governed positive synthetic `/join` intake proof on App Service staging.
+3. Complete governed synthetic Author Operating Center session and artifact proof on App Service staging.
+4. Expand monitoring to health/dependency-specific alerts.
+5. Preserve final non-sensitive evidence.
+6. Jackie explicitly authorizes DNS/cutover timing after reviewing the completed certification package.
 
 No DNS change, production traffic migration, Static Web Apps retirement, Stripe payment action, Business Central posting, broad author activation, secret exposure, or destructive evidence action occurred.
