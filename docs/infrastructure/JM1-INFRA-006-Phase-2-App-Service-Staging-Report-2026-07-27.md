@@ -120,6 +120,7 @@ Publishing intake:
 - Unauthenticated worker call to `/api/publishing/orchestration/intake-autostart`: 401
 - Authenticated worker call with malformed intake ID: 400 with `invalid_intake_id`
 - Positive synthetic intake proof: blocked. Browser Turnstile execution on `https://app-jm1-pub-prod-staging.azurewebsites.net/join` produced Cloudflare Turnstile client error `110200`, documented by Cloudflare as domain not authorized. The staging hostname must be authorized on the current widget or a staging-specific governed Turnstile widget must be configured before a real token-bearing `/join` submission can be completed.
+- 2026-07-28 continuation: Cloudflare dashboard access was attempted through the available browser session, but the session was unauthenticated and required Cloudflare login. No unrestricted hostname mode was enabled and no Turnstile secret was exposed. The hostname addition remains the current material external-admin blocker.
 - Duplicate-idempotency proof: blocked by positive synthetic intake proof.
 - Notification delivery proof: blocked by positive synthetic intake proof.
 
@@ -128,10 +129,15 @@ Author Operating Center:
 - Unauthenticated context fail-closed: pass
 - Former-fallback forged session: pass for author context
 - Staging session secret and access settings: configured through Key Vault references.
-- Current access registry shape: one active non-synthetic grant; no preview/synthetic grant available.
-- Valid synthetic author session: blocked pending governed synthetic access registry and author fixture.
-- Own artifact download: blocked pending governed synthetic artifact fixture.
-- Cross-author artifact denial: blocked pending governed paired synthetic artifact fixture.
+- 2026-07-28 governed synthetic fixture: created two preview-only synthetic authors, Contacts, intakes, Opportunities, titles, publishing assets, editorial stages, approval gates, summaries, and text artifacts. No real author credentials or manuscript content were used.
+- Temporary fixture route: a preview-only access registry and synthetic master access code were applied to App Service staging and then restored to the original Key Vault-backed references. The `/api/author/gate` route continued to reject the temporary access code with `401 Invalid access code`, so App Service staging credential issuance remains unproven.
+- Governed signed synthetic session path: using the staging `AUTHOR_PORTAL_SESSION_SECRET` inside the certification runner without printing or preserving the cookie value, Author A context resolved with HTTP 200, matched the synthetic Contact, and projected exactly one Author A artifact.
+- Author A own-artifact download: HTTP 200, filename matched the fixture, MIME type `text/plain; charset=utf-8`, and SHA-256 matched `3d8132cac22356e5733fc793fd17131d7e14aaa47957c274da1220e0cd347ca6`.
+- Author A to Author B artifact request: non-disclosing 404.
+- Unauthenticated artifact request: 401.
+- Former-fallback forged-session artifact request: 401.
+- Logout: 200; post-logout context request returned 401.
+- Cleanup: App Service staging settings restored to Key Vault references; synthetic Dataverse rows and temporary SharePoint `_certification/INFRA006-AOC-*` folders removed; final cleanup scan found zero matching synthetic Contacts, intakes, titles, Opportunities, editorial artifacts, or temporary SharePoint folders.
 
 ## Monitoring
 
@@ -163,11 +169,11 @@ Additional health-endpoint and dependency-specific alerts should be added before
 
 ## Exceptions
 
-The App Service foundation and refreshed runtime shell are working, but full staging certification is blocked because the positive synthetic business-path proofs cannot be completed until the required external staging fixtures/configuration are available:
+The App Service foundation and refreshed runtime shell are working, and the Author Operating Center context/artifact authorization path has been positively proven through a governed signed synthetic session. Full staging certification remains blocked because the `/join` positive path still cannot obtain a valid Turnstile token for the App Service staging hostname, and the App Service `/api/author/gate` route did not accept temporary synthetic staging access-code settings during the continuation pass.
 
 1. Turnstile hostname authorization for `app-jm1-pub-prod-staging.azurewebsites.net` or a staging-specific governed Turnstile site/secret pair.
 2. Valid `/join` synthetic intake through Turnstile, Dataverse, SharePoint, notification, and idempotency after Turnstile is corrected.
-3. Governed synthetic Author Operating Center session and artifact access pair proving own-artifact success and cross-author denial.
+3. App Service staging author-session issuance through `/api/author/gate`, or a configuration diagnosis explaining why temporary staging access-code settings were not visible to that route after readback and restart. The context, artifact, cross-author denial, unauthenticated denial, forged fallback denial, and logout paths are proven through governed signed synthetic session evidence.
 
 These are runtime certification gates, not reasons to change DNS or cut over production traffic.
 
@@ -179,7 +185,7 @@ Required before cutover authorization:
 
 1. Authorize the App Service staging hostname in Cloudflare Turnstile hostname management, or configure a staging-specific governed Turnstile site/secret pair.
 2. Complete governed positive synthetic `/join` intake proof on App Service staging.
-3. Complete governed synthetic Author Operating Center session and artifact proof on App Service staging.
+3. Complete App Service staging `/api/author/gate` synthetic access-code issuance proof or resolve the App Service access-code configuration propagation issue.
 4. Expand monitoring to health/dependency-specific alerts.
 5. Preserve final non-sensitive evidence.
 6. Jackie explicitly authorizes DNS/cutover timing after reviewing the completed certification package.
