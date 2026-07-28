@@ -37,7 +37,7 @@ test('automatic outside inquiry initialization uses governed publisher initializ
   assert.match(publisher, /initializePublisherEditorialReview\(\{/)
   assert.match(publisher, /operatorEmail: 'JM1 Automation'/)
   assert.match(publisher, /findPublisherExecutionLog\(config, 'PUBLISHER_EDITORIAL_REVIEW_INITIALIZED', input\.intakeId\)/)
-  assert.match(publisher, /findStage0DiagnosticForIntake\(config, input\.intakeId\)/)
+  assert.match(publisher, /waitForStage0DiagnosticForIntake\(config, input\.intakeId\)/)
   assert.match(publisher, /dispatchEditorialReviewNow\(\{/)
   assert.match(publisher, /stage0_diagnostic_handoff_pending/)
   assert.match(publisher, /JM1_EDITORIAL_REVIEW_NOW_URL/)
@@ -62,6 +62,37 @@ test('Untitled is treated as a valid provisional title, not missing metadata', (
   assert.match(publisher, /isProvisionalTitleName\(titleName\)/)
   assert.match(publisher, /Provisional title accepted for publisher intake review/)
   assert.doesNotMatch(publisher, /titleName === 'Untitled'[\s\S]+Publisher Review Required/)
+})
+
+test('autostart binds preserved manuscript asset fields before diagnostic dispatch', () => {
+  assert.match(publisher, /ensureDiagnosticManuscriptAssetBinding/)
+  assert.match(publisher, /jm1_manuscriptasseturl: manuscriptUrl/)
+  assert.match(publisher, /jm1_manuscriptapprovedfordiagnostic: true/)
+  assert.match(publisher, /jm1pub_manuscriptpresent: true/)
+  assert.match(publisher, /jm1_manuscriptfiletype: metadata\.fileType/)
+  assert.match(publisher, /waitForStage0DiagnosticForIntake/)
+})
+
+test('autostart writes one idempotent success event after dispatch', () => {
+  assert.match(publisher, /PUBLISHING_INTAKE_ORCHESTRATION_DISPATCHED/)
+  assert.match(publisher, /findPublisherExecutionLog\([\s\S]*PUBLISHING_INTAKE_ORCHESTRATION_DISPATCHED/)
+  assert.match(publisher, /Author recommendation sent/)
+})
+
+test('diagnostic runner registers the governed intake autostart recovery worker', () => {
+  const index = readFileSync('azure-functions/diagnostic-ai-runner/src/index.js', 'utf8')
+  const worker = readFileSync('azure-functions/diagnostic-ai-runner/src/functions/runPublishingIntakeAutostartRecovery.js', 'utf8')
+  const pkg = readFileSync('azure-functions/diagnostic-ai-runner/package.json', 'utf8')
+
+  assert.match(index, /runPublishingIntakeAutostartRecovery/)
+  assert.match(pkg, /runPublishingIntakeAutostartRecovery\.js/)
+  assert.match(worker, /app\.timer\("run-publishing-intake-autostart-recovery"/)
+  assert.match(worker, /JM1_ORCHESTRATION_WORKER_KEY/)
+  assert.match(worker, /x-jm1-orchestration-worker-key/)
+  assert.match(worker, /jm1_publishingintakeid/)
+  assert.match(worker, /PUBLISHING_INTAKE_ORCHESTRATION_DISPATCHED/)
+  assert.doesNotMatch(worker, /console\.log\(.*workerKey/)
+  assert.doesNotMatch(worker, /context\.(info|warn|error)\(.*workerKey/)
 })
 
 test('fresh Stage 0 diagnostic handoffs are eligible for automated editorial review execution', () => {

@@ -922,7 +922,7 @@ export async function autoInitializeOutsideInquiryEditorialReview(input: {
     correlationId: input.correlationId || `AUTO-EDITORIAL-${String(intake.jm1_intakereferencecode || input.intakeId)}-${Date.now()}`,
   })
 
-  const diagnostic = await findStage0DiagnosticForIntake(config, input.intakeId)
+  const diagnostic = await waitForStage0DiagnosticForIntake(config, input.intakeId)
   if (!diagnostic) {
     await writePublisherExecutionLog(config, {
       actionType: 'PUBLISHING_INTAKE_ORCHESTRATION_WAITING_FOR_STAGE0_HANDOFF',
@@ -944,12 +944,17 @@ export async function autoInitializeOutsideInquiryEditorialReview(input: {
     }
   }
 
+  const assetBinding = await ensureDiagnosticManuscriptAssetBinding(config, diagnostic, intake)
+  const refreshedDiagnostic = assetBinding.bound
+    ? await findStage0DiagnosticForIntake(config, input.intakeId)
+    : diagnostic
+
   const dispatch = await dispatchEditorialReviewNow({
-    diagnosticId: stringValue(diagnostic.jm1pub_editorialdiagnosticid),
+    diagnosticId: stringValue(refreshedDiagnostic?.jm1pub_editorialdiagnosticid || diagnostic.jm1pub_editorialdiagnosticid),
     intakeReferenceCode: stringValue(intake.jm1_intakereferencecode),
-    manuscriptUrl: stringValue(diagnostic.jm1_manuscriptasseturl || intake.jm1_manuscripturl || intake.jm1_submissionurl),
+    manuscriptUrl: stringValue(refreshedDiagnostic?.jm1_manuscriptasseturl || diagnostic.jm1_manuscriptasseturl || intake.jm1_manuscripturl || intake.jm1_submissionurl),
     workspaceUrl: stringValue(intake.jm1_sharepointworkspaceurl || intake.jm1_manuscripturl || intake.jm1_submissionurl),
-    diagnosticStatus: Number(diagnostic.jm1pub_diagnosticstatus ?? DIAGNOSTIC_STATUS_PENDING),
+    diagnosticStatus: Number(refreshedDiagnostic?.jm1pub_diagnosticstatus ?? diagnostic.jm1pub_diagnosticstatus ?? DIAGNOSTIC_STATUS_PENDING),
   })
 
   if (dispatch.status !== 'accepted') {
@@ -973,6 +978,28 @@ export async function autoInitializeOutsideInquiryEditorialReview(input: {
       diagnosticId: stringValue(diagnostic.jm1pub_editorialdiagnosticid),
       ...result,
     }
+  }
+
+  const existingSuccessLog = await findPublisherExecutionLog(
+    config,
+    'PUBLISHING_INTAKE_ORCHESTRATION_DISPATCHED',
+    input.intakeId,
+  )
+  if (!existingSuccessLog) {
+    await writePublisherExecutionLog(config, {
+      actionType: 'PUBLISHING_INTAKE_ORCHESTRATION_DISPATCHED',
+      name: `PUBLISHING_INTAKE_ORCHESTRATION_DISPATCHED - ${String(intake.jm1_projecttitle || input.intakeId)}`,
+      description: [
+        `Outside /join intake ${String(intake.jm1_intakereferencecode || input.intakeId)} was initialized and Editorial Review runner dispatch completed.`,
+        `Diagnostic ${stringValue(diagnostic.jm1pub_editorialdiagnosticid)}.`,
+        `Asset binding ${assetBinding.reason}.`,
+        `Run control ${dispatch.runControlStatus || 'unknown'}.`,
+        `Author recommendation sent ${dispatch.authorRecommendationSent === true ? 'yes' : 'no'}.`,
+        `Correlation ${result.correlationId}.`,
+      ].join(' '),
+      sourceEntity: 'jm1_publishingintake',
+      sourceRecordId: input.intakeId,
+    })
   }
 
   return {
@@ -2406,10 +2433,81 @@ async function findPublisherExecutionLog(config: DataverseServerConfig, actionTy
 async function findStage0DiagnosticForIntake(config: DataverseServerConfig, intakeId: string) {
   return dataverseFirst(config, 'jm1pub_editorialdiagnostics', {
     $select:
-      'jm1pub_editorialdiagnosticid,jm1pub_name,jm1pub_diagnosticstatus,jm1_manuscriptasseturl,jm1_manuscriptfiletype,createdon',
+      'jm1pub_editorialdiagnosticid,jm1pub_name,jm1pub_diagnosticstatus,jm1_manuscriptasseturl,jm1_manuscriptfiletype,jm1_manuscriptapprovedfordiagnostic,jm1_manuscriptfilename,createdon',
     $filter: `_jm1pub_publishingintake_value eq ${intakeId}`,
     $orderby: 'createdon desc',
   })
+}
+
+async function waitForStage0DiagnosticForIntake(config: DataverseServerConfig, intakeId: string) {
+  const attempts = Number.parseInt(process.env.JM1_STAGE0_HANDOFF_WAIT_ATTEMPTS || '6', 10)
+  const delayMs = Number.parseInt(process.env.JM1_STAGE0_HANDOFF_WAIT_DELAY_MS || '5000', 10)
+  const maxAttempts = Number.isFinite(attempts) && attempts > 0 ? Math.min(attempts, 12) : 1
+  const boundedDelay = Number.isFinite(delayMs) && delayMs > 0 ? Math.min(delayMs, 10000) : 5000
+
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const diagnostic = await findStage0DiagnosticForIntake(config, intakeId)
+    if (diagnostic) return diagnostic
+    if (attempt < maxAttempts - 1) {
+      await new Promise((resolve) => setTimeout(resolve, boundedDelay))
+    }
+  }
+
+  return null
+}
+
+function inferManuscriptFileMetadata(manuscriptUrl: string) {
+  let fileName = ''
+  try {
+    const parsed = new URL(manuscriptUrl)
+    fileName = parsed.searchParams.get('file') || parsed.pathname.split('/').filter(Boolean).pop() || ''
+  } catch {
+    fileName = manuscriptUrl.split('/').filter(Boolean).pop() || ''
+  }
+
+  const decodedName = decodeURIComponent(fileName || '').trim()
+  const lower = decodedName.toLowerCase()
+  const fileType = lower.endsWith('.pdf') ? 'pdf' : lower.endsWith('.doc') ? 'doc' : 'docx'
+
+  return {
+    fileName: decodedName.slice(0, 250) || `manuscript.${fileType}`,
+    fileType,
+  }
+}
+
+async function ensureDiagnosticManuscriptAssetBinding(
+  config: DataverseServerConfig,
+  diagnostic: DataverseRow,
+  intake: DataverseRow,
+) {
+  const diagnosticId = stringValue(diagnostic.jm1pub_editorialdiagnosticid)
+  const manuscriptUrl = stringValue(diagnostic.jm1_manuscriptasseturl || intake.jm1_manuscripturl || intake.jm1_submissionurl)
+  if (!diagnosticId || !manuscriptUrl) {
+    return { bound: false, reason: 'manuscript_url_missing' }
+  }
+
+  if (
+    stringValue(diagnostic.jm1_manuscriptasseturl) &&
+    diagnostic.jm1_manuscriptapprovedfordiagnostic === true &&
+    stringValue(diagnostic.jm1_manuscriptfiletype)
+  ) {
+    return { bound: false, reason: 'already_bound' }
+  }
+
+  const metadata = inferManuscriptFileMetadata(manuscriptUrl)
+  await dataversePatch(config, 'jm1pub_editorialdiagnostics', diagnosticId, {
+    jm1_manuscriptasseturl: manuscriptUrl,
+    jm1_manuscriptfiletype: metadata.fileType,
+    jm1_manuscriptfilename: metadata.fileName,
+    jm1_manuscriptapprovedfordiagnostic: true,
+    jm1pub_manuscriptpresent: true,
+    jm1_manuscriptassetstatus: 'Approved for Stage 0 diagnostic',
+    jm1_manuscriptassetnotes:
+      'Manuscript asset bound automatically from the governed /join intake manuscript reference. No manuscript content stored in Dataverse.',
+    jm1_manuscriptapprovedon: new Date().toISOString(),
+  })
+
+  return { bound: true, reason: 'bound_from_intake_manuscript' }
 }
 
 function resolveEditorialReviewNowUrl() {
