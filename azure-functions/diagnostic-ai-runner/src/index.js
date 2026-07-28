@@ -17,6 +17,7 @@ require("./functions/runOp000TrackBAdoption");
 require("./functions/runPreContractEditorialReview");
 require("./functions/runPublisherRecommendationAction");
 require("./functions/runPublisherReviewDecision");
+require("./functions/runPublishingIntakeAutostartRecovery");
 require("./functions/runPublishingMailboxReplyCheck");
 require("./functions/runStage0Diagnostic");
 require("./functions/signNowWebhook");
