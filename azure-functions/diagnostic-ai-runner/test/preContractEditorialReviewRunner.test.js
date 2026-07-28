@@ -600,6 +600,30 @@ describe("runPrePackageEditorialReview — pre-package Editorial Review", () => 
     assert.equal(patchBody.jm1pub_worktype, MANUSCRIPT_WORK_TYPE.FULL_LENGTH_BOOK);
   });
 
+  test("accepts Untitled as a provisional project title and does not require Publisher Review for title finality alone", async () => {
+    process.env[GATE_NAME] = "true";
+    const calls = mockFetchSequence([
+      diagnosticReadResponse({ jm1pub_worktype: MANUSCRIPT_WORK_TYPE.FULL_LENGTH_BOOK }),
+      patchResponse(),
+      executionLogResponse()
+    ]);
+
+    const result = await runPrePackageEditorialReview(
+      baseInput({ opportunityId: "", selectedPackageCode: "", projectTitle: "Untitled" }),
+      reviewerDeps()
+    );
+
+    assert.equal(result.ok, true);
+    assert.equal(result.code, "PRE_PACKAGE_EDITORIAL_REVIEW_RECOMMENDATION_READY");
+    assert.equal(result.publisherReviewRequired, false);
+    assert.equal(result.reviewRunStatus, PRE_PACKAGE_REVIEW_STATUS.RECOMMENDATION_READY_TO_SEND);
+
+    const patchCall = calls.find((c) => c.options.method === "PATCH");
+    const patchBody = JSON.parse(patchCall.options.body);
+    assert.equal(patchBody.jm1pub_diagnosticstatus, DIAGNOSTIC_STATUS.COMPLETE);
+    assert.equal(patchBody.jm1pub_imprintlocked, true);
+  });
+
   test("blocks duplicate pre-package review when recommendation fields already exist", async () => {
     process.env[GATE_NAME] = "true";
     const calls = mockFetchSequence([

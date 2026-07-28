@@ -1,3 +1,7 @@
+// Engine: Stage Transition Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 import {
   dataverseCreate,
   dataverseFirst,
@@ -28,6 +32,9 @@ const BAND_LEVEL_1 = 835500000
 const STAGE_TYPE_REVIEW = 100000000
 const STAGE_STATUS_IN_PROGRESS = 100000001
 const HEALTH_HEALTHY = 196650000
+const DIAGNOSTIC_STATUS_PENDING = 196650000
+const MANUSCRIPT_ASSET_STATUS_APPROVED = 3
+const PROVISIONAL_TITLE_NAMES = new Set(['untitled'])
 
 export type PublisherActionId =
   | 'review_intake'
@@ -839,21 +846,24 @@ export async function initializePublisherEditorialReview(input: {
   const title = await findOrCreateTitle(config, intake)
   const asset = await findOrCreateAsset(config, intake, title.id)
   const stage = await findOrCreateEditorialReviewStage(config, intake, title, asset.id, correlationId)
+  const existingLog = await findPublisherExecutionLog(config, 'PUBLISHER_EDITORIAL_REVIEW_INITIALIZED', input.intakeId)
 
-  await writePublisherExecutionLog(config, {
-    actionType: 'PUBLISHER_EDITORIAL_REVIEW_INITIALIZED',
-    name: `PUBLISHER_EDITORIAL_REVIEW_INITIALIZED - ${title.name}`,
-    description: [
-      `Publisher Operating Center initialized Editorial Review for ${title.name}.`,
-      `Intake ${String(intake.jm1_intakereferencecode || input.intakeId)}.`,
-      `Title ${title.id}; asset ${asset.id}; stage ${stage.id}.`,
-      `Operator ${input.operatorEmail}.`,
-      `Correlation ${correlationId}.`,
-      'No author communication sent.',
-    ].join(' '),
-    sourceEntity: 'jm1_publishingintake',
-    sourceRecordId: input.intakeId,
-  })
+  if (!existingLog) {
+    await writePublisherExecutionLog(config, {
+      actionType: 'PUBLISHER_EDITORIAL_REVIEW_INITIALIZED',
+      name: `PUBLISHER_EDITORIAL_REVIEW_INITIALIZED - ${title.name}`,
+      description: [
+        `Publisher Operating Center initialized Editorial Review for ${title.name}.`,
+        `Intake ${String(intake.jm1_intakereferencecode || input.intakeId)}.`,
+        `Title ${title.id}; asset ${asset.id}; stage ${stage.id}.`,
+        `Operator ${input.operatorEmail}.`,
+        `Correlation ${correlationId}.`,
+        'No author communication sent.',
+      ].join(' '),
+      sourceEntity: 'jm1_publishingintake',
+      sourceRecordId: input.intakeId,
+    })
+  }
 
   return {
     correlationId,
@@ -862,6 +872,143 @@ export async function initializePublisherEditorialReview(input: {
     assetId: asset.id,
     editorialStageId: stage.id,
     stageCreated: stage.created,
+    executionLogCreated: !existingLog,
+  }
+}
+
+export async function autoInitializeOutsideInquiryEditorialReview(input: {
+  intakeId: string
+  correlationId?: string
+}) {
+  const config = getDataverseServerConfig()
+  if (!config) throw new Error('dataverse_config_missing')
+
+  const intake = await getPublisherIntakeForAction(config, input.intakeId)
+  const intakeChannel = stringValue(intake.jm1_intakechannel)
+  if (intakeChannel && intakeChannel !== 'INT-PUB-005 /join') {
+    return {
+      status: 'blocked' as const,
+      blocker: 'unsupported_intake_channel',
+      intakeId: input.intakeId,
+    }
+  }
+
+  if (!stringValue(intake.jm1_projecttitle)) {
+    return {
+      status: 'blocked' as const,
+      blocker: 'intake_missing_title',
+      intakeId: input.intakeId,
+    }
+  }
+
+  if (!dataverseLookupId(intake, '_jm1_linkedcontact_value')) {
+    return {
+      status: 'blocked' as const,
+      blocker: 'intake_missing_contact',
+      intakeId: input.intakeId,
+    }
+  }
+
+  if (intake.jm1_manuscriptreceived !== true && !stringValue(intake.jm1_manuscripturl || intake.jm1_submissionurl)) {
+    return {
+      status: 'blocked' as const,
+      blocker: 'intake_missing_manuscript_evidence',
+      intakeId: input.intakeId,
+    }
+  }
+
+  const result = await initializePublisherEditorialReview({
+    intakeId: input.intakeId,
+    operatorEmail: 'JM1 Automation',
+    correlationId: input.correlationId || `AUTO-EDITORIAL-${String(intake.jm1_intakereferencecode || input.intakeId)}-${Date.now()}`,
+  })
+
+  const diagnostic = await waitForStage0DiagnosticForIntake(config, input.intakeId)
+  if (!diagnostic) {
+    await writePublisherExecutionLog(config, {
+      actionType: 'PUBLISHING_INTAKE_ORCHESTRATION_WAITING_FOR_STAGE0_HANDOFF',
+      name: `PUBLISHING_INTAKE_ORCHESTRATION_WAITING - ${String(intake.jm1_projecttitle || input.intakeId)}`,
+      description: [
+        `Outside /join intake ${String(intake.jm1_intakereferencecode || input.intakeId)} was received and Editorial Review was initialized.`,
+        'Stage 0 diagnostic handoff was not yet available, so the runner was not invoked.',
+        `Correlation ${result.correlationId}.`,
+        'No author recommendation sent by this event.',
+      ].join(' '),
+      sourceEntity: 'jm1_publishingintake',
+      sourceRecordId: input.intakeId,
+    })
+
+    return {
+      status: 'waiting_for_system' as const,
+      blocker: 'stage0_diagnostic_handoff_pending',
+      ...result,
+    }
+  }
+
+  const assetBinding = await ensureDiagnosticManuscriptAssetBinding(config, diagnostic, intake)
+  const refreshedDiagnostic = assetBinding.bound
+    ? await findStage0DiagnosticForIntake(config, input.intakeId)
+    : diagnostic
+
+  const dispatch = await dispatchEditorialReviewNow({
+    diagnosticId: stringValue(refreshedDiagnostic?.jm1pub_editorialdiagnosticid || diagnostic.jm1pub_editorialdiagnosticid),
+    intakeReferenceCode: stringValue(intake.jm1_intakereferencecode),
+    manuscriptUrl: stringValue(refreshedDiagnostic?.jm1_manuscriptasseturl || diagnostic.jm1_manuscriptasseturl || intake.jm1_manuscripturl || intake.jm1_submissionurl),
+    workspaceUrl: stringValue(intake.jm1_sharepointworkspaceurl || intake.jm1_manuscripturl || intake.jm1_submissionurl),
+    diagnosticStatus: Number(refreshedDiagnostic?.jm1pub_diagnosticstatus ?? diagnostic.jm1pub_diagnosticstatus ?? DIAGNOSTIC_STATUS_PENDING),
+  })
+
+  if (dispatch.status !== 'accepted') {
+    await writePublisherExecutionLog(config, {
+      actionType: 'PUBLISHING_INTAKE_ORCHESTRATION_DISPATCH_BLOCKED',
+      name: `PUBLISHING_INTAKE_ORCHESTRATION_BLOCKED - ${String(intake.jm1_projecttitle || input.intakeId)}`,
+      description: [
+        `Outside /join intake ${String(intake.jm1_intakereferencecode || input.intakeId)} was initialized but Editorial Review runner dispatch did not complete.`,
+        `Blocker ${dispatch.blocker}.`,
+        `Diagnostic ${stringValue(diagnostic.jm1pub_editorialdiagnosticid)}.`,
+        `Correlation ${result.correlationId}.`,
+        'No author recommendation sent by this event.',
+      ].join(' '),
+      sourceEntity: 'jm1_publishingintake',
+      sourceRecordId: input.intakeId,
+    })
+
+    return {
+      status: 'waiting_for_system' as const,
+      blocker: dispatch.blocker,
+      diagnosticId: stringValue(diagnostic.jm1pub_editorialdiagnosticid),
+      ...result,
+    }
+  }
+
+  const existingSuccessLog = await findPublisherExecutionLog(
+    config,
+    'PUBLISHING_INTAKE_ORCHESTRATION_DISPATCHED',
+    input.intakeId,
+  )
+  if (!existingSuccessLog) {
+    await writePublisherExecutionLog(config, {
+      actionType: 'PUBLISHING_INTAKE_ORCHESTRATION_DISPATCHED',
+      name: `PUBLISHING_INTAKE_ORCHESTRATION_DISPATCHED - ${String(intake.jm1_projecttitle || input.intakeId)}`,
+      description: [
+        `Outside /join intake ${String(intake.jm1_intakereferencecode || input.intakeId)} was initialized and Editorial Review runner dispatch completed.`,
+        `Diagnostic ${stringValue(diagnostic.jm1pub_editorialdiagnosticid)}.`,
+        `Asset binding ${assetBinding.reason}.`,
+        `Run control ${dispatch.runControlStatus || 'unknown'}.`,
+        `Author recommendation sent ${dispatch.authorRecommendationSent === true ? 'yes' : 'no'}.`,
+        `Correlation ${result.correlationId}.`,
+      ].join(' '),
+      sourceEntity: 'jm1_publishingintake',
+      sourceRecordId: input.intakeId,
+    })
+  }
+
+  return {
+    status: 'dispatched' as const,
+    diagnosticId: stringValue(diagnostic.jm1pub_editorialdiagnosticid),
+    runControlStatus: dispatch.runControlStatus,
+    authorRecommendationSent: dispatch.authorRecommendationSent,
+    ...result,
   }
 }
 
@@ -1068,7 +1215,7 @@ export async function logPublisherAuthorResponseAction(input: {
 async function getPublisherIntakeForAction(config: DataverseServerConfig, intakeId: string) {
   const intake = await dataverseFirst(config, 'jm1_publishingintakes', {
     $select:
-      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_workspacestatus,jm1_stage0handoffstatus,_jm1_linkedcontact_value,_jm1_opportunity_value,createdon,modifiedon',
+      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_intakechannel,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_workspacestatus,jm1_sharepointworkspaceurl,jm1_stage0handoffstatus,_jm1_linkedcontact_value,_jm1_opportunity_value,createdon,modifiedon',
     $filter: `jm1_publishingintakeid eq ${intakeId}`,
   })
   if (!intake) throw new Error('intake_not_found')
@@ -1222,9 +1369,15 @@ function buildQueueItem(
       ? 'author'
       : currentBlocker.includes('in progress')
         ? 'system'
-        : authorizedActions.some((action) => action.id !== 'view_only')
-          ? 'publisher'
-          : 'system'
+        : (
+            currentBlocker === 'Ready for publisher intake review' ||
+            currentBlocker === 'Editorial Review automation pending' ||
+            currentBlocker === 'Ready for next editorial scheduling decision'
+          ) && hasContact && hasManuscript
+          ? 'system'
+          : authorizedActions.some((action) => action.id !== 'view_only')
+            ? 'publisher'
+            : 'system'
   const execution = deriveQueueExecutionModel({
     actionOwner,
     currentBlocker,
@@ -1841,13 +1994,17 @@ function deriveQueueExecutionModel(input: {
   }
   if (input.actionOwner === 'system') {
     return {
-      executionMode: 'SYSTEM_ACTION_MANUALLY_TRIGGERED',
-      executionState: input.currentBlocker.toLowerCase().includes('in progress') ? 'EXECUTING' : 'QUEUED',
+      executionMode: 'AUTOMATIC_SCHEDULED',
+      executionState: input.currentBlocker.toLowerCase().includes('in progress')
+        ? 'EXECUTING'
+        : input.currentBlocker.toLowerCase().includes('pending')
+          ? 'WAITING_FOR_SYSTEM'
+          : 'QUEUED',
       businessOwner: 'System',
       executionOwner: 'JM1 Automation',
       runtime: 'Deployed Publisher Operating Center read model and bounded API',
       runtimeCostCategory: 'Dataverse/API',
-      awaiting: input.currentBlocker.toLowerCase().includes('in progress') ? 'System runtime' : 'Prerequisites',
+      awaiting: input.currentBlocker.toLowerCase().includes('in progress') ? 'System runtime' : 'JM1 Automation',
       lastTrigger: 'Core state refresh',
       lastExecution: input.latestExecutionEvidence || 'No recent execution evidence found',
       expectedDuration: 'Runtime dependent',
@@ -2072,9 +2229,13 @@ function deriveBlocker(input: {
   if (input.hasEvidenceHold) return 'Evidence hold active'
   if (input.titleId && input.assetId && input.hasEditorialStage) return 'Ready for next editorial scheduling decision'
   if (!input.hasManuscript) return 'Manuscript evidence is missing'
-  if (!input.titleId || !input.assetId) return 'Ready for publisher intake review'
+  if (!input.titleId || !input.assetId) return 'Editorial Review automation pending'
   if (!input.hasEditorialStage) return 'Editorial Review ready'
   return 'Ready for next editorial scheduling decision'
+}
+
+function isProvisionalTitleName(value: string) {
+  return PROVISIONAL_TITLE_NAMES.has(value.trim().toLowerCase())
 }
 
 function buildAuthorizedActions(currentBlocker: string, hasContact: boolean): PublisherQueueItem['authorizedActions'] {
@@ -2141,6 +2302,9 @@ function buildAuthorizedActions(currentBlocker: string, hasContact: boolean): Pu
 async function findOrCreateTitle(config: DataverseServerConfig, intake: DataverseRow) {
   const titleName = stringValue(intake.jm1_projecttitle)
   const authorName = [stringValue(intake.jm1_firstname), stringValue(intake.jm1_lastname)].filter(Boolean).join(' ')
+  const titlePublicationStatus = isProvisionalTitleName(titleName)
+    ? 'Provisional title accepted for publisher intake review'
+    : 'Publisher intake review initialized'
   const escaped = escapeODataText(titleName)
   const existing = await dataverseFirst(config, 'jm1pub_titles', {
     $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_stage',
@@ -2161,7 +2325,7 @@ async function findOrCreateTitle(config: DataverseServerConfig, intake: Datavers
     jm1pub_titlename: titleName,
     jm1pub_authorname: authorName,
     jm1pub_stage: TITLE_STAGE_EDITORIAL,
-    jm1pub_publicationstatus: 'Publisher intake review initialized',
+    jm1pub_publicationstatus: titlePublicationStatus,
   })
 
   return { id: extractId(entityId), name: titleName, created: true }
@@ -2258,6 +2422,164 @@ async function writePublisherExecutionLog(
     jm1_sourceentity: input.sourceEntity,
     jm1_sourcerecordid: input.sourceRecordId,
   })
+}
+
+async function findPublisherExecutionLog(config: DataverseServerConfig, actionType: string, sourceRecordId: string) {
+  return dataverseFirst(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiontype,jm1_sourcerecordid',
+    $filter: `jm1_actiontype eq '${escapeODataText(actionType)}' and jm1_sourcerecordid eq '${escapeODataText(sourceRecordId)}'`,
+  })
+}
+
+async function findStage0DiagnosticForIntake(config: DataverseServerConfig, intakeId: string) {
+  return dataverseFirst(config, 'jm1pub_editorialdiagnostics', {
+    $select:
+      'jm1pub_editorialdiagnosticid,jm1pub_name,jm1pub_diagnosticstatus,jm1_manuscriptasseturl,jm1_manuscriptfiletype,jm1_manuscriptapprovedfordiagnostic,jm1_manuscriptfilename,createdon',
+    $filter: `_jm1pub_publishingintake_value eq ${intakeId}`,
+    $orderby: 'createdon desc',
+  })
+}
+
+async function waitForStage0DiagnosticForIntake(config: DataverseServerConfig, intakeId: string) {
+  const attempts = Number.parseInt(process.env.JM1_STAGE0_HANDOFF_WAIT_ATTEMPTS || '6', 10)
+  const delayMs = Number.parseInt(process.env.JM1_STAGE0_HANDOFF_WAIT_DELAY_MS || '5000', 10)
+  const maxAttempts = Number.isFinite(attempts) && attempts > 0 ? Math.min(attempts, 12) : 1
+  const boundedDelay = Number.isFinite(delayMs) && delayMs > 0 ? Math.min(delayMs, 10000) : 5000
+
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const diagnostic = await findStage0DiagnosticForIntake(config, intakeId)
+    if (diagnostic) return diagnostic
+    if (attempt < maxAttempts - 1) {
+      await new Promise((resolve) => setTimeout(resolve, boundedDelay))
+    }
+  }
+
+  return null
+}
+
+function inferManuscriptFileMetadata(manuscriptUrl: string) {
+  let fileName = ''
+  try {
+    const parsed = new URL(manuscriptUrl)
+    fileName = parsed.searchParams.get('file') || parsed.pathname.split('/').filter(Boolean).pop() || ''
+  } catch {
+    fileName = manuscriptUrl.split('/').filter(Boolean).pop() || ''
+  }
+
+  const decodedName = decodeURIComponent(fileName || '').trim()
+  const lower = decodedName.toLowerCase()
+  const fileType = lower.endsWith('.pdf') ? 'pdf' : lower.endsWith('.doc') ? 'doc' : 'docx'
+
+  return {
+    fileName: decodedName.slice(0, 250) || `manuscript.${fileType}`,
+    fileType,
+  }
+}
+
+async function ensureDiagnosticManuscriptAssetBinding(
+  config: DataverseServerConfig,
+  diagnostic: DataverseRow,
+  intake: DataverseRow,
+) {
+  const diagnosticId = stringValue(diagnostic.jm1pub_editorialdiagnosticid)
+  const manuscriptUrl = stringValue(diagnostic.jm1_manuscriptasseturl || intake.jm1_manuscripturl || intake.jm1_submissionurl)
+  if (!diagnosticId || !manuscriptUrl) {
+    return { bound: false, reason: 'manuscript_url_missing' }
+  }
+
+  if (
+    stringValue(diagnostic.jm1_manuscriptasseturl) &&
+    diagnostic.jm1_manuscriptapprovedfordiagnostic === true &&
+    stringValue(diagnostic.jm1_manuscriptfiletype)
+  ) {
+    return { bound: false, reason: 'already_bound' }
+  }
+
+  const metadata = inferManuscriptFileMetadata(manuscriptUrl)
+  await dataversePatch(config, 'jm1pub_editorialdiagnostics', diagnosticId, {
+    jm1_manuscriptasseturl: manuscriptUrl,
+    jm1_manuscriptfiletype: metadata.fileType,
+    jm1_manuscriptfilename: metadata.fileName,
+    jm1_manuscriptapprovedfordiagnostic: true,
+    jm1pub_manuscriptpresent: true,
+    jm1_manuscriptassetstatus: MANUSCRIPT_ASSET_STATUS_APPROVED,
+    jm1_manuscriptassetnotes:
+      'Manuscript asset bound automatically from the governed /join intake manuscript reference. No manuscript content stored in Dataverse.',
+    jm1_manuscriptapprovedon: new Date().toISOString(),
+  })
+
+  return { bound: true, reason: 'bound_from_intake_manuscript' }
+}
+
+function resolveEditorialReviewNowUrl() {
+  const directUrl = process.env.JM1_EDITORIAL_REVIEW_NOW_URL?.trim()
+  if (directUrl) return directUrl
+
+  const baseUrl = process.env.JM1_DIAGNOSTIC_RUNNER_URL?.trim().replace(/\/+$/, '')
+  return baseUrl ? `${baseUrl}/api/run-editorial-review-now` : ''
+}
+
+async function dispatchEditorialReviewNow(input: {
+  diagnosticId: string
+  intakeReferenceCode: string
+  manuscriptUrl: string
+  workspaceUrl: string
+  diagnosticStatus: number
+}): Promise<{
+  status: 'accepted' | 'blocked'
+  blocker: string
+  runControlStatus?: string
+  authorRecommendationSent?: boolean
+}> {
+  const url = resolveEditorialReviewNowUrl()
+  const runnerKey = process.env.JM1_DIAGNOSTIC_RUNNER_KEY?.trim()
+  if (!url) return { status: 'blocked', blocker: 'editorial_review_now_url_missing' }
+  if (!runnerKey) return { status: 'blocked', blocker: 'diagnostic_runner_key_missing' }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-jm1-diagnostic-runner-key': runnerKey,
+    },
+    body: JSON.stringify({
+      confirmRunNow: true,
+      diagnosticId: input.diagnosticId,
+      intakeReferenceCode: input.intakeReferenceCode,
+      readinessRecord: {
+        intakeReferenceCode: input.intakeReferenceCode,
+        diagnosticId: input.diagnosticId,
+        intakeCreated: true,
+        workspaceCreated: true,
+        stage0HandoffCreated: true,
+        manuscriptReceived: true,
+        manuscriptUrl: input.manuscriptUrl,
+        workspaceUrl: input.workspaceUrl,
+        diagnosticStatus: input.diagnosticStatus,
+      },
+    }),
+  })
+
+  const body = await response.json().catch(() => null) as {
+    code?: string
+    reason?: string
+    runControlStatus?: string
+    authorRecommendationSent?: boolean
+  } | null
+
+  if (response.status === 202 || response.status === 200) {
+    return {
+      status: 'accepted',
+      blocker: '',
+      runControlStatus: stringValue(body?.runControlStatus),
+      authorRecommendationSent: body?.authorRecommendationSent === true,
+    }
+  }
+
+  return {
+    status: 'blocked',
+    blocker: stringValue(body?.reason || body?.code) || `editorial_review_now_http_${response.status}`,
+  }
 }
 
 function buildMetrics(
