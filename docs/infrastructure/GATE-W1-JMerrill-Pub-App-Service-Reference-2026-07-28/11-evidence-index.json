@@ -1,0 +1,76 @@
+{
+  "gateId": "GATE-W1",
+  "program": "JM1 Implementation",
+  "workstream": "Digital Experience Modernization",
+  "subject": "JMerrill.Pub App Service Reference Completion",
+  "executionTimestampUtc": "2026-07-28T15:41:14Z",
+  "repository": {
+    "branch": "codex/jm1-infra-006-phase2-staging-certification",
+    "headSha": "16903023640d955c1dc44db18ce8f161e2c9e915",
+    "baseMainSha": "f3f2a9fc96627fc23327e58b7eddbe6f50365a93",
+    "pullRequest": 349
+  },
+  "azure": {
+    "subscription": "JM1 - Nonprofit Core (2025 Grant)",
+    "subscriptionId": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e",
+    "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d",
+    "resourceGroup": "rg-jm1-pub-prod-appsvc",
+    "appService": "app-jm1-pub-prod",
+    "stagingSlot": "staging",
+    "keyVault": "jm1-core-vault",
+    "appInsights": "appi-jm1-pub-prod",
+    "logAnalyticsWorkspace": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e-rg-jm1-core-EUS"
+  },
+  "deployment": {
+    "packagePath": "/tmp/jm1-gate-w1-appsvc-production-20260728T145044Z.zip",
+    "packageSha256": "4f5ef6159127cbedf2ce8cdb57507de1efc68a651e15a192b9d1df30ab1bfe16",
+    "releaseSha": "16903023640d955c1dc44db18ce8f161e2c9e915",
+    "productionHealth": "200",
+    "stagingHealthAfterRestore": "200"
+  },
+  "domains": {
+    "apex": "jmerrill.pub",
+    "www": "www.jmerrill.pub",
+    "appServiceIp": "40.122.114.229",
+    "previousApexA": "172.170.119.25",
+    "previousWwwCname": "calm-plant-0f4f58410.6.azurestaticapps.net",
+    "apexSslThumbprint": "F22F8B44A0E25E8264DD4E200B322062BAF8B2AE",
+    "wwwSslThumbprint": "A19F3830D9A89D156F753078894D1E01989D3E62"
+  },
+  "validation": {
+    "publicRoutes": "pass",
+    "health": "pass",
+    "authorContextUnauthenticated": "pass",
+    "workerUnauthenticated": "pass",
+    "invalidTurnstile": "pass",
+    "positiveJoinSubmission": "blocked",
+    "nativeStagingAuthorGateSyntheticSession": "blocked",
+    "rollbackProof": "blocked",
+    "diagnostics": "pass",
+    "alerts": "partial"
+  },
+  "decision": "NOT_CERTIFIED",
+  "deliverables": [
+    "01-reference-certification-summary.md",
+    "02-app-service-configuration.md",
+    "03-deployment-validation.md",
+    "04-security-validation.md",
+    "05-domain-cutover-validation.md",
+    "06-functional-test-results.md",
+    "07-monitoring-validation.md",
+    "08-rollover-and-rollback-validation.md",
+    "09-open-exceptions.md",
+    "10-reference-certification-decision.md",
+    "11-evidence-index.json",
+    "checksums.sha256"
+  ],
+  "unauthorizedActions": {
+    "otherWebPropertiesModified": false,
+    "staticWebAppsRetired": false,
+    "productionSecretsExposed": false,
+    "stripeAction": false,
+    "payoutOrTransfer": false,
+    "authorCommunication": false,
+    "evidenceDeletion": false
+  }
+}
