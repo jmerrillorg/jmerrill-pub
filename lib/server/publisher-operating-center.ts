@@ -33,6 +33,7 @@ const STAGE_TYPE_REVIEW = 100000000
 const STAGE_STATUS_IN_PROGRESS = 100000001
 const HEALTH_HEALTHY = 196650000
 const DIAGNOSTIC_STATUS_PENDING = 196650000
+const MANUSCRIPT_ASSET_STATUS_APPROVED = 3
 const PROVISIONAL_TITLE_NAMES = new Set(['untitled'])
 
 export type PublisherActionId =
@@ -2501,7 +2502,7 @@ async function ensureDiagnosticManuscriptAssetBinding(
     jm1_manuscriptfilename: metadata.fileName,
     jm1_manuscriptapprovedfordiagnostic: true,
     jm1pub_manuscriptpresent: true,
-    jm1_manuscriptassetstatus: 'Approved for Stage 0 diagnostic',
+    jm1_manuscriptassetstatus: MANUSCRIPT_ASSET_STATUS_APPROVED,
     jm1_manuscriptassetnotes:
       'Manuscript asset bound automatically from the governed /join intake manuscript reference. No manuscript content stored in Dataverse.',
     jm1_manuscriptapprovedon: new Date().toISOString(),
