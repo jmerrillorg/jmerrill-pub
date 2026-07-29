@@ -1,0 +1,190 @@
+name: Publishing App Service CI/CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_production:
+        description: "Deploy approved staging artifact to production after environment approval"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "lib/**"
+      - "public/**"
+      - "scripts/**"
+      - "infra/jm1-infra-006/app-service/**"
+      - "package.json"
+      - "package-lock.json"
+      - "next.config.*"
+      - "tsconfig.json"
+      - ".github/workflows/azure-app-service-publishing.yml"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publishing-app-service-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "20"
+  APP_SERVICE_PACKAGE: jmerrill-pub-appservice-${{ github.sha }}.zip
+  AZURE_RESOURCE_GROUP: ${{ vars.JM1_PUB_APP_SERVICE_RESOURCE_GROUP }}
+  AZURE_WEBAPP_NAME: ${{ vars.JM1_PUB_APP_SERVICE_NAME }}
+  AZURE_STAGING_SLOT: staging
+  STAGING_HEALTH_URL: https://app-jm1-pub-prod-staging.azurewebsites.net/api/health
+  PRODUCTION_HEALTH_URL: https://jmerrill.pub/api/health
+
+jobs:
+  build:
+    name: Build Immutable App Service Artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Certification Guards
+        run: |
+          set -euo pipefail
+          node scripts/check-catalog-runtime-source.mjs
+          node scripts/infra006_health_contract.test.mjs
+          node scripts/program002_author_portal_access.test.mjs
+
+      - name: Build Next Standalone Output
+        env:
+          JM1_RELEASE_SHA: ${{ github.sha }}
+        run: npm run build
+
+      - name: Package Standalone Artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          JM1_RELEASE_SHA="${{ github.sha }}" npm run package:appservice -- "${APP_SERVICE_PACKAGE}"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmerrill-pub-appservice-${{ github.sha }}
+          path: |
+            ${{ env.APP_SERVICE_PACKAGE }}
+            ${{ env.APP_SERVICE_PACKAGE }}.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy_staging:
+    name: Deploy App Service Staging
+    runs-on: ubuntu-latest
+    needs: build
+    environment: jmerrill-pub-staging
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jmerrill-pub-appservice-${{ github.sha }}
+
+      - name: Verify Artifact Checksum
+        run: shasum -a 256 -c "${APP_SERVICE_PACKAGE}.sha256"
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Immutable Artifact To Staging
+        run: |
+          set -euo pipefail
+          az webapp config set \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --slot "$AZURE_STAGING_SLOT" \
+            --startup-file 'node server.js'
+          az webapp config appsettings set \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --slot "$AZURE_STAGING_SLOT" \
+            --settings JM1_RELEASE_SHA="${{ github.sha }}" SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false WEBSITE_RUN_FROM_PACKAGE=1 WEBSITE_SKIP_NODE_MODULES_TAR=1 WEBSITE_WARMUP_PATH=/api/health WEBSITE_WARMUP_STATUSES=200 \
+            --output none
+          az webapp deploy \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --slot "$AZURE_STAGING_SLOT" \
+            --src-path "$APP_SERVICE_PACKAGE" \
+            --type zip \
+            --clean true
+
+      - name: Staging Health Certification
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..18}; do
+            body="$(mktemp)"
+            code="$(curl -fsS -o "$body" -w '%{http_code}' --max-time 20 "$STAGING_HEALTH_URL" || true)"
+            if [ "$code" = "200" ] && node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready' || h.release !== process.argv[2]) process.exit(1)" "$body" "${{ github.sha }}"; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Staging health did not reach ready for ${{ github.sha }}." >&2
+          exit 1
+
+  promote_production:
+    name: Promote Staging To Production
+    runs-on: ubuntu-latest
+    needs: deploy_staging
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == 'true'
+    environment: jmerrill-pub-production
+    steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Swap Staging To Production
+        run: |
+          set -euo pipefail
+          az webapp deployment slot swap \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --slot "$AZURE_STAGING_SLOT" \
+            --target-slot production
+
+      - name: Production Observation
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..12}; do
+            body="$(mktemp)"
+            code="$(curl -fsS -o "$body" -w '%{http_code}' --max-time 20 "$PRODUCTION_HEALTH_URL" || true)"
+            if [ "$code" = "200" ] && node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready') process.exit(1)" "$body"; then
+              sleep 10
+              continue
+            fi
+            echo "Production health failed after swap. Start governed swap-back." >&2
+            az webapp deployment slot swap \
+              --resource-group "$AZURE_RESOURCE_GROUP" \
+              --name "$AZURE_WEBAPP_NAME" \
+              --slot "$AZURE_STAGING_SLOT" \
+              --target-slot production
+            exit 1
+          done
