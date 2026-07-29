@@ -3,7 +3,7 @@
 ## Repository State
 
 - Branch: codex/jm1-infra-006-phase2-staging-certification
-- HEAD: a3a006bcf8839326f4270e789c1697c0d1ad68b7
+- HEAD: de32218684f4f21fcba40a4fbf8812b30cd1cb73
 - Base main at PR inspection: f3f2a9fc96627fc23327e58b7eddbe6f50365a93
 - PR: #349, draft, open, clean merge state
 
@@ -14,7 +14,7 @@ PR #349 check status at inspection:
 - Azure Static Web Apps CI/CD / Build and Deploy Job: success on f80fab2fbbb0c641f5266d554a104b12823965a6 at 2026-07-29T03:46:58Z
 - Azure Static Web Apps CI/CD / Close Pull Request Job: skipped
 
-The checked workflow still deploys Azure Static Web Apps, not App Service. A new Publishing App Service CI/CD workflow was added in source at `.github/workflows/azure-app-service-publishing.yml`, but it has not yet executed successfully and is not yet the active governed release authority.
+The checked workflow still deploys Azure Static Web Apps, not App Service. A new Publishing App Service CI/CD workflow was added in source at `.github/workflows/azure-app-service-publishing.yml`, and focused prerequisite PR #354 was opened to place the executable workflow on the default branch without merging the broader uncertified GATE-W1 evidence package. The App Service workflow has not yet executed successfully and is not yet the active governed release authority.
 
 ## App Service Deployment
 
@@ -28,7 +28,7 @@ The current branch was built with npm and packaged as a standalone Next.js artif
 
 ## Staging Deployment Refresh
 
-On 2026-07-29, staging auto-swap was disabled after readback showed `autoSwapSlotName: production`. The current PR head, `a3a006bcf8839326f4270e789c1697c0d1ad68b7`, was built as a standalone App Service package and deployed to the staging slot only.
+On 2026-07-29, staging auto-swap was disabled after readback showed `autoSwapSlotName: production`. PR head `a3a006bcf8839326f4270e789c1697c0d1ad68b7` was built as a standalone App Service package and deployed to the staging slot only.
 
 - Package: /tmp/jm1-appsvc-staging-a3a006bcf8839326f4270e789c1697c0d1ad68b7-20260729T111549Z.zip
 - Package SHA-256: a6016c1e9b515f2af9a0f37ee0bfe9924b5a4db0030eb7353187eae3ab4c3815
@@ -44,7 +44,19 @@ The App Service startup command was updated for staging to:
 
 `node server.js`
 
-Staging app settings now include `WEBSITE_WARMUP_PATH=/api/health`, `WEBSITE_WARMUP_STATUSES=200`, `WEBSITE_SKIP_NODE_MODULES_TAR=1`, `SCM_DO_BUILD_DURING_DEPLOYMENT=false`, and `ENABLE_ORYX_BUILD=false`. Sanitized Kudu logs still show platform `NodeProjectOptimizer` zipping `node_modules` into `node_modules.tar.gz`, so the optimization appears to be App Service platform behavior rather than source package manifest detection alone.
+Staging app settings now include `WEBSITE_WARMUP_PATH=/api/health`, `WEBSITE_WARMUP_STATUSES=200`, `WEBSITE_SKIP_NODE_MODULES_TAR=1`, `SCM_DO_BUILD_DURING_DEPLOYMENT=false`, and `ENABLE_ORYX_BUILD=false`. Sanitized Kudu logs for the unpacked deployment showed platform `NodeProjectOptimizer` zipping `node_modules` into `node_modules.tar.gz`, so the optimization appeared to be App Service platform behavior rather than source package manifest detection alone.
+
+## Run-From-Package Staging Correction
+
+Follow-up PR head `de32218684f4f21fcba40a4fbf8812b30cd1cb73` changed the governed App Service model to run the immutable ZIP directly with `WEBSITE_RUN_FROM_PACKAGE=1`.
+
+- Package: /tmp/jm1-appsvc-staging-de32218684f4f21fcba40a4fbf8812b30cd1cb73-20260729T1235Z.zip
+- Package SHA-256: 05662c5db772079db21f4f6f02cb4539b0a008ffef50b2c2317a7f561abaab7a
+- Staging release setting: JM1_RELEASE_SHA=de32218684f4f21fcba40a4fbf8812b30cd1cb73
+- Staging `WEBSITE_RUN_FROM_PACKAGE`: 1
+- Staging payment gate: disabled
+
+The Azure deploy command returned a control-plane 502, and deployment log ID `43ce9b15-34a2-4363-ba45-d3202ddaf4b7` still showed no end time during the evidence window. Runtime verification nevertheless showed the staging slot loaded the expected release and returned `/api/health` 200 ready. Because the deployment record did not finalize cleanly, this does not yet certify the governed deployment path.
 
 ## Production Health
 
@@ -75,7 +87,7 @@ Warm staging health returns 200 ready on the deployed PR head:
 - Payment gate: disabled
 - Route duration: 0-17 ms in sampled warm health responses
 
-Restart-adjacent health remains unstable, though the hardened package recovered:
+Restart-adjacent health failed on the unpacked `a3a006bcf8839326f4270e789c1697c0d1ad68b7` package:
 
 - Probe file: /tmp/jm1-staging-a3a006b-restart-20probe-20260729T112057Z.jsonl
 - Attempts 1-4 returned 200 ready on `a3a006bcf8839326f4270e789c1697c0d1ad68b7`.
@@ -83,12 +95,20 @@ Restart-adjacent health remains unstable, though the hardened package recovered:
 - Attempts 11-20 recovered to 200 ready; uptime reset to 9 seconds on attempt 11.
 - Sanitized platform logs show startup probe failure, container stop, later restart, and eventual startup probe success.
 
+Restart-adjacent health passed on the run-from-package `de32218684f4f21fcba40a4fbf8812b30cd1cb73` package:
+
+- Probe file: /tmp/jm1-staging-de32218-runpkg-restart-10probe-20260729T1236Z.jsonl
+- Attempts 1-10 returned 200 ready on `de32218684f4f21fcba40a4fbf8812b30cd1cb73`.
+- No 500, 502, timeout, or restart loop was observed.
+- Attempt timings: first probe completed in 8 seconds after restart; later probes returned within 0-2 seconds except one 155 ms route duration.
+- Reported payment gate: disabled.
+
 Auto-swap remains disabled for the staging slot. Production cutover was performed through DNS and direct production App Service package deployment, not through an automatic slot swap.
 
 ## Deployment Exception
 
 Slot-swap validation remains incomplete. An earlier staging-to-production swap attempt hung and did not provide a clean rollback/swap proof. Staging auto-swap has now been disabled to prevent accidental promotion, but no governed swap/rollback exercise has been completed. This is tracked as GATE-W1-EX-003.
 
-App Service CI/CD validation remains incomplete because the new App Service workflow is source-present but not yet proven by a successful governed run. This is tracked as GATE-W1-EX-006.
+App Service CI/CD validation remains incomplete because the new App Service workflow is source-present and PR #354 is open to land it on the default branch, but it has not yet been proven by a successful governed run. The latest manual Azure deploy also left a nonterminal OneDeploy record despite successful runtime release loading. This is tracked as GATE-W1-EX-006.
 
-Staging runtime stability remains incomplete because restart-adjacent health probes timed out before later recovery. This is tracked as GATE-W1-EX-007.
+Final positive `/join` replay remains incomplete on a workflow-deployed authoritative release. This is tracked as GATE-W1-EX-007.

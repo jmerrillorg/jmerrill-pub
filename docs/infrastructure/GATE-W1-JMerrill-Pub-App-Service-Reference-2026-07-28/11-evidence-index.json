@@ -3,11 +3,11 @@
   "program": "JM1 Implementation",
   "workstream": "Digital Experience Modernization",
   "subject": "JMerrill.Pub App Service Reference Completion",
-  "executionTimestampUtc": "2026-07-29T11:45:00Z",
-  "continuationTimestampUtc": "2026-07-29T11:45:00Z",
+  "executionTimestampUtc": "2026-07-29T12:45:00Z",
+  "continuationTimestampUtc": "2026-07-29T12:45:00Z",
   "repository": {
     "branch": "codex/jm1-infra-006-phase2-staging-certification",
-    "headSha": "a3a006bcf8839326f4270e789c1697c0d1ad68b7",
+    "headSha": "de32218684f4f21fcba40a4fbf8812b30cd1cb73",
     "baseMainSha": "f3f2a9fc96627fc23327e58b7eddbe6f50365a93",
     "pullRequest": 349
   },
@@ -26,21 +26,23 @@
     "productionPackagePath": "/tmp/jm1-gate-w1-appsvc-production-20260728T145044Z.zip",
     "packageSha256": "4f5ef6159127cbedf2ce8cdb57507de1efc68a651e15a192b9d1df30ab1bfe16",
     "productionReleaseSha": "fbb8ca6190543ec9ac60ed80af41a8d0c8f4883c",
-    "stagingPackagePath": "/tmp/jm1-appsvc-staging-a3a006bcf8839326f4270e789c1697c0d1ad68b7-20260729T111549Z.zip",
-    "stagingPackageSha256": "a6016c1e9b515f2af9a0f37ee0bfe9924b5a4db0030eb7353187eae3ab4c3815",
-    "stagingReleaseSha": "a3a006bcf8839326f4270e789c1697c0d1ad68b7",
-    "stagingDeploymentId": "e9dec64d-f2df-4730-999b-424150dfc758",
+    "stagingPackagePath": "/tmp/jm1-appsvc-staging-de32218684f4f21fcba40a4fbf8812b30cd1cb73-20260729T1235Z.zip",
+    "stagingPackageSha256": "05662c5db772079db21f4f6f02cb4539b0a008ffef50b2c2317a7f561abaab7a",
+    "stagingReleaseSha": "de32218684f4f21fcba40a4fbf8812b30cd1cb73",
+    "stagingDeploymentId": "43ce9b15-34a2-4363-ba45-d3202ddaf4b7",
     "stagingInactiveOneDeployId": "3f0c5031-fbb2-4e2f-9309-2f218fc679c1",
     "productionHealth": "200",
-    "stagingHealthAfterRestore": "warm_ready_restart_adjacent_six_20s_timeouts_then_recovery_with_uptime_reset",
-    "stagingRestartProbeFile": "/tmp/jm1-staging-a3a006b-restart-20probe-20260729T112057Z.jsonl",
-    "stagingRestartProbeCount": 20,
-    "stagingRestartProbeResult": "fail_attempts_5_to_10_timeout_then_recovered_attempt_11_with_uptime_reset",
+    "stagingHealthAfterRestore": "run_from_package_restart_10_of_10_success_no_timeout",
+    "stagingRestartProbeFile": "/tmp/jm1-staging-de32218-runpkg-restart-10probe-20260729T1236Z.jsonl",
+    "stagingRestartProbeCount": 10,
+    "stagingRestartProbeResult": "pass_10_of_10_200_ready_expected_release_payment_gate_disabled",
     "stagingAutoSwap": "disabled",
     "stagingStartupCommand": "node server.js",
     "stagingWarmupPath": "/api/health",
     "stagingWarmupStatuses": "200",
-    "stagingStartupException": "Kudu_NodeProjectOptimizer_still_handles_node_modules_tar_gz_as_platform_behavior_and_restart_probe_times_out"
+    "stagingStartupException": "manual_deploy_control_plane_502_and_onedeploy_record_nonterminal_despite_runtime_release_success",
+    "stagingRunFromPackage": "1",
+    "prerequisiteWorkflowPr": 354
   },
   "domains": {
     "apex": "jmerrill.pub",
@@ -67,8 +69,8 @@
     "rollbackProof": "blocked",
     "diagnostics": "pass",
     "alerts": "partial",
-    "appServiceGithubActionsRelease": "source_present_not_proven",
-    "stagingRuntimeStability": "blocked_restart_adjacent_six_20s_timeouts_then_recovery",
+    "appServiceGithubActionsRelease": "prerequisite_pr_354_open_not_yet_proven",
+    "stagingRuntimeStability": "pass_run_from_package_restart_10_of_10_success",
     "nativeStagingAuthorGateMasterIssuance": "pass_cookie_context_logout_post_logout_401",
     "nativeStagingAuthorGateDiagnostics": "env_registry_one_active_grant_pepper_and_session_secret_configured",
     "cloudflareTurnstileWidget": "created_restricted_widget_no_unrestricted_hostnames",
@@ -79,7 +81,8 @@
     "positiveJoinSubmissionContinuation": "pass_browser_token_201_received_reference_JMP-INT-202607-YEUSKK",
     "turnstileSiteverifyInvalidToken": "pass_400_turnstile_verification_failed_invalid_input_response",
     "authorGateSyntheticReference": "pass_JMP-INT-202607-YEUSKK_context_project_no_cookie_401_forged_401_cross_missing_artifact_404_logout_200_post_logout_401",
-    "freshSyntheticOwnArtifactDownload": "blocked_no_delivered_author_facing_graph_backed_artifact"
+    "freshSyntheticOwnArtifactDownload": "blocked_no_delivered_author_facing_graph_backed_artifact",
+    "positiveJoinFinalAuthoritativeReleaseReplay": "blocked_until_workflow_deployed_staging_release"
   },
   "decision": "NOT_CERTIFIED",
   "deliverables": [
@@ -104,5 +107,8 @@
     "payoutOrTransfer": false,
     "authorCommunication": false,
     "evidenceDeletion": false
+  },
+  "security": {
+    "appScopePublishingProfilesReset": "production_and_staging_reset_after_publish_profile_inspection_no_values_retained"
   }
 }

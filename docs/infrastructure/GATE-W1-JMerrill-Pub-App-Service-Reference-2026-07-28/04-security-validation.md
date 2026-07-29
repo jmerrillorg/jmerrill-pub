@@ -6,6 +6,7 @@
 - No Account Link URLs, author access codes, raw cookies, session secrets, or credential-bearing values were stored in this package.
 - AUTHOR_PORTAL_SESSION_SECRET remained Key Vault-backed.
 - Publishing runtime secrets remained governed through jm1-core-vault where appropriate.
+- App-scope publishing profiles for the production app and staging slot were reset after an operator inspection command returned publish-profile credentials during troubleshooting. No publish-profile values were written to source, evidence, PR comments, or retained files.
 
 ## Managed Identity
 
@@ -65,4 +66,4 @@ Production publishing intake invalid Turnstile request:
 
 ## Security-Relevant Exception
 
-Native staging Author Operating Center session issuance is now proven through the configured master gate, but fresh synthetic fixture authorization and artifact isolation are not yet proven in the current evidence window. Staging runtime changes also require a restart and warmup window before the new route handler is consistently served. This is safe but must be codified in the App Service deployment and rollback procedure.
+Native staging Author Operating Center session issuance is now proven through the configured master gate, but fresh synthetic fixture authorization and artifact isolation are not yet proven in the current evidence window. The staging run-from-package release passed the explicit 10-probe restart health proof, but the App Service deployment authority and rollback procedure still need clean workflow and rollback evidence before certification.

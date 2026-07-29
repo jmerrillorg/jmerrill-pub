@@ -40,3 +40,7 @@ If Publishing App Service must be backed out before final reference certificatio
 ## Exception
 
 A clean slot-swap rollback proof is not complete. An earlier swap attempt hung and was cancelled; staging later recovered after direct restart and a standalone redeployment. This prevents reference certification until rollback is tested or a governed alternative rollback proof is accepted.
+
+## Current Staging Stability Note
+
+The run-from-package staging release `de32218684f4f21fcba40a4fbf8812b30cd1cb73` passed 10 consecutive post-restart health probes with no timeout, 500, 502, or restart loop. That improves staging runtime confidence, but it does not replace rollback proof because no controlled swap/swap-back or immutable-artifact rollback exercise has been completed.
