@@ -39,6 +39,7 @@ var appInsightsName = 'appi-${prefix}'
 var diagnosticSettingName = 'diag-${prefix}'
 var keyVaultUri = 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/secrets/'
 var stagingHostName = 'https://${webAppName}-${stagingSlotName}.azurewebsites.net'
+var appServiceStartupCommand = 'bash -lc "cd /home/site/wwwroot && if [ ! -d node_modules/next ] && [ -f node_modules.tar.gz ]; then mkdir -p node_modules && tar -xzf node_modules.tar.gz -C node_modules; fi && exec node server.js"'
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
@@ -84,7 +85,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       healthCheckPath: '/api/health'
-      appCommandLine: 'node server.js'
+      appCommandLine: appServiceStartupCommand
       appSettings: appSettings(appInsights.properties.ConnectionString, keyVaultUri, environmentName)
     }
   }
@@ -112,7 +113,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = {
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       healthCheckPath: '/api/health'
-      appCommandLine: 'node server.js'
+      appCommandLine: appServiceStartupCommand
       appSettings: appSettings(appInsights.properties.ConnectionString, keyVaultUri, 'staging')
     }
   }

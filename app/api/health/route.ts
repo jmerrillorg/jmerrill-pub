@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { getAuthorPortalAccessDiagnostics } from '@/lib/server/author-portal-access'
+
 export const dynamic = 'force-dynamic'
 
 type HealthStatus = 'ready' | 'degraded' | 'not_ready'
@@ -44,8 +46,11 @@ const CHECKS = {
 } as const
 
 const FORMER_AUTHOR_PORTAL_FALLBACK = 'jm1-author-portal-session'
+const PROCESS_STARTED_AT = new Date()
 
 export function GET() {
+  const checkedAt = new Date()
+  const checkStartedAt = Date.now()
   const dependencies = Object.fromEntries(
     Object.entries(CHECKS).map(([name, keys]) => [name, dependencyHealth(keys)]),
   ) as Record<keyof typeof CHECKS, DependencyHealth>
@@ -68,18 +73,32 @@ export function GET() {
     }
   }
 
+  const authorPortalAccess = getAuthorPortalAccessDiagnostics()
+  if (authorPortalAccess.grantCount === 0) {
+    dependencies.authorPortal = {
+      ...dependencies.authorPortal,
+      status: dependencies.authorPortal.status === 'not_ready' ? 'not_ready' : 'degraded',
+      notes: [...(dependencies.authorPortal.notes || []), 'author_access_registry_empty'],
+    }
+  }
+
   const fatalMissing = dependencies.configuration.missing.length > 0 ||
     dependencies.authorPortal.status === 'not_ready'
   const degraded = Object.values(dependencies).some((dependency) => dependency.status !== 'ready')
   const status: HealthStatus = fatalMissing ? 'not_ready' : degraded ? 'degraded' : 'ready'
+  const durationMs = Date.now() - checkStartedAt
 
   return NextResponse.json({
     service: 'jmerrill-pub',
     status,
     release,
-    checkedAt: new Date().toISOString(),
+    checkedAt: checkedAt.toISOString(),
+    processStartedAt: PROCESS_STARTED_AT.toISOString(),
+    uptimeSeconds: Math.round(process.uptime()),
+    durationMs,
     paymentGate,
     dependencies,
+    authorPortalAccess,
   }, {
     status: fatalMissing ? 503 : 200,
     headers: {
