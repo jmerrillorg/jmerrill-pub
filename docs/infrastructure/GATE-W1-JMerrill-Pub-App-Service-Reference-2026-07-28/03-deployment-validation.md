@@ -14,7 +14,15 @@ PR #349 check status at inspection:
 - Azure Static Web Apps CI/CD / Build and Deploy Job: success on f80fab2fbbb0c641f5266d554a104b12823965a6 at 2026-07-29T03:46:58Z
 - Azure Static Web Apps CI/CD / Close Pull Request Job: skipped
 
-The checked workflow still deploys Azure Static Web Apps, not App Service. A new Publishing App Service CI/CD workflow was added in source at `.github/workflows/azure-app-service-publishing.yml`, and focused prerequisite PR #354 was opened to place the executable workflow on the default branch without merging the broader uncertified GATE-W1 evidence package. The App Service workflow has not yet executed successfully and is not yet the active governed release authority.
+The Static Web Apps workflow still appears in the PR status rollup, but the Publishing App Service workflow is now present on the default branch and has executed successfully through governed manual dispatch with production promotion disabled.
+
+Successful App Service workflow evidence:
+
+- Current PR head deployment: run 30465444152, head `172779c04df6d7e7adf6ee1fad96664cbbf2ac61`, artifact SHA-256 `0e2a0a0e93813891ae708435240bb997b0c008e3a4fa0cd968afbe3422c6248b`, staging deployment log ID `eea98b20-a9af-4998-915b-cd1ec4021e8a`, health probe 18 reached 10/10 ready responses.
+- Staging rollback proof: run 30466281742, rollback branch pinned to `bd5ada518a4b2307b49c01f8ef678f51ef6f5cee`, artifact SHA-256 `548a12d61ff9881c4cef61525187c85ffb71280ea51b9e62bec64e6150208fac`, health probe 17 reached 10/10 ready responses.
+- Staging roll-forward proof: run 30466962103, head `172779c04df6d7e7adf6ee1fad96664cbbf2ac61`, artifact SHA-256 `20e3e86c478ca981397503b55bb025a74dfe633227413eba67606fe1d64bce76`, staging deployment log ID `4e0875bf-90c3-4c62-aa3d-ff97ec321d1e`, health probe 17 reached 10/10 ready responses.
+
+The temporary rollback-proof branch was deleted after the roll-forward proof. No production promotion was run.
 
 ## App Service Deployment
 
@@ -107,8 +115,10 @@ Auto-swap remains disabled for the staging slot. Production cutover was performe
 
 ## Deployment Exception
 
-Slot-swap validation remains incomplete. An earlier staging-to-production swap attempt hung and did not provide a clean rollback/swap proof. Staging auto-swap has now been disabled to prevent accidental promotion, but no governed swap/rollback exercise has been completed. This is tracked as GATE-W1-EX-003.
+Production slot-swap validation was intentionally not performed because this completion pass did not authorize production promotion of PR #349. A governed staging-only immutable-artifact rollback and roll-forward proof was completed instead:
 
-App Service CI/CD validation remains incomplete because the new App Service workflow is source-present and PR #354 is open to land it on the default branch, but it has not yet been proven by a successful governed run. The latest manual Azure deploy also left a nonterminal OneDeploy record despite successful runtime release loading. This is tracked as GATE-W1-EX-006.
+`172779c04df6d7e7adf6ee1fad96664cbbf2ac61` -> `bd5ada518a4b2307b49c01f8ef678f51ef6f5cee` -> `172779c04df6d7e7adf6ee1fad96664cbbf2ac61`
+
+This establishes the rollback pattern without moving public traffic. A production slot swap remains deferred until explicit production promotion authorization.
 
 Final positive `/join` replay remains incomplete on a workflow-deployed authoritative release. This is tracked as GATE-W1-EX-007.

@@ -37,10 +37,20 @@ If Publishing App Service must be backed out before final reference certificatio
 - Post-remediation readback confirmed `autoSwapSlotName: null`.
 - Production package deployment was completed directly.
 
+## Staging Immutable-Artifact Rollback Proof
+
+Because production promotion of PR #349 was not authorized, rollback was proven in staging using immutable workflow artifacts rather than a production slot swap.
+
+- Current-head staging deploy: GitHub Actions run 30465444152, `172779c04df6d7e7adf6ee1fad96664cbbf2ac61`, health gate passed 10/10.
+- Rollback staging deploy: GitHub Actions run 30466281742, `bd5ada518a4b2307b49c01f8ef678f51ef6f5cee`, health gate passed 10/10.
+- Roll-forward staging deploy: GitHub Actions run 30466962103, `172779c04df6d7e7adf6ee1fad96664cbbf2ac61`, health gate passed 10/10.
+
+The temporary rollback-proof branch was deleted after the roll-forward run. Staging now reports `172779c04df6d7e7adf6ee1fad96664cbbf2ac61`, `status=ready`, payment gate disabled, and `autoSwapSlotName: null`.
+
 ## Exception
 
-A clean slot-swap rollback proof is not complete. An earlier swap attempt hung and was cancelled; staging later recovered after direct restart and a standalone redeployment. This prevents reference certification until rollback is tested or a governed alternative rollback proof is accepted.
+Production slot-swap/swap-back remains unperformed by design. The certified reference pattern should require explicit production approval before applying the same artifact promotion procedure to public traffic.
 
 ## Current Staging Stability Note
 
-The run-from-package staging release `de32218684f4f21fcba40a4fbf8812b30cd1cb73` passed 10 consecutive post-restart health probes with no timeout, 500, 502, or restart loop. That improves staging runtime confidence, but it does not replace rollback proof because no controlled swap/swap-back or immutable-artifact rollback exercise has been completed.
+The workflow-deployed staging release `172779c04df6d7e7adf6ee1fad96664cbbf2ac61` passed the App Service workflow health gate. During roll-forward, a direct restart-adjacent probe timed out during warmup, but the workflow health gate subsequently reached 10 consecutive ready responses.
