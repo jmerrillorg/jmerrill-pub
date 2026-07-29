@@ -1243,12 +1243,14 @@ async function getRelationshipBackedTitles(
     $top: '25',
   })
 
-  if (relationships.length === 0 && contact?.jm1pub_isauthor !== true) return []
+  const hasRelationship = relationships.length > 0
+  if (!hasRelationship && contact?.jm1pub_isauthor !== true) return []
+  const titleFilter = `jm1pub_authorname eq '${escapeODataText(fullName)}' or jm1pub_authordisplayname eq '${escapeODataText(fullName)}'`
 
   const titles = await dataverseList(config, 'jm1pub_titles', {
     $select:
       'jm1pub_titleid,jm1pub_titlename,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_slug',
-    $filter: `jm1pub_authorname eq '${escapeODataText(fullName)}' or jm1pub_authordisplayname eq '${escapeODataText(fullName)}'`,
+    $filter: hasRelationship ? titleFilter : `(${titleFilter}) and jm1pub_publiccatalogstatus eq 100000001`,
     $orderby: 'jm1pub_titlename asc',
     $top: '50',
   })
