@@ -3,7 +3,7 @@
 ## Repository State
 
 - Branch: codex/jm1-infra-006-phase2-staging-certification
-- HEAD: 91152240cc23c2967d32af0e1393d353f1cae6ee
+- HEAD: a9304f2d85af4d6b53fe6d36b957c28f2cdddb40
 - Base main at PR inspection: f3f2a9fc96627fc23327e58b7eddbe6f50365a93
 - PR: #349, draft, open, clean merge state
 
@@ -11,10 +11,10 @@
 
 PR #349 check status at inspection:
 
-- Azure Static Web Apps CI/CD / Build and Deploy Job: success on 91152240cc23c2967d32af0e1393d353f1cae6ee at 2026-07-29T02:01:19Z
+- Azure Static Web Apps CI/CD / Build and Deploy Job: success on f80fab2fbbb0c641f5266d554a104b12823965a6 at 2026-07-29T03:46:58Z
 - Azure Static Web Apps CI/CD / Close Pull Request Job: skipped
 
-The checked workflow still deploys Azure Static Web Apps, not App Service. Therefore GitHub Actions build validation passed, but App Service release-pipeline validation remains incomplete.
+The checked workflow still deploys Azure Static Web Apps, not App Service. A new Publishing App Service CI/CD workflow was added in source at `.github/workflows/azure-app-service-publishing.yml`, but it has not yet executed successfully and is not yet the active governed release authority.
 
 ## App Service Deployment
 
@@ -28,15 +28,21 @@ The current branch was built with npm and packaged as a standalone Next.js artif
 
 ## Staging Deployment Refresh
 
-On 2026-07-29, staging auto-swap was disabled after readback showed `autoSwapSlotName: production`. Current PR head 91152240cc23c2967d32af0e1393d353f1cae6ee was built as a standalone App Service package and deployed to the staging slot only.
+On 2026-07-29, staging auto-swap was disabled after readback showed `autoSwapSlotName: production`. A later PR head, `a9304f2d85af4d6b53fe6d36b957c28f2cdddb40`, was built as a standalone App Service package and deployed to the staging slot only.
 
-- Package: /tmp/jm1-gate-w1-appsvc-staging-clean-20260729T024232Z.zip
-- Package SHA-256: 76006c49c96793020359494d9dce32a7dad6a38c619624d8b5c67cbb8e824b4e
-- Deployment ID: af7a6585-e765-4072-b7bb-cae0ef1443fb
-- Staging release setting: JM1_RELEASE_SHA=91152240cc23c2967d32af0e1393d353f1cae6ee
+- Package: /tmp/jm1-appsvc-staging-a9304f2-20260729T074004Z.zip
+- Package SHA-256: f8afb6ca890891bddcb049f3422cb1e06b5fc8cefdf6952b228b2618b8a6ee88
+- Deployment ID: 855c2c66-c732-486b-8d12-6ab5f9dbfefd
+- Staging release setting: JM1_RELEASE_SHA=a9304f2d85af4d6b53fe6d36b957c28f2cdddb40
 - Auto-swap after correction: disabled
 
-The final clean redeploy command returned a deployment-client 502 while polling Kudu, but the staging app served the expected branch runtime afterward. The package was built after confirming the working tree had no diagnostic-code diff. Health and public route smoke tests were rerun from the staging hostname after restore.
+The first redeploy attempt was stopped by Kudu because an SCM container restart overlapped a management operation. A later async zipdeploy completed successfully and became active. VFS readback confirmed the deployed `/api/health` route bundle contains the new non-secret author-access diagnostics.
+
+The App Service startup command was updated for staging to:
+
+`bash -lc "cd /home/site/wwwroot && if [ ! -d node_modules/next ] && [ -f node_modules.tar.gz ]; then mkdir -p node_modules && tar -xzf node_modules.tar.gz -C node_modules; fi && exec node server.js"`
+
+This corrects the previously observed Kudu package shape where `node_modules` was compressed into `node_modules.tar.gz` and `server.js` could not resolve `next`.
 
 ## Production Health
 
@@ -61,11 +67,12 @@ The staging slot recovered after the current standalone package deployment and a
 - https://app-jm1-pub-prod-staging.azurewebsites.net/robots.txt: 200
 - https://app-jm1-pub-prod-staging.azurewebsites.net/sitemap.xml: 200
 
-Restart-adjacent health was unstable during the author-gate proof:
+Restart-adjacent health remains unstable, though the hardened package recovered:
 
 - First post-restart `/api/health`: 200 after 37.064790 seconds.
 - Second and third post-restart `/api/health`: timed out after 45 seconds.
 - Later warm route smoke recovered to `/api/health`: 200 after 1.135840 seconds.
+- Latest restart after `a9304f2d85af4d6b53fe6d36b957c28f2cdddb40`: early probes returned old in-memory handler responses, then three 30-second timeout windows occurred, then `/api/health` recovered with release match, `uptimeSeconds: 10`, and `durationMs: 1`.
 
 Auto-swap remains disabled for the staging slot. Production cutover was performed through DNS and direct production App Service package deployment, not through an automatic slot swap.
 
@@ -73,6 +80,6 @@ Auto-swap remains disabled for the staging slot. Production cutover was performe
 
 Slot-swap validation remains incomplete. An earlier staging-to-production swap attempt hung and did not provide a clean rollback/swap proof. Staging auto-swap has now been disabled to prevent accidental promotion, but no governed swap/rollback exercise has been completed. This is tracked as GATE-W1-EX-003.
 
-App Service CI/CD validation remains incomplete because the active GitHub Actions workflow still targets Azure Static Web Apps. This is tracked as GATE-W1-EX-006.
+App Service CI/CD validation remains incomplete because the new App Service workflow is source-present but not yet proven by a successful governed run. This is tracked as GATE-W1-EX-006.
 
 Staging runtime stability remains incomplete because restart-adjacent health probes timed out before later recovery. This is tracked as GATE-W1-EX-007.

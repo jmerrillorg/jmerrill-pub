@@ -39,15 +39,19 @@ Validated:
 
 - Production unauthenticated author context fails closed with 401.
 - Staging health, home, /join, /books, /authors, robots, and sitemap routes initially responded 200 after the 91152240cc23c2967d32af0e1393d353f1cae6ee standalone deployment and Key Vault setting restore.
-- Native staging `/api/author/gate` synthetic session issuance passed after explicit staging restart: the route returned 200, issued a cookie, and `/api/author/context` returned 200 from the issued cookie.
+- Earlier native staging `/api/author/gate` issuance passed after explicit staging restart: the route returned 200, issued a cookie, and `/api/author/context` returned 200 from the issued cookie.
 - No-cookie context returned 401.
 - Former-fallback forged session returned 401.
 - Logout returned 200 and post-logout context returned 401.
 - Temporary staging synthetic access settings were removed and restored to Key Vault references.
 - Logout route clears the author portal cookie.
+- After deployment of `a9304f2d85af4d6b53fe6d36b957c28f2cdddb40`, `/api/health` returned non-secret author-access diagnostics showing `env_registry`, one active grant, configured pepper, and configured session secret.
+- Safe registry inspection found no synthetic fixture marker in the active registry.
+- Staging `/api/author/gate` master-code isolation test returned 200, issued the author portal cookie, allowed context retrieval, and logout invalidated the session.
 
 Not completed:
 
+- Positive synthetic access-code issuance against a governed certification-only grant. The active registry does not contain the synthetic fixture grant.
 - Fresh own-artifact download proof after the prior fixture retirement. The previous governed fixture proved own-artifact 200 and cross-author 404, but those synthetic Dataverse and SharePoint rows were retired after the earlier evidence window.
 - Stable staging health. Restart-adjacent `/api/health` probes timed out before later warm recovery.
 

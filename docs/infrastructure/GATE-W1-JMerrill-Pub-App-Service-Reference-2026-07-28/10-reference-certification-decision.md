@@ -10,7 +10,7 @@ The implementation is not yet a certified enterprise reference because five bloc
 
 1. Positive `/join` submission through production Turnstile was not proven; the staging hostname still produced Cloudflare Turnstile `110200`.
 2. Slot-swap or equivalent rollback validation was not proven.
-3. App Service GitHub Actions release pipeline was not implemented or proven.
+3. App Service GitHub Actions release pipeline was added in source but not yet proven by a governed run.
 4. Staging health is unstable after deployment/restart before later warm recovery.
 5. Fresh own-artifact download proof was not repeated after the prior synthetic fixture was retired.
 
@@ -21,7 +21,7 @@ The implementation is not yet a certified enterprise reference because five bloc
 - Static Web Apps retirement: not performed
 - Business-path certification: incomplete
 - Staging auto-swap: disabled after remediation
-- Staging Author Operating Center gate/session: native issuance passed after explicit restart
+- Staging Author Operating Center gate/session: master-code issuance, cookie, context, logout, and post-logout denial passed; fresh synthetic fixture grant is absent
 - Staging health: unstable after restart, later recovered
 - Enterprise reference status: not certified
 
@@ -31,4 +31,4 @@ Do not advance to GATE-W2 until GATE-W1 reaches CERTIFIED_REFERENCE or Jackie fo
 
 Recommended next action:
 
-Resolve GATE-W1-EX-001, GATE-W1-EX-003, GATE-W1-EX-006, GATE-W1-EX-007, and GATE-W1-EX-008 in a focused completion pass, then rerun the evidence package and decision.
+Resolve GATE-W1-EX-001, GATE-W1-EX-003, GATE-W1-EX-006, GATE-W1-EX-007, and GATE-W1-EX-008 in a focused completion pass, then rerun the evidence package and decision. GATE-W2 remains unauthorized.

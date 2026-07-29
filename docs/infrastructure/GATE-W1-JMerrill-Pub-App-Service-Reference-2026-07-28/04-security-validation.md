@@ -31,15 +31,15 @@ Former-fallback rejection remained within the certified PR #337 runtime matrix a
 
 Staging certification-only synthetic test:
 
-- Temporary staging-only synthetic author access settings were applied without real author credentials or manuscript content.
-- The first attempt without explicit restart returned 401 while slot setting readback showed the synthetic values were present.
-- After explicit staging restart, `/api/author/gate` returned 200, issued `jm1_author_portal_session`, and `/api/author/context` returned 200 from a trusted relationship-scoped session for the synthetic reference.
-- /api/author/context without a valid cookie returned 401.
-- Former-fallback forged session returned 401.
-- /api/author/logout returned 200 and emitted a clearing Set-Cookie header.
-- /api/author/context after logout returned 401.
-- Key Vault-backed staging author settings were restored after the test.
-- Readback confirmed AUTHOR_PORTAL_ACCESS_REGISTRY_JSON, AUTHOR_PORTAL_MASTER_ACCESS_CODE, AUTHOR_PORTAL_ACCESS_CODE_PEPPER, and AUTHOR_PORTAL_SESSION_SECRET were again Key Vault references.
+- Key Vault-backed staging author settings remained configured as Key Vault references after the retest.
+- `/api/health` returned non-secret author-access diagnostics: `registrySource: env_registry`, `grantCount: 1`, `activeGrantCount: 1`, `pepperConfigured: true`, and `sessionSecretConfigured: true`.
+- A safe registry inspection found no synthetic/certification fixture marker in the current active registry.
+- Staging `/api/author/gate` was tested with the configured master access secret without printing or retaining the secret. The gate returned 200 and issued `jm1_author_portal_session`.
+- `/api/author/context` from the issued cookie returned 200.
+- `/api/author/logout` returned 200.
+- `/api/author/context` after logout returned 401.
+
+This isolates the current `/api/author/gate` behavior: session issuance, cookie setting, session-secret validation, and logout are functioning in the deployed staging runtime. The remaining positive synthetic fixture path is blocked because the active staging registry does not contain a governed certification-only synthetic grant and the prior synthetic Dataverse/SharePoint fixture was retired.
 
 ## Intake Fail-Closed
 
@@ -52,4 +52,4 @@ Production publishing intake invalid Turnstile request:
 
 ## Security-Relevant Exception
 
-Native staging Author Operating Center session issuance is now proven, but the test demonstrated that staging runtime changes require an explicit restart and warmup window before the route reliably observes temporary slot settings. This is safe but should be codified in the App Service deployment and rollback procedure.
+Native staging Author Operating Center session issuance is now proven through the configured master gate, but fresh synthetic fixture authorization and artifact isolation are not yet proven in the current evidence window. Staging runtime changes also require a restart and warmup window before the new route handler is consistently served. This is safe but must be codified in the App Service deployment and rollback procedure.
