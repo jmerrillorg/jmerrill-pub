@@ -76,14 +76,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf appservice-package
-          mkdir -p appservice-package/.next appservice-package/public
-          cp -R .next/standalone/. appservice-package/
-          cp -R .next/static appservice-package/.next/static
-          if [ -d public ]; then cp -R public/. appservice-package/public/; fi
-          printf '%s\n' "${{ github.sha }}" > appservice-package/JM1_RELEASE_SHA
-          (cd appservice-package && zip -qr "../${APP_SERVICE_PACKAGE}" .)
-          shasum -a 256 "${APP_SERVICE_PACKAGE}" > "${APP_SERVICE_PACKAGE}.sha256"
+          JM1_RELEASE_SHA="${{ github.sha }}" npm run package:appservice -- "${APP_SERVICE_PACKAGE}"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -123,12 +116,12 @@ jobs:
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$AZURE_WEBAPP_NAME" \
             --slot "$AZURE_STAGING_SLOT" \
-            --startup-file 'bash -lc "cd /home/site/wwwroot && if [ ! -d node_modules/next ] && [ -f node_modules.tar.gz ]; then mkdir -p node_modules && tar -xzf node_modules.tar.gz -C node_modules; fi && exec node server.js"'
+            --startup-file 'node server.js'
           az webapp config appsettings set \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$AZURE_WEBAPP_NAME" \
             --slot "$AZURE_STAGING_SLOT" \
-            --settings JM1_RELEASE_SHA="${{ github.sha }}" \
+            --settings JM1_RELEASE_SHA="${{ github.sha }}" SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false WEBSITE_RUN_FROM_PACKAGE=0 WEBSITE_SKIP_NODE_MODULES_TAR=1 \
             --output none
           az webapp deploy \
             --resource-group "$AZURE_RESOURCE_GROUP" \
