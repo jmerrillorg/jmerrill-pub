@@ -227,6 +227,8 @@ func appSettings(appInsightsConnectionString string, vaultUri string, slotEnviro
   setting('ENABLE_ORYX_BUILD', 'false', false)
   setting('WEBSITE_RUN_FROM_PACKAGE', '0', false)
   setting('WEBSITE_SKIP_NODE_MODULES_TAR', '1', false)
+  setting('WEBSITE_WARMUP_PATH', '/api/health', false)
+  setting('WEBSITE_WARMUP_STATUSES', '200', false)
   setting('WEBSITE_NODE_DEFAULT_VERSION', '~20', false)
   setting('JM1_ENVIRONMENT', slotEnvironmentName == 'prod' ? 'production' : 'staging', true)
   setting('JM1_RELEASE_SHA', 'set-by-deployment-pipeline', true)
