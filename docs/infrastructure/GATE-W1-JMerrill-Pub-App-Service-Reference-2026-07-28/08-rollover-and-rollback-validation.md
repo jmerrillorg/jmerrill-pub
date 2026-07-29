@@ -53,4 +53,13 @@ Production slot-swap/swap-back remains unperformed by design. The certified refe
 
 ## Current Staging Stability Note
 
-The workflow-deployed staging release `172779c04df6d7e7adf6ee1fad96664cbbf2ac61` passed the App Service workflow health gate. During roll-forward, a direct restart-adjacent probe timed out during warmup, but the workflow health gate subsequently reached 10 consecutive ready responses.
+The workflow-deployed staging release `cb32158e4c52750b41d2eda4351af0f8f356fb00` passed the final GATE-W1 restart/cold-start health proof on 2026-07-29:
+
+- Explicit staging restart performed.
+- 10 consecutive `/api/health` probes completed.
+- All 10 returned HTTP 200 and `status=ready`.
+- All 10 reported release `cb32158e4c52750b41d2eda4351af0f8f356fb00`.
+- All 10 reported `paymentGate=disabled`.
+- No timeout, 500, 502, or restart loop was observed.
+
+Production slot swap was not performed under GATE-W1. The certified rollback pattern remains immutable artifact rollback/roll-forward in staging plus documented DNS fallback to the preserved Static Web Apps target if Jackie separately authorizes production backout.

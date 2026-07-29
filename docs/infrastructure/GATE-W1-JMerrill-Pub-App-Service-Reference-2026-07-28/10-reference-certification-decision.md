@@ -1,33 +1,35 @@
 # Reference Certification Decision
 
-Decision: NOT_CERTIFIED
+Decision: CERTIFIED_REFERENCE
 
 ## Rationale
 
-jmerrill.pub is operating on App Service in production, with DNS, TLS, health checks, Key Vault-backed configuration, managed identity, diagnostics, and basic monitoring materially in place. The production site and primary public routes respond normally from the App Service target.
+jmerrill.pub is operating on App Service in production, with DNS, TLS, health checks, Key Vault-backed configuration, managed identity, diagnostics, monitoring, staging deployment, rollback pattern evidence, and business-path validation in place.
 
-The implementation is not yet a certified enterprise reference because two blocking business-path controls remain incomplete:
+The final GATE-W1 completion pass closed the remaining certification blockers:
 
-1. Final positive `/join` evidence has not yet been replayed on a workflow-deployed authoritative staging release.
-2. Fresh own-artifact download proof was not repeated with a delivered synthetic author-facing artifact.
+1. Current-release `/join` positive proof passed with Turnstile, 201 receipt, one synthetic intake, one Contact, one Lead routing record, manuscript preservation, Stage 0 diagnostic, package recommendation, acknowledgement, execution evidence, and duplicate retry 409.
+2. Native staging Author Operating Center proof passed with gate/session/context, own artifact 200, cross/missing artifact 404, no-cookie 401, forged former-fallback 401, logout 200, and post-logout 401.
+3. Staging restart/cold-start health passed 10/10 on release `cb32158e4c52750b41d2eda4351af0f8f356fb00`.
+4. Monitoring coverage now includes health, deployment, restart, Turnstile, Author Gate, orchestration, and rollback/swap alerts.
 
 ## Current Status
 
-- Production App Service: operating
+- Production App Service: healthy
+- Staging App Service: healthy
 - Publishing DNS cutover: completed
 - Static Web Apps retirement: not performed
-- Business-path certification: incomplete
-- Positive `/join`: completed in staging with token-bearing synthetic intake `JMP-INT-202607-YEUSKK`
-- Staging auto-swap: disabled after remediation
-- Staging Author Operating Center gate/session: master-code issuance, cookie, context, logout, and post-logout denial passed; fresh synthetic fixture grant is absent
-- App Service workflow: current-head staging deploy, rollback-to-prior, and roll-forward all passed with production promotion disabled
-- Staging health: workflow-deployed release `172779c04df6d7e7adf6ee1fad96664cbbf2ac61` passed 10/10 health certification
-- Enterprise reference status: not certified
+- Business-path certification: complete
+- Positive `/join`: pass, `JMP-INT-202607-3R2ETT`
+- Author Operating Center artifact access: pass
+- Staging auto-swap: disabled
+- App Service workflow: PR #349 staging deployment passed; production promotion skipped
+- Enterprise reference status: certified
 
 ## Next Gate Recommendation
 
-Do not advance to GATE-W2 until GATE-W1 reaches CERTIFIED_REFERENCE or Jackie formally accepts a revised standard with documented compensating controls.
+Proceed only to the planning/approval gate:
 
-Recommended next action:
+GATE-W2 - Enterprise Web Platform Topology & Cost Approval
 
-Resolve GATE-W1-EX-007 and GATE-W1-EX-008 in a focused completion pass, then rerun the evidence package and decision. GATE-W2 remains unauthorized.
+No other web property migration is authorized by GATE-W1.

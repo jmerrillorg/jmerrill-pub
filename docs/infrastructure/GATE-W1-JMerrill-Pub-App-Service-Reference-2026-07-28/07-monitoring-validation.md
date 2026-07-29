@@ -2,9 +2,7 @@
 
 ## Application Insights
 
-- Component: appi-jm1-pub-prod
-- Application type: web
-- App ID: 6f8fa746-f7ef-470e-9098-93c81293568a
+No Publishing App Service-specific Application Insights component was present in `rg-jm1-pub-prod-appsvc` during final certification. App Service diagnostic settings and Log Analytics alerts are the active GATE-W1 monitoring authority.
 
 ## Log Analytics
 
@@ -33,7 +31,22 @@ Enabled App Service metric alerts:
 
 - alert-jm1-pub-appsvc-http5xx, severity 2, metric Http5xx
 - alert-jm1-pub-appsvc-response-time, severity 3, metric AverageResponseTime
+- alert-jm1-pub-appsvc-healthcheck, severity 2, metric HealthCheckStatus
+- alert-jm1-pub-appsvc-staging-healthcheck, severity 3, metric HealthCheckStatus
+
+Enabled scheduled-query alerts:
+
+- alert-jm1-pub-appsvc-deployment-events
+- alert-jm1-pub-appsvc-restart-events
+- alert-jm1-pub-turnstile-failures
+- alert-jm1-pub-author-gate-failures
+- alert-jm1-pub-orchestration-failures
+- alert-jm1-pub-rollback-events
+
+Action group:
+
+- ag-jm1-pub-infra006-ops
 
 ## Exception
 
-Dependency-specific availability alerts and scheduled-query rules were not completed in this pass. Basic App Service monitoring is operational, but reference-grade dependency monitoring remains an exception.
+No blocking monitoring exception remains for GATE-W1. Future GATE-W2 work should decide whether Publishing receives a dedicated Application Insights component or remains on App Service diagnostics plus Log Analytics scheduled-query rules.

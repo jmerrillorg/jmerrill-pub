@@ -121,4 +121,4 @@ Production slot-swap validation was intentionally not performed because this com
 
 This establishes the rollback pattern without moving public traffic. A production slot swap remains deferred until explicit production promotion authorization.
 
-Final positive `/join` replay remains incomplete on a workflow-deployed authoritative release. This is tracked as GATE-W1-EX-007.
+Final positive `/join` replay on the workflow-deployed authoritative staging release `cb32158e4c52750b41d2eda4351af0f8f356fb00` completed successfully with reference `JMP-INT-202607-3R2ETT`, 201 received response, duplicate retry 409 duplicate response, Dataverse/SharePoint persistence, Stage 0 dispatch, recommendation generation, notification posture, and execution evidence. GATE-W1-EX-007 is closed.

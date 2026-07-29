@@ -63,8 +63,43 @@ Validated:
 
 Not completed:
 
-- Fresh own-artifact download proof. The synthetic project has no delivered author-facing editorial artifact backed by Graph content.
-- Stable restart-adjacent staging health. Restart-adjacent probes still showed six 20-second timeout windows and a process uptime reset before later recovery.
+- None for GATE-W1 certification.
+
+## Final Current-Release Completion Evidence
+
+Authoritative staging release: `cb32158e4c52750b41d2eda4351af0f8f356fb00`
+
+Publishing intake positive path:
+
+- Browser Turnstile token issued on `app-jm1-pub-prod-staging.azurewebsites.net`.
+- Synthetic multipart DOCX intake returned 201 received.
+- Reference: `JMP-INT-202607-3R2ETT`.
+- Duplicate retry with a fresh Turnstile token and the same idempotency key returned 409 duplicate.
+- Dataverse readback: one intake, one synthetic Contact, one Lead routing record, one title, one publishing asset, one Stage 0 editorial diagnostic.
+- Manuscript: received, SharePoint workspace URL present, workspace folder ID present, diagnostic manuscript asset present, approved for diagnostic.
+- Author acknowledgement: sent and timestamped.
+- Recommendation: `Starter`.
+- Execution logs: intake router success, publisher editorial review initialized, pre-package editorial review performed, orchestration dispatched.
+
+Author Operating Center artifact path:
+
+- Gate: 200.
+- Cookie: issued with HttpOnly, Secure, SameSite=Lax, Path=/, Max-Age=28800.
+- Context: 200.
+- Project artifact count: 1.
+- Own artifact: 200, filename `jm1-gate-w1-author-artifact.txt`, MIME `text/plain; charset=utf-8`, SHA-256 `cff8c57e8a7592bbb71ad2ecd94897933bf58e8fc0f4cb7e855dd1c33c3ad3ab`.
+- Cross/missing artifact: non-disclosing 404.
+- No-cookie artifact: 401.
+- Forged former-fallback session: 401.
+- Logout: 200.
+- Post-logout context: 401.
+
+Staging health:
+
+- Explicit staging restart completed.
+- `/api/health` passed 10/10 probes, all HTTP 200 ready.
+- Release remained `cb32158e4c52750b41d2eda4351af0f8f356fb00`.
+- Payment gate remained disabled.
 
 ## Accessibility, Performance, Metadata
 
