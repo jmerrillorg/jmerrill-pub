@@ -1309,6 +1309,10 @@ function collapseProjects(projects: AuthorPortalProjectSummary[], requestedRefer
 
 function projectPriority(project: AuthorPortalProjectSummary, requestedReference: string) {
   let score = 0
+  if (project.authorActionRequired) score += 40
+  if (project.artifacts?.length) score += 30
+  if (project.packageReleaseState === 'RELEASED') score += 15
+  if (project.authorAccessState === 'AVAILABLE') score += 10
   if (project.intakeReference && project.intakeReference === requestedReference) score += 8
   if (isEditorialWorkspaceState(project.workspaceState)) score += 4
   if (project.publishingAssetId) score += 2

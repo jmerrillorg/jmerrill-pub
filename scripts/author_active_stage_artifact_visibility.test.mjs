@@ -42,6 +42,14 @@ const expectations = [
       downloadSource.includes('!visibleArtifact'),
   },
   {
+    name: 'artifact-bearing duplicate project rows win over simple intake rows',
+    ok:
+      contextSource.includes('if (project.authorActionRequired) score += 40') &&
+      contextSource.includes('if (project.artifacts?.length) score += 30') &&
+      contextSource.includes("if (project.packageReleaseState === 'RELEASED') score += 15") &&
+      contextSource.includes('if (project.intakeReference && project.intakeReference === requestedReference) score += 8'),
+  },
+  {
     name: 'download endpoint returns stable attachment headers',
     ok:
       downloadSource.includes('Content-Disposition') &&
