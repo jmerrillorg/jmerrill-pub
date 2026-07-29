@@ -129,7 +129,11 @@ jobs:
             --slot "$AZURE_STAGING_SLOT" \
             --src-path "$APP_SERVICE_PACKAGE" \
             --type zip \
-            --clean true
+            --clean true \
+            --restart true \
+            --async true \
+            --track-status false \
+            --enable-kudu-warmup false
 
       - name: Staging Health Certification
         shell: bash
