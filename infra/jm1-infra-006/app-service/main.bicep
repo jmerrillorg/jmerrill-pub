@@ -38,6 +38,8 @@ var stagingSlotName = 'staging'
 var appInsightsName = 'appi-${prefix}'
 var diagnosticSettingName = 'diag-${prefix}'
 var keyVaultUri = 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/secrets/'
+var stagingHostName = 'https://${webAppName}-${stagingSlotName}.azurewebsites.net'
+var appServiceStartupCommand = 'node server.js'
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
@@ -83,6 +85,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       healthCheckPath: '/api/health'
+      appCommandLine: appServiceStartupCommand
       appSettings: appSettings(appInsights.properties.ConnectionString, keyVaultUri, environmentName)
     }
   }
@@ -110,8 +113,39 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = {
       ftpsState: 'Disabled'
       minTlsVersion: '1.2'
       healthCheckPath: '/api/health'
+      appCommandLine: appServiceStartupCommand
       appSettings: appSettings(appInsights.properties.ConnectionString, keyVaultUri, 'staging')
     }
+  }
+}
+
+resource slotConfigNames 'Microsoft.Web/sites/config@2023-12-01' = {
+  parent: webApp
+  name: 'slotConfigNames'
+  properties: {
+    appSettingNames: [
+      'JM1_ENVIRONMENT'
+      'JM1_RELEASE_SHA'
+      'NEXTAUTH_URL'
+      'AUTH_SECRET'
+      'NEXTAUTH_SECRET'
+      'AUTHOR_PORTAL_SESSION_SECRET'
+      'AUTHOR_PORTAL_ACCESS_CODE_PEPPER'
+      'AUTHOR_PORTAL_ACCESS_REGISTRY_JSON'
+      'AUTHOR_PORTAL_MASTER_ACCESS_CODE'
+      'TURNSTILE_SITE_KEY'
+      'NEXT_PUBLIC_TURNSTILE_SITE_KEY'
+      'TURNSTILE_SECRET_KEY'
+      'INTAKE_ALLOWED_ORIGINS'
+      'AZURE_STORAGE_CONNECTION_STRING'
+      'INTAKE_DEADLETTER_QUEUE_NAME'
+      'STRIPE_CONNECT_SECRET_KEY'
+      'STRIPE_CHECKOUT_SECRET_KEY'
+      'STRIPE_WEBHOOK_SECRET'
+      'JM1_DIAGNOSTIC_RUNNER_KEY'
+      'JM1_DIAGNOSTIC_RUNNER_URL'
+      'JM1_ORCHESTRATION_WORKER_KEY'
+    ]
   }
 }
 
@@ -189,8 +223,18 @@ func setting(name string, value string, slotSetting bool) object => {
 
 func appSettings(appInsightsConnectionString string, vaultUri string, slotEnvironmentName string) array => [
   setting('NODE_ENV', 'production', false)
-  setting('JM1_RELEASE_SHA', 'set-by-deployment-pipeline', false)
-  setting('NEXTAUTH_URL', slotEnvironmentName == 'prod' ? 'https://jmerrill.pub' : 'https://staging.jmerrill.pub', true)
+  setting('SCM_DO_BUILD_DURING_DEPLOYMENT', 'false', false)
+  setting('ENABLE_ORYX_BUILD', 'false', false)
+  setting('WEBSITE_RUN_FROM_PACKAGE', '1', false)
+  setting('WEBSITE_SKIP_NODE_MODULES_TAR', '1', false)
+  setting('WEBSITE_WARMUP_PATH', '/api/health', false)
+  setting('WEBSITE_WARMUP_STATUSES', '200', false)
+  setting('WEBSITE_NODE_DEFAULT_VERSION', '~20', false)
+  setting('JM1_ENVIRONMENT', slotEnvironmentName == 'prod' ? 'production' : 'staging', true)
+  setting('JM1_RELEASE_SHA', 'set-by-deployment-pipeline', true)
+  setting('NEXTAUTH_URL', slotEnvironmentName == 'prod' ? 'https://jmerrill.pub' : stagingHostName, true)
+  setting('AUTH_SECRET', kvRef('AUTH-SECRET'), true)
+  setting('NEXTAUTH_SECRET', kvRef('AUTH-SECRET'), true)
   setting('APPLICATIONINSIGHTS_CONNECTION_STRING', appInsightsConnectionString, false)
   setting('DATAVERSE_TENANT_ID', kvRef('DATAVERSE-TENANT-ID'), false)
   setting('DATAVERSE_CLIENT_ID', kvRef('DATAVERSE-CLIENT-ID'), false)
@@ -213,8 +257,10 @@ func appSettings(appInsightsConnectionString string, vaultUri string, slotEnviro
   setting('TURNSTILE_SITE_KEY', kvRef('TURNSTILE-SITE-KEY'), true)
   setting('NEXT_PUBLIC_TURNSTILE_SITE_KEY', kvRef('TURNSTILE-SITE-KEY'), true)
   setting('TURNSTILE_SECRET_KEY', kvRef('TURNSTILE-SECRET-KEY'), true)
-  setting('INTAKE_ALLOWED_ORIGINS', slotEnvironmentName == 'prod' ? 'https://jmerrill.pub' : 'https://staging.jmerrill.pub', true)
+  setting('INTAKE_ALLOWED_ORIGINS', slotEnvironmentName == 'prod' ? 'https://jmerrill.pub' : stagingHostName, true)
   setting('INTAKE_RATE_LIMIT_ENABLED', 'true', false)
+  setting('AZURE_STORAGE_CONNECTION_STRING', kvRef('AZURE-STORAGE-CONNECTION-STRING'), true)
+  setting('INTAKE_DEADLETTER_QUEUE_NAME', slotEnvironmentName == 'prod' ? 'jm1-pub-intake-deadletter-prod' : 'jm1-pub-intake-deadletter-preview', true)
   setting('JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL', kvRef('JM1-JOIN-INTERNAL-NOTIFICATION-RELAY-URL'), false)
   setting('JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY', kvRef('JM1-JOIN-INTERNAL-NOTIFICATION-RELAY-KEY'), false)
   setting('STRIPE_CONNECT_SECRET_KEY', kvRef('STRIPE-CONNECT-SECRET-KEY'), true)
@@ -223,6 +269,8 @@ func appSettings(appInsightsConnectionString string, vaultUri string, slotEnviro
   setting('JM1_STRIPE_MODE', 'live', false)
   setting('JM1_STRIPE_CONNECT_ENABLED', 'true', false)
   setting('JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED', 'false', false)
+  setting('JM1_DIAGNOSTIC_RUNNER_URL', 'https://func-jm1-diagnostic-ai-runner.azurewebsites.net', true)
+  setting('JM1_DIAGNOSTIC_RUNNER_KEY', kvRef('jm1-int-pub-005-diagnostic-runner-key'), true)
   setting('JM1_ORCHESTRATION_WORKER_KEY', kvRef('JM1-ORCHESTRATION-WORKER-KEY'), true)
 ]
 
