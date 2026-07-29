@@ -123,6 +123,22 @@ jobs:
             --slot "$AZURE_STAGING_SLOT" \
             --settings JM1_RELEASE_SHA="${{ github.sha }}" SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false WEBSITE_RUN_FROM_PACKAGE=1 WEBSITE_SKIP_NODE_MODULES_TAR=1 WEBSITE_WARMUP_PATH=/api/health WEBSITE_WARMUP_STATUSES=200 \
             --output none
+          az webapp deployment slot auto-swap \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --slot "$AZURE_STAGING_SLOT" \
+            --disable \
+            --output none
+          target_slot="$(az webapp deployment slot auto-swap \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --slot "$AZURE_STAGING_SLOT" \
+            --query targetSlot \
+            --output tsv)"
+          if [ -n "$target_slot" ]; then
+            echo "Staging auto-swap remains enabled for target: $target_slot" >&2
+            exit 1
+          fi
           az webapp deploy \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$AZURE_WEBAPP_NAME" \
