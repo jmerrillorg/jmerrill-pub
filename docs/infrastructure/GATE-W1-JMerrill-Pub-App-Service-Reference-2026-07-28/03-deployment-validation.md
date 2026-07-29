@@ -3,7 +3,7 @@
 ## Repository State
 
 - Branch: codex/jm1-infra-006-phase2-staging-certification
-- HEAD: 7c6a043e928723c116715d93acbe61441c45f881
+- HEAD: a3a006bcf8839326f4270e789c1697c0d1ad68b7
 - Base main at PR inspection: f3f2a9fc96627fc23327e58b7eddbe6f50365a93
 - PR: #349, draft, open, clean merge state
 
@@ -28,22 +28,23 @@ The current branch was built with npm and packaged as a standalone Next.js artif
 
 ## Staging Deployment Refresh
 
-On 2026-07-29, staging auto-swap was disabled after readback showed `autoSwapSlotName: production`. The current PR head, `7c6a043e928723c116715d93acbe61441c45f881`, was built as a standalone App Service package and deployed to the staging slot only.
+On 2026-07-29, staging auto-swap was disabled after readback showed `autoSwapSlotName: production`. The current PR head, `a3a006bcf8839326f4270e789c1697c0d1ad68b7`, was built as a standalone App Service package and deployed to the staging slot only.
 
-- Package: /tmp/jm1-appsvc-staging-7c6a043e928723c116715d93acbe61441c45f881-20260729T100615Z.zip
-- Package SHA-256: 6c95246f44122368e233cc4c6aa01a64baeff8621d606c63565866fe20c95ec6
-- Active Kudu deployment ID: e8d57ac2-1492-4503-b14a-a58e88b2a7b6
+- Package: /tmp/jm1-appsvc-staging-a3a006bcf8839326f4270e789c1697c0d1ad68b7-20260729T111549Z.zip
+- Package SHA-256: a6016c1e9b515f2af9a0f37ee0bfe9924b5a4db0030eb7353187eae3ab4c3815
+- Active OneDeploy deployment ID: e9dec64d-f2df-4730-999b-424150dfc758
+- Prior OneDeploy deployment ID: 6963673f-6cf1-4949-a501-70c67d9a6326
 - Inactive OneDeploy record: 3f0c5031-fbb2-4e2f-9309-2f218fc679c1
-- Staging release setting: JM1_RELEASE_SHA=7c6a043e928723c116715d93acbe61441c45f881
+- Staging release setting: JM1_RELEASE_SHA=a3a006bcf8839326f4270e789c1697c0d1ad68b7
 - Auto-swap after correction: disabled
 
-The first `az webapp deploy` attempt did not return promptly and was stopped from the operator console; Azure later recorded it as a completed inactive OneDeploy record. A Kudu async zipdeploy then completed successfully and became the active deployment. VFS/readback and runtime health confirmed the staging slot reports the current PR release SHA.
+The App Service artifact is now assembled by `scripts/package-app-service-artifact.mjs` through the App Service workflow and local certification path. The package copies `.next/standalone`, `.next/static`, and `public`, writes `JM1_RELEASE_SHA`, removes the root package manifest from the deployable zip, and produces a SHA-256 checksum.
 
 The App Service startup command was updated for staging to:
 
-`bash -lc "cd /home/site/wwwroot && if [ ! -d node_modules/next ] && [ -f node_modules.tar.gz ]; then mkdir -p node_modules && tar -xzf node_modules.tar.gz -C node_modules; fi && exec node server.js"`
+`node server.js`
 
-This mitigates the observed Kudu package shape where `node_modules` is compressed into `node_modules.tar.gz` and `server.js` cannot resolve `next` until extraction completes. Sanitized Kudu and App Service logs still show Kudu `NodeProjectOptimizer` zipping `node_modules` and Oryx startup extracting it despite `SCM_DO_BUILD_DURING_DEPLOYMENT=false` and `ENABLE_ORYX_BUILD=false`; startup packaging remains a certification concern for cold-start reliability.
+Staging app settings now include `WEBSITE_WARMUP_PATH=/api/health`, `WEBSITE_WARMUP_STATUSES=200`, `WEBSITE_SKIP_NODE_MODULES_TAR=1`, `SCM_DO_BUILD_DURING_DEPLOYMENT=false`, and `ENABLE_ORYX_BUILD=false`. Sanitized Kudu logs still show platform `NodeProjectOptimizer` zipping `node_modules` into `node_modules.tar.gz`, so the optimization appears to be App Service platform behavior rather than source package manifest detection alone.
 
 ## Production Health
 
@@ -68,20 +69,19 @@ The staging slot recovered after the current standalone package deployment and a
 - https://app-jm1-pub-prod-staging.azurewebsites.net/robots.txt: 200
 - https://app-jm1-pub-prod-staging.azurewebsites.net/sitemap.xml: 200
 
-Warm steady-state staging health now passes on the deployed PR head:
+Warm staging health returns 200 ready on the deployed PR head:
 
-- Probe file: /tmp/jm1-gate-w1-warm-10probe-20260729T101609Z.jsonl
-- Count: 10
-- Result: all 10 probes returned 200 ready
-- Release: 7c6a043e928723c116715d93acbe61441c45f881
-- Response-time range: 0.186060 to 0.435309 seconds
+- Release: a3a006bcf8839326f4270e789c1697c0d1ad68b7
+- Payment gate: disabled
+- Route duration: 0-17 ms in sampled warm health responses
 
 Restart-adjacent health remains unstable, though the hardened package recovered:
 
-- Immediately after deployment, `/api/health` returned a plain 500 before explicit restart.
-- First post-restart `/api/health`: 200 after approximately 3 seconds, with release match.
-- A later restart-adjacent probe sequence observed a transient 502 and multiple 20-second timeout windows before recovery.
-- Later warm route health recovered to 200 ready with route duration 1 ms.
+- Probe file: /tmp/jm1-staging-a3a006b-restart-20probe-20260729T112057Z.jsonl
+- Attempts 1-4 returned 200 ready on `a3a006bcf8839326f4270e789c1697c0d1ad68b7`.
+- Attempts 5-10 timed out after 20 seconds with no response.
+- Attempts 11-20 recovered to 200 ready; uptime reset to 9 seconds on attempt 11.
+- Sanitized platform logs show startup probe failure, container stop, later restart, and eventual startup probe success.
 
 Auto-swap remains disabled for the staging slot. Production cutover was performed through DNS and direct production App Service package deployment, not through an automatic slot swap.
 
