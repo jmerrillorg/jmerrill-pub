@@ -4,6 +4,7 @@
   "workstream": "Digital Experience Modernization",
   "subject": "JMerrill.Pub App Service Reference Completion",
   "executionTimestampUtc": "2026-07-29T07:50:00Z",
+  "continuationTimestampUtc": "2026-07-29T08:25:00Z",
   "repository": {
     "branch": "codex/jm1-infra-006-phase2-staging-certification",
     "headSha": "a9304f2d85af4d6b53fe6d36b957c28f2cdddb40",
@@ -59,7 +60,14 @@
     "appServiceGithubActionsRelease": "source_present_not_proven",
     "stagingRuntimeStability": "blocked_restart_timeouts_then_recovery",
     "nativeStagingAuthorGateMasterIssuance": "pass_cookie_context_logout_post_logout_401",
-    "nativeStagingAuthorGateDiagnostics": "env_registry_one_active_grant_pepper_and_session_secret_configured"
+    "nativeStagingAuthorGateDiagnostics": "env_registry_one_active_grant_pepper_and_session_secret_configured",
+    "cloudflareTurnstileWidget": "created_restricted_widget_no_unrestricted_hostnames",
+    "cloudflareTurnstileHostnames": "jmerrill.pub_www.jmerrill.pub_app-jm1-pub-prod-staging.azurewebsites.net",
+    "turnstileKeyVaultRotation": "completed_values_not_logged_temp_files_cleared",
+    "stagingTurnstileConfigAfterRotation": "pass_200_site_key_present",
+    "stagingTurnstileWidgetRender": "pass_widget_rendered",
+    "positiveJoinSubmissionContinuation": "blocked_turnstile_failure_retry_no_browser_token",
+    "turnstileSiteverifyInvalidToken": "pass_400_turnstile_verification_failed_invalid_input_response"
   },
   "decision": "NOT_CERTIFIED",
   "deliverables": [

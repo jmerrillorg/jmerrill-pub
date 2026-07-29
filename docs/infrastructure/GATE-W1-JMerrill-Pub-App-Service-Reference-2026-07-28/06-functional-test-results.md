@@ -27,11 +27,17 @@ Validated:
 - Intake config endpoint returns a Turnstile site key presence signal.
 - Invalid Turnstile token fails safely with 400 and code turnstile_verification_failed.
 - Invalid-token request did not emit a reference identifier.
-- Automated browser inspection of the staging `/join` page still recorded Cloudflare Turnstile client warning `110200`.
+- A restricted Cloudflare Turnstile widget named `JM1 Publishing /join` was created in the available Cloudflare account after no existing widget was visible.
+- Hostname management on the created widget is limited to `jmerrill.pub`, `www.jmerrill.pub`, and `app-jm1-pub-prod-staging.azurewebsites.net`; Managed mode remained selected and pre-clearance remained off.
+- `TURNSTILE-SITE-KEY` and `TURNSTILE-SECRET-KEY` were rotated through `jm1-core-vault` without retaining or logging the secret values.
+- Staging `/api/health` returned 200 ready after the staging slot restart.
+- Staging `/api/publishing/intake/config` returned 200 with a valid Turnstile site-key presence signal after Key Vault rotation.
+- Browser inspection of staging `/join` rendered the Cloudflare Turnstile widget for the App Service staging hostname, replacing the prior `110200` domain-not-authorized result.
+- A controlled invalid-token POST to staging `/api/publishing/intake` failed safely with `turnstile_verification_failed` and `invalid-input-response`, confirming the server-side Turnstile secret path is wired to Cloudflare siteverify.
 
 Not completed:
 
-- Positive synthetic /join submission. The production Turnstile widget still did not issue a token on the staging hostname, and no bypass was introduced.
+- Positive synthetic /join submission. The newly created restricted Turnstile widget rendered on the staging hostname, but Cloudflare returned `failure_retry` in the controlled desktop browser session and did not issue a valid token. The form remained disabled and no bypass was introduced.
 
 ## Author Operating Center
 
