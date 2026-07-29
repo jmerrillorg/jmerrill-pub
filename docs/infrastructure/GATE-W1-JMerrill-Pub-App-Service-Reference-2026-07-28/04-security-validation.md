@@ -36,6 +36,8 @@ Staging certification-only synthetic test:
 - A safe registry inspection found no synthetic/certification fixture marker in the current active registry.
 - Staging `/api/author/gate` was tested with the configured master access secret without printing or retaining the secret. The gate returned 200 and issued `jm1_author_portal_session`.
 - `/api/author/context` from the issued cookie returned 200.
+- No-cookie `/api/author/context` returned 401.
+- A forged fallback-style session attempt returned 401.
 - `/api/author/logout` returned 200.
 - `/api/author/context` after logout returned 401.
 

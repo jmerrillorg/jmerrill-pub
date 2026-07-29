@@ -32,12 +32,12 @@ Validated:
 - `TURNSTILE-SITE-KEY` and `TURNSTILE-SECRET-KEY` were rotated through `jm1-core-vault` without retaining or logging the secret values.
 - Staging `/api/health` returned 200 ready after the staging slot restart.
 - Staging `/api/publishing/intake/config` returned 200 with a valid Turnstile site-key presence signal after Key Vault rotation.
-- Browser inspection of staging `/join` rendered the Cloudflare Turnstile widget for the App Service staging hostname, replacing the prior `110200` domain-not-authorized result.
+- Browser inspection of staging `/join` rendered the Cloudflare Turnstile widget for the App Service staging hostname, replacing the prior `110200` domain-not-authorized result and later `failure_retry` state.
 - A controlled invalid-token POST to staging `/api/publishing/intake` failed safely with `turnstile_verification_failed` and `invalid-input-response`, confirming the server-side Turnstile secret path is wired to Cloudflare siteverify.
 
 Not completed:
 
-- Positive synthetic /join submission. The newly created restricted Turnstile widget rendered on the staging hostname, but Cloudflare returned `failure_retry` in the controlled desktop browser session and did not issue a valid token. The form remained disabled and no bypass was introduced.
+- Positive synthetic /join submission. The newly created restricted Turnstile widget rendered on the staging hostname, but remained at `Verifying...` in the controlled desktop browser session and did not issue a valid token. The form remained disabled and no bypass was introduced.
 
 ## Author Operating Center
 
@@ -51,7 +51,7 @@ Validated:
 - Logout returned 200 and post-logout context returned 401.
 - Temporary staging synthetic access settings were removed and restored to Key Vault references.
 - Logout route clears the author portal cookie.
-- After deployment of `a9304f2d85af4d6b53fe6d36b957c28f2cdddb40`, `/api/health` returned non-secret author-access diagnostics showing `env_registry`, one active grant, configured pepper, and configured session secret.
+- After deployment of `7c6a043e928723c116715d93acbe61441c45f881`, `/api/health` returned non-secret author-access diagnostics showing `env_registry`, one active grant, configured pepper, and configured session secret.
 - Safe registry inspection found no synthetic fixture marker in the active registry.
 - Staging `/api/author/gate` master-code isolation test returned 200, issued the author portal cookie, allowed context retrieval, and logout invalidated the session.
 
@@ -59,7 +59,7 @@ Not completed:
 
 - Positive synthetic access-code issuance against a governed certification-only grant. The active registry does not contain the synthetic fixture grant.
 - Fresh own-artifact download proof after the prior fixture retirement. The previous governed fixture proved own-artifact 200 and cross-author 404, but those synthetic Dataverse and SharePoint rows were retired after the earlier evidence window.
-- Stable staging health. Restart-adjacent `/api/health` probes timed out before later warm recovery.
+- Stable restart-adjacent staging health. Warm steady-state `/api/health` passed ten consecutive probes, but restart-adjacent probes still showed a transient 502 and timeout windows before later warm recovery.
 
 ## Accessibility, Performance, Metadata
 
