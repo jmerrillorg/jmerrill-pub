@@ -30,11 +30,13 @@ The current branch was built with npm and packaged as a standalone Next.js artif
 
 On 2026-07-29, staging auto-swap was disabled after readback showed `autoSwapSlotName: production`. Current PR head 91152240cc23c2967d32af0e1393d353f1cae6ee was built as a standalone App Service package and deployed to the staging slot only.
 
-- Package: /tmp/jm1-gate-w1-appsvc-staging-20260729T021042Z.zip
-- Package SHA-256: ce38298cdc9d901ffd1a064400606c6fd34cabb9b2bf321eb3a6b6f05372a72e
+- Package: /tmp/jm1-gate-w1-appsvc-staging-clean-20260729T024232Z.zip
+- Package SHA-256: 76006c49c96793020359494d9dce32a7dad6a38c619624d8b5c67cbb8e824b4e
 - Deployment ID: af7a6585-e765-4072-b7bb-cae0ef1443fb
 - Staging release setting: JM1_RELEASE_SHA=91152240cc23c2967d32af0e1393d353f1cae6ee
 - Auto-swap after correction: disabled
+
+The final clean redeploy command returned a deployment-client 502 while polling Kudu, but the staging app served the expected branch runtime afterward. The package was built after confirming the working tree had no diagnostic-code diff. Health and public route smoke tests were rerun from the staging hostname after restore.
 
 ## Production Health
 
@@ -49,7 +51,7 @@ Health check over the App Service target IP with canonical host headers:
 
 ## Staging
 
-The staging slot initially recovered after the current standalone package deployment and after restoring Key Vault-backed author settings:
+The staging slot recovered after the current standalone package deployment and after restoring Key Vault-backed author settings:
 
 - https://app-jm1-pub-prod-staging.azurewebsites.net/api/health: 200
 - https://app-jm1-pub-prod-staging.azurewebsites.net/: 200
@@ -59,10 +61,11 @@ The staging slot initially recovered after the current standalone package deploy
 - https://app-jm1-pub-prod-staging.azurewebsites.net/robots.txt: 200
 - https://app-jm1-pub-prod-staging.azurewebsites.net/sitemap.xml: 200
 
-Final readback after the PR check completed did not remain healthy:
+Restart-adjacent health was unstable during the author-gate proof:
 
-- https://app-jm1-pub-prod-staging.azurewebsites.net/api/health: timed out after 20 seconds
-- https://app-jm1-pub-prod-staging.azurewebsites.net/api/health: timed out after 60 seconds
+- First post-restart `/api/health`: 200 after 37.064790 seconds.
+- Second and third post-restart `/api/health`: timed out after 45 seconds.
+- Later warm route smoke recovered to `/api/health`: 200 after 1.135840 seconds.
 
 Auto-swap remains disabled for the staging slot. Production cutover was performed through DNS and direct production App Service package deployment, not through an automatic slot swap.
 
@@ -72,4 +75,4 @@ Slot-swap validation remains incomplete. An earlier staging-to-production swap a
 
 App Service CI/CD validation remains incomplete because the active GitHub Actions workflow still targets Azure Static Web Apps. This is tracked as GATE-W1-EX-006.
 
-Staging runtime stability remains incomplete because final health probes timed out after the slot initially recovered. This is tracked as GATE-W1-EX-007.
+Staging runtime stability remains incomplete because restart-adjacent health probes timed out before later recovery. This is tracked as GATE-W1-EX-007.

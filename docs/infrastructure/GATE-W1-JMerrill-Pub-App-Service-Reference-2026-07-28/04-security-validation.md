@@ -32,9 +32,12 @@ Former-fallback rejection remained within the certified PR #337 runtime matrix a
 Staging certification-only synthetic test:
 
 - Temporary staging-only synthetic author access settings were applied without real author credentials or manuscript content.
-- /api/author/gate returned 401 and issued no cookie.
+- The first attempt without explicit restart returned 401 while slot setting readback showed the synthetic values were present.
+- After explicit staging restart, `/api/author/gate` returned 200, issued `jm1_author_portal_session`, and `/api/author/context` returned 200 from a trusted relationship-scoped session for the synthetic reference.
 - /api/author/context without a valid cookie returned 401.
+- Former-fallback forged session returned 401.
 - /api/author/logout returned 200 and emitted a clearing Set-Cookie header.
+- /api/author/context after logout returned 401.
 - Key Vault-backed staging author settings were restored after the test.
 - Readback confirmed AUTHOR_PORTAL_ACCESS_REGISTRY_JSON, AUTHOR_PORTAL_MASTER_ACCESS_CODE, AUTHOR_PORTAL_ACCESS_CODE_PEPPER, and AUTHOR_PORTAL_SESSION_SECRET were again Key Vault references.
 
@@ -47,6 +50,6 @@ Production publishing intake invalid Turnstile request:
 - Code: turnstile_verification_failed
 - Reference emitted: no
 
-## Open Security-Relevant Exception
+## Security-Relevant Exception
 
-Native staging Author Operating Center session issuance through /api/author/gate did not accept temporary synthetic access settings. The route failed closed with 401 and no cookie issuance. This is safe, but it prevents reference certification until a governed synthetic issuance path is proven.
+Native staging Author Operating Center session issuance is now proven, but the test demonstrated that staging runtime changes require an explicit restart and warmup window before the route reliably observes temporary slot settings. This is safe but should be codified in the App Service deployment and rollback procedure.
