@@ -225,7 +225,7 @@ func appSettings(appInsightsConnectionString string, vaultUri string, slotEnviro
   setting('NODE_ENV', 'production', false)
   setting('SCM_DO_BUILD_DURING_DEPLOYMENT', 'false', false)
   setting('ENABLE_ORYX_BUILD', 'false', false)
-  setting('WEBSITE_RUN_FROM_PACKAGE', '0', false)
+  setting('WEBSITE_RUN_FROM_PACKAGE', '1', false)
   setting('WEBSITE_SKIP_NODE_MODULES_TAR', '1', false)
   setting('WEBSITE_WARMUP_PATH', '/api/health', false)
   setting('WEBSITE_WARMUP_STATUSES', '200', false)
