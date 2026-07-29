@@ -3,10 +3,10 @@
   "program": "JM1 Implementation",
   "workstream": "Digital Experience Modernization",
   "subject": "JMerrill.Pub App Service Reference Completion",
-  "executionTimestampUtc": "2026-07-28T15:41:14Z",
+  "executionTimestampUtc": "2026-07-29T02:20:00Z",
   "repository": {
     "branch": "codex/jm1-infra-006-phase2-staging-certification",
-    "headSha": "16903023640d955c1dc44db18ce8f161e2c9e915",
+    "headSha": "91152240cc23c2967d32af0e1393d353f1cae6ee",
     "baseMainSha": "f3f2a9fc96627fc23327e58b7eddbe6f50365a93",
     "pullRequest": 349
   },
@@ -22,11 +22,16 @@
     "logAnalyticsWorkspace": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e-rg-jm1-core-EUS"
   },
   "deployment": {
-    "packagePath": "/tmp/jm1-gate-w1-appsvc-production-20260728T145044Z.zip",
+    "productionPackagePath": "/tmp/jm1-gate-w1-appsvc-production-20260728T145044Z.zip",
     "packageSha256": "4f5ef6159127cbedf2ce8cdb57507de1efc68a651e15a192b9d1df30ab1bfe16",
-    "releaseSha": "16903023640d955c1dc44db18ce8f161e2c9e915",
+    "productionReleaseSha": "16903023640d955c1dc44db18ce8f161e2c9e915",
+    "stagingPackagePath": "/tmp/jm1-gate-w1-appsvc-staging-20260729T021042Z.zip",
+    "stagingPackageSha256": "ce38298cdc9d901ffd1a064400606c6fd34cabb9b2bf321eb3a6b6f05372a72e",
+    "stagingReleaseSha": "91152240cc23c2967d32af0e1393d353f1cae6ee",
+    "stagingDeploymentId": "af7a6585-e765-4072-b7bb-cae0ef1443fb",
     "productionHealth": "200",
-    "stagingHealthAfterRestore": "200"
+    "stagingHealthAfterRestore": "200_then_final_timeout_after_20s_and_60s",
+    "stagingAutoSwap": "disabled"
   },
   "domains": {
     "apex": "jmerrill.pub",
@@ -44,10 +49,12 @@
     "workerUnauthenticated": "pass",
     "invalidTurnstile": "pass",
     "positiveJoinSubmission": "blocked",
-    "nativeStagingAuthorGateSyntheticSession": "blocked",
+    "nativeStagingAuthorGateSyntheticSession": "blocked_401_no_cookie",
     "rollbackProof": "blocked",
     "diagnostics": "pass",
-    "alerts": "partial"
+    "alerts": "partial",
+    "appServiceGithubActionsRelease": "blocked",
+    "stagingRuntimeStability": "blocked"
   },
   "decision": "NOT_CERTIFIED",
   "deliverables": [

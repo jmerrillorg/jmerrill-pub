@@ -32,9 +32,11 @@ If Publishing App Service must be backed out before final reference certificatio
 ## Slot Strategy
 
 - Staging slot exists.
-- Auto-swap is disabled.
+- Auto-swap was found enabled for staging with `autoSwapSlotName: production` during the 2026-07-29 review.
+- Auto-swap was disabled on staging during GATE-W1 remediation.
+- Post-remediation readback confirmed `autoSwapSlotName: null`.
 - Production package deployment was completed directly.
 
 ## Exception
 
-A clean slot-swap rollback proof is not complete. An earlier swap attempt hung and was cancelled; staging later recovered after direct restart. This prevents reference certification until rollback is tested or a governed alternative rollback proof is accepted.
+A clean slot-swap rollback proof is not complete. An earlier swap attempt hung and was cancelled; staging later recovered after direct restart and a standalone redeployment. This prevents reference certification until rollback is tested or a governed alternative rollback proof is accepted.
