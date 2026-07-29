@@ -125,6 +125,34 @@ test('v2 canonical hashed access grant accepts approved variants through compact
   assert.equal(compactGrant?.intakeReference, 'JMP-INT-202607-0W5PTQ')
 })
 
+test('wrapped access registry records accept staging-friendly snake case aliases', () => {
+  process.env.AUTHOR_PORTAL_ACCESS_REGISTRY_JSON = JSON.stringify({
+    grants: [
+      {
+        status: 'active',
+        access_code_hash: hashPortalCode(CANONICAL_COMPACT),
+        access_code_version: 'activation-code-v2',
+        intake_reference: 'JMP-CERT-ONLY-OWN',
+        project_ids: ['JMP-CERT-ONLY-OWN', 'own-artifact-fixture'],
+        contact_id: '11111111-1111-1111-1111-111111111111',
+        contact_email: 'synthetic-author-certification@example.invalid',
+        opportunity_id: '22222222-2222-2222-2222-222222222222',
+        scope: 'relationship',
+      },
+    ],
+  })
+
+  const grant = access.resolveAuthorPortalAccessGrant({
+    code: 'jmp-bygs 7yac-mkbs',
+    requestedReference: 'own-artifact-fixture',
+  })
+
+  assert.ok(grant)
+  assert.equal(grant?.scope, 'relationship')
+  assert.equal(grant?.intakeReference, 'own-artifact-fixture')
+  assert.equal(grant?.contactEmail, 'synthetic-author-certification@example.invalid')
+})
+
 test('master access code also accepts normalized variants', () => {
   process.env.AUTHOR_PORTAL_MASTER_ACCESS_CODE = 'JMP-PORTAL-ADMIN-2026'
 

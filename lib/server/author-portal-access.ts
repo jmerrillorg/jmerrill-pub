@@ -71,9 +71,10 @@ export function parseAuthorPortalAccessRegistry(raw: string | undefined) {
 
   try {
     const parsed = JSON.parse(raw) as unknown
-    if (!Array.isArray(parsed)) return []
+    const records = readRegistryRecords(parsed)
+    if (!records.length) return []
 
-    return parsed
+    return records
       .map((entry) => normalizeGrant(entry))
       .filter((entry): entry is AuthorPortalAccessGrant => Boolean(entry))
   } catch {
@@ -287,41 +288,71 @@ function normalizeGrant(entry: unknown): AuthorPortalAccessGrant | null {
   if (!entry || typeof entry !== 'object') return null
 
   const record = entry as Record<string, unknown>
-  const code = optionalString(record.code) || optionalString(record.accessCode) || ''
-  const accessCodeHash = optionalString(record.accessCodeHash)
+  const code = optionalString(record.code) || optionalString(record.accessCode) || optionalString(record.access_code) || ''
+  const accessCodeHash =
+    optionalString(record.accessCodeHash) ||
+    optionalString(record.access_code_hash) ||
+    optionalString(record.codeHash) ||
+    optionalString(record.code_hash)
   if (!code && !accessCodeHash) return null
 
   const scope =
     record.scope === 'relationship' || record.scope === 'project'
       ? record.scope
-      : optionalString(record.contactId) && readStringArray(record.projectIds).length > 1
+      : (optionalString(record.contactId) || optionalString(record.contact_id)) &&
+          readStringArray(record.projectIds || record.project_ids).length > 1
         ? 'relationship'
         : 'project'
 
-  const projectIds = readStringArray(record.projectIds)
+  const projectIds = readStringArray(record.projectIds || record.project_ids)
   const intakeReference =
     optionalString(record.intakeReference) ||
+    optionalString(record.intake_reference) ||
+    optionalString(record.intakeReferenceCode) ||
+    optionalString(record.intake_reference_code) ||
     optionalString(record.projectId) ||
+    optionalString(record.project_id) ||
     projectIds[0]
 
   return {
     code,
     accessCodeHash,
     accessCodeVersion:
-      record.accessCodeVersion === ACTIVATION_CODE_V1 || record.accessCodeVersion === ACTIVATION_CODE_V2
-        ? record.accessCodeVersion
+      record.accessCodeVersion === ACTIVATION_CODE_V1 ||
+      record.access_code_version === ACTIVATION_CODE_V1 ||
+      record.accessCodeVersion === ACTIVATION_CODE_V2 ||
+      record.access_code_version === ACTIVATION_CODE_V2
+        ? record.accessCodeVersion === ACTIVATION_CODE_V1 || record.access_code_version === ACTIVATION_CODE_V1
+          ? ACTIVATION_CODE_V1
+          : ACTIVATION_CODE_V2
         : undefined,
     status: optionalString(record.status),
     intakeReference,
     projectIds,
     title: optionalString(record.title) || optionalString(record.titleName),
-    titleSlug: optionalString(record.titleSlug),
-    contactId: optionalString(record.contactId),
-    contactEmail: optionalString(record.contactEmail),
-    opportunityId: optionalString(record.opportunityId),
-    expiresAt: optionalIsoDate(record.expiresAt) || optionalIsoDate(record.expiresOn),
+    titleSlug: optionalString(record.titleSlug) || optionalString(record.title_slug),
+    contactId: optionalString(record.contactId) || optionalString(record.contact_id),
+    contactEmail: optionalString(record.contactEmail) || optionalString(record.contact_email),
+    opportunityId: optionalString(record.opportunityId) || optionalString(record.opportunity_id),
+    expiresAt:
+      optionalIsoDate(record.expiresAt) ||
+      optionalIsoDate(record.expires_at) ||
+      optionalIsoDate(record.expiresOn) ||
+      optionalIsoDate(record.expires_on),
     scope,
   }
+}
+
+function readRegistryRecords(value: unknown): unknown[] {
+  if (Array.isArray(value)) return value
+  if (!value || typeof value !== 'object') return []
+
+  const record = value as Record<string, unknown>
+  for (const key of ['grants', 'records', 'accessGrants', 'access_grants']) {
+    if (Array.isArray(record[key])) return record[key]
+  }
+
+  return []
 }
 
 function optionalString(value: unknown) {
