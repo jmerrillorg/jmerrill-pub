@@ -31,7 +31,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: publishing-app-service-${{ github.ref }}
+  group: publishing-app-service-${{ github.ref }}-staging
   cancel-in-progress: false
 
 env:
@@ -93,6 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment: jmerrill-pub-staging
+    timeout-minutes: 30
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v4
@@ -100,7 +101,13 @@ jobs:
           name: jmerrill-pub-appservice-${{ github.sha }}
 
       - name: Verify Artifact Checksum
-        run: shasum -a 256 -c "${APP_SERVICE_PACKAGE}.sha256"
+        shell: bash
+        run: |
+          set -euo pipefail
+          shasum -a 256 -c "${APP_SERVICE_PACKAGE}.sha256"
+          checksum="$(cut -d ' ' -f 1 "${APP_SERVICE_PACKAGE}.sha256")"
+          echo "artifact_checksum=$checksum" >> "$GITHUB_ENV"
+          echo "Artifact checksum: $checksum"
 
       - name: Azure Login
         uses: azure/login@v2
@@ -109,9 +116,29 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy Immutable Artifact To Staging
+      - name: Guard App Service Staging Target
+        shell: bash
         run: |
           set -euo pipefail
+          : "${AZURE_RESOURCE_GROUP:?JM1_PUB_APP_SERVICE_RESOURCE_GROUP repository variable is required}"
+          : "${AZURE_WEBAPP_NAME:?JM1_PUB_APP_SERVICE_NAME repository variable is required}"
+          if [ "$AZURE_WEBAPP_NAME" != "app-jm1-pub-prod" ] || [ "$AZURE_STAGING_SLOT" != "staging" ]; then
+            echo "Refusing to deploy outside app-jm1-pub-prod / staging." >&2
+            exit 1
+          fi
+          app_id="$(az webapp show \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --query id \
+            --output tsv)"
+          slot_id="$(az webapp show \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --slot "$AZURE_STAGING_SLOT" \
+            --query id \
+            --output tsv)"
+          echo "Target app: $app_id"
+          echo "Target slot: $slot_id"
           az webapp config set \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$AZURE_WEBAPP_NAME" \
@@ -123,6 +150,15 @@ jobs:
             --slot "$AZURE_STAGING_SLOT" \
             --settings JM1_RELEASE_SHA="${{ github.sha }}" SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false WEBSITE_RUN_FROM_PACKAGE=1 WEBSITE_SKIP_NODE_MODULES_TAR=1 WEBSITE_WARMUP_PATH=/api/health WEBSITE_WARMUP_STATUSES=200 \
             --output none
+          before_target_slot="$(az webapp deployment slot auto-swap \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --slot "$AZURE_STAGING_SLOT" \
+            --query targetSlot \
+            --output tsv)"
+          if [ -n "$before_target_slot" ]; then
+            echo "Disabling unexpected staging auto-swap target: $before_target_slot"
+          fi
           az webapp deployment slot auto-swap \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$AZURE_WEBAPP_NAME" \
@@ -139,31 +175,53 @@ jobs:
             echo "Staging auto-swap remains enabled for target: $target_slot" >&2
             exit 1
           fi
-          az webapp deploy \
+
+      - name: Deploy Immutable Artifact To Staging
+        uses: azure/webapps-deploy@v3
+        timeout-minutes: 12
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ env.AZURE_STAGING_SLOT }}
+          package: ${{ env.APP_SERVICE_PACKAGE }}
+
+      - name: Restart And Capture Staging Deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          az webapp restart \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --slot "$AZURE_STAGING_SLOT"
+          deployment_id="$(az webapp deployment list \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$AZURE_WEBAPP_NAME" \
             --slot "$AZURE_STAGING_SLOT" \
-            --src-path "$APP_SERVICE_PACKAGE" \
-            --type zip \
-            --clean true \
-            --restart true \
-            --async true \
-            --track-status false \
-            --enable-kudu-warmup false
+            --query '[0].id' \
+            --output tsv || true)"
+          echo "deployment_id=$deployment_id" >> "$GITHUB_ENV"
+          echo "Deployment ID: ${deployment_id:-not-reported}"
 
       - name: Staging Health Certification
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in {1..18}; do
+          successes=0
+          for attempt in {1..30}; do
             body="$(mktemp)"
             code="$(curl -fsS -o "$body" -w '%{http_code}' --max-time 20 "$STAGING_HEALTH_URL" || true)"
             if [ "$code" = "200" ] && node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready' || h.release !== process.argv[2]) process.exit(1)" "$body" "${{ github.sha }}"; then
-              exit 0
+              successes=$((successes + 1))
+              echo "Health probe $attempt succeeded for ${{ github.sha }} ($successes/10)."
+              if [ "$successes" -ge 10 ]; then
+                exit 0
+              fi
+            else
+              successes=0
+              echo "Health probe $attempt failed or release mismatch; resetting consecutive count."
             fi
             sleep 10
           done
-          echo "Staging health did not reach ready for ${{ github.sha }}." >&2
+          echo "Staging health did not reach 10 consecutive ready probes for ${{ github.sha }}." >&2
           exit 1
 
   promote_production:
