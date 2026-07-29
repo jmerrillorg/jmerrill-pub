@@ -332,21 +332,21 @@ export async function resolveAuthorPortalContext(
       (session.contactId
         ? await dataverseFirst(config, 'contacts', {
             $select:
-              'contactid,fullname,firstname,lastname,emailaddress1,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
+              'contactid,fullname,firstname,lastname,emailaddress1,jm1pub_isauthor,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
             $filter: `contactid eq ${session.contactId}`,
           })
         : null) ||
       (dataverseLookupId(scopedOpportunity || {}, '_parentcontactid_value')
         ? await dataverseFirst(config, 'contacts', {
             $select:
-              'contactid,fullname,firstname,lastname,emailaddress1,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
+              'contactid,fullname,firstname,lastname,emailaddress1,jm1pub_isauthor,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
             $filter: `contactid eq ${dataverseLookupId(scopedOpportunity || {}, '_parentcontactid_value')}`,
           })
         : null) ||
       (session.contactEmail || stringValue(intake?.jm1_email)
         ? await dataverseFirst(config, 'contacts', {
             $select:
-              'contactid,fullname,firstname,lastname,emailaddress1,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
+              'contactid,fullname,firstname,lastname,emailaddress1,jm1pub_isauthor,jm1pub_authorbio,jm1pub_publicauthorbio,jm1pub_authorwebsite,jm1pub_authorfacebook,jm1pub_authorinstagram,jm1pub_authorxtwitter',
             $filter: `emailaddress1 eq '${escapeODataText(session.contactEmail || stringValue(intake?.jm1_email))}'`,
           })
         : null)
@@ -1243,7 +1243,7 @@ async function getRelationshipBackedTitles(
     $top: '25',
   })
 
-  if (relationships.length === 0) return []
+  if (relationships.length === 0 && contact?.jm1pub_isauthor !== true) return []
 
   const titles = await dataverseList(config, 'jm1pub_titles', {
     $select:
