@@ -1,0 +1,54 @@
+{
+  "capturedAt": "2026-07-30T12:45:05.809646+00:00",
+  "host": "app-jm1-fin-prod-staging.azurewebsites.net",
+  "results": [
+    {
+      "attempt": 1,
+      "timestamp": "2026-07-30T12:43:04.721519+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 2,
+      "timestamp": "2026-07-30T12:43:34.972262+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 3,
+      "timestamp": "2026-07-30T12:44:05.129714+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 4,
+      "timestamp": "2026-07-30T12:44:35.315805+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 5,
+      "timestamp": "2026-07-30T12:44:55.807420+00:00",
+      "status": "ok",
+      "httpStatus": 200,
+      "body": {
+        "status": "ready",
+        "service": "JM1 Enterprise Web Platform",
+        "message": "Infrastructure Ready. Production traffic has not migrated.",
+        "property": "jmerrill.financial",
+        "environment": "staging",
+        "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+        "traffic_migrated": false
+      },
+      "validContract": true
+    }
+  ]
+}

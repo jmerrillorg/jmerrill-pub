@@ -1,0 +1,19 @@
+{
+  "program": "JM1-INFRA-006",
+  "gate": "GATE-W3",
+  "status": "PARTIALLY_COMPLETE",
+  "blockingTarget": "app-jm1-productions-prod/staging",
+  "blocker": "OneDeploy 504.0 GatewayTimeout after Node 22 standardization; no deployment ID captured",
+  "completedTargets": [
+    "app-jm1-one-prod/staging",
+    "app-jm1-fin-prod/staging",
+    "app-jm1-foundation-prod/staging"
+  ],
+  "implementationCompleteRecorded": false,
+  "scmBasicEnabled": false,
+  "ftpBasicEnabled": false,
+  "productionMigrations": 0,
+  "dnsChanges": 0,
+  "staticWebAppsRetired": 0,
+  "completedAt": "2026-07-30T13:11:17.558397+00:00"
+}

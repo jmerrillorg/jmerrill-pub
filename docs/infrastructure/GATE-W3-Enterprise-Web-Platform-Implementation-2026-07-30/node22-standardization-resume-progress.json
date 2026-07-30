@@ -1,0 +1,455 @@
+{
+  "updatedAt": "2026-07-30T12:56:33.768459+00:00",
+  "artifactSha256": "913fd27cdac46baadffe636527dc5582ed23125f91468d056127887fd5293652",
+  "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+  "results": [
+    {
+      "app": "app-jm1-foundation-prod",
+      "slot": "staging",
+      "domain": "jmerrill.foundation",
+      "startedAt": "2026-07-30T12:46:50.128404+00:00",
+      "basicBefore": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "runtimeConfigSet": {
+        "ok": true,
+        "error": null
+      },
+      "nonSecretAppSettingsSet": {
+        "ok": true,
+        "names": [
+          "JM1_RELEASE_ID",
+          "JM1_WEB_GATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_SLOT_ENVIRONMENT",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "ENABLE_ORYX_BUILD",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false,
+        "error": null
+      },
+      "deploymentResult": {
+        "ok": true,
+        "durationSeconds": 138.934,
+        "exitCode": null,
+        "stdoutTail": "WARNING: Note: 'az webapp deploy' does not run build automation (dependency installation, compilation, etc.) by default for Linux web apps. If your package is not pre-built, set the app setting SCM_DO_BUILD_DURING_DEPLOYMENT=true to enable builds during deployment.\nWARNING: Initiating deployment\nWARNING: Deploying from local path: /tmp/gate-w3-minimal-runtime-20260730.zip\nWARNING: Warming up Kudu before deployment.\nWARNING: Warmed up Kudu instance successfully.\nWARNING: Polling the status of sync deployment. Start Time: 2026-07-30 12:49:10.360622+00:00 UTC\nWARNING: Deployment has completed successfully\nWARNING: You can visit your app at: http://app-jm1-foundation-prod-staging.azurewebsites.net\n{\n  \"active\": true,\n  \"author\": \"N/A\",\n  \"author_email\": \"N/A\",\n  \"build_summary\": {\n    \"errors\": [],\n    \"warnings\": []\n  },\n  \"complete\": true,\n  \"deployer\": \"OneDeploy\",\n  \"end_time\": \"2026-07-30T12:49:01.875639Z\",\n  \"id\": \"d5205a38-d8df-4fe7-bfe9-593fcdc2f3e1\",\n  \"is_readonly\": true,\n  \"is_temp\": false,\n  \"last_success_end_time\": \"2026-07-30T12:49:01.875639Z\",\n  \"log_url\": \"https://app-jm1-foundation-prod-staging.scm.azurewebsites.net/api/deployments/d5205a38-d8df-4fe7-bfe9-593fcdc2f3e1/log\",\n  \"message\": \"OneDeploy\",\n  \"progress\": \"\",\n  \"received_time\": \"2026-07-30T12:48:43.4761166Z\",\n  \"site_name\": \"app-jm1-foundation-prod\",\n  \"start_time\": \"2026-07-30T12:48:49.3870761Z\",\n  \"status\": 4,\n  \"status_text\": \"\",\n  \"url\": \"https://app-jm1-foundation-prod-staging.scm.azurewebsites.net/api/deployments/d5205a38-d8df-4fe7-bfe9-593fcdc2f3e1\"\n}",
+        "errorTail": null
+      },
+      "deploymentHistory": {
+        "ok": true,
+        "count": 1,
+        "latest": [
+          {
+            "id": "d5205a38-d8df-4fe7-bfe9-593fcdc2f3e1",
+            "status": 4,
+            "message": "OneDeploy",
+            "receivedTime": null,
+            "endTime": null,
+            "author": "N/A"
+          }
+        ],
+        "error": null
+      },
+      "deploymentId": "d5205a38-d8df-4fe7-bfe9-593fcdc2f3e1",
+      "restart": {
+        "ok": true,
+        "timestamp": "2026-07-30T12:49:24.411900+00:00",
+        "error": null
+      },
+      "warmupValidation": {
+        "ready": true,
+        "attempts": [
+          {
+            "attempt": 1,
+            "timestamp": "2026-07-30T12:49:44.641132+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 2,
+            "timestamp": "2026-07-30T12:50:14.812997+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 3,
+            "timestamp": "2026-07-30T12:50:45.036455+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 4,
+            "timestamp": "2026-07-30T12:51:15.270934+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 5,
+            "timestamp": "2026-07-30T12:51:45.431362+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 6,
+            "timestamp": "2026-07-30T12:52:15.602952+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 7,
+            "timestamp": "2026-07-30T12:52:45.895269+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 8,
+            "timestamp": "2026-07-30T12:53:16.054231+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 9,
+            "timestamp": "2026-07-30T12:53:46.242069+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 10,
+            "timestamp": "2026-07-30T12:54:18.379496+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 11,
+            "timestamp": "2026-07-30T12:54:48.583502+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 12,
+            "timestamp": "2026-07-30T12:55:18.775185+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 13,
+            "timestamp": "2026-07-30T12:55:49.044106+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          },
+          {
+            "attempt": 14,
+            "timestamp": "2026-07-30T12:55:59.580592+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          }
+        ]
+      },
+      "healthValidation": {
+        "passed": true,
+        "successes": 10,
+        "required": 10,
+        "healthAttempts": [
+          {
+            "attempt": 1,
+            "timestamp": "2026-07-30T12:55:59.806111+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          },
+          {
+            "attempt": 2,
+            "timestamp": "2026-07-30T12:56:03.044277+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          },
+          {
+            "attempt": 3,
+            "timestamp": "2026-07-30T12:56:06.332561+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          },
+          {
+            "attempt": 4,
+            "timestamp": "2026-07-30T12:56:09.657049+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          },
+          {
+            "attempt": 5,
+            "timestamp": "2026-07-30T12:56:12.876067+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          },
+          {
+            "attempt": 6,
+            "timestamp": "2026-07-30T12:56:16.228257+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          },
+          {
+            "attempt": 7,
+            "timestamp": "2026-07-30T12:56:19.431474+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          },
+          {
+            "attempt": 8,
+            "timestamp": "2026-07-30T12:56:22.609618+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          },
+          {
+            "attempt": 9,
+            "timestamp": "2026-07-30T12:56:26.148349+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          },
+          {
+            "attempt": 10,
+            "timestamp": "2026-07-30T12:56:29.759408+00:00",
+            "result": {
+              "status": "ok",
+              "httpStatus": 200,
+              "contentType": "application/json",
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "staging",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "sample": null
+            },
+            "validContract": true
+          }
+        ],
+        "rootProbe": {
+          "status": "ok",
+          "httpStatus": 200,
+          "contentType": "application/json",
+          "body": {
+            "status": "ready",
+            "service": "JM1 Enterprise Web Platform",
+            "message": "Infrastructure Ready. Production traffic has not migrated.",
+            "property": "jmerrill.foundation",
+            "environment": "staging",
+            "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+            "traffic_migrated": false
+          },
+          "sample": null
+        },
+        "rootValid": true
+      },
+      "runtimeAfter": {
+        "linuxFxVersion": "NODE|22-lts",
+        "appCommandLine": "node server.js",
+        "healthCheckPath": "/"
+      },
+      "basicAfter": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "endedAt": "2026-07-30T12:56:33.768405+00:00",
+      "result": "PASS"
+    }
+  ]
+}

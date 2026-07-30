@@ -1,0 +1,549 @@
+{
+  "capturedAt": "2026-07-30T12:28:35.719698+00:00",
+  "resourceGroup": "rg-jm1-web-prod-appsvc",
+  "targets": [
+    {
+      "app": "app-jm1-fin-prod",
+      "slot": "staging",
+      "domain": "jmerrill.financial",
+      "defaultHostName": "app-jm1-fin-prod-staging.azurewebsites.net",
+      "site": {
+        "state": "Running",
+        "identityType": "SystemAssigned",
+        "principalId": "0c84e883-1600-469e-b7cb-cff41bc8f7f7",
+        "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux"
+      },
+      "runtime": {
+        "linuxFxVersion": "NODE|20-lts",
+        "appCommandLine": "node server.js",
+        "alwaysOn": true,
+        "healthCheckPath": "/"
+      },
+      "appSettings": {
+        "count": 19,
+        "names": [
+          "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "ENABLE_ORYX_BUILD",
+          "JM1_GATE",
+          "JM1_MIGRATION_STATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_PROPERTY_KEY",
+          "JM1_RELEASE_ID",
+          "JM1_RELEASE_SHA",
+          "JM1_SLOT_ENVIRONMENT",
+          "JM1_WEB_GATE",
+          "KEY_VAULT_URI",
+          "NODE_ENV",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "WEBSITE_NODE_DEFAULT_VERSION",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false
+      },
+      "basicPublishing": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "rootProbe": {
+        "status": "error",
+        "httpStatus": 503,
+        "errorType": "HTTPError"
+      },
+      "healthProbe": {
+        "status": "error",
+        "httpStatus": 503,
+        "errorType": "HTTPError"
+      },
+      "deploymentHistory": {
+        "preRollout": "not-blocking; full deployment IDs captured after standardization"
+      }
+    },
+    {
+      "app": "app-jm1-foundation-prod",
+      "slot": "staging",
+      "domain": "jmerrill.foundation",
+      "defaultHostName": "app-jm1-foundation-prod-staging.azurewebsites.net",
+      "site": {
+        "state": "Running",
+        "identityType": "SystemAssigned",
+        "principalId": "f9da95d8-077f-44c9-b23e-d8e470f909f1",
+        "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux"
+      },
+      "runtime": {
+        "linuxFxVersion": "NODE|20-lts",
+        "appCommandLine": "node server.js",
+        "alwaysOn": true,
+        "healthCheckPath": "/"
+      },
+      "appSettings": {
+        "count": 19,
+        "names": [
+          "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "ENABLE_ORYX_BUILD",
+          "JM1_GATE",
+          "JM1_MIGRATION_STATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_PROPERTY_KEY",
+          "JM1_RELEASE_ID",
+          "JM1_RELEASE_SHA",
+          "JM1_SLOT_ENVIRONMENT",
+          "JM1_WEB_GATE",
+          "KEY_VAULT_URI",
+          "NODE_ENV",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "WEBSITE_NODE_DEFAULT_VERSION",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false
+      },
+      "basicPublishing": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "deploymentHistory": {
+        "preRollout": "not-blocking; full deployment IDs captured after standardization"
+      }
+    },
+    {
+      "app": "app-jm1-productions-prod",
+      "slot": "staging",
+      "domain": "jmerrill.productions",
+      "defaultHostName": "app-jm1-productions-prod-staging.azurewebsites.net",
+      "site": {
+        "state": "Running",
+        "identityType": "SystemAssigned",
+        "principalId": "fd17133f-63a9-467e-ba97-cef9a2c78e41",
+        "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux"
+      },
+      "runtime": {
+        "linuxFxVersion": "NODE|20-lts",
+        "appCommandLine": "node server.js",
+        "alwaysOn": true,
+        "healthCheckPath": "/"
+      },
+      "appSettings": {
+        "count": 19,
+        "names": [
+          "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "ENABLE_ORYX_BUILD",
+          "JM1_GATE",
+          "JM1_MIGRATION_STATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_PROPERTY_KEY",
+          "JM1_RELEASE_ID",
+          "JM1_RELEASE_SHA",
+          "JM1_SLOT_ENVIRONMENT",
+          "JM1_WEB_GATE",
+          "KEY_VAULT_URI",
+          "NODE_ENV",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "WEBSITE_NODE_DEFAULT_VERSION",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false
+      },
+      "basicPublishing": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "deploymentHistory": {
+        "preRollout": "not-blocking; full deployment IDs captured after standardization"
+      }
+    },
+    {
+      "app": "app-jm1-jackiesmithjr-prod",
+      "slot": "staging",
+      "domain": "jackiesmithjr.com",
+      "defaultHostName": "app-jm1-jackiesmithjr-prod-staging.azurewebsites.net",
+      "site": {
+        "state": "Running",
+        "identityType": "SystemAssigned",
+        "principalId": "aefc0054-1b0c-41f8-a820-3a474869b34a",
+        "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux"
+      },
+      "runtime": {
+        "linuxFxVersion": "NODE|20-lts",
+        "appCommandLine": "node server.js",
+        "alwaysOn": true,
+        "healthCheckPath": "/"
+      },
+      "appSettings": {
+        "count": 19,
+        "names": [
+          "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "ENABLE_ORYX_BUILD",
+          "JM1_GATE",
+          "JM1_MIGRATION_STATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_PROPERTY_KEY",
+          "JM1_RELEASE_ID",
+          "JM1_RELEASE_SHA",
+          "JM1_SLOT_ENVIRONMENT",
+          "JM1_WEB_GATE",
+          "KEY_VAULT_URI",
+          "NODE_ENV",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "WEBSITE_NODE_DEFAULT_VERSION",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false
+      },
+      "basicPublishing": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "deploymentHistory": {
+        "preRollout": "not-blocking; full deployment IDs captured after standardization"
+      }
+    },
+    {
+      "app": "app-jm1-one-prod",
+      "slot": "production",
+      "domain": "jmerrill.one",
+      "defaultHostName": "app-jm1-one-prod.azurewebsites.net",
+      "site": {
+        "state": "Running",
+        "identityType": "SystemAssigned",
+        "principalId": "fb03e1ca-2cfb-4a8e-b58a-858723f73fbc",
+        "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux"
+      },
+      "runtime": {
+        "linuxFxVersion": "NODE|20-lts",
+        "appCommandLine": "node server.js",
+        "alwaysOn": true,
+        "healthCheckPath": "/"
+      },
+      "appSettings": {
+        "count": 19,
+        "names": [
+          "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "ENABLE_ORYX_BUILD",
+          "JM1_GATE",
+          "JM1_MIGRATION_STATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_PROPERTY_KEY",
+          "JM1_RELEASE_ID",
+          "JM1_RELEASE_SHA",
+          "JM1_SLOT_ENVIRONMENT",
+          "JM1_WEB_GATE",
+          "KEY_VAULT_URI",
+          "NODE_ENV",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "WEBSITE_NODE_DEFAULT_VERSION",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false
+      },
+      "basicPublishing": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "deploymentHistory": {
+        "preRollout": "not-blocking; full deployment IDs captured after standardization"
+      }
+    },
+    {
+      "app": "app-jm1-fin-prod",
+      "slot": "production",
+      "domain": "jmerrill.financial",
+      "defaultHostName": "app-jm1-fin-prod.azurewebsites.net",
+      "site": {
+        "state": "Running",
+        "identityType": "SystemAssigned",
+        "principalId": "8d99ef1e-d165-4728-93dc-44fde2a29c86",
+        "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux"
+      },
+      "runtime": {
+        "linuxFxVersion": "NODE|20-lts",
+        "appCommandLine": "node server.js",
+        "alwaysOn": true,
+        "healthCheckPath": "/"
+      },
+      "appSettings": {
+        "count": 20,
+        "names": [
+          "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "ENABLE_ORYX_BUILD",
+          "JM1_GATE",
+          "JM1_MIGRATION_STATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_PROPERTY_KEY",
+          "JM1_RELEASE_ID",
+          "JM1_RELEASE_SHA",
+          "JM1_SLOT_ENVIRONMENT",
+          "JM1_WEB_GATE",
+          "KEY_VAULT_URI",
+          "NODE_ENV",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+          "WEBSITE_NODE_DEFAULT_VERSION",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false
+      },
+      "basicPublishing": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "deploymentHistory": {
+        "preRollout": "not-blocking; full deployment IDs captured after standardization"
+      }
+    },
+    {
+      "app": "app-jm1-foundation-prod",
+      "slot": "production",
+      "domain": "jmerrill.foundation",
+      "defaultHostName": "app-jm1-foundation-prod.azurewebsites.net",
+      "site": {
+        "state": "Running",
+        "identityType": "SystemAssigned",
+        "principalId": "bce2f733-31ea-4b84-ba43-3290e75db9c6",
+        "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux"
+      },
+      "runtime": {
+        "linuxFxVersion": "NODE|20-lts",
+        "appCommandLine": "node server.js",
+        "alwaysOn": true,
+        "healthCheckPath": "/"
+      },
+      "appSettings": {
+        "count": 19,
+        "names": [
+          "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "ENABLE_ORYX_BUILD",
+          "JM1_GATE",
+          "JM1_MIGRATION_STATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_PROPERTY_KEY",
+          "JM1_RELEASE_ID",
+          "JM1_RELEASE_SHA",
+          "JM1_SLOT_ENVIRONMENT",
+          "JM1_WEB_GATE",
+          "KEY_VAULT_URI",
+          "NODE_ENV",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "WEBSITE_NODE_DEFAULT_VERSION",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false
+      },
+      "basicPublishing": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "deploymentHistory": {
+        "preRollout": "not-blocking; full deployment IDs captured after standardization"
+      }
+    },
+    {
+      "app": "app-jm1-productions-prod",
+      "slot": "production",
+      "domain": "jmerrill.productions",
+      "defaultHostName": "app-jm1-productions-prod.azurewebsites.net",
+      "site": {
+        "state": "Running",
+        "identityType": "SystemAssigned",
+        "principalId": "d342229f-1a3e-4169-9b14-695fd305b313",
+        "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux"
+      },
+      "runtime": {
+        "linuxFxVersion": "NODE|20-lts",
+        "appCommandLine": "node server.js",
+        "alwaysOn": true,
+        "healthCheckPath": "/"
+      },
+      "appSettings": {
+        "count": 19,
+        "names": [
+          "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "ENABLE_ORYX_BUILD",
+          "JM1_GATE",
+          "JM1_MIGRATION_STATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_PROPERTY_KEY",
+          "JM1_RELEASE_ID",
+          "JM1_RELEASE_SHA",
+          "JM1_SLOT_ENVIRONMENT",
+          "JM1_WEB_GATE",
+          "KEY_VAULT_URI",
+          "NODE_ENV",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "WEBSITE_NODE_DEFAULT_VERSION",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false
+      },
+      "basicPublishing": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "deploymentHistory": {
+        "preRollout": "not-blocking; full deployment IDs captured after standardization"
+      }
+    },
+    {
+      "app": "app-jm1-jackiesmithjr-prod",
+      "slot": "production",
+      "domain": "jackiesmithjr.com",
+      "defaultHostName": "app-jm1-jackiesmithjr-prod.azurewebsites.net",
+      "site": {
+        "state": "Running",
+        "identityType": "SystemAssigned",
+        "principalId": "c0b59b05-9dac-48f4-9014-0774dd7c942d",
+        "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux"
+      },
+      "runtime": {
+        "linuxFxVersion": "NODE|20-lts",
+        "appCommandLine": "node server.js",
+        "alwaysOn": true,
+        "healthCheckPath": "/"
+      },
+      "appSettings": {
+        "count": 19,
+        "names": [
+          "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "ENABLE_ORYX_BUILD",
+          "JM1_GATE",
+          "JM1_MIGRATION_STATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_PROPERTY_KEY",
+          "JM1_RELEASE_ID",
+          "JM1_RELEASE_SHA",
+          "JM1_SLOT_ENVIRONMENT",
+          "JM1_WEB_GATE",
+          "KEY_VAULT_URI",
+          "NODE_ENV",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "WEBSITE_NODE_DEFAULT_VERSION",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false
+      },
+      "basicPublishing": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "deploymentHistory": {
+        "preRollout": "not-blocking; full deployment IDs captured after standardization"
+      }
+    }
+  ],
+  "valuesRecorded": false,
+  "note": "Rerun with bounded timeouts after full deployment-history read blocked on Azure CLI."
+}

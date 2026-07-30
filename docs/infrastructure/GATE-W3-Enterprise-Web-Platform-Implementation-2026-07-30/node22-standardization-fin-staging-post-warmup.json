@@ -1,0 +1,91 @@
+{
+  "capturedAt": "2026-07-30T12:41:52.269617+00:00",
+  "host": "app-jm1-fin-prod-staging.azurewebsites.net",
+  "results": [
+    {
+      "attempt": 1,
+      "timestamp": "2026-07-30T12:37:00.441813+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 2,
+      "timestamp": "2026-07-30T12:37:30.660164+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 3,
+      "timestamp": "2026-07-30T12:38:00.827882+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 4,
+      "timestamp": "2026-07-30T12:38:30.992830+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 5,
+      "timestamp": "2026-07-30T12:39:01.193049+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 6,
+      "timestamp": "2026-07-30T12:39:31.365933+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 7,
+      "timestamp": "2026-07-30T12:40:01.548810+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 8,
+      "timestamp": "2026-07-30T12:40:31.728191+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 9,
+      "timestamp": "2026-07-30T12:41:01.895284+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 10,
+      "timestamp": "2026-07-30T12:41:32.080334+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    }
+  ],
+  "rootProbe": {
+    "status": "error",
+    "errorType": "TimeoutError",
+    "message": "The read operation timed out"
+  }
+}

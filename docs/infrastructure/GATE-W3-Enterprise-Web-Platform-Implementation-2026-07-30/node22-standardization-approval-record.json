@@ -1,0 +1,13 @@
+{
+  "event": "GATE_W3_NODE22_STANDARDIZATION_APPROVED",
+  "program": "JM1-INFRA-006",
+  "gate": "GATE-W3",
+  "authority": "Jackie",
+  "approvedRuntime": "NODE|22-lts",
+  "basis": "Successful app-jm1-one-prod/staging canary",
+  "canaryDeploymentId": "e778a85f-543b-4652-be09-8934bdd15ee9",
+  "approvalScope": "Remaining nine GATE-W3 targets",
+  "status": "APPROVED",
+  "recordedAt": "2026-07-30T13:11:17.557167+00:00",
+  "eventDisposition": "Recorded in governed GATE-W3 evidence package; Dataverse event type not assumed."
+}

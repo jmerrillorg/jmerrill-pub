@@ -1,0 +1,120 @@
+{
+  "updatedAt": "2026-07-30T12:36:19.184186+00:00",
+  "artifactSha256": "913fd27cdac46baadffe636527dc5582ed23125f91468d056127887fd5293652",
+  "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+  "results": [
+    {
+      "app": "app-jm1-fin-prod",
+      "slot": "staging",
+      "domain": "jmerrill.financial",
+      "startedAt": "2026-07-30T12:29:29.609221+00:00",
+      "basicBefore": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "runtimeConfigSet": {
+        "ok": true,
+        "stdout": ""
+      },
+      "nonSecretAppSettingsSet": {
+        "ok": true,
+        "names": [
+          "JM1_RELEASE_ID",
+          "JM1_WEB_GATE",
+          "JM1_PROPERTY_DOMAIN",
+          "JM1_SLOT_ENVIRONMENT",
+          "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "ENABLE_ORYX_BUILD",
+          "WEBSITE_RUN_FROM_PACKAGE",
+          "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "WEBSITE_WARMUP_PATH",
+          "WEBSITE_WARMUP_STATUSES"
+        ],
+        "valuesRecorded": false,
+        "error": null
+      },
+      "deploymentCommand": [
+        "az",
+        "webapp",
+        "deploy",
+        "--resource-group",
+        "rg-jm1-web-prod-appsvc",
+        "--name",
+        "app-jm1-fin-prod",
+        "--slot",
+        "staging",
+        "--src-path",
+        "/tmp/gate-w3-minimal-runtime-20260730.zip",
+        "--type",
+        "zip",
+        "--clean",
+        "true",
+        "--timeout",
+        "600"
+      ],
+      "deploymentResult": {
+        "ok": true,
+        "exitCode": null,
+        "durationSeconds": 326.89,
+        "stdoutTail": "WARNING: Note: 'az webapp deploy' does not run build automation (dependency installation, compilation, etc.) by default for Linux web apps. If your package is not pre-built, set the app setting SCM_DO_BUILD_DURING_DEPLOYMENT=true to enable builds during deployment.\nWARNING: Initiating deployment\nWARNING: Deploying from local path: /tmp/gate-w3-minimal-runtime-20260730.zip\nWARNING: Warming up Kudu before deployment.\nWARNING: Warmed up Kudu instance successfully.\nWARNING: Polling the status of sync deployment. Start Time: 2026-07-30 12:34:55.185647+00:00 UTC\nWARNING: Deployment has completed successfully\nWARNING: You can visit your app at: http://app-jm1-fin-prod-staging.azurewebsites.net\n{\n  \"active\": true,\n  \"author\": \"N/A\",\n  \"author_email\": \"N/A\",\n  \"build_summary\": {\n    \"errors\": [],\n    \"warnings\": []\n  },\n  \"complete\": true,\n  \"deployer\": \"OneDeploy\",\n  \"end_time\": \"2026-07-30T12:34:48.7088196Z\",\n  \"id\": \"a784a1df-35d9-48b2-a00c-0719f1c0fcca\",\n  \"is_readonly\": true,\n  \"is_temp\": false,\n  \"last_success_end_time\": \"2026-07-30T12:34:48.7088196Z\",\n  \"log_url\": \"https://app-jm1-fin-prod-staging.scm.azurewebsites.net/api/deployments/a784a1df-35d9-48b2-a00c-0719f1c0fcca/log\",\n  \"message\": \"OneDeploy\",\n  \"progress\": \"\",\n  \"received_time\": \"2026-07-30T12:34:35.5124231Z\",\n  \"site_name\": \"app-jm1-fin-prod\",\n  \"start_time\": \"2026-07-30T12:34:39.1768719Z\",\n  \"status\": 4,\n  \"status_text\": \"\",\n  \"url\": \"https://app-jm1-fin-prod-staging.scm.azurewebsites.net/api/deployments/a784a1df-35d9-48b2-a00c-0719f1c0fcca\"\n}",
+        "errorTail": null
+      },
+      "deploymentHistory": {
+        "ok": true,
+        "count": 1,
+        "latest": [
+          {
+            "id": "a784a1df-35d9-48b2-a00c-0719f1c0fcca",
+            "status": 4,
+            "message": "OneDeploy",
+            "receivedTime": null,
+            "endTime": null,
+            "author": "N/A"
+          }
+        ],
+        "error": null
+      },
+      "deploymentId": "a784a1df-35d9-48b2-a00c-0719f1c0fcca",
+      "restart": {
+        "ok": true,
+        "timestamp": "2026-07-30T12:35:13.510508+00:00",
+        "error": null
+      },
+      "healthValidation": {
+        "host": "app-jm1-fin-prod-staging.azurewebsites.net",
+        "successes": 0,
+        "required": 10,
+        "healthAttempts": [
+          {
+            "attempt": 1,
+            "timestamp": "2026-07-30T12:35:53.945235+00:00",
+            "result": {
+              "status": "error",
+              "errorType": "TimeoutError",
+              "message": "The read operation timed out"
+            },
+            "validContract": false
+          }
+        ],
+        "rootProbe": {
+          "status": "error",
+          "errorType": "TimeoutError",
+          "message": "The read operation timed out"
+        },
+        "rootValid": false,
+        "passed": false
+      },
+      "runtimeAfter": {
+        "linuxFxVersion": "NODE|22-lts",
+        "appCommandLine": "node server.js",
+        "healthCheckPath": "/"
+      },
+      "basicAfter": {
+        "scm": "false",
+        "ftp": "false"
+      },
+      "endedAt": "2026-07-30T12:36:19.184124+00:00",
+      "result": "HEALTH_OR_POLICY_FAILED"
+    }
+  ]
+}
