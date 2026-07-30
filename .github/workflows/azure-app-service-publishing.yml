@@ -67,6 +67,7 @@ jobs:
           node scripts/infra006_health_contract.test.mjs
           node scripts/program002_author_portal_access.test.mjs
           node scripts/author_external_id_claim_resolution.test.mjs
+          node --test scripts/author_activation_recovery_governance.test.mjs
 
       - name: Build Next Standalone Output
         env:

@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 
 import {
   getAuthorPortalContextFromAuthorEmail,
+  getAuthorPortalContextFromExternalId,
   getAuthorPortalContextFromCookies,
 } from '@/lib/server/author-portal-context'
 import { getDurableAuthorSession } from '@/lib/server/author-durable-auth'
@@ -38,6 +39,8 @@ export async function POST(request: Request) {
       (await getAuthorPortalContextFromCookies().catch(() => null)) ||
       (await getDurableAuthorSession()
         .then((session) => {
+          const externalId = (session?.user as { authorObjectId?: string } | undefined)?.authorObjectId
+          if (externalId) return getAuthorPortalContextFromExternalId(externalId)
           const email = session?.user?.email
           if (!email) return null
           return getAuthorPortalContextFromAuthorEmail(email)
@@ -180,6 +183,8 @@ async function recoverMarketingProfileSubmission(request: Request, correlationId
       (await getAuthorPortalContextFromCookies().catch(() => null)) ||
       (await getDurableAuthorSession()
         .then((session) => {
+          const externalId = (session?.user as { authorObjectId?: string } | undefined)?.authorObjectId
+          if (externalId) return getAuthorPortalContextFromExternalId(externalId)
           const email = session?.user?.email
           if (!email) return null
           return getAuthorPortalContextFromAuthorEmail(email)
