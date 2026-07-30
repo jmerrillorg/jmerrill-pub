@@ -1,0 +1,43 @@
+{
+  "package": "AZURE-COPILOT-AGENT-ACCESS-REVIEW-2026-07-30",
+  "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d",
+  "executionDate": "2026-07-30",
+  "status": "PARTIALLY_COMPLETE_TENANT_CONTROL_BLOCKED",
+  "evidence": [
+    {
+      "id": "AZ-COPILOT-DOCS-001",
+      "type": "microsoft_documentation",
+      "source": "https://learn.microsoft.com/en-us/azure/copilot/manage-access",
+      "finding": "Azure Copilot is documented as tenant-default available unless RBAC-scoped by Global Administrator."
+    },
+    {
+      "id": "AZ-COPILOT-DOCS-002",
+      "type": "microsoft_documentation",
+      "source": "https://learn.microsoft.com/en-us/azure/copilot/manage-agents-preview",
+      "finding": "Agents preview is tenant-level and may auto-expand once approved."
+    },
+    {
+      "id": "AZ-COPILOT-PORTAL-001",
+      "type": "portal_observation",
+      "source": "Azure Portal Copilot admin center",
+      "finding": "Access management was reachable, but controls were not exposed; portal stated all-subscription and management-group access prerequisite."
+    },
+    {
+      "id": "AZ-COPILOT-CLI-001",
+      "type": "azure_cli_readback",
+      "source": "az account and provider queries",
+      "finding": "Two JM1 subscriptions visible; Microsoft.SecurityCopilot provider not registered in visible subscriptions; Copilot-specific role assignments count 0."
+    },
+    {
+      "id": "AZ-COPILOT-REPO-001",
+      "type": "repository_search",
+      "source": "scoped ripgrep over docs/app/lib/scripts/azure-functions excluding generated output",
+      "finding": "No current governed operational dependency on Azure Copilot agents found."
+    }
+  ],
+  "productionChanges": 0,
+  "azureResourceChanges": 0,
+  "newPermissionsGranted": 0,
+  "agentsEnabledByCody": 0,
+  "postAugustVerification": "SCHEDULED_AS_GOVERNANCE_CHECKPOINT"
+}
