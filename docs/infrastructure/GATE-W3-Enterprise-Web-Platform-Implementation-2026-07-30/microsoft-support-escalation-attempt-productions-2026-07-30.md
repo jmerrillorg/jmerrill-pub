@@ -137,12 +137,28 @@ Do not attach:
 - full environment exports;
 - Key Vault values.
 
+## Administrative Exception Lane
+
+Jackie subsequently ruled that GATE-W3 should enter an Administrative Exception Lane because the remaining blocker is Microsoft support entitlement rather than engineering completion.
+
+Current classification:
+
+- GATE-W3: BLOCKED - SUPPORT ENTITLEMENT
+- Engineering: COMPLETE
+- Evidence: COMPLETE
+- Microsoft escalation package: READY
+- Administrative dependency: OPEN
+- Owner: Jackie
+- Retry condition: support available
+
+`app-jm1-productions-prod` is frozen. No further deployment attempts, runtime changes, slot swaps, App Service configuration changes, startup modifications, package changes, or deployment retries are authorized until Microsoft support becomes available or Jackie separately authorizes a different remediation path.
+
 ## Current GATE-W3 State
 
 Microsoft support case: NOT OPENED
 Affected target: `app-jm1-productions-prod`
-Case status: BLOCKED - SUPPORT PLAN / PORTAL SUBMISSION REQUIRED
-GATE-W3: BLOCKED - MICROSOFT DIAGNOSTIC REQUIRED
+Case status: BLOCKED - SUPPORT ENTITLEMENT
+GATE-W3: BLOCKED - SUPPORT ENTITLEMENT
 Production fan-out: HELD
 
 ## Non-Actions Confirmed
