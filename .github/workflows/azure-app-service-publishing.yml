@@ -66,6 +66,7 @@ jobs:
           node scripts/check-catalog-runtime-source.mjs
           node scripts/infra006_health_contract.test.mjs
           node scripts/program002_author_portal_access.test.mjs
+          node scripts/author_external_id_claim_resolution.test.mjs
 
       - name: Build Next Standalone Output
         env:
