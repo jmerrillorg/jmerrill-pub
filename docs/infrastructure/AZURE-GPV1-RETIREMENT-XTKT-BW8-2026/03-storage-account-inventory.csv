@@ -1,0 +1,11 @@
+account_name,resource_group,region,pre_kind,post_kind,sku,access_tier,classification,provisioning_state,databricks_managed,notes
+aiconline,agape-international-cathedral-rg,eastus,StorageV2,StorageV2,Standard_LRS,Hot,GPv2 - NO RETIREMENT ACTION,Succeeded,No,Already compliant
+jm1core,rg-jm1-core,eastus,StorageV2,StorageV2,Standard_LRS,Hot,GPv2 - NO RETIREMENT ACTION,Succeeded,No,Already compliant
+jm1coreservices8242,jm1-core-services,eastus,Storage,StorageV2,Standard_LRS,Hot,GPv1 - MANUAL UPGRADE COMPLETED,Succeeded,No,Dependent Function App jm1-ed-functions
+jm1fin,jmerrill-financial_group,eastus,StorageV2,StorageV2,Standard_LRS,Hot,GPv2 - NO RETIREMENT ACTION,Succeeded,No,Already compliant
+jm1media,rg-jm1-core,eastus,StorageV2,StorageV2,Standard_LRS,Hot,GPv2 - NO RETIREMENT ACTION,Succeeded,No,Already compliant
+jm1pub,jmerrill-pub,eastus,StorageV2,StorageV2,Standard_LRS,Hot,GPv2 - NO RETIREMENT ACTION,Succeeded,No,Already compliant
+jmpaudiobookprod,rg-jmp-audiobook-prod,eastus,StorageV2,StorageV2,Standard_LRS,Hot,GPv2 - NO RETIREMENT ACTION,Succeeded,No,Already compliant
+stjm1acsrelay,rg-jm1-communications,eastus,StorageV2,StorageV2,Standard_LRS,Hot,GPv2 - NO RETIREMENT ACTION,Succeeded,No,Already compliant
+stjm1diagrunner,rg-jm1-ai,eastus,StorageV2,StorageV2,Standard_LRS,Hot,GPv2 - NO RETIREMENT ACTION,Succeeded,No,Already compliant
+funcjm1foundationin8054,func-jm1-foundation-intake_group,eastus2,Storage,StorageV2,Standard_LRS,Hot,GPv1 - MANUAL UPGRADE COMPLETED,Succeeded,No,Dependent Function App func-jm1-foundation-intake
