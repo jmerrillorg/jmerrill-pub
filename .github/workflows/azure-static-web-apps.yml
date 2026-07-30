@@ -25,6 +25,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Install Guard Dependencies
+        run: npm ci
+
       - name: Guard catalog runtime source
         run: |
           node scripts/check-catalog-runtime-source.mjs
