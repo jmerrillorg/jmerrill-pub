@@ -1,0 +1,59 @@
+{
+  "program": "JM1-INFRA-006",
+  "gate": "GATE-W3",
+  "status": "PRODUCTIONS_STAGING_RESTORED_FINAL_STAGING_SLOT_BLOCKED",
+  "target": "app-jm1-productions-prod/staging",
+  "rootCause": "OneDeploy client/control-plane response timed out with 504, but the backend deployment later completed successfully, created deployment history, and served the governed artifact. Healthy-peer comparison found no material runtime, startup, SCM, Basic publishing, access, or health-check configuration difference from app-jm1-foundation-prod/staging.",
+  "repair": "No destructive cleanup or slot recreation was required. The delayed OneDeploy completion was verified through deployment history and runtime health; the slot was certified with 10 consecutive valid /api/health probes.",
+  "productionsStaging": {
+    "runtime": "NODE|22-lts",
+    "deploymentId": "bcba8e89-fb60-479f-b760-3852caa1b5ce",
+    "deploymentHistory": "CREATED",
+    "healthSuccesses": 10,
+    "rootValid": true
+  },
+  "finalStagingSlot": {
+    "target": "app-jm1-jackiesmithjr-prod/staging",
+    "runtime": "NODE|22-lts",
+    "deploymentId": "9fda3481-e057-451c-a5d8-e11718563da5",
+    "deploymentHistory": "CREATED",
+    "deploymentCommandResult": false,
+    "healthSuccesses": 0,
+    "lateHealthValidCount": 0,
+    "blocker": "Deployment command returned 504 GatewayTimeout; deployment history row was created, but /api/health continued timing out and did not certify."
+  },
+  "stagingMatrix": [
+    {
+      "target": "app-jm1-one-prod/staging",
+      "status": "HEALTHY",
+      "deploymentId": "e778a85f-543b-4652-be09-8934bdd15ee9"
+    },
+    {
+      "target": "app-jm1-fin-prod/staging",
+      "status": "HEALTHY",
+      "deploymentId": "a784a1df-35d9-48b2-a00c-0719f1c0fcca"
+    },
+    {
+      "target": "app-jm1-foundation-prod/staging",
+      "status": "HEALTHY",
+      "deploymentId": "d5205a38-d8df-4fe7-bfe9-593fcdc2f3e1"
+    },
+    {
+      "target": "app-jm1-productions-prod/staging",
+      "status": "HEALTHY",
+      "deploymentId": "bcba8e89-fb60-479f-b760-3852caa1b5ce"
+    },
+    {
+      "target": "app-jm1-jackiesmithjr-prod/staging",
+      "status": "BLOCKED_HEALTH_TIMEOUT",
+      "deploymentId": "9fda3481-e057-451c-a5d8-e11718563da5"
+    }
+  ],
+  "scmBasic": "DISABLED",
+  "ftpBasic": "DISABLED",
+  "productionAppChanges": 0,
+  "dnsChanges": 0,
+  "trafficMigration": 0,
+  "staticWebAppsRetired": 0,
+  "completedAt": "2026-07-30T13:47:28.925814+00:00"
+}

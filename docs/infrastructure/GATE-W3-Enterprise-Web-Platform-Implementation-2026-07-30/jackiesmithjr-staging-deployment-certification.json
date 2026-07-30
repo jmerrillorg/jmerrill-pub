@@ -1,0 +1,390 @@
+{
+  "app": "app-jm1-jackiesmithjr-prod",
+  "slot": "staging",
+  "domain": "jackiesmithjr.com",
+  "startedAt": "2026-07-30T13:28:31.726522+00:00",
+  "artifactSha256": "913fd27cdac46baadffe636527dc5582ed23125f91468d056127887fd5293652",
+  "expectedSha256": "913fd27cdac46baadffe636527dc5582ed23125f91468d056127887fd5293652",
+  "basicBefore": {
+    "scm": "false",
+    "ftp": "false"
+  },
+  "runtimeConfigSet": {
+    "ok": true,
+    "stdout": ""
+  },
+  "nonSecretAppSettingsSet": {
+    "result": {
+      "ok": true,
+      "stdout": ""
+    },
+    "names": [
+      "JM1_RELEASE_ID",
+      "JM1_WEB_GATE",
+      "JM1_PROPERTY_DOMAIN",
+      "JM1_SLOT_ENVIRONMENT",
+      "SCM_DO_BUILD_DURING_DEPLOYMENT",
+      "ENABLE_ORYX_BUILD",
+      "WEBSITE_RUN_FROM_PACKAGE",
+      "WEBSITE_SKIP_NODE_MODULES_TAR",
+      "WEBSITE_WARMUP_PATH",
+      "WEBSITE_WARMUP_STATUSES"
+    ],
+    "valuesRecorded": false
+  },
+  "deploymentResult": {
+    "ok": false,
+    "durationSeconds": 326.624,
+    "exitCode": 1,
+    "stdoutTail": null,
+    "errorTail": "WARNING: Note: 'az webapp deploy' does not run build automation (dependency installation, compilation, etc.) by default for Linux web apps. If your package is not pre-built, set the app setting SCM_DO_BUILD_DURING_DEPLOYMENT=true to enable builds during deployment.\nWARNING: Initiating deployment\nWARNING: Deploying from local path: /tmp/gate-w3-minimal-runtime-20260730.zip\nWARNING: Warming up Kudu before deployment.\nWARNING: Warmed up Kudu instance successfully.\nERROR: An error occurred during deployment. Status Code: 504, Details: 504.0 GatewayTimeout, Please visit https://app-jm1-jackiesmithjr-prod-staging.scm.azurewebsites.net/api/deployments/latest to get more information about your deployment"
+  },
+  "deploymentHistory": {
+    "ok": true,
+    "count": 1,
+    "latest": [
+      {
+        "id": "9fda3481-e057-451c-a5d8-e11718563da5",
+        "status": 4,
+        "message": "OneDeploy",
+        "receivedTime": null,
+        "endTime": null,
+        "author": "N/A",
+        "deployer": "OneDeploy"
+      }
+    ],
+    "error": null
+  },
+  "deploymentId": "9fda3481-e057-451c-a5d8-e11718563da5",
+  "restart": {
+    "ok": true,
+    "stdout": ""
+  },
+  "warmupValidation": {
+    "ready": false,
+    "attempts": [
+      {
+        "attempt": 1,
+        "timestamp": "2026-07-30T13:35:17.428217+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "TimeoutError",
+          "message": "The read operation timed out",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 2,
+        "timestamp": "2026-07-30T13:35:47.599353+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "TimeoutError",
+          "message": "The read operation timed out",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 3,
+        "timestamp": "2026-07-30T13:36:17.794098+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "TimeoutError",
+          "message": "The read operation timed out",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 4,
+        "timestamp": "2026-07-30T13:36:48.066543+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "TimeoutError",
+          "message": "The read operation timed out",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 5,
+        "timestamp": "2026-07-30T13:37:18.349464+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "TimeoutError",
+          "message": "The read operation timed out",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 6,
+        "timestamp": "2026-07-30T13:37:28.618331+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 7,
+        "timestamp": "2026-07-30T13:37:38.793076+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 8,
+        "timestamp": "2026-07-30T13:37:49.240168+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 9,
+        "timestamp": "2026-07-30T13:37:59.454909+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 10,
+        "timestamp": "2026-07-30T13:38:09.912471+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 11,
+        "timestamp": "2026-07-30T13:38:20.201345+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 12,
+        "timestamp": "2026-07-30T13:38:30.435504+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 13,
+        "timestamp": "2026-07-30T13:38:44.290804+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 14,
+        "timestamp": "2026-07-30T13:38:54.541222+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 15,
+        "timestamp": "2026-07-30T13:39:04.752496+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 16,
+        "timestamp": "2026-07-30T13:39:14.995204+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 17,
+        "timestamp": "2026-07-30T13:39:25.166915+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 18,
+        "timestamp": "2026-07-30T13:39:35.375304+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 19,
+        "timestamp": "2026-07-30T13:39:45.694121+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 20,
+        "timestamp": "2026-07-30T13:39:56.120064+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 21,
+        "timestamp": "2026-07-30T13:40:06.269220+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 22,
+        "timestamp": "2026-07-30T13:40:16.493445+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 23,
+        "timestamp": "2026-07-30T13:40:26.720202+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 24,
+        "timestamp": "2026-07-30T13:40:37.072529+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 25,
+        "timestamp": "2026-07-30T13:40:47.242366+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 26,
+        "timestamp": "2026-07-30T13:40:57.643000+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 27,
+        "timestamp": "2026-07-30T13:41:07.951822+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 28,
+        "timestamp": "2026-07-30T13:41:18.208546+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 29,
+        "timestamp": "2026-07-30T13:41:28.475549+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "HTTPError",
+          "message": "HTTP Error 503: Service Unavailable",
+          "validContract": false
+        }
+      },
+      {
+        "attempt": 30,
+        "timestamp": "2026-07-30T13:41:58.702785+00:00",
+        "result": {
+          "status": "error",
+          "errorType": "TimeoutError",
+          "message": "The read operation timed out",
+          "validContract": false
+        }
+      }
+    ]
+  },
+  "healthValidation": {
+    "successes": 0,
+    "required": 10,
+    "healthAttempts": [],
+    "rootProbe": {
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    }
+  },
+  "runtimeAfter": {
+    "linuxFxVersion": "NODE|22-lts",
+    "appCommandLine": "node server.js",
+    "healthCheckPath": "/"
+  },
+  "basicAfter": {
+    "scm": "false",
+    "ftp": "false"
+  },
+  "endedAt": "2026-07-30T13:42:35.907188+00:00",
+  "result": "FAILED"
+}

@@ -1,0 +1,30 @@
+{
+  "capturedAt": "2026-07-30T13:47:28.923430+00:00",
+  "policies": [
+    {
+      "app": "app-jm1-fin-prod",
+      "scm": "false",
+      "ftp": "false"
+    },
+    {
+      "app": "app-jm1-one-prod",
+      "scm": "false",
+      "ftp": "false"
+    },
+    {
+      "app": "app-jm1-foundation-prod",
+      "scm": "false",
+      "ftp": "false"
+    },
+    {
+      "app": "app-jm1-productions-prod",
+      "scm": "false",
+      "ftp": "false"
+    },
+    {
+      "app": "app-jm1-jackiesmithjr-prod",
+      "scm": "false",
+      "ftp": "false"
+    }
+  ]
+}

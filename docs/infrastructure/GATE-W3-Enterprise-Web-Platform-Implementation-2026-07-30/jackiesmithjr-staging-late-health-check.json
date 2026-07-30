@@ -1,0 +1,46 @@
+{
+  "capturedAt": "2026-07-30T13:46:24.469507+00:00",
+  "host": "app-jm1-jackiesmithjr-prod-staging.azurewebsites.net",
+  "results": [
+    {
+      "attempt": 1,
+      "timestamp": "2026-07-30T13:44:38.602872+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 2,
+      "timestamp": "2026-07-30T13:45:03.805194+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 3,
+      "timestamp": "2026-07-30T13:45:29.041615+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 4,
+      "timestamp": "2026-07-30T13:45:54.230501+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    },
+    {
+      "attempt": 5,
+      "timestamp": "2026-07-30T13:46:19.464281+00:00",
+      "status": "error",
+      "errorType": "TimeoutError",
+      "message": "The read operation timed out",
+      "validContract": false
+    }
+  ]
+}

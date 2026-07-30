@@ -1,0 +1,203 @@
+{
+  "capturedAt": "2026-07-30T13:27:46.360501+00:00",
+  "host": "app-jm1-productions-prod-staging.azurewebsites.net",
+  "deploymentId": "bcba8e89-fb60-479f-b760-3852caa1b5ce",
+  "successes": 10,
+  "required": 10,
+  "healthAttempts": [
+    {
+      "attempt": 1,
+      "timestamp": "2026-07-30T13:27:16.658430+00:00",
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.productions",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "validContract": true
+      }
+    },
+    {
+      "attempt": 2,
+      "timestamp": "2026-07-30T13:27:19.902627+00:00",
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.productions",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "validContract": true
+      }
+    },
+    {
+      "attempt": 3,
+      "timestamp": "2026-07-30T13:27:23.116768+00:00",
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.productions",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "validContract": true
+      }
+    },
+    {
+      "attempt": 4,
+      "timestamp": "2026-07-30T13:27:26.367194+00:00",
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.productions",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "validContract": true
+      }
+    },
+    {
+      "attempt": 5,
+      "timestamp": "2026-07-30T13:27:29.683635+00:00",
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.productions",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "validContract": true
+      }
+    },
+    {
+      "attempt": 6,
+      "timestamp": "2026-07-30T13:27:33.032975+00:00",
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.productions",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "validContract": true
+      }
+    },
+    {
+      "attempt": 7,
+      "timestamp": "2026-07-30T13:27:36.221582+00:00",
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.productions",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "validContract": true
+      }
+    },
+    {
+      "attempt": 8,
+      "timestamp": "2026-07-30T13:27:39.453102+00:00",
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.productions",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "validContract": true
+      }
+    },
+    {
+      "attempt": 9,
+      "timestamp": "2026-07-30T13:27:42.760197+00:00",
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.productions",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "validContract": true
+      }
+    },
+    {
+      "attempt": 10,
+      "timestamp": "2026-07-30T13:27:46.041140+00:00",
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.productions",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "validContract": true
+      }
+    }
+  ],
+  "rootProbe": {
+    "status": "ok",
+    "httpStatus": 200,
+    "body": {
+      "status": "ready",
+      "service": "JM1 Enterprise Web Platform",
+      "message": "Infrastructure Ready. Production traffic has not migrated.",
+      "property": "jmerrill.productions",
+      "environment": "staging",
+      "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+      "traffic_migrated": false
+    },
+    "validContract": true
+  }
+}

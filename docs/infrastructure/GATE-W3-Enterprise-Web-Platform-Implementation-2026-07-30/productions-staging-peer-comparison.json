@@ -1,0 +1,338 @@
+{
+  "capturedAt": "2026-07-30T13:26:25.721653+00:00",
+  "affected": {
+    "app": "app-jm1-productions-prod",
+    "slot": "staging",
+    "domain": "jmerrill.productions",
+    "host": "app-jm1-productions-prod-staging.azurewebsites.net",
+    "site": {
+      "state": "Running",
+      "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux",
+      "kind": "app,linux",
+      "identityType": "SystemAssigned",
+      "principalId": "fd17133f-63a9-467e-ba97-cef9a2c78e41",
+      "httpsOnly": true,
+      "outboundIpAddresses": "104.43.201.250,104.208.37.158,104.208.34.190,104.208.36.42,13.89.172.3"
+    },
+    "runtime": {
+      "linuxFxVersion": "NODE|22-lts",
+      "appCommandLine": "node server.js",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "http20Enabled": true,
+      "webSocketsEnabled": false,
+      "ftpsState": "Disabled",
+      "scmType": "None",
+      "use32BitWorkerProcess": true,
+      "minimumElasticInstanceCount": 1,
+      "preWarmedInstanceCount": 0,
+      "publicNetworkAccess": "Enabled",
+      "vnetRouteAllEnabled": false,
+      "ipSecurityRestrictionsDefaultAction": null,
+      "scmIpSecurityRestrictionsUseMain": false,
+      "scmIpSecurityRestrictionsDefaultAction": null
+    },
+    "ipSecurityRestrictions": [
+      {
+        "action": "Allow",
+        "description": "Allow all access",
+        "headers": null,
+        "ipAddress": "Any",
+        "name": "Allow all",
+        "priority": 2147483647,
+        "subnetMask": null,
+        "subnetTrafficTag": null,
+        "tag": null,
+        "vnetSubnetResourceId": null,
+        "vnetTrafficTag": null
+      }
+    ],
+    "scmIpSecurityRestrictions": [
+      {
+        "action": "Allow",
+        "description": "Allow all access",
+        "headers": null,
+        "ipAddress": "Any",
+        "name": "Allow all",
+        "priority": 2147483647,
+        "subnetMask": null,
+        "subnetTrafficTag": null,
+        "tag": null,
+        "vnetSubnetResourceId": null,
+        "vnetTrafficTag": null
+      }
+    ],
+    "appSettings": {
+      "count": 19,
+      "names": [
+        "APPINSIGHTS_INSTRUMENTATIONKEY",
+        "APPLICATIONINSIGHTS_CONNECTION_STRING",
+        "ENABLE_ORYX_BUILD",
+        "JM1_GATE",
+        "JM1_MIGRATION_STATE",
+        "JM1_PROPERTY_DOMAIN",
+        "JM1_PROPERTY_KEY",
+        "JM1_RELEASE_ID",
+        "JM1_RELEASE_SHA",
+        "JM1_SLOT_ENVIRONMENT",
+        "JM1_WEB_GATE",
+        "KEY_VAULT_URI",
+        "NODE_ENV",
+        "SCM_DO_BUILD_DURING_DEPLOYMENT",
+        "WEBSITE_NODE_DEFAULT_VERSION",
+        "WEBSITE_RUN_FROM_PACKAGE",
+        "WEBSITE_SKIP_NODE_MODULES_TAR",
+        "WEBSITE_WARMUP_PATH",
+        "WEBSITE_WARMUP_STATUSES"
+      ],
+      "slotSettingNames": [],
+      "valuesRecorded": false
+    },
+    "selectedSettingPresence": {
+      "WEBSITE_RUN_FROM_PACKAGE": true,
+      "SCM_DO_BUILD_DURING_DEPLOYMENT": true,
+      "ENABLE_ORYX_BUILD": true,
+      "WEBSITE_SKIP_NODE_MODULES_TAR": true,
+      "WEBSITE_WARMUP_PATH": true,
+      "WEBSITE_WARMUP_STATUSES": true,
+      "JM1_RELEASE_ID": true,
+      "JM1_PROPERTY_DOMAIN": true,
+      "JM1_SLOT_ENVIRONMENT": true
+    },
+    "basicPublishing": {
+      "scm": "false",
+      "ftp": "false"
+    },
+    "deploymentHistory": {
+      "ok": false,
+      "count": null,
+      "latest": [],
+      "error": "TIMEOUT"
+    },
+    "rootProbe": {
+      "status": "ok",
+      "httpStatus": 200,
+      "contentType": "application/json",
+      "body": {
+        "status": "ready",
+        "service": "JM1 Enterprise Web Platform",
+        "message": "Infrastructure Ready. Production traffic has not migrated.",
+        "property": "jmerrill.productions",
+        "environment": "staging",
+        "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+        "traffic_migrated": false
+      },
+      "sample": null
+    },
+    "healthProbe": {
+      "status": "ok",
+      "httpStatus": 200,
+      "contentType": "application/json",
+      "body": {
+        "status": "ready",
+        "service": "JM1 Enterprise Web Platform",
+        "message": "Infrastructure Ready. Production traffic has not migrated.",
+        "property": "jmerrill.productions",
+        "environment": "staging",
+        "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+        "traffic_migrated": false
+      },
+      "sample": null
+    }
+  },
+  "healthyPeer": {
+    "app": "app-jm1-foundation-prod",
+    "slot": "staging",
+    "domain": "jmerrill.foundation",
+    "host": "app-jm1-foundation-prod-staging.azurewebsites.net",
+    "site": {
+      "state": "Running",
+      "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux",
+      "kind": "app,linux",
+      "identityType": "SystemAssigned",
+      "principalId": "f9da95d8-077f-44c9-b23e-d8e470f909f1",
+      "httpsOnly": true,
+      "outboundIpAddresses": "104.43.201.250,104.208.37.158,104.208.34.190,104.208.36.42,13.89.172.3"
+    },
+    "runtime": {
+      "linuxFxVersion": "NODE|22-lts",
+      "appCommandLine": "node server.js",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "http20Enabled": true,
+      "webSocketsEnabled": false,
+      "ftpsState": "Disabled",
+      "scmType": "None",
+      "use32BitWorkerProcess": true,
+      "minimumElasticInstanceCount": 1,
+      "preWarmedInstanceCount": 0,
+      "publicNetworkAccess": "Enabled",
+      "vnetRouteAllEnabled": false,
+      "ipSecurityRestrictionsDefaultAction": null,
+      "scmIpSecurityRestrictionsUseMain": false,
+      "scmIpSecurityRestrictionsDefaultAction": null
+    },
+    "ipSecurityRestrictions": [
+      {
+        "action": "Allow",
+        "description": "Allow all access",
+        "headers": null,
+        "ipAddress": "Any",
+        "name": "Allow all",
+        "priority": 2147483647,
+        "subnetMask": null,
+        "subnetTrafficTag": null,
+        "tag": null,
+        "vnetSubnetResourceId": null,
+        "vnetTrafficTag": null
+      }
+    ],
+    "scmIpSecurityRestrictions": [
+      {
+        "action": "Allow",
+        "description": "Allow all access",
+        "headers": null,
+        "ipAddress": "Any",
+        "name": "Allow all",
+        "priority": 2147483647,
+        "subnetMask": null,
+        "subnetTrafficTag": null,
+        "tag": null,
+        "vnetSubnetResourceId": null,
+        "vnetTrafficTag": null
+      }
+    ],
+    "appSettings": {
+      "count": 19,
+      "names": [
+        "APPINSIGHTS_INSTRUMENTATIONKEY",
+        "APPLICATIONINSIGHTS_CONNECTION_STRING",
+        "ENABLE_ORYX_BUILD",
+        "JM1_GATE",
+        "JM1_MIGRATION_STATE",
+        "JM1_PROPERTY_DOMAIN",
+        "JM1_PROPERTY_KEY",
+        "JM1_RELEASE_ID",
+        "JM1_RELEASE_SHA",
+        "JM1_SLOT_ENVIRONMENT",
+        "JM1_WEB_GATE",
+        "KEY_VAULT_URI",
+        "NODE_ENV",
+        "SCM_DO_BUILD_DURING_DEPLOYMENT",
+        "WEBSITE_NODE_DEFAULT_VERSION",
+        "WEBSITE_RUN_FROM_PACKAGE",
+        "WEBSITE_SKIP_NODE_MODULES_TAR",
+        "WEBSITE_WARMUP_PATH",
+        "WEBSITE_WARMUP_STATUSES"
+      ],
+      "slotSettingNames": [],
+      "valuesRecorded": false
+    },
+    "selectedSettingPresence": {
+      "WEBSITE_RUN_FROM_PACKAGE": true,
+      "SCM_DO_BUILD_DURING_DEPLOYMENT": true,
+      "ENABLE_ORYX_BUILD": true,
+      "WEBSITE_SKIP_NODE_MODULES_TAR": true,
+      "WEBSITE_WARMUP_PATH": true,
+      "WEBSITE_WARMUP_STATUSES": true,
+      "JM1_RELEASE_ID": true,
+      "JM1_PROPERTY_DOMAIN": true,
+      "JM1_SLOT_ENVIRONMENT": true
+    },
+    "basicPublishing": {
+      "scm": "false",
+      "ftp": "false"
+    },
+    "deploymentHistory": {
+      "ok": false,
+      "count": null,
+      "latest": [],
+      "error": "TIMEOUT"
+    },
+    "rootProbe": {
+      "status": "ok",
+      "httpStatus": 200,
+      "contentType": "application/json",
+      "body": {
+        "status": "ready",
+        "service": "JM1 Enterprise Web Platform",
+        "message": "Infrastructure Ready. Production traffic has not migrated.",
+        "property": "jmerrill.foundation",
+        "environment": "staging",
+        "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+        "traffic_migrated": false
+      },
+      "sample": null
+    },
+    "healthProbe": {
+      "status": "ok",
+      "httpStatus": 200,
+      "contentType": "application/json",
+      "body": {
+        "status": "ready",
+        "service": "JM1 Enterprise Web Platform",
+        "message": "Infrastructure Ready. Production traffic has not migrated.",
+        "property": "jmerrill.foundation",
+        "environment": "staging",
+        "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+        "traffic_migrated": false
+      },
+      "sample": null
+    }
+  },
+  "diff": [
+    {
+      "path": "app",
+      "affected": "app-jm1-productions-prod",
+      "healthyPeer": "app-jm1-foundation-prod"
+    },
+    {
+      "path": "domain",
+      "affected": "jmerrill.productions",
+      "healthyPeer": "jmerrill.foundation"
+    },
+    {
+      "path": "healthProbe.body.property",
+      "affected": "jmerrill.productions",
+      "healthyPeer": "jmerrill.foundation"
+    },
+    {
+      "path": "host",
+      "affected": "app-jm1-productions-prod-staging.azurewebsites.net",
+      "healthyPeer": "app-jm1-foundation-prod-staging.azurewebsites.net"
+    },
+    {
+      "path": "rootProbe.body.property",
+      "affected": "jmerrill.productions",
+      "healthyPeer": "jmerrill.foundation"
+    },
+    {
+      "path": "site.principalId",
+      "affected": "fd17133f-63a9-467e-ba97-cef9a2c78e41",
+      "healthyPeer": "f9da95d8-077f-44c9-b23e-d8e470f909f1"
+    }
+  ],
+  "materialAssessment": [
+    {
+      "path": "app",
+      "classification": "EXPECTED_OR_EVIDENCE_ONLY",
+      "reason": "Identity/target/evidence differs by app or reflects current health/deployment history."
+    },
+    {
+      "path": "domain",
+      "classification": "EXPECTED_OR_EVIDENCE_ONLY",
+      "reason": "Identity/target/evidence differs by app or reflects current health/deployment history."
+    },
+    {
+      "path": "host",
+      "classification": "EXPECTED_OR_EVIDENCE_ONLY",
+      "reason": "Identity/target/evidence differs by app or reflects current health/deployment history."
+    },
+    {
+      "path": "site.principalId",
+      "classification": "EXPECTED_OR_EVIDENCE_ONLY",
+      "reason": "Identity/target/evidence differs by app or reflects current health/deployment history."
+    }
+  ],
+  "valuesRecorded": false
+}
