@@ -153,7 +153,10 @@ function buildAuthorResponseRelayPayload(email) {
     projectTitle: approval.projectTitle,
     subject: approval.draftSubject,
     body: approval.draftBody,
+    htmlBody: approval.draftHtmlBody || null,
     templateName: approval.templateName,
+    templateVersion: approval.templateVersion || null,
+    templateMetadata: approval.templateMetadata || null,
     approvedBy: approval.approvedBy,
     approvedOn: approval.approvedOn,
     internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
@@ -218,6 +221,9 @@ function validateAuthorResponseSendInput(input = {}) {
   }
   if (!normalizeString(approval.draftSubject)) return { ok: false, reason: "AUTHOR_RESPONSE_SUBJECT_MISSING" };
   if (!normalizeString(approval.draftBody)) return { ok: false, reason: "AUTHOR_RESPONSE_BODY_MISSING" };
+  if (approval.templateName === "EDITORIAL_RECOMMENDATION_LETTER_V1" && !normalizeString(approval.draftHtmlBody)) {
+    return { ok: false, reason: "EDITORIAL_RECOMMENDATION_HTML_REQUIRED" };
+  }
   if (approval.internalVisibilityMailbox !== INTERNAL_VISIBILITY_MAILBOX) return { ok: false, reason: "INTERNAL_VISIBILITY_MAILBOX_INVALID" };
   if (approval.futureSendRequiresInternalCopy !== true) return { ok: false, reason: "FUTURE_INTERNAL_COPY_REQUIRED" };
   if (approval.futureSendRequiresDataverseLog !== true) return { ok: false, reason: "FUTURE_DATAVERSE_SEND_LOG_REQUIRED" };
@@ -250,6 +256,7 @@ function buildAuthorResponseEmail(input = {}, config = getAuthorResponseSendProv
       replyTo: config.replyTo,
       subject: input.sendApproval.draftSubject,
       body: input.sendApproval.draftBody,
+      htmlBody: input.sendApproval.draftHtmlBody || null,
       templateName: input.sendApproval.templateName,
       providerName: config.providerName,
       internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,

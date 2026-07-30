@@ -191,7 +191,14 @@ function buildAuthorResponseSendApproval(input = {}) {
       internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
       draftSubject: normalizeString(record.draftSubject),
       draftBody: normalizeString(record.draftBody),
+      draftHtmlBody: normalizeString(record.draftHtmlBody),
       templateName: normalizeString(record.templateName) || TEMPLATE_NAME,
+      templateVersion: normalizeString(record.templateVersion),
+      templateMetadata: isPlainObject(record.templateMetadata) ? {
+        htmlSha256: normalizeString(record.templateMetadata.htmlSha256),
+        textSha256: normalizeString(record.templateMetadata.textSha256),
+        qualityGate: normalizeString(record.templateMetadata.qualityGate)
+      } : null,
       decision,
       sendApproved,
       sendStatus: sendApproved ? AUTHOR_RESPONSE_SEND_STATUS.APPROVED : AUTHOR_RESPONSE_SEND_STATUS.NOT_SENT,

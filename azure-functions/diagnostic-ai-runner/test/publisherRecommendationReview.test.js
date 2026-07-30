@@ -120,30 +120,59 @@ describe("buildRecommendationView", () => {
     });
     const body = view.authorFacingRecommendationDraft.body;
 
-    assert.equal(view.authorFacingRecommendationDraft.subject, "Editorial Recommendation Letter for The Intentional Leader");
+    assert.equal(view.authorFacingRecommendationDraft.subject, "Your Editorial Review & Publishing Recommendation | J Merrill Publishing");
     assert.equal(view.authorFacingRecommendationDraft.templateName, "EDITORIAL_RECOMMENDATION_LETTER_V1");
-    assert.match(body, /^J Merrill Publishing\nEditorial Recommendation Letter/);
+    assert.equal(view.authorFacingRecommendationDraft.templateVersion, "1.1.0");
+    assert.equal(view.authorFacingRecommendationDraft.qualityGate, "PASS");
+    assert.equal(view.authorFacingRecommendationDraft.htmlChecksum.length, 64);
+    assert.equal(view.authorFacingRecommendationDraft.textChecksum.length, 64);
+    assert.match(body, /^J MERRILL PUBLISHING\nEditorial Review & Publishing Recommendation/);
     assert.match(body, /Good day, Jackie,/);
+    assert.match(body, /Thank you for trusting J Merrill Publishing with your manuscript, The Intentional Leader\./);
     assert.match(body, /Before we ever ask an author to invest in us, we first invest in understanding their manuscript\./);
     assert.match(body, /Every book we receive is reviewed with one goal in mind/);
     assert.match(body, /Editorial Review Summary/);
     assert.match(body, /The Intentional Leader/);
     assert.match(body, /Executive Devotional/);
     assert.match(body, /with an Executive Devotional focus/);
-    assert.match(body, /Our Recommendation/);
+    assert.match(body, /OUR RECOMMENDATION/);
     assert.match(body, /Professional Publishing Package\n\$4,500/);
-    assert.match(body, /Developmental editing, line editing, copyediting, and optional AI audiobook production/);
+    assert.match(body, /Developmental editing/);
+    assert.match(body, /Optional AI-assisted audiobook production, where appropriate and separately approved/);
     assert.match(body, /Another Publishing Path/);
-    assert.match(body, /Starter Publishing Package at \$1,999/);
+    assert.match(body, /Starter Publishing Package - \$1,999/);
     assert.match(body, /Recommended Imprint/);
     assert.match(body, /Ready to Move Forward\?/);
-    assert.match(body, /If you're ready to begin your publishing journey with J Merrill Publishing, simply reply to this email with your preferred package\./);
-    assert.match(body, /As soon as we receive your confirmation, we'll prepare your Author Workspace and guide you through the next steps together\./);
-    assert.match(body, /The J Merrill Publishing Team/);
-    assert.ok(view.authorWorkspaceArtifact.body.includes("Editorial Recommendation Letter"));
+    assert.match(body, /Reply with the package you would like to select/);
+    assert.match(body, /The Publishing Team/);
+    assert.match(body, /Helping Authors Help Themselves\./);
+    assert.ok(view.authorFacingRecommendationDraft.htmlBody.includes("J MERRILL PUBLISHING"));
+    assert.ok(view.authorFacingRecommendationDraft.htmlBody.includes("Reply With My Selection"));
+    assert.equal(view.authorWorkspaceArtifact.type, "Editorial Recommendation Letter");
+    assert.ok(view.authorWorkspaceArtifact.subject.includes("Editorial Review & Publishing Recommendation"));
+    assert.ok(view.authorWorkspaceArtifact.body.includes("Editorial Review & Publishing Recommendation"));
     assert.equal(body.includes("JMP-PKG-"), false);
     assert.equal(/Stripe|payment link|invoice|credit card|SignNow|workspace access code|onboarding checklist|financing/i.test(body), false);
     assert.equal(/\|.+\|/.test(body), false);
+  });
+
+  test("provisional Untitled remains valid in body but never appears in the subject", () => {
+    const view = buildRecommendationView(context({
+      intake: { jm1_projecttitle: "Untitled" },
+      diagnostic: {
+        jm1pub_genreconfirmed: "Religious",
+        jm1pub_manuscriptwordcount: 83600
+      }
+    }), {
+      diagnosticId: DIAGNOSTIC_ID,
+      intakeReferenceCode: INTAKE_REFERENCE
+    });
+
+    assert.equal(view.authorFacingRecommendationDraft.subject, "Your Editorial Review & Publishing Recommendation | J Merrill Publishing");
+    assert.equal(view.authorFacingRecommendationDraft.subject.includes("Untitled"), false);
+    assert.match(view.authorFacingRecommendationDraft.body, /your manuscript, Untitled/);
+    assert.match(view.authorFacingRecommendationDraft.body, /full-length book with a religious focus at approximately 83,600 words/i);
+    assert.equal(/project fits naturally under/i.test(view.authorFacingRecommendationDraft.body), false);
   });
 });
 

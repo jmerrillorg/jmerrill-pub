@@ -23,6 +23,11 @@ const {
   DIAGNOSTIC_STATUS,
   RECOMMENDED_IMPRINT_LABELS
 } = require("./preContractEditorialReviewGate");
+const {
+  buildEditorialRecommendationEmail,
+  TEMPLATE_NAME: EDITORIAL_RECOMMENDATION_TEMPLATE_NAME,
+  TEMPLATE_VERSION: EDITORIAL_RECOMMENDATION_TEMPLATE_VERSION
+} = require("./editorialRecommendationEmailTemplate");
 
 const DIAGNOSTIC_ENTITY_SET = "jm1pub_editorialdiagnostics";
 const INTAKE_ENTITY_SET = "jm1_publishingintakes";
@@ -257,7 +262,7 @@ function buildPackageRationale({ diagnostic, logSummary }) {
   return pieces.join(" ");
 }
 
-function buildEditorialRecommendationSummary({ projectTitle, workType, genre, wordCount, imprintLabel }) {
+function buildEditorialRecommendationSummary({ projectTitle, workType, genre, wordCount }) {
   const details = [
     workType ? `a ${workType.toLowerCase()}` : "a book-length manuscript",
     genre ? `with ${indefiniteArticleFor(genre)} ${genre} focus` : null,
@@ -266,7 +271,6 @@ function buildEditorialRecommendationSummary({ projectTitle, workType, genre, wo
 
   return [
     `We reviewed ${projectTitle} as ${details}.`,
-    imprintLabel ? `The project fits naturally under the ${imprintLabel} imprint.` : null,
     "The manuscript shows meaningful substance, a clear desire to serve readers, and enough depth to deserve a structured editorial and production path.",
     "The strongest opportunity is to shape that substance with care so the final book feels focused, professionally prepared, and ready for the audience it was written to reach."
   ].filter(Boolean).join(" ");
@@ -346,69 +350,21 @@ function buildEditorialRecommendationLetterBody({
   genre,
   wordCount
 }) {
-  const greetingName = firstNameFrom(authorName);
-  const editorialSummary = buildEditorialRecommendationSummary({ projectTitle, workType, genre, wordCount, imprintLabel });
-  const recommendation = recommendedPackage || {
-    name: "Professional Publishing Package",
-    price: "$4,500",
-    shortDifference: "Professional gives the manuscript a fuller editorial and production path."
-  };
-  const alternate = alternatePackage || null;
-  return [
-    "J Merrill Publishing",
-    "Editorial Recommendation Letter",
-    "",
-    `Good day, ${greetingName},`,
-    "",
-    `Thank you for trusting J Merrill Publishing with ${projectTitle}.`,
-    "",
-    "Before we ever ask an author to invest in us, we first invest in understanding their manuscript.",
-    "",
-    "Every book we receive is reviewed with one goal in mind: discovering what it needs to become the strongest version of itself and reach the readers it was written to serve.",
-    "",
-    "After completing our initial editorial review, we'd like to share what we found and the publishing path we believe will best support your book.",
-    "",
-    "Editorial Review Summary",
-    "",
-    editorialSummary,
-    "",
-    "Our Recommendation",
-    "",
-    `${recommendation.name}`,
-    `${recommendation.price}`,
-    "",
-    buildPackageWhy({ packageCode, recommendation, projectTitle }),
-    "",
-    buildRecommendedServicesLine(packageCode),
-    "",
-    "Another Publishing Path",
-    "",
-    buildAlternatePackageDifference({ recommendation, alternate }),
-    "",
-    "Recommended Imprint",
-    "",
-    buildImprintWhy({ projectTitle, imprintLabel }),
-    "",
-    "Ready to Move Forward?",
-    "",
-    "If you're ready to begin your publishing journey with J Merrill Publishing, simply reply to this email with your preferred package.",
-    "",
-    "As soon as we receive your confirmation, we'll prepare your Author Workspace and guide you through the next steps together.",
-    "",
-    "If you'd like to talk through the recommendation before making a decision, simply reply to this email or schedule a conversation with us.",
-    "",
-    "We're always happy to help.",
-    "",
-    "Thank you again for inviting us to review your manuscript.",
-    "",
-    "Whether you choose to move forward today or sometime in the future, we appreciate the opportunity to spend time with your work.",
-    "",
-    "If you decide to continue this journey with us, we'll be honored to welcome you to the J Merrill Publishing family and walk alongside you from manuscript to publication—and beyond.",
-    "",
-    "With appreciation,",
-    "",
-    "The J Merrill Publishing Team"
-  ].join("\n");
+  return buildEditorialRecommendationEmail({
+    authorName,
+    projectTitle,
+    packageCode,
+    recommendedPackage: recommendedPackage || {
+      name: "Professional Publishing Package",
+      price: "$4,500",
+      shortDifference: "Professional gives the manuscript a fuller editorial and production path."
+    },
+    alternatePackage: alternatePackage || { name: "Starter Publishing Package", price: "$1,999" },
+    imprintLabel,
+    workType,
+    genre,
+    wordCount
+  }).text;
 }
 
 function buildRecommendationView(context, { diagnosticId, intakeReferenceCode }) {
@@ -446,8 +402,19 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
             PUBLISHER_REVIEW_REASON_LABELS[logSummary.humanReviewReason] || null);
   const publisherReviewRequired = Boolean(publisherReviewReason);
   const packageRationale = buildPackageRationale({ diagnostic, logSummary });
+  const renderedEmail = buildEditorialRecommendationEmail({
+    authorName,
+    projectTitle,
+    packageCode,
+    recommendedPackage: recommendedPackageDetails,
+    alternatePackage: alternatePackageDetails,
+    imprintLabel,
+    workType: WORK_TYPE_LABELS[diagnostic.jm1pub_worktype] || null,
+    genre: normalizeString(diagnostic.jm1pub_genreconfirmed) || null,
+    wordCount: diagnostic.jm1pub_manuscriptwordcount ?? null
+  });
   const authorDraft = {
-    subject: `Editorial Recommendation Letter for ${projectTitle}`,
+    subject: renderedEmail.subject,
     body: buildEditorialRecommendationLetterBody({
       authorName,
       projectTitle,
@@ -459,6 +426,12 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
       genre: normalizeString(diagnostic.jm1pub_genreconfirmed) || null,
       wordCount: diagnostic.jm1pub_manuscriptwordcount ?? null
     }),
+    htmlBody: renderedEmail.html,
+    textBody: renderedEmail.text,
+    templateVersion: EDITORIAL_RECOMMENDATION_TEMPLATE_VERSION,
+    htmlChecksum: renderedEmail.checksums.htmlSha256,
+    textChecksum: renderedEmail.checksums.textSha256,
+    qualityGate: renderedEmail.ok ? "PASS" : `BLOCKED:${renderedEmail.blockers.join(",")}`,
     templateName: "EDITORIAL_RECOMMENDATION_LETTER_V1",
     sendStatus: DRAFT_STATUS,
     approvalStatus: DRAFT_APPROVAL_STATUS,

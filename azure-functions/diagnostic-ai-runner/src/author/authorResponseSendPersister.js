@@ -108,12 +108,20 @@ function buildAuthorResponseSendLogRecord(input = {}) {
   const providerName = normalizeString(input.providerName || delivery.providerName);
   const providerMessageId = normalizeString(input.providerMessageId || delivery.providerMessageId);
   const correlationId = normalizeString(approval.metadata?.correlationId);
+  const templateVersion = normalizeString(approval.templateVersion);
+  const htmlSha256 = normalizeString(approval.templateMetadata?.htmlSha256);
+  const textSha256 = normalizeString(approval.templateMetadata?.textSha256);
+  const qualityGate = normalizeString(approval.templateMetadata?.qualityGate);
   const actionDescription = [
     `${EVENT_TYPE} for intake ${approval.intakeReferenceCode}.`,
     `Author email ${normalizeString(approval.authorEmail)}.`,
     `Internal visibility ${INTERNAL_VISIBILITY_MAILBOX}.`,
     `Subject ${normalizeString(approval.draftSubject)}.`,
     `Template ${normalizeString(approval.templateName)}.`,
+    templateVersion ? `Template version ${templateVersion}.` : "",
+    htmlSha256 ? `HTML checksum ${htmlSha256}.` : "",
+    textSha256 ? `Plain-text checksum ${textSha256}.` : "",
+    qualityGate ? `Template quality gate ${qualityGate}.` : "",
     `Send status ${AUTHOR_RESPONSE_SEND_STATUS.SENT}.`,
     `Delivery status ${delivery.deliveryStatus}.`,
     `Provider ${providerName || "not provided"}.`,
@@ -148,6 +156,10 @@ function buildAuthorResponseSendLogRecord(input = {}) {
       internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
       subject: approval.draftSubject,
       templateName: approval.templateName,
+      templateVersion: templateVersion || null,
+      htmlSha256: htmlSha256 || null,
+      textSha256: textSha256 || null,
+      templateQualityGate: qualityGate || null,
       sendStatus: AUTHOR_RESPONSE_SEND_STATUS.SENT,
       deliveryStatus: delivery.deliveryStatus,
       internalVisibilityStatus: AUTHOR_RESPONSE_SEND_STATUS.INTERNAL_VISIBILITY_SATISFIED,
