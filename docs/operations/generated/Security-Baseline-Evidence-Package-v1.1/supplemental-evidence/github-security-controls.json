@@ -1,0 +1,789 @@
+{
+  "generatedAt": "2026-07-30T00:49:40.005Z",
+  "owner": "jmerrillorg",
+  "ownerType": "User",
+  "ownerApiVerified": true,
+  "repositoryCount": 19,
+  "repositories": [
+    {
+      "repository": "jmerrillorg/jmerrill-pub",
+      "private": false,
+      "visibility": "PUBLIC",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2026-07-30T00:30:00Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": true,
+        "status": "READ_OK",
+        "openAlertSampleCount": 0
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jmerrill-financial",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2026-06-09T09:22:00Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jmerrillfoundation",
+      "private": false,
+      "visibility": "PUBLIC",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2026-06-09T09:19:57Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": true,
+        "status": "READ_OK",
+        "openAlertSampleCount": 0
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jmerrill-one",
+      "private": false,
+      "visibility": "PUBLIC",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2026-06-09T09:03:51Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": true,
+        "status": "READ_OK",
+        "openAlertSampleCount": 0
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jm1-ops",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2026-06-07T00:31:42Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jackiesmithjr",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2026-06-05T10:27:48Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/aic-online",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2026-05-31T12:18:29Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jmerrill-productions",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2026-04-18T10:21:28Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jm1-book-redirector",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2026-04-16T00:05:48Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jm1-one",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2025-11-10T08:44:39Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jm1-terminal-config",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2025-11-08T02:41:11Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jm-productions-redirect",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": true,
+      "defaultBranch": "main",
+      "pushedAt": "2025-11-07T14:47:45Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jm1-core",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2025-11-05T18:12:31Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/infra",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2025-10-21T15:20:20Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/org-to-foundation-redirect",
+      "private": false,
+      "visibility": "PUBLIC",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2025-09-04T20:43:50Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": true,
+        "status": "READ_OK",
+        "openAlertSampleCount": 0
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/agape-international-cathedral",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2025-08-18T13:23:30Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jm1-dotfiles",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2025-06-07T10:35:37Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jm-www-redirect",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2025-04-21T04:17:28Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    },
+    {
+      "repository": "jmerrillorg/jm-redirect-foundation",
+      "private": true,
+      "visibility": "PRIVATE",
+      "archived": false,
+      "defaultBranch": "main",
+      "pushedAt": "2025-04-21T03:54:35Z",
+      "viewerPermission": "ADMIN",
+      "viewerCanAdminister": true,
+      "securityPolicyEnabled": false,
+      "branchProtection": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "enabled": false
+      },
+      "actionsPermissions": {
+        "verified": true,
+        "status": "READ_OK",
+        "allowedActions": "all",
+        "enabled": true
+      },
+      "codeScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "secretScanning": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "dependabotAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1",
+        "openAlertSampleCount": null
+      },
+      "vulnerabilityAlerts": {
+        "verified": false,
+        "status": "NOT_VERIFIED:1"
+      }
+    }
+  ],
+  "limitations": []
+}

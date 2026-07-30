@@ -1,0 +1,788 @@
+{
+  "generatedAt": "2026-07-30T00:51:54.571Z",
+  "subscription": {
+    "verified": true,
+    "name": "JM1 – Nonprofit Core (2025 Grant)",
+    "id": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e",
+    "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d"
+  },
+  "subscriptions": {
+    "verified": true,
+    "count": 3,
+    "names": [
+      {
+        "name": "JM1 Commercial Hub PAYG",
+        "id": "5188eaf9-af40-4753-a271-34782dc9002a",
+        "state": "Enabled",
+        "isDefault": false
+      },
+      {
+        "name": "JM1 – Nonprofit Core (2025 Grant)",
+        "id": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e",
+        "state": "Enabled",
+        "isDefault": true
+      },
+      {
+        "name": "N/A(tenant level account)",
+        "id": "b2f9cca1-74da-41ef-987c-a5e015013be0",
+        "state": "Enabled",
+        "isDefault": false
+      }
+    ]
+  },
+  "defenderForCloud": {
+    "verified": true,
+    "plans": [
+      {
+        "name": "VirtualMachines",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "SqlServers",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "AppServices",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "StorageAccounts",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "SqlServerVirtualMachines",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "KubernetesService",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "ContainerRegistry",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "KeyVaults",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "Dns",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "Arm",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "OpenSourceRelationalDatabases",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "CosmosDbs",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "Containers",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "CloudPosture",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "Api",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "AI",
+        "pricingTier": "Free",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "Discovery",
+        "pricingTier": "Standard",
+        "subPlan": null,
+        "extensions": []
+      },
+      {
+        "name": "FoundationalCspm",
+        "pricingTier": "Standard",
+        "subPlan": null,
+        "extensions": []
+      }
+    ],
+    "status": "READ_OK"
+  },
+  "resourceSecurityInventory": {
+    "verified": true,
+    "totalResources": 110,
+    "selectedResourceCount": 30,
+    "resources": [
+      {
+        "name": "DefaultWorkspace-9ee13245-2303-4010-8b6d-35f7cbcfdc0e-EUS",
+        "type": "Microsoft.OperationalInsights/workspaces",
+        "resourceGroup": "DefaultResourceGroup-EUS",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "kv-jm1-core",
+        "type": "Microsoft.KeyVault/vaults",
+        "resourceGroup": "rg-jm1-core",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "jm1core",
+        "type": "Microsoft.Storage/storageAccounts",
+        "resourceGroup": "rg-jm1-core",
+        "location": "eastus",
+        "identity": null,
+        "tags": {
+          "brand": "JM1 Core",
+          "env": "prod",
+          "purpose": "backups logs"
+        }
+      },
+      {
+        "name": "jm1media",
+        "type": "Microsoft.Storage/storageAccounts",
+        "resourceGroup": "rg-jm1-core",
+        "location": "eastus",
+        "identity": null,
+        "tags": {
+          "brand": "JM1 Media",
+          "env": "prod",
+          "purpose": "cdn static assets"
+        }
+      },
+      {
+        "name": "jm1coreservices8242",
+        "type": "Microsoft.Storage/storageAccounts",
+        "resourceGroup": "jm1-core-services",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "jm1-ed-functions",
+        "type": "Microsoft.Web/sites",
+        "resourceGroup": "jm1-core-services",
+        "location": "eastus",
+        "identity": null,
+        "tags": {
+          "hidden-link: /app-insights-resource-id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/jm1-core-services/providers/microsoft.insights/components/jm1-ed-functions"
+        }
+      },
+      {
+        "name": "jm1-ed-functions-insights",
+        "type": "Microsoft.Insights/components",
+        "resourceGroup": "jm1-core-services",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e-rg-jm1-core-EUS",
+        "type": "Microsoft.OperationalInsights/workspaces",
+        "resourceGroup": "rg-jm1-core",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "oidc-msi-8d57",
+        "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+        "resourceGroup": "jm1-core-services",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "jm1-core-vault",
+        "type": "Microsoft.KeyVault/vaults",
+        "resourceGroup": "rg-jm1-core",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "jm1-core-managed-identity",
+        "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+        "resourceGroup": "rg-jm1-core",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "jmpaudiobookprod",
+        "type": "Microsoft.Storage/storageAccounts",
+        "resourceGroup": "rg-jmp-audiobook-prod",
+        "location": "eastus",
+        "identity": null,
+        "tags": {
+          "Brand": "J Merrill Publishing",
+          "Division": "Audiobook Production",
+          "Environment": "Production",
+          "costCenter": "JMP",
+          "owner": "Jackie Smith Jr",
+          "project": "JMP-AUDIO-AI-001"
+        }
+      },
+      {
+        "name": "jm1-avd-01-nsg",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "resourceGroup": "jm1-core-services",
+        "location": "eastus2",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "stjm1acsrelay",
+        "type": "Microsoft.Storage/storageAccounts",
+        "resourceGroup": "rg-jm1-communications",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "func-jm1-acs-email-relay",
+        "type": "Microsoft.Web/sites",
+        "resourceGroup": "rg-jm1-communications",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "func-jm1-acs-email-relay",
+        "type": "Microsoft.Insights/components",
+        "resourceGroup": "rg-jm1-communications",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "stjm1diagrunner",
+        "type": "Microsoft.Storage/storageAccounts",
+        "resourceGroup": "rg-jm1-ai",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "func-jm1-diagnostic-ai-runner",
+        "type": "Microsoft.Insights/components",
+        "resourceGroup": "rg-jm1-ai",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "func-jm1-diagnostic-ai-runner",
+        "type": "Microsoft.Web/sites",
+        "resourceGroup": "rg-jm1-ai",
+        "location": "eastus",
+        "identity": {
+          "type": "SystemAssigned",
+          "userAssignedIdentityCount": 0
+        },
+        "tags": {
+          "hidden-link: /app-insights-resource-id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-ai/providers/microsoft.insights/components/func-jm1-diagnostic-ai-runner"
+        }
+      },
+      {
+        "name": "jm1fin",
+        "type": "Microsoft.Storage/storageAccounts",
+        "resourceGroup": "jmerrill-financial_group",
+        "location": "eastus",
+        "identity": null,
+        "tags": {
+          "brand": "JM1 Financial",
+          "env": "prod",
+          "purpose": "client contracts"
+        }
+      },
+      {
+        "name": "funcjm1foundationin8054",
+        "type": "Microsoft.Storage/storageAccounts",
+        "resourceGroup": "func-jm1-foundation-intake_group",
+        "location": "eastus2",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "func-jm1-foundation-intake",
+        "type": "Microsoft.Web/sites",
+        "resourceGroup": "func-jm1-foundation-intake_group",
+        "location": "eastus2",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "oidc-msi-a571",
+        "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+        "resourceGroup": "agape-international-cathedral-rg",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "oidc-msi-a8ab",
+        "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+        "resourceGroup": "agape-international-cathedral-rg",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "aic-app-insights",
+        "type": "Microsoft.Insights/components",
+        "resourceGroup": "agape-international-cathedral-rg",
+        "location": "eastus",
+        "identity": null,
+        "tags": {}
+      },
+      {
+        "name": "aiconline",
+        "type": "Microsoft.Storage/storageAccounts",
+        "resourceGroup": "agape-international-cathedral-rg",
+        "location": "eastus",
+        "identity": null,
+        "tags": {
+          "brand": "Agape International Cathedral",
+          "env": "prod",
+          "purpose": "site backups media"
+        }
+      },
+      {
+        "name": "jm1pub",
+        "type": "Microsoft.Storage/storageAccounts",
+        "resourceGroup": "jmerrill-pub",
+        "location": "eastus",
+        "identity": null,
+        "tags": {
+          "brand": "JM1 Publishing",
+          "env": "prod",
+          "purpose": "manuscripts covers audiobooks"
+        }
+      },
+      {
+        "name": "aic-app-service-prod",
+        "type": "Microsoft.Web/sites",
+        "resourceGroup": "agape-international-cathedral-rg",
+        "location": "eastus",
+        "identity": null,
+        "tags": {
+          "hidden-link: /app-insights-resource-id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/microsoft.insights/components/aic-app-insights"
+        }
+      },
+      {
+        "name": "appi-jm1-pub-prod",
+        "type": "Microsoft.Insights/components",
+        "resourceGroup": "rg-jm1-pub-prod-appsvc",
+        "location": "centralus",
+        "identity": null,
+        "tags": {
+          "environment": "prod",
+          "managedBy": "bicep",
+          "owner": "J Merrill One",
+          "program": "JM1-INFRA-006",
+          "system": "jmerrill-pub"
+        }
+      },
+      {
+        "name": "app-jm1-pub-prod",
+        "type": "Microsoft.Web/sites",
+        "resourceGroup": "rg-jm1-pub-prod-appsvc",
+        "location": "centralus",
+        "identity": {
+          "type": "SystemAssigned",
+          "userAssignedIdentityCount": 0
+        },
+        "tags": {
+          "environment": "prod",
+          "hidden-link: /app-insights-resource-id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-pub-prod-appsvc/providers/microsoft.insights/components/appi-jm1-pub-prod",
+          "managedBy": "bicep",
+          "owner": "J Merrill One",
+          "program": "JM1-INFRA-006",
+          "system": "jmerrill-pub"
+        }
+      }
+    ]
+  },
+  "keyVaults": [
+    {
+      "name": "kv-jm1-core",
+      "resourceGroup": "rg-jm1-core",
+      "location": "eastus",
+      "enableRbacAuthorization": true,
+      "softDelete": true,
+      "purgeProtection": null,
+      "secretCount": null,
+      "secretMetadata": [],
+      "readStatus": "NOT_VERIFIED:1"
+    },
+    {
+      "name": "jm1-core-vault",
+      "resourceGroup": "rg-jm1-core",
+      "location": "eastus",
+      "enableRbacAuthorization": true,
+      "softDelete": true,
+      "purgeProtection": null,
+      "secretCount": 35,
+      "secretMetadata": [
+        {
+          "name": "AnthropicApiKey",
+          "enabled": true,
+          "created": "2026-06-17T11:17:40+00:00",
+          "updated": "2026-06-17T11:17:40+00:00",
+          "expires": null
+        },
+        {
+          "name": "AUTH-SECRET",
+          "enabled": true,
+          "created": "2026-07-27T19:40:14+00:00",
+          "updated": "2026-07-27T19:40:14+00:00",
+          "expires": null
+        },
+        {
+          "name": "AUTHOR-OPERATING-CENTER-EXTERNAL-CLIENT-SECRET",
+          "enabled": true,
+          "created": "2026-07-12T06:01:12+00:00",
+          "updated": "2026-07-12T06:01:12+00:00",
+          "expires": null
+        },
+        {
+          "name": "AUTHOR-PORTAL-ACCESS-CODE-PEPPER",
+          "enabled": true,
+          "created": "2026-07-27T18:51:04+00:00",
+          "updated": "2026-07-27T18:51:04+00:00",
+          "expires": null
+        },
+        {
+          "name": "AUTHOR-PORTAL-ACCESS-REGISTRY-JSON",
+          "enabled": true,
+          "created": "2026-07-29T03:07:24+00:00",
+          "updated": "2026-07-29T03:07:24+00:00",
+          "expires": null
+        },
+        {
+          "name": "AUTHOR-PORTAL-MASTER-ACCESS-CODE",
+          "enabled": true,
+          "created": "2026-07-27T18:51:07+00:00",
+          "updated": "2026-07-27T18:51:07+00:00",
+          "expires": null
+        },
+        {
+          "name": "AUTHOR-PORTAL-SESSION-SECRET",
+          "enabled": true,
+          "created": "2026-07-27T18:51:23+00:00",
+          "updated": "2026-07-27T18:51:23+00:00",
+          "expires": null
+        },
+        {
+          "name": "AZURE-STORAGE-CONNECTION-STRING",
+          "enabled": true,
+          "created": "2026-07-27T18:51:20+00:00",
+          "updated": "2026-07-27T18:51:20+00:00",
+          "expires": null
+        },
+        {
+          "name": "DATAVERSE-CLIENT-ID",
+          "enabled": true,
+          "created": "2026-07-27T18:50:56+00:00",
+          "updated": "2026-07-27T18:50:56+00:00",
+          "expires": null
+        },
+        {
+          "name": "DATAVERSE-CLIENT-SECRET",
+          "enabled": true,
+          "created": "2026-07-27T18:50:58+00:00",
+          "updated": "2026-07-27T18:50:58+00:00",
+          "expires": null
+        },
+        {
+          "name": "DATAVERSE-TENANT-ID",
+          "enabled": true,
+          "created": "2026-07-27T18:50:54+00:00",
+          "updated": "2026-07-27T18:50:54+00:00",
+          "expires": null
+        },
+        {
+          "name": "EXTERNAL-ID-PROVISIONER-CLIENT-SECRET",
+          "enabled": true,
+          "created": "2026-07-12T06:10:39+00:00",
+          "updated": "2026-07-12T06:10:39+00:00",
+          "expires": null
+        },
+        {
+          "name": "INFRA002-DATAVERSE-CLIENT-ID",
+          "enabled": true,
+          "created": "2026-07-08T01:58:26+00:00",
+          "updated": "2026-07-08T01:58:26+00:00",
+          "expires": null
+        },
+        {
+          "name": "INFRA002-DATAVERSE-CLIENT-SECRET",
+          "enabled": true,
+          "created": "2026-07-08T01:58:27+00:00",
+          "updated": "2026-07-08T01:58:27+00:00",
+          "expires": null
+        },
+        {
+          "name": "INFRA002-DATAVERSE-RESOURCE-URL",
+          "enabled": true,
+          "created": "2026-07-10T20:00:54+00:00",
+          "updated": "2026-07-10T20:00:54+00:00",
+          "expires": null
+        },
+        {
+          "name": "INFRA002-DATAVERSE-TENANT-ID",
+          "enabled": true,
+          "created": "2026-07-08T01:58:26+00:00",
+          "updated": "2026-07-08T01:58:26+00:00",
+          "expires": null
+        },
+        {
+          "name": "INFRA002-DATAVERSE-WEB-API-BASE-URL",
+          "enabled": true,
+          "created": "2026-07-10T20:00:55+00:00",
+          "updated": "2026-07-10T20:00:55+00:00",
+          "expires": null
+        },
+        {
+          "name": "jm1-int-pub-005-diagnostic-runner-key",
+          "enabled": true,
+          "created": "2026-06-16T06:51:20+00:00",
+          "updated": "2026-06-16T06:51:20+00:00",
+          "expires": null
+        },
+        {
+          "name": "jm1-int-pub-005-relay-api-key",
+          "enabled": true,
+          "created": "2026-06-24T02:14:56+00:00",
+          "updated": "2026-06-24T02:14:56+00:00",
+          "expires": null
+        },
+        {
+          "name": "JM1-JOIN-INTERNAL-NOTIFICATION-RELAY-KEY",
+          "enabled": true,
+          "created": "2026-07-27T18:51:13+00:00",
+          "updated": "2026-07-27T18:51:13+00:00",
+          "expires": null
+        },
+        {
+          "name": "JM1-JOIN-INTERNAL-NOTIFICATION-RELAY-URL",
+          "enabled": true,
+          "created": "2026-07-27T18:51:11+00:00",
+          "updated": "2026-07-27T18:51:11+00:00",
+          "expires": null
+        },
+        {
+          "name": "JM1-ORCHESTRATION-WORKER-KEY",
+          "enabled": true,
+          "created": "2026-07-27T18:51:19+00:00",
+          "updated": "2026-07-27T18:51:19+00:00",
+          "expires": null
+        },
+        {
+          "name": "JM1-PUB-INTAKE-WEBAPI-CLIENT-ID",
+          "enabled": true,
+          "created": "2026-07-15T05:44:07+00:00",
+          "updated": "2026-07-15T05:44:07+00:00",
+          "expires": null
+        },
+        {
+          "name": "JM1-PUB-INTAKE-WEBAPI-CLIENT-SECRET",
+          "enabled": true,
+          "created": "2026-07-15T05:44:05+00:00",
+          "updated": "2026-07-15T05:44:05+00:00",
+          "expires": null
+        },
+        {
+          "name": "jm1-publishing-orchestration-worker-key",
+          "enabled": true,
+          "created": "2026-07-28T13:19:36+00:00",
+          "updated": "2026-07-28T13:19:36+00:00",
+          "expires": null
+        },
+        {
+          "name": "PRECOA-CALENDAR-FEED-URL",
+          "enabled": true,
+          "created": "2026-07-28T13:10:41+00:00",
+          "updated": "2026-07-28T13:10:41+00:00",
+          "expires": null
+        },
+        {
+          "name": "PublisherOperatingCenterClientSecret",
+          "enabled": true,
+          "created": "2026-07-15T08:07:27+00:00",
+          "updated": "2026-07-15T08:07:27+00:00",
+          "expires": null
+        },
+        {
+          "name": "SHAREPOINT-CLIENT-ID",
+          "enabled": true,
+          "created": "2026-07-27T18:51:02+00:00",
+          "updated": "2026-07-27T18:51:02+00:00",
+          "expires": null
+        },
+        {
+          "name": "SHAREPOINT-CLIENT-SECRET",
+          "enabled": true,
+          "created": "2026-07-27T18:51:03+00:00",
+          "updated": "2026-07-27T18:51:03+00:00",
+          "expires": null
+        },
+        {
+          "name": "SHAREPOINT-TENANT-ID",
+          "enabled": true,
+          "created": "2026-07-27T18:51:00+00:00",
+          "updated": "2026-07-27T18:51:00+00:00",
+          "expires": null
+        },
+        {
+          "name": "STRIPE-CHECKOUT-SECRET-KEY",
+          "enabled": true,
+          "created": "2026-07-27T18:51:16+00:00",
+          "updated": "2026-07-27T18:51:16+00:00",
+          "expires": null
+        },
+        {
+          "name": "STRIPE-CONNECT-SECRET-KEY",
+          "enabled": true,
+          "created": "2026-07-27T18:51:14+00:00",
+          "updated": "2026-07-27T18:51:14+00:00",
+          "expires": null
+        },
+        {
+          "name": "STRIPE-WEBHOOK-SECRET",
+          "enabled": true,
+          "created": "2026-07-27T18:51:17+00:00",
+          "updated": "2026-07-27T18:51:17+00:00",
+          "expires": null
+        },
+        {
+          "name": "TURNSTILE-SECRET-KEY",
+          "enabled": true,
+          "created": "2026-07-29T08:12:23+00:00",
+          "updated": "2026-07-29T08:12:23+00:00",
+          "expires": null
+        },
+        {
+          "name": "TURNSTILE-SITE-KEY",
+          "enabled": true,
+          "created": "2026-07-29T08:12:23+00:00",
+          "updated": "2026-07-29T08:12:23+00:00",
+          "expires": null
+        }
+      ],
+      "readStatus": "READ_OK"
+    }
+  ],
+  "monitoring": {
+    "metricAlerts": {
+      "verified": true,
+      "count": 4,
+      "items": [
+        {
+          "name": "alert-jm1-pub-appsvc-http5xx",
+          "resourceGroup": "rg-jm1-pub-prod-appsvc",
+          "enabled": true,
+          "severity": 2,
+          "scopes": 1
+        },
+        {
+          "name": "alert-jm1-pub-appsvc-response-time",
+          "resourceGroup": "rg-jm1-pub-prod-appsvc",
+          "enabled": true,
+          "severity": 3,
+          "scopes": 1
+        },
+        {
+          "name": "alert-jm1-pub-appsvc-healthcheck",
+          "resourceGroup": "rg-jm1-pub-prod-appsvc",
+          "enabled": true,
+          "severity": 2,
+          "scopes": 1
+        },
+        {
+          "name": "alert-jm1-pub-appsvc-staging-healthcheck",
+          "resourceGroup": "rg-jm1-pub-prod-appsvc",
+          "enabled": true,
+          "severity": 3,
+          "scopes": 1
+        }
+      ]
+    },
+    "logAnalytics": {
+      "verified": true,
+      "count": 5,
+      "items": [
+        {
+          "name": "DefaultWorkspace-9ee13245-2303-4010-8b6d-35f7cbcfdc0e-EUS",
+          "resourceGroup": "DefaultResourceGroup-EUS",
+          "location": "eastus",
+          "retentionInDays": 30
+        },
+        {
+          "name": "managed-aic-app-insights-ws",
+          "resourceGroup": "ai_aic-app-insights_a458e2dd-8be0-4eeb-adfd-494e7c14448f_managed",
+          "location": "eastus",
+          "retentionInDays": 30
+        },
+        {
+          "name": "managed-jm1-ed-functions-insights-ws",
+          "resourceGroup": "ai_jm1-ed-functions-insights_b7e394e2-7112-41bd-9ca7-c9fa1649ba64_managed",
+          "location": "eastus",
+          "retentionInDays": 30
+        },
+        {
+          "name": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e-rg-jm1-core-EUS",
+          "resourceGroup": "rg-jm1-core",
+          "location": "eastus",
+          "retentionInDays": 30
+        },
+        {
+          "name": "managed-func-jm1-diagnostic-ai-runner-ws",
+          "resourceGroup": "ai_func-jm1-diagnostic-ai-runner_ab6245b2-2b19-4ba3-9a41-6dc8b2ebbc27_managed",
+          "location": "eastus",
+          "retentionInDays": 30
+        }
+      ]
+    }
+  }
+}

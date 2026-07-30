@@ -1,0 +1,4672 @@
+{
+  "packageVersion": "v1",
+  "generatedAt": "2026-07-29T16:55:41.152Z",
+  "authority": "PROGRAM-004 Amendment 1 Annex S; Jackie Ruling 2026-07-29",
+  "mode": "READ_ONLY",
+  "sourcePackage": "docs/operations/generated/PROGRAM-004-Annex-S-Security-Baseline-Evidence-v1",
+  "maturityRecords": [
+    {
+      "id": "ANNEXS-ENT-001",
+      "lane": "Entitlements",
+      "capability": "M365 SKU and service plan inventory",
+      "maturity_state": "Designed=Defined by tenant licensing; Entitled=Entitled; Activated=Partially activated by assigned licenses; Proven=API readback captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Graph subscribedSkus",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / M365 Admin",
+      "confidence": "High",
+      "known_limitation": "Per-user service plan details summarized to reduce identity data in v1 package.",
+      "required_next_action": "Chad synthesize license sufficiency against nine lanes.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-ENT-002",
+      "lane": "Entitlements",
+      "capability": "Intune availability",
+      "maturity_state": "Designed=Endpoint management lane requires Intune posture; Entitled=Entitled; Activated=PendingActivation observed in subscribed service plan; Proven=Graph SKU evidence",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Graph subscribedSkus",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / M365 Admin",
+      "confidence": "Medium",
+      "known_limitation": "Service plan observed, but tenant activation/enrollment policy still requires portal/API proof.",
+      "required_next_action": "Validate Intune tenant activation and endpoint enrollment policy.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-ENT-003",
+      "lane": "Entitlements",
+      "capability": "Purview availability",
+      "maturity_state": "Designed=Compliance lane requires Purview posture; Entitled=Entitled; Activated=Service plan available; Proven=Graph SKU evidence",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Graph subscribedSkus",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Compliance Admin",
+      "confidence": "Medium",
+      "known_limitation": "Policy configuration requires compliance endpoint readback.",
+      "required_next_action": "Validate labels, retention, DLP coverage in Purview.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-ID-001",
+      "lane": "Identity",
+      "capability": "Conditional Access policies",
+      "maturity_state": "Designed=Conditional Access control plane present; Entitled=Entitled; Activated=Activated; Proven=Graph readback captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Graph conditionalAccess policies",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Entra Admin",
+      "confidence": "High",
+      "known_limitation": "Coverage details require synthesis from full policy bodies.",
+      "required_next_action": "Review coverage against privileged, guest, legacy-auth, and break-glass patterns.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-ID-002",
+      "lane": "Identity",
+      "capability": "Standing privileged role membership",
+      "maturity_state": "Designed=Privileged roles should be least-privilege and reviewed; Entitled=Directory roles readable; Activated=Role memberships present/readable; Proven=Directory role member readback captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Graph directoryRoles",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Entra Admin",
+      "confidence": "Medium",
+      "known_limitation": "PIM eligibility and MFA method strength may require additional permissions.",
+      "required_next_action": "Synthesize standing privilege count and request PIM/method proof where absent.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-ID-003",
+      "lane": "Identity",
+      "capability": "Guest and external access posture",
+      "maturity_state": "Designed=External access posture must be known; Entitled=Users readable; Activated=Guest count captured; Proven=Graph users summary captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Graph users",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Entra Admin",
+      "confidence": "Medium",
+      "known_limitation": "SharePoint/Teams sharing policies are not in user summary.",
+      "required_next_action": "Compare guest count and sharing policies against external collaboration canon.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-M365-001",
+      "lane": "M365 security/compliance",
+      "capability": "Secure Score snapshot",
+      "maturity_state": "Designed=Security baseline requires Secure Score snapshot; Entitled=Unknown; Activated=Unknown; Proven=Not proven",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Graph security secureScores",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Security Admin",
+      "confidence": "Low",
+      "known_limitation": "Secure Score query failed under current token.",
+      "required_next_action": "Review score controls and improvement actions separately.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-ENDPOINT-001",
+      "lane": "Endpoints",
+      "capability": "Intune managed device inventory",
+      "maturity_state": "Designed=Endpoint lane names JM1-PRIME/SUPPORT/ARCHIVE/VIEW/MOBILE; Entitled=Unknown; Activated=Not proven; Proven=Not proven",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Graph Intune managedDevices",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Endpoint Admin",
+      "confidence": "Low",
+      "known_limitation": "Current token may lack Intune device read permission or tenant may not be activated.",
+      "required_next_action": "Confirm Intune enrollment for each named endpoint.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-AZ-001",
+      "lane": "Azure",
+      "capability": "Azure subscription/resource inventory",
+      "maturity_state": "Designed=Both Azure pillars must be visible; Entitled=Both non-tenant subscriptions visible; Activated=Resources read from visible subscriptions; Proven=az account/resource readback captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Azure CLI account/resource list",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Azure Admin",
+      "confidence": "High",
+      "known_limitation": "Resource list is metadata-only and does not inspect every nested child setting.",
+      "required_next_action": "Synthesize tagging, secret references, and workload network controls.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-AZ-002",
+      "lane": "Azure",
+      "capability": "Defender for Cloud plan states",
+      "maturity_state": "Designed=Defender for Cloud plan states required; Entitled=Security pricing readable; Activated=Plan tiers captured; Proven=az security pricing list captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Azure CLI security pricing",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Azure Security Admin",
+      "confidence": "High",
+      "known_limitation": "Many plans read as Free in core; commercial pillar requires synthesis.",
+      "required_next_action": "Decide Standard plan needs by workload risk/grant availability.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-AZ-003",
+      "lane": "Azure",
+      "capability": "Key Vault presence and identity pattern",
+      "maturity_state": "Designed=Secrets should use Key Vault and managed identity where appropriate; Entitled=Key Vault resources visible; Activated=Vault resources present; Proven=Key Vault and identity metadata captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Azure CLI keyvault/resource list",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Azure Admin",
+      "confidence": "High",
+      "known_limitation": "Secret values intentionally not read; access-policy/RBAC detail may require deeper review.",
+      "required_next_action": "Map app setting secrets to Key Vault reference or exception.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-MON-001",
+      "lane": "Monitoring/IR",
+      "capability": "Azure Monitor and Log Analytics coverage",
+      "maturity_state": "Designed=Monitoring coverage required across workloads; Entitled=Azure Monitor resources visible; Activated=Workspaces and alerts present in metadata; Proven=Log Analytics + alert metadata captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Azure CLI monitor workspace/alert list",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Azure Admin",
+      "confidence": "High",
+      "known_limitation": "Alert action delivery was not tested in read-only sweep.",
+      "required_next_action": "Run synthetic alert action proof under separate authorization.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-DEV-001",
+      "lane": "Development security",
+      "capability": "GitHub repository control inventory",
+      "maturity_state": "Designed=Branch protection, secret scanning, Dependabot, CodeQL, Actions permissions required; Entitled=Repo scope readable; Activated=Repository metadata captured; Proven=gh repo/API readback",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "GitHub CLI repo/API",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / GitHub Admin",
+      "confidence": "Medium",
+      "known_limitation": "Org plan metadata requires admin:org/security-manager authority; some repo fields require admin visibility.",
+      "required_next_action": "Refresh GitHub auth or validate org security settings in GitHub UI.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-ENDPOINT-002",
+      "lane": "Endpoints",
+      "capability": "JM1-PRIME local OS/encryption/admin posture",
+      "maturity_state": "Designed=Endpoint baseline includes OS patch, encryption, local admin, enrollment; Entitled=Local read access available; Activated=FileVault active on JM1-PRIME; Proven=Local command readback captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Local macOS commands",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Endpoint Owner",
+      "confidence": "Medium",
+      "known_limitation": "Only JM1-PRIME local posture directly inspected.",
+      "required_next_action": "Run same collector on JM1-SUPPORT/JM1-ARCHIVE or validate via Intune.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-DEV-002",
+      "lane": "Development security",
+      "capability": "Local secrets sweep on JM1-PRIME",
+      "maturity_state": "Designed=Locations/types only; never values; Entitled=Local filesystem readable; Activated=Credential-adjacent files present; Proven=Metadata-only scan captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Metadata-only local filename/type scan",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Cody",
+      "confidence": "Medium",
+      "known_limitation": "No file values read or recorded; candidate list is not proof of compromise. Scan depth bounded.",
+      "required_next_action": "Review candidates and move governed secrets to approved vault/keychain paths as needed.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-AI-001",
+      "lane": "AI/model security",
+      "capability": "External model dependency inventory",
+      "maturity_state": "Designed=Model dependencies and provenance must be known; Entitled=Repository manifests readable; Activated=No package dependencies matched; Proven=package.json metadata captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Local package.json dependency scan",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / AI Runtime Owner",
+      "confidence": "Medium",
+      "known_limitation": "Repository dependencies only; Foundry runtime settings require Azure synthesis.",
+      "required_next_action": "Pin/freeze model versions where dependencies are floating or provider aliases are used.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-REC-001",
+      "lane": "Recovery",
+      "capability": "Backup/recovery documentation coverage",
+      "maturity_state": "Designed=System-of-record backup and restoration evidence required; Entitled=Repository docs readable; Activated=Recovery/backup docs present; Proven=Filename inventory captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Local documentation inventory",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / System Owners",
+      "confidence": "Medium",
+      "known_limitation": "Filename inventory does not prove backup freshness or restoration.",
+      "required_next_action": "Collect last successful restore evidence per Dataverse, BC, SharePoint, GitHub, endpoint.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    },
+    {
+      "id": "ANNEXS-PP-001",
+      "lane": "Power Platform",
+      "capability": "Power Platform environment/resource inventory",
+      "maturity_state": "Designed=Environment inventory, DLP, roles, auditing required; Entitled=Power Platform ARM resource visible; Activated=At least one Power Platform account present; Proven=Azure ARM metadata captured",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "evidence_source": "Azure resource list",
+      "environment": "JM1-PRIME",
+      "capability_owner": "Jackie / Power Platform Admin",
+      "confidence": "Low",
+      "known_limitation": "Power Platform admin DLP/security-role/audit endpoints not fully readable from installed tooling; pac/m365 CLI absent.",
+      "required_next_action": "Validate PP environments, DLP connector groupings, Dataverse auditing via admin center/API.",
+      "related_governance_reference": "PROGRAM-004 Amendment 1 Annex S; Maturity Model v2.0 record fields"
+    }
+  ],
+  "evidenceSources": [
+    {
+      "source_key": "subscribedSkus",
+      "evidence_type": "object",
+      "record_count": 17,
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "conditionalAccess",
+      "evidence_type": "array",
+      "record_count": 3,
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "directoryRoles",
+      "evidence_type": "array",
+      "record_count": 90,
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "users",
+      "evidence_type": "object",
+      "record_count": 42,
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "secureScore",
+      "evidence_type": "object",
+      "record_count": "",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "intuneManagedDevices",
+      "evidence_type": "object",
+      "record_count": "",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "azureAccounts",
+      "evidence_type": "array",
+      "record_count": 3,
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "azure",
+      "evidence_type": "array",
+      "record_count": 2,
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "githubRepositories",
+      "evidence_type": "array",
+      "record_count": 19,
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "localEndpoint",
+      "evidence_type": "object",
+      "record_count": "",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "localSecretSweep",
+      "evidence_type": "object",
+      "record_count": "",
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "aiDependencies",
+      "evidence_type": "array",
+      "record_count": 0,
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "recoveryDocs",
+      "evidence_type": "array",
+      "record_count": 4,
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    },
+    {
+      "source_key": "powerPlatformArm",
+      "evidence_type": "array",
+      "record_count": 1,
+      "last_verified": "2026-07-29T16:51:02.414Z",
+      "environment": "JM1-PRIME",
+      "sensitive_values_retained": "0",
+      "location": "security-baseline-evidence-register.json"
+    }
+  ],
+  "gapsAndRecommendations": [
+    {
+      "gap_id": "ANNEXS-GAP-001",
+      "lane": "Entitlements",
+      "capability": "M365 SKU and service plan inventory",
+      "current_limitation": "Per-user service plan details summarized to reduce identity data in v1 package.",
+      "recommendation": "Chad synthesize license sufficiency against nine lanes.",
+      "owner": "Jackie / M365 Admin",
+      "confidence": "High",
+      "governance_status": "Recommendation only - not ratified remediation",
+      "related_record": "ANNEXS-ENT-001"
+    },
+    {
+      "gap_id": "ANNEXS-GAP-002",
+      "lane": "Entitlements",
+      "capability": "Intune availability",
+      "current_limitation": "Service plan observed, but tenant activation/enrollment policy still requires portal/API proof.",
+      "recommendation": "Validate Intune tenant activation and endpoint enrollment policy.",
+      "owner": "Jackie / M365 Admin",
+      "confidence": "Medium",
+      "governance_status": "Recommendation only - not ratified remediation",
+      "related_record": "ANNEXS-ENT-002"
+    },
+    {
+      "gap_id": "ANNEXS-GAP-003",
+      "lane": "Entitlements",
+      "capability": "Purview availability",
+      "current_limitation": "Policy configuration requires compliance endpoint readback.",
+      "recommendation": "Validate labels, retention, DLP coverage in Purview.",
+      "owner": "Jackie / Compliance Admin",
+      "confidence": "Medium",
+      "governance_status": "Recommendation only - not ratified remediation",
+      "related_record": "ANNEXS-ENT-003"
+    },
+    {
+      "gap_id": "ANNEXS-GAP-004",
+      "lane": "M365 security/compliance",
+      "capability": "Secure Score snapshot",
+      "current_limitation": "Secure Score query failed under current token.",
+      "recommendation": "Review score controls and improvement actions separately.",
+      "owner": "Jackie / Security Admin",
+      "confidence": "Low",
+      "governance_status": "Recommendation only - not ratified remediation",
+      "related_record": "ANNEXS-M365-001"
+    },
+    {
+      "gap_id": "ANNEXS-GAP-005",
+      "lane": "Endpoints",
+      "capability": "Intune managed device inventory",
+      "current_limitation": "Current token may lack Intune device read permission or tenant may not be activated.",
+      "recommendation": "Confirm Intune enrollment for each named endpoint.",
+      "owner": "Jackie / Endpoint Admin",
+      "confidence": "Low",
+      "governance_status": "Recommendation only - not ratified remediation",
+      "related_record": "ANNEXS-ENDPOINT-001"
+    },
+    {
+      "gap_id": "ANNEXS-GAP-006",
+      "lane": "Azure",
+      "capability": "Defender for Cloud plan states",
+      "current_limitation": "Many plans read as Free in core; commercial pillar requires synthesis.",
+      "recommendation": "Decide Standard plan needs by workload risk/grant availability.",
+      "owner": "Jackie / Azure Security Admin",
+      "confidence": "High",
+      "governance_status": "Recommendation only - not ratified remediation",
+      "related_record": "ANNEXS-AZ-002"
+    },
+    {
+      "gap_id": "ANNEXS-GAP-007",
+      "lane": "Development security",
+      "capability": "GitHub repository control inventory",
+      "current_limitation": "Org plan metadata requires admin:org/security-manager authority; some repo fields require admin visibility.",
+      "recommendation": "Refresh GitHub auth or validate org security settings in GitHub UI.",
+      "owner": "Jackie / GitHub Admin",
+      "confidence": "Medium",
+      "governance_status": "Recommendation only - not ratified remediation",
+      "related_record": "ANNEXS-DEV-001"
+    },
+    {
+      "gap_id": "ANNEXS-GAP-008",
+      "lane": "Power Platform",
+      "capability": "Power Platform environment/resource inventory",
+      "current_limitation": "Power Platform admin DLP/security-role/audit endpoints not fully readable from installed tooling; pac/m365 CLI absent.",
+      "recommendation": "Validate PP environments, DLP connector groupings, Dataverse auditing via admin center/API.",
+      "owner": "Jackie / Power Platform Admin",
+      "confidence": "Low",
+      "governance_status": "Recommendation only - not ratified remediation",
+      "related_record": "ANNEXS-PP-001"
+    }
+  ],
+  "rawEvidence": {
+    "subscribedSkus": {
+      "count": 17,
+      "skuPartNumbers": [
+        "FLOW_PER_USER",
+        "POWER_BI_PRO",
+        "Forms_Pro_USL",
+        "WINDOWS_STORE",
+        "FLOW_FREE",
+        "PHONESYSTEM_VIRTUALUSER",
+        "O365_BUSINESS_PREMIUM",
+        "NONPROFIT_PORTAL",
+        "POWER_BI_STANDARD",
+        "MCOTEAMS_ESSENTIALS",
+        "Power_Pages_vTrial_for_Makers",
+        "O365_BUSINESS_ESSENTIALS",
+        "Dynamics_365_Multi_app_",
+        "Dynamics_365_Business_Central_Essentials_Attach",
+        "POWERAPPS_PER_APP_NEW",
+        "POWERAPPS_PER_APP",
+        "DYN365_ENTERPRISE_SALES"
+      ],
+      "consumed": {
+        "FLOW_PER_USER": 1,
+        "POWER_BI_PRO": 1,
+        "Forms_Pro_USL": 2,
+        "WINDOWS_STORE": 0,
+        "FLOW_FREE": 10,
+        "PHONESYSTEM_VIRTUALUSER": 6,
+        "O365_BUSINESS_PREMIUM": 1,
+        "NONPROFIT_PORTAL": 3,
+        "POWER_BI_STANDARD": 3,
+        "MCOTEAMS_ESSENTIALS": 1,
+        "Power_Pages_vTrial_for_Makers": 2,
+        "O365_BUSINESS_ESSENTIALS": 10,
+        "Dynamics_365_Multi_app_": 2,
+        "Dynamics_365_Business_Central_Essentials_Attach": 1,
+        "POWERAPPS_PER_APP_NEW": 0,
+        "POWERAPPS_PER_APP": 0,
+        "DYN365_ENTERPRISE_SALES": 1
+      },
+      "servicePlans": [
+        "BI_AZURE_P0",
+        "BI_AZURE_P2",
+        "BPOS_S_TODO_1",
+        "Bing_Chat_Enterprise",
+        "CDSAICAPACITY_PERAPP",
+        "CDS_FORM_PRO_USL",
+        "CDS_O365_P1",
+        "CDS_O365_P2",
+        "CDS_PER_APP",
+        "CLIPCHAMP",
+        "CUSTOMER_VOICE_DYN365_VIRAL_TRIAL",
+        "D365_CSI_EMBED_CSEnterprise",
+        "DATAVERSE_POWERAPPS_PER_APP_NEW",
+        "DYN365BC_MS_INVOICING",
+        "DYN365_BUSCENTRAL_ESSENTIALS_ATTACH",
+        "DYN365_CDS_O365_P1",
+        "DYN365_CDS_O365_P2",
+        "DYN365_CDS_P2",
+        "DYN365_CDS_VIRAL",
+        "DYN365_CS_MESSAGING_TPS",
+        "DYN365_CS_VOICE",
+        "DYN365_ENTERPRISE_CUSTOMER_SERVICE",
+        "DYN365_ENTERPRISE_FIELD_SERVICE",
+        "DYN365_ENTERPRISE_SALES",
+        "DYN365_MARKETING_APP",
+        "Deskless",
+        "Dynamics_365_for_Retail_Team_members",
+        "EXCHANGE_STORAGE_50GB",
+        "EXCHANGE_S_FOUNDATION",
+        "EXCHANGE_S_STANDARD",
+        "FLOW_DYN_APPS",
+        "FLOW_FORMS_PRO",
+        "FLOW_O365_P1",
+        "FLOW_P2_VIRAL",
+        "FLOW_PER_USER",
+        "FORMS_PLAN_E1",
+        "Flow_Per_APP",
+        "Forms_Pro_FS",
+        "Forms_Pro_SalesEnt",
+        "Forms_Pro_USL",
+        "GRAPH_CONNECTORS_SEARCH_INDEX",
+        "GUIDES",
+        "INSIGHTS_BY_MYANALYTICS",
+        "INTUNE_O365",
+        "KAIZALA_O365_P2",
+        "M365_LIGHTHOUSE_CUSTOMER_PLAN1",
+        "MCOEV",
+        "MCOEV_VIRTUALUSER",
+        "MCOPSTN1",
+        "MCOSMS3",
+        "MCOSTANDARD",
+        "MDOLITE_ENTERPRISE",
+        "MESH_AVATARS_ADDITIONAL_FOR_TEAMS",
+        "MESH_AVATARS_FOR_TEAMS",
+        "MESH_IMMERSIVE_FOR_TEAMS",
+        "MICROSOFTBOOKINGS",
+        "MICROSOFT_LOOP",
+        "MICROSOFT_MYANALYTICS_FULL",
+        "MICROSOFT_REMOTE_ASSIST",
+        "MICROSOFT_SEARCH",
+        "MYANALYTICS_P2",
+        "Microsoft_Viva_Sales_PowerAutomate",
+        "Microsoft_Viva_Sales_PremiumTrial",
+        "NBENTERPRISE",
+        "NONPROFIT_PORTAL",
+        "Nucleus",
+        "O365_SB_Relationship_Management",
+        "OFFICEMOBILE_SUBSCRIPTION",
+        "OFFICE_BUSINESS",
+        "PEOPLE_SKILLS_FOUNDATION",
+        "PLACES_CORE",
+        "POWERAPPS_DYN_APPS",
+        "POWERAPPS_GUIDES",
+        "POWERAPPS_O365_P1",
+        "POWERAPPS_PER_APP",
+        "POWERAPPS_PER_APP_NEW",
+        "POWER_PAGES_VTRIAL",
+        "POWER_VIRTUAL_AGENTS_D365_CS_MESSAGING",
+        "POWER_VIRTUAL_AGENTS_D365_CS_VOICE",
+        "POWER_VIRTUAL_AGENTS_O365_P1",
+        "POWER_VIRTUAL_AGENTS_O365_P2",
+        "PROJECTWORKMANAGEMENT",
+        "PROJECT_ESSENTIALS",
+        "PROJECT_O365_P1",
+        "PROJECT_O365_P2",
+        "PURVIEW_DISCOVERY",
+        "Power_Pages_Internal_User",
+        "RMS_S_BASIC",
+        "SHAREPOINTENTERPRISE",
+        "SHAREPOINTSTANDARD",
+        "SHAREPOINTWAC",
+        "STREAM_O365_SMB",
+        "SWAY",
+        "TEAMS1",
+        "VIVAENGAGE_CORE",
+        "VIVA_LEARNING_SEEDED",
+        "WHITEBOARD_PLAN1",
+        "WINDOWS_STORE",
+        "YAMMER_ENTERPRISE"
+      ]
+    },
+    "conditionalAccess": [
+      {
+        "id": "032e9b85-bbfe-4f1d-81af-9a5ec06bffab",
+        "displayName": "Block Legacy Authentication",
+        "state": "enabled",
+        "createdDateTime": "2025-05-15T12:15:16.266787Z",
+        "modifiedDateTime": "2025-05-15T12:17:51.5086485Z"
+      },
+      {
+        "id": "c2595dca-0f52-45b6-99e5-7fcf1fb8ff9a",
+        "displayName": "Require MFA for All Users",
+        "state": "enabled",
+        "createdDateTime": "2025-05-15T12:21:33.2175376Z",
+        "modifiedDateTime": "2025-05-15T13:36:39.7333128Z"
+      },
+      {
+        "id": "4946b6c8-33a5-47d3-ba8b-68a545c92687",
+        "displayName": "Break Glass Bypass – Minimum CA Enforcement",
+        "state": "enabled",
+        "createdDateTime": "2025-05-15T13:29:11.8325931Z",
+        "modifiedDateTime": "2025-05-15T13:31:08.2968055Z"
+      }
+    ],
+    "directoryRoles": [
+      {
+        "role": "Printer Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Groups Administrator",
+        "members": [
+          {
+            "id": "9586f34b-b5f3-437b-bc64-3e44d2518427",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.one"
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Customer LockBox Access Approver",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Compliance Data Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Application Developer",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Knowledge Manager",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Printer Technician",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Insights Business Leader",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Microsoft 365 Migration Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Viva Glint Tenant Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Teams Telephony Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Directory Writers",
+        "members": [
+          {
+            "id": "09e6b011-a9b7-48c5-8da6-7fc15512e2e0",
+            "displayName": "Jackie Smith",
+            "userPrincipalName": "a0338273-c879-452f-b539-a300faacbb66@jmerrillfoundation.onmicrosoft.com"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Compliance Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Windows Update Deployment Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Helpdesk Administrator",
+        "members": [
+          {
+            "id": "9586f34b-b5f3-437b-bc64-3e44d2518427",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.one"
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Password Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Network Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Search Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Intune Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Global Administrator",
+        "members": [
+          {
+            "id": "ae3ebbb1-55ec-4e9b-9b10-20671831537a",
+            "displayName": "Jackie Smith",
+            "userPrincipalName": "jackie@jmerrillfoundation.onmicrosoft.com"
+          },
+          {
+            "id": "9586f34b-b5f3-437b-bc64-3e44d2518427",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.one"
+          },
+          {
+            "id": "36b7a603-d428-41c8-9a92-0ed29dd6f93e",
+            "displayName": "Break Glass Admin",
+            "userPrincipalName": "admin@jmerrill.one"
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Search Editor",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Message Center Reader",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Office Apps Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Fabric Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Power Platform Administrator",
+        "members": [
+          {
+            "id": "1efd8d5f-afe5-4c18-8e78-3ddceeaec24a",
+            "displayName": "JM1 Appointments",
+            "userPrincipalName": "appointments@jmerrill.one"
+          },
+          {
+            "id": "4846056c-3127-4f23-be97-8e1b0087f484",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.pub"
+          },
+          {
+            "id": "9586f34b-b5f3-437b-bc64-3e44d2518427",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.one"
+          },
+          {
+            "id": "abf9b34d-65fe-4d2d-85c9-cd2b1b038a7c",
+            "displayName": "AI Assistant Admins",
+            "userPrincipalName": null
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Edge Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Global Reader",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "License Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Exchange Administrator",
+        "members": [
+          {
+            "id": "1efd8d5f-afe5-4c18-8e78-3ddceeaec24a",
+            "displayName": "JM1 Appointments",
+            "userPrincipalName": "appointments@jmerrill.one"
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Virtual Visits Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "People Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Message Center Privacy Reader",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Usage Summary Reports Reader",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Azure AD Joined Device Local Administrator",
+        "members": [
+          {
+            "id": "09e6b011-a9b7-48c5-8da6-7fc15512e2e0",
+            "displayName": "Jackie Smith",
+            "userPrincipalName": "a0338273-c879-452f-b539-a300faacbb66@jmerrillfoundation.onmicrosoft.com"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Reports Reader",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Hybrid Identity Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Security Administrator",
+        "members": [
+          {
+            "id": "82334a71-ae8b-40b5-9cbc-f7d9e6556b25",
+            "displayName": "JM1 Tech",
+            "userPrincipalName": "tech@jmerrill.one"
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Viva Goals Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Organizational Data Source Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Yammer Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Authentication Policy Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "External ID User Flow Administrator",
+        "members": [
+          {
+            "id": "09e6b011-a9b7-48c5-8da6-7fc15512e2e0",
+            "displayName": "Jackie Smith",
+            "userPrincipalName": "a0338273-c879-452f-b539-a300faacbb66@jmerrillfoundation.onmicrosoft.com"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Teams Communications Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Security Reader",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Microsoft Hardware Warranty Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Authentication Extensibility Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Windows 365 Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Cloud Device Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Billing Administrator",
+        "members": [
+          {
+            "id": "9586f34b-b5f3-437b-bc64-3e44d2518427",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.one"
+          },
+          {
+            "id": "7c69ecd8-4600-4acf-8a78-9f465950d683",
+            "displayName": "JM1 Accounting",
+            "userPrincipalName": "accounting@jmerrill.one"
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "AI Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Attack Simulation Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Service Support Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Cloud Application Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Desktop Analytics Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "B2C IEF Keyset Administrator",
+        "members": [
+          {
+            "id": "09e6b011-a9b7-48c5-8da6-7fc15512e2e0",
+            "displayName": "Jackie Smith",
+            "userPrincipalName": "a0338273-c879-452f-b539-a300faacbb66@jmerrillfoundation.onmicrosoft.com"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "SharePoint Embedded Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Attribute Definition Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Microsoft 365 Backup Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "User Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Exchange Recipient Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Teams Devices Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Directory Readers",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "External ID User Flow Attribute Administrator",
+        "members": [
+          {
+            "id": "09e6b011-a9b7-48c5-8da6-7fc15512e2e0",
+            "displayName": "Jackie Smith",
+            "userPrincipalName": "a0338273-c879-452f-b539-a300faacbb66@jmerrillfoundation.onmicrosoft.com"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Application Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Dynamics 365 Administrator",
+        "members": [
+          {
+            "id": "1efd8d5f-afe5-4c18-8e78-3ddceeaec24a",
+            "displayName": "JM1 Appointments",
+            "userPrincipalName": "appointments@jmerrill.one"
+          },
+          {
+            "id": "4846056c-3127-4f23-be97-8e1b0087f484",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.pub"
+          },
+          {
+            "id": "9586f34b-b5f3-437b-bc64-3e44d2518427",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.one"
+          },
+          {
+            "id": "abf9b34d-65fe-4d2d-85c9-cd2b1b038a7c",
+            "displayName": "AI Assistant Admins",
+            "userPrincipalName": null
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Authentication Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Teams Communications Support Engineer",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Identity Governance Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Attack Payload Author",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Privileged Role Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Organizational Branding Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "B2C IEF Policy Administrator",
+        "members": [
+          {
+            "id": "09e6b011-a9b7-48c5-8da6-7fc15512e2e0",
+            "displayName": "Jackie Smith",
+            "userPrincipalName": "a0338273-c879-452f-b539-a300faacbb66@jmerrillfoundation.onmicrosoft.com"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "SharePoint Administrator",
+        "members": [
+          {
+            "id": "1efd8d5f-afe5-4c18-8e78-3ddceeaec24a",
+            "displayName": "JM1 Appointments",
+            "userPrincipalName": "appointments@jmerrill.one"
+          },
+          {
+            "id": "9586f34b-b5f3-437b-bc64-3e44d2518427",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.one"
+          },
+          {
+            "id": "abf9b34d-65fe-4d2d-85c9-cd2b1b038a7c",
+            "displayName": "AI Assistant Admins",
+            "userPrincipalName": null
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Security Operator",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Azure Information Protection Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Teams Communications Support Specialist",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Attribute Assignment Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Guest Inviter",
+        "members": [],
+        "readError": null
+      },
+      {
+        "role": "Cloud App Security Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "External Identity Provider Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Skype for Business Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Privileged Authentication Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Insights Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Knowledge Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Conditional Access Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Domain Name Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Kaizala Administrator",
+        "members": [
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Teams Administrator",
+        "members": [
+          {
+            "id": "1efd8d5f-afe5-4c18-8e78-3ddceeaec24a",
+            "displayName": "JM1 Appointments",
+            "userPrincipalName": "appointments@jmerrill.one"
+          },
+          {
+            "id": "9586f34b-b5f3-437b-bc64-3e44d2518427",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.one"
+          },
+          {
+            "id": "abf9b34d-65fe-4d2d-85c9-cd2b1b038a7c",
+            "displayName": "AI Assistant Admins",
+            "userPrincipalName": null
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Dynamics 365 Business Central Administrator",
+        "members": [
+          {
+            "id": "9586f34b-b5f3-437b-bc64-3e44d2518427",
+            "displayName": "Jackie Smith, Jr.",
+            "userPrincipalName": "jackie@jmerrill.one"
+          },
+          {
+            "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+            "displayName": "JM1 Admin",
+            "userPrincipalName": "jm1-admin@jmerrill.one"
+          }
+        ],
+        "readError": null
+      },
+      {
+        "role": "Azure DevOps Administrator",
+        "members": [
+          {
+            "id": "09e6b011-a9b7-48c5-8da6-7fc15512e2e0",
+            "displayName": "Jackie Smith",
+            "userPrincipalName": "a0338273-c879-452f-b539-a300faacbb66@jmerrillfoundation.onmicrosoft.com"
+          }
+        ],
+        "readError": null
+      }
+    ],
+    "users": {
+      "count": 42,
+      "guestCount": 2,
+      "disabledCount": 17,
+      "licensedCount": 19
+    },
+    "secureScore": {
+      "ok": false,
+      "error": "ERROR: Forbidden({\"error\":{\"code\":\"UnknownError\",\"message\":\"Auth token does not contain valid permissions or user does not have valid roles.\",\"innerError\":{\"date\":\"2026-07-29T16:51:57\",\"request-id\":\"39ead597-74af-492a-97c2-e1d80e217bc0\",\"client-request-id\":\"39ead597-74af-492a-97c2-e1d80e217bc0\"}}})\n"
+    },
+    "intuneManagedDevices": {
+      "ok": false,
+      "error": "ERROR: Unauthorized({\"error\":{\"code\":\"UnknownError\",\"message\":\"{\\\"ErrorCode\\\":\\\"Forbidden\\\",\\\"Message\\\":\\\"{\\\\r\\\\n  \\\\\\\"_version\\\\\\\": 3,\\\\r\\\\n  \\\\\\\"Message\\\\\\\": \\\\\\\"An error has occurred - Operation ID (for customer support): 00000000-0000-0000-0000-000000000000 - Activity ID: d3477201-b543-4974-a11d-3dedc717d18d - Url: https://proxy.msua08.manage.microsoft.com/DeviceFE/StatelessDeviceFEService/deviceManagement/managedDevices?api-version=5026-05-11&$select=id%2cdeviceName%2coperatingSystem%2ccomplianceState%2cmanagementAgent%2clastSyncDateTime&$top=999\\\\\\\",\\\\r\\\\n  \\\\\\\"CustomApiErrorPhrase\\\\\\\": \\\\\\\"\\\\\\\",\\\\r\\\\n  \\\\\\\"RetryAfter\\\\\\\": null,\\\\r\\\\n  \\\\\\\"ErrorSourceService\\\\\\\": \\\\\\\"\\\\\\\",\\\\r\\\\n  \\\\\\\"HttpHeaders\\\\\\\": \\\\\\\"{\\\\\\\\\\\\\\\"WWW-Authenticate\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"Bearer\\\\\\\\\\\\\\\"}\\\\\\\"\\\\r\\\\n}\\\",\\\"Target\\\":null,\\\"Details\\\":null,\\\"InnerError\\\":null,\\\"InstanceAnnotations\\\":[]}\",\"innerError\":{\"date\":\"2026-07-29T16:51:58\",\"request-id\":\"d3477201-b543-4974-a11d-3dedc717d18d\",\"client-request-id\":\"d3477201-b5"
+    },
+    "azureAccounts": [
+      {
+        "id": "5188eaf9-af40-4753-a271-34782dc9002a",
+        "isDefault": false,
+        "name": "JM1 Commercial Hub PAYG",
+        "state": "Enabled",
+        "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d"
+      },
+      {
+        "id": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e",
+        "isDefault": true,
+        "name": "JM1 – Nonprofit Core (2025 Grant)",
+        "state": "Enabled",
+        "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d"
+      },
+      {
+        "id": "b2f9cca1-74da-41ef-987c-a5e015013be0",
+        "isDefault": false,
+        "name": "N/A(tenant level account)",
+        "state": "Enabled",
+        "tenantId": "b2f9cca1-74da-41ef-987c-a5e015013be0"
+      }
+    ],
+    "azure": [
+      {
+        "subscription": {
+          "id": "5188eaf9-af40-4753-a271-34782dc9002a",
+          "isDefault": false,
+          "name": "JM1 Commercial Hub PAYG",
+          "state": "Enabled",
+          "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d"
+        },
+        "resources": [
+          {
+            "identity": "SystemAssigned",
+            "location": "eastus2",
+            "name": "jm1pub-foundry",
+            "resourceGroup": "rg-jm1pub-ai-prod",
+            "tags": {
+              "jm1:brand": "jmpublishing",
+              "jm1:cost-center": "commercial",
+              "jm1:environment": "production",
+              "jm1:workload": "stage0-diagnostic"
+            },
+            "type": "Microsoft.CognitiveServices/accounts"
+          },
+          {
+            "identity": "SystemAssigned",
+            "location": "eastus2",
+            "name": "jm1pub-foundry/proj-stage0-diagnostic",
+            "resourceGroup": "rg-jm1pub-ai-prod",
+            "tags": null,
+            "type": "Microsoft.CognitiveServices/accounts/projects"
+          },
+          {
+            "identity": "SystemAssigned",
+            "location": "eastus2",
+            "name": "jm1-ai-verify-foundry-resource",
+            "resourceGroup": "rg-jm1-ai-verify-foundry",
+            "tags": null,
+            "type": "Microsoft.CognitiveServices/accounts"
+          },
+          {
+            "identity": "SystemAssigned",
+            "location": "eastus2",
+            "name": "jm1-ai-verify-foundry-resource/jm1-ai-verify-foundry",
+            "resourceGroup": "rg-jm1-ai-verify-foundry",
+            "tags": null,
+            "type": "Microsoft.CognitiveServices/accounts/projects"
+          }
+        ],
+        "defenderPricing": [
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/VirtualMachines",
+            "name": "VirtualMachines",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/SqlServers",
+            "name": "SqlServers",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/AppServices",
+            "name": "AppServices",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/StorageAccounts",
+            "name": "StorageAccounts",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/SqlServerVirtualMachines",
+            "name": "SqlServerVirtualMachines",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": true,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/KubernetesService",
+            "name": "KubernetesService",
+            "pricingTier": "Free",
+            "replacedBy": [
+              "Containers"
+            ],
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": true,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/ContainerRegistry",
+            "name": "ContainerRegistry",
+            "pricingTier": "Free",
+            "replacedBy": [
+              "Containers"
+            ],
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/KeyVaults",
+            "name": "KeyVaults",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": true,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/Dns",
+            "name": "Dns",
+            "pricingTier": "Free",
+            "replacedBy": [
+              "VirtualMachines"
+            ],
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/Arm",
+            "name": "Arm",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/OpenSourceRelationalDatabases",
+            "name": "OpenSourceRelationalDatabases",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/CosmosDbs",
+            "name": "CosmosDbs",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/Containers",
+            "name": "Containers",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/CloudPosture",
+            "name": "CloudPosture",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/Api",
+            "name": "Api",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/AI",
+            "name": "AI",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/Discovery",
+            "name": "Discovery",
+            "pricingTier": "Standard",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "0:00:00",
+            "id": "/subscriptions/5188eaf9-af40-4753-a271-34782dc9002a/providers/Microsoft.Security/pricings/FoundationalCspm",
+            "name": "FoundationalCspm",
+            "pricingTier": "Standard",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          }
+        ],
+        "keyVaults": [],
+        "logAnalyticsWorkspaces": [],
+        "metricAlerts": [],
+        "scheduledQueryAlerts": []
+      },
+      {
+        "subscription": {
+          "id": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e",
+          "isDefault": true,
+          "name": "JM1 – Nonprofit Core (2025 Grant)",
+          "state": "Enabled",
+          "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d"
+        },
+        "resources": [
+          {
+            "identity": null,
+            "location": "global",
+            "name": "jmerrill.pub",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "Microsoft.Network/dnszones"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "jmerrill.productions",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "Microsoft.Network/dnszones"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "jackiesmithjr.com",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "Microsoft.Network/dnszones"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "jmerrill.foundation",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "Microsoft.Network/dnszones"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "jmerrill.org",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "Microsoft.Network/dnszones"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "jmerrill.financial",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "Microsoft.Network/dnszones"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "jmerrill.one",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "Microsoft.Network/dnszones"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "foundation-main",
+            "resourceGroup": "jm1-core-services",
+            "tags": {
+              "Brand": "Foundation",
+              "Division": "Nonprofit",
+              "Environment": "Production",
+              "Owner": "Jackie Smith Jr",
+              "Project": "Website"
+            },
+            "type": "Microsoft.Web/staticSites"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "org-to-foundation-redirect",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.Web/staticSites"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "DefaultWorkspace-9ee13245-2303-4010-8b6d-35f7cbcfdc0e-EUS",
+            "resourceGroup": "DefaultResourceGroup-EUS",
+            "tags": null,
+            "type": "Microsoft.OperationalInsights/workspaces"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "kv-jm1-core",
+            "resourceGroup": "rg-jm1-core",
+            "tags": {},
+            "type": "Microsoft.KeyVault/vaults"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "managed-aic-app-insights-ws",
+            "resourceGroup": "ai_aic-app-insights_a458e2dd-8be0-4eeb-adfd-494e7c14448f_managed",
+            "tags": null,
+            "type": "microsoft.operationalinsights/workspaces"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1core",
+            "resourceGroup": "rg-jm1-core",
+            "tags": {
+              "brand": "JM1 Core",
+              "env": "prod",
+              "purpose": "backups logs"
+            },
+            "type": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1media",
+            "resourceGroup": "rg-jm1-core",
+            "tags": {
+              "brand": "JM1 Media",
+              "env": "prod",
+              "purpose": "cdn static assets"
+            },
+            "type": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "office365",
+            "resourceGroup": "rg-jm1-core",
+            "tags": null,
+            "type": "Microsoft.Web/connections"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "la-jm1-gov-notify",
+            "resourceGroup": "rg-jm1-core",
+            "tags": null,
+            "type": "Microsoft.Logic/workflows"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "office365-1",
+            "resourceGroup": "rg-jm1-core",
+            "tags": null,
+            "type": "Microsoft.Web/connections"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1coreservices8242",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1-ed-functions",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "microsoft.insights/components"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "ASP-jm1coreservices-bf17",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.Web/serverFarms"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1-ed-functions",
+            "resourceGroup": "jm1-core-services",
+            "tags": {
+              "hidden-link: /app-insights-resource-id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/jm1-core-services/providers/microsoft.insights/components/jm1-ed-functions"
+            },
+            "type": "Microsoft.Web/sites"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1-ed-functions-insights",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "Microsoft.Insights/components"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "managed-jm1-ed-functions-insights-ws",
+            "resourceGroup": "ai_jm1-ed-functions-insights_b7e394e2-7112-41bd-9ca7-c9fa1649ba64_managed",
+            "tags": null,
+            "type": "microsoft.operationalinsights/workspaces"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1-hq-app",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "microsoft.insights/components"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "hq.jmerrill.one-jm1-hq-app",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e-rg-jm1-core-EUS",
+            "resourceGroup": "rg-jm1-core",
+            "tags": null,
+            "type": "Microsoft.OperationalInsights/workspaces"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "JM1-CoreHQ-Insights",
+            "resourceGroup": "rg-jm1-core",
+            "tags": {},
+            "type": "microsoft.insights/components"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "oidc-msi-8d57",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1-core-vault",
+            "resourceGroup": "rg-jm1-core",
+            "tags": {},
+            "type": "Microsoft.KeyVault/vaults"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1-core-managed-identity",
+            "resourceGroup": "rg-jm1-core",
+            "tags": {},
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "JM1-WebPlan-Dev",
+            "resourceGroup": "rg-jm1-web-dev",
+            "tags": null,
+            "type": "Microsoft.Web/serverFarms"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "dev.jmerrill.one",
+            "resourceGroup": "rg-jm1-web-dev",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "dev.jmerrill.pub",
+            "resourceGroup": "rg-jm1-web-dev",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "dev.jmerrill.financial",
+            "resourceGroup": "rg-jm1-web-dev",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "dev.jmerrill.foundation",
+            "resourceGroup": "rg-jm1-web-dev",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "dev.jmerrill.productions",
+            "resourceGroup": "rg-jm1-web-dev",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "dev.agapeic.org",
+            "resourceGroup": "rg-jm1-web-dev",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "azureapp-auto",
+            "resourceGroup": "azureapp-auto-alerts-157e8c-jm1_admin_jmerrill_one",
+            "tags": null,
+            "type": "Microsoft.Insights/actiongroups"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "Service Health issue in 'JM1 – Nonprofit Core (2025 Grant)'",
+            "resourceGroup": "azureapp-auto-alerts-157e8c-jm1_admin_jmerrill_one",
+            "tags": null,
+            "type": "Microsoft.Insights/activityLogAlerts"
+          },
+          {
+            "identity": null,
+            "location": "unitedstates",
+            "name": "JM1CorePayGo2025",
+            "resourceGroup": "rg-jm1-core",
+            "tags": {},
+            "type": "Microsoft.PowerPlatform/accounts"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jmerrill-one",
+            "resourceGroup": "jm1-core-services",
+            "tags": {},
+            "type": "microsoft.insights/components"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "acs-jm1-core",
+            "resourceGroup": "rg-jm1-communications",
+            "tags": {},
+            "type": "Microsoft.Communication/CommunicationServices"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "jm1-book-redirector",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.Web/staticSites"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "jackiesmithjr",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.Web/staticSites"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jmpaudiobookprod",
+            "resourceGroup": "rg-jmp-audiobook-prod",
+            "tags": {
+              "Brand": "J Merrill Publishing",
+              "Division": "Audiobook Production",
+              "Environment": "Production",
+              "costCenter": "JMP",
+              "owner": "Jackie Smith Jr",
+              "project": "JMP-AUDIO-AI-001"
+            },
+            "type": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "azureapp-auto",
+            "resourceGroup": "azureapp-auto-alerts-157e8c-jackie_jmerrillfoundation_onmicrosoft_com",
+            "tags": null,
+            "type": "Microsoft.Insights/actiongroups"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "Service Health issue in 'JM1 – Nonprofit Core (2025 Grant)'",
+            "resourceGroup": "azureapp-auto-alerts-157e8c-jackie_jmerrillfoundation_onmicrosoft_com",
+            "tags": null,
+            "type": "Microsoft.Insights/activityLogAlerts"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "jm1-avd-01-ip",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.Network/publicIPAddresses"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "jm1-avd-01-nsg",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.Network/networkSecurityGroups"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "jm1-avd-01-vnet",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.Network/virtualNetworks"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "jm1-avd-01440_z1",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.Network/networkInterfaces"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "jm1-avd-01",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.Compute/virtualMachines"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "jm1-avd-01_OsDisk_1_dd93e798d07c477386dd21d956d8eed5",
+            "resourceGroup": "JM1-CORE-SERVICES",
+            "tags": null,
+            "type": "Microsoft.Compute/disks"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "shutdown-computevm-jm1-avd-01",
+            "resourceGroup": "jm1-core-services",
+            "tags": null,
+            "type": "Microsoft.DevTestLab/schedules"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "email-jm1-core",
+            "resourceGroup": "rg-jm1-communications",
+            "tags": {},
+            "type": "Microsoft.Communication/EmailServices"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "email-jm1-core/email.jmerrill.one",
+            "resourceGroup": "rg-jm1-communications",
+            "tags": null,
+            "type": "Microsoft.Communication/EmailServices/Domains"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "stjm1acsrelay",
+            "resourceGroup": "rg-jm1-communications",
+            "tags": {},
+            "type": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "func-jm1-acs-email-relay",
+            "resourceGroup": "rg-jm1-communications",
+            "tags": null,
+            "type": "Microsoft.Web/sites"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "EastUSLinuxDynamicPlan",
+            "resourceGroup": "rg-jm1-communications",
+            "tags": null,
+            "type": "Microsoft.Web/serverFarms"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "func-jm1-acs-email-relay",
+            "resourceGroup": "rg-jm1-communications",
+            "tags": {},
+            "type": "Microsoft.Insights/components"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "stjm1diagrunner",
+            "resourceGroup": "rg-jm1-ai",
+            "tags": {},
+            "type": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "func-jm1-diagnostic-ai-runner",
+            "resourceGroup": "rg-jm1-ai",
+            "tags": {},
+            "type": "Microsoft.Insights/components"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "managed-func-jm1-diagnostic-ai-runner-ws",
+            "resourceGroup": "ai_func-jm1-diagnostic-ai-runner_ab6245b2-2b19-4ba3-9a41-6dc8b2ebbc27_managed",
+            "tags": null,
+            "type": "microsoft.operationalinsights/workspaces"
+          },
+          {
+            "identity": "SystemAssigned",
+            "location": "eastus",
+            "name": "func-jm1-diagnostic-ai-runner",
+            "resourceGroup": "rg-jm1-ai",
+            "tags": {
+              "hidden-link: /app-insights-resource-id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-ai/providers/microsoft.insights/components/func-jm1-diagnostic-ai-runner"
+            },
+            "type": "Microsoft.Web/sites"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "EastUSLinuxDynamicPlan",
+            "resourceGroup": "rg-jm1-ai",
+            "tags": null,
+            "type": "Microsoft.Web/serverFarms"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "oai-jm1-diagnostic",
+            "resourceGroup": "rg-jm1-ai",
+            "tags": {
+              "environment": "production",
+              "project": "int-pub-005",
+              "purpose": "diagnostic-ai-runner"
+            },
+            "type": "Microsoft.CognitiveServices/accounts"
+          },
+          {
+            "identity": "SystemAssigned",
+            "location": "eastus2",
+            "name": "ais-jm1-foundry",
+            "resourceGroup": "rg-jm1-ai",
+            "tags": null,
+            "type": "Microsoft.CognitiveServices/accounts"
+          },
+          {
+            "identity": "SystemAssigned",
+            "location": "eastus2",
+            "name": "ais-jm1-foundry/jm1-editorial-foundry",
+            "resourceGroup": "rg-jm1-ai",
+            "tags": null,
+            "type": "Microsoft.CognitiveServices/accounts/projects"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "NetworkWatcher_eastus2",
+            "resourceGroup": "NetworkWatcherRG",
+            "tags": null,
+            "type": "Microsoft.Network/networkWatchers"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "jmerrill-financial",
+            "resourceGroup": "jmerrill-financial_group",
+            "tags": {
+              "BusinessUnit": "J Merrill Financial LLC",
+              "CostCenter": "Marketing or Web",
+              "Environment": "Production",
+              "Owner": "jackie@jmerrill.one",
+              "Project": "jmerrill-financial"
+            },
+            "type": "Microsoft.Web/staticSites"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1fin",
+            "resourceGroup": "jmerrill-financial_group",
+            "tags": {
+              "brand": "JM1 Financial",
+              "env": "prod",
+              "purpose": "client contracts"
+            },
+            "type": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "funcjm1foundationin8054",
+            "resourceGroup": "func-jm1-foundation-intake_group",
+            "tags": {},
+            "type": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "ASP-funcjm1foundationintakegroup-a4e9",
+            "resourceGroup": "func-jm1-foundation-intake_group",
+            "tags": null,
+            "type": "Microsoft.Web/serverFarms"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "func-jm1-foundation-intake",
+            "resourceGroup": "func-jm1-foundation-intake_group",
+            "tags": {},
+            "type": "Microsoft.Web/sites"
+          },
+          {
+            "identity": null,
+            "location": "unitedstates",
+            "name": "jm1authorid",
+            "resourceGroup": "rg-jm1-external-id",
+            "tags": null,
+            "type": "Microsoft.AzureActiveDirectory/ciamDirectories"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "jmerrill-one",
+            "resourceGroup": "jmerrill-one",
+            "tags": {
+              "Project": "J Merrill One"
+            },
+            "type": "Microsoft.Web/staticSites"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "jmerrill-pub",
+            "resourceGroup": "jmerrill-pub",
+            "tags": null,
+            "type": "Microsoft.Web/staticSites"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "aic-app-service",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": {},
+            "type": "microsoft.insights/components"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "Application Insights Smart Detection",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": null,
+            "type": "microsoft.insights/actiongroups"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "oidc-msi-a571",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": {},
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "agapeic.org",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": {},
+            "type": "Microsoft.Network/dnszones"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "agapeic.org-aic-app-service",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "www.agapeic.org-aic-app-service",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "ASP-agapeinternationalcathedralrg-9bc2",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": null,
+            "type": "Microsoft.Web/serverFarms"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "oidc-msi-a8ab",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": {},
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "aic.agapeic.org-aic-app-service",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "eastus2",
+            "name": "aic-public",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": {},
+            "type": "Microsoft.Web/staticSites"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "aic-app-insights",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": {},
+            "type": "Microsoft.Insights/components"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "aiconline",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": {
+              "brand": "Agape International Cathedral",
+              "env": "prod",
+              "purpose": "site backups media"
+            },
+            "type": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "jm1pub",
+            "resourceGroup": "jmerrill-pub",
+            "tags": {
+              "brand": "JM1 Publishing",
+              "env": "prod",
+              "purpose": "manuscripts covers audiobooks"
+            },
+            "type": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "identity": null,
+            "location": "eastus",
+            "name": "aic-app-service-prod",
+            "resourceGroup": "agape-international-cathedral-rg",
+            "tags": {
+              "hidden-link: /app-insights-resource-id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/microsoft.insights/components/aic-app-insights"
+            },
+            "type": "Microsoft.Web/sites"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "jmerrill-productions",
+            "resourceGroup": "jmerrill-productions-rg",
+            "tags": null,
+            "type": "Microsoft.Web/staticSites"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "asp-jm1-pub-prod-linux",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": {
+              "environment": "prod",
+              "managedBy": "bicep",
+              "owner": "J Merrill One",
+              "program": "JM1-INFRA-006",
+              "system": "jmerrill-pub"
+            },
+            "type": "Microsoft.Web/serverFarms"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "appi-jm1-pub-prod",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": {
+              "environment": "prod",
+              "managedBy": "bicep",
+              "owner": "J Merrill One",
+              "program": "JM1-INFRA-006",
+              "system": "jmerrill-pub"
+            },
+            "type": "Microsoft.Insights/components"
+          },
+          {
+            "identity": "SystemAssigned",
+            "location": "centralus",
+            "name": "app-jm1-pub-prod",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": {
+              "environment": "prod",
+              "hidden-link: /app-insights-resource-id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-pub-prod-appsvc/providers/microsoft.insights/components/appi-jm1-pub-prod",
+              "managedBy": "bicep",
+              "owner": "J Merrill One",
+              "program": "JM1-INFRA-006",
+              "system": "jmerrill-pub"
+            },
+            "type": "Microsoft.Web/sites"
+          },
+          {
+            "identity": "SystemAssigned",
+            "location": "centralus",
+            "name": "app-jm1-pub-prod/staging",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": {
+              "environment": "prod",
+              "managedBy": "bicep",
+              "owner": "J Merrill One",
+              "program": "JM1-INFRA-006",
+              "slot": "staging",
+              "system": "jmerrill-pub"
+            },
+            "type": "Microsoft.Web/sites/slots"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "ag-jm1-pub-infra006-ops",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": {
+              "environment": "prod",
+              "program": "JM1-INFRA-006",
+              "system": "jmerrill-pub"
+            },
+            "type": "Microsoft.Insights/actiongroups"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "alert-jm1-pub-appsvc-http5xx",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": {
+              "program": "JM1-INFRA-006",
+              "signal": "http5xx",
+              "system": "jmerrill-pub"
+            },
+            "type": "Microsoft.Insights/metricalerts"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "alert-jm1-pub-appsvc-response-time",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": {
+              "program": "JM1-INFRA-006",
+              "signal": "latency",
+              "system": "jmerrill-pub"
+            },
+            "type": "Microsoft.Insights/metricalerts"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "jmerrill.pub",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "www.jmerrill.pub",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": null,
+            "type": "Microsoft.Web/certificates"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "alert-jm1-pub-appsvc-healthcheck",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": null,
+            "type": "Microsoft.Insights/metricalerts"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "alert-jm1-pub-appsvc-staging-healthcheck",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": null,
+            "type": "Microsoft.Insights/metricalerts"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "alert-jm1-pub-appsvc-restart-events",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": null,
+            "type": "Microsoft.Insights/scheduledqueryrules"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "alert-jm1-pub-appsvc-deployment-events",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": null,
+            "type": "Microsoft.Insights/scheduledqueryrules"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "alert-jm1-pub-turnstile-failures",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": null,
+            "type": "Microsoft.Insights/scheduledqueryrules"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "alert-jm1-pub-author-gate-failures",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": null,
+            "type": "Microsoft.Insights/scheduledqueryrules"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "alert-jm1-pub-orchestration-failures",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": null,
+            "type": "Microsoft.Insights/scheduledqueryrules"
+          },
+          {
+            "identity": null,
+            "location": "centralus",
+            "name": "alert-jm1-pub-rollback-events",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "tags": null,
+            "type": "Microsoft.Insights/scheduledqueryrules"
+          },
+          {
+            "identity": null,
+            "location": "global",
+            "name": "marcusmcintosh.org",
+            "resourceGroup": "marcusmcintosh-org",
+            "tags": {},
+            "type": "Microsoft.Network/dnszones"
+          }
+        ],
+        "defenderPricing": [
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/VirtualMachines",
+            "name": "VirtualMachines",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/SqlServers",
+            "name": "SqlServers",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/AppServices",
+            "name": "AppServices",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/StorageAccounts",
+            "name": "StorageAccounts",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/SqlServerVirtualMachines",
+            "name": "SqlServerVirtualMachines",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": true,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/KubernetesService",
+            "name": "KubernetesService",
+            "pricingTier": "Free",
+            "replacedBy": [
+              "Containers"
+            ],
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": true,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/ContainerRegistry",
+            "name": "ContainerRegistry",
+            "pricingTier": "Free",
+            "replacedBy": [
+              "Containers"
+            ],
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/KeyVaults",
+            "name": "KeyVaults",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": true,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/Dns",
+            "name": "Dns",
+            "pricingTier": "Free",
+            "replacedBy": [
+              "VirtualMachines"
+            ],
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/Arm",
+            "name": "Arm",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/OpenSourceRelationalDatabases",
+            "name": "OpenSourceRelationalDatabases",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/CosmosDbs",
+            "name": "CosmosDbs",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/Containers",
+            "name": "Containers",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/CloudPosture",
+            "name": "CloudPosture",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/Api",
+            "name": "Api",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "30 days, 0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/AI",
+            "name": "AI",
+            "pricingTier": "Free",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/Discovery",
+            "name": "Discovery",
+            "pricingTier": "Standard",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          },
+          {
+            "deprecated": null,
+            "enablementTime": null,
+            "extensions": null,
+            "freeTrialRemainingTime": "0:00:00",
+            "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/providers/Microsoft.Security/pricings/FoundationalCspm",
+            "name": "FoundationalCspm",
+            "pricingTier": "Standard",
+            "replacedBy": null,
+            "subPlan": null,
+            "type": "Microsoft.Security/pricings"
+          }
+        ],
+        "keyVaults": [
+          {
+            "enableRbacAuthorization": null,
+            "location": "eastus",
+            "name": "kv-jm1-core",
+            "publicNetworkAccess": null,
+            "resourceGroup": "rg-jm1-core"
+          },
+          {
+            "enableRbacAuthorization": null,
+            "location": "eastus",
+            "name": "jm1-core-vault",
+            "publicNetworkAccess": null,
+            "resourceGroup": "rg-jm1-core"
+          }
+        ],
+        "logAnalyticsWorkspaces": [
+          {
+            "customerId": "d265988d-f1fb-4cf0-b978-9045f66a913c",
+            "location": "eastus",
+            "name": "DefaultWorkspace-9ee13245-2303-4010-8b6d-35f7cbcfdc0e-EUS",
+            "resourceGroup": "DefaultResourceGroup-EUS"
+          },
+          {
+            "customerId": "7b67b2f3-cf3c-4f84-93b3-3b4780252cd8",
+            "location": "eastus",
+            "name": "managed-aic-app-insights-ws",
+            "resourceGroup": "ai_aic-app-insights_a458e2dd-8be0-4eeb-adfd-494e7c14448f_managed"
+          },
+          {
+            "customerId": "4ea598a6-c595-44b6-a57a-768e5bc954d7",
+            "location": "eastus",
+            "name": "managed-jm1-ed-functions-insights-ws",
+            "resourceGroup": "ai_jm1-ed-functions-insights_b7e394e2-7112-41bd-9ca7-c9fa1649ba64_managed"
+          },
+          {
+            "customerId": "09b35bce-e584-4343-84f8-2f5f18e60648",
+            "location": "eastus",
+            "name": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e-rg-jm1-core-EUS",
+            "resourceGroup": "rg-jm1-core"
+          },
+          {
+            "customerId": "c3b5ebcb-4bf5-4d16-a8a6-a7631f1d4534",
+            "location": "eastus",
+            "name": "managed-func-jm1-diagnostic-ai-runner-ws",
+            "resourceGroup": "ai_func-jm1-diagnostic-ai-runner_ab6245b2-2b19-4ba3-9a41-6dc8b2ebbc27_managed"
+          }
+        ],
+        "metricAlerts": [
+          {
+            "enabled": true,
+            "name": "alert-jm1-pub-appsvc-http5xx",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "scopes": [
+              "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-pub-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-pub-prod"
+            ],
+            "severity": 2
+          },
+          {
+            "enabled": true,
+            "name": "alert-jm1-pub-appsvc-response-time",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "scopes": [
+              "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-pub-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-pub-prod"
+            ],
+            "severity": 3
+          },
+          {
+            "enabled": true,
+            "name": "alert-jm1-pub-appsvc-healthcheck",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "scopes": [
+              "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-pub-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-pub-prod"
+            ],
+            "severity": 2
+          },
+          {
+            "enabled": true,
+            "name": "alert-jm1-pub-appsvc-staging-healthcheck",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "scopes": [
+              "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-pub-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-pub-prod/slots/staging"
+            ],
+            "severity": 3
+          }
+        ],
+        "scheduledQueryAlerts": [
+          {
+            "enabled": true,
+            "name": "alert-jm1-pub-appsvc-restart-events",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "severity": 3
+          },
+          {
+            "enabled": true,
+            "name": "alert-jm1-pub-appsvc-deployment-events",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "severity": 4
+          },
+          {
+            "enabled": true,
+            "name": "alert-jm1-pub-turnstile-failures",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "severity": 2
+          },
+          {
+            "enabled": true,
+            "name": "alert-jm1-pub-author-gate-failures",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "severity": 2
+          },
+          {
+            "enabled": true,
+            "name": "alert-jm1-pub-orchestration-failures",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "severity": 2
+          },
+          {
+            "enabled": true,
+            "name": "alert-jm1-pub-rollback-events",
+            "resourceGroup": "rg-jm1-pub-prod-appsvc",
+            "severity": 3
+          }
+        ]
+      }
+    ],
+    "githubRepositories": [
+      {
+        "name": "jmerrill-pub",
+        "visibility": "PUBLIC",
+        "isPrivate": false,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": false,
+          "security_and_analysis": {
+            "dependabot_security_updates": {
+              "status": "disabled"
+            },
+            "secret_scanning": {
+              "status": "enabled"
+            },
+            "secret_scanning_non_provider_patterns": {
+              "status": "disabled"
+            },
+            "secret_scanning_push_protection": {
+              "status": "enabled"
+            },
+            "secret_scanning_validity_checks": {
+              "status": "disabled"
+            }
+          },
+          "visibility": "public"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "name": "jmerrill-financial",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jmerrillfoundation",
+        "visibility": "PUBLIC",
+        "isPrivate": false,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": false,
+          "security_and_analysis": {
+            "dependabot_security_updates": {
+              "status": "disabled"
+            },
+            "secret_scanning": {
+              "status": "enabled"
+            },
+            "secret_scanning_non_provider_patterns": {
+              "status": "disabled"
+            },
+            "secret_scanning_push_protection": {
+              "status": "enabled"
+            },
+            "secret_scanning_validity_checks": {
+              "status": "disabled"
+            }
+          },
+          "visibility": "public"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "name": "jmerrill-one",
+        "visibility": "PUBLIC",
+        "isPrivate": false,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": false,
+          "security_and_analysis": {
+            "dependabot_security_updates": {
+              "status": "disabled"
+            },
+            "secret_scanning": {
+              "status": "enabled"
+            },
+            "secret_scanning_non_provider_patterns": {
+              "status": "disabled"
+            },
+            "secret_scanning_push_protection": {
+              "status": "enabled"
+            },
+            "secret_scanning_validity_checks": {
+              "status": "disabled"
+            }
+          },
+          "visibility": "public"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "name": "jm1-ops",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jackiesmithjr",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "aic-online",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jmerrill-productions",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jm1-book-redirector",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jm1-one",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jm1-terminal-config",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jm-productions-redirect",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": true,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": true,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jm1-core",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "infra",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "org-to-foundation-redirect",
+        "visibility": "PUBLIC",
+        "isPrivate": false,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": false,
+          "security_and_analysis": {
+            "dependabot_security_updates": {
+              "status": "disabled"
+            },
+            "secret_scanning": {
+              "status": "enabled"
+            },
+            "secret_scanning_non_provider_patterns": {
+              "status": "disabled"
+            },
+            "secret_scanning_push_protection": {
+              "status": "enabled"
+            },
+            "secret_scanning_validity_checks": {
+              "status": "disabled"
+            }
+          },
+          "visibility": "public"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Branch not protected (HTTP 404)\n"
+        }
+      },
+      {
+        "name": "agape-international-cathedral",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jm1-dotfiles",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jm-www-redirect",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      },
+      {
+        "name": "jm-redirect-foundation",
+        "visibility": "PRIVATE",
+        "isPrivate": true,
+        "isArchived": false,
+        "defaultBranch": "main",
+        "repoDetails": {
+          "allow_merge_commit": true,
+          "allow_rebase_merge": true,
+          "allow_squash_merge": true,
+          "archived": false,
+          "delete_branch_on_merge": false,
+          "has_vulnerability_alerts": null,
+          "private": true,
+          "security_and_analysis": null,
+          "visibility": "private"
+        },
+        "branchProtection": {
+          "present": false,
+          "readError": "gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n"
+        }
+      }
+    ],
+    "localEndpoint": {
+      "hostname": "JM1-PRIME",
+      "swVers": [
+        "ProductName:\t\tmacOS",
+        "ProductVersion:\t\t27.0",
+        "BuildVersion:\t\t26A5388g"
+      ],
+      "uname": "Darwin JM1-PRIME 27.0.0 Darwin Kernel Version 27.0.0: Tue Jul 14 21:40:50 PDT 2026; root:xnu-13432.0.94.501.4~1/RELEASE_ARM64_T8132 arm64",
+      "fileVault": "FileVault is On.",
+      "adminMembers": "GroupMembership: root jmerrillone jmerrill",
+      "volumes": [
+        "HD",
+        "Recovery",
+        "UsersExternal"
+      ],
+      "profilesEnrollment": "Enrolled via DEP: No\nMDM enrollment: No"
+    },
+    "localSecretSweep": {
+      "roots": [
+        "/Users/jmerrillone/Developer",
+        "/Users/jmerrillone/.azure",
+        "/Users/jmerrillone/.config",
+        "/Volumes/UsersExternal"
+      ],
+      "candidateCount": 167,
+      "candidates": [
+        {
+          "path": "/Users/jmerrillone/Developer/jackiesmithjr/content/archive/a-secret.mdx",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 3719
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-financial/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 718
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-one/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 5901
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/.env.local",
+          "type": "environment-file",
+          "sizeBytes": 321
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 12555
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/docs/operations/FIN-CALENDAR-TARGET-AUTHORITY-REPAIR-2026-07-29/FIN-Outlook-Connection-Reference-Crosswalk.md",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 4143
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 14056
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 392
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-appservice-prereq/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-appservice-prereq/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-appservice-prereq/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-appservice-prereq/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-appservice-prereq/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-gate-build-env-fix/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-gate-build-env-fix/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 14206
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-gate-runtime-fix/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-gate-scope-fix/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-operating-center/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-operating-center-v2/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-payout-enrollment-governance-alignment/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-payout-enrollment-governance-alignment/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-payout-enrollment-governance-alignment/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-payout-enrollment-governance-alignment/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-author-payout-enrollment-governance-alignment/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-catalog-env-fix/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-catalog-fix/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-catalog-fix/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 14206
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-devreview/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-diagnostic-runner-remediation/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-enterprise-adoption/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-enterprise-execution-backlog/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-enterprise-execution-backlog/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-enterprise-execution-backlog/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-env001/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-env001/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 14206
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-final-reconciliation/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-final-reconciliation/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-final-reconciliation/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-final-reconciliation/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-final-reconciliation/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-gate-recovery/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra005-20260727T154552/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra005-20260727T154552/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra005-20260727T154552/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra005-20260727T154552/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra005-20260727T154552/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-app-service/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-app-service/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-app-service/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-app-service/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-app-service/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-phase1/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-phase1/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-phase1/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-phase1/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-phase1/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-phase2/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-phase2/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-phase2/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-phase2/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-infra006-phase2/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-intake-orchestration-autostart/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-intake-orchestration-autostart/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-intake-orchestration-autostart/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-intake-orchestration-autostart/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-intake-orchestration-autostart/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-intake-sev1-restore/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-intake-sev1-restore/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-intake-sev1-restore/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-intake-sev1-restore/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-intake-sev1-restore/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-join-deadletter/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-join-deadletter/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-join-deadletter/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-join-deadletter/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-join-deadletter/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-op000-trackb/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-op000-trackb/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 14206
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-or-2026-002a/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-or-2026-002a/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-or-2026-002a/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-or-2026-002a/docs/operations/OR-2026-002A/00-secret-safe-execution-and-stop-event-record.md",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 3317
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-or-2026-002a/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-or-2026-002a/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-or-2026-002a/scripts/or2026/secret_safe_precoa_scan.py",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 9556
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-portal-p0/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-portal-p0/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 14206
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-portal-recovery/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-pr229/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-pr229/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 14206
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-program002-portal/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-program002a/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-program003-notifications/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1048
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-reconciliation/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-reconciliation/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 14167
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-runtime-promotion/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-sev1-restore-20260727T150348/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 1171
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-sev1-restore-20260727T150348/azure-functions/diagnostic-ai-runner/test/dataverseCredentialConfig.test.js",
+          "type": "credential-store-file",
+          "sizeBytes": 781
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-sev1-restore-20260727T150348/docs/infrastructure/INFRA-004-Enterprise-Credential-Harmonization.md",
+          "type": "credential-store-file",
+          "sizeBytes": 7518
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-sev1-restore-20260727T150348/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 13513
+        },
+        {
+          "path": "/Users/jmerrillone/Developer/jmerrill-pub-sev1-restore-20260727T150348/scripts/infra003_load_credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 976
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/azure/core/credentials.py",
+          "type": "credential-store-file",
+          "sizeBytes": 9138
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/azure/core/credentials_async.py",
+          "type": "credential-store-file",
+          "sizeBytes": 3238
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/certifi/cacert.pem",
+          "type": "private-key-or-pem-candidate",
+          "sizeBytes": 236095
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/urllib3/__pycache__/_base_connection.cpython-313.pyc",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 7000
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/urllib3/__pycache__/connection.cpython-313.pyc",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 39323
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/urllib3/__pycache__/connectionpool.cpython-313.pyc",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 39540
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/urllib3/_base_connection.py",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 5580
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/urllib3/connection.py",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 42786
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/urllib3/connectionpool.py",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 44164
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/urllib3/http2/connection.py",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 12578
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/cliextensions/communication/urllib3/util/connection.py",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 4444
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/clouds.config",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 66
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/commands/2026-07-28.07-30-06.account_get-access-token.91850.log",
+          "type": "token-named-file",
+          "sizeBytes": 253
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/commands/2026-07-28.07-30-19.account_get-access-token.91878.log",
+          "type": "token-named-file",
+          "sizeBytes": 253
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/commands/2026-07-28.07-30-28.account_get-access-token.91908.log",
+          "type": "token-named-file",
+          "sizeBytes": 253
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/commands/2026-07-28.07-30-39.account_get-access-token.91933.log",
+          "type": "token-named-file",
+          "sizeBytes": 253
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/commands/2026-07-28.07-30-56.account_get-access-token.91950.log",
+          "type": "token-named-file",
+          "sizeBytes": 253
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/commands/2026-07-28.07-31-09.account_get-access-token.91972.log",
+          "type": "token-named-file",
+          "sizeBytes": 253
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/commands/2026-07-28.07-32-07.account_get-access-token.92369.log",
+          "type": "token-named-file",
+          "sizeBytes": 253
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/commands/2026-07-28.07-48-28.account_get-access-token.3599.log",
+          "type": "token-named-file",
+          "sizeBytes": 243
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/commands/2026-07-28.07-49-33.account_get-access-token.4128.log",
+          "type": "token-named-file",
+          "sizeBytes": 243
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/config",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 27
+        },
+        {
+          "path": "/Users/jmerrillone/.azure/msal_token_cache.json",
+          "type": "token-named-file",
+          "sizeBytes": 39403
+        },
+        {
+          "path": "/Users/jmerrillone/.config/NuGet/nuget.config",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 190
+        },
+        {
+          "path": "/Users/jmerrillone/.config/jgit/config",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 118
+        },
+        {
+          "path": "/Volumes/UsersExternal/JM1-PRIME/.azure/clouds.config",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 66
+        },
+        {
+          "path": "/Volumes/UsersExternal/JM1-PRIME/.azure/commands/2026-07-29.12-52-01.keyvault_list.25614.log",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 246
+        },
+        {
+          "path": "/Volumes/UsersExternal/JM1-PRIME/.azure/commands/2026-07-29.12-52-08.keyvault_list.25662.log",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 246
+        },
+        {
+          "path": "/Volumes/UsersExternal/JM1-PRIME/.azure/config",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 89
+        },
+        {
+          "path": "/Volumes/UsersExternal/JM1-PRIME/.azure/msal_token_cache.json",
+          "type": "token-named-file",
+          "sizeBytes": 73531
+        },
+        {
+          "path": "/Volumes/UsersExternal/JM1-PRIME/.env.enterprise",
+          "type": "environment-file",
+          "sizeBytes": 1690
+        },
+        {
+          "path": "/Volumes/UsersExternal/JM1-PRIME/jm1-prime-load-credentials.sh",
+          "type": "credential-store-file",
+          "sizeBytes": 3358
+        },
+        {
+          "path": "/Volumes/UsersExternal/JM1-PRIME/repos/jmerrill-pub-demo/.env.example",
+          "type": "environment-file",
+          "sizeBytes": 689
+        },
+        {
+          "path": "/Volumes/UsersExternal/JM1-PRIME/tooling/powershell-7.6.3/System.Security.SecureString.dll",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 15696
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost000000000008aec0/jquery.hotkeys.js",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 5612
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost000000000008aec0/jquery.hotkeys.min.js",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 1793
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost000000000008aec0/jquery.table-hotkeys.js",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 3730
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost000000000008aec0/jquery.table-hotkeys.min.js",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 2295
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000001e7666/Sharing-Secrets-Little-Girls.jpg",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 22780
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000001e7666/Sharing-Secrets-Little-Girls.jpg.json",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 769
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost0000000000398280/config",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 32
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000003a186b/Web.config",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 7856
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000003a186b/development.config",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 25204
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000003a186b/release.config",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 25305
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000003aa366/Frederica D. Keys.contact",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 2091
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000005630d2/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 83
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbd5/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 2111
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbd6/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 1933
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbd7/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 2129
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbd8/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 2073
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbd9/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 2001
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbda/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 1883
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbdb/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 1193
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbdc/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 1282
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbdd/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 1639
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbde/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 1854
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbdf/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 1093
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbe0/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 1869
+        },
+        {
+          "path": "/Volumes/UsersExternal/Olympus/Orphans/Lost00000000008ccbe1/InfoPlist.strings",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 875
+        },
+        {
+          "path": "/Volumes/UsersExternal/_PROCESSING/976801fd1bacc4b71e368fcdb66fa19a77ad3967f0b54895b6fc3f5f05a6df22-2026-04-14-09-27-40-236b2bc14dc64d95a723f25f5ef63bca/file-1vDKeYTWQzXkTiC3Bnk86i-C0AC8967-1D05-4221-89F6-7641260DAD91.jpeg",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 2712161
+        },
+        {
+          "path": "/Volumes/UsersExternal/_PROCESSING/976801fd1bacc4b71e368fcdb66fa19a77ad3967f0b54895b6fc3f5f05a6df22-2026-04-14-09-27-40-236b2bc14dc64d95a723f25f5ef63bca/file-2EcKEYSTR5LFNFBzbojozP-ED51CF5B-1C78-4963-BC10-FC3E103D99D7.png",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 312866
+        },
+        {
+          "path": "/Volumes/UsersExternal/_PROCESSING/976801fd1bacc4b71e368fcdb66fa19a77ad3967f0b54895b6fc3f5f05a6df22-2026-04-14-09-27-40-236b2bc14dc64d95a723f25f5ef63bca/file-84bZ773RbEmiAmTTdKeYbg-Screenshot 2025-03-21 at 11.47.18 PM.png",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 58620
+        },
+        {
+          "path": "/Volumes/UsersExternal/_PROCESSING/976801fd1bacc4b71e368fcdb66fa19a77ad3967f0b54895b6fc3f5f05a6df22-2026-04-14-09-27-40-236b2bc14dc64d95a723f25f5ef63bca/file-MaqwZK8Lbkey43AZSBfpbw-75938C14-E9CA-4765-B744-C4B2071D8207.jpeg",
+          "type": "credential-adjacent-file",
+          "sizeBytes": 224242
+        },
+        {
+          "path": "/Volumes/UsersExternal/_PROCESSING/jmerrill-pub/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 14192
+        },
+        {
+          "path": "/Volumes/UsersExternal/_PROCESSING/jmerrill-pub 2/lib/tokens.ts",
+          "type": "token-named-file",
+          "sizeBytes": 14192
+        }
+      ]
+    },
+    "aiDependencies": [],
+    "recoveryDocs": [
+      "docs/implementation/CAP-001-Failure-Recovery-Model.md",
+      "docs/implementation/OP-000-Pipeline-Adoption-Recovery-Catalog-Certification.md",
+      "docs/operations/backups/flow-closeout-2026-06-24/int-pub-005-author-ack-flow-LIVE-BACKUP-before-fix-2026-06-24.json",
+      "docs/operations/generated/CAP-007-Cutover-Rollback-InFlight-Criteria-2026-07-14.csv"
+    ],
+    "powerPlatformArm": [
+      {
+        "identity": null,
+        "location": "unitedstates",
+        "name": "JM1CorePayGo2025",
+        "resourceGroup": "rg-jm1-core",
+        "tags": {},
+        "type": "Microsoft.PowerPlatform/accounts"
+      }
+    ]
+  },
+  "nonActions": {
+    "configurationChanges": 0,
+    "remediation": 0,
+    "purchases": 0,
+    "deployments": 0,
+    "newTables": 0,
+    "productionBuilds": 0,
+    "secretValuesRecorded": 0
+  }
+}

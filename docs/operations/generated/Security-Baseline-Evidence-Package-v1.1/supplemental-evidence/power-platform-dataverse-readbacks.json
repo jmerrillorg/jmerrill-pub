@@ -1,0 +1,5578 @@
+{
+  "generatedAt": "2026-07-30T00:52:48.194Z",
+  "pacEnvironmentList": {
+    "verified": true,
+    "environmentRows": [
+      "* JM1-Core dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10 https://jm1hq.crm.dynamics.com/ Production 9dafb403-b493-f011-a700-000d3a106f37",
+      "JM1-CRM-Core 352d075e-8e17-4169-9f8e-22e6946ce66d https://jm1crm.crm.dynamics.com/ Default d2a5163f-5514-ee11-a66b-6045bd06e00c",
+      "JM1-Dev a4d2d3cf-af53-e38c-970b-c6e19f4da917 https://org52409ff2.crm.dynamics.com/ Sandbox 579864ae-44cc-f011-95c7-000d3a37fe06",
+      "JM1-Test 251b8f38-5cea-e329-b9b2-3d34ba47dd1e https://jm1test.crm.dynamics.com/ Sandbox bb7a9d9e-8e73-f111-b27b-000d3a31ff17",
+      "One Dynamics Environment 27b55584-b27f-ea62-84ef-435278eaba1b https://jmerrillone.crm.dynamics.com/ Production e50cc18a-080a-f011-9aed-000d3a106b12"
+    ]
+  },
+  "powerPlatformAdminApi": {
+    "environments": {
+      "verified": true,
+      "status": "READ_OK",
+      "count": 5,
+      "items": [
+        {
+          "name": "251b8f38-5cea-e329-b9b2-3d34ba47dd1e",
+          "location": "unitedstates",
+          "properties": {
+            "displayName": "JM1-Test",
+            "environmentSku": "Sandbox",
+            "createdTime": "2026-06-29T07:52:15.2712071Z",
+            "createdBy": "",
+            "linkedEnvironmentMetadata": {
+              "instanceUrl": "https://jm1test.crm.dynamics.com/",
+              "uniqueName": "unqbb7a9d9e8e73f111b27b000d3a31f"
+            }
+          }
+        },
+        {
+          "name": "27b55584-b27f-ea62-84ef-435278eaba1b",
+          "location": "unitedstates",
+          "properties": {
+            "displayName": "One Dynamics Environment",
+            "environmentSku": "Production",
+            "createdTime": "2025-03-26T16:19:06.4678755Z",
+            "createdBy": "",
+            "linkedEnvironmentMetadata": {
+              "instanceUrl": "https://jmerrillone.crm.dynamics.com/",
+              "uniqueName": "unqe50cc18a080af0119aed000d3a106"
+            }
+          }
+        },
+        {
+          "name": "a4d2d3cf-af53-e38c-970b-c6e19f4da917",
+          "location": "unitedstates",
+          "properties": {
+            "displayName": "JM1-Dev",
+            "environmentSku": "Sandbox",
+            "createdTime": "2025-11-28T11:08:29.9374281Z",
+            "createdBy": "",
+            "linkedEnvironmentMetadata": {
+              "instanceUrl": "https://org52409ff2.crm.dynamics.com/",
+              "uniqueName": "unq579864ae44ccf01195c7000d3a37f"
+            }
+          }
+        },
+        {
+          "name": "dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10",
+          "location": "unitedstates",
+          "properties": {
+            "displayName": "JM1-Core",
+            "environmentSku": "Production",
+            "createdTime": "2025-09-17T17:56:06.930493Z",
+            "createdBy": "",
+            "linkedEnvironmentMetadata": {
+              "instanceUrl": "https://jm1hq.crm.dynamics.com/",
+              "uniqueName": "unq9dafb403b493f011a700000d3a106"
+            }
+          }
+        },
+        {
+          "name": "Default-352d075e-8e17-4169-9f8e-22e6946ce66d",
+          "location": "unitedstates",
+          "properties": {
+            "displayName": "JM1-CRM-Core",
+            "environmentSku": "Default",
+            "createdTime": "2021-07-13T15:03:36.4896581Z",
+            "createdBy": "",
+            "linkedEnvironmentMetadata": {
+              "instanceUrl": "https://jm1crm.crm.dynamics.com/",
+              "uniqueName": "unqd2a5163f5514ee11a66b6045bd06e"
+            }
+          }
+        }
+      ]
+    },
+    "dlpPolicies": {
+      "verified": false,
+      "status": "NOT_VERIFIED:1",
+      "count": null,
+      "items": []
+    }
+  },
+  "dataverse": {
+    "organization": {
+      "verified": true,
+      "status": "READ_OK",
+      "error": null,
+      "items": [
+        {
+          "name": "org48643109",
+          "organizationid": "9dafb403-b493-f011-a700-000d3a106f37",
+          "isauditenabled": false
+        }
+      ]
+    },
+    "solutions": {
+      "verified": false,
+      "count": null,
+      "items": []
+    },
+    "productionFlows": {
+      "verified": true,
+      "status": "READ_OK",
+      "error": null,
+      "count": 250,
+      "items": [
+        {
+          "name": "Show Enabled for Field Service Mobile field if Resource Type is User",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-04-01T10:50:31Z",
+          "modifiedon": "2026-04-01T11:40:49Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "OCRuleItemConditionRule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:21:01Z",
+          "modifiedon": "2025-09-14T11:46:17Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Time Entry Forms: End and Duration Fields Required",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-04-01T10:20:08Z",
+          "modifiedon": "2026-04-01T10:20:37Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "New business rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T03:03:06Z",
+          "modifiedon": "2025-09-14T11:46:19Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "BookableResource-ShowHideDeriveCapacity",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T03:26:51Z",
+          "modifiedon": "2025-09-16T03:35:44Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set defaullt CDS entity workstream rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:21:04Z",
+          "modifiedon": "2025-09-14T11:46:19Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set required fields based on 'Event Name'",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:21:04Z",
+          "modifiedon": "2025-09-14T11:46:20Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set default chat workstream rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:11:15Z",
+          "modifiedon": "2026-07-21T08:51:01Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Default capacity based on stream source",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:20:49Z",
+          "modifiedon": "2025-09-14T11:46:20Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Default max concurrency based on stream source",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:20:49Z",
+          "modifiedon": "2025-09-14T11:46:21Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set Connectors URL Value",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:40:26Z",
+          "modifiedon": "2025-09-16T04:45:23Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Company Id On Product",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-09T13:43:30Z",
+          "modifiedon": "2026-03-09T13:45:14Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Company Id On Order",
+          "category": 2,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-09T13:43:30Z",
+          "modifiedon": "2026-03-09T13:43:30Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Company Id On Opportunity",
+          "category": 2,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-09T13:43:31Z",
+          "modifiedon": "2026-03-09T13:43:31Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Company Id On Quote",
+          "category": 2,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-09T13:43:31Z",
+          "modifiedon": "2026-03-09T13:43:31Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Company Id On Invoice",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-09T13:43:32Z",
+          "modifiedon": "2026-03-09T13:45:15Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Company Id On PriceLevel",
+          "category": 2,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-09T13:43:32Z",
+          "modifiedon": "2026-03-09T13:43:32Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock External ID On Company",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-09T13:06:49Z",
+          "modifiedon": "2026-03-09T13:09:32Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Company ID On Account",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-09T13:06:51Z",
+          "modifiedon": "2026-03-09T13:09:33Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Company ID On Contact",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-09T13:06:51Z",
+          "modifiedon": "2026-03-09T13:09:34Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.Authorize",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:45Z",
+          "modifiedon": "2025-10-19T03:28:45Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.ComponentCollectionAuthorize",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:47Z",
+          "modifiedon": "2025-10-19T03:28:47Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.CreateBotComponents",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:47Z",
+          "modifiedon": "2025-10-19T03:28:47Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.CreateContentSnapshot",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:47Z",
+          "modifiedon": "2025-10-19T03:28:47Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.DeleteBot",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:47Z",
+          "modifiedon": "2025-10-19T03:28:47Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.DeleteBotComponentCollection",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:48Z",
+          "modifiedon": "2025-10-19T03:28:48Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.GetDirectLineEndpoint",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:48Z",
+          "modifiedon": "2025-10-19T03:28:48Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.GetFeatureControlSet",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:49Z",
+          "modifiedon": "2025-10-19T03:28:49Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.GetMaxDatabaseVersion",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:49Z",
+          "modifiedon": "2025-10-19T03:28:49Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.GetUserBots",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:49Z",
+          "modifiedon": "2025-10-19T03:28:49Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.Provision",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:49Z",
+          "modifiedon": "2025-10-19T03:28:49Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.Publish",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:50Z",
+          "modifiedon": "2025-10-19T03:28:50Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.PublishStatus",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:50Z",
+          "modifiedon": "2025-10-19T03:28:50Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.ShareConnection",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:50Z",
+          "modifiedon": "2025-10-19T03:28:50Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Pva.StartConversation",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-10-19T03:28:50Z",
+          "modifiedon": "2025-10-19T03:28:50Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Opt-in timestamp required",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-17T11:07:55Z",
+          "modifiedon": "2026-03-17T11:30:08Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Regulatory context required",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-17T11:14:42Z",
+          "modifiedon": "2026-03-17T11:52:42Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Status required on save",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-17T11:18:49Z",
+          "modifiedon": "2026-03-17T11:19:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Status required on save",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 1,
+          "createdon": "2026-03-17T11:19:37Z",
+          "modifiedon": "2026-03-17T11:19:37Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Opt-in timestamp required",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 1,
+          "createdon": "2026-03-17T11:30:07Z",
+          "modifiedon": "2026-03-17T11:30:07Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Regulatory context required",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 1,
+          "createdon": "2026-03-17T11:52:41Z",
+          "modifiedon": "2026-03-17T11:52:41Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Opt-out immutability",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 1,
+          "createdon": "2026-03-17T11:57:42Z",
+          "modifiedon": "2026-03-17T11:57:42Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JMP-INTAKE-Author Inquiry Notification — LEGACY / DO NOT USE",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-20T11:36:50Z",
+          "modifiedon": "2026-06-16T07:50:12Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 — Prompt Current Version Enforcement",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-06-13T00:45:21Z",
+          "modifiedon": "2026-06-13T00:45:29Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 — Agent Exception Handler",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-06-13T00:57:07Z",
+          "modifiedon": "2026-06-13T00:57:15Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 — Agent Verification Reminder",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-06-13T01:00:25Z",
+          "modifiedon": "2026-06-13T01:00:32Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "INT-PUB-005 Stage 0 Diagnostic Handoff",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-06-15T01:10:28Z",
+          "modifiedon": "2026-07-02T13:55:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "INT-PUB-005 Stage 0 Diagnostic Execution",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-06-15T08:01:24Z",
+          "modifiedon": "2026-06-16T07:56:24Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 — Execution Log Writer",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-05-09T00:38:24Z",
+          "modifiedon": "2026-06-16T07:56:17Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 — AI Verify — Claude Foundry HTTP Test",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-05-18T02:17:57Z",
+          "modifiedon": "2026-06-03T14:50:28Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Not-to-exceed form field visibility and requirement rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-04-01T11:33:53Z",
+          "modifiedon": "2026-04-01T11:40:43Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 – ICS Dispatcher",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-11-14T16:38:45Z",
+          "modifiedon": "2026-01-13T23:01:24Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 - Copilot Clarify Intent",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-12-15T11:56:34Z",
+          "modifiedon": "2026-03-30T04:26:44Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1-VersionEngine-Agent-v1",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-11-30T09:52:37Z",
+          "modifiedon": "2025-12-01T01:01:22Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1-VersionEngine-Agent-Child-v1",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-12-01T01:43:32Z",
+          "modifiedon": "2025-12-01T02:43:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Question Sequence Default Name",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:11:15Z",
+          "modifiedon": "2025-09-16T04:14:07Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Check DV Copilot Sync Status Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T10:47:43Z",
+          "modifiedon": "2025-09-14T10:47:43Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check Booking Custom Control Usage",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:34Z",
+          "modifiedon": "2026-04-01T12:01:34Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if Characteristic Has Matching Resource",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:34Z",
+          "modifiedon": "2026-04-01T12:01:34Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check compatibility of Field Service and Project Service",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:34Z",
+          "modifiedon": "2026-04-01T12:01:34Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check Default Value For Line Status",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:35Z",
+          "modifiedon": "2026-04-01T12:01:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check Field Service database version",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:35Z",
+          "modifiedon": "2026-04-01T12:01:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check for active agreements having past end dates",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:35Z",
+          "modifiedon": "2026-04-01T12:01:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if there are active layers on processes",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:35Z",
+          "modifiedon": "2026-04-01T12:01:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check for deleted booking setup metadata records",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:36Z",
+          "modifiedon": "2026-04-01T12:01:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check for failing delete unique numbers workflow",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:36Z",
+          "modifiedon": "2026-04-01T12:01:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check for failing workflow related to agreement",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:36Z",
+          "modifiedon": "2026-04-01T12:01:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check for Field Service setting record",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:36Z",
+          "modifiedon": "2026-04-01T12:01:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if there are any form libraries removed",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:37Z",
+          "modifiedon": "2026-04-01T12:01:37Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if agreement booking setup owners have required privileges",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:37Z",
+          "modifiedon": "2026-04-01T12:01:37Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if agreement invoice setup owners have required privileges",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:37Z",
+          "modifiedon": "2026-04-01T12:01:37Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Checks For Revision mismatch ABD With ABS",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:38Z",
+          "modifiedon": "2026-04-01T12:01:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Checks For Revision mismatch AID With AIS",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:38Z",
+          "modifiedon": "2026-04-01T12:01:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check for solution version",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:38Z",
+          "modifiedon": "2026-04-01T12:01:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check for waiting workflow with messages related to Agreement",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:38Z",
+          "modifiedon": "2026-04-01T12:01:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check for work order types",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:39Z",
+          "modifiedon": "2026-04-01T12:01:39Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if auto numbering is opted in",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:39Z",
+          "modifiedon": "2026-04-01T12:01:39Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if execution context is passed",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:39Z",
+          "modifiedon": "2026-04-01T12:01:39Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if Latitude and Longitude values are present on Account",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:40Z",
+          "modifiedon": "2026-04-01T12:01:40Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check recurrence setting for Agreement Booking Setup.",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:40Z",
+          "modifiedon": "2026-04-01T12:01:40Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if required level of field is changed",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:40Z",
+          "modifiedon": "2026-04-01T12:01:40Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if territory records exist",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:40Z",
+          "modifiedon": "2026-04-01T12:01:40Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check if Work Order generated from ABS",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:41Z",
+          "modifiedon": "2026-04-01T12:01:41Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check mobile user security role",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:41Z",
+          "modifiedon": "2026-04-01T12:01:41Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Check for Work Orders with multiple primary incidents",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:41Z",
+          "modifiedon": "2026-04-01T12:01:41Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Create booking setup metadata record",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:42Z",
+          "modifiedon": "2026-04-01T12:01:42Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Decommission FieldService Health Rules",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:42Z",
+          "modifiedon": "2026-04-01T12:01:42Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Register FieldService Solution Health Rules",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:42Z",
+          "modifiedon": "2026-04-01T12:01:42Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Mark Agreement As Expired",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:43Z",
+          "modifiedon": "2026-04-01T12:01:43Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Restart agreement related workflow",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:43Z",
+          "modifiedon": "2026-04-01T12:01:43Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Restart unique number workflow",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:44Z",
+          "modifiedon": "2026-04-01T12:01:44Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "IoT - Flow - Parent IoT Alerts",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T04:38:26Z",
+          "modifiedon": "2025-09-14T04:38:26Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "IoT - Flow - Schedule Device Data Pulls",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T04:38:26Z",
+          "modifiedon": "2025-09-14T04:38:26Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Resource Scheduling - GetMultipleResourceBookingDetailsAndSummaries",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-12-07T06:56:12Z",
+          "modifiedon": "2025-12-07T06:56:12Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Thanksgiving Meal Requests",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-11-06T19:30:21Z",
+          "modifiedon": "2025-11-25T13:12:44Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "UpdateBotVoiceProcessingMode",
+          "category": 3,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-07-21T09:58:49Z",
+          "modifiedon": "2026-07-29T08:50:05Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Send a Microsoft Copilot Studio bot survey when a case is resolved in D365",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T07:52:50Z",
+          "modifiedon": "2025-09-14T07:52:50Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "New business rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:36:29Z",
+          "modifiedon": "2025-09-14T11:46:22Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Competitor Research Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:32:23Z",
+          "modifiedon": "2026-02-14T06:29:55Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Cognitive services field validation",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T06:07:55Z",
+          "modifiedon": "2025-09-16T06:11:39Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Hides Sound Form Control on Administration side If Feature Not Enabled",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:20:56Z",
+          "modifiedon": "2025-09-14T11:46:23Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set Default text on Twitter Handle field",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T05:10:23Z",
+          "modifiedon": "2025-09-16T05:23:02Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sales Agents Initiate Opportunity Research Orchestration flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:40:46Z",
+          "modifiedon": "2026-04-06T04:37:05Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sales Agents Refresh Opportunity Research Orchestration flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:40:46Z",
+          "modifiedon": "2025-11-21T08:32:32Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Deal Risk Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:40:45Z",
+          "modifiedon": "2026-05-09T07:11:27Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "OpportunityAccountResearchTriggerFlow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:40:45Z",
+          "modifiedon": "2026-05-18T06:40:02Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "RCS flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:40:46Z",
+          "modifiedon": "2026-04-06T04:37:05Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Deserialization of Inspection Response",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T11:33:37Z",
+          "modifiedon": "2026-04-01T11:50:56Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Deserialization of Inspection Response - Recurrent",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T11:33:37Z",
+          "modifiedon": "2026-04-01T11:51:05Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Deserialization of Inspection Definition",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T10:16:05Z",
+          "modifiedon": "2026-04-01T10:19:22Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Flow - Trigger Analysis job for Field Service Rule Set",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:23Z",
+          "modifiedon": "2026-04-01T12:02:33Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Deserialization of Inspection Definition - Matrix Dynamics Child Flow",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T10:16:05Z",
+          "modifiedon": "2026-04-01T10:19:12Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Deserialization of Inspection Response - Matrix Dynamics",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T11:33:37Z",
+          "modifiedon": "2026-04-01T11:50:44Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Data Enrichment RCS",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-02-28T04:31:38Z",
+          "modifiedon": "2026-05-24T06:05:53Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Execute Outreach Agent",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:37:45Z",
+          "modifiedon": "2026-05-24T05:58:20Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Email Insights cleanup Job",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-12-13T04:05:08Z",
+          "modifiedon": "2026-06-09T10:23:23Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Deal Importance Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:40:45Z",
+          "modifiedon": "2026-05-09T07:11:27Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Invoke case management agent",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-20T07:31:33Z",
+          "modifiedon": "2026-05-18T04:43:15Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Hide or Show Delegated By (CreatedBy)",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T03:31:17Z",
+          "modifiedon": "2025-09-14T11:46:23Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Hide or Show Delegated Users Fields",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T03:31:18Z",
+          "modifiedon": "2025-09-14T11:46:24Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Manage Visibility of the Image Size Field",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T03:31:18Z",
+          "modifiedon": "2025-09-14T11:46:25Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Email Validation Flow - Leads",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:32:23Z",
+          "modifiedon": "2026-03-14T07:47:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service - Flow - Mark Agreement As Expired",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T11:33:47Z",
+          "modifiedon": "2026-04-01T11:53:29Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "OCRuleItemLiveWorkStreamRule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:21:01Z",
+          "modifiedon": "2025-09-14T11:46:25Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set visibility of Assign WorkItem After Decline",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:21:05Z",
+          "modifiedon": "2025-09-14T11:46:26Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Auto Case Simulation",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-03-08T02:58:33Z",
+          "modifiedon": "2026-07-26T05:04:21Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Flow - DeleteGeofenceWhenBookingIsCompletedOrCanceled",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T12:16:47Z",
+          "modifiedon": "2026-04-01T12:16:47Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Flow - UpdateGeofenceInstanceCoordinates",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T12:16:47Z",
+          "modifiedon": "2026-07-26T03:46:37Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Flow - GenerateGeofenceWhenBookingIsCreated",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T12:16:47Z",
+          "modifiedon": "2026-07-26T03:46:37Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "LOB Owner Update",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-11-16T08:57:07Z",
+          "modifiedon": "2025-11-16T08:57:07Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Opportunity Competitor Research Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:40:45Z",
+          "modifiedon": "2026-06-26T10:07:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Entity Type OnChange",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-04-01T10:50:07Z",
+          "modifiedon": "2026-04-01T11:40:33Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Error Code Visibility",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-13T21:57:42Z",
+          "modifiedon": "2025-09-22T08:24:24Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "GetSalesRowSummary",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2025-11-09T08:32:50Z",
+          "modifiedon": "2025-11-09T08:32:50Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Skill finder model status update flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T08:40:26Z",
+          "modifiedon": "2025-09-14T08:40:26Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Load training data flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T08:40:28Z",
+          "modifiedon": "2025-09-14T08:40:28Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Precoa to Scheduling Calendar",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-11-25T15:33:26Z",
+          "modifiedon": "2026-05-18T03:26:16Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Search Dynamics 365 knowledge article flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T00:26:31Z",
+          "modifiedon": "2025-09-14T00:26:31Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sales Close Agent - Test Agent",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-07-25T08:28:35Z",
+          "modifiedon": "2026-07-25T08:28:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Error message when secondary channel is selected",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:20:50Z",
+          "modifiedon": "2025-09-14T11:46:27Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "CustomMessagingBusinessRule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T05:10:22Z",
+          "modifiedon": "2025-09-16T05:12:12Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "CSCaseFollowup Representative Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-20T07:31:32Z",
+          "modifiedon": "2026-04-20T07:05:51Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Summary Synthesizer Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:32:24Z",
+          "modifiedon": "2025-12-09T04:39:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Process AI Description Publish",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-06-14T05:56:52Z",
+          "modifiedon": "2026-06-28T10:15:58Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "ChangeVisiblilityOfButtonsOnAutoAccept",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T05:57:34Z",
+          "modifiedon": "2025-09-14T11:46:28Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sales Micro Agent Orchestration Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:40:46Z",
+          "modifiedon": "2026-04-26T04:44:51Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sales Close Agent - Execute Orchestrator",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-07-25T08:28:35Z",
+          "modifiedon": "2026-07-25T08:28:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sales Close Agent - Execute Engage Agent",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-07-25T08:28:35Z",
+          "modifiedon": "2026-07-25T08:28:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "ConversationKnowledgeHarvestTriggerFlow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-23T04:27:55Z",
+          "modifiedon": "2026-07-18T09:39:41Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "ReAssign Entity and Notify Owner",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:27:30Z",
+          "modifiedon": "2026-02-28T03:51:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lead Qualifcation Agent",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:32:23Z",
+          "modifiedon": "2026-04-06T04:26:52Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set Default Value to Document",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T04:34:31Z",
+          "modifiedon": "2025-09-14T11:46:28Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Show or hide Co-browse providers",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:11:16Z",
+          "modifiedon": "2025-09-16T04:14:08Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Show or Hide Screensharing providers",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:11:16Z",
+          "modifiedon": "2025-09-16T04:14:09Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sentiment Analysis Name Business Rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:21:03Z",
+          "modifiedon": "2025-09-14T11:46:29Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "EnablingPickRule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:20:50Z",
+          "modifiedon": "2025-09-14T11:46:29Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Show or Hide msdyn_Image and msdyn_File fields.",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T04:34:31Z",
+          "modifiedon": "2025-09-14T11:46:30Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock or Unlock Attachment Type field based on msdyn_Image or msdyn_File fields",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T04:34:30Z",
+          "modifiedon": "2025-09-14T11:46:31Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Show \"Allow Automated Messages\"",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:44:14Z",
+          "modifiedon": "2025-09-16T04:45:24Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "SchedulingFeatureFlagsDisableChangesToNameOrDescription",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T03:49:12Z",
+          "modifiedon": "2025-09-16T03:52:25Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Resource Scheduling - Duration Field Rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T03:26:58Z",
+          "modifiedon": "2025-09-16T03:35:48Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "LockLWSforskillattachmentruleitem",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:36:29Z",
+          "modifiedon": "2025-09-14T11:46:32Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Display or hide bot fields",
+          "category": 2,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:20:50Z",
+          "modifiedon": "2025-09-14T11:46:32Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Callback URI and Verify Token",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:54:01Z",
+          "modifiedon": "2025-09-16T04:55:22Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Geo location provider visibility",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:11:14Z",
+          "modifiedon": "2025-09-16T04:14:07Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Bot field validation",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T10:03:58Z",
+          "modifiedon": "2025-09-14T11:46:33Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Execute Handover Microagent",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:27:30Z",
+          "modifiedon": "2026-05-24T05:55:30Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service - Notify user about booking (UCI app)",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T11:33:59Z",
+          "modifiedon": "2026-04-01T11:33:59Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "When Geotracked Record Status changed -> Notify User",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T12:16:47Z",
+          "modifiedon": "2026-04-01T12:16:47Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Update Work Order Recap",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T12:23:30Z",
+          "modifiedon": "2026-04-01T12:27:12Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "SurveyFeedback",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T10:08:07Z",
+          "modifiedon": "2026-04-01T10:08:11Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "CFS - Pull workorder aggregation for device",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:08:11Z",
+          "modifiedon": "2026-04-01T12:08:11Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "CreateTechnicians",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:18:36Z",
+          "modifiedon": "2026-04-01T12:18:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "CreateWorkOrder",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:18:36Z",
+          "modifiedon": "2026-04-01T12:18:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "SendEmailToTechnicians",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:18:37Z",
+          "modifiedon": "2026-04-01T12:18:37Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Show failure information for outbound message",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T06:46:18Z",
+          "modifiedon": "2025-09-16T06:49:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set_North",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 1,
+          "createdon": "2025-11-12T10:01:40Z",
+          "modifiedon": "2025-11-12T10:01:40Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Auto close expired conversations",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T08:20:48Z",
+          "modifiedon": "2025-09-14T08:20:48Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sales Insights Adaptive sequence timeout flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T09:34:57Z",
+          "modifiedon": "2025-09-14T09:34:57Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "CopilotSuggestions",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:27:11Z",
+          "modifiedon": "2026-04-01T12:27:11Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "GetDataFromSummaryConfiguration",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:27:11Z",
+          "modifiedon": "2026-04-01T12:27:11Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "InitializeOutOfBoxSummaryConfigurations",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:27:11Z",
+          "modifiedon": "2026-04-01T12:27:11Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "SummarizeRecordFromConfiguration",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:27:12Z",
+          "modifiedon": "2026-04-01T12:27:12Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Update Work Order Recap",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:27:12Z",
+          "modifiedon": "2026-04-01T12:27:12Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "InvokeStoredProc",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:00:38Z",
+          "modifiedon": "2026-04-01T12:00:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1FND - Constituent Intake",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-02T15:04:46Z",
+          "modifiedon": "2026-04-03T05:04:19Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Show/Hide Placeholder field",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:11:15Z",
+          "modifiedon": "2025-09-16T04:14:08Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Name should not contain restricted character",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:20:58Z",
+          "modifiedon": "2025-09-14T11:46:34Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Validate Assign WorkItem After Decline",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:21:07Z",
+          "modifiedon": "2025-09-14T11:46:34Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "OCRuleItemQueuerule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:21:01Z",
+          "modifiedon": "2025-09-14T11:46:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "OCRuleItemAgentrule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:21:00Z",
+          "modifiedon": "2025-09-14T11:46:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field visibility rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-04-01T10:00:54Z",
+          "modifiedon": "2026-04-01T10:01:33Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "LockPresenceNameAfterFirstInput",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:20:57Z",
+          "modifiedon": "2025-09-14T11:46:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Anonymize Agent",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:11:13Z",
+          "modifiedon": "2025-09-16T04:14:06Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service - Flow - Generate Agreement Booking Dates",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T11:33:47Z",
+          "modifiedon": "2026-04-01T11:51:24Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Hide Fields When OrganizationHealth",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T03:03:06Z",
+          "modifiedon": "2025-09-14T11:46:37Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Field Service Health - Flow - Field Service Solution Health Rules Registration",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-01T12:01:22Z",
+          "modifiedon": "2026-04-01T12:02:16Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock AnalysisComponentType when entity exists",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T03:03:07Z",
+          "modifiedon": "2025-09-14T11:46:37Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Default BotProvider Attribute",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T10:05:13Z",
+          "modifiedon": "2025-09-14T11:46:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Facility/Equipment Display",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T03:58:48Z",
+          "modifiedon": "2026-07-19T03:02:33Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set default Timeout ",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-13T22:57:07Z",
+          "modifiedon": "2025-09-14T11:46:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Linked By",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T00:11:47Z",
+          "modifiedon": "2025-11-03T02:49:28Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Linked On",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T00:11:47Z",
+          "modifiedon": "2025-11-03T02:49:29Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Unlinked By",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T00:11:48Z",
+          "modifiedon": "2025-11-03T02:49:30Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Unlinked On",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T00:11:48Z",
+          "modifiedon": "2025-11-03T02:49:32Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Resource Scheduling - Requirement Group Form IsTemplate Business Rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T03:27:06Z",
+          "modifiedon": "2025-09-16T03:35:59Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Work distribution based visibility rules",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T08:21:07Z",
+          "modifiedon": "2025-09-14T11:46:42Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Default Auto-close after inactivity for SMS stream source",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:40:24Z",
+          "modifiedon": "2025-09-16T04:45:22Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Default max concurrency for SMS stream source",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T04:40:25Z",
+          "modifiedon": "2025-09-16T04:41:31Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "IoT - Is Device Simulated",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T04:38:29Z",
+          "modifiedon": "2025-09-14T11:46:42Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Exception Message Visibility",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-13T21:57:42Z",
+          "modifiedon": "2025-09-22T08:24:25Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Overwrite Customizations Visibility",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-13T21:57:42Z",
+          "modifiedon": "2025-09-22T08:24:25Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Disable remaining terms",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T04:16:07Z",
+          "modifiedon": "2025-09-14T11:46:44Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Topic Model Configuration Time Filter Rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T04:11:21Z",
+          "modifiedon": "2025-09-14T11:46:46Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "IoT - Mandate device fields",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T04:38:31Z",
+          "modifiedon": "2026-04-01T12:08:11Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Resource Scheduling - HideOrShowExpirationDateBasedOnResourcePreferenceType",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-16T03:27:08Z",
+          "modifiedon": "2025-09-16T03:36:00Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Resource Set Contact Field State Rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T03:48:57Z",
+          "modifiedon": "2025-09-14T11:46:47Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Resource Set User Field State Rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T03:48:57Z",
+          "modifiedon": "2025-09-14T11:46:47Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Resource Set Account Field State Rule",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T03:48:56Z",
+          "modifiedon": "2025-09-14T11:46:48Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Resource Scheduling - InitializeDefaultCloneQuery",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-16T03:27:06Z",
+          "modifiedon": "2025-09-16T03:35:59Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Resource Scheduling - CloneEntity",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-16T03:26:56Z",
+          "modifiedon": "2025-09-16T03:35:47Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "IoT - Lock device fields",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T04:38:30Z",
+          "modifiedon": "2025-09-14T11:46:49Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "IoT - Show Registration Message",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T04:38:34Z",
+          "modifiedon": "2025-09-14T11:46:49Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "IoT - Show status reason",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2025-09-14T04:38:34Z",
+          "modifiedon": "2025-09-14T11:46:50Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "CFS - Send to all devices",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-04-01T12:06:44Z",
+          "modifiedon": "2026-04-01T12:08:11Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Opportunity Research Customization Agent Trigger",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-01-31T09:43:55Z",
+          "modifiedon": "2026-05-09T07:11:29Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Tcp and Bant prefill Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:32:24Z",
+          "modifiedon": "2026-02-14T06:29:56Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "UpdateSurveyBotTopics",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T07:52:51Z",
+          "modifiedon": "2025-09-14T07:53:15Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "EmailSentiment",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-01-21T06:10:04Z",
+          "modifiedon": "2026-01-21T06:10:04Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Deal Health Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:40:45Z",
+          "modifiedon": "2026-05-09T07:11:27Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sales Close Agent - Execute Outreach Agent",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-07-25T08:28:35Z",
+          "modifiedon": "2026-07-25T08:28:35Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Retry Failed Duplicate Detection Runs",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T09:52:21Z",
+          "modifiedon": "2025-09-14T09:52:21Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sales Outreach Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-09-14T11:32:24Z",
+          "modifiedon": "2026-04-06T04:26:52Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "CustomizationAgentTriggerFlow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2025-11-21T08:21:14Z",
+          "modifiedon": "2026-03-14T07:47:36Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Sales Profiler Agent - Child Flow",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-05-09T07:29:16Z",
+          "modifiedon": "2026-05-09T07:29:16Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set_East",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 1,
+          "createdon": "2025-11-12T09:56:58Z",
+          "modifiedon": "2025-11-12T09:56:58Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Set_Springfield",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 1,
+          "createdon": "2025-11-12T10:09:23Z",
+          "modifiedon": "2025-11-12T10:09:23Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock External ID On Company",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 1,
+          "createdon": "2026-03-09T13:09:31Z",
+          "modifiedon": "2026-03-09T13:09:31Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Company ID On Account",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 1,
+          "createdon": "2026-03-09T13:09:33Z",
+          "modifiedon": "2026-03-09T13:09:33Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Lock Company ID On Contact",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 1,
+          "createdon": "2026-03-09T13:09:34Z",
+          "modifiedon": "2026-03-09T13:09:34Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "CompanyRefresh",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-03-09T13:29:51Z",
+          "modifiedon": "2026-03-09T13:29:51Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "Opt-out immutability",
+          "category": 2,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 1,
+          "createdon": "2026-03-16T05:15:48Z",
+          "modifiedon": "2026-03-17T11:57:43Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 - PreNeed Calendar Feed Sync",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-03-24T19:49:06Z",
+          "modifiedon": "2026-07-28T14:47:14Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 - Reminder Dispatcher",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-03-29T11:29:25Z",
+          "modifiedon": "2026-05-08T10:43:15Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 - Contact Resolution",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-03-30T04:10:09Z",
+          "modifiedon": "2026-03-30T04:37:21Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 — PUB Join Form Intake — OFF",
+          "category": 5,
+          "statecode": 0,
+          "statuscode": 1,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-04-22T20:25:00Z",
+          "modifiedon": "2026-06-16T07:50:21Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "JM1 — Skill Current Version Enforcement",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-06-13T00:45:39Z",
+          "modifiedon": "2026-06-13T00:45:47Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "INT-PUB-005 Author Acknowledgment Email",
+          "category": 5,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 1,
+          "mode": 0,
+          "createdon": "2026-06-15T00:46:29Z",
+          "modifiedon": "2026-07-02T13:55:08Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "IoT Health - Check if active IoT alert(s) have empty alert data or alert time or device id",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:09:38Z",
+          "modifiedon": "2026-04-01T12:09:38Z",
+          "ownerIdPresent": true
+        },
+        {
+          "name": "IoT Health - Check if an IoT Device Category has been configured",
+          "category": 3,
+          "statecode": 1,
+          "statuscode": 2,
+          "type": 2,
+          "mode": 0,
+          "createdon": "2026-04-01T12:09:38Z",
+          "modifiedon": "2026-04-01T12:09:38Z",
+          "ownerIdPresent": true
+        }
+      ]
+    },
+    "auditedEntities": {
+      "verified": true,
+      "status": "READ_OK",
+      "error": null,
+      "totalEntityDefinitions": 2273,
+      "count": 257,
+      "items": [
+        {
+          "logicalName": "aicopilot",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "aiplugin",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "aipluginauth",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "aipluginoperation",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "aipluginoperationparameter",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "appaction",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "appactionmigration",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "appactionrule",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "application",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "appmodulecomponent",
+          "ownershipType": "None",
+          "enabled": true
+        },
+        {
+          "logicalName": "approvalprocess",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "approvalstageapproval",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "approvalstagecondition",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "approvalstageorder",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "appsetting",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "attributemaskingrule",
+          "ownershipType": "None",
+          "enabled": true
+        },
+        {
+          "logicalName": "businessprocess",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "businessprocesslinkedartifact",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "cardtype",
+          "ownershipType": "None",
+          "enabled": true
+        },
+        {
+          "logicalName": "channelaccessprofile",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "desktopflowbinary",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "desktopflowmodule",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "flowcapacityassignment",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "flowevent",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "flowgroup",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "flowmachine",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "flowmachinegroup",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "flowmachineimage",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "flowmachineimageversion",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "flowmachinenetwork",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "flowsession",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "jm1_consentrecord",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "jm1_personrole",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "maskingrule",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "mcpprompt",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "mcpresource",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "mcpresourcecontent",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "mcpserver",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "mcptool",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agentcopilotterm",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agentgroup",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreement",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreementbookingdate",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreementbookingincident",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreementbookingproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreementbookingservice",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreementbookingservicetask",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreementbookingsetup",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreementinvoicedate",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreementinvoiceproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreementinvoicesetup",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_agreementsubstatus",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_aiagentstatus",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_aidataprocessingevent",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_aimodel",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_aimodelcatalog",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_aitemplate",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_assetcategorytemplateassociation",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_assettemplateassociation",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_bookingalert",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_bookingalertstatus",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_bookingjournal",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_bookingrule",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_bookingsetupmetadata",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_bookingtimestamp",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_businessclosure",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_cannedmessage",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_clientextension",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_configuration",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_consoleapplicationnotificationtemplate",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_consoleapplicationsessiontemplate",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_contactcenteragentskill",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_contactcenteragentskillsetting",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_contactcenterworkstreamskill",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_conversationrecord",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_customapirulesetconfiguration",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_customerasset",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_decisionruleset",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_entitlementapplication",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_entityconfiguration",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluation",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluationcriteria",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluationcriteriaversion",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluationextension",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluationinputconfig",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluationlocalizedcontent",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluationplan",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluationplanbatch",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluationplanontriggerbacklog",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluationplanrun",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_evaluationquestion",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_fieldservicepricelistitem",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_fieldservicesetting",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_fieldservicesummaryconfiguration",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_flow_actionapprovalmodel",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_flow_approval",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_flow_approvalrequest",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_flow_approvalresponse",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_flow_awaitallactionapprovalmodel",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_flow_awaitallapprovalmodel",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_flow_basicapprovalmodel",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_flow_flowapproval",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_flwconfiguration",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_functionallocation",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_functionallocationtype",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_geofence",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_geofenceevent",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_geofencingsettings",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_geolocationsettings",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_harvesteligibilitycondition",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_incidenttype",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_incidenttypecharacteristic",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_incidenttypeproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_incidenttyperecommendationresult",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_incidenttyperecommendationrunhistory",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_incidenttypeservice",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_incidenttypeservicetask",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_incidenttypessetup",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_inspectiondefinition",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_intent",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_intentfamily",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_intentfamily_adminassignment",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_intentplaybookmap",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_inventoryadjustment",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_inventoryadjustmentproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_inventoryjournal",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_inventorytransfer",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_iotdevicecategory",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_iotdevicecommanddefinition",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_iotpropertydefinition",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_iotprovider",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_iotsettings",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_liveworkstream",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_localizedsurveyquestion",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_locationtypetemplateassociation",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_nottoexceed",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_ocapplepay",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_ocflaggedspam",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_ocliveworkitemextension",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_ocliveworkstreamcontextvariable",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_ocoutboundconfiguration",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_ocpaymentprofile",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_operatinghour",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_orderinvoicingdate",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_orderinvoicingproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_orderinvoicingsetup",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_orderinvoicingsetupdate",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_organizationalunit",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_payment",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_paymentdetail",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_paymentmethod",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_paymentterm",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_personalmessage",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_postalcode",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_powerappswrapbuild",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_priority",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_proactive_callback_config",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_proactive_callback_profile",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_proactive_delivery_batch",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_proactive_delivery_batch_error",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_proactive_engagement_config",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_proactive_engagement_config_attribute",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_proactive_engagement_config_status",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_proactive_engagement_message_template",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_proactive_engagement_planner_config",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_productinventory",
+          "ownershipType": "OrganizationOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_productivityactioninputparameter",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_productivityactionoutputparameter",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_productivitymacroactiontemplate",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_productivityparameterdefinition",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_property",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_propertyassetassociation",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_propertylog",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_propertytemplateassociation",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_purchaseorder",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_purchaseorderbill",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_purchaseorderproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_purchaseorderreceipt",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_purchaseorderreceiptproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_purchaseordersubstatus",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_quotebookingincident",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_quotebookingproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_quotebookingservice",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_quotebookingservicetask",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_quotebookingsetup",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_quoteinvoicingproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_quoteinvoicingsetup",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_requirementstatus",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_resolution",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_resourcepaytype",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_resourceterritory",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_rma",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_rmaproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_rmareceipt",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_rmareceiptproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_rmasubstatus",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_rtv",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_rtvproduct",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_rtvsubstatus",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        },
+        {
+          "logicalName": "msdyn_salesagentconfiguration",
+          "ownershipType": "UserOwned",
+          "enabled": true
+        }
+      ]
+    },
+    "environmentSecurityRoles": {
+      "verified": true,
+      "status": "PARTIAL_READ_OK",
+      "teams": {
+        "verified": true,
+        "count": 75,
+        "items": [
+          {
+            "name": "5fbcf631078f46b6b5daf14cd2f9dbf3_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "d7a5b53aabd9f0118543000d3a153b27_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "bd89acb1bf91404a9fc83e58903c9926_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "3fcf7b0d5b294dc2bc39fbb440ed01e3_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "d9af7aec6a034ccb8cf2072bf11d892e_0",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "d9af7aec6a034ccb8cf2072bf11d892e_1",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "d9af7aec6a034ccb8cf2072bf11d892e_2",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "J Merrill Financial LLC (55a509df-a3df-f011-8542-000d3a633452)",
+            "teamtype": 0,
+            "isdefault": true
+          },
+          {
+            "name": "BCI - J Merrill Financial LLC (55a509df-a3df-f011-8542-000d3a633452)",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "77cc637ff1064268b0f152ff9cf6844a_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "645eb86b315c453a875fa6283e9ca4e9_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "c349fa4da1814948982d470097cc723c_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "12cb76d2984e451b99d35fe3213a4277_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "b236e837231c446390e6691a24c82927_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "2c3a1f36f81f44f1b4a8b082e06d468c_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "eba2f146c22b452ea5a6a06955a67920_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "f3c8db47fad8f0118543000d3a153b27_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "c918d660f7c9f011bbd26045bdd8b8a4_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "ee285874c1c84668841cf2d984c8f555_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "56dee0aa93004dbf81b9a60f2db3336c_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "e501ddb6e36d443dbce9236e6aad691a_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "c315f55320244e3e9d165029fae49281_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "3547b1d8d7d64a0b835ebe582b781789_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "38affbceeb4d4b7fae2dfefc621f41ca_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "b738d4fdaf7e40ceaa302a4bc48fa3e2_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "4e7abc8e523a4232a79264a763cd363a_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "749c4570daa2454bb1f8fb8a9d1eb456_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "5cefdb33200047acbcb20911bf921381_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "7aa4ba94f1114158b896d32c36b22db4_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "ec02a12b211c439bb1e83f8d5d65b3ab_0",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "ec02a12b211c439bb1e83f8d5d65b3ab_1",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "ec02a12b211c439bb1e83f8d5d65b3ab_2",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "e4f94d3f538b4021b1b8c2358d596d10_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "a7ab5a322c53f111bec7000d3a14673b_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "JM1 Headquarters",
+            "teamtype": 0,
+            "isdefault": true
+          },
+          {
+            "name": "cfd6d9e54488498bada0c7b39547fe24_0",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "cfd6d9e54488498bada0c7b39547fe24_1",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "cfd6d9e54488498bada0c7b39547fe24_2",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "97769755bf494f7da55ae61894325924_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "c1852cf623f841f4adc466e7971d2c49_0",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "c1852cf623f841f4adc466e7971d2c49_1",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "c1852cf623f841f4adc466e7971d2c49_2",
+            "teamtype": 1,
+            "isdefault": false
+          },
+          {
+            "name": "2d73b792c5c24fb1bcee34b2add949b2_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "e3529af3548941c2a0d73319615c4476_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "409038581e4148f9ba6af552e7e6cd14_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "bf843cfcb3e442e1bc51b379fafb0ce7_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "4f6a5e79bc5f4a22b0c937939376f272_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "890fd523a17f4f9d924499afa972754f_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "2c5e27ba0313444086d680d2c71a0302_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "f5a2984cda7e49b684a46eb4a151dba4_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "ad99d755f7af4779ba7a3a0fa12aecf9_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "4dfb8fc9d6b14a3e900dc74f89f4923b_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "6c2176d48ff547b8bb2607a95cc37701_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "2a3d5bf6a92146b5a98c0f4a8f4294cc_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "55b5aea6b2a847218ed5abcacc20ad2d_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "b60d4a130f0e4dc5bbbc6a0782574a8c_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "5c5b7124dd134659b6bf06427df37c20_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "942e2dba88f2427296076c2a0115883e_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "bcdde4d1d85b4c3184592b915d4874e4_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "65177c9c6ee64a6c909a32aa8316b6b4_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "a48342136d1d4bc1b53c30e8c64651c7_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "0857ae5d243d49d2b707b91e53072f7d_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "b62857b84c054caa9d300bba5af0e7d1_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "81299f7e8a4a4944abfe7b1f58edfa14_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "ab31916e9b7a4e00adfaa80b5cf09eac_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "f124959bcd944fa6bbc42fdb2e3f66b4_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "1f556512ab8c44018215f64cc79acd2a_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "0c76fce76c464647a76dd6dc08ece187_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "2375f5e6cc5c4149a65798b80d743c7e_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "a372c1c799ab4a23968383212fd4323e_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "49cc201c6fe048f7af5cc3dcc2d11b26_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "ca7dd5ebbfccf011bbd26045bdef6a9b_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "415ef6e68f2249e8abf7ce0985514542_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "d38c22433d2e4f9ebbbcf7eeae54db6b_1",
+            "teamtype": 0,
+            "isdefault": false
+          },
+          {
+            "name": "Scheduling Operations Agent Team",
+            "teamtype": 0,
+            "isdefault": false
+          }
+        ]
+      },
+      "users": {
+        "verified": true,
+        "count": 217,
+        "items": [
+          {
+            "fullname": "JM1 Info",
+            "domainname": "info@jmerrill.one",
+            "isdisabled": false,
+            "accessmode": 0
+          },
+          {
+            "fullname": "JM1-PUB-INTAKE-WEBAPI JM1-PUB-INTAKE-WEBAPI",
+            "domainname": "JM1-PUB-INTAKE-WEBA_71ec4dd0-d261-4ffc-9f5a-626d885ecc85@9dafb403-b493-f011-a700-000d3a106f37.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365SalesAgentsWorkspace",
+            "domainname": "D365SalesAgentsWorkspace@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# jm1-publishing-intake-api",
+            "domainname": "jm1-publishing-inta_d8da73f7-c356-44ee-a312-a6d3096d5081@9dafb403-b493-f011-a700-000d3a106f37.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# AgCD-CSC-Prod",
+            "domainname": "AgCD-CSC-Prod@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# AgCD-Warmpath-Prod",
+            "domainname": "AgCD-Warmpath-Prod@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Scheduling Operations Agent Prod",
+            "domainname": "SchedulingOperationsAgentProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerPlatformCopilotGovernance",
+            "domainname": "PowerPlatformCopilotGovernance@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# EventStreamsService",
+            "domainname": "EventStreamsService@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# func-jm1-diagnostic-ai-runner",
+            "domainname": "func-jm1-diagnostic_dc8d1429-8c1b-473b-83ca-f9545fad8074@9dafb403-b493-f011-a700-000d3a106f37.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# OC Messaging Connector Prod",
+            "domainname": "OCMessagingConnectorProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 SequenceStats",
+            "domainname": "D365SequenceStats@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Dynamics 365 Customer Data Experimentation Prod App User",
+            "domainname": "Dynamics365CustomerDataExperimentationProdAppUser@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Agent 365 Tools",
+            "domainname": "Agent365Tools@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorPoland",
+            "domainname": "Flow-CDSNativeConnectorPoland@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "Break Glass",
+            "domainname": "admin@jmerrill.one",
+            "isdisabled": false,
+            "accessmode": 1
+          },
+          {
+            "fullname": "# OC Messaging Prod",
+            "domainname": "OCMessagingProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# OC Messaging Warm Path Prod",
+            "domainname": "OCMessagingWarmPathProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# OC Messaging Worker Prod",
+            "domainname": "OCMessagingWorkerProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# OC Voice Prod",
+            "domainname": "OCVoiceProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# OC Sporch Prod",
+            "domainname": "OCSporchProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Proactive Engagement Prod",
+            "domainname": "ProactiveEngagementProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# AmsAppPublic",
+            "domainname": "AmsAppPublic@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Contact Center CEA",
+            "domainname": "ContactCenterCEA@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "Jackie Smith, Jr.",
+            "domainname": "jackie@jmerrill.one",
+            "isdisabled": false,
+            "accessmode": 0
+          },
+          {
+            "fullname": "Jackie Smith",
+            "domainname": "a0338273-c879-452f-b539-a300faacbb66@jmerrillfoundation.onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 0
+          },
+          {
+            "fullname": "# Dataverse Learning",
+            "domainname": "DataverseLearning@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# MCSAIServer",
+            "domainname": "MCSAIServer@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365RecommendedActionsAgent",
+            "domainname": "D365RecommendedActionsAgent@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# OC Voice Warmpath",
+            "domainname": "OCVoiceWarmpath@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# AppAgents S2S Prod Application",
+            "domainname": "AppAgentsS2SProdApplication@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# ContactCenterRTA ReportingService Prod App",
+            "domainname": "ContactCenterRTAReportingServiceProdApp@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "Jackie Smith",
+            "domainname": "jackie@jmerrillfoundation.onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 1
+          },
+          {
+            "fullname": "# D365 Dataverse Data2",
+            "domainname": "D365DataverseData2@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Dataverse Data3",
+            "domainname": "D365DataverseData3@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Dataverse Data4",
+            "domainname": "D365DataverseData4@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Dataverse Data5",
+            "domainname": "D365DataverseData5@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "Business Central Integration Business Central to Common Data Service",
+            "domainname": "BusinessCentraltoCo_88c57617-94ff-4043-a396-8a85a8d38922@9dafb403-b493-f011-a700-000d3a106f37.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "JM1-INFRA-PAM JM1-INFRA-PAM-Automation",
+            "domainname": "JM1-INFRA-PAM-Autom_1e60cddf-dd28-4933-a927-dbc03bb89737@9dafb403-b493-f011-a700-000d3a106f37.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "JM1 Appointments",
+            "domainname": "appointments@jmerrill.one",
+            "isdisabled": false,
+            "accessmode": 0
+          },
+          {
+            "fullname": "# PpdfCDSClient",
+            "domainname": "ppdfcdsclient@microsoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerAutomate-MachineManagementRelay",
+            "domainname": "PowerAutomate-MachineManagementRelay@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerAutomate-MachineProvisioning",
+            "domainname": "PowerAutomate-MachineProvisioning@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerAutomate-DesktopFlowRuntime",
+            "domainname": "PowerAutomate-DesktopFlowRuntime@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerAutomate-DesktopFlowAI",
+            "domainname": "PowerAutomate-DesktopFlowAI@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerAutomate-AiFlowsAppUser-Web",
+            "domainname": "PowerAutomate-AiFlowsAppUser-Web@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerAutomate-AiFlowsAppUser-Worker",
+            "domainname": "PowerAutomate-AiFlowsAppUser-Worker@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "Microsoft Flow",
+            "domainname": "flowdev@microsoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# AIBuilderProd",
+            "domainname": "AIBuilderProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# AIBuilder_StructuredML_Prod_CDS",
+            "domainname": "AIBuilder_StructuredML_Prod_CDS@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# AIBuilder_StructuredML_Gcc_CDS_Legacy",
+            "domainname": "AIBuilder_StructuredML_Gcc_CDS_Legacy@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CAPI_Prod",
+            "domainname": "CAPI_Prod@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Microsoft Copilot Studio",
+            "domainname": "MicrosoftCopilotStudio@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Power Policy Service CM PROD",
+            "domainname": "PowerPolicyServiceCMPROD@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Power Policy Prod",
+            "domainname": "PowerPolicyProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerPlatformDataAnalytics",
+            "domainname": "PowerPlatformDataAnalytics@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# KISPAdminProd",
+            "domainname": "KISPAdminProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# KISPIngProd",
+            "domainname": "KISPIngProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# KISPSyncProd",
+            "domainname": "KISPSyncProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365OfficeDataSvc",
+            "domainname": "D365OfficeDataSvc@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# TPSProxyService",
+            "domainname": "TPSProxyService@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Dynamics365Athena2",
+            "domainname": "Dynamics365Athena2@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerQueryOnline",
+            "domainname": "PowerQueryOnline@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# EnterpriseSales",
+            "domainname": "EnterpriseSales@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataLakeStorage",
+            "domainname": "DataLakeStorage@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# AriaMdlExporter",
+            "domainname": "AriaMdlExporter@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# ProductInsights",
+            "domainname": "ProductInsights@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Dynamics365SCV",
+            "domainname": "Dynamics365SCV@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# JobsServiceProd",
+            "domainname": "JobsServiceProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnector",
+            "domainname": "Flow-CDSNativeConnector@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorPreview",
+            "domainname": "Flow-CDSNativeConnectorPreview@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorUS",
+            "domainname": "Flow-CDSNativeConnectorUS@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorEurope",
+            "domainname": "Flow-CDSNativeConnectorEurope@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorAsia",
+            "domainname": "Flow-CDSNativeConnectorAsia@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorAustralia",
+            "domainname": "Flow-CDSNativeConnectorAustralia@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorIndia",
+            "domainname": "Flow-CDSNativeConnectorIndia@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorJapan",
+            "domainname": "Flow-CDSNativeConnectorJapan@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorCanada",
+            "domainname": "Flow-CDSNativeConnectorCanada@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorUK",
+            "domainname": "Flow-CDSNativeConnectorUK@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorBrazil",
+            "domainname": "Flow-CDSNativeConnectorBrazil@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorFrance",
+            "domainname": "Flow-CDSNativeConnectorFrance@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorUAE",
+            "domainname": "Flow-CDSNativeConnectorUAE@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorGermany",
+            "domainname": "Flow-CDSNativeConnectorGermany@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorSwitzerland",
+            "domainname": "Flow-CDSNativeConnectorSwitzerland@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorKorea",
+            "domainname": "Flow-CDSNativeConnectorKorea@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorNorway",
+            "domainname": "Flow-CDSNativeConnectorNorway@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorSouthAfrica",
+            "domainname": "Flow-CDSNativeConnectorSouthAfrica@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorSingapore",
+            "domainname": "Flow-CDSNativeConnectorSingapore@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorSweden",
+            "domainname": "Flow-CDSNativeConnectorSweden@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-CDSNativeConnectorItaly",
+            "domainname": "Flow-CDSNativeConnectorItaly@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSFileStorage",
+            "domainname": "CDSFileStorage@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CCADataAnalyticsML",
+            "domainname": "CCADataAnalyticsML@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# SharePointOnline",
+            "domainname": "SharePointOnline@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataverseReportService",
+            "domainname": "DataverseReportService@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Contextual AI S2S Prod Application",
+            "domainname": "ContextualAIS2SProdApplication@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-NAM",
+            "domainname": "CDSReportService-NAM@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-APJ",
+            "domainname": "CDSReportService-APJ@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-CAN",
+            "domainname": "CDSReportService-CAN@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-CHE",
+            "domainname": "CDSReportService-CHE@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-EMEA",
+            "domainname": "CDSReportService-EMEA@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-FRA",
+            "domainname": "CDSReportService-FRA@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-GBR",
+            "domainname": "CDSReportService-GBR@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-GER",
+            "domainname": "CDSReportService-GER@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-IND",
+            "domainname": "CDSReportService-IND@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-JPN",
+            "domainname": "CDSReportService-JPN@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-KOR",
+            "domainname": "CDSReportService-KOR@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-NOR",
+            "domainname": "CDSReportService-NOR@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-OCE",
+            "domainname": "CDSReportService-OCE@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-SAM",
+            "domainname": "CDSReportService-SAM@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-UAE",
+            "domainname": "CDSReportService-UAE@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-ZAF",
+            "domainname": "CDSReportService-ZAF@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-SWE",
+            "domainname": "CDSReportService-SWE@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSReportService-SGP",
+            "domainname": "CDSReportService-SGP@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSUserManagement",
+            "domainname": "CDSUserManagement@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSUserManagementApi",
+            "domainname": "CDSUserManagementApi@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSGlobalDiscovery",
+            "domainname": "CDSGlobalDiscovery@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerPlatformAuthorization",
+            "domainname": "PowerPlatformAuthorization@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DAMS",
+            "domainname": "DAMS@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DAMSIsland",
+            "domainname": "DAMSIsland@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# BAP",
+            "domainname": "BAP@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerPlatformEnvironmentManagement",
+            "domainname": "PowerPlatformEnvironmentManagement@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Omnichannel",
+            "domainname": "Omnichannel@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Flow-RP",
+            "domainname": "Flow-RP@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CloudFlowRunHistory",
+            "domainname": "CloudFlowRunHistory@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# RelevanceSearch",
+            "domainname": "RelevanceSearch@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# MicrosoftDynamicsNRDService",
+            "domainname": "MicrosoftDynamicsNRDService@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataServices",
+            "domainname": "DataServices@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Deflection",
+            "domainname": "Deflection@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-NAM",
+            "domainname": "DataSyncFramework-NAM@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-EMEA-FRA-GBR-GER",
+            "domainname": "DataSyncFramework-EMEA-FRA-GBR-GER@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-APJ",
+            "domainname": "DataSyncFramework-APJ@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-SAM",
+            "domainname": "DataSyncFramework-SAM@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-JPN",
+            "domainname": "DataSyncFramework-JPN@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-OCE",
+            "domainname": "DataSyncFramework-OCE@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-CAN",
+            "domainname": "DataSyncFramework-CAN@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-IND-UAE-ZAF",
+            "domainname": "DataSyncFramework-IND-UAE-ZAF@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-CHE",
+            "domainname": "DataSyncFramework-CHE@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-NOR",
+            "domainname": "DataSyncFramework-NOR@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncFramework-KOR",
+            "domainname": "DataSyncFramework-KOR@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-NAM",
+            "domainname": "DataSyncService-NAM@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-EMEA-FRA-GBR-GER",
+            "domainname": "DataSyncService-EMEA-FRA-GBR-GER@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-APJ",
+            "domainname": "DataSyncService-APJ@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-SAM",
+            "domainname": "DataSyncService-SAM@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-JPN",
+            "domainname": "DataSyncService-JPN@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-OCE",
+            "domainname": "DataSyncService-OCE@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-CAN",
+            "domainname": "DataSyncService-CAN@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-IND-UAE-ZAF",
+            "domainname": "DataSyncService-IND-UAE-ZAF@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-CHE",
+            "domainname": "DataSyncService-CHE@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-NOR",
+            "domainname": "DataSyncService-NOR@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DataSyncService-KOR",
+            "domainname": "DataSyncService-KOR@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# GlobalActiveMetricsMonitoringAlerting",
+            "domainname": "GlobalActiveMetricsMonitoringAlerting@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# InsightsAppsPlatform",
+            "domainname": "InsightsAppsPlatform@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# AppDeploymentOrchestration",
+            "domainname": "AppDeploymentOrchestration@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerAppsCustomerManagementPlaneBackend",
+            "domainname": "PowerAppsCustomerManagementPlaneBackend@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerAppsDataPlaneBackend",
+            "domainname": "PowerAppsDataPlaneBackend@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# ConnectorManagementServiceBackend",
+            "domainname": "ConnectorManagementServiceBackend@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CDSAcisInfraAppGlobal",
+            "domainname": "CDSAcisInfraAppGlobal@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# MicrosoftCustomerEngagementPortalInfra",
+            "domainname": "MicrosoftCustomerEngagementPortalInfra@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Quartzite",
+            "domainname": "Quartzite@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# DynamicsInstaller",
+            "domainname": "DynamicsInstaller@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# ProjectForTheWebBackgroundServices",
+            "domainname": "ProjectForTheWebBackgroundServices@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# SSSAdminProd",
+            "domainname": "SSSAdminProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Dataverse Information Protection",
+            "domainname": "DataverseInformationProtection@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# ApolloProdFirstParty",
+            "domainname": "ApolloProdFirstParty@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# KnowledgeQuality",
+            "domainname": "KnowledgeQuality@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerCards-S2S-IL-Prod",
+            "domainname": "PowerCards-S2S-IL-Prod@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerAutomate-ProcessMining",
+            "domainname": "PowerAutomate-ProcessMining@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "Power Apps Checker Application",
+            "domainname": "pacheckerapp@microsoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerBIApplicationUser",
+            "domainname": "PowerBIApplicationUser@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# BizQA",
+            "domainname": "BizQA@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PowerPages Data Runtime PROD",
+            "domainname": "PowerPagesDataRuntimePROD@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CatalogServiceNam",
+            "domainname": "CatalogServiceNam@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# M365 Copilot Sales",
+            "domainname": "Dynamics365CopilotforSales@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Dynamics 365 Sales Forecasting",
+            "domainname": "Dynamics365SalesForecasting@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365EEApp",
+            "domainname": "D365EEApp@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Dynamics 365 Sales",
+            "domainname": "Dynamics365Sales@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# SIAutoCapture",
+            "domainname": "SIAutoCapture@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "Microsoft Forms Pro",
+            "domainname": "enterprisesurveyappuser@contoso.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# UnifiedRoutingForRecord_App",
+            "domainname": "UnifiedRoutingForRecord_App@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Contact Center",
+            "domainname": "ContactCenter@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Contact Center Secondary",
+            "domainname": "ContactCenterSecondary@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Contact Center Bulk",
+            "domainname": "ContactCenterBulk@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Contact Center Diagnostics",
+            "domainname": "ContactCenterDiagnostics@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# URAssignment",
+            "domainname": "URAssignment@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Sales Conversation Intelligence",
+            "domainname": "SalesConversationIntelligence@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Sms Channel",
+            "domainname": "D365SmsChannel@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Personalization",
+            "domainname": "D365Personalization@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Dataverse Data",
+            "domainname": "D365DataverseData@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Experimentation",
+            "domainname": "D365Experimentation@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365WorkAssignment",
+            "domainname": "D365WorkAssignment@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365WorkAssignment2",
+            "domainname": "D365WorkAssignment2@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365WorkAssignment3",
+            "domainname": "D365WorkAssignment3@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Contact Center Management App - Public",
+            "domainname": "ContactCenterManagementApp-Public@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# CCAAnalytics",
+            "domainname": "CCAAnalytics@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Sales LeadQual",
+            "domainname": "D365SalesLeadQual@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Sales AcctRsrch",
+            "domainname": "D365SalesAcctRsrch@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Sales OutrchAgt",
+            "domainname": "D365SalesOutrchAgt@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "Support User",
+            "domainname": "crmoln@microsoft.com",
+            "isdisabled": false,
+            "accessmode": 3
+          },
+          {
+            "fullname": "Delegated Admin",
+            "domainname": "crmoln2@microsoft.com",
+            "isdisabled": false,
+            "accessmode": 5
+          },
+          {
+            "fullname": "# Pegasus-NAM",
+            "domainname": "Pegasus-NAM@onmicrosoft.com",
+            "isdisabled": true,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Source Control Integration Prod App",
+            "domainname": "SourceControlIntegrationProdApp@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365DataEnrichmentAgent",
+            "domainname": "D365DataEnrichmentAgent@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Prod SchedulingAnalytics Prod",
+            "domainname": "ProdSchedulingAnalyticsProd@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# PromptColumnRuntime",
+            "domainname": "PromptColumnRuntime@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# Intelligent Supervision",
+            "domainname": "IntelligentSupervision@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Consent",
+            "domainname": "D365Consent@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# D365 Consent Int",
+            "domainname": "D365ConsentInt@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "‎JM1 Admin‎",
+            "domainname": "jm1-admin@jmerrill.one",
+            "isdisabled": false,
+            "accessmode": 0
+          },
+          {
+            "fullname": "Jackie Smith",
+            "domainname": "jackie@jmerrill.pub",
+            "isdisabled": false,
+            "accessmode": 0
+          },
+          {
+            "fullname": "JM1 Scheduling",
+            "domainname": "scheduling@jmerrill.one",
+            "isdisabled": false,
+            "accessmode": 0
+          },
+          {
+            "fullname": "# JM1-Dataverse-ServicePrincipal",
+            "domainname": "JM1-Dataverse-Servi_abaed7aa-944f-4c41-8947-bf1bb6b9b111@9dafb403-b493-f011-a700-000d3a106f37.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "# J Merrill Financial",
+            "domainname": "financial@jmerrill.one",
+            "isdisabled": false,
+            "accessmode": 0
+          },
+          {
+            "fullname": "# J Merrill Foundation",
+            "domainname": "foundation@jmerrill.one",
+            "isdisabled": false,
+            "accessmode": 0
+          },
+          {
+            "fullname": "# J Merrill Publishing",
+            "domainname": "publishing@jmerrill.one",
+            "isdisabled": false,
+            "accessmode": 0
+          },
+          {
+            "fullname": "# PurviewApp",
+            "domainname": "PurviewApp@onmicrosoft.com",
+            "isdisabled": false,
+            "accessmode": 4
+          },
+          {
+            "fullname": "INTEGRATION",
+            "domainname": "",
+            "isdisabled": true,
+            "accessmode": 0
+          },
+          {
+            "fullname": "SYSTEM",
+            "domainname": "",
+            "isdisabled": true,
+            "accessmode": 0
+          }
+        ]
+      },
+      "limitation": "Role membership details require expanded security role association query; v1.1 records environment principals without privilege expansion."
+    }
+  }
+}
