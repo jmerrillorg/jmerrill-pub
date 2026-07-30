@@ -1,0 +1,256 @@
+{
+  "capturedAt": "2026-07-30T10:45:53.475113+00:00",
+  "resourceGroup": "rg-jm1-web-prod-appsvc",
+  "records": [
+    {
+      "app": "app-jm1-fin-prod",
+      "slot": "production",
+      "defaultHost": "app-jm1-fin-prod.azurewebsites.net",
+      "state": "Running",
+      "identityType": "SystemAssigned",
+      "principalId": "8d99ef1e-d165-4728-93dc-44fde2a29c86",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "linuxFxVersion": "NODE|20-lts",
+      "startupCommand": "node server.js",
+      "ftpsState": "Disabled",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-fin-prod",
+      "slot": "staging",
+      "defaultHost": "app-jm1-fin-prod-staging.azurewebsites.net",
+      "state": "Running",
+      "identityType": "SystemAssigned",
+      "principalId": "0c84e883-1600-469e-b7cb-cff41bc8f7f7",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "linuxFxVersion": "NODE|20-lts",
+      "startupCommand": "node server.js",
+      "ftpsState": "Disabled",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-one-prod",
+      "slot": "production",
+      "defaultHost": "app-jm1-one-prod.azurewebsites.net",
+      "state": "Running",
+      "identityType": "SystemAssigned",
+      "principalId": "fb03e1ca-2cfb-4a8e-b58a-858723f73fbc",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "linuxFxVersion": "NODE|20-lts",
+      "startupCommand": "node server.js",
+      "ftpsState": "Disabled",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-one-prod",
+      "slot": "staging",
+      "defaultHost": "app-jm1-one-prod-staging.azurewebsites.net",
+      "state": "Running",
+      "identityType": "SystemAssigned",
+      "principalId": "11cd5552-22da-4020-ba97-e6ba38f825e9",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "linuxFxVersion": "NODE|20-lts",
+      "startupCommand": "node server.js",
+      "ftpsState": "Disabled",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-foundation-prod",
+      "slot": "production",
+      "defaultHost": "app-jm1-foundation-prod.azurewebsites.net",
+      "state": "Running",
+      "identityType": "SystemAssigned",
+      "principalId": "bce2f733-31ea-4b84-ba43-3290e75db9c6",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "linuxFxVersion": "NODE|20-lts",
+      "startupCommand": "node server.js",
+      "ftpsState": "Disabled",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-foundation-prod",
+      "slot": "staging",
+      "defaultHost": "app-jm1-foundation-prod-staging.azurewebsites.net",
+      "state": "Running",
+      "identityType": "SystemAssigned",
+      "principalId": "f9da95d8-077f-44c9-b23e-d8e470f909f1",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "linuxFxVersion": "NODE|20-lts",
+      "startupCommand": "node server.js",
+      "ftpsState": "Disabled",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-productions-prod",
+      "slot": "production",
+      "defaultHost": "app-jm1-productions-prod.azurewebsites.net",
+      "state": "Running",
+      "identityType": "SystemAssigned",
+      "principalId": "d342229f-1a3e-4169-9b14-695fd305b313",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "linuxFxVersion": "NODE|20-lts",
+      "startupCommand": "node server.js",
+      "ftpsState": "Disabled",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-productions-prod",
+      "slot": "staging",
+      "defaultHost": "app-jm1-productions-prod-staging.azurewebsites.net",
+      "state": "Running",
+      "identityType": "SystemAssigned",
+      "principalId": "fd17133f-63a9-467e-ba97-cef9a2c78e41",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "linuxFxVersion": "NODE|20-lts",
+      "startupCommand": "node server.js",
+      "ftpsState": "Disabled",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-jackiesmithjr-prod",
+      "slot": "production",
+      "defaultHost": "app-jm1-jackiesmithjr-prod.azurewebsites.net",
+      "state": "Running",
+      "identityType": "SystemAssigned",
+      "principalId": "c0b59b05-9dac-48f4-9014-0774dd7c942d",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "linuxFxVersion": "NODE|20-lts",
+      "startupCommand": "node server.js",
+      "ftpsState": "Disabled",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-jackiesmithjr-prod",
+      "slot": "staging",
+      "defaultHost": "app-jm1-jackiesmithjr-prod-staging.azurewebsites.net",
+      "state": "Running",
+      "identityType": "SystemAssigned",
+      "principalId": "aefc0054-1b0c-41f8-a820-3a474869b34a",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "linuxFxVersion": "NODE|20-lts",
+      "startupCommand": "node server.js",
+      "ftpsState": "Disabled",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    }
+  ]
+}

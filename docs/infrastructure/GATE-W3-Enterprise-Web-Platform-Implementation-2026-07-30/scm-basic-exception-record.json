@@ -1,0 +1,22 @@
+{
+  "event": "GATE_W3_TEMPORARY_SCM_BASIC_EXCEPTION_STARTED",
+  "program": "JM1-INFRA-006",
+  "gate": "GATE-W3",
+  "authority": "Jackie",
+  "scope": "Ten approved App Service production/slot targets in rg-jm1-web-prod-appsvc",
+  "purpose": "Minimal runtime deployment and certification",
+  "maximumDuration": "2 hours",
+  "ftpBasicAuthorized": false,
+  "productionTrafficMigrationAuthorized": false,
+  "startedAt": "2026-07-30T10:46:10.049660+00:00",
+  "expiresAt": "2026-07-30T12:46:10.049660+00:00",
+  "status": "CLOSED_FAILED_CANARY_DEPLOYMENT",
+  "eventDisposition": "Recorded in governed GATE-W3 evidence package; Dataverse event type not assumed.",
+  "endedAt": "2026-07-30T10:54:32.372868+00:00",
+  "stopCondition": "Azure still could not deploy the governed minimal runtime after SCM Basic was temporarily enabled.",
+  "finalScmBasicState": "DISABLED_ON_ALL_APPROVED_APPS",
+  "finalFtpBasicState": "DISABLED_ON_ALL_APPROVED_APPS",
+  "canaryTarget": "app-jm1-one-prod/staging",
+  "canaryResult": "FAILED_504_GATEWAYTIMEOUT",
+  "deploymentHistoryReadback": "NO_DEPLOYMENT_ROWS_RETURNED"
+}

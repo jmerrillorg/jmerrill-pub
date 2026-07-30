@@ -1,0 +1,32 @@
+{
+  "verifiedAt": "2026-07-30T10:54:32.372868+00:00",
+  "subscriptionId": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e",
+  "resourceGroup": "rg-jm1-web-prod-appsvc",
+  "targets": [
+    {
+      "app": "app-jm1-fin-prod",
+      "scmBasicAllowed": "false",
+      "ftpBasicAllowed": "false"
+    },
+    {
+      "app": "app-jm1-one-prod",
+      "scmBasicAllowed": "false",
+      "ftpBasicAllowed": "false"
+    },
+    {
+      "app": "app-jm1-foundation-prod",
+      "scmBasicAllowed": "false",
+      "ftpBasicAllowed": "false"
+    },
+    {
+      "app": "app-jm1-productions-prod",
+      "scmBasicAllowed": "false",
+      "ftpBasicAllowed": "false"
+    },
+    {
+      "app": "app-jm1-jackiesmithjr-prod",
+      "scmBasicAllowed": "false",
+      "ftpBasicAllowed": "false"
+    }
+  ]
+}

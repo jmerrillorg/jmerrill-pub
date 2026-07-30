@@ -1,0 +1,165 @@
+{
+  "capturedAt": "2026-07-30T10:53:27.270453+00:00",
+  "records": [
+    {
+      "app": "app-jm1-fin-prod",
+      "slot": "production",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-fin-prod",
+      "slot": "staging",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "rootProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      }
+    },
+    {
+      "app": "app-jm1-one-prod",
+      "slot": "production",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "rootProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      }
+    },
+    {
+      "app": "app-jm1-one-prod",
+      "slot": "staging",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "rootProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      }
+    },
+    {
+      "app": "app-jm1-foundation-prod",
+      "slot": "production",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "rootProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      }
+    },
+    {
+      "app": "app-jm1-foundation-prod",
+      "slot": "staging",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "rootProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      }
+    },
+    {
+      "app": "app-jm1-productions-prod",
+      "slot": "production",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "rootProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      }
+    },
+    {
+      "app": "app-jm1-productions-prod",
+      "slot": "staging",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "rootProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "HTTPError",
+        "message": "HTTP Error 503: Service Unavailable"
+      }
+    },
+    {
+      "app": "app-jm1-jackiesmithjr-prod",
+      "slot": "production",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    },
+    {
+      "app": "app-jm1-jackiesmithjr-prod",
+      "slot": "staging",
+      "scmBasic": false,
+      "ftpBasic": false,
+      "rootProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "healthProbe": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      }
+    }
+  ]
+}
