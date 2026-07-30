@@ -1,0 +1,790 @@
+{
+  "startedAt": "2026-07-30T14:47:32.727099+00:00",
+  "resourceGroup": "rg-jm1-web-prod-appsvc",
+  "artifact": {
+    "path": "/tmp/gate-w3-minimal-runtime-20260730.zip",
+    "sha256": "913fd27cdac46baadffe636527dc5582ed23125f91468d056127887fd5293652"
+  },
+  "targets": [
+    {
+      "app": "app-jm1-one-prod",
+      "property": "jmerrill.one",
+      "startedAt": "2026-07-30T14:47:32.727412+00:00",
+      "beforeWebapp": {
+        "defaultHostName": "app-jm1-one-prod.azurewebsites.net",
+        "httpsOnly": true,
+        "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-one-prod",
+        "identity": {
+          "principalId": "fb03e1ca-2cfb-4a8e-b58a-858723f73fbc",
+          "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d",
+          "type": "SystemAssigned",
+          "userAssignedIdentities": null
+        },
+        "name": "app-jm1-one-prod",
+        "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux",
+        "state": "Running"
+      },
+      "beforeConfig": {
+        "alwaysOn": true,
+        "appCommandLine": "node server.js",
+        "ftpsState": "Disabled",
+        "healthCheckPath": "/",
+        "http20Enabled": true,
+        "linuxFxVersion": "NODE|22-lts",
+        "scmType": "None"
+      },
+      "beforeSettingsSafe": [
+        {
+          "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "slotSetting": false,
+          "valueClass": "secret_or_sensitive",
+          "present": true
+        },
+        {
+          "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "slotSetting": false,
+          "valueClass": "secret_or_sensitive",
+          "present": true
+        },
+        {
+          "name": "ENABLE_ORYX_BUILD",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_GATE",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_MIGRATION_STATE",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_PROPERTY_DOMAIN",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_PROPERTY_KEY",
+          "slotSetting": false,
+          "valueClass": "secret_or_sensitive",
+          "present": true
+        },
+        {
+          "name": "JM1_RELEASE_ID",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_RELEASE_SHA",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_SLOT_ENVIRONMENT",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_WEB_GATE",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "KEY_VAULT_URI",
+          "slotSetting": false,
+          "valueClass": "secret_or_sensitive",
+          "present": true
+        },
+        {
+          "name": "NODE_ENV",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "WEBSITE_NODE_DEFAULT_VERSION",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "WEBSITE_RUN_FROM_PACKAGE",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "WEBSITE_WARMUP_PATH",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "WEBSITE_WARMUP_STATUSES",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        }
+      ],
+      "deployStartedAt": "2026-07-30T14:47:47.148819+00:00",
+      "deployCommandResult": "submitted_or_returned",
+      "deployCommandJson": {
+        "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-one-prod/deploymentStatus/51d74c42-cfae-4f94-8d95-dc495b419598",
+        "location": "Central US",
+        "name": "51d74c42-cfae-4f94-8d95-dc495b419598",
+        "properties": {
+          "deploymentId": "51d74c42-cfae-4f94-8d95-dc495b419598",
+          "errors": null,
+          "failedInstancesLogs": null,
+          "numberOfInstancesFailed": 0,
+          "numberOfInstancesInProgress": 0,
+          "numberOfInstancesSuccessful": 0,
+          "status": "BuildInProgress"
+        },
+        "resourceGroup": "rg-jm1-web-prod-appsvc",
+        "tags": {
+          "environment": "prod",
+          "gate": "GATE-W3",
+          "hidden-link: /app-insights-resource-id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/microsoft.insights/components/appi-jm1-one-prod",
+          "managedBy": "codex",
+          "owner": "J Merrill One",
+          "program": "JM1-INFRA-006",
+          "property": "corporate",
+          "topology": "OptionB"
+        },
+        "type": "Microsoft.Web/sites/deploymentStatus"
+      },
+      "deploymentHistory": [
+        {
+          "active": true,
+          "deployer": "OneDeploy",
+          "end_time": "2026-07-30T14:49:21.2604312Z",
+          "id": "51d74c42-cfae-4f94-8d95-dc495b419598",
+          "message": "OneDeploy",
+          "start_time": "2026-07-30T14:49:15.6064441Z",
+          "status": 4,
+          "status_text": ""
+        },
+        {
+          "active": false,
+          "deployer": "OneDeploy",
+          "end_time": "2026-07-30T14:44:12.3396973Z",
+          "id": "93d79fbf-490d-46e0-b9f7-0eeb79ed9393",
+          "message": "OneDeploy",
+          "start_time": "2026-07-30T14:44:06.7666138Z",
+          "status": 4,
+          "status_text": ""
+        }
+      ],
+      "warmup": {
+        "pass": true,
+        "attempts": [
+          {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 1525,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        ]
+      },
+      "rootProbe": {
+        "url": "https://app-jm1-one-prod.azurewebsites.net/",
+        "status": 200,
+        "elapsedMs": 565,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.one",
+          "environment": "production",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "healthProbe": {
+        "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+        "status": 200,
+        "elapsedMs": 193,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.one",
+          "environment": "production",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "tenConsecutiveProbes": [
+        {
+          "sequence": 1,
+          "root": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/",
+            "status": 200,
+            "elapsedMs": 222,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          },
+          "health": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 250,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        },
+        {
+          "sequence": 2,
+          "root": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/",
+            "status": 200,
+            "elapsedMs": 196,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          },
+          "health": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 202,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        },
+        {
+          "sequence": 3,
+          "root": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/",
+            "status": 200,
+            "elapsedMs": 515,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          },
+          "health": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 388,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        },
+        {
+          "sequence": 4,
+          "root": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/",
+            "status": 200,
+            "elapsedMs": 1337,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          },
+          "health": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 980,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        },
+        {
+          "sequence": 5,
+          "root": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/",
+            "status": 200,
+            "elapsedMs": 652,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          },
+          "health": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 563,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        },
+        {
+          "sequence": 6,
+          "root": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/",
+            "status": 200,
+            "elapsedMs": 435,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          },
+          "health": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 1070,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        },
+        {
+          "sequence": 7,
+          "root": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/",
+            "status": 200,
+            "elapsedMs": 409,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          },
+          "health": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 629,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        },
+        {
+          "sequence": 8,
+          "root": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/",
+            "status": 200,
+            "elapsedMs": 367,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          },
+          "health": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 480,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        },
+        {
+          "sequence": 9,
+          "root": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/",
+            "status": 200,
+            "elapsedMs": 563,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          },
+          "health": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 347,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        },
+        {
+          "sequence": 10,
+          "root": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/",
+            "status": 200,
+            "elapsedMs": 341,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          },
+          "health": {
+            "url": "https://app-jm1-one-prod.azurewebsites.net/api/health",
+            "status": 200,
+            "elapsedMs": 205,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.one",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        }
+      ],
+      "afterConfig": {
+        "alwaysOn": true,
+        "appCommandLine": "node server.js",
+        "ftpsState": "Disabled",
+        "healthCheckPath": "/",
+        "http20Enabled": true,
+        "linuxFxVersion": "NODE|22-lts",
+        "scmType": "None"
+      },
+      "afterSettingsSafe": [
+        {
+          "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+          "slotSetting": false,
+          "valueClass": "secret_or_sensitive",
+          "present": true
+        },
+        {
+          "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+          "slotSetting": false,
+          "valueClass": "secret_or_sensitive",
+          "present": true
+        },
+        {
+          "name": "ENABLE_ORYX_BUILD",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_GATE",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_MIGRATION_STATE",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_PROPERTY_DOMAIN",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_PROPERTY_KEY",
+          "slotSetting": false,
+          "valueClass": "secret_or_sensitive",
+          "present": true
+        },
+        {
+          "name": "JM1_RELEASE_ID",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_RELEASE_SHA",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_SLOT_ENVIRONMENT",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "JM1_WEB_GATE",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "KEY_VAULT_URI",
+          "slotSetting": false,
+          "valueClass": "secret_or_sensitive",
+          "present": true
+        },
+        {
+          "name": "NODE_ENV",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "WEBSITE_NODE_DEFAULT_VERSION",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "WEBSITE_RUN_FROM_PACKAGE",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "WEBSITE_SKIP_NODE_MODULES_TAR",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "WEBSITE_WARMUP_PATH",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        },
+        {
+          "name": "WEBSITE_WARMUP_STATUSES",
+          "slotSetting": false,
+          "valueClass": "nonsecret",
+          "present": true
+        }
+      ],
+      "diagnosticSettings": [
+        {
+          "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourcegroups/rg-jm1-web-prod-appsvc/providers/microsoft.web/sites/app-jm1-one-prod/providers/microsoft.insights/diagnosticSettings/diag-app-jm1-one-prod-app-jm1-one-prod",
+          "logs": [
+            {
+              "category": "AppServiceHTTPLogs",
+              "enabled": true,
+              "retentionPolicy": {
+                "days": 0,
+                "enabled": false
+              }
+            },
+            {
+              "category": "AppServiceConsoleLogs",
+              "enabled": true,
+              "retentionPolicy": {
+                "days": 0,
+                "enabled": false
+              }
+            },
+            {
+              "category": "AppServiceAppLogs",
+              "enabled": true,
+              "retentionPolicy": {
+                "days": 0,
+                "enabled": false
+              }
+            },
+            {
+              "category": "AppServiceAuditLogs",
+              "enabled": true,
+              "retentionPolicy": {
+                "days": 0,
+                "enabled": false
+              }
+            },
+            {
+              "category": "AppServicePlatformLogs",
+              "enabled": true,
+              "retentionPolicy": {
+                "days": 0,
+                "enabled": false
+              }
+            },
+            {
+              "category": "AppServiceIPSecAuditLogs",
+              "enabled": false,
+              "retentionPolicy": {
+                "days": 0,
+                "enabled": false
+              }
+            },
+            {
+              "category": "AppServiceAuthenticationLogs",
+              "enabled": false,
+              "retentionPolicy": {
+                "days": 0,
+                "enabled": false
+              }
+            }
+          ],
+          "metrics": [
+            {
+              "category": "AllMetrics",
+              "enabled": true,
+              "retentionPolicy": {
+                "days": 0,
+                "enabled": false
+              }
+            }
+          ],
+          "name": "diag-app-jm1-one-prod-app-jm1-one-prod",
+          "resourceGroup": "rg-jm1-web-prod-appsvc",
+          "type": "Microsoft.Insights/diagnosticSettings",
+          "workspaceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-core/providers/Microsoft.OperationalInsights/workspaces/9ee13245-2303-4010-8b6d-35f7cbcfdc0e-rg-jm1-core-EUS"
+        }
+      ],
+      "certificationPass": true,
+      "completedAt": "2026-07-30T14:50:34.385247+00:00"
+    }
+  ]
+}

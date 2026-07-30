@@ -1,0 +1,866 @@
+{
+  "startedAt": "2026-07-30T16:07:55.998346+00:00",
+  "artifact": {
+    "path": "/tmp/gate-w3-minimal-runtime-20260730.zip",
+    "sha256": "913fd27cdac46baadffe636527dc5582ed23125f91468d056127887fd5293652"
+  },
+  "targets": [
+    {
+      "app": "app-jm1-foundation-prod",
+      "property": "jmerrill.foundation",
+      "startedAt": "2026-07-30T16:07:55.998575+00:00",
+      "deployAttempted": false,
+      "certification": {
+        "warmup": [
+          {
+            "attempt": 1,
+            "status": 200,
+            "elapsedMs": 223,
+            "body": {
+              "status": "ready",
+              "service": "JM1 Enterprise Web Platform",
+              "message": "Infrastructure Ready. Production traffic has not migrated.",
+              "property": "jmerrill.foundation",
+              "environment": "production",
+              "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+              "traffic_migrated": false
+            },
+            "pass": true
+          }
+        ],
+        "rootProbe": {
+          "status": 200,
+          "elapsedMs": 182,
+          "body": {
+            "status": "ready",
+            "service": "JM1 Enterprise Web Platform",
+            "message": "Infrastructure Ready. Production traffic has not migrated.",
+            "property": "jmerrill.foundation",
+            "environment": "production",
+            "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+            "traffic_migrated": false
+          },
+          "pass": true
+        },
+        "healthProbe": {
+          "status": 200,
+          "elapsedMs": 242,
+          "body": {
+            "status": "ready",
+            "service": "JM1 Enterprise Web Platform",
+            "message": "Infrastructure Ready. Production traffic has not migrated.",
+            "property": "jmerrill.foundation",
+            "environment": "production",
+            "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+            "traffic_migrated": false
+          },
+          "pass": true
+        },
+        "tenConsecutiveProbes": [
+          {
+            "sequence": 1,
+            "root": {
+              "status": 200,
+              "elapsedMs": 182,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "health": {
+              "status": 200,
+              "elapsedMs": 194,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "pass": true
+          },
+          {
+            "sequence": 2,
+            "root": {
+              "status": 200,
+              "elapsedMs": 153,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "health": {
+              "status": 200,
+              "elapsedMs": 159,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "pass": true
+          },
+          {
+            "sequence": 3,
+            "root": {
+              "status": 200,
+              "elapsedMs": 162,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "health": {
+              "status": 200,
+              "elapsedMs": 188,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "pass": true
+          },
+          {
+            "sequence": 4,
+            "root": {
+              "status": 200,
+              "elapsedMs": 206,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "health": {
+              "status": 200,
+              "elapsedMs": 204,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "pass": true
+          },
+          {
+            "sequence": 5,
+            "root": {
+              "status": 200,
+              "elapsedMs": 226,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "health": {
+              "status": 200,
+              "elapsedMs": 315,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "pass": true
+          },
+          {
+            "sequence": 6,
+            "root": {
+              "status": 200,
+              "elapsedMs": 205,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "health": {
+              "status": 200,
+              "elapsedMs": 333,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "pass": true
+          },
+          {
+            "sequence": 7,
+            "root": {
+              "status": 200,
+              "elapsedMs": 177,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "health": {
+              "status": 200,
+              "elapsedMs": 158,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "pass": true
+          },
+          {
+            "sequence": 8,
+            "root": {
+              "status": 200,
+              "elapsedMs": 148,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "health": {
+              "status": 200,
+              "elapsedMs": 200,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "pass": true
+          },
+          {
+            "sequence": 9,
+            "root": {
+              "status": 200,
+              "elapsedMs": 251,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "health": {
+              "status": 200,
+              "elapsedMs": 224,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "pass": true
+          },
+          {
+            "sequence": 10,
+            "root": {
+              "status": 200,
+              "elapsedMs": 175,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "health": {
+              "status": 200,
+              "elapsedMs": 153,
+              "body": {
+                "status": "ready",
+                "service": "JM1 Enterprise Web Platform",
+                "message": "Infrastructure Ready. Production traffic has not migrated.",
+                "property": "jmerrill.foundation",
+                "environment": "production",
+                "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+                "traffic_migrated": false
+              },
+              "pass": true
+            },
+            "pass": true
+          }
+        ],
+        "pass": true
+      },
+      "afterConfig": {
+        "returncode": 0,
+        "elapsedMs": 1935,
+        "stdout": "{\n  \"alwaysOn\": true,\n  \"appCommandLine\": \"node server.js\",\n  \"ftpsState\": \"Disabled\",\n  \"healthCheckPath\": \"/\",\n  \"http20Enabled\": true,\n  \"linuxFxVersion\": \"NODE|22-lts\",\n  \"scmType\": \"None\"\n}\n",
+        "stderr": "",
+        "json": {
+          "alwaysOn": true,
+          "appCommandLine": "node server.js",
+          "ftpsState": "Disabled",
+          "healthCheckPath": "/",
+          "http20Enabled": true,
+          "linuxFxVersion": "NODE|22-lts",
+          "scmType": "None"
+        }
+      },
+      "result": "PASS"
+    },
+    {
+      "app": "app-jm1-productions-prod",
+      "property": "jmerrill.productions",
+      "startedAt": "2026-07-30T16:08:12.630852+00:00",
+      "deployAttempted": true,
+      "settingsSet": {
+        "returncode": 0,
+        "elapsedMs": 3125,
+        "stdout": "",
+        "stderr": "",
+        "json": {}
+      },
+      "configSet": {
+        "returncode": 0,
+        "elapsedMs": 6302,
+        "stdout": "",
+        "stderr": "",
+        "json": {}
+      },
+      "restartBeforeDeploy": {
+        "returncode": 0,
+        "elapsedMs": 1299,
+        "stdout": "",
+        "stderr": "",
+        "json": {}
+      },
+      "deploy": {
+        "returncode": 0,
+        "elapsedMs": 139511,
+        "stdout": "{\n  \"active\": true,\n  \"author\": \"N/A\",\n  \"author_email\": \"N/A\",\n  \"build_summary\": {\n    \"errors\": [],\n    \"warnings\": []\n  },\n  \"complete\": true,\n  \"deployer\": \"OneDeploy\",\n  \"end_time\": \"2026-07-30T16:10:49.3209972Z\",\n  \"id\": \"ad9a559e-39c4-4623-8790-88aac7fce8b5\",\n  \"is_readonly\": true,\n  \"is_temp\": false,\n  \"last_success_end_time\": \"2026-07-30T16:10:49.3209972Z\",\n  \"log_url\": \"https://app-jm1-productions-prod.scm.azurewebsites.net/api/deployments/ad9a559e-39c4-4623-8790-88aac7fce8b5/log\",\n  \"message\": \"OneDeploy\",\n  \"progress\": \"\",\n  \"received_time\": \"2026-07-30T16:10:46.2460272Z\",\n  \"site_name\": \"app-jm1-productions-prod\",\n  \"start_time\": \"2026-07-30T16:10:47.6686602Z\",\n  \"status\": 4,\n  \"status_text\": \"\",\n  \"url\": \"https://app-jm1-productions-prod.scm.azurewebsites.net/api/deployments/ad9a559e-39c4-4623-8790-88aac7fce8b5\"\n}\n",
+        "stderr": "WARNING: Note: 'az webapp deploy' does not run build automation (dependency installation, compilation, etc.) by default for Linux web apps. If your package is not pre-built, set the app setting SCM_DO_BUILD_DURING_DEPLOYMENT=true to enable builds during deployment.\nWARNING: Initiating deployment\nWARNING: Deploying from local path: /tmp/gate-w3-minimal-runtime-20260730.zip\nWARNING: Deployment has completed successfully\nWARNING: You can visit your app at: http://app-jm1-productions-prod.azurewebsites.net\n",
+        "json": {
+          "active": true,
+          "author": "N/A",
+          "author_email": "N/A",
+          "build_summary": {
+            "errors": [],
+            "warnings": []
+          },
+          "complete": true,
+          "deployer": "OneDeploy",
+          "end_time": "2026-07-30T16:10:49.3209972Z",
+          "id": "ad9a559e-39c4-4623-8790-88aac7fce8b5",
+          "is_readonly": true,
+          "is_temp": false,
+          "last_success_end_time": "2026-07-30T16:10:49.3209972Z",
+          "log_url": "https://app-jm1-productions-prod.scm.azurewebsites.net/api/deployments/ad9a559e-39c4-4623-8790-88aac7fce8b5/log",
+          "message": "OneDeploy",
+          "progress": "",
+          "received_time": "2026-07-30T16:10:46.2460272Z",
+          "site_name": "app-jm1-productions-prod",
+          "start_time": "2026-07-30T16:10:47.6686602Z",
+          "status": 4,
+          "status_text": "",
+          "url": "https://app-jm1-productions-prod.scm.azurewebsites.net/api/deployments/ad9a559e-39c4-4623-8790-88aac7fce8b5"
+        }
+      },
+      "deploymentId": "ad9a559e-39c4-4623-8790-88aac7fce8b5",
+      "certification": {
+        "warmup": [
+          {
+            "attempt": 1,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 173,
+            "pass": false
+          },
+          {
+            "attempt": 2,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 254,
+            "pass": false
+          },
+          {
+            "attempt": 3,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 228,
+            "pass": false
+          },
+          {
+            "attempt": 4,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 2295,
+            "pass": false
+          },
+          {
+            "attempt": 5,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 189,
+            "pass": false
+          },
+          {
+            "attempt": 6,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 192,
+            "pass": false
+          },
+          {
+            "attempt": 7,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 206,
+            "pass": false
+          },
+          {
+            "attempt": 8,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 845,
+            "pass": false
+          },
+          {
+            "attempt": 9,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 177,
+            "pass": false
+          },
+          {
+            "attempt": 10,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 195,
+            "pass": false
+          },
+          {
+            "attempt": 11,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 305,
+            "pass": false
+          },
+          {
+            "attempt": 12,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 447,
+            "pass": false
+          },
+          {
+            "attempt": 13,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 244,
+            "pass": false
+          },
+          {
+            "attempt": 14,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 322,
+            "pass": false
+          },
+          {
+            "attempt": 15,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 280,
+            "pass": false
+          },
+          {
+            "attempt": 16,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 241,
+            "pass": false
+          },
+          {
+            "attempt": 17,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 919,
+            "pass": false
+          },
+          {
+            "attempt": 18,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 533,
+            "pass": false
+          },
+          {
+            "attempt": 19,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 251,
+            "pass": false
+          },
+          {
+            "attempt": 20,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 248,
+            "pass": false
+          },
+          {
+            "attempt": 21,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 487,
+            "pass": false
+          },
+          {
+            "attempt": 22,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 740,
+            "pass": false
+          },
+          {
+            "attempt": 23,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 661,
+            "pass": false
+          },
+          {
+            "attempt": 24,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 207,
+            "pass": false
+          },
+          {
+            "attempt": 25,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 435,
+            "pass": false
+          },
+          {
+            "attempt": 26,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 391,
+            "pass": false
+          },
+          {
+            "attempt": 27,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 280,
+            "pass": false
+          },
+          {
+            "attempt": 28,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 441,
+            "pass": false
+          },
+          {
+            "attempt": 29,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 339,
+            "pass": false
+          },
+          {
+            "attempt": 30,
+            "errorType": "HTTPError",
+            "error": "HTTP Error 503: Service Unavailable",
+            "elapsedMs": 485,
+            "pass": false
+          }
+        ],
+        "rootProbe": {
+          "errorType": "HTTPError",
+          "error": "HTTP Error 503: Service Unavailable",
+          "elapsedMs": 242,
+          "pass": false
+        },
+        "healthProbe": {
+          "errorType": "HTTPError",
+          "error": "HTTP Error 503: Service Unavailable",
+          "elapsedMs": 254,
+          "pass": false
+        },
+        "tenConsecutiveProbes": [
+          {
+            "sequence": 1,
+            "root": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 318,
+              "pass": false
+            },
+            "health": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 243,
+              "pass": false
+            },
+            "pass": false
+          },
+          {
+            "sequence": 2,
+            "root": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 273,
+              "pass": false
+            },
+            "health": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 1489,
+              "pass": false
+            },
+            "pass": false
+          },
+          {
+            "sequence": 3,
+            "root": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 1168,
+              "pass": false
+            },
+            "health": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 1775,
+              "pass": false
+            },
+            "pass": false
+          },
+          {
+            "sequence": 4,
+            "root": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 1164,
+              "pass": false
+            },
+            "health": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 1394,
+              "pass": false
+            },
+            "pass": false
+          },
+          {
+            "sequence": 5,
+            "root": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 347,
+              "pass": false
+            },
+            "health": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 253,
+              "pass": false
+            },
+            "pass": false
+          },
+          {
+            "sequence": 6,
+            "root": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 305,
+              "pass": false
+            },
+            "health": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 334,
+              "pass": false
+            },
+            "pass": false
+          },
+          {
+            "sequence": 7,
+            "root": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 228,
+              "pass": false
+            },
+            "health": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 370,
+              "pass": false
+            },
+            "pass": false
+          },
+          {
+            "sequence": 8,
+            "root": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 431,
+              "pass": false
+            },
+            "health": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 411,
+              "pass": false
+            },
+            "pass": false
+          },
+          {
+            "sequence": 9,
+            "root": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 4812,
+              "pass": false
+            },
+            "health": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 4899,
+              "pass": false
+            },
+            "pass": false
+          },
+          {
+            "sequence": 10,
+            "root": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 263,
+              "pass": false
+            },
+            "health": {
+              "errorType": "HTTPError",
+              "error": "HTTP Error 503: Service Unavailable",
+              "elapsedMs": 191,
+              "pass": false
+            },
+            "pass": false
+          }
+        ],
+        "pass": false
+      },
+      "afterConfig": {
+        "returncode": 0,
+        "elapsedMs": 2256,
+        "stdout": "{\n  \"alwaysOn\": true,\n  \"appCommandLine\": \"node server.js\",\n  \"ftpsState\": \"Disabled\",\n  \"healthCheckPath\": \"/\",\n  \"http20Enabled\": true,\n  \"linuxFxVersion\": \"NODE|22-lts\",\n  \"scmType\": \"None\"\n}\n",
+        "stderr": "",
+        "json": {
+          "alwaysOn": true,
+          "appCommandLine": "node server.js",
+          "ftpsState": "Disabled",
+          "healthCheckPath": "/",
+          "http20Enabled": true,
+          "linuxFxVersion": "NODE|22-lts",
+          "scmType": "None"
+        }
+      },
+      "result": "CERTIFICATION_FAILED"
+    }
+  ],
+  "completedAt": "2026-07-30T16:13:37.454446+00:00"
+}

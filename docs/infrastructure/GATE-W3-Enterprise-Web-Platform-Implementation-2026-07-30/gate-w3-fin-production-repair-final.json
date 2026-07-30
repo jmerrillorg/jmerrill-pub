@@ -1,0 +1,404 @@
+{
+  "completedAt": "2026-07-30T15:34:52.115063+00:00",
+  "pass": false,
+  "checks": [
+    {
+      "sequence": 1,
+      "productionRoot": {
+        "status": 200,
+        "elapsedMs": 1060,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "productionHealth": {
+        "status": 200,
+        "elapsedMs": 460,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "stagingRoot": {
+        "errorType": "HTTPError",
+        "error": "HTTP Error 503: Service Unavailable",
+        "elapsedMs": 12873,
+        "pass": false
+      },
+      "stagingHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20118,
+        "pass": false
+      }
+    },
+    {
+      "sequence": 2,
+      "productionRoot": {
+        "status": 200,
+        "elapsedMs": 293,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "productionHealth": {
+        "status": 200,
+        "elapsedMs": 192,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "stagingRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20139,
+        "pass": false
+      },
+      "stagingHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20146,
+        "pass": false
+      }
+    },
+    {
+      "sequence": 3,
+      "productionRoot": {
+        "status": 200,
+        "elapsedMs": 687,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "productionHealth": {
+        "status": 200,
+        "elapsedMs": 246,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "stagingRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20184,
+        "pass": false
+      },
+      "stagingHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20225,
+        "pass": false
+      }
+    },
+    {
+      "sequence": 4,
+      "productionRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20160,
+        "pass": false
+      },
+      "productionHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20154,
+        "pass": false
+      },
+      "stagingRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20284,
+        "pass": false
+      },
+      "stagingHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20159,
+        "pass": false
+      }
+    },
+    {
+      "sequence": 5,
+      "productionRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20255,
+        "pass": false
+      },
+      "productionHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20148,
+        "pass": false
+      },
+      "stagingRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20252,
+        "pass": false
+      },
+      "stagingHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20158,
+        "pass": false
+      }
+    },
+    {
+      "sequence": 6,
+      "productionRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20201,
+        "pass": false
+      },
+      "productionHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20142,
+        "pass": false
+      },
+      "stagingRoot": {
+        "status": 200,
+        "elapsedMs": 597,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "stagingHealth": {
+        "status": 200,
+        "elapsedMs": 202,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      }
+    },
+    {
+      "sequence": 7,
+      "productionRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20151,
+        "pass": false
+      },
+      "productionHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20147,
+        "pass": false
+      },
+      "stagingRoot": {
+        "status": 200,
+        "elapsedMs": 582,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "stagingHealth": {
+        "status": 200,
+        "elapsedMs": 340,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      }
+    },
+    {
+      "sequence": 8,
+      "productionRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20172,
+        "pass": false
+      },
+      "productionHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20205,
+        "pass": false
+      },
+      "stagingRoot": {
+        "status": 200,
+        "elapsedMs": 497,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "stagingHealth": {
+        "status": 200,
+        "elapsedMs": 594,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      }
+    },
+    {
+      "sequence": 9,
+      "productionRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20158,
+        "pass": false
+      },
+      "productionHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20174,
+        "pass": false
+      },
+      "stagingRoot": {
+        "status": 200,
+        "elapsedMs": 490,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "stagingHealth": {
+        "status": 200,
+        "elapsedMs": 412,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      }
+    },
+    {
+      "sequence": 10,
+      "productionRoot": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20211,
+        "pass": false
+      },
+      "productionHealth": {
+        "errorType": "TimeoutError",
+        "error": "The read operation timed out",
+        "elapsedMs": 20198,
+        "pass": false
+      },
+      "stagingRoot": {
+        "status": 200,
+        "elapsedMs": 378,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      },
+      "stagingHealth": {
+        "status": 200,
+        "elapsedMs": 327,
+        "body": {
+          "status": "ready",
+          "service": "JM1 Enterprise Web Platform",
+          "message": "Infrastructure Ready. Production traffic has not migrated.",
+          "property": "jmerrill.financial",
+          "environment": "staging",
+          "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+          "traffic_migrated": false
+        },
+        "pass": true
+      }
+    }
+  ]
+}
