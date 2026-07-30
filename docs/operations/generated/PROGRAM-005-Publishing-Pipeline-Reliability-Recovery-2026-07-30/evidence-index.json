@@ -11,6 +11,11 @@
       "path": "docs/operations/generated/PROGRAM-005-Publishing-Pipeline-Reliability-Recovery-2026-07-30/01-live-pipeline-readback.json",
       "sha256": "f260b8439da8ffcf7e3c3404910a2610aefe2594557b918525caf74383329cfc",
       "bytes": 26689
+    },
+    {
+      "path": "docs/operations/generated/PROGRAM-005-Publishing-Pipeline-Reliability-Recovery-2026-07-30/02-preview-capacity-and-release-readiness.md",
+      "sha256": "359589e72c7b63c0ece404311883ed7905933e852991619750736e9f8089581e",
+      "bytes": 4174
     }
   ]
 }
