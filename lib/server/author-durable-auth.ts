@@ -34,16 +34,53 @@ export async function isAuthorizedAuthorEmail(email?: string | null) {
   if (!config) return false
 
   const contact = await dataverseFirst(config, 'contacts', {
-    $select: 'contactid,emailaddress1',
-    $filter: `emailaddress1 eq '${normalizedEmail.replace(/'/g, "''")}'`,
+    $select: 'contactid,emailaddress1,emailaddress2,emailaddress3,adx_identity_username',
+    $filter: [
+      `emailaddress1 eq '${normalizedEmail.replace(/'/g, "''")}'`,
+      `emailaddress2 eq '${normalizedEmail.replace(/'/g, "''")}'`,
+      `emailaddress3 eq '${normalizedEmail.replace(/'/g, "''")}'`,
+      `adx_identity_username eq '${normalizedEmail.replace(/'/g, "''")}'`,
+    ].join(' or '),
   })
 
   return Boolean(contact)
 }
 
+async function getAuthorizedAuthorEmailByObjectId(objectId?: string | null) {
+  const normalizedObjectId = objectId?.trim().toLowerCase()
+  if (!normalizedObjectId) return ''
+
+  const config = getDataverseServerConfig()
+  if (!config) return ''
+
+  const contact = await dataverseFirst(config, 'contacts', {
+    $select: 'contactid,emailaddress1,emailaddress2,emailaddress3,externaluseridentifier,adx_identity_username',
+    $filter: `externaluseridentifier eq '${normalizedObjectId.replace(/'/g, "''")}'`,
+  })
+
+  if (!contact) return ''
+
+  return (
+    getProfileValue(contact, 'emailaddress1') ||
+    getProfileValue(contact, 'emailaddress2') ||
+    getProfileValue(contact, 'emailaddress3') ||
+    getProfileValue(contact, 'adx_identity_username')
+  ).toLowerCase()
+}
+
 function getProfileValue(profile: Record<string, unknown> | undefined, key: string) {
   const value = profile?.[key]
   return typeof value === 'string' ? value.trim() : ''
+}
+
+function getProfileStringValues(profile: Record<string, unknown> | undefined, key: string) {
+  const value = profile?.[key]
+  if (typeof value === 'string') return [value.trim()].filter(Boolean)
+  if (!Array.isArray(value)) return []
+
+  return value
+    .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
+    .filter(Boolean)
 }
 
 function decodeGuestUpn(value: string) {
@@ -78,6 +115,10 @@ function collectIdentityEmailCandidates({
     getProfileValue(profile, 'preferred_username'),
     getProfileValue(profile, 'upn'),
     getProfileValue(profile, 'unique_name'),
+    getProfileValue(profile, 'emailAddress'),
+    getProfileValue(profile, 'signInNames.emailAddress'),
+    ...getProfileStringValues(profile, 'emails'),
+    ...getProfileStringValues(profile, 'otherMails'),
     typeof user?.email === 'string' ? user.email.trim() : '',
     typeof token?.email === 'string' ? token.email.trim() : '',
   ].filter(Boolean)
@@ -118,7 +159,7 @@ async function resolveAuthorizedAuthorEmail({
 }: {
   profile?: Record<string, unknown>
   user?: { email?: string | null } | null
-  token?: { email?: unknown } | null
+  token?: { email?: unknown; oid?: unknown; sub?: unknown } | null
 }) {
   const candidates = collectIdentityEmailCandidates({ profile, user, token })
 
@@ -126,6 +167,12 @@ async function resolveAuthorizedAuthorEmail({
     if (await isAuthorizedAuthorEmail(candidate)) {
       return candidate
     }
+  }
+
+  const objectIds = collectIdentityObjectIdCandidates({ profile, token })
+  for (const objectId of objectIds) {
+    const email = await getAuthorizedAuthorEmailByObjectId(objectId)
+    if (email) return email
   }
 
   return ''
