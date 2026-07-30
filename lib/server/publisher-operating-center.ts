@@ -3122,8 +3122,8 @@ function buildAuthorResponseQueue(
     { id: 'view_thread', label: 'View Thread' },
     { id: 'confirm_classification', label: 'Confirm Classification' },
     { id: 'change_classification', label: 'Change Classification' },
-    { id: 'reconcile_response', label: 'Inspect Response Evidence' },
-    { id: 'retry_failed_transition', label: 'Admin Retry Event' },
+    { id: 'reconcile_response', label: 'Reconcile Response' },
+    { id: 'retry_failed_transition', label: 'Retry Failed Transition' },
     { id: 'mark_non_decision_message', label: 'Mark Non-Decision Message' },
   ]
 
@@ -3170,8 +3170,9 @@ function buildAuthorResponseQueue(
           type.includes('CAP004_PROOFREADING_STARTED')
         )
       })
-      const processingStatus = deriveAuthorResponseProcessingStatus(gateStatus, classifiedDecision, transitionLog || downstreamStage)
-      const failedStep = deriveAuthorResponseFailedStep(gateStatus, transitionLog, processingStatus)
+      const transitionEvidence = transitionLog || downstreamStage
+      const processingStatus = deriveAuthorResponseProcessingStatus(gateStatus, classifiedDecision, transitionEvidence)
+      const failedStep = deriveAuthorResponseFailedStep(gateStatus, transitionEvidence, processingStatus)
       const stagePackage = [
         dataverseFormatted(gate, 'jm1pub_gatecode') || stringValue(gate.jm1pub_gatecode),
         stringValue(gate.jm1pub_editorialapprovalgatename),
@@ -3197,7 +3198,7 @@ function buildAuthorResponseQueue(
             ? 'No action required; response has been applied.'
             : processingStatus === 'AMBIGUOUS — REVIEW'
               ? 'Confirm the response classification before movement.'
-              : 'Automatic consumer will retry; use admin replay only with the original event and reason.',
+              : 'Automatic consumer will retry; use Admin Retry Event only with the original event and reason.',
         threadEvidence: stringValue(gate.jm1pub_authordecisionsource) || extractThreadEvidence(summary),
         gateId,
         stageId,

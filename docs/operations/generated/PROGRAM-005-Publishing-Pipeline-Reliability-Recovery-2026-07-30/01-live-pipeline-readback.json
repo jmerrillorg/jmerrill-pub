@@ -1,0 +1,700 @@
+{
+  "verifiedAt": "2026-07-30T15:50:19Z",
+  "environment": "JM1 Dataverse Core via Azure CLI user token; read-only scan",
+  "enterpriseApprovalBacklog": {
+    "decidedGateCount": 5,
+    "candidateCount": 0,
+    "candidates": []
+  },
+  "canonicalTitleCounts": {
+    "The Intentional Leader": 1,
+    "The Long Watch": 1
+  },
+  "titles": {
+    "The Intentional Leader": [
+      {
+        "id": "e797232b-da7a-f111-ab0f-00224820105b",
+        "title": "The Intentional Leader",
+        "author": "Jackie Smith Jr",
+        "stage": "Editorial",
+        "state": "Active",
+        "status": "Active"
+      }
+    ],
+    "The Long Watch": [
+      {
+        "id": "a69b9dfa-bb7b-f111-ab0f-7c1e525b15c2",
+        "title": "The Long Watch",
+        "author": "Jackie Smith Jr",
+        "stage": "Editorial",
+        "state": "Active",
+        "status": "Active"
+      }
+    ]
+  },
+  "intentionalLeader": {
+    "titleId": "e797232b-da7a-f111-ab0f-00224820105b",
+    "stageCount": 5,
+    "stages": [
+      {
+        "id": "cbdc862e-da7a-f111-ab0f-000d3a14673b",
+        "name": "Editorial Review - The Intentional Leader",
+        "type": "Review",
+        "status": "Complete",
+        "sequence": "1",
+        "completedOn": "2026-07-10T01:07:55Z"
+      },
+      {
+        "id": "d8dc4dd3-fb7b-f111-ab0f-6045bdd69435",
+        "name": "Developmental Editing - The Intentional Leader, Volume I",
+        "type": "Developmental",
+        "status": "Complete",
+        "sequence": "2",
+        "completedOn": "2026-07-15T07:25:13Z"
+      },
+      {
+        "id": "a7713ff3-1e80-f111-ab0f-6045bdd69678",
+        "name": "Line Editing - The Intentional Leader, Volume I",
+        "type": "Line",
+        "status": "Complete",
+        "sequence": "3",
+        "completedOn": "2026-07-16T04:25:03Z"
+      },
+      {
+        "id": "cf06664b-ce80-f111-ab0f-7c1e525b15c2",
+        "name": "Copyediting - The Intentional Leader, Volume I",
+        "type": "Copyedit",
+        "status": "Complete",
+        "sequence": "4",
+        "completedOn": "2026-07-16T19:31:42Z"
+      },
+      {
+        "id": "11f3f9f8-4c81-f111-ab0f-7c1e525b15c2",
+        "name": "Proofreading - The Intentional Leader, Volume I",
+        "type": "Proofread",
+        "status": "Complete",
+        "sequence": "5",
+        "completedOn": "2026-07-20T13:45:01Z"
+      }
+    ],
+    "gateCount": 6,
+    "gates": [
+      {
+        "id": "67396131-da7a-f111-ab0f-00224820105b",
+        "gate": "A1 Editorial Review Acceptance",
+        "status": "Publisher Override",
+        "decision": "",
+        "decisionOn": "",
+        "nextStageAuthorized": true,
+        "nextStageAuthorizedOn": "2026-07-10T01:07:55Z",
+        "artifactId": "d215002e-da7a-f111-ab0f-7c1e525b15c2"
+      },
+      {
+        "id": "899ef3cd-fb7b-f111-ab0f-7c1e525b15c2",
+        "gate": "A2 Developmental Completion",
+        "status": "Approved",
+        "decision": "Approve",
+        "decisionOn": "2026-07-10T12:40:56Z",
+        "nextStageAuthorized": true,
+        "nextStageAuthorizedOn": "2026-07-10T19:53:56Z",
+        "artifactId": "0cbf9a4e-3d7c-f111-ab0f-7c1e525b15c2"
+      },
+      {
+        "id": "b1c48e1d-e57d-f111-ab0f-00224820105b",
+        "gate": "A2 Developmental Completion",
+        "status": "Approved",
+        "decision": "Approve",
+        "decisionOn": "2026-07-13T05:17:21Z",
+        "nextStageAuthorized": true,
+        "nextStageAuthorizedOn": "2026-07-15T07:25:13Z",
+        "artifactId": "61af771e-777e-f111-ab0f-00224820105b"
+      },
+      {
+        "id": "b4b734a6-bd80-f111-ab0f-00224820105b",
+        "gate": "A3 Line Editing Completion",
+        "status": "Approved",
+        "decision": "Approve",
+        "decisionOn": "2026-07-16T04:05:26Z",
+        "nextStageAuthorized": true,
+        "nextStageAuthorizedOn": "2026-07-16T04:25:02Z",
+        "artifactId": "59bb14b2-bc80-f111-ab0f-7c1e525b15c2"
+      },
+      {
+        "id": "ca4994e3-ea80-f111-ab0f-7c1e525b15c2",
+        "gate": "A4 Copyediting Completion",
+        "status": "Approved",
+        "decision": "Approve",
+        "decisionOn": "2026-07-16T19:08:21Z",
+        "nextStageAuthorized": true,
+        "nextStageAuthorizedOn": "2026-07-16T19:31:42Z",
+        "artifactId": "ac0595ab-ea80-f111-ab0f-000d3a14673b"
+      },
+      {
+        "id": "be079017-0983-f111-ab0f-000d3a14673b",
+        "gate": "A5 Proofreading Completion",
+        "status": "Approved",
+        "decision": "Approve",
+        "decisionOn": "2026-07-20T07:01:58Z",
+        "nextStageAuthorized": true,
+        "nextStageAuthorizedOn": "2026-07-20T13:45:01Z",
+        "artifactId": "6c01c3f7-0883-f111-ab0f-000d3a14673b"
+      }
+    ],
+    "assetCount": 1,
+    "artifactCount": 30,
+    "sharePointSyncedArtifactCount": 27,
+    "checksumBearingArtifactCount": 11,
+    "artifacts": [
+      {
+        "id": "bf2c8245-b084-f111-ab0f-7c1e525b15c2",
+        "name": "Interior Layout Package Manifest - The Intentional Leader, Volume I",
+        "filename": "2026-07-21-The-Intentional-Leader-Volume-I-Interior-Layout-Package-Manifest.json",
+        "type": "",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "d99c9048-b084-f111-ab0f-00224820105b",
+        "name": "Interior Proof PDF - The Intentional Leader, Volume I",
+        "filename": "2026-07-21-The-Intentional-Leader-Volume-I-Interior-Proof.pdf",
+        "type": "",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "da9c9048-b084-f111-ab0f-00224820105b",
+        "name": "Interior Layout QA Evidence - The Intentional Leader, Volume I",
+        "filename": "2026-07-21-The-Intentional-Leader-Volume-I-Interior-Layout-QA-Evidence.md",
+        "type": "",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "bd924d42-b084-f111-ab0e-00224834734e",
+        "name": "Interior Production File - The Intentional Leader, Volume I",
+        "filename": "2026-07-21-The-Intentional-Leader-Volume-I-Interior-Production-File.docx",
+        "type": "",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "74093704-0983-f111-ab0f-7c1e525b15c2",
+        "name": "Proofreading Review Package - The Intentional Leader Volume I",
+        "filename": "2026-07-19-The-Intentional-Leader-Volume-I-Proofreading-Author-Review-Cover-Note.pdf",
+        "type": "Proof Package",
+        "status": "Delivered",
+        "visibility": "Author Facing",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": true
+      },
+      {
+        "id": "6c01c3f7-0883-f111-ab0f-000d3a14673b",
+        "name": "Proofread Manuscript - The Intentional Leader Volume I",
+        "filename": "2026-07-19-The-Intentional-Leader-Volume-I-Proofread-Manuscript.docx",
+        "type": "Manuscript Review Copy",
+        "status": "Delivered",
+        "visibility": "Author Facing",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": true
+      },
+      {
+        "id": "c2f64dae-ea80-f111-ab0f-6045bdd69738",
+        "name": "Copyedited Working Manuscript - The Intentional Leader Volume I",
+        "filename": "2026-07-16-The-Intentional-Leader-Volume-I-Copyedited-Working-Manuscript.docx",
+        "type": "Manuscript Review Copy",
+        "status": "Delivered",
+        "visibility": "Author Facing",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": true
+      },
+      {
+        "id": "ac0595ab-ea80-f111-ab0f-000d3a14673b",
+        "name": "Copyediting Review Package - The Intentional Leader Volume I",
+        "filename": "2026-07-16-The-Intentional-Leader-Volume-I-Copyediting-Author-Review-Cover-Note.pdf",
+        "type": "Copyedit Package",
+        "status": "Delivered",
+        "visibility": "Author Facing",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": true
+      },
+      {
+        "id": "04f0a44b-ce80-f111-ab0f-000d3a14673b",
+        "name": "Copyediting Entry Package - The Intentional Leader Volume I",
+        "filename": "Copyediting entry package - The Intentional Leader Volume I",
+        "type": "Internal Notes Package",
+        "status": "Ready for Review",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": false,
+        "repositoryPathPresent": false,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "54729309-ce80-f111-ab0f-000d3a14673b",
+        "name": "Line Editing Author Approval Evidence - The Intentional Leader Volume I",
+        "filename": "Outlook message evidence - line editing author approval",
+        "type": "Approval Evidence",
+        "status": "Approved",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": false,
+        "repositoryPathPresent": false,
+        "sha256Present": false,
+        "isCurrentApproved": true
+      },
+      {
+        "id": "aa74c2b0-bc80-f111-ab0f-6045bdd69738",
+        "name": "Line Edit Package - The Intentional Leader Volume I",
+        "filename": "2026-07-16-The-Intentional-Leader-Volume-I-Line-Editing-Author-Review-Cover-Note.pdf",
+        "type": "Line Edit Package",
+        "status": "Approved",
+        "visibility": "Author Facing",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": true
+      },
+      {
+        "id": "59bb14b2-bc80-f111-ab0f-7c1e525b15c2",
+        "name": "Line-Edited Working Manuscript - The Intentional Leader Volume I",
+        "filename": "2026-07-15-The-Intentional-Leader-Volume-I-Line-Edited-Working-Manuscript.docx",
+        "type": "Manuscript Review Copy",
+        "status": "Approved",
+        "visibility": "Author Facing",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": true
+      },
+      {
+        "id": "bfa1d706-2180-f111-ab0f-000d3a14673b",
+        "name": "CAP-002 Controlled Line Editing Sample - January 1 - The Intentional Leader",
+        "filename": "2026-07-15 - CAP002 Controlled Line Editing Sample - January 1.md",
+        "type": "Internal Notes Package",
+        "status": "Delivered",
+        "visibility": "",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "61af771e-777e-f111-ab0f-00224820105b",
+        "name": "Volume I Editorial Working Manuscript - The Intentional Leader - Author Delivery DOCX",
+        "filename": "2026-07-13 - The Intentional Leader - Volume I Editorial Working Manuscript.docx",
+        "type": "Manuscript Review Copy",
+        "status": "Delivered",
+        "visibility": "Author Facing",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": true
+      },
+      {
+        "id": "ba84f61b-e57d-f111-ab0f-7c1e525b15c2",
+        "name": "Volume I Developmental Review Package - The Intentional Leader - Author Delivery PDF",
+        "filename": "2026-07-12-The-Intentional-Leader-Volume-I-Developmental-Review-Package-Author-Delivery.pdf",
+        "type": "Developmental Edit Package",
+        "status": "Delivered",
+        "visibility": "Author Facing",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": true
+      },
+      {
+        "id": "1670c216-a57c-f111-ab0f-000d3a14673b",
+        "name": "Permanent Writeback Proof Artifact",
+        "filename": "proof-internal-writeback.txt",
+        "type": "Line Edit Package",
+        "status": "Draft",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": false,
+        "repositoryPathPresent": false,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "2bfb7552-3d7c-f111-ab0f-6045bdd69678",
+        "name": "A2 Author Review Release Packet - The Intentional Leader",
+        "filename": "2026-07-10 - A2 Author Review Release Packet.md",
+        "type": "Internal Notes Package",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": true
+      },
+      {
+        "id": "0cbf9a4e-3d7c-f111-ab0f-7c1e525b15c2",
+        "name": "Volume I Developmental Recommendation - The Intentional Leader",
+        "filename": "2026-07-10 - The Intentional Leader - Volume I Developmental Recommendation.docx",
+        "type": "Developmental Edit Package",
+        "status": "Superseded",
+        "visibility": "Author Facing",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "e1d91cce-fe7b-f111-ab0e-000d3a129ee8",
+        "name": "Calibrated Author-Facing Developmental Plan - The Intentional Leader, Volume I",
+        "filename": "2026-07-09 - Calibrated Author-Facing Developmental Plan - Volume I.md",
+        "type": "Recommendation Letter",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "dcb770cc-fe7b-f111-ab0f-000d3a14673b",
+        "name": "Internal Publisher Review Result - The Intentional Leader, Volume I",
+        "filename": "2026-07-09 - Internal Publisher Review Result - Volume I.md",
+        "type": "Internal Notes Package",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "b7d93fce-fe7b-f111-ab0f-7c1e525b15c2",
+        "name": "A2 Developmental Approval Package - Internal - The Intentional Leader, Volume I",
+        "filename": "2026-07-09 - A2 Developmental Approval Package - Internal.md",
+        "type": "Internal Notes Package",
+        "status": "Draft",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "06d1dcd3-fb7b-f111-ab0e-000d3a129ee8",
+        "name": "Volume I Developmental Structure Map - The Intentional Leader",
+        "filename": "2026-07-09 - Volume I Developmental Structure Map.md",
+        "type": "Internal Notes Package",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "c8df10d0-fb7b-f111-ab0f-000d3a14673b",
+        "name": "Volume I Developmental Working Memo - The Intentional Leader",
+        "filename": "2026-07-09 - Volume I Developmental Editing Working Memo.md",
+        "type": "Internal Notes Package",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "c9df10d0-fb7b-f111-ab0f-000d3a14673b",
+        "name": "Volume I Entry Review Matrix - The Intentional Leader",
+        "filename": "2026-07-09 - Volume I Entry Review Matrix.csv",
+        "type": "Internal Notes Package",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "2224d3ce-fb7b-f111-ab0f-00224820105b",
+        "name": "Volume I Repetition and Continuity Findings - The Intentional Leader",
+        "filename": "2026-07-09 - Volume I Repetition and Continuity Findings.md",
+        "type": "Internal Notes Package",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "869695d4-fb7b-f111-ab0f-7c1e525b15c2",
+        "name": "Draft Author-Facing Developmental Plan - The Intentional Leader, Volume I",
+        "filename": "2026-07-09 - Draft Author-Facing Developmental Plan - Volume I.md",
+        "type": "Recommendation Letter",
+        "status": "Draft",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "280a9574-f07b-f111-ab0f-7c1e525b15c2",
+        "name": "Quarterly Series Structure Decision - The Intentional Leader",
+        "filename": "2026-07-09 - Quarterly Series Structure Decision - The Intentional Leader.md",
+        "type": "Internal Notes Package",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "63959ec3-d77b-f111-ab0f-6045bdd69435",
+        "name": "Editorial Diagnostic Memo - The Intentional Leader",
+        "filename": "2026-07-09 - Editorial Diagnostic Memo - The Intentional Leader.md",
+        "type": "Internal Notes Package",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "65959ec3-d77b-f111-ab0f-6045bdd69435",
+        "name": "Editorial Recommendation Draft - The Intentional Leader",
+        "filename": "2026-07-09 - Editorial Recommendation Draft - The Intentional Leader.md",
+        "type": "Recommendation Letter",
+        "status": "Approved",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": false,
+        "isCurrentApproved": false
+      },
+      {
+        "id": "d215002e-da7a-f111-ab0f-7c1e525b15c2",
+        "name": "Manuscript Review Copy - The Intentional Leader",
+        "filename": "JMP-INT-202607-0W5PTQ - The Intentional Leader.docx",
+        "type": "Manuscript Review Copy",
+        "status": "Delivered",
+        "visibility": "Internal Only",
+        "repositoryItemIdPresent": true,
+        "repositoryPathPresent": true,
+        "sha256Present": true,
+        "isCurrentApproved": true
+      }
+    ],
+    "productionProjects": [
+      {
+        "id": "b4602e91-9582-f111-ab0f-00224820105b",
+        "name": "Cover Design - The Intentional Leader, Volume I - Wave 1",
+        "type": "CoverDesign",
+        "status": "InProgress",
+        "filesLocationPresent": true,
+        "createdOn": "2026-07-18T10:44:02Z"
+      },
+      {
+        "id": "c9dee533-4184-f111-ab0f-7c1e525b15c2",
+        "name": "Interior Layout - The Intentional Leader",
+        "type": "InteriorLayout",
+        "status": "InProgress",
+        "filesLocationPresent": true,
+        "createdOn": "2026-07-20T13:45:01Z"
+      }
+    ],
+    "productionTasks": [
+      {
+        "id": "64383f96-9582-f111-ab0f-000d3a14673b",
+        "name": "Cover Creative Brief - The Intentional Leader, Volume I",
+        "status": "In Progress",
+        "assignedTo": "Publisher / Cover Design",
+        "due": "2026-07-21T10:44:02Z"
+      },
+      {
+        "id": "151edb33-4184-f111-ab0f-6045bdd69678",
+        "name": "Interior Layout Start - The Intentional Leader",
+        "status": "In Progress",
+        "assignedTo": "JM1 Automation",
+        "due": "2026-07-27T13:45:01Z"
+      }
+    ],
+    "executionLogs": [
+      {
+        "id": "5267c031-4184-f111-ab0f-000d3a14673b",
+        "type": "EDITORIAL_APPROVAL_EVENT_CONSUMED",
+        "source": "be079017-0983-f111-ab0f-000d3a14673b",
+        "createdOn": "2026-07-20T13:45:03Z"
+      },
+      {
+        "id": "5f5e2e33-4184-f111-ab0f-00224820105b",
+        "type": "INTERIOR_LAYOUT_AUTOSTARTED",
+        "source": "c9dee533-4184-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-20T13:45:03Z"
+      },
+      {
+        "id": "cddee533-4184-f111-ab0f-7c1e525b15c2",
+        "type": "PROOFREADING_STAGE_COMPLETED",
+        "source": "be079017-0983-f111-ab0f-000d3a14673b",
+        "createdOn": "2026-07-20T13:45:03Z"
+      },
+      {
+        "id": "4d67c031-4184-f111-ab0f-000d3a14673b",
+        "type": "PROOFREADING_GATE_CLOSED",
+        "source": "be079017-0983-f111-ab0f-000d3a14673b",
+        "createdOn": "2026-07-20T13:45:02Z"
+      },
+      {
+        "id": "605bd103-0a84-f111-ab0f-6045bdd69678",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "be079017-0983-f111-ab0f-000d3a14673b",
+        "createdOn": "2026-07-20T07:10:01Z"
+      },
+      {
+        "id": "c3e19d7a-0484-f111-ab0f-000d3a14673b",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "b4b734a6-bd80-f111-ab0f-00224820105b",
+        "createdOn": "2026-07-20T06:30:29Z"
+      },
+      {
+        "id": "7798c27a-0484-f111-ab0f-7c1e525b15c2",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "b1c48e1d-e57d-f111-ab0f-00224820105b",
+        "createdOn": "2026-07-20T06:30:29Z"
+      },
+      {
+        "id": "8098c27a-0484-f111-ab0f-7c1e525b15c2",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "ca4994e3-ea80-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-20T06:30:29Z"
+      },
+      {
+        "id": "67be507f-0484-f111-ab0f-6045bdd69678",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "899ef3cd-fb7b-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-20T06:30:28Z"
+      },
+      {
+        "id": "f01dc756-bb83-f111-ab0f-00224820105b",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "899ef3cd-fb7b-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-19T21:46:49Z"
+      },
+      {
+        "id": "9c836055-bb83-f111-ab0f-6045bdd69678",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "b1c48e1d-e57d-f111-ab0f-00224820105b",
+        "createdOn": "2026-07-19T21:46:49Z"
+      },
+      {
+        "id": "78316507-b783-f111-ab0f-6045bdd69678",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "b1c48e1d-e57d-f111-ab0f-00224820105b",
+        "createdOn": "2026-07-19T21:16:04Z"
+      },
+      {
+        "id": "462a6a08-b783-f111-ab0f-7c1e525b15c2",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "899ef3cd-fb7b-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-19T21:16:04Z"
+      },
+      {
+        "id": "6f7ea7ce-b683-f111-ab0f-6045bdd69678",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "ca4994e3-ea80-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-19T21:14:29Z"
+      },
+      {
+        "id": "1c490fd0-b683-f111-ab0f-000d3a14673b",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "b4b734a6-bd80-f111-ab0f-00224820105b",
+        "createdOn": "2026-07-19T21:14:28Z"
+      },
+      {
+        "id": "d01ec9d0-b683-f111-ab0f-00224820105b",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "b1c48e1d-e57d-f111-ab0f-00224820105b",
+        "createdOn": "2026-07-19T21:14:28Z"
+      },
+      {
+        "id": "6e7ea7ce-b683-f111-ab0f-6045bdd69678",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "b1c48e1d-e57d-f111-ab0f-00224820105b",
+        "createdOn": "2026-07-19T21:14:28Z"
+      },
+      {
+        "id": "f0c527cd-b683-f111-ab0f-7c1e525b15c2",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "899ef3cd-fb7b-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-19T21:14:27Z"
+      },
+      {
+        "id": "19490fd0-b683-f111-ab0f-000d3a14673b",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "899ef3cd-fb7b-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-19T21:14:26Z"
+      },
+      {
+        "id": "61ba9131-b583-f111-ab0f-7c1e525b15c2",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "ca4994e3-ea80-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-19T21:02:50Z"
+      },
+      {
+        "id": "250e592e-b583-f111-ab0f-000d3a14673b",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "b4b734a6-bd80-f111-ab0f-00224820105b",
+        "createdOn": "2026-07-19T21:02:49Z"
+      },
+      {
+        "id": "c0d1c12d-b583-f111-ab0f-00224820105b",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "b1c48e1d-e57d-f111-ab0f-00224820105b",
+        "createdOn": "2026-07-19T21:02:49Z"
+      },
+      {
+        "id": "f18ee430-b583-f111-ab0f-6045bdd69678",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "b1c48e1d-e57d-f111-ab0f-00224820105b",
+        "createdOn": "2026-07-19T21:02:49Z"
+      },
+      {
+        "id": "b5d1c12d-b583-f111-ab0f-00224820105b",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "899ef3cd-fb7b-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-19T21:02:48Z"
+      },
+      {
+        "id": "5dba9131-b583-f111-ab0f-7c1e525b15c2",
+        "type": "EDITORIAL_APPROVAL_EVENT_BLOCKED",
+        "source": "899ef3cd-fb7b-f111-ab0f-7c1e525b15c2",
+        "createdOn": "2026-07-19T21:02:48Z"
+      }
+    ]
+  },
+  "program005CompletionLog": {
+    "executionLogId": "b59ce66c-2e8c-f111-ab10-7c1e525b15c2",
+    "actionType": "PROGRAM005_PUBLISHING_PIPELINE_RELIABILITY_COMPLETE"
+  }
+}

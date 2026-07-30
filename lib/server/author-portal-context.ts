@@ -1284,31 +1284,54 @@ function normalizeKey(value: string) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')
 }
 
-function collapseProjects(projects: AuthorPortalProjectSummary[], requestedReference: string) {
+export function collapseProjects(projects: AuthorPortalProjectSummary[], requestedReference: string) {
   const collapsed = new Map<string, AuthorPortalProjectSummary>()
+  const aliases = new Map<string, string>()
 
   for (const project of projects) {
-    const identity = project.titleId || normalizeKey(project.title)
-    const existing = collapsed.get(identity)
+    const identity = projectIdentity(project)
+    const projectAliases = projectIdentityAliases(project)
+    const existingIdentity =
+      aliases.get(identity) ||
+      projectAliases.map((alias) => aliases.get(alias)).find(Boolean) ||
+      identity
+    const existing = collapsed.get(existingIdentity)
     if (!existing) {
-      collapsed.set(identity, project)
+      collapsed.set(existingIdentity, project)
+      for (const alias of projectAliases) aliases.set(alias, existingIdentity)
       continue
     }
 
     const projectScore = projectPriority(project, requestedReference)
     const existingScore = projectPriority(existing, requestedReference)
     if (projectScore > existingScore) {
-      collapsed.set(identity, project)
+      collapsed.set(existingIdentity, project)
     }
+
+    for (const alias of projectAliases) aliases.set(alias, existingIdentity)
   }
 
   return Array.from(collapsed.values())
+}
+
+function projectIdentity(project: AuthorPortalProjectSummary) {
+  return project.titleId ? `title:${project.titleId}` : projectTitleAlias(project)
+}
+
+function projectIdentityAliases(project: AuthorPortalProjectSummary) {
+  return [projectIdentity(project), projectTitleAlias(project)].filter(Boolean)
+}
+
+function projectTitleAlias(project: AuthorPortalProjectSummary) {
+  const titleKey = normalizeKey(project.title)
+  return titleKey ? `title-name:${titleKey}` : ''
 }
 
 function projectPriority(project: AuthorPortalProjectSummary, requestedReference: string) {
   let score = 0
   if (project.intakeReference && project.intakeReference === requestedReference) score += 8
   if (isEditorialWorkspaceState(project.workspaceState)) score += 4
+  if (project.titleId) score += 3
   if (project.publishingAssetId) score += 2
   if (project.opportunityId) score += 1
   return score
