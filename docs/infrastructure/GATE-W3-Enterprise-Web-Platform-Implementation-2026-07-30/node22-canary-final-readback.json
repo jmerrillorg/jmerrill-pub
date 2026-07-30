@@ -1,0 +1,17 @@
+{
+  "capturedAt": "2026-07-30T11:52:06.413431+00:00",
+  "app": "app-jm1-one-prod",
+  "slot": "staging",
+  "config": {
+    "alwaysOn": true,
+    "appCommandLine": "node server.js",
+    "ftpsState": "Disabled",
+    "healthCheckPath": "/",
+    "linuxFxVersion": "NODE|22-lts"
+  },
+  "basicPublishing": {
+    "scm": "false",
+    "ftp": "false"
+  },
+  "valuesRecorded": false
+}

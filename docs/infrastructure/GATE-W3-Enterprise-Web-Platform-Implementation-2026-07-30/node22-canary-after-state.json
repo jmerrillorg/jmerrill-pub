@@ -1,0 +1,56 @@
+{
+  "capturedAt": "2026-07-30T11:41:36.991731+00:00",
+  "restartTimestampUtc": "2026-07-30T11:41:02Z",
+  "resourceGroup": "rg-jm1-web-prod-appsvc",
+  "app": "app-jm1-one-prod",
+  "slot": "staging",
+  "defaultHostName": "app-jm1-one-prod-staging.azurewebsites.net",
+  "site": {
+    "state": "Running"
+  },
+  "runtime": {
+    "linuxFxVersion": "NODE|22-lts",
+    "appCommandLine": "node server.js",
+    "alwaysOn": true,
+    "healthCheckPath": "/"
+  },
+  "appSettings": {
+    "count": 19,
+    "names": [
+      "APPINSIGHTS_INSTRUMENTATIONKEY",
+      "APPLICATIONINSIGHTS_CONNECTION_STRING",
+      "ENABLE_ORYX_BUILD",
+      "JM1_GATE",
+      "JM1_MIGRATION_STATE",
+      "JM1_PROPERTY_DOMAIN",
+      "JM1_PROPERTY_KEY",
+      "JM1_RELEASE_ID",
+      "JM1_RELEASE_SHA",
+      "JM1_SLOT_ENVIRONMENT",
+      "JM1_WEB_GATE",
+      "KEY_VAULT_URI",
+      "NODE_ENV",
+      "SCM_DO_BUILD_DURING_DEPLOYMENT",
+      "WEBSITE_NODE_DEFAULT_VERSION",
+      "WEBSITE_RUN_FROM_PACKAGE",
+      "WEBSITE_SKIP_NODE_MODULES_TAR",
+      "WEBSITE_WARMUP_PATH",
+      "WEBSITE_WARMUP_STATUSES"
+    ],
+    "valuesRecorded": false
+  },
+  "basicPublishing": {
+    "scm": "false",
+    "ftp": "false"
+  },
+  "rootProbe": {
+    "status": "error",
+    "errorType": "TimeoutError",
+    "message": "The read operation timed out"
+  },
+  "healthProbe": {
+    "status": "error",
+    "errorType": "TimeoutError",
+    "message": "The read operation timed out"
+  }
+}

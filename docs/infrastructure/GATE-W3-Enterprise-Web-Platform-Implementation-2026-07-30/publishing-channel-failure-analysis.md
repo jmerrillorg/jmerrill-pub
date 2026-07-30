@@ -183,3 +183,30 @@ The following did not occur:
 - FTPS/SCM Basic enablement
 - Azure policy disablement
 - Evidence deletion
+
+## 2026-07-30 Node 22 Canary Update
+
+Jackie later authorized a single canary diagnostic on `app-jm1-one-prod/staging`
+to determine whether the deprecated Node.js 20 Linux runtime materially
+contributed to the Kudu/OneDeploy failure.
+
+Result:
+
+- The canary slot was changed from `NODE|20-lts` to Azure-supported
+  `NODE|22-lts`.
+- SCM Basic remained disabled.
+- FTP Basic remained disabled.
+- The governed minimal runtime artifact checksum matched the approved value.
+- Kudu warmed successfully.
+- OneDeploy completed successfully.
+- A deployment-history row was created.
+- `/api/health` passed 10/10 consecutive probes.
+
+Updated classification:
+
+NODE 20 RUNTIME CONTRIBUTION: CONFIRMED.
+
+The previous App Service publishing-channel failure remains preserved as
+historical evidence, but Microsoft escalation should now be deferred until
+Jackie decides whether to authorize Node 22 standardization across the
+remaining GATE-W3 targets.

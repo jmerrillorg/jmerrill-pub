@@ -1,0 +1,76 @@
+{
+  "capturedAt": "2026-07-30T11:49:51.150476+00:00",
+  "host": "app-jm1-one-prod-staging.azurewebsites.net",
+  "healthAttempts": [
+    {
+      "attempt": 1,
+      "result": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "timestamp": "2026-07-30T11:46:55.607573+00:00"
+    },
+    {
+      "attempt": 2,
+      "result": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "timestamp": "2026-07-30T11:47:25.800769+00:00"
+    },
+    {
+      "attempt": 3,
+      "result": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "timestamp": "2026-07-30T11:47:56.006159+00:00"
+    },
+    {
+      "attempt": 4,
+      "result": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "timestamp": "2026-07-30T11:48:26.255967+00:00"
+    },
+    {
+      "attempt": 5,
+      "result": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "timestamp": "2026-07-30T11:48:56.465327+00:00"
+    },
+    {
+      "attempt": 6,
+      "result": {
+        "status": "error",
+        "errorType": "TimeoutError",
+        "message": "The read operation timed out"
+      },
+      "timestamp": "2026-07-30T11:49:26.635189+00:00"
+    },
+    {
+      "attempt": 7,
+      "result": {
+        "status": "ok",
+        "httpStatus": 200,
+        "contentType": "application/json",
+        "body": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.one\",\"environment\":\"staging\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}"
+      },
+      "timestamp": "2026-07-30T11:49:50.704194+00:00"
+    }
+  ],
+  "rootProbe": {
+    "status": "ok",
+    "httpStatus": 200,
+    "contentType": "application/json",
+    "body": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.one\",\"environment\":\"staging\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "startedAt": "2026-07-30T11:42:53.943205+00:00",
+  "resourceGroup": "rg-jm1-web-prod-appsvc",
+  "app": "app-jm1-one-prod",
+  "slot": "staging",
+  "artifactPath": "/tmp/gate-w3-minimal-runtime-20260730.zip",
+  "artifactSha256": "913fd27cdac46baadffe636527dc5582ed23125f91468d056127887fd5293652",
+  "expectedSha256": "913fd27cdac46baadffe636527dc5582ed23125f91468d056127887fd5293652",
+  "artifactMatchesExpected": true,
+  "deploymentMethod": "az webapp deploy (App Service ZIP/OneDeploy path); existing GitHub workflow not dispatched because it targets all ten GATE-W3 apps/slots and this directive authorizes only the canary slot",
+  "scmBasicExpected": "false",
+  "ftpBasicExpected": "false",
+  "command": [
+    "az",
+    "webapp",
+    "deploy",
+    "--resource-group",
+    "rg-jm1-web-prod-appsvc",
+    "--name",
+    "app-jm1-one-prod",
+    "--slot",
+    "staging",
+    "--src-path",
+    "/tmp/gate-w3-minimal-runtime-20260730.zip",
+    "--type",
+    "zip",
+    "--clean",
+    "true",
+    "--timeout",
+    "600"
+  ],
+  "exitCode": 0,
+  "stdout": "WARNING: Note: 'az webapp deploy' does not run build automation (dependency installation, compilation, etc.) by default for Linux web apps. If your package is not pre-built, set the app setting SCM_DO_BUILD_DURING_DEPLOYMENT=true to enable builds during deployment.\nWARNING: Initiating deployment\nWARNING: Deploying from local path: /tmp/gate-w3-minimal-runtime-20260730.zip\nWARNING: Warming up Kudu before deployment.\nWARNING: Warmed up Kudu instance successfully.\nWARNING: Polling the status of sync deployment. Start Time: 2026-07-30 11:45:29.355121+00:00 UTC\nWARNING: Deployment has completed successfully\nWARNING: You can visit your app at: http://app-jm1-one-prod-staging.azurewebsites.net\n{\n  \"active\": true,\n  \"author\": \"N/A\",\n  \"author_email\": \"N/A\",\n  \"build_summary\": {\n    \"errors\": [],\n    \"warnings\": []\n  },\n  \"complete\": true,\n  \"deployer\": \"OneDeploy\",\n  \"end_time\": \"2026-07-30T11:45:27.0975314Z\",\n  \"id\": \"e778a85f-543b-4652-be09-8934bdd15ee9\",\n  \"is_readonly\": true,\n  \"is_temp\": false,\n  \"last_success_end_time\": \"2026-07-30T11:45:27.0975314Z\",\n  \"log_url\": \"https://app-jm1-one-prod-staging.scm.azurewebsites.net/api/deployments/e778a85f-543b-4652-be09-8934bdd15ee9/log\",\n  \"message\": \"OneDeploy\",\n  \"progress\": \"\",\n  \"received_time\": \"2026-07-30T11:45:21.5054643Z\",\n  \"site_name\": \"app-jm1-one-prod\",\n  \"start_time\": \"2026-07-30T11:45:23.592632Z\",\n  \"status\": 4,\n  \"status_text\": \"\",\n  \"url\": \"https://app-jm1-one-prod-staging.scm.azurewebsites.net/api/deployments/e778a85f-543b-4652-be09-8934bdd15ee9\"\n}\n",
+  "result": "DEPLOY_COMMAND_SUCCEEDED",
+  "durationSeconds": 159.956,
+  "endedAt": "2026-07-30T11:45:33.899494+00:00",
+  "deploymentHistory": {
+    "ok": true,
+    "count": 1,
+    "latest": [
+      {
+        "id": "e778a85f-543b-4652-be09-8934bdd15ee9",
+        "status": 4,
+        "message": "OneDeploy",
+        "receivedTime": null,
+        "endTime": null,
+        "author": "N/A"
+      }
+    ]
+  },
+  "rootProbe": {
+    "status": "error",
+    "errorType": "TimeoutError",
+    "message": "The read operation timed out"
+  },
+  "healthProbe": {
+    "status": "error",
+    "errorType": "TimeoutError",
+    "message": "The read operation timed out"
+  }
+}
