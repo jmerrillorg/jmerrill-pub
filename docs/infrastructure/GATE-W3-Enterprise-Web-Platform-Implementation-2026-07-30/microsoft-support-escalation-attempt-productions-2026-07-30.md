@@ -98,6 +98,14 @@ No case number was issued.
 
 Subscription support-ticket list readback returned no visible existing tickets for Cody to attach this escalation to during this pass.
 
+Azure Portal Help + support was also inspected under the signed-in `jm1-admin@jmerrill.one` session. The Portal accepted:
+
+- service: `Web App (Linux)`;
+- subscription: `JM1 – Nonprofit Core (2025 Grant)`;
+- issue classification: `Application issues post deployment`.
+
+The Portal resource picker did not expose `app-jm1-productions-prod`; under the resource-not-available path, the workflow surfaced troubleshooting guidance and support resources / Microsoft Q&A rather than a technical support case submission form. This is consistent with the API `InvalidSupportPlan` result.
+
 Live `jm1_executionlog` writeback was not performed. No approved GATE-W3 Microsoft-support event type or live write contract was identified in the repository during this pass, and Cody did not invent a Dataverse event shape. The governed evidence record and PR update preserve the support-escalation attempt until an approved execution-log event contract is available.
 
 ## Required Jackie / Administrator Action
