@@ -63,6 +63,13 @@ function toSendApproval({ view, approvedBy, templateName = null }) {
     internalVisibilityMailbox: view.authorFacingRecommendationDraft.internalVisibilityMailbox,
     draftSubject: view.authorFacingRecommendationDraft.subject,
     draftBody: view.authorFacingRecommendationDraft.body,
+    draftHtmlBody: view.authorFacingRecommendationDraft.htmlBody || null,
+    templateVersion: view.authorFacingRecommendationDraft.templateVersion || null,
+    templateMetadata: {
+      htmlSha256: view.authorFacingRecommendationDraft.htmlChecksum || null,
+      textSha256: view.authorFacingRecommendationDraft.textChecksum || null,
+      qualityGate: view.authorFacingRecommendationDraft.qualityGate || null
+    },
     templateName: templateName || view.authorFacingRecommendationDraft.templateName,
     decision: "APPROVE_AUTHOR_SEND",
     sendApproved: true,

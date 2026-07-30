@@ -207,6 +207,22 @@ function validAuthorResponsePayload(overrides = {}) {
   };
 }
 
+function validEditorialRecommendationPayload(overrides = {}) {
+  return validAuthorResponsePayload({
+    subject: "Your Editorial Review & Publishing Recommendation | J Merrill Publishing",
+    body: "J MERRILL PUBLISHING\nEditorial Review & Publishing Recommendation\n\nPlain-text fallback.",
+    htmlBody: "<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table></body></html>",
+    templateName: "EDITORIAL_RECOMMENDATION_LETTER_V1",
+    templateVersion: "1.1.0",
+    templateMetadata: {
+      htmlSha256: "a".repeat(64),
+      textSha256: "b".repeat(64),
+      qualityGate: "PASS"
+    },
+    ...overrides
+  });
+}
+
 function validJoinInternalPayload(overrides = {}) {
   return {
     notificationType: "JOIN_INTAKE_RECEIVED",
@@ -471,6 +487,30 @@ test("missing or invalid author-response ACS sender fails safely", () => {
 
   process.env.ACS_AUTHOR_RESPONSE_EMAIL_SENDER = "DoNotReply@email.jmerrill.one";
   assert.throws(() => relay.buildApprovedAuthorResponseEmail(valid.value), /ACS author-response sender is invalid/);
+});
+
+test("approved editorial recommendation builds ACS email with HTML and plain-text alternative", () => {
+  const relay = loadRelayModule();
+  const valid = relay.validateApprovedAuthorResponsePayload(validEditorialRecommendationPayload());
+
+  assert.equal(valid.ok, true);
+  assert.equal(valid.value.templateVersion, "1.1.0");
+  assert.equal(valid.value.templateMetadata.htmlSha256, "a".repeat(64));
+  const email = relay.buildApprovedAuthorResponseEmail(valid.value);
+  assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
+  assert.equal(email.content.subject, "Your Editorial Review & Publishing Recommendation | J Merrill Publishing");
+  assert.match(email.content.plainText, /Plain-text fallback/);
+  assert.match(email.content.html, /<table/);
+  assert.match(email.content.html, /J MERRILL PUBLISHING/);
+  assert.equal(email.replyTo[0].address, "publishing@jmerrill.one");
+  assert.equal(email.recipients.bcc[0].address, "publishing@jmerrill.one");
+});
+
+test("approved editorial recommendation rejects text-only payloads", () => {
+  const relay = loadRelayModule();
+  const result = relay.validateApprovedAuthorResponsePayload(validEditorialRecommendationPayload({ htmlBody: "" }));
+
+  assertRejected(result, "EDITORIAL_RECOMMENDATION_HTML_REQUIRED");
 });
 
 test("routes are registered without changing acknowledgment route", () => {

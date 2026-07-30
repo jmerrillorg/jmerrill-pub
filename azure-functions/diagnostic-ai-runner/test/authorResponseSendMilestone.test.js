@@ -200,6 +200,57 @@ describe("author response provider boundary", () => {
     assert.equal(calls[0].replyTo, "publishing@jmerrill.one");
   });
 
+  test("editorial recommendation sends require branded HTML and preserve it for the provider", async () => {
+    const calls = [];
+    const sendApproval = approval({
+      record: {
+        draftSubject: "Your Editorial Review & Publishing Recommendation | J Merrill Publishing",
+        draftBody: "Plain-text editorial recommendation fallback.",
+        draftHtmlBody: "<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table></body></html>",
+        templateName: "EDITORIAL_RECOMMENDATION_LETTER_V1",
+        templateVersion: "1.1.0",
+        templateMetadata: {
+          htmlSha256: "a".repeat(64),
+          textSha256: "b".repeat(64),
+          qualityGate: "PASS"
+        }
+      }
+    });
+
+    const result = await sendConfiguredAuthorResponse({
+      input: { sendApproval },
+      env: enabledEnv(),
+      providers: {
+        injected: {
+          async send(message) {
+            calls.push(message);
+            return { messageId: "author-response-message-id" };
+          }
+        }
+      }
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(calls.length, 1);
+    assert.match(calls[0].htmlBody, /J MERRILL PUBLISHING/);
+    assert.equal(calls[0].body, "Plain-text editorial recommendation fallback.");
+  });
+
+  test("editorial recommendation sends fail closed without HTML", () => {
+    const sendApproval = approval({
+      record: {
+        draftSubject: "Your Editorial Review & Publishing Recommendation | J Merrill Publishing",
+        draftBody: "Plain-text editorial recommendation fallback.",
+        templateName: "EDITORIAL_RECOMMENDATION_LETTER_V1"
+      }
+    });
+
+    assertSafeFailure(buildAuthorResponseEmail(
+      { sendApproval },
+      getAuthorResponseSendProviderConfig(enabledEnv())
+    ), "EDITORIAL_RECOMMENDATION_HTML_REQUIRED");
+  });
+
   test("author recipient must be the approved intake author email", () => {
     const result = buildAuthorResponseEmail({
       sendApproval: approval(),
@@ -315,6 +366,7 @@ describe("author response provider boundary", () => {
       assert.equal(body.authorEmail, sendPreparationRecord.authorEmail);
       assert.equal(body.cc, undefined);
       assert.deepEqual(body.bcc, [INTERNAL_VISIBILITY_MAILBOX]);
+      assert.equal(body.htmlBody, null);
       assert.equal(JSON.stringify(result).includes("SECRET_RELAY_KEY"), false);
     } finally {
       global.fetch = originalFetch;

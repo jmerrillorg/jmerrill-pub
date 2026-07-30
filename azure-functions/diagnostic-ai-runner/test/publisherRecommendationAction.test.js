@@ -27,7 +27,7 @@ function draftResult() {
         title: "The Intentional Leader"
       },
       authorFacingRecommendationDraft: {
-        subject: "Editorial Recommendation Letter for The Intentional Leader",
+        subject: "Your Editorial Review & Publishing Recommendation | J Merrill Publishing",
         body: [
           "J Merrill Publishing",
           "Editorial Recommendation Letter",
@@ -53,6 +53,11 @@ function draftResult() {
           "",
           "The J Merrill Publishing Team"
         ].join("\n"),
+        htmlBody: "<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table></body></html>",
+        templateVersion: "1.1.0",
+        htmlChecksum: "a".repeat(64),
+        textChecksum: "b".repeat(64),
+        qualityGate: "PASS",
         templateName: "EDITORIAL_RECOMMENDATION_LETTER_V1",
         internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX
       }
@@ -121,6 +126,9 @@ describe("publisher recommendation replacement resend", () => {
     assert.equal(sends.length, 1);
     assert.equal(sendLogs.length, 1);
     assert.equal(sends[0].templateName, "EDITORIAL_RECOMMENDATION_LETTER_V1");
+    assert.equal(sends[0].templateVersion, "1.1.0");
+    assert.match(sends[0].draftHtmlBody, /J MERRILL PUBLISHING/);
+    assert.equal(sends[0].templateMetadata.htmlSha256, "a".repeat(64));
     assert.match(sends[0].draftBody, /Editorial Recommendation Letter/);
     assert.match(sends[0].draftBody, /Before we ever ask an author to invest in us/);
     assert.equal(sends[0].draftBody.includes("JMP-PKG-"), false);

@@ -8,6 +8,7 @@ const REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i;
 const DIAGNOSTIC_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_FIELD_LENGTH = 300;
 const MAX_BODY_LENGTH = 6000;
+const MAX_HTML_BODY_LENGTH = 50000;
 const ACS_PROVIDER_NAME = "acs-email";
 const ACS_SENDER = "DoNotReply@email.jmerrill.one";
 // Dedicated sender for author-facing approved responses only (Milestone 6
@@ -89,6 +90,10 @@ function normalizeText(value) {
 
 function normalizeBody(value) {
   return safeTrim(value).slice(0, MAX_BODY_LENGTH);
+}
+
+function normalizeHtmlBody(value) {
+  return safeTrim(value).slice(0, MAX_HTML_BODY_LENGTH);
 }
 
 function isValidEmail(value) {
@@ -508,12 +513,17 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
 
   const subject = normalizeText(payload.subject);
   const body = normalizeBody(payload.body);
+  const htmlBody = normalizeHtmlBody(payload.htmlBody);
   if (!subject) {
     return { ok: false, reason: "SUBJECT_MISSING" };
   }
 
   if (!body) {
     return { ok: false, reason: "BODY_MISSING" };
+  }
+
+  if (normalizeText(payload.templateName) === "EDITORIAL_RECOMMENDATION_LETTER_V1" && !htmlBody) {
+    return { ok: false, reason: "EDITORIAL_RECOMMENDATION_HTML_REQUIRED" };
   }
 
   if (!normalizeText(payload.approvedBy)) {
@@ -543,7 +553,14 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       projectTitle: normalizeText(payload.projectTitle),
       subject,
       body,
+      htmlBody: htmlBody || null,
       templateName: normalizeText(payload.templateName),
+      templateVersion: normalizeText(payload.templateVersion),
+      templateMetadata: payload.templateMetadata && typeof payload.templateMetadata === "object" ? {
+        htmlSha256: normalizeText(payload.templateMetadata.htmlSha256),
+        textSha256: normalizeText(payload.templateMetadata.textSha256),
+        qualityGate: normalizeText(payload.templateMetadata.qualityGate)
+      } : null,
       approvedBy: normalizeText(payload.approvedBy),
       approvedOn: normalizeText(payload.approvedOn),
       internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX
@@ -672,7 +689,8 @@ function buildApprovedAuthorResponseEmail(payload) {
     senderAddress: getAuthorResponseSenderAddress(),
     content: {
       subject: payload.subject,
-      plainText: payload.body
+      plainText: payload.body,
+      ...(payload.htmlBody ? { html: payload.htmlBody } : {})
     },
     // A plain "Reply" (not "Reply All") only honors Reply-To, not Cc — so
     // Reply-To must point to the internal visibility mailbox to guarantee
