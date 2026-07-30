@@ -1,0 +1,26 @@
+Item,Type,State,Recommendation,Reason,External dependency
+PR #357 PROGRAM-005 publishing pipeline reliability recovery,Pull request,MERGED,No further engineering action,Merge commit fccf8d6f0004bf57dc093315ff57b407f35ded40 is on main and PROGRAM-005 engineering evidence is complete,None
+PR #358 GATE-W3 platform exception evidence preservation,Pull request,OPEN_DRAFT,HOLD_AS_CANONICAL_EXCEPTION_PACKAGE,Contains corrected app-jm1-productions-prod support target, support entitlement blocker, and administrative exception lane,Microsoft support entitlement
+PR #359 GATE-W3 Productions platform exception evidence,Pull request,OPEN_DRAFT,CLOSE_AS_SUPERSEDED_AFTER_PR358_ACCEPTED,Older narrower Productions exception package superseded by PR #358 canonical package,PR #358 acceptance
+PR #356 PROGRAM-004 Annex S evidence preservation,Pull request,OPEN_READY,HOLD_FOR_NORMAL_REVIEW,Separate evidence-preservation workstream; not required to unblock Publishing operations,Reviewer/CI state
+PR #355 GATE-W2 enterprise web topology and cost decision package,Pull request,OPEN_DRAFT,HOLD_OR_CLOSE_PER_GOVERNANCE,Directive states GATE-W2 complete; draft PR remains as evidence/decision package until governance disposition,Jackie disposition
+PR #349 GATE-W1 jmerrill.pub App Service reference certification,Pull request,OPEN_READY,HOLD_AS_HISTORICAL_REFERENCE_OR_CLOSE_IF_SUPERSEDED,Directive states GATE-W1 complete; later GATE-W3 evidence supersedes parts of runtime rollout,Jackie disposition
+PR #342 JM1-INFRA-006 App Service migration program,Pull request,OPEN_DRAFT,HOLD,Migration program remains separate and no new modernization work is authorized,Future gate authorization
+PR #341 JM1-INFRA-005 production deployment reliability,Pull request,OPEN_READY,HOLD_OR_CLOSE_PER_GOVERNANCE,Older reliability evidence branch remains open; current operational focus superseded by completed later gates,Jackie disposition
+PR #340 Dataverse Title-Pubs identifier model,Pull request,OPEN_DRAFT,HOLD,Title identifier canon remains separate from current operational completion wave,Future governed review
+PR #314 Event-driven runtime gap model,Pull request,OPEN_READY,HOLD_OR_CLOSE_PER_GOVERNANCE,Older governance branch not required for current wave completion,Jackie disposition
+PR #266 Enterprise execution program,Pull request,OPEN_READY,HOLD_OR_CLOSE_PER_GOVERNANCE,Older enterprise backlog branch not required for current wave completion,Jackie disposition
+PR #265 Council phase 3 artifact approval package,Pull request,OPEN_READY,HOLD_OR_CLOSE_PER_GOVERNANCE,Older governance branch not required for current wave completion,Jackie disposition
+codex/gate-w3-platform-exception-evidence,Branch,ACTIVE,HOLD,Canonical GATE-W3 exception package branch for PR #358,Microsoft support entitlement
+codex/gate-w3-productions-production-platform-exception,Branch,ACTIVE,SUPERSEDED_BY_PR358,Older Productions-specific exception package,PR #358 acceptance
+.codex-tmp,Local artifact boundary,UNTOUCHED,KEEP_UNTRACKED,Temporary/evidence-adjacent boundary remains excluded from repo,None
+PROGRAM-005 evidence package,Evidence,COMPLETE,RETAIN,Checksums and secret scan validated in PR #357; merged to main,None
+GATE-W3 evidence package,Evidence,COMPLETE,RETAIN_AS_EXCEPTION_PACKAGE,Checksums validated and secret scan clean; Microsoft support package ready,Microsoft support entitlement
+The Intentional Leader live Dataverse state,Operational record,RECONCILED,CONTINUE_FROM_CURRENT_STAGE,Line Editing CAP-002 already complete; Interior Layout and Cover Design production projects are in progress,None
+Publisher Operating Center,Operating center,CERTIFICATION_READY,CONTINUE_NORMAL_USE,Fail-closed unauthenticated API validated; live queue truth derives from repaired read model,Fresh human/operator sign-in if formal UI proof required
+Author Operating Center,Operating center,CERTIFICATION_READY,CONTINUE_NORMAL_USE,Fail-closed unauthenticated API validated; duplicate project behavior repaired by PROGRAM-005,Fresh approved author/test sign-in if formal UI proof required
+Notification Engine,Runtime capability,COMPLETE,CONTINUE_NORMAL_USE,Regression guards for From, Reply-To, archive copy, attachment policy, idempotency, and no fabricated events passed,None
+GATE-W4,Future gate,HELD,DO_NOT_START,Explicitly held by directive,Future authorization
+Business Central production migration,Future gate,HELD,DO_NOT_START,Explicitly held by directive,Future authorization
+Holdings implementation,Future gate,HELD,DO_NOT_START,Explicitly held by directive,Future authorization
+New modernization work,Future work,HELD,DO_NOT_START,Explicitly held by directive,Future authorization
