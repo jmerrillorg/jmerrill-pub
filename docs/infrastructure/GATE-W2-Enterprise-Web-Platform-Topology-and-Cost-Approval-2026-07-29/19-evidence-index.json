@@ -1,0 +1,98 @@
+{
+  "packageVersion": "v1",
+  "generatedAt": "2026-07-30T00:28:45.618Z",
+  "path": "docs/infrastructure/GATE-W2-Enterprise-Web-Platform-Topology-and-Cost-Approval-2026-07-29",
+  "retainedProperties": [
+    "jmerrill.pub",
+    "jmerrill.one",
+    "jmerrill.financial",
+    "jmerrill.org",
+    "jmerrill.foundation",
+    "jmerrill.productions",
+    "jackiesmithjr.com"
+  ],
+  "excludedProperties": [
+    "Agape International Cathedral",
+    "Marcus McIntosh"
+  ],
+  "topologyOptions": [
+    "A",
+    "B",
+    "C"
+  ],
+  "recommendedOption": "B",
+  "estimatedMonthlyRange": "158.7-183.7",
+  "estimatedAnnualRange": "1904.4-2204.4",
+  "sources": [
+    {
+      "source": "GitHub PR #349 view",
+      "lastVerified": "2026-07-30T00:28:45.618Z",
+      "confidence": "High"
+    },
+    {
+      "source": "Azure CLI appservice/webapp/staticwebapp/resource/DNS readback",
+      "lastVerified": "2026-07-30T00:28:45.618Z",
+      "confidence": "High"
+    },
+    {
+      "source": "Azure Retail Prices API App Service Central US",
+      "lastVerified": "2026-07-30T00:28:45.618Z",
+      "confidence": "High"
+    },
+    {
+      "source": "Microsoft Azure Static Web Apps pricing page",
+      "lastVerified": "2026-07-30T00:28:45.618Z",
+      "confidence": "Medium",
+      "knownLimitation": "Retail Prices API throttled Static Web Apps lookup; public pricing page used for $9/app/month Standard"
+    },
+    {
+      "source": "curl public site smoke checks",
+      "lastVerified": "2026-07-30T00:28:45.618Z",
+      "confidence": "Medium"
+    },
+    {
+      "source": "Azure Cost Management REST attempt",
+      "lastVerified": "2026-07-30T00:28:45.618Z",
+      "confidence": "Low",
+      "knownLimitation": "Returned 429 Too Many Requests; observed cost marked calculated estimate"
+    }
+  ],
+  "nonActions": {
+    "productionChanges": 0,
+    "dnsChanges": 0,
+    "resourcesCreatedOrRetired": 0,
+    "gateW3Started": false,
+    "secretValuesRetained": 0
+  },
+  "files": [
+    "00-executive-decision-brief.md",
+    "01-authority-scope-and-boundaries.md",
+    "02-gate-w1-reference-baseline.md",
+    "03-current-state-property-register.md",
+    "04-current-cost-baseline.md",
+    "05-topology-option-a-maximum-isolation.md",
+    "06-topology-option-b-balanced-isolation.md",
+    "07-topology-option-c-consolidated.md",
+    "08-financial-isolation-assessment.md",
+    "09-region-resiliency-and-networking.md",
+    "10-production-staging-and-rollback-standard.md",
+    "11-domain-and-redirect-strategy.md",
+    "12-static-web-apps-retirement-preconditions.md",
+    "13-repository-and-deployment-crosswalk.md",
+    "14-migration-wave-recommendation.md",
+    "15-cost-comparison.csv",
+    "16-risk-register.md",
+    "17-decision-register.md",
+    "18-recommended-ruling.md",
+    "19-evidence-index.json",
+    "20-current-state-property-register.csv",
+    "21-topology-option-register.json",
+    "checksums.sha256"
+  ],
+  "updatedAt": "2026-07-30T00:29:13.256Z",
+  "machineReadableRegisters": [
+    "20-current-state-property-register.csv",
+    "21-topology-option-register.json",
+    "19-evidence-index.json"
+  ]
+}

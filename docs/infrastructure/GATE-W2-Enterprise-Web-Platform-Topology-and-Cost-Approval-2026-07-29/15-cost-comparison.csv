@@ -1,0 +1,4 @@
+Option,Name,Plans,MonthlyLow,MonthlyHigh,AnnualLow,AnnualHigh,Effort,PrimaryCostDrivers,Status
+"A","Maximum Isolation","3","228.05","253.05","2736.6","3036.6","8-12 engineering days","S1 plan count; monitoring/log ingestion; transition overlap","NOT_RECOMMENDED"
+"B","Balanced Isolation","2","158.7","183.7","1904.4","2204.4","6-9 engineering days","S1 plan count; monitoring/log ingestion; transition overlap","RECOMMENDED"
+"C","Consolidated Plan","1","89.35","114.35","1072.2","1372.2","5-7 engineering days","S1 plan count; monitoring/log ingestion; transition overlap","NOT_RECOMMENDED"

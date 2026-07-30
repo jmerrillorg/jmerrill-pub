@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-07-30T00:29:13.256Z",
+  "options": [
+    {
+      "option": "A",
+      "name": "Maximum Isolation",
+      "plans": 3,
+      "monthlyRange": "228.05-253.05",
+      "annualRange": "2736.60-3036.60",
+      "recommended": false
+    },
+    {
+      "option": "B",
+      "name": "Balanced Isolation",
+      "plans": 2,
+      "monthlyRange": "158.70-183.70",
+      "annualRange": "1904.40-2204.40",
+      "recommended": true
+    },
+    {
+      "option": "C",
+      "name": "Consolidated Plan",
+      "plans": 1,
+      "monthlyRange": "89.35-114.35",
+      "annualRange": "1072.20-1372.20",
+      "recommended": false
+    }
+  ]
+}

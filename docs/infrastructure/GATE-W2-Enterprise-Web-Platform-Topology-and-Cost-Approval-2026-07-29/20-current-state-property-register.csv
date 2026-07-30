@@ -1,0 +1,8 @@
+PublicDomain,CurrentResource,HostingTechnology,Repository,Region,MigrationReadiness,ProposedDisposition
+"jmerrill.pub","app-jm1-pub-prod / asp-jm1-pub-prod-linux S1","App Service Linux + legacy SWA","jmerrill-pub","Central US","CERTIFIED_REFERENCE","Keep isolated Publishing plan"
+"jmerrill.one","Static Web App jmerrill-one Standard","Azure Static Web Apps","jmerrill-one","East US 2","Corporate shared candidate","Migrate to shared enterprise App Service app"
+"jmerrill.financial","Static Web App jmerrill-financial Standard; book redirector","Azure Static Web Apps","jmerrill-financial","East US 2","Financial assessment complete","Shared plan isolated app initially"
+"jmerrill.org","Static Web App org-to-foundation-redirect Free","Redirect SWA","org-to-foundation-redirect","East US 2","Redirect-only candidate","Centralize redirect later"
+"jmerrill.foundation","Static Web App foundation-main Free","Azure Static Web Apps","jmerrillfoundation","East US 2","Foundation strategy dependency","Migrate/retain after Foundation ruling"
+"jmerrill.productions","Static Web App jmerrill-productions Free","Azure Static Web Apps","jmerrill-productions","Central US","Paused/disposition dependency","Defer"
+"jackiesmithjr.com","Static Web App jackiesmithjr Free","Azure Static Web Apps","jackiesmithjr","East US 2","Low-risk later wave","Migrate late or retain SWA"
