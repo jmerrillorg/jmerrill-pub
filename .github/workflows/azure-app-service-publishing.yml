@@ -3,6 +3,14 @@ name: Publishing App Service CI/CD
 on:
   workflow_dispatch:
     inputs:
+      deployment_scope:
+        description: "Deployment scope"
+        required: true
+        default: "publishing_reference"
+        type: choice
+        options:
+          - "publishing_reference"
+          - "gate_w3_enterprise_minimal"
       deploy_production:
         description: "Deploy approved staging artifact to production after environment approval"
         required: true
@@ -46,6 +54,7 @@ env:
 jobs:
   build:
     name: Build Immutable App Service Artifact
+    if: github.event_name != 'workflow_dispatch' || inputs.deployment_scope == 'publishing_reference'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -90,6 +99,7 @@ jobs:
 
   deploy_staging:
     name: Deploy App Service Staging
+    if: github.event_name != 'workflow_dispatch' || inputs.deployment_scope == 'publishing_reference'
     runs-on: ubuntu-latest
     needs: build
     environment: jmerrill-pub-staging
@@ -228,7 +238,7 @@ jobs:
     name: Promote Staging To Production
     runs-on: ubuntu-latest
     needs: deploy_staging
-    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production == 'true'
+    if: github.event_name == 'workflow_dispatch' && inputs.deployment_scope == 'publishing_reference' && inputs.deploy_production == 'true'
     environment: jmerrill-pub-production
     steps:
       - name: Azure Login
@@ -266,3 +276,232 @@ jobs:
               --target-slot production
             exit 1
           done
+
+  gate_w3_build_minimal:
+    name: Build GATE-W3 Minimal Runtime Artifact
+    if: github.event_name == 'workflow_dispatch' && inputs.deployment_scope == 'gate_w3_enterprise_minimal'
+    runs-on: ubuntu-latest
+    env:
+      GATE_W3_PACKAGE: jm1-gate-w3-minimal-runtime-${{ github.sha }}.zip
+    steps:
+      - name: Build Governed Minimal Runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p gate-w3-minimal-runtime
+          cat > gate-w3-minimal-runtime/package.json <<'JSON'
+          {
+            "name": "jm1-gate-w3-minimal-runtime",
+            "version": "1.0.0",
+            "private": true,
+            "type": "commonjs",
+            "scripts": {
+              "start": "node server.js"
+            }
+          }
+          JSON
+          cat > gate-w3-minimal-runtime/server.js <<'JS'
+          const http = require("http");
+
+          const port = Number(process.env.PORT || process.env.WEBSITES_PORT || 8080);
+          const release = process.env.JM1_RELEASE_SHA || "unknown";
+          const property = process.env.JM1_PROPERTY_DOMAIN || "unknown";
+          const slot = process.env.JM1_SLOT_ENVIRONMENT || process.env.NODE_ENV || "unknown";
+
+          function payload(path) {
+            return {
+              status: "ready",
+              service: "JM1 Enterprise Web Platform",
+              gate: "GATE-W3",
+              property,
+              slot,
+              path,
+              release,
+              traffic_migrated: false,
+              message: "Infrastructure Ready. Production traffic has not migrated."
+            };
+          }
+
+          const server = http.createServer((request, response) => {
+            if (request.url === "/" || request.url === "/api/health") {
+              response.writeHead(200, {
+                "content-type": "application/json; charset=utf-8",
+                "cache-control": "no-store"
+              });
+              response.end(JSON.stringify(payload(request.url)));
+              return;
+            }
+
+            response.writeHead(404, {
+              "content-type": "application/json; charset=utf-8",
+              "cache-control": "no-store"
+            });
+            response.end(JSON.stringify({ status: "not_found" }));
+          });
+
+          server.listen(port, "0.0.0.0", () => {
+            console.log(`JM1 GATE-W3 minimal runtime listening on ${port}`);
+          });
+          JS
+          (cd gate-w3-minimal-runtime && zip -qr "../${GATE_W3_PACKAGE}" package.json server.js)
+          shasum -a 256 "${GATE_W3_PACKAGE}" | tee "${GATE_W3_PACKAGE}.sha256"
+
+      - name: Upload GATE-W3 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jm1-gate-w3-minimal-runtime-${{ github.sha }}
+          path: |
+            ${{ env.GATE_W3_PACKAGE }}
+            ${{ env.GATE_W3_PACKAGE }}.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+  gate_w3_deploy_minimal:
+    name: Deploy GATE-W3 Minimal Runtime
+    if: github.event_name == 'workflow_dispatch' && inputs.deployment_scope == 'gate_w3_enterprise_minimal'
+    runs-on: ubuntu-latest
+    needs: gate_w3_build_minimal
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: app-jm1-fin-prod
+            slot: production
+            domain: jmerrill.financial
+          - app: app-jm1-fin-prod
+            slot: staging
+            domain: jmerrill.financial
+          - app: app-jm1-one-prod
+            slot: production
+            domain: jmerrill.one
+          - app: app-jm1-one-prod
+            slot: staging
+            domain: jmerrill.one
+          - app: app-jm1-foundation-prod
+            slot: production
+            domain: jmerrill.foundation
+          - app: app-jm1-foundation-prod
+            slot: staging
+            domain: jmerrill.foundation
+          - app: app-jm1-productions-prod
+            slot: production
+            domain: jmerrill.productions
+          - app: app-jm1-productions-prod
+            slot: staging
+            domain: jmerrill.productions
+          - app: app-jm1-jackiesmithjr-prod
+            slot: production
+            domain: jackiesmithjr.com
+          - app: app-jm1-jackiesmithjr-prod
+            slot: staging
+            domain: jackiesmithjr.com
+    env:
+      GATE_W3_PACKAGE: jm1-gate-w3-minimal-runtime-${{ github.sha }}.zip
+      GATE_W3_RESOURCE_GROUP: rg-jm1-web-prod-appsvc
+    steps:
+      - name: Download GATE-W3 Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jm1-gate-w3-minimal-runtime-${{ github.sha }}
+
+      - name: Verify Artifact Checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          shasum -a 256 -c "${GATE_W3_PACKAGE}.sha256"
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Configure Target Runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          slot_args=()
+          if [ "${{ matrix.slot }}" != "production" ]; then
+            slot_args=(--slot "${{ matrix.slot }}")
+            az webapp deployment slot auto-swap \
+              --resource-group "$GATE_W3_RESOURCE_GROUP" \
+              --name "${{ matrix.app }}" \
+              --slot "${{ matrix.slot }}" \
+              --disable \
+              --output none
+          fi
+          az webapp config set \
+            --resource-group "$GATE_W3_RESOURCE_GROUP" \
+            --name "${{ matrix.app }}" \
+            "${slot_args[@]}" \
+            --startup-file 'node server.js'
+          az webapp config appsettings set \
+            --resource-group "$GATE_W3_RESOURCE_GROUP" \
+            --name "${{ matrix.app }}" \
+            "${slot_args[@]}" \
+            --settings JM1_RELEASE_SHA="${{ github.sha }}" JM1_WEB_GATE=GATE-W3 JM1_PROPERTY_DOMAIN="${{ matrix.domain }}" JM1_SLOT_ENVIRONMENT="${{ matrix.slot }}" SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false WEBSITE_RUN_FROM_PACKAGE=1 WEBSITE_SKIP_NODE_MODULES_TAR=1 WEBSITE_WARMUP_PATH=/api/health WEBSITE_WARMUP_STATUSES=200 \
+            --output none
+
+      - name: Deploy Minimal Runtime To Production Slot
+        if: matrix.slot == 'production'
+        uses: azure/webapps-deploy@v3
+        timeout-minutes: 12
+        with:
+          app-name: ${{ matrix.app }}
+          package: ${{ env.GATE_W3_PACKAGE }}
+
+      - name: Deploy Minimal Runtime To Staging Slot
+        if: matrix.slot != 'production'
+        uses: azure/webapps-deploy@v3
+        timeout-minutes: 12
+        with:
+          app-name: ${{ matrix.app }}
+          slot-name: ${{ matrix.slot }}
+          package: ${{ env.GATE_W3_PACKAGE }}
+
+      - name: Restart Target
+        shell: bash
+        run: |
+          set -euo pipefail
+          slot_args=()
+          if [ "${{ matrix.slot }}" != "production" ]; then
+            slot_args=(--slot "${{ matrix.slot }}")
+          fi
+          az webapp restart \
+            --resource-group "$GATE_W3_RESOURCE_GROUP" \
+            --name "${{ matrix.app }}" \
+            "${slot_args[@]}"
+
+      - name: Runtime Certification
+        shell: bash
+        run: |
+          set -euo pipefail
+          suffix=""
+          if [ "${{ matrix.slot }}" != "production" ]; then
+            suffix="-${{ matrix.slot }}"
+          fi
+          base_url="https://${{ matrix.app }}${suffix}.azurewebsites.net"
+          successes=0
+          for attempt in {1..30}; do
+            body="$(mktemp)"
+            code="$(curl -fsS -o "$body" -w '%{http_code}' --max-time 20 "${base_url}/api/health" || true)"
+            if [ "$code" = "200" ] && node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready' || h.release !== process.argv[2] || h.gate !== 'GATE-W3' || h.traffic_migrated !== false) process.exit(1)" "$body" "${{ github.sha }}"; then
+              successes=$((successes + 1))
+              echo "${{ matrix.app }} / ${{ matrix.slot }} health probe $attempt succeeded ($successes/10)."
+              if [ "$successes" -ge 10 ]; then
+                root_body="$(mktemp)"
+                root_code="$(curl -fsS -o "$root_body" -w '%{http_code}' --max-time 20 "${base_url}/" || true)"
+                node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready' || h.release !== process.argv[2] || h.path !== '/') process.exit(1)" "$root_body" "${{ github.sha }}"
+                test "$root_code" = "200"
+                exit 0
+              fi
+            else
+              successes=0
+              echo "${{ matrix.app }} / ${{ matrix.slot }} health probe $attempt failed or release mismatch; resetting consecutive count."
+            fi
+            sleep 10
+          done
+          echo "${{ matrix.app }} / ${{ matrix.slot }} did not reach 10 consecutive ready probes." >&2
+          exit 1
