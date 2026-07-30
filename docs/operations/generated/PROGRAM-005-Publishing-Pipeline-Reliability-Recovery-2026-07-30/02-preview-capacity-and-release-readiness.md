@@ -11,7 +11,17 @@ PR #357 contains the accepted PROGRAM-005 publishing pipeline reliability repair
 
 Current head:
 
-`da2406f8635d05be7b60aa56e4998dd73536c0e2`
+`7d78e1ec62826fd7cd8db31ecde22b2257473e29`
+
+## Jackie Exception Approval
+
+Approval timestamp: 2026-07-30
+
+Authority reference:
+
+Jackie approved the documented SWA preview-capacity exception for PR #357, PROGRAM-005 Publishing Pipeline Reliability, permitting the narrowest repository action necessary to complete normal review and governed promotion despite the capacity-only SWA preview failure.
+
+This exception applies only to PR #357. It does not authorize deleting an active preview environment, closing another PR solely to free capacity, disabling the SWA workflow globally, weakening branch protection globally, bypassing unrelated required checks, or self-approval where human review is required.
 
 ## Validation Completed
 
