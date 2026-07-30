@@ -1,3 +1,6 @@
+// Engine: Package Engine
+// Reusable? Y
+// Stage-specific exception? N
 import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
 
