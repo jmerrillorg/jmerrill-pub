@@ -7,11 +7,12 @@ const route = readFileSync('app/api/publisher/operating-center/actions/route.ts'
 
 const checks = [
   {
-    name: 'package visible without email remains system-owned notification pending',
+    name: 'package visible without email remains queued for automation without waiting on automation',
     ok:
       publisher.includes("'Proofreading - Notification Pending'") &&
-      publisher.includes("executionState: 'WAITING_FOR_SYSTEM'") &&
-      publisher.includes("awaiting: 'JM1 Automation'") &&
+      publisher.includes("executionState: 'QUEUED'") &&
+      publisher.includes("executionOwner: 'JM1 Automation'") &&
+      publisher.includes("awaiting: 'None'") &&
       publisher.includes('Proofreading package notification has not been sent or logged'),
   },
   {

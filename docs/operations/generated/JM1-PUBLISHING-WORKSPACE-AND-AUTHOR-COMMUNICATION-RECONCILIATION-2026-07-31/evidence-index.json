@@ -1,0 +1,56 @@
+{
+  "package": "JM1-PUBLISHING-WORKSPACE-AND-AUTHOR-COMMUNICATION-RECONCILIATION-2026-07-31",
+  "createdAt": "2026-07-31T00:00:00-04:00",
+  "branch": "codex/no-system-wait-governance",
+  "sources": [
+    {
+      "type": "SharePoint",
+      "site": "jmerrillfoundation.sharepoint.com/sites/publishing",
+      "library": "Documents",
+      "foldersReviewed": [
+        "01_Pre-Pipeline/00_Inquiry",
+        "01_Titles",
+        "01_Titles/01_Editorial-Review",
+        "01_Titles/02_Developmental-Editing",
+        "01_Titles/05_Proofreading",
+        "01_Titles/06_Production",
+        "01_Titles/06_Production/02_Cover-Design",
+        "02_Active-Pipeline",
+        "90_INFRA"
+      ]
+    },
+    {
+      "type": "Dataverse",
+      "environment": "jm1hq.crm.dynamics.com",
+      "access": "delegated Azure CLI token; token not printed or retained",
+      "tablesRead": [
+        "jm1pub_titles",
+        "jm1pub_editorialstages",
+        "jm1pub_publishingassets",
+        "jm1pub_editorialapprovalgates",
+        "jm1_executionlogs"
+      ]
+    },
+    {
+      "type": "Repository",
+      "filesChanged": [
+        "app/publisher/_components/PublisherOperatingCenterClient.tsx",
+        "lib/server/author-communication-brand.ts",
+        "lib/server/author-package-notification-engine.ts",
+        "lib/server/author-portal-context.ts",
+        "lib/server/publisher-operating-center.ts",
+        "package.json",
+        "scripts/author_communication_brand_guard.test.mjs",
+        "scripts/author_package_notification_engine.test.mjs",
+        "scripts/author_stage_messaging.test.mjs",
+        "scripts/publishing_orchestrator.test.mjs",
+        "scripts/publishing_workspace_integrity_guard.test.mjs",
+        "scripts/runtime_ownership_model.test.mjs"
+      ]
+    }
+  ],
+  "secretValuesRetained": 0,
+  "authorMessagesSent": 0,
+  "workspaceDeletes": 0,
+  "workspaceMoves": 0
+}

@@ -1,4 +1,13 @@
+// Engine: Notification Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 import { EmailClient, type EmailAttachment, type EmailMessage } from '@azure/communication-email'
+import {
+  renderAuthorCommunicationEmail,
+  validateAuthorCommunicationEmail,
+  type RenderedAuthorCommunication,
+} from './author-communication-brand'
 
 export const AUTHOR_PACKAGE_NOTIFICATION_EVENTS = {
   audited: 'AUTHOR_PACKAGE_NOTIFICATION_AUDITED',
@@ -130,6 +139,15 @@ export type AuthorPackageNotificationInput = {
   packageChecksum?: string
 }
 
+export type AuthorReviewNotificationCopy = {
+  subject: string
+  body: string
+  htmlBody: string
+  templateName: string
+  templateVersion: string
+  templateMetadata: RenderedAuthorCommunication['metadata']
+}
+
 export type PackageNotificationValidationResult = {
   ok: boolean
   blocker?: string
@@ -248,41 +266,75 @@ export function validateAuthorNotificationHeaders(input: {
 export function buildAuthorReviewNotificationCopy(input: {
   stageCode: AuthorReviewPackageType
   titleName: string
+  authorName?: string
   corrected?: boolean
-}) {
+}): AuthorReviewNotificationCopy {
+  const stageLabel = stageLabelFor(input.stageCode)
+  const authorName = input.authorName?.trim() || 'Author'
   if (input.corrected) {
-    return {
+    const rendered = renderAuthorCommunicationEmail({
+      templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
+      templateVersion: '1.0.0',
       subject: `Corrected Proofreading Review Package - ${input.titleName}`,
-      body: [
-        'Good day, Jackie,',
-        '',
-        `The previous proofreading notice for ${input.titleName} did not include the package attachments.`,
-        '',
-        'This corrected message includes the governed proofread manuscript and proofreading review cover note. The same package remains available in the Author Operating Center.',
-        '',
-        'Please review the proofread manuscript and reply to the publishing team with your approval or requested corrections.',
-        '',
-        'Warmly,',
-        '',
-        'J Merrill Publishing',
-      ].join('\n'),
+      authorName,
+      titleName: input.titleName,
+      preheader: `Corrected ${stageLabel.toLowerCase()} package for ${input.titleName}.`,
+      why: `The previous ${stageLabel.toLowerCase()} notice for ${input.titleName} did not include the required package attachments.`,
+      completed: [
+        'The package was audited against the governed attachment policy.',
+        'The corrected package includes the required review materials.',
+        'The same package remains available in the Author Operating Center.',
+      ],
+      meaning: 'Your review period starts from the corrected package notification, not from the incomplete notice.',
+      authorAction: 'Please review the attached package and reply to the publishing team with your approval or requested corrections.',
+      primaryActionLabel: 'Review Package and Reply',
+      deadline: 'Please use the response window stated in the Author Operating Center or package instructions.',
+      nextSteps: [
+        'The publishing team will record your response.',
+        'Approved corrections or approval will move through the governed next-stage process.',
+        'If you have questions, reply directly to this message.',
+      ],
+    })
+    return {
+      subject: rendered.subject,
+      body: rendered.text,
+      htmlBody: rendered.html,
+      templateName: rendered.metadata.templateName,
+      templateVersion: rendered.metadata.templateVersion,
+      templateMetadata: rendered.metadata,
     }
   }
 
-  const stageLabel = stageLabelFor(input.stageCode)
-  return {
+  const rendered = renderAuthorCommunicationEmail({
+    templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
+    templateVersion: '1.0.0',
     subject: `${stageLabel} Package - ${input.titleName}`,
-    body: [
-      'Good day, Jackie,',
-      '',
-      `Your ${stageLabel.toLowerCase()} package for ${input.titleName} is ready for review. The required package files are attached and are also available in the Author Operating Center.`,
-      '',
-      'Please review the package and reply to the publishing team with your approval or requested corrections.',
-      '',
-      'Warmly,',
-      '',
-      'J Merrill Publishing',
-    ].join('\n'),
+    authorName,
+    titleName: input.titleName,
+    preheader: `Your ${stageLabel.toLowerCase()} package is ready for review.`,
+    why: `Your ${stageLabel.toLowerCase()} package for ${input.titleName} is ready for your review.`,
+    completed: [
+      'The publishing team completed the current internal package step.',
+      'The required review package files are attached to this message.',
+      'The package is also available in the Author Operating Center.',
+    ],
+    meaning: 'This is the point where your review helps us confirm the next governed step for your book.',
+    authorAction: 'Please review the package and reply to the publishing team with your approval or requested corrections.',
+    primaryActionLabel: 'Review Package and Reply',
+    deadline: 'Please use the response window stated in the Author Operating Center or package instructions.',
+    nextSteps: [
+      'The publishing team will record your response.',
+      'If you approve, the project can move to the next governed stage.',
+      'If you request corrections, the publishing team will review them before any stage movement.',
+    ],
+  })
+  return {
+    subject: rendered.subject,
+    body: rendered.text,
+    htmlBody: rendered.html,
+    templateName: rendered.metadata.templateName,
+    templateVersion: rendered.metadata.templateVersion,
+    templateMetadata: rendered.metadata,
   }
 }
 
@@ -294,6 +346,7 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
   bcc: string[]
   subject: string
   textBody: string
+  htmlBody: string
   attachments: GovernedPackageAttachment[]
 }) {
   const headerValidation = validateAuthorNotificationHeaders({
@@ -303,6 +356,13 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
     bcc: input.bcc,
   })
   if (!headerValidation.ok) throw new Error(headerValidation.blocker)
+  const bodyValidation = validateAuthorCommunicationEmail({
+    html: input.htmlBody,
+    text: input.textBody,
+    templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
+    templateVersion: '1.0.0',
+  })
+  if (!bodyValidation.ok) throw new Error(bodyValidation.blocker)
 
   const client = new EmailClient(input.connectionString)
   const message: EmailMessage = {
@@ -311,6 +371,7 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
     content: {
       subject: input.subject,
       plainText: input.textBody,
+      html: input.htmlBody,
     },
     recipients: {
       to: [{ address: input.to }],

@@ -79,7 +79,6 @@ export type PublisherExecutionState =
   | 'COMPLETED'
   | 'EXCEPTION'
   | 'WAITING_FOR_HUMAN'
-  | 'WAITING_FOR_SYSTEM'
   | 'WAITING_FOR_EXTERNAL_PARTY'
 
 export type PublisherExecutionOwner =
@@ -126,7 +125,7 @@ export type PublisherQueueItem = {
   actionOwner: 'publisher' | 'author' | 'system' | 'external'
   executionMode: PublisherExecutionMode
   executionState: PublisherExecutionState
-  businessOwner: 'Publisher' | 'Author' | 'External' | 'System'
+  businessOwner: 'Publisher' | 'Author' | 'External'
   executionOwner: PublisherExecutionOwner
   runtime: string
   runtimeCostCategory: PublisherRuntimeCostCategory
@@ -187,10 +186,10 @@ export type PublisherWorkloadItem = {
   editorialSubstage: string
   workloadState: PublisherWorkloadState
   activeCapability: string
-  currentOwner: 'Publisher' | 'Jackie' | 'Author' | 'External' | 'System'
+  currentOwner: 'Publisher' | 'Jackie' | 'Author' | 'External' | 'Engineering'
   executionMode: PublisherExecutionMode
   executionState: PublisherExecutionState
-  businessOwner: 'Publisher' | 'Author' | 'External' | 'System'
+  businessOwner: 'Publisher' | 'Author' | 'External'
   executionOwner: PublisherExecutionOwner
   runtime: string
   runtimeCostCategory: PublisherRuntimeCostCategory
@@ -257,7 +256,7 @@ export type PublisherTodayItem = {
     | 'Cody Bridge'
     | 'Engineering'
     | 'Not Implemented'
-  businessOwner: 'Publisher' | 'Author' | 'External' | 'System'
+  businessOwner: 'Publisher' | 'Author' | 'External'
   executionOwner: PublisherExecutionOwner
   executionMode: PublisherExecutionMode
   executionState: PublisherExecutionState
@@ -1998,13 +1997,13 @@ function deriveQueueExecutionModel(input: {
       executionState: input.currentBlocker.toLowerCase().includes('in progress')
         ? 'EXECUTING'
         : input.currentBlocker.toLowerCase().includes('pending')
-          ? 'WAITING_FOR_SYSTEM'
+          ? 'QUEUED'
           : 'QUEUED',
-      businessOwner: 'System',
+      businessOwner: 'Publisher',
       executionOwner: 'JM1 Automation',
       runtime: 'Deployed Publisher Operating Center read model and bounded API',
       runtimeCostCategory: 'Dataverse/API',
-      awaiting: input.currentBlocker.toLowerCase().includes('in progress') ? 'System runtime' : 'JM1 Automation',
+      awaiting: 'None',
       lastTrigger: 'Core state refresh',
       lastExecution: input.latestExecutionEvidence || 'No recent execution evidence found',
       expectedDuration: 'Runtime dependent',
@@ -2063,12 +2062,12 @@ function deriveWorkloadExecutionModel(input: {
   if (input.state === 'Proofreading - Notification Pending') {
     return {
       executionMode: 'AUTOMATIC_EVENT_DRIVEN',
-      executionState: 'WAITING_FOR_SYSTEM',
+      executionState: 'QUEUED',
       businessOwner: 'Publisher',
       executionOwner: 'JM1 Automation',
       runtime: 'JM1 Publishing Orchestrator notification transaction and ACS email relay',
       runtimeCostCategory: 'Azure compute',
-      awaiting: 'JM1 Automation',
+      awaiting: 'None',
       lastTrigger: 'Proofreading package ready',
       lastExecution: input.latestExecutionEvidence,
       expectedDuration: 'Immediate retry until sent or exceptioned',
@@ -2113,7 +2112,7 @@ function deriveWorkloadExecutionModel(input: {
       executionOwner: 'JM1 Automation',
       runtime: 'JM1 Editorial Execution Runtime - Proofreading executor',
       runtimeCostCategory: 'Azure compute',
-      awaiting: 'JM1 Automation',
+      awaiting: 'None',
       lastTrigger: 'Publisher-approved proofreading start',
       lastExecution: input.latestExecutionEvidence,
       expectedDuration: 'Runtime SLA controlled',
@@ -2128,7 +2127,7 @@ function deriveWorkloadExecutionModel(input: {
       executionOwner: 'JM1 Automation',
       runtime: 'JM1 Editorial Execution Runtime - editorial executor',
       runtimeCostCategory: 'Azure compute',
-      awaiting: 'JM1 Automation',
+      awaiting: 'None',
       lastTrigger: 'Publisher-approved stage start',
       lastExecution: input.latestExecutionEvidence,
       expectedDuration: 'Runtime SLA controlled',
@@ -2143,7 +2142,7 @@ function deriveWorkloadExecutionModel(input: {
       executionOwner: 'JM1 Automation',
       runtime: 'JM1 Editorial Execution Runtime - Editorial Review executor',
       runtimeCostCategory: 'Azure compute',
-      awaiting: 'JM1 Automation',
+      awaiting: 'None',
       lastTrigger: 'Core editorial stage active',
       lastExecution: input.latestExecutionEvidence,
       expectedDuration: 'Runtime SLA controlled',
@@ -2852,8 +2851,8 @@ function portfolioToTodayItem(item: PublisherPortfolioItem): PublisherTodayItem 
     pipelineStage: item.pipelineStage,
     editorialStage: item.portfolioLabel,
     substage: item.catalogStatus,
-    owner: requiresPublisher ? 'Jackie' : 'JM1 Automation',
-    businessOwner: requiresPublisher ? 'Publisher' : 'System',
+    owner: requiresPublisher ? 'Jackie' : 'Publisher',
+    businessOwner: 'Publisher',
     executionOwner: requiresPublisher ? 'Publisher' : 'JM1 Automation',
     executionMode: requiresPublisher ? 'PUBLISHER_MANUAL' : 'AUTOMATIC_SCHEDULED',
     executionState: requiresPublisher ? 'WAITING_FOR_HUMAN' : 'COMPLETED',
@@ -3042,8 +3041,8 @@ function productionToTodayItem(item: PublisherProductionReadinessItem, lane: 'in
     pipelineStage: lane === 'cover' ? 'Cover Design' : 'Interior Layout',
     editorialStage: item.editorialState,
     substage: readiness,
-    owner: readyForPublisher ? 'Jackie' : 'JM1 Automation',
-    businessOwner: readyForPublisher ? 'Publisher' : 'System',
+    owner: readyForPublisher ? 'Jackie' : 'Publisher',
+    businessOwner: 'Publisher',
     executionOwner: readyForPublisher ? 'Publisher' : 'JM1 Automation',
     executionMode: readyForPublisher ? 'SYSTEM_ACTION_MANUALLY_TRIGGERED' : 'AUTOMATIC_SCHEDULED',
     executionState: readyForPublisher ? 'WAITING_FOR_HUMAN' : 'COMPLETED',
@@ -3264,8 +3263,8 @@ function authorResponseToTodayItem(item: PublisherAuthorResponseQueueItem): Publ
     pipelineStage: 'Author Response',
     editorialStage: item.stagePackage,
     substage: item.classifiedDecision,
-    owner: needsJackie ? 'Jackie' : isException ? 'Cody Bridge' : 'JM1 Automation',
-    businessOwner: needsJackie ? 'Publisher' : 'System',
+    owner: needsJackie ? 'Jackie' : isException ? 'Engineering' : 'Publisher',
+    businessOwner: 'Publisher',
     executionOwner: needsJackie ? 'Publisher' : isException ? 'Cody Bridge' : 'JM1 Automation',
     executionMode: needsJackie ? 'PUBLISHER_MANUAL' : isException ? 'CODY_ASSISTED_BRIDGE' : 'AUTOMATIC_EVENT_DRIVEN',
     executionState: needsJackie ? 'WAITING_FOR_HUMAN' : isException ? 'EXCEPTION' : 'COMPLETED',
@@ -3274,7 +3273,7 @@ function authorResponseToTodayItem(item: PublisherAuthorResponseQueueItem): Publ
       : isException
         ? 'Automatic approval event consumer with administrative replay controls'
         : 'Automatic approval event consumer',
-    awaiting: needsJackie ? 'Jackie' : isException ? 'JM1 Automation retry / publisher admin replay if exhausted' : 'None',
+    awaiting: needsJackie ? 'Jackie' : isException ? 'Engineering remediation' : 'None',
     lastTrigger: 'Governed author email response',
     expectedDuration: needsJackie ? 'Publisher dependent' : isException ? 'Bridge dependent' : 'Within 5 minutes',
     exactBlocker: item.failedStep,
@@ -3321,7 +3320,7 @@ function logToAlertTodayItem(log: DataverseRow): PublisherTodayItem {
     editorialStage: 'Failed Transition',
     substage: actionType,
     owner: 'Engineering',
-    businessOwner: 'System',
+    businessOwner: 'Publisher',
     executionOwner: 'Engineering',
     executionMode: 'CODY_ENGINEERING_ONLY',
     executionState: 'EXCEPTION',
@@ -3356,8 +3355,8 @@ function logToMovementTodayItem(log: DataverseRow): PublisherTodayItem {
     pipelineStage: 'Recent Movement',
     editorialStage: actionType,
     substage: stringValue(log.createdon),
-    owner: 'JM1 Automation',
-    businessOwner: 'System',
+    owner: 'Publisher',
+    businessOwner: 'Publisher',
     executionOwner: 'JM1 Automation',
     executionMode: 'AUTOMATIC_SCHEDULED',
     executionState: 'COMPLETED',
@@ -3390,12 +3389,11 @@ function prioritizeTodayItems(items: PublisherTodayItem[]) {
     Jackie: 0,
     Author: 1,
     Publisher: 2,
-    'Cody Bridge': 3,
-    Engineering: 4,
+    Engineering: 3,
+    'Cody Bridge': 4,
     'JM1 Automation': 5,
-    System: 6,
-    External: 7,
-    'Not Implemented': 8,
+    External: 6,
+    'Not Implemented': 7,
   }
   return [...dedupeTodayItems(items)].sort(
     (a, b) =>

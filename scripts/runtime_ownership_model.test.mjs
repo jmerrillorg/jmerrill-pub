@@ -70,6 +70,16 @@ const expectations = [
       client.includes('executionOwnerLabel'),
   },
   {
+    name: 'active operational waits never assign awaiting ownership to System, JM1 Automation, or Cody',
+    ok:
+      !server.includes("awaiting: 'JM1 Automation'") &&
+      !server.includes("awaiting: 'System runtime'") &&
+      !server.includes("awaiting: 'System'") &&
+      !server.includes("awaiting: 'Cody'") &&
+      !server.includes("businessOwner: 'System'") &&
+      !client.includes('System Hold'),
+  },
+  {
     name: 'The Intentional Leader is author-owned at Proofreading Author Review, not Cody-owned',
     ok:
       activeTitles.get('The Intentional Leader')?.executionMode === 'EXTERNAL_PARTY' &&

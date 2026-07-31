@@ -1,3 +1,7 @@
+// Engine: Publisher Today Rendering Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 'use client'
 
 import { useMemo, useState, type ReactNode } from 'react'
@@ -856,7 +860,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                   <p className="mt-1 text-[14px] text-white/60">{item.authorName || item.authorEmail}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Badge label={item.actionOwner === 'publisher' ? 'Publisher Action' : 'System Hold'} tone={item.actionOwner === 'publisher' ? 'blue' : 'amber'} />
+                  <Badge label={item.actionOwner === 'publisher' ? 'Publisher Action' : 'Automation Tracking'} tone={item.actionOwner === 'publisher' ? 'blue' : 'amber'} />
                   <Badge label={item.contractStatus} />
                   <Badge label={item.paymentStatus} />
                 </div>

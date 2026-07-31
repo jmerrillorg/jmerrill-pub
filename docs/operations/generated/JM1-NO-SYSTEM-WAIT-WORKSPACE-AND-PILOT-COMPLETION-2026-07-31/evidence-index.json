@@ -1,0 +1,36 @@
+{
+  "package": "JM1-NO-SYSTEM-WAIT-WORKSPACE-AND-PILOT-COMPLETION-2026-07-31",
+  "generatedAt": "2026-07-31",
+  "branch": "codex/no-system-wait-governance",
+  "pullRequest": 367,
+  "status": "PARTIALLY_COMPLETE",
+  "files": [
+    {
+      "path": "00-authority-and-outcome.md",
+      "classification": "authority_summary"
+    },
+    {
+      "path": "01-five-title-live-register.md",
+      "classification": "live_dataverse_sharepoint_readback"
+    },
+    {
+      "path": "02-workspace-disposition-plan.md",
+      "classification": "pre_mutation_disposition_plan"
+    },
+    {
+      "path": "03-stop-condition-report.md",
+      "classification": "governed_stop_condition"
+    },
+    {
+      "path": "checksums.sha256",
+      "classification": "integrity_manifest"
+    }
+  ],
+  "mutationsPerformed": {
+    "dataverse": 0,
+    "sharePoint": 0,
+    "email": 0,
+    "deployment": 0
+  },
+  "secretValuesRetained": 0
+}
