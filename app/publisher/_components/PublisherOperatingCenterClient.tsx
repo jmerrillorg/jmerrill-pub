@@ -1,3 +1,7 @@
+// Engine: Publisher Today Rendering Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 'use client'
 
 import { useMemo, useState, type ReactNode } from 'react'

@@ -47,9 +47,9 @@ const checks = [
     name: 'corrected send references incomplete original and starts effective response clock',
     pass: () =>
       engine.includes('Corrected Proofreading Review Package') &&
-      engine.includes('previous proofreading notice') &&
-      engine.includes('did not include the package attachments') &&
-      engine.includes('The same package remains available in the Author Operating Center'),
+      engine.includes('The previous ${stageLabel.toLowerCase()} notice for') &&
+      engine.includes('did not include the required package attachments') &&
+      engine.includes('Your review period starts from the corrected package notification'),
   },
   {
     name: 'canonical events exist for audit, correction, transaction completion, and autostart arming',
@@ -84,6 +84,15 @@ const checks = [
       engine.includes('EmailAttachment') &&
       engine.includes('contentInBase64') &&
       engine.includes('attachments: input.attachments.map'),
+  },
+  {
+    name: 'author package notifications require shared branded HTML and plain text',
+    pass: () =>
+      engine.includes('renderAuthorCommunicationEmail') &&
+      engine.includes('validateAuthorCommunicationEmail') &&
+      engine.includes("templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1'") &&
+      engine.includes('html: input.htmlBody') &&
+      engine.includes('bodyValidation.blocker'),
   },
 ]
 

@@ -1,0 +1,45 @@
+path,item_type,classification,disposition,rationale
+01_Pre-Pipeline/00_Inquiry/_Backlist,folder,HISTORICAL_EVIDENCE,KEEP_OR_MOVE_AFTER_REVIEW,Backlist grouping is not active production Inquiry but may contain real historical evidence.
+01_Pre-Pipeline/00_Inquiry/_certification,folder,SYSTEM_VALIDATION,QUARANTINE_CANDIDATE,Certification label indicates nonproduction evidence.
+01_Pre-Pipeline/00_Inquiry/_YYYY_AuthorLastName_Short_Title_Slug_TEMPLATE,folder,TEMPLATE,MOVE_TO_TEMPLATE_LOCATION,Template must not remain in active Inquiry.
+01_Pre-Pipeline/00_Inquiry/2025-Walls-ThePath2Take,folder,REAL_DORMANT_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/2026_Dillard_GodGotMe,folder,REAL_ACTIVE_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/2026_Dillard_LuckyDucky,folder,REAL_ACTIVE_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/2026-0000 - OP001 Test - Workspace Lifecycle,folder,SYNTHETIC_TEST,QUARANTINE_CANDIDATE,Test and lifecycle markers.
+01_Pre-Pipeline/00_Inquiry/2026-Becky-February,folder,REAL_ACTIVE_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/2026-Fondren-BeyondYourEyes,folder,REAL_ACTIVE_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/2026-Walls-IAmYouth,folder,REAL_ACTIVE_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/2026-Williams-ResidueOfSin,folder,REAL_ACTIVE_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Carter, Melinda - BrownBag,folder,REAL_DORMANT_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Dockery, Winter - War Mother,folder,REAL_DORMANT_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Fleming-Wansley, Frances - FORTIFIED,folder,REAL_DORMANT_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Heard, K.D. - A Walk Home with God,folder,REAL_DORMANT_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Heard, K.D. - Inner Peace Through Life's Storms,folder,REAL_DORMANT_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Howard, Scott - 60 Frames in Search of an Artist,folder,REAL_DORMANT_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Hughley, Kiena - Your Peace is a Priority,folder,REAL_DORMANT_INQUIRY,REVIEW,Author/title pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/James, Karen,folder,REAL_DORMANT_INQUIRY,REVIEW,Author pattern lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ - Jackie Smith jr - The Intentional Leader,folder,DUPLICATE,REMOVE_FROM_ACTIVE_VIEW_AFTER_EVIDENCE_COMPARE,Canonical title is production/interior lane, not Inquiry.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-14G8DT - Jackie Smith Jr - The Long Watch - Intake Success Validation,folder,SYSTEM_VALIDATION,QUARANTINE_CANDIDATE,Validation marker; not the canonical Long Watch workspace.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-3BMEHZ - JM1 SyntheticFinal20260727172010 - JM1 Synthetic Intake Final Proof 20260727172010,folder,SYNTHETIC_TEST,QUARANTINE_CANDIDATE,Synthetic/final proof marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-3R2ETT - Gate W1 Long Docx Synthetic - GATE-W1 App Service Staging Long DOCX Join 1785342346355,folder,SYSTEM_VALIDATION,QUARANTINE_CANDIDATE,Gate W1 App Service synthetic marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-3VAMOM - Carolyn Pierce - Girl Youre Not Crazy Youre Dealing With a Narcissist,folder,ORPHAN_REQUIRES_REVIEW,DO_NOT_DELETE,May relate to live Carolyn pilot/enrollment reconciliation.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-422JSZ - Atta Boateng - Untitled,folder,REAL_ACTIVE_INQUIRY,KEEP,Production orchestration proof/real inquiry.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-6BO5Z5 - Jackie Smith jr. - The Intentional Leader,folder,DUPLICATE,ARCHIVE_AS_DUPLICATE_AFTER_EVIDENCE_COMPARE,Alternate code for same real title.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-95IAEC - Gate W1 Multipart Synthetic - GATE-W1 App Service Staging Multipart Join 1785341972350,folder,SYSTEM_VALIDATION,QUARANTINE_CANDIDATE,Gate W1 App Service synthetic marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-AMDO4I - JM1 SyntheticRestored20260727173332 - JM1 Synthetic Intake Restored Proof 20260727173332,folder,SYNTHETIC_TEST,QUARANTINE_CANDIDATE,Synthetic/restored proof marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-BUAKCY - Gate W1 Docx Synthetic - GATE-W1 App Service Staging DOCX Join 1785342161378,folder,SYSTEM_VALIDATION,QUARANTINE_CANDIDATE,Gate W1 App Service synthetic marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-C3L2SG - JM1 SyntheticIntake20260727163730 - JM1 Synthetic Intake SEV1 Proof 20260727163730,folder,SYNTHETIC_TEST,QUARANTINE_CANDIDATE,Synthetic SEV1 proof marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-DM8F79 - JM1 SyntheticIntake20260727164554 - JM1 Synthetic Intake SEV1 Proof 20260727164554,folder,SYNTHETIC_TEST,QUARANTINE_CANDIDATE,Synthetic SEV1 proof marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-H851LP - JM1 Synthetic Intake Certification - Untitled,folder,SYSTEM_VALIDATION,QUARANTINE_CANDIDATE,Synthetic certification marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-HHGW3M - JM1 SyntheticFinal20260727170349 - JM1 Synthetic Intake Final Proof 20260727170349,folder,SYNTHETIC_TEST,QUARANTINE_CANDIDATE,Synthetic/final proof marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-K4LYCS - Gate W1 Join Synthetic - GATE-W1 App Service Staging Positive Join 1785341427544,folder,SYSTEM_VALIDATION,QUARANTINE_CANDIDATE,Gate W1 App Service synthetic marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-OYZKEI - Gate W1 Synthetic - GATE-W1 Synthetic Certification Manuscript 20260729,folder,SYSTEM_VALIDATION,QUARANTINE_CANDIDATE,Gate W1 synthetic certification marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-P79YWB - JM1 SyntheticFetch20260727165010 - JM1 Synthetic Intake Fetch Proof 20260727165010,folder,SYNTHETIC_TEST,QUARANTINE_CANDIDATE,Synthetic fetch proof marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-YEUSKK - Gate W1 Synthetic - GATE-W1 Synthetic Recommendation Manuscript 20260729,folder,SYSTEM_VALIDATION,QUARANTINE_CANDIDATE,Gate W1 synthetic recommendation marker.
+01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-Z8G8Y0 - JM1 Duplicate20260727173641 - JM1 Duplicate Proof 20260727173641,folder,DUPLICATE,QUARANTINE_CANDIDATE,Duplicate proof marker.
+01_Pre-Pipeline/00_Inquiry/Johnson, J Derrick,folder,REAL_DORMANT_INQUIRY,REVIEW,Author folder lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Morgan, Shannon,folder,REAL_DORMANT_INQUIRY,REVIEW,Author folder lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Smith, Jackie,folder,ORPHAN_REQUIRES_REVIEW,DO_NOT_DELETE,May contain real Jackie Smith title evidence.
+01_Pre-Pipeline/00_Inquiry/Tully, Ruby,folder,REAL_DORMANT_INQUIRY,REVIEW,Author folder lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Walls, Donjia,folder,REAL_DORMANT_INQUIRY,REVIEW,Author folder lacks synthetic markers.
+01_Pre-Pipeline/00_Inquiry/Waters, Yolanda,folder,REAL_DORMANT_INQUIRY,REVIEW,Author folder lacks synthetic markers.

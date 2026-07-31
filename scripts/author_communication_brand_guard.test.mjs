@@ -1,0 +1,70 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import createJiti from 'jiti'
+
+const jiti = createJiti(import.meta.url)
+const brand = jiti('../lib/server/author-communication-brand.ts')
+const engine = jiti('../lib/server/author-package-notification-engine.ts')
+
+test('shared author communication renderer produces branded HTML and plain text', () => {
+  const rendered = brand.renderAuthorCommunicationEmail({
+    templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
+    templateVersion: '1.0.0',
+    subject: 'Interior Layout Package - The Intentional Leader',
+    authorName: 'Jackie',
+    titleName: 'The Intentional Leader',
+    preheader: 'Your interior layout package is ready for review.',
+    why: 'Your interior layout package is ready for review.',
+    completed: ['Interior proof prepared.', 'Review instructions prepared.'],
+    meaning: 'This review confirms the book can move toward final production.',
+    authorAction: 'Please review the package and reply with approval or requested corrections.',
+    primaryActionLabel: 'Review Package and Reply',
+    nextSteps: ['Publishing records your response.', 'The next stage opens only after approval or correction review.'],
+  })
+
+  assert.match(rendered.html, /<!doctype html>/i)
+  assert.match(rendered.html, /<table role="presentation"/)
+  assert.match(rendered.html, /J MERRILL PUBLISHING/)
+  assert.match(rendered.html, /A Division of J Merrill One/)
+  assert.match(rendered.html, /Helping Authors Help Themselves\./)
+  assert.match(rendered.html, /Why you are receiving this/)
+  assert.match(rendered.html, /What we need from you/)
+  assert.match(rendered.html, /What happens next/)
+  assert.match(rendered.text, /Why you are receiving this/)
+  assert.match(rendered.text, /The Publishing Team\nJ Merrill Publishing, Inc\./)
+  assert.equal(rendered.metadata.qualityGate, 'PASS')
+  assert.equal(rendered.metadata.htmlSha256.length, 64)
+  assert.equal(rendered.metadata.textSha256.length, 64)
+})
+
+test('author communication validation blocks unformatted or text-only output', () => {
+  assert.deepEqual(
+    brand.validateAuthorCommunicationEmail({
+      templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
+      templateVersion: '1.0.0',
+      html: '',
+      text: 'plain text only',
+    }),
+    {
+      ok: false,
+      blocker:
+        'AUTHOR_COMMUNICATION_BLOCKED - HTML_BODY_MISSING,HTML_DOCTYPE_MISSING,EMAIL_TABLE_LAYOUT_MISSING,BRAND_HEADER_MISSING,DIVISION_LINE_MISSING,PROMISE_LINE_MISSING,WHY_FIRST_BLOCK_MISSING,AUTHOR_ACTION_BLOCK_MISSING,NEXT_STEPS_BLOCK_MISSING,PLAIN_TEXT_WHY_FIRST_BLOCK_MISSING,PLAIN_TEXT_SIGNATURE_MISSING',
+    },
+  )
+})
+
+test('author package notification copy uses the shared brand renderer', () => {
+  const copy = engine.buildAuthorReviewNotificationCopy({
+    stageCode: 'INTERIOR_LAYOUT_REVIEW',
+    titleName: 'The Intentional Leader',
+    authorName: 'Jackie',
+  })
+
+  assert.equal(copy.templateName, 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1')
+  assert.equal(copy.templateVersion, '1.0.0')
+  assert.equal(copy.templateMetadata.qualityGate, 'PASS')
+  assert.match(copy.htmlBody, /J MERRILL PUBLISHING/)
+  assert.match(copy.htmlBody, /Interior Layout Review Package - The Intentional Leader/)
+  assert.match(copy.body, /Good day, Jackie,/)
+  assert.match(copy.body, /What has been completed/)
+})
