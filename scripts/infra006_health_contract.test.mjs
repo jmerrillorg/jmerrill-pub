@@ -22,6 +22,19 @@ test('health endpoint exposes payment gate state without enabling payments', () 
   assert.doesNotMatch(source, /payouts\.create|transfers\.create|charges\.create|refunds\.create/)
 })
 
+test('health endpoint prefers immutable packaged release metadata', () => {
+  assert.match(source, /readPackagedReleaseSha/)
+  assert.match(source, /JM1_RELEASE_SHA/)
+  assert.ok(source.indexOf('readPackagedReleaseSha()') < source.indexOf('process.env.JM1_RELEASE_SHA'))
+})
+
+test('App Service production promotion requires exact release identity', () => {
+  const workflow = readFileSync('.github/workflows/azure-app-service-publishing.yml', 'utf8')
+  assert.match(workflow, /Production Observation/)
+  assert.match(workflow, /h\.release !== process\.argv\[2\]/)
+  assert.match(workflow, /\$\{\{ github\.sha \}\}/)
+})
+
 test('App Service Bicep uses Key Vault references and health check path', () => {
   const bicep = readFileSync('infra/jm1-infra-006/app-service/main.bicep', 'utf8')
   assert.match(bicep, /@Microsoft\.KeyVault\(SecretUri=/)

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -54,7 +56,8 @@ export function GET() {
     ? 'enabled'
     : 'disabled'
   const sessionSecret = process.env.AUTHOR_PORTAL_SESSION_SECRET?.trim() || ''
-  const release = process.env.JM1_RELEASE_SHA ||
+  const release = readPackagedReleaseSha() ||
+    process.env.JM1_RELEASE_SHA ||
     process.env.GITHUB_SHA ||
     process.env.VERCEL_GIT_COMMIT_SHA ||
     process.env.NEXT_PUBLIC_RELEASE_ID ||
@@ -86,6 +89,14 @@ export function GET() {
       'Cache-Control': 'no-store',
     },
   })
+}
+
+function readPackagedReleaseSha() {
+  try {
+    return readFileSync(resolve(process.cwd(), 'JM1_RELEASE_SHA'), 'utf8').trim()
+  } catch {
+    return ''
+  }
 }
 
 function dependencyHealth(required: readonly string[]): DependencyHealth {

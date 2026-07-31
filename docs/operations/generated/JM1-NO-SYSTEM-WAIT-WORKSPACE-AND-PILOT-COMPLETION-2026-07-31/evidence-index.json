@@ -1,8 +1,9 @@
 {
   "package": "JM1-NO-SYSTEM-WAIT-WORKSPACE-AND-PILOT-COMPLETION-2026-07-31",
   "generatedAt": "2026-07-31",
-  "branch": "codex/no-system-wait-governance",
-  "pullRequest": 367,
+  "branch": "codex/five-title-package-commissioning",
+  "sourceBaseline": "main@582b4aa0be928d905bb89b1b3d357a094e1f75a5",
+  "priorPullRequest": 367,
   "status": "PARTIALLY_COMPLETE",
   "files": [
     {
@@ -20,6 +21,10 @@
     {
       "path": "03-stop-condition-report.md",
       "classification": "governed_stop_condition"
+    },
+    {
+      "path": "04-five-title-package-commissioning-addendum.md",
+      "classification": "release_observability_and_package_readiness_addendum"
     },
     {
       "path": "checksums.sha256",

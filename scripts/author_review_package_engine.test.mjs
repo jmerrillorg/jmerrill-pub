@@ -4,13 +4,20 @@ import { existsSync, symlinkSync, unlinkSync } from 'node:fs'
 import test, { after } from 'node:test'
 
 const notificationShim = new URL('../lib/server/author-package-notification-engine', import.meta.url)
+const brandShim = new URL('../lib/server/author-communication-brand', import.meta.url)
 let createdNotificationShim = false
+let createdBrandShim = false
 if (!existsSync(notificationShim)) {
   symlinkSync('author-package-notification-engine.ts', notificationShim)
   createdNotificationShim = true
 }
+if (!existsSync(brandShim)) {
+  symlinkSync('author-communication-brand.ts', brandShim)
+  createdBrandShim = true
+}
 after(() => {
   if (createdNotificationShim) unlinkSync(notificationShim)
+  if (createdBrandShim) unlinkSync(brandShim)
 })
 
 const {
