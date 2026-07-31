@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import {
   getAuthorPortalContextFromAuthorEmail,
+  getAuthorPortalContextFromExternalId,
   requireAuthorAccess,
   resolveAuthorPortalContext,
 } from '@/lib/server/author-portal-context'
@@ -37,6 +38,8 @@ export async function GET(
     legacySession
       ? await resolveAuthorPortalContext(legacySession)
       : await getDurableAuthorSession().then((session) => {
+          const externalId = (session?.user as { authorObjectId?: string } | undefined)?.authorObjectId
+          if (externalId) return getAuthorPortalContextFromExternalId(externalId)
           const email = session?.user?.email
           if (!email) return null
           return getAuthorPortalContextFromAuthorEmail(email)

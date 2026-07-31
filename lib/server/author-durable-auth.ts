@@ -46,18 +46,25 @@ export async function isAuthorizedAuthorEmail(email?: string | null) {
   return Boolean(contact)
 }
 
-async function getAuthorizedAuthorEmailByObjectId(objectId?: string | null) {
+export async function getAuthorizedAuthorContactByObjectId(objectId?: string | null) {
   const normalizedObjectId = objectId?.trim().toLowerCase()
-  if (!normalizedObjectId) return ''
+  if (!normalizedObjectId) return null
 
   const config = getDataverseServerConfig()
-  if (!config) return ''
+  if (!config) return null
 
   const contact = await dataverseFirst(config, 'contacts', {
     $select: 'contactid,emailaddress1,emailaddress2,emailaddress3,externaluseridentifier,adx_identity_username',
     $filter: `externaluseridentifier eq '${normalizedObjectId.replace(/'/g, "''")}'`,
   })
 
+  if (!contact) return null
+
+  return contact
+}
+
+async function getAuthorizedAuthorEmailByObjectId(objectId?: string | null) {
+  const contact = await getAuthorizedAuthorContactByObjectId(objectId)
   if (!contact) return ''
 
   return (
@@ -163,19 +170,34 @@ async function resolveAuthorizedAuthorEmail({
 }) {
   const candidates = collectIdentityEmailCandidates({ profile, user, token })
 
-  for (const candidate of candidates) {
-    if (await isAuthorizedAuthorEmail(candidate)) {
-      return candidate
-    }
-  }
-
   const objectIds = collectIdentityObjectIdCandidates({ profile, token })
   for (const objectId of objectIds) {
     const email = await getAuthorizedAuthorEmailByObjectId(objectId)
     if (email) return email
   }
 
+  for (const candidate of candidates) {
+    if (await isAuthorizedAuthorEmail(candidate)) {
+      return candidate
+    }
+  }
+
   return ''
+}
+
+function resolvePrimaryIdentityObjectId({
+  profile,
+  token,
+}: {
+  profile?: Record<string, unknown>
+  token?: { oid?: unknown; sub?: unknown; authorObjectId?: unknown } | null
+}) {
+  return [
+    typeof token?.authorObjectId === 'string' ? token.authorObjectId.trim() : '',
+    ...collectIdentityObjectIdCandidates({ profile, token }),
+  ]
+    .filter(Boolean)
+    .map((value) => value.toLowerCase())[0] || ''
 }
 
 type AuthorIdentityProfile = Record<string, unknown> & {
@@ -374,9 +396,18 @@ export const authorAuthOptions: NextAuthOptions = {
       if (existingEmail && token.provider !== PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
         token.email = existingEmail
         token.role = token.role || 'author'
+        const objectId = resolvePrimaryIdentityObjectId({
+          profile: profile as Record<string, unknown> | undefined,
+          token,
+        })
+        if (objectId) token.authorObjectId = objectId
         return token
       }
 
+      const objectId = resolvePrimaryIdentityObjectId({
+        profile: profile as Record<string, unknown> | undefined,
+        token,
+      })
       const email = await resolveAuthorizedAuthorEmail({
         profile: profile as Record<string, unknown> | undefined,
         user,
@@ -385,6 +416,7 @@ export const authorAuthOptions: NextAuthOptions = {
 
       if (email) token.email = email
       if (email) token.role = 'author'
+      if (email && objectId) token.authorObjectId = objectId
       return token
     },
     async session({ session, token }) {
@@ -393,6 +425,9 @@ export const authorAuthOptions: NextAuthOptions = {
       }
       if (session.user && typeof token.role === 'string') {
         ;(session.user as { role?: string }).role = token.role
+      }
+      if (session.user && typeof token.authorObjectId === 'string') {
+        ;(session.user as { authorObjectId?: string }).authorObjectId = token.authorObjectId
       }
       return session
     },

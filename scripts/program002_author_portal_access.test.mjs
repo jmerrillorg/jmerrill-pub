@@ -126,6 +126,7 @@ test('v2 canonical hashed access grant accepts approved variants through compact
 })
 
 test('master access code also accepts normalized variants', () => {
+  process.env.NODE_ENV = 'test'
   process.env.AUTHOR_PORTAL_MASTER_ACCESS_CODE = 'JMP-PORTAL-ADMIN-2026'
 
   const grant = access.resolveAuthorPortalAccessGrant({

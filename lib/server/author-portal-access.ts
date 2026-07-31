@@ -9,6 +9,7 @@ export type AuthorPortalAccessGrant = {
   accessCodeHash?: string
   accessCodeVersion?: 'activation-code-v1' | 'activation-code-v2'
   status?: string
+  purpose?: 'initial_activation' | 'recovery'
   intakeReference?: string
   projectIds?: string[]
   title?: string
@@ -17,6 +18,9 @@ export type AuthorPortalAccessGrant = {
   contactEmail?: string
   opportunityId?: string
   expiresAt?: string
+  consumedAt?: string
+  revokedAt?: string
+  externalUserIdentifier?: string
   scope?: 'project' | 'relationship'
 }
 
@@ -27,15 +31,38 @@ export type AuthorPortalSession = {
   titleSlug?: string
   contactId?: string
   contactEmail?: string
+  externalUserIdentifier?: string
   opportunityId?: string
   scope: 'project' | 'relationship'
   issuedAt: string
+}
+
+export type AuthorPortalActivationTransaction = {
+  v: 1
+  contactId: string
+  purpose: 'initial_activation' | 'recovery'
+  intakeReference?: string
+  title?: string
+  titleSlug?: string
+  opportunityId?: string
+  scope: 'relationship'
+  issuedAt: string
+  expiresAt: string
+}
+
+export type AuthorPortalActivationResolution = {
+  grant: AuthorPortalAccessGrant
+  purpose: 'initial_activation' | 'recovery'
+  contactId: string
+  codeStatus: 'valid'
 }
 
 const SESSION_VERSION = 1
 const DEFAULT_REFERENCE = 'JMP-INT-202607-0W5PTQ'
 const DEFAULT_TITLE = 'The Intentional Leader'
 const COOKIE_NAME = 'jm1_author_portal_session'
+const ACTIVATION_TRANSACTION_COOKIE_NAME = 'jm1_author_activation_tx'
+const ACTIVATION_TRANSACTION_MAX_AGE_SECONDS = 15 * 60
 const LOCAL_TEST_PORTAL_CODE = 'JMP-PORTAL-ADMIN-2026'
 const ACTIVATION_CODE_V1 = 'activation-code-v1'
 const ACTIVATION_CODE_V2 = 'activation-code-v2'
@@ -66,6 +93,14 @@ export function getAuthorPortalCookieName() {
   return COOKIE_NAME
 }
 
+export function getAuthorPortalActivationTransactionCookieName() {
+  return ACTIVATION_TRANSACTION_COOKIE_NAME
+}
+
+export function getAuthorPortalActivationTransactionMaxAgeSeconds() {
+  return ACTIVATION_TRANSACTION_MAX_AGE_SECONDS
+}
+
 export function parseAuthorPortalAccessRegistry(raw: string | undefined) {
   if (!raw?.trim()) return []
 
@@ -84,6 +119,8 @@ export function parseAuthorPortalAccessRegistry(raw: string | undefined) {
 export function getAuthorPortalAccessGrants(): AuthorPortalAccessGrant[] {
   const registry = parseAuthorPortalAccessRegistry(getAuthorPortalAccessRegistryJson())
   if (registry.length) return registry
+
+  if (process.env.NODE_ENV === 'production') return []
 
   const legacyCode = getOnboardingAccessCode() || getMasterAccessCode()
   if (!legacyCode) {
@@ -194,6 +231,56 @@ export function resolveAuthorPortalAccessGrant({
   return matches[0]
 }
 
+export function resolveAuthorPortalActivationCode({
+  code,
+  requestedReference,
+  purpose,
+}: {
+  code: string
+  requestedReference?: string
+  purpose?: 'initial_activation' | 'recovery'
+}): AuthorPortalActivationResolution | null {
+  const grant = resolveAuthorPortalAccessGrant({ code, requestedReference })
+  if (!grant) return null
+  if (!grant.contactId) return null
+  if (grant.consumedAt || grant.revokedAt) return null
+
+  const grantPurpose = normalizeActivationPurpose(grant.purpose)
+  const requestedPurpose = normalizeActivationPurpose(purpose)
+  if (requestedPurpose && grantPurpose !== requestedPurpose) return null
+
+  return {
+    grant,
+    purpose: grantPurpose,
+    contactId: grant.contactId,
+    codeStatus: 'valid',
+  }
+}
+
+export function activationCodeRequiresMicrosoftIdentity(grant: AuthorPortalAccessGrant) {
+  return Boolean(grant.contactId) && !grant.externalUserIdentifier
+}
+
+export function createAuthorPortalActivationTransaction(resolution: AuthorPortalActivationResolution) {
+  const issuedAt = new Date()
+  const payload: AuthorPortalActivationTransaction = {
+    v: SESSION_VERSION,
+    contactId: resolution.contactId,
+    purpose: resolution.purpose,
+    intakeReference: resolution.grant.intakeReference,
+    title: resolution.grant.title,
+    titleSlug: resolution.grant.titleSlug,
+    opportunityId: resolution.grant.opportunityId,
+    scope: 'relationship',
+    issuedAt: issuedAt.toISOString(),
+    expiresAt: new Date(issuedAt.getTime() + ACTIVATION_TRANSACTION_MAX_AGE_SECONDS * 1000).toISOString(),
+  }
+
+  const encodedPayload = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url')
+  const signature = signPortalPayload(encodedPayload)
+  return `${encodedPayload}.${signature}`
+}
+
 export function createAuthorPortalSession(grant: AuthorPortalAccessGrant) {
   const payload: AuthorPortalSession = {
     v: SESSION_VERSION,
@@ -202,6 +289,7 @@ export function createAuthorPortalSession(grant: AuthorPortalAccessGrant) {
     titleSlug: grant.titleSlug,
     contactId: grant.contactId,
     contactEmail: grant.contactEmail,
+    externalUserIdentifier: normalizeExternalUserIdentifier(grant.externalUserIdentifier),
     opportunityId: grant.opportunityId,
     scope: grant.scope || 'project',
     issuedAt: new Date().toISOString(),
@@ -232,6 +320,35 @@ export function readAuthorPortalSession(value: string | undefined) {
   try {
     const parsed = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString('utf8')) as AuthorPortalSession
     if (parsed?.v !== SESSION_VERSION) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+export function readAuthorPortalActivationTransaction(value: string | undefined) {
+  if (!value) return null
+
+  const [encodedPayload, signature] = value.split('.')
+  if (!encodedPayload || !signature) return null
+
+  let expected: string
+  try {
+    expected = signPortalPayload(encodedPayload)
+  } catch (error) {
+    if (error instanceof AuthorPortalSessionConfigurationError) {
+      return null
+    }
+    throw error
+  }
+  if (!constantTimeEqual(signature, expected)) return null
+
+  try {
+    const parsed = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString('utf8')) as AuthorPortalActivationTransaction
+    if (parsed?.v !== SESSION_VERSION) return null
+    if (!parsed.contactId || parsed.scope !== 'relationship') return null
+    if (parsed.purpose !== 'initial_activation' && parsed.purpose !== 'recovery') return null
+    if (isExpired(parsed.expiresAt)) return null
     return parsed
   } catch {
     return null
@@ -312,6 +429,7 @@ function normalizeGrant(entry: unknown): AuthorPortalAccessGrant | null {
         ? record.accessCodeVersion
         : undefined,
     status: optionalString(record.status),
+    purpose: normalizeActivationPurpose(optionalString(record.purpose) || optionalString(record.codePurpose)),
     intakeReference,
     projectIds,
     title: optionalString(record.title) || optionalString(record.titleName),
@@ -320,6 +438,11 @@ function normalizeGrant(entry: unknown): AuthorPortalAccessGrant | null {
     contactEmail: optionalString(record.contactEmail),
     opportunityId: optionalString(record.opportunityId),
     expiresAt: optionalIsoDate(record.expiresAt) || optionalIsoDate(record.expiresOn),
+    consumedAt: optionalIsoDate(record.consumedAt) || optionalIsoDate(record.usedAt),
+    revokedAt: optionalIsoDate(record.revokedAt),
+    externalUserIdentifier: normalizeExternalUserIdentifier(
+      optionalString(record.externalUserIdentifier) || optionalString(record.externalIdObjectId),
+    ),
     scope,
   }
 }
@@ -338,6 +461,16 @@ function normalizeText(value?: string) {
   return value?.trim().toLowerCase() || ''
 }
 
+function normalizeExternalUserIdentifier(value?: string) {
+  return value?.trim().toLowerCase() || undefined
+}
+
+function normalizeActivationPurpose(value?: string) {
+  const normalized = normalizeText(value).replace(/-/g, '_')
+  if (normalized === 'recovery' || normalized === 'access_recovery') return 'recovery'
+  return 'initial_activation'
+}
+
 function readStringArray(value: unknown) {
   if (!Array.isArray(value)) return []
   return value.map((entry) => optionalString(entry)).filter((entry): entry is string => Boolean(entry))
@@ -352,7 +485,7 @@ function isExpired(value?: string) {
 
 function isGrantActive(grant: AuthorPortalAccessGrant) {
   const status = normalizeText(grant.status)
-  return !status || status === 'active' || status === 'enabled'
+  return !status || status === 'active' || status === 'enabled' || status === 'issued'
 }
 
 function signPortalPayload(payload: string) {
@@ -389,6 +522,7 @@ function hashPortalCode(code: string) {
 function isMasterPortalAccessCode(code: string) {
   const candidateForms = buildActivationCodeForms(code)
   if (candidateForms.length === 0) return false
+  if (process.env.NODE_ENV === 'production') return false
 
   return [
     getMasterAccessCode(),

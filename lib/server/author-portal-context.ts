@@ -6,10 +6,15 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import {
   buildPortalTaskState,
+  activationCodeRequiresMicrosoftIdentity,
+  createAuthorPortalActivationTransaction,
   createAuthorPortalSession,
+  getAuthorPortalActivationTransactionCookieName,
+  getAuthorPortalActivationTransactionMaxAgeSeconds,
   getAuthorPortalCookieName,
   readAuthorPortalSession,
   resolveAuthorPortalAccessGrant,
+  resolveAuthorPortalActivationCode,
   type AuthorPortalSession,
 } from './author-portal-access'
 import {
@@ -230,6 +235,7 @@ export async function createAuthorPortalGateResponse({
   requestedReference?: string
 }) {
   const resolvedGrant = resolveAuthorPortalAccessGrant({ code, requestedReference })
+  const activationResolution = resolveAuthorPortalActivationCode({ code, requestedReference })
   const grant = resolvedGrant
     ? ({
         ...resolvedGrant,
@@ -239,6 +245,27 @@ export async function createAuthorPortalGateResponse({
 
   if (!grant) {
     return NextResponse.json({ error: 'Invalid access code.' }, { status: 401 })
+  }
+
+  if (!activationResolution && process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Activation requires a governed author record.' }, { status: 401 })
+  }
+
+  if (activationResolution && activationCodeRequiresMicrosoftIdentity(grant)) {
+    const transactionValue = createAuthorPortalActivationTransaction(activationResolution)
+    const response = NextResponse.json({
+      success: true,
+      requiresMicrosoftSignIn: true,
+      purpose: activationResolution.purpose,
+      contactId: activationResolution.contactId,
+      signInUrl: '/api/auth/signin/jm1-author-operating-center?callbackUrl=%2Fauthor%2Fportal',
+      message:
+        activationResolution.purpose === 'recovery'
+          ? 'Recovery verified. Sign in with your author-owned Microsoft account to restore access.'
+          : 'Activation verified. Sign in with your author-owned Microsoft account to complete setup.',
+    })
+    setAuthorPortalActivationTransactionCookie(response, transactionValue)
+    return response
   }
 
   const sessionValue = createAuthorPortalSession(grant)
@@ -282,6 +309,37 @@ export async function getAuthorPortalContextFromAuthorEmail(
     {
       v: 1,
       contactEmail: normalizedEmail,
+      scope: 'relationship',
+      issuedAt: new Date().toISOString(),
+    },
+    overrides,
+  )
+}
+
+export async function getAuthorPortalContextFromExternalId(
+  externalUserIdentifier: string,
+  overrides?: ResolveOverrides,
+) {
+  const normalizedExternalId = externalUserIdentifier.trim().toLowerCase()
+  if (!normalizedExternalId) return null
+
+  const config = getDataverseServerConfig()
+  if (!config) return null
+
+  const contact = await dataverseFirst(config, 'contacts', {
+    $select: 'contactid,emailaddress1,externaluseridentifier',
+    $filter: `externaluseridentifier eq '${escapeODataText(normalizedExternalId)}'`,
+  })
+
+  const contactId = dataverseLookupId(contact || {}, 'contactid')
+  if (!contactId) return null
+
+  return resolveAuthorPortalContext(
+    {
+      v: 1,
+      contactId,
+      contactEmail: stringValue(contact?.emailaddress1),
+      externalUserIdentifier: normalizedExternalId,
       scope: 'relationship',
       issuedAt: new Date().toISOString(),
     },
@@ -504,7 +562,7 @@ export function clearAuthorPortalSession() {
   return response
 }
 
-function setAuthorPortalSessionCookie(response: NextResponse, value: string) {
+export function setAuthorPortalSessionCookie(response: NextResponse, value: string) {
   const cookieName = getAuthorPortalCookieName()
   const secure = process.env.NODE_ENV === 'production'
 
@@ -525,7 +583,7 @@ function setAuthorPortalSessionCookie(response: NextResponse, value: string) {
   )
 }
 
-function clearAuthorPortalSessionCookie(response: NextResponse) {
+export function clearAuthorPortalSessionCookie(response: NextResponse) {
   const cookieName = getAuthorPortalCookieName()
   const secure = process.env.NODE_ENV === 'production'
 
@@ -542,6 +600,49 @@ function clearAuthorPortalSessionCookie(response: NextResponse) {
     buildCookieHeader(cookieName, '', {
       secure,
       maxAge: 0,
+    }),
+  )
+}
+
+export function clearAuthorPortalActivationTransactionCookie(response: NextResponse) {
+  const cookieName = getAuthorPortalActivationTransactionCookieName()
+  const secure = process.env.NODE_ENV === 'production'
+
+  response.cookies.set(cookieName, '', {
+    httpOnly: true,
+    secure,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
+  })
+
+  response.headers.append(
+    'Set-Cookie',
+    buildCookieHeader(cookieName, '', {
+      secure,
+      maxAge: 0,
+    }),
+  )
+}
+
+function setAuthorPortalActivationTransactionCookie(response: NextResponse, value: string) {
+  const cookieName = getAuthorPortalActivationTransactionCookieName()
+  const secure = process.env.NODE_ENV === 'production'
+  const maxAge = getAuthorPortalActivationTransactionMaxAgeSeconds()
+
+  response.cookies.set(cookieName, value, {
+    httpOnly: true,
+    secure,
+    sameSite: 'lax',
+    path: '/',
+    maxAge,
+  })
+
+  response.headers.append(
+    'Set-Cookie',
+    buildCookieHeader(cookieName, value, {
+      secure,
+      maxAge,
     }),
   )
 }

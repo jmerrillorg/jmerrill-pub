@@ -79,6 +79,12 @@ export function AuthorGate({
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Invalid access code.')
+      if (data?.requiresMicrosoftSignIn && typeof data.signInUrl === 'string') {
+        sessionStorage.removeItem(unlockedKey)
+        sessionStorage.removeItem(bootstrapContextKey)
+        window.location.href = data.signInUrl
+        return
+      }
       sessionStorage.setItem(unlockedKey, 'true')
       if (data?.context) {
         sessionStorage.setItem(
@@ -148,7 +154,7 @@ export function AuthorGate({
           type="password"
           value={code}
           onChange={(event) => setCode(event.target.value)}
-          placeholder="Activation code"
+          placeholder="Activation or recovery code"
           className="min-h-[52px] flex-1 rounded-2xl border border-white/10 bg-white/5 px-5 text-[14px] text-white outline-none transition-colors placeholder:text-white/20 focus:border-blue-500"
           required
         />
@@ -168,7 +174,7 @@ export function AuthorGate({
       ) : null}
 
       <p className="mt-4 text-[12px] leading-[1.7] text-white/35">
-        If you need help with password recovery or secure access restoration, please contact publishing@jmerrill.one so we can use the governed recovery path.
+        J Merrill Publishing will never ask for your password. If you need secure access restoration, contact publishing@jmerrill.one so staff can verify your identity and issue a one-time recovery code.
       </p>
     </div>
   )
@@ -179,6 +185,11 @@ async function tryRecoverAuthorSession(search = '') {
 
   for (let attempt = 0; attempt < AUTHOR_GATE_RECOVERY_ATTEMPTS; attempt += 1) {
     try {
+      await fetch('/api/author/activation/complete', {
+        method: 'POST',
+        credentials: 'same-origin',
+      }).catch(() => null)
+
       const response = await fetch(`/api/author/context${suffix}`, {
         cache: 'no-store',
         credentials: 'same-origin',

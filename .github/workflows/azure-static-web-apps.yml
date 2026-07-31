@@ -25,10 +25,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Install Guard Dependencies
+        run: npm ci
+
       - name: Guard catalog runtime source
         run: |
           node scripts/check-catalog-runtime-source.mjs
           node scripts/author_external_id_claim_resolution.test.mjs
+          node --test scripts/author_activation_recovery_governance.test.mjs
 
       - name: Verify author portal session secret
         shell: bash

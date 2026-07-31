@@ -29,8 +29,16 @@ const expectations = [
     name: 'object-id authorization remains Dataverse-backed',
     ok:
       auth.indexOf('const objectIds = collectIdentityObjectIdCandidates') >
+        auth.indexOf('const candidates = collectIdentityEmailCandidates') &&
+      auth.indexOf('for (const objectId of objectIds)') <
         auth.indexOf('for (const candidate of candidates)') &&
       auth.includes("dataverseFirst(config, 'contacts'"),
+  },
+  {
+    name: 'durable author sessions expose External ID object binding',
+    ok:
+      auth.includes('token.authorObjectId') &&
+      auth.includes('session.user as { authorObjectId?: string }'),
   },
 ]
 
