@@ -84,4 +84,3 @@ The prior successful readback remains preserved in `04-five-title-package-commis
 - Author-facing delivery clocks started: 0.
 - Stripe, payout, Business Central, DNS, or GATE-W3 changes: 0.
 - Secret values retained: 0.
-
