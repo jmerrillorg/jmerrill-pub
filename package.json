@@ -15,7 +15,8 @@
     "royalty-import-guard": "node scripts/check-royalty-import-route.mjs",
     "program005-pipeline-guard": "node scripts/program005_publishing_pipeline_reliability.test.mjs",
     "workflow-engine-guard": "node scripts/check-canonical-workflow-engine-declarations.mjs",
-    "commercial-architecture-guard": "node scripts/commercial_architecture_guard.test.mjs"
+    "commercial-architecture-guard": "node scripts/commercial_architecture_guard.test.mjs",
+    "functions-package-access-guard": "node scripts/check-functions-package-access-hygiene.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",

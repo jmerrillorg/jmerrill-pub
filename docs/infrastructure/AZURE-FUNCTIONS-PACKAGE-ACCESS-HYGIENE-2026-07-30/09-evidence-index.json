@@ -1,0 +1,50 @@
+{
+  "packageId": "AZURE-FUNCTIONS-PACKAGE-ACCESS-HYGIENE-2026-07-30",
+  "authority": "Jackie governed authorization",
+  "status": "COMPLETE",
+  "affectedFunctionApps": [
+    "func-jm1-acs-email-relay",
+    "func-jm1-diagnostic-ai-runner"
+  ],
+  "oldAccessDisposition": "REVOKED_NON_REFERENCED",
+  "websiteRunFromPackage": "ABSENT_ON_BOTH_APPS",
+  "functionIndexing": {
+    "func-jm1-acs-email-relay": "5/5",
+    "func-jm1-diagnostic-ai-runner": "24/24"
+  },
+  "protectedRoutes": "FAIL_CLOSED",
+  "storageKeysRotated": 0,
+  "obsoletePackageBlobsDeleted": 2,
+  "secretValuesRetained": 0,
+  "confirmedCompromise": false,
+  "completionEventRecommendation": {
+    "eventType": "AZURE_FUNCTIONS_PACKAGE_ACCESS_HYGIENE_COMPLETE",
+    "payload": {
+      "affectedFunctionApps": [
+        "func-jm1-acs-email-relay",
+        "func-jm1-diagnostic-ai-runner"
+      ],
+      "priorDeploymentMode": "SAS-bearing remote package path",
+      "oldAccessDisposition": "obsolete package blobs deleted; no current references",
+      "currentDeploymentMode": "extracted/remote-build path",
+      "referenceScanResult": "0 current package/SAS references",
+      "functionIndexingResult": "5/5 and 24/24",
+      "secretValuesRetained": 0,
+      "evidencePath": "docs/infrastructure/AZURE-FUNCTIONS-PACKAGE-ACCESS-HYGIENE-2026-07-30/",
+      "completionTimestamp": "2026-07-30T21:00:00Z"
+    }
+  },
+  "evidenceFiles": [
+    "00-authority-and-scope.md",
+    "01-current-function-state.md",
+    "02-package-source-metadata.csv",
+    "03-dependency-inventory.md",
+    "04-retirement-decision.md",
+    "05-post-retirement-validation.md",
+    "06-deployment-hardening.md",
+    "07-contained-event-disposition.md",
+    "08-known-limitations.md",
+    "09-evidence-index.json",
+    "checksums.sha256"
+  ]
+}

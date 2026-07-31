@@ -1,0 +1,4 @@
+function_app,storage_account,container,blob_name,last_modified_utc,content_length,sha256,stored_access_policy_count,retirement_action,post_action_exists
+func-jm1-acs-email-relay,stjm1acsrelay,function-releases,20260730190521-9b37a31d-8f7d-40ea-808f-c31a5d9b828e.zip,2026-07-30T19:05:21Z,16737,9a416b4d4a03c6a673a123d7b93a798cc5f66805dcc834e59ede1dec35a52b9c,0,deleted_obsolete_blob,false
+func-jm1-diagnostic-ai-runner,stjm1diagrunner,function-releases,20260730190540-67c6b9ec-114c-40ec-a125-759891feeafa.zip,2026-07-30T19:05:40Z,405935,02d7067699e992c00438e625ef53a253b375f5add8237549b871b5d5d669aa60,0,deleted_obsolete_blob,false
+
