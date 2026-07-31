@@ -51,6 +51,9 @@ export type AttachmentRole =
   | 'interiorProof'
   | 'coverProof'
   | 'productionProof'
+  | 'authorResponseMechanism'
+  | 'packageManifest'
+  | 'authorCoverMessage'
 
 export type AttachmentPolicy = {
   workspaceRequired: boolean
@@ -63,7 +66,14 @@ export const AUTHOR_PACKAGE_NOTIFICATION_POLICIES: Record<AuthorReviewPackageTyp
   DEVELOPMENTAL_EDITING_REVIEW: {
     workspaceRequired: true,
     emailRequired: true,
-    attachmentsRequired: ['editedManuscript', 'editorialMemo', 'reviewInstructions'],
+    attachmentsRequired: [
+      'editedManuscript',
+      'editorialMemo',
+      'reviewInstructions',
+      'authorResponseMechanism',
+      'packageManifest',
+      'authorCoverMessage',
+    ],
   },
   LINE_EDITING_REVIEW: {
     workspaceRequired: true,
@@ -83,7 +93,13 @@ export const AUTHOR_PACKAGE_NOTIFICATION_POLICIES: Record<AuthorReviewPackageTyp
   INTERIOR_LAYOUT_REVIEW: {
     workspaceRequired: true,
     emailRequired: true,
-    attachmentsRequired: ['interiorProof', 'reviewInstructions'],
+    attachmentsRequired: [
+      'interiorProof',
+      'reviewInstructions',
+      'authorResponseMechanism',
+      'packageManifest',
+      'authorCoverMessage',
+    ],
     secureLinkAllowedWhenOverBytes: 10 * 1024 * 1024,
   },
   COVER_DESIGN_REVIEW: {

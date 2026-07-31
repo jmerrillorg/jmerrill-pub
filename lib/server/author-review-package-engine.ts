@@ -81,6 +81,9 @@ export type PackageArtifactRole =
   | 'finalCoverProof'
   | 'reviewInstructions'
   | 'productionReviewInstructions'
+  | 'authorResponseMechanism'
+  | 'packageManifest'
+  | 'authorCoverMessage'
 
 export type AuthorDecisionOption =
   | 'APPROVE'
@@ -98,9 +101,23 @@ export type CanonicalPackagePolicy = {
   emailAttachmentRoles: PackageArtifactRole[]
   workspaceDownloadRoles: PackageArtifactRole[]
   cadencePolicyId: string
+  authorResponsePeriodCalendarDays: number
   authorDecisionOptions: AuthorDecisionOption[]
   nextStagePolicy: string
 }
+
+export type AuthorReviewResponseClock = {
+  deliveredAt: string
+  responseDueAt: string
+  reminderAt: string
+  overdueAt: string
+  internalEscalationAt: string
+  autoApprovalAuthorized: false
+}
+
+export const AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS = 7
+export const AUTHOR_REVIEW_REMINDER_DAY = 5
+export const AUTHOR_REVIEW_ESCALATION_DAY = 8
 
 export type PackageArtifactInput = {
   artifactId: string
@@ -221,19 +238,42 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     emailAttachmentRoles: ['assessment', 'recommendedEditorialPath', 'reviewInstructions'],
     workspaceDownloadRoles: ['assessment', 'recommendedEditorialPath', 'reviewInstructions'],
     cadencePolicyId: 'AUTHOR_REVIEW_STANDARD',
+    authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
     authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
     nextStagePolicy: 'route-to-developmental-line-copy-or-production-readiness',
   },
   DEVELOPMENTAL_EDITING: {
     stageCode: 'DEVELOPMENTAL_EDITING',
     packageType: 'DEVELOPMENTAL_EDITING_REVIEW',
-    requiredArtifactRoles: ['editedManuscript', 'developmentalMemo', 'reviewInstructions'],
+    requiredArtifactRoles: [
+      'editedManuscript',
+      'developmentalMemo',
+      'reviewInstructions',
+      'authorResponseMechanism',
+      'packageManifest',
+      'authorCoverMessage',
+    ],
     optionalArtifactRoles: [],
     allowedMimeTypesByRole: manuscriptMemoInstructionTypes(),
     qaChecks: baseQaChecks(),
-    emailAttachmentRoles: ['editedManuscript', 'developmentalMemo', 'reviewInstructions'],
-    workspaceDownloadRoles: ['editedManuscript', 'developmentalMemo', 'reviewInstructions'],
+    emailAttachmentRoles: [
+      'editedManuscript',
+      'developmentalMemo',
+      'reviewInstructions',
+      'authorResponseMechanism',
+      'packageManifest',
+      'authorCoverMessage',
+    ],
+    workspaceDownloadRoles: [
+      'editedManuscript',
+      'developmentalMemo',
+      'reviewInstructions',
+      'authorResponseMechanism',
+      'packageManifest',
+      'authorCoverMessage',
+    ],
     cadencePolicyId: 'EDITORIAL_AUTHOR_REVIEW_BY_WORD_COUNT',
+    authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
     authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
     nextStagePolicy: 'line-editing-eligibility',
   },
@@ -247,6 +287,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     emailAttachmentRoles: ['editedManuscript', 'lineEditingSummary', 'reviewInstructions'],
     workspaceDownloadRoles: ['editedManuscript', 'lineEditingSummary', 'reviewInstructions'],
     cadencePolicyId: 'EDITORIAL_AUTHOR_REVIEW_BY_WORD_COUNT',
+    authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
     authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
     nextStagePolicy: 'copyediting-eligibility',
   },
@@ -260,6 +301,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     emailAttachmentRoles: ['editedManuscript', 'copyeditingSummary', 'reviewInstructions'],
     workspaceDownloadRoles: ['editedManuscript', 'copyeditingSummary', 'reviewInstructions'],
     cadencePolicyId: 'EDITORIAL_AUTHOR_REVIEW_BY_WORD_COUNT',
+    authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
     authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
     nextStagePolicy: 'proofreading-eligibility',
   },
@@ -276,22 +318,45 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     emailAttachmentRoles: ['proofreadManuscript', 'proofreadingCoverNote'],
     workspaceDownloadRoles: ['proofreadManuscript', 'proofreadingCoverNote'],
     cadencePolicyId: 'AUTHOR_REVIEW_STANDARD',
+    authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
     authorDecisionOptions: ['APPROVE', 'APPROVE_WITH_MINOR_CORRECTIONS', 'REQUEST_CORRECTIONS', 'QUESTION'],
     nextStagePolicy: 'interior-layout-eligibility',
   },
   INTERIOR_LAYOUT: {
     stageCode: 'INTERIOR_LAYOUT',
     packageType: 'INTERIOR_LAYOUT_REVIEW',
-    requiredArtifactRoles: ['interiorProofPDF', 'reviewInstructions'],
+    requiredArtifactRoles: [
+      'interiorProofPDF',
+      'reviewInstructions',
+      'authorResponseMechanism',
+      'packageManifest',
+      'authorCoverMessage',
+    ],
     optionalArtifactRoles: [],
     allowedMimeTypesByRole: {
       interiorProofPDF: ['application/pdf'],
       reviewInstructions: ['application/pdf', 'text/plain'],
+      authorResponseMechanism: ['application/pdf', 'text/plain'],
+      packageManifest: ['application/json', 'application/pdf', 'text/plain'],
+      authorCoverMessage: ['application/pdf', 'text/plain'],
     },
     qaChecks: baseQaChecks(),
-    emailAttachmentRoles: ['interiorProofPDF', 'reviewInstructions'],
-    workspaceDownloadRoles: ['interiorProofPDF', 'reviewInstructions'],
+    emailAttachmentRoles: [
+      'interiorProofPDF',
+      'reviewInstructions',
+      'authorResponseMechanism',
+      'packageManifest',
+      'authorCoverMessage',
+    ],
+    workspaceDownloadRoles: [
+      'interiorProofPDF',
+      'reviewInstructions',
+      'authorResponseMechanism',
+      'packageManifest',
+      'authorCoverMessage',
+    ],
     cadencePolicyId: 'PRODUCTION_AUTHOR_REVIEW_STANDARD',
+    authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
     authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
     nextStagePolicy: 'cover-or-production-proof-eligibility',
   },
@@ -309,6 +374,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     emailAttachmentRoles: ['approvedConceptOrReviewSet', 'designRationale', 'reviewInstructions'],
     workspaceDownloadRoles: ['approvedConceptOrReviewSet', 'designRationale', 'reviewInstructions'],
     cadencePolicyId: 'PRODUCTION_AUTHOR_REVIEW_STANDARD',
+    authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
     authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
     nextStagePolicy: 'production-proof-eligibility',
   },
@@ -326,6 +392,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     emailAttachmentRoles: ['finalInteriorProof', 'finalCoverProof', 'productionReviewInstructions'],
     workspaceDownloadRoles: ['finalInteriorProof', 'finalCoverProof', 'productionReviewInstructions'],
     cadencePolicyId: 'FINAL_PRODUCTION_AUTHOR_REVIEW',
+    authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
     authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
     nextStagePolicy: 'distribution-readiness',
   },
@@ -488,6 +555,23 @@ export function evaluatePackageCadence(input: {
     cadenceBasis: `${policy.cadencePolicyId}:word-count-${input.cadence.wordCount || 0}:days-${days}`,
     earliestReleaseAt,
     scheduledReleaseAt: earliestReleaseAt,
+  }
+}
+
+export function createAuthorReviewResponseClock(input: {
+  deliveredAt?: string
+  deliverySucceeded: boolean
+  contractResponsePeriodCalendarDays?: number
+}): AuthorReviewResponseClock | null {
+  if (!input.deliverySucceeded || !input.deliveredAt) return null
+  const period = input.contractResponsePeriodCalendarDays || AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS
+  return {
+    deliveredAt: input.deliveredAt,
+    reminderAt: addCalendarDays(input.deliveredAt, AUTHOR_REVIEW_REMINDER_DAY),
+    responseDueAt: addCalendarDays(input.deliveredAt, period),
+    overdueAt: addCalendarDays(input.deliveredAt, period),
+    internalEscalationAt: addCalendarDays(input.deliveredAt, AUTHOR_REVIEW_ESCALATION_DAY),
+    autoApprovalAuthorized: false,
   }
 }
 
@@ -660,6 +744,9 @@ function manuscriptMemoInstructionTypes() {
     lineEditingSummary: ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
     copyeditingSummary: ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
     reviewInstructions: ['application/pdf', 'text/plain'],
+    authorResponseMechanism: ['application/pdf', 'text/plain'],
+    packageManifest: ['application/json', 'application/pdf', 'text/plain'],
+    authorCoverMessage: ['application/pdf', 'text/plain'],
   } satisfies Partial<Record<PackageArtifactRole, string[]>>
 }
 
@@ -681,6 +768,9 @@ function notificationRolesForPackageType(packageType: AuthorReviewPackageType): 
     finalCoverProof: 'reviewInstructions',
     reviewInstructions: 'reviewInstructions',
     productionReviewInstructions: 'reviewInstructions',
+    authorResponseMechanism: 'authorResponseMechanism',
+    packageManifest: 'packageManifest',
+    authorCoverMessage: 'authorCoverMessage',
   }
 }
 
@@ -713,6 +803,12 @@ function addBusinessDays(value: string, days: number) {
     const day = date.getUTCDay()
     if (day !== 0 && day !== 6) remaining -= 1
   }
+  return date.toISOString()
+}
+
+function addCalendarDays(value: string, days: number) {
+  const date = new Date(value)
+  date.setUTCDate(date.getUTCDate() + days)
   return date.toISOString()
 }
 

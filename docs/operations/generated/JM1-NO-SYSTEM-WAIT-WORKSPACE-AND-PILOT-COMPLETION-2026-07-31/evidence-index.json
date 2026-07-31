@@ -27,6 +27,10 @@
       "classification": "release_observability_and_package_readiness_addendum"
     },
     {
+      "path": "05-five-title-package-decision-resolution.md",
+      "classification": "package_policy_decision_resolution_addendum"
+    },
+    {
       "path": "checksums.sha256",
       "classification": "integrity_manifest"
     }
