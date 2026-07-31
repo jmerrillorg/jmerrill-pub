@@ -13,3 +13,4 @@ Sources: Jackie directive and Microsoft Azure Copilot documentation reviewed 202
 | Migration Agent | Public Preview | DISABLED / NOT APPROVED | Migration planning/execution is separately governed. Not approved. |
 
 Public Preview agents enabled by Cody: 0
+Portal final state: Request access to Agents (preview) off

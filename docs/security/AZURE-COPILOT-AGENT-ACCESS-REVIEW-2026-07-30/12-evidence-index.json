@@ -2,7 +2,7 @@
   "package": "AZURE-COPILOT-AGENT-ACCESS-REVIEW-2026-07-30",
   "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d",
   "executionDate": "2026-07-30",
-  "status": "PARTIALLY_COMPLETE_TENANT_CONTROL_BLOCKED",
+  "status": "COMPLETE_TENANT_CONTAINED",
   "evidence": [
     {
       "id": "AZ-COPILOT-DOCS-001",
@@ -23,10 +23,29 @@
       "finding": "Access management was reachable, but controls were not exposed; portal stated all-subscription and management-group access prerequisite."
     },
     {
+      "id": "AZ-COPILOT-PORTAL-002",
+      "type": "portal_observation",
+      "source": "Azure Portal Copilot admin center Access management",
+      "finding": "After authorized temporary root visibility elevation, Azure Copilot was changed to not available to all users, Azure Copilot RBAC was on, and Request access to Agents preview was off.",
+      "artifact": "screenshots/2026-07-30-azure-copilot-final-contained.png"
+    },
+    {
       "id": "AZ-COPILOT-CLI-001",
       "type": "azure_cli_readback",
       "source": "az account and provider queries",
       "finding": "Two JM1 subscriptions visible; Microsoft.SecurityCopilot provider not registered in visible subscriptions; Copilot-specific role assignments count 0."
+    },
+    {
+      "id": "AZ-COPILOT-CLI-002",
+      "type": "azure_cli_readback",
+      "source": "az role assignment and management-group queries",
+      "finding": "Temporary User Access Administrator assignment exposed the Tenant Root Group, then was removed; post-removal readback returned no root-scope assignment for jm1-admin."
+    },
+    {
+      "id": "AZ-COPILOT-RBAC-001",
+      "type": "azure_cli_readback",
+      "source": "az role definition and role assignment queries",
+      "finding": "No Azure Copilot user role definition was returned by CLI; no Copilot-named role assignments were found. No permanent Copilot access assignment was created."
     },
     {
       "id": "AZ-COPILOT-REPO-001",
@@ -38,6 +57,14 @@
   "productionChanges": 0,
   "azureResourceChanges": 0,
   "newPermissionsGranted": 0,
+  "temporaryPermissionsGrantedAndRemoved": 1,
   "agentsEnabledByCody": 0,
-  "postAugustVerification": "SCHEDULED_AS_GOVERNANCE_CHECKPOINT"
+  "postAugustVerification": "SCHEDULED_AS_GOVERNANCE_CHECKPOINT",
+  "finalTenantState": {
+    "azureCopilotAvailableToAllUsers": false,
+    "azureCopilotRbac": "on",
+    "agentsPreviewRequest": false,
+    "ordinaryUserAccess": false,
+    "permanentRoleAssignmentsCreatedByCody": 0
+  }
 }

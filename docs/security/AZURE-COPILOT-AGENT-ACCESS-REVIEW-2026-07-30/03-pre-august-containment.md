@@ -2,25 +2,31 @@
 
 ## Containment Attempt
 
-The authorized containment control was searched in the Azure Copilot admin center on 2026-07-30. The Access management blade did not expose toggle controls in the available session and instead displayed the prerequisite that the operator must have access to all Azure subscriptions and management groups in the tenant.
+The authorized containment control was searched in the Azure Copilot admin center on 2026-07-30. The Access management blade initially did not expose toggle controls and instead displayed the prerequisite that the operator must have access to all Azure subscriptions and management groups in the tenant.
 
-No tenant setting was changed.
+Jackie then authorized completion of the Azure Portal administrative prerequisite. Cody used temporary root-scope Azure visibility elevation for jm1-admin, exposed the Access management controls, removed the Agents preview access request, and turned off tenant-wide Azure Copilot availability.
 
 ## Current Containment Classification
 
-Pre-August containment state: PARTIAL  
-Reason: tenant-level control unavailable without satisfying a portal access prerequisite  
-Production impact: 0  
-Azure resource changes: 0  
-New permissions granted: 0  
+Pre-August containment state: COMPLETE
+Access model: RBAC gate on; Azure Copilot not available to all users
+Public Preview Agents: Disabled/not requested
+Production impact: 0
+Azure workload resource changes: 0
+Permanent permissions granted: 0
+Temporary permission elevation: User Access Administrator at /, removed after containment
 Agents enabled by Cody: 0
 
-## Required Jackie Administrator Action
+## Final State
 
-Use a tenant administrator account or approved process with access to all Azure subscriptions and management groups in the tenant. In the Azure Copilot admin center, complete one of the following before August 1, 2026:
+- Azure Copilot: governed
+- Tenant-wide access: off
+- Azure Copilot RBAC: on
+- General users: no Azure Copilot access
+- Agents preview: off
+- Approved Copilot admin group assignment: not created in this pass because no clearly approved Azure-administration security group was identified
+- Future admin access: requires a separate governed group or role assignment
 
-- Disable Azure Copilot tenant access pending individual agent review; or
-- Enable role-based access control for Azure Copilot and assign only an approved Azure Copilot user group, then verify Agents preview remains off or separately governed.
+## Required Future Jackie Administrator Action
 
-Do not enable public-preview agents during this containment action.
-
+If JM1 wants admin use of Azure Copilot, identify or create an approved Azure administration security group and assign the Azure Copilot user role only after Azure exposes the role cleanly and Jackie approves the access list.

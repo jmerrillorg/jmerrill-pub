@@ -1,12 +1,16 @@
 # Recommended Ruling
 
-Recommended ruling: Azure Copilot and Azure Copilot Agents remain not approved for JM1 operational use pending explicit access containment and individual agent review.
+Recommended ruling: Azure Copilot tenant governance is complete for the pre-August containment requirement.
 
-Recommended immediate action:
+Current governed posture:
 
-Jackie or an approved tenant administrator should complete the Azure Copilot admin-center prerequisite and either disable tenant-level access or enable RBAC-scoped access to an approved group only. Agents preview should remain off unless separately approved.
+- Azure Copilot tenant-wide availability is off.
+- Azure Copilot RBAC is on.
+- No ordinary tenant users have Azure Copilot access through the default tenant setting.
+- Public Preview Agents are disabled/not requested.
+- No agent is approved for JM1 operational use.
+- No permanent Azure permission expansion remains.
 
 Recommended next governed action:
 
-Review the Observability Agent for possible conditional enablement after access control, logging, audit, and evidence-retention requirements are approved.
-
+Identify or create an approved JM1 Azure administration security group, then review whether Azure Copilot chat should be made available to that group only. Review the Observability Agent separately before any future agent enablement. Deployment, Troubleshooting, Optimization, Resiliency, Migration, and additional preview agents remain not approved.
