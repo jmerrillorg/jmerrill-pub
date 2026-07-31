@@ -1,0 +1,23 @@
+{
+  "package": "Author-Operating-Center-Governed-Activation-and-Recovery-2026-07-30",
+  "status": "IMPLEMENTED_FOR_REVIEW",
+  "createdAt": "2026-07-30",
+  "sourceBranch": "codex/governed-author-activation-recovery",
+  "evidence": [
+    {
+      "path": "01-implementation-summary.md",
+      "classification": "repository-retained governance documentation"
+    },
+    {
+      "path": "02-staff-recovery-procedure.md",
+      "classification": "repository-retained operational procedure"
+    },
+    {
+      "path": "03-validation-register.md",
+      "classification": "repository-retained validation register"
+    }
+  ],
+  "secretsRetained": 0,
+  "runtimeEvidenceRetained": 0,
+  "authorCredentialsRetained": 0
+}

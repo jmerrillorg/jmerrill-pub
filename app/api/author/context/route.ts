@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server'
 
 import { getAuthorPortalContextFromCookies } from '@/lib/server/author-portal-context'
 import { getDurableAuthorSession } from '@/lib/server/author-durable-auth'
-import { getAuthorPortalContextFromAuthorEmail } from '@/lib/server/author-portal-context'
+import {
+  getAuthorPortalContextFromAuthorEmail,
+  getAuthorPortalContextFromExternalId,
+} from '@/lib/server/author-portal-context'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -19,6 +22,8 @@ export async function GET(request: Request) {
   const context =
     (await getAuthorPortalContextFromCookies(overrides)) ||
     (await getDurableAuthorSession().then((session) => {
+      const externalId = (session?.user as { authorObjectId?: string } | undefined)?.authorObjectId
+      if (externalId) return getAuthorPortalContextFromExternalId(externalId, overrides)
       const email = session?.user?.email
       if (!email) return null
       return getAuthorPortalContextFromAuthorEmail(email, overrides)
