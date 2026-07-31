@@ -42,7 +42,7 @@ export type AuthorPortalProjectSummary = {
   currentStageStatus?: string
   currentOperationalActivity?: string
   operationalActivityCode?: string
-  currentOwner?: 'Author' | 'Publisher' | 'System'
+  currentOwner?: 'Author' | 'Publisher'
   awaitingParty?: 'Publisher' | 'Author' | 'Printer' | 'Distributor' | 'Rights Holder' | 'Third Party' | 'No One'
   authorActionRequired?: boolean
   authorActionDescription?: string
@@ -1548,9 +1548,7 @@ function buildStageAwareProjectMessaging(
 ) {
   const owner: AuthorPortalProjectSummary['currentOwner'] = flags.authorActionAvailable
     ? 'Author'
-    : row.workspaceState === 'awaiting_governed_action'
-      ? 'System'
-      : 'Publisher'
+    : 'Publisher'
   const awaitingParty = resolveAwaitingParty(row, flags.authorActionAvailable, owner)
   const activityCode = resolveOperationalActivityCode(row, flags.authorActionAvailable)
   const stageOwnedMessaging =
@@ -1608,7 +1606,6 @@ function resolveAwaitingParty(
   if (authorActionAvailable) return 'Author'
   if (row.workspaceState === 'distribution_release_pending') return 'Distributor'
   if (row.workspaceState === 'published_legacy' || row.workspaceState === 'archived') return 'No One'
-  if (owner === 'System') return 'Publisher'
   return 'Publisher'
 }
 
@@ -2009,7 +2006,7 @@ function defaultNextActionLabel(row: ResolvedProjectRow) {
     case 'awaiting_governed_action':
       return normalizeWorkspaceText(row.stageStatus).includes('hold') || normalizeWorkspaceText(row.stageLabel).includes('hold')
         ? 'No action is required from you at this time. The publishing team will contact you if the hold requires author input.'
-        : 'This project is linked to your author relationship and is waiting for the next governed action.'
+        : 'This project is linked to your author relationship. The publishing team will confirm the next governed action.'
     case 'production_in_progress':
       if (normalizeWorkspaceText(row.stageLabel).includes('cover')) {
         return 'We will share cover concepts when they are approved for author review.'

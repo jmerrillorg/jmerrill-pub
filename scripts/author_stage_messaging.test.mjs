@@ -14,7 +14,7 @@ const expectations = [
       contextSource.includes('currentStageStatus?: string') &&
       contextSource.includes('currentOperationalActivity?: string') &&
       contextSource.includes('operationalActivityCode?: string') &&
-      contextSource.includes("currentOwner?: 'Author' | 'Publisher' | 'System'") &&
+      contextSource.includes("currentOwner?: 'Author' | 'Publisher'") &&
       contextSource.includes("awaitingParty?: 'Publisher' | 'Author' | 'Printer'") &&
       contextSource.includes('authorActionRequired?: boolean') &&
       contextSource.includes('authorActionDescription?: string') &&
