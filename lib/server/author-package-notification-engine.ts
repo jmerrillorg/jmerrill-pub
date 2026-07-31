@@ -1,3 +1,7 @@
+// Engine: Notification Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 import { EmailClient, type EmailAttachment, type EmailMessage } from '@azure/communication-email'
 import {
   renderAuthorCommunicationEmail,
