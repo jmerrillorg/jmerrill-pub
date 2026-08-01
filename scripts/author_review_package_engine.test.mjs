@@ -33,6 +33,7 @@ const {
   packageVisibilityForWorkspace,
   publisherTodayPackageMetrics,
   supersedePackage,
+  validateAuthorReviewResponseMechanism,
   validatePackageQa,
 } = await import('../lib/server/author-review-package-engine.ts')
 const { validateAuthorPackageNotification } = await import('../lib/server/author-package-notification-engine.ts')
@@ -146,6 +147,16 @@ test('all governed author-review stages consume one package policy register', ()
     assert.ok(policy.requiredArtifactRoles.length > 0)
     assert.ok(policy.cadencePolicyId)
     assert.ok(policy.nextStagePolicy)
+  }
+})
+
+test('author response policies use canonical governed response options', () => {
+  for (const policy of Object.values(PACKAGE_STAGE_POLICIES)) {
+    assert.deepEqual(policy.authorDecisionOptions, [
+      'APPROVE_AS_PRESENTED',
+      'APPROVE_WITH_CORRECTIONS',
+      'QUESTIONS_OR_CLARIFICATION_REQUESTED',
+    ])
   }
 })
 
@@ -475,6 +486,121 @@ test('seven-calendar-day author response clock starts only after successful deli
   assert.equal(clock?.overdueAt, '2026-07-27T08:00:00.000Z')
   assert.equal(clock?.internalEscalationAt, '2026-07-28T08:00:00.000Z')
   assert.equal(clock?.autoApprovalAuthorized, false)
+})
+
+test('author response mechanism records authenticated same-author package response', () => {
+  const pkg = { ...interiorPackage(), packageStatus: 'AUTHOR_REVIEW' }
+  const result = validateAuthorReviewResponseMechanism({
+    canonicalContactId: 'contact-jackie',
+    canonicalTitleId: pkg.titleId,
+    authenticatedContactId: 'contact-jackie',
+    authenticatedIdentityId: 'external-id-jackie',
+    stageId: pkg.stageId,
+    gateId: pkg.gateId,
+    packageId: pkg.packageId,
+    packageVersion: pkg.packageVersion,
+    manifestChecksum: pkg.packageChecksum,
+    responseType: 'APPROVE_WITH_CORRECTIONS',
+    authorComments: 'Please correct the consolidated marked items.',
+    submittedAt: now,
+    activePackage: pkg,
+  })
+  assert.equal(result.ok, true)
+  assert.equal(result.responseRecord.responseType, 'APPROVE_WITH_CORRECTIONS')
+  assert.equal(result.responseRecord.approvalGateRelationship, `${pkg.gateId}:${pkg.packageId}:${pkg.packageVersion}`)
+})
+
+test('author response mechanism blocks anonymous, cross-author, and superseded package responses', () => {
+  const pkg = { ...developmentalPackage(), packageStatus: 'AUTHOR_REVIEW' }
+  assert.equal(
+    validateAuthorReviewResponseMechanism({
+      canonicalContactId: 'contact-a',
+      canonicalTitleId: pkg.titleId,
+      authenticatedContactId: 'contact-a',
+      authenticatedIdentityId: '',
+      stageId: pkg.stageId,
+      gateId: pkg.gateId,
+      packageId: pkg.packageId,
+      packageVersion: pkg.packageVersion,
+      manifestChecksum: pkg.packageChecksum,
+      responseType: 'APPROVE_AS_PRESENTED',
+      submittedAt: now,
+      activePackage: pkg,
+    }).blocker,
+    'AUTHOR_RESPONSE_BLOCKED - AUTHENTICATED_IDENTITY_MISSING',
+  )
+  assert.equal(
+    validateAuthorReviewResponseMechanism({
+      canonicalContactId: 'contact-a',
+      canonicalTitleId: pkg.titleId,
+      authenticatedContactId: 'contact-b',
+      authenticatedIdentityId: 'external-id-b',
+      stageId: pkg.stageId,
+      gateId: pkg.gateId,
+      packageId: pkg.packageId,
+      packageVersion: pkg.packageVersion,
+      manifestChecksum: pkg.packageChecksum,
+      responseType: 'APPROVE_AS_PRESENTED',
+      submittedAt: now,
+      activePackage: pkg,
+    }).blocker,
+    'AUTHOR_RESPONSE_BLOCKED - CROSS_AUTHOR_ACCESS_DENIED',
+  )
+  assert.equal(
+    validateAuthorReviewResponseMechanism({
+      canonicalContactId: 'contact-a',
+      canonicalTitleId: pkg.titleId,
+      authenticatedContactId: 'contact-a',
+      authenticatedIdentityId: 'external-id-a',
+      stageId: pkg.stageId,
+      gateId: pkg.gateId,
+      packageId: pkg.packageId,
+      packageVersion: pkg.packageVersion,
+      manifestChecksum: pkg.packageChecksum,
+      responseType: 'APPROVE_AS_PRESENTED',
+      submittedAt: now,
+      activePackage: { ...pkg, packageStatus: 'SUPERSEDED' },
+    }).blocker,
+    'AUTHOR_RESPONSE_BLOCKED - SUPERSEDED_PACKAGE',
+  )
+})
+
+test('author response mechanism rejects wrong manifest checksum and empty correction detail', () => {
+  const pkg = { ...developmentalPackage(), packageStatus: 'AUTHOR_REVIEW' }
+  assert.equal(
+    validateAuthorReviewResponseMechanism({
+      canonicalContactId: 'contact-a',
+      canonicalTitleId: pkg.titleId,
+      authenticatedContactId: 'contact-a',
+      authenticatedIdentityId: 'external-id-a',
+      stageId: pkg.stageId,
+      gateId: pkg.gateId,
+      packageId: pkg.packageId,
+      packageVersion: pkg.packageVersion,
+      manifestChecksum: '0'.repeat(64),
+      responseType: 'APPROVE_AS_PRESENTED',
+      submittedAt: now,
+      activePackage: pkg,
+    }).blocker,
+    'AUTHOR_RESPONSE_BLOCKED - MANIFEST_CHECKSUM_MISMATCH',
+  )
+  assert.equal(
+    validateAuthorReviewResponseMechanism({
+      canonicalContactId: 'contact-a',
+      canonicalTitleId: pkg.titleId,
+      authenticatedContactId: 'contact-a',
+      authenticatedIdentityId: 'external-id-a',
+      stageId: pkg.stageId,
+      gateId: pkg.gateId,
+      packageId: pkg.packageId,
+      packageVersion: pkg.packageVersion,
+      manifestChecksum: pkg.packageChecksum,
+      responseType: 'QUESTIONS_OR_CLARIFICATION_REQUESTED',
+      submittedAt: now,
+      activePackage: pkg,
+    }).blocker,
+    'AUTHOR_RESPONSE_BLOCKED - CORRECTION_OR_QUESTION_DETAIL_REQUIRED',
+  )
 })
 
 test('workspace visibility follows package status', () => {
