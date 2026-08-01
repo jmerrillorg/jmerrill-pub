@@ -24,6 +24,7 @@ const {
   PACKAGE_STAGE_POLICIES,
   assembleAuthorReviewPackage,
   buildNotificationInputFromPackage,
+  certifyGovernedCadenceRetest,
   createAuthorReviewResponseClock,
   createPackageManifest,
   evaluatePackageCadence,
@@ -279,6 +280,111 @@ test('complete package release hands off to canonical notification engine', () =
   assert.equal(notification.recipientPolicy.replyTo, 'publishing@jmerrill.one')
   assert.deepEqual(notification.recipientPolicy.bcc, ['publishing@jmerrill.one'])
   assert.equal('cc' in notification.recipientPolicy, false)
+})
+
+test('governed cadence retest certifies only when all six evidence lanes pass under one correlation', () => {
+  const pkg = proofreadingPackage({
+    packageId: 'package-cadence-retest-v1',
+    packageVersion: 'v1',
+  })
+  const notification = buildNotificationInputFromPackage({
+    pkg,
+    recipientEmail: 'synthetic-author@example.test',
+    workspaceAccessLocation: 'https://jmerrill.pub/author/portal',
+    notificationTemplateId: 'proofreading-review',
+    attachments: [artifact('proofreadManuscript'), artifact('proofreadingCoverNote')],
+  })
+  const evidence = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6'].map((condition, index) => ({
+    condition,
+    status: 'PASS',
+    source: 'synthetic-cadence-retest',
+    recordId: `cadence-log-${condition}`,
+    timestamp: `2026-08-01T12:0${index}:00.000Z`,
+    correlationId: pkg.correlationId,
+    detail: `condition ${condition} pass`,
+  }))
+
+  const certification = certifyGovernedCadenceRetest({
+    package: pkg,
+    scheduledReleaseAt: now,
+    actualStartAt: now,
+    releasedAt: now,
+    notification,
+    notificationResult: {
+      messageId: 'acs-message-synthetic-cadence',
+      providerStatus: 'accepted',
+      sentAt: now,
+    },
+    authorAccess: {
+      accessProofId: 'author-access-proof-synthetic',
+      status: 'AVAILABLE',
+      timestamp: now,
+    },
+    nextGate: {
+      gateId: pkg.gateId,
+      state: 'AUTHOR_RESPONSE_PENDING',
+      createdAt: now,
+    },
+    executionLogRecords: evidence,
+  })
+
+  assert.equal(certification.certified, true)
+  assert.equal(certification.classification, 'CADENCE_CERTIFIED')
+  assert.equal(certification.finalPackageStatus, 'AUTHOR_REVIEW')
+  assert.equal(certification.responseClock?.autoApprovalAuthorized, false)
+  assert.deepEqual(
+    certification.conditions.map((condition) => condition.status),
+    ['PASS', 'PASS', 'PASS', 'PASS', 'PASS', 'PASS'],
+  )
+})
+
+test('governed cadence retest fails closed when execution-log completion evidence is missing', () => {
+  const pkg = proofreadingPackage({ packageId: 'package-cadence-retest-missing-log' })
+  const notification = buildNotificationInputFromPackage({
+    pkg,
+    recipientEmail: 'synthetic-author@example.test',
+    workspaceAccessLocation: 'https://jmerrill.pub/author/portal',
+    notificationTemplateId: 'proofreading-review',
+    attachments: [artifact('proofreadManuscript'), artifact('proofreadingCoverNote')],
+  })
+  const evidence = ['L1', 'L2', 'L3', 'L4', 'L5'].map((condition, index) => ({
+    condition,
+    status: 'PASS',
+    source: 'synthetic-cadence-retest',
+    recordId: `cadence-log-${condition}`,
+    timestamp: `2026-08-01T12:1${index}:00.000Z`,
+    correlationId: pkg.correlationId,
+    detail: `condition ${condition} pass`,
+  }))
+
+  const certification = certifyGovernedCadenceRetest({
+    package: pkg,
+    scheduledReleaseAt: now,
+    actualStartAt: now,
+    releasedAt: now,
+    notification,
+    notificationResult: {
+      messageId: 'acs-message-synthetic-cadence',
+      providerStatus: 'accepted',
+      sentAt: now,
+    },
+    authorAccess: {
+      accessProofId: 'author-access-proof-synthetic',
+      status: 'AVAILABLE',
+      timestamp: now,
+    },
+    nextGate: {
+      gateId: pkg.gateId,
+      state: 'AUTHOR_RESPONSE_PENDING',
+      createdAt: now,
+    },
+    executionLogRecords: evidence,
+  })
+
+  assert.equal(certification.certified, false)
+  assert.equal(certification.classification, 'CADENCE_NOT_CERTIFIED_INTERNAL_DEFECT_REMAINS')
+  assert.ok(certification.blockers.includes('L6_EVIDENCE_NOT_CONCLUSIVE'))
+  assert.equal(certification.conditions.find((condition) => condition.condition === 'L6')?.status, 'NO_EVIDENCE')
 })
 
 test('Developmental and Interior notifications preserve required response, manifest, and cover-message attachments', () => {
