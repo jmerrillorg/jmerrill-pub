@@ -1,0 +1,34 @@
+{
+  "package": "JM1-PUBLISHING-PRODUCTION-CLOSEOUT-2026-08-01",
+  "created": "2026-08-01",
+  "classification": "PUBLISHING IMPLEMENTATION COMPLETE - TITLE-LEVEL WORK REMAINS",
+  "pr368": {
+    "number": 368,
+    "head": "226158cb18da405ab09ab18b3b9ecc563144c410",
+    "mergeSha": "bc64b314c949cfd177b5b8e59efa1a6208cacc4a",
+    "mergedAt": "2026-08-01T06:27:31Z",
+    "deploymentRun": "30689479000"
+  },
+  "currentProduction": {
+    "release": "77230c077f37910f75cf7b274734475ac1a92d3e",
+    "runtime": "NODE|24-lts",
+    "nodeDefaultVersion": "~24",
+    "health": "ready"
+  },
+  "safety": {
+    "authorCommunication": 0,
+    "packageRelease": 0,
+    "duplicateNotification": 0,
+    "lifecycleAdvancement": 0,
+    "stripeActivity": 0,
+    "businessCentralActivity": 0,
+    "paymentOrPayout": 0,
+    "dnsModification": 0,
+    "secretValuesRetained": 0
+  },
+  "documents": [
+    "JM1-PUBLISHING-PRODUCTION-CLOSEOUT-2026-08-01.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}
