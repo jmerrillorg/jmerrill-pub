@@ -14,6 +14,7 @@
 | --- | --- |
 | Azure App Service Linux | `NODE|24-lts` confirmed by Azure CLI supported runtime list |
 | Azure App Service app setting | Microsoft documentation recommends `WEBSITE_NODE_DEFAULT_VERSION="~24"` |
+| Azure Static Web Apps preview | PR deploy rejected Node 24.13.0 and listed supported versions as 18, 20, and 22 |
 | Azure Functions runtime | Azure Functions v4 lists Node.js 24 as GA, and Azure CLI listed `Node|24` |
 | Function programming model | Existing JavaScript v4 package model with `@azure/functions@^4.7.0`; tests pass under Node 24 |
 | JM1 live Function hosts | `Node|24` runtime smoke failed with 503 for protected probes; rollback to `Node|22` restored 401 fail-closed responses |
@@ -41,3 +42,4 @@
 | npm install-scripts approval warning for root dependencies | npm 11 policy warning / safe for this wave | Recorded; no approval change made |
 | Next custom font lint warning | Pre-existing / safe | Recorded; not runtime-related |
 | Dataverse catalog configuration missing during static generation | Pre-existing / safe local build warning | Expected without production Dataverse secrets in local build |
+| SWA deploy action rejected Node 24.13.0 | Platform limitation / blocking for SWA Node 24 only | SWA workflow pinned to Node 22, newest supported non-20 runtime; App Service remains Node 24 path |

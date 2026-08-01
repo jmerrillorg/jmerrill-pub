@@ -17,6 +17,8 @@ Note: Function package metadata now declares `>=22 <25` because the live Functio
 - `.github/workflows/azure-app-service-publishing.yml`
 - `.github/workflows/azure-static-web-apps.yml`
 
+Note: App Service workflow uses Node 24. Static Web Apps workflow uses Node 22 because the SWA deploy action rejected Node 24 and listed 18, 20, and 22 as supported.
+
 ## Infrastructure
 
 - `infra/jm1-infra-006/app-service/main.bicep`

@@ -19,7 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     env:
-      NODE_VERSION: "24"
+      # Azure Static Web Apps currently accepts 18, 20, and 22 for Next.js deploys.
+      # Keep this on the newest supported non-20 runtime until SWA supports Node 24.
+      NODE_VERSION: "22"
     permissions:
       contents: read
       pull-requests: write
