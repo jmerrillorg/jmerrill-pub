@@ -28,6 +28,7 @@
     "02-specific-internal-assignments.md",
     "03-release-boundary-and-stop-conditions.md",
     "04-validation-and-integrity.md",
+    "05-intentional-leader-interior-layout-priority1.md",
     "evidence-index.json",
     "checksums.sha256"
   ]
