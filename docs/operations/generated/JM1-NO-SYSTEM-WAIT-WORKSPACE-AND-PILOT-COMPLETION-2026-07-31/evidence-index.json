@@ -31,6 +31,10 @@
       "classification": "package_policy_decision_resolution_addendum"
     },
     {
+      "path": "cadence-verification-gap-retrieval-2026-07-31-v1.md",
+      "classification": "cadence_gap_retrieval_read_only"
+    },
+    {
       "path": "checksums.sha256",
       "classification": "integrity_manifest"
     }
