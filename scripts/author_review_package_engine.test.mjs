@@ -64,6 +64,16 @@ function artifact(role, overrides = {}) {
     workspaceDownload: overrides.workspaceDownload,
     canMaterializeForEmail: overrides.canMaterializeForEmail ?? true,
     canRender: overrides.canRender ?? true,
+    pageCount: overrides.pageCount,
+    expectedPageCount: overrides.expectedPageCount,
+    manifestPageCount: overrides.manifestPageCount,
+    expectedMinimumFileSize: overrides.expectedMinimumFileSize,
+    visualQaPassed: overrides.visualQaPassed,
+    titlePagePresent: overrides.titlePagePresent,
+    tocPresent: overrides.tocPresent,
+    manuscriptSectionsComplete: overrides.manuscriptSectionsComplete,
+    productionNotesVisible: overrides.productionNotesVisible,
+    truncatedOutput: overrides.truncatedOutput,
     contentBytesBase64: overrides.contentBytesBase64 || Buffer.from(role).toString('base64'),
   }
 }
@@ -120,7 +130,19 @@ function interiorPackage(overrides = {}) {
     packageVersion: overrides.packageVersion || 'v1',
     artifacts:
       overrides.artifacts || [
-        artifact('interiorProofPDF', { stageId: 'stage-interior' }),
+        artifact('interiorProofPDF', {
+          stageId: 'stage-interior',
+          fileSize: 3_100_000,
+          pageCount: 214,
+          expectedPageCount: 214,
+          manifestPageCount: 214,
+          visualQaPassed: true,
+          titlePagePresent: true,
+          tocPresent: true,
+          manuscriptSectionsComplete: true,
+          productionNotesVisible: false,
+          truncatedOutput: false,
+        }),
         artifact('reviewInstructions', { stageId: 'stage-interior' }),
         artifact('authorResponseMechanism', { stageId: 'stage-interior', mimeType: 'text/plain' }),
         artifact('packageManifest', { stageId: 'stage-interior', mimeType: 'application/json' }),
@@ -476,6 +498,75 @@ test('Interior package cannot release without proof, instructions, response path
   })
   assert.equal(pkg.packageStatus, 'QA_FAILED')
   assert.equal(pkg.qaStatus, 'QA_FAILED')
+})
+
+test('Interior proof guard rejects one-page truncated production artifacts', () => {
+  const pkg = interiorPackage({
+    artifacts: [
+      artifact('interiorProofPDF', {
+        artifactId: 'd99c9048-b084-f111-ab0f-00224820105b',
+        stageId: 'stage-interior',
+        fileSize: 2680,
+        pageCount: 1,
+        expectedPageCount: 214,
+        manifestPageCount: 214,
+        visualQaPassed: false,
+        titlePagePresent: false,
+        tocPresent: false,
+        manuscriptSectionsComplete: false,
+        productionNotesVisible: true,
+        truncatedOutput: true,
+      }),
+      artifact('reviewInstructions', { stageId: 'stage-interior' }),
+      artifact('authorResponseMechanism', { stageId: 'stage-interior', mimeType: 'text/plain' }),
+      artifact('packageManifest', { stageId: 'stage-interior', mimeType: 'application/json' }),
+      artifact('authorCoverMessage', { stageId: 'stage-interior' }),
+    ],
+  })
+
+  assert.equal(pkg.qaStatus, 'QA_FAILED')
+  assert.deepEqual(
+    pkg.qaFailures.map((failure) => failure.code).toSorted(),
+    [
+      'PACKAGE_QA_FAILED - MISSING_MANUSCRIPT_SECTIONS',
+      'PACKAGE_QA_FAILED - MISSING_TITLE_PAGE',
+      'PACKAGE_QA_FAILED - MISSING_TOC',
+      'PACKAGE_QA_FAILED - PAGE_COUNT_MISMATCH',
+      'PACKAGE_QA_FAILED - PAGE_COUNT_MISMATCH',
+      'PACKAGE_QA_FAILED - PDF_SIZE_ABNORMAL',
+      'PACKAGE_QA_FAILED - PRODUCTION_NOTES_VISIBLE',
+      'PACKAGE_QA_FAILED - TRUNCATED_OUTPUT',
+      'PACKAGE_QA_FAILED - VISUAL_QA_NOT_PASSED',
+    ].toSorted(),
+  )
+})
+
+test('Interior proof guard blocks author release until front matter and visual QA pass', () => {
+  const pkg = interiorPackage({
+    artifacts: [
+      artifact('interiorProofPDF', {
+        stageId: 'stage-interior',
+        fileSize: 3_116_756,
+        pageCount: 388,
+        expectedPageCount: 388,
+        manifestPageCount: 388,
+        visualQaPassed: true,
+        titlePagePresent: false,
+        tocPresent: false,
+        manuscriptSectionsComplete: true,
+        productionNotesVisible: false,
+        truncatedOutput: false,
+      }),
+      artifact('reviewInstructions', { stageId: 'stage-interior' }),
+      artifact('authorResponseMechanism', { stageId: 'stage-interior', mimeType: 'text/plain' }),
+      artifact('packageManifest', { stageId: 'stage-interior', mimeType: 'application/json' }),
+      artifact('authorCoverMessage', { stageId: 'stage-interior' }),
+    ],
+  })
+
+  assert.equal(pkg.qaStatus, 'QA_FAILED')
+  assert.ok(pkg.qaFailures.some((failure) => failure.code === 'PACKAGE_QA_FAILED - MISSING_TITLE_PAGE'))
+  assert.ok(pkg.qaFailures.some((failure) => failure.code === 'PACKAGE_QA_FAILED - MISSING_TOC'))
 })
 
 test('seven-calendar-day author response clock starts only after successful delivery and never auto-approves', () => {

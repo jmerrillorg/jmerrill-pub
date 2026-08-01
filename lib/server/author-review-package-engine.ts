@@ -65,6 +65,14 @@ export type PackageQaFailure =
   | 'PACKAGE_QA_FAILED - STALE_STAGE_ARTIFACT'
   | 'PACKAGE_QA_FAILED - RENDER_FAILURE'
   | 'PACKAGE_QA_FAILED - AUTHOR_METADATA_MISMATCH'
+  | 'PACKAGE_QA_FAILED - PDF_SIZE_ABNORMAL'
+  | 'PACKAGE_QA_FAILED - PAGE_COUNT_MISMATCH'
+  | 'PACKAGE_QA_FAILED - TRUNCATED_OUTPUT'
+  | 'PACKAGE_QA_FAILED - PRODUCTION_NOTES_VISIBLE'
+  | 'PACKAGE_QA_FAILED - MISSING_TITLE_PAGE'
+  | 'PACKAGE_QA_FAILED - MISSING_TOC'
+  | 'PACKAGE_QA_FAILED - MISSING_MANUSCRIPT_SECTIONS'
+  | 'PACKAGE_QA_FAILED - VISUAL_QA_NOT_PASSED'
 
 export type PackageArtifactRole =
   | 'assessment'
@@ -236,6 +244,16 @@ export type PackageArtifactInput = {
   canMaterializeForEmail?: boolean
   canRender?: boolean
   contentBytesBase64?: string
+  pageCount?: number
+  expectedPageCount?: number
+  manifestPageCount?: number
+  expectedMinimumFileSize?: number
+  visualQaPassed?: boolean
+  titlePagePresent?: boolean
+  tocPresent?: boolean
+  manuscriptSectionsComplete?: boolean
+  productionNotesVisible?: boolean
+  truncatedOutput?: boolean
 }
 
 export type PackageManifestItem = {
@@ -313,6 +331,7 @@ export type CanonicalAuthorReviewPackage = {
   preparedAt: string
   qaStatus: PackageQaResult['status']
   qaCompletedAt?: string
+  qaFailures: Array<{ code: PackageQaFailure; detail: string }>
   cadencePolicyId: string
   earliestReleaseAt?: string
   releasedAt?: string
@@ -599,6 +618,9 @@ export function validatePackageQa(input: {
     if (artifact.canRender === false) {
       failures.push({ code: 'PACKAGE_QA_FAILED - RENDER_FAILURE', detail: role })
     }
+    if (requiresProductionProofControls(artifact.role)) {
+      failures.push(...validateProductionProofControls(artifact))
+    }
   }
 
   const duplicateVersion = input.artifacts.find((artifact, index, all) =>
@@ -613,6 +635,55 @@ export function validatePackageQa(input: {
 
   if (failures.length) return { ok: false, status: 'QA_FAILED', completedAt: input.completedAt, failures }
   return { ok: true, status: 'READY_INTERNAL', completedAt: input.completedAt, checks: policy.qaChecks }
+}
+
+function requiresProductionProofControls(role: PackageArtifactRole) {
+  return role === 'interiorProofPDF' || role === 'finalInteriorProof'
+}
+
+function validateProductionProofControls(artifact: PackageArtifactInput) {
+  const failures: Array<{ code: PackageQaFailure; detail: string }> = []
+  const expectedMinimumFileSize = artifact.expectedMinimumFileSize ?? 100_000
+  const expectedPageCount = artifact.expectedPageCount ?? artifact.manifestPageCount
+
+  if (artifact.fileSize < expectedMinimumFileSize) {
+    failures.push({
+      code: 'PACKAGE_QA_FAILED - PDF_SIZE_ABNORMAL',
+      detail: `${artifact.role}:file-size-${artifact.fileSize}`,
+    })
+  }
+  if (!artifact.pageCount || (expectedPageCount && artifact.pageCount !== expectedPageCount)) {
+    failures.push({
+      code: 'PACKAGE_QA_FAILED - PAGE_COUNT_MISMATCH',
+      detail: `${artifact.role}:actual-${artifact.pageCount ?? 'missing'}:expected-${expectedPageCount ?? 'recorded'}`,
+    })
+  }
+  if (artifact.manifestPageCount && artifact.pageCount && artifact.pageCount !== artifact.manifestPageCount) {
+    failures.push({
+      code: 'PACKAGE_QA_FAILED - PAGE_COUNT_MISMATCH',
+      detail: `${artifact.role}:actual-${artifact.pageCount}:manifest-${artifact.manifestPageCount}`,
+    })
+  }
+  if (artifact.truncatedOutput === true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - TRUNCATED_OUTPUT', detail: artifact.role })
+  }
+  if (artifact.productionNotesVisible === true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - PRODUCTION_NOTES_VISIBLE', detail: artifact.role })
+  }
+  if (artifact.titlePagePresent !== true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - MISSING_TITLE_PAGE', detail: artifact.role })
+  }
+  if (artifact.tocPresent !== true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - MISSING_TOC', detail: artifact.role })
+  }
+  if (artifact.manuscriptSectionsComplete !== true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - MISSING_MANUSCRIPT_SECTIONS', detail: artifact.role })
+  }
+  if (artifact.visualQaPassed !== true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - VISUAL_QA_NOT_PASSED', detail: artifact.role })
+  }
+
+  return failures
 }
 
 export function evaluatePackageCadence(input: {
@@ -851,6 +922,7 @@ export function assembleAuthorReviewPackage(input: {
     preparedAt: input.preparedAt,
     qaStatus: qaResult.status,
     qaCompletedAt: qaResult.completedAt,
+    qaFailures: qaResult.ok ? [] : qaResult.failures,
     cadencePolicyId: policy.cadencePolicyId,
     earliestReleaseAt: cadence.earliestReleaseAt || undefined,
     correlationId: input.correlationId,
