@@ -2,6 +2,7 @@
   "packageId": "JM1-PRIORITY-WAVE-1-COMPLETION-2026-07-31",
   "packageType": "priority-wave-completion-report",
   "generatedAt": "2026-08-01T02:10:00Z",
+  "updatedAt": "2026-08-01T07:45:00Z",
   "authority": "Jackie Smith, Jr. Priority Wave 1 authorization, 2026-07-31",
   "mode": "governed execution with evidence",
   "classification": "PRIORITY WAVE 1 COMPLETE - EXTERNAL DEPENDENCIES REMAIN",
@@ -10,6 +11,11 @@
       "path": "JM1-PRIORITY-WAVE-1-COMPLETION-REPORT-2026-07-31.md",
       "sha256": "e4b5feeaf490bafd8bc8968bdfc082a1cb488f884a6eb5c0371ebbf85cb2d415",
       "purpose": "Consolidated Priority Wave 1 completion report and external-dependency register"
+    },
+    {
+      "path": "JM1-WAVE-1-PRODUCTION-CLOSEOUT-2026-08-01.md",
+      "sha256": "cd0c92d69146c1e5e08a445c51f9e3904bcf579faebfbac6409ea84474d5e982",
+      "purpose": "PR #368 merge, production deployment, production runtime, and Wave 1 closeout readback"
     }
   ],
   "relatedEvidencePackages": [
@@ -20,8 +26,13 @@
   "relatedPullRequests": [
     {
       "number": 368,
-      "status": "open",
+      "status": "merged",
       "purpose": "Five-title package commissioning evidence and author-review package policy"
+    },
+    {
+      "number": 370,
+      "status": "open",
+      "purpose": "Cadence remediation and governed retest certification"
     },
     {
       "number": 356,
@@ -39,6 +50,18 @@
     "sharePointUpdates": 0,
     "authorCommunications": 0,
     "executionLogEvents": 0,
-    "productionDeployments": 0
+    "productionDeployments": 1
+  },
+  "productionCloseout": {
+    "pullRequest": 368,
+    "mergeCommit": "bc64b314c949cfd177b5b8e59efa1a6208cacc4a",
+    "mergedAt": "2026-08-01T06:27:31Z",
+    "deploymentWorkflowRun": "30689479000",
+    "deploymentConclusion": "success",
+    "release": "bc64b314c949cfd177b5b8e59efa1a6208cacc4a",
+    "productionHealth": "ready",
+    "paymentGate": "disabled",
+    "unauthenticatedAuthorContext": 401,
+    "unauthorizedBusinessActions": 0
   }
 }
