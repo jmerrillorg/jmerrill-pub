@@ -22,11 +22,13 @@ Standardize active JM1 Publishing runtime authority on Node.js 24 while preservi
 - Publishing App Service staging was deployed and certified on Node 24; final PR-head deployment evidence is recorded in the PR return package.
 - The two live Function Apps were tested on `Node|24`, returned platform 503 on protected probes, and were rolled back to `Node|22` with 401 fail-closed recovery confirmed.
 
-## Current Completion Classification
+## Final Completion Classification
 
-NODE 24 STANDARDIZATION NOT COMPLETE
+NODE 24 STANDARDIZATION COMPLETE - DOCUMENTED HOSTING PLATFORM EXCEPTIONS REMAIN
 
-The root application, App Service CI, App Service infrastructure, and Publishing App Service staging are Node 24-certified. Static Web Apps preview remains on Node 22 due Microsoft SWA deploy support limits, and the active Azure Function host runtime cannot be promoted in this wave because the live Function Apps did not pass safe runtime smoke checks on `Node|24`; they were returned to the last known-good `Node|22` state. No production slot swap, DNS change, author communication, or business-record advancement is authorized by this package.
+The root application, App Service CI, App Service infrastructure, Publishing App Service staging, and Publishing App Service production are Node 24-certified. Static Web Apps preview remains on Node 22 due Microsoft SWA deploy support limits, and the active Azure Function host runtime remains on the last known-good `Node|22` state after Node 24 host smoke failed and rollback restored protected-route 401 behavior.
+
+These remaining Node 22 surfaces are documented hosting platform exceptions, not incomplete INFRA-007 engineering. No DNS change, author communication, business-record advancement, package release, Stripe action, payout, or Business Central posting occurred during final certification.
 
 ## Official Platform Basis
 
