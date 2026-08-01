@@ -1,0 +1,34 @@
+{
+  "package": "JM1-FIVE-TITLE-PUBLISHING-OPERATIONS-2026-08-01",
+  "generated": "2026-08-01",
+  "status": "PARTIALLY_COMPLETE_TITLE_LEVEL_PUBLISHING_WORK_REMAINS",
+  "pr377": {
+    "state": "MERGED",
+    "merge_sha": "723d1b26f2a71f1596eb712a3a48a1798101a783",
+    "main_sha_after_merge": "723d1b26f2a71f1596eb712a3a48a1798101a783"
+  },
+  "titles": [
+    "The Intentional Leader",
+    "The Long Watch",
+    "Before You Were Born",
+    "The General's Will and Last Testament",
+    "Establishing Glory: The Library"
+  ],
+  "release_actions": {
+    "author_communications_sent": 0,
+    "approval_gates_created": 0,
+    "manual_stage_advancements": 0,
+    "response_clocks_started_before_delivery": 0,
+    "duplicate_gates": 0,
+    "duplicate_communications": 0
+  },
+  "files": [
+    "00-executive-summary.md",
+    "01-title-readback-and-final-states.md",
+    "02-specific-internal-assignments.md",
+    "03-release-boundary-and-stop-conditions.md",
+    "04-validation-and-integrity.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}
