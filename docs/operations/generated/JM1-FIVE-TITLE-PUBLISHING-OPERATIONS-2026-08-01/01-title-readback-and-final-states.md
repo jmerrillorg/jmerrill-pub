@@ -25,4 +25,3 @@ Generated: 2026-08-01
 ## Operational Classification
 
 No title is waiting on SYSTEM, AUTOMATION, or Cody. Each remaining item has a named publishing function and next action in `02-specific-internal-assignments.md`.
-

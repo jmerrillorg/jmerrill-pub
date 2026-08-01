@@ -38,4 +38,3 @@ Archive confirmed
 Dataverse send log written
 Gate changed to AWAITING_AUTHOR_RESPONSE
 Seven-day clock started from confirmed delivery
-

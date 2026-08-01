@@ -38,4 +38,3 @@ Secret values retained: 0
 ## Required Next State
 
 Each title must move independently from a named publishing assignment to package QA, release gate creation, cadence or governed delivery, and then Awaiting Author Response only after confirmed delivery.
-

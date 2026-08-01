@@ -58,4 +58,3 @@ Due date: 2026-08-02
 Escalation date: 2026-08-03
 Package-readiness condition: exactly one canonical Contact, no duplicate relationship, complete author-safe package, response mechanism, cover message, manifest, and gate.
 Expected author-release date: 2026-08-04, if recipient authority and package QA pass.
-
