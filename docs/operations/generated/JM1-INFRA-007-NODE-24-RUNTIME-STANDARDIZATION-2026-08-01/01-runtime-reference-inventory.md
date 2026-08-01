@@ -13,7 +13,7 @@ Discovery command class:
 | `package-lock.json` | Generated lockfile | Regenerated under Node 24/npm 11 |
 | `.nvmrc` | Active local runtime pin | Added `24` |
 | `.github/workflows/azure-app-service-publishing.yml` | Active CI/CD runtime authority | Updated `NODE_VERSION` to `24`; added runtime proof |
-| `.github/workflows/azure-static-web-apps.yml` | Active SWA preview authority | Updated from implicit/old runtime to explicit Node 22; Node 24 retained as platform exception because SWA deploy rejected Node 24 |
+| `.github/workflows/azure-static-web-apps.yml` | Historical Publishing SWA authority | Publishing SWA: RETIRED UNDER JM1-INFRA-012 |
 | `infra/jm1-infra-006/app-service/main.bicep` | Active App Service IaC | Updated production and staging declarations to `NODE|24-lts`; updated `WEBSITE_NODE_DEFAULT_VERSION` to `~24` |
 | `azure-functions/diagnostic-ai-runner/package.json` | Active Function package | Updated Node compatibility window to `>=22 <25`; live host retained on `Node|22` after failed `Node|24` smoke |
 | `azure-functions/diagnostic-ai-runner/package-lock.json` | Generated Function lockfile | Regenerated under Node 24/npm 11 |
@@ -41,4 +41,4 @@ None found in active runtime, CI, App Service, Function package, or forward-look
 | --- | --- | --- |
 | `func-jm1-acs-email-relay` Azure runtime | Active Function host runtime | Retained at `Node|22`; attempted `Node|24` returned 503 on protected route, rollback returned 401 |
 | `func-jm1-diagnostic-ai-runner` Azure runtime | Active Function host runtime | Retained at `Node|22`; attempted `Node|24` returned 503 on protected route, rollback returned 401 |
-| `.github/workflows/azure-static-web-apps.yml` | Active transitional SWA preview runtime | Retained at Node 22; SWA deploy rejected Node 24 and listed only 18, 20, 22 |
+| `.github/workflows/azure-static-web-apps.yml` | Historical Publishing SWA runtime | Publishing SWA: RETIRED UNDER JM1-INFRA-012 |
