@@ -1,0 +1,37 @@
+{
+  "package": "JM1-FIVE-TITLE-EXECUTIVE-RECOVERY-2026-08-01",
+  "generatedAt": "2026-08-01",
+  "mode": "EXECUTIVE_RECOVERY",
+  "deadline": "2026-08-03",
+  "status": "PARTIALLY_COMPLETE_PROTECTED_PRODUCTION_CREDENTIALS_AND_HUMAN_REVIEW_REQUIRED",
+  "pr": {
+    "number": 378,
+    "branch": "codex/five-title-publishing-operations-closeout",
+    "head": "9609bdd478e0faf7096e068d24ad8c2ce033f7d8",
+    "mergeState": "CLEAN",
+    "reviewDecision": "PENDING"
+  },
+  "titles": [
+    "The Intentional Leader",
+    "The Long Watch",
+    "Before You Were Born",
+    "The General's Will and Last Testament",
+    "Establishing Glory: The Library"
+  ],
+  "delivery": {
+    "packagesSent": 0,
+    "duplicateGates": 0,
+    "duplicateCommunications": 0,
+    "responseClocksStarted": 0,
+    "blocker": "Protected production credentials unavailable in current execution environment"
+  },
+  "files": [
+    "00-executive-summary.md",
+    "01-recovery-board.md",
+    "02-invalid-blocker-policy.md",
+    "03-pr378-validation-and-merge-boundary.md",
+    "04-production-delivery-boundary.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}
