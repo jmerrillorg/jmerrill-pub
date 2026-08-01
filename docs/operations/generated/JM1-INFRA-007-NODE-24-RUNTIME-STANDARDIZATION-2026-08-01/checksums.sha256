@@ -1,0 +1,11 @@
+42cd462f865ba3102fe758a5c047c7db4b6aa9ba43dd61d9f14ed82236a3b0f5  ./00-executive-summary.md
+a53df444c8586e1eb16d0b32869ec474b45e9ecc745be6bc5d22342b47998b1e  ./01-runtime-reference-inventory.md
+eee9f5bbdde94d41587f40cc1d4dd1c4f128b2d875a54d0c2bf5d698c2e33cbc  ./02-compatibility-assessment.md
+b2cd3fdf431e1b6c73efeca3c03e7ccf15f718bbec5a6cd8bb90dc9384cec52a  ./03-files-changed.md
+29f6a8c5289e3a91cd5fd407d3e81b47ad63e622f26441f2cec5d79f0487e36d  ./04-local-validation.md
+e8c3a95c18163ede7735bb7cbbac224c3988931ce2cc9e8105ed24f34a17d47c  ./05-app-service-staging-certification.md
+8cbfdfe1dd8cc64461263a46746801a8bfa49f56216bf181656bde83f7926624  ./06-azure-functions-certification.md
+d33dc133bebdf1ae3c8817415d2b1993796333e6cf14e660986e3781068f4613  ./07-production-promotion-readiness.md
+14c61c689bb7675931cb0cd7b531ad5678ffd62c264ef44f7fb003102c29efab  ./08-runtime-readback-before-after.md
+e0fb30b462c3f82321d4d138304171351d3f8bc7af2033972cc72c587cddbf4b  ./09-exceptions-and-external-dependencies.md
+c88e65d8d0dd34fa9175e552621b145bed7084bbe310c69be0a487cb776ddacd  ./evidence-index.json

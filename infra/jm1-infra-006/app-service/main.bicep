@@ -79,7 +79,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
     httpsOnly: true
     clientAffinityEnabled: false
     siteConfig: {
-      linuxFxVersion: 'NODE|20-lts'
+      linuxFxVersion: 'NODE|24-lts'
       alwaysOn: true
       http20Enabled: true
       ftpsState: 'Disabled'
@@ -107,7 +107,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = {
     httpsOnly: true
     clientAffinityEnabled: false
     siteConfig: {
-      linuxFxVersion: 'NODE|20-lts'
+      linuxFxVersion: 'NODE|24-lts'
       alwaysOn: true
       http20Enabled: true
       ftpsState: 'Disabled'
@@ -229,7 +229,7 @@ func appSettings(appInsightsConnectionString string, vaultUri string, slotEnviro
   setting('WEBSITE_SKIP_NODE_MODULES_TAR', '1', false)
   setting('WEBSITE_WARMUP_PATH', '/api/health', false)
   setting('WEBSITE_WARMUP_STATUSES', '200', false)
-  setting('WEBSITE_NODE_DEFAULT_VERSION', '~20', false)
+  setting('WEBSITE_NODE_DEFAULT_VERSION', '~24', false)
   setting('JM1_ENVIRONMENT', slotEnvironmentName == 'prod' ? 'production' : 'staging', true)
   setting('JM1_RELEASE_SHA', 'set-by-deployment-pipeline', true)
   setting('NEXTAUTH_URL', slotEnvironmentName == 'prod' ? 'https://jmerrill.pub' : stagingHostName, true)
