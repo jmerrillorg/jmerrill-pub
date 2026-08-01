@@ -20,7 +20,8 @@
     "02-title-readiness-matrix.md",
     "03-artifact-inventory-and-blockers.md",
     "04-validation-results.md",
-    "05-final-disposition.md"
+    "05-final-disposition.md",
+    "06-first-cadence-eligible-release-readback.md"
   ],
   "releaseEffects": {
     "authorCommunications": 0,
