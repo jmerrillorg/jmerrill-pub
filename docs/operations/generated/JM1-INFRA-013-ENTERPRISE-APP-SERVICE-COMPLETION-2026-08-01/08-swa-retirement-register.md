@@ -2,7 +2,7 @@
 
 | SWA dependency | Retirement state | Reason |
 |---|---|---|
-| Publishing SWA | Retired / absent from active inventory | `jmerrill.pub` now runs on App Service |
+| Publishing SWA | RETIRED UNDER JM1-INFRA-012 | `jmerrill.pub` now runs on App Service |
 | `jmerrill-one` | Held | Live public site still SWA |
 | `jmerrill-financial` | Held | Live public site still SWA |
 | `foundation-main` | Held | Live public site still SWA |
@@ -15,4 +15,3 @@
 ## Retirement Decision
 
 Enterprise-wide SWA retirement is not yet complete. The commercial retirement program may continue property by property after each App Service replacement is real-site certified.
-

@@ -12,10 +12,10 @@ JM1-INFRA-007 is complete at the authorized production boundary.
 
 Node 24 was commissioned for the active Publishing App Service path, including local development authority, CI, App Service infrastructure, staging deployment, production runtime configuration, and production release validation.
 
-Node 22 remains only where the hosting platform or transitional deployment path requires it:
+Node 22 remains only where the hosting platform requires it:
 
 - Azure Functions live host runtime remains Node 22 after the Node 24 host smoke path returned 503 and rollback restored protected-route 401 behavior.
-- Azure Static Web Apps remains Node 22 because the SWA deployment action rejected Node 24 and listed supported versions as 18, 20, and 22; SWA is a legacy deployment path scheduled for retirement behind App Service.
+- Publishing SWA: RETIRED UNDER JM1-INFRA-012.
 
 No author communication, package release, lifecycle advancement, payment, Stripe money movement, Business Central posting, DNS change, or Static Web Apps retirement occurred during final certification.
 
@@ -31,7 +31,7 @@ No author communication, package release, lifecycle advancement, payment, Stripe
 | Publishing App Service production | Node 20 | `NODE|24-lts`; `~24` | Supported | No | Production certified on release `77230c077f37910f75cf7b274734475ac1a92d3e` |
 | Azure Functions source packages | Node 20-adjacent metadata | Node `>=22 <25` compatibility boundary; lockfiles regenerated under Node 24/npm 11 | Source-compatible | Host exception | JM1-INFRA-010 Flex Consumption / Function-host modernization discovery |
 | Azure Functions live host runtime | Node 22 | Node 22 | Supported last-known-good host runtime | Yes | Future Function-host modernization; do not extend INFRA-007 |
-| Azure Static Web Apps preview | Legacy Node 20/default path | Node 22 | Newest supported SWA deployment runtime observed | Yes | Retire SWA path under App Service migration; do not force Node 24 |
+| Publishing Static Web Apps preview | Legacy Node 20/default path | Retired under JM1-INFRA-012 | Not an active Publishing runtime authority | No active exception | Do not reopen INFRA-007 or restore the retired SWA workflow |
 
 ## Merge Evidence
 
@@ -60,8 +60,8 @@ The failed PR check was accepted as a narrow governed exception for PR #369 at h
 | App Service staging certification | PASS |
 | Azure Functions source/package validation | PASS |
 | Azure Functions live host runtime | Node 22 retained as documented hosting exception |
-| Static Web Apps Node 24 path | Unsupported by observed SWA deploy action |
-| Static Web Apps Node 22 path | Build/guard path completed; deployment blocked by max staging-environment capacity |
+| Publishing SWA Node 24 path | Historical limitation only; Publishing SWA retired under JM1-INFRA-012 |
+| Publishing SWA Node 22 path | Historical build/guard path only; no active Publishing deployment authority |
 
 This exception is not a permanent bypass and does not establish precedent for unrelated checks.
 
@@ -178,22 +178,22 @@ The rollback to Node 22 is accepted for active Function host runtime. No further
 
 ## Static Web Apps Findings
 
-Static Web Apps remains a legacy deployment path and should not block INFRA-007 closure.
+Publishing SWA: RETIRED UNDER JM1-INFRA-012. The historical SWA Node 24 limitation remains preserved as past-state evidence but is no longer an active Publishing runtime exception.
 
 | Finding | Result |
 | --- | --- |
-| SWA Node 24 deploy support | Not supported in observed deploy action; accepted versions listed as 18, 20, 22 |
-| SWA current configured PR runtime | Node 22 |
-| SWA PR result for #369 | Build/guards completed; deployment blocked by max staging-environment capacity |
+| SWA Node 24 deploy support | Historical finding only; accepted versions listed as 18, 20, 22 during the prior PR run |
+| Publishing SWA current configured PR runtime | Publishing SWA: RETIRED UNDER JM1-INFRA-012 |
+| SWA PR result for #369 | Historical build/guard result only; no active Publishing deployment authority |
 | Production responsibility | App Service is the certified production path for Publishing |
-| Retirement recommendation | Retire SWA path under App Service migration governance; do not force Node 24 |
+| Retirement disposition | Publishing SWA retired under JM1-INFRA-012 |
 
 ## Platform Exceptions
 
 | Exception ID | Description | Blocking for INFRA-007 closure | Future work |
 | --- | --- | --- | --- |
 | INFRA-007-EX-FUNC-001 | Active Function host runtime remains Node 22 after live Node 24 host smoke failed and rollback restored safe behavior | No | JM1-INFRA-010 |
-| INFRA-007-EX-SWA-001 | Static Web Apps deploy action does not support Node 24 and is capacity-blocked for preview deployment | No | SWA retirement under App Service migration |
+| INFRA-007-EX-SWA-001 | Historical Static Web Apps Node 24 limitation | No - superseded | Publishing SWA: RETIRED UNDER JM1-INFRA-012 |
 | INFRA-007-EX-DEP-001 | npm audit/deprecation posture remains a dependency-modernization concern | No | JM1-INFRA-011 |
 | INFRA-007-EX-OTEL-001 | Azure Monitor OpenTelemetry migration remains a platform-modernization item | No | JM1-INFRA-009 |
 
