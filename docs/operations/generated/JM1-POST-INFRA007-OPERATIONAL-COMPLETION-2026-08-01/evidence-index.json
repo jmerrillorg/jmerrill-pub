@@ -1,6 +1,6 @@
 {
   "package": "JM1-POST-INFRA007-OPERATIONAL-COMPLETION-2026-08-01",
-  "status": "PARTIALLY COMPLETE - MATERIAL AUTHOR-FACING PACKAGE BLOCKERS REMAIN",
+  "status": "PARTIALLY COMPLETE - SWA CREDENTIAL HYGIENE COMPLETE; AUTHOR-FACING PACKAGE BLOCKERS REMAIN",
   "generatedAt": "2026-08-01T12:04:00Z",
   "branch": "codex/post-infra007-operational-completion",
   "files": [
@@ -11,7 +11,9 @@
     "04-workspace-and-communication-boundary.md",
     "05-final-disposition.md",
     "evidence-index.json",
-    "checksums.sha256"
+    "checksums.sha256",
+    "06-swa-credential-hygiene-assessment.md",
+    "07-open-pr-normalization.md"
   ],
   "nonActions": {
     "authorCommunications": 0,
@@ -19,6 +21,11 @@
     "sharePointMutations": 0,
     "duplicateGates": 0,
     "duplicateContacts": 0,
+    "secretValuesRetained": 0
+  },
+  "swaCredentialHygiene": {
+    "status": "COMPLETE",
+    "activeCredentialsRequiringRotation": 0,
     "secretValuesRetained": 0
   }
 }
