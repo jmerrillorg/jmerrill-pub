@@ -39,6 +39,10 @@
       "classification": "cadence_remediation_and_controlled_synthetic_retest"
     },
     {
+      "path": "JM1-CADENCE-FINAL-CERTIFICATION-2026-08-01.md",
+      "classification": "cadence_final_production_certification"
+    },
+    {
       "path": "checksums.sha256",
       "classification": "integrity_manifest"
     }
