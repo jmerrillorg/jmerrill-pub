@@ -9,7 +9,12 @@
   "npmVersion": "11.19.0",
   "recertificationNodeVersion": "v24.11.0",
   "recertificationNpmVersion": "11.6.1",
-  "status": "NODE_24_STANDARDIZATION_COMPLETE_DOCUMENTED_HOSTING_PLATFORM_EXCEPTIONS_REMAIN",
+  "status": "NODE_24_STANDARDIZATION_COMPLETE_FUNCTION_HOSTING_PLATFORM_EXCEPTION_REMAINS",
+  "swaRetirement": {
+    "program": "JM1-INFRA-012",
+    "status": "PUBLISHING_SWA_RETIRED",
+    "authority": "Static Web Apps removed from Publishing deployment authority chain after App Service production validation"
+  },
   "pullRequest": 369,
   "certifiedHeadSha": "680308d75970d3b66b8f93a6f07f3b4d150cb8e7",
   "mergeSha": "77230c077f37910f75cf7b274734475ac1a92d3e",

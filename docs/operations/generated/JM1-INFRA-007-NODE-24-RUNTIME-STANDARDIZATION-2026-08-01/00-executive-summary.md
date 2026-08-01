@@ -14,7 +14,7 @@ Standardize active JM1 Publishing runtime authority on Node.js 24 while preservi
 - Root `@types/node` moved from Node 20 to Node 24.
 - `.nvmrc` added as the single local runtime pin.
 - App Service GitHub workflow moved from `NODE_VERSION=20` to `NODE_VERSION=24`.
-- Static Web Apps workflow now explicitly uses Node 22 instead of Node 20 or runner default because the SWA deploy action rejected Node 24 and listed only 18, 20, and 22 as supported.
+- Static Web Apps was retired from the Publishing authority chain under JM1-INFRA-012 after App Service production certification.
 - Publishing App Service Bicep moved to `NODE|24-lts` and `WEBSITE_NODE_DEFAULT_VERSION=~24`.
 - Azure Function package compatibility boundaries updated for the diagnostic runner and ACS email relay.
 - Function lockfiles regenerated under Node 24/npm 11.
@@ -26,9 +26,9 @@ Standardize active JM1 Publishing runtime authority on Node.js 24 while preservi
 
 NODE 24 STANDARDIZATION COMPLETE - DOCUMENTED HOSTING PLATFORM EXCEPTIONS REMAIN
 
-The root application, App Service CI, App Service infrastructure, Publishing App Service staging, and Publishing App Service production are Node 24-certified. Static Web Apps preview remains on Node 22 due Microsoft SWA deploy support limits, and the active Azure Function host runtime remains on the last known-good `Node|22` state after Node 24 host smoke failed and rollback restored protected-route 401 behavior.
+The root application, App Service CI, App Service infrastructure, Publishing App Service staging, and Publishing App Service production are Node 24-certified. Static Web Apps no longer remains an active Publishing runtime authority after JM1-INFRA-012. The active Azure Function host runtime remains on the last known-good `Node|22` state after Node 24 host smoke failed and rollback restored protected-route 401 behavior.
 
-These remaining Node 22 surfaces are documented hosting platform exceptions, not incomplete INFRA-007 engineering. No DNS change, author communication, business-record advancement, package release, Stripe action, payout, or Business Central posting occurred during final certification.
+The remaining Node 22 surface is a documented Azure Functions hosting exception, not incomplete INFRA-007 engineering. No author communication, business-record advancement, package release, Stripe action, payout, or Business Central posting occurred during final certification.
 
 ## Official Platform Basis
 
