@@ -1,0 +1,13 @@
+{
+  "title": "JM1 Priority Wave 2 Completion",
+  "status": "PRIORITY WAVE 2 COMPLETE - EXTERNAL LEGAL OR ADMINISTRATIVE DEPENDENCIES REMAIN",
+  "created_at": "2026-08-01T00:00:00-04:00",
+  "repository": "jmerrillorg/jmerrill-pub",
+  "branch": "codex/priority-wave-2-governance",
+  "files": [
+    "JM1-PRIORITY-WAVE-2-COMPLETION-REPORT-2026-08-01.md",
+    "02-external-dependency-register.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}

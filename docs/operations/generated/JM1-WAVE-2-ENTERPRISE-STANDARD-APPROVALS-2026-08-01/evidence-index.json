@@ -1,0 +1,22 @@
+{
+  "title": "JM1 Wave 2 Enterprise Standard Approvals",
+  "status": "COMPLETED AND APPROVED WITH NAMED EXTERNAL DEPENDENCIES",
+  "created_at": "2026-08-01T00:00:00-04:00",
+  "repository": "jmerrillorg/jmerrill-pub",
+  "branch": "codex/priority-wave-2-governance",
+  "files": [
+    "00-decision-register.md",
+    "01-approved-capability-pipeline-standard.md",
+    "02-approved-capability-catalog-schema.md",
+    "03-approved-pipeline-register.md",
+    "04-approved-agent-registry-v2.md",
+    "05-annex-a-authority-disposition.md",
+    "06-entitlement-gap-register.csv",
+    "07-amendment-and-supersession-log.md",
+    "08-execution-log-event-placeholders.md",
+    "09-annex-a-entitlement-evidence-register.md",
+    "10-enterprise-standard-approval-register.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}
