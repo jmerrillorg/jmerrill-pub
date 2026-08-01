@@ -4,9 +4,10 @@ c9d9f1156c9fc0fa485e3a3184b641bd00c9249112bc5c7fa6ce5650e3a0060c  docs/operation
 c8bcabf013c841342227532dde05f99ec8cb2a4b27aae5ad0025d18268d39376  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/03-production-generation-and-qa.md
 ca6aa3d848605c04e3a3c75be0ee86dc64a0402e5f5dc5c6eb0668c15c35d098  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/04-front-matter-decision-gap.md
 8059881f8ba4d6b9524f38a39cf63ff8050b77338daf6335027cabfd0a9c7b75  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/05-package-readiness-and-release-disposition.md
+f966a23c4d08c131333f45aa0adcfd1a8f730b94a1ccaca39407990218ef9a1a  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/06-resumption-readback-and-stop-condition.md
 723fc053774d733d1293082a75e34c6cc958b960f7474a2ff7b9408be32a4269  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Proof.pdf
 d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Source.docx
-9916cdb58fd74ae0c33f4f7b22d3d454e60d759ae091c9c42baa735c20270619  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/evidence-index.json
+fdbb15b0e07aa6519d5c96d5f00196e67fcc8b663f46313af5c1ab349c93627c  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/evidence-index.json
 c21f30c7a5aee3a126f4f5241c5198699cd8b46d7061f33737cbf70aa5bbce76  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/qa/artifact-checksums.sha256
 c45f49f17d93a55e74a2e758aa455d364d9f7a9f1a49471d3d461eb5282472ba  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/qa/content-integrity.json
 65713c444531f4f3a051e3a97a53d11747e3ca6d46d0bd3d4b172721684e22c8  docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/qa/pdfinfo.txt

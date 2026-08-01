@@ -37,6 +37,7 @@
     "03-production-generation-and-qa.md",
     "04-front-matter-decision-gap.md",
     "05-package-readiness-and-release-disposition.md",
+    "06-resumption-readback-and-stop-condition.md",
     "qa/content-integrity.json",
     "qa/pdfinfo.txt",
     "qa/artifact-checksums.sha256",
