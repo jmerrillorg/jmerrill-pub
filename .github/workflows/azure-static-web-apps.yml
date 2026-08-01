@@ -18,12 +18,25 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+    env:
+      NODE_VERSION: "24"
     permissions:
       contents: read
       pull-requests: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Confirm Runtime
+        run: |
+          node --version
+          npm --version
 
       - name: Install Guard Dependencies
         run: npm ci

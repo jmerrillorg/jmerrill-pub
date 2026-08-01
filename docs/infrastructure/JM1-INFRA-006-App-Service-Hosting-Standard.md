@@ -37,7 +37,7 @@ GitHub Actions
 | DR strategy | Reproducible IaC plus backup region readiness in East US 2; no active-active in Phase 1 |
 | Resource group | `rg-jm1-pub-prod-appsvc` |
 | App Service Plan | Linux, S1 initially; P1v3 when sustained runtime load or availability need justifies |
-| Web App | Linux Web App, Node 20 LTS |
+| Web App | Linux Web App, Node 24 LTS |
 | Slot strategy | Production plus `staging`; slot swap only after runtime certification |
 | Telemetry | Application Insights workspace-based telemetry plus App Service diagnostics |
 | Secret source | Azure Key Vault references; no secret values in source, workflow logs, Dataverse, or browser bundles |

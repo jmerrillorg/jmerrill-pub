@@ -29,7 +29,7 @@ This runbook prepares the migration sequence. It does not authorize Azure resour
 | App Service Plan | `asp-jm1-pub-prod-linux` |
 | Web App | `app-jm1-pub-prod` |
 | Slot | `staging` |
-| Runtime | Node 20 LTS on Linux |
+| Runtime | Node 24 LTS on Linux |
 | Health path | `/api/health` |
 | Secret path | Key Vault references |
 | Telemetry | `appi-jm1-pub-prod` plus App Service diagnostic settings |

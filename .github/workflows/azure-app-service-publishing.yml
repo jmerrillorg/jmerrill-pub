@@ -35,7 +35,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "24"
   APP_SERVICE_PACKAGE: jmerrill-pub-appservice-${{ github.sha }}.zip
   AZURE_RESOURCE_GROUP: ${{ vars.JM1_PUB_APP_SERVICE_RESOURCE_GROUP }}
   AZURE_WEBAPP_NAME: ${{ vars.JM1_PUB_APP_SERVICE_NAME }}
@@ -56,6 +56,11 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
+
+      - name: Confirm Runtime
+        run: |
+          node --version
+          npm --version
 
       - name: Install Dependencies
         run: npm ci

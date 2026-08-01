@@ -1,0 +1,33 @@
+{
+  "packageId": "JM1-INFRA-007-NODE-24-RUNTIME-STANDARDIZATION-2026-08-01",
+  "program": "JM1-INFRA-007",
+  "workItem": "Node.js 24 Runtime Standardization",
+  "branch": "codex/node-24-runtime-upgrade",
+  "baseSha": "582b4aa0be928d905bb89b1b3d357a094e1f75a5",
+  "nodeVersion": "v24.18.1",
+  "npmVersion": "11.19.0",
+  "status": "READY_FOR_STAGING_CERTIFICATION",
+  "files": [
+    "00-executive-summary.md",
+    "01-runtime-reference-inventory.md",
+    "02-compatibility-assessment.md",
+    "03-files-changed.md",
+    "04-local-validation.md",
+    "05-app-service-staging-certification.md",
+    "06-azure-functions-certification.md",
+    "07-production-promotion-readiness.md",
+    "08-runtime-readback-before-after.md",
+    "09-exceptions-and-external-dependencies.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ],
+  "writeBoundary": {
+    "productionDeployment": 0,
+    "productionRuntimeMutation": 0,
+    "dnsChanges": 0,
+    "authorCommunications": 0,
+    "publishingLifecycleAdvancement": 0,
+    "stripeOrPaymentActions": 0,
+    "secretValuesRetained": 0
+  }
+}
