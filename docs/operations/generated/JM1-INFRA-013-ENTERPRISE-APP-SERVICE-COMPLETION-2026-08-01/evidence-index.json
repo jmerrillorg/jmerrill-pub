@@ -19,6 +19,7 @@
     "08-swa-retirement-register.md",
     "09-production-validation.md",
     "10-rollback-register.md",
-    "11-remaining-exceptions.md"
+    "11-remaining-exceptions.md",
+    "12-governance-closure-and-decision-queue.md"
   ]
 }
