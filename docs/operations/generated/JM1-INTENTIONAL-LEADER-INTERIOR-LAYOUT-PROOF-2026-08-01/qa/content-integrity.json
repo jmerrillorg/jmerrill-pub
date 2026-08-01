@@ -1,0 +1,29 @@
+{
+  "title": "The Intentional Leader",
+  "source_docx": "docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Source.docx",
+  "source_sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+  "source_word_count": 66638,
+  "source_non_empty_paragraphs": 6918,
+  "pdf": "docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Proof.pdf",
+  "pdf_sha256": "723fc053774d733d1293082a75e34c6cc958b960f7474a2ff7b9408be32a4269",
+  "pdf_size_bytes": 3116756,
+  "pdf_page_count": 388,
+  "pdf_extracted_word_count": 66651,
+  "beginning_marker_present": true,
+  "ending_marker_present": true,
+  "sample_text_extractable": true,
+  "forbidden_marker_hits": [],
+  "front_matter": {
+    "title_page_present": false,
+    "copyright_page_present": false,
+    "isbn_page_present": false,
+    "table_of_contents_present": false,
+    "publishing_decision_required": true
+  },
+  "qa_disposition": {
+    "body_proof_complete": true,
+    "visual_sample_qa_passed": true,
+    "author_release_eligible": false,
+    "release_blocker": "Required front matter has no governed publishing decision."
+  }
+}

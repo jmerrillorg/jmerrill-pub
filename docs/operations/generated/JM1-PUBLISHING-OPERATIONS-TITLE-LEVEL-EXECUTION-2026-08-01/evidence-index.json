@@ -1,0 +1,35 @@
+{
+  "package": "JM1-PUBLISHING-OPERATIONS-TITLE-LEVEL-EXECUTION-2026-08-01",
+  "generated": "2026-08-01",
+  "classification": "PARTIALLY_COMPLETE_TITLE_LEVEL_RELEASE_BLOCKERS_REMAIN",
+  "runtimeProof": {
+    "editorialReplay": "EDITORIAL-RUNTIME-ADMIN-2026-08-01T18:15:58.065Z",
+    "packageHandoff": "56973fae-552b-4e58-94f4-c50ab0866f82",
+    "executionLog": "587a6612-d58d-f111-8077-7c1e525b15c2",
+    "examined": 20,
+    "idempotent": 20,
+    "duplicateExecution": 0
+  },
+  "sourceChanges": [
+    "lib/server/author-review-package-engine.ts",
+    "scripts/author_review_package_engine.test.mjs"
+  ],
+  "evidenceFiles": [
+    "00-executive-summary.md",
+    "01-response-mechanism.md",
+    "02-title-readiness-matrix.md",
+    "03-artifact-inventory-and-blockers.md",
+    "04-validation-results.md",
+    "05-final-disposition.md",
+    "06-first-cadence-eligible-release-readback.md"
+  ],
+  "releaseEffects": {
+    "authorCommunications": 0,
+    "approvalGates": 0,
+    "manualStageAdvancement": 0,
+    "duplicateGates": 0,
+    "duplicateCommunications": 0,
+    "responseClocksStartedBeforeDelivery": 0,
+    "secretValuesRetained": 0
+  }
+}

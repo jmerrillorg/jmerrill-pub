@@ -65,6 +65,14 @@ export type PackageQaFailure =
   | 'PACKAGE_QA_FAILED - STALE_STAGE_ARTIFACT'
   | 'PACKAGE_QA_FAILED - RENDER_FAILURE'
   | 'PACKAGE_QA_FAILED - AUTHOR_METADATA_MISMATCH'
+  | 'PACKAGE_QA_FAILED - PDF_SIZE_ABNORMAL'
+  | 'PACKAGE_QA_FAILED - PAGE_COUNT_MISMATCH'
+  | 'PACKAGE_QA_FAILED - TRUNCATED_OUTPUT'
+  | 'PACKAGE_QA_FAILED - PRODUCTION_NOTES_VISIBLE'
+  | 'PACKAGE_QA_FAILED - MISSING_TITLE_PAGE'
+  | 'PACKAGE_QA_FAILED - MISSING_TOC'
+  | 'PACKAGE_QA_FAILED - MISSING_MANUSCRIPT_SECTIONS'
+  | 'PACKAGE_QA_FAILED - VISUAL_QA_NOT_PASSED'
 
 export type PackageArtifactRole =
   | 'assessment'
@@ -87,10 +95,9 @@ export type PackageArtifactRole =
   | 'authorCoverMessage'
 
 export type AuthorDecisionOption =
-  | 'APPROVE'
-  | 'APPROVE_WITH_MINOR_CORRECTIONS'
-  | 'REQUEST_CORRECTIONS'
-  | 'QUESTION'
+  | 'APPROVE_AS_PRESENTED'
+  | 'APPROVE_WITH_CORRECTIONS'
+  | 'QUESTIONS_OR_CLARIFICATION_REQUESTED'
 
 export type CanonicalPackagePolicy = {
   stageCode: PackageStageCode
@@ -114,6 +121,45 @@ export type AuthorReviewResponseClock = {
   overdueAt: string
   internalEscalationAt: string
   autoApprovalAuthorized: false
+}
+
+export type AuthorReviewResponseInput = {
+  canonicalContactId: string
+  canonicalTitleId: string
+  authenticatedContactId: string
+  authenticatedIdentityId: string
+  stageId: string
+  gateId: string
+  packageId: string
+  packageVersion: string
+  manifestChecksum: string
+  responseType: AuthorDecisionOption
+  authorComments?: string
+  correctionListArtifactId?: string
+  markedProofArtifactId?: string
+  submittedAt: string
+  activePackage: CanonicalAuthorReviewPackage
+}
+
+export type AuthorReviewResponseValidation =
+  | { ok: true; responseRecord: AuthorReviewResponseRecord }
+  | { ok: false; blocker: string }
+
+export type AuthorReviewResponseRecord = {
+  canonicalContactId: string
+  canonicalTitleId: string
+  stageId: string
+  gateId: string
+  packageId: string
+  packageVersion: string
+  manifestChecksum: string
+  responseType: AuthorDecisionOption
+  authorComments: string
+  correctionListArtifactId: string | null
+  markedProofArtifactId: string | null
+  submittedAt: string
+  authenticatedIdentityId: string
+  approvalGateRelationship: string
 }
 
 export type CadenceEvidenceCondition = 'L1' | 'L2' | 'L3' | 'L4' | 'L5' | 'L6'
@@ -198,6 +244,16 @@ export type PackageArtifactInput = {
   canMaterializeForEmail?: boolean
   canRender?: boolean
   contentBytesBase64?: string
+  pageCount?: number
+  expectedPageCount?: number
+  manifestPageCount?: number
+  expectedMinimumFileSize?: number
+  visualQaPassed?: boolean
+  titlePagePresent?: boolean
+  tocPresent?: boolean
+  manuscriptSectionsComplete?: boolean
+  productionNotesVisible?: boolean
+  truncatedOutput?: boolean
 }
 
 export type PackageManifestItem = {
@@ -275,6 +331,7 @@ export type CanonicalAuthorReviewPackage = {
   preparedAt: string
   qaStatus: PackageQaResult['status']
   qaCompletedAt?: string
+  qaFailures: Array<{ code: PackageQaFailure; detail: string }>
   cadencePolicyId: string
   earliestReleaseAt?: string
   releasedAt?: string
@@ -301,7 +358,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     workspaceDownloadRoles: ['assessment', 'recommendedEditorialPath', 'reviewInstructions'],
     cadencePolicyId: 'AUTHOR_REVIEW_STANDARD',
     authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
-    authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
+    authorDecisionOptions: ['APPROVE_AS_PRESENTED', 'APPROVE_WITH_CORRECTIONS', 'QUESTIONS_OR_CLARIFICATION_REQUESTED'],
     nextStagePolicy: 'route-to-developmental-line-copy-or-production-readiness',
   },
   DEVELOPMENTAL_EDITING: {
@@ -336,7 +393,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     ],
     cadencePolicyId: 'EDITORIAL_AUTHOR_REVIEW_BY_WORD_COUNT',
     authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
-    authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
+    authorDecisionOptions: ['APPROVE_AS_PRESENTED', 'APPROVE_WITH_CORRECTIONS', 'QUESTIONS_OR_CLARIFICATION_REQUESTED'],
     nextStagePolicy: 'line-editing-eligibility',
   },
   LINE_EDITING: {
@@ -350,7 +407,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     workspaceDownloadRoles: ['editedManuscript', 'lineEditingSummary', 'reviewInstructions'],
     cadencePolicyId: 'EDITORIAL_AUTHOR_REVIEW_BY_WORD_COUNT',
     authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
-    authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
+    authorDecisionOptions: ['APPROVE_AS_PRESENTED', 'APPROVE_WITH_CORRECTIONS', 'QUESTIONS_OR_CLARIFICATION_REQUESTED'],
     nextStagePolicy: 'copyediting-eligibility',
   },
   COPYEDITING: {
@@ -364,7 +421,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     workspaceDownloadRoles: ['editedManuscript', 'copyeditingSummary', 'reviewInstructions'],
     cadencePolicyId: 'EDITORIAL_AUTHOR_REVIEW_BY_WORD_COUNT',
     authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
-    authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
+    authorDecisionOptions: ['APPROVE_AS_PRESENTED', 'APPROVE_WITH_CORRECTIONS', 'QUESTIONS_OR_CLARIFICATION_REQUESTED'],
     nextStagePolicy: 'proofreading-eligibility',
   },
   PROOFREADING: {
@@ -381,7 +438,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     workspaceDownloadRoles: ['proofreadManuscript', 'proofreadingCoverNote'],
     cadencePolicyId: 'AUTHOR_REVIEW_STANDARD',
     authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
-    authorDecisionOptions: ['APPROVE', 'APPROVE_WITH_MINOR_CORRECTIONS', 'REQUEST_CORRECTIONS', 'QUESTION'],
+    authorDecisionOptions: ['APPROVE_AS_PRESENTED', 'APPROVE_WITH_CORRECTIONS', 'QUESTIONS_OR_CLARIFICATION_REQUESTED'],
     nextStagePolicy: 'interior-layout-eligibility',
   },
   INTERIOR_LAYOUT: {
@@ -419,7 +476,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     ],
     cadencePolicyId: 'PRODUCTION_AUTHOR_REVIEW_STANDARD',
     authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
-    authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
+    authorDecisionOptions: ['APPROVE_AS_PRESENTED', 'APPROVE_WITH_CORRECTIONS', 'QUESTIONS_OR_CLARIFICATION_REQUESTED'],
     nextStagePolicy: 'cover-or-production-proof-eligibility',
   },
   COVER_DESIGN: {
@@ -437,7 +494,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     workspaceDownloadRoles: ['approvedConceptOrReviewSet', 'designRationale', 'reviewInstructions'],
     cadencePolicyId: 'PRODUCTION_AUTHOR_REVIEW_STANDARD',
     authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
-    authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
+    authorDecisionOptions: ['APPROVE_AS_PRESENTED', 'APPROVE_WITH_CORRECTIONS', 'QUESTIONS_OR_CLARIFICATION_REQUESTED'],
     nextStagePolicy: 'production-proof-eligibility',
   },
   PRODUCTION_PROOF: {
@@ -455,7 +512,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     workspaceDownloadRoles: ['finalInteriorProof', 'finalCoverProof', 'productionReviewInstructions'],
     cadencePolicyId: 'FINAL_PRODUCTION_AUTHOR_REVIEW',
     authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
-    authorDecisionOptions: ['APPROVE', 'REQUEST_CORRECTIONS', 'QUESTION'],
+    authorDecisionOptions: ['APPROVE_AS_PRESENTED', 'APPROVE_WITH_CORRECTIONS', 'QUESTIONS_OR_CLARIFICATION_REQUESTED'],
     nextStagePolicy: 'distribution-readiness',
   },
 }
@@ -561,6 +618,9 @@ export function validatePackageQa(input: {
     if (artifact.canRender === false) {
       failures.push({ code: 'PACKAGE_QA_FAILED - RENDER_FAILURE', detail: role })
     }
+    if (requiresProductionProofControls(artifact.role)) {
+      failures.push(...validateProductionProofControls(artifact))
+    }
   }
 
   const duplicateVersion = input.artifacts.find((artifact, index, all) =>
@@ -575,6 +635,55 @@ export function validatePackageQa(input: {
 
   if (failures.length) return { ok: false, status: 'QA_FAILED', completedAt: input.completedAt, failures }
   return { ok: true, status: 'READY_INTERNAL', completedAt: input.completedAt, checks: policy.qaChecks }
+}
+
+function requiresProductionProofControls(role: PackageArtifactRole) {
+  return role === 'interiorProofPDF' || role === 'finalInteriorProof'
+}
+
+function validateProductionProofControls(artifact: PackageArtifactInput) {
+  const failures: Array<{ code: PackageQaFailure; detail: string }> = []
+  const expectedMinimumFileSize = artifact.expectedMinimumFileSize ?? 100_000
+  const expectedPageCount = artifact.expectedPageCount ?? artifact.manifestPageCount
+
+  if (artifact.fileSize < expectedMinimumFileSize) {
+    failures.push({
+      code: 'PACKAGE_QA_FAILED - PDF_SIZE_ABNORMAL',
+      detail: `${artifact.role}:file-size-${artifact.fileSize}`,
+    })
+  }
+  if (!artifact.pageCount || (expectedPageCount && artifact.pageCount !== expectedPageCount)) {
+    failures.push({
+      code: 'PACKAGE_QA_FAILED - PAGE_COUNT_MISMATCH',
+      detail: `${artifact.role}:actual-${artifact.pageCount ?? 'missing'}:expected-${expectedPageCount ?? 'recorded'}`,
+    })
+  }
+  if (artifact.manifestPageCount && artifact.pageCount && artifact.pageCount !== artifact.manifestPageCount) {
+    failures.push({
+      code: 'PACKAGE_QA_FAILED - PAGE_COUNT_MISMATCH',
+      detail: `${artifact.role}:actual-${artifact.pageCount}:manifest-${artifact.manifestPageCount}`,
+    })
+  }
+  if (artifact.truncatedOutput === true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - TRUNCATED_OUTPUT', detail: artifact.role })
+  }
+  if (artifact.productionNotesVisible === true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - PRODUCTION_NOTES_VISIBLE', detail: artifact.role })
+  }
+  if (artifact.titlePagePresent !== true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - MISSING_TITLE_PAGE', detail: artifact.role })
+  }
+  if (artifact.tocPresent !== true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - MISSING_TOC', detail: artifact.role })
+  }
+  if (artifact.manuscriptSectionsComplete !== true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - MISSING_MANUSCRIPT_SECTIONS', detail: artifact.role })
+  }
+  if (artifact.visualQaPassed !== true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - VISUAL_QA_NOT_PASSED', detail: artifact.role })
+  }
+
+  return failures
 }
 
 export function evaluatePackageCadence(input: {
@@ -634,6 +743,61 @@ export function createAuthorReviewResponseClock(input: {
     overdueAt: addCalendarDays(input.deliveredAt, period),
     internalEscalationAt: addCalendarDays(input.deliveredAt, AUTHOR_REVIEW_ESCALATION_DAY),
     autoApprovalAuthorized: false,
+  }
+}
+
+export function validateAuthorReviewResponseMechanism(input: AuthorReviewResponseInput): AuthorReviewResponseValidation {
+  const pkg = input.activePackage
+  const policy = getPackagePolicy(pkg.stageCode)
+  const comments = input.authorComments?.trim() || ''
+
+  if (!input.canonicalContactId) return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - CANONICAL_CONTACT_MISSING' }
+  if (!input.canonicalTitleId) return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - CANONICAL_TITLE_MISSING' }
+  if (!input.authenticatedIdentityId) return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - AUTHENTICATED_IDENTITY_MISSING' }
+  if (input.authenticatedContactId !== input.canonicalContactId) {
+    return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - CROSS_AUTHOR_ACCESS_DENIED' }
+  }
+  if (pkg.packageStatus === 'SUPERSEDED') return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - SUPERSEDED_PACKAGE' }
+  if (pkg.packageStatus !== 'AUTHOR_REVIEW' && pkg.packageStatus !== 'RELEASED') {
+    return { ok: false, blocker: `AUTHOR_RESPONSE_BLOCKED - PACKAGE_NOT_OPEN_FOR_AUTHOR_RESPONSE:${pkg.packageStatus}` }
+  }
+  if (input.canonicalTitleId !== pkg.titleId) return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - TITLE_PACKAGE_MISMATCH' }
+  if (input.stageId !== pkg.stageId) return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - STAGE_PACKAGE_MISMATCH' }
+  if (input.gateId !== pkg.gateId) return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - GATE_PACKAGE_MISMATCH' }
+  if (input.packageId !== pkg.packageId || input.packageVersion !== pkg.packageVersion) {
+    return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - PACKAGE_VERSION_MISMATCH' }
+  }
+  if (input.manifestChecksum !== pkg.packageChecksum) {
+    return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - MANIFEST_CHECKSUM_MISMATCH' }
+  }
+  if (!policy.authorDecisionOptions.includes(input.responseType)) {
+    return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - RESPONSE_TYPE_NOT_ALLOWED' }
+  }
+  if (input.responseType !== 'APPROVE_AS_PRESENTED' && !comments && !input.correctionListArtifactId && !input.markedProofArtifactId) {
+    return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - CORRECTION_OR_QUESTION_DETAIL_REQUIRED' }
+  }
+  if (pkg.stageCode === 'INTERIOR_LAYOUT' && input.responseType === 'APPROVE_WITH_CORRECTIONS' && !input.correctionListArtifactId && !input.markedProofArtifactId && !comments) {
+    return { ok: false, blocker: 'AUTHOR_RESPONSE_BLOCKED - INTERIOR_LAYOUT_CORRECTION_METHOD_REQUIRED' }
+  }
+
+  return {
+    ok: true,
+    responseRecord: {
+      canonicalContactId: input.canonicalContactId,
+      canonicalTitleId: input.canonicalTitleId,
+      stageId: input.stageId,
+      gateId: input.gateId,
+      packageId: input.packageId,
+      packageVersion: input.packageVersion,
+      manifestChecksum: input.manifestChecksum,
+      responseType: input.responseType,
+      authorComments: comments,
+      correctionListArtifactId: input.correctionListArtifactId || null,
+      markedProofArtifactId: input.markedProofArtifactId || null,
+      submittedAt: input.submittedAt,
+      authenticatedIdentityId: input.authenticatedIdentityId,
+      approvalGateRelationship: `${input.gateId}:${input.packageId}:${input.packageVersion}`,
+    },
   }
 }
 
@@ -758,6 +922,7 @@ export function assembleAuthorReviewPackage(input: {
     preparedAt: input.preparedAt,
     qaStatus: qaResult.status,
     qaCompletedAt: qaResult.completedAt,
+    qaFailures: qaResult.ok ? [] : qaResult.failures,
     cadencePolicyId: policy.cadencePolicyId,
     earliestReleaseAt: cadence.earliestReleaseAt || undefined,
     correlationId: input.correlationId,

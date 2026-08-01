@@ -1,0 +1,20 @@
+Title:           The Intentional Leader — Volume I Editorial Working Manuscript
+Subject:         Developmental comments for January through March; author-facing companion artifact
+Author:          J Merrill Publishing
+Creator:         Writer
+Producer:        LibreOfficeDev 26.8.0.0.alpha0 (AARCH64)
+CreationDate:    Sat Aug  1 17:46:15 2026 EDT
+Custom Metadata: no
+Metadata Stream: yes
+Tagged:          yes
+UserProperties:  no
+Suspects:        no
+Form:            none
+JavaScript:      no
+Pages:           388
+Encrypted:       no
+Page size:       612 x 792 pts (letter)
+Page rot:        0
+File size:       3116756 bytes
+Optimized:       no
+PDF version:     1.7

@@ -33,6 +33,7 @@ const {
   packageVisibilityForWorkspace,
   publisherTodayPackageMetrics,
   supersedePackage,
+  validateAuthorReviewResponseMechanism,
   validatePackageQa,
 } = await import('../lib/server/author-review-package-engine.ts')
 const { validateAuthorPackageNotification } = await import('../lib/server/author-package-notification-engine.ts')
@@ -63,6 +64,16 @@ function artifact(role, overrides = {}) {
     workspaceDownload: overrides.workspaceDownload,
     canMaterializeForEmail: overrides.canMaterializeForEmail ?? true,
     canRender: overrides.canRender ?? true,
+    pageCount: overrides.pageCount,
+    expectedPageCount: overrides.expectedPageCount,
+    manifestPageCount: overrides.manifestPageCount,
+    expectedMinimumFileSize: overrides.expectedMinimumFileSize,
+    visualQaPassed: overrides.visualQaPassed,
+    titlePagePresent: overrides.titlePagePresent,
+    tocPresent: overrides.tocPresent,
+    manuscriptSectionsComplete: overrides.manuscriptSectionsComplete,
+    productionNotesVisible: overrides.productionNotesVisible,
+    truncatedOutput: overrides.truncatedOutput,
     contentBytesBase64: overrides.contentBytesBase64 || Buffer.from(role).toString('base64'),
   }
 }
@@ -119,7 +130,19 @@ function interiorPackage(overrides = {}) {
     packageVersion: overrides.packageVersion || 'v1',
     artifacts:
       overrides.artifacts || [
-        artifact('interiorProofPDF', { stageId: 'stage-interior' }),
+        artifact('interiorProofPDF', {
+          stageId: 'stage-interior',
+          fileSize: 3_100_000,
+          pageCount: 214,
+          expectedPageCount: 214,
+          manifestPageCount: 214,
+          visualQaPassed: true,
+          titlePagePresent: true,
+          tocPresent: true,
+          manuscriptSectionsComplete: true,
+          productionNotesVisible: false,
+          truncatedOutput: false,
+        }),
         artifact('reviewInstructions', { stageId: 'stage-interior' }),
         artifact('authorResponseMechanism', { stageId: 'stage-interior', mimeType: 'text/plain' }),
         artifact('packageManifest', { stageId: 'stage-interior', mimeType: 'application/json' }),
@@ -146,6 +169,16 @@ test('all governed author-review stages consume one package policy register', ()
     assert.ok(policy.requiredArtifactRoles.length > 0)
     assert.ok(policy.cadencePolicyId)
     assert.ok(policy.nextStagePolicy)
+  }
+})
+
+test('author response policies use canonical governed response options', () => {
+  for (const policy of Object.values(PACKAGE_STAGE_POLICIES)) {
+    assert.deepEqual(policy.authorDecisionOptions, [
+      'APPROVE_AS_PRESENTED',
+      'APPROVE_WITH_CORRECTIONS',
+      'QUESTIONS_OR_CLARIFICATION_REQUESTED',
+    ])
   }
 })
 
@@ -467,6 +500,75 @@ test('Interior package cannot release without proof, instructions, response path
   assert.equal(pkg.qaStatus, 'QA_FAILED')
 })
 
+test('Interior proof guard rejects one-page truncated production artifacts', () => {
+  const pkg = interiorPackage({
+    artifacts: [
+      artifact('interiorProofPDF', {
+        artifactId: 'd99c9048-b084-f111-ab0f-00224820105b',
+        stageId: 'stage-interior',
+        fileSize: 2680,
+        pageCount: 1,
+        expectedPageCount: 214,
+        manifestPageCount: 214,
+        visualQaPassed: false,
+        titlePagePresent: false,
+        tocPresent: false,
+        manuscriptSectionsComplete: false,
+        productionNotesVisible: true,
+        truncatedOutput: true,
+      }),
+      artifact('reviewInstructions', { stageId: 'stage-interior' }),
+      artifact('authorResponseMechanism', { stageId: 'stage-interior', mimeType: 'text/plain' }),
+      artifact('packageManifest', { stageId: 'stage-interior', mimeType: 'application/json' }),
+      artifact('authorCoverMessage', { stageId: 'stage-interior' }),
+    ],
+  })
+
+  assert.equal(pkg.qaStatus, 'QA_FAILED')
+  assert.deepEqual(
+    pkg.qaFailures.map((failure) => failure.code).toSorted(),
+    [
+      'PACKAGE_QA_FAILED - MISSING_MANUSCRIPT_SECTIONS',
+      'PACKAGE_QA_FAILED - MISSING_TITLE_PAGE',
+      'PACKAGE_QA_FAILED - MISSING_TOC',
+      'PACKAGE_QA_FAILED - PAGE_COUNT_MISMATCH',
+      'PACKAGE_QA_FAILED - PAGE_COUNT_MISMATCH',
+      'PACKAGE_QA_FAILED - PDF_SIZE_ABNORMAL',
+      'PACKAGE_QA_FAILED - PRODUCTION_NOTES_VISIBLE',
+      'PACKAGE_QA_FAILED - TRUNCATED_OUTPUT',
+      'PACKAGE_QA_FAILED - VISUAL_QA_NOT_PASSED',
+    ].toSorted(),
+  )
+})
+
+test('Interior proof guard blocks author release until front matter and visual QA pass', () => {
+  const pkg = interiorPackage({
+    artifacts: [
+      artifact('interiorProofPDF', {
+        stageId: 'stage-interior',
+        fileSize: 3_116_756,
+        pageCount: 388,
+        expectedPageCount: 388,
+        manifestPageCount: 388,
+        visualQaPassed: true,
+        titlePagePresent: false,
+        tocPresent: false,
+        manuscriptSectionsComplete: true,
+        productionNotesVisible: false,
+        truncatedOutput: false,
+      }),
+      artifact('reviewInstructions', { stageId: 'stage-interior' }),
+      artifact('authorResponseMechanism', { stageId: 'stage-interior', mimeType: 'text/plain' }),
+      artifact('packageManifest', { stageId: 'stage-interior', mimeType: 'application/json' }),
+      artifact('authorCoverMessage', { stageId: 'stage-interior' }),
+    ],
+  })
+
+  assert.equal(pkg.qaStatus, 'QA_FAILED')
+  assert.ok(pkg.qaFailures.some((failure) => failure.code === 'PACKAGE_QA_FAILED - MISSING_TITLE_PAGE'))
+  assert.ok(pkg.qaFailures.some((failure) => failure.code === 'PACKAGE_QA_FAILED - MISSING_TOC'))
+})
+
 test('seven-calendar-day author response clock starts only after successful delivery and never auto-approves', () => {
   assert.equal(createAuthorReviewResponseClock({ deliveredAt: now, deliverySucceeded: false }), null)
   const clock = createAuthorReviewResponseClock({ deliveredAt: now, deliverySucceeded: true })
@@ -475,6 +577,121 @@ test('seven-calendar-day author response clock starts only after successful deli
   assert.equal(clock?.overdueAt, '2026-07-27T08:00:00.000Z')
   assert.equal(clock?.internalEscalationAt, '2026-07-28T08:00:00.000Z')
   assert.equal(clock?.autoApprovalAuthorized, false)
+})
+
+test('author response mechanism records authenticated same-author package response', () => {
+  const pkg = { ...interiorPackage(), packageStatus: 'AUTHOR_REVIEW' }
+  const result = validateAuthorReviewResponseMechanism({
+    canonicalContactId: 'contact-jackie',
+    canonicalTitleId: pkg.titleId,
+    authenticatedContactId: 'contact-jackie',
+    authenticatedIdentityId: 'external-id-jackie',
+    stageId: pkg.stageId,
+    gateId: pkg.gateId,
+    packageId: pkg.packageId,
+    packageVersion: pkg.packageVersion,
+    manifestChecksum: pkg.packageChecksum,
+    responseType: 'APPROVE_WITH_CORRECTIONS',
+    authorComments: 'Please correct the consolidated marked items.',
+    submittedAt: now,
+    activePackage: pkg,
+  })
+  assert.equal(result.ok, true)
+  assert.equal(result.responseRecord.responseType, 'APPROVE_WITH_CORRECTIONS')
+  assert.equal(result.responseRecord.approvalGateRelationship, `${pkg.gateId}:${pkg.packageId}:${pkg.packageVersion}`)
+})
+
+test('author response mechanism blocks anonymous, cross-author, and superseded package responses', () => {
+  const pkg = { ...developmentalPackage(), packageStatus: 'AUTHOR_REVIEW' }
+  assert.equal(
+    validateAuthorReviewResponseMechanism({
+      canonicalContactId: 'contact-a',
+      canonicalTitleId: pkg.titleId,
+      authenticatedContactId: 'contact-a',
+      authenticatedIdentityId: '',
+      stageId: pkg.stageId,
+      gateId: pkg.gateId,
+      packageId: pkg.packageId,
+      packageVersion: pkg.packageVersion,
+      manifestChecksum: pkg.packageChecksum,
+      responseType: 'APPROVE_AS_PRESENTED',
+      submittedAt: now,
+      activePackage: pkg,
+    }).blocker,
+    'AUTHOR_RESPONSE_BLOCKED - AUTHENTICATED_IDENTITY_MISSING',
+  )
+  assert.equal(
+    validateAuthorReviewResponseMechanism({
+      canonicalContactId: 'contact-a',
+      canonicalTitleId: pkg.titleId,
+      authenticatedContactId: 'contact-b',
+      authenticatedIdentityId: 'external-id-b',
+      stageId: pkg.stageId,
+      gateId: pkg.gateId,
+      packageId: pkg.packageId,
+      packageVersion: pkg.packageVersion,
+      manifestChecksum: pkg.packageChecksum,
+      responseType: 'APPROVE_AS_PRESENTED',
+      submittedAt: now,
+      activePackage: pkg,
+    }).blocker,
+    'AUTHOR_RESPONSE_BLOCKED - CROSS_AUTHOR_ACCESS_DENIED',
+  )
+  assert.equal(
+    validateAuthorReviewResponseMechanism({
+      canonicalContactId: 'contact-a',
+      canonicalTitleId: pkg.titleId,
+      authenticatedContactId: 'contact-a',
+      authenticatedIdentityId: 'external-id-a',
+      stageId: pkg.stageId,
+      gateId: pkg.gateId,
+      packageId: pkg.packageId,
+      packageVersion: pkg.packageVersion,
+      manifestChecksum: pkg.packageChecksum,
+      responseType: 'APPROVE_AS_PRESENTED',
+      submittedAt: now,
+      activePackage: { ...pkg, packageStatus: 'SUPERSEDED' },
+    }).blocker,
+    'AUTHOR_RESPONSE_BLOCKED - SUPERSEDED_PACKAGE',
+  )
+})
+
+test('author response mechanism rejects wrong manifest checksum and empty correction detail', () => {
+  const pkg = { ...developmentalPackage(), packageStatus: 'AUTHOR_REVIEW' }
+  assert.equal(
+    validateAuthorReviewResponseMechanism({
+      canonicalContactId: 'contact-a',
+      canonicalTitleId: pkg.titleId,
+      authenticatedContactId: 'contact-a',
+      authenticatedIdentityId: 'external-id-a',
+      stageId: pkg.stageId,
+      gateId: pkg.gateId,
+      packageId: pkg.packageId,
+      packageVersion: pkg.packageVersion,
+      manifestChecksum: '0'.repeat(64),
+      responseType: 'APPROVE_AS_PRESENTED',
+      submittedAt: now,
+      activePackage: pkg,
+    }).blocker,
+    'AUTHOR_RESPONSE_BLOCKED - MANIFEST_CHECKSUM_MISMATCH',
+  )
+  assert.equal(
+    validateAuthorReviewResponseMechanism({
+      canonicalContactId: 'contact-a',
+      canonicalTitleId: pkg.titleId,
+      authenticatedContactId: 'contact-a',
+      authenticatedIdentityId: 'external-id-a',
+      stageId: pkg.stageId,
+      gateId: pkg.gateId,
+      packageId: pkg.packageId,
+      packageVersion: pkg.packageVersion,
+      manifestChecksum: pkg.packageChecksum,
+      responseType: 'QUESTIONS_OR_CLARIFICATION_REQUESTED',
+      submittedAt: now,
+      activePackage: pkg,
+    }).blocker,
+    'AUTHOR_RESPONSE_BLOCKED - CORRECTION_OR_QUESTION_DETAIL_REQUIRED',
+  )
 })
 
 test('workspace visibility follows package status', () => {
