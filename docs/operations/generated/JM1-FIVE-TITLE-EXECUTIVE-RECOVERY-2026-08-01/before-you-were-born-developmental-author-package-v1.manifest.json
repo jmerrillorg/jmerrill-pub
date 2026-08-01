@@ -1,0 +1,85 @@
+{
+  "packageId": "pkg-before-you-were-born-developmental-author-review-2026-08-01-v1",
+  "packageVersion": "BYWB-DEVELOPMENTAL-AUTHOR-REVIEW-2026-08-01-v1",
+  "preparedAt": "2026-08-01T20:12:35-04:00",
+  "canonicalTitle": "Before You Were Born",
+  "canonicalTitleId": "91c5e1ef-2980-f111-ab0f-7c1e525b15c2",
+  "intakeCode": "JMP-INT-202607-LQPHEK",
+  "canonicalContactId": "dfb397e7-3b7c-f111-ab0f-6045bdd69435",
+  "author": "Sean Crowley",
+  "recipientEmail": "scrowley50@gmail.com",
+  "stage": "Developmental Editing",
+  "packageType": "DEVELOPMENTAL_EDITING_REVIEW",
+  "priorPackageReference": "pkg-88189235-8f80-f111-ab0f-6045bdd69435",
+  "internalManifestSha256": "4eaab8738132ce712ce38a7a8f3ddc3506d1566510911105ea13bc9275318436",
+  "july30EventDisposition": "CADENCE_INCOMPLETE_EVIDENCE_EXECUTION_LOG_FAILURE",
+  "deliveryDispositionBeforeRelease": "PROVEN_NOT_SENT",
+  "components": [
+    {
+      "role": "editedManuscript",
+      "status": "REFERENCED_FROM_GOVERNED_INTERNAL_PACKAGE",
+      "authorFacing": true,
+      "materializationRequiredInLivePackage": true
+    },
+    {
+      "role": "developmentalMemo",
+      "status": "REFERENCED_FROM_GOVERNED_INTERNAL_PACKAGE",
+      "authorFacing": true,
+      "materializationRequiredInLivePackage": true
+    },
+    {
+      "role": "reviewInstructions",
+      "status": "PREPARED",
+      "file": "before-you-were-born-review-instructions-v1.md",
+      "authorFacing": true
+    },
+    {
+      "role": "authorResponseMechanism",
+      "status": "PREPARED_FOR_LIVE_BINDING",
+      "file": "before-you-were-born-response-mechanism-v1.md",
+      "authorFacing": true
+    },
+    {
+      "role": "packageManifest",
+      "status": "PREPARED",
+      "file": "before-you-were-born-developmental-author-package-v1.manifest.json",
+      "authorFacing": true
+    },
+    {
+      "role": "authorCoverMessage",
+      "status": "PREPARED",
+      "file": "before-you-were-born-author-cover-message-v1.md",
+      "authorFacing": true
+    },
+    {
+      "role": "developmentalSummary",
+      "status": "PREPARED",
+      "file": "before-you-were-born-developmental-summary-v1.md",
+      "authorFacing": true
+    }
+  ],
+  "qa": {
+    "canonicalTitle": "PASS",
+    "canonicalRecipient": "PASS",
+    "internalOnlyContentRemovedFromPreparedComponents": "PASS",
+    "developmentalSummary": "PASS",
+    "reviewInstructions": "PASS",
+    "responseMechanism": "PASS",
+    "manifest": "PASS",
+    "sevenDayResponsePolicy": "PASS",
+    "htmlAndPlainText": "PASS",
+    "brandCompliance": "PASS",
+    "fileIntegrity": "PENDING_LIVE_ARTIFACT_MATERIALIZATION",
+    "accessibility": "PASS",
+    "liveApprovalGate": "NOT_CREATED_PROTECTED_PRODUCTION_MUTATION_REQUIRED",
+    "cadenceDelivery": "NOT_SENT_PROTECTED_PRODUCTION_MUTATION_REQUIRED"
+  },
+  "releaseControls": {
+    "requiredGateStateBeforeDelivery": "READY_FOR_AUTHOR_RELEASE",
+    "requiredGateStateAfterDelivery": "AWAITING_AUTHOR_RESPONSE",
+    "responseClock": "START_ONLY_AFTER_CONFIRMED_DELIVERY",
+    "duplicatePackages": 0,
+    "duplicateGates": 0,
+    "duplicateCommunications": 0
+  }
+}

@@ -1,4 +1,10 @@
-# Front Matter Decision Gap
+# Front Matter Decision Gap - Superseded
+
+Superseded: 2026-08-01T20:45:00-04:00
+
+Current disposition: RESOLVED BY JACKIE EXECUTIVE FRONT MATTER STANDARD
+
+This file is preserved as historical before-state evidence. It is no longer the controlling release blocker. The controlling standard is recorded in `11-interior-layout-front-matter-standard.md`.
 
 ## Finding
 
@@ -28,4 +34,3 @@ Cody is not authorized to release a body-only proof as the final Interior Layout
 Publishing Operations must provide or approve the canonical front-matter decision set for The Intentional Leader.
 
 After that decision is recorded, regenerate the release-candidate Interior Layout proof, repeat full visual QA, rebuild the package manifest, and only then create the READY_FOR_AUTHOR_RELEASE gate.
-
