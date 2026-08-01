@@ -16,8 +16,8 @@ const OFFICIAL_JOIN_IMPRINTS: JoinImprint[] = [
 // POST /api/join
 // Author intake form → Power Automate HTTP trigger → Dataverse
 //
-// To wire: set POWER_AUTOMATE_JOIN_URL in your environment
-// variables (Azure Static Web Apps → Configuration → App settings)
+// To wire: set POWER_AUTOMATE_JOIN_URL in the server runtime
+// environment. Production runs on Azure App Service.
 // ─────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
