@@ -5,7 +5,7 @@
   "description": "J Merrill Publishing division site — jmerrill.pub — governed by JM1 Canon v1",
   "engines": {
     "node": ">=24 <25",
-    "npm": ">=11"
+    "npm": ">=11 <12"
   },
   "scripts": {
     "dev": "next dev",

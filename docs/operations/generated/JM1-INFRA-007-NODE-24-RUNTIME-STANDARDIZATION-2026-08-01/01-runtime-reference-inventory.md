@@ -9,7 +9,7 @@ Discovery command class:
 | Reference | Classification | Disposition |
 | --- | --- | --- |
 | `package.json` `@types/node` | Active development configuration | Updated from `^20.0.0` to `^24.13.3` |
-| `package.json` engines | Active development/runtime contract | Added Node `>=24 <25`, npm `>=11` |
+| `package.json` engines | Active development/runtime contract | Added Node `>=24 <25`, npm `>=11 <12` |
 | `package-lock.json` | Generated lockfile | Regenerated under Node 24/npm 11 |
 | `.nvmrc` | Active local runtime pin | Added `24` |
 | `.github/workflows/azure-app-service-publishing.yml` | Active CI/CD runtime authority | Updated `NODE_VERSION` to `24`; added runtime proof |

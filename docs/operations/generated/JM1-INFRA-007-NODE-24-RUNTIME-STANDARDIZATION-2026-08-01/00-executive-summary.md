@@ -10,7 +10,7 @@ Standardize active JM1 Publishing runtime authority on Node.js 24 while preservi
 
 ## Implementation Summary
 
-- Root application runtime boundary added: Node `>=24 <25`, npm `>=11`.
+- Root application runtime boundary added: Node `>=24 <25`, npm `>=11 <12`.
 - Root `@types/node` moved from Node 20 to Node 24.
 - `.nvmrc` added as the single local runtime pin.
 - App Service GitHub workflow moved from `NODE_VERSION=20` to `NODE_VERSION=24`.
