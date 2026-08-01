@@ -38,6 +38,7 @@
     "04-front-matter-decision-gap.md",
     "05-package-readiness-and-release-disposition.md",
     "06-resumption-readback-and-stop-condition.md",
+    "07-front-matter-decision-register.md",
     "qa/content-integrity.json",
     "qa/pdfinfo.txt",
     "qa/artifact-checksums.sha256",
