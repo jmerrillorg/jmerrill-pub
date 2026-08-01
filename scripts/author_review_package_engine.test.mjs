@@ -4,19 +4,27 @@ import { existsSync, symlinkSync, unlinkSync } from 'node:fs'
 import test, { after } from 'node:test'
 
 const notificationShim = new URL('../lib/server/author-package-notification-engine', import.meta.url)
+const brandShim = new URL('../lib/server/author-communication-brand', import.meta.url)
 let createdNotificationShim = false
+let createdBrandShim = false
 if (!existsSync(notificationShim)) {
   symlinkSync('author-package-notification-engine.ts', notificationShim)
   createdNotificationShim = true
 }
+if (!existsSync(brandShim)) {
+  symlinkSync('author-communication-brand.ts', brandShim)
+  createdBrandShim = true
+}
 after(() => {
   if (createdNotificationShim) unlinkSync(notificationShim)
+  if (createdBrandShim) unlinkSync(brandShim)
 })
 
 const {
   PACKAGE_STAGE_POLICIES,
   assembleAuthorReviewPackage,
   buildNotificationInputFromPackage,
+  createAuthorReviewResponseClock,
   createPackageManifest,
   evaluatePackageCadence,
   getPackagePolicy,
@@ -75,6 +83,53 @@ function proofreadingPackage(overrides = {}) {
   })
 }
 
+function developmentalPackage(overrides = {}) {
+  return assembleAuthorReviewPackage({
+    packageId: overrides.packageId || 'package-developmental-v1',
+    titleId: 'title-developmental',
+    authorId: 'author-developmental',
+    stageId: 'stage-developmental',
+    stageCode: 'DEVELOPMENTAL_EDITING',
+    gateId: 'gate-developmental',
+    packageVersion: overrides.packageVersion || 'v1',
+    artifacts:
+      overrides.artifacts || [
+        artifact('editedManuscript', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+        artifact('developmentalMemo', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+        artifact('reviewInstructions', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+        artifact('authorResponseMechanism', { stageId: 'stage-developmental', titleId: 'title-developmental', mimeType: 'text/plain' }),
+        artifact('packageManifest', { stageId: 'stage-developmental', titleId: 'title-developmental', mimeType: 'application/json' }),
+        artifact('authorCoverMessage', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      ],
+    preparedAt: now,
+    cadence: overrides.cadence || { now, rushAuthorized: true },
+    correlationId: 'corr-developmental-package-test',
+  })
+}
+
+function interiorPackage(overrides = {}) {
+  return assembleAuthorReviewPackage({
+    packageId: overrides.packageId || 'package-interior-v1',
+    titleId: 'title-intentional-leader',
+    authorId: 'author-jackie',
+    stageId: 'stage-interior',
+    stageCode: 'INTERIOR_LAYOUT',
+    gateId: 'gate-interior',
+    packageVersion: overrides.packageVersion || 'v1',
+    artifacts:
+      overrides.artifacts || [
+        artifact('interiorProofPDF', { stageId: 'stage-interior' }),
+        artifact('reviewInstructions', { stageId: 'stage-interior' }),
+        artifact('authorResponseMechanism', { stageId: 'stage-interior', mimeType: 'text/plain' }),
+        artifact('packageManifest', { stageId: 'stage-interior', mimeType: 'application/json' }),
+        artifact('authorCoverMessage', { stageId: 'stage-interior' }),
+      ],
+    preparedAt: now,
+    cadence: overrides.cadence || { now, rushAuthorized: true },
+    correlationId: 'corr-interior-package-test',
+  })
+}
+
 test('all governed author-review stages consume one package policy register', () => {
   assert.deepEqual(Object.keys(PACKAGE_STAGE_POLICIES).sort(), [
     'COPYEDITING',
@@ -101,11 +156,22 @@ test('required artifacts differ through policy configuration', () => {
   assert.deepEqual(getPackagePolicy('INTERIOR_LAYOUT').requiredArtifactRoles, [
     'interiorProofPDF',
     'reviewInstructions',
+    'authorResponseMechanism',
+    'packageManifest',
+    'authorCoverMessage',
   ])
   assert.deepEqual(getPackagePolicy('COVER_DESIGN').requiredArtifactRoles, [
     'approvedConceptOrReviewSet',
     'designRationale',
     'reviewInstructions',
+  ])
+  assert.deepEqual(getPackagePolicy('DEVELOPMENTAL_EDITING').requiredArtifactRoles, [
+    'editedManuscript',
+    'developmentalMemo',
+    'reviewInstructions',
+    'authorResponseMechanism',
+    'packageManifest',
+    'authorCoverMessage',
   ])
 })
 
@@ -213,6 +279,96 @@ test('complete package release hands off to canonical notification engine', () =
   assert.equal(notification.recipientPolicy.replyTo, 'publishing@jmerrill.one')
   assert.deepEqual(notification.recipientPolicy.bcc, ['publishing@jmerrill.one'])
   assert.equal('cc' in notification.recipientPolicy, false)
+})
+
+test('Developmental and Interior notifications preserve required response, manifest, and cover-message attachments', () => {
+  const developmental = developmentalPackage()
+  const developmentalNotification = buildNotificationInputFromPackage({
+    pkg: developmental,
+    recipientEmail: 'developmental-author@example.test',
+    workspaceAccessLocation: 'https://jmerrill.pub/author/portal',
+    notificationTemplateId: 'developmental-review',
+    attachments: [
+      artifact('editedManuscript', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('developmentalMemo', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('reviewInstructions', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('authorResponseMechanism', { stageId: 'stage-developmental', titleId: 'title-developmental', mimeType: 'text/plain' }),
+      artifact('packageManifest', { stageId: 'stage-developmental', titleId: 'title-developmental', mimeType: 'application/json' }),
+      artifact('authorCoverMessage', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+    ],
+  })
+
+  const interior = interiorPackage()
+  const interiorNotification = buildNotificationInputFromPackage({
+    pkg: interior,
+    recipientEmail: 'interior-author@example.test',
+    workspaceAccessLocation: 'https://jmerrill.pub/author/portal',
+    notificationTemplateId: 'interior-review',
+    attachments: [
+      artifact('interiorProofPDF', { stageId: 'stage-interior' }),
+      artifact('reviewInstructions', { stageId: 'stage-interior' }),
+      artifact('authorResponseMechanism', { stageId: 'stage-interior', mimeType: 'text/plain' }),
+      artifact('packageManifest', { stageId: 'stage-interior', mimeType: 'application/json' }),
+      artifact('authorCoverMessage', { stageId: 'stage-interior' }),
+    ],
+  })
+
+  assert.equal(validateAuthorPackageNotification(developmentalNotification).ok, true)
+  assert.equal(validateAuthorPackageNotification(interiorNotification).ok, true)
+  assert.deepEqual(
+    developmentalNotification.attachments.map((attachment) => attachment.role).toSorted(),
+    [
+      'authorCoverMessage',
+      'authorResponseMechanism',
+      'editedManuscript',
+      'editorialMemo',
+      'packageManifest',
+      'reviewInstructions',
+    ].toSorted(),
+  )
+  assert.deepEqual(
+    interiorNotification.attachments.map((attachment) => attachment.role).toSorted(),
+    [
+      'authorCoverMessage',
+      'authorResponseMechanism',
+      'interiorProof',
+      'packageManifest',
+      'reviewInstructions',
+    ].toSorted(),
+  )
+})
+
+test('Developmental package cannot release without summary, instructions, response path, and manifest', () => {
+  const pkg = developmentalPackage({
+    artifacts: [
+      artifact('editedManuscript', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('developmentalMemo', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('reviewInstructions', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+    ],
+  })
+  assert.equal(pkg.packageStatus, 'QA_FAILED')
+  assert.equal(pkg.qaStatus, 'QA_FAILED')
+})
+
+test('Interior package cannot release without proof, instructions, response path, and manifest', () => {
+  const pkg = interiorPackage({
+    artifacts: [
+      artifact('interiorProofPDF', { stageId: 'stage-interior' }),
+      artifact('reviewInstructions', { stageId: 'stage-interior' }),
+    ],
+  })
+  assert.equal(pkg.packageStatus, 'QA_FAILED')
+  assert.equal(pkg.qaStatus, 'QA_FAILED')
+})
+
+test('seven-calendar-day author response clock starts only after successful delivery and never auto-approves', () => {
+  assert.equal(createAuthorReviewResponseClock({ deliveredAt: now, deliverySucceeded: false }), null)
+  const clock = createAuthorReviewResponseClock({ deliveredAt: now, deliverySucceeded: true })
+  assert.equal(clock?.reminderAt, '2026-07-25T08:00:00.000Z')
+  assert.equal(clock?.responseDueAt, '2026-07-27T08:00:00.000Z')
+  assert.equal(clock?.overdueAt, '2026-07-27T08:00:00.000Z')
+  assert.equal(clock?.internalEscalationAt, '2026-07-28T08:00:00.000Z')
+  assert.equal(clock?.autoApprovalAuthorized, false)
 })
 
 test('workspace visibility follows package status', () => {

@@ -21,7 +21,9 @@ const checks = [
       requiredStages.every((stage) => engine.includes(`${stage}: {`)) &&
       engine.includes("attachmentsRequired: ['proofreadManuscript', 'reviewCoverNote']") &&
       engine.includes("attachmentsRequired: ['copyeditedManuscript', 'reviewCoverNote']") &&
-      engine.includes("attachmentsRequired: ['interiorProof', 'reviewInstructions']"),
+      engine.includes("'authorResponseMechanism'") &&
+      engine.includes("'packageManifest'") &&
+      engine.includes("'authorCoverMessage'"),
   },
   {
     name: 'workspace link alone does not satisfy attachment policy',

@@ -1,0 +1,44 @@
+{
+  "packageId": "JM1-PRIORITY-WAVE-1-COMPLETION-2026-07-31",
+  "packageType": "priority-wave-completion-report",
+  "generatedAt": "2026-08-01T02:10:00Z",
+  "authority": "Jackie Smith, Jr. Priority Wave 1 authorization, 2026-07-31",
+  "mode": "governed execution with evidence",
+  "classification": "PRIORITY WAVE 1 COMPLETE - EXTERNAL DEPENDENCIES REMAIN",
+  "files": [
+    {
+      "path": "JM1-PRIORITY-WAVE-1-COMPLETION-REPORT-2026-07-31.md",
+      "sha256": "e4b5feeaf490bafd8bc8968bdfc082a1cb488f884a6eb5c0371ebbf85cb2d415",
+      "purpose": "Consolidated Priority Wave 1 completion report and external-dependency register"
+    }
+  ],
+  "relatedEvidencePackages": [
+    "JM1-NO-SYSTEM-WAIT-WORKSPACE-AND-PILOT-COMPLETION-2026-07-31",
+    "Security-Baseline-Evidence-Package-v1.1",
+    "PROGRAM-002-PROGRAM-004-Commissioning-Certification-2026-07-26"
+  ],
+  "relatedPullRequests": [
+    {
+      "number": 368,
+      "status": "open",
+      "purpose": "Five-title package commissioning evidence and author-review package policy"
+    },
+    {
+      "number": 356,
+      "status": "open",
+      "purpose": "PROGRAM-004 Annex S evidence preservation and Chad transition"
+    },
+    {
+      "number": 357,
+      "status": "merged",
+      "purpose": "PROGRAM-005 publishing pipeline reliability"
+    }
+  ],
+  "writeBoundary": {
+    "dataverseCorrections": 0,
+    "sharePointUpdates": 0,
+    "authorCommunications": 0,
+    "executionLogEvents": 0,
+    "productionDeployments": 0
+  }
+}

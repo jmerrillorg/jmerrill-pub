@@ -178,7 +178,7 @@ jobs:
           for attempt in {1..12}; do
             body="$(mktemp)"
             code="$(curl -fsS -o "$body" -w '%{http_code}' --max-time 20 "$PRODUCTION_HEALTH_URL" || true)"
-            if [ "$code" = "200" ] && node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready') process.exit(1)" "$body"; then
+            if [ "$code" = "200" ] && node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready' || h.release !== process.argv[2]) process.exit(1)" "$body" "${{ github.sha }}"; then
               sleep 10
               continue
             fi
