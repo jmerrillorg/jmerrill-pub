@@ -1,0 +1,24 @@
+{
+  "package": "JM1-INFRA-013-ENTERPRISE-APP-SERVICE-COMPLETION-2026-08-01",
+  "created": "2026-08-01",
+  "baseline": "87fb1481ae7e95354e337f9d55caae625510f7c5",
+  "classification": "APP SERVICE ENTERPRISE COMPLETE - DOCUMENTED EXCEPTIONS REMAIN",
+  "secret_values_retained": 0,
+  "dns_changes": 0,
+  "azure_resource_deletions": 0,
+  "production_deployments": 0,
+  "documents": [
+    "00-executive-summary.md",
+    "01-enterprise-hosting-inventory.md",
+    "02-migration-register.md",
+    "03-dns-register.md",
+    "04-runtime-register.md",
+    "05-workflow-register.md",
+    "06-github-cleanup.md",
+    "07-azure-cleanup.md",
+    "08-swa-retirement-register.md",
+    "09-production-validation.md",
+    "10-rollback-register.md",
+    "11-remaining-exceptions.md"
+  ]
+}
