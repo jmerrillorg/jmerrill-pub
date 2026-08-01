@@ -1,0 +1,39 @@
+# JM1-INFRA-007 Node.js 24 Runtime Standardization - Executive Summary
+
+Generated: 2026-08-01
+Branch: `codex/node-24-runtime-upgrade`
+Base SHA: `582b4aa0be928d905bb89b1b3d357a094e1f75a5`
+
+## Objective
+
+Standardize active JM1 Publishing runtime authority on Node.js 24 while preserving historical Node.js 20 evidence as past-state truth.
+
+## Implementation Summary
+
+- Root application runtime boundary added: Node `>=24 <25`, npm `>=11 <12`.
+- Root `@types/node` moved from Node 20 to Node 24.
+- `.nvmrc` added as the single local runtime pin.
+- App Service GitHub workflow moved from `NODE_VERSION=20` to `NODE_VERSION=24`.
+- Static Web Apps was retired from the Publishing authority chain under JM1-INFRA-012 after App Service production certification.
+- Publishing App Service Bicep moved to `NODE|24-lts` and `WEBSITE_NODE_DEFAULT_VERSION=~24`.
+- Azure Function package compatibility boundaries updated for the diagnostic runner and ACS email relay.
+- Function lockfiles regenerated under Node 24/npm 11.
+- Forward-looking hosting and relay documentation updated.
+- Publishing App Service staging was deployed and certified on Node 24; final PR-head deployment evidence is recorded in the PR return package.
+- The two live Function Apps were tested on `Node|24`, returned platform 503 on protected probes, and were rolled back to `Node|22` with 401 fail-closed recovery confirmed.
+
+## Final Completion Classification
+
+NODE 24 STANDARDIZATION COMPLETE - DOCUMENTED HOSTING PLATFORM EXCEPTIONS REMAIN
+
+The root application, App Service CI, App Service infrastructure, Publishing App Service staging, and Publishing App Service production are Node 24-certified. Static Web Apps no longer remains an active Publishing runtime authority after JM1-INFRA-012. The active Azure Function host runtime remains on the last known-good `Node|22` state after Node 24 host smoke failed and rollback restored protected-route 401 behavior.
+
+The remaining Node 22 surface is a documented Azure Functions hosting exception, not incomplete INFRA-007 engineering. No author communication, business-record advancement, package release, Stripe action, payout, or Business Central posting occurred during final certification.
+
+## Official Platform Basis
+
+- Microsoft App Service documentation documents `WEBSITE_NODE_DEFAULT_VERSION="~24"` and `linux-fx-version "NODE|24-lts"` for Linux Node apps.
+- Azure CLI readback on 2026-08-01 listed `NODE|24-lts` as an available Linux Web App runtime.
+- Microsoft Azure Functions runtime documentation lists Node.js 24 as GA for Azure Functions v4.
+- Azure CLI readback on 2026-08-01 listed `Node|24` as an available Linux Azure Functions runtime; JM1 production Function host smoke failed on that stack and recovered after rollback to `Node|22`.
+- Static Web Apps PR deploy logs on 2026-08-01 rejected Node 24.13.0 with supported versions limited to 18, 20, and 22.

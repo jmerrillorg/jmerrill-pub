@@ -1,0 +1,47 @@
+{
+  "packageId": "JM1-INFRA-007-NODE-24-RUNTIME-STANDARDIZATION-2026-08-01",
+  "program": "JM1-INFRA-007",
+  "workItem": "Node.js 24 Runtime Standardization",
+  "branch": "codex/node-24-runtime-upgrade",
+  "baseSha": "582b4aa0be928d905bb89b1b3d357a094e1f75a5",
+  "finalEvidenceBranch": "codex/infra-007-final-certification",
+  "nodeVersion": "v24.18.1",
+  "npmVersion": "11.19.0",
+  "recertificationNodeVersion": "v24.11.0",
+  "recertificationNpmVersion": "11.6.1",
+  "status": "NODE_24_STANDARDIZATION_COMPLETE_FUNCTION_HOSTING_PLATFORM_EXCEPTION_REMAINS",
+  "swaRetirement": {
+    "program": "JM1-INFRA-012",
+    "status": "PUBLISHING_SWA_RETIRED",
+    "authority": "Static Web Apps removed from Publishing deployment authority chain after App Service production validation"
+  },
+  "pullRequest": 369,
+  "certifiedHeadSha": "680308d75970d3b66b8f93a6f07f3b4d150cb8e7",
+  "mergeSha": "77230c077f37910f75cf7b274734475ac1a92d3e",
+  "productionWorkflowRun": "30691248141",
+  "files": [
+    "00-executive-summary.md",
+    "01-runtime-reference-inventory.md",
+    "02-compatibility-assessment.md",
+    "03-files-changed.md",
+    "04-local-validation.md",
+    "05-app-service-staging-certification.md",
+    "06-azure-functions-certification.md",
+    "07-production-promotion-readiness.md",
+    "08-runtime-readback-before-after.md",
+    "09-exceptions-and-external-dependencies.md",
+    "JM1-INFRA-007-FINAL-CERTIFICATION-2026-08-01.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ],
+  "writeBoundary": {
+    "productionDeployment": 1,
+    "productionRuntimeCorrection": "Production App Service linuxFxVersion and WEBSITE_NODE_DEFAULT_VERSION corrected to Node 24 after slot swap left prior production slot runtime settings in place",
+    "productionRuntimeMutation": "2 Function host runtime attempts performed and rolled back to Node|22 after failed Node|24 smoke",
+    "dnsChanges": 0,
+    "authorCommunications": 0,
+    "publishingLifecycleAdvancement": 0,
+    "stripeOrPaymentActions": 0,
+    "secretValuesRetained": 0
+  }
+}

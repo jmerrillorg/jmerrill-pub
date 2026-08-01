@@ -9,7 +9,7 @@ This is the **Division 01 — Publishing** site for the J Merrill One enterprise
 It is governed by **JM1 Canon v1 + Addendum v1.1** and must conform to the parent architecture
 defined at `jmerrill.one`.
 
-**Stack:** Next.js 14+ (App Router) · TypeScript · Tailwind CSS · Azure Static Web Apps
+**Stack:** Next.js 14+ (App Router) · TypeScript · Tailwind CSS · Azure App Service
 
 ---
 
@@ -299,9 +299,16 @@ If the route-specific endpoint is missing in production, the route returns an er
 
 ## Azure Deployment
 
-The project is configured for **Azure Static Web Apps** via `output: 'standalone'` in `next.config.ts`.
+The project is configured for **Azure App Service** using Next.js standalone output.
 
-Deploy via Azure Static Web Apps GitHub Action or Azure DevOps pipeline per JM1 infrastructure standards.
+Deploy through the Publishing App Service GitHub Actions workflow:
+
+- build immutable standalone artifact;
+- deploy to the `app-jm1-pub-prod/staging` slot;
+- validate `/api/health`;
+- promote through governed slot swap after approval.
+
+Static Web Apps is retired from the Publishing deployment authority chain by JM1-INFRA-012.
 
 ---
 

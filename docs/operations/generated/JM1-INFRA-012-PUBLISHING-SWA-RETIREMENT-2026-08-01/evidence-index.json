@@ -1,0 +1,59 @@
+{
+  "packageId": "JM1-INFRA-012-PUBLISHING-SWA-RETIREMENT-2026-08-01",
+  "program": "JM1-INFRA-012",
+  "workItem": "Static Web Apps Authority Retirement for Publishing",
+  "branch": "codex/publishing-swa-retirement",
+  "repository": "jmerrillorg/jmerrill-pub",
+  "status": "PUBLISHING_SWA_RETIRED",
+  "productionOwner": "Azure App Service",
+  "productionReleaseSha": "77230c077f37910f75cf7b274734475ac1a92d3e",
+  "swaResource": {
+    "name": "jmerrill-pub",
+    "resourceGroup": "jmerrill-pub",
+    "finalState": "deleted"
+  },
+  "github": {
+    "swaWorkflow": "disabled and deleted from source",
+    "appServiceWorkflow": "active",
+    "swaSecretsDeleted": [
+      "AZURE_STATIC_WEB_APPS_API_TOKEN",
+      "AZURE_STATIC_WEB_APPS_API_TOKEN_CALM_PLANT_0F4F58410"
+    ],
+    "requiredSwaChecksFound": 0
+  },
+  "previewEnvironmentsDeleted": [
+    "341",
+    "349",
+    "355"
+  ],
+  "productionValidation": {
+    "jmerrillPub": 200,
+    "wwwJmerrillPub": 200,
+    "join": 200,
+    "health": 200,
+    "authorContextUnauthenticated": 401,
+    "publisherOperatingCenterUnauthenticated": 401,
+    "paymentGate": "disabled"
+  },
+  "materialNotes": [
+    "Contained operator-session output occurred during initial SWA app-setting inventory; no values retained in evidence or source."
+  ],
+  "files": [
+    "00-executive-summary.md",
+    "01-swa-dependency-inventory.md",
+    "02-app-service-authority-proof.md",
+    "03-route-and-configuration-parity.md",
+    "04-github-workflow-retirement.md",
+    "05-branch-protection-update.md",
+    "06-secret-and-token-revocation.md",
+    "07-preview-environment-cleanup.md",
+    "08-rollback-authority-replacement.md",
+    "09-swa-resource-retirement.md",
+    "10-production-validation.md",
+    "11-before-after-authority-matrix.md",
+    "12-remaining-exceptions.md",
+    "JM1-INFRA-012-FINAL-CERTIFICATION-2026-08-01.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}

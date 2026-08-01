@@ -234,7 +234,7 @@ Suggested resources:
 
 - Resource group: `rg-jm1-communications`
 - Function App: `func-jm1-acs-email-relay`
-- Runtime: Azure Functions v4, Node.js 20 or 22
+- Runtime: Azure Functions v4, Node.js 24
 - Storage account: create or reuse a governed Function App storage account
 - Application Insights: create or reuse a JM1 communications telemetry instance
 - ACS resource: `acs-jm1-core`
