@@ -1,0 +1,15 @@
+{
+  "title": "JM1 Wave 2 Holdings Purpose",
+  "status": "COMPLETED WITH NAMED EXTERNAL DEPENDENCY",
+  "created_at": "2026-08-01T00:00:00-04:00",
+  "repository": "jmerrillorg/jmerrill-pub",
+  "branch": "codex/priority-wave-2-governance",
+  "files": [
+    "00-holdings-purpose-statement.md",
+    "01-counsel-and-accounting-briefing-note.md",
+    "02-unresolved-professional-questions.md",
+    "03-external-review-checklist.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}

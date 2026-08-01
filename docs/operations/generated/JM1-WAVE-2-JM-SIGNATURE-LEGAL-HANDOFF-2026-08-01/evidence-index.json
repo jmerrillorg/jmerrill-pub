@@ -1,0 +1,17 @@
+{
+  "title": "JM Signature Legal Handoff",
+  "status": "COMPLETED WITH NAMED EXTERNAL DEPENDENCY",
+  "created_at": "2026-08-01T00:00:00-04:00",
+  "repository": "jmerrillorg/jmerrill-pub",
+  "branch": "codex/priority-wave-2-governance",
+  "files": [
+    "00-legal-handoff-summary.md",
+    "01-attorney-review-packet.md",
+    "02-send-ready-email-draft.md",
+    "03-attachment-register.md",
+    "04-recipient-dependency.md",
+    "05-final-outbound-record.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}

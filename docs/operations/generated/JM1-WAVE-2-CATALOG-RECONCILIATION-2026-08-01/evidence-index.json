@@ -1,0 +1,17 @@
+{
+  "title": "JM1 Wave 2 Catalog Reconciliation",
+  "status": "COMPLETED AND APPROVED FOR GOVERNANCE BASELINE",
+  "created_at": "2026-08-01T00:00:00-04:00",
+  "repository": "jmerrillorg/jmerrill-pub",
+  "branch": "codex/priority-wave-2-governance",
+  "files": [
+    "00-executive-summary.md",
+    "01-authoritative-reconciled-worksheet.csv",
+    "02-final-ruling-register.md",
+    "03-migration-crosswalk.csv",
+    "04-amended-candidate-hold-register.csv",
+    "05-sixteen-candidate-decision-package.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}
