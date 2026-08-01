@@ -11,6 +11,7 @@ import {
   type AuthorPackageNotificationInput,
   type AuthorReviewPackageType,
   type GovernedPackageAttachment,
+  validateAuthorPackageNotification,
 } from './author-package-notification-engine'
 
 export const PACKAGE_ENGINE_EVENTS = {
@@ -113,6 +114,67 @@ export type AuthorReviewResponseClock = {
   overdueAt: string
   internalEscalationAt: string
   autoApprovalAuthorized: false
+}
+
+export type CadenceEvidenceCondition = 'L1' | 'L2' | 'L3' | 'L4' | 'L5' | 'L6'
+
+export type CadenceEvidenceStatus = 'PASS' | 'FAIL' | 'NO_EVIDENCE' | 'CONFLICTING_EVIDENCE' | 'NOT_APPLICABLE'
+
+export type CadenceEvidenceRecord = {
+  condition: CadenceEvidenceCondition
+  status: CadenceEvidenceStatus
+  source: string
+  recordId: string
+  timestamp: string
+  correlationId: string
+  detail: string
+}
+
+export type GovernedCadenceRetestInput = {
+  package: CanonicalAuthorReviewPackage
+  scheduledReleaseAt: string
+  actualStartAt: string
+  releasedAt: string
+  notification: AuthorPackageNotificationInput
+  notificationResult: {
+    messageId: string
+    providerStatus: string
+    sentAt: string
+  }
+  authorAccess: {
+    accessProofId: string
+    status: 'AVAILABLE' | 'AUTHENTICATED_ACCESS' | 'BLOCKED'
+    timestamp: string
+  }
+  nextGate: {
+    gateId: string
+    state: 'AUTHOR_REVIEW_OPENED' | 'AUTHOR_RESPONSE_PENDING'
+    createdAt: string
+  }
+  executionLogRecords: CadenceEvidenceRecord[]
+  manualInterventionAfterStart?: boolean
+}
+
+export type CadenceCertificationConditionResult = {
+  condition: CadenceEvidenceCondition
+  status: CadenceEvidenceStatus
+  evidenceRecordIds: string[]
+  detail: string
+}
+
+export type GovernedCadenceRetestCertification = {
+  certified: boolean
+  classification:
+    | 'CADENCE_CERTIFIED'
+    | 'CADENCE_REMEDIATED_RETEST_FAILED'
+    | 'CADENCE_NOT_CERTIFIED_INTERNAL_DEFECT_REMAINS'
+  correlationId: string
+  packageId: string
+  titleId: string
+  conditions: CadenceCertificationConditionResult[]
+  finalPackageStatus: PackageStatus
+  responseClock: AuthorReviewResponseClock | null
+  blockers: string[]
 }
 
 export const AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS = 7
@@ -572,6 +634,89 @@ export function createAuthorReviewResponseClock(input: {
     overdueAt: addCalendarDays(input.deliveredAt, period),
     internalEscalationAt: addCalendarDays(input.deliveredAt, AUTHOR_REVIEW_ESCALATION_DAY),
     autoApprovalAuthorized: false,
+  }
+}
+
+export function certifyGovernedCadenceRetest(input: GovernedCadenceRetestInput): GovernedCadenceRetestCertification {
+  const pkg = input.package
+  const blockers: string[] = []
+  const conditions: CadenceCertificationConditionResult[] = []
+  const correlationId = pkg.correlationId
+
+  if (input.manualInterventionAfterStart) blockers.push('MANUAL_INTERVENTION_AFTER_RETEST_START')
+  if (pkg.packageStatus !== 'READY_FOR_RELEASE') blockers.push(`PACKAGE_NOT_READY_FOR_RELEASE:${pkg.packageStatus}`)
+  if (input.notification.packageId !== pkg.packageId) blockers.push('NOTIFICATION_PACKAGE_MISMATCH')
+  if (input.notification.correlationId !== correlationId) blockers.push('NOTIFICATION_CORRELATION_MISMATCH')
+  if (!releaseReady(input.actualStartAt, input.scheduledReleaseAt)) blockers.push('SCHEDULER_STARTED_BEFORE_RELEASE_TIME')
+
+  const notificationValidation = validateAuthorPackageNotification(input.notification)
+  if (!notificationValidation.ok) blockers.push(notificationValidation.blocker || 'AUTHOR_PACKAGE_NOTIFICATION_BLOCKED')
+
+  const deliverySucceeded = ['accepted', 'delivered', 'succeeded'].includes(input.notificationResult.providerStatus.toLowerCase())
+  const responseClock = createAuthorReviewResponseClock({
+    deliveredAt: input.notificationResult.sentAt,
+    deliverySucceeded,
+    contractResponsePeriodCalendarDays: getPackagePolicy(pkg.stageCode).authorResponsePeriodCalendarDays,
+  })
+  if (!responseClock) blockers.push('AUTHOR_RESPONSE_CLOCK_NOT_CREATED')
+
+  if (input.authorAccess.status === 'BLOCKED') blockers.push('AUTHOR_ACCESS_NOT_AVAILABLE')
+  if (input.nextGate.gateId !== pkg.gateId) blockers.push('NEXT_GATE_PACKAGE_GATE_MISMATCH')
+
+  const recordsByCondition = new Map<CadenceEvidenceCondition, CadenceEvidenceRecord[]>()
+  for (const record of input.executionLogRecords) {
+    if (record.correlationId !== correlationId) blockers.push(`EXECUTION_LOG_CORRELATION_MISMATCH:${record.condition}:${record.recordId}`)
+    const existing = recordsByCondition.get(record.condition) || []
+    existing.push(record)
+    recordsByCondition.set(record.condition, existing)
+  }
+
+  const required: Array<[CadenceEvidenceCondition, string]> = [
+    ['L1', 'Scheduler fired at governed timestamp'],
+    ['L2', 'Package left hold and transitioned'],
+    ['L3', 'Approved notification delivered or accepted'],
+    ['L4', 'Author access available'],
+    ['L5', 'Next lifecycle gate created'],
+    ['L6', 'Complete transaction preserved in jm1_executionlog'],
+  ]
+
+  for (const [condition, detail] of required) {
+    const records = recordsByCondition.get(condition) || []
+    const passRecords = records.filter((record) => record.status === 'PASS')
+    const failingRecords = records.filter((record) => record.status !== 'PASS')
+    if (passRecords.length !== 1 || failingRecords.length) {
+      conditions.push({
+        condition,
+        status: records.length ? 'CONFLICTING_EVIDENCE' : 'NO_EVIDENCE',
+        evidenceRecordIds: records.map((record) => record.recordId),
+        detail,
+      })
+      blockers.push(`${condition}_EVIDENCE_NOT_CONCLUSIVE`)
+      continue
+    }
+    conditions.push({
+      condition,
+      status: 'PASS',
+      evidenceRecordIds: passRecords.map((record) => record.recordId),
+      detail,
+    })
+  }
+
+  const certified = blockers.length === 0 && conditions.every((condition) => condition.status === 'PASS')
+  return {
+    certified,
+    classification: certified
+      ? 'CADENCE_CERTIFIED'
+      : blockers.includes('MANUAL_INTERVENTION_AFTER_RETEST_START')
+        ? 'CADENCE_REMEDIATED_RETEST_FAILED'
+        : 'CADENCE_NOT_CERTIFIED_INTERNAL_DEFECT_REMAINS',
+    correlationId,
+    packageId: pkg.packageId,
+    titleId: pkg.titleId,
+    conditions,
+    finalPackageStatus: certified ? 'AUTHOR_REVIEW' : pkg.packageStatus,
+    responseClock,
+    blockers,
   }
 }
 

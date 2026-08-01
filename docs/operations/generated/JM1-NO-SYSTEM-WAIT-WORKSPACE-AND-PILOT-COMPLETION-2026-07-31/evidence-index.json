@@ -35,6 +35,10 @@
       "classification": "cadence_gap_retrieval_read_only"
     },
     {
+      "path": "cadence-remediation-and-retest-2026-08-01-v1.md",
+      "classification": "cadence_remediation_and_controlled_synthetic_retest"
+    },
+    {
       "path": "checksums.sha256",
       "classification": "integrity_manifest"
     }
