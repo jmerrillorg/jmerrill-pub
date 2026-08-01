@@ -4,12 +4,12 @@
 
 Production promotion is not authorized by this package alone.
 
-Ready-for-review conditions after staging certification:
+Ready-for-review conditions for the App Service portion:
 
 - Root app validates under Node 24.
 - CI workflows declare Node 24 and print Node/npm versions.
 - App Service Bicep declares `NODE|24-lts` and `~24`.
-- Function packages declare Node 24 compatibility and pass local validation.
+- Function packages pass local validation under Node 24, but live Function host runtime remains an exception.
 - Evidence package and checksums validate.
 - No active Node 20 runtime authority remains in source.
 
@@ -22,6 +22,7 @@ Before production runtime promotion:
 3. Staging `/api/health` is ready at the certified head SHA.
 4. Rollback path remains available.
 5. Jackie authorizes production App Service runtime update and/or slot swap.
+6. Function App runtime remediation is completed separately before claiming estate-wide Node 24 completion.
 
 ## Not Authorized
 
@@ -31,4 +32,3 @@ Before production runtime promotion:
 - Author communication.
 - Publishing lifecycle advancement.
 - Stripe, payout, refund, transfer, or Business Central posting.
-

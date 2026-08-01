@@ -36,5 +36,30 @@ App settings readback:
 
 ## App Service Staging After
 
-Pending until staging-only runtime update and deployment certification complete.
+```json
+{
+  "alwaysOn": true,
+  "appCommandLine": "node server.js",
+  "ftpsState": "Disabled",
+  "linuxFxVersion": "NODE|24-lts"
+}
+```
 
+App settings readback:
+
+```json
+[
+  { "name": "WEBSITE_RUN_FROM_PACKAGE", "value": "1", "slotSetting": false },
+  { "name": "WEBSITE_NODE_DEFAULT_VERSION", "value": "~24", "slotSetting": false },
+  { "name": "JM1_RELEASE_SHA", "value": "matched deployed workflow head SHA", "slotSetting": true }
+]
+```
+
+## Azure Functions Runtime Readback
+
+Azure Functions supported runtime readback included `Node|24`.
+
+| Function App | Before | Node 24 attempt | Final |
+| --- | --- | --- | --- |
+| `func-jm1-acs-email-relay` | `Node|22` | `Node|24`, protected probe 503 | `Node|22`, protected probe 401 |
+| `func-jm1-diagnostic-ai-runner` | `Node|22` | `Node|24`, protected probe 503 | `Node|22`, protected probe 401 |

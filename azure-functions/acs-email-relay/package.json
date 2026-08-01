@@ -5,7 +5,7 @@
   "description": "Governed ACS Email relay for JM1 INT-PUB-005 author acknowledgments.",
   "main": "src/functions/*.js",
   "engines": {
-    "node": ">=24 <25"
+    "node": ">=22 <25"
   },
   "scripts": {
     "start": "func start",

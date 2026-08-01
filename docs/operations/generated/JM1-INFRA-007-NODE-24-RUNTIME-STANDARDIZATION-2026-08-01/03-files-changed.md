@@ -10,6 +10,8 @@
 - `azure-functions/acs-email-relay/package.json`
 - `azure-functions/acs-email-relay/package-lock.json`
 
+Note: Function package metadata now declares `>=22 <25` because the live Function Apps did not certify on `Node|24` and were rolled back to `Node|22`.
+
 ## CI/CD
 
 - `.github/workflows/azure-app-service-publishing.yml`
@@ -33,4 +35,3 @@
 
 - Historical evidence packages were not rewritten.
 - Generated local App Service ZIP artifacts were removed from the worktree and are not included.
-

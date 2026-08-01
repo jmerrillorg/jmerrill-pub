@@ -15,9 +15,9 @@ Discovery command class:
 | `.github/workflows/azure-app-service-publishing.yml` | Active CI/CD runtime authority | Updated `NODE_VERSION` to `24`; added runtime proof |
 | `.github/workflows/azure-static-web-apps.yml` | Active CI build authority | Added Node 24 setup and runtime proof |
 | `infra/jm1-infra-006/app-service/main.bicep` | Active App Service IaC | Updated production and staging declarations to `NODE|24-lts`; updated `WEBSITE_NODE_DEFAULT_VERSION` to `~24` |
-| `azure-functions/diagnostic-ai-runner/package.json` | Active Function package | Added Node `>=24 <25` engine |
+| `azure-functions/diagnostic-ai-runner/package.json` | Active Function package | Updated Node compatibility window to `>=22 <25`; live host retained on `Node|22` after failed `Node|24` smoke |
 | `azure-functions/diagnostic-ai-runner/package-lock.json` | Generated Function lockfile | Regenerated under Node 24/npm 11 |
-| `azure-functions/acs-email-relay/package.json` | Active Function package | Added Node `>=24 <25` engine |
+| `azure-functions/acs-email-relay/package.json` | Active Function package | Updated Node compatibility window to `>=22 <25`; live host retained on `Node|22` after failed `Node|24` smoke |
 | `azure-functions/acs-email-relay/package-lock.json` | Generated Function lockfile | Regenerated under Node 24/npm 11 |
 | `docs/infrastructure/JM1-INFRA-006-App-Service-Hosting-Standard.md` | Forward-looking runtime standard | Updated to Node 24 LTS |
 | `docs/infrastructure/JM1-INFRA-006-Publishing-App-Service-Migration-Runbook.md` | Forward-looking migration authority | Updated to Node 24 LTS |
@@ -35,3 +35,9 @@ Discovery command class:
 
 None found in active runtime, CI, App Service, Function package, or forward-looking hosting configuration after changes.
 
+## Remaining Active Non-24 Runtime References
+
+| Reference | Classification | Disposition |
+| --- | --- | --- |
+| `func-jm1-acs-email-relay` Azure runtime | Active Function host runtime | Retained at `Node|22`; attempted `Node|24` returned 503 on protected route, rollback returned 401 |
+| `func-jm1-diagnostic-ai-runner` Azure runtime | Active Function host runtime | Retained at `Node|22`; attempted `Node|24` returned 503 on protected route, rollback returned 401 |

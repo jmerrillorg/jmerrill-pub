@@ -22,5 +22,19 @@ Target: `app-jm1-pub-prod/staging`
 
 ## Post-Deployment Certification
 
-Pending until branch head is committed and deployed to staging.
+| Check | Result |
+| --- | --- |
+| Branch head | Final committed PR head; exact SHA recorded in PR return package |
+| Workflow run | Final staging workflow run recorded in PR return package |
+| Workflow result | SUCCESS |
+| Build job | PASS |
+| Staging deploy job | PASS |
+| Production promotion job | SKIPPED as intended (`deploy_production=false`) |
+| Staging `linuxFxVersion` | `NODE|24-lts` |
+| Staging `WEBSITE_NODE_DEFAULT_VERSION` | `~24` |
+| Staging `JM1_RELEASE_SHA` | Matched the deployed workflow head SHA |
+| Staging `/api/health` | 200, `status: ready` |
+| Payment gate | `disabled` |
+| Dependency health | configuration, Dataverse, Graph, ACS, artifact, Author Portal, and Stripe enrollment all `ready` |
 
+No production swap was triggered.

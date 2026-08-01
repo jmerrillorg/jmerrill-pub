@@ -8,8 +8,8 @@ Azure Functions v4 supports Node.js 24. Both active Function projects are JavaSc
 
 | Function project | Change |
 | --- | --- |
-| `azure-functions/acs-email-relay` | Added Node `>=24 <25` engine; regenerated lockfile |
-| `azure-functions/diagnostic-ai-runner` | Added Node `>=24 <25` engine; regenerated lockfile |
+| `azure-functions/acs-email-relay` | Declares Node `>=22 <25` compatibility; regenerated lockfile under Node 24/npm 11 |
+| `azure-functions/diagnostic-ai-runner` | Declares Node `>=22 <25` compatibility; regenerated lockfile under Node 24/npm 11 |
 
 ## Local Function Validation
 
@@ -18,7 +18,13 @@ Azure Functions v4 supports Node.js 24. Both active Function projects are JavaSc
 | `azure-functions/acs-email-relay` | Node `v24.18.1`, npm `11.19.0` | `npm ci`, lint, and 43/43 tests PASS |
 | `azure-functions/diagnostic-ai-runner` | Node `v24.18.1`, npm `11.19.0` | `npm ci`, lint, and 1757/1757 tests PASS |
 
-## Deployment Boundary
+## Azure Runtime Attempt
 
-No Function App production runtime was changed during this pass. Function source and lockfile readiness are complete; deployment remains a separately governed Function App release step where trigger discovery, invocation, managed identity, and Key Vault references must be rechecked in Azure.
+| Function App | Before | Attempted | Result | Rollback |
+| --- | --- | --- | --- | --- |
+| `func-jm1-acs-email-relay` | `Node|22`, 5 functions indexed, no-key protected probe 401 | `Node|24` | 5 functions indexed, no-key protected probe 503 | Returned to `Node|22`; 5 functions indexed; no-key protected probe 401 |
+| `func-jm1-diagnostic-ai-runner` | `Node|22`, 24 functions indexed, no-key protected probe 401 | `Node|24` | 24 functions indexed, no-key protected probe 503 | Returned to `Node|22`; 24 functions indexed; no-key protected probe 401 |
 
+## Certification Decision
+
+Function source compatibility under Node 24 is proven locally, and Azure platform support exists, but live Function host runtime certification failed. The active Function Apps remain on `Node|22` by rollback. A separate Function-host remediation is required before the overall JM1 runtime estate can be certified as fully Node 24.
