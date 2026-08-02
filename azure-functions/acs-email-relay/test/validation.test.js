@@ -511,6 +511,28 @@ test("approved author-review package sends validated attachments to ACS", () => 
   assert.equal(email.attachments[0].contentInBase64, Buffer.from("author-safe summary").toString("base64"));
 });
 
+test("approved author-review package preserves full attachment base64 payloads", () => {
+  const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
+  const payloadBytes = Buffer.from("author-safe summary ".repeat(500));
+  const payloadBase64 = payloadBytes.toString("base64");
+  assert.ok(payloadBase64.length > 300);
+
+  const result = validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload({
+    attachments: [
+      {
+        name: "Before You Were Born - Developmental Summary.pdf",
+        contentType: "application/pdf",
+        contentInBase64: payloadBase64
+      }
+    ]
+  }));
+
+  assert.equal(result.ok, true);
+  const email = buildApprovedAuthorResponseEmail(result.value);
+  assert.equal(email.attachments[0].contentInBase64, payloadBase64);
+  assert.equal(Buffer.byteLength(email.attachments[0].contentInBase64, "base64"), payloadBytes.byteLength);
+});
+
 test("relay auth failures return safe responses", () => {
   const { milestoneUnauthorized } = loadRelayModule();
 
