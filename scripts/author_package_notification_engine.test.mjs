@@ -48,7 +48,8 @@ const checks = [
   {
     name: 'corrected send references incomplete original and starts effective response clock',
     pass: () =>
-      engine.includes('Corrected Proofreading Review Package') &&
+      engine.includes('Corrected ${stageLabel} Review Package') &&
+      !engine.includes('Corrected Proofreading Review Package') &&
       engine.includes('The previous ${stageLabel.toLowerCase()} notice for') &&
       engine.includes('did not include the required package attachments') &&
       engine.includes('Your review period starts from the corrected package notification'),

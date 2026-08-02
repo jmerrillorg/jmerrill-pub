@@ -284,14 +284,16 @@ export function buildAuthorReviewNotificationCopy(input: {
   titleName: string
   authorName?: string
   corrected?: boolean
+  responseDeadline?: string
 }): AuthorReviewNotificationCopy {
   const stageLabel = stageLabelFor(input.stageCode)
   const authorName = input.authorName?.trim() || 'Author'
+  const responseDeadline = input.responseDeadline?.trim() || 'the seven-calendar-day response period stated in your package'
   if (input.corrected) {
     const rendered = renderAuthorCommunicationEmail({
       templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
       templateVersion: '1.0.0',
-      subject: `Corrected Proofreading Review Package - ${input.titleName}`,
+      subject: `Corrected ${stageLabel} Review Package — ${input.titleName}`,
       authorName,
       titleName: input.titleName,
       preheader: `Corrected ${stageLabel.toLowerCase()} package for ${input.titleName}.`,
@@ -315,7 +317,7 @@ export function buildAuthorReviewNotificationCopy(input: {
         'Approve with corrections',
         'Questions or clarification requested',
       ],
-      deadline: 'Please use the response window stated in the Author Operating Center or package instructions.',
+      deadline: `Please respond by ${responseDeadline}. Your seven-calendar-day review period starts from this corrected package notification.`,
       nextSteps: [
         'The publishing team will record your response.',
         'Approved corrections or approval will move through the governed next-stage process.',
@@ -354,13 +356,13 @@ export function buildAuthorReviewNotificationCopy(input: {
       'Review instructions',
       'Package manifest or package summary',
     ],
-    responseChoices: [
-      'Approve as presented',
-      'Approve with corrections',
-      'Questions or clarification requested',
-    ],
-    deadline: 'Please use the response window stated in the Author Operating Center or package instructions.',
-    nextSteps: [
+      responseChoices: [
+        'Approve as presented',
+        'Approve with corrections',
+        'Questions or clarification requested',
+      ],
+      deadline: `Please respond by ${responseDeadline}.`,
+      nextSteps: [
       'The publishing team will record your response.',
       'If you approve, the project can move to the next governed stage.',
       'If you request corrections, the publishing team will review them before any stage movement.',
