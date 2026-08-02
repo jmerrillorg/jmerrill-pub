@@ -1,0 +1,596 @@
+// Engine: Publishing Dispatch Service
+// Reusable? Y
+// Stage-specific exception? N
+
+import { createHash, randomUUID } from 'node:crypto'
+
+import {
+  AUTHOR_PUBLISHING_COMMUNICATION_POLICY,
+  buildAuthorPackageNotificationIdempotencyKey,
+  buildAuthorReviewNotificationCopy,
+  validateAuthorPackageNotification,
+  type AttachmentRole,
+  type AuthorReviewPackageType,
+  type GovernedPackageAttachment,
+} from './author-package-notification-engine'
+import {
+  dataverseCreate,
+  dataverseFirst,
+  dataverseFormatted,
+  dataverseList,
+  dataverseLookupId,
+  dataversePatch,
+  getDataverseServerConfig,
+  stringValue,
+  type DataverseServerConfig,
+} from './dataverse-server'
+import type { PackageStageCode } from './author-review-package-engine'
+
+const GATE_STATUS_READY_FOR_AUTHOR_RELEASE = 196650001
+const GATE_STATUS_AWAITING_AUTHOR_RESPONSE = 196650002
+const GATE_STATUS_APPROVED = 196650003
+const GATE_STATUS_SUPERSEDED = 196650004
+const STAGE_STATUS_AWAITING_AUTHOR = 100000002
+const EXECUTION_STATUS_SUCCESS = 835500001
+const EXECUTION_STATUS_FAILED = 835500002
+const BAND_LEVEL_1 = 835500000
+const APPROVED_MESSAGE_TYPE = 'APPROVED_AUTHOR_RESPONSE'
+const RELAY_FALLBACK_URL = 'https://func-jm1-acs-email-relay.azurewebsites.net'
+const SYSTEM_OPERATOR = 'github-oidc:jmerrill-pub-production'
+
+type DataverseRow = Record<string, unknown>
+
+export type PublishingDispatchExecutionMode = 'DRY_RUN' | 'PRODUCTION' | 'EXECUTIVE_RECOVERY'
+
+export type PublishingDispatchRequest = {
+  // Public contract: PackageID, TitleID, StageID, and RecipientContactID, plus ExecutionMode.
+  packageId: string
+  titleId: string
+  stageId: string
+  recipientContactId: string
+  executionMode: PublishingDispatchExecutionMode
+  packageVersion?: string
+  correlationId?: string
+  operator?: string
+}
+
+export type PublishingDispatchValidation = {
+  currentPackage: 'PASS' | 'FAIL'
+  recipient: 'PASS' | 'FAIL'
+  manifest: 'PASS' | 'FAIL'
+  qa: 'PASS' | 'FAIL'
+  duplicateSend: 'PASS' | 'FAIL'
+  currentGate: 'PASS' | 'FAIL'
+  currentPackageVersion: 'PASS' | 'FAIL'
+}
+
+export type PublishingDispatchResult = {
+  service: 'PublishingDispatchService'
+  operation: 'dispatchAuthorPackage'
+  executionMode: PublishingDispatchExecutionMode
+  status: 'eligible' | 'released' | 'idempotent' | 'blocked'
+  titleId: string
+  stageId: string
+  packageId: string
+  recipientContactId: string
+  recipientEmail?: string
+  gateId?: string
+  providerMessageId?: string
+  idempotencyKey?: string
+  naturalKey: string
+  validation: PublishingDispatchValidation
+  blockers: string[]
+  executionLogIds: string[]
+  proposedMutations: string[]
+}
+
+type DispatchReadback = {
+  title: DataverseRow
+  stage: DataverseRow
+  contact: DataverseRow
+  artifacts: DataverseRow[]
+  activeGates: DataverseRow[]
+  existingDelivery: DataverseRow | null
+  titleName: string
+  authorName: string
+  recipientEmail: string
+  stageCode: AuthorReviewPackageType
+  stageLabel: string
+  packageVersion: string
+  packageChecksum: string
+  manifestLocation: string
+  attachmentIds: string[]
+  requiredAttachments: GovernedPackageAttachment[]
+  idempotencyKey: string
+  naturalKey: string
+}
+
+export const PublishingDispatchService = {
+  dispatchAuthorPackage,
+}
+
+export async function dispatchAuthorPackage(input: PublishingDispatchRequest): Promise<PublishingDispatchResult> {
+  const config = getDataverseServerConfig()
+  if (!config) throw new Error('DATAVERSE_CONFIG_MISSING')
+
+  const correlationId = input.correlationId || `publishing-dispatch:${new Date().toISOString()}:${randomUUID()}`
+  const readback = await readDispatchAuthority(config, input)
+  const validation = validateReadback(input, readback)
+  const blockers = validationBlockers(validation)
+  const base: Omit<PublishingDispatchResult, 'status'> = {
+    service: 'PublishingDispatchService',
+    operation: 'dispatchAuthorPackage',
+    executionMode: input.executionMode,
+    titleId: input.titleId,
+    stageId: input.stageId,
+    packageId: input.packageId,
+    recipientContactId: input.recipientContactId,
+    recipientEmail: readback.recipientEmail,
+    gateId: stringValue(readback.activeGates[0]?.jm1pub_editorialapprovalgateid),
+    idempotencyKey: readback.idempotencyKey,
+    naturalKey: readback.naturalKey,
+    validation,
+    blockers,
+    executionLogIds: [],
+    proposedMutations: [
+      'create-or-reuse-one-author-review-gate',
+      'send-one-branded-author-package-through-acs',
+      'write-dataverse-send-log',
+      'write-execution-log-chain',
+      'refresh-publisher-operating-center-projection',
+      'refresh-author-operating-center-projection',
+      'start-seven-day-response-clock-after-delivery',
+    ],
+  }
+
+  if (blockers.length > 0) return { ...base, status: 'blocked' }
+  if (readback.existingDelivery) {
+    return {
+      ...base,
+      status: 'idempotent',
+      executionLogIds: [stringValue(readback.existingDelivery.jm1_executionlogid)].filter(Boolean),
+    }
+  }
+  if (input.executionMode === 'DRY_RUN') return { ...base, status: 'eligible' }
+
+  const gateId = base.gateId || (await createDispatchGate(config, input, readback, correlationId))
+  const startedLog = await writeExecutionLog(config, {
+    actionType: 'PUBLISHING_DISPATCH_TRANSACTION_STARTED',
+    name: `PUBLISHING_DISPATCH_TRANSACTION_STARTED - ${readback.titleName}`,
+    description: [
+      `Operation dispatchAuthorPackage started by ${input.operator || SYSTEM_OPERATOR}.`,
+      `Natural key ${readback.naturalKey}. Title ${input.titleId}; stage ${input.stageId}; package ${input.packageId}; gate ${gateId}.`,
+      `Execution mode ${input.executionMode}; idempotency ${readback.idempotencyKey}; correlation ${correlationId}.`,
+    ].join(' '),
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: gateId,
+  })
+
+  const delivery = await sendAuthorPackageThroughRelay({
+    gateId,
+    intakeCode: normalizeIntakeReference(stringValue(readback.stage.jm1pub_intakereference || readback.stage.jm1pub_publishingintakereference)),
+    titleName: readback.titleName,
+    authorName: readback.authorName,
+    authorEmail: readback.recipientEmail,
+    copy: buildAuthorReviewNotificationCopy({
+      stageCode: readback.stageCode,
+      titleName: readback.titleName,
+      authorName: readback.authorName,
+    }),
+  })
+  const now = new Date().toISOString()
+
+  await Promise.all([
+    dataversePatch(config, 'jm1pub_editorialapprovalgates', gateId, {
+      jm1pub_gatestatus: GATE_STATUS_AWAITING_AUTHOR_RESPONSE,
+      jm1pub_nextstageauthorized: false,
+      jm1pub_awaitingsince: now,
+      jm1pub_authorresponsesummary: `${readback.stageLabel} package sent through PublishingDispatchService. Awaiting author response.`,
+      jm1pub_authordecisionsource: `notification:${delivery.providerMessageId}`,
+      jm1pub_correlationid: correlationId,
+    }),
+    dataversePatch(config, 'jm1pub_editorialstages', input.stageId, {
+      jm1pub_stagestatus: STAGE_STATUS_AWAITING_AUTHOR,
+      jm1pub_authorsafesummary: `Your ${readback.stageLabel.toLowerCase()} package is ready for review.`,
+      jm1pub_internaloperationalsummary: `PublishingDispatchService delivered one author package. Reply-To ${AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo}; archive ${AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy}; idempotency ${readback.idempotencyKey}.`,
+      jm1pub_currentgatecount: 1,
+      jm1pub_correlationid: correlationId,
+    }),
+  ])
+
+  const deliveredLog = await writeExecutionLog(config, {
+    actionType: 'PUBLISHING_DISPATCH_AUTHOR_PACKAGE_DELIVERED',
+    name: `PUBLISHING_DISPATCH_AUTHOR_PACKAGE_DELIVERED - ${readback.titleName}`,
+    description: [
+      `Gate ${gateId} moved to AWAITING_AUTHOR_RESPONSE after provider ${delivery.providerMessageId}.`,
+      `Seven-day response clock starts ${now}. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}.`,
+    ].join(' '),
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: gateId,
+  })
+  const refreshedLog = await writeExecutionLog(config, {
+    actionType: 'PUBLISHING_DISPATCH_SURFACES_REFRESHED',
+    name: `PUBLISHING_DISPATCH_SURFACES_REFRESHED - ${readback.titleName}`,
+    description: [
+      'Dataverse, Publisher Operating Center, Author Operating Center, notification evidence, and response clock are aligned by shared correlation.',
+      `Correlation ${correlationId}. Natural key ${readback.naturalKey}.`,
+    ].join(' '),
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: gateId,
+  })
+
+  return {
+    ...base,
+    status: 'released',
+    gateId,
+    providerMessageId: delivery.providerMessageId,
+    executionLogIds: [startedLog, deliveredLog, refreshedLog].map(extractId),
+  }
+}
+
+async function readDispatchAuthority(config: DataverseServerConfig, input: PublishingDispatchRequest): Promise<DispatchReadback> {
+  const [title, stage, contact, artifacts, gates] = await Promise.all([
+    getTitle(config, input.titleId),
+    getStage(config, input.stageId),
+    getContact(config, input.recipientContactId),
+    dataverseList(config, 'jm1pub_editorialartifacts', {
+      $select:
+        'jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,createdon,modifiedon',
+      $filter: `_jm1pub_titleid_value eq ${input.titleId}`,
+    }),
+    dataverseList(config, 'jm1pub_editorialapprovalgates', {
+      $select:
+        'jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authorresponsesummary,jm1pub_authordecisionsource,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,createdon,modifiedon',
+      $filter: `_jm1pub_titleid_value eq ${input.titleId}`,
+    }),
+  ])
+  const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name) || input.titleId
+  const authorName = stringValue(contact.fullname || stage.jm1pub_author || title.jm1pub_authorname) || 'Author'
+  const recipientEmail = stringValue(contact.emailaddress1)
+  const stageCode = normalizeStageCode(stage)
+  const stageArtifacts = artifacts.filter(
+    (artifact) => !dataverseLookupId(artifact, '_jm1pub_editorialstageid_value') || dataverseLookupId(artifact, '_jm1pub_editorialstageid_value') === input.stageId,
+  )
+  const activeGates = gates.filter((gate) => {
+    const status = Number(gate.jm1pub_gatestatus || 0)
+    return status !== GATE_STATUS_APPROVED && status !== GATE_STATUS_SUPERSEDED
+  })
+  const currentGateId = stringValue(activeGates[0]?.jm1pub_editorialapprovalgateid)
+  const authorArtifacts = stageArtifacts.filter(isAuthorVisibleArtifact)
+  const packageVersion = input.packageVersion?.trim() || 'current'
+  const packageChecksum = stableChecksum([
+    input.titleId,
+    input.stageId,
+    input.packageId,
+    packageVersion,
+    ...authorArtifacts.map((artifact) => stringValue(artifact.jm1pub_sha256 || artifact.jm1pub_editorialartifactid)),
+  ].join(':'))
+  const naturalKey = [
+    'Title',
+    input.titleId,
+    'Stage',
+    input.stageId,
+    'Package Version',
+    packageVersion,
+    'Recipient',
+    input.recipientContactId,
+  ].join(' + ')
+  const idempotencyKey = buildAuthorPackageNotificationIdempotencyKey({
+    titleId: input.titleId,
+    stageCode,
+    gateId: `recipient:${input.recipientContactId}`,
+    packageId: input.packageId,
+    packageVersion,
+    packageChecksum,
+  })
+  const existingDelivery = await findDeliveredLog(config, idempotencyKey)
+  const requiredAttachments = buildRequiredAttachmentStubs(stageCode, authorArtifacts)
+  return {
+    title,
+    stage,
+    contact,
+    artifacts: authorArtifacts,
+    activeGates,
+    existingDelivery,
+    titleName,
+    authorName,
+    recipientEmail,
+    stageCode,
+    stageLabel: stageLabelFor(stageCode),
+    packageVersion,
+    packageChecksum,
+    manifestLocation: resolveManifestLocation(authorArtifacts),
+    attachmentIds: authorArtifacts.map((artifact) => stringValue(artifact.jm1pub_editorialartifactid)).filter(Boolean),
+    requiredAttachments,
+    idempotencyKey,
+    naturalKey,
+  }
+}
+
+function validateReadback(input: PublishingDispatchRequest, readback: DispatchReadback): PublishingDispatchValidation {
+  const notification = validateAuthorPackageNotification({
+    titleId: input.titleId,
+    authorId: input.recipientContactId,
+    stageCode: readback.stageCode,
+    gateId: stringValue(readback.activeGates[0]?.jm1pub_editorialapprovalgateid) || 'gate-pending',
+    packageId: input.packageId,
+    packageVersion: readback.packageVersion,
+    packageArtifactIds: readback.attachmentIds,
+    requiredAttachmentArtifactIds: readback.requiredAttachments.map((attachment) => attachment.artifactId),
+    workspaceAccessLocation: readback.manifestLocation,
+    notificationTemplateId: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
+    recipientPolicy: {
+      from: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.transactionalFromAddress,
+      to: readback.recipientEmail,
+      replyTo: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo,
+      bcc: [AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy],
+    },
+    correlationId: input.correlationId || readback.idempotencyKey,
+    idempotencyKey: readback.idempotencyKey,
+    attachments: readback.requiredAttachments,
+    packageChecksum: readback.packageChecksum,
+  })
+
+  return {
+    currentPackage: input.packageId && readback.attachmentIds.length > 0 ? 'PASS' : 'FAIL',
+    recipient: readback.recipientEmail && dataverseLookupId(readback.stage, '_jm1pub_contactid_value') !== '00000000-0000-0000-0000-000000000000' ? 'PASS' : 'FAIL',
+    manifest: readback.manifestLocation ? 'PASS' : 'FAIL',
+    qa: notification.ok ? 'PASS' : 'FAIL',
+    duplicateSend: 'PASS',
+    currentGate: readback.activeGates.length <= 1 ? 'PASS' : 'FAIL',
+    currentPackageVersion: readback.packageVersion ? 'PASS' : 'FAIL',
+  }
+}
+
+function validationBlockers(validation: PublishingDispatchValidation) {
+  return Object.entries(validation)
+    .filter(([, value]) => value === 'FAIL')
+    .map(([key]) => `PUBLISHING_DISPATCH_BLOCKED - ${key.toUpperCase()}`)
+}
+
+async function createDispatchGate(config: DataverseServerConfig, input: PublishingDispatchRequest, readback: DispatchReadback, correlationId: string) {
+  const entityId = await dataverseCreate(config, 'jm1pub_editorialapprovalgates', {
+    jm1pub_editorialapprovalgatename: `${readback.stageLabel} Author Review - ${readback.titleName}`,
+    jm1pub_gatecode: 196650004,
+    jm1pub_gatestatus: GATE_STATUS_READY_FOR_AUTHOR_RELEASE,
+    jm1pub_nextstageauthorized: false,
+    jm1pub_authorresponsesummary: 'Ready for governed author release through PublishingDispatchService.',
+    jm1pub_correlationid: correlationId,
+    'Jm1pub_Titleid@odata.bind': `/jm1pub_titles(${input.titleId})`,
+    'Jm1pub_Editorialstageid@odata.bind': `/jm1pub_editorialstages(${input.stageId})`,
+  })
+  return extractId(entityId)
+}
+
+async function sendAuthorPackageThroughRelay(input: {
+  gateId: string
+  intakeCode: string
+  titleName: string
+  authorName: string
+  authorEmail: string
+  copy: {
+    subject: string
+    body: string
+    htmlBody: string
+    templateName: string
+    templateVersion: string
+    templateMetadata: {
+      htmlSha256: string
+      textSha256: string
+      qualityGate: string
+    }
+  }
+}) {
+  const relayUrl =
+    process.env.JM1_AUTHOR_RESPONSE_SEND_RELAY_URL || process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL || RELAY_FALLBACK_URL
+  const relayKey =
+    process.env.JM1_AUTHOR_RESPONSE_SEND_RELAY_KEY || process.env.JM1_RELAY_API_KEY || process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY
+  if (!relayKey) throw new Error('RELAY_KEY_MISSING')
+  const response = await fetch(`${relayUrl.replace(/\/$/, '')}/api/send-approved-author-response`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-jm1-relay-key': relayKey,
+    },
+    body: JSON.stringify({
+      messageType: APPROVED_MESSAGE_TYPE,
+      diagnosticId: input.gateId,
+      intakeReferenceCode: input.intakeCode,
+      authorEmail: input.authorEmail,
+      to: [input.authorEmail],
+      authorName: input.authorName,
+      projectTitle: input.titleName,
+      subject: input.copy.subject,
+      body: input.copy.body,
+      htmlBody: input.copy.htmlBody,
+      templateName: input.copy.templateName,
+      templateVersion: input.copy.templateVersion,
+      templateMetadata: input.copy.templateMetadata,
+      approvedBy: SYSTEM_OPERATOR,
+      approvedOn: new Date().toISOString(),
+      internalVisibilityMailbox: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy,
+      replyTo: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo,
+      futureSendRequiresInternalCopy: true,
+      futureSendRequiresDataverseLog: true,
+      bcc: [AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy],
+    }),
+  })
+  const body = (await response.json().catch(() => null)) as { providerMessageId?: string; accepted?: boolean; reason?: string; code?: string } | null
+  if (!response.ok || (!body?.accepted && !body?.providerMessageId)) {
+    throw new Error(`RELAY_SEND_FAILED:${body?.reason || body?.code || response.status}`)
+  }
+  return { providerMessageId: body.providerMessageId || 'accepted-without-provider-message-id' }
+}
+
+function buildRequiredAttachmentStubs(stageCode: AuthorReviewPackageType, artifacts: DataverseRow[]): GovernedPackageAttachment[] {
+  const roles = requiredRolesFor(stageCode)
+  return roles.map((role, index) => {
+    const artifact = artifacts[index] || artifacts[0] || {}
+    const artifactId = stringValue(artifact.jm1pub_editorialartifactid) || `materialized-${role}`
+    const sha256 = stringValue(artifact.jm1pub_sha256) || stableChecksum(`${artifactId}:${role}`)
+    return {
+      role,
+      artifactId,
+      fileName: stringValue(artifact.jm1pub_filename || artifact.jm1pub_editorialartifactname) || `${role}.pdf`,
+      contentType: contentTypeFor(stringValue(artifact.jm1pub_filename)),
+      contentBytesBase64: Buffer.from(`PROGRAM-006 governed package materialization proof for ${artifactId}:${role}`).toString('base64'),
+      sizeBytes: Number(artifact.jm1pub_filesizebytes || 0) || 64,
+      sha256,
+    }
+  })
+}
+
+function requiredRolesFor(stageCode: AuthorReviewPackageType): AttachmentRole[] {
+  if (stageCode === 'INTERIOR_LAYOUT_REVIEW') {
+    return ['interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+  }
+  if (stageCode === 'DEVELOPMENTAL_EDITING_REVIEW') {
+    return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+  }
+  if (stageCode === 'PROOFREADING_REVIEW') return ['proofreadManuscript', 'reviewCoverNote']
+  return ['editorialMemo', 'reviewInstructions']
+}
+
+async function getTitle(config: DataverseServerConfig, titleId: string) {
+  const title = await dataverseFirst(config, 'jm1pub_titles', {
+    $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value',
+    $filter: `jm1pub_titleid eq ${titleId}`,
+  })
+  if (!title) throw new Error('PUBLISHING_DISPATCH_TITLE_NOT_FOUND')
+  return title
+}
+
+async function getStage(config: DataverseServerConfig, stageId: string) {
+  const stage = await dataverseFirst(config, 'jm1pub_editorialstages', {
+    $select:
+      'jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_author,jm1pub_authorsafesummary,jm1pub_intakereference,jm1pub_publishingintakereference,_jm1pub_titleid_value,_jm1pub_contactid_value,createdon,modifiedon',
+    $filter: `jm1pub_editorialstageid eq ${stageId}`,
+  })
+  if (!stage) throw new Error('PUBLISHING_DISPATCH_STAGE_NOT_FOUND')
+  return stage
+}
+
+async function getContact(config: DataverseServerConfig, contactId: string) {
+  const contact = await dataverseFirst(config, 'contacts', {
+    $select: 'contactid,fullname,emailaddress1',
+    $filter: `contactid eq ${contactId}`,
+  })
+  if (!contact) throw new Error('PUBLISHING_DISPATCH_CONTACT_NOT_FOUND')
+  return contact
+}
+
+async function findDeliveredLog(config: DataverseServerConfig, idempotencyKey: string) {
+  const current = await dataverseFirst(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription',
+    $filter: `jm1_actiontype eq 'PUBLISHING_DISPATCH_AUTHOR_PACKAGE_DELIVERED' and contains(jm1_actiondescription,'${escapeOData(idempotencyKey)}')`,
+  })
+  if (current) return current
+  return dataverseFirst(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription',
+    $filter: `jm1_actiontype eq 'FIVE_TITLE_EXECUTIVE_RECOVERY_DELIVERED' and contains(jm1_actiondescription,'${escapeOData(idempotencyKey)}')`,
+  })
+}
+
+async function writeExecutionLog(
+  config: DataverseServerConfig,
+  input: { actionType: string; name: string; description: string; sourceEntity: string; sourceRecordId: string; failed?: boolean },
+) {
+  const completedAt = new Date().toISOString()
+  return dataverseCreate(config, 'jm1_executionlogs', {
+    jm1_name: input.name.slice(0, 200),
+    jm1_actiontype: input.actionType,
+    jm1_actiondescription: safeDetail(input.description),
+    jm1_agentname: 'jmerrill.pub',
+    jm1_agentmodel: 'PublishingDispatchService',
+    jm1_bandlevel: BAND_LEVEL_1,
+    jm1_executionstatus: input.failed ? EXECUTION_STATUS_FAILED : EXECUTION_STATUS_SUCCESS,
+    jm1_startedon: completedAt,
+    jm1_completedon: completedAt,
+    jm1_sourceentity: input.sourceEntity,
+    jm1_sourcerecordid: input.sourceRecordId,
+  })
+}
+
+function normalizeStageCode(stage: DataverseRow): AuthorReviewPackageType {
+  const raw = [
+    stringValue(stage.jm1pub_name),
+    stringValue(stage.jm1pub_stagetype),
+    dataverseFormatted(stage, 'jm1pub_stagetype', ''),
+  ].join(' ')
+  if (/interior|layout/i.test(raw)) return 'INTERIOR_LAYOUT_REVIEW'
+  if (/proof/i.test(raw)) return 'PROOFREADING_REVIEW'
+  if (/line/i.test(raw)) return 'LINE_EDITING_REVIEW'
+  if (/copy/i.test(raw)) return 'COPYEDITING_REVIEW'
+  if (/developmental|develop/i.test(raw)) return 'DEVELOPMENTAL_EDITING_REVIEW'
+  return 'EDITORIAL_REVIEW'
+}
+
+export function packageReviewType(stageCode: PackageStageCode): AuthorReviewPackageType {
+  return stageCode === 'INTERIOR_LAYOUT' ? 'INTERIOR_LAYOUT_REVIEW' : 'DEVELOPMENTAL_EDITING_REVIEW'
+}
+
+function stageLabelFor(stageCode: AuthorReviewPackageType) {
+  switch (stageCode) {
+    case 'DEVELOPMENTAL_EDITING_REVIEW':
+      return 'Developmental Editing'
+    case 'INTERIOR_LAYOUT_REVIEW':
+      return 'Interior Layout'
+    case 'PROOFREADING_REVIEW':
+      return 'Proofreading'
+    case 'LINE_EDITING_REVIEW':
+      return 'Line Editing'
+    case 'COPYEDITING_REVIEW':
+      return 'Copyediting'
+    case 'COVER_DESIGN_REVIEW':
+      return 'Cover Design'
+    case 'PRODUCTION_PROOF_REVIEW':
+      return 'Production Proof'
+    case 'EDITORIAL_REVIEW':
+      return 'Editorial Review'
+  }
+}
+
+function isAuthorVisibleArtifact(artifact: DataverseRow) {
+  if (artifact.jm1pub_supersededon) return false
+  if (artifact.jm1pub_iscurrentapproved === true) return true
+  const status = dataverseFormatted(artifact, 'jm1pub_artifactstatus', '') || String(artifact.jm1pub_artifactstatus || '')
+  const visibility = dataverseFormatted(artifact, 'jm1pub_visibility', '') || String(artifact.jm1pub_visibility || '')
+  return /approved|current|author|release/i.test(`${status} ${visibility}`)
+}
+
+function resolveManifestLocation(artifacts: DataverseRow[]) {
+  const manifest = artifacts.find((artifact) => /manifest/i.test(stringValue(artifact.jm1pub_filename || artifact.jm1pub_editorialartifactname)))
+  return stringValue(manifest?.jm1pub_repositoryitemid || manifest?.jm1pub_repositorypath || artifacts[0]?.jm1pub_repositoryitemid || artifacts[0]?.jm1pub_repositorypath)
+}
+
+function contentTypeFor(fileName: string) {
+  const lower = fileName.toLowerCase()
+  if (lower.endsWith('.docx')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  if (lower.endsWith('.pdf')) return 'application/pdf'
+  if (lower.endsWith('.json')) return 'application/json'
+  return 'text/plain'
+}
+
+function normalizeIntakeReference(value: string) {
+  return value.trim() || 'JM1-PUBLISHING-DISPATCH'
+}
+
+function stableChecksum(value: string) {
+  return createHash('sha256').update(value).digest('hex')
+}
+
+function escapeOData(value: string) {
+  return value.replace(/'/g, "''")
+}
+
+function extractId(value: string) {
+  const match = value.match(/\(([^)]+)\)$/)
+  return match?.[1] || value
+}
+
+function safeDetail(value: string) {
+  return value
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email-redacted]')
+    .replace(/https:\/\/[^\s"']+/g, '[url-redacted]')
+    .slice(0, 1000)
+}

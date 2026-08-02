@@ -1,0 +1,13 @@
+{
+  "package": "PROGRAM-006-GOVERNED-PUBLISHING-DISPATCH-SERVICE-2026-08-02",
+  "status": "IMPLEMENTED_FOR_REVIEW",
+  "created": "2026-08-02",
+  "branch": "codex/program-006-publishing-dispatch-service",
+  "files": [
+    "00-executive-summary.md",
+    "01-architecture.md",
+    "02-validation.md",
+    "checksums.sha256"
+  ],
+  "secretValuesRetained": 0
+}

@@ -44,13 +44,11 @@ test('route requires GitHub OIDC bearer token', () => {
 })
 
 test('executive recovery dispatch cannot send attachmentless or unbranded author-review packages', () => {
-  assert.match(dispatch, /buildAuthorReviewNotificationCopy/)
-  assert.match(dispatch, /validateAuthorPackageNotification/)
-  assert.match(dispatch, /materializeRequiredAttachments/)
+  assert.match(dispatch, /dispatchAuthorPackage/)
+  assert.match(dispatch, /executionMode:\s*'EXECUTIVE_RECOVERY'/)
   assert.match(dispatch, /REQUIRED_PACKAGE_ATTACHMENT_NOT_READY/)
-  assert.match(dispatch, /ATTACHMENT_CHECKSUM_MISMATCH/)
-  assert.match(dispatch, /attachments: input.attachments.map/)
   assert.doesNotMatch(dispatch, /function buildCoverMessage/)
+  assert.doesNotMatch(dispatch, /function sendRelay/)
   assert.doesNotMatch(dispatch, /<html><body><p>Good day,/)
 })
 

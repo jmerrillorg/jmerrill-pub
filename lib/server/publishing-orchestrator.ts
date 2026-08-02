@@ -17,6 +17,7 @@ import {
   validateAuthorPackageNotification,
   type AuthorReviewPackageType,
 } from './author-package-notification-engine'
+import { dispatchAuthorPackage } from './publishing-dispatch-service'
 
 const EXECUTION_STATUS_SUCCESS = 835500001
 const EXECUTION_STATUS_FAILED = 835500002
@@ -112,6 +113,49 @@ export async function handleAuthorReviewPackageReadyForRelease(input: Notificati
 
 export async function sendProofreadingNotification(input: NotificationInput): Promise<OrchestrationResult> {
   const config = requireDataverseConfig()
+  const canonicalGate = await getGate(config, input.gateId)
+  const canonicalStageId = dataverseLookupId(canonicalGate, '_jm1pub_editorialstageid_value')
+  const canonicalTitleId = dataverseLookupId(canonicalGate, '_jm1pub_titleid_value')
+  const canonicalPackageId = dataverseLookupId(canonicalGate, '_jm1pub_deliverableartifactid_value') || input.gateId
+  const canonicalStage = canonicalStageId ? await getStage(config, canonicalStageId) : null
+  const recipientContactId =
+    (canonicalStage ? dataverseLookupId(canonicalStage, '_jm1pub_contactid_value') : '') ||
+    dataverseLookupId(canonicalGate, '_jm1pub_contactid_value')
+
+  if (canonicalStageId && canonicalTitleId && recipientContactId) {
+    const dispatch = await dispatchAuthorPackage({
+      packageId: canonicalPackageId,
+      titleId: canonicalTitleId,
+      stageId: canonicalStageId,
+      recipientContactId,
+      executionMode: 'PRODUCTION',
+      packageVersion: 'current',
+      correlationId: input.correlationId,
+      operator: input.operatorEmail,
+    })
+    if (dispatch.status === 'released') {
+      return {
+        status: 'notification-sent',
+        gateId: dispatch.gateId || input.gateId,
+        providerMessageId: dispatch.providerMessageId || 'accepted-without-provider-message-id',
+        providerEvidenceStatus: dispatch.providerMessageId ? 'captured' : 'not-returned-by-relay',
+        executionLogIds: dispatch.executionLogIds,
+      }
+    }
+    if (dispatch.status === 'idempotent') {
+      return {
+        status: 'idempotent',
+        idempotencyKey: dispatch.idempotencyKey || dispatch.naturalKey,
+        executionLogIds: dispatch.executionLogIds,
+      }
+    }
+    return {
+      status: 'blocked',
+      blocker: dispatch.blockers.join('; ') || 'PUBLISHING_DISPATCH_BLOCKED',
+      executionLogIds: dispatch.executionLogIds,
+    }
+  }
+
   const stageCode: AuthorReviewPackageType = 'PROOFREADING_REVIEW'
   const attachmentPolicy = AUTHOR_PACKAGE_NOTIFICATION_POLICIES[stageCode]
   const gate = await getGate(config, input.gateId)
