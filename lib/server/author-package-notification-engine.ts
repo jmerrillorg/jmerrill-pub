@@ -153,6 +153,22 @@ export type AuthorReviewNotificationCopy = {
   templateMetadata: RenderedAuthorCommunication['metadata']
 }
 
+export function responseClockLanguageBeforeCertificationBlocker(copy: {
+  body?: string
+  htmlBody?: string
+  operationallyCertified?: boolean
+}) {
+  const rendered = `${copy.body || ''}\n${copy.htmlBody || ''}`
+  if (copy.operationallyCertified === true) return ''
+  if (/review period starts from this (corrected )?email delivery/i.test(rendered)) {
+    return 'RESPONSE_CLOCK_LANGUAGE_BEFORE_CERTIFICATION'
+  }
+  if (/seven-calendar-day review period starts/i.test(rendered)) {
+    return 'RESPONSE_CLOCK_LANGUAGE_BEFORE_CERTIFICATION'
+  }
+  return ''
+}
+
 export type PackageNotificationValidationResult = {
   ok: boolean
   blocker?: string
@@ -342,13 +358,21 @@ export function buildAuthorReviewNotificationCopy(input: {
       primaryActionLabel: 'View in Author Operating Center',
       primaryActionUrl: input.primaryActionUrl,
       packageInventory,
-      deadline: `Please respond by ${responseDeadline}. Your seven-calendar-day review period starts from this corrected email delivery.`,
+      deadline: `Please respond by ${responseDeadline}. The publishing team will confirm the review period after we verify the corrected delivery is usable.`,
       nextSteps: [
         'The publishing team will record your response.',
         'Approved corrections or approval will move to the next publishing step.',
         'If you have questions, reply directly to this message.',
       ],
     })
+    const prematureClockLanguage = responseClockLanguageBeforeCertificationBlocker({
+      body: rendered.text,
+      htmlBody: rendered.html,
+      operationallyCertified: false,
+    })
+    if (prematureClockLanguage) {
+      throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ${prematureClockLanguage}`)
+    }
     return {
       subject: rendered.subject,
       body: rendered.text,
@@ -384,6 +408,14 @@ export function buildAuthorReviewNotificationCopy(input: {
       'If you request corrections, the publishing team will review them before any stage movement.',
     ],
   })
+  const prematureClockLanguage = responseClockLanguageBeforeCertificationBlocker({
+    body: rendered.text,
+    htmlBody: rendered.html,
+    operationallyCertified: false,
+  })
+  if (prematureClockLanguage) {
+    throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ${prematureClockLanguage}`)
+  }
   return {
     subject: rendered.subject,
     body: rendered.text,

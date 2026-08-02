@@ -45,13 +45,15 @@ const checks = [
       orchestrator.includes('buildAuthorPackageNotificationIdempotencyKey({'),
   },
   {
-    name: 'corrected send is email-first and starts effective response clock',
+    name: 'corrected send is email-first and avoids clock-start language before certification',
     pass: () =>
       engine.includes('Corrected ${subjectStageLabel} Review Materials') &&
       !engine.includes('Corrected Proofreading Review Package') &&
       engine.includes('one clear email') &&
       engine.includes('You do not need to use the portal to complete this review') &&
-      engine.includes('Your seven-calendar-day review period starts from this corrected email delivery') &&
+      engine.includes('The publishing team will confirm the review period after we verify the corrected delivery is usable') &&
+      engine.includes('RESPONSE_CLOCK_LANGUAGE_BEFORE_CERTIFICATION') &&
+      !engine.includes('Your seven-calendar-day review period starts from this corrected email delivery') &&
       engine.includes('Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions'),
   },
   {

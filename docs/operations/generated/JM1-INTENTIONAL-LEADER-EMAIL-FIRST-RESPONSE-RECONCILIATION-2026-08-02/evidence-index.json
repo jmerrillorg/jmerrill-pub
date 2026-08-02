@@ -1,0 +1,32 @@
+{
+  "package": "JM1-INTENTIONAL-LEADER-EMAIL-FIRST-RESPONSE-RECONCILIATION-2026-08-02",
+  "created": "2026-08-02",
+  "title": "The Intentional Leader",
+  "titleId": "e797232b-da7a-f111-ab0f-00224820105b",
+  "stage": "Interior Layout",
+  "stageId": "c9dee533-4184-f111-ab0f-7c1e525b15c2",
+  "gateId": "5141f7db-0a8e-f111-8077-00224820105b",
+  "delivery": {
+    "status": "SENT_ONCE",
+    "timestamp": "2026-08-02T22:16:10Z",
+    "attachmentsReceived": 2,
+    "portalRequired": false
+  },
+  "response": {
+    "timestamp": "2026-08-02T22:40:12Z",
+    "classification": "QUESTIONS_OR_CLARIFICATION_REQUESTED",
+    "responseClockStarted": false
+  },
+  "confirmation": {
+    "sent": true,
+    "timestamp": "2026-08-02T23:20:19Z",
+    "subject": "We received your Interior Layout review notes"
+  },
+  "qualityIssue": "EMAIL_COPY_POLICY_VARIANCE",
+  "guardAdded": "RESPONSE_CLOCK_LANGUAGE_BEFORE_CERTIFICATION",
+  "files": [
+    "00-response-reconciliation.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}
