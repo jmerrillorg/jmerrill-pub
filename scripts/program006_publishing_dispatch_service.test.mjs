@@ -31,7 +31,15 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
     'intakeReference',
     'currentPackageVersion',
     'requiredAttachments',
+    'attachmentByteLength',
+    'fileSignatures',
+    'attachmentOpenTests',
+    'expectedAttachmentContent',
+    'sourceChecksumLineage',
     'attachmentChecksums',
+    'deliveredAttachmentInventory',
+    'deliveredButtonUrl',
+    'authorClickThrough',
     'portalAccessPreflight',
     'workspaceTarget',
     'Title',
@@ -47,6 +55,9 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
   ]) {
     assert.match(service, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
+  assert.match(service, /function stageHasCanonicalIntakeReferences/)
+  assert.match(service, /stageReference && publishingReference && stageReference === publishingReference/)
+  assert.doesNotMatch(service, /jm1pub_intakereference \|\| readback\.stage\.jm1pub_publishingintakereference/)
 })
 
 test('dispatch service reuses governed branding and package notification controls', () => {
@@ -64,6 +75,7 @@ test('dispatch service fails closed unless real package attachments are material
   assert.match(service, /editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage/)
   assert.match(service, /https:\/\/graph\.microsoft\.com\/v1\.0\/drives/)
   assert.match(service, /ATTACHMENT_CHECKSUM_MISMATCH/)
+  assert.match(service, /validateGovernedPackageAttachmentBinary/)
   assert.match(service, /GRAPH_CONFIG_MISSING_FOR_PACKAGE_ATTACHMENT_MATERIALIZATION/)
   assert.doesNotMatch(service, /buildRequiredAttachmentStubs/)
   assert.doesNotMatch(service, /PROGRAM-006 governed package materialization proof/)
@@ -120,11 +132,20 @@ test('operational certification endpoint is OIDC protected and evidence constrai
     'brandedHtml',
     'plainText',
     'requiredAttachments',
+    'attachmentByteLength',
+    'fileSignatures',
+    'attachmentOpenTests',
+    'expectedAttachmentContent',
+    'sourceChecksumLineage',
     'attachmentChecksums',
+    'deliveredAttachmentInventory',
+    'deliveredButtonUrl',
+    'authorClickThrough',
     'archiveConfirmed',
     'portalAccess',
     'packageVisible',
     'responseControls',
+    'responseForm',
     'singleActiveGate',
   ]) {
     assert.match(certifyRoute, new RegExp(token))
@@ -135,6 +156,30 @@ test('operational certification endpoint is OIDC protected and evidence constrai
 test('executive recovery sends corrected stage-specific author package copy', () => {
   assert.match(service, /corrected:\s*input\.executionMode === 'EXECUTIVE_RECOVERY'/)
   assert.match(service, /responseDeadline/)
-  assert.match(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected \$\{stageLabel\} Review Package — \$\{input\.titleName\}/)
+  assert.match(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected \$\{subjectStageLabel\} Review Package — \$\{input\.titleName\}/)
   assert.doesNotMatch(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected Proofreading Review Package/)
+  assert.doesNotMatch(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected \$\{stageLabel\} Review Package/)
+})
+
+test('PROGRAM-006 rejects corrupt package binaries and nonfunctional action links', () => {
+  const notificationEngine = readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8')
+  const brandEngine = readFileSync(new URL('../lib/server/author-communication-brand.ts', import.meta.url), 'utf8')
+  for (const token of [
+    'DOCX_ZIP_SIGNATURE',
+    '[Content_Types].xml',
+    '_rels/.rels',
+    'word/document.xml',
+    'PDF_SIGNATURE',
+    'PDF_EOF_MISSING',
+    'MINIMUM_SIZE',
+    'ERROR_PAYLOAD',
+    'EXPECTED_CONTENT_MISSING',
+  ]) {
+    assert.match(notificationEngine, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
+  assert.match(brandEngine, /PRIMARY_ACTION_LINK_MISSING/)
+  assert.match(brandEngine, /PRIMARY_ACTION_NOT_CLICKABLE/)
+  assert.match(brandEngine, /PRIMARY_ACTION_URL_INVALID/)
+  assert.match(brandEngine, /SUBJECT_DUPLICATED_WORD/)
+  assert.match(brandEngine, /<a href=/)
 })

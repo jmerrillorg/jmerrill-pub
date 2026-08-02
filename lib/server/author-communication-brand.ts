@@ -39,6 +39,7 @@ export type AuthorCommunicationRenderInput = {
   meaning: string
   authorAction: string
   primaryActionLabel: string
+  primaryActionUrl: string
   packageInventory?: string[]
   responseChoices?: string[]
   deadline?: string
@@ -112,9 +113,14 @@ export function validateAuthorCommunicationEmail(input: {
   if (!html.includes('Package inventory')) blockers.push('PACKAGE_INVENTORY_BLOCK_MISSING')
   if (!html.includes('Response choices')) blockers.push('RESPONSE_CHOICES_BLOCK_MISSING')
   if (!html.includes('What happens next')) blockers.push('NEXT_STEPS_BLOCK_MISSING')
+  if (!/<a\b[^>]+href="https:\/\/[^"]+"/i.test(html)) blockers.push('PRIMARY_ACTION_LINK_MISSING')
+  if (/<span[^>]*>\s*(Review Package and Reply|Approve|Review)/i.test(html) && !/<a\b[^>]*>\s*(Review Package and Reply|Approve|Review)/i.test(html)) {
+    blockers.push('PRIMARY_ACTION_NOT_CLICKABLE')
+  }
   if (!text.includes('Why you are receiving this')) blockers.push('PLAIN_TEXT_WHY_FIRST_BLOCK_MISSING')
   if (!text.includes('Package inventory')) blockers.push('PLAIN_TEXT_PACKAGE_INVENTORY_MISSING')
   if (!text.includes('Response choices')) blockers.push('PLAIN_TEXT_RESPONSE_CHOICES_MISSING')
+  if (!/Primary action:\s*https:\/\//i.test(text)) blockers.push('PLAIN_TEXT_PRIMARY_ACTION_URL_MISSING')
   if (!text.includes(AUTHOR_COMMUNICATION_BRAND.signature)) blockers.push('PLAIN_TEXT_SIGNATURE_MISSING')
 
   return blockers.length
@@ -127,7 +133,7 @@ function normalizeInput(input: AuthorCommunicationRenderInput): AuthorCommunicat
     ...input,
     templateName: required(input.templateName, 'templateName'),
     templateVersion: required(input.templateVersion, 'templateVersion'),
-    subject: required(input.subject, 'subject'),
+    subject: validateSubject(required(input.subject, 'subject')),
     authorName: required(input.authorName, 'authorName'),
     titleName: required(input.titleName, 'titleName'),
     preheader: required(input.preheader, 'preheader'),
@@ -136,6 +142,7 @@ function normalizeInput(input: AuthorCommunicationRenderInput): AuthorCommunicat
     meaning: required(input.meaning, 'meaning'),
     authorAction: required(input.authorAction, 'authorAction'),
     primaryActionLabel: required(input.primaryActionLabel, 'primaryActionLabel'),
+    primaryActionUrl: validatePrimaryActionUrl(required(input.primaryActionUrl, 'primaryActionUrl')),
     packageInventory: input.packageInventory?.map((item) => required(item, 'package inventory item')) || [
       'Current author-review package materials',
       'Review instructions',
@@ -176,7 +183,7 @@ function renderText(input: AuthorCommunicationRenderInput) {
     'Response choices',
     ...(input.responseChoices || []).map((item) => `- ${item}`),
     '',
-    `Primary action: ${input.primaryActionLabel}`,
+    `Primary action: ${input.primaryActionUrl}`,
     input.deadline ? `Response window: ${input.deadline}` : '',
     '',
     'What happens next',
@@ -233,7 +240,7 @@ function renderHtml(input: AuthorCommunicationRenderInput) {
                   <p style="margin:0 0 14px;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">${escapeHtml(input.authorAction)}</p>
                   <h3 style="margin:0 0 8px;font-size:14px;color:${brand.textColor};">Response choices</h3>
                   <ul style="margin:0 0 14px 22px;padding:0;font-size:14px;line-height:1.7;color:${brand.mutedTextColor};">${responseChoices}</ul>
-                  <p style="margin:0;"><span style="display:inline-block;background:${brand.primaryColor};color:#ffffff;padding:11px 16px;font-size:14px;font-weight:700;">${escapeHtml(input.primaryActionLabel)}</span></p>
+                  <p style="margin:0;"><a href="${escapeHtml(input.primaryActionUrl)}" style="display:inline-block;background:${brand.primaryColor};color:#ffffff;padding:11px 16px;font-size:14px;font-weight:700;text-decoration:none;">${escapeHtml(input.primaryActionLabel)}</a></p>
                   ${deadline}
                 </div>
                 <h2 style="margin:24px 0 10px;font-size:16px;color:${brand.textColor};">What happens next</h2>
@@ -267,6 +274,26 @@ function required(value: string, name: string) {
   const normalized = value.trim()
   if (!normalized) throw new Error(`AUTHOR_COMMUNICATION_BLOCKED - ${name.toUpperCase().replaceAll(' ', '_')}_MISSING`)
   return normalized
+}
+
+function validatePrimaryActionUrl(value: string) {
+  let url: URL
+  try {
+    url = new URL(value)
+  } catch {
+    throw new Error('AUTHOR_COMMUNICATION_BLOCKED - PRIMARY_ACTION_URL_INVALID')
+  }
+  if (url.protocol !== 'https:') throw new Error('AUTHOR_COMMUNICATION_BLOCKED - PRIMARY_ACTION_URL_NOT_HTTPS')
+  if (!/jmerrill\.pub$/i.test(url.hostname)) throw new Error('AUTHOR_COMMUNICATION_BLOCKED - PRIMARY_ACTION_URL_NOT_AUTHOR_PORTAL')
+  if (url.hash === '#' || value.includes('javascript:')) throw new Error('AUTHOR_COMMUNICATION_BLOCKED - PRIMARY_ACTION_URL_UNSAFE')
+  return url.toString()
+}
+
+function validateSubject(value: string) {
+  if (/\b(Review|Package|Corrected)\s+\1\b/i.test(value)) {
+    throw new Error('AUTHOR_COMMUNICATION_BLOCKED - SUBJECT_DUPLICATED_WORD')
+  }
+  return value
 }
 
 function escapeHtml(value: string) {

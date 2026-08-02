@@ -153,6 +153,7 @@ export type AuthorPackageNotificationInput = {
   idempotencyKey: string
   attachments: GovernedPackageAttachment[]
   packageChecksum?: string
+  expectedTitle?: string
 }
 
 export type AuthorReviewNotificationCopy = {
@@ -237,6 +238,15 @@ export function validateAuthorPackageNotification(input: AuthorPackageNotificati
     return blocked(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ATTACHMENT_MATERIALIZATION_FAILED - ${attachmentWithoutBytes}`)
   }
 
+  for (const role of policy.attachmentsRequired) {
+    const attachment = attachmentsByRole.get(role)
+    if (!attachment) continue
+    const binaryValidation = validateGovernedPackageAttachmentBinary(attachment, input.expectedTitle)
+    if (!binaryValidation.ok) {
+      return blocked(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ${binaryValidation.blocker}`)
+    }
+  }
+
   const totalBytes = input.attachments.reduce((sum, attachment) => sum + (attachment.sizeBytes || estimateBase64Bytes(attachment.contentBytesBase64 || '')), 0)
   const maxBytes = policy.secureLinkAllowedWhenOverBytes || 20 * 1024 * 1024
   if (totalBytes > maxBytes && !policy.secureLinkAllowedWhenOverBytes) {
@@ -285,15 +295,23 @@ export function buildAuthorReviewNotificationCopy(input: {
   authorName?: string
   corrected?: boolean
   responseDeadline?: string
+  primaryActionUrl: string
+  packageInventory?: string[]
 }): AuthorReviewNotificationCopy {
   const stageLabel = stageLabelFor(input.stageCode)
+  const subjectStageLabel = subjectStageLabelFor(input.stageCode)
   const authorName = input.authorName?.trim() || 'Author'
   const responseDeadline = input.responseDeadline?.trim() || 'the seven-calendar-day response period stated in your package'
+  const packageInventory = input.packageInventory?.length ? input.packageInventory : [
+    'Current author-review package materials',
+    'Review instructions',
+    'Package manifest or package summary',
+  ]
   if (input.corrected) {
     const rendered = renderAuthorCommunicationEmail({
       templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
       templateVersion: '1.0.0',
-      subject: `Corrected ${stageLabel} Review Package — ${input.titleName}`,
+      subject: `Corrected ${subjectStageLabel} Review Package — ${input.titleName}`,
       authorName,
       titleName: input.titleName,
       preheader: `Corrected ${stageLabel.toLowerCase()} package for ${input.titleName}.`,
@@ -306,12 +324,8 @@ export function buildAuthorReviewNotificationCopy(input: {
       meaning: 'Your review period starts from the corrected package notification, not from the incomplete notice.',
       authorAction: 'Please review the attached package and reply to the publishing team with your approval or requested corrections.',
       primaryActionLabel: 'Review Package and Reply',
-      packageInventory: [
-        'Current author-review manuscript or proof',
-        'Stage-specific editorial or production summary',
-        'Review instructions',
-        'Package manifest or package summary',
-      ],
+      primaryActionUrl: input.primaryActionUrl,
+      packageInventory,
       responseChoices: [
         'Approve as presented',
         'Approve with corrections',
@@ -350,12 +364,8 @@ export function buildAuthorReviewNotificationCopy(input: {
     meaning: 'This is the point where your review helps us confirm the next governed step for your book.',
     authorAction: 'Please review the package and reply to the publishing team with your approval or requested corrections.',
     primaryActionLabel: 'Review Package and Reply',
-    packageInventory: [
-      'Current author-review manuscript or proof',
-      'Stage-specific editorial or production summary',
-      'Review instructions',
-      'Package manifest or package summary',
-    ],
+    primaryActionUrl: input.primaryActionUrl,
+    packageInventory,
       responseChoices: [
         'Approve as presented',
         'Approve with corrections',
@@ -443,6 +453,89 @@ function blocked(blocker: string): PackageNotificationValidationResult {
   }
 }
 
+export function validateGovernedPackageAttachmentBinary(
+  attachment: GovernedPackageAttachment,
+  expectedTitle?: string,
+): { ok: true } | { ok: false; blocker: string } {
+  if (!attachment.contentBytesBase64) return { ok: false, blocker: `ATTACHMENT_MATERIALIZATION_FAILED:${attachment.role}` }
+  let bytes: Buffer
+  try {
+    bytes = Buffer.from(attachment.contentBytesBase64, 'base64')
+  } catch {
+    return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${attachment.role}:BASE64_DECODE_FAILED` }
+  }
+  const declaredSize = attachment.sizeBytes || bytes.byteLength
+  if (bytes.byteLength === 0 || declaredSize === 0) return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${attachment.role}:EMPTY` }
+  if (declaredSize !== bytes.byteLength) return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${attachment.role}:SIZE_MISMATCH` }
+  const minimum = minimumPlausibleBytesFor(attachment)
+  if (bytes.byteLength < minimum) return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${attachment.role}:MINIMUM_SIZE` }
+  const lowerName = attachment.fileName.toLowerCase()
+  const lowerType = attachment.contentType.toLowerCase()
+  if (lowerName.endsWith('.docx') || lowerType.includes('officedocument.wordprocessingml.document')) {
+    return validateDocx(bytes, attachment.role, expectedTitle)
+  }
+  if (lowerName.endsWith('.pdf') || lowerType.includes('application/pdf')) {
+    return validatePdf(bytes, attachment.role, expectedTitle)
+  }
+  if (lowerName.endsWith('.json') || lowerType.includes('application/json')) {
+    return validateTextLike(bytes, attachment.role, /[{[]/, 'JSON_OR_SCHEMA')
+  }
+  if (lowerName.endsWith('.txt') || lowerName.endsWith('.md') || lowerType.startsWith('text/')) {
+    return validateTextLike(bytes, attachment.role, /\S/, 'TEXT')
+  }
+  return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${attachment.role}:UNSUPPORTED_FILE_TYPE` }
+}
+
+function validateDocx(bytes: Buffer, role: AttachmentRole, expectedTitle?: string): { ok: true } | { ok: false; blocker: string } {
+  if (bytes[0] !== 0x50 || bytes[1] !== 0x4b) return { ok: false, blocker: `ATTACHMENT_FILE_SIGNATURE_INVALID:${role}:DOCX_ZIP_SIGNATURE` }
+  const ascii = bytes.toString('latin1')
+  for (const part of ['[Content_Types].xml', '_rels/.rels', 'word/document.xml']) {
+    if (!ascii.includes(part)) return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:OOXML_PART_MISSING:${part}` }
+  }
+  if (looksLikeErrorPayload(bytes)) return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${role}:ERROR_PAYLOAD` }
+  if (expectedTitle && !normalizedContains(ascii, expectedTitle)) {
+    return { ok: false, blocker: `ATTACHMENT_EXPECTED_CONTENT_MISSING:${role}:TITLE` }
+  }
+  return { ok: true }
+}
+
+function validatePdf(bytes: Buffer, role: AttachmentRole, expectedTitle?: string): { ok: true } | { ok: false; blocker: string } {
+  if (!bytes.subarray(0, 5).equals(Buffer.from('%PDF-'))) return { ok: false, blocker: `ATTACHMENT_FILE_SIGNATURE_INVALID:${role}:PDF_SIGNATURE` }
+  const text = bytes.toString('latin1')
+  if (!/%%EOF/.test(text)) return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:PDF_EOF_MISSING` }
+  if (looksLikeErrorPayload(bytes)) return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${role}:ERROR_PAYLOAD` }
+  if (expectedTitle && !normalizedContains(text, expectedTitle)) {
+    return { ok: false, blocker: `ATTACHMENT_EXPECTED_CONTENT_MISSING:${role}:TITLE` }
+  }
+  return { ok: true }
+}
+
+function validateTextLike(bytes: Buffer, role: AttachmentRole, pattern: RegExp, label: string): { ok: true } | { ok: false; blocker: string } {
+  const text = bytes.toString('utf8').trim()
+  if (!text || !pattern.test(text)) return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:${label}` }
+  if (/<html\b|<!doctype html>|\"error\"\\s*:|AccessDenied|Unauthorized/i.test(text)) {
+    return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${role}:ERROR_PAYLOAD` }
+  }
+  return { ok: true }
+}
+
+function minimumPlausibleBytesFor(attachment: GovernedPackageAttachment) {
+  if (attachment.role === 'editedManuscript') return 10_000
+  if (attachment.role === 'interiorProof' || attachment.role === 'productionProof') return 100_000
+  if (attachment.role === 'editorialMemo') return 2_000
+  return 300
+}
+
+function looksLikeErrorPayload(bytes: Buffer) {
+  const sample = bytes.subarray(0, Math.min(bytes.byteLength, 2048)).toString('utf8')
+  return /<html\b|<!doctype html>|\"error\"\\s*:|AccessDenied|Unauthorized|not found/i.test(sample)
+}
+
+function normalizedContains(haystack: string, needle: string) {
+  const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+  return normalize(haystack).includes(normalize(needle))
+}
+
 function estimateBase64Bytes(value: string) {
   if (!value) return 0
   return Math.floor((value.length * 3) / 4)
@@ -467,4 +560,8 @@ function stageLabelFor(stageCode: AuthorReviewPackageType) {
     case 'EDITORIAL_REVIEW':
       return 'Editorial Review'
   }
+}
+
+function subjectStageLabelFor(stageCode: AuthorReviewPackageType) {
+  return stageLabelFor(stageCode).replace(/\s+Review$/i, '')
 }
