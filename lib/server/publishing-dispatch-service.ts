@@ -261,7 +261,11 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
   )
   const activeGates = gates.filter((gate) => {
     const status = Number(gate.jm1pub_gatestatus || 0)
-    return status !== GATE_STATUS_APPROVED && status !== GATE_STATUS_SUPERSEDED
+    return (
+      dataverseLookupId(gate, '_jm1pub_editorialstageid_value') === input.stageId &&
+      status !== GATE_STATUS_APPROVED &&
+      status !== GATE_STATUS_SUPERSEDED
+    )
   })
   const currentGateId = stringValue(activeGates[0]?.jm1pub_editorialapprovalgateid)
   const authorArtifacts = stageArtifacts.filter(isAuthorVisibleArtifact)
@@ -488,10 +492,10 @@ async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType
 
 function requiredRolesFor(stageCode: AuthorReviewPackageType): AttachmentRole[] {
   if (stageCode === 'INTERIOR_LAYOUT_REVIEW') {
-    return ['interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+    return ['interiorProof', 'reviewInstructions', 'packageManifest']
   }
   if (stageCode === 'DEVELOPMENTAL_EDITING_REVIEW') {
-    return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+    return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'packageManifest']
   }
   if (stageCode === 'PROOFREADING_REVIEW') return ['proofreadManuscript', 'reviewCoverNote']
   return ['editorialMemo', 'reviewInstructions']
@@ -650,17 +654,34 @@ function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) 
     productionProof: /production.*proof/i,
   }
   const pattern = patterns[role]
-  return artifacts.find((artifact) => {
-    const haystack = [
-      stringValue(artifact.jm1pub_editorialartifactname),
-      stringValue(artifact.jm1pub_filename),
-      dataverseFormatted(artifact, 'jm1pub_artifacttype', ''),
-      stringValue(artifact.jm1pub_repositorypath),
-    ].join(' ')
-    const size = Number(artifact.jm1pub_filesizebytes || 0)
-    if (role === 'interiorProof' && size > 0 && size < 100_000) return false
-    return pattern.test(haystack)
-  })
+  return artifacts
+    .filter((artifact) => {
+      const haystack = [
+        stringValue(artifact.jm1pub_editorialartifactname),
+        stringValue(artifact.jm1pub_filename),
+        dataverseFormatted(artifact, 'jm1pub_artifacttype', ''),
+        stringValue(artifact.jm1pub_repositorypath),
+      ].join(' ')
+      const size = Number(artifact.jm1pub_filesizebytes || 0)
+      if (role === 'interiorProof' && size > 0 && size < 100_000) return false
+      return pattern.test(haystack)
+    })
+    .sort((a, b) => artifactRoleScore(b, role) - artifactRoleScore(a, role))[0]
+}
+
+function artifactRoleScore(artifact: DataverseRow, role: AttachmentRole) {
+  const haystack = [
+    stringValue(artifact.jm1pub_editorialartifactname),
+    stringValue(artifact.jm1pub_filename),
+    dataverseFormatted(artifact, 'jm1pub_artifacttype', ''),
+    stringValue(artifact.jm1pub_repositorypath),
+  ].join(' ')
+  let score = artifact.jm1pub_iscurrentapproved === true ? 10 : 0
+  if (role === 'editedManuscript' && /developmentally.*edited|edited.*manuscript/i.test(haystack)) score += 100
+  if (role === 'editedManuscript' && /governed source/i.test(haystack)) score -= 20
+  if (role === 'packageManifest' && /v2/i.test(haystack)) score += 20
+  if (role === 'interiorProof' && /author review proof/i.test(haystack)) score += 100
+  return score
 }
 
 function resolveManifestLocation(artifacts: DataverseRow[]) {
