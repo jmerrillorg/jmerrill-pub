@@ -20,6 +20,7 @@ export async function POST(req: Request) {
       executiveRecovery?: boolean
       confirmation?: string
       titles?: string[]
+      packageVersion?: string
     } | null
     if (!body || (body.mode !== 'dry-run' && body.mode !== 'confirm')) {
       return NextResponse.json({ error: 'Mode must be dry-run or confirm.' }, { status: 400 })
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
       executiveRecovery: body.executiveRecovery === true,
       confirmation: body.confirmation,
       titles: body.titles,
+      packageVersion: body.packageVersion,
     })
 
     return NextResponse.json(

@@ -27,6 +27,10 @@ on:
         description: Comma-separated title names or intake codes. Blank runs the five-title allowlist.
         required: false
         default: ""
+      package_version:
+        description: Governed package version for corrected replacement dispatch.
+        required: false
+        default: "executive-recovery-v1"
 
 permissions:
   contents: read
@@ -49,6 +53,7 @@ jobs:
           EXECUTIVE_RECOVERY: ${{ inputs.executive_recovery }}
           CONFIRMATION: ${{ inputs.confirmation }}
           TITLE_LIST: ${{ inputs.title_list }}
+          PACKAGE_VERSION: ${{ inputs.package_version }}
         run: |
           OIDC_RESPONSE="$(curl -fsS \
             -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
@@ -63,11 +68,13 @@ jobs:
             --arg executiveRecovery "${EXECUTIVE_RECOVERY}" \
             --arg confirmation "${CONFIRMATION}" \
             --arg titleList "${TITLE_LIST}" \
+            --arg packageVersion "${PACKAGE_VERSION}" \
             '{
               mode: $mode,
               executiveRecovery: ($executiveRecovery == "true"),
               confirmation: $confirmation,
-              titles: (if ($titleList | length) == 0 then [] else ($titleList | split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))) end)
+              titles: (if ($titleList | length) == 0 then [] else ($titleList | split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))) end),
+              packageVersion: $packageVersion
             }')"
           curl -fsS \
             -X POST "https://jmerrill.pub/api/publishing/executive-recovery/dispatch" \

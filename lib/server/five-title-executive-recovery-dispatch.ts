@@ -26,6 +26,7 @@ export type FiveTitleDispatchRequest = {
   executiveRecovery: boolean
   confirmation?: string
   titles?: string[]
+  packageVersion?: string
 }
 
 export type FiveTitleDispatchResult = {
@@ -126,7 +127,7 @@ export async function dispatchFiveTitleExecutiveRecovery(input: FiveTitleDispatc
       continue
     }
     try {
-      results.push(await releaseTitle(authority, readback, correlationId))
+      results.push(await releaseTitle(authority, readback, correlationId, input.packageVersion))
     } catch (error) {
       results.push({
         ...readback,
@@ -254,6 +255,7 @@ async function releaseTitle(
   authority: RecoveryTitleAuthority,
   readback: TitleDispatchResult,
   correlationId: string,
+  packageVersion?: string,
 ): Promise<TitleDispatchResult> {
   const titleId = readback.titleId || ''
   const stageId = readback.stageId || ''
@@ -263,7 +265,7 @@ async function releaseTitle(
     stageId,
     recipientContactId: authority.contactId,
     executionMode: 'EXECUTIVE_RECOVERY',
-    packageVersion: 'executive-recovery-v1',
+    packageVersion: packageVersion?.trim() || 'executive-recovery-v1',
     correlationId,
     operator: 'github-oidc:jmerrill-pub-production',
   })

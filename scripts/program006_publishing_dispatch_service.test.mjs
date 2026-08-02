@@ -8,6 +8,7 @@ const orchestrator = readFileSync(new URL('../lib/server/publishing-orchestrator
 const route = readFileSync(new URL('../app/api/publishing/dispatch/author-package/route.ts', import.meta.url), 'utf8')
 const certifyRoute = readFileSync(new URL('../app/api/publishing/dispatch/author-package/certify/route.ts', import.meta.url), 'utf8')
 const relay = readFileSync(new URL('../azure-functions/acs-email-relay/src/functions/sendAuthorAcknowledgment.js', import.meta.url), 'utf8')
+const fiveTitleWorkflow = readFileSync(new URL('../.github/workflows/five-title-executive-recovery-dispatch.yml', import.meta.url), 'utf8')
 
 test('PROGRAM-006 exposes one canonical PublishingDispatchService operation', () => {
   assert.match(service, /export const PublishingDispatchService/)
@@ -159,6 +160,15 @@ test('executive recovery sends corrected stage-specific author package copy', ()
   assert.match(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected \$\{subjectStageLabel\} Review Package — \$\{input\.titleName\}/)
   assert.doesNotMatch(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected Proofreading Review Package/)
   assert.doesNotMatch(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected \$\{stageLabel\} Review Package/)
+})
+
+test('executive recovery exposes package version for corrected replacement dispatch', () => {
+  assert.match(fiveTitleWorkflow, /package_version:/)
+  assert.match(fiveTitleWorkflow, /PACKAGE_VERSION/)
+  assert.match(fiveTitleWorkflow, /packageVersion: \$packageVersion/)
+  assert.match(fiveTitleWorker, /packageVersion\?: string/)
+  assert.match(fiveTitleWorker, /input\.packageVersion/)
+  assert.match(fiveTitleWorker, /packageVersion\?\.trim\(\) \|\| 'executive-recovery-v1'/)
 })
 
 test('PROGRAM-006 rejects corrupt package binaries and nonfunctional action links', () => {
