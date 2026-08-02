@@ -1,0 +1,16 @@
+{
+  "package": "JM1-FIVE-TITLE-PROTECTED-DISPATCH-2026-08-02",
+  "createdAt": "2026-08-02T00:00:00-04:00",
+  "scope": "Protected authenticated production dispatch path for five-title executive recovery",
+  "files": [
+    {
+      "path": "00-executive-summary.md",
+      "classification": "summary"
+    },
+    {
+      "path": "01-protected-worker-design.md",
+      "classification": "design"
+    }
+  ],
+  "secretValuesRetained": 0
+}
