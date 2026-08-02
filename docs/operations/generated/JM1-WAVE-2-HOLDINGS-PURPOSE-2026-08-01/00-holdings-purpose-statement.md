@@ -1,6 +1,18 @@
 # JM1 Holdings Purpose Statement
 
-Status: COMPLETED WITH NAMED EXTERNAL DEPENDENCY
+Status: PRESERVED - HOLDINGS INITIATIVE ON HOLD
+
+Executive update: Jackie determined on 2026-08-02 that J Merrill Holdings is on hold because the intended estate-planning structure may change.
+
+Holdings formation: NOT AUTHORIZED
+
+Legal packet: PRESERVED - NOT SENT
+
+Accounting packet: PRESERVED - NOT SENT
+
+Legal recipient: NOT REQUIRED WHILE ON HOLD
+
+Accounting recipient: NOT REQUIRED WHILE ON HOLD
 
 ## Approved Business Purpose
 

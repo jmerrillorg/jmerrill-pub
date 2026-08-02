@@ -7,16 +7,19 @@ Wave status: PRIORITY WAVE 2 COMPLETE - EXTERNAL LEGAL OR ADMINISTRATIVE DEPENDE
 Items completed:
 
 - Catalog Reconciliation: completed and approved as a 104-row governance baseline.
-- Holdings Purpose Statement: completed as a purpose and professional-review package.
-- JM Signature Agreement attorney handoff: packet prepared; recipient confirmation remains external/administrative.
-- Enterprise Standard Approvals: completed with amendments, except Annex A remains candidate until tenant entitlement proof exists.
+- Holdings Purpose Statement: completed as a purpose and professional-review package; initiative now on hold by executive decision.
+- JM Signature Agreement attorney handoff: packet preserved; additional outside counsel is not being retained at this time.
+- Enterprise Standard Approvals: completed with amendments; Annex A read-only entitlement evidence collected and classified PENDING_EVIDENCE.
 
-Items externally blocked:
+Active unresolved administrative evidence:
 
-- JM Signature legal handoff email requires Jackie-confirmed attorney recipient.
-- Holdings implementation requires counsel/accounting advice and Jackie ratification.
-- Annex A authority promotion requires Microsoft tenant entitlement and installed-app evidence.
+- Annex A read-only Microsoft tenant entitlement evidence was collected on 2026-08-02. Classification remains PENDING_EVIDENCE because product-admin-center configuration evidence remains incomplete and Annex A promotion is not authorized.
 - The 16 amended catalog candidates outside the 104-row ruling set require source-package materialization or Jackie ruling.
+
+Closed former dependencies:
+
+- JM Signature outside-counsel review is closed by executive decision; JM1 proceeds with the current approved JM Signature agreement and no attorney packet is sent.
+- Holdings is on hold by executive decision; legal and accounting packets remain preserved and unsent.
 
 Items that failed validation: 0.
 
@@ -44,9 +47,9 @@ Validation: package preserves explicit non-implementation boundary and AIC separ
 
 Authoritative location: docs/operations/generated/JM1-WAVE-2-HOLDINGS-PURPOSE-2026-08-01/.
 
-Final status: COMPLETED WITH NAMED EXTERNAL DEPENDENCY.
+Final status: ON HOLD BY EXECUTIVE DECISION.
 
-Remaining dependency: external counsel/accounting structure recommendation and Jackie ratification before implementation.
+Remaining dependency: none under Wave 2. Future estate-planning or Holdings structure review requires separate authorization.
 
 ## JM Signature Legal Handoff
 
@@ -58,9 +61,9 @@ Validation: no author-use approval claimed; no attorney email sent because no ve
 
 Authoritative location: docs/operations/generated/JM1-WAVE-2-JM-SIGNATURE-LEGAL-HANDOFF-2026-08-01/.
 
-Final status: COMPLETED WITH NAMED EXTERNAL DEPENDENCY.
+Final status: CLOSED BY EXECUTIVE DECISION.
 
-Remaining dependency: Jackie confirms attorney recipient.
+Remaining dependency: none under Wave 2. Prepared packet is preserved as inactive decision support and was not sent.
 
 ## Enterprise Standard Approvals
 
@@ -74,7 +77,7 @@ Authoritative location: docs/operations/generated/JM1-WAVE-2-ENTERPRISE-STANDARD
 
 Final status: COMPLETED AND APPROVED WITH NAMED EXTERNAL DEPENDENCIES.
 
-Remaining dependency: Annex A needs tenant entitlement/installed-app evidence before authority promotion.
+Remaining dependency: Annex A needs product-admin-center configuration evidence and separate Jackie promotion authorization before authority promotion.
 
 ## Change Register
 

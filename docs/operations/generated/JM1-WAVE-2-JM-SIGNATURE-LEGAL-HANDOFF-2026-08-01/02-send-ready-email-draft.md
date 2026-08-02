@@ -1,6 +1,6 @@
 # Send-Ready Email Draft
 
-Status: READY AFTER RECIPIENT CONFIRMATION
+Status: PRESERVED - NOT SENT
 
 Subject: JM Signature Agreement - Attorney Review Request
 
@@ -19,4 +19,6 @@ J Merrill Publishing, Inc.
 
 ## Sending Boundary
 
-Do not send until Jackie confirms the attorney recipient and attachments.
+Do not send. Jackie determined on 2026-08-02 that additional outside counsel is not being retained for this agreement at this time.
+
+This draft is preserved as inactive decision-support evidence only.

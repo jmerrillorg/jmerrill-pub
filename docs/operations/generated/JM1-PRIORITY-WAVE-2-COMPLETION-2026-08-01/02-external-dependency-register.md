@@ -7,12 +7,17 @@ This register converts all remaining Priority Wave 2 work into named external le
 
 | Dependency | Owner | Required decision/evidence | Due date | Impact if delayed | Authorized next action |
 | --- | --- | --- | --- | --- | --- |
-| Holdings legal review | Jackie / counsel | Legal structure opinion covering suitability, liability, ownership, IP, intercompany agreements, and prohibited premature transfers | TBD | Holdings formation remains paused | Send approved counsel intake after recipient is confirmed |
-| Holdings accounting review | Jackie / accountant | Tax classification, consolidation, capitalization, banking, and accounting-treatment assessment | TBD | Financial design remains provisional | Send approved accounting intake after recipient is confirmed |
-| JM Signature attorney recipient | Jackie | Confirm attorney name, firm, and email | Immediate | Legal review cannot begin | Confirm recipient, then prepare governed draft and attachment package |
-| Annex A entitlement evidence | Tenant administrator | Current entitlement, service-plan, installed-app, and assigned-identity readback | Immediate | Annex A authority promotion blocked | Collect read-only tenant proof |
+| JM Signature attorney review | Jackie | CLOSED BY EXECUTIVE DECISION: additional outside counsel is not being retained at this time | Closed 2026-08-02 | None; JM Signature proceeds with the current approved version | Preserve packet as inactive decision support; do not send |
+| Holdings initiative | Jackie | CLOSED BY EXECUTIVE DECISION / ON HOLD: estate-planning structure may change | Closed 2026-08-02 | Holdings formation remains not authorized | Preserve legal/accounting packets as inactive decision support; do not send |
+| Annex A entitlement evidence | Tenant administrator | Current entitlement, service-plan, installed-app, and assigned-identity readback | Immediate | Annex A authority promotion blocked until Jackie separately approves promotion | Complete read-only tenant proof; no purchases, assignments, or permission changes |
 | Sixteen catalog candidates | Jackie | Include, exclude, merge, retire, amend, or provisional ruling for each outside candidate | Immediate | Catalog closure remains bounded to the approved 104-row worksheet | Review decision package |
 
 ## Boundary
 
 Priority Wave 3 remains uncommissioned. This register does not authorize catalog deployment, Holdings formation, ownership transfers, permission remediation, Annex A promotion, or downstream application changes.
+
+Closed items no longer pending Jackie recipient action:
+
+- JM Signature attorney recipient.
+- Holdings legal recipient.
+- Holdings accounting recipient.
