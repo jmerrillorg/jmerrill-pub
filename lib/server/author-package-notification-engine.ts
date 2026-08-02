@@ -3,6 +3,7 @@
 // Stage-specific exception? N
 
 import { EmailClient, type EmailAttachment, type EmailMessage } from '@azure/communication-email'
+import { strFromU8, unzipSync } from 'fflate'
 import {
   renderAuthorCommunicationEmail,
   validateAuthorCommunicationEmail,
@@ -493,10 +494,27 @@ function validateDocx(bytes: Buffer, role: AttachmentRole, expectedTitle?: strin
     if (!ascii.includes(part)) return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:OOXML_PART_MISSING:${part}` }
   }
   if (looksLikeErrorPayload(bytes)) return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${role}:ERROR_PAYLOAD` }
-  if (expectedTitle && !normalizedContains(ascii, expectedTitle)) {
+  const documentText = extractDocxDocumentText(bytes)
+  if (!documentText) return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:DOCX_TEXT_EXTRACTION_FAILED` }
+  if (expectedTitle && !normalizedContains(documentText, expectedTitle)) {
     return { ok: false, blocker: `ATTACHMENT_EXPECTED_CONTENT_MISSING:${role}:TITLE` }
   }
   return { ok: true }
+}
+
+function extractDocxDocumentText(bytes: Buffer) {
+  try {
+    const entries = unzipSync(new Uint8Array(bytes))
+    const document = entries['word/document.xml']
+    if (!document) return ''
+    return strFromU8(document)
+      .replace(/<w:tab\/>/g, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  } catch {
+    return ''
+  }
 }
 
 function validatePdf(bytes: Buffer, role: AttachmentRole, expectedTitle?: string): { ok: true } | { ok: false; blocker: string } {
