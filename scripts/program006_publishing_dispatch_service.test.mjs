@@ -53,6 +53,9 @@ test('dispatch service reuses governed branding and package notification control
 
 test('dispatch service fails closed unless real package attachments are materialized', () => {
   assert.match(service, /materializeRequiredAttachments/)
+  assert.match(service, /interiorProof', 'reviewInstructions', 'packageManifest/)
+  assert.match(service, /editedManuscript', 'editorialMemo', 'reviewInstructions', 'packageManifest/)
+  assert.doesNotMatch(service, /interiorProof', 'reviewInstructions', 'authorResponseMechanism'/)
   assert.match(service, /https:\/\/graph\.microsoft\.com\/v1\.0\/drives/)
   assert.match(service, /ATTACHMENT_CHECKSUM_MISMATCH/)
   assert.match(service, /GRAPH_CONFIG_MISSING_FOR_PACKAGE_ATTACHMENT_MATERIALIZATION/)

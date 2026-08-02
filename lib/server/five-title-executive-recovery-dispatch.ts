@@ -199,7 +199,11 @@ async function readTitleAuthority(config: DataverseServerConfig, authority: Reco
     : []
   const activeGates = gates.filter((gate) => {
     const status = Number(gate.jm1pub_gatestatus || 0)
-    return status !== 196650003 && status !== 196650004
+    return (
+      dataverseLookupId(gate, '_jm1pub_editorialstageid_value') === stageId &&
+      status !== 196650003 &&
+      status !== 196650004
+    )
   })
   const authorVisibleArtifacts = stageArtifacts.filter((artifact) => isAuthorVisibleArtifact(artifact))
   const packageReadinessBlockers = packageArtifactReadinessBlockers(authority, authorVisibleArtifacts)
@@ -271,12 +275,26 @@ async function releaseTitle(
 }
 
 function selectStage(stages: DataverseRow[], authority: RecoveryTitleAuthority) {
+  const stageMatch = stages.find((stage) => stageMatchesPackageStage(stage, authority.stageCode))
+  if (stageMatch) return stageMatch
+
   const intakeMatch = stages.find(
     (stage) =>
       stringValue(stage.jm1pub_intakereference) === authority.intakeCode ||
       stringValue(stage.jm1pub_publishingintakereference) === authority.intakeCode,
   )
   return intakeMatch || stages[0] || null
+}
+
+function stageMatchesPackageStage(stage: DataverseRow, stageCode: PackageStageCode) {
+  const haystack = [
+    stringValue(stage.jm1pub_name),
+    stringValue(stage.jm1pub_stagetype),
+    dataverseFormatted(stage, 'jm1pub_stagetype', ''),
+  ].join(' ')
+
+  if (stageCode === 'INTERIOR_LAYOUT') return /interior|layout|hold|blocked/i.test(haystack)
+  return /developmental|develop/i.test(haystack)
 }
 
 function isAuthorVisibleArtifact(artifact: DataverseRow) {
@@ -295,9 +313,9 @@ function packageArtifactReadinessBlockers(authority: RecoveryTitleAuthority, art
 
 function requiredAttachmentRoles(stageCode: PackageStageCode): AttachmentRole[] {
   if (stageCode === 'INTERIOR_LAYOUT') {
-    return ['interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+    return ['interiorProof', 'reviewInstructions', 'packageManifest']
   }
-  return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+  return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'packageManifest']
 }
 
 function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) {
@@ -317,16 +335,32 @@ function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) 
     productionProof: /production.*proof/i,
   }
   const pattern = patterns[role]
-  return artifacts.find((artifact) => {
-    const haystack = [
-      stringValue(artifact.jm1pub_editorialartifactname),
-      stringValue(artifact.jm1pub_filename),
-      dataverseFormatted(artifact, 'jm1pub_artifacttype', ''),
-    ].join(' ')
-    const size = Number(artifact.jm1pub_filesizebytes || 0)
-    if (role === 'interiorProof' && size > 0 && size < 100_000) return false
-    return pattern.test(haystack)
-  })
+  return artifacts
+    .filter((artifact) => {
+      const haystack = [
+        stringValue(artifact.jm1pub_editorialartifactname),
+        stringValue(artifact.jm1pub_filename),
+        dataverseFormatted(artifact, 'jm1pub_artifacttype', ''),
+      ].join(' ')
+      const size = Number(artifact.jm1pub_filesizebytes || 0)
+      if (role === 'interiorProof' && size > 0 && size < 100_000) return false
+      return pattern.test(haystack)
+    })
+    .sort((a, b) => artifactRoleScore(b, role) - artifactRoleScore(a, role))[0]
+}
+
+function artifactRoleScore(artifact: DataverseRow, role: AttachmentRole) {
+  const haystack = [
+    stringValue(artifact.jm1pub_editorialartifactname),
+    stringValue(artifact.jm1pub_filename),
+    dataverseFormatted(artifact, 'jm1pub_artifacttype', ''),
+  ].join(' ')
+  let score = artifact.jm1pub_iscurrentapproved === true ? 10 : 0
+  if (role === 'editedManuscript' && /developmentally.*edited|edited.*manuscript/i.test(haystack)) score += 100
+  if (role === 'editedManuscript' && /governed source/i.test(haystack)) score -= 20
+  if (role === 'packageManifest' && /v2/i.test(haystack)) score += 20
+  if (role === 'interiorProof' && /author review proof/i.test(haystack)) score += 100
+  return score
 }
 
 function escapeOData(value: string) {
