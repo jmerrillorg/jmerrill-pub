@@ -39,6 +39,8 @@ export type AuthorCommunicationRenderInput = {
   meaning: string
   authorAction: string
   primaryActionLabel: string
+  packageInventory?: string[]
+  responseChoices?: string[]
   deadline?: string
   nextSteps: string[]
   supportNote?: string
@@ -107,8 +109,12 @@ export function validateAuthorCommunicationEmail(input: {
   if (!html.includes(AUTHOR_COMMUNICATION_BRAND.promiseLine)) blockers.push('PROMISE_LINE_MISSING')
   if (!html.includes('Why you are receiving this')) blockers.push('WHY_FIRST_BLOCK_MISSING')
   if (!html.includes('What we need from you')) blockers.push('AUTHOR_ACTION_BLOCK_MISSING')
+  if (!html.includes('Package inventory')) blockers.push('PACKAGE_INVENTORY_BLOCK_MISSING')
+  if (!html.includes('Response choices')) blockers.push('RESPONSE_CHOICES_BLOCK_MISSING')
   if (!html.includes('What happens next')) blockers.push('NEXT_STEPS_BLOCK_MISSING')
   if (!text.includes('Why you are receiving this')) blockers.push('PLAIN_TEXT_WHY_FIRST_BLOCK_MISSING')
+  if (!text.includes('Package inventory')) blockers.push('PLAIN_TEXT_PACKAGE_INVENTORY_MISSING')
+  if (!text.includes('Response choices')) blockers.push('PLAIN_TEXT_RESPONSE_CHOICES_MISSING')
   if (!text.includes(AUTHOR_COMMUNICATION_BRAND.signature)) blockers.push('PLAIN_TEXT_SIGNATURE_MISSING')
 
   return blockers.length
@@ -130,6 +136,16 @@ function normalizeInput(input: AuthorCommunicationRenderInput): AuthorCommunicat
     meaning: required(input.meaning, 'meaning'),
     authorAction: required(input.authorAction, 'authorAction'),
     primaryActionLabel: required(input.primaryActionLabel, 'primaryActionLabel'),
+    packageInventory: input.packageInventory?.map((item) => required(item, 'package inventory item')) || [
+      'Current author-review package materials',
+      'Review instructions',
+      'Package manifest or package summary',
+    ],
+    responseChoices: input.responseChoices?.map((item) => required(item, 'response choice')) || [
+      'Approve as presented',
+      'Approve with corrections',
+      'Questions or clarification requested',
+    ],
     nextSteps: input.nextSteps.map((item) => required(item, 'next step')),
     supportNote: input.supportNote?.trim() || 'If anything is unclear, reply to this email and the publishing team will help.',
     operationalNote: input.operationalNote?.trim() || 'This message confirms workflow status only. It does not change your publishing agreement or approve publication by itself.',
@@ -154,6 +170,12 @@ function renderText(input: AuthorCommunicationRenderInput) {
     'What we need from you',
     input.authorAction,
     '',
+    ...(input.packageInventory?.length
+      ? ['Package inventory', ...input.packageInventory.map((item) => `- ${item}`), '']
+      : []),
+    'Response choices',
+    ...(input.responseChoices || []).map((item) => `- ${item}`),
+    '',
     `Primary action: ${input.primaryActionLabel}`,
     input.deadline ? `Response window: ${input.deadline}` : '',
     '',
@@ -172,6 +194,8 @@ function renderText(input: AuthorCommunicationRenderInput) {
 function renderHtml(input: AuthorCommunicationRenderInput) {
   const brand = AUTHOR_COMMUNICATION_BRAND
   const completed = input.completed.map((item) => `<li>${escapeHtml(item)}</li>`).join('')
+  const inventory = (input.packageInventory || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')
+  const responseChoices = (input.responseChoices || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')
   const nextSteps = input.nextSteps.map((item) => `<li>${escapeHtml(item)}</li>`).join('')
   const deadline = input.deadline
     ? `<p style="margin:12px 0 0;color:${brand.mutedTextColor};font-size:14px;line-height:1.6;"><strong>Response window:</strong> ${escapeHtml(input.deadline)}</p>`
@@ -199,9 +223,16 @@ function renderHtml(input: AuthorCommunicationRenderInput) {
                 <h2 style="margin:24px 0 10px;font-size:16px;color:${brand.textColor};">What has been completed</h2>
                 <ul style="margin:0 0 18px 22px;padding:0;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">${completed}</ul>
                 ${section('What this means for your book', input.meaning)}
+                ${
+                  inventory
+                    ? `<h2 style="margin:24px 0 10px;font-size:16px;color:${brand.textColor};">Package inventory</h2><ul style="margin:0 0 18px 22px;padding:0;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">${inventory}</ul>`
+                    : ''
+                }
                 <div style="margin:24px 0;padding:18px;border-left:4px solid ${brand.primaryColor};background:#EFF6FF;">
                   <h2 style="margin:0 0 8px;font-size:16px;color:${brand.textColor};">What we need from you</h2>
                   <p style="margin:0 0 14px;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">${escapeHtml(input.authorAction)}</p>
+                  <h3 style="margin:0 0 8px;font-size:14px;color:${brand.textColor};">Response choices</h3>
+                  <ul style="margin:0 0 14px 22px;padding:0;font-size:14px;line-height:1.7;color:${brand.mutedTextColor};">${responseChoices}</ul>
                   <p style="margin:0;"><span style="display:inline-block;background:${brand.primaryColor};color:#ffffff;padding:11px 16px;font-size:14px;font-weight:700;">${escapeHtml(input.primaryActionLabel)}</span></p>
                   ${deadline}
                 </div>

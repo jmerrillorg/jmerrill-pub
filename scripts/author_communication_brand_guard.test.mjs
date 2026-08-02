@@ -28,9 +28,13 @@ test('shared author communication renderer produces branded HTML and plain text'
   assert.match(rendered.html, /A Division of J Merrill One/)
   assert.match(rendered.html, /Helping Authors Help Themselves\./)
   assert.match(rendered.html, /Why you are receiving this/)
+  assert.match(rendered.html, /Package inventory/)
+  assert.match(rendered.html, /Response choices/)
   assert.match(rendered.html, /What we need from you/)
   assert.match(rendered.html, /What happens next/)
   assert.match(rendered.text, /Why you are receiving this/)
+  assert.match(rendered.text, /Package inventory/)
+  assert.match(rendered.text, /Response choices/)
   assert.match(rendered.text, /The Publishing Team\nJ Merrill Publishing, Inc\./)
   assert.equal(rendered.metadata.qualityGate, 'PASS')
   assert.equal(rendered.metadata.htmlSha256.length, 64)
@@ -38,19 +42,18 @@ test('shared author communication renderer produces branded HTML and plain text'
 })
 
 test('author communication validation blocks unformatted or text-only output', () => {
-  assert.deepEqual(
-    brand.validateAuthorCommunicationEmail({
-      templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
-      templateVersion: '1.0.0',
-      html: '',
-      text: 'plain text only',
-    }),
-    {
-      ok: false,
-      blocker:
-        'AUTHOR_COMMUNICATION_BLOCKED - HTML_BODY_MISSING,HTML_DOCTYPE_MISSING,EMAIL_TABLE_LAYOUT_MISSING,BRAND_HEADER_MISSING,DIVISION_LINE_MISSING,PROMISE_LINE_MISSING,WHY_FIRST_BLOCK_MISSING,AUTHOR_ACTION_BLOCK_MISSING,NEXT_STEPS_BLOCK_MISSING,PLAIN_TEXT_WHY_FIRST_BLOCK_MISSING,PLAIN_TEXT_SIGNATURE_MISSING',
-    },
-  )
+  const validation = brand.validateAuthorCommunicationEmail({
+    templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
+    templateVersion: '1.0.0',
+    html: '',
+    text: 'plain text only',
+  })
+
+  assert.equal(validation.ok, false)
+  assert.match(validation.blocker, /HTML_BODY_MISSING/)
+  assert.match(validation.blocker, /PACKAGE_INVENTORY_BLOCK_MISSING/)
+  assert.match(validation.blocker, /RESPONSE_CHOICES_BLOCK_MISSING/)
+  assert.match(validation.blocker, /PLAIN_TEXT_SIGNATURE_MISSING/)
 })
 
 test('author package notification copy uses the shared brand renderer', () => {

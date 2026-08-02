@@ -62,6 +62,10 @@ export type PublishingDispatchValidation = {
   duplicateSend: 'PASS' | 'FAIL'
   currentGate: 'PASS' | 'FAIL'
   currentPackageVersion: 'PASS' | 'FAIL'
+  requiredAttachments: 'PASS' | 'FAIL'
+  attachmentChecksums: 'PASS' | 'FAIL'
+  portalAccessPreflight: 'PASS' | 'FAIL'
+  workspaceTarget: 'PASS' | 'FAIL'
 }
 
 export type PublishingDispatchResult = {
@@ -101,6 +105,7 @@ type DispatchReadback = {
   manifestLocation: string
   attachmentIds: string[]
   requiredAttachments: GovernedPackageAttachment[]
+  materializationBlockers: string[]
   idempotencyKey: string
   naturalKey: string
 }
@@ -135,6 +140,7 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
     proposedMutations: [
       'create-or-reuse-one-author-review-gate',
       'send-one-branded-author-package-through-acs',
+      'attach-required-author-safe-package-artifacts',
       'write-dataverse-send-log',
       'write-execution-log-chain',
       'refresh-publisher-operating-center-projection',
@@ -160,6 +166,7 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
     description: [
       `Operation dispatchAuthorPackage started by ${input.operator || SYSTEM_OPERATOR}.`,
       `Natural key ${readback.naturalKey}. Title ${input.titleId}; stage ${input.stageId}; package ${input.packageId}; gate ${gateId}.`,
+      `Required attachments ${readback.requiredAttachments.map((attachment) => `${attachment.role}:${attachment.sha256}`).join(', ')}.`,
       `Execution mode ${input.executionMode}; idempotency ${readback.idempotencyKey}; correlation ${correlationId}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
@@ -177,6 +184,7 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
       titleName: readback.titleName,
       authorName: readback.authorName,
     }),
+    attachments: readback.requiredAttachments,
   })
   const now = new Date().toISOString()
 
@@ -235,7 +243,7 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     getContact(config, input.recipientContactId),
     dataverseList(config, 'jm1pub_editorialartifacts', {
       $select:
-        'jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,createdon,modifiedon',
+        'jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,createdon,modifiedon',
       $filter: `_jm1pub_titleid_value eq ${input.titleId}`,
     }),
     dataverseList(config, 'jm1pub_editorialapprovalgates', {
@@ -284,7 +292,10 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     packageChecksum,
   })
   const existingDelivery = await findDeliveredLog(config, idempotencyKey)
-  const requiredAttachments = buildRequiredAttachmentStubs(stageCode, authorArtifacts)
+  const materialized = await materializeRequiredAttachments(stageCode, authorArtifacts).catch((error) => ({
+    attachments: [] as GovernedPackageAttachment[],
+    blockers: [safeRuntimeBlocker(error)],
+  }))
   return {
     title,
     stage,
@@ -301,7 +312,8 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     packageChecksum,
     manifestLocation: resolveManifestLocation(authorArtifacts),
     attachmentIds: authorArtifacts.map((artifact) => stringValue(artifact.jm1pub_editorialartifactid)).filter(Boolean),
-    requiredAttachments,
+    requiredAttachments: Array.isArray(materialized) ? materialized : materialized.attachments,
+    materializationBlockers: Array.isArray(materialized) ? [] : materialized.blockers,
     idempotencyKey,
     naturalKey,
   }
@@ -335,10 +347,14 @@ function validateReadback(input: PublishingDispatchRequest, readback: DispatchRe
     currentPackage: input.packageId && readback.attachmentIds.length > 0 ? 'PASS' : 'FAIL',
     recipient: readback.recipientEmail && dataverseLookupId(readback.stage, '_jm1pub_contactid_value') !== '00000000-0000-0000-0000-000000000000' ? 'PASS' : 'FAIL',
     manifest: readback.manifestLocation ? 'PASS' : 'FAIL',
-    qa: notification.ok ? 'PASS' : 'FAIL',
+    qa: notification.ok && readback.materializationBlockers.length === 0 ? 'PASS' : 'FAIL',
     duplicateSend: 'PASS',
     currentGate: readback.activeGates.length <= 1 ? 'PASS' : 'FAIL',
     currentPackageVersion: readback.packageVersion ? 'PASS' : 'FAIL',
+    requiredAttachments: readback.materializationBlockers.length === 0 && readback.requiredAttachments.length > 0 ? 'PASS' : 'FAIL',
+    attachmentChecksums: readback.requiredAttachments.every((attachment) => Boolean(attachment.sha256)) ? 'PASS' : 'FAIL',
+    portalAccessPreflight: readback.manifestLocation ? 'PASS' : 'FAIL',
+    workspaceTarget: /\/01_Titles\b|01_Titles/i.test(readback.manifestLocation) ? 'PASS' : 'FAIL',
   }
 }
 
@@ -380,6 +396,7 @@ async function sendAuthorPackageThroughRelay(input: {
       qualityGate: string
     }
   }
+  attachments: GovernedPackageAttachment[]
 }) {
   const relayUrl =
     process.env.JM1_AUTHOR_RESPONSE_SEND_RELAY_URL || process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL || RELAY_FALLBACK_URL
@@ -406,6 +423,14 @@ async function sendAuthorPackageThroughRelay(input: {
       templateName: input.copy.templateName,
       templateVersion: input.copy.templateVersion,
       templateMetadata: input.copy.templateMetadata,
+      attachments: input.attachments.map((attachment) => ({
+        name: attachment.fileName,
+        contentType: attachment.contentType,
+        contentInBase64: attachment.contentBytesBase64,
+        role: attachment.role,
+        artifactId: attachment.artifactId,
+        sha256: attachment.sha256,
+      })),
       approvedBy: SYSTEM_OPERATOR,
       approvedOn: new Date().toISOString(),
       internalVisibilityMailbox: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy,
@@ -422,22 +447,43 @@ async function sendAuthorPackageThroughRelay(input: {
   return { providerMessageId: body.providerMessageId || 'accepted-without-provider-message-id' }
 }
 
-function buildRequiredAttachmentStubs(stageCode: AuthorReviewPackageType, artifacts: DataverseRow[]): GovernedPackageAttachment[] {
+async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType, artifacts: DataverseRow[]): Promise<GovernedPackageAttachment[]> {
   const roles = requiredRolesFor(stageCode)
-  return roles.map((role, index) => {
-    const artifact = artifacts[index] || artifacts[0] || {}
-    const artifactId = stringValue(artifact.jm1pub_editorialartifactid) || `materialized-${role}`
-    const sha256 = stringValue(artifact.jm1pub_sha256) || stableChecksum(`${artifactId}:${role}`)
-    return {
-      role,
-      artifactId,
-      fileName: stringValue(artifact.jm1pub_filename || artifact.jm1pub_editorialartifactname) || `${role}.pdf`,
-      contentType: contentTypeFor(stringValue(artifact.jm1pub_filename)),
-      contentBytesBase64: Buffer.from(`PROGRAM-006 governed package materialization proof for ${artifactId}:${role}`).toString('base64'),
-      sizeBytes: Number(artifact.jm1pub_filesizebytes || 0) || 64,
-      sha256,
-    }
+  const selected = roles.map((role) => {
+    const artifact = selectArtifactForRole(artifacts, role)
+    if (!artifact) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:REQUIRED_ATTACHMENT_MISSING:${role}`)
+    return { role, artifact }
   })
+  const token = await getGraphToken()
+
+  return Promise.all(
+    selected.map(async ({ role, artifact }) => {
+      const driveId = stringValue(artifact.jm1pub_repositorydriveid)
+      const itemId = stringValue(artifact.jm1pub_repositoryitemid)
+      if (!driveId || !itemId) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:ATTACHMENT_LOCATION_MISSING:${role}`)
+      const response = await fetch(
+        `https://graph.microsoft.com/v1.0/drives/${encodeURIComponent(driveId)}/items/${encodeURIComponent(itemId)}/content`,
+        { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' },
+      )
+      if (!response.ok) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:ATTACHMENT_MATERIALIZATION_FAILED:${role}:${response.status}`)
+      const body = Buffer.from(await response.arrayBuffer())
+      const expectedSha = stringValue(artifact.jm1pub_sha256)
+      const actualSha = stableChecksum(body)
+      if (expectedSha && expectedSha.toLowerCase() !== actualSha.toLowerCase()) {
+        throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:ATTACHMENT_CHECKSUM_MISMATCH:${role}`)
+      }
+      const filename = sanitizeDownloadFilename(stringValue(artifact.jm1pub_filename) || `${role}.bin`)
+      return {
+        role,
+        artifactId: stringValue(artifact.jm1pub_editorialartifactid),
+        fileName: filename,
+        contentType: contentTypeFor(filename),
+        contentBytesBase64: body.toString('base64'),
+        sizeBytes: body.byteLength,
+        sha256: actualSha,
+      }
+    }),
+  )
 }
 
 function requiredRolesFor(stageCode: AuthorReviewPackageType): AttachmentRole[] {
@@ -449,6 +495,35 @@ function requiredRolesFor(stageCode: AuthorReviewPackageType): AttachmentRole[] 
   }
   if (stageCode === 'PROOFREADING_REVIEW') return ['proofreadManuscript', 'reviewCoverNote']
   return ['editorialMemo', 'reviewInstructions']
+}
+
+async function getGraphToken() {
+  const tenantId = process.env.GRAPH_TENANT_ID || process.env.SHAREPOINT_TENANT_ID
+  const clientId = process.env.GRAPH_CLIENT_ID || process.env.SHAREPOINT_CLIENT_ID
+  const clientSecret = process.env.GRAPH_CLIENT_SECRET || process.env.SHAREPOINT_CLIENT_SECRET
+
+  if (!tenantId || !clientId || !clientSecret) {
+    throw new Error('GRAPH_CONFIG_MISSING_FOR_PACKAGE_ATTACHMENT_MATERIALIZATION')
+  }
+
+  const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+    },
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: clientId,
+      client_secret: clientSecret,
+      scope: 'https://graph.microsoft.com/.default',
+    }),
+  })
+  const json = (await response.json().catch(() => null)) as { access_token?: string } | null
+  if (!response.ok || !json?.access_token) {
+    throw new Error(`GRAPH_TOKEN_FAILED_FOR_PACKAGE_ATTACHMENT_MATERIALIZATION:${response.status}`)
+  }
+  return json.access_token
 }
 
 async function getTitle(config: DataverseServerConfig, titleId: string) {
@@ -558,6 +633,36 @@ function isAuthorVisibleArtifact(artifact: DataverseRow) {
   return /approved|current|author|release/i.test(`${status} ${visibility}`)
 }
 
+function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) {
+  const patterns: Record<AttachmentRole, RegExp> = {
+    editedManuscript: /manuscript|developmental.*docx|edited/i,
+    editorialMemo: /memo|summary|developmental.*assessment|developmental.*summary/i,
+    reviewInstructions: /instruction|review/i,
+    authorResponseMechanism: /response|approval/i,
+    packageManifest: /manifest|package.*summary/i,
+    authorCoverMessage: /cover.*message|cover.*letter|message/i,
+    lineEditedManuscript: /line/i,
+    copyeditedManuscript: /copyedit/i,
+    proofreadManuscript: /proofread/i,
+    reviewCoverNote: /cover.*note|completion.*report|change.*summary/i,
+    interiorProof: /interior.*proof|layout.*proof|production.*pdf|\.pdf$/i,
+    coverProof: /cover.*proof/i,
+    productionProof: /production.*proof/i,
+  }
+  const pattern = patterns[role]
+  return artifacts.find((artifact) => {
+    const haystack = [
+      stringValue(artifact.jm1pub_editorialartifactname),
+      stringValue(artifact.jm1pub_filename),
+      dataverseFormatted(artifact, 'jm1pub_artifacttype', ''),
+      stringValue(artifact.jm1pub_repositorypath),
+    ].join(' ')
+    const size = Number(artifact.jm1pub_filesizebytes || 0)
+    if (role === 'interiorProof' && size > 0 && size < 100_000) return false
+    return pattern.test(haystack)
+  })
+}
+
 function resolveManifestLocation(artifacts: DataverseRow[]) {
   const manifest = artifacts.find((artifact) => /manifest/i.test(stringValue(artifact.jm1pub_filename || artifact.jm1pub_editorialartifactname)))
   return stringValue(manifest?.jm1pub_repositoryitemid || manifest?.jm1pub_repositorypath || artifacts[0]?.jm1pub_repositoryitemid || artifacts[0]?.jm1pub_repositorypath)
@@ -568,15 +673,23 @@ function contentTypeFor(fileName: string) {
   if (lower.endsWith('.docx')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
   if (lower.endsWith('.pdf')) return 'application/pdf'
   if (lower.endsWith('.json')) return 'application/json'
-  return 'text/plain'
+  if (lower.endsWith('.xlsx')) return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  if (lower.endsWith('.doc')) return 'application/msword'
+  if (lower.endsWith('.txt')) return 'text/plain; charset=utf-8'
+  if (lower.endsWith('.html')) return 'text/html; charset=utf-8'
+  return 'application/octet-stream'
 }
 
 function normalizeIntakeReference(value: string) {
   return value.trim() || 'JM1-PUBLISHING-DISPATCH'
 }
 
-function stableChecksum(value: string) {
+function stableChecksum(value: string | Buffer) {
   return createHash('sha256').update(value).digest('hex')
+}
+
+function sanitizeDownloadFilename(value: string) {
+  return value.replace(/[\r\n"\\/]/g, '-').slice(0, 180) || 'editorial-artifact'
 }
 
 function escapeOData(value: string) {
@@ -593,4 +706,9 @@ function safeDetail(value: string) {
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email-redacted]')
     .replace(/https:\/\/[^\s"']+/g, '[url-redacted]')
     .slice(0, 1000)
+}
+
+function safeRuntimeBlocker(error: unknown) {
+  const value = error instanceof Error ? error.message : 'AUTHOR_PACKAGE_RELEASE_BLOCKED'
+  return safeDetail(value).replace(/[:][0-9a-zA-Z._~+/=-]{24,}/g, ':[redacted]')
 }
