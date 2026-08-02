@@ -53,9 +53,8 @@ test('dispatch service reuses governed branding and package notification control
 
 test('dispatch service fails closed unless real package attachments are materialized', () => {
   assert.match(service, /materializeRequiredAttachments/)
-  assert.match(service, /interiorProof', 'reviewInstructions', 'packageManifest/)
-  assert.match(service, /editedManuscript', 'editorialMemo', 'reviewInstructions', 'packageManifest/)
-  assert.doesNotMatch(service, /interiorProof', 'reviewInstructions', 'authorResponseMechanism'/)
+  assert.match(service, /interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage/)
+  assert.match(service, /editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage/)
   assert.match(service, /https:\/\/graph\.microsoft\.com\/v1\.0\/drives/)
   assert.match(service, /ATTACHMENT_CHECKSUM_MISMATCH/)
   assert.match(service, /GRAPH_CONFIG_MISSING_FOR_PACKAGE_ATTACHMENT_MATERIALIZATION/)
@@ -87,4 +86,11 @@ test('canonical dispatch endpoint is OIDC protected and mode constrained', () =>
   assert.match(route, /PRODUCTION/)
   assert.match(route, /EXECUTIVE_RECOVERY/)
   assert.doesNotMatch(route, /cookie|session|x-jm1-relay-key/i)
+})
+
+test('executive recovery sends corrected stage-specific author package copy', () => {
+  assert.match(service, /corrected:\s*input\.executionMode === 'EXECUTIVE_RECOVERY'/)
+  assert.match(service, /responseDeadline/)
+  assert.match(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected \$\{stageLabel\} Review Package — \$\{input\.titleName\}/)
+  assert.doesNotMatch(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected Proofreading Review Package/)
 })

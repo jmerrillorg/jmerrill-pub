@@ -160,6 +160,8 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
   if (input.executionMode === 'DRY_RUN') return { ...base, status: 'eligible' }
 
   const gateId = base.gateId || (await createDispatchGate(config, input, readback, correlationId))
+  const deliveryStartedAt = new Date()
+  const responseDeadline = formatResponseDeadline(deliveryStartedAt)
   const startedLog = await writeExecutionLog(config, {
     actionType: 'PUBLISHING_DISPATCH_TRANSACTION_STARTED',
     name: `PUBLISHING_DISPATCH_TRANSACTION_STARTED - ${readback.titleName}`,
@@ -183,6 +185,8 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
       stageCode: readback.stageCode,
       titleName: readback.titleName,
       authorName: readback.authorName,
+      corrected: input.executionMode === 'EXECUTIVE_RECOVERY',
+      responseDeadline,
     }),
     attachments: readback.requiredAttachments,
   })
@@ -492,10 +496,10 @@ async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType
 
 function requiredRolesFor(stageCode: AuthorReviewPackageType): AttachmentRole[] {
   if (stageCode === 'INTERIOR_LAYOUT_REVIEW') {
-    return ['interiorProof', 'reviewInstructions', 'packageManifest']
+    return ['interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
   }
   if (stageCode === 'DEVELOPMENTAL_EDITING_REVIEW') {
-    return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'packageManifest']
+    return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
   }
   if (stageCode === 'PROOFREADING_REVIEW') return ['proofreadManuscript', 'reviewCoverNote']
   return ['editorialMemo', 'reviewInstructions']
@@ -707,6 +711,17 @@ function normalizeIntakeReference(value: string) {
 
 function stableChecksum(value: string | Buffer) {
   return createHash('sha256').update(value).digest('hex')
+}
+
+function formatResponseDeadline(startedAt: Date) {
+  const due = new Date(startedAt.getTime() + 7 * 24 * 60 * 60 * 1000)
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(due)
 }
 
 function sanitizeDownloadFilename(value: string) {
