@@ -136,11 +136,14 @@ export async function dispatchFiveTitleExecutiveRecovery(input: FiveTitleDispatc
   }
 
   return {
-    status: results.every((title) => title.status === 'released' || title.status === 'idempotent')
-      ? input.mode === 'dry-run'
-        ? 'dry-run-complete'
-        : 'completed'
-      : 'blocked',
+    status:
+      input.mode === 'dry-run'
+        ? results.every((title) => title.status !== 'blocked')
+          ? 'dry-run-complete'
+          : 'blocked'
+        : results.every((title) => title.status === 'released' || title.status === 'idempotent')
+          ? 'completed'
+          : 'blocked',
     mode: input.mode,
     correlationId,
     titles: results,
