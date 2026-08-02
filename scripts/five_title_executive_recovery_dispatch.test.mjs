@@ -6,6 +6,8 @@ const workflow = readFileSync(new URL('../.github/workflows/five-title-executive
 const route = readFileSync(new URL('../app/api/publishing/executive-recovery/dispatch/route.ts', import.meta.url), 'utf8')
 const dispatch = readFileSync(new URL('../lib/server/five-title-executive-recovery-dispatch.ts', import.meta.url), 'utf8')
 const oidc = readFileSync(new URL('../lib/server/github-actions-oidc.ts', import.meta.url), 'utf8')
+const relay = readFileSync(new URL('../azure-functions/acs-email-relay/src/functions/sendAuthorAcknowledgment.js', import.meta.url), 'utf8')
+const workspace = readFileSync(new URL('../app/author/_components/AuthorPortalWorkspace.tsx', import.meta.url), 'utf8')
 
 test('five-title allowlist is exact and owner-assigned', () => {
   for (const intakeCode of [
@@ -39,4 +41,30 @@ test('route requires GitHub OIDC bearer token', () => {
   assert.match(route, /verifyGitHubActionsOidcToken/)
   assert.match(route, /Bearer /)
   assert.doesNotMatch(route, /cookie|session|x-jm1-relay-key/i)
+})
+
+test('executive recovery dispatch cannot send attachmentless or unbranded author-review packages', () => {
+  assert.match(dispatch, /buildAuthorReviewNotificationCopy/)
+  assert.match(dispatch, /validateAuthorPackageNotification/)
+  assert.match(dispatch, /materializeRequiredAttachments/)
+  assert.match(dispatch, /REQUIRED_PACKAGE_ATTACHMENT_NOT_READY/)
+  assert.match(dispatch, /ATTACHMENT_CHECKSUM_MISMATCH/)
+  assert.match(dispatch, /attachments: input.attachments.map/)
+  assert.doesNotMatch(dispatch, /function buildCoverMessage/)
+  assert.doesNotMatch(dispatch, /<html><body><p>Good day,/)
+})
+
+test('ACS relay preserves attachments for approved author-review package notifications', () => {
+  assert.match(relay, /AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1/)
+  assert.match(relay, /AUTHOR_REVIEW_ATTACHMENTS_MISSING/)
+  assert.match(relay, /AUTHOR_REVIEW_PACKAGE_HTML_REQUIRED/)
+  assert.match(relay, /attachments: Array\.isArray\(payload\.attachments\)/)
+  assert.match(relay, /contentInBase64: attachment\.contentInBase64/)
+})
+
+test('author portal workspace failure is bounded and routes directly to author provider', () => {
+  assert.match(workspace, /WORKSPACE_CONTEXT_TIMEOUT_MS/)
+  assert.match(workspace, /controller\.abort/)
+  assert.match(workspace, /We could not open your Author Operating Center\./)
+  assert.match(workspace, /\/api\/auth\/signin\/jm1-author-operating-center\?callbackUrl=%2Fauthor%2Fportal/)
 })
