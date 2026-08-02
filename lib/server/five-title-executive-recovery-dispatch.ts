@@ -6,7 +6,11 @@ import { createHash, randomUUID } from 'node:crypto'
 
 import {
   AUTHOR_PUBLISHING_COMMUNICATION_POLICY,
+  buildAuthorReviewNotificationCopy,
   buildAuthorPackageNotificationIdempotencyKey,
+  validateAuthorPackageNotification,
+  type AttachmentRole,
+  type GovernedPackageAttachment,
 } from './author-package-notification-engine'
 import {
   dataverseCreate,
@@ -60,6 +64,7 @@ export type TitleDispatchResult = {
   currentGateCount: number
   currentArtifactCount: number
   authorVisibleArtifactCount: number
+  packageReadinessBlockers?: string[]
   proposedMutations: string[]
   blockers: string[]
   gateId?: string
@@ -136,7 +141,15 @@ export async function dispatchFiveTitleExecutiveRecovery(input: FiveTitleDispatc
       results.push(readback)
       continue
     }
-    results.push(await releaseTitle(config, authority, readback, correlationId))
+    try {
+      results.push(await releaseTitle(config, authority, readback, correlationId))
+    } catch (error) {
+      results.push({
+        ...readback,
+        status: 'blocked',
+        blockers: [...readback.blockers, safeRuntimeBlocker(error)],
+      })
+    }
   }
 
   return {
@@ -189,7 +202,7 @@ async function readTitleAuthority(config: DataverseServerConfig, authority: Reco
   const artifacts = titleId
     ? await dataverseList(config, 'jm1pub_editorialartifacts', {
         $select:
-          'jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,createdon,modifiedon',
+          'jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,createdon,modifiedon',
         $filter: `_jm1pub_titleid_value eq ${titleId}`,
       })
     : []
@@ -206,6 +219,7 @@ async function readTitleAuthority(config: DataverseServerConfig, authority: Reco
     return status !== 196650003 && status !== 196650004
   })
   const authorVisibleArtifacts = stageArtifacts.filter((artifact) => isAuthorVisibleArtifact(artifact))
+  const packageReadinessBlockers = packageArtifactReadinessBlockers(authority, authorVisibleArtifacts)
   const blockers = [
     !titleId ? 'CANONICAL_TITLE_NOT_FOUND' : '',
     !contact ? 'CANONICAL_CONTACT_NOT_FOUND' : '',
@@ -215,6 +229,7 @@ async function readTitleAuthority(config: DataverseServerConfig, authority: Reco
       ? 'STAGE_CONTACT_MISMATCH'
       : '',
     authorVisibleArtifacts.length === 0 ? 'AUTHOR_SAFE_PACKAGE_ARTIFACTS_NOT_FOUND' : '',
+    ...packageReadinessBlockers,
     activeGates.length > 1 ? 'DUPLICATE_ACTIVE_GATES' : '',
   ].filter(Boolean)
 
@@ -230,6 +245,7 @@ async function readTitleAuthority(config: DataverseServerConfig, authority: Reco
     currentGateCount: activeGates.length,
     currentArtifactCount: stageArtifacts.length,
     authorVisibleArtifactCount: authorVisibleArtifacts.length,
+    packageReadinessBlockers,
     proposedMutations: [
       'create-or-reuse-one-author-review-gate',
       'dispatch-one-branded-author-review-message-through-acs',
@@ -266,6 +282,53 @@ async function releaseTitle(
     return { ...readback, status: 'idempotent', gateId, executionLogIds: [stringValue(existing.jm1_executionlogid)] }
   }
 
+  const attachments = await materializeRequiredAttachments(config, authority, titleId, stageId)
+  const message = buildAuthorReviewNotificationCopy({
+    stageCode: packageType(authority.stageCode),
+    titleName: authority.title,
+    authorName: displayNameFromEmail(readback.recipientEmail),
+    corrected: authority.stageCode === 'INTERIOR_LAYOUT',
+  })
+  const packageValidation = validateAuthorPackageNotification({
+    titleId,
+    authorId: authority.contactId,
+    stageCode: packageType(authority.stageCode),
+    gateId,
+    packageId: gateId,
+    packageVersion: 'executive-recovery-v1',
+    packageArtifactIds: attachments.map((attachment) => attachment.artifactId),
+    requiredAttachmentArtifactIds: attachments.map((attachment) => attachment.artifactId),
+    workspaceAccessLocation: `/author/portal?titleId=${encodeURIComponent(titleId)}`,
+    notificationTemplateId: message.templateName,
+    recipientPolicy: {
+      from: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.transactionalFromAddress,
+      to: readback.recipientEmail || '',
+      replyTo: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo,
+      bcc: [AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy],
+    },
+    correlationId,
+    idempotencyKey,
+    attachments,
+    packageChecksum,
+  })
+  if (!packageValidation.ok) {
+    await writeExecutionLog(config, {
+      actionType: 'FIVE_TITLE_EXECUTIVE_RECOVERY_BLOCKED',
+      name: `FIVE_TITLE_EXECUTIVE_RECOVERY_BLOCKED - ${authority.title}`,
+      description: `Release blocked before author communication. ${packageValidation.blocker}; gate ${gateId}; idempotency ${idempotencyKey}.`,
+      sourceEntity: 'jm1pub_editorialapprovalgate',
+      sourceRecordId: gateId,
+      failed: true,
+    })
+    return {
+      ...readback,
+      status: 'blocked',
+      blockers: [...readback.blockers, packageValidation.blocker || 'AUTHOR_PACKAGE_NOTIFICATION_BLOCKED'],
+      gateId,
+      executionLogIds: [],
+    }
+  }
+
   const startedLog = await writeExecutionLog(config, {
     actionType: 'FIVE_TITLE_EXECUTIVE_RECOVERY_STARTED',
     name: `FIVE_TITLE_EXECUTIVE_RECOVERY_STARTED - ${authority.title}`,
@@ -273,16 +336,19 @@ async function releaseTitle(
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: gateId,
   })
-  const message = buildCoverMessage(authority)
   const relay = await sendRelay({
     gateId,
     intakeCode: authority.intakeCode,
     title: authority.title,
-    authorName: readback.recipientEmail || 'Author',
+    authorName: displayNameFromEmail(readback.recipientEmail),
     authorEmail: readback.recipientEmail || '',
     subject: `${stageLabel(authority.stageCode)} Review Package - ${authority.title}`,
-    text: message.text,
-    html: message.html,
+    text: message.body,
+    html: message.htmlBody,
+    templateName: message.templateName,
+    templateVersion: message.templateVersion,
+    templateMetadata: message.templateMetadata,
+    attachments,
   })
   const now = new Date().toISOString()
 
@@ -349,6 +415,14 @@ async function sendRelay(input: {
   subject: string
   text: string
   html: string
+  templateName: string
+  templateVersion: string
+  templateMetadata: {
+    htmlSha256: string
+    textSha256: string
+    qualityGate: string
+  }
+  attachments: GovernedPackageAttachment[]
 }) {
   const relayUrl =
     process.env.JM1_AUTHOR_RESPONSE_SEND_RELAY_URL || process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL || RELAY_FALLBACK_URL
@@ -373,13 +447,17 @@ async function sendRelay(input: {
       subject: input.subject,
       body: input.text,
       htmlBody: input.html,
-      templateName: 'EXECUTIVE_RECOVERY_AUTHOR_REVIEW_PACKAGE_V1',
-      templateVersion: '2026-08-02',
-      templateMetadata: {
-        htmlSha256: stableChecksum(input.html),
-        textSha256: stableChecksum(input.text),
-        qualityGate: 'human-first;why-first;branded;plain-text;archive',
-      },
+      templateName: input.templateName,
+      templateVersion: input.templateVersion,
+      templateMetadata: input.templateMetadata,
+      attachments: input.attachments.map((attachment) => ({
+        name: attachment.fileName,
+        contentType: attachment.contentType,
+        contentInBase64: attachment.contentBytesBase64,
+        role: attachment.role,
+        artifactId: attachment.artifactId,
+        sha256: attachment.sha256,
+      })),
       approvedBy: SYSTEM_OPERATOR,
       approvedOn,
       internalVisibilityMailbox: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy,
@@ -394,6 +472,85 @@ async function sendRelay(input: {
     throw new Error(`RELAY_SEND_FAILED:${body?.reason || body?.code || response.status}`)
   }
   return { providerMessageId: body.providerMessageId || 'accepted-without-provider-message-id' }
+}
+
+async function materializeRequiredAttachments(
+  config: DataverseServerConfig,
+  authority: RecoveryTitleAuthority,
+  titleId: string,
+  stageId: string,
+): Promise<GovernedPackageAttachment[]> {
+  const artifacts = await dataverseList(config, 'jm1pub_editorialartifacts', {
+    $select:
+      'jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_sha256,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value',
+    $filter: `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${stageId}`,
+  })
+  const visible = artifacts.filter((artifact) => isAuthorVisibleArtifact(artifact))
+  const roles = requiredAttachmentRoles(authority.stageCode)
+  const selected = roles.map((role) => {
+    const artifact = selectArtifactForRole(visible, role)
+    if (!artifact) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:REQUIRED_ATTACHMENT_MISSING:${role}`)
+    return { role, artifact }
+  })
+  const token = await getGraphToken()
+
+  return Promise.all(
+    selected.map(async ({ role, artifact }) => {
+      const driveId = stringValue(artifact.jm1pub_repositorydriveid)
+      const itemId = stringValue(artifact.jm1pub_repositoryitemid)
+      if (!driveId || !itemId) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:ATTACHMENT_LOCATION_MISSING:${role}`)
+      const response = await fetch(
+        `https://graph.microsoft.com/v1.0/drives/${encodeURIComponent(driveId)}/items/${encodeURIComponent(itemId)}/content`,
+        { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' },
+      )
+      if (!response.ok) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:ATTACHMENT_MATERIALIZATION_FAILED:${role}:${response.status}`)
+      const body = Buffer.from(await response.arrayBuffer())
+      const expectedSha = stringValue(artifact.jm1pub_sha256)
+      const actualSha = stableChecksum(body)
+      if (expectedSha && expectedSha.toLowerCase() !== actualSha.toLowerCase()) {
+        throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:ATTACHMENT_CHECKSUM_MISMATCH:${role}`)
+      }
+      const filename = sanitizeDownloadFilename(stringValue(artifact.jm1pub_filename) || `${role}.bin`)
+      return {
+        role,
+        artifactId: stringValue(artifact.jm1pub_editorialartifactid),
+        fileName: filename,
+        contentType: contentTypeForFilename(filename),
+        contentBytesBase64: body.toString('base64'),
+        sizeBytes: body.byteLength,
+        sha256: actualSha,
+      }
+    }),
+  )
+}
+
+async function getGraphToken() {
+  const tenantId = process.env.GRAPH_TENANT_ID || process.env.SHAREPOINT_TENANT_ID
+  const clientId = process.env.GRAPH_CLIENT_ID || process.env.SHAREPOINT_CLIENT_ID
+  const clientSecret = process.env.GRAPH_CLIENT_SECRET || process.env.SHAREPOINT_CLIENT_SECRET
+
+  if (!tenantId || !clientId || !clientSecret) {
+    throw new Error('GRAPH_CONFIG_MISSING_FOR_PACKAGE_ATTACHMENT_MATERIALIZATION')
+  }
+
+  const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+    },
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: clientId,
+      client_secret: clientSecret,
+      scope: 'https://graph.microsoft.com/.default',
+    }),
+  })
+  const json = (await response.json().catch(() => null)) as { access_token?: string } | null
+  if (!response.ok || !json?.access_token) {
+    throw new Error(`GRAPH_TOKEN_FAILED_FOR_PACKAGE_ATTACHMENT_MATERIALIZATION:${response.status}`)
+  }
+  return json.access_token
 }
 
 function selectStage(stages: DataverseRow[], authority: RecoveryTitleAuthority) {
@@ -413,27 +570,56 @@ function isAuthorVisibleArtifact(artifact: DataverseRow) {
   return /approved|current|author/i.test(`${status} ${visibility}`)
 }
 
-function buildCoverMessage(authority: RecoveryTitleAuthority) {
-  const stage = stageLabel(authority.stageCode)
-  const text = [
-    'Good day,',
-    '',
-    `Your ${stage.toLowerCase()} review package for ${authority.title} is ready.`,
-    '',
-    'We are sending this package because the current publishing work for this stage has been completed and is ready for your review. Please review the included materials in your Author Operating Center, then choose one response: approve as presented, approve with corrections, or ask a question.',
-    '',
-    'Please submit one consolidated response within seven calendar days. After we receive your response, Publishing will either continue the next production step or review the corrections or questions you provide.',
-    '',
-    'If you need assistance, contact Publishing at publishing@jmerrill.one.',
-    '',
-    'The Publishing Team',
-    'J Merrill Publishing, Inc.',
-    'A Division of J Merrill One',
-  ].join('\n')
-  const html = `<!doctype html><html><body><p>Good day,</p><p>Your ${escapeHtml(stage.toLowerCase())} review package for <strong>${escapeHtml(
-    authority.title,
-  )}</strong> is ready.</p><p>We are sending this package because the current publishing work for this stage has been completed and is ready for your review.</p><p>Please review the included materials in your Author Operating Center, then choose one response: approve as presented, approve with corrections, or ask a question.</p><p>Please submit one consolidated response within seven calendar days. After we receive your response, Publishing will either continue the next production step or review the corrections or questions you provide.</p><p>If you need assistance, contact Publishing at <a href="mailto:publishing@jmerrill.one">publishing@jmerrill.one</a>.</p><p>The Publishing Team<br>J Merrill Publishing, Inc.<br>A Division of J Merrill One</p></body></html>`
-  return { text, html }
+function packageArtifactReadinessBlockers(authority: RecoveryTitleAuthority, artifacts: DataverseRow[]) {
+  return requiredAttachmentRoles(authority.stageCode)
+    .filter((role) => !selectArtifactForRole(artifacts, role))
+    .map((role) => `REQUIRED_PACKAGE_ATTACHMENT_NOT_READY:${role}`)
+}
+
+function requiredAttachmentRoles(stageCode: PackageStageCode): AttachmentRole[] {
+  if (stageCode === 'INTERIOR_LAYOUT') {
+    return ['interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+  }
+  return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+}
+
+function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) {
+  const patterns: Record<AttachmentRole, RegExp> = {
+    editedManuscript: /manuscript|developmental.*docx|edited/i,
+    editorialMemo: /memo|summary|developmental.*assessment|developmental.*summary/i,
+    reviewInstructions: /instruction|review/i,
+    authorResponseMechanism: /response|approval/i,
+    packageManifest: /manifest/i,
+    authorCoverMessage: /cover.*message|cover.*letter|message/i,
+    lineEditedManuscript: /line/i,
+    copyeditedManuscript: /copyedit/i,
+    proofreadManuscript: /proofread/i,
+    reviewCoverNote: /cover.*note/i,
+    interiorProof: /interior.*proof|layout.*proof|production.*pdf|\\.pdf$/i,
+    coverProof: /cover.*proof/i,
+    productionProof: /production.*proof/i,
+  }
+  const pattern = patterns[role]
+  return artifacts.find((artifact) => {
+    const haystack = [
+      stringValue(artifact.jm1pub_editorialartifactname),
+      stringValue(artifact.jm1pub_filename),
+      dataverseFormatted(artifact, 'jm1pub_artifacttype', ''),
+    ].join(' ')
+    const size = Number(artifact.jm1pub_filesizebytes || 0)
+    if (role === 'interiorProof' && size > 0 && size < 100_000) return false
+    return pattern.test(haystack)
+  })
+}
+
+function displayNameFromEmail(email?: string) {
+  if (!email) return 'Author'
+  const local = email.split('@')[0] || 'Author'
+  return local
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ') || 'Author'
 }
 
 async function findExecutionLog(config: DataverseServerConfig, actionType: string, idempotencyKey: string) {
@@ -472,16 +658,27 @@ function stageLabel(stageCode: PackageStageCode) {
   return stageCode === 'INTERIOR_LAYOUT' ? 'Interior Layout' : 'Developmental Editing'
 }
 
-function stableChecksum(value: string) {
+function stableChecksum(value: string | Buffer) {
   return createHash('sha256').update(value).digest('hex')
+}
+
+function sanitizeDownloadFilename(value: string) {
+  return value.replace(/[\r\n"\\/]/g, '-').slice(0, 180) || 'editorial-artifact'
+}
+
+function contentTypeForFilename(filename: string) {
+  const lower = filename.toLowerCase()
+  if (lower.endsWith('.docx')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  if (lower.endsWith('.pdf')) return 'application/pdf'
+  if (lower.endsWith('.xlsx')) return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  if (lower.endsWith('.doc')) return 'application/msword'
+  if (lower.endsWith('.txt')) return 'text/plain; charset=utf-8'
+  if (lower.endsWith('.html')) return 'text/html; charset=utf-8'
+  return 'application/octet-stream'
 }
 
 function escapeOData(value: string) {
   return value.replace(/'/g, "''")
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char] || char)
 }
 
 function extractId(value: string) {
@@ -494,4 +691,9 @@ function safeDetail(value: string) {
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email-redacted]')
     .replace(/https:\/\/[^\s"']+/g, '[url-redacted]')
     .slice(0, 1000)
+}
+
+function safeRuntimeBlocker(error: unknown) {
+  const value = error instanceof Error ? error.message : 'AUTHOR_PACKAGE_RELEASE_BLOCKED'
+  return safeDetail(value).replace(/[:][0-9a-zA-Z._~+/=-]{24,}/g, ':[redacted]')
 }

@@ -27,6 +27,7 @@ const PORTAL_BOOTSTRAP_MAX_AGE_MS = 5 * 60 * 1000
 const PORTAL_UNLOCKED_KEY = 'jmp-author-onboarding-unlocked'
 const WORKSPACE_CONTEXT_ATTEMPTS = 4
 const WORKSPACE_CONTEXT_RETRY_DELAY_MS = 1200
+const WORKSPACE_CONTEXT_TIMEOUT_MS = 9000
 
 function clearAuthorSessionState() {
   sessionStorage.removeItem(PORTAL_UNLOCKED_KEY)
@@ -204,7 +205,25 @@ export function AuthorPortalWorkspace() {
   if (state === 'error' || !context) {
     return (
       <div className="rounded-[28px] border border-amber-300/20 bg-amber-300/10 p-8 text-[14px] leading-[1.8] text-amber-100">
-        {error || 'We could not load your workspace right now.'}
+        <h2 className="text-[20px] font-semibold text-white">We could not open your Author Operating Center.</h2>
+        <p className="mt-3">
+          {error ||
+            'Your sign-in was received, but your author workspace could not be resolved. Please sign in again or contact Publishing so we can restore access without creating a duplicate account.'}
+        </p>
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <a
+            href="/api/auth/signin/jm1-author-operating-center?callbackUrl=%2Fauthor%2Fportal"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-blue-500 px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white"
+          >
+            Sign in again
+          </a>
+          <a
+            href="mailto:publishing@jmerrill.one"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/15 px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white"
+          >
+            Contact Publishing
+          </a>
+        </div>
       </div>
     )
   }
@@ -807,10 +826,13 @@ async function loadWorkspaceContext(params: {
   } | null = null
 
   for (let attempt = 0; attempt < WORKSPACE_CONTEXT_ATTEMPTS; attempt += 1) {
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), WORKSPACE_CONTEXT_TIMEOUT_MS)
     try {
       const response = await fetch(`/api/author/context${query.toString() ? `?${query.toString()}` : ''}`, {
         cache: 'no-store',
         credentials: 'same-origin',
+        signal: controller.signal,
       })
       const data = await safeReadJson(response)
 
@@ -826,9 +848,16 @@ async function loadWorkspaceContext(params: {
       lastResult = {
         ok: false,
         status: 0,
-        error: error instanceof Error ? error.message : 'Workspace context request failed.',
+        error:
+          error instanceof DOMException && error.name === 'AbortError'
+            ? 'Author workspace context timed out.'
+            : error instanceof Error
+              ? error.message
+              : 'Workspace context request failed.',
         context: null,
       }
+    } finally {
+      window.clearTimeout(timeout)
     }
 
     await new Promise((resolve) => window.setTimeout(resolve, WORKSPACE_CONTEXT_RETRY_DELAY_MS))

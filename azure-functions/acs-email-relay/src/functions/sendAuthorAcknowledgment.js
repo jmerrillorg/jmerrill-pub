@@ -514,6 +514,7 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
   const subject = normalizeText(payload.subject);
   const body = normalizeBody(payload.body);
   const htmlBody = normalizeHtmlBody(payload.htmlBody);
+  const attachments = normalizeAuthorReviewAttachments(payload.attachments);
   if (!subject) {
     return { ok: false, reason: "SUBJECT_MISSING" };
   }
@@ -524,6 +525,15 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
 
   if (normalizeText(payload.templateName) === "EDITORIAL_RECOMMENDATION_LETTER_V1" && !htmlBody) {
     return { ok: false, reason: "EDITORIAL_RECOMMENDATION_HTML_REQUIRED" };
+  }
+
+  if (normalizeText(payload.templateName) === "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1") {
+    if (!htmlBody) {
+      return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_HTML_REQUIRED" };
+    }
+    if (!attachments.ok) {
+      return { ok: false, reason: attachments.reason };
+    }
   }
 
   if (!normalizeText(payload.approvedBy)) {
@@ -561,6 +571,7 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
         textSha256: normalizeText(payload.templateMetadata.textSha256),
         qualityGate: normalizeText(payload.templateMetadata.qualityGate)
       } : null,
+      attachments: attachments.ok ? attachments.value : [],
       approvedBy: normalizeText(payload.approvedBy),
       approvedOn: normalizeText(payload.approvedOn),
       internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX
@@ -714,8 +725,39 @@ function buildApprovedAuthorResponseEmail(payload) {
           displayName: "J Merrill Publishing"
         }
       ]
-    }
+    },
+    attachments: Array.isArray(payload.attachments) ? payload.attachments.map((attachment) => ({
+      name: attachment.name,
+      contentType: attachment.contentType,
+      contentInBase64: attachment.contentInBase64
+    })) : []
   };
+}
+
+function normalizeAuthorReviewAttachments(value) {
+  if (value === undefined || value === null) return { ok: true, value: [] };
+  if (!Array.isArray(value)) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENTS_INVALID" };
+  if (value.length === 0) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENTS_MISSING" };
+
+  let totalBytes = 0;
+  const normalized = [];
+  for (const attachment of value) {
+    if (!attachment || typeof attachment !== "object") return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_INVALID" };
+    const name = normalizeText(attachment.name);
+    const contentType = normalizeText(attachment.contentType);
+    const contentInBase64 = normalizeText(attachment.contentInBase64);
+    if (!name) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_NAME_MISSING" };
+    if (!contentType) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CONTENT_TYPE_MISSING" };
+    if (!contentInBase64) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CONTENT_MISSING" };
+    totalBytes += Buffer.byteLength(contentInBase64, "base64");
+    normalized.push({ name, contentType, contentInBase64 });
+  }
+
+  if (totalBytes > 20 * 1024 * 1024) {
+    return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_SIZE_LIMIT" };
+  }
+
+  return { ok: true, value: normalized };
 }
 
 async function sendAcsMessage(message) {
