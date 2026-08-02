@@ -304,6 +304,17 @@ export function buildAuthorReviewNotificationCopy(input: {
       meaning: 'Your review period starts from the corrected package notification, not from the incomplete notice.',
       authorAction: 'Please review the attached package and reply to the publishing team with your approval or requested corrections.',
       primaryActionLabel: 'Review Package and Reply',
+      packageInventory: [
+        'Current author-review manuscript or proof',
+        'Stage-specific editorial or production summary',
+        'Review instructions',
+        'Package manifest or package summary',
+      ],
+      responseChoices: [
+        'Approve as presented',
+        'Approve with corrections',
+        'Questions or clarification requested',
+      ],
       deadline: 'Please use the response window stated in the Author Operating Center or package instructions.',
       nextSteps: [
         'The publishing team will record your response.',
@@ -337,6 +348,17 @@ export function buildAuthorReviewNotificationCopy(input: {
     meaning: 'This is the point where your review helps us confirm the next governed step for your book.',
     authorAction: 'Please review the package and reply to the publishing team with your approval or requested corrections.',
     primaryActionLabel: 'Review Package and Reply',
+    packageInventory: [
+      'Current author-review manuscript or proof',
+      'Stage-specific editorial or production summary',
+      'Review instructions',
+      'Package manifest or package summary',
+    ],
+    responseChoices: [
+      'Approve as presented',
+      'Approve with corrections',
+      'Questions or clarification requested',
+    ],
     deadline: 'Please use the response window stated in the Author Operating Center or package instructions.',
     nextSteps: [
       'The publishing team will record your response.',

@@ -42,7 +42,8 @@ function loadRelayModule() {
 
       return require(name);
     },
-    process
+    process,
+    Buffer
   };
 
   vm.runInNewContext(
@@ -219,6 +220,40 @@ function validEditorialRecommendationPayload(overrides = {}) {
       textSha256: "b".repeat(64),
       qualityGate: "PASS"
     },
+    ...overrides
+  });
+}
+
+function validAuthorReviewPackagePayload(overrides = {}) {
+  return validAuthorResponsePayload({
+    subject: "Developmental Editing Review Package - Before You Were Born",
+    body: [
+      "Good day, Author,",
+      "",
+      "Why you are receiving this",
+      "Your package is ready.",
+      "",
+      "Package inventory",
+      "- Current author-review manuscript",
+      "",
+      "Response choices",
+      "- Approve as presented"
+    ].join("\n"),
+    htmlBody: "<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table><h2>Package inventory</h2><h2>Response choices</h2></body></html>",
+    templateName: "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1",
+    templateVersion: "1.0.0",
+    templateMetadata: {
+      htmlSha256: "c".repeat(64),
+      textSha256: "d".repeat(64),
+      qualityGate: "PASS"
+    },
+    attachments: [
+      {
+        name: "Before You Were Born - Developmental Summary.pdf",
+        contentType: "application/pdf",
+        contentInBase64: Buffer.from("author-safe summary").toString("base64")
+      }
+    ],
     ...overrides
   });
 }
@@ -452,6 +487,28 @@ test("approved author response rejects unsafe fields and returns safe failure on
   assert.equal(response.jsonBody.accepted, false);
   assert.equal(response.jsonBody.code, "ACS_RELAY_VALIDATION_FAILED");
   assert.equal(serialized.includes("SECRET BODY"), false);
+});
+
+test("approved author-review package rejects missing attachments", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload({ attachments: [] })),
+    "AUTHOR_REVIEW_ATTACHMENTS_MISSING"
+  );
+});
+
+test("approved author-review package sends validated attachments to ACS", () => {
+  const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
+  const result = validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload());
+
+  assert.equal(result.ok, true);
+  const email = buildApprovedAuthorResponseEmail(result.value);
+  assert.equal(email.content.html.includes("J MERRILL PUBLISHING"), true);
+  assert.equal(email.attachments.length, 1);
+  assert.equal(email.attachments[0].name, "Before You Were Born - Developmental Summary.pdf");
+  assert.equal(email.attachments[0].contentType, "application/pdf");
+  assert.equal(email.attachments[0].contentInBase64, Buffer.from("author-safe summary").toString("base64"));
 });
 
 test("relay auth failures return safe responses", () => {
