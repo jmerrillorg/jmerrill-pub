@@ -183,6 +183,24 @@ export function isPhysicalEmailAttachmentRole(role: AttachmentRole) {
   return role !== 'authorResponseMechanism' && role !== 'packageManifest' && role !== 'authorCoverMessage'
 }
 
+export function authorFacingAttachmentBlocker(attachment: GovernedPackageAttachment) {
+  if (!isPhysicalEmailAttachmentRole(attachment.role)) {
+    return `AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED:${attachment.role}`
+  }
+  const fileName = attachment.fileName.toLowerCase()
+  const contentType = attachment.contentType.toLowerCase()
+  if (fileName.endsWith('.json') || contentType.includes('application/json')) {
+    return `AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED:${attachment.role}:JSON`
+  }
+  if (fileName.endsWith('.md') || fileName.endsWith('.markdown') || contentType.includes('markdown')) {
+    return `AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED:${attachment.role}:MARKDOWN`
+  }
+  if (/\b(manifest|ledger|evidence|execution|workflow|dataverse|checksum|response[-_ ]?mechanism|package[-_ ]?version)\b/i.test(attachment.fileName)) {
+    return `AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED:${attachment.role}:INTERNAL_NAME`
+  }
+  return ''
+}
+
 export function buildAuthorPackageNotificationIdempotencyKey(input: {
   titleId: string
   stageCode: AuthorReviewPackageType
@@ -217,6 +235,10 @@ export function validateAuthorPackageNotification(input: AuthorPackageNotificati
   if (!headerValidation.ok) return blocked(headerValidation.blocker)
 
   const attachmentsByRole = new Map(input.attachments.map((attachment) => [attachment.role, attachment]))
+  const exposedInternalArtifact = input.attachments.map(authorFacingAttachmentBlocker).find(Boolean)
+  if (exposedInternalArtifact) {
+    return blocked(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ${exposedInternalArtifact}`)
+  }
   const missingRole = policy.attachmentsRequired.find((role) => !attachmentsByRole.get(role))
   if (missingRole) {
     return blocked(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - REQUIRED_ATTACHMENT_MISSING - ${missingRole}`)
@@ -305,25 +327,25 @@ export function buildAuthorReviewNotificationCopy(input: {
     const rendered = renderAuthorCommunicationEmail({
       templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
       templateVersion: '1.0.0',
-      subject: `Corrected ${subjectStageLabel} Review Package — ${input.titleName}`,
+      subject: `Corrected ${subjectStageLabel} Review Materials — ${input.titleName}`,
       authorName,
       titleName: input.titleName,
-      preheader: `Corrected ${stageLabel.toLowerCase()} package for ${input.titleName}.`,
-      why: `We are sending a corrected ${stageLabel.toLowerCase()} package for ${input.titleName} so you have the usable review materials in one clear email.`,
+      preheader: `Corrected ${stageLabel.toLowerCase()} materials for ${input.titleName}.`,
+      why: `We are sending corrected ${stageLabel.toLowerCase()} materials for ${input.titleName} so you have the usable documents in one clear email.`,
       completed: [
         'The publishing team prepared the current author-facing files.',
-        'Internal manifests, ledgers, and workflow records were retained for audit and are not included in this email.',
-        'A portal copy may be available for history and downloads, but it is not required for your review.',
+        'The files you need for this review are attached to this email.',
+        'Your Author Operating Center has also been updated if you would like to view your project history or download another copy.',
       ],
       meaning: 'Please review the attached files for the current publishing stage. You do not need to use the portal to complete this review.',
-      authorAction: 'Reply directly to this email with your approval, one consolidated correction list, or any questions you want the publishing team to answer.',
-      primaryActionLabel: 'Optional: View Portal Copy',
+      authorAction: 'Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions. You may also include one consolidated correction list in your reply.',
+      primaryActionLabel: 'View in Author Operating Center',
       primaryActionUrl: input.primaryActionUrl,
       packageInventory,
-      deadline: `Please respond by ${responseDeadline}. Your seven-calendar-day review period starts from this corrected package notification.`,
+      deadline: `Please respond by ${responseDeadline}. Your seven-calendar-day review period starts from this corrected email delivery.`,
       nextSteps: [
         'The publishing team will record your response.',
-        'Approved corrections or approval will move through the governed next-stage process.',
+        'Approved corrections or approval will move to the next publishing step.',
         'If you have questions, reply directly to this message.',
       ],
     })
@@ -340,25 +362,25 @@ export function buildAuthorReviewNotificationCopy(input: {
   const rendered = renderAuthorCommunicationEmail({
     templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
     templateVersion: '1.0.0',
-    subject: `${stageLabel} Package - ${input.titleName}`,
+    subject: `${stageLabel} Materials - ${input.titleName}`,
     authorName,
     titleName: input.titleName,
-    preheader: `Your ${stageLabel.toLowerCase()} package is ready for review.`,
-    why: `Your ${stageLabel.toLowerCase()} package for ${input.titleName} is ready for your review.`,
+    preheader: `Your ${stageLabel.toLowerCase()} materials are ready for review.`,
+    why: `Your ${stageLabel.toLowerCase()} materials for ${input.titleName} are ready for your review.`,
     completed: [
       'The publishing team prepared the current author-facing files.',
       'The files you need for this review are attached to this email.',
-      'Internal manifests, ledgers, and workflow records were retained for audit and are not included in this email.',
+      'Your Author Operating Center has also been updated if you would like to view your project history or download another copy.',
     ],
-    meaning: 'Please review the attached files for the current publishing stage. You do not need to use the portal to complete this review.',
-    authorAction: 'Reply directly to this email with your approval, one consolidated correction list, or any questions you want the publishing team to answer.',
-    primaryActionLabel: 'Optional: View Portal Copy',
+      meaning: 'Please review the attached files for the current publishing stage. You do not need to use the portal to complete this review.',
+      authorAction: 'Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions. You may also include one consolidated correction list in your reply.',
+      primaryActionLabel: 'View in Author Operating Center',
     primaryActionUrl: input.primaryActionUrl,
     packageInventory,
     deadline: `Please respond by ${responseDeadline}.`,
     nextSteps: [
       'The publishing team will record your response.',
-      'If you approve, the project can move to the next governed stage.',
+      'If you approve, the project can move to the next publishing stage.',
       'If you request corrections, the publishing team will review them before any stage movement.',
     ],
   })
@@ -397,6 +419,9 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
     templateVersion: '1.0.0',
   })
   if (!bodyValidation.ok) throw new Error(bodyValidation.blocker)
+
+  const exposedInternalArtifact = input.attachments.map(authorFacingAttachmentBlocker).find(Boolean)
+  if (exposedInternalArtifact) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ${exposedInternalArtifact}`)
 
   const client = new EmailClient(input.connectionString)
   const message: EmailMessage = {

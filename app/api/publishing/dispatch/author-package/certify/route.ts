@@ -23,6 +23,8 @@ const EVIDENCE_KEYS: Array<keyof OperationalDeliveryCertificationEvidence> = [
   'deliveredButtonUrl',
   'authorClickThrough',
   'archiveConfirmed',
+  'dataverseSendEvidence',
+  'directReplyPath',
   'portalAccess',
   'packageVisible',
   'responseControls',
@@ -52,6 +54,7 @@ export async function POST(req: Request) {
       dryRun?: boolean
       evidence?: Partial<OperationalDeliveryCertificationEvidence>
       evidenceReferences?: EvidenceReferences
+      portalStatus?: 'AVAILABLE' | 'NOT_ACTIVATED' | 'TEMPORARILY_UNAVAILABLE' | 'NOT_APPLICABLE'
     } | null
     if (!body) return NextResponse.json({ error: 'Request body is required.' }, { status: 400 })
     if (!body.packageId || !body.titleId || !body.stageId || !body.recipientContactId || !body.gateId) {
@@ -81,6 +84,7 @@ export async function POST(req: Request) {
       correlationId: body.correlationId,
       dryRun: body.dryRun === true,
       evidence,
+      portalStatus: body.portalStatus || 'NOT_APPLICABLE',
       operator: identity.subject,
     })
 

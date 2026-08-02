@@ -39,6 +39,9 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
     'sourceChecksumLineage',
     'attachmentChecksums',
     'deliveredAttachmentInventory',
+    'dataverseSendEvidence',
+    'directReplyPath',
+    'portalStatus',
     'portalAccessPreflight',
     'workspaceTarget',
     'Title',
@@ -86,12 +89,14 @@ test('dispatch service separates technical release from operational certificatio
   assert.match(service, /TECHNICALLY_RELEASED/)
   assert.match(service, /Operational delivery certification is required before Awaiting Author Response/)
   assert.match(service, /No seven-day response clock starts at technical release/)
-  assert.match(service, /branded HTML, plain text, required email attachments, archive, Dataverse send evidence, and gate/)
+  assert.match(service, /branded HTML, plain text, required attachments, checksums, archive, Dataverse send evidence, direct reply path, and single gate/)
   assert.match(service, /jm1pub_gatestatus:\s*GATE_STATUS_AWAITING_AUTHOR_RESPONSE/)
   assert.match(service, /jm1pub_awaitingsince:\s*now/)
   assert.match(service, /PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED/)
   assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:BRANDED_HTML_NOT_VERIFIED/)
   assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:ARCHIVE_NOT_CONFIRMED/)
+  assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:DATAVERSE_SEND_EVIDENCE_NOT_CONFIRMED/)
+  assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:DIRECT_REPLY_PATH_NOT_CONFIRMED/)
   assert.doesNotMatch(service, /OPERATIONAL_CERTIFICATION_BLOCKED:PORTAL_ACCESS_NOT_CONFIRMED/)
   assert.doesNotMatch(service, /OPERATIONAL_CERTIFICATION_BLOCKED:RESPONSE_CONTROLS_NOT_CONFIRMED/)
   assert.doesNotMatch(service, /Gate \$\{gateId\} moved to AWAITING_AUTHOR_RESPONSE after provider/)
@@ -143,7 +148,10 @@ test('operational certification endpoint is OIDC protected and evidence constrai
     'attachmentChecksums',
     'deliveredAttachmentInventory',
     'archiveConfirmed',
+    'dataverseSendEvidence',
     'singleActiveGate',
+    'directReplyPath',
+    'portalStatus',
   ]) {
     assert.match(certifyRoute, new RegExp(token))
   }
@@ -154,11 +162,12 @@ test('operational certification endpoint is OIDC protected and evidence constrai
 })
 
 test('executive recovery sends corrected stage-specific author package copy', () => {
+  const notificationEngine = readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8')
   assert.match(service, /corrected:\s*input\.executionMode === 'EXECUTIVE_RECOVERY'/)
   assert.match(service, /responseDeadline/)
-  assert.match(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected \$\{subjectStageLabel\} Review Package — \$\{input\.titleName\}/)
-  assert.doesNotMatch(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected Proofreading Review Package/)
-  assert.doesNotMatch(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected \$\{stageLabel\} Review Package/)
+  assert.match(notificationEngine, /Corrected \$\{subjectStageLabel\} Review Materials — \$\{input\.titleName\}/)
+  assert.doesNotMatch(notificationEngine, /Corrected Proofreading Review Package/)
+  assert.doesNotMatch(notificationEngine, /Corrected \$\{stageLabel\} Review Package/)
 })
 
 test('executive recovery exposes package version for corrected replacement dispatch', () => {
@@ -200,4 +209,8 @@ test('PROGRAM-006 keeps service-generated roles out of physical email attachment
   assert.match(notificationEngine, /role !== 'authorResponseMechanism' && role !== 'packageManifest' && role !== 'authorCoverMessage'/)
   assert.match(service, /Required physical attachments/)
   assert.match(service, /packageInventory:\s*readback\.requiredAttachments[\s\S]+isPhysicalEmailAttachmentRole/)
+  assert.match(service, /authorFacingFilename/)
+  assert.match(notificationEngine, /AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED/)
+  assert.match(notificationEngine, /View in Author Operating Center/)
+  assert.match(notificationEngine, /Reply directly to publishing@jmerrill\.one/)
 })

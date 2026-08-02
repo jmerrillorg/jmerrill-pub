@@ -121,7 +121,7 @@ export function validateAuthorCommunicationEmail(input: {
   if (!text.includes("What's attached")) blockers.push('PLAIN_TEXT_ATTACHMENT_BLOCK_MISSING')
   if (!text.includes("What we'd like you to review")) blockers.push('PLAIN_TEXT_AUTHOR_REVIEW_BLOCK_MISSING')
   if (!text.includes('How to respond')) blockers.push('PLAIN_TEXT_AUTHOR_ACTION_BLOCK_MISSING')
-  if (!/Optional portal copy:\s*https:\/\//i.test(text)) blockers.push('PLAIN_TEXT_OPTIONAL_PORTAL_URL_MISSING')
+  if (!/Optional Author Operating Center access:\s*https:\/\//i.test(text)) blockers.push('PLAIN_TEXT_OPTIONAL_PORTAL_URL_MISSING')
   if (!text.includes(AUTHOR_COMMUNICATION_BRAND.signature)) blockers.push('PLAIN_TEXT_SIGNATURE_MISSING')
 
   return blockers.length
@@ -156,7 +156,7 @@ function normalizeInput(input: AuthorCommunicationRenderInput): AuthorCommunicat
     ],
     nextSteps: input.nextSteps.map((item) => required(item, 'next step')),
     supportNote: input.supportNote?.trim() || 'If anything is unclear, reply to this email and the publishing team will help.',
-    operationalNote: input.operationalNote?.trim() || 'This message confirms workflow status only. It does not change your publishing agreement or approve publication by itself.',
+    operationalNote: input.operationalNote?.trim() || 'This message does not change your publishing agreement or approve publication by itself.',
   }
 }
 
@@ -183,8 +183,8 @@ function renderText(input: AuthorCommunicationRenderInput) {
     '',
     input.deadline ? `Response window: ${input.deadline}` : '',
     '',
-    'Optional portal copy',
-    `Optional portal copy: ${input.primaryActionUrl}`,
+    'Optional Author Operating Center access',
+    `Optional Author Operating Center access: ${input.primaryActionUrl}`,
     '',
     'What happens next',
     ...input.nextSteps.map((item) => `- ${item}`),
@@ -240,6 +240,8 @@ function renderHtml(input: AuthorCommunicationRenderInput) {
                   ${deadline}
                 </div>
                 <p style="margin:0 0 18px;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">You can complete this review by replying directly to this email.</p>
+                <h2 style="margin:24px 0 10px;font-size:16px;color:${brand.textColor};">Optional Author Operating Center access</h2>
+                <p style="margin:0 0 14px;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">Your Author Operating Center has also been updated if you would like to view your project history or download another copy.</p>
                 ${
                   `<p style="margin:0 0 22px;"><a href="${escapeHtml(input.primaryActionUrl)}" style="display:inline-block;background:${brand.primaryColor};color:#ffffff;padding:11px 16px;font-size:14px;font-weight:700;text-decoration:none;">${escapeHtml(input.primaryActionLabel)}</a></p>`
                 }

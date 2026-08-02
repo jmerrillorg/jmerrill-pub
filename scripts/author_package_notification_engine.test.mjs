@@ -47,11 +47,12 @@ const checks = [
   {
     name: 'corrected send is email-first and starts effective response clock',
     pass: () =>
-      engine.includes('Corrected ${subjectStageLabel} Review Package') &&
+      engine.includes('Corrected ${subjectStageLabel} Review Materials') &&
       !engine.includes('Corrected Proofreading Review Package') &&
       engine.includes('one clear email') &&
-      engine.includes('not required for your review') &&
-      engine.includes('Your seven-calendar-day review period starts from this corrected package notification'),
+      engine.includes('You do not need to use the portal to complete this review') &&
+      engine.includes('Your seven-calendar-day review period starts from this corrected email delivery') &&
+      engine.includes('Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions'),
   },
   {
     name: 'canonical events exist for audit, correction, transaction completion, and autostart arming',
@@ -88,6 +89,15 @@ const checks = [
       engine.includes('isPhysicalEmailAttachmentRole') &&
       engine.includes('attachments: input.attachments') &&
       engine.includes('.filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))'),
+  },
+  {
+    name: 'author package email fails closed if internal artifacts enter MIME inventory',
+    pass: () =>
+      engine.includes('authorFacingAttachmentBlocker') &&
+      engine.includes('AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED') &&
+      engine.includes("fileName.endsWith('.json')") &&
+      engine.includes("fileName.endsWith('.md')") &&
+      engine.includes('package[-_ ]?version'),
   },
   {
     name: 'author package notifications require shared branded HTML and plain text',

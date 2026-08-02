@@ -6,6 +6,7 @@ import { createHash, randomUUID } from 'node:crypto'
 
 import {
   AUTHOR_PUBLISHING_COMMUNICATION_POLICY,
+  authorFacingAttachmentBlocker,
   buildAuthorPackageNotificationIdempotencyKey,
   buildAuthorReviewNotificationCopy,
   isPhysicalEmailAttachmentRole,
@@ -105,6 +106,8 @@ export type OperationalDeliveryCertificationEvidence = {
   deliveredButtonUrl: boolean
   authorClickThrough: boolean
   archiveConfirmed: boolean
+  dataverseSendEvidence: boolean
+  directReplyPath: boolean
   portalAccess: boolean
   packageVisible: boolean
   responseControls: boolean
@@ -123,6 +126,7 @@ export type OperationalDeliveryCertificationRequest = {
   operator?: string
   dryRun?: boolean
   evidence: OperationalDeliveryCertificationEvidence
+  portalStatus?: 'AVAILABLE' | 'NOT_ACTIVATED' | 'TEMPORARILY_UNAVAILABLE' | 'NOT_APPLICABLE'
 }
 
 export type OperationalDeliveryCertificationResult = {
@@ -241,7 +245,7 @@ export async function certifyOperationalDelivery(
       jm1pub_correlationid: correlationId,
     }),
     dataversePatch(config, 'jm1pub_editorialstages', input.stageId, {
-      jm1pub_internaloperationalsummary: `PublishingDispatchService certified operational delivery. Email is the official delivery mechanism; branded HTML, plain text, required attachments, checksums, archive, Dataverse send evidence, and single gate passed. Author Operating Center evidence is secondary and non-blocking. Idempotency ${readback.idempotencyKey}.`,
+      jm1pub_internaloperationalsummary: `PublishingDispatchService certified operational delivery. Email is the official delivery mechanism; branded HTML, plain text, required attachments, checksums, archive, Dataverse send evidence, direct reply path, and single gate passed. Author Operating Center status ${input.portalStatus || 'NOT_APPLICABLE'} is secondary and non-blocking. Idempotency ${readback.idempotencyKey}.`,
       jm1pub_currentgatecount: 1,
       jm1pub_correlationid: correlationId,
     }),
@@ -252,7 +256,7 @@ export async function certifyOperationalDelivery(
     name: `PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED - ${readback.titleName}`,
     description: [
       `Operational delivery certification passed by ${input.operator || SYSTEM_OPERATOR}.`,
-      `Gate ${input.gateId} moved to AWAITING_AUTHOR_RESPONSE after branded HTML, plain text, required attachments, attachment checksums, archive, Dataverse send evidence, and single active gate passed. Portal availability is secondary and not required for ordinary editorial review.`,
+      `Gate ${input.gateId} moved to AWAITING_AUTHOR_RESPONSE after branded HTML, plain text, required attachments, attachment checksums, archive, Dataverse send evidence, direct reply path, and single active gate passed. Portal status ${input.portalStatus || 'NOT_APPLICABLE'} is secondary and not required for ordinary editorial review.`,
       `Seven-day response clock started at ${now}. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}. Correlation ${correlationId}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
@@ -394,7 +398,7 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
     actionType: 'PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING',
     name: `PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING - ${readback.titleName}`,
     description: [
-      'Awaiting operational delivery certification: branded HTML, plain text, required email attachments, attachment checksums, archive, Dataverse send evidence, and one active gate. The portal is a secondary view and is not required for ordinary editorial review.',
+      'Awaiting operational delivery certification: branded HTML, plain text, required email attachments, attachment checksums, archive, Dataverse send evidence, direct reply path, and one active gate. The portal is a secondary view and is not required for ordinary editorial review.',
       `Correlation ${correlationId}. Natural key ${readback.naturalKey}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
@@ -471,7 +475,7 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
   })
   const existingOperationalCertification = await findOperationalCertificationLog(config, idempotencyKey)
   const existingTechnicalRelease = await findTechnicalReleaseLog(config, idempotencyKey)
-  const materialized = await materializeRequiredAttachments(stageCode, authorArtifacts).catch((error) => ({
+  const materialized = await materializeRequiredAttachments(stageCode, titleName, authorArtifacts).catch((error) => ({
     attachments: [] as GovernedPackageAttachment[],
     blockers: [safeRuntimeBlocker(error)],
   }))
@@ -565,6 +569,8 @@ function operationalCertificationBlockers(evidence: OperationalDeliveryCertifica
     ['attachmentChecksums', 'OPERATIONAL_CERTIFICATION_BLOCKED:ATTACHMENT_CHECKSUMS_NOT_VERIFIED'],
     ['deliveredAttachmentInventory', 'OPERATIONAL_CERTIFICATION_BLOCKED:DELIVERED_ATTACHMENT_INVENTORY_NOT_VERIFIED'],
     ['archiveConfirmed', 'OPERATIONAL_CERTIFICATION_BLOCKED:ARCHIVE_NOT_CONFIRMED'],
+    ['dataverseSendEvidence', 'OPERATIONAL_CERTIFICATION_BLOCKED:DATAVERSE_SEND_EVIDENCE_NOT_CONFIRMED'],
+    ['directReplyPath', 'OPERATIONAL_CERTIFICATION_BLOCKED:DIRECT_REPLY_PATH_NOT_CONFIRMED'],
     ['singleActiveGate', 'OPERATIONAL_CERTIFICATION_BLOCKED:SINGLE_ACTIVE_GATE_NOT_CONFIRMED'],
   ]
   return checks.filter(([key]) => evidence[key] !== true).map(([, blocker]) => blocker)
@@ -604,6 +610,8 @@ async function sendAuthorPackageThroughRelay(input: {
   }
   attachments: GovernedPackageAttachment[]
 }) {
+  const exposedInternalArtifact = input.attachments.map(authorFacingAttachmentBlocker).find(Boolean)
+  if (exposedInternalArtifact) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:${exposedInternalArtifact}`)
   const relayUrl =
     process.env.JM1_AUTHOR_RESPONSE_SEND_RELAY_URL || process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL || RELAY_FALLBACK_URL
   const relayKey =
@@ -653,7 +661,7 @@ async function sendAuthorPackageThroughRelay(input: {
   return { providerMessageId: body.providerMessageId || 'accepted-without-provider-message-id' }
 }
 
-async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType, artifacts: DataverseRow[]): Promise<GovernedPackageAttachment[]> {
+async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType, titleName: string, artifacts: DataverseRow[]): Promise<GovernedPackageAttachment[]> {
   const roles = requiredRolesFor(stageCode)
   const selected = roles.map((role) => {
     const artifact = selectArtifactForRole(artifacts, role)
@@ -678,7 +686,8 @@ async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType
       if (expectedSha && expectedSha.toLowerCase() !== actualSha.toLowerCase()) {
         throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:ATTACHMENT_CHECKSUM_MISMATCH:${role}`)
       }
-      const filename = sanitizeDownloadFilename(stringValue(artifact.jm1pub_filename) || `${role}.bin`)
+      const sourceFilename = sanitizeDownloadFilename(stringValue(artifact.jm1pub_filename) || `${role}.bin`)
+      const filename = authorFacingFilename(titleName, role, sourceFilename)
       const attachment = {
         role,
         artifactId: stringValue(artifact.jm1pub_editorialartifactid),
@@ -916,6 +925,30 @@ function contentTypeFor(fileName: string) {
   if (lower.endsWith('.txt')) return 'text/plain; charset=utf-8'
   if (lower.endsWith('.html')) return 'text/html; charset=utf-8'
   return 'application/octet-stream'
+}
+
+function authorFacingFilename(titleName: string, role: AttachmentRole, sourceFilename: string) {
+  const extension = sourceFilename.match(/\.[a-z0-9]+$/i)?.[0]?.toLowerCase() || '.pdf'
+  const title = sanitizeDownloadFilename(titleName)
+    .replace(/\.[a-z0-9]+$/i, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const label: Record<AttachmentRole, string> = {
+    editedManuscript: 'Edited Manuscript',
+    editorialMemo: "Editor's Notes",
+    reviewInstructions: 'Review Instructions',
+    lineEditedManuscript: 'Line Edited Manuscript',
+    copyeditedManuscript: 'Copyedited Manuscript',
+    proofreadManuscript: 'Proofread Manuscript',
+    reviewCoverNote: 'Review Notes',
+    interiorProof: 'Interior Layout Proof',
+    coverProof: 'Cover Proof',
+    productionProof: 'Production Proof',
+    authorResponseMechanism: 'Internal Response Mechanism',
+    packageManifest: 'Internal Manifest',
+    authorCoverMessage: 'Internal Cover Message',
+  }
+  return `${title || 'Author Review'} - ${label[role]}${extension}`
 }
 
 function buildAuthorResponseUrl(input: { titleId: string; stageId: string; packageId: string; gateId: string }) {
