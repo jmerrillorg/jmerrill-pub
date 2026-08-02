@@ -10,6 +10,10 @@
     {
       "path": "01-protected-worker-design.md",
       "classification": "design"
+    },
+    {
+      "path": "02-the-intentional-leader-gate-reconciliation-and-corrected-delivery.md",
+      "classification": "delivery-evidence"
     }
   ],
   "secretValuesRetained": 0

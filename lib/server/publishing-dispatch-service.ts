@@ -37,6 +37,7 @@ const BAND_LEVEL_1 = 835500000
 const APPROVED_MESSAGE_TYPE = 'APPROVED_AUTHOR_RESPONSE'
 const RELAY_FALLBACK_URL = 'https://func-jm1-acs-email-relay.azurewebsites.net'
 const SYSTEM_OPERATOR = 'github-oidc:jmerrill-pub-production'
+const INTAKE_REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i
 
 type DataverseRow = Record<string, unknown>
 
@@ -61,6 +62,7 @@ export type PublishingDispatchValidation = {
   qa: 'PASS' | 'FAIL'
   duplicateSend: 'PASS' | 'FAIL'
   currentGate: 'PASS' | 'FAIL'
+  intakeReference: 'PASS' | 'FAIL'
   currentPackageVersion: 'PASS' | 'FAIL'
   requiredAttachments: 'PASS' | 'FAIL'
   attachmentChecksums: 'PASS' | 'FAIL'
@@ -358,6 +360,9 @@ function validateReadback(input: PublishingDispatchRequest, readback: DispatchRe
     qa: notification.ok && readback.materializationBlockers.length === 0 ? 'PASS' : 'FAIL',
     duplicateSend: 'PASS',
     currentGate: readback.activeGates.length <= 1 ? 'PASS' : 'FAIL',
+    intakeReference: normalizeIntakeReference(stringValue(readback.stage.jm1pub_intakereference || readback.stage.jm1pub_publishingintakereference))
+      ? 'PASS'
+      : 'FAIL',
     currentPackageVersion: readback.packageVersion ? 'PASS' : 'FAIL',
     requiredAttachments: readback.materializationBlockers.length === 0 && readback.requiredAttachments.length > 0 ? 'PASS' : 'FAIL',
     attachmentChecksums: readback.requiredAttachments.every((attachment) => Boolean(attachment.sha256)) ? 'PASS' : 'FAIL',
@@ -369,7 +374,11 @@ function validateReadback(input: PublishingDispatchRequest, readback: DispatchRe
 function validationBlockers(validation: PublishingDispatchValidation) {
   return Object.entries(validation)
     .filter(([, value]) => value === 'FAIL')
-    .map(([key]) => `PUBLISHING_DISPATCH_BLOCKED - ${key.toUpperCase()}`)
+    .map(([key]) => {
+      if (key === 'currentGate') return 'DUPLICATE_ACTIVE_GATE_RECONCILIATION_REQUIRED'
+      if (key === 'intakeReference') return 'PUBLISHING_DISPATCH_BLOCKED - INTAKE_REFERENCE_CODE_INVALID'
+      return `PUBLISHING_DISPATCH_BLOCKED - ${key.toUpperCase()}`
+    })
 }
 
 async function createDispatchGate(config: DataverseServerConfig, input: PublishingDispatchRequest, readback: DispatchReadback, correlationId: string) {
@@ -706,7 +715,8 @@ function contentTypeFor(fileName: string) {
 }
 
 function normalizeIntakeReference(value: string) {
-  return value.trim() || 'JM1-PUBLISHING-DISPATCH'
+  const normalized = value.trim().toUpperCase()
+  return INTAKE_REFERENCE_PATTERN.test(normalized) ? normalized : ''
 }
 
 function stableChecksum(value: string | Buffer) {
