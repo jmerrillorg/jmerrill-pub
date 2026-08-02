@@ -21,9 +21,8 @@ const checks = [
       requiredStages.every((stage) => engine.includes(`${stage}: {`)) &&
       engine.includes("attachmentsRequired: ['proofreadManuscript', 'reviewCoverNote']") &&
       engine.includes("attachmentsRequired: ['copyeditedManuscript', 'reviewCoverNote']") &&
-      engine.includes("'authorResponseMechanism'") &&
-      engine.includes("'packageManifest'") &&
-      engine.includes("'authorCoverMessage'"),
+      engine.includes("attachmentsRequired: ['editedManuscript', 'editorialMemo', 'reviewInstructions']") &&
+      engine.includes("attachmentsRequired: ['interiorProof', 'reviewInstructions']"),
   },
   {
     name: 'workspace link alone does not satisfy attachment policy',
@@ -46,13 +45,13 @@ const checks = [
       orchestrator.includes('buildAuthorPackageNotificationIdempotencyKey({'),
   },
   {
-    name: 'corrected send references incomplete original and starts effective response clock',
+    name: 'corrected send is email-first and starts effective response clock',
     pass: () =>
       engine.includes('Corrected ${subjectStageLabel} Review Package') &&
       !engine.includes('Corrected Proofreading Review Package') &&
-      engine.includes('The previous ${stageLabel.toLowerCase()} notice for') &&
-      engine.includes('did not include the required package attachments') &&
-      engine.includes('Your review period starts from the corrected package notification'),
+      engine.includes('one clear email') &&
+      engine.includes('not required for your review') &&
+      engine.includes('Your seven-calendar-day review period starts from this corrected package notification'),
   },
   {
     name: 'canonical events exist for audit, correction, transaction completion, and autostart arming',

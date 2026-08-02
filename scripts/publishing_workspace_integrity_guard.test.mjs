@@ -35,7 +35,7 @@ const checks = [
     ok:
       communicationBrand.includes('AUTHOR_COMMUNICATION_BRAND') &&
       communicationBrand.includes('Why you are receiving this') &&
-      communicationBrand.includes('What we need from you') &&
+      communicationBrand.includes('How to respond') &&
       communicationBrand.includes('What happens next') &&
       communicationBrand.includes('AUTHOR_COMMUNICATION_BLOCKED'),
   },

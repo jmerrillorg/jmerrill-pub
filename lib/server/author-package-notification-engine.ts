@@ -67,14 +67,7 @@ export const AUTHOR_PACKAGE_NOTIFICATION_POLICIES: Record<AuthorReviewPackageTyp
   DEVELOPMENTAL_EDITING_REVIEW: {
     workspaceRequired: true,
     emailRequired: true,
-    attachmentsRequired: [
-      'editedManuscript',
-      'editorialMemo',
-      'reviewInstructions',
-      'authorResponseMechanism',
-      'packageManifest',
-      'authorCoverMessage',
-    ],
+    attachmentsRequired: ['editedManuscript', 'editorialMemo', 'reviewInstructions'],
   },
   LINE_EDITING_REVIEW: {
     workspaceRequired: true,
@@ -94,13 +87,7 @@ export const AUTHOR_PACKAGE_NOTIFICATION_POLICIES: Record<AuthorReviewPackageTyp
   INTERIOR_LAYOUT_REVIEW: {
     workspaceRequired: true,
     emailRequired: true,
-    attachmentsRequired: [
-      'interiorProof',
-      'reviewInstructions',
-      'authorResponseMechanism',
-      'packageManifest',
-      'authorCoverMessage',
-    ],
+    attachmentsRequired: ['interiorProof', 'reviewInstructions'],
     secureLinkAllowedWhenOverBytes: 10 * 1024 * 1024,
   },
   COVER_DESIGN_REVIEW: {
@@ -193,7 +180,7 @@ export function getAuthorPackageNotificationPolicy(stageCode: AuthorReviewPackag
 }
 
 export function isPhysicalEmailAttachmentRole(role: AttachmentRole) {
-  return role !== 'authorResponseMechanism' && role !== 'authorCoverMessage'
+  return role !== 'authorResponseMechanism' && role !== 'packageManifest' && role !== 'authorCoverMessage'
 }
 
 export function buildAuthorPackageNotificationIdempotencyKey(input: {
@@ -310,9 +297,9 @@ export function buildAuthorReviewNotificationCopy(input: {
   const authorName = input.authorName?.trim() || 'Author'
   const responseDeadline = input.responseDeadline?.trim() || 'the seven-calendar-day response period stated in your package'
   const packageInventory = input.packageInventory?.length ? input.packageInventory : [
-    'Current author-review package materials',
+    'Current manuscript or proof',
+    "Editor's notes when applicable",
     'Review instructions',
-    'Package manifest or package summary',
   ]
   if (input.corrected) {
     const rendered = renderAuthorCommunicationEmail({
@@ -322,22 +309,17 @@ export function buildAuthorReviewNotificationCopy(input: {
       authorName,
       titleName: input.titleName,
       preheader: `Corrected ${stageLabel.toLowerCase()} package for ${input.titleName}.`,
-      why: `The previous ${stageLabel.toLowerCase()} notice for ${input.titleName} did not include the required package attachments.`,
+      why: `We are sending a corrected ${stageLabel.toLowerCase()} package for ${input.titleName} so you have the usable review materials in one clear email.`,
       completed: [
-        'The package was audited against the governed attachment policy.',
-        'The corrected package includes the required review materials.',
-        'The same package remains available in the Author Operating Center.',
+        'The publishing team prepared the current author-facing files.',
+        'Internal manifests, ledgers, and workflow records were retained for audit and are not included in this email.',
+        'A portal copy may be available for history and downloads, but it is not required for your review.',
       ],
-      meaning: 'Your review period starts from the corrected package notification, not from the incomplete notice.',
-      authorAction: 'Please review the attached package and reply to the publishing team with your approval or requested corrections.',
-      primaryActionLabel: 'Review Package and Reply',
+      meaning: 'Please review the attached files for the current publishing stage. You do not need to use the portal to complete this review.',
+      authorAction: 'Reply directly to this email with your approval, one consolidated correction list, or any questions you want the publishing team to answer.',
+      primaryActionLabel: 'Optional: View Portal Copy',
       primaryActionUrl: input.primaryActionUrl,
       packageInventory,
-      responseChoices: [
-        'Approve as presented',
-        'Approve with corrections',
-        'Questions or clarification requested',
-      ],
       deadline: `Please respond by ${responseDeadline}. Your seven-calendar-day review period starts from this corrected package notification.`,
       nextSteps: [
         'The publishing team will record your response.',
@@ -364,22 +346,17 @@ export function buildAuthorReviewNotificationCopy(input: {
     preheader: `Your ${stageLabel.toLowerCase()} package is ready for review.`,
     why: `Your ${stageLabel.toLowerCase()} package for ${input.titleName} is ready for your review.`,
     completed: [
-      'The publishing team completed the current internal package step.',
-      'The required review package files are attached to this message.',
-      'The package is also available in the Author Operating Center.',
+      'The publishing team prepared the current author-facing files.',
+      'The files you need for this review are attached to this email.',
+      'Internal manifests, ledgers, and workflow records were retained for audit and are not included in this email.',
     ],
-    meaning: 'This is the point where your review helps us confirm the next governed step for your book.',
-    authorAction: 'Please review the package and reply to the publishing team with your approval or requested corrections.',
-    primaryActionLabel: 'Review Package and Reply',
+    meaning: 'Please review the attached files for the current publishing stage. You do not need to use the portal to complete this review.',
+    authorAction: 'Reply directly to this email with your approval, one consolidated correction list, or any questions you want the publishing team to answer.',
+    primaryActionLabel: 'Optional: View Portal Copy',
     primaryActionUrl: input.primaryActionUrl,
     packageInventory,
-      responseChoices: [
-        'Approve as presented',
-        'Approve with corrections',
-        'Questions or clarification requested',
-      ],
-      deadline: `Please respond by ${responseDeadline}.`,
-      nextSteps: [
+    deadline: `Please respond by ${responseDeadline}.`,
+    nextSteps: [
       'The publishing team will record your response.',
       'If you approve, the project can move to the next governed stage.',
       'If you request corrections, the publishing team will review them before any stage movement.',

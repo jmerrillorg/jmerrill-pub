@@ -322,9 +322,9 @@ function packageArtifactReadinessBlockers(authority: RecoveryTitleAuthority, art
 
 function requiredAttachmentRoles(stageCode: PackageStageCode): AttachmentRole[] {
   if (stageCode === 'INTERIOR_LAYOUT') {
-    return ['interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+    return ['interiorProof', 'reviewInstructions']
   }
-  return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+  return ['editedManuscript', 'editorialMemo', 'reviewInstructions']
 }
 
 function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) {

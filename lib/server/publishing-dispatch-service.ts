@@ -214,7 +214,7 @@ export async function certifyOperationalDelivery(
       'start-seven-day-response-clock-after-certification',
       'write-operational-certification-execution-log',
       'refresh-publisher-operating-center-projection',
-      'refresh-author-operating-center-projection',
+      'refresh-author-operating-center-projection-as-secondary-view',
     ],
     executionLogIds: [] as string[],
   }
@@ -236,12 +236,12 @@ export async function certifyOperationalDelivery(
       jm1pub_gatestatus: GATE_STATUS_AWAITING_AUTHOR_RESPONSE,
       jm1pub_nextstageauthorized: false,
       jm1pub_awaitingsince: now,
-      jm1pub_authorresponsesummary: `${readback.stageLabel} package delivery is OPERATIONALLY_CERTIFIED. Seven-calendar-day author response period started after compliant delivery.`,
+      jm1pub_authorresponsesummary: `${readback.stageLabel} package delivery is OPERATIONALLY_CERTIFIED. Seven-calendar-day author response period started after compliant email delivery.`,
       jm1pub_authordecisionsource: `operational-certification:${readback.idempotencyKey}`.slice(0, 100),
       jm1pub_correlationid: correlationId,
     }),
     dataversePatch(config, 'jm1pub_editorialstages', input.stageId, {
-      jm1pub_internaloperationalsummary: `PublishingDispatchService certified operational delivery. Branded HTML, plain text, attachments, checksums, archive, portal access, package visibility, response controls, and single gate passed. Idempotency ${readback.idempotencyKey}.`,
+      jm1pub_internaloperationalsummary: `PublishingDispatchService certified operational delivery. Email is the official delivery mechanism; branded HTML, plain text, required attachments, checksums, archive, Dataverse send evidence, and single gate passed. Author Operating Center evidence is secondary and non-blocking. Idempotency ${readback.idempotencyKey}.`,
       jm1pub_currentgatecount: 1,
       jm1pub_correlationid: correlationId,
     }),
@@ -252,7 +252,7 @@ export async function certifyOperationalDelivery(
     name: `PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED - ${readback.titleName}`,
     description: [
       `Operational delivery certification passed by ${input.operator || SYSTEM_OPERATOR}.`,
-      `Gate ${input.gateId} moved to AWAITING_AUTHOR_RESPONSE after branded HTML, plain text, required attachments, attachment checksums, archive, portal access, package visibility, response controls, and single active gate passed.`,
+      `Gate ${input.gateId} moved to AWAITING_AUTHOR_RESPONSE after branded HTML, plain text, required attachments, attachment checksums, archive, Dataverse send evidence, and single active gate passed. Portal availability is secondary and not required for ordinary editorial review.`,
       `Seven-day response clock started at ${now}. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}. Correlation ${correlationId}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
@@ -297,8 +297,8 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
       'write-dataverse-send-log',
       'write-execution-log-chain',
       'refresh-publisher-operating-center-projection',
-      'refresh-author-operating-center-projection',
-      'require-operational-delivery-certification-before-seven-day-response-clock',
+      'refresh-author-operating-center-projection-as-secondary-view',
+      'require-email-first-operational-delivery-certification-before-seven-day-response-clock',
     ],
   }
 
@@ -373,7 +373,7 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
       jm1pub_correlationid: correlationId,
     }),
     dataversePatch(config, 'jm1pub_editorialstages', input.stageId, {
-      jm1pub_internaloperationalsummary: `PublishingDispatchService recorded TECHNICALLY_RELEASED only. Reply-To ${AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo}; archive ${AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy}; idempotency ${readback.idempotencyKey}. Operational certification must verify branded HTML, attachments, archive, portal access, package visibility, response controls, and gate before Awaiting Author Response.`,
+      jm1pub_internaloperationalsummary: `PublishingDispatchService recorded TECHNICALLY_RELEASED only. Reply-To ${AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo}; archive ${AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy}; idempotency ${readback.idempotencyKey}. Operational certification must verify branded HTML, plain text, required email attachments, archive, Dataverse send evidence, and gate before Awaiting Author Response. Portal checks are secondary and non-blocking.`,
       jm1pub_currentgatecount: 1,
       jm1pub_correlationid: correlationId,
     }),
@@ -394,7 +394,7 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
     actionType: 'PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING',
     name: `PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING - ${readback.titleName}`,
     description: [
-      'Awaiting operational delivery certification: branded HTML, required attachments, attachment checksums, archive, author portal access, package visibility, response controls, and gate.',
+      'Awaiting operational delivery certification: branded HTML, plain text, required email attachments, attachment checksums, archive, Dataverse send evidence, and one active gate. The portal is a secondary view and is not required for ordinary editorial review.',
       `Correlation ${correlationId}. Natural key ${readback.naturalKey}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
@@ -544,10 +544,12 @@ function validationBlockers(validation: PublishingDispatchValidation) {
   return Object.entries(validation)
     .filter(([, value]) => value === 'FAIL')
     .map(([key]) => {
+      if (key === 'portalAccessPreflight' || key === 'workspaceTarget') return ''
       if (key === 'currentGate') return 'DUPLICATE_ACTIVE_GATE_RECONCILIATION_REQUIRED'
       if (key === 'intakeReference') return 'PUBLISHING_DISPATCH_BLOCKED - INTAKE_REFERENCE_CODE_INVALID'
       return `PUBLISHING_DISPATCH_BLOCKED - ${key.toUpperCase()}`
     })
+    .filter(Boolean)
 }
 
 function operationalCertificationBlockers(evidence: OperationalDeliveryCertificationEvidence) {
@@ -562,13 +564,7 @@ function operationalCertificationBlockers(evidence: OperationalDeliveryCertifica
     ['sourceChecksumLineage', 'OPERATIONAL_CERTIFICATION_BLOCKED:SOURCE_CHECKSUM_LINEAGE_NOT_VERIFIED'],
     ['attachmentChecksums', 'OPERATIONAL_CERTIFICATION_BLOCKED:ATTACHMENT_CHECKSUMS_NOT_VERIFIED'],
     ['deliveredAttachmentInventory', 'OPERATIONAL_CERTIFICATION_BLOCKED:DELIVERED_ATTACHMENT_INVENTORY_NOT_VERIFIED'],
-    ['deliveredButtonUrl', 'OPERATIONAL_CERTIFICATION_BLOCKED:DELIVERED_BUTTON_URL_NOT_VERIFIED'],
-    ['authorClickThrough', 'OPERATIONAL_CERTIFICATION_BLOCKED:AUTHOR_CLICK_THROUGH_NOT_VERIFIED'],
     ['archiveConfirmed', 'OPERATIONAL_CERTIFICATION_BLOCKED:ARCHIVE_NOT_CONFIRMED'],
-    ['portalAccess', 'OPERATIONAL_CERTIFICATION_BLOCKED:PORTAL_ACCESS_NOT_CONFIRMED'],
-    ['packageVisible', 'OPERATIONAL_CERTIFICATION_BLOCKED:PACKAGE_VISIBILITY_NOT_CONFIRMED'],
-    ['responseControls', 'OPERATIONAL_CERTIFICATION_BLOCKED:RESPONSE_CONTROLS_NOT_CONFIRMED'],
-    ['responseForm', 'OPERATIONAL_CERTIFICATION_BLOCKED:RESPONSE_FORM_NOT_CONFIRMED'],
     ['singleActiveGate', 'OPERATIONAL_CERTIFICATION_BLOCKED:SINGLE_ACTIVE_GATE_NOT_CONFIRMED'],
   ]
   return checks.filter(([key]) => evidence[key] !== true).map(([, blocker]) => blocker)
@@ -701,10 +697,10 @@ async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType
 
 function requiredRolesFor(stageCode: AuthorReviewPackageType): AttachmentRole[] {
   if (stageCode === 'INTERIOR_LAYOUT_REVIEW') {
-    return ['interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+    return ['interiorProof', 'reviewInstructions']
   }
   if (stageCode === 'DEVELOPMENTAL_EDITING_REVIEW') {
-    return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
+    return ['editedManuscript', 'editorialMemo', 'reviewInstructions']
   }
   if (stageCode === 'PROOFREADING_REVIEW') return ['proofreadManuscript', 'reviewCoverNote']
   return ['editorialMemo', 'reviewInstructions']

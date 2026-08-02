@@ -39,8 +39,6 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
     'sourceChecksumLineage',
     'attachmentChecksums',
     'deliveredAttachmentInventory',
-    'deliveredButtonUrl',
-    'authorClickThrough',
     'portalAccessPreflight',
     'workspaceTarget',
     'Title',
@@ -72,8 +70,10 @@ test('dispatch service reuses governed branding and package notification control
 
 test('dispatch service fails closed unless real package attachments are materialized', () => {
   assert.match(service, /materializeRequiredAttachments/)
-  assert.match(service, /interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage/)
-  assert.match(service, /editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage/)
+  assert.match(service, /interiorProof', 'reviewInstructions/)
+  assert.match(service, /editedManuscript', 'editorialMemo', 'reviewInstructions/)
+  assert.doesNotMatch(service, /return \['interiorProof', 'reviewInstructions', 'authorResponseMechanism'/)
+  assert.doesNotMatch(service, /return \['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism'/)
   assert.match(service, /https:\/\/graph\.microsoft\.com\/v1\.0\/drives/)
   assert.match(service, /ATTACHMENT_CHECKSUM_MISMATCH/)
   assert.match(service, /validateGovernedPackageAttachmentBinary/)
@@ -86,12 +86,14 @@ test('dispatch service separates technical release from operational certificatio
   assert.match(service, /TECHNICALLY_RELEASED/)
   assert.match(service, /Operational delivery certification is required before Awaiting Author Response/)
   assert.match(service, /No seven-day response clock starts at technical release/)
-  assert.match(service, /branded HTML, required attachments, attachment checksums, archive, author portal access, package visibility, response controls, and gate/)
+  assert.match(service, /branded HTML, plain text, required email attachments, archive, Dataverse send evidence, and gate/)
   assert.match(service, /jm1pub_gatestatus:\s*GATE_STATUS_AWAITING_AUTHOR_RESPONSE/)
   assert.match(service, /jm1pub_awaitingsince:\s*now/)
   assert.match(service, /PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED/)
   assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:BRANDED_HTML_NOT_VERIFIED/)
   assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:ARCHIVE_NOT_CONFIRMED/)
+  assert.doesNotMatch(service, /OPERATIONAL_CERTIFICATION_BLOCKED:PORTAL_ACCESS_NOT_CONFIRMED/)
+  assert.doesNotMatch(service, /OPERATIONAL_CERTIFICATION_BLOCKED:RESPONSE_CONTROLS_NOT_CONFIRMED/)
   assert.doesNotMatch(service, /Gate \$\{gateId\} moved to AWAITING_AUTHOR_RESPONSE after provider/)
   assert.doesNotMatch(service, /TECHNICALLY_RELEASED[\s\S]{0,120}jm1pub_awaitingsince:\s*now/)
 })
@@ -140,13 +142,7 @@ test('operational certification endpoint is OIDC protected and evidence constrai
     'sourceChecksumLineage',
     'attachmentChecksums',
     'deliveredAttachmentInventory',
-    'deliveredButtonUrl',
-    'authorClickThrough',
     'archiveConfirmed',
-    'portalAccess',
-    'packageVisible',
-    'responseControls',
-    'responseForm',
     'singleActiveGate',
   ]) {
     assert.match(certifyRoute, new RegExp(token))
@@ -201,7 +197,7 @@ test('PROGRAM-006 rejects corrupt package binaries and nonfunctional action link
 test('PROGRAM-006 keeps service-generated roles out of physical email attachments', () => {
   const notificationEngine = readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8')
   assert.match(notificationEngine, /isPhysicalEmailAttachmentRole/)
-  assert.match(notificationEngine, /role !== 'authorResponseMechanism' && role !== 'authorCoverMessage'/)
+  assert.match(notificationEngine, /role !== 'authorResponseMechanism' && role !== 'packageManifest' && role !== 'authorCoverMessage'/)
   assert.match(service, /Required physical attachments/)
   assert.match(service, /packageInventory:\s*readback\.requiredAttachments[\s\S]+isPhysicalEmailAttachmentRole/)
 })
