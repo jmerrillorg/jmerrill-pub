@@ -1,0 +1,77 @@
+name: Five Title Executive Recovery Dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Dry-run before confirmed execution.
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - confirm
+      executive_recovery:
+        description: Required guard flag.
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      confirmation:
+        description: Must equal EXECUTIVE_RECOVERY for confirmed execution.
+        required: false
+        default: ""
+      title_list:
+        description: Comma-separated title names or intake codes. Blank runs the five-title allowlist.
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: five-title-executive-recovery-dispatch
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    name: Dispatch protected recovery packet
+    runs-on: ubuntu-latest
+    environment: jmerrill-pub-production
+    steps:
+      - name: Invoke production dispatch
+        shell: bash
+        env:
+          MODE: ${{ inputs.mode }}
+          EXECUTIVE_RECOVERY: ${{ inputs.executive_recovery }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+          TITLE_LIST: ${{ inputs.title_list }}
+        run: |
+          OIDC_RESPONSE="$(curl -fsS \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=jm1-pub-executive-recovery-dispatch")"
+          OIDC_JWT="$(jq -r '.value' <<<"${OIDC_RESPONSE}")"
+          if [[ -z "${OIDC_JWT}" || "${OIDC_JWT}" == "null" ]]; then
+            echo "OIDC request failed."
+            exit 1
+          fi
+          BODY="$(jq -cn \
+            --arg mode "${MODE}" \
+            --arg executiveRecovery "${EXECUTIVE_RECOVERY}" \
+            --arg confirmation "${CONFIRMATION}" \
+            --arg titleList "${TITLE_LIST}" \
+            '{
+              mode: $mode,
+              executiveRecovery: ($executiveRecovery == "true"),
+              confirmation: $confirmation,
+              titles: (if ($titleList | length) == 0 then [] else ($titleList | split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))) end)
+            }')"
+          curl -fsS \
+            -X POST "https://jmerrill.pub/api/publishing/executive-recovery/dispatch" \
+            -H "Authorization: Bearer ${OIDC_JWT}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --data "${BODY}"
