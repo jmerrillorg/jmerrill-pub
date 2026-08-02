@@ -151,6 +151,9 @@ test('operational certification endpoint is OIDC protected and evidence constrai
   ]) {
     assert.match(certifyRoute, new RegExp(token))
   }
+  assert.match(certifyRoute, /evidenceReferences/)
+  assert.match(certifyRoute, /missingSupportingEvidenceReferences/)
+  assert.match(certifyRoute, /supporting evidence references for every passed evidence field/)
   assert.doesNotMatch(certifyRoute, /cookie|session|x-jm1-relay-key/i)
 })
 
