@@ -1,0 +1,12 @@
+6e484dd9ca0176f07333d87828df10f2bef3429dbd724e4b7c163133eed08559  00-executive-summary.md
+fd11c1f1ab179ffaf4f6a2ec7c73876b6817340649d46b9b8153999052217263  01-human-first-surface-audit.md
+a61b348c8e1455a5961b78fb6a69ee9b25859b705f84543f24f90bf7562c6c28  02-immediate-service-recovery-register.md
+f884663feb8c2fea8fb658dfc9c083dce4bb0e57c4c57fb13cd8a7a8f8c67191  03-targeted-remediation-plan.md
+49759d0d7df8bbee904c5b134399ac722e3512dca926b49d1bf726df40af6fd8  04-executive-capacity-register.md
+36889563206b8fefa49d3bbb46ffb8dc71be1b8bf7b68a3bdc79fea5a999925d  05-human-experience-acceptance-gates.md
+ea1e33f4e8e8628e53585d362757d1bb4d6d645e0f24e6f4129f4104d38fecf1  06-dirty-worktree-reconciliation-register.csv
+3ba82f9a47e960dbf0e12f28dc7e01c925ba982171164567fcbcdf067dfa72e6  07-canonicalization-and-worktree-reconciliation-addendum.md
+5eea32dcd288ea17de9020f68433686dd46a7524ecb4adb7cd6a9c84a759f829  evidence-index.json
+187fa69c7ae159ba82dfe5818865d58611893fb805912bc86f13308f223d61ad  ../../../doctrine/JM1-HUMAN-FIRST-SERVICE-DELIVERY-STANDARD-v1.0.md
+ac399fa89016b5e64771da44169351fb01534c4988af119e0fda80ddf9b450f2  ../../../../scripts/dirty_worktree_scope_guard.mjs
+5b331c6f61b66681b4d24a5f6f726261456a211414ce4c1bdde35bea29b2037c  ../../../../package.json
