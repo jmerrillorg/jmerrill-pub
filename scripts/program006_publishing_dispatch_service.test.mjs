@@ -184,6 +184,7 @@ test('PROGRAM-006 rejects corrupt package binaries and nonfunctional action link
     'word/document.xml',
     'PDF_SIGNATURE',
     'PDF_EOF_MISSING',
+    'PDF_PAGE_COUNT',
     'MINIMUM_SIZE',
     'ERROR_PAYLOAD',
     'EXPECTED_CONTENT_MISSING',

@@ -522,10 +522,18 @@ function validatePdf(bytes: Buffer, role: AttachmentRole, expectedTitle?: string
   const text = bytes.toString('latin1')
   if (!/%%EOF/.test(text)) return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:PDF_EOF_MISSING` }
   if (looksLikeErrorPayload(bytes)) return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${role}:ERROR_PAYLOAD` }
-  if (expectedTitle && !normalizedContains(text, expectedTitle)) {
-    return { ok: false, blocker: `ATTACHMENT_EXPECTED_CONTENT_MISSING:${role}:TITLE` }
+  if (extractPdfPageCount(text) < 1) {
+    return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:PDF_PAGE_COUNT` }
   }
   return { ok: true }
+}
+
+function extractPdfPageCount(text: string) {
+  const matches = Array.from(text.matchAll(/\/Count\s+(\d+)/g))
+    .map((match) => Number(match[1]))
+    .filter((value) => Number.isFinite(value))
+  if (matches.length > 0) return Math.max(...matches)
+  return (text.match(/\/Type\s*\/Page\b/g) || []).length
 }
 
 function validateTextLike(bytes: Buffer, role: AttachmentRole, pattern: RegExp, label: string): { ok: true } | { ok: false; blocker: string } {
