@@ -55,7 +55,21 @@ NOT CONFIRMED - no post-replacement Sean confirmation proves that the package fi
 
 The reported response clock start `2026-08-02T03:43:28 ET` corresponds to the archive message received at `2026-08-02T07:43:46Z`, but the located message is not operationally certified.
 
-The response clock must not remain authoritative until a replacement package is delivered with:
+The response clock was invalidated after live Dataverse readback confirmed the gate still carried the failed clock.
+
+Invalidation readback:
+
+- Gate: `e996abe7-2f8e-f111-8077-000d3a14673b`
+- Before status: `Awaiting Author Response` (`196650002`)
+- Before awaiting-since: `2026-08-02T07:43:28Z`
+- After status: `Ready for Author Review` (`196650001`)
+- After awaiting-since: `NULL`
+- Active gate count: `1`
+- Duplicate gates: `0`
+- Correlation: `bywb-failed-delivery-clock-invalidated:2026-08-02:47ec6252-d233-4b60-ae97-87b03599780c`
+- Execution log action type: `PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING`
+
+The response clock must not restart until a replacement package is delivered with:
 
 - corrected subject;
 - validated clickable action link;
@@ -77,4 +91,4 @@ Before You Were Born:
 TECHNICALLY_RELEASED / AUTHOR_PACKAGE_DELIVERY_FAILED
 
 Corrective path:
-Merge and deploy PR #391, invalidate the failed clock, send one usable replacement through PROGRAM-006, then certify operational delivery from the usable replacement timestamp.
+Merge and deploy PR #391, send one usable replacement through PROGRAM-006, then certify operational delivery from the usable replacement timestamp.
