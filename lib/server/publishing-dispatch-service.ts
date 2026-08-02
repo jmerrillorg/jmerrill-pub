@@ -8,6 +8,7 @@ import {
   AUTHOR_PUBLISHING_COMMUNICATION_POLICY,
   buildAuthorPackageNotificationIdempotencyKey,
   buildAuthorReviewNotificationCopy,
+  isPhysicalEmailAttachmentRole,
   validateAuthorPackageNotification,
   validateGovernedPackageAttachmentBinary,
   type AttachmentRole,
@@ -327,7 +328,10 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
     description: [
       `Operation dispatchAuthorPackage started by ${input.operator || SYSTEM_OPERATOR}.`,
       `Natural key ${readback.naturalKey}. Title ${input.titleId}; stage ${input.stageId}; package ${input.packageId}; gate ${gateId}.`,
-      `Required attachments ${readback.requiredAttachments.map((attachment) => `${attachment.role}:${attachment.sha256}`).join(', ')}.`,
+      `Required physical attachments ${readback.requiredAttachments
+        .filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))
+        .map((attachment) => `${attachment.role}:${attachment.sha256}`)
+        .join(', ')}.`,
       `Execution mode ${input.executionMode}; idempotency ${readback.idempotencyKey}; correlation ${correlationId}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
@@ -352,7 +356,9 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
         packageId: input.packageId,
         gateId,
       }),
-      packageInventory: readback.requiredAttachments.map((attachment) => attachment.fileName),
+      packageInventory: readback.requiredAttachments
+        .filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))
+        .map((attachment) => attachment.fileName),
     }),
     attachments: readback.requiredAttachments,
   })

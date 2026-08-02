@@ -48,7 +48,7 @@ const checks = [
   {
     name: 'corrected send references incomplete original and starts effective response clock',
     pass: () =>
-      engine.includes('Corrected ${stageLabel} Review Package') &&
+      engine.includes('Corrected ${subjectStageLabel} Review Package') &&
       !engine.includes('Corrected Proofreading Review Package') &&
       engine.includes('The previous ${stageLabel.toLowerCase()} notice for') &&
       engine.includes('did not include the required package attachments') &&
@@ -86,7 +86,9 @@ const checks = [
       engine.includes('EmailClient') &&
       engine.includes('EmailAttachment') &&
       engine.includes('contentInBase64') &&
-      engine.includes('attachments: input.attachments.map'),
+      engine.includes('isPhysicalEmailAttachmentRole') &&
+      engine.includes('attachments: input.attachments') &&
+      engine.includes('.filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))'),
   },
   {
     name: 'author package notifications require shared branded HTML and plain text',

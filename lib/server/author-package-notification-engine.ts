@@ -192,6 +192,10 @@ export function getAuthorPackageNotificationPolicy(stageCode: AuthorReviewPackag
   return AUTHOR_PACKAGE_NOTIFICATION_POLICIES[stageCode]
 }
 
+export function isPhysicalEmailAttachmentRole(role: AttachmentRole) {
+  return role !== 'authorResponseMechanism' && role !== 'authorCoverMessage'
+}
+
 export function buildAuthorPackageNotificationIdempotencyKey(input: {
   titleId: string
   stageCode: AuthorReviewPackageType
@@ -231,7 +235,8 @@ export function validateAuthorPackageNotification(input: AuthorPackageNotificati
     return blocked(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - REQUIRED_ATTACHMENT_MISSING - ${missingRole}`)
   }
 
-  const attachmentWithoutBytes = policy.attachmentsRequired.find((role) => {
+  const physicalAttachmentRoles = policy.attachmentsRequired.filter(isPhysicalEmailAttachmentRole)
+  const attachmentWithoutBytes = physicalAttachmentRoles.find((role) => {
     const attachment = attachmentsByRole.get(role)
     return !attachment?.contentBytesBase64
   })
@@ -239,7 +244,7 @@ export function validateAuthorPackageNotification(input: AuthorPackageNotificati
     return blocked(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ATTACHMENT_MATERIALIZATION_FAILED - ${attachmentWithoutBytes}`)
   }
 
-  for (const role of policy.attachmentsRequired) {
+  for (const role of physicalAttachmentRoles) {
     const attachment = attachmentsByRole.get(role)
     if (!attachment) continue
     const binaryValidation = validateGovernedPackageAttachmentBinary(attachment, input.expectedTitle)
@@ -248,7 +253,8 @@ export function validateAuthorPackageNotification(input: AuthorPackageNotificati
     }
   }
 
-  const totalBytes = input.attachments.reduce((sum, attachment) => sum + (attachment.sizeBytes || estimateBase64Bytes(attachment.contentBytesBase64 || '')), 0)
+  const emailAttachments = input.attachments.filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))
+  const totalBytes = emailAttachments.reduce((sum, attachment) => sum + (attachment.sizeBytes || estimateBase64Bytes(attachment.contentBytesBase64 || '')), 0)
   const maxBytes = policy.secureLinkAllowedWhenOverBytes || 20 * 1024 * 1024
   if (totalBytes > maxBytes && !policy.secureLinkAllowedWhenOverBytes) {
     return blocked('AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ATTACHMENT_SIZE_LIMIT')
@@ -428,11 +434,13 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
       to: [{ address: input.to }],
       bcc: input.bcc.map((address) => ({ address })),
     },
-    attachments: input.attachments.map((attachment): EmailAttachment => ({
-      name: attachment.fileName,
-      contentType: attachment.contentType,
-      contentInBase64: attachment.contentBytesBase64 || '',
-    })),
+    attachments: input.attachments
+      .filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))
+      .map((attachment): EmailAttachment => ({
+        name: attachment.fileName,
+        contentType: attachment.contentType,
+        contentInBase64: attachment.contentBytesBase64 || '',
+      })),
   }
 
   const poller = await client.beginSend(message)

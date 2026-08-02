@@ -197,3 +197,11 @@ test('PROGRAM-006 rejects corrupt package binaries and nonfunctional action link
   assert.match(brandEngine, /SUBJECT_DUPLICATED_WORD/)
   assert.match(brandEngine, /<a href=/)
 })
+
+test('PROGRAM-006 keeps service-generated roles out of physical email attachments', () => {
+  const notificationEngine = readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8')
+  assert.match(notificationEngine, /isPhysicalEmailAttachmentRole/)
+  assert.match(notificationEngine, /role !== 'authorResponseMechanism' && role !== 'authorCoverMessage'/)
+  assert.match(service, /Required physical attachments/)
+  assert.match(service, /packageInventory:\s*readback\.requiredAttachments[\s\S]+isPhysicalEmailAttachmentRole/)
+})
