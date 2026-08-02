@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-02T06:50:00Z",
+  "authority": "Jackie executive repository authority reconciliation",
+  "repository": "jmerrillorg/jmerrill-pub",
+  "initialOpenPrCount": 16,
+  "routineImplementationPrLimit": 3,
+  "administrativeExceptionsTrackedSeparately": true,
+  "rules": {
+    "evidenceOnlyCloseoutWindowHours": 24,
+    "openImplementationPrLimit": 3,
+    "staleOpenDays": 7,
+    "staleNoUpdateDays": 3,
+    "noAutoClose": true
+  },
+  "pullRequests": [
+    {
+      "pr": 383,
+      "classification": "COMPLETE_READY_TO_MERGE",
+      "headSha": "a151557c3ca90d716babb0c7dc59f5101399ff51",
+      "supersedes": [],
+      "supersededBy": "a59ac246a4ae01bd49830d4b14a9a3259b33c0f5",
+      "mustMergeBefore": ["corrected-author-package-delivery"],
+      "productionDeploymentRequired": true,
+      "evidenceOnly": false,
+      "currentOwner": "ENGINEERING",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "MERGED"
+    },
+    {
+      "pr": 366,
+      "classification": "REBASE_AND_REMEDIATE",
+      "headSha": "bfebb4a3e5c94b7f1dfa98c113526882148bd3f1",
+      "supersedes": [],
+      "supersededBy": "codex/pr-authority-reconciliation",
+      "mustMergeBefore": [],
+      "productionDeploymentRequired": false,
+      "evidenceOnly": false,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "FOLDED_INTO_RECONCILIATION_BRANCH"
+    },
+    {
+      "pr": 358,
+      "classification": "ADMINISTRATIVE_EXCEPTION_RETAIN",
+      "headSha": "8d97a24c46ba05b1b26a1fa661adfee1598f6eaa",
+      "supersedes": [359],
+      "supersededBy": null,
+      "mustMergeBefore": [],
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "JACKIE",
+      "decisionDeadline": "support entitlement available",
+      "disposition": "RETAIN_AS_CANONICAL_GATE_W3_ADMINISTRATIVE_EXCEPTION"
+    },
+    {
+      "pr": 359,
+      "classification": "DUPLICATE_CONSOLIDATE",
+      "headSha": "a9e7a23141fe452658c86686893e99bc37ad9ce1",
+      "supersedes": [],
+      "supersededBy": 358,
+      "mustMergeBefore": [],
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "CLOSED_SUPERSEDED"
+    },
+    {
+      "pr": 341,
+      "classification": "SUPERSEDED_CLOSE",
+      "headSha": "5333dd8cc4fda39942427d1a884a96bcf5443b5e",
+      "supersededBy": "INFRA-007/INFRA-012/INFRA-013 and App Service production releases",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": false,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "CLOSED_SUPERSEDED"
+    },
+    {
+      "pr": 342,
+      "classification": "SUPERSEDED_CLOSE",
+      "headSha": "fc0599d5c96dd8032608a7afdd4add796fd2c9f9",
+      "supersededBy": "INFRA-007/INFRA-012/INFRA-013",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "CLOSED_SUPERSEDED"
+    },
+    {
+      "pr": 349,
+      "classification": "SUPERSEDED_CLOSE",
+      "headSha": "428373b79a4cd785db7d3aebfe547f6fe8664900",
+      "supersededBy": "later App Service certification and INFRA closure",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "CLOSED_SUPERSEDED"
+    },
+    {
+      "pr": 355,
+      "classification": "SUPERSEDED_CLOSE",
+      "headSha": "e93196ebbed51c589861e97b65714bb62c87018e",
+      "supersededBy": "implemented enterprise App Service topology",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "CLOSED_SUPERSEDED"
+    },
+    {
+      "pr": 374,
+      "classification": "SUPERSEDED_CLOSE",
+      "headSha": "915ee583855c61ca334ecf29d4a51aee89407c83",
+      "supersededBy": "later production releases and author-delivery remediation",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "CLOSED_SUPERSEDED"
+    },
+    {
+      "pr": 363,
+      "classification": "COMPLETE_READY_TO_MERGE",
+      "headSha": "bf9f9d4a9c834260474df1fd54a100016110c61d",
+      "supersededBy": "24235461364e0aaada72ad1603bceb71e0d60954",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "MERGED"
+    },
+    {
+      "pr": 365,
+      "classification": "COMPLETE_READY_TO_MERGE",
+      "headSha": "228f922b86d37d8f23231d8ea7e35bfa41bbb103",
+      "supersededBy": "81b2d2ebafc6be1884bc816eb076a330d106a31d",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "MERGED"
+    },
+    {
+      "pr": 356,
+      "classification": "COMPLETE_READY_TO_MERGE",
+      "headSha": "0f087c7c92af692a4d855e427a2ae6f070521a05",
+      "supersededBy": "1112a7f51254838241847b7c488f207f9b2539e3",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "MERGED"
+    },
+    {
+      "pr": 340,
+      "classification": "COMPLETE_READY_TO_MERGE",
+      "headSha": "bae566e8f97799ecd8832c996fd238f8c66b4d5a",
+      "supersededBy": "9e420c82f3d770f2f94a35fdd8abd57eaea08e3b",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "MERGED"
+    },
+    {
+      "pr": 314,
+      "classification": "COMPLETE_READY_TO_MERGE",
+      "headSha": "729481428e1fc3a57adb75db0efe2bbc5e5aac4f",
+      "supersededBy": "d75787f745b0d6b6d83df623245bb1c0cc74a863",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": false,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "MERGED"
+    },
+    {
+      "pr": 265,
+      "classification": "SUPERSEDED_CLOSE",
+      "headSha": "5fc2e4a8cda03c59c3e153bad3b5acc3251545e8",
+      "supersededBy": "Wave 2 external decision queue",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "CLOSED_SUPERSEDED"
+    },
+    {
+      "pr": 266,
+      "classification": "SUPERSEDED_CLOSE",
+      "headSha": "5586fd1e305fe8838e287ff17ce012ae46aa6ecd",
+      "supersededBy": "current operational completion and publishing title-level authority",
+      "productionDeploymentRequired": false,
+      "evidenceOnly": true,
+      "currentOwner": "GOVERNANCE",
+      "decisionDeadline": "2026-08-02",
+      "disposition": "CLOSED_SUPERSEDED"
+    }
+  ]
+}

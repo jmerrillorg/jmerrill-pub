@@ -22,7 +22,8 @@
     "workflow-engine-guard": "node scripts/check-canonical-workflow-engine-declarations.mjs",
     "commercial-architecture-guard": "node scripts/commercial_architecture_guard.test.mjs",
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",
-    "author-communication-brand-guard": "node --test scripts/author_communication_brand_guard.test.mjs"
+    "author-communication-brand-guard": "node --test scripts/author_communication_brand_guard.test.mjs",
+    "functions-package-access-guard": "node scripts/check-functions-package-access-hygiene.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",
