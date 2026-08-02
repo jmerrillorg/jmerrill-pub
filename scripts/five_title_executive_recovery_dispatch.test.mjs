@@ -48,6 +48,8 @@ test('executive recovery dispatch cannot send attachmentless or unbranded author
   assert.match(dispatch, /executionMode:\s*'EXECUTIVE_RECOVERY'/)
   assert.match(dispatch, /REQUIRED_PACKAGE_ATTACHMENT_NOT_READY/)
   assert.match(dispatch, /stageMatchesPackageStage/)
+  assert.match(dispatch, /input\.mode === 'dry-run'/)
+  assert.match(dispatch, /title\.status !== 'blocked'/)
   assert.match(dispatch, /interiorProof', 'reviewInstructions', 'packageManifest/)
   assert.match(dispatch, /editedManuscript', 'editorialMemo', 'reviewInstructions', 'packageManifest/)
   assert.doesNotMatch(dispatch, /interiorProof', 'reviewInstructions', 'authorResponseMechanism'/)
