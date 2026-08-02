@@ -1,0 +1,65 @@
+{
+  "package": "JM1-HUMAN-FIRST-ENTERPRISE-REALIGNMENT-2026-08-02",
+  "authority": "Jackie Smith, Jr. executive directive, 2026-08-02",
+  "status": "PREPARED_VALIDATED_APPROVED_FOR_CANONICALIZATION",
+  "canonical_standard": "docs/doctrine/JM1-HUMAN-FIRST-SERVICE-DELIVERY-STANDARD-v1.0.md",
+  "files": [
+    {
+      "path": "00-executive-summary.md",
+      "purpose": "Executive result and work freeze"
+    },
+    {
+      "path": "01-human-first-surface-audit.md",
+      "purpose": "Client-facing surface review and classifications"
+    },
+    {
+      "path": "02-immediate-service-recovery-register.md",
+      "purpose": "72-hour client and author service recovery queue"
+    },
+    {
+      "path": "03-targeted-remediation-plan.md",
+      "purpose": "Keep/simplify/repair/retire/rebuild remediation plan"
+    },
+    {
+      "path": "04-executive-capacity-register.md",
+      "purpose": "Jackie executive exception handling reduction register"
+    },
+    {
+      "path": "05-human-experience-acceptance-gates.md",
+      "purpose": "Human-experience production readiness gates"
+    },
+    {
+      "path": "06-dirty-worktree-reconciliation-register.csv",
+      "purpose": "Path-level classification of original dirty worktree"
+    },
+    {
+      "path": "07-canonicalization-and-worktree-reconciliation-addendum.md",
+      "purpose": "Correction addendum, safety package, and clean-worktree operating boundary"
+    },
+    {
+      "path": "checksums.sha256",
+      "purpose": "SHA-256 checksum manifest"
+    },
+    {
+      "path": "../../../doctrine/JM1-HUMAN-FIRST-SERVICE-DELIVERY-STANDARD-v1.0.md",
+      "purpose": "Canonical enterprise standard"
+    },
+    {
+      "path": "../../../../scripts/dirty_worktree_scope_guard.mjs",
+      "purpose": "Dirty-worktree unrelated-change preflight guard"
+    },
+    {
+      "path": "../../../../package.json",
+      "purpose": "Named npm guard entrypoint"
+    }
+  ],
+  "boundaries": {
+    "new_feature_work": "HELD",
+    "wave_3": "UNCOMMISSIONED",
+    "portal_policy": "OPTIONAL_ENHANCEMENT_UNLESS_JUSTIFIED",
+    "primary_delivery": "EMAIL_PHONE_DIRECT_DOCUMENT_DELIVERY_AS_APPROPRIATE",
+    "secret_values_retained": 0,
+    "client_communications_sent": 0,
+    "production_changes": 0
+  }
+}
