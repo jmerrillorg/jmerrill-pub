@@ -1,0 +1,221 @@
+{
+  "generatedAt": "2026-07-19T00:00:00-04:00",
+  "program": "JM1 Event-Driven Production Runtime Correction",
+  "governingPrinciple": "Author approval closes the current gate and automatically triggers the next authorized stage; Cody is used only for engineering, remediation, publisher judgment support, or explicitly disclosed bridge execution.",
+  "autonomousEditorialLoop": [
+    "Author approves current package",
+    "Approval validated and recorded",
+    "Current gate closes",
+    "Title advances to the next governed stage",
+    "Next-stage runtime starts automatically",
+    "Manuscript is processed",
+    "Automated and policy-based QA runs",
+    "Exceptions route to Publisher Today",
+    "Approved output package is generated",
+    "Human-cadence release timer begins",
+    "Package is released to the author",
+    "Author notification is sent",
+    "Next author-review gate opens"
+  ],
+  "cadencePolicy": {
+    "principle": "Execution starts immediately after authorization; author-facing delivery follows a truthful professional cadence for QA, package preparation, and author processing.",
+    "configurableInputs": [
+      "wordCount",
+      "editorialStage",
+      "complexity",
+      "citationTableFootnoteImageCount",
+      "exceptionSeverity",
+      "requestedTurnaround",
+      "publisherOverride"
+    ],
+    "bands": [
+      {
+        "wordCount": "0-30000",
+        "developmentalBusinessDays": "3-4",
+        "lineCopyBusinessDays": "2-3",
+        "proofreadingBusinessDays": "1-2"
+      },
+      {
+        "wordCount": "30001-60000",
+        "developmentalBusinessDays": "5-7",
+        "lineCopyBusinessDays": "4-5",
+        "proofreadingBusinessDays": "2-3"
+      },
+      {
+        "wordCount": "60001-90000",
+        "developmentalBusinessDays": "8-10",
+        "lineCopyBusinessDays": "6-7",
+        "proofreadingBusinessDays": "3-4"
+      },
+      {
+        "wordCount": "90001-120000",
+        "developmentalBusinessDays": "11-14",
+        "lineCopyBusinessDays": "8-10",
+        "proofreadingBusinessDays": "5-6"
+      },
+      {
+        "wordCount": "120001-160000",
+        "developmentalBusinessDays": "15-20",
+        "lineCopyBusinessDays": "11-14",
+        "proofreadingBusinessDays": "7-9"
+      },
+      {
+        "wordCount": "160001+",
+        "developmentalBusinessDays": "Publisher-calculated",
+        "lineCopyBusinessDays": "Publisher-calculated",
+        "proofreadingBusinessDays": "Publisher-calculated"
+      }
+    ]
+  },
+  "executorCertification": [
+    {
+      "capability": "Editorial Review",
+      "currentRuntime": "Stage 0 diagnostic components exist; end-to-end automatic title executor is not verified as default",
+      "certificationState": "BRIDGE_NOT_CERTIFIED",
+      "requiredPromotion": "Event-triggered Stage 0 execution from approved title state through QA, exception routing, package generation, cadence release, and next gate opening"
+    },
+    {
+      "capability": "Developmental Editing",
+      "currentRuntime": "Workflow proven by The Intentional Leader; parallel titles are still Cody-assisted bridge execution",
+      "certificationState": "BRIDGE_NOT_CERTIFIED",
+      "requiredPromotion": "Automatic CAP-001 executor started by prior gate approval with manuscript processing, QA, package generation, cadence release, and exception routing"
+    },
+    {
+      "capability": "Line Editing",
+      "currentRuntime": "Release and author-review surface deployed; substantive execution remains Cody-assisted bridge",
+      "certificationState": "BRIDGE_NOT_CERTIFIED",
+      "requiredPromotion": "Automatic CAP-002 executor started by Developmental approval with line-edit pass, QA, package generation, release cadence, and gate creation"
+    },
+    {
+      "capability": "Copyediting",
+      "currentRuntime": "Author-response recognition and transition were remediated; substantive copyedit remains Cody-assisted bridge",
+      "certificationState": "BRIDGE_NOT_CERTIFIED",
+      "requiredPromotion": "Automatic CAP-003 executor started by Line Editing approval with copyedit pass, QA, package generation, release cadence, and gate creation"
+    },
+    {
+      "capability": "Proofreading",
+      "currentRuntime": "Proofreading package delivery and author-review state are deployed; substantive proofreading remains Cody-assisted bridge",
+      "certificationState": "BRIDGE_NOT_CERTIFIED",
+      "requiredPromotion": "Automatic CAP-004 executor started by Copyediting approval with proof pass, QA, package generation, release cadence, and gate creation"
+    },
+    {
+      "capability": "Editorial QA",
+      "currentRuntime": "QA artifacts exist; independent policy-based QA executor is not verified",
+      "certificationState": "NOT_CERTIFIED",
+      "requiredPromotion": "Policy-based QA runner with pass/fail/exception outcomes and Publisher Today routing"
+    },
+    {
+      "capability": "Package Generation",
+      "currentRuntime": "Packages are generated and registered, but permanent artifact generator runtime is not verified",
+      "certificationState": "BRIDGE_NOT_CERTIFIED",
+      "requiredPromotion": "Stage-aware package generator with artifact manifest, SharePoint filing, Core artifact registration, active-stage visibility, and idempotent versioning"
+    },
+    {
+      "capability": "Package Release",
+      "currentRuntime": "Bounded release action, email relay, and Author Workspace visibility are deployed",
+      "certificationState": "COMMISSIONED_MANUAL_TRIGGER",
+      "requiredPromotion": "Cadence scheduler can release approved package automatically when no publisher hold exists"
+    }
+  ],
+  "marketingTriggers": [
+    {
+      "trigger": "Contract active",
+      "action": "Create marketing profile and preliminary campaign"
+    },
+    {
+      "trigger": "Editorial path confirmed",
+      "action": "Identify audience, positioning, comparable titles, and themes"
+    },
+    {
+      "trigger": "Developmental Editing approved",
+      "action": "Refresh positioning and audience language"
+    },
+    {
+      "trigger": "Title/subtitle finalized",
+      "action": "Generate metadata and SEO working set"
+    },
+    {
+      "trigger": "Cover concept approved",
+      "action": "Create marketing asset plan and mockup queue"
+    },
+    {
+      "trigger": "Interior page count available",
+      "action": "Finalize print specifications used in promotional materials"
+    },
+    {
+      "trigger": "Production proof approved",
+      "action": "Generate launch kit drafts"
+    },
+    {
+      "trigger": "Distribution submitted",
+      "action": "Start retailer monitoring and preorder workflow"
+    },
+    {
+      "trigger": "Retail listing verified",
+      "action": "Create retailer-linked promotional assets"
+    },
+    {
+      "trigger": "Release date confirmed",
+      "action": "Schedule launch countdown"
+    },
+    {
+      "trigger": "Release day",
+      "action": "Publish approved campaign items"
+    },
+    {
+      "trigger": "7/30/60/90 days after release",
+      "action": "Generate performance review and campaign recommendations"
+    },
+    {
+      "trigger": "Backlist review date",
+      "action": "Trigger evergreen marketing refresh"
+    }
+  ],
+  "productionDistributionBranches": [
+    {
+      "branch": "Ebook generation",
+      "targetRuntime": "System-managed EPUB 3 generation with EPUBCheck and device/render QA",
+      "vellumRole": "Fallback, premium manual option, exception path, and commissioning comparison tool"
+    },
+    {
+      "branch": "ISBN assignment",
+      "targetRuntime": "Controlled publisher action after title, format, imprint, and publication posture are approved",
+      "guards": [
+        "prevent duplicate assignment",
+        "prevent incompatible format reuse",
+        "prevent assignment to test records",
+        "prevent assignment before imprint and edition decisions",
+        "prevent silent replacement of distributed ISBN"
+      ]
+    },
+    {
+      "branch": "Distribution routing",
+      "targetRuntime": "Governed route matrix by format, rights, territory, commercial terms, and supported integration",
+      "manualFallback": "System prepares submission package; publisher completes bounded upload; system records confirmation; retail validation starts automatically"
+    },
+    {
+      "branch": "Audiobook",
+      "targetRuntime": "Separate audiobook branch covering narration strategy, agreements, audio QA, mastering, distribution, and royalty ingestion",
+      "aiNarrationBoundary": "Separate approval required based on rights, author consent, retailer acceptance, disclosure, suitability, quality, cost, and expected sales"
+    },
+    {
+      "branch": "Children and picture books",
+      "targetRuntime": "Distinct production profile with page/spread architecture, illustration brief, art direction, trim/bleed, fixed-layout ebook decision, and child-safety checks"
+    }
+  ],
+  "blockedAssumptions": [
+    {
+      "assumption": "PublishDrive supports six assets on a free option through API",
+      "status": "REVERIFY_BEFORE_IMPLEMENTATION",
+      "reason": "Current terms must be confirmed before implementing a six-title rotation or API integration."
+    }
+  ],
+  "promotionCriteria": [
+    "A prior author approval event automatically starts the next authorized stage without a Cody instruction",
+    "The next-stage executor records start, processing, QA, exception, package generation, cadence, release, notification, and next gate evidence",
+    "Publisher Today shows only true human decisions, external waits, runtime failures, and bridge gaps",
+    "The Author Workspace shows truthful current activity while release cadence is running",
+    "Package release timing is controlled by configurable cadence policy, not by manual Cody availability",
+    "Every bridge process has a named replacement runtime or remains visibly classified as bridge"
+  ]
+}
