@@ -80,6 +80,7 @@ export const FIVE_TITLE_EXECUTIVE_RECOVERY_ALLOWLIST: RecoveryTitleAuthority[] =
     stageCode: 'DEVELOPMENTAL_EDITING',
     contactId: 'c8c8747e-6675-f111-ab0f-6045bdd69678',
     owner: 'PUBLISHING_OPERATIONS',
+    expectedTitleId: '2d21ab5b-4d80-f111-ab0f-7c1e525b15c2',
   },
   {
     title: 'Establishing Glory: The Library',
@@ -240,8 +241,8 @@ async function readTitleAuthority(config: DataverseServerConfig, authority: Reco
       'create-or-reuse-one-author-review-gate',
       'dispatch-one-branded-author-review-message-through-acs',
       'record-dataverse-send-evidence',
-      'set-gate-awaiting-author-response-after-delivery',
-      'set-stage-awaiting-author-response-after-delivery',
+      'record-technical-release-after-provider-acceptance',
+      'require-operational-delivery-certification-before-author-response-clock',
     ],
     blockers,
     gateId: stringValue(activeGates[0]?.jm1pub_editorialapprovalgateid),
@@ -319,9 +320,9 @@ function packageArtifactReadinessBlockers(authority: RecoveryTitleAuthority, art
 
 function requiredAttachmentRoles(stageCode: PackageStageCode): AttachmentRole[] {
   if (stageCode === 'INTERIOR_LAYOUT') {
-    return ['interiorProof', 'reviewInstructions', 'packageManifest']
+    return ['interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
   }
-  return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'packageManifest']
+  return ['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage']
 }
 
 function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) {
