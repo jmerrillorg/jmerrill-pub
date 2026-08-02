@@ -745,7 +745,7 @@ function normalizeAuthorReviewAttachments(value) {
     if (!attachment || typeof attachment !== "object") return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_INVALID" };
     const name = normalizeText(attachment.name);
     const contentType = normalizeText(attachment.contentType);
-    const contentInBase64 = normalizeText(attachment.contentInBase64);
+    const contentInBase64 = safeTrim(attachment.contentInBase64);
     if (!name) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_NAME_MISSING" };
     if (!contentType) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CONTENT_TYPE_MISSING" };
     if (!contentInBase64) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CONTENT_MISSING" };
