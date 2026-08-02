@@ -25,6 +25,7 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
     'qa',
     'duplicateSend',
     'currentGate',
+    'intakeReference',
     'currentPackageVersion',
     'requiredAttachments',
     'attachmentChecksums',
@@ -35,8 +36,11 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
     'Package Version',
     'Recipient',
     'PUBLISHING_DISPATCH_TRANSACTION_STARTED',
-    'PUBLISHING_DISPATCH_AUTHOR_PACKAGE_DELIVERED',
-    'PUBLISHING_DISPATCH_SURFACES_REFRESHED',
+    'PUBLISHING_DISPATCH_TECHNICALLY_RELEASED',
+    'PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING',
+    'PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED',
+    'DUPLICATE_ACTIVE_GATE_RECONCILIATION_REQUIRED',
+    'PUBLISHING_DISPATCH_BLOCKED - INTAKE_REFERENCE_CODE_INVALID',
   ]) {
     assert.match(service, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
@@ -62,6 +66,16 @@ test('dispatch service fails closed unless real package attachments are material
   assert.doesNotMatch(service, /PROGRAM-006 governed package materialization proof/)
 })
 
+test('dispatch service separates technical release from operational certification', () => {
+  assert.match(service, /TECHNICALLY_RELEASED/)
+  assert.match(service, /Operational delivery certification is required before Awaiting Author Response/)
+  assert.match(service, /No seven-day response clock starts at technical release/)
+  assert.match(service, /branded HTML, required attachments, attachment checksums, archive, author portal access, package visibility, response controls, and gate/)
+  assert.doesNotMatch(service, /Gate \$\{gateId\} moved to AWAITING_AUTHOR_RESPONSE after provider/)
+  assert.doesNotMatch(service, /jm1pub_awaitingsince:\s*now/)
+  assert.doesNotMatch(service, /jm1pub_gatestatus:\s*GATE_STATUS_AWAITING_AUTHOR_RESPONSE/)
+})
+
 test('ACS relay requires and forwards attachments for author-review packages', () => {
   assert.match(relay, /AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1/)
   assert.match(relay, /AUTHOR_REVIEW_ATTACHMENTS_MISSING/)
@@ -77,6 +91,9 @@ test('legacy callers delegate dispatch to the canonical service', () => {
   assert.doesNotMatch(fiveTitleWorker, /function sendRelay/)
   assert.match(orchestrator, /import \{ dispatchAuthorPackage \} from '\.\/publishing-dispatch-service'/)
   assert.match(orchestrator, /dispatchAuthorPackage\(\{/)
+  assert.match(orchestrator, /technical-release-recorded/)
+  assert.match(orchestrator, /dispatch\.status === 'operationally_certified'/)
+  assert.doesNotMatch(orchestrator, /dispatch\.status === 'released'/)
 })
 
 test('canonical dispatch endpoint is OIDC protected and mode constrained', () => {

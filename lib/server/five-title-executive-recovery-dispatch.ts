@@ -39,7 +39,7 @@ export type TitleDispatchResult = {
   intakeCode: string
   title: string
   stageCode: PackageStageCode
-  status: 'eligible' | 'blocked' | 'released' | 'idempotent'
+  status: 'eligible' | 'blocked' | 'technically_released' | 'operationally_certified' | 'idempotent'
   titleId?: string
   stageId?: string
   contactId: string
@@ -141,7 +141,7 @@ export async function dispatchFiveTitleExecutiveRecovery(input: FiveTitleDispatc
         ? results.every((title) => title.status !== 'blocked')
           ? 'dry-run-complete'
           : 'blocked'
-        : results.every((title) => title.status === 'released' || title.status === 'idempotent')
+        : results.every((title) => title.status === 'operationally_certified' || title.status === 'idempotent')
           ? 'completed'
           : 'blocked',
     mode: input.mode,
@@ -269,7 +269,10 @@ async function releaseTitle(
 
   return {
     ...readback,
-    status: result.status === 'released' || result.status === 'idempotent' ? result.status : 'blocked',
+    status:
+      result.status === 'technically_released' || result.status === 'operationally_certified' || result.status === 'idempotent'
+        ? result.status
+        : 'blocked',
     gateId: result.gateId,
     providerMessageId: result.providerMessageId,
     executionLogIds: result.executionLogIds,

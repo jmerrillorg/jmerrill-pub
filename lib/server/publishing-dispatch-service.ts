@@ -27,10 +27,8 @@ import {
 import type { PackageStageCode } from './author-review-package-engine'
 
 const GATE_STATUS_READY_FOR_AUTHOR_RELEASE = 196650001
-const GATE_STATUS_AWAITING_AUTHOR_RESPONSE = 196650002
 const GATE_STATUS_APPROVED = 196650003
 const GATE_STATUS_SUPERSEDED = 196650004
-const STAGE_STATUS_AWAITING_AUTHOR = 100000002
 const EXECUTION_STATUS_SUCCESS = 835500001
 const EXECUTION_STATUS_FAILED = 835500002
 const BAND_LEVEL_1 = 835500000
@@ -74,7 +72,7 @@ export type PublishingDispatchResult = {
   service: 'PublishingDispatchService'
   operation: 'dispatchAuthorPackage'
   executionMode: PublishingDispatchExecutionMode
-  status: 'eligible' | 'released' | 'idempotent' | 'blocked'
+  status: 'eligible' | 'technically_released' | 'operationally_certified' | 'idempotent' | 'blocked'
   titleId: string
   stageId: string
   packageId: string
@@ -96,7 +94,8 @@ type DispatchReadback = {
   contact: DataverseRow
   artifacts: DataverseRow[]
   activeGates: DataverseRow[]
-  existingDelivery: DataverseRow | null
+  existingTechnicalRelease: DataverseRow | null
+  existingOperationalCertification: DataverseRow | null
   titleName: string
   authorName: string
   recipientEmail: string
@@ -147,16 +146,23 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
       'write-execution-log-chain',
       'refresh-publisher-operating-center-projection',
       'refresh-author-operating-center-projection',
-      'start-seven-day-response-clock-after-delivery',
+      'require-operational-delivery-certification-before-seven-day-response-clock',
     ],
   }
 
   if (blockers.length > 0) return { ...base, status: 'blocked' }
-  if (readback.existingDelivery) {
+  if (readback.existingOperationalCertification) {
     return {
       ...base,
       status: 'idempotent',
-      executionLogIds: [stringValue(readback.existingDelivery.jm1_executionlogid)].filter(Boolean),
+      executionLogIds: [stringValue(readback.existingOperationalCertification.jm1_executionlogid)].filter(Boolean),
+    }
+  }
+  if (readback.existingTechnicalRelease) {
+    return {
+      ...base,
+      status: 'technically_released',
+      executionLogIds: [stringValue(readback.existingTechnicalRelease.jm1_executionlogid)].filter(Boolean),
     }
   }
   if (input.executionMode === 'DRY_RUN') return { ...base, status: 'eligible' }
@@ -196,37 +202,35 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
 
   await Promise.all([
     dataversePatch(config, 'jm1pub_editorialapprovalgates', gateId, {
-      jm1pub_gatestatus: GATE_STATUS_AWAITING_AUTHOR_RESPONSE,
+      jm1pub_gatestatus: GATE_STATUS_READY_FOR_AUTHOR_RELEASE,
       jm1pub_nextstageauthorized: false,
-      jm1pub_awaitingsince: now,
-      jm1pub_authorresponsesummary: `${readback.stageLabel} package sent through PublishingDispatchService. Awaiting author response.`,
-      jm1pub_authordecisionsource: `notification:${delivery.providerMessageId}`,
+      jm1pub_authorresponsesummary: `${readback.stageLabel} package is TECHNICALLY_RELEASED. Operational delivery certification is required before Awaiting Author Response.`,
+      jm1pub_authordecisionsource: `technical-notification:${delivery.providerMessageId}`,
       jm1pub_correlationid: correlationId,
     }),
     dataversePatch(config, 'jm1pub_editorialstages', input.stageId, {
-      jm1pub_stagestatus: STAGE_STATUS_AWAITING_AUTHOR,
-      jm1pub_authorsafesummary: `Your ${readback.stageLabel.toLowerCase()} package is ready for review.`,
-      jm1pub_internaloperationalsummary: `PublishingDispatchService delivered one author package. Reply-To ${AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo}; archive ${AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy}; idempotency ${readback.idempotencyKey}.`,
+      jm1pub_internaloperationalsummary: `PublishingDispatchService recorded TECHNICALLY_RELEASED only. Reply-To ${AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo}; archive ${AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy}; idempotency ${readback.idempotencyKey}. Operational certification must verify branded HTML, attachments, archive, portal access, package visibility, response controls, and gate before Awaiting Author Response.`,
       jm1pub_currentgatecount: 1,
       jm1pub_correlationid: correlationId,
     }),
   ])
 
-  const deliveredLog = await writeExecutionLog(config, {
-    actionType: 'PUBLISHING_DISPATCH_AUTHOR_PACKAGE_DELIVERED',
-    name: `PUBLISHING_DISPATCH_AUTHOR_PACKAGE_DELIVERED - ${readback.titleName}`,
+  const technicalLog = await writeExecutionLog(config, {
+    actionType: 'PUBLISHING_DISPATCH_TECHNICALLY_RELEASED',
+    name: `PUBLISHING_DISPATCH_TECHNICALLY_RELEASED - ${readback.titleName}`,
     description: [
-      `Gate ${gateId} moved to AWAITING_AUTHOR_RESPONSE after provider ${delivery.providerMessageId}.`,
-      `Seven-day response clock starts ${now}. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}.`,
+      `ACS accepted package send request after provider ${delivery.providerMessageId}.`,
+      `Gate ${gateId} remains READY_FOR_AUTHOR_RELEASE until operational certification passes.`,
+      `No seven-day response clock starts at technical release. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: gateId,
   })
-  const refreshedLog = await writeExecutionLog(config, {
-    actionType: 'PUBLISHING_DISPATCH_SURFACES_REFRESHED',
-    name: `PUBLISHING_DISPATCH_SURFACES_REFRESHED - ${readback.titleName}`,
+  const certificationPendingLog = await writeExecutionLog(config, {
+    actionType: 'PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING',
+    name: `PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING - ${readback.titleName}`,
     description: [
-      'Dataverse, Publisher Operating Center, Author Operating Center, notification evidence, and response clock are aligned by shared correlation.',
+      'Awaiting operational delivery certification: branded HTML, required attachments, attachment checksums, archive, author portal access, package visibility, response controls, and gate.',
       `Correlation ${correlationId}. Natural key ${readback.naturalKey}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
@@ -235,10 +239,10 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
 
   return {
     ...base,
-    status: 'released',
+    status: 'technically_released',
     gateId,
     providerMessageId: delivery.providerMessageId,
-    executionLogIds: [startedLog, deliveredLog, refreshedLog].map(extractId),
+    executionLogIds: [startedLog, technicalLog, certificationPendingLog].map(extractId),
   }
 }
 
@@ -301,7 +305,8 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     packageVersion,
     packageChecksum,
   })
-  const existingDelivery = await findDeliveredLog(config, idempotencyKey)
+  const existingOperationalCertification = await findOperationalCertificationLog(config, idempotencyKey)
+  const existingTechnicalRelease = await findTechnicalReleaseLog(config, idempotencyKey)
   const materialized = await materializeRequiredAttachments(stageCode, authorArtifacts).catch((error) => ({
     attachments: [] as GovernedPackageAttachment[],
     blockers: [safeRuntimeBlocker(error)],
@@ -312,7 +317,8 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     contact,
     artifacts: authorArtifacts,
     activeGates,
-    existingDelivery,
+    existingTechnicalRelease,
+    existingOperationalCertification,
     titleName,
     authorName,
     recipientEmail,
@@ -571,12 +577,24 @@ async function getContact(config: DataverseServerConfig, contactId: string) {
   return contact
 }
 
-async function findDeliveredLog(config: DataverseServerConfig, idempotencyKey: string) {
+async function findOperationalCertificationLog(config: DataverseServerConfig, idempotencyKey: string) {
+  return dataverseFirst(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription',
+    $filter: `jm1_actiontype eq 'PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED' and contains(jm1_actiondescription,'${escapeOData(idempotencyKey)}')`,
+  })
+}
+
+async function findTechnicalReleaseLog(config: DataverseServerConfig, idempotencyKey: string) {
   const current = await dataverseFirst(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription',
+    $filter: `jm1_actiontype eq 'PUBLISHING_DISPATCH_TECHNICALLY_RELEASED' and contains(jm1_actiondescription,'${escapeOData(idempotencyKey)}')`,
+  })
+  if (current) return current
+  const legacyDelivered = await dataverseFirst(config, 'jm1_executionlogs', {
     $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription',
     $filter: `jm1_actiontype eq 'PUBLISHING_DISPATCH_AUTHOR_PACKAGE_DELIVERED' and contains(jm1_actiondescription,'${escapeOData(idempotencyKey)}')`,
   })
-  if (current) return current
+  if (legacyDelivered) return legacyDelivered
   return dataverseFirst(config, 'jm1_executionlogs', {
     $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription',
     $filter: `jm1_actiontype eq 'FIVE_TITLE_EXECUTIVE_RECOVERY_DELIVERED' and contains(jm1_actiondescription,'${escapeOData(idempotencyKey)}')`,

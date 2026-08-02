@@ -291,6 +291,7 @@ function describeConsumerOutcome(result: OrchestrationResult) {
   if (result.status === 'transition-completed') return 'APPROVAL_CONSUMED TRANSITION_COMPLETED NEXT_STAGE_RUNTIME_STARTED'
   if (result.status === 'idempotent') return 'APPROVAL_CONSUMED IDEMPOTENT'
   if (result.status === 'notification-sent') return 'APPROVAL_CONSUMED NOTIFICATION_SENT'
+  if (result.status === 'technical-release-recorded') return 'APPROVAL_CONSUMED TECHNICALLY_RELEASED OPERATIONAL_CERTIFICATION_PENDING'
   return `APPROVAL_CONSUMED TRANSITION_BLOCKED ${result.blocker}`
 }
 

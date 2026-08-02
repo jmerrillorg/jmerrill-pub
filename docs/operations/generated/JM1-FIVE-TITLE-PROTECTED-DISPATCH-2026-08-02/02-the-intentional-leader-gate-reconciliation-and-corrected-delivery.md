@@ -6,6 +6,12 @@ Generated: 2026-08-02T04:03:43-04:00
 
 This addendum records the governed reconciliation and corrected delivery for The Intentional Leader Interior Layout author-review package after PR #381 was merged and production reported the hardened dispatch path.
 
+## Supersession Notice
+
+This report's original final classification treated ACS acceptance, archive presence, and an active gate as a completed delivery. That conclusion is now superseded by the operational-delivery certification rule recorded in `03-operational-delivery-certification-2026-08-02.md`.
+
+The evidence in this file remains valid as technical dispatch evidence. It is not sufficient by itself to prove operational delivery because later author-portal observation showed the package and response controls were not visible to the authenticated author view.
+
 ## Production Authority
 
 - PR #381: MERGED
@@ -119,7 +125,7 @@ Workflow run:
 30739000581
 
 Result:
-released
+technically released under the superseding delivery model
 
 Correlation ID:
 five-title-executive-recovery:2026-08-02T08:03:00.544Z:2f36c54d-3201-493d-8e05-c4c45e145a13
@@ -148,12 +154,12 @@ The publishing@jmerrill.one shared mailbox received the archive copy at 2026-08-
 ## Response Clock
 
 Canonical response clock:
-1
+technical-dispatch clock evidence preserved; not accepted as operational response-clock authority under the superseding delivery model
 
 Clock bound to:
 5141f7db-0a8e-f111-8077-00224820105b
 
-Clock start:
+Observed clock start:
 2026-08-02T08:03:04Z
 
 Duplicate response clocks:
@@ -188,15 +194,24 @@ Validated with:
 - npm run type-check
 - npm run author-communication-brand-guard
 
-## Final Classification
+## Superseded Final Classification
 
-The Intentional Leader Interior Layout corrected delivery is complete.
+The prior classification "The Intentional Leader Interior Layout corrected delivery is complete" is superseded.
+
+Current truthful classification:
+TECHNICALLY_RELEASED / OPERATIONAL_DELIVERY_FAILED
+
+Reason:
+Author Portal package visibility and response controls were not visible during authenticated author-view certification.
 
 Gate reconciliation:
 PASS
 
-Corrected delivery:
+Technical dispatch:
 PASS
+
+Operational delivery:
+FAILED
 
 Idempotency:
 PASS
