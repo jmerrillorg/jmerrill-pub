@@ -27,6 +27,7 @@ import {
 import type { PackageStageCode } from './author-review-package-engine'
 
 const GATE_STATUS_READY_FOR_AUTHOR_RELEASE = 196650001
+const GATE_STATUS_AWAITING_AUTHOR_RESPONSE = 196650002
 const GATE_STATUS_APPROVED = 196650003
 const GATE_STATUS_SUPERSEDED = 196650004
 const EXECUTION_STATUS_SUCCESS = 835500001
@@ -88,6 +89,48 @@ export type PublishingDispatchResult = {
   proposedMutations: string[]
 }
 
+export type OperationalDeliveryCertificationEvidence = {
+  brandedHtml: boolean
+  plainText: boolean
+  requiredAttachments: boolean
+  attachmentChecksums: boolean
+  archiveConfirmed: boolean
+  portalAccess: boolean
+  packageVisible: boolean
+  responseControls: boolean
+  singleActiveGate: boolean
+}
+
+export type OperationalDeliveryCertificationRequest = {
+  packageId: string
+  titleId: string
+  stageId: string
+  recipientContactId: string
+  gateId: string
+  packageVersion?: string
+  correlationId?: string
+  operator?: string
+  dryRun?: boolean
+  evidence: OperationalDeliveryCertificationEvidence
+}
+
+export type OperationalDeliveryCertificationResult = {
+  service: 'PublishingDispatchService'
+  operation: 'certifyOperationalDelivery'
+  status: 'operationally_certified' | 'idempotent' | 'blocked' | 'eligible'
+  resultCode: 'OPERATIONALLY_CERTIFIED' | 'ALREADY_RELEASED_IDEMPOTENT' | 'RECONCILIATION_REQUIRED' | 'READINESS_FAILED'
+  titleId: string
+  stageId: string
+  packageId: string
+  recipientContactId: string
+  gateId: string
+  idempotencyKey: string
+  naturalKey: string
+  blockers: string[]
+  proposedMutations: string[]
+  executionLogIds: string[]
+}
+
 type DispatchReadback = {
   title: DataverseRow
   stage: DataverseRow
@@ -113,6 +156,104 @@ type DispatchReadback = {
 
 export const PublishingDispatchService = {
   dispatchAuthorPackage,
+  certifyOperationalDelivery,
+}
+
+export async function certifyOperationalDelivery(
+  input: OperationalDeliveryCertificationRequest,
+): Promise<OperationalDeliveryCertificationResult> {
+  const config = getDataverseServerConfig()
+  if (!config) throw new Error('DATAVERSE_CONFIG_MISSING')
+
+  const correlationId = input.correlationId || `publishing-dispatch-certification:${new Date().toISOString()}:${randomUUID()}`
+  const readback = await readDispatchAuthority(config, {
+    packageId: input.packageId,
+    titleId: input.titleId,
+    stageId: input.stageId,
+    recipientContactId: input.recipientContactId,
+    executionMode: 'PRODUCTION',
+    packageVersion: input.packageVersion,
+    correlationId,
+    operator: input.operator,
+  })
+  const evidenceBlockers = operationalCertificationBlockers(input.evidence)
+  const activeGateIds = readback.activeGates.map((gate) => stringValue(gate.jm1pub_editorialapprovalgateid)).filter(Boolean)
+  const gateBlockers = [
+    !activeGateIds.includes(input.gateId) ? 'OPERATIONAL_CERTIFICATION_BLOCKED:GATE_NOT_ACTIVE_FOR_TITLE_STAGE' : '',
+    activeGateIds.length !== 1 ? 'OPERATIONAL_CERTIFICATION_BLOCKED:DUPLICATE_ACTIVE_GATE_RECONCILIATION_REQUIRED' : '',
+  ].filter(Boolean)
+  const technicalReleaseBlocker = readback.existingTechnicalRelease
+    ? ''
+    : 'OPERATIONAL_CERTIFICATION_BLOCKED:TECHNICAL_RELEASE_EVIDENCE_MISSING'
+  const blockers = [...evidenceBlockers, ...gateBlockers, technicalReleaseBlocker].filter(Boolean)
+  const base = {
+    service: 'PublishingDispatchService' as const,
+    operation: 'certifyOperationalDelivery' as const,
+    titleId: input.titleId,
+    stageId: input.stageId,
+    packageId: input.packageId,
+    recipientContactId: input.recipientContactId,
+    gateId: input.gateId,
+    idempotencyKey: readback.idempotencyKey,
+    naturalKey: readback.naturalKey,
+    blockers,
+    proposedMutations: [
+      'record-operational-delivery-certification',
+      'move-one-canonical-gate-to-awaiting-author-response',
+      'start-seven-day-response-clock-after-certification',
+      'write-operational-certification-execution-log',
+      'refresh-publisher-operating-center-projection',
+      'refresh-author-operating-center-projection',
+    ],
+    executionLogIds: [] as string[],
+  }
+
+  if (readback.existingOperationalCertification) {
+    return {
+      ...base,
+      status: 'idempotent',
+      resultCode: 'ALREADY_RELEASED_IDEMPOTENT',
+      executionLogIds: [stringValue(readback.existingOperationalCertification.jm1_executionlogid)].filter(Boolean),
+    }
+  }
+  if (blockers.length > 0) return { ...base, status: 'blocked', resultCode: blockers.some((blocker) => /GATE/.test(blocker)) ? 'RECONCILIATION_REQUIRED' : 'READINESS_FAILED' }
+  if (input.dryRun) return { ...base, status: 'eligible', resultCode: 'OPERATIONALLY_CERTIFIED' }
+
+  const now = new Date().toISOString()
+  await Promise.all([
+    dataversePatch(config, 'jm1pub_editorialapprovalgates', input.gateId, {
+      jm1pub_gatestatus: GATE_STATUS_AWAITING_AUTHOR_RESPONSE,
+      jm1pub_nextstageauthorized: false,
+      jm1pub_awaitingsince: now,
+      jm1pub_authorresponsesummary: `${readback.stageLabel} package delivery is OPERATIONALLY_CERTIFIED. Seven-calendar-day author response period started after compliant delivery.`,
+      jm1pub_authordecisionsource: `operational-certification:${readback.idempotencyKey}`.slice(0, 100),
+      jm1pub_correlationid: correlationId,
+    }),
+    dataversePatch(config, 'jm1pub_editorialstages', input.stageId, {
+      jm1pub_internaloperationalsummary: `PublishingDispatchService certified operational delivery. Branded HTML, plain text, attachments, checksums, archive, portal access, package visibility, response controls, and single gate passed. Idempotency ${readback.idempotencyKey}.`,
+      jm1pub_currentgatecount: 1,
+      jm1pub_correlationid: correlationId,
+    }),
+  ])
+
+  const certificationLog = await writeExecutionLog(config, {
+    actionType: 'PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED',
+    name: `PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED - ${readback.titleName}`,
+    description: [
+      `Operational delivery certification passed by ${input.operator || SYSTEM_OPERATOR}.`,
+      `Gate ${input.gateId} moved to AWAITING_AUTHOR_RESPONSE after branded HTML, plain text, required attachments, attachment checksums, archive, portal access, package visibility, response controls, and single active gate passed.`,
+      `Seven-day response clock started at ${now}. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}. Correlation ${correlationId}.`,
+    ].join(' '),
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: input.gateId,
+  })
+
+  return {
+    ...base,
+    status: 'operationally_certified',
+    resultCode: 'OPERATIONALLY_CERTIFIED',
+    executionLogIds: [certificationLog].map(extractId),
+  }
 }
 
 export async function dispatchAuthorPackage(input: PublishingDispatchRequest): Promise<PublishingDispatchResult> {
@@ -385,6 +526,21 @@ function validationBlockers(validation: PublishingDispatchValidation) {
       if (key === 'intakeReference') return 'PUBLISHING_DISPATCH_BLOCKED - INTAKE_REFERENCE_CODE_INVALID'
       return `PUBLISHING_DISPATCH_BLOCKED - ${key.toUpperCase()}`
     })
+}
+
+function operationalCertificationBlockers(evidence: OperationalDeliveryCertificationEvidence) {
+  const checks: Array<[keyof OperationalDeliveryCertificationEvidence, string]> = [
+    ['brandedHtml', 'OPERATIONAL_CERTIFICATION_BLOCKED:BRANDED_HTML_NOT_VERIFIED'],
+    ['plainText', 'OPERATIONAL_CERTIFICATION_BLOCKED:PLAIN_TEXT_NOT_VERIFIED'],
+    ['requiredAttachments', 'OPERATIONAL_CERTIFICATION_BLOCKED:REQUIRED_ATTACHMENTS_NOT_VERIFIED'],
+    ['attachmentChecksums', 'OPERATIONAL_CERTIFICATION_BLOCKED:ATTACHMENT_CHECKSUMS_NOT_VERIFIED'],
+    ['archiveConfirmed', 'OPERATIONAL_CERTIFICATION_BLOCKED:ARCHIVE_NOT_CONFIRMED'],
+    ['portalAccess', 'OPERATIONAL_CERTIFICATION_BLOCKED:PORTAL_ACCESS_NOT_CONFIRMED'],
+    ['packageVisible', 'OPERATIONAL_CERTIFICATION_BLOCKED:PACKAGE_VISIBILITY_NOT_CONFIRMED'],
+    ['responseControls', 'OPERATIONAL_CERTIFICATION_BLOCKED:RESPONSE_CONTROLS_NOT_CONFIRMED'],
+    ['singleActiveGate', 'OPERATIONAL_CERTIFICATION_BLOCKED:SINGLE_ACTIVE_GATE_NOT_CONFIRMED'],
+  ]
+  return checks.filter(([key]) => evidence[key] !== true).map(([, blocker]) => blocker)
 }
 
 async function createDispatchGate(config: DataverseServerConfig, input: PublishingDispatchRequest, readback: DispatchReadback, correlationId: string) {
