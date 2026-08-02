@@ -15,6 +15,10 @@
       "purpose": "Code remediation and validation readback"
     },
     {
+      "path": "02-live-archive-readback-2026-08-02.md",
+      "purpose": "Publishing shared-mailbox archive readback for corrected Before You Were Born send"
+    },
+    {
       "path": "evidence-index.json",
       "purpose": "Evidence index"
     },
