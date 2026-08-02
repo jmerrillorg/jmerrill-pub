@@ -1,0 +1,50 @@
+{
+  "package": "AZURE-GPV1-RETIREMENT-XTKT-BW8-2026",
+  "trackingId": "XTKT-BW8",
+  "subscriptionId": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e",
+  "executionDate": "2026-07-30",
+  "status": "COMPLETE",
+  "storageAccountsAssessed": 10,
+  "gpv1AccountsIdentified": 2,
+  "nonDatabricksGpv1AccountsUpgraded": 2,
+  "databricksManagedAccounts": 0,
+  "legacyBlobStorageAccounts": 0,
+  "remainingGpv1Accounts": 0,
+  "secretValuesRetained": 0,
+  "evidenceFiles": [
+    "00-executive-readout.md",
+    "01-authority-scope-and-boundaries.md",
+    "02-microsoft-advisory.md",
+    "03-storage-account-inventory.csv",
+    "04-dependency-register.csv",
+    "05-cost-and-tier-assessment.csv",
+    "06-upgrade-plan.md",
+    "07-pre-upgrade-validation.md",
+    "08-upgrade-execution-results.md",
+    "09-post-upgrade-certification.md",
+    "10-known-limitations.md",
+    "12-prevention-and-guardrails.md"
+  ],
+  "upgradedAccounts": [
+    {
+      "name": "jm1coreservices8242",
+      "resourceGroup": "jm1-core-services",
+      "priorKind": "Storage",
+      "finalKind": "StorageV2",
+      "accessTier": "Hot",
+      "sku": "Standard_LRS",
+      "dependentWorkload": "jm1-ed-functions",
+      "postValidation": "PASS"
+    },
+    {
+      "name": "funcjm1foundationin8054",
+      "resourceGroup": "func-jm1-foundation-intake_group",
+      "priorKind": "Storage",
+      "finalKind": "StorageV2",
+      "accessTier": "Hot",
+      "sku": "Standard_LRS",
+      "dependentWorkload": "func-jm1-foundation-intake",
+      "postValidation": "PASS"
+    }
+  ]
+}
