@@ -67,14 +67,7 @@ export const AUTHOR_PACKAGE_NOTIFICATION_POLICIES: Record<AuthorReviewPackageTyp
   DEVELOPMENTAL_EDITING_REVIEW: {
     workspaceRequired: true,
     emailRequired: true,
-    attachmentsRequired: [
-      'editedManuscript',
-      'editorialMemo',
-      'reviewInstructions',
-      'authorResponseMechanism',
-      'packageManifest',
-      'authorCoverMessage',
-    ],
+    attachmentsRequired: ['editedManuscript', 'editorialMemo', 'reviewInstructions'],
   },
   LINE_EDITING_REVIEW: {
     workspaceRequired: true,
@@ -94,13 +87,7 @@ export const AUTHOR_PACKAGE_NOTIFICATION_POLICIES: Record<AuthorReviewPackageTyp
   INTERIOR_LAYOUT_REVIEW: {
     workspaceRequired: true,
     emailRequired: true,
-    attachmentsRequired: [
-      'interiorProof',
-      'reviewInstructions',
-      'authorResponseMechanism',
-      'packageManifest',
-      'authorCoverMessage',
-    ],
+    attachmentsRequired: ['interiorProof', 'reviewInstructions'],
     secureLinkAllowedWhenOverBytes: 10 * 1024 * 1024,
   },
   COVER_DESIGN_REVIEW: {
@@ -192,6 +179,28 @@ export function getAuthorPackageNotificationPolicy(stageCode: AuthorReviewPackag
   return AUTHOR_PACKAGE_NOTIFICATION_POLICIES[stageCode]
 }
 
+export function isPhysicalEmailAttachmentRole(role: AttachmentRole) {
+  return role !== 'authorResponseMechanism' && role !== 'packageManifest' && role !== 'authorCoverMessage'
+}
+
+export function authorFacingAttachmentBlocker(attachment: GovernedPackageAttachment) {
+  if (!isPhysicalEmailAttachmentRole(attachment.role)) {
+    return `AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED:${attachment.role}`
+  }
+  const fileName = attachment.fileName.toLowerCase()
+  const contentType = attachment.contentType.toLowerCase()
+  if (fileName.endsWith('.json') || contentType.includes('application/json')) {
+    return `AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED:${attachment.role}:JSON`
+  }
+  if (fileName.endsWith('.md') || fileName.endsWith('.markdown') || contentType.includes('markdown')) {
+    return `AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED:${attachment.role}:MARKDOWN`
+  }
+  if (/\b(manifest|ledger|evidence|execution|workflow|dataverse|checksum|response[-_ ]?mechanism|package[-_ ]?version)\b/i.test(attachment.fileName)) {
+    return `AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED:${attachment.role}:INTERNAL_NAME`
+  }
+  return ''
+}
+
 export function buildAuthorPackageNotificationIdempotencyKey(input: {
   titleId: string
   stageCode: AuthorReviewPackageType
@@ -226,12 +235,17 @@ export function validateAuthorPackageNotification(input: AuthorPackageNotificati
   if (!headerValidation.ok) return blocked(headerValidation.blocker)
 
   const attachmentsByRole = new Map(input.attachments.map((attachment) => [attachment.role, attachment]))
+  const exposedInternalArtifact = input.attachments.map(authorFacingAttachmentBlocker).find(Boolean)
+  if (exposedInternalArtifact) {
+    return blocked(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ${exposedInternalArtifact}`)
+  }
   const missingRole = policy.attachmentsRequired.find((role) => !attachmentsByRole.get(role))
   if (missingRole) {
     return blocked(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - REQUIRED_ATTACHMENT_MISSING - ${missingRole}`)
   }
 
-  const attachmentWithoutBytes = policy.attachmentsRequired.find((role) => {
+  const physicalAttachmentRoles = policy.attachmentsRequired.filter(isPhysicalEmailAttachmentRole)
+  const attachmentWithoutBytes = physicalAttachmentRoles.find((role) => {
     const attachment = attachmentsByRole.get(role)
     return !attachment?.contentBytesBase64
   })
@@ -239,7 +253,7 @@ export function validateAuthorPackageNotification(input: AuthorPackageNotificati
     return blocked(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ATTACHMENT_MATERIALIZATION_FAILED - ${attachmentWithoutBytes}`)
   }
 
-  for (const role of policy.attachmentsRequired) {
+  for (const role of physicalAttachmentRoles) {
     const attachment = attachmentsByRole.get(role)
     if (!attachment) continue
     const binaryValidation = validateGovernedPackageAttachmentBinary(attachment, input.expectedTitle)
@@ -248,7 +262,8 @@ export function validateAuthorPackageNotification(input: AuthorPackageNotificati
     }
   }
 
-  const totalBytes = input.attachments.reduce((sum, attachment) => sum + (attachment.sizeBytes || estimateBase64Bytes(attachment.contentBytesBase64 || '')), 0)
+  const emailAttachments = input.attachments.filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))
+  const totalBytes = emailAttachments.reduce((sum, attachment) => sum + (attachment.sizeBytes || estimateBase64Bytes(attachment.contentBytesBase64 || '')), 0)
   const maxBytes = policy.secureLinkAllowedWhenOverBytes || 20 * 1024 * 1024
   if (totalBytes > maxBytes && !policy.secureLinkAllowedWhenOverBytes) {
     return blocked('AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ATTACHMENT_SIZE_LIMIT')
@@ -304,38 +319,33 @@ export function buildAuthorReviewNotificationCopy(input: {
   const authorName = input.authorName?.trim() || 'Author'
   const responseDeadline = input.responseDeadline?.trim() || 'the seven-calendar-day response period stated in your package'
   const packageInventory = input.packageInventory?.length ? input.packageInventory : [
-    'Current author-review package materials',
+    'Current manuscript or proof',
+    "Editor's notes when applicable",
     'Review instructions',
-    'Package manifest or package summary',
   ]
   if (input.corrected) {
     const rendered = renderAuthorCommunicationEmail({
       templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
       templateVersion: '1.0.0',
-      subject: `Corrected ${subjectStageLabel} Review Package — ${input.titleName}`,
+      subject: `Corrected ${subjectStageLabel} Review Materials — ${input.titleName}`,
       authorName,
       titleName: input.titleName,
-      preheader: `Corrected ${stageLabel.toLowerCase()} package for ${input.titleName}.`,
-      why: `The previous ${stageLabel.toLowerCase()} notice for ${input.titleName} did not include the required package attachments.`,
+      preheader: `Corrected ${stageLabel.toLowerCase()} materials for ${input.titleName}.`,
+      why: `We are sending corrected ${stageLabel.toLowerCase()} materials for ${input.titleName} so you have the usable documents in one clear email.`,
       completed: [
-        'The package was audited against the governed attachment policy.',
-        'The corrected package includes the required review materials.',
-        'The same package remains available in the Author Operating Center.',
+        'The publishing team prepared the current author-facing files.',
+        'The files you need for this review are attached to this email.',
+        'Your Author Operating Center has also been updated if you would like to view your project history or download another copy.',
       ],
-      meaning: 'Your review period starts from the corrected package notification, not from the incomplete notice.',
-      authorAction: 'Please review the attached package and reply to the publishing team with your approval or requested corrections.',
-      primaryActionLabel: 'Review Package and Reply',
+      meaning: 'Please review the attached files for the current publishing stage. You do not need to use the portal to complete this review.',
+      authorAction: 'Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions. You may also include one consolidated correction list in your reply.',
+      primaryActionLabel: 'View in Author Operating Center',
       primaryActionUrl: input.primaryActionUrl,
       packageInventory,
-      responseChoices: [
-        'Approve as presented',
-        'Approve with corrections',
-        'Questions or clarification requested',
-      ],
-      deadline: `Please respond by ${responseDeadline}. Your seven-calendar-day review period starts from this corrected package notification.`,
+      deadline: `Please respond by ${responseDeadline}. Your seven-calendar-day review period starts from this corrected email delivery.`,
       nextSteps: [
         'The publishing team will record your response.',
-        'Approved corrections or approval will move through the governed next-stage process.',
+        'Approved corrections or approval will move to the next publishing step.',
         'If you have questions, reply directly to this message.',
       ],
     })
@@ -352,30 +362,25 @@ export function buildAuthorReviewNotificationCopy(input: {
   const rendered = renderAuthorCommunicationEmail({
     templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
     templateVersion: '1.0.0',
-    subject: `${stageLabel} Package - ${input.titleName}`,
+    subject: `${stageLabel} Materials - ${input.titleName}`,
     authorName,
     titleName: input.titleName,
-    preheader: `Your ${stageLabel.toLowerCase()} package is ready for review.`,
-    why: `Your ${stageLabel.toLowerCase()} package for ${input.titleName} is ready for your review.`,
+    preheader: `Your ${stageLabel.toLowerCase()} materials are ready for review.`,
+    why: `Your ${stageLabel.toLowerCase()} materials for ${input.titleName} are ready for your review.`,
     completed: [
-      'The publishing team completed the current internal package step.',
-      'The required review package files are attached to this message.',
-      'The package is also available in the Author Operating Center.',
+      'The publishing team prepared the current author-facing files.',
+      'The files you need for this review are attached to this email.',
+      'Your Author Operating Center has also been updated if you would like to view your project history or download another copy.',
     ],
-    meaning: 'This is the point where your review helps us confirm the next governed step for your book.',
-    authorAction: 'Please review the package and reply to the publishing team with your approval or requested corrections.',
-    primaryActionLabel: 'Review Package and Reply',
+      meaning: 'Please review the attached files for the current publishing stage. You do not need to use the portal to complete this review.',
+      authorAction: 'Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions. You may also include one consolidated correction list in your reply.',
+      primaryActionLabel: 'View in Author Operating Center',
     primaryActionUrl: input.primaryActionUrl,
     packageInventory,
-      responseChoices: [
-        'Approve as presented',
-        'Approve with corrections',
-        'Questions or clarification requested',
-      ],
-      deadline: `Please respond by ${responseDeadline}.`,
-      nextSteps: [
+    deadline: `Please respond by ${responseDeadline}.`,
+    nextSteps: [
       'The publishing team will record your response.',
-      'If you approve, the project can move to the next governed stage.',
+      'If you approve, the project can move to the next publishing stage.',
       'If you request corrections, the publishing team will review them before any stage movement.',
     ],
   })
@@ -415,6 +420,9 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
   })
   if (!bodyValidation.ok) throw new Error(bodyValidation.blocker)
 
+  const exposedInternalArtifact = input.attachments.map(authorFacingAttachmentBlocker).find(Boolean)
+  if (exposedInternalArtifact) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ${exposedInternalArtifact}`)
+
   const client = new EmailClient(input.connectionString)
   const message: EmailMessage = {
     senderAddress: input.from,
@@ -428,11 +436,13 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
       to: [{ address: input.to }],
       bcc: input.bcc.map((address) => ({ address })),
     },
-    attachments: input.attachments.map((attachment): EmailAttachment => ({
-      name: attachment.fileName,
-      contentType: attachment.contentType,
-      contentInBase64: attachment.contentBytesBase64 || '',
-    })),
+    attachments: input.attachments
+      .filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))
+      .map((attachment): EmailAttachment => ({
+        name: attachment.fileName,
+        contentType: attachment.contentType,
+        contentInBase64: attachment.contentBytesBase64 || '',
+      })),
   }
 
   const poller = await client.beginSend(message)
@@ -522,10 +532,18 @@ function validatePdf(bytes: Buffer, role: AttachmentRole, expectedTitle?: string
   const text = bytes.toString('latin1')
   if (!/%%EOF/.test(text)) return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:PDF_EOF_MISSING` }
   if (looksLikeErrorPayload(bytes)) return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${role}:ERROR_PAYLOAD` }
-  if (expectedTitle && !normalizedContains(text, expectedTitle)) {
-    return { ok: false, blocker: `ATTACHMENT_EXPECTED_CONTENT_MISSING:${role}:TITLE` }
+  if (extractPdfPageCount(text) < 1) {
+    return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:PDF_PAGE_COUNT` }
   }
   return { ok: true }
+}
+
+function extractPdfPageCount(text: string) {
+  const matches = Array.from(text.matchAll(/\/Count\s+(\d+)/g))
+    .map((match) => Number(match[1]))
+    .filter((value) => Number.isFinite(value))
+  if (matches.length > 0) return Math.max(...matches)
+  return (text.match(/\/Type\s*\/Page\b/g) || []).length
 }
 
 function validateTextLike(bytes: Buffer, role: AttachmentRole, pattern: RegExp, label: string): { ok: true } | { ok: false; blocker: string } {

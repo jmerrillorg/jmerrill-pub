@@ -22,15 +22,15 @@ test('shared author communication renderer produces branded HTML and plain text'
   const rendered = brand.renderAuthorCommunicationEmail({
     templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
     templateVersion: '1.0.0',
-    subject: 'Interior Layout Package - The Intentional Leader',
+    subject: 'Interior Layout Materials - The Intentional Leader',
     authorName: 'Jackie',
     titleName: 'The Intentional Leader',
-    preheader: 'Your interior layout package is ready for review.',
-    why: 'Your interior layout package is ready for review.',
+    preheader: 'Your interior layout materials are ready for review.',
+    why: 'Your interior layout materials are ready for review.',
     completed: ['Interior proof prepared.', 'Review instructions prepared.'],
     meaning: 'This review confirms the book can move toward final production.',
-    authorAction: 'Please review the package and reply with approval or requested corrections.',
-    primaryActionLabel: 'Review Package and Reply',
+    authorAction: 'Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions.',
+    primaryActionLabel: 'View in Author Operating Center',
     primaryActionUrl: 'https://jmerrill.pub/author/portal?action=review-package&titleId=title-intentional-leader',
     nextSteps: ['Publishing records your response.', 'The next stage opens only after approval or correction review.'],
   })
@@ -41,16 +41,20 @@ test('shared author communication renderer produces branded HTML and plain text'
   assert.match(rendered.html, /A Division of J Merrill One/)
   assert.match(rendered.html, /Helping Authors Help Themselves\./)
   assert.match(rendered.html, /Why you are receiving this/)
-  assert.match(rendered.html, /Package inventory/)
-  assert.match(rendered.html, /Response choices/)
-  assert.match(rendered.html, /What we need from you/)
+  assert.match(rendered.html, /What's attached/)
+  assert.match(rendered.html, /What we(?:'|&#39;)d like you to review/)
+  assert.match(rendered.html, /How to respond/)
   assert.match(rendered.html, /What happens next/)
   assert.match(rendered.text, /Why you are receiving this/)
-  assert.match(rendered.text, /Package inventory/)
-  assert.match(rendered.text, /Response choices/)
+  assert.match(rendered.text, /What's attached/)
+  assert.match(rendered.text, /What we'd like you to review/)
+  assert.match(rendered.text, /How to respond/)
   assert.match(rendered.html, /<a href="https:\/\/jmerrill\.pub\/author\/portal\?action=review-package&amp;titleId=title-intentional-leader"/)
-  assert.match(rendered.text, /Primary action: https:\/\/jmerrill\.pub\/author\/portal/)
+  assert.match(rendered.text, /Optional Author Operating Center access: https:\/\/jmerrill\.pub\/author\/portal/)
+  assert.match(rendered.text, /Reply directly to publishing@jmerrill\.one/)
+  assert.match(rendered.text, /Approved with corrections/)
   assert.match(rendered.text, /The Publishing Team\nJ Merrill Publishing, Inc\./)
+  assert.doesNotMatch(rendered.text, /package manifest|response mechanism|operational certification|package version|workflow|execution/i)
   assert.equal(rendered.metadata.qualityGate, 'PASS')
   assert.equal(rendered.metadata.htmlSha256.length, 64)
   assert.equal(rendered.metadata.textSha256.length, 64)
@@ -96,8 +100,8 @@ test('author communication validation blocks unformatted or text-only output', (
 
   assert.equal(validation.ok, false)
   assert.match(validation.blocker, /HTML_BODY_MISSING/)
-  assert.match(validation.blocker, /PACKAGE_INVENTORY_BLOCK_MISSING/)
-  assert.match(validation.blocker, /RESPONSE_CHOICES_BLOCK_MISSING/)
+  assert.match(validation.blocker, /ATTACHMENT_BLOCK_MISSING/)
+  assert.match(validation.blocker, /AUTHOR_REVIEW_BLOCK_MISSING/)
   assert.match(validation.blocker, /PLAIN_TEXT_SIGNATURE_MISSING/)
 })
 
@@ -113,9 +117,11 @@ test('author package notification copy uses the shared brand renderer', () => {
   assert.equal(copy.templateVersion, '1.0.0')
   assert.equal(copy.templateMetadata.qualityGate, 'PASS')
   assert.match(copy.htmlBody, /J MERRILL PUBLISHING/)
-  assert.match(copy.htmlBody, /Interior Layout Review Package - The Intentional Leader/)
+  assert.match(copy.htmlBody, /Interior Layout Review Materials - The Intentional Leader/)
   assert.match(copy.body, /Good day, Jackie,/)
-  assert.match(copy.body, /What has been completed/)
+  assert.match(copy.body, /What work has been completed/)
+  assert.match(copy.body, /Reply directly to publishing@jmerrill\.one/)
+  assert.match(copy.htmlBody, /Optional Author Operating Center access/)
 })
 
 test('author communication blocks non-clickable or duplicated-subject package messages', () => {
@@ -123,15 +129,15 @@ test('author communication blocks non-clickable or duplicated-subject package me
     () => brand.renderAuthorCommunicationEmail({
       templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
       templateVersion: '1.0.0',
-      subject: 'Corrected Developmental Editing Review Review Package - Before You Were Born',
+      subject: 'Corrected Developmental Editing Review Review Materials - Before You Were Born',
       authorName: 'Sean',
       titleName: 'Before You Were Born',
-      preheader: 'Corrected package.',
-      why: 'The prior package files were not usable.',
+      preheader: 'Corrected materials.',
+      why: 'The prior files were not usable.',
       completed: ['Files replaced.'],
       meaning: 'Use this message for review.',
-      authorAction: 'Review the package.',
-      primaryActionLabel: 'Review Package and Reply',
+      authorAction: 'Reply directly to publishing@jmerrill.one.',
+      primaryActionLabel: 'View in Author Operating Center',
       primaryActionUrl: 'https://jmerrill.pub/author/portal?action=review-package',
       nextSteps: ['Publishing records your response.'],
     }),
@@ -142,15 +148,15 @@ test('author communication blocks non-clickable or duplicated-subject package me
     () => brand.renderAuthorCommunicationEmail({
       templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
       templateVersion: '1.0.0',
-      subject: 'Corrected Developmental Editing Review Package - Before You Were Born',
+      subject: 'Corrected Developmental Editing Review Materials - Before You Were Born',
       authorName: 'Sean',
       titleName: 'Before You Were Born',
-      preheader: 'Corrected package.',
-      why: 'The prior package files were not usable.',
+      preheader: 'Corrected materials.',
+      why: 'The prior files were not usable.',
       completed: ['Files replaced.'],
       meaning: 'Use this message for review.',
-      authorAction: 'Review the package.',
-      primaryActionLabel: 'Review Package and Reply',
+      authorAction: 'Reply directly to publishing@jmerrill.one.',
+      primaryActionLabel: 'View in Author Operating Center',
       primaryActionUrl: '#',
       nextSteps: ['Publishing records your response.'],
     }),

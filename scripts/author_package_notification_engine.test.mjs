@@ -21,9 +21,8 @@ const checks = [
       requiredStages.every((stage) => engine.includes(`${stage}: {`)) &&
       engine.includes("attachmentsRequired: ['proofreadManuscript', 'reviewCoverNote']") &&
       engine.includes("attachmentsRequired: ['copyeditedManuscript', 'reviewCoverNote']") &&
-      engine.includes("'authorResponseMechanism'") &&
-      engine.includes("'packageManifest'") &&
-      engine.includes("'authorCoverMessage'"),
+      engine.includes("attachmentsRequired: ['editedManuscript', 'editorialMemo', 'reviewInstructions']") &&
+      engine.includes("attachmentsRequired: ['interiorProof', 'reviewInstructions']"),
   },
   {
     name: 'workspace link alone does not satisfy attachment policy',
@@ -46,13 +45,14 @@ const checks = [
       orchestrator.includes('buildAuthorPackageNotificationIdempotencyKey({'),
   },
   {
-    name: 'corrected send references incomplete original and starts effective response clock',
+    name: 'corrected send is email-first and starts effective response clock',
     pass: () =>
-      engine.includes('Corrected ${stageLabel} Review Package') &&
+      engine.includes('Corrected ${subjectStageLabel} Review Materials') &&
       !engine.includes('Corrected Proofreading Review Package') &&
-      engine.includes('The previous ${stageLabel.toLowerCase()} notice for') &&
-      engine.includes('did not include the required package attachments') &&
-      engine.includes('Your review period starts from the corrected package notification'),
+      engine.includes('one clear email') &&
+      engine.includes('You do not need to use the portal to complete this review') &&
+      engine.includes('Your seven-calendar-day review period starts from this corrected email delivery') &&
+      engine.includes('Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions'),
   },
   {
     name: 'canonical events exist for audit, correction, transaction completion, and autostart arming',
@@ -86,7 +86,18 @@ const checks = [
       engine.includes('EmailClient') &&
       engine.includes('EmailAttachment') &&
       engine.includes('contentInBase64') &&
-      engine.includes('attachments: input.attachments.map'),
+      engine.includes('isPhysicalEmailAttachmentRole') &&
+      engine.includes('attachments: input.attachments') &&
+      engine.includes('.filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))'),
+  },
+  {
+    name: 'author package email fails closed if internal artifacts enter MIME inventory',
+    pass: () =>
+      engine.includes('authorFacingAttachmentBlocker') &&
+      engine.includes('AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED') &&
+      engine.includes("fileName.endsWith('.json')") &&
+      engine.includes("fileName.endsWith('.md')") &&
+      engine.includes('package[-_ ]?version'),
   },
   {
     name: 'author package notifications require shared branded HTML and plain text',

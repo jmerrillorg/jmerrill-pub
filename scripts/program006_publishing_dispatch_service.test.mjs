@@ -8,6 +8,7 @@ const orchestrator = readFileSync(new URL('../lib/server/publishing-orchestrator
 const route = readFileSync(new URL('../app/api/publishing/dispatch/author-package/route.ts', import.meta.url), 'utf8')
 const certifyRoute = readFileSync(new URL('../app/api/publishing/dispatch/author-package/certify/route.ts', import.meta.url), 'utf8')
 const relay = readFileSync(new URL('../azure-functions/acs-email-relay/src/functions/sendAuthorAcknowledgment.js', import.meta.url), 'utf8')
+const fiveTitleWorkflow = readFileSync(new URL('../.github/workflows/five-title-executive-recovery-dispatch.yml', import.meta.url), 'utf8')
 
 test('PROGRAM-006 exposes one canonical PublishingDispatchService operation', () => {
   assert.match(service, /export const PublishingDispatchService/)
@@ -38,8 +39,9 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
     'sourceChecksumLineage',
     'attachmentChecksums',
     'deliveredAttachmentInventory',
-    'deliveredButtonUrl',
-    'authorClickThrough',
+    'dataverseSendEvidence',
+    'directReplyPath',
+    'portalStatus',
     'portalAccessPreflight',
     'workspaceTarget',
     'Title',
@@ -71,8 +73,10 @@ test('dispatch service reuses governed branding and package notification control
 
 test('dispatch service fails closed unless real package attachments are materialized', () => {
   assert.match(service, /materializeRequiredAttachments/)
-  assert.match(service, /interiorProof', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage/)
-  assert.match(service, /editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism', 'packageManifest', 'authorCoverMessage/)
+  assert.match(service, /interiorProof', 'reviewInstructions/)
+  assert.match(service, /editedManuscript', 'editorialMemo', 'reviewInstructions/)
+  assert.doesNotMatch(service, /return \['interiorProof', 'reviewInstructions', 'authorResponseMechanism'/)
+  assert.doesNotMatch(service, /return \['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism'/)
   assert.match(service, /https:\/\/graph\.microsoft\.com\/v1\.0\/drives/)
   assert.match(service, /ATTACHMENT_CHECKSUM_MISMATCH/)
   assert.match(service, /validateGovernedPackageAttachmentBinary/)
@@ -85,12 +89,16 @@ test('dispatch service separates technical release from operational certificatio
   assert.match(service, /TECHNICALLY_RELEASED/)
   assert.match(service, /Operational delivery certification is required before Awaiting Author Response/)
   assert.match(service, /No seven-day response clock starts at technical release/)
-  assert.match(service, /branded HTML, required attachments, attachment checksums, archive, author portal access, package visibility, response controls, and gate/)
+  assert.match(service, /branded HTML, plain text, required attachments, checksums, archive, Dataverse send evidence, direct reply path, and single gate/)
   assert.match(service, /jm1pub_gatestatus:\s*GATE_STATUS_AWAITING_AUTHOR_RESPONSE/)
   assert.match(service, /jm1pub_awaitingsince:\s*now/)
   assert.match(service, /PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED/)
   assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:BRANDED_HTML_NOT_VERIFIED/)
   assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:ARCHIVE_NOT_CONFIRMED/)
+  assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:DATAVERSE_SEND_EVIDENCE_NOT_CONFIRMED/)
+  assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:DIRECT_REPLY_PATH_NOT_CONFIRMED/)
+  assert.doesNotMatch(service, /OPERATIONAL_CERTIFICATION_BLOCKED:PORTAL_ACCESS_NOT_CONFIRMED/)
+  assert.doesNotMatch(service, /OPERATIONAL_CERTIFICATION_BLOCKED:RESPONSE_CONTROLS_NOT_CONFIRMED/)
   assert.doesNotMatch(service, /Gate \$\{gateId\} moved to AWAITING_AUTHOR_RESPONSE after provider/)
   assert.doesNotMatch(service, /TECHNICALLY_RELEASED[\s\S]{0,120}jm1pub_awaitingsince:\s*now/)
 })
@@ -139,26 +147,36 @@ test('operational certification endpoint is OIDC protected and evidence constrai
     'sourceChecksumLineage',
     'attachmentChecksums',
     'deliveredAttachmentInventory',
-    'deliveredButtonUrl',
-    'authorClickThrough',
     'archiveConfirmed',
-    'portalAccess',
-    'packageVisible',
-    'responseControls',
-    'responseForm',
+    'dataverseSendEvidence',
     'singleActiveGate',
+    'directReplyPath',
+    'portalStatus',
   ]) {
     assert.match(certifyRoute, new RegExp(token))
   }
+  assert.match(certifyRoute, /evidenceReferences/)
+  assert.match(certifyRoute, /missingSupportingEvidenceReferences/)
+  assert.match(certifyRoute, /supporting evidence references for every passed evidence field/)
   assert.doesNotMatch(certifyRoute, /cookie|session|x-jm1-relay-key/i)
 })
 
 test('executive recovery sends corrected stage-specific author package copy', () => {
+  const notificationEngine = readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8')
   assert.match(service, /corrected:\s*input\.executionMode === 'EXECUTIVE_RECOVERY'/)
   assert.match(service, /responseDeadline/)
-  assert.match(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected \$\{subjectStageLabel\} Review Package — \$\{input\.titleName\}/)
-  assert.doesNotMatch(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected Proofreading Review Package/)
-  assert.doesNotMatch(readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8'), /Corrected \$\{stageLabel\} Review Package/)
+  assert.match(notificationEngine, /Corrected \$\{subjectStageLabel\} Review Materials — \$\{input\.titleName\}/)
+  assert.doesNotMatch(notificationEngine, /Corrected Proofreading Review Package/)
+  assert.doesNotMatch(notificationEngine, /Corrected \$\{stageLabel\} Review Package/)
+})
+
+test('executive recovery exposes package version for corrected replacement dispatch', () => {
+  assert.match(fiveTitleWorkflow, /package_version:/)
+  assert.match(fiveTitleWorkflow, /PACKAGE_VERSION/)
+  assert.match(fiveTitleWorkflow, /packageVersion: \$packageVersion/)
+  assert.match(fiveTitleWorker, /packageVersion\?: string/)
+  assert.match(fiveTitleWorker, /input\.packageVersion/)
+  assert.match(fiveTitleWorker, /packageVersion\?\.trim\(\) \|\| 'executive-recovery-v1'/)
 })
 
 test('PROGRAM-006 rejects corrupt package binaries and nonfunctional action links', () => {
@@ -171,6 +189,7 @@ test('PROGRAM-006 rejects corrupt package binaries and nonfunctional action link
     'word/document.xml',
     'PDF_SIGNATURE',
     'PDF_EOF_MISSING',
+    'PDF_PAGE_COUNT',
     'MINIMUM_SIZE',
     'ERROR_PAYLOAD',
     'EXPECTED_CONTENT_MISSING',
@@ -182,4 +201,16 @@ test('PROGRAM-006 rejects corrupt package binaries and nonfunctional action link
   assert.match(brandEngine, /PRIMARY_ACTION_URL_INVALID/)
   assert.match(brandEngine, /SUBJECT_DUPLICATED_WORD/)
   assert.match(brandEngine, /<a href=/)
+})
+
+test('PROGRAM-006 keeps service-generated roles out of physical email attachments', () => {
+  const notificationEngine = readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8')
+  assert.match(notificationEngine, /isPhysicalEmailAttachmentRole/)
+  assert.match(notificationEngine, /role !== 'authorResponseMechanism' && role !== 'packageManifest' && role !== 'authorCoverMessage'/)
+  assert.match(service, /Required physical attachments/)
+  assert.match(service, /packageInventory:\s*readback\.requiredAttachments[\s\S]+isPhysicalEmailAttachmentRole/)
+  assert.match(service, /authorFacingFilename/)
+  assert.match(notificationEngine, /AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED/)
+  assert.match(notificationEngine, /View in Author Operating Center/)
+  assert.match(notificationEngine, /Reply directly to publishing@jmerrill\.one/)
 })
