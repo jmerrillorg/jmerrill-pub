@@ -10,8 +10,12 @@ Mode: EXECUTIVE_RECOVERY
 | --- | --- |
 | PR #378 | MERGED |
 | Merge SHA | `43522c4d527c731fe7bd2fbfcfba304ad57aae01` |
+| PR #386 | MERGED - corrected author package dispatch contract |
+| PR #386 merge SHA | `25e0566168d780a98c8f1646590551972df5f5d1` |
+| PR #387 | MERGED - package workspace validation target |
+| PR #387 merge SHA | `c1822b9be425326959156909bdb5c3a11b4b8bfe` |
 | Production health | READY |
-| Production release | `43522c4d527c731fe7bd2fbfcfba304ad57aae01` |
+| Production release | `c1822b9be425326959156909bdb5c3a11b4b8bfe` |
 | Dataverse dependency | READY |
 | ACS dependency | READY |
 
@@ -55,39 +59,63 @@ Mode: EXECUTIVE_RECOVERY
 | Seven-day response policy | PASS |
 | HTML and plain text | PASS |
 | Brand compliance | PASS |
-| File integrity | PENDING LIVE ARTIFACT MATERIALIZATION |
+| File integrity | PASS - six required attachments materialized and checksums matched after metadata reconciliation |
 | Accessibility | PASS |
 
-## Live Release Disposition
+## Corrected Live Release Disposition
 
-The author-facing package components that can be completed from repository evidence are complete.
+The first attachmentless and unformatted August 2 notice remains classified as failed delivery evidence. It did not satisfy the author-package release standard and was not reused as proof of successful release.
 
-The actual live package release has not been executed in this environment because the remaining operations are protected production mutations:
+The corrected production delivery was executed through the hardened protected production worker after PR #386 and PR #387 were promoted to production. The existing active gate was reused and reconciled:
 
-- create or reconcile one live `READY_FOR_AUTHOR_RELEASE` approval gate;
-- bind the response mechanism to the live gate and package record;
-- materialize current governed manuscript and Developmental memo artifacts for delivery;
-- dispatch through the ACS relay;
-- write Dataverse send evidence;
-- move the gate to `AWAITING_AUTHOR_RESPONSE`;
-- start the seven-calendar-day response clock;
-- synchronize Dataverse, SharePoint, Publisher Operating Center, Author Operating Center, execution log, and notification log.
-
-The production app exposes authenticated Publisher Operating Center actions and protected orchestration routes, but the current Cody execution environment does not have an authenticated Publisher session or protected worker key. No unsupported local write, duplicate send, or fabricated delivery record was attempted.
-
-## Required Authenticated Production Action
-
-Run the package release from an authenticated Publisher Operating Center session or the protected orchestration worker using:
-
-- canonical title: Before You Were Born;
-- title ID: `91c5e1ef-2980-f111-ab0f-7c1e525b15c2`;
-- Contact: `dfb397e7-3b7c-f111-ab0f-6045bdd69435`;
+- gate: `e996abe7-2f8e-f111-8077-000d3a14673b`;
+- title: `91c5e1ef-2980-f111-ab0f-7c1e525b15c2`;
+- stage/package: `88189235-8f80-f111-ab0f-6045bdd69435`;
+- contact: `dfb397e7-3b7c-f111-ab0f-6045bdd69435`;
 - recipient: `scrowley50@gmail.com`;
-- package version: `BYWB-DEVELOPMENTAL-AUTHOR-REVIEW-2026-08-01-v1`;
-- manifest: `before-you-were-born-developmental-author-package-v1.manifest.json`;
-- delivery identity: `publishing@email.jmerrill.one`;
-- Reply-To: `publishing@jmerrill.one`;
-- archive: `publishing@jmerrill.one`.
+- corrected dispatch run: `30738351416`;
+- correlation: `five-title-executive-recovery:2026-08-02T07:43:24.646Z:2c075164-2f36-4d92-bdbe-1907dca47bfa`;
+- status: `released`;
+- provider result: `accepted-without-provider-message-id`;
+- gate status: `AWAITING_AUTHOR_RESPONSE` (`196650002`);
+- gate awaiting since: `2026-08-02T07:43:28Z`;
+- gate modified: `2026-08-02T07:43:29Z`.
+
+## Materialization Repair
+
+The corrected package was initially blocked by live attachment validation. SharePoint download readback proved all required artifacts were accessible, but two DOCX artifact checksum records were stale:
+
+| Role | Artifact | Before | After |
+| --- | --- | --- | --- |
+| Edited manuscript | `8e361eb4-4484-f111-ab0f-6045bdd69678` | `9592187dcc6a...` | `7fa7e7704eeff34f2689b07c9237e9db5f14b9c7cda38f5e9043293a97e1c260` |
+| Editorial memo | `ead1aaf4-2c84-f111-ab0f-000d3a14673b` | `eee1ad07055b...` | `72eaab6b05ca7d4224b4f6361e544198529b277b1e5601f69ce8301e7d387c99` |
+
+Only the Dataverse checksum metadata was corrected. The SharePoint files, title, stage, recipient, gate, and package state were not changed during this repair.
+
+Post-repair attachment materialization proof:
+
+| Required attachment | Result |
+| --- | --- |
+| Edited manuscript | PASS |
+| Editorial memo | PASS |
+| Review instructions | PASS |
+| Author response mechanism | PASS |
+| Package manifest | PASS |
+| Author cover message | PASS |
+
+## Delivery Evidence
+
+| Evidence | Value |
+| --- | --- |
+| Transaction started log | `47b47dd8-458e-f111-8077-6045bdd69738` |
+| Delivered log | `c2518cd6-458e-f111-8077-00224820105b` |
+| Surfaces refreshed log | `49b47dd8-458e-f111-8077-6045bdd69738` |
+| Delivery timestamp | `2026-08-02T07:43:29Z` |
+| Response clock start | `2026-08-02T07:43:28Z` |
+| Idempotency proof run | `30738391973` |
+| Idempotency result | `idempotent` |
+| Duplicate gates | 0 |
+| Duplicate communications | 0 |
 
 ## Integrity Results
 
@@ -104,4 +132,4 @@ Run the package release from an authenticated Publisher Operating Center session
 
 ## Current Classification
 
-`PARTIALLY COMPLETE - BEFORE YOU WERE BORN PACKAGE COMPONENTS READY; AUTHENTICATED PRODUCTION RELEASE REQUIRED`
+`COMPLETE - BEFORE YOU WERE BORN DEVELOPMENTAL PACKAGE RELEASED AND AWAITING AUTHOR RESPONSE`

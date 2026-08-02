@@ -3,12 +3,12 @@
   "generatedAt": "2026-08-01",
   "mode": "EXECUTIVE_RECOVERY",
   "deadline": "2026-08-03",
-  "status": "PARTIALLY_COMPLETE_BEFORE_YOU_WERE_BORN_PACKAGE_COMPONENTS_READY_AUTHENTICATED_RELEASE_REQUIRED",
+  "status": "COMPLETE_BEFORE_YOU_WERE_BORN_DEVELOPMENTAL_PACKAGE_RELEASED_AWAITING_AUTHOR_RESPONSE",
   "productionPromotion": {
     "workflow": "Publishing App Service CI/CD",
-    "runId": 30724080697,
+    "runId": 30737864976,
     "result": "SUCCESS",
-    "release": "43522c4d527c731fe7bd2fbfcfba304ad57aae01",
+    "release": "c1822b9be425326959156909bdb5c3a11b4b8bfe",
     "health": "READY",
     "dependencyClassesReady": [
       "configuration",
@@ -35,6 +35,22 @@
       "headAtEvidenceUpdate": "SEE_CURRENT_PR_READBACK",
       "state": "OPEN",
       "mergeState": "CLEAN"
+    },
+    {
+      "number": 386,
+      "branch": "codex/before-you-were-born-corrected-delivery-readback",
+      "head": "432a7ce8a315231d967f54dc0c5f46608f011e60",
+      "state": "MERGED",
+      "mergedAt": "2026-08-02T07:14:32Z",
+      "mergeCommit": "25e0566168d780a98c8f1646590551972df5f5d1"
+    },
+    {
+      "number": 387,
+      "branch": "codex/before-you-were-born-corrected-delivery-readback",
+      "head": "af7092d8d1e78a5bb8e1e3225405ce6216ce6a18",
+      "state": "MERGED",
+      "mergedAt": "2026-08-02T07:28:05Z",
+      "mergeCommit": "c1822b9be425326959156909bdb5c3a11b4b8bfe"
     }
   ],
   "titles": [
@@ -45,11 +61,16 @@
     "Establishing Glory: The Library"
   ],
   "delivery": {
-    "packagesSent": 0,
+    "packagesSent": 1,
     "duplicateGates": 0,
     "duplicateCommunications": 0,
-    "responseClocksStarted": 0,
-    "blocker": "Authenticated Publisher Operating Center session or protected orchestration worker key unavailable to Cody in current execution environment"
+    "responseClocksStarted": 1,
+    "correctedDispatchRun": 30738351416,
+    "idempotencyRun": 30738391973,
+    "gateId": "e996abe7-2f8e-f111-8077-000d3a14673b",
+    "deliveryExecutionLogId": "c2518cd6-458e-f111-8077-00224820105b",
+    "correlationId": "five-title-executive-recovery:2026-08-02T07:43:24.646Z:2c075164-2f36-4d92-bdbe-1907dca47bfa",
+    "responseClockStartedAt": "2026-08-02T07:43:28Z"
   },
   "beforeYouWereBorn": {
     "canonicalTitleId": "91c5e1ef-2980-f111-ab0f-7c1e525b15c2",
@@ -64,7 +85,7 @@
       "packageManifest",
       "brandedCoverMessage"
     ],
-    "liveReleaseStatus": "NOT_SENT_AUTHENTICATED_PRODUCTION_MUTATION_REQUIRED",
+    "liveReleaseStatus": "SENT_ONCE_AWAITING_AUTHOR_RESPONSE",
     "july30DispositionPreserved": "CADENCE_INCOMPLETE_EVIDENCE_EXECUTION_LOG_FAILURE"
   },
   "files": [
