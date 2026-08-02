@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-08-01T20:45:00-04:00",
+  "releaseCandidate": "docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Interior-Layout-Author-Review-Release-Candidate.pdf",
+  "contentIntegrity": {
+    "openingContentComplete": true,
+    "closingContentComplete": true,
+    "bodyPageCountPreserved": true,
+    "releaseCandidatePageCount": 393,
+    "manifestPageCountMatchesActual": true,
+    "missingManuscriptSections": 0,
+    "duplicatedManuscriptSections": 0,
+    "productionNotePages": 0,
+    "croppedPages": 0,
+    "unexpectedBlankPages": 0,
+    "tocEntryCount": 88,
+    "tocOffsetVerified": true,
+    "isbnDisposition": "PENDING_WITHOUT_BLOCKING_AUTHOR_REVIEW",
+    "sha256": "dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3",
+    "sizeBytes": 811688
+  },
+  "visualQa": {
+    "fullRenderPages": 393,
+    "fullRenderResult": "PASS",
+    "fullRenderNote": "Poppler rendered every page at low resolution; stderr contained only local Fontconfig default-config warning.",
+    "sampleRenderedPages": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      393
+    ],
+    "titlePage": "PASS",
+    "copyrightPage": "PASS",
+    "toc": "PASS",
+    "firstBodyPage": "PASS",
+    "finalPage": "PASS",
+    "authorReleaseSafe": "YES"
+  },
+  "packageReadiness": {
+    "canonicalTitle": "PASS",
+    "canonicalRecipient": "PASS",
+    "currentProof": "PASS",
+    "frontMatter": "PASS",
+    "toc": "PASS",
+    "actualPageCountMatchesManifest": "PASS",
+    "reviewInstructions": "PENDING_AUTHOR_PACKAGE_DOC",
+    "responseMechanism": "PENDING_AUTHOR_PACKAGE_DOC",
+    "brandedHtml": "PENDING_AUTHOR_PACKAGE_DOC",
+    "plainText": "PENDING_AUTHOR_PACKAGE_DOC",
+    "humanFirst": "PENDING_AUTHOR_PACKAGE_DOC",
+    "whyFirst": "PENDING_AUTHOR_PACKAGE_DOC",
+    "accessibility": "PASS",
+    "internalOnlyContent": 0
+  }
+}

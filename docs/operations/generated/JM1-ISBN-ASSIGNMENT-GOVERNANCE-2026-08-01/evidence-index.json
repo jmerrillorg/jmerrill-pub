@@ -1,0 +1,42 @@
+{
+  "package": "JM1-ISBN-ASSIGNMENT-GOVERNANCE-2026-08-01",
+  "generatedAt": "2026-08-01",
+  "status": "COMPLETE",
+  "assignmentPoint": "PRODUCTION_METADATA_GATE",
+  "authorReviewIsbnRequirement": "NOT_REQUIRED",
+  "finalDistributionIsbnRequirement": "REQUIRED",
+  "operatingModel": "AUTOMATED_ASSIGNMENT_WITH_HUMAN_APPROVAL",
+  "inventoryStatuses": [
+    "AVAILABLE",
+    "RESERVED_PENDING_APPROVAL",
+    "ASSIGNED",
+    "REGISTERED",
+    "PUBLISHED",
+    "VOIDED_WITH_REASON"
+  ],
+  "approvalOptions": [
+    "APPROVE_ASSIGNMENT",
+    "CORRECT_METADATA",
+    "HOLD_FORMAT",
+    "CANCEL_PRODUCT"
+  ],
+  "theIntentionalLeader": {
+    "authorReviewProof": "UNBLOCKED_ISBN_PENDING",
+    "finalDistributionProof": "ISBN_REQUIRED_BEFORE_CERTIFICATION"
+  },
+  "productionMutation": {
+    "isbnAssignments": 0,
+    "bowkerRegistrations": 0,
+    "distributorSubmissions": 0,
+    "barcodeGenerations": 0
+  },
+  "files": [
+    "00-executive-summary.md",
+    "01-policy-and-gate-design.md",
+    "02-inventory-authority.md",
+    "03-guards-and-prevention.md",
+    "04-validation.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}

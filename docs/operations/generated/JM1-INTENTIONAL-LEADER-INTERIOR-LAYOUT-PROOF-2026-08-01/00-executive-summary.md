@@ -4,11 +4,13 @@ Generated: 2026-08-01T17:51:33-04:00
 
 ## Result
 
-PARTIALLY COMPLETE - BODY PRODUCTION PROOF REGENERATED; AUTHOR RELEASE BLOCKED BY FRONT-MATTER AUTHORITY
+COMPLETE - THE INTENTIONAL LEADER INTERIOR LAYOUT RELEASE
 
-The invalid Interior Layout proof was replaced for internal production purposes with a regenerated body proof produced from the approved proofread manuscript. The regenerated PDF is complete as a manuscript-body proof and passes the truncation/cropping checks that failed the prior artifact.
+The invalid Interior Layout proof was superseded and replaced by the current author-review release candidate generated from the approved proofread manuscript, standard J Merrill Publishing front matter, and the complete 388-page body proof.
 
-The proof is not author-release eligible because governed front matter has not been established for the title page, copyright page, ISBN page, publisher imprint/edition statement, or table of contents. No author communication, approval gate activation, cadence dispatch, or seven-day response clock was started.
+Jackie's executive front-matter ruling established that title page, copyright page, generated table of contents, and body manuscript are required production-generated assets for author-review Interior Layout proofs. Optional dedication, acknowledgments, foreword, preface, biography, marketing pages, and supplemental back matter do not block author review when not already approved and available. ISBN pending is nonblocking for author-review proof release.
+
+The front-matter-integrated production PDF passed content-integrity and visual QA, was uploaded to the Publishing SharePoint workspace, registered in Dataverse as the current author-facing Interior Layout proof, sent once through the ACS relay, and tied to an A7 Interior Layout approval gate now awaiting author response.
 
 ## Key Facts
 
@@ -24,17 +26,24 @@ Approved source: 2026-07-19-The-Intentional-Leader-Volume-I-Proofread-Manuscript
 
 Approved source SHA-256: d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922
 
-Regenerated PDF page count: 388
+Body proof page count: 388
 
-Regenerated PDF size: 3,116,756 bytes
+Release-candidate PDF page count: 393
 
-Visual sample QA: PASS for body proof completeness
+Release-candidate PDF SHA-256: dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3
 
-Author-release QA: BLOCKED - required front matter decision missing
+Visual QA: PASS
+
+ACS diagnostic ID: ecf00bf1-478a-4fe9-b37b-dec77f75dc0c
+
+Dataverse current artifact: 5d76feda-0a8e-f111-8077-000d3a14673b
+
+A7 approval gate: 5141f7db-0a8e-f111-8077-00224820105b
+
+A7 gate status: Awaiting Author Response
 
 ## Release Controls
 
 Package engine guards were added so Interior Layout and final interior proofs fail QA when the PDF is abnormally small, page counts do not match, output is truncated, production notes are visible, title page or TOC is missing, manuscript sections are incomplete, or visual QA has not passed.
 
 Focused package-engine validation passed: 25/25 tests.
-
