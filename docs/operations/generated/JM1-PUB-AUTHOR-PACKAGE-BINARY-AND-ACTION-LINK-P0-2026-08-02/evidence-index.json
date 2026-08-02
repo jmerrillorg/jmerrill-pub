@@ -1,0 +1,28 @@
+{
+  "package": "JM1-PUB-AUTHOR-PACKAGE-BINARY-AND-ACTION-LINK-P0-2026-08-02",
+  "generated": "2026-08-02",
+  "incident": "JM1-PUB-AUTHOR-PACKAGE-BINARY-AND-ACTION-LINK-P0",
+  "title": "Before You Were Born",
+  "classification": "AUTHOR_PACKAGE_DELIVERY_FAILED",
+  "operationalCertification": "FAILED",
+  "files": [
+    {
+      "path": "00-incident-summary.md",
+      "purpose": "Production incident classification and operational disposition"
+    },
+    {
+      "path": "01-program006-remediation.md",
+      "purpose": "Code remediation and validation readback"
+    },
+    {
+      "path": "evidence-index.json",
+      "purpose": "Evidence index"
+    },
+    {
+      "path": "checksums.sha256",
+      "purpose": "SHA-256 checksums"
+    }
+  ],
+  "secretValuesRetained": 0,
+  "replacementDeliveryCertified": false
+}

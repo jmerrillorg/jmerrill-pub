@@ -9,6 +9,7 @@ import {
   buildAuthorPackageNotificationIdempotencyKey,
   buildAuthorReviewNotificationCopy,
   validateAuthorPackageNotification,
+  validateGovernedPackageAttachmentBinary,
   type AttachmentRole,
   type AuthorReviewPackageType,
   type GovernedPackageAttachment,
@@ -93,11 +94,20 @@ export type OperationalDeliveryCertificationEvidence = {
   brandedHtml: boolean
   plainText: boolean
   requiredAttachments: boolean
+  attachmentByteLength: boolean
+  fileSignatures: boolean
+  attachmentOpenTests: boolean
+  expectedAttachmentContent: boolean
+  sourceChecksumLineage: boolean
   attachmentChecksums: boolean
+  deliveredAttachmentInventory: boolean
+  deliveredButtonUrl: boolean
+  authorClickThrough: boolean
   archiveConfirmed: boolean
   portalAccess: boolean
   packageVisible: boolean
   responseControls: boolean
+  responseForm: boolean
   singleActiveGate: boolean
 }
 
@@ -336,6 +346,13 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
       authorName: readback.authorName,
       corrected: input.executionMode === 'EXECUTIVE_RECOVERY',
       responseDeadline,
+      primaryActionUrl: buildAuthorResponseUrl({
+        titleId: input.titleId,
+        stageId: input.stageId,
+        packageId: input.packageId,
+        gateId,
+      }),
+      packageInventory: readback.requiredAttachments.map((attachment) => attachment.fileName),
     }),
     attachments: readback.requiredAttachments,
   })
@@ -498,6 +515,7 @@ function validateReadback(input: PublishingDispatchRequest, readback: DispatchRe
     idempotencyKey: readback.idempotencyKey,
     attachments: readback.requiredAttachments,
     packageChecksum: readback.packageChecksum,
+    expectedTitle: readback.titleName,
   })
 
   return {
@@ -533,11 +551,20 @@ function operationalCertificationBlockers(evidence: OperationalDeliveryCertifica
     ['brandedHtml', 'OPERATIONAL_CERTIFICATION_BLOCKED:BRANDED_HTML_NOT_VERIFIED'],
     ['plainText', 'OPERATIONAL_CERTIFICATION_BLOCKED:PLAIN_TEXT_NOT_VERIFIED'],
     ['requiredAttachments', 'OPERATIONAL_CERTIFICATION_BLOCKED:REQUIRED_ATTACHMENTS_NOT_VERIFIED'],
+    ['attachmentByteLength', 'OPERATIONAL_CERTIFICATION_BLOCKED:ATTACHMENT_BYTE_LENGTH_NOT_VERIFIED'],
+    ['fileSignatures', 'OPERATIONAL_CERTIFICATION_BLOCKED:FILE_SIGNATURES_NOT_VERIFIED'],
+    ['attachmentOpenTests', 'OPERATIONAL_CERTIFICATION_BLOCKED:ATTACHMENT_OPEN_TESTS_NOT_VERIFIED'],
+    ['expectedAttachmentContent', 'OPERATIONAL_CERTIFICATION_BLOCKED:EXPECTED_ATTACHMENT_CONTENT_NOT_VERIFIED'],
+    ['sourceChecksumLineage', 'OPERATIONAL_CERTIFICATION_BLOCKED:SOURCE_CHECKSUM_LINEAGE_NOT_VERIFIED'],
     ['attachmentChecksums', 'OPERATIONAL_CERTIFICATION_BLOCKED:ATTACHMENT_CHECKSUMS_NOT_VERIFIED'],
+    ['deliveredAttachmentInventory', 'OPERATIONAL_CERTIFICATION_BLOCKED:DELIVERED_ATTACHMENT_INVENTORY_NOT_VERIFIED'],
+    ['deliveredButtonUrl', 'OPERATIONAL_CERTIFICATION_BLOCKED:DELIVERED_BUTTON_URL_NOT_VERIFIED'],
+    ['authorClickThrough', 'OPERATIONAL_CERTIFICATION_BLOCKED:AUTHOR_CLICK_THROUGH_NOT_VERIFIED'],
     ['archiveConfirmed', 'OPERATIONAL_CERTIFICATION_BLOCKED:ARCHIVE_NOT_CONFIRMED'],
     ['portalAccess', 'OPERATIONAL_CERTIFICATION_BLOCKED:PORTAL_ACCESS_NOT_CONFIRMED'],
     ['packageVisible', 'OPERATIONAL_CERTIFICATION_BLOCKED:PACKAGE_VISIBILITY_NOT_CONFIRMED'],
     ['responseControls', 'OPERATIONAL_CERTIFICATION_BLOCKED:RESPONSE_CONTROLS_NOT_CONFIRMED'],
+    ['responseForm', 'OPERATIONAL_CERTIFICATION_BLOCKED:RESPONSE_FORM_NOT_CONFIRMED'],
     ['singleActiveGate', 'OPERATIONAL_CERTIFICATION_BLOCKED:SINGLE_ACTIVE_GATE_NOT_CONFIRMED'],
   ]
   return checks.filter(([key]) => evidence[key] !== true).map(([, blocker]) => blocker)
@@ -652,7 +679,7 @@ async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType
         throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:ATTACHMENT_CHECKSUM_MISMATCH:${role}`)
       }
       const filename = sanitizeDownloadFilename(stringValue(artifact.jm1pub_filename) || `${role}.bin`)
-      return {
+      const attachment = {
         role,
         artifactId: stringValue(artifact.jm1pub_editorialartifactid),
         fileName: filename,
@@ -661,6 +688,9 @@ async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType
         sizeBytes: body.byteLength,
         sha256: actualSha,
       }
+      const binaryValidation = validateGovernedPackageAttachmentBinary(attachment)
+      if (!binaryValidation.ok) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:${binaryValidation.blocker}`)
+      return attachment
     }),
   )
 }
@@ -886,6 +916,19 @@ function contentTypeFor(fileName: string) {
   if (lower.endsWith('.txt')) return 'text/plain; charset=utf-8'
   if (lower.endsWith('.html')) return 'text/html; charset=utf-8'
   return 'application/octet-stream'
+}
+
+function buildAuthorResponseUrl(input: { titleId: string; stageId: string; packageId: string; gateId: string }) {
+  const base = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://jmerrill.pub'
+  const url = new URL('/author/portal', base)
+  url.searchParams.set('titleId', input.titleId)
+  url.searchParams.set('stageId', input.stageId)
+  url.searchParams.set('packageId', input.packageId)
+  url.searchParams.set('gateId', input.gateId)
+  url.searchParams.set('action', 'review-package')
+  if (url.protocol !== 'https:') throw new Error('AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:REVIEW_ACTION_LINK_NOT_HTTPS')
+  if (!/jmerrill\.pub$/i.test(url.hostname)) throw new Error('AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:REVIEW_ACTION_LINK_NOT_AUTHOR_PORTAL')
+  return url.toString()
 }
 
 function normalizeIntakeReference(value: string) {

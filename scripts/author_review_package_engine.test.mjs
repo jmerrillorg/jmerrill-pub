@@ -44,17 +44,53 @@ function sha(value) {
   return createHash('sha256').update(value).digest('hex')
 }
 
+function fakeDocx(title = 'The Intentional Leader') {
+  return Buffer.concat([
+    Buffer.from('PK\x03\x04'),
+    Buffer.from('[Content_Types].xml _rels/.rels word/document.xml '),
+    Buffer.from(`${title} governed author review manuscript `.repeat(500)),
+  ])
+}
+
+function fakePdf(title = 'The Intentional Leader') {
+  return Buffer.from(`%PDF-1.7\n1 0 obj << /Type /Catalog >> endobj\n${title}\n${'author review package '.repeat(6_000)}\n%%EOF`)
+}
+
+function fakeText(title = 'The Intentional Leader') {
+  return Buffer.from(`${title}\nAuthor review package\n${'response choice '.repeat(30)}`)
+}
+
+function fakeJson(title = 'The Intentional Leader') {
+  return Buffer.from(JSON.stringify({
+    title,
+    packageInventory: ['manuscript', 'summary', 'instructions', 'manifest'],
+    authorSafe: true,
+    checks: ['file signature', 'open test', 'checksum lineage', 'author response route'],
+    description: 'governed author-facing package manifest '.repeat(12),
+  }, null, 2))
+}
+
 function artifact(role, overrides = {}) {
   const isDocx = role.toLowerCase().includes('manuscript')
+  const filename = overrides.filename || `${role}.${isDocx ? 'docx' : overrides.mimeType === 'application/json' ? 'json' : overrides.mimeType === 'text/plain' ? 'txt' : 'pdf'}`
+  const bytes =
+    overrides.bytes ||
+    (filename.endsWith('.docx')
+      ? fakeDocx(overrides.titleName)
+      : filename.endsWith('.pdf')
+        ? fakePdf(overrides.titleName)
+        : filename.endsWith('.json')
+          ? fakeJson(overrides.titleName)
+          : fakeText(overrides.titleName))
   return {
     artifactId: overrides.artifactId || `artifact-${role}`,
     role,
-    filename: overrides.filename || `${role}.${isDocx ? 'docx' : 'pdf'}`,
+    filename,
     mimeType:
       overrides.mimeType ||
       (isDocx ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'application/pdf'),
-    fileSize: overrides.fileSize || 1200,
-    checksum: overrides.checksum || sha(role),
+    fileSize: overrides.fileSize || bytes.byteLength,
+    checksum: overrides.checksum || sha(bytes),
     sourceVersion: overrides.sourceVersion || `source-${role}-v1`,
     createdAt: overrides.createdAt || now,
     stageId: overrides.stageId || 'stage-proofreading',
@@ -74,7 +110,7 @@ function artifact(role, overrides = {}) {
     manuscriptSectionsComplete: overrides.manuscriptSectionsComplete,
     productionNotesVisible: overrides.productionNotesVisible,
     truncatedOutput: overrides.truncatedOutput,
-    contentBytesBase64: overrides.contentBytesBase64 || Buffer.from(role).toString('base64'),
+    contentBytesBase64: overrides.contentBytesBase64 || bytes.toString('base64'),
   }
 }
 
@@ -452,8 +488,10 @@ test('Developmental and Interior notifications preserve required response, manif
     ],
   })
 
-  assert.equal(validateAuthorPackageNotification(developmentalNotification).ok, true)
-  assert.equal(validateAuthorPackageNotification(interiorNotification).ok, true)
+  const developmentalValidation = validateAuthorPackageNotification(developmentalNotification)
+  const interiorValidation = validateAuthorPackageNotification(interiorNotification)
+  assert.equal(developmentalValidation.ok, true, developmentalValidation.blocker)
+  assert.equal(interiorValidation.ok, true, interiorValidation.blocker)
   assert.deepEqual(
     developmentalNotification.attachments.map((attachment) => attachment.role).toSorted(),
     [
