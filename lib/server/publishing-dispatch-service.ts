@@ -668,6 +668,8 @@ async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType
     if (!artifact) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:REQUIRED_ATTACHMENT_MISSING:${role}`)
     return { role, artifact }
   })
+  const roleCollision = physicalAttachmentRoleCollision(selected)
+  if (roleCollision) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:${roleCollision}`)
   const token = await getGraphToken()
 
   return Promise.all(
@@ -890,9 +892,30 @@ function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) 
       ].join(' ')
       const size = Number(artifact.jm1pub_filesizebytes || 0)
       if (role === 'interiorProof' && size > 0 && size < 100_000) return false
+      if (!artifactCanSatisfyRole(role, haystack)) return false
       return pattern.test(haystack)
     })
     .sort((a, b) => artifactRoleScore(b, role) - artifactRoleScore(a, role))[0]
+}
+
+function artifactCanSatisfyRole(role: AttachmentRole, haystack: string) {
+  if (role !== 'reviewInstructions') return true
+  if (!/instruction/i.test(haystack)) return false
+  return !/\b(manifest|ledger|response[-_ ]?mechanism|cover[-_ ]?message)\b/i.test(haystack)
+}
+
+function physicalAttachmentRoleCollision(selected: Array<{ role: AttachmentRole; artifact: DataverseRow }>) {
+  const physical = selected.filter(({ role }) => isPhysicalEmailAttachmentRole(role))
+  const artifactIds = physical.map(({ artifact }) => stringValue(artifact.jm1pub_editorialartifactid)).filter(Boolean)
+  const sourceItemIds = physical
+    .map(({ artifact }) => [stringValue(artifact.jm1pub_repositorydriveid), stringValue(artifact.jm1pub_repositoryitemid)].filter(Boolean).join(':'))
+    .filter(Boolean)
+  const checksums = physical.map(({ artifact }) => stringValue(artifact.jm1pub_sha256).toLowerCase()).filter(Boolean)
+  return hasDuplicate(artifactIds) || hasDuplicate(sourceItemIds) || hasDuplicate(checksums) ? 'AUTHOR_ATTACHMENT_ROLE_COLLISION' : ''
+}
+
+function hasDuplicate(values: string[]) {
+  return new Set(values).size !== values.length
 }
 
 function artifactRoleScore(artifact: DataverseRow, role: AttachmentRole) {

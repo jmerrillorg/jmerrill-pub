@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-08-02T17:15:00-04:00",
+  "title": "The Intentional Leader",
+  "titleId": "e797232b-da7a-f111-ab0f-00224820105b",
+  "stage": "Interior Layout",
+  "stageId": "c9dee533-4184-f111-ab0f-7c1e525b15c2",
+  "authorVisibleArtifactCount": 5,
+  "beforeFix": {
+    "interiorProof": {
+      "artifactId": "5d76feda-0a8e-f111-8077-000d3a14673b",
+      "filename": "The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf",
+      "sha256": "dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3",
+      "sizeBytes": 811688
+    },
+    "reviewInstructions": {
+      "artifactId": "5d76feda-0a8e-f111-8077-000d3a14673b",
+      "filename": "The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf",
+      "sha256": "dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3",
+      "sizeBytes": 811688
+    },
+    "blockers": [
+      "duplicate-selected-artifact"
+    ]
+  },
+  "afterFix": {
+    "interiorProof": {
+      "artifactId": "5d76feda-0a8e-f111-8077-000d3a14673b",
+      "name": "Interior Layout Author Review Proof - The Intentional Leader",
+      "filename": "The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf",
+      "sha256": "dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3",
+      "sizeBytes": 811688,
+      "repositoryPath": "01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ - Jackie Smith Jr - The Intentional Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf"
+    },
+    "reviewInstructions": {
+      "artifactId": "0db9be77-3c8e-f111-8077-00224820105b",
+      "name": "Interior Layout Review Instructions - The Intentional Leader",
+      "filename": "The-Intentional-Leader-Interior-Layout-Review-Instructions.txt",
+      "sha256": "d44c3896b1c4ff0ce1052f943f2ee32add083193a009aec18e7b2dc8c02764ed",
+      "sizeBytes": 1978,
+      "repositoryPath": "01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ - Jackie Smith Jr - The Intentional Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Review-Instructions.txt"
+    },
+    "blockers": []
+  },
+  "sendDisposition": "HELD_UNTIL_SELECTOR_FIX_DEPLOYED",
+  "authorCommunicationsSent": 0,
+  "secretValuesRetained": 0,
+  "requiredFailureCode": "AUTHOR_PACKAGE_NOTIFICATION_BLOCKED:AUTHOR_ATTACHMENT_ROLE_COLLISION",
+  "roleCollisionRule": {
+    "artifactIdsDistinct": "PASS_AFTER_FIX",
+    "sourceItemIdsDistinct": "PASS_AFTER_FIX",
+    "checksumsDistinct": "PASS_AFTER_FIX",
+    "failureTiming": "BEFORE_GRAPH_DOWNLOAD_ACS_SUBMISSION_GATE_MUTATION_OR_RESPONSE_CLOCK"
+  }
+}
