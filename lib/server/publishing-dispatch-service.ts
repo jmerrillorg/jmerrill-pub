@@ -690,7 +690,7 @@ function artifactRoleScore(artifact: DataverseRow, role: AttachmentRole) {
 
 function resolveManifestLocation(artifacts: DataverseRow[]) {
   const manifest = artifacts.find((artifact) => /manifest/i.test(stringValue(artifact.jm1pub_filename || artifact.jm1pub_editorialartifactname)))
-  return stringValue(manifest?.jm1pub_repositoryitemid || manifest?.jm1pub_repositorypath || artifacts[0]?.jm1pub_repositoryitemid || artifacts[0]?.jm1pub_repositorypath)
+  return stringValue(manifest?.jm1pub_repositorypath || manifest?.jm1pub_repositoryitemid || artifacts[0]?.jm1pub_repositorypath || artifacts[0]?.jm1pub_repositoryitemid)
 }
 
 function contentTypeFor(fileName: string) {
