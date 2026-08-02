@@ -1,0 +1,187 @@
+{
+  "packageVersion": "v1.1",
+  "generatedAt": "2026-07-30T01:01:11.535Z",
+  "sourcePackage": "docs/operations/generated/Security-Baseline-Evidence-Package-v1",
+  "packagePath": "docs/operations/generated/Security-Baseline-Evidence-Package-v1.1",
+  "files": [
+    {
+      "file": "00-executive-readout.md",
+      "bytes": 2197
+    },
+    {
+      "file": "01-scope-and-authority.md",
+      "bytes": 1119
+    },
+    {
+      "file": "02-methodology-and-evidence-standard.md",
+      "bytes": 1150
+    },
+    {
+      "file": "03-entitlements.md",
+      "bytes": 2414
+    },
+    {
+      "file": "04-identity.md",
+      "bytes": 2440
+    },
+    {
+      "file": "05-endpoints.md",
+      "bytes": 1846
+    },
+    {
+      "file": "06-m365-security-compliance.md",
+      "bytes": 1030
+    },
+    {
+      "file": "07-power-platform.md",
+      "bytes": 1193
+    },
+    {
+      "file": "08-azure.md",
+      "bytes": 2630
+    },
+    {
+      "file": "09-development-security.md",
+      "bytes": 1885
+    },
+    {
+      "file": "10-ai-model-security.md",
+      "bytes": 1166
+    },
+    {
+      "file": "11-recovery.md",
+      "bytes": 1105
+    },
+    {
+      "file": "12-monitoring-and-incident-response.md",
+      "bytes": 1164
+    },
+    {
+      "file": "13-maturity-record-register.csv",
+      "bytes": 12120
+    },
+    {
+      "file": "14-evidence-source-register.csv",
+      "bytes": 2474
+    },
+    {
+      "file": "15-gaps-and-recommendations-register.csv",
+      "bytes": 2013
+    },
+    {
+      "file": "16-known-limitations.md",
+      "bytes": 2919
+    },
+    {
+      "file": "17-handoff-to-chad.md",
+      "bytes": 693
+    },
+    {
+      "file": "18-evidence-index.json",
+      "bytes": 3272
+    },
+    {
+      "file": "19-confidence-register.csv",
+      "bytes": 4091
+    },
+    {
+      "file": "20-maturity-register-validation.csv",
+      "bytes": 3939
+    },
+    {
+      "file": "21-remaining-limitation-register.csv",
+      "bytes": 2482
+    },
+    {
+      "file": "22-v1-to-v1.1-delta-register.json",
+      "bytes": 5544
+    },
+    {
+      "file": "23-cross-lane-validation.md",
+      "bytes": 1609
+    },
+    {
+      "file": "24-governance-transition-memo.md",
+      "bytes": 1666
+    },
+    {
+      "file": "25-preservation-executive-summary.md",
+      "bytes": 1873
+    },
+    {
+      "file": "security-baseline-evidence-register.json",
+      "bytes": 26938
+    },
+    {
+      "file": "chad-handoff/00-Chad-Handoff.md",
+      "bytes": 518
+    },
+    {
+      "file": "chad-handoff/01-Evidence-Summary.md",
+      "bytes": 363
+    },
+    {
+      "file": "chad-handoff/02-Limitations.md",
+      "bytes": 2916
+    },
+    {
+      "file": "chad-handoff/03-Cross-Lane-Questions.md",
+      "bytes": 1346
+    },
+    {
+      "file": "chad-handoff/04-Maturity-Register.csv",
+      "bytes": 12120
+    },
+    {
+      "file": "chad-handoff/05-Confidence-Register.csv",
+      "bytes": 4091
+    },
+    {
+      "file": "chad-handoff/06-Evidence-Index.json",
+      "bytes": 391
+    },
+    {
+      "file": "supplemental-evidence/azure-security-and-monitoring-readbacks.json",
+      "bytes": 23227
+    },
+    {
+      "file": "supplemental-evidence/endpoint-readonly-validation.json",
+      "bytes": 1917
+    },
+    {
+      "file": "supplemental-evidence/github-security-controls.json",
+      "bytes": 21173
+    },
+    {
+      "file": "supplemental-evidence/microsoft-graph-security-readbacks.json",
+      "bytes": 5720
+    },
+    {
+      "file": "supplemental-evidence/power-platform-dataverse-readbacks.json",
+      "bytes": 170101
+    }
+  ],
+  "supplementalEvidence": [
+    "github-security-controls.json",
+    "microsoft-graph-security-readbacks.json",
+    "azure-security-and-monitoring-readbacks.json",
+    "power-platform-dataverse-readbacks.json",
+    "endpoint-readonly-validation.json"
+  ],
+  "executionEvents": [
+    "SECURITY_EVIDENCE_REFINEMENT_STARTED",
+    "SECURITY_EVIDENCE_V1_1_COMPLETE"
+  ],
+  "configurationChanges": 0,
+  "productionChanges": 0,
+  "secretValuesRecorded": 0,
+  "preservation": {
+    "status": "PRESERVED_PENDING_COMMIT",
+    "branch": "codex/program-004-annex-s-evidence-preservation",
+    "transitionMemo": "24-governance-transition-memo.md",
+    "executiveSummary": "25-preservation-executive-summary.md",
+    "configurationChanges": 0,
+    "productionChanges": 0,
+    "secretValuesRecorded": 0
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "generatedAt": "2026-07-30T00:55:14.543Z",
+  "JM1_PRIME": {
+    "hostName": "JM1-PRIME",
+    "os": {
+      "ProductName": "macOS",
+      "ProductVersion": "27.0",
+      "BuildVersion": "26A5388g"
+    },
+    "uname": "Darwin JM1-PRIME 27.0.0 Darwin Kernel Version 27.0.0: Tue Jul 14 21:40:50 PDT 2026; root:xnu-13432.0.94.501.4~1/RELEASE_ARM64_T8132 arm64",
+    "fileVault": {
+      "verified": true,
+      "status": "FileVault is On."
+    },
+    "mdmEnrollment": {
+      "verified": true,
+      "status": "Enrolled via DEP: No\nMDM enrollment: No"
+    },
+    "localAdminGroup": {
+      "verified": true,
+      "memberCount": 3,
+      "memberNamesRedacted": false,
+      "members": [
+        "root",
+        "jmerrillone",
+        "jmerrill"
+      ]
+    },
+    "firewall": {
+      "verified": true,
+      "status": "Firewall is enabled. (State = 1)"
+    },
+    "gatekeeper": {
+      "verified": true,
+      "status": "assessments enabled"
+    },
+    "userInventory": {
+      "verified": true,
+      "count": 134
+    }
+  },
+  "otherEndpoints": [
+    {
+      "device": "JM1-SUPPORT",
+      "verification": "NOT_VERIFIED",
+      "reason": "No direct endpoint session or Intune managed-device readback available in current read-only execution context."
+    },
+    {
+      "device": "JM1-ARCHIVE",
+      "verification": "NOT_VERIFIED",
+      "reason": "No direct endpoint session or Intune managed-device readback available; network segmentation cannot be changed or probed destructively."
+    },
+    {
+      "device": "JM1-VIEW",
+      "verification": "NOT_VERIFIED",
+      "reason": "No direct endpoint session or Intune managed-device readback available in current read-only execution context."
+    },
+    {
+      "device": "JM1-MOBILE",
+      "verification": "NOT_VERIFIED",
+      "reason": "No direct endpoint session or Intune managed-device readback available in current read-only execution context."
+    }
+  ]
+}

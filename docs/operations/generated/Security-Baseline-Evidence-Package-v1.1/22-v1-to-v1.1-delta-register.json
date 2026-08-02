@@ -1,0 +1,106 @@
+[
+  {
+    "id": "ANNEXS-ENT-002",
+    "capability": "Intune entitlement vs activation",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Graph managedDevices read attempt remained not verified; confidence lowered to LOW.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-ENT-003",
+    "capability": "Purview entitlement vs configuration",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Purview label/retention read attempts blocked; confidence lowered to LOW.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-ID-001",
+    "capability": "Conditional Access",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Policy list/state refreshed; confidence remains HIGH.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-ID-002",
+    "capability": "Privileged roles / PIM",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Role assignments readable; PIM eligibility blocked by missing scope; confidence MEDIUM.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-M365-001",
+    "capability": "Secure Score",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Secure Score remains not verified; confidence LOW.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-ENDPOINT-001",
+    "capability": "Endpoint inventory",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Intune device inventory not verified; confidence UNKNOWN.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-ENDPOINT-002",
+    "capability": "JM1-PRIME local endpoint",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Direct local evidence refreshed; confidence HIGH for JM1-PRIME only.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-AZ-001",
+    "capability": "Azure inventory",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Resource readback expanded; confidence HIGH.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-AZ-002",
+    "capability": "Defender for Cloud",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Plan readback expanded; confidence HIGH.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-AZ-003",
+    "capability": "Key Vault",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Secret metadata only, no values; confidence HIGH.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-MON-001",
+    "capability": "Monitoring",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "Metric alert / Log Analytics readback expanded; confidence HIGH.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-DEV-001",
+    "capability": "GitHub controls",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "19 repos enumerated; most security-control endpoints not verified under current authority; confidence LOW.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  },
+  {
+    "id": "ANNEXS-PP-001",
+    "capability": "Power Platform",
+    "originalEvidence": "Security-Baseline-Evidence-Package-v1/security-baseline-evidence-register.json",
+    "supplementalEvidence": "Security-Baseline-Evidence-Package-v1.1/supplemental-evidence/",
+    "reasonForUpdate": "PAC/Dataverse evidence expanded; DLP admin API blocked; confidence MEDIUM.",
+    "verificationTimestamp": "2026-07-30T00:57:24.975Z"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-07-30T00:57:24.975Z",
+  "packageVersion": "v1.1",
+  "sourcePackage": "docs/operations/generated/Security-Baseline-Evidence-Package-v1.1",
+  "files": [
+    "00-Chad-Handoff.md",
+    "01-Evidence-Summary.md",
+    "02-Limitations.md",
+    "03-Cross-Lane-Questions.md",
+    "04-Maturity-Register.csv",
+    "05-Confidence-Register.csv",
+    "06-Evidence-Index.json"
+  ]
+}

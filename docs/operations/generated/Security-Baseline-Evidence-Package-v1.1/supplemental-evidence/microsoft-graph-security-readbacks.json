@@ -1,0 +1,105 @@
+{
+  "generatedAt": "2026-07-30T00:50:43.261Z",
+  "endpoints": {
+    "org": {
+      "verified": true,
+      "status": "READ_OK",
+      "error": null,
+      "recordCount": 1
+    },
+    "conditionalAccess": {
+      "verified": true,
+      "status": "READ_OK",
+      "error": null,
+      "recordCount": 3
+    },
+    "authMethodsRegistration": {
+      "verified": false,
+      "status": "NOT_VERIFIED:1",
+      "error": "ERROR: Forbidden({\"error\":{\"code\":\"Authentication_RequestFromNonPremiumTenantOrB2CTenant\",\"message\":\"Tenant is not a B2C tenant and doesn't have premium license\",\"innerError\":{\"date\":\"2026-07-30T00:50:46\",\"request-id\":\"8f9a334a-91f9-4fa2-aa93-81ef1410a351\",\"client-request-id\":\"8f9a334a-91f9-4fa2-aa93-81ef1410a351\"}}})\n"
+    },
+    "roleEligibility": {
+      "verified": false,
+      "status": "NOT_VERIFIED:1",
+      "error": "ERROR: Forbidden({\"error\":{\"code\":\"UnknownError\",\"message\":\"{\\\"errorCode\\\":\\\"PermissionScopeNotGranted\\\",\\\"message\\\":\\\"Authorization failed due to missing permission scope RoleEligibilitySchedule.Read.Directory,RoleEligibilitySchedule.ReadWrite.Directory,RoleManagement.ReadWrite.Directory,RoleManagement.Read.Directory,RoleManagement.Read.All.\\\",\\\"instanceAnnotations\\\":[]}\",\"innerError\":{\"date\":\"2026-07-30T00:50:47\",\"request-id\":\"0d70ed63-352d-44b3-bb5c-aeff945839a8\",\"client-request-id\":\"0d70ed63-352d-44b3-bb5c-aeff945839a8\"}}})\n"
+    },
+    "privilegedAssignments": {
+      "verified": true,
+      "status": "READ_OK",
+      "error": null,
+      "recordCount": 101
+    },
+    "managedDevices": {
+      "verified": false,
+      "status": "NOT_VERIFIED:1",
+      "recordCount": null,
+      "error": "ERROR: Unauthorized({\"error\":{\"code\":\"UnknownError\",\"message\":\"{\\\"ErrorCode\\\":\\\"Forbidden\\\",\\\"Message\\\":\\\"{\\\\r\\\\n  \\\\\\\"_version\\\\\\\": 3,\\\\r\\\\n  \\\\\\\"Message\\\\\\\": \\\\\\\"An error has occurred - Operation ID (for customer support): 00000000-0000-0000-0000-000000000000 - Activity ID: fc388dca-8e7d-464d-967d-2f559a666b7e - Url: https://proxy.msua08.manage.microsoft.com/DeviceFE/StatelessDeviceFEService/deviceManagement/managedDevices?api-version=2025-07-09&$select=deviceName%2coperatingSystem%2ccomplianceState%2cmanagementAgent%2cmanagedDeviceOwnerType%2cazureADDeviceId%2clastSyncDateTime%2cisEncrypted&$top=999\\\\\\\",\\\\r\\\\n  \\\\\\\"CustomApiErrorPhrase\\\\\\\": \\\\\\\"\\\\\\\",\\\\r\\\\n  \\\\\\\"RetryAfter\\\\\\\": null,\\\\r\\\\n  \\\\\\\"ErrorSourceService\\\\\\\": \\\\\\\"\\\\\\\",\\\\r\\\\n  \\\\\\\"HttpHeaders\\\\\\\": \\\\\\\"{\\\\\\\\\\\\\\\"WWW-Authenticate\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"Bearer\\\\\\\\\\\\\\\"}\\\\\\\"\\\\r\\\\n}\\\",\\\"Target\\\":null,\\\"Details\\\":null,\\\"InnerError\\\":null,\\\"InstanceAnnotations\\\":[]}\",\"innerError\":{\"date\":\"2026-07-30T00:53:44\",\"request-id\":\"fc388dca-8e7d-464d-967d-2f559a666b7e\",\"client-request-id\":\"fc388dca-8e7d-464d-967d-2f559a666b7e\"}}})\n",
+      "queryCorrectedAt": "2026-07-30T00:53:44.799Z"
+    },
+    "secureScores": {
+      "verified": false,
+      "status": "NOT_VERIFIED:1",
+      "error": "ERROR: Forbidden({\"error\":{\"code\":\"UnknownError\",\"message\":\"Auth token does not contain valid permissions or user does not have valid roles.\",\"innerError\":{\"date\":\"2026-07-30T00:50:49\",\"request-id\":\"f5c342b1-f784-4a4d-a56f-02ec58aef48d\",\"client-request-id\":\"f5c342b1-f784-4a4d-a56f-02ec58aef48d\"}}})\n"
+    },
+    "sensitivityLabels": {
+      "verified": false,
+      "status": "NOT_VERIFIED:1",
+      "error": "ERROR: Forbidden({\"error\":{\"code\":\"UnknownError\",\"message\":\"\",\"innerError\":{\"date\":\"2026-07-30T00:50:49\",\"request-id\":\"0cc4c73c-eb89-4bc9-b316-a39f3866172e\",\"client-request-id\":\"0cc4c73c-eb89-4bc9-b316-a39f3866172e\"}}})\n"
+    },
+    "retentionLabels": {
+      "verified": false,
+      "status": "NOT_VERIFIED:1",
+      "error": "ERROR: Unauthorized({\"error\":{\"code\":\"UnknownError\",\"message\":\"\",\"innerError\":{\"date\":\"2026-07-30T00:50:50\",\"request-id\":\"b23959c2-be85-42ef-a3c7-103d1aa83f53\",\"client-request-id\":\"b23959c2-be85-42ef-a3c7-103d1aa83f53\"}}})\n"
+    },
+    "directoryAudits": {
+      "verified": true,
+      "status": "READ_OK",
+      "error": null,
+      "recordCount": 1
+    }
+  },
+  "summaries": {
+    "organization": [
+      {
+        "createdDateTime": "2021-06-07T13:06:57Z",
+        "displayName": "J Merrill Foundation, Inc.",
+        "id": "352d075e-8e17-4169-9f8e-22e6946ce66d"
+      }
+    ],
+    "conditionalAccess": [
+      {
+        "id": "032e9b85-bbfe-4f1d-81af-9a5ec06bffab",
+        "displayName": "Block Legacy Authentication",
+        "state": "enabled",
+        "createdDateTime": "2025-05-15T12:15:16.266787Z",
+        "modifiedDateTime": "2025-05-15T12:17:51.5086485Z"
+      },
+      {
+        "id": "c2595dca-0f52-45b6-99e5-7fcf1fb8ff9a",
+        "displayName": "Require MFA for All Users",
+        "state": "enabled",
+        "createdDateTime": "2025-05-15T12:21:33.2175376Z",
+        "modifiedDateTime": "2025-05-15T13:36:39.7333128Z"
+      },
+      {
+        "id": "4946b6c8-33a5-47d3-ba8b-68a545c92687",
+        "displayName": "Break Glass Bypass – Minimum CA Enforcement",
+        "state": "enabled",
+        "createdDateTime": "2025-05-15T13:29:11.8325931Z",
+        "modifiedDateTime": "2025-05-15T13:31:08.2968055Z"
+      }
+    ],
+    "privilegedAssignments": {
+      "count": 101
+    },
+    "directoryAudits": {
+      "count": 1,
+      "latest": {
+        "activityDateTime": "2026-07-29T16:18:52.3115453Z",
+        "activityDisplayName": "Update device",
+        "category": "Device",
+        "result": "success"
+      }
+    }
+  }
+}
