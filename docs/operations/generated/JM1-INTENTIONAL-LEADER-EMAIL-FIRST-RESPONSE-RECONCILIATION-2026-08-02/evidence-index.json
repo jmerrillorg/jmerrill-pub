@@ -23,9 +23,17 @@
     "subject": "We received your Interior Layout review notes"
   },
   "qualityIssue": "EMAIL_COPY_POLICY_VARIANCE",
+  "productionReview": {
+    "status": "PRODUCTION_REVIEW_AND_CORRECTION",
+    "copyrightPage": "NEEDS_CORRECTION_REVIEW",
+    "bodyCoverage": "JANUARY_1_THROUGH_MARCH_31_PRESENT",
+    "tocCoverage": "DEFECT_CONFIRMED_STOPS_AT_SOUL_DIVE_FEBRUARY_13",
+    "replacementSendAuthorized": false
+  },
   "guardAdded": "RESPONSE_CLOCK_LANGUAGE_BEFORE_CERTIFICATION",
   "files": [
     "00-response-reconciliation.md",
+    "01-production-review-trace.md",
     "evidence-index.json",
     "checksums.sha256"
   ]
