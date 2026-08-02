@@ -6,15 +6,18 @@ const service = readFileSync(new URL('../lib/server/publishing-dispatch-service.
 const fiveTitleWorker = readFileSync(new URL('../lib/server/five-title-executive-recovery-dispatch.ts', import.meta.url), 'utf8')
 const orchestrator = readFileSync(new URL('../lib/server/publishing-orchestrator.ts', import.meta.url), 'utf8')
 const route = readFileSync(new URL('../app/api/publishing/dispatch/author-package/route.ts', import.meta.url), 'utf8')
+const certifyRoute = readFileSync(new URL('../app/api/publishing/dispatch/author-package/certify/route.ts', import.meta.url), 'utf8')
 const relay = readFileSync(new URL('../azure-functions/acs-email-relay/src/functions/sendAuthorAcknowledgment.js', import.meta.url), 'utf8')
 
 test('PROGRAM-006 exposes one canonical PublishingDispatchService operation', () => {
   assert.match(service, /export const PublishingDispatchService/)
   assert.match(service, /export async function dispatchAuthorPackage/)
+  assert.match(service, /export async function certifyOperationalDelivery/)
   assert.match(service, /PackageID, TitleID, StageID, and RecipientContactID/)
   assert.match(service, /'DRY_RUN' \| 'PRODUCTION' \| 'EXECUTIVE_RECOVERY'/)
   assert.match(service, /service: 'PublishingDispatchService'/)
   assert.match(service, /operation: 'dispatchAuthorPackage'/)
+  assert.match(service, /operation: 'certifyOperationalDelivery'/)
 })
 
 test('dispatch service owns validation, natural idempotency, and transaction evidence', () => {
@@ -71,9 +74,13 @@ test('dispatch service separates technical release from operational certificatio
   assert.match(service, /Operational delivery certification is required before Awaiting Author Response/)
   assert.match(service, /No seven-day response clock starts at technical release/)
   assert.match(service, /branded HTML, required attachments, attachment checksums, archive, author portal access, package visibility, response controls, and gate/)
+  assert.match(service, /jm1pub_gatestatus:\s*GATE_STATUS_AWAITING_AUTHOR_RESPONSE/)
+  assert.match(service, /jm1pub_awaitingsince:\s*now/)
+  assert.match(service, /PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED/)
+  assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:BRANDED_HTML_NOT_VERIFIED/)
+  assert.match(service, /OPERATIONAL_CERTIFICATION_BLOCKED:ARCHIVE_NOT_CONFIRMED/)
   assert.doesNotMatch(service, /Gate \$\{gateId\} moved to AWAITING_AUTHOR_RESPONSE after provider/)
-  assert.doesNotMatch(service, /jm1pub_awaitingsince:\s*now/)
-  assert.doesNotMatch(service, /jm1pub_gatestatus:\s*GATE_STATUS_AWAITING_AUTHOR_RESPONSE/)
+  assert.doesNotMatch(service, /TECHNICALLY_RELEASED[\s\S]{0,120}jm1pub_awaitingsince:\s*now/)
 })
 
 test('ACS relay requires and forwards attachments for author-review packages', () => {
@@ -103,6 +110,26 @@ test('canonical dispatch endpoint is OIDC protected and mode constrained', () =>
   assert.match(route, /PRODUCTION/)
   assert.match(route, /EXECUTIVE_RECOVERY/)
   assert.doesNotMatch(route, /cookie|session|x-jm1-relay-key/i)
+})
+
+test('operational certification endpoint is OIDC protected and evidence constrained', () => {
+  assert.match(certifyRoute, /verifyGitHubActionsOidcToken/)
+  assert.match(certifyRoute, /Bearer /)
+  assert.match(certifyRoute, /certifyOperationalDelivery/)
+  for (const token of [
+    'brandedHtml',
+    'plainText',
+    'requiredAttachments',
+    'attachmentChecksums',
+    'archiveConfirmed',
+    'portalAccess',
+    'packageVisible',
+    'responseControls',
+    'singleActiveGate',
+  ]) {
+    assert.match(certifyRoute, new RegExp(token))
+  }
+  assert.doesNotMatch(certifyRoute, /cookie|session|x-jm1-relay-key/i)
 })
 
 test('executive recovery sends corrected stage-specific author package copy', () => {

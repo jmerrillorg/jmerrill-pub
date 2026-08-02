@@ -160,8 +160,34 @@ The Intentional Leader is the only five-title candidate currently eligible for P
 PROGRAM-006 is active in production and correctly blocks unsafe releases. It has not yet completed the full production certification state because:
 
 - four titles lack required author-visible package components;
-- the deployed service separates technical release from operational certification but does not expose a completed operational-certification execution path in this dry-run evidence;
+- production release 6dfced3f3f2f045b23d953bc741f6f45dbb894d1 separates technical release from operational certification, but did not yet include the protected `certifyOperationalDelivery()` endpoint added after this dry-run;
 - no live title was dispatched during this run.
+
+## Post-Dry-Run Remediation
+
+Branch:
+codex/program006-production-dryrun-evidence
+
+Source remediation added:
+
+- `PublishingDispatchService.certifyOperationalDelivery()`
+- protected route `/api/publishing/dispatch/author-package/certify`
+- OIDC bearer-token protection matching the canonical dispatch route
+- explicit operational evidence checks for branded HTML, plain text, required attachments, attachment checksums, archive, portal access, package visibility, response controls, and a single active gate
+- idempotent readback of prior `PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED` evidence
+- blocked result for missing technical-release evidence or duplicate active gates
+- gate transition to Awaiting Author Response only after operational certification passes
+- seven-calendar-day response clock start only inside the certification transaction
+
+Validation:
+
+- `npm run program006-dispatch-guard`: PASS, 10/10
+- `node --test scripts/program006_publishing_dispatch_service.test.mjs scripts/five_title_executive_recovery_dispatch.test.mjs`: PASS, 17/17
+- `npm run type-check`: PASS
+
+Deployment boundary:
+
+The operational-certification endpoint is implemented but not yet production-deployed from this evidence branch. No corrected resend is authorized until the branch is reviewed, merged, deployed, and production reports the new release.
 
 ## Pipeline Maturity Readback
 
@@ -171,7 +197,7 @@ PROGRAM-006 is active in production and correctly blocks unsafe releases. It has
 - ACS dispatch: READY, not invoked in this dry-run
 - Branded email enforcement: PASS
 - Attachment enforcement: PASS
-- Operational delivery certification: PARTIAL, enforced as a required gate before response clock
+- Operational delivery certification: IMPLEMENTED FOR REVIEW, not yet production-certified
 - Workspace synchronization: NOT CERTIFIED in this run
 - Package generation: HYBRID
 - End-to-end unattended automation: PARTIAL
@@ -179,9 +205,10 @@ PROGRAM-006 is active in production and correctly blocks unsafe releases. It has
 ## Next Executable Actions
 
 1. Register missing author-visible package artifacts for The General's Will and Last Testament, Establishing Glory: The Library, The Long Watch, and Before You Were Born.
-2. Add or execute the governed operational-certification path that can move a technically released package to OPERATIONALLY_CERTIFIED only after branded HTML, attachments, archive, portal package visibility, response controls, and gate evidence pass.
+2. Review, merge, and deploy the operational-certification endpoint.
 3. Rerun PROGRAM-006 dry-run.
 4. Confirm dispatch only for titles that are eligible.
+5. Certify operational delivery before any title moves to Awaiting Author Response.
 
 Secret values retained:
 0
