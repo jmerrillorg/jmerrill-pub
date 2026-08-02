@@ -67,6 +67,13 @@ export type OrchestrationResult =
       executionLogIds: string[]
     }
   | {
+      status: 'technical-release-recorded'
+      gateId: string
+      providerMessageId: string
+      providerEvidenceStatus: 'captured' | 'not-returned-by-relay'
+      executionLogIds: string[]
+    }
+  | {
       status: 'transition-completed'
       titleId: string
       gateId: string
@@ -133,9 +140,18 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
       correlationId: input.correlationId,
       operator: input.operatorEmail,
     })
-    if (dispatch.status === 'released') {
+    if (dispatch.status === 'operationally_certified') {
       return {
         status: 'notification-sent',
+        gateId: dispatch.gateId || input.gateId,
+        providerMessageId: dispatch.providerMessageId || 'accepted-without-provider-message-id',
+        providerEvidenceStatus: dispatch.providerMessageId ? 'captured' : 'not-returned-by-relay',
+        executionLogIds: dispatch.executionLogIds,
+      }
+    }
+    if (dispatch.status === 'technically_released') {
+      return {
+        status: 'technical-release-recorded',
         gateId: dispatch.gateId || input.gateId,
         providerMessageId: dispatch.providerMessageId || 'accepted-without-provider-message-id',
         providerEvidenceStatus: dispatch.providerMessageId ? 'captured' : 'not-returned-by-relay',
