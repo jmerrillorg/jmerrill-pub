@@ -55,6 +55,9 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
   ]) {
     assert.match(service, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
+  assert.match(service, /function stageHasCanonicalIntakeReferences/)
+  assert.match(service, /stageReference && publishingReference && stageReference === publishingReference/)
+  assert.doesNotMatch(service, /jm1pub_intakereference \|\| readback\.stage\.jm1pub_publishingintakereference/)
 })
 
 test('dispatch service reuses governed branding and package notification controls', () => {

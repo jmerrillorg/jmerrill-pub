@@ -336,7 +336,7 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
 
   const delivery = await sendAuthorPackageThroughRelay({
     gateId,
-    intakeCode: normalizeIntakeReference(stringValue(readback.stage.jm1pub_intakereference || readback.stage.jm1pub_publishingintakereference)),
+    intakeCode: canonicalStageIntakeReference(readback.stage),
     titleName: readback.titleName,
     authorName: readback.authorName,
     authorEmail: readback.recipientEmail,
@@ -525,9 +525,7 @@ function validateReadback(input: PublishingDispatchRequest, readback: DispatchRe
     qa: notification.ok && readback.materializationBlockers.length === 0 ? 'PASS' : 'FAIL',
     duplicateSend: 'PASS',
     currentGate: readback.activeGates.length <= 1 ? 'PASS' : 'FAIL',
-    intakeReference: normalizeIntakeReference(stringValue(readback.stage.jm1pub_intakereference || readback.stage.jm1pub_publishingintakereference))
-      ? 'PASS'
-      : 'FAIL',
+    intakeReference: stageHasCanonicalIntakeReferences(readback.stage) ? 'PASS' : 'FAIL',
     currentPackageVersion: readback.packageVersion ? 'PASS' : 'FAIL',
     requiredAttachments: readback.materializationBlockers.length === 0 && readback.requiredAttachments.length > 0 ? 'PASS' : 'FAIL',
     attachmentChecksums: readback.requiredAttachments.every((attachment) => Boolean(attachment.sha256)) ? 'PASS' : 'FAIL',
@@ -934,6 +932,16 @@ function buildAuthorResponseUrl(input: { titleId: string; stageId: string; packa
 function normalizeIntakeReference(value: string) {
   const normalized = value.trim().toUpperCase()
   return INTAKE_REFERENCE_PATTERN.test(normalized) ? normalized : ''
+}
+
+function stageHasCanonicalIntakeReferences(stage: DataverseRow) {
+  return Boolean(canonicalStageIntakeReference(stage))
+}
+
+function canonicalStageIntakeReference(stage: DataverseRow) {
+  const stageReference = normalizeIntakeReference(stringValue(stage.jm1pub_intakereference))
+  const publishingReference = normalizeIntakeReference(stringValue(stage.jm1pub_publishingintakereference))
+  return stageReference && publishingReference && stageReference === publishingReference ? stageReference : ''
 }
 
 function stableChecksum(value: string | Buffer) {
