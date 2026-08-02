@@ -78,5 +78,53 @@ Interior Layout release now requires:
 
 Production dispatch has not been rerun after this local repair because the repair is pending PR #388 review, merge, and production deployment.
 
+## Post-Merge Production Readback
+
+PR #388 was merged at 2026-08-02T08:24:59Z.
+
+- Merge SHA: 6dfced3f3f2f045b23d953bc741f6f45dbb894d1
+- Push deployment run: 30739730564
+- Staging certification: PASS
+- Production health readback: `/api/health` returned ready for release 6dfced3f3f2f045b23d953bc741f6f45dbb894d1 at 2026-08-02T08:33:43Z
+- Manual production promotion run: 30739951011
+- Promotion result: staging deploy conflict before explicit swap; production already reported the merge SHA after the prior staging auto-swap behavior
+
+## Repaired Protected Dry-Run
+
+- Workflow run: 30740022009
+- Mode: dry-run
+- Title selector: JMP-INT-202607-DL2T20
+- Production release: 6dfced3f3f2f045b23d953bc741f6f45dbb894d1
+
+Result:
+BLOCKED
+
+Resolved:
+
+- Canonical title: PASS, `2d21ab5b-4d80-f111-ab0f-7c1e525b15c2`
+- Current stage: PASS, `c2799c31-8f80-f111-ab0f-00224820105b`
+- Canonical recipient: PASS, `c8c8747e-6675-f111-ab0f-6045bdd69678`
+- Recipient email: PASS, `hagher.hagher@ymail.com`
+- Active gates: 0
+- Current artifacts: 13
+- Author-visible artifacts: 1
+
+Remaining blockers:
+
+- REQUIRED_PACKAGE_ATTACHMENT_NOT_READY:editorialMemo
+- REQUIRED_PACKAGE_ATTACHMENT_NOT_READY:reviewInstructions
+- REQUIRED_PACKAGE_ATTACHMENT_NOT_READY:authorResponseMechanism
+- REQUIRED_PACKAGE_ATTACHMENT_NOT_READY:packageManifest
+- REQUIRED_PACKAGE_ATTACHMENT_NOT_READY:authorCoverMessage
+
+No package, gate, communication, or response clock was created.
+
+## Final Boundary
+
+The canonical title-resolution defect is repaired. The General's Will and Last Testament is not yet releasable because the required author-visible package components have not been registered in Dataverse/SharePoint for the protected worker to materialize.
+
+Next executable action:
+Register or convert the existing governed Developmental work into author-visible package artifacts for the five missing roles, then rerun the protected dry-run before confirmed dispatch.
+
 Secret values retained:
 0
