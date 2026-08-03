@@ -1,0 +1,33 @@
+{
+  "package": "JMP-VELLUM-STANDARD-TITLE-TEMPLATE-2026-08-02",
+  "created": "2026-08-02",
+  "classification": "JMP INTERNAL TITLE-ASSEMBLY SOURCE",
+  "authorFacing": false,
+  "sourceTemplate": {
+    "path": "/Volumes/UsersExternal/_ACTIVE_WORK/template.docx",
+    "sha256": "15d8a880706920a27fabc2497579a6bd7842213361474af667cdec02d1ba7d85"
+  },
+  "vellumMasterReadback": {
+    "path": "/var/folders/82/0rhxg0td5rv0l15h8x74yb8w0000gn/T/TemporaryItems/NSIRD_screencaptureui_5E8hP2/Screenshot 2026-08-02 at 7.13.32 PM.png",
+    "sha256": "bb6559c5bdfa46aceaf53a00266bd755c74f4904e5a7840e76d6b1897aa3b955"
+  },
+  "guards": [
+    "INTERNAL_TEMPLATE_CONTENT_EXPOSED",
+    "UNRESOLVED_TEMPLATE_PLACEHOLDER",
+    "SAMPLE_CONTENT_PRESENT",
+    "UNUSED_FORMAT_METADATA_PRESENT",
+    "MULTIPLE_DISCLAIMERS_SELECTED",
+    "INVALID_ISBN_FORMAT_MAPPING",
+    "MISSING_REQUIRED_TITLE_METADATA",
+    "INTERNAL_TEMPLATE_GUIDANCE_EXPOSED"
+  ],
+  "files": [
+    "00-executive-summary.md",
+    "01-template-version-register.md",
+    "02-assembly-standard.md",
+    "03-format-isbn-and-disclaimer-policy.md",
+    "04-preflight-and-five-title-application.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}

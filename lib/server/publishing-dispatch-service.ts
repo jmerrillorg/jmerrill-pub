@@ -127,6 +127,12 @@ export type OperationalDeliveryCertificationRequest = {
   dryRun?: boolean
   evidence: OperationalDeliveryCertificationEvidence
   portalStatus?: 'AVAILABLE' | 'NOT_ACTIVATED' | 'TEMPORARILY_UNAVAILABLE' | 'NOT_APPLICABLE'
+  authorResponseAlreadyReceived?: boolean
+  authorResponseClassification?:
+    | 'APPROVE_AS_PRESENTED'
+    | 'APPROVE_WITH_CORRECTIONS'
+    | 'QUESTIONS_OR_CLARIFICATION_REQUESTED'
+    | 'AMBIGUOUS_RESPONSE'
 }
 
 export type OperationalDeliveryCertificationResult = {
@@ -201,6 +207,8 @@ export async function certifyOperationalDelivery(
     ? ''
     : 'OPERATIONAL_CERTIFICATION_BLOCKED:TECHNICAL_RELEASE_EVIDENCE_MISSING'
   const blockers = [...evidenceBlockers, ...gateBlockers, technicalReleaseBlocker].filter(Boolean)
+  const authorResponseAlreadyReceived = input.authorResponseAlreadyReceived === true
+  const authorResponseClassification = input.authorResponseClassification || 'AMBIGUOUS_RESPONSE'
   const base = {
     service: 'PublishingDispatchService' as const,
     operation: 'certifyOperationalDelivery' as const,
@@ -214,8 +222,12 @@ export async function certifyOperationalDelivery(
     blockers,
     proposedMutations: [
       'record-operational-delivery-certification',
-      'move-one-canonical-gate-to-awaiting-author-response',
-      'start-seven-day-response-clock-after-certification',
+      authorResponseAlreadyReceived
+        ? 'preserve-author-response-without-retroactive-response-clock'
+        : 'move-one-canonical-gate-to-awaiting-author-response',
+      authorResponseAlreadyReceived
+        ? 'do-not-create-retroactive-seven-day-response-clock'
+        : 'start-seven-day-response-clock-after-certification',
       'write-operational-certification-execution-log',
       'refresh-publisher-operating-center-projection',
       'refresh-author-operating-center-projection-as-secondary-view',
@@ -236,16 +248,30 @@ export async function certifyOperationalDelivery(
 
   const now = new Date().toISOString()
   await Promise.all([
-    dataversePatch(config, 'jm1pub_editorialapprovalgates', input.gateId, {
-      jm1pub_gatestatus: GATE_STATUS_AWAITING_AUTHOR_RESPONSE,
-      jm1pub_nextstageauthorized: false,
-      jm1pub_awaitingsince: now,
-      jm1pub_authorresponsesummary: `${readback.stageLabel} package delivery is OPERATIONALLY_CERTIFIED. Seven-calendar-day author response period started after compliant email delivery.`,
-      jm1pub_authordecisionsource: `operational-certification:${readback.idempotencyKey}`.slice(0, 100),
-      jm1pub_correlationid: correlationId,
-    }),
+    dataversePatch(
+      config,
+      'jm1pub_editorialapprovalgates',
+      input.gateId,
+      authorResponseAlreadyReceived
+        ? {
+            jm1pub_nextstageauthorized: false,
+            jm1pub_authorresponsesummary: `${readback.stageLabel} package delivery is OPERATIONALLY_CERTIFIED. Author response already received and classified as ${authorResponseClassification}; no seven-day response clock was created retroactively.`,
+            jm1pub_authordecisionsource: `operational-certification-response:${readback.idempotencyKey}`.slice(0, 100),
+            jm1pub_correlationid: correlationId,
+          }
+        : {
+            jm1pub_gatestatus: GATE_STATUS_AWAITING_AUTHOR_RESPONSE,
+            jm1pub_nextstageauthorized: false,
+            jm1pub_awaitingsince: now,
+            jm1pub_authorresponsesummary: `${readback.stageLabel} package delivery is OPERATIONALLY_CERTIFIED. Seven-calendar-day author response period started after compliant email delivery.`,
+            jm1pub_authordecisionsource: `operational-certification:${readback.idempotencyKey}`.slice(0, 100),
+            jm1pub_correlationid: correlationId,
+          },
+    ),
     dataversePatch(config, 'jm1pub_editorialstages', input.stageId, {
-      jm1pub_internaloperationalsummary: `PublishingDispatchService certified operational delivery. Email is the official delivery mechanism; branded HTML, plain text, required attachments, checksums, archive, Dataverse send evidence, direct reply path, and single gate passed. Author Operating Center status ${input.portalStatus || 'NOT_APPLICABLE'} is secondary and non-blocking. Idempotency ${readback.idempotencyKey}.`,
+      jm1pub_internaloperationalsummary: authorResponseAlreadyReceived
+        ? `PublishingDispatchService certified operational delivery after the author had already responded. Email is the official delivery mechanism; branded HTML, plain text, required attachments, checksums, archive, Dataverse send evidence, direct reply path, and single gate passed. Author response classification ${authorResponseClassification}; no response clock was created. Author Operating Center status ${input.portalStatus || 'NOT_APPLICABLE'} is secondary and non-blocking. Idempotency ${readback.idempotencyKey}.`
+        : `PublishingDispatchService certified operational delivery. Email is the official delivery mechanism; branded HTML, plain text, required attachments, checksums, archive, Dataverse send evidence, direct reply path, and single gate passed. Author Operating Center status ${input.portalStatus || 'NOT_APPLICABLE'} is secondary and non-blocking. Idempotency ${readback.idempotencyKey}.`,
       jm1pub_currentgatecount: 1,
       jm1pub_correlationid: correlationId,
     }),
@@ -256,8 +282,13 @@ export async function certifyOperationalDelivery(
     name: `PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED - ${readback.titleName}`,
     description: [
       `Operational delivery certification passed by ${input.operator || SYSTEM_OPERATOR}.`,
-      `Gate ${input.gateId} moved to AWAITING_AUTHOR_RESPONSE after branded HTML, plain text, required attachments, attachment checksums, archive, Dataverse send evidence, direct reply path, and single active gate passed. Portal status ${input.portalStatus || 'NOT_APPLICABLE'} is secondary and not required for ordinary editorial review.`,
-      `Seven-day response clock started at ${now}. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}. Correlation ${correlationId}.`,
+      authorResponseAlreadyReceived
+        ? `Author response was already received and classified as ${authorResponseClassification}; gate was not moved to AWAITING_AUTHOR_RESPONSE and no seven-day response clock was created retroactively.`
+        : `Gate ${input.gateId} moved to AWAITING_AUTHOR_RESPONSE after branded HTML, plain text, required attachments, attachment checksums, archive, Dataverse send evidence, direct reply path, and single active gate passed.`,
+      `Portal status ${input.portalStatus || 'NOT_APPLICABLE'} is secondary and not required for ordinary editorial review.`,
+      authorResponseAlreadyReceived
+        ? `Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}. Correlation ${correlationId}.`
+        : `Seven-day response clock started at ${now}. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}. Correlation ${correlationId}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: input.gateId,

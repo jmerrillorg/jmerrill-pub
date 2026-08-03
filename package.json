@@ -19,6 +19,7 @@
     "royalty-import-guard": "node scripts/check-royalty-import-route.mjs",
     "program005-pipeline-guard": "node scripts/program005_publishing_pipeline_reliability.test.mjs",
     "program006-dispatch-guard": "node --test scripts/program006_publishing_dispatch_service.test.mjs",
+    "vellum-template-guard": "node --test scripts/vellum_title_template_governance.test.mjs",
     "workflow-engine-guard": "node scripts/check-canonical-workflow-engine-declarations.mjs",
     "commercial-architecture-guard": "node scripts/commercial_architecture_guard.test.mjs",
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",

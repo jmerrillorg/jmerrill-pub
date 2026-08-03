@@ -55,6 +55,12 @@ export async function POST(req: Request) {
       evidence?: Partial<OperationalDeliveryCertificationEvidence>
       evidenceReferences?: EvidenceReferences
       portalStatus?: 'AVAILABLE' | 'NOT_ACTIVATED' | 'TEMPORARILY_UNAVAILABLE' | 'NOT_APPLICABLE'
+      authorResponseAlreadyReceived?: boolean
+      authorResponseClassification?:
+        | 'APPROVE_AS_PRESENTED'
+        | 'APPROVE_WITH_CORRECTIONS'
+        | 'QUESTIONS_OR_CLARIFICATION_REQUESTED'
+        | 'AMBIGUOUS_RESPONSE'
     } | null
     if (!body) return NextResponse.json({ error: 'Request body is required.' }, { status: 400 })
     if (!body.packageId || !body.titleId || !body.stageId || !body.recipientContactId || !body.gateId) {
@@ -85,6 +91,8 @@ export async function POST(req: Request) {
       dryRun: body.dryRun === true,
       evidence,
       portalStatus: body.portalStatus || 'NOT_APPLICABLE',
+      authorResponseAlreadyReceived: body.authorResponseAlreadyReceived === true,
+      authorResponseClassification: body.authorResponseClassification,
       operator: identity.subject,
     })
 
