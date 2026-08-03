@@ -25,7 +25,8 @@
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",
     "author-communication-brand-guard": "node --test scripts/author_communication_brand_guard.test.mjs",
     "functions-package-access-guard": "node scripts/check-functions-package-access-hygiene.mjs",
-    "dirty-worktree-scope-guard": "node scripts/dirty_worktree_scope_guard.mjs"
+    "dirty-worktree-scope-guard": "node scripts/dirty_worktree_scope_guard.mjs",
+    "gate-w3-slot-identity-guard": "node scripts/gate_w3_slot_identity_guard.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",

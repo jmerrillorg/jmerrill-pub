@@ -200,11 +200,30 @@ Reason:
   stale staging content after the swap, not a reproducible Azure-owned platform
   failure.
 
+## Closure Update
+
+Additional closure work completed on 2026-08-03 is preserved in `GATE-W3-APP-SERVICE-PLATFORM-CLOSURE.md`.
+
+Final two-slot readback:
+
+| Slot | Result |
+| --- | --- |
+| Production | 200 / ready / production |
+| Staging | 200 / ready / staging |
+
+Environment identity root cause:
+
+`NON_STICKY_SLOT_IDENTITY_SETTINGS_AFTER_SWAP_WITH_STALE_NODE_ENV_AND_STAGING_CONTENT_DRIFT`
+
+The staging slot was refreshed with the governed minimal readiness package and aligned to `WEBSITE_RUN_FROM_PACKAGE=1`. `JM1_SLOT_ENVIRONMENT` and `NODE_ENV` are now slot-specific for production and staging.
+
+Permanent guard added: `npm run gate-w3-slot-identity-guard`.
+
 ## Final Classification
 
-GATE-W3:
+GATE-W3 App Service platform gate:
 
-`CLOSED — CURRENT TOOLCHAIN REMEDIATION`
+`CLOSED`
 
 Root cause:
 
@@ -212,11 +231,11 @@ Root cause:
 
 Production health:
 
-`READY`
+`200 / ready / production`
 
-Staging:
+Staging health:
 
-`REFRESH REQUIRED BEFORE REUSE`
+`200 / ready / staging`
 
 PR #358:
 
@@ -224,9 +243,4 @@ PR #358:
 
 ## Required Follow-Up
 
-1. Refresh the staging slot with the approved minimal Productions readiness
-   package before future use.
-2. Correct the readiness response label so the production hostname reports
-   `environment: "production"` in a future package/config update.
-3. Append this current-toolchain retry evidence to the historical PR #358
-   disposition and close the draft rather than merging its historical file set.
+Commission the full J Merrill Productions application deployment as a separate Human-First workstream before authorizing DNS or customer traffic migration.

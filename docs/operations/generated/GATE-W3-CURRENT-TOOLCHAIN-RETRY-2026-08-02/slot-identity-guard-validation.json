@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "checkedAt": "2026-08-03T02:12:08.756Z",
+  "expectedRelease": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+  "production": {
+    "label": "production",
+    "url": "https://app-jm1-productions-prod.azurewebsites.net/api/health",
+    "statusCode": 200,
+    "responseMs": 1905,
+    "body": {
+      "status": "ready",
+      "service": "JM1 Enterprise Web Platform",
+      "message": "Infrastructure Ready. Production traffic has not migrated.",
+      "property": "jmerrill.productions",
+      "environment": "production",
+      "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+      "traffic_migrated": false
+    }
+  },
+  "staging": {
+    "label": "staging",
+    "url": "https://app-jm1-productions-prod-staging.azurewebsites.net/api/health",
+    "statusCode": 200,
+    "responseMs": 2153,
+    "body": {
+      "status": "ready",
+      "service": "JM1 Enterprise Web Platform",
+      "message": "Infrastructure Ready. Production traffic has not migrated.",
+      "property": "jmerrill.productions",
+      "environment": "staging",
+      "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+      "traffic_migrated": false
+    }
+  },
+  "failures": []
+}

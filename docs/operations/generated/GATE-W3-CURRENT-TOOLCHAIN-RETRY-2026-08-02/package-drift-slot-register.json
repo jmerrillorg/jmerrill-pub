@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-08-03T02:13:13.385347Z",
+  "rootCause": "DEPLOYMENT_PACKAGE_DEFECT_OR_PRODUCTION_SLOT_CONTENT_DRIFT",
+  "environmentIdentityRootCause": "NON_STICKY_SLOT_IDENTITY_SETTINGS_AFTER_SWAP_WITH_STALE_NODE_ENV_AND_STAGING_CONTENT_DRIFT",
+  "production": {
+    "app": "app-jm1-productions-prod",
+    "host": "app-jm1-productions-prod.azurewebsites.net",
+    "health": "200 / ready",
+    "environment": "production",
+    "releaseIdentity": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+    "package": "governed minimal readiness package already healthy after slot-setting propagation",
+    "swapCorrelation": "f668e224-ec6f-402c-8a41-13701d789ff8",
+    "swapDuringClosure": false
+  },
+  "staging": {
+    "app": "app-jm1-productions-prod/staging",
+    "host": "app-jm1-productions-prod-staging.azurewebsites.net",
+    "health": "200 / ready",
+    "environment": "staging",
+    "releaseIdentity": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+    "packagePath": "/private/tmp/gate-w3-minimal-runtime-20260730.zip",
+    "packageSha256": "913fd27cdac46baadffe636527dc5582ed23125f91468d056127887fd5293652",
+    "initialRefreshDeploymentId": "cb823b4f-e584-4288-b16d-cdb9e72dd37b",
+    "finalRefreshDeploymentId": "54b2eecb-b185-4964-ad24-e624cdd8d12b",
+    "targetSlot": "staging"
+  },
+  "preSwapComparisonRequiredForFuturePromotion": {
+    "stagingPackage": "VALIDATED",
+    "productionCurrentPackage": "RECORDED",
+    "rollbackPackage": "KNOWN",
+    "slotSettings": "VERIFIED",
+    "environmentIdentity": "CORRECT"
+  },
+  "dnsChanges": 0,
+  "trafficMigration": 0,
+  "planResize": 0,
+  "resourceRecreation": 0
+}

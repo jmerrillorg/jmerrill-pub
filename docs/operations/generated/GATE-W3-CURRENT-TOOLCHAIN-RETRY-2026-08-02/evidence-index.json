@@ -4,9 +4,9 @@
   "executionBranch": "codex/gate-w3-current-toolchain-retry",
   "base": "origin/main@b448cd1dbd41b521b63d20cfbe1ab3272ce69582",
   "target": "app-jm1-productions-prod",
-  "result": "GATE_W3_CLOSED_CURRENT_TOOLCHAIN_REMEDIATION",
+  "result": "GATE_W3_APP_SERVICE_PLATFORM_GATE_CLOSED",
   "rootCause": "DEPLOYMENT_PACKAGE_DEFECT_OR_PRODUCTION_SLOT_CONTENT_DRIFT",
-  "productionHealth": "READY",
+  "productionHealth": "200_READY_PRODUCTION",
   "microsoftSupportTicket": "NOT_OPENED",
   "secretValuesRetained": 0,
   "files": [
@@ -40,8 +40,17 @@
     "raw/app-jm1-productions-prod-staging-scm-uri-only.json",
     "raw/app-jm1-productions-prod-staging-show.json",
     "raw/asp-jm1-web-prod-linux-plan.json",
-    "raw/production-slot-swap-operation.json"
+    "raw/production-slot-swap-operation.json",
+    "GATE-W3-APP-SERVICE-PLATFORM-CLOSURE.md",
+    "two-slot-final-readback.json",
+    "slot-specific-settings-readback.json",
+    "package-drift-slot-register.json",
+    "slot-identity-guard-validation.json"
   ],
   "rawLogArchiveRetained": false,
-  "rawLogArchiveDisposition": "Not retained in repository evidence; archive inventory only preserved to avoid retaining raw startup log contents."
+  "rawLogArchiveDisposition": "Not retained in repository evidence; archive inventory only preserved to avoid retaining raw startup log contents.",
+  "stagingHealth": "200_READY_STAGING",
+  "environmentIdentityRootCause": "NON_STICKY_SLOT_IDENTITY_SETTINGS_AFTER_SWAP_WITH_STALE_NODE_ENV_AND_STAGING_CONTENT_DRIFT",
+  "slotIdentityGuard": "ACTIVE",
+  "packageDriftGuard": "ACTIVE"
 }
