@@ -1,7 +1,7 @@
 {
   "title": "The Intentional Leader",
   "intakeCode": "JMP-INT-202607-0W5PTQ",
-  "sourceDisposition": "ACTUAL_LAYOUT_SOURCE_RECOVERED",
+  "sourceDisposition": "ACTUAL_PDF_GENERATION_CHAIN_RECOVERED",
   "nativeVellumProjectRecovered": false,
   "pdfGenerator": "LibreOffice headless body conversion plus pypdf front-matter assembly",
   "candidates": [
@@ -9,37 +9,37 @@
       "candidate": "Approved proofread manuscript / recovered production source DOCX",
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Source.docx",
       "sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
-      "classification": "LIKELY_PDF_SOURCE",
-      "basis": "Exact checksum match to approved proofread manuscript; documented by recovered generation evidence as the LibreOffice body-proof source; full Jan 1-Mar 31 coverage.",
+      "classification": "CANONICAL_CONTENT_SOURCE",
+      "basis": "Exact checksum match to approved proofread manuscript and full Jan 1-Mar 31 coverage. It is the content source, not the editable layout source.",
       "dateCoverage": "90/90",
-      "disposition": "Use as recovered body-layout source lineage; not a native Vellum source."
+      "disposition": "Use as content authority for canonical Vellum rebuild; do not call it a layout source."
     },
     {
       "candidate": "Recovered production body proof PDF",
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Proof.pdf",
       "sha256": "723fc053774d733d1293082a75e34c6cc958b960f7474a2ff7b9408be32a4269",
-      "classification": "PROVEN_PDF_SOURCE",
+      "classification": "PROVEN_PDF_GENERATION_COMPONENT",
       "basis": "Manifest names this file as sourceBodyProof; 388 body pages; used with front matter to assemble 393-page author-review release candidate.",
       "dateCoverage": "90/90 body content per prior QA package",
-      "disposition": "Register as recovered body proof source component if protected production mutation path is used."
+      "disposition": "Preserve as historical rendered body proof component, not as canonical editable source."
     },
     {
       "candidate": "Recovered author-review front matter PDF",
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Interior-Layout-Author-Review-Front-Matter.pdf",
       "sha256": "fcd6bebc8f88d839edda4eef7c8df5803fce04ecd7f47605d7c7f09d8dfe99fc",
-      "classification": "PROVEN_PDF_SOURCE",
+      "classification": "PROVEN_PDF_GENERATION_COMPONENT",
       "basis": "Manifest and QA report identify this as the 5-page front matter source assembled with the 388-page body proof.",
       "dateCoverage": "N/A front matter",
-      "disposition": "Register as recovered front-matter source component if protected production mutation path is used."
+      "disposition": "Preserve as historical rendered front-matter component, not as canonical editable source."
     },
     {
       "candidate": "Current live 393-page interior proof PDF",
       "path": "SharePoint item 01DF3SEQI4STBH2YFUXZBZRHWQNBEPGITZ and repo release candidate PDF",
       "sha256": "dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3",
-      "classification": "RELATED_BUT_NOT_SOURCE",
+      "classification": "HISTORICAL_RENDERED_PROOF",
       "basis": "This is the final assembled output; exact checksum matches recovered release candidate, but it is not the editable source.",
       "dateCoverage": "90/90 extracted entries",
-      "disposition": "Preserve as current proof pending corrected lineage registration and readiness review; do not resend yet."
+      "disposition": "Preserve as prior rendered proof with recovered generation chain; supersede before corrected author resend."
     },
     {
       "candidate": "Registered layout DOCX in live artifact record",
@@ -63,10 +63,12 @@
       "candidate": "Master Vellum 2026.vellum template(s)",
       "path": "Local OneDrive template paths, including _Backlist/2026-Smith-TheIntentionalLeader/03_Design/Master Vellum 2026.vellum",
       "sha256": "not captured in repository evidence",
-      "classification": "RELATED_BUT_NOT_SOURCE",
+      "classification": "TEMPLATE_SOURCE_CANDIDATE",
       "basis": "Template/screenshot evidence establishes standard Vellum title template, but no recovered title-specific .vellum project is proven as the current 393-page PDF source.",
       "dateCoverage": "not assessed as title source",
-      "disposition": "Do not classify as actual source without title-specific project evidence."
+      "disposition": "Use as JMP Vellum Master 2026 template candidate for rebuild only after governed import/population and QA."
     }
-  ]
+  ],
+  "editableCanonicalLayoutSourceRecovered": false,
+  "canonicalVellumRebuild": "REQUIRED"
 }

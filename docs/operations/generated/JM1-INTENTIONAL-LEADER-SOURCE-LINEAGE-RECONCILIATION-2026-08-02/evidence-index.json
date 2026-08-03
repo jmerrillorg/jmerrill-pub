@@ -8,7 +8,7 @@
     "mergeSha": "a16ffd38b83bc4f36e495982f8b8dba46261f7fd",
     "correctedClassification": "INCOMPLETE_LAYOUT_SOURCE"
   },
-  "disposition": "ACTUAL_LAYOUT_SOURCE_RECOVERED",
+  "disposition": "ACTUAL_PDF_GENERATION_CHAIN_RECOVERED",
   "nativeVellumProjectRecovered": false,
   "pdfGenerator": "LibreOffice headless body conversion plus pypdf front-matter assembly",
   "authorState": {
@@ -27,13 +27,23 @@
   "files": [
     {
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/00-source-lineage-reconciliation.md",
-      "sha256": "bf8f9bec33041a5df62cdd221481880f14204ced1b9abd27736eb0e01de82149",
-      "bytes": 5509
+      "sha256": "fc1e40d6abaabfb359fa475dddcf15331ab091592e2ddc5d95dddea51b727d17",
+      "bytes": 5972
     },
     {
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/01-source-lineage-guard-requirement.md",
-      "sha256": "ac07bc0fdbd67ae47ea9313077fb3845b440135f8d25b024df666d0e59301935",
-      "bytes": 2782
+      "sha256": "5300d0db200bc87c1dbd718f5ac2e16d57a6d84496e21d9f1d881a33f92082cc",
+      "bytes": 2991
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/02-canonical-vellum-rebuild-readiness.md",
+      "sha256": "9eef893318af739fb1e9dbc5f6c965220e489c8eca9e230aff5abeff2ff5d442",
+      "bytes": 3386
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/evidence-index.json",
+      "sha256": "cc7625279881b4a7ba8f6d0fa7721dbbef32121adbd684e9554209f8758263e1",
+      "bytes": 6760
     },
     {
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/local-source-candidate-paths.txt",
@@ -76,39 +86,26 @@
       "bytes": 741
     },
     {
-      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/sharepoint-search-Interior-Layout-Author-Review-Proof.json",
-      "sha256": "7ea425ef700aa8f8218dba50261ef091849848be3c538972be66c21e427e85ac",
-      "bytes": 69267
-    },
-    {
-      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/sharepoint-search-Interior-Layout-Author-Review.json",
-      "sha256": "ec3deb63563d64f3d0872c1c02f162a27358e614562d41c98007bc8861b20d92",
-      "bytes": 69443
-    },
-    {
-      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/sharepoint-search-JMP-INT-202607-0W5PTQ.json",
-      "sha256": "3fc947202091662bcd744c4f6d1fdb2448e59dc2e3687fdb0c37e32e56d4f2e2",
-      "bytes": 63859
-    },
-    {
-      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/sharepoint-search-Master-Vellum-2026.json",
-      "sha256": "8419c0ce1169112eb3f081261c63afe45f9e9d78cd01f09f424299ed8601c506",
-      "bytes": 8517
-    },
-    {
-      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/sharepoint-search-The-Intentional-Leader.json",
-      "sha256": "e23b78f48b14a006fa565bc8c4ec582f97e491d70fa035f3bf926eb63cc57e7a",
-      "bytes": 72494
-    },
-    {
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/sharepoint-source-candidates.json",
-      "sha256": "748303ec7b25775604b70c9193a3e18aa9c868adf70b2a1d767c7e2c4198433e",
-      "bytes": 124516
+      "sha256": "01401705643c4006dfddd0a1b623d8705865d67a1b5861d282dce6d0367d096d",
+      "bytes": 1813
     },
     {
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/source-candidate-table.json",
-      "sha256": "bc3e012d8bdb93c33c51fc8375c942733c976e4a61559757c599196f1ebd98f3",
-      "bytes": 4733
+      "sha256": "365d09b082b5769c23410f99f4ae0131ffe46457359355167289a25b11b7fbf9",
+      "bytes": 4882
     }
-  ]
+  ],
+  "editableCanonicalLayoutSourceRecovered": false,
+  "canonicalVellumRebuild": "REQUIRED",
+  "authorResendAuthorized": false,
+  "responseClockStarted": false,
+  "fullManuscriptTextCommitted": 0,
+  "fullPdfTextDumpCommitted": 0,
+  "rawBinaryPayloads": 0,
+  "authorApproval": "NO",
+  "responseClock": 0,
+  "correctedResend": "NOT_AUTHORIZED",
+  "rawSearchResultDumpsRetained": 0,
+  "rawSearchResultDumpsDisposition": "REMOVED_AFTER_CLASSIFICATION_CORRECTION_TO_REDUCE_REPEATED_EVIDENCE; STRUCTURED CANDIDATE SUMMARY RETAINED"
 }

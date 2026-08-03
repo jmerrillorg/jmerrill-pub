@@ -16,7 +16,7 @@ Every release-eligible Interior Layout proof must have:
 | Canonical stage | Interior Layout |
 | Current proof artifact | Exactly one current release-eligible proof |
 | Source artifact relationship | Present and current |
-| Source completeness | Covers the complete approved manuscript or approved layout source |
+| Source completeness | Covers the complete approved manuscript and canonical Vellum layout source |
 | Generator record | Present |
 | Manifest | Page count and checksum match actual proof |
 | Supersession state | Failed or incomplete prior artifacts are not current |
@@ -30,6 +30,7 @@ Every release-eligible Interior Layout proof must have:
 | `LAYOUT_SOURCE_COVERAGE_MISMATCH` | Source date/chapter/section coverage does not match the approved manuscript coverage required for the stage. |
 | `MISSING_VELLUM_PROJECT` | Governance requires a native Vellum project for the proof and no project is registered. |
 | `PROOF_SOURCE_RELATIONSHIP_MISSING` | Proof artifact lacks a current source-artifact relationship. |
+| `NONCANONICAL_PDF_ASSEMBLY_PATH` | Proof was created through a non-Vellum assembly path without an approved emergency exception. |
 
 ## Non-Vellum Generator Handling
 
@@ -69,4 +70,4 @@ Dispatch may continue only when:
 
 The incomplete 21 KB Layout DOCX must be superseded from source authority before a corrected resend can occur.
 
-The recovered source chain is sufficient to support protected production reconciliation, but it does not by itself authorize author delivery.
+The recovered LibreOffice/pypdf chain is sufficient to explain the prior PDF lineage, but it is historical rendered-proof evidence only. It does not satisfy the canonical Vellum production source requirement.

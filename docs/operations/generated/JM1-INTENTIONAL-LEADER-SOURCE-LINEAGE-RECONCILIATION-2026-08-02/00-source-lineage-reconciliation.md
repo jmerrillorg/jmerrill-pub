@@ -19,14 +19,17 @@ The registered live Layout DOCX is not a valid source for the current 393-page a
 
 Disposition:
 
-`ACTUAL_LAYOUT_SOURCE_RECOVERED`
+`ACTUAL_PDF_GENERATION_CHAIN_RECOVERED`
 
-The current evidence supports recovery of the actual non-Vellum layout-generation chain, not recovery of a native title-specific Vellum project.
+The current evidence supports recovery of the prior PDF generation chain. It does not support recovery of a native title-specific Vellum project or a reusable canonical editable layout source.
 
 | Item | Result |
 | --- | --- |
 | Native Vellum title project recovered | NO |
-| Current 393-page PDF source chain recovered | YES |
+| Prior 393-page PDF generation chain recovered | YES |
+| Native Vellum title project recovered | NO |
+| Editable canonical layout source recovered | NO |
+| Canonical Vellum rebuild | REQUIRED |
 | PDF generator class | OTHER |
 | Generator evidence | LibreOffice headless body conversion plus pypdf front-matter assembly |
 | Current live PDF checksum | `dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3` |
@@ -36,9 +39,9 @@ The current evidence supports recovery of the actual non-Vellum layout-generatio
 
 | Asset | SHA-256 | Size / Pages | Date coverage | Classification |
 | --- | --- | --- | --- | --- |
-| Approved Proofreading DOCX | `d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922` | 466,220 bytes | Jan 1-Mar 31, 90 / 90 | COMPLETE_APPROVED_SOURCE |
+| Approved Proofreading DOCX | `d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922` | 466,220 bytes | Jan 1-Mar 31, 90 / 90 | CANONICAL_CONTENT_SOURCE |
 | Registered Layout DOCX | `21e9d06ce444bee5289846a448969dfe783e0c81f276904b75f62b122d106a9b` | 21,573 bytes | Jan 1-Jan 5, 5 / 90 | INCOMPLETE |
-| Current Interior PDF | `dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3` | 811,688 bytes / 393 pages | Jan 1-Mar 31, 90 / 90 | RELATED_BUT_NOT_SOURCE |
+| Current Interior PDF | `dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3` | 811,688 bytes / 393 pages | Jan 1-Mar 31, 90 / 90 | HISTORICAL_RENDERED_PROOF |
 
 The incomplete registered Layout DOCX must be superseded from current source authority. It should remain preserved as historical evidence.
 
@@ -48,10 +51,10 @@ The existing governed proof package `JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROO
 
 | Component | SHA-256 | Role | Classification |
 | --- | --- | --- | --- |
-| `2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Source.docx` | `d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922` | Approved proofread manuscript copy used as body source | LIKELY_PDF_SOURCE |
-| `2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Proof.pdf` | `723fc053774d733d1293082a75e34c6cc958b960f7474a2ff7b9408be32a4269` | 388-page body proof | PROVEN_PDF_SOURCE |
-| `2026-08-01-The-Intentional-Leader-Interior-Layout-Author-Review-Front-Matter.pdf` | `fcd6bebc8f88d839edda4eef7c8df5803fce04ecd7f47605d7c7f09d8dfe99fc` | 5-page author-review front matter | PROVEN_PDF_SOURCE |
-| `2026-08-01-The-Intentional-Leader-Interior-Layout-Author-Review-Release-Candidate.pdf` | `dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3` | 393-page assembled output | RELATED_BUT_NOT_SOURCE |
+| `2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Source.docx` | `d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922` | Approved proofread manuscript copy used as body content source | CANONICAL_CONTENT_SOURCE |
+| `2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Proof.pdf` | `723fc053774d733d1293082a75e34c6cc958b960f7474a2ff7b9408be32a4269` | 388-page rendered body proof | PROVEN_PDF_GENERATION_COMPONENT |
+| `2026-08-01-The-Intentional-Leader-Interior-Layout-Author-Review-Front-Matter.pdf` | `fcd6bebc8f88d839edda4eef7c8df5803fce04ecd7f47605d7c7f09d8dfe99fc` | 5-page rendered author-review front matter | PROVEN_PDF_GENERATION_COMPONENT |
+| `2026-08-01-The-Intentional-Leader-Interior-Layout-Author-Review-Release-Candidate.pdf` | `dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3` | 393-page assembled output | HISTORICAL_RENDERED_PROOF |
 
 The release-candidate PDF checksum exactly matches the current SharePoint/Dataverse-readback current Interior PDF checksum.
 
@@ -91,12 +94,13 @@ Do not infer approval from PR #399, this reconciliation, or the recovered source
 Before corrected delivery can proceed:
 
 1. Supersede the 21 KB registered Layout DOCX from current source authority.
-2. Register the recovered complete layout source chain through the protected production mutation path.
-3. Confirm the current proof or a regenerated proof is bound to the corrected source lineage.
-4. Complete copyright/front-matter readiness review against current publishing policy.
-5. Confirm actual proof page count matches the manifest.
-6. Run author-safe package QA under the email-first reset.
-7. Prepare corrected replacement but do not send until Jackie readiness review authorizes delivery.
+2. Supersede the prior 393-page PDF as historical rendered proof once the canonical Vellum proof exists.
+3. Create and register a title-specific Vellum project from the approved Proofreading DOCX and JMP Vellum Master 2026 template.
+4. Generate a new Vellum proof from that canonical project.
+5. Complete copyright/front-matter readiness review against current publishing policy.
+6. Confirm actual proof page count matches the manifest.
+7. Run author-safe package QA under the email-first reset.
+8. Prepare corrected replacement but do not send until Jackie readiness review authorizes delivery.
 
 ## Permanent Guard Requirement
 
@@ -109,6 +113,7 @@ Required failure codes:
 - `LAYOUT_SOURCE_COVERAGE_MISMATCH`
 - `MISSING_VELLUM_PROJECT`
 - `PROOF_SOURCE_RELATIONSHIP_MISSING`
+- `NONCANONICAL_PDF_ASSEMBLY_PATH`
 
 If the proof was generated outside Vellum, the guard must record the actual generator and complete source relationship rather than requiring a false Vellum assertion.
 
@@ -120,4 +125,4 @@ Current release status:
 
 `CORRECTED_REPLACEMENT_PREPARED_NOT_SENT`
 
-The proof must not be resent until the protected production records are reconciled and Jackie readiness review approves corrected delivery.
+The proof must not be resent until the canonical Vellum source is created, the new Vellum proof passes QA, protected production records are reconciled, and Jackie readiness review approves corrected delivery.
