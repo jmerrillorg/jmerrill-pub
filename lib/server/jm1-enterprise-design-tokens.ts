@@ -46,6 +46,9 @@ export type Jm1BrandOverlay = {
   tagline: string
   logoPath: string | null
   approvedAccent: string | null
+  primaryDomain?: string
+  administrativeEmail?: string
+  enterpriseRelationship?: string
   sender?: string
   replyTo?: string
   archiveMailbox?: string
@@ -116,15 +119,18 @@ export const JM1_BRAND_OVERLAYS: Record<Jm1BrandOverlayKey, Jm1BrandOverlay> = {
     approvedAccent: null,
   },
   agapeInternationalCathedral: {
-    brandName: 'AGAPE INTERNATIONAL CATHEDRAL',
+    brandName: 'Agape International Cathedral',
     legalEntityName: 'Agape International Cathedral',
-    teamName: 'The Ministry Team',
-    divisionRelationship: 'Ministry brand identity governed separately from JM1 commercial imprints',
+    teamName: 'Agape International Cathedral',
+    divisionRelationship: 'Governed within JM1 tenant',
     phone: '614.965.6057',
-    email: 'hello@agape.international',
-    website: 'agape.international',
+    email: 'info@agapeic.org',
+    website: 'agapeic.org',
     tagline: 'Serving People With Faith, Purpose, and Care.',
     logoPath: null,
     approvedAccent: null,
+    primaryDomain: 'agapeic.org',
+    administrativeEmail: 'office@agapeic.org',
+    enterpriseRelationship: 'Infrastructure governed within JM1 tenant; public identity remains Agape International Cathedral.',
   },
 }

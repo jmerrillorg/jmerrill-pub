@@ -1,0 +1,67 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-08-03T00:00:00Z",
+  "initiative": "Agape Shared Mailbox Implementation",
+  "currentState": "DOMAIN_VERIFICATION_REQUIRED_BEFORE_MAILBOX_MUTATION",
+  "brand": "Agape International Cathedral",
+  "tenant": "JM1",
+  "primaryDomain": "agapeic.org",
+  "legacyDomain": "agapeic.com",
+  "legacyDomainScope": "EXCLUDED",
+  "separateTenantMigration": "NOT_PLANNED",
+  "mailboxModel": "SHARED_MAILBOXES",
+  "mailboxStrategy": "ROLE_BASED_SHARED_MAILBOXES",
+  "directSharedMailboxSignIn": "PROHIBITED",
+  "communicationRenderer": "JM1 Enterprise Communication Renderer",
+  "brandOverlay": "agapeInternationalCathedral",
+  "domainAuthority": {
+    "azureDnsHost": "Azure DNS",
+    "azureDnsZone": "agapeic.org",
+    "azureDnsResourceGroup": "agape-international-cathedral-rg",
+    "azureDnsAuthority": "CONFIRMED_READ_ONLY",
+    "microsoft365Tenant": "JM1",
+    "microsoft365DomainPresent": false,
+    "microsoft365DomainVerified": false,
+    "exchangeServicesConfigured": false,
+    "websiteDnsPreserved": true
+  },
+  "mailboxAuthority": {
+    "primarySharedMailboxesPlanned": 18,
+    "primarySharedMailboxesCreated": 0,
+    "aliasesPlannedRequired": 2,
+    "aliasesCreated": 0,
+    "delegatesResolved": false,
+    "pilotRequiredBeforeFullSet": true
+  },
+  "whatIsComplete": [
+    "Azure DNS zone readback exported",
+    "Microsoft Graph domain readback completed",
+    "Agape shared mailbox registry prepared",
+    "Bootstrap Agape authority guard prepared",
+    "Agape ECR overlay updated to agapeic.org"
+  ],
+  "whatIsHeld": [
+    "agapeic.org is not present in Microsoft 365 Graph domain readback",
+    "agapeic.org is not verified in Microsoft 365",
+    "Exchange accepted-domain and shared-mailbox mutation is held until domain verification",
+    "Delegate assignment is held until approved licensed JM1/AIC identities are resolved"
+  ],
+  "currentBlockers": [
+    "AIC_DOMAIN_NOT_PRESENT_IN_M365",
+    "AIC_DOMAIN_NOT_VERIFIED_IN_M365",
+    "AIC_EXCHANGE_READINESS_NOT_CONFIRMED",
+    "AIC_MAILBOX_DELEGATE_NOT_AUTHORIZED"
+  ],
+  "mustNotBeRepeated": [
+    "Do not create, alias, migrate, restore, forward, or preserve any @agapeic.com mailbox or alias",
+    "Do not change nameservers",
+    "Do not delete the current Azure DNS zone",
+    "Do not create donate@agapeic.org as a separate mailbox",
+    "Do not create seed@agapeic.org as a separate mailbox",
+    "Do not create bishopmcintoshspeaks@agapeic.org without later approval",
+    "Do not enable DMARC enforcement beyond p=none during this implementation without separate authorization",
+    "Do not grant broad shared mailbox access to all JM1 users",
+    "Do not assign passwords for routine shared-mailbox use"
+  ],
+  "nextAuthorizedAction": "Add agapeic.org to Microsoft 365, obtain the TXT verification record, add it to the existing Azure DNS zone without changing nameservers, and verify the domain before Exchange mailbox mutation."
+}

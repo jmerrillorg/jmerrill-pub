@@ -1,0 +1,12 @@
+1be5c718a83472d8382da57fd7dc2c499d80263c1c9e60bdcd8e19655ee993a2  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/00-executive-summary.md
+39a3dcdf4b7c954aa4276e1eda41fa8524696d9e4e274f964b3141e6b047b351  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/01-domain-and-dns-readback.md
+fecce4c348be399d5613e8771b059754ecf18fced36bfd01c24c962c1c4b30ce  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/02-dns-reconciliation-register.csv
+f3e16ef1159b9e5fd100a6f993c04cd5d92c17c5ead772dda5b1a2903e9583db  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/03-mailbox-registry.csv
+0a7d15dcbedd95374fcc64b4570099d66c7ee096311790a7a36ff1602acae288  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/04-delegate-access-matrix.csv
+e0c119ca7b9022d7c29aa8c2cb99cd362553bea187d8ff1b51fc2ba69942a639  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/05-pilot-validation.md
+3056f56362203f7ef659b55b16ab9c016e694ac79cc4387107594cab0d6d9fdf  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/06-final-mailbox-validation.md
+6c8a8271b430434971045670452b914ad14deb93e05e383b323a529c5cfc6c38  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/07-bootstrap-and-ecr-update.md
+8c7dcbb7d8c74e4bf04898094f6577116aaea551e5d4593818ed031340a34a8e  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/08-rollback-plan.md
+327cd3126ebb22bb0c0463468298d5c3b9f2ade2af1054c9b664a2d7b5e4aa4a  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/evidence-index.json
+40637a27c7b94012aa37af0e029a5e435e85e369a92bc94a8d7bca551c3d9654  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/raw/azure-dns-zone-agapeic.org.json
+b00e132be7dc29a993de75dc62f954dd52f3a146ec21b2932d326d0e9f06d26d  docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03/raw/graph-domains-readback.txt

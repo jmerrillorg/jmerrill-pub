@@ -1,0 +1,328 @@
+[
+  {
+    "ARecords": [
+      {
+        "ipv4Address": "20.119.8.5"
+      }
+    ],
+    "TTL": 3600,
+    "etag": "98367c15-1265-4f13-a299-509201d5d30d",
+    "fqdn": "agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/A/@",
+    "name": "@",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/A"
+  },
+  {
+    "NSRecords": [
+      {
+        "nsdname": "ns1-07.azure-dns.com."
+      },
+      {
+        "nsdname": "ns2-07.azure-dns.net."
+      },
+      {
+        "nsdname": "ns3-07.azure-dns.org."
+      },
+      {
+        "nsdname": "ns4-07.azure-dns.info."
+      }
+    ],
+    "TTL": 172800,
+    "etag": "352d6b84-cf67-4fae-85e7-500d7a706310",
+    "fqdn": "agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/NS/@",
+    "name": "@",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/NS"
+  },
+  {
+    "SOARecord": {
+      "email": "azuredns-hostmaster.microsoft.com",
+      "expireTime": 2419200,
+      "host": "ns1-07.azure-dns.com.",
+      "minimumTTL": 300,
+      "refreshTime": 3600,
+      "retryTime": 300,
+      "serialNumber": 1
+    },
+    "TTL": 3600,
+    "etag": "295281ad-16b3-463a-85a0-5c2c13ef4646",
+    "fqdn": "agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/SOA/@",
+    "name": "@",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/SOA"
+  },
+  {
+    "MXRecords": [
+      {
+        "exchange": "mail.agapeic.org.",
+        "preference": 0
+      }
+    ],
+    "TTL": 3600,
+    "etag": "917ee012-988f-4f0a-a10e-e876535df33c",
+    "fqdn": "agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/MX/@",
+    "name": "@",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/MX"
+  },
+  {
+    "TTL": 3600,
+    "TXTRecords": [
+      {
+        "value": [
+          "v=spf1 a mx include:_spf.hostpma.pro ~all"
+        ]
+      },
+      {
+        "value": [
+          "_r0o71azb9uu64bqmhxqsy0be6p515zb"
+        ]
+      }
+    ],
+    "etag": "59352d1e-25e4-4440-824f-2405eee48a3e",
+    "fqdn": "agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/TXT/@",
+    "name": "@",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/TXT"
+  },
+  {
+    "TTL": 3600,
+    "TXTRecords": [
+      {
+        "value": [
+          "v=DMARC1; p=reject;"
+        ]
+      }
+    ],
+    "etag": "60277416-f948-41c4-b4f7-9b15cea9b087",
+    "fqdn": "_dmarc.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/TXT/_dmarc",
+    "name": "_dmarc",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/TXT"
+  },
+  {
+    "TTL": 3600,
+    "TXTRecords": [
+      {
+        "value": [
+          "v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqdo0cOah7KqTdf7J+9MZp3NaVjsBq416oBR9FKUP98f3Z5vNMFjBHLasCRuz3gzu0hD6RK639yUPcu1h1nfct2C0a9KoCd0UqABLe0XQAr0JZeevoQzSpwG4s1ToS4JPnedEhZ2wppZLsbm1EDerquZLDAS5iLM9K7W1Zfs7Ufh4nt9qUj2cL5i",
+          "OSVkxwQb+aWu1kX0hGYUSaQ57cjJQO0WbzY1RayUCoF0571QMLFs1UNw3FluREFLGu1cEG5ZfPs1LgpZ0A0AB"
+        ]
+      }
+    ],
+    "etag": "d3cccd8e-7eac-4e73-b538-74632e28eae2",
+    "fqdn": "hostingscp._domainkey.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/TXT/hostingscp._domainkey",
+    "name": "hostingscp._domainkey",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/TXT"
+  },
+  {
+    "CNAMERecord": {
+      "cname": "aic-app-service-prod.azurewebsites.net"
+    },
+    "TTL": 3600,
+    "etag": "e7eb967c-01fd-4ec3-8b22-fbabeca192a0",
+    "fqdn": "aic.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/CNAME/aic",
+    "name": "aic",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/CNAME"
+  },
+  {
+    "TTL": 3600,
+    "TXTRecords": [
+      {
+        "value": [
+          "701529A206930C771AC498089963DA8EA3F98018EDE1C3CFB2ADD346DCEF23AE"
+        ]
+      }
+    ],
+    "etag": "daa4393e-1af5-42fb-9f29-13d642b82b0c",
+    "fqdn": "asuid.aic.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/TXT/asuid.aic",
+    "name": "asuid.aic",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/TXT"
+  },
+  {
+    "TTL": 3600,
+    "TXTRecords": [
+      {
+        "value": [
+          "701529A206930C771AC498089963DA8EA3F98018EDE1C3CFB2ADD346DCEF23AE"
+        ]
+      }
+    ],
+    "etag": "f4e3e1e3-47d3-4783-8886-182c0d4953b1",
+    "fqdn": "asuid.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/TXT/asuid",
+    "name": "asuid",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/TXT"
+  },
+  {
+    "CNAMERecord": {
+      "cname": "jm1-agape-dev.azurewebsites.net"
+    },
+    "TTL": 3600,
+    "etag": "4050a971-504b-4304-925e-05ab2d6705d8",
+    "fqdn": "dev.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/CNAME/dev",
+    "name": "dev",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/CNAME"
+  },
+  {
+    "CNAMERecord": {
+      "cname": "mail.agapeic.org."
+    },
+    "TTL": 3600,
+    "etag": "715878ee-05ed-4227-bfde-f3a1b6975031",
+    "fqdn": "imap.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/CNAME/imap",
+    "name": "imap",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/CNAME"
+  },
+  {
+    "ARecords": [
+      {
+        "ipv4Address": "162.246.17.244"
+      }
+    ],
+    "TTL": 3600,
+    "etag": "3ed3ce7b-3316-4ea3-829f-5e0922f75660",
+    "fqdn": "mail.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/A/mail",
+    "name": "mail",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/A"
+  },
+  {
+    "ARecords": [
+      {
+        "ipv4Address": "162.246.17.244"
+      }
+    ],
+    "TTL": 3600,
+    "etag": "36a0a88a-c36e-47ad-8fff-80a9410988b3",
+    "fqdn": "mysql.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/A/mysql",
+    "name": "mysql",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/A"
+  },
+  {
+    "CNAMERecord": {
+      "cname": "mail.agapeic.org."
+    },
+    "TTL": 3600,
+    "etag": "44289328-cb80-4eaa-9059-a2ec7a8c2a8d",
+    "fqdn": "pop.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/CNAME/pop",
+    "name": "pop",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/CNAME"
+  },
+  {
+    "CNAMERecord": {
+      "cname": "mail.agapeic.org."
+    },
+    "TTL": 3600,
+    "etag": "72d00003-aba9-410c-b172-6494e3e8f5a9",
+    "fqdn": "smtp.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/CNAME/smtp",
+    "name": "smtp",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/CNAME"
+  },
+  {
+    "CNAMERecord": {
+      "cname": "aic-app-service-prod.azurewebsites.net"
+    },
+    "TTL": 3600,
+    "etag": "30757bcc-4583-4c82-baa7-cd1b53014c59",
+    "fqdn": "www.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/CNAME/www",
+    "name": "www",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/CNAME"
+  },
+  {
+    "TTL": 3600,
+    "TXTRecords": [
+      {
+        "value": [
+          "701529A206930C771AC498089963DA8EA3F98018EDE1C3CFB2ADD346DCEF23AE"
+        ]
+      }
+    ],
+    "etag": "8eedb279-8bdc-4637-9df3-def59b9bfabe",
+    "fqdn": "asuid.www.agapeic.org.",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/agape-international-cathedral-rg/providers/Microsoft.Network/dnszones/agapeic.org/TXT/asuid.www",
+    "name": "asuid.www",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "agape-international-cathedral-rg",
+    "targetResource": {},
+    "trafficManagementProfile": {},
+    "type": "Microsoft.Network/dnszones/TXT"
+  }
+]

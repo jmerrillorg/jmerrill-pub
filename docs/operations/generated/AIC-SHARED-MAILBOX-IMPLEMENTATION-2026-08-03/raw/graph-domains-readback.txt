@@ -1,0 +1,125 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#domains(id,isVerified,isDefault,supportedServices,authenticationType)",
+  "value": [
+    {
+      "authenticationType": "Managed",
+      "id": "jmerrillfoundation.onmicrosoft.com",
+      "isDefault": false,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline"
+      ]
+    },
+    {
+      "authenticationType": "Managed",
+      "id": "jmerrill.foundation",
+      "isDefault": false,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline",
+        "Intune"
+      ]
+    },
+    {
+      "authenticationType": "Managed",
+      "id": "jmerrill.financial",
+      "isDefault": false,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline",
+        "Intune"
+      ]
+    },
+    {
+      "authenticationType": "Managed",
+      "id": "jmerrill.org",
+      "isDefault": false,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline",
+        "Intune"
+      ]
+    },
+    {
+      "authenticationType": "Managed",
+      "id": "jmerrill.pub",
+      "isDefault": false,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline",
+        "Intune"
+      ]
+    },
+    {
+      "authenticationType": "Managed",
+      "id": "jmerrill.productions",
+      "isDefault": false,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline",
+        "Intune"
+      ]
+    },
+    {
+      "authenticationType": "Managed",
+      "id": "jmerrill.one",
+      "isDefault": true,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline",
+        "Intune"
+      ]
+    },
+    {
+      "authenticationType": "Managed",
+      "id": "authors.jmerrill.one",
+      "isDefault": false,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline",
+        "Intune"
+      ]
+    },
+    {
+      "authenticationType": "Managed",
+      "id": "clients.jmerrill.one",
+      "isDefault": false,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline",
+        "Intune"
+      ]
+    },
+    {
+      "authenticationType": "Managed",
+      "id": "support.jmerrill.one",
+      "isDefault": false,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline",
+        "Intune"
+      ]
+    },
+    {
+      "authenticationType": "Managed",
+      "id": "media.jmerrill.one",
+      "isDefault": false,
+      "isVerified": true,
+      "supportedServices": [
+        "Email",
+        "OfficeCommunicationsOnline",
+        "Intune"
+      ]
+    }
+  ]
+}

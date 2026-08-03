@@ -9,6 +9,27 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: process.cwd(), encoding: 'utf8' }).trim()
 const args = parseArgs(process.argv.slice(2))
 
+const AIC_CANON = {
+  brand: 'Agape International Cathedral',
+  tenant: 'JM1',
+  primaryDomain: 'agapeic.org',
+  legacyDomain: 'agapeic.com',
+  legacyDomainScope: 'EXCLUDED',
+  separateTenantMigration: 'NOT_PLANNED',
+  mailboxModel: 'SHARED_MAILBOXES',
+  mailboxStrategy: 'ROLE_BASED_SHARED_MAILBOXES',
+  directSharedMailboxSignIn: 'PROHIBITED',
+  communicationRenderer: 'JM1 Enterprise Communication Renderer',
+  brandOverlay: 'agapeInternationalCathedral',
+  failureCodes: [
+    'AIC_UNAPPROVED_SENDER',
+    'AIC_LEGACY_DOMAIN_SELECTED',
+    'AIC_SHARED_MAILBOX_DIRECT_SIGNIN',
+    'AIC_MAILBOX_DELEGATE_NOT_AUTHORIZED',
+    'AIC_ECR_OVERLAY_NOT_LOADED',
+  ],
+}
+
 const bootstrapVersion = '1.0.0'
 const initiative = args.initiative || 'repository'
 const mode = args.mode || 'read-only'
@@ -186,6 +207,39 @@ function loadRuntimeCanon() {
 }
 
 function loadInitiativeContext(name, activeHandoff) {
+  if (/agape.*shared mailbox|aic.*shared mailbox/i.test(name)) {
+    return {
+      status: activeHandoff ? 'loaded' : 'loaded',
+      initiativeType: 'identity-mailbox',
+      name: activeHandoff?.initiative || 'Agape Shared Mailbox Implementation',
+      brand: AIC_CANON.brand,
+      tenant: AIC_CANON.tenant,
+      primaryDomain: AIC_CANON.primaryDomain,
+      legacyDomain: AIC_CANON.legacyDomain,
+      legacyDomainScope: AIC_CANON.legacyDomainScope,
+      separateTenantMigration: AIC_CANON.separateTenantMigration,
+      mailboxModel: AIC_CANON.mailboxModel,
+      mailboxStrategy: AIC_CANON.mailboxStrategy,
+      directSharedMailboxSignIn: AIC_CANON.directSharedMailboxSignIn,
+      communicationRenderer: AIC_CANON.communicationRenderer,
+      brandOverlay: AIC_CANON.brandOverlay,
+      currentStage: {
+        state: activeHandoff?.currentState || 'DOMAIN_VERIFICATION_REQUIRED_BEFORE_MAILBOX_MUTATION',
+      },
+      domainAuthority: activeHandoff?.domainAuthority || {
+        azureDnsZone: 'agapeic.org',
+        azureDnsHost: 'Azure DNS',
+        microsoft365DomainPresent: null,
+        microsoft365DomainVerified: null,
+        exchangeServicesConfigured: null,
+      },
+      mailboxAuthority: activeHandoff?.mailboxAuthority || {},
+      currentBlockers: activeHandoff?.currentBlockers || [],
+      currentHolds: activeHandoff?.whatIsHeld || [],
+      failureCodes: AIC_CANON.failureCodes,
+      openDecisions: activeHandoff?.openDecisions || [],
+    }
+  }
   if (/intentional leader/i.test(name)) {
     const artifact = activeHandoff?.artifacts?.find((item) => item.role === 'approved-proof') || {}
     return {
@@ -322,6 +376,15 @@ function detectConflicts({ runtimeCanon, repositoryCanon, initiativeContext, han
   if (runtimeCanon.communication.portalRequired !== repositoryCanon.communication.portalRequired) conflicts.push('CANON_RUNTIME_CONFLICT')
   if (/intentional leader/i.test(initiativeContext.name) && initiativeContext.imprint !== 'J Merrill Publishing') conflicts.push('TITLE_METADATA_CONFLICT')
   if (/intentional leader/i.test(initiativeContext.name) && !handoff) conflicts.push('STALE_HANDOFF_RECORD')
+  if (/agape.*shared mailbox/i.test(initiativeContext.name)) {
+    if (initiativeContext.legacyDomainScope !== 'EXCLUDED') conflicts.push('AIC_LEGACY_DOMAIN_SELECTED')
+    if (initiativeContext.directSharedMailboxSignIn !== 'PROHIBITED') conflicts.push('AIC_SHARED_MAILBOX_DIRECT_SIGNIN')
+    if (initiativeContext.brandOverlay !== 'agapeInternationalCathedral') conflicts.push('AIC_ECR_OVERLAY_NOT_LOADED')
+    if (initiativeContext.domainAuthority?.microsoft365DomainPresent !== true) conflicts.push('AIC_DOMAIN_NOT_PRESENT_IN_M365')
+    if (initiativeContext.domainAuthority?.microsoft365DomainVerified !== true) conflicts.push('AIC_DOMAIN_NOT_VERIFIED_IN_M365')
+    if (initiativeContext.domainAuthority?.exchangeServicesConfigured !== true) conflicts.push('AIC_EXCHANGE_READINESS_NOT_CONFIRMED')
+    if (initiativeContext.mailboxAuthority?.delegatesResolved !== true) conflicts.push('AIC_MAILBOX_DELEGATE_NOT_AUTHORIZED')
+  }
   if (worktree.behind > 0) conflicts.push('STALE_BRANCH_AUTHORITY')
   return [...new Set(conflicts)]
 }
@@ -335,6 +398,7 @@ function deriveStopConditions({ enterpriseCanon, repositoryCanon, runtimeCanon, 
   if (worktree.behind > 0) stops.push('STALE_BRANCH_AUTHORITY')
   if (conflicts.includes('CANON_RUNTIME_CONFLICT')) stops.push('CANON_RUNTIME_CONFLICT')
   if (conflicts.includes('TITLE_METADATA_CONFLICT')) stops.push('TITLE_METADATA_CONFLICT')
+  for (const conflict of conflicts.filter((item) => item.startsWith('AIC_'))) stops.push(conflict)
   if (executionAuthority.mode === 'production-mutation' && !executionAuthority.mutationAllowed) stops.push('PRODUCTION_MUTATION_AUTHORITY_ABSENT')
   return [...new Set(stops)]
 }
@@ -407,6 +471,14 @@ function printSummary(data) {
   if (data.initiativeContext.additionalAuthorEmail) console.log(`ADDITIONAL_AUTHOR_COMMUNICATION: ${data.initiativeContext.additionalAuthorEmail}`)
   if (data.initiativeContext.protectedArtifactMutation) console.log(`PROTECTED_MUTATION: ${data.initiativeContext.protectedArtifactMutation}`)
   if (data.initiativeContext.interiorLayoutGate) console.log(`INTERIOR_LAYOUT_GATE: ${data.initiativeContext.interiorLayoutGate}`)
+  if (data.initiativeContext.brand === AIC_CANON.brand) {
+    console.log(`BRAND: ${data.initiativeContext.brand}`)
+    console.log(`TENANT: ${data.initiativeContext.tenant}`)
+    console.log(`PRIMARY_DOMAIN: ${data.initiativeContext.primaryDomain}`)
+    console.log(`SEPARATE_TENANT_MIGRATION: ${data.initiativeContext.separateTenantMigration}`)
+    console.log(`MAILBOX_MODEL: ${data.initiativeContext.mailboxModel}`)
+    console.log(`LEGACY_COM_SCOPE: ${data.initiativeContext.legacyDomainScope}`)
+  }
   console.log('DUPLICATE_GATE: PROHIBITED')
   console.log('RETROACTIVE_RESPONSE_CLOCK: PROHIBITED')
   console.log(`OPEN_DECISIONS: ${data.initiativeContext.openDecisions?.length || 0}`)
@@ -438,11 +510,14 @@ function isBootstrapScope(path) {
   return (
     path === '.gitignore' ||
     path === 'gitignore' ||
+    path.startsWith('.bootstrap/') ||
     path === 'package.json' ||
     path.startsWith('scripts/jm1_') ||
     path.startsWith('scripts/jm1-') ||
     path === 'scripts/author_communication_brand_guard.test.mjs' ||
     path === 'scripts/program006_publishing_dispatch_service.test.mjs' ||
+    path === 'scripts/aic_shared_mailbox_guard.test.mjs' ||
+    path.startsWith('lib/server/aic-shared-mailbox-canon') ||
     path.startsWith('lib/server/jm1-enterprise-communication-renderer') ||
     path.startsWith('lib/server/jm1-enterprise-design-tokens') ||
     path === 'lib/server/author-communication-brand.ts' ||
@@ -454,6 +529,7 @@ function isBootstrapScope(path) {
     path === 'docs/schemas/' ||
     path.startsWith('docs/schemas/jm1-bootstrap') ||
     path.startsWith('docs/operations/active/') ||
+    path.startsWith('docs/operations/generated/AIC-SHARED-MAILBOX-IMPLEMENTATION-') ||
     path.startsWith('docs/operations/generated/JM1-GOVERNED-BOOTSTRAP-ECR-')
   )
 }
@@ -469,7 +545,7 @@ function parseArgs(values) {
 }
 
 function parseStatusLine(line) {
-  const raw = line.slice(3)
+  const raw = line.slice(2).trimStart()
   return raw.includes(' -> ') ? raw.split(' -> ').at(-1) || raw : raw
 }
 

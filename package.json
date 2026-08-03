@@ -28,6 +28,7 @@
     "jm1-bootstrap-guard": "node --test scripts/jm1_bootstrap_guard.test.mjs",
     "jm1-canon-consistency-guard": "node --test scripts/jm1_canon_consistency_guard.test.mjs",
     "jm1-initiative-handoff-guard": "node --test scripts/jm1_initiative_handoff_guard.test.mjs",
+    "aic-shared-mailbox-guard": "node --test scripts/aic_shared_mailbox_guard.test.mjs",
     "functions-package-access-guard": "node scripts/check-functions-package-access-hygiene.mjs",
     "dirty-worktree-scope-guard": "node scripts/dirty_worktree_scope_guard.mjs",
     "gate-w3-slot-identity-guard": "node scripts/gate_w3_slot_identity_guard.mjs"

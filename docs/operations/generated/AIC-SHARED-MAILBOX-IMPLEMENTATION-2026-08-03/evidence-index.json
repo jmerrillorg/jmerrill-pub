@@ -1,0 +1,30 @@
+{
+  "package": "AIC-SHARED-MAILBOX-IMPLEMENTATION-2026-08-03",
+  "createdAt": "2026-08-03T00:00:00Z",
+  "status": "PARTIALLY_COMPLETE_MUTATION_HELD",
+  "tenant": "JM1",
+  "brand": "Agape International Cathedral",
+  "primaryDomain": "agapeic.org",
+  "legacyDomainScope": "EXCLUDED",
+  "mutationExecuted": false,
+  "holdReason": [
+    "AIC_DOMAIN_NOT_PRESENT_IN_M365",
+    "AIC_DOMAIN_NOT_VERIFIED_IN_M365",
+    "AIC_EXCHANGE_READINESS_NOT_CONFIRMED",
+    "AIC_MAILBOX_DELEGATE_NOT_AUTHORIZED"
+  ],
+  "evidence": [
+    "00-executive-summary.md",
+    "01-domain-and-dns-readback.md",
+    "02-dns-reconciliation-register.csv",
+    "03-mailbox-registry.csv",
+    "04-delegate-access-matrix.csv",
+    "05-pilot-validation.md",
+    "06-final-mailbox-validation.md",
+    "07-bootstrap-and-ecr-update.md",
+    "08-rollback-plan.md",
+    "raw/azure-dns-zone-agapeic.org.json",
+    "raw/graph-domains-readback.txt"
+  ],
+  "nextAuthorizedAction": "Add agapeic.org to Microsoft 365, add the Microsoft TXT verification record to the existing Azure DNS zone, verify the domain, confirm Exchange readiness, resolve delegates, then create pilot shared mailboxes only."
+}
