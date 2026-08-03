@@ -1,0 +1,610 @@
+{
+  "created": "2026-08-02",
+  "purpose": "Date-level coverage ledger for The Intentional Leader live source-lineage correction. No manuscript text is retained.",
+  "title": "The Intentional Leader",
+  "titleId": "e797232b-da7a-f111-ab0f-00224820105b",
+  "stage": "Interior Layout",
+  "stageId": "c9dee533-4184-f111-ab0f-7c1e525b15c2",
+  "classification": "INCOMPLETE_LAYOUT_SOURCE",
+  "assets": {
+    "approvedProofreadManuscript": {
+      "artifactId": "6c01c3f7-0883-f111-ab0f-000d3a14673b",
+      "itemId": "01DF3SEQJAMN5URIB7PVFIEBA2YUH6XTS4",
+      "filename": "2026-07-19-The-Intentional-Leader-Volume-I-Proofread-Manuscript.docx",
+      "sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+      "sizeBytes": 466220,
+      "source": "live SharePoint item content readback",
+      "wordCountExtracted": 66600,
+      "presentDatesCount": 91,
+      "missingDatesCount": 0,
+      "firstPresentDate": "January 1",
+      "lastPresentDate": "March 31",
+      "firstMissingDate": null
+    },
+    "registeredLayoutProductionSource": {
+      "artifactId": "bd924d42-b084-f111-ab0e-00224834734e",
+      "itemId": "01DF3SEQMYZKHAMTDZSVB2VW3WLE26STEZ",
+      "filename": "2026-07-21-The-Intentional-Leader-Volume-I-Interior-Production-File.docx",
+      "sha256": "21e9d06ce444bee5289846a448969dfe783e0c81f276904b75f62b122d106a9b",
+      "sizeBytes": 21573,
+      "source": "live SharePoint item content readback from Dataverse artifact relationship",
+      "wordCountExtracted": 1901,
+      "presentDatesCount": 5,
+      "missingDatesCount": 86,
+      "firstPresentDate": "January 1",
+      "lastPresentDate": "January 5",
+      "firstMissingDate": "January 6"
+    },
+    "currentAuthorReviewProofPdf": {
+      "artifactId": "5d76feda-0a8e-f111-8077-000d3a14673b",
+      "itemId": "01DF3SEQI4STBH2YFUXZBZRHWQNBEPGITZ",
+      "filename": "The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf",
+      "sha256": "dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3",
+      "sizeBytes": 811688,
+      "source": "live SharePoint item content readback",
+      "wordCountExtracted": 67096,
+      "pageCount": 393,
+      "extractablePages": 393,
+      "presentDatesCount": 91,
+      "missingDatesCount": 0,
+      "firstPresentDate": "January 1",
+      "lastPresentDate": "March 31",
+      "firstMissingDate": null
+    }
+  },
+  "dateCoverage": [
+    {
+      "date": "January 1",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": true,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 2",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": true,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 3",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": true,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 4",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": true,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 5",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": true,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 6",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 7",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 8",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 9",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 10",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 11",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 12",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 13",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 14",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 15",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 16",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 17",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 18",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 19",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 20",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 21",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 22",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 23",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 24",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 25",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 26",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 27",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 28",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 29",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 30",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "January 31",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 1",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 2",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 3",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 4",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 5",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 6",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 7",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 8",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 9",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 10",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 11",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 12",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 13",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 14",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 15",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 16",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 17",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 18",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 19",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 20",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 21",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 22",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 23",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 24",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 25",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 26",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 27",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 28",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "February 29",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 1",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 2",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 3",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 4",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 5",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 6",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 7",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 8",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 9",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 10",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 11",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 12",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 13",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 14",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 15",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 16",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 17",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 18",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 19",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 20",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 21",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 22",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 23",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 24",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 25",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 26",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 27",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 28",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 29",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 30",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    },
+    {
+      "date": "March 31",
+      "approvedProofreadManuscriptPresent": true,
+      "registeredLayoutProductionSourcePresent": false,
+      "currentAuthorReviewProofPdfPresent": true
+    }
+  ],
+  "releaseBoundary": {
+    "currentProofMayBeBodyComplete": true,
+    "registeredLayoutSourceComplete": false,
+    "correctedResendAuthorized": false,
+    "authorApprovalInferred": false,
+    "responseClockStarted": false
+  }
+}
