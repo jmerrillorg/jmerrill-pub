@@ -1,54 +1,54 @@
 {
   "title": "The Intentional Leader",
   "intakeCode": "JMP-INT-202607-0W5PTQ",
-  "sourceDisposition": "ACTUAL_PDF_GENERATION_CHAIN_RECOVERED",
-  "nativeVellumProjectRecovered": false,
-  "pdfGenerator": "LibreOffice headless body conversion plus pypdf front-matter assembly",
+  "sourceDisposition": "APPROVED_AUTOMATED_LAYOUT_GENERATION_CHAIN_RECOVERED",
+  "nativeVellumProjectRecovered": "NOT_REQUIRED",
+  "pdfGenerator": "APPROVED_AUTOMATED_LAYOUT_PROCESS: LibreOffice headless body conversion plus pypdf front-matter assembly",
   "candidates": [
     {
       "candidate": "Approved proofread manuscript / recovered production source DOCX",
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Source.docx",
       "sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
       "classification": "CANONICAL_CONTENT_SOURCE",
-      "basis": "Exact checksum match to approved proofread manuscript and full Jan 1-Mar 31 coverage. It is the content source, not the editable layout source.",
+      "basis": "Exact checksum match to approved proofread manuscript and full Jan 1-Mar 31 coverage. It is the content authority for the approved automated layout process.",
       "dateCoverage": "90/90",
-      "disposition": "Use as content authority for canonical Vellum rebuild; do not call it a layout source."
+      "disposition": "Use as content authority for approved automated layout generation."
     },
     {
       "candidate": "Recovered production body proof PDF",
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Volume-I-Interior-Layout-Production-Proof.pdf",
       "sha256": "723fc053774d733d1293082a75e34c6cc958b960f7474a2ff7b9408be32a4269",
-      "classification": "PROVEN_PDF_GENERATION_COMPONENT",
+      "classification": "APPROVED_AUTOMATED_LAYOUT_COMPONENT",
       "basis": "Manifest names this file as sourceBodyProof; 388 body pages; used with front matter to assemble 393-page author-review release candidate.",
       "dateCoverage": "90/90 body content per prior QA package",
-      "disposition": "Preserve as historical rendered body proof component, not as canonical editable source."
+      "disposition": "Preserve as governed automated body-layout component."
     },
     {
       "candidate": "Recovered author-review front matter PDF",
       "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-INTERIOR-LAYOUT-PROOF-2026-08-01/2026-08-01-The-Intentional-Leader-Interior-Layout-Author-Review-Front-Matter.pdf",
       "sha256": "fcd6bebc8f88d839edda4eef7c8df5803fce04ecd7f47605d7c7f09d8dfe99fc",
-      "classification": "PROVEN_PDF_GENERATION_COMPONENT",
+      "classification": "APPROVED_AUTOMATED_LAYOUT_COMPONENT",
       "basis": "Manifest and QA report identify this as the 5-page front matter source assembled with the 388-page body proof.",
       "dateCoverage": "N/A front matter",
-      "disposition": "Preserve as historical rendered front-matter component, not as canonical editable source."
+      "disposition": "Preserve as governed automated front-matter assembly component."
     },
     {
       "candidate": "Current live 393-page interior proof PDF",
       "path": "SharePoint item 01DF3SEQI4STBH2YFUXZBZRHWQNBEPGITZ and repo release candidate PDF",
       "sha256": "dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3",
-      "classification": "HISTORICAL_RENDERED_PROOF",
-      "basis": "This is the final assembled output; exact checksum matches recovered release candidate, but it is not the editable source.",
+      "classification": "AUTOMATED_AUTHOR_REVIEW_PROOF",
+      "basis": "This is the final assembled output; exact checksum matches recovered release candidate and contains 90/90 dated entries.",
       "dateCoverage": "90/90 extracted entries",
-      "disposition": "Preserve as prior rendered proof with recovered generation chain; supersede before corrected author resend."
+      "disposition": "Preserve as current automated proof lineage evidence; correct confirmed production defects before any replacement send."
     },
     {
       "candidate": "Registered layout DOCX in live artifact record",
       "path": "SharePoint item 01DF3SEQMYZKHAMTDZSVB2VW3WLE26STEZ / 2026-07-21-The-Intentional-Leader-Volume-I-Interior-Production-File.docx",
       "sha256": "21e9d06ce444bee5289846a448969dfe783e0c81f276904b75f62b122d106a9b",
-      "classification": "INCOMPLETE",
+      "classification": "INCOMPLETE_LAYOUT_INTERMEDIATE",
       "basis": "Only 1,901 extracted words and Jan 1-Jan 5 coverage; cannot produce the current 393-page PDF.",
       "dateCoverage": "5/90",
-      "disposition": "Supersede from current layout-source authority; preserve history."
+      "disposition": "Supersede or reclassify from current production authority; preserve history."
     },
     {
       "candidate": "Obsolete one-page interior proof PDF",
@@ -63,12 +63,14 @@
       "candidate": "Master Vellum 2026.vellum template(s)",
       "path": "Local OneDrive template paths, including _Backlist/2026-Smith-TheIntentionalLeader/03_Design/Master Vellum 2026.vellum",
       "sha256": "not captured in repository evidence",
-      "classification": "TEMPLATE_SOURCE_CANDIDATE",
-      "basis": "Template/screenshot evidence establishes standard Vellum title template, but no recovered title-specific .vellum project is proven as the current 393-page PDF source.",
+      "classification": "STRUCTURAL_REFERENCE_STANDARD",
+      "basis": "Template/screenshot evidence establishes the standard title structure and visual reference. It is not a mandatory production engine for this title.",
       "dateCoverage": "not assessed as title source",
-      "disposition": "Use as JMP Vellum Master 2026 template candidate for rebuild only after governed import/population and QA."
+      "disposition": "Retain as Vellum-derived structural reference only; no native Vellum project is required."
     }
   ],
-  "editableCanonicalLayoutSourceRecovered": false,
-  "canonicalVellumRebuild": "REQUIRED"
+  "nativeVellumProjectRequired": false,
+  "approvedAutomatedLayout": "CANONICAL_PRODUCTION_METHOD",
+  "registeredLayoutDocxDisposition": "INCOMPLETE_LAYOUT_INTERMEDIATE_NOT_CURRENT_PRODUCTION_AUTHORITY",
+  "automatedLayoutSourceRegistrationReconciliation": "REQUIRED"
 }
