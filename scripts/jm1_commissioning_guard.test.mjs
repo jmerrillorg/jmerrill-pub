@@ -13,6 +13,7 @@ const dispatchService = readFileSync('lib/server/publishing-dispatch-service.ts'
 const notificationEngine = readFileSync('lib/server/author-package-notification-engine.ts', 'utf8')
 const brandRenderer = readFileSync('lib/server/author-communication-brand.ts', 'utf8')
 const tokens = readFileSync('lib/server/jm1-enterprise-design-tokens.ts', 'utf8')
+const evidenceIndex = readFileSync('docs/operations/generated/JM1-GOVERNED-BOOTSTRAP-ECR-2026-08-03/evidence-index.json', 'utf8')
 
 const brandKeys = [
   'publishing',
@@ -23,14 +24,83 @@ const brandKeys = [
   'agapeInternationalCathedral',
 ]
 
-test('PR 402 merge is represented on current origin/main', () => {
+function commissioningAuthorityFailures(input) {
+  const failures = []
+  if (input.head !== input.originMain) failures.push('COMMISSIONING_MAIN_AUTHORITY_STALE')
+  if (input.state.bootstrap !== 'PRODUCTION' || input.state.bootstrapMandatory !== true) failures.push('COMMISSIONING_BOOTSTRAP_CONTROL_MISSING')
+  if (input.state.enterpriseCommunicationRenderer !== 'PRODUCTION' || input.state.ecrMandatory !== true) failures.push('COMMISSIONING_ECR_CONTROL_MISSING')
+  if (!/npm run jm1-bootstrap --/.test(input.appServiceWorkflow) || !/npm run jm1-bootstrap-guard/.test(input.appServiceWorkflow)) {
+    failures.push('COMMISSIONING_DEPLOYMENT_GUARD_MISSING')
+  }
+  if (!/npm run jm1-bootstrap --/.test(input.recoveryWorkflow) || !/npm run jm1-bootstrap-guard/.test(input.recoveryWorkflow)) {
+    failures.push('COMMISSIONING_DISPATCH_GUARD_MISSING')
+  }
+  if (!/buildAuthorReviewNotificationCopy/.test(input.dispatchService) || !/renderAuthorCommunicationEmail/.test(input.notificationEngine) || !/renderJm1EnterpriseCommunication/.test(input.brandRenderer)) {
+    failures.push('COMMISSIONING_ECR_CONTROL_MISSING')
+  }
+  if (!input.evidenceIndex.includes('JM1-GOVERNED-BOOTSTRAP-ECR-2026-08-03')) failures.push('COMMISSIONING_EVIDENCE_MISSING')
+  return [...new Set(failures)]
+}
+
+function currentAuthorityFixture(overrides = {}) {
+  return {
+    head: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+    originMain: execFileSync('git', ['rev-parse', 'origin/main'], { encoding: 'utf8' }).trim(),
+    subject: execFileSync('git', ['show', '--no-patch', '--format=%s', 'origin/main'], { encoding: 'utf8' }).trim(),
+    state,
+    appServiceWorkflow,
+    recoveryWorkflow,
+    dispatchService,
+    notificationEngine,
+    brandRenderer,
+    evidenceIndex,
+    ...overrides,
+  }
+}
+
+test('commissioning authority is capability-based on current main', () => {
   const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
   const originMain = execFileSync('git', ['rev-parse', 'origin/main'], { encoding: 'utf8' }).trim()
-  const subject = execFileSync('git', ['show', '--no-patch', '--format=%s', 'origin/main'], { encoding: 'utf8' }).trim()
-  const parents = execFileSync('git', ['show', '--no-patch', '--format=%P', 'origin/main'], { encoding: 'utf8' }).trim()
   assert.equal(head, originMain)
-  assert.match(subject, /Merge pull request #402/)
-  assert.match(parents, /9f082edaa35e4e3ae69152497034715943356078/)
+  assert.deepEqual(commissioningAuthorityFailures(currentAuthorityFixture()), [])
+})
+
+test('future valid merge messages do not affect commissioning authority', () => {
+  assert.deepEqual(commissioningAuthorityFailures(currentAuthorityFixture({ subject: 'Merge pull request #999 from jmerrillorg/future-valid-change' })), [])
+})
+
+test('missing Bootstrap deployment enforcement fails closed', () => {
+  const failures = commissioningAuthorityFailures(currentAuthorityFixture({
+    appServiceWorkflow: appServiceWorkflow.replace(/npm run jm1-bootstrap --[^\n]+\n/, ''),
+  }))
+  assert.ok(failures.includes('COMMISSIONING_DEPLOYMENT_GUARD_MISSING'))
+})
+
+test('missing ECR delegation fails closed', () => {
+  const failures = commissioningAuthorityFailures(currentAuthorityFixture({
+    notificationEngine: notificationEngine.replace(/renderAuthorCommunicationEmail/g, 'legacyNotificationRenderer'),
+  }))
+  assert.ok(failures.includes('COMMISSIONING_ECR_CONTROL_MISSING'))
+})
+
+test('missing protected dispatch Bootstrap enforcement fails closed', () => {
+  const failures = commissioningAuthorityFailures(currentAuthorityFixture({
+    recoveryWorkflow: recoveryWorkflow.replace(/npm run jm1-bootstrap --[^\n]+\n/, ''),
+  }))
+  assert.ok(failures.includes('COMMISSIONING_DISPATCH_GUARD_MISSING'))
+})
+
+test('stale main SHA fails closed', () => {
+  const failures = commissioningAuthorityFailures(currentAuthorityFixture({
+    head: '0000000000000000000000000000000000000000',
+  }))
+  assert.ok(failures.includes('COMMISSIONING_MAIN_AUTHORITY_STALE'))
+})
+
+test('historical PR 402 text absent does not fail when capabilities are present', () => {
+  const fixture = currentAuthorityFixture({ subject: 'Merge pull request #403 from jmerrillorg/codex/bootstrap-ecr-commissioning' })
+  assert.doesNotMatch(fixture.subject, /#402/)
+  assert.deepEqual(commissioningAuthorityFailures(fixture), [])
 })
 
 test('commissioning state locks bootstrap and ECR as production mandatory', () => {
