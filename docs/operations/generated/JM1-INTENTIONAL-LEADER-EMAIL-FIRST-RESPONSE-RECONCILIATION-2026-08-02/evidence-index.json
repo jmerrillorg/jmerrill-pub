@@ -24,16 +24,23 @@
   },
   "qualityIssue": "EMAIL_COPY_POLICY_VARIANCE",
   "productionReview": {
-    "status": "PRODUCTION_REVIEW_AND_CORRECTION",
+    "status": "PRODUCTION_CORRECTION_REQUIRED",
+    "correctedClassification": "INCOMPLETE_LAYOUT_SOURCE",
     "copyrightPage": "NEEDS_CORRECTION_REVIEW",
-    "bodyCoverage": "JANUARY_1_THROUGH_MARCH_31_PRESENT",
-    "tocCoverage": "DEFECT_CONFIRMED_STOPS_AT_SOUL_DIVE_FEBRUARY_13",
+    "approvedProofreadSourceCoverage": "JANUARY_1_THROUGH_MARCH_31_PRESENT",
+    "registeredLayoutSourceCoverage": "JANUARY_1_THROUGH_JANUARY_5_ONLY",
+    "registeredLayoutSourceFirstMissing": "JANUARY_6",
+    "currentProofPdfCoverage": "JANUARY_1_THROUGH_MARCH_31_EXTRACTABLE",
+    "sourceLineage": "INVALID_UNTIL_LAYOUT_SOURCE_REBUILT_AND_REGISTERED",
+    "supersedes": "TOC_DEFECT_PRIMARY_INTERPRETATION",
     "replacementSendAuthorized": false
   },
   "guardAdded": "RESPONSE_CLOCK_LANGUAGE_BEFORE_CERTIFICATION",
   "files": [
     "00-response-reconciliation.md",
     "01-production-review-trace.md",
+    "02-layout-source-lineage-correction.md",
+    "date-coverage-ledger.json",
     "evidence-index.json",
     "checksums.sha256"
   ]

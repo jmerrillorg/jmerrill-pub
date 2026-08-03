@@ -2,6 +2,27 @@
 
 Generated: 2026-08-02
 
+## Supersession Notice
+
+The initial production-review interpretation in this file is superseded by
+`02-layout-source-lineage-correction.md`.
+
+Corrected classification:
+
+`INCOMPLETE_LAYOUT_SOURCE`
+
+The earlier conclusion that the active defect was primarily a Table of Contents
+coverage defect is no longer authoritative. Live artifact readback established
+that the registered Interior Layout production-source DOCX is incomplete and
+cannot serve as the governed source lineage for a corrected author-review proof.
+
+Preserved author state:
+
+- Author response: `QUESTIONS_OR_CLARIFICATION_REQUESTED`
+- Approval inferred: NO
+- Response clock started: NO
+- Corrected resend authorized by this trace: NO
+
 ## Scope
 
 This addendum traces Jackie Smith Jr.'s direct email response against the governed source manuscript, current production source, current release-candidate proof, shared-mailbox archive body, Dataverse gate, and execution-log evidence.
