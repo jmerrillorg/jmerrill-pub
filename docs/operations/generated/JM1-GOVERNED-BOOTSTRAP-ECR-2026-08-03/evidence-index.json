@@ -1,0 +1,20 @@
+{
+  "package": "JM1-GOVERNED-BOOTSTRAP-ECR-2026-08-03",
+  "createdAt": "2026-08-03T00:00:00Z",
+  "classification": "PARTIALLY COMPLETE - JM1 GOVERNED BOOTSTRAP AND ECR READY FOR REVIEW",
+  "currentMainSha": "c7cc31bca52f5c73b34d15c0262728e95cac7cb5",
+  "runtimeMutations": 0,
+  "authorCommunications": 0,
+  "pilotCommunications": 0,
+  "secretValuesRetained": 0,
+  "files": [
+    "00-executive-summary.md",
+    "01-authority-hierarchy.md",
+    "02-bootstrap-pilot-result.md",
+    "03-ecr-governance-and-component-map.md",
+    "04-current-main-and-handoff-reconciliation.md",
+    "05-validation-report.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}

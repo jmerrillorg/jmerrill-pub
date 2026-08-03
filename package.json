@@ -24,6 +24,10 @@
     "commercial-architecture-guard": "node scripts/commercial_architecture_guard.test.mjs",
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",
     "author-communication-brand-guard": "node --test scripts/author_communication_brand_guard.test.mjs",
+    "jm1-bootstrap": "node scripts/jm1_bootstrap.mjs",
+    "jm1-bootstrap-guard": "node --test scripts/jm1_bootstrap_guard.test.mjs",
+    "jm1-canon-consistency-guard": "node --test scripts/jm1_canon_consistency_guard.test.mjs",
+    "jm1-initiative-handoff-guard": "node --test scripts/jm1_initiative_handoff_guard.test.mjs",
     "functions-package-access-guard": "node scripts/check-functions-package-access-hygiene.mjs",
     "dirty-worktree-scope-guard": "node scripts/dirty_worktree_scope_guard.mjs",
     "gate-w3-slot-identity-guard": "node scripts/gate_w3_slot_identity_guard.mjs"

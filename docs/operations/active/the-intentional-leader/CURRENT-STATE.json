@@ -1,0 +1,99 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-08-03T00:00:00Z",
+  "initiative": "The Intentional Leader",
+  "initiativeType": "publishing-title",
+  "titleId": "e797232b-da7a-f111-ab0f-00224820105b",
+  "intakeReference": "JMP-INT-202607-0W5PTQ",
+  "currentStage": "Interior Layout",
+  "currentProductionStage": "Interior Layout - live Dataverse stage status 100000002; protected completion pending",
+  "stageId": "c9dee533-4184-f111-ab0f-7c1e525b15c2",
+  "currentGateId": "5141f7db-0a8e-f111-8077-00224820105b",
+  "currentGateCode": "196650006",
+  "currentState": "AUTHOR_APPROVAL_CONFIRMED_PROTECTED_MUTATION_PENDING",
+  "author": "Jackie",
+  "canonicalRecipient": "chosen2k7@gmail.com",
+  "imprint": "J Merrill Publishing",
+  "proofGenerated": "YES",
+  "proofDelivered": "YES",
+  "authorApproval": "YES",
+  "protectedArtifactMutation": "PENDING",
+  "interiorLayoutGate": "PENDING COMPLETION",
+  "additionalAuthorEmail": "NOT AUTHORIZED",
+  "staleHandoffFacts": 0,
+  "unsupportedLiveStateClaims": 0,
+  "unknownValues": [
+    {
+      "field": "protectedMutationCompletionTimestamp",
+      "value": null,
+      "reason": "Protected mutation path was not available from the current Codex session."
+    },
+    {
+      "field": "nextProductionStageAfterMutation",
+      "value": null,
+      "reason": "Next stage must be established by the governed protected mutation response."
+    }
+  ],
+  "liveDataverseReadback": {
+    "checkedAt": "2026-08-03T00:00:00Z",
+    "gateStatus": "196650001",
+    "gateCode": "196650006",
+    "gateAuthorDecision": null,
+    "gateAuthorDecisionSource": "email-reply:questions-clarification",
+    "gateAuthorDecisionOn": null,
+    "gateDeliverableArtifactId": "5d76feda-0a8e-f111-8077-000d3a14673b",
+    "gateNextStageAuthorized": false,
+    "gateNextStageAuthorizedOn": null,
+    "stageStatus": "100000002",
+    "stageCompleteDate": null,
+    "stageCorrelationId": "til-email-first-response-reconciled:2026-08-02:5141f7db-0a8e-f111-8077-00224820105b"
+  },
+  "whatIsComplete": [
+    "Final 275-page pagination-corrected 6 x 9 Interior Layout proof generated",
+    "Corrected review-instructions PDF generated",
+    "Approved proof sent once through ACS email-first workflow",
+    "Author approval confirmed in current governed instruction",
+    "Email brand-header renderer defect corrected in code"
+  ],
+  "whatRemains": [
+    "Execute protected artifact/gate/stage mutation with an authorized protected writer",
+    "Advance the title to the next authorized production stage after protected write succeeds"
+  ],
+  "whatIsApproved": [
+    "Approved automated layout is canonical",
+    "Native Vellum project is not required",
+    "J Merrill Publishing imprint",
+    "275-page pagination-corrected proof"
+  ],
+  "whatIsHeld": [
+    "Dataverse gate/stage mutation blocked from current Codex session by HTTP 401"
+  ],
+  "mustNotBeRepeated": [
+    "Do not reopen Vellum as a mandatory production engine",
+    "Do not reinterpret PR #401 source lineage",
+    "Do not recreate GATE-W3",
+    "Do not reopen Author Experience Reset",
+    "Do not resend the approved package to test template changes",
+    "Do not start a retroactive response clock"
+  ],
+  "artifacts": [
+    {
+      "role": "approved-proof",
+      "artifactId": "intentional-leader-final-pagination-corrected-proof-2026-08-03-v1",
+      "pageCount": 275,
+      "sha256": "0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed"
+    }
+  ],
+  "authorResponseState": "APPROVED",
+  "approvalState": "APPROVED",
+  "approvedProof": "275-page pagination-corrected proof",
+  "responseClockState": "NOT STARTED / NOT REQUIRED - AUTHOR RESPONDED",
+  "responseClockCount": 0,
+  "currentReleaseSha": null,
+  "currentReleaseShaReason": "Resolved dynamically by bootstrap from origin/main at execution time; this handoff does not store a fixed production authority SHA.",
+  "latestVerifiedOriginMainSha": "c7cc31bca52f5c73b34d15c0262728e95cac7cb5",
+  "latestVerifiedOriginMainShaCheckedAt": "2026-08-03T00:00:00Z",
+  "currentBranch": "codex/intentional-leader-corrected-proof",
+  "nextAuthorizedAction": "Execute protected mutation packet and advance the title to the next authorized production stage",
+  "explicitStopBoundary": "Stop before Dataverse artifact/gate/stage mutation if the protected writer is unavailable."
+}

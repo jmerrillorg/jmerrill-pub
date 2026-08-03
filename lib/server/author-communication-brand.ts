@@ -3,12 +3,21 @@
 // Stage-specific exception? N
 
 import { createHash } from 'node:crypto'
+import {
+  JM1_COMMUNICATION_BRANDS,
+  JM1_ENTERPRISE_COMMUNICATION_STANDARD,
+  messageTitleFromSubject,
+  renderJm1EnterpriseCommunication,
+  signatureForBrand,
+  validateJm1EnterpriseCommunication,
+} from './jm1-enterprise-communication-renderer'
 
 export const AUTHOR_COMMUNICATION_BRAND = {
   templateFamily: 'JM1_AUTHOR_COMMUNICATION',
-  brandName: 'J MERRILL PUBLISHING',
-  divisionLine: 'A Division of J Merrill One',
-  promiseLine: 'Helping Authors Help Themselves.',
+  enterpriseStandard: JM1_ENTERPRISE_COMMUNICATION_STANDARD.name,
+  brandName: JM1_COMMUNICATION_BRANDS.publishing.brandName,
+  divisionLine: JM1_COMMUNICATION_BRANDS.publishing.divisionRelationship,
+  promiseLine: JM1_COMMUNICATION_BRANDS.publishing.tagline,
   primaryColor: '#1D4ED8',
   secondaryColor: '#111827',
   accentColor: '#C8A45D',
@@ -17,14 +26,8 @@ export const AUTHOR_COMMUNICATION_BRAND = {
   textColor: '#111827',
   mutedTextColor: '#4B5563',
   borderColor: '#D8DEE9',
-  contactLine: '614.965.6057 | publishing@jmerrill.one | jmerrill.pub',
-  signature: [
-    'The Publishing Team',
-    'J Merrill Publishing, Inc.',
-    'A Division of J Merrill One',
-    '614.965.6057 | publishing@jmerrill.one | jmerrill.pub',
-    'Helping Authors Help Themselves.',
-  ].join('\n'),
+  contactLine: '614.965.6057 · publishing@jmerrill.one · jmerrill.pub',
+  signature: signatureForBrand('publishing'),
 } as const
 
 export type AuthorCommunicationRenderInput = {
@@ -64,8 +67,36 @@ export type RenderedAuthorCommunication = {
 
 export function renderAuthorCommunicationEmail(input: AuthorCommunicationRenderInput): RenderedAuthorCommunication {
   const normalized = normalizeInput(input)
-  const text = renderText(normalized)
-  const html = renderHtml(normalized)
+  const contentTitle = messageTitleFor(normalized)
+  const rendered = renderJm1EnterpriseCommunication({
+    brand: 'publishing',
+    executionAuthority: {
+      authoritySource: 'JM1 Governed Bootstrap',
+      renderAllowed: true,
+      communicationAllowed: false,
+      responseClockAuthorized: Boolean(normalized.deadline),
+    },
+    templateName: normalized.templateName,
+    templateVersion: normalized.templateVersion,
+    subject: normalized.subject,
+    recipientName: normalized.authorName,
+    title: contentTitle,
+    subtitle: normalized.titleName,
+    preheader: normalized.preheader,
+    reason: normalized.why,
+    summaryItems: normalized.completed,
+    attachments: normalized.packageInventory,
+    reviewPrompt: normalized.meaning,
+    actionLabel: normalized.primaryActionLabel,
+    actionUrl: normalized.primaryActionUrl,
+    actionInstruction: normalized.authorAction,
+    responseWindow: normalized.deadline,
+    timelineItems: normalized.nextSteps,
+    supportNote: normalized.supportNote,
+    operationalNote: normalized.operationalNote,
+  })
+  const text = rendered.text
+  const html = rendered.html
   const validation = validateAuthorCommunicationEmail({
     html,
     text,
@@ -108,9 +139,16 @@ export function validateAuthorCommunicationEmail(input: {
   if (!html.includes(AUTHOR_COMMUNICATION_BRAND.brandName)) blockers.push('BRAND_HEADER_MISSING')
   if (!html.includes(AUTHOR_COMMUNICATION_BRAND.divisionLine)) blockers.push('DIVISION_LINE_MISSING')
   if (!html.includes(AUTHOR_COMMUNICATION_BRAND.promiseLine)) blockers.push('PROMISE_LINE_MISSING')
+  const enterpriseValidation = validateJm1EnterpriseCommunication({ html, text, brand: 'publishing' })
+  if (!enterpriseValidation.ok) blockers.push(enterpriseValidation.blocker)
+  if (new RegExp(`<h1[^>]*>\\s*${escapeRegExp(AUTHOR_COMMUNICATION_BRAND.brandName)}\\s*</h1>`, 'i').test(html)) {
+    blockers.push('BRAND_NAME_RENDERED_AS_MESSAGE_H1')
+  }
+  if (/<h1[^>]*>\s*(Warmly|J Merrill Publishing)\s*<\/h1>/i.test(html)) blockers.push('INVENTED_CLOSING_OR_BRAND_H1')
+  if (/\nWarmly,\s*\nJ Merrill Publishing\b/i.test(text)) blockers.push('INVENTED_CLOSING_PRESENT')
   if (!html.includes('Why you are receiving this')) blockers.push('WHY_FIRST_BLOCK_MISSING')
-  if (!html.includes("What's attached")) blockers.push('ATTACHMENT_BLOCK_MISSING')
-  if (!/What we(?:'|&#39;)d like you to review/.test(html)) blockers.push('AUTHOR_REVIEW_BLOCK_MISSING')
+  if (!html.includes("What's attached") && !html.includes('What&#39;s attached')) blockers.push('ATTACHMENT_BLOCK_MISSING')
+  if (!/What we need from you/.test(html)) blockers.push('AUTHOR_REVIEW_BLOCK_MISSING')
   if (!html.includes('How to respond')) blockers.push('AUTHOR_ACTION_BLOCK_MISSING')
   if (!html.includes('What happens next')) blockers.push('NEXT_STEPS_BLOCK_MISSING')
   if (!/<a\b[^>]+href="https:\/\/[^"]+"/i.test(html)) blockers.push('PRIMARY_ACTION_LINK_MISSING')
@@ -119,7 +157,7 @@ export function validateAuthorCommunicationEmail(input: {
   }
   if (!text.includes('Why you are receiving this')) blockers.push('PLAIN_TEXT_WHY_FIRST_BLOCK_MISSING')
   if (!text.includes("What's attached")) blockers.push('PLAIN_TEXT_ATTACHMENT_BLOCK_MISSING')
-  if (!text.includes("What we'd like you to review")) blockers.push('PLAIN_TEXT_AUTHOR_REVIEW_BLOCK_MISSING')
+  if (!text.includes('What we need from you')) blockers.push('PLAIN_TEXT_AUTHOR_REVIEW_BLOCK_MISSING')
   if (!text.includes('How to respond')) blockers.push('PLAIN_TEXT_AUTHOR_ACTION_BLOCK_MISSING')
   if (!/Optional Author Operating Center access:\s*https:\/\//i.test(text)) blockers.push('PLAIN_TEXT_OPTIONAL_PORTAL_URL_MISSING')
   if (!text.includes(AUTHOR_COMMUNICATION_BRAND.signature)) blockers.push('PLAIN_TEXT_SIGNATURE_MISSING')
@@ -160,118 +198,6 @@ function normalizeInput(input: AuthorCommunicationRenderInput): AuthorCommunicat
   }
 }
 
-function renderText(input: AuthorCommunicationRenderInput) {
-  return [
-    `Good day, ${input.authorName},`,
-    '',
-    `We are writing about ${input.titleName}.`,
-    '',
-    'Why you are receiving this',
-    input.why,
-    '',
-    'What work has been completed',
-    ...input.completed.map((item) => `- ${item}`),
-    '',
-    "What's attached",
-    ...(input.packageInventory || []).map((item) => `- ${item}`),
-    '',
-    "What we'd like you to review",
-    input.meaning,
-    '',
-    'How to respond',
-    input.authorAction,
-    '',
-    input.deadline ? `Response window: ${input.deadline}` : '',
-    '',
-    'Optional Author Operating Center access',
-    `Optional Author Operating Center access: ${input.primaryActionUrl}`,
-    '',
-    'What happens next',
-    ...input.nextSteps.map((item) => `- ${item}`),
-    '',
-    'Support',
-    input.supportNote,
-    '',
-    input.operationalNote,
-    '',
-    AUTHOR_COMMUNICATION_BRAND.signature,
-  ].filter((line) => line !== '').join('\n')
-}
-
-function renderHtml(input: AuthorCommunicationRenderInput) {
-  const brand = AUTHOR_COMMUNICATION_BRAND
-  const completed = input.completed.map((item) => `<li>${escapeHtml(item)}</li>`).join('')
-  const inventory = (input.packageInventory || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')
-  const nextSteps = input.nextSteps.map((item) => `<li>${escapeHtml(item)}</li>`).join('')
-  const deadline = input.deadline
-    ? `<p style="margin:12px 0 0;color:${brand.mutedTextColor};font-size:14px;line-height:1.6;"><strong>Response window:</strong> ${escapeHtml(input.deadline)}</p>`
-    : ''
-
-  return `<!doctype html>
-<html lang="en">
-  <body style="margin:0;padding:0;background:${brand.backgroundColor};color:${brand.textColor};font-family:Arial,Helvetica,sans-serif;">
-    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(input.preheader)}</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:${brand.backgroundColor};">
-      <tr>
-        <td align="center" style="padding:28px 16px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;border-collapse:collapse;background:${brand.panelColor};border:1px solid ${brand.borderColor};">
-            <tr>
-              <td style="padding:28px 28px 20px;background:${brand.secondaryColor};color:#ffffff;">
-                <p style="margin:0 0 6px;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:${brand.accentColor};">${brand.brandName}</p>
-                <p style="margin:0;font-size:14px;line-height:1.5;color:#E5E7EB;">${brand.divisionLine}</p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:28px;">
-                <h1 style="margin:0 0 16px;font-size:24px;line-height:1.3;color:${brand.textColor};">${escapeHtml(input.subject)}</h1>
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.7;">Good day, ${escapeHtml(input.authorName)},</p>
-                ${section('Why you are receiving this', input.why)}
-                <h2 style="margin:24px 0 10px;font-size:16px;color:${brand.textColor};">What work has been completed</h2>
-                <ul style="margin:0 0 18px 22px;padding:0;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">${completed}</ul>
-                ${
-                  inventory
-                    ? `<h2 style="margin:24px 0 10px;font-size:16px;color:${brand.textColor};">What's attached</h2><ul style="margin:0 0 18px 22px;padding:0;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">${inventory}</ul>`
-                    : ''
-                }
-                ${section("What we'd like you to review", input.meaning)}
-                <div style="margin:24px 0;padding:18px;border-left:4px solid ${brand.primaryColor};background:#EFF6FF;">
-                  <h2 style="margin:0 0 8px;font-size:16px;color:${brand.textColor};">How to respond</h2>
-                  <p style="margin:0 0 14px;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">${escapeHtml(input.authorAction)}</p>
-                  ${deadline}
-                </div>
-                <p style="margin:0 0 18px;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">You can complete this review by replying directly to this email.</p>
-                <h2 style="margin:24px 0 10px;font-size:16px;color:${brand.textColor};">Optional Author Operating Center access</h2>
-                <p style="margin:0 0 14px;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">Your Author Operating Center has also been updated if you would like to view your project history or download another copy.</p>
-                ${
-                  `<p style="margin:0 0 22px;"><a href="${escapeHtml(input.primaryActionUrl)}" style="display:inline-block;background:${brand.primaryColor};color:#ffffff;padding:11px 16px;font-size:14px;font-weight:700;text-decoration:none;">${escapeHtml(input.primaryActionLabel)}</a></p>`
-                }
-                <h2 style="margin:24px 0 10px;font-size:16px;color:${brand.textColor};">What happens next</h2>
-                <ul style="margin:0 0 18px 22px;padding:0;font-size:15px;line-height:1.7;color:${brand.mutedTextColor};">${nextSteps}</ul>
-                ${section('Support', input.supportNote || '')}
-                <p style="margin:22px 0 0;font-size:13px;line-height:1.6;color:${brand.mutedTextColor};">${escapeHtml(input.operationalNote || '')}</p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:22px 28px;background:#F3F4F6;border-top:1px solid ${brand.borderColor};">
-                <p style="margin:0 0 4px;font-size:14px;font-weight:700;color:${brand.textColor};">The Publishing Team</p>
-                <p style="margin:0;font-size:13px;line-height:1.6;color:${brand.mutedTextColor};">J Merrill Publishing, Inc.<br>${brand.divisionLine}<br>${brand.contactLine}<br>${brand.promiseLine}</p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>`
-}
-
-function section(label: string, body: string) {
-  return [
-    `<h2 style="margin:24px 0 10px;font-size:16px;color:${AUTHOR_COMMUNICATION_BRAND.textColor};">${escapeHtml(label)}</h2>`,
-    `<p style="margin:0 0 18px;font-size:15px;line-height:1.7;color:${AUTHOR_COMMUNICATION_BRAND.mutedTextColor};">${escapeHtml(body)}</p>`,
-  ].join('')
-}
-
 function required(value: string, name: string) {
   const normalized = value.trim()
   if (!normalized) throw new Error(`AUTHOR_COMMUNICATION_BLOCKED - ${name.toUpperCase().replaceAll(' ', '_')}_MISSING`)
@@ -296,6 +222,14 @@ function validateSubject(value: string) {
     throw new Error('AUTHOR_COMMUNICATION_BLOCKED - SUBJECT_DUPLICATED_WORD')
   }
   return value
+}
+
+function messageTitleFor(input: AuthorCommunicationRenderInput) {
+  return messageTitleFromSubject(input.subject, input.titleName)
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 function escapeHtml(value: string) {
