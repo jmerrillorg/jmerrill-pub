@@ -12,6 +12,19 @@ const args = parseArgs(process.argv.slice(2))
 const bootstrapVersion = '1.0.0'
 const initiative = args.initiative || 'repository'
 const mode = args.mode || 'read-only'
+const allowedModes = new Set([
+  'read-only',
+  'development',
+  'governance',
+  'production-dry-run',
+  'production-mutation',
+  'author-communication',
+  'deployment',
+])
+if (!allowedModes.has(mode)) {
+  console.error(`BOOTSTRAP FAIL\nINVALID_BOOTSTRAP_MODE: ${mode}`)
+  process.exit(1)
+}
 const generatedAt = new Date().toISOString()
 const branch = exec('git', ['branch', '--show-current']) || 'detached'
 const headSha = exec('git', ['rev-parse', 'HEAD'])
@@ -437,6 +450,8 @@ function readJsonIfExists(path) {
 function isBootstrapScope(path) {
   return (
     path === '.gitignore' ||
+    path.startsWith('.github/workflows/') ||
+    path.startsWith('github/workflows/') ||
     path === 'gitignore' ||
     path === 'package.json' ||
     path.startsWith('scripts/jm1_') ||
@@ -454,7 +469,9 @@ function isBootstrapScope(path) {
     path === 'docs/schemas/' ||
     path.startsWith('docs/schemas/jm1-bootstrap') ||
     path.startsWith('docs/operations/active/') ||
+    path.startsWith('docs/operations/commissioning/') ||
     path.startsWith('docs/operations/generated/JM1-GOVERNED-BOOTSTRAP-ECR-')
+    || path.startsWith('docs/operations/generated/JM1-BOOTSTRAP-COMMISSIONING-')
   )
 }
 

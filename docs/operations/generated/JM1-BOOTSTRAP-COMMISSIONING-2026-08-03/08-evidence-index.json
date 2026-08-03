@@ -1,0 +1,24 @@
+{
+  "package": "JM1-BOOTSTRAP-COMMISSIONING-2026-08-03",
+  "createdAt": "2026-08-03T00:00:00Z",
+  "classification": "JM1 BOOTSTRAP AND ECR COMMISSIONED",
+  "productionRelease": "76ede371f22c59152f491848707df85ff6fced6f",
+  "bootstrap": "PRODUCTION",
+  "enterpriseCommunicationRenderer": "PRODUCTION",
+  "publishingWorkflowsMigrated": 12,
+  "runtimeMutations": 0,
+  "authorCommunications": 0,
+  "secretValuesRetained": 0,
+  "files": [
+    "00-executive-summary.md",
+    "01-bootstrap-validation.md",
+    "02-ecr-validation.md",
+    "03-publishing-migration.md",
+    "04-cross-brand-validation.md",
+    "05-communication-canon-validation.md",
+    "06-deployment-verification.md",
+    "07-production-verification.md",
+    "08-evidence-index.json",
+    "checksums.sha256"
+  ]
+}

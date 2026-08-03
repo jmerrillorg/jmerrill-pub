@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "commissionedAt": "2026-08-03T00:00:00Z",
+  "productionRelease": "76ede371f22c59152f491848707df85ff6fced6f",
+  "bootstrap": "PRODUCTION",
+  "enterpriseCommunicationRenderer": "PRODUCTION",
+  "bootstrapMandatory": true,
+  "ecrMandatory": true,
+  "legacyStartupPaths": "RETIRED",
+  "legacyRenderers": 0,
+  "workflowHtmlDuplication": 0,
+  "bootstrapBypasses": 0,
+  "authorCommunications": 0,
+  "runtimeMutations": "ONLY_AUTHORIZED",
+  "publishingWorkflowsMigrated": [
+    "Editorial packages",
+    "Developmental Editing",
+    "Copyediting",
+    "Proofreading",
+    "Interior Layout",
+    "Cover Review",
+    "Publication Approval",
+    "Author Activation",
+    "Author Recovery",
+    "Approval Requests",
+    "Reminder Messages",
+    "Release Notifications"
+  ],
+  "brandOverlays": [
+    "publishing",
+    "financial",
+    "foundation",
+    "productions",
+    "corporate",
+    "agapeInternationalCathedral"
+  ],
+  "communicationCanon": {
+    "sender": "publishing@email.jmerrill.one",
+    "replyTo": "publishing@jmerrill.one",
+    "archive": "publishing@jmerrill.one",
+    "primary": "EMAIL",
+    "portal": "OPTIONAL",
+    "internalArtifacts": 0
+  },
+  "protectedEndpoints": "FAIL_CLOSED_WHEN_UNAUTHORIZED",
+  "productionHealth": {
+    "publishingApp": "READY",
+    "dataverse": "READY",
+    "graph": "READY",
+    "acs": "READY"
+  }
+}
