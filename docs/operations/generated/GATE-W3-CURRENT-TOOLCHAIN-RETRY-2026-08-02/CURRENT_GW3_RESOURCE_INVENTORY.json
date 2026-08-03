@@ -1,0 +1,240 @@
+{
+  "package": "GATE-W3-CURRENT-TOOLCHAIN-RETRY-2026-08-02",
+  "created": "2026-08-02",
+  "target": {
+    "app": "app-jm1-productions-prod",
+    "slot": "staging",
+    "resourceGroup": "rg-jm1-web-prod-appsvc",
+    "subscription": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e"
+  },
+  "production": {
+    "name": "app-jm1-productions-prod",
+    "resourceGroup": "rg-jm1-web-prod-appsvc",
+    "location": "Central US",
+    "state": "Running",
+    "availabilityState": "Normal",
+    "kind": "app,linux",
+    "defaultHostName": "app-jm1-productions-prod.azurewebsites.net",
+    "hostNames": [
+      "app-jm1-productions-prod.azurewebsites.net"
+    ],
+    "enabledHostNames": [
+      "app-jm1-productions-prod.azurewebsites.net",
+      "app-jm1-productions-prod.scm.azurewebsites.net"
+    ],
+    "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux",
+    "httpsOnly": true,
+    "identity": {
+      "type": "SystemAssigned",
+      "principalId": "d342229f-1a3e-4169-9b14-695fd305b313",
+      "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d"
+    },
+    "siteConfig": {
+      "linuxFxVersion": "NODE|22-lts",
+      "appCommandLine": "node server.js",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "ftpsState": "Disabled",
+      "minTlsVersion": "1.2",
+      "scmType": "None"
+    }
+  },
+  "staging": {
+    "name": "app-jm1-productions-prod/staging",
+    "resourceGroup": "rg-jm1-web-prod-appsvc",
+    "location": "Central US",
+    "state": "Running",
+    "availabilityState": "Normal",
+    "kind": "app,linux",
+    "defaultHostName": "app-jm1-productions-prod-staging.azurewebsites.net",
+    "hostNames": [
+      "app-jm1-productions-prod-staging.azurewebsites.net"
+    ],
+    "enabledHostNames": [
+      "app-jm1-productions-prod-staging.azurewebsites.net",
+      "app-jm1-productions-prod-staging.scm.azurewebsites.net"
+    ],
+    "serverFarmId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/serverfarms/asp-jm1-web-prod-linux",
+    "httpsOnly": true,
+    "identity": {
+      "type": "SystemAssigned",
+      "principalId": "fd17133f-63a9-467e-ba97-cef9a2c78e41",
+      "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d"
+    },
+    "siteConfig": {
+      "linuxFxVersion": "NODE|22-lts",
+      "appCommandLine": "node server.js",
+      "alwaysOn": true,
+      "healthCheckPath": "/",
+      "ftpsState": "Disabled",
+      "minTlsVersion": "1.2",
+      "scmType": "None"
+    }
+  },
+  "appServicePlan": {
+    "name": "asp-jm1-web-prod-linux",
+    "resourceGroup": "rg-jm1-web-prod-appsvc",
+    "location": "Central US",
+    "sku": {
+      "capacity": 1,
+      "family": "S",
+      "name": "S1",
+      "size": "S1",
+      "tier": "Standard"
+    },
+    "kind": "linux",
+    "reserved": null
+  },
+  "appSettingNameComparison": {
+    "productionCount": 19,
+    "stagingCount": 19,
+    "onlyProduction": [],
+    "onlyStaging": [],
+    "slotSettingDifferences": []
+  },
+  "preRepairProbeSummary": [
+    {
+      "name": "productions_azure_root",
+      "status": 503,
+      "classification": "PLATFORM_503_OR_APP_UNAVAILABLE",
+      "responseMs": 2574
+    },
+    {
+      "name": "productions_azure_health",
+      "status": 503,
+      "classification": "PLATFORM_503_OR_APP_UNAVAILABLE",
+      "responseMs": 1862
+    },
+    {
+      "name": "productions_azure_static",
+      "status": 503,
+      "classification": "PLATFORM_503_OR_APP_UNAVAILABLE",
+      "responseMs": 375
+    },
+    {
+      "name": "productions_azure_api_known",
+      "status": 503,
+      "classification": "PLATFORM_503_OR_APP_UNAVAILABLE",
+      "responseMs": 505
+    },
+    {
+      "name": "staging_azure_root",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 188
+    },
+    {
+      "name": "staging_azure_health",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 223
+    },
+    {
+      "name": "peer_one_root",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 217
+    },
+    {
+      "name": "peer_foundation_root",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 226
+    },
+    {
+      "name": "peer_fin_root",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 451
+    },
+    {
+      "name": "peer_pub_health",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 515
+    }
+  ],
+  "postRepairProbeSummary": [
+    {
+      "name": "productions_azure_root",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 476
+    },
+    {
+      "name": "productions_azure_health",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 715
+    },
+    {
+      "name": "productions_azure_static",
+      "status": 404,
+      "classification": "ROUTE_404_OR_CONTENT_ABSENCE",
+      "responseMs": 250
+    },
+    {
+      "name": "productions_azure_api_known",
+      "status": 404,
+      "classification": "ROUTE_404_OR_CONTENT_ABSENCE",
+      "responseMs": 264
+    },
+    {
+      "name": "staging_azure_root",
+      "status": null,
+      "classification": "NETWORK_TLS_DNS_OR_CONNECT_FAILURE",
+      "responseMs": 20107
+    },
+    {
+      "name": "staging_azure_health",
+      "status": 503,
+      "classification": "PLATFORM_503_OR_APP_UNAVAILABLE",
+      "responseMs": 16589
+    },
+    {
+      "name": "peer_one_root",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 268
+    },
+    {
+      "name": "peer_foundation_root",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 271
+    },
+    {
+      "name": "peer_fin_root",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 275
+    },
+    {
+      "name": "peer_pub_health",
+      "status": 200,
+      "classification": "RESPONDS",
+      "responseMs": 251
+    }
+  ],
+  "rootCause": "DEPLOYMENT_PACKAGE_DEFECT_OR_PRODUCTION_SLOT_CONTENT_DRIFT",
+  "remediation": {
+    "slotSwapPerformed": true,
+    "nonsecretSettingCorrectionAttempted": [
+      "JM1_SLOT_ENVIRONMENT=production"
+    ],
+    "dnsChanges": 0,
+    "planResize": 0,
+    "resourceRecreation": 0,
+    "secretValuesRetained": 0
+  },
+  "finalState": {
+    "productionHealth": "READY",
+    "microsoftSupportRequired": false,
+    "gateW3": "CLOSED_CURRENT_TOOLCHAIN_REMEDIATION",
+    "remainingVariance": "Readiness response still reports environment=staging, likely package-content label rather than active slot setting.",
+    "staging": "REFRESH_REQUIRED_BEFORE_REUSE",
+    "pr358": "SUPERSEDED_BY_CURRENT_TOOLCHAIN_REMEDIATION_EVIDENCE",
+    "microsoftSupportTicket": "NOT_OPENED",
+    "paidSupportChange": 0
+  }
+}

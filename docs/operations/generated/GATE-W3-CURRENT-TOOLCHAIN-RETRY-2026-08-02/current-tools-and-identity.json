@@ -1,0 +1,26 @@
+{
+  "repository": "jmerrillorg/jmerrill-pub",
+  "worktree": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-gate-w3-current-toolchain-retry",
+  "branch": "codex/gate-w3-current-toolchain-retry",
+  "base": "origin/main",
+  "head": "b448cd1dbd41b521b63d20cfbe1ab3272ce69582",
+  "tools": {
+    "git": "git version 2.54.0",
+    "node": "v26.0.0",
+    "npm": "11.12.1",
+    "gh": "gh version 2.94.0 (2026-06-10)",
+    "azureCli": "2.87.0",
+    "azureDeveloperCli": "",
+    "powershell": "PowerShell 7.5.4",
+    "azureFunctionsCoreTools": "4.10.0"
+  },
+  "azureIdentity": {
+  "cloud": "AzureCloud",
+  "isDefault": true,
+  "subscriptionId": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e",
+  "subscriptionName": "JM1 – Nonprofit Core (2025 Grant)",
+  "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d",
+  "user": "jm1-admin@jmerrill.one",
+  "userType": "user"
+}
+}

@@ -1,0 +1,172 @@
+[
+  {
+    "name": "productions_azure_root",
+    "url": "https://app-jm1-productions-prod.azurewebsites.net/",
+    "host": "app-jm1-productions-prod.azurewebsites.net",
+    "dnsAddresses": [
+      "13.89.172.3"
+    ],
+    "status": 503,
+    "reason": "Service Unavailable",
+    "responseMs": 2574,
+    "headers": {
+      "Content-Type": "text/html; charset=utf-8",
+      "Date": "Mon, 03 Aug 2026 01:17:06 GMT"
+    },
+    "bodyPrefix": "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>503 Service Unavailable</title><style>*{box-sizing:border-box}body{margin:0;font-family:\"Segoe UI\",Roboto,Arial,sans-serif;background:#fff;color:#1f2937;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}.wrap{width:min(680px,100%);display:flex;flex-direction:column}h1{margin:0 0 14px;font-size:38px;line-height:1.1;letter-spacing:-",
+    "classification": "PLATFORM_503_OR_APP_UNAVAILABLE"
+  },
+  {
+    "name": "productions_azure_health",
+    "url": "https://app-jm1-productions-prod.azurewebsites.net/api/health",
+    "host": "app-jm1-productions-prod.azurewebsites.net",
+    "dnsAddresses": [
+      "13.89.172.3"
+    ],
+    "status": 503,
+    "reason": "Service Unavailable",
+    "responseMs": 1862,
+    "headers": {
+      "Content-Type": "text/html; charset=utf-8",
+      "Date": "Mon, 03 Aug 2026 01:17:08 GMT"
+    },
+    "bodyPrefix": "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>503 Service Unavailable</title><style>*{box-sizing:border-box}body{margin:0;font-family:\"Segoe UI\",Roboto,Arial,sans-serif;background:#fff;color:#1f2937;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}.wrap{width:min(680px,100%);display:flex;flex-direction:column}h1{margin:0 0 14px;font-size:38px;line-height:1.1;letter-spacing:-",
+    "classification": "PLATFORM_503_OR_APP_UNAVAILABLE"
+  },
+  {
+    "name": "productions_azure_static",
+    "url": "https://app-jm1-productions-prod.azurewebsites.net/favicon.ico",
+    "host": "app-jm1-productions-prod.azurewebsites.net",
+    "dnsAddresses": [
+      "13.89.172.3"
+    ],
+    "status": 503,
+    "reason": "Service Unavailable",
+    "responseMs": 375,
+    "headers": {
+      "Content-Type": "text/html; charset=utf-8",
+      "Date": "Mon, 03 Aug 2026 01:17:08 GMT"
+    },
+    "bodyPrefix": "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>503 Service Unavailable</title><style>*{box-sizing:border-box}body{margin:0;font-family:\"Segoe UI\",Roboto,Arial,sans-serif;background:#fff;color:#1f2937;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}.wrap{width:min(680px,100%);display:flex;flex-direction:column}h1{margin:0 0 14px;font-size:38px;line-height:1.1;letter-spacing:-",
+    "classification": "PLATFORM_503_OR_APP_UNAVAILABLE"
+  },
+  {
+    "name": "productions_azure_api_known",
+    "url": "https://app-jm1-productions-prod.azurewebsites.net/api/status",
+    "host": "app-jm1-productions-prod.azurewebsites.net",
+    "dnsAddresses": [
+      "13.89.172.3"
+    ],
+    "status": 503,
+    "reason": "Service Unavailable",
+    "responseMs": 505,
+    "headers": {
+      "Content-Type": "text/html; charset=utf-8",
+      "Date": "Mon, 03 Aug 2026 01:17:09 GMT"
+    },
+    "bodyPrefix": "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>503 Service Unavailable</title><style>*{box-sizing:border-box}body{margin:0;font-family:\"Segoe UI\",Roboto,Arial,sans-serif;background:#fff;color:#1f2937;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}.wrap{width:min(680px,100%);display:flex;flex-direction:column}h1{margin:0 0 14px;font-size:38px;line-height:1.1;letter-spacing:-",
+    "classification": "PLATFORM_503_OR_APP_UNAVAILABLE"
+  },
+  {
+    "name": "staging_azure_root",
+    "url": "https://app-jm1-productions-prod-staging.azurewebsites.net/",
+    "host": "app-jm1-productions-prod-staging.azurewebsites.net",
+    "dnsAddresses": [
+      "13.89.172.3"
+    ],
+    "status": 200,
+    "reason": "OK",
+    "responseMs": 188,
+    "headers": {
+      "Content-Type": "application/json",
+      "Date": "Mon, 03 Aug 2026 01:17:10 GMT"
+    },
+    "bodyPrefix": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.productions\",\"environment\":\"staging\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}",
+    "classification": "RESPONDS"
+  },
+  {
+    "name": "staging_azure_health",
+    "url": "https://app-jm1-productions-prod-staging.azurewebsites.net/api/health",
+    "host": "app-jm1-productions-prod-staging.azurewebsites.net",
+    "dnsAddresses": [
+      "13.89.172.3"
+    ],
+    "status": 200,
+    "reason": "OK",
+    "responseMs": 223,
+    "headers": {
+      "Content-Type": "application/json",
+      "Date": "Mon, 03 Aug 2026 01:17:10 GMT"
+    },
+    "bodyPrefix": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.productions\",\"environment\":\"staging\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}",
+    "classification": "RESPONDS"
+  },
+  {
+    "name": "peer_one_root",
+    "url": "https://app-jm1-one-prod.azurewebsites.net/",
+    "host": "app-jm1-one-prod.azurewebsites.net",
+    "dnsAddresses": [
+      "13.89.172.3"
+    ],
+    "status": 200,
+    "reason": "OK",
+    "responseMs": 217,
+    "headers": {
+      "Content-Type": "application/json",
+      "Date": "Mon, 03 Aug 2026 01:17:11 GMT"
+    },
+    "bodyPrefix": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.one\",\"environment\":\"production\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}",
+    "classification": "RESPONDS"
+  },
+  {
+    "name": "peer_foundation_root",
+    "url": "https://app-jm1-foundation-prod.azurewebsites.net/",
+    "host": "app-jm1-foundation-prod.azurewebsites.net",
+    "dnsAddresses": [
+      "13.89.172.3"
+    ],
+    "status": 200,
+    "reason": "OK",
+    "responseMs": 226,
+    "headers": {
+      "Content-Type": "application/json",
+      "Date": "Mon, 03 Aug 2026 01:17:11 GMT"
+    },
+    "bodyPrefix": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.foundation\",\"environment\":\"production\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}",
+    "classification": "RESPONDS"
+  },
+  {
+    "name": "peer_fin_root",
+    "url": "https://app-jm1-fin-prod.azurewebsites.net/",
+    "host": "app-jm1-fin-prod.azurewebsites.net",
+    "dnsAddresses": [
+      "13.89.172.3"
+    ],
+    "status": 200,
+    "reason": "OK",
+    "responseMs": 451,
+    "headers": {
+      "Content-Type": "application/json",
+      "Date": "Mon, 03 Aug 2026 01:17:11 GMT"
+    },
+    "bodyPrefix": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.financial\",\"environment\":\"production\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}",
+    "classification": "RESPONDS"
+  },
+  {
+    "name": "peer_pub_health",
+    "url": "https://app-jm1-pub-prod.azurewebsites.net/api/health",
+    "host": "app-jm1-pub-prod.azurewebsites.net",
+    "dnsAddresses": [
+      "40.122.114.229"
+    ],
+    "status": 200,
+    "reason": "OK",
+    "responseMs": 515,
+    "headers": {
+      "Content-Type": "application/json",
+      "Date": "Mon, 03 Aug 2026 01:17:12 GMT"
+    },
+    "bodyPrefix": "{\"service\":\"jmerrill-pub\",\"status\":\"ready\",\"release\":\"b448cd1dbd41b521b63d20cfbe1ab3272ce69582\",\"checkedAt\":\"2026-08-03T01:17:12.421Z\",\"paymentGate\":\"disabled\",\"dependencies\":{\"configuration\":{\"status\":\"ready\",\"required\":[\"NODE_ENV\"],\"present\":[\"NODE_ENV\"],\"missing\":[]},\"dataverse\":{\"status\":\"ready\",\"required\":[\"DATAVERSE_TENANT_ID\",\"DATAVERSE_CLIENT_ID\",\"DATAVERSE_CLIENT_SECRET\",\"DATAVERSE_RESOURCE_URL\",\"DATAVERSE_WEB_API_BASE_URL\"],\"present\":[\"DATAVERSE_TENANT_ID\",\"DATAVERSE_CLIENT_ID\",\"DATAVE",
+    "classification": "RESPONDS"
+  }
+]

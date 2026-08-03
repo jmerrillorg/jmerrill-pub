@@ -1,0 +1,78 @@
+[
+  {
+    "name": "WEBSITE_NODE_DEFAULT_VERSION",
+    "slotSetting": false
+  },
+  {
+    "name": "NODE_ENV",
+    "slotSetting": false
+  },
+  {
+    "name": "JM1_GATE",
+    "slotSetting": false
+  },
+  {
+    "name": "JM1_PROPERTY_DOMAIN",
+    "slotSetting": false
+  },
+  {
+    "name": "JM1_PROPERTY_KEY",
+    "slotSetting": false
+  },
+  {
+    "name": "JM1_MIGRATION_STATE",
+    "slotSetting": false
+  },
+  {
+    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "slotSetting": false
+  },
+  {
+    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+    "slotSetting": false
+  },
+  {
+    "name": "KEY_VAULT_URI",
+    "slotSetting": false
+  },
+  {
+    "name": "JM1_RELEASE_ID",
+    "slotSetting": false
+  },
+  {
+    "name": "JM1_SLOT_ENVIRONMENT",
+    "slotSetting": false
+  },
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "slotSetting": false
+  },
+  {
+    "name": "ENABLE_ORYX_BUILD",
+    "slotSetting": false
+  },
+  {
+    "name": "WEBSITE_RUN_FROM_PACKAGE",
+    "slotSetting": false
+  },
+  {
+    "name": "JM1_RELEASE_SHA",
+    "slotSetting": false
+  },
+  {
+    "name": "JM1_WEB_GATE",
+    "slotSetting": false
+  },
+  {
+    "name": "WEBSITE_SKIP_NODE_MODULES_TAR",
+    "slotSetting": false
+  },
+  {
+    "name": "WEBSITE_WARMUP_PATH",
+    "slotSetting": false
+  },
+  {
+    "name": "WEBSITE_WARMUP_STATUSES",
+    "slotSetting": false
+  }
+]

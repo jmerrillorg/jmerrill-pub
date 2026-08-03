@@ -1,0 +1,146 @@
+[
+  {
+    "correlationId": "f668e224-ec6f-402c-8a41-13701d789ff8",
+    "eventTimestamp": "2026-08-03T01:21:29.3123742Z",
+    "operationName": "Microsoft.Web/sites/slots/slotsswap/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging",
+    "status": "Accepted",
+    "subStatus": "Accepted"
+  },
+  {
+    "correlationId": "f668e224-ec6f-402c-8a41-13701d789ff8",
+    "eventTimestamp": "2026-08-03T01:21:26.859211Z",
+    "operationName": "Microsoft.Web/sites/slots/slotsswap/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging",
+    "status": "Started",
+    "subStatus": ""
+  },
+  {
+    "correlationId": "f6385bac-8f54-4f11-a2e4-9b5167c6aa65",
+    "eventTimestamp": "2026-08-03T01:18:01.7162236Z",
+    "operationName": "Microsoft.Web/sites/slots/config/write",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging/config/logs",
+    "status": "Succeeded",
+    "subStatus": "OK"
+  },
+  {
+    "correlationId": "f6385bac-8f54-4f11-a2e4-9b5167c6aa65",
+    "eventTimestamp": "2026-08-03T01:18:00.9349744Z",
+    "operationName": "Microsoft.Web/sites/slots/config/write",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging/config/logs",
+    "status": "Started",
+    "subStatus": ""
+  },
+  {
+    "correlationId": "024edd45-1464-4d02-a033-50e830231828",
+    "eventTimestamp": "2026-08-03T01:17:58.1408676Z",
+    "operationName": "Microsoft.Web/sites/config/write",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/config/logs",
+    "status": "Succeeded",
+    "subStatus": "OK"
+  },
+  {
+    "correlationId": "024edd45-1464-4d02-a033-50e830231828",
+    "eventTimestamp": "2026-08-03T01:17:57.3752415Z",
+    "operationName": "Microsoft.Web/sites/config/write",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/config/logs",
+    "status": "Started",
+    "subStatus": ""
+  },
+  {
+    "correlationId": "9901dc12-f047-4a33-8705-c7991323d770",
+    "eventTimestamp": "2026-08-03T01:15:42.109546Z",
+    "operationName": "Microsoft.Web/sites/slots/config/list/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging/config/publishingcredentials",
+    "status": "Succeeded",
+    "subStatus": "OK"
+  },
+  {
+    "correlationId": "9901dc12-f047-4a33-8705-c7991323d770",
+    "eventTimestamp": "2026-08-03T01:15:42.0001675Z",
+    "operationName": "Microsoft.Web/sites/slots/config/list/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging/config/publishingcredentials",
+    "status": "Started",
+    "subStatus": ""
+  },
+  {
+    "correlationId": "0b3cdb52-34ab-4d47-9669-38d9263b6bee",
+    "eventTimestamp": "2026-08-03T01:15:40.3294686Z",
+    "operationName": "Microsoft.Web/sites/slots/publishxml/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging",
+    "status": "Succeeded",
+    "subStatus": "OK"
+  },
+  {
+    "correlationId": "0b3cdb52-34ab-4d47-9669-38d9263b6bee",
+    "eventTimestamp": "2026-08-03T01:15:40.1731817Z",
+    "operationName": "Microsoft.Web/sites/slots/publishxml/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging",
+    "status": "Started",
+    "subStatus": ""
+  },
+  {
+    "correlationId": "01b05a97-05cf-49b4-85e8-aaf32f266ea2",
+    "eventTimestamp": "2026-08-03T01:15:38.0666253Z",
+    "operationName": "Microsoft.Web/sites/slots/config/list/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging/config/connectionstrings",
+    "status": "Succeeded",
+    "subStatus": "OK"
+  },
+  {
+    "correlationId": "01b05a97-05cf-49b4-85e8-aaf32f266ea2",
+    "eventTimestamp": "2026-08-03T01:15:37.9572497Z",
+    "operationName": "Microsoft.Web/sites/slots/config/list/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging/config/connectionstrings",
+    "status": "Started",
+    "subStatus": ""
+  },
+  {
+    "correlationId": "a261d4ae-8dda-44ab-a720-2649854a0b64",
+    "eventTimestamp": "2026-08-03T01:15:35.6591879Z",
+    "operationName": "Microsoft.Web/sites/slots/config/list/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging/config/appsettings",
+    "status": "Succeeded",
+    "subStatus": "OK"
+  },
+  {
+    "correlationId": "a261d4ae-8dda-44ab-a720-2649854a0b64",
+    "eventTimestamp": "2026-08-03T01:15:35.5342419Z",
+    "operationName": "Microsoft.Web/sites/slots/config/list/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging/config/appsettings",
+    "status": "Started",
+    "subStatus": ""
+  },
+  {
+    "correlationId": "535472fb-5d46-4034-8a14-7af6981d2ccf",
+    "eventTimestamp": "2026-08-03T01:15:31.2393417Z",
+    "operationName": "Microsoft.Web/sites/slots/publishxml/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging",
+    "status": "Succeeded",
+    "subStatus": "OK"
+  },
+  {
+    "correlationId": "535472fb-5d46-4034-8a14-7af6981d2ccf",
+    "eventTimestamp": "2026-08-03T01:15:31.0674801Z",
+    "operationName": "Microsoft.Web/sites/slots/publishxml/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging",
+    "status": "Started",
+    "subStatus": ""
+  },
+  {
+    "correlationId": "ade017ae-74ec-478c-8eed-4b95f60a61d8",
+    "eventTimestamp": "2026-08-03T01:15:21.3542215Z",
+    "operationName": "Microsoft.Web/sites/publishxml/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod",
+    "status": "Succeeded",
+    "subStatus": "OK"
+  },
+  {
+    "correlationId": "ade017ae-74ec-478c-8eed-4b95f60a61d8",
+    "eventTimestamp": "2026-08-03T01:15:21.1354592Z",
+    "operationName": "Microsoft.Web/sites/publishxml/action",
+    "resourceId": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod",
+    "status": "Started",
+    "subStatus": ""
+  }
+]

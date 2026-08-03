@@ -1,0 +1,40 @@
+{
+  "applicationLogs": {
+    "azureBlobStorage": {
+      "level": "Off",
+      "retentionInDays": null,
+      "sasUrl": null
+    },
+    "azureTableStorage": {
+      "level": "Off",
+      "sasUrl": null
+    },
+    "fileSystem": {
+      "level": "Off"
+    }
+  },
+  "detailedErrorMessages": {
+    "enabled": false
+  },
+  "failedRequestsTracing": {
+    "enabled": false
+  },
+  "httpLogs": {
+    "azureBlobStorage": {
+      "enabled": false,
+      "retentionInDays": null,
+      "sasUrl": null
+    },
+    "fileSystem": {
+      "enabled": false,
+      "retentionInDays": null,
+      "retentionInMb": 35
+    }
+  },
+  "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/slots/staging/config/logs",
+  "kind": null,
+  "name": "logs",
+  "resourceGroup": "rg-jm1-web-prod-appsvc",
+  "systemData": null,
+  "type": "Microsoft.Web/sites/config"
+}

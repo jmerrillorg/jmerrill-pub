@@ -1,0 +1,14 @@
+{
+  "availabilityState": "Normal",
+  "defaultHostName": "app-jm1-productions-prod.azurewebsites.net",
+  "hostNames": [
+    "app-jm1-productions-prod.azurewebsites.net"
+  ],
+  "siteConfig": {
+    "alwaysOn": true,
+    "appCommandLine": "node server.js",
+    "healthCheckPath": "/",
+    "linuxFxVersion": "NODE|22-lts"
+  },
+  "state": "Running"
+}

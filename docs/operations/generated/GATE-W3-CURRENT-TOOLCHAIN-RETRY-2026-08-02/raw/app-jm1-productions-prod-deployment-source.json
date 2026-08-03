@@ -1,0 +1,15 @@
+{
+  "branch": null,
+  "deploymentRollbackEnabled": false,
+  "gitHubActionConfiguration": null,
+  "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-web-prod-appsvc/providers/Microsoft.Web/sites/app-jm1-productions-prod/sourcecontrols/web",
+  "isGitHubAction": false,
+  "isManualIntegration": false,
+  "isMercurial": false,
+  "kind": null,
+  "name": "app-jm1-productions-prod",
+  "repoUrl": null,
+  "resourceGroup": "rg-jm1-web-prod-appsvc",
+  "systemData": null,
+  "type": "Microsoft.Web/sites/sourcecontrols"
+}
