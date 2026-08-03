@@ -194,6 +194,7 @@ test('executive recovery exposes package version for corrected replacement dispa
 test('PROGRAM-006 rejects corrupt package binaries and nonfunctional action links', () => {
   const notificationEngine = readFileSync(new URL('../lib/server/author-package-notification-engine.ts', import.meta.url), 'utf8')
   const brandEngine = readFileSync(new URL('../lib/server/author-communication-brand.ts', import.meta.url), 'utf8')
+  const enterpriseRenderer = readFileSync(new URL('../lib/server/jm1-enterprise-communication-renderer.ts', import.meta.url), 'utf8')
   for (const token of [
     'DOCX_ZIP_SIGNATURE',
     '[Content_Types].xml',
@@ -212,7 +213,8 @@ test('PROGRAM-006 rejects corrupt package binaries and nonfunctional action link
   assert.match(brandEngine, /PRIMARY_ACTION_NOT_CLICKABLE/)
   assert.match(brandEngine, /PRIMARY_ACTION_URL_INVALID/)
   assert.match(brandEngine, /SUBJECT_DUPLICATED_WORD/)
-  assert.match(brandEngine, /<a href=/)
+  assert.match(brandEngine, /renderJm1EnterpriseCommunication/)
+  assert.match(enterpriseRenderer, /<a href=/)
 })
 
 test('PROGRAM-006 keeps service-generated roles out of physical email attachments', () => {

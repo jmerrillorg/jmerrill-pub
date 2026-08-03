@@ -19,3 +19,6 @@ azure-functions/acs-email-relay/local.settings.*.json
 
 # Locally-generated, author-specific controlled-record output (never commit real legal/PII documents)
 .controlled-output/
+
+# Runtime bootstrap manifests are regenerated per execution context.
+.bootstrap/

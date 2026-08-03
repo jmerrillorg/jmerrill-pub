@@ -38,22 +38,28 @@ test('shared author communication renderer produces branded HTML and plain text'
   assert.match(rendered.html, /<!doctype html>/i)
   assert.match(rendered.html, /<table role="presentation"/)
   assert.match(rendered.html, /J MERRILL PUBLISHING/)
+  assert.doesNotMatch(rendered.html, /<h1[^>]*>\s*J MERRILL PUBLISHING\s*<\/h1>/i)
+  assert.match(rendered.html, /<h1[^>]*>\s*Interior Layout Materials\s*<\/h1>/i)
+  assert.match(rendered.html, /The Intentional Leader/)
   assert.match(rendered.html, /A Division of J Merrill One/)
   assert.match(rendered.html, /Helping Authors Help Themselves\./)
   assert.match(rendered.html, /Why you are receiving this/)
-  assert.match(rendered.html, /What's attached/)
-  assert.match(rendered.html, /What we(?:'|&#39;)d like you to review/)
+  assert.match(rendered.html, /What(?:'|&#39;)s attached/)
+  assert.match(rendered.html, /What we need from you/)
   assert.match(rendered.html, /How to respond/)
   assert.match(rendered.html, /What happens next/)
   assert.match(rendered.text, /Why you are receiving this/)
   assert.match(rendered.text, /What's attached/)
-  assert.match(rendered.text, /What we'd like you to review/)
+  assert.match(rendered.text, /What we need from you/)
   assert.match(rendered.text, /How to respond/)
   assert.match(rendered.html, /<a href="https:\/\/jmerrill\.pub\/author\/portal\?action=review-package&amp;titleId=title-intentional-leader"/)
   assert.match(rendered.text, /Optional Author Operating Center access: https:\/\/jmerrill\.pub\/author\/portal/)
   assert.match(rendered.text, /Reply directly to publishing@jmerrill\.one/)
   assert.match(rendered.text, /Approved with corrections/)
+  assert.match(rendered.text, /^Interior Layout Materials\nThe Intentional Leader\n/)
   assert.match(rendered.text, /The Publishing Team\nJ Merrill Publishing, Inc\./)
+  assert.match(rendered.text, /614\.965\.6057 · publishing@jmerrill\.one · jmerrill\.pub/)
+  assert.doesNotMatch(rendered.text, /\nWarmly,\s*\nJ Merrill Publishing\b/i)
   assert.doesNotMatch(rendered.text, /package manifest|response mechanism|operational certification|package version|workflow|execution/i)
   assert.equal(rendered.metadata.qualityGate, 'PASS')
   assert.equal(rendered.metadata.htmlSha256.length, 64)
@@ -117,11 +123,43 @@ test('author package notification copy uses the shared brand renderer', () => {
   assert.equal(copy.templateVersion, '1.0.0')
   assert.equal(copy.templateMetadata.qualityGate, 'PASS')
   assert.match(copy.htmlBody, /J MERRILL PUBLISHING/)
-  assert.match(copy.htmlBody, /Interior Layout Review Materials - The Intentional Leader/)
+  assert.doesNotMatch(copy.htmlBody, /<h1[^>]*>\s*J MERRILL PUBLISHING\s*<\/h1>/i)
+  assert.match(copy.htmlBody, /<h1[^>]*>\s*Interior Layout Review Materials\s*<\/h1>/i)
+  assert.match(copy.htmlBody, /The Intentional Leader/)
   assert.match(copy.body, /Good day, Jackie,/)
-  assert.match(copy.body, /What work has been completed/)
+  assert.match(copy.body, /What has been completed/)
   assert.match(copy.body, /Reply directly to publishing@jmerrill\.one/)
+  assert.match(copy.body, /^Interior Layout Review Materials\nThe Intentional Leader\n/)
+  assert.match(copy.body, /The Publishing Team\nJ Merrill Publishing, Inc\./)
+  assert.doesNotMatch(copy.body, /\nWarmly,\s*\nJ Merrill Publishing\b/i)
   assert.match(copy.htmlBody, /Optional Author Operating Center access/)
+})
+
+test('author communication rejects oversized brand heading and invented closing', () => {
+  const validation = brand.validateAuthorCommunicationEmail({
+    templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
+    templateVersion: '1.0.0',
+    html: `<!doctype html><html><body><table><tr><td><h1>J MERRILL PUBLISHING</h1></td></tr></table><h2>Why you are receiving this</h2><h2>What has been completed</h2><h2>What's attached</h2><h2>What we need from you</h2><h2>How to respond</h2><a href="https://jmerrill.pub/author/portal">Review</a><h2>What happens next</h2><h2>Support</h2>A Division of J Merrill One Helping Authors Help Themselves.</body></html>`,
+    text: `Why you are receiving this
+What has been completed
+What's attached
+What we need from you
+How to respond
+Optional Author Operating Center access: https://jmerrill.pub/author/portal
+What happens next
+Support
+Warmly,
+J Merrill Publishing
+The Publishing Team
+J Merrill Publishing, Inc.
+A Division of J Merrill One
+614.965.6057 · publishing@jmerrill.one · jmerrill.pub
+Helping Authors Help Themselves.`,
+  })
+
+  assert.equal(validation.ok, false)
+  assert.match(validation.blocker, /BRAND_NAME_RENDERED_AS_MESSAGE_H1/)
+  assert.match(validation.blocker, /INVENTED_CLOSING_PRESENT/)
 })
 
 test('author communication blocks non-clickable or duplicated-subject package messages', () => {

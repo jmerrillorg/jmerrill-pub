@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jmerrill.one/schemas/jm1-bootstrap-manifest.schema.json",
+  "title": "JM1 Bootstrap Manifest",
+  "type": "object",
+  "required": [
+    "bootstrapVersion",
+    "generatedAt",
+    "status",
+    "repository",
+    "enterpriseCanon",
+    "repositoryCanon",
+    "runtimeCanon",
+    "initiativeContext",
+    "executionAuthority",
+    "conflicts",
+    "stopConditions"
+  ],
+  "properties": {
+    "bootstrapVersion": { "const": "1.0.0" },
+    "generatedAt": { "type": "string" },
+    "status": {
+      "enum": ["BOOTSTRAP PASS", "BOOTSTRAP PASS WITH HOLDS", "BOOTSTRAP FAIL"]
+    },
+    "repository": {
+      "type": "object",
+      "required": ["name", "branch", "headSha", "mainSha", "worktreeClean", "ahead", "behind"],
+      "properties": {
+        "name": { "type": "string" },
+        "branch": { "type": "string" },
+        "headSha": { "type": "string" },
+        "mainSha": { "type": "string" },
+        "worktreeClean": { "type": "boolean" },
+        "ahead": { "type": "number" },
+        "behind": { "type": "number" }
+      }
+    },
+    "enterpriseCanon": { "type": "object", "required": ["status", "documents"] },
+    "repositoryCanon": { "type": "object", "required": ["status", "programs", "standards", "guards"] },
+    "runtimeCanon": { "type": "object", "required": ["status", "communication", "secretValuesPrinted"] },
+    "initiativeContext": { "type": "object", "required": ["status", "initiativeType", "name", "openDecisions"] },
+    "executionAuthority": { "type": "object", "required": ["mode", "mutationAllowed", "communicationAllowed", "deploymentAllowed", "requiredApprovals"] },
+    "conflicts": { "type": "array", "items": { "type": "string" } },
+    "stopConditions": { "type": "array", "items": { "type": "string" } }
+  }
+}
