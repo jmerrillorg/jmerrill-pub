@@ -25,6 +25,46 @@ export const JM1_ENTERPRISE_DESIGN_TOKENS = {
     caption: '13px',
     metadata: '12px',
   },
+  spacing: {
+    pagePadding: '28px',
+    sectionGap: '24px',
+    blockGap: '18px',
+    compactGap: '8px',
+  },
+  buttons: {
+    primaryBackground: '#1D4ED8',
+    primaryText: '#FFFFFF',
+    padding: '11px 16px',
+    fontWeight: '700',
+  },
+  icons: {
+    approvedSet: ['brand', 'action', 'support', 'attachment'],
+    inlineSvgAllowed: false,
+  },
+  borders: {
+    standard: '1px solid #D8DEE9',
+    accent: '4px solid #1D4ED8',
+  },
+  cards: {
+    background: '#FFFFFF',
+    radius: '0',
+    nestedCardsAllowed: false,
+  },
+  callouts: {
+    actionBackground: '#EFF6FF',
+    actionBorder: '#1D4ED8',
+  },
+  tables: {
+    role: 'presentation',
+    borderCollapse: 'collapse',
+    maxWidth: '680px',
+  },
+  accessibility: {
+    language: 'en',
+    preheaderRequired: true,
+    plainTextRequired: true,
+    unsupportedMarkup: ['script', 'link', 'iframe', 'form'],
+  },
 } as const
 
 export type Jm1BrandOverlayKey =

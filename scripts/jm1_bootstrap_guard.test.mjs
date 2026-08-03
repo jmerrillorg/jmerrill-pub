@@ -90,6 +90,16 @@ test('bootstrap command creates manifest outputs for The Intentional Leader pilo
   assert.equal(manifest.initiativeContext.responseClock.state, 'NOT STARTED / NOT REQUIRED - AUTHOR RESPONDED')
 })
 
+test('bootstrap supports only commissioned execution modes', () => {
+  for (const mode of ['read-only', 'development', 'governance', 'production-dry-run', 'production-mutation', 'author-communication', 'deployment']) {
+    assert.match(bootstrap, new RegExp(`'${mode}'`))
+  }
+  assert.throws(
+    () => execFileSync('npm', ['run', 'jm1-bootstrap', '--', '--initiative', 'Mode Check', '--mode', 'legacy-send'], { encoding: 'utf8', stdio: 'pipe' }),
+    /INVALID_BOOTSTRAP_MODE/,
+  )
+})
+
 test('bootstrap contains stale handoff and dirty worktree fail-closed controls', () => {
   assert.match(bootstrap, /STALE_HANDOFF_RECORD/)
   assert.match(bootstrap, /STALE_BRANCH_AUTHORITY/)

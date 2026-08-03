@@ -68,6 +68,12 @@ jobs:
       - name: Run Certification Guards
         run: |
           set -euo pipefail
+          npm run jm1-bootstrap -- --initiative "Publishing App Service Deployment" --mode "deployment"
+          npm run jm1-bootstrap-guard
+          npm run jm1-canon-consistency-guard
+          npm run jm1-initiative-handoff-guard
+          npm run author-communication-brand-guard
+          npm run program006-dispatch-guard
           node scripts/check-catalog-runtime-source.mjs
           node scripts/infra006_health_contract.test.mjs
           node scripts/program002_author_portal_access.test.mjs

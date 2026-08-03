@@ -13,10 +13,10 @@ test('JM1 Enterprise Communication Renderer exposes governed tokens and componen
     'Brand Header',
     'Hero',
     'Greeting',
-    'Reason',
+    'Purpose',
     'Summary',
     'Attachments',
-    'Actions',
+    'Action Required',
     'Timeline',
     'Support',
     'Signature',
@@ -27,7 +27,7 @@ test('JM1 Enterprise Communication Renderer exposes governed tokens and componen
 })
 
 test('enterprise design tokens and brand overlays are centralized', () => {
-  for (const token of ['enterpriseNavy', 'enterpriseGold', 'neutralBackground', 'surfaceWhite', 'textPrimary', 'textSecondary', 'border', 'primaryCta', 'focusState', 'error', 'success']) {
+  for (const token of ['enterpriseNavy', 'enterpriseGold', 'neutralBackground', 'surfaceWhite', 'textPrimary', 'textSecondary', 'border', 'primaryCta', 'focusState', 'error', 'success', 'spacing', 'buttons', 'icons', 'borders', 'cards', 'callouts', 'tables', 'accessibility']) {
     assert.match(tokens, new RegExp(token))
   }
   for (const overlay of ['corporate', 'publishing', 'financial', 'foundation', 'productions', 'agapeInternationalCathedral']) {
