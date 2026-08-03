@@ -1,0 +1,49 @@
+{
+  "purpose": "Compacted SharePoint/source search candidate summary. Bulky raw search-result dumps removed to avoid unnecessary repeated evidence.",
+  "fullManuscriptTextCommitted": 0,
+  "fullPdfTextDumpCommitted": 0,
+  "rawBinaryPayloads": 0,
+  "keyCandidates": [
+    {
+      "name": "Approved Proofreading DOCX",
+      "itemId": "01DF3SEQJAMN5URIB7PVFIEBA2YUH6XTS4",
+      "sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+      "classification": "CANONICAL_CONTENT_SOURCE",
+      "coverage": "January 1-March 31"
+    },
+    {
+      "name": "Registered Layout DOCX",
+      "itemId": "01DF3SEQMYZKHAMTDZSVB2VW3WLE26STEZ",
+      "sha256": "21e9d06ce444bee5289846a448969dfe783e0c81f276904b75f62b122d106a9b",
+      "classification": "INCOMPLETE_LAYOUT_INTERMEDIATE",
+      "coverage": "January 1-January 5"
+    },
+    {
+      "name": "Current 393-page PDF",
+      "itemId": "01DF3SEQI4STBH2YFUXZBZRHWQNBEPGITZ",
+      "sha256": "dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3",
+      "classification": "AUTOMATED_AUTHOR_REVIEW_PROOF",
+      "coverage": "January 1-March 31"
+    },
+    {
+      "name": "Recovered body proof PDF",
+      "sha256": "723fc053774d733d1293082a75e34c6cc958b960f7474a2ff7b9408be32a4269",
+      "classification": "APPROVED_AUTOMATED_LAYOUT_COMPONENT",
+      "pages": 388
+    },
+    {
+      "name": "Recovered front matter PDF",
+      "sha256": "fcd6bebc8f88d839edda4eef7c8df5803fce04ecd7f47605d7c7f09d8dfe99fc",
+      "classification": "APPROVED_AUTOMATED_LAYOUT_COMPONENT",
+      "pages": 5
+    },
+    {
+      "name": "JMP Vellum-derived title structure reference",
+      "sha256": "961a0ade5ab7d6e535119a503dfb1b8f491bdd17ccb3a2eb82887b224bb17055",
+      "classification": "STRUCTURAL_REFERENCE_STANDARD",
+      "nativeVellumRequired": false
+    }
+  ],
+  "approvedAutomatedLayout": "CANONICAL_PRODUCTION_METHOD",
+  "nativeVellumProjectRequired": false
+}

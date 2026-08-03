@@ -1,0 +1,90 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#drives('b%21mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se')/items('01DF3SEQJAMN5URIB7PVFIEBA2YUH6XTS4')/versions",
+  "value": [
+    {
+      "@microsoft.graph.downloadUrl": "[REDACTED_DOWNLOAD_URL]",
+      "id": "5.0",
+      "lastModifiedDateTime": "2026-07-19T00:33:59Z",
+      "size": 466220,
+      "lastModifiedBy": {
+        "application": {
+          "id": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+          "displayName": "Microsoft Azure CLI"
+        },
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      }
+    },
+    {
+      "@microsoft.graph.downloadUrl": "[REDACTED_DOWNLOAD_URL]",
+      "id": "4.0",
+      "lastModifiedDateTime": "2026-07-19T00:31:54Z",
+      "size": 466220,
+      "lastModifiedBy": {
+        "application": {
+          "id": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+          "displayName": "Microsoft Azure CLI"
+        },
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      }
+    },
+    {
+      "@microsoft.graph.downloadUrl": "[REDACTED_DOWNLOAD_URL]",
+      "id": "3.0",
+      "lastModifiedDateTime": "2026-07-19T00:30:53Z",
+      "size": 466220,
+      "lastModifiedBy": {
+        "application": {
+          "id": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+          "displayName": "Microsoft Azure CLI"
+        },
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      }
+    },
+    {
+      "@microsoft.graph.downloadUrl": "[REDACTED_DOWNLOAD_URL]",
+      "id": "2.0",
+      "lastModifiedDateTime": "2026-07-19T00:30:19Z",
+      "size": 466220,
+      "lastModifiedBy": {
+        "application": {
+          "id": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+          "displayName": "Microsoft Azure CLI"
+        },
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      }
+    },
+    {
+      "@microsoft.graph.downloadUrl": "[REDACTED_DOWNLOAD_URL]",
+      "id": "1.0",
+      "lastModifiedDateTime": "2026-07-19T00:29:54Z",
+      "size": 466220,
+      "lastModifiedBy": {
+        "application": {
+          "id": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+          "displayName": "Microsoft Azure CLI"
+        },
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      }
+    }
+  ]
+}

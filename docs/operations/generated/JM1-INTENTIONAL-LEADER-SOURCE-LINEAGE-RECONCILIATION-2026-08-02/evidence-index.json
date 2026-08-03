@@ -1,0 +1,122 @@
+{
+  "package": "JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02",
+  "generatedAt": "2026-08-02T21:45:00-04:00",
+  "title": "The Intentional Leader",
+  "intakeCode": "JMP-INT-202607-0W5PTQ",
+  "pr399": {
+    "finalReviewedHead": "28e6d9d0f7ff772d4ab1edb99293f77b976ca5c0",
+    "mergeSha": "a16ffd38b83bc4f36e495982f8b8dba46261f7fd",
+    "correctedClassification": "INCOMPLETE_LAYOUT_SOURCE"
+  },
+  "disposition": "APPROVED_AUTOMATED_LAYOUT_GENERATION_CHAIN_RECOVERED",
+  "nativeVellumProjectRecovered": "NOT_REQUIRED",
+  "pdfGenerator": "APPROVED_AUTOMATED_LAYOUT_PROCESS: LibreOffice headless body conversion plus pypdf front-matter assembly",
+  "authorState": {
+    "response": "QUESTIONS_OR_CLARIFICATION_REQUESTED",
+    "approvalGiven": false,
+    "responseClockStarted": false,
+    "correctedResendAuthorized": false
+  },
+  "sourceEvidence": {
+    "approvedProofreadDocxSha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+    "incompleteRegisteredLayoutDocxSha256": "21e9d06ce444bee5289846a448969dfe783e0c81f276904b75f62b122d106a9b",
+    "currentInteriorPdfSha256": "dfc25985d495a425935751ab33ab108c372c9373141940fb44ddffc9cf12aca3",
+    "bodyProofSha256": "723fc053774d733d1293082a75e34c6cc958b960f7474a2ff7b9408be32a4269",
+    "frontMatterSha256": "fcd6bebc8f88d839edda4eef7c8df5803fce04ecd7f47605d7c7f09d8dfe99fc"
+  },
+  "files": [
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/00-source-lineage-reconciliation.md",
+      "sha256": "e58c78f6190a58afdfe94e0c1110be636652941f31dce4962bd803171b88562c",
+      "bytes": 7571
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/01-source-lineage-guard-requirement.md",
+      "sha256": "0738047fdf7e74f5f3e2ff412804b819034751a2d06ef6a7b04d7c54027abac8",
+      "bytes": 3580
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/02-automated-layout-authority-readiness.md",
+      "sha256": "246d382737930e1e2d59274434e17b45ccef8a88135534cbb37405eaa18e3244",
+      "bytes": 3321
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/evidence-index.json",
+      "sha256": "5293d3722839ab0890853ffb38d8aa630a87c8d9d260a15a049dee014b6eef4f",
+      "bytes": 6126
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/local-source-candidate-paths.txt",
+      "sha256": "1b685320c1effee7d43cbbd3d4adbb2e1ab1df0f0900ffae413a44e968adceab",
+      "bytes": 22450
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/pdf-metadata-and-content-fingerprints.json",
+      "sha256": "6fa0a80b141349f68c2685458e3c0900b0c42e472420077af346f3c5b17ff506",
+      "bytes": 34563
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/approved-proofread-manuscript.docx.metadata.json",
+      "sha256": "5a050b592d27f0e129f7a2fa75c14a8bbebdc184899ba79f1ee6ebffc0c73d0d",
+      "bytes": 2549
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/approved-proofread-manuscript.docx.versions.json",
+      "sha256": "5394a49875514e9218a57351b7ee9e40c01deab2bcdcac35ca0a18d1f8034835",
+      "bytes": 2838
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/current-interior-proof.pdf.metadata.json",
+      "sha256": "98d1386f8c3ccadcdd4196de2dcccafcaabc7243cf91567678b9b7400e047976",
+      "bytes": 2572
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/current-interior-proof.pdf.versions.json",
+      "sha256": "0563e0ce585312b7f3cceffd6e3d3e034ddab22d511cac44135cd20af769893a",
+      "bytes": 742
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/registered-layout-source.docx.metadata.json",
+      "sha256": "4df735ecb821ceb91be3221eea7bb437814f2ed0d74f50f5251b3f895bb68fbc",
+      "bytes": 2556
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/raw/registered-layout-source.docx.versions.json",
+      "sha256": "becf3ddd13cb9255d74b10b04f26be4eaae541fe5b8ac95ff7a6fbad606bbfcd",
+      "bytes": 741
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/sharepoint-source-candidates.json",
+      "sha256": "102f5c067955ba4380e7854cee9ed4c8212360dba5f85769a0c8ffd8fbfb38cb",
+      "bytes": 1925
+    },
+    {
+      "path": "docs/operations/generated/JM1-INTENTIONAL-LEADER-SOURCE-LINEAGE-RECONCILIATION-2026-08-02/source-candidate-table.json",
+      "sha256": "884fb4074fb3af3917f0946c2ef47ad28bfe03f8776ccf20d38c116228b14123",
+      "bytes": 5073
+    }
+  ],
+  "authorResendAuthorized": false,
+  "responseClockStarted": false,
+  "fullManuscriptTextCommitted": 0,
+  "fullPdfTextDumpCommitted": 0,
+  "rawBinaryPayloads": 0,
+  "authorApproval": "NO",
+  "responseClock": 0,
+  "correctedResend": "NOT_AUTHORIZED",
+  "rawSearchResultDumpsRetained": 0,
+  "rawSearchResultDumpsDisposition": "REMOVED_AFTER_CLASSIFICATION_CORRECTION_TO_REDUCE_REPEATED_EVIDENCE; STRUCTURED CANDIDATE SUMMARY RETAINED",
+  "nativeVellumProjectRequired": false,
+  "approvedAutomatedLayout": "CANONICAL_PRODUCTION_METHOD",
+  "registeredLayoutDocxDisposition": "INCOMPLETE_LAYOUT_INTERMEDIATE_NOT_CURRENT_PRODUCTION_AUTHORITY",
+  "automatedLayoutSourceRegistrationReconciliation": "REQUIRED",
+  "vellum": "REFERENCE_OPTIONAL_MANUAL_PRODUCTION_TOOL",
+  "templateDocx": "INTERNAL_STRUCTURAL_REFERENCE",
+  "expectedEntries": 90,
+  "automatedOutputEntries": 90,
+  "missingEntries": 0,
+  "duplicateEntries": 0,
+  "toc": "MATCHES_COMPLETE_BODY",
+  "correctedProofRequired": "PENDING_COPYRIGHT_METADATA_AND_VISUAL_DEFECT_REVIEW",
+  "correctedReplacement": "PREPARED_NOT_SENT"
+}
