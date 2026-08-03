@@ -1,0 +1,86 @@
+[
+  {
+    "label": "production-root",
+    "url": "https://app-jm1-productions-prod.azurewebsites.net/",
+    "checkedAt": "2026-08-03T02:10:26Z",
+    "statusCode": 200,
+    "responseMs": 2163,
+    "headers": {
+      "content-type": "application/json",
+      "cache-control": "no-store"
+    },
+    "body": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.productions\",\"environment\":\"production\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}",
+    "json": {
+      "status": "ready",
+      "service": "JM1 Enterprise Web Platform",
+      "message": "Infrastructure Ready. Production traffic has not migrated.",
+      "property": "jmerrill.productions",
+      "environment": "production",
+      "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+      "traffic_migrated": false
+    }
+  },
+  {
+    "label": "production-health",
+    "url": "https://app-jm1-productions-prod.azurewebsites.net/api/health",
+    "checkedAt": "2026-08-03T02:10:28Z",
+    "statusCode": 200,
+    "responseMs": 307,
+    "headers": {
+      "content-type": "application/json",
+      "cache-control": "no-store"
+    },
+    "body": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.productions\",\"environment\":\"production\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}",
+    "json": {
+      "status": "ready",
+      "service": "JM1 Enterprise Web Platform",
+      "message": "Infrastructure Ready. Production traffic has not migrated.",
+      "property": "jmerrill.productions",
+      "environment": "production",
+      "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+      "traffic_migrated": false
+    }
+  },
+  {
+    "label": "staging-root",
+    "url": "https://app-jm1-productions-prod-staging.azurewebsites.net/",
+    "checkedAt": "2026-08-03T02:10:28Z",
+    "statusCode": 200,
+    "responseMs": 730,
+    "headers": {
+      "content-type": "application/json",
+      "cache-control": "no-store"
+    },
+    "body": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.productions\",\"environment\":\"staging\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}",
+    "json": {
+      "status": "ready",
+      "service": "JM1 Enterprise Web Platform",
+      "message": "Infrastructure Ready. Production traffic has not migrated.",
+      "property": "jmerrill.productions",
+      "environment": "staging",
+      "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+      "traffic_migrated": false
+    }
+  },
+  {
+    "label": "staging-health",
+    "url": "https://app-jm1-productions-prod-staging.azurewebsites.net/api/health",
+    "checkedAt": "2026-08-03T02:10:29Z",
+    "statusCode": 200,
+    "responseMs": 1132,
+    "headers": {
+      "content-type": "application/json",
+      "cache-control": "no-store"
+    },
+    "body": "{\"status\":\"ready\",\"service\":\"JM1 Enterprise Web Platform\",\"message\":\"Infrastructure Ready. Production traffic has not migrated.\",\"property\":\"jmerrill.productions\",\"environment\":\"staging\",\"release\":\"GATE-W3-MINIMAL-RUNTIME-20260730-001\",\"traffic_migrated\":false}",
+    "json": {
+      "status": "ready",
+      "service": "JM1 Enterprise Web Platform",
+      "message": "Infrastructure Ready. Production traffic has not migrated.",
+      "property": "jmerrill.productions",
+      "environment": "staging",
+      "release": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+      "traffic_migrated": false
+    }
+  }
+]

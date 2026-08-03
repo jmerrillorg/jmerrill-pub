@@ -1,0 +1,117 @@
+{
+  "checkedAt": "2026-08-03T02:13:07.095390Z",
+  "production": [
+    {
+      "name": "JM1_GATE",
+      "value": "GATE-W3",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_MIGRATION_STATE",
+      "value": "INFRASTRUCTURE_READY_DNS_NOT_CUT_OVER",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_PROPERTY_DOMAIN",
+      "value": "jmerrill.productions",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_PROPERTY_KEY",
+      "value": "productions",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_RELEASE_ID",
+      "value": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_RELEASE_SHA",
+      "value": "e47e18b86121a8ac189dfe9b659e5fcffb69489e",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_SLOT_ENVIRONMENT",
+      "value": "production",
+      "slotSetting": true
+    },
+    {
+      "name": "JM1_WEB_GATE",
+      "value": "GATE-W3",
+      "slotSetting": false
+    },
+    {
+      "name": "NODE_ENV",
+      "value": "production",
+      "slotSetting": true
+    },
+    {
+      "name": "WEBSITE_NODE_DEFAULT_VERSION",
+      "value": "~22",
+      "slotSetting": false
+    },
+    {
+      "name": "WEBSITE_RUN_FROM_PACKAGE",
+      "value": "1",
+      "slotSetting": false
+    }
+  ],
+  "staging": [
+    {
+      "name": "JM1_GATE",
+      "value": "GATE-W3",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_MIGRATION_STATE",
+      "value": "foundation-ready",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_PROPERTY_DOMAIN",
+      "value": "jmerrill.productions",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_PROPERTY_KEY",
+      "value": "productions",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_RELEASE_ID",
+      "value": "GATE-W3-MINIMAL-RUNTIME-20260730-001",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_RELEASE_SHA",
+      "value": "913fd27cdac46baadffe636527dc5582ed23125f91468d056127887fd5293652",
+      "slotSetting": false
+    },
+    {
+      "name": "JM1_SLOT_ENVIRONMENT",
+      "value": "staging",
+      "slotSetting": true
+    },
+    {
+      "name": "JM1_WEB_GATE",
+      "value": "GATE-W3",
+      "slotSetting": false
+    },
+    {
+      "name": "NODE_ENV",
+      "value": "staging",
+      "slotSetting": true
+    },
+    {
+      "name": "WEBSITE_NODE_DEFAULT_VERSION",
+      "value": "~22",
+      "slotSetting": false
+    },
+    {
+      "name": "WEBSITE_RUN_FROM_PACKAGE",
+      "value": "1",
+      "slotSetting": false
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"status":"ready","service":"JM1 Enterprise Web Platform","message":"Infrastructure Ready. Production traffic has not migrated.","property":"jmerrill.productions","environment":"staging","release":"GATE-W3-MINIMAL-RUNTIME-20260730-001","traffic_migrated":false}
