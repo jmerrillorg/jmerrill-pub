@@ -1,0 +1,63 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(driveItem)/$entity",
+  "@microsoft.graph.downloadUrl": "[REDACTED_DOWNLOAD_URL]",
+  "@microsoft.graph.downloadUrlNoAuth": "[REDACTED_DOWNLOAD_URL]",
+  "createdBy": {
+    "application": {
+      "id": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+      "displayName": "Microsoft Azure CLI"
+    },
+    "user": {
+      "email": "jm1-admin@jmerrill.one",
+      "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+      "displayName": "\u200eJM1 Admin\u200e"
+    }
+  },
+  "createdDateTime": "2026-07-19T00:29:53Z",
+  "eTag": "\"{487B6320-3FA0-4A7D-8204-1AC50FEBCE5C},5\"",
+  "id": "01DF3SEQJAMN5URIB7PVFIEBA2YUH6XTS4",
+  "lastModifiedBy": {
+    "application": {
+      "id": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+      "displayName": "Microsoft Azure CLI"
+    },
+    "user": {
+      "email": "jm1-admin@jmerrill.one",
+      "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+      "displayName": "\u200eJM1 Admin\u200e"
+    }
+  },
+  "lastModifiedDateTime": "2026-07-19T00:33:59Z",
+  "name": "2026-07-19-The-Intentional-Leader-Volume-I-Proofread-Manuscript.docx",
+  "parentReference": {
+    "driveType": "documentLibrary",
+    "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+    "id": "01DF3SEQMGVFALTXLCR5GJVOK4NBV3FXVS",
+    "name": "2026-07-19_Proofreading-Author-Review-Package",
+    "path": "/drives/b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se/root:/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ - Jackie Smith jr - The Intentional Leader/20_Editorial/05_Proofreading/Volume-I/2026-07-19_Proofreading-Author-Review-Package",
+    "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+  },
+  "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B487B6320-3FA0-4A7D-8204-1AC50FEBCE5C%7D&file=2026-07-19-The-Intentional-Leader-Volume-I-Proofread-Manuscript.docx&action=default&mobileredirect=true",
+  "cTag": "\"c:{487B6320-3FA0-4A7D-8204-1AC50FEBCE5C},5\"",
+  "file": {
+    "fileExtension": ".docx",
+    "hashes": {
+      "quickXorHash": "AKO1zX096p1JCxjjRPvh0GlpMCY="
+    },
+    "irmEffectivelyEnabled": false,
+    "irmEnabled": false,
+    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  },
+  "fileSystemInfo": {
+    "createdDateTime": "2026-07-19T00:29:53Z",
+    "lastModifiedDateTime": "2026-07-19T00:33:59Z"
+  },
+  "isAuthoritative": false,
+  "shared": {
+    "effectiveRoles": [
+      "write"
+    ],
+    "scope": "users"
+  },
+  "size": 466220
+}

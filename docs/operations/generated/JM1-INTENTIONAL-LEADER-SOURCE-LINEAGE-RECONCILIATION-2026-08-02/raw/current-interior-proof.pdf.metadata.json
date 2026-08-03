@@ -1,0 +1,63 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(driveItem)/$entity",
+  "@microsoft.graph.downloadUrl": "[REDACTED_DOWNLOAD_URL]",
+  "@microsoft.graph.downloadUrlNoAuth": "[REDACTED_DOWNLOAD_URL]",
+  "createdBy": {
+    "application": {
+      "id": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+      "displayName": "Microsoft Azure CLI"
+    },
+    "user": {
+      "email": "jm1-admin@jmerrill.one",
+      "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+      "displayName": "\u200eJM1 Admin\u200e"
+    }
+  },
+  "createdDateTime": "2026-08-02T07:54:24Z",
+  "eTag": "\"{7DC2941C-B460-43BE-989E-D06848F32279},1\"",
+  "id": "01DF3SEQI4STBH2YFUXZBZRHWQNBEPGITZ",
+  "lastModifiedBy": {
+    "application": {
+      "id": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+      "displayName": "Microsoft Azure CLI"
+    },
+    "user": {
+      "email": "jm1-admin@jmerrill.one",
+      "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+      "displayName": "\u200eJM1 Admin\u200e"
+    }
+  },
+  "lastModifiedDateTime": "2026-08-02T07:54:24Z",
+  "name": "The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf",
+  "parentReference": {
+    "driveType": "documentLibrary",
+    "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+    "id": "01DF3SEQPYAMRBZNOPCZAJQOYTZY6MIM4S",
+    "name": "2026-08-02_Corrected-Interior-Layout-Author-Review-Package",
+    "path": "/drives/b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se/root:/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ - Jackie Smith Jr - The Intentional Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package",
+    "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+  },
+  "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf",
+  "cTag": "\"c:{7DC2941C-B460-43BE-989E-D06848F32279},1\"",
+  "file": {
+    "fileExtension": ".pdf",
+    "hashes": {
+      "quickXorHash": "rBZQfanwiWK0iUlaTvHvExPrOEw="
+    },
+    "irmEffectivelyEnabled": false,
+    "irmEnabled": false,
+    "mimeType": "application/pdf"
+  },
+  "fileSystemInfo": {
+    "createdDateTime": "2026-08-02T07:54:24Z",
+    "lastModifiedDateTime": "2026-08-02T07:54:24Z"
+  },
+  "isAuthoritative": false,
+  "shared": {
+    "effectiveRoles": [
+      "write"
+    ],
+    "scope": "users"
+  },
+  "size": 811688
+}

@@ -1,0 +1,1714 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.driveItem)",
+  "@odata.nextLink": "https://graph.microsoft.com/v1.0/drives/b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se/root/search(q='JMP-INT-202607-0W5PTQ')?$top=50&$skiptoken=s!NTA7YWZiNDc0ZmYtMjA4My00M2ZjLTlmYWUtNDBhMmRmYzg5NDY1",
+  "value": [
+    {
+      "createdDateTime": "2026-08-02T07:54:21Z",
+      "id": "01DF3SEQO5FAIVZDQNX5A2VVBA4WIN2QJG",
+      "lastModifiedDateTime": "2026-08-02T07:54:21Z",
+      "name": "JMP-INT-202607-0W5PTQ - Jackie Smith Jr - The Intentional Leader",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPXYFBYQHDZQRDYEP7ZJI6DOTPS",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T07:54:21Z",
+        "lastModifiedDateTime": "2026-08-02T07:54:21Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T00:31:59Z",
+      "id": "01DF3SEQKU2VVBPBOQXNG3EXC7QUSMWNWQ",
+      "lastModifiedDateTime": "2026-08-02T00:31:59Z",
+      "name": "JMP-INT-202607-0W5PTQ - Jackie Smith jr - The Intentional Leader",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNQBAVUEG3GUBFIF75FKJNRXVPA",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T00:31:59Z",
+        "lastModifiedDateTime": "2026-08-02T00:31:59Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:18Z",
+      "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+      "lastModifiedDateTime": "2026-07-16T20:07:51Z",
+      "name": "JMP-INT-202607-0W5PTQ - Jackie Smith jr - The Intentional Leader",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPBCCW267BUWJFKJAPJBQLS6FNN",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:18Z",
+        "lastModifiedDateTime": "2026-07-16T20:07:51Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-19T00:29:48Z",
+      "id": "01DF3SEQM4COUXYUPIYNHY7DCFFC6R75DP",
+      "lastModifiedDateTime": "2026-07-19T00:29:48Z",
+      "name": "JMP-INT-202607-0W5PTQ - Jackie Smith jr - The Intentional Leader",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJOZBMSFU2UMNHKLVCHOR2C54KA",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-19T00:29:48Z",
+        "lastModifiedDateTime": "2026-07-19T00:29:48Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:28Z",
+      "id": "01DF3SEQOQIWPDM3TRGFBJMT5CQA6TPNKF",
+      "lastModifiedDateTime": "2026-07-02T21:52:28Z",
+      "name": "JMP-INT-202607-0W5PTQ - The Intentional Leader.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B369E45D0-716E-4231-964F-A2803D37B545%7D&file=JMP-INT-202607-0W5PTQ%20-%20The%20Intentional%20Leader.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 1053763,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQI2GGARTEZW2VGJIUAZWUT54CQU",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:28Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:28Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-18T10:35:18Z",
+      "id": "01DF3SEQOBY3AW6FDHGREZUZQEU4HDTKQI",
+      "lastModifiedDateTime": "2026-07-18T10:35:19Z",
+      "name": "JMP-INT-202607-0W5PTQ - Jackie Smith jr - The Intentional Leader",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Cover-Design/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIM5OKIZAPU2ZAZH35HKGP66GOK",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-18T10:35:18Z",
+        "lastModifiedDateTime": "2026-07-18T10:35:19Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-06T12:15:28Z",
+      "id": "01DF3SEQMJKY4XUV6QL5GK3BFU3UU32NIM",
+      "lastModifiedDateTime": "2026-07-05T12:06:04Z",
+      "name": "JMP-Premier-Package-Commissioning-Addendum-The-Intentional-Leader-JMP-INT-202607-0W5PTQ.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B7A395689-D057-4C5F-AD84-B4DD29BD350C%7D&file=JMP-Premier-Package-Commissioning-Addendum-The-Intentional-Leader-JMP-INT-202607-0W5PTQ.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 16029,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQKXHHALDB4C5BDIIFB6DGV74E2B",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-06T12:15:28Z",
+        "lastModifiedDateTime": "2026-07-05T12:06:04Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-06T12:15:28Z",
+      "id": "01DF3SEQITSYA6C7GFXBAI7ZNZITTRG435",
+      "lastModifiedDateTime": "2026-07-05T12:06:04Z",
+      "name": "JMP-Publishing-Agreement-The-Intentional-Leader-JMP-INT-202607-0W5PTQ.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BE1019613-C57C-40B8-8FE5-B944E713737D%7D&file=JMP-Publishing-Agreement-The-Intentional-Leader-JMP-INT-202607-0W5PTQ.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 37512,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQKXHHALDB4C5BDIIFB6DGV74E2B",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-06T12:15:28Z",
+        "lastModifiedDateTime": "2026-07-05T12:06:04Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-06T12:15:27Z",
+      "id": "01DF3SEQI2QVHKKET7HVCZNMNX5SL76WQ3",
+      "lastModifiedDateTime": "2026-07-05T21:21:31Z",
+      "name": "JMP-Publishing-Agreement-The-Intentional-Leader-JMP-INT-202607-0W5PTQ-PUBLISHER-SIGNED.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BA54E851A-7F12-453D-96B1-B7EC97FF5A1B%7D&file=JMP-Publishing-Agreement-The-Intentional-Leader-JMP-INT-202607-0W5PTQ-PUBLISHER-SIGNED.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 257475,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQKXHHALDB4C5BDIIFB6DGV74E2B",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-06T12:15:27Z",
+        "lastModifiedDateTime": "2026-07-05T21:21:31Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T07:54:22Z",
+      "id": "01DF3SEQPYAMRBZNOPCZAJQOYTZY6MIM4S",
+      "lastModifiedDateTime": "2026-08-02T07:54:23Z",
+      "name": "2026-08-02_Corrected-Interior-Layout-Author-Review-Package",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQO5FAIVZDQNX5A2VVBA4WIN2QJG",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T07:54:22Z",
+        "lastModifiedDateTime": "2026-08-02T07:54:23Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-09T23:46:57Z",
+      "id": "01DF3SEQOQXT4DXF2YGFGJLRUX3A6BZEVL",
+      "lastModifiedDateTime": "2026-07-09T23:46:57Z",
+      "name": "2026-07-09 - Quarterly Series Structure Decision - The Intentional Leader.md",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/01_Editorial-Review/Internal/2026-07-09%20-%20Quarterly%20Series%20Structure%20Decision%20-%20The%20Intentional%20Leader.md",
+      "size": 1413,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNURXDNV4I75BE3N4PTWGTRVIR4",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/markdown",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-09T23:46:57Z",
+        "lastModifiedDateTime": "2026-07-09T23:46:57Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T07:54:26Z",
+      "id": "01DF3SEQIB3W65T46TQNEIPSD2PP73UAUT",
+      "lastModifiedDateTime": "2026-08-02T07:54:26Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Author-Review-Manifest.json",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Author-Review-Manifest.json",
+      "size": 1343,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPYAMRBZNOPCZAJQOYTZY6MIM4S",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/json",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T07:54:26Z",
+        "lastModifiedDateTime": "2026-08-02T07:54:26Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T00:32:09Z",
+      "id": "01DF3SEQIENIDZJEX3ORB2USKGTI3LK6GV",
+      "lastModifiedDateTime": "2026-08-02T00:32:10Z",
+      "name": "01_Interior-Layout",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/06_Production/01_Interior-Layout",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQICFNGJIIX3BFHZ4EKFTJEQPIN6",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T00:32:09Z",
+        "lastModifiedDateTime": "2026-08-02T00:32:10Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-09T20:50:08Z",
+      "id": "01DF3SEQIP3I574PADIZGZMHVWHONJBZ2M",
+      "lastModifiedDateTime": "2026-07-09T20:50:08Z",
+      "name": "2026-07-09 - Editorial Diagnostic Memo - The Intentional Leader.md",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/01_Editorial-Review/Internal/2026-07-09%20-%20Editorial%20Diagnostic%20Memo%20-%20The%20Intentional%20Leader.md",
+      "size": 5247,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNURXDNV4I75BE3N4PTWGTRVIR4",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/markdown",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-09T20:50:08Z",
+        "lastModifiedDateTime": "2026-07-09T20:50:08Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T00:31:59Z",
+      "id": "01DF3SEQLERY4L7CABOFAJ3IQJKNG5JIMD",
+      "lastModifiedDateTime": "2026-08-02T00:31:59Z",
+      "name": "20_Editorial",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQKU2VVBPBOQXNG3EXC7QUSMWNWQ",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T00:31:59Z",
+        "lastModifiedDateTime": "2026-08-02T00:31:59Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-10T00:55:54Z",
+      "id": "01DF3SEQLIH7EHGF5WZZA2LXVBQEGZYFRA",
+      "lastModifiedDateTime": "2026-07-10T01:08:12Z",
+      "name": "README-Source-Manuscript.md",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/02_Developmental-Editing/Volume-I/01_Source-Manuscript/README-Source-Manuscript.md",
+      "size": 1413,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQMGNV6WQUFA7FHZMKKUWUJQCUAV",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/markdown",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-10T00:55:54Z",
+        "lastModifiedDateTime": "2026-07-10T01:08:12Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-11T01:15:35Z",
+      "id": "01DF3SEQKWEK3E6ZNFN5DZ2WMAE6T2G4NO",
+      "lastModifiedDateTime": "2026-07-11T01:15:35Z",
+      "name": "99_Internal",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/99_Internal",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-11T01:15:35Z",
+        "lastModifiedDateTime": "2026-07-11T01:15:35Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T00:31:59Z",
+      "id": "01DF3SEQICFNGJIIX3BFHZ4EKFTJEQPIN6",
+      "lastModifiedDateTime": "2026-08-02T00:31:59Z",
+      "name": "06_Production",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/06_Production",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQLERY4L7CABOFAJ3IQJKNG5JIMD",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T00:31:59Z",
+        "lastModifiedDateTime": "2026-08-02T00:31:59Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-19T00:29:50Z",
+      "id": "01DF3SEQMYIY3F6BVS3REIZNSHRJ5URD7E",
+      "lastModifiedDateTime": "2026-07-19T00:29:50Z",
+      "name": "20_Editorial",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQM4COUXYUPIYNHY7DCFFC6R75DP",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-19T00:29:50Z",
+        "lastModifiedDateTime": "2026-07-19T00:29:50Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:32:47Z",
+      "id": "01DF3SEQJBT6LOSBOMJRFYI52TYGPCIG43",
+      "lastModifiedDateTime": "2026-07-08T14:32:47Z",
+      "name": "Internal",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/03_Line-Editing/Internal",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQKF5KOOQXZHLRBZKWI554GWND7T",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:32:47Z",
+        "lastModifiedDateTime": "2026-07-08T14:32:47Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:32:56Z",
+      "id": "01DF3SEQKJ3APPXEGDG5AZXZOJT7DZ2JLQ",
+      "lastModifiedDateTime": "2026-07-08T14:32:56Z",
+      "name": "Internal",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/04_Copyediting/Internal",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIHIKUIGRXWMVDZZQVSP5FPDUKY",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:32:56Z",
+        "lastModifiedDateTime": "2026-07-08T14:32:56Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:33:30Z",
+      "id": "01DF3SEQNLO7AJNBMFWJBZPLXNQTPU5ESH",
+      "lastModifiedDateTime": "2026-07-08T14:33:30Z",
+      "name": "07_Publisher-Review",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/07_Publisher-Review",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:33:30Z",
+        "lastModifiedDateTime": "2026-07-08T14:33:30Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:24Z",
+      "id": "01DF3SEQNBQGLCANSM3FHJIHT4AOMQI7JJ",
+      "lastModifiedDateTime": "2026-07-02T21:52:24Z",
+      "name": "06_Marketing",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/06_Marketing",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:24Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:24Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:22Z",
+      "id": "01DF3SEQNKHVLVFXIGIFE2U5IIG3IML545",
+      "lastModifiedDateTime": "2026-07-02T21:52:22Z",
+      "name": "04_Production",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/04_Production",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:22Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:22Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:32:22Z",
+      "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+      "lastModifiedDateTime": "2026-07-08T14:32:22Z",
+      "name": "20_Editorial",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:32:22Z",
+        "lastModifiedDateTime": "2026-07-08T14:32:22Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:25Z",
+      "id": "01DF3SEQIPWAHPH3CFDVHJZHIU37FORMVM",
+      "lastModifiedDateTime": "2026-07-02T21:52:25Z",
+      "name": "08_Archive",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/08_Archive",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:25Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:25Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:20Z",
+      "id": "01DF3SEQNJNBXQYZEHHBEJUPSLB6DOVPFM",
+      "lastModifiedDateTime": "2026-07-02T21:52:20Z",
+      "name": "02_Editorial",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/02_Editorial",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:20Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:20Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:32:52Z",
+      "id": "01DF3SEQIHIKUIGRXWMVDZZQVSP5FPDUKY",
+      "lastModifiedDateTime": "2026-07-08T14:32:52Z",
+      "name": "04_Copyediting",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/04_Copyediting",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:32:52Z",
+        "lastModifiedDateTime": "2026-07-08T14:32:52Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:32:33Z",
+      "id": "01DF3SEQPF7JICWB3EVFD2YUA7XOM6OPFU",
+      "lastModifiedDateTime": "2026-07-08T14:32:34Z",
+      "name": "02_Developmental-Editing",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/02_Developmental-Editing",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:32:33Z",
+        "lastModifiedDateTime": "2026-07-08T14:32:34Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:23Z",
+      "id": "01DF3SEQLYCAWKWP2X5VEZ3G3AUZHBJYPG",
+      "lastModifiedDateTime": "2026-07-02T21:52:24Z",
+      "name": "05_Distribution",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/05_Distribution",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:23Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:24Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:25Z",
+      "id": "01DF3SEQMVKVQCT4UZTZGL54B5LGLS2FDS",
+      "lastModifiedDateTime": "2026-07-02T21:52:25Z",
+      "name": "07_Legal-Rights",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/07_Legal-Rights",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:25Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:25Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:19Z",
+      "id": "01DF3SEQNIUHX7UWTMUZHZU3QRGVSEKSBP",
+      "lastModifiedDateTime": "2026-07-02T21:52:19Z",
+      "name": "00_Admin",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/00_Admin",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:19Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:19Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:32:42Z",
+      "id": "01DF3SEQKF5KOOQXZHLRBZKWI554GWND7T",
+      "lastModifiedDateTime": "2026-07-08T14:32:42Z",
+      "name": "03_Line-Editing",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/03_Line-Editing",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:32:42Z",
+        "lastModifiedDateTime": "2026-07-08T14:32:42Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:33:34Z",
+      "id": "01DF3SEQNEV2LFLCZJQZGZLHRNSVOAOR5M",
+      "lastModifiedDateTime": "2026-07-08T14:33:35Z",
+      "name": "09_Meetings",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/09_Meetings",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:33:34Z",
+        "lastModifiedDateTime": "2026-07-08T14:33:35Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-19T00:29:51Z",
+      "id": "01DF3SEQIJH4C2HXYRIJH3RPSEVF4WRLU5",
+      "lastModifiedDateTime": "2026-07-19T00:29:51Z",
+      "name": "05_Proofreading",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/05_Proofreading",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQMYIY3F6BVS3REIZNSHRJ5URD7E",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-19T00:29:51Z",
+        "lastModifiedDateTime": "2026-07-19T00:29:51Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-06T12:15:22Z",
+      "id": "01DF3SEQKXHHALDB4C5BDIIFB6DGV74E2B",
+      "lastModifiedDateTime": "2026-07-05T21:21:31Z",
+      "name": "Agreement-Preparation",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/00_Admin/Agreement-Preparation",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNIUHX7UWTMUZHZU3QRGVSEKSBP",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-06T12:15:22Z",
+        "lastModifiedDateTime": "2026-07-05T21:21:31Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:32:24Z",
+      "id": "01DF3SEQP6JYCZ4FUBVFCL3JZCG45XALNK",
+      "lastModifiedDateTime": "2026-07-08T14:32:24Z",
+      "name": "01_Editorial-Review",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/01_Editorial-Review",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:32:24Z",
+        "lastModifiedDateTime": "2026-07-08T14:32:24Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:33:32Z",
+      "id": "01DF3SEQJ6O564ZABD3JFK7ZQTQDVTLQFT",
+      "lastModifiedDateTime": "2026-07-08T14:33:33Z",
+      "name": "08_Exceptions",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/08_Exceptions",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:33:32Z",
+        "lastModifiedDateTime": "2026-07-08T14:33:33Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:21Z",
+      "id": "01DF3SEQJ4XSQZJVOWP5D3IB557H6G4AEI",
+      "lastModifiedDateTime": "2026-07-02T21:52:21Z",
+      "name": "03_Design",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/03_Design",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:21Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:21Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:33:09Z",
+      "id": "01DF3SEQLO5RPNS5AFEFGLK6AEK5U2EPPY",
+      "lastModifiedDateTime": "2026-07-08T14:33:10Z",
+      "name": "06_Approval-Packages",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/06_Approval-Packages",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:33:09Z",
+        "lastModifiedDateTime": "2026-07-08T14:33:10Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:33:38Z",
+      "id": "01DF3SEQLHBLZLYUOP6FFK4ZQXAMTL2RL2",
+      "lastModifiedDateTime": "2026-07-08T14:33:38Z",
+      "name": "99_Archive-Superseded",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/99_Archive-Superseded",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:33:38Z",
+        "lastModifiedDateTime": "2026-07-08T14:33:38Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:19Z",
+      "id": "01DF3SEQM6RQZBVXACMRD33G4IEPHMSUX2",
+      "lastModifiedDateTime": "2026-07-02T21:52:19Z",
+      "name": "01_Manuscript",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/01_Manuscript",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIA64C77GWALFEYBRKVLMDBY26W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:19Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:19Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:33:00Z",
+      "id": "01DF3SEQPL3GJLPBFGSJDZRDHI2IGR7K2W",
+      "lastModifiedDateTime": "2026-07-08T14:33:00Z",
+      "name": "05_Proofreading",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/05_Proofreading",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:33:00Z",
+        "lastModifiedDateTime": "2026-07-08T14:33:00Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-11T01:15:35Z",
+      "id": "01DF3SEQOKCLPG7LXUSZHLJU7EHSYAJIOC",
+      "lastModifiedDateTime": "2026-07-11T01:15:35Z",
+      "name": "Shadow Evaluations",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/99_Internal/Shadow%20Evaluations",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQKWEK3E6ZNFN5DZ2WMAE6T2G4NO",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-11T01:15:35Z",
+        "lastModifiedDateTime": "2026-07-11T01:15:35Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-02T21:52:26Z",
+      "id": "01DF3SEQI2GGARTEZW2VGJIUAZWUT54CQU",
+      "lastModifiedDateTime": "2026-07-02T21:52:26Z",
+      "name": "Original",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/01_Manuscript/Original",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQM6RQZBVXACMRD33G4IEPHMSUX2",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-02T21:52:26Z",
+        "lastModifiedDateTime": "2026-07-02T21:52:26Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:33:36Z",
+      "id": "01DF3SEQLFAVEMRLYCCFC3GGWV2MR7KWE4",
+      "lastModifiedDateTime": "2026-07-08T14:33:37Z",
+      "name": "10_Handoff-to-Production",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/10_Handoff-to-Production",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNG5TYIV6HWNBDZSSZC4X7UWX4W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:33:36Z",
+        "lastModifiedDateTime": "2026-07-08T14:33:37Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:33:07Z",
+      "id": "01DF3SEQJN5CZJWH7MXBGIDX4V6DWIEECC",
+      "lastModifiedDateTime": "2026-07-08T14:33:07Z",
+      "name": "Evidence",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/05_Proofreading/Evidence",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPL3GJLPBFGSJDZRDHI2IGR7K2W",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:33:07Z",
+        "lastModifiedDateTime": "2026-07-08T14:33:07Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:32:58Z",
+      "id": "01DF3SEQNFRZ2ULNC5SBF2UBU5UEVD6PYO",
+      "lastModifiedDateTime": "2026-07-08T14:32:58Z",
+      "name": "Evidence",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/04_Copyediting/Evidence",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIHIKUIGRXWMVDZZQVSP5FPDUKY",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:32:58Z",
+        "lastModifiedDateTime": "2026-07-08T14:32:58Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:32:49Z",
+      "id": "01DF3SEQMX2EYTWUB5RREKCAQDGYMVNZUJ",
+      "lastModifiedDateTime": "2026-07-08T14:32:50Z",
+      "name": "Evidence",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/03_Line-Editing/Evidence",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQKF5KOOQXZHLRBZKWI554GWND7T",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:32:49Z",
+        "lastModifiedDateTime": "2026-07-08T14:32:50Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T14:32:41Z",
+      "id": "01DF3SEQOXVF3NMGKNI5AYPQ4E4U2LSGB6",
+      "lastModifiedDateTime": "2026-07-08T14:32:41Z",
+      "name": "Evidence",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/05_Proofreading/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/02_Developmental-Editing/Evidence",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPF7JICWB3EVFD2YUA7XOM6OPFU",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T14:32:41Z",
+        "lastModifiedDateTime": "2026-07-08T14:32:41Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    }
+  ]
+}

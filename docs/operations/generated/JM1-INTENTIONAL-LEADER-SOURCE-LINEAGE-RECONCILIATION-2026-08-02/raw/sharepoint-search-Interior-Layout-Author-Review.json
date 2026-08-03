@@ -1,0 +1,1754 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.driveItem)",
+  "@odata.nextLink": "https://graph.microsoft.com/v1.0/drives/b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se/root/search(q='Interior-Layout-Author-Review')?$top=50&$skiptoken=s!NTA7MTNiZjlmYzItNGU1NS00NDNjLTg2ZjEtYzBjNTI5Zjg0ZmNl",
+  "value": [
+    {
+      "createdDateTime": "2026-08-02T07:54:22Z",
+      "id": "01DF3SEQPYAMRBZNOPCZAJQOYTZY6MIM4S",
+      "lastModifiedDateTime": "2026-08-02T07:54:23Z",
+      "name": "2026-08-02_Corrected-Interior-Layout-Author-Review-Package",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQO5FAIVZDQNX5A2VVBA4WIN2QJG",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T07:54:22Z",
+        "lastModifiedDateTime": "2026-08-02T07:54:23Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T00:32:16Z",
+      "id": "01DF3SEQJDR42BC5I6ANA3ZZXFU26JIYWZ",
+      "lastModifiedDateTime": "2026-08-02T00:32:16Z",
+      "name": "2026-08-01_Interior-Layout-Author-Review-Package",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/06_Production/01_Interior-Layout/2026-08-01_Interior-Layout-Author-Review-Package",
+      "size": 0,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIENIDZJEX3ORB2USKGTI3LK6GV",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T00:32:16Z",
+        "lastModifiedDateTime": "2026-08-02T00:32:16Z"
+      },
+      "folder": {
+        "childCount": 0
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T00:34:54Z",
+      "id": "01DF3SEQOBM2WUNK7F4ZGIDV47I6NMYJHU",
+      "lastModifiedDateTime": "2026-08-02T00:34:54Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Author-Review-Instructions-and-Cover-Message.md",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/06_Production/01_Interior-Layout/2026-08-01_Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Author-Review-Instructions-and-Cover-Message.md",
+      "size": 6737,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJDR42BC5I6ANA3ZZXFU26JIYWZ",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/markdown",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T00:34:54Z",
+        "lastModifiedDateTime": "2026-08-02T00:34:54Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T07:54:24Z",
+      "id": "01DF3SEQI4STBH2YFUXZBZRHWQNBEPGITZ",
+      "lastModifiedDateTime": "2026-08-02T07:54:24Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf",
+      "size": 811688,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPYAMRBZNOPCZAJQOYTZY6MIM4S",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/pdf",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T07:54:24Z",
+        "lastModifiedDateTime": "2026-08-02T07:54:24Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T07:54:26Z",
+      "id": "01DF3SEQIB3W65T46TQNEIPSD2PP73UAUT",
+      "lastModifiedDateTime": "2026-08-02T07:54:26Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Author-Review-Manifest.json",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Author-Review-Manifest.json",
+      "size": 1343,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPYAMRBZNOPCZAJQOYTZY6MIM4S",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/json",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T07:54:26Z",
+        "lastModifiedDateTime": "2026-08-02T07:54:26Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T00:32:39Z",
+      "id": "01DF3SEQM4Z3ANB5TVXRCZWPHG4SWNXCIE",
+      "lastModifiedDateTime": "2026-08-02T00:34:45Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Author-Review-Manifest.json",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/06_Production/01_Interior-Layout/2026-08-01_Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Author-Review-Manifest.json",
+      "size": 1343,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJDR42BC5I6ANA3ZZXFU26JIYWZ",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/json",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T00:32:39Z",
+        "lastModifiedDateTime": "2026-08-02T00:34:45Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T07:56:38Z",
+      "id": "01DF3SEQK5Q7S7VSN7TZAJIDMRLLCQ2PSM",
+      "lastModifiedDateTime": "2026-08-02T07:56:38Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Corrected-Author-Cover-Message.md",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Corrected-Author-Cover-Message.md",
+      "size": 3186,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPYAMRBZNOPCZAJQOYTZY6MIM4S",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/markdown",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T07:56:38Z",
+        "lastModifiedDateTime": "2026-08-02T07:56:38Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T00:32:26Z",
+      "id": "01DF3SEQJ2D4NDOTM4EJB2F54AJBXAFUUP",
+      "lastModifiedDateTime": "2026-08-02T00:32:26Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/06_Production/01_Interior-Layout/2026-08-01_Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Author-Review-Proof.pdf",
+      "size": 811688,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJDR42BC5I6ANA3ZZXFU26JIYWZ",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/pdf",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T00:32:26Z",
+        "lastModifiedDateTime": "2026-08-02T00:32:26Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T07:54:27Z",
+      "id": "01DF3SEQOIVGURSZSFVNCK5MD3PQKX6UBZ",
+      "lastModifiedDateTime": "2026-08-02T07:54:27Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Author-Response-Mechanism.md",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Author-Response-Mechanism.md",
+      "size": 2555,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPYAMRBZNOPCZAJQOYTZY6MIM4S",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/markdown",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T07:54:27Z",
+        "lastModifiedDateTime": "2026-08-02T07:54:27Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T07:54:26Z",
+      "id": "01DF3SEQPJW4R4XSSBNZG2KHZTAS2SJYVO",
+      "lastModifiedDateTime": "2026-08-02T07:54:26Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Review-Instructions.txt",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Review-Instructions.txt",
+      "size": 1978,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPYAMRBZNOPCZAJQOYTZY6MIM4S",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/plain",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T07:54:26Z",
+        "lastModifiedDateTime": "2026-08-02T07:54:26Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T06:36:27Z",
+      "id": "01DF3SEQLQNXIUJ22MBFBJRHT4NCHQJB6H",
+      "lastModifiedDateTime": "2026-08-02T06:36:27Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Review-Instructions.txt",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/06_Production/01_Interior-Layout/2026-08-01_Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Review-Instructions.txt",
+      "size": 1978,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJDR42BC5I6ANA3ZZXFU26JIYWZ",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/plain",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T06:36:27Z",
+        "lastModifiedDateTime": "2026-08-02T06:36:27Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-08-02T07:54:27Z",
+      "id": "01DF3SEQOOFVZ4CW4WI5BIT5V3HR5MT6B5",
+      "lastModifiedDateTime": "2026-08-02T07:54:27Z",
+      "name": "The-Intentional-Leader-Interior-Layout-Corrected-Author-Cover-Message.html",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Titles/06_Production/02_Interior-Layout/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20Jr%20-%20The%20Intentional%20Leader/2026-08-02_Corrected-Interior-Layout-Author-Review-Package/The-Intentional-Leader-Interior-Layout-Corrected-Author-Cover-Message.html",
+      "size": 1561,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPYAMRBZNOPCZAJQOYTZY6MIM4S",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/html",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-08-02T07:54:27Z",
+        "lastModifiedDateTime": "2026-08-02T07:54:27Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-19T00:29:58Z",
+      "id": "01DF3SEQOIYZESIAJNHFEL7GJSXU7BPYUJ",
+      "lastModifiedDateTime": "2026-07-19T00:34:02Z",
+      "name": "2026-07-19-The-Intentional-Leader-Interior-Layout-Readiness.md",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/05_Proofreading/Volume-I/2026-07-19_Proofreading-Author-Review-Package/2026-07-19-The-Intentional-Leader-Interior-Layout-Readiness.md",
+      "size": 751,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQMGVFALTXLCR5GJVOK4NBV3FXVS",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/markdown",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-19T00:29:58Z",
+        "lastModifiedDateTime": "2026-07-19T00:34:02Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-21T03:00:09Z",
+      "id": "01DF3SEQOJTBN25U5GC5FLBGNMSRONF5ZL",
+      "lastModifiedDateTime": "2026-07-21T03:00:09Z",
+      "name": "2026-07-21-The-Intentional-Leader-Volume-I-Interior-Layout-QA-Evidence.md",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/05_Proofreading/Volume-I/2026-07-19_Proofreading-Author-Review-Package/2026-07-21-The-Intentional-Leader-Volume-I-Interior-Layout-QA-Evidence.md",
+      "size": 1252,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQMGVFALTXLCR5GJVOK4NBV3FXVS",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/markdown",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-21T03:00:09Z",
+        "lastModifiedDateTime": "2026-07-21T03:00:09Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-21T03:00:11Z",
+      "id": "01DF3SEQJLIJKZLS5KDRAJ5G2X2MIOXZCB",
+      "lastModifiedDateTime": "2026-07-21T03:00:11Z",
+      "name": "2026-07-21-The-Intentional-Leader-Volume-I-Interior-Layout-Package-Manifest.json",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/05_Proofreading/Volume-I/2026-07-19_Proofreading-Author-Review-Package/2026-07-21-The-Intentional-Leader-Volume-I-Interior-Layout-Package-Manifest.json",
+      "size": 2408,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQMGVFALTXLCR5GJVOK4NBV3FXVS",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/json",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-21T03:00:11Z",
+        "lastModifiedDateTime": "2026-07-21T03:00:11Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-22T19:42:22Z",
+      "id": "01DF3SEQPEXOAHY2MKEFAJCR2WVECRGCEZ",
+      "lastModifiedDateTime": "2026-05-21T00:36:18Z",
+      "name": "doc6-publishing-pathways.pdf",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/03_Marketing/doc6-publishing-pathways.pdf",
+      "size": 287629,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNJQAIHZMCZXFB2HMRVDZLMSQQM",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/pdf",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-22T19:42:22Z",
+        "lastModifiedDateTime": "2026-05-21T00:36:18Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-22T19:42:27Z",
+      "id": "01DF3SEQIHN7CRZDHC7ZEKRC5HXJYYFMNZ",
+      "lastModifiedDateTime": "2026-05-21T02:27:12Z",
+      "name": "Prospect Folder.pdf",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/03_Marketing/Prospect%20Folder.pdf",
+      "size": 251050,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNJQAIHZMCZXFB2HMRVDZLMSQQM",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/pdf",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-22T19:42:27Z",
+        "lastModifiedDateTime": "2026-05-21T02:27:12Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-19T00:29:59Z",
+      "id": "01DF3SEQJZ6MK674OUXJEIECKHKJMZRVJG",
+      "lastModifiedDateTime": "2026-07-19T00:34:03Z",
+      "name": "2026-07-19-JM1-Publisher-Operations-Wave2-Report.md",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/JMP-INT-202607-0W5PTQ%20-%20Jackie%20Smith%20jr%20-%20The%20Intentional%20Leader/20_Editorial/05_Proofreading/Volume-I/2026-07-19_Proofreading-Author-Review-Package/2026-07-19-JM1-Publisher-Operations-Wave2-Report.md",
+      "size": 1258,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQMGVFALTXLCR5GJVOK4NBV3FXVS",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/markdown",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-19T00:29:59Z",
+        "lastModifiedDateTime": "2026-07-19T00:34:03Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-24T09:08:49Z",
+      "id": "01DF3SEQOOSJZ6OWLXZBDK52H7QNFY2W4G",
+      "lastModifiedDateTime": "2026-05-25T12:56:28Z",
+      "name": "JMP_Author_Pipeline_Tracker_2026.xlsx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BE77392CE-7759-46C8-AEE8-FF834B8D5B86%7D&file=JMP_Author_Pipeline_Tracker_2026.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 26031,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQOIVW5I3EDNDJCLBOL6OAVQTIG2",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-24T09:08:49Z",
+        "lastModifiedDateTime": "2026-05-25T12:56:28Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-01T13:26:48Z",
+      "id": "01DF3SEQMHKQRZGJKZARGYVAKAOZK2MVNT",
+      "lastModifiedDateTime": "2026-06-30T11:14:42Z",
+      "name": "IB-002-12-product-master-readback.json",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/General/Developer/C-Developer-Workstation/repos/jmerrill-pub/docs/implementation/evidence/IB-002-12/IB-002-12-product-master-readback.json",
+      "size": 5781,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPTNXMCMJDKI5CIRTWEVUMSSF76",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/json",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-01T13:26:48Z",
+        "lastModifiedDateTime": "2026-06-30T11:14:42Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-25T21:28:35Z",
+      "id": "01DF3SEQLEWSSXFPVQSNF26NZJWUCMI6AV",
+      "lastModifiedDateTime": "2026-07-25T21:28:35Z",
+      "name": "2026-07-25-Publishing-Schema-Harmonization-Audit-Register.csv",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B72A5B464-B0BE-4B93-AF37-29B504C47815%7D&file=2026-07-25-Publishing-Schema-Harmonization-Audit-Register.csv&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 6389,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQOJNYRXKT3GWZCZMVIINTTUVXVF",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.ms-excel",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-25T21:28:35Z",
+        "lastModifiedDateTime": "2026-07-25T21:28:35Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-06-30T11:09:03Z",
+      "id": "01DF3SEQLRJCJE26IGTRD2VLMTDDY23VCF",
+      "lastModifiedDateTime": "2026-06-16T19:12:48Z",
+      "name": "JMP_Product_Reference_Guide_v1_1.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B4D924871-0679-479C-AAAD-9318F1ADD445%7D&file=JMP_Product_Reference_Guide_v1_1.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 34491,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQKNEMBVFPUVONGLPATQTGJVNGMA",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-06-30T11:09:03Z",
+        "lastModifiedDateTime": "2026-06-16T19:12:48Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-01T13:27:13Z",
+      "id": "01DF3SEQJIE3IVG3INHBGLETXECZXAEM2O",
+      "lastModifiedDateTime": "2026-06-30T11:14:42Z",
+      "name": "IB-002-12-product-master-readback.json",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/General/Developer/C-Developer-Workstation/repos/jmerrill-pub/docs/baselines/IS-002-BC-Foundation-Baseline-20260701/source/docs/implementation/evidence/IB-002-12/IB-002-12-product-master-readback.json",
+      "size": 5781,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQO56IJ3IM6DBBDZCTSTDEXFHTZB",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/json",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-01T13:27:13Z",
+        "lastModifiedDateTime": "2026-06-30T11:14:42Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-04T12:26:00Z",
+      "id": "01DF3SEQNLWON65VIHF5FICDFOJZCEBG63",
+      "lastModifiedDateTime": "2026-05-04T16:19:58Z",
+      "name": "JMP_Publishing_Package_Addendum_v2.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BEE9BB3AB-07D5-4A2F-810C-AE4E44409BDB%7D&file=JMP_Publishing_Package_Addendum_v2.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 24510,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQKTDJWX5QN4ABFLCO66RAZZ5QIW",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-04T12:26:00Z",
+        "lastModifiedDateTime": "2026-05-04T16:19:58Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-01T13:22:21Z",
+      "id": "01DF3SEQJIO6XUOER6EFG3CCJV2YPHANWL",
+      "lastModifiedDateTime": "2026-07-01T12:34:58Z",
+      "name": "PROGRAM-002-Initial-Backlog.md",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/General/Developer/C-Developer-Workstation/repos/jmerrill-pub/docs/implementation/PROGRAM-002-Initial-Backlog.md",
+      "size": 9735,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQLGBCHN2GNQJ5GIC6UDIMARLGFN",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "text/markdown",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-01T13:22:21Z",
+        "lastModifiedDateTime": "2026-07-01T12:34:58Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-06T02:33:09Z",
+      "id": "01DF3SEQJME6PSQYAX5FGL7J2PDB4TJJVD",
+      "lastModifiedDateTime": "2026-05-04T16:44:20Z",
+      "name": "JMP_Publishing_Package_Addendum_v2.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B289F272C-1760-4CE9-BFA7-4F187934A6A3%7D&file=JMP_Publishing_Package_Addendum_v2.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 24867,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPCKIJOETP5BFB3TGCETZW5O7Z4",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-06T02:33:09Z",
+        "lastModifiedDateTime": "2026-05-04T16:44:20Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-12-10T12:32:56Z",
+      "id": "01DF3SEQMDBEP4NYX4EJAJKY55QZJGRCLE",
+      "lastModifiedDateTime": "2025-12-31T11:49:41Z",
+      "name": "Prompts.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BC61F0983-FCE2-4022-9563-BD8652688964%7D&file=Prompts.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 38802,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQISEASRCIOXZZCJM3BP4X22CZHL",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-12-10T12:32:56Z",
+        "lastModifiedDateTime": "2025-12-31T11:49:41Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-04T12:26:00Z",
+      "id": "01DF3SEQIO5LNHYGGT5FBL7364BI3BVOF3",
+      "lastModifiedDateTime": "2026-05-04T16:19:58Z",
+      "name": "JMP_Publishing_Package_Addendum_v2.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B7CDAEA0E-D318-42E9-BFEF-DC0A361AB8BB%7D&file=JMP_Publishing_Package_Addendum_v2.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 24510,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQMWEM77LFSOXREYH26UJW3YY3NJ",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-04T12:26:00Z",
+        "lastModifiedDateTime": "2026-05-04T16:19:58Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-07T13:26:46Z",
+      "id": "01DF3SEQJ3GVVENPXERRELJWAUWFSLQAXW",
+      "lastModifiedDateTime": "2026-05-04T16:44:20Z",
+      "name": "JMP_Publishing_Package_Addendum_v2.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B466A353B-E4BE-488C-B4D8-14B164B802F6%7D&file=JMP_Publishing_Package_Addendum_v2.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 24867,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIBHJOEZA5W2NFZ2GEHNP3ND2PC",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-07T13:26:46Z",
+        "lastModifiedDateTime": "2026-05-04T16:44:20Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-06-30T03:56:13Z",
+      "id": "01DF3SEQJR6A7BOEPT4VGZGRN7FHHMZA3E",
+      "lastModifiedDateTime": "2026-06-30T03:56:13Z",
+      "name": "JMP_Publishing_Package_Addendum_FILLED_64e387e0-7e6a-f111-a826-00224820105b.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B173EF031-F311-4DE5-9345-BF29CECC8364%7D&file=JMP_Publishing_Package_Addendum_FILLED_64e387e0-7e6a-f111-a826-00224820105b.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 310370,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQPKPHXXHQ2WA5CYBPMLJUREOR5C",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-06-30T03:56:13Z",
+        "lastModifiedDateTime": "2026-06-30T03:56:13Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-04T12:24:01Z",
+      "id": "01DF3SEQOF6KXWIUBY5RAKHWNPC6BEW7W2",
+      "lastModifiedDateTime": "2026-05-04T16:19:58Z",
+      "name": "JMP_Publishing_Package_Addendum_v2.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B64AFF2C5-3850-40EC-A3D9-AF17824B7EDA%7D&file=JMP_Publishing_Package_Addendum_v2.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 24480,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQLHSR44MNKJMJAYKMH2TP7DWLXZ",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-04T12:24:01Z",
+        "lastModifiedDateTime": "2026-05-04T16:19:58Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-12T04:38:09Z",
+      "id": "01DF3SEQIKUIW5BGLT7JGLWG5OSQM4FZ2M",
+      "lastModifiedDateTime": "2026-05-04T16:44:20Z",
+      "name": "JMP_Publishing_Package_Addendum_v2.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BD02DA20A-7399-4CFA-BB1B-AE9419C2E74C%7D&file=JMP_Publishing_Package_Addendum_v2.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 24867,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQMOJOFL2OEQPJCJDO6LYTOSD2JM",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-12T04:38:09Z",
+        "lastModifiedDateTime": "2026-05-04T16:44:20Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-04T12:25:59Z",
+      "id": "01DF3SEQOGTRHHIBIMZ5FKTJGHMA7I6CWB",
+      "lastModifiedDateTime": "2026-05-04T16:19:58Z",
+      "name": "JMP_Publishing_Package_Addendum_v2.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B744E9CC6-0C05-4ACF-A9A4-C7603E8F0AC1%7D&file=JMP_Publishing_Package_Addendum_v2.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 24480,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQMPID56EITNN5BIBBCG4KQGKTWT",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-04T12:25:59Z",
+        "lastModifiedDateTime": "2026-05-04T16:19:58Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-04T12:26:00Z",
+      "id": "01DF3SEQJYX75U4BVYWRF3ZONA5NU5K6PP",
+      "lastModifiedDateTime": "2026-05-04T16:19:58Z",
+      "name": "JMP_Publishing_Package_Addendum_v2.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B4EFBBF38-B806-4BB4-BCB9-A0EB69D579EF%7D&file=JMP_Publishing_Package_Addendum_v2.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 24480,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNPC246Z4FXEZFZYMBIE2OFLTVJ",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-04T12:26:00Z",
+        "lastModifiedDateTime": "2026-05-04T16:19:58Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-06-30T11:09:03Z",
+      "id": "01DF3SEQMUQMDOXHQ355A2F3F4FDO52LW7",
+      "lastModifiedDateTime": "2026-06-16T19:11:34Z",
+      "name": "JMP_Full_Catalog_v2_1.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BEB068394-1B9E-41EF-A2EC-BC28DDDD2EDF%7D&file=JMP_Full_Catalog_v2_1.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 43914,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQKNEMBVFPUVONGLPATQTGJVNGMA",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-06-30T11:09:03Z",
+        "lastModifiedDateTime": "2026-06-16T19:11:34Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-13T08:00:52Z",
+      "id": "01DF3SEQJXPQ6PTZLPQNEYK3CFFM7DE4Q4",
+      "lastModifiedDateTime": "2026-05-04T16:44:20Z",
+      "name": "JMP_Publishing_Package_Addendum_v2.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BF93C7C37-6FE5-4983-856C-452B3E32721C%7D&file=JMP_Publishing_Package_Addendum_v2.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 24867,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQL54KXR2HJCZNDZX3LA2NOQOGUL",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-13T08:00:52Z",
+        "lastModifiedDateTime": "2026-05-04T16:44:20Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-05-04T12:26:01Z",
+      "id": "01DF3SEQJSVA6IJRGLH5GJRXM4YTYWJWQ6",
+      "lastModifiedDateTime": "2026-05-04T16:19:58Z",
+      "name": "JMP_Publishing_Package_Addendum_v2.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B843CA832-CBC4-4C3F-98DD-9CC4F164DA1E%7D&file=JMP_Publishing_Package_Addendum_v2.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 24480,
+      "createdBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQIM27RBE7PQWJDJX7RLLABFPOQT",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-05-04T12:26:01Z",
+        "lastModifiedDateTime": "2026-05-04T16:19:58Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-05-12T11:19:02Z",
+      "id": "01DF3SEQOPUEYNFXBEXZBYKOOF5EKI7LHT",
+      "lastModifiedDateTime": "2025-05-14T12:52:28Z",
+      "name": "ContractTemplate.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BD230A1CF-24DC-43BE-8539-C5E9148FACF3%7D&file=ContractTemplate.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 63491,
+      "createdBy": {
+        "user": {
+          "email": "jackie@jmerrill.pub",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNUUIJBVGIG2VF2Y56GWGQWACTB",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-05-12T11:19:02Z",
+        "lastModifiedDateTime": "2025-05-14T12:52:28Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-04-26T14:29:40Z",
+      "id": "01DF3SEQLKQ7NW66ENYRC2AUFCTBJ7ONAN",
+      "lastModifiedDateTime": "2025-04-28T04:54:44Z",
+      "name": "ContractTemplate.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B6FDB876A-8D78-45C4-A050-A29853F7340D%7D&file=ContractTemplate.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 168067,
+      "createdBy": {
+        "user": {
+          "email": "jackie@jmerrill.pub",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJUYJOFLBVELNFJFS4NA4YDRQ2Z",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-04-26T14:29:40Z",
+        "lastModifiedDateTime": "2025-04-28T04:54:44Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-06-07T06:58:33Z",
+      "id": "01DF3SEQMLTKH5MLH5T5DZYWZQ6AEZEYVW",
+      "lastModifiedDateTime": "2025-06-18T18:54:33Z",
+      "name": "ContractTemplate.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BD68F9A8B-FD2C-479F-9C5B-30F0099262B6%7D&file=ContractTemplate.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 63558,
+      "createdBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJRKDFRXIGUFZEZJGUKZZAT5A25",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-06-07T06:58:33Z",
+        "lastModifiedDateTime": "2025-06-18T18:54:33Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T02:10:11Z",
+      "id": "01DF3SEQIQIQSJJO6N5ZFYS3YIADIRFEO3",
+      "lastModifiedDateTime": "2026-07-08T02:10:11Z",
+      "name": "CONTRACT_TEMPLATE.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B94244410-CDBB-4BEE-896F-0800D11291DB%7D&file=CONTRACT_TEMPLATE.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 75188,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJ6P327I6ML6BCZS4ERK4456XJX",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T02:10:11Z",
+        "lastModifiedDateTime": "2026-07-08T02:10:11Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-05-12T11:19:02Z",
+      "id": "01DF3SEQPVLQQC7MMYNFF2JFOUALDLTKLT",
+      "lastModifiedDateTime": "2025-03-29T12:45:34Z",
+      "name": "CONTRACT_TEMPLATE.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B2F205CF5-98B1-4B69-A495-D402C6B9A973%7D&file=CONTRACT_TEMPLATE.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 76978,
+      "createdBy": {
+        "user": {
+          "email": "jackie@jmerrill.pub",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jackie@jmerrill.pub",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNUUIJBVGIG2VF2Y56GWGQWACTB",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-05-12T11:19:02Z",
+        "lastModifiedDateTime": "2025-03-29T12:45:34Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-05-12T11:19:02Z",
+      "id": "01DF3SEQKMDFNPHASBJBDKYCYTLVKJJAHD",
+      "lastModifiedDateTime": "2025-05-14T12:52:28Z",
+      "name": "ContractTemplate-Nimbus.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BF35A194C-4182-4648-AC0B-135D549480E3%7D&file=ContractTemplate-Nimbus.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 63492,
+      "createdBy": {
+        "user": {
+          "email": "jackie@jmerrill.pub",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNUUIJBVGIG2VF2Y56GWGQWACTB",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-05-12T11:19:02Z",
+        "lastModifiedDateTime": "2025-05-14T12:52:28Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-05-12T11:19:02Z",
+      "id": "01DF3SEQKXRTUSQNOI6JD3LK7DANVRNK5N",
+      "lastModifiedDateTime": "2025-05-14T12:52:28Z",
+      "name": "ContractTemplate-Nimbus-Nimbus.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B28E98C57-C835-47F2-B5AB-E3036B16ABAD%7D&file=ContractTemplate-Nimbus-Nimbus.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 63496,
+      "createdBy": {
+        "user": {
+          "email": "jackie@jmerrill.pub",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQNUUIJBVGIG2VF2Y56GWGQWACTB",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-05-12T11:19:02Z",
+        "lastModifiedDateTime": "2025-05-14T12:52:28Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-04-08T03:07:58Z",
+      "id": "01DF3SEQOZI54MFAYTDZGYOXC6PISZX2NX",
+      "lastModifiedDateTime": "2025-04-15T07:58:59Z",
+      "name": "ContractTemplate.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BC27847D9-1383-4D1E-875C-5E7A259BE9B7%7D&file=ContractTemplate.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 62961,
+      "createdBy": {
+        "user": {
+          "email": "jackie@jmerrill.pub",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJHK6DXUUBFDNBIB5KTRK2XX2S3",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-04-08T03:07:58Z",
+        "lastModifiedDateTime": "2025-04-15T07:58:59Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-07-14T19:40:16Z",
+      "id": "01DF3SEQKHSGU4W526DBCY4MJIX6WQP3ZR",
+      "lastModifiedDateTime": "2025-03-30T02:13:44Z",
+      "name": "ContractTemplate.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BCBA99147-5E77-4518-8E31-28BFAD07EF31%7D&file=ContractTemplate.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 59512,
+      "createdBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQMPYMSGFDFSL5ALC5XMBPDVAB6C",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-07-14T19:40:16Z",
+        "lastModifiedDateTime": "2025-03-30T02:13:44Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-06-07T06:58:33Z",
+      "id": "01DF3SEQKZALAUTVATENDYL4HY2NP44IB7",
+      "lastModifiedDateTime": "2025-06-18T18:54:33Z",
+      "name": "ContractTemplate-Nimbus-Nimbus.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B49C10259-13D4-4723-85F0-F8D35FCE203F%7D&file=ContractTemplate-Nimbus-Nimbus.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 63555,
+      "createdBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJRKDFRXIGUFZEZJGUKZZAT5A25",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-06-07T06:58:33Z",
+        "lastModifiedDateTime": "2025-06-18T18:54:33Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2025-06-04T20:08:35Z",
+      "id": "01DF3SEQLMMOQWCI6UOVDY3SVRZCMCKTEP",
+      "lastModifiedDateTime": "2025-05-14T12:52:28Z",
+      "name": "ContractTemplate-Nimbus.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B61A1636C-D423-4775-8DCA-B1C898254C8F%7D&file=ContractTemplate-Nimbus.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 63492,
+      "createdBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "jackie@jmerrill.one",
+          "displayName": "Jackie Smith, Jr."
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQN5WVM2EYU2A5GZ4NWL4U52JVOD",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2025-06-04T20:08:35Z",
+        "lastModifiedDateTime": "2025-05-14T12:52:28Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T02:10:05Z",
+      "id": "01DF3SEQJVQD6IPBQA35BLE4PFOHHBOIRB",
+      "lastModifiedDateTime": "2026-07-08T02:10:05Z",
+      "name": "CONTRACT_TEMPLATE-Nimbus.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B87FC8035-0086-42DF-B271-E571CE172221%7D&file=CONTRACT_TEMPLATE-Nimbus.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 75188,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQJ6P327I6ML6BCZS4ERK4456XJX",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T02:10:05Z",
+        "lastModifiedDateTime": "2026-07-08T02:10:05Z"
+      },
+      "searchResult": {}
+    },
+    {
+      "createdDateTime": "2026-07-08T02:10:00Z",
+      "id": "01DF3SEQLEOCHT7ILYI5DIYXAZN6PS623G",
+      "lastModifiedDateTime": "2026-07-08T02:10:00Z",
+      "name": "CONTRACT_TEMPLATE-Nimbus-Nimbus.docx",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B3F8F7064-78A1-4647-8C5C-196F9F2F6B66%7D&file=CONTRACT_TEMPLATE-Nimbus-Nimbus.docx&action=default&mobileredirect=true&DefaultItemOpen=1",
+      "size": 75188,
+      "createdBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "lastModifiedBy": {
+        "user": {
+          "email": "",
+          "displayName": "SharePoint App"
+        }
+      },
+      "parentReference": {
+        "driveType": "documentLibrary",
+        "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "id": "01DF3SEQM2YKVGYS323REJGWCDYJCFGQHJ",
+        "siteId": "35fb0d98-bc68-4250-9d0d-8c07d68e4024"
+      },
+      "file": {
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "hashes": {}
+      },
+      "fileSystemInfo": {
+        "createdDateTime": "2026-07-08T02:10:00Z",
+        "lastModifiedDateTime": "2026-07-08T02:10:00Z"
+      },
+      "searchResult": {}
+    }
+  ]
+}

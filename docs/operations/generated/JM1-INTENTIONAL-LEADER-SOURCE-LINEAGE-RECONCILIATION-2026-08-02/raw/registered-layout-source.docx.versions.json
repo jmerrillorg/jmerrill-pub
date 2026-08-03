@@ -1,0 +1,22 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#drives('b%21mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se')/items('01DF3SEQMYZKHAMTDZSVB2VW3WLE26STEZ')/versions",
+  "value": [
+    {
+      "@microsoft.graph.downloadUrl": "[REDACTED_DOWNLOAD_URL]",
+      "id": "1.0",
+      "lastModifiedDateTime": "2026-07-21T03:00:07Z",
+      "size": 21573,
+      "lastModifiedBy": {
+        "application": {
+          "id": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+          "displayName": "Microsoft Azure CLI"
+        },
+        "user": {
+          "email": "jm1-admin@jmerrill.one",
+          "id": "9750d862-2024-42bc-9707-f84b325dfb19",
+          "displayName": "\u200eJM1 Admin\u200e"
+        }
+      }
+    }
+  ]
+}
