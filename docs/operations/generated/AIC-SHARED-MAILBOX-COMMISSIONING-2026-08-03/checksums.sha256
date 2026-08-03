@@ -1,0 +1,10 @@
+34cc0c49a0525f29016ec8402831c2ce1f29ed889eb5665058aa746656534fb9  docs/operations/generated/AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03/00-executive-summary.md
+3227569c87b8f6318e300930505ac0a85f025d72b570e8ffb7cb7246580790b1  docs/operations/generated/AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03/01-domain-dns-exchange-readback.md
+3670e591e8309d11bf1ac7075ca6706e5ebd3e1c4b6ed785a81b5bf16b69a54b  docs/operations/generated/AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03/02-mailbox-and-alias-commissioning-register.csv
+58b2bce9c1815a2794017dc5947b01304f6b25f4ddbc10d17b6d13e00689ddbf  docs/operations/generated/AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03/03-delegate-matrix.md
+4344ca29f0a9b2b51e2c650995c851dd9d0f7b7787ecc7adf281d80ffdc02ab7  docs/operations/generated/AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03/04-validation-report.md
+cc3384e7a8abd358dfdc77b84aba148258889d0c611e35b15025ad470557c6c7  docs/operations/generated/AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03/evidence-index.json
+2e2e51954f2f6e4359783cdcc56c23a47d6520c28ac86a7436f1b9b469d335ab  docs/operations/generated/AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03/raw/authoritative-dns-readback.txt
+11ab0a34d814e71fd9e5e867f39fd3b80b014a4d98932a6b678205ba26449e29  docs/operations/generated/AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03/raw/azure-dns-zone-post-dkim-dmarc.json
+5a19791d54d353879d3780a70ee904673ce225be5075f6f6558c8632ec64ae9a  docs/operations/generated/AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03/raw/exchange-readiness-readback.json
+a05a300aedc627f92b2be90df71e6e47fb0f11b1fb257aaad57de3c4eb5d7455  docs/operations/generated/AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03/raw/graph-domain-agapeic.org.json

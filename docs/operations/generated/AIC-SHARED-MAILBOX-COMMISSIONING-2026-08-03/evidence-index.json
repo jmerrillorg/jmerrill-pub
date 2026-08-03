@@ -1,0 +1,32 @@
+{
+  "package": "AIC-SHARED-MAILBOX-COMMISSIONING-2026-08-03",
+  "createdAt": "2026-08-03T00:00:00Z",
+  "status": "PARTIALLY_COMPLETE_DKIM_SYNC_HELD",
+  "tenant": "JM1",
+  "primaryDomain": "agapeic.org",
+  "microsoft365DomainVerified": true,
+  "azureDnsReconciled": true,
+  "exchangeAcceptedDomain": "PASS",
+  "dkimEnabled": false,
+  "currentHold": "AIC_EXCHANGE_DKIM_SYNC_PENDING",
+  "mailboxCreationExecuted": false,
+  "legacyComCreated": 0,
+  "runtimeMutations": [
+    "Created Exchange DKIM signing config for agapeic.org",
+    "Added selector1._domainkey CNAME in Azure DNS",
+    "Added selector2._domainkey CNAME in Azure DNS",
+    "Changed _dmarc TXT from p=reject to p=none"
+  ],
+  "evidence": [
+    "00-executive-summary.md",
+    "01-domain-dns-exchange-readback.md",
+    "02-mailbox-and-alias-commissioning-register.csv",
+    "03-delegate-matrix.md",
+    "04-validation-report.md",
+    "raw/authoritative-dns-readback.txt",
+    "raw/azure-dns-zone-post-dkim-dmarc.json",
+    "raw/exchange-readiness-readback.json",
+    "raw/graph-domain-agapeic.org.json"
+  ],
+  "nextGovernedAction": "Retry DKIM enablement after Microsoft 365 DNS sync recognizes the selector CNAMEs, then create only the three pilot shared mailboxes."
+}

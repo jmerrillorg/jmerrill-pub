@@ -1,0 +1,29 @@
+{
+  "acceptedDomain": {
+    "Name": "agapeic.org",
+    "DomainName": "agapeic.org",
+    "DomainType": "Authoritative",
+    "Default": false,
+    "OutboundOnly": false
+  },
+  "dkim": {
+    "Domain": "agapeic.org",
+    "Enabled": false,
+    "Status": "CnameMissing",
+    "Selector1CNAME": "selector1-agapeic-org._domainkey.jmerrillfoundation.y-v1.dkim.mail.microsoft",
+    "Selector2CNAME": "selector2-agapeic-org._domainkey.jmerrillfoundation.y-v1.dkim.mail.microsoft"
+  },
+  "pilotRecipients": [],
+  "approvedOwners": [
+    {
+      "DisplayName": "Jackie Smith, Jr.",
+      "PrimarySmtpAddress": "jackie@jmerrill.one",
+      "RecipientTypeDetails": "UserMailbox"
+    },
+    {
+      "DisplayName": "JM1 Admin",
+      "PrimarySmtpAddress": "jm1-admin@jmerrill.one",
+      "RecipientTypeDetails": "UserMailbox"
+    }
+  ]
+}

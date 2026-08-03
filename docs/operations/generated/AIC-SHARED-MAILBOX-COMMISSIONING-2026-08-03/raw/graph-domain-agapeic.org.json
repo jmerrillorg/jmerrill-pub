@@ -1,0 +1,17 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#domains/$entity",
+  "authenticationType": "Managed",
+  "availabilityStatus": null,
+  "id": "agapeic.org",
+  "isAdminManaged": true,
+  "isDefault": false,
+  "isInitial": false,
+  "isRoot": true,
+  "isVerified": true,
+  "passwordNotificationWindowInDays": 14,
+  "passwordValidityPeriodInDays": 2147483647,
+  "state": null,
+  "supportedServices": [
+    "Email"
+  ]
+}

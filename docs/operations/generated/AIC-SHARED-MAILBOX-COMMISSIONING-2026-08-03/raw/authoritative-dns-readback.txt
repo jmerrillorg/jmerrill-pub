@@ -1,0 +1,9 @@
+AUTHORITATIVE_AZURE_DNS_READBACK
+0 agapeic-org.mail.protection.outlook.com.
+"_r0o71azb9uu64bqmhxqsy0be6p515zb"
+"MS=ms24808293"
+"v=spf1 include:spf.protection.outlook.com -all"
+"v=DMARC1; p=none;"
+autodiscover.outlook.com.
+selector1-agapeic-org._domainkey.jmerrillfoundation.y-v1.dkim.mail.microsoft.
+selector2-agapeic-org._domainkey.jmerrillfoundation.y-v1.dkim.mail.microsoft.
