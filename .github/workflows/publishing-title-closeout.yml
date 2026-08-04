@@ -1,0 +1,220 @@
+name: Publishing Title Closeout
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: Allowlisted title to close.
+        required: true
+        default: The Intentional Leader
+      dry_run:
+        description: Run read-only dry-run.
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      confirm:
+        description: Execute confirmed mutation after dry-run.
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      expected_production_release:
+        description: Production release SHA expected before invocation.
+        required: true
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publishing-title-closeout
+  cancel-in-progress: false
+
+env:
+  PRODUCTION_HEALTH_URL: https://jmerrill.pub/api/health
+  TITLE_CLOSEOUT_URL: https://jmerrill.pub/api/publishing/title-closeout
+
+jobs:
+  closeout:
+    name: Protected title closeout
+    runs-on: ubuntu-latest
+    environment: jmerrill-pub-production
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Commissioned Bootstrap Gate
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run jm1-bootstrap -- --initiative "Protected Publishing Title Closeout Executor" --mode "production-mutation"
+          npm run jm1-bootstrap-guard
+          npm run jm1-canon-consistency-guard
+          npm run jm1-commissioning-guard
+
+      - name: Verify Production Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$(mktemp)"
+          code="$(curl -fsS -o "$body" -w '%{http_code}' --max-time 20 "$PRODUCTION_HEALTH_URL" || true)"
+          if [ "$code" != "200" ]; then
+            echo "Production health returned HTTP $code." >&2
+            exit 1
+          fi
+          node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready' || h.release !== process.argv[2]) process.exit(1)" "$body" "${{ inputs.expected_production_release }}"
+
+      - name: Obtain GitHub OIDC Identity
+        id: oidc
+        shell: bash
+        run: |
+          set -euo pipefail
+          OIDC_RESPONSE="$(curl -fsS \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=jm1-pub-title-closeout")"
+          OIDC_JWT="$(jq -r '.value' <<<"${OIDC_RESPONSE}")"
+          if [[ -z "${OIDC_JWT}" || "${OIDC_JWT}" == "null" ]]; then
+            echo "OIDC request failed." >&2
+            exit 1
+          fi
+          {
+            echo "token<<EOF"
+            echo "${OIDC_JWT}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Invoke Dry Run
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ inputs.title }}" != "The Intentional Leader" ]]; then
+            echo "TITLE_CLOSEOUT_TITLE_NOT_ALLOWLISTED" >&2
+            exit 1
+          fi
+          BODY="$(jq -cn \
+            --arg titleId "e797232b-da7a-f111-ab0f-00224820105b" \
+            --arg stageId "c9dee533-4184-f111-ab0f-7c1e525b15c2" \
+            --arg gateId "5141f7db-0a8e-f111-8077-00224820105b" \
+            --arg approvedArtifactId "intentional-leader-final-pagination-corrected-proof-2026-08-03-v1" \
+            --arg approvedArtifactChecksum "0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed" \
+            --arg approvalSource "jackie-author-approval-confirmed" \
+            --arg approvalTimestamp "2026-08-03T00:00:00Z" \
+            --arg nextStage "Cover Design" \
+            '{
+              titleId: $titleId,
+              stageId: $stageId,
+              gateId: $gateId,
+              approvedArtifactId: $approvedArtifactId,
+              approvedArtifactChecksum: $approvedArtifactChecksum,
+              approvalSource: $approvalSource,
+              approvalTimestamp: $approvalTimestamp,
+              expectedCurrentStage: "INTERIOR_LAYOUT",
+              expectedGateState: "READY_FOR_AUTHOR_RELEASE",
+              expectedActiveGateCount: 1,
+              expectedResponseClockCount: 0,
+              dryRun: true,
+              confirm: false,
+              nextStage: $nextStage
+            }')"
+          curl -fsS \
+            -X POST "$TITLE_CLOSEOUT_URL" \
+            -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --data "$BODY" | tee title-closeout-dry-run.json
+          grep -q '"status":"eligible"' title-closeout-dry-run.json
+
+      - name: Invoke Confirmed Closeout
+        if: inputs.confirm == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          BODY="$(jq -cn \
+            --arg titleId "e797232b-da7a-f111-ab0f-00224820105b" \
+            --arg stageId "c9dee533-4184-f111-ab0f-7c1e525b15c2" \
+            --arg gateId "5141f7db-0a8e-f111-8077-00224820105b" \
+            --arg approvedArtifactId "intentional-leader-final-pagination-corrected-proof-2026-08-03-v1" \
+            --arg approvedArtifactChecksum "0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed" \
+            --arg approvalSource "jackie-author-approval-confirmed" \
+            --arg approvalTimestamp "2026-08-03T00:00:00Z" \
+            --arg nextStage "Cover Design" \
+            '{
+              titleId: $titleId,
+              stageId: $stageId,
+              gateId: $gateId,
+              approvedArtifactId: $approvedArtifactId,
+              approvedArtifactChecksum: $approvedArtifactChecksum,
+              approvalSource: $approvalSource,
+              approvalTimestamp: $approvalTimestamp,
+              expectedCurrentStage: "INTERIOR_LAYOUT",
+              expectedGateState: "READY_FOR_AUTHOR_RELEASE",
+              expectedActiveGateCount: 1,
+              expectedResponseClockCount: 0,
+              dryRun: false,
+              confirm: true,
+              nextStage: $nextStage
+            }')"
+          curl -fsS \
+            -X POST "$TITLE_CLOSEOUT_URL" \
+            -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --data "$BODY" | tee title-closeout-confirmed.json
+          grep -q '"status":"completed"' title-closeout-confirmed.json
+
+      - name: Idempotency Readback
+        if: inputs.confirm == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          BODY="$(jq -cn \
+            --arg titleId "e797232b-da7a-f111-ab0f-00224820105b" \
+            --arg stageId "c9dee533-4184-f111-ab0f-7c1e525b15c2" \
+            --arg gateId "5141f7db-0a8e-f111-8077-00224820105b" \
+            --arg approvedArtifactId "intentional-leader-final-pagination-corrected-proof-2026-08-03-v1" \
+            --arg approvedArtifactChecksum "0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed" \
+            --arg approvalSource "jackie-author-approval-confirmed" \
+            --arg approvalTimestamp "2026-08-03T00:00:00Z" \
+            --arg nextStage "Cover Design" \
+            '{
+              titleId: $titleId,
+              stageId: $stageId,
+              gateId: $gateId,
+              approvedArtifactId: $approvedArtifactId,
+              approvedArtifactChecksum: $approvedArtifactChecksum,
+              approvalSource: $approvalSource,
+              approvalTimestamp: $approvalTimestamp,
+              expectedCurrentStage: "INTERIOR_LAYOUT",
+              expectedGateState: "READY_FOR_AUTHOR_RELEASE",
+              expectedActiveGateCount: 0,
+              expectedResponseClockCount: 0,
+              dryRun: false,
+              confirm: true,
+              nextStage: $nextStage
+            }')"
+          curl -fsS \
+            -X POST "$TITLE_CLOSEOUT_URL" \
+            -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --data "$BODY" | tee title-closeout-idempotency.json
+          grep -q '"status":"idempotent"' title-closeout-idempotency.json
+
+      - name: Preserve Closeout Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publishing-title-closeout-evidence
+          path: title-closeout-*.json
+          if-no-files-found: ignore
