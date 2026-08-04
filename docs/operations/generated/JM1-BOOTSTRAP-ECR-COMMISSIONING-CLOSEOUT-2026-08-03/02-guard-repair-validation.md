@@ -2,7 +2,7 @@
 
 ## Regression Coverage Added
 
-- Current PR #403 merge state: PASS
+- Current PR #405 merge state: PASS
 - Different valid future merge message: PASS
 - Missing Bootstrap deployment enforcement: FAILS CLOSED
 - Missing ECR delegation: FAILS CLOSED
@@ -14,8 +14,9 @@ Permanent rule:
 
 MERGED CAPABILITY IS AUTHORITY. MERGE-MESSAGE WORDING IS NOT AUTHORITY.
 
-## Local Validation
+## Main Validation
 
+- `npm ci`: PASS with existing dependency deprecation and vulnerability warnings
 - `npm run jm1-bootstrap-guard`: PASS
 - `npm run jm1-canon-consistency-guard`: PASS
 - `npm run jm1-initiative-handoff-guard`: PASS
@@ -28,9 +29,17 @@ MERGED CAPABILITY IS AUTHORITY. MERGE-MESSAGE WORDING IS NOT AUTHORITY.
 - `node --test azure-functions/acs-email-relay/test/validation.test.js`: PASS
 - `git diff --check`: PASS
 
+## Production-Safe Pilot
+
+- `npm run jm1-bootstrap -- --initiative "JM1 Bootstrap and ECR Commissioning" --mode "production-dry-run"`: PASS
+- `npm run jm1-bootstrap -- --initiative "The Intentional Leader" --mode "author-communication"`: PASS WITH HOLDS
+- Additional author communication: NOT AUTHORIZED
+- Protected mutation: PENDING
+- Duplicate gate: PROHIBITED
+- Retroactive response clock: PROHIBITED
+
 ## Side Effects
 
 - Author communications: 0
 - Runtime data mutations: 0
 - Secret values retained: 0
-

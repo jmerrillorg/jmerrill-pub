@@ -1,7 +1,7 @@
-e37450f6fa30e72c700d0a103e30f51ca8a430340f3f3de56f46d3a6b3407ab5  docs/operations/generated/JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-2026-08-03/00-executive-summary.md
-78299d0b02802ea3e7b8cab5925efc0185a9ea67d6731b509576108ad866c594  docs/operations/generated/JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-2026-08-03/01-stale-guard-root-cause.md
-6e1d5c4654501a78b4f2c9f7a5a4e844d2af32d7ad0b9f962328d7a1f0b2dd43  docs/operations/generated/JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-2026-08-03/02-guard-repair-validation.md
-a32a8ac74151d77d82e93e3f6a4bc2729f285db5e084e0daca02570215c91404  docs/operations/generated/JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-2026-08-03/03-staging-deployment-readback.md
-2d79c1e705dc4e9617fac1db57ebd87419b36f37932950ab5e3ac1f1df9f0d89  docs/operations/generated/JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-2026-08-03/04-production-promotion-readback.md
-9bb281a612c0b6b634f13619c458f93a73d51647ff2274116a4767c60347352c  docs/operations/generated/JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-2026-08-03/05-final-commissioning-state.md
-80b9c8d85808a864176b61e8565f98154af34713e1a764077e985f2098124a9b  docs/operations/generated/JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-2026-08-03/evidence-index.json
+88db9dcfd3aada7aca4de54ddbd4053952c41bb8f2fc748d723d4a7c62151cfc  00-executive-summary.md
+78299d0b02802ea3e7b8cab5925efc0185a9ea67d6731b509576108ad866c594  01-stale-guard-root-cause.md
+510ba0871d94ed281f82194001c792c64a44f2bb236d7cb137be7830c94bb8fa  02-guard-repair-validation.md
+5eb98ba8ef54d25cb8d0a3073eb9cf0cce8921fc7e3eb413ca39453b96c8bcfa  03-staging-deployment-readback.md
+09bb740356d652f16355288a35a82c98ef33bba36af95b2399bb923ae3b1d1c5  04-production-promotion-readback.md
+968263a8ce589b4c9205210774fb0a1df7845359abb5a08b10037852f0007028  05-final-commissioning-state.md
+5c78f955fde1d838c580817e4d62d7f24d906f3b4b0fb84b71b5941143c53e12  evidence-index.json
