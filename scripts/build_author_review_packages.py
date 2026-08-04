@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build PROGRAM-008 author review notes and instructions PDFs."""
+"""Build PROGRAM-008 editorial review guide PDFs."""
 
 from __future__ import annotations
 
@@ -165,36 +165,37 @@ def styles():
     }
 
 
-def pdf(path: Path, title: TitlePackage, kind: str) -> None:
+def guide_pdf(path: Path, title: TitlePackage) -> None:
     style = styles()
     story = [
         Paragraph("J Merrill Publishing, Inc. | Author Review", style["brand"]),
-        Paragraph(kind, style["title"]),
+        Paragraph("Editorial Review Guide", style["title"]),
         Paragraph(title.title, style["subtitle"]),
         Paragraph("Prepared for", style["heading"]),
         Paragraph(f"{title.recipient} ({title.recipient_email})", style["body"]),
         Paragraph("Review stage", style["heading"]),
         Paragraph(title.stage, style["body"]),
+        Paragraph("Your Edited Manuscript", style["heading"]),
+        Paragraph("The attached DOCX is the edited manuscript prepared for your review.", style["body"]),
+        Paragraph("What Was Completed", style["heading"]),
     ]
-    if kind == "Author Review Notes":
-        story.append(Paragraph("Editorial notes", style["heading"]))
-        for note in title.notes:
-            story.append(Paragraph(f"- {note}", style["body"]))
-    else:
-        story.extend(
-            [
-                Paragraph("What is attached", style["heading"]),
-                Paragraph("- Author Review Manuscript<br/>- Author Review Notes, if applicable<br/>- Review Instructions", style["body"]),
-                Paragraph("What to review", style["heading"]),
-                Paragraph("Please review the manuscript for editorial accuracy, author intent, factual names and references, unresolved questions, and any corrections needed before this stage closes.", style["body"]),
-                Paragraph("How to respond", style["heading"]),
-                Paragraph("Reply directly to the delivery email with one of these responses: approve as presented; approve with corrections; or questions/clarification requested.", style["body"]),
-                Paragraph("Reply-To", style["heading"]),
-                Paragraph("publishing@jmerrill.one", style["body"]),
-                Paragraph("Portal", style["heading"]),
-                Paragraph("Portal access is optional. Direct email reply remains the author response path.", style["body"]),
-            ]
-        )
+    story.append(Paragraph(f"- {title.stage} materials were prepared for author review.", style["body"]))
+    story.append(Paragraph("- The manuscript was cleaned to remove internal production-only material while preserving the edited manuscript content.", style["body"]))
+    story.append(Paragraph("Items Requiring Your Attention", style["heading"]))
+    for note in title.notes:
+        story.append(Paragraph(f"- {note}", style["body"]))
+    story.extend(
+        [
+            Paragraph("How to Review", style["heading"]),
+            Paragraph("Please review editorial changes; comments or questions; names, dates, facts, and references; areas requiring clarification; and any substantive revisions.", style["body"]),
+            Paragraph("How to Respond", style["heading"]),
+            Paragraph("Reply directly to publishing@jmerrill.one with one of these responses: Approved; Approved with minor corrections; Questions or clarification requested; or Substantive revisions requested.", style["body"]),
+            Paragraph("Portal", style["heading"]),
+            Paragraph("Portal access remains optional. Direct email reply is the response path.", style["body"]),
+            Paragraph("Support", style["heading"]),
+            Paragraph("614.965.6057<br/>publishing@jmerrill.one<br/>jmerrill.pub", style["body"]),
+        ]
+    )
     story.extend(
         [
             Spacer(1, 0.12 * inch),
@@ -208,7 +209,7 @@ def pdf(path: Path, title: TitlePackage, kind: str) -> None:
         leftMargin=0.85 * inch,
         topMargin=0.75 * inch,
         bottomMargin=0.75 * inch,
-        title=f"{kind} - {title.title}",
+        title=f"Editorial Review Guide - {title.title}",
         author="J Merrill Publishing, Inc.",
     )
     doc.build(story)
@@ -223,20 +224,20 @@ def main() -> int:
     for title in TITLES:
         package_dir = root / "packages" / title.slug
         package_dir.mkdir(parents=True, exist_ok=True)
-        notes_path = package_dir / f"{title.slug}-Author-Review-Notes.pdf"
-        instructions_path = package_dir / f"{title.slug}-Review-Instructions.pdf"
-        pdf(notes_path, title, "Author Review Notes")
-        pdf(instructions_path, title, "Review Instructions")
+        for old_pdf in package_dir.glob("*-Author-Review-Notes.pdf"):
+            old_pdf.unlink()
+        for old_pdf in package_dir.glob("*-Review-Instructions.pdf"):
+            old_pdf.unlink()
+        guide_path = package_dir / f"{title.slug}-Editorial-Review-Guide.pdf"
+        guide_pdf(guide_path, title)
         records.append(
             {
                 "slug": title.slug,
                 "title": title.title,
                 "recipient": title.recipient,
                 "recipient_email": title.recipient_email,
-                "notes_pdf": str(notes_path),
-                "notes_sha256": sha256(notes_path),
-                "instructions_pdf": str(instructions_path),
-                "instructions_sha256": sha256(instructions_path),
+                "guide_pdf": str(guide_path),
+                "guide_sha256": sha256(guide_path),
             }
         )
     print(json.dumps(records, indent=2))

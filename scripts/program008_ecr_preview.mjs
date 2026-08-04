@@ -47,8 +47,7 @@ for (const [slug, title, recipient] of titles) {
     primaryActionUrl: `https://jmerrill.pub/author/portal?action=review-package&title=${encodeURIComponent(slug)}`,
     packageInventory: [
       'Author Review Manuscript',
-      'Author Review Notes',
-      'Review Instructions',
+      'Editorial Review Guide',
     ],
     nextSteps: [
       'Jackie reviews the prepared package before any author delivery.',

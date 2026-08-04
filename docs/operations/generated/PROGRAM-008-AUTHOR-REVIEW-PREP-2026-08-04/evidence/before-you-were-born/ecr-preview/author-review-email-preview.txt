@@ -9,8 +9,7 @@ What has been completed
 - Internal metadata and publisher-only material were removed.
 What's attached
 - Author Review Manuscript
-- Author Review Notes
-- Review Instructions
+- Editorial Review Guide
 What we need from you
 Please review the attached manuscript and notes for editorial accuracy, author intent, factual details, and any corrections needed before this stage closes.
 How to respond

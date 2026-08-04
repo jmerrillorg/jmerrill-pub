@@ -4,8 +4,8 @@
   "status": "PASS",
   "removed_paragraphs": 0,
   "cleaned_inline_fragments": 0,
-  "removed_comment_parts": 3,
+  "removed_comment_parts": 0,
   "input_sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
-  "output_sha256": "211ee8d3c7e180d479906133cd4ce31a20cc9525b0aa7a794472276ff42e110b",
-  "output_size": 458330
+  "output_sha256": "6ef2918a842bf7d215fc02c11822f50a5a07db220fc4d75ed9b0c0eae434a4bb",
+  "output_size": 466281
 }

@@ -76,8 +76,7 @@ def main() -> int:
         slug = package_dir.name
         files = sorted(path for path in package_dir.iterdir() if path.is_file())
         docx = [path for path in files if path.name.endswith("-Author-Review-Manuscript.docx")]
-        notes = [path for path in files if path.name.endswith("-Author-Review-Notes.pdf")]
-        instructions = [path for path in files if path.name.endswith("-Review-Instructions.pdf")]
+        guide = [path for path in files if path.name.endswith("-Editorial-Review-Guide.pdf")]
         checksums = {path.name: sha256(path) for path in files}
         internal_count = 0
         for path in files:
@@ -88,7 +87,7 @@ def main() -> int:
             else:
                 text = path.read_text(errors="ignore")
             internal_count += len(INTERNAL_PATTERNS.findall(text))
-        pdf_open = all(pdf_pages(path) == shell_pages(path) == 1 for path in notes + instructions)
+        pdf_open = all(pdf_pages(path) == shell_pages(path) and pdf_pages(path) >= 1 for path in guide)
         ecr_record = ecr.get(slug, {})
         record = {
             "slug": slug,
@@ -96,8 +95,7 @@ def main() -> int:
             "attachmentCount": len(files),
             "attachmentsDistinct": len(set(checksums.values())) == len(files),
             "authorReviewManuscript": "PASS" if len(docx) == 1 else "FAIL",
-            "authorReviewNotes": "PASS" if len(notes) == 1 else "FAIL",
-            "reviewInstructions": "PASS" if len(instructions) == 1 else "FAIL",
+            "editorialReviewGuide": "PASS" if len(guide) == 1 else "FAIL",
             "open": "PASS" if len(docx) == 1 and zipfile.is_zipfile(docx[0]) and pdf_open else "FAIL",
             "internalArtifacts": internal_count,
             "ecr": ecr_record.get("status", "FAIL"),
@@ -109,7 +107,7 @@ def main() -> int:
             "checksums": checksums,
         }
         if (
-            record["attachmentCount"] != 3
+            record["attachmentCount"] != 2
             or not record["attachmentsDistinct"]
             or record["open"] != "PASS"
             or record["internalArtifacts"] != 0

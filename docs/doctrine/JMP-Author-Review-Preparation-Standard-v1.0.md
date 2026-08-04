@@ -93,11 +93,12 @@ The prepared Author Review Manuscript must fail closed unless all checks pass:
 
 ## Package Boundary
 
-The author review package may include only:
+The default author review package must include only:
 
 1. Author Review Manuscript
-2. Author Review Notes, when applicable
-3. Review Instructions PDF
+2. Editorial Review Guide PDF
+
+A third attachment is permitted only when a title has a legitimate separate editorial artifact that cannot reasonably be included in the guide.
 
 The package must not include manifests, Markdown, JSON, ledgers, execution evidence, internal records, gate records, response records, Dataverse exports, SharePoint inventories, or portal-only instructions.
 

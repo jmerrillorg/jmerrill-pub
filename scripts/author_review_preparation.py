@@ -185,13 +185,6 @@ def clean_document_xml(path: Path) -> tuple[int, int]:
             set_paragraph_text(paragraph, cleaned)
             cleaned_inline += count
 
-    parent_map = parents(root)
-    for tag in ("commentRangeStart", "commentRangeEnd", "commentReference"):
-        for element in list(root.findall(f".//w:{tag}", NS)):
-            parent = parent_map.get(id(element))
-            if parent is not None:
-                parent.remove(element)
-
     tree.write(path, encoding="utf-8", xml_declaration=True)
     return removed_paragraphs, cleaned_inline
 
@@ -224,20 +217,11 @@ def prepare_docx(input_path: Path, output_path: Path) -> PreparationResult:
         with zipfile.ZipFile(input_path) as source, zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as target:
             for info in source.infolist():
                 name = info.filename
-                if name.startswith("word/comments") and name.endswith(".xml"):
-                    removed_comment_parts += 1
-                    continue
                 if name == "[Content_Types].xml":
-                    content = source.read(name).decode("utf-8", errors="ignore")
-                    content = re.sub(r'<Override[^>]+PartName="/word/comments[^"]+"[^>]*/>', "", content)
-                    target.writestr(info, content.encode("utf-8"))
-                    removed_comment_parts += 1
+                    target.writestr(info, source.read(name))
                     continue
                 if name == "word/_rels/document.xml.rels":
-                    content = source.read(name).decode("utf-8", errors="ignore")
-                    content = re.sub(r'<Relationship[^>]+Target="comments[^"]*"[^>]*/>', "", content)
-                    target.writestr(info, content.encode("utf-8"))
-                    removed_comment_parts += 1
+                    target.writestr(info, source.read(name))
                     continue
                 if name in replacement_parts:
                     target.writestr(info, replacement_parts[name])
@@ -279,8 +263,19 @@ def extract_text(path: Path) -> str:
 
 def count_internal_comments(path: Path) -> int:
     with zipfile.ZipFile(path) as archive:
-        names = archive.namelist()
-        return sum(1 for name in names if name.startswith("word/comments") and name.endswith(".xml"))
+        total = 0
+        for name in archive.namelist():
+            if not (name.startswith("word/comments") and name.endswith(".xml")):
+                continue
+            xml = archive.read(name).decode("utf-8", errors="ignore")
+            total += len(VALIDATION_PATTERNS["publisher_notes"].findall(xml))
+            total += len(VALIDATION_PATTERNS["automation_metadata"].findall(xml))
+            total += len(VALIDATION_PATTERNS["correlation_ids"].findall(xml))
+            total += len(VALIDATION_PATTERNS["artifact_ids"].findall(xml))
+            total += len(VALIDATION_PATTERNS["checksums"].findall(xml))
+            total += len(VALIDATION_PATTERNS["execution_state"].findall(xml))
+            total += len(VALIDATION_PATTERNS["visible_qa_markers"].findall(xml))
+        return total
 
 
 def track_change_state(path: Path) -> str:

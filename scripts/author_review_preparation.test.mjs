@@ -27,6 +27,16 @@ doc.save(r'''${path}''')
 `])
 }
 
+function makeCommentFixture(path) {
+  execFileSync(python, ['-c', `
+from docx import Document
+doc=Document()
+p=doc.add_paragraph('The visible manuscript text remains.')
+comment=doc.add_comment(p.runs, text='Author-facing editorial question: Please confirm this detail.', author='J Merrill Publishing')
+doc.save(r'''${path}''')
+`])
+}
+
 test('preparation removes visible internal metadata and publisher-only notes', () => {
   const dir = mkdtempSync(join(tmpdir(), 'program-008-'))
   const input = join(dir, 'internal.docx')
@@ -62,6 +72,23 @@ test('validation fails closed when internal markers remain', () => {
   assert.equal(failed, true)
 })
 
+test('preparation preserves author-facing editorial comments', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'program-008-'))
+  const input = join(dir, 'commented.docx')
+  const output = join(dir, 'author.docx')
+  makeCommentFixture(input)
+
+  const prep = JSON.parse(execFileSync(python, [script, 'prepare', input, output], { encoding: 'utf8' }))
+  assert.equal(prep.status, 'PASS')
+
+  const commentsXml = execFileSync('unzip', ['-p', output, 'word/comments.xml'], { encoding: 'utf8' })
+  assert.match(commentsXml, /Author-facing editorial question/)
+
+  const validation = JSON.parse(execFileSync(python, [script, 'validate', output], { encoding: 'utf8' }))
+  assert.equal(validation.status, 'PASS')
+  assert.equal(validation.internal_comments, 0)
+})
+
 test('standard declares package boundary and prohibited internal material', () => {
   const standard = readFileSync(new URL('../docs/doctrine/JMP-Author-Review-Preparation-Standard-v1.0.md', import.meta.url), 'utf8')
   assert.match(standard, /Internal Editorial Working Manuscript/)
@@ -69,5 +96,6 @@ test('standard declares package boundary and prohibited internal material', () =
   assert.match(standard, /must never contain/)
   assert.match(standard, /automation metadata/)
   assert.match(standard, /publisher-only notes/)
+  assert.match(standard, /Editorial Review Guide PDF/)
   assert.match(standard, /Portal access remains optional/)
 })

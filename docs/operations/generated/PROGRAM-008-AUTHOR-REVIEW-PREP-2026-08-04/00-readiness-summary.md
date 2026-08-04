@@ -1,31 +1,47 @@
 # PROGRAM-008 Author Review Preparation Readiness
 
 Date: 2026-08-04
-Status: PARTIALLY COMPLETE - FIVE AUTHOR REVIEW PACKAGES READY
+Status: PARTIALLY COMPLETE - FIVE CORRECTED AUTHOR PACKAGES READY FOR JACKIE
 
-## Scope
+## Correction
 
-PROGRAM-008 created JMP Author Review Preparation Standard v1.0, implemented AuthorReviewPreparationService, and generated author-safe review packages for the five active Publishing titles.
+Previous package state: FAILED - EDITED MANUSCRIPT OMITTED
+
+The prior readiness conclusion is withdrawn. The earlier package model used separate support documents and did not truthfully certify the actual edited manuscript as the package authority.
+
+Corrected package state: ACTUAL EDITED MANUSCRIPT INCLUDED
+
+Support documents: CONSOLIDATED INTO ONE EDITORIAL REVIEW GUIDE
 
 No author communications were sent. No duplicate gates were created. Response clocks remain unchanged.
 
 ## Package Boundary
 
-Each author package contains only:
+Each corrected author package contains exactly:
 
-1. Author Review Manuscript
-2. Author Review Notes
-3. Review Instructions PDF
+1. Author Review Manuscript DOCX
+2. Editorial Review Guide PDF
 
 No package folder contains manifests, Markdown, JSON, ledgers, execution evidence, workflow records, template files, or portal-only documents.
 
+## Source Authority
+
+Each manuscript was produced from the exact governed edited DOCX recorded in the selected-source readback. Source authority is documented per title in `evidence/source-fidelity-results.json` and in each title's `source-fidelity-ledger.json`.
+
+The transformation used the governed edited manuscript, removed only prohibited internal material, and did not rebuild, summarize, reconstruct, or regenerate manuscript text.
+
 ## QA Summary
 
-- Internal Editorial Working Manuscripts: 5 verified
+- Actual edited manuscripts located: 5 / 5
+- Actual edited manuscripts included: 5 / 5
+- Source fidelity: 5 / 5 PASS
 - Author Review Manuscripts: 5 generated
-- Author packages: 5 ready
+- Editorial Review Guides: 5 generated
+- Separate notes documents: retired
+- Separate instructions documents: retired
+- Final attachment count: 2 per title
 - Internal metadata exposed: 0
-- Publisher notes exposed: 0
+- Publisher-only notes exposed: 0
 - Automation metadata exposed: 0
 - ECR previews: PASS
 - HTML previews: PASS
@@ -37,14 +53,14 @@ No package folder contains manifests, Markdown, JSON, ledgers, execution evidenc
 
 ## Titles
 
-| Title | Recipient | Package QA | Internal artifact count |
-| --- | --- | --- | --- |
-| The Intentional Leader | Jackie Smith Jr. | PASS | 0 |
-| The General's Will and Last Testament | Iyorwuese Hagher | PASS | 0 |
-| The Long Watch | Jackie Smith Jr. | PASS | 0 |
-| Establishing Glory: The Library | Jackie Smith Jr. | PASS | 0 |
-| Before You Were Born | Sean Arron Crowley | PASS | 0 |
+| Title | Recipient | Actual edited manuscript included | Source fidelity | Package QA | Internal artifact count |
+| --- | --- | --- | --- | --- | --- |
+| The Intentional Leader | chosen2k7@gmail.com | YES | PASS | PASS | 0 |
+| The General's Will and Last Testament | hagher.hagher@ymail.com | YES | PASS | PASS | 0 |
+| The Long Watch | chosen2k7@gmail.com | YES | PASS | PASS | 0 |
+| Establishing Glory: The Library | chosen2k7@gmail.com | YES | PASS | PASS | 0 |
+| Before You Were Born | scrowley50@gmail.com | YES | PASS | PASS | 0 |
 
 ## Next Governed Action
 
-Jackie reviews the five prepared author packages individually. After approval, release each package through the existing ECR and ACS workflow, certify delivery, process responses, and close each title before moving to the next stage.
+Jackie reviews the five corrected author packages individually. After approval, release each package through the existing ECR and ACS workflow, certify delivery, process responses, and close each title before moving to the next stage.
