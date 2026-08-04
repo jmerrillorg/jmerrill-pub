@@ -1,0 +1,21 @@
+{
+  "package": "JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-2026-08-03",
+  "createdAt": "2026-08-03T00:00:00Z",
+  "status": "HOTFIX_READY_FOR_HUMAN_REVIEW",
+  "rootCauseClassification": "COMMISSIONING_GUARD_COUPLED_TO_HISTORICAL_MERGE_MESSAGE",
+  "correctiveClassification": "CAPABILITY_BASED_MAIN_AUTHORITY_VALIDATION",
+  "stalePr402AssertionRemoved": true,
+  "historicalMergeMessageDependency": 0,
+  "authorCommunications": 0,
+  "runtimeDataMutations": 0,
+  "secretValuesRetained": 0,
+  "evidence": [
+    "00-executive-summary.md",
+    "01-stale-guard-root-cause.md",
+    "02-guard-repair-validation.md",
+    "03-staging-deployment-readback.md",
+    "04-production-promotion-readback.md",
+    "05-final-commissioning-state.md"
+  ],
+  "nextGovernedAction": "Human review and merge of the focused commissioning guard hotfix PR, followed by governed staging deployment and protected production promotion."
+}
