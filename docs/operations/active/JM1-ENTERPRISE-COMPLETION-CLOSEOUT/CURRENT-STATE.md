@@ -39,7 +39,7 @@ Evidence: `docs/operations/generated/JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-20
 
 ## Lane 2 - The Intentional Leader
 
-Status: READY TO START.
+Status: STOPPED AT PROTECTED MUTATION BOUNDARY.
 
 Business truth:
 
@@ -49,11 +49,26 @@ Business truth:
 - Corrected package: SENT ONCE.
 - Response clock: NOT REQUIRED.
 
-Next action: run production-mutation Bootstrap and live system-of-record readback. Stop before protected mutation if the protected writer is unavailable.
+Completed in this lane:
+
+- Ran production-mutation Bootstrap: PASS WITH HOLDS.
+- Ran protected GitHub OIDC dry-run through `five-title-executive-recovery-dispatch`, scoped only to The Intentional Leader.
+- Confirmed title is still eligible and no later production mutation already closed the work.
+- Current gate count: 1.
+- Current artifact count: 9.
+- Author-visible artifact count: 5.
+- Package readiness blockers: 0.
+
+Stop boundary:
+
+- The available protected dispatch path can dry-run or dispatch author packages; it does not perform the required approved-proof registration, obsolete-proof supersession, 21 KB intermediate reclassification, gate closure as approved, and stage advance.
+- Local Dataverse credentials are not available for direct read/write, and Cody must not improvise Dataverse schema writes.
+
+Next action: resume Lane 2 only when a governed protected mutation executor for artifact/gate/stage closeout is available.
 
 ## Held Lanes
 
-- Lane 3 Agape shared mailbox commissioning: held until Lane 2 is complete or externally blocked.
+- Lane 3 Agape shared mailbox commissioning: held until Jackie accepts the Lane 2 protected-mutation stop state or a governed protected executor becomes available.
 - Lane 4 remaining Publishing title recovery: held until Lanes 1-3 are complete or externally blocked.
 - Lane 5 Wave 2 governance holds: held until Lanes 1-4 are complete or externally blocked.
 - Lane 6 legacy dirty-worktree extraction: held until human-service lanes are complete or blocked.
@@ -70,4 +85,4 @@ Next action: run production-mutation Bootstrap and live system-of-record readbac
 
 ## Next Authorized Action
 
-Begin Lane 2 Bootstrap and live system-of-record readback for The Intentional Leader.
+Resolve Lane 2 protected mutation executor availability before beginning Agape shared mailbox commissioning.
