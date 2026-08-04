@@ -19,9 +19,9 @@ const checks = [
     name: 'every author-review package type declares attachment policy',
     pass: () =>
       requiredStages.every((stage) => engine.includes(`${stage}: {`)) &&
-      engine.includes("attachmentsRequired: ['proofreadManuscript', 'reviewCoverNote']") &&
+      engine.includes("attachmentsRequired: ['proofreadManuscript', 'reviewInstructions']") &&
       engine.includes("attachmentsRequired: ['copyeditedManuscript', 'reviewCoverNote']") &&
-      engine.includes("attachmentsRequired: ['editedManuscript', 'editorialMemo', 'reviewInstructions']") &&
+      engine.includes("attachmentsRequired: ['editedManuscript', 'reviewInstructions']") &&
       engine.includes("attachmentsRequired: ['interiorProof', 'reviewInstructions']"),
   },
   {

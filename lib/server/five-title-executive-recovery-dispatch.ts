@@ -324,7 +324,7 @@ function requiredAttachmentRoles(stageCode: PackageStageCode): AttachmentRole[] 
   if (stageCode === 'INTERIOR_LAYOUT') {
     return ['interiorProof', 'reviewInstructions']
   }
-  return ['editedManuscript', 'editorialMemo', 'reviewInstructions']
+  return ['editedManuscript', 'reviewInstructions']
 }
 
 function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) {
@@ -338,7 +338,7 @@ function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) 
     lineEditedManuscript: /line/i,
     copyeditedManuscript: /copyedit/i,
     proofreadManuscript: /proofread/i,
-    reviewCoverNote: /cover.*note/i,
+    reviewCoverNote: /cover.*note|guide/i,
     interiorProof: /interior.*proof|layout.*proof|production.*pdf|\.pdf$/i,
     coverProof: /cover.*proof/i,
     productionProof: /production.*proof/i,

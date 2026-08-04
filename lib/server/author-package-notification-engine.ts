@@ -67,7 +67,7 @@ export const AUTHOR_PACKAGE_NOTIFICATION_POLICIES: Record<AuthorReviewPackageTyp
   DEVELOPMENTAL_EDITING_REVIEW: {
     workspaceRequired: true,
     emailRequired: true,
-    attachmentsRequired: ['editedManuscript', 'editorialMemo', 'reviewInstructions'],
+    attachmentsRequired: ['editedManuscript', 'reviewInstructions'],
   },
   LINE_EDITING_REVIEW: {
     workspaceRequired: true,
@@ -82,7 +82,7 @@ export const AUTHOR_PACKAGE_NOTIFICATION_POLICIES: Record<AuthorReviewPackageTyp
   PROOFREADING_REVIEW: {
     workspaceRequired: true,
     emailRequired: true,
-    attachmentsRequired: ['proofreadManuscript', 'reviewCoverNote'],
+    attachmentsRequired: ['proofreadManuscript', 'reviewInstructions'],
   },
   INTERIOR_LAYOUT_REVIEW: {
     workspaceRequired: true,
