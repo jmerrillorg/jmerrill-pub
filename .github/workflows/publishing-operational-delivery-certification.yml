@@ -102,6 +102,7 @@ jobs:
           npm run jm1-bootstrap -- --initiative "Publishing Operational Delivery Certification - ${{ inputs.title }}" --mode "production-mutation"
           npm run jm1-bootstrap-guard
           npm run jm1-canon-consistency-guard
+          npm run jm1-canon-guard-enforcement
           npm run author-communication-brand-guard
 
       - name: Verify Production Release

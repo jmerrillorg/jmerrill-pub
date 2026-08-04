@@ -61,6 +61,7 @@ jobs:
           npm run jm1-bootstrap -- --initiative "Protected Publishing Title Closeout Executor" --mode "production-mutation"
           npm run jm1-bootstrap-guard
           npm run jm1-canon-consistency-guard
+          npm run jm1-canon-guard-enforcement
           npm run jm1-commissioning-guard
 
       - name: Verify Production Release
