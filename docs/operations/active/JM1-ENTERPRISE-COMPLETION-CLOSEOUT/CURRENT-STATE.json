@@ -1,0 +1,216 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-08-04T02:20:13Z",
+  "initiative": "JM1 Enterprise Completion Closeout",
+  "completionFreeze": "ACTIVE",
+  "governingRule": "NO_NEW_MAJOR_INITIATIVES_ONE_LANE_AT_A_TIME",
+  "currentOriginMain": "fdd01eff41f511f2f1d0970299e4127d34b4cbb8",
+  "bootstrap": {
+    "initiative": "JM1 Enterprise Completion Closeout",
+    "mode": "governance",
+    "status": "BOOTSTRAP PASS",
+    "dirtyPaths": 0,
+    "outOfScopePaths": 0,
+    "secretValuesPrinted": 0
+  },
+  "activeLaneOrder": [
+    "Bootstrap/ECR production commissioning closeout",
+    "The Intentional Leader system-of-record closeout",
+    "Agape shared mailbox commissioning",
+    "Remaining Publishing title recovery",
+    "Wave 2 governance holds",
+    "Legacy dirty-worktree extraction",
+    "Cross-brand ECR migration backlog"
+  ],
+  "lanes": [
+    {
+      "lane": 1,
+      "name": "Bootstrap/ECR production commissioning closeout",
+      "status": "COMPLETE",
+      "controllingAuthority": "PR #405 merged; merge SHA fdd01eff41f511f2f1d0970299e4127d34b4cbb8",
+      "currentLiveState": {
+        "originMain": "fdd01eff41f511f2f1d0970299e4127d34b4cbb8",
+        "staging": "200 / ready / fdd01eff41f511f2f1d0970299e4127d34b4cbb8",
+        "production": "200 / ready / fdd01eff41f511f2f1d0970299e4127d34b4cbb8",
+        "protectedEndpoints": "FAIL_CLOSED_UNAUTHENTICATED",
+        "commissioningGuard": "PASS_ON_CURRENT_MAIN"
+      },
+      "completed": [
+        "Confirmed current origin/main",
+        "Ran jm1-commissioning-guard on detached current main",
+        "Verified staging serves current main SHA",
+        "Verified protected workflow_dispatch deploy_production=true executed for current main SHA",
+        "Verified production serves current main SHA",
+        "Confirmed Bootstrap and ECR mandatory controls",
+        "Confirmed no author communication and no runtime data mutation"
+      ],
+      "outstanding": [],
+      "blockedBy": [],
+      "jackieDecisionRequired": "NO",
+      "nextAuthorizedAction": "Proceed to Lane 2 only",
+      "stopCondition": "NONE",
+      "evidenceLocation": "docs/operations/generated/JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-2026-08-03/"
+    },
+    {
+      "lane": 2,
+      "name": "The Intentional Leader system-of-record closeout",
+      "status": "READY_TO_START",
+      "controllingAuthority": "Author approved final 275-page pagination-corrected proof; checksum 0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed",
+      "currentLiveState": "Protected system-of-record mutation not yet re-read in this lane",
+      "completed": [
+        "Corrected package sent once",
+        "Response clock not required because author responded"
+      ],
+      "outstanding": [
+        "Run production-mutation Bootstrap",
+        "Read Dataverse, SharePoint, gate, artifact, response, and stage state",
+        "Execute governed protected mutation packet if available",
+        "Register current approved artifact, supersede obsolete proofs, close gate, and advance stage"
+      ],
+      "blockedBy": [],
+      "jackieDecisionRequired": "NO unless protected readback changes the expected next stage or exposes a conflict",
+      "nextAuthorizedAction": "Begin Lane 2 Bootstrap and live readback",
+      "stopCondition": "Stop if protected writer is unavailable or live state proves the mutation already completed",
+      "evidenceLocation": "docs/operations/active/the-intentional-leader/"
+    },
+    {
+      "lane": 3,
+      "name": "Agape shared mailbox commissioning",
+      "status": "HELD_UNTIL_LANE_2_COMPLETE_OR_BLOCKED",
+      "controllingAuthority": "PR #404 controlling branch; domain agapeic.org Microsoft 365 verified; DKIM pending CnameMissing",
+      "currentLiveState": {
+        "domain": "agapeic.org",
+        "microsoft365": "VERIFIED",
+        "azureDns": "RECONCILED",
+        "mx": "PASS",
+        "spf": "PASS",
+        "autodiscover": "PASS",
+        "dmarc": "p=none",
+        "dkim": "PENDING / CnameMissing",
+        "pilotMailboxes": "0 / 3",
+        "primaryMailboxes": "0 / 18"
+      },
+      "completed": [],
+      "outstanding": [
+        "Reconcile PR #404 against current main",
+        "Retry DKIM only with bounded backoff",
+        "Create pilot mailboxes only after DKIM active or explicit Jackie authorization",
+        "Validate pilot before remaining mailbox creation"
+      ],
+      "blockedBy": [
+        "Lane sequencing freeze"
+      ],
+      "jackieDecisionRequired": "Only if DKIM remains in Microsoft synchronization hold or Jackie authorizes pilot mailbox creation before DKIM",
+      "nextAuthorizedAction": "Do not start until Lane 2 is complete or externally blocked",
+      "stopCondition": "External Microsoft synchronization hold after authoritative DNS and Microsoft expected values match",
+      "evidenceLocation": "docs/operations/generated/agape-shared-mailbox-evidence/"
+    },
+    {
+      "lane": 4,
+      "name": "Remaining Publishing title recovery",
+      "status": "HELD_UNTIL_LANES_1_TO_3_COMPLETE_OR_BLOCKED",
+      "controllingAuthority": "One title at a time; no five-title wave",
+      "currentLiveState": "Not re-read in this lane",
+      "completed": [],
+      "outstanding": [
+        "The General's Will and Last Testament",
+        "Establishing Glory: The Library",
+        "The Long Watch",
+        "Before You Were Born final-state reconciliation"
+      ],
+      "blockedBy": [
+        "Lane sequencing freeze"
+      ],
+      "jackieDecisionRequired": "Per-title only where package review or protected readback exposes a real decision",
+      "nextAuthorizedAction": "Start first title-specific clean worktree after Lane 3 is complete or blocked",
+      "stopCondition": "Stop per title on protected mutation unavailability, missing canonical source, or Jackie decision requirement",
+      "evidenceLocation": "Per-title generated evidence folder"
+    },
+    {
+      "lane": 5,
+      "name": "Wave 2 governance holds",
+      "status": "HELD_UNTIL_LANES_1_TO_4_COMPLETE_OR_BLOCKED",
+      "controllingAuthority": "Executive closeout instruction",
+      "currentLiveState": {
+        "attorneyEngagement": "DEFERRED BY EXECUTIVE DECISION",
+        "jmSignatureLegalPacket": "NOT AUTHORIZED FOR SEND",
+        "holdings": "STRATEGIC HOLD",
+        "annexA": "READ_ONLY_REVIEW_REQUIRED",
+        "sixteenCatalogRulings": "DECISION_TABLE_REQUIRED"
+      },
+      "completed": [],
+      "outstanding": [
+        "Record attorney and JM Signature deferral",
+        "Record Holdings strategic hold",
+        "Prepare exact Annex A Jackie action",
+        "Prepare sixteen catalog ruling table"
+      ],
+      "blockedBy": [
+        "Lane sequencing freeze"
+      ],
+      "jackieDecisionRequired": "Sixteen catalog rulings after decision table; Annex A exact action after read-only review",
+      "nextAuthorizedAction": "Do not start until Lane 4 is complete or blocked",
+      "stopCondition": "Stop before mutating 104-row baseline or sending any legal packet",
+      "evidenceLocation": "docs/operations/generated/JM1-WAVE-2-GOVERNANCE-HOLDS/"
+    },
+    {
+      "lane": 6,
+      "name": "Legacy dirty-worktree extraction",
+      "status": "HELD_UNTIL_HUMAN_SERVICE_LANES_COMPLETE_OR_BLOCKED",
+      "controllingAuthority": "Existing safety package and named-initiative register",
+      "currentLiveState": {
+        "initialDirtyPaths": 247,
+        "observedCurrentOriginalWorktree": "DIRTY",
+        "uniqueWorkLost": 0
+      },
+      "completed": [],
+      "outstanding": [
+        "Evidence canonicalization",
+        "PROGRAM-002 Track A",
+        "Diagnostic runner",
+        "Title recovery",
+        "Unknown-requires-Jackie paths",
+        "Superseded/local-only disposal"
+      ],
+      "blockedBy": [
+        "Lane sequencing freeze"
+      ],
+      "jackieDecisionRequired": "Only for unknown-requires-Jackie paths",
+      "nextAuthorizedAction": "Do not bulk-clean original worktree; process after human-service lanes",
+      "stopCondition": "Stop before deleting or reverting any unclassified legacy work",
+      "evidenceLocation": "Existing safety package and reconciliation register"
+    },
+    {
+      "lane": 7,
+      "name": "Cross-brand ECR migration backlog",
+      "status": "BACKLOG_ONLY_IMPLEMENTATION_HELD",
+      "controllingAuthority": "Executive closeout instruction",
+      "currentLiveState": "Prioritized backlog required; no implementation authorized",
+      "completed": [],
+      "outstanding": [
+        "J Merrill Financial appointment communications",
+        "Agape ministry communications",
+        "J Merrill Foundation donor acknowledgments",
+        "J Merrill One corporate letters",
+        "J Merrill Productions communications",
+        "Formal Letter Renderer profile"
+      ],
+      "blockedBy": [
+        "Implementation held until Lanes 1-5 complete"
+      ],
+      "jackieDecisionRequired": "Future implementation authorization after closeout review",
+      "nextAuthorizedAction": "Create prioritized backlog only when lane sequencing permits",
+      "stopCondition": "Stop before implementation",
+      "evidenceLocation": "docs/operations/generated/JM1-CROSS-BRAND-ECR-BACKLOG/"
+    }
+  ],
+  "programTotals": {
+    "newMajorInitiativesStarted": 0,
+    "unauthorizedCommunications": 0,
+    "duplicateGates": 0,
+    "duplicateCommunications": 0,
+    "runtimeMutations": "AUTHORIZED_ONLY",
+    "secretValuesRetained": 0
+  },
+  "nextGovernedAction": "Begin Lane 2 Bootstrap and live system-of-record readback for The Intentional Leader."
+}

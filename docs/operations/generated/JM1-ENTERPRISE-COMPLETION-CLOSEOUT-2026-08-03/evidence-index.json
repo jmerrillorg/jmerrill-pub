@@ -1,0 +1,27 @@
+{
+  "package": "JM1-ENTERPRISE-COMPLETION-CLOSEOUT-2026-08-03",
+  "createdAt": "2026-08-04T02:20:13Z",
+  "status": "PHASE_0_COMPLETE_LANE_1_COMPLETE",
+  "currentOriginMain": "fdd01eff41f511f2f1d0970299e4127d34b4cbb8",
+  "completionFreeze": "ACTIVE",
+  "activeLanes": 7,
+  "lane1": {
+    "status": "COMPLETE",
+    "stagingRelease": "fdd01eff41f511f2f1d0970299e4127d34b4cbb8",
+    "productionRelease": "fdd01eff41f511f2f1d0970299e4127d34b4cbb8",
+    "commissioningGuard": "PASS_ON_CURRENT_MAIN",
+    "bootstrap": "PRODUCTION_MANDATORY",
+    "ecr": "PRODUCTION_MANDATORY"
+  },
+  "authorCommunications": 0,
+  "runtimeDataMutations": 0,
+  "duplicateGates": 0,
+  "duplicateCommunications": 0,
+  "secretValuesRetained": 0,
+  "evidence": [
+    "00-executive-summary.md",
+    "01-lane-register.md",
+    "02-lane-1-bootstrap-ecr-readback.md"
+  ],
+  "nextGovernedAction": "Begin Lane 2 Bootstrap and live system-of-record readback for The Intentional Leader."
+}
