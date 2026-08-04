@@ -64,6 +64,7 @@ jobs:
           npm run jm1-bootstrap -- --initiative "Five Title Executive Recovery Dispatch" --mode "production-mutation"
           npm run jm1-bootstrap-guard
           npm run jm1-canon-consistency-guard
+          npm run jm1-canon-guard-enforcement
 
       - name: Invoke production dispatch
         shell: bash
