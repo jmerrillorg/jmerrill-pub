@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { pathToFileURL } from 'node:url'
 import test from 'node:test'
 import ts from 'typescript'
 
@@ -199,6 +198,7 @@ test('generated or historical evidence cannot override approved print canon in g
   assert.notEqual(unapprovedEvidenceRecord.provenance, 'APPROVED_CANON')
 })
 
-test('canon guard module is loaded from the active correction worktree', () => {
-  assert.match(pathToFileURL(process.cwd()).href, /jmerrill-pub-canon-guard-print-rule-correction/)
+test('canon guard module is loaded from the repository source under test', () => {
+  assert.match(source, /export function enforceB3Pagination/)
+  assert.equal(typeof guard.enforceB3Pagination, 'function')
 })
