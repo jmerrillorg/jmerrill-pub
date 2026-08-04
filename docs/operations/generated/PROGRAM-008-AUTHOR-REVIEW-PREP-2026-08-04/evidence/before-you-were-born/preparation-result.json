@@ -1,0 +1,11 @@
+{
+  "input": "/tmp/jm1-program-008-sources/before-you-were-born/2026-07-21-Developmental-Editing-Before-You-Were-Born-Developmentally-Edited-Manuscript.docx",
+  "output": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/before-you-were-born/before-you-were-born-Author-Review-Manuscript.docx",
+  "status": "PASS",
+  "removed_paragraphs": 14,
+  "cleaned_inline_fragments": 16,
+  "removed_comment_parts": 3,
+  "input_sha256": "7fa7e7704eeff34f2689b07c9237e9db5f14b9c7cda38f5e9043293a97e1c260",
+  "output_sha256": "1521eabf748e9ed6c938fa7517bc459618306f3a07f82f2a22ce6881a5b6cc08",
+  "output_size": 65243
+}

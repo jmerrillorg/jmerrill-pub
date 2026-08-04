@@ -1,0 +1,11 @@
+{
+  "input": "/tmp/jm1-program-008-sources/the-intentional-leader/2026-07-19-The-Intentional-Leader-Volume-I-Proofread-Manuscript.docx",
+  "output": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/the-intentional-leader/the-intentional-leader-Author-Review-Manuscript.docx",
+  "status": "PASS",
+  "removed_paragraphs": 0,
+  "cleaned_inline_fragments": 0,
+  "removed_comment_parts": 3,
+  "input_sha256": "d038b45dddb7b797cc69d576f5fbeb4520a85d84c61162c180c506666200b922",
+  "output_sha256": "211ee8d3c7e180d479906133cd4ce31a20cc9525b0aa7a794472276ff42e110b",
+  "output_size": 458330
+}

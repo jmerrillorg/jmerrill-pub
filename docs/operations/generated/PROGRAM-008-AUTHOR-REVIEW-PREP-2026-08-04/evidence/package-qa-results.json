@@ -1,0 +1,136 @@
+{
+  "status": "PASS",
+  "failures": [],
+  "titles": [
+    {
+      "slug": "before-you-were-born",
+      "attachments": [
+        "before-you-were-born-Author-Review-Manuscript.docx",
+        "before-you-were-born-Author-Review-Notes.pdf",
+        "before-you-were-born-Review-Instructions.pdf"
+      ],
+      "attachmentCount": 3,
+      "attachmentsDistinct": true,
+      "authorReviewManuscript": "PASS",
+      "authorReviewNotes": "PASS",
+      "reviewInstructions": "PASS",
+      "open": "PASS",
+      "internalArtifacts": 0,
+      "ecr": "PASS",
+      "html": "PASS",
+      "plainText": "PASS",
+      "portal": "OPTIONAL",
+      "sender": "publishing@email.jmerrill.one",
+      "replyTo": "publishing@jmerrill.one",
+      "checksums": {
+        "before-you-were-born-Author-Review-Manuscript.docx": "1521eabf748e9ed6c938fa7517bc459618306f3a07f82f2a22ce6881a5b6cc08",
+        "before-you-were-born-Author-Review-Notes.pdf": "a8de8170c5105d59926fbfb16935ab0544a9b88e55cc378c3de7c0083cc30aea",
+        "before-you-were-born-Review-Instructions.pdf": "6514c120a1d8d89c38ce605ae5f4b5ad8f1c776a4eec11feae8bca4d1a871917"
+      }
+    },
+    {
+      "slug": "establishing-glory-the-library",
+      "attachments": [
+        "establishing-glory-the-library-Author-Review-Manuscript.docx",
+        "establishing-glory-the-library-Author-Review-Notes.pdf",
+        "establishing-glory-the-library-Review-Instructions.pdf"
+      ],
+      "attachmentCount": 3,
+      "attachmentsDistinct": true,
+      "authorReviewManuscript": "PASS",
+      "authorReviewNotes": "PASS",
+      "reviewInstructions": "PASS",
+      "open": "PASS",
+      "internalArtifacts": 0,
+      "ecr": "PASS",
+      "html": "PASS",
+      "plainText": "PASS",
+      "portal": "OPTIONAL",
+      "sender": "publishing@email.jmerrill.one",
+      "replyTo": "publishing@jmerrill.one",
+      "checksums": {
+        "establishing-glory-the-library-Author-Review-Manuscript.docx": "732eda356d816fa487178a53f6cdb3d8fce92359ebb32a7698398b22c4f067b8",
+        "establishing-glory-the-library-Author-Review-Notes.pdf": "1ba0639e4bee877944a9624e08fc550278464b1754ee287e97b0b462f67e2252",
+        "establishing-glory-the-library-Review-Instructions.pdf": "de010ed23fd76c0b14c61f8ed1d9fe549db09aaa88cc6e6f4c678247d97f176c"
+      }
+    },
+    {
+      "slug": "the-generals-will-and-last-testament",
+      "attachments": [
+        "the-generals-will-and-last-testament-Author-Review-Manuscript.docx",
+        "the-generals-will-and-last-testament-Author-Review-Notes.pdf",
+        "the-generals-will-and-last-testament-Review-Instructions.pdf"
+      ],
+      "attachmentCount": 3,
+      "attachmentsDistinct": true,
+      "authorReviewManuscript": "PASS",
+      "authorReviewNotes": "PASS",
+      "reviewInstructions": "PASS",
+      "open": "PASS",
+      "internalArtifacts": 0,
+      "ecr": "PASS",
+      "html": "PASS",
+      "plainText": "PASS",
+      "portal": "OPTIONAL",
+      "sender": "publishing@email.jmerrill.one",
+      "replyTo": "publishing@jmerrill.one",
+      "checksums": {
+        "the-generals-will-and-last-testament-Author-Review-Manuscript.docx": "fb109affaa3edcf2f52270ef9543e0473e468d64e175494f8f70c3b579ad8c8e",
+        "the-generals-will-and-last-testament-Author-Review-Notes.pdf": "0107d01030a236dc4108a7fceccb6ef3a189f4ccd32def4e6f756203e4ec0669",
+        "the-generals-will-and-last-testament-Review-Instructions.pdf": "79279540af89a186e740c5f03a864eaf1940ca1bc11940f3d66903be96f52d3e"
+      }
+    },
+    {
+      "slug": "the-intentional-leader",
+      "attachments": [
+        "the-intentional-leader-Author-Review-Manuscript.docx",
+        "the-intentional-leader-Author-Review-Notes.pdf",
+        "the-intentional-leader-Review-Instructions.pdf"
+      ],
+      "attachmentCount": 3,
+      "attachmentsDistinct": true,
+      "authorReviewManuscript": "PASS",
+      "authorReviewNotes": "PASS",
+      "reviewInstructions": "PASS",
+      "open": "PASS",
+      "internalArtifacts": 0,
+      "ecr": "PASS",
+      "html": "PASS",
+      "plainText": "PASS",
+      "portal": "OPTIONAL",
+      "sender": "publishing@email.jmerrill.one",
+      "replyTo": "publishing@jmerrill.one",
+      "checksums": {
+        "the-intentional-leader-Author-Review-Manuscript.docx": "211ee8d3c7e180d479906133cd4ce31a20cc9525b0aa7a794472276ff42e110b",
+        "the-intentional-leader-Author-Review-Notes.pdf": "e47333ce950c508ba030f4de757734f62f97bd4b03df6ed1fbae5c47f6dfd249",
+        "the-intentional-leader-Review-Instructions.pdf": "f8de1fab6d26aaf5953c0422d28ccc2b4fa6598189f3d36305d8254ae194f971"
+      }
+    },
+    {
+      "slug": "the-long-watch",
+      "attachments": [
+        "the-long-watch-Author-Review-Manuscript.docx",
+        "the-long-watch-Author-Review-Notes.pdf",
+        "the-long-watch-Review-Instructions.pdf"
+      ],
+      "attachmentCount": 3,
+      "attachmentsDistinct": true,
+      "authorReviewManuscript": "PASS",
+      "authorReviewNotes": "PASS",
+      "reviewInstructions": "PASS",
+      "open": "PASS",
+      "internalArtifacts": 0,
+      "ecr": "PASS",
+      "html": "PASS",
+      "plainText": "PASS",
+      "portal": "OPTIONAL",
+      "sender": "publishing@email.jmerrill.one",
+      "replyTo": "publishing@jmerrill.one",
+      "checksums": {
+        "the-long-watch-Author-Review-Manuscript.docx": "f624b402a3a2e1878e741d6429985143bf206f38de17743b93af7155509dbd52",
+        "the-long-watch-Author-Review-Notes.pdf": "446c407ae2e30eb29068955de37e4613bdb0263b66b93c47b8541c9a71938928",
+        "the-long-watch-Review-Instructions.pdf": "55915e6bdd7ba521c33210f63bd02e38e3de7c93c6689f11092c410e5a85a54d"
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "input": "/tmp/jm1-program-008-sources/establishing-glory-the-library/2026-07-21-Developmental-Editing-Establishing-Glory-The-Library-Developmentally-Edited-Manuscript.docx",
+  "output": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/establishing-glory-the-library/establishing-glory-the-library-Author-Review-Manuscript.docx",
+  "status": "PASS",
+  "removed_paragraphs": 14,
+  "cleaned_inline_fragments": 33,
+  "removed_comment_parts": 3,
+  "input_sha256": "e09414df4b3c42854bba496caca14264a68186467d746be39963d5d5885b9a6b",
+  "output_sha256": "732eda356d816fa487178a53f6cdb3d8fce92359ebb32a7698398b22c4f067b8",
+  "output_size": 131417
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "slug": "the-intentional-leader",
+    "title": "The Intentional Leader",
+    "status": "PASS",
+    "sender": "publishing@email.jmerrill.one",
+    "replyTo": "publishing@jmerrill.one",
+    "archive": "publishing@jmerrill.one",
+    "html": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/evidence/the-intentional-leader/ecr-preview/author-review-email-preview.html",
+    "htmlSha256": "9489f49c30fedc7a9cec963e5a0807f722066839810d15cdcfddf51292d4cf4b",
+    "text": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/evidence/the-intentional-leader/ecr-preview/author-review-email-preview.txt",
+    "textSha256": "c7d56ba4b5c898a7cc6186a9d3702893fea14c7da491c217fa7dafc0592c9b36"
+  },
+  {
+    "slug": "the-generals-will-and-last-testament",
+    "title": "The General's Will and Last Testament",
+    "status": "PASS",
+    "sender": "publishing@email.jmerrill.one",
+    "replyTo": "publishing@jmerrill.one",
+    "archive": "publishing@jmerrill.one",
+    "html": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/evidence/the-generals-will-and-last-testament/ecr-preview/author-review-email-preview.html",
+    "htmlSha256": "5bd5879cccdfb37406172c037340fb47ed408e0bc0722010d913f0315d5b8e00",
+    "text": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/evidence/the-generals-will-and-last-testament/ecr-preview/author-review-email-preview.txt",
+    "textSha256": "ce7af286aba8a48804b8f72c983c707769886960fedecf8f122d6bef73751b78"
+  },
+  {
+    "slug": "the-long-watch",
+    "title": "The Long Watch",
+    "status": "PASS",
+    "sender": "publishing@email.jmerrill.one",
+    "replyTo": "publishing@jmerrill.one",
+    "archive": "publishing@jmerrill.one",
+    "html": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/evidence/the-long-watch/ecr-preview/author-review-email-preview.html",
+    "htmlSha256": "e21567dad6cb2765b6cb0e7d974f13a0e6b957fe04a457ccecde59c99497153a",
+    "text": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/evidence/the-long-watch/ecr-preview/author-review-email-preview.txt",
+    "textSha256": "447bdd4ceba885a4721793cc125ae9636f28973c0850d0f2a5ca407b7eba44f6"
+  },
+  {
+    "slug": "establishing-glory-the-library",
+    "title": "Establishing Glory: The Library",
+    "status": "PASS",
+    "sender": "publishing@email.jmerrill.one",
+    "replyTo": "publishing@jmerrill.one",
+    "archive": "publishing@jmerrill.one",
+    "html": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/evidence/establishing-glory-the-library/ecr-preview/author-review-email-preview.html",
+    "htmlSha256": "b7aa7e3155d3a04e046ae1b9cf25e600a7e4f8f3ec08168470356a4376574626",
+    "text": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/evidence/establishing-glory-the-library/ecr-preview/author-review-email-preview.txt",
+    "textSha256": "f8daffb04d3aad28bad2152ac7d72d506736b0225229de9346aba70ce2adfb59"
+  },
+  {
+    "slug": "before-you-were-born",
+    "title": "Before You Were Born",
+    "status": "PASS",
+    "sender": "publishing@email.jmerrill.one",
+    "replyTo": "publishing@jmerrill.one",
+    "archive": "publishing@jmerrill.one",
+    "html": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/evidence/before-you-were-born/ecr-preview/author-review-email-preview.html",
+    "htmlSha256": "af02916f8aa8c57745483235009eb0713aab05c73b40edcabeacbd4f051ff785",
+    "text": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/evidence/before-you-were-born/ecr-preview/author-review-email-preview.txt",
+    "textSha256": "e28b50fd8e0c59069f8544b6bd9dd8262ff0e62acb132289227be9471cc0fdd6"
+  }
+]

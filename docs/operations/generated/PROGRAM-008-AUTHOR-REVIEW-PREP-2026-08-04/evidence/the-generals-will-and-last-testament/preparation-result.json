@@ -1,0 +1,11 @@
+{
+  "input": "/tmp/jm1-program-008-sources/the-generals-will-and-last-testament/2026-07-21-Developmental-Editing-The-General-s-Will-and-Last-Testament-Developmentally-Edited-Manuscript.docx",
+  "output": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/the-generals-will-and-last-testament/the-generals-will-and-last-testament-Author-Review-Manuscript.docx",
+  "status": "PASS",
+  "removed_paragraphs": 14,
+  "cleaned_inline_fragments": 98,
+  "removed_comment_parts": 3,
+  "input_sha256": "6188fa4ee4b3b13d0ab8c22e0b35a1aaba85faae907586b45a8858590c455bbb",
+  "output_sha256": "fb109affaa3edcf2f52270ef9543e0473e468d64e175494f8f70c3b579ad8c8e",
+  "output_size": 343307
+}
