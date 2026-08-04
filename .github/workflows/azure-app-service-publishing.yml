@@ -123,6 +123,21 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Preflight Single Promotion Authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          auto_swap="$(az webapp config show \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --slot "$AZURE_STAGING_SLOT" \
+            --query autoSwapSlotName \
+            -o tsv)"
+          if [[ -n "$auto_swap" && "$auto_swap" != "None" && "$auto_swap" != "null" ]]; then
+            echo "AZURE_AUTO_SWAP_CONFLICTS_WITH_EXPLICIT_GOVERNED_PROMOTION: staging auto-swap target is ${auto_swap} while this workflow performs an explicit production slot swap." >&2
+            exit 1
+          fi
+
       - name: Deploy Immutable Artifact To Staging
         run: |
           set -euo pipefail

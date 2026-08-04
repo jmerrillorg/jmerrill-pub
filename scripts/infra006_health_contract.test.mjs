@@ -35,6 +35,15 @@ test('App Service production promotion requires exact release identity', () => {
   assert.match(workflow, /\$\{\{ github\.sha \}\}/)
 })
 
+test('App Service promotion has one authority and rejects staging auto-swap', () => {
+  const workflow = readFileSync('.github/workflows/azure-app-service-publishing.yml', 'utf8')
+  assert.match(workflow, /Preflight Single Promotion Authority/)
+  assert.match(workflow, /autoSwapSlotName/)
+  assert.match(workflow, /AZURE_AUTO_SWAP_CONFLICTS_WITH_EXPLICIT_GOVERNED_PROMOTION/)
+  assert.match(workflow, /az webapp deployment slot swap/)
+  assert.match(workflow, /--target-slot production/)
+})
+
 test('App Service Bicep uses Key Vault references and health check path', () => {
   const bicep = readFileSync('infra/jm1-infra-006/app-service/main.bicep', 'utf8')
   assert.match(bicep, /@Microsoft\.KeyVault\(SecretUri=/)
