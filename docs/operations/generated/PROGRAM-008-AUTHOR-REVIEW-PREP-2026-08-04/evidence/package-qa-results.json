@@ -1,0 +1,121 @@
+{
+  "status": "PASS",
+  "failures": [],
+  "titles": [
+    {
+      "slug": "before-you-were-born",
+      "attachments": [
+        "before-you-were-born-Author-Review-Manuscript.docx",
+        "before-you-were-born-Editorial-Review-Guide.pdf"
+      ],
+      "attachmentCount": 2,
+      "attachmentsDistinct": true,
+      "authorReviewManuscript": "PASS",
+      "editorialReviewGuide": "PASS",
+      "open": "PASS",
+      "internalArtifacts": 0,
+      "ecr": "PASS",
+      "html": "PASS",
+      "plainText": "PASS",
+      "portal": "OPTIONAL",
+      "sender": "publishing@email.jmerrill.one",
+      "replyTo": "publishing@jmerrill.one",
+      "checksums": {
+        "before-you-were-born-Author-Review-Manuscript.docx": "da5684ec3a5b2915c592b0e60e7c6f4724da36a2bf2642b324506e7ba7144f35",
+        "before-you-were-born-Editorial-Review-Guide.pdf": "2d80ed451840b2b88979ade029929069a84c1602b64c708bc1c083ba35a4e5f0"
+      }
+    },
+    {
+      "slug": "establishing-glory-the-library",
+      "attachments": [
+        "establishing-glory-the-library-Author-Review-Manuscript.docx",
+        "establishing-glory-the-library-Editorial-Review-Guide.pdf"
+      ],
+      "attachmentCount": 2,
+      "attachmentsDistinct": true,
+      "authorReviewManuscript": "PASS",
+      "editorialReviewGuide": "PASS",
+      "open": "PASS",
+      "internalArtifacts": 0,
+      "ecr": "PASS",
+      "html": "PASS",
+      "plainText": "PASS",
+      "portal": "OPTIONAL",
+      "sender": "publishing@email.jmerrill.one",
+      "replyTo": "publishing@jmerrill.one",
+      "checksums": {
+        "establishing-glory-the-library-Author-Review-Manuscript.docx": "b502ed9f9dc308964380daf4e0537aeb0da33563988ffbf82dc72cd36a4b1d30",
+        "establishing-glory-the-library-Editorial-Review-Guide.pdf": "1a1f10581766eb76be851a68c99a7991a6a5c94d2080e0a3a8c50f8229c78926"
+      }
+    },
+    {
+      "slug": "the-generals-will-and-last-testament",
+      "attachments": [
+        "the-generals-will-and-last-testament-Author-Review-Manuscript.docx",
+        "the-generals-will-and-last-testament-Editorial-Review-Guide.pdf"
+      ],
+      "attachmentCount": 2,
+      "attachmentsDistinct": true,
+      "authorReviewManuscript": "PASS",
+      "editorialReviewGuide": "PASS",
+      "open": "PASS",
+      "internalArtifacts": 0,
+      "ecr": "PASS",
+      "html": "PASS",
+      "plainText": "PASS",
+      "portal": "OPTIONAL",
+      "sender": "publishing@email.jmerrill.one",
+      "replyTo": "publishing@jmerrill.one",
+      "checksums": {
+        "the-generals-will-and-last-testament-Author-Review-Manuscript.docx": "246d722e2a103a1b04fa138edfffbd9b7fcd14ba1ae2cefafc912f8cb0188dba",
+        "the-generals-will-and-last-testament-Editorial-Review-Guide.pdf": "a91893c4d16d1a2f92abdbf7e4ac95b1d600bf2bbf44a83b1386881bf545069f"
+      }
+    },
+    {
+      "slug": "the-intentional-leader",
+      "attachments": [
+        "the-intentional-leader-Author-Review-Manuscript.docx",
+        "the-intentional-leader-Editorial-Review-Guide.pdf"
+      ],
+      "attachmentCount": 2,
+      "attachmentsDistinct": true,
+      "authorReviewManuscript": "PASS",
+      "editorialReviewGuide": "PASS",
+      "open": "PASS",
+      "internalArtifacts": 0,
+      "ecr": "PASS",
+      "html": "PASS",
+      "plainText": "PASS",
+      "portal": "OPTIONAL",
+      "sender": "publishing@email.jmerrill.one",
+      "replyTo": "publishing@jmerrill.one",
+      "checksums": {
+        "the-intentional-leader-Author-Review-Manuscript.docx": "6ef2918a842bf7d215fc02c11822f50a5a07db220fc4d75ed9b0c0eae434a4bb",
+        "the-intentional-leader-Editorial-Review-Guide.pdf": "8388d06645813f5bea8420d6f3437c749591618dd93e701266208963518779f2"
+      }
+    },
+    {
+      "slug": "the-long-watch",
+      "attachments": [
+        "the-long-watch-Author-Review-Manuscript.docx",
+        "the-long-watch-Editorial-Review-Guide.pdf"
+      ],
+      "attachmentCount": 2,
+      "attachmentsDistinct": true,
+      "authorReviewManuscript": "PASS",
+      "editorialReviewGuide": "PASS",
+      "open": "PASS",
+      "internalArtifacts": 0,
+      "ecr": "PASS",
+      "html": "PASS",
+      "plainText": "PASS",
+      "portal": "OPTIONAL",
+      "sender": "publishing@email.jmerrill.one",
+      "replyTo": "publishing@jmerrill.one",
+      "checksums": {
+        "the-long-watch-Author-Review-Manuscript.docx": "072fc6bf2179460d49afb3e0c9c6a0f192f240d2743902ec8fd268baeaac6190",
+        "the-long-watch-Editorial-Review-Guide.pdf": "d6245bf1482c630a9e80f45fb02ba8fb7a992d4ebf2924ab2585e28777ab5602"
+      }
+    }
+  ]
+}

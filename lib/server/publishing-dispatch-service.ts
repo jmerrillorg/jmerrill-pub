@@ -742,9 +742,9 @@ function requiredRolesFor(stageCode: AuthorReviewPackageType): AttachmentRole[] 
     return ['interiorProof', 'reviewInstructions']
   }
   if (stageCode === 'DEVELOPMENTAL_EDITING_REVIEW') {
-    return ['editedManuscript', 'editorialMemo', 'reviewInstructions']
+    return ['editedManuscript', 'reviewInstructions']
   }
-  if (stageCode === 'PROOFREADING_REVIEW') return ['proofreadManuscript', 'reviewCoverNote']
+  if (stageCode === 'PROOFREADING_REVIEW') return ['proofreadManuscript', 'reviewInstructions']
   return ['editorialMemo', 'reviewInstructions']
 }
 
@@ -907,7 +907,7 @@ function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) 
     lineEditedManuscript: /line/i,
     copyeditedManuscript: /copyedit/i,
     proofreadManuscript: /proofread/i,
-    reviewCoverNote: /cover.*note|completion.*report|change.*summary/i,
+    reviewCoverNote: /cover.*note|completion.*report|change.*summary|guide/i,
     interiorProof: /interior.*proof|layout.*proof|production.*pdf|\.pdf$/i,
     coverProof: /cover.*proof/i,
     productionProof: /production.*proof/i,
@@ -990,7 +990,7 @@ function authorFacingFilename(titleName: string, role: AttachmentRole, sourceFil
   const label: Record<AttachmentRole, string> = {
     editedManuscript: 'Edited Manuscript',
     editorialMemo: "Editor's Notes",
-    reviewInstructions: 'Review Instructions',
+    reviewInstructions: 'Editorial Review Guide',
     lineEditedManuscript: 'Line Edited Manuscript',
     copyeditedManuscript: 'Copyedited Manuscript',
     proofreadManuscript: 'Proofread Manuscript',

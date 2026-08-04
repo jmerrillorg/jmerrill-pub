@@ -1,0 +1,19 @@
+{
+  "file": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/the-long-watch/the-long-watch-Author-Review-Manuscript.docx",
+  "status": "PASS",
+  "opens": "PASS",
+  "corruption": "NONE",
+  "internal_comments": 0,
+  "track_changes": "NONE",
+  "checks": {
+    "publisher_notes": 0,
+    "automation_metadata": 0,
+    "correlation_ids": 0,
+    "artifact_ids": 0,
+    "checksums": 0,
+    "execution_state": 0,
+    "visible_qa_markers": 0
+  },
+  "blockers": [],
+  "page_count": 571
+}

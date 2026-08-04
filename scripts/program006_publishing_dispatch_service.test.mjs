@@ -74,7 +74,8 @@ test('dispatch service reuses governed branding and package notification control
 test('dispatch service fails closed unless real package attachments are materialized', () => {
   assert.match(service, /materializeRequiredAttachments/)
   assert.match(service, /interiorProof', 'reviewInstructions/)
-  assert.match(service, /editedManuscript', 'editorialMemo', 'reviewInstructions/)
+  assert.match(service, /editedManuscript', 'reviewInstructions/)
+  assert.doesNotMatch(service, /return \['editedManuscript', 'editorialMemo', 'reviewInstructions'\]/)
   assert.doesNotMatch(service, /return \['interiorProof', 'reviewInstructions', 'authorResponseMechanism'/)
   assert.doesNotMatch(service, /return \['editedManuscript', 'editorialMemo', 'reviewInstructions', 'authorResponseMechanism'/)
   assert.match(service, /https:\/\/graph\.microsoft\.com\/v1\.0\/drives/)

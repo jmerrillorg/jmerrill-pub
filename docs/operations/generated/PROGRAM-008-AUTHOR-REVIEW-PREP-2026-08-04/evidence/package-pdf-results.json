@@ -1,0 +1,42 @@
+[
+  {
+    "slug": "the-intentional-leader",
+    "title": "The Intentional Leader",
+    "recipient": "Jackie Smith Jr.",
+    "recipient_email": "chosen2k7@gmail.com",
+    "guide_pdf": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/the-intentional-leader/the-intentional-leader-Editorial-Review-Guide.pdf",
+    "guide_sha256": "8388d06645813f5bea8420d6f3437c749591618dd93e701266208963518779f2"
+  },
+  {
+    "slug": "the-generals-will-and-last-testament",
+    "title": "The General's Will and Last Testament",
+    "recipient": "Iyorwuese Hagher",
+    "recipient_email": "hagher.hagher@ymail.com",
+    "guide_pdf": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/the-generals-will-and-last-testament/the-generals-will-and-last-testament-Editorial-Review-Guide.pdf",
+    "guide_sha256": "a91893c4d16d1a2f92abdbf7e4ac95b1d600bf2bbf44a83b1386881bf545069f"
+  },
+  {
+    "slug": "the-long-watch",
+    "title": "The Long Watch",
+    "recipient": "Jackie Smith Jr.",
+    "recipient_email": "chosen2k7@gmail.com",
+    "guide_pdf": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/the-long-watch/the-long-watch-Editorial-Review-Guide.pdf",
+    "guide_sha256": "d6245bf1482c630a9e80f45fb02ba8fb7a992d4ebf2924ab2585e28777ab5602"
+  },
+  {
+    "slug": "establishing-glory-the-library",
+    "title": "Establishing Glory: The Library",
+    "recipient": "Jackie Smith Jr.",
+    "recipient_email": "chosen2k7@gmail.com",
+    "guide_pdf": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/establishing-glory-the-library/establishing-glory-the-library-Editorial-Review-Guide.pdf",
+    "guide_sha256": "1a1f10581766eb76be851a68c99a7991a6a5c94d2080e0a3a8c50f8229c78926"
+  },
+  {
+    "slug": "before-you-were-born",
+    "title": "Before You Were Born",
+    "recipient": "Sean Arron Crowley",
+    "recipient_email": "scrowley50@gmail.com",
+    "guide_pdf": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-program-008-author-review-prep/docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/before-you-were-born/before-you-were-born-Editorial-Review-Guide.pdf",
+    "guide_sha256": "2d80ed451840b2b88979ade029929069a84c1602b64c708bc1c083ba35a4e5f0"
+  }
+]
