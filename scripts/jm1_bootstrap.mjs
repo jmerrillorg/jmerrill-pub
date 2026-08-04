@@ -471,6 +471,7 @@ function isBootstrapScope(path) {
     path.startsWith('docs/operations/active/') ||
     path.startsWith('docs/operations/commissioning/') ||
     path.startsWith('docs/operations/generated/JM1-GOVERNED-BOOTSTRAP-ECR-')
+    || path.startsWith('docs/operations/generated/JM1-BOOTSTRAP-ECR-COMMISSIONING-CLOSEOUT-')
     || path.startsWith('docs/operations/generated/JM1-BOOTSTRAP-COMMISSIONING-')
   )
 }

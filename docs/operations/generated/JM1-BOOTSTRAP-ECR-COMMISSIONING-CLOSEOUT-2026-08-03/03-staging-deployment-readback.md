@@ -1,16 +1,23 @@
 # Staging Deployment Readback
 
-## Pre-Hotfix Readback
+## PR #405 Push-To-Main Workflow
 
-The PR #403 push-to-main workflow completed successfully before this hotfix:
+The PR #405 push-to-main workflow completed successfully for staging:
 
 - Build: PASS
 - Staging deployment: PASS
 - Staging health certification: PASS
-- Staging release: `2b42b325f7b271edb9ae7cf0c0ca6747739b670d`
+- Staging release: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
 - Production promotion in that push workflow: SKIPPED BY DESIGN
 
-## Hotfix Status
+## Direct Staging Health Readback
 
-The hotfix has not yet been merged to `main`. The governed Publishing App Service CI/CD staging deployment for the hotfix SHA must run after human review and merge.
-
+- URL: `https://app-jm1-pub-prod-staging.azurewebsites.net/api/health`
+- HTTP: 200
+- Status: ready
+- Release: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
+- Dataverse: ready
+- Graph: ready
+- ACS: ready
+- Author Portal: ready
+- Payment gate: disabled

@@ -2,26 +2,44 @@
 
 ## Status
 
-PENDING - HUMAN REVIEW AND MERGE REQUIRED FIRST
+PASS - PRODUCTION RELEASE READBACK CONFIRMED
 
-The instruction requires human review before merging the focused hotfix PR. Protected production promotion was therefore not executed from this unmerged branch.
+Protected production promotion was executed through the governed GitHub Actions workflow after PR #405 merged.
 
-## Required Promotion Path After Merge
+## Protected Promotion Path
 
-Use the existing governed workflow:
-
-- Workflow: `Publishing App Service CI/CD`
+- Workflow run: `https://github.com/jmerrillorg/jmerrill-pub/actions/runs/30870655112`
 - Trigger: `workflow_dispatch`
 - Input: `deploy_production=true`
+- Head SHA: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
 - Identity: OIDC / governed Azure workflow
 - Local production credentials: 0
 
-## Current Production Readback Before Hotfix Promotion
+## Workflow Result
+
+- Build immutable artifact: PASS
+- Deploy App Service staging: PASS
+- Staging health certification: PASS
+- Promote staging to production: Azure reported an already-running `SwapSiteSlots` operation and returned workflow conclusion `failure`
+- Production observation step: SKIPPED by workflow after the Azure concurrency response
+
+## Production Readback
+
+Direct production health readback after the protected workflow showed the intended production release:
 
 - Production health: 200 / ready
-- Production release: `76ede371f22c59152f491848707df85ff6fced6f`
-- Dataverse: READY
-- Graph: READY
-- ACS: READY
-- Author Portal: READY
+- Production release: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
+- Dataverse: ready
+- Graph: ready
+- ACS: ready
+- Author Portal: ready
+- Payment gate: disabled
 
+## Protected Route Readback
+
+Unauthenticated probes returned 401:
+
+- `/api/publishing/dispatch/author-package`: 401
+- `/api/publishing/dispatch/author-package/certify`: 401
+- `/api/publishing/executive-recovery/dispatch`: 401
+- `/api/publisher/operating-center`: 401

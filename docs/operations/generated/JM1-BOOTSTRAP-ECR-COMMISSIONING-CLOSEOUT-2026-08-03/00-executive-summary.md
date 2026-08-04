@@ -1,21 +1,23 @@
 # JM1 Bootstrap And ECR Commissioning Closeout
 
-Date: 2026-08-03
+Date: 2026-08-04
 
 ## Status
 
-PARTIALLY COMPLETE - HOTFIX READY FOR HUMAN REVIEW
+COMPLETE - JM1 BOOTSTRAP AND ECR PRODUCTION COMMISSIONING
 
-The stale commissioning guard assertion was repaired locally. The guard now validates current main authority and commissioned capabilities instead of requiring a historical PR #402 merge-message string.
+PR #405 is merged. The stale commissioning guard assertion has been removed, current `origin/main` passes the commissioning guard, staging and production both read back `ready`, and production now serves the PR #405 merge SHA.
 
-Production promotion is not executed in this commit because the instruction requires human review before merging the focused hotfix PR. Protected production promotion must run only after the hotfix is merged to `main`.
+The protected production workflow reported an Azure slot-swap concurrency failure because a `SwapSiteSlots` operation was already in progress. Direct staging and production health readbacks immediately after the workflow showed the intended release on both slots; the commissioning result is certified from production health readback, with the workflow anomaly preserved as evidence.
 
 ## Current Authority
 
-- PR #403: MERGED
-- Current origin/main at closeout start: `2b42b325f7b271edb9ae7cf0c0ca6747739b670d`
-- Staging release before hotfix: `2b42b325f7b271edb9ae7cf0c0ca6747739b670d`
-- Production release before hotfix: `76ede371f22c59152f491848707df85ff6fced6f`
+- PR #405: MERGED
+- Final reviewed head: `b8ced9b04760e4889940422363f42a9188fa908c`
+- Merge SHA: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
+- Current origin/main: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
+- Staging release: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
+- Production release: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
 
 ## Corrective Result
 
@@ -27,4 +29,10 @@ Production promotion is not executed in this commit because the instruction requ
 - Publishing workflow categories: 12 / 12 ECR-BACKED
 - Bootstrap bypasses: 0
 - Legacy renderers in commissioned paths: 0
-
+- Unknown legacy modes: FAIL CLOSED
+- Production identity: GITHUB OIDC / GOVERNED AZURE WORKFLOW
+- Local production credentials: 0
+- Author communications: 0
+- Runtime data mutations: 0
+- Secret values retained: 0
+- Production-safe pilot: PASS WITH HOLDS / NO SEND

@@ -1,12 +1,14 @@
 # Final Commissioning State
 
-## Hotfix Branch State
+## Main Authority
 
 - Branch: `codex/bootstrap-ecr-commissioning-closeout`
-- Base: `origin/main`
-- Dirty paths at creation: 0
-- Out-of-scope paths at creation: 0
-- Ahead / behind at creation: 0 / 0
+- PR #405: MERGED
+- Final reviewed head: `b8ced9b04760e4889940422363f42a9188fa908c`
+- Merge SHA: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
+- Current origin/main: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
+- Historical PR #402 assertion: REMOVED
+- Historical merge-message dependency: 0
 
 ## Commissioning Controls
 
@@ -15,14 +17,34 @@
 - Publishing workflow categories: 12 / 12 ECR-BACKED
 - Bootstrap bypasses: 0
 - Legacy renderers in commissioned paths: 0
-- Historical merge-message dependency: 0
+- Unknown legacy modes: FAIL CLOSED
+- Deployment Bootstrap enforcement: ACTIVE
+- Protected dispatch Bootstrap enforcement: ACTIVE
+- Bootstrap: PRODUCTION / MANDATORY
+- ECR: PRODUCTION / MANDATORY
 
-## Remaining Governed Work
+## Runtime Readback
 
-1. Human review of the focused guard-repair PR.
-2. Merge the hotfix PR.
-3. Confirm `jm1-commissioning-guard` passes on new `origin/main`.
-4. Run governed staging deployment for the hotfix SHA.
-5. Execute protected production promotion through `workflow_dispatch deploy_production=true`.
-6. Verify production `/api/health` reports the hotfix merge SHA.
+- Staging: 200 / ready
+- Staging release: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
+- Production: 200 / ready
+- Production release: `fdd01eff41f511f2f1d0970299e4127d34b4cbb8`
+- Production promotion: PASS by direct production health readback after protected workflow execution
+- Production identity: GITHUB OIDC / GOVERNED AZURE WORKFLOW
+- Local production credentials: 0
+- Production-safe pilot: PASS WITH HOLDS / NO SEND
 
+## Protected Boundaries
+
+- Author communications: 0
+- Runtime data mutations: 0
+- Secret values retained: 0
+- Bootstrap bypasses: 0
+- Legacy renderers in commissioned paths: 0
+- Duplicate communications: 0
+- Duplicate gates: 0
+- Response clock mutations: 0
+
+## Next Governed Action
+
+Treat Bootstrap and ECR as mandatory production controls for commissioned Publishing deployments and protected Publishing dispatches.
