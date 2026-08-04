@@ -1,0 +1,55 @@
+{
+  "package": "JM1-BOOTSTRAP-ECR-PRODUCTION-COMMISSIONING-CLOSEOUT-2026-08-03",
+  "createdAt": "2026-08-04T09:22:12-04:00",
+  "status": "PRODUCTION_COMMISSIONING_EVIDENCE_CANONICALIZATION_READY_FOR_REVIEW",
+  "scope": "EVIDENCE_ONLY",
+  "sourceEvidenceCommit": "6f6f4b19cb035106aaeaf6af14f31b197271e199",
+  "pullRequest": 405,
+  "finalReviewedHead": "b8ced9b04760e4889940422363f42a9188fa908c",
+  "commissionedRuntimeRelease": "fdd01eff41f511f2f1d0970299e4127d34b4cbb8",
+  "repositoryEvidenceOnlyAdvancement": "ALLOWED",
+  "productionRedeploymentRequired": false,
+  "staging": {
+    "http": 200,
+    "status": "ready",
+    "release": "fdd01eff41f511f2f1d0970299e4127d34b4cbb8"
+  },
+  "production": {
+    "http": 200,
+    "status": "ready",
+    "release": "fdd01eff41f511f2f1d0970299e4127d34b4cbb8"
+  },
+  "protectedPromotion": {
+    "workflow": "Publishing App Service CI/CD",
+    "workflowRun": "https://github.com/jmerrillorg/jmerrill-pub/actions/runs/30870655112",
+    "identity": "GITHUB_OIDC_GOVERNED_AZURE_WORKFLOW",
+    "swapSiteSlotsConcurrencyError": "OBSERVED",
+    "independentProductionReadback": "200 / ready",
+    "intendedReleaseLive": "CONFIRMED",
+    "operationalBlocker": "NO"
+  },
+  "bootstrap": "PRODUCTION_MANDATORY",
+  "ecr": "PRODUCTION_MANDATORY",
+  "deploymentBootstrapEnforcement": "ACTIVE",
+  "protectedDispatchBootstrapEnforcement": "ACTIVE",
+  "publishingWorkflowCategories": "12 / 12 ECR-BACKED",
+  "bootstrapBypasses": 0,
+  "legacyRenderersInCommissionedPublishingPaths": 0,
+  "unknownLegacyModes": "FAIL_CLOSED",
+  "runtimeFilesChanged": 0,
+  "workflowFilesChanged": 0,
+  "authorCommunications": 0,
+  "productionDataMutations": 0,
+  "secretValuesRetained": 0,
+  "evidence": [
+    "00-executive-summary.md",
+    "01-pr405-merge-authority.md",
+    "02-main-validation.md",
+    "03-staging-readback.md",
+    "04-production-promotion.md",
+    "05-production-readback.md",
+    "06-final-control-matrix.md",
+    "07-pilot-readback.md"
+  ],
+  "nextGovernedAction": "Human review of the evidence-only PR, then merge without production redeployment."
+}
