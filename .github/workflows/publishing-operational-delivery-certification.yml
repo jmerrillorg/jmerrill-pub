@@ -1,0 +1,236 @@
+name: Publishing Operational Delivery Certification
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Dry-run before confirmed certification.
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - confirm
+      confirmation:
+        description: Must equal OPERATIONALLY_CERTIFY for confirmed execution.
+        required: false
+        default: ""
+      title:
+        description: Title name for audit readability.
+        required: true
+      title_id:
+        description: Dataverse title ID.
+        required: true
+      stage_id:
+        description: Dataverse editorial stage ID.
+        required: true
+      recipient_contact_id:
+        description: Dataverse recipient contact ID.
+        required: true
+      gate_id:
+        description: Active author review gate ID.
+        required: true
+      package_id:
+        description: Package ID used by PublishingDispatchService.
+        required: true
+      package_version:
+        description: Governed package version.
+        required: true
+        default: program-008-approved-v1
+      expected_production_release:
+        description: Production release SHA expected before invocation.
+        required: true
+      evidence_references:
+        description: Semicolon-separated evidence references supporting certification.
+        required: true
+      portal_status:
+        description: Portal status is secondary for email-first delivery.
+        required: true
+        default: NOT_APPLICABLE
+        type: choice
+        options:
+          - AVAILABLE
+          - NOT_ACTIVATED
+          - TEMPORARILY_UNAVAILABLE
+          - NOT_APPLICABLE
+      author_response_already_received:
+        description: Set true only when the author already responded before certification.
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      author_response_classification:
+        description: Required only when author_response_already_received is true.
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publishing-operational-delivery-certification
+  cancel-in-progress: false
+
+env:
+  PRODUCTION_HEALTH_URL: https://jmerrill.pub/api/health
+  CERTIFY_URL: https://jmerrill.pub/api/publishing/dispatch/author-package/certify
+
+jobs:
+  certify:
+    name: Protected operational delivery certification
+    runs-on: ubuntu-latest
+    environment: jmerrill-pub-production
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Commissioned Bootstrap Gate
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run jm1-bootstrap -- --initiative "Publishing Operational Delivery Certification - ${{ inputs.title }}" --mode "production-mutation"
+          npm run jm1-bootstrap-guard
+          npm run jm1-canon-consistency-guard
+          npm run author-communication-brand-guard
+
+      - name: Verify Production Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$(mktemp)"
+          code="$(curl -fsS -o "$body" -w '%{http_code}' --max-time 20 "$PRODUCTION_HEALTH_URL" || true)"
+          if [ "$code" != "200" ]; then
+            echo "Production health returned HTTP $code." >&2
+            exit 1
+          fi
+          node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready' || h.release !== process.argv[2]) process.exit(1)" "$body" "${{ inputs.expected_production_release }}"
+
+      - name: Confirm Certification Mode
+        if: inputs.mode == 'confirm'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ inputs.confirmation }}" != "OPERATIONALLY_CERTIFY" ]]; then
+            echo "OPERATIONAL_CERTIFICATION_CONFIRMATION_REQUIRED" >&2
+            exit 1
+          fi
+
+      - name: Invoke Certification
+        shell: bash
+        env:
+          MODE: ${{ inputs.mode }}
+          TITLE_ID: ${{ inputs.title_id }}
+          STAGE_ID: ${{ inputs.stage_id }}
+          RECIPIENT_CONTACT_ID: ${{ inputs.recipient_contact_id }}
+          GATE_ID: ${{ inputs.gate_id }}
+          PACKAGE_ID: ${{ inputs.package_id }}
+          PACKAGE_VERSION: ${{ inputs.package_version }}
+          EVIDENCE_REFERENCES: ${{ inputs.evidence_references }}
+          PORTAL_STATUS: ${{ inputs.portal_status }}
+          AUTHOR_RESPONSE_ALREADY_RECEIVED: ${{ inputs.author_response_already_received }}
+          AUTHOR_RESPONSE_CLASSIFICATION: ${{ inputs.author_response_classification }}
+        run: |
+          set -euo pipefail
+          OIDC_RESPONSE="$(curl -fsS \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=jm1-pub-executive-recovery-dispatch")"
+          OIDC_JWT="$(jq -r '.value' <<<"${OIDC_RESPONSE}")"
+          if [[ -z "${OIDC_JWT}" || "${OIDC_JWT}" == "null" ]]; then
+            echo "OIDC request failed." >&2
+            exit 1
+          fi
+          DRY_RUN="false"
+          if [[ "$MODE" == "dry-run" ]]; then
+            DRY_RUN="true"
+          fi
+          BODY="$(jq -cn \
+            --arg titleId "$TITLE_ID" \
+            --arg stageId "$STAGE_ID" \
+            --arg recipientContactId "$RECIPIENT_CONTACT_ID" \
+            --arg gateId "$GATE_ID" \
+            --arg packageId "$PACKAGE_ID" \
+            --arg packageVersion "$PACKAGE_VERSION" \
+            --arg evidenceReferences "$EVIDENCE_REFERENCES" \
+            --arg portalStatus "$PORTAL_STATUS" \
+            --arg authorResponseAlreadyReceived "$AUTHOR_RESPONSE_ALREADY_RECEIVED" \
+            --arg authorResponseClassification "$AUTHOR_RESPONSE_CLASSIFICATION" \
+            --argjson dryRun "$DRY_RUN" \
+            '($evidenceReferences | split(";") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))) as $refs |
+            {
+              packageId: $packageId,
+              titleId: $titleId,
+              stageId: $stageId,
+              recipientContactId: $recipientContactId,
+              gateId: $gateId,
+              packageVersion: $packageVersion,
+              dryRun: $dryRun,
+              evidence: {
+                brandedHtml: true,
+                plainText: true,
+                requiredAttachments: true,
+                attachmentByteLength: true,
+                fileSignatures: true,
+                attachmentOpenTests: true,
+                expectedAttachmentContent: true,
+                sourceChecksumLineage: true,
+                attachmentChecksums: true,
+                deliveredAttachmentInventory: true,
+                deliveredButtonUrl: true,
+                authorClickThrough: false,
+                archiveConfirmed: true,
+                dataverseSendEvidence: true,
+                directReplyPath: true,
+                portalAccess: false,
+                packageVisible: false,
+                responseControls: true,
+                responseForm: false,
+                singleActiveGate: true
+              },
+              evidenceReferences: {
+                brandedHtml: $refs,
+                plainText: $refs,
+                requiredAttachments: $refs,
+                attachmentByteLength: $refs,
+                fileSignatures: $refs,
+                attachmentOpenTests: $refs,
+                expectedAttachmentContent: $refs,
+                sourceChecksumLineage: $refs,
+                attachmentChecksums: $refs,
+                deliveredAttachmentInventory: $refs,
+                deliveredButtonUrl: $refs,
+                archiveConfirmed: $refs,
+                dataverseSendEvidence: $refs,
+                directReplyPath: $refs,
+                responseControls: $refs,
+                singleActiveGate: $refs
+              },
+              portalStatus: $portalStatus,
+              authorResponseAlreadyReceived: ($authorResponseAlreadyReceived == "true")
+            }
+            + (if ($authorResponseClassification | length) > 0 then {authorResponseClassification: $authorResponseClassification} else {} end)')"
+          curl -fsS \
+            -X POST "$CERTIFY_URL" \
+            -H "Authorization: Bearer ${OIDC_JWT}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --data "$BODY" | tee operational-delivery-certification.json
+          grep -Eq '"status":"(eligible|operationally_certified|idempotent)"' operational-delivery-certification.json
+
+      - name: Preserve Certification Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publishing-operational-delivery-certification-evidence
+          path: operational-delivery-certification.json
+          if-no-files-found: ignore

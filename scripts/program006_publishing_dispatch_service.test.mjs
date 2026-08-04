@@ -9,6 +9,10 @@ const route = readFileSync(new URL('../app/api/publishing/dispatch/author-packag
 const certifyRoute = readFileSync(new URL('../app/api/publishing/dispatch/author-package/certify/route.ts', import.meta.url), 'utf8')
 const relay = readFileSync(new URL('../azure-functions/acs-email-relay/src/functions/sendAuthorAcknowledgment.js', import.meta.url), 'utf8')
 const fiveTitleWorkflow = readFileSync(new URL('../.github/workflows/five-title-executive-recovery-dispatch.yml', import.meta.url), 'utf8')
+const certificationWorkflow = readFileSync(
+  new URL('../.github/workflows/publishing-operational-delivery-certification.yml', import.meta.url),
+  'utf8',
+)
 
 test('PROGRAM-006 exposes one canonical PublishingDispatchService operation', () => {
   assert.match(service, /export const PublishingDispatchService/)
@@ -172,6 +176,23 @@ test('operational certification endpoint is OIDC protected and evidence constrai
   assert.match(certifyRoute, /missingSupportingEvidenceReferences/)
   assert.match(certifyRoute, /supporting evidence references for every passed evidence field/)
   assert.doesNotMatch(certifyRoute, /cookie|session|x-jm1-relay-key/i)
+})
+
+test('operational certification workflow is protected and evidence backed', () => {
+  assert.match(certificationWorkflow, /Publishing Operational Delivery Certification/)
+  assert.match(certificationWorkflow, /environment: jmerrill-pub-production/)
+  assert.match(certificationWorkflow, /npm run jm1-bootstrap -- --initiative "Publishing Operational Delivery Certification/)
+  assert.match(certificationWorkflow, /Verify Production Release/)
+  assert.match(certificationWorkflow, /jm1-pub-executive-recovery-dispatch/)
+  assert.match(certificationWorkflow, /api\/publishing\/dispatch\/author-package\/certify/)
+  assert.match(certificationWorkflow, /OPERATIONAL_CERTIFICATION_CONFIRMATION_REQUIRED/)
+  assert.match(certificationWorkflow, /evidenceReferences/)
+  assert.match(certificationWorkflow, /archiveConfirmed: true/)
+  assert.match(certificationWorkflow, /dataverseSendEvidence: true/)
+  assert.match(certificationWorkflow, /directReplyPath: true/)
+  assert.match(certificationWorkflow, /singleActiveGate: true/)
+  assert.match(certificationWorkflow, /authorResponseAlreadyReceived/)
+  assert.doesNotMatch(certificationWorkflow, /x-jm1-relay-key/)
 })
 
 test('executive recovery sends corrected stage-specific author package copy', () => {
