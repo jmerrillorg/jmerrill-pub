@@ -931,7 +931,8 @@ function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) 
 
 function artifactCanSatisfyRole(role: AttachmentRole, haystack: string) {
   if (role !== 'reviewInstructions') return true
-  if (!/instruction/i.test(haystack)) return false
+  if (!/instruction|guide|review/i.test(haystack)) return false
+  if (!/\.pdf\b|pdf/i.test(haystack)) return false
   return !/\b(manifest|ledger|response[-_ ]?mechanism|cover[-_ ]?message)\b/i.test(haystack)
 }
 
@@ -959,6 +960,9 @@ function artifactRoleScore(artifact: DataverseRow, role: AttachmentRole) {
   let score = artifact.jm1pub_iscurrentapproved === true ? 10 : 0
   if (role === 'editedManuscript' && /developmentally.*edited|edited.*manuscript/i.test(haystack)) score += 100
   if (role === 'editedManuscript' && /governed source/i.test(haystack)) score -= 20
+  if (role === 'reviewInstructions' && /editorial.*review.*guide|review.*guide/i.test(haystack)) score += 100
+  if (role === 'reviewInstructions' && /\.pdf\b|pdf/i.test(haystack)) score += 50
+  if (role === 'reviewInstructions' && /\.(txt|md|json)\b|text\/|markdown/i.test(haystack)) score -= 100
   if (role === 'packageManifest' && /v2/i.test(haystack)) score += 20
   if (role === 'interiorProof' && /author review proof/i.test(haystack)) score += 100
   return score
