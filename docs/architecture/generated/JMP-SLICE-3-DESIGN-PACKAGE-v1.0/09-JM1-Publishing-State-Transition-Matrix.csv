@@ -1,0 +1,68 @@
+Object,From,To,Allowed,Requires,Evidence
+PF,REQUESTED,CONTRACTED,Yes,Contract package SOW or manual authority,Contract or entitlement reference
+PF,REQUESTED,ON_HOLD,Yes,Governed blocker,Hold reason owner next action
+PF,REQUESTED,CANCELLED,Yes,Cancellation authority,Cancellation record
+PF,REQUESTED,READY_FOR_PRODUCTION,No,,Forbidden direct transition
+PF,REQUESTED,IN_PRODUCTION,No,,Forbidden direct transition
+PF,REQUESTED,SUBMITTED,No,,Forbidden direct transition
+PF,REQUESTED,LIVE,No,,Forbidden direct transition
+PF,CONTRACTED,READY_FOR_PRODUCTION,Yes,Editorial Master and readiness evidence,Readiness checklist
+PF,CONTRACTED,ON_HOLD,Yes,Governed blocker,Hold record
+PF,CONTRACTED,CANCELLED,Yes,Cancellation authority,Cancellation record
+PF,CONTRACTED,IN_PRODUCTION,No,,Must pass READY_FOR_PRODUCTION
+PF,READY_FOR_PRODUCTION,IN_PRODUCTION,Yes,Production start authorization,Production start event
+PF,READY_FOR_PRODUCTION,ON_HOLD,Yes,Governed blocker,Hold record
+PF,READY_FOR_PRODUCTION,CANCELLED,Yes,Cancellation authority,Cancellation record
+PF,READY_FOR_PRODUCTION,AUTHOR_REVIEW,No,,Must produce output and pass QA
+PF,IN_PRODUCTION,INTERNAL_QA,Yes,Production output exists,Output artifact
+PF,IN_PRODUCTION,ON_HOLD,Yes,Governed blocker,Hold record
+PF,IN_PRODUCTION,CANCELLED,Yes,Cancellation authority,Cancellation record
+PF,INTERNAL_QA,AUTHOR_REVIEW,Yes,QA complete and author package ready,QA report package manifest
+PF,INTERNAL_QA,IN_PRODUCTION,Yes,QA requires rework,QA findings
+PF,INTERNAL_QA,ON_HOLD,Yes,Governed blocker,Hold record
+PF,AUTHOR_REVIEW,APPROVED,Yes,Author or publisher approval,Approval decision
+PF,AUTHOR_REVIEW,IN_PRODUCTION,Yes,Author correction request or publisher disposition,Correction/rework evidence
+PF,AUTHOR_REVIEW,ON_HOLD,Yes,Waiting on author/vendor/publisher,Hold record
+PF,APPROVED,DISTRIBUTION_READY,Yes,FTL release package and identifier where required,Distribution readiness checklist
+PF,APPROVED,IN_PRODUCTION,Only via CORRECTION_AUTHORIZED,Correction approval,Correction event
+PF,APPROVED,SUBMITTED,No,,Must pass DISTRIBUTION_READY
+PF,DISTRIBUTION_READY,SUBMITTED,Yes,Submission authority and complete package,Submission receipt
+PF,DISTRIBUTION_READY,IN_PRODUCTION,Only via CORRECTION_AUTHORIZED,Correction approval,Correction event
+PF,DISTRIBUTION_READY,LIVE,No,,Must submit and receive live readback
+PF,SUBMITTED,LIVE,Yes,Confirmed-live readback,Live evidence
+PF,SUBMITTED,ON_HOLD,Yes,Submission blocker,Platform notice
+PF,SUBMITTED,DISTRIBUTION_READY,Yes,Submission rejected or replacement required,Rejection/return evidence
+PF,SUBMITTED,CANCELLED,Yes,Withdrawal/cancellation authority,Withdrawal record
+PF,LIVE,RETIRED,Yes,Retirement authority,Retirement record
+PF,LIVE,ON_HOLD,Yes,Live blocker/takedown review,Hold record
+PF,LIVE,IN_PRODUCTION,Only via CORRECTION_AUTHORIZED,Correction approval,Correction event
+PF,LIVE,SUBMITTED,No,,Must use correction or distribution update path
+PF,ON_HOLD,Prior State,Yes,Entry criteria restored,Hold resolution evidence
+PF,ON_HOLD,CANCELLED,Yes,Cancellation authority,Cancellation record
+PF,ON_HOLD,RETIRED,Yes,Retirement authority,Retirement record
+PF,CANCELLED,Any State,No,,Cancelled instance is terminal
+PF,RETIRED,Any State,No,,Retired instance is terminal without new edition authority
+PF-07,Any Sellable State,Any Sellable State,No,PF-07 schema inert,Target Architecture and Slice 2 catalog authority
+PF-08,REQUESTED,CONTRACTED,Yes,Approved SOW or scope path,SOW/scope evidence
+PF-08,READY_FOR_PRODUCTION,IN_PRODUCTION,Yes,Approved SOW scope and inputs,SOW/scope production evidence
+PF-08,Any Production State,Any Production State,No without SOW,Approved scope required,SOW blocker evidence
+Title,Editing,Production,Yes,Editorial completion and production readiness,Editorial completion evidence
+Title,Production,Review Required,Yes,Author review package ready,Package manifest
+Title,Review Required,Preparing Release,Yes,Author approval or disposition,Decision record
+Title,Preparing Release,Submitted,Yes,Distribution submission,Submission receipt
+Title,Submitted,Released,Yes,Confirmed-live readback,Live evidence
+Title,Released,Production,Only via CORRECTION_AUTHORIZED,Correction approval,Correction event
+Editorial Master,v1.0,v1.1,Only via CORRECTION_AUTHORIZED,Approved correction,Correction approval and version record
+Editorial Master,Draft,Versioned,Yes,Editorial authority and checksum,Version record
+Format & Title Lock,Unlocked,Locked,Yes,Approved title and format evidence,FTL record
+Format & Title Lock,Locked,Unlocked,Only via CORRECTION_AUTHORIZED,Correction or executive approval,Correction/rollback event
+ISBN,Unassigned,Assigned,Yes,Verified FTL,ISBN assignment evidence
+ISBN,Assigned,Changed,Only via CORRECTION_AUTHORIZED,Identifier correction authority,Correction and ISBN evidence
+Release Anchor,Unset,Set,Yes,Release plan and 21-day lead,Release plan
+Release Anchor,Set,Changed,Yes with approval,Release change authority,Release anchor changed event
+Distribution,Ready,Submitted,Yes,Complete package,Submission receipt
+Distribution,Submitted,Confirmed Live,Yes,Live readback,Live evidence
+Distribution,Submitted,Rejected,Yes,Platform rejection,Rejection notice
+Companion Edition,Proposed,Related,Yes,Approved relationship no slot swap,Companion relationship evidence
+Companion Edition,Related,Released,Yes,Own FTL/identifier/release evidence if separate edition,Release evidence
+Client-title Automation,FROZEN,ACTIVE,No,Executive thaw not granted,Automation freeze authority
