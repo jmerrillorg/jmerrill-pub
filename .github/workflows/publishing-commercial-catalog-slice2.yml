@@ -104,6 +104,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          post_slice2() {
+            local body="$1"
+            local output="$2"
+            local status
+            status="$(curl -sS \
+              -o "$output" \
+              -w '%{http_code}' \
+              -X POST "$SLICE2_URL" \
+              -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json" \
+              --data "$body")"
+            cat "$output"
+            if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+              echo "Protected Slice 2 endpoint returned HTTP $status" >&2
+              return 1
+            fi
+          }
           CORRELATION_ID="$(uuidgen | tr '[:upper:]' '[:lower:]')"
           BODY="$(jq -cn \
             --arg expectedMainSha "${{ inputs.expected_main_sha }}" \
@@ -116,12 +134,7 @@ jobs:
               seedManifestSha256: $seedManifestSha256,
               correlationId: $correlationId
             }')"
-          curl -fsS \
-            -X POST "$SLICE2_URL" \
-            -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            --data "$BODY" | tee catalog-slice2-dry-run.json
+          post_slice2 "$BODY" catalog-slice2-dry-run.json
           node -e "const fs=require('fs'); const r=JSON.parse(fs.readFileSync('catalog-slice2-dry-run.json','utf8')).result; if (r.status !== 'eligible' || r.counts.errors !== 0 || r.representedRows !== 120) process.exit(1)"
 
       - name: Invoke Confirmed Slice 2 Execution
@@ -129,6 +142,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          post_slice2() {
+            local body="$1"
+            local output="$2"
+            local status
+            status="$(curl -sS \
+              -o "$output" \
+              -w '%{http_code}' \
+              -X POST "$SLICE2_URL" \
+              -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json" \
+              --data "$body")"
+            cat "$output"
+            if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+              echo "Protected Slice 2 endpoint returned HTTP $status" >&2
+              return 1
+            fi
+          }
           CORRELATION_ID="$(uuidgen | tr '[:upper:]' '[:lower:]')"
           BODY="$(jq -cn \
             --arg expectedMainSha "${{ inputs.expected_main_sha }}" \
@@ -141,12 +172,7 @@ jobs:
               seedManifestSha256: $seedManifestSha256,
               correlationId: $correlationId
             }')"
-          curl -fsS \
-            -X POST "$SLICE2_URL" \
-            -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            --data "$BODY" | tee catalog-slice2-execute.json
+          post_slice2 "$BODY" catalog-slice2-execute.json
           node -e "const fs=require('fs'); const r=JSON.parse(fs.readFileSync('catalog-slice2-execute.json','utf8')).result; if (!['completed','idempotent'].includes(r.status) || r.counts.errors !== 0) process.exit(1)"
 
       - name: Idempotency Readback
@@ -154,6 +180,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          post_slice2() {
+            local body="$1"
+            local output="$2"
+            local status
+            status="$(curl -sS \
+              -o "$output" \
+              -w '%{http_code}' \
+              -X POST "$SLICE2_URL" \
+              -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json" \
+              --data "$body")"
+            cat "$output"
+            if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+              echo "Protected Slice 2 endpoint returned HTTP $status" >&2
+              return 1
+            fi
+          }
           CORRELATION_ID="$(uuidgen | tr '[:upper:]' '[:lower:]')"
           BODY="$(jq -cn \
             --arg expectedMainSha "${{ inputs.expected_main_sha }}" \
@@ -166,12 +210,7 @@ jobs:
               seedManifestSha256: $seedManifestSha256,
               correlationId: $correlationId
             }')"
-          curl -fsS \
-            -X POST "$SLICE2_URL" \
-            -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            --data "$BODY" | tee catalog-slice2-idempotency.json
+          post_slice2 "$BODY" catalog-slice2-idempotency.json
           node -e "const fs=require('fs'); const r=JSON.parse(fs.readFileSync('catalog-slice2-idempotency.json','utf8')).result; if (r.status !== 'idempotent' || r.counts.noopMatches !== 120 || r.counts.errors !== 0) process.exit(1)"
 
       - name: Preserve Slice 2 Evidence
