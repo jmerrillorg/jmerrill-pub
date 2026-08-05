@@ -1,0 +1,35 @@
+{
+  "packageId": "JMP-COMMERCIAL-CATALOG-SCHEMA-SPEC-2026-08-05",
+  "status": "SCHEMA_READY_FOR_REVIEW",
+  "sources": [
+    {
+      "path": "docs/architecture/generated/JMP-CATALOG-RECONCILIATION-FINAL-2026-08-05/09-slice2-seed-manifest.json",
+      "role": "approved 120-row Slice 2 seed manifest",
+      "sha256": "3a5797ca319f921fc505dded4a1fc7cc277cf9ed289263342c740af6c7d12880"
+    },
+    {
+      "path": "docs/architecture/generated/JMP-CATALOG-RECONCILIATION-FINAL-2026-08-05/00-executive-disposition.md",
+      "role": "final catalog reconciliation disposition"
+    },
+    {
+      "path": "docs/architecture/generated/JMP-PATH-B-SCHEMA-DIVERGENCE-INVENTORY-2026-08-04/00-executive-summary.md",
+      "role": "Path B divergence inventory"
+    },
+    {
+      "path": "lib/commercial/catalog.ts",
+      "role": "commercial projection and post-Slice-2 source hierarchy"
+    },
+    {
+      "path": "/tmp/jm1-slice2-schema-discovery.json",
+      "role": "read-only live Dataverse schema discovery output",
+      "persistence": "local evidence only; no Dataverse mutation"
+    }
+  ],
+  "mutationBoundary": {
+    "dataverseCatalogMutations": 0,
+    "businessCentralMutations": 0,
+    "publicWebsiteChanges": 0,
+    "authorCommunications": 0,
+    "clientTitleAutomation": "FROZEN"
+  }
+}

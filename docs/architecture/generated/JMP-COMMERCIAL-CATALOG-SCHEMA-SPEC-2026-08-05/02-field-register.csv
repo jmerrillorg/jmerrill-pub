@@ -1,0 +1,36 @@
+field,display_name,type,requirement,authority_note
+jm1pub_commercialcatalogitemid,JMP Commercial Catalog Item,GUID,primary key,Dataverse primary key
+jm1pub_name,Name,Text,required primary name,Human-readable catalog item name
+jm1pub_canonicalsku,Canonical SKU,Text,required alternate key,Controls duplicate active canonical catalog identity
+jm1pub_legacysku,Legacy SKU,Text,optional,Preserves superseded or legacy identifiers
+jm1pub_catalogrowid,Catalog Row ID,Text,required recommended alternate key,Source ruling row such as CAT-014
+jm1pub_category,Category,Choice or lookup,required,Approved catalog category
+jm1pub_description,Description,Multiline text,required where public or quotable,Author/proposal-safe description
+jm1pub_jackieruling,Jackie Ruling,Choice,required,One of MIGRATE AMEND RETIRE MERGE PROVISIONAL
+jm1pub_commercialstatus,Commercial Status,Choice,required,One of ACTIVE SUPERSEDED RETIRED PROVISIONAL INTERNAL_ONLY SCHEMA_INERT
+jm1pub_sourceauthority,Source Authority,Text or lookup,required,Approved catalog authority reference
+jm1pub_matrixversion,Matrix Version,Text,required,Matrix v1.1 or later approved authority
+jm1pub_effectivedate,Effective Date,Date,required,Authority effective date
+jm1pub_evidencereference,Evidence Reference,URL or text,required,Register/workbook/evidence pointer
+jm1pub_seedchecksum,Seed Checksum,Text,required,Approved seed manifest checksum
+jm1pub_authorityversion,Authority Version,Text,required,Commercial authority version
+jm1pub_publicvisibility,Public Visibility,Choice,required,One of PUBLIC NON_PUBLIC CONDITIONAL
+jm1pub_quotingstatus,Quoting Status,Choice,required,One of QUOTABLE SOW_GATED NOT_QUOTABLE
+jm1pub_sellablestatus,Sellable Status,Choice,required,One of SELLABLE NOT_SELLABLE
+jm1pub_contractstatus,Contract Status,Choice,required,One of CONTRACTABLE NOT_CONTRACTABLE
+jm1pub_pricingmethod,Pricing Method,Choice,required,One of FIXED STARTING_AT PER_FINISHED_HOUR TIERED QUOTED COMMISSION INCLUDED NOT_APPLICABLE
+jm1pub_unitprice,Unit Price,Currency,optional,Structured price where one currency value is sufficient
+jm1pub_priceexpression,Price Expression,Text,conditional,Approved text for tiered or formula pricing
+jm1pub_sloteligibility,Slot Eligibility,Choice,required,Package slot eligibility authority
+jm1pub_premiumupcharge,Premium Upcharge,Currency,optional,Premium add-on amount where applicable
+jm1pub_publishingtrackapplicability,Publishing Track Applicability,Multiselect choice or relationship,required,Track applicability without using track as SKU identity
+jm1pub_productformcode,Product Form Code,Choice or text,optional,PF-01 through PF-08
+jm1pub_releasemodelcode,Release Model Code,Choice or text,optional,Release model mapping
+jm1pub_productionmodecode,Production Mode Code,Existing canonical lookup or field only,optional,Must not create competing production-mode entity
+jm1pub_scopegate,Scope Gate,Choice,required,SOW/scoping posture
+jm1pub_requiresstatementofwork,Requires Statement of Work,Yes/No,required,Required for PF-08 and quoted work where applicable
+jm1pub_supersededby,Superseded By,Self lookup,optional,Preserves replacement lineage
+jm1pub_replacementreason,Replacement Reason,Text,optional,Reason for supersession or merge
+jm1pub_migrationaction,Migration Action,Text,required,Approved Slice 2 action
+jm1pub_downstreamremediation,Downstream Remediation,Multiline text,optional,Systems requiring cleanup or caution
+jm1pub_recordfingerprint,Record Fingerprint,Text,required,Idempotency and drift-detection fingerprint
