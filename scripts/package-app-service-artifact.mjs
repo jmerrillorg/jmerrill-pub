@@ -20,6 +20,9 @@ const staticDir = resolve('.next/static')
 const publicDir = resolve('public')
 const packagePath = resolve(packageName)
 const packageDir = resolve('.appservice-package')
+const requiredRuntimeFiles = [
+  'docs/architecture/generated/JMP-CATALOG-RECONCILIATION-FINAL-2026-08-05/09-slice2-seed-manifest.json',
+]
 
 if (!existsSync(resolve(standaloneDir, 'server.js'))) {
   console.error('Missing .next/standalone/server.js. Run npm run build first.')
@@ -46,9 +49,19 @@ if (existsSync(publicDir)) {
   cpSync(publicDir, resolve(packageDir, 'public'), { recursive: true })
 }
 
+for (const runtimeFile of requiredRuntimeFiles) {
+  const source = resolve(runtimeFile)
+  if (!existsSync(source)) {
+    console.error(`Missing required App Service runtime file: ${runtimeFile}`)
+    process.exit(1)
+  }
+  const target = resolve(packageDir, runtimeFile)
+  mkdirSync(dirname(target), { recursive: true })
+  cpSync(source, target)
+}
+
 writeFileSync(resolve(packageDir, 'JM1_RELEASE_SHA'), `${releaseSha}\n`)
 
 execFileSync('zip', ['-qr', packagePath, '.'], { cwd: packageDir, stdio: 'inherit' })
 const checksum = execFileSync('shasum', ['-a', '256', packagePath], { encoding: 'utf8' })
 writeFileSync(`${packagePath}.sha256`, checksum.replace(packagePath, basename(packagePath)))
-
