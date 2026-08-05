@@ -1,0 +1,38 @@
+{
+  "packageId": "JM1-SLICE2-COMMERCIAL-CATALOG-SCHEMA-PROVISIONING-2026-08-05",
+  "generatedAt": "2026-08-05",
+  "authority": {
+    "mergedSchemaPr": 418,
+    "schemaMergeHead": "5245087a81fb75997bd0617291e426da1c24696f",
+    "canonicalEntity": "jm1pub_commercialcatalogitem",
+    "displayName": "JMP Commercial Catalog Item",
+    "solution": "JM1 Publishing Commercial Catalog"
+  },
+  "evidence": [
+    {
+      "path": "dev-provision-readback.json",
+      "role": "JM1-Dev provisioning and metadata readback"
+    },
+    {
+      "path": "core-provision-readback.json",
+      "role": "JM1-Core managed-solution deployment readback"
+    },
+    {
+      "path": "solution-package-checksums.sha256",
+      "role": "SHA-256 checksums for unmanaged evidence export and managed Core import package"
+    }
+  ],
+  "verified": {
+    "entitySet": "jm1pub_commercialcatalogitems",
+    "canonicalSkuAlternateKey": "ACTIVE",
+    "catalogRowAlternateKey": "ACTIVE",
+    "securityRoles": "6 / 6"
+  },
+  "mutationBoundary": {
+    "catalogRowsSeeded": 0,
+    "businessCentralMutations": 0,
+    "publicWebsiteChanges": 0,
+    "authorCommunications": 0,
+    "clientTitleAutomation": "FROZEN"
+  }
+}

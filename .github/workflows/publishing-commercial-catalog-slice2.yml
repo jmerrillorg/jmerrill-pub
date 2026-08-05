@@ -25,7 +25,7 @@ on:
       expected_main_sha:
         description: Approved Slice 2 seed authority SHA.
         required: true
-        default: ef92880313d1de4f6fe9a33a01ca5f3c99394076
+        default: 5245087a81fb75997bd0617291e426da1c24696f
       seed_manifest_sha256:
         description: Approved Slice 2 seed manifest checksum.
         required: true

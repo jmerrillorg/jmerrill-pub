@@ -9,7 +9,7 @@ import {
   stringValue,
 } from './dataverse-server'
 
-export const SLICE2_APPROVED_MAIN_SHA = 'ef92880313d1de4f6fe9a33a01ca5f3c99394076'
+export const SLICE2_APPROVED_MAIN_SHA = '5245087a81fb75997bd0617291e426da1c24696f'
 export const SLICE2_SEED_MANIFEST_PATH =
   'docs/architecture/generated/JMP-CATALOG-RECONCILIATION-FINAL-2026-08-05/09-slice2-seed-manifest.json'
 export const SLICE2_SEED_MANIFEST_SHA256 = '3a5797ca319f921fc505dded4a1fc7cc277cf9ed289263342c740af6c7d12880'
@@ -282,15 +282,7 @@ export function validateSlice2RequestAndManifest(request: PublishingCommercialCa
   })
   if (unresolved.length > 0) blockers.push('CATALOG_SLICE2_REPLACEMENT_SKU_UNRESOLVED')
 
-  if (
-    manifest.records.some(
-      (record) =>
-        record.pfMapping === 'PF-07' &&
-        (record.publicVisibility !== 'NON-PUBLIC' ||
-          record.quoteEligibility !== 'NOT QUOTABLE' ||
-          record.contractEligibility !== 'NOT CONTRACTABLE'),
-    )
-  ) {
+  if (manifest.records.some((record) => record.pfMapping === 'PF-07' && !isPf07SchemaInert(record))) {
     blockers.push('CATALOG_SLICE2_PF07_BOUNDARY_VIOLATION')
   }
 
@@ -391,12 +383,12 @@ function createDataverseSlice2Adapter(): PublishingCommercialCatalogSlice2Adapte
       if (!config) throw new Error('CATALOG_SLICE2_DATAVERSE_CONFIG_NOT_AVAILABLE')
       const rows = await dataverseList(config, entitySet, {
         $select:
-          'jm1pub_commercialcatalogitemid,jm1pub_sourcerowid,jm1pub_legacysku,jm1pub_canonicalsku,jm1pub_recordfingerprint,jm1pub_commercialstatus',
+          'jm1pub_commercialcatalogitemid,jm1pub_catalogrowid,jm1pub_legacysku,jm1pub_canonicalsku,jm1pub_recordfingerprint,jm1pub_commercialstatus',
         $top: '5000',
       })
       lastRead = rows.map((row) => ({
         id: stringValue(row.jm1pub_commercialcatalogitemid),
-        rowId: stringValue(row.jm1pub_sourcerowid),
+        rowId: stringValue(row.jm1pub_catalogrowid),
         legacySku: stringValue(row.jm1pub_legacysku),
         canonicalSku: stringValue(row.jm1pub_canonicalsku),
         recordFingerprint: stringValue(row.jm1pub_recordfingerprint),
@@ -413,7 +405,7 @@ function createDataverseSlice2Adapter(): PublishingCommercialCatalogSlice2Adapte
           await dataverseList(config, entitySet, {
             $select: 'jm1pub_commercialcatalogitemid',
             $top: '1',
-            $filter: `jm1pub_sourcerowid eq '${escapeOData(record.sourceRowId)}'`,
+            $filter: `jm1pub_catalogrowid eq '${escapeOData(record.sourceRowId)}'`,
           })
         )[0]
       const payload = dataversePayloadFor(record, desired)
@@ -451,34 +443,150 @@ function createDataverseSlice2Adapter(): PublishingCommercialCatalogSlice2Adapte
 }
 
 function dataversePayloadFor(record: Slice2SeedRecord, desired: Slice2CatalogState) {
+  const price = priceFor(record.unitPriceOrPricingMethod)
   return {
     jm1pub_name: record.name,
-    jm1pub_sourcerowid: record.sourceRowId,
+    jm1pub_catalogrowid: record.sourceRowId,
     jm1pub_legacysku: record.legacySku,
     jm1pub_canonicalsku: record.canonicalSku,
-    jm1pub_productname: record.name,
-    jm1pub_category: record.category,
-    jm1pub_jackieruling: record.finalJackieRuling,
-    jm1pub_commercialstatus: record.commercialStatus,
-    jm1pub_pricingmethod: record.unitPriceOrPricingMethod,
-    jm1pub_pfmapping: record.pfMapping,
-    jm1pub_releasemodelmapping: record.releaseModelMapping,
-    jm1pub_productionmodemapping: record.productionModeMapping,
-    jm1pub_sloteligibility: record.slotEligibility,
-    jm1pub_premiumupcharge: record.premiumUpcharge,
-    jm1pub_publicvisibility: record.publicVisibility,
-    jm1pub_quoteeligibility: record.quoteEligibility,
-    jm1pub_contracteligibility: record.contractEligibility,
-    jm1pub_supersededby: record.supersededBy,
+    jm1pub_category: choice('category', record.category),
+    jm1pub_description: record.name,
+    jm1pub_jackieruling: choice('jackieRuling', record.finalJackieRuling),
+    jm1pub_commercialstatus: choice('commercialStatus', record.commercialStatus),
+    jm1pub_pricingmethod: choice('pricingMethod', price.method),
+    ...(price.unitPrice === null ? {} : { jm1pub_unitprice: price.unitPrice }),
+    jm1pub_priceexpression: price.expression,
+    jm1pub_productformcode: choice('productFormCode', normalizeNotApplicable(record.pfMapping)),
+    jm1pub_releasemodelcode: normalizeNotApplicable(record.releaseModelMapping),
+    jm1pub_productionmodecode: normalizeNotApplicable(record.productionModeMapping),
+    jm1pub_sloteligibility: choice('slotEligibility', normalizeSlot(record.slotEligibility)),
+    ...(currencyOrNull(record.premiumUpcharge) === null ? {} : { jm1pub_premiumupcharge: currencyOrNull(record.premiumUpcharge) }),
+    jm1pub_publicvisibility: choice('publicVisibility', normalizeChoice(record.publicVisibility)),
+    jm1pub_quotingstatus: choice('quotingStatus', normalizeChoice(record.quoteEligibility)),
+    jm1pub_sellablestatus: choice('sellableStatus', sellableStatusFor(record)),
+    jm1pub_contractstatus: choice('contractStatus', normalizeChoice(record.contractEligibility)),
+    jm1pub_publishingtrackapplicability: 'J Merrill Publishing',
+    jm1pub_scopegate: choice('scopeGate', scopeGateFor(record)),
+    jm1pub_requiresstatementofwork: requiresStatementOfWork(record),
+    jm1pub_replacementreason: record.supersededBy ? `Superseded by ${record.supersededBy}` : '',
     jm1pub_effectivedate: record.effectiveDate,
     jm1pub_sourceauthority: record.sourceAuthority,
     jm1pub_matrixversion: record.matrixVersion,
-    jm1pub_jackierulingreference: record.jackieRulingReference,
+    jm1pub_evidencereference: record.jackieRulingReference,
+    jm1pub_authorityversion: 'Slice 2 commercial catalog authority 2026-08-05',
     jm1pub_migrationaction: record.migrationAction,
+    jm1pub_downstreamremediation: '',
     jm1pub_seedchecksum: SLICE2_SEED_MANIFEST_SHA256,
-    jm1pub_mainsha: SLICE2_APPROVED_MAIN_SHA,
     jm1pub_recordfingerprint: desired.recordFingerprint,
   }
+}
+
+const CHOICES = {
+  category: [
+    'AI Services',
+    'Accessibility and Translation',
+    'Audio',
+    'Author Platform',
+    'Book Formats and Author Copies',
+    'Catalog Services',
+    "Children's Publishing",
+    'Coming Soon Capabilities',
+    'Design and Production',
+    'Distribution and Post-Launch',
+    'Editorial Services',
+    'Education and Legal',
+    'Marketing and Launch',
+    'Publishing Packages',
+    'Rights and Legal',
+    'Strategic Publishing Programs',
+    'Subscriptions',
+    'Uncategorized',
+  ],
+  jackieRuling: ['MIGRATE', 'AMEND', 'RETIRE', 'MERGE', 'PROVISIONAL'],
+  commercialStatus: ['ACTIVE', 'SUPERSEDED', 'RETIRED', 'PROVISIONAL', 'INTERNAL_ONLY', 'SCHEMA_INERT'],
+  publicVisibility: ['PUBLIC', 'NON_PUBLIC', 'CONDITIONAL'],
+  quotingStatus: ['QUOTABLE', 'SOW_GATED', 'NOT_QUOTABLE'],
+  sellableStatus: ['SELLABLE', 'NOT_SELLABLE'],
+  contractStatus: ['CONTRACTABLE', 'NOT_CONTRACTABLE'],
+  pricingMethod: ['FIXED', 'STARTING_AT', 'PER_FINISHED_HOUR', 'TIERED', 'QUOTED', 'COMMISSION', 'INCLUDED', 'NOT_APPLICABLE'],
+  slotEligibility: ['Conditional', 'No', 'Yes'],
+  productFormCode: ['PF-01', 'PF-02', 'PF-03', 'PF-04', 'PF-05', 'PF-06', 'PF-07', 'PF-08', 'N/A'],
+  scopeGate: ['NONE', 'SOW_GATED', 'CONDITIONAL', 'INTERNAL_ONLY'],
+} as const
+
+function choice(group: keyof typeof CHOICES, value: string) {
+  const values = CHOICES[group] as readonly string[]
+  const index = values.indexOf(value)
+  if (index < 0) throw new Error(`CATALOG_SLICE2_CHOICE_VALUE_UNMAPPED:${group}:${value}`)
+  return 100000000 + index
+}
+
+function normalizeChoice(value: string) {
+  return value.trim().replace(/[-\s]+/g, '_').toUpperCase()
+}
+
+function normalizeSlot(value: string) {
+  const normalized = value.trim().toLowerCase()
+  if (normalized === 'yes') return 'Yes'
+  if (normalized === 'conditional') return 'Conditional'
+  return 'No'
+}
+
+function normalizeNotApplicable(value: string) {
+  const trimmed = value.trim()
+  return trimmed && trimmed.toUpperCase() !== 'N/A' ? trimmed : 'N/A'
+}
+
+function priceFor(value: string) {
+  const normalized = value.trim()
+  if (!normalized || normalized.toUpperCase() === 'N/A') return { method: 'NOT_APPLICABLE', unitPrice: null, expression: normalized }
+  const amount = currencyOrNull(normalized)
+  if (amount !== null) return { method: 'FIXED', unitPrice: amount, expression: normalized }
+  if (/starting|from/i.test(normalized)) return { method: 'STARTING_AT', unitPrice: null, expression: normalized }
+  if (/pfh|finished hour/i.test(normalized)) return { method: 'PER_FINISHED_HOUR', unitPrice: null, expression: normalized }
+  if (/commission/i.test(normalized)) return { method: 'COMMISSION', unitPrice: null, expression: normalized }
+  if (/included/i.test(normalized)) return { method: 'INCLUDED', unitPrice: null, expression: normalized }
+  if (/tier/i.test(normalized)) return { method: 'TIERED', unitPrice: null, expression: normalized }
+  return { method: 'QUOTED', unitPrice: null, expression: normalized }
+}
+
+function currencyOrNull(value: string) {
+  const match = value.trim().match(/^\$?([0-9]+(?:,[0-9]{3})*(?:\.[0-9]{1,2})?)$/)
+  if (!match) return null
+  return Number(match[1].replace(/,/g, ''))
+}
+
+function sellableStatusFor(record: Slice2SeedRecord) {
+  if (
+    record.commercialStatus !== 'ACTIVE' ||
+    normalizeChoice(record.publicVisibility) !== 'PUBLIC' ||
+    normalizeChoice(record.quoteEligibility) === 'NOT_QUOTABLE' ||
+    normalizeChoice(record.contractEligibility) === 'NOT_CONTRACTABLE'
+  ) {
+    return 'NOT_SELLABLE'
+  }
+  return 'SELLABLE'
+}
+
+function scopeGateFor(record: Slice2SeedRecord) {
+  if (record.commercialStatus === 'INTERNAL_ONLY' || record.commercialStatus === 'SCHEMA_INERT') return 'INTERNAL_ONLY'
+  if (requiresStatementOfWork(record)) return 'SOW_GATED'
+  if (normalizeChoice(record.publicVisibility) === 'CONDITIONAL' || normalizeSlot(record.slotEligibility) === 'Conditional') return 'CONDITIONAL'
+  return 'NONE'
+}
+
+function requiresStatementOfWork(record: Slice2SeedRecord) {
+  return normalizeChoice(record.quoteEligibility) === 'SOW_GATED' || /SOW|statement of work/i.test(record.productionModeMapping)
+}
+
+function isPf07SchemaInert(record: Slice2SeedRecord) {
+  return (
+    record.commercialStatus === 'SCHEMA_INERT' &&
+    normalizeChoice(record.publicVisibility) === 'NON_PUBLIC' &&
+    normalizeChoice(record.quoteEligibility) === 'NOT_QUOTABLE' &&
+    normalizeChoice(record.contractEligibility) === 'NOT_CONTRACTABLE' &&
+    sellableStatusFor(record) === 'NOT_SELLABLE'
+  )
 }
 
 function escapeOData(value: string) {
