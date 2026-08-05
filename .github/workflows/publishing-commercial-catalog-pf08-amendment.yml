@@ -1,0 +1,229 @@
+name: Publishing Commercial Catalog PF-08 Authority Amendment
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Run protected dry-run or confirmed PF-08 amendment execution.
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - execute
+      confirm:
+        description: Execute confirmed PF-08 production amendment after dry-run.
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      expected_production_release:
+        description: Production release SHA expected before invocation.
+        required: true
+      expected_main_sha:
+        description: Approved Slice 2 seed authority SHA.
+        required: true
+        default: 5245087a81fb75997bd0617291e426da1c24696f
+      seed_manifest_sha256:
+        description: Approved Slice 2 seed manifest checksum.
+        required: true
+        default: 3a5797ca319f921fc505dded4a1fc7cc277cf9ed289263342c740af6c7d12880
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publishing-commercial-catalog-pf08-amendment
+  cancel-in-progress: false
+
+env:
+  PRODUCTION_HEALTH_URL: https://jmerrill.pub/api/health
+  SLICE2_URL: https://jmerrill.pub/api/publishing/catalog/slice2
+  AUTHORITY_AMENDMENT: PF08_ACTIVE_SCOPING_GATED_V1
+
+jobs:
+  pf08-amendment:
+    name: Protected PF-08 catalog authority amendment
+    runs-on: ubuntu-latest
+    environment: jmerrill-pub-production
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Commissioned Bootstrap Gate
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run jm1-bootstrap -- --initiative "Publishing Commercial Catalog PF-08 Authority Amendment" --mode "production-mutation"
+          npm run jm1-bootstrap-guard
+          npm run jm1-canon-consistency-guard
+          npm run jm1-canon-guard-enforcement
+          npm run jm1-commissioning-guard
+          npm run catalog-reconciliation-final-guard
+
+      - name: Verify Production Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$(mktemp)"
+          code="$(curl -fsS -o "$body" -w '%{http_code}' --max-time 20 "$PRODUCTION_HEALTH_URL" || true)"
+          if [ "$code" != "200" ]; then
+            echo "Production health returned HTTP $code." >&2
+            exit 1
+          fi
+          node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready' || h.release !== process.argv[2]) process.exit(1)" "$body" "${{ inputs.expected_production_release }}"
+
+      - name: Obtain GitHub OIDC Identity
+        id: oidc
+        shell: bash
+        run: |
+          set -euo pipefail
+          OIDC_RESPONSE="$(curl -fsS \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=jm1-pub-catalog-slice2")"
+          OIDC_JWT="$(jq -r '.value' <<<"${OIDC_RESPONSE}")"
+          if [[ -z "${OIDC_JWT}" || "${OIDC_JWT}" == "null" ]]; then
+            echo "OIDC request failed." >&2
+            exit 1
+          fi
+          {
+            echo "token<<EOF"
+            echo "${OIDC_JWT}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Invoke Protected PF-08 Dry Run
+        shell: bash
+        run: |
+          set -euo pipefail
+          post_slice2() {
+            local body="$1"
+            local output="$2"
+            local status
+            status="$(curl -sS \
+              -o "$output" \
+              -w '%{http_code}' \
+              -X POST "$SLICE2_URL" \
+              -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json" \
+              --data "$body")"
+            cat "$output"
+            if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+              echo "Protected PF-08 amendment endpoint returned HTTP $status" >&2
+              return 1
+            fi
+          }
+          CORRELATION_ID="$(uuidgen | tr '[:upper:]' '[:lower:]')"
+          BODY="$(jq -cn \
+            --arg expectedMainSha "${{ inputs.expected_main_sha }}" \
+            --arg seedManifestSha256 "${{ inputs.seed_manifest_sha256 }}" \
+            --arg correlationId "$CORRELATION_ID" \
+            --arg authorityAmendment "$AUTHORITY_AMENDMENT" \
+            '{
+              mode: "dry-run",
+              confirm: false,
+              expectedMainSha: $expectedMainSha,
+              seedManifestSha256: $seedManifestSha256,
+              correlationId: $correlationId,
+              authorityAmendment: $authorityAmendment
+            }')"
+          post_slice2 "$BODY" catalog-pf08-authority-dry-run.json
+          node -e "const fs=require('fs'); const r=JSON.parse(fs.readFileSync('catalog-pf08-authority-dry-run.json','utf8')).result; if (r.status !== 'eligible' || r.resultCode !== 'CATALOG_SLICE2_PF08_AUTHORITY_DRY_RUN_PASS' || r.counts.errors !== 0 || r.representedRows !== 2) process.exit(1)"
+
+      - name: Invoke Confirmed PF-08 Amendment
+        if: inputs.mode == 'execute' && inputs.confirm == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          post_slice2() {
+            local body="$1"
+            local output="$2"
+            local status
+            status="$(curl -sS \
+              -o "$output" \
+              -w '%{http_code}' \
+              -X POST "$SLICE2_URL" \
+              -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json" \
+              --data "$body")"
+            cat "$output"
+            if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+              echo "Protected PF-08 amendment endpoint returned HTTP $status" >&2
+              return 1
+            fi
+          }
+          CORRELATION_ID="$(uuidgen | tr '[:upper:]' '[:lower:]')"
+          BODY="$(jq -cn \
+            --arg expectedMainSha "${{ inputs.expected_main_sha }}" \
+            --arg seedManifestSha256 "${{ inputs.seed_manifest_sha256 }}" \
+            --arg correlationId "$CORRELATION_ID" \
+            --arg authorityAmendment "$AUTHORITY_AMENDMENT" \
+            '{
+              mode: "execute",
+              confirm: true,
+              expectedMainSha: $expectedMainSha,
+              seedManifestSha256: $seedManifestSha256,
+              correlationId: $correlationId,
+              authorityAmendment: $authorityAmendment
+            }')"
+          post_slice2 "$BODY" catalog-pf08-authority-execute.json
+          node -e "const fs=require('fs'); const r=JSON.parse(fs.readFileSync('catalog-pf08-authority-execute.json','utf8')).result; if (!['amended','idempotent'].includes(r.status) || !['CATALOG_SLICE2_PF08_AUTHORITY_AMENDED','CATALOG_SLICE2_PF08_AUTHORITY_ALREADY_APPLIED'].includes(r.resultCode) || r.counts.errors !== 0 || r.representedRows !== 2) process.exit(1)"
+
+      - name: PF-08 Idempotency Readback
+        if: inputs.mode == 'execute' && inputs.confirm == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          post_slice2() {
+            local body="$1"
+            local output="$2"
+            local status
+            status="$(curl -sS \
+              -o "$output" \
+              -w '%{http_code}' \
+              -X POST "$SLICE2_URL" \
+              -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json" \
+              --data "$body")"
+            cat "$output"
+            if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+              echo "Protected PF-08 amendment endpoint returned HTTP $status" >&2
+              return 1
+            fi
+          }
+          CORRELATION_ID="$(uuidgen | tr '[:upper:]' '[:lower:]')"
+          BODY="$(jq -cn \
+            --arg expectedMainSha "${{ inputs.expected_main_sha }}" \
+            --arg seedManifestSha256 "${{ inputs.seed_manifest_sha256 }}" \
+            --arg correlationId "$CORRELATION_ID" \
+            --arg authorityAmendment "$AUTHORITY_AMENDMENT" \
+            '{
+              mode: "execute",
+              confirm: true,
+              expectedMainSha: $expectedMainSha,
+              seedManifestSha256: $seedManifestSha256,
+              correlationId: $correlationId,
+              authorityAmendment: $authorityAmendment
+            }')"
+          post_slice2 "$BODY" catalog-pf08-authority-idempotency.json
+          node -e "const fs=require('fs'); const r=JSON.parse(fs.readFileSync('catalog-pf08-authority-idempotency.json','utf8')).result; if (r.status !== 'idempotent' || r.counts.noopMatches !== 2 || r.counts.errors !== 0) process.exit(1)"
+
+      - name: Preserve PF-08 Amendment Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publishing-commercial-catalog-pf08-amendment-evidence
+          path: catalog-pf08-authority-*.json
+          if-no-files-found: ignore

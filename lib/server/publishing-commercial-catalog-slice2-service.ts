@@ -49,6 +49,7 @@ const REPLACEMENT_AUTHORITIES = new Set([
 export type Slice2ExecutionMode = 'dry-run' | 'execute'
 export type Slice2Ruling = keyof typeof EXPECTED_RULINGS
 export type Slice2CommercialStatus = 'ACTIVE' | 'SUPERSEDED' | 'RETIRED' | 'INTERNAL_ONLY' | 'SCHEMA_INERT' | 'PROVISIONAL'
+export type Slice2AuthorityAmendment = 'PF08_ACTIVE_SCOPING_GATED_V1'
 
 export type PublishingCommercialCatalogSlice2Request = {
   mode: Slice2ExecutionMode
@@ -57,6 +58,7 @@ export type PublishingCommercialCatalogSlice2Request = {
   seedManifestSha256: string
   correlationId: string
   operator?: string
+  authorityAmendment?: Slice2AuthorityAmendment
 }
 
 export type Slice2SeedRecord = {
@@ -126,7 +128,7 @@ export type Slice2Counts = {
 }
 
 export type Slice2Result = {
-  status: 'eligible' | 'completed' | 'idempotent' | 'blocked'
+  status: 'eligible' | 'completed' | 'idempotent' | 'amended' | 'blocked'
   resultCode: string
   mode: Slice2ExecutionMode
   counts: Slice2Counts
@@ -150,6 +152,10 @@ export async function executePublishingCommercialCatalogSlice2(
   request: PublishingCommercialCatalogSlice2Request,
   adapter: PublishingCommercialCatalogSlice2Adapter = createDataverseSlice2Adapter(),
 ): Promise<Slice2Result> {
+  if (request.authorityAmendment === 'PF08_ACTIVE_SCOPING_GATED_V1') {
+    return executePf08AuthorityAmendment(request, adapter)
+  }
+
   const manifest = readSeedManifest()
   const validation = validateSlice2RequestAndManifest(request, manifest)
   if (validation.blockers.length > 0) return blocked(request, validation.blockers)
@@ -241,10 +247,124 @@ export async function executePublishingCommercialCatalogSlice2(
   }
 }
 
+export async function executePf08AuthorityAmendment(
+  request: PublishingCommercialCatalogSlice2Request,
+  adapter: PublishingCommercialCatalogSlice2Adapter = createDataverseSlice2Adapter(),
+): Promise<Slice2Result> {
+  const validation = validateSlice2RequestAndManifest(request)
+  if (validation.blockers.length > 0) return blocked(request, validation.blockers)
+
+  const state = await adapter.readCatalogState()
+  const legacy = pf08LegacySupersessionRecord()
+  const active = pf08ActiveCanonicalRecord()
+  const desired = [
+    { record: legacy, state: desiredStateFor(legacy) },
+    { record: active, state: desiredStateFor(active) },
+  ]
+  const reconciled = desired.filter(({ record, state: next }) => isExactRecordReconciled(record, next, state))
+  const allNoop = reconciled.length === desired.length
+
+  if (request.mode === 'dry-run') {
+    return {
+      status: 'eligible',
+      resultCode: 'CATALOG_SLICE2_PF08_AUTHORITY_DRY_RUN_PASS',
+      mode: request.mode,
+      counts: allNoop
+        ? { creates: 0, updates: 0, supersessions: 0, retirements: 0, provisionalHolds: 0, noopMatches: 2, errors: 0 }
+        : { creates: state.some((row) => row.rowId === active.sourceRowId) ? 0 : 1, updates: 1, supersessions: 1, retirements: 0, provisionalHolds: 0, noopMatches: 0, errors: 0 },
+      representedRows: 2,
+      rulingCounts: { PF08_AUTHORITY_AMENDMENT: 2 },
+      blockers: [],
+      evidenceReference: 'PF-08 catalog authority amendment 2026-08-05',
+      seedManifestSha256: SLICE2_SEED_MANIFEST_SHA256,
+      mainSha: request.expectedMainSha,
+      mutationPerformed: false,
+    }
+  }
+
+  if (request.confirm !== true) return blocked(request, ['CATALOG_SLICE2_CONFIRM_REQUIRED'])
+
+  const timestamp = new Date().toISOString()
+  if (allNoop) {
+    await adapter.writeExecutionLog({
+      eventType: 'CATALOG_SLICE2_PF08_AUTHORITY_IDEMPOTENT_REPLAY',
+      priorState: { noOpMatches: 2 },
+      resultingState: { noOpMatches: 2 },
+      actor: request.operator || 'github-actions-oidc',
+      correlationId: request.correlationId,
+      timestamp,
+      evidenceReference: 'PF-08 catalog authority amendment 2026-08-05',
+      seedChecksum: SLICE2_SEED_MANIFEST_SHA256,
+      mainSha: request.expectedMainSha,
+    })
+    return {
+      status: 'idempotent',
+      resultCode: 'CATALOG_SLICE2_PF08_AUTHORITY_ALREADY_APPLIED',
+      mode: request.mode,
+      counts: { creates: 0, updates: 0, supersessions: 0, retirements: 0, provisionalHolds: 0, noopMatches: 2, errors: 0 },
+      representedRows: 2,
+      rulingCounts: { PF08_AUTHORITY_AMENDMENT: 2 },
+      blockers: [],
+      evidenceReference: 'PF-08 catalog authority amendment 2026-08-05',
+      seedManifestSha256: SLICE2_SEED_MANIFEST_SHA256,
+      mainSha: request.expectedMainSha,
+      mutationPerformed: false,
+    }
+  }
+
+  for (const { record, state: next } of desired) {
+    if (!isExactRecordReconciled(record, next, state)) {
+      await adapter.upsertCatalogRecord(record, next)
+      await adapter.writeExecutionLog({
+        eventType:
+          record.sourceRowId === legacy.sourceRowId
+            ? 'CATALOG_SLICE2_PF08_LEGACY_SUPERSEDED'
+            : 'CATALOG_SLICE2_PF08_AUTHORITY_ACTIVATED',
+        rowId: record.sourceRowId,
+        legacySku: record.legacySku,
+        canonicalSku: record.canonicalSku,
+        priorState: findExistingCatalogRecord(record, next, state),
+        resultingState: next,
+        jackieRuling: record.finalJackieRuling,
+        actor: request.operator || 'github-actions-oidc',
+        correlationId: request.correlationId,
+        timestamp,
+        evidenceReference: 'PF-08 catalog authority amendment 2026-08-05',
+        seedChecksum: SLICE2_SEED_MANIFEST_SHA256,
+        mainSha: request.expectedMainSha,
+      })
+    }
+  }
+
+  return {
+    status: 'amended',
+    resultCode: 'CATALOG_SLICE2_PF08_AUTHORITY_AMENDED',
+    mode: request.mode,
+    counts: { creates: state.some((row) => row.rowId === active.sourceRowId) ? 0 : 1, updates: 1, supersessions: 1, retirements: 0, provisionalHolds: 0, noopMatches: 0, errors: 0 },
+    representedRows: 2,
+    rulingCounts: { PF08_AUTHORITY_AMENDMENT: 2 },
+    blockers: [],
+    evidenceReference: 'PF-08 catalog authority amendment 2026-08-05',
+    seedManifestSha256: SLICE2_SEED_MANIFEST_SHA256,
+    mainSha: request.expectedMainSha,
+    mutationPerformed: true,
+  }
+}
+
 function isRecordReconciled(record: Slice2SeedRecord, desired: Slice2CatalogState, state: Slice2CatalogState[]) {
   const exactRow = state.find((current) => current.rowId === desired.rowId)
   if (exactRow?.recordFingerprint === desired.recordFingerprint) return true
   return record.finalJackieRuling === 'MERGE' && state.some((current) => current.canonicalSku === desired.canonicalSku)
+}
+
+function isExactRecordReconciled(record: Slice2SeedRecord, desired: Slice2CatalogState, state: Slice2CatalogState[]) {
+  return state.some(
+    (current) =>
+      current.rowId === desired.rowId &&
+      current.legacySku === record.legacySku &&
+      current.canonicalSku === record.canonicalSku &&
+      current.recordFingerprint === desired.recordFingerprint,
+  )
 }
 
 function findExistingCatalogRecord(record: Slice2SeedRecord, desired: Slice2CatalogState, state: Slice2CatalogState[]) {
@@ -345,6 +465,60 @@ function desiredStateFor(record: Slice2SeedRecord): Slice2CatalogState {
       supersededBy: record.supersededBy,
       effectiveDate: record.effectiveDate,
     })),
+  }
+}
+
+function pf08LegacySupersessionRecord(): Slice2SeedRecord {
+  return {
+    sourceRowId: 'CAT-052',
+    legacySku: 'JMP-DES-INTERACTIVE',
+    canonicalSku: 'JMP-DES-INTERACTIVE',
+    name: 'Interactive eBook Production - Coming Soon',
+    category: 'Coming Soon Capabilities',
+    finalJackieRuling: 'MERGE',
+    commercialStatus: 'SUPERSEDED',
+    unitPriceOrPricingMethod: 'N/A',
+    pfMapping: 'N/A',
+    releaseModelMapping: 'N/A',
+    productionModeMapping: 'N/A',
+    slotEligibility: 'No',
+    premiumUpcharge: 'N/A',
+    publicVisibility: 'NON-PUBLIC',
+    quoteEligibility: 'NOT QUOTABLE',
+    contractEligibility: 'NOT CONTRACTABLE',
+    supersededBy: 'JMP-INT-EPUB3-STD',
+    effectiveDate: '2026-08-05',
+    sourceAuthority: 'PF-08 catalog authority amendment approved 2026-08-05',
+    matrixVersion: 'Matrix v1.1',
+    jackieRulingReference: 'PF-08 authority amendment / legacy row remains superseded',
+    migrationAction: 'Keep legacy JMP-DES-INTERACTIVE superseded; replacement canonical authority is JMP-INT-EPUB3-STD.',
+  }
+}
+
+function pf08ActiveCanonicalRecord(): Slice2SeedRecord {
+  return {
+    sourceRowId: 'PF08-AUTH-001',
+    legacySku: 'JMP-INT-EPUB3-STD',
+    canonicalSku: 'JMP-INT-EPUB3-STD',
+    name: 'Interactive EPUB3 Edition',
+    category: 'Design and Production',
+    finalJackieRuling: 'AMEND',
+    commercialStatus: 'ACTIVE',
+    unitPriceOrPricingMethod: 'Starting at $1,500; advanced features require SOW',
+    pfMapping: 'PF-08',
+    releaseModelMapping: 'N/A',
+    productionModeMapping: 'SOW-gated interactive production',
+    slotEligibility: 'No',
+    premiumUpcharge: 'N/A',
+    publicVisibility: 'PUBLIC',
+    quoteEligibility: 'SOW-GATED',
+    contractEligibility: 'CONTRACTABLE',
+    supersededBy: '',
+    effectiveDate: '2026-08-05',
+    sourceAuthority: 'PF-08 catalog authority amendment approved 2026-08-05',
+    matrixVersion: 'Matrix v1.1',
+    jackieRulingReference: 'PF-08 authority amendment / canonical active scoping-gated offering',
+    migrationAction: 'Activate canonical PF-08 offering as scoping-gated and contractable only after approved scope.',
   }
 }
 
