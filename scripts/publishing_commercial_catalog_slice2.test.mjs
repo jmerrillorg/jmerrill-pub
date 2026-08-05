@@ -7,6 +7,10 @@ const jiti = createJiti(import.meta.url)
 const service = jiti('../lib/server/publishing-commercial-catalog-slice2-service.ts')
 const route = readFileSync(new URL('../app/api/publishing/catalog/slice2/route.ts', import.meta.url), 'utf8')
 const workflow = readFileSync(new URL('../.github/workflows/publishing-commercial-catalog-slice2.yml', import.meta.url), 'utf8')
+const pf08Workflow = readFileSync(
+  new URL('../.github/workflows/publishing-commercial-catalog-pf08-amendment.yml', import.meta.url),
+  'utf8',
+)
 const serviceSource = readFileSync(
   new URL('../lib/server/publishing-commercial-catalog-slice2-service.ts', import.meta.url),
   'utf8',
@@ -124,6 +128,8 @@ test('protected endpoint is OIDC-only and fail closed', () => {
   assert.match(route, /status:\s*401/)
   assert.match(route, /audience:\s*'jm1-pub-catalog-slice2'/)
   assert.match(route, /Confirmed Slice 2 execution requires confirm=true/)
+  assert.match(route, /Unsupported Slice 2 authority amendment/)
+  assert.match(route, /authorityAmendment:\s*body\.authorityAmendment/)
 })
 
 test('valid dry-run returns approved counts without mutation', async () => {
@@ -236,6 +242,75 @@ test('second execution is idempotent with one replay log', async () => {
   assert.equal(mock.logs[0].eventType, 'CATALOG_SLICE2_IDEMPOTENT_REPLAY')
 })
 
+test('PF-08 authority amendment creates active canonical record and keeps legacy superseded', async () => {
+  const mock = memoryAdapter([
+    {
+      id: 'existing-cat-052',
+      rowId: 'CAT-052',
+      legacySku: 'JMP-DES-INTERACTIVE',
+      canonicalSku: 'JMP-INT-EPUB3-STD',
+      commercialStatus: 'SUPERSEDED',
+      recordFingerprint: 'prior-pf08-fingerprint',
+    },
+  ])
+  const request = {
+    ...baseRequest,
+    mode: 'execute',
+    confirm: true,
+    authorityAmendment: 'PF08_ACTIVE_SCOPING_GATED_V1',
+  }
+
+  const result = await executePublishingCommercialCatalogSlice2(request, mock)
+
+  assert.equal(result.status, 'amended')
+  assert.equal(result.resultCode, 'CATALOG_SLICE2_PF08_AUTHORITY_AMENDED')
+  assert.equal(result.representedRows, 2)
+  assert.equal(mock.upserts.length, 2)
+  assert.equal(mock.logs.length, 2)
+
+  const legacy = mock.state.find((row) => row.rowId === 'CAT-052')
+  const active = mock.state.find((row) => row.rowId === 'PF08-AUTH-001')
+  assert.equal(legacy?.legacySku, 'JMP-DES-INTERACTIVE')
+  assert.equal(legacy?.canonicalSku, 'JMP-DES-INTERACTIVE')
+  assert.equal(legacy?.commercialStatus, 'SUPERSEDED')
+  assert.equal(active?.legacySku, 'JMP-INT-EPUB3-STD')
+  assert.equal(active?.canonicalSku, 'JMP-INT-EPUB3-STD')
+  assert.equal(active?.commercialStatus, 'ACTIVE')
+  assert.equal(new Set(mock.state.map((row) => `${row.commercialStatus}:${row.canonicalSku}`)).size, mock.state.length)
+  assert.equal(mock.logs.some((log) => log.eventType === 'CATALOG_SLICE2_PF08_AUTHORITY_ACTIVATED'), true)
+})
+
+test('PF-08 authority amendment is idempotent after activation', async () => {
+  const mock = memoryAdapter([
+    {
+      id: 'existing-cat-052',
+      rowId: 'CAT-052',
+      legacySku: 'JMP-DES-INTERACTIVE',
+      canonicalSku: 'JMP-INT-EPUB3-STD',
+      commercialStatus: 'SUPERSEDED',
+      recordFingerprint: 'prior-pf08-fingerprint',
+    },
+  ])
+  const request = {
+    ...baseRequest,
+    mode: 'execute',
+    confirm: true,
+    authorityAmendment: 'PF08_ACTIVE_SCOPING_GATED_V1',
+  }
+  await executePublishingCommercialCatalogSlice2(request, mock)
+  mock.upserts = []
+  mock.logs = []
+
+  const result = await executePublishingCommercialCatalogSlice2(request, mock)
+
+  assert.equal(result.status, 'idempotent')
+  assert.equal(result.resultCode, 'CATALOG_SLICE2_PF08_AUTHORITY_ALREADY_APPLIED')
+  assert.equal(result.counts.noopMatches, 2)
+  assert.equal(mock.upserts.length, 0)
+  assert.equal(mock.logs.length, 1)
+  assert.equal(mock.logs[0].eventType, 'CATALOG_SLICE2_PF08_AUTHORITY_IDEMPOTENT_REPLAY')
+})
+
 test('workflow is governed, protected, and does not expose local production secrets', () => {
   assert.match(workflow, /publishing-commercial-catalog-slice2/)
   assert.match(workflow, /environment:\s*jmerrill-pub-production/)
@@ -244,6 +319,19 @@ test('workflow is governed, protected, and does not expose local production secr
   assert.match(workflow, /npm run jm1-bootstrap -- --initiative "Publishing Commercial Catalog Slice 2" --mode "production-mutation"/)
   assert.match(workflow, /npm run catalog-reconciliation-final-guard/)
   assert.doesNotMatch(workflow, /DATAVERSE_CLIENT_SECRET|AZURE_CLIENT_SECRET|client-secret/i)
+})
+
+test('PF-08 amendment workflow is governed, protected, and scoped to the named amendment', () => {
+  assert.match(pf08Workflow, /publishing-commercial-catalog-pf08-amendment/)
+  assert.match(pf08Workflow, /environment:\s*jmerrill-pub-production/)
+  assert.match(pf08Workflow, /id-token:\s*write/)
+  assert.match(pf08Workflow, /audience=jm1-pub-catalog-slice2/)
+  assert.match(pf08Workflow, /AUTHORITY_AMENDMENT:\s*PF08_ACTIVE_SCOPING_GATED_V1/)
+  assert.match(pf08Workflow, /authorityAmendment:\s*\$authorityAmendment/)
+  assert.match(pf08Workflow, /CATALOG_SLICE2_PF08_AUTHORITY_DRY_RUN_PASS/)
+  assert.match(pf08Workflow, /CATALOG_SLICE2_PF08_AUTHORITY_AMENDED/)
+  assert.match(pf08Workflow, /CATALOG_SLICE2_PF08_AUTHORITY_ALREADY_APPLIED/)
+  assert.doesNotMatch(pf08Workflow, /DATAVERSE_CLIENT_SECRET|AZURE_CLIENT_SECRET|client-secret/i)
 })
 
 test('service source does not print secret values', () => {

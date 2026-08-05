@@ -26,6 +26,12 @@ export async function POST(req: Request) {
     if (body.mode === 'execute' && body.confirm !== true) {
       return NextResponse.json({ error: 'Confirmed Slice 2 execution requires confirm=true.' }, { status: 400 })
     }
+    if (
+      body.authorityAmendment &&
+      body.authorityAmendment !== 'PF08_ACTIVE_SCOPING_GATED_V1'
+    ) {
+      return NextResponse.json({ error: 'Unsupported Slice 2 authority amendment.' }, { status: 400 })
+    }
     if (!body.expectedMainSha || !body.seedManifestSha256 || !body.correlationId) {
       return NextResponse.json(
         { error: 'expectedMainSha, seedManifestSha256, and correlationId are required.' },
@@ -40,6 +46,7 @@ export async function POST(req: Request) {
       seedManifestSha256: body.seedManifestSha256,
       correlationId: body.correlationId,
       operator: identity.subject,
+      authorityAmendment: body.authorityAmendment,
     })
 
     return NextResponse.json(
@@ -58,5 +65,8 @@ function statusFor(code: string) {
   if (code === 'CATALOG_SLICE2_DRY_RUN_PASS') return 200
   if (code === 'CATALOG_SLICE2_EXECUTED') return 200
   if (code === 'CATALOG_SLICE2_ALREADY_APPLIED') return 200
+  if (code === 'CATALOG_SLICE2_PF08_AUTHORITY_DRY_RUN_PASS') return 200
+  if (code === 'CATALOG_SLICE2_PF08_AUTHORITY_AMENDED') return 200
+  if (code === 'CATALOG_SLICE2_PF08_AUTHORITY_ALREADY_APPLIED') return 200
   return 422
 }
