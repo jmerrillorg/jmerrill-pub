@@ -156,9 +156,7 @@ export async function executePublishingCommercialCatalogSlice2(
 
   const state = await adapter.readCatalogState()
   const desired = manifest.records.map((record) => ({ record, state: desiredStateFor(record) }))
-  const noopRows = desired.filter(({ state: next }) =>
-    state.some((current) => current.rowId === next.rowId && current.recordFingerprint === next.recordFingerprint),
-  )
+  const noopRows = desired.filter(({ record, state: next }) => isRecordReconciled(record, next, state))
   const allNoop = noopRows.length === 120
   const counts = allNoop ? noOpCounts() : { ...EXPECTED_EMPTY_STATE_COUNTS }
 
@@ -209,8 +207,8 @@ export async function executePublishingCommercialCatalogSlice2(
   }
 
   for (const { record, state: next } of desired) {
-    const prior = state.find((current) => current.rowId === next.rowId || current.legacySku === next.legacySku) || null
-    await adapter.upsertCatalogRecord(record, next)
+    const prior = findExistingCatalogRecord(record, next, state)
+    if (!isRecordReconciled(record, next, state)) await adapter.upsertCatalogRecord(record, next)
     await adapter.writeExecutionLog({
       eventType: eventTypeFor(record),
       rowId: record.sourceRowId,
@@ -241,6 +239,21 @@ export async function executePublishingCommercialCatalogSlice2(
     mainSha: request.expectedMainSha,
     mutationPerformed: true,
   }
+}
+
+function isRecordReconciled(record: Slice2SeedRecord, desired: Slice2CatalogState, state: Slice2CatalogState[]) {
+  const exactRow = state.find((current) => current.rowId === desired.rowId)
+  if (exactRow?.recordFingerprint === desired.recordFingerprint) return true
+  return record.finalJackieRuling === 'MERGE' && state.some((current) => current.canonicalSku === desired.canonicalSku)
+}
+
+function findExistingCatalogRecord(record: Slice2SeedRecord, desired: Slice2CatalogState, state: Slice2CatalogState[]) {
+  return (
+    state.find((current) => current.rowId === desired.rowId) ||
+    state.find((current) => current.legacySku === desired.legacySku) ||
+    state.find((current) => record.finalJackieRuling === 'MERGE' && current.canonicalSku === desired.canonicalSku) ||
+    null
+  )
 }
 
 export function validateSlice2RequestAndManifest(request: PublishingCommercialCatalogSlice2Request, manifest = readSeedManifest()) {
