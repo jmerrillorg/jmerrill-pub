@@ -1,0 +1,30 @@
+{
+  "package": "JMP-CATALOG-RULING-WORKBOOK-2026-08-04",
+  "generated_on": "2026-08-04",
+  "source_branch": "codex/catalog-reconciliation-prep",
+  "source_head": "032cc8725dd14ca0b08b6461b9f3a032872d2f76",
+  "origin_main_observed": "49c1e78 advanced after source prep; workbook generated from committed prep evidence without rebasing analytical source",
+  "original_rows": 104,
+  "catalog_v21_unique_skus": 112,
+  "new_delta_rows": 16,
+  "total_ruling_rows": 120,
+  "class_counts": {
+    "A": 93,
+    "B": 6,
+    "C": 2,
+    "D": 19
+  },
+  "jackie_ruling_cells": "BLANK / EDITABLE",
+  "boundaries": {
+    "catalog_mutations": 0,
+    "pricing_mutations": 0,
+    "dataverse_mutations": 0,
+    "business_central_mutations": 0,
+    "deployments": 0,
+    "author_communications": 0
+  },
+  "files": [
+    "JMP-Catalog-Reconciliation-Jackie-Rulings-2026-08-04.xlsx",
+    "JMP-Catalog-Reconciliation-Jackie-Rulings-2026-08-04.csv"
+  ]
+}
