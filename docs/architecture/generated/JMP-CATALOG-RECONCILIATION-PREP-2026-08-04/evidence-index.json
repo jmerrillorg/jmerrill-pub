@@ -1,0 +1,47 @@
+{
+  "package": "JMP-CATALOG-RECONCILIATION-PREP-2026-08-04",
+  "generated_on": "2026-08-04",
+  "repository_basis": {
+    "ref": "origin/main",
+    "sha": "b2a4d3e6b50eaba0194352d3a5984efaf7bc747f"
+  },
+  "source_parse": "PASS",
+  "source_failure_mode": "NONE",
+  "docx_sku_count": 112,
+  "missing_sku_delta_count": 16,
+  "worksheet_row_count": 104,
+  "ruling_classes": {
+    "Class A": 93,
+    "Class B": 6,
+    "Class C": 2,
+    "Class D": 3
+  },
+  "jackie_ruling_column": "BLANK",
+  "boundaries": {
+    "migrate": 0,
+    "deploy": 0,
+    "reprice": 0,
+    "retire": 0,
+    "amend": 0,
+    "business_central_items": 0,
+    "dataverse_mutations": 0,
+    "catalog_mutations": 0
+  },
+  "sources": [
+    "/Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/Implementation HQ - Documents/Architecture/00_CANON/Publishing/JMP_Products_Services_Catalog_v2.1_CANON-CANDIDATE.docx",
+    "/Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/Implementation HQ - Documents/Architecture/00_CANON/Publishing/JMP_Products_Services_Catalog_v2.1_CANON-CANDIDATE.pdf",
+    "/Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/Implementation HQ - Documents/Architecture/01_GOVERNANCE/JMP_Products_Services_Catalog_v2.1.docx",
+    "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-catalog-reconciliation-prep/docs/operations/generated/2026-07-20-JMP-Catalog-Reconciliation-Worksheet.csv",
+    "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-catalog-reconciliation-prep/docs/operations/generated/2026-07-20-JMP-Catalog-Reconciliation-Worksheet-Amended.csv"
+  ],
+  "outputs": [
+    "00-source-parse-result.md",
+    "01-missing-sku-delta.csv",
+    "02-ruling-class-summary.csv",
+    "03-class-a-spot-check.csv",
+    "04-known-conflict-register.md",
+    "05-jackie-ruling-session-guide.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}
