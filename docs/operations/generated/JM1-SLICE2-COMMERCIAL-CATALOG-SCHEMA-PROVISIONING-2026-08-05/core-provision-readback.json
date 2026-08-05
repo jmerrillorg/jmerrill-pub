@@ -1,0 +1,733 @@
+{
+  "generatedAt": "2026-08-05T08:54:21.088Z",
+  "mode": "readback",
+  "environmentUrl": "https://jm1hq.crm.dynamics.com",
+  "solution": "JM1PublishingCommercialCatalog",
+  "table": "jm1pub_commercialcatalogitem",
+  "seedRows": 120,
+  "actions": [],
+  "readback": {
+    "entity": {
+      "logicalName": "jm1pub_commercialcatalogitem",
+      "schemaName": "jm1pub_CommercialCatalogItem",
+      "entitySetName": "jm1pub_commercialcatalogitems",
+      "ownershipType": "OrganizationOwned",
+      "isCustomEntity": true
+    },
+    "attributes": [
+      {
+        "logicalName": "createdby",
+        "schemaName": "CreatedBy",
+        "type": "Lookup",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "createdbyname",
+        "schemaName": "CreatedByName",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "createdbyyominame",
+        "schemaName": "CreatedByYomiName",
+        "type": "String",
+        "requiredLevel": "SystemRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "createdon",
+        "schemaName": "CreatedOn",
+        "type": "DateTime",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "createdonbehalfby",
+        "schemaName": "CreatedOnBehalfBy",
+        "type": "Lookup",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "createdonbehalfbyname",
+        "schemaName": "CreatedOnBehalfByName",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "createdonbehalfbyyominame",
+        "schemaName": "CreatedOnBehalfByYomiName",
+        "type": "String",
+        "requiredLevel": "SystemRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "exchangerate",
+        "schemaName": "ExchangeRate",
+        "type": "Decimal",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "importsequencenumber",
+        "schemaName": "ImportSequenceNumber",
+        "type": "Integer",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_authorityversion",
+        "schemaName": "jm1pub_Authorityversion",
+        "type": "String",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_canonicalsku",
+        "schemaName": "jm1pub_Canonicalsku",
+        "type": "String",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_catalogrowid",
+        "schemaName": "jm1pub_Catalogrowid",
+        "type": "String",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_category",
+        "schemaName": "jm1pub_Category",
+        "type": "Picklist",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_categoryname",
+        "schemaName": "jm1pub_categoryName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_commercialcatalogitemid",
+        "schemaName": "jm1pub_CommercialCatalogItemId",
+        "type": "Uniqueidentifier",
+        "requiredLevel": "SystemRequired",
+        "isPrimaryId": true,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_commercialstatus",
+        "schemaName": "jm1pub_Commercialstatus",
+        "type": "Picklist",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_commercialstatusname",
+        "schemaName": "jm1pub_commercialstatusName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_contractstatus",
+        "schemaName": "jm1pub_Contractstatus",
+        "type": "Picklist",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_contractstatusname",
+        "schemaName": "jm1pub_contractstatusName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_description",
+        "schemaName": "jm1pub_Description",
+        "type": "Memo",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_downstreamremediation",
+        "schemaName": "jm1pub_Downstreamremediation",
+        "type": "Memo",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_effectivedate",
+        "schemaName": "jm1pub_Effectivedate",
+        "type": "DateTime",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_evidencereference",
+        "schemaName": "jm1pub_Evidencereference",
+        "type": "String",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_jackieruling",
+        "schemaName": "jm1pub_Jackieruling",
+        "type": "Picklist",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_jackierulingname",
+        "schemaName": "jm1pub_jackierulingName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_legacysku",
+        "schemaName": "jm1pub_Legacysku",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_matrixversion",
+        "schemaName": "jm1pub_Matrixversion",
+        "type": "String",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_migrationaction",
+        "schemaName": "jm1pub_Migrationaction",
+        "type": "Memo",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_name",
+        "schemaName": "jm1pub_Name",
+        "type": "String",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": true
+      },
+      {
+        "logicalName": "jm1pub_premiumupcharge",
+        "schemaName": "jm1pub_Premiumupcharge",
+        "type": "Money",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_premiumupcharge_base",
+        "schemaName": "jm1pub_premiumupcharge_Base",
+        "type": "Money",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_priceexpression",
+        "schemaName": "jm1pub_Priceexpression",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_pricingmethod",
+        "schemaName": "jm1pub_Pricingmethod",
+        "type": "Picklist",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_pricingmethodname",
+        "schemaName": "jm1pub_pricingmethodName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_productformcode",
+        "schemaName": "jm1pub_Productformcode",
+        "type": "Picklist",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_productformcodename",
+        "schemaName": "jm1pub_productformcodeName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_productionmodecode",
+        "schemaName": "jm1pub_Productionmodecode",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_publicvisibility",
+        "schemaName": "jm1pub_Publicvisibility",
+        "type": "Picklist",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_publicvisibilityname",
+        "schemaName": "jm1pub_publicvisibilityName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_publishingtrackapplicability",
+        "schemaName": "jm1pub_Publishingtrackapplicability",
+        "type": "String",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_quotingstatus",
+        "schemaName": "jm1pub_Quotingstatus",
+        "type": "Picklist",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_quotingstatusname",
+        "schemaName": "jm1pub_quotingstatusName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_recordfingerprint",
+        "schemaName": "jm1pub_Recordfingerprint",
+        "type": "String",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_releasemodelcode",
+        "schemaName": "jm1pub_Releasemodelcode",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_replacementreason",
+        "schemaName": "jm1pub_Replacementreason",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_requiresstatementofwork",
+        "schemaName": "jm1pub_Requiresstatementofwork",
+        "type": "Boolean",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_requiresstatementofworkname",
+        "schemaName": "jm1pub_requiresstatementofworkName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_scopegate",
+        "schemaName": "jm1pub_Scopegate",
+        "type": "Picklist",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_scopegatename",
+        "schemaName": "jm1pub_scopegateName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_seedchecksum",
+        "schemaName": "jm1pub_Seedchecksum",
+        "type": "String",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_sellablestatus",
+        "schemaName": "jm1pub_Sellablestatus",
+        "type": "Picklist",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_sellablestatusname",
+        "schemaName": "jm1pub_sellablestatusName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_sloteligibility",
+        "schemaName": "jm1pub_Sloteligibility",
+        "type": "Picklist",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_sloteligibilityname",
+        "schemaName": "jm1pub_sloteligibilityName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_sourceauthority",
+        "schemaName": "jm1pub_Sourceauthority",
+        "type": "String",
+        "requiredLevel": "ApplicationRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_supersededby",
+        "schemaName": "jm1pub_SupersededBy",
+        "type": "Lookup",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_supersededbyname",
+        "schemaName": "jm1pub_SupersededByName",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_unitprice",
+        "schemaName": "jm1pub_Unitprice",
+        "type": "Money",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "jm1pub_unitprice_base",
+        "schemaName": "jm1pub_unitprice_Base",
+        "type": "Money",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "modifiedby",
+        "schemaName": "ModifiedBy",
+        "type": "Lookup",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "modifiedbyname",
+        "schemaName": "ModifiedByName",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "modifiedbyyominame",
+        "schemaName": "ModifiedByYomiName",
+        "type": "String",
+        "requiredLevel": "SystemRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "modifiedon",
+        "schemaName": "ModifiedOn",
+        "type": "DateTime",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "modifiedonbehalfby",
+        "schemaName": "ModifiedOnBehalfBy",
+        "type": "Lookup",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "modifiedonbehalfbyname",
+        "schemaName": "ModifiedOnBehalfByName",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "modifiedonbehalfbyyominame",
+        "schemaName": "ModifiedOnBehalfByYomiName",
+        "type": "String",
+        "requiredLevel": "SystemRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "organizationid",
+        "schemaName": "OrganizationId",
+        "type": "Lookup",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "organizationidname",
+        "schemaName": "OrganizationIdName",
+        "type": "String",
+        "requiredLevel": "SystemRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "overriddencreatedon",
+        "schemaName": "OverriddenCreatedOn",
+        "type": "DateTime",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "statecode",
+        "schemaName": "statecode",
+        "type": "State",
+        "requiredLevel": "SystemRequired",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "statecodename",
+        "schemaName": "statecodeName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "statuscode",
+        "schemaName": "statuscode",
+        "type": "Status",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "statuscodename",
+        "schemaName": "statuscodeName",
+        "type": "Virtual",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "timezoneruleversionnumber",
+        "schemaName": "TimeZoneRuleVersionNumber",
+        "type": "Integer",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "transactioncurrencyid",
+        "schemaName": "TransactionCurrencyId",
+        "type": "Lookup",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "transactioncurrencyidname",
+        "schemaName": "TransactionCurrencyIdName",
+        "type": "String",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "utcconversiontimezonecode",
+        "schemaName": "UTCConversionTimeZoneCode",
+        "type": "Integer",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      },
+      {
+        "logicalName": "versionnumber",
+        "schemaName": "VersionNumber",
+        "type": "BigInt",
+        "requiredLevel": "None",
+        "isPrimaryId": false,
+        "isPrimaryName": false
+      }
+    ],
+    "keys": [
+      {
+        "MetadataId": "59fc620a-b6a7-45f8-87d0-b4c176391f59",
+        "LogicalName": "jm1pub_commercialcatalogitem_canonicalsku_key",
+        "SchemaName": "jm1pub_commercialcatalogitem_canonicalsku_key",
+        "KeyAttributes": [
+          "jm1pub_canonicalsku"
+        ],
+        "EntityKeyIndexStatus": "Active",
+        "DisplayName": {
+          "LocalizedLabels": [
+            {
+              "Label": "Commercial Catalog Item - Canonical SKU",
+              "LanguageCode": 1033,
+              "IsManaged": true,
+              "MetadataId": "bb8c42bf-54e5-4795-8733-04cbc84869a0",
+              "HasChanged": null
+            }
+          ],
+          "UserLocalizedLabel": {
+            "Label": "Commercial Catalog Item - Canonical SKU",
+            "LanguageCode": 1033,
+            "IsManaged": true,
+            "MetadataId": "bb8c42bf-54e5-4795-8733-04cbc84869a0",
+            "HasChanged": null
+          }
+        }
+      },
+      {
+        "MetadataId": "514619d4-7901-4d1c-b43e-6af1a1bd62e0",
+        "LogicalName": "jm1pub_commercialcatalogitem_catalogrowid_key",
+        "SchemaName": "jm1pub_commercialcatalogitem_catalogrowid_key",
+        "KeyAttributes": [
+          "jm1pub_catalogrowid"
+        ],
+        "EntityKeyIndexStatus": "Active",
+        "DisplayName": {
+          "LocalizedLabels": [
+            {
+              "Label": "Commercial Catalog Item - Catalog Row ID",
+              "LanguageCode": 1033,
+              "IsManaged": true,
+              "MetadataId": "511a6113-13e3-4f3e-83d5-6488f5dfc991",
+              "HasChanged": null
+            }
+          ],
+          "UserLocalizedLabel": {
+            "Label": "Commercial Catalog Item - Catalog Row ID",
+            "LanguageCode": 1033,
+            "IsManaged": true,
+            "MetadataId": "511a6113-13e3-4f3e-83d5-6488f5dfc991",
+            "HasChanged": null
+          }
+        }
+      }
+    ],
+    "securityRoles": [
+      {
+        "name": "JM1 Publishing Catalog Administrator",
+        "deployed": true
+      },
+      {
+        "name": "JM1 Publishing Operations",
+        "deployed": true
+      },
+      {
+        "name": "Quoting/Proposal service identity",
+        "deployed": true
+      },
+      {
+        "name": "Website/API service identity",
+        "deployed": true
+      },
+      {
+        "name": "Authors/external users",
+        "deployed": true
+      },
+      {
+        "name": "Protected Slice 2 executor identity",
+        "deployed": true
+      }
+    ]
+  },
+  "mutationBoundary": {
+    "catalogRowsSeeded": 0,
+    "businessCentralMutations": 0,
+    "publicWebsiteChanges": 0,
+    "authorCommunications": 0,
+    "clientTitleAutomation": "FROZEN"
+  }
+}
