@@ -1,0 +1,133 @@
+{
+  "packageId": "JMP-COMMERCIAL-CATALOG-SCHEMA-SPEC-2026-08-05",
+  "generatedAt": "2026-08-05",
+  "repositoryBasis": "47ad0e07e0ae41a849edab77f42292304772de43",
+  "disposition": "NEW_ENTITY_REQUIRED",
+  "clientTitleAutomation": "FROZEN",
+  "solution": {
+    "uniqueName": "JM1PublishingCommercialCatalog",
+    "displayName": "JM1 Publishing Commercial Catalog",
+    "type": "unmanaged-development-solution",
+    "provisioningStatus": "HELD_FOR_HUMAN_REVIEW",
+    "scope": [
+      "new table",
+      "columns",
+      "choices",
+      "self-reference",
+      "alternate keys",
+      "security roles",
+      "administration forms and views",
+      "executor configuration evidence"
+    ],
+    "excludedScope": [
+      "title lifecycle entities",
+      "Slice 3 architecture",
+      "Business Central mutation",
+      "public website publication",
+      "client-title automation"
+    ]
+  },
+  "table": {
+    "logicalName": "jm1pub_commercialcatalogitem",
+    "schemaName": "jm1pub_CommercialCatalogItem",
+    "displayName": "JMP Commercial Catalog Item",
+    "pluralDisplayName": "JMP Commercial Catalog Items",
+    "expectedEntitySetName": "jm1pub_commercialcatalogitems",
+    "entitySetVerification": "REQUIRED_AFTER_LIVE_METADATA_READBACK",
+    "ownership": "OrganizationOwned",
+    "primaryKey": "jm1pub_commercialcatalogitemid",
+    "primaryName": "jm1pub_name",
+    "stateModel": "standard-active-inactive"
+  },
+  "columns": [
+    { "logicalName": "jm1pub_name", "displayName": "Name", "type": "Text", "required": true, "role": "primaryName" },
+    { "logicalName": "jm1pub_canonicalsku", "displayName": "Canonical SKU", "type": "Text", "required": true, "alternateKey": true },
+    { "logicalName": "jm1pub_legacysku", "displayName": "Legacy SKU", "type": "Text", "required": false },
+    { "logicalName": "jm1pub_catalogrowid", "displayName": "Catalog Row ID", "type": "Text", "required": true, "alternateKeyRecommended": true },
+    { "logicalName": "jm1pub_category", "displayName": "Category", "type": "ChoiceOrLookup", "required": true },
+    { "logicalName": "jm1pub_description", "displayName": "Description", "type": "MultilineText", "requiredWhen": "public or quotable" },
+    { "logicalName": "jm1pub_jackieruling", "displayName": "Jackie Ruling", "type": "Choice", "required": true, "choices": ["MIGRATE", "AMEND", "RETIRE", "MERGE", "PROVISIONAL"] },
+    { "logicalName": "jm1pub_commercialstatus", "displayName": "Commercial Status", "type": "Choice", "required": true, "choices": ["ACTIVE", "SUPERSEDED", "RETIRED", "PROVISIONAL", "INTERNAL_ONLY", "SCHEMA_INERT"] },
+    { "logicalName": "jm1pub_sourceauthority", "displayName": "Source Authority", "type": "TextOrLookup", "required": true },
+    { "logicalName": "jm1pub_matrixversion", "displayName": "Matrix Version", "type": "Text", "required": true },
+    { "logicalName": "jm1pub_effectivedate", "displayName": "Effective Date", "type": "DateOnly", "required": true },
+    { "logicalName": "jm1pub_evidencereference", "displayName": "Evidence Reference", "type": "UrlOrText", "required": true },
+    { "logicalName": "jm1pub_seedchecksum", "displayName": "Seed Checksum", "type": "Text", "required": true },
+    { "logicalName": "jm1pub_authorityversion", "displayName": "Authority Version", "type": "Text", "required": true },
+    { "logicalName": "jm1pub_publicvisibility", "displayName": "Public Visibility", "type": "Choice", "required": true, "choices": ["PUBLIC", "NON_PUBLIC", "CONDITIONAL"] },
+    { "logicalName": "jm1pub_quotingstatus", "displayName": "Quoting Status", "type": "Choice", "required": true, "choices": ["QUOTABLE", "SOW_GATED", "NOT_QUOTABLE"] },
+    { "logicalName": "jm1pub_sellablestatus", "displayName": "Sellable Status", "type": "Choice", "required": true, "choices": ["SELLABLE", "NOT_SELLABLE"] },
+    { "logicalName": "jm1pub_contractstatus", "displayName": "Contract Status", "type": "Choice", "required": true, "choices": ["CONTRACTABLE", "NOT_CONTRACTABLE"] },
+    { "logicalName": "jm1pub_pricingmethod", "displayName": "Pricing Method", "type": "Choice", "required": true, "choices": ["FIXED", "STARTING_AT", "PER_FINISHED_HOUR", "TIERED", "QUOTED", "COMMISSION", "INCLUDED", "NOT_APPLICABLE"] },
+    { "logicalName": "jm1pub_unitprice", "displayName": "Unit Price", "type": "Currency", "required": false },
+    { "logicalName": "jm1pub_priceexpression", "displayName": "Price Expression", "type": "Text", "requiredWhen": "price cannot be represented as one structured currency value" },
+    { "logicalName": "jm1pub_sloteligibility", "displayName": "Slot Eligibility", "type": "Choice", "required": true },
+    { "logicalName": "jm1pub_premiumupcharge", "displayName": "Premium Upcharge", "type": "Currency", "required": false },
+    { "logicalName": "jm1pub_publishingtrackapplicability", "displayName": "Publishing Track Applicability", "type": "MultiselectChoiceOrRelationship", "required": true },
+    { "logicalName": "jm1pub_productformcode", "displayName": "Product Form Code", "type": "ChoiceOrText", "required": false, "choices": ["PF-01", "PF-02", "PF-03", "PF-04", "PF-05", "PF-06", "PF-07", "PF-08"] },
+    { "logicalName": "jm1pub_releasemodelcode", "displayName": "Release Model Code", "type": "ChoiceOrText", "required": false },
+    { "logicalName": "jm1pub_productionmodecode", "displayName": "Production Mode Code", "type": "ExistingCanonicalLookupOrFieldOnly", "required": false },
+    { "logicalName": "jm1pub_scopegate", "displayName": "Scope Gate", "type": "Choice", "required": true },
+    { "logicalName": "jm1pub_requiresstatementofwork", "displayName": "Requires Statement of Work", "type": "YesNo", "required": true },
+    { "logicalName": "jm1pub_supersededby", "displayName": "Superseded By", "type": "SelfLookup", "target": "jm1pub_commercialcatalogitem", "required": false },
+    { "logicalName": "jm1pub_replacementreason", "displayName": "Replacement Reason", "type": "Text", "required": false },
+    { "logicalName": "jm1pub_migrationaction", "displayName": "Migration Action", "type": "Text", "required": true },
+    { "logicalName": "jm1pub_downstreamremediation", "displayName": "Downstream Remediation", "type": "MultilineText", "required": false },
+    { "logicalName": "jm1pub_recordfingerprint", "displayName": "Record Fingerprint", "type": "Text", "required": true }
+  ],
+  "alternateKeys": [
+    {
+      "logicalName": "jm1pub_commercialcatalogitem_canonicalsku_key",
+      "displayName": "Commercial Catalog Item - Canonical SKU",
+      "columns": ["jm1pub_canonicalsku"],
+      "required": true
+    },
+    {
+      "logicalName": "jm1pub_commercialcatalogitem_catalogrowid_key",
+      "displayName": "Commercial Catalog Item - Catalog Row ID",
+      "columns": ["jm1pub_catalogrowid"],
+      "required": "recommended"
+    }
+  ],
+  "relationships": [
+    {
+      "schemaName": "jm1pub_CommercialCatalogItem_SupersededBy",
+      "type": "self-referencing-many-to-one",
+      "lookupColumn": "jm1pub_supersededby",
+      "target": "jm1pub_commercialcatalogitem",
+      "required": false
+    }
+  ],
+  "executorFailClosedRules": [
+    "DUPLICATE_ACTIVE_CANONICAL_SKU",
+    "MERGE_REPLACEMENT_UNRESOLVED",
+    "PF07_PUBLIC_QUOTABLE_SELLABLE_OR_CONTRACTABLE",
+    "PF08_NOT_ACTIVE_AND_SOW_GATED",
+    "REQUIRED_PRICE_WITHOUT_UNIT_PRICE_OR_PRICE_EXPRESSION",
+    "CATALOG_ROW_NOT_REPRESENTED_EXACTLY_ONCE",
+    "LIVE_ENTITY_SET_NOT_VERIFIED"
+  ],
+  "securityRoles": [
+    { "name": "JM1 Publishing Catalog Administrator", "access": "Full create/read/update" },
+    { "name": "JM1 Publishing Operations", "access": "Read; limited update only if separately approved" },
+    { "name": "Quoting/Proposal service identity", "access": "Read active quotable items" },
+    { "name": "Website/API service identity", "access": "Read public items only" },
+    { "name": "Authors/external users", "access": "No direct table access" },
+    { "name": "Protected Slice 2 executor identity", "access": "Minimum privileges required to upsert, supersede, retire, and log" }
+  ],
+  "executor": {
+    "currentTarget": "jm1pub_commercialcatalogitems",
+    "retargetingStatus": "HELD_UNTIL_LIVE_ENTITY_SET_VERIFICATION",
+    "fieldMappingStatus": "HELD_UNTIL_SCHEMA_PROVISIONING",
+    "requiredSeedPopulation": 120,
+    "seedManifest": "docs/architecture/generated/JMP-CATALOG-RECONCILIATION-FINAL-2026-08-05/09-slice2-seed-manifest.json",
+    "seedManifestSha256": "3a5797ca319f921fc505dded4a1fc7cc277cf9ed289263342c740af6c7d12880"
+  },
+  "mutationBoundary": {
+    "dataverseCatalogMutations": 0,
+    "businessCentralMutations": 0,
+    "publicWebsiteChanges": 0,
+    "authorCommunications": 0,
+    "tableProvisioning": "NOT_YET_EXECUTED"
+  }
+}
