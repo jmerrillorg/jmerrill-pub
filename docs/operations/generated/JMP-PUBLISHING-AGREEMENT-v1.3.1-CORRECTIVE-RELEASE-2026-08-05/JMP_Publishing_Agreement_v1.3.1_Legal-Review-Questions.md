@@ -1,7 +1,7 @@
 # JMP Publishing Agreement v1.3.1 Legal-Review Questions
 
-Classification: LEGAL LANGUAGE PENDING
-Do not treat this register as legal advice or as resolving the questions listed below.
+Classification: COUNSEL REVIEW RECOMMENDED / NOT AN EXECUTION BLOCKER
+Jackie approval is the controlling business authority for operational use. Do not treat this register as legal advice or as resolving the questions listed below.
 
 1. Does the revised approximately 90-day royalty-payment language require notice to any author executed on a prior agreement version?
    - Current exposure readback: no authors received or executed this specific v1.3 CLEAN draft.

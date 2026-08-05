@@ -1,7 +1,7 @@
 {
   "packageId": "JMP-PUBLISHING-AGREEMENT-v1.3.1-CORRECTIVE-RELEASE-2026-08-05",
   "createdAt": "2026-08-05",
-  "classification": "LEGAL_LANGUAGE_PENDING",
+  "classification": "CURRENT_APPROVED_AUTHOR_USE_AUTHORIZED",
   "sourceBaseline": "/Volumes/UsersExternal/_ACTIVE_WORK/JMP_Publishing_Agreement_v1.3_CLEAN.docx",
   "sourceBaselineFileName": "JMP_Publishing_Agreement_v1.3_CLEAN.docx",
   "sourceBaselineSha256": "7981bee7e3d1673468edcbbd9f7cb1b91b9c8d5f031970292f03bc6474cc68b4",
@@ -35,5 +35,9 @@
     "secretValuesRetained": 0
   },
   "remainingDistributorPlatformNameOccurrences": [],
-  "nextGovernedAction": "Jackie reviews the clean and redline versions, then includes v1.3.1 in the existing bundled counsel engagement with the Traditional / JM Signature agreement."
+  "nextGovernedAction": "Use JMP_Publishing_Agreement_v1.3.1.docx as the current approved Hybrid publishing agreement. Counsel review remains recommended risk review and is not an execution blocker.",
+  "approvedOperationalAgreement": "JMP_Publishing_Agreement_v1.3.1.docx",
+  "approvedOperationalAgreementSha256": "6ee5fb05558b7af755749061034effaecfdccace96b9e9fb6af5b5e769468745",
+  "jackieApproval": "CONTROLLING_BUSINESS_AUTHORITY",
+  "counselReview": "RECOMMENDED_NOT_EXECUTION_BLOCKER"
 }
