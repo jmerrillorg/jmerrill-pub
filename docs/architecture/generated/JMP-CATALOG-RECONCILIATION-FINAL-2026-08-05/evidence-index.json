@@ -1,0 +1,55 @@
+{
+  "package": "JMP-CATALOG-RECONCILIATION-FINAL-2026-08-05",
+  "generatedOn": "2026-08-05",
+  "sourceWorkbook": "/Volumes/UsersExternal/_ACTIVE_WORK/JMP-Catalog-Reconciliation-Jackie-Rulings-2026-08-04.xlsx",
+  "sourceWorkbookSha256": "710a9e6ca1f1322065e77d2865f30948c147b8b71fe5153408cbd708daaba9d3",
+  "priorExpectedWorkbookSha256": "80b507cc81d6d5f9555a495e898e978a14f43ac44272202ea5d390ab234fa442",
+  "sourceChecksumMatchedPriorExpected": false,
+  "sourceChecksumDisposition": "MISMATCH_RECORDED_COMPLETED_RULINGS_USED",
+  "sourceMainSha": "49c1e787421323b7c5b62f4b93c825445a7a4e82",
+  "pathBInventory": "CANONICAL_ON_MAIN",
+  "counts": {
+    "MIGRATE": 93,
+    "MERGE": 10,
+    "RETIRE": 6,
+    "AMEND": 5,
+    "PROVISIONAL": 6
+  },
+  "validation": {
+    "totalRows": 120,
+    "duplicateRowIds": 0,
+    "duplicateActiveCanonicalSkus": 0,
+    "blankJackieRulings": 0,
+    "blankFinalDispositions": 0,
+    "unknownRulingValues": 0,
+    "matrixConflictRowsUnresolved": 0,
+    "pf07PublicRows": 0,
+    "pf07SellableRows": 0,
+    "pf08Classification": "ACTIVE / SCOPING-GATED",
+    "bornAccessibleEpub": "INCLUDED IN PF-03",
+    "separateBornAccessibilityCharge": 0,
+    "legacyPriceAuthorityRemaining": 0
+  },
+  "boundaries": {
+    "catalogMutations": 0,
+    "pricingMutations": 0,
+    "dataverseMutations": 0,
+    "businessCentralMutations": 0,
+    "deployments": 0,
+    "authorCommunications": 0
+  },
+  "files": [
+    "00-executive-disposition.md",
+    "01-final-120-row-catalog-register.csv",
+    "02-migrate-register.csv",
+    "03-amend-register.csv",
+    "04-merge-and-supersession-register.csv",
+    "05-retirement-register.csv",
+    "06-provisional-hold-register.csv",
+    "07-pricing-authority-register.csv",
+    "08-downstream-remediation-register.csv",
+    "09-slice2-seed-manifest.json",
+    "10-jackie-ruling-provenance.md",
+    "JMP-Catalog-Reconciliation-Final-Completed-Rulings-2026-08-05.xlsx"
+  ]
+}
