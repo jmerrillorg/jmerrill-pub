@@ -1,0 +1,93 @@
+{
+  "package": "JMP-PATH-B-SCHEMA-DIVERGENCE-INVENTORY-2026-08-04",
+  "generated_on": "2026-08-04",
+  "repository_basis": {
+    "ref": "origin/main",
+    "sha": "b2a4d3e6b50eaba0194352d3a5984efaf7bc747f"
+  },
+  "classification": "TARGET ARCHITECTURE v0.9 / DRAFT read-only divergence inventory",
+  "boundaries": {
+    "schema_changes": 0,
+    "table_creation": 0,
+    "renames": 0,
+    "dataverse_mutations": 0,
+    "catalog_mutations": 0,
+    "pricing_changes": 0,
+    "deployments": 0,
+    "author_communications": 0
+  },
+  "source_note": "No file named Activation Wave Riders 1-3 was found on origin/main. Rider requirements are drawn from the executive instruction plus approved commercial, PAM, editorial, and PROGRAM-002 evidence present on origin/main.",
+  "evidence_sources": [
+    {
+      "path": "lib/commercial/catalog.ts",
+      "purpose": "Approved commercial projection for PF codes, Publishing Track, packages, slot eligibility, pricing, PF-07/PF-08 gates, and Title Edition required fields"
+    },
+    {
+      "path": "docs/operations/generated/2026-07-20-JMP-Commercial-Architecture-Activation-Report.md",
+      "purpose": "Activation report for commercial architecture and Slice 2 boundary"
+    },
+    {
+      "path": "docs/operations/generated/2026-07-20-JMP-Commercial-Architecture-Dataverse-and-BC-Crosswalk.md",
+      "purpose": "Dataverse/BC crosswalk and Title Edition required field inventory"
+    },
+    {
+      "path": "docs/operations/generated/2026-07-20-JMP-Edition-Lifecycle-Executionlog-Event-Specification.md",
+      "purpose": "Required jm1_executionlog lifecycle event payloads and idempotency rules"
+    },
+    {
+      "path": "docs/operations/generated/2026-07-20-JMP-Contract-Pricing-Schedule-Mapping.md",
+      "purpose": "Contract schedule, PF, Publishing Track, quote/SOW, and legal-pending boundaries"
+    },
+    {
+      "path": "docs/operations/generated/2026-07-20-JMP-Catalog-Reconciliation-Worksheet-Amended.md",
+      "purpose": "Catalog reconciliation blocker and unresolved SKU/service decisions"
+    },
+    {
+      "path": "docs/implementation/IS-009-Publishing-Asset-Registry-Specification.md",
+      "purpose": "PAM schema for jm1pub_publishingasset and jm1pub_assetmarketplace"
+    },
+    {
+      "path": "docs/implementation/PAM-001-Publishing-Asset-Management.md",
+      "purpose": "Canonical PAM model and SharePoint file evidence doctrine"
+    },
+    {
+      "path": "docs/implementation/IS-009-Dataverse-Live-Inventory-Summary.md",
+      "purpose": "Live JM1-Dev schema readback for title, execution log, publishing asset, and asset marketplace"
+    },
+    {
+      "path": "docs/implementation/TITLE-PUBS-Canonical-Identifier-Model-2026-07-27.md",
+      "purpose": "Title-Pubs canonical identifier authority"
+    },
+    {
+      "path": "scripts/program003_core_schema_activate.mjs",
+      "purpose": "Editorial artifact, approval gate, summary, exception, and relationship schema"
+    },
+    {
+      "path": "docs/implementation/PROGRAM-002-Autonomous-Publishing-Production-Pipeline.md",
+      "purpose": "Publishing pipeline stage and author-facing workspace doctrine"
+    },
+    {
+      "path": "docs/implementation/PROGRAM-002-Full-Author-Workspace-Production-Pipeline-Commissioning.md",
+      "purpose": "Author-facing status projection and internal-language suppression evidence"
+    },
+    {
+      "path": "docs/implementation/OP-008-Production-Readiness-Distribution-Gate.md",
+      "purpose": "Production readiness/distribution gate boundaries"
+    },
+    {
+      "path": "docs/implementation/OP-009-Distribution-Command-Center.md",
+      "purpose": "Distribution command center boundaries"
+    }
+  ],
+  "outputs": [
+    "00-executive-summary.md",
+    "01-entity-mapping.csv",
+    "02-field-gap-register.csv",
+    "03-rider-compliance-matrix.md",
+    "04-conflict-register.md",
+    "05-recommended-canonical-model.md",
+    "evidence-index.json",
+    "checksums.sha256"
+  ]
+}
+
