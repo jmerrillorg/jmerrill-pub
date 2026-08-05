@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-08-05T15:42:31.382469-04:00",
+  "status": "COMPLETE",
+  "governed_filing": "COMPLETE",
+  "agreement_templates_active": 2,
+  "governed_template_location": "Implementation HQ/01_GOVERNANCE/Agreement Templates",
+  "templates": [
+    {
+      "Agreement name": "JMP Publishing Agreement",
+      "Version": "v1.3.1",
+      "Effective status": "ACTIVE / AUTHORITATIVE",
+      "Approval date": "2026-08-05",
+      "Checksum": "6ee5fb05558b7af755749061034effaecfdccace96b9e9fb6af5b5e769468745",
+      "Source baseline": "JMP_Publishing_Agreement_v1.3.1.docx; approved content baseline from corrective-release clean v1.3.1",
+      "Superseded version": "JMP Publishing Agreement v1.3.0 and earlier operational drafts",
+      "Storage location": "Implementation HQ/01_GOVERNANCE/Agreement Templates/JMP_Publishing_Agreement_v1.3.1.docx"
+    },
+    {
+      "Agreement name": "JM Signature Publishing Agreement",
+      "Version": "v1.0",
+      "Effective status": "ACTIVE / AUTHORITATIVE",
+      "Approval date": "2026-08-05",
+      "Checksum": "c793e6e3f2950ed76138bc2a09bb4cf29dd345b148c807434d2de65dc266ff25",
+      "Source baseline": "/Volumes/UsersExternal/_INBOX/JM_Signature_Publishing_Agreement.docx",
+      "Superseded version": "DRAFT.docx, DRAFT(1).docx, DRAFT(2).docx, DRAFT(3).docx, DRAFT(4).docx, and unmanaged _INBOX copies",
+      "Storage location": "Implementation HQ/01_GOVERNANCE/Agreement Templates/JM_Signature_Publishing_Agreement_v1.0.docx"
+    }
+  ],
+  "superseded_templates": "ARCHIVED / MARKED IN REGISTER - DO NOT USE",
+  "pipeline_automation": "COMPLETE",
+  "automatic_agreement_selection": "PASS",
+  "docx_generation": "PASS",
+  "pdf_generation": "PASS",
+  "governed_storage": "PASS",
+  "execution_logging": "PASS",
+  "agreement_version_preserved": "PASS",
+  "runtime_contract_changes": 0,
+  "dataverse_schema_changes": 0,
+  "business_central_changes": 0,
+  "author_communications": 0,
+  "agreement_signatures": 0,
+  "client_title_automation": "FROZEN",
+  "client_title_production": "MANUAL",
+  "validation_artifacts": [
+    "docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/JM1_Hybrid_v1-3-1_INT-VALIDATION-AGREEMENT-001_internal-validation-hybrid-20260805.docx",
+    "docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/JM1_Hybrid_v1-3-1_INT-VALIDATION-AGREEMENT-001_internal-validation-hybrid-20260805.pdf",
+    "docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/JM1_JM-Signature_v1-0_INT-VALIDATION-SIGNATURE-001_internal-validation-signature-20260805.docx",
+    "docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/JM1_JM-Signature_v1-0_INT-VALIDATION-SIGNATURE-001_internal-validation-signature-20260805.pdf",
+    "docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/internal-validation-manifest.json"
+  ],
+  "next_governed_action": "Demonstrate end-to-end agreement generation using an internal validation title only. No client agreements are to be generated or issued until Jackie authorizes the client automation thaw."
+}
