@@ -1,4 +1,4 @@
-# OR-2026-0XX Repository Audit
+# OR-2026-003 Repository Audit
 
 Date: 2026-08-06
 
@@ -36,7 +36,8 @@ Historical, generated, or catalog-evidence references also appeared for author-c
 ## Conflicting Language
 
 - Premier agreement logic used 15 paperback / 4 hardcover / 1 eBook.
-- Approved policy requires Premier / Signature to use 15 paperback / 5 hardcover / 1 eBook.
+- Approved policy requires Premier Publishing Package to use 15 paperback / 5 hardcover / 1 eBook.
+- Approved policy requires JM Signature traditional publishing track to use 15 paperback / 5 hardcover / 1 eBook when the traditional publishing agreement grants the author-copy benefit.
 - Starter agreement logic had no complimentary-copy configuration, even though approved policy requires 5 paperback / 0 hardcover / 1 eBook.
 - Public package page omitted hardcover and eBook complimentary-copy benefits.
 - One agreement merge-field label implied a default of 10 copies instead of a package-specific governed policy.

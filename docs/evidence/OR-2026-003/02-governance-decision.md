@@ -1,4 +1,4 @@
-# OR-2026-0XX Governance Decision
+# OR-2026-003 Governance Decision
 
 Date: 2026-08-06
 
@@ -10,7 +10,8 @@ Decision: establish `docs/governance/publishing/PUB-STD-Author-Copy-Policy.md` a
 | --- | ---: | ---: | ---: |
 | Starter | 5 | 0 | 1 |
 | Professional | 10 | 2 | 1 |
-| Premier / Signature | 15 | 5 | 1 |
+| Premier Publishing Package | 15 | 5 | 1 |
+| JM Signature traditional publishing track | 15 | 5 | 1 |
 
 Hardcover copies are delivered once the hardcover edition is published.
 

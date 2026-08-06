@@ -1,0 +1,91 @@
+{
+  "date": "2026-08-06",
+  "node": "v24.11.0",
+  "soffice": "/Users/jmerrillone/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/soffice",
+  "results": [
+    {
+      "label": "Starter",
+      "code": "JMP-PKG-STARTER",
+      "policyConsumed": true,
+      "generatedDocx": "starter-author-copy-policy-validation.docx",
+      "generatedPdf": "starter-author-copy-policy-validation.pdf",
+      "verifiedCopies": {
+        "paperback": 5,
+        "hardcover": 0,
+        "ebook": 1
+      },
+      "extractedCopyRows": {
+        "paperback": "Paperback 5",
+        "hardcover": "Hardcover 0",
+        "ebook": "eBook (digital delivery) 1"
+      },
+      "docxSha256": "5a5c8ec5495b89dce6be80c0945d4c02b1030d64c4f0ea775e81a23c1e662b3e",
+      "pdfSha256": "a24ed275e7d3375bee4daabd1ff7963a77f948494cf074dd5c0d4d51fa059851",
+      "docxBytes": 9565,
+      "pdfBytes": 51258
+    },
+    {
+      "label": "Professional",
+      "code": "JMP-PKG-PRO",
+      "policyConsumed": true,
+      "generatedDocx": "professional-author-copy-policy-validation.docx",
+      "generatedPdf": "professional-author-copy-policy-validation.pdf",
+      "verifiedCopies": {
+        "paperback": 10,
+        "hardcover": 2,
+        "ebook": 1
+      },
+      "extractedCopyRows": {
+        "paperback": "Paperback 10",
+        "hardcover": "Hardcover 2",
+        "ebook": "eBook (digital delivery) 1"
+      },
+      "docxSha256": "06a6ffbdba50987194d11eedc3b0d2c1235e47fd863aead6114e2bde28a7e60a",
+      "pdfSha256": "ad85c51857d4881f5e19c0f7b668f47c01d498a6279f219b11645b6e1ebf16fb",
+      "docxBytes": 9677,
+      "pdfBytes": 52527
+    },
+    {
+      "label": "Premier",
+      "code": "JMP-PKG-PREMIER",
+      "policyConsumed": true,
+      "generatedDocx": "premier-author-copy-policy-validation.docx",
+      "generatedPdf": "premier-author-copy-policy-validation.pdf",
+      "verifiedCopies": {
+        "paperback": 15,
+        "hardcover": 5,
+        "ebook": 1
+      },
+      "extractedCopyRows": {
+        "paperback": "Paperback 15",
+        "hardcover": "Hardcover 5",
+        "ebook": "eBook (digital delivery) 1"
+      },
+      "docxSha256": "a2b5c0dc998efcf61fc2a68722a2e3601048e39d9f9ba93a436919be1c6ecc3e",
+      "pdfSha256": "db7f8179b021fc91589bb4c77a0eab8317da4a9de69ec3bda9e2626a9e284af6",
+      "docxBytes": 9692,
+      "pdfBytes": 52471
+    },
+    {
+      "label": "JM Signature",
+      "code": "JMP-PKG-SIGNATURE",
+      "policyConsumed": true,
+      "generatedDocx": "jm-signature-author-copy-policy-validation.docx",
+      "generatedPdf": "jm-signature-author-copy-policy-validation.pdf",
+      "verifiedCopies": {
+        "paperback": 15,
+        "hardcover": 5,
+        "ebook": 1
+      },
+      "extractedCopyRows": {
+        "paperback": "Paperback 15",
+        "hardcover": "Hardcover 5",
+        "ebook": "eBook (digital delivery) 1"
+      },
+      "docxSha256": "35300207a46ac10bd98df68115a4ae056b12d4a4f2534fcd79a6106d8b708bf2",
+      "pdfSha256": "ecb5555fa790e616ac1ccd996cacd63b04ec35ee8b60cf87b1471d1fb4b82e1d",
+      "docxBytes": 9361,
+      "pdfBytes": 47406
+    }
+  ]
+}

@@ -6,7 +6,7 @@ Status: CANONICAL GOVERNANCE STANDARD
 
 Effective date: 2026-08-06
 
-Authority: OR-2026-0XX governance remediation
+Authority: OR-2026-003 governance remediation
 
 ## Purpose
 
@@ -16,7 +16,7 @@ Approved package benefits must be discoverable from repository documentation. Th
 
 ## Scope
 
-This policy applies to complimentary author copies included with J Merrill Publishing package-based publishing offers, including Starter, Professional, Premier, and Signature package references.
+This policy applies to complimentary author copies included with J Merrill Publishing package-based publishing offers, including Starter, Professional, Premier Publishing Package, and JM Signature traditional publishing track references.
 
 This policy does not replace separately purchased author-copy orders, bulk author-copy order support, shipping charges, royalty terms, publication rights, or separately approved package amendments.
 
@@ -26,7 +26,8 @@ This policy does not replace separately purchased author-copy orders, bulk autho
 | --- | ---: | ---: | ---: |
 | Starter | 5 | 0 | 1 |
 | Professional | 10 | 2 | 1 |
-| Premier / Signature | 15 | 5 | 1 |
+| Premier Publishing Package | 15 | 5 | 1 |
+| JM Signature traditional publishing track | 15 | 5 | 1 |
 
 ## Delivery Timing
 
@@ -44,7 +45,9 @@ Starter includes no complimentary hardcover copies.
 
 Professional includes two complimentary hardcover copies.
 
-Premier / Signature includes five complimentary hardcover copies.
+Premier Publishing Package includes five complimentary hardcover copies.
+
+JM Signature traditional publishing track includes five complimentary hardcover copies when the traditional publishing agreement grants the author-copy benefit.
 
 ## eBook Delivery
 

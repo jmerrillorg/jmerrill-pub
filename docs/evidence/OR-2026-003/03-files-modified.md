@@ -1,4 +1,4 @@
-# OR-2026-0XX Files Modified
+# OR-2026-003 Files Modified
 
 Date: 2026-08-06
 
@@ -26,5 +26,12 @@ Date: 2026-08-06
 ## Regression Tests
 
 - `azure-functions/diagnostic-ai-runner/test/agreementFieldComputer.test.js`: updated Starter and Premier assertions.
+- `azure-functions/diagnostic-ai-runner/test/authorCopyPolicy.test.js`: added direct policy assertions for Starter, Professional, Premier, and JM Signature.
 - `azure-functions/diagnostic-ai-runner/test/packageSpecificAddendumContent.test.js`: added Starter assertion and updated Premier hardcover quantity.
 - `azure-functions/diagnostic-ai-runner/test/simplifiedAgreementPacketRunner.test.js`: updated Premier assertion and validated Starter no-audiobook generation.
+
+## Validation Artifacts
+
+- `docs/evidence/OR-2026-003/generated-validation-artifacts/document-generation-validation.json`: recorded generated DOCX/PDF validation for Starter, Professional, Premier, and JM Signature.
+- `docs/evidence/OR-2026-003/generated-validation-artifacts/*.docx`: generated validation DOCX artifacts.
+- `docs/evidence/OR-2026-003/generated-validation-artifacts/*.pdf`: generated validation PDF artifacts.
