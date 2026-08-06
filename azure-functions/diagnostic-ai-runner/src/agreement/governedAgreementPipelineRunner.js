@@ -65,7 +65,7 @@ function agreementMergeValues(input) {
     "[Series Information (if applicable)]": input.seriesInformation,
     "[Target Publication Date or Window]": input.targetPublicationDateOrWindow,
     "[Royalty Allocation Among Co-Authors, if applicable]": input.royaltyAllocationAmongCoAuthors,
-    "[Complimentary-Copy Configuration (if different from Section 3A.1 default of 10)]": input.complimentaryCopyConfiguration,
+    "[Complimentary-Copy Configuration (if different from the governed package policy)]": input.complimentaryCopyConfiguration,
     "[Special Permissions or Third-Party Content Required]": input.specialPermissionsOrThirdPartyContent,
     "[Approved Deviations from Standard Agreement Terms, if any]": input.approvedDeviationsFromStandardAgreementTerms,
     "[Artwork (as referenced in Section 3C.0)]": input.artwork,

@@ -59,7 +59,7 @@ describe("generateSimplifiedAgreementPacket — gate enforcement and validation"
     assert.equal(result.ok, true);
     assert.equal(result.fields.packageLabel, "Premier Publishing Package (JMP-PKG-PREMIER)");
     assert.equal(result.fields.packageFeeFormatted, "$7,500.00");
-    assert.deepEqual(result.fields.complimentaryCopies, { paperback: 15, hardcover: 4, ebook: 1 });
+    assert.deepEqual(result.fields.complimentaryCopies, { paperback: 15, hardcover: 5, ebook: 1 });
   });
 });
 
@@ -111,13 +111,12 @@ describe("generateSimplifiedAgreementPacket — produces the package-specific, s
 
 describe("generateSimplifiedAgreementPacket — omits the audiobook document when not included in the package", () => {
   test("a package without audiobook inclusion produces only 2 new documents", async () => {
-    // JMP-PKG-STARTER has no audiobookIncluded flag in agreementFieldComputer's PACKAGE_INFO,
-    // so it is rejected by computeAgreementFields rather than silently treated as excluded —
-    // this documents that behavior explicitly.
     process.env[GATE_NAME] = "true";
     const result = await generateSimplifiedAgreementPacket(controlledInput({ selectedPackageCode: "JMP-PKG-STARTER" }));
-    assert.equal(result.ok, false);
-    assert.equal(result.reason, "FIELD_COMPUTATION_FAILED");
+    assert.equal(result.ok, true);
+    assert.deepEqual(result.fields.complimentaryCopies, { paperback: 5, hardcover: 0, ebook: 1 });
+    assert.equal(result.fields.audiobookIncluded, false);
+    assert.equal(result.documents.length, 2);
   });
 });
 

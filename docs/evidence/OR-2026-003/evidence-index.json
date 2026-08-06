@@ -1,0 +1,56 @@
+{
+  "id": "OR-2026-003",
+  "title": "Govern Complimentary Copy Policy",
+  "date": "2026-08-06",
+  "scope": "Governance remediation for complimentary author-copy policy discoverability and consistency",
+  "canonical_policy": "docs/governance/publishing/PUB-STD-Author-Copy-Policy.md",
+  "policy": {
+    "Starter": {
+      "paperback": 5,
+      "hardcover": 0,
+      "ebook": 1
+    },
+    "Professional": {
+      "paperback": 10,
+      "hardcover": 2,
+      "ebook": 1
+    },
+    "Premier Publishing Package": {
+      "paperback": 15,
+      "hardcover": 5,
+      "ebook": 1
+    },
+    "JM Signature traditional publishing track": {
+      "paperback": 15,
+      "hardcover": 5,
+      "ebook": 1
+    }
+  },
+  "evidence_files": [
+    "search-results-before-remediation.md",
+    "01-repository-audit.md",
+    "02-governance-decision.md",
+    "03-files-modified.md",
+    "04-validation-results.md",
+    "search-results-after-remediation.md",
+    "generated-validation-artifacts/document-generation-validation.json",
+    "generated-validation-artifacts/starter-author-copy-policy-validation.docx",
+    "generated-validation-artifacts/starter-author-copy-policy-validation.pdf",
+    "generated-validation-artifacts/professional-author-copy-policy-validation.docx",
+    "generated-validation-artifacts/professional-author-copy-policy-validation.pdf",
+    "generated-validation-artifacts/premier-author-copy-policy-validation.docx",
+    "generated-validation-artifacts/premier-author-copy-policy-validation.pdf",
+    "generated-validation-artifacts/jm-signature-author-copy-policy-validation.docx",
+    "generated-validation-artifacts/jm-signature-author-copy-policy-validation.pdf",
+    "checksums.sha256"
+  ],
+  "mutations": {
+    "author_communications_sent": 0,
+    "runtime_activation": 0,
+    "client_title_automation_thaw": 0,
+    "dataverse_schema_changes": 0,
+    "business_central_changes": 0,
+    "public_website_source": "CHANGED",
+    "public_website_deployment": "NOT_EXECUTED"
+  }
+}

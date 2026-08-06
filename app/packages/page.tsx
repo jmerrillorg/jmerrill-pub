@@ -14,6 +14,13 @@ export const metadata: Metadata = {
 
 const bookingUrl = 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled'
 
+const packageCopyBenefits = Object.fromEntries(
+  packages.map((pkg) => [
+    pkg.tier,
+    pkg.complimentaryCopies,
+  ]),
+) as Record<string, { paperback: number; hardcover: number; ebook: number }>
+
 const matrix = [
   { feature: 'BASICS', starter: '', pro: '', premier: '', head: true },
   { feature: 'Price', starter: '$1,999', pro: '$4,500', premier: '$7,500' },
@@ -57,7 +64,24 @@ const matrix = [
   { feature: 'AUDIOBOOK', starter: '', pro: '', premier: '', head: true },
   { feature: 'Audiobook', starter: 'Separate line item', pro: 'Separate line item', premier: 'AI narration included through 8 PFH' },
   { feature: 'AUTHOR COPIES', starter: '', pro: '', premier: '', head: true },
-  { feature: 'Complimentary paperbacks', starter: '5 copies', pro: '10 copies', premier: '15 copies' },
+  {
+    feature: 'Complimentary paperbacks',
+    starter: `${packageCopyBenefits.Starter.paperback} copies`,
+    pro: `${packageCopyBenefits.Professional.paperback} copies`,
+    premier: `${packageCopyBenefits.Premier.paperback} copies`,
+  },
+  {
+    feature: 'Complimentary hardcovers',
+    starter: `${packageCopyBenefits.Starter.hardcover} copies`,
+    pro: `${packageCopyBenefits.Professional.hardcover} copies`,
+    premier: `${packageCopyBenefits.Premier.hardcover} copies`,
+  },
+  {
+    feature: 'Complimentary eBooks',
+    starter: `${packageCopyBenefits.Starter.ebook} copy`,
+    pro: `${packageCopyBenefits.Professional.ebook} copy`,
+    premier: `${packageCopyBenefits.Premier.ebook} copy`,
+  },
 ]
 
 const paymentOptions = [

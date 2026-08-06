@@ -16,7 +16,25 @@
  * present.
  */
 
+const { getComplimentaryCopies } = require("./authorCopyPolicy");
+
 const PACKAGE_CONTENT = Object.freeze({
+  "JMP-PKG-STARTER": Object.freeze({
+    packageLabel: "Starter Publishing Package (JMP-PKG-STARTER)",
+    includedServices: Object.freeze([
+      "Editorial review + light line editing + copy editing + proofreading (up to 50,000 words)",
+      "Professional cover design",
+      "Standard interior layout & typography",
+      "eBook conversion (EPUB via Ingram Content)",
+      "ISBN assignment",
+      "Ingram Content distribution setup",
+      "Basic metadata optimization",
+      "Author profile page"
+    ]),
+    complimentaryCopies: getComplimentaryCopies("JMP-PKG-STARTER"),
+    audiobookIncluded: false,
+    estimatedDelivery: "8-10 weeks from manuscript receipt"
+  }),
   "JMP-PKG-PRO": Object.freeze({
     packageLabel: "Professional Publishing Package (JMP-PKG-PRO)",
     includedServices: Object.freeze([
@@ -32,7 +50,7 @@ const PACKAGE_CONTENT = Object.freeze({
       "Launch planning session + marketing guidance",
       "AI audiobook production (included — no additional fee)"
     ]),
-    complimentaryCopies: Object.freeze({ paperback: 10, hardcover: 2, ebook: 1 }),
+    complimentaryCopies: getComplimentaryCopies("JMP-PKG-PRO"),
     audiobookIncluded: true,
     estimatedDelivery: "10-12 weeks from manuscript receipt (audiobook: +2-3 weeks)"
   }),
@@ -51,7 +69,7 @@ const PACKAGE_CONTENT = Object.freeze({
       "Extended launch planning and marketing guidance",
       "AI audiobook production (included — no additional fee)"
     ]),
-    complimentaryCopies: Object.freeze({ paperback: 15, hardcover: 4, ebook: 1 }),
+    complimentaryCopies: getComplimentaryCopies("JMP-PKG-PREMIER"),
     audiobookIncluded: true,
     estimatedDelivery: "12-16 weeks from manuscript receipt; final timeline depends on editorial and production complexity"
   })
