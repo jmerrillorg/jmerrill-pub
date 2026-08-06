@@ -34,12 +34,20 @@ describe("buildPackageSpecificAddendumSections — JMP-PKG-PRO", () => {
 });
 
 describe("buildPackageSpecificAddendumSections — undefined content", () => {
+  test("returns Starter content with the governed complimentary-copy policy", () => {
+    const result = buildPackageSpecificAddendumSections("JMP-PKG-STARTER");
+    assert.equal(result.ok, true);
+    assert.equal(result.packageLabel, "Starter Publishing Package (JMP-PKG-STARTER)");
+    assert.deepEqual(result.complimentaryCopies, { paperback: 5, hardcover: 0, ebook: 1 });
+    assert.equal(result.audiobookIncluded, false);
+  });
+
   test("returns Premier content for the restored third package", () => {
     const result = buildPackageSpecificAddendumSections("JMP-PKG-PREMIER");
     assert.equal(result.ok, true);
     assert.equal(result.packageLabel, "Premier Publishing Package (JMP-PKG-PREMIER)");
     assert.ok(result.includedServices.some((service) => service.includes("large or complex manuscripts")));
-    assert.deepEqual(result.complimentaryCopies, { paperback: 15, hardcover: 4, ebook: 1 });
+    assert.deepEqual(result.complimentaryCopies, { paperback: 15, hardcover: 5, ebook: 1 });
   });
 
   test("returns ok:false for an unrecognized package code", () => {

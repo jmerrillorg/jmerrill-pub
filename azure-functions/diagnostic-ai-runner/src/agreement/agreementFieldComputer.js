@@ -1,5 +1,7 @@
 "use strict";
 
+const { getComplimentaryCopies } = require("./authorCopyPolicy");
+
 /**
  * Computes the safe, validated field values needed to fill the
  * canonical J Merrill Publishing agreement stack for a controlled
@@ -24,14 +26,12 @@ const PACKAGE_INFO = Object.freeze({
     label: "Professional Publishing Package (JMP-PKG-PRO)",
     fee: 4500.00,
     wordLimit: 75000,
-    complimentaryCopies: { paperback: 10, hardcover: 2, ebook: 1 },
     audiobookIncluded: true
   },
   "JMP-PKG-PREMIER": {
     label: "Premier Publishing Package (JMP-PKG-PREMIER)",
     fee: 7500.00,
     wordLimit: null,
-    complimentaryCopies: { paperback: 15, hardcover: 4, ebook: 1 },
     audiobookIncluded: true
   },
   "JMP-PKG-CHILD": { label: "Children's Book Publishing Package (JMP-PKG-CHILD)", fee: 2495.00, wordLimit: null }
@@ -98,12 +98,13 @@ function computeAgreementFields(input = {}) {
   }
 
   const packageInfo = PACKAGE_INFO[selectedPackageCode];
+  const complimentaryCopies = packageInfo ? getComplimentaryCopies(selectedPackageCode) : null;
   if (!packageInfo) {
     errors.push("SELECTED_PACKAGE_CODE_UNRECOGNIZED");
   } else if (typeof officialManuscriptWordCount === "number" && packageInfo.wordLimit != null && officialManuscriptWordCount > packageInfo.wordLimit) {
     errors.push("OFFICIAL_WORD_COUNT_EXCEEDS_PACKAGE_LIMIT");
   }
-  if (packageInfo && !packageInfo.complimentaryCopies) {
+  if (packageInfo && !complimentaryCopies) {
     errors.push("COMPLIMENTARY_COPIES_NOT_DEFINED_FOR_PACKAGE");
   }
 
@@ -144,7 +145,7 @@ function computeAgreementFields(input = {}) {
     packageLabel: packageInfo.label,
     packageFeeUsd: packageInfo.fee,
     packageFeeFormatted: formatUsd(packageInfo.fee),
-    complimentaryCopies: packageInfo.complimentaryCopies,
+    complimentaryCopies,
     audiobookIncluded: packageInfo.audiobookIncluded === true,
     paymentSchedule: {
       installments: paymentInfo.installments,

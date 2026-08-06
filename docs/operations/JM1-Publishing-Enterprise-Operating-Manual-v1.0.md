@@ -435,6 +435,8 @@ A Publishing Package Addendum explains package-specific details that sit beside 
 
 It may clarify included services, add-on services, package scope, author deliverables, payment schedule, production assumptions, or special terms.
 
+Complimentary author-copy benefits are governed by `docs/governance/publishing/PUB-STD-Author-Copy-Policy.md`. Do not restate different copy quantities in an addendum, welcome guide, website page, or author-facing package material.
+
 The addendum should not contradict the main agreement. If there is tension, pause and ask for review.
 
 ### When Agreements Are Issued

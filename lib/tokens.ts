@@ -135,6 +135,7 @@ export const packages = commercialPackages.map((pkg) => ({
         ? 'Expanded scope reviewed during fit'
         : 'Large / complex manuscripts',
   editionSlots: pkg.editionSlots,
+  complimentaryCopies: pkg.complimentaryCopies,
   audiobookPolicy: pkg.audiobookPolicy,
   featured: pkg.featured,
   features: [
