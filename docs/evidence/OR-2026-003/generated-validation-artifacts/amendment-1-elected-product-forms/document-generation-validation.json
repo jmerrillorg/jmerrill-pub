@@ -1,0 +1,245 @@
+{
+  "generatedAt": "2026-08-06",
+  "scenarios": [
+    {
+      "id": "starter-pf01-pf03",
+      "packageCode": "JMP-PKG-STARTER",
+      "electedProductForms": [
+        "PF-01",
+        "PF-03"
+      ],
+      "entitlements": [
+        {
+          "productFormCode": "PF-01",
+          "productFormName": "Paperback",
+          "quantity": 5,
+          "unit": "copies",
+          "label": "Paperback: 5 copies"
+        },
+        {
+          "productFormCode": "PF-03",
+          "productFormName": "Standard Ebook",
+          "quantity": 1,
+          "unit": "digital entitlement",
+          "label": "Standard Ebook: 1 digital entitlement"
+        }
+      ],
+      "docx": "starter-pf01-pf03.docx",
+      "pdf": "starter-pf01-pf03.pdf"
+    },
+    {
+      "id": "starter-pf01-pf05",
+      "packageCode": "JMP-PKG-STARTER",
+      "electedProductForms": [
+        "PF-01",
+        "PF-05"
+      ],
+      "entitlements": [
+        {
+          "productFormCode": "PF-01",
+          "productFormName": "Paperback",
+          "quantity": 5,
+          "unit": "copies",
+          "label": "Paperback: 5 copies"
+        },
+        {
+          "productFormCode": "PF-05",
+          "productFormName": "Large Print",
+          "quantity": 5,
+          "unit": "copies",
+          "label": "Large Print: 5 copies"
+        }
+      ],
+      "docx": "starter-pf01-pf05.docx",
+      "pdf": "starter-pf01-pf05.pdf"
+    },
+    {
+      "id": "starter-pf05-pf03",
+      "packageCode": "JMP-PKG-STARTER",
+      "electedProductForms": [
+        "PF-05",
+        "PF-03"
+      ],
+      "entitlements": [
+        {
+          "productFormCode": "PF-05",
+          "productFormName": "Large Print",
+          "quantity": 5,
+          "unit": "copies",
+          "label": "Large Print: 5 copies"
+        },
+        {
+          "productFormCode": "PF-03",
+          "productFormName": "Standard Ebook",
+          "quantity": 1,
+          "unit": "digital entitlement",
+          "label": "Standard Ebook: 1 digital entitlement"
+        }
+      ],
+      "docx": "starter-pf05-pf03.docx",
+      "pdf": "starter-pf05-pf03.pdf"
+    },
+    {
+      "id": "professional-pf01-pf02-pf04",
+      "packageCode": "JMP-PKG-PRO",
+      "electedProductForms": [
+        "PF-01",
+        "PF-02",
+        "PF-04"
+      ],
+      "entitlements": [
+        {
+          "productFormCode": "PF-01",
+          "productFormName": "Paperback",
+          "quantity": 10,
+          "unit": "copies",
+          "label": "Paperback: 10 copies"
+        },
+        {
+          "productFormCode": "PF-02",
+          "productFormName": "Hardcover",
+          "quantity": 10,
+          "unit": "copies",
+          "label": "Hardcover: 10 copies"
+        },
+        {
+          "productFormCode": "PF-04",
+          "productFormName": "Audiobook",
+          "quantity": 1,
+          "unit": "author delivery",
+          "label": "Audiobook: 1 author delivery"
+        }
+      ],
+      "docx": "professional-pf01-pf02-pf04.docx",
+      "pdf": "professional-pf01-pf02-pf04.pdf"
+    },
+    {
+      "id": "professional-pf01-pf05-pf03",
+      "packageCode": "JMP-PKG-PRO",
+      "electedProductForms": [
+        "PF-01",
+        "PF-05",
+        "PF-03"
+      ],
+      "entitlements": [
+        {
+          "productFormCode": "PF-01",
+          "productFormName": "Paperback",
+          "quantity": 10,
+          "unit": "copies",
+          "label": "Paperback: 10 copies"
+        },
+        {
+          "productFormCode": "PF-05",
+          "productFormName": "Large Print",
+          "quantity": 10,
+          "unit": "copies",
+          "label": "Large Print: 10 copies"
+        },
+        {
+          "productFormCode": "PF-03",
+          "productFormName": "Standard Ebook",
+          "quantity": 1,
+          "unit": "digital entitlement",
+          "label": "Standard Ebook: 1 digital entitlement"
+        }
+      ],
+      "docx": "professional-pf01-pf05-pf03.docx",
+      "pdf": "professional-pf01-pf05-pf03.pdf"
+    },
+    {
+      "id": "premier-pf01-pf02-pf03-pf04",
+      "packageCode": "JMP-PKG-PREMIER",
+      "electedProductForms": [
+        "PF-01",
+        "PF-02",
+        "PF-03",
+        "PF-04"
+      ],
+      "entitlements": [
+        {
+          "productFormCode": "PF-01",
+          "productFormName": "Paperback",
+          "quantity": 15,
+          "unit": "copies",
+          "label": "Paperback: 15 copies"
+        },
+        {
+          "productFormCode": "PF-02",
+          "productFormName": "Hardcover",
+          "quantity": 15,
+          "unit": "copies",
+          "label": "Hardcover: 15 copies"
+        },
+        {
+          "productFormCode": "PF-03",
+          "productFormName": "Standard Ebook",
+          "quantity": 1,
+          "unit": "digital entitlement",
+          "label": "Standard Ebook: 1 digital entitlement"
+        },
+        {
+          "productFormCode": "PF-04",
+          "productFormName": "Audiobook",
+          "quantity": 1,
+          "unit": "author delivery",
+          "label": "Audiobook: 1 author delivery"
+        }
+      ],
+      "docx": "premier-pf01-pf02-pf03-pf04.docx",
+      "pdf": "premier-pf01-pf02-pf03-pf04.pdf"
+    },
+    {
+      "id": "jm-signature-pf01-pf05-pf03",
+      "packageCode": "JMP-PKG-SIGNATURE",
+      "electedProductForms": [
+        "PF-01",
+        "PF-05",
+        "PF-03"
+      ],
+      "entitlements": [
+        {
+          "productFormCode": "PF-01",
+          "productFormName": "Paperback",
+          "quantity": 15,
+          "unit": "copies",
+          "label": "Paperback: 15 copies"
+        },
+        {
+          "productFormCode": "PF-05",
+          "productFormName": "Large Print",
+          "quantity": 15,
+          "unit": "copies",
+          "label": "Large Print: 15 copies"
+        },
+        {
+          "productFormCode": "PF-03",
+          "productFormName": "Standard Ebook",
+          "quantity": 1,
+          "unit": "digital entitlement",
+          "label": "Standard Ebook: 1 digital entitlement"
+        }
+      ],
+      "docx": "jm-signature-pf01-pf05-pf03.docx",
+      "pdf": "jm-signature-pf01-pf05-pf03.pdf"
+    },
+    {
+      "id": "premier-pf08-scope-approved",
+      "packageCode": "JMP-PKG-PREMIER",
+      "electedProductForms": [
+        "PF-08"
+      ],
+      "entitlements": [
+        {
+          "productFormCode": "PF-08",
+          "productFormName": "Interactive / Multimedia",
+          "quantity": 1,
+          "unit": "digital entitlement",
+          "label": "Interactive / Multimedia: 1 digital entitlement"
+        }
+      ],
+      "docx": "premier-pf08-scope-approved.docx",
+      "pdf": "premier-pf08-scope-approved.pdf"
+    }
+  ]
+}

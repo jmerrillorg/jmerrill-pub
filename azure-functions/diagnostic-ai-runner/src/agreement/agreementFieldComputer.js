@@ -1,6 +1,6 @@
 "use strict";
 
-const { getComplimentaryCopies } = require("./authorCopyPolicy");
+const { computeComplimentaryEntitlements } = require("./authorCopyPolicy");
 
 /**
  * Computes the safe, validated field values needed to fill the
@@ -9,7 +9,7 @@ const { getComplimentaryCopies } = require("./authorCopyPolicy");
  *
  * Every value here is either:
  *   (a) confirmed, already-known commercial/legal data for the package
- *       (fee, complimentary copies, audiobook inclusion), or
+ *       (fee, package allocation, audiobook inclusion), or
  *   (b) directly supplied by the caller (title, author, imprint,
  *       official word count, payment option), or
  *   (c) computed deterministically from (a)+(b) (payment schedule,
@@ -63,7 +63,9 @@ function todayIsoDate(now = new Date()) {
  * @param {{
  *   title: string, authorLegalName: string, imprintLabel: string,
  *   officialManuscriptWordCount: number, selectedPackageCode: string,
- *   paymentOption: string, contractDate?: string
+ *   paymentOption: string, contractDate?: string,
+ *   electedProductForms: (string|{ productFormCode: string, scopeApproved?: boolean, addedLater?: boolean, addOnApproved?: boolean })[],
+ *   scopeApprovedProductForms?: string[]
  * }} input
  * @returns {{
  *   ok: boolean, errors: string[],
@@ -71,7 +73,8 @@ function todayIsoDate(now = new Date()) {
  *   contractDate: string, officialManuscriptWordCount: number,
  *   wordCountSource: string, manuscriptDeadlineText: string,
  *   packageLabel: string, packageFeeUsd: number, packageFeeFormatted: string,
- *   complimentaryCopies: { paperback: number, hardcover: number, ebook: number },
+ *   complimentaryCopies: object,
+ *   complimentaryEntitlements: { productFormCode: string, productFormName: string, deliveryClass: string, quantity: number, unit: string, label: string }[],
  *   audiobookIncluded: boolean,
  *   paymentSchedule: { installments: number, perInstallmentUsd: number,
  *     perInstallmentFormatted: string, totalUsd: number, totalFormatted: string,
@@ -89,6 +92,11 @@ function computeAgreementFields(input = {}) {
   const selectedPackageCode = typeof input.selectedPackageCode === "string" ? input.selectedPackageCode.trim().toUpperCase() : "";
   const paymentOption = typeof input.paymentOption === "string" ? input.paymentOption.trim().toUpperCase() : "";
   const contractDate = input.contractDate || todayIsoDate();
+  const electedProductForms = Array.isArray(input.electedProductForms)
+    ? input.electedProductForms
+    : Array.isArray(input.approvedElectedProductForms)
+      ? input.approvedElectedProductForms
+      : [];
 
   if (!title) errors.push("TITLE_REQUIRED");
   if (!authorLegalName) errors.push("AUTHOR_LEGAL_NAME_REQUIRED");
@@ -98,14 +106,20 @@ function computeAgreementFields(input = {}) {
   }
 
   const packageInfo = PACKAGE_INFO[selectedPackageCode];
-  const complimentaryCopies = packageInfo ? getComplimentaryCopies(selectedPackageCode) : null;
+  const complimentaryEntitlementResult = packageInfo
+    ? computeComplimentaryEntitlements(selectedPackageCode, electedProductForms, {
+      scopeApprovedProductForms: input.scopeApprovedProductForms
+    })
+    : null;
   if (!packageInfo) {
     errors.push("SELECTED_PACKAGE_CODE_UNRECOGNIZED");
   } else if (typeof officialManuscriptWordCount === "number" && packageInfo.wordLimit != null && officialManuscriptWordCount > packageInfo.wordLimit) {
     errors.push("OFFICIAL_WORD_COUNT_EXCEEDS_PACKAGE_LIMIT");
   }
-  if (packageInfo && !complimentaryCopies) {
-    errors.push("COMPLIMENTARY_COPIES_NOT_DEFINED_FOR_PACKAGE");
+  if (packageInfo && !complimentaryEntitlementResult?.ok) {
+    for (const error of complimentaryEntitlementResult?.errors || ["COMPLIMENTARY_ENTITLEMENTS_NOT_DEFINED_FOR_PACKAGE"]) {
+      errors.push(error);
+    }
   }
 
   const paymentInfo = PAYMENT_OPTION_INFO[paymentOption];
@@ -117,6 +131,7 @@ function computeAgreementFields(input = {}) {
     return { ok: false, errors, title: null, authorLegalName: null, imprintLabel: null, contractDate: null,
       officialManuscriptWordCount: null, wordCountSource: null, manuscriptDeadlineText: null,
       packageLabel: null, packageFeeUsd: null, packageFeeFormatted: null, complimentaryCopies: null,
+      complimentaryEntitlements: null,
       audiobookIncluded: null, paymentSchedule: null };
   }
 
@@ -145,7 +160,8 @@ function computeAgreementFields(input = {}) {
     packageLabel: packageInfo.label,
     packageFeeUsd: packageInfo.fee,
     packageFeeFormatted: formatUsd(packageInfo.fee),
-    complimentaryCopies,
+    complimentaryCopies: complimentaryEntitlementResult.complimentaryCopies,
+    complimentaryEntitlements: complimentaryEntitlementResult.entitlements,
     audiobookIncluded: packageInfo.audiobookIncluded === true,
     paymentSchedule: {
       installments: paymentInfo.installments,

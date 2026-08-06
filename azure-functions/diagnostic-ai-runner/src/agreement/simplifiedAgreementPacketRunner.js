@@ -66,7 +66,8 @@ function blocked(reason, extra = {}) {
  *   diagnosticId: string, title: string, authorLegalName: string,
  *   authorEmail: string, imprintLabel: string,
  *   officialManuscriptWordCount: number, selectedPackageCode: string,
- *   paymentOption: string, contractDate?: string
+ *   paymentOption: string, contractDate?: string,
+ *   electedProductForms: (string|object)[], scopeApprovedProductForms?: string[]
  * }} input
  * @param {{ writeOutput?: (name: string, buffer: Buffer) => Promise<string> }} [deps]
  * @returns {Promise<object>}
@@ -82,9 +83,12 @@ async function generateSimplifiedAgreementPacket(input = {}, deps = {}) {
   const fields = computeAgreementFields(input);
   if (!fields.ok) return blocked("FIELD_COMPUTATION_FAILED", { errors: fields.errors });
 
-  const packageContent = buildPackageSpecificAddendumSections(input.selectedPackageCode);
+  const packageContent = buildPackageSpecificAddendumSections(input.selectedPackageCode, {
+    electedProductForms: input.electedProductForms || input.approvedElectedProductForms,
+    scopeApprovedProductForms: input.scopeApprovedProductForms
+  });
   if (!packageContent.ok) {
-    return blocked("PACKAGE_CONTENT_NOT_DEFINED", { detail: packageContent.error });
+    return blocked("PACKAGE_CONTENT_NOT_DEFINED", { detail: packageContent.error, errors: packageContent.errors });
   }
 
   const audiobookSection = buildSimplifiedAudiobookSection({
@@ -156,6 +160,7 @@ async function generateSimplifiedAgreementPacket(input = {}, deps = {}) {
       packageLabel: fields.packageLabel,
       packageFeeFormatted: fields.packageFeeFormatted,
       complimentaryCopies: fields.complimentaryCopies,
+      complimentaryEntitlements: fields.complimentaryEntitlements,
       audiobookIncluded: fields.audiobookIncluded,
       paymentSchedule: fields.paymentSchedule
     },

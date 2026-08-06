@@ -90,7 +90,11 @@ export const packages = [
     tier: 'Starter',
     price: { amount: 1999, currency: 'USD' },
     editionSlots: 2,
-    complimentaryCopies: { paperback: 5, hardcover: 0, ebook: 1 },
+    complimentaryEntitlements: {
+      printPerElectedPrintProductForm: 5,
+      digitalPerElectedDigitalProductForm: 1,
+      audioPerElectedAudiobookProductForm: '1 author delivery',
+    },
     audiobookPolicy: 'Audiobook separate line item',
     featured: false,
     suggestedDefaults: ['PF-01', 'PF-03'],
@@ -100,7 +104,11 @@ export const packages = [
     tier: 'Professional',
     price: { amount: 4500, currency: 'USD' },
     editionSlots: 3,
-    complimentaryCopies: { paperback: 10, hardcover: 2, ebook: 1 },
+    complimentaryEntitlements: {
+      printPerElectedPrintProductForm: 10,
+      digitalPerElectedDigitalProductForm: 1,
+      audioPerElectedAudiobookProductForm: '1 author delivery',
+    },
     audiobookPolicy: 'Audiobook separate line item',
     featured: true,
     suggestedDefaults: ['PF-01', 'PF-02', 'PF-03'],
@@ -110,7 +118,11 @@ export const packages = [
     tier: 'Premier',
     price: { amount: 7500, currency: 'USD' },
     editionSlots: 4,
-    complimentaryCopies: { paperback: 15, hardcover: 5, ebook: 1 },
+    complimentaryEntitlements: {
+      printPerElectedPrintProductForm: 15,
+      digitalPerElectedDigitalProductForm: 1,
+      audioPerElectedAudiobookProductForm: '1 author delivery',
+    },
     audiobookPolicy:
       'AI narration included under the 8-PFH length policy; human narration swap removes AI with no credit and full quoted human line item',
     featured: false,

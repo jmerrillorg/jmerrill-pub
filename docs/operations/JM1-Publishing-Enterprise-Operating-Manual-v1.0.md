@@ -435,7 +435,15 @@ A Publishing Package Addendum explains package-specific details that sit beside 
 
 It may clarify included services, add-on services, package scope, author deliverables, payment schedule, production assumptions, or special terms.
 
-Complimentary author-copy benefits are governed by `docs/governance/publishing/PUB-STD-Author-Copy-Policy.md`. Do not restate different copy quantities in an addendum, welcome guide, website page, or author-facing package material.
+Complimentary author-copy and author-delivery benefits are governed by `docs/governance/publishing/PUB-STD-Author-Copy-Policy.md`. Do not restate different copy quantities in an addendum, welcome guide, website page, or author-facing package material.
+
+The package determines the number of complimentary print copies. The author's approved and elected Product Forms determine which print editions receive those copies.
+
+For example, if a package provides 10 print copies per elected print Product Form and the title elects paperback and large print, the author receives 10 paperback copies and 10 large-print copies after those editions are published. The author does not receive hardcover copies unless hardcover is an approved and elected Product Form for that title.
+
+Each elected digital Product Form receives one complimentary digital entitlement. An elected audiobook receives one author delivery or redemption entitlement after publication. If an additional Product Form is approved later, its complimentary entitlement applies only after that add-on or election is approved and the Product Form is published or delivered.
+
+Already executed agreements and addenda must be preserved as executed. Do not silently reinterpret or regenerate an executed agreement because this policy was amended. If an existing signed term conflicts with the current elected-Product-Form rule, pause and ask Jackie for review.
 
 The addendum should not contradict the main agreement. If there is tension, pause and ask for review.
 

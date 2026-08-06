@@ -18,7 +18,9 @@ async function extractText(buffer) {
 
 describe("generateSimplifiedPackageAddendumDocument", () => {
   test("produces a valid docx containing only the Professional Package content", async () => {
-    const content = buildPackageSpecificAddendumSections("JMP-PKG-PRO");
+    const content = buildPackageSpecificAddendumSections("JMP-PKG-PRO", {
+      electedProductForms: ["PF-01", "PF-02", "PF-04"]
+    });
     const buffer = await generateSimplifiedPackageAddendumDocument({
       title: "Establishing Glory: The Library", authorLegalName: "Jackie Smith Jr.", contractDate: "2026-06-22",
       packageAddendumContent: content, packageFeeFormatted: "$4,500.00", paymentDisclosureSummaryLine: "8 payments of $585.00 each (total $4,680.00)."
@@ -33,7 +35,9 @@ describe("generateSimplifiedPackageAddendumDocument", () => {
   });
 
   test("never mentions Starter, Premier, or Children's package names", async () => {
-    const content = buildPackageSpecificAddendumSections("JMP-PKG-PRO");
+    const content = buildPackageSpecificAddendumSections("JMP-PKG-PRO", {
+      electedProductForms: ["PF-01", "PF-02", "PF-04"]
+    });
     const buffer = await generateSimplifiedPackageAddendumDocument({
       title: "x", authorLegalName: "y", contractDate: "2026-06-22",
       packageAddendumContent: content, packageFeeFormatted: "$4,500.00", paymentDisclosureSummaryLine: "x"

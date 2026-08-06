@@ -120,7 +120,7 @@ Daily Responsibilities: Watch urgent payment or royalty issues and author-copy o
 
 Weekly Responsibilities: Report agreement or payment exceptions and upcoming obligations.
 
-Monthly Responsibilities: Prepare royalty review, payment evidence, unresolved allocation questions, and author-copy obligation review.
+Monthly Responsibilities: Prepare royalty review, payment evidence, unresolved allocation questions, and author-copy obligation review by elected Product Form.
 
 Approvals Held: Preparation and reconciliation within approved financial policy.
 
@@ -155,4 +155,3 @@ Key Reports: Access issues, preservation concerns, support tickets.
 Escalation Path: Jackie for business authority; appropriate support owner for platform incidents.
 
 Continuity Expectations: Keep current authorities available and protect evidence without changing business meaning.
-

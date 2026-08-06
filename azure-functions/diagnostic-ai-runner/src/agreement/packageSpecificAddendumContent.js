@@ -16,7 +16,7 @@
  * present.
  */
 
-const { getComplimentaryCopies } = require("./authorCopyPolicy");
+const { computeComplimentaryEntitlements } = require("./authorCopyPolicy");
 
 const PACKAGE_CONTENT = Object.freeze({
   "JMP-PKG-STARTER": Object.freeze({
@@ -31,7 +31,6 @@ const PACKAGE_CONTENT = Object.freeze({
       "Basic metadata optimization",
       "Author profile page"
     ]),
-    complimentaryCopies: getComplimentaryCopies("JMP-PKG-STARTER"),
     audiobookIncluded: false,
     estimatedDelivery: "8-10 weeks from manuscript receipt"
   }),
@@ -50,7 +49,6 @@ const PACKAGE_CONTENT = Object.freeze({
       "Launch planning session + marketing guidance",
       "AI audiobook production (included — no additional fee)"
     ]),
-    complimentaryCopies: getComplimentaryCopies("JMP-PKG-PRO"),
     audiobookIncluded: true,
     estimatedDelivery: "10-12 weeks from manuscript receipt (audiobook: +2-3 weeks)"
   }),
@@ -69,7 +67,6 @@ const PACKAGE_CONTENT = Object.freeze({
       "Extended launch planning and marketing guidance",
       "AI audiobook production (included — no additional fee)"
     ]),
-    complimentaryCopies: getComplimentaryCopies("JMP-PKG-PREMIER"),
     audiobookIncluded: true,
     estimatedDelivery: "12-16 weeks from manuscript receipt; final timeline depends on editorial and production complexity"
   })
@@ -83,14 +80,15 @@ const EXCLUDED_PACKAGE_LABELS = Object.freeze([
 
 /**
  * @param {string} packageCode
+ * @param {{ electedProductForms?: any[], scopeApprovedProductForms?: string[] }} [options]
  * @returns {{
  *   ok: boolean, error: string|null,
  *   packageLabel: string|null, includedServices: string[]|null,
- *   complimentaryCopies: object|null, audiobookIncluded: boolean|null,
+ *   complimentaryCopies: object|null, complimentaryEntitlements: object[]|null, audiobookIncluded: boolean|null,
  *   estimatedDelivery: string|null, excludedSections: string[]
  * }}
  */
-function buildPackageSpecificAddendumSections(packageCode) {
+function buildPackageSpecificAddendumSections(packageCode, options = {}) {
   const code = typeof packageCode === "string" ? packageCode.trim().toUpperCase() : "";
   const content = PACKAGE_CONTENT[code];
 
@@ -101,6 +99,25 @@ function buildPackageSpecificAddendumSections(packageCode) {
       packageLabel: null,
       includedServices: null,
       complimentaryCopies: null,
+      complimentaryEntitlements: null,
+      audiobookIncluded: null,
+      estimatedDelivery: null,
+      excludedSections: []
+    };
+  }
+
+  const entitlementResult = computeComplimentaryEntitlements(code, options.electedProductForms, {
+    scopeApprovedProductForms: options.scopeApprovedProductForms
+  });
+  if (!entitlementResult.ok) {
+    return {
+      ok: false,
+      error: "COMPLIMENTARY_ENTITLEMENT_COMPUTATION_FAILED",
+      errors: entitlementResult.errors,
+      packageLabel: null,
+      includedServices: null,
+      complimentaryCopies: null,
+      complimentaryEntitlements: null,
       audiobookIncluded: null,
       estimatedDelivery: null,
       excludedSections: []
@@ -112,7 +129,8 @@ function buildPackageSpecificAddendumSections(packageCode) {
     error: null,
     packageLabel: content.packageLabel,
     includedServices: content.includedServices,
-    complimentaryCopies: content.complimentaryCopies,
+    complimentaryCopies: entitlementResult.complimentaryCopies,
+    complimentaryEntitlements: entitlementResult.entitlements,
     audiobookIncluded: content.audiobookIncluded,
     estimatedDelivery: content.estimatedDelivery,
     // Every other package's table, plus unrelated add-on tables and
