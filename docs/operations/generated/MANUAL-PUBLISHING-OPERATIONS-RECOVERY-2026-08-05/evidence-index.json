@@ -2,6 +2,12 @@
   "package": "MANUAL-PUBLISHING-OPERATIONS-RECOVERY-2026-08-05",
   "authority": "Operating Manual v1.0 canonical on main",
   "scope": "Manual publishing operations recovery only",
+  "operational_truth": {
+    "naughty_tales": "PACKAGE COMPLETE / SHAREPOINT FILED / JACKIE_APPROVAL_REQUIRED",
+    "the_generals_will_and_last_testament": "PACKAGE READY / AUTHOR DELIVERY NOT PROVEN / JACKIE_APPROVAL_REQUIRED",
+    "before_you_were_born": "PACKAGE READY / AUTHOR DELIVERY NOT PROVEN / JACKIE_APPROVAL_REQUIRED",
+    "strategies_for_success": "NOT DISTRIBUTION READY / EXACT RELEASE BLOCKERS IDENTIFIED"
+  },
   "mutations": {
     "runtime_implementation": 0,
     "schema_changes": 0,

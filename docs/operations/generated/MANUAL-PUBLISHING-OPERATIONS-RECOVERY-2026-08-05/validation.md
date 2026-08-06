@@ -37,11 +37,22 @@ Rows represent the currently visible active and unresolved SharePoint portfolio 
 - Distribution spreadsheets located: PASS.
 - Final print files found: NO.
 - Final digital files found: NO.
-- Selected cover evidence proven: NO.
+- Selected cover Option 2/core-principles banner proven: NO.
+- Modern school image proven: NO.
+- Hardcover election/readiness proven: NO.
+- Ebook election/readiness proven: NO.
+- Metadata completeness validated: NO.
+- ISBNs proven per Product Form: NO.
 - Author approval proven: NO.
 - Distribution submission authorized: NO.
 
-Result: not distribution-ready; stopped at JACKIE_APPROVAL_REQUIRED and AUTHOR_DECISION_REQUIRED.
+Result: not distribution-ready; stopped at JACKIE_APPROVAL_REQUIRED; AUTHOR_DECISION_REQUIRED.
+
+## Send-Boundary Corrections
+
+- Naughty Tales: PACKAGE COMPLETE / SHAREPOINT FILED; stopped at JACKIE_APPROVAL_REQUIRED before any author decision can be requested.
+- The General's Will and Last Testament: PACKAGE READY / AUTHOR DELIVERY NOT PROVEN; stopped at JACKIE_APPROVAL_REQUIRED before AUTHOR_DELIVERY_REQUIRED and AUTHOR_DECISION_REQUIRED.
+- Before You Were Born: PACKAGE READY / AUTHOR DELIVERY NOT PROVEN; stopped at JACKIE_APPROVAL_REQUIRED before AUTHOR_DELIVERY_REQUIRED and AUTHOR_DECISION_REQUIRED.
 
 ## Boundaries Preserved
 

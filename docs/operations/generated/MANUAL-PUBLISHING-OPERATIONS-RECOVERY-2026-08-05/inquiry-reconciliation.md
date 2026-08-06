@@ -12,7 +12,7 @@ Evidence: current SharePoint folder under /01_Pre-Pipeline/00_Inquiry.
 
 No executed agreement, payment, onboarding completion, or acceptance evidence was found in this pass.
 
-Boundary: JACKIE_APPROVAL_REQUIRED or AGREEMENT_REQUIRED if Jackie accepts the title.
+Boundary: JACKIE_APPROVAL_REQUIRED; AGREEMENT_REQUIRED if Jackie accepts the title.
 
 ### 2026_Dillard_LuckyDucky
 
@@ -22,7 +22,7 @@ Evidence: current SharePoint folder under /01_Pre-Pipeline/00_Inquiry.
 
 No executed agreement, payment, onboarding completion, or acceptance evidence was found in this pass.
 
-Boundary: JACKIE_APPROVAL_REQUIRED or AGREEMENT_REQUIRED if Jackie accepts the title.
+Boundary: JACKIE_APPROVAL_REQUIRED; AGREEMENT_REQUIRED if Jackie accepts the title.
 
 ### 2026-Becky-February
 
@@ -32,7 +32,7 @@ Evidence: current SharePoint folder under /01_Pre-Pipeline/00_Inquiry.
 
 No executed agreement, payment, onboarding completion, or acceptance evidence was found in this pass.
 
-Boundary: JACKIE_APPROVAL_REQUIRED or AGREEMENT_REQUIRED if Jackie accepts the title.
+Boundary: JACKIE_APPROVAL_REQUIRED; AGREEMENT_REQUIRED if Jackie accepts the title.
 
 ### Heard, K.D. - A Walk Home with God
 

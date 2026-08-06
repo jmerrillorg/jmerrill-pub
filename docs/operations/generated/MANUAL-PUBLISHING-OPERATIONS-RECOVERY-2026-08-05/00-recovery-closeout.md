@@ -24,9 +24,9 @@ Every active or unresolved title identified in those sources is represented once
 
 Priority 1 authors waiting on JMP:
 
-- Naughty Tales: developmental author-review package prepared in this pass; send requires Jackie approval.
-- The General's Will and Last Testament: two-piece author-review package exists; actual send remains author-decision boundary.
-- Before You Were Born: two-piece author-review package exists; actual send remains author-decision boundary.
+- Naughty Tales: developmental author-review package prepared and filed in SharePoint; send requires Jackie approval before any author decision can be requested.
+- The General's Will and Last Testament: two-piece author-review package exists; author delivery is not proven; Jackie approval is required before delivery and author decision.
+- Before You Were Born: two-piece author-review package exists; author delivery is not proven; Jackie approval is required before delivery and author decision.
 
 Priority 2 titles one step from release:
 
@@ -63,16 +63,21 @@ Blocking facts:
 - Print production folder read back empty.
 - Digital production folder read back empty.
 - Cover election and final selected cover file were not proven in current SharePoint readback.
+- Modern school image selection was not proven in current SharePoint readback.
+- Hardcover election/readiness was not proven in current SharePoint readback.
+- Ebook election/readiness was not proven in current SharePoint readback.
+- Metadata completeness was not validated in this pass.
 - Author approval was not proven in current evidence.
 - ISBN assignment for each elected Product Form was not proven in this pass.
+- Distribution package authorization was not proven in this pass.
 
-Boundary: JACKIE_APPROVAL_REQUIRED and AUTHOR_DECISION_REQUIRED.
+Boundary: JACKIE_APPROVAL_REQUIRED; AUTHOR_DECISION_REQUIRED.
 
-Next valid action: Jackie confirms cover Option 2, Product Form elections, author approval, metadata, ISBNs, and permission to export final production files. Production then exports final paperback/hardcover/ebook files from Vellum and performs manual QA before any distribution submission.
+Next valid action: Jackie confirms cover Option 2/core-principles banner, modern school image selection, Product Form elections, author approval status, metadata completeness, ISBNs for each Product Form, and permission to export final production files. The author then makes any remaining required elections/approval. Production exports final paperback/hardcover/ebook files from Vellum only after those decisions, performs manual QA, and prepares the distribution package before any submission.
 
 ### Naughty Tales
 
-Current status: developmental author-review package prepared.
+Current status: package complete and filed in SharePoint; Jackie send approval required.
 
 Evidence found:
 
@@ -95,13 +100,13 @@ SharePoint filing:
 - Author Review Manuscript: https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BFF9927FB-16C4-4537-9349-4F2588899268%7D&file=naughty-tales-Author-Review-Manuscript.docx&action=default&mobileredirect=true
 - Editorial Review Guide: https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/02_Active-Pipeline/04_Editorial/Stevette,%20Jaylonna%20-%20Naughty%20Tales/02-MANUSCRIPT/naughty-tales-Editorial-Review-Guide.pdf
 
-Boundary: AUTHOR_DECISION_REQUIRED after Jackie approves sending.
+Boundary: JACKIE_APPROVAL_REQUIRED.
 
-Next valid action: send the prepared package to Jaylonna Stevette using the prepared communication draft.
+Next valid action: Jackie approves or declines the prepared author communication/send. Only after Jackie approval may the package be delivered; only after delivery may an author decision be requested.
 
 ### The General's Will and Last Testament
 
-Current status: author-review package ready, actual author-facing send not proven.
+Current status: package ready; author delivery not proven; Jackie send approval required.
 
 Evidence found:
 
@@ -110,13 +115,13 @@ Evidence found:
 - consolidated Editorial Review Guide PDF;
 - active title folder under /01_Titles/02_Developmental-Editing.
 
-Boundary: AUTHOR_DECISION_REQUIRED.
+Boundary: JACKIE_APPROVAL_REQUIRED.
 
-Next valid action: if Jackie approves send, deliver the existing two-piece package and request author review.
+Next valid action: Jackie approves or declines the send. If approved, the next boundary becomes AUTHOR_DELIVERY_REQUIRED. After delivery, the next boundary becomes AUTHOR_DECISION_REQUIRED.
 
 ### Before You Were Born
 
-Current status: author-review package ready, actual author-facing send not proven.
+Current status: package ready; author delivery not proven; Jackie send approval required.
 
 Evidence found:
 
@@ -125,9 +130,9 @@ Evidence found:
 - consolidated Editorial Review Guide PDF;
 - active title folder under /01_Titles/02_Developmental-Editing.
 
-Boundary: AUTHOR_DECISION_REQUIRED.
+Boundary: JACKIE_APPROVAL_REQUIRED.
 
-Next valid action: if Jackie approves send, deliver the existing two-piece package and request author review.
+Next valid action: Jackie approves or declines the send. If approved, the next boundary becomes AUTHOR_DELIVERY_REQUIRED. After delivery, the next boundary becomes AUTHOR_DECISION_REQUIRED.
 
 ### Inquiry Cohort
 

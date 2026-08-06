@@ -30,8 +30,20 @@ Priority: 2 - one step from release, but not yet distribution-ready.
 
 ## Next Valid Action
 
-Boundary: JACKIE_APPROVAL_REQUIRED and AUTHOR_DECISION_REQUIRED.
+Boundary: JACKIE_APPROVAL_REQUIRED; AUTHOR_DECISION_REQUIRED.
 
-Jackie must confirm cover selection, Product Form elections, author approval status, metadata, and ISBN readiness. After that, a manual production operator may export the final paperback/hardcover/ebook files from Vellum, QA them, and prepare the distribution package.
+Jackie must confirm every remaining release blocker:
+
+- selected cover Option 2 with core-principles banner;
+- modern school image;
+- paperback final print files;
+- hardcover election/readiness;
+- ebook election/readiness and EPUB;
+- metadata completeness;
+- ISBNs for each elected Product Form;
+- author approval status;
+- distribution package authorization.
+
+The author must make any remaining required elections/approval. After those decisions, a manual production operator may export the final paperback/hardcover/ebook files from Vellum, QA them, and prepare the distribution package.
 
 No distribution submission was made.
