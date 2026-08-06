@@ -1,49 +1,42 @@
-# Strategies For Success Release-Critical Checklist
+# Strategies For Success Manual Production Status
 
 Title: Strategies For Success
 
 Author: Sean Crowley
 
-Priority: 2 - one step from release, but not yet distribution-ready.
+Current state: MANUAL_FINAL_PRODUCTION
+
+Release date: 2026-09-22
 
 ## Current Evidence
 
-- Active folder: /02_Active-Pipeline/04_Editorial/2026_Crowley_Strategies_For_Success.
+- Active folder: `/02_Active-Pipeline/04_Editorial/2026_Crowley_Strategies_For_Success`.
 - Agreement evidence: signed agreement located in Crowley people/agreement folder; active folder contains agreement and package addendum.
-- Latest editorial candidate: 260529_d_StrategiesForSuccess.docx.
-- Production source: Strategies_For_Success.vellum.
-- Distribution workbooks: JMerrill_PaperEbook.xlsx and JMerrill_PaperHardEbook.xlsx.
+- Latest editorial candidate: `260529_d_StrategiesForSuccess.docx`.
+- Production source: `Strategies_For_Success.vellum`.
+- Distribution workbooks: `JMerrill_PaperEbook.xlsx` and `JMerrill_PaperHardEbook.xlsx`.
 
-## Required Checklist
+## Corrected Current Boundary
 
-- Final title: Strategies For Success - PASS.
-- Selected cover: Option 2 with core-principles banner - NOT PROVEN IN CURRENT READBACK.
-- School image: Modern school - NOT PROVEN IN CURRENT READBACK.
-- Interior: Vellum source exists; final exported interior files not found - BLOCKED.
-- Paperback readiness: Print folder empty; final PDF/cover/spine/proof not found - BLOCKED.
-- Hardcover readiness: election and files not proven - BLOCKED.
-- Ebook readiness: Digital folder empty; EPUB not found - BLOCKED.
-- Metadata: distribution workbooks found; current metadata completeness not validated - BLOCKED.
-- ISBNs: not proven for each Product Form in this pass - BLOCKED.
-- Author approval: not proven in this pass - BLOCKED.
-- Distribution package: cannot prepare or submit until final exports, cover, metadata, ISBNs, and approval are confirmed - BLOCKED.
+The prior broad blocker list is not carried forward as current operating status. Jackie has identified the remaining current item as:
+
+- HARDCOVER_DESIGN.
+
+Hardcover design is being handled manually by Jackie.
+
+## Manual Production Status
+
+- Paperback production: manual production path; no client automation used.
+- Ebook production: manual production path; no client automation used.
+- Hardcover production: design in progress manually with Jackie.
+- Distribution: manual release plan remains under the Operating Manual.
 
 ## Next Valid Action
 
-Boundary: JACKIE_APPROVAL_REQUIRED; AUTHOR_DECISION_REQUIRED.
+Continue manual hardcover design and final production under the Operating Manual.
 
-Jackie must confirm every remaining release blocker:
-
-- selected cover Option 2 with core-principles banner;
-- modern school image;
-- paperback final print files;
-- hardcover election/readiness;
-- ebook election/readiness and EPUB;
-- metadata completeness;
-- ISBNs for each elected Product Form;
-- author approval status;
-- distribution package authorization.
-
-The author must make any remaining required elections/approval. After those decisions, a manual production operator may export the final paperback/hardcover/ebook files from Vellum, QA them, and prepare the distribution package.
+No author status communication is required under PR #431 unless Jackie separately requests it.
 
 No distribution submission was made.
+
+Client-title automation remains FROZEN.

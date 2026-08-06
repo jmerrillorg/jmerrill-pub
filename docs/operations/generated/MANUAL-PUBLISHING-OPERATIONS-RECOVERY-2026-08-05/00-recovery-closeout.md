@@ -1,159 +1,121 @@
 # Manual Publishing Operations Recovery
 
-Date: 2026-08-05
+Date: 2026-08-06
 
-Authority: Operating Manual v1.0 canonical on main.
+Authority: JM1 Publishing Enterprise Operating Manual v1.0 canonical on main.
 
-Scope: manual publishing operations and backlog recovery only.
+Scope: manual Publishing operations recovery only.
 
-No runtime implementation, schema change, client-title automation thaw, author send, Business Central mutation, catalog change, agreement change, or new architecture was performed.
+No runtime implementation, schema change, client-title automation thaw, author send, Business Central mutation, catalog change, agreement change, website deployment, or new architecture was performed.
 
-## Result
+## Corrected Result
 
-Portfolio inventory is complete for the currently visible governed SharePoint portfolio reviewed in this pass:
+This package has been corrected to remove stale package-complete and author-decision language that was not supported by the current title evidence.
 
-- /01_Pre-Pipeline/00_Inquiry
-- /02_Active-Pipeline/04_Editorial
-- /01_Titles
-- PROGRAM-008 Jackie Review 2026-08-04
-- prior repository evidence for Program 008 and five-title recovery
+The recovery pass did not truthfully complete clean author-review packages for Naughty Tales, The General's Will and Last Testament, or Before You Were Born. It located the controlling or candidate manuscript sources and established the current operational boundary for each title.
 
-Every active or unresolved title identified in those sources is represented once in `operational-register.csv`.
+The PR should not be treated as ready for merge as a completed manual recovery package until the unresolved title-level gates in `validation.md` are cleared.
 
-## Client-Service Priority
+## Priority 1 Authors Waiting on JMP
 
-Priority 1 authors waiting on JMP:
+- Naughty Tales: authoritative source manuscript located. Developmental edit is still required unless a later approved developmental package is proven from the exact controlling manuscript.
+- The General's Will and Last Testament: candidate controlling manuscript located. Existing generated developmental outputs contain internal operational language and require authoritative validation before author delivery.
+- Before You Were Born: candidate source manuscript located. The title remains under editorial-state confirmation and a major author-facing internal-information exposure incident. Prior technical dispatch is not a valid author-review delivery.
 
-- Naughty Tales: developmental author-review package prepared and filed in SharePoint; send requires Jackie approval before any author decision can be requested.
-- The General's Will and Last Testament: two-piece author-review package exists; author delivery is not proven; Jackie approval is required before delivery and author decision.
-- Before You Were Born: two-piece author-review package exists; author delivery is not proven; Jackie approval is required before delivery and author decision.
+## Priority 2 Title One Step from Release
 
-Priority 2 titles one step from release:
-
-- Strategies For Success: not ready for submission because production output folders for print and digital read back empty. Release-critical export, cover/election approval, metadata, ISBN, and final QA remain required.
-
-Priority 3 active editorial or internal validation:
-
-- The Intentional Leader
-- The Long Watch
-- Establishing Glory: The Library
-- Why Faith Works For Some and Not For Others
-
-Priority 4 intake and onboarding cleanup:
-
-- All unresolved inquiry rows in `operational-register.csv`.
+- Strategies For Success: manual final production continues under the Operating Manual. Jackie identified hardcover design as the current remaining item. Client-title automation remains frozen and was not used.
 
 ## Specific Title Outcomes
 
-### Strategies For Success
-
-Current status: near-release recovery, but not distribution-ready.
-
-Evidence found:
-
-- active SharePoint folder under /02_Active-Pipeline/04_Editorial/2026_Crowley_Strategies_For_Success;
-- signed agreement evidence in the Crowley people/agreement folder;
-- active folder agreement and package addendum;
-- latest editorial candidate: 260529_d_StrategiesForSuccess.docx;
-- Vellum source: Strategies_For_Success.vellum;
-- distribution spreadsheets: JMerrill_PaperEbook.xlsx and JMerrill_PaperHardEbook.xlsx.
-
-Blocking facts:
-
-- Print production folder read back empty.
-- Digital production folder read back empty.
-- Cover election and final selected cover file were not proven in current SharePoint readback.
-- Modern school image selection was not proven in current SharePoint readback.
-- Hardcover election/readiness was not proven in current SharePoint readback.
-- Ebook election/readiness was not proven in current SharePoint readback.
-- Metadata completeness was not validated in this pass.
-- Author approval was not proven in current evidence.
-- ISBN assignment for each elected Product Form was not proven in this pass.
-- Distribution package authorization was not proven in this pass.
-
-Boundary: JACKIE_APPROVAL_REQUIRED; AUTHOR_DECISION_REQUIRED.
-
-Next valid action: Jackie confirms cover Option 2/core-principles banner, modern school image selection, Product Form elections, author approval status, metadata completeness, ISBNs for each Product Form, and permission to export final production files. The author then makes any remaining required elections/approval. Production exports final paperback/hardcover/ebook files from Vellum only after those decisions, performs manual QA, and prepares the distribution package before any submission.
-
 ### Naughty Tales
 
-Current status: package complete and filed in SharePoint; Jackie send approval required.
+Current status: DEVELOPMENTAL_EDIT_REQUIRED.
 
-Evidence found:
+Authoritative source located:
 
-- active SharePoint folder under /02_Active-Pipeline/04_Editorial/Stevette, Jaylonna - Naughty Tales;
-- hold-folder manuscript archive under /02_Active-Pipeline/04_Editorial/06_Hold/2025-Stevette-NaughtyTales;
-- latest manuscript candidate: 260303 Naughty Tales.docx, modified 2026-03-04;
-- source checksum: e123ff3febe60c4c1b22f7ed96e5c51f5c956fcab62e6c7fb6e393c959adbfea.
+- `240920 9781954414846.docx`
+- SharePoint location: `/sites/publishing/Shared Documents/02_Active-Pipeline/04_Editorial/Stevette, Jaylonna - Naughty Tales/02-MANUSCRIPT/240920 9781954414846.docx`
+- Last verified: 2026-08-06
 
-Completed in this pass:
+Corrected finding:
 
-- corrected author-review manuscript with title and author filled in;
-- consolidated Editorial Review Guide PDF;
-- structural QA for no comments, no tracked changes, no internal markers, title and author correctness;
-- DOCX render QA produced 145 manuscript pages;
-- guide PDF render produced 2 pages.
-- filed both deliverables in SharePoint under /02_Active-Pipeline/04_Editorial/Stevette, Jaylonna - Naughty Tales/02-MANUSCRIPT.
+The previously recorded `PACKAGE COMPLETE / SHAREPOINT FILED` state is not carried forward because the package was not proven to be built from the exact controlling manuscript after a completed developmental edit.
 
-SharePoint filing:
+Boundary: DEVELOPMENTAL_EDIT_REQUIRED; JACKIE_SEND_APPROVAL_REQUIRED only after clean package QA passes.
 
-- Author Review Manuscript: https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BFF9927FB-16C4-4537-9349-4F2588899268%7D&file=naughty-tales-Author-Review-Manuscript.docx&action=default&mobileredirect=true
-- Editorial Review Guide: https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/02_Active-Pipeline/04_Editorial/Stevette,%20Jaylonna%20-%20Naughty%20Tales/02-MANUSCRIPT/naughty-tales-Editorial-Review-Guide.pdf
-
-Boundary: JACKIE_APPROVAL_REQUIRED.
-
-Next valid action: Jackie approves or declines the prepared author communication/send. Only after Jackie approval may the package be delivered; only after delivery may an author decision be requested.
+Next valid action: perform manual developmental edit from the verified source manuscript, generate clean author-facing deliverables, run leakage QA, file the package, then request Jackie send approval. Do not send.
 
 ### The General's Will and Last Testament
 
-Current status: package ready; author delivery not proven; Jackie send approval required.
+Current status: AUTHORITATIVE_DEV_EDIT_VALIDATION_REQUIRED.
 
-Evidence found:
+Candidate controlling manuscript located:
 
-- Program 008 SharePoint package folder;
-- author-review manuscript DOCX;
-- consolidated Editorial Review Guide PDF;
-- active title folder under /01_Titles/02_Developmental-Editing.
+- `THE_GENERALS_FULL_MANUSCRIPT_Clean_Formatted_Editorial_Working_Copy (1).docx`
+- SharePoint location: `/sites/publishing/Shared Documents/01_Titles/02_Developmental-Editing/JMP-INT-202607-DL2T20 - Iyorwuese Hagher - The General's Will and Last Testament/02_Manuscript/THE_GENERALS_FULL_MANUSCRIPT_Clean_Formatted_Editorial_Working_Copy (1).docx`
+- Last verified: 2026-08-06
 
-Boundary: JACKIE_APPROVAL_REQUIRED.
+Corrected finding:
 
-Next valid action: Jackie approves or declines the send. If approved, the next boundary becomes AUTHOR_DELIVERY_REQUIRED. After delivery, the next boundary becomes AUTHOR_DECISION_REQUIRED.
+The existing package-ready state is not carried forward. A later generated developmental-edit manuscript was located, but it contains internal operational language including automation-generation metadata, source artifact references, correlation language, and publisher review notes. That artifact is not author-facing clean.
+
+Boundary: AUTHORITATIVE_DEV_EDIT_VALIDATION_REQUIRED.
+
+Next valid action: validate the candidate source against prior manuscripts, Program-008 package evidence, and later outputs. Only after authoritative source validation and leakage QA may a corrected author-review package be prepared for Jackie approval. Do not send.
 
 ### Before You Were Born
 
-Current status: package ready; author delivery not proven; Jackie send approval required.
+Current status: EDITORIAL_STATE_CONFIRMATION_REQUIRED; AUTHOR_FACING_INTERNAL_INFORMATION_EXPOSURE.
 
-Evidence found:
+Candidate source manuscript located:
 
-- Program 008 SharePoint package folder;
-- author-review manuscript DOCX;
-- consolidated Editorial Review Guide PDF;
-- active title folder under /01_Titles/02_Developmental-Editing.
+- `JMP-INT-202607-LQPHEK - Before You Were Born copy.docx`
+- SharePoint location: `/sites/publishing/Shared Documents/01_Titles/02_Developmental-Editing/JMP-INT-202607-LQPHEK - Sean Crowley - Before You Were Born/01_Manuscript/Original/JMP-INT-202607-LQPHEK - Before You Were Born copy.docx`
+- Last verified: 2026-08-06
 
-Boundary: JACKIE_APPROVAL_REQUIRED.
+Corrected finding:
 
-Next valid action: Jackie approves or declines the send. If approved, the next boundary becomes AUTHOR_DELIVERY_REQUIRED. After delivery, the next boundary becomes AUTHOR_DECISION_REQUIRED.
+The prior author-review delivery is not accepted as valid operational delivery. Existing protected-dispatch evidence classified the title as `TECHNICALLY_RELEASED / OPERATIONAL_CERTIFICATION_FAILED`, and no author response clock may run from that defective state.
 
-### Inquiry Cohort
+Incident record:
 
-The five named inquiry titles are reconciled:
+- `incidents/before-you-were-born-author-facing-internal-information-exposure.md`
 
-- God Got Me: inquiry, not accepted/contracted in current evidence.
-- Lucky Ducky: inquiry, not accepted/contracted in current evidence.
-- February: inquiry, not accepted/contracted in current evidence.
-- A Walk Home with God: dormant inquiry, author decision required.
-- Inner Peace Through Life's Storms: dormant inquiry/backlist ambiguity, author decision required.
+Boundary: EDITORIAL_STATE_CONFIRMATION_REQUIRED; corrective communication and package preparation must wait until the clean package is verified.
 
-No accepted or contracted status was proven for those five in current evidence, so no folder movement was performed.
+Next valid action: confirm editorial state, preserve the incident evidence, prepare a clean corrected package after verification, then request Jackie approval for any apology or corrected package send. Do not send.
+
+### Strategies For Success
+
+Current status: MANUAL_FINAL_PRODUCTION.
+
+Release date: 2026-09-22.
+
+Corrected finding:
+
+The prior broad not-distribution-ready blocker list is superseded unless separately proven current by direct evidence. Current manual operational understanding is that the remaining identified item is hardcover design, handled manually by Jackie.
+
+Boundary: HARDCOVER_DESIGN_IN_PROGRESS; CLIENT_AUTOMATION_NOT_USED.
+
+Next valid action: continue manual hardcover design and manual release preparation under the Operating Manual. No author status communication is required under this recovery package unless Jackie separately requests it.
+
+## Stale States Removed
+
+- Naughty Tales is not marked package complete.
+- The General's Will and Last Testament is not marked author-decision-required.
+- Before You Were Born is not marked author-decision-required.
+- Strategies For Success no longer carries broad stale blockers not verified as current in this corrective pass.
 
 ## Evidence
 
 - `operational-register.csv`
-- `strategies-for-success-release-critical-checklist.md`
-- `inquiry-reconciliation.md`
-- `author-deliverables/naughty-tales/naughty-tales-Author-Review-Manuscript.docx`
-- `author-deliverables/naughty-tales/naughty-tales-Editorial-Review-Guide.pdf`
+- `source-verification-and-title-state-correction.md`
+- `validation.md`
+- `incidents/before-you-were-born-author-facing-internal-information-exposure.md`
 - `communications/naughty-tales-author-review-draft.md`
+- `communications/general-author-review-ready-draft.md`
+- `communications/strategies-for-success-status-draft.md`
 - `checksums.sha256`
 
 ## Stop State
@@ -165,5 +127,11 @@ Client-title production remains MANUAL.
 Runtime implementation: 0.
 
 Schema changes: 0.
+
+Dataverse mutations: 0.
+
+Business Central changes: 0.
+
+Author communications sent: 0.
 
 New architecture: 0.

@@ -1,100 +1,109 @@
 # Manual Publishing Decisions Awaiting Jackie
 
-Date: 2026-08-05
+Date: 2026-08-06
 
-Purpose: executive decision summary for manual publishing recovery. This file is a review aid only and is separate from the recovery evidence package.
+Purpose: corrected executive decision summary for manual Publishing recovery. This file is a review aid only and is separate from the recovery evidence package.
 
-No author communications have been sent. No runtime work, schema change, automation thaw, Business Central change, agreement change, catalog change, or distribution submission is authorized by this summary.
+No author communications have been sent. No runtime work, schema change, automation thaw, Business Central change, agreement change, catalog change, website deployment, or distribution submission is authorized by this summary.
+
+## Current Truthful Boundary
+
+The current PR #431 evidence does not support marking the first three client titles as send-ready. Their next actions are manual recovery actions, not author decisions.
 
 ## Naughty Tales
 
-Current state: PACKAGE COMPLETE / SHAREPOINT FILED / JACKIE SEND APPROVAL REQUIRED.
+Current state: DEVELOPMENTAL_EDIT_REQUIRED.
 
-Remaining work:
+Verified source:
 
-- Jackie approves or declines the prepared author communication.
-- If approved, send the prepared author-review package.
-- After delivery, request author review decisions.
+- `240920 9781954414846.docx`
 
-Prepared package:
+Decision needed:
 
-- Author Review Manuscript DOCX.
-- Editorial Review Guide PDF.
-- Both filed in the governed SharePoint title folder.
+- Jackie confirms the located source is the controlling manuscript unless a later approved manuscript is produced.
 
-Prepared communication:
+Next manual action:
 
-- `communications/naughty-tales-author-review-draft.md`.
+- Complete developmental edit from the verified source.
+- Generate clean author-facing package.
+- Run leakage QA.
+- Only then request Jackie send approval.
 
-Recommendation: APPROVE SEND.
+Send recommendation:
+
+- DO NOT SEND from the current PR package.
 
 ## The General's Will and Last Testament
 
-Current state: PACKAGE READY / AUTHOR DELIVERY NOT PROVEN / JACKIE SEND APPROVAL REQUIRED.
+Current state: AUTHORITATIVE_DEV_EDIT_VALIDATION_REQUIRED.
 
-Prepared package:
+Verified candidate source:
 
-- Existing two-piece author-review package located in the Program 008 recovery evidence and active title evidence.
+- `THE_GENERALS_FULL_MANUSCRIPT_Clean_Formatted_Editorial_Working_Copy (1).docx`
 
-Prepared communication:
+Decision needed:
 
-- `communications/general-author-review-ready-draft.md`.
+- Jackie confirms whether this is the controlling developmental-edit source after comparison against prior manuscript and package evidence.
 
-Remaining work:
+Next manual action:
 
-- Jackie approves or declines send.
-- If approved, deliver the existing package.
-- After delivery, request author review decisions.
+- Validate source lineage.
+- Correct any author-facing artifacts that contain internal operational language.
+- Run leakage QA.
+- Only then request Jackie corrective-send approval.
 
-Recommendation: APPROVE SEND.
+Send recommendation:
+
+- DO NOT SEND from the current PR package.
 
 ## Before You Were Born
 
-Current state: PACKAGE READY / AUTHOR DELIVERY NOT PROVEN / JACKIE SEND APPROVAL REQUIRED.
+Current state: EDITORIAL_STATE_CONFIRMATION_REQUIRED; AUTHOR_FACING_INTERNAL_INFORMATION_EXPOSURE.
 
-Prepared package:
+Verified candidate source:
 
-- Existing two-piece author-review package located in the Program 008 recovery evidence and active title evidence.
+- `JMP-INT-202607-LQPHEK - Before You Were Born copy.docx`
 
-Prepared communication:
+Decision needed:
 
-- `communications/general-author-review-ready-draft.md` may be adapted only after Jackie approves the specific send.
+- Jackie confirms the editorial state after comparison against the located developmental outputs.
 
-Remaining work:
+Next manual action:
 
-- Jackie approves or declines send.
-- If approved, deliver the existing package.
-- After delivery, request author review decisions.
+- Preserve incident record.
+- Confirm editorial state.
+- Prepare clean corrected package only after verification.
+- Prepare apology/corrective communication only after clean package QA passes.
+- Request Jackie approval before any author communication.
 
-Recommendation: APPROVE SEND.
+Send recommendation:
+
+- DO NOT SEND from the current PR package.
 
 ## Strategies For Success
 
-Current state: NOT DISTRIBUTION READY / JACKIE APPROVAL REQUIRED / AUTHOR DECISION REQUIRED.
+Current state: MANUAL_FINAL_PRODUCTION.
 
-Exact remaining release blockers:
+Release date:
 
-- selected cover Option 2 with core-principles banner not proven;
-- modern school image not proven;
-- final print files not found;
-- final digital/EPUB files not found;
-- hardcover election/readiness not proven;
-- ebook election/readiness not proven;
-- metadata completeness not validated;
-- ISBNs not proven for each selected Product Form;
-- author approval not proven;
-- distribution package authorization not proven.
+- 2026-09-22.
 
-Prepared communication:
+Current remaining item:
 
-- `communications/strategies-for-success-status-draft.md`.
+- HARDCOVER_DESIGN, handled manually by Jackie.
 
-Recommendation: AUTHOR DECISION, then FINAL PRODUCTION.
+Next manual action:
+
+- Continue manual hardcover design and manual final production.
+
+Communication recommendation:
+
+- NO STATUS COMMUNICATION REQUIRED under PR #431 unless Jackie separately asks.
 
 ## Stop State
-
-Do not send anything under this review package. Jackie must individually approve or decline each prepared author communication before any author-facing action occurs.
 
 Client-title automation remains FROZEN.
 
 Client-title production remains MANUAL.
+
+Slice 3 runtime implementation remains NOT AUTHORIZED.

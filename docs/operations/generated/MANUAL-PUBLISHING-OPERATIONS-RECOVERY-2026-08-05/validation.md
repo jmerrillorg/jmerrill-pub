@@ -1,58 +1,105 @@
 # Validation
 
-Date: 2026-08-05
+Date: 2026-08-06
 
 ## Portfolio Inventory
 
-Operational register created at `operational-register.csv`.
+Operational register exists at `operational-register.csv`.
 
-Rows represent the currently visible active and unresolved SharePoint portfolio reviewed in this pass, including:
+This corrective pass updates the register so the active recovery titles no longer carry stale package-complete, package-ready, author-decision-required, or broad release-blocker states that were not supported by current evidence.
 
-- required five-title inquiry cohort;
-- active editorial titles;
-- Program 008 author-review titles;
-- internal manual publishing titles;
-- visible unresolved inquiry titles.
+## Source Location Validation
 
-## Naughty Tales Package QA
+| Title | Required source | Result | Last verified |
+| --- | --- | --- | --- |
+| Naughty Tales | `240920 9781954414846.docx` | LOCATED | 2026-08-06 |
+| The General's Will and Last Testament | `THE_GENERALS_FULL_MANUSCRIPT_Clean_Formatted_Editorial_Working_Copy (1).docx` | LOCATED | 2026-08-06 |
+| Before You Were Born | `JMP-INT-202607-LQPHEK - Before You Were Born copy.docx` | LOCATED | 2026-08-06 |
+| Strategies For Success | Manual production source set | PRIOR PASS LOCATED Vellum and distribution spreadsheets; current remaining item identified as hardcover design | 2026-08-06 |
 
-- Source file materialized: PASS.
-- Source checksum captured: PASS.
-- Author Review Manuscript generated: PASS.
-- Editorial Review Guide PDF generated: PASS.
-- Title line corrected: PASS.
-- Author line corrected: PASS.
-- Comments present: 0.
-- Tracked insertions: 0.
-- Tracked deletions: 0.
-- Internal marker scan: PASS.
-- DOCX render: PASS, 145 pages.
-- PDF guide render: PASS, 2 pages.
-- SharePoint filing: PASS.
+## Title Gate Validation
 
-## Strategies For Success Readiness
+### Naughty Tales
 
-- Agreement evidence located: PASS.
-- Vellum source located: PASS.
-- Distribution spreadsheets located: PASS.
-- Final print files found: NO.
-- Final digital files found: NO.
-- Selected cover Option 2/core-principles banner proven: NO.
-- Modern school image proven: NO.
-- Hardcover election/readiness proven: NO.
-- Ebook election/readiness proven: NO.
-- Metadata completeness validated: NO.
-- ISBNs proven per Product Form: NO.
-- Author approval proven: NO.
-- Distribution submission authorized: NO.
+- Authoritative source located: PASS.
+- Completed developmental edit from exact source: NOT PROVEN.
+- Clean author-facing package generated from exact source: NOT PROVEN.
+- Leakage QA for new governed package: NOT RUN because clean package is not ready.
+- SharePoint filing of clean package: NOT READY.
 
-Result: not distribution-ready; stopped at JACKIE_APPROVAL_REQUIRED; AUTHOR_DECISION_REQUIRED.
+Result: DEVELOPMENTAL_EDIT_REQUIRED. The title is not package complete.
 
-## Send-Boundary Corrections
+### The General's Will and Last Testament
 
-- Naughty Tales: PACKAGE COMPLETE / SHAREPOINT FILED; stopped at JACKIE_APPROVAL_REQUIRED before any author decision can be requested.
-- The General's Will and Last Testament: PACKAGE READY / AUTHOR DELIVERY NOT PROVEN; stopped at JACKIE_APPROVAL_REQUIRED before AUTHOR_DELIVERY_REQUIRED and AUTHOR_DECISION_REQUIRED.
-- Before You Were Born: PACKAGE READY / AUTHOR DELIVERY NOT PROVEN; stopped at JACKIE_APPROVAL_REQUIRED before AUTHOR_DELIVERY_REQUIRED and AUTHOR_DECISION_REQUIRED.
+- Candidate controlling manuscript located: PASS.
+- Authoritative developmental-edit validation: REQUIRED.
+- Existing generated developmental artifact clean for author-facing use: FAIL.
+- Internal operational content detected in an existing generated developmental artifact: YES.
+- Corrected author-facing package: NOT READY.
+- Leakage QA for corrected package: NOT RUN because corrected package is not ready.
+
+Result: AUTHORITATIVE_DEV_EDIT_VALIDATION_REQUIRED. The title is not author-decision-required.
+
+### Before You Were Born
+
+- Candidate source manuscript located: PASS.
+- Prior operational delivery certification: FAIL.
+- Prior state acceptable as author-review delivery: NO.
+- Response clock started from defective state: NO.
+- Major incident record created: PASS.
+- Editorial state confirmed: NOT YET.
+- Corrected clean package: NOT READY.
+- Corrective author communication: NOT READY.
+
+Result: EDITORIAL_STATE_CONFIRMATION_REQUIRED; AUTHOR_FACING_INTERNAL_INFORMATION_EXPOSURE. The title is not author-decision-required.
+
+### Strategies For Success
+
+- Current state corrected to manual final production: PASS.
+- Release date recorded: 2026-09-22.
+- Remaining item identified by Jackie: HARDCOVER_DESIGN.
+- Broad stale blocker list carried forward: NO.
+- Author status communication required by this PR: NO.
+- Client-title automation used: NO.
+
+Result: MANUAL_FINAL_PRODUCTION; HARDCOVER_DESIGN_IN_PROGRESS.
+
+## Leakage Guard
+
+Required leakage terms for author-facing package readiness:
+
+- AI
+- automation
+- generated by
+- generated on
+- stage
+- workflow
+- execution
+- correlation
+- source ID
+- Dataverse
+- SharePoint path
+- internal
+- publisher-only
+- review status
+- technical IDs
+- filenames revealing internal process
+
+Current validation result:
+
+- Naughty Tales clean package leakage result: NOT RUN; clean package not ready.
+- The General's Will and Last Testament existing generated artifact: FAIL; internal operational content detected.
+- Before You Were Born corrected package leakage result: NOT RUN; corrected package not ready.
+
+No package in this corrective pass is certified ready for author send.
+
+## Communications
+
+- Author communications sent: 0.
+- Naughty Tales communication: NOT SEND-READY until clean package QA passes.
+- The General's Will communication: NOT SEND-READY until authoritative validation and leakage QA pass.
+- Before You Were Born apology/corrective communication: NOT PREPARED until clean package verification.
+- Strategies For Success communication: NOT REQUIRED under this PR.
 
 ## Boundaries Preserved
 
@@ -60,16 +107,22 @@ Result: not distribution-ready; stopped at JACKIE_APPROVAL_REQUIRED; AUTHOR_DECI
 - Client-title production: MANUAL.
 - Runtime implementation: 0.
 - Schema changes: 0.
+- Dataverse mutations: 0.
 - Business Central changes: 0.
 - Author communications sent: 0.
+- Agreement changes: 0.
+- Catalog changes: 0.
+- Website deployment: 0.
 - New architecture: 0.
 
-## Outlook Evidence Check
+## PR Readiness
 
-Recent Outlook searches for the named title cohorts returned no matching messages since 2026-07-01:
+PR #431 is not validated as a completed manual recovery package.
 
-- Naughty Tales / Jaylonna.
-- Strategies For Success / Sean Crowley.
-- Before You Were Born / The General's Will.
+The truthful boundary is:
 
-Result: no author-facing send evidence was found in this pass; communications remain prepared locally and not sent.
+- Source-location evidence: COMPLETE for the three requested source files.
+- Naughty Tales manual developmental edit: NOT COMPLETE.
+- The General's Will authoritative validation and clean package: NOT COMPLETE.
+- Before You Were Born editorial-state confirmation and clean corrective package: NOT COMPLETE.
+- Strategies current manual status correction: COMPLETE.

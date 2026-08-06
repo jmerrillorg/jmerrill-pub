@@ -1,22 +1,21 @@
-# Send-Ready Draft - Developmental Review Package Ready
+# The General's Will and Last Testament Author Review Communication
 
-Status: PREPARED / NOT SENT
+Status: NOT SEND-READY
 
-Subject: [Book Title] - developmental review package
+Reason: the authoritative developmental-edit source and clean author-facing package have not been validated.
 
-Dear [Author Name],
+Do not send this communication.
 
-Thank you for your patience.
+## Current Boundary
 
-Your developmental review package is ready. It includes:
+The General's Will and Last Testament remains AUTHORITATIVE_DEV_EDIT_VALIDATION_REQUIRED.
 
-- the Author Review Manuscript;
-- one Editorial Review Guide.
+Before an author-facing communication may be prepared:
 
-Please review the package for the main editorial decisions first. This is not final page layout or final proofreading. The goal is to confirm whether the manuscript direction is approved or whether you want changes before the next publishing step.
+1. Validate the candidate controlling manuscript against prior manuscript and package evidence.
+2. Confirm the authoritative developmental-edit output.
+3. Remove internal operational content from author-facing materials.
+4. Run leakage QA.
+5. Obtain Jackie corrective-send approval.
 
-Please reply with either your approval to continue or the changes you want us to address.
-
-With appreciation,
-
-J Merrill Publishing
+Author communications sent under this PR: 0.
