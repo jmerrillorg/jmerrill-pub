@@ -2,29 +2,48 @@
   "id": "OR-2026-003",
   "title": "Govern Complimentary Copy Policy",
   "date": "2026-08-06",
-  "scope": "Governance remediation for complimentary author-copy policy discoverability and consistency",
+  "scope": "Governance remediation and Amendment 1 for complimentary author-copy policy discoverability and elected Product Form consistency",
   "canonical_policy": "docs/governance/publishing/PUB-STD-Author-Copy-Policy.md",
+  "policy_version": "1.1",
+  "amendments": [
+    {
+      "id": "OR-2026-003-Amendment-1",
+      "title": "Elected Product Form Entitlement Rule",
+      "controlling_rule": "Complimentary author entitlements follow approved/elected Product Forms; package or track determines quantity.",
+      "effective_date": "2026-08-06"
+    }
+  ],
   "policy": {
     "Starter": {
-      "paperback": 5,
-      "hardcover": 0,
-      "ebook": 1
+      "print_allocation_per_elected_print_product_form": 5,
+      "digital_entitlement_per_elected_digital_product_form": 1,
+      "audio_entitlement": "1 author delivery"
     },
     "Professional": {
-      "paperback": 10,
-      "hardcover": 2,
-      "ebook": 1
+      "print_allocation_per_elected_print_product_form": 10,
+      "digital_entitlement_per_elected_digital_product_form": 1,
+      "audio_entitlement": "1 author delivery"
     },
     "Premier Publishing Package": {
-      "paperback": 15,
-      "hardcover": 5,
-      "ebook": 1
+      "print_allocation_per_elected_print_product_form": 15,
+      "digital_entitlement_per_elected_digital_product_form": 1,
+      "audio_entitlement": "1 author delivery"
     },
     "JM Signature traditional publishing track": {
-      "paperback": 15,
-      "hardcover": 5,
-      "ebook": 1
+      "print_allocation_per_elected_print_product_form": 15,
+      "digital_entitlement_per_elected_digital_product_form": 1,
+      "audio_entitlement": "1 author delivery"
     }
+  },
+  "product_form_delivery_class": {
+    "PF-01": "PRINT",
+    "PF-02": "PRINT",
+    "PF-03": "DIGITAL",
+    "PF-04": "AUDIO",
+    "PF-05": "PRINT",
+    "PF-06": "DIGITAL unless separately approved physical edition exists",
+    "PF-07": "INACTIVE / NO ENTITLEMENT",
+    "PF-08": "DIGITAL unless approved scope explicitly defines another delivery class"
   },
   "evidence_files": [
     "search-results-before-remediation.md",
@@ -33,6 +52,8 @@
     "03-files-modified.md",
     "04-validation-results.md",
     "search-results-after-remediation.md",
+    "amendment-1-validation-plan.md",
+    "amendment-1-executed-agreement-impact-report.md",
     "generated-validation-artifacts/document-generation-validation.json",
     "generated-validation-artifacts/starter-author-copy-policy-validation.docx",
     "generated-validation-artifacts/starter-author-copy-policy-validation.pdf",
@@ -42,6 +63,23 @@
     "generated-validation-artifacts/premier-author-copy-policy-validation.pdf",
     "generated-validation-artifacts/jm-signature-author-copy-policy-validation.docx",
     "generated-validation-artifacts/jm-signature-author-copy-policy-validation.pdf",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/document-generation-validation.json",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/starter-pf01-pf03.docx",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/starter-pf01-pf03.pdf",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/starter-pf01-pf05.docx",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/starter-pf01-pf05.pdf",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/starter-pf05-pf03.docx",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/starter-pf05-pf03.pdf",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/professional-pf01-pf02-pf04.docx",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/professional-pf01-pf02-pf04.pdf",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/professional-pf01-pf05-pf03.docx",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/professional-pf01-pf05-pf03.pdf",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/premier-pf01-pf02-pf03-pf04.docx",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/premier-pf01-pf02-pf03-pf04.pdf",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/jm-signature-pf01-pf05-pf03.docx",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/jm-signature-pf01-pf05-pf03.pdf",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/premier-pf08-scope-approved.docx",
+    "generated-validation-artifacts/amendment-1-elected-product-forms/premier-pf08-scope-approved.pdf",
     "checksums.sha256"
   ],
   "mutations": {
@@ -50,6 +88,8 @@
     "client_title_automation_thaw": 0,
     "dataverse_schema_changes": 0,
     "business_central_changes": 0,
+    "executed_agreements_modified": 0,
+    "agreement_signatures_requested": 0,
     "public_website_source": "CHANGED",
     "public_website_deployment": "NOT_EXECUTED"
   }

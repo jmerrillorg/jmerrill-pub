@@ -52,6 +52,7 @@ function controlledInput(overrides = {}) {
     imprintLabel: "J Merrill Publishing",
     officialManuscriptWordCount: 48232,
     selectedPackageCode: "JMP-PKG-PRO",
+    electedProductForms: ["PF-01", "PF-02", "PF-03"],
     paymentOption: "EIGHT_PAYMENTS",
     contractDate: "2026-06-22",
     ...overrides
@@ -167,7 +168,7 @@ describe("fillPackageAddendum", () => {
 
     const fieldsByName = Object.fromEntries(r.filledFields.map((f) => [f.field, f.value]));
     assert.equal(fieldsByName.complimentaryPaperback, "10");
-    assert.equal(fieldsByName.complimentaryHardcover, "2");
+    assert.equal(fieldsByName.complimentaryHardcover, "10");
     assert.equal(fieldsByName.complimentaryEbook, "1");
   });
 

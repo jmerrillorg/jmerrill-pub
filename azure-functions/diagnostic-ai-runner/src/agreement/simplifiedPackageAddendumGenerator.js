@@ -4,7 +4,7 @@
  * Generates the simplified, package-specific Package Addendum document
  * — a NEW document, not a fill of the canonical multi-package template.
  * Shows only the selected package's fee, included services,
- * complimentary copies, selected payment option, and applicable terms
+ * complimentary author entitlements, selected payment option, and applicable terms
  * — never the other packages' tables, unselected checkboxes, or
  * unrelated add-on tables.
  *
@@ -33,16 +33,16 @@ function bulletParagraph(text) {
   });
 }
 
-function copiesRow(label, qty, width) {
+function entitlementRow(entitlement, width) {
   return new TableRow({
     children: [
       new TableCell({
         borders, width: { size: width, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 120, right: 120 },
-        children: [new Paragraph({ children: [new TextRun({ text: label, bold: true })] })]
+        children: [new Paragraph({ children: [new TextRun({ text: entitlement.productFormName, bold: true })] })]
       }),
       new TableCell({
         borders, width: { size: width, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 120, right: 120 },
-        children: [new Paragraph({ children: [new TextRun(String(qty))] })]
+        children: [new Paragraph({ children: [new TextRun(`${entitlement.quantity} ${entitlement.unit}`)] })]
       })
     ]
   });
@@ -52,7 +52,7 @@ function copiesRow(label, qty, width) {
  * @param {{
  *   title: string, authorLegalName: string, contractDate: string,
  *   packageAddendumContent: { packageLabel: string, includedServices: string[],
- *     complimentaryCopies: { paperback: number, hardcover: number, ebook: number },
+ *     complimentaryEntitlements: { productFormName: string, quantity: number, unit: string }[],
  *     estimatedDelivery: string },
  *   packageFeeFormatted: string,
  *   paymentDisclosureSummaryLine: string
@@ -62,6 +62,7 @@ function copiesRow(label, qty, width) {
 async function generateSimplifiedPackageAddendumDocument(fields) {
   const content = fields.packageAddendumContent;
   const copyCols = [CONTENT_WIDTH / 2, CONTENT_WIDTH / 2];
+  const entitlementRows = content.complimentaryEntitlements.map((entitlement) => entitlementRow(entitlement, copyCols[0]));
 
   const doc = new Document({
     styles: {
@@ -88,15 +89,13 @@ async function generateSimplifiedPackageAddendumDocument(fields) {
         new Paragraph({ children: [new TextRun({ text: "Included Services", bold: true })] }),
         ...content.includedServices.map((s) => bulletParagraph(s)),
         new Paragraph({ text: "" }),
-        new Paragraph({ children: [new TextRun({ text: "Complimentary Copies", bold: true })] }),
+        new Paragraph({ children: [new TextRun({ text: "Complimentary Author Entitlements", bold: true })] }),
+        new Paragraph({ children: [new TextRun("Complimentary author copies and delivery entitlements are determined by the Product Forms elected for the title. Each elected print Product Form receives the package's approved print-copy allocation. Each elected digital Product Form receives one complimentary digital entitlement. An elected audiobook receives one complimentary author delivery entitlement upon publication.")] }),
+        new Paragraph({ text: "" }),
         new Table({
           width: { size: CONTENT_WIDTH, type: WidthType.DXA },
           columnWidths: copyCols,
-          rows: [
-            copiesRow("Paperback", content.complimentaryCopies.paperback, copyCols[0]),
-            copiesRow("Hardcover", content.complimentaryCopies.hardcover, copyCols[1]),
-            copiesRow("eBook (digital delivery)", content.complimentaryCopies.ebook, copyCols[0])
-          ]
+          rows: entitlementRows
         }),
         new Paragraph({ text: "" }),
         new Paragraph({ children: [new TextRun({ text: "Selected Payment Option: ", bold: true }), new TextRun(fields.paymentDisclosureSummaryLine)] }),

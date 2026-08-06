@@ -11,6 +11,7 @@ function baseInput(overrides = {}) {
     imprintLabel: "J Merrill Publishing",
     officialManuscriptWordCount: 48232,
     selectedPackageCode: "JMP-PKG-PRO",
+    electedProductForms: ["PF-01", "PF-02", "PF-03"],
     paymentOption: "EIGHT_PAYMENTS",
     contractDate: "2026-06-22",
     ...overrides
@@ -31,7 +32,11 @@ describe("computeAgreementFields — the controlled record's real values", () =>
     assert.equal(r.packageLabel, "Professional Publishing Package (JMP-PKG-PRO)");
     assert.equal(r.packageFeeUsd, 4500.00);
     assert.equal(r.packageFeeFormatted, "$4,500.00");
-    assert.deepEqual(r.complimentaryCopies, { paperback: 10, hardcover: 2, ebook: 1 });
+    assert.deepEqual(r.complimentaryEntitlements.map((e) => e.label), [
+      "Paperback: 10 copies",
+      "Hardcover: 10 copies",
+      "Standard Ebook: 1 digital entitlement"
+    ]);
     assert.equal(r.audiobookIncluded, true);
   });
 
@@ -69,20 +74,29 @@ describe("computeAgreementFields — audiobook inclusion", () => {
       title: "The Intentional Leader",
       officialManuscriptWordCount: 165482,
       selectedPackageCode: "JMP-PKG-PREMIER",
+      electedProductForms: ["PF-01", "PF-02", "PF-03"],
       paymentOption: "SINGLE"
     }));
     assert.equal(r.ok, true);
     assert.equal(r.packageLabel, "Premier Publishing Package (JMP-PKG-PREMIER)");
     assert.equal(r.packageFeeUsd, 7500.00);
     assert.equal(r.packageFeeFormatted, "$7,500.00");
-    assert.deepEqual(r.complimentaryCopies, { paperback: 15, hardcover: 5, ebook: 1 });
+    assert.deepEqual(r.complimentaryEntitlements.map((e) => e.label), [
+      "Paperback: 15 copies",
+      "Hardcover: 15 copies",
+      "Standard Ebook: 1 digital entitlement"
+    ]);
     assert.equal(r.paymentSchedule.totalFormatted, "$7,500.00");
   });
 
   test("Starter Package uses the governed complimentary-copy policy and no audiobook inclusion", () => {
     const r = computeAgreementFields(baseInput({ selectedPackageCode: "JMP-PKG-STARTER" }));
     assert.equal(r.ok, true);
-    assert.deepEqual(r.complimentaryCopies, { paperback: 5, hardcover: 0, ebook: 1 });
+    assert.deepEqual(r.complimentaryEntitlements.map((e) => e.label), [
+      "Paperback: 5 copies",
+      "Hardcover: 5 copies",
+      "Standard Ebook: 1 digital entitlement"
+    ]);
     assert.equal(r.audiobookIncluded, false);
   });
 });
@@ -103,6 +117,12 @@ describe("computeAgreementFields — does not invent values, validates instead",
     const r = computeAgreementFields(baseInput({ selectedPackageCode: "JMP-PKG-NOT-REAL" }));
     assert.equal(r.ok, false);
     assert.ok(r.errors.includes("SELECTED_PACKAGE_CODE_UNRECOGNIZED"));
+  });
+
+  test("rejects an empty elected Product Form set rather than assuming paperback/hardcover/ebook", () => {
+    const r = computeAgreementFields(baseInput({ electedProductForms: [] }));
+    assert.equal(r.ok, false);
+    assert.ok(r.errors.includes("ELECTED_PRODUCT_FORMS_REQUIRED"));
   });
 
   test("rejects an unrecognized payment option rather than guessing an amount", () => {

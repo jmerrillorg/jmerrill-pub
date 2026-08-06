@@ -25,6 +25,7 @@ function controlledInput(overrides = {}) {
     imprintLabel: "J Merrill Publishing",
     officialManuscriptWordCount: 48232,
     selectedPackageCode: "JMP-PKG-PRO",
+    electedProductForms: ["PF-01", "PF-02", "PF-03"],
     paymentOption: "EIGHT_PAYMENTS",
     contractDate: "2026-06-22",
     ...overrides
@@ -54,12 +55,17 @@ describe("generateSimplifiedAgreementPacket — gate enforcement and validation"
     process.env[GATE_NAME] = "true";
     const result = await generateSimplifiedAgreementPacket(controlledInput({
       selectedPackageCode: "JMP-PKG-PREMIER",
+      electedProductForms: ["PF-01", "PF-02", "PF-03"],
       officialManuscriptWordCount: 165482
     }));
     assert.equal(result.ok, true);
     assert.equal(result.fields.packageLabel, "Premier Publishing Package (JMP-PKG-PREMIER)");
     assert.equal(result.fields.packageFeeFormatted, "$7,500.00");
-    assert.deepEqual(result.fields.complimentaryCopies, { paperback: 15, hardcover: 5, ebook: 1 });
+    assert.deepEqual(result.fields.complimentaryEntitlements.map((e) => e.label), [
+      "Paperback: 15 copies",
+      "Hardcover: 15 copies",
+      "Standard Ebook: 1 digital entitlement"
+    ]);
   });
 });
 
@@ -95,7 +101,11 @@ describe("generateSimplifiedAgreementPacket — produces the package-specific, s
     const result = await generateSimplifiedAgreementPacket(controlledInput());
     assert.equal(result.fields.packageLabel, "Professional Publishing Package (JMP-PKG-PRO)");
     assert.equal(result.fields.packageFeeFormatted, "$4,500.00");
-    assert.deepEqual(result.fields.complimentaryCopies, { paperback: 10, hardcover: 2, ebook: 1 });
+    assert.deepEqual(result.fields.complimentaryEntitlements.map((e) => e.label), [
+      "Paperback: 10 copies",
+      "Hardcover: 10 copies",
+      "Standard Ebook: 1 digital entitlement"
+    ]);
     assert.equal(result.fields.audiobookIncluded, true);
     assert.equal(result.fields.paymentSchedule.installments, 8);
     assert.equal(result.fields.paymentSchedule.totalFormatted, "$4,680.00");
@@ -114,7 +124,11 @@ describe("generateSimplifiedAgreementPacket — omits the audiobook document whe
     process.env[GATE_NAME] = "true";
     const result = await generateSimplifiedAgreementPacket(controlledInput({ selectedPackageCode: "JMP-PKG-STARTER" }));
     assert.equal(result.ok, true);
-    assert.deepEqual(result.fields.complimentaryCopies, { paperback: 5, hardcover: 0, ebook: 1 });
+    assert.deepEqual(result.fields.complimentaryEntitlements.map((e) => e.label), [
+      "Paperback: 5 copies",
+      "Hardcover: 5 copies",
+      "Standard Ebook: 1 digital entitlement"
+    ]);
     assert.equal(result.fields.audiobookIncluded, false);
     assert.equal(result.documents.length, 2);
   });

@@ -544,19 +544,22 @@ What You Need Before Starting: Package or track, author-copy policy, publication
 Steps:
 
 1. Confirm the package or track.
-2. Use the current author-copy policy.
-3. Confirm the edition has been published before promising delivery.
-4. Record copy quantities by paperback, hardcover, and ebook.
-5. Arrange fulfillment through the approved process.
-6. Preserve fulfillment proof and author communication.
+2. Confirm the approved and elected Product Forms for the title.
+3. Use the current author-copy policy.
+4. Confirm the elected edition or delivery form has been published or delivered before promising fulfillment.
+5. Record the complimentary entitlement by elected Product Form.
+6. Arrange fulfillment through the approved process.
+7. Preserve fulfillment proof and author communication.
+
+Plain-English Rule: The package determines how many complimentary print copies are provided. The elected Product Forms determine which print editions receive them. Each elected digital Product Form receives one digital delivery, and an elected audiobook receives one author delivery after publication.
 
 Jackie Approval Required? Required for exceptions, replacements, or additional free copies.
 
 Evidence to Preserve: Policy used, quantities, fulfillment request, delivery proof, communication.
 
-What Good Looks Like: Included copies match the current policy and delivery timing.
+What Good Looks Like: Included copies and digital or audio deliveries match the current policy, the elected Product Forms, and delivery timing.
 
-When to Stop: Stop if the package, delivery address, edition status, or exception authority is unclear.
+When to Stop: Stop if the package, elected Product Forms, delivery address, edition status, or exception authority is unclear.
 
 Related Forms and Templates: Complimentary-copy policy; author-copy order support.
 
@@ -575,7 +578,7 @@ What You Need Before Starting: Title, edition, requested quantity, delivery addr
 Steps:
 
 1. Confirm whether the request is complimentary or purchased.
-2. Confirm edition availability.
+2. Confirm the elected Product Form and edition availability.
 3. Confirm pricing or quote approval.
 4. Confirm payment requirements before fulfillment when required.
 5. Place or prepare the order through the approved channel.
@@ -585,9 +588,9 @@ Jackie Approval Required? Required for discounts, free extra copies, special shi
 
 Evidence to Preserve: Request, quote or price approval, payment proof when applicable, order record, delivery proof.
 
-What Good Looks Like: The author receives the requested copies and the business record distinguishes included benefits from purchased copies.
+What Good Looks Like: The author receives the requested copies and the business record distinguishes included benefits from purchased copies by elected Product Form.
 
-When to Stop: Stop if price, payment, edition availability, or address is unclear.
+When to Stop: Stop if price, payment, elected Product Form, edition availability, or address is unclear.
 
 Related Forms and Templates: Author-copy policy; package addendum; status update email.
 
@@ -623,4 +626,3 @@ When to Stop: Stop if rights, royalties, public listing, or author expectations 
 Related Forms and Templates: Title closeout checklist; retirement or reversion policy.
 
 System Support Reference: Use current closeout procedure and title evidence references.
-

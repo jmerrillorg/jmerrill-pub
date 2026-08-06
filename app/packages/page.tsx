@@ -17,9 +17,13 @@ const bookingUrl = 'https://outlook.office.com/book/JMerrillPublishing@jmerrill.
 const packageCopyBenefits = Object.fromEntries(
   packages.map((pkg) => [
     pkg.tier,
-    pkg.complimentaryCopies,
+    pkg.complimentaryEntitlements,
   ]),
-) as Record<string, { paperback: number; hardcover: number; ebook: number }>
+) as Record<string, {
+  printPerElectedPrintProductForm: number
+  digitalPerElectedDigitalProductForm: number
+  audioPerElectedAudiobookProductForm: string
+}>
 
 const matrix = [
   { feature: 'BASICS', starter: '', pro: '', premier: '', head: true },
@@ -65,22 +69,22 @@ const matrix = [
   { feature: 'Audiobook', starter: 'Separate line item', pro: 'Separate line item', premier: 'AI narration included through 8 PFH' },
   { feature: 'AUTHOR COPIES', starter: '', pro: '', premier: '', head: true },
   {
-    feature: 'Complimentary paperbacks',
-    starter: `${packageCopyBenefits.Starter.paperback} copies`,
-    pro: `${packageCopyBenefits.Professional.paperback} copies`,
-    premier: `${packageCopyBenefits.Premier.paperback} copies`,
+    feature: 'Complimentary print copies',
+    starter: `${packageCopyBenefits.Starter.printPerElectedPrintProductForm} per elected print Product Form`,
+    pro: `${packageCopyBenefits.Professional.printPerElectedPrintProductForm} per elected print Product Form`,
+    premier: `${packageCopyBenefits.Premier.printPerElectedPrintProductForm} per elected print Product Form`,
   },
   {
-    feature: 'Complimentary hardcovers',
-    starter: `${packageCopyBenefits.Starter.hardcover} copies`,
-    pro: `${packageCopyBenefits.Professional.hardcover} copies`,
-    premier: `${packageCopyBenefits.Premier.hardcover} copies`,
+    feature: 'Complimentary digital delivery',
+    starter: `${packageCopyBenefits.Starter.digitalPerElectedDigitalProductForm} per elected digital Product Form`,
+    pro: `${packageCopyBenefits.Professional.digitalPerElectedDigitalProductForm} per elected digital Product Form`,
+    premier: `${packageCopyBenefits.Premier.digitalPerElectedDigitalProductForm} per elected digital Product Form`,
   },
   {
-    feature: 'Complimentary eBooks',
-    starter: `${packageCopyBenefits.Starter.ebook} copy`,
-    pro: `${packageCopyBenefits.Professional.ebook} copy`,
-    premier: `${packageCopyBenefits.Premier.ebook} copy`,
+    feature: 'Audiobook author delivery',
+    starter: packageCopyBenefits.Starter.audioPerElectedAudiobookProductForm,
+    pro: packageCopyBenefits.Professional.audioPerElectedAudiobookProductForm,
+    premier: packageCopyBenefits.Premier.audioPerElectedAudiobookProductForm,
   },
 ]
 
