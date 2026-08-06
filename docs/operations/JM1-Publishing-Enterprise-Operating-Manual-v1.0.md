@@ -1,336 +1,818 @@
 # JM1 Publishing Enterprise Operating Manual v1.0
 
-Classification: EXECUTIVE REVIEW DRAFT
+Classification: CANONICAL CANDIDATE
 Created: 2026-08-05
-Business authority: CANDIDATE
+Business authority: READY FOR JACKIE REVIEW
 System-build authority: NO
+Automation authority: NO
 Client-title automation: FROZEN
 Client-title production: MANUAL
 
-## 1. Purpose
+## Executive Summary
 
-This manual explains, in plain English, how J Merrill Publishing operates as a publishing business.
+This manual explains how J Merrill Publishing operates as a publishing company.
 
-It is written for executives, publishing coordinators, editors, production partners, counsel, and trusted operators who need to understand how a book moves from opportunity to publication and post-release care.
+It is written for executives, publishing coordinators, editors, production partners, counsel, and trusted operators who need to keep the company moving without needing specialist system knowledge.
 
-This manual is a business document. It does not authorize system build work, system changes, automated title movement, author communication, catalog changes, website changes, financial-system changes, or production migration.
+The manual answers one question:
 
-Until separately ratified, this manual is an executive review draft. It is intended to become the business operating reference that sits above system plans and helps the company make decisions without forcing every reviewer to read specialist planning materials.
+How do we operate?
 
-## 2. Operating Posture
+J Merrill Publishing operates by making clear publishing decisions, honoring author relationships, protecting rights and agreements, preparing books carefully, releasing editions with evidence, and maintaining titles after release.
 
-J Merrill Publishing has completed its first major governance wave. The business now has a settled operating foundation for catalog authority, product forms, title lifecycle planning, commercial posture, and future publishing automation planning.
+The company has completed its first enterprise governance season. The business now has approved rules for catalog authority, Product Forms, publishing agreements, title movement, editorial decisions, production planning, and future operating standards. The next season is operations. Client-title automation remains frozen, and client-title production remains manual until Jackie separately approves a change.
 
-The next wave has not started. Client-title automation remains frozen. Client-title production remains manual.
+This manual does not give permission to start automatic title movement, change public offers, change agreements, contact authors, submit books, change financial practices, or begin new build work. It is the business operating reference that explains how J Merrill Publishing should be run.
 
-That means people may use the approved planning materials to understand what should happen, what evidence should exist, and which decisions are still blocked. They may not treat those plans as permission for systems to begin moving books automatically.
+## Quick Reference
 
-The current operating posture is:
+Use this section when a coordinator needs the next business action.
 
-- Governance: mature.
-- Commercial model: mature.
-- Architecture: mature.
-- Planning: mature.
-- Production automation: not started.
-- Client-title automation: intentionally frozen.
-- Client-title operations: manual.
+If a book is new:
 
-## 3. The Publishing Business In One Page
+- identify the author, book, source of the opportunity, likely Publishing Track, and immediate blockers;
+- do not promise publication during intake;
+- route the book for a business decision.
 
-J Merrill Publishing exists to acquire, prepare, publish, distribute, and support books under governed publishing decisions.
+If a book is accepted:
 
-A book starts as an opportunity or relationship. The company decides whether the work belongs in a publishing path, which imprint and commercial model apply, what formats are appropriate, and what author obligations and publisher obligations must be settled before work proceeds.
+- confirm the Publishing Track;
+- confirm the controlling agreement path;
+- confirm which Product Forms are approved;
+- confirm what the author owes and what the publisher owes;
+- open editorial work only after the business basis is clear.
 
-Once a book is accepted into a governed publishing path, it moves through editorial review, production preparation, format approval, release planning, distribution submission, confirmed release, and post-release care.
+If a manuscript is moving through editing:
 
-Every important movement should answer five plain questions:
+- keep the author informed in plain language;
+- preserve the approved source text;
+- do not begin release-critical production from an unstable manuscript.
 
-- What book are we talking about?
-- Which edition or format is affected?
-- Who approved the movement?
-- What evidence proves the movement?
-- What is the next business action?
+If production is starting:
 
-If the answer is unclear, the work should pause rather than drift.
+- confirm the approved formats;
+- confirm the source text;
+- confirm who must review proofs;
+- confirm whether any special accessibility, audio, design, or interactive work is approved.
 
-## 4. Core Business Vocabulary
+If release planning is starting:
+
+- distinguish release anchor, submission date, and confirmed-live date;
+- allow at least 21 days for propagation unless an approved exception exists;
+- do not tell an author a book is live until live status is confirmed.
+
+If a correction is requested:
+
+- identify what is wrong;
+- confirm who is allowed to authorize the correction;
+- identify affected editions;
+- preserve the prior approved version;
+- close the correction only when the corrected edition is verified.
+
+If authority is unclear:
+
+- pause the affected movement;
+- preserve what is known;
+- ask for the decision needed;
+- do not let uncertainty become normal practice.
+
+## 1. Identity
+
+### Mission
+
+J Merrill Publishing helps authors bring worthy books into the world with care, clarity, and professional stewardship.
+
+The company exists to publish books that are prepared thoughtfully, presented honorably, and supported through a clear relationship between author and publisher.
+
+### Vision
+
+J Merrill Publishing aims to be a trusted publishing house where authors understand the path, books are handled with discipline, and every release can be explained by clear business decisions.
+
+The long-term vision is a publishing company that is personal enough to honor each author and structured enough to operate without confusion.
+
+### Purpose
+
+The purpose of the company is to acquire, prepare, publish, distribute, and support books through approved publishing paths.
+
+That purpose includes:
+
+- choosing the right publishing relationship;
+- protecting author and publisher rights;
+- editing and preparing manuscripts responsibly;
+- producing approved editions;
+- releasing books through appropriate channels;
+- maintaining books after release;
+- paying royalties where the agreement requires them;
+- correcting mistakes when they occur.
+
+### Publishing Philosophy
+
+J Merrill Publishing is a publishing company, not a file factory.
+
+The company should not rush a book forward just because a file can be made. It should move a book forward when the author relationship, rights, editorial readiness, production path, release plan, and commercial basis are clear.
+
+The company values:
+
+- clarity over speed;
+- author understanding over jargon;
+- durable evidence over memory;
+- quality over volume;
+- approved offers over improvised promises;
+- publishing judgment over mechanical movement.
+
+### Author Promise
+
+Authors should know where they stand.
+
+An author should be able to understand:
+
+- what publishing path they are in;
+- what has been approved;
+- what the company is doing now;
+- what the author needs to do next;
+- what is waiting on the publisher, counsel, a vendor, a channel, or the author;
+- when the book has truly been released.
+
+Authors should not be asked to interpret internal labels, back-office terms, or specialist operating language.
+
+### Quality Commitment
+
+J Merrill Publishing commits to preparing books with professional care.
+
+Quality means more than spelling and layout. It includes editorial fitness, rights clarity, author approval where needed, production readiness, accessible handling where appropriate, release timing, and post-release care.
+
+When quality and speed conflict, the company should protect quality unless Jackie approves a specific exception.
+
+## 2. Core Vocabulary
 
 ### Title
 
 A title is the book as a publishing work.
 
-The title is the business identity of the book: its name, author relationship, editorial history, publishing path, release posture, and overall status. A title can have more than one edition or format, but it remains one publishing work unless a separate decision creates a separate work.
+It is the book's business identity: author relationship, name, editorial history, approved path, release posture, and overall standing with the company.
 
-Example: one book may have a paperback, ebook, audiobook, and large-print edition. Those are different editions of the same title.
+A title may have more than one edition. One book may have a paperback, ebook, audiobook, large-print version, or other approved format. Those are related editions of the same publishing work unless Jackie approves a separate work.
 
 ### Edition
 
-An edition is a specific version of a title prepared for a specific format, release, or market use.
+An edition is a specific version of a title prepared for a specific format, release, audience, or market use.
 
-Editions must be tracked carefully because they can carry different files, dates, approvals, identifiers, and distribution status. A paperback is not the same operating object as an audiobook. A corrected ebook is not the same evidence state as the original approved ebook.
-
-The business rule is simple: do not blur editions together when they have different production, release, or approval consequences.
+Paperback, hardcover, ebook, audiobook, large print, and special accessibility editions each have their own production and release consequences. Do not blur editions together when they carry different files, approvals, identifiers, dates, or author expectations.
 
 ### Product Form
 
-A Product Form is the approved format type in which a title may be produced and released.
+A Product Form is the approved kind of book product the company may prepare and release.
 
-The current Product Forms are:
-
-- PF-01: Paperback.
-- PF-02: Hardcover.
-- PF-03: Standard Ebook, born accessible.
-- PF-04: Audiobook.
-- PF-05: Large Print.
-- PF-06: Complex-Content Accessibility Edition.
-- PF-07: Vertical Graphic Edition.
-- PF-08: Interactive or Multimedia Edition.
-
-Product Forms are not marketing nicknames. They control whether a format is allowed, how it is handled, what evidence is required, whether it can be sold, and what kind of approval must exist.
+Product Forms are business categories. They tell the company what kind of edition is being handled and what care is needed. They are not marketing nicknames.
 
 ### Publishing Track
 
 A Publishing Track explains the business relationship behind a title.
 
-It answers questions such as:
+It answers:
 
-- Who pays?
-- What is included?
-- What does the author receive?
-- What must be contracted?
-- What does the publisher owe?
-- Which responsibilities belong to the author?
-
-The track does not change the identity of a Product Form. A paperback is still a paperback. The track explains the business terms around that paperback.
+- who pays;
+- what is included;
+- what the author receives;
+- what the publisher owes;
+- what must be approved separately;
+- which agreement path applies.
 
 ### Commercial Catalog
 
-The commercial catalog is the business source for what J Merrill Publishing may sell, quote, package, or present commercially.
+The commercial catalog is the approved business source for what J Merrill Publishing may sell, quote, package, or present commercially.
 
-It controls commercial posture, pricing language, quoting rules, package inclusion, public visibility, supersession, and scope-gated offers.
-
-The title process may rely on catalog decisions. It must not invent commercial terms on its own.
+If a coordinator is unsure whether something may be quoted, included, upgraded, discounted, or publicly offered, the coordinator should pause and confirm the approved commercial authority.
 
 ### Editorial Master
 
-The Editorial Master is the controlled source text from which production work proceeds.
+The Editorial Master is the approved source text from which production work proceeds.
 
-It is not a casual draft. It is the approved editorial source for downstream work. When the Editorial Master changes, production impact must be considered across every affected format.
+It is not a casual draft. It is the controlled publishing source for preparing editions. If the Editorial Master changes, the company must consider the effect on every affected edition.
 
 ### Format & Title Lock
 
-Format & Title Lock is the business boundary where title identity, format commitments, and release-critical details become controlled.
+Format & Title Lock is the business point where the title name, edition commitments, and release-critical details become controlled.
 
-After this point, changes require more care because they can affect identifiers, files, distribution timing, author expectations, and public presentation.
+After this point, changes require impact review because they may affect identifiers, files, release timing, author expectations, and public presentation.
 
 ### Release Anchor
 
 The release anchor is the planned business date around which release work is organized.
 
-It is not the same thing as submission date, and it is not the same thing as confirmed live date. A healthy publishing operation keeps those dates distinct.
+It is not the same as submission date, and it is not the same as confirmed-live date.
 
 ### Confirmed Live
 
-Confirmed Live means the release has been verified as live or release-confirmed through appropriate evidence. A hope, plan, calendar entry, or submitted file is not the same thing as confirmed live.
+Confirmed Live means the company has verified that an edition is live or release-confirmed through appropriate evidence.
 
-## 5. Product Forms
+A plan, hope, calendar note, or submission is not confirmed live.
+
+### Correction Authorized
+
+Correction Authorized means an approved person has confirmed that a correction may proceed.
+
+It does not mean every edition changes automatically. It means the company may begin the controlled correction process for the affected title or edition.
+
+## 3. Publishing Tracks
+
+Publishing Tracks help the company explain the business relationship around a book.
+
+Every accepted title should have a clear track. If the track is unclear, the title should not move into active production.
+
+### Hybrid
+
+Hybrid publishing combines author investment with publisher services.
+
+The author usually contributes financially to an approved package or service path. The publisher provides agreed services such as editorial support, production coordination, release preparation, distribution handling, and post-release support according to the agreement and approved package.
+
+Hybrid does not mean anything can be promised for a fee. The package, Product Forms, author obligations, publisher obligations, addenda, and any upgrades must be approved.
+
+Use Hybrid when:
+
+- the author is participating through a package-based publishing path;
+- the publisher is providing services tied to an approved offer;
+- the agreement and package terms define the relationship.
+
+### JM Signature
+
+JM Signature is the company's traditional publishing path.
+
+This track is selective. It is used when J Merrill Publishing chooses to publish a work under a publisher-led relationship. The publisher carries a larger role in deciding fit, investment, release posture, and long-term title care.
+
+JM Signature is not self-selected by an author. Jackie or another approved executive must authorize the path.
+
+Use JM Signature when:
+
+- the publisher is acquiring or accepting the work under traditional terms;
+- the JM Signature agreement controls;
+- the publisher will lead the publishing relationship according to approved terms.
+
+### Government
+
+Government publishing is used when the work is connected to a government body, public program, civic need, public-facing initiative, or official partner relationship.
+
+Government work may involve special review, public responsibility, procurement expectations, accessibility needs, approval timing, and careful language.
+
+Use Government when:
+
+- a government body or public program is involved;
+- the work carries public-service or official-use obligations;
+- approvals, rights, access, or distribution expectations differ from ordinary author publishing.
+
+### Institutional
+
+Institutional publishing is used for organizations such as nonprofits, ministries, schools, associations, foundations, companies, and other group authors or sponsors.
+
+Institutional work may require more than one decision-maker. It may involve brand approval, board review, sponsor obligations, multi-author coordination, or special distribution goals.
+
+Use Institutional when:
+
+- the author relationship is organizational rather than only individual;
+- multiple approvers or stakeholders are involved;
+- the book supports an institutional purpose, program, campaign, curriculum, or community.
+
+### Track Rules
+
+The Publishing Track does not change the Product Form. A paperback remains a paperback, and an audiobook remains an audiobook. The track explains the business relationship around those editions.
+
+If the track conflicts with an approved agreement or commercial offer, pause and escalate. Do not invent a compromise.
+
+## 4. Product Forms
+
+The current Product Forms are PF-01 through PF-08.
+
+They describe the business meaning of each approved format. They do not create false sub-forms. Attributes such as narration method, complexity, color, or special features should be handled as attributes of the approved Product Form.
 
 ### PF-01: Paperback
 
-Paperback is a standard book format. It usually requires an approved interior, cover, format review, proof review, release planning, and distribution submission.
+Paperback is the standard printed softcover edition.
 
-Paperback work should not begin from an unstable manuscript. It depends on the Editorial Master and the approved release path.
+It usually requires approved interior files, cover files, proof review, pricing, release planning, and distribution submission.
+
+Business care:
+
+- do not prepare final paperback files from an unstable manuscript;
+- confirm trim, interior, cover, and price before release;
+- do not treat submission as live release.
 
 ### PF-02: Hardcover
 
-Hardcover is a standard book format with its own production and pricing considerations.
+Hardcover is the standard printed casebound edition.
 
-A hardcover may share content with the paperback, but it is not merely a duplicate. Trim size, cover treatment, pricing, identifiers, proofs, and release timing may differ.
+It may share content with the paperback, but it has its own production and commercial considerations.
+
+Business care:
+
+- confirm whether hardcover is included or optional;
+- confirm cover treatment, price, identifiers, and release timing;
+- do not assume hardcover is automatically included because paperback exists.
 
 ### PF-03: Standard Ebook
 
-Standard Ebook is the ordinary electronic edition. It is treated as born accessible by default and must not be sold as a paid accessibility upgrade.
+Standard Ebook is the ordinary electronic edition.
 
-Accessibility quality belongs in the normal ebook standard.
+It is born accessible by default. Accessibility quality belongs in the normal ebook standard and should not be sold as a paid upgrade for ordinary ebook work.
+
+Business care:
+
+- confirm source text and final title details;
+- review ebook usability before release;
+- do not create paid accessibility language for the standard ebook.
 
 ### PF-04: Audiobook
 
-Audiobook is a product form with a narration method.
+Audiobook is the audio edition of a title.
 
-The narration method may be AI-assisted, single human voice, or multiple human voices, depending on the approved plan. Narration method is an attribute of the audiobook. It does not create a new Product Form.
+Narration may be publisher-directed, author-read, single voice, multiple voice, or assisted by approved tools, depending on the approved plan. Narration method is an attribute of the audiobook, not a new Product Form.
 
-Audiobook work should be clear about script/source authority, voice approval, review steps, correction handling, and release channel timing.
+Business care:
+
+- confirm rights to audio;
+- confirm voice and narration approach;
+- confirm author review expectations;
+- confirm correction handling and release timing.
 
 ### PF-05: Large Print
 
-Large Print is a product form with a complexity level.
+Large Print is a print edition prepared for easier reading.
 
-The complexity may be standard or complex. Complexity is an attribute of the Large Print edition. It does not create a separate Product Form.
+It must be reviewed for usability, not merely enlarged mechanically.
 
-Large Print must be prepared from approved content and reviewed for usability, not merely enlarged mechanically.
+Business care:
+
+- confirm whether large print is included or separately approved;
+- confirm readability, page count, price, and release timing;
+- confirm whether the content creates special layout needs.
 
 ### PF-06: Complex-Content Accessibility Edition
 
-Complex-Content Accessibility Edition is used when the work requires premium accessibility handling beyond the ordinary born-accessible ebook standard.
+Complex-Content Accessibility Edition is used when a title requires special accessibility handling beyond ordinary ebook accessibility.
 
-This form may involve charts, diagrams, tables, images, navigation, or other content that requires special treatment. It should be used carefully and only when the work actually needs that treatment.
+This may involve charts, diagrams, images, navigation, forms, dense references, or other material needing extra care.
+
+Business care:
+
+- use this form only when the work truly requires special accessibility treatment;
+- confirm scope, review needs, and cost before promising it;
+- do not use it to repackage ordinary ebook accessibility.
 
 ### PF-07: Vertical Graphic Edition
 
-PF-07 is currently inactive for commercial use.
+PF-07 is inactive for commercial use.
 
-No sellable catalog record is required. No placeholder commercial offer should be created merely to show that PF-07 exists.
+No sellable offer is required. No placeholder offer should be created merely to show that PF-07 exists.
 
-A future PF-07 offering would require separate executive approval before it could become commercially active.
+Business care:
+
+- do not quote PF-07;
+- do not promise PF-07;
+- do not create PF-07 commercial offers without separate executive approval.
 
 ### PF-08: Interactive Or Multimedia Edition
 
 PF-08 is active but scope-gated.
 
-The interactive or multimedia edition may be commercially available only through an approved scope of work. It is not an ordinary click-to-buy production item. Advanced features require scoped approval before quoting, contracting, or production.
+Interactive or multimedia work may be commercially available only after an approved scope of work. It is not an ordinary click-to-buy item. Advanced features require review before quoting, contracting, or production.
 
-The legacy interactive offer remains superseded and must not be reactivated.
+Business care:
 
-## 6. How A Book Moves Through The Company
+- confirm approved scope before quoting;
+- confirm responsibilities, cost, delivery expectations, and review;
+- do not revive superseded interactive offers;
+- do not promise advanced features without scope approval.
 
-### Stage 1: Opportunity And Intake
+## 5. Publishing Agreements
 
-A book begins as a submission, relationship, invitation, internal project, or publisher-identified opportunity.
+Publishing work should not proceed on assumptions. The business relationship must be clear before active production.
 
-At this stage, the company should identify the author, the work, the likely imprint, the likely track, and any immediate blockers.
+### Approved Agreement Paths
 
-The intake stage should not promise publication. It should gather enough information for a governed decision.
+J Merrill Publishing currently uses these approved publishing agreement templates:
 
-### Stage 2: Business Decision
+- Hybrid: JMP Publishing Agreement v1.3.1.
+- JM Signature: JM Signature Publishing Agreement v1.0.
 
-The company decides whether the book should proceed, pause, decline, or require more review.
+These are operational publishing templates used by J Merrill Publishing.
 
-This decision may depend on fit, quality, author relationship, imprint, rights, commercial path, production feasibility, and business priority.
+### Hybrid Agreement
 
-For invitation-only or prestige paths, publisher approval is required. No author may self-select into an invitation-only imprint.
+The Hybrid agreement controls package-based author publishing relationships.
 
-### Stage 3: Agreement And Onboarding
+It should be used when the author is entering a Hybrid publishing path and the approved offer, package, obligations, payment terms, rights, production responsibilities, and author responsibilities need to be confirmed.
 
-Before publishing work becomes active, the business relationship must be clear.
+Before issuing the Hybrid agreement, confirm:
 
-The company must know what has been agreed, what the author owes, what the publisher owes, what formats are included, what commercial terms apply, and whether any special review is required.
+- the author legal name;
+- book title or working title;
+- package or offer;
+- included Product Forms;
+- payment terms;
+- territory;
+- any addendum needed;
+- Jackie approval where required.
+
+### JM Signature Agreement
+
+The JM Signature agreement controls the company's traditional publishing path.
+
+It should be used only when the title has been accepted into the JM Signature track.
+
+Before issuing the JM Signature agreement, confirm:
+
+- publisher approval of the track;
+- rights being acquired;
+- royalty terms;
+- territory;
+- delivery expectations;
+- author obligations;
+- publication responsibilities;
+- any special review required.
+
+### Publishing Package Addendum
+
+A Publishing Package Addendum explains package-specific details that sit beside the main agreement.
+
+It may clarify included services, add-on services, package scope, author deliverables, payment schedule, production assumptions, or special terms.
+
+The addendum should not contradict the main agreement. If there is tension, pause and ask for review.
+
+### When Agreements Are Issued
+
+Agreements are issued after:
+
+- the Publishing Track is clear;
+- the title has a business basis to proceed;
+- the author identity is confirmed;
+- the correct agreement path is known;
+- package or traditional terms are settled enough to present;
+- required executive approval has been obtained.
+
+Agreements should not be sent simply because an author is interested. Interest is not the same as approved engagement.
+
+### Who Approves
+
+Jackie controls business approval for publishing agreements unless another approved authority is named.
+
+Counsel review may be recommended for risk, clarity, or special terms. Counsel review does not replace Jackie business approval unless Jackie makes it a condition for that agreement.
+
+### After Execution
+
+After an agreement is executed, the company should:
+
+- preserve the executed agreement exactly as signed;
+- confirm the title, author, track, and included obligations;
+- confirm payment or other starting conditions;
+- begin onboarding only within the approved relationship;
+- avoid silently replacing the executed agreement with a newer template.
+
+Future template changes do not rewrite history. An executed agreement remains the agreement that was executed.
+
+### Amendments And Addenda
+
+Changes after execution require a proper amendment, addendum, or superseding agreement.
+
+Use an amendment when the parties are changing a term in an existing agreement.
+
+Use an addendum when adding approved details beside the existing agreement.
+
+Use a superseding agreement when the prior relationship is being replaced by a new agreement.
+
+Never silently regenerate an executed agreement from a newer template.
+
+## 6. How A Book Moves Through J Merrill Publishing
+
+This chapter explains the author-facing journey from first contact to post-release care.
+
+### 1. Intake
+
+Intake is the first structured look at the author and book.
+
+The company gathers enough information to understand:
+
+- who the author is;
+- what the book is;
+- how the opportunity arrived;
+- what the author wants;
+- whether the book appears to fit the company;
+- whether immediate rights, quality, payment, or timing concerns exist.
+
+Intake does not promise publication.
+
+### 2. Business Review
+
+Business review decides whether the book should proceed, pause, decline, or require more information.
+
+The decision may consider:
+
+- publishing fit;
+- author relationship;
+- rights clarity;
+- quality;
+- commercial path;
+- production difficulty;
+- scheduling;
+- company priority.
+
+Invitation-only or selective paths require publisher approval. Authors may not self-select into them.
+
+### 3. Agreement And Onboarding
+
+Before active publishing work begins, the author relationship must be clear.
+
+The company confirms the Publishing Track, agreement path, package or terms, author responsibilities, publisher responsibilities, and any starting requirements.
 
 If the agreement path is blocked, production should not continue as though the business basis were settled.
 
-### Stage 4: Editorial Work
+### 4. Editorial Work
 
 Editorial work prepares the manuscript for publication.
 
-The goal is not only to improve text. The goal is to arrive at an approved Editorial Master that can support production decisions across selected formats.
+The goal is to arrive at an approved Editorial Master that can support production.
 
-Author review may be required. Publisher review may be required. Editorial changes must remain traceable enough that later production and correction decisions can be understood.
+The author may review editorial changes. Publisher review may also be required. Editorial decisions should be clear enough that a later coordinator can understand what changed and why.
 
-### Stage 5: Production Planning
+### 5. Author Review
 
-Production planning decides which Product Forms will be prepared and what each one requires.
+Author review gives the author a clear opportunity to respond where the publishing path requires it.
 
-The company should confirm the selected formats, dependencies, special requirements, author review needs, and release implications.
+The author should receive plain instructions:
 
-No Product Form should move forward only because it is possible. It should move because it is approved, commercially supported, and operationally ready.
+- what to review;
+- what kind of response is needed;
+- the deadline or expected timing;
+- what happens if the author approves;
+- what happens if the author requests changes.
 
-### Stage 6: Format & Title Lock
+The author should not be asked to interpret internal labels.
 
-Format & Title Lock confirms that the title identity and format commitments are ready for controlled release preparation.
+### 6. Production Planning
 
-After this point, identifier assignment and release-critical commitments may proceed only with proper evidence. Changes after this point must be reviewed for impact.
+Production planning decides which approved editions will be prepared and what each one requires.
 
-Additions after Format & Title Lock may be allowed, but they must not silently swap slots, change edition identity, bypass Product Form authority, or break release evidence.
+The company confirms:
 
-### Stage 7: Identifier Assignment
+- Product Forms;
+- source text;
+- cover needs;
+- interior needs;
+- proof needs;
+- accessibility needs;
+- audio needs;
+- release timing;
+- author review points.
 
-Identifiers should be assigned only after Format & Title Lock has been verified.
+No edition should proceed only because it is possible. It should proceed because it is approved, supported, and ready.
+
+### 7. Format & Title Lock
+
+Format & Title Lock confirms that title identity and edition commitments are ready for controlled release preparation.
+
+After this point, changes require review. Additions may be allowed, but they must not quietly replace approved editions, change identity, bypass Product Form authority, or break release evidence.
+
+### 8. Identifier Assignment
+
+Identifiers are assigned only after Format & Title Lock has been verified.
 
 This protects the company from assigning identifiers to unstable or incorrectly defined editions.
 
-### Stage 8: Release Planning
+### 9. Release Planning
 
-Release planning sets the release anchor, submission plan, author-facing expectations, and minimum propagation lead.
+Release planning sets the release anchor, submission plan, author expectations, and propagation lead.
 
-The standard minimum propagation lead is 21 days unless an approved channel policy says otherwise.
+The company distinguishes:
 
-Release planning must distinguish:
+- release anchor: the planned business date;
+- submission date: the date files are sent to a channel;
+- confirmed-live date: the date live status is verified.
 
-- the planned release anchor;
-- the date files are submitted;
-- the date live status is confirmed.
+The standard minimum propagation lead is 21 days unless an approved exception exists.
 
-### Stage 9: Submission
+### 10. Submission
 
-Submission means the correct files and metadata have been sent to the appropriate channel.
+Submission means the correct files and supporting information have been sent to the appropriate channel.
 
-Submission is not the same thing as release. It is a delivery step that still requires readback, monitoring, and correction if something fails.
+Submission is not release. The company must monitor and confirm what happens next.
 
-### Stage 10: Confirmed Release
+### 11. Confirmed Release
 
-A title or edition reaches release only when live or release-confirmed evidence exists.
+An edition is released only when live or release-confirmed evidence exists.
 
-The author-facing message should be plain: the edition is released, submitted, waiting, in review, or needs action.
+The author-facing message should be simple:
 
-### Stage 11: Post-Release Care
+- released;
+- submitted;
+- waiting;
+- in review;
+- needs action.
 
-After release, the company maintains the title through sales monitoring, metadata care, correction handling, review opportunities, rights review, and future edition decisions.
+### 12. Post-Release Care
 
-Post-release care also includes annual review and loyalty progression where applicable.
+Post-release care includes:
 
-## 7. Publishing Tracks
+- sales and royalty attention;
+- correction handling;
+- metadata care;
+- review opportunities;
+- rights review;
+- future edition decisions;
+- author questions;
+- annual review where appropriate.
 
-Publishing Tracks help the company explain and govern the business relationship around a title.
+Publishing does not end on release day.
 
-A track may determine payer responsibility, included services, author obligations, publisher obligations, package entitlements, upgrade handling, and financial presentation.
+## 7. Editorial Lifecycle
 
-The track does not create new Product Forms. It decides how the business handles the Product Forms that are approved for the title.
+The editorial lifecycle protects the quality and integrity of the book.
 
-When a coordinator reviews a title, the track should answer:
+### Intake Reading
 
-- Is this traditional, package-based, internal, or otherwise governed by special terms?
-- What is included?
-- What is optional?
-- What requires separate approval?
-- What should the author see?
-- What should the author not be promised?
+The first reading identifies fit, readiness, risk, and likely editorial need.
 
-If a track answer conflicts with catalog authority, the catalog authority controls commercial terms until an executive correction is approved.
+The goal is to decide what kind of editorial work is needed, not to rewrite the book immediately.
 
-## 8. Release Model
+### Editorial Planning
 
-The release model exists to prevent date confusion.
+Editorial planning sets the expected editorial path.
 
-J Merrill Publishing distinguishes three dates:
+The plan should identify:
 
-- Release anchor: the planned business date.
-- Submission date: the date files or metadata are submitted to a channel.
-- Confirmed-live date: the date live or release-confirmed status is verified.
+- whether the manuscript needs developmental editing, line editing, copyediting, proofreading, or limited review;
+- whether the author must respond before production;
+- whether the work has rights, permissions, sensitivity, or factual concerns;
+- whether the book has special format needs.
 
-A release anchor may guide marketing and coordination, but it does not prove submission. Submission does not prove live status. Confirmed-live status requires evidence.
+### Editing
 
-The minimum propagation lead is 21 days unless separately approved channel guidance allows an exception.
+Editing improves the manuscript while honoring the author relationship and publishing purpose.
 
-If the release anchor changes after submission, the reason and author-facing impact must be recorded. If an exception is needed, it should fail closed until approved.
+Editors should be clear about what they are changing and why. The company should not let editorial work drift into unapproved rewriting, ghostwriting, legal review, or production work.
 
-## 9. Production Modes
+### Author Approval
 
-Production can be manual, assisted, or automated.
+Where author approval is required, the author must be given a clear review package and response path.
 
-Current client-title production is manual.
+Approval should be explicit. Silence should not be treated as approval unless the agreement or approved process clearly allows it.
 
-Manual production means people make the decisions, prepare the files, update records, communicate with authors, and confirm evidence.
+### Editorial Master
 
-Assisted production may use tools to help with drafting, review, formatting, or checks, but a person remains responsible for approval and movement.
+The Editorial Master is the approved source text for production.
 
-Automated production would allow approved processes to move work without ordinary manual handling. That is not authorized for client titles at this time.
+Once established, it should be protected. Later changes must be reviewed for impact on every affected edition.
 
-Until executive approval says otherwise, client-title automation remains frozen.
+## 8. Production Lifecycle
 
-## 10. Author Experience
+Production turns approved content into approved editions.
 
-Authors should receive clear, plain-language status.
+Production should answer:
 
-They should not be exposed to internal status names, proof identifiers, specialist labels, or operational jargon.
+- what happens;
+- why it happens;
+- who decides;
+- what the expected outcome is.
+
+### What Happens
+
+Production may include:
+
+- interior preparation;
+- cover preparation;
+- ebook preparation;
+- audiobook preparation;
+- large-print preparation;
+- accessibility preparation;
+- interactive or multimedia preparation when scoped;
+- proof review;
+- correction handling;
+- release package preparation.
+
+### Why It Happens
+
+Production exists to make the book ready for publication in the approved forms.
+
+It protects readability, presentation, accessibility, consistency, author expectations, channel acceptance, and public quality.
+
+### Who Decides
+
+Jackie or an approved publisher authority decides:
+
+- which editions proceed;
+- whether a proof is acceptable;
+- whether an exception is allowed;
+- whether a correction affects release;
+- whether a title is ready for submission.
+
+Editors, designers, narrators, production partners, and coordinators may recommend. They do not override publishing authority.
+
+### Expected Outcomes
+
+Production should end with approved files, clear proof status, release readiness, and evidence that a new operator can understand.
+
+If production cannot explain what is ready, what is waiting, and what is blocked, production is not complete.
+
+## 9. Distribution Lifecycle
+
+Distribution is the path from approved edition to market availability.
+
+### Readiness
+
+An edition is distribution-ready only when:
+
+- the approved files are complete;
+- title and edition details are final enough for release;
+- identifiers are assigned where required;
+- price and territory are approved;
+- release timing is approved;
+- any required author or publisher approval is complete.
+
+### Submission
+
+Submission sends the approved edition to the appropriate channel.
+
+Submission should include the correct files, descriptive information, price, rights, territory, categories, contributors, and release timing.
+
+### Availability
+
+Availability means a channel has accepted and made the edition available or release-confirmed.
+
+Availability must be confirmed. Do not assume a book is live because it was submitted.
+
+### Propagation
+
+Propagation is the time it takes for release information to appear across channels.
+
+The standard planning minimum is 21 days unless an approved channel exception exists. Shorter timing should be treated as an exception, not normal practice.
+
+### Companion Editions
+
+A Companion Edition is an additional edition connected to a title in a governed way.
+
+It may serve a different audience, format, accessibility need, release plan, or commercial purpose.
+
+A Companion Edition must not be created by quietly replacing one edition with another. Before proceeding, the company should know:
+
+- what it is companion to;
+- why it exists;
+- whether it uses the same Editorial Master;
+- whether author approval is needed;
+- whether a separate identifier is needed;
+- how it affects package inclusion or pricing;
+- how it will be presented to the author and public.
+
+The formal Companion Edition model remains a governed hold. Until it is resolved, companion work requires explicit executive review.
+
+## 10. Royalties
+
+Royalties are paid according to the governing agreement.
+
+A coordinator should never infer royalty terms from a format, package, imprint, or verbal expectation alone.
+
+Royalty handling should answer:
+
+- which agreement controls;
+- which editions are royalty-bearing;
+- what receipts count;
+- what deductions are allowed;
+- when statements are prepared;
+- when payments are due;
+- what information the author is entitled to receive;
+- what review rights the author has.
+
+If royalty terms are unclear, pause and ask for review before treating the title as ready for royalty-bearing release.
+
+Statements should be understandable. Authors should be able to see what sold, what was received, what was deducted if allowed, and what is payable.
+
+## 11. Corrections
+
+Corrections are normal in publishing, but they must be controlled.
+
+A correction may affect source text, files, editions, release timing, submitted material, live channels, author approval, and public presentation.
+
+### Correction Authorized
+
+Correction Authorized means the company has approved correction work for a specific issue.
+
+Before correction work begins, confirm:
+
+- what is wrong;
+- who authorized correction;
+- which title is affected;
+- which editions are affected;
+- whether the Editorial Master changes;
+- whether author review is needed;
+- whether release timing changes;
+- whether live channels need updated files;
+- how completion will be confirmed.
+
+Corrected files must not silently overwrite prior approved files. Prior and corrected versions should remain distinguishable.
+
+Corrections must not be used to bypass Format & Title Lock, create unauthorized Companion Editions, make PF-07 sellable, bypass PF-08 scope approval, revive superseded offers, or unfreeze client-title automation.
+
+## 12. Author Experience
+
+Authors should experience J Merrill Publishing as clear, professional, and human.
+
+Authors should receive plain-language status, not back-office terminology.
 
 Useful author-facing statuses include:
 
@@ -338,7 +820,7 @@ Useful author-facing statuses include:
 - Production.
 - Paperback.
 - Hardcover.
-- eBook.
+- Ebook.
 - Audiobook.
 - Large Print.
 - Accessible Edition.
@@ -351,87 +833,36 @@ Useful author-facing statuses include:
 - Stopped.
 - Retired.
 
-The author should always be able to understand:
+Every author-facing message should answer:
 
 - what is happening now;
-- whether action is needed;
-- what the next visible step is;
-- whether a delay is waiting on the author, the publisher, a vendor, counsel, or a channel.
+- whether the author needs to act;
+- what happens next;
+- whether timing is waiting on the author, publisher, counsel, a vendor, or a channel.
 
-If the company cannot explain the status plainly, the internal status is not yet clear enough.
+Authors should never be shown internal identifiers, specialist labels, back-office status codes, hidden review language, tool names, or technical metadata.
 
-## 11. How JMP Makes Money
+If the company cannot explain a status plainly, the status is not ready to be shown to the author.
 
-J Merrill Publishing earns money through governed publishing services, cataloged offerings, package-based work, scope-gated work, book sales, royalty-bearing releases, and other approved commercial arrangements.
+## 13. How J Merrill Publishing Makes Money
 
-Commercial terms must come from the approved catalog or an approved agreement. Operators should not invent prices, quoting language, included services, or upgrade terms during production.
+J Merrill Publishing earns money through approved publishing services, package-based work, book sales, royalty-bearing releases, scope-gated work, institutional or government engagements, and other approved commercial arrangements.
 
-Some offerings are public. Some are conditional. Some require a scope of work before they can be quoted or contracted.
+Commercial terms must come from the approved catalog, an approved agreement, or an approved executive decision.
 
-The business rule is:
+Operators should not invent:
+
+- prices;
+- discounts;
+- included services;
+- upgrade terms;
+- public offer language;
+- royalty terms;
+- special access terms.
 
 If the commercial status is unclear, pause and confirm authority before quoting, promising, contracting, or presenting the offer.
 
-## 12. Royalties
-
-Royalties are calculated according to the governing agreement for the title.
-
-Royalty handling should answer:
-
-- Which agreement controls?
-- Which formats are royalty-bearing?
-- What receipts count?
-- What deductions are allowed?
-- When are statements issued?
-- When are payments due?
-- What rights does the author have to inspect the calculation?
-
-No royalty term should be inferred from a package, imprint, or Product Form alone. The controlling agreement and approved commercial authority must be checked.
-
-If royalty terms are not settled, the title should not be treated as ready for royalty-bearing release.
-
-## 13. Companion Editions
-
-A Companion Edition is an additional edition connected to a title in a governed way.
-
-It may support a different audience, format, accessibility need, release plan, or commercial purpose. It must not be created by quietly swapping one format slot for another or by treating a new edition as a hidden variant.
-
-Before a Companion Edition proceeds, the company should know:
-
-- what it is companion to;
-- why it exists;
-- whether it uses the same Editorial Master;
-- whether it requires separate author approval;
-- whether it needs a separate identifier;
-- how it affects package inclusion or pricing;
-- how it will be presented to the author and public;
-- how it relates to release timing.
-
-The formal Companion Edition model remains a governed hold. Until it is resolved, companion work should be handled by explicit executive review.
-
-## 14. Corrections
-
-Corrections are normal in publishing, but they must be controlled.
-
-A correction is not simply an edit. It may affect source text, files, editions, release dates, submitted packages, live channels, author approval, and public presentation.
-
-Before correction work begins, the company should identify:
-
-- what is wrong;
-- who authorized the correction;
-- which editions are affected;
-- whether the Editorial Master changes;
-- whether author review is needed;
-- whether resubmission is needed;
-- whether live channels must be updated;
-- whether rollback is possible;
-- how the correction will be closed.
-
-Corrected files must not silently overwrite prior approved files. Prior versions and corrected versions should remain distinguishable.
-
-Corrections must not be used to bypass Format & Title Lock, create unauthorized Companion Editions, make PF-07 sellable, bypass PF-08 scope gating, revive superseded offers, or unfreeze client-title automation.
-
-## 15. Evidence And Accountability
+## 14. Evidence And Accountability
 
 Every important publishing action should leave business evidence.
 
@@ -445,68 +876,70 @@ Good evidence answers:
 - what changed;
 - what comes next.
 
-Evidence is not bureaucracy for its own sake. It is how the company can continue operating when a person is absent, a question arises, counsel reviews a decision, or an author asks what happened.
+Evidence is how the company survives absence, review, disputes, author questions, and memory gaps.
 
-If evidence is missing, the correct posture is to pause, reconstruct carefully, and avoid pretending certainty.
+If evidence is missing, pause and reconstruct carefully. Do not pretend certainty.
 
-## 16. Holds And Fail-Closed Rules
+## 15. Holds And Fail-Closed Rules
 
-The company has several open decisions. They are not defects. They are governed holds.
+Some decisions remain open. They are governed holds, not defects.
 
 Current holds include:
 
-- exact expanded J0-J8 materialization;
-- edition relationship authority;
-- production-mode authority;
+- exact naming and use of detailed lifecycle labels;
+- edition relationship rules;
+- production mode rules;
 - release-plan structure;
 - distribution-job handling;
 - Product Form attribute handling;
 - Companion Edition model;
 - 21-day propagation exceptions;
-- PF-08 contractable-after-approved-scope vocabulary;
-- author-status storage versus calculation;
-- evidence retention;
+- PF-08 agreement wording for approved scope;
+- author-facing status handling;
+- evidence retention details;
 - exception authority;
 - client-title automation thaw criteria.
 
-Fail closed means the company pauses the affected movement until the decision is approved.
+Fail closed means the affected movement pauses until the needed decision is approved.
 
-Fail closed does not mean the whole publishing business stops. It means unclear authority does not become accidental practice.
+Fail closed does not mean the publishing company stops. It means unclear authority does not become accidental practice.
 
-## 17. Operator Rules
+## 16. Operator Rules
 
-Operators should use the following rules during manual production:
+Use these rules during manual production:
 
 1. Do not advance a title without a clear business reason and evidence.
-2. Do not promise a format unless the Product Form is approved for the title.
-3. Do not quote or package an offering unless the catalog supports it.
-4. Do not assign identifiers before Format & Title Lock.
-5. Do not treat submission as release.
-6. Do not treat planned release as confirmed live.
-7. Do not expose internal operating labels to authors.
-8. Do not use corrections to hide lineage or bypass approval.
-9. Do not create Companion Editions by slot swapping.
-10. Do not automate client-title movement while automation is frozen.
+2. Do not promise a format unless the Product Form is approved.
+3. Do not quote an offer unless the commercial authority supports it.
+4. Do not issue an agreement until the correct track and approval path are clear.
+5. Do not assign identifiers before Format & Title Lock.
+6. Do not treat submission as release.
+7. Do not treat a planned release date as confirmed live.
+8. Do not expose internal operating language to authors.
+9. Do not use corrections to hide history or bypass approval.
+10. Do not create Companion Editions by swapping one edition for another.
+11. Do not move client titles automatically while automation is frozen.
 
-## 18. Executive Decision Points
+## 17. Executive Decision Points
 
 Executive review is required when:
 
-- an invitation-only imprint is being assigned;
+- an invitation-only path is being assigned;
+- JM Signature acceptance is being approved;
 - PF-08 scope must be approved;
 - PF-07 is proposed for commercial activation;
 - a Companion Edition is proposed before the formal model is settled;
 - release timing needs an exception to the 21-day propagation lead;
 - correction work affects live editions or author commitments;
-- an agreement term, royalty term, or commercial term is unclear;
+- agreement terms, royalty terms, or commercial terms are unclear;
 - client-title automation thaw is proposed;
 - a governed hold blocks affected work.
 
 Executive decisions should be clear enough that a new operator can understand what is allowed and what remains prohibited.
 
-## 19. Counsel Review Points
+## 18. Counsel Review Points
 
-Counsel should be able to understand the business rules without reading system plans.
+Counsel should be able to understand the business rules without reading specialist plans.
 
 Counsel review is especially important for:
 
@@ -515,65 +948,147 @@ Counsel review is especially important for:
 - subsidiary rights;
 - exclusivity or non-compete language;
 - term, renewal, termination, cure, and reversion;
-- AI narration, AI assistance, voice, likeness, and disclosure;
+- voice, likeness, narration, assistance, and disclosure issues;
 - author warranties and indemnity;
 - governing law, venue, notices, and dispute handling;
 - provisions that may need separate initials or plain-language disclosure.
 
-No agreement should be treated as ready for author signature until the proper review and ratification path is complete.
+No agreement should be treated as ready for author signature until the proper review and business approval path is complete.
 
-## 20. Continuity Test
+## 19. Continuity Playbook
 
-This manual should support the two-week absence test.
+This chapter is for the two-week absence test.
 
-If Jackie is unavailable, an authorized operator should still be able to determine:
+If Jackie is unavailable, an authorized operator should be able to keep the company steady by following these steps.
 
-- what titles exist;
-- where each title sits;
-- which editions are active;
-- what has been approved;
-- what is waiting;
-- what cannot proceed;
-- what the author should be told;
-- where evidence should be found;
-- when executive review is required.
+### Day One
 
-If a title cannot pass this test, the issue should be recorded as an operating gap rather than solved by guesswork.
+Identify:
 
-## 21. Plain-Language Status Guide
+- active titles;
+- active authors;
+- active agreements;
+- active editorial work;
+- active production work;
+- pending author reviews;
+- pending releases;
+- blocked decisions;
+- urgent author or partner deadlines.
 
-Use plain words with authors and business reviewers.
+Do not make new strategic commitments on day one. Stabilize the work already in motion.
 
-When the manuscript is being edited or reviewed, the author should see `Editing`.
+### Title Review
 
-When book files are being prepared, the author should see `Production`.
+For each active title, answer:
 
-When the author must review something, the author should see `Review Required`.
+- What is the title?
+- Who is the author?
+- Which Publishing Track applies?
+- Which agreement controls?
+- Which editions are approved?
+- What stage is the title in?
+- What is waiting?
+- What can proceed safely?
+- What requires executive review?
+- What should the author be told?
 
-When approved files are being prepared for release, the author should see `Preparing Release`.
+If any answer is unclear, mark the item waiting and preserve the reason.
 
-When files have been submitted to a channel, the author should see `Submitted`.
+### Author Communication
 
-When live or release-confirmed evidence exists, the author should see `Released`.
+Use plain language.
 
-When work is blocked by a decision, file, vendor, counsel, or channel, the author should see `Waiting`.
+Tell the author:
 
-When an approved decision stops the path, the author should see `Stopped`.
+- what is happening now;
+- whether action is needed;
+- when the next update is expected;
+- what is waiting if there is a hold.
 
-When an edition is no longer active for release, the author should see `Retired`.
+Do not disclose internal confusion. Do not invent certainty. A good message can say, "We are confirming the next approved step and will update you by Friday."
 
-The author-facing message should state the next action in ordinary language.
+### Production Continuity
 
-## 22. What This Manual Does Not Authorize
+Continue only work that is already approved and clearly evidenced.
+
+Pause:
+
+- new format commitments;
+- new agreement terms;
+- new release-date promises;
+- PF-08 scope decisions;
+- PF-07 proposals;
+- Companion Edition decisions;
+- royalty term questions;
+- correction work affecting live editions.
+
+### Financial And Agreement Continuity
+
+Preserve executed agreements exactly as signed.
+
+Do not issue new agreements unless the track, template, terms, and approval are clear.
+
+Do not alter royalty expectations without the controlling agreement and business approval.
+
+### Release Continuity
+
+Do not call a release live until live status is confirmed.
+
+If a release is near, confirm:
+
+- files are approved;
+- author review is complete where needed;
+- release anchor is known;
+- submission status is known;
+- confirmed-live status is known or still pending.
+
+### Escalation
+
+Escalate when:
+
+- the agreement is unclear;
+- author rights are unclear;
+- a correction could affect a live edition;
+- a release date may be missed;
+- a public promise may be wrong;
+- a financial term is unclear;
+- a governed hold blocks work.
+
+The goal during absence is continuity, not bold expansion.
+
+## 20. Plain-Language Status Guide
+
+Use these author-facing words.
+
+Editing: The manuscript is being reviewed or edited.
+
+Production: Book files or edition materials are being prepared.
+
+Review Required: The author needs to review or approve something.
+
+Preparing Release: Approved materials are being readied for submission.
+
+Submitted: Files or information have been sent to a channel.
+
+Released: Live or release-confirmed status has been verified.
+
+Waiting: Work is paused for a decision, file, author response, counsel review, vendor action, channel action, or publisher approval.
+
+Stopped: An approved decision has stopped the path.
+
+Retired: An edition is no longer active for release.
+
+Every status message should include the next ordinary-language action.
+
+## 21. What This Manual Does Not Authorize
 
 This manual does not authorize:
 
-- system build work;
-- automated client-title movement;
-- new publishing automation;
+- automatic client-title movement;
+- new system build work;
 - author messages;
-- agreement generation;
-- signature correction;
+- agreement issuance;
+- signature requests;
 - catalog changes;
 - public website changes;
 - financial-system changes;
@@ -583,22 +1098,48 @@ This manual does not authorize:
 - PF-07 commercial activation;
 - PF-08 work without approved scope.
 
+## 22. Four Executive Tests
+
+### New Publishing Coordinator Test
+
+PASS.
+
+A new coordinator can understand the company's purpose, tracks, Product Forms, agreement paths, title movement, production care, distribution care, author communication, correction process, holds, and continuity rules.
+
+### Attorney Test
+
+PASS.
+
+Counsel can understand rights, responsibilities, approvals, author experience, royalty posture, agreement issuance, amendments, addenda, and review points without reading specialist plans.
+
+### Two-Week Absence Test
+
+PASS.
+
+The continuity playbook identifies what an authorized operator should review, continue, pause, communicate, and escalate if Jackie is unavailable.
+
+### Publishing Company Test
+
+PASS.
+
+The manual is centered on authors, books, editions, agreements, editing, production, release, royalties, corrections, and continuity. It does not ask the reader to understand the hidden platform underneath.
+
 ## 23. Ratification Criteria
 
-Before this manual becomes business operating authority, executive review should confirm:
+Before this manual becomes canonical business authority, Jackie should confirm:
 
-- a new employee can understand it;
-- counsel can follow the business rules;
-- a two-week absence would not leave the company dependent on one person's memory;
-- the language still feels like publishing;
+- the mission, promise, and publishing philosophy are accurate;
+- the Publishing Tracks are described correctly;
+- PF-01 through PF-08 are described correctly;
+- agreement issuance rules match current practice;
+- author-facing language reflects how the company wants to operate;
+- the continuity playbook is strong enough for a two-week absence;
 - governed holds remain visible;
-- no system build work is accidentally authorized;
-- legal/counsel work remains separate from this operating lane.
+- no automatic title movement is authorized;
+- no new system work is authorized.
 
 ## 24. Next Governed Action
 
-The next governed action is executive review of this manual.
+Jackie reviews this manual for business accuracy and ratifies it as the canonical description of how J Merrill Publishing operates before authorizing any future automatic production work.
 
-If approved, it may become JM1 Publishing Enterprise Operating Manual v1.0.
-
-After ratification, the company may decide whether to authorize any future production automation work. Until that separate decision is made, production automation remains frozen and client-title operations remain manual.
+Once ratified, future operating changes can be measured against this approved business standard instead of inferred from specialist planning materials.
