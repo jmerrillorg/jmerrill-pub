@@ -1,0 +1,80 @@
+{
+  "package": "PRECOA-CALENDAR-SYNC-REPAIR-2026-08-05",
+  "environment": "JM1-Core",
+  "classification": "COMPLETE",
+  "rootCause": [
+    "FLOW_B_PARTIAL_LOOP_TERMINATION",
+    "FLOW_B_STALE_OUTLOOK_EVENT_ID"
+  ],
+  "productionCorrection": "DEPLOYED",
+  "targetMailbox": "scheduling@jmerrill.one",
+  "flows": {
+    "ingestion": {
+      "name": "JM1 - PreNeed Calendar Feed Sync",
+      "workflowId": "ac92147f-ba27-f111-8341-00224820105b",
+      "recurrence": "15 minutes",
+      "concurrency": 1
+    },
+    "writer": {
+      "name": "JM1 - Appointment to Outlook Sync",
+      "workflowId": "98c97488-1e2a-f111-8342-7c1e525b15c2",
+      "recurrence": "15 minutes",
+      "concurrency": 1,
+      "outlookConnectionReference": "new_sharedoffice365_5a576",
+      "dataverseConnectionReference": "jm1_sharedcommondataserviceforapps_d6cf8",
+      "normalFilterRestored": true
+    }
+  },
+  "repairRuns": [
+    {
+      "runId": "08584156411849368473220757410CU08",
+      "startedUtc": "2026-08-05T21:35:00Z",
+      "status": "Succeeded"
+    },
+    {
+      "runId": "08584156402858401497839793663CU18",
+      "startedUtc": "2026-08-05T21:49:59Z",
+      "status": "Succeeded"
+    },
+    {
+      "runId": "08584156393855892898400341482CU17",
+      "startedUtc": "2026-08-05T22:04:59Z",
+      "status": "Succeeded"
+    }
+  ],
+  "august2026": {
+    "feedVevents": 71,
+    "feedActiveRealAppointments": 16,
+    "feedBlockedTimeRecords": 54,
+    "feedCancelledRecords": 1,
+    "dataversePrecoaRecords": 74,
+    "activeRealDataverseRecords": 16,
+    "activeRealSchedulingEventIds": 16,
+    "activeRealMissingOutlookIds": 0,
+    "activeRealAdminPrefixIds": 0,
+    "activeRealSyncErrors": 0,
+    "duplicateActiveSourceUids": 0
+  },
+  "august9To15": {
+    "expectedAppointments": 8,
+    "dataverseRecords": 8,
+    "outlookEventIds": 8,
+    "missingAppointmentsRepaired": 4
+  },
+  "boundaries": {
+    "clientCommunications": 0,
+    "reminderMessages": 0,
+    "businessCentralChanges": 0,
+    "dataverseSchemaChanges": 0,
+    "microsoft365MailboxOrDnsChanges": 0,
+    "unrelatedCalendarMutations": 0,
+    "productionSecretsRetained": 0
+  },
+  "evidenceFiles": [
+    "Precoa-Dataverse-Outlook-Calendar-Sync-Repair-Report.md"
+  ],
+  "regressionGuard": {
+    "script": "scripts/precoa-calendar-sync-guard.mjs",
+    "tests": "test/precoa-calendar-sync-guard.test.mjs"
+  }
+}
