@@ -2,6 +2,7 @@
 
 require("./functions/getPublisherRecommendationReview");
 require("./functions/runAgreementPackageSend");
+require("./functions/runGovernedAgreementGeneration");
 require("./functions/runApprovalEventConsumer");
 require("./functions/runAuthorReviewResponseConsumer");
 require("./functions/runEditorialExecutionRuntime");

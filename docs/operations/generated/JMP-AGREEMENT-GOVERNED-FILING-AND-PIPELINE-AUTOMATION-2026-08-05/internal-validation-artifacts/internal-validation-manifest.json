@@ -1,0 +1,214 @@
+{
+  "generatedAt": "2026-08-05T19:41:41.172Z",
+  "hybrid": {
+    "ok": true,
+    "code": "GOVERNED_AGREEMENT_GENERATION_COMPLETE",
+    "manifest": {
+      "agreementSelected": "JMP Publishing Agreement",
+      "agreementType": "Hybrid",
+      "agreementVersion": "v1.3.1",
+      "templateFilename": "JMP_Publishing_Agreement_v1.3.1.docx",
+      "templateGovernedPath": "Implementation HQ/01_GOVERNANCE/Agreement Templates/JMP_Publishing_Agreement_v1.3.1.docx",
+      "templateSha256": "6ee5fb05558b7af755749061034effaecfdccace96b9e9fb6af5b5e769468745",
+      "generationTimestamp": "2026-08-05T19:41:40.432Z",
+      "title": {
+        "id": "INT-VALIDATION-AGREEMENT-001",
+        "name": "Internal Validation Title"
+      },
+      "author": {
+        "id": "AUTHOR-VALIDATION-001",
+        "legalName": "Validation Author"
+      },
+      "publishingTrack": "Hybrid",
+      "executionCorrelationId": "internal-validation-hybrid-20260805",
+      "generatedArtifacts": [
+        {
+          "name": "JM1_Hybrid_v1-3-1_INT-VALIDATION-AGREEMENT-001_internal-validation-hybrid-20260805.docx",
+          "storageLocation": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-agreement-filing-pipeline-automation/docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/JM1_Hybrid_v1-3-1_INT-VALIDATION-AGREEMENT-001_internal-validation-hybrid-20260805.docx",
+          "sha256": "d8b2010d0226045cf329ff9c24209a3b9ba2bb94a01402b0776b34c7d66d9a29",
+          "byteLength": 137004
+        },
+        {
+          "name": "JM1_Hybrid_v1-3-1_INT-VALIDATION-AGREEMENT-001_internal-validation-hybrid-20260805.pdf",
+          "storageLocation": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-agreement-filing-pipeline-automation/docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/JM1_Hybrid_v1-3-1_INT-VALIDATION-AGREEMENT-001_internal-validation-hybrid-20260805.pdf",
+          "sha256": "abb75a4330eaf79c30bdb79a072e408060d7aa5be68fa33d3b54ede852f64987",
+          "byteLength": 156709
+        }
+      ],
+      "filledFields": [
+        {
+          "placeholder": "[Author Legal Name]",
+          "occurrences": 2,
+          "value": "Validation Author"
+        },
+        {
+          "placeholder": "[Effective Date]",
+          "occurrences": 1,
+          "value": "2026-08-05"
+        },
+        {
+          "placeholder": "[Book Title]",
+          "occurrences": 1,
+          "value": "Internal Validation Title"
+        }
+      ],
+      "deferredFields": [
+        {
+          "placeholder": "[Address]",
+          "reason": "NO_APPROVED_SOURCE_VALUE"
+        },
+        {
+          "placeholder": "[City, State ZIP]",
+          "reason": "NO_APPROVED_SOURCE_VALUE"
+        }
+      ],
+      "immutableAfterExecution": true,
+      "authorFacingOutputSent": false,
+      "clientTitleAutomation": "FROZEN"
+    },
+    "executionLog": {
+      "created": false,
+      "id": null,
+      "payload": {
+        "jm1_name": "GOVERNED-AGREEMENT-internal-validation-hybrid-20260805",
+        "jm1_actiondescription": "Governed agreement generated for title Internal Validation Title (INT-VALIDATION-AGREEMENT-001). Author: Validation Author (AUTHOR-VALIDATION-001). Publishing Track: Hybrid. Agreement selected: JMP Publishing Agreement v1.3.1. Template: JMP_Publishing_Agreement_v1.3.1.docx sha256:6ee5fb05558b7af755749061034effaecfdccace96b9e9fb6af5b5e769468745. Artifacts: JM1_Hybrid_v1-3-1_INT-VALIDATION-AGREEMENT-001_internal-validation-hybrid-20260805.docx -> /Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-agreement-filing-pipeline-automation/docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/JM1_Hybrid_v1-3-1_INT-VALIDATION-AGREEMENT-001_internal-validation-hybrid-20260805.docx; JM1_Hybrid_v1-3-1_INT-VALIDATION-AGREEMENT-001_internal-validation-hybrid-20260805.pdf -> /Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-agreement-filing-pipeline-automation/docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-P",
+        "jm1_actiontype": "GOVERNED_AGREEMENT_GENERATED",
+        "jm1_agentname": "jm1-diagnostic-ai-runner",
+        "jm1_agentmodel": "governed-agreement-pipeline-runner",
+        "jm1_bandlevel": 835500000,
+        "jm1_executionstatus": 835500001,
+        "jm1_startedon": "2026-08-05T19:41:40.432Z",
+        "jm1_completedon": "2026-08-05T19:41:40.432Z",
+        "jm1_sourceentity": "jm1pub_editorialdiagnostic",
+        "jm1_sourcerecordid": "INT-VALIDATION-AGREEMENT-001"
+      },
+      "error": "DATAVERSE_WRITE_FAILED",
+      "diagnostics": null
+    },
+    "gateUsed": "JM1_GOVERNED_AGREEMENT_PIPELINE_ENABLED",
+    "liveActions": {
+      "selectedAgreementAutomatically": true,
+      "readCanonicalPublishingData": true,
+      "wroteDocx": true,
+      "wrotePdf": true,
+      "sentAuthorFacingOutput": false,
+      "requestedSignature": false,
+      "activatedClientTitleAutomation": false,
+      "changedDataverseSchema": false,
+      "changedBusinessCentral": false
+    }
+  },
+  "signature": {
+    "ok": true,
+    "code": "GOVERNED_AGREEMENT_GENERATION_COMPLETE",
+    "manifest": {
+      "agreementSelected": "JM Signature Publishing Agreement",
+      "agreementType": "JM Signature",
+      "agreementVersion": "v1.0",
+      "templateFilename": "JM_Signature_Publishing_Agreement_v1.0.docx",
+      "templateGovernedPath": "Implementation HQ/01_GOVERNANCE/Agreement Templates/JM_Signature_Publishing_Agreement_v1.0.docx",
+      "templateSha256": "c793e6e3f2950ed76138bc2a09bb4cf29dd345b148c807434d2de65dc266ff25",
+      "generationTimestamp": "2026-08-05T19:41:41.172Z",
+      "title": {
+        "id": "INT-VALIDATION-SIGNATURE-001",
+        "name": "Internal Validation Title"
+      },
+      "author": {
+        "id": "AUTHOR-VALIDATION-001",
+        "legalName": "Validation Author"
+      },
+      "publishingTrack": "JM Signature",
+      "executionCorrelationId": "internal-validation-signature-20260805",
+      "generatedArtifacts": [
+        {
+          "name": "JM1_JM-Signature_v1-0_INT-VALIDATION-SIGNATURE-001_internal-validation-signature-20260805.docx",
+          "storageLocation": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-agreement-filing-pipeline-automation/docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/JM1_JM-Signature_v1-0_INT-VALIDATION-SIGNATURE-001_internal-validation-signature-20260805.docx",
+          "sha256": "4266a77ce96bce56c547cfea9da19b1687e5b72245291454238926172561d869",
+          "byteLength": 142862
+        },
+        {
+          "name": "JM1_JM-Signature_v1-0_INT-VALIDATION-SIGNATURE-001_internal-validation-signature-20260805.pdf",
+          "storageLocation": "/Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-agreement-filing-pipeline-automation/docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/JM1_JM-Signature_v1-0_INT-VALIDATION-SIGNATURE-001_internal-validation-signature-20260805.pdf",
+          "sha256": "ab4d30e63d10e8dc71d72db3a3ccb1c463b794e3b24d987dd438ce14ecbc4762",
+          "byteLength": 174348
+        }
+      ],
+      "filledFields": [
+        {
+          "placeholder": "[Author Full Legal Name]",
+          "occurrences": 2,
+          "value": "Validation Author"
+        },
+        {
+          "placeholder": "[Effective Date]",
+          "occurrences": 1,
+          "value": "2026-08-05"
+        },
+        {
+          "placeholder": "[Working Title]",
+          "occurrences": 1,
+          "value": "Internal Validation Title"
+        },
+        {
+          "placeholder": "[State of Incorporation]",
+          "occurrences": 1,
+          "value": "Ohio"
+        },
+        {
+          "placeholder": "[JM1 Business Address]",
+          "occurrences": 1,
+          "value": "J Merrill Publishing business address on file"
+        },
+        {
+          "placeholder": "[Author Address]",
+          "occurrences": 1,
+          "value": "Author address on file"
+        }
+      ],
+      "deferredFields": [
+        {
+          "placeholder": "[ ]",
+          "reason": "NO_APPROVED_SOURCE_VALUE"
+        },
+        {
+          "placeholder": "[World / United States and Canada / Other — specify]",
+          "reason": "NO_APPROVED_SOURCE_VALUE"
+        }
+      ],
+      "immutableAfterExecution": true,
+      "authorFacingOutputSent": false,
+      "clientTitleAutomation": "FROZEN"
+    },
+    "executionLog": {
+      "created": false,
+      "id": null,
+      "payload": {
+        "jm1_name": "GOVERNED-AGREEMENT-internal-validation-signature-20260805",
+        "jm1_actiondescription": "Governed agreement generated for title Internal Validation Title (INT-VALIDATION-SIGNATURE-001). Author: Validation Author (AUTHOR-VALIDATION-001). Publishing Track: JM Signature. Agreement selected: JM Signature Publishing Agreement v1.0. Template: JM_Signature_Publishing_Agreement_v1.0.docx sha256:c793e6e3f2950ed76138bc2a09bb4cf29dd345b148c807434d2de65dc266ff25. Artifacts: JM1_JM-Signature_v1-0_INT-VALIDATION-SIGNATURE-001_internal-validation-signature-20260805.docx -> /Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-agreement-filing-pipeline-automation/docs/operations/generated/JMP-AGREEMENT-GOVERNED-FILING-AND-PIPELINE-AUTOMATION-2026-08-05/internal-validation-artifacts/JM1_JM-Signature_v1-0_INT-VALIDATION-SIGNATURE-001_internal-validation-signature-20260805.docx; JM1_JM-Signature_v1-0_INT-VALIDATION-SIGNATURE-001_internal-validation-signature-20260805.pdf -> /Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-agreement-filing-pipeline-automation/docs/operations/gene",
+        "jm1_actiontype": "GOVERNED_AGREEMENT_GENERATED",
+        "jm1_agentname": "jm1-diagnostic-ai-runner",
+        "jm1_agentmodel": "governed-agreement-pipeline-runner",
+        "jm1_bandlevel": 835500000,
+        "jm1_executionstatus": 835500001,
+        "jm1_startedon": "2026-08-05T19:41:41.172Z",
+        "jm1_completedon": "2026-08-05T19:41:41.172Z",
+        "jm1_sourceentity": "jm1pub_editorialdiagnostic",
+        "jm1_sourcerecordid": "INT-VALIDATION-SIGNATURE-001"
+      },
+      "error": "DATAVERSE_WRITE_FAILED",
+      "diagnostics": null
+    },
+    "gateUsed": "JM1_GOVERNED_AGREEMENT_PIPELINE_ENABLED",
+    "liveActions": {
+      "selectedAgreementAutomatically": true,
+      "readCanonicalPublishingData": true,
+      "wroteDocx": true,
+      "wrotePdf": true,
+      "sentAuthorFacingOutput": false,
+      "requestedSignature": false,
+      "activatedClientTitleAutomation": false,
+      "changedDataverseSchema": false,
+      "changedBusinessCentral": false
+    }
+  }
+}
