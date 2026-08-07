@@ -1,6 +1,6 @@
 # Ruling Worksheet
 
-Status: RULING WORKSHEET / NOT CANON UNTIL JACKIE COMPLETES RULING FIELDS
+Status: EXECUTIVE-RULED WORKSHEET / CANONICAL AFTER PR #435 MERGE
 
 Date: 2026-08-07
 
@@ -10,7 +10,7 @@ Scope: PR #435 Publishing Capability Register ruling preparation. No implementat
 
 ABSORB rows: 19. Assessed material loss: 5. Assessed partial loss: 13. Assessed nothing: 1.
 
-Rows with material or partial loss are listed first. A loss assessment does not reclassify the row; it identifies what Jackie should watch before ruling ABSORB, RETAIN, or SUPERSEDE.
+Rows with material or partial loss are listed first. Jackie completed the ruling pass on 2026-08-07. ABSORB preserves unique functions, controls, evidence references, and aliases under the ruled parent capability.
 
 ### A1. Author Communications
 
@@ -24,7 +24,7 @@ What stops happening if absorbed: MATERIAL LOSS: communication governance, templ
 
 Evidence paths: lib/server/author-communication-brand.ts; lib/server/publishing-dispatch-service.ts
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: RETAIN (Jackie ruled 2026-08-07); Communication governance, delivery proof, templates, and response-clock integrity remain visibly named under Author Experience.
 
 ### A2. Author Operating Center
 
@@ -38,7 +38,7 @@ What stops happening if absorbed: MATERIAL LOSS: the author-facing operating sur
 
 Evidence paths: lib/server/author-portal-access.ts; lib/server/author-portal-context.ts
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: RETAIN (Jackie ruled 2026-08-07); Author Experience is the family; the Operating Center remains the distinct channel through which authors act.
 
 ### A3. Distribution Readiness and Submission
 
@@ -52,7 +52,7 @@ What stops happening if absorbed: MATERIAL LOSS: distributor submission/readback
 
 Evidence paths: docs/implementation/OP-009-Distribution-Command-Center.md; docs/operations/int-pub-005-milestone-8-distribution-setup-readiness.md
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: RETAIN (Jackie ruled 2026-08-07); Submission, distributor acceptance/readback, and external-channel proof remain distinct from producing files.
 
 ### A4. Payment Capture and Authorization
 
@@ -66,7 +66,7 @@ What stops happening if absorbed: MATERIAL LOSS: payment authority can blur into
 
 Evidence paths: lib/server/stripe/author-workspace-stripe.ts; app/api/author/stripe/webhook/route.ts
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: RETAIN (Jackie ruled 2026-08-07); Publishing retains a visible payment/authorization gate where Stripe/payment truth intersects fulfillment authorization.
 
 ### A5. Royalty Calculation and Statements
 
@@ -80,7 +80,7 @@ What stops happening if absorbed: MATERIAL LOSS: royalties can be treated as acc
 
 Evidence paths: scripts/cap007_royalty_controlled_proof.mjs; docs/implementation/JM1-PAY-001-Author-Payout-Royalty-Governance-Standard-v1.0.md
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: RETAIN (Jackie ruled 2026-08-07); Royalties remain a distinct post-publication obligation and do not disappear into accounting or generic post-publication language.
 
 ### A6. Cover Design
 
@@ -94,7 +94,7 @@ What stops happening if absorbed: PARTIAL LOSS: cover-specific approval, evidenc
 
 Evidence paths: docs/operations/generated/2026-07-19-The-Intentional-Leader-Cover-Concept-Development-Package.md
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: ABSORB (Jackie ruled 2026-08-07); Absorbed into Production & Distribution with cover-specific approval, QA, and production dependencies preserved.
 
 ### A7. Editorial Command Center
 
@@ -108,7 +108,7 @@ What stops happening if absorbed: PARTIAL LOSS: stage-level editorial coordinati
 
 Evidence paths: docs/doctrine/PROGRAM-003-Editorial-Doctrine.md; lib/program003/editorial-command.ts
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: ABSORB (Jackie ruled 2026-08-07); Absorbed as the operating mechanism for Editorial with queues and gates preserved explicitly.
 
 ### A8. Interior Layout and Vellum Production
 
@@ -122,7 +122,7 @@ What stops happening if absorbed: PARTIAL LOSS: Vellum/source/layout authority c
 
 Evidence paths: lib/server/vellum-title-template-governance.ts; docs/operations/generated/2026-07-19-The-Intentional-Leader-Interior-Layout-Readiness.md
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: ABSORB (Jackie ruled 2026-08-07); Absorbed as a Production & Distribution lane with source lineage, layout QA, and proof controls preserved.
 
 ### A9. Lead and Opportunity Management
 
@@ -136,7 +136,7 @@ What stops happening if absorbed: PARTIAL LOSS: D365/Sales-style pipeline accoun
 
 Evidence paths: azure-functions/diagnostic-ai-runner/src/functions/runMilestone6OpportunityUpdate.js; docs/implementation/PROGRAM-004-Microsoft-Capability-Utilization-Matrix-2026-07-26.csv
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: ABSORB (Jackie ruled 2026-08-07); Absorbed into Commercial Operations, preferably leveraging Dynamics 365 Sales rather than a separate JMP command center.
 
 ### A10. Line Copy and Proof Editing
 
@@ -150,7 +150,7 @@ What stops happening if absorbed: PARTIAL LOSS: later editorial stages can be ov
 
 Evidence paths: scripts/cap002_priority1_line_edit.py; scripts/cap003_copyediting.py
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: ABSORB (Jackie ruled 2026-08-07); Absorbed as explicit editorial stages under Editorial without independent top-level capability status.
 
 ### A11. Newsletter and Reader Updates
 
@@ -164,7 +164,7 @@ What stops happening if absorbed: PARTIAL LOSS: consent, subscription capture, a
 
 Evidence paths: docs/audits/issue-12-form-integration-audit.md; app/api/newsletter/route.ts
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: ABSORB (Jackie ruled 2026-08-07); Absorbed as a Strategic Marketing channel/tactic with audience consent and subscription rules preserved.
 
 ### A12. No-Cost Author Marketing Framework
 
@@ -178,7 +178,7 @@ What stops happening if absorbed: PARTIAL LOSS: included no-cost support can van
 
 Evidence paths: docs/implementation/JM1-Capability-Maturity-Registry.md; app/author/marketing-profile/page.tsx
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: RETAIN (Jackie ruled 2026-08-07); Retained as the boundary between included JMP support and separately scoped marketing, preserving prior strategic work.
 
 ### A13. Publisher Operating Center
 
@@ -192,7 +192,7 @@ What stops happening if absorbed: PARTIAL LOSS: daily executive visibility can v
 
 Evidence paths: lib/server/publisher-operating-center.ts; app/publisher/page.tsx
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: RETAIN (Jackie ruled 2026-08-07); Retained because a single-operator enterprise needs daily visibility without manual reconstruction.
 
 ### A14. Release Live Confirmation
 
@@ -206,7 +206,7 @@ What stops happening if absorbed: PARTIAL LOSS: confirmed-live readback can blur
 
 Evidence paths: docs/architecture/generated/JMP-SLICE-3-IMPLEMENTATION-PLANNING-v1.0/06-executionlog-event-contract.md
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: ABSORB (Jackie ruled 2026-08-07); Absorbed into Production & Distribution with submitted-not-live proof rule preserved.
 
 ### A15. Revenue and Accounting
 
@@ -220,7 +220,7 @@ What stops happening if absorbed: PARTIAL LOSS: revenue evidence can be mixed wi
 
 Evidence paths: docs/implementation/IS-002-Business-Central-Configuration-Specification.md; docs/implementation/PROGRAM-004-Commissioning-Microsoft-Productization-Delta-Report-2026-07-26.md
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: RETAIN (Jackie ruled 2026-08-07); Financial Operations remains visibly real; Business Central/accounting does not disappear behind publishing lifecycle language.
 
 ### A16. Strategic Marketing Command Center
 
@@ -234,7 +234,7 @@ What stops happening if absorbed: PARTIAL LOSS: marketing can remain a concept w
 
 Evidence paths: docs/implementation/OP-010-Marketing-Command-Center.md; docs/operations/int-pub-005-milestone-9-launch-release-readiness.md
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: RETAIN (Jackie ruled 2026-08-07); Retained as the identifiable operating mechanism for lifecycle-triggered JMP, author, and title marketing.
 
 ### A17. Stripe and Payout Enrollment
 
@@ -248,7 +248,7 @@ What stops happening if absorbed: PARTIAL LOSS: payout enrollment can be confuse
 
 Evidence paths: scripts/author_payout_enrollment_governance.test.mjs; lib/server/stripe/author-workspace-stripe.ts
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: ABSORB (Jackie ruled 2026-08-07); Absorbed into Financial Operations with enrollment/readiness kept distinct from money movement.
 
 ### A18. Workflow Engine and Dispatch Services
 
@@ -262,7 +262,7 @@ What stops happening if absorbed: PARTIAL LOSS: package delivery and state trans
 
 Evidence paths: lib/server/publishing-dispatch-service.ts; scripts/program006_publishing_dispatch_service.test.mjs
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: ABSORB (Jackie ruled 2026-08-07); Absorbed as Enterprise Support enabling infrastructure, not a separate business capability Jackie operates.
 
 ### A19. Microsoft Ecosystem and Tenant Support
 
@@ -276,7 +276,7 @@ What stops happening if absorbed: NOTHING
 
 Evidence paths: docs/implementation/PROGRAM-004-Commissioning-Microsoft-Productization-Delta-Report-2026-07-26.md
 
-Ruling: __________ (ABSORB / RETAIN / SUPERSEDE)
+Ruling: ABSORB (Jackie ruled 2026-08-07); Absorbed into Enterprise Support with no meaningful loss; Microsoft support is not a standalone Publishing capability.
 
 
 ## Section B - Conflicts
@@ -295,7 +295,7 @@ Why: The title/PF lifecycle architecture and Slice 3 planning both require an ed
 
 Downstream dependencies affected either way: PF state machine, release dates, ISBN assignment, author-facing status, distribution events, correction handling.
 
-Ruling: __________ (single system name)
+Ruling: Dataverse `jm1pub_edition` (Jackie ruled 2026-08-07)
 
 ### B2. Manuscript source
 
@@ -309,7 +309,7 @@ Why: The Operating Manual and SOPs treat the governed title folder/source file a
 
 Downstream dependencies affected either way: Editorial start, source lineage, author-review packages, production source lock, correction packages.
 
-Ruling: __________ (single system name)
+Ruling: SharePoint governed title folder (Jackie ruled 2026-08-07)
 
 ### B3. Editorial artifact
 
@@ -323,7 +323,7 @@ Why: The actual artifact is the governed file; Dataverse/reference records shoul
 
 Downstream dependencies affected either way: Author package QA, artifact visibility, checksums, source/output relationships, internal leakage controls.
 
-Ruling: __________ (single system name)
+Ruling: SharePoint governed artifact/file location (Jackie ruled 2026-08-07)
 
 ### B4. Distribution job
 
@@ -337,7 +337,7 @@ Why: Current approved design uses execution-log events first and holds job-table
 
 Downstream dependencies affected either way: Submission attempts, acceptance/rejection readback, idempotency, live confirmation, author status projection.
 
-Ruling: __________ (single system name)
+Ruling: Dataverse `jm1_executionlog` (Jackie ruled 2026-08-07)
 
 ### B5. Release plan
 
@@ -351,7 +351,7 @@ Why: Until a release-plan entity is separately approved, release anchor/submissi
 
 Downstream dependencies affected either way: 21-day propagation, release anchor changes, edition schedules, author-facing status, distribution readiness.
 
-Ruling: __________ (single system name)
+Ruling: Dataverse title/edition authority (Jackie ruled 2026-08-07)
 
 ### B6. Royalty statement
 
@@ -365,7 +365,7 @@ Why: Dataverse royalty statement/line tables are the designed operational statem
 
 Downstream dependencies affected either way: Royalty calculation, statement review, payment allocation, author delivery, BC handoff.
 
-Ruling: __________ (single system name)
+Ruling: Dataverse royalty statement/line authority; Business Central remains accounting/payable/posting/payment/GL authority (Jackie ruled 2026-08-07)
 
 ### B7. Payment evidence
 
@@ -379,7 +379,7 @@ Why: Stripe is the source of payment transaction truth; Dataverse and Business C
 
 Downstream dependencies affected either way: Payment authorization, fulfillment unlocks, revenue recognition, refund/payment exception handling.
 
-Ruling: __________ (single system name)
+Ruling: Stripe (Jackie ruled 2026-08-07)
 
 ### B8. Microsoft entitlement state
 
@@ -393,24 +393,24 @@ Why: Repository matrices record evidence, but current entitlement authority must
 
 Downstream dependencies affected either way: Reuse gate, activation decisions, build-vs-configure decisions, spend/entitlement blockers.
 
-Ruling: __________ (single system name)
+Ruling: Microsoft tenant/license readback (Jackie ruled 2026-08-07)
 
 
 ## Section C - RETAIN Rows
 
 | Capability | Parent capability | One-line reason | Jackie bulk confirmation |
 | --- | --- | --- | --- |
-| Executive Control | Executive Control | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Successor Operations Hub | Enterprise Support | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Current Authority and Work View | Executive Control | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Inquiry Intake | Commercial Operations | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Quote Package and Pricing | Commercial Operations | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Agreement Governance and Generation | Commercial Operations | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Author Onboarding | Author Experience | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Developmental Editing | Editorial | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Correction Authorization | Editorial | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| PF State Machine | Production & Distribution | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Product Form and Edition Lifecycle | Production & Distribution | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Complimentary Author Copies | Post-Publication Operations | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Author Marketing Profile | Strategic Marketing | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
-| Evidence and Execution Logging | Enterprise Support | Retain because it is current authority or a directly usable capability under the nine-capability model. | |
+| Executive Control | Executive Control | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Successor Operations Hub | Enterprise Support | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Current Authority and Work View | Executive Control | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Inquiry Intake | Commercial Operations | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Quote Package and Pricing | Commercial Operations | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Agreement Governance and Generation | Commercial Operations | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Author Onboarding | Author Experience | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Developmental Editing | Editorial | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Correction Authorization | Editorial | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| PF State Machine | Production & Distribution | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Product Form and Edition Lifecycle | Production & Distribution | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Complimentary Author Copies | Post-Publication Operations | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Author Marketing Profile | Strategic Marketing | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |
+| Evidence and Execution Logging | Enterprise Support | Retain because it is current authority or a directly usable capability under the nine-capability model. | RETAIN (Jackie ruled 2026-08-07) |

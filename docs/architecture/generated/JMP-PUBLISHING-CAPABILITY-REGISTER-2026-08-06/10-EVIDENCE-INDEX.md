@@ -18,6 +18,7 @@
 | Microsoft utilization | `docs/implementation/PROGRAM-004-Microsoft-Capability-Utilization-Matrix-2026-07-26.csv` | Microsoft reuse map |
 | Royalty/payment | `docs/implementation/JM1-PAY-001-Author-Payout-Royalty-Governance-Standard-v1.0.md`; `docs/operations/generated/2026-07-17-JM1-2026-Royalty-*`; `docs/operations/generated/2026-07-18-JM1-2026-Royalty-*` | Financial/Post-Publication split |
 | Parse failure precedent | `docs/operations/generated/2026-07-20-JMP-Catalog-Reconciliation-Worksheet.md`; `docs/operations/generated/2026-07-20-JMP-Catalog-Reconciliation-Worksheet-Amended-Summary.json` | unparseable artifact flag |
+| Executive ruling pass | `/Users/jmerrillone/.codex/attachments/d28b77de-7068-4774-a46a-b7b02aac7ad9/pasted-text.txt`; `12-RULING-WORKSHEET.md` | final capability classifications and system-of-record rulings |
 
 ## Unparseable Artifact Register
 
@@ -28,3 +29,7 @@
 ## Search Notes
 
 Repository searches covered docs, app, lib, scripts, and azure-functions for command centers, pipelines, agents, marketing, agreements, Product Forms, Microsoft capabilities, royalties, Stripe, Business Central, retirement, reversion, and author copies. Binary DOCX/PDF contents were not reparsed in this pass except where prior evidence already recorded validation or parse failure.
+
+## Governance Confirmation
+
+Microsoft Capability Reuse Gate v1.0 and Publishing Capability Register Maintenance v1.0 remain intact. Replacement candidates remain `LOGGED - NO ACTION SCHEDULED`. First quarterly delta remains scheduled for November 2026.
