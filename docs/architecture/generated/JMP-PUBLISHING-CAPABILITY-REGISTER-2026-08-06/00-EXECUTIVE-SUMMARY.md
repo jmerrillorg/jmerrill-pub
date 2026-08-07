@@ -4,7 +4,7 @@
 
 Status: READ-ONLY EVIDENCE PACKAGE
 
-Classification: REGISTER CANDIDATE / NOT CANON
+Classification: RULING-PREPARED REGISTER CANDIDATE / NOT CANON
 
 Date: 2026-08-06
 
@@ -48,6 +48,14 @@ This package inventories the Publishing capabilities found in repository evidenc
 | Human operating coverage NOT_HUMAN_OPERATED | 0 parent capabilities |
 | Writes performed outside this generated package | 0 |
 | Checksums | VALIDATED |
+
+## Ruling Preparation Update - 2026-08-07
+
+Jackie's standing rulings have been applied only to MISSING and FUTURE rows: 2 MISSING rows ruled `IN MODEL - MISSING` and 3 FUTURE rows ruled `IN MODEL - FUTURE`. These rulings place the items inside the operating model only and do not authorize design, scope, implementation, runtime, automation, or author-facing work.
+
+`12-RULING-WORKSHEET.md` has been added for the live ruling pass. ABSORB, RETAIN, and conflict rows remain unrated by Jackie except where the worksheet provides Cody assessment for Jackie to accept or replace. Merge remains gated on the completed ruling worksheet, not ordinary review.
+
+Governance adoption documents added: `docs/governance/JM1-PUB-MICROSOFT-CAPABILITY-REUSE-GATE-v1.0.md` and `docs/governance/JM1-PUB-CAPABILITY-REGISTER-MAINTENANCE-v1.0.md`.
 
 ## Standing Boundary
 
