@@ -1,0 +1,221 @@
+{
+  "workflow": {
+    "ok": true,
+    "status": 200,
+    "data": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#workflows(workflowid,name,uniquename,category,statecode,statuscode,primaryentity,clientdata)",
+      "value": [
+        {
+          "@odata.etag": "W/\"14412058\"",
+          "category@OData.Community.Display.V1.FormattedValue": "Business Process Flow",
+          "category": 4,
+          "statuscode@OData.Community.Display.V1.FormattedValue": "Activated",
+          "statuscode": 2,
+          "name": "Publishing Opportunity Process",
+          "clientdata": "{\"__class\":\"WorkflowStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"WorkflowStep0\",\"description\":\"\",\"name\":\"Step_0\",\"stepLabels\":{\"list\":[]},\"steps\":{\"list\":[{\"__class\":\"RelationshipCollectionStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"RelationshipCollectionStep1\",\"description\":\"\",\"name\":\"Step_1\",\"stepLabels\":{\"list\":[]},\"steps\":{\"list\":[]}},{\"__class\":\"EntityStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"EntityStep2\",\"description\":\"opportunity\",\"name\":\"Step_2\",\"stepLabels\":{\"list\":[]},\"steps\":{\"list\":[{\"__class\":\"StageStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StageStep3\",\"description\":\"Discovery\",\"name\":\"Step_3\",\"stepLabels\":{\"list\":[{\"labelId\":\"149e25f6-6e93-47c2-80a3-8458df81fb44\",\"languageCode\":1033,\"description\":\"Discovery\"}]},\"steps\":{\"list\":[{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep4\",\"description\":\"New Step\",\"name\":\"Step_4\",\"stepLabels\":{\"list\":[{\"labelId\":\"e1370c79-7d4b-4d60-93e4-850b5f3e70d1\",\"languageCode\":1033,\"description\":\"Topic\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep5\",\"description\":\"\",\"name\":\"Step_5\",\"stepLabels\":{\"list\":[]},\"controlId\":\"name\",\"classId\":\"4273edbd-ac1d-40d3-9fb2-095c621b552d\",\"dataFieldName\":\"name\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Topic\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"e1370c79-7d4b-4d60-93e4-850b5f3e70d1\",\"name\":null,\"isProcessRequired\":true,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep6\",\"description\":\"New Step\",\"name\":\"Step_6\",\"stepLabels\":{\"list\":[{\"labelId\":\"5fd7e767-3dbb-42b8-b8a9-5c3ed58b55e2\",\"languageCode\":1033,\"description\":\"Contact\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep7\",\"description\":\"\",\"name\":\"Step_7\",\"stepLabels\":{\"list\":[]},\"controlId\":\"customerid\",\"classId\":\"270bd3db-d9af-4782-9025-509e298dec0a\",\"dataFieldName\":\"customerid\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Potential Customer\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"5fd7e767-3dbb-42b8-b8a9-5c3ed58b55e2\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep8\",\"description\":\"New Step\",\"name\":\"Step_8\",\"stepLabels\":{\"list\":[{\"labelId\":\"3c8a0ee0-f57a-422e-9ffb-afe70b7238b1\",\"languageCode\":1033,\"description\":\"Project Title\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep9\",\"description\":\"\",\"name\":\"Step_9\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_projecttitle\",\"classId\":\"4273edbd-ac1d-40d3-9fb2-095c621b552d\",\"dataFieldName\":\"jm1pub_projecttitle\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Project Title\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"3c8a0ee0-f57a-422e-9ffb-afe70b7238b1\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep10\",\"description\":\"New Step\",\"name\":\"Step_10\",\"stepLabels\":{\"list\":[{\"labelId\":\"8eb3c7b3-dfd7-4206-b57b-20bfef8b58fd\",\"languageCode\":1033,\"description\":\"Manuscript Type\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep11\",\"description\":\"\",\"name\":\"Step_11\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_manuscripttype\",\"classId\":\"3ef39988-22bb-4f0b-bbbe-64b5a3748aee\",\"dataFieldName\":\"jm1pub_manuscripttype\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Manuscript Type\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"8eb3c7b3-dfd7-4206-b57b-20bfef8b58fd\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep12\",\"description\":\"New Step\",\"name\":\"Step_12\",\"stepLabels\":{\"list\":[{\"labelId\":\"fb620859-dd8b-4826-af6a-308b7edc21f0\",\"languageCode\":1033,\"description\":\"Preferred Format\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep13\",\"description\":\"\",\"name\":\"Step_13\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_preferredformat_oppty\",\"classId\":\"3ef39988-22bb-4f0b-bbbe-64b5a3748aee\",\"dataFieldName\":\"jm1pub_preferredformat_oppty\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Preferred Format\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"fb620859-dd8b-4826-af6a-308b7edc21f0\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false}]},\"stageId\":\"149e25f6-6e93-47c2-80a3-8458df81fb44\",\"nextStageId\":\"20469836-7fd1-4b6e-84af-10afbd910c7c\",\"stageCategory\":\"0\"}]},\"relationshipName\":null,\"attributeName\":null,\"isClosedLoop\":false},{\"__class\":\"EntityStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"EntityStep3\",\"description\":\"opportunity\",\"name\":\"Step_3\",\"stepLabels\":{\"list\":[]},\"steps\":{\"list\":[{\"__class\":\"StageStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StageStep15\",\"description\":\"Submission\",\"name\":\"Step_15\",\"stepLabels\":{\"list\":[{\"labelId\":\"20469836-7fd1-4b6e-84af-10afbd910c7c\",\"languageCode\":1033,\"description\":\"Submission\"}]},\"steps\":{\"list\":[{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep16\",\"description\":\"New Step\",\"name\":\"Step_16\",\"stepLabels\":{\"list\":[{\"labelId\":\"4b873421-0ac9-4c90-a316-f54fd11c49ca\",\"languageCode\":1033,\"description\":\"Manuscript Submitted?\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep17\",\"description\":\"\",\"name\":\"Step_17\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_manuscriptsubmitted\",\"classId\":\"67fac785-cd58-4f9f-abb3-4b7ddc6ed5ed\",\"dataFieldName\":\"jm1pub_manuscriptsubmitted\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Manuscript Submitted?\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"4b873421-0ac9-4c90-a316-f54fd11c49ca\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep18\",\"description\":\"New Step\",\"name\":\"Step_18\",\"stepLabels\":{\"list\":[{\"labelId\":\"51c24392-c9ed-435f-a6ac-db8787538f91\",\"languageCode\":1033,\"description\":\"Estimated Page Count\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep19\",\"description\":\"\",\"name\":\"Step_19\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_estimatedpagecount\",\"classId\":\"c6d124ca-7eda-4a60-aea9-7fb8d318b68f\",\"dataFieldName\":\"jm1pub_estimatedpagecount\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Estimated Page Count\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"51c24392-c9ed-435f-a6ac-db8787538f91\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep20\",\"description\":\"New Step\",\"name\":\"Step_20\",\"stepLabels\":{\"list\":[{\"labelId\":\"9cc76802-7f30-41ab-937f-498dd46e8e10\",\"languageCode\":1033,\"description\":\"Picture Book?\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep21\",\"description\":\"\",\"name\":\"Step_21\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_picturebook\",\"classId\":\"67fac785-cd58-4f9f-abb3-4b7ddc6ed5ed\",\"dataFieldName\":\"jm1pub_picturebook\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Picture Book?\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"9cc76802-7f30-41ab-937f-498dd46e8e10\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep22\",\"description\":\"New Step\",\"name\":\"Step_22\",\"stepLabels\":{\"list\":[{\"labelId\":\"3a74d554-ea25-4102-aab3-1f82bfc3b0e9\",\"languageCode\":1033,\"description\":\"Audiobook?\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep23\",\"description\":\"\",\"name\":\"Step_23\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_audiobook\",\"classId\":\"67fac785-cd58-4f9f-abb3-4b7ddc6ed5ed\",\"dataFieldName\":\"jm1pub_audiobook\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Audiobook?\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"3a74d554-ea25-4102-aab3-1f82bfc3b0e9\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false}]},\"stageId\":\"20469836-7fd1-4b6e-84af-10afbd910c7c\",\"nextStageId\":\"de52c5ef-1fd6-4c8e-a795-d7affa9bc5ca\",\"stageCategory\":\"1\"}]},\"relationshipName\":null,\"attributeName\":null,\"isClosedLoop\":false},{\"__class\":\"EntityStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"EntityStep4\",\"description\":\"opportunity\",\"name\":\"Step_4\",\"stepLabels\":{\"list\":[]},\"steps\":{\"list\":[{\"__class\":\"StageStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StageStep25\",\"description\":\"Editorial Review\",\"name\":\"Step_25\",\"stepLabels\":{\"list\":[{\"labelId\":\"de52c5ef-1fd6-4c8e-a795-d7affa9bc5ca\",\"languageCode\":1033,\"description\":\"Editorial Review\"}]},\"steps\":{\"list\":[{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep26\",\"description\":\"New Step\",\"name\":\"Step_26\",\"stepLabels\":{\"list\":[{\"labelId\":\"04c6b5a9-5d16-49a6-b6fb-3d66773dda76\",\"languageCode\":1033,\"description\":\"Review Status\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep27\",\"description\":\"\",\"name\":\"Step_27\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_reviewstatus\",\"classId\":\"3ef39988-22bb-4f0b-bbbe-64b5a3748aee\",\"dataFieldName\":\"jm1pub_reviewstatus\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Review Status\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"04c6b5a9-5d16-49a6-b6fb-3d66773dda76\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep28\",\"description\":\"New Step\",\"name\":\"Step_28\",\"stepLabels\":{\"list\":[{\"labelId\":\"2eba4c64-0bce-470d-b069-3b00dc4b2490\",\"languageCode\":1033,\"description\":\"Review Recommendation\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep29\",\"description\":\"\",\"name\":\"Step_29\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_reviewrecommendation\",\"classId\":\"3ef39988-22bb-4f0b-bbbe-64b5a3748aee\",\"dataFieldName\":\"jm1pub_reviewrecommendation\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Review Recommendation\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"2eba4c64-0bce-470d-b069-3b00dc4b2490\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep30\",\"description\":\"New Step\",\"name\":\"Step_30\",\"stepLabels\":{\"list\":[{\"labelId\":\"a617e573-fb13-4088-9ab6-31172ad5079d\",\"languageCode\":1033,\"description\":\"Editorial Effort\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep31\",\"description\":\"\",\"name\":\"Step_31\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_editorialeffort\",\"classId\":\"3ef39988-22bb-4f0b-bbbe-64b5a3748aee\",\"dataFieldName\":\"jm1pub_editorialeffort\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Editorial Effort\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"a617e573-fb13-4088-9ab6-31172ad5079d\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep32\",\"description\":\"New Step\",\"name\":\"Step_32\",\"stepLabels\":{\"list\":[{\"labelId\":\"efe6329c-555a-4839-aa96-46c66f34448b\",\"languageCode\":1033,\"description\":\"Risk Level\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep33\",\"description\":\"\",\"name\":\"Step_33\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_risklevel\",\"classId\":\"3ef39988-22bb-4f0b-bbbe-64b5a3748aee\",\"dataFieldName\":\"jm1pub_risklevel\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Risk Level\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"efe6329c-555a-4839-aa96-46c66f34448b\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false}]},\"stageId\":\"de52c5ef-1fd6-4c8e-a795-d7affa9bc5ca\",\"nextStageId\":\"055f3c52-6275-45b5-a44e-2de7bd23d9e0\",\"stageCategory\":\"1\"}]},\"relationshipName\":null,\"attributeName\":null,\"isClosedLoop\":false},{\"__class\":\"EntityStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"EntityStep5\",\"description\":\"opportunity\",\"name\":\"Step_5\",\"stepLabels\":{\"list\":[]},\"steps\":{\"list\":[{\"__class\":\"StageStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StageStep35\",\"description\":\"Package \\u0026 Quote\",\"name\":\"Step_35\",\"stepLabels\":{\"list\":[{\"labelId\":\"055f3c52-6275-45b5-a44e-2de7bd23d9e0\",\"languageCode\":1033,\"description\":\"Package \\u0026 Quote\"}]},\"steps\":{\"list\":[{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep36\",\"description\":\"New Step\",\"name\":\"Step_36\",\"stepLabels\":{\"list\":[{\"labelId\":\"5a554978-0062-49f4-8244-9f4d626e5183\",\"languageCode\":1033,\"description\":\"Package Recommended\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep37\",\"description\":\"\",\"name\":\"Step_37\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_packagerecommended\",\"classId\":\"4273edbd-ac1d-40d3-9fb2-095c621b552d\",\"dataFieldName\":\"jm1pub_packagerecommended\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Package Recommended\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"5a554978-0062-49f4-8244-9f4d626e5183\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep38\",\"description\":\"New Step\",\"name\":\"Step_38\",\"stepLabels\":{\"list\":[{\"labelId\":\"c420f29e-6f96-4d36-9101-dc298f08cd0f\",\"languageCode\":1033,\"description\":\"Est. revenue\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep39\",\"description\":\"\",\"name\":\"Step_39\",\"stepLabels\":{\"list\":[]},\"controlId\":\"estimatedvalue\",\"classId\":\"533b9e00-756b-4312-95a0-dc888637ac78\",\"dataFieldName\":\"estimatedvalue\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Est. revenue\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"c420f29e-6f96-4d36-9101-dc298f08cd0f\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep40\",\"description\":\"New Step\",\"name\":\"Step_40\",\"stepLabels\":{\"list\":[{\"labelId\":\"12c5cb66-40af-49f4-ab53-340283867866\",\"languageCode\":1033,\"description\":\"Est. close date\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep41\",\"description\":\"\",\"name\":\"Step_41\",\"stepLabels\":{\"list\":[]},\"controlId\":\"estimatedclosedate\",\"classId\":\"5b773807-9fb2-42db-97c3-7a91eff8adff\",\"dataFieldName\":\"estimatedclosedate\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Est. close date\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"12c5cb66-40af-49f4-ab53-340283867866\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false}]},\"stageId\":\"055f3c52-6275-45b5-a44e-2de7bd23d9e0\",\"nextStageId\":\"6a306266-0d55-43f6-8909-b0f4c8256ec6\",\"stageCategory\":\"2\"}]},\"relationshipName\":null,\"attributeName\":null,\"isClosedLoop\":false},{\"__class\":\"EntityStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"EntityStep6\",\"description\":\"opportunity\",\"name\":\"Step_6\",\"stepLabels\":{\"list\":[]},\"steps\":{\"list\":[{\"__class\":\"StageStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StageStep43\",\"description\":\"Contract\",\"name\":\"Step_43\",\"stepLabels\":{\"list\":[{\"labelId\":\"6a306266-0d55-43f6-8909-b0f4c8256ec6\",\"languageCode\":1033,\"description\":\"Contract\"}]},\"steps\":{\"list\":[{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep44\",\"description\":\"New Step\",\"name\":\"Step_44\",\"stepLabels\":{\"list\":[{\"labelId\":\"15f1379e-b24e-48a6-adaf-b492f9c08491\",\"languageCode\":1033,\"description\":\"Contract Status\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep45\",\"description\":\"\",\"name\":\"Step_45\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_contractstatus\",\"classId\":\"3ef39988-22bb-4f0b-bbbe-64b5a3748aee\",\"dataFieldName\":\"jm1pub_contractstatus\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Contract Status\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"15f1379e-b24e-48a6-adaf-b492f9c08491\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep46\",\"description\":\"New Step\",\"name\":\"Step_46\",\"stepLabels\":{\"list\":[{\"labelId\":\"16613f31-cdeb-4ed1-bb8b-3e1268d7c82c\",\"languageCode\":1033,\"description\":\"Contract URL\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep47\",\"description\":\"\",\"name\":\"Step_47\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_contracturl\",\"classId\":\"71716b6c-711e-476c-8ab8-5d11542bfb47\",\"dataFieldName\":\"jm1pub_contracturl\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Contract URL\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"16613f31-cdeb-4ed1-bb8b-3e1268d7c82c\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false}]},\"stageId\":\"6a306266-0d55-43f6-8909-b0f4c8256ec6\",\"nextStageId\":\"630cf8a9-9c9f-4432-b4a6-54f707641040\",\"stageCategory\":\"2\"}]},\"relationshipName\":null,\"attributeName\":null,\"isClosedLoop\":false},{\"__class\":\"EntityStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"EntityStep7\",\"description\":\"opportunity\",\"name\":\"Step_7\",\"stepLabels\":{\"list\":[]},\"steps\":{\"list\":[{\"__class\":\"StageStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StageStep49\",\"description\":\"Activation\",\"name\":\"Step_49\",\"stepLabels\":{\"list\":[{\"labelId\":\"630cf8a9-9c9f-4432-b4a6-54f707641040\",\"languageCode\":1033,\"description\":\"Activation\"}]},\"steps\":{\"list\":[{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep50\",\"description\":\"New Step\",\"name\":\"Step_50\",\"stepLabels\":{\"list\":[{\"labelId\":\"b6f94679-18ac-4bdf-8ce9-6451577836bb\",\"languageCode\":1033,\"description\":\"Actual Close Date\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep51\",\"description\":\"\",\"name\":\"Step_51\",\"stepLabels\":{\"list\":[]},\"controlId\":\"actualclosedate\",\"classId\":\"5b773807-9fb2-42db-97c3-7a91eff8adff\",\"dataFieldName\":\"actualclosedate\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Actual Close Date\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"b6f94679-18ac-4bdf-8ce9-6451577836bb\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false},{\"__class\":\"StepStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"StepStep52\",\"description\":\"New Step\",\"name\":\"Step_52\",\"stepLabels\":{\"list\":[{\"labelId\":\"dadf874c-c5fe-4bba-bd31-89d54bc3faa3\",\"languageCode\":1033,\"description\":\"Editorial Project Id\"}]},\"steps\":{\"list\":[{\"__class\":\"ControlStep:#Microsoft.Crm.Workflow.ObjectModel\",\"id\":\"ControlStep53\",\"description\":\"\",\"name\":\"Step_53\",\"stepLabels\":{\"list\":[]},\"controlId\":\"jm1pub_editorialprojectid\",\"classId\":\"4273edbd-ac1d-40d3-9fb2-095c621b552d\",\"dataFieldName\":\"jm1pub_editorialprojectid\",\"systemStepType\":\"IdentifyContact\",\"isSystemControl\":false,\"parameters\":\"\",\"controlDisplayName\":\"Editorial Project Id\",\"isUnbound\":false,\"controlType\":\"0\"}]},\"stepStepId\":\"dadf874c-c5fe-4bba-bd31-89d54bc3faa3\",\"name\":null,\"isProcessRequired\":false,\"isHidden\":false}]},\"stageId\":\"630cf8a9-9c9f-4432-b4a6-54f707641040\",\"nextStageId\":null,\"stageCategory\":\"-1\"}]},\"relationshipName\":null,\"attributeName\":null,\"isClosedLoop\":false}]},\"primaryEntityName\":\"opportunity\",\"nextStepIndex\":\"54\",\"isCrmUIWorkflow\":true,\"category\":\"4\",\"businessProcessType\":\"0\",\"mode\":\"0\",\"title\":\"Publishing Opportunity Process\",\"description\":\"\",\"workflowEntityId\":\"5242571d-d8c6-f011-bbd3-6045bda81e56\",\"formId\":null,\"argumentsArray\":[],\"variables\":[],\"inputs\":[]}",
+          "workflowid": "5242571d-d8c6-f011-bbd3-6045bda81e56",
+          "statecode@OData.Community.Display.V1.FormattedValue": "Activated",
+          "statecode": 1,
+          "primaryentity@OData.Community.Display.V1.FormattedValue": "Opportunity",
+          "primaryentity": "opportunity",
+          "uniquename": "jm1pub_publishingopportunityprocess"
+        }
+      ]
+    }
+  },
+  "entity": {
+    "ok": true,
+    "status": 200,
+    "data": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(MetadataId,LogicalName,EntitySetName,SchemaName)/$entity",
+      "MetadataId": "83d48ac0-dec6-f011-bbd3-000d3a98ac66",
+      "LogicalName": "jm1pub_publishingopportunityprocess",
+      "SchemaName": "jm1pub_publishingopportunityprocess",
+      "EntitySetName": "jm1pub_publishingopportunityprocesses"
+    }
+  },
+  "solution": {
+    "ok": true,
+    "status": 200,
+    "data": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#solutions(solutionid,uniquename)",
+      "value": [
+        {
+          "@odata.etag": "W/\"14394399\"",
+          "solutionid": "b7c79bdb-d1c6-f011-bbd3-7ced8d1e18b4",
+          "uniquename": "JM1PublishingSales"
+        }
+      ]
+    }
+  },
+  "components": {
+    "ok": true,
+    "status": 200,
+    "data": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#solutioncomponents(componenttype,objectid)",
+      "value": [
+        {
+          "@odata.etag": "W/\"14448775\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "5cd7a3ce-26c8-f011-bbd2-000d3a153b27",
+          "solutioncomponentid": "62d7a3ce-26c8-f011-bbd2-000d3a153b27"
+        },
+        {
+          "@odata.etag": "W/\"14479909\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "3a1f5f35-59c8-f011-bbd2-000d3a153b27",
+          "solutioncomponentid": "3f1f5f35-59c8-f011-bbd2-000d3a153b27"
+        },
+        {
+          "@odata.etag": "W/\"14480271\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "7e65ec12-5ac8-f011-bbd2-000d3a153b27",
+          "solutioncomponentid": "8765ec12-5ac8-f011-bbd2-000d3a153b27"
+        },
+        {
+          "@odata.etag": "W/\"14396815\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "b29c3204-d7c6-f011-bbd3-000d3a8be336",
+          "solutioncomponentid": "b59c3204-d7c6-f011-bbd3-000d3a8be336"
+        },
+        {
+          "@odata.etag": "W/\"14394413\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Entity",
+          "componenttype": 1,
+          "objectid": "dc6574cb-92ce-446c-a5d6-885a75107d52",
+          "solutioncomponentid": "ae42e320-d2c6-f011-bbd3-000d3a98ac66"
+        },
+        {
+          "@odata.etag": "W/\"14394414\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Entity",
+          "componenttype": 1,
+          "objectid": "608861bc-50a4-4c5f-a02c-21fe1943e2cf",
+          "solutioncomponentid": "b342e320-d2c6-f011-bbd3-000d3a98ac66"
+        },
+        {
+          "@odata.etag": "W/\"14394415\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Entity",
+          "componenttype": 1,
+          "objectid": "70816501-edb9-4740-a16c-6a5efbc05d84",
+          "solutioncomponentid": "b542e320-d2c6-f011-bbd3-000d3a98ac66"
+        },
+        {
+          "@odata.etag": "W/\"14394416\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Entity",
+          "componenttype": 1,
+          "objectid": "30b0cd7e-0081-42e1-9a48-688442277fae",
+          "solutioncomponentid": "b642e320-d2c6-f011-bbd3-000d3a98ac66"
+        },
+        {
+          "@odata.etag": "W/\"14394417\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Entity",
+          "componenttype": 1,
+          "objectid": "107a7272-ebb3-469a-be46-76036d858623",
+          "solutioncomponentid": "b742e320-d2c6-f011-bbd3-000d3a98ac66"
+        },
+        {
+          "@odata.etag": "W/\"14394965\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "207f472b-d3c6-f011-bbd3-000d3a98ac66",
+          "solutioncomponentid": "237f472b-d3c6-f011-bbd3-000d3a98ac66"
+        },
+        {
+          "@odata.etag": "W/\"14396409\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "488f329c-d6c6-f011-bbd3-000d3a98ac66",
+          "solutioncomponentid": "4e8f329c-d6c6-f011-bbd3-000d3a98ac66"
+        },
+        {
+          "@odata.etag": "W/\"14396525\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "fbc9b1ba-d6c6-f011-bbd3-000d3a98ac66",
+          "solutioncomponentid": "fec9b1ba-d6c6-f011-bbd3-000d3a98ac66"
+        },
+        {
+          "@odata.etag": "W/\"14395385\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "4dfd1e0b-d5c6-f011-bbd3-0022481d90b4",
+          "solutioncomponentid": "60278011-d5c6-f011-bbd3-0022481d90b4"
+        },
+        {
+          "@odata.etag": "W/\"14396646\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "3c0230d8-d6c6-f011-bbd3-6045bda81e56",
+          "solutioncomponentid": "3f0230d8-d6c6-f011-bbd3-6045bda81e56"
+        },
+        {
+          "@odata.etag": "W/\"14397209\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Workflow",
+          "componenttype": 29,
+          "objectid": "5242571d-d8c6-f011-bbd3-6045bda81e56",
+          "solutioncomponentid": "5b42571d-d8c6-f011-bbd3-6045bda81e56"
+        },
+        {
+          "@odata.etag": "W/\"14447281\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "de0adae0-20c8-f011-bbd2-6045bdd8b624",
+          "solutioncomponentid": "ef0adae0-20c8-f011-bbd2-6045bdd8b624"
+        },
+        {
+          "@odata.etag": "W/\"14448458\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "364969a8-25c8-f011-bbd2-6045bdd8b624",
+          "solutioncomponentid": "33378fae-25c8-f011-bbd2-6045bdd8b624"
+        },
+        {
+          "@odata.etag": "W/\"14446938\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "a2d5804a-20c8-f011-bbd2-6045bdd8b8a4",
+          "solutioncomponentid": "7fa09e51-20c8-f011-bbd2-6045bdd8b8a4"
+        },
+        {
+          "@odata.etag": "W/\"14447904\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "1285035d-24c8-f011-bbd2-6045bdd8b8a4",
+          "solutioncomponentid": "3785035d-24c8-f011-bbd2-6045bdd8b8a4"
+        },
+        {
+          "@odata.etag": "W/\"14396261\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "9bd1fd70-d6c6-f011-bbd3-6045bdda34fc",
+          "solutioncomponentid": "3839fb76-d6c6-f011-bbd3-6045bdda34fc"
+        },
+        {
+          "@odata.etag": "W/\"14447554\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "766df2c8-21c8-f011-bbd2-6045bdef6a9b",
+          "solutioncomponentid": "c0b2efce-21c8-f011-bbd2-6045bdef6a9b"
+        },
+        {
+          "@odata.etag": "W/\"14426318\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Entity",
+          "componenttype": 1,
+          "objectid": "9d48cb83-bcc6-f011-bbd2-7c1e527f0c61",
+          "solutioncomponentid": "35df9633-8cee-4423-8cd6-64e89291ae94"
+        },
+        {
+          "@odata.etag": "W/\"14447079\"",
+          "componenttype@OData.Community.Display.V1.FormattedValue": "Option Set",
+          "componenttype": 9,
+          "objectid": "32aae184-20c8-f011-bbd2-7ced8d1aef03",
+          "solutioncomponentid": "3baae184-20c8-f011-bbd2-7ced8d1aef03"
+        }
+      ]
+    }
+  }
+}

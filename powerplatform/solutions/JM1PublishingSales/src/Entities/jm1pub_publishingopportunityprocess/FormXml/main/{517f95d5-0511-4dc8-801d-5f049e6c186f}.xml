@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{517f95d5-0511-4dc8-801d-5f049e6c186f}</formid>
+    <IntroducedVersion>1.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{149e25f6-6e93-47c2-80a3-8458df81fb44}" name="StageStep3" locklevel="0" expanded="true" visible="false" labelid="{8d6ab1d3-21a7-4d69-9c2c-694df48f5737}">
+          <labels>
+            <label description="Discovery" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showbar="false" columns="1" id="{ac2a3656-056c-ffbf-f35f-6825c1e1a9ba}" name="StageStep3_section1" labelid="{82166879-dcf7-40c1-add7-a0ea34855e54}">
+                  <labels>
+                    <label description="Discovery" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{e1370c79-7d4b-4d60-93e4-850b5f3e70d1}" showlabel="true" visible="true" labelid="{ec9fcd44-8ebc-4bb9-b1f8-0af9ccd500e3}">
+                        <labels>
+                          <label description="Topic" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:name" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="name" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="true" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{5fd7e767-3dbb-42b8-b8a9-5c3ed58b55e2}" showlabel="true" visible="true" labelid="{8688b011-ea4e-44c0-a225-a5c09616a175}">
+                        <labels>
+                          <label description="Contact" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:customerid" classid="{270bd3db-d9af-4782-9025-509e298dec0a}" datafieldname="customerid" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{3c8a0ee0-f57a-422e-9ffb-afe70b7238b1}" showlabel="true" visible="true" labelid="{db634585-e0d9-408f-b2ce-7d7ebe9c3050}">
+                        <labels>
+                          <label description="Project Title" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_projecttitle" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="jm1pub_projecttitle" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{8eb3c7b3-dfd7-4206-b57b-20bfef8b58fd}" showlabel="true" visible="true" labelid="{938f7213-abbe-4deb-8ecd-1550df018b80}">
+                        <labels>
+                          <label description="Manuscript Type" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_manuscripttype" classid="{3ef39988-22bb-4f0b-bbbe-64b5a3748aee}" datafieldname="jm1pub_manuscripttype" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{fb620859-dd8b-4826-af6a-308b7edc21f0}" showlabel="true" visible="true" labelid="{b7de1dab-2762-4bec-aa97-a1f55df7e302}">
+                        <labels>
+                          <label description="Preferred Format" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_preferredformat_oppty" classid="{3ef39988-22bb-4f0b-bbbe-64b5a3748aee}" datafieldname="jm1pub_preferredformat_oppty" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab verticallayout="true" id="{20469836-7fd1-4b6e-84af-10afbd910c7c}" name="StageStep15" locklevel="0" expanded="true" visible="false" labelid="{ece9f70c-4213-4e4d-924b-9914ac46dc5c}">
+          <labels>
+            <label description="Submission" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showbar="false" columns="1" id="{9f7207cd-0d10-dab3-ab11-915fb2d83349}" name="StageStep15_section1" labelid="{f2a92c91-07bb-465f-964a-01ccba91c618}">
+                  <labels>
+                    <label description="Submission" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{4b873421-0ac9-4c90-a316-f54fd11c49ca}" showlabel="true" visible="true" labelid="{bba38bd9-6179-412c-87fd-d423e95ee3b5}">
+                        <labels>
+                          <label description="Manuscript Submitted?" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_manuscriptsubmitted" classid="{67fac785-cd58-4f9f-abb3-4b7ddc6ed5ed}" datafieldname="jm1pub_manuscriptsubmitted" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{51c24392-c9ed-435f-a6ac-db8787538f91}" showlabel="true" visible="true" labelid="{ad38bcae-b32c-49d9-8d86-d0806f9d2a0e}">
+                        <labels>
+                          <label description="Estimated Page Count" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_estimatedpagecount" classid="{c6d124ca-7eda-4a60-aea9-7fb8d318b68f}" datafieldname="jm1pub_estimatedpagecount" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{9cc76802-7f30-41ab-937f-498dd46e8e10}" showlabel="true" visible="true" labelid="{47ebef28-0f5d-4a74-ac31-ec352b841d92}">
+                        <labels>
+                          <label description="Picture Book?" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_picturebook" classid="{67fac785-cd58-4f9f-abb3-4b7ddc6ed5ed}" datafieldname="jm1pub_picturebook" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{3a74d554-ea25-4102-aab3-1f82bfc3b0e9}" showlabel="true" visible="true" labelid="{aa917e20-0d16-40fc-b9d7-525381235f83}">
+                        <labels>
+                          <label description="Audiobook?" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_audiobook" classid="{67fac785-cd58-4f9f-abb3-4b7ddc6ed5ed}" datafieldname="jm1pub_audiobook" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab verticallayout="true" id="{de52c5ef-1fd6-4c8e-a795-d7affa9bc5ca}" name="StageStep25" locklevel="0" expanded="true" visible="false" labelid="{8a43d784-afb5-4715-86db-263b36a07d10}">
+          <labels>
+            <label description="Editorial Review" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showbar="false" columns="1" id="{3acfa427-3487-a633-1658-7962a5be7445}" name="StageStep25_section1" labelid="{f4eab3d8-7211-429b-addf-70fe6fc7ff35}">
+                  <labels>
+                    <label description="Editorial Review" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{04c6b5a9-5d16-49a6-b6fb-3d66773dda76}" showlabel="true" visible="true" labelid="{e782fad5-ea3e-4f8a-815c-da4225507b5a}">
+                        <labels>
+                          <label description="Review Status" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_reviewstatus" classid="{3ef39988-22bb-4f0b-bbbe-64b5a3748aee}" datafieldname="jm1pub_reviewstatus" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{2eba4c64-0bce-470d-b069-3b00dc4b2490}" showlabel="true" visible="true" labelid="{cc588bd2-6989-49b7-abfa-6046fafe8cb2}">
+                        <labels>
+                          <label description="Review Recommendation" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_reviewrecommendation" classid="{3ef39988-22bb-4f0b-bbbe-64b5a3748aee}" datafieldname="jm1pub_reviewrecommendation" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{a617e573-fb13-4088-9ab6-31172ad5079d}" showlabel="true" visible="true" labelid="{ee1690df-03c7-4694-a766-6c4b98bcf991}">
+                        <labels>
+                          <label description="Editorial Effort" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_editorialeffort" classid="{3ef39988-22bb-4f0b-bbbe-64b5a3748aee}" datafieldname="jm1pub_editorialeffort" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{efe6329c-555a-4839-aa96-46c66f34448b}" showlabel="true" visible="true" labelid="{00eedb8a-1055-4c2f-a694-fb47cd3b2481}">
+                        <labels>
+                          <label description="Risk Level" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_risklevel" classid="{3ef39988-22bb-4f0b-bbbe-64b5a3748aee}" datafieldname="jm1pub_risklevel" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab verticallayout="true" id="{055f3c52-6275-45b5-a44e-2de7bd23d9e0}" name="StageStep35" locklevel="0" expanded="true" visible="false" labelid="{48495dfb-ba5b-4c34-a413-2658f39dcbc8}">
+          <labels>
+            <label description="Package &amp; Quote" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showbar="false" columns="1" id="{cde5628d-165f-c49f-9783-d9c06ad080eb}" name="StageStep35_section1" labelid="{12d3ab94-ca61-46d2-8f3e-84eb8db77f78}">
+                  <labels>
+                    <label description="Package &amp; Quote" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{5a554978-0062-49f4-8244-9f4d626e5183}" showlabel="true" visible="true" labelid="{09c403c9-91e8-4be1-82c0-67409225901a}">
+                        <labels>
+                          <label description="Package Recommended" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_packagerecommended" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="jm1pub_packagerecommended" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{c420f29e-6f96-4d36-9101-dc298f08cd0f}" showlabel="true" visible="true" labelid="{db5a369a-f242-413a-9df7-7bf38d369204}">
+                        <labels>
+                          <label description="Est. revenue" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:estimatedvalue" classid="{533b9e00-756b-4312-95a0-dc888637ac78}" datafieldname="estimatedvalue" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{12c5cb66-40af-49f4-ab53-340283867866}" showlabel="true" visible="true" labelid="{524b8bf0-c843-4b7d-b069-e947589a46eb}">
+                        <labels>
+                          <label description="Est. close date" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:estimatedclosedate" classid="{5b773807-9fb2-42db-97c3-7a91eff8adff}" datafieldname="estimatedclosedate" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab verticallayout="true" id="{6a306266-0d55-43f6-8909-b0f4c8256ec6}" name="StageStep43" locklevel="0" expanded="true" visible="false" labelid="{8785c6ab-caa6-4265-b2b8-37bddbb4c464}">
+          <labels>
+            <label description="Contract" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showbar="false" columns="1" id="{0e242c61-c823-6575-355e-c444e73edacf}" name="StageStep43_section1" labelid="{d4b94f17-4baf-4f54-b654-433f085ffaca}">
+                  <labels>
+                    <label description="Contract" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{15f1379e-b24e-48a6-adaf-b492f9c08491}" showlabel="true" visible="true" labelid="{1f5bd858-9768-4e4b-89ae-a6f0356749f0}">
+                        <labels>
+                          <label description="Contract Status" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_contractstatus" classid="{3ef39988-22bb-4f0b-bbbe-64b5a3748aee}" datafieldname="jm1pub_contractstatus" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{16613f31-cdeb-4ed1-bb8b-3e1268d7c82c}" showlabel="true" visible="true" labelid="{490f88bd-d7ef-4e84-b99e-79383d9cddb3}">
+                        <labels>
+                          <label description="Contract URL" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_contracturl" classid="{71716b6c-711e-476c-8ab8-5d11542bfb47}" datafieldname="jm1pub_contracturl" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+        <tab verticallayout="true" id="{630cf8a9-9c9f-4432-b4a6-54f707641040}" name="StageStep49" locklevel="0" expanded="true" visible="false" labelid="{a2dc10a4-e367-4555-891a-29f35f2c5fbc}">
+          <labels>
+            <label description="Activation" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showbar="false" columns="1" id="{b450c3e1-b2a5-2c5c-1e5c-f80f602b72ab}" name="StageStep49_section1" labelid="{3e8179b5-a9df-4a65-b530-261f5ad2ecf8}">
+                  <labels>
+                    <label description="Activation" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{b6f94679-18ac-4bdf-8ce9-6451577836bb}" showlabel="true" visible="true" labelid="{46a5c862-a446-4bd2-99f9-c28449e8a82f}">
+                        <labels>
+                          <label description="Actual Close Date" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:actualclosedate" classid="{5b773807-9fb2-42db-97c3-7a91eff8adff}" datafieldname="actualclosedate" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{dadf874c-c5fe-4bba-bd31-89d54bc3faa3}" showlabel="true" visible="true" labelid="{d4ee98b8-f28f-4013-8667-ad1d71b13df4}">
+                        <labels>
+                          <label description="Editorial Project Id" languagecode="1033" />
+                        </labels>
+                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_editorialprojectid" classid="{4273edbd-ac1d-40d3-9fb2-095c621b552d}" datafieldname="jm1pub_editorialprojectid" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

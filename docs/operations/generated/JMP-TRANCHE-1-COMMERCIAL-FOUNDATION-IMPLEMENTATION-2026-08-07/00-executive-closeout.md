@@ -1,23 +1,42 @@
 # Executive Closeout
 
-Last verified: 2026-08-07T11:55:01.206540Z
+Last verified: 2026-08-07T20:52:37.069456Z
 
 ## Classification
 
-BLOCKED AT PHASE 0 / FAIL-CLOSED / NO PRODUCTION MUTATION
+POWER PLATFORM LIFECYCLE PARTIALLY ESTABLISHED / TRANCHE 1 STILL BLOCKED / NO CLIENT MUTATION
 
-Tranche 1 implementation authority was received, but execution did not proceed past protected preflight because the governed development-to-production Power Platform solution path for this tranche is not present in the repository or exposed by the current preflight.
+PR #438 originally stopped fail-closed because no governed Power Platform lifecycle was discoverable. This update establishes the reusable repo-side lifecycle standard, source-controls the `JM1PublishingSales` baseline, adds a lifecycle guard, and adds a protected deployment workflow skeleton.
 
-## Authority Preserved
+The deployment lifecycle is not yet fully proven because `JM1-Dev` cannot import the current `JM1PublishingSales` baseline. The import failed due missing first-party Sales/Service dependencies and missing JM1 active-layer dependencies.
 
-- PR #437 canonical planning authority: `ce8e9f0bf15e3a9a088f3243e569706a8ebee857`.
-- Tranche 1 implementation authority: acknowledged.
-- Client-title automation: FROZEN.
-- Client-title production: MANUAL.
+## Current Blocker
+
+`DEVELOPMENT_ENVIRONMENT_DEPENDENCY_PARITY_REQUIRED`
+
+## What Changed
+
+- Added `docs/governance/JM1-POWER-PLATFORM-SOLUTION-LIFECYCLE-v1.0.md`.
+- Added source-controlled solution baseline under `powerplatform/solutions/JM1PublishingSales/`.
+- Exported `JM1PublishingSales` from JM1-Core after adding its already-existing BPF entity to the solution boundary.
+- Unpacked the solution into source control.
+- Validated unmanaged pack from source.
+- Exported managed baseline artifact.
+- Added `jm1-power-platform-solution-lifecycle-guard`.
+- Added protected workflow skeleton `publishing-power-platform-solution-deploy.yml`.
+
+## Still Not Completed
+
+- Dev import proof: BLOCKED.
+- Protected production import proof: NOT RUN.
+- Internal deployment proof: NOT RUN.
+- PR #438 holds closed: 2 / 5.
+- Tranche 1 Phase 0 resumed: NO.
 
 ## Mutation Summary
 
-- Dynamics mutations: 0.
+- Production solution-boundary repair: added existing BPF entity `jm1pub_publishingopportunityprocess` to `JM1PublishingSales`.
+- Dynamics business/data mutations: 0.
 - Dataverse business/data mutations: 0.
 - Stripe mutations: 0.
 - Business Central mutations: 0.
@@ -25,7 +44,5 @@ Tranche 1 implementation authority was received, but execution did not proceed p
 - Website deployment: 0.
 - Author communications: 0.
 - Live client records used: 0.
-
-## Reason
-
-Phase 12 requires governed solution/deployment paths only. A direct production customization run would not satisfy that requirement.
+- Client-title automation: FROZEN.
+- Client-title production: MANUAL.

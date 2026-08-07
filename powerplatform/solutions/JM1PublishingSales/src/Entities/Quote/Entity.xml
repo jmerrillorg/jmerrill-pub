@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name LocalizedName="Quote" OriginalName="Quote">Quote</Name>
+  <EntityInfo>
+    <entity Name="Quote">
+      <attributes>
+        <attribute PhysicalName="ExchangeRate">
+          <Type>decimal</Type>
+          <Name>exchangerate</Name>
+          <LogicalName>exchangerate</LogicalName>
+          <RequiredLevel>none</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>disabled</ImeMode>
+          <ValidForUpdateApi>0</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>0</ValidForCreateApi>
+          <IsCustomField>0</IsCustomField>
+          <IsAuditEnabled>1</IsAuditEnabled>
+          <IsSecured>0</IsSecured>
+          <IntroducedVersion>5.0.0.0</IntroducedVersion>
+          <SourceType>0</SourceType>
+          <IsGlobalFilterEnabled>0</IsGlobalFilterEnabled>
+          <IsSortableEnabled>0</IsSortableEnabled>
+          <IsDataSourceSecret>0</IsDataSourceSecret>
+          <AutoNumberFormat></AutoNumberFormat>
+          <IsSearchable>0</IsSearchable>
+          <IsFilterable>0</IsFilterable>
+          <IsRetrievable>0</IsRetrievable>
+          <IsLocalizable>0</IsLocalizable>
+          <MinValue>1E-12</MinValue>
+          <MaxValue>100000000000</MaxValue>
+          <Accuracy>12</Accuracy>
+          <displaynames>
+            <displayname description="Exchange Rate" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Shows the conversion rate of the record's currency. The exchange rate is used to convert all money fields in the record from the local currency to the system's default currency." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+        <attribute PhysicalName="PaymentTermsCode">
+          <Type>picklist</Type>
+          <Name>paymenttermscode</Name>
+          <LogicalName>paymenttermscode</LogicalName>
+          <RequiredLevel>none</RequiredLevel>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>auto</ImeMode>
+          <ValidForUpdateApi>1</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsCustomField>0</IsCustomField>
+          <IsAuditEnabled>1</IsAuditEnabled>
+          <IsSecured>0</IsSecured>
+          <IntroducedVersion>5.0.0.0</IntroducedVersion>
+          <SourceType>0</SourceType>
+          <IsGlobalFilterEnabled>1</IsGlobalFilterEnabled>
+          <IsSortableEnabled>1</IsSortableEnabled>
+          <IsDataSourceSecret>0</IsDataSourceSecret>
+          <AutoNumberFormat></AutoNumberFormat>
+          <IsSearchable>0</IsSearchable>
+          <IsFilterable>0</IsFilterable>
+          <IsRetrievable>0</IsRetrievable>
+          <IsLocalizable>0</IsLocalizable>
+          <AppDefaultValue>-1</AppDefaultValue>
+          <optionset Name="quote_paymenttermscode">
+            <OptionSetType>picklist</OptionSetType>
+            <IntroducedVersion>5.0.0.0</IntroducedVersion>
+            <displaynames>
+              <displayname description="Payment Terms" languagecode="1033" />
+            </displaynames>
+            <Descriptions>
+              <Description description="Payment terms for the quote." languagecode="1033" />
+            </Descriptions>
+            <options>
+              <option value="1" IsHidden="0">
+                <labels>
+                  <label description="Net 30" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000001" IsHidden="0">
+                <labels>
+                  <label description="DUEUPONREC" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="2" IsHidden="0">
+                <labels>
+                  <label description="2% 10, Net 30" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="3" IsHidden="0">
+                <labels>
+                  <label description="Net 45" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000002" IsHidden="0">
+                <labels>
+                  <label description="INTERNAL" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000003" IsHidden="0">
+                <labels>
+                  <label description="MONTHLY" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="4" IsHidden="0">
+                <labels>
+                  <label description="Net 60" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000000" IsHidden="0">
+                <labels>
+                  <label description="COMMISSION" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000004" IsHidden="0">
+                <labels>
+                  <label description="NET 30 DAY" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000005" IsHidden="0">
+                <labels>
+                  <label description="NET15" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000006" IsHidden="0">
+                <labels>
+                  <label description="NET30" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000008" IsHidden="0">
+                <labels>
+                  <label description="PLAN90" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000011" IsHidden="0">
+                <labels>
+                  <label description="SAME-DAY" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000012" IsHidden="0">
+                <labels>
+                  <label description="ANNUAL" languagecode="1033" />
+                </labels>
+              </option>
+              <option value="100000009" IsHidden="0">
+                <labels>
+                  <label description="PREPAID" languagecode="1033" />
+                </labels>
+              </option>
+            </options>
+          </optionset>
+          <displaynames>
+            <displayname description="Payment Terms" languagecode="1033" />
+          </displaynames>
+          <Descriptions>
+            <Description description="Select the payment terms to indicate when the customer needs to pay the total amount." languagecode="1033" />
+          </Descriptions>
+        </attribute>
+      </attributes>
+      <EntitySetName>quotes</EntitySetName>
+      <IsDuplicateCheckSupported>1</IsDuplicateCheckSupported>
+      <IsBusinessProcessEnabled>1</IsBusinessProcessEnabled>
+      <IsRequiredOffline>0</IsRequiredOffline>
+      <IsInteractionCentricEnabled>0</IsInteractionCentricEnabled>
+      <IsCollaboration>0</IsCollaboration>
+      <AutoRouteToOwnerQueue>0</AutoRouteToOwnerQueue>
+      <IsConnectionsEnabled>1</IsConnectionsEnabled>
+      <IsDocumentManagementEnabled>1</IsDocumentManagementEnabled>
+      <AutoCreateAccessTeams>0</AutoCreateAccessTeams>
+      <IsOneNoteIntegrationEnabled>0</IsOneNoteIntegrationEnabled>
+      <IsKnowledgeManagementEnabled>0</IsKnowledgeManagementEnabled>
+      <IsSLAEnabled>0</IsSLAEnabled>
+      <IsDocumentRecommendationsEnabled>0</IsDocumentRecommendationsEnabled>
+      <IsBPFEntity>0</IsBPFEntity>
+      <OwnershipTypeMask>UserOwned</OwnershipTypeMask>
+      <EntityMask>ActivityPointer</EntityMask>
+      <IsAuditEnabled>0</IsAuditEnabled>
+      <IsRetrieveAuditEnabled>0</IsRetrieveAuditEnabled>
+      <IsRetrieveMultipleAuditEnabled>0</IsRetrieveMultipleAuditEnabled>
+      <IsActivity>0</IsActivity>
+      <ActivityTypeMask></ActivityTypeMask>
+      <IsActivityParty>1</IsActivityParty>
+      <IsReplicated>1</IsReplicated>
+      <IsReplicationUserFiltered>1</IsReplicationUserFiltered>
+      <IsMailMergeEnabled>0</IsMailMergeEnabled>
+      <IsVisibleInMobile>0</IsVisibleInMobile>
+      <IsVisibleInMobileClient>1</IsVisibleInMobileClient>
+      <IsReadOnlyInMobileClient>0</IsReadOnlyInMobileClient>
+      <IsOfflineInMobileClient>1</IsOfflineInMobileClient>
+      <DaysSinceRecordLastModified>0</DaysSinceRecordLastModified>
+      <MobileOfflineFilters>
+        &lt;fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false"&gt;
+          &lt;entity name="quote"&gt;
+          &lt;filter type="and"&gt;
+            &lt;condition attribute="modifiedon" operator="last-x-days" value="10"/&gt;
+          &lt;/filter&gt;
+         &lt;/entity&gt;
+        &lt;/fetch&gt;
+      </MobileOfflineFilters>
+      <IsMapiGridEnabled>1</IsMapiGridEnabled>
+      <IsReadingPaneEnabled>1</IsReadingPaneEnabled>
+      <IsQuickCreateEnabled>1</IsQuickCreateEnabled>
+      <SyncToExternalSearchIndex>1</SyncToExternalSearchIndex>
+      <IntroducedVersion>5.0.0.0</IntroducedVersion>
+      <EnforceStateTransitions>0</EnforceStateTransitions>
+      <EntityHelpUrlEnabled>0</EntityHelpUrlEnabled>
+      <ChangeTrackingEnabled>1</ChangeTrackingEnabled>
+      <IsEnabledForExternalChannels>0</IsEnabledForExternalChannels>
+      <IsMSTeamsIntegrationEnabled>0</IsMSTeamsIntegrationEnabled>
+      <IsSolutionAware>0</IsSolutionAware>
+      <HasRelatedNotes>True</HasRelatedNotes>
+      <HasRelatedActivities>True</HasRelatedActivities>
+    </entity>
+  </EntityInfo>
+  <FormXml />
+  <RibbonDiffXml />
+</Entity>

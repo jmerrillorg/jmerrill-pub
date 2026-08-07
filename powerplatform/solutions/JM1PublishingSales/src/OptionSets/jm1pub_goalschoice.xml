@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="jm1pub_goalschoice" localizedName="Goals Choice" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <ExternalTypeName></ExternalTypeName>
+  <displaynames>
+    <displayname description="Goals Choice" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="196650000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Publish My Book " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Get My Manuscript Reviewed " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Edit My Manuscript " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650003" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Design My Book Cover " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650004" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Format My Book Interior " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650005" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Prepare My Book for Distribution " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650006" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Publish a Children’s Book " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650007" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Publish a Legacy Book " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650008" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Publish an Audiobook " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650009" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Publish a Blockchain Edition" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650010" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Publish an eBook Only &#x9;" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650011" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Publish Print + eBook" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

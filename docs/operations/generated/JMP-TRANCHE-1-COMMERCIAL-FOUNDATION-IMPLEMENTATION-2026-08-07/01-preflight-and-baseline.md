@@ -1,33 +1,32 @@
 # Preflight and Baseline
 
-Last verified: 2026-08-07T11:55:01.206540Z
+Last verified: 2026-08-07T20:52:37.069456Z
 
 ## Result
 
-PROTECTED PREFLIGHT: PASS WITH GOVERNED DEPLOYMENT BLOCKER
+PREFLIGHT PASS / LIFECYCLE SOURCE BASELINE ACTIVE / DEV IMPORT BLOCKED
+
+## Environment Topology
+
+| Lane | Environment | URL | Type | Status |
+| --- | --- | --- | --- | --- |
+| DEV | JM1-Dev | `https://org52409ff2.crm.dynamics.com/` | Sandbox | FOUND / DEPENDENCY PARITY BLOCKED |
+| TEST/UAT | JM1-Test | `https://jm1test.crm.dynamics.com/` | Sandbox | FOUND / NOT SELECTED |
+| PROD | JM1-Core | `https://jm1hq.crm.dynamics.com/` | Production | FOUND |
 
 ## Verified
 
-- origin/main includes PR #437 merge SHA `ce8e9f0bf15e3a9a088f3243e569706a8ebee857`.
-- Clean Tranche 1 worktree was created from current origin/main.
-- `npm ci` completed from repository lockfile.
-- Repository guards and type-check passed.
-- JM1-PRIME canonical preflight passed.
-- Azure account is authenticated as `jm1-admin@jmerrill.one`.
-- PAC is authenticated to `JM1-Core` at `https://jm1hq.crm.dynamics.com/`.
-- `JM1PublishingSales` solution exists in JM1-Core.
-- Standard D365 Sales entity sets are reachable: leads, contacts, accounts, opportunities, products, pricelevels, quotes, quotedetails, salesorders, salesorderdetails, tasks, savedqueries, systemforms.
-- Publishing commercial catalog table is reachable.
+- PR #437 merge SHA present on main.
+- JM1-PRIME preflight passed.
+- `JM1PublishingSales` exists in JM1-Core.
+- Production solution was repaired to include the generated BPF entity needed for export.
+- Production unmanaged export succeeded.
+- Production managed export succeeded.
+- Source-controlled unpack succeeded.
+- Unmanaged pack validation succeeded.
 
-## Baseline Snapshot
+## Blocked
 
-- Existing JMP Sales products with `productnumber` beginning `JMP-`: 0.
-- Existing JMP/J Merrill Publishing price lists found by name filter: 0.
-- Existing Tranche 1 internal validation leads/opportunities/quotes/orders: 0.
-- Active Dataverse commercial catalog rows read with confirmed metadata: 119 Dataverse active rows, including 99 rows whose commercial status is `ACTIVE`.
-
-## Blocker
-
-Production mutation was not started because the repository and JM1-PRIME preflight do not identify a governed Tranche 1 dev-first solution package, source-controlled Power Platform customization artifact, approved development environment target, export/import path, or deployable Power Apps/Approvals artifact for this tranche.
-
-Phase 12 requires approved development-environment configuration first, governed packaging, validation, and production deployment through the approved release mechanism. Direct production REST/PAC customization would be ad hoc production customization and was therefore not performed.
+- JM1-Dev import failed due missing dependencies.
+- Production import proof was not attempted.
+- Tranche 1 runtime implementation remains stopped.

@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="jm1pub_worktypechoice" localizedName="Work Type Choice" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <ExternalTypeName></ExternalTypeName>
+  <displaynames>
+    <displayname description="Work Type Choice" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="196650000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Book – Full Service " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Book – Blockchain " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Book – Audiobook Production " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650003" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Book – Children’s Book (Picture Book) " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650004" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Book – Legacy Project " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650005" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Book – Marketing / Branding Package " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650006" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Book – Editing Services Only " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650007" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Book – Consulting Only " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650008" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Manuscript Review (Free) " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650009" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Distribution Only" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650010" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Pre-Need Planning &#x9;" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650011" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Estate Planning " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650012" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Insurance Policy Review " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650013" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="General Inquiry" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650014" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Volunteer " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650015" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Program Enrollment " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650016" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Donation Inquiry" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650017" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Membership Interest " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650018" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Prayer Request " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650019" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Counseling Request" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

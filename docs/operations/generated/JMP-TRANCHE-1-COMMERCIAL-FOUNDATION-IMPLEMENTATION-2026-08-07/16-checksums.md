@@ -1,11 +1,11 @@
 # Checksums
 
-Last verified: 2026-08-07T11:55:01.206540Z
+Last verified: 2026-08-07T20:54:05.459089Z
 
 | File | SHA-256 |
 | --- | --- |
-| 00-executive-closeout.md | c09cd003e6621157b49f57f11fa57204d4b75f483877ca99551d967d8ea16376 |
-| 01-preflight-and-baseline.md | 588730522754ffae84a4de642bbd2a82a884e513a369d184db2a08d9dcb1c3bc |
+| 00-executive-closeout.md | fb94bffc015d9acea010f5d7ec71e4065ab4fd1082daced6014010e35683b04e |
+| 01-preflight-and-baseline.md | ca09ce6a7062cd153075e1cb62b759240401d211c2f28b720549787a632aff5c |
 | 02-d365-sales-configuration.md | d7b6d634617a52f3e83550b5bd7029fa2055d0b9a3cf0691ae965739ad9f7460 |
 | 03-catalog-projection.md | 6877a12b9c0357ed7e62a695c5cd2019a6c77bb926b4d4f9b24a9e5f4e6a8b5d |
 | 04-quote-order-proof.md | 6994a97f82f539cd467fae575cb87b1263583675a765687f9596ab1d8f26f99b |
@@ -16,7 +16,7 @@ Last verified: 2026-08-07T11:55:01.206540Z
 | 09-exception-approval-proof.md | 401c0d8da10024935f34d8d53267c1f30904c414c44c233f42c4b880ca07fce5 |
 | 10-internal-validation-results.md | da201e0229ea579fe36024ffe840d9695a74d8d8826543ca55d633bc011d7cc0 |
 | 11-operator-burden-results.md | 08833c44652b79a56528cb9bb7ef039c3b4dc736bfa1bfe7989b8f392ed7bb23 |
-| 12-security-and-rollback.md | 856b63c6792f34e18757aea887667b796b00d4a4cbb7e231ae62e3b2125ca46e |
-| 13-production-readback.md | 078301818453329bed1aeaf8f76ab87e5475ee20e84edd5d293c963d19241b21 |
-| 14-open-holds.md | 8dac7fe6c8e4af576a11aee61c312a62e08b336f1bdba9648048b7ca83e60835 |
-| 15-evidence-index.md | a8aa4dfd6284dff3efada880c61cc07413fbefe22edc4b0f9c8c358535b8dd8b |
+| 12-security-and-rollback.md | b0c1ddb1129f86895b2472b5af31a88618b4547d0293f802ad5a570ae8c8450d |
+| 13-production-readback.md | e9591696f1b4986a1815946ca87f9e9c9d65f7e68e483c9079d86262c384a12e |
+| 14-open-holds.md | c381ff51d72e26e63d45bbf95bc95109f322ffe750c142fb4a409e3f2bb935ba |
+| 15-evidence-index.md | 8f2b92f1e3b0159705f6d188030ee0560d8c68d88b194d0471f8170bc185db22 |

@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="jm1pub_stageatsubmissionchoice" localizedName="Stage at Submission Choice" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <ExternalTypeName></ExternalTypeName>
+  <displaynames>
+    <displayname description="Stage at Submission Choice" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="196650000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Idea Only (No Manuscript) " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Early Draft (0–25%) " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Partial Draft (25–75%) " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650003" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Full Draft (75–100%) " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650004" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Manuscript Complete " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650005" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Manuscript Complete + Editing Requested " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650006" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Manuscript Complete + Ready for Publishing " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650007" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Manuscript Complete + Ready for Audiobook" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650008" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Children’s Book (Picture Book) – Manuscript Ready " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650009" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Legacy Book – Notes Only " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650010" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Legacy Book – Manuscript Ready " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650011" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Branding/Marketing Request Only " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650012" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Audiobook Production Only" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650013" IsHidden="0">
+      <labels>
+        <label description="Returning Author – New Project " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650014" IsHidden="0">
+      <labels>
+        <label description="Returning Author – Revision/Update " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650015" IsHidden="0">
+      <labels>
+        <label description="Distribution Only " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="196650016" IsHidden="0">
+      <labels>
+        <label description="Consultation Only" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

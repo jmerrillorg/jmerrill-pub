@@ -1,18 +1,20 @@
 # Evidence Index
 
-Last verified: 2026-08-07T11:55:01.206540Z
+Last verified: 2026-08-07T20:52:37.069456Z
 
 | Evidence | Source | Result |
 | --- | --- | --- |
-| PR #437 merge on main | `git log` / `origin/main` | PASS |
-| Repository type-check | `npm run type-check` | PASS |
-| Bootstrap guard | `npm run jm1-bootstrap-guard` | PASS |
-| Canon consistency guard | `npm run jm1-canon-consistency-guard` | PASS |
-| Canon enforcement guard | `npm run jm1-canon-guard-enforcement` | PASS |
-| Commissioning guard | `npm run jm1-commissioning-guard` | PASS |
-| Commercial architecture guard | `npm run commercial-architecture-guard` | PASS |
-| Slice 3 planning guard | `npm run slice3-implementation-planning-guard` | PASS |
-| Dirty worktree scope guard | `npm run dirty-worktree-scope-guard` | PASS |
-| JM1-PRIME preflight | `scripts/infra003_preflight.sh` | PASS |
-| PAC solution readback | `pac solution list` | `JM1PublishingSales` present |
-| Dataverse metadata readback | read-only Web API via Azure token | PASS |
+| Environment inventory | `pac admin list` | PASS |
+| Production solution inventory | `pac solution list --environment https://jm1hq.crm.dynamics.com/` | PASS |
+| DEV solution inventory | `pac solution list --environment https://org52409ff2.crm.dynamics.com/` | PASS |
+| TEST solution inventory | `pac solution list --environment https://jm1test.crm.dynamics.com/` | PASS |
+| Initial production export | `export-prod-baseline.log` | FAIL / missing BPF entity in solution |
+| BPF entity readback | `bpf-export-blocker-readback.json` | PASS / entity exists and workflow activated |
+| Solution-boundary repair | `add-bpf-entity-to-prod-solution.log` | PASS |
+| Production unmanaged export retry | `export-prod-baseline-retry.log` | PASS |
+| Production managed export | `export-prod-managed-baseline.log` | PASS |
+| Unpack baseline | `unpack-prod-baseline.log` | PASS |
+| Unmanaged pack validation | `pack-unmanaged-validation.log` | PASS |
+| Managed pack from unmanaged source | `pack-managed-validation.log` | NOT APPLICABLE / source package typed unmanaged |
+| DEV import proof | `import-dev-unmanaged-baseline.log` | FAIL / dependency parity blocker |
+| Lifecycle guard | `npm run jm1-power-platform-solution-lifecycle-guard` | PASS |
