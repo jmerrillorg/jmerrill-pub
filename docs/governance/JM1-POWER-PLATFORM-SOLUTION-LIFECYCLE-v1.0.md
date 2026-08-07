@@ -45,6 +45,10 @@ If the development environment cannot import or build the target solution becaus
 
 `DEVELOPMENT_ENVIRONMENT_DEPENDENCY_PARITY_REQUIRED`
 
+If the selected development sandbox cannot be brought to safe parity without broad unrelated first-party app installation, production cloning, or manual reconstruction of unmanaged production components, work stops with:
+
+`DEVELOPMENT_SANDBOX_REQUIRED`
+
 ## Solution-Aware Requirement
 
 All Dataverse configuration, model-driven app components, canvas apps, cloud flows, business process flows, connection references, environment variables, security roles, forms, views, and command components created for governed JM1 implementation must be solution-aware unless explicitly approved as an external dependency.
@@ -168,4 +172,3 @@ Do not:
 - deploy undocumented environment variables;
 - bypass protected production environment controls;
 - use client records for validation unless specifically authorized.
-

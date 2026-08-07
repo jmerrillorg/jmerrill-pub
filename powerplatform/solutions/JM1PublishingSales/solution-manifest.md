@@ -1,6 +1,6 @@
 # JM1PublishingSales Solution Manifest
 
-Status: SOURCE-CONTROLLED BASELINE / DEV IMPORT BLOCKED BY DEPENDENCY PARITY
+Status: SOURCE-CONTROLLED BASELINE / DEVELOPMENT SANDBOX REQUIRED
 
 ## Solution
 
@@ -22,8 +22,8 @@ Current source baseline version: `1.0.0.0`
 
 | Lane | Environment | URL | Type | Environment ID | Status |
 | --- | --- | --- | --- | --- | --- |
-| DEV | JM1-Dev | `https://org52409ff2.crm.dynamics.com/` | Sandbox | `a4d2d3cf-af53-e38c-970b-c6e19f4da917` | FOUND / DEPENDENCY PARITY BLOCKED |
-| TEST/UAT | JM1-Test | `https://jm1test.crm.dynamics.com/` | Sandbox | `251b8f38-5cea-e329-b9b2-3d34ba47dd1e` | FOUND / NOT SELECTED |
+| DEV | JM1-Dev | `https://org52409ff2.crm.dynamics.com/` | Sandbox | `a4d2d3cf-af53-e38c-970b-c6e19f4da917` | FOUND / NOT SAFELY REMEDIABLE IN THIS PASS |
+| TEST/UAT | JM1-Test | `https://jm1test.crm.dynamics.com/` | Sandbox | `251b8f38-5cea-e329-b9b2-3d34ba47dd1e` | FOUND / NOT PARITY |
 | PROD | JM1-Core | `https://jm1hq.crm.dynamics.com/` | Production | `dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10` | FOUND |
 
 ## Production Posture
@@ -110,4 +110,6 @@ PROD IMPORT PROOF: NOT RUN
 
 Blocker code:
 
-`DEVELOPMENT_ENVIRONMENT_DEPENDENCY_PARITY_REQUIRED`
+`DEVELOPMENT_SANDBOX_REQUIRED`
+
+The current dependency register contains 335 unique missing required components and 692 dependency edges. JM1-Dev is missing Tranche 1-aligned Dynamics Sales prerequisites, broad first-party dependencies that are not authorized for Tranche 1, and 38 JM1 `Active`-layer prerequisites without governed packages located in this repository. JM1-Test does not satisfy parity.

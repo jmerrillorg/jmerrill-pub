@@ -1,0 +1,13 @@
+
+Packing Solution...
+
+Packing /Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-tranche1-commercial-implementation/powerplatform/solutions/JM1PublishingSales/src to /Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-tranche1-commercial-implementation/powerplatform/solutions/JM1PublishingSales/artifacts/packed/JM1PublishingSales_managed_repacked.zip
+
+Microsoft PowerPlatform CLI
+Version: 1.49.4+g406813e (.NET 10.0.9)
+Online documentation: https://aka.ms/PowerPlatformCLI
+Feedback, Suggestions, Issues: https://github.com/microsoft/powerplatform-build-tools/discussions
+
+Error: Solution package type did not match requested type.
+Command line argument: Managed
+Package type: Unmanaged

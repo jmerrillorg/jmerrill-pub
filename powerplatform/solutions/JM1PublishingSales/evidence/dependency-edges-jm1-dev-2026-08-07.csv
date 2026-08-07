@@ -1,0 +1,693 @@
+requiredKey,requiredDisplay,dependent,canResolveMissingDependency
+"1|competitor|Competitor|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Competitor,Form: Opportunity/Field Service Information,True
+"1|competitor|Competitor|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Competitor,Form: Opportunity/Opportunity,True
+"1|competitor|Competitor|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Competitor,Form: Lead/Lead,True
+"1|entitlement|Entitlement|msdynce_Service (9.0.5.56)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'),)",Entitlement,Form: Contact/Contact,True
+"1|incident|Case|msdynce_Service (9.0.5.56)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'),)",Case,Form: Contact/Contact,True
+1|jm1_airunlog|AI Run Log|Active|(),AI Run Log,Entity/Table: /contact,False
+1|jm1_authorprofile|Author Profile|Active|(),Author Profile,Entity/Table: /contact,False
+1|jm1_consentrecord|Consent Record|Active|(),Consent Record,Entity/Table: /contact,False
+1|jm1_documents|Documents|Active|(),Documents,Entity/Table: /contact,False
+1|jm1_editorialjob|Editorial Job|Active|(),Editorial Job,Entity/Table: /contact,False
+1|jm1_engagements|Engagements|Active|(),Engagements,Entity/Table: /contact,False
+1|jm1_household|Household|Active|(),Household,Entity/Table: /contact,False
+1|jm1_jm1policy|JM1 Policy|Active|(),JM1 Policy,Entity/Table: /contact,False
+1|jm1_personrole|Person Role|Active|(),Person Role,Entity/Table: /account,False
+1|jm1_personrole|Person Role|Active|(),Person Role,Entity/Table: /contact,False
+1|jm1_project|Project|Active|(),Project,Entity/Table: /account,False
+1|jm1_project|Project|Active|(),Project,Entity/Table: /contact,False
+1|jm1_project|Project|Active|(),Project,Entity/Table: /opportunity,False
+1|jm1_projects|Projects|Active|(),Projects,Entity/Table: /contact,False
+1|jm1_publishingintake|Publishing Intake|Active|(),Publishing Intake,Entity/Table: /contact,False
+1|jm1_publishingintake|Publishing Intake|Active|(),Publishing Intake,Entity/Table: /lead,False
+1|jm1_publishingintake|Publishing Intake|Active|(),Publishing Intake,Entity/Table: /opportunity,False
+1|jm1_royaltyprofile|Royalty Profile|Active|(),Royalty Profile,Entity/Table: /contact,False
+1|jm1_royaltytransaction|Royalty Transaction|Active|(),Royalty Transaction,Entity/Table: /contact,False
+1|jm1fin_appointment|Appointment|Active|(),Appointment,Entity/Table: /contact,False
+1|jm1fin_case|Case|Active|(),Case,Entity/Table: /account,False
+1|jm1fin_case|Case|Active|(),Case,Entity/Table: /contact,False
+1|jm1fnd_jm1fndconstituent|JM1 FND Constituent|Active|(),JM1 FND Constituent,Entity/Table: /contact,False
+1|jm1pub_editorialdiagnostic|Editorial Diagnostic|Active|(),Editorial Diagnostic,Entity/Table: /contact,False
+1|jm1pub_editorialdiagnostic|Editorial Diagnostic|Active|(),Editorial Diagnostic,Entity/Table: /lead,False
+1|jm1pub_editorialdiagnostic|Editorial Diagnostic|Active|(),Editorial Diagnostic,Entity/Table: /opportunity,False
+1|jm1pub_editorialstage|Editorial Stage|Active|(),Editorial Stage,Entity/Table: /contact,False
+1|jm1pub_submission|Submission|Active|(),Submission,Entity/Table: /contact,False
+1|jm1pub_submission|Submission|Active|(),Submission,Entity/Table: /lead,False
+"1|lead|Lead|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Lead,Entity/Table: /lead,True
+"1|msdyn_accountkpiitem|Account KPI Item|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Account KPI Item,Entity/Table: /account,True
+"1|msdyn_activitymapping|Activity Mapping|msdyn_SalesCopilot (9.1.26064.10004)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Activity Mapping,Entity/Table: /lead,True
+"1|msdyn_activitymapping|Activity Mapping|msdyn_SalesCopilot (9.1.26064.10004)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Activity Mapping,Entity/Table: /opportunity,True
+"1|msdyn_actual|Actual|MicrosoftDynamicsScheduling (3.12.0.448)|(('msdynce_CoreServiceScheduling', 'msdynce_CoreServiceSchedulingAnchor (9.0.25123.2002)'), ('Field Service', 'FieldService_Anchor (8.8.147.60)'), ('Dynamics 365 Service Scheduling', 'msdynce_CoreServiceSchedulingAnchor (9.0.26023.2005)'))",Actual,Entity/Table: /account,True
+"1|msdyn_actual|Actual|MicrosoftDynamicsScheduling (3.12.0.448)|(('msdynce_CoreServiceScheduling', 'msdynce_CoreServiceSchedulingAnchor (9.0.25123.2002)'), ('Field Service', 'FieldService_Anchor (8.8.147.60)'), ('Dynamics 365 Service Scheduling', 'msdynce_CoreServiceSchedulingAnchor (9.0.26023.2005)'))",Actual,Entity/Table: /contact,True
+"1|msdyn_admin_pin|msdyn_admin_pin|msdyn_ChannelExperienceApp (1.0.26064.1015)|(('ChannelExperienceApps', 'msdyn_ChannelExperienceAppsAnchor (1.0.26013.1006)'), ('Dynamics 365 ChannelExperienceApps', 'msdyn_ChannelExperienceAppsAnchor (1.0.26021.1002)'))",msdyn_admin_pin,Entity/Table: /contact,True
+"1|msdyn_agreement|Agreement|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Agreement,Entity/Table: /account,True
+"1|msdyn_aicontactsuggestion|Teams Contact Suggestion by AI|msdyn_Collaboration (9.1.26054.10001)|(('msdynce_OfficeProductivity', 'msdynce_OfficeProductivityAnchor (9.0.26063.10001)'),)",Teams Contact Suggestion by AI,Entity/Table: /account,True
+"1|msdyn_contactkpiitem|Contact KPI Item|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Contact KPI Item,Entity/Table: /contact,True
+"1|msdyn_contactprofilerdetail|contactprofilerdetail|msdyn_SalesProfilerAgent (9.1.26052.10021)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'),)",contactprofilerdetail,Entity/Table: /contact,True
+"1|msdyn_contactprofilerresult|contactprofilerresult|msdyn_SalesProfilerAgent (9.1.26052.10021)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'),)",contactprofilerresult,Entity/Table: /account,True
+"1|msdyn_contactprofilerresult|contactprofilerresult|msdyn_SalesProfilerAgent (9.1.26052.10021)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'),)",contactprofilerresult,Entity/Table: /lead,True
+"1|msdyn_contactprofilerresult|contactprofilerresult|msdyn_SalesProfilerAgent (9.1.26052.10021)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'),)",contactprofilerresult,Entity/Table: /opportunity,True
+"1|msdyn_conversationparticipantinsights|Conversation Participant Insights|msdyn_Conversation_Intelligence (9.0.1.1294)|(('msdyn_SalesConversationIntelligence', 'msdyn_SalesConversationIntelligenceAnchor (9.0.1.1294)'),)",Conversation Participant Insights,Entity/Table: /account,True
+"1|msdyn_conversationparticipantinsights|Conversation Participant Insights|msdyn_Conversation_Intelligence (9.0.1.1294)|(('msdyn_SalesConversationIntelligence', 'msdyn_SalesConversationIntelligenceAnchor (9.0.1.1294)'),)",Conversation Participant Insights,Entity/Table: /contact,True
+"1|msdyn_customerasset|Customer Asset|msdyn_AssetCommon (1.0.3412.1)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'), ('Field Service', 'FieldService_Anchor (8.8.147.60)'))",Customer Asset,Entity/Table: /account,True
+"1|msdyn_dailyaccountkpiitem|Daily Kpis for account|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Daily Kpis for account,Entity/Table: /account,True
+"1|msdyn_dailycontactkpiitem|Daily kpis for contact|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Daily kpis for contact,Entity/Table: /contact,True
+"1|msdyn_dailyleadkpiitem|Daily kpis for lead|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Daily kpis for lead,Entity/Table: /lead,True
+"1|msdyn_dailyopportunitykpiitem|Daily kpis for Opportunity|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Daily kpis for Opportunity,Entity/Table: /opportunity,True
+"1|msdyn_dcaengageagentresult|SCA Engage Agent Result|msdyn_DealClosingAgent (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'),)",SCA Engage Agent Result,Entity/Table: /account,True
+"1|msdyn_dcaengageagentresult|SCA Engage Agent Result|msdyn_DealClosingAgent (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'),)",SCA Engage Agent Result,Entity/Table: /contact,True
+"1|msdyn_dcaengageagentresult|SCA Engage Agent Result|msdyn_DealClosingAgent (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'),)",SCA Engage Agent Result,Entity/Table: /lead,True
+"1|msdyn_dcaengageagentresult|SCA Engage Agent Result|msdyn_DealClosingAgent (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'),)",SCA Engage Agent Result,Entity/Table: /opportunity,True
+"1|msdyn_duplicatedetectionpluginrun|Duplicate Detection Plugin Run|msdyn_leadhygiene (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Duplicate Detection Plugin Run,Entity/Table: /lead,True
+"1|msdyn_duplicateleadmapping|Duplicate Lead Mapping|msdyn_leadhygiene (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Duplicate Lead Mapping,Entity/Table: /lead,True
+"1|msdyn_engageandreadinessagentresult|Engage And Readiness Agent Result|msdyn_AutonomousSQA (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Engage And Readiness Agent Result,Entity/Table: /lead,True
+"1|msdyn_engagereadinessagentresult|Engage And Readiness Agent Result V2|msdyn_SalesAgentsCommon (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Engage And Readiness Agent Result V2,Entity/Table: /lead,True
+"1|msdyn_entitlementapplication|Entitlement Application|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Entitlement Application,Entity/Table: /account,True
+"1|msdyn_insurance|Insurance|msdyn_FieldService_patch_update (8.8.147.60)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Insurance,Entity/Table: /account,True
+"1|msdyn_iotdevice|IoT Device|IoTConnector (1.8.53.0)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'), ('Field Service', 'FieldService_Anchor (8.8.147.60)'))",IoT Device,Entity/Table: /account,True
+"1|msdyn_lastagent|Last Agent|UnifiedRouting (1.5.26063.1004)|(('UnifiedRoutingPrime', 'UnifiedRoutingPrimeAnchor (1.5.27.250)'),)",Last Agent,Entity/Table: /account,True
+"1|msdyn_lastagent|Last Agent|UnifiedRouting (1.5.26063.1004)|(('UnifiedRoutingPrime', 'UnifiedRoutingPrimeAnchor (1.5.27.250)'),)",Last Agent,Entity/Table: /contact,True
+"1|msdyn_leadagentresult|Lead Agent Result|msdyn_SalesLeadResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Lead Agent Result,Entity/Table: /lead,True
+"1|msdyn_leademailextension|Lead Email Extension|msdyn_SalesLeadResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Lead Email Extension,Entity/Table: /lead,True
+"1|msdyn_leadkpiitem|Lead KPI Item|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Lead KPI Item,Entity/Table: /lead,True
+"1|msdyn_linkedentityattributevalidity|Linked Entity Attribute Validity|msdyn_leadhygiene (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Linked Entity Attribute Validity,Entity/Table: /contact,True
+"1|msdyn_linkedentityattributevalidity|Linked Entity Attribute Validity|msdyn_leadhygiene (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Linked Entity Attribute Validity,Entity/Table: /lead,True
+"1|msdyn_liveconversation|Ongoing conversation (Deprecated)|OmnichannelBase (1.10.0.146)|(('UnifiedRoutingPrime', 'UnifiedRoutingPrimeAnchor (1.5.27.250)'),)",Ongoing conversation (Deprecated),Entity/Table: /account,True
+"1|msdyn_liveconversation|Ongoing conversation (Deprecated)|OmnichannelBase (1.10.0.146)|(('UnifiedRoutingPrime', 'UnifiedRoutingPrimeAnchor (1.5.27.250)'),)",Ongoing conversation (Deprecated),Entity/Table: /contact,True
+"1|msdyn_mostcontacted|Most Contacted|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Most Contacted,Entity/Table: /account,True
+"1|msdyn_mostcontacted|Most Contacted|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Most Contacted,Entity/Table: /contact,True
+"1|msdyn_mostcontacted|Most Contacted|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Most Contacted,Entity/Table: /lead,True
+"1|msdyn_mostcontacted|Most Contacted|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Most Contacted,Entity/Table: /opportunity,True
+"1|msdyn_mostcontactedby|Most Contacted By|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Most Contacted By,Entity/Table: /account,True
+"1|msdyn_mostcontactedby|Most Contacted By|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Most Contacted By,Entity/Table: /contact,True
+"1|msdyn_mostcontactedby|Most Contacted By|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Most Contacted By,Entity/Table: /lead,True
+"1|msdyn_mostcontactedby|Most Contacted By|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Most Contacted By,Entity/Table: /opportunity,True
+"1|msdyn_nottoexceed|Not-to-exceed|msdyn_FieldService_patch_update (8.8.147.60)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Not-to-exceed,Entity/Table: /account,True
+"1|msdyn_ocexternalsecuritysetting|External Security Setting|OmnichannelTelephony (1.10.0.299)|(('OmnichannelPrimeTelephony', 'OmnichannelPrimeTelephony (1.5.27.641)'),)",External Security Setting,Entity/Table: /contact,True
+"1|msdyn_ocliveworkitem|Conversation|OmnichannelBase (1.10.0.146)|(('UnifiedRoutingPrime', 'UnifiedRoutingPrimeAnchor (1.5.27.250)'),)",Conversation,Entity/Table: /account,True
+"1|msdyn_ocliveworkitem|Conversation|OmnichannelBase (1.10.0.146)|(('UnifiedRoutingPrime', 'UnifiedRoutingPrimeAnchor (1.5.27.250)'),)",Conversation,Entity/Table: /contact,True
+"1|msdyn_ocvoicemail|Voicemail|OmnichannelTelephony (1.10.0.299)|(('OmnichannelPrimeTelephony', 'OmnichannelPrimeTelephony (1.5.27.641)'),)",Voicemail,Entity/Table: /account,True
+"1|msdyn_ocvoicemail|Voicemail|OmnichannelTelephony (1.10.0.299)|(('OmnichannelPrimeTelephony', 'OmnichannelPrimeTelephony (1.5.27.641)'),)",Voicemail,Entity/Table: /contact,True
+"1|msdyn_opportunityaccountresearchresult|Opportunity Account Research Result|msdyn_SalesOpportunityResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Opportunity Account Research Result,Entity/Table: /account,True
+"1|msdyn_opportunitycompetitorresearchresultcache|Opportunity Competitor Research Result Cache|msdyn_SalesOpportunityResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Opportunity Competitor Research Result Cache,Entity/Table: /account,True
+"1|msdyn_opportunitykpiitem|Opportunity KPI Item|RelationshipAnalytics (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Opportunity KPI Item,Entity/Table: /opportunity,True
+"1|msdyn_opportunityresearchindicator|Opportunity Research Indicator|msdyn_SalesOpportunityResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Opportunity Research Indicator,Entity/Table: /opportunity,True
+"1|msdyn_opportunityresearchresult|Opportunity Research Result|msdyn_SalesOpportunityResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Opportunity Research Result,Entity/Table: /opportunity,True
+"1|msdyn_opportunityresearchuserinteractions|Opportunity Research User Interactions|msdyn_SalesOpportunityResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Opportunity Research User Interactions,Entity/Table: /opportunity,True
+"1|msdyn_orgchartnode|Microsoft Orgchart node entity|msdyn_LinkedInExtensions (9.0.26064.10157)|(('msdyn_SalesIntegrationsAndAddOns', 'msdyn_SalesIntegrationsAddOns (9.0.26064.10003)'),)",Microsoft Orgchart node entity,Entity/Table: /account,True
+"1|msdyn_orgchartnode|Microsoft Orgchart node entity|msdyn_LinkedInExtensions (9.0.26064.10157)|(('msdyn_SalesIntegrationsAndAddOns', 'msdyn_SalesIntegrationsAddOns (9.0.26064.10003)'),)",Microsoft Orgchart node entity,Entity/Table: /contact,True
+"1|msdyn_payment|Payment|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Payment,Entity/Table: /account,True
+"1|msdyn_personal_pin|msdyn_personal_pin|msdyn_ChannelExperienceApp (1.0.26064.1015)|(('ChannelExperienceApps', 'msdyn_ChannelExperienceAppsAnchor (1.0.26013.1006)'), ('Dynamics 365 ChannelExperienceApps', 'msdyn_ChannelExperienceAppsAnchor (1.0.26021.1002)'))",msdyn_personal_pin,Entity/Table: /contact,True
+"1|msdyn_preferredagent|Preferred Agent|UnifiedRouting (1.5.26063.1004)|(('UnifiedRoutingPrime', 'UnifiedRoutingPrimeAnchor (1.5.27.250)'),)",Preferred Agent,Entity/Table: /account,True
+"1|msdyn_preferredagent|Preferred Agent|UnifiedRouting (1.5.26063.1004)|(('UnifiedRoutingPrime', 'UnifiedRoutingPrimeAnchor (1.5.27.250)'),)",Preferred Agent,Entity/Table: /contact,True
+"1|msdyn_prioritizedactioncatalogue|Prioritized Action Catalogue|msdyn_NextBestActionAgent (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Prioritized Action Catalogue,Entity/Table: /lead,True
+"1|msdyn_prioritizedactioncatalogue|Prioritized Action Catalogue|msdyn_NextBestActionAgent (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Prioritized Action Catalogue,Entity/Table: /opportunity,True
+"1|msdyn_purchaseorder|Purchase Order|FieldServiceCommon (1.0.0.1185)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Purchase Order,Entity/Table: /account,True
+"1|msdyn_quotebookingincident|Quote Booking Incident|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Quote Booking Incident,Entity/Table: /quote,True
+"1|msdyn_quotebookingproduct|Quote Booking Product|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Quote Booking Product,Entity/Table: /quote,True
+"1|msdyn_quotebookingservice|Quote Booking Service|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Quote Booking Service,Entity/Table: /quote,True
+"1|msdyn_quotebookingservicetask|Quote Booking Service Task|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Quote Booking Service Task,Entity/Table: /quote,True
+"1|msdyn_quotebookingsetup|Quote Booking Setup|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Quote Booking Setup,Entity/Table: /quote,True
+"1|msdyn_quoteinvoicingsetup|Quote Invoicing Setup|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Quote Invoicing Setup,Entity/Table: /quote,True
+"1|msdyn_rawactioncatalogue|rawactioncatalogue|msdyn_NextBestActionAgent (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",rawactioncatalogue,Entity/Table: /lead,True
+"1|msdyn_rawactioncatalogue|rawactioncatalogue|msdyn_NextBestActionAgent (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",rawactioncatalogue,Entity/Table: /opportunity,True
+"1|msdyn_recommendedactionderivedinsight|Recommended Action Derived Insights|msdyn_NextBestActionAgent (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Recommended Action Derived Insights,Entity/Table: /lead,True
+"1|msdyn_recommendedactionderivedinsight|Recommended Action Derived Insights|msdyn_NextBestActionAgent (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Recommended Action Derived Insights,Entity/Table: /opportunity,True
+"1|msdyn_requirementresourcepreference|Requirement Resource Preference|MicrosoftDynamicsScheduling (3.12.0.448)|(('msdynce_CoreServiceScheduling', 'msdynce_CoreServiceSchedulingAnchor (9.0.25123.2002)'), ('Field Service', 'FieldService_Anchor (8.8.147.60)'), ('Dynamics 365 Service Scheduling', 'msdynce_CoreServiceSchedulingAnchor (9.0.26023.2005)'))",Requirement Resource Preference,Entity/Table: /account,True
+"1|msdyn_rma|RMA|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",RMA,Entity/Table: /account,True
+"1|msdyn_rma|RMA|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",RMA,Entity/Table: /contact,True
+"1|msdyn_rmaproduct|RMA Product|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",RMA Product,Entity/Table: /account,True
+"1|msdyn_rtv|RTV|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",RTV,Entity/Table: /account,True
+"1|msdyn_rtv|RTV|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",RTV,Entity/Table: /contact,True
+"1|msdyn_sabackupdiagnostic|sabackupdiagnostic|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",sabackupdiagnostic,Entity/Table: /account,True
+"1|msdyn_sabackupdiagnostic|sabackupdiagnostic|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",sabackupdiagnostic,Entity/Table: /contact,True
+"1|msdyn_sabackupdiagnostic|sabackupdiagnostic|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",sabackupdiagnostic,Entity/Table: /lead,True
+"1|msdyn_sabackupdiagnostic|sabackupdiagnostic|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",sabackupdiagnostic,Entity/Table: /opportunity,True
+"1|msdyn_salesaccelerationinsight|Sales acceleration insights|msdyn_acceleratedsales (9.1.26064.10001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Sales acceleration insights,Entity/Table: /account,True
+"1|msdyn_salesagenthandover|Sales Agent Handover|msdyn_SalesAgentsCommon (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Sales Agent Handover,Entity/Table: /lead,True
+"1|msdyn_salesagentprocessingstate|Sales agent processing state|msdyn_SalesAgentsCommon (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Sales agent processing state,Entity/Table: /opportunity,True
+"1|msdyn_salesagentrun|Sales agent run|msdyn_SalesAgentsCommon (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Sales agent run,Entity/Table: /account,True
+"1|msdyn_salesagentrun|Sales agent run|msdyn_SalesAgentsCommon (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Sales agent run,Entity/Table: /contact,True
+"1|msdyn_salesagentrun|Sales agent run|msdyn_SalesAgentsCommon (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Sales agent run,Entity/Table: /lead,True
+"1|msdyn_salesagentrun|Sales agent run|msdyn_SalesAgentsCommon (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Sales agent run,Entity/Table: /opportunity,True
+"1|msdyn_salescopilotinsight|Sales Copilot Insight|msdyn_SalesCopilot (9.1.26064.10004)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Sales Copilot Insight,Entity/Table: /account,True
+"1|msdyn_salescopilotinsight|Sales Copilot Insight|msdyn_SalesCopilot (9.1.26064.10004)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Sales Copilot Insight,Entity/Table: /contact,True
+"1|msdyn_salescopilotinsight|Sales Copilot Insight|msdyn_SalesCopilot (9.1.26064.10004)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Sales Copilot Insight,Entity/Table: /lead,True
+"1|msdyn_salescopilotinsight|Sales Copilot Insight|msdyn_SalesCopilot (9.1.26064.10004)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Sales Copilot Insight,Entity/Table: /opportunity,True
+"1|msdyn_salesroutingdiagnostic|salesroutingdiagnostic|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",salesroutingdiagnostic,Entity/Table: /account,True
+"1|msdyn_salesroutingdiagnostic|salesroutingdiagnostic|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",salesroutingdiagnostic,Entity/Table: /contact,True
+"1|msdyn_salesroutingdiagnostic|salesroutingdiagnostic|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",salesroutingdiagnostic,Entity/Table: /lead,True
+"1|msdyn_salesroutingdiagnostic|salesroutingdiagnostic|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",salesroutingdiagnostic,Entity/Table: /opportunity,True
+"1|msdyn_salesroutingrun|Sales routing run|msdyn_SalesRouting (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Sales routing run,Entity/Table: /account,True
+"1|msdyn_salesroutingrun|Sales routing run|msdyn_SalesRouting (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Sales routing run,Entity/Table: /contact,True
+"1|msdyn_salesroutingrun|Sales routing run|msdyn_SalesRouting (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Sales routing run,Entity/Table: /lead,True
+"1|msdyn_salesroutingrun|Sales routing run|msdyn_SalesRouting (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Sales routing run,Entity/Table: /opportunity,True
+"1|msdyn_salessuggestion|Insight|msdyn_acceleratedsales (9.1.26064.10001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Insight,Entity/Table: /account,True
+"1|msdyn_salessuggestion|Insight|msdyn_acceleratedsales (9.1.26064.10001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Insight,Entity/Table: /contact,True
+"1|msdyn_salessuggestion|Insight|msdyn_acceleratedsales (9.1.26064.10001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Insight,Entity/Table: /opportunity,True
+"1|msdyn_sequencetarget|Sequence Target|msdyn_Sequence (9.1.26054.10002)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Sequence Target,Entity/Table: /account,True
+"1|msdyn_sequencetarget|Sequence Target|msdyn_Sequence (9.1.26054.10002)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Sequence Target,Entity/Table: /contact,True
+"1|msdyn_sequencetarget|Sequence Target|msdyn_Sequence (9.1.26054.10002)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Sequence Target,Entity/Table: /lead,True
+"1|msdyn_sequencetarget|Sequence Target|msdyn_Sequence (9.1.26054.10002)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Sequence Target,Entity/Table: /opportunity,True
+"1|msdyn_stakeholderresearchoutput|Stakeholder Research Output|msdyn_SalesLeadResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Stakeholder Research Output,Entity/Table: /account,True
+"1|msdyn_summarysynthesizerinput|Summary Synthesizer Input|msdyn_SalesLeadResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Summary Synthesizer Input,Entity/Table: /lead,True
+"1|msdyn_summarysynthesizerinput|Summary Synthesizer Input|msdyn_SalesLeadResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Summary Synthesizer Input,Entity/Table: /opportunity,True
+"1|msdyn_summarysynthesizeroutput|summarysynthesizeroutput (Deprecated)|msdyn_SalesLeadResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",summarysynthesizeroutput (Deprecated),Entity/Table: /lead,True
+"1|msdyn_summarysynthesizeroutput|summarysynthesizeroutput (Deprecated)|msdyn_SalesLeadResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",summarysynthesizeroutput (Deprecated),Entity/Table: /opportunity,True
+"1|msdyn_swarm|Swarm|msdyn_Swarming (9.0.26064.2022)|(('ServiceExtended', 'msdyn_ServiceExtendedAnchor (9.0.26064.2022)'),)",Swarm,Entity/Table: /account,True
+"1|msdyn_synthesizeroutput|Summary Synthesizer Output|msdyn_SalesLeadResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Summary Synthesizer Output,Entity/Table: /lead,True
+"1|msdyn_synthesizeroutput|Summary Synthesizer Output|msdyn_SalesLeadResearch (9.1.26064.10021)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Summary Synthesizer Output,Entity/Table: /opportunity,True
+"1|msdyn_taggedrecord|Tagged Record|msdyn_VivaSalesCore (9.39.26133.1)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Tagged Record,Entity/Table: /contact,True
+"1|msdyn_taggedrecord|Tagged Record|msdyn_VivaSalesCore (9.39.26133.1)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Tagged Record,Entity/Table: /lead,True
+"1|msdyn_timespent|Time spent in BPF|msdyn_PredictiveScoringCommon (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Time spent in BPF,Entity/Table: /lead,True
+"1|msdyn_timespent|Time spent in BPF|msdyn_PredictiveScoringCommon (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",Time spent in BPF,Entity/Table: /opportunity,True
+"1|msdyn_tradecoverage|Trade Coverage|msdyn_FieldService_patch_update (8.8.147.60)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Trade Coverage,Entity/Table: /account,True
+"1|msdyn_triggersalesagent|Trigger Sales Agent|msdyn_SalesAgentsCommon (9.1.26064.10015)|(('msdyn_SalesAgents', 'msdyn_SalesOpportunityResearch (9.1.25091.10019)'), ('msdyn_SalesAgents', 'msdyn_SalesAgentsAnchor (9.1.26064.10021)'), ('msdyn_SalesAgents', 'msdyn_NextBestActionAgent (9.1.26034.10017)'))",Trigger Sales Agent,Entity/Table: /lead,True
+"1|msdyn_warranty|Warranty|msdyn_AssetCommon (1.0.3412.1)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'), ('Field Service', 'FieldService_Anchor (8.8.147.60)'))",Warranty,Entity/Table: /account,True
+"1|msdyn_workorder|Work Order|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Work Order,Entity/Table: /account,True
+"1|msdyn_workorder|Work Order|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Work Order,Entity/Table: /contact,True
+"1|msdyn_workorder|Work Order|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Work Order,Entity/Table: /opportunity,True
+"1|msdyn_workorderresourcerestriction|Resource Restriction (Deprecated)|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Resource Restriction (Deprecated),Entity/Table: /account,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Entity/Table: /opportunity,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_brand,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_linkedproject,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6agreementpreparationstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6authorportalstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6authorselectedpackagecode,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6businesshandoffstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6firstpaymentconfirmationsource,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6firstpaymentconfirmedon,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6firstpaymentstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6onboardingstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6opportunityupdatestatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6packageselectionstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6paymentoptionpreparationstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6paymentoptionselectionstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6paymentselectionevidencelog,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6paymentselectionreceivedon,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6paymentselectionsource,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6paymentselectionthreadsubject,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6selectedinstallmentcount,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6selectedpaymentamount,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6selectedpaymentoption,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6selectedpaymenttotal,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6stripepricemappingstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_m6stripeproductmappingstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_originlead,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1_pipeline,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_audiobook,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_budgetcomfortlevel,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_contractstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_contracturl,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_desiredpublishingtimeline,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_editorialeffort,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_editorialprojectid,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_estimatedpagecount,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_genre,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_intaketrackingid,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_intakeversion,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_leadquality,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_leadsource,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_manuscript_submitted,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_manuscriptsubmitted,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_manuscripttype,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_packagerecommended,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_picturebook,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_preferredformat,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_preferredformat_oppty,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_primarylanguage,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_projectsummary,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_projecttitle,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_publishingservicetype,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_reviewrecommendation,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_reviewstatus,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_risklevel,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_targetreleasedate,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Attribute/Column: opportunity/jm1pub_trimsize,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Saved View: jm1pub_publishingopportunityprocess/Inactive Publishing Opportunity Process on my Opportunities,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Saved View: jm1pub_publishingopportunityprocess/Active Publishing Opportunity Process on my Opportunities,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Saved View: opportunity/Opportunities I Follow,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Saved View: opportunity/Opportunities Being Followed,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Component type 29: /Publishing Opportunity Process,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Component type 50: ribboncustomization/opportunity:RibbonDiffXml,True
+"1|opportunity|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Form: Contact/Contact,True
+"1|opportunityproduct|Opportunity Line|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Line,Entity/Table: /account,True
+"1|opportunityproduct|Opportunity Line|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Line,Form: Opportunity/Field Service Information,True
+"1|opportunityproduct|Opportunity Line|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Line,Form: Opportunity/Information,True
+"1|opportunityproduct|Opportunity Line|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Line,Form: Opportunity/Opportunity,True
+"1|powerpagesusermapping|PowerPagesUserMapping|PowerPages_RuntimeExtensions (1.1.2605.0)|(('Power Pages Core Package', 'PowerPages_Core (1.1.2605.258)'),)",PowerPagesUserMapping,Entity/Table: /account,True
+"1|powerpagesusermapping|PowerPagesUserMapping|PowerPages_RuntimeExtensions (1.1.2605.0)|(('Power Pages Core Package', 'PowerPages_Core (1.1.2605.258)'),)",PowerPagesUserMapping,Entity/Table: /contact,True
+"1|product|Product|msdynce_ProductManagement (9.0.4.0066)|(('msdynce_ProductManagement', 'msdynce_ProductManagementAnchor (9.0.26064.10001)'),)",Product,Entity/Table: /account,True
+"1|quote|Quote|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote,Entity/Table: /quote,True
+"1|quote|Quote|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote,Form: Opportunity/Field Service Information,True
+"1|quote|Quote|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote,Form: Opportunity/Information,True
+"1|quote|Quote|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote,Form: Opportunity/Opportunity,True
+"1|quotedetail|Quote Product|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Product,Entity/Table: /account,True
+"1|quotedetail|Quote Product|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Product,Form: Quote/Quote,True
+"1|quotedetail|Quote Product|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Product,Form: Quote/Field Service Information,True
+"1|salesorder|Order|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Order,Entity/Table: /account,True
+10|bcbi_Contact_CompanyId_bcbi_Company|bcbi_Contact_CompanyId_bcbi_Company|bcbi_CdsBaseIntegration (27.0.46208.0)|(),bcbi_Contact_CompanyId_bcbi_Company,Relationship: bcbi_company/bcbi_Contact_CompanyId_bcbi_Company,False
+10|bcbi_Opportunity_Company_bcbi_Company|bcbi_Opportunity_Company_bcbi_Company|MicrosoftDynamicsNavIntegration (27.0.46208.0)|(),bcbi_Opportunity_Company_bcbi_Company,Form: Opportunity/Opportunity,False
+10|bcbi_Quote_Company_bcbi_Company|bcbi_Quote_Company_bcbi_Company|MicrosoftDynamicsNavIntegration (27.0.46208.0)|(),bcbi_Quote_Company_bcbi_Company,Form: Quote/Quote,False
+"10|msdyn_account_quote_Account|msdyn_account_quote_Account|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_account_quote_Account,Form: Quote/Field Service Information,True
+"10|msdyn_msdyn_predictivescore_lead|msdyn_msdyn_predictivescore_lead|msdyn_PredictiveScoringCommon (9.0.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",msdyn_msdyn_predictivescore_lead,Relationship: msdyn_predictivescore/msdyn_msdyn_predictivescore_lead,True
+"10|msdyn_msdyn_segment_lead|msdyn_msdyn_segment_lead|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",msdyn_msdyn_segment_lead,Relationship: msdyn_segment/msdyn_msdyn_segment_lead,True
+"10|msdyn_msdyn_workordertype_opportunity_WorkOrderType|msdyn_msdyn_workordertype_opportunity_WorkOrderType|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_msdyn_workordertype_opportunity_WorkOrderType,Form: Opportunity/Field Service Information,True
+"10|msdyn_msdyn_workordertype_opportunity_WorkOrderType|msdyn_msdyn_workordertype_opportunity_WorkOrderType|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_msdyn_workordertype_opportunity_WorkOrderType,Form: Opportunity/Opportunity,True
+"10|msdyn_opportunity_msdyn_workorder|msdyn_opportunity_msdyn_workorder|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_opportunity_msdyn_workorder,Form: Opportunity/Field Service Information,True
+"10|msdyn_opportunity_msdyn_workorder|msdyn_opportunity_msdyn_workorder|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_opportunity_msdyn_workorder,Form: Opportunity/Opportunity,True
+"10|msdyn_quote_msdyn_quoteinvoicingsetup_Quote|msdyn_quote_msdyn_quoteinvoicingsetup_Quote|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_quote_msdyn_quoteinvoicingsetup_Quote,Form: Quote/Field Service Information,True
+"2|actualclosedate|Actual Close Date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Actual Close Date,Component type 29: /Publishing Opportunity Process,True
+"2|actualclosedate|Actual Close Date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Actual Close Date,Form: Publishing Opportunity Process/Information,True
+"2|address1_city|City|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",City,Form: Lead/Information,True
+"2|address1_city|City|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",City,Form: Lead/Lead,True
+"2|address1_composite|Address 1|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Address 1,Form: Lead/Lead,True
+"2|address1_country|Country/Region|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Country/Region,Form: Lead/Information,True
+"2|address1_country|Country/Region|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Country/Region,Form: Lead/Lead,True
+"2|address1_line1|Street 1|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Street 1,Form: Lead/Information,True
+"2|address1_line1|Street 1|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Street 1,Form: Lead/Lead,True
+"2|address1_line2|Street 2|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Street 2,Form: Lead/Information,True
+"2|address1_line2|Street 2|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Street 2,Form: Lead/Lead,True
+"2|address1_line3|Street 3|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Street 3,Form: Lead/Information,True
+"2|address1_line3|Street 3|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Street 3,Form: Lead/Lead,True
+"2|address1_postalcode|ZIP/Postal Code|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",ZIP/Postal Code,Form: Lead/Information,True
+"2|address1_postalcode|ZIP/Postal Code|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",ZIP/Postal Code,Form: Lead/Lead,True
+"2|address1_stateorprovince|State/Province|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",State/Province,Form: Lead/Information,True
+"2|address1_stateorprovince|State/Province|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",State/Province,Form: Lead/Lead,True
+2|bcbi_companyid|Company|MicrosoftDynamicsNavIntegration (27.0.46208.0)|(),Company,Form: Opportunity/Opportunity,False
+2|bcbi_companyid|Company|MicrosoftDynamicsNavIntegration (27.0.46208.0)|(),Company,Form: Quote/Quote,False
+"2|billto_composite|Bill To Address|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Bill To Address,Form: Quote/Quote,True
+"2|billto_composite|Bill To Address|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Bill To Address,Form: Quote/Field Service Information,True
+"2|budgetamount|Budget amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Budget amount,Form: Opportunity/Lead qualification opportunity form,True
+"2|budgetamount|Budget amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Budget amount,Form: Opportunity/Field Service Information,True
+"2|budgetamount|Budget amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Budget amount,Form: Opportunity/Opportunity,True
+"2|businesscard|Business Card|msdynce_SalesPatch201904 (9.0.1912.1007)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Business Card,Form: Contact/Contact,True
+"2|businesscard|Business Card|msdynce_SalesPatch201904 (9.0.1912.1007)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Business Card,Form: Lead/Lead,True
+"2|businesscardattributes|BusinessCardAttributes|msdynce_SalesPatch201904 (9.0.1912.1007)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",BusinessCardAttributes,Form: Contact/Contact,True
+"2|businesscardattributes|BusinessCardAttributes|msdynce_SalesPatch201904 (9.0.1912.1007)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",BusinessCardAttributes,Form: Lead/Lead,True
+"2|campaignid|Source Campaign|msdynce_Marketing (9.0.4.37)|(('msdynce_Marketing', 'msdynce_MarketingAnchor (9.0.26063.10002)'),)",Source Campaign,Form: Lead/Information,True
+"2|campaignid|Source Campaign|msdynce_Marketing (9.0.4.37)|(('msdynce_Marketing', 'msdynce_MarketingAnchor (9.0.26063.10002)'),)",Source Campaign,Form: Lead/Lead,True
+"2|campaignid|Source Campaign|msdynce_MarketingSales (9.0.4.29)|(('msdynce_MarketingSales', 'msdynce_MarketingSalesAnchor (9.0.26064.10003)'),)",Source Campaign,Form: Opportunity/Information,True
+"2|closeprobability|Probability|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Probability,Saved View: opportunity/Opportunities I Follow,True
+"2|closeprobability|Probability|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Probability,Saved View: opportunity/Opportunities Being Followed,True
+"2|closeprobability|Probability|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Probability,Form: Opportunity/Field Service Information,True
+"2|closeprobability|Probability|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Probability,Form: Opportunity/Information,True
+"2|companyname|Company Name|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Company Name,Form: Lead/Information,True
+"2|companyname|Company Name|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Company Name,Form: Lead/Lead,True
+"2|createdon|Created On|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Created On,Saved View: lead/Leads I Follow,True
+"2|createdon|Created On|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Created On,Saved View: lead/Leads Being Followed,True
+"2|createdon|Created On|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Created On,Form: Lead/Leads Dashboard,True
+"2|createdon|Created On|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Created On,Form: Quote/Quotes Dashboard,True
+"2|currentsituation|Current Situation|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Current Situation,Form: Opportunity/Lead qualification opportunity form,True
+"2|currentsituation|Current Situation|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Current Situation,Form: Opportunity/Field Service Information,True
+"2|currentsituation|Current Situation|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Current Situation,Form: Opportunity/Opportunity,True
+"2|customerid|Potential Customer|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Potential Customer,Saved View: opportunity/Opportunities I Follow,True
+"2|customerid|Potential Customer|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Potential Customer,Saved View: opportunity/Opportunities Being Followed,True
+"2|customerid|Potential Customer|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Potential Customer,Component type 29: /Publishing Opportunity Process,True
+"2|customerid|Potential Customer|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Potential Customer,Form: Publishing Opportunity Process/Information,True
+"2|customerid|Potential Customer|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Potential Customer,Form: Opportunity/Information,True
+"2|customerid|Potential Customer|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Potential Customer,Form: Quote/Quote,True
+"2|customerid|Potential Customer|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Potential Customer,Form: Quote/Field Service Information,True
+"2|customerneed|Customer Need|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Customer Need,Form: Opportunity/Lead qualification opportunity form,True
+"2|customerneed|Customer Need|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Customer Need,Form: Opportunity/Field Service Information,True
+"2|customerneed|Customer Need|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Customer Need,Form: Opportunity/Opportunity,True
+"2|defaultpricelevelid|Price List|msdynce_ProductManagement (9.0.4.0066)|(('msdynce_ProductManagement', 'msdynce_ProductManagementAnchor (9.0.26064.10001)'),)",Price List,Form: Account/Information,True
+"2|defaultpricelevelid|Price List|msdynce_ProductManagement (9.0.4.0066)|(('msdynce_ProductManagement', 'msdynce_ProductManagementAnchor (9.0.26064.10001)'),)",Price List,Form: Contact/Portal Contact (Enhanced),True
+"2|description|Description|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Description,Form: Lead/Information,True
+"2|description|Description|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Description,Form: Lead/Lead,True
+"2|description|Description|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Description,Form: Opportunity/Lead qualification opportunity form,True
+"2|description|Description|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Description,Form: Opportunity/Field Service Information,True
+"2|description|Description|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Description,Form: Opportunity/Information,True
+"2|description|Description|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Description,Form: Opportunity/Opportunity,True
+"2|description|Description|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Description,Form: Quote/Quote,True
+"2|description|Description|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Description,Form: Quote/Field Service Information,True
+"2|discountamount|Opportunity Discount Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Discount Amount,Form: Opportunity/Field Service Information,True
+"2|discountamount|Opportunity Discount Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Discount Amount,Form: Opportunity/Information,True
+"2|discountamount|Opportunity Discount Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Discount Amount,Form: Opportunity/Opportunity,True
+"2|discountamount|Quote Discount Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Discount Amount,Form: Quote/Quote,True
+"2|discountamount|Quote Discount Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Discount Amount,Form: Quote/Field Service Information,True
+"2|discountpercentage|Opportunity Discount (%)|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Discount (%),Form: Opportunity/Field Service Information,True
+"2|discountpercentage|Opportunity Discount (%)|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Discount (%),Form: Opportunity/Information,True
+"2|discountpercentage|Opportunity Discount (%)|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Discount (%),Form: Opportunity/Opportunity,True
+"2|discountpercentage|Quote Discount (%)|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Discount (%),Form: Quote/Quote,True
+"2|discountpercentage|Quote Discount (%)|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Discount (%),Form: Quote/Field Service Information,True
+"2|donotbulkemail|Do not allow Bulk Emails|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Do not allow Bulk Emails,Form: Lead/Information,True
+"2|donotbulkemail|Do not allow Bulk Emails|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Do not allow Bulk Emails,Form: Lead/Lead,True
+"2|donotemail|Do not allow Emails|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Do not allow Emails,Form: Lead/Information,True
+"2|donotemail|Do not allow Emails|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Do not allow Emails,Form: Lead/Lead,True
+"2|donotfax|Do not allow Faxes|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Do not allow Faxes,Form: Lead/Information,True
+"2|donotphone|Do not allow Phone Calls|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Do not allow Phone Calls,Form: Lead/Information,True
+"2|donotphone|Do not allow Phone Calls|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Do not allow Phone Calls,Form: Lead/Lead,True
+"2|donotpostalmail|Do not allow Mails|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Do not allow Mails,Form: Lead/Information,True
+"2|donotpostalmail|Do not allow Mails|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Do not allow Mails,Form: Lead/Lead,True
+"2|donotsendmm|Marketing Material|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Marketing Material,Form: Lead/Information,True
+"2|donotsendmm|Marketing Material|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Marketing Material,Form: Lead/Lead,True
+"2|effectivefrom|Effective from|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Effective from,Form: Quote/Quote,True
+"2|effectivefrom|Effective from|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Effective from,Form: Quote/Field Service Information,True
+"2|effectiveto|Effective to|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Effective to,Form: Quote/Quote,True
+"2|effectiveto|Effective to|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Effective to,Form: Quote/Field Service Information,True
+"2|emailaddress1|Email|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Email,Form: Lead/Information,True
+"2|emailaddress1|Email|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Email,Form: Lead/Lead,True
+"2|estimatedclosedate|Est. close date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. close date,Saved View: opportunity/Opportunities I Follow,True
+"2|estimatedclosedate|Est. close date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. close date,Saved View: opportunity/Opportunities Being Followed,True
+"2|estimatedclosedate|Est. close date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. close date,Component type 29: /Publishing Opportunity Process,True
+"2|estimatedclosedate|Est. close date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. close date,Form: Opportunity/Lead qualification opportunity form,True
+"2|estimatedclosedate|Est. close date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. close date,Form: Publishing Opportunity Process/Information,True
+"2|estimatedclosedate|Est. close date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. close date,Form: Opportunity/Field Service Information,True
+"2|estimatedclosedate|Est. close date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. close date,Form: Opportunity/Information,True
+"2|estimatedclosedate|Est. close date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. close date,Form: Opportunity/Opportunity,True
+"2|estimatedclosedate|Est. close date|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. close date,Form: Opportunity/Opportunities Dashboard,True
+"2|estimatedvalue|Est. revenue|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. revenue,Saved View: opportunity/Opportunities I Follow,True
+"2|estimatedvalue|Est. revenue|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. revenue,Saved View: opportunity/Opportunities Being Followed,True
+"2|estimatedvalue|Est. revenue|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. revenue,Component type 29: /Publishing Opportunity Process,True
+"2|estimatedvalue|Est. revenue|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. revenue,Form: Publishing Opportunity Process/Information,True
+"2|estimatedvalue|Est. revenue|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. revenue,Form: Opportunity/Field Service Information,True
+"2|estimatedvalue|Est. revenue|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. revenue,Form: Opportunity/Information,True
+"2|estimatedvalue|Est. revenue|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Est. revenue,Form: Opportunity/Opportunity,True
+"2|fax|Fax|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Fax,Form: Lead/Information,True
+"2|firstname|First Name|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",First Name,Form: Lead/Information,True
+"2|followemail|Follow Email Activity|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Follow Email Activity,Form: Lead/Information,True
+"2|followemail|Follow Email Activity|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Follow Email Activity,Form: Lead/Lead,True
+"2|freightamount|Freight Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Freight Amount,Form: Opportunity/Field Service Information,True
+"2|freightamount|Freight Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Freight Amount,Form: Opportunity/Information,True
+"2|freightamount|Freight Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Freight Amount,Form: Opportunity/Opportunity,True
+"2|freightamount|Freight Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Freight Amount,Form: Quote/Quote,True
+"2|freightamount|Freight Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Freight Amount,Form: Quote/Field Service Information,True
+"2|freighttermscode|Freight Terms|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Freight Terms,Form: Quote/Quote,True
+"2|freighttermscode|Freight Terms|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Freight Terms,Form: Quote/Field Service Information,True
+"2|fullname|Name|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Name,Relationship: lead/jm1_opportunity_OriginLead_lead,True
+"2|fullname|Name|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Name,Saved View: lead/Leads I Follow,True
+"2|fullname|Name|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Name,Saved View: lead/Leads Being Followed,True
+"2|fullname|Name|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Name,Form: Lead/Lead,True
+"2|industrycode|Industry|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Industry,Form: Lead/Information,True
+"2|industrycode|Industry|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Industry,Form: Lead/Lead,True
+"2|isrevenuesystemcalculated|Revenue|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Revenue,Form: Opportunity/Field Service Information,True
+"2|isrevenuesystemcalculated|Revenue|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Revenue,Form: Opportunity/Information,True
+"2|isrevenuesystemcalculated|Revenue|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Revenue,Form: Opportunity/Opportunity,True
+2|jm1_name|Name|Active|(),Name,Relationship: jm1_project/jm1_opportunity_LinkedProject_jm1_project,False
+"2|jobtitle|Job Title|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Job Title,Form: Lead/Information,True
+"2|jobtitle|Job Title|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Job Title,Form: Lead/Lead,True
+"2|lastname|Last Name|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Last Name,Form: Lead/Information,True
+"2|lastusedincampaign|Last Campaign Date|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Last Campaign Date,Form: Lead/Information,True
+"2|lastusedincampaign|Last Campaign Date|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Last Campaign Date,Form: Lead/Lead,True
+"2|leadid|Lead|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Lead,Saved View: lead/Leads I Follow,True
+"2|leadid|Lead|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Lead,Saved View: lead/Leads Being Followed,True
+"2|leadqualitycode|Rating|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Rating,Form: Lead/Information,True
+"2|leadqualitycode|Rating|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Rating,Form: Lead/Lead,True
+"2|leadsourcecode|Lead Source|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Lead Source,Form: Lead/Information,True
+"2|leadsourcecode|Lead Source|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Lead Source,Form: Lead/Lead,True
+"2|mobilephone|Mobile Phone|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Mobile Phone,Form: Lead/Information,True
+"2|mobilephone|Mobile Phone|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Mobile Phone,Form: Lead/Lead,True
+"2|msdyn_account|Potential Customer|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Potential Customer,Form: Quote/Field Service Information,True
+"2|msdyn_estimatedcost|Estimated Cost|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Estimated Cost,Form: Quote/Field Service Information,True
+"2|msdyn_estimatedquotemargin|Estimated Margin|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Estimated Margin,Form: Quote/Field Service Information,True
+"2|msdyn_forecastcategory|Forecast category|msdyn_Forecasting (9.0.26064.10002)|(('msdyn_SalesIntegrationsAndAddOns', 'msdyn_SalesIntegrationsAddOns (9.0.26064.10003)'),)",Forecast category,Form: Opportunity/Lead qualification opportunity form,True
+"2|msdyn_forecastcategory|Forecast category|msdyn_Forecasting (9.0.26064.10002)|(('msdyn_SalesIntegrationsAndAddOns', 'msdyn_SalesIntegrationsAddOns (9.0.26064.10003)'),)",Forecast category,Form: Opportunity/Opportunity,True
+"2|msdyn_invoicesetuptotals|Invoice Setup Totals|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Invoice Setup Totals,Form: Quote/Field Service Information,True
+"2|msdyn_name|Segment name|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Segment name,Relationship: msdyn_segment/msdyn_msdyn_segment_account,True
+"2|msdyn_name|Segment name|msdyn_segment (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",Segment name,Relationship: msdyn_segment/msdyn_msdyn_segment_contact,True
+"2|msdyn_ordertype|Type|FieldServiceCommon (1.0.0.1185)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Type,Form: Lead/Lead,True
+"2|msdyn_ordertype|Order Type|FieldServiceCommon (1.0.0.1185)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Order Type,Form: Opportunity/Field Service Information,True
+"2|msdyn_ordertype|Order Type|FieldServiceCommon (1.0.0.1185)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Order Type,Form: Opportunity/Opportunity,True
+"2|msdyn_ordertype|Order Type|FieldServiceCommon (1.0.0.1185)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Order Type,Form: Quote/Quote,True
+"2|msdyn_ordertype|Order Type|FieldServiceCommon (1.0.0.1185)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Order Type,Form: Quote/Field Service Information,True
+"2|msdyn_primarytimezone|Primary Time Zone|msdyn_AssetCommon (1.0.3412.1)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'), ('Field Service', 'FieldService_Anchor (8.8.147.60)'))",Primary Time Zone,Form: Contact/Contact,True
+"2|msdyn_totalamount|TotalAmount|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",TotalAmount,Form: Quote/Field Service Information,True
+"2|msdyn_workordertype|Work Order Type|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Work Order Type,Form: Opportunity/Field Service Information,True
+"2|msdyn_workordertype|Work Order Type|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Work Order Type,Form: Opportunity/Opportunity,True
+"2|name|Topic|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Topic,Relationship: opportunity/bpf_opportunity_jm1pub_publishingopportunityprocess,True
+"2|name|Topic|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Topic,Relationship: opportunity/jm1pub_PublishingSubmission_Opportunity_Opportunity,True
+"2|name|Topic|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Topic,Saved View: opportunity/Opportunities I Follow,True
+"2|name|Topic|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Topic,Saved View: opportunity/Opportunities Being Followed,True
+"2|name|Topic|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Topic,Component type 29: /Publishing Opportunity Process,True
+"2|name|Topic|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Topic,Form: Opportunity/Lead qualification opportunity form,True
+"2|name|Topic|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Topic,Form: Publishing Opportunity Process/Information,True
+"2|name|Topic|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Topic,Form: Opportunity/Field Service Information,True
+"2|name|Topic|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Topic,Form: Opportunity/Information,True
+"2|name|Topic|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Topic,Form: Opportunity/Opportunity,True
+"2|name|Name|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Name,Form: Quote/Quote,True
+"2|name|Name|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Name,Form: Quote/Field Service Information,True
+"2|numberofemployees|No. of Employees|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",No. of Employees,Form: Lead/Information,True
+"2|numberofemployees|No. of Employees|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",No. of Employees,Form: Lead/Lead,True
+"2|opportunityid|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Saved View: jm1pub_publishingopportunityprocess/Inactive Publishing Opportunity Process on my Opportunities,True
+"2|opportunityid|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Saved View: jm1pub_publishingopportunityprocess/Active Publishing Opportunity Process on my Opportunities,True
+"2|opportunityid|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Saved View: opportunity/Opportunities I Follow,True
+"2|opportunityid|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Saved View: opportunity/Opportunities Being Followed,True
+"2|opportunityid|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Component type 29: /Publishing Opportunity Process,True
+"2|opportunityid|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Form: Quote/Quote,True
+"2|opportunityid|Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Form: Quote/Field Service Information,True
+"2|opportunityratingcode|Rating|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Rating,Saved View: opportunity/Opportunities I Follow,True
+"2|opportunityratingcode|Rating|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Rating,Saved View: opportunity/Opportunities Being Followed,True
+"2|opportunityratingcode|Rating|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Rating,Form: Opportunity/Field Service Information,True
+"2|opportunityratingcode|Rating|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Rating,Form: Opportunity/Information,True
+"2|originatingleadid|Originating Lead|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Originating Lead,Form: Account/Information,True
+"2|originatingleadid|Originating Lead|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Originating Lead,Form: Contact/Contact,True
+"2|originatingleadid|Originating Lead|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Originating Lead,Form: Opportunity/Information,True
+"2|ownerid|Owner|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Owner,Saved View: lead/Leads I Follow,True
+"2|ownerid|Owner|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Owner,Saved View: lead/Leads Being Followed,True
+"2|ownerid|Owner|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Owner,Form: Lead/Information,True
+"2|ownerid|Owner|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Owner,Form: Lead/Lead,True
+"2|ownerid|Owner|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Owner,Saved View: jm1pub_publishingopportunityprocess/Inactive Publishing Opportunity Process on my Opportunities,True
+"2|ownerid|Owner|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Owner,Saved View: jm1pub_publishingopportunityprocess/Active Publishing Opportunity Process on my Opportunities,True
+"2|ownerid|Owner|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Owner,Form: Opportunity/Lead qualification opportunity form,True
+"2|ownerid|Owner|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Owner,Form: Opportunity/Field Service Information,True
+"2|ownerid|Owner|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Owner,Form: Opportunity/Information,True
+"2|ownerid|Owner|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Owner,Form: Opportunity/Opportunity,True
+"2|ownerid|Owner|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Owner,Form: Quote/Quote,True
+"2|ownerid|Owner|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Owner,Form: Quote/Field Service Information,True
+"2|pager|Pager|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Pager,Form: Lead/Information,True
+"2|parentaccountid|Account|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Account,Form: Opportunity/Field Service Information,True
+"2|parentaccountid|Account|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Account,Form: Opportunity/Opportunity,True
+"2|parentbundleidref|Parent bundle product|msdynce_SalesPatch (9.0.1904.3002)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Parent bundle product,Form: Opportunity/Field Service Information,True
+"2|parentbundleidref|Parent bundle product|msdynce_SalesPatch (9.0.1904.3002)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Parent bundle product,Form: Opportunity/Opportunity,True
+"2|parentbundleidref|Parent bundle product|msdynce_SalesPatch (9.0.1904.3002)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Parent bundle product,Form: Quote/Quote,True
+"2|parentbundleidref|Parent bundle product|msdynce_SalesPatch (9.0.1904.3002)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Parent bundle product,Form: Quote/Field Service Information,True
+"2|parentcontactid|Contact|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Contact,Form: Opportunity/Field Service Information,True
+"2|parentcontactid|Contact|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Contact,Form: Opportunity/Opportunity,True
+"2|paymenttermscode|Payment Terms|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Payment Terms,Form: Quote/Quote,True
+"2|paymenttermscode|Payment Terms|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Payment Terms,Form: Quote/Field Service Information,True
+"2|preferredcontactmethodcode|Preferred Method of Contact|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Preferred Method of Contact,Form: Lead/Information,True
+"2|preferredcontactmethodcode|Preferred Method of Contact|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Preferred Method of Contact,Form: Lead/Lead,True
+"2|pricelevelid|Price List|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Price List,Form: Opportunity/Field Service Information,True
+"2|pricelevelid|Price List|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Price List,Form: Opportunity/Information,True
+"2|pricelevelid|Price List|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Price List,Form: Opportunity/Opportunity,True
+"2|pricelevelid|Price List|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Price List,Form: Quote/Quote,True
+"2|pricelevelid|Price List|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Price List,Form: Quote/Field Service Information,True
+"2|proposedsolution|Proposed Solution|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Proposed Solution,Form: Opportunity/Lead qualification opportunity form,True
+"2|proposedsolution|Proposed Solution|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Proposed Solution,Form: Opportunity/Field Service Information,True
+"2|proposedsolution|Proposed Solution|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Proposed Solution,Form: Opportunity/Opportunity,True
+"2|purchaseprocess|Purchase Process|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Purchase Process,Form: Opportunity/Lead qualification opportunity form,True
+"2|purchaseprocess|Purchase Process|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Purchase Process,Form: Opportunity/Field Service Information,True
+"2|purchaseprocess|Purchase Process|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Purchase Process,Form: Opportunity/Opportunity,True
+"2|purchasetimeframe|Purchase Timeframe|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Purchase Timeframe,Form: Opportunity/Lead qualification opportunity form,True
+"2|purchasetimeframe|Purchase Timeframe|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Purchase Timeframe,Form: Opportunity/Field Service Information,True
+"2|purchasetimeframe|Purchase Timeframe|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Purchase Timeframe,Form: Opportunity/Opportunity,True
+"2|quotenumber|Quote ID|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote ID,Form: Quote/Quote,True
+"2|quotenumber|Quote ID|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote ID,Form: Quote/Field Service Information,True
+"2|revenue|Annual Revenue|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Annual Revenue,Form: Lead/Information,True
+"2|revenue|Annual Revenue|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Annual Revenue,Form: Lead/Lead,True
+"2|revisionnumber|Revision ID|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Revision ID,Form: Quote/Quote,True
+"2|revisionnumber|Revision ID|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Revision ID,Form: Quote/Field Service Information,True
+"2|salesstagecode|Process Code|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Process Code,Form: Opportunity/Field Service Information,True
+"2|salutation|Salutation|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Salutation,Form: Lead/Information,True
+"2|shippingmethodcode|Shipping Method|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Shipping Method,Form: Quote/Quote,True
+"2|shippingmethodcode|Shipping Method|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Shipping Method,Form: Quote/Field Service Information,True
+"2|shipto_composite|Ship To Address|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Ship To Address,Form: Quote/Quote,True
+"2|shipto_composite|Ship To Address|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Ship To Address,Form: Quote/Field Service Information,True
+"2|sic|SIC Code|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",SIC Code,Form: Lead/Information,True
+"2|sic|SIC Code|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",SIC Code,Form: Lead/Lead,True
+"2|statecode|Status|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Status,Saved View: lead/Leads I Follow,True
+"2|statecode|Status|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Status,Saved View: lead/Leads Being Followed,True
+"2|statecode|Status|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Status,Saved View: opportunity/Opportunities I Follow,True
+"2|statecode|Status|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Status,Saved View: opportunity/Opportunities Being Followed,True
+"2|statecode|Status|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Status,Form: Quote/Field Service Information,True
+"2|statuscode|Status Reason|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Status Reason,Saved View: lead/Leads I Follow,True
+"2|statuscode|Status Reason|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Status Reason,Saved View: lead/Leads Being Followed,True
+"2|statuscode|Status Reason|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Status Reason,Form: Lead/Information,True
+"2|statuscode|Status Reason|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Status Reason,Form: Lead/Lead,True
+"2|statuscode|Status Reason|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Status Reason,Form: Opportunity/Field Service Information,True
+"2|statuscode|Status Reason|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Status Reason,Form: Opportunity/Information,True
+"2|statuscode|Status Reason|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Status Reason,Form: Quote/Quote,True
+"2|statuscode|Status Reason|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Status Reason,Form: Quote/Field Service Information,True
+"2|subject|Topic|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Topic,Saved View: lead/Leads I Follow,True
+"2|subject|Topic|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Topic,Saved View: lead/Leads Being Followed,True
+"2|subject|Topic|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Topic,Form: Lead/Information,True
+"2|subject|Topic|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Topic,Form: Lead/Lead,True
+"2|telephone1|Business Phone|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Business Phone,Form: Lead/Information,True
+"2|telephone1|Business Phone|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Business Phone,Form: Lead/Lead,True
+"2|telephone2|Home Phone|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Home Phone,Form: Lead/Information,True
+"2|telephone3|Other Phone|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Other Phone,Form: Lead/Information,True
+"2|territoryid|Territory|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Territory,Form: Account/Information,True
+"2|timeline|Timeline|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Timeline,Form: Opportunity/Opportunity,True
+"2|totalamount|Total Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Amount,Form: Opportunity/Field Service Information,True
+"2|totalamount|Total Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Amount,Form: Opportunity/Information,True
+"2|totalamount|Total Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Amount,Form: Opportunity/Opportunity,True
+"2|totalamount|Total amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total amount,Form: Quote/Quote,True
+"2|totalamount|Total amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total amount,Form: Quote/Field Service Information,True
+"2|totalamountlessfreight|Total Pre-Freight Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Pre-Freight Amount,Form: Opportunity/Field Service Information,True
+"2|totalamountlessfreight|Total Pre-Freight Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Pre-Freight Amount,Form: Opportunity/Information,True
+"2|totalamountlessfreight|Total Pre-Freight Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Pre-Freight Amount,Form: Opportunity/Opportunity,True
+"2|totalamountlessfreight|Total Pre-Freight Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Pre-Freight Amount,Form: Quote/Quote,True
+"2|totalamountlessfreight|Total Pre-Freight Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Pre-Freight Amount,Form: Quote/Field Service Information,True
+"2|totallineitemamount|Total Detail Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Detail Amount,Form: Opportunity/Field Service Information,True
+"2|totallineitemamount|Total Detail Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Detail Amount,Form: Opportunity/Information,True
+"2|totallineitemamount|Total Detail Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Detail Amount,Form: Opportunity/Opportunity,True
+"2|totallineitemamount|Total Detail Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Detail Amount,Form: Quote/Quote,True
+"2|totallineitemamount|Total Detail Amount|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Detail Amount,Form: Quote/Field Service Information,True
+"2|totaltax|Total Tax|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Tax,Form: Opportunity/Field Service Information,True
+"2|totaltax|Total Tax|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Tax,Form: Opportunity/Information,True
+"2|totaltax|Total Tax|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Tax,Form: Opportunity/Opportunity,True
+"2|totaltax|Total Tax|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Tax,Form: Quote/Quote,True
+"2|totaltax|Total Tax|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Total Tax,Form: Quote/Field Service Information,True
+"2|transactioncurrencyid|Currency|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Currency,Form: Lead/Information,True
+"2|transactioncurrencyid|Currency|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Currency,Form: Lead/Lead,True
+"2|transactioncurrencyid|Currency|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Currency,Form: Opportunity/Lead qualification opportunity form,True
+"2|transactioncurrencyid|Currency|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Currency,Form: Opportunity/Field Service Information,True
+"2|transactioncurrencyid|Currency|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Currency,Form: Opportunity/Information,True
+"2|transactioncurrencyid|Currency|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Currency,Form: Opportunity/Opportunity,True
+"2|transactioncurrencyid|Currency|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Currency,Form: Quote/Quote,True
+"2|transactioncurrencyid|Currency|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Currency,Form: Quote/Field Service Information,True
+"2|websiteurl|Website|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Website,Form: Lead/Information,True
+"2|websiteurl|Website|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Website,Form: Lead/Lead,True
+"2|willcall|Ship To|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Ship To,Form: Quote/Quote,True
+"2|willcall|Ship To|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Ship To,Form: Quote/Field Service Information,True
+"2|yomifullname|Yomi Full Name|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Yomi Full Name,Relationship: lead/jm1_opportunity_OriginLead_lead,True
+"20||Field Service - Administrator|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Field Service - Administrator,Form: Opportunity/Field Service Information,True
+"20||Field Service - Administrator|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Field Service - Administrator,Form: Quote/Field Service Information,True
+"20||Field Service - Inventory Purchase|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Field Service - Inventory Purchase,Form: Opportunity/Field Service Information,True
+"20||Field Service - Inventory Purchase|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Field Service - Inventory Purchase,Form: Quote/Field Service Information,True
+"20||Field Service - Dispatcher|IoTConnector (1.8.53.0)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'), ('Field Service', 'FieldService_Anchor (8.8.147.60)'))",Field Service - Dispatcher,Form: Opportunity/Field Service Information,True
+"20||Field Service - Dispatcher|IoTConnector (1.8.53.0)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'), ('Field Service', 'FieldService_Anchor (8.8.147.60)'))",Field Service - Dispatcher,Form: Quote/Field Service Information,True
+"20||Field Service - Resource|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Field Service - Resource,Form: Opportunity/Field Service Information,True
+"20||Field Service - Resource|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Field Service - Resource,Form: Quote/Field Service Information,True
+"26|Active Quotes|Active Quotes|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Active Quotes,Form: Quote/Quotes Dashboard,True
+"26|All Competitors (summary)|All Competitors (summary)|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",All Competitors (summary),Form: Opportunity/Field Service Information,True
+"26|All Competitors (summary)|All Competitors (summary)|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",All Competitors (summary),Form: Opportunity/Opportunity,True
+"26|All Competitors (summary)|All Competitors (summary)|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",All Competitors (summary),Form: Lead/Lead,True
+"26|All Entitlements|All Entitlements|msdynce_Service (9.0.5.56)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'),)",All Entitlements,Form: Contact/Contact,True
+"26|All Leads|All Leads|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",All Leads,Form: Lead/Leads Dashboard,True
+"26|All Opportunities|All Opportunities|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",All Opportunities,Form: Opportunity/Opportunities Dashboard,True
+"26|All Quotes|All Quotes|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",All Quotes,Form: Quote/Quotes Dashboard,True
+"26|Campaign Lookup View|Campaign Lookup View|msdynce_Marketing (9.0.4.37)|(('msdynce_Marketing', 'msdynce_MarketingAnchor (9.0.26063.10002)'),)",Campaign Lookup View,Form: Lead/Lead,True
+"26|Closed Leads|Closed Leads|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Closed Leads,Form: Lead/Leads Dashboard,True
+"26|Closed Opportunities|Closed Opportunities|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Closed Opportunities,Form: Opportunity/Opportunities Dashboard,True
+"26|My Active Cases|My Active Cases|msdynce_Service (9.0.5.56)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'),)",My Active Cases,Form: Contact/Contact,True
+"26|My Open Leads|My Open Leads|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",My Open Leads,Form: Lead/Leads Dashboard,True
+"26|My Open Opportunities|My Open Opportunities|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",My Open Opportunities,Form: Contact/Contact,True
+"26|My Open Opportunities|My Open Opportunities|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",My Open Opportunities,Form: Opportunity/Opportunities Dashboard,True
+"26|My Quotes|My Quotes|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",My Quotes,Form: Quote/Quotes Dashboard,True
+"26|Open Leads|Open Leads|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Open Leads,Form: Lead/Leads Dashboard,True
+"26|Open Opportunities|Open Opportunities|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Open Opportunities,Form: Opportunity/Opportunities Dashboard,True
+"26|Opportunity Product Inline Edit View|Opportunity Product Inline Edit View|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Product Inline Edit View,Form: Opportunity/Field Service Information,True
+"26|Opportunity Product Inline Edit View|Opportunity Product Inline Edit View|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Product Inline Edit View,Form: Opportunity/Information,True
+"26|Opportunity Product Inline Edit View|Opportunity Product Inline Edit View|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Product Inline Edit View,Form: Opportunity/Opportunity,True
+"26|Opportunity Product Inline Edit View: Bundle Products|Opportunity Product Inline Edit View: Bundle Products|msdynce_SalesPatch (9.0.1904.3002)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Product Inline Edit View: Bundle Products,Form: Opportunity/Field Service Information,True
+"26|Opportunity Product Inline Edit View: Bundle Products|Opportunity Product Inline Edit View: Bundle Products|msdynce_SalesPatch (9.0.1904.3002)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Product Inline Edit View: Bundle Products,Form: Opportunity/Opportunity,True
+"26|Opportunity Quotes|Opportunity Quotes|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity Quotes,Form: Opportunity/Opportunity,True
+"26|Price List Lookup View|Price List Lookup View|msdynce_ProductManagement (9.0.4.0066)|(('msdynce_ProductManagement', 'msdynce_ProductManagementAnchor (9.0.26064.10001)'),)",Price List Lookup View,Form: Opportunity/Field Service Information,True
+"26|Quote Associated View|Quote Associated View|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Associated View,Form: Opportunity/Information,True
+"26|Quote Product Inline Edit View|Quote Product Inline Edit View|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Product Inline Edit View,Form: Quote/Quote,True
+"26|Quote Product Inline Edit View|Quote Product Inline Edit View|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Product Inline Edit View,Form: Quote/Field Service Information,True
+"26|Quote Product Inline Edit View: Bundle Products|Quote Product Inline Edit View: Bundle Products|msdynce_SalesPatch (9.0.1904.3002)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Product Inline Edit View: Bundle Products,Form: Quote/Quote,True
+"26|Quote Product Inline Edit View: Bundle Products|Quote Product Inline Edit View: Bundle Products|msdynce_SalesPatch (9.0.1904.3002)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote Product Inline Edit View: Bundle Products,Form: Quote/Field Service Information,True
+"26|Recent Cases|Recent Cases|msdynce_Service (9.0.5.56)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'),)",Recent Cases,Form: Contact/Contact,True
+"26|Recent Opportunities|Recent Opportunities|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Recent Opportunities,Form: Contact/Contact,True
+"26|Service Lines View|Service Lines View|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Service Lines View,Form: Quote/Field Service Information,True
+"26|Service Maintenance Line Grid View|Service Maintenance Line Grid View|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Service Maintenance Line Grid View,Form: Opportunity/Field Service Information,True
+"26|Service-Maintenance Based Opportunity Quotes|Service-Maintenance Based Opportunity Quotes|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Service-Maintenance Based Opportunity Quotes,Form: Opportunity/Field Service Information,True
+"26|Work Order Type Lookup View|Work Order Type Lookup View|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Work Order Type Lookup View,Form: Opportunity/Opportunity,True
+"59|Case Mix (By Business Unit)|Case Mix (By Business Unit)|msdynce_Service (9.0.5.56)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'),)",Case Mix (By Business Unit),Form: Contact/Contact,True
+"59|Entitlements Expiration|Entitlements Expiration|msdynce_Service (9.0.5.56)|(('msdynce_Service', 'msdynce_ServiceAnchor (9.0.26064.1006)'),)",Entitlements Expiration,Form: Contact/Contact,True
+"59|Leads by Owner (Tag Chart)|Leads by Owner (Tag Chart)|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Leads by Owner (Tag Chart),Form: Lead/Leads Dashboard,True
+"59|Leads by Rating|Leads by Rating|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Leads by Rating,Form: Lead/Leads Dashboard,True
+"59|Leads by Source (DOUGHNUT)|Leads by Source (DOUGHNUT)|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Leads by Source (DOUGHNUT),Form: Lead/Leads Dashboard,True
+"59|Opportunities by Account|Opportunities by Account|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunities by Account,Form: Opportunity/Opportunities Dashboard,True
+"59|Opportunities by Pipeline Phase|Opportunities by Pipeline Phase|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunities by Pipeline Phase,Form: Opportunity/Opportunities Dashboard,True
+"59|Opportunities by Rating|Opportunities by Rating|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunities by Rating,Form: Opportunity/Opportunities Dashboard,True
+"59|Opportunities by Status – Column Chart|Opportunities by Status – Column Chart|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunities by Status – Column Chart,Form: Opportunity/Opportunities Dashboard,True
+"59|Quotes by Customer|Quotes by Customer|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quotes by Customer,Form: Quote/Quotes Dashboard,True
+"59|Quotes by Owner|Quotes by Owner|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quotes by Owner,Form: Quote/Quotes Dashboard,True
+"59|Quotes by Pricelist|Quotes by Pricelist|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quotes by Pricelist,Form: Quote/Quotes Dashboard,True
+"59|Quotes by Status Reason|Quotes by Status Reason|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quotes by Status Reason,Form: Quote/Quotes Dashboard,True
+"59|Top Customers|Top Customers|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Top Customers,Form: Contact/Contact,True
+"60||Lead qualification opportunity form|msdynce_MarketingSalesPatch (9.0.26064.10003)|(('msdynce_MarketingSales', 'msdynce_MarketingSalesAnchor (9.0.26064.10003)'),)",Lead qualification opportunity form,Form: Opportunity/Lead qualification opportunity form,True
+"60||Quote|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quote,Form: Quote/Quote,True
+"60||Field Service Information|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Field Service Information,Form: Opportunity/Field Service Information,True
+"60||Information|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Information,Form: Lead/Information,True
+"60||Leads Dashboard|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Leads Dashboard,Form: Lead/Leads Dashboard,True
+"60||Information|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Information,Form: Opportunity/Information,True
+"60||Opportunity|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunity,Form: Opportunity/Opportunity,True
+"60||Field Service Information|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",Field Service Information,Form: Quote/Field Service Information,True
+"60||Quotes Dashboard|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Quotes Dashboard,Form: Quote/Quotes Dashboard,True
+"60||Lead|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",Lead,Form: Lead/Lead,True
+"60||Opportunities Dashboard|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Opportunities Dashboard,Form: Opportunity/Opportunities Dashboard,True
+"61|LeadManagement/Lead/Lead_main_system_library.js|LeadManagement/Lead/Lead_main_system_library.js|msdynce_LeadManagement (9.0.4.0066)|(('msdynce_LeadManagement', 'msdynce_LeadManagementAnchor (9.0.26064.10001)'),)",LeadManagement/Lead/Lead_main_system_library.js,Form: Lead/Information,True
+"61|MarketingSales/Lead/Lead_main_system_library.js|MarketingSales/Lead/Lead_main_system_library.js|msdynce_MarketingSales (9.0.4.29)|(('msdynce_MarketingSales', 'msdynce_MarketingSalesAnchor (9.0.26064.10003)'),)",MarketingSales/Lead/Lead_main_system_library.js,Form: Lead/Lead,True
+"61|msdyn_/ActivityFeeds.Form.js|msdyn_/ActivityFeeds.Form.js|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/ActivityFeeds.Form.js,Form: Contact/Profile Web Form (Enhanced) - Japanese,True
+"61|msdyn_/ActivityFeeds.Form.js|msdyn_/ActivityFeeds.Form.js|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/ActivityFeeds.Form.js,Form: Opportunity/Lead qualification opportunity form,True
+"61|msdyn_/ActivityFeeds.Form.js|msdyn_/ActivityFeeds.Form.js|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/ActivityFeeds.Form.js,Form: Contact/Information,True
+"61|msdyn_/ActivityFeeds.Form.js|msdyn_/ActivityFeeds.Form.js|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/ActivityFeeds.Form.js,Form: Lead/Information,True
+"61|msdyn_/ActivityFeeds.Form.js|msdyn_/ActivityFeeds.Form.js|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/ActivityFeeds.Form.js,Form: Opportunity/Information,True
+"61|msdyn_/ActivityFeeds.Form.js|msdyn_/ActivityFeeds.Form.js|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/ActivityFeeds.Form.js,Form: Account/Information,True
+"61|msdyn_/ActivityFeeds.Form.js|msdyn_/ActivityFeeds.Form.js|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/ActivityFeeds.Form.js,Form: Contact/Profile Web Form (Enhanced),True
+"61|msdyn_/ActivityFeeds.Form.js|msdyn_/ActivityFeeds.Form.js|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/ActivityFeeds.Form.js,Form: Contact/Portal Contact (Enhanced),True
+"61|msdyn_/ActivityFeeds.Form.js|msdyn_/ActivityFeeds.Form.js|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/ActivityFeeds.Form.js,Form: Contact/Invite Web Form,True
+"61|msdyn_/Contact/Contact.Library.js|msdyn_/Contact/Contact.Library.js|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_/Contact/Contact.Library.js,Form: Contact/Contact,True
+"61|msdyn_/Lead/FieldService.Lead.js|msdyn_/Lead/FieldService.Lead.js|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_/Lead/FieldService.Lead.js,Form: Lead/Lead,True
+"61|msdyn_/Opportunity/Opportunity.Library.js|msdyn_/Opportunity/Opportunity.Library.js|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_/Opportunity/Opportunity.Library.js,Form: Opportunity/Field Service Information,True
+"61|msdyn_/Opportunity/Opportunity.Library.js|msdyn_/Opportunity/Opportunity.Library.js|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_/Opportunity/Opportunity.Library.js,Form: Opportunity/Opportunity,True
+"61|msdyn_/Quote/FieldService.Quote.js|msdyn_/Quote/FieldService.Quote.js|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_/Quote/FieldService.Quote.js,Form: Quote/Quote,True
+"61|msdyn_/Quote/FieldService.Quote.js|msdyn_/Quote/FieldService.Quote.js|FieldService (8.8.0.88)|(('Field Service', 'FieldService_Anchor (8.8.147.60)'),)",msdyn_/Quote/FieldService.Quote.js,Form: Quote/Field Service Information,True
+"61|msdyn_/RecordWall.htm|msdyn_/RecordWall.htm|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/RecordWall.htm,Form: Contact/Profile Web Form (Enhanced) - Japanese,True
+"61|msdyn_/RecordWall.htm|msdyn_/RecordWall.htm|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/RecordWall.htm,Form: Opportunity/Lead qualification opportunity form,True
+"61|msdyn_/RecordWall.htm|msdyn_/RecordWall.htm|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/RecordWall.htm,Form: Contact/Information,True
+"61|msdyn_/RecordWall.htm|msdyn_/RecordWall.htm|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/RecordWall.htm,Form: Lead/Information,True
+"61|msdyn_/RecordWall.htm|msdyn_/RecordWall.htm|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/RecordWall.htm,Form: Opportunity/Information,True
+"61|msdyn_/RecordWall.htm|msdyn_/RecordWall.htm|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/RecordWall.htm,Form: Account/Information,True
+"61|msdyn_/RecordWall.htm|msdyn_/RecordWall.htm|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/RecordWall.htm,Form: Contact/Profile Web Form (Enhanced),True
+"61|msdyn_/RecordWall.htm|msdyn_/RecordWall.htm|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/RecordWall.htm,Form: Contact/Portal Contact (Enhanced),True
+"61|msdyn_/RecordWall.htm|msdyn_/RecordWall.htm|ActivityFeedsCore (9.0.0.0011)|(('ActivityFeedsCore', 'ActivityFeedsCore (9.0.0.0011)'),)",msdyn_/RecordWall.htm,Form: Contact/Invite Web Form,True
+"61|msdyn_/Scripts/WhoKnowsWhomLoader.js|msdyn_/Scripts/WhoKnowsWhomLoader.js|msdyn_connectiongraph (9.3.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",msdyn_/Scripts/WhoKnowsWhomLoader.js,Form: Contact/Contact,True
+"61|msdyn_/Scripts/WhoKnowsWhomLoader.js|msdyn_/Scripts/WhoKnowsWhomLoader.js|msdyn_connectiongraph (9.3.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",msdyn_/Scripts/WhoKnowsWhomLoader.js,Form: Lead/Lead,True
+"61|msdyn_SalesCopilot/CopilotSummaryWidget.Library.js|msdyn_SalesCopilot/CopilotSummaryWidget.Library.js|msdyn_SalesCopilot (9.1.26064.10004)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",msdyn_SalesCopilot/CopilotSummaryWidget.Library.js,Form: Opportunity/Opportunity,True
+"61|msdyn_SalesOmniChannel/SalesPhoneNumber.Library.js|msdyn_SalesOmniChannel/SalesPhoneNumber.Library.js|msdyn_SalesOmniChannel (9.1.26064.10001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",msdyn_SalesOmniChannel/SalesPhoneNumber.Library.js,Form: Contact/Contact,True
+"61|msdyn_SalesOmniChannel/SalesPhoneNumber.Library.js|msdyn_SalesOmniChannel/SalesPhoneNumber.Library.js|msdyn_SalesOmniChannel (9.1.26064.10001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",msdyn_SalesOmniChannel/SalesPhoneNumber.Library.js,Form: Lead/Lead,True
+"61|msdyn_talkingpointsloader.js|msdyn_talkingpointsloader.js|msdynce_Talkingpoints (9.1.0.59)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",msdyn_talkingpointsloader.js,Form: Contact/Contact,True
+"61|msdynmkt_Consent.CrmWebResources|msdynmkt_Consent.CrmWebResources|DynamicsMKT_Consent (1.2.1258.43)|(('CxpSales', 'DynamicsMKT_CxpSalesAnchorSolution (1.2.1258.46)'),)",msdynmkt_Consent.CrmWebResources,Form: Lead/Lead,True
+"61|Sales/_static/sfa/quotes/QuoteRibbonActions.js|Sales/_static/sfa/quotes/QuoteRibbonActions.js|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Sales/_static/sfa/quotes/QuoteRibbonActions.js,Form: Quote/Quote,True
+"61|Sales/ClientCommon/Sales_ClientCommon.js|Sales/ClientCommon/Sales_ClientCommon.js|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Sales/ClientCommon/Sales_ClientCommon.js,Form: Contact/Contact,True
+"61|Sales/ClientCommon/Sales_ClientCommon.js|Sales/ClientCommon/Sales_ClientCommon.js|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Sales/ClientCommon/Sales_ClientCommon.js,Form: Lead/Lead,True
+"61|Sales/Opportunity/Opportunity_main_system_library.js|Sales/Opportunity/Opportunity_main_system_library.js|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Sales/Opportunity/Opportunity_main_system_library.js,Form: Opportunity/Field Service Information,True
+"61|Sales/Opportunity/Opportunity_main_system_library.js|Sales/Opportunity/Opportunity_main_system_library.js|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Sales/Opportunity/Opportunity_main_system_library.js,Form: Opportunity/Information,True
+"61|Sales/Quote/Quote_main_system_library.js|Sales/Quote/Quote_main_system_library.js|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Sales/Quote/Quote_main_system_library.js,Form: Quote/Field Service Information,True
+"66|Consent.ContactabilityControl.ContactabilityControl|Consent.ContactabilityControl.ContactabilityControl|DynamicsMKT_Consent (1.2.1258.43)|(('CxpSales', 'DynamicsMKT_CxpSalesAnchorSolution (1.2.1258.46)'),)",Consent.ContactabilityControl.ContactabilityControl,Form: Contact/Contact,True
+"66|Consent.ContactabilityGridControl.ContactabilityGridControl|Consent.ContactabilityGridControl.ContactabilityGridControl|DynamicsMKT_Consent (1.2.1258.43)|(('CxpSales', 'DynamicsMKT_CxpSalesAnchorSolution (1.2.1258.46)'),)",Consent.ContactabilityGridControl.ContactabilityGridControl,Form: Contact/Contact,True
+"66|Consent.ContactabilityGridControl.ContactabilityGridControl|Consent.ContactabilityGridControl.ContactabilityGridControl|DynamicsMKT_Consent (1.2.1258.43)|(('CxpSales', 'DynamicsMKT_CxpSalesAnchorSolution (1.2.1258.46)'),)",Consent.ContactabilityGridControl.ContactabilityGridControl,Form: Lead/Lead,True
+"66|MscrmControls.AcceleratedSales.CadenceWidgetControl|MscrmControls.AcceleratedSales.CadenceWidgetControl|msdyn_acceleratedsales (9.1.26064.10001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",MscrmControls.AcceleratedSales.CadenceWidgetControl,Form: Opportunity/Opportunity,True
+"66|MscrmControls.AcceleratedSales.CadenceWidgetControl|MscrmControls.AcceleratedSales.CadenceWidgetControl|msdyn_acceleratedsales (9.1.26064.10001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",MscrmControls.AcceleratedSales.CadenceWidgetControl,Form: Lead/Lead,True
+"66|MscrmControls.LeadHygiene.ValidatedFieldControl|MscrmControls.LeadHygiene.ValidatedFieldControl|msdyn_leadhygiene (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",MscrmControls.LeadHygiene.ValidatedFieldControl,Form: Contact/Contact,True
+"66|MscrmControls.LeadHygiene.ValidatedFieldControl|MscrmControls.LeadHygiene.ValidatedFieldControl|msdyn_leadhygiene (9.1.2605.4001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",MscrmControls.LeadHygiene.ValidatedFieldControl,Form: Lead/Lead,True
+"66|MscrmControls.TalkingPointsControl.TalkingPoints|MscrmControls.TalkingPointsControl.TalkingPoints|msdynce_Talkingpoints (9.1.0.59)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",MscrmControls.TalkingPointsControl.TalkingPoints,Form: Contact/Contact,True
+"66|msdyn_Sales.Controls.CopilotSummaryWidget|msdyn_Sales.Controls.CopilotSummaryWidget|msdyn_SalesCopilot (9.1.26064.10004)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",msdyn_Sales.Controls.CopilotSummaryWidget,Form: Opportunity/Opportunity,True
+"66|msdyn_SalesOmniChannel.SalesPhoneNumberControl|msdyn_SalesOmniChannel.SalesPhoneNumberControl|msdyn_SalesOmniChannel (9.1.26064.10001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",msdyn_SalesOmniChannel.SalesPhoneNumberControl,Form: Contact/Contact,True
+"66|msdyn_SalesOmniChannel.SalesPhoneNumberControl|msdyn_SalesOmniChannel.SalesPhoneNumberControl|msdyn_SalesOmniChannel (9.1.26064.10001)|(('msdyn_AcceleratedSales', 'msdyn_AcceleratedSalesAnchor (9.1.26064.10001)'),)",msdyn_SalesOmniChannel.SalesPhoneNumberControl,Form: Lead/Lead,True
+"66|MsdynControls.WKWControls.ConnectionsWidget|MsdynControls.WKWControls.ConnectionsWidget|msdyn_connectiongraph (9.3.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",MsdynControls.WKWControls.ConnectionsWidget,Form: Contact/Contact,True
+"66|MsdynControls.WKWControls.ConnectionsWidget|MsdynControls.WKWControls.ConnectionsWidget|msdyn_connectiongraph (9.3.26064.10001)|(('msdynce_SalesInsights', 'msdynce_SalesInsightsAnchor (9.0.26064.10003)'),)",MsdynControls.WKWControls.ConnectionsWidget,Form: Lead/Lead,True
+9|jm1_accounttypechoice|Account Type Choice|Active|(),Account Type Choice,Attribute/Column: account/jm1_accounttype,False
+9|jm1_brandroles|Brand Roles|Active|(),Brand Roles,Attribute/Column: contact/jm1_brandroles,False
+9|jm1_contacttypeglobal|Contact Type Global|Active|(),Contact Type Global,Attribute/Column: contact/jm1_contacttype,False
+9|jm1_funeralhome|Funeral Home|Active|(),Funeral Home,Attribute/Column: contact/jm1_funeralhome,False
+9|jm1_genrechoice|Genre Choice|Active|(),Genre Choice,Attribute/Column: opportunity/jm1pub_genre,False
+9|jm1_interesttypechoice|Interest Type Choice|Active|(),Interest Type Choice,Attribute/Column: lead/jm1_interesttype,False
+9|jm1_lastactivitytype|Last Activity Type|Active|(),Last Activity Type,Attribute/Column: contact/jm1_lastactivitytype,False
+9|jm1_leadsource|Lead Source|Active|(),Lead Source,Attribute/Column: contact/jm1_leadsource,False
+9|jm1_leadstatus|Lead Status|Active|(),Lead Status,Attribute/Column: contact/jm1_leadstatus,False
+9|jm1_manuscripttype|Manuscript Type|Active|(),Manuscript Type,Attribute/Column: opportunity/jm1pub_manuscripttype,False
+9|jm1_originchoice|Origin Choice|Active|(),Origin Choice,Attribute/Column: lead/jm1_origin,False
+9|jm1_pipelinechoice|Pipeline Choice|Active|(),Pipeline Choice,Attribute/Column: opportunity/jm1_pipeline,False
+9|jm1_precoasyncstatus|Precoa Sync Status|Active|(),Precoa Sync Status,Attribute/Column: contact/jm1_precoasyncstatus,False
+9|jm1_preferredcommunicationchannelchoice|Preferred Communication Channel Choice|Active|(),Preferred Communication Channel Choice,Attribute/Column: contact/jm1_preferredcommunicationchannel,False
+9|jm1_primarylanguage|Primary Language|Active|(),Primary Language,Attribute/Column: opportunity/jm1pub_primarylanguage,False
+9|jm1_trimsizechoice|Trim Size Choice|Active|(),Trim Size Choice,Attribute/Column: opportunity/jm1pub_trimsize,False
+9|jm1pub_imprint|Imprint|Active|(),Imprint,Attribute/Column: lead/jm1pub_imprint,False
+"9|quote_paymenttermscode|Payment Terms|msdynce_Sales (9.0.4.0076)|(('msdynce_Sales', 'msdynce_SalesAnchor (9.0.26064.10011)'),)",Payment Terms,Option Set/Choice: /quote_paymenttermscode,True

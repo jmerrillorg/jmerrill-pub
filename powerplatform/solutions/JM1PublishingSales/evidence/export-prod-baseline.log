@@ -1,0 +1,11 @@
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Core
+
+Starting Solution Export...
+Microsoft PowerPlatform CLI
+Version: 1.49.4+g406813e (.NET 10.0.9)
+Online documentation: https://aka.ms/PowerPlatformCLI
+Feedback, Suggestions, Issues: https://github.com/microsoft/powerplatform-build-tools/discussions
+
+Error: Failed to export Business Process “Publishing Opportunity Process” because solution does not include corresponding Business Process entity “jm1pub_publishingopportunityprocess”. If this is a newly created Business Process in Draft state, activate it once to generate the Business Process entity and include it in the solution. For more information, see http://support.microsoft.com/kb/4337537.
+    Failed to export Business Process “Publishing Opportunity Process” because solution does not include corresponding Business Process entity “jm1pub_publishingopportunityprocess”. If this is a newly created Business Process in Draft state, activate it once to generate the Business Process entity and include it in the solution. For more information, see http://support.microsoft.com/kb/4337537.

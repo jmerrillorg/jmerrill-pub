@@ -4,10 +4,14 @@ import { existsSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 const solutionRoot = 'powerplatform/solutions/JM1PublishingSales'
+const trancheEvidenceRoot =
+  'docs/operations/generated/JMP-TRANCHE-1-COMMERCIAL-FOUNDATION-IMPLEMENTATION-2026-08-07'
 const required = [
   `${solutionRoot}/solution-manifest.md`,
   `${solutionRoot}/environment-map.md`,
   `${solutionRoot}/connection-references-and-environment-variables.md`,
+  `${solutionRoot}/evidence/dependency-register-jm1-dev-2026-08-07.json`,
+  `${solutionRoot}/evidence/dependency-register-jm1-dev-2026-08-07.csv`,
   `${solutionRoot}/src/Other/Solution.xml`,
   `${solutionRoot}/src/Entities/Lead/Entity.xml`,
   `${solutionRoot}/src/Entities/Opportunity/Entity.xml`,
@@ -15,6 +19,10 @@ const required = [
   `${solutionRoot}/src/Entities/jm1pub_publishingopportunityprocess/Entity.xml`,
   `${solutionRoot}/src/Workflows/PublishingOpportunityProcess-5242571D-D8C6-F011-BBD3-6045BDA81E56.xaml`,
   'docs/governance/JM1-POWER-PLATFORM-SOLUTION-LIFECYCLE-v1.0.md',
+  `${trancheEvidenceRoot}/17-dependency-parity-register.md`,
+  `${trancheEvidenceRoot}/18-environment-strategy-and-stop.md`,
+  `${trancheEvidenceRoot}/19-bpf-and-connection-dependency-proof.md`,
+  `${trancheEvidenceRoot}/20-parity-preflight-and-remaining-holds.md`,
   '.github/workflows/publishing-power-platform-solution-deploy.yml',
 ]
 
@@ -58,10 +66,34 @@ if (existsSync(manifestPath)) {
     'JM1PublishingSales',
     'JM1-Dev',
     'JM1-Core',
-    'DEVELOPMENT_ENVIRONMENT_DEPENDENCY_PARITY_REQUIRED',
+    'DEVELOPMENT_SANDBOX_REQUIRED',
     'EXTEND_EXISTING',
   ]) {
     if (!manifest.includes(text)) errors.push(`manifest_missing:${text}`)
+  }
+}
+
+const dependencyRegisterPath = `${solutionRoot}/evidence/dependency-register-jm1-dev-2026-08-07.json`
+if (existsSync(dependencyRegisterPath)) {
+  const register = JSON.parse(readFileSync(dependencyRegisterPath, 'utf8'))
+  const counts = register.classificationCounts ?? {}
+  const records = register.records ?? []
+  if (register.solution !== 'JM1PublishingSales') errors.push('dependency_register_wrong_solution')
+  if (register.devEnvironment?.includes('JM1-Dev') !== true) {
+    errors.push('dependency_register_missing_jm1_dev')
+  }
+  if (register.uniqueDependencies !== records.length) {
+    errors.push('dependency_register_count_mismatch')
+  }
+  if ((counts.UNKNOWN ?? 0) !== 0) errors.push('dependency_register_has_unknown_classifications')
+  for (const requiredClass of [
+    'MICROSOFT_APP_REQUIRED',
+    'JM1_UNMANAGED_PREREQUISITE',
+    'NOT_REQUIRED_FOR_TRANCHE_1',
+  ]) {
+    if ((counts[requiredClass] ?? 0) < 1) {
+      errors.push(`dependency_register_missing_classification:${requiredClass}`)
+    }
   }
 }
 
@@ -78,4 +110,3 @@ if (errors.length) {
 }
 
 console.log('JM1_POWER_PLATFORM_SOLUTION_LIFECYCLE_GUARD PASS')
-

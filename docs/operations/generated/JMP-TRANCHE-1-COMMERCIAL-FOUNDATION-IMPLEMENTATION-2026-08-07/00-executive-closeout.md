@@ -1,6 +1,6 @@
 # Executive Closeout
 
-Last verified: 2026-08-07T20:52:37.069456Z
+Last verified: 2026-08-07T23:42:44.669312+00:00
 
 ## Classification
 
@@ -8,11 +8,11 @@ POWER PLATFORM LIFECYCLE PARTIALLY ESTABLISHED / TRANCHE 1 STILL BLOCKED / NO CL
 
 PR #438 originally stopped fail-closed because no governed Power Platform lifecycle was discoverable. This update establishes the reusable repo-side lifecycle standard, source-controls the `JM1PublishingSales` baseline, adds a lifecycle guard, and adds a protected deployment workflow skeleton.
 
-The deployment lifecycle is not yet fully proven because `JM1-Dev` cannot import the current `JM1PublishingSales` baseline. The import failed due missing first-party Sales/Service dependencies and missing JM1 active-layer dependencies.
+The deployment lifecycle is not yet fully proven because `JM1-Dev` cannot import the current `JM1PublishingSales` baseline. The fresh import rerun produced 692 missing dependency edges across 335 unique required components, including Tranche 1-aligned Sales prerequisites, broad non-Tranche-1 first-party import drag, and 38 JM1 Active-layer prerequisites without governed packages located in this repository.
 
 ## Current Blocker
 
-`DEVELOPMENT_ENVIRONMENT_DEPENDENCY_PARITY_REQUIRED`
+`DEVELOPMENT_SANDBOX_REQUIRED`
 
 ## What Changed
 
@@ -24,13 +24,14 @@ The deployment lifecycle is not yet fully proven because `JM1-Dev` cannot import
 - Exported managed baseline artifact.
 - Added `jm1-power-platform-solution-lifecycle-guard`.
 - Added protected workflow skeleton `publishing-power-platform-solution-deploy.yml`.
+- Added machine-readable dependency register and environment strategy stop evidence.
 
 ## Still Not Completed
 
 - Dev import proof: BLOCKED.
 - Protected production import proof: NOT RUN.
 - Internal deployment proof: NOT RUN.
-- PR #438 holds closed: 2 / 5.
+- PR #438 holds closed: 3 / 5; dependency parity remains blocking after register completion.
 - Tranche 1 Phase 0 resumed: NO.
 
 ## Mutation Summary
@@ -46,3 +47,7 @@ The deployment lifecycle is not yet fully proven because `JM1-Dev` cannot import
 - Live client records used: 0.
 - Client-title automation: FROZEN.
 - Client-title production: MANUAL.
+
+## Dependency-Parity Update
+
+Dependency register: COMPLETE. Unknown classifications: 0. JM1-Dev import remains blocked; Tranche 1 implementation did not resume.
