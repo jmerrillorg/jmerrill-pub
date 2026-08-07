@@ -1,5 +1,17 @@
 # Microsoft Capability Reuse
 
+## SCOPE-NOTE
+
+Population names:
+
+- Register population: 38 rows in `01-PUBLISHING-CAPABILITY-REGISTER.md`.
+- Visible Microsoft reuse disposition table population: 9 parent capabilities, one row for each approved capability in the human-first operating model.
+- Replacement candidates population: 11 candidate functions or custom-build areas, not 11 capability rows.
+- Microsoft unused/unproven population: 7 Microsoft product or platform families, not 7 capability rows.
+- Potential custom systems avoided population: 11 candidate functions or custom-build areas, matching the replacement-candidate unit.
+
+The disposition counts below are therefore over nine parent capabilities: `USE_AS_IS 0 / CONFIGURE 4 / EXTEND 3 / CUSTOM_REQUIRED 1 / UNKNOWN 1`. The replacement-candidate and unused/unproven counts use different units and should not be added to, or reconciled as if they were, the nine disposition rows or the 38 register rows.
+
 No implementation recommendation is made. Disposition records reuse posture only.
 
 | Capability | Business need | Current custom solution if any | Already-licensed Microsoft capability to check/use | Disposition | Current duplication | Operator burden |

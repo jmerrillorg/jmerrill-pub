@@ -32,26 +32,30 @@ This package inventories the Publishing capabilities found in repository evidenc
 | Operator Frequency MONTHLY | 8 |
 | Operator Frequency QUARTERLY | 2 |
 | Operator Frequency EXCEPTION_ONLY | 4 |
-| Operator load appropriate | 18 |
-| Operator load should-be-automated | 35 |
-| Microsoft reuse USE_AS_IS | 4 |
-| Microsoft reuse CONFIGURE | 10 |
-| Microsoft reuse EXTEND | 8 |
-| Microsoft reuse CUSTOM_REQUIRED | 4 |
-| Microsoft reuse UNKNOWN | 10 |
+| Operator load appropriate | 6 visible actions |
+| Operator load should-be-automated | 12 visible actions |
+| Microsoft reuse USE_AS_IS | 0 parent capabilities |
+| Microsoft reuse CONFIGURE | 4 parent capabilities |
+| Microsoft reuse EXTEND | 3 parent capabilities |
+| Microsoft reuse CUSTOM_REQUIRED | 1 parent capability |
+| Microsoft reuse UNKNOWN | 1 parent capability |
 | Replacement candidates | 11 |
 | Microsoft capability currently unused | 7 |
 | Potential custom systems avoided | 11 |
-| Human operating coverage COVERED | 13 |
-| Human operating coverage PARTIALLY_COVERED | 17 |
-| Human operating coverage NOT_COVERED | 5 |
-| Human operating coverage NOT_HUMAN_OPERATED | 1 |
+| Human operating coverage COVERED | 3 parent capabilities |
+| Human operating coverage PARTIALLY_COVERED | 5 parent capabilities |
+| Human operating coverage NOT_COVERED | 1 parent capability |
+| Human operating coverage NOT_HUMAN_OPERATED | 0 parent capabilities |
 | Writes performed outside this generated package | 0 |
 | Checksums | VALIDATED |
 
 ## Standing Boundary
 
 Slice 3 runtime remains blocked. Client-title automation remains frozen. The Human Operating Layer is treated as current authority for coverage analysis, not as a question of existence. Slice 2 is treated as complete input.
+
+## Denominator Scope
+
+The register contains 38 capability rows. The human operating coverage and Microsoft reuse tables currently score the nine parent capabilities, not all 38 register rows. The operator-load table currently scores 18 visible operator actions, not capability rows. Prior summary counts of 36 coverage items and 53 operator-load items are not traceable to visible source tables in this package and are not used as governing return-state counts.
 
 ## High-Risk Findings
 
