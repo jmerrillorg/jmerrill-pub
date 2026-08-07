@@ -15,9 +15,9 @@ What remains valid: the PF state machine, title/edition authority, execution-log
 
 What must change: the implementation sequence must no longer start from title-lifecycle runtime alone. Commercial Operations, Financial Operations, Executive Control, Strategic Marketing, Author Experience, and Microsoft reuse decisions must be represented before runtime work proceeds.
 
-Microsoft tools that may remove custom work: Dynamics 365 Sales, Business Central, Power Automate, Power Apps, Power BI/Fabric, SharePoint, Exchange, Teams/Approvals, Customer Insights/Journeys if entitlement and fit are proven.
+Microsoft tools that may remove custom work: Dynamics 365 Sales, Business Central, Power Automate, Power Apps, Power BI/Fabric, SharePoint, Exchange, Teams/Approvals, and the tenant-provisioned Dynamics marketing capability (`DYN365_MARKETING_APP`).
 
-Missing integrations before runtime: lead/opportunity/quote/order, Stripe-to-authorization projection, Business Central financial handoff, lifecycle marketing, author-facing Microsoft surface decision, daily Jackie operating surface, and post-publication money/copy/royalty/retirement support.
+Missing integrations before runtime: lead/opportunity/quote/order, Stripe-to-authorization projection, Business Central financial handoff, configured lifecycle-marketing mapping, author-facing Microsoft surface decision, daily Jackie operating surface, and post-publication money/copy/royalty/retirement support.
 
 ## Counts
 
@@ -41,12 +41,12 @@ Counts below combine 13 existing backlog items and the 9 parent capability reuse
 | --- | --- |
 | USE_AS_IS | 0 |
 | CONFIGURE | 8 |
-| EXTEND | 9 |
+| EXTEND | 10 |
 | CUSTOM_REQUIRED | 4 |
-| UNKNOWN | 1 |
+| UNKNOWN | 0 |
 
 
-Replacement candidates: 2 direct backlog replacements, plus 11 capability-register reference candidates logged under the Microsoft Capability Reuse Gate.
+Replacement candidates: 2 direct backlog replacements, plus 11 capability-register reference candidates logged under the Microsoft Capability Reuse Gate. Strategic Marketing UNKNOWN is resolved to EXTEND by read-only Graph SKU readback of `DYN365_MARKETING_APP`.
 
 Potential custom builds avoided in the revised sequence: 5.
 

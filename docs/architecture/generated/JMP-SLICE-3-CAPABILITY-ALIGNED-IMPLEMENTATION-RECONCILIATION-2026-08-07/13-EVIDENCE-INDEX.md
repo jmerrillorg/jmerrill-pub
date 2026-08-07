@@ -21,3 +21,12 @@
 ## Non-Mutation Statement
 
 This package was produced from repository evidence only. It did not write to Dataverse, configure Business Central, create Stripe products, activate workflows, modify D365, change SharePoint operational libraries, deploy website changes, send author communications, thaw client-title automation, begin Slice 3 runtime, modify agreements, modify the commercial catalog, or design Financial/JMF systems.
+
+## Tenant Readback Evidence
+
+| Evidence | Result |
+| --- | --- |
+| Azure CLI `az account show` | Signed into tenant `352d075e-8e17-4169-9f8e-22e6946ce66d` as `jm1-admin@jmerrill.one`. |
+| Microsoft Graph `subscribedSkus` read-only query | Found SKU `Dynamics_365_Multi_app_` enabled with service plan `DYN365_MARKETING_APP` provisioned successfully. |
+
+No tenant configuration, license purchase, license assignment, Dynamics app setup, journey, segment, email, or workflow activation was performed.

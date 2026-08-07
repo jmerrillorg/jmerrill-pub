@@ -1,6 +1,6 @@
 # Microsoft Reuse Decisions
 
-UNKNOWN blocks implementation. Strategic Marketing remains UNKNOWN for Customer Insights/Journeys until entitlement and fit are verified.
+UNKNOWN blocks implementation. Strategic Marketing UNKNOWN is resolved to EXTEND by read-only tenant readback showing `DYN365_MARKETING_APP` provisioned successfully. No Dynamics or marketing configuration was performed.
 
 ## Parent Capability Reuse
 
@@ -11,7 +11,7 @@ UNKNOWN blocks implementation. Strategic Marketing remains UNKNOWN for Customer 
 | Author Experience | relationship, communication, author status | Author Operating Center; ACS/Exchange relay | EXTEND | Microsoft surfaces may handle much, but author experience may require extension. |
 | Editorial | manuscript and package work | custom editorial command and scripts | CUSTOM_REQUIRED | Editorial judgment and package rules likely justify targeted custom logic. |
 | Production & Distribution | PF, files, release, distribution | custom PF state design and distribution command | EXTEND | Use Dataverse/SharePoint/Power Automate where possible; PF-specific enforcement may need extension. |
-| Strategic Marketing | campaigns, journeys, newsletter | manual/partial profile and newsletter routes | UNKNOWN | Customer Insights/Journeys entitlement and fit must be verified before implementation. |
+| Strategic Marketing | campaigns, journeys, newsletter | manual/partial profile and newsletter routes | EXTEND | Tenant readback shows `DYN365_MARKETING_APP` provisioned successfully; extend/configure Microsoft marketing capability with publishing-specific lifecycle triggers, consent, cost-class, and reporting rules. |
 | Financial Operations | revenue/accounting | Stripe + BC specs/proofs | CONFIGURE | Business Central, Stripe, Power Automate, and Dataverse projections should carry most work. |
 | Post-Publication Operations | royalties/copies/retirement/reversion | royalty scripts/registers and copy policy | EXTEND | Publishing-specific royalties/copy/retirement logic likely extends Microsoft capabilities. |
 | Enterprise Support | evidence, AI, reporting, platform | GitHub docs; Azure Functions; generated evidence | CONFIGURE | Prefer SharePoint, Power BI, Azure Monitor, Power Platform, and tenant readback. |
