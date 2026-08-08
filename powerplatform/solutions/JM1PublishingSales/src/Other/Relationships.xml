@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EntityRelationships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <EntityRelationship Name="bpf_opportunity_jm1pub_publishingopportunityprocess" />
+  <EntityRelationship Name="jm1pub_PublishingSubmission_Author_Contact" />
+  <EntityRelationship Name="jm1pub_PublishingSubmission_Opportunity_Opportunity" />
+</EntityRelationships>

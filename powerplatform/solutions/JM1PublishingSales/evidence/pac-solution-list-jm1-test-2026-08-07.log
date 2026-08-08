@@ -1,0 +1,9 @@
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Test
+
+Listing all Solutions from the current Dataverse organization...
+Unique Name              Friendly Name                         Version Managed
+Cr1f66d                  Common Data Services Default Solution 1.0.0.0 False
+Default                  Default Solution                      1.0     False
+JM1_EnterpriseFoundation JM1 Enterprise Foundation             1.0.0.0 True
+JM1_Publishing           JM1 Publishing                        1.0.0.0 True

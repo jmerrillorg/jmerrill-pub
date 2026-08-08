@@ -1,0 +1,36 @@
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Enterprise-Dev
+
+Solution Importing...
+
+Waiting for asynchronous operation 85c64d85-de92-f111-8076-000d3a37d363 to complete with timeout of 02:00:00.
+
+Processing asynchronous operation... execution time: 00:00:00 and 0.00% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:04 and 0.06% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:08 and 0.11% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:12 and 0.17% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:16 and 0.23% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:20 and 0.29% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:24 and 0.34% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:28 and 0.40% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:32 and 0.46% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:37 and 0.52% of max time allotted
+
+Asynchronous operation 85c64d85-de92-f111-8076-000d3a37d363 failed within 00:00:41.2419115.
+
+The reason given was: The following attributes jm1pub_Author, jm1pub_Opportunity of entity jm1pub_PublishingSubmission are missing their associated relationship definition in customizations xml of JM1PublishingSales solution. Please include the associated relationship components and retry solution import.
+Microsoft PowerPlatform CLI
+Version: 1.49.4+g406813e (.NET 10.0.9)
+Online documentation: https://aka.ms/PowerPlatformCLI
+Feedback, Suggestions, Issues: https://github.com/microsoft/powerplatform-build-tools/discussions
+
+Error: The async operation completed with a statuscode of Failed.

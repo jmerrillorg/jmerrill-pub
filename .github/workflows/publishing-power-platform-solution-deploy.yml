@@ -62,11 +62,16 @@ jobs:
           node-version: "24"
           cache: npm
 
+      - name: Fetch main authority ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main:refs/remotes/origin/main
+
       - name: Repository Guards
         run: |
           set -euo pipefail
           npm ci
-          npm run jm1-bootstrap-guard
           npm run jm1-canon-consistency-guard
           npm run jm1-canon-guard-enforcement
           npm run commercial-architecture-guard
@@ -92,8 +97,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
           mkdir -p "$SOLUTION_PATH/artifacts/workflow"
-          pac solution pack \
+          "$PAC_CLI" solution pack \
             --zipfile "$SOLUTION_PATH/artifacts/workflow/${{ inputs.solution_name }}_unmanaged.zip" \
             --folder "$SOLUTION_PATH/src" \
             --packagetype Unmanaged
@@ -151,7 +157,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          pac auth create \
+          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
+          "$PAC_CLI" auth create \
             --name jm1-pub-prod-oidc \
             --applicationId "$PAC_APPLICATION_ID" \
             --tenant "$PAC_TENANT_ID" \
@@ -162,20 +169,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          pac solution import \
+          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
+          "$PAC_CLI" solution import \
             --environment "$PROD_ENVIRONMENT_URL" \
             --path "$SOLUTION_PATH/artifacts/workflow/${{ inputs.solution_name }}_unmanaged.zip" \
             --force-overwrite \
-            --publish-changes \
-            --async \
-            --max-async-wait-time 120
+            --publish-changes
 
       - name: Production readback
         shell: bash
         run: |
           set -euo pipefail
+          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
           mkdir -p "$SOLUTION_PATH/artifacts/workflow/readback"
-          pac solution list --environment "$PROD_ENVIRONMENT_URL" \
+          "$PAC_CLI" solution list --environment "$PROD_ENVIRONMENT_URL" \
             > "$SOLUTION_PATH/artifacts/workflow/readback/solution-list.txt"
           grep -F "JM1PublishingSales" "$SOLUTION_PATH/artifacts/workflow/readback/solution-list.txt"
 

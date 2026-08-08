@@ -1,0 +1,29 @@
+
+Packing Solution...
+
+Packing /tmp/jm1ps_src_norels.qneYwJ/src to /Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-tranche1-commercial-implementation/powerplatform/solutions/JM1PublishingSales/artifacts/packed/JM1PublishingSales_pruned_unmanaged_no_relationships_test.zip
+
+Processing Component: Entities
+ - Opportunity
+ - Quote
+ - Lead
+ - jm1pub_PublishingSubmission
+ - jm1pub_publishingopportunityprocess
+Processing Component: Roles
+Processing Component: Workflows
+ - Publishing Opportunity Process
+Processing Component: FieldSecurityProfiles
+Processing Component: Templates
+Processing Component: EntityMaps
+Processing Component: EntityRelationships
+Processing Component: OrganizationSettings
+Processing Component: optionsets
+Processing Component: InteractionCentricDashboards
+Processing Component: CustomControls
+Processing Component: EntityDataProviders
+Processing Sharded Component Files
+
+Unmanaged Pack complete.
+
+
+Packed Solution.

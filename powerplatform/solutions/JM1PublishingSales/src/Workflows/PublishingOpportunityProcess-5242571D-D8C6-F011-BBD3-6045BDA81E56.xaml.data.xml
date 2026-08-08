@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Workflow WorkflowId="{5242571d-d8c6-f011-bbd3-6045bda81e56}" Name="Publishing Opportunity Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <XamlFileName>/Workflows/PublishingOpportunityProcess-5242571D-D8C6-F011-BBD3-6045BDA81E56.xaml</XamlFileName>
+  <Type>1</Type>
+  <Subprocess>0</Subprocess>
+  <Category>4</Category>
+  <Mode>0</Mode>
+  <Scope>4</Scope>
+  <OnDemand>0</OnDemand>
+  <TriggerOnCreate>1</TriggerOnCreate>
+  <TriggerOnDelete>0</TriggerOnDelete>
+  <AsyncAutodelete>0</AsyncAutodelete>
+  <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+  <StateCode>1</StateCode>
+  <StatusCode>2</StatusCode>
+  <processorder>100</processorder>
+  <RunAs>1</RunAs>
+  <UniqueName>jm1pub_publishingopportunityprocess</UniqueName>
+  <IsTransacted>1</IsTransacted>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <BusinessProcessType>0</BusinessProcessType>
+  <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
+  <ProcessTriggerScope>1</ProcessTriggerScope>
+  <ModernFlowType>0</ModernFlowType>
+  <PrimaryEntity>Opportunity</PrimaryEntity>
+  <LocalizedNames>
+    <LocalizedName languagecode="1033" description="Publishing Opportunity Process" />
+  </LocalizedNames>
+  <labels>
+    <steplabels id="{149e25f6-6e93-47c2-80a3-8458df81fb44}">
+      <label languagecode="1033" description="Discovery" />
+    </steplabels>
+    <steplabels id="{e1370c79-7d4b-4d60-93e4-850b5f3e70d1}">
+      <label languagecode="1033" description="Topic" />
+    </steplabels>
+    <steplabels id="{5fd7e767-3dbb-42b8-b8a9-5c3ed58b55e2}">
+      <label languagecode="1033" description="Contact" />
+    </steplabels>
+    <steplabels id="{3c8a0ee0-f57a-422e-9ffb-afe70b7238b1}">
+      <label languagecode="1033" description="Project Title" />
+    </steplabels>
+    <steplabels id="{8eb3c7b3-dfd7-4206-b57b-20bfef8b58fd}">
+      <label languagecode="1033" description="Manuscript Type" />
+    </steplabels>
+    <steplabels id="{fb620859-dd8b-4826-af6a-308b7edc21f0}">
+      <label languagecode="1033" description="Preferred Format" />
+    </steplabels>
+    <steplabels id="{20469836-7fd1-4b6e-84af-10afbd910c7c}">
+      <label languagecode="1033" description="Submission" />
+    </steplabels>
+    <steplabels id="{4b873421-0ac9-4c90-a316-f54fd11c49ca}">
+      <label languagecode="1033" description="Manuscript Submitted?" />
+    </steplabels>
+    <steplabels id="{51c24392-c9ed-435f-a6ac-db8787538f91}">
+      <label languagecode="1033" description="Estimated Page Count" />
+    </steplabels>
+    <steplabels id="{9cc76802-7f30-41ab-937f-498dd46e8e10}">
+      <label languagecode="1033" description="Picture Book?" />
+    </steplabels>
+    <steplabels id="{3a74d554-ea25-4102-aab3-1f82bfc3b0e9}">
+      <label languagecode="1033" description="Audiobook?" />
+    </steplabels>
+    <steplabels id="{de52c5ef-1fd6-4c8e-a795-d7affa9bc5ca}">
+      <label languagecode="1033" description="Editorial Review" />
+    </steplabels>
+    <steplabels id="{04c6b5a9-5d16-49a6-b6fb-3d66773dda76}">
+      <label languagecode="1033" description="Review Status" />
+    </steplabels>
+    <steplabels id="{2eba4c64-0bce-470d-b069-3b00dc4b2490}">
+      <label languagecode="1033" description="Review Recommendation" />
+    </steplabels>
+    <steplabels id="{a617e573-fb13-4088-9ab6-31172ad5079d}">
+      <label languagecode="1033" description="Editorial Effort" />
+    </steplabels>
+    <steplabels id="{efe6329c-555a-4839-aa96-46c66f34448b}">
+      <label languagecode="1033" description="Risk Level" />
+    </steplabels>
+    <steplabels id="{055f3c52-6275-45b5-a44e-2de7bd23d9e0}">
+      <label languagecode="1033" description="Package &amp; Quote" />
+    </steplabels>
+    <steplabels id="{5a554978-0062-49f4-8244-9f4d626e5183}">
+      <label languagecode="1033" description="Package Recommended" />
+    </steplabels>
+    <steplabels id="{c420f29e-6f96-4d36-9101-dc298f08cd0f}">
+      <label languagecode="1033" description="Est. revenue" />
+    </steplabels>
+    <steplabels id="{12c5cb66-40af-49f4-ab53-340283867866}">
+      <label languagecode="1033" description="Est. close date" />
+    </steplabels>
+    <steplabels id="{6a306266-0d55-43f6-8909-b0f4c8256ec6}">
+      <label languagecode="1033" description="Contract" />
+    </steplabels>
+    <steplabels id="{15f1379e-b24e-48a6-adaf-b492f9c08491}">
+      <label languagecode="1033" description="Contract Status" />
+    </steplabels>
+    <steplabels id="{16613f31-cdeb-4ed1-bb8b-3e1268d7c82c}">
+      <label languagecode="1033" description="Contract URL" />
+    </steplabels>
+    <steplabels id="{630cf8a9-9c9f-4432-b4a6-54f707641040}">
+      <label languagecode="1033" description="Activation" />
+    </steplabels>
+    <steplabels id="{b6f94679-18ac-4bdf-8ce9-6451577836bb}">
+      <label languagecode="1033" description="Actual Close Date" />
+    </steplabels>
+    <steplabels id="{dadf874c-c5fe-4bba-bd31-89d54bc3faa3}">
+      <label languagecode="1033" description="Editorial Project Id" />
+    </steplabels>
+  </labels>
+</Workflow>

@@ -26,6 +26,7 @@
     "vellum-template-guard": "node --test scripts/vellum_title_template_governance.test.mjs",
     "workflow-engine-guard": "node scripts/check-canonical-workflow-engine-declarations.mjs",
     "commercial-architecture-guard": "node scripts/commercial_architecture_guard.test.mjs",
+    "tranche1-commercial-foundation-guard": "node --test scripts/tranche1_commercial_foundation_runtime.test.mjs",
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",
     "author-communication-brand-guard": "node --test scripts/author_communication_brand_guard.test.mjs",
     "jm1-bootstrap": "node scripts/jm1_bootstrap.mjs",
@@ -37,7 +38,8 @@
     "functions-package-access-guard": "node scripts/check-functions-package-access-hygiene.mjs",
     "dirty-worktree-scope-guard": "node scripts/dirty_worktree_scope_guard.mjs",
     "gate-w3-slot-identity-guard": "node scripts/gate_w3_slot_identity_guard.mjs",
-    "jm1-power-platform-solution-lifecycle-guard": "node scripts/jm1_power_platform_solution_lifecycle_guard.mjs"
+    "jm1-power-platform-solution-lifecycle-guard": "node scripts/jm1_power_platform_solution_lifecycle_guard.mjs",
+    "jm1-prune-publishing-sales-solution": "node scripts/jm1_prune_publishing_sales_solution.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",

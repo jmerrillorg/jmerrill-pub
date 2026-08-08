@@ -1,0 +1,4 @@
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Core
+Sorry, the app encountered a non-recoverable error and will need to terminate. The exception details have been captured and will be forwarded to the development team, if telemetry has been enabled. Session Id: 8d161870-d6e8-4d64-abc9-f7f577a4fa1b, Exception Type: System.Xml.XmlException
+The diagnostic logs can be found at: /Users/jmerrillone/.dotnet/tools/.store/microsoft.powerapps.cli.tool/1.49.4/microsoft.powerapps.cli.tool/1.49.4/tools/net9.0/any/logs/pac-log.txt

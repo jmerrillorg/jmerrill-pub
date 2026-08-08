@@ -1,0 +1,12 @@
+--- accounts
+{"@odata.context":"https://jm1enterprisedev.crm.dynamics.com/api/data/v9.2/$metadata#accounts(createdon)","value":[]}
+--- contacts
+{"@odata.context":"https://jm1enterprisedev.crm.dynamics.com/api/data/v9.2/$metadata#contacts(createdon)","value":[]}
+--- leads
+{"@odata.context":"https://jm1enterprisedev.crm.dynamics.com/api/data/v9.2/$metadata#leads(createdon)","value":[]}
+--- opportunities
+{"@odata.context":"https://jm1enterprisedev.crm.dynamics.com/api/data/v9.2/$metadata#opportunities(createdon)","value":[]}
+--- quotes
+{"@odata.context":"https://jm1enterprisedev.crm.dynamics.com/api/data/v9.2/$metadata#quotes(createdon)","value":[]}
+--- jm1pub_publishingsubmissions
+{"@odata.context":"https://jm1enterprisedev.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_publishingsubmissions(createdon)","value":[]}

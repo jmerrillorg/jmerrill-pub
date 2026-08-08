@@ -1,0 +1,648 @@
+Protected production import	Set up job	﻿2026-08-08T07:49:33.8109039Z Current runner version: '2.336.0'
+Protected production import	Set up job	2026-08-08T07:49:33.8137334Z ##[group]Runner Image Provisioner
+Protected production import	Set up job	2026-08-08T07:49:33.8138259Z Hosted Compute Agent
+Protected production import	Set up job	2026-08-08T07:49:33.8138960Z Version: 20260707.563
+Protected production import	Set up job	2026-08-08T07:49:33.8139614Z Commit: 02667638d2b423fbc733a8e32a88b44996a3ba6e
+Protected production import	Set up job	2026-08-08T07:49:33.8140338Z Build Date: 2026-07-07T19:33:50Z
+Protected production import	Set up job	2026-08-08T07:49:33.8141124Z Worker ID: {416fa563-5ab1-494c-9614-14fba86efb15}
+Protected production import	Set up job	2026-08-08T07:49:33.8141889Z Azure Region: eastus2
+Protected production import	Set up job	2026-08-08T07:49:33.8142508Z ##[endgroup]
+Protected production import	Set up job	2026-08-08T07:49:33.8143907Z ##[group]Operating System
+Protected production import	Set up job	2026-08-08T07:49:33.8144654Z Ubuntu
+Protected production import	Set up job	2026-08-08T07:49:33.8145215Z 24.04.4
+Protected production import	Set up job	2026-08-08T07:49:33.8145994Z LTS
+Protected production import	Set up job	2026-08-08T07:49:33.8146630Z ##[endgroup]
+Protected production import	Set up job	2026-08-08T07:49:33.8147216Z ##[group]Runner Image
+Protected production import	Set up job	2026-08-08T07:49:33.8147827Z Image: ubuntu-24.04
+Protected production import	Set up job	2026-08-08T07:49:33.8148947Z Version: 20260720.247.2
+Protected production import	Set up job	2026-08-08T07:49:33.8150074Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260720.247/images/ubuntu/Ubuntu2404-Readme.md
+Protected production import	Set up job	2026-08-08T07:49:33.8152217Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260720.247
+Protected production import	Set up job	2026-08-08T07:49:33.8153701Z ##[endgroup]
+Protected production import	Set up job	2026-08-08T07:49:33.8155436Z ##[group]GITHUB_TOKEN Permissions
+Protected production import	Set up job	2026-08-08T07:49:33.8158182Z Contents: read
+Protected production import	Set up job	2026-08-08T07:49:33.8158939Z Metadata: read
+Protected production import	Set up job	2026-08-08T07:49:33.8159531Z ##[endgroup]
+Protected production import	Set up job	2026-08-08T07:49:33.8161733Z Secret source: Actions
+Protected production import	Set up job	2026-08-08T07:49:33.8162959Z Prepare workflow directory
+Protected production import	Set up job	2026-08-08T07:49:33.8552566Z Prepare all required actions
+Protected production import	Set up job	2026-08-08T07:49:33.8603432Z Getting action download info
+Protected production import	Set up job	2026-08-08T07:49:34.0650943Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Protected production import	Set up job	2026-08-08T07:49:34.3322835Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+Protected production import	Set up job	2026-08-08T07:49:34.4274074Z Download action repository 'microsoft/powerplatform-actions@v1' (SHA:0e44beb5424af932af47250a2568eba4c259e3d8)
+Protected production import	Set up job	2026-08-08T07:49:35.4935436Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+Protected production import	Set up job	2026-08-08T07:49:35.7038338Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+Protected production import	Set up job	2026-08-08T07:49:35.9454597Z Complete job name: Protected production import
+Protected production import	Checkout Repository	﻿2026-08-08T07:49:36.0387673Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0398992Z ##[group]Run actions/checkout@v4
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0400263Z with:
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0401177Z   repository: jmerrillorg/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0410059Z   token: ***
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0410943Z   ssh-strict: true
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0411846Z   ssh-user: git
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0412752Z   persist-credentials: true
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0413747Z   clean: true
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0414680Z   sparse-checkout-cone-mode: true
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0415868Z   fetch-depth: 1
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0416763Z   fetch-tags: false
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0417686Z   show-progress: true
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0418612Z   lfs: false
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0419526Z   submodules: false
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0420510Z   set-safe-directory: true
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0421546Z   allow-unsafe-pr-checkout: false
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0422900Z env:
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0423960Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0425521Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0427163Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0428691Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0430125Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0431514Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Checkout Repository	2026-08-08T07:49:36.0432789Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1481766Z Syncing repository: jmerrillorg/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1486199Z ##[group]Getting Git version info
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1488451Z Working directory is '/home/runner/work/jmerrill-pub/jmerrill-pub'
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1491763Z [command]/usr/bin/git version
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1520430Z git version 2.54.0
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1544048Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1563775Z Temporarily overriding HOME='/home/runner/work/_temp/3b073ea4-69c2-4ae5-96be-43cca646b0f5' before making global git config changes
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1568903Z Adding repository directory to the temporary git global config as a safe directory
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1572708Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/jmerrill-pub/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1642285Z Deleting the contents of '/home/runner/work/jmerrill-pub/jmerrill-pub'
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1648513Z ##[group]Initializing the repository
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1656687Z [command]/usr/bin/git init /home/runner/work/jmerrill-pub/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1764739Z hint: Using 'master' as the name for the initial branch. This default branch name
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1768514Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1772372Z hint: to use in all of your new repositories, which will suppress this warning,
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1774823Z hint: call:
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1776271Z hint:
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1777807Z hint: 	git config --global init.defaultBranch <name>
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1779603Z hint:
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1781320Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1784164Z hint: 'development'. The just-created branch can be renamed via this command:
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1786758Z hint:
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1788007Z hint: 	git branch -m <name>
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1789359Z hint:
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1791192Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1794478Z Initialized empty Git repository in /home/runner/work/jmerrill-pub/jmerrill-pub/.git/
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1798700Z [command]/usr/bin/git remote add origin https://github.com/jmerrillorg/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1841376Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1959393Z ##[group]Disabling automatic garbage collection
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1961962Z [command]/usr/bin/git config --local gc.auto 0
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1965322Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1966959Z ##[group]Setting up auth
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1968379Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Protected production import	Checkout Repository	2026-08-08T07:49:36.1976208Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Protected production import	Checkout Repository	2026-08-08T07:49:36.2402582Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Protected production import	Checkout Repository	2026-08-08T07:49:36.2445190Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Protected production import	Checkout Repository	2026-08-08T07:49:36.2697250Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Protected production import	Checkout Repository	2026-08-08T07:49:36.2738337Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Protected production import	Checkout Repository	2026-08-08T07:49:36.2990656Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Protected production import	Checkout Repository	2026-08-08T07:49:36.3034429Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:49:36.3036750Z ##[group]Fetching the repository
+Protected production import	Checkout Repository	2026-08-08T07:49:36.3046961Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +d852c2b70048f3c94e0e917d84ecc6fe7b94b930:refs/remotes/origin/codex/tranche1-commercial-foundation-implementation-20260807
+Protected production import	Checkout Repository	2026-08-08T07:49:37.5434195Z From https://github.com/jmerrillorg/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:49:37.5435558Z  * [new ref]         d852c2b70048f3c94e0e917d84ecc6fe7b94b930 -> origin/codex/tranche1-commercial-foundation-implementation-20260807
+Protected production import	Checkout Repository	2026-08-08T07:49:37.5479268Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:49:37.5479811Z ##[group]Determining the checkout info
+Protected production import	Checkout Repository	2026-08-08T07:49:37.5481749Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:49:37.5488403Z [command]/usr/bin/git sparse-checkout disable
+Protected production import	Checkout Repository	2026-08-08T07:49:37.5545375Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Protected production import	Checkout Repository	2026-08-08T07:49:37.5588270Z ##[group]Checking out the ref
+Protected production import	Checkout Repository	2026-08-08T07:49:37.5593360Z [command]/usr/bin/git checkout --progress --force -B codex/tranche1-commercial-foundation-implementation-20260807 refs/remotes/origin/codex/tranche1-commercial-foundation-implementation-20260807
+Protected production import	Checkout Repository	2026-08-08T07:49:37.7476963Z Switched to a new branch 'codex/tranche1-commercial-foundation-implementation-20260807'
+Protected production import	Checkout Repository	2026-08-08T07:49:37.7478800Z branch 'codex/tranche1-commercial-foundation-implementation-20260807' set up to track 'origin/codex/tranche1-commercial-foundation-implementation-20260807'.
+Protected production import	Checkout Repository	2026-08-08T07:49:37.7497731Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:49:37.7557741Z [command]/usr/bin/git log -1 --format=%H
+Protected production import	Checkout Repository	2026-08-08T07:49:37.7592904Z d852c2b70048f3c94e0e917d84ecc6fe7b94b930
+Protected production import	Setup Node	﻿2026-08-08T07:49:37.7862002Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Protected production import	Setup Node	2026-08-08T07:49:37.7863788Z ##[group]Run actions/setup-node@v4
+Protected production import	Setup Node	2026-08-08T07:49:37.7864062Z with:
+Protected production import	Setup Node	2026-08-08T07:49:37.7864267Z   node-version: 24
+Protected production import	Setup Node	2026-08-08T07:49:37.7864486Z   cache: npm
+Protected production import	Setup Node	2026-08-08T07:49:37.7864707Z   always-auth: false
+Protected production import	Setup Node	2026-08-08T07:49:37.7864930Z   check-latest: false
+Protected production import	Setup Node	2026-08-08T07:49:37.7867396Z   token: ***
+Protected production import	Setup Node	2026-08-08T07:49:37.7867613Z env:
+Protected production import	Setup Node	2026-08-08T07:49:37.7868411Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Setup Node	2026-08-08T07:49:37.7868862Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Setup Node	2026-08-08T07:49:37.7869263Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Setup Node	2026-08-08T07:49:37.7869647Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Setup Node	2026-08-08T07:49:37.7870060Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Setup Node	2026-08-08T07:49:37.7870422Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Setup Node	2026-08-08T07:49:37.7870776Z ##[endgroup]
+Protected production import	Setup Node	2026-08-08T07:49:37.9336142Z Found in cache @ /opt/hostedtoolcache/node/24.18.0/x64
+Protected production import	Setup Node	2026-08-08T07:49:37.9342039Z (node:2255) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Protected production import	Setup Node	2026-08-08T07:49:37.9343175Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Protected production import	Setup Node	2026-08-08T07:49:37.9345216Z ##[group]Environment details
+Protected production import	Setup Node	2026-08-08T07:49:38.3374816Z node: v24.18.0
+Protected production import	Setup Node	2026-08-08T07:49:38.3375451Z npm: 11.16.0
+Protected production import	Setup Node	2026-08-08T07:49:38.3376040Z yarn: 1.22.22
+Protected production import	Setup Node	2026-08-08T07:49:38.3377375Z ##[endgroup]
+Protected production import	Setup Node	2026-08-08T07:49:38.3396812Z [command]/opt/hostedtoolcache/node/24.18.0/x64/bin/npm config get cache
+Protected production import	Setup Node	2026-08-08T07:49:38.4573065Z /home/runner/.npm
+Protected production import	Setup Node	2026-08-08T07:49:38.5456925Z Cache hit for: node-cache-Linux-x64-npm-e799989891354805214b778b0dcdc6fc73c8374cd2734634c5a18e8e0306378f
+Protected production import	Setup Node	2026-08-08T07:49:38.5596495Z (node:2255) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Protected production import	Setup Node	2026-08-08T07:49:39.0412254Z Received 88349231 of 88349231 (100.0%), 183.2 MBs/sec
+Protected production import	Setup Node	2026-08-08T07:49:39.0413478Z Cache Size: ~84 MB (88349231 B)
+Protected production import	Setup Node	2026-08-08T07:49:39.0446141Z [command]/usr/bin/tar -xf /home/runner/work/_temp/566ffda6-d0aa-44e6-b52f-16d731654afc/cache.tzst -P -C /home/runner/work/jmerrill-pub/jmerrill-pub --use-compress-program unzstd
+Protected production import	Setup Node	2026-08-08T07:49:39.2928525Z Cache restored successfully
+Protected production import	Setup Node	2026-08-08T07:49:39.2983376Z Cache restored from key: node-cache-Linux-x64-npm-e799989891354805214b778b0dcdc6fc73c8374cd2734634c5a18e8e0306378f
+Protected production import	Install Power Platform CLI	﻿2026-08-08T07:49:39.3233898Z ##[group]Run microsoft/powerplatform-actions/actions-install@v1
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3234294Z with:
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3234493Z env:
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3234771Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3235200Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3235594Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3236167Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3236525Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3236875Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3237195Z ##[endgroup]
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3918499Z ##[group]actions-install:
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3928181Z Installing Microsoft.PowerApps.CLI.Tool.2.8.1 via dotnet tool install
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:39.3986095Z [command]/usr/bin/dotnet tool install Microsoft.PowerApps.CLI.Tool --version 2.8.1 --tool-path /tmp/powerplatform-actions-H5z6sV
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:45.2246763Z You can invoke the tool using the following command: pac
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:45.2248049Z Tool 'microsoft.powerapps.cli.tool' (version '2.8.1') was successfully installed.
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:45.2396989Z pac installed to /tmp/powerplatform-actions-H5z6sV/pac
+Protected production import	Install Power Platform CLI	2026-08-08T07:49:45.2397745Z ##[endgroup]
+Protected production import	Download validation artifact	﻿2026-08-08T07:49:45.2513958Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2515217Z ##[group]Run actions/download-artifact@v4
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2515497Z with:
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2515939Z   name: power-platform-solution-validation
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2516399Z   path: powerplatform/solutions/JM1PublishingSales/artifacts/workflow
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2516803Z   merge-multiple: false
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2517059Z   repository: jmerrillorg/jmerrill-pub
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2517327Z   run-id: 31246998549
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2517540Z env:
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2517802Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2518207Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2518585Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2519004Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2519361Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2519712Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2520044Z   POWERPLATFORMTOOLS_PACINSTALLED: true
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2520432Z   POWERPLATFORMTOOLS_PACPATH: /tmp/powerplatform-actions-H5z6sV/pac
+Protected production import	Download validation artifact	2026-08-08T07:49:45.2520800Z ##[endgroup]
+Protected production import	Download validation artifact	2026-08-08T07:49:45.4027515Z Downloading single artifact
+Protected production import	Download validation artifact	2026-08-08T07:49:45.4200064Z (node:2378) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Protected production import	Download validation artifact	2026-08-08T07:49:45.4201561Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Protected production import	Download validation artifact	2026-08-08T07:49:45.4894959Z Preparing to download the following artifacts:
+Protected production import	Download validation artifact	2026-08-08T07:49:45.4897005Z - power-platform-solution-validation (ID: 9018805233, Size: 31734, Expected Digest: sha256:341aebc9d956920c110645caf9e49a61807187581adba21a16cdadf017e1b647)
+Protected production import	Download validation artifact	2026-08-08T07:49:45.5720064Z Redirecting to blob download url: https://productionresultssa6.blob.core.windows.net/actions-results/a4bc5cae-9e31-416f-b273-4f20e117e247/workflow-job-run-07495655-cdbf-5951-8f7a-33408043ba56/artifacts/57d5c7e699c0a0aa383990c11fe3eb18a5eb97417977503d6ad3c48ea51f0d03.zip
+Protected production import	Download validation artifact	2026-08-08T07:49:45.5721930Z Starting download of artifact to: /home/runner/work/jmerrill-pub/jmerrill-pub/powerplatform/solutions/JM1PublishingSales/artifacts/workflow
+Protected production import	Download validation artifact	2026-08-08T07:49:45.5929701Z (node:2378) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Protected production import	Download validation artifact	2026-08-08T07:49:45.5969262Z SHA256 digest of downloaded artifact is 341aebc9d956920c110645caf9e49a61807187581adba21a16cdadf017e1b647
+Protected production import	Download validation artifact	2026-08-08T07:49:45.5970423Z Artifact download completed successfully.
+Protected production import	Download validation artifact	2026-08-08T07:49:45.5971016Z Total of 1 artifact(s) downloaded
+Protected production import	Download validation artifact	2026-08-08T07:49:45.5975655Z Download artifact has finished successfully
+Protected production import	Production preflight	﻿2026-08-08T07:49:45.6126092Z ##[group]Run set -euo pipefail
+Protected production import	Production preflight	2026-08-08T07:49:45.6126512Z ^[[36;1mset -euo pipefail^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6126784Z ^[[36;1mnpm ci^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6127129Z ^[[36;1mnpm run jm1-power-platform-solution-lifecycle-guard^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6127577Z ^[[36;1mtest "JM1PublishingSales" = "JM1PublishingSales"^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6127918Z ^[[36;1mtest "1.0.0.0" = "1.0.0.0"^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6128234Z ^[[36;1mtest "production" = "production"^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6128565Z ^[[36;1mtest "true" = "true"^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6128885Z ^[[36;1mtest -n "d852c2b70048f3c94e0e917d84ecc6fe7b94b930"^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6129304Z ^[[36;1mtest "${GITHUB_SHA}" = "d852c2b70048f3c94e0e917d84ecc6fe7b94b930"^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6129826Z ^[[36;1mtest -f "$SOLUTION_PATH/artifacts/workflow/JM1PublishingSales_unmanaged.zip"^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6130360Z ^[[36;1mtest "$PROD_ENVIRONMENT_URL" = "https://jm1hq.crm.dynamics.com/"^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6130855Z ^[[36;1mtest "$PROD_ENVIRONMENT_ID" = "dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10"^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6131381Z ^[[36;1mtest "$PROD_ORGANIZATION_ID" = "9dafb403-b493-f011-a700-000d3a106f37"^[[0m
+Protected production import	Production preflight	2026-08-08T07:49:45.6190371Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Protected production import	Production preflight	2026-08-08T07:49:45.6190746Z env:
+Protected production import	Production preflight	2026-08-08T07:49:45.6191043Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Production preflight	2026-08-08T07:49:45.6191470Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Production preflight	2026-08-08T07:49:45.6191867Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Production preflight	2026-08-08T07:49:45.6192267Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Production preflight	2026-08-08T07:49:45.6192631Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Production preflight	2026-08-08T07:49:45.6192993Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Production preflight	2026-08-08T07:49:45.6193327Z   POWERPLATFORMTOOLS_PACINSTALLED: true
+Protected production import	Production preflight	2026-08-08T07:49:45.6193722Z   POWERPLATFORMTOOLS_PACPATH: /tmp/powerplatform-actions-H5z6sV/pac
+Protected production import	Production preflight	2026-08-08T07:49:45.6194101Z ##[endgroup]
+Protected production import	Production preflight	2026-08-08T07:49:48.2444703Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+Protected production import	Production preflight	2026-08-08T07:49:48.3133346Z npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+Protected production import	Production preflight	2026-08-08T07:49:48.3206086Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+Protected production import	Production preflight	2026-08-08T07:49:48.3960566Z npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+Protected production import	Production preflight	2026-08-08T07:49:48.4662989Z npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+Protected production import	Production preflight	2026-08-08T07:49:49.2045357Z npm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+Protected production import	Production preflight	2026-08-08T07:49:49.3215356Z npm warn deprecated glob@10.3.10: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+Protected production import	Production preflight	2026-08-08T07:49:51.6759727Z npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+Protected production import	Production preflight	2026-08-08T07:50:04.8631469Z 
+Protected production import	Production preflight	2026-08-08T07:50:04.8632328Z added 421 packages, and audited 422 packages in 19s
+Protected production import	Production preflight	2026-08-08T07:50:04.8632640Z 
+Protected production import	Production preflight	2026-08-08T07:50:04.8633423Z 159 packages are looking for funding
+Protected production import	Production preflight	2026-08-08T07:50:04.8634226Z   run `npm fund` for details
+Protected production import	Production preflight	2026-08-08T07:50:05.0223893Z 
+Protected production import	Production preflight	2026-08-08T07:50:05.0224955Z 10 vulnerabilities (1 moderate, 8 high, 1 critical)
+Protected production import	Production preflight	2026-08-08T07:50:05.0225358Z 
+Protected production import	Production preflight	2026-08-08T07:50:05.0225687Z To address issues that do not require attention, run:
+Protected production import	Production preflight	2026-08-08T07:50:05.0227022Z   npm audit fix
+Protected production import	Production preflight	2026-08-08T07:50:05.0227223Z 
+Protected production import	Production preflight	2026-08-08T07:50:05.0227656Z To address all issues (including breaking changes), run:
+Protected production import	Production preflight	2026-08-08T07:50:05.0228195Z   npm audit fix --force
+Protected production import	Production preflight	2026-08-08T07:50:05.0228412Z 
+Protected production import	Production preflight	2026-08-08T07:50:05.0228608Z Run `npm audit` for details.
+Protected production import	Production preflight	2026-08-08T07:50:05.0233421Z npm warn allow-scripts 1 package has install scripts not yet covered by allowScripts:
+Protected production import	Production preflight	2026-08-08T07:50:05.0234703Z npm warn allow-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+Protected production import	Production preflight	2026-08-08T07:50:05.0235475Z npm warn allow-scripts
+Protected production import	Production preflight	2026-08-08T07:50:05.0236777Z npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+Protected production import	Production preflight	2026-08-08T07:50:05.2168542Z 
+Protected production import	Production preflight	2026-08-08T07:50:05.2169610Z > jmerrill-pub@1.0.0 jm1-power-platform-solution-lifecycle-guard
+Protected production import	Production preflight	2026-08-08T07:50:05.2170252Z > node scripts/jm1_power_platform_solution_lifecycle_guard.mjs
+Protected production import	Production preflight	2026-08-08T07:50:05.2170562Z 
+Protected production import	Production preflight	2026-08-08T07:50:05.2585304Z JM1_POWER_PLATFORM_SOLUTION_LIFECYCLE_GUARD PASS
+Protected production import	Authenticate Power Platform with GitHub OIDC	﻿2026-08-08T07:50:05.2735492Z ##[group]Run set -euo pipefail
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2736993Z ^[[36;1mset -euo pipefail^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2737320Z ^[[36;1mPAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2737681Z ^[[36;1m"$PAC_CLI" auth create \^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2737973Z ^[[36;1m  --name jm1-pub-prod-oidc \^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2738303Z ^[[36;1m  --applicationId "$PAC_APPLICATION_ID" \^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2738685Z ^[[36;1m  --tenant "$PAC_TENANT_ID" \^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2739003Z ^[[36;1m  --githubFederated \^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2739306Z ^[[36;1m  --environment "$PROD_ENVIRONMENT_URL"^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2788883Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2789271Z env:
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2789569Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2789991Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2790402Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2790806Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2791232Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2791598Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2791964Z   POWERPLATFORMTOOLS_PACINSTALLED: true
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2792367Z   POWERPLATFORMTOOLS_PACPATH: /tmp/powerplatform-actions-H5z6sV/pac
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:05.2792752Z ##[endgroup]
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:11.2854176Z '97891ed1-6623-487c-b890-633bea440e22' authenticated successfully.
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:12.1430569Z Validating connection...
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:12.1440363Z Connected to... JM1-Core
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:12.1514020Z Default organization: JM1-Core
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:12.1789053Z Authentication profile created
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:12.3441091Z     * UNIVERSAL jm1-pub-prod-oidc              : 97891ed1-6623-487c-b890-633bea440e22     Public https://jm1hq.crm.dynamics.com/         
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:50:12.3441668Z 
+Protected production import	Protected production import	﻿2026-08-08T07:50:13.4003312Z ##[group]Run set -euo pipefail
+Protected production import	Protected production import	2026-08-08T07:50:13.4003884Z ^[[36;1mset -euo pipefail^[[0m
+Protected production import	Protected production import	2026-08-08T07:50:13.4004366Z ^[[36;1mPAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"^[[0m
+Protected production import	Protected production import	2026-08-08T07:50:13.4004896Z ^[[36;1m"$PAC_CLI" solution import \^[[0m
+Protected production import	Protected production import	2026-08-08T07:50:13.4005457Z ^[[36;1m  --environment "$PROD_ENVIRONMENT_URL" \^[[0m
+Protected production import	Protected production import	2026-08-08T07:50:13.4006675Z ^[[36;1m  --path "$SOLUTION_PATH/artifacts/workflow/JM1PublishingSales_unmanaged.zip" \^[[0m
+Protected production import	Protected production import	2026-08-08T07:50:13.4007678Z ^[[36;1m  --force-overwrite \^[[0m
+Protected production import	Protected production import	2026-08-08T07:50:13.4008080Z ^[[36;1m  --publish-changes \^[[0m
+Protected production import	Protected production import	2026-08-08T07:50:13.4008465Z ^[[36;1m  --async \^[[0m
+Protected production import	Protected production import	2026-08-08T07:50:13.4008818Z ^[[36;1m  --max-async-wait-time 120^[[0m
+Protected production import	Protected production import	2026-08-08T07:50:13.4075663Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Protected production import	Protected production import	2026-08-08T07:50:13.4076555Z env:
+Protected production import	Protected production import	2026-08-08T07:50:13.4077010Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Protected production import	2026-08-08T07:50:13.4077673Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Protected production import	2026-08-08T07:50:13.4078298Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Protected production import	2026-08-08T07:50:13.4078957Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Protected production import	2026-08-08T07:50:13.4079527Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Protected production import	2026-08-08T07:50:13.4080082Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Protected production import	2026-08-08T07:50:13.4080632Z   POWERPLATFORMTOOLS_PACINSTALLED: true
+Protected production import	Protected production import	2026-08-08T07:50:13.4081275Z   POWERPLATFORMTOOLS_PACPATH: /tmp/powerplatform-actions-H5z6sV/pac
+Protected production import	Protected production import	2026-08-08T07:50:13.4081884Z ##[endgroup]
+Protected production import	Protected production import	2026-08-08T07:50:14.1319660Z Connected as 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Protected production import	2026-08-08T07:50:15.1120344Z Connected to... JM1-Core
+Protected production import	Protected production import	2026-08-08T07:50:15.1199676Z 
+Protected production import	Protected production import	2026-08-08T07:50:15.1200044Z Solution Importing...
+Protected production import	Protected production import	2026-08-08T07:50:18.1516347Z 
+Protected production import	Protected production import	2026-08-08T07:50:18.1517925Z Waiting for asynchronous operation 0769acc6-fd92-f111-8076-00224820105b to complete with timeout of 02:00:00.
+Protected production import	Protected production import	2026-08-08T07:50:18.1518675Z 
+Protected production import	Protected production import	2026-08-08T07:50:18.1527169Z Processing asynchronous operation... execution time: 00:00:00 and 0.00% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:50:22.2229938Z 
+Protected production import	Protected production import	2026-08-08T07:50:22.2231106Z Processing asynchronous operation... execution time: 00:00:04 and 0.06% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:50:26.2496768Z 
+Protected production import	Protected production import	2026-08-08T07:50:26.2497727Z Processing asynchronous operation... execution time: 00:00:08 and 0.11% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:50:30.2749851Z 
+Protected production import	Protected production import	2026-08-08T07:50:30.2750986Z Processing asynchronous operation... execution time: 00:00:12 and 0.17% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:50:34.3022612Z 
+Protected production import	Protected production import	2026-08-08T07:50:34.3023562Z Processing asynchronous operation... execution time: 00:00:16 and 0.22% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:50:38.3798424Z 
+Protected production import	Protected production import	2026-08-08T07:50:38.3799694Z Processing asynchronous operation... execution time: 00:00:20 and 0.28% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:50:42.4140440Z 
+Protected production import	Protected production import	2026-08-08T07:50:42.4141667Z Processing asynchronous operation... execution time: 00:00:24 and 0.34% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:50:46.4406466Z 
+Protected production import	Protected production import	2026-08-08T07:50:46.4408146Z Processing asynchronous operation... execution time: 00:00:28 and 0.39% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:50:50.4668990Z 
+Protected production import	Protected production import	2026-08-08T07:50:50.4669974Z Processing asynchronous operation... execution time: 00:00:32 and 0.45% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:50:54.4931223Z 
+Protected production import	Protected production import	2026-08-08T07:50:54.4932369Z Processing asynchronous operation... execution time: 00:00:36 and 0.50% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:50:58.5179125Z 
+Protected production import	Protected production import	2026-08-08T07:50:58.5180437Z Processing asynchronous operation... execution time: 00:00:40 and 0.56% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:02.5432764Z 
+Protected production import	Protected production import	2026-08-08T07:51:02.5433855Z Processing asynchronous operation... execution time: 00:00:44 and 0.62% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:06.5704219Z 
+Protected production import	Protected production import	2026-08-08T07:51:06.5705159Z Processing asynchronous operation... execution time: 00:00:48 and 0.67% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:10.5962573Z 
+Protected production import	Protected production import	2026-08-08T07:51:10.5963690Z Processing asynchronous operation... execution time: 00:00:52 and 0.73% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:14.6220695Z 
+Protected production import	Protected production import	2026-08-08T07:51:14.6222199Z Processing asynchronous operation... execution time: 00:00:56 and 0.78% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:18.6477335Z 
+Protected production import	Protected production import	2026-08-08T07:51:18.6478242Z Processing asynchronous operation... execution time: 00:01:00 and 0.84% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:22.6725513Z 
+Protected production import	Protected production import	2026-08-08T07:51:22.6727101Z Processing asynchronous operation... execution time: 00:01:04 and 0.90% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:26.6989447Z 
+Protected production import	Protected production import	2026-08-08T07:51:26.6990361Z Processing asynchronous operation... execution time: 00:01:08 and 0.95% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:30.7258326Z 
+Protected production import	Protected production import	2026-08-08T07:51:30.7259554Z Processing asynchronous operation... execution time: 00:01:12 and 1.01% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:34.7757555Z 
+Protected production import	Protected production import	2026-08-08T07:51:34.7758779Z Processing asynchronous operation... execution time: 00:01:16 and 1.06% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:38.8031237Z 
+Protected production import	Protected production import	2026-08-08T07:51:38.8032207Z Processing asynchronous operation... execution time: 00:01:20 and 1.12% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:42.8282350Z 
+Protected production import	Protected production import	2026-08-08T07:51:42.8283274Z Processing asynchronous operation... execution time: 00:01:24 and 1.18% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:46.8566556Z 
+Protected production import	Protected production import	2026-08-08T07:51:46.8567684Z Processing asynchronous operation... execution time: 00:01:28 and 1.23% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:50.8820861Z 
+Protected production import	Protected production import	2026-08-08T07:51:50.8822040Z Processing asynchronous operation... execution time: 00:01:32 and 1.29% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:54.9067633Z 
+Protected production import	Protected production import	2026-08-08T07:51:54.9068671Z Processing asynchronous operation... execution time: 00:01:36 and 1.34% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:51:58.9347983Z 
+Protected production import	Protected production import	2026-08-08T07:51:58.9349097Z Processing asynchronous operation... execution time: 00:01:40 and 1.40% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:02.9597517Z 
+Protected production import	Protected production import	2026-08-08T07:52:02.9598703Z Processing asynchronous operation... execution time: 00:01:44 and 1.46% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:07.0227813Z 
+Protected production import	Protected production import	2026-08-08T07:52:07.0229003Z Processing asynchronous operation... execution time: 00:01:48 and 1.51% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:11.0491243Z 
+Protected production import	Protected production import	2026-08-08T07:52:11.0492477Z Processing asynchronous operation... execution time: 00:01:52 and 1.57% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:15.0802691Z 
+Protected production import	Protected production import	2026-08-08T07:52:15.0803571Z Processing asynchronous operation... execution time: 00:01:56 and 1.62% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:19.1068474Z 
+Protected production import	Protected production import	2026-08-08T07:52:19.1069668Z Processing asynchronous operation... execution time: 00:02:00 and 1.68% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:23.1339615Z 
+Protected production import	Protected production import	2026-08-08T07:52:23.1340770Z Processing asynchronous operation... execution time: 00:02:04 and 1.74% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:27.1739837Z 
+Protected production import	Protected production import	2026-08-08T07:52:27.1741023Z Processing asynchronous operation... execution time: 00:02:09 and 1.79% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:31.1998235Z 
+Protected production import	Protected production import	2026-08-08T07:52:31.1999386Z Processing asynchronous operation... execution time: 00:02:13 and 1.85% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:35.2276651Z 
+Protected production import	Protected production import	2026-08-08T07:52:35.2277826Z Processing asynchronous operation... execution time: 00:02:17 and 1.90% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:39.2512709Z 
+Protected production import	Protected production import	2026-08-08T07:52:39.2513712Z Processing asynchronous operation... execution time: 00:02:21 and 1.96% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:43.2773817Z 
+Protected production import	Protected production import	2026-08-08T07:52:43.2774936Z Processing asynchronous operation... execution time: 00:02:25 and 2.02% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:47.3007059Z 
+Protected production import	Protected production import	2026-08-08T07:52:47.3008151Z Processing asynchronous operation... execution time: 00:02:29 and 2.07% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:51.3459947Z 
+Protected production import	Protected production import	2026-08-08T07:52:51.3461264Z Processing asynchronous operation... execution time: 00:02:33 and 2.13% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:55.3780517Z 
+Protected production import	Protected production import	2026-08-08T07:52:55.3781554Z Processing asynchronous operation... execution time: 00:02:37 and 2.18% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:52:59.4039857Z 
+Protected production import	Protected production import	2026-08-08T07:52:59.4041037Z Processing asynchronous operation... execution time: 00:02:41 and 2.24% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:03.4282120Z 
+Protected production import	Protected production import	2026-08-08T07:53:03.4283751Z Processing asynchronous operation... execution time: 00:02:45 and 2.30% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:07.4521752Z 
+Protected production import	Protected production import	2026-08-08T07:53:07.4522923Z Processing asynchronous operation... execution time: 00:02:49 and 2.35% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:11.4771960Z 
+Protected production import	Protected production import	2026-08-08T07:53:11.4773112Z Processing asynchronous operation... execution time: 00:02:53 and 2.41% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:15.5031048Z 
+Protected production import	Protected production import	2026-08-08T07:53:15.5032186Z Processing asynchronous operation... execution time: 00:02:57 and 2.46% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:19.5294545Z 
+Protected production import	Protected production import	2026-08-08T07:53:19.5295698Z Processing asynchronous operation... execution time: 00:03:01 and 2.52% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:23.5530249Z 
+Protected production import	Protected production import	2026-08-08T07:53:23.5531135Z Processing asynchronous operation... execution time: 00:03:05 and 2.58% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:27.5784802Z 
+Protected production import	Protected production import	2026-08-08T07:53:27.5786084Z Processing asynchronous operation... execution time: 00:03:09 and 2.63% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:31.6073218Z 
+Protected production import	Protected production import	2026-08-08T07:53:31.6075043Z Processing asynchronous operation... execution time: 00:03:13 and 2.69% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:35.6323443Z 
+Protected production import	Protected production import	2026-08-08T07:53:35.6324460Z Processing asynchronous operation... execution time: 00:03:17 and 2.74% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:39.6587388Z 
+Protected production import	Protected production import	2026-08-08T07:53:39.6588536Z Processing asynchronous operation... execution time: 00:03:21 and 2.80% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:43.6894102Z 
+Protected production import	Protected production import	2026-08-08T07:53:43.6895276Z Processing asynchronous operation... execution time: 00:03:25 and 2.85% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:47.7150055Z 
+Protected production import	Protected production import	2026-08-08T07:53:47.7151270Z Processing asynchronous operation... execution time: 00:03:29 and 2.91% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:51.7395457Z 
+Protected production import	Protected production import	2026-08-08T07:53:51.7396842Z Processing asynchronous operation... execution time: 00:03:33 and 2.97% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:55.8633509Z 
+Protected production import	Protected production import	2026-08-08T07:53:55.8634570Z Processing asynchronous operation... execution time: 00:03:37 and 3.02% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:53:59.8881447Z 
+Protected production import	Protected production import	2026-08-08T07:53:59.8882445Z Processing asynchronous operation... execution time: 00:03:41 and 3.08% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:03.9290092Z 
+Protected production import	Protected production import	2026-08-08T07:54:03.9291380Z Processing asynchronous operation... execution time: 00:03:45 and 3.14% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:07.9554769Z 
+Protected production import	Protected production import	2026-08-08T07:54:07.9556067Z Processing asynchronous operation... execution time: 00:03:49 and 3.19% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:11.9834946Z 
+Protected production import	Protected production import	2026-08-08T07:54:11.9836333Z Processing asynchronous operation... execution time: 00:03:53 and 3.25% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:16.0139008Z 
+Protected production import	Protected production import	2026-08-08T07:54:16.0139882Z Processing asynchronous operation... execution time: 00:03:57 and 3.30% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:20.0402573Z 
+Protected production import	Protected production import	2026-08-08T07:54:20.0403531Z Processing asynchronous operation... execution time: 00:04:01 and 3.36% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:24.0651611Z 
+Protected production import	Protected production import	2026-08-08T07:54:24.0652509Z Processing asynchronous operation... execution time: 00:04:05 and 3.42% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:28.0890742Z 
+Protected production import	Protected production import	2026-08-08T07:54:28.0891628Z Processing asynchronous operation... execution time: 00:04:09 and 3.47% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:32.1145213Z 
+Protected production import	Protected production import	2026-08-08T07:54:32.1146385Z Processing asynchronous operation... execution time: 00:04:13 and 3.53% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:36.1410807Z 
+Protected production import	Protected production import	2026-08-08T07:54:36.1411728Z Processing asynchronous operation... execution time: 00:04:17 and 3.58% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:40.1887201Z 
+Protected production import	Protected production import	2026-08-08T07:54:40.1888196Z Processing asynchronous operation... execution time: 00:04:22 and 3.64% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:44.2147549Z 
+Protected production import	Protected production import	2026-08-08T07:54:44.2148755Z Processing asynchronous operation... execution time: 00:04:26 and 3.70% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:48.2380884Z 
+Protected production import	Protected production import	2026-08-08T07:54:48.2381887Z Processing asynchronous operation... execution time: 00:04:30 and 3.75% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:52.2642589Z 
+Protected production import	Protected production import	2026-08-08T07:54:52.2643571Z Processing asynchronous operation... execution time: 00:04:34 and 3.81% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:54:56.2876580Z 
+Protected production import	Protected production import	2026-08-08T07:54:56.2877748Z Processing asynchronous operation... execution time: 00:04:38 and 3.86% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:00.3111415Z 
+Protected production import	Protected production import	2026-08-08T07:55:00.3112557Z Processing asynchronous operation... execution time: 00:04:42 and 3.92% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:04.3389581Z 
+Protected production import	Protected production import	2026-08-08T07:55:04.3390738Z Processing asynchronous operation... execution time: 00:04:46 and 3.97% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:08.3640536Z 
+Protected production import	Protected production import	2026-08-08T07:55:08.3641709Z Processing asynchronous operation... execution time: 00:04:50 and 4.03% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:12.3880128Z 
+Protected production import	Protected production import	2026-08-08T07:55:12.3881315Z Processing asynchronous operation... execution time: 00:04:54 and 4.09% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:16.4142764Z 
+Protected production import	Protected production import	2026-08-08T07:55:16.4143979Z Processing asynchronous operation... execution time: 00:04:58 and 4.14% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:20.4448131Z 
+Protected production import	Protected production import	2026-08-08T07:55:20.4448946Z Processing asynchronous operation... execution time: 00:05:02 and 4.20% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:24.4696882Z 
+Protected production import	Protected production import	2026-08-08T07:55:24.4697861Z Processing asynchronous operation... execution time: 00:05:06 and 4.25% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:28.5118502Z 
+Protected production import	Protected production import	2026-08-08T07:55:28.5119547Z Processing asynchronous operation... execution time: 00:05:10 and 4.31% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:32.5376710Z 
+Protected production import	Protected production import	2026-08-08T07:55:32.5377614Z Processing asynchronous operation... execution time: 00:05:14 and 4.37% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:36.5626100Z 
+Protected production import	Protected production import	2026-08-08T07:55:36.5626979Z Processing asynchronous operation... execution time: 00:05:18 and 4.42% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:40.5860507Z 
+Protected production import	Protected production import	2026-08-08T07:55:40.5861578Z Processing asynchronous operation... execution time: 00:05:22 and 4.48% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:44.6104141Z 
+Protected production import	Protected production import	2026-08-08T07:55:44.6105138Z Processing asynchronous operation... execution time: 00:05:26 and 4.53% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:48.6333694Z 
+Protected production import	Protected production import	2026-08-08T07:55:48.6334558Z Processing asynchronous operation... execution time: 00:05:30 and 4.59% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:52.6640164Z 
+Protected production import	Protected production import	2026-08-08T07:55:52.6641333Z Processing asynchronous operation... execution time: 00:05:34 and 4.65% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:55:56.7773445Z 
+Protected production import	Protected production import	2026-08-08T07:55:56.7774650Z Processing asynchronous operation... execution time: 00:05:38 and 4.70% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:00.8008601Z 
+Protected production import	Protected production import	2026-08-08T07:56:00.8009759Z Processing asynchronous operation... execution time: 00:05:42 and 4.76% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:04.8250768Z 
+Protected production import	Protected production import	2026-08-08T07:56:04.8251724Z Processing asynchronous operation... execution time: 00:05:46 and 4.81% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:08.8489748Z 
+Protected production import	Protected production import	2026-08-08T07:56:08.8490835Z Processing asynchronous operation... execution time: 00:05:50 and 4.87% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:12.8812761Z 
+Protected production import	Protected production import	2026-08-08T07:56:12.8813912Z Processing asynchronous operation... execution time: 00:05:54 and 4.93% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:16.9076301Z 
+Protected production import	Protected production import	2026-08-08T07:56:16.9077499Z Processing asynchronous operation... execution time: 00:05:58 and 4.98% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:20.9414754Z 
+Protected production import	Protected production import	2026-08-08T07:56:20.9415973Z Processing asynchronous operation... execution time: 00:06:02 and 5.04% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:24.9679880Z 
+Protected production import	Protected production import	2026-08-08T07:56:24.9680894Z Processing asynchronous operation... execution time: 00:06:06 and 5.09% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:28.9935061Z 
+Protected production import	Protected production import	2026-08-08T07:56:28.9936199Z Processing asynchronous operation... execution time: 00:06:10 and 5.15% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:33.0194899Z 
+Protected production import	Protected production import	2026-08-08T07:56:33.0195940Z Processing asynchronous operation... execution time: 00:06:14 and 5.21% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:37.0453750Z 
+Protected production import	Protected production import	2026-08-08T07:56:37.0454876Z Processing asynchronous operation... execution time: 00:06:18 and 5.26% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:41.0693549Z 
+Protected production import	Protected production import	2026-08-08T07:56:41.0694717Z Processing asynchronous operation... execution time: 00:06:22 and 5.32% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:45.0938285Z 
+Protected production import	Protected production import	2026-08-08T07:56:45.0939459Z Processing asynchronous operation... execution time: 00:06:26 and 5.37% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:49.1196582Z 
+Protected production import	Protected production import	2026-08-08T07:56:49.1197710Z Processing asynchronous operation... execution time: 00:06:30 and 5.43% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:53.1439035Z 
+Protected production import	Protected production import	2026-08-08T07:56:53.1440142Z Processing asynchronous operation... execution time: 00:06:34 and 5.49% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:56:57.1678059Z 
+Protected production import	Protected production import	2026-08-08T07:56:57.1678954Z Processing asynchronous operation... execution time: 00:06:39 and 5.54% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:01.1969434Z 
+Protected production import	Protected production import	2026-08-08T07:57:01.1970348Z Processing asynchronous operation... execution time: 00:06:43 and 5.60% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:05.2214841Z 
+Protected production import	Protected production import	2026-08-08T07:57:05.2216199Z Processing asynchronous operation... execution time: 00:06:47 and 5.65% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:09.2444409Z 
+Protected production import	Protected production import	2026-08-08T07:57:09.2445461Z Processing asynchronous operation... execution time: 00:06:51 and 5.71% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:13.2999831Z 
+Protected production import	Protected production import	2026-08-08T07:57:13.3000899Z Processing asynchronous operation... execution time: 00:06:55 and 5.77% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:17.3232784Z 
+Protected production import	Protected production import	2026-08-08T07:57:17.3233947Z Processing asynchronous operation... execution time: 00:06:59 and 5.82% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:21.3502525Z 
+Protected production import	Protected production import	2026-08-08T07:57:21.3503719Z Processing asynchronous operation... execution time: 00:07:03 and 5.88% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:25.3774861Z 
+Protected production import	Protected production import	2026-08-08T07:57:25.3776248Z Processing asynchronous operation... execution time: 00:07:07 and 5.93% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:29.4001471Z 
+Protected production import	Protected production import	2026-08-08T07:57:29.4002640Z Processing asynchronous operation... execution time: 00:07:11 and 5.99% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:33.4255292Z 
+Protected production import	Protected production import	2026-08-08T07:57:33.4256603Z Processing asynchronous operation... execution time: 00:07:15 and 6.05% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:37.4506760Z 
+Protected production import	Protected production import	2026-08-08T07:57:37.4507670Z Processing asynchronous operation... execution time: 00:07:19 and 6.10% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:41.4829721Z 
+Protected production import	Protected production import	2026-08-08T07:57:41.4830670Z Processing asynchronous operation... execution time: 00:07:23 and 6.16% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:45.5073548Z 
+Protected production import	Protected production import	2026-08-08T07:57:45.5074575Z Processing asynchronous operation... execution time: 00:07:27 and 6.21% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:49.5308714Z 
+Protected production import	Protected production import	2026-08-08T07:57:49.5309691Z Processing asynchronous operation... execution time: 00:07:31 and 6.27% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:53.5552045Z 
+Protected production import	Protected production import	2026-08-08T07:57:53.5552970Z Processing asynchronous operation... execution time: 00:07:35 and 6.33% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:57:57.5783503Z 
+Protected production import	Protected production import	2026-08-08T07:57:57.5784663Z Processing asynchronous operation... execution time: 00:07:39 and 6.38% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:01.6058713Z 
+Protected production import	Protected production import	2026-08-08T07:58:01.6059938Z Processing asynchronous operation... execution time: 00:07:43 and 6.44% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:05.6299832Z 
+Protected production import	Protected production import	2026-08-08T07:58:05.6301009Z Processing asynchronous operation... execution time: 00:07:47 and 6.49% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:09.6543597Z 
+Protected production import	Protected production import	2026-08-08T07:58:09.6544761Z Processing asynchronous operation... execution time: 00:07:51 and 6.55% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:13.6775692Z 
+Protected production import	Protected production import	2026-08-08T07:58:13.6776999Z Processing asynchronous operation... execution time: 00:07:55 and 6.60% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:17.7014308Z 
+Protected production import	Protected production import	2026-08-08T07:58:17.7015444Z Processing asynchronous operation... execution time: 00:07:59 and 6.66% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:21.7247710Z 
+Protected production import	Protected production import	2026-08-08T07:58:21.7248861Z Processing asynchronous operation... execution time: 00:08:03 and 6.72% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:25.7489814Z 
+Protected production import	Protected production import	2026-08-08T07:58:25.7494282Z Processing asynchronous operation... execution time: 00:08:07 and 6.77% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:29.7718725Z 
+Protected production import	Protected production import	2026-08-08T07:58:29.7719851Z Processing asynchronous operation... execution time: 00:08:11 and 6.83% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:33.7960935Z 
+Protected production import	Protected production import	2026-08-08T07:58:33.7962124Z Processing asynchronous operation... execution time: 00:08:15 and 6.88% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:37.8205641Z 
+Protected production import	Protected production import	2026-08-08T07:58:37.8206975Z Processing asynchronous operation... execution time: 00:08:19 and 6.94% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:41.8440464Z 
+Protected production import	Protected production import	2026-08-08T07:58:41.8441764Z Processing asynchronous operation... execution time: 00:08:23 and 7.00% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:45.8676908Z 
+Protected production import	Protected production import	2026-08-08T07:58:45.8678569Z Processing asynchronous operation... execution time: 00:08:27 and 7.05% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:49.8918642Z 
+Protected production import	Protected production import	2026-08-08T07:58:49.8919695Z Processing asynchronous operation... execution time: 00:08:31 and 7.11% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:53.9148042Z 
+Protected production import	Protected production import	2026-08-08T07:58:53.9149193Z Processing asynchronous operation... execution time: 00:08:35 and 7.16% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:58:57.9412500Z 
+Protected production import	Protected production import	2026-08-08T07:58:57.9413844Z Processing asynchronous operation... execution time: 00:08:39 and 7.22% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:01.9651314Z 
+Protected production import	Protected production import	2026-08-08T07:59:01.9652247Z Processing asynchronous operation... execution time: 00:08:43 and 7.28% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:05.9901902Z 
+Protected production import	Protected production import	2026-08-08T07:59:05.9902823Z Processing asynchronous operation... execution time: 00:08:47 and 7.33% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:10.0148051Z 
+Protected production import	Protected production import	2026-08-08T07:59:10.0148975Z Processing asynchronous operation... execution time: 00:08:51 and 7.39% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:14.0377576Z 
+Protected production import	Protected production import	2026-08-08T07:59:14.0378548Z Processing asynchronous operation... execution time: 00:08:55 and 7.44% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:18.7117994Z 
+Protected production import	Protected production import	2026-08-08T07:59:18.7118904Z Processing asynchronous operation... execution time: 00:09:00 and 7.51% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:22.7356373Z 
+Protected production import	Protected production import	2026-08-08T07:59:22.7357382Z Processing asynchronous operation... execution time: 00:09:04 and 7.56% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:26.7632512Z 
+Protected production import	Protected production import	2026-08-08T07:59:26.7633466Z Processing asynchronous operation... execution time: 00:09:08 and 7.62% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:30.7981052Z 
+Protected production import	Protected production import	2026-08-08T07:59:30.7981963Z Processing asynchronous operation... execution time: 00:09:12 and 7.68% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:34.8224538Z 
+Protected production import	Protected production import	2026-08-08T07:59:34.8225461Z Processing asynchronous operation... execution time: 00:09:16 and 7.73% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:39.8061056Z 
+Protected production import	Protected production import	2026-08-08T07:59:39.8062028Z Processing asynchronous operation... execution time: 00:09:21 and 7.80% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:43.8362885Z 
+Protected production import	Protected production import	2026-08-08T07:59:43.8363882Z Processing asynchronous operation... execution time: 00:09:25 and 7.86% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:47.8615598Z 
+Protected production import	Protected production import	2026-08-08T07:59:47.8616916Z Processing asynchronous operation... execution time: 00:09:29 and 7.91% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:51.8871273Z 
+Protected production import	Protected production import	2026-08-08T07:59:51.8872463Z Processing asynchronous operation... execution time: 00:09:33 and 7.97% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:55.9141961Z 
+Protected production import	Protected production import	2026-08-08T07:59:55.9142825Z Processing asynchronous operation... execution time: 00:09:37 and 8.02% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:59:59.9373760Z 
+Protected production import	Protected production import	2026-08-08T07:59:59.9374760Z Processing asynchronous operation... execution time: 00:09:41 and 8.08% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:03.9663530Z 
+Protected production import	Protected production import	2026-08-08T08:00:03.9664649Z Processing asynchronous operation... execution time: 00:09:45 and 8.14% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:08.3353248Z 
+Protected production import	Protected production import	2026-08-08T08:00:08.3354154Z Processing asynchronous operation... execution time: 00:09:50 and 8.20% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:12.3605185Z 
+Protected production import	Protected production import	2026-08-08T08:00:12.3606332Z Processing asynchronous operation... execution time: 00:09:54 and 8.25% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:16.4051024Z 
+Protected production import	Protected production import	2026-08-08T08:00:16.4052188Z Processing asynchronous operation... execution time: 00:09:58 and 8.31% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:20.4290998Z 
+Protected production import	Protected production import	2026-08-08T08:00:20.4292119Z Processing asynchronous operation... execution time: 00:10:02 and 8.36% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:24.4530978Z 
+Protected production import	Protected production import	2026-08-08T08:00:24.4532174Z Processing asynchronous operation... execution time: 00:10:06 and 8.42% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:28.4763316Z 
+Protected production import	Protected production import	2026-08-08T08:00:28.4764200Z Processing asynchronous operation... execution time: 00:10:10 and 8.48% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:32.4999184Z 
+Protected production import	Protected production import	2026-08-08T08:00:32.5000038Z Processing asynchronous operation... execution time: 00:10:14 and 8.53% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:36.5250116Z 
+Protected production import	Protected production import	2026-08-08T08:00:36.5251484Z Processing asynchronous operation... execution time: 00:10:18 and 8.59% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:40.5488506Z 
+Protected production import	Protected production import	2026-08-08T08:00:40.5489660Z Processing asynchronous operation... execution time: 00:10:22 and 8.64% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:44.5745197Z 
+Protected production import	Protected production import	2026-08-08T08:00:44.5746549Z Processing asynchronous operation... execution time: 00:10:26 and 8.70% of max time allotted
+Protected production import	Protected production import	2026-08-08T08:00:48.6009690Z 
+Protected production import	Protected production import	2026-08-08T08:00:48.6010829Z Asynchronous operation 0769acc6-fd92-f111-8076-00224820105b failed within 00:10:30.4491977.
+Protected production import	Protected production import	2026-08-08T08:00:48.6011394Z 
+Protected production import	Protected production import	2026-08-08T08:00:48.6012053Z The reason given was: A duplicate import job id already exists : 7702ad3c-17d3-406a-bfcf-708576e1b110
+Protected production import	Protected production import	2026-08-08T08:00:48.9942750Z Microsoft PowerPlatform CLI
+Protected production import	Protected production import	2026-08-08T08:00:48.9947639Z Version: 2.8.1+ga4eb71c (.NET 10.0.10)
+Protected production import	Protected production import	2026-08-08T08:00:48.9948303Z Online documentation: https://aka.ms/PowerPlatformCLI
+Protected production import	Protected production import	2026-08-08T08:00:48.9949354Z Feedback, Suggestions, Issues: https://github.com/microsoft/powerplatform-build-tools/discussions
+Protected production import	Protected production import	2026-08-08T08:00:48.9949974Z 
+Protected production import	Protected production import	2026-08-08T08:00:48.9952902Z Error: The async operation completed with a statuscode of Failed.
+Protected production import	Protected production import	2026-08-08T08:00:48.9953342Z 
+Protected production import	Protected production import	2026-08-08T08:00:48.9953351Z 
+Protected production import	Protected production import	2026-08-08T08:00:49.0626833Z ##[error]Process completed with exit code 1.
+Protected production import	Post Checkout Repository	﻿2026-08-08T08:00:49.0748530Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.0749699Z Post job cleanup.
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.1614205Z [command]/usr/bin/git version
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.1657657Z git version 2.54.0
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.1695167Z Temporarily overriding HOME='/home/runner/work/_temp/d3676733-9b30-4118-9f94-a7305b2bd03a' before making global git config changes
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.1697235Z Adding repository directory to the temporary git global config as a safe directory
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.1701218Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/jmerrill-pub/jmerrill-pub
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.1742511Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.1781046Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.2105606Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.2137893Z http.https://github.com/.extraheader
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.2150001Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.2186454Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.2480513Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Protected production import	Post Checkout Repository	2026-08-08T08:00:49.2519326Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Protected production import	Complete job	﻿2026-08-08T08:00:49.2940621Z Cleaning up orphan processes
+Protected production import	Complete job	2026-08-08T08:00:49.3261568Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

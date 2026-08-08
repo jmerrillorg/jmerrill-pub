@@ -1,0 +1,44 @@
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Enterprise-Dev
+
+Solution Importing...
+
+Waiting for asynchronous operation 8e4161b6-de92-f111-8076-0022480b3175 to complete with timeout of 02:00:00.
+
+Processing asynchronous operation... execution time: 00:00:00 and 0.00% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:04 and 0.06% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:08 and 0.11% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:12 and 0.17% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:16 and 0.23% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:20 and 0.29% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:24 and 0.34% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:28 and 0.40% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:32 and 0.46% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:37 and 0.51% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:41 and 0.57% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:45 and 0.63% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:49 and 0.69% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:53 and 0.74% of max time allotted
+
+Asynchronous operation 8e4161b6-de92-f111-8076-0022480b3175 failed within 00:00:57.6599115.
+
+The reason given was: The following attributes bpf_opportunityid of entity jm1pub_publishingopportunityprocess are missing their associated relationship definition in customizations xml of JM1PublishingSales solution. Please include the associated relationship components and retry solution import.
+Microsoft PowerPlatform CLI
+Version: 1.49.4+g406813e (.NET 10.0.9)
+Online documentation: https://aka.ms/PowerPlatformCLI
+Feedback, Suggestions, Issues: https://github.com/microsoft/powerplatform-build-tools/discussions
+
+Error: The async operation completed with a statuscode of Failed.

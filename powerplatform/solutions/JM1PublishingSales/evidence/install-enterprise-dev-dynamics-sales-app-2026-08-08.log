@@ -1,0 +1,10 @@
+Connected as jm1-admin@jmerrill.one
+Verifying if application(s) are already installed...
+'msdyn_SalesApp' is already installed. Proceeding with update.
+Installing 'msdyn_SalesApp'...
+Microsoft PowerPlatform CLI
+Version: 1.49.4+g406813e (.NET 10.0.9)
+Online documentation: https://aka.ms/PowerPlatformCLI
+Feedback, Suggestions, Issues: https://github.com/microsoft/powerplatform-build-tools/discussions
+
+Error: {"HttpStatusCode":400,"RequestMethod":"POST","RequestUri":"environments/6535a04d-307a-e6f1-bb79-5eaeb5121c1b/applicationPackages/msdyn_SalesApp/install?api-version=2022-03-01-preview","CorrelationIdName":"x-ms-correlation-id","CorrelationId":"0f2b67b7-bc2e-4c8e-a45f-e56023534fa4","ResponseBody":"{\"StatusCode\":400,\"Message\":\"The environment: 6535a04d-307a-e6f1-bb79-5eaeb5121c1b is not enabled. Please retry installation once the environment is enabled or retry with a different environment.\"}"}

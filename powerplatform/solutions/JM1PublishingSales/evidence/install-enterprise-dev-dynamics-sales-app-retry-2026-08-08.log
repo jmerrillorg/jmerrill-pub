@@ -1,0 +1,10 @@
+Connected as jm1-admin@jmerrill.one
+Verifying if application(s) are already installed...
+'msdyn_SalesApp' is already installed. Proceeding with update.
+Installing 'msdyn_SalesApp'...
+Polling to check the status of your Application... Execution time: 00:00:30.2109817
+Polling to check the status of your Application... Execution time: 00:01:00.4027815
+Polling to check the status of your Application... Execution time: 00:01:30.6943867
+Application successfully installed
+Package Name   Operation ID
+msdyn_SalesApp 6409a99f-385d-4e2b-b60d-db41062fac93

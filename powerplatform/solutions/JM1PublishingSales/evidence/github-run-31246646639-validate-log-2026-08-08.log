@@ -1,0 +1,289 @@
+Validate and package solution	Set up job	﻿2026-08-08T07:39:19.5098172Z Current runner version: '2.336.0'
+Validate and package solution	Set up job	2026-08-08T07:39:19.5135431Z ##[group]Runner Image Provisioner
+Validate and package solution	Set up job	2026-08-08T07:39:19.5136723Z Hosted Compute Agent
+Validate and package solution	Set up job	2026-08-08T07:39:19.5137750Z Version: 20260707.563
+Validate and package solution	Set up job	2026-08-08T07:39:19.5138794Z Commit: 02667638d2b423fbc733a8e32a88b44996a3ba6e
+Validate and package solution	Set up job	2026-08-08T07:39:19.5140008Z Build Date: 2026-07-07T19:33:50Z
+Validate and package solution	Set up job	2026-08-08T07:39:19.5141149Z Worker ID: {64de307b-003c-43e9-8ff0-c1787a7e4def}
+Validate and package solution	Set up job	2026-08-08T07:39:19.5142399Z Azure Region: eastus
+Validate and package solution	Set up job	2026-08-08T07:39:19.5143672Z ##[endgroup]
+Validate and package solution	Set up job	2026-08-08T07:39:19.5146506Z ##[group]Operating System
+Validate and package solution	Set up job	2026-08-08T07:39:19.5147472Z Ubuntu
+Validate and package solution	Set up job	2026-08-08T07:39:19.5148405Z 24.04.4
+Validate and package solution	Set up job	2026-08-08T07:39:19.5149298Z LTS
+Validate and package solution	Set up job	2026-08-08T07:39:19.5150194Z ##[endgroup]
+Validate and package solution	Set up job	2026-08-08T07:39:19.5151035Z ##[group]Runner Image
+Validate and package solution	Set up job	2026-08-08T07:39:19.5151991Z Image: ubuntu-24.04
+Validate and package solution	Set up job	2026-08-08T07:39:19.5153294Z Version: 20260720.247.2
+Validate and package solution	Set up job	2026-08-08T07:39:19.5155163Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260720.247/images/ubuntu/Ubuntu2404-Readme.md
+Validate and package solution	Set up job	2026-08-08T07:39:19.5158656Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260720.247
+Validate and package solution	Set up job	2026-08-08T07:39:19.5160267Z ##[endgroup]
+Validate and package solution	Set up job	2026-08-08T07:39:19.5162227Z ##[group]GITHUB_TOKEN Permissions
+Validate and package solution	Set up job	2026-08-08T07:39:19.5165310Z Contents: read
+Validate and package solution	Set up job	2026-08-08T07:39:19.5166305Z Metadata: read
+Validate and package solution	Set up job	2026-08-08T07:39:19.5167179Z ##[endgroup]
+Validate and package solution	Set up job	2026-08-08T07:39:19.5170150Z Secret source: Actions
+Validate and package solution	Set up job	2026-08-08T07:39:19.5172133Z Prepare workflow directory
+Validate and package solution	Set up job	2026-08-08T07:39:19.5699084Z Prepare all required actions
+Validate and package solution	Set up job	2026-08-08T07:39:19.5747226Z Getting action download info
+Validate and package solution	Set up job	2026-08-08T07:39:19.7345049Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Validate and package solution	Set up job	2026-08-08T07:39:19.9439278Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+Validate and package solution	Set up job	2026-08-08T07:39:20.0398050Z Download action repository 'microsoft/powerplatform-actions@v1' (SHA:0e44beb5424af932af47250a2568eba4c259e3d8)
+Validate and package solution	Set up job	2026-08-08T07:39:21.0210739Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+Validate and package solution	Set up job	2026-08-08T07:39:21.2490113Z Complete job name: Validate and package solution
+Validate and package solution	Checkout Repository	﻿2026-08-08T07:39:21.3447579Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3458987Z ##[group]Run actions/checkout@v4
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3460290Z with:
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3461206Z   repository: jmerrillorg/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3471386Z   token: ***
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3472274Z   ssh-strict: true
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3473309Z   ssh-user: git
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3474216Z   persist-credentials: true
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3475217Z   clean: true
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3476133Z   sparse-checkout-cone-mode: true
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3477206Z   fetch-depth: 1
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3478119Z   fetch-tags: false
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3479019Z   show-progress: true
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3479962Z   lfs: false
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3480803Z   submodules: false
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3481766Z   set-safe-directory: true
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3482957Z   allow-unsafe-pr-checkout: false
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3484331Z env:
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3485414Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3486980Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3488523Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3490072Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3491783Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3493595Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.3494934Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4529826Z Syncing repository: jmerrillorg/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4533340Z ##[group]Getting Git version info
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4535534Z Working directory is '/home/runner/work/jmerrill-pub/jmerrill-pub'
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4538465Z [command]/usr/bin/git version
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4595350Z git version 2.54.0
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4629450Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4656217Z Temporarily overriding HOME='/home/runner/work/_temp/7f3e7b17-1689-439e-90c8-10132d24b9e8' before making global git config changes
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4662040Z Adding repository directory to the temporary git global config as a safe directory
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4666742Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/jmerrill-pub/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4736237Z Deleting the contents of '/home/runner/work/jmerrill-pub/jmerrill-pub'
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4740773Z ##[group]Initializing the repository
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4748136Z [command]/usr/bin/git init /home/runner/work/jmerrill-pub/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4876216Z hint: Using 'master' as the name for the initial branch. This default branch name
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4885304Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4888993Z hint: to use in all of your new repositories, which will suppress this warning,
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4892176Z hint: call:
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4894035Z hint:
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4895886Z hint: 	git config --global init.defaultBranch <name>
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4898308Z hint:
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4900656Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4904466Z hint: 'development'. The just-created branch can be renamed via this command:
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4907284Z hint:
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4908734Z hint: 	git branch -m <name>
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4909946Z hint:
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4911475Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4915767Z Initialized empty Git repository in /home/runner/work/jmerrill-pub/jmerrill-pub/.git/
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4922355Z [command]/usr/bin/git remote add origin https://github.com/jmerrillorg/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4968387Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4971439Z ##[group]Disabling automatic garbage collection
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.4983344Z [command]/usr/bin/git config --local gc.auto 0
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.5017524Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.5020618Z ##[group]Setting up auth
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.5024709Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.5084074Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.5495933Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.5605500Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.5904242Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.5947544Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.6186596Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.6225759Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.6227280Z ##[group]Fetching the repository
+Validate and package solution	Checkout Repository	2026-08-08T07:39:21.6237385Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +79c6b04d7dbefddc8b55ed6204f49a2701e76801:refs/remotes/origin/codex/tranche1-commercial-foundation-implementation-20260807
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.6805598Z From https://github.com/jmerrillorg/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.6808027Z  * [new ref]         79c6b04d7dbefddc8b55ed6204f49a2701e76801 -> origin/codex/tranche1-commercial-foundation-implementation-20260807
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.6840452Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.6841284Z ##[group]Determining the checkout info
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.6845076Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.6850524Z [command]/usr/bin/git sparse-checkout disable
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.6907295Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.6943236Z ##[group]Checking out the ref
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.6947452Z [command]/usr/bin/git checkout --progress --force -B codex/tranche1-commercial-foundation-implementation-20260807 refs/remotes/origin/codex/tranche1-commercial-foundation-implementation-20260807
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.8718461Z Switched to a new branch 'codex/tranche1-commercial-foundation-implementation-20260807'
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.8720344Z branch 'codex/tranche1-commercial-foundation-implementation-20260807' set up to track 'origin/codex/tranche1-commercial-foundation-implementation-20260807'.
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.8735553Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.8783121Z [command]/usr/bin/git log -1 --format=%H
+Validate and package solution	Checkout Repository	2026-08-08T07:39:22.8812422Z 79c6b04d7dbefddc8b55ed6204f49a2701e76801
+Validate and package solution	Setup Node	﻿2026-08-08T07:39:22.9141713Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9143698Z ##[group]Run actions/setup-node@v4
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9144010Z with:
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9144234Z   node-version: 24
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9144475Z   cache: npm
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9144716Z   always-auth: false
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9144968Z   check-latest: false
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9147773Z   token: ***
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9148011Z env:
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9148317Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9148782Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9149241Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9149689Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9150132Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9150534Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Validate and package solution	Setup Node	2026-08-08T07:39:22.9150907Z ##[endgroup]
+Validate and package solution	Setup Node	2026-08-08T07:39:23.0559024Z Found in cache @ /opt/hostedtoolcache/node/24.18.0/x64
+Validate and package solution	Setup Node	2026-08-08T07:39:23.0563322Z (node:2312) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Validate and package solution	Setup Node	2026-08-08T07:39:23.0564348Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Validate and package solution	Setup Node	2026-08-08T07:39:23.0566482Z ##[group]Environment details
+Validate and package solution	Setup Node	2026-08-08T07:39:25.5484240Z node: v24.18.0
+Validate and package solution	Setup Node	2026-08-08T07:39:25.5485309Z npm: 11.16.0
+Validate and package solution	Setup Node	2026-08-08T07:39:25.5485952Z yarn: 1.22.22
+Validate and package solution	Setup Node	2026-08-08T07:39:25.5487144Z ##[endgroup]
+Validate and package solution	Setup Node	2026-08-08T07:39:25.5532087Z [command]/opt/hostedtoolcache/node/24.18.0/x64/bin/npm config get cache
+Validate and package solution	Setup Node	2026-08-08T07:39:25.8281648Z /home/runner/.npm
+Validate and package solution	Setup Node	2026-08-08T07:39:25.8957313Z Cache hit for: node-cache-Linux-x64-npm-e799989891354805214b778b0dcdc6fc73c8374cd2734634c5a18e8e0306378f
+Validate and package solution	Setup Node	2026-08-08T07:39:25.9111915Z (node:2312) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Validate and package solution	Setup Node	2026-08-08T07:39:26.5073033Z Received 88349231 of 88349231 (100.0%), 152.1 MBs/sec
+Validate and package solution	Setup Node	2026-08-08T07:39:26.5073792Z Cache Size: ~84 MB (88349231 B)
+Validate and package solution	Setup Node	2026-08-08T07:39:26.5105808Z [command]/usr/bin/tar -xf /home/runner/work/_temp/4bc6b619-302c-4e1d-8652-3b0786ce95e3/cache.tzst -P -C /home/runner/work/jmerrill-pub/jmerrill-pub --use-compress-program unzstd
+Validate and package solution	Setup Node	2026-08-08T07:39:26.7763361Z Cache restored successfully
+Validate and package solution	Setup Node	2026-08-08T07:39:26.7804319Z Cache restored from key: node-cache-Linux-x64-npm-e799989891354805214b778b0dcdc6fc73c8374cd2734634c5a18e8e0306378f
+Validate and package solution	Fetch main authority ref	﻿2026-08-08T07:39:26.8011984Z ##[group]Run set -euo pipefail
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8012996Z ^[[36;1mset -euo pipefail^[[0m
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8013469Z ^[[36;1mgit fetch origin main:refs/remotes/origin/main^[[0m
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8109996Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8110351Z env:
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8110621Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8111032Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8111467Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8111864Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8112236Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8112875Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:26.8113208Z ##[endgroup]
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:27.9349453Z From https://github.com/jmerrillorg/jmerrill-pub
+Validate and package solution	Fetch main authority ref	2026-08-08T07:39:27.9349952Z  * [new branch]      main       -> origin/main
+Validate and package solution	Repository Guards	﻿2026-08-08T07:39:27.9400936Z ##[group]Run set -euo pipefail
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9401285Z ^[[36;1mset -euo pipefail^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9401529Z ^[[36;1mnpm ci^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9401762Z ^[[36;1mnpm run jm1-bootstrap-guard^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9402065Z ^[[36;1mnpm run jm1-canon-consistency-guard^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9402387Z ^[[36;1mnpm run jm1-canon-guard-enforcement^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9402958Z ^[[36;1mnpm run commercial-architecture-guard^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9403314Z ^[[36;1mnpm run slice3-implementation-planning-guard^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9403716Z ^[[36;1mnpm run jm1-power-platform-solution-lifecycle-guard^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9447524Z shell: /usr/bin/bash -e {0}
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9447784Z env:
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9448059Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9448488Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9448900Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9449291Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9449696Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9450039Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Validate and package solution	Repository Guards	2026-08-08T07:39:27.9450340Z ##[endgroup]
+Validate and package solution	Repository Guards	2026-08-08T07:39:31.6797576Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+Validate and package solution	Repository Guards	2026-08-08T07:39:31.7559494Z npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+Validate and package solution	Repository Guards	2026-08-08T07:39:31.7636655Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+Validate and package solution	Repository Guards	2026-08-08T07:39:31.8465565Z npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+Validate and package solution	Repository Guards	2026-08-08T07:39:31.9224002Z npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+Validate and package solution	Repository Guards	2026-08-08T07:39:32.7015199Z npm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+Validate and package solution	Repository Guards	2026-08-08T07:39:32.8299015Z npm warn deprecated glob@10.3.10: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+Validate and package solution	Repository Guards	2026-08-08T07:39:35.3205079Z npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.1571168Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.1572265Z added 421 packages, and audited 422 packages in 20s
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.1573118Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.1574031Z 159 packages are looking for funding
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.1575024Z   run `npm fund` for details
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3164297Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3165371Z 10 vulnerabilities (1 moderate, 8 high, 1 critical)
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3165917Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3166421Z To address issues that do not require attention, run:
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3167141Z   npm audit fix
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3167493Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3167998Z To address all issues (including breaking changes), run:
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3168767Z   npm audit fix --force
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3169078Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3169348Z Run `npm audit` for details.
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3173963Z npm warn allow-scripts 1 package has install scripts not yet covered by allowScripts:
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3175395Z npm warn allow-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3176391Z npm warn allow-scripts
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.3177795Z npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.5074560Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.5075210Z > jmerrill-pub@1.0.0 jm1-bootstrap-guard
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.5075900Z > node --test scripts/jm1_bootstrap_guard.test.mjs
+Validate and package solution	Repository Guards	2026-08-08T07:39:48.5076340Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.8867261Z ✔ bootstrap manifest schema declares required authority layers (2.200394ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.8869563Z ✔ new thread loads ACS sender and Reply-To canon (0.277721ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.8874055Z ✔ portal is optional and noncanonical mail providers fail closed by canon (0.17559ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.8875173Z ✔ print production canon blocks stale Vellum and forced later recto starts (0.160401ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.8875857Z ✔ handoff carries current approval and clock state (0.179878ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.8894063Z ✖ bootstrap resolves current main dynamically and does not hard-code historical main (2472.285767ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.8901714Z ✖ bootstrap command creates manifest outputs for The Intentional Leader pilot (683.850661ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.8904270Z ✔ bootstrap supports only commissioned execution modes (137.03927ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.8913904Z ✔ bootstrap contains stale handoff and dirty worktree fail-closed controls (0.235963ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9011714Z ℹ tests 9
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9012179Z ℹ suites 0
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9013160Z ℹ pass 7
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9013665Z ℹ fail 2
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9014115Z ℹ cancelled 0
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9014540Z ℹ skipped 0
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9014955Z ℹ todo 0
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9015425Z ℹ duration_ms 3361.227991
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9047332Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9048162Z ✖ failing tests:
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9048436Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9048824Z test at scripts/jm1_bootstrap_guard.test.mjs:62:1
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9050159Z ✖ bootstrap resolves current main dynamically and does not hard-code historical main (2472.285767ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9051241Z   Error: Command failed: npm run jm1-bootstrap -- --initiative The Intentional Leader --mode author-communication
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9051896Z       at genericNodeError (node:internal/errors:985:15)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9052285Z       at wrappedFn (node:internal/errors:539:14)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9053044Z       at checkExecSyncError (node:child_process:925:11)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9053437Z       at execFileSync (node:child_process:961:15)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9054135Z       at TestContext.<anonymous> (file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap_guard.test.mjs:64:18)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9054812Z       at Test.runInAsyncScope (node:async_hooks:227:14)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9055205Z       at Test.run (node:internal/test_runner/test:1325:25)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9055678Z       at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9056162Z       at Test.postRun (node:internal/test_runner/test:1465:19)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9056575Z       at Test.run (node:internal/test_runner/test:1390:12) {
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9056885Z     status: 1,
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9057238Z     signal: null,
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9062273Z     output: [ null, '\n> jmerrill-pub@1.0.0 jm1-bootstrap\n> node scripts/jm1_bootstrap.mjs --initiative The Intentional Leader --mode author-communication\n\nBOOTSTRAP FAIL\nENTERPRISE_CANON: LOADED\nREPOSITORY_CANON: LOADED\nRUNTIME_CANON: VERIFIED\nINITIATIVE_CONTEXT: LOADED\nAPPLICABLE_PROGRAMS: Author Experience Reset, PROGRAM-006 PublishingDispatchService, Author communication brand canon, Email-first author workflow, JM1 Enterprise Communication Renderer\nCONTROLLING_MAIN_SHA: 6043cc619cbfd94b566431d5a5db09294c947894\nCURRENT_STATE: AUTHOR_APPROVAL_CONFIRMED_PROTECTED_MUTATION_PENDING\nAUTHOR_APPROVAL: APPROVED\nADDITIONAL_AUTHOR_COMMUNICATION: NOT AUTHORIZED\nPROTECTED_MUTATION: PENDING\nINTERIOR_LAYOUT_GATE: PENDING COMPLETION\nDUPLICATE_GATE: PROHIBITED\nRETROACTIVE_RESPONSE_CLOCK: PROHIBITED\nOPEN_DECISIONS: 0\nWORKTREE: PASS\nDIRTY PATHS: 0\nOUT-OF-SCOPE PATHS: 0\nAHEAD: 1\nBEHIND: 866\nSECRET VALUES PRINTED: 0\n', '' ],
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9066579Z     pid: 2428,
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9077022Z     stdout: '\n> jmerrill-pub@1.0.0 jm1-bootstrap\n> node scripts/jm1_bootstrap.mjs --initiative The Intentional Leader --mode author-communication\n\nBOOTSTRAP FAIL\nENTERPRISE_CANON: LOADED\nREPOSITORY_CANON: LOADED\nRUNTIME_CANON: VERIFIED\nINITIATIVE_CONTEXT: LOADED\nAPPLICABLE_PROGRAMS: Author Experience Reset, PROGRAM-006 PublishingDispatchService, Author communication brand canon, Email-first author workflow, JM1 Enterprise Communication Renderer\nCONTROLLING_MAIN_SHA: 6043cc619cbfd94b566431d5a5db09294c947894\nCURRENT_STATE: AUTHOR_APPROVAL_CONFIRMED_PROTECTED_MUTATION_PENDING\nAUTHOR_APPROVAL: APPROVED\nADDITIONAL_AUTHOR_COMMUNICATION: NOT AUTHORIZED\nPROTECTED_MUTATION: PENDING\nINTERIOR_LAYOUT_GATE: PENDING COMPLETION\nDUPLICATE_GATE: PROHIBITED\nRETROACTIVE_RESPONSE_CLOCK: PROHIBITED\nOPEN_DECISIONS: 0\nWORKTREE: PASS\nDIRTY PATHS: 0\nOUT-OF-SCOPE PATHS: 0\nAHEAD: 1\nBEHIND: 866\nSECRET VALUES PRINTED: 0\n',
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9083419Z     stderr: ''
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9084010Z   }
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9084208Z
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9084668Z test at scripts/jm1_bootstrap_guard.test.mjs:69:1
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9086029Z ✖ bootstrap command creates manifest outputs for The Intentional Leader pilot (683.850661ms)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9087472Z   Error: Command failed: npm run jm1-bootstrap -- --initiative The Intentional Leader --mode author-communication
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9088613Z       at genericNodeError (node:internal/errors:985:15)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9089313Z       at wrappedFn (node:internal/errors:539:14)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9090024Z       at checkExecSyncError (node:child_process:925:11)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9090721Z       at execFileSync (node:child_process:961:15)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9091936Z       at TestContext.<anonymous> (file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap_guard.test.mjs:70:18)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9093378Z       at Test.runInAsyncScope (node:async_hooks:227:14)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9094101Z       at Test.run (node:internal/test_runner/test:1325:25)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9095016Z       at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9095908Z       at Test.postRun (node:internal/test_runner/test:1465:19)
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9096635Z       at Test.run (node:internal/test_runner/test:1390:12) {
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9097198Z     status: 1,
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9097564Z     signal: null,
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9104933Z     output: [ null, '\n> jmerrill-pub@1.0.0 jm1-bootstrap\n> node scripts/jm1_bootstrap.mjs --initiative The Intentional Leader --mode author-communication\n\nBOOTSTRAP FAIL\nENTERPRISE_CANON: LOADED\nREPOSITORY_CANON: LOADED\nRUNTIME_CANON: VERIFIED\nINITIATIVE_CONTEXT: LOADED\nAPPLICABLE_PROGRAMS: Author Experience Reset, PROGRAM-006 PublishingDispatchService, Author communication brand canon, Email-first author workflow, JM1 Enterprise Communication Renderer\nCONTROLLING_MAIN_SHA: 6043cc619cbfd94b566431d5a5db09294c947894\nCURRENT_STATE: AUTHOR_APPROVAL_CONFIRMED_PROTECTED_MUTATION_PENDING\nAUTHOR_APPROVAL: APPROVED\nADDITIONAL_AUTHOR_COMMUNICATION: NOT AUTHORIZED\nPROTECTED_MUTATION: PENDING\nINTERIOR_LAYOUT_GATE: PENDING COMPLETION\nDUPLICATE_GATE: PROHIBITED\nRETROACTIVE_RESPONSE_CLOCK: PROHIBITED\nOPEN_DECISIONS: 0\nWORKTREE: PASS\nDIRTY PATHS: 0\nOUT-OF-SCOPE PATHS: 0\nAHEAD: 1\nBEHIND: 866\nSECRET VALUES PRINTED: 0\n', '' ],
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9108731Z     pid: 2492,
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9112507Z     stdout: '\n> jmerrill-pub@1.0.0 jm1-bootstrap\n> node scripts/jm1_bootstrap.mjs --initiative The Intentional Leader --mode author-communication\n\nBOOTSTRAP FAIL\nENTERPRISE_CANON: LOADED\nREPOSITORY_CANON: LOADED\nRUNTIME_CANON: VERIFIED\nINITIATIVE_CONTEXT: LOADED\nAPPLICABLE_PROGRAMS: Author Experience Reset, PROGRAM-006 PublishingDispatchService, Author communication brand canon, Email-first author workflow, JM1 Enterprise Communication Renderer\nCONTROLLING_MAIN_SHA: 6043cc619cbfd94b566431d5a5db09294c947894\nCURRENT_STATE: AUTHOR_APPROVAL_CONFIRMED_PROTECTED_MUTATION_PENDING\nAUTHOR_APPROVAL: APPROVED\nADDITIONAL_AUTHOR_COMMUNICATION: NOT AUTHORIZED\nPROTECTED_MUTATION: PENDING\nINTERIOR_LAYOUT_GATE: PENDING COMPLETION\nDUPLICATE_GATE: PROHIBITED\nRETROACTIVE_RESPONSE_CLOCK: PROHIBITED\nOPEN_DECISIONS: 0\nWORKTREE: PASS\nDIRTY PATHS: 0\nOUT-OF-SCOPE PATHS: 0\nAHEAD: 1\nBEHIND: 866\nSECRET VALUES PRINTED: 0\n',
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9117327Z     stderr: ''
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9117673Z   }
+Validate and package solution	Repository Guards	2026-08-08T07:39:51.9190284Z ##[error]Process completed with exit code 1.
+Validate and package solution	Post Checkout Repository	﻿2026-08-08T07:39:51.9338546Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:51.9339808Z Post job cleanup.
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0201798Z [command]/usr/bin/git version
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0245670Z git version 2.54.0
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0289272Z Temporarily overriding HOME='/home/runner/work/_temp/e822e2a2-7c58-4809-adb0-801de9bb2db5' before making global git config changes
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0290728Z Adding repository directory to the temporary git global config as a safe directory
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0295080Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/jmerrill-pub/jmerrill-pub
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0333623Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0368451Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0614042Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0641811Z http.https://github.com/.extraheader
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0660393Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0690096Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.0981099Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Validate and package solution	Post Checkout Repository	2026-08-08T07:39:52.1022277Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Validate and package solution	Complete job	﻿2026-08-08T07:39:52.1410604Z Cleaning up orphan processes
+Validate and package solution	Complete job	2026-08-08T07:39:52.1712482Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

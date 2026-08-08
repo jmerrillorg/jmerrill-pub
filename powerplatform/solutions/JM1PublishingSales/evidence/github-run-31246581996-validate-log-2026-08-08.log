@@ -1,0 +1,360 @@
+Validate and package solution	Set up job	﻿2026-08-08T07:37:37.3356578Z Current runner version: '2.336.0'
+Validate and package solution	Set up job	2026-08-08T07:37:37.3381587Z ##[group]Runner Image Provisioner
+Validate and package solution	Set up job	2026-08-08T07:37:37.3382571Z Hosted Compute Agent
+Validate and package solution	Set up job	2026-08-08T07:37:37.3383174Z Version: 20260707.563
+Validate and package solution	Set up job	2026-08-08T07:37:37.3383788Z Commit: 02667638d2b423fbc733a8e32a88b44996a3ba6e
+Validate and package solution	Set up job	2026-08-08T07:37:37.3384587Z Build Date: 2026-07-07T19:33:50Z
+Validate and package solution	Set up job	2026-08-08T07:37:37.3385261Z Worker ID: {203c240e-0a48-4b96-b097-073685aaa4b7}
+Validate and package solution	Set up job	2026-08-08T07:37:37.3386043Z Azure Region: westus
+Validate and package solution	Set up job	2026-08-08T07:37:37.3386635Z ##[endgroup]
+Validate and package solution	Set up job	2026-08-08T07:37:37.3388291Z ##[group]Operating System
+Validate and package solution	Set up job	2026-08-08T07:37:37.3389048Z Ubuntu
+Validate and package solution	Set up job	2026-08-08T07:37:37.3389573Z 24.04.4
+Validate and package solution	Set up job	2026-08-08T07:37:37.3390107Z LTS
+Validate and package solution	Set up job	2026-08-08T07:37:37.3390685Z ##[endgroup]
+Validate and package solution	Set up job	2026-08-08T07:37:37.3391277Z ##[group]Runner Image
+Validate and package solution	Set up job	2026-08-08T07:37:37.3391909Z Image: ubuntu-24.04
+Validate and package solution	Set up job	2026-08-08T07:37:37.3392496Z Version: 20260720.247.2
+Validate and package solution	Set up job	2026-08-08T07:37:37.3393581Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260720.247/images/ubuntu/Ubuntu2404-Readme.md
+Validate and package solution	Set up job	2026-08-08T07:37:37.3395321Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260720.247
+Validate and package solution	Set up job	2026-08-08T07:37:37.3396352Z ##[endgroup]
+Validate and package solution	Set up job	2026-08-08T07:37:37.3397689Z ##[group]GITHUB_TOKEN Permissions
+Validate and package solution	Set up job	2026-08-08T07:37:37.3400199Z Contents: read
+Validate and package solution	Set up job	2026-08-08T07:37:37.3400856Z Metadata: read
+Validate and package solution	Set up job	2026-08-08T07:37:37.3401400Z ##[endgroup]
+Validate and package solution	Set up job	2026-08-08T07:37:37.3403480Z Secret source: Actions
+Validate and package solution	Set up job	2026-08-08T07:37:37.3404815Z Prepare workflow directory
+Validate and package solution	Set up job	2026-08-08T07:37:37.3835209Z Prepare all required actions
+Validate and package solution	Set up job	2026-08-08T07:37:37.3901214Z Getting action download info
+Validate and package solution	Set up job	2026-08-08T07:37:37.7441040Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Validate and package solution	Set up job	2026-08-08T07:37:38.1790150Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+Validate and package solution	Set up job	2026-08-08T07:37:38.2650030Z Download action repository 'microsoft/powerplatform-actions@v1' (SHA:0e44beb5424af932af47250a2568eba4c259e3d8)
+Validate and package solution	Set up job	2026-08-08T07:37:40.3251915Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+Validate and package solution	Set up job	2026-08-08T07:37:40.6548048Z Complete job name: Validate and package solution
+Validate and package solution	Checkout Repository	﻿2026-08-08T07:37:40.7280366Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7288873Z ##[group]Run actions/checkout@v4
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7289448Z with:
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7289747Z   repository: jmerrillorg/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7292420Z   token: ***
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7292676Z   ssh-strict: true
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7292926Z   ssh-user: git
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7293176Z   persist-credentials: true
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7293456Z   clean: true
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7293710Z   sparse-checkout-cone-mode: true
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7294010Z   fetch-depth: 1
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7294442Z   fetch-tags: false
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7294856Z   show-progress: true
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7295305Z   lfs: false
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7295679Z   submodules: false
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7296139Z   set-safe-directory: true
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7296640Z   allow-unsafe-pr-checkout: false
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7297815Z env:
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7298302Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7298788Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7299239Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7299690Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7300104Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7300495Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.7300843Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8294899Z Syncing repository: jmerrillorg/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8297304Z ##[group]Getting Git version info
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8298297Z Working directory is '/home/runner/work/jmerrill-pub/jmerrill-pub'
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8299048Z [command]/usr/bin/git version
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8402856Z git version 2.54.0
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8434969Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8452993Z Temporarily overriding HOME='/home/runner/work/_temp/a82727ac-1f84-4e60-81cc-83526b630e10' before making global git config changes
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8454686Z Adding repository directory to the temporary git global config as a safe directory
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8459958Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/jmerrill-pub/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8515756Z Deleting the contents of '/home/runner/work/jmerrill-pub/jmerrill-pub'
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8519597Z ##[group]Initializing the repository
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8525284Z [command]/usr/bin/git init /home/runner/work/jmerrill-pub/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8666214Z hint: Using 'master' as the name for the initial branch. This default branch name
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8667941Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8669013Z hint: to use in all of your new repositories, which will suppress this warning,
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8669822Z hint: call:
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8670379Z hint:
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8670922Z hint: 	git config --global init.defaultBranch <name>
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8671474Z hint:
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8671837Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8672418Z hint: 'development'. The just-created branch can be renamed via this command:
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8672909Z hint:
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8673161Z hint: 	git branch -m <name>
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8673456Z hint:
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8673827Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8678052Z Initialized empty Git repository in /home/runner/work/jmerrill-pub/jmerrill-pub/.git/
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8690067Z [command]/usr/bin/git remote add origin https://github.com/jmerrillorg/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8740350Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8741395Z ##[group]Disabling automatic garbage collection
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8745233Z [command]/usr/bin/git config --local gc.auto 0
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8779009Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8780150Z ##[group]Setting up auth
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8787604Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.8829182Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.9278248Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.9319305Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.9550455Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.9587249Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.9812439Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.9850200Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.9850923Z ##[group]Fetching the repository
+Validate and package solution	Checkout Repository	2026-08-08T07:37:40.9860939Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +150bc2703ff9b730caa442000a147e041a0c9910:refs/remotes/origin/codex/tranche1-commercial-foundation-implementation-20260807
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.6668972Z From https://github.com/jmerrillorg/jmerrill-pub
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.6670754Z  * [new ref]         150bc2703ff9b730caa442000a147e041a0c9910 -> origin/codex/tranche1-commercial-foundation-implementation-20260807
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.6722891Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.6728181Z ##[group]Determining the checkout info
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.6728899Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.6729471Z [command]/usr/bin/git sparse-checkout disable
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.6783108Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.6814089Z ##[group]Checking out the ref
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.6818596Z [command]/usr/bin/git checkout --progress --force -B codex/tranche1-commercial-foundation-implementation-20260807 refs/remotes/origin/codex/tranche1-commercial-foundation-implementation-20260807
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.8631243Z Switched to a new branch 'codex/tranche1-commercial-foundation-implementation-20260807'
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.8633565Z branch 'codex/tranche1-commercial-foundation-implementation-20260807' set up to track 'origin/codex/tranche1-commercial-foundation-implementation-20260807'.
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.8649950Z ##[endgroup]
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.8698269Z [command]/usr/bin/git log -1 --format=%H
+Validate and package solution	Checkout Repository	2026-08-08T07:37:42.8724815Z 150bc2703ff9b730caa442000a147e041a0c9910
+Validate and package solution	Setup Node	﻿2026-08-08T07:37:42.9053565Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9055353Z ##[group]Run actions/setup-node@v4
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9055651Z with:
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9055873Z   node-version: 24
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9056116Z   cache: npm
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9056366Z   always-auth: false
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9056621Z   check-latest: false
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9059557Z   token: ***
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9059818Z env:
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9060130Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9060590Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9061034Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9061475Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9061909Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9062310Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Validate and package solution	Setup Node	2026-08-08T07:37:42.9062683Z ##[endgroup]
+Validate and package solution	Setup Node	2026-08-08T07:37:43.0455146Z Found in cache @ /opt/hostedtoolcache/node/24.18.0/x64
+Validate and package solution	Setup Node	2026-08-08T07:37:43.0459507Z (node:2235) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Validate and package solution	Setup Node	2026-08-08T07:37:43.0460268Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Validate and package solution	Setup Node	2026-08-08T07:37:43.0462283Z ##[group]Environment details
+Validate and package solution	Setup Node	2026-08-08T07:37:46.2530429Z node: v24.18.0
+Validate and package solution	Setup Node	2026-08-08T07:37:46.2531127Z npm: 11.16.0
+Validate and package solution	Setup Node	2026-08-08T07:37:46.2531788Z yarn: 1.22.22
+Validate and package solution	Setup Node	2026-08-08T07:37:46.2533096Z ##[endgroup]
+Validate and package solution	Setup Node	2026-08-08T07:37:46.2554956Z [command]/opt/hostedtoolcache/node/24.18.0/x64/bin/npm config get cache
+Validate and package solution	Setup Node	2026-08-08T07:37:46.5859580Z /home/runner/.npm
+Validate and package solution	Setup Node	2026-08-08T07:37:46.8322954Z Cache hit for: node-cache-Linux-x64-npm-e799989891354805214b778b0dcdc6fc73c8374cd2734634c5a18e8e0306378f
+Validate and package solution	Setup Node	2026-08-08T07:37:46.8437863Z (node:2235) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Validate and package solution	Setup Node	2026-08-08T07:37:48.1317867Z Received 0 of 88349231 (0.0%), 0.0 MBs/sec
+Validate and package solution	Setup Node	2026-08-08T07:37:49.0142424Z Received 88349231 of 88349231 (100.0%), 44.7 MBs/sec
+Validate and package solution	Setup Node	2026-08-08T07:37:49.0143873Z Cache Size: ~84 MB (88349231 B)
+Validate and package solution	Setup Node	2026-08-08T07:37:49.0177876Z [command]/usr/bin/tar -xf /home/runner/work/_temp/d078986c-c5b6-4f6e-a089-f43ace308009/cache.tzst -P -C /home/runner/work/jmerrill-pub/jmerrill-pub --use-compress-program unzstd
+Validate and package solution	Setup Node	2026-08-08T07:37:49.4056425Z Cache restored successfully
+Validate and package solution	Setup Node	2026-08-08T07:37:49.4103190Z Cache restored from key: node-cache-Linux-x64-npm-e799989891354805214b778b0dcdc6fc73c8374cd2734634c5a18e8e0306378f
+Validate and package solution	Repository Guards	﻿2026-08-08T07:37:49.4262170Z ##[group]Run set -euo pipefail
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4262542Z ^[[36;1mset -euo pipefail^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4262797Z ^[[36;1mnpm ci^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4263035Z ^[[36;1mnpm run jm1-bootstrap-guard^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4263352Z ^[[36;1mnpm run jm1-canon-consistency-guard^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4263689Z ^[[36;1mnpm run jm1-canon-guard-enforcement^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4264022Z ^[[36;1mnpm run commercial-architecture-guard^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4264381Z ^[[36;1mnpm run slice3-implementation-planning-guard^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4264796Z ^[[36;1mnpm run jm1-power-platform-solution-lifecycle-guard^[[0m
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4436436Z shell: /usr/bin/bash -e {0}
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4436720Z env:
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4437365Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4438071Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4438678Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4439273Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4439936Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4440600Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Validate and package solution	Repository Guards	2026-08-08T07:37:49.4441159Z ##[endgroup]
+Validate and package solution	Repository Guards	2026-08-08T07:37:53.6074145Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+Validate and package solution	Repository Guards	2026-08-08T07:37:53.6874460Z npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+Validate and package solution	Repository Guards	2026-08-08T07:37:53.6955123Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+Validate and package solution	Repository Guards	2026-08-08T07:37:53.7806554Z npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+Validate and package solution	Repository Guards	2026-08-08T07:37:53.8632283Z npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+Validate and package solution	Repository Guards	2026-08-08T07:37:54.7180469Z npm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+Validate and package solution	Repository Guards	2026-08-08T07:37:54.8501647Z npm warn deprecated glob@10.3.10: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+Validate and package solution	Repository Guards	2026-08-08T07:37:57.4709876Z npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+Validate and package solution	Repository Guards	2026-08-08T07:38:10.8892769Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:10.8893733Z added 421 packages, and audited 422 packages in 21s
+Validate and package solution	Repository Guards	2026-08-08T07:38:10.8894118Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:10.8895011Z 159 packages are looking for funding
+Validate and package solution	Repository Guards	2026-08-08T07:38:10.8895992Z   run `npm fund` for details
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0485104Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0486193Z 10 vulnerabilities (1 moderate, 8 high, 1 critical)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0486789Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0487544Z To address issues that do not require attention, run:
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0488225Z   npm audit fix
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0488485Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0488945Z To address all issues (including breaking changes), run:
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0489684Z   npm audit fix --force
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0489987Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0490165Z Run `npm audit` for details.
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0499276Z npm warn allow-scripts 1 package has install scripts not yet covered by allowScripts:
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0500140Z npm warn allow-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0500684Z npm warn allow-scripts
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.0501499Z npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.2445596Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.2446320Z > jmerrill-pub@1.0.0 jm1-bootstrap-guard
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.2447569Z > node --test scripts/jm1_bootstrap_guard.test.mjs
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.2448124Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.3409526Z fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.3416602Z Use '--' to separate paths from revisions, like this:
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.3419089Z 'git <command> [<revision>...] -- [<file>...]'
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.4977105Z fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.4978726Z Use '--' to separate paths from revisions, like this:
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.4979961Z 'git <command> [<revision>...] -- [<file>...]'
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5000510Z node:internal/errors:985
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5001208Z   const err = new Error(message);
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5001681Z               ^
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5001927Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5002298Z Error: Command failed: git rev-parse origin/main
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5003389Z fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5004415Z Use '--' to separate paths from revisions, like this:
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5005106Z 'git <command> [<revision>...] -- [<file>...]'
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5005469Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5005796Z     at genericNodeError (node:internal/errors:985:15)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5006450Z     at wrappedFn (node:internal/errors:539:14)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5007333Z     at checkExecSyncError (node:child_process:925:11)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5007968Z     at execFileSync (node:child_process:961:15)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5008868Z     at exec (file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap.mjs:499:10)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5009991Z     at file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap.mjs:31:17
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5010961Z     at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5011744Z     at async node:internal/modules/esm/loader:643:26
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5012528Z     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5013029Z   status: 128,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5013263Z   signal: null,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5013462Z   output: [
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5013649Z     null,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5013844Z     'origin/main\n',
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5014332Z     "fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\n" +
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5014921Z       "Use '--' to separate paths from revisions, like this:\n" +
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5015357Z       "'git <command> [<revision>...] -- [<file>...]'\n"
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5015660Z   ],
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5015853Z   pid: 2385,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5016063Z   stdout: 'origin/main\n',
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5016581Z   stderr: "fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\n" +
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5017654Z     "Use '--' to separate paths from revisions, like this:\n" +
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5018342Z     "'git <command> [<revision>...] -- [<file>...]'\n"
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5018903Z }
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5019097Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.5019273Z Node.js v24.18.0
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6410660Z ✔ bootstrap manifest schema declares required authority layers (2.899183ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6412121Z ✔ new thread loads ACS sender and Reply-To canon (0.281576ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6423928Z ✔ portal is optional and noncanonical mail providers fail closed by canon (0.228707ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6431262Z ✔ print production canon blocks stale Vellum and forced later recto starts (0.170348ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6433143Z ✔ handoff carries current approval and clock state (0.232924ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6450630Z ✖ bootstrap resolves current main dynamically and does not hard-code historical main (5.113237ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6455623Z ✖ bootstrap command creates manifest outputs for The Intentional Leader pilot (157.616964ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6458061Z ✔ bootstrap supports only commissioned execution modes (139.625147ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6470968Z ✔ bootstrap contains stale handoff and dirty worktree fail-closed controls (0.247082ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6557808Z ℹ tests 9
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6558294Z ℹ suites 0
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6559357Z ℹ pass 7
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6559772Z ℹ fail 2
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6560140Z ℹ cancelled 0
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6560551Z ℹ skipped 0
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6560922Z ℹ todo 0
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6561356Z ℹ duration_ms 377.416841
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6594834Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6595149Z ✖ failing tests:
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6595424Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6595812Z test at scripts/jm1_bootstrap_guard.test.mjs:62:1
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6597531Z ✖ bootstrap resolves current main dynamically and does not hard-code historical main (5.113237ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6598222Z   Error: Command failed: git rev-parse origin/main
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6599107Z   fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6599845Z   Use '--' to separate paths from revisions, like this:
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6600240Z   'git <command> [<revision>...] -- [<file>...]'
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6600544Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6600816Z       at genericNodeError (node:internal/errors:985:15)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6601191Z       at wrappedFn (node:internal/errors:539:14)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6601564Z       at checkExecSyncError (node:child_process:925:11)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6601932Z       at execFileSync (node:child_process:961:15)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6602640Z       at TestContext.<anonymous> (file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap_guard.test.mjs:63:29)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6603314Z       at Test.runInAsyncScope (node:async_hooks:227:14)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6603767Z       at Test.run (node:internal/test_runner/test:1325:25)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6604237Z       at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6604732Z       at Test.postRun (node:internal/test_runner/test:1465:19)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6605145Z       at Test.run (node:internal/test_runner/test:1390:12) {
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6605498Z     status: 128,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6605703Z     signal: null,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6606651Z     output: [ null, 'origin/main\n', "fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n" ],
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6607861Z     pid: 2362,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6608085Z     stdout: 'origin/main\n',
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6608969Z     stderr: "fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6609753Z   }
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6609858Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6610051Z test at scripts/jm1_bootstrap_guard.test.mjs:69:1
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6610803Z ✖ bootstrap command creates manifest outputs for The Intentional Leader pilot (157.616964ms)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6611622Z   Error: Command failed: npm run jm1-bootstrap -- --initiative The Intentional Leader --mode author-communication
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6613310Z   fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6614451Z   Use '--' to separate paths from revisions, like this:
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6614921Z   'git <command> [<revision>...] -- [<file>...]'
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6615281Z   node:internal/errors:985
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6615579Z     const err = new Error(message);
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6615864Z                 ^
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6616092Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6616437Z   Error: Command failed: git rev-parse origin/main
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6617309Z   fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6617913Z   Use '--' to separate paths from revisions, like this:
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6618859Z   'git <command> [<revision>...] -- [<file>...]'
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6619191Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6619481Z       at genericNodeError (node:internal/errors:985:15)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6619897Z       at wrappedFn (node:internal/errors:539:14)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6620325Z       at checkExecSyncError (node:child_process:925:11)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6620697Z       at execFileSync (node:child_process:961:15)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6621260Z       at exec (file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap.mjs:499:10)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6621978Z       at file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap.mjs:31:17
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6623126Z       at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6623860Z       at async node:internal/modules/esm/loader:643:26
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6624546Z       at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6624999Z     status: 128,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6625207Z     signal: null,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6625409Z     output: [
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6625604Z       null,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6625797Z       'origin/main\n',
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6626264Z       "fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\n" +
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6626836Z         "Use '--' to separate paths from revisions, like this:\n" +
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6627624Z         "'git <command> [<revision>...] -- [<file>...]'\n"
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6627935Z     ],
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6628124Z     pid: 2385,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6628335Z     stdout: 'origin/main\n',
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6628854Z     stderr: "fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\n" +
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6629454Z       "Use '--' to separate paths from revisions, like this:\n" +
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6629859Z       "'git <command> [<revision>...] -- [<file>...]'\n"
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6630150Z   }
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6630324Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6630516Z   Node.js v24.18.0
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6630714Z
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6630977Z       at genericNodeError (node:internal/errors:985:15)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6631344Z       at wrappedFn (node:internal/errors:539:14)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6631710Z       at checkExecSyncError (node:child_process:925:11)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6632076Z       at execFileSync (node:child_process:961:15)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6632739Z       at TestContext.<anonymous> (file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap_guard.test.mjs:70:18)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6633396Z       at Test.runInAsyncScope (node:async_hooks:227:14)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6633788Z       at Test.run (node:internal/test_runner/test:1325:25)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6634265Z       at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6634752Z       at Test.postRun (node:internal/test_runner/test:1465:19)
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6635161Z       at Test.run (node:internal/test_runner/test:1390:12) {
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6635476Z     status: 1,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6635681Z     signal: null,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6642845Z     output: [ null, '\n> jmerrill-pub@1.0.0 jm1-bootstrap\n> node scripts/jm1_bootstrap.mjs --initiative The Intentional Leader --mode author-communication\n\n', `fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\nnode:internal/errors:985\n  const err = new Error(message);\n              ^\n\nError: Command failed: git rev-parse origin/main\nfatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:925:11)\n    at execFileSync (node:child_process:961:15)\n    at exec (file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap.mjs:499:10)\n    at file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap.mjs:31:17\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  status: 128,\n  signal: null,\n  output: [\n    null,\n    'origin/main\\n',\n    "fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\\n" +\n      "Use '--' to separate paths from revisions, like this:\\n" +\n      "'git <command> [<revision>...] -- [<file>...]'\\n"\n  ],\n  pid: 2385,\n  stdout: 'origin/main\\n',\n  stderr: "fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\\n" +\n    "Use '--' to separate paths from revisions, like this:\\n" +\n    "'git <command> [<revision>...] -- [<file>...]'\\n"\n}\n\nNode.js v24.18.0\n` ],
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6653274Z     pid: 2363,
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6654489Z     stdout: '\n> jmerrill-pub@1.0.0 jm1-bootstrap\n> node scripts/jm1_bootstrap.mjs --initiative The Intentional Leader --mode author-communication\n\n',
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6667334Z     stderr: `fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\nnode:internal/errors:985\n  const err = new Error(message);\n              ^\n\nError: Command failed: git rev-parse origin/main\nfatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:925:11)\n    at execFileSync (node:child_process:961:15)\n    at exec (file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap.mjs:499:10)\n    at file:///home/runner/work/jmerrill-pub/jmerrill-pub/scripts/jm1_bootstrap.mjs:31:17\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  status: 128,\n  signal: null,\n  output: [\n    null,\n    'origin/main\\n',\n    "fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\\n" +\n      "Use '--' to separate paths from revisions, like this:\\n" +\n      "'git <command> [<revision>...] -- [<file>...]'\\n"\n  ],\n  pid: 2385,\n  stdout: 'origin/main\\n',\n  stderr: "fatal: ambiguous argument 'origin/main': unknown revision or path not in the working tree.\\n" +\n    "Use '--' to separate paths from revisions, like this:\\n" +\n    "'git <command> [<revision>...] -- [<file>...]'\\n"\n}\n\nNode.js v24.18.0\n`
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6677433Z   }
+Validate and package solution	Repository Guards	2026-08-08T07:38:11.6734579Z ##[error]Process completed with exit code 1.
+Validate and package solution	Post Checkout Repository	﻿2026-08-08T07:38:11.6885710Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.6887929Z Post job cleanup.
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.7747215Z [command]/usr/bin/git version
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.7807571Z git version 2.54.0
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.7837764Z Temporarily overriding HOME='/home/runner/work/_temp/348b7337-bf58-4655-b4a6-c966e238eb38' before making global git config changes
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.7839442Z Adding repository directory to the temporary git global config as a safe directory
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.7844957Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/jmerrill-pub/jmerrill-pub
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.7886320Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.7922873Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.8173029Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.8223336Z http.https://github.com/.extraheader
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.8250729Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.8264123Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.8522270Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Validate and package solution	Post Checkout Repository	2026-08-08T07:38:11.8564290Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Validate and package solution	Complete job	﻿2026-08-08T07:38:11.8972729Z Cleaning up orphan processes
+Validate and package solution	Complete job	2026-08-08T07:38:11.9377963Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

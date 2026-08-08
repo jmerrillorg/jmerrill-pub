@@ -1,0 +1,343 @@
+Protected production import	Set up job	﻿2026-08-08T07:46:13.2323123Z Current runner version: '2.336.0'
+Protected production import	Set up job	2026-08-08T07:46:13.2347711Z ##[group]Runner Image Provisioner
+Protected production import	Set up job	2026-08-08T07:46:13.2348684Z Hosted Compute Agent
+Protected production import	Set up job	2026-08-08T07:46:13.2349328Z Version: 20260707.563
+Protected production import	Set up job	2026-08-08T07:46:13.2349951Z Commit: 02667638d2b423fbc733a8e32a88b44996a3ba6e
+Protected production import	Set up job	2026-08-08T07:46:13.2350854Z Build Date: 2026-07-07T19:33:50Z
+Protected production import	Set up job	2026-08-08T07:46:13.2351499Z Worker ID: {d0e174e4-1f7f-4bf6-80b3-49d41f9eb609}
+Protected production import	Set up job	2026-08-08T07:46:13.2352297Z Azure Region: westus
+Protected production import	Set up job	2026-08-08T07:46:13.2352905Z ##[endgroup]
+Protected production import	Set up job	2026-08-08T07:46:13.2354314Z ##[group]Operating System
+Protected production import	Set up job	2026-08-08T07:46:13.2355059Z Ubuntu
+Protected production import	Set up job	2026-08-08T07:46:13.2355792Z 24.04.4
+Protected production import	Set up job	2026-08-08T07:46:13.2356353Z LTS
+Protected production import	Set up job	2026-08-08T07:46:13.2356914Z ##[endgroup]
+Protected production import	Set up job	2026-08-08T07:46:13.2357448Z ##[group]Runner Image
+Protected production import	Set up job	2026-08-08T07:46:13.2358117Z Image: ubuntu-24.04
+Protected production import	Set up job	2026-08-08T07:46:13.2358680Z Version: 20260720.247.2
+Protected production import	Set up job	2026-08-08T07:46:13.2359683Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260720.247/images/ubuntu/Ubuntu2404-Readme.md
+Protected production import	Set up job	2026-08-08T07:46:13.2361881Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260720.247
+Protected production import	Set up job	2026-08-08T07:46:13.2362909Z ##[endgroup]
+Protected production import	Set up job	2026-08-08T07:46:13.2363954Z ##[group]GITHUB_TOKEN Permissions
+Protected production import	Set up job	2026-08-08T07:46:13.2366285Z Contents: read
+Protected production import	Set up job	2026-08-08T07:46:13.2366971Z Metadata: read
+Protected production import	Set up job	2026-08-08T07:46:13.2367519Z ##[endgroup]
+Protected production import	Set up job	2026-08-08T07:46:13.2369614Z Secret source: Actions
+Protected production import	Set up job	2026-08-08T07:46:13.2371061Z Prepare workflow directory
+Protected production import	Set up job	2026-08-08T07:46:13.2769433Z Prepare all required actions
+Protected production import	Set up job	2026-08-08T07:46:13.2817482Z Getting action download info
+Protected production import	Set up job	2026-08-08T07:46:13.6286760Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+Protected production import	Set up job	2026-08-08T07:46:14.0419405Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+Protected production import	Set up job	2026-08-08T07:46:14.1833969Z Download action repository 'microsoft/powerplatform-actions@v1' (SHA:0e44beb5424af932af47250a2568eba4c259e3d8)
+Protected production import	Set up job	2026-08-08T07:46:15.7965271Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+Protected production import	Set up job	2026-08-08T07:46:16.2164061Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+Protected production import	Set up job	2026-08-08T07:46:16.4205354Z Complete job name: Protected production import
+Protected production import	Checkout Repository	﻿2026-08-08T07:46:16.4956855Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4964958Z ##[group]Run actions/checkout@v4
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4965768Z with:
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4966125Z   repository: jmerrillorg/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4969491Z   token: ***
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4969761Z   ssh-strict: true
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4970025Z   ssh-user: git
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4970340Z   persist-credentials: true
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4970638Z   clean: true
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4970929Z   sparse-checkout-cone-mode: true
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4971252Z   fetch-depth: 1
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4971511Z   fetch-tags: false
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4971793Z   show-progress: true
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4972062Z   lfs: false
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4972308Z   submodules: false
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4972608Z   set-safe-directory: true
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4972913Z   allow-unsafe-pr-checkout: false
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4973496Z env:
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4973834Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4974318Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4974804Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4975271Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4975898Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4976317Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Checkout Repository	2026-08-08T07:46:16.4976695Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:46:16.5984401Z Syncing repository: jmerrillorg/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:46:16.5986732Z ##[group]Getting Git version info
+Protected production import	Checkout Repository	2026-08-08T07:46:16.5987575Z Working directory is '/home/runner/work/jmerrill-pub/jmerrill-pub'
+Protected production import	Checkout Repository	2026-08-08T07:46:16.5988720Z [command]/usr/bin/git version
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6035955Z git version 2.54.0
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6089569Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6103674Z Temporarily overriding HOME='/home/runner/work/_temp/e9752ca4-249e-4006-a665-b5973600063d' before making global git config changes
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6105118Z Adding repository directory to the temporary git global config as a safe directory
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6111419Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/jmerrill-pub/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6161377Z Deleting the contents of '/home/runner/work/jmerrill-pub/jmerrill-pub'
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6167017Z ##[group]Initializing the repository
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6172468Z [command]/usr/bin/git init /home/runner/work/jmerrill-pub/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6271388Z hint: Using 'master' as the name for the initial branch. This default branch name
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6277271Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6278856Z hint: to use in all of your new repositories, which will suppress this warning,
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6280065Z hint: call:
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6280688Z hint:
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6281461Z hint: 	git config --global init.defaultBranch <name>
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6282431Z hint:
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6283440Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6363414Z hint: 'development'. The just-created branch can be renamed via this command:
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6364348Z hint:
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6364822Z hint: 	git branch -m <name>
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6365344Z hint:
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6366484Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6367734Z Initialized empty Git repository in /home/runner/work/jmerrill-pub/jmerrill-pub/.git/
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6369903Z [command]/usr/bin/git remote add origin https://github.com/jmerrillorg/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6371679Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6372527Z ##[group]Disabling automatic garbage collection
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6373606Z [command]/usr/bin/git config --local gc.auto 0
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6387652Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6388142Z ##[group]Setting up auth
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6397562Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6435155Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Protected production import	Checkout Repository	2026-08-08T07:46:16.6806286Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Protected production import	Checkout Repository	2026-08-08T07:46:16.7083336Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Protected production import	Checkout Repository	2026-08-08T07:46:16.7092131Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Protected production import	Checkout Repository	2026-08-08T07:46:16.7130822Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Protected production import	Checkout Repository	2026-08-08T07:46:16.7364377Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Protected production import	Checkout Repository	2026-08-08T07:46:16.7404692Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:46:16.7405349Z ##[group]Fetching the repository
+Protected production import	Checkout Repository	2026-08-08T07:46:16.7415217Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +d852c2b70048f3c94e0e917d84ecc6fe7b94b930:refs/remotes/origin/codex/tranche1-commercial-foundation-implementation-20260807
+Protected production import	Checkout Repository	2026-08-08T07:46:17.9725861Z From https://github.com/jmerrillorg/jmerrill-pub
+Protected production import	Checkout Repository	2026-08-08T07:46:17.9728106Z  * [new ref]         d852c2b70048f3c94e0e917d84ecc6fe7b94b930 -> origin/codex/tranche1-commercial-foundation-implementation-20260807
+Protected production import	Checkout Repository	2026-08-08T07:46:17.9766884Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:46:17.9767759Z ##[group]Determining the checkout info
+Protected production import	Checkout Repository	2026-08-08T07:46:17.9768463Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:46:17.9770561Z [command]/usr/bin/git sparse-checkout disable
+Protected production import	Checkout Repository	2026-08-08T07:46:17.9822159Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Protected production import	Checkout Repository	2026-08-08T07:46:17.9861786Z ##[group]Checking out the ref
+Protected production import	Checkout Repository	2026-08-08T07:46:17.9866819Z [command]/usr/bin/git checkout --progress --force -B codex/tranche1-commercial-foundation-implementation-20260807 refs/remotes/origin/codex/tranche1-commercial-foundation-implementation-20260807
+Protected production import	Checkout Repository	2026-08-08T07:46:18.1677338Z Switched to a new branch 'codex/tranche1-commercial-foundation-implementation-20260807'
+Protected production import	Checkout Repository	2026-08-08T07:46:18.1679793Z branch 'codex/tranche1-commercial-foundation-implementation-20260807' set up to track 'origin/codex/tranche1-commercial-foundation-implementation-20260807'.
+Protected production import	Checkout Repository	2026-08-08T07:46:18.1698904Z ##[endgroup]
+Protected production import	Checkout Repository	2026-08-08T07:46:18.1755257Z [command]/usr/bin/git log -1 --format=%H
+Protected production import	Checkout Repository	2026-08-08T07:46:18.1786687Z d852c2b70048f3c94e0e917d84ecc6fe7b94b930
+Protected production import	Setup Node	﻿2026-08-08T07:46:18.2054564Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Protected production import	Setup Node	2026-08-08T07:46:18.2057019Z ##[group]Run actions/setup-node@v4
+Protected production import	Setup Node	2026-08-08T07:46:18.2057305Z with:
+Protected production import	Setup Node	2026-08-08T07:46:18.2057505Z   node-version: 24
+Protected production import	Setup Node	2026-08-08T07:46:18.2057716Z   cache: npm
+Protected production import	Setup Node	2026-08-08T07:46:18.2057935Z   always-auth: false
+Protected production import	Setup Node	2026-08-08T07:46:18.2058162Z   check-latest: false
+Protected production import	Setup Node	2026-08-08T07:46:18.2061241Z   token: ***
+Protected production import	Setup Node	2026-08-08T07:46:18.2061441Z env:
+Protected production import	Setup Node	2026-08-08T07:46:18.2061716Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Setup Node	2026-08-08T07:46:18.2062155Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Setup Node	2026-08-08T07:46:18.2062558Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Setup Node	2026-08-08T07:46:18.2062950Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Setup Node	2026-08-08T07:46:18.2063375Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Setup Node	2026-08-08T07:46:18.2063731Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Setup Node	2026-08-08T07:46:18.2064048Z ##[endgroup]
+Protected production import	Setup Node	2026-08-08T07:46:18.3485102Z Found in cache @ /opt/hostedtoolcache/node/24.18.0/x64
+Protected production import	Setup Node	2026-08-08T07:46:18.3489343Z (node:2263) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Protected production import	Setup Node	2026-08-08T07:46:18.3490508Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Protected production import	Setup Node	2026-08-08T07:46:18.3492500Z ##[group]Environment details
+Protected production import	Setup Node	2026-08-08T07:46:20.9635181Z node: v24.18.0
+Protected production import	Setup Node	2026-08-08T07:46:20.9636170Z npm: 11.16.0
+Protected production import	Setup Node	2026-08-08T07:46:20.9636872Z yarn: 1.22.22
+Protected production import	Setup Node	2026-08-08T07:46:20.9638041Z ##[endgroup]
+Protected production import	Setup Node	2026-08-08T07:46:20.9657955Z [command]/opt/hostedtoolcache/node/24.18.0/x64/bin/npm config get cache
+Protected production import	Setup Node	2026-08-08T07:46:21.2745715Z /home/runner/.npm
+Protected production import	Setup Node	2026-08-08T07:46:21.5340501Z Cache hit for: node-cache-Linux-x64-npm-e799989891354805214b778b0dcdc6fc73c8374cd2734634c5a18e8e0306378f
+Protected production import	Setup Node	2026-08-08T07:46:21.5446642Z (node:2263) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+Protected production import	Setup Node	2026-08-08T07:46:22.8316885Z Received 0 of 88349231 (0.0%), 0.0 MBs/sec
+Protected production import	Setup Node	2026-08-08T07:46:23.7174586Z Received 88349231 of 88349231 (100.0%), 44.7 MBs/sec
+Protected production import	Setup Node	2026-08-08T07:46:23.7175432Z Cache Size: ~84 MB (88349231 B)
+Protected production import	Setup Node	2026-08-08T07:46:23.7211595Z [command]/usr/bin/tar -xf /home/runner/work/_temp/07c45cde-4b0f-4653-bc26-d8f53bd1530a/cache.tzst -P -C /home/runner/work/jmerrill-pub/jmerrill-pub --use-compress-program unzstd
+Protected production import	Setup Node	2026-08-08T07:46:23.9904940Z Cache restored successfully
+Protected production import	Setup Node	2026-08-08T07:46:23.9952041Z Cache restored from key: node-cache-Linux-x64-npm-e799989891354805214b778b0dcdc6fc73c8374cd2734634c5a18e8e0306378f
+Protected production import	Install Power Platform CLI	﻿2026-08-08T07:46:24.0148525Z ##[group]Run microsoft/powerplatform-actions/actions-install@v1
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0148952Z with:
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0149149Z env:
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0149425Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0149852Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0150263Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0150659Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0151027Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0151395Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0151714Z ##[endgroup]
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0806284Z ##[group]actions-install:
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0816457Z Installing Microsoft.PowerApps.CLI.Tool.2.8.1 via dotnet tool install
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:24.0889288Z [command]/usr/bin/dotnet tool install Microsoft.PowerApps.CLI.Tool --version 2.8.1 --tool-path /tmp/powerplatform-actions-980EbF
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:29.3643102Z You can invoke the tool using the following command: pac
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:29.3644408Z Tool 'microsoft.powerapps.cli.tool' (version '2.8.1') was successfully installed.
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:29.3764387Z pac installed to /tmp/powerplatform-actions-980EbF/pac
+Protected production import	Install Power Platform CLI	2026-08-08T07:46:29.3765396Z ##[endgroup]
+Protected production import	Download validation artifact	﻿2026-08-08T07:46:29.3889560Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3890932Z ##[group]Run actions/download-artifact@v4
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3891224Z with:
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3891456Z   name: power-platform-solution-validation
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3891889Z   path: powerplatform/solutions/JM1PublishingSales/artifacts/workflow
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3892292Z   merge-multiple: false
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3892546Z   repository: jmerrillorg/jmerrill-pub
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3892820Z   run-id: 31246867991
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3893027Z env:
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3893316Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3893728Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3894146Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3894588Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3894957Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3895314Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3896051Z   POWERPLATFORMTOOLS_PACINSTALLED: true
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3896469Z   POWERPLATFORMTOOLS_PACPATH: /tmp/powerplatform-actions-980EbF/pac
+Protected production import	Download validation artifact	2026-08-08T07:46:29.3896858Z ##[endgroup]
+Protected production import	Download validation artifact	2026-08-08T07:46:29.5339547Z Downloading single artifact
+Protected production import	Download validation artifact	2026-08-08T07:46:29.5495319Z (node:2386) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+Protected production import	Download validation artifact	2026-08-08T07:46:29.5497142Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Protected production import	Download validation artifact	2026-08-08T07:46:29.7874895Z Preparing to download the following artifacts:
+Protected production import	Download validation artifact	2026-08-08T07:46:29.7876919Z - power-platform-solution-validation (ID: 9018768335, Size: 31734, Expected Digest: sha256:519cd7d12d0cd4cfadbd16dd0cd666bb795ea8d0e0718b66256734b41f6f9e96)
+Protected production import	Download validation artifact	2026-08-08T07:46:29.9977488Z Redirecting to blob download url: https://productionresultssa18.blob.core.windows.net/actions-results/78de51b0-6956-4114-bb09-68a30118a46b/workflow-job-run-4deb3d45-8066-5c38-85a9-22b44a8b1fda/artifacts/57d5c7e699c0a0aa383990c11fe3eb18a5eb97417977503d6ad3c48ea51f0d03.zip
+Protected production import	Download validation artifact	2026-08-08T07:46:29.9980817Z Starting download of artifact to: /home/runner/work/jmerrill-pub/jmerrill-pub/powerplatform/solutions/JM1PublishingSales/artifacts/workflow
+Protected production import	Download validation artifact	2026-08-08T07:46:30.2851591Z (node:2386) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Protected production import	Download validation artifact	2026-08-08T07:46:30.3508673Z SHA256 digest of downloaded artifact is 519cd7d12d0cd4cfadbd16dd0cd666bb795ea8d0e0718b66256734b41f6f9e96
+Protected production import	Download validation artifact	2026-08-08T07:46:30.3509946Z Artifact download completed successfully.
+Protected production import	Download validation artifact	2026-08-08T07:46:30.3510767Z Total of 1 artifact(s) downloaded
+Protected production import	Download validation artifact	2026-08-08T07:46:30.3514390Z Download artifact has finished successfully
+Protected production import	Production preflight	﻿2026-08-08T07:46:30.3661808Z ##[group]Run set -euo pipefail
+Protected production import	Production preflight	2026-08-08T07:46:30.3662210Z ^[[36;1mset -euo pipefail^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3662482Z ^[[36;1mnpm ci^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3662818Z ^[[36;1mnpm run jm1-power-platform-solution-lifecycle-guard^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3663268Z ^[[36;1mtest "JM1PublishingSales" = "JM1PublishingSales"^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3663614Z ^[[36;1mtest "1.0.0.0" = "1.0.0.0"^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3663936Z ^[[36;1mtest "production" = "production"^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3664233Z ^[[36;1mtest "true" = "true"^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3664557Z ^[[36;1mtest -n "d852c2b70048f3c94e0e917d84ecc6fe7b94b930"^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3665015Z ^[[36;1mtest "${GITHUB_SHA}" = "d852c2b70048f3c94e0e917d84ecc6fe7b94b930"^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3665902Z ^[[36;1mtest -f "$SOLUTION_PATH/artifacts/workflow/JM1PublishingSales_unmanaged.zip"^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3666482Z ^[[36;1mtest "$PROD_ENVIRONMENT_URL" = "https://jm1hq.crm.dynamics.com/"^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3667019Z ^[[36;1mtest "$PROD_ENVIRONMENT_ID" = "dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10"^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3667594Z ^[[36;1mtest "$PROD_ORGANIZATION_ID" = "9dafb403-b493-f011-a700-000d3a106f37"^[[0m
+Protected production import	Production preflight	2026-08-08T07:46:30.3764841Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Protected production import	Production preflight	2026-08-08T07:46:30.3765270Z env:
+Protected production import	Production preflight	2026-08-08T07:46:30.3765795Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Production preflight	2026-08-08T07:46:30.3766306Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Production preflight	2026-08-08T07:46:30.3766817Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Production preflight	2026-08-08T07:46:30.3767304Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Production preflight	2026-08-08T07:46:30.3767755Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Production preflight	2026-08-08T07:46:30.3768201Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Production preflight	2026-08-08T07:46:30.3768618Z   POWERPLATFORMTOOLS_PACINSTALLED: true
+Protected production import	Production preflight	2026-08-08T07:46:30.3769098Z   POWERPLATFORMTOOLS_PACPATH: /tmp/powerplatform-actions-980EbF/pac
+Protected production import	Production preflight	2026-08-08T07:46:30.3769587Z ##[endgroup]
+Protected production import	Production preflight	2026-08-08T07:46:34.1244088Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+Protected production import	Production preflight	2026-08-08T07:46:34.2018106Z npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+Protected production import	Production preflight	2026-08-08T07:46:34.2095872Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+Protected production import	Production preflight	2026-08-08T07:46:34.2858589Z npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+Protected production import	Production preflight	2026-08-08T07:46:34.3663885Z npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+Protected production import	Production preflight	2026-08-08T07:46:35.1941808Z npm warn deprecated uuid@8.3.2: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+Protected production import	Production preflight	2026-08-08T07:46:35.3256743Z npm warn deprecated glob@10.3.10: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+Protected production import	Production preflight	2026-08-08T07:46:37.9767885Z npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+Protected production import	Production preflight	2026-08-08T07:46:51.2660519Z 
+Protected production import	Production preflight	2026-08-08T07:46:51.2661298Z added 421 packages, and audited 422 packages in 21s
+Protected production import	Production preflight	2026-08-08T07:46:51.2661818Z 
+Protected production import	Production preflight	2026-08-08T07:46:51.2663259Z 159 packages are looking for funding
+Protected production import	Production preflight	2026-08-08T07:46:51.2664129Z   run `npm fund` for details
+Protected production import	Production preflight	2026-08-08T07:46:51.4259456Z 
+Protected production import	Production preflight	2026-08-08T07:46:51.4260357Z 10 vulnerabilities (1 moderate, 8 high, 1 critical)
+Protected production import	Production preflight	2026-08-08T07:46:51.4260840Z 
+Protected production import	Production preflight	2026-08-08T07:46:51.4261186Z To address issues that do not require attention, run:
+Protected production import	Production preflight	2026-08-08T07:46:51.4262150Z   npm audit fix
+Protected production import	Production preflight	2026-08-08T07:46:51.4262343Z 
+Protected production import	Production preflight	2026-08-08T07:46:51.4263075Z To address all issues (including breaking changes), run:
+Protected production import	Production preflight	2026-08-08T07:46:51.4263976Z   npm audit fix --force
+Protected production import	Production preflight	2026-08-08T07:46:51.4264399Z 
+Protected production import	Production preflight	2026-08-08T07:46:51.4264724Z Run `npm audit` for details.
+Protected production import	Production preflight	2026-08-08T07:46:51.4270389Z npm warn allow-scripts 1 package has install scripts not yet covered by allowScripts:
+Protected production import	Production preflight	2026-08-08T07:46:51.4272440Z npm warn allow-scripts   unrs-resolver@1.12.2 (postinstall: node postinstall.js)
+Protected production import	Production preflight	2026-08-08T07:46:51.4273670Z npm warn allow-scripts
+Protected production import	Production preflight	2026-08-08T07:46:51.4275757Z npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+Protected production import	Production preflight	2026-08-08T07:46:51.6308502Z 
+Protected production import	Production preflight	2026-08-08T07:46:51.6309508Z > jmerrill-pub@1.0.0 jm1-power-platform-solution-lifecycle-guard
+Protected production import	Production preflight	2026-08-08T07:46:51.6310664Z > node scripts/jm1_power_platform_solution_lifecycle_guard.mjs
+Protected production import	Production preflight	2026-08-08T07:46:51.6311252Z 
+Protected production import	Production preflight	2026-08-08T07:46:51.6723291Z JM1_POWER_PLATFORM_SOLUTION_LIFECYCLE_GUARD PASS
+Protected production import	Authenticate Power Platform with GitHub OIDC	﻿2026-08-08T07:46:51.6859523Z ##[group]Run set -euo pipefail
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6859927Z ^[[36;1mset -euo pipefail^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6860315Z ^[[36;1mPAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6860731Z ^[[36;1m"$PAC_CLI" auth create \^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6861069Z ^[[36;1m  --name jm1-pub-prod-oidc \^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6861474Z ^[[36;1m  --applicationId "$PAC_APPLICATION_ID" \^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6861884Z ^[[36;1m  --tenant "$PAC_TENANT_ID" \^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6862228Z ^[[36;1m  --githubFederated \^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6862575Z ^[[36;1m  --environment "$PROD_ENVIRONMENT_URL"^[[0m
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6907709Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6908173Z env:
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6908532Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6909091Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6909623Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6910143Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6910671Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6911139Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6911606Z   POWERPLATFORMTOOLS_PACINSTALLED: true
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6912139Z   POWERPLATFORMTOOLS_PACPATH: /tmp/powerplatform-actions-980EbF/pac
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:51.6912641Z ##[endgroup]
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:58.1438795Z '97891ed1-6623-487c-b890-633bea440e22' authenticated successfully.
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:59.6449955Z Validating connection...
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:59.6460920Z Connected to... JM1-Core
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:59.6524120Z Default organization: JM1-Core
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:46:59.6790081Z Authentication profile created
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:47:00.5847570Z     * UNIVERSAL jm1-pub-prod-oidc              : 97891ed1-6623-487c-b890-633bea440e22     Public https://jm1hq.crm.dynamics.com/         
+Protected production import	Authenticate Power Platform with GitHub OIDC	2026-08-08T07:47:00.5849300Z 
+Protected production import	Protected production import	﻿2026-08-08T07:47:00.8822504Z ##[group]Run set -euo pipefail
+Protected production import	Protected production import	2026-08-08T07:47:00.8822876Z ^[[36;1mset -euo pipefail^[[0m
+Protected production import	Protected production import	2026-08-08T07:47:00.8823209Z ^[[36;1mPAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"^[[0m
+Protected production import	Protected production import	2026-08-08T07:47:00.8823561Z ^[[36;1m"$PAC_CLI" solution import \^[[0m
+Protected production import	Protected production import	2026-08-08T07:47:00.8823899Z ^[[36;1m  --environment "$PROD_ENVIRONMENT_URL" \^[[0m
+Protected production import	Protected production import	2026-08-08T07:47:00.8824577Z ^[[36;1m  --path "$SOLUTION_PATH/artifacts/workflow/JM1PublishingSales_unmanaged.zip" \^[[0m
+Protected production import	Protected production import	2026-08-08T07:47:00.8825051Z ^[[36;1m  --force-overwrite \^[[0m
+Protected production import	Protected production import	2026-08-08T07:47:00.8825329Z ^[[36;1m  --publish-changes \^[[0m
+Protected production import	Protected production import	2026-08-08T07:47:00.8825897Z ^[[36;1m  --async \^[[0m
+Protected production import	Protected production import	2026-08-08T07:47:00.8826159Z ^[[36;1m  --max-async-wait-time 120^[[0m
+Protected production import	Protected production import	2026-08-08T07:47:00.8870528Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Protected production import	Protected production import	2026-08-08T07:47:00.8870888Z env:
+Protected production import	Protected production import	2026-08-08T07:47:00.8871180Z   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
+Protected production import	Protected production import	2026-08-08T07:47:00.8871618Z   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+Protected production import	Protected production import	2026-08-08T07:47:00.8872048Z   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+Protected production import	Protected production import	2026-08-08T07:47:00.8872510Z   PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+Protected production import	Protected production import	2026-08-08T07:47:00.8872887Z   PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+Protected production import	Protected production import	2026-08-08T07:47:00.8873254Z   PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Protected production import	2026-08-08T07:47:00.8873608Z   POWERPLATFORMTOOLS_PACINSTALLED: true
+Protected production import	Protected production import	2026-08-08T07:47:00.8874013Z   POWERPLATFORMTOOLS_PACPATH: /tmp/powerplatform-actions-980EbF/pac
+Protected production import	Protected production import	2026-08-08T07:47:00.8874411Z ##[endgroup]
+Protected production import	Protected production import	2026-08-08T07:47:02.0732108Z Connected as 97891ed1-6623-487c-b890-633bea440e22
+Protected production import	Protected production import	2026-08-08T07:47:02.9904449Z Connected to... JM1-Core
+Protected production import	Protected production import	2026-08-08T07:47:02.9982119Z 
+Protected production import	Protected production import	2026-08-08T07:47:02.9982476Z Solution Importing...
+Protected production import	Protected production import	2026-08-08T07:47:07.2460664Z 
+Protected production import	Protected production import	2026-08-08T07:47:07.2462156Z Waiting for asynchronous operation d1db8358-fd92-f111-8076-000d3a14673b to complete with timeout of 02:00:00.
+Protected production import	Protected production import	2026-08-08T07:47:07.2484451Z 
+Protected production import	Protected production import	2026-08-08T07:47:07.2485259Z Processing asynchronous operation... execution time: 00:00:00 and 0.00% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:47:12.6329551Z 
+Protected production import	Protected production import	2026-08-08T07:47:12.6330713Z Processing asynchronous operation... execution time: 00:00:05 and 0.07% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:47:16.7183165Z 
+Protected production import	Protected production import	2026-08-08T07:47:16.7183983Z Processing asynchronous operation... execution time: 00:00:09 and 0.13% of max time allotted
+Protected production import	Protected production import	2026-08-08T07:47:20.7999679Z 
+Protected production import	Protected production import	2026-08-08T07:47:20.8001104Z Asynchronous operation d1db8358-fd92-f111-8076-000d3a14673b failed within 00:00:13.5537365.
+Protected production import	Protected production import	2026-08-08T07:47:20.8002083Z 
+Protected production import	Protected production import	2026-08-08T07:47:20.8005093Z The reason given was: Cannot start the requested operation [Import] because there is another [EntityCustomization] running at this moment. Use Solution History for more details. -- The solution installation or removal failed due to the installation or removal of another solution at the same time. Please try again later.
+Protected production import	Protected production import	2026-08-08T07:47:21.6161517Z Microsoft PowerPlatform CLI
+Protected production import	Protected production import	2026-08-08T07:47:21.6166398Z Version: 2.8.1+ga4eb71c (.NET 10.0.10)
+Protected production import	Protected production import	2026-08-08T07:47:21.6167240Z Online documentation: https://aka.ms/PowerPlatformCLI
+Protected production import	Protected production import	2026-08-08T07:47:21.6168664Z Feedback, Suggestions, Issues: https://github.com/microsoft/powerplatform-build-tools/discussions
+Protected production import	Protected production import	2026-08-08T07:47:21.6169526Z 
+Protected production import	Protected production import	2026-08-08T07:47:21.6172750Z Error: The async operation completed with a statuscode of Failed.
+Protected production import	Protected production import	2026-08-08T07:47:21.6173352Z 
+Protected production import	Protected production import	2026-08-08T07:47:21.6173370Z 
+Protected production import	Protected production import	2026-08-08T07:47:21.6871020Z ##[error]Process completed with exit code 1.
+Protected production import	Post Checkout Repository	﻿2026-08-08T07:47:21.6993762Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.6995047Z Post job cleanup.
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.7837395Z [command]/usr/bin/git version
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.7878838Z git version 2.54.0
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.7917026Z Temporarily overriding HOME='/home/runner/work/_temp/9d39fba5-6de4-4b6c-90c1-daef81b5569d' before making global git config changes
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.7918673Z Adding repository directory to the temporary git global config as a safe directory
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.7922781Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/jmerrill-pub/jmerrill-pub
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.7966086Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.8000617Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.8296776Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.8324006Z http.https://github.com/.extraheader
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.8336448Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.8370410Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.8644143Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Protected production import	Post Checkout Repository	2026-08-08T07:47:21.8685287Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Protected production import	Complete job	﻿2026-08-08T07:47:21.9078348Z Cleaning up orphan processes
+Protected production import	Complete job	2026-08-08T07:47:21.9367175Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -1,0 +1,252 @@
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Enterprise-Dev
+
+statecode message                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    friendlymessage                                                                                                                            startedon        name           operationtype         statuscode completedon      asyncoperationid
+Completed Exception type: System.ServiceModel.FaultException`1[Microsoft.Xrm.Sdk.OrganizationServiceFault]
+Message: Attribute Display Name for id: ab1bbc9f-2c24-4eaf-b641-2048119f3161, objectcolumn: DisplayName and labelTypeCode: Attribute  not specifiedDetail:
+<OrganizationServiceFault xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/xrm/2011/Contracts">
+  <ActivityId>e30cdf6a-8d39-4e36-89b2-9f980f03b4e0</ActivityId>
+  <ErrorCode>-2147220989</ErrorCode>
+  <ErrorDetails xmlns:d2p1="http://schemas.datacontract.org/2004/07/System.Collections.Generic">
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiExceptionSourceKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">Plugin/Microsoft.Crm.WebServices.ImportXmlService</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiSourceActivityKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string"></d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiExceptionOwnerKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">OwnershipNotFoundInExceptionOwnerSettings</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiOriginalExceptionKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">Microsoft.Crm.CrmException: Attribute Display Name for id: ab1bbc9f-2c24-4eaf-b641-2048119f3161, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified ---&gt; Microsoft.Crm.CrmException: Attribute Display Name for id: ab1bbc9f-2c24-4eaf-b641-2048119f3161, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified
+   at Microsoft.Crm.Metadata.LocalizedLabelHelper.ValidateLabelCollectionContentsAbstract(LabelCollection labelCollection, Guid objectId, String objectColumnName, LabelTypeCode labelTypeCode, String parameterName, ISqlExecutionContext context, Boolean throwIfCollectionIsNullOrEmpty)
+   at Microsoft.Crm.Metadata.AttributeService.ValidateForCreate(AttributeInfo attributeInfo, ExecutionContext context, Boolean isPrimaryAttribute, Boolean validateSchemaName, IMetadataHelper metadataHelper, Boolean skipLabelValidation)
+   at Microsoft.Crm.Metadata.AttributeService.ValidateAndCreateInternalAbstract(AttributeInfo attributeInfo, IMetadataHelper metadataHelper, Boolean isPrimaryAttribute, Boolean validateSchemaName, ContextModifierOption modifierOption, ExecutionContext context, Boolean skipLabelValidation)
+   at Microsoft.Crm.Metadata.LookupAttributeHelper.CreateLookupAttributeSet(LookupAttributeInfo lookupAttributeInfo, Boolean validateSchemaName, Boolean isPolymorphicLookup, Nullable`1 isDenormalizedOverride, String lookupEntityName, MetadataBusinessEntity primaryFieldAttribute, ContextModifierOption modifierOption, MetadataHelper metadataHelper, ExecutionContext context, DenormalizedLookupAttributeInfo denormalizedLookupAttributeInfo)
+   at Microsoft.Crm.Metadata.RelationshipService.CreateLookupAttributeSet(RelationshipDescriptionPropertyBag relationshipDescription, RelationshipCreateInfo relationshipInfo, MetadataBusinessEntity referencedEntity, MetadataBusinessEntity primaryFieldAttribute, MetadataHelper metadataHelper, Boolean validateAttributeName, ExecutionContext context, ContextModifierOption modifierOption)
+   at Microsoft.Crm.Metadata.RelationshipService.CreateRelationshipAttributes(RelationshipDescriptionPropertyBag relationshipDescription, RelationshipCreateInfo relationshipInfo, MetadataBusinessEntity referencedEntity, MetadataHelper metadataHelper, Boolean validateAttributeName, ExecutionContext context)
+   at Microsoft.Crm.Metadata.RelationshipService.CreateRequiredAttributes(ExecutionContext context, MetadataHelper metadataHelper, RelationshipCreateInfo firstRelationshipInfo)
+   at Microsoft.Crm.Metadata.RelationshipService.&lt;&gt;c__DisplayClass32_0.&lt;CreateInternal&gt;b__0()
+   at Microsoft.PowerApps.CoreFramework.ActivityLoggerExtensions.Execute[TResult](ILogger logger, EventId eventId, ActivityType activityType, Func`1 func, IEnumerable`1 additionalCustomProperties)
+   at Microsoft.Xrm.Telemetry.XrmTelemetryExtensions.Execute[TResult](ILogger logger, XrmTelemetryActivityType activityType, Func`1 func)
+   at Microsoft.Crm.Metadata.RelationshipServiceBase.CreateNoPrivilegeChecks(IRelationshipCreateInfo relationshipInfo, ExecutionContext context, MetadataHelper metadataHelper)
+   at Microsoft.Crm.Tools.ImportExportPublish.OneToManyEntityRelationshipProcessor.CreateNewEntityRelationship(XmlNode entityRelationshipNode, ImportHelper importHelper, IHierarchyChangesSet affectedHierarchies, LocLabelHelper locLabelHelper, MetadataHelper metadataHelper, XmlDocument importDocument)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportEntityRelationshipHandler.&lt;ImportItem&gt;b__21_0()
+   at Microsoft.PowerApps.CoreFramework.ActivityLoggerExtensions.Execute(ILogger logger, EventId eventId, ActivityType activityType, Action action, IEnumerable`1 additionalCustomProperties)
+   at Microsoft.Xrm.Telemetry.XrmTelemetryExtensions.Execute(ILogger logger, XrmTelemetryActivityType activityType, Action action)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportHandler.ImportInternal()
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportHandler.&lt;Import&gt;b__42_0()
+   at Microsoft.PowerApps.CoreFramework.ActivityLoggerExtensions.Execute(ILogger logger, EventId eventId, ActivityType activityType, Action action, IEnumerable`1 additionalCustomProperties)
+   at Microsoft.Xrm.Telemetry.XrmTelemetryExtensions.Execute(ILogger logger, XrmTelemetryActivityType activityType, Action action)
+   at Microsoft.Crm.Tools.ImportExportPublish.RootImportHandler.ImportAndUpdateProgress(ImportHandler ih)
+   at Microsoft.Crm.Tools.ImportExportPublish.RootImportHandler.ProcessHandlers(String[] importEntities, Hashtable ht, String&amp; curPath, ImportHandler&amp; ihForCurrentPath, CounterList listCounters)
+   at Microsoft.Crm.Tools.ImportExportPublish.RootImportHandler.RunImport(String[] importEntities)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportXml.&lt;&gt;c.&lt;RunImport&gt;b__188_0(ValueTuple`2 args)
+   at Microsoft.Crm.Platform.Sdk.Metadata.Partitioning.DaacMetadataSnapshotHelper.UseOwnStandardMetadataCache[TResult,TArg](IOrganizationContext context, Func`2 callback, TArg arg)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportXml.RunImport(String[] importEntities)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportXml.RunImport()
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportXml.RunImportInternal(Boolean withSolutionManifest)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportXml.&lt;&gt;c__DisplayClass173_0.&lt;RunImport&gt;b__0()
+   at Microsoft.PowerApps.CoreFramework.ActivityLoggerExtensions.Execute(ILogger logger, EventId eventId, ActivityType activityType, Action action, IEnumerable`1 additionalCustomProperties)
+   at Microsoft.Xrm.Telemetry.XrmTelemetryExtensions.Execute(ILogger logger, XrmTelemetryActivityType activityType, Action action)
+   at Microsoft.Crm.WebServices.ImportXmlService.ImportSolutionSkipCapableInternal(Boolean overwriteUnmanagedCustomizations, Boolean publishWorkflows, Byte[] customizationFile, Guid importJobId, Boolean convertToManaged, Boolean skipProductUpdateDependencies, Boolean holdingSolution, ExecutionContext context, Boolean skipQueueRibbonJob, LayerDesiredOrder layerDesiredOrder, Boolean asyncRibbonProcessing, EntityCollection componentParameters, Boolean isTemplateMode, String templateSuffix, SolutionParameters solutionParameters, String templateDisplayNamePrefix, Boolean stageAndUpgrade, Boolean schemaUpdatesOnly)
+   at Microsoft.Crm.WebServices.ImportXmlService.ImportSolutionSkipCapable(Boolean overwriteUnmanagedCustomizations, Boolean publishWorkflows, Byte[] customizationFile, Guid importJobId, Boolean convertToManaged, Boolean skipProductUpdateDependencies, Boolean holdingSolution, ExecutionContext context, Boolean skipQueueRibbonJob, LayerDesiredOrder layerDesiredOrder, Boolean asyncRibbonProcessing, EntityCollection componentParameters, Boolean isTemplateMode, String templateSuffix, SolutionParameters solutionParameters, String templateDisplayNamePrefix, Boolean stageAndUpgrade, Boolean schemaUpdatesOnly)
+   --- End of inner exception stack trace ---
+   at Microsoft.Crm.Extensibility.VersionedPluginProxyStepBase.Execute(PipelineExecutionContext context)
+   at Microsoft.Crm.Extensibility.PipelineInstrumentationHelper.Execute(Boolean instrumentationEnabled, String stopwatchName, ExecuteWithInstrumentation action, PipelineExecutionContext context)
+   at Microsoft.Crm.Extensibility.Pipeline.&lt;&gt;c__DisplayClass7_0.&lt;RunStep&gt;b__0()</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiStepKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/" i:type="d4p1:guid">1b830950-e106-4ee1-b3fd-d348cb65dc8d</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiDepthKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:int">2</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiActivityIdKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/" i:type="d4p1:guid">e30cdf6a-8d39-4e36-89b2-9f980f03b4e0</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiPluginSolutionNameKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">System</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiStepSolutionNameKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">System</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiExceptionCategory</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">ClientError</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiExceptionMessageName</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">InvalidArgument</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiExceptionHttpStatusCode</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:int">400</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>0</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string"></d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>HasRetried</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">True</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>RetryExecutionStatus</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">Microsoft.Crm.Core.Extensions.Retry.RetryExecutionStatus</d2p1:value>
+    </KeyValuePairOfstringanyType>
+  </ErrorDetails>
+  <HelpLink>http://go.microsoft.com/fwlink/?LinkID=398563&amp;error=Microsoft.Crm.CrmException%3a80040203&amp;client=platform</HelpLink>
+  <Message>Attribute Display Name for id: ab1bbc9f-2c24-4eaf-b641-2048119f3161, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified</Message>
+  <Timestamp>2026-08-08T03:59:14.3703117Z</Timestamp>
+  <ExceptionRetriable>false</ExceptionRetriable>
+  <ExceptionSource i:nil="true" />
+  <InnerFault>
+    <ActivityId>e30cdf6a-8d39-4e36-89b2-9f980f03b4e0</ActivityId>
+    <ErrorCode>-2147220989</ErrorCode>
+    <ErrorDetails xmlns:d3p1="http://schemas.datacontract.org/2004/07/System.Collections.Generic" />
+    <HelpLink i:nil="true" />
+    <Message>Attribute Display Name for id: ab1bbc9f-2c24-4eaf-b641-2048119f3161, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified</Message>
+    <Timestamp>2026-08-08T03:59:14.3703117Z</Timestamp>
+    <ExceptionRetriable>false</ExceptionRetriable>
+    <ExceptionSource i:nil="true" />
+    <InnerFault i:nil="true" />
+    <OriginalException i:nil="true" />
+    <TraceText i:nil="true" />
+  </InnerFault>
+  <OriginalException i:nil="true" />
+  <TraceText i:nil="true" />
+</OrganizationServiceFault> Attribute Display Name for id: ab1bbc9f-2c24-4eaf-b641-2048119f3161, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified 8/8/2026 3:57 AM ImportSolution Execute Async Request Failed     8/8/2026 3:59 AM 92fdd44e-dd92-f111-8076-0022480b3175
+Completed Exception type: System.ServiceModel.FaultException`1[Microsoft.Xrm.Sdk.OrganizationServiceFault]
+Message: Attribute Display Name for id: 9dfd0135-1d8d-43cc-836c-fb2babbdfec3, objectcolumn: DisplayName and labelTypeCode: Attribute  not specifiedDetail:
+<OrganizationServiceFault xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/xrm/2011/Contracts">
+  <ActivityId>38461333-c51e-4256-88c7-f41dfa2a26eb</ActivityId>
+  <ErrorCode>-2147220989</ErrorCode>
+  <ErrorDetails xmlns:d2p1="http://schemas.datacontract.org/2004/07/System.Collections.Generic">
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiExceptionSourceKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">Plugin/Microsoft.Crm.WebServices.ImportXmlService</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiSourceActivityKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string"></d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiExceptionOwnerKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">OwnershipNotFoundInExceptionOwnerSettings</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiOriginalExceptionKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">Microsoft.Crm.CrmException: Attribute Display Name for id: 9dfd0135-1d8d-43cc-836c-fb2babbdfec3, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified ---&gt; Microsoft.Crm.CrmException: Attribute Display Name for id: 9dfd0135-1d8d-43cc-836c-fb2babbdfec3, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified
+   at Microsoft.Crm.Metadata.LocalizedLabelHelper.ValidateLabelCollectionContentsAbstract(LabelCollection labelCollection, Guid objectId, String objectColumnName, LabelTypeCode labelTypeCode, String parameterName, ISqlExecutionContext context, Boolean throwIfCollectionIsNullOrEmpty)
+   at Microsoft.Crm.Metadata.AttributeService.ValidateForCreate(AttributeInfo attributeInfo, ExecutionContext context, Boolean isPrimaryAttribute, Boolean validateSchemaName, IMetadataHelper metadataHelper, Boolean skipLabelValidation)
+   at Microsoft.Crm.Metadata.AttributeService.ValidateAndCreateInternalAbstract(AttributeInfo attributeInfo, IMetadataHelper metadataHelper, Boolean isPrimaryAttribute, Boolean validateSchemaName, ContextModifierOption modifierOption, ExecutionContext context, Boolean skipLabelValidation)
+   at Microsoft.Crm.Metadata.LookupAttributeHelper.CreateLookupAttributeSet(LookupAttributeInfo lookupAttributeInfo, Boolean validateSchemaName, Boolean isPolymorphicLookup, Nullable`1 isDenormalizedOverride, String lookupEntityName, MetadataBusinessEntity primaryFieldAttribute, ContextModifierOption modifierOption, MetadataHelper metadataHelper, ExecutionContext context, DenormalizedLookupAttributeInfo denormalizedLookupAttributeInfo)
+   at Microsoft.Crm.Metadata.RelationshipService.CreateLookupAttributeSet(RelationshipDescriptionPropertyBag relationshipDescription, RelationshipCreateInfo relationshipInfo, MetadataBusinessEntity referencedEntity, MetadataBusinessEntity primaryFieldAttribute, MetadataHelper metadataHelper, Boolean validateAttributeName, ExecutionContext context, ContextModifierOption modifierOption)
+   at Microsoft.Crm.Metadata.RelationshipService.CreateRelationshipAttributes(RelationshipDescriptionPropertyBag relationshipDescription, RelationshipCreateInfo relationshipInfo, MetadataBusinessEntity referencedEntity, MetadataHelper metadataHelper, Boolean validateAttributeName, ExecutionContext context)
+   at Microsoft.Crm.Metadata.RelationshipService.CreateRequiredAttributes(ExecutionContext context, MetadataHelper metadataHelper, RelationshipCreateInfo firstRelationshipInfo)
+   at Microsoft.Crm.Metadata.RelationshipService.&lt;&gt;c__DisplayClass32_0.&lt;CreateInternal&gt;b__0()
+   at Microsoft.PowerApps.CoreFramework.ActivityLoggerExtensions.Execute[TResult](ILogger logger, EventId eventId, ActivityType activityType, Func`1 func, IEnumerable`1 additionalCustomProperties)
+   at Microsoft.Xrm.Telemetry.XrmTelemetryExtensions.Execute[TResult](ILogger logger, XrmTelemetryActivityType activityType, Func`1 func)
+   at Microsoft.Crm.Metadata.RelationshipServiceBase.CreateNoPrivilegeChecks(IRelationshipCreateInfo relationshipInfo, ExecutionContext context, MetadataHelper metadataHelper)
+   at Microsoft.Crm.Tools.ImportExportPublish.OneToManyEntityRelationshipProcessor.CreateNewEntityRelationship(XmlNode entityRelationshipNode, ImportHelper importHelper, IHierarchyChangesSet affectedHierarchies, LocLabelHelper locLabelHelper, MetadataHelper metadataHelper, XmlDocument importDocument)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportEntityRelationshipHandler.&lt;ImportItem&gt;b__21_0()
+   at Microsoft.PowerApps.CoreFramework.ActivityLoggerExtensions.Execute(ILogger logger, EventId eventId, ActivityType activityType, Action action, IEnumerable`1 additionalCustomProperties)
+   at Microsoft.Xrm.Telemetry.XrmTelemetryExtensions.Execute(ILogger logger, XrmTelemetryActivityType activityType, Action action)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportHandler.ImportInternal()
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportHandler.&lt;Import&gt;b__42_0()
+   at Microsoft.PowerApps.CoreFramework.ActivityLoggerExtensions.Execute(ILogger logger, EventId eventId, ActivityType activityType, Action action, IEnumerable`1 additionalCustomProperties)
+   at Microsoft.Xrm.Telemetry.XrmTelemetryExtensions.Execute(ILogger logger, XrmTelemetryActivityType activityType, Action action)
+   at Microsoft.Crm.Tools.ImportExportPublish.RootImportHandler.ImportAndUpdateProgress(ImportHandler ih)
+   at Microsoft.Crm.Tools.ImportExportPublish.RootImportHandler.ProcessHandlers(String[] importEntities, Hashtable ht, String&amp; curPath, ImportHandler&amp; ihForCurrentPath, CounterList listCounters)
+   at Microsoft.Crm.Tools.ImportExportPublish.RootImportHandler.RunImport(String[] importEntities)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportXml.&lt;&gt;c.&lt;RunImport&gt;b__188_0(ValueTuple`2 args)
+   at Microsoft.Crm.Platform.Sdk.Metadata.Partitioning.DaacMetadataSnapshotHelper.UseOwnStandardMetadataCache[TResult,TArg](IOrganizationContext context, Func`2 callback, TArg arg)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportXml.RunImport(String[] importEntities)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportXml.RunImport()
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportXml.RunImportInternal(Boolean withSolutionManifest)
+   at Microsoft.Crm.Tools.ImportExportPublish.ImportXml.&lt;&gt;c__DisplayClass173_0.&lt;RunImport&gt;b__0()
+   at Microsoft.PowerApps.CoreFramework.ActivityLoggerExtensions.Execute(ILogger logger, EventId eventId, ActivityType activityType, Action action, IEnumerable`1 additionalCustomProperties)
+   at Microsoft.Xrm.Telemetry.XrmTelemetryExtensions.Execute(ILogger logger, XrmTelemetryActivityType activityType, Action action)
+   at Microsoft.Crm.WebServices.ImportXmlService.ImportSolutionSkipCapableInternal(Boolean overwriteUnmanagedCustomizations, Boolean publishWorkflows, Byte[] customizationFile, Guid importJobId, Boolean convertToManaged, Boolean skipProductUpdateDependencies, Boolean holdingSolution, ExecutionContext context, Boolean skipQueueRibbonJob, LayerDesiredOrder layerDesiredOrder, Boolean asyncRibbonProcessing, EntityCollection componentParameters, Boolean isTemplateMode, String templateSuffix, SolutionParameters solutionParameters, String templateDisplayNamePrefix, Boolean stageAndUpgrade, Boolean schemaUpdatesOnly)
+   at Microsoft.Crm.WebServices.ImportXmlService.ImportSolutionSkipCapable(Boolean overwriteUnmanagedCustomizations, Boolean publishWorkflows, Byte[] customizationFile, Guid importJobId, Boolean convertToManaged, Boolean skipProductUpdateDependencies, Boolean holdingSolution, ExecutionContext context, Boolean skipQueueRibbonJob, LayerDesiredOrder layerDesiredOrder, Boolean asyncRibbonProcessing, EntityCollection componentParameters, Boolean isTemplateMode, String templateSuffix, SolutionParameters solutionParameters, String templateDisplayNamePrefix, Boolean stageAndUpgrade, Boolean schemaUpdatesOnly)
+   --- End of inner exception stack trace ---
+   at Microsoft.Crm.Extensibility.VersionedPluginProxyStepBase.Execute(PipelineExecutionContext context)
+   at Microsoft.Crm.Extensibility.PipelineInstrumentationHelper.Execute(Boolean instrumentationEnabled, String stopwatchName, ExecuteWithInstrumentation action, PipelineExecutionContext context)
+   at Microsoft.Crm.Extensibility.Pipeline.&lt;&gt;c__DisplayClass7_0.&lt;RunStep&gt;b__0()</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiStepKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/" i:type="d4p1:guid">1b830950-e106-4ee1-b3fd-d348cb65dc8d</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiDepthKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:int">2</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiActivityIdKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/" i:type="d4p1:guid">38461333-c51e-4256-88c7-f41dfa2a26eb</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiPluginSolutionNameKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">System</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiStepSolutionNameKey</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">System</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiExceptionCategory</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">ClientError</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiExceptionMessageName</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">InvalidArgument</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>ApiExceptionHttpStatusCode</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:int">400</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>0</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string"></d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>HasRetried</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">True</d2p1:value>
+    </KeyValuePairOfstringanyType>
+    <KeyValuePairOfstringanyType>
+      <d2p1:key>RetryExecutionStatus</d2p1:key>
+      <d2p1:value xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:string">Microsoft.Crm.Core.Extensions.Retry.RetryExecutionStatus</d2p1:value>
+    </KeyValuePairOfstringanyType>
+  </ErrorDetails>
+  <HelpLink>http://go.microsoft.com/fwlink/?LinkID=398563&amp;error=Microsoft.Crm.CrmException%3a80040203&amp;client=platform</HelpLink>
+  <Message>Attribute Display Name for id: 9dfd0135-1d8d-43cc-836c-fb2babbdfec3, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified</Message>
+  <Timestamp>2026-08-08T04:01:43.9090824Z</Timestamp>
+  <ExceptionRetriable>false</ExceptionRetriable>
+  <ExceptionSource i:nil="true" />
+  <InnerFault>
+    <ActivityId>38461333-c51e-4256-88c7-f41dfa2a26eb</ActivityId>
+    <ErrorCode>-2147220989</ErrorCode>
+    <ErrorDetails xmlns:d3p1="http://schemas.datacontract.org/2004/07/System.Collections.Generic" />
+    <HelpLink i:nil="true" />
+    <Message>Attribute Display Name for id: 9dfd0135-1d8d-43cc-836c-fb2babbdfec3, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified</Message>
+    <Timestamp>2026-08-08T04:01:43.9090824Z</Timestamp>
+    <ExceptionRetriable>false</ExceptionRetriable>
+    <ExceptionSource i:nil="true" />
+    <InnerFault i:nil="true" />
+    <OriginalException i:nil="true" />
+    <TraceText i:nil="true" />
+  </InnerFault>
+  <OriginalException i:nil="true" />
+  <TraceText i:nil="true" />
+</OrganizationServiceFault> Attribute Display Name for id: 9dfd0135-1d8d-43cc-836c-fb2babbdfec3, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified 8/8/2026 4:00 AM ImportSolution Execute Async Request Failed     8/8/2026 4:01 AM 37ba48a9-dd92-f111-8076-000d3a37d363

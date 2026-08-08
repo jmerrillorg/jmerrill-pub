@@ -1,0 +1,17 @@
+<fetch>
+<entity name="asyncoperation">
+<attribute name="asyncoperationid"/>
+<attribute name="name"/>
+<attribute name="statuscode"/>
+<attribute name="statecode"/>
+<attribute name="message"/>
+<attribute name="friendlymessage"/>
+<attribute name="operationtype"/>
+<attribute name="startedon"/>
+<attribute name="completedon"/>
+<filter type="or">
+<condition attribute="asyncoperationid" operator="eq" value="92fdd44e-dd92-f111-8076-0022480b3175"/>
+<condition attribute="asyncoperationid" operator="eq" value="37ba48a9-dd92-f111-8076-000d3a37d363"/>
+</filter>
+</entity>
+</fetch>
