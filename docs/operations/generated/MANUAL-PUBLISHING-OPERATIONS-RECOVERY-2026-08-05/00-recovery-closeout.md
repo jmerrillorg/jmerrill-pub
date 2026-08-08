@@ -18,9 +18,9 @@ The PR should not be treated as ready for merge as a completed manual recovery p
 
 ## Priority 1 Authors Waiting on JMP
 
+- Before You Were Born: candidate source manuscript located. The title remains under editorial-state confirmation and a major author-facing internal-information exposure incident. Prior technical dispatch is not a valid author-review delivery. This is now the first manual recovery priority.
 - Naughty Tales: authoritative source manuscript located. Developmental edit is still required unless a later approved developmental package is proven from the exact controlling manuscript.
 - The General's Will and Last Testament: candidate controlling manuscript located. Existing generated developmental outputs contain internal operational language and require authoritative validation before author delivery.
-- Before You Were Born: candidate source manuscript located. The title remains under editorial-state confirmation and a major author-facing internal-information exposure incident. Prior technical dispatch is not a valid author-review delivery.
 
 ## Priority 2 Title One Step from Release
 
@@ -112,6 +112,7 @@ Next valid action: continue manual hardcover design and manual release preparati
 - `operational-register.csv`
 - `source-verification-and-title-state-correction.md`
 - `validation.md`
+- `priority-and-single-operator-routing-addendum.md`
 - `incidents/before-you-were-born-author-facing-internal-information-exposure.md`
 - `communications/naughty-tales-author-review-draft.md`
 - `communications/general-author-review-ready-draft.md`

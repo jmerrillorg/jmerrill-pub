@@ -96,6 +96,7 @@ No package in this corrective pass is certified ready for author send.
 ## Communications
 
 - Author communications sent: 0.
+- Current manual title priority: Before You Were Born; Naughty Tales; The General's Will and Last Testament; Strategies For Success in parallel manual final production.
 - Naughty Tales communication: NOT SEND-READY until clean package QA passes.
 - The General's Will communication: NOT SEND-READY until authoritative validation and leakage QA pass.
 - Before You Were Born apology/corrective communication: NOT PREPARED until clean package verification.
