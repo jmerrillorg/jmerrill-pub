@@ -62,6 +62,12 @@ jobs:
           node-version: "24"
           cache: npm
 
+      - name: Fetch main authority ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main:refs/remotes/origin/main
+
       - name: Repository Guards
         run: |
           set -euo pipefail
