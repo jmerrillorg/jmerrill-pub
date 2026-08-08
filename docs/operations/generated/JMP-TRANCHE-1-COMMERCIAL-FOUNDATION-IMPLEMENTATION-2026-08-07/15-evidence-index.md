@@ -39,3 +39,4 @@ Last verified: 2026-08-07T23:41:26.306557+00:00
 | Product Management package install | `install-dev-msdynce-productmanagement-2026-08-07.log` | FAIL / package not found |
 
 | JM1-Dev post-install-attempt solution list | `pac-solution-list-jm1-dev-after-sales-install-attempt-2026-08-07.log` | PASS / no Sales or JM1PublishingSales solution present |
+| Sandbox stop thresholds | `25-sandbox-stop-thresholds.md` | COMPLETE / thresholds pass; JM1-Dev unsuitability stop remains |

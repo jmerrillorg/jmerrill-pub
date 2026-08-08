@@ -19,7 +19,7 @@ Last verified: 2026-08-08T03:38:51.248981+00:00
 | 12-security-and-rollback.md | b0c1ddb1129f86895b2472b5af31a88618b4547d0293f802ad5a570ae8c8450d |
 | 13-production-readback.md | e9591696f1b4986a1815946ca87f9e9c9d65f7e68e483c9079d86262c384a12e |
 | 14-open-holds.md | 72e0c2528b16fff058963e75499b722633b4c60746d2df27b888670d8f1ac871 |
-| 15-evidence-index.md | 6882777f4cada26be9248f7091048a543d23776bc6b682fbf04b272fc079c6af |
+| 15-evidence-index.md | 7e45fba782cb0669207f49fec04864c3ac8dad287235ca601ac74a3d57470f35 |
 | 17-active-layer-prerequisite-reconciliation.md | 8ef48bc0ca7e6518795ce09edbf5d058020b9a9d7aa3a6d200791d766472abda |
 | 17-dependency-parity-register.md | 646b30dc030c330b2e59433b3cd9ff08c74bf7fd692be2fcb4abe9487198e7e2 |
 | 18-environment-strategy-and-stop.md | 1f6b2dce75ebed06c7b08f8621fd61f6bacf9f0a46931d98a453668e96749165 |
@@ -31,4 +31,5 @@ Last verified: 2026-08-08T03:38:51.248981+00:00
 | 21-dev-import-proof.md | d6c71b7d5ddf186cac910cd95225374d77275c4b95d15fd5d83b84287e79ff68 |
 | 22-alm-lifecycle-proof.md | 3fc6847fbea1ef1261f805770b8c1a9221b3334a6925231aeaf03eccd300465f |
 | 23-stripe-projection-disposition.md | 38cbb2310d5d85c843b06941570822a93330017b02a1a6b10dc876347637dc91 |
-| 24-tranche1-resumption-record.md | c96b3837c981ed304cb85a335cf7fca103f02bd2682fd0f9612993334eb3d598 |
+| 24-tranche1-resumption-record.md | 0f979cdfd55218dcfbd157ac1d42542ab39a7824ffa5a4987612e1c3cee814d8 |
+| 25-sandbox-stop-thresholds.md | 6cc91c5755ff4be3594c8d77198cb551f4a8da89c681207bafe3ea7eccef114b |

@@ -43,6 +43,16 @@ Jackie rules the delta rows only.
 
 No reruling of unchanged baseline rows is required.
 
+## Consolidation Guard
+
+Any future proposal to ABSORB or SUPERSEDE an existing capability requires explicit Jackie ruling.
+
+Do not bulk-apply consolidation classifications during quarterly delta maintenance.
+
+Factual metadata changes may be handled through normal delta maintenance.
+
+This maintenance rule does not reopen already ruled capability classifications.
+
 ## Escalation
 
 If a delta run returns more than 10 changed rows, flag it. More than 10 changed rows indicates the register is drifting faster than quarterly maintenance can hold, and the cadence needs revisiting.

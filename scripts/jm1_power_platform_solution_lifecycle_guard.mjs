@@ -33,6 +33,8 @@ const required = [
   `${trancheEvidenceRoot}/22-alm-lifecycle-proof.md`,
   `${trancheEvidenceRoot}/23-stripe-projection-disposition.md`,
   `${trancheEvidenceRoot}/24-tranche1-resumption-record.md`,
+  `${trancheEvidenceRoot}/25-sandbox-stop-thresholds.md`,
+  'docs/governance/JM1-PUB-CAPABILITY-REGISTER-MAINTENANCE-v1.0.md',
   'scripts/jm1_prune_publishing_sales_solution.mjs',
   '.github/workflows/publishing-power-platform-solution-deploy.yml',
 ]
@@ -81,6 +83,32 @@ if (existsSync(manifestPath)) {
     'EXTEND_EXISTING',
   ]) {
     if (!manifest.includes(text)) errors.push(`manifest_missing:${text}`)
+  }
+}
+
+const sandboxThresholdsPath = `${trancheEvidenceRoot}/25-sandbox-stop-thresholds.md`
+if (existsSync(sandboxThresholdsPath)) {
+  const thresholds = readFileSync(sandboxThresholdsPath, 'utf8')
+  for (const text of [
+    'Original unique dependencies | 335',
+    'Original ungoverned JM1 Active-layer prerequisites | 38',
+    'Required unique dependency groups | 4 | 100 | PASS',
+    'Required ungoverned JM1 Active-layer prerequisites | 3 | 12 | PASS',
+    'BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED',
+  ]) {
+    if (!thresholds.includes(text)) errors.push(`sandbox_thresholds_missing:${text}`)
+  }
+}
+
+const capabilityMaintenancePath = 'docs/governance/JM1-PUB-CAPABILITY-REGISTER-MAINTENANCE-v1.0.md'
+if (existsSync(capabilityMaintenancePath)) {
+  const maintenance = readFileSync(capabilityMaintenancePath, 'utf8')
+  for (const text of [
+    'Any future proposal to ABSORB or SUPERSEDE an existing capability requires explicit Jackie ruling.',
+    'Do not bulk-apply consolidation classifications during quarterly delta maintenance.',
+    'This maintenance rule does not reopen already ruled capability classifications.',
+  ]) {
+    if (!maintenance.includes(text)) errors.push(`capability_maintenance_missing:${text}`)
   }
 }
 
