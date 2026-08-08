@@ -1,0 +1,261 @@
+{
+  "removed": {
+    "directories": [
+      "powerplatform/solutions/JM1PublishingSales/src/Entities/Account",
+      "powerplatform/solutions/JM1PublishingSales/src/Entities/Contact",
+      "powerplatform/solutions/JM1PublishingSales/src/InteractionCentricDashboards"
+    ],
+    "attributes": [
+      {
+        "entityName": "Lead",
+        "physicalName": "jm1_AuthorGoal",
+        "logicalName": "jm1_authorgoal",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Lead",
+        "physicalName": "jm1_BookTitle",
+        "logicalName": "jm1_booktitle",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Lead",
+        "physicalName": "jm1_Brand",
+        "logicalName": "jm1_brand",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Lead",
+        "physicalName": "jm1_InterestType",
+        "logicalName": "jm1_interesttype",
+        "optionSet": "jm1_interesttypechoice"
+      },
+      {
+        "entityName": "Lead",
+        "physicalName": "jm1_InternalClassification",
+        "logicalName": "jm1_internalclassification",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Lead",
+        "physicalName": "jm1_Origin",
+        "logicalName": "jm1_origin",
+        "optionSet": "jm1_originchoice"
+      },
+      {
+        "entityName": "Lead",
+        "physicalName": "jm1_SubmissionReceivedOn",
+        "logicalName": "jm1_submissionreceivedon",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Lead",
+        "physicalName": "jm1_SubmissionRoute",
+        "logicalName": "jm1_submissionroute",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Lead",
+        "physicalName": "jm1_TargetPublishDate",
+        "logicalName": "jm1_targetpublishdate",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Lead",
+        "physicalName": "jm1_Timezone",
+        "logicalName": "jm1_timezone",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_Brand",
+        "logicalName": "jm1_brand",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_LinkedProject",
+        "logicalName": "jm1_linkedproject",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6AgreementPreparationStatus",
+        "logicalName": "jm1_m6agreementpreparationstatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6AuthorPortalStatus",
+        "logicalName": "jm1_m6authorportalstatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6AuthorSelectedPackageCode",
+        "logicalName": "jm1_m6authorselectedpackagecode",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6BusinessHandoffStatus",
+        "logicalName": "jm1_m6businesshandoffstatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6FirstPaymentConfirmationSource",
+        "logicalName": "jm1_m6firstpaymentconfirmationsource",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6FirstPaymentConfirmedOn",
+        "logicalName": "jm1_m6firstpaymentconfirmedon",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6FirstPaymentStatus",
+        "logicalName": "jm1_m6firstpaymentstatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6OnboardingStatus",
+        "logicalName": "jm1_m6onboardingstatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6OpportunityUpdateStatus",
+        "logicalName": "jm1_m6opportunityupdatestatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6PackageSelectionStatus",
+        "logicalName": "jm1_m6packageselectionstatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6PaymentOptionPreparationStatus",
+        "logicalName": "jm1_m6paymentoptionpreparationstatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6PaymentOptionSelectionStatus",
+        "logicalName": "jm1_m6paymentoptionselectionstatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6PaymentSelectionEvidenceLog",
+        "logicalName": "jm1_m6paymentselectionevidencelog",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6PaymentSelectionReceivedOn",
+        "logicalName": "jm1_m6paymentselectionreceivedon",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6PaymentSelectionSource",
+        "logicalName": "jm1_m6paymentselectionsource",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6PaymentSelectionThreadSubject",
+        "logicalName": "jm1_m6paymentselectionthreadsubject",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6SelectedInstallmentCount",
+        "logicalName": "jm1_m6selectedinstallmentcount",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6SelectedPaymentAmount",
+        "logicalName": "jm1_m6selectedpaymentamount",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6SelectedPaymentOption",
+        "logicalName": "jm1_m6selectedpaymentoption",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6SelectedPaymentTotal",
+        "logicalName": "jm1_m6selectedpaymenttotal",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6StripePriceMappingStatus",
+        "logicalName": "jm1_m6stripepricemappingstatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_M6StripeProductMappingStatus",
+        "logicalName": "jm1_m6stripeproductmappingstatus",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_OriginLead",
+        "logicalName": "jm1_originlead",
+        "optionSet": ""
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1_Pipeline",
+        "logicalName": "jm1_pipeline",
+        "optionSet": "jm1_pipelinechoice"
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1pub_Genre",
+        "logicalName": "jm1pub_genre",
+        "optionSet": "jm1_genrechoice"
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1pub_ManuscriptType",
+        "logicalName": "jm1pub_manuscripttype",
+        "optionSet": "jm1_manuscripttype"
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1pub_PrimaryLanguage",
+        "logicalName": "jm1pub_primarylanguage",
+        "optionSet": "jm1_primarylanguage"
+      },
+      {
+        "entityName": "Opportunity",
+        "physicalName": "jm1pub_TrimSize",
+        "logicalName": "jm1pub_trimsize",
+        "optionSet": "jm1_trimsizechoice"
+      }
+    ],
+    "controls": [
+      {
+        "file": "powerplatform/solutions/JM1PublishingSales/src/Entities/jm1pub_publishingopportunityprocess/FormXml/main/{517f95d5-0511-4dc8-801d-5f049e6c186f}.xml",
+        "logicalName": "jm1pub_manuscripttype",
+        "count": 1
+      }
+    ],
+    "relationships": [
+      "jm1_opportunity_LinkedProject_jm1_project"
+    ]
+  }
+}

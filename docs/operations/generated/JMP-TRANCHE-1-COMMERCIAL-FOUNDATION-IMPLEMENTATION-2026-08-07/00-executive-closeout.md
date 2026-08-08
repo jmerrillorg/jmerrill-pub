@@ -4,7 +4,7 @@ Last verified: 2026-08-07T23:42:44.669312+00:00
 
 ## Classification
 
-POWER PLATFORM LIFECYCLE PARTIALLY ESTABLISHED / TRANCHE 1 STILL BLOCKED / NO CLIENT MUTATION
+BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED / NO CLIENT MUTATION
 
 PR #438 originally stopped fail-closed because no governed Power Platform lifecycle was discoverable. This update establishes the reusable repo-side lifecycle standard, source-controls the `JM1PublishingSales` baseline, adds a lifecycle guard, and adds a protected deployment workflow skeleton.
 
@@ -12,7 +12,7 @@ The deployment lifecycle is not yet fully proven because `JM1-Dev` cannot import
 
 ## Current Blocker
 
-`DEVELOPMENT_SANDBOX_REQUIRED`
+`BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED`
 
 ## What Changed
 
@@ -51,3 +51,9 @@ The deployment lifecycle is not yet fully proven because `JM1-Dev` cannot import
 ## Dependency-Parity Update
 
 Dependency register: COMPLETE. Unknown classifications: 0. JM1-Dev import remains blocked; Tranche 1 implementation did not resume.
+
+## Remediation Attempt Update
+
+Last verified: 2026-08-08T03:36:37.099920+00:00
+
+Dependency pruning was performed and the pruned unmanaged package packed successfully. The pruned package import failed because JM1-Dev lacks the Dynamics Sales table/application baseline. Attempts to install `msdyn_SalesApp`, `msdynce_Sales`, `msdynce_LeadManagement`, and `msdynce_ProductManagement` through PAC failed. Tranche 1 implementation did not resume.

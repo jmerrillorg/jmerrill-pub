@@ -14,7 +14,6 @@
   <EntityRelationship Name="jm1_contact_PrimaryBrand_jm1_brand" />
   <EntityRelationship Name="jm1_lead_Brand_jm1_brand" />
   <EntityRelationship Name="jm1_opportunity_Brand_jm1_brand" />
-  <EntityRelationship Name="jm1_opportunity_LinkedProject_jm1_project" />
   <EntityRelationship Name="jm1_opportunity_OriginLead_lead" />
   <EntityRelationship Name="jm1pub_PublishingSubmission_Author_Contact" />
   <EntityRelationship Name="jm1pub_PublishingSubmission_Opportunity_Opportunity" />

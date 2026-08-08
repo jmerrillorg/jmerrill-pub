@@ -28,3 +28,14 @@ Last verified: 2026-08-07T23:41:26.306557+00:00
 | BPF and connection dependency proof | `19-bpf-and-connection-dependency-proof.md` | COMPLETE / no redesign / no secrets |
 | Lifecycle guard | `npm run jm1-power-platform-solution-lifecycle-guard` | PASS |
 | Commissioning guard | `npm run jm1-commissioning-guard` | EXPECTED FEATURE-BRANCH FAIL / `COMMISSIONING_MAIN_AUTHORITY_STALE` |
+
+| Pruning script | `scripts/jm1_prune_publishing_sales_solution.mjs` | COMPLETE |
+| Prune evidence | `prune-publishing-sales-solution-2026-08-07.json` | COMPLETE |
+| Pruned package validation | `pack-pruned-unmanaged-2026-08-07.log` | PASS |
+| Pruned DEV import | `import-dev-pruned-unmanaged-2026-08-07.log` | FAIL / Sales baseline missing |
+| Dynamics Sales app install | `install-dev-dynamics-sales-app-2026-08-07.log` | FAIL |
+| Core Sales package install | `install-dev-msdynce-sales-2026-08-07.log` | FAIL / package not found |
+| Lead Management package install | `install-dev-msdynce-leadmanagement-2026-08-07.log` | FAIL / package not found |
+| Product Management package install | `install-dev-msdynce-productmanagement-2026-08-07.log` | FAIL / package not found |
+
+| JM1-Dev post-install-attempt solution list | `pac-solution-list-jm1-dev-after-sales-install-attempt-2026-08-07.log` | PASS / no Sales or JM1PublishingSales solution present |

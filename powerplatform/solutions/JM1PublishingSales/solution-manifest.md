@@ -1,6 +1,6 @@
 # JM1PublishingSales Solution Manifest
 
-Status: SOURCE-CONTROLLED BASELINE / DEVELOPMENT SANDBOX REQUIRED
+Status: SOURCE-CONTROLLED PRUNED BASELINE / JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED
 
 ## Solution
 
@@ -22,7 +22,7 @@ Current source baseline version: `1.0.0.0`
 
 | Lane | Environment | URL | Type | Environment ID | Status |
 | --- | --- | --- | --- | --- | --- |
-| DEV | JM1-Dev | `https://org52409ff2.crm.dynamics.com/` | Sandbox | `a4d2d3cf-af53-e38c-970b-c6e19f4da917` | FOUND / NOT SAFELY REMEDIABLE IN THIS PASS |
+| DEV | JM1-Dev | `https://org52409ff2.crm.dynamics.com/` | Sandbox | `a4d2d3cf-af53-e38c-970b-c6e19f4da917` | FOUND / DYNAMICS SALES BASELINE NOT INSTALLABLE THROUGH PAC |
 | TEST/UAT | JM1-Test | `https://jm1test.crm.dynamics.com/` | Sandbox | `251b8f38-5cea-e329-b9b2-3d34ba47dd1e` | FOUND / NOT PARITY |
 | PROD | JM1-Core | `https://jm1hq.crm.dynamics.com/` | Production | `dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10` | FOUND |
 
@@ -38,10 +38,8 @@ Managed production import remains the preferred lifecycle posture. The current u
 
 ## Component Boundary
 
-Current baseline includes:
+Current pruned baseline includes:
 
-- Account;
-- Contact;
 - Lead;
 - Opportunity;
 - Quote;
@@ -49,7 +47,18 @@ Current baseline includes:
 - Publishing Opportunity Process BPF entity;
 - Publishing Opportunity Process workflow;
 - Publishing option sets;
-- interaction-centric dashboards inherited by the exported solution.
+- pruned Tranche 1 Publishing Sales table customizations.
+
+Pruned from the production-exported boundary:
+
+- Account table customizations;
+- Contact table customizations;
+- inherited interaction-centric dashboards/forms;
+- legacy `jm1_` Lead fields;
+- legacy `jm1_` and M6 Opportunity fields;
+- Opportunity fields backed by ungoverned `jm1_*` option sets;
+- legacy Project relationship dependency;
+- static production-export `MissingDependencies` manifest.
 
 Tranche 1 components that belong in this solution:
 
@@ -104,12 +113,12 @@ SOURCE CONTROL: ACTIVE
 
 PACKAGE VALIDATION: UNMANAGED PASS / MANAGED EXPORT PASS / MANAGED PACK FROM UNMANAGED SOURCE NOT APPLICABLE
 
-DEV IMPORT: BLOCKED BY DEPENDENCY PARITY
+DEV IMPORT: BLOCKED BY MISSING DYNAMICS SALES BASELINE
 
 PROD IMPORT PROOF: NOT RUN
 
 Blocker code:
 
-`DEVELOPMENT_SANDBOX_REQUIRED`
+`BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED`
 
-The current dependency register contains 335 unique missing required components and 692 dependency edges. JM1-Dev is missing Tranche 1-aligned Dynamics Sales prerequisites, broad first-party dependencies that are not authorized for Tranche 1, and 38 JM1 `Active`-layer prerequisites without governed packages located in this repository. JM1-Test does not satisfy parity.
+The original dependency register contains 335 unique missing required components and 692 dependency edges. Boundary pruning reduced the Active-layer prerequisite burden, and the pruned package packed successfully. The pruned package still cannot import because JM1-Dev does not have an installable Dynamics Sales table/application baseline through the available PAC path.

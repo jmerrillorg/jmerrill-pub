@@ -49,6 +49,14 @@ If the selected development sandbox cannot be brought to safe parity without bro
 
 `DEVELOPMENT_SANDBOX_REQUIRED`
 
+If pruning proves the target solution needs a Microsoft first-party application baseline and the selected development sandbox cannot install that baseline through the approved Power Platform path, work stops with:
+
+`BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED`
+
+A development environment requires sufficient governed dependency parity for the solution being developed; full production-environment cloning is neither required nor preferred.
+
+Active-layer production components required for continued development must be recovered into governed source and solution authority rather than repeatedly treated as invisible production prerequisites.
+
 ## Solution-Aware Requirement
 
 All Dataverse configuration, model-driven app components, canvas apps, cloud flows, business process flows, connection references, environment variables, security roles, forms, views, and command components created for governed JM1 implementation must be solution-aware unless explicitly approved as an external dependency.

@@ -1,0 +1,11 @@
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Dev
+
+Listing all Solutions from the current Dataverse organization...
+Unique Name                    Friendly Name                         Version Managed
+Cr562d2                        Common Data Services Default Solution 1.0.0.0 False
+Default                        Default Solution                      1.0     False
+JM1_EnterpriseFoundation       JM1 Enterprise Foundation             1.0.0.0 False
+JM1_PAM_AssetRegistry          JM1 PAM Asset Registry                1.0.0.0 False
+JM1_Publishing                 JM1 Publishing                        1.0.0.0 False
+JM1PublishingCommercialCatalog JM1 Publishing Commercial Catalog     1.0.0.0 False

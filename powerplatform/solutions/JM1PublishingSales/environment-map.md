@@ -4,7 +4,7 @@ Last verified: 2026-08-07
 
 | Environment | URL | Type | Role | Dataverse | Notes |
 | --- | --- | --- | --- | --- | --- |
-| JM1-Dev | `https://org52409ff2.crm.dynamics.com/` | Sandbox | DEV candidate | YES | Existing sandbox, but not safely remediable in this pass. The dependency register shows 335 unique missing components, including broad non-Tranche-1 first-party import drag and 38 JM1 Active-layer prerequisites without located governed packages. |
+| JM1-Dev | `https://org52409ff2.crm.dynamics.com/` | Sandbox | DEV target attempted | YES | Existing sandbox. Boundary pruning succeeded, but the pruned package failed because the Dynamics Sales baseline is missing. PAC installation of `msdyn_SalesApp`, `msdynce_Sales`, `msdynce_LeadManagement`, and `msdynce_ProductManagement` failed. |
 | JM1-Test | `https://jm1test.crm.dynamics.com/` | Sandbox | TEST/UAT candidate | YES | Existing sandbox. Checked read-only; not parity and has fewer JM1 prerequisite solutions than JM1-Dev. |
 | JM1-Core | `https://jm1hq.crm.dynamics.com/` | Production | PROD | YES | Production system of record for JM1-Core. |
 | JM1-CRM-Core | `https://jm1crm.crm.dynamics.com/` | Default | Not selected | YES | Default environment, not approved as Tranche 1 DEV. |
@@ -18,6 +18,6 @@ Suitable development environment ready: NO
 
 Blocker:
 
-`DEVELOPMENT_SANDBOX_REQUIRED`
+`BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED`
 
-JM1-Dev must either receive separately authorized prerequisite remediation using governed source packages and narrowly approved Microsoft app installs, or a different approved sandbox with dependency parity must be designated before Tranche 1 Power Platform implementation resumes.
+A different approved sandbox with the Dynamics Sales baseline, or tenant/admin remediation outside this PAC path, is required before Tranche 1 Power Platform implementation resumes.

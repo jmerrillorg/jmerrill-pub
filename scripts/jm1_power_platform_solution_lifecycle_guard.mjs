@@ -12,6 +12,8 @@ const required = [
   `${solutionRoot}/connection-references-and-environment-variables.md`,
   `${solutionRoot}/evidence/dependency-register-jm1-dev-2026-08-07.json`,
   `${solutionRoot}/evidence/dependency-register-jm1-dev-2026-08-07.csv`,
+  `${solutionRoot}/evidence/import-dev-pruned-unmanaged-2026-08-07.log`,
+  `${solutionRoot}/evidence/install-dev-dynamics-sales-app-2026-08-07.log`,
   `${solutionRoot}/src/Other/Solution.xml`,
   `${solutionRoot}/src/Entities/Lead/Entity.xml`,
   `${solutionRoot}/src/Entities/Opportunity/Entity.xml`,
@@ -23,6 +25,15 @@ const required = [
   `${trancheEvidenceRoot}/18-environment-strategy-and-stop.md`,
   `${trancheEvidenceRoot}/19-bpf-and-connection-dependency-proof.md`,
   `${trancheEvidenceRoot}/20-parity-preflight-and-remaining-holds.md`,
+  `${trancheEvidenceRoot}/17-active-layer-prerequisite-reconciliation.md`,
+  `${trancheEvidenceRoot}/18-minimum-dependency-baseline.md`,
+  `${trancheEvidenceRoot}/19-prerequisite-solution-map.md`,
+  `${trancheEvidenceRoot}/20-jm1-dev-parity-proof.md`,
+  `${trancheEvidenceRoot}/21-dev-import-proof.md`,
+  `${trancheEvidenceRoot}/22-alm-lifecycle-proof.md`,
+  `${trancheEvidenceRoot}/23-stripe-projection-disposition.md`,
+  `${trancheEvidenceRoot}/24-tranche1-resumption-record.md`,
+  'scripts/jm1_prune_publishing_sales_solution.mjs',
   '.github/workflows/publishing-power-platform-solution-deploy.yml',
 ]
 
@@ -66,7 +77,7 @@ if (existsSync(manifestPath)) {
     'JM1PublishingSales',
     'JM1-Dev',
     'JM1-Core',
-    'DEVELOPMENT_SANDBOX_REQUIRED',
+    'JM1-DEV UNSUITABLE',
     'EXTEND_EXISTING',
   ]) {
     if (!manifest.includes(text)) errors.push(`manifest_missing:${text}`)

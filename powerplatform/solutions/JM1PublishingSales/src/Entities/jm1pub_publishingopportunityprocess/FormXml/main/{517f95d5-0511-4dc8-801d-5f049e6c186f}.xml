@@ -48,7 +48,6 @@
                         <labels>
                           <label description="Manuscript Type" languagecode="1033" />
                         </labels>
-                        <control id="bpf_opportunity_jm1pub_publishingopportunityprocess:jm1pub_manuscripttype" classid="{3ef39988-22bb-4f0b-bbbe-64b5a3748aee}" datafieldname="jm1pub_manuscripttype" relationship="bpf_opportunity_jm1pub_publishingopportunityprocess" isrequired="false" disabled="false" />
                       </cell>
                     </row>
                     <row>

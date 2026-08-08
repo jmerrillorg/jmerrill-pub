@@ -1,0 +1,9 @@
+Connected as jm1-admin@jmerrill.one
+Verifying if application(s) are already installed...
+Installing 'msdynce_LeadManagement'...
+Microsoft PowerPlatform CLI
+Version: 1.49.4+g406813e (.NET 10.0.9)
+Online documentation: https://aka.ms/PowerPlatformCLI
+Feedback, Suggestions, Issues: https://github.com/microsoft/powerplatform-build-tools/discussions
+
+Error: {"HttpStatusCode":400,"RequestMethod":"POST","RequestUri":"environments/a4d2d3cf-af53-e38c-970b-c6e19f4da917/applicationPackages/msdynce_LeadManagement/install?api-version=2022-03-01-preview","CorrelationIdName":"x-ms-correlation-id","CorrelationId":"247fca60-21b0-48c0-9f89-7869310ddbdf","ResponseBody":"{\"StatusCode\":400,\"Message\":\"Package requested for installation was not found\"}"}

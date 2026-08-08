@@ -1,10 +1,10 @@
 # Checksums
 
-Last verified: 2026-08-07T23:44:27.894964+00:00
+Last verified: 2026-08-08T03:38:51.248981+00:00
 
 | File | SHA-256 |
 | --- | --- |
-| 00-executive-closeout.md | 09114bd61f2f58683fb989770461f2b69b73a910705a23f5910c0d6f8df391d7 |
+| 00-executive-closeout.md | 1c24fd04497ea0a716884c59e2debfbd4a3e17ff1232d8402bb40218f5cdd983 |
 | 01-preflight-and-baseline.md | ca09ce6a7062cd153075e1cb62b759240401d211c2f28b720549787a632aff5c |
 | 02-d365-sales-configuration.md | d7b6d634617a52f3e83550b5bd7029fa2055d0b9a3cf0691ae965739ad9f7460 |
 | 03-catalog-projection.md | 6877a12b9c0357ed7e62a695c5cd2019a6c77bb926b4d4f9b24a9e5f4e6a8b5d |
@@ -18,9 +18,17 @@ Last verified: 2026-08-07T23:44:27.894964+00:00
 | 11-operator-burden-results.md | 08833c44652b79a56528cb9bb7ef039c3b4dc736bfa1bfe7989b8f392ed7bb23 |
 | 12-security-and-rollback.md | b0c1ddb1129f86895b2472b5af31a88618b4547d0293f802ad5a570ae8c8450d |
 | 13-production-readback.md | e9591696f1b4986a1815946ca87f9e9c9d65f7e68e483c9079d86262c384a12e |
-| 14-open-holds.md | dbfe98facb0408df3e3d1c93bacfca5d4f01199ccdc98cd1ba04a08a547d5525 |
-| 15-evidence-index.md | 0cdda2a83d7463c02ed53a574fc8f7395c9675bc8d15034b31e2c8f979530213 |
+| 14-open-holds.md | 72e0c2528b16fff058963e75499b722633b4c60746d2df27b888670d8f1ac871 |
+| 15-evidence-index.md | 6882777f4cada26be9248f7091048a543d23776bc6b682fbf04b272fc079c6af |
+| 17-active-layer-prerequisite-reconciliation.md | 8ef48bc0ca7e6518795ce09edbf5d058020b9a9d7aa3a6d200791d766472abda |
 | 17-dependency-parity-register.md | 646b30dc030c330b2e59433b3cd9ff08c74bf7fd692be2fcb4abe9487198e7e2 |
 | 18-environment-strategy-and-stop.md | 1f6b2dce75ebed06c7b08f8621fd61f6bacf9f0a46931d98a453668e96749165 |
+| 18-minimum-dependency-baseline.md | d2b700514326b89fc425b87f287eebd7c4aa57f9c11158f504f23b008db5ee2d |
 | 19-bpf-and-connection-dependency-proof.md | 8a4871471f647708c687556a8596f3c7b6b18d2c19817d35363ec051a4689641 |
+| 19-prerequisite-solution-map.md | 0bf453b22b97f7c70bd531544507fbbe6cc10af5aa9860c1632c466d1021776e |
+| 20-jm1-dev-parity-proof.md | f61f8197d764b27c1b6264cad7cb3fa705acc9dc273b3139612b8520ec5d45bb |
 | 20-parity-preflight-and-remaining-holds.md | 0b88af3e25607c70156929f4fb5e0c21f2dd7f5e24ef3791a26cbdb8da9a8267 |
+| 21-dev-import-proof.md | d6c71b7d5ddf186cac910cd95225374d77275c4b95d15fd5d83b84287e79ff68 |
+| 22-alm-lifecycle-proof.md | 3fc6847fbea1ef1261f805770b8c1a9221b3334a6925231aeaf03eccd300465f |
+| 23-stripe-projection-disposition.md | 38cbb2310d5d85c843b06941570822a93330017b02a1a6b10dc876347637dc91 |
+| 24-tranche1-resumption-record.md | c96b3837c981ed304cb85a335cf7fca103f02bd2682fd0f9612993334eb3d598 |
