@@ -1,0 +1,25 @@
+HTTP/2 204
+cache-control: no-cache
+allow: OPTIONS,GET,HEAD,POST
+content-type: text/html; charset=utf-8
+expires: -1
+location: https://jm1hq.crm.dynamics.com/api/data/v9.2/systemusers(761a6aee-e692-f111-8077-000d3a14673b)
+set-cookie: ARRAffinity=8d0439f9f248fff83ed3d64329b38cffef26496302b88dd76ff00c46734cb26ef16921585aa9d18b9e2a3e899a56f8075a9e4d1d722668af0a49aafc12547a0608DEF50F064F764B0000001302195949; path=/; secure; HttpOnly
+set-cookie: ReqClientId=5c7a1a33-53cb-4178-b3d1-c7d7dcca45e9; expires=Sat, 08-Aug-2076 05:06:41 GMT; path=/; secure; HttpOnly
+set-cookie: orgId=9dafb403-b493-f011-a700-000d3a106f37; expires=Sat, 08-Aug-2076 05:06:41 GMT; path=/; secure; HttpOnly
+set-cookie: last_commit_time=2026-08-08 05:06:58Z; expires=Sat, 08-Aug-2026 05:07:58 GMT; path=/; secure; HttpOnly
+x-ms-service-request-id: 77513978-d4b3-475d-8bc7-6d146611045a
+strict-transport-security: max-age=31536000; includeSubDomains
+req_id: 77513978-d4b3-475d-8bc7-6d146611045a
+authactivityid: 7cd307e9-24f9-4e7f-abe5-450867be1190
+x-ms-dop-hint: 64
+x-ms-ratelimit-time-remaining-xrm-requests: 1,168.53
+x-ms-ratelimit-burst-remaining-xrm-requests: 7996
+odata-version: 4.0
+odata-entityid: https://jm1hq.crm.dynamics.com/api/data/v9.2/systemusers(761a6aee-e692-f111-8077-000d3a14673b)
+x-content-type-options: nosniff
+x-source: 19117725437493925162141461301781299822610023958291316506417711322991209142236113111
+public: OPTIONS,GET,HEAD,POST
+set-cookie: ARRAffinity=8d0439f9f248fff83ed3d64329b38cffef26496302b88dd76ff00c46734cb26ef16921585aa9d18b9e2a3e899a56f8075a9e4d1d722668af0a49aafc12547a0608DEF50F064F764B0000001302195949; path=/; secure; HttpOnly
+x-source: 219176180165962431996360219194562391881792244615712613119944187571582212351322924366
+date: Sat, 08 Aug 2026 05:06:58 GMT

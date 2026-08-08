@@ -1,0 +1,22 @@
+HTTP/2 204
+cache-control: no-cache
+allow: OPTIONS,GET,HEAD,POST
+content-type: text/html; charset=utf-8
+expires: -1
+set-cookie: ARRAffinity=88a1244f3bd980dccab7ed34eef27c700ef30e60b159982632ca79116f8aa418f16921585aa9d18b9e2a3e899a56f8075a9e4d1d722668af0a49aafc12547a0608DEF50F1B3E5E680000002116332062; path=/; secure; HttpOnly
+set-cookie: ReqClientId=e168991d-1ee4-4e74-bd42-8c795b2cbfba; expires=Sat, 08-Aug-2076 05:07:16 GMT; path=/; secure; HttpOnly
+set-cookie: orgId=9dafb403-b493-f011-a700-000d3a106f37; expires=Sat, 08-Aug-2076 05:07:16 GMT; path=/; secure; HttpOnly
+x-ms-service-request-id: 415409a2-0e61-4f0f-8d1a-bfd5bc81229a
+strict-transport-security: max-age=31536000; includeSubDomains
+req_id: 415409a2-0e61-4f0f-8d1a-bfd5bc81229a
+authactivityid: ade08069-b461-4857-b39e-01e811bc37bb
+x-ms-dop-hint: 64
+x-ms-ratelimit-time-remaining-xrm-requests: 1,199.61
+x-ms-ratelimit-burst-remaining-xrm-requests: 7995
+odata-version: 4.0
+x-content-type-options: nosniff
+x-source: 36148182781162331591961712049153212111651512522541351906110312514124221112227109240142157
+public: OPTIONS,GET,HEAD,POST
+set-cookie: ARRAffinity=88a1244f3bd980dccab7ed34eef27c700ef30e60b159982632ca79116f8aa418f16921585aa9d18b9e2a3e899a56f8075a9e4d1d722668af0a49aafc12547a0608DEF50F1B3E5E680000002116332062; path=/; secure; HttpOnly
+x-source: 1262434017418337152621731081991061114377236215502100196204576324195482411004214237
+date: Sat, 08 Aug 2026 05:07:30 GMT

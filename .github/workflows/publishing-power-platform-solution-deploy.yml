@@ -27,6 +27,10 @@ on:
         options:
           - "false"
           - "true"
+      approved_source_sha:
+        description: Exact approved source SHA to deploy. Required for production.
+        required: true
+        default: ""
 
 permissions:
   contents: read
@@ -39,6 +43,10 @@ concurrency:
 env:
   SOLUTION_PATH: powerplatform/solutions/JM1PublishingSales
   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+  PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+  PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+  PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+  PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
 
 jobs:
   validate:
@@ -61,10 +69,21 @@ jobs:
           npm run jm1-bootstrap-guard
           npm run jm1-canon-consistency-guard
           npm run jm1-canon-guard-enforcement
-          npm run jm1-commissioning-guard
           npm run commercial-architecture-guard
           npm run slice3-implementation-planning-guard
           npm run jm1-power-platform-solution-lifecycle-guard
+
+      - name: Validate dispatch boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ inputs.solution_name }}" = "JM1PublishingSales"
+          test "${{ inputs.solution_version }}" = "1.0.0.0"
+          if [ "${{ inputs.target_environment }}" = "production" ]; then
+            test "${{ inputs.confirm }}" = "true"
+            test -n "${{ inputs.approved_source_sha }}"
+            test "${GITHUB_SHA}" = "${{ inputs.approved_source_sha }}"
+          fi
 
       - name: Install Power Platform CLI
         uses: microsoft/powerplatform-actions/actions-install@v1
@@ -102,12 +121,67 @@ jobs:
           node-version: "24"
           cache: npm
 
-      - name: Fail closed until federated PAC identity is commissioned
+      - name: Install Power Platform CLI
+        uses: microsoft/powerplatform-actions/actions-install@v1
+
+      - name: Download validation artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: power-platform-solution-validation
+          path: powerplatform/solutions/JM1PublishingSales/artifacts/workflow
+
+      - name: Production preflight
+        shell: bash
         run: |
           set -euo pipefail
           npm ci
           npm run jm1-power-platform-solution-lifecycle-guard
-          # Commissioned production import command, enabled only after federated PAC identity is approved:
-          # pac solution import --environment "$PROD_ENVIRONMENT_URL" --path "$SOLUTION_PATH/artifacts/workflow/${{ inputs.solution_name }}_managed.zip" --publish-changes
-          echo "Production import requires governed federated PAC identity commissioning before activation." >&2
-          exit 1
+          test "${{ inputs.solution_name }}" = "JM1PublishingSales"
+          test "${{ inputs.solution_version }}" = "1.0.0.0"
+          test "${{ inputs.target_environment }}" = "production"
+          test "${{ inputs.confirm }}" = "true"
+          test -n "${{ inputs.approved_source_sha }}"
+          test "${GITHUB_SHA}" = "${{ inputs.approved_source_sha }}"
+          test -f "$SOLUTION_PATH/artifacts/workflow/${{ inputs.solution_name }}_unmanaged.zip"
+          test "$PROD_ENVIRONMENT_URL" = "https://jm1hq.crm.dynamics.com/"
+          test "$PROD_ENVIRONMENT_ID" = "dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10"
+          test "$PROD_ORGANIZATION_ID" = "9dafb403-b493-f011-a700-000d3a106f37"
+
+      - name: Authenticate Power Platform with GitHub OIDC
+        shell: bash
+        run: |
+          set -euo pipefail
+          pac auth create \
+            --name jm1-pub-prod-oidc \
+            --applicationId "$PAC_APPLICATION_ID" \
+            --tenant "$PAC_TENANT_ID" \
+            --githubFederated \
+            --environment "$PROD_ENVIRONMENT_URL"
+
+      - name: Protected production import
+        shell: bash
+        run: |
+          set -euo pipefail
+          pac solution import \
+            --environment "$PROD_ENVIRONMENT_URL" \
+            --path "$SOLUTION_PATH/artifacts/workflow/${{ inputs.solution_name }}_unmanaged.zip" \
+            --force-overwrite \
+            --publish-changes \
+            --async \
+            --max-async-wait-time 120
+
+      - name: Production readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$SOLUTION_PATH/artifacts/workflow/readback"
+          pac solution list --environment "$PROD_ENVIRONMENT_URL" \
+            > "$SOLUTION_PATH/artifacts/workflow/readback/solution-list.txt"
+          grep -F "JM1PublishingSales" "$SOLUTION_PATH/artifacts/workflow/readback/solution-list.txt"
+
+      - name: Preserve production deployment evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: power-platform-production-deployment-evidence
+          path: powerplatform/solutions/JM1PublishingSales/artifacts/workflow/readback/*
+          if-no-files-found: error

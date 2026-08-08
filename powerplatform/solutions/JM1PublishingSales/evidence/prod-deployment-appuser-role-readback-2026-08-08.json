@@ -1,0 +1,1 @@
+{"@odata.context":"https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#roles(roleid,name,_businessunitid_value)","value":[{"@odata.etag":"W/\"37449818\"","roleid":"1e8ed1e7-e690-f011-b4cc-7c1e525b3eb3","_businessunitid_value":"b589d1e7-e690-f011-b4cc-7c1e525b3eb3","name":"System Customizer"}]}
