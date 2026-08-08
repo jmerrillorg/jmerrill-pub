@@ -120,6 +120,6 @@ PROD IMPORT PROOF: NOT RUN / BLOCKED BY UNCOMMISSIONED FEDERATED PAC IDENTITY
 
 Blocker code:
 
-`BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED`
+`BLOCKED — PROTECTED WORKFLOW NOT DISPATCHABLE UNTIL DEFAULT-BRANCH WORKFLOW EXISTS`
 
-The original JM1-Dev dependency register contains 335 unique missing required components and 692 dependency edges. Boundary pruning and prerequisite recovery reduced the required Active-layer source repair to four governed components. JM1-Enterprise-Dev was created as the Dynamics-capable sandbox, `msdyn_SalesApp` was installed, and the pruned `JM1PublishingSales` package imported and published successfully there. Tranche 1 runtime implementation has not resumed because protected production deployment identity and Power Apps / Approvals ownership proof remain open.
+The original JM1-Dev dependency register contains 335 unique missing required components and 692 dependency edges. Boundary pruning and prerequisite recovery reduced the required Active-layer source repair to four governed components. JM1-Enterprise-Dev was created as the Dynamics-capable sandbox, `msdyn_SalesApp` was installed, and the pruned `JM1PublishingSales` package imported and published successfully there. The protected production deployment identity is now commissioned. Tranche 1 runtime implementation has not resumed because protected workflow dispatch and Power Apps / Approvals ownership proof remain open.

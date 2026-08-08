@@ -39,7 +39,7 @@ Sandbox decision: `JM1-ENTERPRISE-DEV ESTABLISHED / DEV IMPORT PASS`.
 
 The threshold analysis showed that the high-cost dependency threshold was not crossed after pruning. Executive authority then allowed a governed Dynamics-capable sandbox rather than JM1-Dev rehabilitation. JM1-Enterprise-Dev was created, Dynamics Sales was installed, source-boundary prerequisites were recovered, and JM1PublishingSales import/publish passed.
 
-Active stop: `BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED`.
+Active stop: `BLOCKED — PROTECTED WORKFLOW NOT DISPATCHABLE UNTIL DEFAULT-BRANCH WORKFLOW EXISTS`.
 
 ## Stop Conditions Preserved
 

@@ -58,3 +58,17 @@ Last verified: 2026-08-07T23:41:26.306557+00:00
 | Enterprise DEV unpack | `powerplatform/solutions/JM1PublishingSales/evidence/unpack-enterprise-dev-jm1publishingsales-2026-08-08.log` | PASS |
 | Enterprise DEV optionset readback | `powerplatform/solutions/JM1PublishingSales/evidence/enterprise-dev-optionset-readback-2026-08-08.json` | PASS |
 | Enterprise DEV business record sample | `powerplatform/solutions/JM1PublishingSales/evidence/enterprise-dev-business-record-sample-readback-2026-08-08.log` | PASS / sampled business tables empty |
+| Production deployment identity | `34-production-deployment-identity.md` | COMMISSIONED |
+| Deployment least privilege | `35-deployment-least-privilege.md` | VERIFIED FOR INITIAL ROLE SELECTION / PRODUCTION IMPORT NOT PROVEN |
+| Protected production deployment proof | `36-protected-production-deployment-proof.md` | BLOCKED / workflow not on default branch |
+| Power Apps ownership | `37-power-apps-ownership.md` | NOT CLOSED |
+| Approvals workflow ownership | `38-approvals-workflow-ownership.md` | NOT CLOSED |
+| Connection reference readback | `39-connection-reference-readback.md` | PARTIAL / runtime connections not created |
+| Stripe projection final disposition | `40-stripe-projection-final-disposition.md` | EXTEND_EXISTING |
+| Five-hold closeout | `41-five-hold-closeout.md` | 3 / 5 CLOSED |
+| Tranche 1 runtime resumption | `42-tranche1-runtime-resumption.md` | NOT RESUMED |
+| GitHub Power Platform production environment | `powerplatform/solutions/JM1PublishingSales/evidence/github-power-platform-production-environment-readback-2026-08-08.json` | PASS / branch policy present |
+| Azure OIDC federated credential | `powerplatform/solutions/JM1PublishingSales/evidence/azure-oidc-federated-credential-readback-2026-08-08.json` | PASS |
+| Dataverse deployment app user | `powerplatform/solutions/JM1PublishingSales/evidence/prod-deployment-appuser-final-readback-2026-08-08.json` | PASS |
+| Dataverse deployment app user role | `powerplatform/solutions/JM1PublishingSales/evidence/prod-deployment-appuser-role-readback-2026-08-08.json` | PASS / System Customizer |
+| Protected workflow dispatch attempt | `powerplatform/solutions/JM1PublishingSales/evidence/github-protected-workflow-dispatch-failure-2026-08-08.log` | BLOCKED / workflow not on default branch |

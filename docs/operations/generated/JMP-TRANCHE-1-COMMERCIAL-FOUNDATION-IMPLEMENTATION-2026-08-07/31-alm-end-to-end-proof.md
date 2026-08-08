@@ -19,13 +19,13 @@ Last verified: 2026-08-08T04:34:00Z
 
 Protected production deployment proof: NOT RUN / BLOCKED.
 
-Protected production deployment identity: NOT COMMISSIONED.
+Protected production deployment identity: COMMISSIONED.
 
-Reason: `.github/workflows/publishing-power-platform-solution-deploy.yml` intentionally fails closed in the production-import job until governed federated PAC identity commissioning is complete.
+Reason: `.github/workflows/publishing-power-platform-solution-deploy.yml` is patched for governed GitHub OIDC authentication, but GitHub Actions rejected dispatch because the workflow file does not exist on the default branch.
 
-The workflow contains:
+Dispatch blocker:
 
-`Production import requires governed federated PAC identity commissioning before activation.`
+`HTTP 404: workflow publishing-power-platform-solution-deploy.yml not found on the default branch`
 
 ## Status
 

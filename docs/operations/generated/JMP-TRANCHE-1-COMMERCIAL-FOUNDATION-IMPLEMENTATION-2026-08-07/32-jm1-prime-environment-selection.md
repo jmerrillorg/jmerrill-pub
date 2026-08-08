@@ -23,7 +23,8 @@ JM1-Enterprise-Dev is the canonical development target for Dynamics-capable, sol
 | Deployment workflow | FOUND / FAIL-CLOSED FOR PRODUCTION |
 | Connection references | NONE IN BASELINE |
 | Environment variables | NONE IN BASELINE |
-| Deployment identity | NOT COMMISSIONED FOR PRODUCTION |
+| Deployment identity | COMMISSIONED |
+| Protected workflow dispatch | BLOCKED UNTIL DEFAULT-BRANCH WORKFLOW EXISTS |
 | Stripe projection | EXTEND_EXISTING |
 
 ## Status

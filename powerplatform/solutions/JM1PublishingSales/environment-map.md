@@ -19,6 +19,6 @@ Suitable Dynamics-capable development environment ready: YES
 
 Remaining lifecycle blocker:
 
-`BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED`
+`BLOCKED — PROTECTED WORKFLOW NOT DISPATCHABLE UNTIL DEFAULT-BRANCH WORKFLOW EXISTS`
 
-JM1-Enterprise-Dev is ready for DEV work. Full ALM proof and Tranche 1 runtime resumption remain blocked until the protected production deployment identity and ownership proof are closed.
+JM1-Enterprise-Dev is ready for DEV work. The protected production deployment identity is commissioned. Full ALM proof and Tranche 1 runtime resumption remain blocked until the protected workflow is dispatchable from GitHub Actions and ownership proof is closed.

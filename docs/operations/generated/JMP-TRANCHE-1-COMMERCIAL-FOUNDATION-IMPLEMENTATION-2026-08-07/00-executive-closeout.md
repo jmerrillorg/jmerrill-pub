@@ -4,15 +4,15 @@ Last verified: 2026-08-08T04:34:00Z
 
 ## Classification
 
-BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED / NO CLIENT MUTATION
+BLOCKED — PROTECTED WORKFLOW NOT DISPATCHABLE UNTIL DEFAULT-BRANCH WORKFLOW EXISTS / NO CLIENT MUTATION
 
 PR #438 originally stopped fail-closed because no governed Power Platform lifecycle was discoverable. This update establishes the reusable repo-side lifecycle standard, source-controls the `JM1PublishingSales` baseline, adds a lifecycle guard, adds a protected deployment workflow skeleton, creates the governed Dynamics-capable development sandbox, and proves DEV import in that sandbox.
 
-The deployment lifecycle is not yet fully proven because protected production import remains fail-closed until the governed federated PAC deployment identity is commissioned. `JM1-Dev` remains unsuitable for Dynamics-dependent Tranche 1 work, but the active DEV blocker is closed by `JM1-Enterprise-Dev`.
+The deployment identity is now commissioned through the existing `jm1-pub-github-actions-oidc` application and dedicated GitHub environment `jm1-power-platform-production`. Protected production proof remains blocked because GitHub will not dispatch `publishing-power-platform-solution-deploy.yml` from the PR branch until the workflow exists on the default branch. `JM1-Dev` remains unsuitable for Dynamics-dependent Tranche 1 work, but the active DEV blocker is closed by `JM1-Enterprise-Dev`.
 
 ## Current Blocker
 
-`BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED`
+`BLOCKED — PROTECTED WORKFLOW NOT DISPATCHABLE UNTIL DEFAULT-BRANCH WORKFLOW EXISTS`
 
 ## What Changed
 
@@ -29,9 +29,9 @@ The deployment lifecycle is not yet fully proven because protected production im
 ## Still Not Completed
 
 - Dev import proof: PASS in JM1-Enterprise-Dev.
-- Protected production import proof: NOT RUN / BLOCKED by uncommissioned federated PAC identity.
+- Protected production import proof: NOT RUN / BLOCKED by GitHub workflow-dispatch default-branch requirement.
 - Internal deployment proof: NOT RUN.
-- PR #438 holds closed: 3 / 5; production deployment identity and Power Apps / Approvals ownership remain open.
+- PR #438 holds closed: 3 / 5; protected production workflow proof and Power Apps / Approvals ownership remain open.
 - Tranche 1 Phase 0 resumed: NO.
 
 ## Mutation Summary
@@ -51,7 +51,7 @@ The deployment lifecycle is not yet fully proven because protected production im
 
 ## Dependency-Parity Update
 
-Dependency register: COMPLETE. Unknown classifications: 0. JM1-Enterprise-Dev import passed; Tranche 1 implementation did not resume because full ALM proof remains blocked by protected production deployment identity and ownership proof.
+Dependency register: COMPLETE. Unknown classifications: 0. JM1-Enterprise-Dev import passed; Tranche 1 implementation did not resume because full ALM proof remains blocked by protected workflow dispatch and ownership proof.
 
 ## Remediation Attempt Update
 

@@ -109,7 +109,7 @@ if (existsSync(sandboxThresholdsPath)) {
     'Required unique dependency groups | 5 | 100 | PASS',
     'Required ungoverned JM1 Active-layer prerequisites | 4 | 12 | PASS',
     'JM1-ENTERPRISE-DEV ESTABLISHED / DEV IMPORT PASS',
-    'BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED',
+    'BLOCKED — PROTECTED WORKFLOW NOT DISPATCHABLE UNTIL DEFAULT-BRANCH WORKFLOW EXISTS',
   ]) {
     if (!thresholds.includes(text)) errors.push(`sandbox_thresholds_missing:${text}`)
   }
@@ -132,7 +132,7 @@ if (existsSync(almProofPath)) {
   const alm = readFileSync(almProofPath, 'utf8')
   for (const text of [
     'Full ALM lifecycle proof: NOT COMPLETE',
-    'Protected production deployment identity: NOT COMMISSIONED',
+    'Protected production deployment identity: COMMISSIONED',
     'Production import executed: NO',
   ]) {
     if (!alm.includes(text)) errors.push(`alm_proof_missing:${text}`)
