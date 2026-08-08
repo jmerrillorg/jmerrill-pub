@@ -1,0 +1,43 @@
+
+Unpacking Solution...
+
+Extracting /Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-tranche1-commercial-implementation/powerplatform/solutions/JM1PublishingSales/artifacts/packed/JM1PublishingSales_enterprise_dev_export_unmanaged.zip to /Users/jmerrillone/Developer/codex-worktrees/jmerrill-pub-tranche1-commercial-implementation/powerplatform/solutions/JM1PublishingSales/artifacts/unpacked-enterprise-dev-export
+
+Skipping localization
+Processing Component: Entities
+ - jm1pub_publishingopportunityprocess
+ - jm1pub_PublishingSubmission
+ - Lead
+ - Opportunity
+ - Quote
+Processing Component: Workflows
+ - Publishing Opportunity Process
+Processing Component: EntityRelationships
+Processing Component: optionsets
+ - jm1_manuscripttype
+ - jm1pub_budgetcomfortlevelchoice
+ - jm1pub_contractstatus
+ - jm1pub_desiredpublishingtimelinechoice
+ - jm1pub_editorialeffort
+ - jm1pub_goalschoice
+ - jm1pub_imprint
+ - jm1pub_jm1brand
+ - jm1pub_leadqualitychoice
+ - jm1pub_preferredformat
+ - jm1pub_publishingservicetypechoice
+ - jm1pub_reviewrecommendation
+ - jm1pub_reviewstatus
+ - jm1pub_risklevel
+ - jm1pub_stageatsubmissionchoice
+ - jm1pub_targetaudiencechoice
+ - jm1pub_websitesourcechoice
+ - jm1pub_worktypechoice
+Processing Component: InteractionCentricDashboards
+ - {9a14ebb4-143e-e711-80e1-00155d871bb4}
+ - {db86e637-863c-e711-80e0-00155d871bb4}
+ - {f7e6d29b-1e3e-e711-80e1-00155d871bb4}
+
+Unmanaged Extract complete.
+
+
+Unpacked Solution.

@@ -1,10 +1,11 @@
 # JM1PublishingSales Environment Map
 
-Last verified: 2026-08-07
+Last verified: 2026-08-08
 
 | Environment | URL | Type | Role | Dataverse | Notes |
 | --- | --- | --- | --- | --- | --- |
 | JM1-Dev | `https://org52409ff2.crm.dynamics.com/` | Sandbox | DEV target attempted | YES | Existing sandbox. Boundary pruning succeeded, but the pruned package failed because the Dynamics Sales baseline is missing. PAC installation of `msdyn_SalesApp`, `msdynce_Sales`, `msdynce_LeadManagement`, and `msdynce_ProductManagement` failed. |
+| JM1-Enterprise-Dev | `https://jm1enterprisedev.crm.dynamics.com/` | Sandbox | Canonical Dynamics-capable DEV target | YES | Created 2026-08-08 for Dynamics-dependent JM1PublishingSales work. Dynamics Sales app installed. JM1PublishingSales import and publish passed. |
 | JM1-Test | `https://jm1test.crm.dynamics.com/` | Sandbox | TEST/UAT candidate | YES | Existing sandbox. Checked read-only; not parity and has fewer JM1 prerequisite solutions than JM1-Dev. |
 | JM1-Core | `https://jm1hq.crm.dynamics.com/` | Production | PROD | YES | Production system of record for JM1-Core. |
 | JM1-CRM-Core | `https://jm1crm.crm.dynamics.com/` | Default | Not selected | YES | Default environment, not approved as Tranche 1 DEV. |
@@ -14,10 +15,10 @@ Last verified: 2026-08-07
 
 Development environment exists: YES
 
-Suitable development environment ready: NO
+Suitable Dynamics-capable development environment ready: YES
 
-Blocker:
+Remaining lifecycle blocker:
 
-`BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED`
+`BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED`
 
-A different approved sandbox with the Dynamics Sales baseline, or tenant/admin remediation outside this PAC path, is required before Tranche 1 Power Platform implementation resumes.
+JM1-Enterprise-Dev is ready for DEV work. Full ALM proof and Tranche 1 runtime resumption remain blocked until the protected production deployment identity and ownership proof are closed.

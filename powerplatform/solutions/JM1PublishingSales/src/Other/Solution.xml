@@ -86,11 +86,13 @@
       <RootComponent type="1" schemaName="opportunity" behavior="0" />
       <RootComponent type="1" schemaName="quote" behavior="0" />
       <RootComponent type="29" id="{5242571d-d8c6-f011-bbd3-6045bda81e56}" behavior="0" />
+      <RootComponent type="9" schemaName="jm1_manuscripttype" behavior="0" />
       <RootComponent type="9" schemaName="jm1pub_budgetcomfortlevelchoice" behavior="0" />
       <RootComponent type="9" schemaName="jm1pub_contractstatus" behavior="0" />
       <RootComponent type="9" schemaName="jm1pub_desiredpublishingtimelinechoice" behavior="0" />
       <RootComponent type="9" schemaName="jm1pub_editorialeffort" behavior="0" />
       <RootComponent type="9" schemaName="jm1pub_goalschoice" behavior="0" />
+      <RootComponent type="9" schemaName="jm1pub_imprint" behavior="0" />
       <RootComponent type="9" schemaName="jm1pub_jm1brand" behavior="0" />
       <RootComponent type="9" schemaName="jm1pub_leadqualitychoice" behavior="0" />
       <RootComponent type="9" schemaName="jm1pub_preferredformat" behavior="0" />

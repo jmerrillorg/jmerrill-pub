@@ -1,6 +1,6 @@
 # JM1PublishingSales Solution Manifest
 
-Status: SOURCE-CONTROLLED PRUNED BASELINE / JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED
+Status: SOURCE-CONTROLLED PRUNED BASELINE / ENTERPRISE DEV IMPORT PROVEN / PRODUCTION DEPLOYMENT IDENTITY BLOCKED
 
 ## Solution
 
@@ -22,7 +22,8 @@ Current source baseline version: `1.0.0.0`
 
 | Lane | Environment | URL | Type | Environment ID | Status |
 | --- | --- | --- | --- | --- | --- |
-| DEV | JM1-Dev | `https://org52409ff2.crm.dynamics.com/` | Sandbox | `a4d2d3cf-af53-e38c-970b-c6e19f4da917` | FOUND / DYNAMICS SALES BASELINE NOT INSTALLABLE THROUGH PAC |
+| DEV | JM1-Enterprise-Dev | `https://jm1enterprisedev.crm.dynamics.com/` | Sandbox | `6535a04d-307a-e6f1-bb79-5eaeb5121c1b` | CANONICAL DEV / DYNAMICS SALES BASELINE INSTALLED / IMPORT PASS |
+| Legacy DEV | JM1-Dev | `https://org52409ff2.crm.dynamics.com/` | Sandbox | `a4d2d3cf-af53-e38c-970b-c6e19f4da917` | RETAINED / NOT SUITABLE FOR DYNAMICS-DEPENDENT TRANCHE 1 WORK |
 | TEST/UAT | JM1-Test | `https://jm1test.crm.dynamics.com/` | Sandbox | `251b8f38-5cea-e329-b9b2-3d34ba47dd1e` | FOUND / NOT PARITY |
 | PROD | JM1-Core | `https://jm1hq.crm.dynamics.com/` | Production | `dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10` | FOUND |
 
@@ -46,7 +47,7 @@ Current pruned baseline includes:
 - Publishing Submission;
 - Publishing Opportunity Process BPF entity;
 - Publishing Opportunity Process workflow;
-- Publishing option sets;
+- Publishing option sets, including `jm1pub_imprint` and `jm1_manuscripttype`;
 - pruned Tranche 1 Publishing Sales table customizations.
 
 Pruned from the production-exported boundary:
@@ -113,12 +114,12 @@ SOURCE CONTROL: ACTIVE
 
 PACKAGE VALIDATION: UNMANAGED PASS / MANAGED EXPORT PASS / MANAGED PACK FROM UNMANAGED SOURCE NOT APPLICABLE
 
-DEV IMPORT: BLOCKED BY MISSING DYNAMICS SALES BASELINE
+DEV IMPORT: PASS IN JM1-ENTERPRISE-DEV
 
-PROD IMPORT PROOF: NOT RUN
+PROD IMPORT PROOF: NOT RUN / BLOCKED BY UNCOMMISSIONED FEDERATED PAC IDENTITY
 
 Blocker code:
 
-`BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED`
+`BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED`
 
-The original dependency register contains 335 unique missing required components and 692 dependency edges. Boundary pruning reduced the Active-layer prerequisite burden, and the pruned package packed successfully. The pruned package still cannot import because JM1-Dev does not have an installable Dynamics Sales table/application baseline through the available PAC path.
+The original JM1-Dev dependency register contains 335 unique missing required components and 692 dependency edges. Boundary pruning and prerequisite recovery reduced the required Active-layer source repair to four governed components. JM1-Enterprise-Dev was created as the Dynamics-capable sandbox, `msdyn_SalesApp` was installed, and the pruned `JM1PublishingSales` package imported and published successfully there. Tranche 1 runtime implementation has not resumed because protected production deployment identity and Power Apps / Approvals ownership proof remain open.

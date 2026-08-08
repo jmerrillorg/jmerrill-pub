@@ -1,0 +1,10 @@
+Connected as jm1-admin@jmerrill.one
+
+Listing all environments from your tenant...
+Active Environment              Environment ID                       Environment Url                            Type       Organization ID
+*      JM1-Core                 dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10 https://jm1hq.crm.dynamics.com/            Production 9dafb403-b493-f011-a700-000d3a106f37
+       JM1-CRM-Core             352d075e-8e17-4169-9f8e-22e6946ce66d https://jm1crm.crm.dynamics.com/           Default    d2a5163f-5514-ee11-a66b-6045bd06e00c
+       JM1-Dev                  a4d2d3cf-af53-e38c-970b-c6e19f4da917 https://org52409ff2.crm.dynamics.com/      Sandbox    579864ae-44cc-f011-95c7-000d3a37fe06
+       JM1-Enterprise-Dev       6535a04d-307a-e6f1-bb79-5eaeb5121c1b https://jm1enterprisedev.crm.dynamics.com/ Sandbox    45b44b7b-6192-f111-9969-6045bd01bf18
+       JM1-Test                 251b8f38-5cea-e329-b9b2-3d34ba47dd1e https://jm1test.crm.dynamics.com/          Sandbox    bb7a9d9e-8e73-f111-b27b-000d3a31ff17
+       One Dynamics Environment 27b55584-b27f-ea62-84ef-435278eaba1b https://jmerrillone.crm.dynamics.com/      Production e50cc18a-080a-f011-9aed-000d3a106b12

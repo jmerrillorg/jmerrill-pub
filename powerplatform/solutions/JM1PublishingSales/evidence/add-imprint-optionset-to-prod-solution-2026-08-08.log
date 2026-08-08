@@ -1,0 +1,8 @@
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Core
+Microsoft PowerPlatform CLI
+Version: 1.49.4+g406813e (.NET 10.0.9)
+Online documentation: https://aka.ms/PowerPlatformCLI
+Feedback, Suggestions, Issues: https://github.com/microsoft/powerplatform-build-tools/discussions
+
+Error: ************ Exception getting metadata info from Dataverse   : Failed to resolve entity metadata for jm1pub_imprint.

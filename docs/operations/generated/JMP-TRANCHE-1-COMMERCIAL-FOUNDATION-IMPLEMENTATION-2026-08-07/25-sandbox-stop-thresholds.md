@@ -4,7 +4,7 @@ Last verified: 2026-08-08T04:20:00+00:00
 
 Scope: PR #438 Tranche 1 technical evidence only.
 
-This record adds the sandbox stop thresholds required before any further prerequisite import or sandbox strategy work. It does not authorize a new sandbox, production cloning, Dataverse mutation, Dynamics configuration, Business Central posting, Stripe mutation, workflow activation, author communication, Tranche 2 work, or client-title automation thaw.
+This record preserves the sandbox stop thresholds and records the approved sandbox outcome. It does not authorize production cloning, production import, Business Central posting, Stripe mutation, workflow activation, author communication, Tranche 2 work, or client-title automation thaw.
 
 ## Original Dependency Baseline
 
@@ -20,27 +20,29 @@ The pruning pass removed Account/Contact production-export residue, inherited in
 
 | Measure | Required after pruning | Threshold | Result |
 | --- | ---: | ---: | --- |
-| Required unique dependency groups | 4 | 100 | PASS |
-| Required ungoverned JM1 Active-layer prerequisites | 3 | 12 | PASS |
+| Required unique dependency groups | 5 | 100 | PASS |
+| Required ungoverned JM1 Active-layer prerequisites | 4 | 12 | PASS |
 
-The four required dependency groups are:
+The five required dependency groups are:
 
 1. Microsoft Dynamics Sales table/application baseline.
 2. `jm1pub_submission`.
 3. `jm1pub_editorialdiagnostic`.
 4. `jm1pub_imprint`.
+5. `jm1_manuscripttype` / `opportunity.jm1pub_manuscripttype`, required by the preserved Publishing Opportunity Process BPF.
 
 ## Sandbox Decision
 
 Threshold result: PASS.
 
-Sandbox decision: `BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED`.
+Sandbox decision: `JM1-ENTERPRISE-DEV ESTABLISHED / DEV IMPORT PASS`.
 
-The threshold analysis does not authorize creation of a new sandbox. It shows that the high-cost dependency threshold was not crossed after pruning. The active stop remains the technical installability failure: JM1-Dev does not have the required Dynamics Sales baseline, and the approved PAC install attempts did not make that baseline available.
+The threshold analysis showed that the high-cost dependency threshold was not crossed after pruning. Executive authority then allowed a governed Dynamics-capable sandbox rather than JM1-Dev rehabilitation. JM1-Enterprise-Dev was created, Dynamics Sales was installed, source-boundary prerequisites were recovered, and JM1PublishingSales import/publish passed.
+
+Active stop: `BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED`.
 
 ## Stop Conditions Preserved
 
-- Do not create a new sandbox before executive sandbox ruling.
 - Do not clone production.
 - Do not import broad unrelated first-party applications.
 - Do not manually reconstruct unmanaged production components.

@@ -14,6 +14,9 @@ const required = [
   `${solutionRoot}/evidence/dependency-register-jm1-dev-2026-08-07.csv`,
   `${solutionRoot}/evidence/import-dev-pruned-unmanaged-2026-08-07.log`,
   `${solutionRoot}/evidence/install-dev-dynamics-sales-app-2026-08-07.log`,
+  `${solutionRoot}/evidence/import-enterprise-dev-final-2026-08-08.log`,
+  `${solutionRoot}/evidence/export-enterprise-dev-jm1publishingsales-2026-08-08.log`,
+  `${solutionRoot}/evidence/unpack-enterprise-dev-jm1publishingsales-2026-08-08.log`,
   `${solutionRoot}/src/Other/Solution.xml`,
   `${solutionRoot}/src/Entities/Lead/Entity.xml`,
   `${solutionRoot}/src/Entities/Opportunity/Entity.xml`,
@@ -34,9 +37,20 @@ const required = [
   `${trancheEvidenceRoot}/23-stripe-projection-disposition.md`,
   `${trancheEvidenceRoot}/24-tranche1-resumption-record.md`,
   `${trancheEvidenceRoot}/25-sandbox-stop-thresholds.md`,
+  `${trancheEvidenceRoot}/25-enterprise-dev-environment-decision.md`,
+  `${trancheEvidenceRoot}/26-microsoft-first-party-baseline.md`,
+  `${trancheEvidenceRoot}/27-jm1-prerequisite-governance.md`,
+  `${trancheEvidenceRoot}/28-enterprise-dev-import-proof.md`,
+  `${trancheEvidenceRoot}/29-environment-bindings.md`,
+  `${trancheEvidenceRoot}/30-power-apps-approvals-ownership.md`,
+  `${trancheEvidenceRoot}/31-alm-end-to-end-proof.md`,
+  `${trancheEvidenceRoot}/32-jm1-prime-environment-selection.md`,
+  `${trancheEvidenceRoot}/33-tranche1-resumption-record.md`,
   'docs/governance/JM1-PUB-CAPABILITY-REGISTER-MAINTENANCE-v1.0.md',
   'scripts/jm1_prune_publishing_sales_solution.mjs',
   '.github/workflows/publishing-power-platform-solution-deploy.yml',
+  `${solutionRoot}/src/OptionSets/jm1pub_imprint.xml`,
+  `${solutionRoot}/src/OptionSets/jm1_manuscripttype.xml`,
 ]
 
 const errors = []
@@ -77,9 +91,9 @@ if (existsSync(manifestPath)) {
   const manifest = readFileSync(manifestPath, 'utf8')
   for (const text of [
     'JM1PublishingSales',
-    'JM1-Dev',
+    'JM1-Enterprise-Dev',
     'JM1-Core',
-    'JM1-DEV UNSUITABLE',
+    'PRODUCTION DEPLOYMENT IDENTITY BLOCKED',
     'EXTEND_EXISTING',
   ]) {
     if (!manifest.includes(text)) errors.push(`manifest_missing:${text}`)
@@ -92,11 +106,36 @@ if (existsSync(sandboxThresholdsPath)) {
   for (const text of [
     'Original unique dependencies | 335',
     'Original ungoverned JM1 Active-layer prerequisites | 38',
-    'Required unique dependency groups | 4 | 100 | PASS',
-    'Required ungoverned JM1 Active-layer prerequisites | 3 | 12 | PASS',
-    'BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED',
+    'Required unique dependency groups | 5 | 100 | PASS',
+    'Required ungoverned JM1 Active-layer prerequisites | 4 | 12 | PASS',
+    'JM1-ENTERPRISE-DEV ESTABLISHED / DEV IMPORT PASS',
+    'BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED',
   ]) {
     if (!thresholds.includes(text)) errors.push(`sandbox_thresholds_missing:${text}`)
+  }
+}
+
+const enterpriseDevProofPath = `${trancheEvidenceRoot}/28-enterprise-dev-import-proof.md`
+if (existsSync(enterpriseDevProofPath)) {
+  const proof = readFileSync(enterpriseDevProofPath, 'utf8')
+  for (const text of [
+    'JM1PublishingSales DEV IMPORT PASS',
+    'JM1-Enterprise-Dev',
+    'Production client data copied: 0',
+  ]) {
+    if (!proof.includes(text)) errors.push(`enterprise_dev_proof_missing:${text}`)
+  }
+}
+
+const almProofPath = `${trancheEvidenceRoot}/31-alm-end-to-end-proof.md`
+if (existsSync(almProofPath)) {
+  const alm = readFileSync(almProofPath, 'utf8')
+  for (const text of [
+    'Full ALM lifecycle proof: NOT COMPLETE',
+    'Protected production deployment identity: NOT COMMISSIONED',
+    'Production import executed: NO',
+  ]) {
+    if (!alm.includes(text)) errors.push(`alm_proof_missing:${text}`)
   }
 }
 

@@ -1,18 +1,18 @@
 # Executive Closeout
 
-Last verified: 2026-08-07T23:42:44.669312+00:00
+Last verified: 2026-08-08T04:34:00Z
 
 ## Classification
 
-BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED / NO CLIENT MUTATION
+BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED / NO CLIENT MUTATION
 
-PR #438 originally stopped fail-closed because no governed Power Platform lifecycle was discoverable. This update establishes the reusable repo-side lifecycle standard, source-controls the `JM1PublishingSales` baseline, adds a lifecycle guard, and adds a protected deployment workflow skeleton.
+PR #438 originally stopped fail-closed because no governed Power Platform lifecycle was discoverable. This update establishes the reusable repo-side lifecycle standard, source-controls the `JM1PublishingSales` baseline, adds a lifecycle guard, adds a protected deployment workflow skeleton, creates the governed Dynamics-capable development sandbox, and proves DEV import in that sandbox.
 
-The deployment lifecycle is not yet fully proven because `JM1-Dev` cannot import the current `JM1PublishingSales` baseline. The fresh import rerun produced 692 missing dependency edges across 335 unique required components, including Tranche 1-aligned Sales prerequisites, broad non-Tranche-1 first-party import drag, and 38 JM1 Active-layer prerequisites without governed packages located in this repository.
+The deployment lifecycle is not yet fully proven because protected production import remains fail-closed until the governed federated PAC deployment identity is commissioned. `JM1-Dev` remains unsuitable for Dynamics-dependent Tranche 1 work, but the active DEV blocker is closed by `JM1-Enterprise-Dev`.
 
 ## Current Blocker
 
-`BLOCKED — JM1-DEV UNSUITABLE / NEW GOVERNED SANDBOX REQUIRED`
+`BLOCKED — PROTECTED PRODUCTION DEPLOYMENT IDENTITY NOT COMMISSIONED`
 
 ## What Changed
 
@@ -28,15 +28,16 @@ The deployment lifecycle is not yet fully proven because `JM1-Dev` cannot import
 
 ## Still Not Completed
 
-- Dev import proof: BLOCKED.
-- Protected production import proof: NOT RUN.
+- Dev import proof: PASS in JM1-Enterprise-Dev.
+- Protected production import proof: NOT RUN / BLOCKED by uncommissioned federated PAC identity.
 - Internal deployment proof: NOT RUN.
-- PR #438 holds closed: 3 / 5; dependency parity remains blocking after register completion.
+- PR #438 holds closed: 3 / 5; production deployment identity and Power Apps / Approvals ownership remain open.
 - Tranche 1 Phase 0 resumed: NO.
 
 ## Mutation Summary
 
-- Production solution-boundary repair: added existing BPF entity `jm1pub_publishingopportunityprocess` to `JM1PublishingSales`.
+- Production solution-boundary repair: added existing BPF entity `jm1pub_publishingopportunityprocess` and existing option sets `jm1pub_imprint` and `jm1_manuscripttype` to `JM1PublishingSales`.
+- Development sandbox creation: JM1-Enterprise-Dev sandbox created with Dynamics Sales baseline.
 - Dynamics business/data mutations: 0.
 - Dataverse business/data mutations: 0.
 - Stripe mutations: 0.
@@ -50,10 +51,10 @@ The deployment lifecycle is not yet fully proven because `JM1-Dev` cannot import
 
 ## Dependency-Parity Update
 
-Dependency register: COMPLETE. Unknown classifications: 0. JM1-Dev import remains blocked; Tranche 1 implementation did not resume.
+Dependency register: COMPLETE. Unknown classifications: 0. JM1-Enterprise-Dev import passed; Tranche 1 implementation did not resume because full ALM proof remains blocked by protected production deployment identity and ownership proof.
 
 ## Remediation Attempt Update
 
 Last verified: 2026-08-08T03:36:37.099920+00:00
 
-Dependency pruning was performed and the pruned unmanaged package packed successfully. The pruned package import failed because JM1-Dev lacks the Dynamics Sales table/application baseline. Attempts to install `msdyn_SalesApp`, `msdynce_Sales`, `msdynce_LeadManagement`, and `msdynce_ProductManagement` through PAC failed. Tranche 1 implementation did not resume.
+Dependency pruning was performed and the pruned unmanaged package packed successfully. JM1-Enterprise-Dev was created as the Dynamics-capable sandbox, `msdyn_SalesApp` was installed, the source boundary was repaired, and JM1PublishingSales import/publish passed. Tranche 1 implementation did not resume because protected production deployment identity and ownership proof are not closed.

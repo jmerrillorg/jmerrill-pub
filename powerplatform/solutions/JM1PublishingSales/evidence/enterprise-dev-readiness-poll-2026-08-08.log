@@ -1,0 +1,65 @@
+--- poll 1 2026-08-08T03:50:19Z
+Active Environment              Environment ID                       Environment Url                            Type       Organization ID
+       JM1-Enterprise-Dev       6535a04d-307a-e6f1-bb79-5eaeb5121c1b https://jm1enterprisedev.crm.dynamics.com/ Sandbox    45b44b7b-6192-f111-9969-6045bd01bf18
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Enterprise-Dev
+
+Listing all Solutions from the current Dataverse organization...
+Unique Name Friendly Name                         Version Managed
+Cr16aab     Common Data Services Default Solution 1.0.0.0 False
+Default     Default Solution                      1.0     False
+
+--- poll 2 2026-08-08T03:51:33Z
+Active Environment              Environment ID                       Environment Url                            Type       Organization ID
+       JM1-Enterprise-Dev       6535a04d-307a-e6f1-bb79-5eaeb5121c1b https://jm1enterprisedev.crm.dynamics.com/ Sandbox    45b44b7b-6192-f111-9969-6045bd01bf18
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Enterprise-Dev
+
+Listing all Solutions from the current Dataverse organization...
+Unique Name Friendly Name                         Version Managed
+Cr16aab     Common Data Services Default Solution 1.0.0.0 False
+Default     Default Solution                      1.0     False
+
+--- poll 3 2026-08-08T03:52:10Z
+Active Environment              Environment ID                       Environment Url                            Type       Organization ID
+       JM1-Enterprise-Dev       6535a04d-307a-e6f1-bb79-5eaeb5121c1b https://jm1enterprisedev.crm.dynamics.com/ Sandbox    45b44b7b-6192-f111-9969-6045bd01bf18
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Enterprise-Dev
+
+Listing all Solutions from the current Dataverse organization...
+Unique Name Friendly Name                         Version Managed
+Cr16aab     Common Data Services Default Solution 1.0.0.0 False
+Default     Default Solution                      1.0     False
+
+--- poll 4 2026-08-08T03:52:45Z
+Active Environment              Environment ID                       Environment Url                            Type       Organization ID
+       JM1-Enterprise-Dev       6535a04d-307a-e6f1-bb79-5eaeb5121c1b https://jm1enterprisedev.crm.dynamics.com/ Sandbox    45b44b7b-6192-f111-9969-6045bd01bf18
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Enterprise-Dev
+
+Listing all Solutions from the current Dataverse organization...
+Unique Name Friendly Name                         Version Managed
+Cr16aab     Common Data Services Default Solution 1.0.0.0 False
+Default     Default Solution                      1.0     False
+
+--- poll 5 2026-08-08T03:53:20Z
+Active Environment              Environment ID                       Environment Url                            Type       Organization ID
+       JM1-Enterprise-Dev       6535a04d-307a-e6f1-bb79-5eaeb5121c1b https://jm1enterprisedev.crm.dynamics.com/ Sandbox    45b44b7b-6192-f111-9969-6045bd01bf18
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Enterprise-Dev
+
+Listing all Solutions from the current Dataverse organization...
+Unique Name Friendly Name                         Version Managed
+Cr16aab     Common Data Services Default Solution 1.0.0.0 False
+Default     Default Solution                      1.0     False
+
+--- poll 6 2026-08-08T03:53:56Z
+Active Environment              Environment ID                       Environment Url                            Type       Organization ID
+       JM1-Enterprise-Dev       6535a04d-307a-e6f1-bb79-5eaeb5121c1b https://jm1enterprisedev.crm.dynamics.com/ Sandbox    45b44b7b-6192-f111-9969-6045bd01bf18
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Enterprise-Dev
+
+Listing all Solutions from the current Dataverse organization...
+Unique Name Friendly Name                         Version Managed
+Cr16aab     Common Data Services Default Solution 1.0.0.0 False
+Default     Default Solution                      1.0     False

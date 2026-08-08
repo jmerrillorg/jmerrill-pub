@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="jm1_manuscripttype" localizedName="Manuscript Type" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <ExternalTypeName></ExternalTypeName>
+  <displaynames>
+    <displayname description="Manuscript Type" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="835500000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="TextOnly – Text-only manuscript  " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="835500001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="PictureBook – Children’s/picture book with images  " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="835500002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="ImageHeavyNonfiction – Non-fiction with charts, tables, graphics  " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="835500003" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Poetry  " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="835500004" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Script – Screenplay / stage play  " languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="835500005" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="AudioScript – Script prepared primarily for audio" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

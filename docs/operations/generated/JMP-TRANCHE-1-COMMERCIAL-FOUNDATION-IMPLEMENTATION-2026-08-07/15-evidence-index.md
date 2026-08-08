@@ -39,4 +39,22 @@ Last verified: 2026-08-07T23:41:26.306557+00:00
 | Product Management package install | `install-dev-msdynce-productmanagement-2026-08-07.log` | FAIL / package not found |
 
 | JM1-Dev post-install-attempt solution list | `pac-solution-list-jm1-dev-after-sales-install-attempt-2026-08-07.log` | PASS / no Sales or JM1PublishingSales solution present |
-| Sandbox stop thresholds | `25-sandbox-stop-thresholds.md` | COMPLETE / thresholds pass; JM1-Dev unsuitability stop remains |
+| Sandbox stop thresholds | `25-sandbox-stop-thresholds.md` | COMPLETE / thresholds pass; JM1-Enterprise-Dev established; production identity stop remains |
+| Enterprise DEV environment decision | `25-enterprise-dev-environment-decision.md` | COMPLETE / JM1-Enterprise-Dev created |
+| Microsoft first-party baseline | `26-microsoft-first-party-baseline.md` | COMPLETE / Dynamics Sales installed |
+| JM1 prerequisite governance | `27-jm1-prerequisite-governance.md` | COMPLETE / 4 required prerequisites governed after BPF preservation |
+| Enterprise DEV import proof | `28-enterprise-dev-import-proof.md` | PASS / import and publish successful |
+| Environment bindings | `29-environment-bindings.md` | COMPLETE / no secrets committed |
+| Power Apps / Approvals ownership | `30-power-apps-approvals-ownership.md` | OPEN / no orphan apps or flows created |
+| ALM end-to-end proof | `31-alm-end-to-end-proof.md` | PARTIAL / production identity blocked |
+| JM1-PRIME environment selection | `32-jm1-prime-environment-selection.md` | COMPLETE / DEV target class recorded |
+| Tranche 1 resumption record | `33-tranche1-resumption-record.md` | NOT RESUMED / PR #438 holds 3 of 5 closed |
+| Enterprise DEV create log | `powerplatform/solutions/JM1PublishingSales/evidence/create-jm1-enterprise-dev-2026-08-08.log` | PASS |
+| Enterprise DEV create status log | `powerplatform/solutions/JM1PublishingSales/evidence/status-jm1-enterprise-dev-create-2026-08-08.log` | PASS |
+| Enterprise DEV Sales install retry | `powerplatform/solutions/JM1PublishingSales/evidence/install-enterprise-dev-dynamics-sales-app-retry-2026-08-08.log` | PASS |
+| Enterprise DEV final import log | `powerplatform/solutions/JM1PublishingSales/evidence/import-enterprise-dev-final-2026-08-08.log` | PASS |
+| Enterprise DEV final solution readback | `powerplatform/solutions/JM1PublishingSales/evidence/pac-solution-list-jm1-enterprise-dev-final-2026-08-08.log` | PASS |
+| Enterprise DEV export | `powerplatform/solutions/JM1PublishingSales/evidence/export-enterprise-dev-jm1publishingsales-2026-08-08.log` | PASS |
+| Enterprise DEV unpack | `powerplatform/solutions/JM1PublishingSales/evidence/unpack-enterprise-dev-jm1publishingsales-2026-08-08.log` | PASS |
+| Enterprise DEV optionset readback | `powerplatform/solutions/JM1PublishingSales/evidence/enterprise-dev-optionset-readback-2026-08-08.json` | PASS |
+| Enterprise DEV business record sample | `powerplatform/solutions/JM1PublishingSales/evidence/enterprise-dev-business-record-sample-readback-2026-08-08.log` | PASS / sampled business tables empty |

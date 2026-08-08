@@ -2,7 +2,7 @@
 
 Classification: CANONICAL GOVERNANCE STANDARD / POWER PLATFORM ALM
 
-Status: ACTIVE STANDARD / DEPLOYMENT PROOF BLOCKED PENDING DEV DEPENDENCY PARITY
+Status: ACTIVE STANDARD / DEV IMPORT PROVEN / PRODUCTION DEPLOYMENT IDENTITY BLOCKED
 
 ## Purpose
 
@@ -56,6 +56,18 @@ If pruning proves the target solution needs a Microsoft first-party application 
 A development environment requires sufficient governed dependency parity for the solution being developed; full production-environment cloning is neither required nor preferred.
 
 Active-layer production components required for continued development must be recovered into governed source and solution authority rather than repeatedly treated as invisible production prerequisites.
+
+## Development Target Classes
+
+The solution determines the required development target.
+
+JM1-Dev is the general Power Platform and Dataverse development environment for work where first-party Dynamics dependency parity is not required.
+
+JM1-Enterprise-Dev is the governed enterprise development environment for Dynamics-dependent and solution-aware JM1 workloads requiring first-party Dynamics application capabilities unavailable in JM1-Dev.
+
+Neither environment is universally appropriate.
+
+For JM1PublishingSales, the required development class is `DYNAMICS_CAPABLE` and the canonical DEV target is JM1-Enterprise-Dev.
 
 ## Solution-Aware Requirement
 

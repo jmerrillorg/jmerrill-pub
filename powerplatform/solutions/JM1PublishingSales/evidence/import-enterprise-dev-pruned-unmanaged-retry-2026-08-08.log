@@ -1,0 +1,56 @@
+Connected as jm1-admin@jmerrill.one
+Connected to... JM1-Enterprise-Dev
+
+Solution Importing...
+
+Waiting for asynchronous operation 37ba48a9-dd92-f111-8076-000d3a37d363 to complete with timeout of 02:00:00.
+
+Processing asynchronous operation... execution time: 00:00:00 and 0.00% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:04 and 0.06% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:08 and 0.11% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:12 and 0.17% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:16 and 0.24% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:21 and 0.29% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:25 and 0.35% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:29 and 0.41% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:33 and 0.47% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:37 and 0.52% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:41 and 0.58% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:45 and 0.64% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:50 and 0.70% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:54 and 0.75% of max time allotted
+
+Processing asynchronous operation... execution time: 00:00:58 and 0.81% of max time allotted
+
+Processing asynchronous operation... execution time: 00:01:02 and 0.87% of max time allotted
+
+Processing asynchronous operation... execution time: 00:01:06 and 0.92% of max time allotted
+
+Processing asynchronous operation... execution time: 00:01:10 and 0.98% of max time allotted
+
+Processing asynchronous operation... execution time: 00:01:14 and 1.04% of max time allotted
+
+Processing asynchronous operation... execution time: 00:01:18 and 1.10% of max time allotted
+
+Asynchronous operation 37ba48a9-dd92-f111-8076-000d3a37d363 failed within 00:01:23.1313513.
+
+The reason given was: Attribute Display Name for id: 9dfd0135-1d8d-43cc-836c-fb2babbdfec3, objectcolumn: DisplayName and labelTypeCode: Attribute  not specified
+Microsoft PowerPlatform CLI
+Version: 1.49.4+g406813e (.NET 10.0.9)
+Online documentation: https://aka.ms/PowerPlatformCLI
+Feedback, Suggestions, Issues: https://github.com/microsoft/powerplatform-build-tools/discussions
+
+Error: The async operation completed with a statuscode of Failed.
