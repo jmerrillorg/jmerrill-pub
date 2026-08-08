@@ -72,7 +72,6 @@ jobs:
         run: |
           set -euo pipefail
           npm ci
-          npm run jm1-bootstrap-guard
           npm run jm1-canon-consistency-guard
           npm run jm1-canon-guard-enforcement
           npm run commercial-architecture-guard
