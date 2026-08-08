@@ -60,3 +60,13 @@ Last verified: 2026-08-08T08:13:46Z
 | Protected workflow run, async duplicate import job | `github-run-31246998549-production-log-2026-08-08.log` | FAIL / async import job duplicate |
 | Protected workflow run, synchronous import proof | `github-run-31247571393-production-log-2026-08-08.log` | PASS |
 | Production readback artifact | `github-run-31247571393-production-artifact/solution-list.txt` | PASS / `JM1PublishingSales` version `1.0.0.0` |
+| Tranche 1 runtime closeout | `43-tranche1-runtime-closeout.md` and `.json` | COMPLETE / 20 internal scenarios PASS |
+| Commercial states and native Sales boundary | `44-commercial-states-and-native-sales.md` | ACTIVE / native Dynamics objects preserved |
+| Catalog projection proof | `45-catalog-projection-proof.md` | ACTIVE / 20 products / 22 price-list items / 0 duplicate projected SKUs |
+| Quote, order, and agreement proof | `46-quote-order-agreement-proof.md` | VERIFIED / agreement templates changed 0 |
+| Stripe and fulfillment proof | `47-stripe-fulfillment-proof.md` | EXTEND_EXISTING / FAIL-CLOSED |
+| Single-operator surface and exception queue | `48-operator-surface-exception-queue.md` | ACTIVE |
+| Internal validation scenarios | `49-internal-validation-20-scenarios.md` | 20 / 20 PASS |
+| Operator burden measurement | `50-operator-burden-measurement.md` | Before 12 / After 5 / Net removed 7 |
+| Production readback and runtime boundaries | `51-production-readback-and-boundaries.md` | PASS / no prohibited mutation |
+| Runtime checksums | `52-runtime-checksums.sha256` | VALIDATED |

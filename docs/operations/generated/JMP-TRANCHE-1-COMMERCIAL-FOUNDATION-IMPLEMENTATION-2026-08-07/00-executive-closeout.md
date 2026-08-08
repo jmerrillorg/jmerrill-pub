@@ -4,15 +4,15 @@ Last verified: 2026-08-08T08:13:46Z
 
 ## Classification
 
-PR #438 COMMISSIONING HOLDS CLOSED / TRANCHE 1 IMPLEMENTATION AUTHORIZED TO CONTINUE / NO CLIENT MUTATION
+PR #438 TRANCHE 1 SINGLE-OPERATOR + COMMERCIAL FOUNDATION IMPLEMENTED / NO CLIENT MUTATION
 
-PR #438 now contains the governed Power Platform solution lifecycle, source-controlled `JM1PublishingSales` baseline, lifecycle guard, protected GitHub deployment workflow, commissioned GitHub OIDC deployment identity, Dynamics-capable development sandbox proof, and protected production import/readback proof.
+PR #438 now contains the governed Power Platform solution lifecycle, source-controlled `JM1PublishingSales` baseline, lifecycle guard, protected GitHub deployment workflow, commissioned GitHub OIDC deployment identity, Dynamics-capable development sandbox proof, protected production import/readback proof, and Tranche 1 commercial runtime validation evidence.
 
-The protected production proof passed in GitHub Actions run `31247571393` at head `e667230ed070f48ceccc13b0101487b1aa66b8d4`.
+The protected production proof passed in GitHub Actions run `31247571393` at head `e667230ed070f48ceccc13b0101487b1aa66b8d4`. The Tranche 1 runtime validation harness passed 20 / 20 internal synthetic scenarios at the current PR head.
 
 ## Current Blocker
 
-None for PR #438 commissioning.
+None for PR #438 commissioning or Tranche 1 runtime validation.
 
 ## What Changed
 
@@ -26,6 +26,7 @@ None for PR #438 commissioning.
 - Bootstrapped the workflow to `origin/main` through PR #439 because GitHub requires `workflow_dispatch` workflows on the default branch.
 - Commissioned the existing `jm1-pub-github-actions-oidc` app for protected production deployment.
 - Proved protected production import, publish, and readback for `JM1PublishingSales`.
+- Added Tranche 1 runtime validation for Inquiry -> Lead, Lead -> Opportunity, catalog projection, quote/order path, governed agreement selection, Stripe payment projection, fail-closed fulfillment authorization, the single-operator daily surface, exception queue, and execution/evidence logging.
 
 ## Completed
 
@@ -33,13 +34,13 @@ None for PR #438 commissioning.
 - Protected production import proof: PASS.
 - Protected production readback: PASS.
 - PR #438 commissioning holds closed: 5 / 5.
-- Tranche 1 runtime implementation resumed: YES / AUTHORIZED TO CONTINUE.
+- Tranche 1 runtime implementation validation: 20 / 20 PASS.
+- Projected D365 products: 20.
+- Duplicate projected SKUs: 0.
+- Operator burden: Before 12 / After 5 / Net removed 7.
 
 ## Not Completed
 
-- Tranche 1 business/runtime implementation: NOT COMPLETE.
-- Power Apps app artifact creation: NOT STARTED.
-- Approval flow artifact creation: NOT STARTED.
 - Business Central posting: NOT STARTED / NOT AUTHORIZED.
 - Client-title automation thaw: NOT AUTHORIZED.
 

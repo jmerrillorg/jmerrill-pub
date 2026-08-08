@@ -46,6 +46,17 @@ const required = [
   `${trancheEvidenceRoot}/31-alm-end-to-end-proof.md`,
   `${trancheEvidenceRoot}/32-jm1-prime-environment-selection.md`,
   `${trancheEvidenceRoot}/33-tranche1-resumption-record.md`,
+  `${trancheEvidenceRoot}/43-tranche1-runtime-closeout.md`,
+  `${trancheEvidenceRoot}/43-tranche1-runtime-closeout.json`,
+  `${trancheEvidenceRoot}/44-commercial-states-and-native-sales.md`,
+  `${trancheEvidenceRoot}/45-catalog-projection-proof.md`,
+  `${trancheEvidenceRoot}/46-quote-order-agreement-proof.md`,
+  `${trancheEvidenceRoot}/47-stripe-fulfillment-proof.md`,
+  `${trancheEvidenceRoot}/48-operator-surface-exception-queue.md`,
+  `${trancheEvidenceRoot}/49-internal-validation-20-scenarios.md`,
+  `${trancheEvidenceRoot}/50-operator-burden-measurement.md`,
+  `${trancheEvidenceRoot}/51-production-readback-and-boundaries.md`,
+  `${trancheEvidenceRoot}/52-runtime-checksums.sha256`,
   'docs/governance/JM1-PUB-CAPABILITY-REGISTER-MAINTENANCE-v1.0.md',
   'scripts/jm1_prune_publishing_sales_solution.mjs',
   '.github/workflows/publishing-power-platform-solution-deploy.yml',
@@ -136,6 +147,42 @@ if (existsSync(almProofPath)) {
     'Production import executed: YES, limited to `JM1PublishingSales`.',
   ]) {
     if (!alm.includes(text)) errors.push(`alm_proof_missing:${text}`)
+  }
+}
+
+const runtimeCloseoutPath = `${trancheEvidenceRoot}/43-tranche1-runtime-closeout.json`
+if (existsSync(runtimeCloseoutPath)) {
+  const closeout = JSON.parse(readFileSync(runtimeCloseoutPath, 'utf8'))
+  const expected = {
+    dynamicsCommercialFoundation: 'ACTIVE / VERIFIED',
+    canonicalCatalogProjection: 'ACTIVE / IDEMPOTENT',
+    duplicateProjectedSkus: 0,
+    quotePath: 'VERIFIED',
+    orderPath: 'VERIFIED',
+    agreementIntegration: 'VERIFIED',
+    agreementTemplatesChanged: 0,
+    stripePaymentProjection: 'EXTEND_EXISTING / VERIFIED / IDEMPOTENT',
+    stripeTransactionTruth: 'PRESERVED',
+    fulfillmentAuthorization: 'ACTIVE / FAIL-CLOSED',
+    singleOperatorDailySurface: 'ACTIVE',
+    exceptionQueueStatus: 'ACTIVE',
+    internalValidation: '20 / 20 PASS',
+    liveAuthorsUsed: 0,
+    liveTitlesUsed: 0,
+    pr431TitlesUsed: 0,
+    businessCentralPosting: 0,
+    strategicMarketingActivation: 0,
+    titlePfRuntime: 'NOT STARTED',
+    clientTitleAutomation: 'FROZEN',
+    clientTitleProduction: 'MANUAL',
+    tranche2: 'NOT STARTED',
+  }
+  for (const [key, value] of Object.entries(expected)) {
+    if (closeout[key] !== value) errors.push(`runtime_closeout_mismatch:${key}`)
+  }
+  if (closeout.projectedProducts !== 20) errors.push('runtime_closeout_projected_products_mismatch')
+  if (closeout.operatorBurden?.before !== 12 || closeout.operatorBurden?.after !== 5 || closeout.operatorBurden?.netRemoved !== 7) {
+    errors.push('runtime_closeout_operator_burden_mismatch')
   }
 }
 

@@ -51,3 +51,5 @@ Last verified: 2026-08-08T08:13:46Z
 | 40-stripe-projection-final-disposition.md | acc573fd6c38918cd0bba91676888025c0eff4c3b7b48a3f898b8961d7ec9d65 |
 | 41-five-hold-closeout.md | d949a9bcef67a02939cf2951da52c9e49ad014e7df7ea499c5716692e224f56f |
 | 42-tranche1-runtime-resumption.md | ff4fe16a146fbbe70b13b321cbd0ab5d4af62d13fe6cb73575273fb9bab04730 |
+
+Runtime completion checksums are recorded in `52-runtime-checksums.sha256`.

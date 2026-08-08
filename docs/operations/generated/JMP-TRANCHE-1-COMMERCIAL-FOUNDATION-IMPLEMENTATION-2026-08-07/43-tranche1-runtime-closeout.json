@@ -1,0 +1,1013 @@
+{
+  "classification": "COMPLETE - TRANCHE 1 SINGLE-OPERATOR + COMMERCIAL FOUNDATION IMPLEMENTED",
+  "generatedAt": "2026-08-08T12:35:23.583Z",
+  "pr": 438,
+  "dynamicsCommercialFoundation": "ACTIVE / VERIFIED",
+  "commercialStates": "ACTIVE",
+  "inquiryToLead": "VERIFIED",
+  "leadToOpportunity": "VERIFIED",
+  "canonicalCatalogProjection": "ACTIVE / IDEMPOTENT",
+  "projectedProducts": 20,
+  "duplicateProjectedSkus": 0,
+  "priceListItems": 22,
+  "quotePath": "VERIFIED",
+  "orderPath": "VERIFIED",
+  "agreementIntegration": "VERIFIED",
+  "agreementTemplatesChanged": 0,
+  "stripePaymentProjection": "EXTEND_EXISTING / VERIFIED / IDEMPOTENT",
+  "stripeTransactionTruth": "PRESERVED",
+  "fulfillmentAuthorization": "ACTIVE / FAIL-CLOSED",
+  "singleOperatorDailySurface": "ACTIVE",
+  "exceptionQueue": "ACTIVE",
+  "executionEvidenceLogging": "ACTIVE",
+  "internalValidation": "20 / 20 PASS",
+  "liveAuthorsUsed": 0,
+  "liveTitlesUsed": 0,
+  "pr431TitlesUsed": 0,
+  "operatorBurden": {
+    "before": 12,
+    "after": 5,
+    "netRemoved": 7
+  },
+  "businessCentralPosting": 0,
+  "strategicMarketingActivation": 0,
+  "titlePfRuntime": "NOT STARTED",
+  "clientTitleAutomation": "FROZEN",
+  "clientTitleProduction": "MANUAL",
+  "tranche2": "NOT STARTED",
+  "pr431": "UNCHANGED / CURRENT OPERATING PRIORITY",
+  "productionDeployments": 1,
+  "productionReadback": "PASS",
+  "rollbackHoldControls": "VALIDATED",
+  "validation": {
+    "result": "PASS",
+    "passed": 20,
+    "total": 20,
+    "scenarios": [
+      {
+        "id": "T1-01",
+        "name": "Hybrid inquiry creates native Lead and Opportunity",
+        "result": "PASS",
+        "detail": [
+          "INQUIRY_RECEIVED",
+          "LEAD_QUALIFIED",
+          "OPPORTUNITY_OPEN"
+        ]
+      },
+      {
+        "id": "T1-02",
+        "name": "Traditional inquiry selects JM Signature agreement",
+        "result": "PASS",
+        "detail": {
+          "selected": "JM Signature Publishing Agreement",
+          "version": "v1.0",
+          "templateFile": "JM_Signature_Publishing_Agreement_v1.0.docx",
+          "governingLocation": "Implementation HQ/01_GOVERNANCE/Agreement Templates",
+          "changedTemplates": 0
+        }
+      },
+      {
+        "id": "T1-03",
+        "name": "Hybrid inquiry selects JMP agreement v1.3.1",
+        "result": "PASS",
+        "detail": {
+          "selected": "JMP Publishing Agreement",
+          "version": "v1.3.1",
+          "templateFile": "JMP_Publishing_Agreement_v1.3.1.docx",
+          "governingLocation": "Implementation HQ/01_GOVERNANCE/Agreement Templates",
+          "changedTemplates": 0
+        }
+      },
+      {
+        "id": "T1-04",
+        "name": "Canonical catalog projects one Product per SKU",
+        "result": "PASS",
+        "detail": {
+          "projectedProducts": 20
+        }
+      },
+      {
+        "id": "T1-05",
+        "name": "Canonical catalog projects package and price-list rows",
+        "result": "PASS",
+        "detail": {
+          "priceListItems": 22
+        }
+      },
+      {
+        "id": "T1-06",
+        "name": "Starter quote and order path uses D365 Quote and Order",
+        "result": "PASS",
+        "detail": {
+          "quote": {
+            "table": "quote",
+            "id": "QUOTE-T1-06",
+            "opportunityId": "OPP-T1-06",
+            "packageSku": "JMP-PKG-STARTER",
+            "amount": 1999,
+            "currency": "USD",
+            "state": "QUOTE_APPROVED",
+            "lines": [
+              {
+                "table": "quotedetail",
+                "productTable": "product",
+                "priceListItemTable": "productpricelevel",
+                "sku": "JMP-PKG-STARTER",
+                "amount": 1999
+              }
+            ]
+          },
+          "order": {
+            "table": "salesorder",
+            "id": "ORDER-T1-06",
+            "quoteId": "QUOTE-T1-06",
+            "opportunityId": "OPP-T1-06",
+            "packageSku": "JMP-PKG-STARTER",
+            "amount": 1999,
+            "currency": "USD",
+            "state": "ORDER_READY",
+            "lines": [
+              {
+                "table": "salesorderdetail",
+                "productTable": "product",
+                "priceListItemTable": "productpricelevel",
+                "sku": "JMP-PKG-STARTER",
+                "amount": 1999
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "T1-07",
+        "name": "Professional quote amount follows canonical package price",
+        "result": "PASS",
+        "detail": {
+          "table": "quote",
+          "id": "QUOTE-T1-07",
+          "opportunityId": "OPP-T1-07",
+          "packageSku": "JMP-PKG-PRO",
+          "amount": 4500,
+          "currency": "USD",
+          "state": "QUOTE_APPROVED",
+          "lines": [
+            {
+              "table": "quotedetail",
+              "productTable": "product",
+              "priceListItemTable": "productpricelevel",
+              "sku": "JMP-PKG-PRO",
+              "amount": 4500
+            }
+          ]
+        }
+      },
+      {
+        "id": "T1-08",
+        "name": "Premier quote amount follows canonical package price",
+        "result": "PASS",
+        "detail": {
+          "table": "quote",
+          "id": "QUOTE-T1-08",
+          "opportunityId": "OPP-T1-08",
+          "packageSku": "JMP-PKG-PREMIER",
+          "amount": 7500,
+          "currency": "USD",
+          "state": "QUOTE_APPROVED",
+          "lines": [
+            {
+              "table": "quotedetail",
+              "productTable": "product",
+              "priceListItemTable": "productpricelevel",
+              "sku": "JMP-PKG-PREMIER",
+              "amount": 7500
+            }
+          ]
+        }
+      },
+      {
+        "id": "T1-09",
+        "name": "Quote requiring approval holds Order path fail-closed",
+        "result": "PASS",
+        "detail": {
+          "table": "salesorder",
+          "id": "ORDER-T1-09",
+          "quoteId": "QUOTE-T1-09",
+          "opportunityId": "OPP-T1-09",
+          "packageSku": "JMP-PKG-PREMIER",
+          "amount": 7500,
+          "currency": "USD",
+          "state": "ON_HOLD",
+          "lines": [
+            {
+              "table": "salesorderdetail",
+              "productTable": "product",
+              "priceListItemTable": "productpricelevel",
+              "sku": "JMP-PKG-PREMIER",
+              "amount": 7500
+            }
+          ]
+        }
+      },
+      {
+        "id": "T1-10",
+        "name": "Stripe session-created projects without money movement",
+        "result": "PASS",
+        "detail": {
+          "state": "SESSION_CREATED",
+          "transactionTruth": "Stripe",
+          "projectionMode": "EXTEND_EXISTING",
+          "idempotencyKey": "jm1-tranche1-stripe-projection-T1-10",
+          "amountDue": 1999,
+          "amountPaid": 0,
+          "refunded": 0
+        }
+      },
+      {
+        "id": "T1-11",
+        "name": "Stripe partial payment remains not authorized",
+        "result": "PASS",
+        "detail": {
+          "projection": {
+            "state": "PARTIALLY_PAID",
+            "transactionTruth": "Stripe",
+            "projectionMode": "EXTEND_EXISTING",
+            "idempotencyKey": "jm1-tranche1-stripe-projection-T1-11",
+            "amountDue": 4500,
+            "amountPaid": 1000,
+            "refunded": 0
+          },
+          "auth": {
+            "result": "NOT_AUTHORIZED",
+            "failClosed": true,
+            "blockers": [
+              "PAYMENT_NOT_CONFIRMED"
+            ],
+            "eventType": "FULFILLMENT_AUTHORIZATION_BLOCKED"
+          }
+        }
+      },
+      {
+        "id": "T1-12",
+        "name": "Stripe paid authorizes only after executed agreement and ready order",
+        "result": "PASS",
+        "detail": {
+          "projection": {
+            "state": "PAID",
+            "transactionTruth": "Stripe",
+            "projectionMode": "EXTEND_EXISTING",
+            "idempotencyKey": "jm1-tranche1-stripe-projection-T1-12",
+            "amountDue": 1999,
+            "amountPaid": 1999,
+            "refunded": 0
+          },
+          "auth": {
+            "result": "AUTHORIZED",
+            "failClosed": false,
+            "blockers": [],
+            "eventType": "FULFILLMENT_AUTHORIZED"
+          }
+        }
+      },
+      {
+        "id": "T1-13",
+        "name": "Missing executed agreement fails closed",
+        "result": "PASS",
+        "detail": {
+          "result": "NOT_AUTHORIZED",
+          "failClosed": true,
+          "blockers": [
+            "AGREEMENT_NOT_EXECUTED"
+          ],
+          "eventType": "FULFILLMENT_AUTHORIZATION_BLOCKED"
+        }
+      },
+      {
+        "id": "T1-14",
+        "name": "Open exception routes to exception review",
+        "result": "PASS",
+        "detail": {
+          "result": "EXCEPTION_REVIEW_REQUIRED",
+          "failClosed": true,
+          "blockers": [
+            "EXCEPTION_OPEN"
+          ],
+          "eventType": "FULFILLMENT_AUTHORIZATION_BLOCKED"
+        }
+      },
+      {
+        "id": "T1-15",
+        "name": "Governed hold routes to hold queue",
+        "result": "PASS",
+        "detail": {
+          "result": "ON_HOLD",
+          "failClosed": true,
+          "blockers": [
+            "GOVERNED_HOLD_OPEN"
+          ],
+          "eventType": "FULFILLMENT_AUTHORIZATION_BLOCKED"
+        }
+      },
+      {
+        "id": "T1-16",
+        "name": "Traditional track may bypass payment only when payment is not required",
+        "result": "PASS",
+        "detail": {
+          "result": "AUTHORIZED",
+          "failClosed": false,
+          "blockers": [],
+          "eventType": "FULFILLMENT_AUTHORIZED"
+        }
+      },
+      {
+        "id": "T1-17",
+        "name": "Single operator surface hides internal IDs",
+        "result": "PASS",
+        "detail": {
+          "ready": 1,
+          "commercial": 1,
+          "exception": 1,
+          "hold": 1
+        }
+      },
+      {
+        "id": "T1-18",
+        "name": "Exception queue creates task records for non-authorized items",
+        "result": "PASS",
+        "detail": [
+          {
+            "table": "task",
+            "title": "Internal Validation Missing Payment",
+            "owner": "Commercial Operator",
+            "reason": "PAYMENT_NOT_CONFIRMED",
+            "approvalRequired": false
+          },
+          {
+            "table": "task",
+            "title": "Internal Validation Exception",
+            "owner": "Jackie",
+            "reason": "EXCEPTION_OPEN",
+            "approvalRequired": true
+          },
+          {
+            "table": "task",
+            "title": "Internal Validation Hold",
+            "owner": "Commercial Operator",
+            "reason": "GOVERNED_HOLD_OPEN",
+            "approvalRequired": true
+          }
+        ]
+      },
+      {
+        "id": "T1-19",
+        "name": "Commercial event vocabulary includes fulfillment authorization",
+        "result": "PASS",
+        "detail": {
+          "commercialStates": 14,
+          "stripePaymentStates": 11
+        }
+      },
+      {
+        "id": "T1-20",
+        "name": "Native Dynamics object boundary contains no custom substitutes",
+        "result": "PASS",
+        "detail": [
+          "lead",
+          "contact",
+          "account",
+          "opportunity",
+          "product",
+          "pricelevel",
+          "productpricelevel",
+          "quote",
+          "quotedetail",
+          "salesorder",
+          "salesorderdetail",
+          "task"
+        ]
+      }
+    ],
+    "catalog": {
+      "products": [
+        {
+          "sku": "JMP-ACC-EPUB-ENH",
+          "name": "edition add-on",
+          "source": "price_rule",
+          "listAmount": 1000,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-AUD-FIRST-DEV",
+          "name": "audio-first origination starting rate",
+          "source": "price_rule",
+          "listAmount": 500,
+          "pricingMethod": "unit",
+          "unit": "PFH",
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-AUD-HUMAN-SV",
+          "name": "starting quote-required human single-voice narration",
+          "source": "price_rule",
+          "listAmount": 400,
+          "pricingMethod": "unit",
+          "unit": "PFH",
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-AUD-SYNTH-STD",
+          "name": "AI narration base through 8 PFH",
+          "source": "price_rule",
+          "listAmount": 500,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-AUD-SYNTH-STD-OVR",
+          "name": "AI narration overage after 8 PFH",
+          "source": "price_rule",
+          "listAmount": 50,
+          "pricingMethod": "unit",
+          "unit": "PFH",
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-CUS-SOW",
+          "name": "custom scoped work",
+          "source": "price_rule",
+          "listAmount": null,
+          "pricingMethod": "quote-sow",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-EDT-EB-STD",
+          "name": "edition add-on",
+          "source": "price_rule",
+          "listAmount": 350,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-EDT-HC-STD",
+          "name": "edition add-on",
+          "source": "price_rule",
+          "listAmount": 350,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-EDT-LP-CPLX",
+          "name": "edition add-on",
+          "source": "price_rule",
+          "listAmount": 600,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-EDT-LP-STD",
+          "name": "edition add-on",
+          "source": "price_rule",
+          "listAmount": 350,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-EDT-PB-STD",
+          "name": "edition add-on",
+          "source": "price_rule",
+          "listAmount": 350,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-GFX-WEBTOON-12",
+          "name": "provisional internal webtoon season",
+          "source": "price_rule",
+          "listAmount": 850,
+          "pricingMethod": "unit",
+          "unit": "episode",
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-GFX-WEBTOON-PILOT",
+          "name": "provisional internal webtoon pilot",
+          "source": "price_rule",
+          "listAmount": 1200,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-INT-EPUB3-STD",
+          "name": "scope-capped interactive EPUB 3 starting price",
+          "source": "price_rule",
+          "listAmount": 1500,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-INT-WEB-CUSTOM",
+          "name": "custom browser-based edition",
+          "source": "price_rule",
+          "listAmount": null,
+          "pricingMethod": "quote-sow",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-PKG-PREMIER",
+          "name": "Premier Publishing Package",
+          "source": "package",
+          "listAmount": 7500,
+          "pricingMethod": "fixed",
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-PKG-PRO",
+          "name": "Professional Publishing Package",
+          "source": "package",
+          "listAmount": 4500,
+          "pricingMethod": "fixed",
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-PKG-STARTER",
+          "name": "Starter Publishing Package",
+          "source": "package",
+          "listAmount": 1999,
+          "pricingMethod": "fixed",
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-SER-DIGITAL-06",
+          "name": "serialized release, 6 installments",
+          "source": "price_rule",
+          "listAmount": 600,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        },
+        {
+          "sku": "JMP-SER-DIGITAL-12",
+          "name": "serialized release, 12 installments",
+          "source": "price_rule",
+          "listAmount": 1000,
+          "pricingMethod": "fixed",
+          "unit": null,
+          "d365ProductTable": "product",
+          "d365PriceListItemTable": "productpricelevel"
+        }
+      ],
+      "priceListItems": [
+        {
+          "sku": "JMP-PKG-STARTER",
+          "amount": 1999,
+          "method": "fixed",
+          "unit": null,
+          "use": "Starter package list price"
+        },
+        {
+          "sku": "JMP-PKG-PRO",
+          "amount": 4500,
+          "method": "fixed",
+          "unit": null,
+          "use": "Professional package list price"
+        },
+        {
+          "sku": "JMP-PKG-PREMIER",
+          "amount": 7500,
+          "method": "fixed",
+          "unit": null,
+          "use": "Premier package list price"
+        },
+        {
+          "sku": "JMP-EDT-PB-STD",
+          "method": "fixed",
+          "amount": 350,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-EDT-HC-STD",
+          "method": "fixed",
+          "amount": 350,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-EDT-EB-STD",
+          "method": "fixed",
+          "amount": 350,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-EDT-LP-STD",
+          "method": "fixed",
+          "amount": 350,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-EDT-LP-CPLX",
+          "method": "fixed",
+          "amount": 600,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-EDT-LP-CPLX",
+          "method": "fixed",
+          "amount": 250,
+          "unit": null,
+          "use": "in-slot premium"
+        },
+        {
+          "sku": "JMP-ACC-EPUB-ENH",
+          "method": "fixed",
+          "amount": 1000,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-ACC-EPUB-ENH",
+          "method": "fixed",
+          "amount": 650,
+          "unit": null,
+          "use": "in-slot premium"
+        },
+        {
+          "sku": "JMP-AUD-SYNTH-STD",
+          "method": "fixed",
+          "amount": 500,
+          "unit": null,
+          "use": "AI narration base through 8 PFH"
+        },
+        {
+          "sku": "JMP-AUD-SYNTH-STD-OVR",
+          "method": "unit",
+          "amount": 50,
+          "unit": "PFH",
+          "use": "AI narration overage after 8 PFH"
+        },
+        {
+          "sku": "JMP-AUD-HUMAN-SV",
+          "method": "unit",
+          "amount": 400,
+          "unit": "PFH",
+          "use": "starting quote-required human single-voice narration"
+        },
+        {
+          "sku": "JMP-SER-DIGITAL-06",
+          "method": "fixed",
+          "amount": 600,
+          "unit": null,
+          "use": "serialized release, 6 installments"
+        },
+        {
+          "sku": "JMP-SER-DIGITAL-12",
+          "method": "fixed",
+          "amount": 1000,
+          "unit": null,
+          "use": "serialized release, 12 installments"
+        },
+        {
+          "sku": "JMP-AUD-FIRST-DEV",
+          "method": "unit",
+          "amount": 500,
+          "unit": "PFH",
+          "use": "audio-first origination starting rate"
+        },
+        {
+          "sku": "JMP-GFX-WEBTOON-PILOT",
+          "method": "fixed",
+          "amount": 1200,
+          "unit": null,
+          "use": "provisional internal webtoon pilot"
+        },
+        {
+          "sku": "JMP-GFX-WEBTOON-12",
+          "method": "unit",
+          "amount": 850,
+          "unit": "episode",
+          "use": "provisional internal webtoon season"
+        },
+        {
+          "sku": "JMP-INT-EPUB3-STD",
+          "method": "fixed",
+          "amount": 1500,
+          "unit": null,
+          "use": "scope-capped interactive EPUB 3 starting price"
+        },
+        {
+          "sku": "JMP-INT-WEB-CUSTOM",
+          "method": "quote-sow",
+          "amount": null,
+          "unit": null,
+          "use": "custom browser-based edition"
+        },
+        {
+          "sku": "JMP-CUS-SOW",
+          "method": "quote-sow",
+          "amount": null,
+          "unit": null,
+          "use": "custom scoped work"
+        }
+      ],
+      "packages": [
+        {
+          "sku": "JMP-PKG-STARTER",
+          "tier": "Starter",
+          "price": {
+            "amount": 1999,
+            "currency": "USD"
+          },
+          "editionSlots": 2
+        },
+        {
+          "sku": "JMP-PKG-PRO",
+          "tier": "Professional",
+          "price": {
+            "amount": 4500,
+            "currency": "USD"
+          },
+          "editionSlots": 3
+        },
+        {
+          "sku": "JMP-PKG-PREMIER",
+          "tier": "Premier",
+          "price": {
+            "amount": 7500,
+            "currency": "USD"
+          },
+          "editionSlots": 4
+        }
+      ],
+      "priceRules": [
+        {
+          "sku": "JMP-EDT-PB-STD",
+          "method": "fixed",
+          "amount": 350,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-EDT-HC-STD",
+          "method": "fixed",
+          "amount": 350,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-EDT-EB-STD",
+          "method": "fixed",
+          "amount": 350,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-EDT-LP-STD",
+          "method": "fixed",
+          "amount": 350,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-EDT-LP-CPLX",
+          "method": "fixed",
+          "amount": 600,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-EDT-LP-CPLX",
+          "method": "fixed",
+          "amount": 250,
+          "unit": null,
+          "use": "in-slot premium"
+        },
+        {
+          "sku": "JMP-ACC-EPUB-ENH",
+          "method": "fixed",
+          "amount": 1000,
+          "unit": null,
+          "use": "edition add-on"
+        },
+        {
+          "sku": "JMP-ACC-EPUB-ENH",
+          "method": "fixed",
+          "amount": 650,
+          "unit": null,
+          "use": "in-slot premium"
+        },
+        {
+          "sku": "JMP-AUD-SYNTH-STD",
+          "method": "fixed",
+          "amount": 500,
+          "unit": null,
+          "use": "AI narration base through 8 PFH"
+        },
+        {
+          "sku": "JMP-AUD-SYNTH-STD-OVR",
+          "method": "unit",
+          "amount": 50,
+          "unit": "PFH",
+          "use": "AI narration overage after 8 PFH"
+        },
+        {
+          "sku": "JMP-AUD-HUMAN-SV",
+          "method": "unit",
+          "amount": 400,
+          "unit": "PFH",
+          "use": "starting quote-required human single-voice narration"
+        },
+        {
+          "sku": "JMP-SER-DIGITAL-06",
+          "method": "fixed",
+          "amount": 600,
+          "unit": null,
+          "use": "serialized release, 6 installments"
+        },
+        {
+          "sku": "JMP-SER-DIGITAL-12",
+          "method": "fixed",
+          "amount": 1000,
+          "unit": null,
+          "use": "serialized release, 12 installments"
+        },
+        {
+          "sku": "JMP-AUD-FIRST-DEV",
+          "method": "unit",
+          "amount": 500,
+          "unit": "PFH",
+          "use": "audio-first origination starting rate"
+        },
+        {
+          "sku": "JMP-GFX-WEBTOON-PILOT",
+          "method": "fixed",
+          "amount": 1200,
+          "unit": null,
+          "use": "provisional internal webtoon pilot"
+        },
+        {
+          "sku": "JMP-GFX-WEBTOON-12",
+          "method": "unit",
+          "amount": 850,
+          "unit": "episode",
+          "use": "provisional internal webtoon season"
+        },
+        {
+          "sku": "JMP-INT-EPUB3-STD",
+          "method": "fixed",
+          "amount": 1500,
+          "unit": null,
+          "use": "scope-capped interactive EPUB 3 starting price"
+        },
+        {
+          "sku": "JMP-INT-WEB-CUSTOM",
+          "method": "quote-sow",
+          "amount": null,
+          "unit": null,
+          "use": "custom browser-based edition"
+        },
+        {
+          "sku": "JMP-CUS-SOW",
+          "method": "quote-sow",
+          "amount": null,
+          "unit": null,
+          "use": "custom scoped work"
+        }
+      ],
+      "duplicateProjectedSkus": [],
+      "sourceHash": "954fe5df6ad2235ee81b28961fb546f9650fe0a9d983857b05b9b01bbc2adbdc"
+    },
+    "validationItems": [
+      {
+        "title": "Internal Validation Ready",
+        "fulfillment": {
+          "result": "AUTHORIZED",
+          "failClosed": false,
+          "blockers": [],
+          "eventType": "FULFILLMENT_AUTHORIZED"
+        }
+      },
+      {
+        "title": "Internal Validation Missing Payment",
+        "fulfillment": {
+          "result": "NOT_AUTHORIZED",
+          "failClosed": true,
+          "blockers": [
+            "PAYMENT_NOT_CONFIRMED"
+          ],
+          "eventType": "FULFILLMENT_AUTHORIZATION_BLOCKED"
+        }
+      },
+      {
+        "title": "Internal Validation Exception",
+        "fulfillment": {
+          "result": "EXCEPTION_REVIEW_REQUIRED",
+          "failClosed": true,
+          "blockers": [
+            "EXCEPTION_OPEN"
+          ],
+          "eventType": "FULFILLMENT_AUTHORIZATION_BLOCKED"
+        }
+      },
+      {
+        "title": "Internal Validation Hold",
+        "fulfillment": {
+          "result": "ON_HOLD",
+          "failClosed": true,
+          "blockers": [
+            "GOVERNED_HOLD_OPEN"
+          ],
+          "eventType": "FULFILLMENT_AUTHORIZATION_BLOCKED"
+        }
+      }
+    ]
+  },
+  "operatorSurface": {
+    "surface": "Single-Operator Daily Surface",
+    "exposesInternalIds": false,
+    "actions": [
+      {
+        "title": "Internal Validation Ready",
+        "action": "Start publishing kickoff",
+        "queue": "Ready"
+      },
+      {
+        "title": "Internal Validation Missing Payment",
+        "action": "Complete missing commercial prerequisite",
+        "queue": "Commercial"
+      },
+      {
+        "title": "Internal Validation Exception",
+        "action": "Resolve exception",
+        "queue": "Exception"
+      },
+      {
+        "title": "Internal Validation Hold",
+        "action": "Review governed hold",
+        "queue": "Hold"
+      }
+    ],
+    "queues": {
+      "ready": 1,
+      "commercial": 1,
+      "exception": 1,
+      "hold": 1
+    }
+  },
+  "exceptionQueueStatus": "ACTIVE",
+  "exceptionQueueItems": [
+    {
+      "table": "task",
+      "title": "Internal Validation Missing Payment",
+      "owner": "Commercial Operator",
+      "reason": "PAYMENT_NOT_CONFIRMED",
+      "approvalRequired": false
+    },
+    {
+      "table": "task",
+      "title": "Internal Validation Exception",
+      "owner": "Jackie",
+      "reason": "EXCEPTION_OPEN",
+      "approvalRequired": true
+    },
+    {
+      "table": "task",
+      "title": "Internal Validation Hold",
+      "owner": "Commercial Operator",
+      "reason": "GOVERNED_HOLD_OPEN",
+      "approvalRequired": true
+    }
+  ]
+}
