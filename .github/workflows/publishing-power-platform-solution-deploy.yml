@@ -174,9 +174,7 @@ jobs:
             --environment "$PROD_ENVIRONMENT_URL" \
             --path "$SOLUTION_PATH/artifacts/workflow/${{ inputs.solution_name }}_unmanaged.zip" \
             --force-overwrite \
-            --publish-changes \
-            --async \
-            --max-async-wait-time 120
+            --publish-changes
 
       - name: Production readback
         shell: bash
