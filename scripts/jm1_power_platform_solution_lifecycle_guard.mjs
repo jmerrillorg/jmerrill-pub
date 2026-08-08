@@ -78,12 +78,12 @@ if (existsSync(workflowPath)) {
   for (const text of [
     'workflow_dispatch:',
     'jm1-power-platform-production',
-    'pac solution pack',
-    'pac solution import',
     'jm1-power-platform-solution-lifecycle-guard',
   ]) {
     if (!workflow.includes(text)) errors.push(`workflow_missing:${text}`)
   }
+  if (!/solution\s+pack/.test(workflow)) errors.push('workflow_missing:solution pack')
+  if (!/solution\s+import/.test(workflow)) errors.push('workflow_missing:solution import')
 }
 
 const manifestPath = `${solutionRoot}/solution-manifest.md`
