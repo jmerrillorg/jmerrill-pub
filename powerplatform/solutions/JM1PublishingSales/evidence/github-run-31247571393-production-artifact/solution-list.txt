@@ -1,0 +1,37 @@
+Connected as 97891ed1-6623-487c-b890-633bea440e22
+Connected to... JM1-Core
+
+Listing all Solutions from the current Dataverse organization...
+Unique Name                     Friendly Name                                                      Version      Managed
+Cr850fa                         Common Data Services Default Solution                              1.0.0.0      False
+Default                         Default Solution                                                   1.0          False
+Dynamics365Company              Dynamics 365 Company                                               2.0.777.412  True
+DynamicsMKT_SendOptimization    Dynamics Marketing Send Optimization                               1.1.61220.60 True
+JMerrillOne                     J Merrill One                                                      1.0.0.0      False
+JM1_BR_Template_Temp            JM1 BR Template Temp                                               1.0.0.0      False
+JM1CoreGovernance               JM1 Core Governance                                                1.0.0.0      False
+JM1CorePlatform                 JM1 Core Platform                                                  1.0.0.0      False
+JM1DistributionCommandCenter    JM1 Distribution Command Center                                    1.0.0.0      False
+JM1EditorialAutomations         JM1 Editorial – Automations                                        1.0.0.0      False
+JM1EditorialAICommandCenter     JM1 Editorial AI Command Center                                    1.0.0.0      False
+JM1_EnterpriseFoundation        JM1 Enterprise Foundation                                          1.0.0.0      False
+JM1FoundationCore               JM1 Foundation Core                                                1.0.0.0      False
+JM1_PAM_AssetRegistry           JM1 PAM Asset Registry                                             1.0.0.0      False
+JM1_PAM_BaselinePrerequisites   JM1 PAM Baseline Prerequisites                                     1.0.0.0      False
+JM1PrecoaCalendarSync           JM1 Precoa Calendar Sync                                           1.0.0.1      True
+JM1ProductionCommandCenter      JM1 Production Command Center                                      1.0.0.0      False
+JM1PublishingSales              JM1 Publishing – Sales                                             1.0.0.0      False
+JM1PublishingCommandSuite       JM1 Publishing Command Suite                                       1.0.0.0      False
+JM1PublishingCommercialCatalog  JM1 Publishing Commercial Catalog                                  1.0.0.0      True
+JM1SecurityCompliance           JM1 Security & Compliance                                          1.0.0.0      False
+JM1_Wave1_CoreActivation        JM1 Wave 1 Core Activation                                         1.0.0.0      False
+JM1_BaseOps                     JM1_BaseOps                                                        1.0.0.0      False
+JM1_Core                        JM1_Core                                                           1.0.0.0      False
+JM1_Financial                   JM1_Financial                                                      1.0.0.0      False
+JM1_Foundation                  JM1_Foundation                                                     1.0.0.0      False
+JM1_Publishing                  JM1_Publishing                                                     1.0.0.0      False
+JM1_Publishing_Core             JM1_Publishing_Core                                                1.0.0.0      False
+bcbi_CdsBaseIntegration         Microsoft Dynamics 365 Business Central Dataverse Base Integration 27.0.46208.0 True
+MicrosoftDynamicsNavIntegration Microsoft Dynamics 365 Business Central Integration                27.0.46208.0 True
+Quarantine                      Quarantine                                                         1.0.0.0      False
+

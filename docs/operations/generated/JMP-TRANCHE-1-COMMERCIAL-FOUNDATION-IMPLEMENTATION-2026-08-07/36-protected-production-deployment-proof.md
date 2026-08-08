@@ -1,47 +1,50 @@
 # Protected Production Deployment Proof
 
-Last verified: 2026-08-08T05:12:00Z
+Last verified: 2026-08-08T08:13:46Z
 
 ## Result
 
-Protected production deployment proof: BLOCKED.
+Protected production deployment proof: PASS.
 
-## Blocker
-
-GitHub Actions refused workflow dispatch because `publishing-power-platform-solution-deploy.yml` is not present on the default branch.
-
-The branch contains the commissioned workflow, but GitHub requires a workflow file to exist on the default branch before `workflow_dispatch` can be invoked.
-
-## Attempted Dispatch
+## Successful Run
 
 | Field | Value |
 | --- | --- |
 | Workflow | `publishing-power-platform-solution-deploy.yml` |
-| Ref | `codex/tranche1-commercial-foundation-implementation-20260807` |
-| Approved source SHA | `3e66175a84c8fb438b0fcd3f240f61eb83e57e3f` |
+| Run | `https://github.com/jmerrillorg/jmerrill-pub/actions/runs/31247571393` |
+| Head SHA | `e667230ed070f48ceccc13b0101487b1aa66b8d4` |
 | Target environment | `production` |
-| Confirm | `true` |
-| Result | `HTTP 404: workflow ... not found on the default branch` |
+| Production URL | `https://jm1hq.crm.dynamics.com/` |
+| Environment name | `JM1-Core` |
+| Deployment identity | `97891ed1-6623-487c-b890-633bea440e22` |
+| GitHub environment | `jm1-power-platform-production` |
+| Validation/package job | PASS |
+| Protected production import job | PASS |
+| Solution import | PASS |
+| Publish all customizations | PASS |
+| Production readback | PASS |
 
-## Completed Before Blocker
+## Readback
 
-- Deployment identity commissioned.
-- GitHub environment `jm1-power-platform-production` created.
-- Environment branch policy restricted to the PR branch.
-- OIDC federated credential added to the existing deployment identity.
-- Dataverse application user created in JM1-Core.
-- `System Customizer` assigned.
-- Workflow patched for exact solution, version, source SHA, target URL, environment ID, and organization ID validation.
+The workflow readback listed:
 
-## Not Completed
+`JM1PublishingSales              JM1 Publishing - Sales                                             1.0.0.0      False`
 
-- Protected workflow run ID: NONE.
-- Production import: NOT RUN.
-- Production publish/readback: NOT RUN.
-- Repeat-safe deployment validation: NOT RUN.
+## Prior Failed Attempts Preserved
+
+| Run | Result | Reason |
+| --- | --- | --- |
+| `31246581996` | FAIL | Workflow checkout lacked `origin/main` for branch guard context. |
+| `31246646639` | FAIL | Bootstrap guard was inappropriate for branch-targeted ALM workflow execution. |
+| `31246703219` | FAIL | Microsoft action installed PAC to `POWERPLATFORMTOOLS_PACPATH`; raw `pac` command was not on PATH. |
+| `31246867991` | FAIL | Dataverse rejected import due concurrent `EntityCustomization` operation. |
+| `31246998549` | FAIL | PAC async import path failed with duplicate import job id. |
+
+Those failed attempts did not use Jackie interactive identity, did not broaden privileges, and did not bypass the protected workflow.
 
 ## Evidence
 
-- `github-protected-workflow-dispatch-failure-2026-08-08.log`
-
-Tranche 1 runtime implementation remains blocked.
+- `powerplatform/solutions/JM1PublishingSales/evidence/github-run-31247571393-production-log-2026-08-08.log`
+- `powerplatform/solutions/JM1PublishingSales/evidence/github-run-31247571393-production-artifact/solution-list.txt`
+- `powerplatform/solutions/JM1PublishingSales/evidence/github-run-31246867991-production-log-2026-08-08.log`
+- `powerplatform/solutions/JM1PublishingSales/evidence/github-run-31246998549-production-log-2026-08-08.log`

@@ -14,4 +14,4 @@ Live client records used: 0.
 
 The scenarios were not executed because creating validation records and activating/configuring the supporting D365/Power Platform path would require the missing governed deployment path.
 
-2026-08-08 update: protected workflow dispatch remains blocked by GitHub's default-branch workflow requirement. PR #438 holds remain 3 / 5 closed; internal validation remains NOT RUN.
+2026-08-08 update: protected workflow dispatch/import/readback passed in run `31247571393`. PR #438 commissioning holds are 5 / 5 closed; Tranche 1 business validation remains NOT RUN.

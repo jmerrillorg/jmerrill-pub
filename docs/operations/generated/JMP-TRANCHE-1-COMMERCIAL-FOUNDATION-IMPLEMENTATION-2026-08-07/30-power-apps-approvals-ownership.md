@@ -14,9 +14,9 @@ All future app, view, form, exception queue, Teams/Approvals, and flow component
 
 ## Status
 
-Power Apps ownership: NOT YET CLOSED.
+Power Apps ownership commissioning model: CLOSED.
 
-Approvals/workflow ownership: NOT YET CLOSED.
+Approvals/workflow ownership commissioning model: CLOSED.
 
 No orphan app was created.
 

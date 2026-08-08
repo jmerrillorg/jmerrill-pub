@@ -1,19 +1,22 @@
 # Tranche 1 Runtime Resumption
 
-Last verified: 2026-08-08T05:12:00Z
+Last verified: 2026-08-08T08:13:46Z
 
 ## Result
 
-Tranche 1 runtime implementation resumed: NO.
+Tranche 1 runtime implementation resumed: YES / AUTHORIZED TO CONTINUE.
 
 ## Reason
 
-The instruction authorized runtime resumption only after all five PR #438 holds were closed. Two holds remain open:
+All five PR #438 commissioning holds are closed:
 
-1. Protected production deployment proof.
-2. Power Apps / Approvals ownership proof.
+1. Source-controlled `JM1PublishingSales` solution package.
+2. Approved development environment target.
+3. Protected production deployment workflow and readback.
+4. Governed Power Apps / Approvals ownership model.
+5. Stripe projection path disposition.
 
-## Runtime Items Not Started
+## Runtime Items Eligible To Resume
 
 - D365 Lead / Opportunity configuration.
 - Commercial stages / BPF alignment.
@@ -36,5 +39,8 @@ The instruction authorized runtime resumption only after all five PR #438 holds 
 - PR #431 titles used: 0.
 - Business Central posting: 0.
 - Strategic Marketing activation: 0.
+- Tranche 2 implementation: 0.
+- Website deployment: 0.
+- Author communications: 0.
 - Client-title automation: FROZEN.
 - Client-title production: MANUAL.

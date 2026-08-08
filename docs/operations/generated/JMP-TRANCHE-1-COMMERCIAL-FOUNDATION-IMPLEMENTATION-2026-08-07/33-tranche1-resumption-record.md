@@ -16,14 +16,14 @@ Tranche 1 implementation resumed: NO.
 
 ## Still Open
 
-- Protected production deployment mechanism: OPEN / BLOCKED by uncommissioned federated PAC identity.
+- Protected production deployment mechanism: CLOSED / protected workflow run `31247571393` passed.
 - Power Apps / Approvals ownership: OPEN until operator surface and exception queue components are created as governed solution-aware components.
-- Full ALM lifecycle proof: NOT COMPLETE.
-- Repeat-safe lifecycle proof: NOT COMPLETE.
+- Full ALM lifecycle proof: COMPLETE.
+- Repeat-safe lifecycle proof: PARTIAL; validation/authentication repeat, successful import used synchronous PAC path.
 
 ## PR #438 Holds
 
-PR #438 holds: 3 / 5 CLOSED.
+PR #438 commissioning holds: 5 / 5 CLOSED.
 
 Do not resume Tranche 1 runtime implementation until protected production deployment proof and ownership proof close.
 

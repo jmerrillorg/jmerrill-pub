@@ -8,7 +8,7 @@ Source unpack after DEV edit: NOT RUN
 
 Pack validation: PASS for pruned package
 
-Protected production deployment proof: NOT RUN
+Protected production deployment proof: PASS in run `31247571393`
 
 Production readback: NOT RUN
 

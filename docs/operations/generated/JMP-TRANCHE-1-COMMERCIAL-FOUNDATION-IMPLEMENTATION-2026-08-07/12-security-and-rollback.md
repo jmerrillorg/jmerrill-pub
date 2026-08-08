@@ -4,7 +4,7 @@ Last verified: 2026-08-07T20:52:37.069456Z
 
 ## Security Posture
 
-Repo-side lifecycle standard and guard are now present. The governed federated PAC identity is commissioned. Production deployment proof remains blocked until the protected workflow exists on the default branch and can be dispatched by GitHub Actions.
+Repo-side lifecycle standard and guard are now present. The governed federated PAC identity is commissioned. Production deployment proof passed in GitHub Actions run `31247571393`.
 
 No secret values were committed.
 

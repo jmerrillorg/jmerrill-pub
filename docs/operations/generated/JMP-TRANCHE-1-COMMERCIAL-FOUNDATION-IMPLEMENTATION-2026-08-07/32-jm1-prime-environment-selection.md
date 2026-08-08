@@ -24,11 +24,11 @@ JM1-Enterprise-Dev is the canonical development target for Dynamics-capable, sol
 | Connection references | NONE IN BASELINE |
 | Environment variables | NONE IN BASELINE |
 | Deployment identity | COMMISSIONED |
-| Protected workflow dispatch | BLOCKED UNTIL DEFAULT-BRANCH WORKFLOW EXISTS |
+| Protected workflow dispatch | PASS in run `31247571393` |
 | Stripe projection | EXTEND_EXISTING |
 
 ## Status
 
 JM1-PRIME preflight rule: UPDATED IN EVIDENCE.
 
-Runtime implementation: NOT RESUMED.
+Runtime implementation: AUTHORIZED TO CONTINUE.

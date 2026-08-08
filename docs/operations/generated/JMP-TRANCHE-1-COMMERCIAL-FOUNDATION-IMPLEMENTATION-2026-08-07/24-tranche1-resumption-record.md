@@ -6,15 +6,15 @@ Tranche 1 implementation resumed: NO
 
 Stop code:
 
-`BLOCKED — PROTECTED WORKFLOW NOT DISPATCHABLE UNTIL DEFAULT-BRANCH WORKFLOW EXISTS`
+`SUPERSEDED — SEE 42-TRANCHE1-RUNTIME-RESUMPTION`
 
 Required gates not met:
 
-- Protected workflow dispatch: BLOCKED UNTIL DEFAULT-BRANCH WORKFLOW EXISTS
+- Protected workflow dispatch: PASS in run `31247571393`
 - Protected production import proof: NOT RUN
 - Power Apps / Approvals ownership proof: OPEN
 - ALM lifecycle proof: PARTIAL ONLY
-- PR #438 holds: 3 / 5 CLOSED
+- PR #438 commissioning holds: 5 / 5 CLOSED
 
 PR #431 remains unchanged and separate.
 
