@@ -1,0 +1,29 @@
+# Checksums
+
+| File | SHA-256 |
+| --- | --- |
+| 00-executive-closeout.md | 381504e7f06c97ce31bfe4e4da531384b73db85ce87688f9a216a78c87b3c890 |
+| 01-preflight-and-authority-map.md | 2d23b1605b04b8a568d269480c778f759987e8def94983802ff623582f07281d |
+| 02-title-runtime-initialization.md | 5edaa59e8bff2c7d7b0af4b0c53a2ce8db5ad3832af2d6d5943175582e3c3957 |
+| 03-edition-product-form-authority.md | 2c1b1684ae3b08fe77bfebbb47093f04c1a1bc194f883f9b189d6a0c594d1497 |
+| 04-lifecycle-state-machine.md | 8d9404c83f127d7bb062700d07b90916e0faa93e418da73a09b930ee38a22829 |
+| 05-editorial-runtime.md | b46339475969efd405d0eec6a72d178299654d7a51771b020f373ce0786a8cd4 |
+| 06-ftl-runtime.md | 8e539ec014481b64bad3b50a14403d94785c5f5dbddaa9437e537f54bfe45f65 |
+| 07-production-readiness.md | c2462b1635e6bd350187ea2950dbed4eecb517e99fd09ab20cc2bfade5ea9940 |
+| 08-distribution-readiness.md | d1810e91cab0c33d02b34f3d366f0010e24715acef7b13e7c9a14d3cc79b43a9 |
+| 09-release-date-gate.md | 447fd5e1e845da3eb0178e6a9569c4621d8fb95aa46b2d4ec007fd10cf0b6cfe |
+| 10-distribution-submission.md | 038503411a4d4d47acb87473b6df96ec93ef2f60448ca5d18238478c917534a9 |
+| 11-confirmed-live-readback.md | 7a5bc13689940c3f44a0df567b540032ea86280f2f14053cea0d8add5597ce71 |
+| 12-correction-authority.md | 53c2af59db02b4e27b7a0d0c4a3dd1c99c9a3e3d77ad58be533431f6922dfc30 |
+| 13-companion-edition-runtime.md | c179d680b6b59223ca5236148e3b139fefcf28e230275e0d7c07add1065b6aa6 |
+| 14-author-copy-entitlements.md | 35edf27edd125094b52d04f4d1716e29ec4c8c68763a388022113694c11d1c92 |
+| 15-sharepoint-artifact-authority.md | a43d8fdeecfb2d2aa192125f1bddda6ed761416f64e51f332426f92879fb0da9 |
+| 16-author-experience-boundary.md | b36cc68d8cad7e6a0cf84a06e9433b242411b564abf090956ccfccbed056bdf2 |
+| 17-single-operator-title-surface.md | 67c3908716c0b77dd5623c4d894e24a879b30a87714c94d11278cd7ddba99c3e |
+| 18-execution-log-proof.md | 12f9ffbcea02b029981940a6ac9bb21eae08fb249f53b66a27bc4b7f5fa20277 |
+| 19-internal-validation-results.md | 45fd510abcd198def00ae5a28cf087412e46dce669226902a525105d9ad1c829 |
+| 20-operator-burden-results.md | e26bf8273a04f7ac3edd5287b70799eb58c2210dd42ea6249624dca7d2a462fd |
+| 21-security-and-rollback.md | 96f392cfd383ea58a101cba18bb1977a78bfe2697dc2aace35c523d3e2d18c96 |
+| 22-production-readback.md | 6f552b4bc535582f595c4ed2e84c5cac5f0dea071e0a0d00dfd900bd95b970c1 |
+| 23-open-holds.md | 30f75cf7ab3e0f51cd23c675d7b5189453eccfa8c24e5292d475c5162d86f1e0 |
+| 24-evidence-index.md | 298c84f2fa2c9512de03b9644f5871f2a8c99067b46b32d914cfdfe3dcc79fc3 |
