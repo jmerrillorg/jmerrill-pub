@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { buildActivationMatrix, runCertification } from './tranche6_certification_controlled_thaw.mjs'
 
 export const doctrinePath = 'docs/governance/publishing/JMP-NO-LOW-COST-MARKETING-SPEND-AUTHORIZATION-DOCTRINE-v1.0.md'
+export const hybridDisclosurePath = 'docs/governance/publishing/JMP-HYBRID-MARKETING-DISCLOSURE-v1.0.md'
 export const evidenceRoot = 'docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09'
 
 export const authorizedTables = {
@@ -29,7 +30,7 @@ export const requirementRows = [
   req('MR-003', artifacts[0], 'Classify target as JMP, Author, Title, or combination.', 'ALREADY_IMPLEMENTED', 'Author and Title Marketing Profiles exist in Tranche 4.'),
   req('MR-004', artifacts[0], 'Prioritize no-cost and owned/earned opportunities.', 'CANON_AMENDMENT_REQUIRED', 'New doctrine required for no-/low-cost-first authority.'),
   req('MR-005', artifacts[1], 'Do not create a shadow marketing services catalog.', 'ALREADY_CANONICAL', 'Slice 2 catalog remains commercial authority.'),
-  req('MR-006', artifacts[1], 'Paid campaign services must become catalog candidates before sale.', 'COMMERCIAL_CATALOG_CHANGE', 'Commercial catalog candidate only; no SKU added.'),
+  req('MR-006', artifacts[1], 'Paid campaign services must become governed catalog entries before sale.', 'COMMERCIAL_CATALOG_CHANGE', 'Jackie approved 2 / 2 Campaign Service candidates on 2026-08-09.'),
   req('MR-007', artifacts[1], 'Internal marketing actions are not commercial products.', 'NO_CHANGE_REQUIRED', 'Existing Strategic Marketing runtime can prepare internal opportunities.'),
   req('MR-008', artifacts[1], 'Dynamics quote/order path remains sale authority.', 'ALREADY_CANONICAL', 'Tranche 1 commercial foundation.'),
   req('MR-009', artifacts[2], 'Hybrid author-owned spend requires author approval.', 'BUSINESS_RULE_ENHANCEMENT', 'Spend authorization guard added.'),
@@ -40,14 +41,14 @@ export const requirementRows = [
   req('MR-014', artifacts[3], 'Configured budget is not spending authority.', 'BUSINESS_RULE_ENHANCEMENT', 'Guard fails closed when budget exists without approval.'),
   req('MR-015', artifacts[3], 'Campaign decision lifecycle includes Continue, Revise, Stop.', 'RUNTIME_EXTENSION_REQUIRED', 'Existing runtime can carry as campaign status/config extension.'),
   req('MR-016', artifacts[3], 'Campaign result history must avoid overclaiming attribution.', 'BUSINESS_RULE_ENHANCEMENT', 'Attribution standard added: directly attributable, correlated, unknown.'),
-  req('MR-017', artifacts[4], 'Hybrid marketing disclosure may need author-facing alignment.', 'AGREEMENT_DISCLOSURE_IMPACT', 'Disclosure/exhibit recommended; agreement unchanged.'),
-  req('MR-018', artifacts[4], 'No guaranteed sales, reviews, media, bestseller, retailer placement, ad profitability.', 'ATTORNEY_REVIEW_REQUIRED', 'Legal review required before contract/disclosure language becomes author-facing authority.'),
+  req('MR-017', artifacts[4], 'Hybrid marketing disclosure is approved author-facing business material.', 'AGREEMENT_DISCLOSURE_IMPACT', 'Jackie approved disclosure on 2026-08-09; agreement unchanged.'),
+  req('MR-018', artifacts[4], 'No guaranteed sales, reviews, media, bestseller, retailer placement, ad profitability.', 'BUSINESS_RULE_ENHANCEMENT', 'Jackie ruled attorney review not required on 2026-08-09.'),
   req('MR-019', artifacts[4], 'Current Hybrid agreement remains v1.3.1 unchanged.', 'ALREADY_CANONICAL', 'JMP_Publishing_Agreement_v1.3.1 remains controlling.'),
   req('MR-020', artifacts[5], 'Use existing canonical title authority instead of jm1_title.', 'REJECT_DUPLICATIVE', 'jm1_title rejected as duplicate title authority.'),
   req('MR-021', artifacts[5], 'Use lifecycle events and Marketing Opportunity instead of jm1_marketingstage.', 'REJECT_DUPLICATIVE', 'jm1_marketingstage rejected as duplicate state machine.'),
   req('MR-022', artifacts[5], 'Use commercial catalog, Marketing Opportunity, and Dynamics quote/order instead of jm1_addonservice.', 'REJECT_DUPLICATIVE', 'jm1_addonservice rejected as duplicate catalog/add-on authority.'),
   req('MR-023', artifacts[5], 'Minimal fields for cost owner, approval, stop-loss, and evidence.', 'RUNTIME_EXTENSION_REQUIRED', 'Existing entities require field/config extension.'),
-  req('MR-024', artifacts[6], 'Limit counsel packet to legal/contract questions.', 'ATTORNEY_REVIEW_REQUIRED', 'Attorney review recommended only for disclosure/no-guarantee/pass-through language.'),
+  req('MR-024', artifacts[6], 'Close counsel packet after Jackie ruling.', 'NO_CHANGE_REQUIRED', 'Attorney review not required by Jackie ruling dated 2026-08-09.'),
   req('MR-025', artifacts[6], 'Do not ask counsel to approve implementation design.', 'NO_CHANGE_REQUIRED', 'Internal architecture remains governed by JM1 authority.'),
   req('MR-026', 'Imprint Treatment', 'Use one JMP framework with optional imprint profiles.', 'BUSINESS_RULE_ENHANCEMENT', 'Profile-based variation filed; no separate operating model.'),
   req('MR-027', 'Human-First Marketing Standard', 'Use existing single-operator surface rather than new marketing dashboard.', 'ALREADY_CANONICAL', 'Capability model and Tranche 4/6 surfaces already carry marketing decisions.'),
@@ -62,10 +63,27 @@ export const campaignServiceRows = [
   service('Author social launch prompts', 'EXISTING_CAPABILITY_NOT_SOLD', 'OWNED / AUTHOR', 'NO_EXTERNAL_COST'),
   service('Podcast outreach', 'EXISTING_CAPABILITY_NOT_SOLD', 'EARNED / PARTNER', 'NO_EXTERNAL_COST'),
   service('Library/bookstore outreach', 'EXISTING_CAPABILITY_NOT_SOLD', 'EARNED / PARTNER', 'NO_EXTERNAL_COST'),
-  service('Paid social ad setup', 'NEW_CATALOG_CANDIDATE', 'PAID', 'AUTHOR_COST or JMP_COST or SHARED_COST'),
-  service('Paid ARC/review platform placement', 'NEW_CATALOG_CANDIDATE', 'PAID', 'AUTHOR_COST or JMP_COST or SHARED_COST'),
+  service('Paid social ad setup', 'APPROVED_GOVERNED_SKU', 'PAID', 'AUTHOR_COST or JMP_COST or SHARED_COST', 'JMP-MKT-PAID-SOCIAL-SETUP'),
+  service('Paid ARC/review platform placement', 'APPROVED_GOVERNED_SKU', 'PAID', 'AUTHOR_COST or JMP_COST or SHARED_COST', 'JMP-MKT-ARC'),
   service('Media kit preparation', 'EXISTING_CAPABILITY_NOT_SOLD', 'OWNED', 'NO_EXTERNAL_COST'),
   service('Retailer metadata tune-up', 'EXISTING_CAPABILITY_NOT_SOLD', 'OWNED', 'NO_EXTERNAL_COST'),
+]
+
+export const approvedCampaignServiceSkus = [
+  {
+    sku: 'JMP-MKT-ARC',
+    name: 'ARC Campaign Management',
+    layer: 'CAMPAIGN_SERVICES',
+    trackEligibility: 'Hybrid and Traditional/JM Signature',
+    defaultCostOwnerLogic: 'AUTHOR_COST / JMP_COST / SHARED_COST based on track and approved campaign terms',
+  },
+  {
+    sku: 'JMP-MKT-PAID-SOCIAL-SETUP',
+    name: 'Paid Social Ad Setup',
+    layer: 'CAMPAIGN_SERVICES',
+    trackEligibility: 'Hybrid and Traditional/JM Signature',
+    defaultCostOwnerLogic: 'AUTHOR_COST / JMP_COST / SHARED_COST based on track and approved campaign terms',
+  },
 ]
 
 export const readinessActions = [
@@ -76,7 +94,7 @@ export const readinessActions = [
   action('JMP newsletter consideration', 'Organic Launch', 'RELEASE_CONFIRMED_LIVE', 'JMP / TITLE', 'Hybrid and Traditional', 'NO_EXTERNAL_COST', 'Jackie editorial approval', false, 'ALREADY_IMPLEMENTED'),
   action('Podcast/library outreach', 'Organic Launch', 'RELEASE_CONFIRMED_LIVE', 'TITLE', 'Hybrid and Traditional', 'NO_EXTERNAL_COST', 'Jackie or operator approval to proceed', false, 'RUNTIME_EXTENSION_REQUIRED'),
   action('Paid social ad', 'Campaign Services', 'POST_RELEASE_MARKETING_REVIEW', 'TITLE', 'Hybrid and Traditional', 'AUTHOR_COST or JMP_COST or SHARED_COST', 'Spend owner approval required', true, 'RUNTIME_EXTENSION_REQUIRED'),
-  action('Paid ARC/review service', 'Campaign Services', 'POST_RELEASE_MARKETING_REVIEW', 'TITLE', 'Hybrid and Traditional', 'AUTHOR_COST or JMP_COST or SHARED_COST', 'Spend owner approval required', true, 'COMMERCIAL_CATALOG_CANDIDATE'),
+  action('Paid ARC/review service', 'Campaign Services', 'POST_RELEASE_MARKETING_REVIEW', 'TITLE', 'Hybrid and Traditional', 'AUTHOR_COST or JMP_COST or SHARED_COST', 'Spend owner approval required', true, 'APPROVED_GOVERNED_SKU'),
 ]
 
 export const pilotMarketingRows = [
@@ -186,13 +204,15 @@ export function buildMarketingPackage() {
     tranches: 'CANONICAL / COMPLETE',
     integratedCertification: `${runCertification().passed} / ${runCertification().total} PASS`,
     framework: 'RECONCILED AGAINST CANON',
-    threeLayerModel: 'READINESS / ORGANIC LAUNCH / CAMPAIGN SERVICES - ADOPTED AS CANON-CANDIDATE / FILED',
-    doctrine: 'CREATED',
+    threeLayerModel: 'READINESS / ORGANIC LAUNCH / CAMPAIGN SERVICES - CANONICAL',
+    doctrine: 'CANONICAL',
     classifications,
     deltas,
-    campaignServiceCandidates: campaignServiceRows.filter((row) => row.disposition === 'NEW_CATALOG_CANDIDATE').length,
-    hybridDisclosure: 'DISCLOSURE / EXHIBIT RECOMMENDED; ATTORNEY REVIEW REQUIRED BEFORE DECISION',
-    attorneyPacket: 'PREPARED NOT SENT',
+    campaignServiceCandidates: 0,
+    approvedCampaignServices: approvedCampaignServiceSkus.length,
+    newCanonicalSkus: approvedCampaignServiceSkus.map((item) => item.sku),
+    hybridDisclosure: 'APPROVED / GOVERNED',
+    attorneyPacket: 'DO NOT SEND / HISTORICAL INTERNAL EVIDENCE ONLY',
     attorneyMaterialsReleased: 0,
     imprintModel: 'ONE JMP FRAMEWORK / PROFILE-BASED VARIATION',
     marketingSyntheticValidation: `${validation.passed} / ${validation.total} PASS`,
@@ -200,12 +220,13 @@ export function buildMarketingPackage() {
     separateMarketingDashboardRequired: 'NO',
     singleOperatorPilotGaps: 2,
     humanOperatingLayerPilotGaps: 1,
+    unruledPilotGaps: 0,
     pilotBlockers: 0,
-    intentionalLeaderReassessment: 'PILOT READY WITH HOLDS',
+    intentionalLeaderReassessment: 'PILOT READY FOR LIMITED LIVE ACTIVATION',
     pilotRisk: 'MODERATE',
     criticalShadowMismatches: 0,
     waveCDecisionBlocks: '5 / 5 COMPLETE',
-    waveCApprovalsGranted: 0,
+    waveCApprovalsGranted: 5,
     zeroes: {
       realMarketingSpend: 0,
       realMarketingActivation: 0,
@@ -225,6 +246,7 @@ export function writeMarketingPackage() {
   mkdirSync('docs/governance/publishing', { recursive: true })
   mkdirSync(evidenceRoot, { recursive: true })
   writeFileSync(doctrinePath, doctrineDoc())
+  writeFileSync(hybridDisclosurePath, hybridDisclosureAuthorityDoc())
   const docs = {
     '00-executive-summary.md': executiveSummary(pkg),
     '01-marketing-doctrine-authority.md': markdown('Marketing Doctrine Authority', doctrineBody()),
@@ -247,9 +269,10 @@ export function writeMarketingPackage() {
     '18-runtime-delta-register.md': runtimeDeltaDoc(pkg),
     '19-open-holds.md': openHoldsDoc(pkg),
     '20-evidence-index.md': evidenceIndexDoc(pkg),
+    'PILOT-1-LAUNCH-CARD.md': launchCardDoc(pkg),
   }
   for (const [file, content] of Object.entries(docs)) writeFileSync(join(evidenceRoot, file), ensureNewline(content))
-  writeFileSync(join(evidenceRoot, '21-checksums.md'), checksums([doctrinePath, ...Object.keys(docs).map((file) => join(evidenceRoot, file))]))
+  writeFileSync(join(evidenceRoot, '21-checksums.md'), checksums([doctrinePath, hybridDisclosurePath, ...Object.keys(docs).map((file) => join(evidenceRoot, file))]))
   return pkg
 }
 
@@ -257,8 +280,8 @@ function req(id, artifact, requirement, classification, evidence) {
   return { id, artifact, requirement, classification, evidence }
 }
 
-function service(name, disposition, channelClass, costOwner) {
-  return { name, disposition, channelClass, costOwner }
+function service(name, disposition, channelClass, costOwner, sku = null) {
+  return { name, disposition, channelClass, costOwner, sku }
 }
 
 function action(name, layer, lifecycleTrigger, target, trackApplicability, costOwner, approvalAuthority, externalCostPossible, support) {
@@ -273,8 +296,64 @@ function doctrineDoc() {
   return markdown('JMP No-/Low-Cost Marketing Spend Authorization Doctrine v1.0', doctrineBody())
 }
 
+function hybridDisclosureAuthorityDoc() {
+  return `# JMP Hybrid Marketing Disclosure v1.0
+
+Status: APPROVED / GOVERNED
+Jackie ruling date: 2026-08-09
+Agreement relationship: companion/reference under JMP_Publishing_Agreement_v1.3.1
+Attorney review: NOT REQUIRED BY JACKIE RULING
+
+## Purpose
+
+This disclosure explains how J Merrill Publishing handles marketing support for Hybrid publishing titles.
+
+## Included Publishing Marketing Support
+
+JMP considers and performs appropriate readiness and organic launch support based on the title, author, timing, available assets, audience fit, consent, and channel relevance.
+
+The standard framework does not guarantee that every possible tactic will apply to every title.
+
+## Author Responsibilities
+
+The author may be asked to provide profile information, biography details, platform links, audience context, launch preferences, approvals, and author-owned channel participation where appropriate.
+
+## Optional Campaign Services
+
+Paid or special Campaign Services are separate governed services. They must flow through the canonical commercial catalog, quote/order path, agreement or addendum where applicable, and payment/financial readiness where required.
+
+Approved Campaign Service SKUs:
+
+- JMP-MKT-ARC - ARC Campaign Management
+- JMP-MKT-PAID-SOCIAL-SETUP - Paid Social Ad Setup
+
+## Cost Ownership
+
+Hybrid author-owned external cost requires author approval before commitment or spend.
+
+Shared external cost requires author and Jackie approval before commitment or spend.
+
+JMP-owned external cost requires Jackie approval before commitment or spend.
+
+## Spend Authorization
+
+SKU availability does not authorize a campaign. A configured budget does not authorize spend. Wave C capability approval does not authorize spend.
+
+External paid activity requires explicit approval from the applicable cost owner before JMP commits to or incurs the cost.
+
+## No Guarantee
+
+JMP performs governed marketing activities but cannot guarantee third-party decisions or market outcomes, including sales volume, revenue, reviews, media coverage, bestseller status, retailer placement, speaking opportunities, advertising performance, audience growth, or campaign profitability.
+
+## Agreement Version
+
+JMP_Publishing_Agreement_v1.3.1 remains current and unchanged. This disclosure does not create JMP Publishing Agreement v1.3.2.
+`
+}
+
 function doctrineBody() {
   return `Classification: CANONICAL BUSINESS DOCTRINE AFTER MERGE
+Jackie ruling date: 2026-08-09
 
 ## Purpose
 
@@ -282,7 +361,7 @@ J Merrill Publishing operates on a no-cost / low-cost marketing-first standard a
 
 ## Scope
 
-This doctrine governs Publishing marketing opportunities, readiness, organic launch activity, campaign services, Strategic Marketing runtime behavior, and Pilot #445 readiness. It does not authorize any live marketing spend, live journey activation, commercial SKU, agreement edit, or author-facing disclosure.
+This doctrine governs Publishing marketing opportunities, readiness, organic launch activity, campaign services, Strategic Marketing runtime behavior, and Pilot #445 readiness. It does not authorize any live marketing spend, live journey activation, agreement edit, or live author-facing action.
 
 ## No-/Low-Cost-First Principle
 
@@ -324,7 +403,7 @@ Any marketing service sold to an author must flow through the canonical Publishi
 
 ## Relationship To Agreements And Disclosures
 
-JMP_Publishing_Agreement_v1.3.1 remains current and unchanged. Hybrid disclosure/no-guarantee wording is a review candidate and not author-facing legal canon until separately approved.
+JMP_Publishing_Agreement_v1.3.1 remains current and unchanged. The Hybrid Marketing Disclosure is governed author-facing business material by Jackie ruling dated 2026-08-09 and operates as a companion/reference under the existing agreement path without creating v1.3.2.
 
 ## Relationship To Strategic Marketing Runtime
 
@@ -360,7 +439,10 @@ Runtime behavioral extensions: ${pkg.deltas.runtimeBehavioralExtensions}
 New marketing tables required: ${pkg.deltas.newMarketingTablesRequired}
 Proposed duplicate tables rejected: ${pkg.deltas.proposedDuplicateTablesRejected}
 
-New catalog candidates awaiting Jackie: ${pkg.campaignServiceCandidates}
+Approved Campaign Service candidates: ${pkg.approvedCampaignServices} / 2 GOVERNED
+New canonical SKUs:
+${pkg.newCanonicalSkus.map((sku) => `- ${sku}`).join('\n')}
+Duplicate SKUs: 0
 Hybrid Agreement: JMP_Publishing_Agreement_v1.3.1 / UNCHANGED
 Hybrid Marketing Disclosure: ${pkg.hybridDisclosure}
 Attorney packet: ${pkg.attorneyPacket}
@@ -371,6 +453,7 @@ Pilot risk: ${pkg.pilotRisk}
 Pilot blockers: ${pkg.pilotBlockers}
 Wave C decision blocks: ${pkg.waveCDecisionBlocks}
 Wave C approvals granted: ${pkg.waveCApprovalsGranted}
+Enterprise-wide blanket Wave C activation: NO
 
 Real marketing spend: ${pkg.zeroes.realMarketingSpend}
 Real marketing activation: ${pkg.zeroes.realMarketingActivation}
@@ -383,13 +466,13 @@ Real distribution submission: ${pkg.zeroes.realDistributionSubmission}
 Tier 4 automated actions: ${pkg.zeroes.tier4AutomatedActions}
 
 Client-title automation: PARTIALLY THAWED UNDER ACTIVATION REGISTER
-Pilot 1: NOT ACTIVATED
+Pilot 1: READY / NOT ACTIVATED
 PR #431: UNCHANGED / CURRENT OPERATING PRIORITY
 `
 }
 
 function threeLayerModelDoc() {
-  return markdown('Three-Layer Model Reconciliation', `The model is adopted as canon-candidate business framework inside Strategic Marketing:
+  return markdown('Three-Layer Model Reconciliation', `The model is canonical business framework inside Strategic Marketing by Jackie ruling dated 2026-08-09:
 
 Publishing lifecycle event -> Marketing Opportunity -> Layer -> Target -> Track rules -> Cost owner -> Consent/readiness -> Spend authorization if required -> Prepare -> Approve -> Execute only when activation state permits -> Measure/continue/revise/stop.
 
@@ -418,11 +501,14 @@ ${readinessActions.map((row) => `| ${row.name} | ${row.layer} | ${row.lifecycleT
 }
 
 function campaignServicesDoc() {
-  return markdown('Campaign Services Catalog Reconciliation', `No new SKU becomes canonical under this instruction.
+  return markdown('Campaign Services Catalog Reconciliation', `Jackie ruling dated 2026-08-09 approves 2 / 2 Campaign Service candidates as governed commercial catalog entries. SKU approval does not authorize campaign spend.
 
-| Proposed service | Disposition | Owned/Earned/Partner/Paid | Cost owner |
-|---|---|---|---|
-${campaignServiceRows.map((row) => `| ${row.name} | ${row.disposition} | ${row.channelClass} | ${row.costOwner} |`).join('\n')}
+| Proposed service | Disposition | SKU | Owned/Earned/Partner/Paid | Cost owner |
+|---|---|---|---|---|
+${campaignServiceRows.map((row) => `| ${row.name} | ${row.disposition} | ${row.sku || 'N/A'} | ${row.channelClass} | ${row.costOwner} |`).join('\n')}
+
+Approved governed SKUs:
+${approvedCampaignServiceSkus.map((row) => `- ${row.sku}: ${row.name}; ${row.layer}; ${row.trackEligibility}; ${row.defaultCostOwnerLogic}.`).join('\n')}
 `)
 }
 
@@ -454,11 +540,11 @@ REVISE requires updated governed terms if budget, objective, audience, or stop-l
 function hybridDisclosureDoc(pkg) {
   return markdown('Hybrid Disclosure and Agreement Impact', `JMP_Publishing_Agreement_v1.3.1: CURRENT / UNCHANGED
 
-Recommendation: ${pkg.hybridDisclosure}
+Ruling: ${pkg.hybridDisclosure}
 
-Current agreement is not changed by this PR. The disclosure candidate should be reviewed for included marketing support, author responsibilities, optional services, cost ownership, spend authorization, and no-guarantee language.
+Current agreement is not changed by this PR. The disclosure operates as governed author-facing business material and a companion/reference under the existing agreement path. It explains included marketing support, author responsibilities, optional Campaign Services, cost ownership, spend authorization, and no-guarantee expectations.
 
-No-guarantee topics for attorney review before author-facing legal canon:
+No-guarantee topics:
 - Sales volume
 - Revenue
 - Reviews
@@ -470,7 +556,7 @@ No-guarantee topics for attorney review before author-facing legal canon:
 - Audience growth
 - Campaign profitability
 
-Disclosure consistency classification: DISCLOSURE / EXHIBIT RECOMMENDED. Attorney review required before decision.`)
+Attorney review: NOT REQUIRED BY JACKIE RULING - 2026-08-09.`)
 }
 
 function dataverseSpecDoc(pkg) {
@@ -507,7 +593,7 @@ Out of scope for counsel approval:
 - Lifecycle event maps
 - Implementation design
 
-Jackie release remains required before attorney materials are sent.`)
+Attorney review is not required by Jackie ruling dated 2026-08-09. Do not send counsel materials under PR #445.`)
 }
 
 function spendEvidenceDoc() {
@@ -548,14 +634,15 @@ ${pkg.validation.results.map((row) => `| ${row.id} | ${row.name} | ${row.result}
 function pilotGapDoc(pkg) {
   return markdown('Pilot Gap Register', `| Gap | Classification | Blocker? |
 |---|---|---|
-| Confirm governed SharePoint artifact path before any live title mutation. | PRE_LIVE_REQUIRED | NO |
-| Confirm protected mutation authorization for The Intentional Leader. | PRE_LIVE_REQUIRED | NO |
-| Add Human Operating Layer note explaining paid marketing approval states. | POST_PILOT_IMPROVEMENT | NO |
+| Confirm governed SharePoint artifact path before any live title mutation. | ACCEPTED FOR PILOT | NO |
+| Confirm protected mutation authorization for The Intentional Leader. | ACCEPTED FOR PILOT | NO |
+| Add Human Operating Layer note explaining paid marketing approval states. | PRE-LIVE CORRECTION COMPLETED | NO |
 
 Single-operator pilot gaps: ${pkg.singleOperatorPilotGaps}
 Human Operating Layer pilot gaps: ${pkg.humanOperatingLayerPilotGaps}
+Unruled pilot gaps: ${pkg.unruledPilotGaps}
 Pilot blockers: ${pkg.pilotBlockers}
-Pilot readiness: PILOT READY WITH HOLDS`)
+Pilot readiness: PILOT READY FOR LIMITED LIVE ACTIVATION`)
 }
 
 function intentionalLeaderDoc(pkg) {
@@ -571,32 +658,37 @@ Marketing pilot scope:
 ${pilotMarketingRows.map((row) => `| ${row.layer} | ${row.actionName} | ${row.state} | ${row.note} |`).join('\n')}
 
 Paid spend: 0 until explicit spend approval.
-Campaign Services: HOLD unless specifically approved.
+Campaign Services: governed SKUs are available, but any paid campaign remains PAID_MARKETING_HOLD until cost owner, approved amount, approver, approval evidence, stop-loss, success metric, and reporting cadence are present.
 `)
 }
 
 function waveCDecisionDoc(pkg) {
   const rows = [
-    ['Protected real-title state mutation', 'NO', 'N/A', 'Jackie', '0', 'NO', 'HOLD'],
-    ['Assisted author communication approval', 'NO', 'N/A', 'Jackie', '0', 'NO', 'HOLD'],
-    ['Assisted distribution submission', 'YES', 'JMP or author depending channel/terms', 'Jackie and/or author if cost emerges', '0', 'NO', 'HOLD'],
-    ['Assisted marketing journey activation', 'YES', 'AUTHOR_COST / JMP_COST / SHARED_COST', 'Author / Jackie / both', '0', 'NO', 'HOLD'],
-    ['Business Central live posting', 'NO direct marketing cost', 'N/A', 'Jackie finance authority', '0', 'NO', 'HOLD'],
+    ['Protected real-title state mutation', 'NO', 'N/A', 'Jackie', '0', 'APPROVED', 'LIMITED_LIVE / title scoped'],
+    ['Assisted author communication approval', 'NO', 'N/A', 'Jackie', '0', 'APPROVED', 'ASSISTED / title scoped'],
+    ['Assisted distribution submission', 'YES', 'JMP or author depending channel/terms', 'Jackie and/or author if cost emerges', '0', 'APPROVED', 'ASSISTED unless distribution-ready and specific external action approved'],
+    ['Assisted marketing journey activation', 'YES', 'AUTHOR_COST / JMP_COST / SHARED_COST', 'Author / Jackie / both', '0', 'APPROVED', 'ASSISTED / paid spend remains held'],
+    ['Business Central live posting', 'NO direct marketing cost', 'N/A', 'Jackie finance authority', '0', 'APPROVED', 'SHADOW / no posting'],
   ]
   return markdown('Wave C Decision Package', `Wave C decision blocks: ${pkg.waveCDecisionBlocks}
 Wave C approvals granted: ${pkg.waveCApprovalsGranted}
+Enterprise-wide blanket Wave C activation: NO
 
-| Decision | Could create external cost? | Cost owner | Spend approval authority | Maximum authorized amount | Approval currently present? | Cody recommendation |
+| Decision | Could create external cost? | Cost owner | Spend approval authority | Maximum authorized amount | Jackie ruling | Pilot-title approved state |
 |---|---|---|---|---|---|---|
 ${rows.map((row) => `| ${row.join(' | ')} |`).join('\n')}
 `)
 }
 
 function pilotActivationMatrixDoc() {
-  const rows = buildActivationMatrix().rows
-    .filter((row) => row.parentCapability === 'Strategic Marketing')
-    .map((row) => `| ${row.capability} | ${row.currentActivationState} | ${row.targetActivationState} | HOLD / NOT LIVE | ${row.killSwitch} |`)
-  return markdown('Pilot Activation Matrix Update', `| Capability | Current state | Target state | Pilot marketing decision | Kill switch |
+  const rows = [
+    ['Protected real-title state mutation', 'SHADOW_MODE', 'LIMITED_LIVE / title scoped after launch-card approval', 'TIER_2', 'disable-title-runtime'],
+    ['Author communication send', 'ASSISTED', 'ASSISTED / title scoped; Jackie review before governed send', 'TIER_3', 'disable-author-send'],
+    ['Distribution submission', 'FROZEN', 'ASSISTED / title scoped; stop before external submission unless separately launch-approved', 'TIER_3', 'disable-distribution-submission'],
+    ['Marketing journey activation', 'FROZEN', 'ASSISTED / title scoped; spend remains held without approval evidence', 'TIER_3', 'disable-marketing-journey'],
+    ['Business Central invoice projection/posting', 'SHADOW_MODE / no posting', 'SHADOW_MODE / title scoped; no live posting', 'TIER_3', 'disable-bc-invoice-path'],
+  ].map((row) => `| ${row.join(' | ')} |`)
+  return markdown('Pilot Activation Matrix Update', `| Capability | Enterprise default state | Pilot-title approved state | Risk tier | Kill switch |
 |---|---|---|---|---|
 ${rows.join('\n')}
 `)
@@ -607,8 +699,8 @@ function runtimeDeltaDoc(pkg) {
     ['MD-001', 'No-/low-cost-first priority', 'Doctrine', 'Strategic Marketing Opportunity', 'Supported conceptually', 'Canon document update', 'CANON_DOCUMENT_UPDATE', 'NO', 'NO', 'NO', 'NO', 'YES', 'NO'],
     ['MD-002', 'Paid campaign spend authorization', 'Artifacts 3/4', 'Marketing Opportunity / Journey prep', 'Approval concept exists; spend specifics need config', 'Fields/config', 'FIELD_EXTENSION', 'YES', 'YES', 'NO', 'DISCLOSURE REVIEW', 'YES', 'YES'],
     ['MD-003', 'Stop-loss before paid campaign activation', 'Artifact 4', 'Marketing Opportunity / Journey prep', 'Prepared journeys exist; stop-loss gate needs behavior', 'Behavioral gate', 'BEHAVIORAL_EXTENSION', 'YES', 'NO', 'NO', 'NO', 'YES', 'NO'],
-    ['MD-004', 'Campaign services sold to authors', 'Artifact 2', 'Commercial catalog', 'No SKU added', 'Candidate only', 'COMMERCIAL_CATALOG_CANDIDATE', 'NO', 'NO', 'YES', 'YES', 'YES', 'YES'],
-    ['MD-005', 'Hybrid disclosure/no-guarantee consistency', 'Artifact 5', 'Agreement / Operating Manual / package language', 'Agreement unchanged', 'Disclosure review', 'AUTHOR_DISCLOSURE_REVIEW', 'NO', 'NO', 'NO', 'YES', 'YES', 'YES'],
+    ['MD-004', 'Campaign services sold to authors', 'Artifact 2', 'Commercial catalog', '2 approved governed SKUs', 'None after ruling', 'CONFIGURATION_CHANGE', 'YES', 'NO', 'YES', 'YES', 'COMPLETE', 'NO'],
+    ['MD-005', 'Hybrid disclosure/no-guarantee consistency', 'Artifact 5', 'Agreement / Operating Manual / package language', 'Agreement unchanged; disclosure governed', 'None after ruling', 'AUTHOR_DISCLOSURE_REVIEW', 'NO', 'NO', 'NO', 'YES', 'COMPLETE', 'NO'],
     ['MD-006', 'Reject duplicate marketing tables', 'Artifact 6', 'Canonical title, lifecycle, catalog authorities', 'Existing authorities preserved', 'None', 'REJECT_DUPLICATIVE', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO'],
     ['MD-007', 'Result and attribution discipline', 'Artifacts 4/36/37', 'Marketing Opportunity / reporting evidence', 'Outcome evidence can be carried; attribution standard needed', 'Behavior/reporting extension', 'BEHAVIORAL_EXTENSION', 'YES', 'NO', 'NO', 'DISCLOSURE REVIEW', 'YES', 'NO'],
   ]
@@ -629,20 +721,68 @@ New top-level Publishing capabilities: ${pkg.deltas.newTopLevelPublishingCapabil
 function openHoldsDoc(pkg) {
   return markdown('Open Holds', `| Hold | Owner | Status |
 |---|---|---|
-| Campaign Service catalog candidates | Jackie | AWAITING RULING |
-| Hybrid disclosure/agreement recommendation | Jackie / attorney if released | AWAITING RULING |
-| Pilot #445 gaps | Jackie / operator | PILOT READY WITH HOLDS |
-| Five Wave C decisions | Jackie | ${pkg.waveCDecisionBlocks} / approvals 0 |
+| Campaign Service catalog candidates | Jackie | APPROVED 2 / 2 |
+| Hybrid disclosure/agreement recommendation | Jackie | APPROVED / attorney review not required |
+| Pilot #445 gaps | Jackie / operator | ALL RULED / accepted for pilot |
+| Five Wave C decisions | Jackie | ${pkg.waveCDecisionBlocks} / approvals ${pkg.waveCApprovalsGranted} |
 | PR #431 manual operations | Jackie / publishing operator | CURRENT OPERATING PRIORITY |
 `)
 }
 
 function evidenceIndexDoc(pkg) {
   return markdown('Evidence Index', `Doctrine: ${doctrinePath}
+Hybrid disclosure: ${hybridDisclosurePath}
 Evidence package: ${evidenceRoot}
 Marketing synthetic validation: ${pkg.marketingSyntheticValidation}
 Checksums: 21-checksums.md
 `)
+}
+
+function launchCardDoc() {
+  return `# Pilot 1 Launch Card
+
+Pilot: The Intentional Leader
+Governed identifier: JMP-INT-202607-0W5PTQ
+Risk: MODERATE
+Pilot readiness: READY
+
+## Approved Wave C Capabilities
+
+| Capability | Current activation state | Pilot-title state | Risk tier |
+|---|---|---|---|
+| Protected real-title state mutation | SHADOW_MODE | LIMITED_LIVE after launch-card approval | TIER_2 |
+| Author communication send | ASSISTED | ASSISTED / Jackie review before governed send | TIER_3 |
+| Distribution submission | FROZEN | ASSISTED unless separately approved for exact submission | TIER_3 |
+| Marketing journey activation | FROZEN | ASSISTED / paid spend held | TIER_3 |
+| Business Central invoice projection/posting | SHADOW_MODE / no posting | SHADOW_MODE / no live posting | TIER_3 |
+
+First proposed real external action: Send one governed assisted author-facing status/update communication for The Intentional Leader only, after leakage guard and Jackie approval.
+
+Who/what it affects: Jackie/The Intentional Leader title relationship; no other title, author, campaign, catalog item, financial record, or distribution channel.
+
+Cost: none.
+
+Cost owner: not applicable.
+
+Spend approval: N-A.
+
+Human approval: Jackie approves the exact prepared communication before send.
+
+Kill switch: disable-author-send.
+
+Rollback/recovery: stop assisted send path, preserve prepared artifact and evidence, continue manual communication.
+
+Expected evidence: prepared communication, leakage-guard PASS, Jackie approval, governed send evidence if later authorized, execution correlation ID, no unexpected response clock.
+
+Stop conditions:
+- leakage guard fails;
+- Jackie does not approve exact text;
+- recipient/title identity mismatch;
+- cost appears;
+- response clock would start unexpectedly;
+- kill switch unavailable;
+- PR #431 real-author recovery needs Jackie attention first.
+`
 }
 
 function markdown(title, body) {

@@ -28,9 +28,9 @@ test('Tranche 2 preserves system-of-record authority boundaries', () => {
   assert.equal(authorityMap.dataverse, 'Publishing operational state and fulfillment projection')
 })
 
-test('Tranche 2 maps all 20 catalog products to Business Central without duplicate financial SKUs', () => {
+test('Tranche 2 maps all projected catalog products to Business Central without duplicate financial SKUs', () => {
   const map = buildBusinessCentralItemMap()
-  assert.equal(map.length, 20)
+  assert.equal(map.length, 22)
   assert.deepEqual(
     map.filter((item, index) => map.findIndex((candidate) => candidate.sku === item.sku) !== index),
     [],

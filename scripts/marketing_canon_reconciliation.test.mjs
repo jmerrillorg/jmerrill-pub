@@ -1,8 +1,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 
 import {
   architectureDelta,
+  approvedCampaignServiceSkus,
   artifacts,
   authorizedTables,
   buildMarketingPackage,
@@ -11,6 +13,8 @@ import {
   requirementRows,
   runMarketingSyntheticValidation,
 } from './marketing_canon_reconciliation.mjs'
+
+const catalog = readFileSync('lib/commercial/catalog.ts', 'utf8')
 
 test('marketing doctrine reconciliation covers all seven artifacts', () => {
   assert.equal(artifacts.length, 7)
@@ -37,16 +41,22 @@ test('marketing artifact classifications are explicit', () => {
   assert.ok(counts.REJECT_DUPLICATIVE >= 3)
 })
 
-test('campaign services remain candidates and do not silently become catalog SKUs', () => {
-  assert.equal(campaignServiceRows.filter((row) => row.disposition === 'NEW_CATALOG_CANDIDATE').length, 2)
-  assert.ok(campaignServiceRows.every((row) => row.disposition !== 'EXISTING_CANONICAL_SKU'))
+test('campaign services are governed SKUs without duplicate catalog authority', () => {
+  assert.equal(campaignServiceRows.filter((row) => row.disposition === 'APPROVED_GOVERNED_SKU').length, 2)
+  assert.deepEqual(approvedCampaignServiceSkus.map((item) => item.sku).sort(), ['JMP-MKT-ARC', 'JMP-MKT-PAID-SOCIAL-SETUP'].sort())
+  assert.equal((catalog.match(/JMP-MKT-ARC/g) || []).length >= 2, true)
+  assert.equal((catalog.match(/JMP-MKT-PAID-SOCIAL-SETUP/g) || []).length >= 2, true)
+  assert.ok(catalog.includes('marketingCampaignServices'))
+  assert.ok(catalog.includes('spendAuthorizationRequired: true'))
 })
 
 test('marketing package is ready with holds and no live actions', () => {
   const pkg = buildMarketingPackage()
   assert.equal(pkg.marketingSyntheticValidation, '20 / 20 PASS')
   assert.equal(pkg.pilotBlockers, 0)
-  assert.equal(pkg.intentionalLeaderReassessment, 'PILOT READY WITH HOLDS')
+  assert.equal(pkg.intentionalLeaderReassessment, 'PILOT READY FOR LIMITED LIVE ACTIVATION')
+  assert.equal(pkg.waveCApprovalsGranted, 5)
+  assert.equal(pkg.approvedCampaignServices, 2)
   for (const value of Object.values(pkg.zeroes)) assert.equal(value, 0)
 })
 

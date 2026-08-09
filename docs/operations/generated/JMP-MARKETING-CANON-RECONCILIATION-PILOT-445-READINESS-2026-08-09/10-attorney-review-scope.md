@@ -1,6 +1,6 @@
 # Attorney Review Scope
 
-Attorney packet: PREPARED NOT SENT
+Attorney packet: DO NOT SEND / HISTORICAL INTERNAL EVIDENCE ONLY
 Attorney materials released: 0
 
 In scope for future attorney review:
@@ -18,4 +18,4 @@ Out of scope for counsel approval:
 - Lifecycle event maps
 - Implementation design
 
-Jackie release remains required before attorney materials are sent.
+Attorney review is not required by Jackie ruling dated 2026-08-09. Do not send counsel materials under PR #445.

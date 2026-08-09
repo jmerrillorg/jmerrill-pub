@@ -9,7 +9,7 @@ Source treatment: instruction-provided canon-candidate business material. No art
 | MR-003 | Readiness & Organic Launch Standard | Classify target as JMP, Author, Title, or combination. | ALREADY_IMPLEMENTED | Author and Title Marketing Profiles exist in Tranche 4. |
 | MR-004 | Readiness & Organic Launch Standard | Prioritize no-cost and owned/earned opportunities. | CANON_AMENDMENT_REQUIRED | New doctrine required for no-/low-cost-first authority. |
 | MR-005 | Campaign Services Catalog | Do not create a shadow marketing services catalog. | ALREADY_CANONICAL | Slice 2 catalog remains commercial authority. |
-| MR-006 | Campaign Services Catalog | Paid campaign services must become catalog candidates before sale. | COMMERCIAL_CATALOG_CHANGE | Commercial catalog candidate only; no SKU added. |
+| MR-006 | Campaign Services Catalog | Paid campaign services must become governed catalog entries before sale. | COMMERCIAL_CATALOG_CHANGE | Jackie approved 2 / 2 Campaign Service candidates on 2026-08-09. |
 | MR-007 | Campaign Services Catalog | Internal marketing actions are not commercial products. | NO_CHANGE_REQUIRED | Existing Strategic Marketing runtime can prepare internal opportunities. |
 | MR-008 | Campaign Services Catalog | Dynamics quote/order path remains sale authority. | ALREADY_CANONICAL | Tranche 1 commercial foundation. |
 | MR-009 | Traditional vs. Hybrid Responsibility Matrix | Hybrid author-owned spend requires author approval. | BUSINESS_RULE_ENHANCEMENT | Spend authorization guard added. |
@@ -20,14 +20,14 @@ Source treatment: instruction-provided canon-candidate business material. No art
 | MR-014 | Campaign Budget and Stop-Loss Standard | Configured budget is not spending authority. | BUSINESS_RULE_ENHANCEMENT | Guard fails closed when budget exists without approval. |
 | MR-015 | Campaign Budget and Stop-Loss Standard | Campaign decision lifecycle includes Continue, Revise, Stop. | RUNTIME_EXTENSION_REQUIRED | Existing runtime can carry as campaign status/config extension. |
 | MR-016 | Campaign Budget and Stop-Loss Standard | Campaign result history must avoid overclaiming attribution. | BUSINESS_RULE_ENHANCEMENT | Attribution standard added: directly attributable, correlated, unknown. |
-| MR-017 | Hybrid Marketing Disclosure | Hybrid marketing disclosure may need author-facing alignment. | AGREEMENT_DISCLOSURE_IMPACT | Disclosure/exhibit recommended; agreement unchanged. |
-| MR-018 | Hybrid Marketing Disclosure | No guaranteed sales, reviews, media, bestseller, retailer placement, ad profitability. | ATTORNEY_REVIEW_REQUIRED | Legal review required before contract/disclosure language becomes author-facing authority. |
+| MR-017 | Hybrid Marketing Disclosure | Hybrid marketing disclosure is approved author-facing business material. | AGREEMENT_DISCLOSURE_IMPACT | Jackie approved disclosure on 2026-08-09; agreement unchanged. |
+| MR-018 | Hybrid Marketing Disclosure | No guaranteed sales, reviews, media, bestseller, retailer placement, ad profitability. | BUSINESS_RULE_ENHANCEMENT | Jackie ruled attorney review not required on 2026-08-09. |
 | MR-019 | Hybrid Marketing Disclosure | Current Hybrid agreement remains v1.3.1 unchanged. | ALREADY_CANONICAL | JMP_Publishing_Agreement_v1.3.1 remains controlling. |
 | MR-020 | Dataverse Functional Specification - Minimal Scope | Use existing canonical title authority instead of jm1_title. | REJECT_DUPLICATIVE | jm1_title rejected as duplicate title authority. |
 | MR-021 | Dataverse Functional Specification - Minimal Scope | Use lifecycle events and Marketing Opportunity instead of jm1_marketingstage. | REJECT_DUPLICATIVE | jm1_marketingstage rejected as duplicate state machine. |
 | MR-022 | Dataverse Functional Specification - Minimal Scope | Use commercial catalog, Marketing Opportunity, and Dynamics quote/order instead of jm1_addonservice. | REJECT_DUPLICATIVE | jm1_addonservice rejected as duplicate catalog/add-on authority. |
 | MR-023 | Dataverse Functional Specification - Minimal Scope | Minimal fields for cost owner, approval, stop-loss, and evidence. | RUNTIME_EXTENSION_REQUIRED | Existing entities require field/config extension. |
-| MR-024 | Attorney Review Change Memorandum | Limit counsel packet to legal/contract questions. | ATTORNEY_REVIEW_REQUIRED | Attorney review recommended only for disclosure/no-guarantee/pass-through language. |
+| MR-024 | Attorney Review Change Memorandum | Close counsel packet after Jackie ruling. | NO_CHANGE_REQUIRED | Attorney review not required by Jackie ruling dated 2026-08-09. |
 | MR-025 | Attorney Review Change Memorandum | Do not ask counsel to approve implementation design. | NO_CHANGE_REQUIRED | Internal architecture remains governed by JM1 authority. |
 | MR-026 | Imprint Treatment | Use one JMP framework with optional imprint profiles. | BUSINESS_RULE_ENHANCEMENT | Profile-based variation filed; no separate operating model. |
 | MR-027 | Human-First Marketing Standard | Use existing single-operator surface rather than new marketing dashboard. | ALREADY_CANONICAL | Capability model and Tranche 4/6 surfaces already carry marketing decisions. |

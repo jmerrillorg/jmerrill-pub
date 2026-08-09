@@ -14,8 +14,8 @@ test('Tranche 1 catalog projection is idempotent and duplicate-free', () => {
   const first = loadCatalogProjection()
   const second = loadCatalogProjection()
 
-  assert.equal(first.products.length, 20)
-  assert.equal(first.priceListItems.length, 22)
+  assert.equal(first.products.length, 22)
+  assert.equal(first.priceListItems.length, 24)
   assert.deepEqual(first.products, second.products)
   assert.deepEqual(first.duplicateProjectedSkus, [])
 })

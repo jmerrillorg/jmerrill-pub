@@ -1,6 +1,7 @@
 # Marketing Doctrine Authority
 
 Classification: CANONICAL BUSINESS DOCTRINE AFTER MERGE
+Jackie ruling date: 2026-08-09
 
 ## Purpose
 
@@ -8,7 +9,7 @@ J Merrill Publishing operates on a no-cost / low-cost marketing-first standard a
 
 ## Scope
 
-This doctrine governs Publishing marketing opportunities, readiness, organic launch activity, campaign services, Strategic Marketing runtime behavior, and Pilot #445 readiness. It does not authorize any live marketing spend, live journey activation, commercial SKU, agreement edit, or author-facing disclosure.
+This doctrine governs Publishing marketing opportunities, readiness, organic launch activity, campaign services, Strategic Marketing runtime behavior, and Pilot #445 readiness. It does not authorize any live marketing spend, live journey activation, agreement edit, or live author-facing action.
 
 ## No-/Low-Cost-First Principle
 
@@ -50,7 +51,7 @@ Any marketing service sold to an author must flow through the canonical Publishi
 
 ## Relationship To Agreements And Disclosures
 
-JMP_Publishing_Agreement_v1.3.1 remains current and unchanged. Hybrid disclosure/no-guarantee wording is a review candidate and not author-facing legal canon until separately approved.
+JMP_Publishing_Agreement_v1.3.1 remains current and unchanged. The Hybrid Marketing Disclosure is governed author-facing business material by Jackie ruling dated 2026-08-09 and operates as a companion/reference under the existing agreement path without creating v1.3.2.
 
 ## Relationship To Strategic Marketing Runtime
 

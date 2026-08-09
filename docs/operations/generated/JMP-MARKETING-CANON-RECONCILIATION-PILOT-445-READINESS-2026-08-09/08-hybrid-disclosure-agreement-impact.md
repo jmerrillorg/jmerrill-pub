@@ -2,11 +2,11 @@
 
 JMP_Publishing_Agreement_v1.3.1: CURRENT / UNCHANGED
 
-Recommendation: DISCLOSURE / EXHIBIT RECOMMENDED; ATTORNEY REVIEW REQUIRED BEFORE DECISION
+Ruling: APPROVED / GOVERNED
 
-Current agreement is not changed by this PR. The disclosure candidate should be reviewed for included marketing support, author responsibilities, optional services, cost ownership, spend authorization, and no-guarantee language.
+Current agreement is not changed by this PR. The disclosure operates as governed author-facing business material and a companion/reference under the existing agreement path. It explains included marketing support, author responsibilities, optional Campaign Services, cost ownership, spend authorization, and no-guarantee expectations.
 
-No-guarantee topics for attorney review before author-facing legal canon:
+No-guarantee topics:
 - Sales volume
 - Revenue
 - Reviews
@@ -18,4 +18,4 @@ No-guarantee topics for attorney review before author-facing legal canon:
 - Audience growth
 - Campaign profitability
 
-Disclosure consistency classification: DISCLOSURE / EXHIBIT RECOMMENDED. Attorney review required before decision.
+Attorney review: NOT REQUIRED BY JACKIE RULING - 2026-08-09.

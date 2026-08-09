@@ -6,6 +6,9 @@ This library points only to controlling or genuinely useful references. It does 
 | --- | --- |
 | [JM1 Publishing Enterprise Operating Manual v1.0](../JM1-Publishing-Enterprise-Operating-Manual-v1.0.md) | Canonical business operating authority. |
 | [PUB-STD: Author Copy Policy](../../governance/publishing/PUB-STD-Author-Copy-Policy.md) | Complimentary author-copy quantities, elected Product Form entitlements, and timing. |
+| [No-/Low-Cost Marketing Spend Authorization Doctrine](../../governance/publishing/JMP-NO-LOW-COST-MARKETING-SPEND-AUTHORIZATION-DOCTRINE-v1.0.md) | Marketing spend approval, no-/low-cost-first rule, stop-loss, and Campaign Service spend boundary. |
+| [Hybrid Marketing Disclosure](../../governance/publishing/JMP-HYBRID-MARKETING-DISCLOSURE-v1.0.md) | Governed author-facing Hybrid marketing disclosure. |
+| [Real-Title Pilot Governance](../../governance/JM1-PUB-REAL-TITLE-PILOT-GOVERNANCE-v1.0.md) | Pilot #445 title-scoped activation and launch-card boundary. |
 | [Target Architecture v1.0](../../architecture/JMP-Title-Lifecycle-and-Product-Form-Orchestration-Target-Architecture-v1.0.md) | Reference for title lifecycle and Product Form design authority. |
 | `docs/architecture/generated/JMP-CATALOG-RECONCILIATION-FINAL-2026-08-05/01-final-120-row-catalog-register.csv` | Commercial catalog authority reference. |
 | `docs/architecture/generated/JMP-CATALOG-RECONCILIATION-FINAL-2026-08-05/07-pricing-authority-register.csv` | Pricing authority reference. |

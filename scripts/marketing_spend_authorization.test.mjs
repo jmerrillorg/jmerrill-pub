@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
+  approvedCampaignServiceSkus,
   evaluateSpendAuthorization,
   evaluateWaveCMarketing,
 } from './marketing_canon_reconciliation.mjs'
@@ -86,4 +87,20 @@ test('Wave C marketing remains held without pilot activation permission', () => 
     contentApproved: true,
     pilotActivationPermitsAction: false,
   }), 'HOLD / NOT ELIGIBLE')
+})
+
+test('approved Campaign Service SKUs do not create spend authority', () => {
+  assert.equal(approvedCampaignServiceSkus.length, 2)
+  for (const service of approvedCampaignServiceSkus) {
+    assert.equal(service.layer, 'CAMPAIGN_SERVICES')
+    assert.match(service.trackEligibility, /Hybrid/)
+    assert.match(service.trackEligibility, /Traditional/)
+    assert.equal(evaluateSpendAuthorization({
+      externalCost: true,
+      track: 'Hybrid',
+      costOwner: 'AUTHOR_COST',
+      configuredBudget: 100,
+      stopLossDefined: true,
+    }).eligible, false, `${service.sku} must still require spend approval`)
+  }
 })

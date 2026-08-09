@@ -9,5 +9,5 @@
 | JMP newsletter consideration | Organic Launch | RELEASE_CONFIRMED_LIVE | JMP / TITLE | Hybrid and Traditional | NO_EXTERNAL_COST | NO | Jackie editorial approval | ALREADY_IMPLEMENTED |
 | Podcast/library outreach | Organic Launch | RELEASE_CONFIRMED_LIVE | TITLE | Hybrid and Traditional | NO_EXTERNAL_COST | NO | Jackie or operator approval to proceed | RUNTIME_EXTENSION_REQUIRED |
 | Paid social ad | Campaign Services | POST_RELEASE_MARKETING_REVIEW | TITLE | Hybrid and Traditional | AUTHOR_COST or JMP_COST or SHARED_COST | YES | Spend owner approval required | RUNTIME_EXTENSION_REQUIRED |
-| Paid ARC/review service | Campaign Services | POST_RELEASE_MARKETING_REVIEW | TITLE | Hybrid and Traditional | AUTHOR_COST or JMP_COST or SHARED_COST | YES | Spend owner approval required | COMMERCIAL_CATALOG_CANDIDATE |
+| Paid ARC/review service | Campaign Services | POST_RELEASE_MARKETING_REVIEW | TITLE | Hybrid and Traditional | AUTHOR_COST or JMP_COST or SHARED_COST | YES | Spend owner approval required | APPROVED_GOVERNED_SKU |
 

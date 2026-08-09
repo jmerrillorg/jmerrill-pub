@@ -2,7 +2,7 @@
 
 Title: The Intentional Leader
 Identifier: JMP-INT-202607-0W5PTQ
-Reassessment: PILOT READY WITH HOLDS
+Reassessment: PILOT READY FOR LIMITED LIVE ACTIVATION
 Risk: MODERATE
 
 Marketing pilot scope:
@@ -20,5 +20,5 @@ Marketing pilot scope:
 | Campaign Services | Paid ARC/review service | BLOCKED | Catalog candidate only; no SKU or spend authority. |
 
 Paid spend: 0 until explicit spend approval.
-Campaign Services: HOLD unless specifically approved.
+Campaign Services: governed SKUs are available, but any paid campaign remains PAID_MARKETING_HOLD until cost owner, approved amount, approver, approval evidence, stop-loss, success metric, and reporting cadence are present.
 
