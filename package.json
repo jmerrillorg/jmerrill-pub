@@ -27,6 +27,7 @@
     "workflow-engine-guard": "node scripts/check-canonical-workflow-engine-declarations.mjs",
     "commercial-architecture-guard": "node scripts/commercial_architecture_guard.test.mjs",
     "tranche1-commercial-foundation-guard": "node --test scripts/tranche1_commercial_foundation_runtime.test.mjs",
+    "tranche2-money-fulfillment-guard": "node --test scripts/tranche2_money_fulfillment_runtime.test.mjs",
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",
     "author-communication-brand-guard": "node --test scripts/author_communication_brand_guard.test.mjs",
     "jm1-bootstrap": "node scripts/jm1_bootstrap.mjs",

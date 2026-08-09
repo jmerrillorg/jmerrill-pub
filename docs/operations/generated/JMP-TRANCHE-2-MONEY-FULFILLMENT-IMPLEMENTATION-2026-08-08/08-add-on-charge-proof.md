@@ -1,0 +1,25 @@
+# Add-on Charge Proof
+
+Last verified: 2026-08-08T19:12:47.819Z
+
+Add-on charges map to native Business Central item/resource invoice lines. Unit-priced lines preserve unit quantities; SOW lines fail closed until amount approval.
+
+| SKU | Amount | BC item type | Invoice policy |
+| --- | ---: | --- | --- |
+| JMP-ACC-EPUB-ENH | 1000 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-AUD-FIRST-DEV | 500 | Unit Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-AUD-HUMAN-SV | 400 | Unit Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-AUD-SYNTH-STD | 500 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-AUD-SYNTH-STD-OVR | 50 | Unit Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-CUS-SOW | SOW | Quote/SOW Item | SOW_AMOUNT_REQUIRED_BEFORE_INVOICE |
+| JMP-EDT-EB-STD | 350 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-EDT-HC-STD | 350 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-EDT-LP-CPLX | 600 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-EDT-LP-STD | 350 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-EDT-PB-STD | 350 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-GFX-WEBTOON-12 | 850 | Unit Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-GFX-WEBTOON-PILOT | 1200 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-INT-EPUB3-STD | 1500 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-INT-WEB-CUSTOM | SOW | Quote/SOW Item | SOW_AMOUNT_REQUIRED_BEFORE_INVOICE |
+| JMP-SER-DIGITAL-06 | 600 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
+| JMP-SER-DIGITAL-12 | 1000 | Fixed Service Item | INVOICEABLE_FROM_APPROVED_ORDER |
