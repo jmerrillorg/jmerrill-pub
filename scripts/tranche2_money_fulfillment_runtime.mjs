@@ -386,7 +386,7 @@ export function runInternalValidation() {
     return businessCentralReadback.environments
   })
   add('T2-20', 'All projected catalog products have one BC financial map', () => {
-    assertEqual(bcMap.length, 20)
+    assertEqual(bcMap.length, 22)
     assertEqual(duplicateValues(bcMap.map((item) => item.sku)).length, 0)
     return { mapped: bcMap.length }
   })

@@ -53,6 +53,7 @@ export type PublishingTrack =
 
 export type PricingMethod = 'fixed' | 'unit' | 'quote-sow'
 export type BcItemClassification = 'Fixed Service Item' | 'Unit Service Item' | 'Quote/SOW Item'
+export type MarketingLayer = 'READINESS' | 'ORGANIC_LAUNCH' | 'CAMPAIGN_SERVICES'
 
 export const productForms = [
   { code: 'PF-01', label: 'Paperback', attributes: [] },
@@ -236,6 +237,8 @@ export const priceRules = [
   { sku: 'JMP-GFX-WEBTOON-12', method: 'unit', amount: 850, unit: 'episode', use: 'provisional internal webtoon season' },
   { sku: 'JMP-INT-EPUB3-STD', method: 'fixed', amount: 1500, use: 'scope-capped interactive EPUB 3 starting price' },
   { sku: 'JMP-INT-WEB-CUSTOM', method: 'quote-sow', amount: null, use: 'custom browser-based edition' },
+  { sku: 'JMP-MKT-ARC', method: 'fixed', amount: 650, use: 'ARC campaign management campaign service' },
+  { sku: 'JMP-MKT-PAID-SOCIAL-SETUP', method: 'quote-sow', amount: null, use: 'paid social ad setup campaign service' },
   { sku: 'JMP-CUS-SOW', method: 'quote-sow', amount: null, use: 'custom scoped work' },
 ] as const satisfies readonly {
   sku: string
@@ -243,6 +246,46 @@ export const priceRules = [
   amount: number | null
   unit?: string
   use: string
+}[]
+
+export const marketingCampaignServices = [
+  {
+    sku: 'JMP-MKT-ARC',
+    label: 'ARC Campaign Management',
+    serviceFamily: 'Strategic Marketing',
+    marketingLayer: 'CAMPAIGN_SERVICES',
+    hybridEligible: true,
+    traditionalSignatureEligible: true,
+    defaultCostOwnerLogic:
+      'Hybrid author-owned or shared cost requires author approval; Traditional/JM Signature JMP-owned cost requires Jackie approval.',
+    spendAuthorizationRequired: true,
+    externalCostPossible: true,
+    noLowCostDoctrineApplies: true,
+  },
+  {
+    sku: 'JMP-MKT-PAID-SOCIAL-SETUP',
+    label: 'Paid Social Ad Setup',
+    serviceFamily: 'Strategic Marketing',
+    marketingLayer: 'CAMPAIGN_SERVICES',
+    hybridEligible: true,
+    traditionalSignatureEligible: true,
+    defaultCostOwnerLogic:
+      'Hybrid author-owned or shared cost requires author approval; Traditional/JM Signature JMP-owned cost requires Jackie approval.',
+    spendAuthorizationRequired: true,
+    externalCostPossible: true,
+    noLowCostDoctrineApplies: true,
+  },
+] as const satisfies readonly {
+  sku: string
+  label: string
+  serviceFamily: 'Strategic Marketing'
+  marketingLayer: MarketingLayer
+  hybridEligible: boolean
+  traditionalSignatureEligible: boolean
+  defaultCostOwnerLogic: string
+  spendAuthorizationRequired: boolean
+  externalCostPossible: boolean
+  noLowCostDoctrineApplies: boolean
 }[]
 
 export const publishingPrograms = [

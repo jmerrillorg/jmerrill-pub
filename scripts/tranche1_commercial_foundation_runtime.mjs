@@ -311,12 +311,12 @@ export function runInternalValidation() {
     return agreement
   })
   add('T1-04', 'Canonical catalog projects one Product per SKU', () => {
-    assertEqual(catalog.products.length, 20)
+    assertEqual(catalog.products.length, 22)
     assertEqual(catalog.duplicateProjectedSkus.length, 0)
     return { projectedProducts: catalog.products.length }
   })
   add('T1-05', 'Canonical catalog projects package and price-list rows', () => {
-    assertEqual(catalog.priceListItems.length, 22)
+    assertEqual(catalog.priceListItems.length, 24)
     return { priceListItems: catalog.priceListItems.length }
   })
   add('T1-06', 'Starter quote and order path uses D365 Quote and Order', () => {

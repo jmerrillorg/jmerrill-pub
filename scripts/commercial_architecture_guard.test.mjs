@@ -94,7 +94,9 @@ const checks = [
       catalog.includes("sku: 'JMP-AUD-SYNTH-STD-OVR'") &&
       catalog.includes('amount: 50') &&
       catalog.includes("sku: 'JMP-AUD-HUMAN-SV'") &&
-      catalog.includes('starting quote-required human single-voice narration'),
+      catalog.includes('starting quote-required human single-voice narration') &&
+      catalog.includes("sku: 'JMP-MKT-ARC'") &&
+      catalog.includes("sku: 'JMP-MKT-PAID-SOCIAL-SETUP'"),
   },
   {
     name: 'traditional track bills author at zero without changing SKU identity',

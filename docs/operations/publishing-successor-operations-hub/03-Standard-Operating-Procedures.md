@@ -626,3 +626,41 @@ When to Stop: Stop if rights, royalties, public listing, or author expectations 
 Related Forms and Templates: Title closeout checklist; retirement or reversion policy.
 
 System Support Reference: Use current closeout procedure and title evidence references.
+
+## 21. How to Handle Marketing Opportunities and Pilot Activation
+
+Purpose: Use the governed Publishing marketing model without turning marketing into a separate command center.
+
+When to Use: A title has a marketing opportunity, Campaign Service question, paid marketing idea, or title-scoped pilot capability.
+
+Who Owns It: Publishing Coordinator prepares; Jackie decides spend, sensitive positioning, and pilot launch actions.
+
+What You Need Before Starting: Title, Publishing Track, marketing layer, author or title marketing profile, consent posture, cost owner, approval evidence, stop-loss if paid, and current pilot activation state.
+
+Steps:
+
+1. Classify the opportunity as Readiness, Organic Launch, or Campaign Services.
+2. Prefer no-cost or low-cost owned, earned, partner, or organic activity where reasonably effective.
+3. Confirm whether any external cost could be created.
+4. If there is no external cost, continue only through normal readiness, consent, approval, and activation controls.
+5. For Hybrid author-owned cost, stop until author approval is present.
+6. For Traditional or JM Signature JMP-owned cost, stop until Jackie approval is present.
+7. For shared cost, stop until author and Jackie approval are present.
+8. Do not treat a configured budget, SKU availability, or campaign idea as spend authority.
+9. For paid activity, confirm approved amount, approver, approval evidence, stop-loss, success metric, and reporting cadence.
+10. For a pilot capability, confirm the title-scoped state and kill switch before acting.
+11. Stop before the first real external pilot action unless Jackie has approved the launch card.
+
+Plain-English Rule: Readiness prepares the title. Organic Launch uses owned, earned, partner, and no-/low-cost opportunities first. Campaign Services are governed commercial services, but spend still requires the correct approval.
+
+Jackie Approval Required? Required for JMP-owned spend, shared spend, sensitive positioning, title-scoped pilot launch, Wave C external action, and all Tier 4 actions.
+
+Evidence to Preserve: Marketing opportunity, layer, cost owner, approvals, budget and stop-loss if paid, consent, prepared content, pilot state, kill switch, and launch-card approval.
+
+What Good Looks Like: Jackie sees the title, marketing layer, cost owner, spend approval status, budget, stop-loss, consent, Wave C state, next action, and kill switch without reading technical logs.
+
+When to Stop: Stop if cost owner, approval evidence, consent, stop-loss, title identity, activation state, or kill switch is unclear.
+
+Related Forms and Templates: No-/Low-Cost Marketing Spend Authorization Doctrine; Hybrid Marketing Disclosure; Pilot 1 Launch Card.
+
+System Support Reference: Use the Current Authority Index entries for marketing doctrine, disclosure, and real-title pilot governance.
