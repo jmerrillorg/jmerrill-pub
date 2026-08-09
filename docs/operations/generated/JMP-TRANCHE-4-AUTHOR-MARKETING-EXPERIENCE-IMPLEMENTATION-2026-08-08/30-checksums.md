@@ -1,0 +1,34 @@
+# Checksums
+
+| File | SHA-256 |
+| --- | --- |
+| 00-executive-closeout.md | 67550b9fbe5405218880b8381d5ed9770a3564cf4bd616d449d11b5824ace16c |
+| 01-preflight-and-authority-map.md | c8d072518deb15ca7800f84396f01dc898e7f1c7af76aa18f99318ec827931aa |
+| 02-author-experience-runtime.md | 43bcaef16f74f1cea4d8721b3fbbf50b54c015a5cb3236e5b064cfb4ea5ff5f7 |
+| 03-author-status-projection.md | 12caed7b50eee3a46e5d87f3d4fa285b43cd5439777a7b4aeab266bdcacb5b32 |
+| 04-author-operating-center.md | 6508b1b80a67a68808a9a89384b12d8c5c201e1b443b79f2f0ec792deb87c4a4 |
+| 05-author-decision-runtime.md | 4dce03ee72e25dae601728a543e0f2d87f693a99332784c5188a79d1ac282da2 |
+| 06-author-communications-governance.md | 19b2934726b62de92f853b50f72db404c412bf54fe152c5bf55c6f320dd559f1 |
+| 07-author-facing-leakage-guard.md | bfdba46f983a35d27233d0808ebf59d571112ace2de1e3e32e4e6ac6692f3af8 |
+| 08-author-marketing-profile.md | 82fa9e35d21a28adbda4e4d3f6d2bace77299b490772af383cc6f61d6dd3be64 |
+| 09-title-marketing-profile.md | a81aaf7d224e1c02502f3e15dddbdc78d73db4c2a21aed468b91046cddfc243b |
+| 10-marketing-lifecycle-event-map.md | 11436f50ce1aed9e203cf5396dffbf1c5739469d301eae80daf312f7ee824502 |
+| 11-marketing-opportunity-runtime.md | 00e42ba12eb8b86635211c66bc44a025d8b185656ac3658e99dd85fdfb442d82 |
+| 12-no-cost-marketing-framework.md | d7e03fb731a12815670e7783974d13e178b28af551f637d2b69897b2354f2913 |
+| 13-customer-insights-journeys.md | 70a7c745503c5a5950c1823c24bef60e63d152226e0b466f3cb0cd81deb2bb73 |
+| 14-consent-and-preferences.md | 315bfbabf092681e384dd052ec07c8f5b4308bfb94d9520b283044f2e0525eeb |
+| 15-newsletter-reader-updates.md | 21f34c43afe5a9ef1be6ee77fe967a790c464b11e49e321fc567fed90f2f71ec |
+| 16-jmp-corporate-marketing.md | 9f865b78f57389b74890f75945192044efe3a748a617dd6b5cdb96e7539a5cfb |
+| 17-author-marketing-runtime.md | c6cac5247c9cb6cee400250523b32803d1cfb48272dd1b1085c5e4d8d445376a |
+| 18-title-marketing-runtime.md | 884459d3a61e6d602e847c51d37b539f6f8b440113ad7fc394442d44ab3d4ab0 |
+| 19-media-outreach-opportunities.md | ef0c0860fc4c71b035b8a1d98e6d3a47e489dfb8f375141c29182d03098efb33 |
+| 20-marketing-calendar.md | 6afe2888fe5c8b79e4f064d1054a9bfa26e543e8a4754962b58e2f3acad3555f |
+| 21-single-operator-surface.md | 56a24fda9a98da2b50c34b951b6507cab2bed1db611ef19a260d5a2c2e5f778f |
+| 22-ai-copilot-boundary.md | 9f397745e8dff8fe51db5f0c16087d90221d767a9e5ea9ed76612561e01e6196 |
+| 23-execution-log-proof.md | d4e3fd3c3119c6bf1dd6f8ec0a9d63bad49dd1b43f3dd4f50f3c0bb85c13bd3d |
+| 24-internal-validation-results.md | 13b6240d4bf5616854b453c8606975e1056361d8526c0b243e439db2d26b9afc |
+| 25-operator-burden-results.md | 71adbd5ae80675276753c32081fcc3f55928b50924cc40f7b325d31e8437d6fb |
+| 26-security-consent-rollback.md | c4b6230b8b3000a81e9ebe20eb90693e2cdee847567cf3d3dc5566e014e21cc1 |
+| 27-production-readback.md | 4d5968f9894b31000f19e86fe08ce126152b300aa2d0796ca3e23d7759a5afcf |
+| 28-open-holds.md | 9c4d543fdd44018025348a89990a063470f929f05f01a3212f7538118807dedd |
+| 29-evidence-index.md | e439a1fb8f967b072ba36c5094f6286884e946b584ed47424dc53c0c7a3ffd9c |
