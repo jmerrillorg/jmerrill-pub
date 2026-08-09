@@ -1,0 +1,24 @@
+# Checksums
+
+- 961fd14677c795aa129a5956daaf7df53ad96dbad40e99323f0282f8eb6958f0  docs/governance/publishing/JMP-NO-LOW-COST-MARKETING-SPEND-AUTHORIZATION-DOCTRINE-v1.0.md
+- 51ddf8cb08a32fe29afd3862cde8929be056fc3486ffd2d0cf651d0d6bf7cb9b  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/00-executive-summary.md
+- ad568281fb074878796153309cc13af8ea5abf7ac2c559093fdf10244720465b  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/01-marketing-doctrine-authority.md
+- 035cef657f699d8e8a78697cd4693aaab4f520cf1d651377abc3d95e3d4baa77  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/02-three-layer-model-reconciliation.md
+- b8ebdfb9ab8b9cb81ef0bd6ad6aceba1ba5bf8e4cf4345469556ccb5aeb81965  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/03-seven-artifact-reconciliation.md
+- 72b4807ce064502187743423a28f95f893daec3c97fc9ef258bb992c3b2e5506  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/04-readiness-organic-launch-map.md
+- 34eca0f335b504e341e62f98bff7716a9ab190745ec3608baadfac4adaa509b2  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/05-campaign-services-catalog-reconciliation.md
+- e9ef34eb31305241fd2f408ec33914d78bac51244ae677f34a66efe893250d3f  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/06-track-responsibility-matrix.md
+- c4ca2301f85fc3fa952991ea91553b52a24bfd5de9e2e1f3313fa42cf1be3ef4  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/07-campaign-budget-stop-loss.md
+- 31fb211ba758d31aa7e0bcc96b5467dcf7065506a8453ed59ce0e4dc900b3a6f  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/08-hybrid-disclosure-agreement-impact.md
+- 299bc4b16c04a36900568e978782f13c3d301058d13aed47e0bc2a00cbc7b628  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/09-dataverse-functional-spec-reconciliation.md
+- be3dcb9c6096f49c5dd8aebfb35d7c188cfc5398a96329906c2080ea89b518d5  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/10-attorney-review-scope.md
+- 17ad8a76a89446015299b2299971189dd24fd438814159e19f739a0156fa079f  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/11-marketing-spend-approval-evidence.md
+- 8aeaddbf690bafa7e9b807ec640c95f433fe529ebb35cfeb24d367943f4f65dc  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/12-tranche6-marketing-activation-delta.md
+- 8ade0f1d0a9d9ae332ebcbeb8ab17fe5fac65bbbb4b9ecb41fd079d01d4979b5  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/13-marketing-synthetic-validation.md
+- bac270bda8c08d80a807de7f33e60a9e0509a7af7c39dee8f23571aab76bf174  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/14-pilot-gap-register.md
+- e9925de866ee1662ea570a28733531897ad2c601637c9b323c7ae31e5081d117  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/15-the-intentional-leader-reassessment.md
+- 458b5835dcac9941bdf2f03936406786819bece2f939749832286d8926ceed0e  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/16-wave-c-decision-package.md
+- 67a245461e4bbb9301599f7e5784ef1bd4c4342478bb6ad8ea8b3c5b8369b250  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/17-pilot-activation-matrix-update.md
+- bd0902343ef4686198bb2d7a2dd83f6b6d420a502959b959fe27d7f050a35f59  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/18-runtime-delta-register.md
+- 7cf755a93fa981be0903b030bdfacd35be77a88f8badb76cce88d47777acef39  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/19-open-holds.md
+- 27377b5fe75ea007a70799af14f42271226da5558f81f1ca360a6b8df7407dd7  docs/operations/generated/JMP-MARKETING-CANON-RECONCILIATION-PILOT-445-READINESS-2026-08-09/20-evidence-index.md
