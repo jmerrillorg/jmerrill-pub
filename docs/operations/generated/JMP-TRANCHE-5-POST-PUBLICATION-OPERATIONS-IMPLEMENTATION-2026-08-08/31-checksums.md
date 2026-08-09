@@ -1,0 +1,35 @@
+# Checksums
+
+| File | SHA-256 |
+| --- | --- |
+| 00-executive-closeout.md | ee0ed0ceb6fce98669f6b8f73582d70e2048e00050567729e23486304c924aa4 |
+| 01-preflight-and-authority-map.md | 031666d44506e490cdce3a60c41ca8b076a29710265aa74bccac9679c96d83a4 |
+| 02-post-publication-lifecycle.md | 78361138bcda777154eaf79c97d70233ce1418dbf41d4e2c620a8b34ddd99e92 |
+| 03-royalty-source-intake.md | 2ee30284b16f3cda81671f1cbc3cba08e13844cc7671ce492388cdc0d82ee03c |
+| 04-royalty-reconciliation.md | caae1c932240812915896e261f958bf3e4b05924976a83d4eac5f1b943da0304 |
+| 05-royalty-calculation.md | cb0ba8ffbacc0ec5e3c605868f0940b638e9ea330508fa0af518729be76591e0 |
+| 06-royalty-statement-runtime.md | ffd6d6585b0b4db41c48e27551dbce20d9b2f7ae8bfa271ca969fa938b5c91c8 |
+| 07-royalty-statement-artifact.md | 7aa14e76380fab4dc33d7ceaf39e032a8fe0e7c47ad1a2ba034f5aed6b7baf0a |
+| 08-business-central-payable-handoff.md | a66031f4743f8f4b7065db49057e5db6b74c4c5d183ca4daf2a0ee2e10c428a5 |
+| 09-author-payout-readiness.md | 52b4e357ce1174728a7a91dccf01a7b7e6caf8b799f234592dd53cc7211d89e1 |
+| 10-complimentary-copy-entitlements.md | 1c25617b77ece144be01e75919fc8735b70d981b6707f2f3102b14a479b0716f |
+| 11-author-copy-orders.md | a2b5e6726870b51bd8ea5e8eb9284a02ec0f96c9c135853a30edbf3ffacd283e |
+| 12-annual-distribution-fee.md | 63b15543ada130a90a2e156d9c436be929951285b6770e27f7462e1539c760cc |
+| 13-post-release-corrections.md | 060d1cefcf2c9124c0c0d0e7be62f2f95c5fbe330bbd4dc5bdfabae4c363077a |
+| 14-edition-revision-lineage.md | bfa540b4e36eaa8c26c03e3474f43769d28289d0e64b81b98d5754ad41ab96cd |
+| 15-distribution-stewardship.md | 79d9bf986fc3c1b57609c64e2cb05b3616de3cf514919da1d06b4c3177b3cc12 |
+| 16-retirement-runtime.md | f51e0878e8f09868d70b3c9cc5864278a7c7126411c1a18b8a33506e732dc476 |
+| 17-reversion-runtime.md | 202abb800cf90074fe10f8d059ff9beda5ff7bf13d6489a3fd781ce517ee6ca3 |
+| 18-post-release-marketing-events.md | b2892afbb12792c11f02107bffe267635a1df8b7e6defd6e298b396cc3f40f7b |
+| 19-post-release-author-experience.md | 585ab89680bda230e53d40ff3277a1cdad91713e16c71af56f9e8cc011b64ce2 |
+| 20-single-operator-surface.md | 87391cff4d064c25a59fd870b03de8aa065b7d227dd0883d2f426abc874c8db4 |
+| 21-reporting.md | a4a143017840a822c22feacb55b58b98007e993ed34b576e9df0ae4381846b67 |
+| 22-execution-log-proof.md | 9391b9d8218ebdc65b035a872325db039d1be3733baf14977563651a00e4ed17 |
+| 23-internal-validation-results.md | deb91ab4820280d28be20724b38a1a7046332a186b2b576b8a3aaeda221abd3f |
+| 24-royalty-reconciliation-proof.md | fe5050915ca562099876632a641253f8ff07e384a315bbd2f84e1454c75dce4e |
+| 25-operator-burden-results.md | 8714b1d0c846da0760cb0d778a3db8a190e8905b5834723606e0b1397ebdd0fb |
+| 26-microsoft-capability-dispositions.md | dd37cb46b4dfac15d98cffb2c955251907914d4dba7712ddd917080b710aa5e3 |
+| 27-security-financial-controls.md | 0579efbd0d5fd0f758f992c77ab6355b28c36dd0416ffb621a641e51d834db42 |
+| 28-production-readback.md | a98ef248b5bb1536cc2e18434b7f733b788a842dbaab2fe260a454f65fc4abc3 |
+| 29-open-holds.md | e192024e87673bbeb2da209008a1f22e9063aa588a5095057fec04fb6e536b8f |
+| 30-evidence-index.md | 67143daac5e443df519188d7e4c407652cfb2cb50b0098846c87b885c781d6cc |

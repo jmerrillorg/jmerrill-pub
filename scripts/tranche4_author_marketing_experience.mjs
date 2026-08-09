@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 export const evidenceRoot =
   'docs/operations/generated/JMP-TRANCHE-4-AUTHOR-MARKETING-EXPERIENCE-IMPLEMENTATION-2026-08-08'
@@ -674,7 +675,7 @@ function sha256(input) {
   return createHash('sha256').update(input).digest('hex')
 }
 
-if (process.argv.includes('--write-evidence')) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href && process.argv.includes('--write-evidence')) {
   const c = writeEvidence()
   console.log(JSON.stringify({ result: c.validation.result, internalValidation: c.internalValidation, operatorBurden: c.operatorBurden, microsoftDispositions: c.microsoftDispositions }, null, 2))
 }

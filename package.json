@@ -30,6 +30,7 @@
     "tranche2-money-fulfillment-guard": "node --test scripts/tranche2_money_fulfillment_runtime.test.mjs",
     "tranche3-title-pf-runtime-guard": "node --test scripts/tranche3_title_pf_runtime.test.mjs",
     "tranche4-author-marketing-experience-guard": "node --test scripts/tranche4_author_marketing_experience.test.mjs",
+    "tranche5-post-publication-operations-guard": "node --test scripts/tranche5_post_publication_operations.test.mjs",
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",
     "author-communication-brand-guard": "node --test scripts/author_communication_brand_guard.test.mjs",
     "jm1-bootstrap": "node scripts/jm1_bootstrap.mjs",
