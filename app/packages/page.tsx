@@ -197,7 +197,7 @@ const programRows = publishingPrograms
       label: program.label,
       price,
       availability: program.salesAvailability === 'inquiry_only' ? 'Inquiry only' : 'Available',
-      cta: program.permittedCtas[0] || 'Contact Publishing',
+      cta: program.permittedCtas[0] || 'Contact the Publishing Team',
     }
   })
 

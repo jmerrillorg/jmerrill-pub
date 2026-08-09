@@ -398,7 +398,7 @@ export default function DistributionPage() {
 
           <div className="bg-white/[0.04] border border-white/8 rounded-2xl p-7">
             <div className="text-[11px] text-white/25 uppercase tracking-[0.12em] mb-5"
-              style={{ fontFamily: "'DM Mono', monospace" }}>Contact Publishing</div>
+              style={{ fontFamily: "'DM Mono', monospace" }}>Contact the Publishing Team</div>
             <div className="flex flex-col gap-4 mb-6">
               <a href={JMP_CONTACT.phoneHref}
                 className="flex items-center gap-3 text-[15px] text-white/65 hover:text-white transition-colors group">

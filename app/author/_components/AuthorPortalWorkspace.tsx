@@ -208,7 +208,7 @@ export function AuthorPortalWorkspace() {
         <h2 className="text-[20px] font-semibold text-white">We could not open your Author Operating Center.</h2>
         <p className="mt-3">
           {error ||
-            'Your sign-in was received, but your author workspace could not be resolved. Please sign in again or contact Publishing so we can restore access without creating a duplicate account.'}
+            'Your sign-in was received, but your author workspace could not be resolved. Please sign in again or contact the Publishing Team so we can restore access without creating a duplicate account.'}
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <a
@@ -221,7 +221,7 @@ export function AuthorPortalWorkspace() {
             href="mailto:publishing@jmerrill.one"
             className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/15 px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white"
           >
-            Contact Publishing
+            Contact the Publishing Team
           </a>
         </div>
       </div>

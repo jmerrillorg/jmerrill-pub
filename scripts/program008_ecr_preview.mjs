@@ -51,10 +51,10 @@ for (const [slug, title, recipient] of titles) {
     ],
     nextSteps: [
       'Jackie reviews the prepared package before any author delivery.',
-      'After approval, Publishing sends the package through the governed ECR and ACS workflow.',
+      'After approval, the Publishing Team sends the package through the governed ECR and ACS workflow.',
       'The author response is processed by direct reply to publishing@jmerrill.one.',
     ],
-    supportNote: 'Reply to this email if anything is unclear and the publishing team will help.',
+    supportNote: 'Reply to this email if anything is unclear and the Publishing Team will help.',
     operationalNote: 'Portal access is optional. Direct email reply remains the author response path.',
   })
   const dir = join(root, 'evidence', slug, 'ecr-preview')

@@ -2,6 +2,10 @@ import { createHash } from 'node:crypto'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import createJiti from 'jiti'
+
+const jiti = createJiti(import.meta.url)
+const terminology = jiti('../lib/server/author-facing-terminology.ts')
 
 export const evidenceRoot =
   'docs/operations/generated/JMP-TRANCHE-4-AUTHOR-MARKETING-EXPERIENCE-IMPLEMENTATION-2026-08-08'
@@ -16,7 +20,7 @@ export const authorStatuses = {
   SUBMITTED: 'Submitted for Distribution',
   LIVE: 'Available / Live',
   POST_PUBLICATION_HANDOFF: 'Post-Release',
-  ON_HOLD: 'On Hold - Contact Publishing',
+  ON_HOLD: 'On Hold - Contact the Publishing Team',
 }
 
 export const marketingTriggers = [
@@ -155,6 +159,8 @@ export function recordAuthorResponse(input) {
 export function validateAuthorFacingArtifact(input) {
   const text = `${input.subject || ''}\n${input.body || ''}`
   const blockers = internalLeakagePatterns.filter((pattern) => pattern.test(text)).map((pattern) => pattern.source)
+  const actorTerminology = terminology.validateAuthorFacingPublishingActorTerminology(text)
+  if (!actorTerminology.ok) blockers.push('STANDALONE_PUBLISHING_ACTOR_TERMINOLOGY')
   return { result: blockers.length ? 'BLOCKED' : 'PASS', blockers, failClosed: blockers.length > 0 }
 }
 
