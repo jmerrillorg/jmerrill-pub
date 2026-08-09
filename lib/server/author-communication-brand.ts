@@ -11,6 +11,10 @@ import {
   signatureForBrand,
   validateJm1EnterpriseCommunication,
 } from './jm1-enterprise-communication-renderer'
+import {
+  AUTHOR_FACING_ACTOR_TERMINOLOGY_RULE,
+  validateAuthorFacingPublishingActorTerminology,
+} from './author-facing-terminology'
 
 export const AUTHOR_COMMUNICATION_BRAND = {
   templateFamily: 'JM1_AUTHOR_COMMUNICATION',
@@ -161,6 +165,10 @@ export function validateAuthorCommunicationEmail(input: {
   if (!text.includes('How to respond')) blockers.push('PLAIN_TEXT_AUTHOR_ACTION_BLOCK_MISSING')
   if (!/Optional Author Operating Center access:\s*https:\/\//i.test(text)) blockers.push('PLAIN_TEXT_OPTIONAL_PORTAL_URL_MISSING')
   if (!text.includes(AUTHOR_COMMUNICATION_BRAND.signature)) blockers.push('PLAIN_TEXT_SIGNATURE_MISSING')
+  const terminology = validateAuthorFacingPublishingActorTerminology(`${html}\n${text}`)
+  if (!terminology.ok) {
+    blockers.push(`STANDALONE_PUBLISHING_ACTOR_TERMINOLOGY - ${AUTHOR_FACING_ACTOR_TERMINOLOGY_RULE}`)
+  }
 
   return blockers.length
     ? { ok: false, blocker: `AUTHOR_COMMUNICATION_BLOCKED - ${blockers.join(',')}` }

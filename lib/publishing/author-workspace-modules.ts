@@ -158,7 +158,7 @@ export const authorWorkspaceModules: readonly AuthorWorkspaceModule[] = [
     status: 'Active',
     tone: 'active',
     summary: 'This is the relationship layer for questions, next steps, future titles, and long-term author support.',
-    whyItMatters: 'Publishing is not just a file handoff. This area keeps communication, support, and future planning visible.',
+    whyItMatters: 'The Publishing Team is not just here for a file handoff. This area keeps communication, support, and future planning visible.',
     currentFocus: 'Keeping the author relationship active while the first title moves through production.',
     nextStep: 'Reach out to publishing@jmerrill.one if you need help or have a question about your project.',
     checklist: [

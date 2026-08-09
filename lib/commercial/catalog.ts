@@ -352,7 +352,7 @@ export const publishingPrograms = [
     salesAvailability: 'inquiry_only',
     legalStatus: 'legal_language_pending',
     commercialPriceStatus: 'approved',
-    permittedCtas: ['Request a Custom Scope', 'Contact Publishing', 'Begin an Inquiry'],
+    permittedCtas: ['Request a Custom Scope', 'Contact the Publishing Team', 'Begin an Inquiry'],
   },
   {
     sku: 'JMP-CUS-SOW',
@@ -361,7 +361,7 @@ export const publishingPrograms = [
     salesAvailability: 'inquiry_only',
     legalStatus: 'legal_language_pending',
     commercialPriceStatus: 'approved',
-    permittedCtas: ['Request a Custom Scope', 'Contact Publishing', 'Begin an Inquiry'],
+    permittedCtas: ['Request a Custom Scope', 'Contact the Publishing Team', 'Begin an Inquiry'],
   },
 ] as const satisfies readonly {
   sku: string

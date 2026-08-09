@@ -57,6 +57,8 @@ test('Tranche 4 blocks real author journey recipients', () => {
 
 test('Tranche 4 leakage guard blocks internal author-facing content', () => {
   assert.equal(validateAuthorFacingArtifact({ subject: 'Review', body: 'Dataverse GUID debug QA note' }).result, 'BLOCKED')
+  assert.equal(validateAuthorFacingArtifact({ subject: 'Status update', body: 'Publishing will complete the next step.' }).result, 'BLOCKED')
+  assert.equal(validateAuthorFacingArtifact({ subject: 'Status update', body: 'The Publishing Team will complete the next step.' }).result, 'PASS')
   assert.equal(validateAuthorFacingArtifact({ subject: 'Review ready', body: 'Please review the attached publishing materials.' }).result, 'PASS')
 })
 

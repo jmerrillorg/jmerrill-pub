@@ -5,6 +5,7 @@ import createJiti from 'jiti'
 const jiti = createJiti(import.meta.url)
 const brand = jiti('../lib/server/author-communication-brand.ts')
 const engine = jiti('../lib/server/author-package-notification-engine.ts')
+const terminology = jiti('../lib/server/author-facing-terminology.ts')
 
 function attachment(role, fileName, contentType, bytes) {
   return {
@@ -32,7 +33,7 @@ test('shared author communication renderer produces branded HTML and plain text'
     authorAction: 'Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions.',
     primaryActionLabel: 'View in Author Operating Center',
     primaryActionUrl: 'https://jmerrill.pub/author/portal?action=review-package&titleId=title-intentional-leader',
-    nextSteps: ['Publishing records your response.', 'The next stage opens only after approval or correction review.'],
+    nextSteps: ['The Publishing Team records your response.', 'The next stage opens only after approval or correction review.'],
   })
 
   assert.match(rendered.html, /<!doctype html>/i)
@@ -177,7 +178,7 @@ test('author communication blocks non-clickable or duplicated-subject package me
       authorAction: 'Reply directly to publishing@jmerrill.one.',
       primaryActionLabel: 'View in Author Operating Center',
       primaryActionUrl: 'https://jmerrill.pub/author/portal?action=review-package',
-      nextSteps: ['Publishing records your response.'],
+      nextSteps: ['The Publishing Team records your response.'],
     }),
     /SUBJECT_DUPLICATED_WORD/,
   )
@@ -196,8 +197,65 @@ test('author communication blocks non-clickable or duplicated-subject package me
       authorAction: 'Reply directly to publishing@jmerrill.one.',
       primaryActionLabel: 'View in Author Operating Center',
       primaryActionUrl: '#',
-      nextSteps: ['Publishing records your response.'],
+      nextSteps: ['The Publishing Team records your response.'],
     }),
     /PRIMARY_ACTION_URL_INVALID/,
   )
+})
+
+test('author-facing actor terminology guard distinguishes prohibited actor use from valid publishing references', () => {
+  const cases = [
+    ['Publishing will complete the next step.', false],
+    ['The Publishing Team will complete the next step.', true],
+    ['The book is now with Publishing.', false],
+    ['The book is now with the Publishing Team.', true],
+    ['while Publishing continues the production process', false],
+    ['while the Publishing Team continues the production process', true],
+    ['J Merrill Publishing, Inc.', true],
+    ['your publishing agreement', true],
+    ['the publishing process', true],
+    ['publishing@jmerrill.one', true],
+    ['Publishing Track', true],
+    ['J Merrill Publishing will assign one from our registered pool.', true],
+  ]
+
+  for (const [text, ok] of cases) {
+    assert.equal(terminology.validateAuthorFacingPublishingActorTerminology(text).ok, ok, text)
+  }
+})
+
+test('Pilot 1 status update source rerenders with Publishing Team actor terminology', () => {
+  const rendered = brand.renderAuthorCommunicationEmail({
+    templateName: 'AUTHOR_STATUS_UPDATE_V1',
+    templateVersion: '1.0.0',
+    subject: 'Production Status Update - The Intentional Leader',
+    authorName: 'Jackie',
+    titleName: 'The Intentional Leader',
+    preheader: 'A brief status update after your approval of the corrected interior layout proof.',
+    why: 'This message is only to keep you informed while the Publishing Team continues the production process.',
+    completed: [
+      'The corrected proof was delivered.',
+      'Your approval was received.',
+      'The book is now with the Publishing Team for the next production step.',
+    ],
+    meaning: 'No files are attached to this update, and no action is needed from you right now.',
+    authorAction: 'No response is required. You may reply to publishing@jmerrill.one if you have a question.',
+    primaryActionLabel: 'View in Author Operating Center',
+    primaryActionUrl: 'https://jmerrill.pub/author/portal?action=status-update&titleId=e797232b-da7a-f111-ab0f-00224820105b',
+    packageInventory: ['No files are attached to this status update.'],
+    nextSteps: [
+      'The Publishing Team will complete the next production handling for the approved proof.',
+      'Your book continues toward final production preparation.',
+      'The Publishing Team will contact you only if another review or decision is needed.',
+    ],
+  })
+
+  const combined = `${rendered.html}\n${rendered.text}`
+  assert.equal(terminology.validateAuthorFacingPublishingActorTerminology(combined).ok, true)
+  assert.match(combined, /with the Publishing Team for the next production step/)
+  assert.match(combined, /while the Publishing Team continues the production process/)
+  assert.match(combined, /The Publishing Team will complete the next production handling/)
+  assert.doesNotMatch(combined, /with Publishing for the next production step/)
+  assert.doesNotMatch(combined, /while Publishing continues/)
+  assert.doesNotMatch(combined, /Publishing will complete the next production handling/)
 })
