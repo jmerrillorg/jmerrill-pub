@@ -1,0 +1,15 @@
+# Evidence Index
+
+Last verified: 2026-08-10T13:24:04Z
+
+| Evidence | Source |
+| --- | --- |
+| PR #454 approved head | `e51224ed74a01abc9200426c3117ff2de1d1410a` |
+| PR #454 merge SHA | `4d4059c94f72912c5ea98cda867034930c001aa3` |
+| Canonical main readback | `origin/main` at `4d4059c94f72912c5ea98cda867034930c001aa3` |
+| Merged Live Action 003 evidence package | `docs/operations/generated/JMP-REAL-TITLE-PILOT-1-LIVE-ACTION-003-2026-08-10/` |
+| Governed baseline artifact | `docs/operations/generated/2026-07-19-The-Intentional-Leader-Cover-Concept-Development-Package.md` |
+| Governed baseline checksum | `b5d07e546b105b22c26b658fef44f96d09c77d4aad05c983e9645ccff59364a2` |
+| Observation closeout package | `docs/operations/generated/JMP-REAL-TITLE-PILOT-1-LIVE-ACTION-003-OBSERVATION-CLOSEOUT-2026-08-10/` |
+
+The evidence package is limited to observation closeout. It does not modify production state, perform human review, or execute the next Pilot action.
