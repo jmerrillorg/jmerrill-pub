@@ -64,6 +64,39 @@ Hybrid author-owned spend requires author approval. Traditional/JM Signature JMP
 
 The next governed action is Jackie review of the Pilot 1 Launch Card. This governance package stops before the first real external pilot action.
 
+## Pilot PR Lifecycle Governance
+
+Bounded pilot pull requests must not remain open after their operational role has been overtaken by later canonical evidence.
+
+Readiness pull requests follow this lifecycle:
+
+1. READINESS PR
+2. Action authorized
+3. EXECUTION PR
+4. Observation or remediation
+5. Canonical evidence established
+6. Readiness PR closed as SUPERSEDED
+
+Execution evidence pull requests follow this lifecycle:
+
+1. EXECUTION EVIDENCE PR
+2. Unique-evidence check
+3. If unique evidence is required, merge the PR
+4. If later canonical evidence fully supersedes it, close the PR as SUPERSEDED
+
+Historical PRs are never deleted. Their comments, branches, commits, and discussion remain preserved as historical evidence even when the PR is closed without merge.
+
+## Pilot PR Closeout Metadata
+
+Every future pilot readiness or execution PR must include lifecycle metadata:
+
+- Lifecycle status: ACTIVE, SUPERSEDED, MERGED / CANONICAL, or CLOSED / HISTORICAL
+- Superseded by: PR number, merge SHA, or canonical evidence package when applicable
+- Current authority: whether the PR is current operating authority, historical readiness evidence, or canonical evidence after merge
+- Send/activation boundary: whether the PR authorizes an external send, response clock, marketing activation, distribution action, financial action, or none
+
+When a readiness PR is superseded by later execution, observation, or remediation evidence, the readiness PR must receive a final closeout comment and be closed without merge unless its evidence is not otherwise preserved.
+
 ## Kill Switches
 
 All live-capable paths must have an explicit disable control before use. When a stop criterion fires, the pilot moves to SUSPENDED and manual production remains controlling.
