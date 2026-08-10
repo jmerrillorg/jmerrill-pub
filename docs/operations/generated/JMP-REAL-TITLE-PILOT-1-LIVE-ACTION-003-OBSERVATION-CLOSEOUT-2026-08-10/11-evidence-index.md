@@ -1,6 +1,6 @@
 # Evidence Index
 
-Last verified: 2026-08-10T13:24:04Z
+Last verified: 2026-08-10T14:20:00Z
 
 | Evidence | Source |
 | --- | --- |
@@ -11,5 +11,9 @@ Last verified: 2026-08-10T13:24:04Z
 | Governed baseline artifact | `docs/operations/generated/2026-07-19-The-Intentional-Leader-Cover-Concept-Development-Package.md` |
 | Governed baseline checksum | `b5d07e546b105b22c26b658fef44f96d09c77d4aad05c983e9645ccff59364a2` |
 | Observation closeout package | `docs/operations/generated/JMP-REAL-TITLE-PILOT-1-LIVE-ACTION-003-OBSERVATION-CLOSEOUT-2026-08-10/` |
+| Operator reality check | Jackie report that no actual cover was surfaced |
+| Remediation PR | `https://github.com/jmerrillorg/jmerrill-pub/pull/456` |
+| SharePoint Cover Design title folder | `01_Titles/06_Production/02_Cover-Design/JMP-INT-202607-0W5PTQ - Jackie Smith jr - The Intentional Leader` |
+| Actual visual cover concept found | NONE |
 
-The evidence package is limited to observation closeout. It does not modify production state, perform human review, or execute the next Pilot action.
+The evidence package is amended observation closeout. It does not modify production state, perform human review, generate cover artwork, or execute the next Pilot action.

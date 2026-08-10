@@ -1,12 +1,15 @@
 # Open Holds
 
-Last verified: 2026-08-10T13:23:51.742Z
+Last verified: 2026-08-10T14:20:00Z
 
 The following holds remain in force after Live Action 003 observation closeout:
 
 | Hold | State |
 | --- | --- |
 | Jackie internal cover review | REQUIRED |
+| Jackie internal cover review readiness | NOT READY |
+| Actual visual cover concept | NOT FOUND |
+| Human-review readiness remediation | PR #456 REQUIRED |
 | Final cover concept selection | NOT PERFORMED |
 | Visual direction approval | NOT PERFORMED |
 | Cover artwork generation | NOT AUTHORIZED |
