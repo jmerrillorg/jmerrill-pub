@@ -1,6 +1,6 @@
 # Evidence Index
 
-Last verified: 2026-08-10T14:20:00Z
+Last verified: 2026-08-10T15:45:00Z
 
 | Evidence | Source |
 | --- | --- |
@@ -13,7 +13,8 @@ Last verified: 2026-08-10T14:20:00Z
 | Observation closeout package | `docs/operations/generated/JMP-REAL-TITLE-PILOT-1-LIVE-ACTION-003-OBSERVATION-CLOSEOUT-2026-08-10/` |
 | Operator reality check | Jackie report that no actual cover was surfaced |
 | Remediation PR | `https://github.com/jmerrillorg/jmerrill-pub/pull/456` |
+| Remediation merge SHA | `59ab590d814cde7bad764f4605ee34c101d8ec00` |
 | SharePoint Cover Design title folder | `01_Titles/06_Production/02_Cover-Design/JMP-INT-202607-0W5PTQ - Jackie Smith jr - The Intentional Leader` |
 | Actual visual cover concept found | NONE |
 
-The evidence package is amended observation closeout. It does not modify production state, perform human review, generate cover artwork, or execute the next Pilot action.
+The evidence package is final observation closeout after remediation. It does not perform human review, generate cover artwork, or execute the next Pilot action.

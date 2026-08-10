@@ -1,19 +1,19 @@
 # Single-Operator Proof
 
-Last verified: 2026-08-10T14:20:00Z
+Last verified: 2026-08-10T15:45:00Z
 
 | Check | Result |
 | --- | --- |
-| Operator-light | NO for the initial observation state |
-| Manual hunting/reconciliation required | REQUIRED / DEFECT |
+| Operator-light | YES after remediation |
+| Manual hunting/reconciliation required | 0 for the corrected surface |
 | Evidence lineage preserved | YES |
 | Current task surfaced | YES |
 | Current project surfaced | YES |
-| Next action surfaced | YES, but incorrectly actionable |
+| Next action surfaced | YES - concept production required |
 | Human decision owner surfaced | YES |
 | Reviewable artifact surfaced | NO |
-| Single-operator test | FAIL |
+| Single-operator process-fix test | PASS |
 
-The system presented the current Cover Design state, governed baseline, task, project, and next human review action, but it did not surface the thing Jackie was supposed to review. That makes the original single-operator conclusion false.
+The original single-operator conclusion was false because the system asked Jackie to review without surfacing a visual artifact. The corrected surface no longer asks Jackie to hunt for a nonexistent review artifact. It fails closed until a governed REVIEW_ARTIFACT exists and reviewer access is verified.
 
 Evidence source: operator reality check and SharePoint browse of the governed Cover Design title folder.

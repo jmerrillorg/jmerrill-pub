@@ -1,18 +1,19 @@
 # Next Action Readiness
 
-Last verified: 2026-08-10T14:20:00Z
+Last verified: 2026-08-10T15:45:00Z
 
 | Field | Value |
 | --- | --- |
-| Next required step | REMEDIATE HUMAN REVIEW ARTIFACT READINESS, THEN RECLOSE OBSERVATION |
+| Next required step | JACKIE REVIEWS LIVE ACTION 004 EXECUTION CARD |
 | Jackie internal cover review readiness | NOT READY |
 | Reason | REVIEWABLE COVER CONCEPT DOES NOT YET EXIST |
 | Live Action 004 | NOT EXECUTED |
-| Live Action 004 readiness | NOT APPLICABLE UNTIL REMEDIATION AND JACKIE AUTHORIZATION |
-| Pilot state | ACTIVE - LIVE ACTION 003 OBSERVATION AMENDED / REMEDIATION PENDING |
+| Recommended Live Action 004 | Create/prepare the first governed reviewable cover concept for The Intentional Leader |
+| Live Action 004 readiness | READY FOR JACKIE EXECUTION APPROVAL |
+| Pilot state | ACTIVE - LIVE ACTION 003 OBSERVATION COMPLETE AFTER REMEDIATION |
 | PR #431 | UNCHANGED / CURRENT OPERATING PRIORITY |
 
-Live Action 004 is intentionally not scoped here. If no reviewable cover exists after remediation, the next bounded Pilot candidate is to prepare/generate the first governed cover concept, requiring separate Jackie authorization.
+Live Action 004 is intentionally not executed here. The next bounded candidate should stop after the first valid governed REVIEW_ARTIFACT exists in SharePoint, is registered, and Jackie access is verified.
 
 No Pilot action occurs automatically from this closeout.
 
