@@ -22,6 +22,10 @@ import {
   type CatalogPortfolioClassification,
   type CatalogPortfolioState,
 } from './catalog-portfolio'
+import {
+  evaluateHumanReviewReadiness,
+  type ReviewArtifact,
+} from './human-review-artifact-readiness'
 
 const TITLE_STAGE_EDITORIAL = 100000006
 const ASSET_STATUS_STAGED = 100000000
@@ -360,6 +364,7 @@ export type PublisherProductionReadinessItem = {
     | 'CREATIVE BRIEF IN PROGRESS'
     | 'READY FOR CONCEPTS'
     | 'CONCEPTS IN PROGRESS'
+    | 'REVIEW ARTIFACT NOT READY'
     | 'INTERNAL REVIEW'
     | 'AUTHOR REVIEW'
     | 'FRONT COVER APPROVED'
@@ -2964,6 +2969,7 @@ function productionReadinessFromWorkload(
   )
   const coverProjectStatus = dataverseFormatted(coverProject || {}, 'jm1_status')
   const interiorProjectStatus = dataverseFormatted(interiorProject || {}, 'jm1_status')
+  const coverReviewReadiness = coverProject ? evaluateCoverReviewReadiness(item, coverProject, coverTask) : null
   const productionReady = state.includes('Proofreading Ready') || state.includes('Production Ready')
   const proofingBlocked =
     state.includes('Copyediting') || state.includes('Line Editing') || state.includes('Developmental Editing')
@@ -2975,7 +2981,9 @@ function productionReadinessFromWorkload(
       ? 'BLOCKED — PROOFREADING'
       : 'BLOCKED — FINAL MANUSCRIPT'
   const coverReadiness: PublisherProductionReadinessItem['coverReadiness'] = coverProject
-    ? 'CREATIVE BRIEF IN PROGRESS'
+    ? coverReviewReadiness?.eligible
+      ? 'INTERNAL REVIEW'
+      : 'REVIEW ARTIFACT NOT READY'
     : isIntentionalLeader
     ? 'READY FOR CREATIVE BRIEF'
     : state.includes('Developmental Editing')
@@ -3007,7 +3015,9 @@ function productionReadinessFromWorkload(
       ? 'Begin Interior Layout after production intake package is confirmed.'
       : 'Wait for final approved proofread manuscript or approved production exception.',
     nextCoverAction: coverProject
-      ? 'Continue the governed cover creative brief; full wrap waits for final page count and printer template.'
+      ? coverReviewReadiness?.eligible
+        ? 'Open the governed review artifact from the normal title workspace and record Jackie internal cover review decision.'
+        : 'Prepare or register the first governed visual cover concept before Jackie internal review; do not treat the brief or evidence package as the review artifact.'
       : isIntentionalLeader
       ? 'Create governed cover creative brief; full wrap waits for final page count.'
       : 'Confirm stable title copy, metadata, visual direction, and rights evidence.',
@@ -3026,6 +3036,76 @@ function productionReadinessFromWorkload(
       ? [{ id: 'begin_cover_design', label: 'Begin Cover Brief' }]
       : [],
   }
+}
+
+function evaluateCoverReviewReadiness(
+  item: PublisherWorkloadItem,
+  coverProject: DataverseRow,
+  coverTask: DataverseRow | undefined,
+) {
+  return evaluateHumanReviewReadiness({
+    titleId: item.titleId,
+    title: item.title,
+    reviewType: 'COVER_REVIEW',
+    assignedReviewer: stringValue(coverTask?.jm1_assignedto) || 'Jackie',
+    decisionRequest: 'Accept the internal cover direction, request revisions, or hold.',
+    artifacts: coverProjectArtifacts(item, coverProject),
+  })
+}
+
+function coverProjectArtifacts(item: PublisherWorkloadItem, coverProject: DataverseRow): ReviewArtifact[] {
+  const files = stringValue(coverProject.jm1_fileslocation)
+  const artifacts: ReviewArtifact[] = []
+  if (files.includes('brief:')) {
+    artifacts.push({
+      id: 'cover-brief',
+      titleId: item.titleId,
+      name: `Cover Creative Brief - ${item.title}`,
+      artifactClass: 'BRIEF',
+      reviewType: 'COVER_REVIEW',
+      state: 'READY_FOR_REVIEW',
+      governedReference: files,
+      version: extractProjectMarker(files, 'brief'),
+      reviewerAccess: true,
+      visualReviewable: false,
+      current: true,
+    })
+  }
+  if (files.includes('baseline:')) {
+    artifacts.push({
+      id: 'cover-baseline',
+      titleId: item.titleId,
+      name: `Cover concept development evidence - ${item.title}`,
+      artifactClass: 'EVIDENCE_ARTIFACT',
+      reviewType: 'COVER_REVIEW',
+      state: 'READY_FOR_REVIEW',
+      governedReference: files,
+      version: extractProjectMarker(files, 'baseline'),
+      reviewerAccess: true,
+      visualReviewable: false,
+      current: true,
+    })
+  }
+  if (files.includes('review-artifact:') || files.includes('concept:')) {
+    artifacts.push({
+      id: 'cover-review-artifact',
+      titleId: item.titleId,
+      name: `Cover concept review artifact - ${item.title}.pdf`,
+      artifactClass: 'REVIEW_ARTIFACT',
+      reviewType: 'COVER_REVIEW',
+      state: 'READY_FOR_REVIEW',
+      governedReference: files,
+      version: extractProjectMarker(files, 'review-artifact') || extractProjectMarker(files, 'concept'),
+      reviewerAccess: files.includes('reviewer-access:verified'),
+      visualReviewable: true,
+      current: !files.includes('superseded'),
+    })
+  }
+  return artifacts
+}
+
+function extractProjectMarker(files: string, marker: string) {
+  return files.match(new RegExp(`${marker}:([^;]+)`))?.[1] || ''
 }
 
 function productionToTodayItem(item: PublisherProductionReadinessItem, lane: 'interior' | 'cover' = 'interior'): PublisherTodayItem {

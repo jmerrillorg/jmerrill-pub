@@ -76,6 +76,15 @@ const expectations = [
       forbiddenCapacityLanguage.every((needle) => !combined.includes(needle)),
   },
   {
+    name: 'cover internal review fails closed until review artifact is surfaced',
+    ok:
+      server.includes('evaluateHumanReviewReadiness') &&
+      server.includes("'REVIEW ARTIFACT NOT READY'") &&
+      server.includes('Prepare or register the first governed visual cover concept before Jackie internal review') &&
+      server.includes('reviewer-access:verified') &&
+      server.includes('do not treat the brief or evidence package as the review artifact'),
+  },
+  {
     name: 'daily summary links to operational sections',
     ok:
       client.includes('waiting-jackie') &&
