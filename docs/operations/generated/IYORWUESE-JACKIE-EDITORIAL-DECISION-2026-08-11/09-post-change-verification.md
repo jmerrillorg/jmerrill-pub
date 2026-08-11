@@ -1,0 +1,35 @@
+# Post-Change Verification
+
+Last verified: 2026-08-11T12:45:00Z
+
+- last_verified: `2026-08-11T12:45:00Z`
+- approved_decision: `OPTION 1 - RESTORE AUTHOR ORIGINAL FOR ALL 54 AUTHOR-MARKED PASSAGES`
+- source_sha256: `bd08c013786313782923d869276e8e2c6d16e6fb6446d898f7930527f31596e9`
+- prior_governed_manuscript_sha256: `246d722e2a103a1b04fa138edfffbd9b7fcd14ba1ae2cefafc912f8cb0188dba`
+- working_version_sha256: `d1d26531bae4be696150b3db8bbcfa2b8caab6e2d39b7aec34b6c72f11bd3453`
+- working_version_path: `docs/operations/generated/IYORWUESE-JACKIE-EDITORIAL-DECISION-2026-08-11/editorial-working-version/The General’s Will and Last Testament - Editorial Working Version - Jackie Restoration.docx`
+- valid_zip: `True`
+- has_document_xml: `True`
+- paragraph_count: `12075`
+- run_count: `12182`
+- italic_run_count: `152`
+- comments_count: `0`
+- tracked_revision_count: `0`
+- authorized_passages: `54`
+- mutations_recorded: `54`
+- formatting_restorations: `53`
+- wording_and_formatting_restorations: `1`
+- text_changed_paragraphs: `[3610]`
+- expected_text_changed_paragraphs: `[3610]`
+- unrelated_text_changed_paragraphs: `[]`
+- italic_targets_verified: `54`
+- comments_delta: `0`
+- tracked_revision_delta: `0`
+- production_progression_events: `0`
+- developmental_edit_closeout_events: `0`
+- author_messages_sent: `0`
+- author_resend_requests: `0`
+- PR431_progression_events: `0`
+- IntentionalLeader_state_mutations: `0`
+- unrelated_manuscript_mutations: `0`
+- italic_targets_missing: `0`
