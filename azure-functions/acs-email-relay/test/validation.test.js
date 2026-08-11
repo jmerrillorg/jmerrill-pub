@@ -225,6 +225,31 @@ function validEditorialRecommendationPayload(overrides = {}) {
 }
 
 function validAuthorReviewPackagePayload(overrides = {}) {
+  const canonicalHtml = `<!doctype html>
+<html lang="en">
+  <body>
+    <table role="presentation"><tr><td>J MERRILL PUBLISHING</td></tr></table>
+    <p>A Division of J Merrill One</p>
+    <p>Helping Authors Help Themselves.</p>
+    <h1>Cover Design Review</h1>
+    <h2>Why you are receiving this</h2>
+    <p>Your cover design review package is ready.</p>
+    <h2>What has been completed</h2>
+    <ul><li>The Publishing Team prepared the current author-facing files.</li></ul>
+    <h2>What's attached</h2>
+    <ul><li>Cover concept image.</li></ul>
+    <h2>What we need from you</h2>
+    <p>Please review the package.</p>
+    <h2>How to respond</h2>
+    <p>Reply directly to publishing@jmerrill.one.</p>
+    <a href="https://jmerrill.pub/author/portal?action=review-package" style="display:inline-block;background:#1D4ED8;color:#ffffff;">View in Author Operating Center</a>
+    <h2>What happens next</h2>
+    <p>The Publishing Team records your response.</p>
+    <h2>Support</h2>
+    <p>Reply to this email and the Publishing Team will help.</p>
+    <p>The Publishing Team</p>
+  </body>
+</html>`;
   return validAuthorResponsePayload({
     subject: "Developmental Editing Review Package - Before You Were Born",
     body: [
@@ -233,19 +258,41 @@ function validAuthorReviewPackagePayload(overrides = {}) {
       "Why you are receiving this",
       "Your package is ready.",
       "",
-      "Package inventory",
+      "What has been completed",
+      "- The Publishing Team prepared the current author-facing files.",
+      "",
+      "What's attached",
       "- Current author-review manuscript",
       "",
-      "Response choices",
-      "- Approve as presented"
+      "What we need from you",
+      "Please review the package.",
+      "",
+      "How to respond",
+      "Reply directly to publishing@jmerrill.one.",
+      "",
+      "Optional Author Operating Center access: https://jmerrill.pub/author/portal?action=review-package",
+      "",
+      "What happens next",
+      "- The Publishing Team records your response.",
+      "",
+      "Support",
+      "Reply to this email and the Publishing Team will help.",
+      "",
+      "The Publishing Team"
     ].join("\n"),
-    htmlBody: "<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table><h2>Package inventory</h2><h2>Response choices</h2></body></html>",
+    htmlBody: canonicalHtml,
     templateName: "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1",
     templateVersion: "1.0.0",
     templateMetadata: {
       htmlSha256: "c".repeat(64),
       textSha256: "d".repeat(64),
-      qualityGate: "PASS"
+      qualityGate: "PASS",
+      brandSystem: "JM1_AUTHOR_COMMUNICATION",
+      enterpriseStandard: "JM1 Enterprise Communication Standard v1.0",
+      renderer: "JM1 Enterprise Communication Renderer",
+      rendererVersion: "1.0.0",
+      renderMode: "CANONICAL_HTML",
+      renderTemplateGuard: "PASS"
     },
     attachments: [
       {
@@ -495,6 +542,32 @@ test("approved author-review package rejects missing attachments", () => {
   assertRejected(
     validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload({ attachments: [] })),
     "AUTHOR_REVIEW_ATTACHMENTS_MISSING"
+  );
+});
+
+test("approved author-review package rejects noncanonical HTML even when HTML exists", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload({
+      htmlBody: "<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table><p>Simple package notice.</p></body></html>"
+    })),
+    "AUTHOR_REVIEW_PACKAGE_CANONICAL_STRUCTURE_REQUIRED"
+  );
+});
+
+test("approved author-review package rejects missing canonical renderer metadata", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload({
+      templateMetadata: {
+        htmlSha256: "c".repeat(64),
+        textSha256: "d".repeat(64),
+        qualityGate: "PASS"
+      }
+    })),
+    "AUTHOR_REVIEW_PACKAGE_CANONICAL_RENDER_MODE_REQUIRED"
   );
 });
 
