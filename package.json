@@ -37,6 +37,7 @@
     "marketing-reconciliation-guard": "node --test scripts/marketing_canon_reconciliation.test.mjs",
     "marketing-spend-authorization-guard": "node --test scripts/marketing_spend_authorization.test.mjs",
     "author-decision-propagation-guard": "node --test scripts/author_decision_closeout_propagation.test.mjs",
+    "author-response-runtime-remediation-guard": "node --test azure-functions/diagnostic-ai-runner/test/authorReviewResponseConsumer.test.js",
     "artifact-propagation-guard": "node --test scripts/author_decision_closeout_propagation.test.mjs",
     "awaiting-state-closure-guard": "node --test scripts/author_decision_closeout_propagation.test.mjs",
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",
