@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-08-11T17:37:29.998Z",
+  "classification": "COMPLETE - PR470 SEMANTICS CORRECTED / FULL AUTHOR APPROVAL GOVERNANCE REMEDIATED / IYORWUESE FINAL DEVELOPMENTAL-EDIT REVIEW READY FOR JACKIE SEND / CLOSEOUT EXECUTOR GENERALIZED AND VERIFIED",
+  "pr469": {
+    "approvedHead": "3a28ea08340770a9450de8d83fce307ec657bb00",
+    "mergeSha": "d97be33a96f6fd60ae002c5379ed648f478e4ba6"
+  },
+  "iyorwuese": {
+    "state": "DEVELOPMENTAL_EDITING_IN_PROGRESS",
+    "corrections": "APPLIED",
+    "publishingTeamVerification": "COMPLETE",
+    "finalAuthorApproval": "PENDING",
+    "closeoutEligible": false,
+    "lineEditingEligible": false,
+    "artifactPath": "docs/operations/generated/IYORWUESE-JACKIE-EDITORIAL-DECISION-2026-08-11/editorial-working-version/The General’s Will and Last Testament - Editorial Working Version - Jackie Restoration.docx",
+    "artifactHash": "d1d26531bae4be696150b3db8bbcfa2b8caab6e2d39b7aec34b6c72f11bd3453",
+    "recipient": "Iyorwuese Hagher <hagher.hagher@ymail.com>"
+  },
+  "communication": {
+    "subject": "Final Developmental Review - The General’s Will and Last Testament",
+    "html": "author-final-developmental-review-preview.html",
+    "text": "author-final-developmental-review-preview.txt",
+    "htmlSha256": "b98b830312931d17a06fd9b69fa5ce8c5dc7c49ca781ec619fd3558e5671bef4",
+    "textSha256": "09f9f7a56cba204837acd1fad257db54c32ee59c5ecf7d10c6b2f7dd226490ba",
+    "validation": "PASS",
+    "sent": false
+  },
+  "negativeCounts": {
+    "developmental_edit_closeout_events": 0,
+    "line_editing_entry_events": 0,
+    "production_progression_events": 0,
+    "duplicate_author_review_sends": 0,
+    "author_resend_requests": 0,
+    "PR431_progression_events": 0,
+    "IntentionalLeader_unauthorized_mutations": 0,
+    "unrelated_title_mutations": 0
+  }
+}

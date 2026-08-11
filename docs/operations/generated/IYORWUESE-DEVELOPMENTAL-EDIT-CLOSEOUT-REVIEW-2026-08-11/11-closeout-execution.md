@@ -1,25 +1,7 @@
 # Closeout Execution
 
-Last verified: 2026-08-11T17:15:00Z
+Last verified: 2026-08-11T17:37:29.998Z
 
-Closeout performed: NO
+Closeout execution performed: NO.
 
-Closeout event ID: NOT CREATED
-
-Reason:
-
-The current canonical protected title-closeout executor is not authorized for this title.
-
-Execution blocker:
-
-- `lib/server/publishing-title-closeout-service.ts` title allowlist permits only The Intentional Leader.
-- `.github/workflows/publishing-title-closeout.yml` rejects any title other than The Intentional Leader.
-
-Mutation counts:
-
-- developmental_edit_closeout_events: 0
-- production_progression_events: 0
-- author_messages_sent: 0
-- PR431_progression_events: 0
-- IntentionalLeader_state_mutations: 0
-
+This package also remediates the exposed executor defect: `PublishingTitleCloseoutService` no longer relies on the Intentional Leader hard-coded title identity as primary business authorization. It now evaluates governed title/stage/gate/artifact readback, final author approval semantics, artifact/version correlation, unresolved corrections, internal verification, response clocks, and idempotency.

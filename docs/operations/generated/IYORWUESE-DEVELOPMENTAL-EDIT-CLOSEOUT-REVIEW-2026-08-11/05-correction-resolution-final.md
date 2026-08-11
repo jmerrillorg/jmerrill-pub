@@ -1,22 +1,9 @@
 # Correction Resolution Final
 
-Last verified: 2026-08-11T17:15:00Z
+Last verified: 2026-08-11T17:37:29.998Z
 
-Author response:
+Correct classification:
 
-- Decision: APPROVED_WITH_CORRECTIONS
-- Historical response: durably captured
-- Author judgment required: NO
-- Author communication required: NO
+AUTHOR CORRECTIONS RESOLVED / FINAL AUTHOR APPROVAL REQUIRED
 
-Correction inventory:
-
-- Total correction items evaluated: 54 author-marked pidgin/vernacular passages
-- Formatting-only corrections resolved: 53
-- Wording + formatting correction resolved: 1
-- Unresolved correction count: 0
-
-Final correction status:
-
-AUTHOR_CORRECTIONS_RESOLVED
-
+Do not classify this state as developmental-edit closeout ready. The author previously responded `APPROVED_WITH_CORRECTIONS`; that response authorized correction implementation but did not approve the revised artifact.

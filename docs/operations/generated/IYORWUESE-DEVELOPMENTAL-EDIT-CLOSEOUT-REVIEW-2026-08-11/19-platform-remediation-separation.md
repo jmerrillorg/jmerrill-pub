@@ -1,19 +1,13 @@
 # Platform Remediation Separation
 
-Last verified: 2026-08-11T17:15:00Z
+Last verified: 2026-08-11T17:37:29.998Z
 
-Automated shared-mailbox attachment recovery remains separate.
+Platform remediation completed in this PR:
 
-Current known symptoms:
+- reusable author final approval gate added;
+- author-decision propagation no longer closes awaiting state on conditional responses;
+- protected title closeout service generalized away from hard-coded title allowlist;
+- workflow dispatch parameterized for governed title/stage/gate/artifact facts;
+- regression tests added/updated.
 
-- Microsoft Graph shared-mailbox attachment path returns 403
-- Outlook attachment connector is signed-in-mailbox scoped
-
-Title impact:
-
-Not a blocker for this title because manual governed recovery succeeded and author corrections are resolved.
-
-Route:
-
-MICROSOFT 365 / CONNECTOR REMEDIATION
-
+No production title progression was performed by the remediation.

@@ -1,24 +1,17 @@
 # Closeout Decision
 
-Last verified: 2026-08-11T17:15:00Z
+Last verified: 2026-08-11T17:37:29.998Z
 
-Phase 5 classification:
+Decision: DO NOT CLOSE DEVELOPMENTAL EDITING.
 
-DEVELOPMENTAL_EDIT_CLOSEOUT_READY
+Reason: final author approval of the revised developmental-edit artifact has not been received.
 
-Reason:
+Correct state:
 
-Every editorial closeout criterion located in the developmental-editing standard is satisfied by canonical evidence after PR #469.
-
-Closeout execution decision:
-
-NOT PERFORMED
-
-Reason:
-
-The existing protected title-closeout service and GitHub workflow are allowlisted only for The Intentional Leader and cannot mutate The General's Will and Last Testament. The service test explicitly proves another title cannot be mutated.
-
-Required next action:
-
-Jackie must authorize a governed closeout action for this title, either by extending/commissioning the protected closeout executor for The General's Will and Last Testament or by approving another canonical closeout mechanism.
-
+- Developmental Editing: IN PROGRESS
+- Author Corrections: APPLIED
+- Publishing Team Verification: COMPLETE
+- Updated Manuscript: READY FOR AUTHOR REVIEW
+- Final Author Approval: PENDING
+- Developmental-Edit Closeout: NOT ELIGIBLE
+- Next Stage: NOT ELIGIBLE

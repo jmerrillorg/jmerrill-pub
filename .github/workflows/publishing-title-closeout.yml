@@ -4,9 +4,90 @@ on:
   workflow_dispatch:
     inputs:
       title:
-        description: Allowlisted title to close.
+        description: Human-readable title label for operator confirmation.
         required: true
         default: The Intentional Leader
+      title_id:
+        description: Governed title record ID.
+        required: true
+        default: e797232b-da7a-f111-ab0f-00224820105b
+      stage_id:
+        description: Current editorial stage record ID.
+        required: true
+        default: c9dee533-4184-f111-ab0f-7c1e525b15c2
+      gate_id:
+        description: Current author approval gate record ID.
+        required: true
+        default: 5141f7db-0a8e-f111-8077-00224820105b
+      approved_artifact_id:
+        description: Current artifact/version approved by the author.
+        required: true
+        default: intentional-leader-final-pagination-corrected-proof-2026-08-03-v1
+      approved_artifact_checksum:
+        description: SHA-256 checksum of current approved artifact.
+        required: true
+        default: 0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed
+      approval_source:
+        description: Governed source of explicit final author approval.
+        required: true
+        default: jackie-author-approval-confirmed
+      approval_timestamp:
+        description: Timestamp of explicit final author approval.
+        required: true
+        default: "2026-08-03T00:00:00Z"
+      author_approval_semantic:
+        description: Final approval semantic for this closeout.
+        required: true
+        default: APPROVED
+        type: choice
+        options:
+          - APPROVED
+          - APPROVED_WITH_CORRECTIONS
+          - CHANGES_REQUESTED
+          - REVISED_FOR_AUTHOR_REVIEW
+          - QUESTIONS
+          - REVIEW_REQUIRED
+      current_stage_artifact_version:
+        description: Current stage artifact/version expected for closeout.
+        required: true
+        default: intentional-leader-final-pagination-corrected-proof-2026-08-03-v1
+      approved_artifact_version:
+        description: Artifact/version actually approved by author.
+        required: true
+        default: intentional-leader-final-pagination-corrected-proof-2026-08-03-v1
+      unresolved_author_corrections:
+        description: Count of unresolved author-requested corrections.
+        required: true
+        default: "0"
+      required_internal_verification:
+        description: Internal verification state.
+        required: true
+        default: COMPLETE
+        type: choice
+        options:
+          - COMPLETE
+          - IN_PROGRESS
+          - NOT_STARTED
+      expected_current_stage:
+        description: Expected current stage type or label.
+        required: true
+        default: INTERIOR_LAYOUT
+      expected_gate_state:
+        description: Expected gate state label.
+        required: true
+        default: READY_FOR_AUTHOR_RELEASE
+      expected_active_gate_count:
+        description: Expected active canonical gate count.
+        required: true
+        default: "1"
+      expected_response_clock_count:
+        description: Expected response clock count.
+        required: true
+        default: "0"
+      next_stage:
+        description: Exact next stage after closeout.
+        required: true
+        default: Cover Design
       dry_run:
         description: Run read-only dry-run.
         required: true
@@ -99,19 +180,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "${{ inputs.title }}" != "The Intentional Leader" ]]; then
-            echo "TITLE_CLOSEOUT_TITLE_NOT_ALLOWLISTED" >&2
-            exit 1
-          fi
           BODY="$(jq -cn \
-            --arg titleId "e797232b-da7a-f111-ab0f-00224820105b" \
-            --arg stageId "c9dee533-4184-f111-ab0f-7c1e525b15c2" \
-            --arg gateId "5141f7db-0a8e-f111-8077-00224820105b" \
-            --arg approvedArtifactId "intentional-leader-final-pagination-corrected-proof-2026-08-03-v1" \
-            --arg approvedArtifactChecksum "0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed" \
-            --arg approvalSource "jackie-author-approval-confirmed" \
-            --arg approvalTimestamp "2026-08-03T00:00:00Z" \
-            --arg nextStage "Cover Design" \
+            --arg titleId "${{ inputs.title_id }}" \
+            --arg stageId "${{ inputs.stage_id }}" \
+            --arg gateId "${{ inputs.gate_id }}" \
+            --arg approvedArtifactId "${{ inputs.approved_artifact_id }}" \
+            --arg approvedArtifactChecksum "${{ inputs.approved_artifact_checksum }}" \
+            --arg approvalSource "${{ inputs.approval_source }}" \
+            --arg approvalTimestamp "${{ inputs.approval_timestamp }}" \
+            --arg authorApprovalSemantic "${{ inputs.author_approval_semantic }}" \
+            --arg currentStageArtifactVersion "${{ inputs.current_stage_artifact_version }}" \
+            --arg approvedArtifactVersion "${{ inputs.approved_artifact_version }}" \
+            --arg unresolvedAuthorCorrections "${{ inputs.unresolved_author_corrections }}" \
+            --arg requiredInternalVerification "${{ inputs.required_internal_verification }}" \
+            --arg expectedCurrentStage "${{ inputs.expected_current_stage }}" \
+            --arg expectedGateState "${{ inputs.expected_gate_state }}" \
+            --arg expectedActiveGateCount "${{ inputs.expected_active_gate_count }}" \
+            --arg expectedResponseClockCount "${{ inputs.expected_response_clock_count }}" \
+            --arg nextStage "${{ inputs.next_stage }}" \
             '{
               titleId: $titleId,
               stageId: $stageId,
@@ -120,10 +206,15 @@ jobs:
               approvedArtifactChecksum: $approvedArtifactChecksum,
               approvalSource: $approvalSource,
               approvalTimestamp: $approvalTimestamp,
-              expectedCurrentStage: "INTERIOR_LAYOUT",
-              expectedGateState: "READY_FOR_AUTHOR_RELEASE",
-              expectedActiveGateCount: 1,
-              expectedResponseClockCount: 0,
+              authorApprovalSemantic: $authorApprovalSemantic,
+              currentStageArtifactVersion: $currentStageArtifactVersion,
+              approvedArtifactVersion: $approvedArtifactVersion,
+              unresolvedAuthorCorrections: ($unresolvedAuthorCorrections | tonumber),
+              requiredInternalVerification: $requiredInternalVerification,
+              expectedCurrentStage: $expectedCurrentStage,
+              expectedGateState: $expectedGateState,
+              expectedActiveGateCount: ($expectedActiveGateCount | tonumber),
+              expectedResponseClockCount: ($expectedResponseClockCount | tonumber),
               dryRun: true,
               confirm: false,
               nextStage: $nextStage
@@ -142,14 +233,23 @@ jobs:
         run: |
           set -euo pipefail
           BODY="$(jq -cn \
-            --arg titleId "e797232b-da7a-f111-ab0f-00224820105b" \
-            --arg stageId "c9dee533-4184-f111-ab0f-7c1e525b15c2" \
-            --arg gateId "5141f7db-0a8e-f111-8077-00224820105b" \
-            --arg approvedArtifactId "intentional-leader-final-pagination-corrected-proof-2026-08-03-v1" \
-            --arg approvedArtifactChecksum "0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed" \
-            --arg approvalSource "jackie-author-approval-confirmed" \
-            --arg approvalTimestamp "2026-08-03T00:00:00Z" \
-            --arg nextStage "Cover Design" \
+            --arg titleId "${{ inputs.title_id }}" \
+            --arg stageId "${{ inputs.stage_id }}" \
+            --arg gateId "${{ inputs.gate_id }}" \
+            --arg approvedArtifactId "${{ inputs.approved_artifact_id }}" \
+            --arg approvedArtifactChecksum "${{ inputs.approved_artifact_checksum }}" \
+            --arg approvalSource "${{ inputs.approval_source }}" \
+            --arg approvalTimestamp "${{ inputs.approval_timestamp }}" \
+            --arg authorApprovalSemantic "${{ inputs.author_approval_semantic }}" \
+            --arg currentStageArtifactVersion "${{ inputs.current_stage_artifact_version }}" \
+            --arg approvedArtifactVersion "${{ inputs.approved_artifact_version }}" \
+            --arg unresolvedAuthorCorrections "${{ inputs.unresolved_author_corrections }}" \
+            --arg requiredInternalVerification "${{ inputs.required_internal_verification }}" \
+            --arg expectedCurrentStage "${{ inputs.expected_current_stage }}" \
+            --arg expectedGateState "${{ inputs.expected_gate_state }}" \
+            --arg expectedActiveGateCount "${{ inputs.expected_active_gate_count }}" \
+            --arg expectedResponseClockCount "${{ inputs.expected_response_clock_count }}" \
+            --arg nextStage "${{ inputs.next_stage }}" \
             '{
               titleId: $titleId,
               stageId: $stageId,
@@ -158,10 +258,15 @@ jobs:
               approvedArtifactChecksum: $approvedArtifactChecksum,
               approvalSource: $approvalSource,
               approvalTimestamp: $approvalTimestamp,
-              expectedCurrentStage: "INTERIOR_LAYOUT",
-              expectedGateState: "READY_FOR_AUTHOR_RELEASE",
-              expectedActiveGateCount: 1,
-              expectedResponseClockCount: 0,
+              authorApprovalSemantic: $authorApprovalSemantic,
+              currentStageArtifactVersion: $currentStageArtifactVersion,
+              approvedArtifactVersion: $approvedArtifactVersion,
+              unresolvedAuthorCorrections: ($unresolvedAuthorCorrections | tonumber),
+              requiredInternalVerification: $requiredInternalVerification,
+              expectedCurrentStage: $expectedCurrentStage,
+              expectedGateState: $expectedGateState,
+              expectedActiveGateCount: ($expectedActiveGateCount | tonumber),
+              expectedResponseClockCount: ($expectedResponseClockCount | tonumber),
               dryRun: false,
               confirm: true,
               nextStage: $nextStage
@@ -180,14 +285,22 @@ jobs:
         run: |
           set -euo pipefail
           BODY="$(jq -cn \
-            --arg titleId "e797232b-da7a-f111-ab0f-00224820105b" \
-            --arg stageId "c9dee533-4184-f111-ab0f-7c1e525b15c2" \
-            --arg gateId "5141f7db-0a8e-f111-8077-00224820105b" \
-            --arg approvedArtifactId "intentional-leader-final-pagination-corrected-proof-2026-08-03-v1" \
-            --arg approvedArtifactChecksum "0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed" \
-            --arg approvalSource "jackie-author-approval-confirmed" \
-            --arg approvalTimestamp "2026-08-03T00:00:00Z" \
-            --arg nextStage "Cover Design" \
+            --arg titleId "${{ inputs.title_id }}" \
+            --arg stageId "${{ inputs.stage_id }}" \
+            --arg gateId "${{ inputs.gate_id }}" \
+            --arg approvedArtifactId "${{ inputs.approved_artifact_id }}" \
+            --arg approvedArtifactChecksum "${{ inputs.approved_artifact_checksum }}" \
+            --arg approvalSource "${{ inputs.approval_source }}" \
+            --arg approvalTimestamp "${{ inputs.approval_timestamp }}" \
+            --arg authorApprovalSemantic "${{ inputs.author_approval_semantic }}" \
+            --arg currentStageArtifactVersion "${{ inputs.current_stage_artifact_version }}" \
+            --arg approvedArtifactVersion "${{ inputs.approved_artifact_version }}" \
+            --arg unresolvedAuthorCorrections "${{ inputs.unresolved_author_corrections }}" \
+            --arg requiredInternalVerification "${{ inputs.required_internal_verification }}" \
+            --arg expectedCurrentStage "${{ inputs.expected_current_stage }}" \
+            --arg expectedGateState "${{ inputs.expected_gate_state }}" \
+            --arg expectedResponseClockCount "${{ inputs.expected_response_clock_count }}" \
+            --arg nextStage "${{ inputs.next_stage }}" \
             '{
               titleId: $titleId,
               stageId: $stageId,
@@ -196,10 +309,15 @@ jobs:
               approvedArtifactChecksum: $approvedArtifactChecksum,
               approvalSource: $approvalSource,
               approvalTimestamp: $approvalTimestamp,
-              expectedCurrentStage: "INTERIOR_LAYOUT",
-              expectedGateState: "READY_FOR_AUTHOR_RELEASE",
+              authorApprovalSemantic: $authorApprovalSemantic,
+              currentStageArtifactVersion: $currentStageArtifactVersion,
+              approvedArtifactVersion: $approvedArtifactVersion,
+              unresolvedAuthorCorrections: ($unresolvedAuthorCorrections | tonumber),
+              requiredInternalVerification: $requiredInternalVerification,
+              expectedCurrentStage: $expectedCurrentStage,
+              expectedGateState: $expectedGateState,
               expectedActiveGateCount: 0,
-              expectedResponseClockCount: 0,
+              expectedResponseClockCount: ($expectedResponseClockCount | tonumber),
               dryRun: false,
               confirm: true,
               nextStage: $nextStage

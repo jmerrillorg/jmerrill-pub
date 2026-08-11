@@ -38,11 +38,15 @@ Developmental Editing may begin only when:
 
 Developmental Editing exits only when:
 
-- the author decision is captured truthfully
-- required revisions are received, waived, or held by approved exception
+- the current stage artifact has full, explicit author approval
+- the approved artifact version is the current developmental artifact version
+- required author-requested corrections are implemented, internally verified, and returned for author review where corrections were requested
+- unresolved author corrections equal zero
 - the Publisher Recommendation is settled
 - next-stage authorization is recorded
 - evidence is retained and versioned
+
+Conditional author responses, including approved with corrections, changes requested, questions, or any equivalent "yes, but" response, do not close Developmental Editing and do not authorize the next stage. Publishing Team verification means the requested changes were implemented accurately; it is not a substitute for final author approval of the resulting artifact.
 
 ## 5. Author Experience
 
@@ -191,6 +195,8 @@ Email remains the official transactional channel for author decisions. The Autho
 ## 20. Author Response Handling
 
 Author responses must map to the correct package version and approval gate. No later package or stage may overwrite the recorded decision for the current package.
+
+Response received and final approval received are separate states. A response that requests corrections, approves with corrections, asks questions, rejects the artifact, or otherwise conditions approval keeps the author approval gate open. After the Publishing Team applies and verifies requested changes, the updated artifact must return to the author for explicit final approval. Final approval attaches only to the artifact version actually approved.
 
 ## 20A. Correction Count Standard
 

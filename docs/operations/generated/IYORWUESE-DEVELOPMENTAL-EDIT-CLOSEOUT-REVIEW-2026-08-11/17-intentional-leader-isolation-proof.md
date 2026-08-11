@@ -1,17 +1,7 @@
 # The Intentional Leader Isolation Proof
 
-Last verified: 2026-08-11T17:15:00Z
+Last verified: 2026-08-11T17:37:29.998Z
 
-The Intentional Leader protected lane remains unchanged.
+No state mutation was performed against The Intentional Leader. The global approval doctrine applies to its future Cover Review response: if the author returns `APPROVED_WITH_CORRECTIONS`, Cover Review remains open until the revised cover artifact receives full approval.
 
-IntentionalLeader_state_mutations = 0
-
-Expected state remains:
-
-- author decision = PENDING
-- independent external delivery proof = NOT PROVEN
-- response clock = NOT STARTED
-- Live Action 006 = NOT AUTHORIZED
-
-No files or runtime action in this run mutated The Intentional Leader.
-
+IntentionalLeader_unauthorized_mutations: 0.
