@@ -15,6 +15,7 @@ import {
 } from './dataverse-server'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { randomUUID } from 'node:crypto'
 import {
   classifyTitlePortfolio,
   isActivePipeline,
@@ -39,6 +40,9 @@ const HEALTH_HEALTHY = 196650000
 const DIAGNOSTIC_STATUS_PENDING = 196650000
 const MANUSCRIPT_ASSET_STATUS_APPROVED = 3
 const PROVISIONAL_TITLE_NAMES = new Set(['untitled'])
+const INTERNAL_VISIBILITY_MAILBOX = 'publishing@jmerrill.one'
+const JACKIE_NOTIFICATION_SENT = 'JACKIE_ACTION_REQUIRED_NOTIFICATION_SENT'
+const JACKIE_NOTIFICATION_FAILED = 'JACKIE_ACTION_REQUIRED_NOTIFICATION_FAILED'
 
 export type PublisherActionId =
   | 'review_intake'
@@ -63,6 +67,7 @@ export type PublisherActionId =
   | 'place_evidence_hold'
   | 'remove_evidence_hold'
   | 'retry_failed_operation'
+  | 'notify_jackie_action_required'
   | 'view_only'
 
 export type PublisherExecutionMode =
@@ -786,6 +791,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     portfolio,
     productionCommand,
     authorResponses,
+    logs,
   })
 
   return {
@@ -2883,6 +2889,7 @@ function buildTitleOperatingView(input: {
   portfolio: PublisherPortfolioItem[]
   productionCommand: PublisherOperatingCenterSnapshot['productionCommand']
   authorResponses: PublisherAuthorResponseQueueItem[]
+  logs?: DataverseRow[]
 }): PublisherTitleOperatingView {
   const stages = deriveTitleOperatingStages(input)
   const allTodayItems = [
@@ -2901,7 +2908,7 @@ function buildTitleOperatingView(input: {
   }
 
   const cards = Array.from(byTitle.values())
-    .map((items) => titleItemsToOperatingCard(items, stages, input.authorResponses))
+    .map((items) => titleItemsToOperatingCard(items, stages, input.authorResponses, input.logs || []))
     .sort((a, b) => {
       const urgency = { urgent: 0, watch: 1, normal: 2 }
       return urgency[a.urgency] - urgency[b.urgency] || a.stageId.localeCompare(b.stageId) || a.title.localeCompare(b.title)
@@ -3010,6 +3017,7 @@ function titleItemsToOperatingCard(
   items: PublisherTodayItem[],
   stages: PublisherTitleOperatingStage[],
   authorResponses: PublisherAuthorResponseQueueItem[],
+  logs: DataverseRow[],
 ): PublisherTitleOperatingCard {
   const primary = prioritizeTodayItems(items)[0]
   const stageId = canonicalStageId(`${primary.editorialStage} ${primary.pipelineStage} ${primary.nextAction}`)
@@ -3019,8 +3027,11 @@ function titleItemsToOperatingCard(
   const titleResponse = authorResponses.find((item) => normalizeTitle(item.title) === normalizeTitle(primary.title))
   const currentArtifact = bestEvidenceLink(primary)
   const liveClassification = isSyntheticTitle(primary.title) ? 'TEST_CERTIFICATION' : 'LIVE'
-  const actionUrl = `/publisher/operating-center?titleId=${encodeURIComponent(primary.titleId || primary.recordId)}&action=${encodeURIComponent(primary.nextAction)}`
-  const actions = primary.allowedActions.length
+  const actionUrl = `${publisherOperatingCenterBaseUrl()}/publisher/operating-center?titleId=${encodeURIComponent(
+    primary.titleId || primary.recordId,
+  )}&action=${encodeURIComponent(primary.nextAction)}`
+  const notificationState = notificationStateFor(primary, logs)
+  const baseActions = primary.allowedActions.length
     ? primary.allowedActions.map((action) => ({
         id: action.id,
         label: action.label,
@@ -3033,6 +3044,18 @@ function titleItemsToOperatingCard(
         available: true,
         unavailableReason: '',
       }]
+  const notificationAction =
+    primary.owner === 'Jackie' && notificationState.state !== 'SENT'
+      ? [
+          {
+            id: 'notify_jackie_action_required' as PublisherActionId,
+            label: notificationState.state === 'FAILED' ? 'Retry Jackie Notification' : 'Notify Jackie',
+            available: true,
+            unavailableReason: '',
+          },
+        ]
+      : []
+  const actions = [...notificationAction, ...baseActions]
 
   return {
     key: `title:${primary.titleId || primary.recordId || primary.key}`,
@@ -3067,8 +3090,8 @@ function titleItemsToOperatingCard(
           review: currentArtifact.label,
           decisionOptions: actions.map((action) => action.label),
           consequence: primary.nextAction ? `After this decision, ${primary.nextAction.toLowerCase()}.` : 'The title state will refresh after the governed action records.',
-          notificationState: 'PENDING',
-          lastNotified: '',
+          notificationState: notificationState.state,
+          lastNotified: notificationState.lastNotified,
           operatingCenterUrl: actionUrl,
         }
       : undefined,
@@ -3086,6 +3109,175 @@ function titleItemsToOperatingCard(
     },
     liveClassification,
   }
+}
+
+export async function dispatchJackieActionRequiredNotification(input: {
+  event: JackieActionRequiredNotificationEvent
+  operatorEmail?: string
+}) {
+  const config = getDataverseServerConfig()
+  if (!config) {
+    return { ok: false as const, state: 'FAILED' as const, reason: 'DATAVERSE_CONFIG_MISSING' }
+  }
+
+  const existing = await findJackieNotificationEvidence(config, input.event.idempotencyKey)
+  if (existing?.sent) {
+    return {
+      ok: true as const,
+      state: 'SENT' as const,
+      duplicateSuppressed: true,
+      evidenceId: existing.id,
+      providerMessageId: existing.providerMessageId,
+    }
+  }
+
+  const relayUrl =
+    process.env.JM1_INTERNAL_NOTIFICATION_RELAY_URL ||
+    process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL ||
+    'https://func-jm1-acs-email-relay.azurewebsites.net'
+  const relayKey =
+    process.env.JM1_INTERNAL_NOTIFICATION_RELAY_KEY ||
+    process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY ||
+    process.env.JM1_RELAY_API_KEY
+
+  if (!relayKey) {
+    const failure = await writeJackieNotificationFailure(config, input.event, 'RELAY_KEY_MISSING')
+    return { ok: false as const, state: 'FAILED' as const, reason: 'RELAY_KEY_MISSING', evidenceId: extractId(failure) }
+  }
+
+  const payload = {
+    notificationType: 'AUTHOR_DRAFT_READY_FOR_REVIEW',
+    diagnosticId: randomUUID(),
+    intakeReferenceCode: intakeReferenceForNotification(input.event),
+    authorName: input.event.author || 'Not applicable',
+    authorEmail: '',
+    projectTitle: input.event.title,
+    draftStatus: 'DRAFT_ONLY',
+    approvalStatus: 'PENDING_HUMAN_APPROVAL',
+    draftPreview: jackieNotificationPreview(input.event),
+    nextAction: `${input.event.actionSummary} — ${input.event.operatingCenterUrl}`,
+    recipient: INTERNAL_VISIBILITY_MAILBOX,
+  }
+
+  const response = await fetch(`${relayUrl.replace(/\/$/, '')}/api/send-internal-author-draft-review-notification`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-jm1-relay-key': relayKey,
+    },
+    body: JSON.stringify(payload),
+  })
+  const body = (await response.json().catch(() => null)) as { accepted?: boolean; providerMessageId?: string; reason?: string; code?: string } | null
+  if (!response.ok || body?.accepted !== true) {
+    const reason = body?.reason || body?.code || `RELAY_HTTP_${response.status}`
+    const failure = await writeJackieNotificationFailure(config, input.event, reason)
+    return { ok: false as const, state: 'FAILED' as const, reason, evidenceId: extractId(failure) }
+  }
+
+  const log = await writePublisherExecutionLog(config, {
+    actionType: JACKIE_NOTIFICATION_SENT,
+    name: `Jackie action notification sent - ${input.event.title}`,
+    description: [
+      `JACKIE_ACTION_REQUIRED notification sent to ${INTERNAL_VISIBILITY_MAILBOX}.`,
+      `Channel EMAIL via ACS internal relay.`,
+      `Title: ${input.event.title}.`,
+      `Action: ${input.event.actionSummary}.`,
+      `Why: ${input.event.whyRequired}.`,
+      `Deep link: ${input.event.operatingCenterUrl}.`,
+      `Provider message ID: ${body.providerMessageId || 'not-returned-by-relay'}.`,
+      `Idempotency: ${input.event.idempotencyKey}.`,
+    ].join(' '),
+    sourceEntity: 'publisher_operating_center',
+    sourceRecordId: input.event.sourceRecord,
+  })
+
+  return {
+    ok: true as const,
+    state: 'SENT' as const,
+    duplicateSuppressed: false,
+    evidenceId: extractId(log),
+    providerMessageId: body.providerMessageId || 'not-returned-by-relay',
+  }
+}
+
+async function findJackieNotificationEvidence(config: DataverseServerConfig, idempotencyKey: string) {
+  const rows = await dataverseList(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon',
+    $filter: `jm1_actiontype eq '${JACKIE_NOTIFICATION_SENT}' or jm1_actiontype eq '${JACKIE_NOTIFICATION_FAILED}'`,
+    $orderby: 'createdon desc',
+    $top: '50',
+  })
+  const row = rows.find((candidate) => stringValue(candidate.jm1_actiondescription).includes(`Idempotency: ${idempotencyKey}.`))
+  if (!row) return null
+  return {
+    id: stringValue(row.jm1_executionlogid),
+    sent: stringValue(row.jm1_actiontype) === JACKIE_NOTIFICATION_SENT,
+    providerMessageId: stringValue(row.jm1_actiondescription).match(/Provider message ID: ([^.]+)\./)?.[1] || '',
+  }
+}
+
+async function writeJackieNotificationFailure(config: DataverseServerConfig, event: JackieActionRequiredNotificationEvent, reason: string) {
+  return writePublisherExecutionLog(config, {
+    actionType: JACKIE_NOTIFICATION_FAILED,
+    name: `Jackie action notification failed - ${event.title}`,
+    description: [
+      `JACKIE_ACTION_REQUIRED notification failed for ${INTERNAL_VISIBILITY_MAILBOX}.`,
+      `Channel EMAIL via ACS internal relay.`,
+      `Title: ${event.title}.`,
+      `Action: ${event.actionSummary}.`,
+      `Why: ${event.whyRequired}.`,
+      `Deep link: ${event.operatingCenterUrl}.`,
+      `Failure reason: ${reason}.`,
+      `Idempotency: ${event.idempotencyKey}.`,
+    ].join(' '),
+    sourceEntity: 'publisher_operating_center',
+    sourceRecordId: event.sourceRecord,
+  })
+}
+
+function notificationStateFor(item: PublisherTodayItem, logs: DataverseRow[]) {
+  const sourceRecord = item.titleId || item.recordId
+  const idempotencyKey = `jackie-action:${sourceRecord}:${canonicalStageId(`${item.editorialStage} ${item.pipelineStage} ${item.nextAction}`)}:${item.nextAction}`
+  const evidence = logs.find((log) => {
+    const actionType = stringValue(log.jm1_actiontype)
+    return (
+      (actionType === JACKIE_NOTIFICATION_SENT || actionType === JACKIE_NOTIFICATION_FAILED) &&
+      stringValue(log.jm1_actiondescription).includes(`Idempotency: ${idempotencyKey}.`)
+    )
+  })
+  const actionType = stringValue(evidence?.jm1_actiontype)
+  if (actionType === JACKIE_NOTIFICATION_SENT) {
+    return { state: 'SENT' as const, lastNotified: stringValue(evidence?.createdon) }
+  }
+  if (actionType === JACKIE_NOTIFICATION_FAILED) {
+    return { state: 'FAILED' as const, lastNotified: stringValue(evidence?.createdon) }
+  }
+  return { state: 'PENDING' as const, lastNotified: '' }
+}
+
+function jackieNotificationPreview(event: JackieActionRequiredNotificationEvent) {
+  return [
+    'JACKIE ACTION REQUIRED',
+    '',
+    `Division: ${event.division}`,
+    `Application: ${event.application}`,
+    `Title: ${event.title}`,
+    `Author: ${event.author || 'Not applicable'}`,
+    `Action required: ${event.actionSummary}`,
+    `Why Jackie is required: ${event.whyRequired}`,
+    `Priority: ${event.priority}`,
+    `Due: ${event.dueAt || 'No governed due date'}`,
+    `Open exact action: ${event.operatingCenterUrl}`,
+  ].join('\n')
+}
+
+function intakeReferenceForNotification(event: JackieActionRequiredNotificationEvent) {
+  const candidate = `${event.sourceRecord} ${event.titleId} ${event.operatingCenterUrl}`.match(/\bJMP-INT-\d{6}-[A-Z0-9-]+\b/i)?.[0]
+  return candidate?.toUpperCase() || 'JMP-INT-202607-0W5PTQ'
+}
+
+function publisherOperatingCenterBaseUrl() {
+  return (process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://jmerrill.pub').replace(/\/$/, '')
 }
 
 function canonicalStageId(value: string) {
