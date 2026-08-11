@@ -20,6 +20,9 @@ const INTERNAL_VISIBILITY_MAILBOX = "publishing@jmerrill.one";
 const INTERNAL_NOTIFICATION_TYPE = "AUTHOR_DRAFT_READY_FOR_REVIEW";
 const JOIN_INTERNAL_NOTIFICATION_TYPE = "JOIN_INTAKE_RECEIVED";
 const APPROVED_AUTHOR_RESPONSE_TYPE = "APPROVED_AUTHOR_RESPONSE";
+const AUTHOR_REVIEW_PACKAGE_TEMPLATE = "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1";
+const CANONICAL_AUTHOR_RENDERER = "JM1 Enterprise Communication Renderer";
+const CANONICAL_AUTHOR_RENDER_MODE = "CANONICAL_HTML";
 const INTERNAL_NOTIFICATION_SENT = "INTERNAL_NOTIFICATION_SENT";
 const JOIN_INTERNAL_NOTIFICATION_SENT = "JOIN_INTERNAL_NOTIFICATION_SENT";
 const AUTHOR_RESPONSE_SENT = "AUTHOR_RESPONSE_SENT";
@@ -527,9 +530,17 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
     return { ok: false, reason: "EDITORIAL_RECOMMENDATION_HTML_REQUIRED" };
   }
 
-  if (normalizeText(payload.templateName) === "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1") {
+  if (normalizeText(payload.templateName) === AUTHOR_REVIEW_PACKAGE_TEMPLATE) {
     if (!htmlBody) {
       return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_HTML_REQUIRED" };
+    }
+    const renderValidation = validateCanonicalAuthorReviewHtmlPayload({
+      htmlBody,
+      body,
+      templateMetadata: payload.templateMetadata
+    });
+    if (!renderValidation.ok) {
+      return { ok: false, reason: renderValidation.reason };
     }
     if (!attachments.ok) {
       return { ok: false, reason: attachments.reason };
@@ -569,7 +580,13 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       templateMetadata: payload.templateMetadata && typeof payload.templateMetadata === "object" ? {
         htmlSha256: normalizeText(payload.templateMetadata.htmlSha256),
         textSha256: normalizeText(payload.templateMetadata.textSha256),
-        qualityGate: normalizeText(payload.templateMetadata.qualityGate)
+        qualityGate: normalizeText(payload.templateMetadata.qualityGate),
+        brandSystem: normalizeText(payload.templateMetadata.brandSystem),
+        enterpriseStandard: normalizeText(payload.templateMetadata.enterpriseStandard),
+        renderer: normalizeText(payload.templateMetadata.renderer),
+        rendererVersion: normalizeText(payload.templateMetadata.rendererVersion),
+        renderMode: normalizeText(payload.templateMetadata.renderMode),
+        renderTemplateGuard: normalizeText(payload.templateMetadata.renderTemplateGuard)
       } : null,
       attachments: attachments.ok ? attachments.value : [],
       approvedBy: normalizeText(payload.approvedBy),
@@ -577,6 +594,83 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX
     }
   };
+}
+
+function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
+  const html = normalizeHtmlBody(payload.htmlBody);
+  const text = normalizeBody(payload.body);
+  const metadata = payload.templateMetadata && typeof payload.templateMetadata === "object" ? payload.templateMetadata : null;
+
+  if (!metadata) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_TEMPLATE_METADATA_REQUIRED" };
+  }
+
+  if (normalizeText(metadata.qualityGate) !== "PASS") {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_QUALITY_GATE_REQUIRED" };
+  }
+
+  if (normalizeText(metadata.renderMode) !== CANONICAL_AUTHOR_RENDER_MODE) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_CANONICAL_RENDER_MODE_REQUIRED" };
+  }
+
+  if (normalizeText(metadata.renderTemplateGuard) !== "PASS") {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_RENDER_TEMPLATE_GUARD_REQUIRED" };
+  }
+
+  if (normalizeText(metadata.renderer) !== CANONICAL_AUTHOR_RENDERER) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_CANONICAL_RENDERER_REQUIRED" };
+  }
+
+  for (const [field, value] of [
+    ["htmlSha256", metadata.htmlSha256],
+    ["textSha256", metadata.textSha256]
+  ]) {
+    if (!/^[0-9a-f]{64}$/i.test(normalizeText(value))) {
+      return { ok: false, reason: `AUTHOR_REVIEW_PACKAGE_${field.toUpperCase()}_INVALID` };
+    }
+  }
+
+  const requiredHtmlFragments = [
+    "<!doctype html>",
+    "<table",
+    "J MERRILL PUBLISHING",
+    "A Division of J Merrill One",
+    "Helping Authors Help Themselves.",
+    "Why you are receiving this",
+    "What has been completed",
+    "How to respond",
+    "What happens next",
+    "Support",
+    "The Publishing Team"
+  ];
+
+  for (const fragment of requiredHtmlFragments) {
+    if (!html.toLowerCase().includes(fragment.toLowerCase())) {
+      return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_CANONICAL_STRUCTURE_REQUIRED" };
+    }
+  }
+
+  if (!html.includes("What's attached") && !html.includes("What&#39;s attached")) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_CANONICAL_STRUCTURE_REQUIRED" };
+  }
+
+  if (!html.includes("What we need from you")) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_REVIEW_PROMPT_REQUIRED" };
+  }
+
+  if (!/<a\b[^>]+href="https:\/\/[^"]+"[^>]+style="[^"]*(display:inline-block|background:)/i.test(html)) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_CTA_BUTTON_REQUIRED" };
+  }
+
+  if (!text.includes("Optional Author Operating Center access: https://")) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_TEXT_PORTAL_REFERENCE_REQUIRED" };
+  }
+
+  if (/\b(Dataverse|execution log|workflow record|internal instruction|package manifest|response mechanism|evidence file)\b/i.test(`${html}\n${text}`)) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_INTERNAL_LANGUAGE_BLOCKED" };
+  }
+
+  return { ok: true };
 }
 
 function getAcsSenderAddress() {
