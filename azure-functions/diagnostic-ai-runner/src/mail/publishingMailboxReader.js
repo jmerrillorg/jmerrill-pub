@@ -10,7 +10,8 @@
  *   - GET only. No code path in this module performs PATCH, POST, or DELETE
  *     against Graph. Mail cannot be sent, deleted, moved, or marked
  *     read/unread from this module — those operations are simply absent.
- *   - Never ingests attachments.
+ *   - The default reply reader never ingests attachments. Attachment reads
+ *     require an explicit caller path in this module and remain GET-only.
  *   - Never logs or returns the raw Graph response, headers, or tokens.
  *
  * Live read requires JM1_PUBLISHING_MAIL_READ_ENABLED="true", checked fresh
@@ -27,6 +28,7 @@
  * the module's own query is hardcoded to this one address regardless.
  */
 
+const { createHash } = require("node:crypto");
 const { DefaultAzureCredential } = require("@azure/identity");
 
 const GATE_NAME = "JM1_PUBLISHING_MAIL_READ_ENABLED";
@@ -34,6 +36,7 @@ const PUBLISHING_MAILBOX = "publishing@jmerrill.one";
 const GRAPH_SCOPE = "https://graph.microsoft.com/.default";
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 const MAX_MESSAGES_FETCHED = 25;
+const FILE_ATTACHMENT_TYPE = "#microsoft.graph.fileAttachment";
 const INTERNAL_PUBLISHING_SENDERS = Object.freeze([
   "publishing@email.jmerrill.one",
   "publishing@jmerrill.one"
@@ -87,21 +90,47 @@ async function getGraphToken(deps = {}) {
   return tokenResponse.token;
 }
 
+function getFetchImpl(deps = {}) {
+  return deps.fetchImpl || fetch;
+}
+
+function graphMailboxMessageUrl(messageId, suffix = "") {
+  const id = normalizeString(messageId);
+  if (!id) throw Object.assign(new Error("Message id missing"), { safeCode: "MESSAGE_ID_MISSING" });
+  return `${GRAPH_BASE}/users/${encodeURIComponent(PUBLISHING_MAILBOX)}/messages/${encodeURIComponent(id)}${suffix}`;
+}
+
+function attachmentSafeMetadata(attachment = {}) {
+  return {
+    id: normalizeString(attachment.id) || null,
+    name: normalizeString(attachment.name) || null,
+    contentType: normalizeString(attachment.contentType) || null,
+    size: Number.isFinite(attachment.size) ? attachment.size : null,
+    isInline: attachment.isInline === true,
+    lastModifiedDateTime: normalizeString(attachment.lastModifiedDateTime) || null,
+    graphType: normalizeString(attachment["@odata.type"]) || null
+  };
+}
+
+function sha256Buffer(buffer) {
+  return createHash("sha256").update(buffer).digest("hex");
+}
+
 /**
  * Fetches recent Inbox messages for the publishing mailbox received on or
  * after `afterIso`, requesting only the fields needed for filtering and
  * classification. GET only — no other Graph verb is ever used.
  */
-async function fetchRecentInboxMessages(token, afterIso) {
+async function fetchRecentInboxMessages(token, afterIso, deps = {}) {
   const filter = encodeURIComponent(`receivedDateTime ge ${afterIso}`);
   const select = encodeURIComponent(
-    "id,internetMessageId,subject,from,toRecipients,ccRecipients,receivedDateTime,bodyPreview,body,conversationId"
+    "id,internetMessageId,subject,from,toRecipients,ccRecipients,receivedDateTime,bodyPreview,body,conversationId,hasAttachments"
   );
   const url =
     `${GRAPH_BASE}/users/${encodeURIComponent(PUBLISHING_MAILBOX)}/mailFolders/inbox/messages` +
     `?$filter=${filter}&$select=${select}&$orderby=receivedDateTime desc&$top=${MAX_MESSAGES_FETCHED}`;
 
-  const response = await fetch(url, {
+  const response = await getFetchImpl(deps)(url, {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${token}`,
@@ -119,6 +148,73 @@ async function fetchRecentInboxMessages(token, afterIso) {
 
   const body = await response.json().catch(() => ({}));
   return Array.isArray(body.value) ? body.value : [];
+}
+
+async function fetchMessageAttachmentMetadata(token, messageId, deps = {}) {
+  const select = encodeURIComponent("id,name,contentType,size,isInline,lastModifiedDateTime");
+  const url = graphMailboxMessageUrl(messageId, `/attachments?$select=${select}`);
+
+  const response = await getFetchImpl(deps)(url, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    throw Object.assign(new Error(`Graph attachment metadata read failed: HTTP ${response.status}`), {
+      safeCode: "GRAPH_ATTACHMENT_METADATA_READ_FAILED",
+      httpStatus: response.status
+    });
+  }
+
+  const body = await response.json().catch(() => ({}));
+  return Array.isArray(body.value) ? body.value.map(attachmentSafeMetadata) : [];
+}
+
+async function fetchMessageFileAttachment(token, messageId, attachmentId, deps = {}) {
+  const id = normalizeString(attachmentId);
+  if (!id) throw Object.assign(new Error("Attachment id missing"), { safeCode: "ATTACHMENT_ID_MISSING" });
+
+  const url = graphMailboxMessageUrl(messageId, `/attachments/${encodeURIComponent(id)}`);
+  const response = await getFetchImpl(deps)(url, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    throw Object.assign(new Error(`Graph attachment content read failed: HTTP ${response.status}`), {
+      safeCode: "GRAPH_ATTACHMENT_CONTENT_READ_FAILED",
+      httpStatus: response.status
+    });
+  }
+
+  const body = await response.json().catch(() => ({}));
+  const metadata = attachmentSafeMetadata(body);
+  if (metadata.graphType && metadata.graphType !== FILE_ATTACHMENT_TYPE) {
+    throw Object.assign(new Error(`Unsupported Graph attachment type: ${metadata.graphType}`), {
+      safeCode: "GRAPH_ATTACHMENT_TYPE_UNSUPPORTED",
+      graphType: metadata.graphType
+    });
+  }
+  if (!normalizeString(body.contentBytes)) {
+    throw Object.assign(new Error("Graph fileAttachment contentBytes missing"), {
+      safeCode: "GRAPH_ATTACHMENT_CONTENT_MISSING"
+    });
+  }
+
+  const content = Buffer.from(body.contentBytes, "base64");
+  return {
+    ...metadata,
+    declaredSize: metadata.size,
+    size: content.length,
+    sha256: sha256Buffer(content),
+    content
+  };
 }
 
 /**
@@ -162,7 +258,7 @@ async function readPublishingMailboxReply(input = {}, deps = {}) {
 
   let messages;
   try {
-    messages = await fetchRecentInboxMessages(token, afterIso);
+    messages = await fetchRecentInboxMessages(token, afterIso, deps);
   } catch (err) {
     return blocked(err.safeCode || "GRAPH_MAILBOX_READ_FAILED", { httpStatus: err.httpStatus || null, found: false });
   }
@@ -205,6 +301,7 @@ async function readPublishingMailboxReply(input = {}, deps = {}) {
     inboundMessageId: normalizeString(latest.id) || null,
     internetMessageId: normalizeString(latest.internetMessageId) || null,
     conversationId: normalizeString(latest.conversationId) || null,
+    hasAttachments: latest.hasAttachments === true,
     subject: normalizeString(latest.subject) || null,
     senderAddress,
     toRecipients: latestCandidate.toRecipients,
@@ -214,11 +311,84 @@ async function readPublishingMailboxReply(input = {}, deps = {}) {
   };
 }
 
+async function listPublishingMailboxMessageAttachments(input = {}, deps = {}) {
+  const messageId = normalizeString(input.messageId);
+  if (!messageId) return blocked("MESSAGE_ID_MISSING", { sourceMailbox: PUBLISHING_MAILBOX, attachmentCount: 0 });
+  if (!isGateOpen()) return blocked("GATE_CLOSED", { gate: GATE_NAME, sourceMailbox: PUBLISHING_MAILBOX, attachmentCount: 0 });
+
+  let token;
+  try {
+    token = await getGraphToken(deps);
+  } catch (err) {
+    return blocked(err.safeCode || "GRAPH_AUTH_FAILED", { sourceMailbox: PUBLISHING_MAILBOX, attachmentCount: 0 });
+  }
+
+  try {
+    const attachments = await fetchMessageAttachmentMetadata(token, messageId, deps);
+    return {
+      ok: true,
+      code: "PUBLISHING_MAILBOX_ATTACHMENTS_LISTED",
+      sourceMailbox: PUBLISHING_MAILBOX,
+      sourceMessageId: messageId,
+      attachmentCount: attachments.length,
+      attachments
+    };
+  } catch (err) {
+    return blocked(err.safeCode || "GRAPH_ATTACHMENT_METADATA_READ_FAILED", {
+      sourceMailbox: PUBLISHING_MAILBOX,
+      sourceMessageId: messageId,
+      attachmentCount: 0,
+      httpStatus: err.httpStatus || null
+    });
+  }
+}
+
+async function fetchPublishingMailboxMessageAttachment(input = {}, deps = {}) {
+  const messageId = normalizeString(input.messageId);
+  const attachmentId = normalizeString(input.attachmentId);
+  if (!messageId) return blocked("MESSAGE_ID_MISSING", { sourceMailbox: PUBLISHING_MAILBOX, attachment: null });
+  if (!attachmentId) return blocked("ATTACHMENT_ID_MISSING", { sourceMailbox: PUBLISHING_MAILBOX, sourceMessageId: messageId, attachment: null });
+  if (!isGateOpen()) return blocked("GATE_CLOSED", { gate: GATE_NAME, sourceMailbox: PUBLISHING_MAILBOX, sourceMessageId: messageId, attachment: null });
+
+  let token;
+  try {
+    token = await getGraphToken(deps);
+  } catch (err) {
+    return blocked(err.safeCode || "GRAPH_AUTH_FAILED", { sourceMailbox: PUBLISHING_MAILBOX, sourceMessageId: messageId, attachment: null });
+  }
+
+  try {
+    const attachment = await fetchMessageFileAttachment(token, messageId, attachmentId, deps);
+    const retrievedAt = deps.now ? deps.now() : new Date().toISOString();
+    return {
+      ok: true,
+      code: "PUBLISHING_MAILBOX_ATTACHMENT_FETCHED",
+      sourceMailbox: PUBLISHING_MAILBOX,
+      sourceMessageId: messageId,
+      attachmentId,
+      retrievedAt,
+      attachment
+    };
+  } catch (err) {
+    return blocked(err.safeCode || "GRAPH_ATTACHMENT_CONTENT_READ_FAILED", {
+      sourceMailbox: PUBLISHING_MAILBOX,
+      sourceMessageId: messageId,
+      attachmentId,
+      attachment: null,
+      httpStatus: err.httpStatus || null,
+      graphType: err.graphType || null
+    });
+  }
+}
+
 module.exports = {
   readPublishingMailboxReply,
+  listPublishingMailboxMessageAttachments,
+  fetchPublishingMailboxMessageAttachment,
   GATE_NAME,
   PUBLISHING_MAILBOX,
   MAX_MESSAGES_FETCHED,
+  FILE_ATTACHMENT_TYPE,
   INTERNAL_PUBLISHING_SENDERS,
   extractAuthorReplyText
 };
