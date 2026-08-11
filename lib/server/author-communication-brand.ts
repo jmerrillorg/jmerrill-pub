@@ -44,6 +44,7 @@ export type AuthorFacingRenderMode = typeof AUTHOR_FACING_RENDER_MODES[keyof typ
 export const AUTHOR_FACING_COMMUNICATION_RENDER_MATRIX = [
   { communicationType: 'status update', templateName: 'AUTHOR_STATUS_UPDATE_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
   { communicationType: 'cover review', templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
+  { communicationType: 'final developmental review', templateName: 'AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
   { communicationType: 'interior/proof review', templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
   { communicationType: 'editorial review', templateName: 'EDITORIAL_RECOMMENDATION_LETTER_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
   { communicationType: 'decision request', templateName: 'AUTHOR_DECISION_REQUEST_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
@@ -69,6 +70,7 @@ export type AuthorCommunicationRenderInput = {
   authorAction: string
   primaryActionLabel: string
   primaryActionUrl: string
+  replyOnly?: boolean
   packageInventory?: string[]
   responseChoices?: string[]
   deadline?: string
@@ -121,6 +123,7 @@ export function renderAuthorCommunicationEmail(input: AuthorCommunicationRenderI
     actionLabel: normalized.primaryActionLabel,
     actionUrl: normalized.primaryActionUrl,
     actionInstruction: normalized.authorAction,
+    replyOnly: normalized.replyOnly,
     responseWindow: normalized.deadline,
     timelineItems: normalized.nextSteps,
     supportNote: normalized.supportNote,
@@ -164,6 +167,7 @@ export function validateAuthorCommunicationEmail(input: {
   const html = input.html?.trim() || ''
   const text = input.text?.trim() || ''
   const blockers: string[] = []
+  const replyOnly = input.templateName?.trim() === 'AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1'
 
   if (!input.templateName?.trim()) blockers.push('TEMPLATE_NAME_MISSING')
   if (!input.templateVersion?.trim()) blockers.push('TEMPLATE_VERSION_MISSING')
@@ -175,7 +179,7 @@ export function validateAuthorCommunicationEmail(input: {
   if (!html.includes(AUTHOR_COMMUNICATION_BRAND.brandName)) blockers.push('BRAND_HEADER_MISSING')
   if (!html.includes(AUTHOR_COMMUNICATION_BRAND.divisionLine)) blockers.push('DIVISION_LINE_MISSING')
   if (!html.includes(AUTHOR_COMMUNICATION_BRAND.promiseLine)) blockers.push('PROMISE_LINE_MISSING')
-  const enterpriseValidation = validateJm1EnterpriseCommunication({ html, text, brand: 'publishing' })
+  const enterpriseValidation = validateJm1EnterpriseCommunication({ html, text, brand: 'publishing', replyOnly })
   if (!enterpriseValidation.ok) blockers.push(enterpriseValidation.blocker)
   if (new RegExp(`<h1[^>]*>\\s*${escapeRegExp(AUTHOR_COMMUNICATION_BRAND.brandName)}\\s*</h1>`, 'i').test(html)) {
     blockers.push('BRAND_NAME_RENDERED_AS_MESSAGE_H1')
@@ -187,7 +191,8 @@ export function validateAuthorCommunicationEmail(input: {
   if (!/What we need from you/.test(html)) blockers.push('AUTHOR_REVIEW_BLOCK_MISSING')
   if (!html.includes('How to respond')) blockers.push('AUTHOR_ACTION_BLOCK_MISSING')
   if (!html.includes('What happens next')) blockers.push('NEXT_STEPS_BLOCK_MISSING')
-  if (!/<a\b[^>]+href="https:\/\/[^"]+"/i.test(html)) blockers.push('PRIMARY_ACTION_LINK_MISSING')
+  if (!replyOnly && !/<a\b[^>]+href="https:\/\/[^"]+"/i.test(html)) blockers.push('PRIMARY_ACTION_LINK_MISSING')
+  if (replyOnly && /author\/portal|Author Operating Center|<a\b[^>]+href=/i.test(`${html}\n${text}`)) blockers.push('REPLY_ONLY_PORTAL_OR_LINK_PRESENT')
   if (/<span[^>]*>\s*(Review Package and Reply|Approve|Review)/i.test(html) && !/<a\b[^>]*>\s*(Review Package and Reply|Approve|Review)/i.test(html)) {
     blockers.push('PRIMARY_ACTION_NOT_CLICKABLE')
   }
@@ -195,7 +200,7 @@ export function validateAuthorCommunicationEmail(input: {
   if (!text.includes("What's attached")) blockers.push('PLAIN_TEXT_ATTACHMENT_BLOCK_MISSING')
   if (!text.includes('What we need from you')) blockers.push('PLAIN_TEXT_AUTHOR_REVIEW_BLOCK_MISSING')
   if (!text.includes('How to respond')) blockers.push('PLAIN_TEXT_AUTHOR_ACTION_BLOCK_MISSING')
-  if (!/Optional Author Operating Center access:\s*https:\/\//i.test(text)) blockers.push('PLAIN_TEXT_OPTIONAL_PORTAL_URL_MISSING')
+  if (!replyOnly && !/Optional Author Operating Center access:\s*https:\/\//i.test(text)) blockers.push('PLAIN_TEXT_OPTIONAL_PORTAL_URL_MISSING')
   if (!text.includes(AUTHOR_COMMUNICATION_BRAND.signature)) blockers.push('PLAIN_TEXT_SIGNATURE_MISSING')
   const terminology = validateAuthorFacingPublishingActorTerminology(`${html}\n${text}`)
   if (!terminology.ok) {
@@ -231,6 +236,7 @@ export function validateAuthorCommunicationRenderContract(input: {
   const text = input.text?.trim() || ''
   const policy = AUTHOR_FACING_COMMUNICATION_RENDER_MATRIX.find((row) => row.templateName === templateName)
   const renderMode = input.renderMode || policy?.renderMode || AUTHOR_FACING_RENDER_MODES.canonicalHtml
+  const replyOnly = templateName === 'AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1'
   const blockers: string[] = []
   const brandBlockers: string[] = []
   const leakageBlockers: string[] = []
@@ -262,7 +268,7 @@ export function validateAuthorCommunicationRenderContract(input: {
     if (metadata.renderMode !== AUTHOR_FACING_RENDER_MODES.canonicalHtml) renderBlockers.push('CANONICAL_RENDER_MODE_METADATA_MISSING')
     if (metadata.renderTemplateGuard !== 'PASS') renderBlockers.push('CANONICAL_RENDER_TEMPLATE_GUARD_METADATA_MISSING')
     if (metadata.renderer !== JM1_ENTERPRISE_COMMUNICATION_STANDARD.rendererName) renderBlockers.push('CANONICAL_RENDERER_METADATA_MISSING')
-    if (!/<a\b[^>]+href="https:\/\/[^"]+"[^>]+style="[^"]*(display:inline-block|background:)/i.test(html)) {
+    if (!replyOnly && !/<a\b[^>]+href="https:\/\/[^"]+"[^>]+style="[^"]*(display:inline-block|background:)/i.test(html)) {
       renderBlockers.push('CTA_BUTTON_TREATMENT_MISSING')
     }
   }
@@ -317,6 +323,7 @@ export function renderCoverReviewAuthorCommunication(input: {
 }
 
 function normalizeInput(input: AuthorCommunicationRenderInput): AuthorCommunicationRenderInput {
+  const replyOnly = Boolean(input.replyOnly)
   return {
     ...input,
     templateName: required(input.templateName, 'templateName'),
@@ -329,8 +336,9 @@ function normalizeInput(input: AuthorCommunicationRenderInput): AuthorCommunicat
     completed: input.completed.map((item) => required(item, 'completed item')),
     meaning: required(input.meaning, 'meaning'),
     authorAction: required(input.authorAction, 'authorAction'),
-    primaryActionLabel: required(input.primaryActionLabel, 'primaryActionLabel'),
-    primaryActionUrl: validatePrimaryActionUrl(required(input.primaryActionUrl, 'primaryActionUrl')),
+    primaryActionLabel: replyOnly ? input.primaryActionLabel?.trim() || '' : required(input.primaryActionLabel, 'primaryActionLabel'),
+    primaryActionUrl: replyOnly ? input.primaryActionUrl?.trim() || '' : validatePrimaryActionUrl(required(input.primaryActionUrl, 'primaryActionUrl')),
+    replyOnly,
     packageInventory: input.packageInventory?.map((item) => required(item, 'package inventory item')) || [
       'Current manuscript or proof',
       'Review instructions',

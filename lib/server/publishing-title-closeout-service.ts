@@ -1,6 +1,6 @@
 // Engine: Publishing Title Closeout Service
 // Reusable? Y
-// Stage-specific exception? Y - pilot allowlist is limited to The Intentional Leader.
+// Stage-specific exception? N - governed closeout authority is condition-based.
 
 import { createHash, randomUUID } from 'node:crypto'
 
@@ -15,6 +15,10 @@ import {
   stringValue,
   type DataverseServerConfig,
 } from './dataverse-server'
+import {
+  evaluateAuthorFinalApprovalGate,
+  type AuthorFinalApprovalSemantic,
+} from './author-final-approval-gate'
 
 type DataverseRow = Record<string, unknown>
 
@@ -38,6 +42,11 @@ export type PublishingTitleCloseoutRequest = {
   approvedArtifactChecksum: string
   approvalSource: string
   approvalTimestamp: string
+  authorApprovalSemantic?: AuthorFinalApprovalSemantic
+  currentStageArtifactVersion?: string
+  approvedArtifactVersion?: string
+  unresolvedAuthorCorrections?: number
+  requiredInternalVerification?: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETE'
   expectedCurrentStage: string
   expectedGateState: string
   expectedActiveGateCount: number
@@ -86,11 +95,12 @@ export type PublishingTitleCloseoutResult = {
 
 export type PublishingTitleCloseoutFailureCode =
   | 'TITLE_CLOSEOUT_AUTHORITY_MISSING'
-  | 'TITLE_CLOSEOUT_TITLE_NOT_ALLOWLISTED'
+  | 'TITLE_CLOSEOUT_TITLE_NOT_FOUND'
   | 'TITLE_CLOSEOUT_STAGE_MISMATCH'
   | 'TITLE_CLOSEOUT_GATE_MISMATCH'
   | 'TITLE_CLOSEOUT_MULTIPLE_ACTIVE_GATES'
   | 'TITLE_CLOSEOUT_APPROVAL_NOT_FOUND'
+  | 'TITLE_CLOSEOUT_FINAL_AUTHOR_APPROVAL_MISSING'
   | 'TITLE_CLOSEOUT_ARTIFACT_MISMATCH'
   | 'TITLE_CLOSEOUT_CHECKSUM_MISMATCH'
   | 'TITLE_CLOSEOUT_NEXT_STAGE_UNDEFINED'
@@ -103,6 +113,19 @@ export type PublishingTitleCloseoutReadback = {
   gates: DataverseRow[]
   artifacts: DataverseRow[]
   existingCloseoutLog: DataverseRow | null
+}
+
+export const TITLE_CLOSEOUT_PILOT_DEFAULTS = {
+  title: 'The Intentional Leader',
+  titleId: 'e797232b-da7a-f111-ab0f-00224820105b',
+  stageId: 'c9dee533-4184-f111-ab0f-7c1e525b15c2',
+  gateId: '5141f7db-0a8e-f111-8077-00224820105b',
+  approvedChecksum: '0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed',
+  expectedStage: 'INTERIOR_LAYOUT',
+  expectedGateState: 'READY_FOR_AUTHOR_RELEASE',
+  expectedActiveGateCount: 1,
+  expectedResponseClockCount: 0,
+  nextStage: 'Cover Design',
 }
 
 export type PublishingTitleCloseoutAdapter = {
@@ -152,14 +175,14 @@ export async function closeApprovedStage(
     duplicateStageTransitions: 0 as const,
   }
 
-  if (!titleIsAllowlisted(input)) {
-    return blocked(input, idempotencyKey, 'TITLE_CLOSEOUT_TITLE_NOT_ALLOWLISTED', proposedMutations, emptyCounts)
-  }
   if (!input.nextStage?.trim()) {
     return blocked(input, idempotencyKey, 'TITLE_CLOSEOUT_NEXT_STAGE_UNDEFINED', proposedMutations, emptyCounts)
   }
   if (!approvalExists(input)) {
     return blocked(input, idempotencyKey, 'TITLE_CLOSEOUT_APPROVAL_NOT_FOUND', proposedMutations, emptyCounts)
+  }
+  if (!finalAuthorApprovalExists(input)) {
+    return blocked(input, idempotencyKey, 'TITLE_CLOSEOUT_FINAL_AUTHOR_APPROVAL_MISSING', proposedMutations, emptyCounts)
   }
 
   const readback = await adapter.read(input, idempotencyKey)
@@ -191,6 +214,18 @@ export async function closeApprovedStage(
   }
 }
 
+function finalAuthorApprovalExists(input: PublishingTitleCloseoutRequest) {
+  if (!input.authorApprovalSemantic) return true
+  return evaluateAuthorFinalApprovalGate({
+    requiresAuthorApproval: true,
+    responseSemantic: input.authorApprovalSemantic,
+    currentStageArtifactVersion: input.currentStageArtifactVersion || input.approvedArtifactId,
+    approvedArtifactVersion: input.approvedArtifactVersion || input.approvedArtifactId,
+    unresolvedAuthorCorrections: input.unresolvedAuthorCorrections ?? 0,
+    requiredInternalVerification: input.requiredInternalVerification || 'COMPLETE',
+  }).stageCloseEligible
+}
+
 export function buildTitleCloseoutIdempotencyKey(input: Pick<PublishingTitleCloseoutRequest, 'titleId' | 'stageId' | 'gateId' | 'approvedArtifactId' | 'approvedArtifactChecksum'>) {
   return createHash('sha256')
     .update([
@@ -213,10 +248,17 @@ export function validateCloseoutReadback(
   const responseClockCount = responseClocks(readback.gates)
   const artifact = approvedArtifact(readback.artifacts, input.approvedArtifactId)
 
-  if (!readback.title) failures.push('TITLE_CLOSEOUT_TITLE_NOT_ALLOWLISTED')
+  if (!readback.title) failures.push('TITLE_CLOSEOUT_TITLE_NOT_FOUND')
   if (!readback.stage || stringValue(readback.stage.jm1pub_editorialstageid) !== input.stageId) failures.push('TITLE_CLOSEOUT_STAGE_MISMATCH')
+  if (readback.stage && dataverseLookupId(readback.stage, '_jm1pub_titleid_value') && dataverseLookupId(readback.stage, '_jm1pub_titleid_value') !== input.titleId) {
+    failures.push('TITLE_CLOSEOUT_STAGE_MISMATCH')
+  }
   if (!stageMatches(input.expectedCurrentStage, readback.stage || {})) failures.push('TITLE_CLOSEOUT_STAGE_MISMATCH')
   if (!readback.gate || stringValue(readback.gate.jm1pub_editorialapprovalgateid) !== input.gateId) failures.push('TITLE_CLOSEOUT_GATE_MISMATCH')
+  if (readback.gate && dataverseLookupId(readback.gate, '_jm1pub_titleid_value') && dataverseLookupId(readback.gate, '_jm1pub_titleid_value') !== input.titleId) {
+    failures.push('TITLE_CLOSEOUT_GATE_MISMATCH')
+  }
+  if (readback.gate && dataverseLookupId(readback.gate, '_jm1pub_editorialstageid_value') !== input.stageId) failures.push('TITLE_CLOSEOUT_GATE_MISMATCH')
   if (input.expectedActiveGateCount !== activeGates.length) failures.push('TITLE_CLOSEOUT_MULTIPLE_ACTIVE_GATES')
   if (activeGates.length > 1) failures.push('TITLE_CLOSEOUT_MULTIPLE_ACTIVE_GATES')
   if (input.expectedResponseClockCount !== responseClockCount) failures.push('TITLE_CLOSEOUT_RESPONSE_CLOCK_CONFLICT')
@@ -289,15 +331,6 @@ async function readTitleCloseoutAuthority(
   return { title, stage, gate, gates, artifacts, existingCloseoutLog }
 }
 
-function titleIsAllowlisted(input: PublishingTitleCloseoutRequest) {
-  return (
-    input.titleId === INTENTIONAL_LEADER_TITLE_CLOSEOUT_ALLOWLIST.titleId &&
-    input.stageId === INTENTIONAL_LEADER_TITLE_CLOSEOUT_ALLOWLIST.stageId &&
-    input.gateId === INTENTIONAL_LEADER_TITLE_CLOSEOUT_ALLOWLIST.gateId &&
-    input.approvedArtifactChecksum === INTENTIONAL_LEADER_TITLE_CLOSEOUT_ALLOWLIST.approvedChecksum
-  )
-}
-
 function approvalExists(input: PublishingTitleCloseoutRequest) {
   return Boolean(input.approvalSource.trim() && input.approvalTimestamp.trim() && !Number.isNaN(Date.parse(input.approvalTimestamp)))
 }
@@ -324,12 +357,17 @@ function approvedArtifact(artifacts: DataverseRow[], approvedArtifactId: string)
 }
 
 function stageMatches(expected: string, stage: DataverseRow) {
-  const haystack = [
-    expected,
+  const expectedStage = normalizeStageText(expected)
+  const actualStage = normalizeStageText([
     stringValue(stage.jm1pub_name),
     dataverseFormatted(stage, 'jm1pub_stagetype', String(stage.jm1pub_stagetype || '')),
-  ].join(' ')
-  return /interior|layout/i.test(haystack)
+  ].join(' '))
+  if (!expectedStage || !actualStage) return false
+  return actualStage.includes(expectedStage) || expectedStage.includes(actualStage)
+}
+
+function normalizeStageText(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 }
 
 function base(

@@ -95,8 +95,8 @@ test('valid approved title dry-run passes', async () => {
 })
 
 test('unapproved title fails', async () => {
-  const result = await closeApprovedStage({ ...baseInput, titleId: 'not-allowlisted' }, adapter())
-  assert.equal(result.resultCode, 'TITLE_CLOSEOUT_TITLE_NOT_ALLOWLISTED')
+  const result = await closeApprovedStage({ ...baseInput, titleId: 'missing-governed-title' }, adapter(rows({ title: null })))
+  assert.equal(result.resultCode, 'TITLE_CLOSEOUT_TITLE_NOT_FOUND')
 })
 
 test('wrong stage fails', async () => {
@@ -171,11 +171,13 @@ test('rerun returns idempotent', async () => {
   assert.deepEqual(result.executionLogIds, ['existing-log'])
 })
 
-test('another title cannot be mutated', () => {
-  assert.match(route, /TITLE_CLOSEOUT_TITLE_NOT_ALLOWLISTED/)
-  assert.match(route, /status:\s*403/)
-  assert.match(workflow, /The Intentional Leader/)
-  assert.doesNotMatch(workflow, /title_list|five-title/i)
+test('closeout executor does not rely on hard-coded title allowlist as business authorization', () => {
+  assert.doesNotMatch(route, /body\.titleId\s*!==\s*INTENTIONAL_LEADER_TITLE_CLOSEOUT_ALLOWLIST/)
+  assert.doesNotMatch(workflow, /TITLE_CLOSEOUT_TITLE_NOT_ALLOWLISTED/)
+  assert.match(workflow, /title_id:/)
+  assert.match(workflow, /author_approval_semantic:/)
+  assert.match(workflow, /current_stage_artifact_version:/)
+  assert.doesNotMatch(workflow, /if \[\[ \"\\$\\{\\{ inputs\.title \}\\}\" != \"The Intentional Leader\"/)
 })
 
 test('workflow is governed and production protected', () => {
@@ -192,4 +194,58 @@ test('stable idempotency key includes operation facts', () => {
   const second = buildTitleCloseoutIdempotencyKey({ ...baseInput, approvedArtifactChecksum: 'different' })
   assert.notEqual(first, second)
   assert.match(first, /^[a-f0-9]{64}$/)
+})
+
+test('eligible non-pilot governed title can use closeout service once all gates pass', async () => {
+  const nonPilotInput = {
+    ...baseInput,
+    titleId: 'governed-title-001',
+    stageId: 'governed-stage-001',
+    gateId: 'governed-gate-001',
+    approvedArtifactId: 'governed-current-artifact-v2',
+    approvedArtifactChecksum: 'a'.repeat(64),
+    expectedCurrentStage: 'DEVELOPMENTAL_EDITING',
+    expectedGateState: 'READY_FOR_AUTHOR_RELEASE',
+    nextStage: 'Line Editing',
+    authorApprovalSemantic: 'APPROVED',
+    currentStageArtifactVersion: 'governed-current-artifact-v2',
+    approvedArtifactVersion: 'governed-current-artifact-v2',
+    unresolvedAuthorCorrections: 0,
+    requiredInternalVerification: 'COMPLETE',
+  }
+  const result = await closeApprovedStage(nonPilotInput, adapter(rows({
+    title: { jm1pub_titleid: 'governed-title-001', jm1pub_titlename: 'The General’s Will and Last Testament' },
+    stage: {
+      jm1pub_editorialstageid: 'governed-stage-001',
+      jm1pub_name: 'Developmental Editing - The General’s Will and Last Testament',
+      jm1pub_stagetype: 'DEVELOPMENTAL_EDITING',
+      _jm1pub_titleid_value: 'governed-title-001',
+    },
+    gate: {
+      jm1pub_editorialapprovalgateid: 'governed-gate-001',
+      jm1pub_gatestatus: 196650001,
+      _jm1pub_titleid_value: 'governed-title-001',
+      _jm1pub_editorialstageid_value: 'governed-stage-001',
+    },
+    gates: [
+      {
+        jm1pub_editorialapprovalgateid: 'governed-gate-001',
+        jm1pub_gatestatus: 196650001,
+        _jm1pub_titleid_value: 'governed-title-001',
+        _jm1pub_editorialstageid_value: 'governed-stage-001',
+      },
+    ],
+    artifacts: [
+      {
+        jm1pub_editorialartifactid: 'artifact-guid',
+        jm1pub_editorialartifactname: 'governed-current-artifact-v2',
+        jm1pub_filename: 'The General’s Will and Last Testament - Revised.docx',
+        jm1pub_sha256: 'a'.repeat(64),
+        _jm1pub_titleid_value: 'governed-title-001',
+        _jm1pub_editorialstageid_value: 'governed-stage-001',
+      },
+    ],
+  })))
+  assert.equal(result.status, 'eligible')
+  assert.equal(result.nextStage, 'Line Editing')
 })

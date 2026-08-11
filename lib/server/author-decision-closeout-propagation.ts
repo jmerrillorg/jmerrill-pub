@@ -6,6 +6,10 @@ import {
   type PublishingTitleCloseoutAdapter,
   type PublishingTitleCloseoutRequest,
 } from './publishing-title-closeout-service'
+import {
+  evaluateAuthorFinalApprovalGate,
+  type AuthorFinalApprovalSemantic,
+} from './author-final-approval-gate'
 
 type Decision = 'APPROVED' | 'APPROVED_WITH_CORRECTIONS' | 'QUESTIONS' | 'REVIEW_REQUIRED'
 type PropagationStatus = 'PASS' | 'HOLD'
@@ -31,6 +35,7 @@ export type AuthorReviewRequest = {
   correlationId: string
   sentAt: string
   nextEligibleState: string
+  currentArtifactVersion?: string
   expectedArtifactChecksum?: string
   requiredArtifactIds: string[]
 }
@@ -94,6 +99,11 @@ export type PropagationResult = {
   protectedCloseoutReevaluated: boolean
   protectedCloseout: 'PASS' | 'HOLD' | 'NOT_APPLICABLE'
   eligibleNextState: string | null
+  finalAuthorApprovalReceived: boolean
+  stageCloseEligible: boolean
+  nextStageEligible: boolean
+  revisionLoopRequired: boolean
+  approvalGateBlockers: string[]
   duplicateAuthorDecisions: 0
   duplicateCloseoutEvents: 0
   duplicateArtifactRecords: 0
@@ -205,7 +215,16 @@ export async function propagateAuthorDecisionEvidence(input: PropagationInput): 
   }
 
   const authorDecisionCaptured = correlated.ok && decision !== 'REVIEW_REQUIRED'
-  const awaitingStateClosed = authorDecisionCaptured && Boolean(matchingGate)
+  const approvalGate = evaluateAuthorFinalApprovalGate({
+    requiresAuthorApproval: true,
+    responseSemantic: decisionToApprovalSemantic(decision),
+    currentStageArtifactVersion: input.reviewRequest.currentArtifactVersion || input.reviewRequest.packageId,
+    approvedArtifactVersion: approvedDecision ? input.reviewRequest.packageId : undefined,
+    unresolvedAuthorCorrections: approvedDecision ? 0 : 1,
+    requiredInternalVerification: approvedDecision ? 'COMPLETE' : 'IN_PROGRESS',
+    updatedArtifactReturnedToAuthor: false,
+  })
+  const awaitingStateClosed = authorDecisionCaptured && Boolean(matchingGate) && approvalGate.stageCloseEligible
   const approvedArtifactRegistered = approvedDecision && Boolean(selectedArtifact) && !blockers.some((item) => item.includes('ARTIFACT'))
   const checksumRegistered = approvedArtifactRegistered && Boolean(selectedArtifact?.sha256)
 
@@ -250,6 +269,11 @@ export async function propagateAuthorDecisionEvidence(input: PropagationInput): 
     protectedCloseoutReevaluated,
     protectedCloseout,
     eligibleNextState,
+    finalAuthorApprovalReceived: approvalGate.finalAuthorApprovalReceived,
+    stageCloseEligible: approvalGate.stageCloseEligible,
+    nextStageEligible: approvalGate.nextStageEligible,
+    revisionLoopRequired: approvalGate.revisionLoopRequired,
+    approvalGateBlockers: approvalGate.blockers,
     duplicateAuthorDecisions: 0,
     duplicateCloseoutEvents: 0,
     duplicateArtifactRecords: 0,
@@ -273,6 +297,13 @@ export async function propagateAuthorDecisionEvidence(input: PropagationInput): 
     },
     proposedEvidenceMutations,
   }
+}
+
+function decisionToApprovalSemantic(decision: Decision): AuthorFinalApprovalSemantic {
+  if (decision === 'APPROVED') return 'APPROVED'
+  if (decision === 'APPROVED_WITH_CORRECTIONS') return 'APPROVED_WITH_CORRECTIONS'
+  if (decision === 'QUESTIONS') return 'QUESTIONS'
+  return 'REVIEW_REQUIRED'
 }
 
 function replyCorrelates(review: AuthorReviewRequest, reply: AuthorReplyEvent) {

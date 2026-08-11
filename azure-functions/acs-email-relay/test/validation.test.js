@@ -305,6 +305,84 @@ function validAuthorReviewPackagePayload(overrides = {}) {
   });
 }
 
+function validFinalDevelopmentalReviewPayload(overrides = {}) {
+  const canonicalHtml = `<!doctype html>
+<html lang="en">
+  <body>
+    <table role="presentation"><tr><td>J MERRILL PUBLISHING</td></tr></table>
+    <p>A Division of J Merrill One</p>
+    <p>Helping Authors Help Themselves.</p>
+    <h1>Final Developmental Review</h1>
+    <h2>Why you are receiving this</h2>
+    <p>The Publishing Team has incorporated the revisions requested during developmental editing.</p>
+    <h2>What has been completed</h2>
+    <ul><li>The Publishing Team verified the revised manuscript.</li></ul>
+    <h2>What's attached</h2>
+    <ul><li>The revised developmental-edit manuscript.</li></ul>
+    <h2>What we need from you</h2>
+    <p>Please review the attached manuscript and reply with Approved or Changes still required.</p>
+    <h2>How to respond</h2>
+    <p>Reply to this email with Approved or Changes still required.</p>
+    <h2>What happens next</h2>
+    <p>The Publishing Team records your response.</p>
+    <h2>Support</h2>
+    <p>Reply to this email and the Publishing Team will help.</p>
+    <p>The Publishing Team</p>
+  </body>
+</html>`;
+  return validAuthorResponsePayload({
+    subject: "Final Developmental Review - The General’s Will and Last Testament",
+    body: [
+      "Good day, Iyorwuese,",
+      "",
+      "Why you are receiving this",
+      "The Publishing Team has incorporated the revisions requested during developmental editing.",
+      "",
+      "What has been completed",
+      "- The Publishing Team verified the revised manuscript.",
+      "",
+      "What's attached",
+      "- The revised developmental-edit manuscript.",
+      "",
+      "What we need from you",
+      "Please review the attached manuscript and reply with Approved or Changes still required.",
+      "",
+      "How to respond",
+      "Reply to this email with Approved or Changes still required.",
+      "",
+      "What happens next",
+      "- The Publishing Team records your response.",
+      "",
+      "Support",
+      "Reply to this email and the Publishing Team will help.",
+      "",
+      "The Publishing Team"
+    ].join("\n"),
+    htmlBody: canonicalHtml,
+    templateName: "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1",
+    templateVersion: "1.0.0",
+    templateMetadata: {
+      htmlSha256: "e".repeat(64),
+      textSha256: "f".repeat(64),
+      qualityGate: "PASS",
+      brandSystem: "JM1_AUTHOR_COMMUNICATION",
+      enterpriseStandard: "JM1 Enterprise Communication Standard v1.0",
+      renderer: "JM1 Enterprise Communication Renderer",
+      rendererVersion: "1.0.0",
+      renderMode: "CANONICAL_HTML",
+      renderTemplateGuard: "PASS"
+    },
+    attachments: [
+      {
+        name: "The General’s Will and Last Testament - Editorial Working Version - Jackie Restoration.docx",
+        contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        contentInBase64: Buffer.from("author-safe revised manuscript").toString("base64")
+      }
+    ],
+    ...overrides
+  });
+}
+
 function validJoinInternalPayload(overrides = {}) {
   return {
     notificationType: "JOIN_INTAKE_RECEIVED",
@@ -582,6 +660,32 @@ test("approved author-review package sends validated attachments to ACS", () => 
   assert.equal(email.attachments[0].name, "Before You Were Born - Developmental Summary.pdf");
   assert.equal(email.attachments[0].contentType, "application/pdf");
   assert.equal(email.attachments[0].contentInBase64, Buffer.from("author-safe summary").toString("base64"));
+});
+
+test("final developmental review permits reply-only canonical HTML without portal CTA", () => {
+  const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
+  const result = validateApprovedAuthorResponsePayload(validFinalDevelopmentalReviewPayload());
+
+  assert.equal(result.ok, true);
+  const email = buildApprovedAuthorResponseEmail(result.value);
+  const rendered = `${email.content.html}\n${email.content.plainText}`;
+  assert.equal(/author\/portal|Author Operating Center|<a\b[^>]+href=/i.test(rendered), false);
+  assert.equal(email.attachments.length, 1);
+  assert.equal(email.attachments[0].contentType, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+});
+
+test("final developmental review rejects accidental portal links", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validFinalDevelopmentalReviewPayload({
+      htmlBody: validFinalDevelopmentalReviewPayload().htmlBody.replace(
+        "<h2>What happens next</h2>",
+        '<a href="https://jmerrill.pub/author/portal?action=final-developmental-review">Open Author Operating Center</a><h2>What happens next</h2>'
+      )
+    })),
+    "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_REPLY_ONLY_REQUIRED"
+  );
 });
 
 test("approved author-review package preserves full attachment base64 payloads", () => {

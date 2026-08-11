@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-08-11T18:14:04.241Z",
+  "classification": "COMPLETE - PR470 UPDATED / PORTAL FRICTION REMOVED / IYORWUESE FINAL DEVELOPMENTAL-EDIT REVIEW SENT / AWAITING FINAL AUTHOR APPROVAL",
+  "pr469": {
+    "approvedHead": "3a28ea08340770a9450de8d83fce307ec657bb00",
+    "mergeSha": "d97be33a96f6fd60ae002c5379ed648f478e4ba6"
+  },
+  "iyorwuese": {
+    "state": "DEVELOPMENTAL_EDITING_IN_PROGRESS",
+    "corrections": "APPLIED",
+    "publishingTeamVerification": "COMPLETE",
+    "finalAuthorApproval": "PENDING",
+    "closeoutEligible": false,
+    "lineEditingEligible": false,
+    "artifactPath": "docs/operations/generated/IYORWUESE-JACKIE-EDITORIAL-DECISION-2026-08-11/editorial-working-version/The General’s Will and Last Testament - Editorial Working Version - Jackie Restoration.docx",
+    "artifactHash": "d1d26531bae4be696150b3db8bbcfa2b8caab6e2d39b7aec34b6c72f11bd3453",
+    "recipient": "Iyorwuese Hagher <hagher.hagher@ymail.com>"
+  },
+  "communication": {
+    "subject": "Final Developmental Review - The General’s Will and Last Testament",
+    "html": "author-final-developmental-review-preview.html",
+    "text": "author-final-developmental-review-preview.txt",
+    "htmlSha256": "2197c808075d1dd0cf9459f5ee49acc3eee59673a0c2fe004795be4482450c8d",
+    "textSha256": "1798cc2e0a8f68ddd8c45fc210dd6ea0fc20d3901c12123c252b4932a9ecc3f1",
+    "validation": "PASS - PORTAL_FREE_REPLY_ONLY",
+    "sent": true,
+    "sendTimestamp": "2026-08-11T18:14:04.241Z",
+    "event": "FINAL_DEVELOPMENTAL_EDIT_AUTHOR_REVIEW_SENT",
+    "recipient": "Iyorwuese Hagher <hagher.hagher@ymail.com>",
+    "messageId": "NOT_RETURNED_BY_RELAY",
+    "provider": "acs-email",
+    "sendCount": 1,
+    "responseCorrelationTarget": "publishing@jmerrill.one reply-to / intake JMP-INT-202607-DL2T20 / subject Final Developmental Review",
+    "sentHtmlSha256": "2197c808075d1dd0cf9459f5ee49acc3eee59673a0c2fe004795be4482450c8d",
+    "sentTextSha256": "1798cc2e0a8f68ddd8c45fc210dd6ea0fc20d3901c12123c252b4932a9ecc3f1",
+    "currentPreviewHtmlSha256": "1a252fe5ff781e3cc790f90cfbbdb6bb3fca32be7d0eabf3339d62856d89d636",
+    "currentPreviewTextSha256": "1798cc2e0a8f68ddd8c45fc210dd6ea0fc20d3901c12123c252b4932a9ecc3f1",
+    "previewNormalization": "Trailing whitespace removed after send; author-visible content unchanged."
+  },
+  "negativeCounts": {
+    "developmental_edit_closeout_events": 0,
+    "line_editing_entry_events": 0,
+    "production_progression_events": 0,
+    "duplicate_author_review_sends": 0,
+    "author_resend_requests": 0,
+    "PR431_progression_events": 0,
+    "IntentionalLeader_unauthorized_mutations": 0,
+    "unrelated_title_mutations": 0
+  }
+}

@@ -100,9 +100,16 @@ test('2. Approved with corrections correlates but does not grant wrong next stag
   const result = await run({ reply: { body: 'Approved with corrections' } })
   assert.equal(result.status, 'PASS')
   assert.equal(result.decision, 'APPROVED_WITH_CORRECTIONS')
+  assert.equal(result.authorDecisionCaptured, true)
+  assert.equal(result.finalAuthorApprovalReceived, false)
+  assert.equal(result.awaitingStateClosed, false)
+  assert.equal(result.stageCloseEligible, false)
+  assert.equal(result.nextStageEligible, false)
+  assert.equal(result.revisionLoopRequired, true)
   assert.equal(result.protectedCloseout, 'NOT_APPLICABLE')
   assert.equal(result.eligibleNextState, null)
   assert.equal(result.titleStateMutations, 0)
+  assert.equal(result.proposedEvidenceMutations.some((mutation) => mutation.fields.includes('jm1pub_awaitingsince:null')), false)
 })
 
 test('3. I have questions records decision/state appropriately', async () => {
@@ -110,7 +117,9 @@ test('3. I have questions records decision/state appropriately', async () => {
   assert.equal(result.status, 'PASS')
   assert.equal(result.decision, 'QUESTIONS')
   assert.equal(result.authorDecisionCaptured, true)
-  assert.equal(result.awaitingStateClosed, true)
+  assert.equal(result.finalAuthorApprovalReceived, false)
+  assert.equal(result.awaitingStateClosed, false)
+  assert.equal(result.stageCloseEligible, false)
   assert.equal(result.protectedCloseout, 'NOT_APPLICABLE')
 })
 
@@ -276,3 +285,23 @@ test('historical The Intentional Leader shadow replay passes without title mutat
   assert.equal(result.titleStateMutations, 0)
 })
 
+test('conditional approval keeps author-required stage open after Publishing Team implementation', async () => {
+  const result = await run({ reply: { body: 'Approved with corrections' } })
+  assert.equal(result.authorDecisionCaptured, true)
+  assert.equal(result.finalAuthorApprovalReceived, false)
+  assert.equal(result.awaitingStateClosed, false)
+  assert.equal(result.stageCloseEligible, false)
+  assert.equal(result.nextStageEligible, false)
+  assert.match(result.approvalGateBlockers.join(','), /FINAL_AUTHOR_APPROVAL_NOT_RECEIVED/)
+})
+
+test('approval of an older artifact version cannot approve current stage artifact', async () => {
+  const result = await run({ reviewRequest: { currentArtifactVersion: 'materially-revised-v2' } })
+  assert.equal(result.status, 'HOLD')
+  assert.equal(result.decision, 'APPROVED')
+  assert.equal(result.finalAuthorApprovalReceived, true)
+  assert.equal(result.stageCloseEligible, false)
+  assert.equal(result.nextStageEligible, false)
+  assert.match(result.approvalGateBlockers.join(','), /APPROVAL_ARTIFACT_VERSION_MISMATCH/)
+  assert.equal(result.protectedCloseoutReevaluated, false)
+})
