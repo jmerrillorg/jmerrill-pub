@@ -252,7 +252,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
   return (
     <main className="min-h-screen bg-[#080b12] text-white">
       <section className="border-b border-white/10 bg-[#071323]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-8 sm:px-8 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mx-auto flex w-full max-w-none flex-col gap-6 px-5 py-8 sm:px-8 2xl:px-10 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-blue-300">Publisher Operating Center</p>
             <h1 className="mt-3 font-display text-4xl leading-tight md:text-6xl">Publisher Today</h1>
@@ -287,7 +287,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
+      <section className="mx-auto w-full max-w-none px-5 py-6 sm:px-8 2xl:px-10">
         {snapshot && (
           <TitlePipelineBoard
             snapshot={snapshot}
@@ -1268,9 +1268,9 @@ function TitlePipelineBoard({
         </button>
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_420px]">
+      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(720px,1fr)_420px] 2xl:grid-cols-[minmax(0,1fr)_460px]">
         <div className="overflow-x-auto pb-2">
-          <div className="grid min-w-[1040px] auto-cols-[260px] grid-flow-col gap-3">
+          <div className="grid min-w-full auto-cols-[minmax(260px,1fr)] grid-flow-col gap-3">
             {stages.map((stage) => {
               const stageCards = cardsByStage.get(stage.id) || []
               return (

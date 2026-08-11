@@ -5,7 +5,9 @@ import { readFileSync } from 'node:fs'
 const server = readFileSync('lib/server/publisher-operating-center.ts', 'utf8')
 const client = readFileSync('app/publisher/_components/PublisherOperatingCenterClient.tsx', 'utf8')
 const actionRoute = readFileSync('app/api/publisher/operating-center/actions/route.ts', 'utf8')
-const combined = `${server}\n${client}\n${actionRoute}`
+const nav = readFileSync('components/layout/NavBar.tsx', 'utf8')
+const pageSection = readFileSync('components/site/PageSection.tsx', 'utf8')
+const combined = `${server}\n${client}\n${actionRoute}\n${nav}`
 
 const requiredSections = [
   'Waiting for Jackie',
@@ -106,6 +108,14 @@ const expectations = [
       client.indexOf('<TitlePipelineBoard') < client.indexOf('Operational queues and readbacks'),
   },
   {
+    name: 'publisher operating center uses a desktop wide application shell without changing public page sections',
+    ok:
+      client.includes('w-full max-w-none flex-col gap-6') &&
+      client.includes('w-full max-w-none px-5 py-6') &&
+      pageSection.includes('mx-auto max-w-[1280px]') &&
+      !pageSection.includes('max-w-none'),
+  },
+  {
     name: 'pipeline board derives canonical stage columns and hides test records by default',
     ok:
       server.includes('function deriveTitleOperatingStages') &&
@@ -113,6 +123,14 @@ const expectations = [
       client.includes('Include Test / Certification Records') &&
       client.includes("card.liveClassification === 'LIVE'") &&
       client.includes('cardsByStage'),
+  },
+  {
+    name: 'pipeline board owns desktop horizontal navigation while preserving readable stage columns',
+    ok:
+      client.includes('overflow-x-auto pb-2') &&
+      client.includes('auto-cols-[minmax(260px,1fr)]') &&
+      client.includes('xl:grid-cols-[minmax(720px,1fr)_420px]') &&
+      client.includes('2xl:grid-cols-[minmax(0,1fr)_460px]'),
   },
   {
     name: 'title detail drawer surfaces why, artifact, author state, next stage, and technical diagnostics',
@@ -124,6 +142,23 @@ const expectations = [
       client.includes('Next Stage') &&
       client.includes('Technical Details') &&
       client.includes('Why it is waiting'),
+  },
+  {
+    name: 'deep links and title detail panel remain compatible with full-width board behavior',
+    ok:
+      client.includes("searchParams.get('titleId')") &&
+      client.includes("searchParams.get('title')") &&
+      client.includes('selectedTitle') &&
+      client.includes('TitleDetailDrawer') &&
+      client.includes('operatingCenterUrl'),
+  },
+  {
+    name: 'opaque header treatment remains isolated to the global navigation',
+    ok:
+      nav.includes('bg-white border-b border-gray-200 shadow-sm') &&
+      nav.includes('bg-[#0F1C2E] border-b border-white/10') &&
+      !nav.includes('backdrop-blur') &&
+      !nav.includes('/72'),
   },
   {
     name: 'Jackie-owned actions surface decision context and notification delivery',
