@@ -2,11 +2,18 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { existsSync, symlinkSync, unlinkSync } from 'node:fs'
 import test, { after } from 'node:test'
+import { strToU8, zipSync } from 'fflate'
 
 const notificationShim = new URL('../lib/server/author-package-notification-engine', import.meta.url)
 const brandShim = new URL('../lib/server/author-communication-brand', import.meta.url)
+const rendererShim = new URL('../lib/server/jm1-enterprise-communication-renderer', import.meta.url)
+const designTokensShim = new URL('../lib/server/jm1-enterprise-design-tokens', import.meta.url)
+const terminologyShim = new URL('../lib/server/author-facing-terminology', import.meta.url)
 let createdNotificationShim = false
 let createdBrandShim = false
+let createdRendererShim = false
+let createdDesignTokensShim = false
+let createdTerminologyShim = false
 if (!existsSync(notificationShim)) {
   symlinkSync('author-package-notification-engine.ts', notificationShim)
   createdNotificationShim = true
@@ -15,9 +22,24 @@ if (!existsSync(brandShim)) {
   symlinkSync('author-communication-brand.ts', brandShim)
   createdBrandShim = true
 }
+if (!existsSync(rendererShim)) {
+  symlinkSync('jm1-enterprise-communication-renderer.ts', rendererShim)
+  createdRendererShim = true
+}
+if (!existsSync(designTokensShim)) {
+  symlinkSync('jm1-enterprise-design-tokens.ts', designTokensShim)
+  createdDesignTokensShim = true
+}
+if (!existsSync(terminologyShim)) {
+  symlinkSync('author-facing-terminology.ts', terminologyShim)
+  createdTerminologyShim = true
+}
 after(() => {
   if (createdNotificationShim) unlinkSync(notificationShim)
   if (createdBrandShim) unlinkSync(brandShim)
+  if (createdRendererShim) unlinkSync(rendererShim)
+  if (createdDesignTokensShim) unlinkSync(designTokensShim)
+  if (createdTerminologyShim) unlinkSync(terminologyShim)
 })
 
 const {
@@ -36,7 +58,10 @@ const {
   validateAuthorReviewResponseMechanism,
   validatePackageQa,
 } = await import('../lib/server/author-review-package-engine.ts')
-const { validateAuthorPackageNotification } = await import('../lib/server/author-package-notification-engine.ts')
+const {
+  authorFacingAttachmentBlocker,
+  validateAuthorPackageNotification,
+} = await import('../lib/server/author-package-notification-engine.ts')
 
 const now = '2026-07-20T08:00:00.000Z'
 
@@ -45,15 +70,16 @@ function sha(value) {
 }
 
 function fakeDocx(title = 'The Intentional Leader') {
-  return Buffer.concat([
-    Buffer.from('PK\x03\x04'),
-    Buffer.from('[Content_Types].xml _rels/.rels word/document.xml '),
-    Buffer.from(`${title} governed author review manuscript `.repeat(500)),
-  ])
+  const documentText = `${title} governed author review manuscript `.repeat(500)
+  return Buffer.from(zipSync({
+    '[Content_Types].xml': strToU8('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'),
+    '_rels/.rels': strToU8('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'),
+    'word/document.xml': strToU8(`<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>${documentText}</w:t></w:r></w:p></w:body></w:document>`),
+  }, { level: 0 }))
 }
 
 function fakePdf(title = 'The Intentional Leader') {
-  return Buffer.from(`%PDF-1.7\n1 0 obj << /Type /Catalog >> endobj\n${title}\n${'author review package '.repeat(6_000)}\n%%EOF`)
+  return Buffer.from(`%PDF-1.7\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n2 0 obj << /Type /Pages /Count 1 /Kids [3 0 R] >> endobj\n3 0 obj << /Type /Page /Parent 2 0 R >> endobj\n${title}\n${'author review package '.repeat(6_000)}\n%%EOF`)
 }
 
 function fakeText(title = 'The Intentional Leader') {
@@ -124,7 +150,7 @@ function proofreadingPackage(overrides = {}) {
     gateId: 'gate-a5',
     packageVersion: overrides.packageVersion || 'v1',
     artifacts:
-      overrides.artifacts || [artifact('proofreadManuscript'), artifact('proofreadingCoverNote')],
+      overrides.artifacts || [artifact('proofreadManuscript'), artifact('reviewInstructions')],
     preparedAt: now,
     cadence: overrides.cadence || { now, rushAuthorized: true },
     correlationId: 'corr-package-engine-test',
@@ -221,7 +247,7 @@ test('author response policies use canonical governed response options', () => {
 test('required artifacts differ through policy configuration', () => {
   assert.deepEqual(getPackagePolicy('PROOFREADING').requiredArtifactRoles, [
     'proofreadManuscript',
-    'proofreadingCoverNote',
+    'reviewInstructions',
   ])
   assert.deepEqual(getPackagePolicy('INTERIOR_LAYOUT').requiredArtifactRoles, [
     'interiorProofPDF',
@@ -263,7 +289,7 @@ test('missing required artifact blocks package QA', () => {
 })
 
 test('stale-stage artifact is rejected', () => {
-  const artifacts = [artifact('proofreadManuscript', { stageId: 'stage-copyediting' }), artifact('proofreadingCoverNote')]
+  const artifacts = [artifact('proofreadManuscript', { stageId: 'stage-copyediting' }), artifact('reviewInstructions')]
   const manifest = createPackageManifest({
     packageId: 'pkg-stale',
     titleId: 'title-intentional-leader',
@@ -287,7 +313,7 @@ test('manifest controls email attachments and workspace downloads', () => {
     recipientEmail: 'chosen2k7@gmail.com',
     workspaceAccessLocation: 'https://jmerrill.pub/author/portal',
     notificationTemplateId: 'proofreading-review',
-    attachments: [artifact('proofreadManuscript'), artifact('proofreadingCoverNote')],
+    attachments: [artifact('proofreadManuscript'), artifact('reviewInstructions')],
   })
   assert.deepEqual(
     pkg.manifest.artifacts.filter((item) => item.emailAttachment).map((item) => item.artifactId).toSorted(),
@@ -295,7 +321,7 @@ test('manifest controls email attachments and workspace downloads', () => {
   )
   assert.deepEqual(
     pkg.manifest.artifacts.filter((item) => item.workspaceDownload).map((item) => item.artifactId).toSorted(),
-    ['artifact-proofreadManuscript', 'artifact-proofreadingCoverNote'].toSorted(),
+    ['artifact-proofreadManuscript', 'artifact-reviewInstructions'].toSorted(),
   )
   assert.equal(validateAuthorPackageNotification(notification).ok, true)
 })
@@ -321,7 +347,7 @@ test('QA failure prevents cadence release', () => {
       ok: false,
       status: 'QA_FAILED',
       completedAt: now,
-      failures: [{ code: 'PACKAGE_QA_FAILED - REQUIRED_ARTIFACT_MISSING', detail: 'proofreadingCoverNote' }],
+      failures: [{ code: 'PACKAGE_QA_FAILED - REQUIRED_ARTIFACT_MISSING', detail: 'reviewInstructions' }],
     },
     cadence: { now, rushAuthorized: true },
   })
@@ -343,7 +369,7 @@ test('complete package release hands off to canonical notification engine', () =
     recipientEmail: 'chosen2k7@gmail.com',
     workspaceAccessLocation: 'https://jmerrill.pub/author/portal',
     notificationTemplateId: 'proofreading-review',
-    attachments: [artifact('proofreadManuscript'), artifact('proofreadingCoverNote')],
+    attachments: [artifact('proofreadManuscript'), artifact('reviewInstructions')],
   })
   assert.equal(validateAuthorPackageNotification(notification).ok, true)
   assert.equal(notification.recipientPolicy.replyTo, 'publishing@jmerrill.one')
@@ -361,7 +387,7 @@ test('governed cadence retest certifies only when all six evidence lanes pass un
     recipientEmail: 'synthetic-author@example.test',
     workspaceAccessLocation: 'https://jmerrill.pub/author/portal',
     notificationTemplateId: 'proofreading-review',
-    attachments: [artifact('proofreadManuscript'), artifact('proofreadingCoverNote')],
+    attachments: [artifact('proofreadManuscript'), artifact('reviewInstructions')],
   })
   const evidence = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6'].map((condition, index) => ({
     condition,
@@ -414,7 +440,7 @@ test('governed cadence retest fails closed when execution-log completion evidenc
     recipientEmail: 'synthetic-author@example.test',
     workspaceAccessLocation: 'https://jmerrill.pub/author/portal',
     notificationTemplateId: 'proofreading-review',
-    attachments: [artifact('proofreadManuscript'), artifact('proofreadingCoverNote')],
+    attachments: [artifact('proofreadManuscript'), artifact('reviewInstructions')],
   })
   const evidence = ['L1', 'L2', 'L3', 'L4', 'L5'].map((condition, index) => ({
     condition,
@@ -456,7 +482,13 @@ test('governed cadence retest fails closed when execution-log completion evidenc
   assert.equal(certification.conditions.find((condition) => condition.condition === 'L6')?.status, 'NO_EVIDENCE')
 })
 
-test('Developmental and Interior notifications preserve required response, manifest, and cover-message attachments', () => {
+function manifestItem(pkg, role) {
+  const item = pkg.manifest.artifacts.find((artifact) => artifact.artifactRole === role)
+  assert.ok(item, `expected manifest artifact for ${role}`)
+  return item
+}
+
+test('Developmental and Interior packages keep response, manifest, and cover-message artifacts internal', () => {
   const developmental = developmentalPackage()
   const developmentalNotification = buildNotificationInputFromPackage({
     pkg: developmental,
@@ -492,26 +524,44 @@ test('Developmental and Interior notifications preserve required response, manif
   const interiorValidation = validateAuthorPackageNotification(interiorNotification)
   assert.equal(developmentalValidation.ok, true, developmentalValidation.blocker)
   assert.equal(interiorValidation.ok, true, interiorValidation.blocker)
+  for (const role of ['authorResponseMechanism', 'packageManifest', 'authorCoverMessage']) {
+    const developmentalInternal = manifestItem(developmental, role)
+    assert.equal(developmentalInternal.authorVisible, false)
+    assert.equal(developmentalInternal.emailAttachment, false)
+    assert.equal(developmentalInternal.workspaceDownload, false)
+
+    const interiorInternal = manifestItem(interior, role)
+    assert.equal(interiorInternal.authorVisible, false)
+    assert.equal(interiorInternal.emailAttachment, false)
+    assert.equal(interiorInternal.workspaceDownload, false)
+  }
   assert.deepEqual(
     developmentalNotification.attachments.map((attachment) => attachment.role).toSorted(),
     [
-      'authorCoverMessage',
-      'authorResponseMechanism',
       'editedManuscript',
       'editorialMemo',
-      'packageManifest',
       'reviewInstructions',
     ].toSorted(),
   )
   assert.deepEqual(
     interiorNotification.attachments.map((attachment) => attachment.role).toSorted(),
     [
-      'authorCoverMessage',
-      'authorResponseMechanism',
       'interiorProof',
-      'packageManifest',
       'reviewInstructions',
     ].toSorted(),
+  )
+  const unsafeResponseArtifact = artifact('authorResponseMechanism', { mimeType: 'text/plain' })
+  assert.equal(
+    authorFacingAttachmentBlocker({
+      role: 'authorResponseMechanism',
+      artifactId: unsafeResponseArtifact.artifactId,
+      fileName: unsafeResponseArtifact.filename,
+      contentType: unsafeResponseArtifact.mimeType,
+      contentBytesBase64: unsafeResponseArtifact.contentBytesBase64,
+      sizeBytes: unsafeResponseArtifact.fileSize,
+      sha256: unsafeResponseArtifact.checksum,
+    }),
+    'AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED:authorResponseMechanism',
   )
 })
 
