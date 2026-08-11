@@ -34,6 +34,28 @@ export const AUTHOR_COMMUNICATION_BRAND = {
   signature: signatureForBrand('publishing'),
 } as const
 
+export const AUTHOR_FACING_RENDER_MODES = {
+  canonicalHtml: 'CANONICAL_HTML',
+  plainTextAuthorized: 'PLAIN_TEXT_AUTHORIZED',
+} as const
+
+export type AuthorFacingRenderMode = typeof AUTHOR_FACING_RENDER_MODES[keyof typeof AUTHOR_FACING_RENDER_MODES]
+
+export const AUTHOR_FACING_COMMUNICATION_RENDER_MATRIX = [
+  { communicationType: 'status update', templateName: 'AUTHOR_STATUS_UPDATE_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
+  { communicationType: 'cover review', templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
+  { communicationType: 'interior/proof review', templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
+  { communicationType: 'editorial review', templateName: 'EDITORIAL_RECOMMENDATION_LETTER_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
+  { communicationType: 'decision request', templateName: 'AUTHOR_DECISION_REQUEST_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
+  { communicationType: 'correction/revision', templateName: 'AUTHOR_CORRECTION_REQUEST_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
+  { communicationType: 'onboarding', templateName: 'AUTHOR_ONBOARDING_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
+  { communicationType: 'production update', templateName: 'AUTHOR_PRODUCTION_UPDATE_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
+  { communicationType: 'distribution/release', templateName: 'AUTHOR_DISTRIBUTION_RELEASE_UPDATE_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
+  { communicationType: 'launch', templateName: 'AUTHOR_LAUNCH_COMMUNICATION_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
+  { communicationType: 'post-publication', templateName: 'AUTHOR_POST_PUBLICATION_UPDATE_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
+  { communicationType: 'plain text exception', templateName: 'AUTHOR_PLAIN_TEXT_ADMIN_NOTICE_V1', renderMode: AUTHOR_FACING_RENDER_MODES.plainTextAuthorized, state: 'EXPLICIT_EXCEPTION_ONLY' },
+] as const
+
 export type AuthorCommunicationRenderInput = {
   templateName: string
   templateVersion: string
@@ -63,6 +85,11 @@ export type RenderedAuthorCommunication = {
     templateName: string
     templateVersion: string
     brandSystem: typeof AUTHOR_COMMUNICATION_BRAND.templateFamily
+    enterpriseStandard: typeof JM1_ENTERPRISE_COMMUNICATION_STANDARD.name
+    renderer: typeof JM1_ENTERPRISE_COMMUNICATION_STANDARD.rendererName
+    rendererVersion: typeof JM1_ENTERPRISE_COMMUNICATION_STANDARD.rendererVersion
+    renderMode: typeof AUTHOR_FACING_RENDER_MODES.canonicalHtml
+    renderTemplateGuard: 'PASS'
     qualityGate: 'PASS'
     htmlSha256: string
     textSha256: string
@@ -116,6 +143,11 @@ export function renderAuthorCommunicationEmail(input: AuthorCommunicationRenderI
       templateName: normalized.templateName,
       templateVersion: normalized.templateVersion,
       brandSystem: AUTHOR_COMMUNICATION_BRAND.templateFamily,
+      enterpriseStandard: JM1_ENTERPRISE_COMMUNICATION_STANDARD.name,
+      renderer: rendered.metadata.renderer,
+      rendererVersion: rendered.metadata.rendererVersion,
+      renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml,
+      renderTemplateGuard: 'PASS',
       qualityGate: 'PASS',
       htmlSha256: sha256(html),
       textSha256: sha256(text),
@@ -173,6 +205,115 @@ export function validateAuthorCommunicationEmail(input: {
   return blockers.length
     ? { ok: false, blocker: `AUTHOR_COMMUNICATION_BLOCKED - ${blockers.join(',')}` }
     : { ok: true }
+}
+
+export function validateAuthorCommunicationRenderContract(input: {
+  html?: string | null
+  text?: string | null
+  templateName?: string | null
+  templateVersion?: string | null
+  channel?: 'EMAIL' | string | null
+  authorFacing?: boolean | null
+  renderMode?: AuthorFacingRenderMode | null
+  templateMetadata?: Record<string, unknown> | null
+}): {
+  ok: boolean
+  brandLanguageGuard: 'PASS' | 'FAIL'
+  leakageGuard: 'PASS' | 'FAIL'
+  renderTemplateGuard: 'PASS' | 'FAIL'
+  blockers: string[]
+  renderMode: AuthorFacingRenderMode
+  communicationType: string
+} {
+  const templateName = input.templateName?.trim() || ''
+  const templateVersion = input.templateVersion?.trim() || ''
+  const html = input.html?.trim() || ''
+  const text = input.text?.trim() || ''
+  const policy = AUTHOR_FACING_COMMUNICATION_RENDER_MATRIX.find((row) => row.templateName === templateName)
+  const renderMode = input.renderMode || policy?.renderMode || AUTHOR_FACING_RENDER_MODES.canonicalHtml
+  const blockers: string[] = []
+  const brandBlockers: string[] = []
+  const leakageBlockers: string[] = []
+  const renderBlockers: string[] = []
+  const authorFacingEmail = input.authorFacing !== false && (input.channel || 'EMAIL') === 'EMAIL'
+
+  if (authorFacingEmail && !policy) renderBlockers.push('UNKNOWN_AUTHOR_FACING_EMAIL_TYPE')
+  if (!templateName) renderBlockers.push('TEMPLATE_NAME_MISSING')
+  if (!templateVersion) renderBlockers.push('TEMPLATE_VERSION_MISSING')
+
+  const combined = `${html}\n${text}`
+  if (!combined.includes(AUTHOR_COMMUNICATION_BRAND.brandName)) brandBlockers.push('BRAND_NAME_MISSING')
+  if (html && !html.includes(AUTHOR_COMMUNICATION_BRAND.divisionLine)) brandBlockers.push('DIVISION_LINE_MISSING')
+  if (html && !html.includes(AUTHOR_COMMUNICATION_BRAND.promiseLine)) brandBlockers.push('PROMISE_LINE_MISSING')
+  const terminology = validateAuthorFacingPublishingActorTerminology(combined)
+  if (!terminology.ok) brandBlockers.push('AUTHOR_FACING_TERMINOLOGY_BLOCKED')
+
+  if (/\b(Dataverse|execution log|workflow record|internal instruction|package manifest|response mechanism|evidence file)\b/i.test(combined)) {
+    leakageBlockers.push('INTERNAL_ARTIFACT_LANGUAGE_EXPOSED')
+  }
+
+  if (renderMode === AUTHOR_FACING_RENDER_MODES.plainTextAuthorized) {
+    if (policy?.renderMode !== AUTHOR_FACING_RENDER_MODES.plainTextAuthorized) renderBlockers.push('PLAIN_TEXT_NOT_AUTHORIZED')
+    if (!text) renderBlockers.push('PLAIN_TEXT_BODY_MISSING')
+  } else {
+    const validation = validateAuthorCommunicationEmail({ html, text, templateName, templateVersion })
+    if (!validation.ok) renderBlockers.push(validation.blocker)
+    const metadata = input.templateMetadata || {}
+    if (metadata.renderMode !== AUTHOR_FACING_RENDER_MODES.canonicalHtml) renderBlockers.push('CANONICAL_RENDER_MODE_METADATA_MISSING')
+    if (metadata.renderTemplateGuard !== 'PASS') renderBlockers.push('CANONICAL_RENDER_TEMPLATE_GUARD_METADATA_MISSING')
+    if (metadata.renderer !== JM1_ENTERPRISE_COMMUNICATION_STANDARD.rendererName) renderBlockers.push('CANONICAL_RENDERER_METADATA_MISSING')
+    if (!/<a\b[^>]+href="https:\/\/[^"]+"[^>]+style="[^"]*(display:inline-block|background:)/i.test(html)) {
+      renderBlockers.push('CTA_BUTTON_TREATMENT_MISSING')
+    }
+  }
+
+  blockers.push(...brandBlockers, ...leakageBlockers, ...renderBlockers)
+  return {
+    ok: blockers.length === 0,
+    brandLanguageGuard: brandBlockers.length ? 'FAIL' : 'PASS',
+    leakageGuard: leakageBlockers.length ? 'FAIL' : 'PASS',
+    renderTemplateGuard: renderBlockers.length ? 'FAIL' : 'PASS',
+    blockers,
+    renderMode,
+    communicationType: policy?.communicationType || 'unknown',
+  }
+}
+
+export function renderCoverReviewAuthorCommunication(input: {
+  authorName: string
+  titleName: string
+  primaryActionUrl: string
+  artifactLabel?: string
+}): RenderedAuthorCommunication {
+  return renderAuthorCommunicationEmail({
+    templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
+    templateVersion: '1.0.0',
+    subject: `Cover Design Review - ${input.titleName}`,
+    authorName: input.authorName,
+    titleName: input.titleName,
+    preheader: `Your cover design review package for ${input.titleName} is ready.`,
+    why: `The Publishing Team has prepared a cover design review package for ${input.titleName}.`,
+    completed: [
+      'The proposed cover concept is ready for your review.',
+      'The cover review instructions are included with the package.',
+      'Your Author Operating Center has been updated for reference.',
+    ],
+    meaning: 'Please review the cover concept and reply with your approval, requested corrections, or questions. This review covers the proposed cover direction only.',
+    authorAction: 'Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions. You may include one consolidated correction list in your reply.',
+    primaryActionLabel: 'View in Author Operating Center',
+    primaryActionUrl: input.primaryActionUrl,
+    packageInventory: [
+      input.artifactLabel || 'Proposed cover concept image',
+      'Cover review instructions',
+    ],
+    nextSteps: [
+      'The Publishing Team records your response.',
+      'Approved corrections or approval will move cover production to the next governed step.',
+      'If you have questions, reply directly to this message.',
+    ],
+    supportNote: 'If anything is unclear, reply to this email and the Publishing Team will help.',
+    operationalNote: 'This message does not approve publication, change your publishing agreement, or start a review period by itself.',
+  })
 }
 
 function normalizeInput(input: AuthorCommunicationRenderInput): AuthorCommunicationRenderInput {
