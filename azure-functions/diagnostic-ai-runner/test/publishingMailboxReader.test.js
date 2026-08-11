@@ -4,8 +4,11 @@ const { describe, test, beforeEach, afterEach } = require("node:test");
 const assert = require("node:assert/strict");
 const {
   readPublishingMailboxReply,
+  listPublishingMailboxMessageAttachments,
+  fetchPublishingMailboxMessageAttachment,
   GATE_NAME,
   PUBLISHING_MAILBOX,
+  FILE_ATTACHMENT_TYPE,
   extractAuthorReplyText
 } = require("../src/mail/publishingMailboxReader");
 
@@ -45,6 +48,24 @@ function graphMessagesResponse(messages) {
     ok: true,
     async json() {
       return { value: messages };
+    }
+  };
+}
+
+function graphAttachmentsResponse(attachments) {
+  return {
+    ok: true,
+    async json() {
+      return { value: attachments };
+    }
+  };
+}
+
+function graphAttachmentResponse(attachment) {
+  return {
+    ok: true,
+    async json() {
+      return attachment;
     }
   };
 }
@@ -277,11 +298,13 @@ describe("readPublishingMailboxReply — safety invariants", () => {
       "code",
       "conversationId",
       "found",
+      "hasAttachments",
       "inboundMessageId",
       "internetMessageId",
       "ok",
       "receivedDateTime",
       "senderAddress",
+      "subject",
       "toRecipients"
     ]);
   });
@@ -302,11 +325,103 @@ describe("readPublishingMailboxReply — safety invariants", () => {
     assert.ok(!fnSource.includes("method: \"DELETE\""));
   });
 
-  test("the Graph query never expands or requests attachments", () => {
+  test("the default reply reader detects but never expands or retrieves attachments", () => {
     process.env[GATE_NAME] = "true";
     const calls = mockFetchSequence([graphMessagesResponse([message()])]);
     return readPublishingMailboxReply({ subjectContains: SUBJECT, afterIso: AFTER_ISO }, FAKE_TOKEN_DEPS).then(() => {
-      assert.ok(!calls[0].url.toLowerCase().includes("attachment"));
+      assert.ok(calls[0].url.includes("hasAttachments"));
+      assert.ok(!calls[0].url.toLowerCase().includes("/attachments"));
+      assert.ok(!calls[0].url.toLowerCase().includes("$expand=attachments"));
     });
+  });
+});
+
+describe("publishing mailbox attachments — explicit gated recovery path", () => {
+  test("lists attachment metadata from the hardcoded shared publishing mailbox using GET only", async () => {
+    process.env[GATE_NAME] = "true";
+    const calls = mockFetchSequence([
+      graphAttachmentsResponse([
+        {
+          "@odata.type": FILE_ATTACHMENT_TYPE,
+          id: "att-1",
+          name: "Author-marked manuscript.docx",
+          contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          size: 450000,
+          isInline: false,
+          lastModifiedDateTime: "2026-08-11T10:00:00Z",
+          contentBytes: "this-must-not-be-returned-from-list"
+        }
+      ])
+    ]);
+
+    const result = await listPublishingMailboxMessageAttachments({ messageId: "shared-message-id" }, FAKE_TOKEN_DEPS);
+
+    assert.equal(result.ok, true);
+    assert.equal(result.sourceMailbox, PUBLISHING_MAILBOX);
+    assert.equal(result.sourceMessageId, "shared-message-id");
+    assert.equal(result.attachmentCount, 1);
+    assert.equal(result.attachments[0].name, "Author-marked manuscript.docx");
+    assert.equal(result.attachments[0].graphType, FILE_ATTACHMENT_TYPE);
+    assert.ok(!Object.hasOwn(result.attachments[0], "contentBytes"));
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].options.method, "GET");
+    assert.ok(calls[0].url.includes(`/users/${encodeURIComponent(PUBLISHING_MAILBOX)}/messages/shared-message-id/attachments`));
+  });
+
+  test("fetches one file attachment and returns checksum plus bytes without changing mailbox state", async () => {
+    process.env[GATE_NAME] = "true";
+    const bytes = Buffer.from("marked manuscript bytes", "utf8");
+    const calls = mockFetchSequence([
+      graphAttachmentResponse({
+        "@odata.type": FILE_ATTACHMENT_TYPE,
+        id: "att-1",
+        name: "The General's Will and Last Testament - Edited Manuscript.docx",
+        contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        size: 999999,
+        isInline: false,
+        lastModifiedDateTime: "2026-08-11T10:00:00Z",
+        contentBytes: bytes.toString("base64")
+      })
+    ]);
+
+    const result = await fetchPublishingMailboxMessageAttachment(
+      { messageId: "shared-message-id", attachmentId: "att-1" },
+      { ...FAKE_TOKEN_DEPS, now: () => "2026-08-11T12:00:00.000Z" }
+    );
+
+    assert.equal(result.ok, true);
+    assert.equal(result.code, "PUBLISHING_MAILBOX_ATTACHMENT_FETCHED");
+    assert.equal(result.sourceMailbox, PUBLISHING_MAILBOX);
+    assert.equal(result.attachment.name, "The General's Will and Last Testament - Edited Manuscript.docx");
+    assert.equal(result.attachment.declaredSize, 999999);
+    assert.equal(result.attachment.size, bytes.length);
+    assert.equal(result.attachment.sha256, "0eb8b6f6f4e147a29b4bd3b3588dbe6a83e08f907af8a18e536f596ed70f6059");
+    assert.deepEqual(result.attachment.content, bytes);
+    assert.equal(calls[0].options.method, "GET");
+  });
+
+  test("returns a governed block on Graph shared-mailbox permission failure", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([{ ok: false, status: 403, async json() { return {}; } }]);
+
+    const result = await listPublishingMailboxMessageAttachments({ messageId: "shared-message-id" }, FAKE_TOKEN_DEPS);
+
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "GRAPH_ATTACHMENT_METADATA_READ_FAILED");
+    assert.equal(result.httpStatus, 403);
+    assert.equal(result.attachmentCount, 0);
+  });
+
+  test("keeps attachment recovery gate-closed by default", async () => {
+    const calls = mockFetchSequence([graphAttachmentsResponse([])]);
+    const result = await fetchPublishingMailboxMessageAttachment(
+      { messageId: "shared-message-id", attachmentId: "att-1" },
+      FAKE_TOKEN_DEPS
+    );
+
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "GATE_CLOSED");
+    assert.equal(result.attachment, null);
+    assert.equal(calls.length, 0);
   });
 });

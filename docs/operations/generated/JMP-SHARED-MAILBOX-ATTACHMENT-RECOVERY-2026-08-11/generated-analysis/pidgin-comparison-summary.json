@@ -1,0 +1,14 @@
+{
+  "source_sha256": "bd08c013786313782923d869276e8e2c6d16e6fb6446d898f7930527f31596e9",
+  "current_governed_manuscript": "docs/operations/generated/PROGRAM-008-AUTHOR-REVIEW-PREP-2026-08-04/packages/the-generals-will-and-last-testament/the-generals-will-and-last-testament-Author-Review-Manuscript.docx",
+  "total_italic_candidates": 152,
+  "system_editorial_notes": 98,
+  "pidgin_marking_candidates": 54,
+  "other_intentional_italic": 0,
+  "pidgin_exact_wording_present_in_current": 53,
+  "pidgin_source_wording_differs_from_current": 1,
+  "proposed_restore_author_original_count": 54,
+  "author_judgment_required_count": 0,
+  "recommended_author_contact": "NO",
+  "recommended_editorial_action": "Jackie review: restore author-marked italic treatment for all 54 pidgin/vernacular candidates and restore source wording for the one wording difference."
+}
