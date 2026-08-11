@@ -18,10 +18,10 @@ export function NavBar() {
   return (
     <nav
       className={[
-        'fixed left-0 right-0 z-50 h-[76px] flex items-center px-12 transition-all duration-300',
+        'fixed left-0 right-0 z-50 h-[76px] flex items-center px-12 transition-colors duration-300',
         scrolled
-          ? 'bg-white/96 border-b border-gray-200 backdrop-blur-xl shadow-sm'
-          : 'bg-[#0F1C2E]/72 border-b border-white/10 backdrop-blur-md',
+          ? 'bg-white border-b border-gray-200 shadow-sm'
+          : 'bg-[#0F1C2E] border-b border-white/10 shadow-[0_1px_0_rgba(255,255,255,0.04)]',
       ].join(' ')}
     >
       {/* Logo */}

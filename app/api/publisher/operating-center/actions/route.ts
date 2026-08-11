@@ -7,7 +7,9 @@ import {
   type ApprovalTransitionPayload,
 } from '@/lib/server/publishing-orchestrator'
 import {
+  buildPublisherOperatingCenterSnapshot,
   clearPublisherEvidenceHold,
+  dispatchJackieActionRequiredNotification,
   initializePublisherEditorialReview,
   initializePublisherIntakeReview,
   logPublisherAuthorResponseAction,
@@ -44,6 +46,7 @@ const SUPPORTED_ACTIONS: PublisherActionId[] = [
   'place_evidence_hold',
   'remove_evidence_hold',
   'retry_failed_operation',
+  'notify_jackie_action_required',
 ]
 
 export async function POST(req: Request) {
@@ -154,6 +157,19 @@ export async function POST(req: Request) {
           action: publisherAction,
         })
         break
+      case 'notify_jackie_action_required': {
+        if (!body.titleId) return NextResponse.json({ error: 'Title id is required.' }, { status: 400 })
+        const snapshot = await buildPublisherOperatingCenterSnapshot()
+        const notification = snapshot.titleOperatingView.jackieActionNotifications.find(
+          (candidate) => candidate.titleId === body.titleId || candidate.sourceRecord === body.titleId,
+        )
+        if (!notification) return NextResponse.json({ error: 'No Jackie action notification is pending for this title.' }, { status: 404 })
+        result = await dispatchJackieActionRequiredNotification({
+          event: notification,
+          operatorEmail: session.user.email,
+        })
+        break
+      }
       case 'send_proofreading_notification':
         if (!body.gateId) return NextResponse.json({ error: 'Approval gate id is required.' }, { status: 400 })
         result = await sendProofreadingNotification({

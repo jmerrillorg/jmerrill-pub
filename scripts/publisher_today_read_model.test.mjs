@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs'
 
 const server = readFileSync('lib/server/publisher-operating-center.ts', 'utf8')
 const client = readFileSync('app/publisher/_components/PublisherOperatingCenterClient.tsx', 'utf8')
-const combined = `${server}\n${client}`
+const actionRoute = readFileSync('app/api/publisher/operating-center/actions/route.ts', 'utf8')
+const combined = `${server}\n${client}\n${actionRoute}`
 
 const requiredSections = [
   'Waiting for Jackie',
@@ -125,18 +126,24 @@ const expectations = [
       client.includes('Why it is waiting'),
   },
   {
-    name: 'Jackie-owned actions surface decision context and notification envelope',
+    name: 'Jackie-owned actions surface decision context and notification delivery',
     ok:
       server.includes('export type JackieActionRequiredNotificationEvent') &&
       server.includes("eventType: 'JACKIE_ACTION_REQUIRED'") &&
       server.includes('jackieActionNotificationForCard') &&
+      server.includes('dispatchJackieActionRequiredNotification') &&
+      server.includes('findJackieNotificationEvidence') &&
+      server.includes('JACKIE_ACTION_REQUIRED_NOTIFICATION_SENT') &&
+      server.includes('JACKIE_ACTION_REQUIRED_NOTIFICATION_FAILED') &&
       server.includes("preferredChannel: 'MICROSOFT_TEAMS'") &&
       server.includes("fallbackChannel: 'EMAIL'") &&
       server.includes("escalationChannel: 'SMS'") &&
       server.includes('idempotencyKey') &&
+      actionRoute.includes("'notify_jackie_action_required'") &&
       client.includes('Jackie Decision') &&
       client.includes('Notification') &&
-      client.includes('Copy direct action view'),
+      client.includes('Copy direct action view') &&
+      server.includes('Notify Jackie'),
   },
   {
     name: 'blocked actions explain why instead of silently disabling controls',

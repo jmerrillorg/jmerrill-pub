@@ -6,6 +6,7 @@
 
 import { useMemo, useState, type ReactNode } from 'react'
 import { signIn, signOut } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
 
 import { PUBLISHER_OPERATING_CENTER_PROVIDER_ID } from '@/lib/author-durable-auth-shared'
 import type {
@@ -33,6 +34,7 @@ type ActionState = {
 }
 
 export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, operatorEmail }: Props) {
+  const searchParams = useSearchParams()
   const [snapshot, setSnapshot] = useState(initialSnapshot)
   const [actionState, setActionState] = useState<ActionState>({ itemKey: '', status: 'idle', message: '' })
   const [filter, setFilter] = useState('all')
@@ -68,8 +70,16 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
   }, [boardView, includeTestRecords, snapshot])
   const selectedTitle = useMemo(() => {
     if (!titleCards.length) return null
+    const requestedTitle = searchParams.get('titleId') || searchParams.get('title')
+    if (requestedTitle) {
+      const normalized = decodeURIComponent(requestedTitle).toLowerCase()
+      const deepLinked = titleCards.find((card) =>
+        [card.titleId, card.key, card.title].some((value) => value.toLowerCase() === normalized),
+      )
+      if (deepLinked) return deepLinked
+    }
     return titleCards.find((card) => card.key === selectedTitleKey) || titleCards[0]
-  }, [selectedTitleKey, titleCards])
+  }, [searchParams, selectedTitleKey, titleCards])
   const portfolio = useMemo(() => {
     if (!snapshot) return []
     if (portfolioView === 'published') return snapshot.queues.publishedCatalog
