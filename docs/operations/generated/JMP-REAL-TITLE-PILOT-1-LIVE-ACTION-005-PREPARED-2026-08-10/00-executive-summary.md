@@ -1,13 +1,14 @@
 # Executive Summary
 
-Last verified: 2026-08-10T19:41:17Z
+Last verified: 2026-08-11T02:24:22Z
 
 | Field | Value |
 | --- | --- |
 | PR #458 | MERGED |
 | Approved head | `a54e5ef93bdabf8e34fa45a8bf2fd0ab0ee7c705` |
 | PR #458 merge SHA | `98ddc38b99823fd13da7ea5248248108f446f3cc` |
-| Canonical origin/main | `98ddc38b99823fd13da7ea5248248108f446f3cc` |
+| Canonical origin/main | `3078d514cdcadea0e7feb953a7d72ec31fa3cfb4` |
+| Author review package engine reconciliation | PR #461 MERGED / `3078d514cdcadea0e7feb953a7d72ec31fa3cfb4` |
 | Pilot | The Intentional Leader / `JMP-INT-202607-0W5PTQ` |
 | Current Cover Design state | INTERNAL COVER REVIEW APPROVED |
 | Author-facing review package | PREPARED |
@@ -43,7 +44,23 @@ This package records preparation only. No delivery, approval request, or respons
 | author-communication-brand-guard | PASS, 8 / 8 |
 | author-decision-propagation / artifact-propagation / awaiting-state-closure guards | PASS, 25 / 25 each |
 | author-package-notification, publisher today, publishing orchestrator, contamination tests | PASS |
-| author-review-package-engine focused extra test | EXECUTED WITH CAVEAT: 21 / 25 pass; four pre-existing attachment-policy assertions conflict with the current notification guard that blocks internal response/manifest artifacts. No runtime engine change was made in this preparation-only PR. |
+| author-review-package-engine focused test | PASS, 25 / 25 after PR #461 package-engine reconciliation |
 | git diff --check | PASS |
 | evidence checksums | VALIDATED |
 
+## Author Review Package Engine Reconciliation
+
+| Field | Value |
+| --- | --- |
+| Original focused result | 21 / 25 PASS |
+| Failures classified | 4 / 4 |
+| OBSOLETE_TEST | 0 |
+| EXPECTED_FAIL_CLOSED_BEHAVIOR | 0 |
+| TEST_RUNTIME_POLICY_DRIFT | 4 |
+| REAL_RUNTIME_DEFECT | 0 |
+| Current focused suite | 25 / 25 PASS |
+| Unexplained failures | 0 |
+| Internal response/manifest leakage | 0 |
+| Remediation PR | #461 / MERGED |
+
+The four failures were package-engine policy drift against the canonical notification guard. Internal response, manifest, and cover-message artifacts may exist as internal package evidence, but they are not author-visible, email attachments, or author workspace downloads.

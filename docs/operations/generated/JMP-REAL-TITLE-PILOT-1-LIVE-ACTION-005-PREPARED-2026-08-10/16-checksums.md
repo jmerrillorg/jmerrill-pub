@@ -1,10 +1,10 @@
 # Checksums
 
-Last verified: 2026-08-10T19:43:16Z
+Last verified: 2026-08-11T02:24:22Z
 
 | File | SHA-256 |
 | --- | --- |
-| `00-executive-summary.md` | `0fe36c93f55a21d76c2aecd07a158221b57217cb0dfe8a00f8e9c82a5b4ad7d3` |
+| `00-executive-summary.md` | `70bac485596bcb51ca35394b6a530d83c9292a8de64bf0518c08c4681ce40fd8` |
 | `01-pr458-merge-proof.md` | `fef28df455e3d6b00e6292c2f02272d7027c8360f65dcf1ef77a691733ae24b3` |
 | `02-canonical-title-readback.md` | `f7fe73da504d6b498ed307013e12a225e88daf5a7c85b6c06ab44603e0f2d680` |
 | `03-approved-concept-author-readiness.md` | `307df327abbaa522137d5c214254147a37b6d179753880d128ec22db7ac52065` |
@@ -19,5 +19,6 @@ Last verified: 2026-08-10T19:43:16Z
 | `12-side-effect-check.md` | `4ab8ad74950b0ef0ebf5017fda61ac7f4623251a451319bd129c6ebb0f4fe828` |
 | `13-single-operator-proof.md` | `82a81eddd616364d596891181a8a9c1fee2ff19eadb3137eafee4189e3589259` |
 | `14-execution-card.md` | `6eec10a7956113d0344945c44d0691b58ebe9867fb6ae628d3609a667f7086af` |
-| `15-evidence-index.md` | `7f8be01ddb824981d2f0f29eafddd1f54aa5e94ce65bb44c112e85b7af256d14` |
+| `15-evidence-index.md` | `b012e010923197672bce03caafadedc56000a321a257d70fb69aec6fcb7a2c63` |
+| `17-author-review-package-engine-reconciliation.md` | `de35cafb9077fd276c6fabc66606e5440f9ac7b358a7d224655fc993952d8936` |
 | `PILOT-1-LIVE-ACTION-005-SEND-EXECUTION-CARD.md` | `9bbf023bfa7d741f545b89edcf12f25023dc82f345c16f798d1324843281e341` |

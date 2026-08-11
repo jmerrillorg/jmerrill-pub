@@ -1,6 +1,6 @@
 # Evidence Index
 
-Last verified: 2026-08-10T19:41:17Z
+Last verified: 2026-08-11T02:24:22Z
 
 | Field | Value |
 | --- | --- |
@@ -19,6 +19,7 @@ Last verified: 2026-08-10T19:41:17Z
 | Single-operator proof | `13-single-operator-proof.md` |
 | Execution card | `14-execution-card.md` |
 | Named execution card | `PILOT-1-LIVE-ACTION-005-SEND-EXECUTION-CARD.md` |
+| Author review package engine reconciliation | `17-author-review-package-engine-reconciliation.md` |
 | Checksums | `16-checksums.md` |
 | Dataverse preparation log | `5563bdd6-f294-f111-8076-7c1e525b15c2` |
 | SharePoint package folder | `01DF3SEQPUVB43XHNY4FDJVGVK2W3APMJI` |
