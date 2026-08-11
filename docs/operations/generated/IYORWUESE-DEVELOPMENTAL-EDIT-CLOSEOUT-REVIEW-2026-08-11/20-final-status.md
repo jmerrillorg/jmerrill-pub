@@ -1,8 +1,8 @@
 # Final Status
 
-Last verified: 2026-08-11T17:37:29.998Z
+Last verified: 2026-08-11T18:14:04.241Z
 
-COMPLETE - PR470 SEMANTICS CORRECTED / FULL AUTHOR APPROVAL GOVERNANCE REMEDIATED / IYORWUESE FINAL DEVELOPMENTAL-EDIT REVIEW READY FOR JACKIE SEND / CLOSEOUT EXECUTOR GENERALIZED AND VERIFIED
+COMPLETE - PR470 UPDATED / PORTAL FRICTION REMOVED / IYORWUESE FINAL DEVELOPMENTAL-EDIT REVIEW SENT / AWAITING FINAL AUTHOR APPROVAL
 
 | Area | State |
 | --- | --- |
@@ -16,9 +16,11 @@ COMPLETE - PR470 SEMANTICS CORRECTED / FULL AUTHOR APPROVAL GOVERNANCE REMEDIATE
 | Developmental Editing | IN PROGRESS |
 | Developmental closeout eligible | NO |
 | Line Editing eligible | NO |
-| Final review communication | PREPARED |
-| Send state | READY_FOR_JACKIE_SEND_APPROVAL |
-| Author messages sent | 0 |
+| Final review communication | SENT |
+| Send state | COMPLETE |
+| Author messages sent | 1 |
+| Send event | `FINAL_DEVELOPMENTAL_EDIT_AUTHOR_REVIEW_SENT` |
+| Portal links / Author Operating Center references in sent communication | 0 |
 | Closeout executor | GENERALIZED / VERIFIED |
 | Developmental closeout events | 0 |
 | Line Editing entry events | 0 |

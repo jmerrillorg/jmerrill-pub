@@ -94,6 +94,58 @@ const expectations = [
       client.includes('catalog-queue') &&
       client.includes('recent-movements'),
   },
+  {
+    name: 'publisher operating center exposes title-centric pipeline board before diagnostics',
+    ok:
+      server.includes('export type PublisherTitleOperatingView') &&
+      server.includes('export type PublisherTitleOperatingCard') &&
+      server.includes('function buildTitleOperatingView') &&
+      client.includes('TitlePipelineBoard') &&
+      client.includes('Process as the interface') &&
+      client.indexOf('<TitlePipelineBoard') < client.indexOf('Operational queues and readbacks'),
+  },
+  {
+    name: 'pipeline board derives canonical stage columns and hides test records by default',
+    ok:
+      server.includes('function deriveTitleOperatingStages') &&
+      server.includes('canonicalStageId') &&
+      client.includes('Include Test / Certification Records') &&
+      client.includes("card.liveClassification === 'LIVE'") &&
+      client.includes('cardsByStage'),
+  },
+  {
+    name: 'title detail drawer surfaces why, artifact, author state, next stage, and technical diagnostics',
+    ok:
+      client.includes('TitleDetailDrawer') &&
+      client.includes('Current Situation') &&
+      client.includes('Current Artifact') &&
+      client.includes('Author State') &&
+      client.includes('Next Stage') &&
+      client.includes('Technical Details') &&
+      client.includes('Why it is waiting'),
+  },
+  {
+    name: 'Jackie-owned actions surface decision context and notification envelope',
+    ok:
+      server.includes('export type JackieActionRequiredNotificationEvent') &&
+      server.includes("eventType: 'JACKIE_ACTION_REQUIRED'") &&
+      server.includes('jackieActionNotificationForCard') &&
+      server.includes("preferredChannel: 'MICROSOFT_TEAMS'") &&
+      server.includes("fallbackChannel: 'EMAIL'") &&
+      server.includes("escalationChannel: 'SMS'") &&
+      server.includes('idempotencyKey') &&
+      client.includes('Jackie Decision') &&
+      client.includes('Notification') &&
+      client.includes('Copy direct action view'),
+  },
+  {
+    name: 'blocked actions explain why instead of silently disabling controls',
+    ok:
+      client.includes('unavailableReason') &&
+      server.includes('Unavailable because') &&
+      client.includes('Reason') &&
+      server.includes('nextStageBlockedReason'),
+  },
 ]
 
 const failures = expectations.filter((expectation) => !expectation.ok)

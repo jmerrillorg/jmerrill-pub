@@ -312,6 +312,118 @@ export type PublisherTodaySnapshot = {
   recentMovements: PublisherTodayItem[]
 }
 
+export type PublisherTitleOperatingStage = {
+  id: string
+  label: string
+  displayOrder: number
+  authorInputRequired: boolean
+  entryCondition: string
+  closeCondition: string
+  nextStageId: string
+}
+
+export type PublisherTitleOperatingCard = {
+  key: string
+  titleId: string
+  title: string
+  author: string
+  stageId: string
+  stageLabel: string
+  humanStatus: string
+  waitingOn: 'Publishing Team' | 'Author' | 'Jackie' | 'Automation' | 'External' | 'None'
+  ageDays: number
+  targetDate: string
+  urgency: 'normal' | 'watch' | 'urgent'
+  blocker: string
+  nextAction: string
+  nextStage: string
+  nextStageEligible: boolean
+  nextStageBlockedReason: string
+  latestMovement: string
+  currentArtifact: {
+    label: string
+    href: string
+    version: string
+    reviewState: string
+  }
+  authorState: {
+    latestResponse: string
+    classification: string
+    approvalState: string
+    reviewRound: string
+    currentArtifactFullyApproved: boolean
+  }
+  jackieDecision?: {
+    what: string
+    why: string
+    review: string
+    decisionOptions: string[]
+    consequence: string
+    notificationState: 'PENDING' | 'SENT' | 'FAILED' | 'ESCALATED'
+    lastNotified: string
+    operatingCenterUrl: string
+  }
+  actions: Array<{
+    id: PublisherActionId
+    label: string
+    available: boolean
+    unavailableReason: string
+  }>
+  timeline: Array<{
+    label: string
+    timestamp: string
+  }>
+  technical: {
+    rawStatus: string
+    runtimeState: string
+    executionMode: PublisherExecutionMode
+    executionOwner: PublisherExecutionOwner
+    evidenceReferences: string[]
+  }
+  liveClassification: 'LIVE' | 'TEST_CERTIFICATION'
+}
+
+export type JackieActionRequiredNotificationEvent = {
+  eventId: string
+  eventType: 'JACKIE_ACTION_REQUIRED'
+  division: 'J Merrill Publishing'
+  application: 'Publisher Operating Center'
+  titleId: string
+  title: string
+  author: string
+  actionType: string
+  actionSummary: string
+  whyRequired: string
+  priority: 'normal' | 'watch' | 'urgent'
+  dueAt: string
+  operatingCenterUrl: string
+  sourceStage: string
+  sourceRecord: string
+  createdAt: string
+  notificationState: 'PENDING' | 'SENT' | 'FAILED' | 'ESCALATED'
+  preferredChannel: 'MICROSOFT_TEAMS'
+  fallbackChannel: 'EMAIL'
+  escalationChannel: 'SMS'
+  idempotencyKey: string
+}
+
+export type PublisherTitleOperatingView = {
+  generatedAt: string
+  stageSource: string
+  stages: PublisherTitleOperatingStage[]
+  cards: PublisherTitleOperatingCard[]
+  jackieActionNotifications: JackieActionRequiredNotificationEvent[]
+  summary: {
+    activeTitles: number
+    needsJackie: number
+    waitingOnAuthors: number
+    blockedTitles: number
+    overdueTitles: number
+    inProduction: number
+    publishedThisPeriod: number
+  }
+}
+
 export type PublisherAuthorResponseQueueItem = {
   key: string
   author: string
@@ -588,6 +700,7 @@ export type PublisherOperatingCenterSnapshot = {
   authorResponses: PublisherAuthorResponseQueueItem[]
   royalties: PublisherRoyaltyReviewQueue
   today: PublisherTodaySnapshot
+  titleOperatingView: PublisherTitleOperatingView
 }
 
 type DataverseRow = Record<string, unknown>
@@ -622,6 +735,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       authorResponses: [],
       royalties: readRoyaltyReviewQueue(),
       today: emptyPublisherToday(),
+      titleOperatingView: emptyTitleOperatingView(),
     }
   }
 
@@ -665,6 +779,14 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     logs,
     metrics,
   })
+  const titleOperatingView = buildTitleOperatingView({
+    generatedAt: today.generatedAt,
+    today,
+    workload,
+    portfolio,
+    productionCommand,
+    authorResponses,
+  })
 
   return {
     generatedAt: today.generatedAt,
@@ -689,6 +811,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     authorResponses,
     royalties: readRoyaltyReviewQueue(),
     today,
+    titleOperatingView,
   }
 }
 
@@ -2753,6 +2876,284 @@ function buildPublisherToday(input: {
   }
 }
 
+function buildTitleOperatingView(input: {
+  generatedAt: string
+  today: PublisherTodaySnapshot
+  workload: PublisherWorkloadItem[]
+  portfolio: PublisherPortfolioItem[]
+  productionCommand: PublisherOperatingCenterSnapshot['productionCommand']
+  authorResponses: PublisherAuthorResponseQueueItem[]
+}): PublisherTitleOperatingView {
+  const stages = deriveTitleOperatingStages(input)
+  const allTodayItems = [
+    ...input.today.waitingForJackie,
+    ...input.today.waitingForAuthors,
+    ...input.today.activeEditorial,
+    ...input.today.productionQueue,
+    ...input.today.distributionCatalogQueue,
+    ...input.today.alerts,
+  ]
+  const byTitle = new Map<string, PublisherTodayItem[]>()
+  for (const item of allTodayItems) {
+    const key = titleOperatingKey(item)
+    if (!key) continue
+    byTitle.set(key, [...(byTitle.get(key) || []), item])
+  }
+
+  const cards = Array.from(byTitle.values())
+    .map((items) => titleItemsToOperatingCard(items, stages, input.authorResponses))
+    .sort((a, b) => {
+      const urgency = { urgent: 0, watch: 1, normal: 2 }
+      return urgency[a.urgency] - urgency[b.urgency] || a.stageId.localeCompare(b.stageId) || a.title.localeCompare(b.title)
+    })
+
+  const jackieActionNotifications = cards
+    .filter((card) => card.waitingOn === 'Jackie' && card.jackieDecision)
+    .map((card) => jackieActionNotificationForCard(card, input.generatedAt))
+
+  return {
+    generatedAt: input.generatedAt,
+    stageSource: 'Derived from governed Publisher Operating Center workload, portfolio, production command, author-response, and execution-log read models.',
+    stages,
+    cards,
+    jackieActionNotifications,
+    summary: {
+      activeTitles: cards.filter((card) => card.liveClassification === 'LIVE').length,
+      needsJackie: cards.filter((card) => card.waitingOn === 'Jackie').length,
+      waitingOnAuthors: cards.filter((card) => card.waitingOn === 'Author').length,
+      blockedTitles: cards.filter((card) => Boolean(card.blocker)).length,
+      overdueTitles: cards.filter((card) => card.urgency === 'urgent').length,
+      inProduction: cards.filter((card) => card.stageId === 'production').length,
+      publishedThisPeriod: cards.filter((card) => card.stageId === 'published').length,
+    },
+  }
+}
+
+function jackieActionNotificationForCard(
+  card: PublisherTitleOperatingCard,
+  createdAt: string,
+): JackieActionRequiredNotificationEvent {
+  const sourceRecord = card.titleId || card.key
+  const idempotencyKey = `jackie-action:${sourceRecord}:${card.stageId}:${card.nextAction}`
+  return {
+    eventId: stableEventId(idempotencyKey),
+    eventType: 'JACKIE_ACTION_REQUIRED',
+    division: 'J Merrill Publishing',
+    application: 'Publisher Operating Center',
+    titleId: card.titleId,
+    title: card.title,
+    author: card.author,
+    actionType: card.actions[0]?.id || 'view_only',
+    actionSummary: card.jackieDecision?.what || card.nextAction,
+    whyRequired: card.jackieDecision?.why || card.blocker || 'Publisher authority is required.',
+    priority: card.urgency,
+    dueAt: card.targetDate,
+    operatingCenterUrl: card.jackieDecision?.operatingCenterUrl || `/publisher/operating-center?titleId=${encodeURIComponent(card.titleId)}`,
+    sourceStage: card.stageLabel,
+    sourceRecord,
+    createdAt,
+    notificationState: card.jackieDecision?.notificationState || 'PENDING',
+    preferredChannel: 'MICROSOFT_TEAMS',
+    fallbackChannel: 'EMAIL',
+    escalationChannel: 'SMS',
+    idempotencyKey,
+  }
+}
+
+function stableEventId(value: string) {
+  return `JACKIE_ACTION_REQUIRED_${Buffer.from(value).toString('base64url').slice(0, 32)}`
+}
+
+function deriveTitleOperatingStages(input: {
+  workload: PublisherWorkloadItem[]
+  portfolio: PublisherPortfolioItem[]
+  productionCommand: PublisherOperatingCenterSnapshot['productionCommand']
+}): PublisherTitleOperatingStage[] {
+  const present = new Set<string>()
+  for (const item of input.workload) present.add(canonicalStageId(`${item.workloadState} ${item.pipelineStage}`))
+  for (const item of input.portfolio) present.add(canonicalStageId(`${item.pipelineStage} ${item.portfolioLabel}`))
+  for (const item of input.productionCommand.interiorQueue) present.add('cover-interior')
+  for (const item of input.productionCommand.coverQueue) present.add('cover-interior')
+
+  const registry: PublisherTitleOperatingStage[] = [
+    defineStage('intake', 'Intake', 10, false, 'Inquiry or intake exists.', 'Commercial and manuscript evidence are ready.', 'developmental-editing'),
+    defineStage('developmental-editing', 'Developmental Editing', 20, true, 'Developmental editing is initialized.', 'Author fully approves the current developmental-edit artifact.', 'line-editing'),
+    defineStage('line-editing', 'Line Editing', 30, true, 'Developmental Editing is closed and Line Editing entry conditions pass.', 'Author approval or approved release decision is recorded.', 'copyediting'),
+    defineStage('copyediting', 'Copyediting', 40, true, 'Line Editing is closed and copyediting is authorized.', 'Copyediting release conditions pass.', 'proofreading'),
+    defineStage('proofreading', 'Proofreading', 50, true, 'Copyediting is complete and proofreading is authorized.', 'Final proof approval is recorded.', 'cover-interior'),
+    defineStage('cover-interior', 'Cover / Interior', 60, true, 'Approved copy and production assets are ready.', 'Cover and interior review conditions pass.', 'author-approval'),
+    defineStage('author-approval', 'Author Approval', 70, true, 'A current author-facing artifact requires final approval.', 'Author approves the current artifact version.', 'production'),
+    defineStage('production', 'Production', 80, false, 'All required approvals and production specifications are complete.', 'Production QA and release readiness pass.', 'distribution'),
+    defineStage('distribution', 'Distribution', 90, false, 'Production release package is ready.', 'Distribution/readback evidence is captured.', 'published'),
+    defineStage('published', 'Published', 100, false, 'Confirmed-live evidence exists.', 'Post-publication stewardship remains current.', ''),
+    defineStage('exception', 'Exceptions', 900, false, 'A blocker or reconciliation issue exists.', 'Issue is resolved or reclassified.', ''),
+  ]
+
+  return registry
+    .filter((item) => present.size === 0 || present.has(item.id) || ['intake', 'developmental-editing', 'line-editing', 'copyediting', 'proofreading', 'cover-interior', 'author-approval', 'production', 'distribution', 'published'].includes(item.id))
+    .sort((a, b) => a.displayOrder - b.displayOrder)
+}
+
+function defineStage(
+  id: string,
+  label: string,
+  displayOrder: number,
+  authorInputRequired: boolean,
+  entryCondition: string,
+  closeCondition: string,
+  nextStageId: string,
+): PublisherTitleOperatingStage {
+  return { id, label, displayOrder, authorInputRequired, entryCondition, closeCondition, nextStageId }
+}
+
+function titleItemsToOperatingCard(
+  items: PublisherTodayItem[],
+  stages: PublisherTitleOperatingStage[],
+  authorResponses: PublisherAuthorResponseQueueItem[],
+): PublisherTitleOperatingCard {
+  const primary = prioritizeTodayItems(items)[0]
+  const stageId = canonicalStageId(`${primary.editorialStage} ${primary.pipelineStage} ${primary.nextAction}`)
+  const stage = stages.find((item) => item.id === stageId) || stages.find((item) => item.id === 'exception') || defineStage('exception', 'Exceptions', 900, false, 'Issue exists.', 'Issue resolved.', '')
+  const waitingOn = waitingOnForTodayItem(primary)
+  const blocker = humanBlocker(primary)
+  const titleResponse = authorResponses.find((item) => normalizeTitle(item.title) === normalizeTitle(primary.title))
+  const currentArtifact = bestEvidenceLink(primary)
+  const liveClassification = isSyntheticTitle(primary.title) ? 'TEST_CERTIFICATION' : 'LIVE'
+  const actionUrl = `/publisher/operating-center?titleId=${encodeURIComponent(primary.titleId || primary.recordId)}&action=${encodeURIComponent(primary.nextAction)}`
+  const actions = primary.allowedActions.length
+    ? primary.allowedActions.map((action) => ({
+        id: action.id,
+        label: action.label,
+        available: !blocker,
+        unavailableReason: blocker ? `Unavailable because ${blocker}` : '',
+      }))
+    : [{
+        id: 'view_only' as PublisherActionId,
+        label: 'View Details',
+        available: true,
+        unavailableReason: '',
+      }]
+
+  return {
+    key: `title:${primary.titleId || primary.recordId || primary.key}`,
+    titleId: primary.titleId || primary.recordId,
+    title: primary.title,
+    author: primary.author,
+    stageId: stage.id,
+    stageLabel: stage.label,
+    humanStatus: humanStatusForTodayItem(primary),
+    waitingOn,
+    ageDays: Math.max(...items.map((item) => item.ageDays || 0)),
+    targetDate: primary.targetDate,
+    urgency: primary.severity === 'urgent' ? 'urgent' : primary.severity === 'watch' || primary.ageDays > 7 ? 'watch' : 'normal',
+    blocker,
+    nextAction: primary.nextAction || 'Review current title state',
+    nextStage: stages.find((item) => item.id === stage.nextStageId)?.label || 'No next stage',
+    nextStageEligible: !blocker && waitingOn !== 'Author' && stage.nextStageId !== '',
+    nextStageBlockedReason: blocker || (waitingOn === 'Author' ? 'Waiting for author response or approval.' : stage.nextStageId ? '' : 'No next stage is currently defined.'),
+    latestMovement: primary.lastMovement,
+    currentArtifact,
+    authorState: {
+      latestResponse: titleResponse?.responseReceived || 'No current author response recorded',
+      classification: titleResponse?.classifiedDecision || 'No current response',
+      approvalState: approvalStateFor(primary, titleResponse),
+      reviewRound: titleResponse?.stagePackage || primary.packageState,
+      currentArtifactFullyApproved: titleResponse?.classifiedDecision === 'APPROVED WITHOUT CHANGES',
+    },
+    jackieDecision: waitingOn === 'Jackie'
+      ? {
+          what: primary.nextAction || 'Publisher decision required',
+          why: blocker || primary.exactBlocker || primary.dependency || 'Publisher authority is required before this title can move.',
+          review: currentArtifact.label,
+          decisionOptions: actions.map((action) => action.label),
+          consequence: primary.nextAction ? `After this decision, ${primary.nextAction.toLowerCase()}.` : 'The title state will refresh after the governed action records.',
+          notificationState: 'PENDING',
+          lastNotified: '',
+          operatingCenterUrl: actionUrl,
+        }
+      : undefined,
+    actions,
+    timeline: items.slice(0, 4).map((item) => ({
+      label: item.lastMovement || item.nextAction || item.pipelineStage,
+      timestamp: item.lastTrigger || item.targetDate || '',
+    })),
+    technical: {
+      rawStatus: `${primary.executionMode}-${primary.executionState}`,
+      runtimeState: primary.runtime,
+      executionMode: primary.executionMode,
+      executionOwner: primary.executionOwner,
+      evidenceReferences: primary.evidenceLinks.map((link) => link.href),
+    },
+    liveClassification,
+  }
+}
+
+function canonicalStageId(value: string) {
+  const normalized = value.toLowerCase()
+  if (normalized.includes('reconciliation') || normalized.includes('blocked') || normalized.includes('exception') || normalized.includes('failed')) return 'exception'
+  if (normalized.includes('published') || normalized.includes('confirmed live')) return 'published'
+  if (normalized.includes('distribution') || normalized.includes('catalog')) return 'distribution'
+  if (normalized.includes('production')) return 'production'
+  if (normalized.includes('author review') || normalized.includes('author approval') || normalized.includes('final author')) return 'author-approval'
+  if (normalized.includes('interior') || normalized.includes('cover')) return 'cover-interior'
+  if (normalized.includes('proof')) return 'proofreading'
+  if (normalized.includes('copy')) return 'copyediting'
+  if (normalized.includes('line')) return 'line-editing'
+  if (normalized.includes('developmental') || normalized.includes('editorial review') || normalized.includes('editorial')) return 'developmental-editing'
+  return 'intake'
+}
+
+function titleOperatingKey(item: PublisherTodayItem) {
+  return item.titleId || item.recordId || normalizeTitle(item.title)
+}
+
+function waitingOnForTodayItem(item: PublisherTodayItem): PublisherTitleOperatingCard['waitingOn'] {
+  if (item.owner === 'Jackie') return 'Jackie'
+  if (item.owner === 'Author') return 'Author'
+  if (item.owner === 'JM1 Automation') return 'Automation'
+  if (item.owner === 'External') return 'External'
+  if (item.owner === 'Publisher') return 'Publishing Team'
+  return 'None'
+}
+
+function humanStatusForTodayItem(item: PublisherTodayItem) {
+  if (item.owner === 'Jackie') return 'Waiting for Jackie'
+  if (item.owner === 'Author') return item.nextAction.toLowerCase().includes('approval') ? 'Awaiting Author Approval' : 'Waiting on Author'
+  if (item.executionState === 'EXECUTING') return 'Automation running'
+  if (item.executionState === 'EXCEPTION') return 'Needs reconciliation'
+  if (item.dependency.toLowerCase().includes('stale')) return 'Refresh required'
+  if (item.nextAction) return item.nextAction
+  return 'Current'
+}
+
+function humanBlocker(item: PublisherTodayItem) {
+  if (item.exactBlocker && !/no active exception/i.test(item.exactBlocker)) return item.exactBlocker
+  if (item.dependency && !/no active exception/i.test(item.dependency)) return item.dependency
+  if (item.owner === 'Author') return 'Waiting for author response or approval.'
+  return ''
+}
+
+function bestEvidenceLink(item: PublisherTodayItem): PublisherTitleOperatingCard['currentArtifact'] {
+  const first = item.evidenceLinks[0]
+  return {
+    label: first?.label || item.packageState || 'Current title evidence',
+    href: first?.href || '',
+    version: item.qaState || 'Current',
+    reviewState: item.packageState || 'Not applicable',
+  }
+}
+
+function approvalStateFor(item: PublisherTodayItem, response?: PublisherAuthorResponseQueueItem) {
+  if (response?.classifiedDecision === 'APPROVED WITHOUT CHANGES') return 'Approved'
+  if (response?.classifiedDecision === 'APPROVED WITH CORRECTIONS') return 'Approved with corrections - stage remains open'
+  if (item.owner === 'Author') return 'Pending author response'
+  return 'No author approval required right now'
+}
+
+function isSyntheticTitle(title: string) {
+  return /synthetic|duplicate proof|gate-w1|certification|test/i.test(title)
+}
+
 function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
   const owner = item.actionOwner === 'publisher' ? 'Jackie' : item.executionOwner
   return {
@@ -3545,6 +3946,25 @@ function emptyPublisherToday(): PublisherTodaySnapshot {
     distributionCatalogQueue: [],
     alerts: [],
     recentMovements: [],
+  }
+}
+
+function emptyTitleOperatingView(): PublisherTitleOperatingView {
+  return {
+    generatedAt: new Date().toISOString(),
+    stageSource: 'Publisher Operating Center read model unavailable.',
+    stages: [],
+    cards: [],
+    jackieActionNotifications: [],
+    summary: {
+      activeTitles: 0,
+      needsJackie: 0,
+      waitingOnAuthors: 0,
+      blockedTitles: 0,
+      overdueTitles: 0,
+      inProduction: 0,
+      publishedThisPeriod: 0,
+    },
   }
 }
 

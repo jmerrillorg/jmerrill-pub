@@ -56,9 +56,10 @@ export type Jm1EnterpriseCommunicationInput = {
   summaryItems?: string[]
   attachments?: string[]
   reviewPrompt?: string
-  actionLabel: string
-  actionUrl: string
+  actionLabel?: string
+  actionUrl?: string
   actionInstruction: string
+  replyOnly?: boolean
   responseWindow?: string
   timelineItems?: string[]
   supportNote?: string
@@ -90,7 +91,7 @@ export function renderJm1EnterpriseCommunication(input: Jm1EnterpriseCommunicati
   if (!brandValidation.ok) throw new Error(brandValidation.blocker)
   const html = renderHtml(normalized)
   const text = renderText(normalized)
-  const validation = validateJm1EnterpriseCommunication({ html, text, brand: normalized.brand })
+  const validation = validateJm1EnterpriseCommunication({ html, text, brand: normalized.brand, replyOnly: normalized.replyOnly })
   if (!validation.ok) throw new Error(validation.blocker)
   return {
     subject: normalized.subject,
@@ -132,6 +133,7 @@ export function validateJm1EnterpriseCommunication(input: {
   html?: string | null
   text?: string | null
   brand?: Jm1CommunicationBrandKey
+  replyOnly?: boolean | null
 }): { ok: true } | { ok: false; blocker: string } {
   const html = input.html?.trim() || ''
   const text = input.text?.trim() || ''
@@ -165,7 +167,10 @@ export function validateJm1EnterpriseCommunication(input: {
   if (html.includes('What we need from you') !== text.includes('What we need from you')) {
     blockers.push('HTML_TEXT_REVIEW_PROMPT_PARITY_MISSING')
   }
-  if (!/<a\b[^>]+href="https:\/\/[^"]+"/i.test(html)) blockers.push('PRIMARY_ACTION_LINK_MISSING')
+  if (!input.replyOnly && !/<a\b[^>]+href="https:\/\/[^"]+"/i.test(html)) blockers.push('PRIMARY_ACTION_LINK_MISSING')
+  if (input.replyOnly && /author\/portal|Author Operating Center|<a\b[^>]+href=/i.test(`${html}\n${text}`)) {
+    blockers.push('REPLY_ONLY_PORTAL_OR_LINK_PRESENT')
+  }
 
   return blockers.length ? { ok: false, blocker: `JM1_ECR_BLOCKED - ${blockers.join(',')}` } : { ok: true }
 }
@@ -183,12 +188,13 @@ function normalizeInput(input: Jm1EnterpriseCommunicationInput): Jm1EnterpriseCo
     subtitle: input.subtitle?.trim(),
     preheader: required(input.preheader, 'preheader'),
     reason: required(input.reason, 'reason'),
-    actionLabel: required(input.actionLabel, 'actionLabel'),
-    actionUrl: validateUrl(required(input.actionUrl, 'actionUrl')),
+    actionLabel: input.replyOnly ? input.actionLabel?.trim() : required(input.actionLabel, 'actionLabel'),
+    actionUrl: input.replyOnly ? input.actionUrl?.trim() : validateUrl(required(input.actionUrl, 'actionUrl')),
     actionInstruction: required(input.actionInstruction, 'actionInstruction'),
+    replyOnly: Boolean(input.replyOnly),
     responseWindow: input.responseWindow?.trim(),
     supportNote: input.supportNote?.trim() || 'Reply to this email and the team will help.',
-    operationalNote: input.operationalNote?.trim() || 'This message follows the JM1 Enterprise Communication Standard v1.0.',
+    operationalNote: input.operationalNote === '' ? '' : input.operationalNote?.trim() || 'This message follows the JM1 Enterprise Communication Standard v1.0.',
   }
 }
 
@@ -217,11 +223,7 @@ function renderText(input: Jm1EnterpriseCommunicationInput) {
     'How to respond',
     input.actionInstruction,
     ...responseWindow,
-    input.actionUrl,
-    '',
-    'Optional Author Operating Center access',
-    `Optional Author Operating Center access: ${input.actionUrl}`,
-    '',
+    ...(input.replyOnly ? [] : [input.actionUrl || '', '', 'Optional Author Operating Center access', `Optional Author Operating Center access: ${input.actionUrl}`, '']),
     'What happens next',
     ...(input.timelineItems || []).map((item) => `- ${item}`),
     '',
@@ -279,12 +281,12 @@ function renderHtml(input: Jm1EnterpriseCommunicationInput) {
                   <p style="margin:0 0 14px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(input.actionInstruction)}</p>
                   ${responseWindow}
                 </div>
-                <p style="margin:0 0 22px;"><a href="${escapeHtml(input.actionUrl)}" style="display:inline-block;background:${colors.primaryCta};color:${colors.surfaceWhite};padding:11px 16px;font-size:14px;font-weight:700;text-decoration:none;">${escapeHtml(input.actionLabel)}</a></p>
+                ${input.replyOnly ? '' : `<p style="margin:0 0 22px;"><a href="${escapeHtml(input.actionUrl || '')}" style="display:inline-block;background:${colors.primaryCta};color:${colors.surfaceWhite};padding:11px 16px;font-size:14px;font-weight:700;text-decoration:none;">${escapeHtml(input.actionLabel || '')}</a></p>
                 <h2 style="margin:24px 0 10px;font-size:${type.headingM};color:${colors.textPrimary};">Optional Author Operating Center access</h2>
-                <p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">Your Author Operating Center is secondary to email and available when you want another copy or project history.</p>
+                <p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">Your Author Operating Center is secondary to email and available when you want another copy or project history.</p>`}
                 ${listSection('What happens next', timeline, colors.textSecondary, type.body, colors.textPrimary, type.headingM)}
                 ${section('Support', input.supportNote || '', colors.textSecondary, type.body, colors.textPrimary, type.headingM)}
-                <p style="margin:22px 0 0;font-size:${type.caption};line-height:1.6;color:${colors.textSecondary};">${escapeHtml(input.operationalNote || '')}</p>
+                ${input.operationalNote ? `<p style="margin:22px 0 0;font-size:${type.caption};line-height:1.6;color:${colors.textSecondary};">${escapeHtml(input.operationalNote)}</p>` : ''}
               </td>
             </tr>
             <tr>

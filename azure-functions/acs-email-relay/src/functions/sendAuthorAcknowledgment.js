@@ -21,6 +21,7 @@ const INTERNAL_NOTIFICATION_TYPE = "AUTHOR_DRAFT_READY_FOR_REVIEW";
 const JOIN_INTERNAL_NOTIFICATION_TYPE = "JOIN_INTAKE_RECEIVED";
 const APPROVED_AUTHOR_RESPONSE_TYPE = "APPROVED_AUTHOR_RESPONSE";
 const AUTHOR_REVIEW_PACKAGE_TEMPLATE = "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1";
+const FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE = "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1";
 const CANONICAL_AUTHOR_RENDERER = "JM1 Enterprise Communication Renderer";
 const CANONICAL_AUTHOR_RENDER_MODE = "CANONICAL_HTML";
 const INTERNAL_NOTIFICATION_SENT = "INTERNAL_NOTIFICATION_SENT";
@@ -530,14 +531,15 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
     return { ok: false, reason: "EDITORIAL_RECOMMENDATION_HTML_REQUIRED" };
   }
 
-  if (normalizeText(payload.templateName) === AUTHOR_REVIEW_PACKAGE_TEMPLATE) {
+  if ([AUTHOR_REVIEW_PACKAGE_TEMPLATE, FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE].includes(normalizeText(payload.templateName))) {
     if (!htmlBody) {
       return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_HTML_REQUIRED" };
     }
     const renderValidation = validateCanonicalAuthorReviewHtmlPayload({
       htmlBody,
       body,
-      templateMetadata: payload.templateMetadata
+      templateMetadata: payload.templateMetadata,
+      templateName: payload.templateName
     });
     if (!renderValidation.ok) {
       return { ok: false, reason: renderValidation.reason };
@@ -599,6 +601,8 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
 function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
   const html = normalizeHtmlBody(payload.htmlBody);
   const text = normalizeBody(payload.body);
+  const templateName = normalizeText(payload.templateName);
+  const replyOnly = templateName === FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE;
   const metadata = payload.templateMetadata && typeof payload.templateMetadata === "object" ? payload.templateMetadata : null;
 
   if (!metadata) {
@@ -658,12 +662,16 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_REVIEW_PROMPT_REQUIRED" };
   }
 
-  if (!/<a\b[^>]+href="https:\/\/[^"]+"[^>]+style="[^"]*(display:inline-block|background:)/i.test(html)) {
+  if (!replyOnly && !/<a\b[^>]+href="https:\/\/[^"]+"[^>]+style="[^"]*(display:inline-block|background:)/i.test(html)) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_CTA_BUTTON_REQUIRED" };
   }
 
-  if (!text.includes("Optional Author Operating Center access: https://")) {
+  if (!replyOnly && !text.includes("Optional Author Operating Center access: https://")) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_TEXT_PORTAL_REFERENCE_REQUIRED" };
+  }
+
+  if (replyOnly && /author\/portal|Author Operating Center|<a\b[^>]+href=/i.test(`${html}\n${text}`)) {
+    return { ok: false, reason: "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_REPLY_ONLY_REQUIRED" };
   }
 
   if (/\b(Dataverse|execution log|workflow record|internal instruction|package manifest|response mechanism|evidence file)\b/i.test(`${html}\n${text}`)) {

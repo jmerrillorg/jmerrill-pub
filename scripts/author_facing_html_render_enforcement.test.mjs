@@ -252,6 +252,39 @@ test('registered author-facing matrix contains status update and cover review pa
 
   assert.ok(names.some((row) => row.includes('status update:AUTHOR_STATUS_UPDATE_V1:CANONICAL_HTML')))
   assert.ok(names.some((row) => row.includes('cover review:AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1:CANONICAL_HTML')))
+  assert.ok(names.some((row) => row.includes('final developmental review:AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1:CANONICAL_HTML')))
+})
+
+test('final developmental review renders as reply-only with no portal friction', () => {
+  const rendered = brand.renderAuthorCommunicationEmail({
+    templateName: 'AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1',
+    templateVersion: '1.0.0',
+    subject: 'Final Developmental Review - The General’s Will and Last Testament',
+    authorName: 'Iyorwuese',
+    titleName: 'The General’s Will and Last Testament',
+    preheader: 'Your revised developmental-edit manuscript is attached for final review.',
+    why: 'The Publishing Team has incorporated the revisions you requested during developmental editing and prepared the updated manuscript for your final review.',
+    completed: [
+      'Your requested developmental-edit corrections have been incorporated.',
+      'The Publishing Team completed its verification of the revised manuscript.',
+    ],
+    meaning: 'Please review the attached manuscript and reply to this email with either Approved or Changes still required.',
+    authorAction: 'Reply to this email with Approved or Changes still required. If anything still needs correction, please identify the changes in your reply.',
+    primaryActionLabel: '',
+    primaryActionUrl: '',
+    replyOnly: true,
+    packageInventory: ['The General’s Will and Last Testament - Editorial Working Version - Jackie Restoration.docx'],
+    nextSteps: [
+      'If you approve the updated manuscript, the Publishing Team can complete the developmental-edit stage.',
+      'If additional changes are required, developmental editing will remain open while the Publishing Team addresses the next correction round.',
+    ],
+  })
+  const validation = validateContract(rendered)
+
+  assert.equal(validation.ok, true)
+  assert.doesNotMatch(`${rendered.html}\n${rendered.text}`, /author\/portal|Author Operating Center|<a\b[^>]+href=/i)
+  assert.match(rendered.text, /Approved/)
+  assert.match(rendered.text, /Changes still required/)
 })
 
 test('registered author-facing matrix includes future lifecycle communications', () => {

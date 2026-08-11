@@ -14,6 +14,7 @@ import type {
   PublisherPortfolioItem,
   PublisherProductionReadinessItem,
   PublisherQueueItem,
+  PublisherTitleOperatingCard,
   PublisherRoyaltyDecisionCard,
   PublisherTodayItem,
   PublisherWorkloadItem,
@@ -36,6 +37,9 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
   const [actionState, setActionState] = useState<ActionState>({ itemKey: '', status: 'idle', message: '' })
   const [filter, setFilter] = useState('all')
   const [portfolioView, setPortfolioView] = useState('active')
+  const [boardView, setBoardView] = useState('pipeline')
+  const [includeTestRecords, setIncludeTestRecords] = useState(false)
+  const [selectedTitleKey, setSelectedTitleKey] = useState<string | null>(null)
   const [royaltyImport, setRoyaltyImport] = useState({
     sourceSystem: 'KDP',
     reportingMonth: '2026-06',
@@ -52,6 +56,20 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
   }, [filter, snapshot])
 
   const workload = snapshot?.queues.workload || []
+  const titleCards = useMemo(() => {
+    const cards = snapshot?.titleOperatingView.cards || []
+    const liveFiltered = includeTestRecords ? cards : cards.filter((card) => card.liveClassification === 'LIVE')
+    if (boardView === 'needs-jackie') return liveFiltered.filter((card) => card.waitingOn === 'Jackie')
+    if (boardView === 'waiting-authors') return liveFiltered.filter((card) => card.waitingOn === 'Author')
+    if (boardView === 'exceptions') return liveFiltered.filter((card) => card.urgency === 'urgent' || Boolean(card.blocker))
+    if (boardView === 'production') return liveFiltered.filter((card) => card.stageId === 'production' || card.stageId === 'cover-interior')
+    if (boardView === 'catalog') return liveFiltered.filter((card) => card.stageId === 'distribution' || card.stageId === 'published')
+    return liveFiltered
+  }, [boardView, includeTestRecords, snapshot])
+  const selectedTitle = useMemo(() => {
+    if (!titleCards.length) return null
+    return titleCards.find((card) => card.key === selectedTitleKey) || titleCards[0]
+  }, [selectedTitleKey, titleCards])
   const portfolio = useMemo(() => {
     if (!snapshot) return []
     if (portfolioView === 'published') return snapshot.queues.publishedCatalog
@@ -261,11 +279,26 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
 
       <section className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
         {snapshot && (
+          <TitlePipelineBoard
+            snapshot={snapshot}
+            cards={titleCards}
+            selectedTitle={selectedTitle}
+            boardView={boardView}
+            includeTestRecords={includeTestRecords}
+            onBoardView={setBoardView}
+            onToggleTest={() => setIncludeTestRecords((value) => !value)}
+            onSelectTitle={setSelectedTitleKey}
+            actionState={actionState}
+            onAction={runScopedAction}
+          />
+        )}
+
+        {snapshot && (
           <section className="border border-blue-300/20 bg-blue-950/15 p-5">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Daily Summary</p>
-                <h2 className="mt-2 text-2xl font-semibold">What needs attention today?</h2>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Diagnostics</p>
+                <h2 className="mt-2 text-2xl font-semibold">Operational queues and readbacks</h2>
                 <p className="mt-2 text-[12px] text-white/45">Generated {formatDateTime(snapshot.today.generatedAt)}</p>
               </div>
               <Badge label={snapshot.status === 'core-live' ? 'JM1-Core live' : 'Core unavailable'} tone={snapshot.status === 'core-live' ? 'blue' : 'amber'} />
@@ -1146,6 +1179,296 @@ function Info({ label, value }: { label: string; value: string }) {
       <p className="mt-2 break-words text-[13px] leading-5 text-white/75">{value}</p>
     </div>
   )
+}
+
+function TitlePipelineBoard({
+  snapshot,
+  cards,
+  selectedTitle,
+  boardView,
+  includeTestRecords,
+  onBoardView,
+  onToggleTest,
+  onSelectTitle,
+  actionState,
+  onAction,
+}: {
+  snapshot: PublisherOperatingCenterSnapshot
+  cards: PublisherTitleOperatingCard[]
+  selectedTitle: PublisherTitleOperatingCard | null
+  boardView: string
+  includeTestRecords: boolean
+  onBoardView: (view: string) => void
+  onToggleTest: () => void
+  onSelectTitle: (key: string) => void
+  actionState: ActionState
+  onAction: (input: { key: string; actionId: string; titleId?: string }) => void
+}) {
+  const stages = snapshot.titleOperatingView.stages
+  const cardsByStage = new Map(stages.map((stage) => [stage.id, cards.filter((card) => card.stageId === stage.id)]))
+
+  return (
+    <section className="border border-blue-300/20 bg-blue-950/15 p-5">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Title Pipeline Board</p>
+          <h2 className="mt-2 text-3xl font-semibold">Process as the interface</h2>
+          <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
+            One real title appears once, in its current governed stage, with what it is waiting on and what can happen next.
+          </p>
+          <p className="mt-2 text-[11px] leading-5 text-white/35">{snapshot.titleOperatingView.stageSource}</p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-3 xl:min-w-[420px]">
+          <SummaryTile label="Needs Jackie" value={snapshot.titleOperatingView.summary.needsJackie} />
+          <SummaryTile label="Waiting on Authors" value={snapshot.titleOperatingView.summary.waitingOnAuthors} />
+          <SummaryTile label="Blocked" value={snapshot.titleOperatingView.summary.blockedTitles} />
+        </div>
+      </div>
+
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        {[
+          ['pipeline', 'Pipeline'],
+          ['needs-jackie', 'Needs Jackie'],
+          ['waiting-authors', 'Waiting on Authors'],
+          ['exceptions', 'Exceptions'],
+          ['production', 'Production'],
+          ['catalog', 'Catalog'],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => onBoardView(id)}
+            className={`min-h-[36px] border px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${
+              boardView === id
+                ? 'border-blue-300 bg-blue-400/15 text-blue-100'
+                : 'border-white/10 bg-black/20 text-white/55 hover:border-blue-300/40'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={onToggleTest}
+          className={`min-h-[36px] border px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${
+            includeTestRecords ? 'border-amber-300 bg-amber-400/15 text-amber-100' : 'border-white/10 bg-black/20 text-white/55'
+          }`}
+        >
+          Include Test / Certification Records
+        </button>
+      </div>
+
+      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_420px]">
+        <div className="overflow-x-auto pb-2">
+          <div className="grid min-w-[1040px] auto-cols-[260px] grid-flow-col gap-3">
+            {stages.map((stage) => {
+              const stageCards = cardsByStage.get(stage.id) || []
+              return (
+                <section key={stage.id} className="min-h-[420px] border border-white/10 bg-black/20">
+                  <div className="border-b border-white/10 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="text-[13px] font-semibold text-white/88">{stage.label}</h3>
+                      <Badge label={String(stageCards.length)} tone={stageCards.length ? 'blue' : 'neutral'} />
+                    </div>
+                    <p className="mt-2 text-[11px] leading-5 text-white/38">Close: {stage.closeCondition}</p>
+                  </div>
+                  <div className="grid gap-3 p-3">
+                    {stageCards.map((card) => (
+                      <TitlePipelineCard
+                        key={card.key}
+                        card={card}
+                        selected={selectedTitle?.key === card.key}
+                        onSelect={() => onSelectTitle(card.key)}
+                      />
+                    ))}
+                    {stageCards.length === 0 && (
+                      <div className="border border-dashed border-white/10 p-3 text-[12px] leading-5 text-white/35">
+                        No title is currently in this stage.
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )
+            })}
+          </div>
+        </div>
+
+        <TitleDetailDrawer
+          card={selectedTitle}
+          actionState={actionState}
+          onAction={onAction}
+        />
+      </div>
+    </section>
+  )
+}
+
+function SummaryTile({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="border border-white/10 bg-black/20 p-3">
+      <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">{label}</p>
+      <p className="mt-2 text-2xl font-semibold">{value}</p>
+    </div>
+  )
+}
+
+function TitlePipelineCard({
+  card,
+  selected,
+  onSelect,
+}: {
+  card: PublisherTitleOperatingCard
+  selected: boolean
+  onSelect: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`w-full border p-3 text-left transition ${
+        selected ? 'border-blue-300 bg-blue-400/10' : 'border-white/10 bg-white/[0.04] hover:border-blue-300/40'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[13px] font-semibold leading-5 text-white">{card.title}</p>
+          <p className="mt-1 text-[12px] text-white/50">{card.author}</p>
+        </div>
+        <StatusDot urgency={card.urgency} />
+      </div>
+      <div className="mt-3 grid gap-2">
+        <MiniFact label="Status" value={card.humanStatus} />
+        <MiniFact label="Waiting on" value={card.waitingOn} />
+        <MiniFact label="Age" value={`${card.ageDays} day${card.ageDays === 1 ? '' : 's'}`} />
+      </div>
+      {card.blocker && <p className="mt-3 border-l-2 border-amber-300 pl-3 text-[11px] leading-5 text-amber-100">{card.blocker}</p>}
+    </button>
+  )
+}
+
+function TitleDetailDrawer({
+  card,
+  actionState,
+  onAction,
+}: {
+  card: PublisherTitleOperatingCard | null
+  actionState: ActionState
+  onAction: (input: { key: string; actionId: string; titleId?: string }) => void
+}) {
+  if (!card) {
+    return (
+      <aside className="border border-white/10 bg-black/20 p-5 text-[13px] leading-6 text-white/45">
+        Select a title to see the current situation, artifact, decision context, and governed actions.
+      </aside>
+    )
+  }
+
+  return (
+    <aside className="border border-white/10 bg-black/25 p-5 xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Title Detail</p>
+          <h3 className="mt-2 text-2xl font-semibold leading-tight">{card.title}</h3>
+          <p className="mt-1 text-[13px] text-white/55">{card.author}</p>
+        </div>
+        <Badge label={card.waitingOn} tone={card.waitingOn === 'Jackie' ? 'amber' : 'blue'} />
+      </div>
+
+      <div className="mt-5 grid gap-3">
+        <DetailBlock title="Current Situation">
+          <MiniFact label="Stage" value={card.stageLabel} />
+          <MiniFact label="Status" value={card.humanStatus} />
+          <MiniFact label="Why it is waiting" value={card.blocker || 'No blocker is currently recorded.'} />
+        </DetailBlock>
+
+        <DetailBlock title="Current Artifact">
+          <MiniFact label="Artifact" value={card.currentArtifact.label} />
+          <MiniFact label="Version" value={card.currentArtifact.version} />
+          <MiniFact label="Review state" value={card.currentArtifact.reviewState} />
+          {card.currentArtifact.href && <a className="text-[12px] font-semibold text-blue-200 underline" href={card.currentArtifact.href}>Open artifact</a>}
+        </DetailBlock>
+
+        <DetailBlock title="Author State">
+          <MiniFact label="Latest response" value={card.authorState.latestResponse} />
+          <MiniFact label="Classification" value={card.authorState.classification} />
+          <MiniFact label="Approval" value={card.authorState.approvalState} />
+          <MiniFact label="Review round" value={card.authorState.reviewRound} />
+        </DetailBlock>
+
+        {card.jackieDecision && (
+          <DetailBlock title="Jackie Decision">
+            <MiniFact label="What" value={card.jackieDecision.what} />
+            <MiniFact label="Why" value={card.jackieDecision.why} />
+            <MiniFact label="Review" value={card.jackieDecision.review} />
+            <MiniFact label="Consequence" value={card.jackieDecision.consequence} />
+            <MiniFact label="Notification" value={card.jackieDecision.notificationState} />
+            <MiniFact label="Last notified" value={card.jackieDecision.lastNotified || 'Not sent yet'} />
+            <a className="text-[12px] font-semibold text-blue-200 underline" href={card.jackieDecision.operatingCenterUrl}>Copy direct action view</a>
+          </DetailBlock>
+        )}
+
+        <DetailBlock title="Next Stage">
+          <MiniFact label="Next" value={card.nextStage} />
+          <MiniFact label="Eligible" value={card.nextStageEligible ? 'YES' : 'NO'} />
+          {!card.nextStageEligible && <MiniFact label="Reason" value={card.nextStageBlockedReason} />}
+        </DetailBlock>
+
+        <DetailBlock title="Actions">
+          <div className="grid gap-2">
+            {card.actions.map((action) => {
+              const running = actionState.itemKey === `${card.key}:${action.id}` && actionState.status === 'running'
+              return (
+                <div key={action.id}>
+                  <button
+                    type="button"
+                    disabled={!action.available || action.id === 'view_only' || running}
+                    onClick={() => onAction({ key: card.key, actionId: action.id, titleId: card.titleId })}
+                    className="min-h-[38px] w-full border border-blue-300/30 bg-blue-500/10 px-3 text-left text-[12px] font-semibold uppercase tracking-[0.08em] text-blue-100 disabled:border-white/10 disabled:bg-white/[0.03] disabled:text-white/35"
+                  >
+                    {running ? 'Running...' : action.label}
+                  </button>
+                  {!action.available && <p className="mt-1 text-[11px] leading-5 text-amber-100">{action.unavailableReason}</p>}
+                </div>
+              )
+            })}
+          </div>
+        </DetailBlock>
+
+        <details className="border border-white/10 bg-black/20 p-3">
+          <summary className="cursor-pointer text-[12px] font-semibold uppercase tracking-[0.08em] text-white/55">Technical Details</summary>
+          <div className="mt-3 grid gap-2">
+            <MiniFact label="Raw status" value={card.technical.rawStatus} />
+            <MiniFact label="Runtime state" value={card.technical.runtimeState} />
+            <MiniFact label="Execution owner" value={card.technical.executionOwner} />
+            <MiniFact label="Evidence references" value={card.technical.evidenceReferences.join('; ') || 'None surfaced'} />
+          </div>
+        </details>
+      </div>
+    </aside>
+  )
+}
+
+function DetailBlock({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="border border-white/10 bg-white/[0.03] p-3">
+      <h4 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/50">{title}</h4>
+      <div className="mt-3 grid gap-2">{children}</div>
+    </section>
+  )
+}
+
+function MiniFact({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/35">{label}</p>
+      <p className="mt-1 break-words text-[12px] leading-5 text-white/75">{value || 'None'}</p>
+    </div>
+  )
+}
+
+function StatusDot({ urgency }: { urgency: PublisherTitleOperatingCard['urgency'] }) {
+  const color = urgency === 'urgent' ? 'bg-amber-300' : urgency === 'watch' ? 'bg-blue-300' : 'bg-emerald-300'
+  return <span aria-label={`${urgency} urgency`} className={`mt-1 block size-2.5 ${color}`} />
 }
 
 function TodaySection({

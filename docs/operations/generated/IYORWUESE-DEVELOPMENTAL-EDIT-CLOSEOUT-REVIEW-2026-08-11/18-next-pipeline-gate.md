@@ -1,7 +1,7 @@
 # Next Pipeline Gate
 
-Last verified: 2026-08-11T17:37:29.998Z
+Last verified: 2026-08-11T18:14:04.241Z
 
-Next gate: Jackie send approval for the prepared final developmental-edit author review communication.
+Next gate: Iyorwuese final author approval of the revised developmental-edit manuscript.
 
-After send, the real external dependency is Iyorwuese final author approval. Line Editing remains not eligible until final author approval, developmental closeout, and Line Editing entry conditions all pass.
+The final developmental-edit author review has been sent. Line Editing remains not eligible until final author approval, developmental closeout, and Line Editing entry conditions all pass.
