@@ -1,10 +1,12 @@
 # Observation State
 
-Last verified: 2026-08-11T08:10:00Z
+Last verified: 2026-08-11T08:45:00Z
 
 | Field | Value |
 | --- | --- |
 | Pilot state | ACTIVE - LIVE ACTION 005 OBSERVATION |
+| Observation classification | PASS WITH REUSABLE DEFECT DISCOVERED AND REMEDIATED |
+| Rendering defect remediation | PR #463 merged at `1eec97274ce188c1a7e66f88ae6a3633765a2d22` |
 | Author response received | NO |
 | Author decision classification | PENDING |
 | Response clock | NOT STARTED |
@@ -14,3 +16,4 @@ Last verified: 2026-08-11T08:10:00Z
 
 Do not manufacture Live Action 006, resend the message, start the response clock manually, or move Cover Design forward without a new governed event and explicit authorization.
 
+The historical Live Action 005 send remains unchanged. No resend was performed as part of the rendering remediation.

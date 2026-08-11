@@ -1,8 +1,8 @@
 # Executive Summary
 
-Last verified: 2026-08-11T08:10:00Z
+Last verified: 2026-08-11T08:45:00Z
 
-PR #462 was marked ready for review after preflight confirmed the approved head and evidence-only scope. Live Action 005 remains successful and is now in governed observation.
+PR #462 was reconciled after PR #463 merged the global author-facing HTML rendering enforcement. Live Action 005 remains successful, and its historical formatting defect is preserved as a reusable defect discovered and remediated by PR #463.
 
 | Field | Value |
 | --- | --- |
@@ -10,6 +10,11 @@ PR #462 was marked ready for review after preflight confirmed the approved head 
 | PR #462 approved preflight head | `015d11a67e042d47e3d457e565b77686d33c00e8` |
 | Pilot | The Intentional Leader / `JMP-INT-202607-0W5PTQ` |
 | Live Action 005 | SUCCESSFUL |
+| Observation classification | PASS WITH REUSABLE DEFECT DISCOVERED AND REMEDIATED |
+| Rendering remediation | PR #463 / merge `1eec97274ce188c1a7e66f88ae6a3633765a2d22` |
+| Historical formatting defect | PRESERVED |
+| Historical send modified | NO |
+| Historical resend | 0 |
 | ACS accepted | YES |
 | Publishing archive/readback | PRESENT |
 | Independent external delivery | NOT PROVEN |
@@ -18,7 +23,6 @@ PR #462 was marked ready for review after preflight confirmed the approved head 
 | Cover Design marker | `pkg005:sent-awaiting` |
 | Additional sends | 0 |
 | Manual downstream synchronization | 0 |
-| Pilot state | ACTIVE - LIVE ACTION 005 OBSERVATION |
+| Pilot state | ACTIVE - LIVE ACTION 005 OBSERVATION / HTML DEFECT REMEDIATED |
 
 Only two future events may change the Pilot state: a real author response from the governed recipient or canonical delivery evidence satisfying the response-clock trigger. No Live Action 006, resend, reminder, response-clock forcing, or Cover Design progression is authorized.
-
