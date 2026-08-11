@@ -13,6 +13,7 @@ const EXECUTION_STATUS = { SUCCESS: 835500001, FAILED: 835500002 };
 const BAND_LEVEL_1 = 835500000;
 const AUTHOR_DECISION_APPROVE = 196650000;
 const AUTHOR_DECISION_REQUEST_REVISION = 196650001;
+const AUTHOR_DECISION_REQUEST_CLARIFICATION = 196650002;
 const RESPONSE_STATES = Object.freeze({
   DISCOVERED: "DISCOVERED",
   CLAIMED: "CLAIMED",
@@ -22,6 +23,19 @@ const RESPONSE_STATES = Object.freeze({
   COMPLETED: "COMPLETED",
   BLOCKED: "BLOCKED",
   DEAD_LETTERED: "DEAD_LETTERED"
+});
+const DECISION = Object.freeze({
+  APPROVED: "APPROVED",
+  APPROVED_WITH_CORRECTIONS: "APPROVED_WITH_CORRECTIONS",
+  CHANGES_REQUESTED: "CHANGES_REQUESTED",
+  QUESTIONS_OR_REVIEW_REQUIRED: "QUESTIONS_OR_REVIEW_REQUIRED",
+  PENDING_AMBIGUOUS: "PENDING_AMBIGUOUS",
+  ACKNOWLEDGMENT_ONLY: "ACKNOWLEDGMENT_ONLY"
+});
+const ACKNOWLEDGEMENT_POLICY = Object.freeze({
+  status: "NOT_YET_GOVERNED",
+  wouldSend: false,
+  htmlRendering: "NOT_APPLICABLE"
 });
 
 function normalizeString(value) {
@@ -47,6 +61,10 @@ function extractId(entityUrl) {
 function stableIdempotencyKey(gateId, inboundMessageId) {
   const digest = createHash("sha256").update(`${gateId}:${inboundMessageId}`).digest("hex").slice(0, 24);
   return `author-review-response:${digest}`;
+}
+
+function captureEnabled() {
+  return normalizeString(process.env.JM1_AUTHOR_RESPONSE_CAPTURE_DISABLED).toLowerCase() !== "true";
 }
 
 function requireDataverseConfig() {
@@ -125,12 +143,141 @@ function createDataverseClient(config, deps = {}) {
 
 function classifyAuthorReviewResponse(text) {
   const normalized = normalizeString(text).toLowerCase();
-  if (/^(thank you|thanks|received|got it|i will review|will review|looking now)\b/.test(normalized)) return "ACKNOWLEDGMENT_ONLY";
-  if (/^(approved with minor corrections|approve with minor corrections|i approve with minor corrections)\b/.test(normalized)) return "APPROVE_WITH_MINOR_CORRECTIONS";
-  if (/^(approved|approve|i approve|i approve!|approved!|yes approved)\b/.test(normalized)) return "APPROVE";
-  if (/\b(corrections?|changes?|revise|revision|fix)\b/.test(normalized)) return "REQUEST_CORRECTIONS";
-  if (/\?|\b(question|clarify|discussion|call)\b/.test(normalized)) return "QUESTION";
-  return "AMBIGUOUS";
+  if (!normalized) return DECISION.PENDING_AMBIGUOUS;
+  if (/^(thank you|thanks|received|got it|i will review|will review|looking now)\b/.test(normalized)) return DECISION.ACKNOWLEDGMENT_ONLY;
+  if (/\b(approved with corrections|approve with corrections|approved with minor corrections|approve with minor corrections|i approve with corrections|i approve with minor corrections)\b/.test(normalized)) {
+    return DECISION.APPROVED_WITH_CORRECTIONS;
+  }
+  if (/\b(approved|approve|i approve|yes approved|convey approval)\b/.test(normalized) && /\b(corrections?|changes?|revise|revision|fix|notes?|preferred style|italics?)\b/.test(normalized)) {
+    return DECISION.APPROVED_WITH_CORRECTIONS;
+  }
+  if (/^(approved|approve|i approve|i approve!|approved!|yes approved)\b/.test(normalized)) return DECISION.APPROVED;
+  if (/\b(corrections?|changes?|revise|revision|fix)\b/.test(normalized)) return DECISION.CHANGES_REQUESTED;
+  if (/\?|\b(question|clarify|discussion|call)\b/.test(normalized)) return DECISION.QUESTIONS_OR_REVIEW_REQUIRED;
+  return DECISION.PENDING_AMBIGUOUS;
+}
+
+function decisionCode(decision) {
+  if (decision === DECISION.APPROVED) return AUTHOR_DECISION_APPROVE;
+  if (decision === DECISION.APPROVED_WITH_CORRECTIONS || decision === DECISION.CHANGES_REQUESTED) return AUTHOR_DECISION_REQUEST_REVISION;
+  if (decision === DECISION.QUESTIONS_OR_REVIEW_REQUIRED) return AUTHOR_DECISION_REQUEST_CLARIFICATION;
+  return null;
+}
+
+function decisionOutcome(decision) {
+  if (decision === DECISION.APPROVED) return "APPROVAL_PERSISTED";
+  if (decision === DECISION.APPROVED_WITH_CORRECTIONS) return "APPROVED_WITH_CORRECTIONS_PERSISTED";
+  if (decision === DECISION.CHANGES_REQUESTED) return "CHANGES_REQUESTED_PERSISTED";
+  if (decision === DECISION.QUESTIONS_OR_REVIEW_REQUIRED) return "QUESTIONS_REQUIRING_REVIEW_PERSISTED";
+  if (decision === DECISION.ACKNOWLEDGMENT_ONLY) return "ACKNOWLEDGMENT_RECORDED";
+  return "PUBLISHER_REVIEW_REQUIRED";
+}
+
+function decisionActionType(decision) {
+  if (decision === DECISION.APPROVED) return "AUTHOR_APPROVAL_PERSISTED";
+  if (decision === DECISION.APPROVED_WITH_CORRECTIONS) return "AUTHOR_APPROVED_WITH_CORRECTIONS_PERSISTED";
+  if (decision === DECISION.CHANGES_REQUESTED) return "AUTHOR_CHANGES_REQUESTED";
+  if (decision === DECISION.QUESTIONS_OR_REVIEW_REQUIRED) return "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW";
+  if (decision === DECISION.ACKNOWLEDGMENT_ONLY) return "AUTHOR_RESPONSE_ACKNOWLEDGMENT_RECORDED";
+  return "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW";
+}
+
+function decisionSummary(decision) {
+  if (decision === DECISION.APPROVED) return "Author approved without changes through monitored publishing mailbox.";
+  if (decision === DECISION.APPROVED_WITH_CORRECTIONS) return "Author approved with corrections/notes through monitored publishing mailbox. Production movement remains separately governed.";
+  if (decision === DECISION.CHANGES_REQUESTED) return "Author requested changes through monitored publishing mailbox. Production movement remains separately governed.";
+  if (decision === DECISION.QUESTIONS_OR_REVIEW_REQUIRED) return "Author response requires publisher review before any production movement.";
+  if (decision === DECISION.ACKNOWLEDGMENT_ONLY) return "Acknowledgment-only response preserved; response wait remains open.";
+  return "Author response is ambiguous and requires publisher review.";
+}
+
+function extractEmailCandidates(gate) {
+  return [
+    gate.jm1pub_authoremail,
+    gate.jm1_authoremail,
+    gate.authorEmail,
+    gate.emailaddress1,
+    gate.author?.email,
+    gate.contact?.emailaddress1
+  ].map((value) => normalizeString(value).toLowerCase()).filter(Boolean);
+}
+
+function validateAuthorIdentity(gate, reply) {
+  const sender = normalizeString(reply.senderAddress).toLowerCase();
+  const candidates = extractEmailCandidates(gate);
+  if (!sender) return { ok: false, reason: "UNKNOWN_SENDER_EMAIL" };
+  if (candidates.length === 0) return { ok: false, reason: "AUTHOR_IDENTITY_NOT_AVAILABLE_FOR_GATE" };
+  if (!candidates.includes(sender)) return { ok: false, reason: "AUTHOR_SENDER_MISMATCH" };
+  return { ok: true, sender, candidates };
+}
+
+function gateValue(gate, names) {
+  for (const name of names) {
+    const value = normalizeString(gate[name]);
+    if (value) return value;
+  }
+  return "";
+}
+
+function validateReplyCorrelation(gate, reply, subjectContains) {
+  const gateTitleId = gateValue(gate, ["_jm1pub_titleid_value", "titleId", "jm1pub_titleid"]);
+  const gatePackageId = gateValue(gate, ["jm1pub_packageid", "packageId", "jm1pub_decisionpackageid"]);
+  const gateDecisionRequestId = gateValue(gate, ["jm1pub_decisionrequestid", "decisionRequestId"]);
+  const gateOutboundMessageId = gateValue(gate, ["jm1pub_outboundmessageid", "outboundMessageId", "jm1pub_notificationmessageid"]);
+  const gateThreadId = gateValue(gate, ["jm1pub_threadid", "threadId", "jm1pub_conversationid"]);
+  const gateId = normalizeString(gate.jm1pub_editorialapprovalgateid);
+
+  if (reply.titleId && gateTitleId && reply.titleId !== gateTitleId) return { ok: false, reason: "WRONG_TITLE_REPLY_REVIEW_REQUIRED" };
+  if (reply.gateId && reply.gateId !== gateId) return { ok: false, reason: "WRONG_GATE_REPLY_REVIEW_REQUIRED" };
+  if (reply.packageId && gatePackageId && reply.packageId !== gatePackageId) return { ok: false, reason: "WRONG_PACKAGE_REPLY_REVIEW_REQUIRED" };
+  if (reply.decisionRequestId && gateDecisionRequestId && reply.decisionRequestId !== gateDecisionRequestId) return { ok: false, reason: "WRONG_DECISION_REQUEST_REPLY_REVIEW_REQUIRED" };
+
+  if (gateOutboundMessageId && (reply.inReplyToMessageId === gateOutboundMessageId || reply.references?.includes(gateOutboundMessageId))) {
+    return { ok: true, mode: "MESSAGE_THREAD_EXACT" };
+  }
+  if (gateThreadId && reply.conversationId === gateThreadId) return { ok: true, mode: "THREAD_ID_EXACT" };
+  if (gatePackageId && reply.packageId === gatePackageId) return { ok: true, mode: "PACKAGE_ID_EXACT" };
+  if (gateDecisionRequestId && reply.decisionRequestId === gateDecisionRequestId) return { ok: true, mode: "DECISION_REQUEST_ID_EXACT" };
+  if (gateTitleId && reply.titleId === gateTitleId && gateId && reply.gateId === gateId) return { ok: true, mode: "TITLE_GATE_EXACT" };
+
+  const subject = normalizeString(reply.subject).toLowerCase();
+  if (subject && subjectContains && subject.includes(subjectContains.toLowerCase())) {
+    return { ok: true, mode: "SUBJECT_PROBE_WITH_VALIDATED_IDENTITY" };
+  }
+
+  return { ok: false, reason: "UNMATCHED_REPLY_REVIEW_REQUIRED" };
+}
+
+function isManualRecoveryGate(gate) {
+  return Boolean(
+    gate.manualRecovery === true ||
+    gate.jm1pub_manualrecovery === true ||
+    normalizeString(gate.jm1pub_recoverymode).toUpperCase() === "MANUAL_RECOVERY" ||
+    normalizeString(gate.jm1pub_productionmode).toUpperCase() === "MANUAL" ||
+    normalizeString(gate.jm1pub_titleidentifier).toUpperCase() === "JMP-INT-202607-DL2T20"
+  );
+}
+
+function preserveAuthorNotes(text) {
+  const notes = normalizeString(text);
+  return notes.length > 900 ? `${notes.slice(0, 897)}...` : notes;
+}
+
+function evaluateAcknowledgementPolicy(input = {}) {
+  const required = input.requireAcknowledgement === true;
+  if (!required) return ACKNOWLEDGEMENT_POLICY;
+  const render = input.renderedAcknowledgement || {};
+  const metadata = render.templateMetadata || render.metadata || {};
+  const ok =
+    normalizeString(render.htmlBody || render.html).startsWith("<!doctype html>") &&
+    normalizeString(metadata.renderTemplateGuard) === "PASS" &&
+    normalizeString(metadata.renderMode) === "CANONICAL_HTML";
+  return {
+    status: "REQUIRED",
+    wouldSend: ok,
+    htmlRendering: ok ? "PASS" : "FAIL",
+    blockers: ok ? [] : ["CANONICAL_JMP_HTML_RENDERER_REQUIRED"]
+  };
 }
 
 async function writeLog(client, input) {
@@ -194,7 +341,7 @@ function compactDecisionSource(inboundMessageId) {
 async function findOpenAuthorReviewGates(client, maxGates) {
   return client.list("jm1pub_editorialapprovalgates", {
     $select:
-      "jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,jm1pub_authorresponsesummary,jm1pub_authordecisionsource,_jm1pub_titleid_value,_jm1pub_deliverableartifactid_value,modifiedon",
+      "jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,jm1pub_authorresponsesummary,jm1pub_authordecisionsource,jm1pub_awaitingsince,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,modifiedon",
     $filter: "jm1pub_authordecisionon eq null",
     $orderby: "modifiedon desc",
     $top: String(Math.min(Math.max(Number(maxGates || 10), 1), 25))
@@ -209,10 +356,17 @@ function subjectProbeForGate(gate) {
 
 async function processGateReply(client, gate, deps, triggerSource) {
   const gateId = normalizeString(gate.jm1pub_editorialapprovalgateid);
+  if (!captureEnabled()) return { gateId, outcome: "CAPTURE_DISABLED", detail: "JM1_AUTHOR_RESPONSE_CAPTURE_DISABLED" };
+
   const subjectContains = subjectProbeForGate(gate);
   const afterIso = normalizeString(gate.modifiedon) || "2026-01-01T00:00:00Z";
   const reply = await (deps.readReply || readPublishingMailboxReply)({ subjectContains, afterIso }, deps);
   if (!reply.ok || !reply.found) return { gateId, outcome: "NO_REPLY_FOUND", detail: reply.reason || reply.code || "no_match" };
+
+  const identity = validateAuthorIdentity(gate, reply);
+  if (!identity.ok) return { gateId, outcome: "HELD_IDENTITY_VALIDATION", detail: identity.reason, processingState: RESPONSE_STATES.BLOCKED };
+  const correlation = validateReplyCorrelation(gate, reply, subjectContains);
+  if (!correlation.ok) return { gateId, outcome: "HELD_CORRELATION_VALIDATION", detail: correlation.reason, processingState: RESPONSE_STATES.BLOCKED };
 
   const inboundMessageId = durableInboundMessageId(reply);
   const idempotencyKey = stableIdempotencyKey(gateId, inboundMessageId);
@@ -220,8 +374,11 @@ async function processGateReply(client, gate, deps, triggerSource) {
     client,
     [
       "AUTHOR_INBOUND_MESSAGE_COMPLETED",
+      "AUTHOR_RESPONSE_CAPTURED",
       "AUTHOR_APPROVAL_PERSISTED",
+      "AUTHOR_APPROVED_WITH_CORRECTIONS_PERSISTED",
       "AUTHOR_CORRECTIONS_REQUESTED",
+      "AUTHOR_CHANGES_REQUESTED",
       "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW",
       "AUTHOR_RESPONSE_ACKNOWLEDGMENT_RECORDED"
     ],
@@ -253,6 +410,9 @@ async function processGateReply(client, gate, deps, triggerSource) {
   const classification = classifyAuthorReviewResponse(reply.bodyText || "");
   const receivedAt = normalizeString(reply.receivedDateTime) || new Date().toISOString();
   const source = compactDecisionSource(inboundMessageId);
+  const manualRecovery = isManualRecoveryGate(gate);
+  const authorNotes = preserveAuthorNotes(reply.bodyText || "");
+  const acknowledgement = evaluateAcknowledgementPolicy(deps.acknowledgement || {});
   const classifiedLog = await writeStateLog(client, {
     state: RESPONSE_STATES.CLASSIFIED,
     gateId,
@@ -270,25 +430,41 @@ async function processGateReply(client, gate, deps, triggerSource) {
     sourceEntity: "jm1pub_editorialapprovalgate",
     sourceRecordId: gateId
   });
+  const capturedLog = await writeLog(client, {
+    actionType: "AUTHOR_RESPONSE_CAPTURED",
+    name: `AUTHOR_RESPONSE_CAPTURED - ${gateId}`,
+    description:
+      `Author response captured; author=${identity.sender}; title=${gate._jm1pub_titleid_value || gate.titleId || "unknown"}; ` +
+      `package=${gate.jm1pub_packageid || reply.packageId || "unknown"}; decisionRequest=${gate.jm1pub_decisionrequestid || reply.decisionRequestId || "unknown"}; ` +
+      `message=${inboundMessageId}; received=${receivedAt}; classification=${classification}; notesReference=jm1pub_authorresponsesummary; ` +
+      `awaitingState=CLOSE_MATCHING_RESPONSE_WAIT; manualRecovery=${manualRecovery ? "YES" : "NO"}; correlation=${correlation.mode}; ` +
+      `acknowledgementPolicy=${acknowledgement.status}; Idempotency: ${idempotencyKey}.`,
+    sourceEntity: "jm1pub_editorialapprovalgate",
+    sourceRecordId: gateId
+  });
 
-  if (classification === "APPROVE") {
+  const code = decisionCode(classification);
+  if (code !== null) {
     await client.patch("jm1pub_editorialapprovalgates", gateId, {
-      jm1pub_authordecision: AUTHOR_DECISION_APPROVE,
+      jm1pub_authordecision: code,
       jm1pub_authordecisionon: receivedAt,
       jm1pub_authordecisionsource: source,
-      jm1pub_authorresponsesummary: "Author approved without changes through monitored publishing mailbox. Automatic approval-event consumer will process the next governed movement."
+      jm1pub_authorresponsesummary: authorNotes,
+      jm1pub_awaitingsince: null
     });
     const persistedLog = await writeStateLog(client, {
       state: RESPONSE_STATES.PERSISTED,
       gateId,
       inboundMessageId,
       idempotencyKey,
-      description: "Author approval decision persisted to the canonical gate path; approval consumer will independently discover the eligible gate."
+      description: `${decisionSummary(classification)} Matching response wait closed only for this gate. Production stage progression remains separately governed.`
     });
-    const approvalLog = await writeLog(client, {
-      actionType: "AUTHOR_APPROVAL_PERSISTED",
-      name: `AUTHOR_APPROVAL_PERSISTED - ${gateId}`,
-      description: `Author approval persisted from monitored mailbox response; approval event is now eligible for the durable approval consumer. Idempotency: ${idempotencyKey}.`,
+    const decisionLog = await writeLog(client, {
+      actionType: decisionActionType(classification),
+      name: `${decisionActionType(classification)} - ${gateId}`,
+      description:
+        `${decisionSummary(classification)} Decision=${classification}; author=${identity.sender}; manualRecovery=${manualRecovery ? "YES" : "NO"}; ` +
+        `productionProgression=0; acknowledgementPolicy=${acknowledgement.status}; Idempotency: ${idempotencyKey}.`,
       sourceEntity: "jm1pub_editorialapprovalgate",
       sourceRecordId: gateId
     });
@@ -297,80 +473,49 @@ async function processGateReply(client, gate, deps, triggerSource) {
       gateId,
       inboundMessageId,
       idempotencyKey,
-      description: "Inbound listener completed its responsibility after durable response and decision persistence. It did not call the transition handler."
+      description: "Inbound listener completed durable response capture, classification, notes persistence, awaiting-state closure, and execution logging. It did not call the transition handler."
     });
     return {
       gateId,
-      outcome: "APPROVAL_PERSISTED",
-      detail: "approval_ready_for_approval_event_consumer",
+      outcome: decisionOutcome(classification),
+      detail: manualRecovery ? "manual_recovery_capture_complete_no_production_progression" : "response_capture_complete",
       processingState: RESPONSE_STATES.COMPLETED,
-      executionLogIds: [discoveredLog, claimedLog, correlatedLog, classifiedLog, correlationLog, persistedLog, approvalLog, completedLog]
+      acknowledgementPolicy: acknowledgement.status,
+      productionProgression: 0,
+      manualRecovery,
+      executionLogIds: [discoveredLog, claimedLog, correlatedLog, classifiedLog, correlationLog, capturedLog, persistedLog, decisionLog, completedLog]
     };
   }
 
-  if (classification === "REQUEST_CORRECTIONS") {
-    await client.patch("jm1pub_editorialapprovalgates", gateId, {
-      jm1pub_authordecision: AUTHOR_DECISION_REQUEST_REVISION,
-      jm1pub_authordecisionon: receivedAt,
-      jm1pub_authordecisionsource: source,
-      jm1pub_authorresponsesummary: "Author requested proofreading corrections through monitored publishing mailbox. Awaiting returns to Publisher/JM1 Automation."
-    });
-    const persistedLog = await writeStateLog(client, {
-      state: RESPONSE_STATES.PERSISTED,
-      gateId,
-      inboundMessageId,
-      idempotencyKey,
-      description: "Author correction request persisted to the canonical gate path. No approval event is emitted."
-    });
-    const correctionLog = await writeLog(client, {
-      actionType: "AUTHOR_CORRECTIONS_REQUESTED",
-      name: `AUTHOR_CORRECTIONS_REQUESTED - ${gateId}`,
-      description: `Author correction request persisted from monitored mailbox response. No Interior Layout autostart is allowed. Idempotency: ${idempotencyKey}.`,
-      sourceEntity: "jm1pub_editorialapprovalgate",
-      sourceRecordId: gateId
-    });
-    const completedLog = await writeStateLog(client, {
-      state: RESPONSE_STATES.COMPLETED,
-      gateId,
-      inboundMessageId,
-      idempotencyKey,
-      description: "Inbound listener completed correction-response persistence. It did not call the transition handler."
-    });
-    return {
-      gateId,
-      outcome: "CORRECTIONS_PERSISTED",
-      detail: "corrections_ready_for_publisher_runtime",
-      processingState: RESPONSE_STATES.COMPLETED,
-      executionLogIds: [discoveredLog, claimedLog, correlatedLog, classifiedLog, correlationLog, persistedLog, correctionLog, completedLog]
-    };
-  }
-
-  const terminalState = classification === "ACKNOWLEDGMENT_ONLY" ? RESPONSE_STATES.COMPLETED : RESPONSE_STATES.BLOCKED;
+  const terminalState = classification === DECISION.ACKNOWLEDGMENT_ONLY ? RESPONSE_STATES.COMPLETED : RESPONSE_STATES.BLOCKED;
   const terminalLog = await writeStateLog(client, {
     state: terminalState,
     gateId,
     inboundMessageId,
     idempotencyKey,
     description:
-      classification === "ACKNOWLEDGMENT_ONLY"
+      classification === DECISION.ACKNOWLEDGMENT_ONLY
         ? "Acknowledgment-only response preserved; A5 remains open and no approval event is emitted."
         : `Classification ${classification} requires publisher review before gate movement.`,
-    failed: classification !== "ACKNOWLEDGMENT_ONLY"
+    failed: classification !== DECISION.ACKNOWLEDGMENT_ONLY
   });
   const reviewLog = await writeLog(client, {
-    actionType: classification === "ACKNOWLEDGMENT_ONLY" ? "AUTHOR_RESPONSE_ACKNOWLEDGMENT_RECORDED" : "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW",
-    name: `${classification === "ACKNOWLEDGMENT_ONLY" ? "AUTHOR_RESPONSE_ACKNOWLEDGMENT_RECORDED" : "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW"} - ${gateId}`,
-    description: `Author response reached monitored mailbox but classification=${classification}; publisher review required. Idempotency: ${idempotencyKey}.`,
+    actionType: classification === DECISION.ACKNOWLEDGMENT_ONLY ? "AUTHOR_RESPONSE_ACKNOWLEDGMENT_RECORDED" : "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW",
+    name: `${classification === DECISION.ACKNOWLEDGMENT_ONLY ? "AUTHOR_RESPONSE_ACKNOWLEDGMENT_RECORDED" : "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW"} - ${gateId}`,
+    description: `Author response reached monitored mailbox but classification=${classification}; publisher review required; manualRecovery=${manualRecovery ? "YES" : "NO"}; productionProgression=0; Idempotency: ${idempotencyKey}.`,
     sourceEntity: "jm1pub_editorialapprovalgate",
     sourceRecordId: gateId,
-    failed: classification !== "ACKNOWLEDGMENT_ONLY"
+    failed: classification !== DECISION.ACKNOWLEDGMENT_ONLY
   });
   return {
     gateId,
-    outcome: classification === "ACKNOWLEDGMENT_ONLY" ? "ACKNOWLEDGMENT_RECORDED" : "PUBLISHER_REVIEW_REQUIRED",
+    outcome: classification === DECISION.ACKNOWLEDGMENT_ONLY ? "ACKNOWLEDGMENT_RECORDED" : "PUBLISHER_REVIEW_REQUIRED",
     detail: classification,
     processingState: terminalState,
-    executionLogIds: [discoveredLog, claimedLog, correlatedLog, classifiedLog, correlationLog, terminalLog, reviewLog]
+    acknowledgementPolicy: acknowledgement.status,
+    productionProgression: 0,
+    manualRecovery,
+    executionLogIds: [discoveredLog, claimedLog, correlatedLog, classifiedLog, correlationLog, capturedLog, terminalLog, reviewLog]
   };
 }
 
@@ -392,7 +537,12 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
     timeout: "10 minutes host timeout target",
     deadLetterBehavior: "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW with exact blocker",
     costCategory: "Consumption/serverless timer execution",
-    processed: results.filter((r) => r.outcome === "APPROVAL_PERSISTED" || r.outcome === "CORRECTIONS_PERSISTED").length,
+    processed: results.filter((r) => [
+      "APPROVAL_PERSISTED",
+      "APPROVED_WITH_CORRECTIONS_PERSISTED",
+      "CHANGES_REQUESTED_PERSISTED",
+      "QUESTIONS_REQUIRING_REVIEW_PERSISTED"
+    ].includes(r.outcome)).length,
     idempotent: results.filter((r) => r.outcome === "IDEMPOTENT").length,
     results
   };
@@ -404,5 +554,9 @@ module.exports = {
   stableIdempotencyKey,
   createDataverseClient,
   normalizeConfiguredSecret,
-  compactDecisionSource
+  compactDecisionSource,
+  validateAuthorIdentity,
+  validateReplyCorrelation,
+  evaluateAcknowledgementPolicy,
+  DECISION
 };

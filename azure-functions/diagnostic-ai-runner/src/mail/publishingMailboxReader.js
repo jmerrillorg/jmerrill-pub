@@ -205,6 +205,7 @@ async function readPublishingMailboxReply(input = {}, deps = {}) {
     inboundMessageId: normalizeString(latest.id) || null,
     internetMessageId: normalizeString(latest.internetMessageId) || null,
     conversationId: normalizeString(latest.conversationId) || null,
+    subject: normalizeString(latest.subject) || null,
     senderAddress,
     toRecipients: latestCandidate.toRecipients,
     ccRecipients: latestCandidate.ccRecipients,
