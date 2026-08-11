@@ -768,7 +768,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       ),
     )
     .slice(0, 2)
-  const portfolio = buildPortfolioItems(titles, assets, editorialStages)
+  const portfolio = buildPortfolioItems(titles, assets, editorialStages, productionProjects)
   const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, logs, portfolio)
   const productionCommand = buildProductionCommand(workload, portfolio, productionProjects, productionTasks)
   const authorResponses = buildAuthorResponseQueue(approvalGates, editorialStages, titles, logs)
@@ -811,7 +811,9 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       publishedCatalog: portfolio.filter((item) => item.portfolioState === 'published_catalog'),
       externalHolds: portfolio.filter((item) => item.portfolioState === 'external_hold'),
       archiveHistorical: portfolio.filter((item) => item.portfolioState === 'archive_historical'),
-      reconciliationRequired: portfolio.filter((item) => item.portfolioState === 'reconciliation_required'),
+      reconciliationRequired: portfolio.filter((item) =>
+        ['reconciliation_required', 'manual_recovery'].includes(item.portfolioState),
+      ),
     },
     productionCommand,
     authorResponses,
@@ -1687,6 +1689,7 @@ function buildPortfolioItems(
   titles: DataverseRow[],
   assets: DataverseRow[],
   editorialStages: DataverseRow[],
+  productionProjects: DataverseRow[] = [],
 ): PublisherPortfolioItem[] {
   return titles
     .map((title) => {
@@ -1696,6 +1699,7 @@ function buildPortfolioItems(
         title,
         assets: titleAssets,
         stages: editorialStages,
+        productionProjects,
       })
       const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name) || '(Untitled)'
 
@@ -2789,7 +2793,7 @@ function buildPublisherToday(input: {
 }): PublisherTodaySnapshot {
   const workloadTodayItems = input.workload.map(workloadToTodayItem)
   const queueTodayItems = input.queue.map(queueToTodayItem)
-  const portfolioTodayItems = input.portfolio.map(portfolioToTodayItem)
+  const portfolioTodayItems = input.portfolio.filter(includePortfolioItemInDefaultToday).map(portfolioToTodayItem)
   const failedLogItems = input.logs
     .filter((log) => isOpenFailureLog(log))
     .map((log) => logToAlertTodayItem(log))
@@ -2832,7 +2836,8 @@ function buildPublisherToday(input: {
   const distributionCatalogQueue = prioritizeTodayItems(
     portfolioTodayItems.filter(
       (item) =>
-        item.portfolioState !== 'published_catalog' ||
+        item.portfolioState === 'reconciliation_required' ||
+        item.portfolioState === 'manual_recovery' ||
         item.dependency.includes('ISBN') ||
         item.dependency.toLowerCase().includes('missing') ||
         item.dependency.toLowerCase().includes('mismatch') ||
@@ -3438,7 +3443,7 @@ function workloadToTodayItem(item: PublisherWorkloadItem): PublisherTodayItem {
 }
 
 function portfolioToTodayItem(item: PublisherPortfolioItem): PublisherTodayItem {
-  const requiresPublisher = item.portfolioState === 'reconciliation_required'
+  const requiresPublisher = ['reconciliation_required', 'manual_recovery'].includes(item.portfolioState)
   return {
     key: `portfolio:${item.key}`,
     recordId: item.assetIds[0] || item.titleId,
@@ -3470,6 +3475,15 @@ function portfolioToTodayItem(item: PublisherPortfolioItem): PublisherTodayItem 
     allowedActions: [],
     lastMovement: item.evidence[0] || 'Portfolio classification read from Core-backed title and asset evidence',
   }
+}
+
+function includePortfolioItemInDefaultToday(item: PublisherPortfolioItem) {
+  if (['synthetic_test', 'certification', 'non_title_operational_artifact'].includes(item.portfolioState)) return false
+  if (item.portfolioState === 'archive_historical') return false
+  if (item.portfolioState === 'published_catalog') {
+    return item.isbn13s.length === 0 || item.author === 'Author pending' || Boolean(item.exceptionReason)
+  }
+  return true
 }
 
 function buildProductionCommand(

@@ -15,6 +15,10 @@ const expectations = [
       classifier.includes("'published_catalog'") &&
       classifier.includes("'external_hold'") &&
       classifier.includes("'archive_historical'") &&
+      classifier.includes("'synthetic_test'") &&
+      classifier.includes("'certification'") &&
+      classifier.includes("'manual_recovery'") &&
+      classifier.includes("'non_title_operational_artifact'") &&
       classifier.includes("'reconciliation_required'"),
   },
   {
@@ -31,7 +35,8 @@ const expectations = [
     ok:
       publisher.includes("portfolioItem.portfolioState !== 'active_pipeline'") &&
       publisher.includes('portfolio.filter((item) => item.portfolioState ===') &&
-      publisher.includes('publishedCatalog: portfolio.filter'),
+      publisher.includes('publishedCatalog: portfolio.filter') &&
+      publisher.includes('includePortfolioItemInDefaultToday'),
   },
   {
     name: 'publisher center exposes portfolio metrics and views',

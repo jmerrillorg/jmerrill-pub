@@ -350,7 +350,13 @@ async function findOpenAuthorReviewGates(client, maxGates) {
 
 function subjectProbeForGate(gate) {
   const name = normalizeString(gate.jm1pub_editorialapprovalgatename);
-  if (name.toLowerCase().includes("intentional leader")) return "Proofreading Review Package";
+  const gateCode = normalizeString(gate.jm1pub_gatecode);
+  const source = `${name} ${gateCode}`.toLowerCase();
+  if (source.includes("cover")) return "Cover Design Review";
+  if (source.includes("proofread")) return "Proofreading Review Package";
+  if (source.includes("copyedit")) return "Copyediting Review Package";
+  if (source.includes("line edit")) return "Line Editing Review Package";
+  if (source.includes("developmental")) return "Developmental Review";
   return name.replace(/^A\d+\s*/i, "").replace(/\s+-\s+.*$/, "").slice(0, 80);
 }
 
