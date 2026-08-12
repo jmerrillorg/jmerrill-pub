@@ -12,6 +12,7 @@ const {
   evaluateAcknowledgementPolicy,
   runAuthorReviewResponseConsumer,
   findOpenPackageSelectionDiagnostics,
+  packageSelectionSubjectProbes,
   processPackageSelectionReply,
   stableIdempotencyKey,
   stablePackageSelectionIdempotencyKey,
@@ -180,6 +181,51 @@ test("package-selection discovery recovers stale draft rows from durable send ev
   const rows = await findOpenPackageSelectionDiagnostics(client, 10);
   assert.equal(rows.length, 1);
   assert.equal(rows[0].jm1pub_editorialdiagnosticid, diagnostic.jm1pub_editorialdiagnosticid);
+});
+
+test("package-selection mailbox lookup falls back to the canonical selection subject", async () => {
+  const diagnostic = createDiagnostic({
+    jm1_authordraftsubject: "Your Editorial Review & Publishing Recommendation | J Merrill Publishing"
+  });
+  assert.deepEqual(packageSelectionSubjectProbes(diagnostic), [
+    "Your Editorial Review & Publishing Recommendation | J Merrill Publishing",
+    "My Publishing Package Selection"
+  ]);
+
+  const client = createMockClient();
+  const probes = [];
+  const result = await processPackageSelectionReply(
+    client,
+    diagnostic,
+    {
+      readPackageSelectionReply: async ({ subjectContains }) => {
+        probes.push(subjectContains);
+        if (subjectContains !== "My Publishing Package Selection") {
+          return { ok: false, found: false, reason: "NO_MATCHING_REPLY_FOUND" };
+        }
+        return {
+          ...createReply({
+            inboundMessageId: "mailbox-selection-fallback",
+            internetMessageId: "<selection-fallback@jmerrill.one>",
+            senderAddress: "publishing@jmerrill.one",
+            toRecipients: ["publishing@jmerrill.one"],
+            subject: "My Publishing Package Selection",
+            receivedDateTime: "2026-08-12T10:35:08Z",
+            bodyText: "Let's move forward with the Starter package",
+            selfAddressedPublishingSelection: true
+          })
+        };
+      }
+    },
+    "TEST"
+  );
+
+  assert.deepEqual(probes, [
+    "Your Editorial Review & Publishing Recommendation | J Merrill Publishing",
+    "My Publishing Package Selection"
+  ]);
+  assert.equal(result.outcome, "PACKAGE_SELECTED");
+  assert.equal(result.selectedPackage.code, "JMP-PKG-STARTER");
 });
 
 test("package-selection classifier accepts natural human language for all package tiers", async () => {
