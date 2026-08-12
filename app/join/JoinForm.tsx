@@ -74,7 +74,7 @@ const initialForm: JoinFormState = {
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const buildTimeSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || ''
-const allowedManuscriptExtensions = ['.docx', '.doc', '.pdf']
+const allowedManuscriptExtensions = ['.docx', '.doc', '.pdf', '.md']
 const maxManuscriptFileBytes = 25 * 1024 * 1024
 
 export default function JoinForm() {
@@ -401,13 +401,13 @@ export default function JoinForm() {
               id="manuscriptFile"
               name="manuscriptFile"
               type="file"
-              accept=".docx,.doc,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/pdf"
+              accept=".docx,.doc,.pdf,.md,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/pdf,text/markdown,text/plain"
               onChange={setFile}
               className={`${fieldClass(Boolean(errors.manuscriptFile))} file:mr-4 file:rounded-full file:border-0 file:bg-blue-500 file:px-4 file:py-2 file:text-[12px] file:font-semibold file:text-white hover:file:bg-blue-600`}
             />
             {!errors.manuscriptFile && (
               <p className="mt-1.5 text-[11px] leading-[1.6] text-white/55">
-                Optional. Upload .docx, .doc, or .pdf up to 25 MB. .doc files may need cleanup; PDFs are review-only.
+                Optional. Upload .docx, .doc, .pdf, or .md up to 25 MB. .doc files may need cleanup; PDFs are review-only.
               </p>
             )}
             {errors.manuscriptFile && (
