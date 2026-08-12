@@ -130,12 +130,13 @@ test("Azure Functions timer registers the durable inbound response consumer", ()
 
 test("package-selection replies are processed by the shared five-minute inbound consumer", async () => {
   const client = createMockClient();
+  const diagnostic = createDiagnostic();
   const result = await runAuthorReviewResponseConsumer(
-    { maxGates: 1, maxPackageSelections: 1 },
+    { maxGates: 1, maxPackageSelections: 1, targetDiagnosticId: diagnostic.jm1pub_editorialdiagnosticid },
     {
       client,
       findGates: async () => [],
-      findPackageSelectionDiagnostics: async () => [createDiagnostic()],
+      findPackageSelectionDiagnostics: async () => [diagnostic],
       readPackageSelectionReply: async () => ({
         ...createReply({
           inboundMessageId: "mailbox-selection-001",
@@ -215,7 +216,8 @@ test("package-selection mailbox lookup falls back to the canonical selection sub
             selfAddressedPublishingSelection: true
           })
         };
-      }
+      },
+      targetDiagnosticId: diagnostic.jm1pub_editorialdiagnosticid
     },
     "TEST"
   );
@@ -226,6 +228,33 @@ test("package-selection mailbox lookup falls back to the canonical selection sub
   ]);
   assert.equal(result.outcome, "PACKAGE_SELECTED");
   assert.equal(result.selectedPackage.code, "JMP-PKG-STARTER");
+});
+
+test("self-addressed package-selection reply fails closed without an exact diagnostic target", async () => {
+  const client = createMockClient();
+  const result = await processPackageSelectionReply(
+    client,
+    createDiagnostic(),
+    {
+      readPackageSelectionReply: async () => ({
+        ...createReply({
+          inboundMessageId: "mailbox-selection-no-target",
+          internetMessageId: "<selection-no-target@jmerrill.one>",
+          senderAddress: "publishing@jmerrill.one",
+          toRecipients: ["publishing@jmerrill.one"],
+          subject: "My Publishing Package Selection",
+          receivedDateTime: "2026-08-12T10:35:08Z",
+          bodyText: "Let's move forward with the Starter package",
+          selfAddressedPublishingSelection: true
+        })
+      })
+    },
+    "TEST"
+  );
+
+  assert.equal(result.outcome, "SELF_ADDRESSED_SELECTION_REQUIRES_EXACT_DIAGNOSTIC_TARGET");
+  assert.equal(client.calls.created.length, 0);
+  assert.equal(client.calls.patched.length, 0);
 });
 
 test("package-selection classifier accepts natural human language for all package tiers", async () => {
@@ -239,6 +268,7 @@ test("package-selection classifier accepts natural human language for all packag
       client,
       createDiagnostic(),
       {
+        targetDiagnosticId: createDiagnostic().jm1pub_editorialdiagnosticid,
         readPackageSelectionReply: async () => ({
           ...createReply({
             inboundMessageId: `inbound-${expectedCode}`,
@@ -266,6 +296,7 @@ test("ambiguous or irrelevant package-selection replies fail closed without pack
       client,
       createDiagnostic(),
       {
+        targetDiagnosticId: createDiagnostic().jm1pub_editorialdiagnosticid,
         readPackageSelectionReply: async () => ({
           ...createReply({
             inboundMessageId: `ambiguous-${bodyText.length}`,
@@ -293,6 +324,7 @@ test("package-selection replay is idempotent by immutable message identity", asy
     client,
     createDiagnostic(),
     {
+      targetDiagnosticId: createDiagnostic().jm1pub_editorialdiagnosticid,
       readPackageSelectionReply: async () => ({
         ...createReply({
           inboundMessageId: "mailbox-selection-duplicate",
