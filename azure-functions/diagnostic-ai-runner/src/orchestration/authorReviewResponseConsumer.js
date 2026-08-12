@@ -406,6 +406,13 @@ function packageSelectionSubjectProbe(diagnostic) {
   return normalizeString(diagnostic.jm1_authordraftsubject) || "My Publishing Package Selection";
 }
 
+function packageSelectionSubjectProbes(diagnostic) {
+  return [...new Set([
+    packageSelectionSubjectProbe(diagnostic),
+    "My Publishing Package Selection"
+  ].filter(Boolean))];
+}
+
 function packageSelectionAfterIso(diagnostic) {
   return normalizeString(diagnostic.jm1_authordraftpreparedon || diagnostic.modifiedon) || "2026-01-01T00:00:00Z";
 }
@@ -421,15 +428,25 @@ async function processPackageSelectionReply(client, diagnostic, deps, triggerSou
   if (!diagnosticId) return { diagnosticId: "", outcome: "DIAGNOSTIC_ID_MISSING" };
   if (!captureEnabled()) return { diagnosticId, outcome: "CAPTURE_DISABLED", detail: "JM1_AUTHOR_RESPONSE_CAPTURE_DISABLED" };
 
-  const subjectContains = packageSelectionSubjectProbe(diagnostic);
-  const reply = await (deps.readPackageSelectionReply || deps.readReply || readPublishingMailboxReply)(
-    {
-      subjectContains,
-      afterIso: packageSelectionAfterIso(diagnostic),
-      allowInternalPublishingSelection: true
-    },
-    deps
-  );
+  const subjectProbes = packageSelectionSubjectProbes(diagnostic);
+  let reply = null;
+  let subjectContains = subjectProbes[0] || "My Publishing Package Selection";
+  for (const probe of subjectProbes) {
+    const candidate = await (deps.readPackageSelectionReply || deps.readReply || readPublishingMailboxReply)(
+      {
+        subjectContains: probe,
+        afterIso: packageSelectionAfterIso(diagnostic),
+        allowInternalPublishingSelection: true
+      },
+      deps
+    );
+    if (candidate.ok && candidate.found) {
+      reply = candidate;
+      subjectContains = probe;
+      break;
+    }
+    reply = candidate;
+  }
   if (!reply.ok || !reply.found) return { diagnosticId, outcome: "NO_PACKAGE_SELECTION_REPLY_FOUND", detail: reply.reason || reply.code || "no_match" };
 
   const inboundMessageId = durableInboundMessageId(reply);
@@ -758,6 +775,7 @@ module.exports = {
   validateAuthorIdentity,
   validateReplyCorrelation,
   findOpenPackageSelectionDiagnostics,
+  packageSelectionSubjectProbes,
   processPackageSelectionReply,
   evaluateAcknowledgementPolicy,
   DECISION
