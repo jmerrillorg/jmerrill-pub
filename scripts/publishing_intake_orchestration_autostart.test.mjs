@@ -74,6 +74,8 @@ test('autostart binds preserved manuscript asset fields before diagnostic dispat
   assert.match(publisher, /jm1_manuscriptassetstatus: MANUSCRIPT_ASSET_STATUS_APPROVED/)
   assert.doesNotMatch(publisher, /jm1_manuscriptassetstatus: 'Approved for Stage 0 diagnostic'/)
   assert.match(publisher, /jm1_manuscriptfiletype: metadata\.fileType/)
+  assert.match(publisher, /lower\.endsWith\('\.md'\)[\s\S]+\? 'md'/)
+  assert.match(publisher, /lower\.endsWith\('\.txt'\)[\s\S]+\? 'txt'/)
   assert.match(publisher, /waitForStage0DiagnosticForIntake/)
 })
 

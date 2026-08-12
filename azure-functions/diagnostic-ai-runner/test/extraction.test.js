@@ -196,10 +196,23 @@ describe("extractManuscript — safety invariants", () => {
     assert.equal(result.contentReturned, false);
   });
 
-  test("SUPPORTED_TYPES contains exactly .txt and .docx", () => {
+  test("supports Markdown manuscripts as transient UTF-8 text metadata", async () => {
+    const buf = Buffer.from("# Title\n\nFaith centered manuscript text\n", "utf8");
+    const result = await extractManuscript(".md", buf);
+    assert.equal(result.supported, true);
+    assert.equal(result.fileType, ".md");
+    assert.equal(result.byteLength, buf.byteLength);
+    assert.equal(result.wordCount, 6);
+    assert.equal(result.lineCount, 4);
+    assert.equal(result.contentReturned, false);
+    assert.equal(result.error, null);
+  });
+
+  test("SUPPORTED_TYPES contains exactly .txt, .md, and .docx", () => {
     assert.ok(SUPPORTED_TYPES.has(".txt"));
+    assert.ok(SUPPORTED_TYPES.has(".md"));
     assert.ok(SUPPORTED_TYPES.has(".docx"));
-    assert.equal(SUPPORTED_TYPES.size, 2);
+    assert.equal(SUPPORTED_TYPES.size, 3);
   });
 
   test("empty buffer does not throw and returns metadata", async () => {

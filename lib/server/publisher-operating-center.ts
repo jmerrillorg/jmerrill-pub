@@ -2646,7 +2646,15 @@ function inferManuscriptFileMetadata(manuscriptUrl: string) {
 
   const decodedName = decodeURIComponent(fileName || '').trim()
   const lower = decodedName.toLowerCase()
-  const fileType = lower.endsWith('.pdf') ? 'pdf' : lower.endsWith('.doc') ? 'doc' : 'docx'
+  const fileType = lower.endsWith('.pdf')
+    ? 'pdf'
+    : lower.endsWith('.doc')
+      ? 'doc'
+      : lower.endsWith('.md')
+        ? 'md'
+        : lower.endsWith('.txt')
+          ? 'txt'
+          : 'docx'
 
   return {
     fileName: decodedName.slice(0, 250) || `manuscript.${fileType}`,

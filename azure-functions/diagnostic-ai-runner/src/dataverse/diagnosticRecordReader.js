@@ -51,7 +51,7 @@ async function getDataverseToken(resourceUrl) {
 
 /**
  * Normalizes a Dataverse filetype string to a supported extension.
- * Returns ".docx", ".txt", or null.
+ * Returns ".docx", ".txt", ".md", or null.
  *
  * @param {string|null} raw
  * @returns {string|null}
@@ -61,6 +61,7 @@ function normalizeFileTypeHint(raw) {
   const s = raw.trim().toLowerCase().replace(/^\./, "");
   if (s === "docx") return ".docx";
   if (s === "txt") return ".txt";
+  if (s === "md" || s === "markdown") return ".md";
   return null;
 }
 

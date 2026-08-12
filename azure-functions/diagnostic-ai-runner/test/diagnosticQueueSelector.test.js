@@ -62,6 +62,16 @@ describe("diagnosticQueueSelector — eligible records", () => {
     assert.equal(result.intakeReferenceCode, baseRecord.intakeReferenceCode);
   });
 
+  test("accepts approved Markdown manuscript source records", () => {
+    const result = evaluateDiagnosticQueueEligibility(makeRecord({
+      manuscriptAssetUrl: "https://jmerrill.sharepoint.com/sites/publishing/source.md",
+      manuscriptFileType: "md"
+    }));
+
+    assert.equal(result.eligible, true);
+    assert.equal(result.reason, "ELIGIBLE");
+  });
+
   test("selectEligibleDiagnostics separates eligible and rejected records without processing them", () => {
     const selection = selectEligibleDiagnostics([
       makeRecord(),
