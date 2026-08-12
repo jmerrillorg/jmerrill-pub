@@ -6,7 +6,8 @@ const {
   ACTION,
   RESEND_EVENT,
   runPublisherRecommendationAction,
-  buildRecommendationResendEventPayload
+  buildRecommendationResendEventPayload,
+  buildAwaitingAuthorResponsePatch
 } = require("../src/functions/runPublisherRecommendationAction");
 const { INTERNAL_VISIBILITY_MAILBOX } = require("../src/author/authorResponseDraftBuilder");
 
@@ -81,10 +82,18 @@ describe("publisher recommendation replacement resend", () => {
     assert.equal(/secret|token|header|prompt body|manuscript text/i.test(payload.jm1_actiondescription), true);
   });
 
+  test("builds durable awaiting-author-response diagnostic state after author send", () => {
+    const patch = buildAwaitingAuthorResponsePatch({ sentAt: "2026-08-12T10:35:08Z" });
+    assert.equal(patch.jm1_authordraftsendstatus, "AUTHOR_RESPONSE_SENT");
+    assert.match(patch.jm1_authordraftapprovalnotes, /Workflow remains Awaiting Author Response/);
+    assert.match(patch.jm1_authordraftapprovalnotes, /2026-08-12T10:35:08Z/);
+  });
+
   test("sends exactly one Editorial Recommendation Letter replacement and logs superseded plus replacement events", async () => {
     const events = [];
     const sends = [];
     const sendLogs = [];
+    const awaitingWrites = [];
 
     const result = await runPublisherRecommendationAction({
       diagnosticId: DIAGNOSTIC_ID,
@@ -112,6 +121,10 @@ describe("publisher recommendation replacement resend", () => {
       persistResendEvent: async (input) => {
         events.push(input.eventType);
         return { ok: true, id: `${input.eventType}-id` };
+      },
+      persistAwaitingAuthorResponse: async (input) => {
+        awaitingWrites.push(input);
+        return { dataverseRecordId: input.diagnosticId };
       }
     });
 
@@ -125,6 +138,9 @@ describe("publisher recommendation replacement resend", () => {
     ]);
     assert.equal(sends.length, 1);
     assert.equal(sendLogs.length, 1);
+    assert.equal(awaitingWrites.length, 1);
+    assert.equal(awaitingWrites[0].diagnosticId, DIAGNOSTIC_ID);
+    assert.equal(result.awaitingAuthorResponseStatus, "PERSISTED");
     assert.equal(sends[0].templateName, "EDITORIAL_RECOMMENDATION_LETTER_V1");
     assert.equal(sends[0].templateVersion, "1.1.0");
     assert.match(sends[0].draftHtmlBody, /J MERRILL PUBLISHING/);

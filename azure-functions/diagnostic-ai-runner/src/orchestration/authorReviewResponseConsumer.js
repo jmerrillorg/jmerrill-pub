@@ -318,6 +318,19 @@ async function findAnyExecutionLog(client, actionTypes, idempotencyKey) {
   return null;
 }
 
+async function findRecommendationSendEvidence(client, diagnosticId) {
+  const safeId = escapeODataText(diagnosticId);
+  return client.first("jm1_executionlogs", {
+    $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,createdon",
+    $filter:
+      `jm1_sourcerecordid eq '${safeId}' and (` +
+      "jm1_actiontype eq 'AUTHOR_RESPONSE_SENT' or " +
+      "jm1_actiontype eq 'EDITORIAL_RECOMMENDATION_LETTER_REPLACEMENT_SENT'" +
+      ")",
+    $orderby: "createdon desc"
+  });
+}
+
 async function writeStateLog(client, { state, gateId, inboundMessageId, idempotencyKey, description, failed = false }) {
   return writeLog(client, {
     actionType: `AUTHOR_INBOUND_MESSAGE_${state}`,
@@ -368,13 +381,25 @@ async function findOpenAuthorReviewGates(client, maxGates) {
 }
 
 async function findOpenPackageSelectionDiagnostics(client, maxDiagnostics) {
-  return client.list("jm1pub_editorialdiagnostics", {
+  const rows = await client.list("jm1pub_editorialdiagnostics", {
     $select:
       "jm1pub_editorialdiagnosticid,jm1pub_name,jm1pub_recommendedpackage,jm1_m6alternatepackagecode,jm1_authordraftsubject,jm1_authordraftsendstatus,jm1_authordraftpreparedon,jm1_authordraftapprovalnotes,_jm1pub_publishingintake_value,_jm1pub_authorcontact_value,modifiedon",
-    $filter: "jm1pub_recommendedpackage ne null and contains(jm1_authordraftapprovalnotes,'Awaiting Author Response')",
+    $filter: "jm1pub_recommendedpackage ne null and jm1_authordraftpreparedon ne null",
     $orderby: "modifiedon desc",
     $top: String(Math.min(Math.max(Number(maxDiagnostics || 10), 1), 25))
   });
+  const open = [];
+  for (const row of rows) {
+    const status = normalizeString(row.jm1_authordraftsendstatus).toUpperCase();
+    const notes = normalizeString(row.jm1_authordraftapprovalnotes);
+    if (status === "AUTHOR_RESPONSE_SENT" || /Awaiting Author Response/i.test(notes)) {
+      open.push(row);
+      continue;
+    }
+    const diagnosticId = normalizeString(row.jm1pub_editorialdiagnosticid);
+    if (diagnosticId && await findRecommendationSendEvidence(client, diagnosticId)) open.push(row);
+  }
+  return open.slice(0, Math.min(Math.max(Number(maxDiagnostics || 10), 1), 25));
 }
 
 function packageSelectionSubjectProbe(diagnostic) {
@@ -732,6 +757,7 @@ module.exports = {
   compactDecisionSource,
   validateAuthorIdentity,
   validateReplyCorrelation,
+  findOpenPackageSelectionDiagnostics,
   processPackageSelectionReply,
   evaluateAcknowledgementPolicy,
   DECISION

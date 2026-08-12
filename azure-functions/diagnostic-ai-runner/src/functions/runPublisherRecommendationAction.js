@@ -13,7 +13,7 @@ const {
   buildAuthorDraftApprovalUpdate,
   AUTHOR_DRAFT_APPROVAL_DECISION
 } = require("../author/authorDraftApprovalDecisionModel");
-const { ENTITY_SET } = require("../author/authorDraftFieldMap");
+const { ENTITY_SET, AUTHOR_DRAFT_FIELD_MAP } = require("../author/authorDraftFieldMap");
 const {
   AGENT_NAME,
   BAND_LEVEL,
@@ -190,6 +190,26 @@ async function persistRecommendationResendEvent(input = {}, dataverseClient = cr
   };
 }
 
+function buildAwaitingAuthorResponsePatch({ sentAt = new Date().toISOString() } = {}) {
+  return {
+    [AUTHOR_DRAFT_FIELD_MAP.draftSendStatus]: "AUTHOR_RESPONSE_SENT",
+    [AUTHOR_DRAFT_FIELD_MAP.draftApprovalNotes]:
+      `Author-facing recommendation sent. Workflow remains Awaiting Author Response. Sent at ${sentAt}.`
+  };
+}
+
+async function persistDiagnosticAwaitingAuthorResponse({ diagnosticId, sentAt = new Date().toISOString(), token } = {}) {
+  const apiBase = process.env.DATAVERSE_WEB_API_BASE_URL;
+  const resourceUrl = process.env.DATAVERSE_RESOURCE_URL;
+  if (!apiBase || (!token && !resourceUrl)) {
+    throw Object.assign(new Error("Dataverse configuration missing"), {
+      safeCode: "DATAVERSE_CONFIG_MISSING"
+    });
+  }
+  const resolvedToken = token || await getDataverseToken(resourceUrl);
+  return patchDataverseRecord(apiBase, resolvedToken, ENTITY_SET, diagnosticId, buildAwaitingAuthorResponsePatch({ sentAt }));
+}
+
 app.http("run-publisher-recommendation-action", {
   methods: ["POST"],
   authLevel: "anonymous",
@@ -356,6 +376,12 @@ app.http("run-publisher-recommendation-action", {
         providerMessageId: sendResult.providerMessageId
       }, createDataverseCreateClient())
       : null;
+    const awaitingResult = sendResult.ok && sendResult.deliveryStatus === "AUTHOR_RESPONSE_SENT"
+      ? await persistDiagnosticAwaitingAuthorResponse({
+        diagnosticId,
+        sentAt: sendResult.sentAt || sendResult.completedAt || new Date().toISOString()
+      })
+      : null;
 
     return {
       status: sendResult.ok && sendResult.deliveryStatus === "AUTHOR_RESPONSE_SENT" ? 200 : 422,
@@ -368,6 +394,7 @@ app.http("run-publisher-recommendation-action", {
         deliveryStatus: sendResult.deliveryStatus || null,
         internalVisibilityStatus: sendResult.internalVisibilityStatus || null,
         dataverseSendLogStatus: logResult?.dataverseSendLogStatus || logResult?.reason || null,
+        awaitingAuthorResponseStatus: awaitingResult ? "PERSISTED" : null,
         providerMessageId: sendResult.providerMessageId || null,
         authorRecommendationSent: sendResult.deliveryStatus === "AUTHOR_RESPONSE_SENT"
       }
@@ -395,6 +422,7 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
   const sendResponse = deps.sendResponse || sendConfiguredAuthorResponse;
   const persistSendLog = deps.persistSendLog || persistAuthorResponseSendLog;
   const persistResendEvent = deps.persistResendEvent || persistRecommendationResendEvent;
+  const persistAwaitingAuthorResponse = deps.persistAwaitingAuthorResponse || persistDiagnosticAwaitingAuthorResponse;
   const dataverseClient = deps.dataverseClient || createDataverseCreateClient();
 
   const draftResult = await prepareDraft({ diagnosticId, intakeReferenceCode }, {
@@ -437,6 +465,10 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
     providerName: sendResult.providerName,
     providerMessageId: sendResult.providerMessageId
   }, dataverseClient);
+  const awaitingAuthorResponse = await persistAwaitingAuthorResponse({
+    diagnosticId,
+    sentAt: sendResult.sentAt || sendResult.completedAt || new Date().toISOString()
+  });
 
   const replacement = await persistResendEvent({
     eventType: RESEND_EVENT.REPLACEMENT_SENT,
@@ -459,6 +491,7 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
     supersededEventId: superseded.id || null,
     replacementEventId: replacement.id || null,
     dataverseSendLogStatus: sendLog.dataverseSendLogStatus || sendLog.reason || null,
+    awaitingAuthorResponseStatus: awaitingAuthorResponse ? "PERSISTED" : null,
     authorRecommendationSent: true,
     workflowStatus: "Awaiting Author Response"
   };
@@ -469,5 +502,6 @@ module.exports = {
   RESEND_EVENT,
   runPublisherRecommendationAction,
   buildRecommendationResendEventPayload,
+  buildAwaitingAuthorResponsePatch,
   persistRecommendationResendEvent
 };
