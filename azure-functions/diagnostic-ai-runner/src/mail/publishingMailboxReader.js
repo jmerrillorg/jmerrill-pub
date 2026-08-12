@@ -224,7 +224,8 @@ async function fetchMessageFileAttachment(token, messageId, attachmentId, deps =
  *
  * @param {{
  *   subjectContains: string,
- *   afterIso: string
+ *   afterIso: string,
+ *   allowInternalPublishingSelection?: boolean
  * }} input
  * @param {{ getToken?: (scope: string) => Promise<string> }} [deps]
  *   Test-only injection seam. Production callers must omit this.
@@ -241,6 +242,7 @@ async function fetchMessageFileAttachment(token, messageId, attachmentId, deps =
 async function readPublishingMailboxReply(input = {}, deps = {}) {
   const subjectContains = normalizeString(input.subjectContains);
   const afterIso = normalizeString(input.afterIso);
+  const allowInternalPublishingSelection = input.allowInternalPublishingSelection === true;
 
   if (!subjectContains) return blocked("SUBJECT_FILTER_MISSING", { found: false });
   if (!afterIso || Number.isNaN(Date.parse(afterIso))) return blocked("AFTER_TIMESTAMP_INVALID", { found: false });
@@ -280,7 +282,7 @@ async function readPublishingMailboxReply(input = {}, deps = {}) {
       };
     })
     .filter((m) => normalizeString(m.raw.subject).toLowerCase().includes(subjectLower))
-    .filter((m) => !isInternalPublishingSender(m.senderAddress))
+    .filter((m) => allowInternalPublishingSelection || !isInternalPublishingSender(m.senderAddress))
     .filter((m) => m.toRecipients.includes(PUBLISHING_MAILBOX))
     .filter((m) => Boolean(m.authorReplyText));
 
@@ -304,6 +306,7 @@ async function readPublishingMailboxReply(input = {}, deps = {}) {
     hasAttachments: latest.hasAttachments === true,
     subject: normalizeString(latest.subject) || null,
     senderAddress,
+    selfAddressedPublishingSelection: allowInternalPublishingSelection && isInternalPublishingSender(senderAddress),
     toRecipients: latestCandidate.toRecipients,
     ccRecipients: latestCandidate.ccRecipients,
     receivedDateTime,

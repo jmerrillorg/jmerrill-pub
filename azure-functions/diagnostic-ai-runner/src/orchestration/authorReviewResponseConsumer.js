@@ -7,6 +7,7 @@
  */
 
 const { readPublishingMailboxReply, PUBLISHING_MAILBOX } = require("../mail/publishingMailboxReader");
+const { classifyPackageReply } = require("../mail/publishingPackageReplyClassifier");
 const { createHash } = require("node:crypto");
 
 const EXECUTION_STATUS = { SUCCESS: 835500001, FAILED: 835500002 };
@@ -61,6 +62,11 @@ function extractId(entityUrl) {
 function stableIdempotencyKey(gateId, inboundMessageId) {
   const digest = createHash("sha256").update(`${gateId}:${inboundMessageId}`).digest("hex").slice(0, 24);
   return `author-review-response:${digest}`;
+}
+
+function stablePackageSelectionIdempotencyKey(diagnosticId, inboundMessageId) {
+  const digest = createHash("sha256").update(`${diagnosticId}:${inboundMessageId}`).digest("hex").slice(0, 24);
+  return `package-selection-response:${digest}`;
 }
 
 function captureEnabled() {
@@ -325,6 +331,19 @@ async function writeStateLog(client, { state, gateId, inboundMessageId, idempote
   });
 }
 
+async function writePackageStateLog(client, { state, diagnosticId, inboundMessageId, idempotencyKey, description, failed = false }) {
+  return writeLog(client, {
+    actionType: `AUTHOR_PACKAGE_SELECTION_MESSAGE_${state}`,
+    name: `AUTHOR_PACKAGE_SELECTION_MESSAGE_${state} - ${diagnosticId}`,
+    description:
+      `${description} State=${state}; inboundMessageId=${inboundMessageId}; monitoredMailbox=${PUBLISHING_MAILBOX}; ` +
+      `Idempotency: ${idempotencyKey}.`,
+    sourceEntity: "jm1pub_editorialdiagnostic",
+    sourceRecordId: diagnosticId,
+    failed
+  });
+}
+
 function durableInboundMessageId(reply) {
   return (
     normalizeString(reply.internetMessageId) ||
@@ -346,6 +365,151 @@ async function findOpenAuthorReviewGates(client, maxGates) {
     $orderby: "modifiedon desc",
     $top: String(Math.min(Math.max(Number(maxGates || 10), 1), 25))
   });
+}
+
+async function findOpenPackageSelectionDiagnostics(client, maxDiagnostics) {
+  return client.list("jm1pub_editorialdiagnostics", {
+    $select:
+      "jm1pub_editorialdiagnosticid,jm1pub_name,jm1pub_recommendedpackage,jm1_m6alternatepackagecode,jm1_authordraftsubject,jm1_authordraftsendstatus,jm1_authordraftpreparedon,jm1_authordraftapprovalnotes,_jm1pub_publishingintake_value,_jm1pub_authorcontact_value,modifiedon",
+    $filter: "jm1pub_recommendedpackage ne null and contains(jm1_authordraftapprovalnotes,'Awaiting Author Response')",
+    $orderby: "modifiedon desc",
+    $top: String(Math.min(Math.max(Number(maxDiagnostics || 10), 1), 25))
+  });
+}
+
+function packageSelectionSubjectProbe(diagnostic) {
+  return normalizeString(diagnostic.jm1_authordraftsubject) || "My Publishing Package Selection";
+}
+
+function packageSelectionAfterIso(diagnostic) {
+  return normalizeString(diagnostic.jm1_authordraftpreparedon || diagnostic.modifiedon) || "2026-01-01T00:00:00Z";
+}
+
+function packageSelectionConfidence(classification) {
+  if (/PACKAGE_SELECTED$/.test(classification)) return "HIGH";
+  if (classification === "UNCLASSIFIED") return "LOW";
+  return "MEDIUM";
+}
+
+async function processPackageSelectionReply(client, diagnostic, deps, triggerSource) {
+  const diagnosticId = normalizeString(diagnostic.jm1pub_editorialdiagnosticid);
+  if (!diagnosticId) return { diagnosticId: "", outcome: "DIAGNOSTIC_ID_MISSING" };
+  if (!captureEnabled()) return { diagnosticId, outcome: "CAPTURE_DISABLED", detail: "JM1_AUTHOR_RESPONSE_CAPTURE_DISABLED" };
+
+  const subjectContains = packageSelectionSubjectProbe(diagnostic);
+  const reply = await (deps.readPackageSelectionReply || deps.readReply || readPublishingMailboxReply)(
+    {
+      subjectContains,
+      afterIso: packageSelectionAfterIso(diagnostic),
+      allowInternalPublishingSelection: true
+    },
+    deps
+  );
+  if (!reply.ok || !reply.found) return { diagnosticId, outcome: "NO_PACKAGE_SELECTION_REPLY_FOUND", detail: reply.reason || reply.code || "no_match" };
+
+  const inboundMessageId = durableInboundMessageId(reply);
+  const idempotencyKey = stablePackageSelectionIdempotencyKey(diagnosticId, inboundMessageId);
+  const existing = await findAnyExecutionLog(
+    client,
+    [
+      "AUTHOR_PACKAGE_SELECTION_MESSAGE_COMPLETED",
+      "AUTHOR_RESPONSE_CAPTURED",
+      "PACKAGE_SELECTED",
+      "AUTHOR_PACKAGE_SELECTION_REQUIRES_PUBLISHER_REVIEW"
+    ],
+    idempotencyKey
+  );
+  if (existing) return { diagnosticId, outcome: "IDEMPOTENT", detail: "package_selection_already_processed", executionLogIds: [existing.jm1_executionlogid] };
+
+  const receivedAt = normalizeString(reply.receivedDateTime) || new Date().toISOString();
+  const classified = classifyPackageReply(reply.bodyText || "");
+  const classification = classified.classification;
+  const selectedPackage = classified.selectedPackage;
+  const confidence = packageSelectionConfidence(classification);
+
+  const discoveredLog = await writePackageStateLog(client, {
+    state: RESPONSE_STATES.DISCOVERED,
+    diagnosticId,
+    inboundMessageId,
+    idempotencyKey,
+    description: `Package-selection author response discovered by ${triggerSource}; internetMessageId=${reply.internetMessageId || "unknown"}; conversation=${reply.conversationId || "unknown"}.`
+  });
+  const correlatedLog = await writePackageStateLog(client, {
+    state: RESPONSE_STATES.CORRELATED,
+    diagnosticId,
+    inboundMessageId,
+    idempotencyKey,
+    description: `Package-selection response correlated to Stage 0 recommendation by subject/body context; subjectProbe="${subjectContains}".`
+  });
+  const classifiedLog = await writePackageStateLog(client, {
+    state: RESPONSE_STATES.CLASSIFIED,
+    diagnosticId,
+    inboundMessageId,
+    idempotencyKey,
+    description: `Package-selection response classified as ${classification}; confidence=${confidence}; clarificationRequired=${selectedPackage ? "NO" : "YES"}.`,
+    failed: !selectedPackage
+  });
+  const capturedLog = await writeLog(client, {
+    actionType: "AUTHOR_RESPONSE_CAPTURED",
+    name: `AUTHOR_RESPONSE_CAPTURED - ${diagnosticId}`,
+    description:
+      `Author package-selection response captured; source=Stage0Recommendation; message=${inboundMessageId}; received=${receivedAt}; ` +
+      `classification=${classification}; selectedPackage=${selectedPackage?.code || "none"}; confidence=${confidence}; ` +
+      `selfAddressedPublishingSelection=${reply.selfAddressedPublishingSelection === true ? "YES" : "NO"}; Idempotency: ${idempotencyKey}.`,
+    sourceEntity: "jm1pub_editorialdiagnostic",
+    sourceRecordId: diagnosticId
+  });
+
+  if (!selectedPackage) {
+    const reviewLog = await writeLog(client, {
+      actionType: "AUTHOR_PACKAGE_SELECTION_REQUIRES_PUBLISHER_REVIEW",
+      name: `AUTHOR_PACKAGE_SELECTION_REQUIRES_PUBLISHER_REVIEW - ${diagnosticId}`,
+      description: `Package-selection reply reached the monitored mailbox but classification=${classification}; no package persisted; Idempotency: ${idempotencyKey}.`,
+      sourceEntity: "jm1pub_editorialdiagnostic",
+      sourceRecordId: diagnosticId,
+      failed: true
+    });
+    return {
+      diagnosticId,
+      outcome: "PACKAGE_SELECTION_REVIEW_REQUIRED",
+      detail: classification,
+      selectedPackage: null,
+      executionLogIds: [discoveredLog, correlatedLog, classifiedLog, capturedLog, reviewLog]
+    };
+  }
+
+  await client.patch("jm1pub_editorialdiagnostics", diagnosticId, {
+    jm1_authordraftapprovalnotes:
+      `Author selected ${selectedPackage.name}. Package selection captured from monitored publishing mailbox. ` +
+      `Message received ${receivedAt}. Awaiting Author Response is resolved; downstream onboarding/agreement continuation is eligible.`
+  });
+  const selectedLog = await writeLog(client, {
+    actionType: "PACKAGE_SELECTED",
+    name: `PACKAGE_SELECTED - ${diagnosticId}`,
+    description:
+      `Package selected from real author response. selectedPackage=${selectedPackage.name} (${selectedPackage.code}); classification=${classification}; ` +
+      `received=${receivedAt}; manualPackageSelectionMutation=0; unnecessaryJackieGate=0; unnecessaryAuthorClarification=0; downstreamResumeRequired=YES; ` +
+      `Idempotency: ${idempotencyKey}.`,
+    sourceEntity: "jm1pub_editorialdiagnostic",
+    sourceRecordId: diagnosticId
+  });
+  const completedLog = await writePackageStateLog(client, {
+    state: RESPONSE_STATES.COMPLETED,
+    diagnosticId,
+    inboundMessageId,
+    idempotencyKey,
+    description: "Package-selection response capture completed; awaiting-response state resolved. Downstream continuation remains governed by the commercial/onboarding runtime."
+  });
+  return {
+    diagnosticId,
+    outcome: "PACKAGE_SELECTED",
+    detail: classification,
+    selectedPackage,
+    confidence,
+    receivedDateTime: receivedAt,
+    processingState: RESPONSE_STATES.COMPLETED,
+    executionLogIds: [discoveredLog, correlatedLog, classifiedLog, capturedLog, selectedLog, completedLog]
+  };
 }
 
 function subjectProbeForGate(gate) {
@@ -529,15 +693,18 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
   const triggerSource = input.triggerSource || "SCHEDULED_WORKER";
   const client = deps.client || createDataverseClient(requireDataverseConfig(), deps);
   const gates = await (deps.findGates || findOpenAuthorReviewGates)(client, input.maxGates || 10);
+  const packageDiagnostics = await (deps.findPackageSelectionDiagnostics || findOpenPackageSelectionDiagnostics)(client, input.maxPackageSelections || 10);
   const results = [];
   for (const gate of gates) results.push(await processGateReply(client, gate, deps, triggerSource));
+  const packageSelectionResults = [];
+  for (const diagnostic of packageDiagnostics) packageSelectionResults.push(await processPackageSelectionReply(client, diagnostic, deps, triggerSource));
   return {
     runtimeName: "JM1 Author Review Response Consumer",
     deploymentEnvironment: "func-jm1-diagnostic-ai-runner",
     triggerType: "Azure Functions timer",
     schedule: "0 */5 * * * *",
     monitoredMailbox: PUBLISHING_MAILBOX,
-    queue: "publishing@jmerrill.one Inbox plus open Dataverse author-review gates",
+    queue: "publishing@jmerrill.one Inbox plus open Dataverse author-review gates and Stage 0 package-selection responses",
     identity: "func-jm1-diagnostic-ai-runner application identity",
     retryPolicy: "Azure Functions host retry plus idempotent Dataverse response records",
     timeout: "10 minutes host timeout target",
@@ -548,9 +715,10 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
       "APPROVED_WITH_CORRECTIONS_PERSISTED",
       "CHANGES_REQUESTED_PERSISTED",
       "QUESTIONS_REQUIRING_REVIEW_PERSISTED"
-    ].includes(r.outcome)).length,
-    idempotent: results.filter((r) => r.outcome === "IDEMPOTENT").length,
-    results
+    ].includes(r.outcome)).length + packageSelectionResults.filter((r) => r.outcome === "PACKAGE_SELECTED").length,
+    idempotent: [...results, ...packageSelectionResults].filter((r) => r.outcome === "IDEMPOTENT").length,
+    results,
+    packageSelectionResults
   };
 }
 
@@ -558,11 +726,13 @@ module.exports = {
   runAuthorReviewResponseConsumer,
   classifyAuthorReviewResponse,
   stableIdempotencyKey,
+  stablePackageSelectionIdempotencyKey,
   createDataverseClient,
   normalizeConfiguredSecret,
   compactDecisionSource,
   validateAuthorIdentity,
   validateReplyCorrelation,
+  processPackageSelectionReply,
   evaluateAcknowledgementPolicy,
   DECISION
 };

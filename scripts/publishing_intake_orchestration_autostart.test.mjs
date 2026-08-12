@@ -122,12 +122,14 @@ test('fresh Stage 0 diagnostic handoffs are eligible for automated editorial rev
   assert.doesNotMatch(runControl, /DIAGNOSTIC_NOT_AWAITING_PUBLISHER_REVIEW/)
 })
 
-test('live join inquiries preserve lead linkage and surface Stage 0 Jackie review as the human gate', () => {
+test('live join inquiries preserve lead linkage and do not surface routine Stage 0 handoffs as Jackie gates', () => {
   assert.match(publisher, /_jm1_linkedlead_value/)
   assert.match(publisher, /_jm1_lead_value/)
   assert.match(publisher, /getRecentEditorialDiagnostics/)
   assert.match(publisher, /DIAGNOSTIC_STATUS_AWAITING_JACKIE_REVIEW/)
-  assert.match(publisher, /stage0AwaitingJackie/)
-  assert.match(publisher, /Stage 0 diagnostic awaiting Jackie review/)
-  assert.match(publisher, /Review Stage 0 diagnostic/)
+  assert.match(publisher, /stage0RequiresJackieGate/)
+  assert.match(publisher, /Stage 0 diagnostic requires publisher review/)
+  assert.match(publisher, /Manuscript evidence is missing/)
+  assert.doesNotMatch(publisher, /Stage 0 diagnostic awaiting Jackie review/)
+  assert.doesNotMatch(publisher, /currentStage = dataverseFormatted\(title \|\| \{\}, 'jm1pub_stage'\) \|\| 'Inquiry'/)
 })

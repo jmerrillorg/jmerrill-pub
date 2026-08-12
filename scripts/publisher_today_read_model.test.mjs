@@ -146,13 +146,20 @@ const expectations = [
       client.includes('Why it is waiting'),
   },
   {
-    name: 'deep links and title detail panel remain compatible with full-width board behavior',
+    name: 'deep links resolve exact title, intake, and diagnostic actions without wrong-title fallback',
     ok:
       client.includes("searchParams.get('titleId')") &&
+      client.includes("searchParams.get('intakeId')") &&
+      client.includes("searchParams.get('diagnosticId')") &&
       client.includes("searchParams.get('title')") &&
       client.includes('selectedTitle') &&
+      client.includes('Requested action could not be resolved.') &&
+      client.includes('No fallback title was opened.') &&
+      !client.includes('return titleCards.find((card) => card.key === selectedTitleKey) || titleCards[0]') &&
       client.includes('TitleDetailDrawer') &&
-      client.includes('operatingCenterUrl'),
+      client.includes('operatingCenterUrl') &&
+      server.includes('intakeId?: string') &&
+      server.includes('diagnosticId?: string'),
   },
   {
     name: 'opaque header treatment remains isolated to the global navigation',

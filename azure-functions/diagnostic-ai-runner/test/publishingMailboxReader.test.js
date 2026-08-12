@@ -303,6 +303,7 @@ describe("readPublishingMailboxReply — safety invariants", () => {
       "internetMessageId",
       "ok",
       "receivedDateTime",
+      "selfAddressedPublishingSelection",
       "senderAddress",
       "subject",
       "toRecipients"

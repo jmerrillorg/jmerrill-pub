@@ -68,18 +68,32 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     if (boardView === 'catalog') return liveFiltered.filter((card) => card.stageId === 'distribution' || card.stageId === 'published')
     return liveFiltered
   }, [boardView, includeTestRecords, snapshot])
-  const selectedTitle = useMemo(() => {
-    if (!titleCards.length) return null
-    const requestedTitle = searchParams.get('titleId') || searchParams.get('title')
-    if (requestedTitle) {
-      const normalized = decodeURIComponent(requestedTitle).toLowerCase()
-      const deepLinked = titleCards.find((card) =>
-        [card.titleId, card.key, card.title].some((value) => value.toLowerCase() === normalized),
+  const selectedResolution = useMemo(() => {
+    const allCards = snapshot?.titleOperatingView.cards || []
+    const requestedTitleId = searchParams.get('titleId')
+    const requestedIntakeId = searchParams.get('intakeId')
+    const requestedDiagnosticId = searchParams.get('diagnosticId')
+    const requestedRecordId = searchParams.get('recordId')
+    const requestedTitle = searchParams.get('title')
+    const hasRequestedAction = Boolean(requestedTitleId || requestedIntakeId || requestedDiagnosticId || requestedRecordId || requestedTitle)
+    const match = (value?: string | null, expected?: string | null) =>
+      Boolean(value && expected && value.toLowerCase() === expected.toLowerCase())
+
+    if (hasRequestedAction) {
+      const deepLinked = allCards.find((card) =>
+        match(card.titleId, requestedTitleId) ||
+        match(card.intakeId, requestedIntakeId) ||
+        match(card.diagnosticId, requestedDiagnosticId) ||
+        match(card.key, requestedRecordId) ||
+        match(card.title, requestedTitle),
       )
-      if (deepLinked) return deepLinked
+      if (deepLinked) return { card: deepLinked, unresolved: false }
+      return { card: null, unresolved: true }
     }
-    return titleCards.find((card) => card.key === selectedTitleKey) || titleCards[0]
-  }, [searchParams, selectedTitleKey, titleCards])
+
+    return { card: titleCards.find((card) => card.key === selectedTitleKey) || titleCards[0] || null, unresolved: false }
+  }, [searchParams, selectedTitleKey, snapshot, titleCards])
+  const selectedTitle = selectedResolution.card
   const portfolio = useMemo(() => {
     if (!snapshot) return []
     if (portfolioView === 'published') return snapshot.queues.publishedCatalog
@@ -289,10 +303,11 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
 
       <section className="mx-auto w-full max-w-none px-5 py-6 sm:px-8 2xl:px-10">
         {snapshot && (
-          <TitlePipelineBoard
+            <TitlePipelineBoard
             snapshot={snapshot}
             cards={titleCards}
-            selectedTitle={selectedTitle}
+              selectedTitle={selectedTitle}
+              requestedActionUnresolved={selectedResolution.unresolved}
             boardView={boardView}
             includeTestRecords={includeTestRecords}
             onBoardView={setBoardView}
@@ -1195,6 +1210,7 @@ function TitlePipelineBoard({
   snapshot,
   cards,
   selectedTitle,
+  requestedActionUnresolved,
   boardView,
   includeTestRecords,
   onBoardView,
@@ -1206,6 +1222,7 @@ function TitlePipelineBoard({
   snapshot: PublisherOperatingCenterSnapshot
   cards: PublisherTitleOperatingCard[]
   selectedTitle: PublisherTitleOperatingCard | null
+  requestedActionUnresolved: boolean
   boardView: string
   includeTestRecords: boolean
   onBoardView: (view: string) => void
@@ -1305,6 +1322,7 @@ function TitlePipelineBoard({
 
         <TitleDetailDrawer
           card={selectedTitle}
+          requestedActionUnresolved={requestedActionUnresolved}
           actionState={actionState}
           onAction={onAction}
         />
@@ -1358,13 +1376,27 @@ function TitlePipelineCard({
 
 function TitleDetailDrawer({
   card,
+  requestedActionUnresolved,
   actionState,
   onAction,
 }: {
   card: PublisherTitleOperatingCard | null
+  requestedActionUnresolved: boolean
   actionState: ActionState
   onAction: (input: { key: string; actionId: string; titleId?: string }) => void
 }) {
+  if (requestedActionUnresolved) {
+    return (
+      <aside className="border border-amber-300/30 bg-amber-950/20 p-5 text-[13px] leading-6 text-amber-50">
+        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-amber-200">Action Link</p>
+        <h3 className="mt-2 text-xl font-semibold">Requested action could not be resolved.</h3>
+        <p className="mt-2 text-amber-100/70">
+          The link did not match a current title, intake, or diagnostic action. No fallback title was opened.
+        </p>
+      </aside>
+    )
+  }
+
   if (!card) {
     return (
       <aside className="border border-white/10 bg-black/20 p-5 text-[13px] leading-6 text-white/45">

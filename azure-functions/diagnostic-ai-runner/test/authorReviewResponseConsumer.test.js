@@ -11,7 +11,9 @@ const {
   DECISION,
   evaluateAcknowledgementPolicy,
   runAuthorReviewResponseConsumer,
+  processPackageSelectionReply,
   stableIdempotencyKey,
+  stablePackageSelectionIdempotencyKey,
   validateAuthorIdentity,
   validateReplyCorrelation
 } = require("../src/orchestration/authorReviewResponseConsumer");
@@ -33,6 +35,19 @@ function createGate(overrides = {}) {
     jm1pub_outboundmessageid: outboundMessageId,
     jm1pub_threadid: "conv-1",
     modifiedon: "2026-07-19T13:28:12Z",
+    ...overrides
+  };
+}
+
+function createDiagnostic(overrides = {}) {
+  return {
+    jm1pub_editorialdiagnosticid: "48cd0d86-f595-f111-8076-6045bdd69435",
+    jm1pub_name: "Stage 0 - 'TIL DEATH DO US PART",
+    jm1pub_recommendedpackage: 196650000,
+    jm1_authordraftsubject: "My Publishing Package Selection",
+    jm1_authordraftpreparedon: "2026-08-12T03:00:19Z",
+    jm1_authordraftapprovalnotes: "Workflow remains Awaiting Author Response.",
+    modifiedon: "2026-08-12T03:00:19Z",
     ...overrides
   };
 }
@@ -111,6 +126,122 @@ test("Azure Functions timer registers the durable inbound response consumer", ()
   assert.match(index, /runAuthorReviewResponseConsumer/);
 });
 
+test("package-selection replies are processed by the shared five-minute inbound consumer", async () => {
+  const client = createMockClient();
+  const result = await runAuthorReviewResponseConsumer(
+    { maxGates: 1, maxPackageSelections: 1 },
+    {
+      client,
+      findGates: async () => [],
+      findPackageSelectionDiagnostics: async () => [createDiagnostic()],
+      readPackageSelectionReply: async () => ({
+        ...createReply({
+          inboundMessageId: "mailbox-selection-001",
+          internetMessageId: "<selection-001@jmerrill.one>",
+          senderAddress: "publishing@jmerrill.one",
+          toRecipients: ["publishing@jmerrill.one"],
+          subject: "My Publishing Package Selection",
+          receivedDateTime: "2026-08-12T10:35:08Z",
+          bodyText: "Let’s move forward with the Starter package",
+          selfAddressedPublishingSelection: true
+        })
+      })
+    }
+  );
+
+  assert.equal(result.processed, 1);
+  assert.equal(result.packageSelectionResults[0].outcome, "PACKAGE_SELECTED");
+  assert.equal(result.packageSelectionResults[0].selectedPackage.code, "JMP-PKG-STARTER");
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_SELECTED"));
+  assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialdiagnostics"));
+});
+
+test("package-selection classifier accepts natural human language for all package tiers", async () => {
+  for (const [bodyText, expectedCode] of [
+    ["Let's move forward with the Starter package", "JMP-PKG-STARTER"],
+    ["We would like the Professional Publishing Package", "JMP-PKG-PRO"],
+    ["Please move ahead with Premier", "JMP-PKG-PREMIER"]
+  ]) {
+    const client = createMockClient();
+    const result = await processPackageSelectionReply(
+      client,
+      createDiagnostic(),
+      {
+        readPackageSelectionReply: async () => ({
+          ...createReply({
+            inboundMessageId: `inbound-${expectedCode}`,
+            internetMessageId: `<${expectedCode}@jmerrill.one>`,
+            senderAddress: "publishing@jmerrill.one",
+            toRecipients: ["publishing@jmerrill.one"],
+            subject: "My Publishing Package Selection",
+            receivedDateTime: "2026-08-12T10:35:08Z",
+            bodyText,
+            selfAddressedPublishingSelection: true
+          })
+        })
+      },
+      "TEST"
+    );
+    assert.equal(result.outcome, "PACKAGE_SELECTED");
+    assert.equal(result.selectedPackage.code, expectedCode);
+  }
+});
+
+test("ambiguous or irrelevant package-selection replies fail closed without package persistence", async () => {
+  for (const bodyText of ["Can we talk about options?", "Thank you for sending this."]) {
+    const client = createMockClient();
+    const result = await processPackageSelectionReply(
+      client,
+      createDiagnostic(),
+      {
+        readPackageSelectionReply: async () => ({
+          ...createReply({
+            inboundMessageId: `ambiguous-${bodyText.length}`,
+            internetMessageId: `<ambiguous-${bodyText.length}@jmerrill.one>`,
+            senderAddress: "publishing@jmerrill.one",
+            toRecipients: ["publishing@jmerrill.one"],
+            subject: "My Publishing Package Selection",
+            receivedDateTime: "2026-08-12T10:35:08Z",
+            bodyText,
+            selfAddressedPublishingSelection: true
+          })
+        })
+      },
+      "TEST"
+    );
+    assert.equal(result.outcome, "PACKAGE_SELECTION_REVIEW_REQUIRED");
+    assert.ok(!client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialdiagnostics"));
+  }
+});
+
+test("package-selection replay is idempotent by immutable message identity", async () => {
+  const key = stablePackageSelectionIdempotencyKey("48cd0d86-f595-f111-8076-6045bdd69435", "<selection-duplicate@jmerrill.one>");
+  const client = createMockClient({ existingLog: { jm1_executionlogid: "existing-selection" } });
+  const result = await processPackageSelectionReply(
+    client,
+    createDiagnostic(),
+    {
+      readPackageSelectionReply: async () => ({
+        ...createReply({
+          inboundMessageId: "mailbox-selection-duplicate",
+          internetMessageId: "<selection-duplicate@jmerrill.one>",
+          senderAddress: "publishing@jmerrill.one",
+          toRecipients: ["publishing@jmerrill.one"],
+          subject: "My Publishing Package Selection",
+          receivedDateTime: "2026-08-12T10:35:08Z",
+          bodyText: "Let's move forward with the Starter package",
+          selfAddressedPublishingSelection: true
+        })
+      })
+    },
+    "TEST"
+  );
+  assert.match(key, /^package-selection-response:[a-f0-9]{24}$/);
+  assert.equal(result.outcome, "IDEMPOTENT");
+  assert.equal(client.calls.created.length, 0);
+  assert.equal(client.calls.patched.length, 0);
+});
+
 test("inbound approval begins at monitored mailbox and persists the gate decision", async () => {
   const client = createMockClient();
   const result = await runAuthorReviewResponseConsumer(
@@ -180,6 +311,44 @@ test("publishing sender copy is ignored and cannot be classified as author corre
   assert.equal(result.processed, 0);
   assert.equal(client.calls.created.length, 0);
   assert.equal(client.calls.patched.length, 0);
+});
+
+test("mailbox reader only admits self-addressed publishing messages for governed package selection", async () => {
+  const { readPublishingMailboxReply } = require("../src/mail/publishingMailboxReader");
+  process.env.JM1_PUBLISHING_MAIL_READ_ENABLED = "true";
+  const message = {
+    id: "self-selection",
+    internetMessageId: "<self-selection@jmerrill.one>",
+    conversationId: "conv-package",
+    subject: "My Publishing Package Selection",
+    from: { emailAddress: { address: "publishing@jmerrill.one" } },
+    toRecipients: [{ emailAddress: { address: "publishing@jmerrill.one" } }],
+    ccRecipients: [],
+    receivedDateTime: "2026-08-12T10:35:08Z",
+    hasAttachments: false,
+    body: { content: "Let's move forward with the Starter package" },
+    bodyPreview: "Let's move forward with the Starter package"
+  };
+  const deps = {
+    getToken: async () => "token",
+    fetchImpl: async () => ({
+      ok: true,
+      json: async () => ({ value: [message] })
+    })
+  };
+
+  const defaultRead = await readPublishingMailboxReply(
+    { subjectContains: "My Publishing Package Selection", afterIso: "2026-08-12T03:00:00Z" },
+    deps
+  );
+  const packageRead = await readPublishingMailboxReply(
+    { subjectContains: "My Publishing Package Selection", afterIso: "2026-08-12T03:00:00Z", allowInternalPublishingSelection: true },
+    deps
+  );
+
+  assert.equal(defaultRead.found, false);
+  assert.equal(packageRead.found, true);
+  assert.equal(packageRead.selfAddressedPublishingSelection, true);
 });
 
 test("acknowledgment-only response is preserved but does not approve the gate", async () => {
@@ -297,8 +466,8 @@ test("open-gate query only selects deployed approval-gate schema fields", async 
     async first() {
       return null;
     },
-    async list(_entitySet, query) {
-      Object.assign(requested, query);
+    async list(entitySet, query) {
+      if (entitySet === "jm1pub_editorialapprovalgates") Object.assign(requested, query);
       return [];
     }
   };
