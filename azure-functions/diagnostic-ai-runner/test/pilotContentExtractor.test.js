@@ -17,8 +17,13 @@ describe("pilotContentExtractor — detectExtension", () => {
     assert.equal(detectExtension("https://example.com/files/manuscript.txt"), ".txt");
   });
 
+  it("returns .md for a URL ending in .md", () => {
+    assert.equal(detectExtension("https://example.com/files/manuscript.md"), ".md");
+  });
+
   it("handles uppercase extensions case-insensitively", () => {
     assert.equal(detectExtension("https://example.com/manuscript.DOCX"), ".docx");
+    assert.equal(detectExtension("https://example.com/manuscript.MD"), ".md");
     assert.equal(detectExtension("https://example.com/manuscript.TXT"), ".txt");
   });
 
@@ -136,6 +141,31 @@ describe("pilotContentExtractor — fetch failure paths", () => {
 });
 
 // ---------------------------------------------------------------------------
+// fetchAndExtractManuscript — Markdown
+// ---------------------------------------------------------------------------
+
+describe("pilotContentExtractor — Markdown extraction", () => {
+  it("extracts Markdown as UTF-8 text with safe metadata", async () => {
+    const originalFetch = global.fetch;
+    const markdown = Array.from({ length: 120 }, (_, index) => `word${index + 1}`).join(" ");
+    global.fetch = async () => new Response(Buffer.from(`# Title\n\n${markdown}`, "utf8"), { status: 200 });
+
+    try {
+      const result = await fetchAndExtractManuscript("https://example.com/manuscript.md");
+
+      assert.equal(result.ok, true);
+      assert.equal(result.code, null);
+      assert.equal(result.metadata.fileType, ".md");
+      assert.equal(result.metadata.wordCount, 122);
+      assert.equal(result.metadata.downloadMethod, "direct");
+      assert.match(result.content, /^# Title/);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
 // fetchAndExtractManuscript — unsupported type
 // ---------------------------------------------------------------------------
 
@@ -169,6 +199,13 @@ describe("pilotContentExtractor — fileTypeHint priority over URL extension", (
     const url = "https://example.com/document.txt";
     const ext = fileTypeHint || detectExtension(url);
     assert.equal(ext, ".txt");
+  });
+
+  it("fileTypeHint .md is preferred over URL extension", () => {
+    const fileTypeHint = ".md";
+    const url = "https://example.com/document.docx";
+    const ext = fileTypeHint || detectExtension(url);
+    assert.equal(ext, ".md");
   });
 
   it("returns null when both fileTypeHint and URL extension are absent", () => {
