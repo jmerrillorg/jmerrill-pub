@@ -792,6 +792,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
   const titleOperatingView = buildTitleOperatingView({
     generatedAt: today.generatedAt,
     today,
+    queue,
     workload,
     portfolio,
     productionCommand,
@@ -2939,6 +2940,7 @@ function buildPublisherToday(input: {
 function buildTitleOperatingView(input: {
   generatedAt: string
   today: PublisherTodaySnapshot
+  queue: PublisherQueueItem[]
   workload: PublisherWorkloadItem[]
   portfolio: PublisherPortfolioItem[]
   productionCommand: PublisherOperatingCenterSnapshot['productionCommand']
@@ -2946,6 +2948,9 @@ function buildTitleOperatingView(input: {
   logs?: DataverseRow[]
 }): PublisherTitleOperatingView {
   const stages = deriveTitleOperatingStages(input)
+  const unslicedJackieQueueItems = input.queue
+    .filter((item) => item.actionOwner === 'publisher')
+    .map(queueToTodayItem)
   const allTodayItems = [
     ...input.today.waitingForJackie,
     ...input.today.waitingForAuthors,
@@ -2953,6 +2958,7 @@ function buildTitleOperatingView(input: {
     ...input.today.productionQueue,
     ...input.today.distributionCatalogQueue,
     ...input.today.alerts,
+    ...unslicedJackieQueueItems,
   ]
   const byTitle = new Map<string, PublisherTodayItem[]>()
   for (const item of allTodayItems) {
@@ -3081,16 +3087,19 @@ function titleItemsToOperatingCard(
   const titleResponse = authorResponses.find((item) => normalizeTitle(item.title) === normalizeTitle(primary.title))
   const currentArtifact = bestEvidenceLink(primary)
   const liveClassification = isSyntheticTitle(primary.title) ? 'TEST_CERTIFICATION' : 'LIVE'
-  const actionUrl = `${publisherOperatingCenterBaseUrl()}/publisher/operating-center?titleId=${encodeURIComponent(
+  const defaultActionUrl = `${publisherOperatingCenterBaseUrl()}/publisher/operating-center?titleId=${encodeURIComponent(
     primary.titleId || primary.recordId,
   )}&action=${encodeURIComponent(primary.nextAction)}`
+  const actionUrl = currentArtifact.href?.includes('/publisher/operating-center')
+    ? currentArtifact.href
+    : defaultActionUrl
   const notificationState = notificationStateFor(primary, logs)
   const baseActions = primary.allowedActions.length
     ? primary.allowedActions.map((action) => ({
         id: action.id,
         label: action.label,
-        available: !blocker,
-        unavailableReason: blocker ? `Unavailable because ${blocker}` : '',
+        available: !blocker || action.id === 'review_intake',
+        unavailableReason: blocker && action.id !== 'review_intake' ? `Unavailable because ${blocker}` : '',
       }))
     : [{
         id: 'view_only' as PublisherActionId,
@@ -3402,6 +3411,15 @@ function isSyntheticTitle(title: string) {
 
 function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
   const owner = item.actionOwner === 'publisher' ? 'Jackie' : item.executionOwner
+  const actionUrl = `${publisherOperatingCenterBaseUrl()}/publisher/operating-center?titleId=${encodeURIComponent(
+    item.titleId || item.intakeId,
+  )}&action=${encodeURIComponent(item.recommendedNextAction)}${item.diagnosticId ? `&diagnosticId=${encodeURIComponent(item.diagnosticId)}` : ''}`
+  const evidenceLinks = [
+    item.currentBlocker === 'Stage 0 diagnostic awaiting Jackie review'
+      ? { label: 'Stage 0 diagnostic review package', href: actionUrl }
+      : null,
+    item.sharePointLink ? { label: 'Source evidence', href: item.sharePointLink } : null,
+  ].filter((link): link is { label: string; href: string } => Boolean(link))
   return {
     key: `queue:${item.key}`,
     recordId: item.intakeId,
@@ -3435,7 +3453,7 @@ function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
           : 'No active author package',
     qaState: 'Not applicable',
     dependency: item.holdReason || item.currentBlocker,
-    evidenceLinks: item.sharePointLink ? [{ label: 'Source evidence', href: item.sharePointLink }] : [],
+    evidenceLinks,
     allowedActions: item.authorizedActions
       .filter((action) => action.id !== 'view_only')
       .map((action) => ({ id: action.id, label: action.label })),
