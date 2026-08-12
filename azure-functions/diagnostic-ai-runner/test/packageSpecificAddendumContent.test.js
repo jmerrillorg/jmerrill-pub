@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const { buildPackageSpecificAddendumSections, EXCLUDED_PACKAGE_LABELS } = require("../src/agreement/packageSpecificAddendumContent");
 
 describe("buildPackageSpecificAddendumSections — JMP-PKG-PRO", () => {
-  test("returns the Professional package label, services, complimentary copies, and audiobook inclusion", () => {
+  test("returns the Professional package label, services, complimentary copies, and separate-line-item audiobook treatment", () => {
     const result = buildPackageSpecificAddendumSections("JMP-PKG-PRO", { electedProductForms: ["PF-01", "PF-02", "PF-03"] });
     assert.equal(result.ok, true);
     assert.equal(result.packageLabel, "Professional Publishing Package (JMP-PKG-PRO)");
@@ -15,7 +15,7 @@ describe("buildPackageSpecificAddendumSections — JMP-PKG-PRO", () => {
       "Hardcover: 10 copies",
       "Standard Ebook: 1 digital entitlement"
     ]);
-    assert.equal(result.audiobookIncluded, true);
+    assert.equal(result.audiobookIncluded, false);
   });
 
   test("excludes the Starter, Premier, and Children's package sections", () => {
@@ -59,6 +59,7 @@ describe("buildPackageSpecificAddendumSections — undefined content", () => {
       "Hardcover: 15 copies",
       "Standard Ebook: 1 digital entitlement"
     ]);
+    assert.equal(result.audiobookIncluded, true);
   });
 
   test("returns ok:false for an unrecognized package code", () => {

@@ -11,6 +11,7 @@ const {
   fillAudiobookAddendum,
   buildAgreementPreparationExecutionLogPayload,
   TEMPLATE_NAME,
+  ACTIVE_PACKAGE_ADDENDUM_VERSION,
   GATE_NAME
 } = require("../src/agreement/agreementPreparationRunner");
 const { computeAgreementFields } = require("../src/agreement/agreementFieldComputer");
@@ -40,6 +41,14 @@ afterEach(() => {
     if (v === undefined) delete process.env[k];
     else process.env[k] = v;
   }
+});
+
+describe("active agreement stack version", () => {
+  test("uses Publishing Agreement v1.3.1 and Package Addendum v4.1 prospectively", () => {
+    assert.equal(TEMPLATE_NAME.PUBLISHING_AGREEMENT, "JMP_Publishing_Agreement_v1.3.1.docx");
+    assert.equal(TEMPLATE_NAME.PACKAGE_ADDENDUM, "JMP_Publishing_Package_Addendum_v4.1.docx");
+    assert.equal(ACTIVE_PACKAGE_ADDENDUM_VERSION, "4.1");
+  });
 });
 
 function controlledInput(overrides = {}) {
@@ -232,7 +241,7 @@ describe("prepareAgreementDocumentPackage — gate enforcement and validation", 
 });
 
 describe("prepareAgreementDocumentPackage — produces the expected document set for the controlled record", () => {
-  test("Professional Package with 8 payments produces Agreement + Addendum + Audiobook Addendum + Schedule A", async () => {
+  test("Professional Package with 8 payments produces Agreement + Addendum + Schedule A without bundled Audiobook Addendum", async () => {
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     const writes = [];
@@ -243,12 +252,12 @@ describe("prepareAgreementDocumentPackage — produces the expected document set
     }, { writes });
     const result = await prepareAgreementDocumentPackage(controlledInput(), deps);
     assert.equal(result.ok, true);
-    assert.equal(result.audiobookAddendumGenerated, true);
+    assert.equal(result.audiobookAddendumGenerated, false);
     assert.equal(result.scheduleAGenerated, true);
-    assert.equal(result.manifest.documents.length, 4);
+    assert.equal(result.manifest.documents.length, 3);
     assert.ok(writes.some((w) => w.name.includes("Publishing_Agreement_FILLED")));
     assert.ok(writes.some((w) => w.name.includes("Publishing_Package_Addendum_FILLED")));
-    assert.ok(writes.some((w) => w.name.includes("Audiobook_Addendum_FILLED")));
+    assert.ok(!writes.some((w) => w.name.includes("Audiobook_Addendum_FILLED")));
     assert.ok(writes.some((w) => w.name.includes("Schedule_A_Payment_Schedule")));
   });
 
@@ -263,7 +272,7 @@ describe("prepareAgreementDocumentPackage — produces the expected document set
     const result = await prepareAgreementDocumentPackage(controlledInput({ paymentOption: "SINGLE" }), deps);
     assert.equal(result.ok, true);
     assert.equal(result.scheduleAGenerated, false);
-    assert.equal(result.manifest.documents.length, 3);
+    assert.equal(result.manifest.documents.length, 2);
   });
 });
 
@@ -328,7 +337,7 @@ describe("buildAgreementPreparationExecutionLogPayload", () => {
 
   test("states the audiobook addendum and Schedule A decisions", () => {
     const p = buildAgreementPreparationExecutionLogPayload(logInput());
-    assert.ok(p.jm1_actiondescription.includes("Audiobook addendum generated: true"));
+    assert.ok(p.jm1_actiondescription.includes("Audiobook addendum generated: false"));
     assert.ok(p.jm1_actiondescription.includes("Schedule A attachment generated"));
   });
 

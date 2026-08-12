@@ -5,7 +5,7 @@ const AUTHOR_COPY_POLICY = Object.freeze({
   "JMP-PKG-STARTER": Object.freeze({ printAllocation: 5, digitalEntitlement: 1, audioEntitlement: 1 }),
   "JMP-PKG-PRO": Object.freeze({ printAllocation: 10, digitalEntitlement: 1, audioEntitlement: 1 }),
   "JMP-PKG-PREMIER": Object.freeze({ printAllocation: 15, digitalEntitlement: 1, audioEntitlement: 1 }),
-  "JMP-PKG-SIGNATURE": Object.freeze({ printAllocation: 15, digitalEntitlement: 1, audioEntitlement: 1 })
+  "JM-SIGNATURE-TRACK": Object.freeze({ printAllocation: 15, digitalEntitlement: 1, audioEntitlement: 1 })
 });
 
 const PRODUCT_FORM_DELIVERY_CLASS = Object.freeze({

@@ -31,7 +31,7 @@ describe("createLocalTemplateReader", () => {
 describe("createBlobTemplateReader — missing-template and hash-mismatch fail safely", () => {
   test("throws TEMPLATE_MANIFEST_NOT_FOUND when no manifest exists", async () => {
     const reader = createBlobTemplateReader({ downloadBlob: async () => null });
-    await assert.rejects(() => reader("JMP_Publishing_Agreement_v3.docx"), (err) => err.safeCode === "TEMPLATE_MANIFEST_NOT_FOUND");
+    await assert.rejects(() => reader("JMP_Publishing_Agreement_v1.3.1.docx"), (err) => err.safeCode === "TEMPLATE_MANIFEST_NOT_FOUND");
   });
 
   test("throws TEMPLATE_MANIFEST_INVALID when the manifest is not valid JSON", async () => {

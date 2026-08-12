@@ -8,8 +8,8 @@ function baseInput(overrides = {}) {
   return {
     sourceCanonPath: "/Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/Implementation HQ - Architecture/00_CANON/Publishing/Agreements/JMP_Complete_Agreement_Stack_v1",
     files: [
-      { name: "JMP_Publishing_Agreement_v3.docx", sha256: "a".repeat(64), byteLength: 100 },
-      { name: "JMP_Publishing_Package_Addendum_v3.docx", sha256: "b".repeat(64), byteLength: 200 },
+      { name: "JMP_Publishing_Agreement_v1.3.1.docx", sha256: "a".repeat(64), byteLength: 100 },
+      { name: "JMP_Publishing_Package_Addendum_v4.1.docx", sha256: "b".repeat(64), byteLength: 200 },
       { name: "JMP_Audiobook_Addendum_v3.docx", sha256: "c".repeat(64), byteLength: 300 }
     ],
     uploadedAt: "2026-06-22T10:00:00.000Z",
@@ -36,7 +36,7 @@ describe("buildTemplateStackManifest — required fields", () => {
   test("includes each file's name, sha256, and byte length", () => {
     const m = buildTemplateStackManifest(baseInput());
     assert.equal(m.files.length, 3);
-    assert.equal(m.files[0].name, "JMP_Publishing_Agreement_v3.docx");
+    assert.equal(m.files[0].name, "JMP_Publishing_Agreement_v1.3.1.docx");
     assert.equal(m.files[0].sha256, "a".repeat(64));
     assert.equal(m.files[0].byteLength, 100);
   });

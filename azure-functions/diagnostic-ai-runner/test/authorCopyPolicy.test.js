@@ -55,8 +55,8 @@ describe("AUTHOR_COPY_POLICY — elected Product Form entitlement rule", () => {
     ]);
   });
 
-  test("JM Signature — PF-01 + PF-05 + PF-03 returns 15 paperback, 15 large print, and 1 ebook", () => {
-    const result = computeComplimentaryEntitlements("JMP-PKG-SIGNATURE", ["PF-01", "PF-05", "PF-03"]);
+  test("JM Signature track — PF-01 + PF-05 + PF-03 returns 15 paperback, 15 large print, and 1 ebook", () => {
+    const result = computeComplimentaryEntitlements("JM-SIGNATURE-TRACK", ["PF-01", "PF-05", "PF-03"]);
     assert.equal(result.ok, true);
     assert.deepEqual(labels(result), ["Paperback: 15 copies", "Large Print: 15 copies", "Standard Ebook: 1 digital entitlement"]);
   });
@@ -118,8 +118,8 @@ describe("AUTHOR_COPY_POLICY — elected Product Form entitlement rule", () => {
 
 describe("AUTHOR_COPY_POLICY — authority identity", () => {
   test("keeps Premier package and JM Signature track identities distinct", () => {
-    assert.notEqual(AUTHOR_COPY_POLICY["JMP-PKG-PREMIER"], AUTHOR_COPY_POLICY["JMP-PKG-SIGNATURE"]);
-    assert.deepEqual(getComplimentaryAllocation("JMP-PKG-PREMIER"), getComplimentaryAllocation("JMP-PKG-SIGNATURE"));
+    assert.notEqual(AUTHOR_COPY_POLICY["JMP-PKG-PREMIER"], AUTHOR_COPY_POLICY["JM-SIGNATURE-TRACK"]);
+    assert.deepEqual(getComplimentaryAllocation("JMP-PKG-PREMIER"), getComplimentaryAllocation("JM-SIGNATURE-TRACK"));
   });
 
   test("publishes the governed Product Form delivery-class mapping", () => {

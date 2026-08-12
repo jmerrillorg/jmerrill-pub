@@ -47,9 +47,9 @@ const PACKAGE_CONTENT = Object.freeze({
       "Advanced metadata optimization",
       "Author profile page",
       "Launch planning session + marketing guidance",
-      "AI audiobook production (included — no additional fee)"
+      "AI audiobook production (available as a separate line item if selected)"
     ]),
-    audiobookIncluded: true,
+    audiobookIncluded: false,
     estimatedDelivery: "10-12 weeks from manuscript receipt (audiobook: +2-3 weeks)"
   }),
   "JMP-PKG-PREMIER": Object.freeze({

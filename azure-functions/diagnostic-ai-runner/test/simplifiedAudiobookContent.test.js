@@ -4,7 +4,7 @@ const { describe, test } = require("node:test");
 const assert = require("node:assert/strict");
 const { buildSimplifiedAudiobookSection, NARRATION_PATH } = require("../src/agreement/simplifiedAudiobookContent");
 
-describe("buildSimplifiedAudiobookSection — audiobook included (Professional Package)", () => {
+describe("buildSimplifiedAudiobookSection — audiobook included (Premier Package)", () => {
   test("AI narration is the primary election with no additional fee", () => {
     const result = buildSimplifiedAudiobookSection({ packageCode: "JMP-PKG-PRO", audiobookIncludedInPackage: true });
     assert.equal(result.primaryElection, NARRATION_PATH.AI_INCLUDED);

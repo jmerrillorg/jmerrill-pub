@@ -1,0 +1,55 @@
+{
+  "title": "Publishing Package Addendum v4.1 Reconciliation",
+  "lastVerified": "2026-08-12T11:38:36Z",
+  "baselineAddendum": {
+    "path": "Implementation HQ/00_CANON/Publishing/Agreements/JMP_Complete_Agreement_Stack_v1/JMP_Publishing_Package_Addendum_v4.docx",
+    "sha256": "cc5e5a8c2af51f5a2828b34ea548bb51c1cf8922761368776aa5de9245f922b2"
+  },
+  "reconciledAddendum": {
+    "path": "Implementation HQ/00_CANON/Publishing/Agreements/JMP_Complete_Agreement_Stack_v1/JMP_Publishing_Package_Addendum_v4.1.docx",
+    "sha256": "13e5e4a2e9304d611c1f690d3a8a07dcb3609cf58691acee30e4226428369c63"
+  },
+  "agreementCompared": {
+    "path": "Implementation HQ/00_CANON/Publishing/Agreements/JMP_Publishing_Agreement_v1.3.1.docx",
+    "sha256": "8a54fcd2fa8bef7c119c28c1ab88eea57c22e3d51b6aa3bcb0237321df52282f"
+  },
+  "activeAgreementStack": {
+    "publishingAgreement": {
+      "path": "Implementation HQ/00_CANON/Publishing/Agreements/JMP_Complete_Agreement_Stack_v1/JMP_Publishing_Agreement_v1.3.1.docx",
+      "sha256": "8a54fcd2fa8bef7c119c28c1ab88eea57c22e3d51b6aa3bcb0237321df52282f"
+    },
+    "packageAddendum": {
+      "active_package_addendum_version": "4.1",
+      "path": "Implementation HQ/00_CANON/Publishing/Agreements/JMP_Complete_Agreement_Stack_v1/JMP_Publishing_Package_Addendum_v4.1.docx",
+      "sha256": "13e5e4a2e9304d611c1f690d3a8a07dcb3609cf58691acee30e4226428369c63"
+    },
+    "historicalPackageAddendum": {
+      "path": "Implementation HQ/00_CANON/Publishing/Agreements/JMP_Complete_Agreement_Stack_v1/JMP_Publishing_Package_Addendum_v4.docx",
+      "sha256": "cc5e5a8c2af51f5a2828b34ea548bb51c1cf8922761368776aa5de9245f922b2"
+    }
+  },
+  "activePackageSkuMapping": {
+    "Starter Publishing Package": "JMP-PKG-STARTER",
+    "Professional Publishing Package": "JMP-PKG-PRO",
+    "Premier Publishing Package": "JMP-PKG-PREMIER",
+    "JM Signature traditional publishing track": "JM-SIGNATURE-TRACK"
+  },
+  "validation": {
+    "expandedAgreementPackageTemplateTests": "122/122 PASS",
+    "activeAgreementStackGuard": "PASS",
+    "typeCheck": "PASS",
+    "tranche3TitlePfRuntimeGuard": "10/10 PASS",
+    "tranche6CertificationControlledThawGuard": "9/9 PASS",
+    "docxStructuralValidation": "PASS",
+    "fullLibreOfficeRender": "NOT_AVAILABLE_IN_THIS_ENVIRONMENT",
+    "quickLookThumbnail": "PASS"
+  },
+  "boundaries": {
+    "authorFacingSends": 0,
+    "agreementSignatures": 0,
+    "runtimeDeployments": 0,
+    "dataverseMutations": 0,
+    "businessCentralMutations": 0,
+    "websiteDeployments": 0
+  }
+}
