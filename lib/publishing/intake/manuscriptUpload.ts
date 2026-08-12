@@ -1,4 +1,5 @@
 import type { NormalizedPublishingIntake } from './schema'
+import { createHash } from 'node:crypto'
 
 export type ManuscriptUploadCandidate = {
   fileName: string
@@ -32,7 +33,7 @@ export type ManuscriptLinkVerificationResult =
   | { status: 'usable'; manuscriptUrl: string }
   | { status: 'failed'; reason: 'inaccessible_link' | 'invalid_link' | 'unsafe_link' | 'link_check_timeout' }
 
-type ManuscriptFileExtension = 'docx' | 'doc' | 'pdf'
+type ManuscriptFileExtension = 'docx' | 'doc' | 'pdf' | 'md'
 type ManuscriptReviewFlag = 'preferred_editable' | 'cleanup_required' | 'review_only'
 type ManuscriptUploadErrorCode =
   | 'empty_file'
@@ -76,6 +77,7 @@ const EXTENSION_FLAGS: Record<ManuscriptFileExtension, ManuscriptReviewFlag> = {
   docx: 'preferred_editable',
   doc: 'cleanup_required',
   pdf: 'review_only',
+  md: 'preferred_editable',
 }
 
 export function validateManuscriptUploadCandidate(candidate: ManuscriptUploadCandidate): ManuscriptUploadValidation {
@@ -94,7 +96,7 @@ export function validateManuscriptUploadCandidate(candidate: ManuscriptUploadCan
 
   const extension = getAllowedExtension(safeName)
   if (!extension) {
-    return { ok: false, code: 'unsupported_file_type', message: 'Upload a .docx, .doc, or .pdf manuscript file.' }
+    return { ok: false, code: 'unsupported_file_type', message: 'Upload a .docx, .doc, .pdf, or .md manuscript file.' }
   }
 
   return {
@@ -125,12 +127,27 @@ export async function uploadManuscriptToInquiryWorkspace(
       `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}`,
     )
     const uploadFileName = buildUploadFileName(intake.reference, validation.value.fileName)
+    const sourceSha256 = computeSha256(validation.value.bytes)
     const uploaded = await uploadSmallFile(
       context.token,
       context.driveId,
       `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}/${uploadFileName}`,
       validation.value.bytes,
       validation.value.contentType,
+    )
+    const sourceManifestBytes = encodeUtf8Json(buildSourceArtifactManifest({
+      intake,
+      uploaded,
+      uploadFileName,
+      validation,
+      sourceSha256,
+    }))
+    await uploadSmallFile(
+      context.token,
+      context.driveId,
+      `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}/${intake.reference} - source-artifact-manifest.json`,
+      sourceManifestBytes,
+      'application/json',
     )
 
     return {
@@ -225,9 +242,44 @@ export async function verifyShareableManuscriptLink(url: string): Promise<Manusc
 
 export const manuscriptUploadPolicy = {
   maxBytes: MAX_MANUSCRIPT_UPLOAD_BYTES,
-  allowedExtensions: ['.docx', '.doc', '.pdf'],
+  allowedExtensions: ['.docx', '.doc', '.pdf', '.md'],
   flags: EXTENSION_FLAGS,
 } as const
+
+export function buildSourceArtifactManifest(input: {
+  intake: NormalizedPublishingIntake
+  uploaded: GraphDriveItem
+  uploadFileName: string
+  validation: ManuscriptUploadValidation & { ok: true }
+  sourceSha256: string
+}) {
+  return {
+    schema: 'JM1_PUBLISHING_SOURCE_ARTIFACT_MANIFEST_V1',
+    title: input.intake.bookTitle,
+    author: `${input.intake.firstName} ${input.intake.lastName}`.trim(),
+    intakeReference: input.intake.reference,
+    correlationId: input.intake.idempotencyKey,
+    sourceArtifact: {
+      immutable: true,
+      fileName: input.uploadFileName,
+      originalFileName: input.validation.value.fileName,
+      sourceFormat: input.validation.extension,
+      contentType: input.validation.value.contentType || 'application/octet-stream',
+      sizeBytes: input.validation.value.size,
+      sha256: input.sourceSha256,
+      reviewFlag: input.validation.reviewFlag,
+      sharePointItemId: input.uploaded.id,
+      sharePointWebUrl: input.uploaded.webUrl,
+    },
+    provenance: {
+      receivedThrough: 'website-join',
+      route: '/api/publishing/intake',
+      sourceMutationPolicy: 'preserve_original_unchanged',
+      downstreamVersionsMustDeriveFromSource: true,
+    },
+    ingestedAt: new Date().toISOString(),
+  }
+}
 
 function getGraphConfig(): { ok: true; value: GraphConfig } | { ok: false; missing: string[] } {
   const config = {
@@ -450,8 +502,17 @@ function sanitizeFileName(value: string) {
 
 function getAllowedExtension(fileName: string): ManuscriptFileExtension | null {
   const extension = fileName.split('.').pop()?.toLowerCase()
-  if (extension === 'docx' || extension === 'doc' || extension === 'pdf') return extension
+  if (extension === 'docx' || extension === 'doc' || extension === 'pdf' || extension === 'md') return extension
   return null
+}
+
+function computeSha256(bytes: ArrayBuffer) {
+  return createHash('sha256').update(Buffer.from(bytes)).digest('hex')
+}
+
+function encodeUtf8Json(value: unknown) {
+  const encoded = new TextEncoder().encode(JSON.stringify(value, null, 2))
+  return encoded.buffer.slice(encoded.byteOffset, encoded.byteOffset + encoded.byteLength)
 }
 
 function trimSlashes(value: string) {
