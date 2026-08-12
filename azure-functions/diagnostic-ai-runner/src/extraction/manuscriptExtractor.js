@@ -1,5 +1,5 @@
 /**
- * Synthetic-safe manuscript text extractor for DOCX and TXT files.
+ * Synthetic-safe manuscript text extractor for DOCX, TXT, and Markdown files.
  *
  * SAFETY CONTRACT:
  * - Extracted text is held in transient runtime memory only.
@@ -12,6 +12,7 @@
  *
  * Supported file types for this scaffold pass:
  *   .txt  — UTF-8 text read
+ *   .md   — UTF-8 Markdown text read
  *   .docx — DOCX plain-text extraction via mammoth
  *
  * Unsupported (deferred):
@@ -23,7 +24,7 @@
 const { createHash } = require("node:crypto");
 const mammoth = require("mammoth");
 
-const SUPPORTED_TYPES = new Set([".txt", ".docx"]);
+const SUPPORTED_TYPES = new Set([".txt", ".md", ".docx"]);
 
 /**
  * @param {string} ext — normalized lowercase extension e.g. ".txt"
@@ -57,7 +58,7 @@ async function extractManuscript(ext, fileBuffer) {
       sha256: null,
       extractionWarnings: [],
       contentReturned: false,
-      error: `File type '${fileType}' is not supported. Supported types: .txt, .docx`
+      error: `File type '${fileType}' is not supported. Supported types: .txt, .md, .docx`
     };
   }
 
@@ -68,7 +69,7 @@ async function extractManuscript(ext, fileBuffer) {
     let text;
     const warnings = [];
 
-    if (fileType === ".txt") {
+    if (fileType === ".txt" || fileType === ".md") {
       text = fileBuffer.toString("utf8");
     } else if (fileType === ".docx") {
       const result = await mammoth.extractRawText({ buffer: fileBuffer });
@@ -84,7 +85,7 @@ async function extractManuscript(ext, fileBuffer) {
     // Calculate metadata from text; text itself is not returned
     const charCount = text.length;
     const wordCount = text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
-    const lineCount = fileType === ".txt" ? text.split(/\r?\n/).length : null;
+    const lineCount = fileType === ".txt" || fileType === ".md" ? text.split(/\r?\n/).length : null;
 
     // text is discarded here — never returned, never stored, never logged
 

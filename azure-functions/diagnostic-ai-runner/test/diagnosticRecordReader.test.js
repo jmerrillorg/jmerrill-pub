@@ -122,6 +122,12 @@ describe("diagnosticRecordReader — normalizeFileTypeHint", () => {
     assert.equal(normalizeFileTypeHint(".TXT"), ".txt");
   });
 
+  it("normalizes Markdown hints to '.md'", () => {
+    const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
+    assert.equal(normalizeFileTypeHint("md"), ".md");
+    assert.equal(normalizeFileTypeHint(".MARKDOWN"), ".md");
+  });
+
   it("returns null for 'pdf'", () => {
     const { normalizeFileTypeHint } = require("../src/dataverse/diagnosticRecordReader");
     assert.equal(normalizeFileTypeHint("pdf"), null);

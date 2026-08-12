@@ -30,7 +30,7 @@ const QUEUE_STATUS_LABEL = {
 };
 
 const DEFAULT_MAX_ATTEMPTS = 3;
-const SUPPORTED_FILE_TYPES = new Set([".docx", ".txt"]);
+const SUPPORTED_FILE_TYPES = new Set([".docx", ".txt", ".md"]);
 const DIAGNOSTIC_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const INTAKE_REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i;
 const APPROVED_ASSET_STATUS_VALUES = new Set([

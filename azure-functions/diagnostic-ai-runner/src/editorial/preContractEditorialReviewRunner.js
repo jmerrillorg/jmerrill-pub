@@ -747,7 +747,15 @@ async function runEditorialReviewCore(input = {}, deps = {}, options = {}) {
           manuscriptUrl = intakeBody.jm1_manuscripturl;
           const path = new URL(manuscriptUrl).pathname.toLowerCase();
           if (!fileTypeHint) {
-            fileTypeHint = path.endsWith(".pdf") ? ".pdf" : path.endsWith(".doc") ? ".doc" : ".docx";
+            fileTypeHint = path.endsWith(".pdf")
+              ? ".pdf"
+              : path.endsWith(".doc")
+                ? ".doc"
+                : path.endsWith(".md")
+                  ? ".md"
+                  : path.endsWith(".txt")
+                    ? ".txt"
+                    : ".docx";
           }
         }
       }
