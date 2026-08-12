@@ -12,6 +12,7 @@ Last Verified: 2026-08-11
 | `node scripts/catalog_portfolio_layer.test.mjs` | PASS |
 | `node scripts/production_title_contamination_guard.test.mjs` | PASS |
 | `node scripts/publisher_today_read_model.test.mjs` | PASS |
+| `node scripts/publishing_intake_orchestration_autostart.test.mjs` | PASS - 10 / 10 |
 | `node --test scripts/author_payout_enrollment_governance.test.mjs scripts/program002_author_portal_logic.test.mjs scripts/tranche3_title_pf_runtime.test.mjs` | PASS - 26 / 26 |
 | `npm run author-auth-guard` | PASS |
 | `npm run tranche1-commercial-foundation-guard` | PASS |
@@ -29,4 +30,4 @@ Last Verified: 2026-08-11
 - Node warning remains because the local environment is Node 26 while the repository declares Node `>=24 <25`.
 - `npm ci` reported audit warnings; this run did not authorize dependency remediation.
 - Distribution settlement-source reconciliation is blocked pending source documents.
-- Jackie notification delivery was not proven through a live configured delivery channel in this run.
+- Jackie notification delivery was not proven through a live configured delivery channel in this run because relay credentials were unavailable locally.

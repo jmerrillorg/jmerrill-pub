@@ -38,6 +38,7 @@ const STAGE_TYPE_REVIEW = 100000000
 const STAGE_STATUS_IN_PROGRESS = 100000001
 const HEALTH_HEALTHY = 196650000
 const DIAGNOSTIC_STATUS_PENDING = 196650000
+const DIAGNOSTIC_STATUS_AWAITING_JACKIE_REVIEW = 196650004
 const MANUSCRIPT_ASSET_STATUS_APPROVED = 3
 const PROVISIONAL_TITLE_NAMES = new Set(['untitled'])
 const INTERNAL_VISIBILITY_MAILBOX = 'publishing@jmerrill.one'
@@ -120,7 +121,10 @@ export type PublisherQueueItem = {
   title: string
   titleId?: string
   assetId?: string
+  leadId?: string
   opportunityId?: string
+  diagnosticId?: string
+  diagnosticStatus?: string
   contractStatus: string
   paymentStatus: string
   rightsStatus: string
@@ -744,7 +748,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     }
   }
 
-  const [intakes, titles, assets, editorialStages, approvalGates, opportunities, logs, productionProjects, productionTasks] =
+  const [intakes, titles, assets, editorialStages, approvalGates, opportunities, diagnostics, logs, productionProjects, productionTasks] =
     await Promise.all([
     getRecentIntakes(config),
     getRecentTitles(config),
@@ -752,13 +756,14 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     getRecentEditorialStages(config),
     getRecentApprovalGates(config),
     getRecentOpportunities(config),
+    getRecentEditorialDiagnostics(config),
     getRecentExecutionLogs(config),
     getRecentProductionProjects(config),
     getRecentProductionTasks(config),
   ])
 
   const queue = intakes
-    .map((intake) => buildQueueItem(intake, titles, assets, editorialStages, opportunities, logs))
+    .map((intake) => buildQueueItem(intake, titles, assets, editorialStages, opportunities, diagnostics, logs))
     .filter((item) => item.intakeReference)
 
   const proofAssets = queue
@@ -1350,7 +1355,7 @@ export async function logPublisherAuthorResponseAction(input: {
 async function getPublisherIntakeForAction(config: DataverseServerConfig, intakeId: string) {
   const intake = await dataverseFirst(config, 'jm1_publishingintakes', {
     $select:
-      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_intakechannel,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_workspacestatus,jm1_sharepointworkspaceurl,jm1_stage0handoffstatus,_jm1_linkedcontact_value,_jm1_opportunity_value,createdon,modifiedon',
+      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_intakechannel,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_workspacestatus,jm1_sharepointworkspaceurl,jm1_stage0handoffstatus,_jm1_linkedcontact_value,_jm1_linkedlead_value,_jm1_lead_value,_jm1_opportunity_value,createdon,modifiedon',
     $filter: `jm1_publishingintakeid eq ${intakeId}`,
   })
   if (!intake) throw new Error('intake_not_found')
@@ -1364,7 +1369,7 @@ function assertLinkedContact(intake: DataverseRow) {
 async function getRecentIntakes(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1_publishingintakes', {
     $select:
-      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_intakestatus,jm1_workspacestatus,jm1_stageatsubmission,jm1_stage0handoffstatus,jm1_stage0handoffcreated,_jm1_linkedcontact_value,_jm1_opportunity_value,createdon,modifiedon',
+      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_intakestatus,jm1_workspacestatus,jm1_stageatsubmission,jm1_stage0handoffstatus,jm1_stage0handoffcreated,_jm1_stage0diagnostic_value,_jm1_linkedcontact_value,_jm1_linkedlead_value,_jm1_lead_value,_jm1_opportunity_value,createdon,modifiedon',
     $orderby: 'createdon desc',
     $top: '40',
   })
@@ -1415,6 +1420,15 @@ async function getRecentOpportunities(config: DataverseServerConfig) {
   })
 }
 
+async function getRecentEditorialDiagnostics(config: DataverseServerConfig) {
+  return dataverseList(config, 'jm1pub_editorialdiagnostics', {
+    $select:
+      'jm1pub_editorialdiagnosticid,jm1pub_name,jm1pub_diagnosticstatus,_jm1pub_publishingintake_value,createdon,modifiedon',
+    $orderby: 'createdon desc',
+    $top: '100',
+  })
+}
+
 async function getRecentExecutionLogs(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1_executionlogs', {
     $select: 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription,jm1_sourceentity,jm1_sourcerecordid,createdon',
@@ -1447,6 +1461,7 @@ function buildQueueItem(
   assets: DataverseRow[],
   editorialStages: DataverseRow[],
   opportunities: DataverseRow[],
+  diagnostics: DataverseRow[],
   logs: DataverseRow[],
 ): PublisherQueueItem {
   const titleName = stringValue(intake.jm1_projecttitle) || stringValue(intake.jm1_name)
@@ -1458,6 +1473,15 @@ function buildQueueItem(
   const editorialStage = editorialStages.find(
     (row) => asset && dataverseLookupId(row, '_jm1pub_publishingassetid_value') === stringValue(asset.jm1pub_publishingassetid),
   )
+  const diagnosticId = dataverseLookupId(intake, '_jm1_stage0diagnostic_value')
+  const diagnostic = diagnostics.find(
+    (row) =>
+      stringValue(row.jm1pub_editorialdiagnosticid) === diagnosticId ||
+      dataverseLookupId(row, '_jm1pub_publishingintake_value') === stringValue(intake.jm1_publishingintakeid),
+  )
+  const diagnosticStatus = Number(diagnostic?.jm1pub_diagnosticstatus || 0)
+  const stage0AwaitingJackie = diagnosticStatus === DIAGNOSTIC_STATUS_AWAITING_JACKIE_REVIEW
+  const leadId = dataverseLookupId(intake, '_jm1_linkedlead_value') || dataverseLookupId(intake, '_jm1_lead_value')
   const opportunityId = dataverseLookupId(intake, '_jm1_opportunity_value')
   const opportunity = opportunities.find((row) => stringValue(row.opportunityid) === opportunityId)
   const log = logs.find(
@@ -1491,6 +1515,7 @@ function buildQueueItem(
       assetId: stringValue(asset?.jm1pub_publishingassetid),
       hasEvidenceHold,
       hasEditorialStage,
+      stage0AwaitingJackie,
     }),
   )
   const authorizedActions = buildAuthorizedActions(currentBlocker, hasContact)
@@ -1531,7 +1556,10 @@ function buildQueueItem(
     title: titleName,
     titleId,
     assetId: stringValue(asset?.jm1pub_publishingassetid),
+    leadId,
     opportunityId,
+    diagnosticId: stringValue(diagnostic?.jm1pub_editorialdiagnosticid || diagnosticId),
+    diagnosticStatus: dataverseFormatted(diagnostic || {}, 'jm1pub_diagnosticstatus') || '',
     contractStatus: dataverseFormatted(opportunity || {}, 'jm1pub_contractstatus') || (title?._jm1pub_contract_value ? 'Linked' : 'Not confirmed'),
     paymentStatus: dataverseFormatted(opportunity || {}, 'jm1_m6firstpaymentstatus') || 'Not confirmed',
     rightsStatus: hasContact ? 'Contact linked; rights evidence pending publisher review' : 'Contact link missing',
@@ -2361,8 +2389,10 @@ function deriveBlocker(input: {
   assetId?: string
   hasEvidenceHold?: boolean
   hasEditorialStage?: boolean
+  stage0AwaitingJackie?: boolean
 }) {
   if (!input.hasContact) return 'Author contact must be reconciled'
+  if (input.stage0AwaitingJackie) return 'Stage 0 diagnostic awaiting Jackie review'
   if (input.hasEvidenceHold) return 'Evidence hold active'
   if (input.titleId && input.assetId && input.hasEditorialStage) return 'Ready for next editorial scheduling decision'
   if (!input.hasManuscript) return 'Manuscript evidence is missing'
@@ -2383,6 +2413,17 @@ function buildAuthorizedActions(currentBlocker: string, hasContact: boolean): Pu
         label: 'Review intake',
         entryConditions: ['Linked contact exists', 'Manuscript evidence exists'],
         authorFacingConsequence: 'None. This is an internal publisher movement.',
+      },
+    ]
+  }
+
+  if (currentBlocker === 'Stage 0 diagnostic awaiting Jackie review') {
+    return [
+      {
+        id: 'review_intake',
+        label: 'Review Stage 0 diagnostic',
+        entryConditions: ['Stage 0 diagnostic exists', 'Diagnostic status is Awaiting Jackie Review'],
+        authorFacingConsequence: 'None. This is an internal publisher decision gate and does not accept or reject the author.',
       },
     ]
   }

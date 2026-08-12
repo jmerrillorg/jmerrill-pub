@@ -19,6 +19,7 @@ The new-author front door is certified through the repository's governed guard s
 | Title/Product Form runtime guard | PASS |
 | Strong author portal session secret enforcement | PASS |
 | Legacy/current access-code compatibility | PASS |
+| Real new inquiry event-driven routing | PASS WITH NOTIFICATION HOLD |
 
 ## Test Remediation
 
@@ -54,3 +55,20 @@ The governed agreement remains:
 - Attorney review is not an execution blocker for v1.3.1.
 
 No agreement language was modified in this run.
+
+## Real Inquiry Validation
+
+The live `/join` inquiry `JMP-INT-202608-0AOS7L` proved:
+
+- intake created exactly once;
+- Contact created exactly once;
+- Lead created exactly once;
+- internal inquiry workspace created;
+- author acknowledgement sent once;
+- Stage 0 diagnostic handed off and awaiting Jackie review;
+- no Author Workspace activation;
+- no agreement send;
+- no Stripe Connect start;
+- no production movement.
+
+The only hold is Jackie notification delivery proof, because the local execution environment did not have the governed notification relay credentials.

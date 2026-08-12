@@ -21,6 +21,10 @@ Detailed Live Action 006 evidence:
 
 `docs/operations/generated/JMP-REAL-TITLE-PILOT-1-LIVE-ACTION-006-AUTHOR-COVER-APPROVAL-2026-08-11/`
 
+Real new inquiry validation evidence:
+
+`docs/operations/generated/JMP-REAL-INQUIRY-LIVE-VALIDATION-QUANISHA-DOCKERY-2026-08-11/`
+
 ## Files Modified by This Continuation Run
 
 Runtime/test files:
@@ -32,9 +36,11 @@ Runtime/test files:
 - `scripts/catalog_portfolio_layer.test.mjs`
 - `scripts/production_title_contamination_guard.test.mjs`
 - `scripts/program002_author_portal_logic.test.mjs`
+- `scripts/publishing_intake_orchestration_autostart.test.mjs`
 - `scripts/publisher_today_read_model.test.mjs`
 
 Evidence files:
 
 - `docs/operations/generated/JMP-REAL-TITLE-PILOT-1-LIVE-ACTION-006-AUTHOR-COVER-APPROVAL-2026-08-11/`
+- `docs/operations/generated/JMP-REAL-INQUIRY-LIVE-VALIDATION-QUANISHA-DOCKERY-2026-08-11/`
 - `docs/operations/generated/JMP-PUBLISHING-LEVELSET-CONTINUATION-WAVE-A-TO-D-2026-08-11/`

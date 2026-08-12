@@ -45,13 +45,15 @@ The canonical principle remains active:
 
 IF JACKIE MUST ACT, JACKIE MUST KNOW.
 
+This run identified a real Jackie action for `JMP-INT-202608-0AOS7L`: Stage 0 diagnostic `572a89ef-cd95-f111-8076-7c1e525b15c2` is awaiting Jackie review.
+
 This run did not execute a production-safe real Jackie notification delivery. Envelope/model-level notification work is not treated as equivalent to delivered notification evidence.
 
 State:
 
 - Jackie-owned notification design requirement: ACTIVE
 - Real delivery proof in this run: NOT COMPLETED
-- Reason: no governed production-safe Jackie notification delivery was executed during this continuation run.
+- Reason: governed relay credentials were not available in the local execution environment.
 
 ## Automation
 
@@ -59,6 +61,7 @@ State:
 | --- | --- |
 | Safe author-response processing | ACTIVE for bounded response capture/correlation |
 | Title truth read-model classification | UPDATED |
+| New inquiry event-driven processing | OBSERVED / PASS WITH JACKIE NOTIFICATION HOLD |
 | New-author guard certification | PASS |
 | Client-title automation | FROZEN |
 | Real author marketing automation | NOT ACTIVATED |
@@ -67,4 +70,4 @@ State:
 
 ## Next Activation Boundary
 
-The next automation boundary should be a separately governed, production-safe Jackie action notification delivery proof or the next bounded The Intentional Leader Cover Design action. Broad client-title automation remains frozen.
+The next automation boundary should be a production-safe Jackie action notification delivery proof for the live Stage 0 diagnostic or the next bounded The Intentional Leader Cover Design action. Broad client-title automation remains frozen.

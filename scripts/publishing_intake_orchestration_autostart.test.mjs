@@ -104,3 +104,13 @@ test('fresh Stage 0 diagnostic handoffs are eligible for automated editorial rev
   assert.match(runControl, /DIAGNOSTIC_NOT_READY_FOR_EDITORIAL_REVIEW/)
   assert.doesNotMatch(runControl, /DIAGNOSTIC_NOT_AWAITING_PUBLISHER_REVIEW/)
 })
+
+test('live join inquiries preserve lead linkage and surface Stage 0 Jackie review as the human gate', () => {
+  assert.match(publisher, /_jm1_linkedlead_value/)
+  assert.match(publisher, /_jm1_lead_value/)
+  assert.match(publisher, /getRecentEditorialDiagnostics/)
+  assert.match(publisher, /DIAGNOSTIC_STATUS_AWAITING_JACKIE_REVIEW/)
+  assert.match(publisher, /stage0AwaitingJackie/)
+  assert.match(publisher, /Stage 0 diagnostic awaiting Jackie review/)
+  assert.match(publisher, /Review Stage 0 diagnostic/)
+})
