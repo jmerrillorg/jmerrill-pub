@@ -427,12 +427,14 @@ async function executeCloseoutMutations(
   if (!artifact) throw new Error('TITLE_CLOSEOUT_ARTIFACT_MISMATCH')
   const artifactId = stringValue(artifact.jm1pub_editorialartifactid)
   if (!artifactId) throw new Error('TITLE_CLOSEOUT_ARTIFACT_MISMATCH')
+  const stageLabel = closeoutStageLabel(input, readback)
+  const artifactLabel = closeoutArtifactLabel(artifact, input)
   await adapter.patch('jm1pub_editorialartifacts', artifactId, {
     jm1pub_iscurrentapproved: true,
     jm1pub_artifactstatus: ARTIFACT_STATUS_APPROVED,
     jm1pub_visibility: ARTIFACT_VISIBILITY_AUTHOR_FACING,
     jm1pub_approvedon: input.approvalTimestamp,
-    jm1pub_notes: `Approved 275-page proof confirmed by ${input.approvalSource}. Idempotency ${idempotencyKey}.`,
+    jm1pub_notes: `Approved ${stageLabel} artifact confirmed by ${input.approvalSource}. Artifact ${artifactLabel}. Idempotency ${idempotencyKey}.`,
   })
   for (const intermediateId of input.incompleteIntermediateArtifactIds || []) {
     await adapter.patch('jm1pub_editorialartifacts', intermediateId, {
@@ -440,7 +442,7 @@ async function executeCloseoutMutations(
       jm1pub_artifactstatus: ARTIFACT_STATUS_SUPERSEDED,
       jm1pub_visibility: ARTIFACT_VISIBILITY_INTERNAL,
       jm1pub_supersededon: now,
-      jm1pub_notes: `INCOMPLETE_LAYOUT_INTERMEDIATE. NOT CURRENT PRODUCTION AUTHORITY. Reclassified during title closeout ${idempotencyKey}.`,
+      jm1pub_notes: `INCOMPLETE_STAGE_INTERMEDIATE. NOT CURRENT ${stageLabel.toUpperCase()} AUTHORITY. Reclassified during title closeout ${idempotencyKey}.`,
     })
   }
   for (const obsoleteId of input.obsoleteArtifactIds || []) {
@@ -449,14 +451,14 @@ async function executeCloseoutMutations(
       jm1pub_supersededon: now,
       jm1pub_artifactstatus: ARTIFACT_STATUS_SUPERSEDED,
       jm1pub_visibility: ARTIFACT_VISIBILITY_INTERNAL,
-      jm1pub_notes: `Superseded by approved 275-page proof ${input.approvedArtifactChecksum}. Idempotency ${idempotencyKey}.`,
+      jm1pub_notes: `Superseded by approved ${stageLabel} artifact ${input.approvedArtifactChecksum}. Idempotency ${idempotencyKey}.`,
     })
   }
   await adapter.patch('jm1pub_editorialapprovalgates', input.gateId, {
     jm1pub_gatestatus: GATE_STATUS_APPROVED,
     jm1pub_authordecision: AUTHOR_DECISION_APPROVE,
     jm1pub_authordecisionon: input.approvalTimestamp,
-    jm1pub_authorresponsesummary: 'Author approved the 275-page pagination-corrected Interior Layout proof. No response clock required because the author already responded.',
+    jm1pub_authorresponsesummary: `Author approved the current ${stageLabel} artifact/version. No response clock required because the author already responded.`,
     jm1pub_authordecisionsource: input.approvalSource.slice(0, 100),
     jm1pub_nextstageauthorized: true,
     jm1pub_nextstageauthorizedon: now,
@@ -465,15 +467,15 @@ async function executeCloseoutMutations(
     jm1pub_stagestatus: STAGE_STATUS_COMPLETE,
     jm1pub_stagecompletedate: now,
     jm1pub_currentgatecount: 0,
-    jm1pub_internaloperationalsummary: `Interior Layout closed as approved. Next stage: ${input.nextStage}. No author communication sent. No response clock created. Idempotency ${idempotencyKey}.`,
+    jm1pub_internaloperationalsummary: `${stageLabel} closed as approved. Next stage: ${input.nextStage}. No author communication sent. No response clock created. Idempotency ${idempotencyKey}.`,
     jm1pub_correlationid: idempotencyKey,
   })
   const executionLog = await adapter.create('jm1_executionlogs', {
     jm1_name: `${TITLE_CLOSEOUT_OPERATION_VERSION} - ${idempotencyKey}`,
     jm1_actiontype: TITLE_CLOSEOUT_OPERATION_VERSION,
     jm1_actiondescription: [
-      'Closed approved Interior Layout stage for The Intentional Leader.',
-      `Approved proof checksum ${input.approvedArtifactChecksum}.`,
+      `Closed approved ${stageLabel} stage for title ${input.titleId}.`,
+      `Approved artifact checksum ${input.approvedArtifactChecksum}.`,
       `Next stage ${input.nextStage}.`,
       'No email sent. No gate created. No response clock created.',
     ].join(' '),
@@ -487,6 +489,23 @@ async function executeCloseoutMutations(
     jm1_sourcerecordid: input.gateId,
   })
   return extractId(executionLog)
+}
+
+function closeoutStageLabel(input: PublishingTitleCloseoutRequest, readback: PublishingTitleCloseoutReadback) {
+  return (
+    input.expectedCurrentStage ||
+    stringValue(readback.stage?.jm1pub_name) ||
+    dataverseFormatted(readback.stage || {}, 'jm1pub_stagetype') ||
+    'current stage'
+  ).replace(/_/g, ' ')
+}
+
+function closeoutArtifactLabel(artifact: DataverseRow, input: PublishingTitleCloseoutRequest) {
+  return (
+    stringValue(artifact.jm1pub_editorialartifactname) ||
+    stringValue(artifact.jm1pub_filename) ||
+    input.approvedArtifactId
+  )
 }
 
 function extractId(value: string) {

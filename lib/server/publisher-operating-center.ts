@@ -253,6 +253,8 @@ export type PublisherPortfolioItem = {
 export type PublisherTodayItem = {
   key: string
   recordId: string
+  intakeId?: string
+  diagnosticId?: string
   titleId: string
   title: string
   author: string
@@ -334,6 +336,8 @@ export type PublisherTitleOperatingStage = {
 export type PublisherTitleOperatingCard = {
   key: string
   titleId: string
+  intakeId?: string
+  diagnosticId?: string
   title: string
   author: string
   stageId: string
@@ -398,6 +402,8 @@ export type JackieActionRequiredNotificationEvent = {
   division: 'J Merrill Publishing'
   application: 'Publisher Operating Center'
   titleId: string
+  intakeId?: string
+  diagnosticId?: string
   title: string
   author: string
   actionType: string
@@ -792,6 +798,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
   const titleOperatingView = buildTitleOperatingView({
     generatedAt: today.generatedAt,
     today,
+    queue,
     workload,
     portfolio,
     productionCommand,
@@ -1480,7 +1487,6 @@ function buildQueueItem(
       dataverseLookupId(row, '_jm1pub_publishingintake_value') === stringValue(intake.jm1_publishingintakeid),
   )
   const diagnosticStatus = Number(diagnostic?.jm1pub_diagnosticstatus || 0)
-  const stage0AwaitingJackie = diagnosticStatus === DIAGNOSTIC_STATUS_AWAITING_JACKIE_REVIEW
   const leadId = dataverseLookupId(intake, '_jm1_linkedlead_value') || dataverseLookupId(intake, '_jm1_lead_value')
   const opportunityId = dataverseLookupId(intake, '_jm1_opportunity_value')
   const opportunity = opportunities.find((row) => stringValue(row.opportunityid) === opportunityId)
@@ -1492,7 +1498,8 @@ function buildQueueItem(
   const sourceLocation = stringValue(intake.jm1_manuscripturl || intake.jm1_submissionurl)
   const hasManuscript = intake.jm1_manuscriptreceived === true || Boolean(sourceLocation)
   const hasContact = Boolean(dataverseLookupId(intake, '_jm1_linkedcontact_value'))
-  const currentStage = dataverseFormatted(title || {}, 'jm1pub_stage') || 'Inquiry'
+  const stage0RequiresJackie = stage0RequiresJackieGate(diagnostic, { hasManuscript })
+  const currentStage = dataverseFormatted(title || {}, 'jm1pub_stage') || 'Intake'
   const latestActionType = stringValue(log?.jm1_actiontype)
   const hasEvidenceHold = latestActionType === 'PUBLISHER_INTAKE_EVIDENCE_HOLD_PLACED' && !hasManuscript
   const hasEditorialStage = Boolean(editorialStage) || latestActionType === 'PUBLISHER_EDITORIAL_REVIEW_INITIALIZED'
@@ -1515,7 +1522,7 @@ function buildQueueItem(
       assetId: stringValue(asset?.jm1pub_publishingassetid),
       hasEvidenceHold,
       hasEditorialStage,
-      stage0AwaitingJackie,
+      stage0RequiresJackie,
     }),
   )
   const authorizedActions = buildAuthorizedActions(currentBlocker, hasContact)
@@ -1535,6 +1542,8 @@ function buildQueueItem(
             currentBlocker === 'Ready for next editorial scheduling decision'
           ) && hasContact && hasManuscript
           ? 'system'
+          : currentBlocker === 'Manuscript evidence is missing'
+            ? 'author'
           : authorizedActions.some((action) => action.id !== 'view_only')
             ? 'publisher'
             : 'system'
@@ -2389,16 +2398,32 @@ function deriveBlocker(input: {
   assetId?: string
   hasEvidenceHold?: boolean
   hasEditorialStage?: boolean
-  stage0AwaitingJackie?: boolean
+  stage0RequiresJackie?: boolean
 }) {
   if (!input.hasContact) return 'Author contact must be reconciled'
-  if (input.stage0AwaitingJackie) return 'Stage 0 diagnostic awaiting Jackie review'
   if (input.hasEvidenceHold) return 'Evidence hold active'
-  if (input.titleId && input.assetId && input.hasEditorialStage) return 'Ready for next editorial scheduling decision'
   if (!input.hasManuscript) return 'Manuscript evidence is missing'
+  if (input.stage0RequiresJackie) return 'Stage 0 diagnostic requires publisher review'
+  if (input.titleId && input.assetId && input.hasEditorialStage) return 'Ready for next editorial scheduling decision'
   if (!input.titleId || !input.assetId) return 'Editorial Review automation pending'
   if (!input.hasEditorialStage) return 'Editorial Review ready'
   return 'Ready for next editorial scheduling decision'
+}
+
+function stage0RequiresJackieGate(diagnostic: DataverseRow | undefined, input: { hasManuscript: boolean }) {
+  if (!diagnostic || !input.hasManuscript) return false
+  const status = Number(diagnostic.jm1pub_diagnosticstatus || 0)
+  if (status !== DIAGNOSTIC_STATUS_AWAITING_JACKIE_REVIEW) return false
+  return Boolean(
+    diagnostic.jm1pub_legalflag === true ||
+      diagnostic.jm1pub_rightsconcernflag === true ||
+      diagnostic.jm1pub_hardstopflag === true ||
+      diagnostic.jm1pub_ethicsflag === true ||
+      diagnostic.jm1pub_brandmisalignmentflag === true ||
+      diagnostic.jm1pub_secondaryauthorizationrequired === true ||
+      diagnostic.jm1pub_signaturereviewrequired === true ||
+      diagnostic.jm1_diagnosticrequireshumanreview === true && Boolean(diagnostic.jm1_diagnosticoutputsummary || diagnostic.jm1_diagnosticstructuredoutputjson),
+  )
 }
 
 function isProvisionalTitleName(value: string) {
@@ -2417,12 +2442,12 @@ function buildAuthorizedActions(currentBlocker: string, hasContact: boolean): Pu
     ]
   }
 
-  if (currentBlocker === 'Stage 0 diagnostic awaiting Jackie review') {
+  if (currentBlocker === 'Stage 0 diagnostic requires publisher review') {
     return [
       {
         id: 'review_intake',
         label: 'Review Stage 0 diagnostic',
-        entryConditions: ['Stage 0 diagnostic exists', 'Diagnostic status is Awaiting Jackie Review'],
+        entryConditions: ['Stage 0 diagnostic exists', 'Diagnostic result contains a publisher-reserved review condition'],
         authorFacingConsequence: 'None. This is an internal publisher decision gate and does not accept or reject the author.',
       },
     ]
@@ -2939,6 +2964,7 @@ function buildPublisherToday(input: {
 function buildTitleOperatingView(input: {
   generatedAt: string
   today: PublisherTodaySnapshot
+  queue: PublisherQueueItem[]
   workload: PublisherWorkloadItem[]
   portfolio: PublisherPortfolioItem[]
   productionCommand: PublisherOperatingCenterSnapshot['productionCommand']
@@ -2946,6 +2972,9 @@ function buildTitleOperatingView(input: {
   logs?: DataverseRow[]
 }): PublisherTitleOperatingView {
   const stages = deriveTitleOperatingStages(input)
+  const unslicedJackieQueueItems = input.queue
+    .filter((item) => item.actionOwner === 'publisher')
+    .map(queueToTodayItem)
   const allTodayItems = [
     ...input.today.waitingForJackie,
     ...input.today.waitingForAuthors,
@@ -2953,6 +2982,7 @@ function buildTitleOperatingView(input: {
     ...input.today.productionQueue,
     ...input.today.distributionCatalogQueue,
     ...input.today.alerts,
+    ...unslicedJackieQueueItems,
   ]
   const byTitle = new Map<string, PublisherTodayItem[]>()
   for (const item of allTodayItems) {
@@ -2994,7 +3024,7 @@ function jackieActionNotificationForCard(
   card: PublisherTitleOperatingCard,
   createdAt: string,
 ): JackieActionRequiredNotificationEvent {
-  const sourceRecord = card.titleId || card.key
+  const sourceRecord = card.titleId || card.intakeId || card.key
   const idempotencyKey = `jackie-action:${sourceRecord}:${card.stageId}:${card.nextAction}`
   return {
     eventId: stableEventId(idempotencyKey),
@@ -3002,6 +3032,8 @@ function jackieActionNotificationForCard(
     division: 'J Merrill Publishing',
     application: 'Publisher Operating Center',
     titleId: card.titleId,
+    intakeId: card.intakeId,
+    diagnosticId: card.diagnosticId,
     title: card.title,
     author: card.author,
     actionType: card.actions[0]?.id || 'view_only',
@@ -3009,7 +3041,7 @@ function jackieActionNotificationForCard(
     whyRequired: card.jackieDecision?.why || card.blocker || 'Publisher authority is required.',
     priority: card.urgency,
     dueAt: card.targetDate,
-    operatingCenterUrl: card.jackieDecision?.operatingCenterUrl || `/publisher/operating-center?titleId=${encodeURIComponent(card.titleId)}`,
+    operatingCenterUrl: card.jackieDecision?.operatingCenterUrl || `/publisher/operating-center?${card.titleId ? `titleId=${encodeURIComponent(card.titleId)}` : `intakeId=${encodeURIComponent(card.intakeId || card.key)}`}`,
     sourceStage: card.stageLabel,
     sourceRecord,
     createdAt,
@@ -3081,16 +3113,23 @@ function titleItemsToOperatingCard(
   const titleResponse = authorResponses.find((item) => normalizeTitle(item.title) === normalizeTitle(primary.title))
   const currentArtifact = bestEvidenceLink(primary)
   const liveClassification = isSyntheticTitle(primary.title) ? 'TEST_CERTIFICATION' : 'LIVE'
-  const actionUrl = `${publisherOperatingCenterBaseUrl()}/publisher/operating-center?titleId=${encodeURIComponent(
-    primary.titleId || primary.recordId,
-  )}&action=${encodeURIComponent(primary.nextAction)}`
+  const deepLinkParams = new URLSearchParams()
+  if (primary.titleId) deepLinkParams.set('titleId', primary.titleId)
+  else if (primary.intakeId) deepLinkParams.set('intakeId', primary.intakeId)
+  else deepLinkParams.set('recordId', primary.recordId)
+  if (primary.diagnosticId) deepLinkParams.set('diagnosticId', primary.diagnosticId)
+  deepLinkParams.set('action', primary.nextAction)
+  const defaultActionUrl = `${publisherOperatingCenterBaseUrl()}/publisher/operating-center?${deepLinkParams.toString()}`
+  const actionUrl = currentArtifact.href?.includes('/publisher/operating-center')
+    ? currentArtifact.href
+    : defaultActionUrl
   const notificationState = notificationStateFor(primary, logs)
   const baseActions = primary.allowedActions.length
     ? primary.allowedActions.map((action) => ({
         id: action.id,
         label: action.label,
-        available: !blocker,
-        unavailableReason: blocker ? `Unavailable because ${blocker}` : '',
+        available: !blocker || action.id === 'review_intake',
+        unavailableReason: blocker && action.id !== 'review_intake' ? `Unavailable because ${blocker}` : '',
       }))
     : [{
         id: 'view_only' as PublisherActionId,
@@ -3113,7 +3152,9 @@ function titleItemsToOperatingCard(
 
   return {
     key: `title:${primary.titleId || primary.recordId || primary.key}`,
-    titleId: primary.titleId || primary.recordId,
+    titleId: primary.titleId,
+    intakeId: primary.intakeId,
+    diagnosticId: primary.diagnosticId,
     title: primary.title,
     author: primary.author,
     stageId: stage.id,
@@ -3290,7 +3331,7 @@ async function writeJackieNotificationFailure(config: DataverseServerConfig, eve
 }
 
 function notificationStateFor(item: PublisherTodayItem, logs: DataverseRow[]) {
-  const sourceRecord = item.titleId || item.recordId
+  const sourceRecord = item.titleId || item.intakeId || item.recordId
   const idempotencyKey = `jackie-action:${sourceRecord}:${canonicalStageId(`${item.editorialStage} ${item.pipelineStage} ${item.nextAction}`)}:${item.nextAction}`
   const evidence = logs.find((log) => {
     const actionType = stringValue(log.jm1_actiontype)
@@ -3402,9 +3443,23 @@ function isSyntheticTitle(title: string) {
 
 function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
   const owner = item.actionOwner === 'publisher' ? 'Jackie' : item.executionOwner
+  const params = new URLSearchParams()
+  if (item.titleId) params.set('titleId', item.titleId)
+  else params.set('intakeId', item.intakeId)
+  if (item.diagnosticId) params.set('diagnosticId', item.diagnosticId)
+  params.set('action', item.recommendedNextAction)
+  const actionUrl = `${publisherOperatingCenterBaseUrl()}/publisher/operating-center?${params.toString()}`
+  const evidenceLinks = [
+    item.currentBlocker === 'Stage 0 diagnostic requires publisher review'
+      ? { label: 'Stage 0 diagnostic review package', href: actionUrl }
+      : null,
+    item.sharePointLink ? { label: 'Source evidence', href: item.sharePointLink } : null,
+  ].filter((link): link is { label: string; href: string } => Boolean(link))
   return {
     key: `queue:${item.key}`,
     recordId: item.intakeId,
+    intakeId: item.intakeId,
+    diagnosticId: item.diagnosticId,
     titleId: item.titleId || '',
     title: item.title,
     author: item.authorName || item.authorEmail || 'Author pending',
@@ -3435,7 +3490,7 @@ function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
           : 'No active author package',
     qaState: 'Not applicable',
     dependency: item.holdReason || item.currentBlocker,
-    evidenceLinks: item.sharePointLink ? [{ label: 'Source evidence', href: item.sharePointLink }] : [],
+    evidenceLinks,
     allowedActions: item.authorizedActions
       .filter((action) => action.id !== 'view_only')
       .map((action) => ({ id: action.id, label: action.label })),
