@@ -76,14 +76,14 @@ function createMockClient({ gateOverrides = {}, existingLog = null } = {}) {
   };
 }
 
-async function runOne({ gateOverrides = {}, replyOverrides = {}, existingLog = null, acknowledgement = null } = {}) {
+async function runOne({ gateOverrides = {}, replyOverrides = {}, existingLog = null, acknowledgement = null, readReply = null } = {}) {
   const client = createMockClient({ gateOverrides, existingLog });
   const result = await runAuthorReviewResponseConsumer(
     { maxGates: 1 },
     {
       client,
       acknowledgement,
-      readReply: async () => createReply(replyOverrides)
+      readReply: readReply || (async () => createReply(replyOverrides))
     }
   );
   return { client, result };
@@ -248,6 +248,68 @@ test("source text documents no Publisher button or Cody session in the normal pa
 test("pilot title reply is captured through the same pathway", async () => {
   const { result } = await runOne({ gateOverrides: { jm1pub_titleidentifier: "JMP-INT-202607-0W5PTQ" } });
   assert.equal(result.results[0].outcome, "APPROVAL_PERSISTED");
+});
+
+test("Intentional Leader Cover Design approval uses the cover-review subject instead of stale proofreading probe", async () => {
+  let observedSubjectProbe = "";
+  const { client, result } = await runOne({
+    gateOverrides: {
+      jm1pub_editorialapprovalgatename: "Cover Design Approval - The Intentional Leader",
+      jm1pub_gatecode: "A6_COVER_DESIGN_APPROVAL",
+      jm1pub_titleidentifier: "JMP-INT-202607-0W5PTQ",
+      jm1pub_packageid: "01DF3SEQPUVB43XHNY4FDJVGVK2W3APMJI",
+      jm1pub_outboundmessageid: "outbound-cover-review-message-001",
+      jm1pub_threadid: "cover-review-conversation-001"
+    },
+    replyOverrides: {
+      inboundMessageId: "AAMk-live-cover-approval",
+      internetMessageId: "<live-cover-approval@jmerrill.one>",
+      conversationId: "cover-review-conversation-001",
+      inReplyToMessageId: "outbound-cover-review-message-001",
+      references: ["outbound-cover-review-message-001"],
+      subject: "Re: Cover Design Review - The Intentional Leader",
+      receivedDateTime: "2026-08-11T08:12:54Z",
+      bodyText: "Approved"
+    },
+    readReply: async (input) => {
+      observedSubjectProbe = input.subjectContains;
+      return createReply({
+        inboundMessageId: "AAMk-live-cover-approval",
+        internetMessageId: "<live-cover-approval@jmerrill.one>",
+        conversationId: "cover-review-conversation-001",
+        inReplyToMessageId: "outbound-cover-review-message-001",
+        references: ["outbound-cover-review-message-001"],
+        subject: "Re: Cover Design Review - The Intentional Leader",
+        receivedDateTime: "2026-08-11T08:12:54Z",
+        bodyText: "Approved"
+      });
+    }
+  });
+
+  assert.equal(observedSubjectProbe, "Cover Design Review");
+  assert.equal(result.results[0].outcome, "APPROVAL_PERSISTED");
+  assert.ok(client.calls.patched.some((call) => call.payload.jm1pub_authordecision === 196650000));
+});
+
+test("open-gate query only selects deployed approval-gate schema fields", async () => {
+  const requested = {};
+  const client = {
+    async first() {
+      return null;
+    },
+    async list(_entitySet, query) {
+      Object.assign(requested, query);
+      return [];
+    }
+  };
+  await runAuthorReviewResponseConsumer({ maxGates: 1 }, { client, readReply: async () => createReply() });
+  const select = requested.$select || "";
+  for (const field of ["jm1pub_editorialapprovalgateid", "jm1pub_editorialapprovalgatename", "_jm1pub_titleid_value", "modifiedon"]) {
+    assert.match(select, new RegExp(`\\b${field}\\b`));
+  }
+  assert.doesNotMatch(select, /\bjm1pub_authoremail\b/);
+  assert.doesNotMatch(select, /\bjm1pub_packageid\b/);
+  assert.doesNotMatch(select, /\bjm1pub_outboundmessageid\b/);
 });
 
 test("normal governed title reply is captured through the same pathway", async () => {

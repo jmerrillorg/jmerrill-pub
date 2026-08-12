@@ -135,6 +135,7 @@ export type AuthorPackageNotificationInput = {
     from: string
     to: string
     replyTo: string
+    cc?: string[]
     bcc: string[]
   }
   correlationId: string
@@ -297,11 +298,15 @@ export function validateAuthorNotificationHeaders(input: {
   from: string
   to: string
   replyTo?: string
+  cc?: string[]
   bcc: string[]
 }): { ok: true } | { ok: false; blocker: string } {
   const from = input.from.trim().toLowerCase()
+  const to = input.to.trim().toLowerCase()
   const replyTo = (input.replyTo || '').trim().toLowerCase()
+  const cc = input.cc?.map((address) => address.trim().toLowerCase()).filter(Boolean) || []
   const bcc = input.bcc.map((address) => address.trim().toLowerCase())
+  const publishingCopy = AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy
 
   if (from !== AUTHOR_PUBLISHING_COMMUNICATION_POLICY.transactionalFromAddress) {
     return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - SENDER_NOT_APPROVED' }
@@ -315,8 +320,14 @@ export function validateAuthorNotificationHeaders(input: {
   if (replyTo.endsWith('@email.jmerrill.one')) {
     return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_DOMAIN_NOT_RECEIVING_MAIL' }
   }
-  if (!bcc.includes(AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy)) {
-    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_ARCHIVE_BCC_MISSING' }
+  if (to !== publishingCopy && !cc.includes(publishingCopy)) {
+    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_CC_MISSING' }
+  }
+  if (cc.filter((recipient) => recipient === publishingCopy).length > 1) {
+    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - DUPLICATE_PUBLISHING_CC' }
+  }
+  if (bcc.includes(publishingCopy)) {
+    return { ok: false, blocker: 'AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_COPY_MUST_BE_CC' }
   }
   return { ok: true }
 }
@@ -431,6 +442,7 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
   from: string
   to: string
   replyTo: string
+  cc?: string[]
   bcc: string[]
   subject: string
   textBody: string
@@ -441,6 +453,7 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
     from: input.from,
     to: input.to,
     replyTo: input.replyTo,
+    cc: input.cc,
     bcc: input.bcc,
   })
   if (!headerValidation.ok) throw new Error(headerValidation.blocker)
@@ -466,6 +479,7 @@ export async function sendAuthorPackageNotificationViaAcs(input: {
     },
     recipients: {
       to: [{ address: input.to }],
+      cc: Array.from(new Set((input.cc || []).map((address) => address.trim().toLowerCase()).filter(Boolean))).map((address) => ({ address })),
       bcc: input.bcc.map((address) => ({ address })),
     },
     attachments: input.attachments

@@ -12,6 +12,8 @@ const requiredPatterns = [
   '/^editorial_/i',
   '/^proofreading_/i',
   '/^package_/i',
+  '/^jm1\\b/i',
+  '/\\bsynthetic\\b/i',
 ]
 
 const expectations = [
@@ -19,7 +21,9 @@ const expectations = [
     name: 'catalog classifier exposes production title contamination guard',
     ok:
       classifier.includes('isProductionTitleContaminant') &&
-      classifier.includes('Production Test Contamination') &&
+      classifier.includes('Synthetic / Test') &&
+      classifier.includes('Certification') &&
+      classifier.includes('Non-Title Operational Artifact') &&
       requiredPatterns.every((pattern) => classifier.includes(pattern)),
   },
   {

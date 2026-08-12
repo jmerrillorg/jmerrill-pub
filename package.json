@@ -43,6 +43,7 @@
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",
     "author-communication-brand-guard": "node --test scripts/author_communication_brand_guard.test.mjs",
     "author-facing-html-render-enforcement-guard": "node --test scripts/author_facing_html_render_enforcement.test.mjs",
+    "author-facing-email-cc-canon-guard": "node --test scripts/author_facing_email_cc_canon.test.mjs",
     "jm1-bootstrap": "node scripts/jm1_bootstrap.mjs",
     "jm1-bootstrap-guard": "node --test scripts/jm1_bootstrap_guard.test.mjs",
     "jm1-canon-consistency-guard": "node --test scripts/jm1_canon_consistency_guard.test.mjs",

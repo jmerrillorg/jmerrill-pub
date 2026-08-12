@@ -70,7 +70,6 @@ function validPayload(overrides = {}) {
     intakeReferenceCode: "JMP-INT-202606-UFYG60",
     to: "chosen2k7@gmail.com",
     toDisplayName: "Jackie Smith Jr.",
-    bcc: "publishing@jmerrill.one",
     replyTo: "publishing@jmerrill.one",
     subject: "Agreement package for Establishing Glory: The Library",
     bodyText: "Hi Jackie, attached is your agreement package for review and signature.",
@@ -93,15 +92,19 @@ test("rejects a recipient at @jmerrill.pub", () => {
   assert.equal(result.reason, "JMERRILL_PUB_MAILBOX_NOT_ALLOWED");
 });
 
-test("rejects visible archive copies and requires internal visibility bcc", () => {
+test("injects Publishing CC and rejects unapproved CC recipients", () => {
   const { validateAgreementPackageSendPayload } = loadAgreementPackageModule();
+  const valid = validateAgreementPackageSendPayload(validPayload());
+  assert.equal(valid.ok, true);
+  assert.equal(JSON.stringify(valid.value.cc), JSON.stringify(["publishing@jmerrill.one"]));
+
   const result = validateAgreementPackageSendPayload(validPayload({ cc: "someone-else@jmerrill.one" }));
   assert.equal(result.ok, false);
-  assert.equal(result.reason, "VISIBLE_ARCHIVE_COPY_NOT_ALLOWED");
+  assert.equal(result.reason, "UNAPPROVED_CC_RECIPIENT_PRESENT");
 
-  const missingBcc = validateAgreementPackageSendPayload(validPayload({ bcc: "" }));
-  assert.equal(missingBcc.ok, false);
-  assert.equal(missingBcc.reason, "BCC_MUST_BE_INTERNAL_VISIBILITY_MAILBOX");
+  const deduped = validateAgreementPackageSendPayload(validPayload({ cc: ["Publishing@JMERRILL.ONE", "publishing@jmerrill.one"] }));
+  assert.equal(deduped.ok, true);
+  assert.equal(JSON.stringify(deduped.value.cc), JSON.stringify(["publishing@jmerrill.one"]));
 });
 
 test("rejects when replyTo is not the internal visibility mailbox", () => {
@@ -171,7 +174,7 @@ test("validateAttachments — rejects missing attachment content", () => {
   assert.equal(result.reason, "ATTACHMENT_CONTENT_MISSING");
 });
 
-test("buildAgreementPackageSendEmail — sender, replyTo, hidden archive bcc, and attachments are correct", () => {
+test("buildAgreementPackageSendEmail — sender, replyTo, Publishing CC, and attachments are correct", () => {
   const { validateAgreementPackageSendPayload, buildAgreementPackageSendEmail } = loadAgreementPackageModule();
   const validation = validateAgreementPackageSendPayload(validPayload());
   const email = buildAgreementPackageSendEmail(validation.value);
@@ -179,17 +182,17 @@ test("buildAgreementPackageSendEmail — sender, replyTo, hidden archive bcc, an
   assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
   assert.equal(email.replyTo[0].address, "publishing@jmerrill.one");
   assert.equal(email.recipients.to[0].address, "chosen2k7@gmail.com");
-  assert.equal(email.recipients.cc, undefined);
-  assert.equal(email.recipients.bcc[0].address, "publishing@jmerrill.one");
+  assert.equal(email.recipients.cc[0].address, "publishing@jmerrill.one");
+  assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
   assert.equal(email.attachments.length, 4);
   assert.ok(email.attachments.every((a) => a.contentType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
 });
 
-test("buildAgreementPackageSendEmail — never exposes the archive copy through cc", () => {
+test("buildAgreementPackageSendEmail — preserves one effective Publishing CC", () => {
   const { validateAgreementPackageSendPayload, buildAgreementPackageSendEmail } = loadAgreementPackageModule();
   const validation = validateAgreementPackageSendPayload(validPayload());
   const email = buildAgreementPackageSendEmail(validation.value);
-  assert.equal(email.recipients.cc, undefined);
+  assert.equal(JSON.stringify(email.recipients.cc.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
 });
 
 test("the route is registered as send-agreement-package, POST only, anonymous authLevel (relay key is the real gate)", () => {

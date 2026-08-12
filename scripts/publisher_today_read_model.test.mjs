@@ -44,7 +44,7 @@ const expectations = [
       server.includes('function buildPublisherToday') &&
       server.includes('queue.map(queueToTodayItem)') &&
       server.includes('workload.map(workloadToTodayItem)') &&
-      server.includes('portfolio.map(portfolioToTodayItem)') &&
+      server.includes('filter(includePortfolioItemInDefaultToday).map(portfolioToTodayItem)') &&
       server.includes('logToMovementTodayItem'),
   },
   {
@@ -67,7 +67,9 @@ const expectations = [
   {
     name: 'catalog queue remains exception-oriented rather than dumping all published titles into daily work',
     ok:
-      server.includes("item.portfolioState !== 'published_catalog'") &&
+      server.includes("item.portfolioState === 'reconciliation_required'") &&
+      server.includes("item.portfolioState === 'manual_recovery'") &&
+      server.includes('includePortfolioItemInDefaultToday') &&
       server.includes("item.dependency.includes('ISBN')") &&
       client.includes('Exceptions only'),
   },

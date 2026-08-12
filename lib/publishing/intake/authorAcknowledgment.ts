@@ -1,4 +1,5 @@
 import type { NormalizedPublishingIntake } from './schema'
+import { PUBLISHING_EMAIL_CANON, ensurePublishingAuthorEmailCc } from '@/lib/server/publishing-email-canon'
 
 type AuthorAcknowledgmentResult =
   | { status: 'sent' }
@@ -43,6 +44,8 @@ function buildAuthorAcknowledgmentPayload(intake: NormalizedPublishingIntake) {
   return {
     reference: intake.reference,
     to: intake.email,
+    cc: ensurePublishingAuthorEmailCc({ to: [intake.email] }),
+    replyTo: PUBLISHING_EMAIL_CANON.replyTo,
     firstName: intake.firstName,
     projectTitle: intake.bookTitle,
     intakeChannel: intake.intakeChannel,

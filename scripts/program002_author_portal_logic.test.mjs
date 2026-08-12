@@ -1,14 +1,18 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import test from 'node:test'
+import createJiti from 'jiti'
 
-import {
+const jiti = createJiti(import.meta.url)
+const {
   buildPortalTaskState,
   createAuthorPortalSession,
   parseAuthorPortalAccessRegistry,
   readAuthorPortalSession,
   resolveAuthorPortalAccessGrant,
-} from '../lib/server/author-portal-access.ts'
+} = jiti('../lib/server/author-portal-access.ts')
+
+const STRONG_TEST_SECRET = 'jm1-author-portal-unit-secret-2026-Q3-7Kp9-R4t2-W8z5'
 
 test('parses access registry entries', () => {
   const entries = parseAuthorPortalAccessRegistry(
@@ -24,7 +28,7 @@ test('parses access registry entries', () => {
 })
 
 test('builds and verifies signed portal session', () => {
-  process.env.AUTHOR_PORTAL_SESSION_SECRET = 'unit-test-secret'
+  process.env.AUTHOR_PORTAL_SESSION_SECRET = STRONG_TEST_SECRET
   const session = createAuthorPortalSession({
     code: 'abc',
     intakeReference: 'JMP-INT-1',
@@ -39,10 +43,12 @@ test('builds and verifies signed portal session', () => {
 
 test('returning author with editorial workspace skips repeated setup', () => {
   const tasks = buildPortalTaskState({
-    isReturningAuthor: true,
-    hasEditorialWorkspace: true,
-    hasContract: true,
-    hasStripeAccount: true,
+    relationshipProfileComplete: true,
+    relationshipStripeComplete: true,
+    relationshipTaxComplete: true,
+    relationshipPayoutComplete: true,
+    contractSatisfied: true,
+    currentProjectState: 'editorial_review',
   })
 
   assert.equal(tasks.authorProfileRequired, false)
@@ -51,10 +57,12 @@ test('returning author with editorial workspace skips repeated setup', () => {
 
 test('new author still sees onboarding and payment setup', () => {
   const tasks = buildPortalTaskState({
-    isReturningAuthor: false,
-    hasEditorialWorkspace: false,
-    hasContract: false,
-    hasStripeAccount: false,
+    relationshipProfileComplete: false,
+    relationshipStripeComplete: false,
+    relationshipTaxComplete: false,
+    relationshipPayoutComplete: false,
+    contractSatisfied: false,
+    currentProjectState: 'pre_contract_setup',
   })
 
   assert.equal(tasks.authorProfileRequired, true)
@@ -94,7 +102,8 @@ test('legacy hashed access record resolves contact-scoped project access', () =>
   process.env.AUTHOR_PORTAL_ACCESS_RECORDS_JSON = JSON.stringify([
     {
       status: 'active',
-      accessCodeHash: createHash('sha256').update('pepperportal-code').digest('hex'),
+      accessCodeHash: createHash('sha256').update('pepperPORTALCODE').digest('hex'),
+      accessCodeVersion: 'activation-code-v2',
       contactId: 'contact-123',
       projectId: 'JMP-INT-202607-0W5PTQ',
       projectIds: ['JMP-INT-202607-0W5PTQ', 'JMP-INT-LONGWATCH'],

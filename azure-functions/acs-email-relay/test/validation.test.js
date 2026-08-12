@@ -152,7 +152,7 @@ test("acknowledgment asks for manuscript file or link when missing", () => {
   assert.doesNotMatch(email.content.plainText, /We received your manuscript link/);
 });
 
-test("does not include reply-to by default", () => {
+test("acknowledgment includes Publishing mailbox CC and no reply-to by default", () => {
   const { validatePayload, buildAcknowledgmentEmail } = loadRelayModule();
 
   const result = validatePayload({
@@ -165,6 +165,7 @@ test("does not include reply-to by default", () => {
 
   const email = buildAcknowledgmentEmail(result.value);
   assert.equal(Object.hasOwn(email, "replyTo"), false);
+  assert.equal(JSON.stringify(email.recipients.cc.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
 });
 
 const diagnosticId = "64e387e0-7e6a-f111-a826-00224820105b";
@@ -203,7 +204,6 @@ function validAuthorResponsePayload(overrides = {}) {
     internalVisibilityMailbox: "publishing@jmerrill.one",
     futureSendRequiresInternalCopy: true,
     futureSendRequiresDataverseLog: true,
-    bcc: ["publishing@jmerrill.one"],
     ...overrides
   };
 }
@@ -513,7 +513,7 @@ test("internal notification rejects CC/BCC, @jmerrill.pub, missing preview, and 
   }
 });
 
-test("valid approved author response builds ACS email to author and hidden archive copy to publishing mailbox", () => {
+test("valid approved author response builds ACS email to author and Publishing mailbox CC", () => {
   const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
   const result = validateApprovedAuthorResponsePayload(validAuthorResponsePayload());
 
@@ -521,8 +521,8 @@ test("valid approved author response builds ACS email to author and hidden archi
   const email = buildApprovedAuthorResponseEmail(result.value);
   assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
   assert.equal(JSON.stringify(email.recipients.to.map((recipient) => recipient.address)), JSON.stringify(["author@example.com"]));
-  assert.equal(Object.hasOwn(email.recipients, "cc"), false);
-  assert.equal(JSON.stringify(email.recipients.bcc.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
+  assert.equal(JSON.stringify(email.recipients.cc.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
+  assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
   assert.equal(email.content.subject, "Next step for your J Merrill Publishing submission");
 });
 
@@ -570,14 +570,19 @@ test("approved author response Reply-To is never a @jmerrill.pub address", () =>
   assert.ok(!email.replyTo[0].address.toLowerCase().endsWith("@jmerrill.pub"));
 });
 
-test("approved author response rejects missing author email, To mismatch, missing copy, and visible archive copy", () => {
+test("approved author response injects Publishing CC, dedupes case variants, and rejects unapproved CC", () => {
   const { validateApprovedAuthorResponsePayload } = loadRelayModule();
 
   assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ authorEmail: "" })), "AUTHOR_EMAIL_INVALID");
   assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ to: "other@example.com" })), "AUTHOR_RECIPIENT_INVALID");
-  assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ bcc: [] })), "INTERNAL_VISIBILITY_REQUIRED");
-  assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ cc: ["publishing@jmerrill.one"] })), "VISIBLE_ARCHIVE_COPY_NOT_ALLOWED");
-  assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ bcc: ["audit@example.com"] })), "INTERNAL_VISIBILITY_REQUIRED");
+  const injected = validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ cc: [] }));
+  assert.equal(injected.ok, true);
+  assert.equal(JSON.stringify(injected.value.cc), JSON.stringify(["publishing@jmerrill.one"]));
+  const deduped = validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ cc: ["Publishing@JMERRILL.ONE", "publishing@jmerrill.one"] }));
+  assert.equal(deduped.ok, true);
+  assert.equal(JSON.stringify(deduped.value.cc), JSON.stringify(["publishing@jmerrill.one"]));
+  assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ cc: ["audit@example.com"] })), "UNAPPROVED_CC_RECIPIENT_PRESENT");
+  assertRejected(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ bcc: ["audit@example.com"] })), "UNAPPROVED_BCC_RECIPIENT_PRESENT");
 });
 
 test("approved author response rejects @jmerrill.pub, missing approval fields, subject/body, and log requirement", () => {
@@ -759,7 +764,7 @@ test("approved editorial recommendation builds ACS email with HTML and plain-tex
   assert.match(email.content.html, /<table/);
   assert.match(email.content.html, /J MERRILL PUBLISHING/);
   assert.equal(email.replyTo[0].address, "publishing@jmerrill.one");
-  assert.equal(email.recipients.bcc[0].address, "publishing@jmerrill.one");
+  assert.equal(email.recipients.cc[0].address, "publishing@jmerrill.one");
 });
 
 test("approved editorial recommendation rejects text-only payloads", () => {

@@ -373,8 +373,8 @@ test('complete package release hands off to canonical notification engine', () =
   })
   assert.equal(validateAuthorPackageNotification(notification).ok, true)
   assert.equal(notification.recipientPolicy.replyTo, 'publishing@jmerrill.one')
-  assert.deepEqual(notification.recipientPolicy.bcc, ['publishing@jmerrill.one'])
-  assert.equal('cc' in notification.recipientPolicy, false)
+  assert.deepEqual(notification.recipientPolicy.cc, ['publishing@jmerrill.one'])
+  assert.deepEqual(notification.recipientPolicy.bcc, [])
 })
 
 test('governed cadence retest certifies only when all six evidence lanes pass under one correlation', () => {

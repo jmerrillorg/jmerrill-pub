@@ -125,6 +125,37 @@ function normalizeRecipients(value) {
   return single ? [single] : [];
 }
 
+function uniqueRecipients(value) {
+  return Array.from(new Set(normalizeRecipients(value)));
+}
+
+function normalizeAuthorFacingCc(to, cc) {
+  const toRecipients = uniqueRecipients(to);
+  const ccRecipients = uniqueRecipients(cc).filter((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX);
+  return toRecipients.includes(INTERNAL_VISIBILITY_MAILBOX)
+    ? ccRecipients
+    : [...ccRecipients, INTERNAL_VISIBILITY_MAILBOX];
+}
+
+function validateAuthorFacingCopy({ to, cc, bcc }) {
+  const toRecipients = uniqueRecipients(to);
+  const ccRecipients = uniqueRecipients(cc);
+  const bccRecipients = uniqueRecipients(bcc);
+  const nonCanonicalCc = ccRecipients.filter((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX);
+
+  if (nonCanonicalCc.length > 0) return { ok: false, reason: "UNAPPROVED_CC_RECIPIENT_PRESENT" };
+  if (!toRecipients.includes(INTERNAL_VISIBILITY_MAILBOX) && !ccRecipients.includes(INTERNAL_VISIBILITY_MAILBOX)) {
+    return { ok: false, reason: "PUBLISHING_CC_MISSING" };
+  }
+  if (ccRecipients.filter((recipient) => recipient === INTERNAL_VISIBILITY_MAILBOX).length > 1) {
+    return { ok: false, reason: "DUPLICATE_PUBLISHING_CC" };
+  }
+  if (bccRecipients.some((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX)) {
+    return { ok: false, reason: "UNAPPROVED_BCC_RECIPIENT_PRESENT" };
+  }
+  return { ok: true };
+}
+
 function hasUnsafeField(value) {
   if (!value || typeof value !== "object") {
     return false;
@@ -225,6 +256,8 @@ function verifyRelayKey(request) {
 function validatePayload(payload) {
   const reference = normalizeText(payload.reference);
   const to = normalizeText(payload.to).toLowerCase();
+  const cc = normalizeAuthorFacingCc([to], payload.cc);
+  const copyValidation = validateAuthorFacingCopy({ to: [to], cc, bcc: payload.bcc });
   const firstName = normalizeText(payload.firstName);
   const projectTitle = normalizeText(payload.projectTitle) || DEFAULT_PROJECT_TITLE;
   const intakeChannel = safeTrim(payload.intakeChannel);
@@ -236,6 +269,10 @@ function validatePayload(payload) {
 
   if (!to || !isValidEmail(to)) {
     return { ok: false, code: "INVALID_TO", reference };
+  }
+
+  if (!copyValidation.ok) {
+    return { ok: false, code: copyValidation.reason, reference };
   }
 
   if (intakeChannel !== ALLOWED_INTAKE_CHANNEL) {
@@ -251,6 +288,7 @@ function validatePayload(payload) {
     value: {
       reference,
       to,
+      cc,
       firstName,
       projectTitle,
       intakeChannel,
@@ -314,7 +352,11 @@ function buildAcknowledgmentEmail(payload) {
           address: payload.to,
           displayName: payload.firstName
         }
-      ]
+      ],
+      cc: payload.cc.map((address) => ({
+        address,
+        displayName: "J Merrill Publishing"
+      }))
     }
   };
 }
@@ -482,7 +524,7 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
 
   const authorEmail = normalizeText(payload.authorEmail).toLowerCase();
   const to = normalizeRecipients(payload.to === undefined ? authorEmail : payload.to);
-  const cc = normalizeRecipients(payload.cc);
+  const cc = normalizeAuthorFacingCc(to, payload.cc);
   const bcc = normalizeRecipients(payload.bcc);
   const internalVisibilityMailbox = normalizeText(payload.internalVisibilityMailbox).toLowerCase();
   const allRecipients = [...to, ...cc, ...bcc, internalVisibilityMailbox].filter(Boolean);
@@ -499,19 +541,16 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
     return { ok: false, reason: "AUTHOR_RECIPIENT_INVALID" };
   }
 
-  if (internalVisibilityMailbox !== INTERNAL_VISIBILITY_MAILBOX || !bcc.includes(INTERNAL_VISIBILITY_MAILBOX)) {
+  if (internalVisibilityMailbox !== INTERNAL_VISIBILITY_MAILBOX) {
     return { ok: false, reason: "INTERNAL_VISIBILITY_REQUIRED" };
   }
 
-  if (cc.length > 0) {
-    return { ok: false, reason: "VISIBLE_ARCHIVE_COPY_NOT_ALLOWED" };
+  const copyValidation = validateAuthorFacingCopy({ to, cc, bcc });
+  if (!copyValidation.ok) {
+    return { ok: false, reason: copyValidation.reason };
   }
 
-  if (bcc.some((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX)) {
-    return { ok: false, reason: "UNAPPROVED_RECIPIENT_PRESENT" };
-  }
-
-  if (allRecipients.some(isJmerrillPubMailbox)) {
+  if (allRecipients.some((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX && isJmerrillPubMailbox(recipient))) {
     return { ok: false, reason: "JMERRILL_PUB_MAILBOX_NOT_ALLOWED" };
   }
 
@@ -593,7 +632,8 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       attachments: attachments.ok ? attachments.value : [],
       approvedBy: normalizeText(payload.approvedBy),
       approvedOn: normalizeText(payload.approvedOn),
-      internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX
+      internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
+      cc
     }
   };
 }
@@ -821,12 +861,10 @@ function buildApprovedAuthorResponseEmail(payload) {
           displayName: payload.authorName || payload.authorEmail
         }
       ],
-      bcc: [
-        {
-          address: INTERNAL_VISIBILITY_MAILBOX,
-          displayName: "J Merrill Publishing"
-        }
-      ]
+      cc: payload.cc.map((address) => ({
+        address,
+        displayName: "J Merrill Publishing"
+      }))
     },
     attachments: Array.isArray(payload.attachments) ? payload.attachments.map((attachment) => ({
       name: attachment.name,

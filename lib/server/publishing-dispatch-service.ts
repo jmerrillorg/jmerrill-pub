@@ -550,7 +550,8 @@ function validateReadback(input: PublishingDispatchRequest, readback: DispatchRe
       from: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.transactionalFromAddress,
       to: readback.recipientEmail,
       replyTo: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo,
-      bcc: [AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy],
+      cc: [AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy],
+      bcc: [],
     },
     correlationId: input.correlationId || readback.idempotencyKey,
     idempotencyKey: readback.idempotencyKey,
@@ -682,7 +683,8 @@ async function sendAuthorPackageThroughRelay(input: {
       replyTo: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo,
       futureSendRequiresInternalCopy: true,
       futureSendRequiresDataverseLog: true,
-      bcc: [AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy],
+      cc: [AUTHOR_PUBLISHING_COMMUNICATION_POLICY.publishingArchiveCopy],
+      bcc: [],
     }),
   })
   const body = (await response.json().catch(() => null)) as { providerMessageId?: string; accepted?: boolean; reason?: string; code?: string } | null
