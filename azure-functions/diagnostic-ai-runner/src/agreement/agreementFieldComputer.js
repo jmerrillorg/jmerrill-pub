@@ -26,7 +26,7 @@ const PACKAGE_INFO = Object.freeze({
     label: "Professional Publishing Package (JMP-PKG-PRO)",
     fee: 4500.00,
     wordLimit: 75000,
-    audiobookIncluded: true
+    audiobookIncluded: false
   },
   "JMP-PKG-PREMIER": {
     label: "Premier Publishing Package (JMP-PKG-PREMIER)",

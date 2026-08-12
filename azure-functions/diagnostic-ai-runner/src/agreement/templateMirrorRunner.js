@@ -35,8 +35,8 @@ const EVENT_TYPE = "AGREEMENT_TEMPLATE_MIRROR_PERFORMED";
 const AGENT_MODEL_NAME = "template-mirror-runner";
 
 const CANONICAL_TEMPLATE_FILES = Object.freeze([
-  "JMP_Publishing_Agreement_v3.docx",
-  "JMP_Publishing_Package_Addendum_v3.docx",
+  "JMP_Publishing_Agreement_v1.3.1.docx",
+  "JMP_Publishing_Package_Addendum_v4.1.docx",
   "JMP_Audiobook_Addendum_v3.docx"
 ]);
 

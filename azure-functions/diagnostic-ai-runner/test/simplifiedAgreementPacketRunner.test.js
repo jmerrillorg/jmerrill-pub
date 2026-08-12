@@ -70,16 +70,16 @@ describe("generateSimplifiedAgreementPacket — gate enforcement and validation"
 });
 
 describe("generateSimplifiedAgreementPacket — produces the package-specific, simplified, single-packet documents", () => {
-  test("generates exactly 3 new documents (Package Addendum, Audiobook section, Payment Disclosure) for JMP-PKG-PRO", async () => {
+  test("generates exactly 2 new documents (Package Addendum, Payment Disclosure) for JMP-PKG-PRO", async () => {
     process.env[GATE_NAME] = "true";
     const result = await generateSimplifiedAgreementPacket(controlledInput());
     assert.equal(result.ok, true);
     assert.equal(result.packageSpecific, true);
     assert.equal(result.audiobookSimplified, true);
     assert.equal(result.paymentDisclosureReplacesScheduleA, true);
-    assert.equal(result.documents.length, 3);
+    assert.equal(result.documents.length, 2);
     const roles = result.documents.map((d) => d.role);
-    assert.deepEqual(roles, ["PACKAGE_ADDENDUM", "AUDIOBOOK_ADDENDUM", "PAYMENT_DISCLOSURE"]);
+    assert.deepEqual(roles, ["PACKAGE_ADDENDUM", "PAYMENT_DISCLOSURE"]);
   });
 
   test("every generated document is a structurally valid .docx", async () => {
@@ -89,7 +89,7 @@ describe("generateSimplifiedAgreementPacket — produces the package-specific, s
       writeOutput: async (name, buffer) => { writtenBuffers.push(buffer); return `/fake/${name}`; }
     });
     assert.equal(result.ok, true);
-    assert.equal(writtenBuffers.length, 3);
+    assert.equal(writtenBuffers.length, 2);
     for (const buf of writtenBuffers) {
       const v = await isValidDocxBuffer(buf);
       assert.equal(v.valid, true);
@@ -106,16 +106,16 @@ describe("generateSimplifiedAgreementPacket — produces the package-specific, s
       "Hardcover: 10 copies",
       "Standard Ebook: 1 digital entitlement"
     ]);
-    assert.equal(result.fields.audiobookIncluded, true);
+    assert.equal(result.fields.audiobookIncluded, false);
     assert.equal(result.fields.paymentSchedule.installments, 8);
     assert.equal(result.fields.paymentSchedule.totalFormatted, "$4,680.00");
   });
 
-  test("includes an Adobe-Sign-ready signing packet plan with all four documents and five fields", async () => {
+  test("includes an Adobe-Sign-ready signing packet plan without a bundled audiobook addendum for Professional", async () => {
     process.env[GATE_NAME] = "true";
     const result = await generateSimplifiedAgreementPacket(controlledInput());
-    assert.equal(result.signingPacketPlan.documents.length, 4);
-    assert.equal(result.signingPacketPlan.signatureFields.length, 5);
+    assert.equal(result.signingPacketPlan.documents.length, 3);
+    assert.equal(result.signingPacketPlan.signatureFields.length, 4);
   });
 });
 

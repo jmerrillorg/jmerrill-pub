@@ -37,7 +37,7 @@ describe("computeAgreementFields — the controlled record's real values", () =>
       "Hardcover: 10 copies",
       "Standard Ebook: 1 digital entitlement"
     ]);
-    assert.equal(r.audiobookIncluded, true);
+    assert.equal(r.audiobookIncluded, false);
   });
 
   test("computes the exact 8-payment schedule: $585.00 x 8 = $4,680.00", () => {
@@ -64,9 +64,9 @@ describe("computeAgreementFields — the controlled record's real values", () =>
 });
 
 describe("computeAgreementFields — audiobook inclusion", () => {
-  test("Professional Package includes AI audiobook production with no additional fee implied", () => {
+  test("Professional Package treats AI audiobook production as a separate line item", () => {
     const r = computeAgreementFields(baseInput());
-    assert.equal(r.audiobookIncluded, true);
+    assert.equal(r.audiobookIncluded, false);
   });
 
   test("Premier Package supports the commissioning title's large manuscript scope", () => {
@@ -86,6 +86,7 @@ describe("computeAgreementFields — audiobook inclusion", () => {
       "Hardcover: 15 copies",
       "Standard Ebook: 1 digital entitlement"
     ]);
+    assert.equal(r.audiobookIncluded, true);
     assert.equal(r.paymentSchedule.totalFormatted, "$7,500.00");
   });
 

@@ -297,7 +297,7 @@ export function computeComplimentaryEntitlements(packageSku, elections) {
     'JMP-PKG-STARTER': { printPerElectedPrintProductForm: 5, digitalPerElectedDigitalProductForm: 1, audioPerElectedAudiobookProductForm: '1 author delivery' },
     'JMP-PKG-PRO': { printPerElectedPrintProductForm: 10, digitalPerElectedDigitalProductForm: 1, audioPerElectedAudiobookProductForm: '1 author delivery' },
     'JMP-PKG-PREMIER': { printPerElectedPrintProductForm: 15, digitalPerElectedDigitalProductForm: 1, audioPerElectedAudiobookProductForm: '1 author delivery' },
-    'JMP-PKG-SIGNATURE': { printPerElectedPrintProductForm: 15, digitalPerElectedDigitalProductForm: 1, audioPerElectedAudiobookProductForm: '1 author delivery' },
+    'JM-SIGNATURE-TRACK': { printPerElectedPrintProductForm: 15, digitalPerElectedDigitalProductForm: 1, audioPerElectedAudiobookProductForm: '1 author delivery' },
   }[packageSku]
   if (!ent) throw new Error(`package_missing:${packageSku}`)
   const election = validateProductFormElection(elections)
@@ -739,7 +739,7 @@ Later Product Forms require an approved addendum/election, separate \`jm1pub_edi
 function authorCopy(c) {
   const starter = computeComplimentaryEntitlements('JMP-PKG-STARTER', ['PF-01', 'PF-03'])
   const nonstandard = computeComplimentaryEntitlements('JMP-PKG-PRO', ['PF-01', 'PF-05', 'PF-03'])
-  const signature = computeComplimentaryEntitlements('JMP-PKG-SIGNATURE', ['PF-01', 'PF-05', 'PF-03'])
+  const signature = computeComplimentaryEntitlements('JM-SIGNATURE-TRACK', ['PF-01', 'PF-05', 'PF-03'])
   return `# Author-Copy Entitlements
 
 Last verified: ${c.generatedAt}

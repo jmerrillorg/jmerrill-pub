@@ -14,6 +14,7 @@ This library points only to controlling or genuinely useful references. It does 
 | `docs/architecture/generated/JMP-CATALOG-RECONCILIATION-FINAL-2026-08-05/07-pricing-authority-register.csv` | Pricing authority reference. |
 | `Implementation HQ/01_GOVERNANCE/Agreement Templates/JMP_Publishing_Agreement_v1.3.1.docx` | Current Hybrid agreement template. |
 | `Implementation HQ/01_GOVERNANCE/Agreement Templates/JM_Signature_Publishing_Agreement_v1.0.docx` | Current JM Signature agreement template. |
+| `Implementation HQ/00_CANON/Publishing/Agreements/JMP_Complete_Agreement_Stack_v1/JMP_Publishing_Package_Addendum_v4.1.docx` | Current Publishing Package Addendum template. |
 | `docs/operations/active/the-intentional-leader/CURRENT-STATE.md` | Active title current-state example. |
 | `docs/operations/int-pub-005-milestone-8-distribution-setup-readiness.md` | Distribution readiness reference. |
 | `docs/operations/int-pub-005-milestone-9-launch-release-readiness.md` | Launch and release readiness reference. |

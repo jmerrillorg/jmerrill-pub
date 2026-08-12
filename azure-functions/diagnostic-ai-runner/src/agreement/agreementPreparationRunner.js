@@ -45,10 +45,12 @@ const EVENT_TYPE = "AGREEMENT_DOCUMENT_PREPARATION_PERFORMED";
 const AGENT_MODEL_NAME = "agreement-preparation-runner";
 
 const TEMPLATE_NAME = Object.freeze({
-  PUBLISHING_AGREEMENT: "JMP_Publishing_Agreement_v3.docx",
-  PACKAGE_ADDENDUM: "JMP_Publishing_Package_Addendum_v3.docx",
+  PUBLISHING_AGREEMENT: "JMP_Publishing_Agreement_v1.3.1.docx",
+  PACKAGE_ADDENDUM: "JMP_Publishing_Package_Addendum_v4.1.docx",
   AUDIOBOOK_ADDENDUM: "JMP_Audiobook_Addendum_v3.docx"
 });
+
+const ACTIVE_PACKAGE_ADDENDUM_VERSION = "4.1";
 
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -379,7 +381,9 @@ function fillAudiobookAddendum(xml, fields) {
     filledFields,
     unmatchedFields,
     deferredFields: [
-      "specialNotesAnnotation (recommend manual note: 'AI audiobook production included via Professional Package — no additional $699 fee applies')"
+      fields.audiobookIncluded
+        ? "specialNotesAnnotation (recommend manual note: 'AI audiobook production included via selected package; human narration requires separate approval and pricing')"
+        : "specialNotesAnnotation (recommend manual note: 'AI audiobook production is not included in the selected package unless separately approved as an add-on')"
     ]
   };
 }
@@ -577,7 +581,9 @@ function buildAgreementPreparationExecutionLogPayload({ diagnosticId, intakeRefe
     `Official word count used: ${fields.officialManuscriptWordCount} (MANUSCRIPT_FILE).`,
     `Payment plan: ${fields.paymentSchedule.installments} x ${fields.paymentSchedule.perInstallmentFormatted}, total ${fields.paymentSchedule.totalFormatted}.`,
     fields.paymentSchedule.requiresScheduleAAttachment ? "Schedule A attachment generated (3-row table cannot represent this plan)." : "Payment fit within the 3-row table.",
-    `Audiobook addendum generated: ${fields.audiobookIncluded} (included via package, no separate $699 fee).`,
+    fields.audiobookIncluded
+      ? "Audiobook addendum generated: true (included via selected package; no separate legacy $699 fee)."
+      : "Audiobook addendum generated: false (not included in selected package; separate add-on approval required).",
     `${manifest.documents.length} document(s) prepared. Deferred fields: ${manifest.deferredFields.length === 0 ? "none" : manifest.deferredFields.join("; ")}.`,
     "Documents prepared only — not sent. No manuscript text, raw AI output, or prompt text included.",
     "No contract finalized, no author-facing send, no Stripe/payment/production/distribution/launch/royalty/marketing action occurred."
@@ -634,6 +640,7 @@ module.exports = {
   fillAudiobookAddendum,
   buildAgreementPreparationExecutionLogPayload,
   TEMPLATE_NAME,
+  ACTIVE_PACKAGE_ADDENDUM_VERSION,
   GATE_NAME,
   EVENT_TYPE
 };

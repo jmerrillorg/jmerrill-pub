@@ -51,7 +51,7 @@ describe("generateSimplifiedPackageAddendumDocument", () => {
 
 describe("generateSimplifiedAudiobookSectionDocument", () => {
   test("produces a valid docx with AI narration as the primary election and no $699 fee mentioned as owed", async () => {
-    const section = buildSimplifiedAudiobookSection({ packageCode: "JMP-PKG-PRO", audiobookIncludedInPackage: true });
+    const section = buildSimplifiedAudiobookSection({ packageCode: "JMP-PKG-PREMIER", audiobookIncludedInPackage: true });
     const buffer = await generateSimplifiedAudiobookSectionDocument({
       title: "x", authorLegalName: "y", contractDate: "2026-06-22", audiobookSection: section
     });

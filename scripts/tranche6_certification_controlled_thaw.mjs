@@ -129,7 +129,7 @@ export const systemOfRecordMap = [
 export const cohorts = [
   { id: 'A', name: 'Standard Hybrid', packageSku: 'JMP-PKG-STARTER', productForms: ['PF-01', 'PF-03'], payment: 'FULL', track: 'Hybrid' },
   { id: 'B', name: 'Professional Multi-PF', packageSku: 'JMP-PKG-PRO', productForms: ['PF-01', 'PF-02', 'PF-03'], payment: 'PLAN', track: 'Hybrid' },
-  { id: 'C', name: 'JM Signature', packageSku: 'JMP-PKG-SIGNATURE', productForms: ['PF-01', 'PF-02', 'PF-03'], payment: 'PUBLISHER_BILLED', track: 'JM Signature' },
+  { id: 'C', name: 'JM Signature', packageSku: 'JM-SIGNATURE-TRACK', productForms: ['PF-01', 'PF-02', 'PF-03'], payment: 'PUBLISHER_BILLED', track: 'JM Signature' },
   { id: 'D', name: 'Nonstandard Product Forms', packageSku: 'JMP-PKG-STARTER', productForms: ['PF-01', 'PF-05', 'PF-03'], payment: 'FULL', track: 'Hybrid' },
   { id: 'E', name: 'Exception Heavy', packageSku: 'JMP-PKG-PRO', productForms: ['PF-01', 'PF-03'], payment: 'FAILURE', track: 'Hybrid' },
   { id: 'F', name: 'Rights/Post-Publication', packageSku: 'JMP-PKG-PREMIER', productForms: ['PF-01', 'PF-02', 'PF-03'], payment: 'FULL', track: 'Hybrid' },
