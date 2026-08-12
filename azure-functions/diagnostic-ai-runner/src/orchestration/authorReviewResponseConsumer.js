@@ -448,6 +448,14 @@ async function processPackageSelectionReply(client, diagnostic, deps, triggerSou
     reply = candidate;
   }
   if (!reply.ok || !reply.found) return { diagnosticId, outcome: "NO_PACKAGE_SELECTION_REPLY_FOUND", detail: reply.reason || reply.code || "no_match" };
+  const targetDiagnosticId = normalizeString(deps.targetDiagnosticId).toLowerCase();
+  if (reply.selfAddressedPublishingSelection === true && (!targetDiagnosticId || targetDiagnosticId !== diagnosticId.toLowerCase())) {
+    return {
+      diagnosticId,
+      outcome: "SELF_ADDRESSED_SELECTION_REQUIRES_EXACT_DIAGNOSTIC_TARGET",
+      detail: "self_addressed_internal_validation_reply_not_applied_without_exact_target"
+    };
+  }
 
   const inboundMessageId = durableInboundMessageId(reply);
   const idempotencyKey = stablePackageSelectionIdempotencyKey(diagnosticId, inboundMessageId);
@@ -735,11 +743,14 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
   const triggerSource = input.triggerSource || "SCHEDULED_WORKER";
   const client = deps.client || createDataverseClient(requireDataverseConfig(), deps);
   const gates = await (deps.findGates || findOpenAuthorReviewGates)(client, input.maxGates || 10);
-  const packageDiagnostics = await (deps.findPackageSelectionDiagnostics || findOpenPackageSelectionDiagnostics)(client, input.maxPackageSelections || 10);
+  const targetDiagnosticId = normalizeString(input.targetDiagnosticId);
+  const packageDiagnostics = (await (deps.findPackageSelectionDiagnostics || findOpenPackageSelectionDiagnostics)(client, input.maxPackageSelections || 10))
+    .filter((diagnostic) => !targetDiagnosticId || normalizeString(diagnostic.jm1pub_editorialdiagnosticid).toLowerCase() === targetDiagnosticId.toLowerCase());
   const results = [];
   for (const gate of gates) results.push(await processGateReply(client, gate, deps, triggerSource));
   const packageSelectionResults = [];
-  for (const diagnostic of packageDiagnostics) packageSelectionResults.push(await processPackageSelectionReply(client, diagnostic, deps, triggerSource));
+  const packageDeps = { ...deps, targetDiagnosticId };
+  for (const diagnostic of packageDiagnostics) packageSelectionResults.push(await processPackageSelectionReply(client, diagnostic, packageDeps, triggerSource));
   return {
     runtimeName: "JM1 Author Review Response Consumer",
     deploymentEnvironment: "func-jm1-diagnostic-ai-runner",

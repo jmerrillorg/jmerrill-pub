@@ -47,7 +47,8 @@ app.http("run-author-review-response-consumer-admin-replay", {
 
     const result = await runAuthorReviewResponseConsumer({
       triggerSource: "ADMIN_RETRY",
-      maxGates: Math.min(Math.max(Number(body.maxGates || 10), 1), 25)
+      maxGates: Math.min(Math.max(Number(body.maxGates || 10), 1), 25),
+      targetDiagnosticId: body.targetDiagnosticId
     });
     return { status: 200, jsonBody: { ...result, administrativeReplay: true } };
   }
