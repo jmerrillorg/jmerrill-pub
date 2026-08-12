@@ -81,6 +81,44 @@ function normalizeText(value) {
   return safeTrim(value).slice(0, MAX_FIELD_LENGTH);
 }
 
+function normalizeRecipients(value) {
+  if (value === undefined || value === null) return [];
+  if (Array.isArray(value)) return value.map((item) => normalizeText(item).toLowerCase()).filter(Boolean);
+  const single = normalizeText(value).toLowerCase();
+  return single ? [single] : [];
+}
+
+function uniqueRecipients(value) {
+  return Array.from(new Set(normalizeRecipients(value)));
+}
+
+function normalizeAuthorFacingCc(to, cc) {
+  const toRecipients = uniqueRecipients(to);
+  const ccRecipients = uniqueRecipients(cc).filter((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX);
+  return toRecipients.includes(INTERNAL_VISIBILITY_MAILBOX)
+    ? ccRecipients
+    : [...ccRecipients, INTERNAL_VISIBILITY_MAILBOX];
+}
+
+function validateAuthorFacingCopy({ to, cc, bcc }) {
+  const toRecipients = uniqueRecipients(to);
+  const ccRecipients = uniqueRecipients(cc);
+  const bccRecipients = uniqueRecipients(bcc);
+  const nonCanonicalCc = ccRecipients.filter((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX);
+
+  if (nonCanonicalCc.length > 0) return { ok: false, reason: "UNAPPROVED_CC_RECIPIENT_PRESENT" };
+  if (!toRecipients.includes(INTERNAL_VISIBILITY_MAILBOX) && !ccRecipients.includes(INTERNAL_VISIBILITY_MAILBOX)) {
+    return { ok: false, reason: "PUBLISHING_CC_MISSING" };
+  }
+  if (ccRecipients.filter((recipient) => recipient === INTERNAL_VISIBILITY_MAILBOX).length > 1) {
+    return { ok: false, reason: "DUPLICATE_PUBLISHING_CC" };
+  }
+  if (bccRecipients.some((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX)) {
+    return { ok: false, reason: "UNAPPROVED_BCC_RECIPIENT_PRESENT" };
+  }
+  return { ok: true };
+}
+
 function normalizeBody(value) {
   return safeTrim(value).slice(0, MAX_BODY_LENGTH);
 }
@@ -200,14 +238,14 @@ function validateAgreementPackageSendPayload(payload = {}) {
   }
 
   const to = normalizeText(payload.to).toLowerCase();
-  const cc = normalizeText(payload.cc).toLowerCase();
-  const bcc = normalizeText(payload.bcc).toLowerCase();
+  const cc = normalizeAuthorFacingCc([to], payload.cc);
+  const bcc = normalizeRecipients(payload.bcc);
   const replyTo = normalizeText(payload.replyTo).toLowerCase();
 
   if (!to || !isValidEmail(to)) return { ok: false, reason: "TO_INVALID" };
   if (isJmerrillPubMailbox(to)) return { ok: false, reason: "JMERRILL_PUB_MAILBOX_NOT_ALLOWED" };
-  if (cc) return { ok: false, reason: "VISIBLE_ARCHIVE_COPY_NOT_ALLOWED" };
-  if (bcc !== INTERNAL_VISIBILITY_MAILBOX) return { ok: false, reason: "BCC_MUST_BE_INTERNAL_VISIBILITY_MAILBOX" };
+  const copyValidation = validateAuthorFacingCopy({ to: [to], cc, bcc });
+  if (!copyValidation.ok) return { ok: false, reason: copyValidation.reason };
   if (replyTo !== INTERNAL_VISIBILITY_MAILBOX) return { ok: false, reason: "REPLY_TO_MUST_BE_INTERNAL_VISIBILITY_MAILBOX" };
 
   const subject = normalizeText(payload.subject);
@@ -231,6 +269,7 @@ function validateAgreementPackageSendPayload(payload = {}) {
       diagnosticId,
       intakeReferenceCode,
       to,
+      cc,
       toDisplayName: normalizeText(payload.toDisplayName) || to,
       subject,
       bodyText,
@@ -253,9 +292,7 @@ function buildAgreementPackageSendEmail(value) {
       to: [
         { address: value.to, displayName: value.toDisplayName }
       ],
-      bcc: [
-        { address: INTERNAL_VISIBILITY_MAILBOX, displayName: SENDER_DISPLAY_NAME }
-      ]
+      cc: value.cc.map((address) => ({ address, displayName: SENDER_DISPLAY_NAME }))
     },
     attachments: value.attachments.map((a) => ({
       name: safeTrim(a.name),

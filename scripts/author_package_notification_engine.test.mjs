@@ -73,13 +73,14 @@ const checks = [
       ].every((event) => engine.includes(event)),
   },
   {
-    name: 'author package notification validates canonical From, Reply-To, and hidden archive policy',
+    name: 'author package notification validates canonical From, Reply-To, and Publishing CC policy',
     pass: () =>
       engine.includes('AUTHOR_PUBLISHING_COMMUNICATION_POLICY') &&
       engine.includes('validateAuthorNotificationHeaders') &&
       engine.includes('AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_MISSING') &&
       engine.includes('AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_NOT_CANONICAL') &&
       engine.includes('AUTHOR_NOTIFICATION_BLOCKED - REPLY_TO_DOMAIN_NOT_RECEIVING_MAIL') &&
+      engine.includes('AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_CC_MISSING') &&
       orchestrator.includes('replyTo: CANONICAL_REPLY_TO'),
   },
   {

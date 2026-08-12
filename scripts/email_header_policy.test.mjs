@@ -39,12 +39,12 @@ const checks = [
       relayTests.includes('approved author response sets Reply-To to publishing@jmerrill.one'),
   },
   {
-    name: 'hidden archive BCC remains required for author-facing communication evidence',
+    name: 'Publishing CC remains required for author-facing communication evidence',
     pass: () =>
-      engine.includes('AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_ARCHIVE_BCC_MISSING') &&
-      orchestrator.includes('bcc: [INTERNAL_VISIBILITY_MAILBOX]') &&
-      relay.includes('bcc: [') &&
-      relay.includes('VISIBLE_ARCHIVE_COPY_NOT_ALLOWED'),
+      engine.includes('AUTHOR_NOTIFICATION_BLOCKED - PUBLISHING_CC_MISSING') &&
+      orchestrator.includes('cc: [INTERNAL_VISIBILITY_MAILBOX]') &&
+      relay.includes('cc: payload.cc.map') &&
+      relay.includes('PUBLISHING_CC_MISSING'),
   },
 ]
 
