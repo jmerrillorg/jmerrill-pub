@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
 const intakeRoute = readFileSync('app/api/publishing/intake/route.ts', 'utf8')
+const manuscriptUpload = readFileSync('lib/publishing/intake/manuscriptUpload.ts', 'utf8')
 const autostartRoute = readFileSync('app/api/publishing/orchestration/intake-autostart/route.ts', 'utf8')
 const publisher = readFileSync('lib/server/publisher-operating-center.ts', 'utf8')
 const runControl = readFileSync('azure-functions/diagnostic-ai-runner/src/editorial/editorialReviewRunControl.js', 'utf8')
@@ -74,6 +75,20 @@ test('autostart binds preserved manuscript asset fields before diagnostic dispat
   assert.doesNotMatch(publisher, /jm1_manuscriptassetstatus: 'Approved for Stage 0 diagnostic'/)
   assert.match(publisher, /jm1_manuscriptfiletype: metadata\.fileType/)
   assert.match(publisher, /waitForStage0DiagnosticForIntake/)
+})
+
+test('Markdown manuscripts are governed source artifacts with immutable provenance manifest', () => {
+  assert.match(manuscriptUpload, /type ManuscriptFileExtension = 'docx' \| 'doc' \| 'pdf' \| 'md'/)
+  assert.match(manuscriptUpload, /allowedExtensions: \['\.docx', '\.doc', '\.pdf', '\.md'\]/)
+  assert.match(manuscriptUpload, /Upload a \.docx, \.doc, \.pdf, or \.md manuscript file\./)
+  assert.match(manuscriptUpload, /JM1_PUBLISHING_SOURCE_ARTIFACT_MANIFEST_V1/)
+  assert.match(manuscriptUpload, /immutable: true/)
+  assert.match(manuscriptUpload, /sourceFormat: input\.validation\.extension/)
+  assert.match(manuscriptUpload, /sizeBytes: input\.validation\.value\.size/)
+  assert.match(manuscriptUpload, /sha256: input\.sourceSha256/)
+  assert.match(manuscriptUpload, /correlationId: input\.intake\.idempotencyKey/)
+  assert.match(manuscriptUpload, /downstreamVersionsMustDeriveFromSource: true/)
+  assert.match(manuscriptUpload, /source-artifact-manifest\.json/)
 })
 
 test('autostart writes one idempotent success event after dispatch', () => {

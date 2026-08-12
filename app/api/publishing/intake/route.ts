@@ -492,7 +492,7 @@ function manuscriptLinkError(reason: string) {
     return 'We could not confirm this manuscript link before the request timed out. Please upload the file or provide a reachable share link.'
   }
 
-  return 'Provide a reachable manuscript link, or upload a .docx, .doc, or .pdf file.'
+  return 'Provide a reachable manuscript link, or upload a .docx, .doc, .pdf, or .md file.'
 }
 
 function buildErrorResponse(code: IntakeErrorCode, detail: string, reference?: string): IntakeErrorResponse {

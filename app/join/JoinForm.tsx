@@ -593,7 +593,7 @@ function validate(form: JoinFormState, manuscriptFile: File | null): Errors {
   if (manuscriptFile) {
     const extension = manuscriptFile.name.toLowerCase().match(/\.[^.]+$/)?.[0] || ''
     if (!allowedManuscriptExtensions.includes(extension)) {
-      errors.manuscriptFile = 'Upload a .docx, .doc, or .pdf manuscript file.'
+      errors.manuscriptFile = 'Upload a .docx, .doc, .pdf, or .md manuscript file.'
     } else if (manuscriptFile.size <= 0) {
       errors.manuscriptFile = 'Upload a non-empty manuscript file.'
     } else if (manuscriptFile.size > maxManuscriptFileBytes) {
