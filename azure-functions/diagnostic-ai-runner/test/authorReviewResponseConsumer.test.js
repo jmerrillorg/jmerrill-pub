@@ -11,6 +11,7 @@ const {
   DECISION,
   evaluateAcknowledgementPolicy,
   runAuthorReviewResponseConsumer,
+  findOpenPackageSelectionDiagnostics,
   processPackageSelectionReply,
   stableIdempotencyKey,
   stablePackageSelectionIdempotencyKey,
@@ -154,6 +155,31 @@ test("package-selection replies are processed by the shared five-minute inbound 
   assert.equal(result.packageSelectionResults[0].selectedPackage.code, "JMP-PKG-STARTER");
   assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_SELECTED"));
   assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialdiagnostics"));
+});
+
+test("package-selection discovery recovers stale draft rows from durable send evidence", async () => {
+  const diagnostic = createDiagnostic({
+    jm1_authordraftsendstatus: "DRAFT_ONLY",
+    jm1_authordraftapprovalnotes: "Pending human approval. Draft only; no author-facing email sent."
+  });
+  const client = {
+    async list(entitySet) {
+      assert.equal(entitySet, "jm1pub_editorialdiagnostics");
+      return [diagnostic];
+    },
+    async first(entitySet, query) {
+      assert.equal(entitySet, "jm1_executionlogs");
+      assert.match(query.$filter, /EDITORIAL_RECOMMENDATION_LETTER_REPLACEMENT_SENT/);
+      return {
+        jm1_executionlogid: "replacement-sent-evidence",
+        jm1_actiontype: "EDITORIAL_RECOMMENDATION_LETTER_REPLACEMENT_SENT"
+      };
+    }
+  };
+
+  const rows = await findOpenPackageSelectionDiagnostics(client, 10);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].jm1pub_editorialdiagnosticid, diagnostic.jm1pub_editorialdiagnosticid);
 });
 
 test("package-selection classifier accepts natural human language for all package tiers", async () => {
