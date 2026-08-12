@@ -13,7 +13,7 @@
  * - The caller MUST NOT log the manuscript URL.
  * - Pilot authorization is enforced upstream in runStage0Diagnostic.js.
  *
- * Supported file types: .txt, .docx
+ * Supported file types: .txt, .md, .docx
  * File size limit: 10 MB
  * Minimum word count: 100
  *
@@ -37,6 +37,7 @@ function detectExtension(manuscriptUrl) {
     const url = new URL(manuscriptUrl);
     const pathname = url.pathname.toLowerCase().split("?")[0];
     if (pathname.endsWith(".docx")) return ".docx";
+    if (pathname.endsWith(".md")) return ".md";
     if (pathname.endsWith(".txt")) return ".txt";
   } catch {
     // Fall through to null
@@ -203,11 +204,13 @@ async function fetchAndExtractManuscript(manuscriptUrl, { fileTypeHint = null, t
   // Extract text in memory
   let text;
   try {
-    if (ext === ".txt") {
+    if (ext === ".txt" || ext === ".md") {
       text = buffer.toString("utf8");
     } else if (ext === ".docx") {
       const result = await mammoth.extractRawText({ buffer });
       text = result.value;
+    } else {
+      return { ok: false, code: "MANUSCRIPT_TYPE_UNSUPPORTED", content: null, metadata: { fileType: ext, byteLength, wordCount: null, charCount: null, sha256, downloadMethod } };
     }
   } catch {
     return { ok: false, code: "MANUSCRIPT_EXTRACTION_FAILED", content: null, metadata: { fileType: ext, byteLength, wordCount: null, charCount: null, sha256, downloadMethod } };
