@@ -74,18 +74,18 @@ export default async function AuthorsPage() {
         eyebrow="The People Behind The Books"
         title={
           <>
-            Every title carries
+            Every title is held with
             <br />
-            <em className="not-italic italic text-blue-500">a name</em>
+            <em className="not-italic italic text-blue-500">the right care</em>
           </>
         }
-        description="The catalog is more than a list of books. It is a record of people who chose to publish their words with care, ownership, and professional support. Some came with ministry. Some came with memoir. Some came with children’s stories, poetry, fiction, business insight, or legacy work. Each author brought something that mattered."
+        description="The catalog is more than a list of books. It is a record of work entrusted to J Merrill Publishing with care, ownership, and professional support. Some books carry a visible author name. Some require a quieter public attribution. Each work is handled according to its governed publishing path."
       >
         <div className="grid gap-4 lg:grid-cols-3">
           {[
             'Authors are not inventory. Their books are attached to lives, messages, and real callings.',
             'JMP exists to help authors carry the work forward with visibility, care, and professional preparation.',
-            'The author remains visible. The publisher should strengthen the name behind the book, not hide it.',
+            'Author visibility follows the governed attribution for the title, including anonymous publication when required.',
           ].map((item) => (
             <div key={item} className="rounded-[28px] border border-[#0F1C2E]/10 bg-[#F8FAFD] p-7 shadow-[0_18px_45px_rgba(15,28,46,0.06)]">
               <p className="text-[15px] font-light leading-[1.8] text-[#0F1C2E]/70">{item}</p>
@@ -125,7 +125,7 @@ export default async function AuthorsPage() {
             <em className="not-italic italic text-blue-500">look at how they treat authors</em>
           </>
         }
-        description="A publisher’s catalog should show more than output. It should show care, continuity, and respect for the people behind the books. For authors considering JMP, this page is proof that your name and work can have a visible home here."
+        description="A publisher’s catalog should show more than output. It should show care, continuity, and respect for the people behind the books. For authors considering JMP, this page is proof that your work can have a visible home here while your public attribution is handled according to the publishing agreement."
         surface="dark"
       >
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
