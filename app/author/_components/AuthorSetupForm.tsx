@@ -397,17 +397,16 @@ export const onboardingFields: Field[] = [
   {
     kind: 'section',
     name: 'section-governed-format-selection',
-    label: 'Format selection',
-    note: 'Your package determines what is included. Additional formats may be available as add-ons or may require separate approval before production.',
+    label: 'Choose Your Publishing Formats',
+    note: 'Your package determines how many edition slots are included. Starter includes two edition slots; choose the formats you want included. Additional formats are reviewed as add-ons or separate authorization before production.',
   },
   {
     name: 'governedFormatSelection',
-    label: 'Selected book formats',
+    label: 'Choose your publishing formats',
     type: 'select',
     required: true,
-    defaultValue: 'starter_included_paperback_ebook',
     options: governedFormatSelectionOptions,
-    note: 'For Starter, paperback and eBook are the normal included format set. Additional formats are reviewed before production planning.',
+    note: 'No format is selected for you. Choose the formats you want governed for agreement preparation.',
   },
   {
     name: 'additionalFormatInterest',
@@ -415,13 +414,13 @@ export const onboardingFields: Field[] = [
     type: 'select',
     defaultValue: 'none',
     options: additionalFormatInterestOptions,
+    note: 'Additional interest does not add a format to the signed package unless J Merrill Publishing separately approves it.',
   },
   {
     name: 'preferredPrintFormat',
     label: 'Preferred print format',
     type: 'select',
     required: true,
-    defaultValue: 'paperback_ebook',
     options: preferredPrintFormatOptions,
   },
   {

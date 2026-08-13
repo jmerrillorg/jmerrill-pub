@@ -76,6 +76,7 @@ export type AuthorPortalProjectSummary = {
   pendingApprovalLabel?: string
   artifacts?: AuthorPortalArtifact[]
   contractStatusInternal?: string
+  agreementPreparationStatusInternal?: string
   portfolioState?: CatalogPortfolioState
   portfolioLabel?: string
   catalogStatus?: string
@@ -160,6 +161,7 @@ export type AuthorPortalContext = {
   tasks: {
     authorProfileRequired: boolean
     paymentRoyaltyRequired: boolean
+    formatSelectionRequired: boolean
   }
   editorial: null | {
     stageLabel: string
@@ -198,6 +200,7 @@ type ResolvedProjectRow = {
   notificationFailed?: boolean
   lastUpdated?: string
   contractStatusInternal?: string
+  agreementPreparationStatusInternal?: string
   portfolioState?: CatalogPortfolioState
   portfolioLabel?: string
   catalogStatus?: string
@@ -371,19 +374,19 @@ export async function resolveAuthorPortalContext(
     const scopedOpportunity =
       (overrides.opportunityId
         ? await dataverseFirst(config, 'opportunities', {
-            $select: 'opportunityid,name,_parentcontactid_value,createdon',
+            $select: 'opportunityid,name,_parentcontactid_value,createdon,jm1_m6agreementpreparationstatus',
             $filter: `opportunityid eq ${overrides.opportunityId}`,
           })
         : null) ||
       (session.opportunityId
         ? await dataverseFirst(config, 'opportunities', {
-            $select: 'opportunityid,name,_parentcontactid_value,createdon',
+            $select: 'opportunityid,name,_parentcontactid_value,createdon,jm1_m6agreementpreparationstatus',
             $filter: `opportunityid eq ${session.opportunityId}`,
           })
         : null) ||
       (intake
         ? await dataverseFirst(config, 'opportunities', {
-            $select: 'opportunityid,name,_parentcontactid_value,createdon',
+            $select: 'opportunityid,name,_parentcontactid_value,createdon,jm1_m6agreementpreparationstatus',
             $filter: `contains(name,'${escapeODataText(stringValue(intake.jm1_projecttitle))}')`,
             $orderby: 'createdon desc',
           })
@@ -415,7 +418,7 @@ export async function resolveAuthorPortalContext(
     const relatedOpportunities =
       contact && dataverseLookupId(contact, 'contactid')
         ? await dataverseList(config, 'opportunities', {
-            $select: 'opportunityid,name,createdon',
+            $select: 'opportunityid,name,createdon,jm1_m6agreementpreparationstatus',
             $filter: `_parentcontactid_value eq ${dataverseLookupId(contact, 'contactid')}`,
             $orderby: 'createdon desc',
             $top: '25',
@@ -489,6 +492,7 @@ export async function resolveAuthorPortalContext(
       relationshipPayoutComplete,
       contractSatisfied,
       currentProjectState: currentProject.workspaceState,
+      currentAgreementPreparationStatus: currentProject.agreementPreparationStatusInternal,
     })
 
     return {
@@ -824,6 +828,7 @@ async function buildProjectSummaries(
         undefined,
       contractStatusInternal:
         title && !asset ? 'Signed / Exists - Location Pending Reconciliation' : undefined,
+      agreementPreparationStatusInternal: stringValue(opportunity.jm1_m6agreementpreparationstatus) || undefined,
       ...authorPortfolioFields(title, asset ? [asset] : [], stage ? [stage] : []),
       workspaceState: inferWorkspaceState({
         hasOpportunity: Boolean(dataverseLookupId(opportunity, 'opportunityid')),
@@ -1316,6 +1321,7 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
     tasks: {
       authorProfileRequired: false,
       paymentRoyaltyRequired: false,
+      formatSelectionRequired: false,
     },
     editorial:
       isEditorialWorkspaceState(currentProject.workspaceState)

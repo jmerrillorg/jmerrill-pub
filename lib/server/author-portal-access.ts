@@ -362,12 +362,14 @@ export function buildPortalTaskState({
   relationshipPayoutComplete,
   contractSatisfied,
   currentProjectState,
+  currentAgreementPreparationStatus,
 }: {
   relationshipProfileComplete: boolean
   relationshipStripeComplete: boolean
   relationshipTaxComplete: boolean
   relationshipPayoutComplete: boolean
   contractSatisfied: boolean
+  currentAgreementPreparationStatus?: string
   currentProjectState:
     | 'pre_contract_setup'
     | 'awaiting_governed_action'
@@ -394,9 +396,14 @@ export function buildPortalTaskState({
     !relationshipReadyForSetupSuppression &&
     (!relationshipStripeComplete || !relationshipTaxComplete || !relationshipPayoutComplete)
 
+  const formatSelectionRequired =
+    currentProjectState === 'pre_contract_setup' &&
+    normalizeText(currentAgreementPreparationStatus).includes('awaiting_format_selection')
+
   return {
     authorProfileRequired,
     paymentRoyaltyRequired,
+    formatSelectionRequired,
   }
 }
 
