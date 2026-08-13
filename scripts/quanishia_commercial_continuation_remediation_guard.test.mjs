@@ -18,6 +18,9 @@ const onboardingOptions = readFileSync('lib/publishing/onboarding-production-opt
 test('Stage 0 real-manuscript prompt is compatible with Azure JSON-object fallback', () => {
   assert.match(stage0, /Return one valid JSON object only\./)
   assert.match(stage0, /jm1_diagnosticoutputsummary, jm1_diagnosticriskflags, jm1_confidence, jm1_requireshumanreview/)
+  assert.doesNotMatch(stage0, /Call the submit_stage0_diagnostic tool with your complete assessment\./)
+  assert.match(azureProvider, /RESPONSE_FORMAT_JSON_OBJECT_ENV/)
+  assert.doesNotMatch(azureProvider, /response_format:\s*\{\s*type:\s*"json_object"\s*\}/)
   assert.match(azureProvider, /providerMessage/)
   assert.equal(azureProvider.includes('`AZURE_OPENAI_HTTP_${httpStatus}: ${providerMessage}`'), true)
 })

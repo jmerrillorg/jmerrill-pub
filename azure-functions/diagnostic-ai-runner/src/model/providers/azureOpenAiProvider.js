@@ -21,9 +21,15 @@ const REQUIRED_VARS = [
   "AZURE_OPENAI_DEPLOYMENT_NAME"
 ];
 
+const RESPONSE_FORMAT_JSON_OBJECT_ENV = "AZURE_OPENAI_ENABLE_RESPONSE_FORMAT_JSON_OBJECT";
+
 function checkConfig() {
   const missing = REQUIRED_VARS.filter(v => !process.env[v]);
   return missing.length === 0 ? null : missing;
+}
+
+function shouldRequestJsonObjectResponseFormat() {
+  return process.env[RESPONSE_FORMAT_JSON_OBJECT_ENV] === "true";
 }
 
 async function call({ promptBody, diagnosticId, telemetry = null, route = null }) {
@@ -48,9 +54,12 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
   const requestBody = {
     messages: [{ role: "user", content: promptBody }],
     temperature: 0.2,
-    max_tokens: 1200,
-    response_format: { type: "json_object" }
+    max_tokens: 1200
   };
+
+  if (shouldRequestJsonObjectResponseFormat()) {
+    requestBody.response_format = { type: "json_object" };
+  }
 
   let httpStatus = null;
 
@@ -158,4 +167,10 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
   }
 }
 
-module.exports = { call, checkConfig, REQUIRED_VARS };
+module.exports = {
+  RESPONSE_FORMAT_JSON_OBJECT_ENV,
+  call,
+  checkConfig,
+  REQUIRED_VARS,
+  shouldRequestJsonObjectResponseFormat
+};
