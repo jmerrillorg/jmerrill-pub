@@ -1,6 +1,6 @@
 # Validation Results
 
-Last Verified: 2026-08-13T03:49:51Z
+Last Verified: 2026-08-13T04:06:50Z
 
 | Validation | Result | Notes |
 | --- | --- | --- |
@@ -15,8 +15,11 @@ Last Verified: 2026-08-13T03:49:51Z
 | Production build | PASS | `npm run build`. |
 | Local public page | PASS | `GET http://localhost:3100/experience`: 200. |
 | Direct Dataverse storage validation | PASS | 1 response and 9 question responses created. |
-| Deployed public link | PENDING | Requires App Service workflow deployment. |
-| Deployed response submission | PENDING | Requires App Service workflow deployment. |
+| Staging public link | PASS | `GET https://app-jm1-pub-prod-staging.azurewebsites.net/experience`: 200. |
+| Staging response submission | PASS | `POST /api/author-experience`: 201. |
+| Production public link | PASS | `GET https://jmerrill.pub/experience`: 200. |
+| Production response submission | PASS | `POST https://jmerrill.pub/api/author-experience`: 201. |
+| Production Dataverse readback | PASS | Response `5ab8a564-cc96-f111-8076-6045bdd69435`; 9 question responses. |
 | Author communications | PASS | 0 sent. |
 | Client-title automation | PASS | FROZEN. |
 
