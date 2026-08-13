@@ -136,7 +136,7 @@ function replacePublisherSignatureLine(xml, relId) {
   const publisherIndex = xml.indexOf("<w:t>Publisher</w:t>");
   const authorIndex = xml.indexOf("<w:t>Author</w:t>", publisherIndex);
   if (publisherIndex === -1 || authorIndex === -1) {
-    return { xml, inserted: false };
+    return replaceFinalPublisherByLine(xml, relId);
   }
   const before = xml.slice(0, publisherIndex);
   const block = xml.slice(publisherIndex, authorIndex);
@@ -144,7 +144,7 @@ function replacePublisherSignatureLine(xml, relId) {
   const linePattern = /<w:p\b[^>]*>[\s\S]*?<w:t>By: _{3,}<\/w:t>[\s\S]*?<\/w:p>/;
   const match = block.match(linePattern);
   if (!match) {
-    return { xml, inserted: false };
+    return replaceFinalPublisherByLine(xml, relId);
   }
   const replacement = [
     '<w:p>',
@@ -155,17 +155,53 @@ function replacePublisherSignatureLine(xml, relId) {
   return { xml: before + block.replace(linePattern, replacement) + after, inserted: true };
 }
 
+function replaceFinalPublisherByLine(xml, relId) {
+  const linePattern = /<w:p\b[^>]*>[\s\S]*?<w:t>By: _{3,}<\/w:t>[\s\S]*?<\/w:p>/g;
+  const matches = Array.from(xml.matchAll(linePattern));
+  if (matches.length === 0) {
+    return { xml, inserted: false };
+  }
+  const match = matches[matches.length - 1];
+  const replacement = [
+    '<w:p>',
+    '<w:r><w:t xml:space="preserve">By: </w:t></w:r>',
+    buildPublisherSignatureDrawing(relId),
+    '</w:p>'
+  ].join("");
+  return {
+    xml: xml.slice(0, match.index) + replacement + xml.slice(match.index + match[0].length),
+    inserted: true
+  };
+}
+
 function replacePublisherDateLine(xml, contractDate) {
   const publisherIndex = xml.indexOf("<w:t>Publisher</w:t>");
   const authorIndex = xml.indexOf("<w:t>Author</w:t>", publisherIndex);
   if (publisherIndex === -1 || authorIndex === -1) {
-    return { xml, filled: false };
+    return replaceFinalPublisherDateLine(xml, contractDate);
   }
   const before = xml.slice(0, publisherIndex);
   const block = xml.slice(publisherIndex, authorIndex);
   const after = xml.slice(authorIndex);
   const updated = block.replace(/<w:t>Date: _{3,}<\/w:t>/, `<w:t>Date: ${escapeXmlAttr(contractDate)}</w:t>`);
+  if (updated === block) {
+    return replaceFinalPublisherDateLine(xml, contractDate);
+  }
   return { xml: before + updated + after, filled: updated !== block };
+}
+
+function replaceFinalPublisherDateLine(xml, contractDate) {
+  const linePattern = /<w:t>Date: _{3,}<\/w:t>/g;
+  const matches = Array.from(xml.matchAll(linePattern));
+  if (matches.length === 0) {
+    return { xml, filled: false };
+  }
+  const match = matches[0];
+  const replacement = `<w:t>Date: ${escapeXmlAttr(contractDate)}</w:t>`;
+  return {
+    xml: xml.slice(0, match.index) + replacement + xml.slice(match.index + match[0].length),
+    filled: true
+  };
 }
 
 async function applyPublisherSignatureToAgreementBuffer(buffer, signaturePngBuffer, fields) {
