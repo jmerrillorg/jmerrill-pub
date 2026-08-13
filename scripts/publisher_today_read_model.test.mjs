@@ -152,6 +152,8 @@ const expectations = [
       client.includes("searchParams.get('intakeId')") &&
       client.includes("searchParams.get('diagnosticId')") &&
       client.includes("searchParams.get('title')") &&
+      client.includes('matchesEveryProvidedIdentifier') &&
+      client.includes('deepLinked.length === 1') &&
       client.includes('selectedTitle') &&
       client.includes('Requested action could not be resolved.') &&
       client.includes('No fallback title was opened.') &&

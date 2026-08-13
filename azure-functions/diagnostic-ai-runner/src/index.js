@@ -15,6 +15,7 @@ require("./functions/runMilestone6OpportunityUpdate");
 require("./functions/runMilestone6PaymentOptionCapture");
 require("./functions/runOp000TrackAAdoption");
 require("./functions/runOp000TrackBAdoption");
+require("./functions/runPackageSelectionCommercialContinuation");
 require("./functions/runPreContractEditorialReview");
 require("./functions/runPublisherRecommendationAction");
 require("./functions/runPublisherReviewDecision");

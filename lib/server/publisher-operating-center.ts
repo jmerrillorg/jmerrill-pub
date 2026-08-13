@@ -1542,7 +1542,7 @@ function buildQueueItem(
             currentBlocker === 'Ready for next editorial scheduling decision'
           ) && hasContact && hasManuscript
           ? 'system'
-          : currentBlocker === 'Manuscript evidence is missing'
+          : currentBlocker === 'Source manuscript/material evidence is missing'
             ? 'author'
           : authorizedActions.some((action) => action.id !== 'view_only')
             ? 'publisher'
@@ -2402,7 +2402,7 @@ function deriveBlocker(input: {
 }) {
   if (!input.hasContact) return 'Author contact must be reconciled'
   if (input.hasEvidenceHold) return 'Evidence hold active'
-  if (!input.hasManuscript) return 'Manuscript evidence is missing'
+  if (!input.hasManuscript) return 'Source manuscript/material evidence is missing'
   if (input.stage0RequiresJackie) return 'Stage 0 diagnostic requires publisher review'
   if (input.titleId && input.assetId && input.hasEditorialStage) return 'Ready for next editorial scheduling decision'
   if (!input.titleId || !input.assetId) return 'Editorial Review automation pending'
@@ -2453,12 +2453,12 @@ function buildAuthorizedActions(currentBlocker: string, hasContact: boolean): Pu
     ]
   }
 
-  if (currentBlocker === 'Manuscript evidence is missing' && hasContact) {
+  if (currentBlocker === 'Source manuscript/material evidence is missing' && hasContact) {
     return [
       {
         id: 'place_evidence_hold',
         label: 'Place evidence hold',
-        entryConditions: ['Linked contact exists', 'Manuscript evidence is missing'],
+        entryConditions: ['Linked contact exists', 'Source manuscript/material evidence is missing'],
         authorFacingConsequence: 'None. This records the internal evidence hold without contacting the author.',
       },
       {
@@ -3069,7 +3069,7 @@ function deriveTitleOperatingStages(input: {
   for (const item of input.productionCommand.coverQueue) present.add('cover-interior')
 
   const registry: PublisherTitleOperatingStage[] = [
-    defineStage('intake', 'Intake', 10, false, 'Inquiry or intake exists.', 'Commercial and manuscript evidence are ready.', 'developmental-editing'),
+    defineStage('intake', 'Intake', 10, false, 'Intake exists from a governed inquiry event.', 'Commercial and manuscript evidence are ready.', 'developmental-editing'),
     defineStage('developmental-editing', 'Developmental Editing', 20, true, 'Developmental editing is initialized.', 'Author fully approves the current developmental-edit artifact.', 'line-editing'),
     defineStage('line-editing', 'Line Editing', 30, true, 'Developmental Editing is closed and Line Editing entry conditions pass.', 'Author approval or approved release decision is recorded.', 'copyediting'),
     defineStage('copyediting', 'Copyediting', 40, true, 'Line Editing is closed and copyediting is authorized.', 'Copyediting release conditions pass.', 'proofreading'),
