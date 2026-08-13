@@ -16,8 +16,19 @@ const SENDER_DISPLAY_NAME = "J Merrill Publishing";
 const AGREEMENT_PACKAGE_SEND_TYPE = "AGREEMENT_PACKAGE_SEND";
 const AGREEMENT_PACKAGE_SENT = "AGREEMENT_PACKAGE_SENT";
 
-// Exactly the four documents the agreement package must always contain.
-const REQUIRED_ATTACHMENT_COUNT = 4;
+// Dynamic governed agreement packets contain the Agreement + Package
+// Addendum, with Audiobook Addendum and Schedule A added only when
+// generated for the selected package/payment plan.
+const MIN_ATTACHMENT_COUNT = 2;
+const MAX_ATTACHMENT_COUNT = 4;
+const REQUIRED_ATTACHMENT_BASENAMES = Object.freeze([
+  "JMP_Publishing_Agreement_FILLED",
+  "JMP_Publishing_Package_Addendum_FILLED"
+]);
+const OPTIONAL_ATTACHMENT_BASENAMES = Object.freeze([
+  "JMP_Audiobook_Addendum_FILLED",
+  "JMP_Schedule_A_Payment_Schedule"
+]);
 const ALLOWED_ATTACHMENT_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // ACS request-size limit, including attachments
 
@@ -198,22 +209,33 @@ function milestoneServerError(code, payload = {}) {
 }
 
 function validateAttachments(attachments) {
-  if (!Array.isArray(attachments) || attachments.length !== REQUIRED_ATTACHMENT_COUNT) {
+  if (!Array.isArray(attachments) || attachments.length < MIN_ATTACHMENT_COUNT || attachments.length > MAX_ATTACHMENT_COUNT) {
     return { ok: false, reason: "ATTACHMENT_COUNT_INVALID" };
   }
 
   let totalBytes = 0;
+  const seenBaseNames = new Set();
   for (const attachment of attachments) {
     if (!attachment || typeof attachment !== "object") return { ok: false, reason: "ATTACHMENT_SHAPE_INVALID" };
     const name = safeTrim(attachment.name);
     const contentType = safeTrim(attachment.contentType);
     const contentInBase64 = typeof attachment.contentInBase64 === "string" ? attachment.contentInBase64 : "";
+    const baseName = [...REQUIRED_ATTACHMENT_BASENAMES, ...OPTIONAL_ATTACHMENT_BASENAMES].find((allowed) => name.startsWith(allowed));
 
     if (!name || !name.toLowerCase().endsWith(".docx")) return { ok: false, reason: "ATTACHMENT_NAME_INVALID" };
+    if (!baseName) return { ok: false, reason: "ATTACHMENT_NAME_UNRECOGNIZED" };
+    if (seenBaseNames.has(baseName)) return { ok: false, reason: "ATTACHMENT_DUPLICATE" };
+    seenBaseNames.add(baseName);
     if (contentType !== ALLOWED_ATTACHMENT_CONTENT_TYPE) return { ok: false, reason: "ATTACHMENT_CONTENT_TYPE_INVALID" };
     if (!contentInBase64) return { ok: false, reason: "ATTACHMENT_CONTENT_MISSING" };
 
     totalBytes += Buffer.byteLength(contentInBase64, "base64");
+  }
+
+  for (const requiredBaseName of REQUIRED_ATTACHMENT_BASENAMES) {
+    if (!seenBaseNames.has(requiredBaseName)) {
+      return { ok: false, reason: "REQUIRED_ATTACHMENT_MISSING" };
+    }
   }
 
   if (totalBytes > MAX_ATTACHMENT_BYTES) {

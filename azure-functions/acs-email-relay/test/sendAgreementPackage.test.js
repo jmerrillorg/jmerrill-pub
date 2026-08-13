@@ -64,6 +64,10 @@ function fourValidAttachments() {
   ];
 }
 
+function twoValidAttachments() {
+  return fourValidAttachments().slice(0, 2);
+}
+
 function validPayload(overrides = {}) {
   return {
     diagnosticId: "64e387e0-7e6a-f111-a826-00224820105b",
@@ -141,10 +145,38 @@ test("rejects an unsafe field (e.g. rawModelOutput, paymentLink) anywhere in the
   assert.equal(result.reason, "UNSAFE_FIELD_PRESENT");
 });
 
-test("validateAttachments — requires exactly four attachments", () => {
+test("validateAttachments — accepts dynamic governed packet sizes", () => {
   const { validateAttachments } = loadAgreementPackageModule();
-  assert.equal(validateAttachments(fourValidAttachments().slice(0, 3)).ok, false);
+  assert.equal(validateAttachments(twoValidAttachments()).ok, true);
+  assert.equal(validateAttachments(fourValidAttachments().slice(0, 3)).ok, true);
   assert.equal(validateAttachments(fourValidAttachments()).ok, true);
+});
+
+test("validateAttachments — requires Agreement and Package Addendum", () => {
+  const { validateAttachments } = loadAgreementPackageModule();
+  const result = validateAttachments(fourValidAttachments().slice(2));
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "REQUIRED_ATTACHMENT_MISSING");
+});
+
+test("validateAttachments — rejects duplicate governed attachment names", () => {
+  const { validateAttachments } = loadAgreementPackageModule();
+  const result = validateAttachments([
+    { ...VALID_ATTACHMENT, name: "JMP_Publishing_Agreement_FILLED_a.docx" },
+    { ...VALID_ATTACHMENT, name: "JMP_Publishing_Agreement_FILLED_b.docx" }
+  ]);
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "ATTACHMENT_DUPLICATE");
+});
+
+test("validateAttachments — rejects unrecognized docx attachment names", () => {
+  const { validateAttachments } = loadAgreementPackageModule();
+  const result = validateAttachments([
+    ...twoValidAttachments(),
+    { ...VALID_ATTACHMENT, name: "Random_Document.docx" }
+  ]);
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "ATTACHMENT_NAME_UNRECOGNIZED");
 });
 
 test("validateAttachments — rejects a non-.docx attachment name", () => {
@@ -186,6 +218,16 @@ test("buildAgreementPackageSendEmail — sender, replyTo, Publishing CC, and att
   assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
   assert.equal(email.attachments.length, 4);
   assert.ok(email.attachments.every((a) => a.contentType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+});
+
+test("buildAgreementPackageSendEmail — accepts Starter/internal commissioning two-document packet", () => {
+  const { validateAgreementPackageSendPayload, buildAgreementPackageSendEmail } = loadAgreementPackageModule();
+  const validation = validateAgreementPackageSendPayload(validPayload({ attachments: twoValidAttachments() }));
+  assert.equal(validation.ok, true);
+  const email = buildAgreementPackageSendEmail(validation.value);
+  assert.equal(email.attachments.length, 2);
+  assert.equal(email.attachments[0].name, "JMP_Publishing_Agreement_FILLED_x.docx");
+  assert.equal(email.attachments[1].name, "JMP_Publishing_Package_Addendum_FILLED_x.docx");
 });
 
 test("buildAgreementPackageSendEmail — preserves one effective Publishing CC", () => {
