@@ -78,16 +78,16 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     const hasRequestedAction = Boolean(requestedTitleId || requestedIntakeId || requestedDiagnosticId || requestedRecordId || requestedTitle)
     const match = (value?: string | null, expected?: string | null) =>
       Boolean(value && expected && value.toLowerCase() === expected.toLowerCase())
+    const matchesEveryProvidedIdentifier = (card: PublisherTitleOperatingCard) =>
+      (!requestedTitleId || match(card.titleId, requestedTitleId)) &&
+      (!requestedIntakeId || match(card.intakeId, requestedIntakeId)) &&
+      (!requestedDiagnosticId || match(card.diagnosticId, requestedDiagnosticId)) &&
+      (!requestedRecordId || match(card.key, requestedRecordId)) &&
+      (!requestedTitle || match(card.title, requestedTitle))
 
     if (hasRequestedAction) {
-      const deepLinked = allCards.find((card) =>
-        match(card.titleId, requestedTitleId) ||
-        match(card.intakeId, requestedIntakeId) ||
-        match(card.diagnosticId, requestedDiagnosticId) ||
-        match(card.key, requestedRecordId) ||
-        match(card.title, requestedTitle),
-      )
-      if (deepLinked) return { card: deepLinked, unresolved: false }
+      const deepLinked = allCards.filter(matchesEveryProvidedIdentifier)
+      if (deepLinked.length === 1) return { card: deepLinked[0], unresolved: false }
       return { card: null, unresolved: true }
     }
 

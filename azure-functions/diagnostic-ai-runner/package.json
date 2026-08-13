@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "func start",
-    "lint": "node --check src/functions/runStage0Diagnostic.js src/dataverse/client.js src/functions/runApprovalEventConsumer.js src/orchestration/approvalEventConsumer.js src/functions/runAuthorReviewResponseConsumer.js src/orchestration/authorReviewResponseConsumer.js src/functions/runEditorialExecutionRuntime.js src/functions/runEditorialPackageHandoffConsumer.js src/editorial/editorialExecutionRuntime.js src/editorial/editorialPackageHandoffConsumer.js src/functions/runPublishingIntakeAutostartRecovery.js",
+    "lint": "node --check src/functions/runStage0Diagnostic.js src/dataverse/client.js src/functions/runApprovalEventConsumer.js src/orchestration/approvalEventConsumer.js src/functions/runAuthorReviewResponseConsumer.js src/orchestration/authorReviewResponseConsumer.js src/functions/runEditorialExecutionRuntime.js src/functions/runEditorialPackageHandoffConsumer.js src/editorial/editorialExecutionRuntime.js src/editorial/editorialPackageHandoffConsumer.js src/functions/runPublishingIntakeAutostartRecovery.js src/functions/runPackageSelectionCommercialContinuation.js",
     "test": "node --test"
   },
   "dependencies": {
