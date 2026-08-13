@@ -161,7 +161,7 @@ export default function PublishingPage() {
         description="You wrote something that matters. J Merrill Publishing helps you bring it into the world with professional editing, design, distribution, and guidance while your name, your rights, and your legacy stay at the center."
         actions={[
           { label: 'Tell Us About Your Book', href: '/join' },
-          { label: 'Share Your Experience', href: '/experience' },
+          { label: 'Share Your Experience', href: 'https://customervoice.microsoft.com/Pages/ResponsePage.aspx?id=XgctNReOaUGfjiLmlGzmbWLYUJckILxClwf4SzJd-xlUQUNJUFFGQldJTkVVQzdSU1RSN1RCMjFRNi4u' },
         ]}
       />
 
@@ -396,7 +396,7 @@ export default function PublishingPage() {
         }
         description="Tell us where you are in the journey: idea, manuscript, edited draft, or ready-to-publish work. We will help you understand the right next step."
         primary={{ label: 'Tell Us About Your Book', href: '/join' }}
-        secondary={{ label: 'Share Your Experience', href: '/experience' }}
+        secondary={{ label: 'Share Your Experience', href: 'https://customervoice.microsoft.com/Pages/ResponsePage.aspx?id=XgctNReOaUGfjiLmlGzmbWLYUJckILxClwf4SzJd-xlUQUNJUFFGQldJTkVVQzdSU1RSN1RCMjFRNi4u' }}
       />
     </div>
   )

@@ -49,7 +49,7 @@ export default function ContactPage() {
         description="If you are carrying a manuscript, message, story, or legacy work, we want the next step to feel clear. Use this page for publishing questions, consultations, media inquiries, and direct communication with J Merrill Publishing."
         actions={[
           { label: 'Join the Family', href: '/join' },
-          { label: 'Share Your Experience', href: '/experience' },
+          { label: 'Share Your Experience', href: 'https://customervoice.microsoft.com/Pages/ResponsePage.aspx?id=XgctNReOaUGfjiLmlGzmbWLYUJckILxClwf4SzJd-xlUQUNJUFFGQldJTkVVQzdSU1RSN1RCMjFRNi4u' },
         ]}
       />
 

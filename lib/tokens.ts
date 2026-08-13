@@ -228,7 +228,7 @@ export const footerLinks = {
   ],
   authorSupport: [
     { label: 'Memberships', href: '/memberships' },
-    { label: 'Share Your Experience', href: '/experience' },
+    { label: 'Share Your Experience', href: 'https://customervoice.microsoft.com/Pages/ResponsePage.aspx?id=XgctNReOaUGfjiLmlGzmbWLYUJckILxClwf4SzJd-xlUQUNJUFFGQldJTkVVQzdSU1RSN1RCMjFRNi4u' },
     { label: 'Contact',     href: '/contact' },
     { label: 'Readers',     href: '/readers' },
   ],

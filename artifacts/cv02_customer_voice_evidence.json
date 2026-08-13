@@ -1,0 +1,22 @@
+{
+  "status": "PENDING DEPLOYMENT VALIDATION",
+  "updated_at": "2026-08-13T04:15:10.581Z",
+  "repository": "publishing",
+  "environment": "JM1-Core",
+  "environment_url": "https://jm1hq.crm.dynamics.com/",
+  "project_id": "e9d9a1ae-286e-49e8-8981-d04ea0aa5ebc",
+  "project_name": "J Merrill Publishing — Author Experience",
+  "survey_id": "fe494eb2-cb96-f111-8076-000d3a14673b",
+  "survey_name": "J Merrill Publishing — Share Your Experience",
+  "public_url": "https://customervoice.microsoft.com/Pages/ResponsePage.aspx?id=XgctNReOaUGfjiLmlGzmbWLYUJckILxClwf4SzJd-xlUQUNJUFFGQldJTkVVQzdSU1RSN1RCMjFRNi4u",
+  "controlled_response_ids": [
+    "573a7bd6-cc96-f111-8075-000d3a117063"
+  ],
+  "question_response_counts": [
+    10
+  ],
+  "anonymous_response_behavior": "PASS - no required identity and no controlled-marker Contact created.",
+  "testimonial_permission": "Follow-up permission only.",
+  "service_recovery_boundary": "Human review before consequential follow-up.",
+  "privacy_result": "PASS"
+}

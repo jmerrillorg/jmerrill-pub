@@ -110,7 +110,7 @@ export default function AuthorJourneyPage() {
         description="Publishing should not feel confusing or lonely. At J Merrill Publishing, we walk with authors through a clear process from the first conversation to editorial preparation, design, distribution, launch, and long-term support."
         actions={[
           { label: 'Tell Us About Your Book', href: '/join' },
-          { label: 'Share Your Experience', href: '/experience' },
+          { label: 'Share Your Experience', href: 'https://customervoice.microsoft.com/Pages/ResponsePage.aspx?id=XgctNReOaUGfjiLmlGzmbWLYUJckILxClwf4SzJd-xlUQUNJUFFGQldJTkVVQzdSU1RSN1RCMjFRNi4u' },
         ]}
       />
 
@@ -265,7 +265,7 @@ export default function AuthorJourneyPage() {
         }
         description="Tell us about your book, where you are in the journey, and what you hope the work will become. We will help you understand the publishing path that fits."
         primary={{ label: 'Tell Us About Your Book', href: '/join' }}
-        secondary={{ label: 'Share Your Experience', href: '/experience' }}
+        secondary={{ label: 'Share Your Experience', href: 'https://customervoice.microsoft.com/Pages/ResponsePage.aspx?id=XgctNReOaUGfjiLmlGzmbWLYUJckILxClwf4SzJd-xlUQUNJUFFGQldJTkVVQzdSU1RSN1RCMjFRNi4u' }}
       />
     </div>
   )
