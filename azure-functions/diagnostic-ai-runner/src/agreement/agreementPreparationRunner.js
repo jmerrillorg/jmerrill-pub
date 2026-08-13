@@ -375,6 +375,7 @@ function fillPackageAddendum(xml, fields) {
   const blankSteps = [
     { label: "Selected Package: ", value: fields.packageLabel, name: "selectedPackage" },
     { label: "Imprint: ", value: fields.imprintLabel, name: "imprint" },
+    { label: "Selected Editions / Formats: ", value: fields.selectedEditionsFormats, name: "selectedEditionsFormats", preferInline: true },
     { label: "Word Count (approx.): ", value: wordCountDisplay(fields), name: "wordCount", preferInline: true },
     { label: "Manuscript Deadline: ", value: fields.manuscriptDeadlineText, name: "manuscriptDeadline", preferInline: true }
   ];

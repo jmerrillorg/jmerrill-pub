@@ -8,15 +8,20 @@ export type FormatDisposition = 'INCLUDED' | 'AVAILABLE_ADD_ON' | 'NOT_APPLICABL
 export type FormatSelectionSummary = {
   packageCode: string
   packageName: string
+  packageIncludedSlotLimit: number
   selectedFormatKey: string
   selectedFormatLabel: string
   addOnInterestKey: string
   addOnInterestLabel: string
   selectedProductForms: string[]
   includedProductForms: string[]
+  selectedIncludedProductForms: string[]
+  selectedAddOnProductForms: string[]
+  selectedSeparateAuthorizationProductForms: string[]
   availableAddOnProductForms: string[]
   separateAuthorizationProductForms: string[]
   notApplicableProductForms: string[]
+  selectionBlockers: string[]
   dispositions: Array<{
     productForm: string
     label: string
@@ -69,28 +74,40 @@ export const preferredPrintFormatOptions: PublishingSelectOption[] = [
 
 export const governedFormatSelectionOptions: PublishingSelectOption[] = [
   {
-    key: 'starter_included_paperback_ebook',
-    label: 'Paperback + eBook - included with Starter',
+    key: 'paperback_ebook',
+    label: 'Paperback + eBook',
   },
   {
     key: 'paperback_only',
     label: 'Paperback only',
   },
   {
-    key: 'paperback_ebook_hardcover',
-    label: 'Paperback + eBook + hardcover',
+    key: 'ebook_only',
+    label: 'eBook only',
   },
   {
-    key: 'paperback_ebook_large_print',
-    label: 'Paperback + eBook + large print',
+    key: 'paperback_hardcover',
+    label: 'Paperback + hardcover',
   },
   {
-    key: 'paperback_ebook_audiobook_interest',
-    label: 'Paperback + eBook + audiobook interest',
+    key: 'paperback_large_print',
+    label: 'Paperback + large print',
+  },
+  {
+    key: 'ebook_hardcover',
+    label: 'eBook + hardcover',
+  },
+  {
+    key: 'ebook_large_print',
+    label: 'eBook + large print',
+  },
+  {
+    key: 'hardcover_large_print',
+    label: 'Hardcover + large print',
   },
   {
     key: 'needs_recommendation',
-    label: 'Not sure - recommend the right format set',
+    label: 'Not sure - I need a recommendation before agreement preparation',
   },
 ]
 
@@ -203,10 +220,10 @@ function normalize(value: string) {
 
 function resolvePackage(packageConfirmation: string) {
   const normalized = normalize(packageConfirmation)
-  if (normalized.includes('starter')) return { packageCode: 'JMP-PKG-STARTER', packageName: 'Starter Publishing Package' }
-  if (normalized.includes('professional')) return { packageCode: 'JMP-PKG-PRO', packageName: 'Professional Publishing Package' }
-  if (normalized.includes('premier')) return { packageCode: 'JMP-PKG-PREMIER', packageName: 'Premier Publishing Package' }
-  return { packageCode: 'CUSTOM_OR_UNCONFIRMED', packageName: packageConfirmation || 'Unconfirmed package' }
+  if (normalized.includes('starter')) return { packageCode: 'JMP-PKG-STARTER', packageName: 'Starter Publishing Package', packageIncludedSlotLimit: 2 }
+  if (normalized.includes('professional')) return { packageCode: 'JMP-PKG-PRO', packageName: 'Professional Publishing Package', packageIncludedSlotLimit: 3 }
+  if (normalized.includes('premier')) return { packageCode: 'JMP-PKG-PREMIER', packageName: 'Premier Publishing Package', packageIncludedSlotLimit: 4 }
+  return { packageCode: 'CUSTOM_OR_UNCONFIRMED', packageName: packageConfirmation || 'Unconfirmed package', packageIncludedSlotLimit: 0 }
 }
 
 function unique(values: string[]) {
@@ -226,48 +243,66 @@ export function resolveGovernedFormatSelection({
   const addOn = resolveOption(additionalFormatInterestOptions, additionalFormatInterest || 'none')
   const pkg = resolvePackage(packageConfirmation)
 
-  const includedProductForms =
+  const packageIncludedProductForms =
     pkg.packageCode === 'JMP-PKG-STARTER'
-      ? ['PF-01', 'PF-03']
+      ? ['PF-01', 'PF-02', 'PF-03', 'PF-05']
       : pkg.packageCode === 'JMP-PKG-PRO'
-        ? ['PF-01', 'PF-02', 'PF-03']
+        ? ['PF-01', 'PF-02', 'PF-03', 'PF-05']
         : pkg.packageCode === 'JMP-PKG-PREMIER'
           ? ['PF-01', 'PF-02', 'PF-03', 'PF-05']
           : []
 
   const selectedProductForms = unique([
-    ...(selected.key.includes('paperback') || selected.key === 'needs_recommendation' ? ['PF-01'] : []),
-    ...(selected.key.includes('ebook') || selected.key === 'starter_included_paperback_ebook' || selected.key === 'needs_recommendation' ? ['PF-03'] : []),
+    ...(selected.key.includes('paperback') ? ['PF-01'] : []),
+    ...(selected.key.includes('ebook') ? ['PF-03'] : []),
     ...(selected.key.includes('hardcover') || addOn.key === 'hardcover_addon' ? ['PF-02'] : []),
     ...(selected.key.includes('large_print') || addOn.key === 'large_print_addon' ? ['PF-05'] : []),
     ...(selected.key.includes('audiobook') || addOn.key === 'audiobook_separate_authorization' ? ['PF-04'] : []),
     ...(addOn.key === 'accessible_enhanced_ebook_review' ? ['PF-06'] : []),
   ])
 
+  const selectedIncludedProductForms = selectedProductForms.filter((pf) => packageIncludedProductForms.includes(pf))
+  const selectedSeparateAuthorizationProductForms = selectedProductForms.filter((pf) => ['PF-04', 'PF-06'].includes(pf))
+  const selectedNotApplicableProductForms = selectedProductForms.filter((pf) => pf === 'PF-07')
+  const selectedAddOnProductForms =
+    pkg.packageIncludedSlotLimit > 0 && selectedIncludedProductForms.length > pkg.packageIncludedSlotLimit
+      ? selectedIncludedProductForms.slice(pkg.packageIncludedSlotLimit)
+      : []
+  const includedProductForms =
+    pkg.packageIncludedSlotLimit > 0
+      ? selectedIncludedProductForms.slice(0, pkg.packageIncludedSlotLimit)
+      : []
+  const selectionBlockers = unique([
+    ...(selected.key === 'needs_recommendation' ? ['AUTHOR_FORMAT_RECOMMENDATION_REQUIRED'] : []),
+    ...(pkg.packageIncludedSlotLimit === 0 ? ['PACKAGE_NOT_CONFIRMED_FOR_FORMAT_SELECTION'] : []),
+    ...(selectedSeparateAuthorizationProductForms.map((pf) => `${pf}:SEPARATE_AUTHORIZATION_REQUIRED`)),
+    ...(selectedNotApplicableProductForms.map((pf) => `${pf}:NOT_APPLICABLE`)),
+  ])
+
   const dispositions = [
     {
       productForm: 'PF-01',
       label: 'Paperback',
-      disposition: includedProductForms.includes('PF-01') ? 'INCLUDED' : 'AVAILABLE_ADD_ON',
-      reason: includedProductForms.includes('PF-01') ? 'Included/default print format for the confirmed package.' : 'Eligible print format if added to scope.',
+      disposition: packageIncludedProductForms.includes('PF-01') ? 'INCLUDED' : 'AVAILABLE_ADD_ON',
+      reason: packageIncludedProductForms.includes('PF-01') ? 'Eligible for an included package edition slot when the author elects it.' : 'Eligible print format if added to scope.',
     },
     {
       productForm: 'PF-03',
       label: 'Standard eBook',
-      disposition: includedProductForms.includes('PF-03') ? 'INCLUDED' : 'AVAILABLE_ADD_ON',
-      reason: includedProductForms.includes('PF-03') ? 'Included/default digital format for the confirmed package.' : 'Eligible digital format if added to scope.',
+      disposition: packageIncludedProductForms.includes('PF-03') ? 'INCLUDED' : 'AVAILABLE_ADD_ON',
+      reason: packageIncludedProductForms.includes('PF-03') ? 'Eligible for an included package edition slot when the author elects it.' : 'Eligible digital format if added to scope.',
     },
     {
       productForm: 'PF-02',
       label: 'Hardcover',
-      disposition: includedProductForms.includes('PF-02') ? 'INCLUDED' : 'AVAILABLE_ADD_ON',
-      reason: includedProductForms.includes('PF-02') ? 'Included with the confirmed package.' : 'Available as an add-on or package upgrade when approved.',
+      disposition: packageIncludedProductForms.includes('PF-02') ? 'INCLUDED' : 'AVAILABLE_ADD_ON',
+      reason: packageIncludedProductForms.includes('PF-02') ? 'Eligible for an included package edition slot when the author elects it.' : 'Available as an add-on or package upgrade when approved.',
     },
     {
       productForm: 'PF-05',
       label: 'Large Print',
-      disposition: includedProductForms.includes('PF-05') ? 'INCLUDED' : 'AVAILABLE_ADD_ON',
-      reason: includedProductForms.includes('PF-05') ? 'Included with the confirmed package.' : 'Available as an add-on when approved.',
+      disposition: packageIncludedProductForms.includes('PF-05') ? 'INCLUDED' : 'AVAILABLE_ADD_ON',
+      reason: packageIncludedProductForms.includes('PF-05') ? 'Eligible for an included package edition slot when the author elects it.' : 'Available as an add-on when approved.',
     },
     {
       productForm: 'PF-06',
@@ -297,9 +332,13 @@ export function resolveGovernedFormatSelection({
     addOnInterestLabel: addOn.label,
     selectedProductForms,
     includedProductForms,
+    selectedIncludedProductForms,
+    selectedAddOnProductForms,
+    selectedSeparateAuthorizationProductForms,
     availableAddOnProductForms: dispositions.filter((item) => item.disposition === 'AVAILABLE_ADD_ON').map((item) => item.productForm),
     separateAuthorizationProductForms: dispositions.filter((item) => item.disposition === 'REQUIRES_SEPARATE_AUTHORIZATION').map((item) => item.productForm),
     notApplicableProductForms: dispositions.filter((item) => item.disposition === 'NOT_APPLICABLE').map((item) => item.productForm),
+    selectionBlockers,
     dispositions,
     downstreamDrivers: {
       isbnRequirements: selectedProductForms.filter((pf) => ['PF-01', 'PF-02', 'PF-03', 'PF-05', 'PF-06'].includes(pf)),

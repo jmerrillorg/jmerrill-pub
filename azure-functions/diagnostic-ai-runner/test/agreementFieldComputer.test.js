@@ -37,6 +37,7 @@ describe("computeAgreementFields — the controlled record's real values", () =>
       "Hardcover: 10 copies",
       "Standard Ebook: 1 digital entitlement"
     ]);
+    assert.equal(r.selectedEditionsFormats, "PF-01 Paperback; PF-02 Hardcover; PF-03 Standard Ebook");
     assert.equal(r.audiobookIncluded, false);
   });
 

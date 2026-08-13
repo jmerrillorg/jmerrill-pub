@@ -64,6 +64,12 @@ function todayIsoDate(now = new Date()) {
   return now.toISOString().slice(0, 10);
 }
 
+function selectedEditionsFormatsLabel(entitlements = []) {
+  return entitlements
+    .map((entitlement) => `${entitlement.productFormCode} ${entitlement.productFormName}`)
+    .join("; ");
+}
+
 /**
  * @param {{
  *   title: string, authorLegalName: string, imprintLabel: string,
@@ -169,6 +175,7 @@ function computeAgreementFields(input = {}) {
     packageLabel: packageInfo.label,
     packageFeeUsd: packageInfo.fee,
     packageFeeFormatted: formatUsd(packageInfo.fee),
+    selectedEditionsFormats: selectedEditionsFormatsLabel(complimentaryEntitlementResult.entitlements),
     complimentaryCopies: complimentaryEntitlementResult.complimentaryCopies,
     complimentaryEntitlements: complimentaryEntitlementResult.entitlements,
     audiobookIncluded: packageInfo.audiobookIncluded === true,
@@ -193,5 +200,6 @@ module.exports = {
   todayIsoDate,
   PACKAGE_INFO,
   PAYMENT_OPTION_INFO,
-  MANUSCRIPT_DEADLINE_TEXT
+  MANUSCRIPT_DEADLINE_TEXT,
+  selectedEditionsFormatsLabel
 };

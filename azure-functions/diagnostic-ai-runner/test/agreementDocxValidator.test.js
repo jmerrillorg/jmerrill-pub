@@ -7,7 +7,18 @@ const { isValidDocxBuffer, DOCX_MIME_TYPE } = require("../src/agreement/agreemen
 
 async function buildMinimalDocx() {
   const zip = new JSZip();
-  zip.file("[Content_Types].xml", '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>');
+  zip.file("[Content_Types].xml", [
+    '<?xml version="1.0"?>',
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">',
+    '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>',
+    '</Types>'
+  ].join(""));
+  zip.file("_rels/.rels", [
+    '<?xml version="1.0"?>',
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">',
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>',
+    '</Relationships>'
+  ].join(""));
   zip.file("word/document.xml", "<w:document/>");
   return zip.generateAsync({ type: "nodebuffer" });
 }
@@ -45,6 +56,16 @@ describe("isValidDocxBuffer", () => {
     const result = await isValidDocxBuffer(buffer);
     assert.equal(result.valid, false);
     assert.equal(result.reason, "MISSING_WORD_DOCUMENT_XML");
+  });
+
+  test("rejects a generated package that lacks the Office document relationship", async () => {
+    const zip = new JSZip();
+    zip.file("[Content_Types].xml", '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+    zip.file("word/document.xml", "<w:document/>");
+    const buffer = await zip.generateAsync({ type: "nodebuffer" });
+    const result = await isValidDocxBuffer(buffer);
+    assert.equal(result.valid, false);
+    assert.equal(result.reason, "MISSING_PACKAGE_RELS");
   });
 
   test("DOCX_MIME_TYPE matches the standard Office Open XML word-processing MIME type", () => {

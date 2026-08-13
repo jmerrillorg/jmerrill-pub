@@ -230,6 +230,13 @@ export function AuthorPortalWorkspace() {
 
   const steps = [
     {
+      label: 'Choose Your Publishing Formats',
+      description:
+        'Starter Package includes two edition slots. Choose the formats for this title before agreement preparation continues.',
+      href: '/author/onboarding',
+      visible: context.tasks.formatSelectionRequired,
+    },
+    {
       label: 'Author Profile',
       description: context.tasks.authorProfileRequired
         ? 'Confirm your author details, mailing address, and book information.'

@@ -2,9 +2,9 @@
 
 /**
  * Validates that a buffer is a structurally valid .docx file before it
- * is attached to an outbound email. Never inspects or returns document
- * text — only confirms the ZIP signature and the presence of the
- * required word/document.xml part.
+ * is allowed to enter any agreement execution path. Never inspects or
+ * returns document text — only confirms the Open XML package shape
+ * required by Word/e-sign providers.
  */
 
 const JSZip = require("jszip");
@@ -33,6 +33,27 @@ async function isValidDocxBuffer(buffer) {
 
   if (!zip.file("word/document.xml")) {
     return { valid: false, reason: "MISSING_WORD_DOCUMENT_XML" };
+  }
+  if (!zip.file("[Content_Types].xml")) {
+    return { valid: false, reason: "MISSING_CONTENT_TYPES_XML" };
+  }
+  if (!zip.file("_rels/.rels")) {
+    return { valid: false, reason: "MISSING_PACKAGE_RELS" };
+  }
+
+  let contentTypesXml;
+  let packageRelsXml;
+  try {
+    contentTypesXml = await zip.file("[Content_Types].xml").async("string");
+    packageRelsXml = await zip.file("_rels/.rels").async("string");
+  } catch {
+    return { valid: false, reason: "OPENXML_PACKAGE_PART_READ_FAILED" };
+  }
+  if (!contentTypesXml.includes("wordprocessingml.document.main+xml")) {
+    return { valid: false, reason: "MISSING_MAIN_DOCUMENT_CONTENT_TYPE" };
+  }
+  if (!packageRelsXml.includes("officeDocument")) {
+    return { valid: false, reason: "MISSING_OFFICE_DOCUMENT_RELATIONSHIP" };
   }
 
   return { valid: true, reason: null };
