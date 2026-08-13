@@ -32,8 +32,11 @@ Publishing App Service workflow:
 
 - Run status: SUCCESS
 - Head SHA: `aa62b91489677f4479403cc730917ae1a39f75ad`
-- Production `jmerrill.pub` release after workflow: `43b438e0c9b86936e78d96aeca249840f6a9350b`
-- Public/app-service production promotion: NOT EXECUTED
+- Initial push workflow built and certified staging only.
+- Production promotion workflow run: `https://github.com/jmerrillorg/jmerrill-pub/actions/runs/31660186711`
+- Production promotion workflow status: SUCCESS
+- Production `jmerrill.pub` release after promotion: `8ea7c2ef330f75c5c786cb89f3ab8541b23893e4`
+- Public/app-service production promotion: EXECUTED
 
 Function deployment:
 
