@@ -75,7 +75,11 @@ async function dataverseRequest(api, token, path, options = {}) {
     throw Object.assign(new Error(`Dataverse request failed: ${response.status}`), {
       safeCode: "DATAVERSE_REQUEST_FAILED",
       httpStatus: response.status,
-      dvCode: body?.error?.code || null
+      dvCode: body?.error?.code || null,
+      dvMessage: typeof body?.error?.message === "string"
+        ? body.error.message.replace(/\s+/g, " ").slice(0, 500)
+        : null,
+      step: options.step || null
     });
   }
   return { body, etag: normalizeString(body["@odata.etag"]) || null, entityId: normalizeString(response.headers.get("OData-EntityId")) || null };
@@ -209,10 +213,15 @@ async function continuePackageSelectionCommercialPath(input = {}, deps = {}) {
       } else {
         const created = await dataverseRequest(api, token, "opportunities", {
           method: "POST",
+          step: "opportunity:create",
           headers: { Prefer: "return=representation" },
           body: buildOpportunityPayload({ intake, contactId, leadId, selectedPackageCode })
         });
         opportunityId = normalizeString(created.body.opportunityid);
+        if (!opportunityId && created.entityId) {
+          const match = created.entityId.match(/opportunities\(([0-9a-f-]{36})\)/i);
+          opportunityId = match ? match[1] : "";
+        }
         createdOpportunity = true;
       }
     }
@@ -225,21 +234,25 @@ async function continuePackageSelectionCommercialPath(input = {}, deps = {}) {
     delete opportunityPatch["jm1_OriginLead@odata.bind"];
     await dataverseRequest(api, token, `opportunities(${opportunityId})`, {
       method: "PATCH",
+      step: "opportunity:patch",
       headers: { Prefer: "return=representation" },
       body: opportunityPatch
     });
     await dataverseRequest(api, token, `jm1_publishingintakes(${intakeId})`, {
       method: "PATCH",
+      step: "intake:link-opportunity",
       body: { "jm1_Opportunity@odata.bind": `/opportunities(${opportunityId})` }
     });
     await dataverseRequest(api, token, `jm1pub_editorialdiagnostics(${diagnosticId})`, {
       method: "PATCH",
+      step: "diagnostic:link-opportunity",
       body: { "jm1pub_Opportunity@odata.bind": `/opportunities(${opportunityId})` }
     });
 
     const completedAt = new Date().toISOString();
     const log = await dataverseRequest(api, token, EXECUTION_LOG_ENTITY_SET, {
       method: "POST",
+      step: "execution-log:create",
       headers: { Prefer: "return=representation" },
       body: buildExecutionLogPayload({ diagnosticId, intakeReferenceCode, opportunityId, selectedPackageCode, createdOpportunity, correlationId, completedAt })
     });
@@ -271,7 +284,9 @@ async function continuePackageSelectionCommercialPath(input = {}, deps = {}) {
   } catch (err) {
     return blocked(err.safeCode || "DATAVERSE_OPERATION_FAILED", {
       httpStatus: err.httpStatus || null,
-      dvCode: err.dvCode || null
+      dvCode: err.dvCode || null,
+      dvMessage: err.dvMessage || null,
+      step: err.step || null
     });
   }
 }

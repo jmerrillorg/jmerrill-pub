@@ -97,6 +97,9 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
     const responseBody = await response.json();
 
     if (!response.ok) {
+      const providerMessage = typeof responseBody?.error?.message === "string"
+        ? responseBody.error.message.replace(/\s+/g, " ").slice(0, 240)
+        : "";
       return {
         ok: false,
         provider: "azure-openai",
@@ -104,7 +107,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
         output: null,
         tokenCounts: { input: 0, output: 0, total: 0 },
         httpStatus,
-        error: `AZURE_OPENAI_HTTP_${httpStatus}`
+        error: providerMessage ? `AZURE_OPENAI_HTTP_${httpStatus}: ${providerMessage}` : `AZURE_OPENAI_HTTP_${httpStatus}`
       };
     }
 

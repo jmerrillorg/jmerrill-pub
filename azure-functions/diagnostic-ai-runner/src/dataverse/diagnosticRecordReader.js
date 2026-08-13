@@ -164,9 +164,10 @@ async function readDiagnosticRecord(diagnosticId, options = {}) {
 
   // Extract asset-gate metadata fields (safe to log)
   const approvedForDiagnostic = body[ASSET_GATE_COLUMNS.manuscriptApprovedForDiagnostic] === true;
-  const assetStatus = typeof body[ASSET_GATE_COLUMNS.manuscriptAssetStatus] === "string"
-    ? body[ASSET_GATE_COLUMNS.manuscriptAssetStatus].trim() || null
-    : null;
+  const rawAssetStatus = body[ASSET_GATE_COLUMNS.manuscriptAssetStatus];
+  const assetStatus = typeof rawAssetStatus === "string"
+    ? rawAssetStatus.trim() || null
+    : (typeof rawAssetStatus === "number" ? String(rawAssetStatus) : null);
   const filename = typeof body[ASSET_GATE_COLUMNS.manuscriptFilename] === "string"
     ? body[ASSET_GATE_COLUMNS.manuscriptFilename].trim() || null
     : null;

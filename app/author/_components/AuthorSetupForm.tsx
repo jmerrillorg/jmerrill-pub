@@ -8,6 +8,7 @@ import {
   bindingTypeOptions,
   coverFinishPreferenceOptions,
   genreOptions,
+  governedFormatSelectionOptions,
   initialAuthorCopyNeedsOptions,
   interiorColorOptions,
   manuscriptStatusOptions,
@@ -17,6 +18,7 @@ import {
   publishingGoalOptions,
   type PublishingSelectOption,
   w9StatusOptions,
+  additionalFormatInterestOptions,
 } from '@/lib/publishing/onboarding-production-options'
 
 type FieldOption = string | PublishingSelectOption | { label: string; value: string }
@@ -391,6 +393,28 @@ export const onboardingFields: Field[] = [
     name: 'section-production-specifications',
     label: 'Section 4 - Production specifications',
     note: 'Confirm the book format details we need before cover, interior, and release preparation.',
+  },
+  {
+    kind: 'section',
+    name: 'section-governed-format-selection',
+    label: 'Format selection',
+    note: 'Your package determines what is included. Additional formats may be available as add-ons or may require separate approval before production.',
+  },
+  {
+    name: 'governedFormatSelection',
+    label: 'Selected book formats',
+    type: 'select',
+    required: true,
+    defaultValue: 'starter_included_paperback_ebook',
+    options: governedFormatSelectionOptions,
+    note: 'For Starter, paperback and eBook are the normal included format set. Additional formats are reviewed before production planning.',
+  },
+  {
+    name: 'additionalFormatInterest',
+    label: 'Additional format interest',
+    type: 'select',
+    defaultValue: 'none',
+    options: additionalFormatInterestOptions,
   },
   {
     name: 'preferredPrintFormat',
