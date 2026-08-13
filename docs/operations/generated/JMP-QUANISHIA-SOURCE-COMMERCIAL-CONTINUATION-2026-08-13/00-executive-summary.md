@@ -18,7 +18,9 @@ The work is a runtime remediation and continuation lane. It does not create a ne
 - The stale missing-source blocker was cleared without creating a false Jackie gate and without asking the author to resend files.
 - The compiled manuscript contains a Chapter 11 placeholder. This is preserved as source truth for Stage 0/editorial review, not hidden.
 - The Stage 0 runtime needed a prompt/provider compatibility correction before retry because the Azure JSON-object fallback rejected the real-manuscript prompt.
+- After deployment, Stage 0 reached the governed model call but Azure returned `429` rate limiting for `jm1-pub-diagnostic-primary`.
 - The package-selection commercial continuation path now returns the failing Dataverse step and sanitized platform message and accepts `OData-EntityId` when Dataverse create omits a representation body.
+- `'Til Death Do Us Part` commercial continuation replay succeeded idempotently against the existing Opportunity with zero duplicate Opportunity creation.
 - Author onboarding now includes governed package-aware Format Selection before production specifications.
 
 ## Evidence Index

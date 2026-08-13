@@ -37,4 +37,41 @@ The diagnostic record reader also treated numeric Dataverse choice values for ma
 
 ## Post-Deployment Proof
 
-Pending merge and production deployment of this head.
+PR #485 merged at:
+
+- Merge SHA: `aa62b91489677f4479403cc730917ae1a39f75ad`
+
+Function deployment:
+
+- Function app: `func-jm1-diagnostic-ai-runner`
+- Resource group: `rg-jm1-ai`
+- First Core Tools publish completed but left no indexed functions and the protected route returned `404`.
+- Explicit zip deployment restored the protected route.
+- Zip package SHA-256: `569a3c08ecd5625f3668113cc13f1349ccbc275c5aa0be83e8b0b7792742003c`
+- Unauthenticated Stage 0 probe after redeploy: `401 Unauthorized`
+
+Quanishia Stage 0 retry after deployment:
+
+- Correlation ID: `QUANISHIA-STAGE0-COMPILED-SOURCE-POSTFIX-20260813`
+- Result: FAILED
+- HTTP status: `503`
+- Failed stage: `modelCall`
+- Error: `AZURE_OPENAI_HTTP_429: Your requests to gpt-4o-mini for jm1-pub-diagnostic-primary in eastus have exceeded rate limit.`
+
+Bounded retry:
+
+- Correlation ID: `QUANISHIA-STAGE0-COMPILED-SOURCE-RETRY-20260813`
+- Result: FAILED
+- HTTP status: `503`
+- Failed stage: `modelCall`
+- Error: `AZURE_OPENAI_HTTP_429: Your requests to gpt-4o-mini for jm1-pub-diagnostic-primary in eastus have exceeded rate limit.`
+
+Current Quanishia state:
+
+- Source dependency: RESOLVED INTERNALLY
+- Stage 0 source: CORRELATED
+- Stage 0 execution: BLOCKED BY GOVERNED AZURE MODEL RATE LIMIT
+- Author resend request: 0
+- Author communication sent: 0
+
+This is no longer the stale missing-source blocker or the prior opaque Azure `400` prompt defect.
