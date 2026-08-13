@@ -101,6 +101,23 @@ export function suppressesPersonalAuthorIdentity(policy: AuthorPublicationPrivac
   return policy.visibility === 'ANONYMOUS' || policy.visibility === 'HIDDEN'
 }
 
+export function isSuppressedPublicAuthorSlug(slug?: string) {
+  const normalizedSlug = slugify(slug)
+  if (!normalizedSlug) return false
+
+  return GOVERNED_AUTHOR_PUBLICATION_POLICIES.some((record) => {
+    const suppressesProfile =
+      record.visibility === 'ANONYMOUS' || record.visibility === 'HIDDEN'
+    return suppressesProfile && record.legalAuthorNames.some((name) => slugify(name) === normalizedSlug)
+  })
+}
+
 function normalize(value?: string) {
   return (value || '').trim().toLowerCase()
+}
+
+function slugify(value?: string) {
+  return normalize(value)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
 }
