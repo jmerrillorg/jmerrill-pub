@@ -118,6 +118,75 @@ describe("package selection commercial continuation", () => {
     assert.equal(calls.some((call) => call.options.body?.includes(`"jm1_actiontype":"${EVENT_TYPE}"`)), true);
   });
 
+  test("accepts OData-EntityId when Dataverse create omits representation body", async () => {
+    const calls = mockFetchSequence([
+      jsonResponse({
+        jm1pub_editorialdiagnosticid: diagnosticId,
+        _jm1pub_publishingintake_value: intakeId,
+        _jm1pub_authorcontact_value: contactId,
+        _jm1pub_lead_value: leadId
+      }),
+      jsonResponse({
+        jm1_publishingintakeid: intakeId,
+        jm1_intakereferencecode: "JMP-INT-202608-3W6Q6L",
+        jm1_projecttitle: "'Til Death Do Us Part"
+      }),
+      jsonResponse({
+        value: [{ jm1_executionlogid: "log-package", jm1_actiondescription: "selectedPackage=Starter Publishing Package (JMP-PKG-STARTER)" }]
+      }),
+      jsonResponse({ value: [] }),
+      jsonResponse({}, true, 204, `https://jm1hq.crm.dynamics.com/api/data/v9.2/opportunities(${opportunityId})`),
+      jsonResponse({ opportunityid: opportunityId }),
+      jsonResponse({ jm1_publishingintakeid: intakeId }),
+      jsonResponse({ jm1pub_editorialdiagnosticid: diagnosticId }),
+      jsonResponse({ jm1_executionlogid: "log-continuation" })
+    ]);
+
+    const result = await continuePackageSelectionCommercialPath({
+      diagnosticId,
+      intakeReferenceCode: "JMP-INT-202608-3W6Q6L",
+      confirmPackageSelectionCommercialContinuation: true
+    }, { getToken: async () => "fake-token" });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.createdOpportunity, true);
+    assert.equal(result.opportunityId, opportunityId);
+    assert.equal(calls.filter((call) => call.options.method === "POST" && /\/opportunities$/.test(call.url)).length, 1);
+  });
+
+  test("returns sanitized Dataverse step and message when Opportunity create fails", async () => {
+    mockFetchSequence([
+      jsonResponse({
+        jm1pub_editorialdiagnosticid: diagnosticId,
+        _jm1pub_publishingintake_value: intakeId,
+        _jm1pub_authorcontact_value: contactId,
+        _jm1pub_lead_value: leadId
+      }),
+      jsonResponse({
+        jm1_publishingintakeid: intakeId,
+        jm1_intakereferencecode: "JMP-INT-202608-3W6Q6L",
+        jm1_projecttitle: "'Til Death Do Us Part"
+      }),
+      jsonResponse({
+        value: [{ jm1_executionlogid: "log-package", jm1_actiondescription: "selectedPackage=Starter Publishing Package (JMP-PKG-STARTER)" }]
+      }),
+      jsonResponse({ value: [] }),
+      jsonResponse({ error: { code: "0x80040265", message: "Service identity cannot create this Opportunity." } }, false, 400)
+    ]);
+
+    const result = await continuePackageSelectionCommercialPath({
+      diagnosticId,
+      intakeReferenceCode: "JMP-INT-202608-3W6Q6L",
+      confirmPackageSelectionCommercialContinuation: true
+    }, { getToken: async () => "fake-token" });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "DATAVERSE_REQUEST_FAILED");
+    assert.equal(result.step, "opportunity:create");
+    assert.equal(result.dvCode, "0x80040265");
+    assert.match(result.dvMessage, /Service identity cannot create/);
+  });
+
   test("reuses an existing candidate and does not create a duplicate Opportunity", async () => {
     const calls = mockFetchSequence([
       jsonResponse({

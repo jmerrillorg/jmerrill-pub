@@ -5,13 +5,16 @@ import {
   bindingTypeOptions,
   coverFinishPreferenceOptions,
   genreOptions,
+  governedFormatSelectionOptions,
   initialAuthorCopyNeedsOptions,
   interiorColorOptions,
   manuscriptStatusOptions,
   paperTypePreferenceOptions,
   preferredPrintFormatOptions,
   preferredTrimSizeOptions,
+  additionalFormatInterestOptions,
   publishingGoalOptions,
+  resolveGovernedFormatSelection,
   resolveOption,
   w9StatusOptions,
 } from '@/lib/publishing/onboarding-production-options'
@@ -56,6 +59,7 @@ export async function POST(req: NextRequest) {
       'bindingType',
       'rightsHolderConfirmed',
       'publishingGoal',
+      'governedFormatSelection',
     ]
     const missing = missingFields(body, required)
     if (missing.length) return requiredFieldsResponse(missing)
@@ -123,6 +127,16 @@ export async function POST(req: NextRequest) {
     const initialAuthorCopyNeeds = initialAuthorCopyNeedsOption.label
     const eventLaunchDeadline = cleanString(body.eventLaunchDeadline)
     const productionNotes = cleanString(body.productionNotes)
+    const governedFormatSelectionOption = resolveOption(governedFormatSelectionOptions, cleanString(body.governedFormatSelection))
+    const additionalFormatInterestOption = resolveOption(
+      additionalFormatInterestOptions,
+      cleanString(body.additionalFormatInterest) || 'none',
+    )
+    const governedFormatSelection = resolveGovernedFormatSelection({
+      packageConfirmation,
+      selectedFormats: governedFormatSelectionOption.key,
+      additionalFormatInterest: additionalFormatInterestOption.key,
+    })
 
     const author = {
       firstName,
@@ -186,6 +200,11 @@ export async function POST(req: NextRequest) {
       initialAuthorCopyNeedsKey: initialAuthorCopyNeedsKey || null,
       eventLaunchDeadline: eventLaunchDeadline || null,
       productionNotes: productionNotes || null,
+      governedFormatSelection,
+      governedFormatSelectionKey: governedFormatSelectionOption.key,
+      governedFormatSelectionLabel: governedFormatSelectionOption.label,
+      additionalFormatInterestKey: additionalFormatInterestOption.key,
+      additionalFormatInterestLabel: additionalFormatInterestOption.label,
     }
 
     const payload = {
@@ -262,6 +281,18 @@ export async function POST(req: NextRequest) {
       initialAuthorCopyNeedsKey: initialAuthorCopyNeedsKey || null,
       eventLaunchDeadline: eventLaunchDeadline || null,
       productionNotes: productionNotes || null,
+      governedFormatSelection,
+      governedFormatSelectionKey: governedFormatSelectionOption.key,
+      governedFormatSelectionLabel: governedFormatSelectionOption.label,
+      selectedProductForms: governedFormatSelection.selectedProductForms,
+      includedProductForms: governedFormatSelection.includedProductForms,
+      availableAddOnProductForms: governedFormatSelection.availableAddOnProductForms,
+      separateAuthorizationProductForms: governedFormatSelection.separateAuthorizationProductForms,
+      notApplicableProductForms: governedFormatSelection.notApplicableProductForms,
+      formatDownstreamDrivers: governedFormatSelection.downstreamDrivers,
+      additionalFormatInterest: additionalFormatInterestOption.label,
+      additionalFormatInterestKey: additionalFormatInterestOption.key,
+      additionalFormatInterestLabel: additionalFormatInterestOption.label,
       rightsHolderConfirmed,
       rightsHolderConfirmedKey,
       originalWorkConfirmation: rightsHolderConfirmed,
