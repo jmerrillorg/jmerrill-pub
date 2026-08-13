@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import {
+  isSuppressedPublicAuthorSlug,
   resolveAuthorPublicationPrivacy,
   suppressesPersonalAuthorIdentity,
 } from '../lib/catalog/author-publication-privacy.ts'
@@ -115,7 +116,12 @@ test('sitemap does not expose suppressed author profile', () => {
 
 test('direct anonymous-author profile does not reveal identity', () => {
   const authorPage = readFileSync('app/authors/[slug]/page.tsx', 'utf8')
-  assert.match(authorPage, /notFound\(\)/)
+  const middleware = readFileSync('middleware.ts', 'utf8')
+  assert.equal(isSuppressedPublicAuthorSlug('felix-catheline'), true)
+  assert.equal(isSuppressedPublicAuthorSlug('visible-author'), false)
+  assert.match(authorPage, /isSuppressedPublicAuthorSlug/)
+  assert.match(authorPage, /redirect\('\/authors'\)/)
+  assert.match(middleware, /isSuppressedPublicAuthorSlug/)
   assert.doesNotMatch(authorPage, /Felix Catheline/)
 })
 

@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { CTASection } from '@/components/content/CTASection'
 import { BookCard } from '@/components/content/BookCard'
 import { catalogTitleToBookCardRecord } from '@/lib/catalog/display'
+import { isSuppressedPublicAuthorSlug } from '@/lib/catalog/author-publication-privacy'
 import { getPublicAuthorBySlug } from '@/lib/server/dataverse/catalog'
 
 type Props = { params: { slug: string } }
@@ -36,6 +37,8 @@ function AuthorUnavailable() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  if (isSuppressedPublicAuthorSlug(params.slug)) return { title: 'Authors' }
+
   const result = await getPublicAuthorBySlug(params.slug)
   if (!result.ok) return { title: 'Author Profile Temporarily Unavailable' }
   if (!result.data) return { title: 'Author Not Found' }
@@ -47,6 +50,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AuthorProfilePage({ params }: Props) {
+  if (isSuppressedPublicAuthorSlug(params.slug)) redirect('/authors')
+
   const result = await getPublicAuthorBySlug(params.slug)
   if (!result.ok) return <AuthorUnavailable />
   if (!result.data) notFound()
