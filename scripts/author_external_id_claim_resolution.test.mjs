@@ -40,6 +40,21 @@ const expectations = [
       auth.includes('token.authorObjectId') &&
       auth.includes('session.user as { authorObjectId?: string }'),
   },
+  {
+    name: 'author provider cannot be shadowed by publisher role classification',
+    ok:
+      auth.includes("if (account?.provider === AUTHOR_OPERATING_CENTER_PROVIDER_ID)") &&
+      auth.includes("token.provider = AUTHOR_OPERATING_CENTER_PROVIDER_ID") &&
+      auth.indexOf("if (account?.provider === AUTHOR_OPERATING_CENTER_PROVIDER_ID)") <
+        auth.indexOf('const publisherIdentity = getAuthorizedPublisherIdentity'),
+  },
+  {
+    name: 'publisher provider requires publisher authorization before publisher role assignment',
+    ok:
+      auth.includes("if (account?.provider === PUBLISHER_OPERATING_CENTER_PROVIDER_ID)") &&
+      auth.includes("token.provider = PUBLISHER_OPERATING_CENTER_PROVIDER_ID") &&
+      auth.includes('return Boolean(\n          getAuthorizedPublisherIdentity'),
+  },
 ]
 
 const failures = expectations.filter((expectation) => !expectation.ok)

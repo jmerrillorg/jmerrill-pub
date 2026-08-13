@@ -46,6 +46,13 @@ export function AuthorGate({
           setUnlocked(true)
           return
         }
+        if (response && [403, 409].includes(response.status)) {
+          const data = await readAuthorGateError(response)
+          setError(
+            data?.error ||
+              'Your sign-in was found, but your author relationship could not be resolved. Please contact the Publishing Team so we can restore access without creating a duplicate account.',
+          )
+        }
       } catch {
         // Ignore passive session checks.
       } finally {
@@ -104,6 +111,14 @@ export function AuthorGate({
         setUnlocked(true)
         return
       }
+      if (recovered && [403, 409].includes(recovered.status)) {
+        const data = await readAuthorGateError(recovered)
+        setError(
+          data?.error ||
+            'Your sign-in was found, but your author relationship could not be resolved. Please contact the Publishing Team so we can restore access without creating a duplicate account.',
+        )
+        return
+      }
 
       setError(err.message || 'Unable to validate access code.')
     } finally {
@@ -121,11 +136,15 @@ export function AuthorGate({
   }
 
   const signInUrl = `/api/auth/signin/${AUTHOR_OPERATING_CENTER_PROVIDER_ID}?callbackUrl=%2Fauthor%2Fportal`
+  const signedInRelationshipError =
+    /sign-in was found|publisher sign-in was found|relationship could not be resolved/i.test(error)
 
   return (
     <div className="rounded-[32px] border border-white/8 bg-white/[0.04] p-8 backdrop-blur">
       <div className="mb-7">
-        <div className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Invitation required</div>
+        <div className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">
+          {signedInRelationshipError ? 'Relationship not resolved' : 'Invitation required'}
+        </div>
         <h2
           className="mt-3 text-white"
           style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '30px', fontWeight: 700, lineHeight: 1.15 }}
@@ -149,23 +168,25 @@ export function AuthorGate({
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:flex-row">
-        <input
-          type="password"
-          value={code}
-          onChange={(event) => setCode(event.target.value)}
-          placeholder="Activation or recovery code"
-          className="min-h-[52px] flex-1 rounded-2xl border border-white/10 bg-white/5 px-5 text-[14px] text-white outline-none transition-colors placeholder:text-white/20 focus:border-blue-500"
-          required
-        />
-        <button
-          type="submit"
-          disabled={submitting}
-          className="min-h-[52px] rounded-full bg-blue-500 px-7 text-[13px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.35)] transition-all hover:-translate-y-0.5 hover:bg-blue-600 disabled:opacity-60"
-        >
-          {submitting ? 'Checking...' : 'Unlock'}
-        </button>
-      </form>
+      {signedInRelationshipError ? null : (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:flex-row">
+          <input
+            type="password"
+            value={code}
+            onChange={(event) => setCode(event.target.value)}
+            placeholder="Activation or recovery code"
+            className="min-h-[52px] flex-1 rounded-2xl border border-white/10 bg-white/5 px-5 text-[14px] text-white outline-none transition-colors placeholder:text-white/20 focus:border-blue-500"
+            required
+          />
+          <button
+            type="submit"
+            disabled={submitting}
+            className="min-h-[52px] rounded-full bg-blue-500 px-7 text-[13px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.35)] transition-all hover:-translate-y-0.5 hover:bg-blue-600 disabled:opacity-60"
+          >
+            {submitting ? 'Checking...' : 'Unlock'}
+          </button>
+        </form>
+      )}
 
       {error ? (
         <p className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[13px] text-red-300">
@@ -182,6 +203,7 @@ export function AuthorGate({
 
 async function tryRecoverAuthorSession(search = '') {
   const suffix = search || ''
+  let lastRelationshipResponse: Response | null = null
 
   for (let attempt = 0; attempt < AUTHOR_GATE_RECOVERY_ATTEMPTS; attempt += 1) {
     try {
@@ -198,6 +220,10 @@ async function tryRecoverAuthorSession(search = '') {
       if (response.ok) {
         return response
       }
+      if ([403, 409].includes(response.status)) {
+        lastRelationshipResponse = response
+        break
+      }
     } catch {
       // Keep retrying while the browser settles cross-request cookies.
     }
@@ -205,7 +231,7 @@ async function tryRecoverAuthorSession(search = '') {
     await new Promise((resolve) => window.setTimeout(resolve, AUTHOR_GATE_RECOVERY_DELAY_MS))
   }
 
-  return null
+  return lastRelationshipResponse
 }
 
 async function storeBootstrapContext(response: Response, storageKey: string) {
@@ -222,5 +248,13 @@ async function storeBootstrapContext(response: Response, storageKey: string) {
     )
   } catch {
     // The workspace can still load directly if the bootstrap payload is unavailable.
+  }
+}
+
+async function readAuthorGateError(response: Response) {
+  try {
+    return (await response.clone().json()) as { error?: string; status?: string; correlationId?: string }
+  } catch {
+    return null
   }
 }
