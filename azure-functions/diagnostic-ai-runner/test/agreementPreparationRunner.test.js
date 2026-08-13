@@ -232,11 +232,13 @@ describe("fillPackageAddendum", () => {
       "<w:t>10 print copies per elected print Product Form; 1 digital entitlement per elected digital Product Form; 1 audiobook author delivery if PF-04 is separately elected/approved and published.</w:t>",
       "<w:t>Premier</w:t>",
       "<w:t>15 print copies per elected print Product Form; 1 digital entitlement per elected digital Product Form; AI audiobook production included through the governed length policy; 1 audiobook author delivery after PF-04 publication.</w:t>",
-      "<w:t>6. RELATIONSHIP TO AGREEMENT</w:t>"
+      "<w:t>6. RELATIONSHIP TO AGREEMENT</w:t>",
+      "<w:t>TOTAL</w:t><w:t>$____________</w:t>"
     ].join("");
     const r = fillPackageAddendum(xml, fields);
     assert.ok(r.xml.includes("23,413 (manuscript-derived)"));
     assert.ok(r.xml.includes("Manuscript Deadline: Manuscript received prior to agreement preparation"));
+    assert.ok(!r.xml.includes("$23,413 (manuscript-derived)"));
     assert.equal(r.unmatchedFields.length, 0);
 
     const fieldsByName = Object.fromEntries(r.filledFields.map((f) => [f.field, f]));

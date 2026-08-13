@@ -98,6 +98,10 @@ function replaceInlineBlankAfterLabel(xml, labelText, value, options = {}) {
 }
 
 function replaceBlankAfterLabelCompatible(xml, labelText, value, options = {}) {
+  if (options.preferInline === true) {
+    const inlineResult = replaceInlineBlankAfterLabel(xml, labelText, value, options);
+    if (inlineResult.found) return inlineResult;
+  }
   const result = replaceBlankAfterLabel(xml, labelText, value, options);
   if (result.found) return result;
   return replaceInlineBlankAfterLabel(xml, labelText, value, options);
@@ -371,12 +375,15 @@ function fillPackageAddendum(xml, fields) {
   const blankSteps = [
     { label: "Selected Package: ", value: fields.packageLabel, name: "selectedPackage" },
     { label: "Imprint: ", value: fields.imprintLabel, name: "imprint" },
-    { label: "Word Count (approx.): ", value: wordCountDisplay(fields), name: "wordCount" },
-    { label: "Manuscript Deadline: ", value: fields.manuscriptDeadlineText, name: "manuscriptDeadline" }
+    { label: "Word Count (approx.): ", value: wordCountDisplay(fields), name: "wordCount", preferInline: true },
+    { label: "Manuscript Deadline: ", value: fields.manuscriptDeadlineText, name: "manuscriptDeadline", preferInline: true }
   ];
   let cursor = 0;
   for (const step of blankSteps) {
-    const result = replaceBlankAfterLabelCompatible(current, step.label, step.value, { fromIndex: cursor });
+    const result = replaceBlankAfterLabelCompatible(current, step.label, step.value, {
+      fromIndex: cursor,
+      preferInline: step.preferInline === true
+    });
     current = result.xml;
     cursor = result.nextIndex;
     if (result.found) {
