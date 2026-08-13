@@ -236,13 +236,46 @@ test('Author Portal protected routes resolve durable context from External ID be
       assert.ok(source.includes('setAuthorPortalSessionCookie'), file)
     } else {
       assert.ok(source.includes('getAuthorPortalContextFromExternalId'), file)
-      assert.match(
-        source,
-        /const externalId = .*authorObjectId[\s\S]+if \(externalId\) return getAuthorPortalContextFromExternalId[\s\S]+const email = session\?\.user\?\.email/,
-        file,
-      )
+      if (file === 'app/api/author/context/route.ts') {
+        assert.match(
+          source,
+          /const externalId = durableUser\?\.authorObjectId[\s\S]+const email = durableUser\?\.email[\s\S]+const context = externalId[\s\S]+getAuthorPortalContextFromExternalId[\s\S]+getAuthorPortalContextFromAuthorEmail/,
+          file,
+        )
+      } else {
+        assert.match(
+          source,
+          /const externalId = .*authorObjectId[\s\S]+if \(externalId\) return getAuthorPortalContextFromExternalId[\s\S]+const email = session\?\.user\?\.email/,
+          file,
+        )
+      }
     }
   }
+})
+
+test('Author Portal context bridges durable author sign-in into the portal session cookie', () => {
+  const source = readFileSync('app/api/author/context/route.ts', 'utf8')
+
+  assert.ok(source.includes('getDurableAuthorSession'), 'durable author session is inspected')
+  assert.ok(source.includes('getAuthorPortalContextFromExternalId'), 'External ID resolves before email fallback')
+  assert.ok(source.includes('createAuthorPortalSession'), 'resolved durable sign-in creates portal session')
+  assert.ok(source.includes('setAuthorPortalSessionCookie'), 'portal session cookie is written after resolution')
+  assert.ok(source.includes('author_relationship_not_resolved'), 'signed-in unresolved relationship is classified truthfully')
+  assert.ok(
+    source.includes('AUTHOR_WORKSPACE_AUTH_SESSION_RESOLUTION'),
+    'safe auth/session diagnostics are logged without raw tokens',
+  )
+  assert.equal(source.includes('access_token'), false, 'route does not log provider access tokens')
+  assert.equal(source.includes('cookie:'), false, 'route does not log cookie values')
+})
+
+test('AuthorGate does not show generic invitation-required state for signed-in unresolved relationships', () => {
+  const source = readFileSync('app/author/_components/AuthorGate.tsx', 'utf8')
+
+  assert.ok(source.includes('Relationship not resolved'))
+  assert.ok(source.includes('signedInRelationshipError ? null'))
+  assert.ok(source.includes('Your sign-in was found, but your author relationship could not be resolved'))
+  assert.ok(source.includes('[403, 409].includes(response.status)'))
 })
 
 test('Carolyn pilot relationship count remains a guarded precondition', () => {

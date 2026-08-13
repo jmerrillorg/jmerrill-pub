@@ -185,6 +185,33 @@ async function resolveAuthorizedAuthorEmail({
   return ''
 }
 
+async function getAuthorizedAuthorIdentity({
+  profile,
+  user,
+  token,
+}: {
+  profile?: Record<string, unknown>
+  user?: { email?: string | null } | null
+  token?: { email?: unknown; oid?: unknown; sub?: unknown; authorObjectId?: unknown } | null
+}) {
+  const objectId = resolvePrimaryIdentityObjectId({
+    profile,
+    token,
+  })
+  const email = await resolveAuthorizedAuthorEmail({
+    profile,
+    user,
+    token,
+  })
+
+  if (!email) return null
+
+  return {
+    email,
+    objectId,
+  }
+}
+
 function resolvePrimaryIdentityObjectId({
   profile,
   token,
@@ -356,7 +383,21 @@ export const authorAuthOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ account, profile, user }) {
       if (account?.provider === PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
-        return true
+        return Boolean(
+          getAuthorizedPublisherIdentity({
+            profile: profile as Record<string, unknown> | undefined,
+            user,
+          }),
+        )
+      }
+
+      if (account?.provider === AUTHOR_OPERATING_CENTER_PROVIDER_ID) {
+        return Boolean(
+          await getAuthorizedAuthorIdentity({
+            profile: profile as Record<string, unknown> | undefined,
+            user,
+          }),
+        )
       }
 
       const publisherIdentity = getAuthorizedPublisherIdentity({
@@ -375,6 +416,36 @@ export const authorAuthOptions: NextAuthOptions = {
       )
     },
     async jwt({ token, account, profile, user }) {
+      if (account?.provider === PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
+        const publisherIdentity = getAuthorizedPublisherIdentity({
+          profile: profile as Record<string, unknown> | undefined,
+          user,
+          token: token as { email?: unknown; oid?: unknown; sub?: unknown },
+        })
+        if (publisherIdentity?.email) {
+          token.email = publisherIdentity.email
+          token.role = 'publisher'
+          token.provider = PUBLISHER_OPERATING_CENTER_PROVIDER_ID
+          if (publisherIdentity.objectId) token.publisherObjectId = publisherIdentity.objectId
+        }
+        return token
+      }
+
+      if (account?.provider === AUTHOR_OPERATING_CENTER_PROVIDER_ID) {
+        const authorIdentity = await getAuthorizedAuthorIdentity({
+          profile: profile as Record<string, unknown> | undefined,
+          user,
+          token: token as { email?: unknown; oid?: unknown; sub?: unknown; authorObjectId?: unknown },
+        })
+        if (authorIdentity?.email) {
+          token.email = authorIdentity.email
+          token.role = 'author'
+          token.provider = AUTHOR_OPERATING_CENTER_PROVIDER_ID
+          if (authorIdentity.objectId) token.authorObjectId = authorIdentity.objectId
+        }
+        return token
+      }
+
       const publisherIdentity = getAuthorizedPublisherIdentity({
         profile: profile as Record<string, unknown> | undefined,
         user,
@@ -383,12 +454,8 @@ export const authorAuthOptions: NextAuthOptions = {
       if (publisherIdentity?.email) {
         token.email = publisherIdentity.email
         token.role = 'publisher'
-        token.provider = account?.provider || token.provider || PUBLISHER_OPERATING_CENTER_PROVIDER_ID
+        token.provider = token.provider || PUBLISHER_OPERATING_CENTER_PROVIDER_ID
         if (publisherIdentity.objectId) token.publisherObjectId = publisherIdentity.objectId
-        return token
-      }
-
-      if (account?.provider === PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
         return token
       }
 
