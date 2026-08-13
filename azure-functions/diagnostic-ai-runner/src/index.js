@@ -1,6 +1,7 @@
 "use strict";
 
 require("./functions/getPublisherRecommendationReview");
+require("./functions/runAgreementDocumentPreparation");
 require("./functions/runAgreementPackageSend");
 require("./functions/runGovernedAgreementGeneration");
 require("./functions/runApprovalEventConsumer");
