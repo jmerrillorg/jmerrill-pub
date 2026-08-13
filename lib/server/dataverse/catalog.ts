@@ -9,6 +9,10 @@ import type {
   CatalogTitleDetail,
   CatalogTitleSummary,
 } from '@/lib/catalog/types'
+import {
+  resolveAuthorPublicationPrivacy,
+  suppressesPersonalAuthorIdentity,
+} from '@/lib/catalog/author-publication-privacy'
 import { bookRetailerEnrichmentOverrides } from '@/data/book-retailer-enrichment-overrides'
 
 type DataverseCatalogConfig = {
@@ -236,6 +240,8 @@ function buildAuthorSummaries(contactRows: DataverseRecord[], titles: CatalogTit
   for (const row of contactRows) {
     const name = stringField(row, 'fullname')
     if (!name) continue
+    const policy = resolveAuthorPublicationPrivacy({ legalAuthorName: name })
+    if (suppressesPersonalAuthorIdentity(policy)) continue
     const slug = stringField(row, 'jm1pub_publicslug') || slugify(name)
     bySlug.set(slug, {
       contactId: stringField(row, 'contactid'),
@@ -325,7 +331,18 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
   const year = numberField(row, 'jm1pub_publicationyear')
   const title = stringField(row, 'jm1pub_titlename') || stringField(row, 'jm1pub_name')
   const slug = stringField(row, 'jm1pub_slug') || slugify(title)
-  const authorDisplayName = resolveAuthorDisplayName(row)
+  const internalAuthorDisplayName = resolveAuthorDisplayName(row)
+  const authorPrivacyPolicy = resolveAuthorPublicationPrivacy({
+    titleId: id,
+    titleSlug: slug,
+    title,
+    legalAuthorName: internalAuthorDisplayName,
+    publicAuthorName: internalAuthorDisplayName,
+    contactId: stringField(row, '_jm1_author_value'),
+  })
+  const publicAttribution = authorPrivacyPolicy.publicAttribution || internalAuthorDisplayName
+  const suppressAuthorProfile = suppressesPersonalAuthorIdentity(authorPrivacyPolicy)
+  const authorDisplayName = publicAttribution
   const authorLookupId = stringField(row, '_jm1_author_value')
   const retailerCoverUrl = bookRetailerEnrichmentOverrides[slug]?.retailerCoverUrl?.trim() || ''
 
@@ -335,7 +352,7 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
     title,
     subtitle: stringField(row, 'jm1pub_subtitle'),
     authorDisplayName,
-    authors: authorDisplayName
+    authors: authorDisplayName && !suppressAuthorProfile
       ? [
           {
             contactId: authorLookupId,

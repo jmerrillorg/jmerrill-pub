@@ -86,6 +86,7 @@ export default async function BookPage({ params }: Props) {
   const bookCard = catalogTitleToBookCardRecord(book)
   const authorName = catalogAuthorDisplayName(book)
   const authorSlug = book.authors[0]?.slug || ''
+  const authorProfileVisible = Boolean(authorSlug)
   const coverIsRemote = Boolean(book.coverUrl?.startsWith('http'))
   const readerImprint = getImprintStrategyByLabel(book.certifiedImprint)
   const isbnDisplay =
@@ -181,7 +182,7 @@ export default async function BookPage({ params }: Props) {
                   Ask about this title
                 </Link>
               )}
-              {authorSlug ? (
+              {authorProfileVisible ? (
                 <Link
                   href={`/authors/${authorSlug}`}
                   className="block rounded-full border border-white/10 py-3 text-center text-[13px] font-medium text-white/40 transition-all hover:border-blue-500/40 hover:text-blue-400"
@@ -190,7 +191,7 @@ export default async function BookPage({ params }: Props) {
                 </Link>
               ) : (
                 <div className="rounded-full border border-white/10 py-3 text-center text-[13px] font-medium text-white/25">
-                  J Merrill Publishing author family
+                  Author profile not public
                 </div>
               )}
               {readerImprint ? (
@@ -284,7 +285,7 @@ export default async function BookPage({ params }: Props) {
               </section>
 
               <section className="rounded-[28px] border border-white/8 bg-white/[0.03] p-8">
-                <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.12em] text-blue-400">About the author</div>
+                <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.12em] text-blue-400">Public attribution</div>
                 <div className="flex items-center gap-4">
                   <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-blue-500/20 bg-blue-500/10">
                     <div className="flex h-full w-full items-center justify-center text-[22px] font-semibold text-blue-400">
@@ -299,9 +300,9 @@ export default async function BookPage({ params }: Props) {
                   </div>
                 </div>
                 <p className="mt-5 text-[14px] font-light leading-[1.8] text-white/45">
-                  Author profile details are maintained in the J Merrill Publishing author records and will appear as the public profile is completed.
+                  This title uses the public attribution maintained in the J Merrill Publishing catalog.
                 </p>
-                {authorSlug ? (
+                {authorProfileVisible ? (
                   <Link href={`/authors/${authorSlug}`} className="mt-6 inline-flex text-[13px] font-medium text-blue-400 transition-colors hover:text-blue-300">
                     Explore full author profile -&gt;
                   </Link>

@@ -15,6 +15,7 @@
     "type-check": "tsc --noEmit --incremental false",
     "package:appservice": "node scripts/package-app-service-artifact.mjs",
     "catalog-source-guard": "node scripts/check-catalog-runtime-source.mjs",
+    "public-author-privacy-guard": "node --test scripts/public_author_privacy_guard.test.mjs",
     "catalog-reconciliation-final-guard": "node scripts/catalog_reconciliation_final_guard.mjs",
     "slice2-commercial-catalog-schema-spec-guard": "node --test scripts/slice2_commercial_catalog_schema_spec_guard.mjs",
     "slice3-implementation-planning-guard": "node --test scripts/slice3_implementation_planning_guard.test.mjs",
