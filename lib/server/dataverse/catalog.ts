@@ -10,9 +10,9 @@ import type {
   CatalogTitleSummary,
 } from '@/lib/catalog/types'
 import {
-  resolveAuthorPublicationPrivacy,
+  resolvePublicAuthorIdentity,
   suppressesPersonalAuthorIdentity,
-} from '@/lib/catalog/author-publication-privacy'
+} from '@/lib/catalog/public-author-identity'
 import { bookRetailerEnrichmentOverrides } from '@/data/book-retailer-enrichment-overrides'
 
 type DataverseCatalogConfig = {
@@ -238,17 +238,22 @@ function buildAuthorSummaries(contactRows: DataverseRecord[], titles: CatalogTit
   const bySlug = new Map<string, CatalogAuthorSummary>()
 
   for (const row of contactRows) {
-    const name = stringField(row, 'fullname')
-    if (!name) continue
-    const policy = resolveAuthorPublicationPrivacy({ legalAuthorName: name })
-    if (suppressesPersonalAuthorIdentity(policy)) continue
-    const slug = stringField(row, 'jm1pub_publicslug') || slugify(name)
+    const legalName = stringField(row, 'fullname')
+    if (!legalName) continue
+    const identity = resolvePublicAuthorIdentity({
+      legalAuthorName: legalName,
+      governedPublicAuthorName: legalName,
+      publicAuthorName: legalName,
+      contactId: stringField(row, 'contactid'),
+    })
+    if (suppressesPersonalAuthorIdentity(identity) || !identity.publicAuthorName) continue
+    const slug = stringField(row, 'jm1pub_publicslug') || identity.publicSlug || slugify(identity.publicAuthorName)
     bySlug.set(slug, {
       contactId: stringField(row, 'contactid'),
       slug,
-      name,
+      name: identity.publicAuthorName,
       shortBio: stringField(row, 'jm1pub_publicauthorbio') || 'J Merrill Publishing author family.',
-      photoUrl: stringField(row, 'jm1pub_authorphoto'),
+      photoUrl: identity.exposeHeadshot ? stringField(row, 'jm1pub_authorphoto') : '',
       titleCount: 0,
       genres: [],
       imprints: [],
@@ -331,17 +336,25 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
   const year = numberField(row, 'jm1pub_publicationyear')
   const title = stringField(row, 'jm1pub_titlename') || stringField(row, 'jm1pub_name')
   const slug = stringField(row, 'jm1pub_slug') || slugify(title)
-  const internalAuthorDisplayName = resolveAuthorDisplayName(row)
-  const authorPrivacyPolicy = resolveAuthorPublicationPrivacy({
+  const titleDisplayName = stringField(row, 'jm1pub_authordisplayname')
+  const governedTitleAuthorName = stringField(row, 'jm1pub_authorname')
+  const legalAuthorName = stringField(row, '_jm1_author_value@OData.Community.Display.V1.FormattedValue')
+  const titleRelationshipPenName = distinctPublicAttribution(titleDisplayName, [
+    legalAuthorName,
+    governedTitleAuthorName,
+  ])
+  const publicAuthorIdentity = resolvePublicAuthorIdentity({
     titleId: id,
     titleSlug: slug,
     title,
-    legalAuthorName: internalAuthorDisplayName,
-    publicAuthorName: internalAuthorDisplayName,
+    legalAuthorName,
+    titleRelationshipPenName,
+    governedPublicAuthorName: titleDisplayName || governedTitleAuthorName,
+    publicAuthorName: titleDisplayName || governedTitleAuthorName,
     contactId: stringField(row, '_jm1_author_value'),
   })
-  const publicAttribution = authorPrivacyPolicy.publicAttribution || internalAuthorDisplayName
-  const suppressAuthorProfile = suppressesPersonalAuthorIdentity(authorPrivacyPolicy)
+  const publicAttribution = publicAuthorIdentity.publicAuthorName
+  const suppressAuthorProfile = suppressesPersonalAuthorIdentity(publicAuthorIdentity)
   const authorDisplayName = publicAttribution
   const authorLookupId = stringField(row, '_jm1_author_value')
   const retailerCoverUrl = bookRetailerEnrichmentOverrides[slug]?.retailerCoverUrl?.trim() || ''
@@ -356,7 +369,7 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
       ? [
           {
             contactId: authorLookupId,
-            slug: slugify(authorDisplayName),
+            slug: publicAuthorIdentity.publicSlug || slugify(authorDisplayName),
             name: authorDisplayName,
             role: 'Author',
             primary: true,
@@ -596,14 +609,6 @@ function buildKeywords(summary: CatalogTitleSummary) {
   )
 }
 
-function resolveAuthorDisplayName(row: DataverseRecord) {
-  return (
-    stringField(row, 'jm1pub_authordisplayname') ||
-    stringField(row, 'jm1pub_authorname') ||
-    stringField(row, '_jm1_author_value@OData.Community.Display.V1.FormattedValue')
-  )
-}
-
 function stringField(row: DataverseRecord, key: string) {
   const value = row[key]
   return typeof value === 'string' ? value.trim() : ''
@@ -646,6 +651,17 @@ function slugify(value: string) {
     .replace(/['’]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
+}
+
+function distinctPublicAttribution(value: string, internalNames: string[]) {
+  const normalizedValue = normalizeName(value)
+  if (!normalizedValue) return ''
+  const matchesInternal = internalNames.some((name) => normalizeName(name) === normalizedValue)
+  return matchesInternal ? '' : value
+}
+
+function normalizeName(value: string) {
+  return value.trim().toLowerCase().replace(/\s+/g, ' ')
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

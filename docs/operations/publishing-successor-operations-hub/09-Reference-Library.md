@@ -5,6 +5,7 @@ This library points only to controlling or genuinely useful references. It does 
 | Reference | Use |
 | --- | --- |
 | [JM1 Publishing Enterprise Operating Manual v1.0](../JM1-Publishing-Enterprise-Operating-Manual-v1.0.md) | Canonical business operating authority. |
+| [PUB-CANON: Author Identity and Public Attribution](../../governance/publishing/PUB-CANON-Author-Identity-and-Public-Attribution.md) | Legal/internal identity, pen names, anonymous publication, hidden profiles, and public attribution precedence. |
 | [PUB-STD: Author Copy Policy](../../governance/publishing/PUB-STD-Author-Copy-Policy.md) | Complimentary author-copy quantities, elected Product Form entitlements, and timing. |
 | [No-/Low-Cost Marketing Spend Authorization Doctrine](../../governance/publishing/JMP-NO-LOW-COST-MARKETING-SPEND-AUTHORIZATION-DOCTRINE-v1.0.md) | Marketing spend approval, no-/low-cost-first rule, stop-loss, and Campaign Service spend boundary. |
 | [Hybrid Marketing Disclosure](../../governance/publishing/JMP-HYBRID-MARKETING-DISCLOSURE-v1.0.md) | Governed author-facing Hybrid marketing disclosure. |
