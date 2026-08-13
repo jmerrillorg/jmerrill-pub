@@ -5,7 +5,7 @@ import { notFound, redirect } from 'next/navigation'
 import { CTASection } from '@/components/content/CTASection'
 import { BookCard } from '@/components/content/BookCard'
 import { catalogTitleToBookCardRecord } from '@/lib/catalog/display'
-import { isSuppressedPublicAuthorSlug } from '@/lib/catalog/author-publication-privacy'
+import { isSuppressedPublicAuthorSlug } from '@/lib/catalog/public-author-identity'
 import { getPublicAuthorBySlug } from '@/lib/server/dataverse/catalog'
 
 type Props = { params: { slug: string } }

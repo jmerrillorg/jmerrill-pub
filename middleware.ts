@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { isSuppressedPublicAuthorSlug } from '@/lib/catalog/author-publication-privacy'
+import { isSuppressedPublicAuthorSlug } from '@/lib/catalog/public-author-identity'
 
 export function middleware(request: NextRequest) {
   const authorProfileMatch = request.nextUrl.pathname.match(/^\/authors\/([^/]+)\/?$/)
