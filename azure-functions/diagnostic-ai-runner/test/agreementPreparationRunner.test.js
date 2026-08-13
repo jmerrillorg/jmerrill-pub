@@ -149,6 +149,28 @@ describe("applyPublisherSignatureToAgreementBuffer", () => {
     assert.ok(contentTypes.includes('Extension="png"'));
     assert.ok(zip.file("word/media/jm1-publisher-signature.png"));
   });
+
+  test("embeds the governed publisher signature in the v1.3.1 two-column signature table shape", async () => {
+    const docx = await buildMinimalDocx([
+      "<w:p><w:r><w:t>PUBLISHER</w:t></w:r><w:r><w:t>AUTHOR</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>J Merrill Publishing, Inc.</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>By: _______________________________</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>Jackie Smith, Jr., President &amp; CEO, J Merrill Publishing, Inc.</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>Date: _____________________________</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>Jackie Smith Jr</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>Signature: ________________________</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>Date: _____________________________</w:t></w:r></w:p>"
+    ].join(""));
+    const result = await applyPublisherSignatureToAgreementBuffer(docx, PNG_SIGNATURE_BYTES, { contractDate: "2026-08-13" });
+    assert.equal(result.applied, true);
+    assert.equal(result.publisherDateFilled, true);
+
+    const zip = await JSZip.loadAsync(result.buffer);
+    const xml = await zip.file("word/document.xml").async("string");
+    assert.ok(xml.includes("Publisher Signature"));
+    assert.ok(xml.includes("Date: 2026-08-13"));
+    assert.ok(xml.includes("Signature: ________________________"), "author signature blank remains present");
+  });
 });
 
 describe("fillPackageAddendum", () => {
