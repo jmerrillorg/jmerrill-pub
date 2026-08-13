@@ -3,13 +3,12 @@
 /**
  * Governed agreement-package send.
  *
- * Sends the prepared, governed agreement package to the
- * author for review and signature, using the approved publishing
- * identity. This is the FIRST author-facing send in the agreement
- * lifecycle — it never includes a payment link, never implies
- * production has started, and never exposes editorial scoring,
- * manuscript text, or raw AI/model output (this module has no access
- * to any of those).
+ * Legacy governed agreement-package email send.
+ *
+ * This path is intentionally superseded for signature execution. It
+ * MUST NOT be used to move a live agreement into Sent for Signature
+ * because it emails source DOCX attachments instead of creating an
+ * e-sign provider transaction/envelope with a secure review/sign link.
  *
  * Safety boundaries:
  *   - Recipient is always confirmed from Dataverse (the Opportunity's
@@ -27,7 +26,8 @@
  *     schema is created.
  *
  * Requires JM1_AGREEMENT_PACKAGE_SEND_ENABLED="true", checked fresh on
- * every call.
+ * every call, and also requires an explicit legacy override so old
+ * tests/evidence can exercise the validator without author-facing use.
  */
 
 const { readOpportunityAuthorContact } = require("../dataverse/opportunityContactReader");
@@ -42,6 +42,7 @@ const GATE_NAME = "JM1_AGREEMENT_PACKAGE_SEND_ENABLED";
 const OPPORTUNITY_ENTITY_SET = "opportunities";
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
 const EVENT_TYPE = "AGREEMENT_PACKAGE_SEND_PERFORMED";
+const SUPERSEDED_EVENT_TYPE = "AGREEMENT_ATTACHMENT_SEND_SUPERSEDED";
 const AGENT_MODEL_NAME = "agreement-package-send-runner";
 
 // Approved publishing identity — fixed, never caller-supplied.
@@ -84,6 +85,10 @@ function isPlainObject(value) {
 
 function isGateOpen() {
   return normalizeString(process.env[GATE_NAME]).toLowerCase() === "true";
+}
+
+function legacyAttachmentSendAllowed(input = {}) {
+  return input.allowSupersededAttachmentSendForEvidence === true;
 }
 
 function blocked(reason, extra = {}) {
@@ -216,6 +221,21 @@ async function sendAgreementPackage(input = {}, deps = {}) {
   if (!isPlainObject(input.paymentSchedule)) return blocked("PAYMENT_SCHEDULE_REQUIRED");
 
   if (!isGateOpen()) return blocked("GATE_CLOSED", { gate: GATE_NAME });
+  if (!legacyAttachmentSendAllowed(input)) {
+    return blocked("ATTACHMENT_EMAIL_SIGNATURE_PATH_SUPERSEDED", {
+      defectiveEmailSendCount: 1,
+      validEsignTransactionSendCount: 0,
+      requiredNextState: "AWAITING_AUTHOR_FORMAT_SELECTION_OR_SIGNNOW_PROVIDER_CONFIGURATION",
+      canonicalProvider: "SIGNNOW",
+      supersededEventType: SUPERSEDED_EVENT_TYPE,
+      liveActions: {
+        sentAuthorFacingOutput: false,
+        createdEsignTransaction: false,
+        updatedOpportunity: false,
+        markedSentForSignature: false
+      }
+    });
+  }
 
   // Step 1: confirm recipient from source of truth — never trust a
   // caller-supplied email alone for an actual send.
@@ -338,8 +358,11 @@ async function sendAgreementPackage(input = {}, deps = {}) {
     opportunityUpdate,
     executionLog,
     gateUsed: GATE_NAME,
+    supersededSignatureExecutionPath: true,
     liveActions: {
       sentAuthorFacingOutput: true,
+      createdEsignTransaction: false,
+      markedSentForSignature: opportunityUpdate.updated,
       includedPaymentLink: false,
       createsPaymentLink: false,
       startsProduction: false,
@@ -360,6 +383,7 @@ module.exports = {
   CONTRACT_STATUS,
   GATE_NAME,
   EVENT_TYPE,
+  SUPERSEDED_EVENT_TYPE,
   INTERNAL_VISIBILITY_MAILBOX,
   SENDER_DISPLAY_NAME
 };

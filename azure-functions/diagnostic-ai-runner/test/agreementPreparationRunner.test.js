@@ -70,7 +70,18 @@ function controlledInput(overrides = {}) {
 
 async function buildMinimalDocx(documentXml) {
   const zip = new JSZip();
-  zip.file("[Content_Types].xml", '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>');
+  zip.file("[Content_Types].xml", [
+    '<?xml version="1.0"?>',
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">',
+    '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>',
+    '</Types>'
+  ].join(""));
+  zip.file("_rels/.rels", [
+    '<?xml version="1.0"?>',
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">',
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>',
+    '</Relationships>'
+  ].join(""));
   zip.file("word/document.xml", documentXml);
   return zip.generateAsync({ type: "nodebuffer" });
 }
@@ -180,6 +191,7 @@ describe("fillPackageAddendum", () => {
       "<w:t>[Date]</w:t><w:t>[Author Legal Name]</w:t><w:t>[Book Title]</w:t><w:t>[Contract Date]</w:t>",
       '<w:t xml:space="preserve">Selected Package: </w:t><w:t>________________________________________</w:t>',
       '<w:t xml:space="preserve">    Imprint: </w:t><w:t>______________________________</w:t>',
+      '<w:t xml:space="preserve">Selected Editions / Formats: </w:t><w:t>__________________________________________________________</w:t>',
       '<w:t xml:space="preserve">Word Count (approx.): </w:t><w:t>_____________</w:t>',
       '<w:t xml:space="preserve">    Manuscript Deadline: </w:t><w:t>______________________________</w:t>',
       "<w:t>COMPLIMENTARY COPIES</w:t>",
@@ -191,6 +203,7 @@ describe("fillPackageAddendum", () => {
     const r = fillPackageAddendum(xml, fields);
     assert.ok(r.xml.includes("Professional Publishing Package (JMP-PKG-PRO)"));
     assert.ok(r.xml.includes("J Merrill Publishing"));
+    assert.ok(r.xml.includes("PF-01 Paperback; PF-02 Hardcover; PF-03 Standard Ebook"));
     assert.ok(r.xml.includes("48,232 (manuscript-derived)"));
     assert.ok(r.xml.includes("Manuscript received prior to agreement preparation"));
     assert.ok(r.xml.includes("$4,680.00"));
@@ -224,6 +237,7 @@ describe("fillPackageAddendum", () => {
       "<w:t>[Date]</w:t><w:t>[Author Legal Name]</w:t><w:t>[Book Title]</w:t><w:t>[Contract Date]</w:t>",
       '<w:t xml:space="preserve">Selected Package: </w:t><w:t>________________________________________</w:t>',
       '<w:t xml:space="preserve">    Imprint: </w:t><w:t>______________________________</w:t>',
+      '<w:t>Selected Editions / Formats: __________________________________________________________</w:t>',
       '<w:t>Word Count (approx.): _____________    Manuscript Deadline: ______________________________</w:t>',
       "<w:t>5. COMPLIMENTARY COPIES</w:t>",
       "<w:t>Starter</w:t>",
@@ -237,6 +251,7 @@ describe("fillPackageAddendum", () => {
     ].join("");
     const r = fillPackageAddendum(xml, fields);
     assert.ok(r.xml.includes("23,413 (manuscript-derived)"));
+    assert.ok(r.xml.includes("Selected Editions / Formats: PF-01 Paperback; PF-03 Standard Ebook"));
     assert.ok(r.xml.includes("Manuscript Deadline: Manuscript received prior to agreement preparation"));
     assert.ok(!r.xml.includes("$23,413 (manuscript-derived)"));
     assert.equal(r.unmatchedFields.length, 0);

@@ -42,7 +42,18 @@ afterEach(() => {
 
 async function buildMinimalDocx() {
   const zip = new JSZip();
-  zip.file("[Content_Types].xml", '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>');
+  zip.file("[Content_Types].xml", [
+    '<?xml version="1.0"?>',
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">',
+    '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>',
+    '</Types>'
+  ].join(""));
+  zip.file("_rels/.rels", [
+    '<?xml version="1.0"?>',
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">',
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>',
+    '</Relationships>'
+  ].join(""));
   zip.file("word/document.xml", "<w:document/>");
   return zip.generateAsync({ type: "nodebuffer" });
 }
@@ -64,6 +75,7 @@ function controlledInput(overrides = {}) {
     packageLabel: "Professional Publishing Package (JMP-PKG-PRO)",
     paymentSchedule: { installments: 8, perInstallmentUsd: 585.00, totalUsd: 4680.00 },
     expectedAuthorEmail: "chosen2k7@gmail.com",
+    allowSupersededAttachmentSendForEvidence: true,
     ...overrides
   };
 }
@@ -102,6 +114,19 @@ describe("sendAgreementPackage — gate enforcement and validation", () => {
     process.env[GATE_NAME] = "true";
     const result = await sendAgreementPackage(controlledInput(), {});
     assert.equal(result.reason, "DEPS_MISSING_REQUIRED_FUNCTIONS");
+  });
+
+
+  test("default live path is blocked because DOCX attachment email is superseded by e-sign", async () => {
+    process.env[GATE_NAME] = "true";
+    const deps = await fakeDeps({ sendEmail: async () => { throw new Error("send must not be called"); } });
+    const result = await sendAgreementPackage(controlledInput({ allowSupersededAttachmentSendForEvidence: false }), deps);
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "ATTACHMENT_EMAIL_SIGNATURE_PATH_SUPERSEDED");
+    assert.equal(result.validEsignTransactionSendCount, 0);
+    assert.equal(result.liveActions.sentAuthorFacingOutput, false);
+    assert.equal(result.liveActions.createdEsignTransaction, false);
+    assert.equal(result.liveActions.markedSentForSignature, false);
   });
 
   test("rejects when title is missing", async () => {
