@@ -209,6 +209,43 @@ describe("fillPackageAddendum", () => {
     assert.ok(r.deferredFields.some((d) => d.includes("Schedule A")));
   });
 
+  test("v4.1 fills inline manuscript deadline and verifies package-policy complimentary copy text", () => {
+    const fields = computeAgreementFields(controlledInput({
+      title: "'Til Death Do Us Part",
+      authorLegalName: "Jackie Smith Jr",
+      officialManuscriptWordCount: 23413,
+      selectedPackageCode: "JMP-PKG-STARTER",
+      electedProductForms: ["PF-01", "PF-03"],
+      paymentOption: "INTERNAL_COMMISSIONING",
+      contractDate: "2026-08-13"
+    }));
+    assert.equal(fields.ok, true);
+    const xml = [
+      "<w:t>[Date]</w:t><w:t>[Author Legal Name]</w:t><w:t>[Book Title]</w:t><w:t>[Contract Date]</w:t>",
+      '<w:t xml:space="preserve">Selected Package: </w:t><w:t>________________________________________</w:t>',
+      '<w:t xml:space="preserve">    Imprint: </w:t><w:t>______________________________</w:t>',
+      '<w:t>Word Count (approx.): _____________    Manuscript Deadline: ______________________________</w:t>',
+      "<w:t>5. COMPLIMENTARY COPIES</w:t>",
+      "<w:t>Starter</w:t>",
+      "<w:t>5 print copies per elected print Product Form; 1 digital entitlement per elected digital Product Form; 1 audiobook author delivery if PF-04 is elected and published.</w:t>",
+      "<w:t>Professional</w:t>",
+      "<w:t>10 print copies per elected print Product Form; 1 digital entitlement per elected digital Product Form; 1 audiobook author delivery if PF-04 is separately elected/approved and published.</w:t>",
+      "<w:t>Premier</w:t>",
+      "<w:t>15 print copies per elected print Product Form; 1 digital entitlement per elected digital Product Form; AI audiobook production included through the governed length policy; 1 audiobook author delivery after PF-04 publication.</w:t>",
+      "<w:t>6. RELATIONSHIP TO AGREEMENT</w:t>"
+    ].join("");
+    const r = fillPackageAddendum(xml, fields);
+    assert.ok(r.xml.includes("23,413 (manuscript-derived)"));
+    assert.ok(r.xml.includes("Manuscript Deadline: Manuscript received prior to agreement preparation"));
+    assert.equal(r.unmatchedFields.length, 0);
+
+    const fieldsByName = Object.fromEntries(r.filledFields.map((f) => [f.field, f]));
+    assert.equal(fieldsByName.complimentaryPaperback.value, "5");
+    assert.equal(fieldsByName.complimentaryHardcover.value, "0");
+    assert.equal(fieldsByName.complimentaryEbook.value, "1");
+    assert.equal(fieldsByName.complimentaryPaperback.representation, "PACKAGE_POLICY_TEXT");
+  });
+
   test("never touches an unrelated earlier occurrence of 'Paperback'/'Hardcover' outside the complimentary-copies section", () => {
     const fields = computeAgreementFields(controlledInput());
     const xml = [

@@ -30,7 +30,7 @@
 
 const JSZip = require("jszip");
 const fs = require("node:fs/promises");
-const { replaceBracketPlaceholder, replaceBlankAfterLabel } = require("./agreementDocumentFiller");
+const { escapeXmlText, replaceBracketPlaceholder, replaceBlankAfterLabel } = require("./agreementDocumentFiller");
 const { computeAgreementFields } = require("./agreementFieldComputer");
 const { generateScheduleADocument } = require("./scheduleAGenerator");
 const { buildPreparationManifest } = require("./agreementPreparationManifest");
@@ -70,6 +70,65 @@ function blocked(reason, extra = {}) {
 
 function wordCountDisplay(fields) {
   return `${fields.officialManuscriptWordCount.toLocaleString("en-US")} (manuscript-derived)`;
+}
+
+function replaceInlineBlankAfterLabel(xml, labelText, value, options = {}) {
+  const fromIndex = options.fromIndex || 0;
+  const minUnderscores = options.minUnderscores || 3;
+  const labelIndex = xml.indexOf(labelText, fromIndex);
+  if (labelIndex === -1) {
+    return { xml, found: false, nextIndex: fromIndex };
+  }
+  const searchStart = labelIndex + labelText.length;
+  const textRunEnd = xml.indexOf("</w:t>", searchStart);
+  if (textRunEnd === -1) {
+    return { xml, found: false, nextIndex: searchStart };
+  }
+  const blankPattern = new RegExp(`\\$?_{${minUnderscores},}`);
+  const relativeMatch = xml.slice(searchStart, textRunEnd).match(blankPattern);
+  if (!relativeMatch) {
+    return { xml, found: false, nextIndex: searchStart };
+  }
+  const matchStart = searchStart + relativeMatch.index;
+  const matchText = relativeMatch[0];
+  const currencyPrefix = matchText.startsWith("$") ? "$" : "";
+  const replacement = `${currencyPrefix}${escapeXmlText(value)}`;
+  const updated = xml.slice(0, matchStart) + replacement + xml.slice(matchStart + matchText.length);
+  return { xml: updated, found: true, nextIndex: matchStart + replacement.length };
+}
+
+function replaceBlankAfterLabelCompatible(xml, labelText, value, options = {}) {
+  const result = replaceBlankAfterLabel(xml, labelText, value, options);
+  if (result.found) return result;
+  return replaceInlineBlankAfterLabel(xml, labelText, value, options);
+}
+
+function packagePolicyNeedles(packageLabel) {
+  const normalized = normalizeString(packageLabel).toUpperCase();
+  if (normalized.includes("JMP-PKG-STARTER")) {
+    return ["Starter", "5 print copies per elected print Product Form", "1 digital entitlement per elected digital Product Form"];
+  }
+  if (normalized.includes("JMP-PKG-PRO")) {
+    return ["Professional", "10 print copies per elected print Product Form", "1 digital entitlement per elected digital Product Form"];
+  }
+  if (normalized.includes("JMP-PKG-PREMIER")) {
+    return ["Premier", "15 print copies per elected print Product Form", "1 digital entitlement per elected digital Product Form"];
+  }
+  return [];
+}
+
+function verifyPackageAddendumV41ComplimentaryPolicy(xml, fields) {
+  const anchor = xml.indexOf("COMPLIMENTARY COPIES");
+  if (anchor === -1) return false;
+  const sectionEnd = xml.indexOf("RELATIONSHIP TO AGREEMENT", anchor);
+  const section = xml.slice(anchor, sectionEnd === -1 ? undefined : sectionEnd);
+  const needles = packagePolicyNeedles(fields.packageLabel);
+  return needles.length > 0 && needles.every((needle) => section.includes(needle));
+}
+
+function legacyCopyQuantity(fields, key) {
+  const value = fields?.complimentaryCopies?.[key];
+  return Number.isFinite(value) ? value : 0;
 }
 
 function escapeXmlAttr(value) {
@@ -317,7 +376,7 @@ function fillPackageAddendum(xml, fields) {
   ];
   let cursor = 0;
   for (const step of blankSteps) {
-    const result = replaceBlankAfterLabel(current, step.label, step.value, { fromIndex: cursor });
+    const result = replaceBlankAfterLabelCompatible(current, step.label, step.value, { fromIndex: cursor });
     current = result.xml;
     cursor = result.nextIndex;
     if (result.found) {
@@ -333,19 +392,34 @@ function fillPackageAddendum(xml, fields) {
     unmatchedFields.push("complimentaryPaperback", "complimentaryHardcover", "complimentaryEbook");
   } else {
     const copySteps = [
-      { label: "Paperback", value: String(fields.complimentaryCopies.paperback), name: "complimentaryPaperback" },
-      { label: "Hardcover", value: String(fields.complimentaryCopies.hardcover), name: "complimentaryHardcover" },
-      { label: "eBook", value: String(fields.complimentaryCopies.ebook), name: "complimentaryEbook" }
+      { label: "Paperback", value: String(legacyCopyQuantity(fields, "paperback")), name: "complimentaryPaperback" },
+      { label: "Hardcover", value: String(legacyCopyQuantity(fields, "hardcover")), name: "complimentaryHardcover" },
+      { label: "eBook", value: String(legacyCopyQuantity(fields, "ebook")), name: "complimentaryEbook" }
     ];
     let copyCursor = complimentaryAnchor;
+    let copiedIntoLegacyBlanks = false;
     for (const step of copySteps) {
-      const result = replaceBlankAfterLabel(current, step.label, step.value, { fromIndex: copyCursor });
+      const result = replaceBlankAfterLabelCompatible(current, step.label, step.value, { fromIndex: copyCursor });
       current = result.xml;
       copyCursor = result.nextIndex;
       if (result.found) {
+        copiedIntoLegacyBlanks = true;
         filledFields.push({ field: step.name, label: step.label, value: step.value });
-      } else {
-        unmatchedFields.push(step.name);
+      }
+    }
+    if (!copiedIntoLegacyBlanks && verifyPackageAddendumV41ComplimentaryPolicy(current, fields)) {
+      for (const step of copySteps) {
+        filledFields.push({
+          field: step.name,
+          label: "COMPLIMENTARY COPIES",
+          value: step.value,
+          representation: "PACKAGE_POLICY_TEXT"
+        });
+      }
+    } else {
+      for (const step of copySteps) {
+        const alreadyFilled = filledFields.some((field) => field.field === step.name);
+        if (!alreadyFilled) unmatchedFields.push(step.name);
       }
     }
   }
