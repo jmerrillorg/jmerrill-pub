@@ -1,6 +1,6 @@
 # Public Link And Website Surface
 
-Last Verified: 2026-08-13T03:49:51Z
+Last Verified: 2026-08-13T04:06:50Z
 
 ## Public Surface
 
@@ -10,7 +10,7 @@ Last Verified: 2026-08-13T03:49:51Z
 | Public URL | `https://jmerrill.pub/experience/` |
 | Button/link label | `Share Your Experience` |
 | Website source changed | YES |
-| Public deployment | PENDING GOVERNED APP SERVICE WORKFLOW |
+| Public deployment | COMPLETE / PRODUCTION VERIFIED |
 
 ## Source Locations
 
@@ -24,10 +24,12 @@ Last Verified: 2026-08-13T03:49:51Z
 | `app/contact/page.tsx` | Added `Share Your Experience` action. |
 | `lib/tokens.ts` | Added footer link under Author Support. |
 
-## Local Public Page Check
+## Public Page Checks
 
 | Check | Result |
 | --- | --- |
 | `GET http://localhost:3100/experience` | 200 |
+| `GET https://app-jm1-pub-prod-staging.azurewebsites.net/experience` | 200 |
+| `GET https://jmerrill.pub/experience` | 200 |
 
-The deployed public link must be rechecked after the App Service workflow promotes the validated source to production.
+The production public link is live at `https://jmerrill.pub/experience`.
