@@ -228,6 +228,7 @@ export const footerLinks = {
   ],
   authorSupport: [
     { label: 'Memberships', href: '/memberships' },
+    { label: 'Share Your Experience', href: '/experience' },
     { label: 'Contact',     href: '/contact' },
     { label: 'Readers',     href: '/readers' },
   ],

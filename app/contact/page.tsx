@@ -49,7 +49,7 @@ export default function ContactPage() {
         description="If you are carrying a manuscript, message, story, or legacy work, we want the next step to feel clear. Use this page for publishing questions, consultations, media inquiries, and direct communication with J Merrill Publishing."
         actions={[
           { label: 'Join the Family', href: '/join' },
-          { label: 'Schedule a Consultation', href: JMP_CONTACT.booking, external: true },
+          { label: 'Share Your Experience', href: '/experience' },
         ]}
       />
 
