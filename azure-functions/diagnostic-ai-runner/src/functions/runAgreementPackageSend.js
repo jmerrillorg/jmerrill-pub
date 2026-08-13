@@ -19,9 +19,6 @@ const { DefaultAzureCredential } = require("@azure/identity");
 const { sendAgreementPackage } = require("../agreement/agreementPackageSendRunner");
 const { createGeneratedOutputBlobReader, DEFAULT_BLOB_CONTAINER } = require("../agreement/agreementTemplateSource");
 
-const AUTHORIZED_DIAGNOSTIC_ID = "64e387e0-7e6a-f111-a826-00224820105b";
-const AUTHORIZED_INTAKE_REFERENCE_CODE = "JMP-INT-202606-UFYG60";
-const AUTHORIZED_OPPORTUNITY_ID = "2653fca9-eacd-4c44-b3ed-1764dd5d35aa";
 const STORAGE_ACCOUNT = "stjm1diagrunner";
 
 function safeTrim(value) {
@@ -36,10 +33,6 @@ function verifyRunnerKey(request) {
 
 function unauthorized() {
   return { status: 401, jsonBody: { status: "error", code: "UNAUTHORIZED" } };
-}
-
-function recordNotAuthorized() {
-  return { status: 403, jsonBody: { status: "error", code: "AGREEMENT_PACKAGE_SEND_RECORD_NOT_AUTHORIZED" } };
 }
 
 function confirmationRequired() {
@@ -120,16 +113,6 @@ app.http("run-agreement-package-send", {
       return confirmationRequired();
     }
 
-    const matches =
-      diagnosticId.toLowerCase() === AUTHORIZED_DIAGNOSTIC_ID.toLowerCase() &&
-      intakeReferenceCode.toUpperCase() === AUTHORIZED_INTAKE_REFERENCE_CODE.toUpperCase() &&
-      opportunityId.toLowerCase() === AUTHORIZED_OPPORTUNITY_ID.toLowerCase();
-
-    if (!matches) {
-      context.warn("Agreement package send rejected: record does not match the one authorized controlled record.");
-      return recordNotAuthorized();
-    }
-
     const containerClient = getBlobContainerClient();
     const readGeneratedDocument = createGeneratedOutputBlobReader({
       diagnosticId,
@@ -137,7 +120,18 @@ app.http("run-agreement-package-send", {
     });
 
     const result = await sendAgreementPackage(
-      { diagnosticId, intakeReferenceCode, opportunityId, title, packageLabel, paymentSchedule, expectedAuthorEmail },
+      {
+        diagnosticId,
+        intakeReferenceCode,
+        opportunityId,
+        title,
+        packageLabel,
+        paymentSchedule,
+        expectedAuthorEmail,
+        requiredDocumentNames: Array.isArray(body.requiredDocumentNames) ? body.requiredDocumentNames : undefined,
+        audiobookAddendumGenerated: body.audiobookAddendumGenerated === true,
+        scheduleAGenerated: body.scheduleAGenerated === true
+      },
       { readGeneratedDocument, sendEmail: sendEmailViaRelay }
     );
 

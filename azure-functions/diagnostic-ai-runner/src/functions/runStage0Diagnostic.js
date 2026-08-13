@@ -10,6 +10,7 @@ const { routeDiagnosticResult } = require("../routing/confidenceRouter");
 const { writeMetadata } = require("../dataverse/metadataWriter");
 const { checkAiExecutionGate, getGateState } = require("../activation/aiExecutionGate");
 const { callModel } = require("../model/modelCaller");
+const { classifyModelFailureForWorkflow } = require("../model/modelCapacityRetryPolicy");
 const {
   ALLOWED_CONTROLLED_FIXTURES,
   loadControlledFixtureBuffer
@@ -120,6 +121,20 @@ function validationError(code, diagnosticId) {
       diagnosticId: diagnosticId || null
     }
   };
+}
+
+function parseAttemptCount(payload) {
+  const candidates = [
+    payload.workflowRetryCount,
+    payload.retryCount,
+    payload.attemptCount,
+    payload.diagnosticAttemptCount
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate === "number" && Number.isInteger(candidate) && candidate >= 0) return candidate;
+    if (typeof candidate === "string" && /^\d+$/.test(candidate.trim())) return Number.parseInt(candidate.trim(), 10);
+  }
+  return 0;
 }
 
 function verifyRunnerKey(request) {
@@ -822,6 +837,9 @@ app.http("run-stage0-diagnostic", {
         const errorCode = modelResult.gateBlocked
           ? `GATE_BLOCKED_${modelResult.gateReason}`
           : (modelResult.error || "MODEL_CALL_FAILED");
+        const retryDecision = classifyModelFailureForWorkflow(modelResult, {
+          attemptCount: parseAttemptCount(body)
+        });
 
         const metadataFail = {
           diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
@@ -829,12 +847,46 @@ app.http("run-stage0-diagnostic", {
           modelDeploymentAlias: promptResolution.modelDeploymentAlias || process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
           promptKey, promptVersion,
           confidence: null,
-          requiresHumanReview: true,
+          requiresHumanReview: retryDecision.retryable ? false : true,
           tokenCounts: modelResult.tokenCounts,
           requestTimestamp, responseTimestamp,
-          errorCode, errorMessage: modelResult.error
+          errorCode: retryDecision.retryable ? retryDecision.code : errorCode,
+          errorMessage: retryDecision.retryable
+            ? `${retryDecision.reason}; waitingOn=${retryDecision.waitingOn}; retryCount=${retryDecision.retryCount}; nextAttemptAt=${retryDecision.nextAttemptAt}`
+            : modelResult.error
         };
         await writeMetadata(metadataFail, { telemetry });
+
+        if (retryDecision.retryable) {
+          return {
+            status: 202,
+            jsonBody: {
+              status: "retry-scheduled",
+              code: retryDecision.code,
+              diagnosticId,
+              intakeReferenceCode,
+              failedStage: "modelCall",
+              waitingOn: retryDecision.waitingOn,
+              notificationRequired: false,
+              retry: {
+                reason: retryDecision.reason,
+                retryCount: retryDecision.retryCount,
+                nextAttemptAt: retryDecision.nextAttemptAt,
+                delayMinutes: retryDecision.delayMinutes,
+                maxRetries: retryDecision.maxRetries
+              },
+              operatingCenter: {
+                status: "EDITORIAL_REVIEW_PROCESSING",
+                substatus: "RETRY_SCHEDULED",
+                waitingOn: "System",
+                jackieActionRequired: false
+              },
+              gate: { permitted: gate.permitted, reason: gate.reason },
+              tokens: modelResult.tokenCounts,
+              message: "Transient model capacity failure classified. Retry is system-owned; no Jackie action is required for this attempt."
+            }
+          };
+        }
 
         return {
           status: 503,

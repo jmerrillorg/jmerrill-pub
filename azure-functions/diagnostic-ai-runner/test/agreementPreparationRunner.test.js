@@ -274,6 +274,29 @@ describe("prepareAgreementDocumentPackage — produces the expected document set
     assert.equal(result.scheduleAGenerated, false);
     assert.equal(result.manifest.documents.length, 2);
   });
+
+  test("internal commissioning Starter preparation creates no fake payment, Stripe, or Business Central action", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchAlwaysOk();
+    const deps = fakeDeps({
+      [TEMPLATE_NAME.PUBLISHING_AGREEMENT]: publishingAgreementTemplateXml("<w:t>[Author Legal Name]</w:t>"),
+      [TEMPLATE_NAME.PACKAGE_ADDENDUM]: "<w:t>COMPLIMENTARY COPIES</w:t>",
+      [TEMPLATE_NAME.AUDIOBOOK_ADDENDUM]: "<w:t>[Date]</w:t>"
+    });
+    const result = await prepareAgreementDocumentPackage(controlledInput({
+      title: "'Til Death Do Us Part",
+      selectedPackageCode: "JMP-PKG-STARTER",
+      electedProductForms: ["PF-01", "PF-03"],
+      paymentOption: "INTERNAL_COMMISSIONING"
+    }), deps);
+    assert.equal(result.ok, true);
+    assert.equal(result.scheduleAGenerated, false);
+    assert.equal(result.audiobookAddendumGenerated, false);
+    assert.equal(result.manifest.documents.length, 2);
+    assert.equal(result.liveActions.createsPaymentLink, false);
+    assert.equal(result.liveActions.sentAuthorFacingOutput, false);
+    assert.equal(result.liveActions.startsProduction, false);
+  });
 });
 
 describe("prepareAgreementDocumentPackage — never sends, never touches the Opportunity, never starts production", () => {

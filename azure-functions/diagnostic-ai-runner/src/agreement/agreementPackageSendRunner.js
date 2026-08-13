@@ -3,8 +3,7 @@
 /**
  * Governed agreement-package send.
  *
- * Sends the prepared, governed agreement package (Publishing Agreement,
- * Publishing Package Addendum, Audiobook Addendum, Schedule A) to the
+ * Sends the prepared, governed agreement package to the
  * author for review and signature, using the approved publishing
  * identity. This is the FIRST author-facing send in the agreement
  * lifecycle — it never includes a payment link, never implies
@@ -59,11 +58,20 @@ const CONTRACT_STATUS = Object.freeze({
   DECLINED: 196650004
 });
 
-const REQUIRED_DOCUMENT_NAMES = Object.freeze([
+const BASE_REQUIRED_DOCUMENT_NAMES = Object.freeze([
   "JMP_Publishing_Agreement_FILLED",
-  "JMP_Publishing_Package_Addendum_FILLED",
-  "JMP_Audiobook_Addendum_FILLED",
-  "JMP_Schedule_A_Payment_Schedule"
+  "JMP_Publishing_Package_Addendum_FILLED"
+]);
+
+const OPTIONAL_DOCUMENT_NAMES = Object.freeze({
+  audiobook: "JMP_Audiobook_Addendum_FILLED",
+  scheduleA: "JMP_Schedule_A_Payment_Schedule"
+});
+
+const REQUIRED_DOCUMENT_NAMES = Object.freeze([
+  ...BASE_REQUIRED_DOCUMENT_NAMES,
+  OPTIONAL_DOCUMENT_NAMES.audiobook,
+  OPTIONAL_DOCUMENT_NAMES.scheduleA
 ]);
 
 function normalizeString(value) {
@@ -80,6 +88,39 @@ function isGateOpen() {
 
 function blocked(reason, extra = {}) {
   return { ok: false, code: "AGREEMENT_PACKAGE_SEND_BLOCKED", reason, ...extra };
+}
+
+function normalizeBaseName(value) {
+  const normalized = normalizeString(value);
+  return normalized.endsWith(".docx") ? normalized.slice(0, -5) : normalized;
+}
+
+function resolveRequiredDocumentNames(input = {}) {
+  const explicit = Array.isArray(input.requiredDocumentNames)
+    ? input.requiredDocumentNames.map(normalizeBaseName).filter(Boolean)
+    : [];
+  if (explicit.length > 0) return [...new Set(explicit)];
+
+  const names = [...BASE_REQUIRED_DOCUMENT_NAMES];
+  if (input.audiobookAddendumRequired === true || input.audiobookAddendumGenerated === true) {
+    names.push(OPTIONAL_DOCUMENT_NAMES.audiobook);
+  }
+  if (
+    input.scheduleARequired === true ||
+    input.scheduleAGenerated === true ||
+    (isPlainObject(input.paymentSchedule) && Number(input.paymentSchedule.installments) > 3)
+  ) {
+    names.push(OPTIONAL_DOCUMENT_NAMES.scheduleA);
+  }
+  return names;
+}
+
+function attachmentLabelForBaseName(baseName) {
+  if (baseName === "JMP_Publishing_Agreement_FILLED") return "Publishing Agreement";
+  if (baseName === "JMP_Publishing_Package_Addendum_FILLED") return "Publishing Package Addendum";
+  if (baseName === "JMP_Audiobook_Addendum_FILLED") return "Audiobook Addendum";
+  if (baseName === "JMP_Schedule_A_Payment_Schedule") return "Schedule A / Payment Schedule";
+  return baseName;
 }
 
 async function postExecutionLogRecord(apiBase, token, payload) {
@@ -108,13 +149,14 @@ async function postExecutionLogRecord(apiBase, token, payload) {
   return { id: typeof body.jm1_executionlogid === "string" ? body.jm1_executionlogid : null };
 }
 
-function buildAgreementSendExecutionLogPayload({ diagnosticId, intakeReferenceCode, opportunityId, authorEmail, emailContent, sendResult, completedAt }) {
+function buildAgreementSendExecutionLogPayload({ diagnosticId, intakeReferenceCode, opportunityId, authorEmail, emailContent, sendResult, completedAt, attachmentLabels = [] }) {
+  const attachmentSummary = attachmentLabels.length > 0 ? attachmentLabels.join(", ") : "prepared agreement package";
   const actionDescription = [
     `Agreement package send performed for intake ${intakeReferenceCode}, Opportunity ${opportunityId}.`,
     `Recipient confirmed from Dataverse Contact: ${authorEmail}.`,
-    `Sender: publishing@email.jmerrill.one. Reply-To: ${INTERNAL_VISIBILITY_MAILBOX}. Hidden archive copy: ${INTERNAL_VISIBILITY_MAILBOX}.`,
+    `Sender: publishing@email.jmerrill.one. Reply-To: ${INTERNAL_VISIBILITY_MAILBOX}. Cc: ${INTERNAL_VISIBILITY_MAILBOX}.`,
     `Subject: ${emailContent.subject}.`,
-    "Attachments: Publishing Agreement, Publishing Package Addendum, Audiobook Addendum, Schedule A (4 documents).",
+    `Attachments: ${attachmentSummary} (${attachmentLabels.length || "prepared"} document(s)).`,
     "No payment link included. No editorial scoring, manuscript text, or raw AI/model output included.",
     sendResult ? `Send accepted by relay; providerMessageId=${sendResult.providerMessageId || "unknown"}.` : null,
     "No Stripe/payment/production/distribution/launch/royalty/marketing action occurred."
@@ -187,8 +229,9 @@ async function sendAgreementPackage(input = {}, deps = {}) {
 
   // Step 2: confirm the generated package exists and every document is
   // a structurally valid .docx.
+  const requiredDocumentNames = resolveRequiredDocumentNames(input);
   const attachments = [];
-  for (const baseName of REQUIRED_DOCUMENT_NAMES) {
+  for (const baseName of requiredDocumentNames) {
     const fileName = `${baseName}_${diagnosticId}.docx`;
     let buffer;
     try {
@@ -206,9 +249,10 @@ async function sendAgreementPackage(input = {}, deps = {}) {
       contentInBase64: buffer.toString("base64")
     });
   }
-  if (attachments.length !== 4) {
+  if (attachments.length !== requiredDocumentNames.length) {
     return blocked("ATTACHMENT_COUNT_INVALID", { count: attachments.length });
   }
+  const attachmentLabels = requiredDocumentNames.map(attachmentLabelForBaseName);
 
   // Step 3: build the email content — never a payment link, never
   // editorial scoring, never manuscript/AI output.
@@ -216,7 +260,8 @@ async function sendAgreementPackage(input = {}, deps = {}) {
     authorFirstName: (contact.authorName || "").split(" ")[0] || contact.authorName,
     title,
     packageLabel,
-    paymentSchedule: input.paymentSchedule
+    paymentSchedule: input.paymentSchedule,
+    attachmentLabels
   });
 
   // Step 4: send via the ACS relay's dedicated, relay-key-gated endpoint.
@@ -226,7 +271,7 @@ async function sendAgreementPackage(input = {}, deps = {}) {
       senderDisplayName: SENDER_DISPLAY_NAME,
       to: contact.authorEmail,
       toDisplayName: contact.authorName || contact.authorEmail,
-      bcc: INTERNAL_VISIBILITY_MAILBOX,
+      cc: INTERNAL_VISIBILITY_MAILBOX,
       replyTo: INTERNAL_VISIBILITY_MAILBOX,
       subject: emailContent.subject,
       bodyText: emailContent.bodyText,
@@ -266,7 +311,7 @@ async function sendAgreementPackage(input = {}, deps = {}) {
     try {
       const token = await resolveToken(resourceUrl);
       const payload = buildAgreementSendExecutionLogPayload({
-        diagnosticId, intakeReferenceCode, opportunityId, authorEmail: contact.authorEmail, emailContent, sendResult, completedAt
+        diagnosticId, intakeReferenceCode, opportunityId, authorEmail: contact.authorEmail, emailContent, sendResult, completedAt, attachmentLabels
       });
       const result = await postExecutionLogRecord(apiBase, token, payload);
       executionLog = { created: true, id: result.id, error: null, diagnostics: null };
@@ -285,8 +330,9 @@ async function sendAgreementPackage(input = {}, deps = {}) {
     sender: "publishing@email.jmerrill.one",
     replyTo: INTERNAL_VISIBILITY_MAILBOX,
     archiveCopy: INTERNAL_VISIBILITY_MAILBOX,
-    archiveVisibility: "hidden",
+    archiveVisibility: "cc",
     subject: emailContent.subject,
+    attachmentLabels,
     attachmentNames: attachments.map((a) => a.name),
     providerMessageId: sendResult.providerMessageId || null,
     opportunityUpdate,
@@ -308,6 +354,9 @@ module.exports = {
   sendAgreementPackage,
   buildAgreementSendExecutionLogPayload,
   REQUIRED_DOCUMENT_NAMES,
+  BASE_REQUIRED_DOCUMENT_NAMES,
+  OPTIONAL_DOCUMENT_NAMES,
+  resolveRequiredDocumentNames,
   CONTRACT_STATUS,
   GATE_NAME,
   EVENT_TYPE,

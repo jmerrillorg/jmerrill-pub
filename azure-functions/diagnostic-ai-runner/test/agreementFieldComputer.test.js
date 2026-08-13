@@ -158,6 +158,23 @@ describe("computeAgreementFields — single payment has no fee, multi-payment op
     assert.equal(r.paymentSchedule.requiresScheduleAAttachment, false);
   });
 
+  test("INTERNAL_COMMISSIONING creates a truthful zero-author-payment disposition without Schedule A", () => {
+    const r = computeAgreementFields(baseInput({
+      title: "'Til Death Do Us Part",
+      selectedPackageCode: "JMP-PKG-STARTER",
+      electedProductForms: ["PF-01", "PF-03"],
+      paymentOption: "INTERNAL_COMMISSIONING"
+    }));
+    assert.equal(r.ok, true);
+    assert.equal(r.paymentSchedule.disposition, "INTERNAL_COMMISSIONING");
+    assert.equal(r.paymentSchedule.internalCommissioning, true);
+    assert.equal(r.paymentSchedule.installments, 0);
+    assert.equal(r.paymentSchedule.totalUsd, 0);
+    assert.equal(r.paymentSchedule.perInstallmentUsd, 0);
+    assert.equal(r.paymentSchedule.requiresScheduleAAttachment, false);
+    assert.deepEqual(r.paymentSchedule.rows, []);
+  });
+
   test("TWO_PAYMENTS requires a Schedule A is false (fits the 3-row table) but FOUR/EIGHT/TWELVE do require it", () => {
     assert.equal(computeAgreementFields(baseInput({ paymentOption: "TWO_PAYMENTS" })).paymentSchedule.requiresScheduleAAttachment, false);
     assert.equal(computeAgreementFields(baseInput({ paymentOption: "FOUR_PAYMENTS" })).paymentSchedule.requiresScheduleAAttachment, true);

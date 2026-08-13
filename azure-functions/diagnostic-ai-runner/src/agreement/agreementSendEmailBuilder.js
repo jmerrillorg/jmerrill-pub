@@ -25,7 +25,8 @@ function formatUsd(amount) {
 /**
  * @param {{
  *   authorFirstName: string, title: string, packageLabel: string,
- *   paymentSchedule: { installments: number, perInstallmentUsd: number, totalUsd: number }
+ *   paymentSchedule: { installments: number, perInstallmentUsd: number, totalUsd: number, internalCommissioning?: boolean },
+ *   attachmentLabels?: string[]
  * }} input
  * @returns {{ subject: string, bodyText: string }}
  */
@@ -34,26 +35,31 @@ function buildAgreementSendEmailContent(input = {}) {
   const title = (input.title || "").trim();
   const packageLabel = (input.packageLabel || "").trim();
   const schedule = input.paymentSchedule || {};
+  const attachmentLabels = Array.isArray(input.attachmentLabels) && input.attachmentLabels.length > 0
+    ? input.attachmentLabels.map((label) => String(label || "").trim()).filter(Boolean)
+    : ["Publishing Agreement", "Publishing Package Addendum", "Audiobook Addendum", "Schedule A / Payment Schedule"];
 
   const subject = `Agreement package for ${title}`;
 
-  const paymentLine = schedule.installments === 1
+  const paymentLine = schedule.internalCommissioning === true || schedule.disposition === "INTERNAL_COMMISSIONING"
+    ? "internal commissioning; no author payment is due for this commissioning record"
+    : schedule.installments === 1
     ? `a single payment of ${formatUsd(schedule.perInstallmentUsd)}`
     : `${schedule.installments} payments of ${formatUsd(schedule.perInstallmentUsd)} each (total ${formatUsd(schedule.totalUsd)})`;
+  const productionStartLine = schedule.internalCommissioning === true || schedule.disposition === "INTERNAL_COMMISSIONING"
+    ? "Once the agreement is signed and onboarding is complete, we'll continue the governed commissioning process."
+    : "Once the agreement is signed and your first payment is received, we'll begin production — production has not started yet.";
 
   const bodyText = [
     `Hi ${authorFirstName},`,
     "",
     `We're excited to move forward with ${title}. Attached is your agreement package for review and signature:`,
     "",
-    "- Publishing Agreement",
-    "- Publishing Package Addendum",
-    "- Audiobook Addendum",
-    "- Schedule A / Payment Schedule",
+    ...attachmentLabels.map((label) => `- ${label}`),
     "",
     `This reflects the ${packageLabel} and the payment plan you selected: ${paymentLine}.`,
     "",
-    "Please take your time reviewing each document. Once the agreement is signed and your first payment is received, we'll begin production — production has not started yet.",
+    `Please take your time reviewing each document. ${productionStartLine}`,
     "",
     "If you have any questions before signing, just reply to this email and we'll be glad to help.",
     "",

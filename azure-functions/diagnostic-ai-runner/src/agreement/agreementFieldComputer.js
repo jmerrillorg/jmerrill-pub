@@ -46,7 +46,12 @@ const PAYMENT_OPTION_INFO = Object.freeze({
   TWO_PAYMENTS: { installments: 2, feeApplies: true },
   FOUR_PAYMENTS: { installments: 4, feeApplies: true },
   EIGHT_PAYMENTS: { installments: 8, feeApplies: true },
-  TWELVE_PAYMENTS: { installments: 12, feeApplies: true }
+  TWELVE_PAYMENTS: { installments: 12, feeApplies: true },
+  INTERNAL_COMMISSIONING: {
+    installments: 0,
+    feeApplies: false,
+    internalCommissioning: true
+  }
 });
 
 const MANUSCRIPT_DEADLINE_TEXT = "Manuscript received prior to agreement preparation";
@@ -135,11 +140,15 @@ function computeAgreementFields(input = {}) {
       audiobookIncluded: null, paymentSchedule: null };
   }
 
-  const totalUsd = Math.round(packageInfo.fee * (paymentInfo.feeApplies ? 1.04 : 1) * 100) / 100;
-  const perInstallmentUsd = Math.round((totalUsd / paymentInfo.installments) * 100) / 100;
+  const totalUsd = paymentInfo.internalCommissioning
+    ? 0
+    : Math.round(packageInfo.fee * (paymentInfo.feeApplies ? 1.04 : 1) * 100) / 100;
+  const perInstallmentUsd = paymentInfo.internalCommissioning
+    ? 0
+    : Math.round((totalUsd / paymentInfo.installments) * 100) / 100;
   const requiresScheduleAAttachment = paymentInfo.installments > 3;
 
-  const rows = Array.from({ length: paymentInfo.installments }, (_, i) => ({
+  const rows = paymentInfo.internalCommissioning ? [] : Array.from({ length: paymentInfo.installments }, (_, i) => ({
     paymentNumber: i + 1,
     amountFormatted: formatUsd(perInstallmentUsd),
     dueDateNote: i === 0
@@ -170,6 +179,8 @@ function computeAgreementFields(input = {}) {
       totalUsd,
       totalFormatted: formatUsd(totalUsd),
       feeApplies: paymentInfo.feeApplies,
+      internalCommissioning: paymentInfo.internalCommissioning === true,
+      disposition: paymentInfo.internalCommissioning === true ? "INTERNAL_COMMISSIONING" : "AUTHOR_PAYMENT_REQUIRED",
       requiresScheduleAAttachment,
       rows
     }

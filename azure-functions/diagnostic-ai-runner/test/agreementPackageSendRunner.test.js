@@ -7,6 +7,8 @@ const {
   sendAgreementPackage,
   buildAgreementSendExecutionLogPayload,
   REQUIRED_DOCUMENT_NAMES,
+  BASE_REQUIRED_DOCUMENT_NAMES,
+  resolveRequiredDocumentNames,
   CONTRACT_STATUS,
   GATE_NAME,
   INTERNAL_VISIBILITY_MAILBOX
@@ -140,18 +142,38 @@ describe("sendAgreementPackage — recipient confirmed from source of truth", ()
 });
 
 describe("sendAgreementPackage — confirms the generated package and validates every attachment", () => {
-  test("sends exactly four valid .docx attachments", async () => {
+  test("sends the valid .docx attachments required by the prepared package", async () => {
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     let sentAttachments = null;
     const deps = await fakeDeps({ sendEmail: async (msg) => { sentAttachments = msg.attachments; return { providerMessageId: "x" }; } });
     const result = await sendAgreementPackage(controlledInput(), deps);
     assert.equal(result.ok, true);
-    assert.equal(sentAttachments.length, 4);
-    assert.equal(result.attachmentNames.length, 4);
-    for (const name of REQUIRED_DOCUMENT_NAMES) {
+    assert.equal(sentAttachments.length, 3);
+    assert.equal(result.attachmentNames.length, 3);
+    for (const name of [
+      "JMP_Publishing_Agreement_FILLED",
+      "JMP_Publishing_Package_Addendum_FILLED",
+      "JMP_Schedule_A_Payment_Schedule"
+    ]) {
       assert.ok(result.attachmentNames.some((n) => n.startsWith(name)));
     }
+  });
+
+  test("Starter/internal commissioning can send only Agreement + Package Addendum", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchAlwaysOk();
+    let sentAttachments = null;
+    const deps = await fakeDeps({ sendEmail: async (msg) => { sentAttachments = msg.attachments; return { providerMessageId: "x" }; } });
+    const result = await sendAgreementPackage(controlledInput({
+      packageLabel: "Starter Publishing Package (JMP-PKG-STARTER)",
+      paymentSchedule: { installments: 0, perInstallmentUsd: 0, totalUsd: 0, internalCommissioning: true },
+      requiredDocumentNames: BASE_REQUIRED_DOCUMENT_NAMES
+    }), deps);
+    assert.equal(result.ok, true);
+    assert.equal(sentAttachments.length, 2);
+    assert.deepEqual(result.attachmentLabels, ["Publishing Agreement", "Publishing Package Addendum"]);
+    assert.equal(result.liveActions.createsPaymentLink, false);
   });
 
   test("fails when a generated document cannot be read", async () => {
@@ -228,20 +250,49 @@ describe("sendAgreementPackage — updates existing Opportunity fields (no new s
   });
 });
 
-describe("sendAgreementPackage — sender/replyTo/hidden archive match the approved publishing identity", () => {
-  test("sender, replyTo, and bcc archive are fixed and correct", async () => {
+describe("sendAgreementPackage — sender/replyTo/cc archive match the approved publishing identity", () => {
+  test("sender, replyTo, and cc archive are fixed and correct", async () => {
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     let capturedMessage = null;
     const deps = await fakeDeps({ sendEmail: async (msg) => { capturedMessage = msg; return { providerMessageId: "x" }; } });
     const result = await sendAgreementPackage(controlledInput(), deps);
-    assert.equal(capturedMessage.cc, undefined);
-    assert.equal(capturedMessage.bcc, INTERNAL_VISIBILITY_MAILBOX);
+    assert.equal(capturedMessage.cc, INTERNAL_VISIBILITY_MAILBOX);
+    assert.equal(capturedMessage.bcc, undefined);
     assert.equal(capturedMessage.replyTo, INTERNAL_VISIBILITY_MAILBOX);
     assert.equal(result.sender, "publishing@email.jmerrill.one");
     assert.equal(result.replyTo, INTERNAL_VISIBILITY_MAILBOX);
     assert.equal(result.archiveCopy, INTERNAL_VISIBILITY_MAILBOX);
-    assert.equal(result.archiveVisibility, "hidden");
+    assert.equal(result.archiveVisibility, "cc");
+  });
+});
+
+describe("resolveRequiredDocumentNames", () => {
+  test("defaults to Agreement + Addendum only for a Starter single/internal package", () => {
+    assert.deepEqual(resolveRequiredDocumentNames({ paymentSchedule: { installments: 0 } }), [
+      "JMP_Publishing_Agreement_FILLED",
+      "JMP_Publishing_Package_Addendum_FILLED"
+    ]);
+  });
+
+  test("adds Schedule A for payment plans over three installments", () => {
+    assert.deepEqual(resolveRequiredDocumentNames({ paymentSchedule: { installments: 8 } }), [
+      "JMP_Publishing_Agreement_FILLED",
+      "JMP_Publishing_Package_Addendum_FILLED",
+      "JMP_Schedule_A_Payment_Schedule"
+    ]);
+  });
+
+  test("honors explicit manifest-derived document names", () => {
+    assert.deepEqual(resolveRequiredDocumentNames({
+      requiredDocumentNames: [
+        "JMP_Publishing_Agreement_FILLED.docx",
+        "JMP_Publishing_Package_Addendum_FILLED.docx"
+      ]
+    }), [
+      "JMP_Publishing_Agreement_FILLED",
+      "JMP_Publishing_Package_Addendum_FILLED"
+    ]);
   });
 });
 
