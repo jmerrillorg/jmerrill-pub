@@ -130,18 +130,22 @@ async function trackDependency(telemetry, descriptor, operation) {
     const client = getAppInsightsClient();
 
     if (client) {
-      client.trackDependency({
-        target: descriptor.target,
-        name: descriptor.name,
-        data: descriptor.data || descriptor.name,
-        duration,
-        success,
-        resultCode,
-        dependencyTypeName: descriptor.dependencyTypeName || "HTTP",
-        properties: buildProperties(telemetry, descriptor.properties)
-      });
+      try {
+        client.trackDependency({
+          target: descriptor.target,
+          name: descriptor.name,
+          data: descriptor.data || descriptor.name,
+          duration,
+          success,
+          resultCode,
+          dependencyTypeName: descriptor.dependencyTypeName || "HTTP",
+          properties: buildProperties(telemetry, descriptor.properties)
+        });
 
-      await flushClient(client);
+        await flushClient(client);
+      } catch (_error) {
+        logClientUnavailable(telemetry);
+      }
     } else {
       logClientUnavailable(telemetry);
     }

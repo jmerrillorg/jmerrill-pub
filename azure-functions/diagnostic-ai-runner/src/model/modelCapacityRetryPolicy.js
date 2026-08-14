@@ -38,6 +38,19 @@ function calculateNextAttemptAt({ attemptCount = 0, now = new Date(), config = r
   };
 }
 
+function calculateProviderRetryAttemptAt({ retryAfterMs, now = new Date(), maxDelayMinutes = DEFAULT_MAX_DELAY_MINUTES } = {}) {
+  const normalizedRetryAfterMs = Number(retryAfterMs);
+  if (!Number.isFinite(normalizedRetryAfterMs) || normalizedRetryAfterMs < 0) {
+    return null;
+  }
+
+  const boundedDelayMs = Math.min(normalizedRetryAfterMs, maxDelayMinutes * 60 * 1000);
+  return {
+    delayMinutes: Math.max(1, Math.ceil(boundedDelayMs / 60000)),
+    nextAttemptAt: new Date(now.getTime() + boundedDelayMs).toISOString()
+  };
+}
+
 function classifyModelFailureForWorkflow(modelResult = {}, input = {}) {
   if (!isTransientCapacityFailure(modelResult)) {
     return {
@@ -62,7 +75,13 @@ function classifyModelFailureForWorkflow(modelResult = {}, input = {}) {
     };
   }
 
-  const schedule = calculateNextAttemptAt({ attemptCount, now: input.now || new Date(), config });
+  const providerSchedule = calculateProviderRetryAttemptAt({
+    retryAfterMs: modelResult.rateLimit?.retryAfterMs,
+    now: input.now || new Date(),
+    maxDelayMinutes: config.maxDelayMinutes
+  });
+  const schedule = providerSchedule || calculateNextAttemptAt({ attemptCount, now: input.now || new Date(), config });
+  const retryCount = normalizeAttemptCount(attemptCount) + 1;
   return {
     retryable: true,
     code: "MODEL_CAPACITY_RETRY_SCHEDULED",
@@ -70,15 +89,17 @@ function classifyModelFailureForWorkflow(modelResult = {}, input = {}) {
     waitingOn: "System",
     notificationRequired: false,
     attemptCount,
-    retryCount: schedule.nextAttemptNumber,
+    retryCount,
     nextAttemptAt: schedule.nextAttemptAt,
     delayMinutes: schedule.delayMinutes,
+    retryAfterHonored: Boolean(providerSchedule),
     maxRetries: config.maxRetries
   };
 }
 
 module.exports = {
   classifyModelFailureForWorkflow,
+  calculateProviderRetryAttemptAt,
   isTransientCapacityFailure,
   calculateNextAttemptAt,
   retryPolicyConfig,

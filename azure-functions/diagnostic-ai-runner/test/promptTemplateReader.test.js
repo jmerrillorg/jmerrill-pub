@@ -11,6 +11,8 @@ const {
 const {
   buildFallbackPromptResolution,
   choosePromptTemplateRow,
+  getStage0ModelDeploymentAliasNormalization,
+  normalizeStage0ModelDeploymentAlias,
   resolveGovernedPromptTemplate
 } = require("../src/dataverse/promptTemplateReader");
 
@@ -83,7 +85,21 @@ describe("prompt template reader", () => {
       assert.equal(result.ok, true);
       assert.equal(result.source, "env-fallback");
       assert.equal(result.effectiveState, "controlled-fallback");
+      assert.equal(result.modelDeploymentAlias, "jm1-editorial-devline-primary");
     });
+  });
+
+  test("Stage 0 normalizes stale Azure fallback aliases to the canonical primary route alias", () => {
+    assert.equal(
+      normalizeStage0ModelDeploymentAlias("jm1-pub-diagnostic-primary"),
+      "jm1-editorial-devline-primary"
+    );
+
+    const result = getStage0ModelDeploymentAliasNormalization("jm1-pub-diagnostic-primary");
+    assert.equal(result.normalized, true);
+    assert.equal(result.originalAlias, "jm1-pub-diagnostic-primary");
+    assert.equal(result.normalizedAlias, "jm1-editorial-devline-primary");
+    assert.equal(result.normalizationReason, "STAGE0_PROMPT_TEMPLATE_REFERENCED_APPROVED_FALLBACK_ALIAS");
   });
 
   test("controlled execution can resolve an inactive prompt only when explicitly allowed", async () => {
@@ -118,6 +134,9 @@ describe("prompt template reader", () => {
           });
           assert.equal(result.ok, true);
           assert.equal(result.effectiveState, "controlled-inactive-allowed");
+          assert.equal(result.promptModelDeploymentAlias, "jm1-pub-diagnostic-primary");
+          assert.equal(result.modelDeploymentAlias, "jm1-editorial-devline-primary");
+          assert.equal(result.modelDeploymentAliasNormalized, true);
         } finally {
           identity.DefaultAzureCredential.prototype.getToken = original;
         }

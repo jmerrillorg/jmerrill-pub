@@ -5,7 +5,8 @@ const assert = require("node:assert/strict");
 const {
   classifyModelFailureForWorkflow,
   isTransientCapacityFailure,
-  calculateNextAttemptAt
+  calculateNextAttemptAt,
+  calculateProviderRetryAttemptAt
 } = require("../src/model/modelCapacityRetryPolicy");
 
 describe("modelCapacityRetryPolicy", () => {
@@ -61,5 +62,41 @@ describe("modelCapacityRetryPolicy", () => {
     });
     assert.equal(result.delayMinutes, 60);
     assert.equal(result.nextAttemptAt, "2026-08-13T13:00:00.000Z");
+  });
+
+  test("honors provider retry-after when scheduling workflow retry", () => {
+    const result = classifyModelFailureForWorkflow(
+      {
+        ok: false,
+        httpStatus: 429,
+        error: "AZURE_OPENAI_HTTP_429",
+        rateLimit: { retryAfterMs: 120000 }
+      },
+      {
+        attemptCount: 0,
+        now: new Date("2026-08-13T12:00:00.000Z"),
+        env: {
+          JM1_STAGE0_MODEL_CAPACITY_MAX_RETRIES: "5",
+          JM1_STAGE0_MODEL_CAPACITY_RETRY_BASE_MINUTES: "15",
+          JM1_STAGE0_MODEL_CAPACITY_RETRY_MAX_MINUTES: "240"
+        }
+      }
+    );
+
+    assert.equal(result.retryable, true);
+    assert.equal(result.retryAfterHonored, true);
+    assert.equal(result.delayMinutes, 2);
+    assert.equal(result.nextAttemptAt, "2026-08-13T12:02:00.000Z");
+  });
+
+  test("bounds provider retry-after by configured max delay", () => {
+    const result = calculateProviderRetryAttemptAt({
+      retryAfterMs: 10 * 60 * 1000,
+      now: new Date("2026-08-13T12:00:00.000Z"),
+      maxDelayMinutes: 3
+    });
+
+    assert.equal(result.delayMinutes, 3);
+    assert.equal(result.nextAttemptAt, "2026-08-13T12:03:00.000Z");
   });
 });

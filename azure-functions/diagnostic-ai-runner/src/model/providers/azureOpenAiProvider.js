@@ -10,6 +10,7 @@
 
 const { trackDependency } = require("../../observability/dependencyTelemetry");
 const {
+  buildRateLimitMetadata,
   fetchWithRetry,
   getProviderRuntimeOptions,
   parseStructuredJsonObject
@@ -22,6 +23,7 @@ const REQUIRED_VARS = [
 ];
 
 const RESPONSE_FORMAT_JSON_OBJECT_ENV = "AZURE_OPENAI_ENABLE_RESPONSE_FORMAT_JSON_OBJECT";
+const DEFAULT_MAX_OUTPUT_TOKENS = 1200;
 
 function checkConfig() {
   const missing = REQUIRED_VARS.filter(v => !process.env[v]);
@@ -54,7 +56,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
   const requestBody = {
     messages: [{ role: "user", content: promptBody }],
     temperature: 0.2,
-    max_tokens: 1200
+    max_tokens: DEFAULT_MAX_OUTPUT_TOKENS
   };
 
   if (shouldRequestJsonObjectResponseFormat()) {
@@ -103,6 +105,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
     );
 
     httpStatus = response.status;
+    const rateLimit = buildRateLimitMetadata(response.headers);
     const responseBody = await response.json();
 
     if (!response.ok) {
@@ -116,6 +119,12 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
         output: null,
         tokenCounts: { input: 0, output: 0, total: 0 },
         httpStatus,
+        request: {
+          deployment,
+          maxOutputTokens: requestBody.max_tokens,
+          responseFormatJsonObject: Boolean(requestBody.response_format)
+        },
+        rateLimit,
         error: providerMessage ? `AZURE_OPENAI_HTTP_${httpStatus}: ${providerMessage}` : `AZURE_OPENAI_HTTP_${httpStatus}`
       };
     }
@@ -136,6 +145,12 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
           total: usage.total_tokens || 0
         },
         httpStatus,
+        request: {
+          deployment,
+          maxOutputTokens: requestBody.max_tokens,
+          responseFormatJsonObject: Boolean(requestBody.response_format)
+        },
+        rateLimit,
         error: parsedOutput.error
       };
     }
@@ -151,6 +166,12 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
         total: usage.total_tokens || 0
       },
       httpStatus,
+      request: {
+        deployment,
+        maxOutputTokens: requestBody.max_tokens,
+        responseFormatJsonObject: Boolean(requestBody.response_format)
+      },
+      rateLimit,
       error: null,
       responseClassification: parsedOutput.classification
     };
@@ -168,6 +189,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route = null }
 }
 
 module.exports = {
+  DEFAULT_MAX_OUTPUT_TOKENS,
   RESPONSE_FORMAT_JSON_OBJECT_ENV,
   call,
   checkConfig,

@@ -39,6 +39,8 @@ const REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i;
 const CORRELATION_ID_PATTERN = /^[0-9a-zA-Z_-]{1,100}$/;
 const MAX_FIELD_LENGTH = 200;
 const TEXT_FIELD_MAX_CHARS = 240;
+const STAGE0_DEFAULT_MAX_OUTPUT_TOKEN_ESTIMATE = 1200;
+const TOKEN_ESTIMATE_CHARS_PER_TOKEN = 4;
 
 const REAL_MANUSCRIPT_BREVITY_INSTRUCTIONS = [
   "TEXT FIELD BREVITY REQUIREMENTS:",
@@ -99,6 +101,59 @@ function buildRealManuscriptPilotPrompt({ knowledgeContent, manuscriptContent })
     "",
     "ALL string fields: characterization only. No manuscript excerpts. No quoted prose. No verbatim author text."
   ].join("\n");
+}
+
+function estimateTokensFromText(value) {
+  if (typeof value !== "string" || value.length === 0) {
+    return 0;
+  }
+  return Math.ceil(value.length / TOKEN_ESTIMATE_CHARS_PER_TOKEN);
+}
+
+function buildStage0RequestSizing({
+  knowledgeContent,
+  manuscriptMetadata,
+  promptBody,
+  maxOutputTokens = STAGE0_DEFAULT_MAX_OUTPUT_TOKEN_ESTIMATE
+} = {}) {
+  const inputTokenEstimate = estimateTokensFromText(promptBody);
+  return {
+    estimateMethod: "chars_divided_by_4",
+    knowledgeCharCount: typeof knowledgeContent === "string" ? knowledgeContent.length : 0,
+    knowledgeTokenEstimate: estimateTokensFromText(knowledgeContent),
+    manuscriptCharCount: Number.isFinite(Number(manuscriptMetadata?.charCount)) ? Number(manuscriptMetadata.charCount) : null,
+    manuscriptWordCount: Number.isFinite(Number(manuscriptMetadata?.wordCount)) ? Number(manuscriptMetadata.wordCount) : null,
+    promptCharCount: typeof promptBody === "string" ? promptBody.length : 0,
+    inputTokenEstimate,
+    configuredMaxOutputTokens: maxOutputTokens,
+    admissionTokenEstimate: inputTokenEstimate + maxOutputTokens
+  };
+}
+
+function buildStage0ModelRoutingProvenance({ promptResolution, modelResult } = {}) {
+  const route = modelResult?.route || {};
+  const fallback = Boolean(route.fallbackFromAlias);
+  return {
+    routingAuthority: "governedRouteRegistry",
+    promptTemplateSource: promptResolution?.source || null,
+    promptModelDeploymentAlias: promptResolution?.promptModelDeploymentAlias || null,
+    requestedDeploymentAlias: promptResolution?.modelDeploymentAlias || null,
+    promptAliasNormalized: promptResolution?.modelDeploymentAliasNormalized === true,
+    promptAliasNormalizationReason: promptResolution?.modelDeploymentAliasNormalizationReason || null,
+    routeSource: route.source || null,
+    routePolicy: route.routePolicy || null,
+    preferredDeploymentAlias: fallback
+      ? route.fallbackFromAlias
+      : (promptResolution?.modelDeploymentAlias || route.deploymentAlias || null),
+    selectedDeploymentAlias: route.deploymentAlias || promptResolution?.modelDeploymentAlias || null,
+    selectedDeploymentName: route.deploymentName || modelResult?.request?.deployment || null,
+    provider: route.provider || modelResult?.provider || null,
+    model: route.model || null,
+    modelVersion: route.version || null,
+    fallback,
+    fallbackReason: route.fallbackReason || null,
+    certificationStatus: route.certificationStatus || null
+  };
 }
 
 function unauthorized() {
@@ -804,12 +859,17 @@ app.http("run-stage0-diagnostic", {
         knowledgeContent,
         manuscriptContent: extractResult.content
       });
+      const requestSizing = buildStage0RequestSizing({
+        knowledgeContent,
+        manuscriptMetadata: extractResult.metadata,
+        promptBody
+      });
 
       // Clear content reference — no longer needed after prompt construction
       extractResult.content = null;
 
       context.info(
-        `Pilot stage 4 prompt built; diagnosticId=${diagnosticId}; promptKey=${promptKey}`
+        `Pilot stage 4 prompt built; diagnosticId=${diagnosticId}; promptKey=${promptKey}; inputTokenEstimate=${requestSizing.inputTokenEstimate}; admissionTokenEstimate=${requestSizing.admissionTokenEstimate}`
       );
 
       // Stage 5: Model call
@@ -831,6 +891,7 @@ app.http("run-stage0-diagnostic", {
       context.info(
         `Pilot stage 5 model call complete; diagnosticId=${diagnosticId}; ok=${modelResult.ok}; httpStatus=${modelResult.httpStatus}; tokens=${JSON.stringify(modelResult.tokenCounts)}`
       );
+      const modelRouting = buildStage0ModelRoutingProvenance({ promptResolution, modelResult });
 
       if (!modelResult.ok) {
         const errorCode = modelResult.gateBlocked
@@ -839,16 +900,24 @@ app.http("run-stage0-diagnostic", {
         const retryDecision = classifyModelFailureForWorkflow(modelResult, {
           attemptCount: parseAttemptCount(body)
         });
+        const safeRequestSizing = {
+          ...requestSizing,
+          configuredMaxOutputTokens: modelResult.request?.maxOutputTokens || requestSizing.configuredMaxOutputTokens,
+          admissionTokenEstimate: requestSizing.inputTokenEstimate + (modelResult.request?.maxOutputTokens || requestSizing.configuredMaxOutputTokens)
+        };
 
         const metadataFail = {
           diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
           executionMode,
-          modelDeploymentAlias: promptResolution.modelDeploymentAlias || process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+          modelDeploymentAlias: modelRouting.selectedDeploymentAlias || promptResolution.modelDeploymentAlias || "unknown",
           promptKey, promptVersion,
           confidence: null,
           requiresHumanReview: retryDecision.retryable ? false : true,
           tokenCounts: modelResult.tokenCounts,
           requestTimestamp, responseTimestamp,
+          requestSizing: safeRequestSizing,
+          modelRouting,
+          rateLimit: modelResult.rateLimit || null,
           errorCode: retryDecision.retryable ? retryDecision.code : errorCode,
           errorMessage: retryDecision.retryable
             ? `${retryDecision.reason}; waitingOn=${retryDecision.waitingOn}; retryCount=${retryDecision.retryCount}; nextAttemptAt=${retryDecision.nextAttemptAt}`
@@ -872,6 +941,7 @@ app.http("run-stage0-diagnostic", {
                 retryCount: retryDecision.retryCount,
                 nextAttemptAt: retryDecision.nextAttemptAt,
                 delayMinutes: retryDecision.delayMinutes,
+                retryAfterHonored: retryDecision.retryAfterHonored,
                 maxRetries: retryDecision.maxRetries
               },
               operatingCenter: {
@@ -882,6 +952,10 @@ app.http("run-stage0-diagnostic", {
               },
               gate: { permitted: gate.permitted, reason: gate.reason },
               tokens: modelResult.tokenCounts,
+              requestSizing: safeRequestSizing,
+              modelRouting,
+              providerRequest: modelResult.request || null,
+              rateLimit: modelResult.rateLimit || null,
               message: "Transient model capacity failure classified. Retry is system-owned; no Jackie action is required for this attempt."
             }
           };
@@ -896,6 +970,10 @@ app.http("run-stage0-diagnostic", {
             failedStage: "modelCall",
             gate: { permitted: gate.permitted, reason: gate.reason },
             tokens: modelResult.tokenCounts,
+            requestSizing: safeRequestSizing,
+            modelRouting,
+            providerRequest: modelResult.request || null,
+            rateLimit: modelResult.rateLimit || null,
             message: "Real manuscript pilot model call failed. Metadata logged."
           }
         };
@@ -912,12 +990,13 @@ app.http("run-stage0-diagnostic", {
         const metadataSchema = {
           diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
           executionMode,
-          modelDeploymentAlias: promptResolution.modelDeploymentAlias || process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+          modelDeploymentAlias: modelRouting.selectedDeploymentAlias || promptResolution.modelDeploymentAlias || "unknown",
           promptKey, promptVersion,
           confidence: null,
           requiresHumanReview: true,
           tokenCounts: modelResult.tokenCounts,
           requestTimestamp, responseTimestamp,
+          modelRouting,
           errorCode: "PILOT_OUTPUT_SCHEMA_INVALID",
           errorMessage: schemaResult.errors.join("; ")
         };
@@ -932,6 +1011,7 @@ app.http("run-stage0-diagnostic", {
             failedStage: "schemaValidation",
             schemaErrors: schemaResult.errors,
             tokens: modelResult.tokenCounts,
+            modelRouting,
             message: "Real manuscript pilot output failed schema validation. No output forwarded. Metadata logged."
           }
         };
@@ -955,12 +1035,13 @@ app.http("run-stage0-diagnostic", {
         const metadataViolation = {
           diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
           executionMode,
-          modelDeploymentAlias: promptResolution.modelDeploymentAlias || process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+          modelDeploymentAlias: modelRouting.selectedDeploymentAlias || promptResolution.modelDeploymentAlias || "unknown",
           promptKey, promptVersion,
           confidence: null,
           requiresHumanReview: true,
           tokenCounts: modelResult.tokenCounts,
           requestTimestamp, responseTimestamp,
+          modelRouting,
           errorCode: "OUTPUT_QUOTATION_VIOLATION",
           errorMessage: `${aiValidation.violations.length} violation(s) in model output`
         };
@@ -975,6 +1056,7 @@ app.http("run-stage0-diagnostic", {
             failedStage: "outputValidation",
             validation: { valid: false, violations: aiValidation.violations, fieldsChecked: aiValidation.fieldsChecked },
             tokens: modelResult.tokenCounts,
+            modelRouting,
             message: "Real manuscript pilot output failed no-quotation validation. No output forwarded. Metadata logged."
           }
         };
@@ -988,12 +1070,13 @@ app.http("run-stage0-diagnostic", {
       const metadataSuccess = {
         diagnosticId, intakeReferenceCode, correlationId: correlationId || null,
         executionMode,
-        modelDeploymentAlias: promptResolution.modelDeploymentAlias || process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "unknown",
+        modelDeploymentAlias: modelRouting.selectedDeploymentAlias || promptResolution.modelDeploymentAlias || "unknown",
         promptKey, promptVersion,
         confidence,
         requiresHumanReview: true,
         tokenCounts: modelResult.tokenCounts,
         requestTimestamp, responseTimestamp,
+        modelRouting,
         errorCode: null,
         errorMessage: null
       };
@@ -1030,7 +1113,7 @@ app.http("run-stage0-diagnostic", {
               sha256: extractResult.metadata.sha256,
               contentReturned: false
             },
-            modelCall: { ok: true, provider: modelResult.provider, httpStatus: modelResult.httpStatus, tokens: modelResult.tokenCounts },
+            modelCall: { ok: true, provider: modelResult.provider, httpStatus: modelResult.httpStatus, tokens: modelResult.tokenCounts, modelRouting },
             outputValidation: { valid: true, violations: [], fieldsChecked: aiValidation.fieldsChecked },
             confidenceRouting: { status: routingDecision.status, statusLabel: routingDecision.statusLabel, requiresHumanReview: true, lowConfidenceNote: routingDecision.lowConfidenceNote, routingBasis: routingDecision.routingBasis },
             metadataWrites: { aiRequestLog: { created: writeResult.aiRequestLog.created, id: writeResult.aiRequestLog.id }, executionLog: { created: writeResult.executionLog.created, id: writeResult.executionLog.id } }

@@ -10,6 +10,12 @@ const {
 } = require("../src/editorial/editorialModelRoutingRegistry");
 
 describe("editorial model routing registry", () => {
+  test("editorial diagnostic / Stage 0 prefers Claude Sonnet and is fallback-only until deployed", () => {
+    const route = getModelRoute("editorial_diagnostic");
+    assert.equal(route.preferredCatalogCandidate.exactModel, "claude-sonnet-5");
+    assert.equal(route.executionReadiness, "fallback_only_until_claude_deployed");
+  });
+
   test("developmental editing prefers Claude Sonnet catalog candidate", () => {
     const route = getModelRoute("developmental_editing");
     assert.equal(route.preferredCatalogCandidate.exactModel, "claude-sonnet-5");
@@ -18,6 +24,16 @@ describe("editorial model routing registry", () => {
 
   test("copy editing prefers GPT-5.4 catalog candidate", () => {
     const route = getModelRoute("copy_editing");
+    assert.equal(route.preferredCatalogCandidate.exactModel, "gpt-5.4");
+  });
+
+  test("line editing prefers Claude Sonnet catalog candidate", () => {
+    const route = getModelRoute("line_editing");
+    assert.equal(route.preferredCatalogCandidate.exactModel, "claude-sonnet-5");
+  });
+
+  test("proofreading prefers GPT-5.4 catalog candidate", () => {
+    const route = getModelRoute("proofreading");
     assert.equal(route.preferredCatalogCandidate.exactModel, "gpt-5.4");
   });
 

@@ -452,6 +452,7 @@ describe("routeToProvider — provider routing errors (no live calls)", () => {
       });
       assert.equal(result.ok, false);
       assert.equal(result.provider, "azure-openai");
+      assert.equal(result.route.deploymentAlias, "jm1-pub-diagnostic-primary");
       assert.ok(result.error.includes("AZURE_OPENAI_CONFIG_MISSING"),
         `expected AZURE_OPENAI_CONFIG_MISSING in error, got: ${result.error}`);
     });
