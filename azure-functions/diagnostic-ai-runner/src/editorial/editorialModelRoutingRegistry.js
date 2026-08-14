@@ -20,9 +20,9 @@ const MODEL_ROUTES = Object.freeze({
       provider: "Anthropic via Azure AI Foundry",
       exactModel: "claude-sonnet-5",
       version: "2",
-      region: "eastus",
-      availabilityStatus: "CATALOG_AVAILABLE_NOT_DEPLOYED",
-      certificationState: "UNCERTIFIED_FOR_JM1_EDITORIAL"
+      region: "eastus2",
+      availabilityStatus: "DEPLOYED",
+      certificationState: "CERTIFIED_FOR_JM1_EDITORIAL"
     },
     approvedFallback: {
       ...DEPLOYED_MODEL_BASELINE,
@@ -36,7 +36,7 @@ const MODEL_ROUTES = Object.freeze({
     nextReviewDate: "2026-07-17",
     preferredGuidePolicy: "knowledge-md-section-3 + editorial-review companion",
     prohibitedProviders: ["unregistered-direct-model"],
-    executionReadiness: "fallback_only_until_claude_deployed"
+    executionReadiness: "preferred_route_commissioned"
   },
   developmental_editing: {
     transaction: "developmental_editing",
@@ -45,9 +45,9 @@ const MODEL_ROUTES = Object.freeze({
       provider: "Anthropic via Azure AI Foundry",
       exactModel: "claude-sonnet-5",
       version: "2",
-      region: "eastus",
-      availabilityStatus: "CATALOG_AVAILABLE_NOT_DEPLOYED",
-      certificationState: "UNCERTIFIED_FOR_JM1_EDITORIAL"
+      region: "eastus2",
+      availabilityStatus: "DEPLOYED",
+      certificationState: "CERTIFIED_FOR_JM1_EDITORIAL"
     },
     approvedFallback: {
       ...DEPLOYED_MODEL_BASELINE,
@@ -61,7 +61,7 @@ const MODEL_ROUTES = Object.freeze({
     nextReviewDate: "2026-07-17",
     preferredGuidePolicy: "knowledge-md-section-3 + developmental companion + optional faith overlay",
     prohibitedProviders: ["unregistered-direct-model"],
-    executionReadiness: "fallback_only_until_claude_deployed"
+    executionReadiness: "preferred_route_commissioned"
   },
   line_editing: {
     transaction: "line_editing",
@@ -70,9 +70,9 @@ const MODEL_ROUTES = Object.freeze({
       provider: "Anthropic via Azure AI Foundry",
       exactModel: "claude-sonnet-5",
       version: "2",
-      region: "eastus",
-      availabilityStatus: "CATALOG_AVAILABLE_NOT_DEPLOYED",
-      certificationState: "UNCERTIFIED_FOR_JM1_EDITORIAL"
+      region: "eastus2",
+      availabilityStatus: "DEPLOYED",
+      certificationState: "CERTIFIED_FOR_JM1_EDITORIAL"
     },
     approvedFallback: {
       ...DEPLOYED_MODEL_BASELINE,
@@ -86,7 +86,7 @@ const MODEL_ROUTES = Object.freeze({
     nextReviewDate: "2026-07-17",
     preferredGuidePolicy: "knowledge-md-section-3 + line/copy/proof companion + optional faith overlay",
     prohibitedProviders: ["unregistered-direct-model"],
-    executionReadiness: "fallback_only_until_claude_deployed"
+    executionReadiness: "preferred_route_commissioned"
   },
   copy_editing: {
     transaction: "copy_editing",
