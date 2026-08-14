@@ -11,7 +11,7 @@ const {
 
 const REQUIRED_VARS = ["AZURE_FOUNDRY_ENDPOINT"];
 const DEFAULT_ANTHROPIC_VERSION = "2023-06-01";
-const DEFAULT_MAX_OUTPUT_TOKENS = 1200;
+const DEFAULT_MAX_OUTPUT_TOKENS = 4096;
 const TOKEN_SCOPE = "https://ai.azure.com/.default";
 
 function checkConfig(route = {}) {

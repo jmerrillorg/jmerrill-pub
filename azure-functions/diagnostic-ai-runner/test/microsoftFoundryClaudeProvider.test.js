@@ -165,7 +165,7 @@ describe("microsoftFoundryClaudeProvider", () => {
 
       const parsedBody = JSON.parse(calls[0].init.body);
       assert.equal(parsedBody.temperature, undefined);
-      assert.equal(parsedBody.max_tokens, 1200);
+      assert.equal(parsedBody.max_tokens, 4096);
       assert.equal(parsedBody.stream, false);
       assert.equal(parsedBody.model, "jm1-editorial-devline-primary");
       assert.equal(parsedBody.messages[0].role, "user");
