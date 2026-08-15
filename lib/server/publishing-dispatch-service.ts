@@ -17,6 +17,12 @@ import {
   type GovernedPackageAttachment,
 } from './author-package-notification-engine'
 import {
+  evaluateTitleReadiness,
+  isUsableAuthorFacingName,
+  type TitleRequirementProcess,
+  type TitleStatus,
+} from './working-title-policy'
+import {
   dataverseCreate,
   dataverseFirst,
   dataverseFormatted,
@@ -59,6 +65,8 @@ export type PublishingDispatchRequest = {
 
 export type PublishingDispatchValidation = {
   currentPackage: 'PASS' | 'FAIL'
+  titleReadiness: 'PASS' | 'WORKING_TITLE'
+  authorFacingIdentity: 'PASS' | 'FAIL'
   recipient: 'PASS' | 'FAIL'
   manifest: 'PASS' | 'FAIL'
   qa: 'PASS' | 'FAIL'
@@ -165,6 +173,7 @@ type DispatchReadback = {
   recipientEmail: string
   stageCode: AuthorReviewPackageType
   stageLabel: string
+  titleStatus: TitleStatus
   packageVersion: string
   packageChecksum: string
   manifestLocation: string
@@ -327,6 +336,12 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
     executionLogIds: [],
     proposedMutations: [
       'create-or-reuse-one-author-review-gate',
+      ...(readback.titleStatus === 'WORKING_TITLE'
+        ? [
+            'generate-or-reuse-three-governed-title-suggestions',
+            'create-or-reuse-nonblocking-author-title-selection-task',
+          ]
+        : []),
       'send-one-branded-author-package-through-acs',
       'attach-required-author-safe-package-artifacts',
       'write-dataverse-send-log',
@@ -462,9 +477,11 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     }),
   ])
   const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name) || input.titleId
-  const authorName = stringValue(contact.fullname || stage.jm1pub_author || title.jm1pub_authorname) || 'Author'
+  const authorName =
+    stringValue(title.jm1pub_authordisplayname || title.jm1pub_authorname || contact.fullname || stage.jm1pub_author) || 'Author'
   const recipientEmail = stringValue(contact.emailaddress1)
   const stageCode = normalizeStageCode(stage)
+  const titleReadiness = evaluateTitleReadiness({ process: titlePolicyProcessForStage(stageCode), title: titleName })
   const stageArtifacts = artifacts.filter(
     (artifact) => !dataverseLookupId(artifact, '_jm1pub_editorialstageid_value') || dataverseLookupId(artifact, '_jm1pub_editorialstageid_value') === input.stageId,
   )
@@ -523,6 +540,7 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     recipientEmail,
     stageCode,
     stageLabel: stageLabelFor(stageCode),
+    titleStatus: titleReadiness.status,
     packageVersion,
     packageChecksum,
     manifestLocation: resolveManifestLocation(authorArtifacts),
@@ -562,6 +580,8 @@ function validateReadback(input: PublishingDispatchRequest, readback: DispatchRe
 
   return {
     currentPackage: input.packageId && readback.attachmentIds.length > 0 ? 'PASS' : 'FAIL',
+    titleReadiness: readback.titleStatus === 'WORKING_TITLE' ? 'WORKING_TITLE' : 'PASS',
+    authorFacingIdentity: isUsableAuthorFacingName(readback.authorName) ? 'PASS' : 'FAIL',
     recipient: readback.recipientEmail && dataverseLookupId(readback.stage, '_jm1pub_contactid_value') !== '00000000-0000-0000-0000-000000000000' ? 'PASS' : 'FAIL',
     manifest: readback.manifestLocation ? 'PASS' : 'FAIL',
     qa: notification.ok && readback.materializationBlockers.length === 0 ? 'PASS' : 'FAIL',
@@ -583,6 +603,7 @@ function validationBlockers(validation: PublishingDispatchValidation) {
       if (key === 'portalAccessPreflight' || key === 'workspaceTarget') return ''
       if (key === 'currentGate') return 'DUPLICATE_ACTIVE_GATE_RECONCILIATION_REQUIRED'
       if (key === 'intakeReference') return 'PUBLISHING_DISPATCH_BLOCKED - INTAKE_REFERENCE_CODE_INVALID'
+      if (key === 'authorFacingIdentity') return 'PUBLISHING_DISPATCH_BLOCKED - AUTHOR_FACING_IDENTITY_NOT_RESOLVED'
       return `PUBLISHING_DISPATCH_BLOCKED - ${key.toUpperCase()}`
     })
     .filter(Boolean)
@@ -862,6 +883,14 @@ function normalizeStageCode(stage: DataverseRow): AuthorReviewPackageType {
   if (/line/i.test(raw)) return 'LINE_EDITING_REVIEW'
   if (/copy/i.test(raw)) return 'COPYEDITING_REVIEW'
   if (/developmental|develop/i.test(raw)) return 'DEVELOPMENTAL_EDITING_REVIEW'
+  return 'EDITORIAL_REVIEW'
+}
+
+function titlePolicyProcessForStage(stageCode: AuthorReviewPackageType): TitleRequirementProcess {
+  if (stageCode === 'DEVELOPMENTAL_EDITING_REVIEW') return 'DEVELOPMENTAL_EDITING'
+  if (stageCode === 'LINE_EDITING_REVIEW') return 'LINE_EDITING'
+  if (stageCode === 'COPYEDITING_REVIEW') return 'COPYEDITING'
+  if (stageCode === 'PROOFREADING_REVIEW') return 'PROOFREADING'
   return 'EDITORIAL_REVIEW'
 }
 
