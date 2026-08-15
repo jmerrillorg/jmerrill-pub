@@ -18,7 +18,7 @@ The clean-send criteria were:
 
 - real author/title;
 - current unsuperseded gate;
-- final author-facing title;
+- valid title state, including `Untitled` as a governed working title during Editorial Review;
 - author-facing identity resolved;
 - current author-facing artifact/package;
 - no prior valid send;
@@ -31,10 +31,10 @@ No active gate met all criteria.
 
 PublishingDispatchService now blocks real author-review dispatch when:
 
-- title finality is not resolved;
 - author-facing identity is not resolved.
+- the current artifact/package is not author-facing.
 
 Blockers:
 
-- `PUBLISHING_DISPATCH_BLOCKED - TITLE_NOT_FINAL_FOR_AUTHOR_REVIEW`
 - `PUBLISHING_DISPATCH_BLOCKED - AUTHOR_FACING_IDENTITY_NOT_RESOLVED`
+- `PUBLISHING_DISPATCH_BLOCKED - AUTHOR_FACING_ATTACHMENTS_NOT_MATERIALIZED`

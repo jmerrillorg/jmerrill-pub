@@ -26,11 +26,11 @@ This package records the real author-review commissioning pass after PR #507 was
 
 BLOCKED / READY FOR NEXT CLEAN GATE
 
-The author-gate runtime is canonical and production-deployed. The real author-review send did not proceed because no active gate met the live-send criteria. The newest CC-010 gate is artifact-bound and idempotent, but its title remains `Untitled`, its artifact is internal-only Markdown, and it is therefore not author-sendable.
+The author-gate runtime is canonical and production-deployed. The real author-review send did not proceed because no active gate met the live-send criteria. The newest CC-010 gate is artifact-bound and idempotent. Its title remains `Untitled`, which is now governed as a valid working title and is not a send blocker. Its remaining blocker is artifact readiness: the bound review artifact is internal-only Markdown and is not yet a governed author-facing review package.
 
 ## Guard Added
 
-The governed PublishingDispatchService now blocks real author-review dispatch when the title is provisional or author-facing identity is unresolved.
+The governed PublishingDispatchService now separates title readiness from artifact readiness. `Untitled` is accepted as a valid working title for author-review dispatch, while unresolved author-facing identity and non-author-facing artifacts still fail closed.
 
 ## Boundary
 

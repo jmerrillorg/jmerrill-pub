@@ -15,8 +15,8 @@ Last verified: 2026-08-15T09:50:00-04:00
 - Real author request delivered: NO
 - Reason: no clean valid unsent real gate exists
 - Current selected closest gate: `eeffc5fb-5698-f111-8076-000d3a14673b`
-- Selected gate state: RECONCILIATION_REQUIRED
-- Next action: resolve the Atta Boateng / `JMP-INT-202607-422JSZ` title and author-facing package readiness before sending any author review request
+- Selected gate state: ARTIFACT_BLOCKED
+- Next action: create or validate the Atta Boateng / `JMP-INT-202607-422JSZ` author-facing Editorial Review package before sending any author review request. Title resolution is no longer a prerequisite for the Editorial Review send.
 
 ## Negative Proof
 
@@ -37,4 +37,4 @@ Last verified: 2026-08-15T09:50:00-04:00
 
 BLOCKED / READY FOR NEXT CLEAN GATE
 
-The author gate exists in runtime and is canonical. The live author-review experience cannot be truthfully commissioned with a send until a clean gate exists with final title identity, author-facing identity, current author-facing artifact/package, and no prior response/send ambiguity.
+The author gate exists in runtime and is canonical. The live author-review experience cannot be truthfully commissioned with a send until a clean gate exists with author-facing identity, current author-facing artifact/package, and no prior response/send ambiguity. A working title of `Untitled` is valid for Editorial Review.

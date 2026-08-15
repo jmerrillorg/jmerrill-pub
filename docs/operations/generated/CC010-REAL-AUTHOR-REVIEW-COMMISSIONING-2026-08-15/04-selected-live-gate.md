@@ -20,16 +20,16 @@ No real active author-review gate qualified for live author-review request deliv
 
 ## Classification
 
-RECONCILIATION_REQUIRED
+ARTIFACT_BLOCKED
 
 ## Reason
 
 The gate is real and artifact-bound, but it is not sendable as an author-review request because:
 
-- the canonical title is still provisional: `Untitled`;
+- the canonical title is `Untitled`, now classified as a valid working title and not a send blocker;
 - the review artifact is internal-only Markdown;
 - the author-facing review package is not established as a governed author-facing artifact;
-- sending would violate exact-title and author-safe artifact requirements.
+- sending would violate author-safe artifact/package requirements.
 
 ## Live Action
 

@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
 const service = readFileSync(new URL('../lib/server/publishing-dispatch-service.ts', import.meta.url), 'utf8')
+const workingTitlePolicy = readFileSync(new URL('../lib/server/working-title-policy.ts', import.meta.url), 'utf8')
 const fiveTitleWorker = readFileSync(new URL('../lib/server/five-title-executive-recovery-dispatch.ts', import.meta.url), 'utf8')
 const orchestrator = readFileSync(new URL('../lib/server/publishing-orchestrator.ts', import.meta.url), 'utf8')
 const route = readFileSync(new URL('../app/api/publishing/dispatch/author-package/route.ts', import.meta.url), 'utf8')
@@ -28,7 +29,7 @@ test('PROGRAM-006 exposes one canonical PublishingDispatchService operation', ()
 test('dispatch service owns validation, natural idempotency, and transaction evidence', () => {
   for (const token of [
     'currentPackage',
-    'titleFinality',
+    'titleReadiness',
     'authorFacingIdentity',
     'recipient',
     'manifest',
@@ -60,7 +61,6 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
     'PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED',
     'DUPLICATE_ACTIVE_GATE_RECONCILIATION_REQUIRED',
     'PUBLISHING_DISPATCH_BLOCKED - INTAKE_REFERENCE_CODE_INVALID',
-    'PUBLISHING_DISPATCH_BLOCKED - TITLE_NOT_FINAL_FOR_AUTHOR_REVIEW',
     'PUBLISHING_DISPATCH_BLOCKED - AUTHOR_FACING_IDENTITY_NOT_RESOLVED',
   ]) {
     assert.match(service, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
@@ -70,14 +70,49 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
   assert.doesNotMatch(service, /jm1pub_intakereference \|\| readback\.stage\.jm1pub_publishingintakereference/)
 })
 
-test('dispatch service blocks real author-review sends for provisional titles or unresolved author identity', () => {
-  assert.match(service, /function isFinalAuthorFacingTitle/)
-  assert.match(service, /function isUsableAuthorFacingName/)
-  assert.match(service, /titleFinality:\s*isFinalAuthorFacingTitle\(readback\.titleName\) \? 'PASS' : 'FAIL'/)
+test('dispatch service allows working-title author review while preserving identity protection', () => {
+  assert.match(service, /evaluateTitleReadiness/)
+  assert.match(service, /titlePolicyProcessForStage/)
+  assert.match(service, /titleReadiness:\s*readback\.titleStatus === 'WORKING_TITLE' \? 'WORKING_TITLE' : 'PASS'/)
+  assert.match(service, /generate-or-reuse-three-governed-title-suggestions/)
+  assert.match(service, /create-or-reuse-nonblocking-author-title-selection-task/)
+  assert.match(service, /isUsableAuthorFacingName,\n\s+type TitleRequirementProcess/)
   assert.match(service, /authorFacingIdentity:\s*isUsableAuthorFacingName\(readback\.authorName\) \? 'PASS' : 'FAIL'/)
-  assert.match(service, /\['untitled', 'unknown', 'tbd', 'to be determined', 'manuscript'\]/)
-  assert.match(service, /\['author', 'unknown author', 'unknown', 'tbd'\]/)
+  assert.match(workingTitlePolicy, /function isUsableAuthorFacingName/)
+  assert.match(workingTitlePolicy, /\['author', 'unknown author', 'unknown', 'tbd'\]/)
   assert.match(service, /title\.jm1pub_authordisplayname \|\| title\.jm1pub_authorname \|\| contact\.fullname \|\| stage\.jm1pub_author/)
+  assert.doesNotMatch(service, /TITLE_NOT_FINAL_FOR_AUTHOR_REVIEW/)
+})
+
+test('working-title policy treats Untitled as valid through editorial and final-only downstream gates', () => {
+  for (const token of [
+    "WORKING_TITLE",
+    "AUTHOR_PROVIDED",
+    "AUTHOR_SELECTED_SUGGESTION",
+    "FINAL_TITLE_APPROVED",
+    "TITLE_CHANGE_REQUESTED",
+    "EDITORIAL_REVIEW: workingAllowed('EDITORIAL_REVIEW')",
+    "DEVELOPMENTAL_EDITING: workingAllowed('DEVELOPMENTAL_EDITING')",
+    "LINE_EDITING: workingAllowed('LINE_EDITING')",
+    "COPYEDITING: workingAllowed('COPYEDITING')",
+    "PROOFREADING: workingAllowed('PROOFREADING')",
+    "ISBN_ASSIGNMENT: finalRequired('ISBN_ASSIGNMENT')",
+    "DISTRIBUTOR_METADATA: finalRequired('DISTRIBUTOR_METADATA')",
+    "FINAL_COVER_PRODUCTION: finalRequired('FINAL_COVER_PRODUCTION')",
+    "PUBLICATION_METADATA: finalRequired('PUBLICATION_METADATA')",
+    "titleStatus: TITLE_STATUS.WORKING_TITLE",
+    "nonblockingForEditorialApproval: true",
+    "KEEP_WORKING_TITLE_FOR_NOW",
+    "canonicalTitleMutation: false",
+    "editorialApprovalBlocked: false",
+  ]) {
+    assert.match(workingTitlePolicy, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
+  assert.match(workingTitlePolicy, /requiredSuggestionCount:\s*3/)
+  assert.match(workingTitlePolicy, /preferredModelFamily:\s*'CLAUDE'/)
+  assert.match(workingTitlePolicy, /fallbackAllowed:\s*false/)
+  assert.match(workingTitlePolicy, /TITLE_SUGGESTION_BLOCKED - EXACTLY_THREE_DISTINCT_TITLES_REQUIRED/)
+  assert.match(workingTitlePolicy, /author-title-selection/)
 })
 
 test('dispatch service reuses governed branding and package notification controls', () => {

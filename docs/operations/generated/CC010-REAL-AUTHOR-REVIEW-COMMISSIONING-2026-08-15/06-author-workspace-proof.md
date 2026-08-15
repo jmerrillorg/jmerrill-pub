@@ -18,7 +18,7 @@ Existing source surfaces remain canonical:
 
 ## Live Gate Boundary
 
-The selected closest gate was not surfaced to the author because it is not yet author-sendable. The artifact is internal-only Markdown and the title remains `Untitled`.
+The selected closest gate was not surfaced to the author because it is not yet author-sendable. The title remains `Untitled`, which is a valid working title. The remaining blocker is that the artifact is internal-only Markdown and no governed author-facing review package has been established for that gate.
 
 ## Security Position
 
