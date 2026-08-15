@@ -1,6 +1,6 @@
 # CC010 Stage Runtime Author Gates - Executive Summary
 
-Last verified: 2026-08-14
+Last verified: 2026-08-15
 
 ## Scope
 
@@ -23,7 +23,7 @@ This package records the CC-010 stage execution runtime integration for mandator
 ## Validation
 
 - Syntax/lint: PASS.
-- Focused CC-010 runtime/gate suite: 49 / 49 PASS.
+- Focused CC-010 runtime/gate suite: 50 / 50 PASS.
 - Full function-app suite: 1888 / 1891 PASS; 3 pre-existing/unrelated failures remain in `agreementGeneratedPackageMirror.test.js`.
 
 ## Boundary
@@ -31,3 +31,5 @@ This package records the CC-010 stage execution runtime integration for mandator
 - No retroactive author notification was sent by this runtime.
 - No author communication was sent by tests.
 - Deployment/readback/replay evidence is recorded in `15-live-boundary-evidence.md` and `16-final-cc010-stage-runtime-state.md`.
+- Final deployed release SHA: `035d5c74d149720ab266ff7b063c200a309a5865`.
+- Final replay: HTTP 200, `ok=true`.
