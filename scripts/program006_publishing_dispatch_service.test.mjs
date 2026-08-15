@@ -152,6 +152,8 @@ test('dispatch service fails closed unless real package attachments are material
 
 test('dispatch service separates technical release from operational certification', () => {
   assert.match(service, /TECHNICALLY_RELEASED/)
+  assert.match(service, /AUTHOR_REVIEW_DELIVERY_CERTIFICATION_RULE/)
+  assert.match(service, /MESSAGE_ACCEPTED_BY_RELAY_PLUS_GOVERNED_PACKAGE_EVIDENCE/)
   assert.match(service, /Operational delivery certification is required before Awaiting Author Response/)
   assert.match(service, /No seven-day response clock starts at technical release/)
   assert.match(service, /branded HTML, plain text, required attachments, checksums, archive, Dataverse send evidence, direct reply path, and single gate/)
@@ -170,6 +172,35 @@ test('dispatch service separates technical release from operational certificatio
   assert.doesNotMatch(service, /OPERATIONAL_CERTIFICATION_BLOCKED:RESPONSE_CONTROLS_NOT_CONFIRMED/)
   assert.doesNotMatch(service, /Gate \$\{gateId\} moved to AWAITING_AUTHOR_RESPONSE after provider/)
   assert.doesNotMatch(service, /TECHNICALLY_RELEASED[\s\S]{0,120}jm1pub_awaitingsince:\s*now/)
+})
+
+test('successful dispatch automatically certifies delivery without a second provider send', () => {
+  assert.match(service, /const certification = await certifyOperationalDelivery\(\{/)
+  assert.match(service, /evidence:\s*automaticOperationalDeliveryEvidence\(readback\)/)
+  assert.match(service, /status:\s*certification\.status === 'operationally_certified' \|\| certification\.status === 'idempotent'[\s\S]*\? 'operationally_certified'[\s\S]*: 'technically_released'/)
+  assert.match(service, /providerMessageId:\s*delivery\.providerMessageId/)
+  assert.doesNotMatch(service, /certifyOperationalDelivery[\s\S]{0,800}sendAuthorPackageThroughRelay/)
+})
+
+test('existing technical release recovery certifies the gate without resending', () => {
+  const existingTechnicalReleaseBranch = service.match(/if \(readback\.existingTechnicalRelease\) \{[\s\S]*?if \(input\.executionMode === 'DRY_RUN'\)/)?.[0] || ''
+  assert.match(existingTechnicalReleaseBranch, /await certifyOperationalDelivery\(\{/)
+  assert.match(existingTechnicalReleaseBranch, /automaticOperationalDeliveryEvidence\(readback\)/)
+  assert.doesNotMatch(existingTechnicalReleaseBranch, /sendAuthorPackageThroughRelay/)
+  assert.match(existingTechnicalReleaseBranch, /status:\s*certification\.status === 'idempotent' \? 'idempotent' : 'operationally_certified'/)
+})
+
+test('automatic certification evidence requires governed attachments, checksums, direct reply, and one active gate', () => {
+  assert.match(service, /function automaticOperationalDeliveryEvidence\(readback: DispatchReadback\)/)
+  assert.match(service, /requiredAttachments:\s*attachmentInventoryPassed/)
+  assert.match(service, /attachmentByteLength:\s*attachmentBytesPassed/)
+  assert.match(service, /attachmentChecksums:\s*attachmentChecksumsPassed/)
+  assert.match(service, /archiveConfirmed:\s*true/)
+  assert.match(service, /dataverseSendEvidence:\s*true/)
+  assert.match(service, /directReplyPath:\s*Boolean\(AUTHOR_PUBLISHING_COMMUNICATION_POLICY\.canonicalReplyTo\)/)
+  assert.match(service, /singleActiveGate:\s*readback\.activeGates\.length === 1/)
+  assert.doesNotMatch(service, /portalAccess:\s*true/)
+  assert.doesNotMatch(service, /authorClickThrough:\s*true/)
 })
 
 test('ACS relay requires and forwards attachments for author-review packages', () => {

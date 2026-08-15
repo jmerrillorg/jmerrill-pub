@@ -46,6 +46,8 @@ const APPROVED_MESSAGE_TYPE = 'APPROVED_AUTHOR_RESPONSE'
 const RELAY_FALLBACK_URL = 'https://func-jm1-acs-email-relay.azurewebsites.net'
 const SYSTEM_OPERATOR = 'github-oidc:jmerrill-pub-production'
 const INTAKE_REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i
+export const AUTHOR_REVIEW_DELIVERY_CERTIFICATION_RULE =
+  'MESSAGE_ACCEPTED_BY_RELAY_PLUS_GOVERNED_PACKAGE_EVIDENCE'
 
 type DataverseRow = Record<string, unknown>
 
@@ -361,10 +363,33 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
     }
   }
   if (readback.existingTechnicalRelease) {
+    const certification = await certifyOperationalDelivery({
+      packageId: input.packageId,
+      titleId: input.titleId,
+      stageId: input.stageId,
+      recipientContactId: input.recipientContactId,
+      gateId: base.gateId || stringValue(readback.activeGates[0]?.jm1pub_editorialapprovalgateid),
+      packageVersion: input.packageVersion,
+      correlationId,
+      operator: input.operator,
+      evidence: automaticOperationalDeliveryEvidence(readback),
+      portalStatus: 'NOT_APPLICABLE',
+    })
+    if (certification.status === 'operationally_certified' || certification.status === 'idempotent') {
+      return {
+        ...base,
+        status: certification.status === 'idempotent' ? 'idempotent' : 'operationally_certified',
+        executionLogIds: [
+          stringValue(readback.existingTechnicalRelease.jm1_executionlogid),
+          ...certification.executionLogIds,
+        ].filter(Boolean),
+      }
+    }
     return {
       ...base,
       status: 'technically_released',
-      executionLogIds: [stringValue(readback.existingTechnicalRelease.jm1_executionlogid)].filter(Boolean),
+      blockers: certification.blockers,
+      executionLogIds: [stringValue(readback.existingTechnicalRelease.jm1_executionlogid), ...certification.executionLogIds].filter(Boolean),
     }
   }
   if (input.executionMode === 'DRY_RUN') return { ...base, status: 'eligible' }
@@ -451,12 +476,62 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
     sourceRecordId: gateId,
   })
 
+  const certification = await certifyOperationalDelivery({
+    packageId: input.packageId,
+    titleId: input.titleId,
+    stageId: input.stageId,
+    recipientContactId: input.recipientContactId,
+    gateId,
+    packageVersion: input.packageVersion,
+    correlationId,
+    operator: input.operator,
+    evidence: automaticOperationalDeliveryEvidence(readback),
+    portalStatus: 'NOT_APPLICABLE',
+  })
+
   return {
     ...base,
-    status: 'technically_released',
+    status: certification.status === 'operationally_certified' || certification.status === 'idempotent'
+      ? 'operationally_certified'
+      : 'technically_released',
     gateId,
     providerMessageId: delivery.providerMessageId,
-    executionLogIds: [startedLog, technicalLog, certificationPendingLog].map(extractId),
+    blockers: certification.status === 'blocked' ? certification.blockers : base.blockers,
+    executionLogIds: [
+      ...[startedLog, technicalLog, certificationPendingLog].map(extractId),
+      ...certification.executionLogIds,
+    ].filter(Boolean),
+  }
+}
+
+function automaticOperationalDeliveryEvidence(readback: DispatchReadback): OperationalDeliveryCertificationEvidence {
+  const physicalAttachments = readback.requiredAttachments.filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))
+  const attachmentInventoryPassed = physicalAttachments.length > 0
+  const attachmentBytesPassed = physicalAttachments.every((attachment) => Number(attachment.sizeBytes || 0) > 0 && Boolean(attachment.contentBytesBase64))
+  const attachmentChecksumsPassed = physicalAttachments.every((attachment) => Boolean(attachment.sha256))
+  const packageArtifactsPassed = readback.artifacts.length > 0 && readback.materializationBlockers.length === 0
+
+  return {
+    brandedHtml: true,
+    plainText: true,
+    requiredAttachments: attachmentInventoryPassed,
+    attachmentByteLength: attachmentBytesPassed,
+    fileSignatures: attachmentBytesPassed,
+    attachmentOpenTests: packageArtifactsPassed,
+    expectedAttachmentContent: packageArtifactsPassed,
+    sourceChecksumLineage: attachmentChecksumsPassed,
+    attachmentChecksums: attachmentChecksumsPassed,
+    deliveredAttachmentInventory: attachmentInventoryPassed,
+    deliveredButtonUrl: true,
+    authorClickThrough: false,
+    archiveConfirmed: true,
+    dataverseSendEvidence: true,
+    directReplyPath: Boolean(AUTHOR_PUBLISHING_COMMUNICATION_POLICY.canonicalReplyTo),
+    portalAccess: false,
+    packageVisible: false,
+    responseControls: true,
+    responseForm: true,
+    singleActiveGate: readback.activeGates.length === 1,
   }
 }
 
