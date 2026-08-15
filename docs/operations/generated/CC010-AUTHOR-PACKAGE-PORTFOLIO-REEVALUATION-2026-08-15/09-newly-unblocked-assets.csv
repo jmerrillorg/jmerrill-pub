@@ -1,0 +1,2 @@
+gate_id,title,stage,new_classification,reclassification,newly_unblocked,resume_action,sendable,waiting_owner,reevaluation_reason
+eeffc5fb-5698-f111-8076-000d3a14673b,Untitled,A1 Editorial Review Acceptance,ARTIFACT_BLOCKED,PACKAGE_READY_PENDING_PERSISTENCE,YES,Generate and persist governed author-facing Editorial Review package before any author send.,NO,SYSTEM/PUBLISHING_RELEASE,"Shared author-facing Editorial Review package capability is now available; live send remains gated by deployment, governed artifact persistence, recipient identity, and notification policy."

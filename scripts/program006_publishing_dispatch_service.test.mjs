@@ -144,7 +144,7 @@ test('dispatch service fails closed unless real package attachments are material
   assert.match(service, /role !== 'reviewInstructions'/)
   assert.match(service, /!\/instruction\|guide\|review\/i\.test\(haystack\)/)
   assert.match(service, /!\/\\\.pdf\\b\|pdf\/i\.test\(haystack\)/)
-  assert.match(service, /role === 'reviewInstructions' && \/editorial\.\*review\.\*guide\|review\.\*guide\/i\.test\(haystack\)/)
+  assert.match(service, /role === 'reviewInstructions' && \/editorial\.\*review\.\*instruction\|editorial\.\*review\.\*guide\|review\.\*guide\/i\.test\(haystack\)/)
   assert.match(service, /role === 'reviewInstructions' && \/\\\.\(txt\|md\|json\)\\b\|text\\\/\|markdown\/i\.test\(haystack\)/)
   assert.doesNotMatch(service, /buildRequiredAttachmentStubs/)
   assert.doesNotMatch(service, /PROGRAM-006 governed package materialization proof/)

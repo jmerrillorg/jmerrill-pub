@@ -354,7 +354,7 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
       reviewInstructions: ['application/pdf', 'text/plain'],
     },
     qaChecks: baseQaChecks(),
-    emailAttachmentRoles: ['assessment', 'recommendedEditorialPath', 'reviewInstructions'],
+    emailAttachmentRoles: ['assessment', 'reviewInstructions'],
     workspaceDownloadRoles: ['assessment', 'recommendedEditorialPath', 'reviewInstructions'],
     cadencePolicyId: 'AUTHOR_REVIEW_STANDARD',
     authorResponsePeriodCalendarDays: AUTHOR_REVIEW_RESPONSE_PERIOD_CALENDAR_DAYS,
