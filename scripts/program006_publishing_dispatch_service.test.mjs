@@ -28,6 +28,8 @@ test('PROGRAM-006 exposes one canonical PublishingDispatchService operation', ()
 test('dispatch service owns validation, natural idempotency, and transaction evidence', () => {
   for (const token of [
     'currentPackage',
+    'titleFinality',
+    'authorFacingIdentity',
     'recipient',
     'manifest',
     'qa',
@@ -58,12 +60,24 @@ test('dispatch service owns validation, natural idempotency, and transaction evi
     'PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED',
     'DUPLICATE_ACTIVE_GATE_RECONCILIATION_REQUIRED',
     'PUBLISHING_DISPATCH_BLOCKED - INTAKE_REFERENCE_CODE_INVALID',
+    'PUBLISHING_DISPATCH_BLOCKED - TITLE_NOT_FINAL_FOR_AUTHOR_REVIEW',
+    'PUBLISHING_DISPATCH_BLOCKED - AUTHOR_FACING_IDENTITY_NOT_RESOLVED',
   ]) {
     assert.match(service, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
   }
   assert.match(service, /function stageHasCanonicalIntakeReferences/)
   assert.match(service, /stageReference && publishingReference && stageReference === publishingReference/)
   assert.doesNotMatch(service, /jm1pub_intakereference \|\| readback\.stage\.jm1pub_publishingintakereference/)
+})
+
+test('dispatch service blocks real author-review sends for provisional titles or unresolved author identity', () => {
+  assert.match(service, /function isFinalAuthorFacingTitle/)
+  assert.match(service, /function isUsableAuthorFacingName/)
+  assert.match(service, /titleFinality:\s*isFinalAuthorFacingTitle\(readback\.titleName\) \? 'PASS' : 'FAIL'/)
+  assert.match(service, /authorFacingIdentity:\s*isUsableAuthorFacingName\(readback\.authorName\) \? 'PASS' : 'FAIL'/)
+  assert.match(service, /\['untitled', 'unknown', 'tbd', 'to be determined', 'manuscript'\]/)
+  assert.match(service, /\['author', 'unknown author', 'unknown', 'tbd'\]/)
+  assert.match(service, /title\.jm1pub_authordisplayname \|\| title\.jm1pub_authorname \|\| contact\.fullname \|\| stage\.jm1pub_author/)
 })
 
 test('dispatch service reuses governed branding and package notification controls', () => {

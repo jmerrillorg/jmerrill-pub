@@ -59,6 +59,8 @@ export type PublishingDispatchRequest = {
 
 export type PublishingDispatchValidation = {
   currentPackage: 'PASS' | 'FAIL'
+  titleFinality: 'PASS' | 'FAIL'
+  authorFacingIdentity: 'PASS' | 'FAIL'
   recipient: 'PASS' | 'FAIL'
   manifest: 'PASS' | 'FAIL'
   qa: 'PASS' | 'FAIL'
@@ -462,7 +464,8 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     }),
   ])
   const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name) || input.titleId
-  const authorName = stringValue(contact.fullname || stage.jm1pub_author || title.jm1pub_authorname) || 'Author'
+  const authorName =
+    stringValue(title.jm1pub_authordisplayname || title.jm1pub_authorname || contact.fullname || stage.jm1pub_author) || 'Author'
   const recipientEmail = stringValue(contact.emailaddress1)
   const stageCode = normalizeStageCode(stage)
   const stageArtifacts = artifacts.filter(
@@ -562,6 +565,8 @@ function validateReadback(input: PublishingDispatchRequest, readback: DispatchRe
 
   return {
     currentPackage: input.packageId && readback.attachmentIds.length > 0 ? 'PASS' : 'FAIL',
+    titleFinality: isFinalAuthorFacingTitle(readback.titleName) ? 'PASS' : 'FAIL',
+    authorFacingIdentity: isUsableAuthorFacingName(readback.authorName) ? 'PASS' : 'FAIL',
     recipient: readback.recipientEmail && dataverseLookupId(readback.stage, '_jm1pub_contactid_value') !== '00000000-0000-0000-0000-000000000000' ? 'PASS' : 'FAIL',
     manifest: readback.manifestLocation ? 'PASS' : 'FAIL',
     qa: notification.ok && readback.materializationBlockers.length === 0 ? 'PASS' : 'FAIL',
@@ -583,9 +588,23 @@ function validationBlockers(validation: PublishingDispatchValidation) {
       if (key === 'portalAccessPreflight' || key === 'workspaceTarget') return ''
       if (key === 'currentGate') return 'DUPLICATE_ACTIVE_GATE_RECONCILIATION_REQUIRED'
       if (key === 'intakeReference') return 'PUBLISHING_DISPATCH_BLOCKED - INTAKE_REFERENCE_CODE_INVALID'
+      if (key === 'titleFinality') return 'PUBLISHING_DISPATCH_BLOCKED - TITLE_NOT_FINAL_FOR_AUTHOR_REVIEW'
+      if (key === 'authorFacingIdentity') return 'PUBLISHING_DISPATCH_BLOCKED - AUTHOR_FACING_IDENTITY_NOT_RESOLVED'
       return `PUBLISHING_DISPATCH_BLOCKED - ${key.toUpperCase()}`
     })
     .filter(Boolean)
+}
+
+function isFinalAuthorFacingTitle(value: string) {
+  const normalized = stringValue(value).trim().toLowerCase()
+  if (!normalized) return false
+  return !['untitled', 'unknown', 'tbd', 'to be determined', 'manuscript'].includes(normalized)
+}
+
+function isUsableAuthorFacingName(value: string) {
+  const normalized = stringValue(value).trim().toLowerCase()
+  if (!normalized) return false
+  return !['author', 'unknown author', 'unknown', 'tbd'].includes(normalized)
 }
 
 function operationalCertificationBlockers(evidence: OperationalDeliveryCertificationEvidence) {
