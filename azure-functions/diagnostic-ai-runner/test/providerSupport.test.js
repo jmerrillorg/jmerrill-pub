@@ -4,6 +4,8 @@ const { describe, test } = require("node:test");
 const assert = require("node:assert/strict");
 
 const {
+  buildRateLimitMetadata,
+  collectSafeRateLimitHeaders,
   parseStructuredJsonObject,
   parseRetryAfterMs
 } = require("../src/model/providerSupport");
@@ -33,5 +35,30 @@ describe("provider support", () => {
     const headers = new Headers({ "retry-after": "3" });
     const ms = parseRetryAfterMs(headers);
     assert.equal(ms, 3000);
+  });
+
+  test("collects only safe rate-limit headers", () => {
+    const headers = new Headers({
+      "retry-after": "60",
+      "x-ratelimit-remaining-tokens": "0",
+      "apim-request-id": "request-123",
+      "authorization": "Bearer secret"
+    });
+
+    const result = collectSafeRateLimitHeaders(headers);
+    assert.deepEqual(result, {
+      "retry-after": "60",
+      "x-ratelimit-remaining-tokens": "0",
+      "apim-request-id": "request-123"
+    });
+    assert.equal("authorization" in result, false);
+  });
+
+  test("builds retry-after metadata for workflow scheduling evidence", () => {
+    const headers = new Headers({ "retry-after": "90" });
+    const result = buildRateLimitMetadata(headers);
+    assert.equal(result.retryAfterMs, 90000);
+    assert.equal(result.retryAfterSeconds, 90);
+    assert.equal(result.headers["retry-after"], "90");
   });
 });

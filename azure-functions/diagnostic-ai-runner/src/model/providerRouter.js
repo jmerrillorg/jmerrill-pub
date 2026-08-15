@@ -108,15 +108,18 @@ async function routeToProvider({
   switch (resolution.provider) {
     case PROVIDERS.ANTHROPIC_DIRECT: {
       const { call } = require("./providers/anthropicProvider");
-      return call({ promptBody, diagnosticId, telemetry, route: resolution.route });
+      const result = await call({ promptBody, diagnosticId, telemetry, route: resolution.route });
+      return { ...result, route: resolution.route };
     }
     case PROVIDERS.AZURE_OPENAI: {
       const { call } = require("./providers/azureOpenAiProvider");
-      return call({ promptBody, diagnosticId, telemetry, route: resolution.route });
+      const result = await call({ promptBody, diagnosticId, telemetry, route: resolution.route });
+      return { ...result, route: resolution.route };
     }
     case PROVIDERS.MICROSOFT_FOUNDRY_CLAUDE: {
       const { call } = require("./providers/microsoftFoundryClaudeProvider");
-      return call({ promptBody, diagnosticId, telemetry, route: resolution.route });
+      const result = await call({ promptBody, diagnosticId, telemetry, route: resolution.route });
+      return { ...result, route: resolution.route };
     }
     default:
       // Unreachable given SUPPORTED_PROVIDERS check above, but must not fall through silently.

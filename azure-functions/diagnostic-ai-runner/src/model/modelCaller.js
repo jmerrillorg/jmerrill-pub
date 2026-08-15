@@ -7,9 +7,9 @@
  *   1. CONTRACT_TEST_MODE must be false  (hardcoded; requires Jackie Approval 1)
  *   2. JM1_AI_EXECUTION_ENABLED must be "true"  (env var; requires explicit setting)
  *
- * Provider is selected from JM1_AI_PROVIDER env var:
- *   anthropic     — Claude Sonnet (preferred for INT-PUB-005 REV)
- *   azure-openai  — Azure OpenAI (infrastructure-validated; not preferred for REV)
+ * Provider is selected through the governed route registry. Legacy provider
+ * environment overrides are intentionally disabled unless an explicit governed
+ * override flag is opened.
  *
  * Never stores prompt body, raw response, or manuscript text.
  * Never logs or returns the API key or any secret.
@@ -91,6 +91,8 @@ async function callModel({
     output: result.output,
     tokenCounts: result.tokenCounts || { input: 0, output: 0, total: 0 },
     httpStatus: result.httpStatus,
+    request: result.request || null,
+    rateLimit: result.rateLimit || null,
     error: result.error
   };
 }

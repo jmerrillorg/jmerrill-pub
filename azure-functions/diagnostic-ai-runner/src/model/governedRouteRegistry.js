@@ -49,7 +49,7 @@ const ROUTES = Object.freeze({
     version: "2",
     promptKey: "jm1-prompt-pub-stage0-diagnostic",
     promptVersion: "PUB-STAGE0-DIAGNOSTIC-V1",
-    certificationStatus: "pending-deployment-certification",
+    certificationStatus: "certified",
     fallbackDeploymentAlias: "jm1-pub-diagnostic-primary",
     humanReviewRequired: true,
     requiredStyleGuides: [],

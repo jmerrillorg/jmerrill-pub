@@ -55,24 +55,26 @@ describe("governed route registry", () => {
     assert.equal(result.route.certificationStatus, "governed-fallback-certified");
   });
 
-  test("falls back explicitly when Foundry Claude route is not certified", () => {
+  test("resolves certified Foundry Claude route without fallback", () => {
     const result = resolveGovernedRoute({
       executionType: SHADOW_EXECUTION_TYPE,
       modelDeploymentAlias: "jm1-editorial-devline-primary",
       allowFallback: true
     });
     assert.equal(result.ok, true);
-    assert.equal(result.route.provider, PROVIDERS.AZURE_OPENAI);
-    assert.equal(result.route.fallbackFromAlias, "jm1-editorial-devline-primary");
+    assert.equal(result.route.provider, PROVIDERS.MICROSOFT_FOUNDRY_CLAUDE);
+    assert.equal(result.route.certificationStatus, "certified");
+    assert.equal(result.route.fallbackFromAlias, undefined);
   });
 
-  test("blocks uncertified route when fallback is not allowed", () => {
+  test("resolves certified Foundry Claude route when fallback is not allowed", () => {
     const result = resolveGovernedRoute({
       executionType: SHADOW_EXECUTION_TYPE,
       modelDeploymentAlias: "jm1-editorial-devline-primary",
       allowFallback: false
     });
-    assert.equal(result.ok, false);
-    assert.equal(result.error, "AI_ROUTE_NOT_CERTIFIED");
+    assert.equal(result.ok, true);
+    assert.equal(result.route.provider, PROVIDERS.MICROSOFT_FOUNDRY_CLAUDE);
+    assert.equal(result.route.certificationStatus, "certified");
   });
 });

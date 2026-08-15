@@ -10,7 +10,9 @@ const { trackDependency } = require("../observability/dependencyTelemetry");
 
 const DEFAULT_PROMPT_KEY = "jm1-prompt-pub-stage0-diagnostic";
 const DEFAULT_PROMPT_VERSION = "PUB-STAGE0-DIAGNOSTIC-V1";
-const DEFAULT_MODEL_DEPLOYMENT_ALIAS = "jm1-pub-diagnostic-primary";
+const STAGE0_CANONICAL_PRIMARY_MODEL_DEPLOYMENT_ALIAS = "jm1-editorial-devline-primary";
+const STAGE0_APPROVED_FALLBACK_MODEL_DEPLOYMENT_ALIAS = "jm1-pub-diagnostic-primary";
+const DEFAULT_MODEL_DEPLOYMENT_ALIAS = STAGE0_CANONICAL_PRIMARY_MODEL_DEPLOYMENT_ALIAS;
 const ENTITY_SET = "jm1pub_aiprompttemplates";
 
 function normalizeString(value) {
@@ -21,8 +23,35 @@ function isEnvTrue(name) {
   return process.env[name] === "true";
 }
 
+function normalizeStage0ModelDeploymentAlias(value) {
+  const alias = normalizeString(value) || DEFAULT_MODEL_DEPLOYMENT_ALIAS;
+  if (alias.toLowerCase() === STAGE0_APPROVED_FALLBACK_MODEL_DEPLOYMENT_ALIAS.toLowerCase()) {
+    return STAGE0_CANONICAL_PRIMARY_MODEL_DEPLOYMENT_ALIAS;
+  }
+  return alias;
+}
+
+function getStage0ModelDeploymentAliasNormalization(rawAlias) {
+  const normalizedAlias = normalizeStage0ModelDeploymentAlias(rawAlias);
+  const originalAlias = normalizeString(rawAlias) || null;
+  return {
+    originalAlias,
+    normalizedAlias,
+    normalized: Boolean(originalAlias && originalAlias !== normalizedAlias),
+    normalizationReason:
+      originalAlias && originalAlias !== normalizedAlias
+        ? "STAGE0_PROMPT_TEMPLATE_REFERENCED_APPROVED_FALLBACK_ALIAS"
+        : null
+  };
+}
+
 function buildFallbackPromptResolution(executionType) {
   const fallbackAllowed = isEnvTrue(CONTROLLED_PROMPT_FALLBACK_ALLOWED_ENV);
+  const aliasNormalization = getStage0ModelDeploymentAliasNormalization(
+    process.env.JM1_PROMPT_MODEL_DEPLOYMENT_ALIAS ||
+    process.env.AZURE_OPENAI_DEPLOYMENT_NAME ||
+    DEFAULT_MODEL_DEPLOYMENT_ALIAS
+  );
 
   return {
     ok: fallbackAllowed,
@@ -31,10 +60,10 @@ function buildFallbackPromptResolution(executionType) {
     promptKey: process.env.JM1_PROMPT_KEY || DEFAULT_PROMPT_KEY,
     promptName: process.env.JM1_PROMPT_NAME || "Stage 0 Editorial Diagnostic",
     promptVersion: process.env.JM1_PROMPT_VERSION || DEFAULT_PROMPT_VERSION,
-    modelDeploymentAlias:
-      process.env.JM1_PROMPT_MODEL_DEPLOYMENT_ALIAS ||
-      process.env.AZURE_OPENAI_DEPLOYMENT_NAME ||
-      DEFAULT_MODEL_DEPLOYMENT_ALIAS,
+    promptModelDeploymentAlias: aliasNormalization.originalAlias,
+    modelDeploymentAlias: aliasNormalization.normalizedAlias,
+    modelDeploymentAliasNormalized: aliasNormalization.normalized,
+    modelDeploymentAliasNormalizationReason: aliasNormalization.normalizationReason,
     active: false,
     effectiveState:
       executionType === CONTROLLED_EXECUTION_TYPE
@@ -45,6 +74,7 @@ function buildFallbackPromptResolution(executionType) {
 }
 
 function buildPromptResolutionError({ promptKey, promptVersion, row, effectiveState, error }) {
+  const aliasNormalization = getStage0ModelDeploymentAliasNormalization(row?.jm1pub_modeldeploymentalias);
   return {
     ok: false,
     source: "dataverse",
@@ -52,9 +82,10 @@ function buildPromptResolutionError({ promptKey, promptVersion, row, effectiveSt
     promptKey: normalizeString(row?.jm1pub_promptkey) || promptKey,
     promptName: normalizeString(row?.jm1pub_promptname) || "Stage 0 Editorial Diagnostic",
     promptVersion: normalizeString(row?.jm1pub_promptversion) || promptVersion,
-    modelDeploymentAlias:
-      normalizeString(row?.jm1pub_modeldeploymentalias) ||
-      DEFAULT_MODEL_DEPLOYMENT_ALIAS,
+    promptModelDeploymentAlias: aliasNormalization.originalAlias,
+    modelDeploymentAlias: aliasNormalization.normalizedAlias,
+    modelDeploymentAliasNormalized: aliasNormalization.normalized,
+    modelDeploymentAliasNormalizationReason: aliasNormalization.normalizationReason,
     active: false,
     effectiveState,
     error
@@ -196,6 +227,8 @@ async function resolveGovernedPromptTemplate({ executionType, telemetry = null }
     });
   }
 
+  const aliasNormalization = getStage0ModelDeploymentAliasNormalization(row.jm1pub_modeldeploymentalias);
+
   return {
     ok: true,
     source: "dataverse",
@@ -203,9 +236,10 @@ async function resolveGovernedPromptTemplate({ executionType, telemetry = null }
     promptKey: normalizeString(row.jm1pub_promptkey) || promptKey,
     promptName: normalizeString(row.jm1pub_promptname) || "Stage 0 Editorial Diagnostic",
     promptVersion: normalizeString(row.jm1pub_promptversion) || promptVersion,
-    modelDeploymentAlias:
-      normalizeString(row.jm1pub_modeldeploymentalias) ||
-      DEFAULT_MODEL_DEPLOYMENT_ALIAS,
+    promptModelDeploymentAlias: aliasNormalization.originalAlias,
+    modelDeploymentAlias: aliasNormalization.normalizedAlias,
+    modelDeploymentAliasNormalized: aliasNormalization.normalized,
+    modelDeploymentAliasNormalizationReason: aliasNormalization.normalizationReason,
     active,
     effectiveState: active ? "active" : "controlled-inactive-allowed",
     error: null
@@ -216,8 +250,12 @@ module.exports = {
   DEFAULT_MODEL_DEPLOYMENT_ALIAS,
   DEFAULT_PROMPT_KEY,
   DEFAULT_PROMPT_VERSION,
+  STAGE0_APPROVED_FALLBACK_MODEL_DEPLOYMENT_ALIAS,
+  STAGE0_CANONICAL_PRIMARY_MODEL_DEPLOYMENT_ALIAS,
   buildFallbackPromptResolution,
   choosePromptTemplateRow,
   fetchPromptTemplateRows,
+  getStage0ModelDeploymentAliasNormalization,
+  normalizeStage0ModelDeploymentAlias,
   resolveGovernedPromptTemplate
 };

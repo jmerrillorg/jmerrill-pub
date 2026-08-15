@@ -98,7 +98,7 @@ describe("microsoftFoundryClaudeProvider", () => {
     }
   });
 
-  test("uses governed endpoint, bearer auth, json response format, and route deployment name", async () => {
+  test("uses governed Anthropic Messages endpoint, bearer auth, and route deployment name", async () => {
     const calls = [];
     const dependencyCalls = [];
 
@@ -111,8 +111,8 @@ describe("microsoftFoundryClaudeProvider", () => {
           headers: new Headers(),
           async json() {
             return {
-              choices: [{ message: { content: "{\"ok\":true,\"provider\":\"foundry\"}" } }],
-              usage: { prompt_tokens: 11, completion_tokens: 7, total_tokens: 18 }
+              content: [{ type: "text", text: "{\"ok\":true,\"provider\":\"foundry\"}" }],
+              usage: { input_tokens: 11, output_tokens: 7 }
             };
           }
         };
@@ -127,7 +127,7 @@ describe("microsoftFoundryClaudeProvider", () => {
       await withEnv(
         {
           AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/",
-          AZURE_FOUNDRY_API_VERSION: "2024-10-21",
+          AZURE_FOUNDRY_ANTHROPIC_VERSION: "2023-06-01",
           AZURE_FOUNDRY_TIMEOUT_MS: "5000",
           AZURE_FOUNDRY_MAX_RETRIES: "1",
           AZURE_FOUNDRY_BASE_DELAY_MS: "1",
@@ -156,16 +156,18 @@ describe("microsoftFoundryClaudeProvider", () => {
       assert.equal(calls.length, 1);
       assert.equal(
         calls[0].url,
-        "https://ais-jm1-foundry.services.ai.azure.com/openai/deployments/jm1-editorial-devline-primary/chat/completions?api-version=2024-10-21"
+        "https://ais-jm1-foundry.services.ai.azure.com/anthropic/v1/messages"
       );
       assert.equal(calls[0].init.method, "POST");
       assert.equal(calls[0].init.headers.Authorization, "Bearer foundry-token");
       assert.equal(calls[0].init.headers["Content-Type"], "application/json");
+      assert.equal(calls[0].init.headers["anthropic-version"], "2023-06-01");
 
       const parsedBody = JSON.parse(calls[0].init.body);
-      assert.deepEqual(parsedBody.response_format, { type: "json_object" });
-      assert.equal(parsedBody.temperature, 0.2);
-      assert.equal(parsedBody.max_tokens, 1200);
+      assert.equal(parsedBody.temperature, undefined);
+      assert.equal(parsedBody.max_tokens, 4096);
+      assert.equal(parsedBody.stream, false);
+      assert.equal(parsedBody.model, "jm1-editorial-devline-primary");
       assert.equal(parsedBody.messages[0].role, "user");
       assert.equal(parsedBody.messages[0].content, "{\"task\":\"analyze\"}");
 
@@ -186,8 +188,8 @@ describe("microsoftFoundryClaudeProvider", () => {
         headers: new Headers(),
         async json() {
           return {
-            choices: [{ message: { content: "```json\nnot-json\n```" } }],
-            usage: { prompt_tokens: 5, completion_tokens: 5, total_tokens: 10 }
+            content: [{ type: "text", text: "```json\nnot-json\n```" }],
+            usage: { input_tokens: 5, output_tokens: 5 }
           };
         }
       })
@@ -207,6 +209,24 @@ describe("microsoftFoundryClaudeProvider", () => {
           assert.equal(result.error, "MODEL_RESPONSE_FENCED_JSON_INVALID");
           assert.equal(result.httpStatus, 200);
         }
+      );
+    } finally {
+      restore();
+    }
+  });
+
+  test("extractTextContent joins Anthropic text content blocks", () => {
+    const { loaded, restore } = loadProviderWithStubs();
+    try {
+      assert.equal(
+        loaded.extractTextContent({
+          content: [
+            { type: "text", text: "{\"a\":" },
+            { type: "thinking", thinking: "ignored" },
+            { type: "text", text: "true}" }
+          ]
+        }),
+        "{\"a\":\ntrue}"
       );
     } finally {
       restore();

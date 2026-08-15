@@ -204,4 +204,54 @@ describe("azureOpenAiProvider", () => {
       restore();
     }
   });
+
+  test("returns safe Azure 429 rate-limit metadata without prompt content", async () => {
+    const { loaded, restore } = loadProviderWithStubs({
+      fetchImpl: async () => ({
+        ok: false,
+        status: 429,
+        headers: new Headers({
+          "retry-after": "0",
+          "x-ratelimit-remaining-tokens": "0",
+          "x-ratelimit-limit-tokens": "10000",
+          "apim-request-id": "apim-123",
+          "authorization": "Bearer secret"
+        }),
+        async json() {
+          return {
+            error: {
+              message: "Requests to the ChatCompletions_Create Operation have exceeded token rate limit."
+            }
+          };
+        }
+      })
+    });
+
+    try {
+      await withEnv(
+        {
+          AZURE_OPENAI_ENDPOINT: "https://example.openai.azure.com",
+          AZURE_OPENAI_API_VERSION: "2024-08-01-preview",
+          AZURE_OPENAI_DEPLOYMENT_NAME: "jm1-pub-diagnostic-primary"
+        },
+        async () => {
+          const result = await loaded.call({
+            promptBody: "SECRET MANUSCRIPT CONTENT",
+            diagnosticId: "diag-azure-429"
+          });
+          assert.equal(result.ok, false);
+          assert.equal(result.httpStatus, 429);
+          assert.equal(result.request.deployment, "jm1-pub-diagnostic-primary");
+          assert.equal(result.request.maxOutputTokens, loaded.DEFAULT_MAX_OUTPUT_TOKENS);
+          assert.equal(result.rateLimit.retryAfterMs, 0);
+          assert.equal(result.rateLimit.headers["x-ratelimit-limit-tokens"], "10000");
+          assert.equal(result.rateLimit.headers["apim-request-id"], "apim-123");
+          assert.equal("authorization" in result.rateLimit.headers, false);
+          assert.doesNotMatch(result.error, /SECRET MANUSCRIPT CONTENT/);
+        }
+      );
+    } finally {
+      restore();
+    }
+  });
 });

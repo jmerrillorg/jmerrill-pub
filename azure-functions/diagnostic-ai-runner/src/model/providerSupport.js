@@ -55,6 +55,44 @@ function parseRetryAfterMs(headers) {
   return null;
 }
 
+const SAFE_RATE_LIMIT_HEADERS = Object.freeze([
+  "retry-after",
+  "retry-after-ms",
+  "x-ratelimit-limit-requests",
+  "x-ratelimit-limit-tokens",
+  "x-ratelimit-remaining-requests",
+  "x-ratelimit-remaining-tokens",
+  "x-ratelimit-reset-requests",
+  "x-ratelimit-reset-tokens",
+  "x-request-id",
+  "apim-request-id"
+]);
+
+function collectSafeRateLimitHeaders(headers) {
+  if (!headers || typeof headers.get !== "function") {
+    return {};
+  }
+
+  const safeHeaders = {};
+  for (const name of SAFE_RATE_LIMIT_HEADERS) {
+    const value = headers.get(name);
+    if (typeof value === "string" && value.trim()) {
+      safeHeaders[name] = value.trim().slice(0, 200);
+    }
+  }
+  return safeHeaders;
+}
+
+function buildRateLimitMetadata(headers) {
+  const safeHeaders = collectSafeRateLimitHeaders(headers);
+  const retryAfterMs = parseRetryAfterMs(headers);
+  return {
+    retryAfterMs,
+    retryAfterSeconds: Number.isFinite(retryAfterMs) ? Math.ceil(retryAfterMs / 1000) : null,
+    headers: safeHeaders
+  };
+}
+
 function computeBackoffDelayMs({ attempt, baseDelayMs, jitterRatio, retryAfterMs }) {
   if (Number.isFinite(retryAfterMs) && retryAfterMs >= 0) {
     return retryAfterMs;
@@ -173,6 +211,8 @@ function parseStructuredJsonObject(content) {
 }
 
 module.exports = {
+  buildRateLimitMetadata,
+  collectSafeRateLimitHeaders,
   DEFAULT_API_TIMEOUT_MS,
   DEFAULT_BASE_DELAY_MS,
   DEFAULT_MAX_RETRIES,

@@ -3,13 +3,15 @@
 const { DefaultAzureCredential } = require("@azure/identity");
 const { trackDependency } = require("../../observability/dependencyTelemetry");
 const {
+  buildRateLimitMetadata,
   fetchWithRetry,
   getProviderRuntimeOptions,
   parseStructuredJsonObject
 } = require("../providerSupport");
 
 const REQUIRED_VARS = ["AZURE_FOUNDRY_ENDPOINT"];
-const DEFAULT_API_VERSION = "2024-10-21";
+const DEFAULT_ANTHROPIC_VERSION = "2023-06-01";
+const DEFAULT_MAX_OUTPUT_TOKENS = 4096;
 const TOKEN_SCOPE = "https://ai.azure.com/.default";
 
 function checkConfig(route = {}) {
@@ -35,14 +37,14 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
   }
 
   const endpoint = process.env.AZURE_FOUNDRY_ENDPOINT.replace(/\/$/, "");
-  const apiVersion = process.env.AZURE_FOUNDRY_API_VERSION || DEFAULT_API_VERSION;
+  const anthropicVersion = process.env.AZURE_FOUNDRY_ANTHROPIC_VERSION || DEFAULT_ANTHROPIC_VERSION;
   const deployment = route.deploymentName;
-  const url = `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=${apiVersion}`;
+  const url = `${endpoint}/anthropic/v1/messages`;
   const requestBody = {
+    model: deployment,
     messages: [{ role: "user", content: promptBody }],
-    temperature: 0.2,
-    max_tokens: 1200,
-    response_format: { type: "json_object" }
+    max_tokens: DEFAULT_MAX_OUTPUT_TOKENS,
+    stream: false
   };
 
   let httpStatus = null;
@@ -79,6 +81,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "anthropic-version": anthropicVersion,
             Authorization: `Bearer ${tokenResult.token}`
           },
           body: JSON.stringify(requestBody),
@@ -88,9 +91,13 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
     );
 
     httpStatus = response.status;
+    const rateLimit = buildRateLimitMetadata(response.headers);
     const responseBody = await response.json().catch(() => ({}));
 
     if (!response.ok) {
+      const providerMessage = typeof responseBody?.error?.message === "string"
+        ? responseBody.error.message.replace(/\s+/g, " ").slice(0, 240)
+        : "";
       return {
         ok: false,
         provider: "microsoft-foundry-claude",
@@ -98,11 +105,19 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
         output: null,
         tokenCounts: { input: 0, output: 0, total: 0 },
         httpStatus,
-        error: `MICROSOFT_FOUNDRY_HTTP_${httpStatus}`
+        request: {
+          deployment,
+          maxOutputTokens: requestBody.max_tokens,
+          responseContract: "anthropic-messages"
+        },
+        rateLimit,
+        error: providerMessage
+          ? `MICROSOFT_FOUNDRY_HTTP_${httpStatus}: ${providerMessage}`
+          : `MICROSOFT_FOUNDRY_HTTP_${httpStatus}`
       };
     }
 
-    const content = responseBody?.choices?.[0]?.message?.content;
+    const content = extractTextContent(responseBody);
     const usage = responseBody?.usage || {};
     const parsed = parseStructuredJsonObject(content);
     if (!parsed.ok) {
@@ -112,11 +127,17 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
         configMissing: null,
         output: null,
         tokenCounts: {
-          input: usage.prompt_tokens || 0,
-          output: usage.completion_tokens || 0,
-          total: usage.total_tokens || 0
+          input: usage.input_tokens || 0,
+          output: usage.output_tokens || 0,
+          total: (usage.input_tokens || 0) + (usage.output_tokens || 0)
         },
         httpStatus,
+        request: {
+          deployment,
+          maxOutputTokens: requestBody.max_tokens,
+          responseContract: "anthropic-messages"
+        },
+        rateLimit,
         error: parsed.error
       };
     }
@@ -127,11 +148,17 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
       configMissing: null,
       output: parsed.value,
       tokenCounts: {
-        input: usage.prompt_tokens || 0,
-        output: usage.completion_tokens || 0,
-        total: usage.total_tokens || 0
+        input: usage.input_tokens || 0,
+        output: usage.output_tokens || 0,
+        total: (usage.input_tokens || 0) + (usage.output_tokens || 0)
       },
       httpStatus,
+      request: {
+        deployment,
+        maxOutputTokens: requestBody.max_tokens,
+        responseContract: "anthropic-messages"
+      },
+      rateLimit,
       error: null,
       responseClassification: parsed.classification
     };
@@ -148,10 +175,29 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
   }
 }
 
+function extractTextContent(responseBody) {
+  const content = responseBody?.content;
+  if (typeof content === "string") {
+    return content;
+  }
+
+  if (!Array.isArray(content)) {
+    return "";
+  }
+
+  return content
+    .filter((part) => part && part.type === "text" && typeof part.text === "string")
+    .map((part) => part.text)
+    .join("\n")
+    .trim();
+}
+
 module.exports = {
-  DEFAULT_API_VERSION,
+  DEFAULT_ANTHROPIC_VERSION,
+  DEFAULT_MAX_OUTPUT_TOKENS,
   REQUIRED_VARS,
   TOKEN_SCOPE,
   call,
-  checkConfig
+  checkConfig,
+  extractTextContent
 };

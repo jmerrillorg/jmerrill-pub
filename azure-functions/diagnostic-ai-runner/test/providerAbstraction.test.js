@@ -87,21 +87,22 @@ describe("resolveProvider — governed route selection", () => {
     assert.equal(r.error, null);
   });
 
-  test("uncertified Foundry route fails closed without fallback", () => {
+  test("certified Foundry route resolves without fallback", () => {
     const r = resolveProvider({ modelDeploymentAlias: "jm1-editorial-devline-primary" });
-    assert.equal(r.ok, false);
+    assert.equal(r.ok, true);
     assert.equal(r.provider, "microsoft-foundry-claude");
-    assert.equal(r.error, "AI_ROUTE_NOT_CERTIFIED");
+    assert.equal(r.error, null);
+    assert.equal(r.route.certificationStatus, "certified");
   });
 
-  test("uncertified Foundry route falls back explicitly when allowed", () => {
+  test("certified Foundry route does not fall back when fallback is allowed", () => {
     const r = resolveProvider({
       modelDeploymentAlias: "jm1-editorial-devline-primary",
       allowFallback: true
     });
     assert.equal(r.ok, true);
-    assert.equal(r.provider, "azure-openai");
-    assert.equal(r.route.fallbackFromAlias, "jm1-editorial-devline-primary");
+    assert.equal(r.provider, "microsoft-foundry-claude");
+    assert.equal(r.route.fallbackFromAlias, undefined);
   });
 
   test("returns AI_ROUTE_ALIAS_MISSING when alias is absent and legacy override is closed", () => {
@@ -413,14 +414,15 @@ describe("routeToProvider — provider routing errors (no live calls)", () => {
     });
   });
 
-  test("returns AI_ROUTE_NOT_CERTIFIED for uncertified Foundry route without explicit fallback", async () => {
+  test("certified Foundry route reaches provider config check without fallback", async () => {
     const result = await routeToProvider({
       promptBody: "test",
       diagnosticId: "test-id",
       modelDeploymentAlias: "jm1-editorial-devline-primary"
     });
       assert.equal(result.ok, false);
-      assert.equal(result.error, "AI_ROUTE_NOT_CERTIFIED");
+      assert.equal(result.provider, "microsoft-foundry-claude");
+      assert.match(result.error, /MICROSOFT_FOUNDRY_CONFIG_MISSING/);
   });
 
   test("legacy override routes to Anthropic config check (no HTTP call — key missing)", async () => {
@@ -452,6 +454,7 @@ describe("routeToProvider — provider routing errors (no live calls)", () => {
       });
       assert.equal(result.ok, false);
       assert.equal(result.provider, "azure-openai");
+      assert.equal(result.route.deploymentAlias, "jm1-pub-diagnostic-primary");
       assert.ok(result.error.includes("AZURE_OPENAI_CONFIG_MISSING"),
         `expected AZURE_OPENAI_CONFIG_MISSING in error, got: ${result.error}`);
     });
