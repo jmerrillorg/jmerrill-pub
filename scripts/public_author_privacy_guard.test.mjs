@@ -143,6 +143,42 @@ test('author-level pen name is used when no title override exists', () => {
   assert.equal(identity.publicAuthorName, 'Jane House Name')
 })
 
+test('governed title-specific pen name controls The Sun, the Shadow, and the Silence', () => {
+  const identity = resolvePublicAuthorIdentity({
+    titleSlug: 'the-sun-the-shadow-and-the-silence',
+    title: 'The Sun, the Shadow, and the Silence',
+    legalAuthorName: 'Nicky Williams',
+  })
+  const projected = projectTitle({
+    titleSlug: 'the-sun-the-shadow-and-the-silence',
+    title: 'The Sun, the Shadow, and the Silence',
+    legalAuthorName: 'Nicky Williams',
+  })
+
+  assert.equal(identity.mode, 'PEN_NAME')
+  assert.equal(identity.publicAuthorName, 'R. Dorian Night')
+  assert.equal(identity.publicSlug, 'r-dorian-night')
+  assert.equal(JSON.stringify(projected).includes('Nicky Williams'), false)
+})
+
+test('governed public identity preserves J. Derrick Johnson capitalization and punctuation', () => {
+  const identity = resolvePublicAuthorIdentity({
+    titleSlug: '101-wisdom-lessons-for-life-and-living',
+    title: '101 Wisdom Lessons for Life and Living',
+    legalAuthorName: 'j. Derrick Johnson',
+  })
+  const projected = projectTitle({
+    titleSlug: '101-wisdom-lessons-for-life-and-living',
+    title: '101 Wisdom Lessons for Life and Living',
+    legalAuthorName: 'j. Derrick Johnson',
+  })
+
+  assert.equal(identity.mode, 'PUBLIC')
+  assert.equal(identity.publicAuthorName, 'J. Derrick Johnson')
+  assert.equal(projected.authorDisplayName, 'J. Derrick Johnson')
+  assert.equal(JSON.stringify(projected).includes('j. Derrick Johnson'), false)
+})
+
 test('public API/read model does not leak internal legal name', () => {
   const title = projectTitle({
     titleSlug: 'the-paper-champ',
