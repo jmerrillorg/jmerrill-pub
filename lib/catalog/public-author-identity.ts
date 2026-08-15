@@ -56,6 +56,30 @@ const GOVERNED_AUTHOR_PUBLICATION_POLICIES: GovernedPolicyRecord[] = [
     reason:
       'Governed public privacy remediation: internal author identity is retained, while public attribution is anonymous.',
   },
+  {
+    titleSlugs: ['the-sun-the-shadow-and-the-silence'],
+    titleNames: ['the sun, the shadow, and the silence'],
+    legalAuthorNames: ['nicky williams', 'devin gilchrest'],
+    mode: 'PEN_NAME',
+    publicAttribution: 'R. Dorian Night',
+    reason:
+      'Governed public attribution correction: title-specific pen name controls public title, metadata, and catalog surfaces.',
+  },
+  {
+    titleSlugs: [
+      '101-wisdom-lessons-for-life-and-living',
+      '100-wisdom-lessons-for-life-and-living',
+    ],
+    titleNames: [
+      '101 wisdom lessons for life and living',
+      '100 wisdom lessons for life and living',
+    ],
+    legalAuthorNames: ['j. derrick johnson', 'j derrick johnson', 'derrick johnson'],
+    mode: 'PUBLIC',
+    publicAttribution: 'J. Derrick Johnson',
+    reason:
+      'Governed public attribution correction: preserve exact capitalization and punctuation for public author identity.',
+  },
 ]
 
 export function resolvePublicAuthorIdentity(input: PublicAuthorIdentityInput): PublicAuthorIdentity {
