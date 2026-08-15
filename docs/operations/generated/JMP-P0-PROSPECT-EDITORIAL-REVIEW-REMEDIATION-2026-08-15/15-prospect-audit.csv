@@ -1,0 +1,2 @@
+record_type,record_id,title,author,lifecycle_context,decision_type,status,last_verified,evidence_source
+LOCAL_POLICY,prospect-policy,Not applicable,Not applicable,PROSPECT_INQUIRY,PROSPECT_PACKAGE_SELECTION,VALIDATED,2026-08-15,lib/server/prospect-editorial-review-policy.ts

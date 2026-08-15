@@ -34,6 +34,9 @@ export type EditorialReviewPresentationInput = {
   stageRecommendation: string
   importantObservations: string[]
   nextStageLabel: string
+  primaryPackage?: string
+  backupPackage?: string
+  recommendedImprint?: string
   suggestedTitles?: string[]
 }
 
@@ -44,9 +47,9 @@ export type EditorialReviewWorkspacePresentation = {
   authorName: string
   sections: Array<{ heading: string; body: string[] }>
   decisionOptions: [
-    'APPROVE_AS_PRESENTED',
+    'SELECT_RECOMMENDED_PACKAGE',
+    'SELECT_BACKUP_PACKAGE',
     'QUESTIONS_OR_CLARIFICATION_REQUESTED',
-    'REQUEST_REVISION',
   ]
   titleSelectionTask: TitleSelectionTask | null
   versionLabel: string
@@ -111,19 +114,21 @@ export function buildAuthorFacingEditorialReviewPackage(
       section('What we found', input.reviewSummary),
       section('Manuscript strengths', ...input.manuscriptStrengths),
       section('Editorial opportunities', ...input.editorialOpportunities),
-      section('Recommended path', input.recommendedPath),
-      section('Stage recommendation', input.stageRecommendation),
+      section('Primary publishing recommendation', input.primaryPackage || input.recommendedPath),
+      section('Backup publishing recommendation', input.backupPackage || 'None'),
+      section('Recommended imprint', input.recommendedImprint || 'To be confirmed by the publishing team'),
       section('Important observations', ...input.importantObservations),
       section(
         'What happens next',
-        `Once you fully approve Editorial Review, your manuscript can move to ${input.nextStageLabel}.`,
-        'If you request changes, the Publishing Team will review your requested changes and return the updated stage to you for approval.',
+        'Choose the publishing package and path you want to pursue.',
+        'Agreement, payment, and onboarding steps happen after package selection.',
+        'Editorial production work begins only after the commercial onboarding boundary is complete.',
       ),
     ],
     decisionOptions: [
-      'APPROVE_AS_PRESENTED',
+      'SELECT_RECOMMENDED_PACKAGE',
+      'SELECT_BACKUP_PACKAGE',
       'QUESTIONS_OR_CLARIFICATION_REQUESTED',
-      'REQUEST_REVISION',
     ],
     titleSelectionTask,
     versionLabel: `Editorial Review package ${input.packageVersion} - ${dateLabel(input.generatedAt)}`,
@@ -181,23 +186,24 @@ function buildArtifacts(
     ]),
   ].join('\n'))
   const pathPdf = pdfBytes([
-    'Recommended Editorial Path',
+    'Publishing Path Recommendation',
     `Title: ${title}`,
-    `Recommendation: ${input.recommendedPath}`,
-    `Stage recommendation: ${input.stageRecommendation}`,
+    `Primary recommendation: ${input.primaryPackage || input.recommendedPath}`,
+    `Backup recommendation: ${input.backupPackage || 'None'}`,
+    `Recommended imprint: ${input.recommendedImprint || 'To be confirmed by the publishing team'}`,
     '',
-    'This recommendation helps the author understand the next publishing stage. It does not finalize the title, publish the book, or replace author review of the manuscript.',
+    'This recommendation helps the author choose a publishing path. It does not finalize the title, publish the book, create a contract, or approve an active-author editorial stage.',
   ].join('\n'))
   const instructions = [
-    'Editorial Review Instructions',
+    'Editorial Review Recommendation Instructions',
     `Title: ${title}`,
     `Author: ${presentation.authorName}`,
     '',
-    'Please review the Editorial Review package.',
-    'You may approve the review, ask questions, or request a revision.',
+    'Please review the Editorial Review summary and publishing recommendation.',
+    'Choose the publishing package and path you want to pursue, or ask questions if you would like help deciding.',
     'If the manuscript is using the working title Untitled, you may provide a title, select one suggested title, or keep Untitled for now.',
-    `If you fully approve this stage, your manuscript can move to ${input.nextStageLabel}.`,
-    'If you request changes, the Publishing Team will review your requested changes and return the updated stage to you for approval.',
+    'Agreement, payment, and onboarding steps happen after package selection.',
+    'Editorial production work begins only after the commercial onboarding boundary is complete.',
   ].join('\n')
 
   return [
@@ -248,21 +254,46 @@ function artifact(input: Omit<PackageArtifactInput, 'fileSize' | 'checksum' | 'c
 }
 
 function pdfBytes(text: string) {
-  const safeText = text.replace(/[()\\]/g, ' ')
+  const safeLines = wrapPdfText(text)
+    .slice(0, 42)
+    .map((line) => line.replace(/[()\\]/g, ' '))
+  const textStream = [
+    'BT /F1 11 Tf 72 720 Td',
+    ...safeLines.flatMap((line, index) => [
+      index === 0 ? '' : '0 -16 Td',
+      `(${line}) Tj`,
+    ]).filter(Boolean),
+    'ET',
+  ].join('\n')
   const body = [
     '%PDF-1.7',
     '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
     '2 0 obj << /Type /Pages /Count 1 /Kids [3 0 R] >> endobj',
     '3 0 obj << /Type /Page /Parent 2 0 R /Resources << >> /MediaBox [0 0 612 792] /Contents 4 0 R >> endobj',
-    `4 0 obj << /Length ${safeText.length + 48} >> stream`,
-    'BT /F1 11 Tf 72 720 Td',
-    `(${safeText}) Tj`,
-    'ET',
+    `4 0 obj << /Length ${textStream.length} >> stream`,
+    textStream,
     'endstream endobj',
     `% author-facing review package ${'content '.repeat(400)}`,
     '%%EOF',
   ].join('\n')
   return Buffer.from(body, 'utf8')
+}
+
+function wrapPdfText(text: string) {
+  const words = text.replace(/\s+/g, ' ').trim().split(' ').filter(Boolean)
+  const lines: string[] = []
+  let current = ''
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word
+    if (candidate.length > 78) {
+      if (current) lines.push(current)
+      current = word
+    } else {
+      current = candidate
+    }
+  }
+  if (current) lines.push(current)
+  return lines
 }
 
 function authorFacingFileName(title: string, label: string, extension: string) {

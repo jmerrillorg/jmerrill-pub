@@ -1,0 +1,39 @@
+# P0 Prospect Editorial Review Lifecycle Remediation
+
+Last verified: 2026-08-15
+
+Evidence source: local branch `codex/p0-prospect-editorial-review-remediation-20260815`
+
+Status: IMPLEMENTED / LOCAL VALIDATION PASSED / PRODUCTION DEPLOYMENT PENDING
+
+This package records the P0 remediation for the defect class where a prospect/inquiry Editorial Review could be treated as an active contracted-author editorial-stage approval package.
+
+Implemented controls:
+
+- Prospect and active contracted-author lifecycle contexts are distinct.
+- Lifecycle context is not inferred from contact, title, workspace, diagnostic, opportunity, or gate existence alone.
+- Prospect Editorial Review resolves to package selection, not editorial-stage approval.
+- Active contracted-author review dispatch remains available for active editorial stages.
+- Canonical package catalog is used for Starter, Professional, and Premier recommendations.
+- Starter recommendations fail closed to backup `NONE`.
+- Author-facing prospect communication blocks active-author approval language.
+- Attachment certification blocks single-line PDF overflow artifacts.
+
+Validation:
+
+- `npm run type-check`: PASS
+- `node --test scripts/p0_prospect_editorial_review_lifecycle_guard.test.mjs`: 7 / 7 PASS
+- `node --test scripts/author_facing_editorial_review_package.test.mjs`: 5 / 5 PASS
+- `npm run program006-dispatch-guard`: 19 / 19 PASS
+- `npm run author-communication-brand-guard`: 8 / 8 PASS
+- `npm run author-response-runtime-remediation-guard`: 49 / 49 PASS
+
+Known environment note:
+
+- Tests ran under Node 26.0.0. The repository root declares Node `>=24 <25`; the Azure Functions package declares Node `>=22 <25`. Engine warnings were observed and preserved.
+
+Production/live boundary:
+
+- Production deployment: NOT EXECUTED from this local branch.
+- Atta corrective send: NOT EXECUTED from this local branch.
+- Prospect dispatch hold lift: NOT EXECUTED from this local branch.

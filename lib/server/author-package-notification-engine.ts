@@ -581,6 +581,11 @@ function validatePdf(bytes: Buffer, role: AttachmentRole, expectedTitle?: string
   if (extractPdfPageCount(text) < 1) {
     return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:PDF_PAGE_COUNT` }
   }
+  if (expectedTitle && !normalizedContains(extractPdfVisibleText(text), expectedTitle)) {
+    return { ok: false, blocker: `ATTACHMENT_EXPECTED_CONTENT_MISSING:${role}:TITLE` }
+  }
+  const flow = evaluatePdfTextFlow(text)
+  if (!flow.ok) return { ok: false, blocker: `ATTACHMENT_OPEN_TEST_FAILED:${role}:${flow.blocker}` }
   return { ok: true }
 }
 
@@ -590,6 +595,29 @@ function extractPdfPageCount(text: string) {
     .filter((value) => Number.isFinite(value))
   if (matches.length > 0) return Math.max(...matches)
   return (text.match(/\/Type\s*\/Page\b/g) || []).length
+}
+
+function extractPdfVisibleText(text: string) {
+  return Array.from(text.matchAll(/\(([^()]*)\)\s*Tj/g))
+    .map((match) => match[1])
+    .join(' ')
+    .replace(/\\[()\\]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function evaluatePdfTextFlow(text: string): { ok: true } | { ok: false; blocker: string } {
+  const textOperators = (text.match(/\)\s*Tj\b/g) || []).length + (text.match(/\]\s*TJ\b/g) || []).length
+  const lineMovementOperators = (text.match(/\b(?:Td|TD|T\*|Tm)\b/g) || []).length
+  const visibleText = extractPdfVisibleText(text)
+  const visibleWords = visibleText.split(/\s+/).filter(Boolean).length
+  if (textOperators === 1 && visibleWords > 80 && lineMovementOperators <= 1) {
+    return { ok: false, blocker: 'PDF_TEXT_FLOW_INVALID:SINGLE_LINE_OVERFLOW' }
+  }
+  if (visibleText && visibleWords < 10 && text.length > 2_000) {
+    return { ok: false, blocker: 'PDF_TEXT_DENSITY_INVALID:LOW_VISIBLE_TEXT' }
+  }
+  return { ok: true }
 }
 
 function validateTextLike(bytes: Buffer, role: AttachmentRole, pattern: RegExp, label: string): { ok: true } | { ok: false; blocker: string } {
