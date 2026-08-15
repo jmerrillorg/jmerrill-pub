@@ -5,11 +5,13 @@ const test = require("node:test");
 
 const {
   EXECUTOR_POLICIES,
+  authorGateBlocksRuntime,
   buildExactBlocker,
   classifyGraphFailure,
   extractSourceText,
   findSourceArtifact,
   graphRequest,
+  isLivePortfolioStage,
   normalizeStageCode,
   runEditorialExecutionRuntime
 } = require("../src/editorial/editorialExecutionRuntime");
@@ -31,6 +33,22 @@ test("stage names normalize to canonical executor codes", () => {
   assert.equal(normalizeStageCode({ jm1pub_name: "Developmental Editing - Before You Were Born" }), "DEVELOPMENTAL_EDITING");
   assert.equal(normalizeStageCode({ jm1pub_name: "Editorial Review - The Long Watch" }), "EDITORIAL_REVIEW");
   assert.equal(normalizeStageCode({ jm1pub_name: "Proofreading - The Intentional Leader" }), "PROOFREADING");
+});
+
+test("live portfolio stage guard excludes synthetic and test records without excluding Testament titles", () => {
+  assert.equal(isLivePortfolioStage({ jm1pub_name: "Developmental Editing - The General’s Will and Last Testament" }), true);
+  assert.equal(isLivePortfolioStage({ jm1pub_name: "GATE-W1 App Service Staging DOCX Join 1785342161378" }), false);
+  assert.equal(isLivePortfolioStage({ jm1pub_name: "JM1 Synthetic Intake Final Proof 20260727170349" }), false);
+  assert.equal(isLivePortfolioStage({ jm1pub_name: "Developmental Editing - Test" }), false);
+  assert.equal(isLivePortfolioStage({ jm1pub_name: "JM1 Duplicate Proof 20260727173641" }), false);
+});
+
+test("author gate guard blocks runtime unless the tied gate has final approval", () => {
+  assert.equal(authorGateBlocksRuntime(null), false);
+  assert.equal(authorGateBlocksRuntime({ jm1pub_gatestatus: 196650003, jm1pub_authordecision: 196650000, jm1pub_authordecisionon: "2026-08-14T00:00:00Z" }), false);
+  assert.equal(authorGateBlocksRuntime({ jm1pub_gatestatus: 196650001, jm1pub_authordecision: 196650000, jm1pub_authordecisionon: "2026-08-14T00:00:00Z" }), true);
+  assert.equal(authorGateBlocksRuntime({ jm1pub_gatestatus: 196650003, jm1pub_authordecision: 196650001, jm1pub_authordecisionon: "2026-08-14T00:00:00Z" }), true);
+  assert.equal(authorGateBlocksRuntime({ jm1pub_gatestatus: 196650003, jm1pub_authordecision: 196650000 }), true);
 });
 
 test("missing source artifact becomes an exact stage-specific blocker", () => {

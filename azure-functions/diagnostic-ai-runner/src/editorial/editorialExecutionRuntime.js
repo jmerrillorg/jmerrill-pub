@@ -27,6 +27,8 @@ const STAGE_STATUS = {
   AUTHOR_REVIEW: 100000002,
   COMPLETE: 100000008
 };
+const AUTHOR_DECISION_APPROVE = 196650000;
+const GATE_STATUS_APPROVED = 196650003;
 
 const EXECUTOR_POLICIES = {
   EDITORIAL_REVIEW: {
@@ -87,6 +89,38 @@ function normalizeStageCode(stage) {
 function stageStatusIsExecutable(stage) {
   const status = Number(stage?.jm1pub_stagestatus);
   return status === STAGE_STATUS.IN_PROGRESS;
+}
+
+function isLivePortfolioStage(stage) {
+  const text = [
+    stage?.jm1pub_name,
+    stage?.jm1pub_internaloperationalsummary,
+    stage?.jm1pub_authorsafesummary
+  ]
+    .map((value) => normalizeString(value).toLowerCase())
+    .filter(Boolean)
+    .join(" ");
+  if (!text) return true;
+  if (/\btest\b/.test(text) && !/\btestament\b/.test(text)) return false;
+  return ![
+    "synthetic",
+    "fixture",
+    "gate-w1",
+    "gate w1",
+    "certification manuscript",
+    "duplicate proof",
+    "preview proof",
+    "staging",
+    "final proof 202607"
+  ].some((marker) => text.includes(marker));
+}
+
+function authorGateBlocksRuntime(gate) {
+  if (!gate) return false;
+  const status = Number(gate.jm1pub_gatestatus || 0);
+  const decision = Number(gate.jm1pub_authordecision || 0);
+  const decidedOn = normalizeString(gate.jm1pub_authordecisionon);
+  return !(status === GATE_STATUS_APPROVED && decision === AUTHOR_DECISION_APPROVE && decidedOn);
 }
 
 function requireDataverseConfig() {
@@ -282,7 +316,7 @@ async function findExecutionLog(client, actionType, idempotencyKey) {
 }
 
 async function findActiveEditorialStages(client, maxTasks) {
-  return client.list("jm1pub_editorialstages", {
+  const rows = await client.list("jm1pub_editorialstages", {
     $select:
       "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,_jm1pub_titleid_value,_jm1pub_publishingassetid_value,createdon,modifiedon",
     $filter:
@@ -294,6 +328,26 @@ async function findActiveEditorialStages(client, maxTasks) {
     $orderby: "modifiedon asc",
     $top: String(maxTasks)
   });
+  const liveRows = rows.filter(isLivePortfolioStage);
+  const unblocked = [];
+  for (const stage of liveRows) {
+    const titleId = normalizeString(stage._jm1pub_titleid_value);
+    const stageId = normalizeString(stage.jm1pub_editorialstageid);
+    if (!titleId || !stageId) {
+      unblocked.push(stage);
+      continue;
+    }
+    const gates = await client.list("jm1pub_editorialapprovalgates", {
+      $select:
+        "jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,modifiedon",
+      $filter:
+        `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${stageId}`,
+      $orderby: "modifiedon desc",
+      $top: "10"
+    }).catch(() => []);
+    if (!gates.some(authorGateBlocksRuntime)) unblocked.push(stage);
+  }
+  return unblocked;
 }
 
 async function findSourceArtifact(client, stage) {
@@ -1299,14 +1353,17 @@ module.exports = {
   STAGE_TYPES,
   allowedMimeForRole,
   buildExactBlocker,
+  authorGateBlocksRuntime,
   classifyGraphFailure,
   createDataverseClient,
   createPackageManifestArtifact,
   extractSourceText,
   findArtifactByName,
+  findActiveEditorialStages,
   findExecutionLog,
   findSourceArtifact,
   graphRequest,
+  isLivePortfolioStage,
   normalizeStageCode,
   packageChecksum,
   packageDeliveryPolicy,
