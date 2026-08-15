@@ -5,6 +5,7 @@ const test = require("node:test");
 
 const {
   EXECUTOR_POLICIES,
+  authorGateBlocksRuntime,
   buildExactBlocker,
   classifyGraphFailure,
   extractSourceText,
@@ -40,6 +41,14 @@ test("live portfolio stage guard excludes synthetic and test records without exc
   assert.equal(isLivePortfolioStage({ jm1pub_name: "JM1 Synthetic Intake Final Proof 20260727170349" }), false);
   assert.equal(isLivePortfolioStage({ jm1pub_name: "Developmental Editing - Test" }), false);
   assert.equal(isLivePortfolioStage({ jm1pub_name: "JM1 Duplicate Proof 20260727173641" }), false);
+});
+
+test("author gate guard blocks runtime unless the tied gate has final approval", () => {
+  assert.equal(authorGateBlocksRuntime(null), false);
+  assert.equal(authorGateBlocksRuntime({ jm1pub_gatestatus: 196650003, jm1pub_authordecision: 196650000, jm1pub_authordecisionon: "2026-08-14T00:00:00Z" }), false);
+  assert.equal(authorGateBlocksRuntime({ jm1pub_gatestatus: 196650001, jm1pub_authordecision: 196650000, jm1pub_authordecisionon: "2026-08-14T00:00:00Z" }), true);
+  assert.equal(authorGateBlocksRuntime({ jm1pub_gatestatus: 196650003, jm1pub_authordecision: 196650001, jm1pub_authordecisionon: "2026-08-14T00:00:00Z" }), true);
+  assert.equal(authorGateBlocksRuntime({ jm1pub_gatestatus: 196650003, jm1pub_authordecision: 196650000 }), true);
 });
 
 test("missing source artifact becomes an exact stage-specific blocker", () => {
