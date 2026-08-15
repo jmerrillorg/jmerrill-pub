@@ -1,0 +1,3 @@
+Title,Author,Current_CC010_Stage,Waiting_On,Current_Blocker,Next_Governed_Action,Safe_to_Resume,Mutation_Required,queue,provider,portfolio_serialized_behind_atta
+The Intentional Leader,Jackie Smith Jr,Editorial Internal QA,None,Confirm next boundary after Editorial Internal QA,Confirm next boundary after Editorial Internal QA,NO,NO - dry-run evidence first,STRANDED_OR_RECONCILIATION_QUEUE,NO_PROVIDER,NO
+unknown,,Unknown,Author,Await Unknown author response/full approval,Await Unknown author response/full approval,NO,NO - dry-run evidence first,STRANDED_OR_RECONCILIATION_QUEUE,NO_PROVIDER,NO

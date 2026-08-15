@@ -930,7 +930,7 @@ function isAuthorVisibleArtifact(artifact: DataverseRow) {
 function selectArtifactForRole(artifacts: DataverseRow[], role: AttachmentRole) {
   const patterns: Record<AttachmentRole, RegExp> = {
     editedManuscript: /manuscript|developmental.*docx|edited/i,
-    editorialMemo: /memo|summary|developmental.*assessment|developmental.*summary/i,
+    editorialMemo: /author-facing.*editorial.*review|editorial.*review.*assessment|editorial.*review.*package|memo|summary|developmental.*assessment|developmental.*summary/i,
     reviewInstructions: /instruction|review/i,
     authorResponseMechanism: /response|approval/i,
     packageManifest: /manifest|package.*summary/i,
@@ -991,7 +991,7 @@ function artifactRoleScore(artifact: DataverseRow, role: AttachmentRole) {
   let score = artifact.jm1pub_iscurrentapproved === true ? 10 : 0
   if (role === 'editedManuscript' && /developmentally.*edited|edited.*manuscript/i.test(haystack)) score += 100
   if (role === 'editedManuscript' && /governed source/i.test(haystack)) score -= 20
-  if (role === 'reviewInstructions' && /editorial.*review.*guide|review.*guide/i.test(haystack)) score += 100
+  if (role === 'reviewInstructions' && /editorial.*review.*instruction|editorial.*review.*guide|review.*guide/i.test(haystack)) score += 100
   if (role === 'reviewInstructions' && /\.pdf\b|pdf/i.test(haystack)) score += 50
   if (role === 'reviewInstructions' && /\.(txt|md|json)\b|text\/|markdown/i.test(haystack)) score -= 100
   if (role === 'packageManifest' && /v2/i.test(haystack)) score += 20

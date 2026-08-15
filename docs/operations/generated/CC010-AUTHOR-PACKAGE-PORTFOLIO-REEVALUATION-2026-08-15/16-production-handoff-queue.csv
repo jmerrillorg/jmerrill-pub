@@ -1,0 +1,3 @@
+Title,Author,Current_CC010_Stage,Waiting_On,Current_Blocker,Next_Governed_Action,Safe_to_Resume,Mutation_Required,queue,provider,portfolio_serialized_behind_atta
+02_Cover-Design,,Production / Downstream,None,Confirm next boundary after Production / Downstream,Confirm next boundary after Production / Downstream,NO,NO - dry-run evidence first,PRODUCTION_HANDOFF_QUEUE,NO_PROVIDER,NO
+02_Interior-Layout,,Production / Downstream,None,Confirm next boundary after Production / Downstream,Confirm next boundary after Production / Downstream,NO,NO - dry-run evidence first,PRODUCTION_HANDOFF_QUEUE,NO_PROVIDER,NO
