@@ -4,6 +4,12 @@ const crypto = require("node:crypto");
 const { ClientSecretCredential, DefaultAzureCredential } = require("@azure/identity");
 const { Document, Packer, Paragraph, TextRun, HeadingLevel } = require("docx");
 const mammoth = require("mammoth");
+const { routeToProvider } = require("../model/providerRouter");
+const {
+  createAuthorReviewGatePlan,
+  gateBlocksCurrentStageRuntime,
+  evaluateNextStageEligibility
+} = require("./editorialAuthorGatePolicy");
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 
@@ -29,6 +35,14 @@ const STAGE_STATUS = {
 };
 const AUTHOR_DECISION_APPROVE = 196650000;
 const GATE_STATUS_APPROVED = 196650003;
+const GATE_STATUS_READY_FOR_AUTHOR_REVIEW = 196650001;
+const GATE_CODES = Object.freeze({
+  EDITORIAL_REVIEW: 196650000,
+  DEVELOPMENTAL_EDITING: 196650001,
+  LINE_EDITING: 196650002,
+  COPYEDITING: 196650003,
+  PROOFREADING: 196650004
+});
 
 const EXECUTOR_POLICIES = {
   EDITORIAL_REVIEW: {
@@ -116,11 +130,91 @@ function isLivePortfolioStage(stage) {
 }
 
 function authorGateBlocksRuntime(gate) {
-  if (!gate) return false;
-  const status = Number(gate.jm1pub_gatestatus || 0);
-  const decision = Number(gate.jm1pub_authordecision || 0);
-  const decidedOn = normalizeString(gate.jm1pub_authordecisionon);
-  return !(status === GATE_STATUS_APPROVED && decision === AUTHOR_DECISION_APPROVE && decidedOn);
+  return gateBlocksCurrentStageRuntime(gate);
+}
+
+function stageTypeForCode(stageCode) {
+  return EXECUTOR_POLICIES[stageCode]?.stageType || null;
+}
+
+function transactionForStage(stageCode) {
+  if (stageCode === "EDITORIAL_REVIEW") return "editorial_diagnostic";
+  if (stageCode === "DEVELOPMENTAL_EDITING") return "developmental_editing";
+  if (stageCode === "LINE_EDITING") return "line_editing";
+  if (stageCode === "COPYEDITING") return "copy_editing";
+  if (stageCode === "PROOFREADING") return "proofreading";
+  return "independent_quality_review";
+}
+
+function preferredDeploymentAliasForStage(stageCode) {
+  if (stageCode === "COPYEDITING" || stageCode === "PROOFREADING") {
+    return normalizeString(process.env.JM1_COPY_PROOF_MODEL_DEPLOYMENT_ALIAS);
+  }
+  return (
+    normalizeString(process.env.JM1_PROMPT_MODEL_DEPLOYMENT_ALIAS) ||
+    normalizeString(process.env.AZURE_FOUNDRY_CLAUDE_DEPLOYMENT_NAME)
+  );
+}
+
+function buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText }) {
+  const summary = summarizeExtractedText(extractedText || "");
+  return JSON.stringify({
+    task: "cc010_stage_execution",
+    contract: "Return only JSON.",
+    stageCode,
+    stageName: stage.jm1pub_name,
+    titleId: stage._jm1pub_titleid_value,
+    sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+    sourceSha256: sourceArtifact.jm1pub_sha256,
+    sourceWordCount: summary.words,
+    sourceParagraphCount: summary.paragraphs,
+    requiredOutput: {
+      stageScopeSummary: "string",
+      qualityNotes: ["string"],
+      authorReviewSummary: "string",
+      revisionCandidates: ["string"]
+    },
+    authorGateInvariant:
+      "Model completion and QA are not author approval. The stage must wait for the author after artifact generation.",
+    sourceSample: summary.sample.slice(0, 2000)
+  });
+}
+
+async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extractedText, correlationId) {
+  if (typeof invokeStageModelProvider.override === "function") {
+    return invokeStageModelProvider.override(stage, stageCode, sourceArtifact, extractedText, correlationId);
+  }
+  const deploymentAlias = preferredDeploymentAliasForStage(stageCode);
+  if (!deploymentAlias) {
+    return {
+      ok: false,
+      provider: null,
+      route: null,
+      fellBack: false,
+      error:
+        stageCode === "COPYEDITING" || stageCode === "PROOFREADING"
+          ? "COPY_PROOF_PREFERRED_MODEL_ROUTE_NOT_CONFIGURED"
+          : "EDITORIAL_STAGE_MODEL_ROUTE_NOT_CONFIGURED"
+    };
+  }
+  const result = await routeToProvider({
+    promptBody: buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText }),
+    diagnosticId: normalizeString(stage._jm1pub_titleid_value) || normalizeString(stage.jm1pub_editorialstageid),
+    executionType: "default",
+    editorialTransaction: transactionForStage(stageCode),
+    modelDeploymentAlias: deploymentAlias,
+    promptKey: `jm1-prompt-pub-${stageCode.toLowerCase().replace(/_/g, "-")}`,
+    promptVersion: `CC010-${stageCode}-V1`,
+    selectedStyleGuides: [],
+    allowFallback: false,
+    telemetry: { correlationId }
+  });
+  return {
+    ...result,
+    fellBack: Boolean(result.route?.fallbackFromAlias),
+    routeAlias: result.route?.deploymentAlias || deploymentAlias,
+    promptVersion: `CC010-${stageCode}-V1`
+  };
 }
 
 function requireDataverseConfig() {
@@ -315,6 +409,49 @@ async function findExecutionLog(client, actionType, idempotencyKey) {
   return rows[0] || null;
 }
 
+async function findUpstreamApprovalEvidence(client, stage, stageCode) {
+  const titleId = normalizeString(stage._jm1pub_titleid_value);
+  const previousType = stageTypeForCode(evaluateNextStageEligibility({ stageCode }).previousStageCode);
+  if (!titleId || !previousType) {
+    return { ok: true, reason: "NO_UPSTREAM_AUTHOR_GATE_REQUIRED", stages: [], artifacts: [], gates: [] };
+  }
+  const upstreamStages = await client.list("jm1pub_editorialstages", {
+    $select:
+      "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,_jm1pub_titleid_value,modifiedon",
+    $filter: `_jm1pub_titleid_value eq ${titleId} and jm1pub_stagetype eq ${previousType}`,
+    $orderby: "modifiedon desc",
+    $top: "5"
+  }).catch(() => []);
+  const artifacts = [];
+  const gates = [];
+  for (const upstreamStage of upstreamStages) {
+    const upstreamStageId = normalizeString(upstreamStage.jm1pub_editorialstageid);
+    if (!upstreamStageId) continue;
+    const stageArtifacts = await client.list("jm1pub_editorialartifacts", {
+      $select:
+        "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_sha256,jm1pub_iscurrentapproved,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,modifiedon",
+      $filter: `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${upstreamStageId}`,
+      $orderby: "modifiedon desc",
+      $top: "25"
+    }).catch(() => []);
+    const stageGates = await client.list("jm1pub_editorialapprovalgates", {
+      $select:
+        "jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,jm1pub_nextstageauthorized,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,modifiedon",
+      $filter: `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${upstreamStageId}`,
+      $orderby: "modifiedon desc",
+      $top: "25"
+    }).catch(() => []);
+    artifacts.push(...stageArtifacts);
+    gates.push(...stageGates);
+  }
+  return {
+    ...evaluateNextStageEligibility({ stageCode, upstreamArtifacts: artifacts, upstreamGates: gates }),
+    stages: upstreamStages,
+    artifacts,
+    gates
+  };
+}
+
 async function findActiveEditorialStages(client, maxTasks) {
   const rows = await client.list("jm1pub_editorialstages", {
     $select:
@@ -337,9 +474,12 @@ async function findActiveEditorialStages(client, maxTasks) {
       unblocked.push(stage);
       continue;
     }
+    const stageCode = normalizeStageCode(stage);
+    const upstream = await findUpstreamApprovalEvidence(client, stage, stageCode);
+    if (!upstream.ok) continue;
     const gates = await client.list("jm1pub_editorialapprovalgates", {
       $select:
-        "jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,modifiedon",
+        "jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,jm1pub_nextstageauthorized,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,modifiedon",
       $filter:
         `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${stageId}`,
       $orderby: "modifiedon desc",
@@ -403,6 +543,30 @@ async function findArtifactByName(client, stage, artifactName) {
   return rows[0] || null;
 }
 
+async function findExistingOutputArtifacts(client, stage, stageCode) {
+  const titleId = normalizeString(stage._jm1pub_titleid_value);
+  const stageId = normalizeString(stage.jm1pub_editorialstageid);
+  if (!titleId || !stageId) return [];
+  const expectedNames = new Set(outputDefinitions(stageCode).map((name) => `${name} - ${stage.jm1pub_name}`));
+  const rows = await client.list("jm1pub_editorialartifacts", {
+    $select:
+      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_fileextension,jm1pub_filesizebytes,jm1pub_sha256,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,modifiedon",
+    $filter: `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${stageId}`,
+    $orderby: "modifiedon desc",
+    $top: "50"
+  }).catch(() => []);
+  return rows
+    .filter((row) => expectedNames.has(normalizeString(row.jm1pub_editorialartifactname)))
+    .map((row) => ({
+      outputName: normalizeString(row.jm1pub_editorialartifactname).replace(new RegExp(`\\s+-\\s+${stage.jm1pub_name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`), ""),
+      artifactId: row.jm1pub_editorialartifactid,
+      filename: row.jm1pub_filename,
+      extension: row.jm1pub_fileextension,
+      size: row.jm1pub_filesizebytes,
+      sha256: row.jm1pub_sha256
+    }));
+}
+
 function buildExactBlocker(stageCode, sourceArtifact) {
   if (!sourceArtifact) return EXECUTOR_POLICIES[stageCode].exactMissingSourceBlocker;
   if (!normalizeString(sourceArtifact.jm1pub_sha256)) return `${stageCode}_BLOCKED — SOURCE_CHECKSUM_MISSING`;
@@ -454,6 +618,23 @@ async function recordBlockedTask(client, stage, stageCode, exactBlocker, correla
     description:
       `${exactBlocker}. Stage ${stage.jm1pub_editorialstageid} remains In Progress with exact blocker; generic uncommissioned-runtime blocker removed. ` +
       `Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
+    sourceEntity: "jm1pub_editorialstage",
+    sourceRecordId: stage.jm1pub_editorialstageid
+  });
+  return { idempotent: false, logId, idempotencyKey };
+}
+
+async function recordAuthorApprovalBlocked(client, stage, stageCode, upstream, correlationId) {
+  const reason = upstream?.reason || `${stageCode}_AUTHOR_APPROVAL_REQUIRED`;
+  const idempotencyKey = `editorial-runtime:author-gate-block:${stage.jm1pub_editorialstageid}:${stageCode}:${reason}`;
+  const existing = await findExecutionLog(client, "EDITORIAL_STAGE_BLOCKED_BY_AUTHOR_GATE", idempotencyKey);
+  if (existing) return { idempotent: true, logId: existing.jm1_executionlogid, idempotencyKey };
+  const logId = await writeLog(client, {
+    name: `EDITORIAL_STAGE_BLOCKED_BY_AUTHOR_GATE - ${stage.jm1pub_name}`,
+    actionType: "EDITORIAL_STAGE_BLOCKED_BY_AUTHOR_GATE",
+    description:
+      `${stageCode} did not execute because required upstream author approval is missing or not bound to the exact approved artifact. ` +
+      `${reason}. Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
     sourceEntity: "jm1pub_editorialstage",
     sourceRecordId: stage.jm1pub_editorialstageid
   });
@@ -855,14 +1036,30 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
     });
   }
   const extracted = await extractSourceText(sourceBuffer, stageCode);
+  const modelInvocation = await invokeStageModelProvider(
+    stage,
+    stageCode,
+    sourceArtifact,
+    extracted.value || "",
+    correlationId
+  );
+  if (!modelInvocation.ok || modelInvocation.fellBack) {
+    throw Object.assign(new Error(modelInvocation.error || "Governed model route failed"), {
+      safeCode: `${stageCode}_BLOCKED — MODEL_INVOCATION_FAILED`
+    });
+  }
   const outputs = [];
   for (const outputName of outputDefinitions(stageCode)) {
     const isDevelopmentalManuscript =
       stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Developmentally Edited Manuscript";
     const isDevelopmentalMemo = stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Developmental Memo";
+    const isEditedManuscript =
+      (stageCode === "LINE_EDITING" || stageCode === "COPYEDITING") && outputName === "Edited Manuscript";
+    const isProofreadManuscript = stageCode === "PROOFREADING" && outputName === "Proofread Manuscript";
     const isReviewInstructions = outputName.toLowerCase().includes("review instructions");
-    const extension = isDevelopmentalManuscript || isDevelopmentalMemo ? "docx" : isReviewInstructions ? "txt" : "md";
-    const contentType = isDevelopmentalManuscript || isDevelopmentalMemo
+    const shouldBuildDocx = isDevelopmentalManuscript || isDevelopmentalMemo || isEditedManuscript || isProofreadManuscript;
+    const extension = shouldBuildDocx ? "docx" : isReviewInstructions ? "txt" : "md";
+    const contentType = shouldBuildDocx
       ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       : isReviewInstructions
         ? "text/plain"
@@ -870,7 +1067,7 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
     const filename = `${new Date().toISOString().slice(0, 10)}-${stage.jm1pub_name.replace(/[^a-zA-Z0-9]+/g, "-")}-${outputName.replace(/[^a-zA-Z0-9]+/g, "-")}.${extension}`;
     const body = isDevelopmentalManuscript
       ? await buildDevelopmentalRevisionDocx(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId)
-      : isDevelopmentalMemo
+      : shouldBuildDocx
         ? await buildSimpleEditorialDocx(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId)
         : Buffer.from(
             isReviewInstructions
@@ -904,6 +1101,7 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
       jm1pub_notes: isDevelopmentalManuscript
         ? `Package-grade governed developmental revision artifact produced from source artifact ${sourceArtifact.jm1pub_editorialartifactid}. This preserves author voice and routes high-risk edits as notes instead of silent rewrites.`
         : `Editorial runtime output produced from governed source artifact ${sourceArtifact.jm1pub_editorialartifactid}.`,
+      jm1pub_correlationid: correlationId,
       "Jm1pub_Titleid@odata.bind": `/jm1pub_titles(${stage._jm1pub_titleid_value})`,
       "Jm1pub_Editorialstageid@odata.bind": `/jm1pub_editorialstages(${stage.jm1pub_editorialstageid})`
     };
@@ -925,16 +1123,108 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
       extension,
       contentType,
       size: uploaded.size || body.length,
-      sha256: artifactPayload.jm1pub_sha256
+      sha256: artifactPayload.jm1pub_sha256,
+      modelProvider: modelInvocation.provider || modelInvocation.route?.provider || "",
+      modelDeployment: modelInvocation.routeAlias || "",
+      promptVersion: modelInvocation.promptVersion || ""
     });
   }
+  outputs.modelInvocation = {
+    provider: modelInvocation.provider || modelInvocation.route?.provider || "",
+    routeAlias: modelInvocation.routeAlias || "",
+    promptVersion: modelInvocation.promptVersion || "",
+    transaction: transactionForStage(stageCode),
+    fellBack: Boolean(modelInvocation.fellBack)
+  };
   return outputs;
+}
+
+function selectPrimaryAuthorReviewArtifact(outputs, packageHandoff) {
+  const artifacts = Array.isArray(outputs) ? outputs : [];
+  return (
+    artifacts.find((item) => packageRoleForOutput(item.outputName) === "editedManuscript") ||
+    artifacts.find((item) => packageRoleForOutput(item.outputName) === "assessment") ||
+    artifacts.find((item) => item.artifactId) ||
+    (packageHandoff?.manifestArtifactId
+      ? {
+          outputName: "Package Manifest",
+          artifactId: packageHandoff.manifestArtifactId,
+          sha256: packageHandoff.packageChecksum
+        }
+      : null)
+  );
+}
+
+async function findAuthorReviewGatesForStage(client, stage) {
+  const titleId = normalizeString(stage._jm1pub_titleid_value);
+  const stageId = normalizeString(stage.jm1pub_editorialstageid);
+  if (!titleId || !stageId) return [];
+  return client.list("jm1pub_editorialapprovalgates", {
+    $select:
+      "jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,jm1pub_nextstageauthorized,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,modifiedon",
+    $filter: `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${stageId}`,
+    $orderby: "modifiedon desc",
+    $top: "25"
+  }).catch(() => []);
+}
+
+async function createAuthorReviewGate(client, stage, stageCode, artifact, correlationId) {
+  const existingGates = await findAuthorReviewGatesForStage(client, stage);
+  const plan = createAuthorReviewGatePlan({
+    stageCode,
+    titleId: stage._jm1pub_titleid_value,
+    stageId: stage.jm1pub_editorialstageid,
+    artifact: {
+      artifactId: artifact.artifactId,
+      sha256: artifact.sha256
+    },
+    existingGates
+  });
+  if (!plan.ok) return plan;
+  if (plan.idempotent) return plan;
+  const payload = {
+    jm1pub_editorialapprovalgatename: `${plan.authorLabel} Author Review - ${stage.jm1pub_name}`,
+    jm1pub_gatecode: GATE_CODES[stageCode],
+    jm1pub_gatestatus: GATE_STATUS_READY_FOR_AUTHOR_REVIEW,
+    jm1pub_nextstageauthorized: false,
+    jm1pub_awaitingsince: new Date().toISOString(),
+    jm1pub_authorresponsesummary:
+      `Awaiting full author approval for ${plan.authorLabel}. Bound deliverable artifact ${plan.artifactId}; checksum ${plan.artifactHash}.`,
+    jm1pub_correlationid: correlationId,
+    "Jm1pub_Titleid@odata.bind": `/jm1pub_titles(${stage._jm1pub_titleid_value})`,
+    "Jm1pub_Editorialstageid@odata.bind": `/jm1pub_editorialstages(${stage.jm1pub_editorialstageid})`,
+    "Jm1pub_Deliverableartifactid@odata.bind": `/jm1pub_editorialartifacts(${plan.artifactId})`
+  };
+  if (normalizeString(stage._jm1pub_publishingassetid_value)) {
+    payload["Jm1pub_Publishingassetid@odata.bind"] = `/jm1pub_publishingassets(${stage._jm1pub_publishingassetid_value})`;
+  }
+  const gateId = await client.create("jm1pub_editorialapprovalgates", payload);
+  const idempotencyKey = `editorial-runtime:author-review-gate:${stage.jm1pub_editorialstageid}:${stageCode}:${plan.artifactId}:${plan.artifactHash}`;
+  const existingLog = await findExecutionLog(client, "AUTHOR_REVIEW_GATE_CREATED", idempotencyKey);
+  if (!existingLog) {
+    await writeLog(client, {
+      name: `AUTHOR_REVIEW_GATE_CREATED - ${stage.jm1pub_name}`,
+      actionType: "AUTHOR_REVIEW_GATE_CREATED",
+      description:
+        `${stageCode} opened mandatory author review gate ${gateId} for artifact ${plan.artifactId}; checksum ${plan.artifactHash}. ` +
+        `No notification was sent by this runtime. Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
+      sourceEntity: "jm1pub_editorialapprovalgate",
+      sourceRecordId: gateId
+    });
+  }
+  return { ...plan, gateId };
 }
 
 function packageRoleForOutput(outputName) {
   const normalized = normalizeString(outputName).toLowerCase();
+  if (normalized === "edited manuscript") return "editedManuscript";
   if (normalized.includes("developmentally edited manuscript")) return "editedManuscript";
   if (normalized.includes("developmental memo")) return "developmentalMemo";
+  if (normalized.includes("line editing summary")) return "lineEditingSummary";
+  if (normalized.includes("copyediting summary")) return "copyeditingSummary";
+  if (normalized.includes("proofread manuscript")) return "proofreadManuscript";
+  if (normalized.includes("proofreading cover note")) return "proofreadingCoverNote";
+  if (normalized.includes("style sheet")) return "styleSheet";
   if (normalized.includes("change ledger")) return "changeLedger";
   if (normalized.includes("author-query") || normalized.includes("author query")) return "authorQueryList";
   if (normalized.includes("review instructions")) return "reviewInstructions";
@@ -948,15 +1238,27 @@ function packageRoleForOutput(outputName) {
 function requiredPackageRoles(stageCode) {
   if (stageCode === "DEVELOPMENTAL_EDITING") return ["editedManuscript", "developmentalMemo", "changeLedger", "reviewInstructions"];
   if (stageCode === "EDITORIAL_REVIEW") return ["assessment", "recommendedEditorialPath", "riskRegister", "qaEvidence"];
+  if (stageCode === "LINE_EDITING") return ["editedManuscript", "lineEditingSummary", "changeLedger", "qaEvidence"];
+  if (stageCode === "COPYEDITING") return ["editedManuscript", "copyeditingSummary", "styleSheet", "qaEvidence"];
+  if (stageCode === "PROOFREADING") return ["proofreadManuscript", "proofreadingCoverNote", "qaEvidence"];
   return [];
 }
 
 function allowedMimeForRole(role) {
-  if (role === "editedManuscript" || role === "developmentalMemo") {
+  if (role === "editedManuscript" || role === "developmentalMemo" || role === "proofreadManuscript") {
     return ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/pdf"];
   }
   if (role === "reviewInstructions") return ["text/plain", "application/pdf"];
-  if (role === "changeLedger" || role === "authorQueryList") return ["text/markdown", "text/plain", "application/json", "application/pdf"];
+  if (
+    role === "changeLedger" ||
+    role === "authorQueryList" ||
+    role === "lineEditingSummary" ||
+    role === "copyeditingSummary" ||
+    role === "proofreadingCoverNote" ||
+    role === "styleSheet"
+  ) {
+    return ["text/markdown", "text/plain", "application/json", "application/pdf"];
+  }
   if (role === "assessment" || role === "recommendedEditorialPath" || role === "riskRegister" || role === "qaEvidence") {
     return ["text/markdown", "application/json", "application/pdf"];
   }
@@ -966,12 +1268,12 @@ function allowedMimeForRole(role) {
 function packageDeliveryPolicy(stageCode) {
   if (stageCode === "EDITORIAL_REVIEW") {
     return {
-      audience: "PUBLISHER",
-      notificationPolicy: "NOT_REQUIRED_PUBLISHER_FACING",
-      workspaceVisibility: "HIDDEN_FROM_AUTHOR",
-      cadenceStatus: "READY_INTERNAL",
-      cadenceDetail: "CADENCE_NOT_REQUIRED: publisher-facing Editorial Review decision package; no author release scheduled.",
-      nextGovernedAction: "Publisher editorial-path decision or automatic stage routing under approved policy."
+      audience: "AUTHOR",
+      notificationPolicy: "AUTHOR_REVIEW_AFTER_STAGE_COMPLETION_AND_CADENCE",
+      workspaceVisibility: "VISIBLE_AFTER_COMPLETE_NOTIFICATION",
+      cadenceStatus: "CADENCE_HOLD",
+      cadenceDetail: "CADENCE_HOLD: Editorial Review author release held until stage completion and cadence authorization.",
+      nextGovernedAction: "Canonical author review before Developmental Editing may begin."
     };
   }
   return {
@@ -1215,14 +1517,34 @@ async function processStage(client, stage, correlationId) {
   if (!policy || !stageStatusIsExecutable(stage)) {
     return { stageId: stage.jm1pub_editorialstageid, stageCode, status: "SKIPPED_NOT_EXECUTABLE" };
   }
+  const preservedExactBlocker = extractExistingExactBlocker(stage);
+  if (preservedExactBlocker) {
+    return {
+      stageId: stage.jm1pub_editorialstageid,
+      titleId: stage._jm1pub_titleid_value,
+      stageCode,
+      status: "EXCEPTION",
+      exactBlocker: preservedExactBlocker,
+      blocked: { idempotent: true, logId: null, idempotencyKey: "preserved-existing-exact-blocker" }
+    };
+  }
+  const upstream = await findUpstreamApprovalEvidence(client, stage, stageCode);
+  if (!upstream.ok) {
+    const blocked = await recordAuthorApprovalBlocked(client, stage, stageCode, upstream, correlationId);
+    return {
+      stageId: stage.jm1pub_editorialstageid,
+      titleId: stage._jm1pub_titleid_value,
+      stageCode,
+      status: "BLOCKED_AUTHOR_APPROVAL_REQUIRED",
+      reason: upstream.reason,
+      blocked
+    };
+  }
   const claim = await claimStageTask(client, stage, stageCode, correlationId);
   const sourceArtifact = await findSourceArtifact(client, stage);
-  const preservedExactBlocker = !sourceArtifact ? extractExistingExactBlocker(stage) : "";
-  const exactBlocker = preservedExactBlocker || buildExactBlocker(stageCode, sourceArtifact);
+  const exactBlocker = buildExactBlocker(stageCode, sourceArtifact);
   if (exactBlocker) {
-    const blocked = preservedExactBlocker
-      ? { idempotent: true, logId: null, idempotencyKey: "preserved-existing-exact-blocker" }
-      : await recordBlockedTask(client, stage, stageCode, exactBlocker, correlationId);
+    const blocked = await recordBlockedTask(client, stage, stageCode, exactBlocker, correlationId);
     return {
       stageId: stage.jm1pub_editorialstageid,
       titleId: stage._jm1pub_titleid_value,
@@ -1239,13 +1561,19 @@ async function processStage(client, stage, correlationId) {
   const idempotencyKey = `editorial-runtime:output-ready-${outputReadyVersion}:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
   const existing = await findExecutionLog(client, "ACTIVE_EDITORIAL_OUTPUT_CREATED", idempotencyKey);
   if (existing) {
+    const existingOutputs = await findExistingOutputArtifacts(client, stage, stageCode);
+    const reviewArtifact = selectPrimaryAuthorReviewArtifact(existingOutputs, null);
+    const authorGate = reviewArtifact
+      ? await createAuthorReviewGate(client, stage, stageCode, reviewArtifact, correlationId)
+      : { ok: false, reason: "AUTHOR_REVIEW_ARTIFACT_BINDING_MISSING" };
     return {
       stageId: stage.jm1pub_editorialstageid,
       titleId: stage._jm1pub_titleid_value,
       stageCode,
       status: "OUTPUT_ALREADY_RECORDED",
       sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
-      idempotent: true
+      idempotent: true,
+      authorGate
     };
   }
   let outputs;
@@ -1273,7 +1601,9 @@ async function processStage(client, stage, correlationId) {
     name: `ACTIVE_EDITORIAL_OUTPUT_CREATED - ${stage.jm1pub_name}`,
     actionType: "ACTIVE_EDITORIAL_OUTPUT_CREATED",
     description:
-      `${stageCode} produced governed output artifacts: ${outputs.map((item) => `${item.outputName} ${item.artifactId}`).join("; ")}. Source artifact ${sourceArtifact.jm1pub_editorialartifactid}; checksum ${sourceArtifact.jm1pub_sha256 || "pending"}. Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
+      `${stageCode} produced governed output artifacts: ${outputs.map((item) => `${item.outputName} ${item.artifactId}`).join("; ")}. ` +
+      `Model route ${outputs.modelInvocation?.routeAlias || "unknown"}; provider ${outputs.modelInvocation?.provider || "unknown"}; prompt ${outputs.modelInvocation?.promptVersion || "unknown"}. ` +
+      `Source artifact ${sourceArtifact.jm1pub_editorialartifactid}; checksum ${sourceArtifact.jm1pub_sha256 || "pending"}. Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
     sourceEntity: "jm1pub_editorialstage",
     sourceRecordId: stage.jm1pub_editorialstageid
   });
@@ -1294,13 +1624,21 @@ async function processStage(client, stage, correlationId) {
     packageHandoff = { status: "EXCEPTION", exactBlocker: exact, graphDetail: error.graphDetail };
   }
   if (packageHandoff && !packageHandoff.skipped) {
+    const reviewArtifact = selectPrimaryAuthorReviewArtifact(outputs, packageHandoff);
+    const authorGate = reviewArtifact
+      ? await createAuthorReviewGate(client, stage, stageCode, reviewArtifact, correlationId)
+      : { ok: false, reason: "AUTHOR_REVIEW_ARTIFACT_BINDING_MISSING" };
     await client.patch("jm1pub_editorialstages", stage.jm1pub_editorialstageid, {
       jm1pub_internaloperationalsummary:
         packageHandoff.status === "EXCEPTION"
           ? `EXCEPTION — ${packageHandoff.exactBlocker}${packageHandoff.graphDetail ? `. ${packageHandoff.graphDetail}` : ""}`
-          : `PACKAGE_PREPARATION: Package Engine handoff completed for ${packageHandoff.packageId}; manifest ${packageHandoff.manifestArtifactId}; package checksum ${packageHandoff.packageChecksum}; QA ${packageHandoff.qaStatus}; cadence ${packageHandoff.cadenceStatus}; notification ${packageHandoff.notificationPolicy}; workspace ${packageHandoff.workspaceVisibility}. Next governed action: ${packageHandoff.nextGovernedAction}`,
-      jm1pub_authorsafesummary: "Editorial work is in progress internally. No author action is required at this time."
+          : `PACKAGE_PREPARATION: Package Engine handoff completed for ${packageHandoff.packageId}; manifest ${packageHandoff.manifestArtifactId}; package checksum ${packageHandoff.packageChecksum}; QA ${packageHandoff.qaStatus}; cadence ${packageHandoff.cadenceStatus}; notification ${packageHandoff.notificationPolicy}; workspace ${packageHandoff.workspaceVisibility}. Author review gate ${authorGate.gateId || authorGate.reason || "pending"}. Next governed action: ${packageHandoff.nextGovernedAction}`,
+      jm1pub_authorsafesummary:
+        packageHandoff.status === "EXCEPTION"
+          ? "Editorial work is in progress internally. No author action is required at this time."
+          : "Editorial work has produced review materials. The publishing team will release them through the governed author review process when ready."
     });
+    packageHandoff.authorGate = authorGate;
   }
   return {
     stageId: stage.jm1pub_editorialstageid,
@@ -1356,13 +1694,17 @@ module.exports = {
   authorGateBlocksRuntime,
   classifyGraphFailure,
   createDataverseClient,
+  createAuthorReviewGate,
   createPackageManifestArtifact,
   extractSourceText,
   findArtifactByName,
   findActiveEditorialStages,
   findExecutionLog,
   findSourceArtifact,
+  findExistingOutputArtifacts,
+  findUpstreamApprovalEvidence,
   graphRequest,
+  invokeStageModelProvider,
   isLivePortfolioStage,
   normalizeStageCode,
   packageChecksum,
