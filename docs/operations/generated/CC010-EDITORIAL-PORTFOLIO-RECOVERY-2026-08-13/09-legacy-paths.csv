@@ -1,0 +1,5 @@
+path_or_component,classification,evidence,normal_runtime_disposition
+lib/server/five-title-executive-recovery-dispatch.ts,RECOVERY_ONLY,Exact five-title recovery path; not canonical normal CC-010 lifecycle authority.,Guarded as recovery-only; portfolio guard prevents normal-runtime use as live editorial authority.
+azure-functions/diagnostic-ai-runner/src/functions/runIntentionalLeaderAuthorResponse.js,RECOVERY_ONLY,Intentional Leader-specific response processor exists.,Keep historical/recovery only; shared author-response consumer is canonical.
+lib/server/author-portal-context.ts,SUPERSEDED_IF_NORMAL_RUNTIME,Contains title-specific author workspace state branches.,Must defer to canonical CC-010/Author Workspace state projection for normal current-state truth.
+lib/server/publisher-operating-center.ts,CANONICAL_CC010_WITH_REMEDIATION,Current Publisher Operating Center read model; contains title-specific priority/next-action branches to generalize.,Extend with CC-010 portfolio view and guard.
