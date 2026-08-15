@@ -10,6 +10,7 @@ const {
   extractSourceText,
   findSourceArtifact,
   graphRequest,
+  isLivePortfolioStage,
   normalizeStageCode,
   runEditorialExecutionRuntime
 } = require("../src/editorial/editorialExecutionRuntime");
@@ -31,6 +32,14 @@ test("stage names normalize to canonical executor codes", () => {
   assert.equal(normalizeStageCode({ jm1pub_name: "Developmental Editing - Before You Were Born" }), "DEVELOPMENTAL_EDITING");
   assert.equal(normalizeStageCode({ jm1pub_name: "Editorial Review - The Long Watch" }), "EDITORIAL_REVIEW");
   assert.equal(normalizeStageCode({ jm1pub_name: "Proofreading - The Intentional Leader" }), "PROOFREADING");
+});
+
+test("live portfolio stage guard excludes synthetic and test records without excluding Testament titles", () => {
+  assert.equal(isLivePortfolioStage({ jm1pub_name: "Developmental Editing - The General’s Will and Last Testament" }), true);
+  assert.equal(isLivePortfolioStage({ jm1pub_name: "GATE-W1 App Service Staging DOCX Join 1785342161378" }), false);
+  assert.equal(isLivePortfolioStage({ jm1pub_name: "JM1 Synthetic Intake Final Proof 20260727170349" }), false);
+  assert.equal(isLivePortfolioStage({ jm1pub_name: "Developmental Editing - Test" }), false);
+  assert.equal(isLivePortfolioStage({ jm1pub_name: "JM1 Duplicate Proof 20260727173641" }), false);
 });
 
 test("missing source artifact becomes an exact stage-specific blocker", () => {

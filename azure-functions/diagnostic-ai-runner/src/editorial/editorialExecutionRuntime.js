@@ -89,6 +89,30 @@ function stageStatusIsExecutable(stage) {
   return status === STAGE_STATUS.IN_PROGRESS;
 }
 
+function isLivePortfolioStage(stage) {
+  const text = [
+    stage?.jm1pub_name,
+    stage?.jm1pub_internaloperationalsummary,
+    stage?.jm1pub_authorsafesummary
+  ]
+    .map((value) => normalizeString(value).toLowerCase())
+    .filter(Boolean)
+    .join(" ");
+  if (!text) return true;
+  if (/\btest\b/.test(text) && !/\btestament\b/.test(text)) return false;
+  return ![
+    "synthetic",
+    "fixture",
+    "gate-w1",
+    "gate w1",
+    "certification manuscript",
+    "duplicate proof",
+    "preview proof",
+    "staging",
+    "final proof 202607"
+  ].some((marker) => text.includes(marker));
+}
+
 function requireDataverseConfig() {
   const apiBase = normalizeString(process.env.DATAVERSE_WEB_API_BASE_URL).replace(/\/$/, "");
   const resourceUrl = normalizeString(process.env.DATAVERSE_RESOURCE_URL).replace(/\/$/, "");
@@ -282,7 +306,7 @@ async function findExecutionLog(client, actionType, idempotencyKey) {
 }
 
 async function findActiveEditorialStages(client, maxTasks) {
-  return client.list("jm1pub_editorialstages", {
+  const rows = await client.list("jm1pub_editorialstages", {
     $select:
       "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,_jm1pub_titleid_value,_jm1pub_publishingassetid_value,createdon,modifiedon",
     $filter:
@@ -294,6 +318,7 @@ async function findActiveEditorialStages(client, maxTasks) {
     $orderby: "modifiedon asc",
     $top: String(maxTasks)
   });
+  return rows.filter(isLivePortfolioStage);
 }
 
 async function findSourceArtifact(client, stage) {
@@ -1304,9 +1329,11 @@ module.exports = {
   createPackageManifestArtifact,
   extractSourceText,
   findArtifactByName,
+  findActiveEditorialStages,
   findExecutionLog,
   findSourceArtifact,
   graphRequest,
+  isLivePortfolioStage,
   normalizeStageCode,
   packageChecksum,
   packageDeliveryPolicy,
