@@ -1,0 +1,5 @@
+Title,Author,Current_CC010_Stage,Waiting_On,Current_Blocker,Next_Governed_Action,Safe_to_Resume,Mutation_Required,queue,provider,portfolio_serialized_behind_atta
+The Long Watch,Jackie Smith Jr,Developmental Editing,Author,Await Developmental Editing author response/full approval,Await Developmental Editing author response/full approval,NO,RUNTIME_REPLAY_APPLIED,DEVELOPMENTAL_QUEUE,CLAUDE,NO
+The General’s Will and Last Testament,Iyorwuese Hagher,Developmental Editing,Author,Await Developmental Editing author response/full approval,Await Developmental Editing author response/full approval,NO,RUNTIME_REPLAY_APPLIED,DEVELOPMENTAL_QUEUE,CLAUDE,NO
+Before You Were Born,Sean Crowley,Developmental Editing,External,External dependency for Developmental Editing,External dependency for Developmental Editing,NO,NO - dry-run evidence first,DEVELOPMENTAL_QUEUE,CLAUDE,NO
+Establishing Glory: The Library,"Jackie Smith, Jr.",Developmental Editing,Author,Await Developmental Editing author response/full approval,Await Developmental Editing author response/full approval,NO,RUNTIME_REPLAY_APPLIED,DEVELOPMENTAL_QUEUE,CLAUDE,NO
