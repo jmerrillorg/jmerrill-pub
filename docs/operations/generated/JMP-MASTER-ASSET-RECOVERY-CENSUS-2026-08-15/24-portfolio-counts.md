@@ -1,10 +1,10 @@
 # Portfolio Counts
 
-Last verified: 2026-08-16T02:40:56.062Z
+Last verified: 2026-08-16T07:57:06.866Z
 
 ```json
 {
-  "asOf": "2026-08-16T02:40:56.062Z",
+  "asOf": "2026-08-16T07:57:06.866Z",
   "totalRealAssets": 395,
   "testSyntheticExcluded": 16,
   "prospects": 7,
@@ -29,6 +29,11 @@ Last verified: 2026-08-16T02:40:56.062Z
   "manualHoldReconciliation": 381,
   "stalled": 8,
   "brokenDeliverables": 0,
-  "communicationMismatches": 0
+  "communicationMismatches": 0,
+  "operationallyActive": 67,
+  "activeReconciliationRequired": 53,
+  "historicalBacklistNoCurrentAction": 31,
+  "duplicateLegacy": 297,
+  "unknownRemaining": 0
 }
 ```

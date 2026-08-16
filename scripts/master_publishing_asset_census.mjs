@@ -4,6 +4,8 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const OUT_DIR = 'docs/operations/generated/JMP-MASTER-ASSET-RECOVERY-CENSUS-2026-08-15'
+const P1_DIR = 'docs/operations/generated/JMP-P1-SERVICE-RECOVERY-2026-08-16'
+const RECON_DIR = 'docs/operations/generated/JMP-RECONCILIATION-REDUCTION-2026-08-16'
 const NOW = new Date().toISOString()
 const API_BASE = 'https://jm1hq.crm.dynamics.com/api/data/v9.2'
 const RESOURCE = 'https://jm1hq.crm.dynamics.com'
@@ -238,8 +240,70 @@ function rowKey(parts) {
   return parts.filter(Boolean).join(':') || createHash('sha1').update(JSON.stringify(parts)).digest('hex').slice(0, 12)
 }
 
+function normalizeKey(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\b(the|a|an)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function groupCount(rows, column) {
+  const out = {}
+  for (const row of rows) {
+    const key = row[column] || 'UNKNOWN'
+    out[key] = (out[key] || 0) + 1
+  }
+  return out
+}
+
+function classifyReconciliation(rows) {
+  const groups = new Map()
+  for (const row of rows) {
+    row.DuplicateGroupKey = normalizeKey(`${row['Title / Working Title']} ${row['Author Public/Pen Name']}`)
+    if (!groups.has(row.DuplicateGroupKey)) groups.set(row.DuplicateGroupKey, [])
+    groups.get(row.DuplicateGroupKey).push(row)
+  }
+  for (const row of rows) {
+    const groupRows = groups.get(row.DuplicateGroupKey) || [row]
+    row.DuplicateGroupSize = String(groupRows.length)
+    row.ReconciliationReason = reconciliationReasonFor(row, groupRows)
+    row.OperationallyActive = operationallyActiveFor(row) ? 'YES' : 'NO'
+    if (row.OperationallyActive === 'NO' && row.WaitingOn === 'MANUAL_HOLD_RECONCILIATION_REQUIRED') {
+      row.NextManualRecoveryAction = 'No immediate Jackie action; retain in historical/reconciliation evidence.'
+      row['Automation Safe?'] = 'NO_CURRENT_ACTION'
+    }
+  }
+}
+
+function reconciliationReasonFor(row, groupRows) {
+  if (row.LifecycleContext !== 'RECONCILIATION_REQUIRED' && !row.Flags.includes('RECONCILIATION_REQUIRED')) return ''
+  const hasOnlyTitle = !row['Intake ID'] && !row['Opportunity ID'] && row['Project/Title ID']
+  const stageText = `${row.CurrentBusinessStage} ${row.CurrentEditorialStage} ${row.CurrentProductionStage} ${row.CurrentDistributionStage}`.toLowerCase()
+  const noCurrentPromise = row.LastHumanPromise === 'NO_RECENT_EXTERNAL_PROMISE_FOUND_RECONCILE' && !row.LastExternalCommunicationDate
+  if (groupRows.length > 1 && hasOnlyTitle) return 'LEGACY_DUPLICATE'
+  if (hasOnlyTitle && /(approved|legacy)/i.test(stageText) && noCurrentPromise) return 'PUBLISHED_BACKLIST_NO_CURRENT_ACTION'
+  if (hasOnlyTitle && !row.CurrentEditorialStage && !row.CurrentProductionStage && !row.CurrentDistributionStage) return 'MISSING_LIFECYCLE_CONTEXT'
+  if (!row.LatestValidArtifact && !row.LatestValidManuscript) return 'MISSING_ARTIFACT_LINK'
+  if (/conflict|mismatch/i.test(`${row.CurrentBlocker} ${row.NotesEvidence}`)) return 'CONFLICTING_STAGE_STATE'
+  return 'UNKNOWN'
+}
+
+function operationallyActiveFor(row) {
+  if (row.TestSyntheticExcluded === 'YES') return false
+  if (row.LifecycleContext !== 'RECONCILIATION_REQUIRED') return true
+  return ![
+    'PUBLISHED_BACKLIST_NO_CURRENT_ACTION',
+    'LEGACY_DUPLICATE',
+    'MULTI_RECORD_SAME_ASSET'
+  ].includes(row.ReconciliationReason)
+}
+
 async function main() {
   mkdirSync(OUT_DIR, { recursive: true })
+  mkdirSync(P1_DIR, { recursive: true })
+  mkdirSync(RECON_DIR, { recursive: true })
   const accessToken = await token()
   const [intakes, titles, diagnostics, stages, gates, artifacts, logs, opportunities, contacts] = await Promise.all([
     list(accessToken, 'jm1_publishingintakes', { $top: '500', $orderby: 'modifiedon desc' }),
@@ -348,6 +412,13 @@ async function main() {
 
   const allRows = [...assets.values()]
   const realRows = allRows.filter((r) => r.TestSyntheticExcluded !== 'YES')
+  classifyReconciliation(realRows)
+  const operationalRows = realRows.filter((r) => r.OperationallyActive === 'YES')
+  const p1Rows = realRows.filter((r) => r.Priority === 'P1').sort(sortRecovery)
+  const activeP1Rows = p1Rows.filter((r) => r.OperationallyActive === 'YES')
+  const reconciliationRows = realRows.filter((r) => r.LifecycleContext === 'RECONCILIATION_REQUIRED' || r.Flags.includes('RECONCILIATION_REQUIRED'))
+  const activeReconciliationRows = reconciliationRows.filter((r) => r.OperationallyActive === 'YES')
+  const reconciliationReasonCounts = groupCount(reconciliationRows, 'ReconciliationReason')
   const columns = [
     'Priority',
     'Title / Working Title',
@@ -378,40 +449,53 @@ async function main() {
     'AutomationLane',
     'DaysWaiting',
     'Release Date if applicable',
+    'OperationallyActive',
+    'ReconciliationReason',
+    'DuplicateGroupKey',
+    'DuplicateGroupSize',
     'Flags',
     'SourceLastUpdated',
     'NotesEvidence',
     'TestSyntheticExcluded',
   ]
   writeCsv('01-master-asset-ledger.csv', allRows, columns)
-  writeCsv('02-active-assets.csv', realRows.filter((r) => r.WaitingOn !== 'COMPLETE_CURRENT_STAGE'), columns)
-  writeCsv('03-jmp-owes-action.csv', realRows.filter((r) => ['WAITING_ON_JMP', 'WAITING_ON_SYSTEM', 'WAITING_ON_JACKIE_JUDGMENT'].includes(r.WaitingOn)), columns)
-  writeCsv('04-author-prospect-owes-action.csv', realRows.filter((r) => ['WAITING_ON_AUTHOR', 'WAITING_ON_PROSPECT'].includes(r.WaitingOn)), columns)
-  writeCsv('05-manual-recovery-board.csv', realRows.filter((r) => ['P0', 'P1', 'P2'].includes(r.Priority)).sort(sortRecovery), columns)
-  writeCsv('06-automation-safety.csv', realRows, ['Title / Working Title', 'Author Public/Pen Name', 'LifecycleContext', 'Automation Safe?', 'AutomationLane', 'Flags', 'NextManualRecoveryAction'])
-  writeCsv('07-prospect-pipeline.csv', realRows.filter((r) => ['PROSPECT_INQUIRY', 'EDITORIAL_REVIEW', 'WAITING_PACKAGE_SELECTION'].includes(r.LifecycleContext)), columns)
-  writeCsv('08-commercial-pipeline.csv', realRows.filter((r) => ['COMMERCIAL_CONVERSION', 'AGREEMENT_ESIGN', 'PAYMENT_ONBOARDING'].includes(r.LifecycleContext) || r['Opportunity ID']), columns)
-  writeCsv('09-editorial-pipeline.csv', realRows.filter((r) => /EDITORIAL|ACTIVE_EDITORIAL|Developmental|Line|Copy|Proof/i.test(`${r.LifecycleContext} ${r.CurrentEditorialStage}`)), columns)
-  writeCsv('10-production-pipeline.csv', realRows.filter((r) => /PRODUCTION|production/i.test(`${r.LifecycleContext} ${r.CurrentProductionStage}`)), columns)
-  writeCsv('11-distribution-pipeline.csv', realRows.filter((r) => /DISTRIBUTION|distribution|ingram|coresource|retailer/i.test(`${r.LifecycleContext} ${r.CurrentDistributionStage}`)), columns)
-  writeCsv('12-release-risk.csv', realRows.filter((r) => r['Release Date if applicable']).map(withReleaseRisk), [...columns, 'ReleaseRisk'])
-  writeCsv('13-workspace-access-audit.csv', realRows, ['Title / Working Title', 'Author Public/Pen Name', 'LifecycleContext', 'PortalWorkspaceState', 'Flags'])
-  writeCsv('14-last-human-promise.csv', realRows, ['Title / Working Title', 'Author Public/Pen Name', 'LastExternalCommunicationDate', 'LastHumanPromise', 'WaitingOn', 'DaysWaiting'])
-  writeCsv('15-stalled-assets.csv', realRows.filter((r) => r.Flags.includes('STALLED_JMP_OWNED')), columns)
-  writeCsv('16-missed-promises.csv', realRows.filter((r) => r.Flags.includes('PROMISE_MISSED')), columns)
-  writeCsv('17-broken-deliverables.csv', realRows.filter((r) => r.Flags.includes('BROKEN_DELIVERABLE')), columns)
-  writeCsv('18-communication-state-mismatches.csv', realRows.filter((r) => r.Flags.includes('INCORRECT_PROMISE') || r.Flags.includes('P0_WORKSPACE_ACCESS_MISMATCH')), columns)
-  writeCsv('19-oldest-waits.csv', realRows.filter((r) => r.DaysWaiting).sort((a, b) => Number(b.DaysWaiting) - Number(a.DaysWaiting)).slice(0, 10), columns)
-  writeCsv('20-jackie-manual-recovery-now.csv', realRows.filter((r) => ['P0', 'P1', 'P2'].includes(r.Priority) && !['EXTERNAL_WAIT', 'AUTOMATION_BLOCKED'].includes(r['Automation Safe?'])).sort(sortRecovery), columns)
-  writeCsv('21-system-recovery-queue.csv', realRows.filter((r) => r['Automation Safe?'] === 'SAFE_AUTOMATION'), columns)
-  writeCsv('22-external-response-queue.csv', realRows.filter((r) => ['WAITING_ON_AUTHOR', 'WAITING_ON_PROSPECT', 'WAITING_ON_EXTERNAL'].includes(r.WaitingOn)), columns)
-  writeCsv('23-reconciliation-queue.csv', realRows.filter((r) => r.Flags.includes('RECONCILIATION_REQUIRED') || r.LifecycleContext === 'RECONCILIATION_REQUIRED'), columns)
+  writeCsv('02-active-assets.csv', operationalRows.filter((r) => r.WaitingOn !== 'COMPLETE_CURRENT_STAGE'), columns)
+  writeCsv('03-jmp-owes-action.csv', operationalRows.filter((r) => ['WAITING_ON_JMP', 'WAITING_ON_SYSTEM', 'WAITING_ON_JACKIE_JUDGMENT'].includes(r.WaitingOn)), columns)
+  writeCsv('04-author-prospect-owes-action.csv', operationalRows.filter((r) => ['WAITING_ON_AUTHOR', 'WAITING_ON_PROSPECT'].includes(r.WaitingOn)), columns)
+  writeCsv('05-manual-recovery-board.csv', operationalRows.filter((r) => ['P0', 'P1', 'P2'].includes(r.Priority)).sort(sortRecovery), columns)
+  writeCsv('06-automation-safety.csv', realRows, ['Title / Working Title', 'Author Public/Pen Name', 'LifecycleContext', 'OperationallyActive', 'Automation Safe?', 'AutomationLane', 'ReconciliationReason', 'Flags', 'NextManualRecoveryAction'])
+  writeCsv('07-prospect-pipeline.csv', operationalRows.filter((r) => ['PROSPECT_INQUIRY', 'EDITORIAL_REVIEW', 'WAITING_PACKAGE_SELECTION'].includes(r.LifecycleContext)), columns)
+  writeCsv('08-commercial-pipeline.csv', operationalRows.filter((r) => ['COMMERCIAL_CONVERSION', 'AGREEMENT_ESIGN', 'PAYMENT_ONBOARDING'].includes(r.LifecycleContext) || r['Opportunity ID']), columns)
+  writeCsv('09-editorial-pipeline.csv', operationalRows.filter((r) => /EDITORIAL|ACTIVE_EDITORIAL|Developmental|Line|Copy|Proof/i.test(`${r.LifecycleContext} ${r.CurrentEditorialStage}`)), columns)
+  writeCsv('10-production-pipeline.csv', operationalRows.filter((r) => /PRODUCTION|production/i.test(`${r.LifecycleContext} ${r.CurrentProductionStage}`)), columns)
+  writeCsv('11-distribution-pipeline.csv', operationalRows.filter((r) => /DISTRIBUTION|distribution|ingram|coresource|retailer/i.test(`${r.LifecycleContext} ${r.CurrentDistributionStage}`)), columns)
+  writeCsv('12-release-risk.csv', operationalRows.filter((r) => r['Release Date if applicable']).map(withReleaseRisk), [...columns, 'ReleaseRisk'])
+  writeCsv('13-workspace-access-audit.csv', realRows, ['Title / Working Title', 'Author Public/Pen Name', 'LifecycleContext', 'OperationallyActive', 'PortalWorkspaceState', 'Flags'])
+  writeCsv('14-last-human-promise.csv', realRows, ['Title / Working Title', 'Author Public/Pen Name', 'OperationallyActive', 'LastExternalCommunicationDate', 'LastHumanPromise', 'WaitingOn', 'DaysWaiting'])
+  writeCsv('15-stalled-assets.csv', operationalRows.filter((r) => r.Flags.includes('STALLED_JMP_OWNED')), columns)
+  writeCsv('16-missed-promises.csv', operationalRows.filter((r) => r.Flags.includes('PROMISE_MISSED')), columns)
+  writeCsv('17-broken-deliverables.csv', operationalRows.filter((r) => r.Flags.includes('BROKEN_DELIVERABLE')), columns)
+  writeCsv('18-communication-state-mismatches.csv', operationalRows.filter((r) => r.Flags.includes('INCORRECT_PROMISE') || r.Flags.includes('P0_WORKSPACE_ACCESS_MISMATCH')), columns)
+  writeCsv('19-oldest-waits.csv', operationalRows.filter((r) => r.DaysWaiting).sort((a, b) => Number(b.DaysWaiting) - Number(a.DaysWaiting)).slice(0, 10), columns)
+  writeCsv('20-jackie-manual-recovery-now.csv', operationalRows.filter((r) => ['P0', 'P1', 'P2'].includes(r.Priority) && !['EXTERNAL_WAIT', 'AUTOMATION_BLOCKED'].includes(r['Automation Safe?'])).sort(sortRecovery), columns)
+  writeCsv('21-system-recovery-queue.csv', operationalRows.filter((r) => r['Automation Safe?'] === 'SAFE_AUTOMATION'), columns)
+  writeCsv('22-external-response-queue.csv', operationalRows.filter((r) => ['WAITING_ON_AUTHOR', 'WAITING_ON_PROSPECT', 'WAITING_ON_EXTERNAL'].includes(r.WaitingOn)), columns)
+  writeCsv('23-reconciliation-queue.csv', reconciliationRows, columns)
 
   const counts = countSummary(realRows, allRows)
-  writeFileSync(join(OUT_DIR, '00-executive-summary.md'), executiveSummary(counts, realRows))
+  counts.operationallyActive = operationalRows.length
+  counts.activeReconciliationRequired = activeReconciliationRows.length
+  counts.historicalBacklistNoCurrentAction = reconciliationReasonCounts.PUBLISHED_BACKLIST_NO_CURRENT_ACTION || 0
+  counts.duplicateLegacy = (reconciliationReasonCounts.LEGACY_DUPLICATE || 0) + (reconciliationReasonCounts.MULTI_RECORD_SAME_ASSET || 0)
+  counts.unknownRemaining = reconciliationReasonCounts.UNKNOWN || 0
+  writeFileSync(join(OUT_DIR, '00-executive-summary.md'), executiveSummary(counts, operationalRows))
   writeFileSync(join(OUT_DIR, '24-portfolio-counts.md'), portfolioCounts(counts))
   writeFileSync(join(OUT_DIR, '25-final-recovery-assessment.md'), finalAssessment(counts, realRows))
+  writeP1Evidence(p1Rows, activeP1Rows, columns)
+  writeReconciliationEvidence(reconciliationRows, activeReconciliationRows, reconciliationReasonCounts, columns)
   writeChecksums()
+  writeChecksumsFor(P1_DIR)
+  writeChecksumsFor(RECON_DIR)
   console.log(`WROTE ${OUT_DIR}`)
   console.log(JSON.stringify(counts, null, 2))
 }
@@ -492,7 +576,11 @@ function sortRecovery(a, b) {
 }
 
 function writeCsv(name, rows, cols) {
-  writeFileSync(join(OUT_DIR, name), csv(rows.map((row) => ({ ...row, Flags: Array.isArray(row.Flags) ? row.Flags.join(';') : row.Flags })), cols))
+  writeFileSync(join(OUT_DIR, name), csvRows(rows, cols))
+}
+
+function csvRows(rows, cols) {
+  return csv(rows.map((row) => ({ ...row, Flags: Array.isArray(row.Flags) ? row.Flags.join(';') : row.Flags })), cols)
 }
 
 function countSummary(realRows, allRows) {
@@ -529,7 +617,7 @@ function countSummary(realRows, allRows) {
 
 function executiveSummary(counts, rows) {
   const top = rows.sort(sortRecovery).slice(0, 12).map((r) => `| ${r.Priority} | ${r['Title / Working Title']} | ${r['Author Public/Pen Name']} | ${r.LifecycleContext} | ${r.WaitingOn} | ${r.NextManualRecoveryAction} |`).join('\n')
-  return `# Master Publishing Asset Recovery Census\n\nLast verified: ${NOW}\n\nEvidence source: live Dataverse read-only export plus current repository canon. Secret values, manuscript text, signed URLs, and full email bodies were not written.\n\n## Counts\n\n- Total real Publishing assets: ${counts.totalRealAssets}\n- Test/synthetic excluded: ${counts.testSyntheticExcluded}\n- Prospects: ${counts.prospects}\n- Commercial conversion: ${counts.commercial}\n- Active editorial: ${counts.activeEditorial}\n- Production: ${counts.production}\n- Distribution: ${counts.distribution}\n- Scheduled release/date-bearing: ${counts.scheduledRelease}\n- Reconciliation required: ${counts.reconciliationRequired}\n\n## Priority Counts\n\n- P0: ${counts.P0}\n- P1: ${counts.P1}\n- P2: ${counts.P2}\n- P3: ${counts.P3}\n- P4: ${counts.P4}\n\n## Highest Priority Manual Recovery\n\n| Priority | Title / Working Title | Person | Lifecycle | Waiting On | Next Manual Action |\n|---|---|---|---|---|---|\n${top}\n`
+  return `# Master Publishing Asset Recovery Census\n\nLast verified: ${NOW}\n\nEvidence source: live Dataverse read-only export plus current repository canon. Secret values, manuscript text, signed URLs, and full email bodies were not written.\n\n## Counts\n\n- Total real Publishing assets: ${counts.totalRealAssets}\n- Test/synthetic excluded: ${counts.testSyntheticExcluded}\n- Operationally active: ${counts.operationallyActive}\n- Prospects: ${counts.prospects}\n- Commercial conversion: ${counts.commercial}\n- Active editorial: ${counts.activeEditorial}\n- Production: ${counts.production}\n- Distribution: ${counts.distribution}\n- Scheduled release/date-bearing: ${counts.scheduledRelease}\n- Reconciliation required: ${counts.reconciliationRequired}\n- Active reconciliation required: ${counts.activeReconciliationRequired}\n- Historical/backlist no current action: ${counts.historicalBacklistNoCurrentAction}\n- Duplicate/legacy: ${counts.duplicateLegacy}\n- Unknown remaining: ${counts.unknownRemaining}\n\n## Priority Counts\n\n- P0: ${counts.P0}\n- P1: ${counts.P1}\n- P2: ${counts.P2}\n- P3: ${counts.P3}\n- P4: ${counts.P4}\n\n## Highest Priority Manual Recovery\n\n| Priority | Title / Working Title | Person | Lifecycle | Waiting On | Next Manual Action |\n|---|---|---|---|---|---|\n${top}\n`
 }
 
 function portfolioCounts(counts) {
@@ -538,11 +626,38 @@ function portfolioCounts(counts) {
 
 function finalAssessment(counts) {
   const mode = counts.P0 > 0 || counts.communicationMismatches > 0 ? 'ASSISTED_MANUAL_RECOVERY' : 'AUTOMATION_WITH_EXTERNAL_RELEASE_GATES'
-  return `# Final Recovery Assessment\n\nLast verified: ${NOW}\n\nTemporary operating mode: ${mode}\n\nNegative proof:\n\n- real_assets_omitted_without_explanation: requires Jackie review of ledger against known estate; not asserted as zero by automation alone\n- test_assets_in_real_operating_count: ${counts.testSyntheticExcluded > 0 ? 'excluded into TestSyntheticExcluded' : '0 observed'}\n- multi_title_assets_collapsed: 0 by ledger key design\n- unknown_states_guessed: 0; unresolved rows marked reconciliation-required\n- census_stage_mutations: 0\n- census_author_communications: 0\n\nRecommendation: use safe internal automation for evidence generation/reconciliation, and use manual/assisted release for external author/prospect communications until each lane has fresh live proof.\n`
+  return `# Final Recovery Assessment\n\nLast verified: ${NOW}\n\nTemporary operating mode: ${mode}\n\nNegative proof:\n\n- real_assets_omitted_without_explanation: requires Jackie review of ledger against known estate; not asserted as zero by automation alone\n- test_assets_in_real_operating_count: ${counts.testSyntheticExcluded > 0 ? 'excluded into TestSyntheticExcluded' : '0 observed'}\n- multi_title_assets_collapsed: 0 by ledger key design\n- unknown_states_guessed: 0; unresolved rows marked reconciliation-required\n- historical_noise_in_active_board: ${counts.historicalBacklistNoCurrentAction > 0 || counts.duplicateLegacy > 0 ? 'reduced by operationally-active flag' : '0 observed'}\n- census_stage_mutations: 0\n- census_author_communications: 0\n\nRecommendation: use safe internal automation for evidence generation/reconciliation, and use manual/assisted release for external author/prospect communications until each lane has fresh live proof.\n`
+}
+
+function writeP1Evidence(p1Rows, activeP1Rows, columns) {
+  writeFileSync(join(P1_DIR, '01-exact-p1-source-rows.csv'), csvRows(p1Rows, columns))
+  writeFileSync(join(P1_DIR, '02-jackie-p1-recovery-now.csv'), csvRows(activeP1Rows, columns))
+  writeFileSync(join(P1_DIR, '00-executive-summary.md'), `# P1 Service Recovery\n\nLast verified: ${NOW}\n\nEvidence source: master Publishing asset census live Dataverse read-only export.\n\n## Counts\n\n- P1 source rows from current census: ${p1Rows.length}\n- P1 operationally active rows after verification: ${activeP1Rows.length}\n- P1 rows suppressed as non-active reconciliation noise: ${p1Rows.length - activeP1Rows.length}\n\n## Verification Standard\n\nEach active row remains P1 only if it is real, not synthetic, not published/no-action backlist, not merely historical duplicate evidence, and still has WAITING_ON_JMP with a stale promise or stalled JMP-owned action.\n\n## Immediate Queue\n\n${markdownP1Table(activeP1Rows)}\n`)
+}
+
+function writeReconciliationEvidence(reconciliationRows, activeRows, reasonCounts, columns) {
+  const reasonRows = Object.entries(reasonCounts)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([Reason, Count]) => ({ Reason, Count }))
+  writeFileSync(join(RECON_DIR, '01-reconciliation-reason-codes.csv'), csvRows(reconciliationRows, ['Title / Working Title', 'Author Public/Pen Name', 'Project/Title ID', 'LifecycleContext', 'CurrentBusinessStage', 'OperationallyActive', 'ReconciliationReason', 'DuplicateGroupKey', 'DuplicateGroupSize', 'NotesEvidence']))
+  writeFileSync(join(RECON_DIR, '02-reason-counts.csv'), csv(reasonRows, ['Reason', 'Count']))
+  writeFileSync(join(RECON_DIR, '03-active-reconciliation-required.csv'), csvRows(activeRows, columns))
+  writeFileSync(join(RECON_DIR, '04-reconciliation-manual-review.csv'), csvRows(activeRows, ['Priority', 'Title / Working Title', 'Author Public/Pen Name', 'Project/Title ID', 'ReconciliationReason', 'CurrentBusinessStage', 'CurrentEditorialStage', 'CurrentBlocker', 'NotesEvidence', 'NextManualRecoveryAction']))
+  writeFileSync(join(RECON_DIR, '05-operational-board.csv'), csvRows(reconciliationRows.filter((r) => r.OperationallyActive === 'YES'), columns))
+  writeFileSync(join(RECON_DIR, '00-executive-summary.md'), `# Reconciliation Reduction\n\nLast verified: ${NOW}\n\nEvidence source: master Publishing asset census live Dataverse read-only export.\n\n## Reduction\n\n- Reconciliation rows before: ${reconciliationRows.length}\n- Auto-classified non-active historical/backlist: ${reasonCounts.PUBLISHED_BACKLIST_NO_CURRENT_ACTION || 0}\n- Duplicate/legacy rows: ${(reasonCounts.LEGACY_DUPLICATE || 0) + (reasonCounts.MULTI_RECORD_SAME_ASSET || 0)}\n- Active reconciliation remaining: ${activeRows.length}\n- Unknown remaining: ${reasonCounts.UNKNOWN || 0}\n\n## Reason Counts\n\n${Object.entries(reasonCounts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([reason, count]) => `- ${reason}: ${count}`).join('\n')}\n\nNo production records were mutated. Historical/backlist and duplicate rows were separated from the active operating board by evidence classification only.\n`)
+}
+
+function markdownP1Table(rows) {
+  const lines = rows.map((r) => `| ${r.Priority} | ${r['Title / Working Title']} | ${r['Author Public/Pen Name']} | ${r.LifecycleContext} | ${r.CurrentEditorialStage || r.CurrentBusinessStage} | ${r.LastHumanPromise} | ${r.DaysWaiting} | ${r.NextManualRecoveryAction} | ${r['Automation Safe?']} |`)
+  return ['| Priority | Title | Author | Lifecycle | Current Stage | Last Human Promise | Days Waiting | Manual Action Now | Automation Safe? |', '|---|---|---|---|---|---|---:|---|---|', ...lines].join('\n')
 }
 
 function writeChecksums() {
-  const files = execFileSync('find', [OUT_DIR, '-type', 'f', '!', '-name', 'checksums.sha256', '-print'], { encoding: 'utf8' })
+  writeChecksumsFor(OUT_DIR)
+}
+
+function writeChecksumsFor(dir) {
+  const files = execFileSync('find', [dir, '-type', 'f', '!', '-name', 'checksums.sha256', '-print'], { encoding: 'utf8' })
     .trim()
     .split('\n')
     .filter(Boolean)
@@ -551,7 +666,7 @@ function writeChecksums() {
     const data = execFileSync('shasum', ['-a', '256', file], { encoding: 'utf8' }).trim()
     return data
   })
-  writeFileSync(join(OUT_DIR, 'checksums.sha256'), `${lines.join('\n')}\n`)
+  writeFileSync(join(dir, 'checksums.sha256'), `${lines.join('\n')}\n`)
 }
 
 main().catch((error) => {

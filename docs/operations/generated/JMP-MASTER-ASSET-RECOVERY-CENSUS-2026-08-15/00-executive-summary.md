@@ -1,6 +1,6 @@
 # Master Publishing Asset Recovery Census
 
-Last verified: 2026-08-16T02:40:56.062Z
+Last verified: 2026-08-16T07:57:06.866Z
 
 Evidence source: live Dataverse read-only export plus current repository canon. Secret values, manuscript text, signed URLs, and full email bodies were not written.
 
@@ -8,6 +8,7 @@ Evidence source: live Dataverse read-only export plus current repository canon. 
 
 - Total real Publishing assets: 395
 - Test/synthetic excluded: 16
+- Operationally active: 67
 - Prospects: 7
 - Commercial conversion: 0
 - Active editorial: 7
@@ -15,6 +16,10 @@ Evidence source: live Dataverse read-only export plus current repository canon. 
 - Distribution: 0
 - Scheduled release/date-bearing: 0
 - Reconciliation required: 381
+- Active reconciliation required: 53
+- Historical/backlist no current action: 31
+- Duplicate/legacy: 297
+- Unknown remaining: 0
 
 ## Priority Counts
 
