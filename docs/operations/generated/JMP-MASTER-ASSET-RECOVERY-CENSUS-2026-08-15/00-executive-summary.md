@@ -1,6 +1,6 @@
 # Master Publishing Asset Recovery Census
 
-Last verified: 2026-08-16T07:57:06.866Z
+Last verified: 2026-08-16T11:37:19.700Z
 
 Evidence source: live Dataverse read-only export plus current repository canon. Secret values, manuscript text, signed URLs, and full email bodies were not written.
 
@@ -43,5 +43,5 @@ Evidence source: live Dataverse read-only export plus current repository canon. 
 | P1 | The Long Watch | Jackie Smith, Jr. | ACTIVE_EDITORIAL | WAITING_ON_JMP | Verify latest approved artifact and complete next editorial/author-approval step manually. |
 | P2 | Indomitable Indomitable Escaping Witchcraft and Finding My Identity in Christ | Quanisha Dockery | EDITORIAL_REVIEW | WAITING_ON_JMP | Prepare or verify prospect Editorial Review and package-selection communication. |
 | P3 | The Intentional Leader | Jackie Smith, jr. | ACTIVE_EDITORIAL | WAITING_ON_PROSPECT | Verify latest approved artifact and complete next editorial/author-approval step manually. |
-| P3 | Untitled | Atta Boateng | EDITORIAL_REVIEW | WAITING_ON_PROSPECT | Prepare or verify prospect Editorial Review and package-selection communication. |
 | P3 | 'TIL DEATH DO US PART | Jackie Smith, Jr. | ACTIVE_EDITORIAL | WAITING_ON_PROSPECT | Verify latest approved artifact and complete next editorial/author-approval step manually. |
+| P3 | Untitled | Atta Boateng | WAITING_PACKAGE_SELECTION | WAITING_ON_PROSPECT | Monitor package-selection reply; send manual clarification only if promise is stale. |
