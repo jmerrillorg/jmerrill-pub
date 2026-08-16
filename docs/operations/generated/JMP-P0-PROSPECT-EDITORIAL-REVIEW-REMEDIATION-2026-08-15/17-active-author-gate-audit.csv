@@ -1,0 +1,3 @@
+gate_type,expected_context,status,last_verified,evidence_source
+Developmental/Line/Copy/Proof active-author gates,ACTIVE_CONTRACTED_AUTHOR,PRESERVED_BY_POLICY,2026-08-15,lib/server/publishing-lifecycle-context.ts
+Prospect Editorial Review active-author dispatch,PROSPECT_INQUIRY,BLOCKED_BY_POLICY,2026-08-15,lib/server/publishing-dispatch-service.ts

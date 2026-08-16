@@ -5,9 +5,17 @@ import test, { after } from 'node:test'
 const notificationShim = new URL('../lib/server/author-package-notification-engine', import.meta.url)
 const packageEngineShim = new URL('../lib/server/author-review-package-engine', import.meta.url)
 const workingTitleShim = new URL('../lib/server/working-title-policy', import.meta.url)
+const brandShim = new URL('../lib/server/author-communication-brand', import.meta.url)
+const rendererShim = new URL('../lib/server/jm1-enterprise-communication-renderer', import.meta.url)
+const designTokensShim = new URL('../lib/server/jm1-enterprise-design-tokens', import.meta.url)
+const terminologyShim = new URL('../lib/server/author-facing-terminology', import.meta.url)
 let createdNotificationShim = false
 let createdPackageEngineShim = false
 let createdWorkingTitleShim = false
+let createdBrandShim = false
+let createdRendererShim = false
+let createdDesignTokensShim = false
+let createdTerminologyShim = false
 if (!existsSync(notificationShim)) {
   symlinkSync('author-package-notification-engine.ts', notificationShim)
   createdNotificationShim = true
@@ -20,10 +28,30 @@ if (!existsSync(workingTitleShim)) {
   symlinkSync('working-title-policy.ts', workingTitleShim)
   createdWorkingTitleShim = true
 }
+if (!existsSync(brandShim)) {
+  symlinkSync('author-communication-brand.ts', brandShim)
+  createdBrandShim = true
+}
+if (!existsSync(rendererShim)) {
+  symlinkSync('jm1-enterprise-communication-renderer.ts', rendererShim)
+  createdRendererShim = true
+}
+if (!existsSync(designTokensShim)) {
+  symlinkSync('jm1-enterprise-design-tokens.ts', designTokensShim)
+  createdDesignTokensShim = true
+}
+if (!existsSync(terminologyShim)) {
+  symlinkSync('author-facing-terminology.ts', terminologyShim)
+  createdTerminologyShim = true
+}
 after(() => {
   if (createdNotificationShim) unlinkSync(notificationShim)
   if (createdPackageEngineShim) unlinkSync(packageEngineShim)
   if (createdWorkingTitleShim) unlinkSync(workingTitleShim)
+  if (createdBrandShim) unlinkSync(brandShim)
+  if (createdRendererShim) unlinkSync(rendererShim)
+  if (createdDesignTokensShim) unlinkSync(designTokensShim)
+  if (createdTerminologyShim) unlinkSync(terminologyShim)
 })
 
 const {
@@ -56,7 +84,10 @@ function input(overrides = {}) {
     manuscriptStrengths: ['Clear lived experience', 'Strong faith-centered motivation', 'A direct author voice'],
     editorialOpportunities: ['Clarify chapter sequence', 'Reduce repeated setup', 'Prepare the narrative for Developmental Editing'],
     recommendedPath: 'Developmental Editing',
-    stageRecommendation: 'Move to Developmental Editing after author approval of Editorial Review.',
+    stageRecommendation: 'Professional package recommended before commercial onboarding.',
+    primaryPackage: 'Professional Publishing Package',
+    backupPackage: 'Starter Publishing Package',
+    recommendedImprint: 'J Merrill Publishing',
     importantObservations: ['The manuscript should preserve the author voice while improving flow.'],
     nextStageLabel: 'Developmental Editing',
     suggestedTitles: ['Grace in the Turning', 'A Willing Road', 'The Shape of My Yes'],
@@ -77,9 +108,9 @@ test('author-facing Editorial Review package is shared stage logic, not Atta-spe
   assert.equal(pkg.titleSuggestionRequest?.route.fallbackAllowed, false)
   assert.equal(pkg.titleSuggestionRequest?.requiredSuggestionCount, 3)
   assert.deepEqual(pkg.workspacePresentation.decisionOptions, [
-    'APPROVE_AS_PRESENTED',
+    'SELECT_RECOMMENDED_PACKAGE',
+    'SELECT_BACKUP_PACKAGE',
     'QUESTIONS_OR_CLARIFICATION_REQUESTED',
-    'REQUEST_REVISION',
   ])
   assert.deepEqual(pkg.workspacePresentation.titleSelectionTask?.suggestedTitles, [
     'Grace in the Turning',
@@ -102,6 +133,7 @@ test('package artifacts are author-facing and contain no internal implementation
     assert.ok(artifact.contentBytesBase64)
     const rendered = Buffer.from(artifact.contentBytesBase64 || '', 'base64').toString('utf8')
     assert.doesNotMatch(rendered, /Dataverse|execution log|workflow record|internal instruction|package manifest|response mechanism|evidence file/i)
+    assert.doesNotMatch(rendered, /approve this editorial stage|approved with corrections|move to the next publishing stage|fully approve/i)
   }
 })
 

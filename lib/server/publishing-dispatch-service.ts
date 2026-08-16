@@ -34,6 +34,10 @@ import {
   type DataverseServerConfig,
 } from './dataverse-server'
 import type { PackageStageCode } from './author-review-package-engine'
+import {
+  derivePublishingLifecycleContext,
+  type PublishingLifecycleContext,
+} from './publishing-lifecycle-context'
 
 const GATE_STATUS_READY_FOR_AUTHOR_RELEASE = 196650001
 const GATE_STATUS_AWAITING_AUTHOR_RESPONSE = 196650002
@@ -63,6 +67,7 @@ export type PublishingDispatchRequest = {
   packageVersion?: string
   correlationId?: string
   operator?: string
+  lifecycleContext?: PublishingLifecycleContext
 }
 
 export type PublishingDispatchValidation = {
@@ -175,6 +180,7 @@ type DispatchReadback = {
   recipientEmail: string
   stageCode: AuthorReviewPackageType
   stageLabel: string
+  lifecycleContext: PublishingLifecycleContext
   titleStatus: TitleStatus
   packageVersion: string
   packageChecksum: string
@@ -321,6 +327,7 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
   const readback = await readDispatchAuthority(config, input)
   const validation = validateReadback(input, readback)
   const blockers = validationBlockers(validation)
+  const contextBlockers = lifecycleContextBlockers(readback)
   const base: Omit<PublishingDispatchResult, 'status'> = {
     service: 'PublishingDispatchService',
     operation: 'dispatchAuthorPackage',
@@ -334,7 +341,7 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
     idempotencyKey: readback.idempotencyKey,
     naturalKey: readback.naturalKey,
     validation,
-    blockers,
+    blockers: [...blockers, ...contextBlockers],
     executionLogIds: [],
     proposedMutations: [
       'create-or-reuse-one-author-review-gate',
@@ -354,7 +361,7 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
     ],
   }
 
-  if (blockers.length > 0) return { ...base, status: 'blocked' }
+  if (base.blockers.length > 0) return { ...base, status: 'blocked' }
   if (readback.existingOperationalCertification) {
     return {
       ...base,
@@ -556,6 +563,13 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     stringValue(title.jm1pub_authordisplayname || title.jm1pub_authorname || contact.fullname || stage.jm1pub_author) || 'Author'
   const recipientEmail = stringValue(contact.emailaddress1)
   const stageCode = normalizeStageCode(stage)
+  const lifecycleContext = derivePublishingLifecycleContext({
+    lifecycleContext: input.lifecycleContext,
+    businessStage: stringValue(stage.jm1pub_internaloperationalsummary || stage.jm1pub_authorsafesummary),
+    hasContact: Boolean(dataverseLookupId(stage, '_jm1pub_contactid_value')),
+    hasTitle: Boolean(dataverseLookupId(stage, '_jm1pub_titleid_value')),
+    hasEditorialGate: gates.length > 0,
+  })
   const titleReadiness = evaluateTitleReadiness({ process: titlePolicyProcessForStage(stageCode), title: titleName })
   const stageArtifacts = artifacts.filter(
     (artifact) => !dataverseLookupId(artifact, '_jm1pub_editorialstageid_value') || dataverseLookupId(artifact, '_jm1pub_editorialstageid_value') === input.stageId,
@@ -615,6 +629,7 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     recipientEmail,
     stageCode,
     stageLabel: stageLabelFor(stageCode),
+    lifecycleContext,
     titleStatus: titleReadiness.status,
     packageVersion,
     packageChecksum,
@@ -625,6 +640,13 @@ async function readDispatchAuthority(config: DataverseServerConfig, input: Publi
     idempotencyKey,
     naturalKey,
   }
+}
+
+function lifecycleContextBlockers(readback: DispatchReadback) {
+  if (readback.stageCode === 'EDITORIAL_REVIEW' && readback.lifecycleContext === 'PROSPECT_INQUIRY') {
+    return ['PROSPECT_EDITORIAL_REVIEW_REQUIRES_PROSPECT_PACKAGE_SELECTION_PATH']
+  }
+  return []
 }
 
 function validateReadback(input: PublishingDispatchRequest, readback: DispatchReadback): PublishingDispatchValidation {
@@ -887,7 +909,7 @@ async function getTitle(config: DataverseServerConfig, titleId: string) {
 async function getStage(config: DataverseServerConfig, stageId: string) {
   const stage = await dataverseFirst(config, 'jm1pub_editorialstages', {
     $select:
-      'jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_author,jm1pub_authorsafesummary,jm1pub_intakereference,jm1pub_publishingintakereference,_jm1pub_titleid_value,_jm1pub_contactid_value,createdon,modifiedon',
+      'jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_author,jm1pub_authorsafesummary,jm1pub_internaloperationalsummary,jm1pub_intakereference,jm1pub_publishingintakereference,_jm1pub_titleid_value,_jm1pub_contactid_value,createdon,modifiedon',
     $filter: `jm1pub_editorialstageid eq ${stageId}`,
   })
   if (!stage) throw new Error('PUBLISHING_DISPATCH_STAGE_NOT_FOUND')
