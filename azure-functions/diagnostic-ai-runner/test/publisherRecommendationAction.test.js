@@ -7,6 +7,7 @@ const {
   RESEND_EVENT,
   runPublisherRecommendationAction,
   buildRecommendationResendEventPayload,
+  buildPostSendStatePatch,
   buildAwaitingAuthorResponsePatch
 } = require("../src/functions/runPublisherRecommendationAction");
 const { INTERNAL_VISIBILITY_MAILBOX } = require("../src/author/authorResponseDraftBuilder");
@@ -50,7 +51,7 @@ function draftResult() {
           "",
           "If you're ready to begin your publishing journey with J Merrill Publishing, simply reply to this email with your preferred package.",
           "",
-          "As soon as we receive your confirmation, we'll prepare your Author Workspace and guide you through the next steps together.",
+          "Reply with the package you would like to select, or send us any questions you want answered before choosing.",
           "",
           "The J Merrill Publishing Team"
         ].join("\n"),
@@ -77,16 +78,34 @@ describe("publisher recommendation replacement resend", () => {
     });
 
     assert.equal(payload.jm1_actiontype, "AUTHOR_RECOMMENDATION_SUPERSEDED");
-    assert.match(payload.jm1_actiondescription, /Workflow remains Awaiting Author Response/);
+    assert.match(payload.jm1_actiondescription, /LifecycleContext=PROSPECT_INQUIRY/);
+    assert.match(payload.jm1_actiondescription, /DecisionType=PROSPECT_PACKAGE_SELECTION/);
+    assert.match(payload.jm1_actiondescription, /Workflow remains Waiting On Prospect Package Selection/);
     assert.match(payload.jm1_actiondescription, /No package recommendation change/);
     assert.equal(/secret|token|header|prompt body|manuscript text/i.test(payload.jm1_actiondescription), true);
   });
 
-  test("builds durable awaiting-author-response diagnostic state after author send", () => {
+  test("builds durable prospect package-selection state after prospect recommendation send", () => {
+    const patch = buildPostSendStatePatch({
+      sentAt: "2026-08-12T10:35:08Z",
+      lifecycleContext: "PROSPECT_INQUIRY"
+    });
+    assert.equal(patch.jm1_authordraftsendstatus, "AUTHOR_RESPONSE_SENT");
+    assert.match(patch.jm1_authordraftapprovalnotes, /LifecycleContext=PROSPECT_INQUIRY/);
+    assert.match(patch.jm1_authordraftapprovalnotes, /WaitingOwner=Prospect/);
+    assert.match(patch.jm1_authordraftapprovalnotes, /DecisionType=PROSPECT_PACKAGE_SELECTION/);
+    assert.match(patch.jm1_authordraftapprovalnotes, /Waiting On Prospect Package Selection/);
+    assert.doesNotMatch(patch.jm1_authordraftapprovalnotes, /Awaiting Author Response/);
+    assert.match(patch.jm1_authordraftapprovalnotes, /2026-08-12T10:35:08Z/);
+  });
+
+  test("retains durable active-author editorial approval state for active contracted author sends", () => {
     const patch = buildAwaitingAuthorResponsePatch({ sentAt: "2026-08-12T10:35:08Z" });
     assert.equal(patch.jm1_authordraftsendstatus, "AUTHOR_RESPONSE_SENT");
+    assert.match(patch.jm1_authordraftapprovalnotes, /LifecycleContext=ACTIVE_CONTRACTED_AUTHOR/);
+    assert.match(patch.jm1_authordraftapprovalnotes, /WaitingOwner=Author/);
+    assert.match(patch.jm1_authordraftapprovalnotes, /DecisionType=EDITORIAL_STAGE_APPROVAL/);
     assert.match(patch.jm1_authordraftapprovalnotes, /Workflow remains Awaiting Author Response/);
-    assert.match(patch.jm1_authordraftapprovalnotes, /2026-08-12T10:35:08Z/);
   });
 
   test("sends exactly one Editorial Recommendation Letter replacement and logs superseded plus replacement events", async () => {
@@ -122,7 +141,7 @@ describe("publisher recommendation replacement resend", () => {
         events.push(input.eventType);
         return { ok: true, id: `${input.eventType}-id` };
       },
-      persistAwaitingAuthorResponse: async (input) => {
+      persistPostSendState: async (input) => {
         awaitingWrites.push(input);
         return { dataverseRecordId: input.diagnosticId };
       }
@@ -130,7 +149,11 @@ describe("publisher recommendation replacement resend", () => {
 
     assert.equal(result.ok, true);
     assert.equal(result.code, "PUBLISHER_RECOMMENDATION_REPLACEMENT_SENT");
-    assert.equal(result.workflowStatus, "Awaiting Author Response");
+    assert.equal(result.lifecycleContext, "PROSPECT_INQUIRY");
+    assert.equal(result.waitingOwner, "Prospect");
+    assert.equal(result.decisionType, "PROSPECT_PACKAGE_SELECTION");
+    assert.equal(result.responseClockDecisionType, "PROSPECT_PACKAGE_SELECTION");
+    assert.equal(result.workflowStatus, "Waiting On Prospect Package Selection");
     assert.equal(result.authorRecommendationSent, true);
     assert.deepEqual(events, [
       "AUTHOR_RECOMMENDATION_SUPERSEDED",
@@ -140,14 +163,54 @@ describe("publisher recommendation replacement resend", () => {
     assert.equal(sendLogs.length, 1);
     assert.equal(awaitingWrites.length, 1);
     assert.equal(awaitingWrites[0].diagnosticId, DIAGNOSTIC_ID);
-    assert.equal(result.awaitingAuthorResponseStatus, "PERSISTED");
+    assert.equal(awaitingWrites[0].lifecycleContext, "PROSPECT_INQUIRY");
+    assert.equal(result.postSendStateStatus, "PERSISTED");
     assert.equal(sends[0].templateName, "EDITORIAL_RECOMMENDATION_LETTER_V1");
     assert.equal(sends[0].templateVersion, "1.1.0");
+    assert.equal(sends[0].lifecycleContext, "PROSPECT_INQUIRY");
+    assert.equal(sends[0].waitingOwner, "Prospect");
+    assert.equal(sends[0].decisionType, "PROSPECT_PACKAGE_SELECTION");
+    assert.equal(sends[0].responseClockDecisionType, "PROSPECT_PACKAGE_SELECTION");
     assert.match(sends[0].draftHtmlBody, /J MERRILL PUBLISHING/);
     assert.equal(sends[0].templateMetadata.htmlSha256, "a".repeat(64));
     assert.match(sends[0].draftBody, /Editorial Recommendation Letter/);
     assert.match(sends[0].draftBody, /Before we ever ask an author to invest in us/);
     assert.equal(sends[0].draftBody.includes("JMP-PKG-"), false);
     assert.equal(/Stripe|payment link|invoice|credit card|SignNow|workspace access code/i.test(sends[0].draftBody), false);
+  });
+
+  test("resend preserves active-author stage approval semantics when explicitly active", async () => {
+    const awaitingWrites = [];
+    const result = await runPublisherRecommendationAction({
+      diagnosticId: DIAGNOSTIC_ID,
+      intakeReferenceCode: INTAKE_REFERENCE,
+      action: ACTION.RESEND_EDITORIAL_RECOMMENDATION_LETTER,
+      approvedBy: "jackie",
+      confirmAction: true,
+      confirmSend: true,
+      lifecycleContext: "ACTIVE_CONTRACTED_AUTHOR"
+    }, {
+      prepareDraft: async () => draftResult(),
+      sendResponse: async ({ input }) => ({
+        ok: true,
+        deliveryStatus: "AUTHOR_RESPONSE_SENT",
+        providerName: "acs-relay",
+        providerMessageId: input.decisionType
+      }),
+      persistSendLog: async () => ({ ok: true, dataverseSendLogStatus: "DATAVERSE_SEND_LOG_CREATED" }),
+      persistResendEvent: async (input) => ({ ok: true, id: `${input.lifecycleContext}-${input.eventType}` }),
+      persistPostSendState: async (input) => {
+        awaitingWrites.push(input);
+        return { dataverseRecordId: input.diagnosticId };
+      }
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.lifecycleContext, "ACTIVE_CONTRACTED_AUTHOR");
+    assert.equal(result.waitingOwner, "Author");
+    assert.equal(result.decisionType, "EDITORIAL_STAGE_APPROVAL");
+    assert.equal(result.responseClockDecisionType, "EDITORIAL_STAGE_APPROVAL");
+    assert.equal(result.workflowStatus, "Awaiting Author Response");
+    assert.equal(awaitingWrites[0].lifecycleContext, "ACTIVE_CONTRACTED_AUTHOR");
   });
 });
