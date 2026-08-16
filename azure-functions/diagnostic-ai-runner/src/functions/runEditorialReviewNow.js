@@ -17,6 +17,7 @@ const { runPrePackageEditorialReview } = require("../editorial/preContractEditor
 const { preparePublisherRecommendationDraft } = require("../editorial/publisherRecommendationReview");
 const { sendConfiguredAuthorResponse } = require("../author/authorResponseSendProviderConfig");
 const { persistAuthorResponseSendLog } = require("../author/authorResponseSendPersister");
+const { resolveRecommendationSendSemantics } = require("../author/authorRecommendationSendSemantics");
 const {
   REVIEW_RUN_STATUS,
   evaluateRunNowRequest
@@ -38,6 +39,7 @@ function unauthorized() {
 
 function toAutomaticSendApproval({ draftResult }) {
   const view = draftResult.view;
+  const semantics = resolveRecommendationSendSemantics({ lifecycleContext: "PROSPECT_INQUIRY", view });
   return {
     diagnosticId: view.diagnosticId,
     intakeReferenceCode: view.intakeReferenceCode,
@@ -52,9 +54,19 @@ function toAutomaticSendApproval({ draftResult }) {
     templateMetadata: {
       htmlSha256: view.authorFacingRecommendationDraft.htmlChecksum || null,
       textSha256: view.authorFacingRecommendationDraft.textChecksum || null,
-      qualityGate: view.authorFacingRecommendationDraft.qualityGate || null
+      qualityGate: view.authorFacingRecommendationDraft.qualityGate || null,
+      lifecycleContext: semantics.lifecycleContext,
+      waitingOwner: semantics.waitingOwner,
+      decisionType: semantics.decisionType,
+      responseClockDecisionType: semantics.responseClockDecisionType,
+      responseConsumer: semantics.responseConsumer
     },
     templateName: view.authorFacingRecommendationDraft.templateName,
+    lifecycleContext: semantics.lifecycleContext,
+    waitingOwner: semantics.waitingOwner,
+    decisionType: semantics.decisionType,
+    responseClockDecisionType: semantics.responseClockDecisionType,
+    responseConsumer: semantics.responseConsumer,
     decision: "APPROVE_AUTHOR_SEND",
     sendApproved: true,
     approvedBy: "publisher-certified-automation",
@@ -190,6 +202,7 @@ app.http("run-editorial-review-now", {
     }
 
     const sendApproval = toAutomaticSendApproval({ draftResult });
+    const semantics = resolveRecommendationSendSemantics({ lifecycleContext: sendApproval.lifecycleContext });
     const sendResult = await sendConfiguredAuthorResponse({ input: { sendApproval } });
     context.info(
       `Run Editorial Review standard recommendation send attempted; diagnosticId=${diagnosticId}; ok=${sendResult.ok}; code=${sendResult.code || sendResult.reason}; providerCalled=${sendResult.providerCalled === true}`
@@ -226,7 +239,11 @@ app.http("run-editorial-review-now", {
         internalVisibilityStatus: sendResult.internalVisibilityStatus || null,
         dataverseSendLogStatus: sendLog.dataverseSendLogStatus || sendLog.reason || null,
         providerMessageId: sendResult.providerMessageId || null,
-        runControlStatus: REVIEW_RUN_STATUS.AWAITING_AUTHOR_RESPONSE,
+        runControlStatus: REVIEW_RUN_STATUS.WAITING_FOR_PROSPECT_PACKAGE_SELECTION,
+        waitingOwner: semantics.waitingOwner,
+        decisionType: semantics.decisionType,
+        responseClockDecisionType: semantics.responseClockDecisionType,
+        workflowStatus: semantics.workflowStatus,
         authorRecommendationSent: true
       }
     };

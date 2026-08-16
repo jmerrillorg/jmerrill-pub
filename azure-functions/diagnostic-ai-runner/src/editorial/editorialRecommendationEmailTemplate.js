@@ -200,7 +200,7 @@ function buildHtmlEmail(input) {
                 <tr>
                   <td style="padding:22px; color:#ffffff;">
                     <h2 style="font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:28px; margin:0 0 10px 0; color:#ffffff;">Ready to Move Forward?</h2>
-                    <p style="margin:0 0 18px 0; font-size:15px; line-height:24px; color:#e4e8ee;">Reply with the package you would like to select. We will prepare your Author Workspace and guide you through the next steps.</p>
+                    <p style="margin:0 0 18px 0; font-size:15px; line-height:24px; color:#e4e8ee;">Reply with the package you would like to select, or send us any questions you want answered before choosing. We will guide you through the next governed step.</p>
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td style="background:#c7a45a;">
@@ -282,7 +282,7 @@ function buildPlainTextEmail(input) {
     imprintText({ projectTitle, imprintLabel: input.imprintLabel || "J Merrill Publishing" }),
     "",
     "Ready to Move Forward?",
-    "Reply with the package you would like to select. We will prepare your Author Workspace and guide you through the next steps.",
+    "Reply with the package you would like to select, or send us any questions you want answered before choosing. We will guide you through the next governed step.",
     `You can also reply directly to this email at ${BRAND_EMAIL}.`,
     "",
     "Thank you again for inviting us to review your manuscript.",

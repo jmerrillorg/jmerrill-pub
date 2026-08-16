@@ -148,6 +148,8 @@ describe("buildRecommendationView", () => {
     assert.match(body, /Helping Authors Help Themselves\./);
     assert.ok(view.authorFacingRecommendationDraft.htmlBody.includes("J MERRILL PUBLISHING"));
     assert.ok(view.authorFacingRecommendationDraft.htmlBody.includes("Reply With My Selection"));
+    assert.equal(/Author Workspace|workspace access code|author portal/i.test(body), false);
+    assert.equal(/Author Workspace|workspace access code|author portal/i.test(view.authorFacingRecommendationDraft.htmlBody), false);
     assert.equal(view.authorWorkspaceArtifact.type, "Editorial Recommendation Letter");
     assert.ok(view.authorWorkspaceArtifact.subject.includes("Editorial Review & Publishing Recommendation"));
     assert.ok(view.authorWorkspaceArtifact.body.includes("Editorial Review & Publishing Recommendation"));
