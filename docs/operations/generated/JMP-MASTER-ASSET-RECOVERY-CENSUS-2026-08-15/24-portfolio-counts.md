@@ -1,10 +1,10 @@
 # Portfolio Counts
 
-Last verified: 2026-08-16T02:38:39.507Z
+Last verified: 2026-08-16T02:40:56.062Z
 
 ```json
 {
-  "asOf": "2026-08-16T02:38:39.507Z",
+  "asOf": "2026-08-16T02:40:56.062Z",
   "totalRealAssets": 395,
   "testSyntheticExcluded": 16,
   "prospects": 7,

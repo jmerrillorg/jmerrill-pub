@@ -1,6 +1,6 @@
 # Master Publishing Asset Recovery Census
 
-Last verified: 2026-08-16T02:38:39.507Z
+Last verified: 2026-08-16T02:40:56.062Z
 
 Evidence source: live Dataverse read-only export plus current repository canon. Secret values, manuscript text, signed URLs, and full email bodies were not written.
 
