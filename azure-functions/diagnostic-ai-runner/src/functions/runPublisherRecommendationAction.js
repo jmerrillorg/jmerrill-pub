@@ -9,6 +9,7 @@ const {
 } = require("../editorial/publisherRecommendationReview");
 const { sendConfiguredAuthorResponse } = require("../author/authorResponseSendProviderConfig");
 const { persistAuthorResponseSendLog } = require("../author/authorResponseSendPersister");
+const { resolveRecommendationSendSemantics } = require("../author/authorRecommendationSendSemantics");
 const {
   buildAuthorDraftApprovalUpdate,
   AUTHOR_DRAFT_APPROVAL_DECISION
@@ -53,7 +54,8 @@ function blocked(reason, extra = {}) {
   return { ok: false, code: "PUBLISHER_RECOMMENDATION_ACTION_BLOCKED", reason, ...extra };
 }
 
-function toSendApproval({ view, approvedBy, templateName = null }) {
+function toSendApproval({ view, approvedBy, templateName = null, lifecycleContext = null }) {
+  const semantics = resolveRecommendationSendSemantics({ lifecycleContext, view });
   return {
     diagnosticId: view.diagnosticId,
     intakeReferenceCode: view.intakeReferenceCode,
@@ -68,9 +70,19 @@ function toSendApproval({ view, approvedBy, templateName = null }) {
     templateMetadata: {
       htmlSha256: view.authorFacingRecommendationDraft.htmlChecksum || null,
       textSha256: view.authorFacingRecommendationDraft.textChecksum || null,
-      qualityGate: view.authorFacingRecommendationDraft.qualityGate || null
+      qualityGate: view.authorFacingRecommendationDraft.qualityGate || null,
+      lifecycleContext: semantics.lifecycleContext,
+      waitingOwner: semantics.waitingOwner,
+      decisionType: semantics.decisionType,
+      responseClockDecisionType: semantics.responseClockDecisionType,
+      responseConsumer: semantics.responseConsumer
     },
     templateName: templateName || view.authorFacingRecommendationDraft.templateName,
+    lifecycleContext: semantics.lifecycleContext,
+    waitingOwner: semantics.waitingOwner,
+    decisionType: semantics.decisionType,
+    responseClockDecisionType: semantics.responseClockDecisionType,
+    responseConsumer: semantics.responseConsumer,
     decision: "APPROVE_AUTHOR_SEND",
     sendApproved: true,
     approvedBy,
@@ -154,8 +166,10 @@ function buildRecommendationResendEventPayload({
   intakeReferenceCode,
   subject,
   approvedBy,
+  lifecycleContext,
   occurredAt = new Date().toISOString()
 }) {
+  const semantics = resolveRecommendationSendSemantics({ lifecycleContext });
   return {
     jm1_name: `${eventType}-${diagnosticId}`,
     jm1_actiontype: eventType,
@@ -164,7 +178,8 @@ function buildRecommendationResendEventPayload({
       `Subject ${safeTrim(subject)}.`,
       `Approved by ${safeTrim(approvedBy)}.`,
       "Prior recommendation/email supersession and replacement send evidence only.",
-      "Workflow remains Awaiting Author Response.",
+      `LifecycleContext=${semantics.lifecycleContext}; WaitingOwner=${semantics.waitingOwner}; DecisionType=${semantics.decisionType}.`,
+      `Workflow remains ${semantics.workflowStatus}.`,
       "No package recommendation change. No editorial review change. No Opportunity, Stripe, Business Central, royalty, payment, contract, production, distribution, launch, or marketing action occurred.",
       "No manuscript text, prompt body, raw model output, secrets, tokens, or headers stored."
     ].join(" ").slice(0, 1000),
@@ -190,15 +205,23 @@ async function persistRecommendationResendEvent(input = {}, dataverseClient = cr
   };
 }
 
-function buildAwaitingAuthorResponsePatch({ sentAt = new Date().toISOString() } = {}) {
+function buildPostSendStatePatch({ sentAt = new Date().toISOString(), lifecycleContext } = {}) {
+  const semantics = resolveRecommendationSendSemantics({ lifecycleContext });
   return {
     [AUTHOR_DRAFT_FIELD_MAP.draftSendStatus]: "AUTHOR_RESPONSE_SENT",
     [AUTHOR_DRAFT_FIELD_MAP.draftApprovalNotes]:
-      `Author-facing recommendation sent. Workflow remains Awaiting Author Response. Sent at ${sentAt}.`
+      `${semantics.approvalNotes} Sent at ${sentAt}.`
   };
 }
 
-async function persistDiagnosticAwaitingAuthorResponse({ diagnosticId, sentAt = new Date().toISOString(), token } = {}) {
+function buildAwaitingAuthorResponsePatch(input = {}) {
+  return buildPostSendStatePatch({
+    ...input,
+    lifecycleContext: "ACTIVE_CONTRACTED_AUTHOR"
+  });
+}
+
+async function persistDiagnosticPostSendState({ diagnosticId, sentAt = new Date().toISOString(), lifecycleContext, token } = {}) {
   const apiBase = process.env.DATAVERSE_WEB_API_BASE_URL;
   const resourceUrl = process.env.DATAVERSE_RESOURCE_URL;
   if (!apiBase || (!token && !resourceUrl)) {
@@ -207,7 +230,7 @@ async function persistDiagnosticAwaitingAuthorResponse({ diagnosticId, sentAt = 
     });
   }
   const resolvedToken = token || await getDataverseToken(resourceUrl);
-  return patchDataverseRecord(apiBase, resolvedToken, ENTITY_SET, diagnosticId, buildAwaitingAuthorResponsePatch({ sentAt }));
+  return patchDataverseRecord(apiBase, resolvedToken, ENTITY_SET, diagnosticId, buildPostSendStatePatch({ sentAt, lifecycleContext }));
 }
 
 app.http("run-publisher-recommendation-action", {
@@ -234,6 +257,7 @@ app.http("run-publisher-recommendation-action", {
     const reviewerNotes = safeTrim(body.reviewerNotes || body.notes);
     const confirmAction = body.confirmAction === true;
     const confirmSend = body.confirmSend === true;
+    const lifecycleContext = safeTrim(body.lifecycleContext || body.publishingLifecycleContext);
     const deps = { getToken: getDataverseToken };
 
     if (!confirmAction) {
@@ -252,7 +276,8 @@ app.http("run-publisher-recommendation-action", {
         action,
         approvedBy,
         confirmAction,
-        confirmSend
+        confirmSend,
+        lifecycleContext
       });
       return {
         status: result.ok ? 200 : 422,
@@ -342,7 +367,7 @@ app.http("run-publisher-recommendation-action", {
     if (!viewResult.ok) {
       return { status: 422, jsonBody: viewResult };
     }
-    const sendApproval = toSendApproval({ view: viewResult.view, approvedBy });
+    const sendApproval = toSendApproval({ view: viewResult.view, approvedBy, lifecycleContext });
 
     if (!confirmSend) {
       return {
@@ -377,11 +402,13 @@ app.http("run-publisher-recommendation-action", {
       }, createDataverseCreateClient())
       : null;
     const awaitingResult = sendResult.ok && sendResult.deliveryStatus === "AUTHOR_RESPONSE_SENT"
-      ? await persistDiagnosticAwaitingAuthorResponse({
+      ? await persistDiagnosticPostSendState({
         diagnosticId,
-        sentAt: sendResult.sentAt || sendResult.completedAt || new Date().toISOString()
+        sentAt: sendResult.sentAt || sendResult.completedAt || new Date().toISOString(),
+        lifecycleContext: sendApproval.lifecycleContext
       })
       : null;
+    const semantics = resolveRecommendationSendSemantics({ lifecycleContext: sendApproval.lifecycleContext });
 
     return {
       status: sendResult.ok && sendResult.deliveryStatus === "AUTHOR_RESPONSE_SENT" ? 200 : 422,
@@ -394,7 +421,11 @@ app.http("run-publisher-recommendation-action", {
         deliveryStatus: sendResult.deliveryStatus || null,
         internalVisibilityStatus: sendResult.internalVisibilityStatus || null,
         dataverseSendLogStatus: logResult?.dataverseSendLogStatus || logResult?.reason || null,
-        awaitingAuthorResponseStatus: awaitingResult ? "PERSISTED" : null,
+        postSendStateStatus: awaitingResult ? "PERSISTED" : null,
+        waitingOwner: semantics.waitingOwner,
+        decisionType: semantics.decisionType,
+        responseClockDecisionType: semantics.responseClockDecisionType,
+        workflowStatus: semantics.workflowStatus,
         providerMessageId: sendResult.providerMessageId || null,
         authorRecommendationSent: sendResult.deliveryStatus === "AUTHOR_RESPONSE_SENT"
       }
@@ -409,6 +440,7 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
   const approvedBy = safeTrim(input.approvedBy || input.reviewerId);
   const confirmAction = input.confirmAction === true;
   const confirmSend = input.confirmSend === true;
+  const lifecycleContext = safeTrim(input.lifecycleContext || input.publishingLifecycleContext);
 
   if (!confirmAction) return blocked("CONFIRM_PUBLISHER_RECOMMENDATION_ACTION_REQUIRED", { diagnosticId, intakeReferenceCode });
   if (!Object.values(ACTION).includes(action)) return blocked("PUBLISHER_RECOMMENDATION_ACTION_UNSUPPORTED", { diagnosticId, intakeReferenceCode });
@@ -422,7 +454,7 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
   const sendResponse = deps.sendResponse || sendConfiguredAuthorResponse;
   const persistSendLog = deps.persistSendLog || persistAuthorResponseSendLog;
   const persistResendEvent = deps.persistResendEvent || persistRecommendationResendEvent;
-  const persistAwaitingAuthorResponse = deps.persistAwaitingAuthorResponse || persistDiagnosticAwaitingAuthorResponse;
+  const persistPostSendState = deps.persistPostSendState || deps.persistAwaitingAuthorResponse || persistDiagnosticPostSendState;
   const dataverseClient = deps.dataverseClient || createDataverseCreateClient();
 
   const draftResult = await prepareDraft({ diagnosticId, intakeReferenceCode }, {
@@ -434,15 +466,18 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
   const sendApproval = toSendApproval({
     view: draftResult.view,
     approvedBy,
-    templateName: "EDITORIAL_RECOMMENDATION_LETTER_V1"
+    templateName: "EDITORIAL_RECOMMENDATION_LETTER_V1",
+    lifecycleContext
   });
+  const semantics = resolveRecommendationSendSemantics({ lifecycleContext: sendApproval.lifecycleContext });
 
   const superseded = await persistResendEvent({
     eventType: RESEND_EVENT.SUPERSEDED,
     diagnosticId,
     intakeReferenceCode,
     subject: sendApproval.draftSubject,
-    approvedBy
+    approvedBy,
+    lifecycleContext: semantics.lifecycleContext
   }, dataverseClient);
 
   const sendResult = await sendResponse({ input: { sendApproval } });
@@ -465,9 +500,10 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
     providerName: sendResult.providerName,
     providerMessageId: sendResult.providerMessageId
   }, dataverseClient);
-  const awaitingAuthorResponse = await persistAwaitingAuthorResponse({
+  const postSendState = await persistPostSendState({
     diagnosticId,
-    sentAt: sendResult.sentAt || sendResult.completedAt || new Date().toISOString()
+    sentAt: sendResult.sentAt || sendResult.completedAt || new Date().toISOString(),
+    lifecycleContext: semantics.lifecycleContext
   });
 
   const replacement = await persistResendEvent({
@@ -475,7 +511,8 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
     diagnosticId,
     intakeReferenceCode,
     subject: sendApproval.draftSubject,
-    approvedBy
+    approvedBy,
+    lifecycleContext: semantics.lifecycleContext
   }, dataverseClient);
 
   return {
@@ -491,9 +528,13 @@ async function runPublisherRecommendationAction(input = {}, deps = {}) {
     supersededEventId: superseded.id || null,
     replacementEventId: replacement.id || null,
     dataverseSendLogStatus: sendLog.dataverseSendLogStatus || sendLog.reason || null,
-    awaitingAuthorResponseStatus: awaitingAuthorResponse ? "PERSISTED" : null,
+    postSendStateStatus: postSendState ? "PERSISTED" : null,
     authorRecommendationSent: true,
-    workflowStatus: "Awaiting Author Response"
+    lifecycleContext: semantics.lifecycleContext,
+    waitingOwner: semantics.waitingOwner,
+    decisionType: semantics.decisionType,
+    responseClockDecisionType: semantics.responseClockDecisionType,
+    workflowStatus: semantics.workflowStatus
   };
 }
 
@@ -502,6 +543,7 @@ module.exports = {
   RESEND_EVENT,
   runPublisherRecommendationAction,
   buildRecommendationResendEventPayload,
+  buildPostSendStatePatch,
   buildAwaitingAuthorResponsePatch,
   persistRecommendationResendEvent
 };

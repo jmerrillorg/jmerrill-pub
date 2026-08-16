@@ -3,28 +3,10 @@ name: Publishing App Service CI/CD
 on:
   workflow_dispatch:
     inputs:
-      deploy_production:
-        description: "Deploy approved staging artifact to production after environment approval"
+      rollback_reason:
+        description: "Required governed rollback reason for the superseded pre-Premium Publishing App Service path."
         required: true
-        default: "false"
-        type: choice
-        options:
-          - "false"
-          - "true"
-  push:
-    branches:
-      - main
-    paths:
-      - "app/**"
-      - "lib/**"
-      - "public/**"
-      - "scripts/**"
-      - "infra/jm1-infra-006/app-service/**"
-      - "package.json"
-      - "package-lock.json"
-      - "next.config.*"
-      - "tsconfig.json"
-      - ".github/workflows/azure-app-service-publishing.yml"
+        type: string
 
 permissions:
   contents: read

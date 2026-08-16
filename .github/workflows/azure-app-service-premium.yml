@@ -1,0 +1,94 @@
+name: Deploy J Merrill Publishing to Premium App Service
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "lib/**"
+      - "public/**"
+      - "scripts/**"
+      - "package.json"
+      - "package-lock.json"
+      - "next.config.*"
+      - ".github/workflows/azure-app-service-premium.yml"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: jmerrill-pub-premium-appservice-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "24"
+  AZURE_RESOURCE_GROUP: rg-jm1-web-prod-premium
+  AZURE_WEBAPP_NAME: app-jm1-pub-prod-v2
+  APP_SERVICE_PACKAGE: jmerrill-pub-appservice-${{ github.sha }}.zip
+  PRODUCTION_HEALTH_URL: https://jmerrill.pub/api/health
+
+jobs:
+  deploy:
+    name: Build, Package, Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run deployment guards
+        run: |
+          npm run jm1-bootstrap -- --initiative "Publishing Premium App Service Deployment" --mode "deployment"
+          npm run jm1-bootstrap-guard
+          npm run jm1-canon-consistency-guard
+          npm run jm1-canon-guard-enforcement
+          npm run jm1-initiative-handoff-guard
+          node scripts/check-catalog-runtime-source.mjs
+          node scripts/infra006_health_contract.test.mjs
+
+      - name: Build
+        env:
+          JM1_RELEASE_SHA: ${{ github.sha }}
+        run: npm run build
+
+      - name: Package App Service artifact
+        run: JM1_RELEASE_SHA="${{ github.sha }}" npm run package:appservice -- "${APP_SERVICE_PACKAGE}"
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Configure runtime
+        run: |
+          az webapp config set --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --linux-fx-version "NODE|24-lts" --startup-file "node server.js"
+          az webapp config appsettings set --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --settings JM1_RELEASE_SHA="${{ github.sha }}" SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false WEBSITE_RUN_FROM_PACKAGE=1 WEBSITE_SKIP_NODE_MODULES_TAR=1 WEBSITE_WARMUP_PATH=/api/health WEBSITE_WARMUP_STATUSES=200 --output none
+
+      - name: Deploy artifact
+        run: az webapp deploy --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_WEBAPP_NAME" --src-path "$APP_SERVICE_PACKAGE" --type zip --clean true
+
+      - name: Health probe
+        run: |
+          for attempt in {1..18}; do
+            code="$(curl -fsS -o /tmp/health.json -w '%{http_code}' --max-time 20 "$PRODUCTION_HEALTH_URL" || true)"
+            if [ "$code" = "200" ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          cat /tmp/health.json 2>/dev/null || true
+          exit 1
