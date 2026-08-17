@@ -1,13 +1,13 @@
 # Portfolio Counts
 
-Last verified: 2026-08-17T01:22:36.151Z
+Last verified: 2026-08-17T02:18:20.394Z
 
 ```json
 {
-  "asOf": "2026-08-17T01:22:36.151Z",
-  "totalRealAssets": 395,
-  "testSyntheticExcluded": 16,
-  "prospects": 7,
+  "asOf": "2026-08-17T02:18:20.394Z",
+  "totalRealAssets": 394,
+  "testSyntheticExcluded": 17,
+  "prospects": 6,
   "commercial": 0,
   "activeEditorial": 7,
   "production": 0,
@@ -19,18 +19,18 @@ Last verified: 2026-08-17T01:22:36.151Z
   "P1": 8,
   "P2": 1,
   "P3": 3,
-  "P4": 383,
+  "P4": 382,
   "waitingOnJmp": 9,
   "waitingOnAuthor": 0,
   "waitingOnProspect": 3,
   "waitingOnSystem": 0,
   "waitingOnExternal": 0,
-  "waitingOnJackie": 2,
+  "waitingOnJackie": 1,
   "manualHoldReconciliation": 381,
   "stalled": 8,
   "brokenDeliverables": 0,
   "communicationMismatches": 0,
-  "operationallyActive": 67,
+  "operationallyActive": 66,
   "activeReconciliationRequired": 53,
   "historicalBacklistNoCurrentAction": 31,
   "duplicateLegacy": 297,

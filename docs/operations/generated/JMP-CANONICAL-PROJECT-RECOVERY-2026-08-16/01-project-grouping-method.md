@@ -1,6 +1,6 @@
 # Canonical Project Grouping Method
 
-Last verified: 2026-08-17T01:22:36.151Z
+Last verified: 2026-08-17T02:18:20.394Z
 
 Grouping order:
 

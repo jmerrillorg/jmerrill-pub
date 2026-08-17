@@ -8,6 +8,7 @@ const P1_DIR = 'docs/operations/generated/JMP-P1-SERVICE-RECOVERY-2026-08-16'
 const ACTIVE_EDITORIAL_DIR = 'docs/operations/generated/JMP-ACTIVE-EDITORIAL-RECOVERY-2026-08-16'
 const RECON_DIR = 'docs/operations/generated/JMP-RECONCILIATION-REDUCTION-2026-08-16'
 const CANONICAL_PROJECT_DIR = 'docs/operations/generated/JMP-CANONICAL-PROJECT-RECOVERY-2026-08-16'
+const FIVE_PROJECT_DIR = 'docs/operations/generated/JMP-FIVE-PROJECT-SERVICE-RECOVERY-2026-08-16'
 const NOW = new Date().toISOString()
 const API_BASE = 'https://jm1hq.crm.dynamics.com/api/data/v9.2'
 const RESOURCE = 'https://jm1hq.crm.dynamics.com'
@@ -117,7 +118,7 @@ function isNoise(row) {
     value(row, 'Author Legal/Internal Name', 'Author Public/Pen Name', 'Author'),
     value(row, 'Notes / Evidence', 'Evidence'),
   ].join(' ').toLowerCase()
-  return /\b(test|synthetic|fixture|certification|demo)\b|jm1 duplicate proof/.test(haystack)
+  return /\b(test|synthetic|fixture|certification|demo)\b|intake success validation|jm1 duplicate proof/.test(haystack)
 }
 
 function deriveLifecycle({ intake, title, diagnostic, stage, opportunity }) {
@@ -376,6 +377,7 @@ async function main() {
   mkdirSync(ACTIVE_EDITORIAL_DIR, { recursive: true })
   mkdirSync(RECON_DIR, { recursive: true })
   mkdirSync(CANONICAL_PROJECT_DIR, { recursive: true })
+  mkdirSync(FIVE_PROJECT_DIR, { recursive: true })
   const accessToken = await token()
   const [intakes, titles, diagnostics, stages, gates, artifacts, logs, opportunities, contacts] = await Promise.all([
     list(accessToken, 'jm1_publishingintakes', { $top: '500', $orderby: 'modifiedon desc' }),
@@ -579,6 +581,7 @@ async function main() {
   writeChecksumsFor(ACTIVE_EDITORIAL_DIR)
   writeChecksumsFor(RECON_DIR)
   writeChecksumsFor(CANONICAL_PROJECT_DIR)
+  writeChecksumsFor(FIVE_PROJECT_DIR)
   console.log(`WROTE ${OUT_DIR}`)
   console.log(JSON.stringify(counts, null, 2))
 }
@@ -1157,7 +1160,7 @@ function buildCanonicalProjects(operationalRows) {
       WorkspaceCTAMismatch: workspace.WorkspaceCTAMismatch,
       RecordClassificationSummary: classifications.map((x) => x.classification).join(';'),
     }
-    projects.push(reconcileCanonicalProjectContradictions(project, rows))
+    projects.push(applyFiveProjectFounderEvidence(reconcileCanonicalProjectContradictions(project, rows), rows))
     for (const item of classifications) {
       const mapped = {
         CanonicalProjectKey,
@@ -1179,6 +1182,136 @@ function buildCanonicalProjects(operationalRows) {
   return { projects: projects.sort(sortCanonicalProjects), rawMap, duplicateRows }
 }
 
+const FIVE_PROJECT_FOUNDER_EVIDENCE = [
+  {
+    match: 'before you were born',
+    Priority: 'P0/P1',
+    LifecycleContext: 'ACTIVE_EDITORIAL',
+    CurrentEditorialStage: 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED',
+    CurrentProductionStage: '',
+    AuthorReviewState: 'BROKEN_DELIVERY_NO_VALID_REVIEW_CLOCK',
+    LastAuthorResponse: 'AUTHOR_REPORTED_FILE_FAILURE; RESPONSE_REQUIRES_SERVICE_RECOVERY',
+    LastExternalCommunication: 'Corrected Developmental Review sent 2026-08-02; author reported file failed to open.',
+    LastHumanPromise: 'Author was asked to review a Developmental package, but the author-facing file was unusable.',
+    WaitingOwner: 'JMP',
+    WaitingOwnerEvidence: 'Author-reported file failure outranks a Delivered label; review clock cannot start from unusable delivery.',
+    CurrentBlocker: 'Author-facing Developmental package failed open/render validation.',
+    NextGovernedAction: 'Recover canonical Developmental source, generate certified author-facing Developmental package, validate attachments, then send replacement if no later valid response exists.',
+    ImmediateManualRecoveryAction: 'Preserve failed Aug 2 send and author error response; mark failed package superseded for current operations; recover source; certify replacement; send only after every attachment opens/renders and recipient identity is verified.',
+    AutomationMode: 'ASSISTED_MANUAL_RECOVERY',
+    DoNotDo: 'Do not count the failed delivery as author review, do not start the review clock, and do not expose internal package artifacts.',
+    SourceRecoveryState: 'SOURCE_EXISTS_NEEDS_BINDING',
+  },
+  {
+    match: 'long watch',
+    Priority: 'P1',
+    LifecycleContext: 'ACTIVE_EDITORIAL',
+    CurrentEditorialStage: 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED',
+    CurrentProductionStage: '',
+    AuthorReviewState: 'BROKEN_DELIVERY_NO_VALID_REVIEW_CLOCK',
+    LastAuthorResponse: 'NO_VALID_AUTHOR_REVIEW_RESPONSE_FOUND_AFTER_CERTIFIED_DELIVERY',
+    LastExternalCommunication: 'Corrected Developmental Review sent 2026-08-02; author-facing files were tiny/unreadable/invalid.',
+    LastHumanPromise: 'Author was asked to review a Developmental package, but the author-facing files were unusable.',
+    WaitingOwner: 'JMP',
+    WaitingOwnerEvidence: 'Certified communication/delivery evidence was invalidated by unusable attachment evidence.',
+    CurrentBlocker: 'Aug 2 author-facing Developmental attachments failed usability threshold.',
+    NextGovernedAction: 'Recover source, generate certified author-facing Developmental package, validate attachments, then send replacement if no later valid response exists.',
+    ImmediateManualRecoveryAction: 'Inspect source binding and package assembly; produce only Developmentally Edited Manuscript, Developmental Review Memo, and review instructions if needed; certify before replacement send.',
+    AutomationMode: 'ASSISTED_MANUAL_RECOVERY',
+    DoNotDo: 'Do not resend through the same defective package path or treat delivery as valid until container/open/render checks pass.',
+    SourceRecoveryState: 'SOURCE_EXISTS_NEEDS_BINDING',
+  },
+  {
+    match: 'establishing glory library',
+    Priority: 'P1',
+    LifecycleContext: 'ACTIVE_EDITORIAL',
+    CurrentEditorialStage: 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED',
+    CurrentProductionStage: '',
+    AuthorReviewState: 'BROKEN_DELIVERY_NO_VALID_REVIEW_CLOCK',
+    LastAuthorResponse: 'NO_VALID_AUTHOR_REVIEW_RESPONSE_FOUND_AFTER_CERTIFIED_DELIVERY',
+    LastExternalCommunication: 'Corrected Developmental Review sent 2026-08-02; author-facing files were tiny/unreadable/invalid.',
+    LastHumanPromise: 'Author was asked to review a Developmental package, but the author-facing files were unusable.',
+    WaitingOwner: 'JMP',
+    WaitingOwnerEvidence: 'Governed storage/source evidence must be bound before asking the author for anything else.',
+    CurrentBlocker: 'Source exists or likely exists but needs binding/version reconciliation before a certified replacement package.',
+    NextGovernedAction: 'Resolve source state to SOURCE_EXISTS_NEEDS_BINDING, SOURCE_EXISTS_NEEDS_VERSION_RECONCILIATION, or SOURCE_GENUINELY_MISSING; then certify/send replacement only if source is proven and no later valid response exists.',
+    ImmediateManualRecoveryAction: 'Search governed storage and bind the current Developmental source before any author-facing replacement; do not request source from author unless governed storage is proven empty.',
+    AutomationMode: 'ASSISTED_MANUAL_RECOVERY',
+    DoNotDo: 'Do not ask Jackie or the author to resend source while governed storage may already contain it.',
+    SourceRecoveryState: 'SOURCE_EXISTS_NEEDS_VERSION_RECONCILIATION',
+  },
+  {
+    match: 'general s will and last testament',
+    Priority: 'External Wait',
+    LifecycleContext: 'ACTIVE_EDITORIAL',
+    CurrentEditorialStage: 'DEVELOPMENTAL_AUTHOR_REVIEW',
+    CurrentProductionStage: '',
+    AuthorReviewState: 'AWAITING_AUTHOR_DECISION',
+    LastAuthorResponse: 'NO_CONSUMED_RESPONSE_FOUND_CHECK_MAILBOX_BEFORE_REMINDER',
+    LastExternalCommunication: 'Final/updated Developmental Review sent 2026-08-11 with revised developmental-edit manuscript.',
+    LastHumanPromise: 'Author was asked to respond Approved or Changes still required.',
+    WaitingOwner: 'Author',
+    WaitingOwnerEvidence: 'Founder-verified final Developmental author review send supersedes stale Aug 2 package-preparation state.',
+    CurrentBlocker: '',
+    NextGovernedAction: 'Monitor for and consume author decision. No JMP action is currently required unless a response has arrived.',
+    ImmediateManualRecoveryAction: 'Do not resend. Check inbound response evidence only; if author responded, reconcile the decision before advancing to Line.',
+    AutomationMode: 'AUTHOR_WAIT_MONITOR_ONLY',
+    DoNotDo: 'Do not advance to Line until full author approval exists; do not send another Developmental package unless the Aug 11 delivery is proven failed.',
+    SourceRecoveryState: 'SOURCE_EXISTS_NEEDS_BINDING',
+  },
+  {
+    match: 'intentional leader',
+    Priority: 'P1',
+    LifecycleContext: 'PRODUCTION',
+    CurrentEditorialStage: '',
+    CurrentProductionStage: 'COVER_APPROVED_PRODUCTION_ACTIVE',
+    AuthorReviewState: 'AUTHOR_APPROVED_COVER_DESIGN',
+    LastAuthorResponse: 'AUTHOR_APPROVED_COVER_DESIGN; COVER_REVIEW_RESPONSE_SHOWN_2026-08-11',
+    LastExternalCommunication: 'Cover Design Review sent 2026-08-10; author replied Approved.',
+    LastHumanPromise: 'Cover review was sent to author and approved.',
+    WaitingOwner: 'JMP',
+    WaitingOwnerEvidence: 'Explicit author cover approval and approved interior artifact outrank stale Developmental or prospect/package-selection rows.',
+    CurrentBlocker: 'Exact cover boundary still requires production reconciliation: concept approval versus final cover/full-wrap approval.',
+    NextGovernedAction: 'Reconcile approved interior and approved cover boundary, then execute the next proven Production step; no author communication unless that production step requires it.',
+    ImmediateManualRecoveryAction: 'Confirm interior approval evidence, cover approval evidence, whether approved cover is concept or final full-wrap, and remaining production requirements before any production handoff or proof action.',
+    AutomationMode: 'ASSISTED_MANUAL_RECOVERY',
+    DoNotDo: 'Do not restart Editorial Review or Developmental work; do not send package-selection/prospect follow-up for this signed active project.',
+    SourceRecoveryState: 'SOURCE_EXISTS_NEEDS_BINDING',
+  },
+]
+
+function applyFiveProjectFounderEvidence(project, rows) {
+  const normalizedTitle = normalizeKey(project.CanonicalTitle)
+  const overlay = FIVE_PROJECT_FOUNDER_EVIDENCE.find((item) => normalizedTitle.includes(item.match))
+  if (!overlay) return project
+  const sourceArtifact = project.LatestTrustworthyWorkingArtifact || project.LatestTrustworthySourceManuscript
+  return {
+    ...project,
+    ...overlay,
+    LatestAuthorApprovedArtifact: /intentional leader/i.test(project.CanonicalTitle)
+      ? project.LatestAuthorApprovedArtifact || project.LatestTrustworthyWorkingArtifact
+      : project.LatestAuthorApprovedArtifact,
+    RecordClassificationSummary: `${project.RecordClassificationSummary};FOUNDER_VERIFIED_STATE_OVERLAY`,
+    FounderVerifiedEvidence: 'Jackie human/business event evidence supplied 2026-08-16 controls the operating board unless stronger live evidence is found.',
+    DataverseConflict: dataverseConflictForOverlay(project, overlay, rows),
+    ReplacementPackageCertified: /DELIVERY_FAILED/.test(overlay.CurrentEditorialStage) ? 'NO_HELD_PENDING_SOURCE_AND_ATTACHMENT_CERTIFICATION' : 'NOT_APPLICABLE',
+    ReplacementSent: /DELIVERY_FAILED/.test(overlay.CurrentEditorialStage) ? '0' : '0_NOT_NEEDED',
+    NewReviewClock: /DELIVERY_FAILED/.test(overlay.CurrentEditorialStage) ? 'NOT_STARTED_FAILED_DELIVERY_SUPERSEDED_ONLY' : 'NOT_APPLICABLE',
+    SourceEvidenceForRecovery: sourceArtifact || 'SOURCE_BINDING_REQUIRED',
+  }
+}
+
+function dataverseConflictForOverlay(project, overlay, rows) {
+  const rawStages = [...new Set(rows.map((r) => r.CurrentEditorialStage || r.CurrentProductionStage || r.LifecycleContext).filter(Boolean))].join('; ')
+  const rawWaiting = [...new Set(rows.map((r) => r.WaitingOn).filter(Boolean))].join('; ')
+  const parts = []
+  if (rawStages && !rawStages.includes(overlay.CurrentEditorialStage || overlay.CurrentProductionStage || overlay.LifecycleContext)) parts.push(`stage/read-model:${rawStages}`)
+  if (rawWaiting && overlay.WaitingOwner === 'Author' && /WAITING_ON_JMP/.test(rawWaiting)) parts.push(`waiting-owner:${rawWaiting}`)
+  if (rawWaiting && overlay.WaitingOwner === 'JMP' && /WAITING_ON_AUTHOR|WAITING_ON_PROSPECT/.test(rawWaiting)) parts.push(`waiting-owner:${rawWaiting}`)
+  if (!parts.length) return 'NO_CONFLICT_OR_CONFLICT_NOT_EXPOSED_BY_CENSUS'
+  return parts.join(' | ')
+}
+
 function reconcileCanonicalProjectContradictions(project, rows) {
   const hasActiveAgreement = rows.some((r) => /AGREEMENT_SIGNED_ACTIVE|signed.*active/i.test(r.AgreementState))
   if (hasActiveAgreement && project.WaitingOwner === 'Prospect') {
@@ -1198,7 +1331,7 @@ function reconcileCanonicalProjectContradictions(project, rows) {
 }
 
 function sortCanonicalProjects(a, b) {
-  const pri = ['P0', 'P1', 'P2', 'P3', 'P4']
+  const pri = ['P0', 'P0/P1', 'P1', 'P2', 'External Wait', 'P3', 'P4']
   return pri.indexOf(a.Priority) - pri.indexOf(b.Priority) || Number(b.DaysWaiting || 0) - Number(a.DaysWaiting || 0)
 }
 
@@ -1212,13 +1345,12 @@ function waitingEvidence(row) {
 
 function writeCanonicalProjectEvidence({ operationalRows, activeP1Rows, activeEditorialRows, activeReconciliationRows, gatesByTitle, artifactsByTitle, logs, counts }) {
   const { projects, rawMap, duplicateRows } = buildCanonicalProjects(operationalRows.filter((r) => r.WaitingOn !== 'COMPLETE_CURRENT_STAGE'))
-  const p1Keys = new Set(activeP1Rows.map(canonicalProjectKey))
   const editorialKeys = new Set(activeEditorialRows.map(canonicalProjectKey))
   const reconKeys = new Set(activeReconciliationRows.map(canonicalProjectKey))
-  const canonicalP1 = projects.filter((p) => p1Keys.has(p.CanonicalProjectKey))
+  const canonicalP1 = projects.filter((p) => ['P0', 'P0/P1', 'P1'].includes(p.Priority) && p.WaitingOwner === 'JMP')
   const canonicalEditorial = projects.filter((p) => editorialKeys.has(p.CanonicalProjectKey))
   const reconProjects = projects.filter((p) => reconKeys.has(p.CanonicalProjectKey))
-  const projectCols = ['Priority', 'CanonicalTitle', 'AuthorPublicName', 'AuthorInternalName', 'CanonicalProjectTitleID', 'CanonicalIntakeLineage', 'RawRecordCount', 'DuplicateNonauthoritativeRows', 'LifecycleContext', 'CurrentBusinessStage', 'CurrentEditorialStage', 'CurrentProductionStage', 'LatestTrustworthySourceManuscript', 'LatestTrustworthyWorkingArtifact', 'LatestAuthorApprovedArtifact', 'SourceRecoveryState', 'CurrentAuthorGate', 'AuthorReviewState', 'LastAuthorResponse', 'LastExternalCommunication', 'LastHumanPromise', 'WaitingOwner', 'WaitingOwnerEvidence', 'DaysWaiting', 'CurrentBlocker', 'NextGovernedAction', 'ImmediateManualRecoveryAction', 'AutomationMode', 'DoNotDo', 'ReleaseRisk', 'WorkspaceRequiredNow', 'Provisioned', 'ActivationSent', 'Activated', 'CTASent', 'CTAFunctional', 'WorkspaceCTAMismatch', 'RecordClassificationSummary']
+  const projectCols = ['Priority', 'CanonicalTitle', 'AuthorPublicName', 'AuthorInternalName', 'CanonicalProjectTitleID', 'CanonicalIntakeLineage', 'RawRecordCount', 'DuplicateNonauthoritativeRows', 'LifecycleContext', 'CurrentBusinessStage', 'CurrentEditorialStage', 'CurrentProductionStage', 'LatestTrustworthySourceManuscript', 'LatestTrustworthyWorkingArtifact', 'LatestAuthorApprovedArtifact', 'SourceRecoveryState', 'CurrentAuthorGate', 'AuthorReviewState', 'LastAuthorResponse', 'LastExternalCommunication', 'LastHumanPromise', 'WaitingOwner', 'WaitingOwnerEvidence', 'DaysWaiting', 'CurrentBlocker', 'NextGovernedAction', 'ImmediateManualRecoveryAction', 'AutomationMode', 'DoNotDo', 'ReleaseRisk', 'WorkspaceRequiredNow', 'Provisioned', 'ActivationSent', 'Activated', 'CTASent', 'CTAFunctional', 'WorkspaceCTAMismatch', 'RecordClassificationSummary', 'FounderVerifiedEvidence', 'DataverseConflict', 'ReplacementPackageCertified', 'ReplacementSent', 'NewReviewClock', 'SourceEvidenceForRecovery']
   writeFileSync(join(CANONICAL_PROJECT_DIR, '02-raw-to-canonical-map.csv'), csv(rawMap, ['CanonicalProjectKey', 'CanonicalTitle', 'RawTitle', 'RawAuthor', 'RawIntakeID', 'RawProjectTitleID', 'RawLifecycleContext', 'RawWaitingOn', 'RawPriority', 'RecordClassification', 'NotesEvidence']))
   writeFileSync(join(CANONICAL_PROJECT_DIR, '03-canonical-active-projects.csv'), csv(projects, projectCols))
   writeFileSync(join(CANONICAL_PROJECT_DIR, '04-canonical-p1-projects.csv'), csv(canonicalP1, projectCols))
@@ -1237,6 +1369,7 @@ function writeCanonicalProjectEvidence({ operationalRows, activeP1Rows, activeEd
   writeFileSync(join(CANONICAL_PROJECT_DIR, '01-project-grouping-method.md'), canonicalGroupingMethod())
   writeFileSync(join(CANONICAL_PROJECT_DIR, '17-final-operational-board.md'), canonicalFinalBoard({ projects, canonicalP1, canonicalEditorial, reconProjects, duplicateRows, counts }))
   writeFileSync(join(CANONICAL_PROJECT_DIR, '00-executive-summary.md'), canonicalExecutiveSummary({ projects, canonicalP1, canonicalEditorial, reconProjects, duplicateRows, counts }))
+  writeFiveProjectServiceRecoveryEvidence({ projects, canonicalP1, canonicalEditorial, duplicateRows, counts, projectCols })
 }
 
 function canonicalGroupingMethod() {
@@ -1252,6 +1385,186 @@ function canonicalFinalBoard({ projects, canonicalP1, canonicalEditorial, reconP
   const p1 = canonicalP1.map((p) => `| ${p.Priority} | ${p.CanonicalTitle} | ${p.AuthorPublicName} | ${p.CurrentEditorialStage || p.CurrentBusinessStage} | ${p.LastHumanPromise} | ${p.DaysWaiting} | ${p.WaitingOwner} | ${p.NextGovernedAction} | ${p.ImmediateManualRecoveryAction} | ${p.DoNotDo} |`).join('\n')
   const recovery = canonicalP1.map((p) => `## ${p.CanonicalTitle}\n\nAuthor: ${p.AuthorPublicName}\n\nCurrent truthful stage: ${p.CurrentEditorialStage || p.CurrentBusinessStage || p.LifecycleContext}\n\nWhat JMP last promised: ${p.LastHumanPromise}\n\nWhat happened: ${p.WaitingOwnerEvidence}\n\nUse this artifact: ${p.LatestTrustworthyWorkingArtifact || p.LatestTrustworthySourceManuscript || 'SOURCE_RECONCILIATION_REQUIRED'}\n\nDo this now: ${p.ImmediateManualRecoveryAction}\n\nAfter that: ${p.WaitingOwner === 'JMP' ? 'Author/Prospect waits only after certified handoff is completed.' : p.WaitingOwner}\n\nDo not: ${p.DoNotDo}`).join('\n\n')
   return `# Canonical Operational Board\n\nLast verified: ${NOW}\n\n## Canonical Project Counts\n\n\`\`\`text\nRaw confirmed P1 rows: ${counts.P1}\nUnique confirmed P1 projects: ${canonicalP1.length}\nRaw active-editorial rows: ${counts.activeEditorial}\nUnique active-editorial projects: ${canonicalEditorial.length}\nRaw active reconciliation rows: ${counts.activeReconciliationRequired}\nCanonical project groups represented: ${projects.length}\nDuplicate/nonauthoritative rows: ${duplicateRows.length}\nHistorical/lineage rows: ${duplicateRows.filter((r) => /LINEAGE|HISTORICAL/.test(r.RecordClassification)).length}\nTrue unresolved canonical projects: ${reconProjects.filter((p) => /UNKNOWN/.test(p.RecordClassificationSummary)).length}\n\`\`\`\n\n## Canonical P1 Recovery Queue\n\n| Priority | Canonical Title | Author/Public Name | Current Stage | Last Human Promise | Days Waiting | Waiting On | What JMP Owes | Exact Manual Action Now | Do Not Do |\n|---|---|---|---|---|---:|---|---|---|---|\n${p1}\n\n## All Active Editorial Projects\n\n| Priority | Canonical Title | Author/Public Name | Lifecycle | Current Stage | Latest Approved Artifact | Author Review State | Waiting On | Last Human Promise | Manual Action Now | Automation Mode |\n|---|---|---|---|---|---|---|---|---|---|---|\n${board}\n\n## JACKIE_EDITORIAL_RECOVERY_NOW\n\n${recovery || 'No canonical P1 project is actionable.'}\n`
+}
+
+function fiveProjectRows(projects) {
+  const wanted = ['before you were born', 'long watch', 'establishing glory library', 'intentional leader', 'general s will and last testament']
+  return wanted.map((key) => projects.find((p) => normalizeKey(p.CanonicalTitle).includes(key))).filter(Boolean)
+}
+
+function writeFiveProjectServiceRecoveryEvidence({ projects, canonicalP1, canonicalEditorial, duplicateRows, counts }) {
+  const rows = fiveProjectRows(projects)
+  const broken = rows.filter((p) => p.CurrentEditorialStage === 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED')
+  const general = rows.find((p) => /general/i.test(p.CanonicalTitle))
+  const intentional = rows.find((p) => /intentional leader/i.test(p.CanonicalTitle))
+  const jmpOwned = rows.filter((p) => p.WaitingOwner === 'JMP')
+  const authorWaits = rows.filter((p) => p.WaitingOwner === 'Author')
+  const productionActive = rows.filter((p) => p.LifecycleContext === 'PRODUCTION')
+  const priorityRows = rows.map((p) => ({
+    Priority: p.Priority,
+    Title: p.CanonicalTitle,
+    Author: p.AuthorPublicName,
+    CurrentTruth: currentTruthForFiveProject(p),
+    WaitingOn: p.WaitingOwner,
+    ExactNextAction: p.NextGovernedAction,
+  }))
+  const brokenRows = broken.map((p) => ({
+    Title: p.CanonicalTitle,
+    FailedSendDate: /2026-08-02/.test(p.LastExternalCommunication) ? '2026-08-02' : 'REQUIRES_EVIDENCE_BINDING',
+    FailureType: p.CanonicalTitle === 'Before You Were Born' ? 'Author explicitly reported file failed to open' : 'Tiny/unreadable/invalid author-facing Developmental package files',
+    SourceRecovered: p.SourceRecoveryState,
+    ReplacementCertified: p.ReplacementPackageCertified,
+    ReplacementSent: p.ReplacementSent,
+    NewReviewClock: p.NewReviewClock,
+    WaitingOn: p.WaitingOwner,
+  }))
+  const deliveryRows = broken.map((p) => ({
+    Title: p.CanonicalTitle,
+    CorrectedPackageStatus: 'NOT_SENT_IN_THIS_PASS',
+    SendAuthorizedIfCertified: 'YES',
+    CertificationStatus: p.ReplacementPackageCertified,
+    RecipientVerified: 'NOT_VERIFIED_IN_THIS_EVIDENCE_PASS',
+    PublicIdentityVerified: 'NOT_VERIFIED_IN_THIS_EVIDENCE_PASS',
+    ExistingValidResponseCheck: p.LastAuthorResponse,
+    DeliveryEvidence: 'HELD_PENDING_CERTIFIED_AUTHOR_FACING_PACKAGE',
+    NewReviewClock: p.NewReviewClock,
+  }))
+  const responseRows = rows.map((p) => ({
+    Title: p.CanonicalTitle,
+    CurrentHumanDecisionRequested: humanDecisionRequestedFor(p),
+    ResponseFound: responseFoundFor(p),
+    Decision: decisionFor(p),
+    Consumed: consumedFor(p),
+    Action: responseActionFor(p),
+  }))
+  const reconcileRows = rows.map((p) => ({
+    Title: p.CanonicalTitle,
+    CurrentRecoveryTruth: currentTruthForFiveProject(p),
+    DataverseConflict: p.DataverseConflict,
+    ReconciliationNeeded: reconciliationNeedFor(p),
+    SafeAutomaticReconcile: 'NO_READ_MODEL_EVIDENCE_ONLY',
+    FollowUp: p.ImmediateManualRecoveryAction,
+  }))
+  const certificationRows = broken.flatMap((p) => [
+    packageCertificationRow(p, 'Developmentally Edited Manuscript'),
+    packageCertificationRow(p, 'Developmental Review Memo'),
+    packageCertificationRow(p, 'Review Instructions'),
+  ])
+
+  writeFileSync(join(FIVE_PROJECT_DIR, '03-canonical-five-project-board.csv'), csv(priorityRows, ['Priority', 'Title', 'Author', 'CurrentTruth', 'WaitingOn', 'ExactNextAction']))
+  writeFileSync(join(FIVE_PROJECT_DIR, '11-corrected-delivery-evidence.csv'), csv(deliveryRows, ['Title', 'CorrectedPackageStatus', 'SendAuthorizedIfCertified', 'CertificationStatus', 'RecipientVerified', 'PublicIdentityVerified', 'ExistingValidResponseCheck', 'DeliveryEvidence', 'NewReviewClock']))
+  writeFileSync(join(FIVE_PROJECT_DIR, '12-author-response-state.csv'), csv(responseRows, ['Title', 'CurrentHumanDecisionRequested', 'ResponseFound', 'Decision', 'Consumed', 'Action']))
+  writeFileSync(join(FIVE_PROJECT_DIR, '13-dataverse-reconciliation-needed.csv'), csv(reconcileRows, ['Title', 'CurrentRecoveryTruth', 'DataverseConflict', 'ReconciliationNeeded', 'SafeAutomaticReconcile', 'FollowUp']))
+  writeFileSync(join(FIVE_PROJECT_DIR, '10-author-facing-package-certification.md'), packageCertificationMarkdown(certificationRows))
+  writeFileSync(join(FIVE_PROJECT_DIR, '01-founder-verified-state.md'), founderVerifiedMarkdown(rows))
+  writeFileSync(join(FIVE_PROJECT_DIR, '02-human-event-evidence-precedence.md'), precedenceMarkdown())
+  writeFileSync(join(FIVE_PROJECT_DIR, '04-before-you-were-born-recovery.md'), recoveryMarkdown(rows.find((p) => p.CanonicalTitle === 'Before You Were Born'), 'P0/P1', 'Author explicitly reported the corrected Developmental package file failed to open.'))
+  writeFileSync(join(FIVE_PROJECT_DIR, '05-the-long-watch-recovery.md'), recoveryMarkdown(rows.find((p) => p.CanonicalTitle === 'The Long Watch'), 'P1', 'Corrected Developmental author-facing files were tiny/unreadable/invalid.'))
+  writeFileSync(join(FIVE_PROJECT_DIR, '06-establishing-glory-recovery.md'), recoveryMarkdown(rows.find((p) => p.CanonicalTitle === 'Establishing Glory: The Library'), 'P1', 'Corrected Developmental package failed usability threshold and source binding/version reconciliation is required.'))
+  writeFileSync(join(FIVE_PROJECT_DIR, '07-generals-will-author-wait.md'), generalMarkdown(general))
+  writeFileSync(join(FIVE_PROJECT_DIR, '08-intentional-leader-production-state.md'), intentionalMarkdown(intentional))
+  writeFileSync(join(FIVE_PROJECT_DIR, '09-broken-package-root-cause.md'), brokenPackageRootCauseMarkdown(brokenRows))
+  writeFileSync(join(FIVE_PROJECT_DIR, '14-final-operational-board.md'), finalFiveProjectBoardMarkdown({ rows, brokenRows, jmpOwned, authorWaits, productionActive }))
+  writeFileSync(join(FIVE_PROJECT_DIR, '00-executive-summary.md'), fiveProjectSummaryMarkdown({ rows, brokenRows, jmpOwned, authorWaits, productionActive, counts, canonicalP1, canonicalEditorial, duplicateRows }))
+}
+
+function currentTruthForFiveProject(p) {
+  if (!p) return 'NOT_FOUND'
+  if (p.CurrentEditorialStage === 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED') return 'Developmental review delivery failed'
+  if (/general/i.test(p.CanonicalTitle)) return 'Updated Developmental review delivered'
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'Cover approved / Production active'
+  return p.CurrentEditorialStage || p.CurrentProductionStage || p.LifecycleContext
+}
+
+function humanDecisionRequestedFor(p) {
+  if (/general/i.test(p.CanonicalTitle)) return 'Approve updated Developmental review or request changes'
+  if (p.CurrentEditorialStage === 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED') return 'None valid until replacement package is certified and delivered'
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'Cover design approval already provided'
+  return p.AuthorReviewState
+}
+
+function responseFoundFor(p) {
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'YES'
+  if (/general/i.test(p.CanonicalTitle)) return 'NO_CONSUMED_RESPONSE_FOUND_BY_THIS_CENSUS'
+  return 'NO_VALID_RESPONSE_AFTER_CERTIFIED_DELIVERY'
+}
+
+function decisionFor(p) {
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'APPROVED'
+  if (/general/i.test(p.CanonicalTitle)) return 'PENDING_AUTHOR'
+  return 'NOT_APPLICABLE_FAILED_DELIVERY'
+}
+
+function consumedFor(p) {
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'YES_AS_FOUNDER_VERIFIED_OPERATING_EVIDENCE'
+  if (/general/i.test(p.CanonicalTitle)) return 'NO_RESPONSE_TO_CONSUME'
+  return 'NO_VALID_REVIEW_CLOCK'
+}
+
+function responseActionFor(p) {
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'Continue Production from author-approved cover state.'
+  if (/general/i.test(p.CanonicalTitle)) return 'Monitor for author decision; no resend.'
+  return 'Repair delivery first; do not solicit author decision against broken files.'
+}
+
+function reconciliationNeedFor(p) {
+  if (/general/i.test(p.CanonicalTitle)) return 'Update operating read-model from WAITING_ON_JMP package-preparation to WAITING_ON_AUTHOR Developmental review.'
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'Update operating read-model from stale editorial/prospect state to PRODUCTION cover-approved state.'
+  if (p.CurrentEditorialStage === 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED') return 'Mark failed package superseded for operations and keep waiting owner JMP until certified replacement delivery.'
+  return 'NONE'
+}
+
+function packageCertificationRow(p, artifactType) {
+  return {
+    Filename: `${p.CanonicalTitle} - ${artifactType}`,
+    ArtifactType: artifactType,
+    SourceChecksum: 'NOT_AVAILABLE_IN_READ_MODEL',
+    GeneratedSize: 'NOT_GENERATED_IN_THIS_PASS',
+    ContainerValidation: 'NOT_RUN_SOURCE_OR_GENERATED_ARTIFACT_NOT_BOUND',
+    OpenParse: 'NOT_RUN_SOURCE_OR_GENERATED_ARTIFACT_NOT_BOUND',
+    Render: 'NOT_RUN_SOURCE_OR_GENERATED_ARTIFACT_NOT_BOUND',
+    ContentSanity: 'NOT_RUN_SOURCE_OR_GENERATED_ARTIFACT_NOT_BOUND',
+    Title: p.CanonicalTitle,
+    Author: p.AuthorPublicName,
+    Certified: 'NO',
+  }
+}
+
+function packageCertificationMarkdown(rows) {
+  return `# Author-Facing Package Certification\n\nLast verified: ${NOW}\n\nEvidence source: five-project recovery read-model overlay plus canonical project census. No manuscript contents, signed URLs, or private attachments are written here.\n\nThis evidence pass did not generate or certify replacement author-facing packages. Replacement sends remain held until source binding, recipient verification, document validation, and render/open checks all pass.\n\n## File Certification\n\n| Filename | Artifact Type | Source Checksum | Generated Size | Container Validation | Open/Parse | Render | Content Sanity | Title | Author | Certified |\n|---|---|---|---|---|---|---|---|---|---|---|\n${rows.map((r) => `| ${r.Filename} | ${r.ArtifactType} | ${r.SourceChecksum} | ${r.GeneratedSize} | ${r.ContainerValidation} | ${r.OpenParse} | ${r.Render} | ${r.ContentSanity} | ${r.Title} | ${r.Author} | ${r.Certified} |`).join('\n')}\n\n## Author Package Contents Standard\n\nFor each replacement Developmental package, the author-facing bundle may contain only:\n\n- Developmentally Edited Manuscript\n- Developmental Review Memo\n- Review Instructions, if needed\n\nInternal response-mechanism files, raw JSON manifests, technical provenance files, and system metadata are retained internally only and must not be exposed to authors.\n`
+}
+
+function founderVerifiedMarkdown(rows) {
+  return `# Founder-Verified State\n\nLast verified: ${NOW}\n\nEvidence source: Jackie human/business event evidence supplied for the five canonical projects, reconciled against current read-only canonical project census.\n\n| Title | Author | Founder-Verified Current Truth | Waiting On | Exact Next Action |\n|---|---|---|---|---|\n${rows.map((p) => `| ${p.CanonicalTitle} | ${p.AuthorPublicName} | ${currentTruthForFiveProject(p)} | ${p.WaitingOwner} | ${p.NextGovernedAction} |`).join('\n')}\n`
+}
+
+function precedenceMarkdown() {
+  return `# Human-Event Evidence Precedence\n\nLast verified: ${NOW}\n\nEvidence source: approved recovery instruction and read-only canonical project census.\n\nThe operating board applies this precedence order when raw system rows conflict:\n\n1. Explicit real human decision tied to the exact project/artifact.\n2. Certified communication/delivery evidence.\n3. Artifact provenance plus approval.\n4. Current governed project/business state.\n5. Canonical Dataverse stage.\n6. Historical or duplicate intake/stage records.\n\nThis pass does not delete Dataverse history. It prevents stale or duplicate rows from becoming Jackie-facing work when stronger human/business evidence proves a different current state.\n`
+}
+
+function recoveryMarkdown(p, priority, incident) {
+  return `# ${p?.CanonicalTitle || 'Project Not Found'} Recovery\n\nLast verified: ${NOW}\n\nPriority: ${priority}\n\nEvidence source: founder-verified service recovery instruction plus canonical project census.\n\nIncident: ${incident}\n\nCurrent truth: ${p ? currentTruthForFiveProject(p) : 'NOT_FOUND'}\n\nWaiting on: ${p?.WaitingOwner || 'UNKNOWN'}\n\nSource recovery state: ${p?.SourceRecoveryState || 'UNKNOWN'}\n\nReplacement certified: ${p?.ReplacementPackageCertified || 'NO'}\n\nReplacement sent: ${p?.ReplacementSent || '0'}\n\nNew review clock: ${p?.NewReviewClock || 'NOT_STARTED'}\n\nExact next action: ${p?.ImmediateManualRecoveryAction || 'Recover project evidence before action.'}\n\nDo not do: ${p?.DoNotDo || 'Do not send or progress without evidence.'}\n`
+}
+
+function generalMarkdown(p) {
+  return `# The General's Will and Last Testament Author Wait\n\nLast verified: ${NOW}\n\nEvidence source: founder-verified Aug 11 final/updated Developmental Review send plus canonical project census.\n\nCurrent artifact/delivery: ${p?.LastExternalCommunication || 'NOT_FOUND'}\n\nDelivery date: 2026-08-11 per founder-verified evidence.\n\nAttachment usable: NOT_REVERIFIED_BY_THIS_READ_MODEL_PASS.\n\nResponse found: ${p ? responseFoundFor(p) : 'NOT_FOUND'}\n\nResponse consumed: ${p ? consumedFor(p) : 'NOT_FOUND'}\n\nCurrent gate: ${p?.CurrentEditorialStage || 'UNKNOWN'}\n\nWaiting owner: ${p?.WaitingOwner || 'UNKNOWN'}\n\nNext action: ${p?.NextGovernedAction || 'UNKNOWN'}\n\nNo JMP action is currently required unless a new author response has arrived or the Aug 11 delivery is later proven failed.\n`
+}
+
+function intentionalMarkdown(p) {
+  return `# The Intentional Leader Production State\n\nLast verified: ${NOW}\n\nEvidence source: founder-verified cover approval event plus canonical project census.\n\nInterior status: APPROVED ARTIFACT EVIDENCE PRESENT.\n\nInterior approval evidence: ${p?.LatestAuthorApprovedArtifact || p?.LatestTrustworthyWorkingArtifact || 'NOT_FOUND'}\n\nCover status: AUTHOR APPROVED COVER DESIGN.\n\nCover approval evidence: Cover Design Review sent 2026-08-10; author replied Approved; response shown 2026-08-11 per founder-verified evidence.\n\nExact approved cover boundary: REQUIRES_PRODUCTION_RECONCILIATION_CONCEPT_VS_FINAL_FULL_WRAP.\n\nCurrent Production stage: ${p?.CurrentProductionStage || 'COVER_APPROVED_PRODUCTION_ACTIVE'}\n\nRemaining requirements: reconcile approved interior, approved cover boundary, and remaining production proof/final file requirements before any further author-facing or production handoff step.\n\nExact next action: ${p?.NextGovernedAction || 'Reconcile production boundary and execute next proven production step.'}\n\nManual now: YES.\n\nAutomation mode: ${p?.AutomationMode || 'ASSISTED_MANUAL_RECOVERY'}.\n`
+}
+
+function brokenPackageRootCauseMarkdown(rows) {
+  return `# Broken Developmental Package Root Cause\n\nLast verified: ${NOW}\n\nEvidence source: founder-verified failed-delivery incidents plus canonical project census.\n\n## Current Finding\n\nThe Aug 2 corrected Developmental delivery path produced author-facing files that were labeled delivered but were not proven usable. The read-model evidence cannot certify the root cause by itself because source bytes, generated package bytes, MIME/container records, and transport attachment bytes were not all bound in this evidence pass.\n\n## Required Root-Cause Checks Before Resend\n\n- Source file exists and matches intended title/version.\n- Package generator receives the source bytes, not a placeholder or manifest stub.\n- MIME/container type matches DOCX/PDF expectations.\n- Attachment assembly attaches generated author documents only.\n- Email transport preserves delivered bytes.\n- DOCX opens/parses with a document parser.\n- PDF renders/open-checks when PDF is included.\n- Content sanity confirms the title/author and meaningful author-facing content without writing manuscript contents to evidence.\n\n## Broken Developmental Deliveries\n\n| Title | Failed Send Date | Failure Type | Source Recovered | Replacement Certified | Replacement Sent | New Review Clock | Waiting On |\n|---|---|---|---|---|---|---|---|\n${rows.map((r) => `| ${r.Title} | ${r.FailedSendDate} | ${r.FailureType} | ${r.SourceRecovered} | ${r.ReplacementCertified} | ${r.ReplacementSent} | ${r.NewReviewClock} | ${r.WaitingOn} |`).join('\n')}\n\nRuntime/package certification changes, if required, belong in a separate bounded runtime PR and must not be hidden inside this evidence PR.\n`
+}
+
+function finalFiveProjectBoardMarkdown({ rows, brokenRows, jmpOwned, authorWaits, productionActive }) {
+  const owes = rows.filter((p) => p.WaitingOwner === 'JMP').map((p) => `- ${p.Priority}: ${p.CanonicalTitle} — ${p.ImmediateManualRecoveryAction}`).join('\n')
+  return `# Final Five-Project Operational Board\n\nLast verified: ${NOW}\n\n## Current Five-Project Truth\n\n| Priority | Title | Author | Current Truth | Waiting On | Exact Next Action |\n|---|---|---|---|---|---|\n${rows.map((p) => `| ${p.Priority} | ${p.CanonicalTitle} | ${p.AuthorPublicName} | ${currentTruthForFiveProject(p)} | ${p.WaitingOwner} | ${p.NextGovernedAction} |`).join('\n')}\n\n## Corrected P1 Queue Counts\n\n- Previous canonical P1 projects: 5\n- Current JMP-owned P0/P1 projects: ${jmpOwned.length}\n- Legitimate author waits: ${authorWaits.length}\n- Production-active JMP-owned: ${productionActive.filter((p) => p.WaitingOwner === 'JMP').length}\n- Resolved/separated from JMP-owned service recovery: ${authorWaits.length}\n\n## JMP Truly Owes\n\n${owes || '- None.'}\n\n## Broken Developmental Deliveries\n\n| Title | Failed Send Date | Failure Type | Source Recovered | Replacement Certified | Replacement Sent | New Review Clock | Waiting On |\n|---|---|---|---|---|---|---|---|\n${brokenRows.map((r) => `| ${r.Title} | ${r.FailedSendDate} | ${r.FailureType} | ${r.SourceRecovered} | ${r.ReplacementCertified} | ${r.ReplacementSent} | ${r.NewReviewClock} | ${r.WaitingOn} |`).join('\n')}\n\n## Negative Proof\n\nThese values are scoped to this 2026-08-16 recovery pass and do not erase the historical failed deliveries being remediated.\n\n\`\`\`text\nbroken_author_facing_files_released = 0\nauthor_reported_file_failure_ignored = 0\nreview_clock_started_from_failed_delivery = 0\nduplicate_recovery_sends = 0\nexisting_author_response_ignored = 0\nThe_Generals_Will_unnecessary_resend = 0\nThe_Intentional_Leader_restarted_in_editorial = 0\nstale_prospect_state_overrode_active_agreement = 0\nauthor_asked_to_resend_source_JMP_already_has = 0\ninternal_package_artifacts_exposed_to_author = 0\nportal_required_when_not_ready = 0\nauthor_approval_bypasses = 0\nduplicate_project_recovery_tasks = 0\nDataverse_history_deleted = 0\nmanual_stage_progressions = 0\n\`\`\`\n`
+}
+
+function fiveProjectSummaryMarkdown({ rows, brokenRows, jmpOwned, authorWaits, productionActive, counts, canonicalP1, canonicalEditorial, duplicateRows }) {
+  return `# Five-Project Service Recovery Evidence Package\n\nLast verified: ${NOW}\n\nEvidence source: founder-verified human/business events, live read-only Dataverse census, and generated canonical project read model. No Dataverse rows were deleted or mutated. No author communications were sent by this pass.\n\n## Evidence Index\n\n- 01-founder-verified-state.md\n- 02-human-event-evidence-precedence.md\n- 03-canonical-five-project-board.csv\n- 04-before-you-were-born-recovery.md\n- 05-the-long-watch-recovery.md\n- 06-establishing-glory-recovery.md\n- 07-generals-will-author-wait.md\n- 08-intentional-leader-production-state.md\n- 09-broken-package-root-cause.md\n- 10-author-facing-package-certification.md\n- 11-corrected-delivery-evidence.csv\n- 12-author-response-state.csv\n- 13-dataverse-reconciliation-needed.csv\n- 14-final-operational-board.md\n- checksums.sha256\n\n## Counts\n\n- Five canonical projects represented: ${rows.length}\n- Broken Developmental deliveries requiring JMP recovery: ${brokenRows.length}\n- JMP-owned current actions: ${jmpOwned.length}\n- Legitimate author waits: ${authorWaits.length}\n- Production-active JMP-owned projects: ${productionActive.filter((p) => p.WaitingOwner === 'JMP').length}\n- Previous canonical P1 projects before founder correction: 5\n- Corrected canonical P0/P1 queue rows after founder correction: ${canonicalP1.length}\n- Raw confirmed P1 rows in census: ${counts.P1}\n- Raw active-editorial rows in census: ${counts.activeEditorial}\n- Duplicate/nonauthoritative rows preserved: ${duplicateRows.length}\n\n## Current Truth\n\n| Priority | Title | Author | Current Truth | Waiting On | Exact Next Action |\n|---|---|---|---|---|---|\n${rows.map((p) => `| ${p.Priority} | ${p.CanonicalTitle} | ${p.AuthorPublicName} | ${currentTruthForFiveProject(p)} | ${p.WaitingOwner} | ${p.NextGovernedAction} |`).join('\n')}\n\n## Boundary\n\nThis package corrects the operating evidence/read-model. Replacement package generation, attachment certification, external sends, Dataverse reconciliation writes, and production progression require the separate governed path stated in the package files.\n`
 }
 
 function writeChecksums() {

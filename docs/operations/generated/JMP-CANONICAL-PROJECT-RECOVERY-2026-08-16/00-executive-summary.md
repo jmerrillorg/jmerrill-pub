@@ -1,17 +1,17 @@
 # Canonical Project Recovery
 
-Last verified: 2026-08-17T01:22:36.151Z
+Last verified: 2026-08-17T02:18:20.394Z
 
 Evidence source: live Dataverse read-only census collapsed into deterministic canonical project groups.
 
 ## Counts
 
 - Raw confirmed P1 rows: 8
-- Unique confirmed P1 projects: 5
+- Unique confirmed P1 projects: 4
 - Raw active-editorial rows: 7
 - Unique active-editorial projects: 5
 - Raw active reconciliation rows: 53
-- Canonical project groups represented: 63
+- Canonical project groups represented: 62
 - Duplicate/nonauthoritative rows: 4
 - True unresolved canonical projects: 0
 

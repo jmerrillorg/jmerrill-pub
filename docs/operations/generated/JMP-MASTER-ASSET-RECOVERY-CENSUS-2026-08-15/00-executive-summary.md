@@ -1,15 +1,15 @@
 # Master Publishing Asset Recovery Census
 
-Last verified: 2026-08-17T01:22:36.151Z
+Last verified: 2026-08-17T02:18:20.394Z
 
 Evidence source: live Dataverse read-only export plus current repository canon. Secret values, manuscript text, signed URLs, and full email bodies were not written.
 
 ## Counts
 
-- Total real Publishing assets: 395
-- Test/synthetic excluded: 16
-- Operationally active: 67
-- Prospects: 7
+- Total real Publishing assets: 394
+- Test/synthetic excluded: 17
+- Operationally active: 66
+- Prospects: 6
 - Commercial conversion: 0
 - Active editorial: 7
 - Production: 0
@@ -27,7 +27,7 @@ Evidence source: live Dataverse read-only export plus current repository canon. 
 - P1: 8
 - P2: 1
 - P3: 3
-- P4: 383
+- P4: 382
 
 ## Highest Priority Manual Recovery
 
