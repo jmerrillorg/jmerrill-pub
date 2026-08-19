@@ -22,6 +22,15 @@ const {
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
 const EVENT_TYPE = "AUTHOR_RESPONSE_SENT";
 
+// Diagnostic-era titles (Stage 0 pipeline) default to a jm1pub_editorialdiagnostic
+// source, matching prior behavior exactly. Titles without a diagnostic record
+// (e.g. onboarded before the Stage 0 pipeline existed) may pass an explicit
+// sourceEntity/sourceRecordId on sendApproval instead — this mirrors the
+// polymorphic pattern already used by approvalEventConsumer.js,
+// authorReviewResponseConsumer.js, dataverse-execution-log.ts,
+// publishing-dispatch-service.ts, and publishing-orchestrator.ts.
+const ALLOWED_EXPLICIT_SOURCE_ENTITIES = ["jm1pub_title"];
+
 const SAFE_SEND_LOG_FIELDS = [
   "sendApproval",
   "deliveryResult",
@@ -95,6 +104,15 @@ function validateAuthorResponseSendLogInput(input = {}) {
   if (input.deliveryResult.deliveryStatus !== AUTHOR_RESPONSE_SEND_STATUS.SENT) return { ok: false, reason: "AUTHOR_RESPONSE_NOT_SENT" };
   if (input.deliveryResult.internalVisibilityStatus !== AUTHOR_RESPONSE_SEND_STATUS.INTERNAL_VISIBILITY_SATISFIED) return { ok: false, reason: "INTERNAL_VISIBILITY_NOT_SATISFIED" };
 
+  if (approval.sourceEntity !== undefined || approval.sourceRecordId !== undefined) {
+    if (!ALLOWED_EXPLICIT_SOURCE_ENTITIES.includes(normalizeString(approval.sourceEntity))) {
+      return { ok: false, reason: "SOURCE_ENTITY_NOT_ALLOWED" };
+    }
+    if (!normalizeString(approval.sourceRecordId) || !DIAGNOSTIC_ID_PATTERN.test(normalizeString(approval.sourceRecordId))) {
+      return { ok: false, reason: "SOURCE_RECORD_ID_INVALID" };
+    }
+  }
+
   return { ok: true };
 }
 
@@ -131,6 +149,9 @@ function buildAuthorResponseSendLogRecord(input = {}) {
     "No Opportunity created. No Flow D activation. No production activation. No manuscript text, prompt body, raw model output, or secrets stored."
   ].join(" ");
 
+  const sourceEntity = normalizeString(approval.sourceEntity) || SOURCE_ENTITY;
+  const sourceRecordId = normalizeString(approval.sourceRecordId) || approval.diagnosticId;
+
   const executionLogPayload = {
     jm1_name: `AUTHOR-RESPONSE-SEND-${approval.diagnosticId}`,
     jm1_actiondescription: actionDescription.slice(0, 1000),
@@ -141,8 +162,8 @@ function buildAuthorResponseSendLogRecord(input = {}) {
     jm1_executionstatus: EXECUTION_STATUS.SUCCESS,
     jm1_startedon: persistedAt,
     jm1_completedon: persistedAt,
-    jm1_sourceentity: SOURCE_ENTITY,
-    jm1_sourcerecordid: approval.diagnosticId
+    jm1_sourceentity: sourceEntity,
+    jm1_sourcerecordid: sourceRecordId
   };
 
   return {
