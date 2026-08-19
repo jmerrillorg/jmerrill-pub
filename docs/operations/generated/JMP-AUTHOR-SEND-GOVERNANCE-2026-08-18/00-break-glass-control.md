@@ -59,3 +59,40 @@ Both sends: **DELIVERY VALID / GOVERNANCE PATH EXCEPTION**. Materials reached
 the authors and were independently certified before dispatch. The normal
 control-plane send workflow is not yet proven commissioned end-to-end by
 these two events.
+
+---
+
+## 2026-08-19 Addendum — Canonical Gate-Transition Reconciliation
+
+### Canonical service identified
+
+`lib/server/publishing-dispatch-service.ts` — `certifyOperationalDelivery()` is the real, reusable (Developmental/Line/Copy/Proof-agnostic) gate-transition service. Direct precedent: "Before You Were Born" is registered in `five-title-executive-recovery-dispatch.ts`'s allowlist for exactly this dispatch path. Defect classification: `SERVICE_EXISTS_NOT_CALLED`.
+
+### Gap found and fixed (PR #518)
+
+`certifyOperationalDelivery()`'s idempotency check requires a prior `PUBLISHING_DISPATCH_TECHNICALLY_RELEASED` execution log, which is normally written only as a side effect of `dispatchAuthorPackage` actually sending an email — there was no honest way to record real already-happened delivery evidence without resending. Added `recordExternalDeliveryEvidence()`, which writes the identical evidence shape without ever calling the send path. See PR #518.
+
+### Second, more serious bug found and fixed (same PR)
+
+While live-verifying the new function against real Dataverse data, discovered that `writeExecutionLog`'s 1000-char description truncation (`safeDetail()`) cut off the idempotency key, which was written near the *end* of each description. This meant `findTechnicalReleaseLog`/`findOperationalCertificationLog`'s `contains()` lookup could never match a prior write — **every replay of `dispatchAuthorPackage`/`certifyOperationalDelivery`/`recordExternalDeliveryEvidence` silently duplicated the execution log and reset the review-clock start (`jm1pub_awaitingsince`)**. This is a systemic defect likely affecting any title/stage whose natural key pushes the description past ~800-900 characters of preamble, not specific to this reconciliation. Fixed by moving the idempotency key to the first sentence of all three affected description writes.
+
+**Confirmed live**: reconciling Before You Were Born's gate hit this exactly — 3 duplicate `PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED` execution logs were created (`ab48a205-...` true original, then `93febe11-...` and `99153717-...` duplicates from replay/idempotency-testing) before the fix landed, each resetting `jm1pub_awaitingsince`. A further transient pollution occurred when the post-fix verification test reused the same real gate (gates are keyed by title+stage, not by package version) and briefly overwrote `jm1pub_awaitingsince`/`jm1pub_authordecisionsource`/`jm1pub_authorresponsesummary` with test-only values.
+
+**Corrective action taken** (documented here for full transparency — this is a targeted restoration of the true original value using real evidence already on record, not a guess): `jm1pub_awaitingsince` was patched back to `2026-08-19T03:06:54.452Z` (the timestamp recorded in the true original, first-and-correct execution log `ab48a205-7b9b-f111-b8dc-000d3a14673b`), and `jm1pub_authordecisionsource`/`jm1pub_authorresponsesummary`/`jm1pub_correlationid` restored to reference that same true event. The duplicate execution logs (`93febe11-...`, `99153717-...`, and the disposable test-only log `8724b90c-...`) were left in place as evidence rather than deleted, consistent with this session's "never delete evidence" practice — they are harmless audit-log noise, now explained.
+
+### Before You Were Born — final state (verified via direct Dataverse readback)
+
+| Field | Value |
+|---|---|
+| `jm1pub_gatestatus` | `196650002` (Awaiting Author Response) |
+| `jm1pub_nextstageauthorized` | `false` |
+| `jm1pub_awaitingsince` | `2026-08-19T03:06:54Z` (true, corrected value) |
+| Governing execution log | `ab48a205-7b9b-f111-b8dc-000d3a14673b` |
+
+### The Long Watch — held
+
+Per plan: execution-log persistence and gate-transition reconciliation for The Long Watch are held until PR #517 (source-entity polymorphism fix) is reviewed and merged — it has no `jm1pub_editorialdiagnostic` record, so its execution log must use `sourceEntity: "jm1pub_title"`, which #517 enables. As of this writing, PR #517 is open, not yet merged.
+
+### Break-glass incident status
+
+Both sends remain classified `DELIVERY VALID / GOVERNANCE PATH EXCEPTION` — this reconciliation does not reclassify them as normal control-plane proof. Before You Were Born's post-event reconciliation is now **complete**. The Long Watch's remains **open**, blocked on PR #517.
