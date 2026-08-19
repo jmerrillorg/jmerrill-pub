@@ -305,11 +305,13 @@ export async function recordExternalDeliveryEvidence(
   const technicalLog = await writeExecutionLog(config, {
     actionType: 'PUBLISHING_DISPATCH_TECHNICALLY_RELEASED',
     name: `PUBLISHING_DISPATCH_TECHNICALLY_RELEASED - ${readback.titleName}`,
+    // Idempotency key first — see comment in dispatchAuthorPackage's equivalent write.
     description: [
+      `Idempotency ${readback.idempotencyKey}.`,
       `Recorded from documented external/break-glass delivery evidence (reference ${input.breakGlassReference}) — this call did not send an email.`,
       `Provider ${input.externalProviderName} accepted the send at ${input.externalDeliveryTimestamp}, message ID ${input.externalProviderMessageId}.`,
       `Gate ${gateId} remains READY_FOR_AUTHOR_RELEASE until operational certification passes.`,
-      `No seven-day response clock starts at technical release. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}.`,
+      `No seven-day response clock starts at technical release. Natural key ${readback.naturalKey}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: gateId,
@@ -432,15 +434,22 @@ export async function certifyOperationalDelivery(
   const certificationLog = await writeExecutionLog(config, {
     actionType: 'PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED',
     name: `PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED - ${readback.titleName}`,
+    // Idempotency key first — see comment in dispatchAuthorPackage's equivalent write.
+    // This was the actual root cause of a real replay-duplication defect found
+    // 2026-08-19 while reconciling the Before You Were Born break-glass send:
+    // the key previously landed past writeExecutionLog's 1000-char truncation,
+    // so findOperationalCertificationLog's contains() lookup never matched,
+    // and every replay wrote a duplicate certification + reset the review clock.
     description: [
+      `Idempotency ${readback.idempotencyKey}.`,
       `Operational delivery certification passed by ${input.operator || SYSTEM_OPERATOR}.`,
       authorResponseAlreadyReceived
         ? `Author response was already received and classified as ${authorResponseClassification}; gate was not moved to AWAITING_AUTHOR_RESPONSE and no seven-day response clock was created retroactively.`
         : `Gate ${input.gateId} moved to AWAITING_AUTHOR_RESPONSE after branded HTML, plain text, required attachments, attachment checksums, archive, Dataverse send evidence, direct reply path, and single active gate passed.`,
       `Portal status ${input.portalStatus || 'NOT_APPLICABLE'} is secondary and not required for ordinary editorial review.`,
       authorResponseAlreadyReceived
-        ? `Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}. Correlation ${correlationId}.`
-        : `Seven-day response clock started at ${now}. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}. Correlation ${correlationId}.`,
+        ? `Natural key ${readback.naturalKey}. Correlation ${correlationId}.`
+        : `Seven-day response clock started at ${now}. Natural key ${readback.naturalKey}. Correlation ${correlationId}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: input.gateId,
@@ -599,10 +608,16 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
   const technicalLog = await writeExecutionLog(config, {
     actionType: 'PUBLISHING_DISPATCH_TECHNICALLY_RELEASED',
     name: `PUBLISHING_DISPATCH_TECHNICALLY_RELEASED - ${readback.titleName}`,
+    // Idempotency key must come first: writeExecutionLog's safeDetail() truncates
+    // descriptions to 1000 chars, and findTechnicalReleaseLog's idempotency
+    // lookup does contains(jm1_actiondescription, idempotencyKey) — if the key
+    // lands after the truncation point (easy with a long title/natural key),
+    // the lookup can never match and every replay creates a duplicate.
     description: [
+      `Idempotency ${readback.idempotencyKey}.`,
       `ACS accepted package send request after provider ${delivery.providerMessageId}.`,
       `Gate ${gateId} remains READY_FOR_AUTHOR_RELEASE until operational certification passes.`,
-      `No seven-day response clock starts at technical release. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}.`,
+      `No seven-day response clock starts at technical release. Natural key ${readback.naturalKey}.`,
     ].join(' '),
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: gateId,
