@@ -167,6 +167,43 @@ export type OperationalDeliveryCertificationResult = {
   executionLogIds: string[]
 }
 
+export type ExternalDeliveryEvidenceRequest = {
+  // Reconciles a package that was already sent through a governed,
+  // documented break-glass path (see JMP-AUTHOR-SEND-GOVERNANCE-2026-08-18)
+  // instead of through dispatchAuthorPackage itself. Never sends an email —
+  // it only records the same PUBLISHING_DISPATCH_TECHNICALLY_RELEASED /
+  // PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING evidence that
+  // dispatchAuthorPackage would have written, so the normal
+  // certifyOperationalDelivery idempotency path can proceed without a
+  // resend. Reusable across every stage (Developmental/Line/Copy/Proof) —
+  // no stage-specific branching.
+  packageId: string
+  titleId: string
+  stageId: string
+  recipientContactId: string
+  packageVersion?: string
+  correlationId?: string
+  operator?: string
+  externalProviderMessageId: string
+  externalProviderName: string
+  externalDeliveryTimestamp: string
+  breakGlassReference: string
+}
+
+export type ExternalDeliveryEvidenceResult = {
+  service: 'PublishingDispatchService'
+  operation: 'recordExternalDeliveryEvidence'
+  status: 'technically_released' | 'idempotent' | 'blocked'
+  titleId: string
+  stageId: string
+  packageId: string
+  gateId: string
+  idempotencyKey: string
+  naturalKey: string
+  blockers: string[]
+  executionLogIds: string[]
+}
+
 type DispatchReadback = {
   title: DataverseRow
   stage: DataverseRow
@@ -195,6 +232,105 @@ type DispatchReadback = {
 export const PublishingDispatchService = {
   dispatchAuthorPackage,
   certifyOperationalDelivery,
+  recordExternalDeliveryEvidence,
+}
+
+export async function recordExternalDeliveryEvidence(
+  input: ExternalDeliveryEvidenceRequest,
+): Promise<ExternalDeliveryEvidenceResult> {
+  const config = getDataverseServerConfig()
+  if (!config) throw new Error('DATAVERSE_CONFIG_MISSING')
+
+  const correlationId = input.correlationId || `publishing-dispatch-external-evidence:${new Date().toISOString()}:${randomUUID()}`
+  const readback = await readDispatchAuthority(config, {
+    packageId: input.packageId,
+    titleId: input.titleId,
+    stageId: input.stageId,
+    recipientContactId: input.recipientContactId,
+    executionMode: 'EXECUTIVE_RECOVERY',
+    packageVersion: input.packageVersion,
+    correlationId,
+    operator: input.operator,
+  })
+  const gateId = stringValue(readback.activeGates[0]?.jm1pub_editorialapprovalgateid) || (await createDispatchGate(
+    config,
+    {
+      packageId: input.packageId,
+      titleId: input.titleId,
+      stageId: input.stageId,
+      recipientContactId: input.recipientContactId,
+      executionMode: 'EXECUTIVE_RECOVERY',
+      packageVersion: input.packageVersion,
+      correlationId,
+      operator: input.operator,
+    },
+    readback,
+    correlationId,
+  ))
+  const base = {
+    service: 'PublishingDispatchService' as const,
+    operation: 'recordExternalDeliveryEvidence' as const,
+    titleId: input.titleId,
+    stageId: input.stageId,
+    packageId: input.packageId,
+    gateId,
+    idempotencyKey: readback.idempotencyKey,
+    naturalKey: readback.naturalKey,
+    blockers: [] as string[],
+    executionLogIds: [] as string[],
+  }
+
+  if (readback.existingOperationalCertification) {
+    return { ...base, status: 'idempotent', executionLogIds: [stringValue(readback.existingOperationalCertification.jm1_executionlogid)].filter(Boolean) }
+  }
+  if (readback.existingTechnicalRelease) {
+    return { ...base, status: 'idempotent', executionLogIds: [stringValue(readback.existingTechnicalRelease.jm1_executionlogid)].filter(Boolean) }
+  }
+
+  await Promise.all([
+    dataversePatch(config, 'jm1pub_editorialapprovalgates', gateId, {
+      jm1pub_gatestatus: GATE_STATUS_READY_FOR_AUTHOR_RELEASE,
+      jm1pub_nextstageauthorized: false,
+      jm1pub_authorresponsesummary: `${readback.stageLabel} package is TECHNICALLY_RELEASED (recorded from documented external/break-glass delivery evidence, reference ${input.breakGlassReference}). Operational delivery certification is required before Awaiting Author Response.`,
+      jm1pub_authordecisionsource: `technical-notification:${input.externalProviderMessageId}`,
+      jm1pub_correlationid: correlationId,
+    }),
+    dataversePatch(config, 'jm1pub_editorialstages', input.stageId, {
+      jm1pub_internaloperationalsummary: `PublishingDispatchService recorded TECHNICALLY_RELEASED from external delivery evidence (break-glass reference ${input.breakGlassReference}); no email was sent by this call. Provider ${input.externalProviderName}, delivered ${input.externalDeliveryTimestamp}. Idempotency ${readback.idempotencyKey}. Operational certification must still verify branded HTML, plain text, required email attachments, archive, Dataverse send evidence, and gate before Awaiting Author Response.`,
+      jm1pub_currentgatecount: 1,
+      jm1pub_correlationid: correlationId,
+    }),
+  ])
+
+  const technicalLog = await writeExecutionLog(config, {
+    actionType: 'PUBLISHING_DISPATCH_TECHNICALLY_RELEASED',
+    name: `PUBLISHING_DISPATCH_TECHNICALLY_RELEASED - ${readback.titleName}`,
+    // Idempotency key first — see comment in dispatchAuthorPackage's equivalent write.
+    description: buildIdempotencySafeExecutionLogDescription(readback.idempotencyKey, [
+      `Recorded from documented external/break-glass delivery evidence (reference ${input.breakGlassReference}) — this call did not send an email.`,
+      `Provider ${input.externalProviderName} accepted the send at ${input.externalDeliveryTimestamp}, message ID ${input.externalProviderMessageId}.`,
+      `Gate ${gateId} remains READY_FOR_AUTHOR_RELEASE until operational certification passes.`,
+      `No seven-day response clock starts at technical release. Natural key ${readback.naturalKey}.`,
+    ]),
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: gateId,
+  })
+  const certificationPendingLog = await writeExecutionLog(config, {
+    actionType: 'PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING',
+    name: `PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING - ${readback.titleName}`,
+    description: [
+      'Awaiting operational delivery certification: branded HTML, plain text, required email attachments, attachment checksums, archive, Dataverse send evidence, direct reply path, and one active gate. The portal is a secondary view and is not required for ordinary editorial review.',
+      `Correlation ${correlationId}. Natural key ${readback.naturalKey}.`,
+    ].join(' '),
+    sourceEntity: 'jm1pub_editorialapprovalgate',
+    sourceRecordId: gateId,
+  })
+
+  return {
+    ...base,
+    status: 'technically_released',
+    executionLogIds: [extractId(technicalLog), extractId(certificationPendingLog)].filter(Boolean),
+  }
 }
 
 export async function certifyOperationalDelivery(
@@ -297,16 +433,22 @@ export async function certifyOperationalDelivery(
   const certificationLog = await writeExecutionLog(config, {
     actionType: 'PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED',
     name: `PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED - ${readback.titleName}`,
-    description: [
+    // Idempotency key first — see comment in dispatchAuthorPackage's equivalent write.
+    // This was the actual root cause of a real replay-duplication defect found
+    // 2026-08-19 while reconciling the Before You Were Born break-glass send:
+    // the key previously landed past writeExecutionLog's 1000-char truncation,
+    // so findOperationalCertificationLog's contains() lookup never matched,
+    // and every replay wrote a duplicate certification + reset the review clock.
+    description: buildIdempotencySafeExecutionLogDescription(readback.idempotencyKey, [
       `Operational delivery certification passed by ${input.operator || SYSTEM_OPERATOR}.`,
       authorResponseAlreadyReceived
         ? `Author response was already received and classified as ${authorResponseClassification}; gate was not moved to AWAITING_AUTHOR_RESPONSE and no seven-day response clock was created retroactively.`
         : `Gate ${input.gateId} moved to AWAITING_AUTHOR_RESPONSE after branded HTML, plain text, required attachments, attachment checksums, archive, Dataverse send evidence, direct reply path, and single active gate passed.`,
       `Portal status ${input.portalStatus || 'NOT_APPLICABLE'} is secondary and not required for ordinary editorial review.`,
       authorResponseAlreadyReceived
-        ? `Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}. Correlation ${correlationId}.`
-        : `Seven-day response clock started at ${now}. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}. Correlation ${correlationId}.`,
-    ].join(' '),
+        ? `Natural key ${readback.naturalKey}. Correlation ${correlationId}.`
+        : `Seven-day response clock started at ${now}. Natural key ${readback.naturalKey}. Correlation ${correlationId}.`,
+    ]),
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: input.gateId,
   })
@@ -464,11 +606,16 @@ export async function dispatchAuthorPackage(input: PublishingDispatchRequest): P
   const technicalLog = await writeExecutionLog(config, {
     actionType: 'PUBLISHING_DISPATCH_TECHNICALLY_RELEASED',
     name: `PUBLISHING_DISPATCH_TECHNICALLY_RELEASED - ${readback.titleName}`,
-    description: [
+    // Idempotency key must come first: writeExecutionLog's safeDetail() truncates
+    // descriptions to 1000 chars, and findTechnicalReleaseLog's idempotency
+    // lookup does contains(jm1_actiondescription, idempotencyKey) — if the key
+    // lands after the truncation point (easy with a long title/natural key),
+    // the lookup can never match and every replay creates a duplicate.
+    description: buildIdempotencySafeExecutionLogDescription(readback.idempotencyKey, [
       `ACS accepted package send request after provider ${delivery.providerMessageId}.`,
       `Gate ${gateId} remains READY_FOR_AUTHOR_RELEASE until operational certification passes.`,
-      `No seven-day response clock starts at technical release. Natural key ${readback.naturalKey}. Idempotency ${readback.idempotencyKey}.`,
-    ].join(' '),
+      `No seven-day response clock starts at technical release. Natural key ${readback.naturalKey}.`,
+    ]),
     sourceEntity: 'jm1pub_editorialapprovalgate',
     sourceRecordId: gateId,
   })
@@ -1191,6 +1338,30 @@ function escapeOData(value: string) {
 function extractId(value: string) {
   const match = value.match(/\(([^)]+)\)$/)
   return match?.[1] || value
+}
+
+// Pure, dependency-free: builds an execution-log description with the
+// idempotency key guaranteed to survive safeDetail()'s 1000-char truncation,
+// regardless of how long the rest of the description (title names, natural
+// keys, etc.) runs. The 2026-08-19 review-clock-reset defect existed because
+// callers previously interpolated the idempotency key wherever it fit
+// naturally in a sentence — often near the end — so long descriptions
+// silently dropped it before findTechnicalReleaseLog/findOperationalCertificationLog's
+// contains(jm1_actiondescription, idempotencyKey) lookup ever saw it.
+export function buildIdempotencySafeExecutionLogDescription(idempotencyKey: string, restOfDescription: string[]): string {
+  return [`Idempotency ${idempotencyKey}.`, ...restOfDescription].join(' ')
+}
+
+// Pure: true iff safeDetail's truncation (1000 chars, after email/URL
+// redaction) would still preserve idempotencyKey somewhere in the resulting
+// string. Used by tests to prove the fix holds for arbitrary input lengths,
+// without needing a live Dataverse call.
+export function idempotencyKeySurvivesTruncation(description: string, idempotencyKey: string, truncateAt = 1000): boolean {
+  const redacted = description
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email-redacted]')
+    .replace(/https:\/\/[^\s"']+/g, '[url-redacted]')
+    .slice(0, truncateAt)
+  return redacted.includes(idempotencyKey)
 }
 
 function safeDetail(value: string) {
