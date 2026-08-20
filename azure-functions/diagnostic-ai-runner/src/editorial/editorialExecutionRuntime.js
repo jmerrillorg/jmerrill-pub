@@ -7,6 +7,7 @@ const mammoth = require("mammoth");
 const { routeToProvider } = require("../model/providerRouter");
 const { summarizeCorrectionCount } = require("./correctionCounting");
 const { validateEditorialCompliance } = require("./editorialComplianceValidator");
+const { buildLineRetentionDriftQa } = require("./lineRetentionDriftQa");
 const {
   createAuthorReviewGatePlan,
   gateBlocksCurrentStageRuntime,
@@ -484,7 +485,7 @@ function summarizeUpstreamContextForPrompt(stage, stageCode, sourceArtifact, ups
     inheritanceRequirements: [
       "Use the author-approved upstream artifact as the controlling prior-stage baseline.",
       "Use upstream Editorial Review or Developmental context when present; if absent, preserve the manuscript's existing style and flag the missing context.",
-      "Line Editing must preserve 95% to 100% of source wording and must not perform developmental restructuring or copyediting drift.",
+      "Line Editing must preserve at least 95% net source wording while separately controlling output expansion, structural loss, substantive invention, and copyediting drift.",
       "Line Editing completion creates an author review/approval gate and does not authorize Copyediting automatically."
     ]
   };
@@ -941,7 +942,11 @@ function extractExistingExactBlocker(stage) {
 
 function shouldPreserveExistingExactBlocker(exactBlocker) {
   if (!exactBlocker) return false;
-  return !exactBlocker.includes("SOURCE_GRAPH_IDENTITY_MISSING");
+  const retryableBlockers = [
+    "SOURCE_GRAPH_IDENTITY_MISSING",
+    "LINE_RETENTION_OUTSIDE_95_TO_100_PERCENT_WINDOW"
+  ];
+  return !retryableBlockers.some((retryable) => exactBlocker.includes(retryable));
 }
 
 async function findArtifactByName(client, stage, artifactName) {
@@ -1030,6 +1035,32 @@ async function recordBlockedTask(client, stage, stageCode, exactBlocker, correla
     failed: true,
     description:
       `${exactBlocker}. Stage ${stage.jm1pub_editorialstageid} remains In Progress with exact blocker; generic uncommissioned-runtime blocker removed. ` +
+      `Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
+    sourceEntity: "jm1pub_editorialstage",
+    sourceRecordId: stage.jm1pub_editorialstageid
+  });
+  return { idempotent: false, logId, idempotencyKey };
+}
+
+async function recordRejectedLineOutputDiagnostics(client, stage, stageCode, sourceArtifact, error, correlationId) {
+  if (stageCode !== "LINE_EDITING" || !error?.lineQa) return null;
+  const outputHash = normalizeString(error.rejectedLineOutputHash) || "missing-output";
+  const violationList = error.lineQa.violations.concat(error.lineQa.compliance?.violations || []);
+  const idempotencyKey =
+    `editorial-runtime:line-rejected-output-diagnostics:${stage.jm1pub_editorialstageid}:` +
+    `${normalizeString(sourceArtifact?.jm1pub_editorialartifactid)}:${outputHash}:${violationList.join("|")}`;
+  const existing = await findExecutionLog(client, "LINE_REJECTED_OUTPUT_QA_DIAGNOSTICS", idempotencyKey);
+  if (existing) return { idempotent: true, logId: existing.jm1_executionlogid, idempotencyKey };
+  const logId = await writeLog(client, {
+    name: `LINE_REJECTED_OUTPUT_QA_DIAGNOSTICS - ${stage.jm1pub_name}`,
+    actionType: "LINE_REJECTED_OUTPUT_QA_DIAGNOSTICS",
+    failed: true,
+    description:
+      `NON_GOVERNING / QA_REJECTED / NOT_AUTHOR_FACING. Line output failed stage-aware retention/drift QA before artifact persistence. ` +
+      `Algorithm ${error.lineQa.algorithm}. Violations ${violationList.length ? violationList.join(", ") : "None"}. ` +
+      `Metrics ${JSON.stringify(error.lineQa.metrics)}. Rejected output hash ${outputHash}. ` +
+      `Source artifact ${normalizeString(sourceArtifact?.jm1pub_editorialartifactid)}; checksum ${normalizeString(sourceArtifact?.jm1pub_sha256) || "pending"}. ` +
+      `No author gate, author communication, governing artifact, or Copyediting stage was created. ` +
       `Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
     sourceEntity: "jm1pub_editorialstage",
     sourceRecordId: stage.jm1pub_editorialstageid
@@ -1293,14 +1324,8 @@ function lineEditingOutput(modelInvocation = {}) {
   return { editedManuscript, lineEditingSummary, retentionNotes, changeLedger, authorQueries };
 }
 
-function countWords(text) {
-  return normalizeString(text).split(/\s+/).filter(Boolean).length;
-}
-
 function buildLineEditingQa({ sourceText, editedText, modelInvocation, correlationId }) {
-  const sourceWords = countWords(sourceText);
-  const editedWords = countWords(editedText);
-  const retentionRatio = sourceWords ? editedWords / sourceWords : 0;
+  const stageAwareQa = buildLineRetentionDriftQa({ sourceText, editedText });
   const correctionSummary = summarizeCorrectionCount({
     patterns: lineEditingOutput(modelInvocation).changeLedger.map((pattern) => ({ correctedInstances: 1, pattern })),
     preservedVoice: true,
@@ -1321,18 +1346,27 @@ function buildLineEditingQa({ sourceText, editedText, modelInvocation, correlati
       voiceProtectionAcknowledged: true
     }
   });
-  const violations = [];
-  if (!editedText) violations.push("LINE_EDITED_MANUSCRIPT_MISSING");
-  if (retentionRatio < 0.95 || retentionRatio > 1.0) violations.push("LINE_RETENTION_OUTSIDE_95_TO_100_PERCENT_WINDOW");
+  const violations = [...stageAwareQa.violations];
   if (modelInvocation.fellBack) violations.push("MODEL_FALLBACK_NOT_ALLOWED");
   if (modelInvocation.provider !== "microsoft-foundry-claude") violations.push("PREFERRED_LINE_MODEL_PROVIDER_NOT_USED");
   return {
     ok: violations.length === 0 && compliance.violations.length === 0,
-    sourceWords,
-    editedWords,
-    retentionRatio,
-    retentionPercent: Math.round(retentionRatio * 10000) / 100,
+    sourceWords: stageAwareQa.metrics.sourceWords,
+    editedWords: stageAwareQa.metrics.outputWords,
+    retentionRatio: stageAwareQa.metrics.netWordRetentionPercent / 100,
+    retentionPercent: stageAwareQa.metrics.netWordRetentionPercent,
+    measuredRetentionPercent: stageAwareQa.metrics.measuredRetentionPercent,
+    netCharacterRetentionPercent: stageAwareQa.metrics.netCharacterRetentionPercent,
+    structuralRetentionPercent: stageAwareQa.metrics.structuralRetentionPercent,
+    paragraphRetentionPercent: stageAwareQa.metrics.paragraphRetentionPercent,
+    headingRetentionPercent: stageAwareQa.metrics.headingRetentionPercent,
+    sectionRetentionPercent: stageAwareQa.metrics.sectionRetentionPercent,
+    outputExpansionPercent: stageAwareQa.metrics.outputExpansionPercent,
+    rewriteMagnitudePercent: stageAwareQa.metrics.rewriteMagnitudePercent,
+    substantiveDeletion: stageAwareQa.metrics.deletedWords,
+    substantiveAddition: stageAwareQa.metrics.addedWords,
     violations,
+    stageAwareQa,
     correctionSummary,
     compliance,
     provider: modelInvocation.provider || modelInvocation.route?.provider || "",
@@ -1353,7 +1387,9 @@ function assertLineEditingOutputReady(modelInvocation, sourceText, correlationId
   });
   if (!qa.ok) {
     throw Object.assign(new Error("Line Editing output failed governed QA"), {
-      safeCode: `LINE_EDITING_BLOCKED — ${qa.violations.concat(qa.compliance.violations).join("_") || "LINE_OUTPUT_QA_FAILED"}`
+      safeCode: `LINE_EDITING_BLOCKED — ${qa.violations.concat(qa.compliance.violations).join("_") || "LINE_OUTPUT_QA_FAILED"}`,
+      lineQa: qa,
+      rejectedLineOutputHash: crypto.createHash("sha256").update(lineOutput.editedManuscript || "").digest("hex")
     });
   }
   return { lineOutput, qa };
@@ -1372,7 +1408,10 @@ async function buildLineEditedManuscriptDocx(stage, sourceArtifact, outputName, 
     paragraphFromText(`Model provider: ${qa.provider}`),
     paragraphFromText(`Model deployment: ${qa.deployment}`),
     paragraphFromText(`Model fallback: ${qa.fallback ? "YES" : "NO"}`),
-    paragraphFromText(`Retention: ${qa.retentionPercent}%`),
+    paragraphFromText(`Net word retention: ${qa.retentionPercent}%`),
+    paragraphFromText(`Measured output/source word ratio: ${qa.measuredRetentionPercent}%`),
+    paragraphFromText(`Output expansion: ${qa.outputExpansionPercent}%`),
+    paragraphFromText(`Rewrite magnitude: ${qa.rewriteMagnitudePercent}%`),
     paragraphFromText("Governed Line-Edited Manuscript", { heading: HeadingLevel.HEADING_2 }),
     paragraphFromText(
       "This artifact uses the governed model output as the edited manuscript. The pass is limited to sentence-level clarity, paragraph flow, rhythm, readability, tone, and author-voice preservation. It does not authorize developmental restructuring, copyediting, proofreading, or progression to the next stage without author review."
@@ -1430,10 +1469,22 @@ function buildLineEditingMarkdownOutput(stage, outputName, sourceArtifact, extra
     return [
       ...base,
       "## Retention / Drift QA",
+      `Algorithm: ${qa.stageAwareQa.algorithm}`,
       `Source words: ${qa.sourceWords}`,
       `Edited words: ${qa.editedWords}`,
-      `Retention: ${qa.retentionPercent}%`,
-      `Retention window: 95% to 100%`,
+      `Measured output/source word ratio: ${qa.measuredRetentionPercent}%`,
+      `Net word retention: ${qa.retentionPercent}%`,
+      `Net character retention: ${qa.netCharacterRetentionPercent}%`,
+      `Paragraph retention: ${qa.paragraphRetentionPercent}%`,
+      `Heading retention: ${qa.headingRetentionPercent}%`,
+      `Section retention: ${qa.sectionRetentionPercent}%`,
+      `Output expansion: ${qa.outputExpansionPercent}%`,
+      `Rewrite magnitude: ${qa.rewriteMagnitudePercent}%`,
+      `Substantive additions: ${qa.substantiveAddition}`,
+      `Substantive deletions: ${qa.substantiveDeletion}`,
+      `Retention floor: net word retention >= 95%`,
+      `Drift controls: no section loss, no material structure loss, no excessive rewrite magnitude, no substantive invention`,
+      `Violations: ${qa.violations.length ? qa.violations.join(", ") : "None"}`,
       `QA result: ${qa.ok ? "PASS" : "FAIL"}`,
       "",
       "## Compliance",
@@ -2201,6 +2252,7 @@ async function processStage(client, stage, correlationId, options = {}) {
     outputs = await materializeEditorialOutputs(client, stage, stageCode, sourceArtifact, correlationId, upstream);
   } catch (error) {
     const exact = error.safeCode || `${stageCode}_BLOCKED — OUTPUT_MATERIALIZATION_FAILED`;
+    const diagnostics = await recordRejectedLineOutputDiagnostics(client, stage, stageCode, sourceArtifact, error, correlationId);
     const blocked = await recordBlockedTask(client, stage, stageCode, exact, correlationId);
     return {
       stageId: stage.jm1pub_editorialstageid,
@@ -2209,6 +2261,7 @@ async function processStage(client, stage, correlationId, options = {}) {
       status: "EXCEPTION",
       exactBlocker: exact,
       claim,
+      diagnostics,
       blocked
     };
   }
@@ -2329,6 +2382,8 @@ module.exports = {
   graphShareToken,
   invokeStageModelProvider,
   isLivePortfolioStage,
+  buildLineEditingQa,
+  recordRejectedLineOutputDiagnostics,
   normalizeStageCode,
   packageChecksum,
   packageDeliveryPolicy,

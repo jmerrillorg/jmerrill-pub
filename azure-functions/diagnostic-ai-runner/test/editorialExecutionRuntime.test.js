@@ -17,6 +17,7 @@ const {
   graphShareToken,
   invokeStageModelProvider,
   isLivePortfolioStage,
+  buildLineEditingQa,
   normalizeStageCode,
   resolveSourceGraphItem,
   shouldPreserveExistingExactBlocker,
@@ -101,6 +102,10 @@ test("source Graph resolver uses SharePoint web URL when drive/item identity is 
 
 test("source Graph identity blockers are retriable while substantive blockers remain preserved", () => {
   assert.equal(shouldPreserveExistingExactBlocker("LINE_EDITING_BLOCKED — SOURCE_GRAPH_IDENTITY_MISSING"), false);
+  assert.equal(
+    shouldPreserveExistingExactBlocker("LINE_EDITING_BLOCKED — LINE_RETENTION_OUTSIDE_95_TO_100_PERCENT_WINDOW"),
+    false
+  );
   assert.equal(
     shouldPreserveExistingExactBlocker("DEVELOPMENTAL_EDITING_BLOCKED — CANONICAL_COMPILATION_FILE_AMBIGUOUS"),
     true
@@ -439,7 +444,43 @@ test("line editing prompt inherits author-approved developmental context", () =>
   assert.equal(prompt.upstreamContext.priorAuthorDecision.gateId, "gate-dev");
   assert.equal(prompt.upstreamContext.priorAuthorDecision.deliverableArtifactId, "artifact-dev");
   assert.equal(prompt.upstreamContext.approvedUpstreamArtifacts[0].sha256, "sha-dev");
-  assert.match(prompt.upstreamContext.inheritanceRequirements.join(" "), /95% to 100%/);
+  assert.match(prompt.upstreamContext.inheritanceRequirements.join(" "), /at least 95% net source wording/);
+});
+
+test("line editing QA allows safe expansion above the old output/source upper bound", () => {
+  const sourceText = [
+    "Chapter One",
+    "",
+    "This paragraph keeps the author's voice, structure, and meaning intact while giving the runtime enough source language to measure.",
+    "",
+    "The second paragraph preserves sequence and cadence so a small clarifying addition can be evaluated without changing the work."
+  ].join("\n");
+  const editedText = [
+    "Chapter One",
+    "",
+    "This paragraph keeps the author's voice, structure, and meaning intact while giving the runtime enough source language to measure safely.",
+    "",
+    "The second paragraph preserves sequence and cadence so a small clarifying addition can be evaluated without changing the work."
+  ].join("\n");
+  const qa = buildLineEditingQa({
+    sourceText,
+    editedText,
+    modelInvocation: {
+      provider: "microsoft-foundry-claude",
+      routeAlias: "jm1-editorial-devline-primary",
+      promptVersion: "CC010-LINE_EDITING-V1",
+      fellBack: false,
+      output: {
+        editedManuscript: editedText,
+        changeLedger: ["Added one clarifying word."]
+      }
+    },
+    correlationId: "safe-expansion-test"
+  });
+  assert.equal(qa.measuredRetentionPercent > 100, true);
+  assert.equal(qa.retentionPercent, 100);
+  assert.equal(qa.ok, true);
+  assert.equal(qa.violations.includes("LINE_RETENTION_OUTSIDE_95_TO_100_PERCENT_WINDOW"), false);
 });
 
 test("missing source artifact becomes an exact stage-specific blocker", () => {
@@ -1000,7 +1041,126 @@ test("line editing fails closed when governed model output lacks edited manuscri
     assert.equal(result.results[0].status, "EXCEPTION");
     assert.match(result.results[0].exactBlocker, /LINE_EDITED_MANUSCRIPT_MISSING/);
     assert.equal(logs.some((log) => log.jm1_actiontype === "ACTIVE_EDITORIAL_OUTPUT_CREATED"), false);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "LINE_REJECTED_OUTPUT_QA_DIAGNOSTICS"), true);
     assert.equal(patches.some((patch) => /LINE_EDITED_MANUSCRIPT_MISSING/.test(patch.payload.jm1pub_internaloperationalsummary)), true);
+  } finally {
+    graphRequest.override = null;
+    extractSourceText.override = null;
+    invokeStageModelProvider.override = null;
+  }
+});
+
+test("line editing rejected drift logs diagnostics without artifacts or author gate", async () => {
+  const created = [];
+  const logs = [];
+  const patches = [];
+  const sourceText = [
+    "Chapter One",
+    "",
+    "This paragraph keeps rhythm, author voice, story sequence, and the actual source language intact for line editing.",
+    "",
+    "This second paragraph provides enough manuscript language for the validator to reject substantive invention."
+  ].join("\n");
+  const sourceBuffer = Buffer.from(sourceText);
+  const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
+  graphRequest.override = async (path, options = {}) => {
+    assert.notEqual(options.method, "PUT");
+    if (path.endsWith("/content") && !options.method) return sourceBuffer;
+    if (path.includes("?$select=id,name,parentReference,size,webUrl") || path.includes("?$select=id,parentReference")) {
+      return { id: "source-item", parentReference: { id: "parent-folder" }, webUrl: "https://sharepoint/source.docx" };
+    }
+    throw new Error(`Unexpected graph path ${path}`);
+  };
+  extractSourceText.override = async () => ({ value: sourceText });
+  invokeStageModelProvider.override = async () => ({
+    ok: true,
+    provider: "microsoft-foundry-claude",
+    routeAlias: "jm1-editorial-devline-primary",
+    promptVersion: "CC010-LINE_EDITING-V1",
+    fellBack: false,
+    output: {
+      editedManuscript: `${sourceText}\n\nThis new chapter invents an additional argument outside the source manuscript.`,
+      lineEditingSummary: "Added material outside line-editing scope.",
+      changeLedger: ["Invented new material."],
+      authorQueries: []
+    }
+  });
+  const client = {
+    async list(entitySet, query = {}) {
+      if (entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1pub_editorialstages") {
+        return [{ jm1pub_editorialstageid: "stage-dev", jm1pub_stagetype: 100000001 }];
+      }
+      if (
+        entitySet === "jm1pub_editorialartifacts" &&
+        query.$filter?.includes("_jm1pub_editorialstageid_value eq stage-dev")
+      ) {
+        return [{ jm1pub_editorialartifactid: "artifact-dev", jm1pub_sha256: "sha-dev", jm1pub_iscurrentapproved: true }];
+      }
+      if (entitySet === "jm1pub_editorialapprovalgates" && query.$filter?.includes("_jm1pub_editorialstageid_value eq stage-dev")) {
+        return [
+          {
+            jm1pub_editorialapprovalgateid: "gate-dev",
+            jm1pub_gatestatus: 196650003,
+            jm1pub_authordecision: 196650000,
+            jm1pub_authordecisionon: "2026-08-19T01:28:44Z",
+            jm1pub_nextstageauthorized: true,
+            _jm1pub_deliverableartifactid_value: "artifact-dev"
+          }
+        ];
+      }
+      if (entitySet === "jm1pub_editorialartifacts") {
+        return [
+          {
+            jm1pub_editorialartifactid: "source-artifact",
+            jm1pub_editorialartifactname: "Approved Developmental Artifact - Test",
+            jm1pub_filename: "developmental-approved.docx",
+            jm1pub_repositorydriveid: "drive",
+            jm1pub_repositoryitemid: "item",
+            jm1pub_sha256: sourceSha,
+            jm1pub_iscurrentapproved: true
+          }
+        ];
+      }
+      if (entitySet === "jm1pub_editorialapprovalgates") return [];
+      return [];
+    },
+    async create(entitySet, payload) {
+      if (entitySet === "jm1_executionlogs") {
+        logs.push(payload);
+        return `log-${logs.length}`;
+      }
+      created.push({ entitySet, payload });
+      return `created-${created.length}`;
+    },
+    async patch(entitySet, id, payload) {
+      patches.push({ entitySet, id, payload });
+    }
+  };
+  try {
+    const result = await runEditorialExecutionRuntime(
+      { correlationId: "line-rejected-drift-test", maxTasks: 1 },
+      {
+        client,
+        stages: [
+          {
+            jm1pub_editorialstageid: "stage-line",
+            jm1pub_name: "Line Editing - Test",
+            jm1pub_stagetype: 100000002,
+            jm1pub_stagestatus: 100000001,
+            _jm1pub_titleid_value: "title-1",
+            _jm1pub_publishingassetid_value: "asset-1"
+          }
+        ]
+      }
+    );
+    assert.equal(result.results[0].status, "EXCEPTION");
+    assert.match(result.results[0].exactBlocker, /LINE_SUBSTANTIVE_INVENTION_RISK/);
+    assert.equal(created.length, 0);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "LINE_REJECTED_OUTPUT_QA_DIAGNOSTICS"), true);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "AUTHOR_REVIEW_GATE_CREATED"), false);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "ACTIVE_EDITORIAL_OUTPUT_CREATED"), false);
+    assert.equal(patches.some((patch) => /LINE_SUBSTANTIVE_INVENTION_RISK/.test(patch.payload.jm1pub_internaloperationalsummary)), true);
   } finally {
     graphRequest.override = null;
     extractSourceText.override = null;
