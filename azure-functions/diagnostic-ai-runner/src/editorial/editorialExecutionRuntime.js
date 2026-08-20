@@ -766,6 +766,47 @@ function graphFailureDetail(error, sourceArtifact = {}) {
   ].join("; ");
 }
 
+function graphShareToken(webUrl) {
+  const normalized = normalizeString(webUrl);
+  if (!/^https:\/\/.+/i.test(normalized)) return "";
+  return `u!${Buffer.from(normalized).toString("base64").replace(/=+$/g, "").replace(/\+/g, "-").replace(/\//g, "_")}`;
+}
+
+async function resolveSourceGraphItem(sourceArtifact, stageCode) {
+  const driveId = normalizeString(sourceArtifact.jm1pub_repositorydriveid);
+  const itemId = normalizeString(sourceArtifact.jm1pub_repositoryitemid);
+  if (driveId && itemId) {
+    const item = await graphRequest(`drives/${driveId}/items/${itemId}?$select=id,name,parentReference,size,webUrl`).catch((error) => {
+      throw Object.assign(error, {
+        safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_METADATA_READ_FAILED"}`,
+        graphDetail: graphFailureDetail(error, sourceArtifact)
+      });
+    });
+    return { item, driveId, contentPath: `drives/${driveId}/items/${itemId}/content` };
+  }
+
+  const shareToken = graphShareToken(sourceArtifact.jm1pub_repositorypath);
+  if (!shareToken) {
+    throw Object.assign(new Error("Source artifact is missing Graph drive/item identity"), {
+      safeCode: `${stageCode}_BLOCKED — SOURCE_GRAPH_IDENTITY_MISSING`
+    });
+  }
+  const item = await graphRequest(`shares/${shareToken}/driveItem?$select=id,name,parentReference,size,webUrl`).catch((error) => {
+    throw Object.assign(error, {
+      safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_SHARE_METADATA_READ_FAILED"}`,
+      graphDetail: graphFailureDetail(error, sourceArtifact)
+    });
+  });
+  const resolvedDriveId = normalizeString(item?.parentReference?.driveId);
+  const resolvedItemId = normalizeString(item?.id);
+  if (!resolvedDriveId || !resolvedItemId) {
+    throw Object.assign(new Error("SharePoint source URL did not resolve to a Graph drive item"), {
+      safeCode: `${stageCode}_BLOCKED — SOURCE_GRAPH_IDENTITY_MISSING`
+    });
+  }
+  return { item, driveId: resolvedDriveId, contentPath: `shares/${shareToken}/driveItem/content` };
+}
+
 async function findExecutionLog(client, actionType, idempotencyKey) {
   const rows = await client.list("jm1_executionlogs", {
     $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,createdon",
@@ -1578,20 +1619,10 @@ function buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extra
 }
 
 async function materializeEditorialOutputs(client, stage, stageCode, sourceArtifact, correlationId, upstreamContext = null) {
-  const driveId = normalizeString(sourceArtifact.jm1pub_repositorydriveid);
-  const itemId = normalizeString(sourceArtifact.jm1pub_repositoryitemid);
-  if (!driveId || !itemId) {
-    throw Object.assign(new Error("Source artifact is missing Graph drive/item identity"), {
-      safeCode: `${stageCode}_BLOCKED — SOURCE_GRAPH_IDENTITY_MISSING`
-    });
-  }
-  const sourceItem = await graphRequest(`drives/${driveId}/items/${itemId}?$select=id,name,parentReference,size,webUrl`).catch((error) => {
-    throw Object.assign(error, {
-      safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_METADATA_READ_FAILED"}`,
-      graphDetail: graphFailureDetail(error, sourceArtifact)
-    });
-  });
-  const sourceBuffer = await graphRequest(`drives/${driveId}/items/${itemId}/content`).catch((error) => {
+  const sourceRef = await resolveSourceGraphItem(sourceArtifact, stageCode);
+  const driveId = sourceRef.driveId;
+  const sourceItem = sourceRef.item;
+  const sourceBuffer = await graphRequest(sourceRef.contentPath).catch((error) => {
     throw Object.assign(error, {
       safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_DOWNLOAD_FAILED"}`,
       graphDetail: graphFailureDetail(error, sourceArtifact)
@@ -2290,6 +2321,7 @@ module.exports = {
   findExistingOutputArtifacts,
   findUpstreamApprovalEvidence,
   graphRequest,
+  graphShareToken,
   invokeStageModelProvider,
   isLivePortfolioStage,
   normalizeStageCode,
@@ -2298,6 +2330,7 @@ module.exports = {
   packageRoleForOutput,
   requiredPackageRoles,
   requireDataverseConfig,
+  resolveSourceGraphItem,
   writeLog,
   evaluateTargetedEditorialExecution,
   runTargetedEditorialExecution,
