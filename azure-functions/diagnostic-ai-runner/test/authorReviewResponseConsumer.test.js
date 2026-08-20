@@ -156,6 +156,11 @@ test("package-selection replies are processed by the shared five-minute inbound 
   assert.equal(result.packageSelectionResults[0].outcome, "PACKAGE_SELECTED");
   assert.equal(result.packageSelectionResults[0].selectedPackage.code, "JMP-PKG-STARTER");
   assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_SELECTED"));
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_ACCEPTED"));
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "OFFER_PREVIEW_GENERATED"));
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "RESPONSE_PREVIEW"));
+  assert.equal(result.packageSelectionResults[0].offerPreview.liveActions.sendsAuthorEmail, false);
+  assert.equal(result.packageSelectionResults[0].responsePreview.liveAutoSendEnabled, false);
   assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialdiagnostics"));
 });
 
