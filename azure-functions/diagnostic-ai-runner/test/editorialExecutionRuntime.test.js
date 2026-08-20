@@ -113,6 +113,7 @@ test("source Graph identity blockers are retriable while substantive blockers re
     shouldPreserveExistingExactBlocker("LINE_EDITING_BLOCKED — LINE_EDITED_MANUSCRIPT_MISSING_LINE_NET_WORD_RETENTION_BELOW_95_PERCENT"),
     false
   );
+  assert.equal(shouldPreserveExistingExactBlocker("LINE_EDITING_BLOCKED — MODEL_INVOCATION_FAILED"), false);
   assert.equal(
     shouldPreserveExistingExactBlocker("DEVELOPMENTAL_EDITING_BLOCKED — CANONICAL_COMPILATION_FILE_AMBIGUOUS"),
     true
