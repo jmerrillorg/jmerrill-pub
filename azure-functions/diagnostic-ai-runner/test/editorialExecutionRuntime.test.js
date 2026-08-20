@@ -16,6 +16,9 @@ const {
   graphRequest,
   graphShareToken,
   invokeStageModelProvider,
+  invokeSingleStageModelProvider,
+  splitLineEditingSourceChunks,
+  buildLineEditingChunkPrompt,
   isLivePortfolioStage,
   buildLineEditingQa,
   normalizeStageCode,
@@ -481,6 +484,105 @@ test("line editing QA allows safe expansion above the old output/source upper bo
   assert.equal(qa.retentionPercent, 100);
   assert.equal(qa.ok, true);
   assert.equal(qa.violations.includes("LINE_RETENTION_OUTSIDE_95_TO_100_PERCENT_WINDOW"), false);
+});
+
+test("line editing source chunker preserves full manuscript text in order", () => {
+  const sourceText = [
+    "Chapter One",
+    "",
+    "one two three four five",
+    "",
+    "six seven eight nine ten",
+    "",
+    "eleven twelve thirteen"
+  ].join("\n");
+  const chunks = splitLineEditingSourceChunks(sourceText, 6);
+  assert.equal(chunks.length > 1, true);
+  assert.equal(chunks.join("\n\n"), sourceText);
+});
+
+test("line editing chunk prompt includes sourceText instead of sample-only input", () => {
+  const prompt = JSON.parse(buildLineEditingChunkPrompt({
+    stage: {
+      jm1pub_editorialstageid: "stage-line",
+      jm1pub_name: "Line Editing - Test",
+      _jm1pub_titleid_value: "title-1"
+    },
+    sourceArtifact: {
+      jm1pub_editorialartifactid: "source-artifact",
+      jm1pub_editorialartifactname: "Approved Developmental Manuscript",
+      jm1pub_filename: "approved.docx",
+      jm1pub_sha256: "sha-source",
+      jm1pub_iscurrentapproved: true
+    },
+    chunkText: "Chapter One\n\nThe exact chunk text must be edited and returned.",
+    chunkIndex: 1,
+    chunkCount: 2,
+    totalWordCount: 100,
+    upstreamContext: null
+  }));
+  assert.equal(prompt.task, "cc010_line_editing_full_manuscript_chunk_execution");
+  assert.equal(prompt.sourceText, "Chapter One\n\nThe exact chunk text must be edited and returned.");
+  assert.equal(prompt.sourceSample, undefined);
+  assert.equal(prompt.requiredOutput.editedManuscript.includes("exact chunk"), true);
+});
+
+test("line editing provider route chunks and aggregates full-manuscript output", async () => {
+  const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
+  process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = "7";
+  const calls = [];
+  const stage = {
+    jm1pub_editorialstageid: "stage-line",
+    jm1pub_name: "Line Editing - Test",
+    _jm1pub_titleid_value: "title-1"
+  };
+  const sourceArtifact = {
+    jm1pub_editorialartifactid: "source-artifact",
+    jm1pub_editorialartifactname: "Approved Developmental Manuscript",
+    jm1pub_filename: "approved.docx",
+    jm1pub_sha256: "sha-source",
+    jm1pub_iscurrentapproved: true
+  };
+  invokeSingleStageModelProvider.override = async (input) => {
+    calls.push(input);
+    const prompt = JSON.parse(input.promptBody);
+    return {
+      ok: true,
+      provider: "microsoft-foundry-claude",
+      routeAlias: "jm1-editorial-devline-primary",
+      promptVersion: input.promptVersion,
+      fellBack: false,
+      tokenCounts: { input: 10, output: 8, total: 18 },
+      output: {
+        editedManuscript: prompt.sourceText.replace("rough", "clear"),
+        lineEditingSummary: `Edited chunk ${prompt.chunkIndex}.`,
+        changeLedger: [`Smoothed chunk ${prompt.chunkIndex}.`],
+        retentionNotes: "Chunk retained.",
+        authorQueries: []
+      }
+    };
+  };
+  try {
+    const sourceText = [
+      "Chapter One",
+      "",
+      "This rough paragraph keeps source order.",
+      "",
+      "This rough second paragraph also remains."
+    ].join("\n");
+    const result = await invokeStageModelProvider(stage, "LINE_EDITING", sourceArtifact, sourceText, "chunk-route-test", null);
+    assert.equal(result.ok, true);
+    assert.equal(result.chunkCount, 3);
+    assert.equal(calls.length, 3);
+    assert.match(result.output.editedManuscript, /This clear paragraph/);
+    assert.match(result.output.editedManuscript, /This clear second paragraph/);
+    assert.equal(result.tokenCounts.total, 54);
+    assert.equal(result.promptVersion, "CC010-LINE_EDITING-CHUNK-V1");
+  } finally {
+    invokeSingleStageModelProvider.override = null;
+    if (previousLimit === undefined) delete process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
+    else process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = previousLimit;
+  }
 });
 
 test("missing source artifact becomes an exact stage-specific blocker", () => {
