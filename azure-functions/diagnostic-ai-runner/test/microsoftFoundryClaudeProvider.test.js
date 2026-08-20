@@ -168,6 +168,8 @@ describe("microsoftFoundryClaudeProvider", () => {
       assert.equal(parsedBody.max_tokens, 4096);
       assert.equal(parsedBody.stream, false);
       assert.equal(parsedBody.model, "jm1-editorial-devline-primary");
+      assert.equal(parsedBody.tools[0].name, "submit_jm1_structured_output");
+      assert.equal(parsedBody.tool_choice.name, "submit_jm1_structured_output");
       assert.equal(parsedBody.messages[0].role, "user");
       assert.equal(parsedBody.messages[0].content, "{\"task\":\"analyze\"}");
 
@@ -175,6 +177,51 @@ describe("microsoftFoundryClaudeProvider", () => {
       assert.equal(dependencyCalls[0].meta.dependencyTypeName, "Microsoft Foundry");
       assert.equal(dependencyCalls[0].meta.properties.provider, "microsoft-foundry-claude");
       assert.equal(dependencyCalls[0].meta.properties.model, "claude-sonnet-5");
+    } finally {
+      restore();
+    }
+  });
+
+  test("accepts structured tool_use output before falling back to text JSON parsing", async () => {
+    const { loaded, restore } = loadProviderWithStubs({
+      fetchImpl: async () => ({
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        async json() {
+          return {
+            content: [
+              {
+                type: "tool_use",
+                name: "submit_jm1_structured_output",
+                input: {
+                  editedManuscript: "Edited chunk text.",
+                  lineEditingSummary: "Completed."
+                }
+              }
+            ],
+            usage: { input_tokens: 9, output_tokens: 8 }
+          };
+        }
+      })
+    });
+
+    try {
+      await withEnv(
+        { AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" },
+        async () => {
+          const result = await loaded.call({
+            promptBody: "{\"task\":\"line\"}",
+            diagnosticId: "diag-tool",
+            route: { deploymentName: "jm1-editorial-devline-primary" }
+          });
+
+          assert.equal(result.ok, true);
+          assert.equal(result.responseClassification, "tool-use");
+          assert.equal(result.output.editedManuscript, "Edited chunk text.");
+          assert.equal(result.request.responseContract, "anthropic-messages-tool");
+        }
+      );
     } finally {
       restore();
     }
