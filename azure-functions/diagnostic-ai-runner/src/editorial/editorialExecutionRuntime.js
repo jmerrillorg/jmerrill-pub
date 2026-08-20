@@ -46,6 +46,7 @@ const GATE_CODES = Object.freeze({
   COPYEDITING: 196650003,
   PROOFREADING: 196650004
 });
+const DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT = 1800;
 
 const EXECUTOR_POLICIES = {
   EDITORIAL_REVIEW: {
@@ -541,6 +542,89 @@ function buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText
   });
 }
 
+function parsePositiveInteger(value, fallback) {
+  const parsed = Number.parseInt(normalizeString(value), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function lineEditingChunkWordLimit() {
+  return parsePositiveInteger(process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT, DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT);
+}
+
+function splitLineEditingSourceChunks(text, maxWords = lineEditingChunkWordLimit()) {
+  const normalized = normalizeString(text).replace(/\r\n/g, "\n");
+  const sourceParagraphs = normalized
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+  const chunks = [];
+  let current = [];
+  let currentWords = 0;
+  for (const paragraph of sourceParagraphs) {
+    const paragraphWords = paragraph.split(/\s+/).filter(Boolean).length;
+    if (current.length && currentWords + paragraphWords > maxWords) {
+      chunks.push(current.join("\n\n"));
+      current = [];
+      currentWords = 0;
+    }
+    if (paragraphWords > maxWords) {
+      const paragraphTokens = paragraph.split(/\s+/).filter(Boolean);
+      for (let index = 0; index < paragraphTokens.length; index += maxWords) {
+        if (current.length) {
+          chunks.push(current.join("\n\n"));
+          current = [];
+          currentWords = 0;
+        }
+        chunks.push(paragraphTokens.slice(index, index + maxWords).join(" "));
+      }
+      continue;
+    }
+    current.push(paragraph);
+    currentWords += paragraphWords;
+  }
+  if (current.length) chunks.push(current.join("\n\n"));
+  return chunks.length ? chunks : [normalized];
+}
+
+function buildLineEditingChunkPrompt({
+  stage,
+  sourceArtifact,
+  chunkText,
+  chunkIndex,
+  chunkCount,
+  totalWordCount,
+  upstreamContext
+}) {
+  const chunkSummary = summarizeExtractedText(chunkText || "");
+  return JSON.stringify({
+    task: "cc010_line_editing_full_manuscript_chunk_execution",
+    contract:
+      "Return only JSON. Do not return markdown fences. Return the full edited text for this chunk in editedManuscript.",
+    stageCode: "LINE_EDITING",
+    stageName: stage.jm1pub_name,
+    titleId: stage._jm1pub_titleid_value,
+    sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+    sourceSha256: sourceArtifact.jm1pub_sha256,
+    chunkIndex,
+    chunkCount,
+    sourceWordCount: totalWordCount,
+    chunkWordCount: chunkSummary.words,
+    lineScope:
+      "Sentence-level clarity, paragraph flow, tone, rhythm, readability, and author voice preservation. Preserve this chunk's substantive content. Do not summarize, omit sections, invent content, perform developmental restructuring, or copyedit beyond Line scope.",
+    upstreamContext: summarizeUpstreamContextForPrompt(stage, "LINE_EDITING", sourceArtifact, upstreamContext || {}),
+    requiredOutput: {
+      editedManuscript: "string containing the full line-edited text for this exact chunk",
+      lineEditingSummary: "string",
+      changeLedger: ["specific line-level changes or recurring patterns in this chunk"],
+      retentionNotes: "string",
+      authorQueries: ["string"]
+    },
+    chunkAssemblyInvariant:
+      "This is one governed chunk of a full-manuscript Line Editing pass. Preserve chunk order. Do not add headings unless present in the chunk. Do not omit source paragraphs.",
+    sourceText: chunkText
+  });
+}
+
 function selectedStyleGuidesForStage(stageCode) {
   if (stageCode === "LINE_EDITING" || stageCode === "COPYEDITING" || stageCode === "PROOFREADING") {
     return ["JMP-CG-LINE-COPY-PROOF-V1"];
@@ -548,9 +632,29 @@ function selectedStyleGuidesForStage(stageCode) {
   return [];
 }
 
-async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extractedText, correlationId, upstreamContext = null) {
-  if (typeof invokeStageModelProvider.override === "function") {
-    return invokeStageModelProvider.override(stage, stageCode, sourceArtifact, extractedText, correlationId, upstreamContext);
+async function invokeSingleStageModelProvider({
+  stage,
+  stageCode,
+  sourceArtifact,
+  extractedText,
+  correlationId,
+  upstreamContext = null,
+  promptBody = null,
+  diagnosticId = null,
+  promptVersion = null
+}) {
+  if (typeof invokeSingleStageModelProvider.override === "function") {
+    return invokeSingleStageModelProvider.override({
+      stage,
+      stageCode,
+      sourceArtifact,
+      extractedText,
+      correlationId,
+      upstreamContext,
+      promptBody,
+      diagnosticId,
+      promptVersion
+    });
   }
   const deploymentAlias = preferredDeploymentAliasForStage(stageCode);
   if (!deploymentAlias) {
@@ -566,13 +670,13 @@ async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extrac
     };
   }
   const result = await routeToProvider({
-    promptBody: buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText, upstreamContext }),
-    diagnosticId: normalizeString(stage._jm1pub_titleid_value) || normalizeString(stage.jm1pub_editorialstageid),
+    promptBody: promptBody || buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText, upstreamContext }),
+    diagnosticId: diagnosticId || normalizeString(stage._jm1pub_titleid_value) || normalizeString(stage.jm1pub_editorialstageid),
     executionType: "default",
     editorialTransaction: transactionForStage(stageCode),
     modelDeploymentAlias: deploymentAlias,
     promptKey: `jm1-prompt-pub-${stageCode.toLowerCase().replace(/_/g, "-")}`,
-    promptVersion: `CC010-${stageCode}-V1`,
+    promptVersion: promptVersion || `CC010-${stageCode}-V1`,
     selectedStyleGuides: selectedStyleGuidesForStage(stageCode),
     allowFallback: false,
     telemetry: { correlationId }
@@ -581,8 +685,85 @@ async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extrac
     ...result,
     fellBack: Boolean(result.route?.fallbackFromAlias),
     routeAlias: result.route?.deploymentAlias || deploymentAlias,
-    promptVersion: `CC010-${stageCode}-V1`
+    promptVersion: promptVersion || `CC010-${stageCode}-V1`
   };
+}
+
+async function invokeLineEditingModelProvider(stage, sourceArtifact, extractedText, correlationId, upstreamContext = null) {
+  const chunks = splitLineEditingSourceChunks(extractedText);
+  const totalWordCount = summarizeExtractedText(extractedText || "").words;
+  const chunkOutputs = [];
+  const tokenCounts = { input: 0, output: 0, total: 0 };
+  let firstResult = null;
+  for (let index = 0; index < chunks.length; index += 1) {
+    const chunkIndex = index + 1;
+    const result = await invokeSingleStageModelProvider({
+      stage,
+      stageCode: "LINE_EDITING",
+      sourceArtifact,
+      extractedText: chunks[index],
+      correlationId: `${correlationId}:chunk-${chunkIndex}-of-${chunks.length}`,
+      upstreamContext,
+      promptBody: buildLineEditingChunkPrompt({
+        stage,
+        sourceArtifact,
+        chunkText: chunks[index],
+        chunkIndex,
+        chunkCount: chunks.length,
+        totalWordCount,
+        upstreamContext
+      }),
+      diagnosticId: `${normalizeString(stage._jm1pub_titleid_value) || normalizeString(stage.jm1pub_editorialstageid)}:line-chunk-${chunkIndex}`,
+      promptVersion: "CC010-LINE_EDITING-CHUNK-V1"
+    });
+    if (!firstResult) firstResult = result;
+    tokenCounts.input += result.tokenCounts?.input || 0;
+    tokenCounts.output += result.tokenCounts?.output || 0;
+    tokenCounts.total += result.tokenCounts?.total || 0;
+    if (!result.ok || result.fellBack) return { ...result, tokenCounts, chunkCount: chunks.length, failedChunk: chunkIndex };
+    const output = lineEditingOutput(result);
+    if (!output.editedManuscript) {
+      return {
+        ...result,
+        ok: false,
+        tokenCounts,
+        chunkCount: chunks.length,
+        failedChunk: chunkIndex,
+        error: "LINE_CHUNK_EDITED_MANUSCRIPT_MISSING"
+      };
+    }
+    chunkOutputs.push({ ...output, routeAlias: result.routeAlias, provider: result.provider, promptVersion: result.promptVersion });
+  }
+  return {
+    ...(firstResult || {}),
+    ok: true,
+    tokenCounts,
+    output: {
+      editedManuscript: chunkOutputs.map((item) => item.editedManuscript).join("\n\n"),
+      lineEditingSummary: chunkOutputs.map((item, index) => `Chunk ${index + 1}: ${item.lineEditingSummary || "Line editing completed."}`).join("\n"),
+      retentionNotes: chunkOutputs.map((item, index) => `Chunk ${index + 1}: ${item.retentionNotes || "Source content retained."}`).join("\n"),
+      changeLedger: chunkOutputs.flatMap((item, index) =>
+        item.changeLedger.length
+          ? item.changeLedger.map((entry) => `Chunk ${index + 1}: ${entry}`)
+          : [`Chunk ${index + 1}: No recurring line-editing pattern separately reported.`]
+      ),
+      authorQueries: chunkOutputs.flatMap((item, index) =>
+        item.authorQueries.map((entry) => `Chunk ${index + 1}: ${entry}`)
+      )
+    },
+    chunkCount: chunks.length,
+    promptVersion: "CC010-LINE_EDITING-CHUNK-V1"
+  };
+}
+
+async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extractedText, correlationId, upstreamContext = null) {
+  if (typeof invokeStageModelProvider.override === "function") {
+    return invokeStageModelProvider.override(stage, stageCode, sourceArtifact, extractedText, correlationId, upstreamContext);
+  }
+  if (stageCode === "LINE_EDITING") {
+    return invokeLineEditingModelProvider(stage, sourceArtifact, extractedText, correlationId, upstreamContext);
+  }
+  return invokeSingleStageModelProvider({ stage, stageCode, sourceArtifact, extractedText, correlationId, upstreamContext });
 }
 
 function requireDataverseConfig() {
@@ -2381,6 +2562,9 @@ module.exports = {
   graphRequest,
   graphShareToken,
   invokeStageModelProvider,
+  invokeSingleStageModelProvider,
+  splitLineEditingSourceChunks,
+  buildLineEditingChunkPrompt,
   isLivePortfolioStage,
   buildLineEditingQa,
   recordRejectedLineOutputDiagnostics,
