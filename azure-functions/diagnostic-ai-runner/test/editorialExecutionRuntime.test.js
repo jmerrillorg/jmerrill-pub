@@ -5,6 +5,7 @@ const test = require("node:test");
 const mammoth = require("mammoth");
 
 const {
+  DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT,
   EXECUTOR_POLICIES,
   authorGateBlocksRuntime,
   buildStageModelPrompt,
@@ -505,6 +506,21 @@ test("line editing source chunker preserves full manuscript text in order", () =
   const chunks = splitLineEditingSourceChunks(sourceText, 6);
   assert.equal(chunks.length > 1, true);
   assert.equal(chunks.join("\n\n"), sourceText);
+});
+
+test("line editing default chunk size is production-sized for full-manuscript execution", () => {
+  const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
+  delete process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
+  try {
+    assert.equal(DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT, 4500);
+    const sourceText = Array.from({ length: 9001 }, (_, index) => `word${index}`).join(" ");
+    const chunks = splitLineEditingSourceChunks(sourceText);
+    assert.equal(chunks.length, 3);
+    assert.equal(chunks.join(" "), sourceText);
+  } finally {
+    if (previousLimit === undefined) delete process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
+    else process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = previousLimit;
+  }
 });
 
 test("line editing chunk prompt includes sourceText instead of sample-only input", () => {

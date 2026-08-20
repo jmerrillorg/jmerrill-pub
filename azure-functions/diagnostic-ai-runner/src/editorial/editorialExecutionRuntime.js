@@ -46,7 +46,7 @@ const GATE_CODES = Object.freeze({
   COPYEDITING: 196650003,
   PROOFREADING: 196650004
 });
-const DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT = 1800;
+const DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT = 4500;
 
 const EXECUTOR_POLICIES = {
   EDITORIAL_REVIEW: {
@@ -2579,6 +2579,7 @@ async function runEditorialExecutionRuntime(options = {}, deps = {}) {
 }
 
 module.exports = {
+  DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT,
   EXECUTOR_POLICIES,
   STAGE_STATUS,
   STAGE_TYPES,
