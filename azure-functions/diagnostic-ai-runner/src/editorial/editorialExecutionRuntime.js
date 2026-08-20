@@ -158,7 +158,80 @@ function preferredDeploymentAliasForStage(stageCode) {
   );
 }
 
-function buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText }) {
+function compactPromptText(value, maxLength = 1200) {
+  const text = normalizeString(value).replace(/\s+/g, " ");
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength - 3)}...`;
+}
+
+function summarizeUpstreamContextForPrompt(stage, stageCode, sourceArtifact, upstreamContext = {}) {
+  const approvedGate =
+    (upstreamContext.gates || []).find((gate) =>
+      Number(gate.jm1pub_gatestatus) === GATE_STATUS_APPROVED &&
+      Number(gate.jm1pub_authordecision) === AUTHOR_DECISION_APPROVE &&
+      gate.jm1pub_nextstageauthorized === true
+    ) || null;
+  const approvedArtifactId =
+    normalizeString(upstreamContext.approvedArtifactId) ||
+    normalizeString(approvedGate?._jm1pub_deliverableartifactid_value);
+  const approvedArtifacts = (upstreamContext.artifacts || [])
+    .filter((artifact) =>
+      normalizeString(artifact.jm1pub_editorialartifactid) === approvedArtifactId ||
+      artifact.jm1pub_iscurrentapproved === true
+    )
+    .slice(0, 5)
+    .map((artifact) => ({
+      artifactId: artifact.jm1pub_editorialartifactid,
+      name: artifact.jm1pub_editorialartifactname,
+      filename: artifact.jm1pub_filename,
+      sha256: artifact.jm1pub_sha256,
+      currentApproved: artifact.jm1pub_iscurrentapproved === true,
+      modifiedOn: artifact.modifiedon
+    }));
+  return {
+    manualCanon:
+      "JMP-GPTs_2.zip editorial manuals plus Founder corrections canonicalized in repository canon cache.",
+    currentStage: {
+      stageId: stage.jm1pub_editorialstageid,
+      stageCode,
+      stageName: stage.jm1pub_name,
+      internalSummary: compactPromptText(stage.jm1pub_internaloperationalsummary),
+      authorSafeSummary: compactPromptText(stage.jm1pub_authorsafesummary)
+    },
+    sourceAuthority: {
+      artifactId: sourceArtifact.jm1pub_editorialartifactid,
+      name: sourceArtifact.jm1pub_editorialartifactname,
+      filename: sourceArtifact.jm1pub_filename,
+      sha256: sourceArtifact.jm1pub_sha256,
+      currentApproved: sourceArtifact.jm1pub_iscurrentapproved === true
+    },
+    priorAuthorDecision: approvedGate
+      ? {
+          gateId: approvedGate.jm1pub_editorialapprovalgateid,
+          decision: "APPROVED",
+          decisionOn: approvedGate.jm1pub_authordecisionon,
+          nextStageAuthorized: approvedGate.jm1pub_nextstageauthorized === true,
+          deliverableArtifactId: approvedGate._jm1pub_deliverableartifactid_value
+        }
+      : null,
+    approvedUpstreamArtifacts: approvedArtifacts,
+    upstreamStages: (upstreamContext.stages || []).slice(0, 5).map((upstreamStage) => ({
+      stageId: upstreamStage.jm1pub_editorialstageid,
+      stageName: upstreamStage.jm1pub_name,
+      stageType: upstreamStage.jm1pub_stagetype,
+      stageStatus: upstreamStage.jm1pub_stagestatus,
+      modifiedOn: upstreamStage.modifiedon
+    })),
+    inheritanceRequirements: [
+      "Use the author-approved upstream artifact as the controlling prior-stage baseline.",
+      "Use upstream Editorial Review or Developmental context when present; if absent, preserve the manuscript's existing style and flag the missing context.",
+      "Line Editing must preserve 95% to 100% of source wording and must not perform developmental restructuring or copyediting drift.",
+      "Line Editing completion creates an author review/approval gate and does not authorize Copyediting automatically."
+    ]
+  };
+}
+
+function buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText, upstreamContext }) {
   const summary = summarizeExtractedText(extractedText || "");
   if (stageCode === "LINE_EDITING") {
     return JSON.stringify({
@@ -173,6 +246,7 @@ function buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText
       sourceParagraphCount: summary.paragraphs,
       lineScope:
         "Sentence-level clarity, paragraph flow, tone, rhythm, readability, and author voice preservation. Do not perform developmental restructuring, substantive invention, or copyediting drift.",
+      upstreamContext: summarizeUpstreamContextForPrompt(stage, stageCode, sourceArtifact, upstreamContext),
       requiredOutput: {
         editedManuscript: "string containing the full line-edited manuscript text",
         lineEditingSummary: "string",
@@ -214,9 +288,9 @@ function selectedStyleGuidesForStage(stageCode) {
   return [];
 }
 
-async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extractedText, correlationId) {
+async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extractedText, correlationId, upstreamContext = null) {
   if (typeof invokeStageModelProvider.override === "function") {
-    return invokeStageModelProvider.override(stage, stageCode, sourceArtifact, extractedText, correlationId);
+    return invokeStageModelProvider.override(stage, stageCode, sourceArtifact, extractedText, correlationId, upstreamContext);
   }
   const deploymentAlias = preferredDeploymentAliasForStage(stageCode);
   if (!deploymentAlias) {
@@ -232,7 +306,7 @@ async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extrac
     };
   }
   const result = await routeToProvider({
-    promptBody: buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText }),
+    promptBody: buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText, upstreamContext }),
     diagnosticId: normalizeString(stage._jm1pub_titleid_value) || normalizeString(stage.jm1pub_editorialstageid),
     executionType: "default",
     editorialTransaction: transactionForStage(stageCode),
@@ -944,7 +1018,7 @@ function buildLineEditingQa({ sourceText, editedText, modelInvocation, correlati
   });
   const violations = [];
   if (!editedText) violations.push("LINE_EDITED_MANUSCRIPT_MISSING");
-  if (retentionRatio < 0.95 || retentionRatio > 1.05) violations.push("LINE_RETENTION_OUTSIDE_95_TO_105_PERCENT_WINDOW");
+  if (retentionRatio < 0.95 || retentionRatio > 1.0) violations.push("LINE_RETENTION_OUTSIDE_95_TO_100_PERCENT_WINDOW");
   if (modelInvocation.fellBack) violations.push("MODEL_FALLBACK_NOT_ALLOWED");
   if (modelInvocation.provider !== "microsoft-foundry-claude") violations.push("PREFERRED_LINE_MODEL_PROVIDER_NOT_USED");
   return {
@@ -1054,7 +1128,7 @@ function buildLineEditingMarkdownOutput(stage, outputName, sourceArtifact, extra
       `Source words: ${qa.sourceWords}`,
       `Edited words: ${qa.editedWords}`,
       `Retention: ${qa.retentionPercent}%`,
-      `Retention window: 95% to 105%`,
+      `Retention window: 95% to 100%`,
       `QA result: ${qa.ok ? "PASS" : "FAIL"}`,
       "",
       "## Compliance",
@@ -1244,7 +1318,7 @@ function buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extra
   ].join("\n");
 }
 
-async function materializeEditorialOutputs(client, stage, stageCode, sourceArtifact, correlationId) {
+async function materializeEditorialOutputs(client, stage, stageCode, sourceArtifact, correlationId, upstreamContext = null) {
   const driveId = normalizeString(sourceArtifact.jm1pub_repositorydriveid);
   const itemId = normalizeString(sourceArtifact.jm1pub_repositoryitemid);
   if (!driveId || !itemId) {
@@ -1283,7 +1357,8 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
     stageCode,
     sourceArtifact,
     extracted.value || "",
-    correlationId
+    correlationId,
+    upstreamContext
   );
   if (!modelInvocation.ok || modelInvocation.fellBack) {
     throw Object.assign(new Error(modelInvocation.error || "Governed model route failed"), {
@@ -1828,7 +1903,7 @@ async function processStage(client, stage, correlationId) {
   }
   let outputs;
   try {
-    outputs = await materializeEditorialOutputs(client, stage, stageCode, sourceArtifact, correlationId);
+    outputs = await materializeEditorialOutputs(client, stage, stageCode, sourceArtifact, correlationId, upstream);
   } catch (error) {
     const exact = error.safeCode || `${stageCode}_BLOCKED — OUTPUT_MATERIALIZATION_FAILED`;
     const blocked = await recordBlockedTask(client, stage, stageCode, exact, correlationId);
@@ -1947,6 +2022,7 @@ module.exports = {
   createDataverseClient,
   createAuthorReviewGate,
   createPackageManifestArtifact,
+  buildStageModelPrompt,
   extractSourceText,
   findArtifactByName,
   findActiveEditorialStages,

@@ -7,6 +7,7 @@ const mammoth = require("mammoth");
 const {
   EXECUTOR_POLICIES,
   authorGateBlocksRuntime,
+  buildStageModelPrompt,
   buildExactBlocker,
   classifyGraphFailure,
   extractSourceText,
@@ -122,6 +123,63 @@ test("upstream approval evidence blocks when the approval is not bound to the ar
   );
   assert.equal(result.ok, false);
   assert.match(result.reason, /AUTHOR_APPROVAL_NOT_BOUND_TO_CURRENT_ARTIFACT/);
+});
+
+test("line editing prompt inherits author-approved developmental context", () => {
+  const prompt = JSON.parse(buildStageModelPrompt({
+    stage: {
+      jm1pub_editorialstageid: "stage-line",
+      jm1pub_name: "Line Editing - Test",
+      jm1pub_internaloperationalsummary: "Line pass is ready after Developmental author approval.",
+      jm1pub_authorsafesummary: "The manuscript is moving to line editing.",
+      _jm1pub_titleid_value: "title-1"
+    },
+    stageCode: "LINE_EDITING",
+    sourceArtifact: {
+      jm1pub_editorialartifactid: "source-artifact",
+      jm1pub_editorialartifactname: "Approved Developmental Manuscript",
+      jm1pub_filename: "developmental-approved.docx",
+      jm1pub_sha256: "sha-source",
+      jm1pub_iscurrentapproved: true
+    },
+    extractedText: "This sentence reads clearly today.",
+    upstreamContext: {
+      approvedArtifactId: "artifact-dev",
+      stages: [
+        {
+          jm1pub_editorialstageid: "stage-dev",
+          jm1pub_name: "Developmental Editing - Test",
+          jm1pub_stagetype: 100000001,
+          jm1pub_stagestatus: 100000008,
+          modifiedon: "2026-08-19T01:28:44Z"
+        }
+      ],
+      artifacts: [
+        {
+          jm1pub_editorialartifactid: "artifact-dev",
+          jm1pub_editorialartifactname: "Developmentally Edited Manuscript",
+          jm1pub_filename: "developmental-approved.docx",
+          jm1pub_sha256: "sha-dev",
+          jm1pub_iscurrentapproved: true,
+          modifiedon: "2026-08-19T01:28:44Z"
+        }
+      ],
+      gates: [
+        {
+          jm1pub_editorialapprovalgateid: "gate-dev",
+          jm1pub_gatestatus: 196650003,
+          jm1pub_authordecision: 196650000,
+          jm1pub_authordecisionon: "2026-08-19T01:28:44Z",
+          jm1pub_nextstageauthorized: true,
+          _jm1pub_deliverableartifactid_value: "artifact-dev"
+        }
+      ]
+    }
+  }));
+  assert.equal(prompt.upstreamContext.priorAuthorDecision.gateId, "gate-dev");
+  assert.equal(prompt.upstreamContext.priorAuthorDecision.deliverableArtifactId, "artifact-dev");
+  assert.equal(prompt.upstreamContext.approvedUpstreamArtifacts[0].sha256, "sha-dev");
+  assert.match(prompt.upstreamContext.inheritanceRequirements.join(" "), /95% to 100%/);
 });
 
 test("missing source artifact becomes an exact stage-specific blocker", () => {
@@ -452,6 +510,7 @@ test("line editing materializes model-supplied edited manuscript and opens autho
   const editedText = "This sentence reads more clearly.\n\nThis paragraph keeps rhythm intact.";
   const sourceBuffer = Buffer.from(sourceText);
   const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
+  let capturedUpstreamContext = null;
   graphRequest.override = async (path, options = {}) => {
     if (path.endsWith("/content") && !options.method) return sourceBuffer;
     if (path.includes("?$select=id,name,parentReference,size,webUrl") || path.includes("?$select=id,parentReference")) {
@@ -470,20 +529,23 @@ test("line editing materializes model-supplied edited manuscript and opens autho
     throw new Error(`Unexpected graph path ${path}`);
   };
   extractSourceText.override = async () => ({ value: sourceText });
-  invokeStageModelProvider.override = async () => ({
-    ok: true,
-    provider: "microsoft-foundry-claude",
-    routeAlias: "jm1-editorial-devline-primary",
-    promptVersion: "CC010-LINE_EDITING-V1",
-    fellBack: false,
-    output: {
-      editedManuscript: editedText,
-      lineEditingSummary: "Improved sentence clarity while preserving voice.",
-      changeLedger: ["Smoothed one sentence for clarity without changing meaning."],
-      retentionNotes: "Full manuscript retained.",
-      authorQueries: []
-    }
-  });
+  invokeStageModelProvider.override = async (_stage, _stageCode, _sourceArtifact, _extractedText, _correlationId, upstreamContext) => {
+    capturedUpstreamContext = upstreamContext;
+    return {
+      ok: true,
+      provider: "microsoft-foundry-claude",
+      routeAlias: "jm1-editorial-devline-primary",
+      promptVersion: "CC010-LINE_EDITING-V1",
+      fellBack: false,
+      output: {
+        editedManuscript: editedText,
+        lineEditingSummary: "Improved sentence clarity while preserving voice.",
+        changeLedger: ["Smoothed one sentence for clarity without changing meaning."],
+        retentionNotes: "Full manuscript retained.",
+        authorQueries: []
+      }
+    };
+  };
   const client = {
     async list(entitySet, query = {}) {
       if (entitySet === "jm1_executionlogs") return [];
@@ -574,6 +636,8 @@ test("line editing materializes model-supplied edited manuscript and opens autho
     assert.match(qaBody, /Retention \/ Drift QA/);
     assert.match(qaBody, /Model provider: microsoft-foundry-claude/);
     assert.match(qaBody, /Model fallback: NO/);
+    assert.equal(capturedUpstreamContext.approvedArtifactId, "artifact-dev");
+    assert.equal(capturedUpstreamContext.gates[0]._jm1pub_deliverableartifactid_value, "artifact-dev");
     assert.equal(logs.some((log) => log.jm1_actiontype === "AUTHOR_REVIEW_GATE_CREATED"), true);
     assert.equal(logs.some((log) => log.jm1_actiondescription?.includes("Copyediting is not authorized")), true);
   } finally {
