@@ -512,8 +512,8 @@ test("line editing default chunk size is production-sized for full-manuscript ex
   const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
   delete process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
   try {
-    assert.equal(DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT, 4500);
-    const sourceText = Array.from({ length: 9001 }, (_, index) => `word${index}`).join(" ");
+    assert.equal(DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT, 3000);
+    const sourceText = Array.from({ length: 6001 }, (_, index) => `word${index}`).join(" ");
     const chunks = splitLineEditingSourceChunks(sourceText);
     assert.equal(chunks.length, 3);
     assert.equal(chunks.join(" "), sourceText);
