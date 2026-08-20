@@ -79,6 +79,11 @@ const EXECUTOR_POLICIES = {
   }
 };
 
+const TARGETED_EXECUTION_MODES = Object.freeze({
+  DRY_RUN: "DRY_RUN",
+  EXECUTE: "EXECUTE"
+});
+
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -156,6 +161,260 @@ function preferredDeploymentAliasForStage(stageCode) {
     normalizeString(process.env.JM1_PROMPT_MODEL_DEPLOYMENT_ALIAS) ||
     normalizeString(process.env.AZURE_FOUNDRY_CLAUDE_DEPLOYMENT_NAME)
   );
+}
+
+function targetedExecutionIdempotencyKey(input) {
+  return crypto
+    .createHash("sha256")
+    .update([
+      "TARGETED_EDITORIAL_EXECUTION_V1",
+      normalizeString(input.titleId),
+      normalizeString(input.stageCode),
+      normalizeString(input.sourceArtifactId),
+      normalizeString(input.sourceChecksum)
+    ].join(":"))
+    .digest("hex");
+}
+
+function targetedBlocked(input, code, detail, extra = {}) {
+  return {
+    ok: false,
+    status: "BLOCKED",
+    code,
+    detail,
+    executionMode: normalizeString(input.executionMode),
+    titleId: normalizeString(input.titleId),
+    stageCode: normalizeString(input.stageCode),
+    sourceArtifactId: normalizeString(input.sourceArtifactId),
+    sourceChecksum: normalizeString(input.sourceChecksum),
+    ...extra
+  };
+}
+
+function validateTargetedExecutionInput(input = {}) {
+  const mode = normalizeString(input.executionMode).toUpperCase();
+  const stageCode = normalizeString(input.stageCode).toUpperCase();
+  if (normalizeString(input.bulkSelector) || normalizeString(input.portfolioSelector) || normalizeString(input.query)) {
+    return targetedBlocked(input, "BULK_SELECTOR_NOT_ALLOWED", "Targeted execution accepts one explicit title/stage/source request only.");
+  }
+  if (!normalizeString(input.titleId)) return targetedBlocked(input, "TITLE_ID_REQUIRED", "titleId is required.");
+  if (!EXECUTOR_POLICIES[stageCode]) return targetedBlocked(input, "SUPPORTED_STAGE_CODE_REQUIRED", "stageCode must resolve to one supported editorial executor.");
+  if (!normalizeString(input.sourceArtifactId)) return targetedBlocked(input, "SOURCE_ARTIFACT_ID_REQUIRED", "sourceArtifactId is required.");
+  if (!normalizeString(input.sourceChecksum)) return targetedBlocked(input, "SOURCE_CHECKSUM_REQUIRED", "sourceChecksum is required.");
+  if (!Object.values(TARGETED_EXECUTION_MODES).includes(mode)) {
+    return targetedBlocked(input, "EXECUTION_MODE_REQUIRED", "executionMode must be DRY_RUN or EXECUTE.");
+  }
+  if (input.authorApprovalRequired !== true) {
+    return targetedBlocked(input, "AUTHOR_APPROVAL_REQUIRED", "authorApprovalRequired must be true for targeted editorial execution.");
+  }
+  return null;
+}
+
+async function findExactTitle(client, titleId) {
+  return client.list("jm1pub_titles", {
+    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,modifiedon",
+    $filter: `jm1pub_titleid eq ${normalizeString(titleId)}`,
+    $top: "2"
+  });
+}
+
+async function findExactStage(client, titleId, stageCode) {
+  const stageType = stageTypeForCode(stageCode);
+  return client.list("jm1pub_editorialstages", {
+    $select:
+      "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,_jm1pub_titleid_value,_jm1pub_publishingassetid_value,createdon,modifiedon",
+    $filter: `_jm1pub_titleid_value eq ${normalizeString(titleId)} and jm1pub_stagetype eq ${stageType}`,
+    $orderby: "modifiedon desc",
+    $top: "2"
+  });
+}
+
+async function findExactSourceArtifact(client, titleId, sourceArtifactId) {
+  return client.list("jm1pub_editorialartifacts", {
+    $select:
+      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_sha256,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_repositorypath,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_iscurrentapproved,createdon,modifiedon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value",
+    $filter:
+      `jm1pub_editorialartifactid eq ${normalizeString(sourceArtifactId)} and _jm1pub_titleid_value eq ${normalizeString(titleId)}`,
+    $top: "2"
+  });
+}
+
+function expectedCurrentStageMatches(input, upstream, stageCode) {
+  const expected = normalizeString(input.expectedCurrentStage).toUpperCase();
+  if (!expected) return { ok: true, reason: "NO_EXPECTED_CURRENT_STAGE_SPECIFIED" };
+  if (expected === "DEVELOPMENTAL_COMPLETE" && stageCode === "LINE_EDITING") {
+    const stage = (upstream.stages || []).find((row) => Number(row.jm1pub_stagetype) === STAGE_TYPES.DEVELOPMENTAL_EDITING);
+    if (!stage) return { ok: false, reason: "EXPECTED_DEVELOPMENTAL_STAGE_NOT_FOUND" };
+    if (Number(stage.jm1pub_stagestatus) !== STAGE_STATUS.COMPLETE) return { ok: false, reason: "EXPECTED_DEVELOPMENTAL_STAGE_NOT_COMPLETE" };
+    return { ok: true, reason: "DEVELOPMENTAL_COMPLETE_CONFIRMED" };
+  }
+  return { ok: false, reason: `EXPECTED_CURRENT_STAGE_UNSUPPORTED_FOR_TARGET:${expected}:${stageCode}` };
+}
+
+async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
+  const normalized = {
+    ...input,
+    executionMode: normalizeString(input.executionMode).toUpperCase(),
+    stageCode: normalizeString(input.stageCode).toUpperCase()
+  };
+  const invalid = validateTargetedExecutionInput(normalized);
+  if (invalid) return invalid;
+
+  const client = deps.client || createDataverseClient(requireDataverseConfig(), deps);
+  const idempotencyKey = targetedExecutionIdempotencyKey(normalized);
+  const [titles, stages, artifacts] = await Promise.all([
+    findExactTitle(client, normalized.titleId),
+    findExactStage(client, normalized.titleId, normalized.stageCode),
+    findExactSourceArtifact(client, normalized.titleId, normalized.sourceArtifactId)
+  ]);
+
+  if (titles.length === 0) return targetedBlocked(normalized, "TITLE_NOT_FOUND", "No title resolves to the supplied titleId.", { idempotencyKey });
+  if (titles.length > 1) return targetedBlocked(normalized, "TITLE_NOT_UNIQUE", "More than one title resolved for the supplied titleId.", { idempotencyKey, resolvedCount: titles.length });
+  if (stages.length === 0) return targetedBlocked(normalized, "TARGET_STAGE_NOT_FOUND", "No target stage resolves to the supplied titleId and stageCode.", { idempotencyKey });
+  if (stages.length > 1) return targetedBlocked(normalized, "TARGET_STAGE_NOT_UNIQUE", "More than one target stage resolved for the supplied titleId and stageCode.", { idempotencyKey, resolvedCount: stages.length });
+  if (artifacts.length === 0) return targetedBlocked(normalized, "SOURCE_ARTIFACT_NOT_FOUND", "No source artifact resolves to the supplied titleId and sourceArtifactId.", { idempotencyKey });
+  if (artifacts.length > 1) return targetedBlocked(normalized, "SOURCE_ARTIFACT_NOT_UNIQUE", "More than one source artifact resolved for the supplied titleId and sourceArtifactId.", { idempotencyKey, resolvedCount: artifacts.length });
+
+  const title = titles[0];
+  const stage = stages[0];
+  const sourceArtifact = artifacts[0];
+  const actualStageCode = normalizeStageCode(stage);
+  if (actualStageCode !== normalized.stageCode) {
+    return targetedBlocked(normalized, "TARGET_STAGE_CODE_MISMATCH", "Resolved target stage does not match requested stageCode.", {
+      idempotencyKey,
+      actualStageCode
+    });
+  }
+  if (!stageStatusIsExecutable(stage)) {
+    return targetedBlocked(normalized, "TARGET_STAGE_NOT_EXECUTABLE", "Resolved target stage is not IN_PROGRESS.", {
+      idempotencyKey,
+      stageStatus: stage.jm1pub_stagestatus
+    });
+  }
+  if (normalizeString(sourceArtifact.jm1pub_sha256) !== normalizeString(normalized.sourceChecksum)) {
+    return targetedBlocked(normalized, "SOURCE_CHECKSUM_MISMATCH", "Resolved source artifact checksum does not match request.", {
+      idempotencyKey,
+      actualChecksum: normalizeString(sourceArtifact.jm1pub_sha256)
+    });
+  }
+
+  const upstream = await findUpstreamApprovalEvidence(client, stage, normalized.stageCode);
+  if (!upstream.ok) {
+    return targetedBlocked(normalized, "AUTHOR_APPROVAL_NOT_EXACT_ARTIFACT_BOUND", upstream.reason || "Required upstream approval is missing.", {
+      idempotencyKey
+    });
+  }
+  if (normalizeString(upstream.approvedArtifactId) !== normalizeString(normalized.sourceArtifactId)) {
+    return targetedBlocked(normalized, "AUTHOR_APPROVAL_BINDS_DIFFERENT_ARTIFACT", "Upstream approval does not bind to the requested source artifact.", {
+      idempotencyKey,
+      approvedArtifactId: upstream.approvedArtifactId
+    });
+  }
+  const expected = expectedCurrentStageMatches(normalized, upstream, normalized.stageCode);
+  if (!expected.ok) return targetedBlocked(normalized, "EXPECTED_CURRENT_STAGE_MISMATCH", expected.reason, { idempotencyKey });
+
+  const outputReadyVersion = normalized.stageCode === "EDITORIAL_REVIEW" ? "v5" : "v4";
+  const existingOutput = await findExecutionLog(
+    client,
+    "ACTIVE_EDITORIAL_OUTPUT_CREATED",
+    `editorial-runtime:output-ready-${outputReadyVersion}:${stage.jm1pub_editorialstageid}:${normalized.stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`
+  );
+  if (existingOutput) {
+    return targetedBlocked(normalized, "TARGET_STAGE_ALREADY_COMPLETED_FOR_SOURCE", "Output is already recorded for the target stage/source combination.", {
+      idempotencyKey,
+      existingOutputLogId: existingOutput.jm1_executionlogid
+    });
+  }
+
+  return {
+    ok: true,
+    status: normalized.executionMode === TARGETED_EXECUTION_MODES.DRY_RUN ? "DRY_RUN_READY" : "EXECUTION_READY",
+    executionMode: normalized.executionMode,
+    idempotencyKey,
+    canonicalTitle: {
+      titleId: title.jm1pub_titleid,
+      title: normalizeString(title.jm1pub_titlename || title.jm1pub_name),
+      author: normalizeString(title.jm1pub_authorname)
+    },
+    currentStage: {
+      stageId: stage.jm1pub_editorialstageid,
+      stageName: stage.jm1pub_name,
+      stageCode: normalized.stageCode,
+      stageStatus: stage.jm1pub_stagestatus
+    },
+    exactSourceArtifact: {
+      artifactId: sourceArtifact.jm1pub_editorialartifactid,
+      name: sourceArtifact.jm1pub_editorialartifactname,
+      filename: sourceArtifact.jm1pub_filename,
+      sha256: sourceArtifact.jm1pub_sha256,
+      currentApproved: sourceArtifact.jm1pub_iscurrentapproved === true
+    },
+    authorApprovalEvidence: {
+      approvedArtifactId: upstream.approvedArtifactId,
+      gates: (upstream.gates || [])
+        .filter((gate) =>
+          Number(gate.jm1pub_gatestatus) === GATE_STATUS_APPROVED &&
+          Number(gate.jm1pub_authordecision) === AUTHOR_DECISION_APPROVE &&
+          gate.jm1pub_nextstageauthorized === true
+        )
+        .map((gate) => ({
+          gateId: gate.jm1pub_editorialapprovalgateid,
+          decisionOn: gate.jm1pub_authordecisionon,
+          deliverableArtifactId: gate._jm1pub_deliverableartifactid_value
+        }))
+    },
+    styleGuide: selectedStyleGuidesForStage(normalized.stageCode),
+    targetStage: normalized.stageCode,
+    providerRoute: {
+      provider: normalized.stageCode === "LINE_EDITING" ? "microsoft-foundry-claude" : "stage-policy",
+      deploymentAlias: preferredDeploymentAliasForStage(normalized.stageCode),
+      silentFallbackAllowed: false
+    },
+    expectedMutations: [
+      "claim target editorial stage",
+      "read exact source artifact",
+      "invoke governed provider route",
+      "persist output artifacts",
+      "write QA evidence",
+      "create package manifest",
+      "create mandatory author-review gate"
+    ],
+    expectedOutputArtifactType: EXECUTOR_POLICIES[normalized.stageCode].outputRoles,
+    expectedNextAuthorGate: {
+      stageCode: normalized.stageCode,
+      nextStageAuthorized: false
+    },
+    stage,
+    sourceArtifact,
+    upstream
+  };
+}
+
+async function runTargetedEditorialExecution(input = {}, deps = {}) {
+  const evaluated = await evaluateTargetedEditorialExecution(input, deps);
+  if (!evaluated.ok) return evaluated;
+  if (evaluated.executionMode === TARGETED_EXECUTION_MODES.DRY_RUN) {
+    const { stage, sourceArtifact, upstream, ...safe } = evaluated;
+    return { ...safe, mutationsPerformed: 0, externalSends: 0 };
+  }
+
+  const client = deps.client || createDataverseClient(requireDataverseConfig(), deps);
+  const commissioned = await recordRuntimeCommissioned(client, evaluated.targetStage, `TARGETED-${evaluated.idempotencyKey}`);
+  const result = await processStage(client, evaluated.stage, `TARGETED-${evaluated.idempotencyKey}`, {
+    sourceArtifact: evaluated.sourceArtifact
+  });
+  return {
+    ok: true,
+    status: "EXECUTED",
+    executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+    idempotencyKey: evaluated.idempotencyKey,
+    canonicalTitle: evaluated.canonicalTitle,
+    currentStage: evaluated.currentStage,
+    exactSourceArtifact: evaluated.exactSourceArtifact,
+    commissioned,
+    result,
+    externalSends: 0
+  };
 }
 
 function compactPromptText(value, maxLength = 1200) {
@@ -1836,7 +2095,7 @@ async function recordRuntimeCommissioned(client, stageCode, correlationId) {
   return { idempotent: false, logId };
 }
 
-async function processStage(client, stage, correlationId) {
+async function processStage(client, stage, correlationId, options = {}) {
   const stageCode = normalizeStageCode(stage);
   const policy = EXECUTOR_POLICIES[stageCode];
   if (!policy || !stageStatusIsExecutable(stage)) {
@@ -1866,7 +2125,7 @@ async function processStage(client, stage, correlationId) {
     };
   }
   const claim = await claimStageTask(client, stage, stageCode, correlationId);
-  const sourceArtifact = await findSourceArtifact(client, stage);
+  const sourceArtifact = options.sourceArtifact || await findSourceArtifact(client, stage);
   const exactBlocker = buildExactBlocker(stageCode, sourceArtifact);
   if (exactBlocker) {
     const blocked = await recordBlockedTask(client, stage, stageCode, exactBlocker, correlationId);
@@ -2040,5 +2299,8 @@ module.exports = {
   requiredPackageRoles,
   requireDataverseConfig,
   writeLog,
+  evaluateTargetedEditorialExecution,
+  runTargetedEditorialExecution,
+  targetedExecutionIdempotencyKey,
   runEditorialExecutionRuntime
 };
