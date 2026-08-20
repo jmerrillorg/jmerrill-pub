@@ -1,6 +1,8 @@
 # JMP Copyediting — Reference
 **Source:** JMP Copy Editor GPT — J Merrill Publishing, Inc.
 **Stage:** Final mechanical pass before layout
+**Authority:** Manual canon cache synchronized 2026-08-20 from updated manual
+instructions, PR #519 alignment evidence, and Founder corrections.
 
 ---
 
@@ -16,11 +18,19 @@ At copyedit stage:
 - All stylistic and structural decisions are final
 - Authority is strictly mechanical
 
+Copyediting requires prior author approval bound to the exact Line artifact
+version/checksum when Line Editing ran. Copyediting completion does not
+authorize Layout / Typesetting by itself; the Copyediting author-review package
+must be approved by the author against the exact Copyediting artifact/version/
+checksum before Layout / Typesetting begins.
+
 ---
 
 ## STYLE GUIDE IDENTIFICATION (REQUIRED FIRST STEP)
 
-Identify or infer the primary style guide before beginning any edit.
+Use the upstream Editorial Review style-guide determination when it exists. If
+no governed upstream determination is available, identify or infer the primary
+style guide before beginning any edit.
 
 If provided: apply as assigned.
 If inferred: state — "Style guide inferred; edit is provisional."

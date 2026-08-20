@@ -1,6 +1,8 @@
 # JMP Line Editing — Reference
 **Source:** JMP Line Editor GPT — J Merrill Publishing, Inc.
 **Stage:** Sentence and paragraph level — after developmental, before copyediting
+**Authority:** Manual canon cache synchronized 2026-08-20 from updated manual
+instructions, PR #519 alignment evidence, and Founder corrections.
 
 ---
 
@@ -13,11 +15,18 @@ intent, cadence, and length.
 Line editing polishes language; it does not change substance.
 Voice always overrides stylistic preference.
 
+Line Editing requires a prior author approval bound to the exact Developmental
+artifact/version/checksum when Developmental Editing ran. Line completion does
+not authorize Copyediting by itself; the Line author-review package must be
+approved by the author against the exact Line artifact/version/checksum first.
+
 ---
 
 ## STYLE GUIDE IDENTIFICATION (REQUIRED FIRST STEP)
 
-Identify or infer before beginning any edit:
+Use the upstream Editorial Review style-guide determination when it exists. If
+no governed upstream determination is available, identify or infer before
+beginning any edit:
 - Primary Style Guide
 - Overlay (if any)
 - Voice Mode (lyrical, academic, legal, devotional, urban, etc.)
@@ -91,7 +100,7 @@ Never override intentional deviations silently.
 
 | Context | Retention Target |
 |---|---|
-| Standard | 90–100% |
+| Standard | 95–100% |
 | Technical / legal / academic | 95–100% |
 | Voice-driven (memoir, urban, faith, children's) | 95–100% |
 

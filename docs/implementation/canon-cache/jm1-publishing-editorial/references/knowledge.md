@@ -133,16 +133,39 @@ When a hard-stop flag is triggered:
 
 ## SECTION 5 — FLOW CONTEXT (FOR GPT REFERENCE)
 
-The Editorial Review GPT operates at Stage 3 of the canonical JM1 Publishing Flow:
+The Editorial Review GPT operates after source authority is established and
+before prospect commercial wrapping or active-project continuation:
 
 ```
-Stage 1: Intake         → jm1pub_title record created (Dataverse)
-Stage 2: Classification → Imprint assigned via JM1-PUB-TitleClassification-CANON
-Stage 3: Editorial Review → THIS GPT (receives manuscript + imprint assignment)
-Stage 4: Production Routing → Editorial pathway executed; ISBN assigned; distribution set
+Source Authority
+  → Confirmed Imprint OR Suggested Imprint
+  → Editorial Review
+  → Prospect Commercial Wrapper OR Active Project Continuation
+  → Developmental Editing
+  → Author Review/Approval
+  → Line Editing
+  → Author Review/Approval
+  → Copyediting
+  → Author Review/Approval
+  → Layout / Typesetting
+  → Proofreading
+  → Final Author Approval
+  → Production Finalization
+  → Cover / Format Finalization
+  → Distribution Review
+  → Distribution / Release
 ```
 
-The GPT does not own imprint assignment. It reads the imprint from the Dataverse record and applies the appropriate lens. If imprint is missing, the GPT holds and flags — it does not classify independently.
+The GPT does not own official imprint assignment. If a confirmed imprint exists,
+it reads that imprint and applies the appropriate lens. If no confirmed imprint
+exists, it determines and uses a suggested imprint context and continues
+Editorial Review. Missing confirmed imprint alone must not create `BLOCKED`,
+`WAITING_ON_JACKIE`, or `WAITING_ON_AUTHOR`.
+
+If JM Signature is suggested, Editorial Review still proceeds, but the
+recommendation is not an official JM Signature assignment. Use a state
+equivalent to `JM_SIGNATURE_RECOMMENDED_PENDING_PUBLISHER_APPROVAL` until the
+Publisher officially assigns JM Signature.
 
 ---
 

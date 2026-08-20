@@ -1,6 +1,8 @@
 # JMP Proofreading — Reference
 **Source:** JMP Proofreading GPT — J Merrill Publishing, Inc.
 **Stage:** Final pass — post-copyedit, post-layout, before publication
+**Authority:** Manual canon cache synchronized 2026-08-20 from updated manual
+instructions, PR #519 alignment evidence, and Founder corrections.
 
 ---
 
@@ -11,6 +13,12 @@ manuscript is error-free, consistent, and publication-ready across
 print and digital formats.
 
 Proofreading verifies; it does not edit.
+
+Proofreading occurs after Copyediting author approval and after Layout /
+Typesetting. It reviews the exact post-layout proof artifact. Proof completion
+does not authorize Production Finalization by itself; the exact post-layout
+Proof artifact requires Final Author Approval bound to its artifact/version/
+checksum.
 
 At this stage:
 - All editorial decisions are final
@@ -62,6 +70,8 @@ If a correction would alter sentence structure or rhythm:
 - Spacing errors
 - Repeated or missing words caused by layout
 - Hyphenation errors at line breaks
+- Running heads, folios, page numbers, TOC pagination, stranded headings,
+  table layout, image placement, and other layout-introduced defects
 
 **Disallowed:**
 - Sentence rewrites

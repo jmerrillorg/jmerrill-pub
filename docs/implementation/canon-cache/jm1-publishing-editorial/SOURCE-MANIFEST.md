@@ -1,7 +1,7 @@
 # JM1 Publishing Editorial Canon Cache Source Manifest
 
-**Status:** Local implementation cache reconciled to uploaded governing canon
-**Date refreshed:** 2026-07-11
+**Status:** Local implementation cache reconciled to uploaded governing canon and 2026-08-20 Founder corrections
+**Date refreshed:** 2026-08-20
 **Purpose:** Ensure implementation points to the current governing canon and not stale repository or branch copies.
 
 ## Source Authority
@@ -16,6 +16,29 @@ Supporting canon path retained for mirrored references:
 
 `/Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/Implementation HQ - Architecture/00_CANON/Publishing/Skills/jm1-publishing-editorial`
 
+Manual/autonomous alignment evidence in PR #519 identifies the latest updated
+manual GPT source package as `JMP-GPTs_2.zip`. That zip was not located in the
+repository or searched local OneDrive/Codex paths during the 2026-08-20
+synchronization pass. The repository cache is therefore synchronized as the
+available manual-canon mirror, with PR #519 used as alignment evidence and the
+Founder corrections below controlling where older cache language conflicted.
+
+## 2026-08-20 Founder Corrections Applied
+
+- Missing confirmed imprint is nonblocking for Editorial Review.
+- If no confirmed imprint exists, determine/use suggested imprint and continue.
+- JM Signature recommendation is not official JM Signature assignment; use a
+  pending-Publisher-approval state until assignment is approved.
+- Author approval is required between editorial stages.
+- Author approval is channel-agnostic; electronic self-service approval is not
+  mandatory.
+- Offline/verbal decisions distinguish `Decision Made By = Author` from
+  `Recorded By = Publisher operator`.
+- Every approval binds to the exact artifact/version/checksum.
+- Proofreading is post-layout/typesetting and requires Final Author Approval
+  before Production Finalization.
+- Cover Concept, Full Wrap, and Final Production Cover are distinct states.
+
 ## Cached Files
 
 | Local cache file | Source |
@@ -25,6 +48,12 @@ Supporting canon path retained for mirrored references:
 | `references/line-editing.md` | `jm1-publishing-editorial-v2.skill` package |
 | `references/copyediting.md` | `jm1-publishing-editorial-v2.skill` package |
 | `references/proofreading.md` | `jm1-publishing-editorial-v2.skill` package |
+| `references/editorial-review.md` | Restored cache reference from PR #519 manual-alignment requirements plus Founder corrections |
+| `references/distribution-review.md` | Restored cache reference from PR #519 manual-alignment requirements plus Founder corrections |
+| `references/cover-intelligence.md` | Restored cache reference from PR #519 manual-alignment requirements plus Founder corrections |
+| `references/jmp_cover_genre_guide.md` | Restored Cover Intelligence companion reference |
+| `references/jmp_cover_layout_guide.md` | Restored Cover Intelligence companion reference |
+| `references/jmp_cover_production_specs.md` | Restored Cover Intelligence companion reference |
 | `references/line-copyedit-proof.md` | Active OneDrive canon reference, pending immutable publication registry |
 | `references/knowledge.md` | Reconciled implementation mirror of the uploaded governing knowledge file plus explicit Jackie roster ruling |
 | `references/faith-editorial-overlay.md` | Uploaded governing overlay mirror |

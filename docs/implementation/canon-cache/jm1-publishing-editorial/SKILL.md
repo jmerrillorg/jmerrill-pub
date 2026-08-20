@@ -58,12 +58,16 @@ are not governance-compliant.
 
 ## CORE GOVERNANCE RULES (NON-NEGOTIABLE)
 
-1. **Imprint is a hard gate.** Do not proceed with full editorial review
-   without a confirmed imprint assignment from the JM1 Classification Flow.
-   Offer a preliminary recommendation for human confirmation only — then hold.
+1. **Imprint is nonblocking for Editorial Review.** If a confirmed imprint
+   exists, use it. If no confirmed imprint exists, determine and use the
+   suggested imprint context and continue Editorial Review. Do not create
+   `BLOCKED`, `WAITING_ON_JACKIE`, or `WAITING_ON_AUTHOR` solely because the
+   imprint is not confirmed.
 
-2. **JM Signature requires dual Publisher authorization.** If imprint =
-   JM Signature, display the guard notice and mark the report advisory only.
+2. **JM Signature recommendation is not assignment.** If the suggested imprint
+   is JM Signature, Editorial Review still proceeds, but the state must remain
+   equivalent to `JM_SIGNATURE_RECOMMENDED_PENDING_PUBLISHER_APPROVAL` until
+   the Publisher officially assigns JM Signature.
 
 3. **Editorial review evaluates — it does not revise.** All observations
    are diagnostic and advisory. No rewriting, no restructuring, no stylistic
@@ -83,19 +87,37 @@ are not governance-compliant.
    perform work outside the scope of the requested stage. Escalate
    and flag — never fix outside scope.
 
+8. **Author approval is human-first, channel-agnostic, and artifact-bound.**
+   Author review/approval is required between editorial stages and no AI
+   completion event substitutes for it. Valid author decisions may be captured
+   through governed channels including email, Author Operating Center, phone,
+   in person, Teams video, SMS, or another recorded channel. Record both
+   `Decision Made By = Author` and `Recorded By = Publisher operator` when a
+   Publisher operator records an offline/verbal decision. Every approval binds
+   to the exact artifact/version/checksum under review.
+
 ---
 
 ## EDITORIAL PIPELINE SEQUENCE
 
 ```
-Stage 1: Intake         → jm1pub_title record created (Dataverse)
-Stage 2: Classification → Imprint assigned via JM1-PUB-TitleClassification-CANON
-Stage 3: Editorial Review → imprint triage, scoring, routing recommendation
-Stage 4: Developmental  → structure, narrative, argument (if routed)
-Stage 5: Line Editing   → sentence/paragraph clarity and rhythm
-Stage 6: Copyediting    → mechanical correction per style guide
-Stage 7: Proofreading   → final verification, post-layout
-Stage 8: Distribution   → readiness, metadata, pricing, sequencing
+Source Authority
+  → Confirmed Imprint OR Suggested Imprint
+  → Editorial Review
+  → Prospect Commercial Wrapper OR Active Project Continuation
+  → Developmental Editing
+  → Author Review/Approval
+  → Line Editing
+  → Author Review/Approval
+  → Copyediting
+  → Author Review/Approval
+  → Layout / Typesetting
+  → Proofreading
+  → Final Author Approval
+  → Production Finalization
+  → Cover / Format Finalization
+  → Distribution Review
+  → Distribution / Release
 ```
 
 ---

@@ -37,7 +37,13 @@ error.
 ## 0.2 Stage sequence and inheritance
 
 ```
-Line Editing → Copyediting → Proofreading
+Line Editing
+  → Author Review/Approval
+  → Copyediting
+  → Author Review/Approval
+  → Layout / Typesetting
+  → Proofreading
+  → Final Author Approval
 ```
 
 - Line editing operates after developmental editing is complete, or when
@@ -50,8 +56,13 @@ Line Editing → Copyediting → Proofreading
 - The **voice profile** (built at developmental stage where that stage
   ran; built at line-edit start otherwise) travels downstream — every
   stage tests its work against it.
-- The **style sheet** (built at copyedit — §2.5) travels to proofreading
-  and to production. Proofreading does not relitigate copyedit decisions.
+- The **style sheet** (built at copyedit — §2.5) travels through Layout /
+  Typesetting to proofreading and production. Proofreading does not relitigate
+  copyedit decisions.
+- Author approval is required between stages and binds to the exact
+  artifact/version/checksum under review. Electronic self-service approval is
+  not mandatory; governed offline/verbal decisions may be recorded by a
+  Publisher operator while preserving `Decision Made By = Author`.
 
 ## 0.3 Visible edits
 
@@ -286,27 +297,31 @@ front/back matter mechanics. When in doubt, everything is a choice.
 
 ## 3.1 Role
 
-Proofreading is the final quality check before layout or publication. It
-addresses typographical errors, formatting inconsistencies, and
-production-ready compliance. It is conservative by design.
+Proofreading is the post-copyedit, post-layout final quality check before
+production finalization. It addresses typographical errors, layout-introduced
+formatting defects, and production-ready compliance. It is conservative by
+design.
 
-**Entry conditions:** copyedit complete and author-accepted; style sheet
-in hand. Proofreading **against the style sheet** — the proofreader
-enforces recorded rulings and does not reopen them.
+**Entry conditions:** copyedit complete and author-accepted; layout/typesetting
+complete; exact post-layout proof artifact available; style sheet in hand.
+Proofreading works **against the style sheet** — the proofreader enforces
+recorded rulings and does not reopen them.
 
 **Editorial floor note:** professional proofread is the minimum standard
 for any book carrying the "Produced by J Merrill Publishing, Inc." credit
 (including JM Legacy Editions work — Legacy Tier Specifications CANON).
 
-## 3.2 Pre-layout proof (manuscript proof)
+## 3.2 Post-layout proof
 
 - Residual typos, doubled words, missing words
 - Style-sheet compliance sweep (spellings, hyphenation, caps as ruled)
 - Scripture quotations: final KJV wording verification; LORD/GOD
   treatment correct for output format; translator italics intact
-- Cross-reference integrity (chapter references, "see page" placeholders
-  flagged for layout)
+- Cross-reference integrity (chapter references and final page references)
 - Front/back matter completeness against package scope
+- Page breaks, running heads, folios, TOC pagination, stranded headings,
+  tables/layout, image placement, and conversion errors introduced during
+  layout/typesetting
 
 ## 3.3 Post-layout proof (page proof)
 
