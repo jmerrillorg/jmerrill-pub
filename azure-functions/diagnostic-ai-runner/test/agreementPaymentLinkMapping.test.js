@@ -4,7 +4,9 @@ const { describe, test } = require("node:test");
 const assert = require("node:assert/strict");
 const {
   computeInstallmentStripeAmount,
+  computeInstallmentStripeAmountFromAuthorOffer,
   crossValidateAgainstConfirmedFigures,
+  offerPlanCodeFromPaymentOption,
   resolvePaymentOptionConfig,
   GATE_NAME,
   PACKAGE_CODES
@@ -117,5 +119,42 @@ describe("resolvePaymentOptionConfig", () => {
 
   test("an unknown code resolves to null", () => {
     assert.equal(resolvePaymentOptionConfig("NOT_REAL"), null);
+  });
+});
+
+describe("author-offer-backed Stripe amount adapter", () => {
+  test("maps existing Milestone 6 payment-option codes onto canonical offer plans", () => {
+    assert.equal(offerPlanCodeFromPaymentOption("SINGLE_PAYMENT"), "FULL_PAY");
+    assert.equal(offerPlanCodeFromPaymentOption("TWO_PAYMENTS"), "2_PAY");
+    assert.equal(offerPlanCodeFromPaymentOption("FOUR_PAYMENTS"), "4_PAY");
+    assert.equal(offerPlanCodeFromPaymentOption("EIGHT_PAYMENTS"), "8_PAY");
+    assert.equal(offerPlanCodeFromPaymentOption("TWELVE_PAYMENTS"), "");
+  });
+
+  test("matches current no-discount Professional 8-pay total through the canonical offer engine", () => {
+    const result = computeInstallmentStripeAmountFromAuthorOffer({
+      packageCode: PACKAGE_CODES.PROFESSIONAL,
+      paymentOptionCode: "EIGHT_PAYMENTS"
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.adjustedPackagePrincipalUsd, 4500);
+    assert.equal(result.perInstallmentUsd, 585);
+    assert.equal(result.totalUsd, 4680);
+    assert.equal(result.installmentSchedule[0].principal, 562.5);
+    assert.equal(result.installmentSchedule[0].multiPayFee, 22.5);
+  });
+
+  test("supports loyalty/referral-adjusted payment-link amounts without recalculating downstream", () => {
+    const result = computeInstallmentStripeAmountFromAuthorOffer({
+      packageCode: PACKAGE_CODES.PROFESSIONAL,
+      paymentOptionCode: "TWO_PAYMENTS",
+      priorEligibleTitleCount: 2,
+      referralCreditsAvailablePercent: 20,
+      referralCreditsRequestedPercent: 20
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.adjustedPackagePrincipalUsd, 2925);
+    assert.equal(result.perInstallmentUsd, 1521);
+    assert.equal(result.totalUsd, 3042);
   });
 });
