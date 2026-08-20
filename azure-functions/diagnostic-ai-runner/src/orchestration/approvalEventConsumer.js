@@ -1,5 +1,7 @@
 "use strict";
 
+const { materializeNextStageFromApprovalEvent } = require("../editorial/editorialNextStageMaterialization");
+
 const EXECUTION_STATUS = {
   SUCCESS: 835500001,
   FAILED: 835500002
@@ -405,6 +407,23 @@ async function consumeProofreadingApprovalEvent(client, event) {
 async function consumeApprovalEvent(client, event) {
   if (event.currentStageCode === "PROOFREADING" || event.eventType === "PROOFREADING_APPROVED") {
     return consumeProofreadingApprovalEvent(client, event);
+  }
+  if (event.currentStageCode === "DEVELOPMENTAL_EDITING") {
+    const result = await materializeNextStageFromApprovalEvent(client, event);
+    if (result.status === "MATERIALIZED") {
+      const consumedLogId = await writeLog(client, {
+        actionType: "EDITORIAL_APPROVAL_EVENT_CONSUMED",
+        name: `EDITORIAL_APPROVAL_EVENT_CONSUMED - ${event.eventType}`,
+        description:
+          `Approval event materialized next editorial stage ${result.targetStage.stageCode} ${result.targetStage.stageId}. ` +
+          `No author communication sent. No downstream stage authorized. Idempotency: ${event.idempotencyKey}.`,
+        sourceEntity: "jm1pub_editorialapprovalgate",
+        sourceRecordId: event.gateId
+      });
+      return { status: "transition-completed", targetStageId: result.targetStage.stageId, executionLogIds: [result.executionLogId, consumedLogId] };
+    }
+    if (result.status === "IDEMPOTENT") return { status: "idempotent", executionLogIds: [] };
+    return transitionBlocked(client, event, result.code || "NEXT_STAGE_MATERIALIZATION_BLOCKED");
   }
   return transitionBlocked(client, event, "NEXT_STAGE_EXECUTOR_MISSING");
 }
