@@ -21,6 +21,7 @@ const {
   PROCESSING_FEE_RATE,
   GATES
 } = require("../author/milestone6BusinessSourceLayer");
+const { calculateAuthorOffer } = require("../author/authorOfferEngine");
 
 const GATE_NAME = GATES.authorPaymentLinkSend; // "JM1_AUTHOR_PAYMENT_LINK_SEND_ENABLED"
 
@@ -97,9 +98,58 @@ function crossValidateAgainstConfirmedFigures(computed, confirmed = {}) {
   return { ok: mismatches.length === 0, mismatches };
 }
 
+function offerPlanCodeFromPaymentOption(paymentOptionCode) {
+  const normalized = typeof paymentOptionCode === "string" ? paymentOptionCode.trim().toUpperCase() : "";
+  return {
+    SINGLE_PAYMENT: "FULL_PAY",
+    SINGLE: "FULL_PAY",
+    TWO_PAYMENTS: "2_PAY",
+    FOUR_PAYMENTS: "4_PAY",
+    EIGHT_PAYMENTS: "8_PAY"
+  }[normalized] || "";
+}
+
+function computeInstallmentStripeAmountFromAuthorOffer(input = {}) {
+  const packageCode = typeof input.packageCode === "string" ? input.packageCode.trim().toUpperCase() : "";
+  const paymentOptionCode = typeof input.paymentOptionCode === "string" ? input.paymentOptionCode.trim().toUpperCase() : "";
+  const mapping = STRIPE_PACKAGE_MAPPINGS[packageCode];
+  if (!mapping) {
+    return { ok: false, error: "STRIPE_MAPPING_NOT_FOUND", mapping: null, offer: null, plan: null };
+  }
+  const planCode = offerPlanCodeFromPaymentOption(paymentOptionCode);
+  if (!planCode) {
+    return { ok: false, error: "PAYMENT_OPTION_NOT_FOUND", mapping, offer: null, plan: null };
+  }
+  const offer = calculateAuthorOffer(input);
+  if (!offer.ok) {
+    return { ok: false, error: "AUTHOR_OFFER_CALCULATION_FAILED", mapping, offer, plan: null };
+  }
+  const plan = offer.paymentOptions.find((item) => item.planCode === planCode);
+  if (!plan) {
+    return { ok: false, error: "AUTHOR_OFFER_PAYMENT_PLAN_NOT_FOUND", mapping, offer, plan: null };
+  }
+  return {
+    ok: true,
+    error: null,
+    mapping,
+    offer,
+    plan,
+    baseFeeUsd: offer.basePackagePrice,
+    adjustedPackagePrincipalUsd: offer.adjustedPackagePrincipal,
+    totalUsd: plan.totalDue,
+    perInstallmentUsd: plan.installments[0]?.totalDue || 0,
+    perInstallmentCents: plan.installments[0]?.totalDueCents || 0,
+    totalCents: plan.totalDueCents,
+    feeApplied: plan.multiPayFeeRate > 0,
+    installmentSchedule: plan.installments
+  };
+}
+
 module.exports = {
   computeInstallmentStripeAmount,
+  computeInstallmentStripeAmountFromAuthorOffer,
   crossValidateAgainstConfirmedFigures,
+  offerPlanCodeFromPaymentOption,
   resolvePaymentOptionConfig,
   GATE_NAME,
   PACKAGE_CODES

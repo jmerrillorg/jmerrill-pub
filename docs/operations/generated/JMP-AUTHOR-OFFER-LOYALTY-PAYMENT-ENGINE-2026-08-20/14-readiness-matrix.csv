@@ -1,0 +1,15 @@
+Area,Status,Evidence,Notes
+Package catalog source,READY,authorOfferEngine imports milestone6BusinessSourceLayer PACKAGE_CATALOG,No duplicate package-price table added
+Loyalty tier calculation,READY,authorOfferEngine.test.js,Automatic relationship benefit implemented
+Referral ledger evaluation,READY,authorOfferEngine.test.js,Pure evaluation only; persistence pending
+50 percent cap,READY,authorOfferEngine.test.js,Cap enforced in canonical engine
+Payment-plan generation,READY,authorOfferEngine.test.js,Full / 2 / 4 / 8 Pay generated
+4 percent fee,READY,authorOfferEngine.test.js,Per-installment rounded fee
+Tax treatment,READY,authorOfferEngine.js,PENDING_EXTERNAL only
+Pricing snapshot,READY_PREVIEW,authorOfferEngine.test.js,Pure immutable preview; no Dataverse write
+Stripe mapping adapter,READY_PREVIEW,agreementPaymentLinkMapping.test.js,Downstream adapter added; not live activated
+Package acceptance trigger,PLANNED,02-package-acceptance-trigger.md,Integration pending
+Automatic author response,PLANNED,08-automatic-response-flow.md,No live send activated
+Joined the Family integration,PLANNED,09-joined-family-integration.md,No event mutation in this PR
+Author Workspace integration,PLANNED,10-author-workspace-integration.md,No UI changed
+Existing author reconciliation,PLANNED_READ_ONLY,11-existing-author-reconciliation.md,No broad remediation performed
