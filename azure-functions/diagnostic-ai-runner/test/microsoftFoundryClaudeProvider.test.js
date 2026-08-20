@@ -170,6 +170,7 @@ describe("microsoftFoundryClaudeProvider", () => {
       assert.equal(parsedBody.model, "jm1-editorial-devline-primary");
       assert.equal(parsedBody.tools[0].name, "submit_jm1_structured_output");
       assert.equal(parsedBody.tool_choice.name, "submit_jm1_structured_output");
+      assert.equal(parsedBody.tools[0].input_schema.additionalProperties, true);
       assert.equal(parsedBody.messages[0].role, "user");
       assert.equal(parsedBody.messages[0].content, "{\"task\":\"analyze\"}");
 
@@ -177,6 +178,66 @@ describe("microsoftFoundryClaudeProvider", () => {
       assert.equal(dependencyCalls[0].meta.dependencyTypeName, "Microsoft Foundry");
       assert.equal(dependencyCalls[0].meta.properties.provider, "microsoft-foundry-claude");
       assert.equal(dependencyCalls[0].meta.properties.model, "claude-sonnet-5");
+    } finally {
+      restore();
+    }
+  });
+
+  test("uses strict required schema for Line Editing chunk prompts", async () => {
+    const calls = [];
+    const { loaded, restore } = loadProviderWithStubs({
+      fetchImpl: async (url, init) => {
+        calls.push({ url, init });
+        return {
+          ok: true,
+          status: 200,
+          headers: new Headers(),
+          async json() {
+            return {
+              content: [
+                {
+                  type: "tool_use",
+                  name: "submit_jm1_structured_output",
+                  input: {
+                    editedManuscript: "Edited chunk.",
+                    lineEditingSummary: "Summary.",
+                    changeLedger: [],
+                    retentionNotes: "Retained.",
+                    authorQueries: []
+                  }
+                }
+              ],
+              usage: { input_tokens: 4, output_tokens: 5 }
+            };
+          }
+        };
+      }
+    });
+
+    try {
+      await withEnv(
+        { AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" },
+        async () => {
+          const result = await loaded.call({
+            promptBody: "{\"task\":\"cc010_line_editing_full_manuscript_chunk_execution\"}",
+            diagnosticId: "diag-line",
+            route: { deploymentName: "jm1-editorial-devline-primary" }
+          });
+
+          assert.equal(result.ok, true);
+          assert.equal(result.output.editedManuscript, "Edited chunk.");
+        }
+      );
+
+      const parsedBody = JSON.parse(calls[0].init.body);
+      assert.deepEqual(parsedBody.tools[0].input_schema.required, [
+        "editedManuscript",
+        "lineEditingSummary",
+        "changeLedger",
+        "retentionNotes",
+        "authorQueries"
+      ]);
+      assert.equal(parsedBody.tools[0].input_schema.properties.editedManuscript.minLength, 1);
     } finally {
       restore();
     }
