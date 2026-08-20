@@ -17,11 +17,16 @@ Supporting canon path retained for mirrored references:
 `/Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/Implementation HQ - Architecture/00_CANON/Publishing/Skills/jm1-publishing-editorial`
 
 Manual/autonomous alignment evidence in PR #519 identifies the latest updated
-manual GPT source package as `JMP-GPTs_2.zip`. That zip was not located in the
-repository or searched local OneDrive/Codex paths during the 2026-08-20
-synchronization pass. The repository cache is therefore synchronized as the
-available manual-canon mirror, with PR #519 used as alignment evidence and the
-Founder corrections below controlling where older cache language conflicted.
+manual GPT source package as `JMP-GPTs_2.zip`.
+
+Updated source package located 2026-08-20:
+
+- Path: `/Users/jmerrillone/Downloads/JMP-GPTs_2.zip`
+- SHA-256: `53a85a57aaf1b7bf7a1d09182dbf033713bc239866b150591447374997708886`
+
+The repository cache is synchronized from that source package with the Founder
+corrections below controlling where package language conflicted with later
+Founder authority.
 
 ## 2026-08-20 Founder Corrections Applied
 
@@ -43,19 +48,28 @@ Founder corrections below controlling where older cache language conflicted.
 
 | Local cache file | Source |
 |---|---|
-| `SKILL.md` | `jm1-publishing-editorial-v2.skill` package |
-| `references/developmental-editing.md` | `jm1-publishing-editorial-v2.skill` package |
-| `references/line-editing.md` | `jm1-publishing-editorial-v2.skill` package |
-| `references/copyediting.md` | `jm1-publishing-editorial-v2.skill` package |
-| `references/proofreading.md` | `jm1-publishing-editorial-v2.skill` package |
-| `references/editorial-review.md` | Restored cache reference from PR #519 manual-alignment requirements plus Founder corrections |
-| `references/distribution-review.md` | Restored cache reference from PR #519 manual-alignment requirements plus Founder corrections |
-| `references/cover-intelligence.md` | Restored cache reference from PR #519 manual-alignment requirements plus Founder corrections |
-| `references/jmp_cover_genre_guide.md` | Restored Cover Intelligence companion reference |
-| `references/jmp_cover_layout_guide.md` | Restored Cover Intelligence companion reference |
-| `references/jmp_cover_production_specs.md` | Restored Cover Intelligence companion reference |
+| `README.md` | `JMP-GPTs_2.zip` / `JMP-GPTs/README.md` |
+| `SKILL.md` | Existing repo skill router updated to reference the located source package files |
+| `references/editorial-review.md` | `JMP-GPTs_2.zip` / `01-Editorial-Review/instructions.md` plus Founder corrections |
+| `references/knowledge.md` | `JMP-GPTs_2.zip` / `01-Editorial-Review/knowledge.md` plus Founder corrections |
+| `references/developmental-editing.md` | `JMP-GPTs_2.zip` / `02-Developmental-Editing/instructions.md` plus Founder corrections |
+| `references/developmental-pipeline-bridge.md` | `JMP-GPTs_2.zip` / `02-Developmental-Editing/knowledge.md` |
+| `references/line-editing.md` | `JMP-GPTs_2.zip` / `03-Line-Editor/instructions.md` plus Founder corrections |
+| `references/copyediting.md` | `JMP-GPTs_2.zip` / `04-Copy-Editor/instructions.md` plus Founder corrections |
+| `references/proofreading.md` | `JMP-GPTs_2.zip` / `05-Proofreader/instructions.md` plus Founder corrections |
+| `references/distribution-review.md` | `JMP-GPTs_2.zip` / `06-Distribution-Review/instructions.md` |
+| `references/cover-intelligence.md` | `JMP-GPTs_2.zip` / `07-Cover-Intelligence/instructions.md` plus Founder corrections |
+| `references/jmp_cover_genre_guide.md` | `JMP-GPTs_2.zip` / `07-Cover-Intelligence/jmp_cover_genre_guide.md` |
+| `references/jmp_cover_layout_guide.md` | `JMP-GPTs_2.zip` / `07-Cover-Intelligence/jmp_cover_layout_guide.md` |
+| `references/jmp_cover_production_specs.md` | `JMP-GPTs_2.zip` / `07-Cover-Intelligence/jmp_cover_production_specs.md` |
+| `references/brand-infrastructure.md` | `JMP-GPTs_2.zip` / `08-Brand-Infrastructure/instructions.md` |
+| `references/jackie-personal-blog.md` | `JMP-GPTs_2.zip` / `09-Jackie-Personal-Blog/instructions.md` |
+| `references/blog-editorial.md` | `JMP-GPTs_2.zip` / `10-JM1-Content-Blog/instructions.md` |
+| `references/jm1_blogging_architecture_decision_framework.md` | `JMP-GPTs_2.zip` / `10-JM1-Content-Blog/jm1_blogging_architecture_decision_framework.md` |
+| `references/jm1_branch_editorial_matrix.md` | `JMP-GPTs_2.zip` / `10-JM1-Content-Blog/jm1_branch_editorial_matrix.md` |
+| `references/jm1_enterprise_content_architecture.md` | `JMP-GPTs_2.zip` / `10-JM1-Content-Blog/jm1_enterprise_content_architecture.md` |
+| `references/jm1_visual_identity_governance.md` | `JMP-GPTs_2.zip` / `10-JM1-Content-Blog/jm1_visual_identity_governance.md` |
 | `references/line-copyedit-proof.md` | Active OneDrive canon reference, pending immutable publication registry |
-| `references/knowledge.md` | Reconciled implementation mirror of the uploaded governing knowledge file plus explicit Jackie roster ruling |
 | `references/faith-editorial-overlay.md` | Uploaded governing overlay mirror |
 
 ## Canon Reconciliation Result

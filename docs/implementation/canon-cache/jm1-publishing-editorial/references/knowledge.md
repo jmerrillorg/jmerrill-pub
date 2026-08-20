@@ -1,6 +1,6 @@
 # JM1-PUB-Editorial-Knowledge-v1.0
 **J Merrill Publishing, Inc. — Editorial Review GPT Knowledge Document**
-Status: CANON | Version: 1.0 | Effective date: 2026-07-11 | Supersession: immutable published canon; substantive changes require version increment and synchronized publication
+Status: CANON | Version: 1.0 | April 2026
 
 This document is attached to the Editorial Review GPT as a reference knowledge file.
 It contains imprint definitions, scoring weight guidance, style guide matrix, and compliance detail.
@@ -55,8 +55,8 @@ The GPT instructions reference this file directly. Do not modify without Publish
 - **Content:** Exceptional manuscripts selected personally by the Publisher; inaugural title: Iyorwuese Hagher, *The Conquest of Azenga*
 - **Editorial bar:** Highest across all categories — no exceptions
 - **Scoring emphasis:** All eight categories scored at full weight. Any score of ≤ 3 in any category triggers an automatic flag.
-- **Authorization requirement:** JM Signature cannot be self-submitted. Assignment is made exclusively through the JM1 Classification Flow with dual Publisher authorization.
-- **GPT behavior:** When JM Signature is the assigned imprint, the editorial report is advisory only. The ⚠️ JM SIGNATURE GUARD ACTIVE notice must appear at the top of the report. No recommendation is actionable until Publisher dual authorization is confirmed.
+- **Authorization requirement:** JM Signature cannot be self-submitted. Official assignment requires Publisher approval.
+- **GPT behavior:** When JM Signature is suggested but not officially assigned, Editorial Review still proceeds using JM Signature as recommendation context. The report must state that JM Signature is recommended pending Publisher approval and is not officially assigned until approved.
 - **Hard stops:** Missing Publisher dual authorization overrides all scores and pathways.
 
 ---
@@ -96,13 +96,8 @@ The GPT instructions reference this file directly. Do not modify without Publish
 | Humanities, literature | MLA | CMoS |
 | Medical, health | AMA | CMoS |
 | Journalism / media | AP | CMoS |
-| Technical / scientific | IEEE / ACS / CSE | CMoS |
-| Legal / institutional | Bluebook | Government style as applicable |
-| Public sector / government | GPO | CMoS |
-| Academic humanities / thesis | Turabian | CMoS |
-| International academic / UK-facing | Harvard / MHRA / Oxford | CMoS |
-
-Approved style guide roster: CMoS, APA, MLA, AP, Harvard, Turabian, AMA, ACS, Bluebook, IEEE, CSE, GPO, MHRA, Oxford.
+| Technical / scientific | IEEE / ACS / AIP / CSE / ISO | CMoS |
+| Legal / institutional | Bluebook / OSCOLA / AGLC | Government style as applicable |
 
 **Rules:**
 - CMoS is the default for all J Merrill Publishing trade content unless manuscript type warrants otherwise.
@@ -122,50 +117,33 @@ The following flags override all scores and block progression to the next stage:
 | Severe ethical or reputational risk | All imprints |
 | Unclear authorship or provenance | All imprints |
 | Any content sensitivity flag | JM Little only — automatic hard stop |
-| Missing Publisher dual authorization | JM Signature only — automatic hard stop |
+| Missing Publisher assignment approval | JM Signature official assignment only — does not block Editorial Review |
 
 When a hard-stop flag is triggered:
 - State the flag clearly at the top of the report
 - Do not continue to routing recommendation
 - Provide author-supportive language explaining next steps or resubmission eligibility
 
+Founder correction: missing confirmed imprint and missing Publisher approval for official JM Signature assignment do not block Editorial Review from running. They affect authority/status labeling, not review execution.
+
 ---
 
 ## SECTION 5 — FLOW CONTEXT (FOR GPT REFERENCE)
 
-The Editorial Review GPT operates after source authority is established and
-before prospect commercial wrapping or active-project continuation:
+The Editorial Review GPT operates at Stage 3 of the canonical JM1 Publishing Flow:
 
 ```
-Source Authority
-  → Confirmed Imprint OR Suggested Imprint
-  → Editorial Review
-  → Prospect Commercial Wrapper OR Active Project Continuation
-  → Developmental Editing
-  → Author Review/Approval
-  → Line Editing
-  → Author Review/Approval
-  → Copyediting
-  → Author Review/Approval
-  → Layout / Typesetting
-  → Proofreading
-  → Final Author Approval
-  → Production Finalization
-  → Cover / Format Finalization
-  → Distribution Review
-  → Distribution / Release
+Stage 1: Intake         → jm1pub_title record created (Dataverse)
+Stage 2: Classification → Imprint assigned via JM1-PUB-TitleClassification-CANON
+Stage 3: Editorial Review → THIS GPT (receives manuscript + imprint assignment)
+Stage 4: Production Routing → Editorial pathway executed; ISBN assigned; distribution set
 ```
 
 The GPT does not own official imprint assignment. If a confirmed imprint exists,
-it reads that imprint and applies the appropriate lens. If no confirmed imprint
-exists, it determines and uses a suggested imprint context and continues
-Editorial Review. Missing confirmed imprint alone must not create `BLOCKED`,
-`WAITING_ON_JACKIE`, or `WAITING_ON_AUTHOR`.
-
-If JM Signature is suggested, Editorial Review still proceeds, but the
-recommendation is not an official JM Signature assignment. Use a state
-equivalent to `JM_SIGNATURE_RECOMMENDED_PENDING_PUBLISHER_APPROVAL` until the
-Publisher officially assigns JM Signature.
+it reads the imprint from the Dataverse record and applies the appropriate lens.
+If no confirmed imprint exists, the GPT determines and uses a suggested imprint
+for review context and continues. It does not create BLOCKED, WAITING_ON_JACKIE,
+or WAITING_ON_AUTHOR solely because confirmed imprint is missing.
 
 ---
 

@@ -12,14 +12,17 @@
 ## Updated Manual Source Package
 
 PR #519 identifies the updated manual GPT source package as `JMP-GPTs_2.zip`.
-That package was not located in the repository, Codex attachment paths, or the
-searched OneDrive paths during this synchronization pass.
+Jackie provided the package after the initial PR was opened.
 
-Classification: `SOURCE_PACKAGE_NOT_LOCATED_LOCALLY`
+| Item | Value |
+|---|---|
+| Source package path | `/Users/jmerrillone/Downloads/JMP-GPTs_2.zip` |
+| SHA-256 | `53a85a57aaf1b7bf7a1d09182dbf033713bc239866b150591447374997708886` |
+| Extracted package root | `JMP-GPTs/` |
+| Classification | `SOURCE_PACKAGE_LOCATED_AND_IMPORTED` |
 
-Because the zip was not reachable, this pass synchronized the repository's
-manual canon cache as the available repo-backed mirror and applied Founder
-corrections over older conflicting cache language.
+The repository cache is synchronized from this source package with Founder
+corrections applied where later Founder authority supersedes stale source text.
 
 ## Repo Gaps Found
 
@@ -31,7 +34,8 @@ corrections over older conflicting cache language.
 - `references/brand-infrastructure.md`
 - `references/blog-editorial.md`
 
-This pass restored the Publishing editorial components in scope:
+This pass restored the Publishing editorial components in scope and the related
+manual-package references now present in the zip:
 
 - `references/editorial-review.md`
 - `references/distribution-review.md`
@@ -39,6 +43,10 @@ This pass restored the Publishing editorial components in scope:
 - `references/jmp_cover_genre_guide.md`
 - `references/jmp_cover_layout_guide.md`
 - `references/jmp_cover_production_specs.md`
-
-Brand Infrastructure and Blog Editorial are outside this instruction's seven
-manual editorial components.
+- `references/brand-infrastructure.md`
+- `references/jackie-personal-blog.md`
+- `references/blog-editorial.md`
+- `references/jm1_blogging_architecture_decision_framework.md`
+- `references/jm1_branch_editorial_matrix.md`
+- `references/jm1_enterprise_content_architecture.md`
+- `references/jm1_visual_identity_governance.md`

@@ -28,6 +28,8 @@ handled by Chad's GPT suite:
 - JMP Cover Intelligence GPT → `references/cover-intelligence.md`
 - JMP Brand Infrastructure Intelligence Engine → `references/brand-infrastructure.md`
 - JM1 Blog Editorial GPT → `references/blog-editorial.md`
+- Jackie Personal Blog GPT → `references/jackie-personal-blog.md`
+- JM1 Content Blog references → `references/jm1_blogging_architecture_decision_framework.md`, `references/jm1_branch_editorial_matrix.md`, `references/jm1_enterprise_content_architecture.md`, `references/jm1_visual_identity_governance.md`
 - Imprint definitions / scoring weights / style guides → `references/knowledge.md`
 
 ---

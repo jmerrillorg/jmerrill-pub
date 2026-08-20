@@ -15,11 +15,17 @@
 
 ## Result
 
-The repository manual canon cache has been synchronized to the updated manual
-instruction authority available in repository evidence, with Founder
-corrections applied. Missing reference files promised by `SKILL.md` were
-restored as canonical cache files: Editorial Review, Distribution Review, Cover
-Intelligence, and the three Cover Intelligence companion references.
+The repository manual canon cache has been synchronized to the located updated
+manual instruction source package:
+
+- `/Users/jmerrillone/Downloads/JMP-GPTs_2.zip`
+- SHA-256: `53a85a57aaf1b7bf7a1d09182dbf033713bc239866b150591447374997708886`
+
+Founder corrections were applied where the source package contained stale
+language. Missing reference files promised by `SKILL.md` were restored as
+canonical cache files, including Editorial Review, Distribution Review, Cover
+Intelligence, the Cover Intelligence companion references, Brand
+Infrastructure, Jackie Personal Blog, and JM1 Content Blog references.
 
 ## Boundaries Preserved
 
