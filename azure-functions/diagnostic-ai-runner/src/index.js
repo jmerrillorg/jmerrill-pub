@@ -8,6 +8,7 @@ require("./functions/runApprovalEventConsumer");
 require("./functions/runAuthorReviewResponseConsumer");
 require("./functions/runEditorialExecutionRuntime");
 require("./functions/runEditorialPackageHandoffConsumer");
+require("./functions/runTargetedEditorialExecution");
 require("./functions/runEditorialReviewNow");
 require("./functions/runIntentionalLeaderAuthorResponse");
 require("./functions/runMilestone6ContinuationCommunication");

@@ -17,6 +17,7 @@ const {
   invokeStageModelProvider,
   isLivePortfolioStage,
   normalizeStageCode,
+  evaluateTargetedEditorialExecution,
   runEditorialExecutionRuntime
 } = require("../src/editorial/editorialExecutionRuntime");
 
@@ -123,6 +124,197 @@ test("upstream approval evidence blocks when the approval is not bound to the ar
   );
   assert.equal(result.ok, false);
   assert.match(result.reason, /AUTHOR_APPROVAL_NOT_BOUND_TO_CURRENT_ARTIFACT/);
+});
+
+function targetedExecutionClient(overrides = {}) {
+  const rows = {
+    jm1pub_titles: [
+      {
+        jm1pub_titleid: "title-1",
+        jm1pub_titlename: "The General's Will and Last Testament",
+        jm1pub_authorname: "Iyorwuese Hagher"
+      }
+    ],
+    targetStages: [
+      {
+        jm1pub_editorialstageid: "stage-line",
+        jm1pub_name: "Line Editing - The General's Will and Last Testament",
+        jm1pub_stagetype: 100000002,
+        jm1pub_stagestatus: 100000001,
+        _jm1pub_titleid_value: "title-1"
+      }
+    ],
+    upstreamStages: [
+      {
+        jm1pub_editorialstageid: "stage-dev",
+        jm1pub_name: "Developmental Editing - The General's Will and Last Testament",
+        jm1pub_stagetype: 100000001,
+        jm1pub_stagestatus: 100000008,
+        _jm1pub_titleid_value: "title-1"
+      }
+    ],
+    sourceArtifacts: [
+      {
+        jm1pub_editorialartifactid: "artifact-dev",
+        jm1pub_editorialartifactname: "Final Developmental Manuscript",
+        jm1pub_filename: "developmental-approved.docx",
+        jm1pub_sha256: "sha-dev",
+        jm1pub_repositoryitemid: "source-item",
+        jm1pub_iscurrentapproved: true,
+        _jm1pub_titleid_value: "title-1",
+        _jm1pub_editorialstageid_value: "stage-dev"
+      }
+    ],
+    upstreamArtifacts: [
+      {
+        jm1pub_editorialartifactid: "artifact-dev",
+        jm1pub_editorialartifactname: "Final Developmental Manuscript",
+        jm1pub_filename: "developmental-approved.docx",
+        jm1pub_sha256: "sha-dev",
+        jm1pub_iscurrentapproved: true,
+        _jm1pub_titleid_value: "title-1",
+        _jm1pub_editorialstageid_value: "stage-dev"
+      }
+    ],
+    upstreamGates: [
+      {
+        jm1pub_editorialapprovalgateid: "gate-dev",
+        jm1pub_gatestatus: 196650003,
+        jm1pub_authordecision: 196650000,
+        jm1pub_authordecisionon: "2026-08-19T00:00:00Z",
+        jm1pub_nextstageauthorized: true,
+        _jm1pub_titleid_value: "title-1",
+        _jm1pub_editorialstageid_value: "stage-dev",
+        _jm1pub_deliverableartifactid_value: "artifact-dev"
+      }
+    ],
+    existingLogs: [],
+    ...overrides
+  };
+  return {
+    creates: [],
+    patches: [],
+    async list(entitySet, query = {}) {
+      if (entitySet === "jm1pub_titles") return rows.jm1pub_titles;
+      if (entitySet === "jm1pub_editorialstages" && /jm1pub_stagetype eq 100000002/.test(query.$filter || "")) {
+        return rows.targetStages;
+      }
+      if (entitySet === "jm1pub_editorialstages" && /jm1pub_stagetype eq 100000001/.test(query.$filter || "")) {
+        return rows.upstreamStages;
+      }
+      if (entitySet === "jm1pub_editorialartifacts" && /jm1pub_editorialartifactid eq artifact-dev/.test(query.$filter || "")) {
+        return rows.sourceArtifacts;
+      }
+      if (entitySet === "jm1pub_editorialartifacts") return rows.upstreamArtifacts;
+      if (entitySet === "jm1pub_editorialapprovalgates") return rows.upstreamGates;
+      if (entitySet === "jm1_executionlogs") return rows.existingLogs;
+      throw new Error(`Unexpected list ${entitySet} ${JSON.stringify(query)}`);
+    },
+    async first(entitySet, query = {}) {
+      return (await this.list(entitySet, query))[0] || null;
+    },
+    async create(entitySet, payload) {
+      this.creates.push({ entitySet, payload });
+      return "created-id";
+    },
+    async patch(entitySet, id, payload) {
+      this.patches.push({ entitySet, id, payload });
+    }
+  };
+}
+
+test("targeted editorial execution dry-run resolves exactly one Line stage/source without mutations", async () => {
+  const client = targetedExecutionClient();
+  const result = await evaluateTargetedEditorialExecution(
+    {
+      titleId: "title-1",
+      stageCode: "LINE_EDITING",
+      sourceArtifactId: "artifact-dev",
+      sourceChecksum: "sha-dev",
+      expectedCurrentStage: "DEVELOPMENTAL_COMPLETE",
+      authorApprovalRequired: true,
+      executionMode: "DRY_RUN"
+    },
+    { client }
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.status, "DRY_RUN_READY");
+  assert.equal(result.canonicalTitle.title, "The General's Will and Last Testament");
+  assert.equal(result.currentStage.stageId, "stage-line");
+  assert.equal(result.exactSourceArtifact.artifactId, "artifact-dev");
+  assert.equal(result.authorApprovalEvidence.approvedArtifactId, "artifact-dev");
+  assert.deepEqual(result.expectedMutations, [
+    "claim target editorial stage",
+    "read exact source artifact",
+    "invoke governed provider route",
+    "persist output artifacts",
+    "write QA evidence",
+    "create package manifest",
+    "create mandatory author-review gate"
+  ]);
+  assert.equal(client.creates.length, 0);
+  assert.equal(client.patches.length, 0);
+});
+
+test("targeted editorial execution rejects missing target stage instead of creating one implicitly", async () => {
+  const result = await evaluateTargetedEditorialExecution(
+    {
+      titleId: "title-1",
+      stageCode: "LINE_EDITING",
+      sourceArtifactId: "artifact-dev",
+      sourceChecksum: "sha-dev",
+      expectedCurrentStage: "DEVELOPMENTAL_COMPLETE",
+      authorApprovalRequired: true,
+      executionMode: "DRY_RUN"
+    },
+    { client: targetedExecutionClient({ targetStages: [] }) }
+  );
+
+  assert.equal(result.ok, false);
+  assert.equal(result.code, "TARGET_STAGE_NOT_FOUND");
+});
+
+test("targeted editorial execution rejects bulk selectors", async () => {
+  const result = await evaluateTargetedEditorialExecution(
+    {
+      titleId: "title-1",
+      stageCode: "LINE_EDITING",
+      sourceArtifactId: "artifact-dev",
+      sourceChecksum: "sha-dev",
+      expectedCurrentStage: "DEVELOPMENTAL_COMPLETE",
+      authorApprovalRequired: true,
+      executionMode: "DRY_RUN",
+      portfolioSelector: "all-line-ready"
+    },
+    { client: targetedExecutionClient() }
+  );
+
+  assert.equal(result.ok, false);
+  assert.equal(result.code, "BULK_SELECTOR_NOT_ALLOWED");
+});
+
+test("targeted editorial execution rejects stages already completed for the same source", async () => {
+  const result = await evaluateTargetedEditorialExecution(
+    {
+      titleId: "title-1",
+      stageCode: "LINE_EDITING",
+      sourceArtifactId: "artifact-dev",
+      sourceChecksum: "sha-dev",
+      expectedCurrentStage: "DEVELOPMENTAL_COMPLETE",
+      authorApprovalRequired: true,
+      executionMode: "EXECUTE"
+    },
+    {
+      client: targetedExecutionClient({
+        existingLogs: [{ jm1_executionlogid: "existing-output-log" }]
+      })
+    }
+  );
+
+  assert.equal(result.ok, false);
+  assert.equal(result.code, "TARGET_STAGE_ALREADY_COMPLETED_FOR_SOURCE");
+  assert.equal(result.existingOutputLogId, "existing-output-log");
 });
 
 test("line editing prompt inherits author-approved developmental context", () => {
