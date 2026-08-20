@@ -19,6 +19,7 @@ const {
   isLivePortfolioStage,
   normalizeStageCode,
   resolveSourceGraphItem,
+  shouldPreserveExistingExactBlocker,
   evaluateTargetedEditorialExecution,
   runEditorialExecutionRuntime
 } = require("../src/editorial/editorialExecutionRuntime");
@@ -96,6 +97,15 @@ test("source Graph resolver uses SharePoint web URL when drive/item identity is 
   } finally {
     graphRequest.override = null;
   }
+});
+
+test("source Graph identity blockers are retriable while substantive blockers remain preserved", () => {
+  assert.equal(shouldPreserveExistingExactBlocker("LINE_EDITING_BLOCKED — SOURCE_GRAPH_IDENTITY_MISSING"), false);
+  assert.equal(
+    shouldPreserveExistingExactBlocker("DEVELOPMENTAL_EDITING_BLOCKED — CANONICAL_COMPILATION_FILE_AMBIGUOUS"),
+    true
+  );
+  assert.equal(shouldPreserveExistingExactBlocker(""), false);
 });
 
 test("live portfolio stage guard excludes synthetic and test records without excluding Testament titles", () => {

@@ -939,6 +939,11 @@ function extractExistingExactBlocker(stage) {
   return match?.[1] || "";
 }
 
+function shouldPreserveExistingExactBlocker(exactBlocker) {
+  if (!exactBlocker) return false;
+  return !exactBlocker.includes("SOURCE_GRAPH_IDENTITY_MISSING");
+}
+
 async function findArtifactByName(client, stage, artifactName) {
   const rows = await client.list("jm1pub_editorialartifacts", {
     $select: "jm1pub_editorialartifactid,jm1pub_editorialartifactname",
@@ -2133,7 +2138,7 @@ async function processStage(client, stage, correlationId, options = {}) {
     return { stageId: stage.jm1pub_editorialstageid, stageCode, status: "SKIPPED_NOT_EXECUTABLE" };
   }
   const preservedExactBlocker = extractExistingExactBlocker(stage);
-  if (preservedExactBlocker) {
+  if (shouldPreserveExistingExactBlocker(preservedExactBlocker)) {
     return {
       stageId: stage.jm1pub_editorialstageid,
       titleId: stage._jm1pub_titleid_value,
@@ -2331,6 +2336,7 @@ module.exports = {
   requiredPackageRoles,
   requireDataverseConfig,
   resolveSourceGraphItem,
+  shouldPreserveExistingExactBlocker,
   writeLog,
   evaluateTargetedEditorialExecution,
   runTargetedEditorialExecution,
