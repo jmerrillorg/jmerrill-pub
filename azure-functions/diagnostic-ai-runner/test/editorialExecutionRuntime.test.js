@@ -14,9 +14,11 @@ const {
   findSourceArtifact,
   findUpstreamApprovalEvidence,
   graphRequest,
+  graphShareToken,
   invokeStageModelProvider,
   isLivePortfolioStage,
   normalizeStageCode,
+  resolveSourceGraphItem,
   evaluateTargetedEditorialExecution,
   runEditorialExecutionRuntime
 } = require("../src/editorial/editorialExecutionRuntime");
@@ -38,6 +40,62 @@ test("stage names normalize to canonical executor codes", () => {
   assert.equal(normalizeStageCode({ jm1pub_name: "Developmental Editing - Before You Were Born" }), "DEVELOPMENTAL_EDITING");
   assert.equal(normalizeStageCode({ jm1pub_name: "Editorial Review - The Long Watch" }), "EDITORIAL_REVIEW");
   assert.equal(normalizeStageCode({ jm1pub_name: "Proofreading - The Intentional Leader" }), "PROOFREADING");
+});
+
+test("Graph share token encodes SharePoint web URLs for driveItem resolution", () => {
+  const token = graphShareToken("https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/source.docx");
+  assert.match(token, /^u!/);
+  assert.equal(token.includes("="), false);
+  assert.equal(token.includes("+"), false);
+  assert.equal(token.includes("/"), false);
+  assert.equal(graphShareToken("/repo/path/source.docx"), "");
+});
+
+test("source Graph resolver preserves canonical drive/item identity when present", async () => {
+  const paths = [];
+  graphRequest.override = async (path) => {
+    paths.push(path);
+    assert.equal(path, "drives/drive-1/items/item-1?$select=id,name,parentReference,size,webUrl");
+    return { id: "item-1", parentReference: { driveId: "drive-1", id: "parent-1" } };
+  };
+
+  try {
+    const result = await resolveSourceGraphItem(
+      {
+        jm1pub_repositorydriveid: "drive-1",
+        jm1pub_repositoryitemid: "item-1",
+        jm1pub_repositorypath: "https://example.invalid/ignored.docx"
+      },
+      "LINE_EDITING"
+    );
+    assert.equal(result.driveId, "drive-1");
+    assert.equal(result.item.id, "item-1");
+    assert.equal(result.contentPath, "drives/drive-1/items/item-1/content");
+    assert.deepEqual(paths, ["drives/drive-1/items/item-1?$select=id,name,parentReference,size,webUrl"]);
+  } finally {
+    graphRequest.override = null;
+  }
+});
+
+test("source Graph resolver uses SharePoint web URL when drive/item identity is absent", async () => {
+  const webUrl = "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/source.docx";
+  const shareToken = graphShareToken(webUrl);
+  const paths = [];
+  graphRequest.override = async (path) => {
+    paths.push(path);
+    assert.equal(path, `shares/${shareToken}/driveItem?$select=id,name,parentReference,size,webUrl`);
+    return { id: "item-from-share", parentReference: { driveId: "drive-from-share", id: "parent-from-share" } };
+  };
+
+  try {
+    const result = await resolveSourceGraphItem({ jm1pub_repositorypath: webUrl }, "LINE_EDITING");
+    assert.equal(result.driveId, "drive-from-share");
+    assert.equal(result.item.id, "item-from-share");
+    assert.equal(result.contentPath, `shares/${shareToken}/driveItem/content`);
+    assert.deepEqual(paths, [`shares/${shareToken}/driveItem?$select=id,name,parentReference,size,webUrl`]);
+  } finally {
+    graphRequest.override = null;
+  }
 });
 
 test("live portfolio stage guard excludes synthetic and test records without excluding Testament titles", () => {
