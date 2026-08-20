@@ -1,0 +1,14 @@
+e6e2f1d53782fa24774c87d833891302d13dd8bdfc8c0b67091c2ada447543d2  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/00-executive-summary.md
+1f10ec614071d97dcf152b8f83272a43bbd6ba1ad9cb12a1df3dca85cfd28780  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/01-current-blocker.md
+51d0e784383b4ea35f9b248a4d2bba55ef15993cb4991f995cf38f3d866d9741  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/02-runtime-root-cause.md
+4ad97bb03e9d9b232dfc78f172202702fa86225455861fba60aebc9dc94d9f38  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/03-async-worker-contract.md
+c03af68280e1b8ca4336776a6424e64ae1052f69acccb02b985b5cb2d674237e  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/04-rate-governor.md
+d0fed5fb151cdb312694139d467203b520c5171ea935df27ee8e80d3635bfecf  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/05-resume-idempotency.md
+8192361717d6d0ceda009e3b5cb94a14c577130c6a8a63898ebb68fbbc644e01  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/06-artifact-lineage-and-gates.md
+cbb73aa2eed6812aa4378e85b85d0c1315f6543290a70013c21dd349c2bfc25e  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/07-provider-capacity-evidence.md
+37926fecb14f1ea02f1f8a57f8557c0086ba0224180838af3409eabcc7c95312  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/08-support-request-packet.md
+ab1ec5524edd1e860bc0a52563a09e07b29e49c6c663324590bd5a750aa41cee  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/09-durable-functions-evaluation.md
+df85816c3012e3f7b090771444f27dcf9bc74350d1ad2746de56a5c3f5501eff  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/10-validation-results.md
+42d64b78c627dd48684f5c0c0f21911f886e1d2bb1c1aca62a3ee5a6eea2037a  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/11-production-readiness.md
+f9bf7aa03ecc9385e75aa7811d944e5bcc633ecd5bf516e44f0c68f662fe43f6  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/12-negative-proof.md
+5a5a265cb1672149cb19c57f72db0976946f7ee7117a4eeed98c175c353dfc30  docs/operations/generated/JMP-ASYNC-EDITORIAL-FOUNDRY-CAPACITY-2026-08-20/13-capacity-planning.md
