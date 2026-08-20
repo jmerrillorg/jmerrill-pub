@@ -55,6 +55,31 @@ Helping Authors Help Themselves.
 
 The brand name may appear only as a restrained identity header or approved logo/lockup. It must not render as the message H1.
 
+## Communications Evidence Routing
+
+Microsoft 365 is the primary business-communications evidence authority for J Merrill One. Connector availability does not determine evidence authority.
+
+When investigating a JM1 business communication, use this evidence-source order:
+
+1. Relevant Microsoft 365 shared or organizational mailbox
+2. Other relevant JM1 Microsoft 365 mailbox
+3. Dynamics or Dataverse communication and operational records
+4. SharePoint or OneDrive governed project evidence
+5. Repository or evidence artifacts
+6. External or personal email source only when concrete evidence identifies that source as part of the actual thread
+
+For Publishing author communications, begin with the governed Publishing mailbox:
+
+```text
+publishing@jmerrill.one
+```
+
+An author's Gmail address as recipient does not make a JM1 Gmail connector the governed source. If JM1 sent from `publishing@jmerrill.one` or internally mirrored to that mailbox, the governed evidence source remains Microsoft 365 / Outlook for the Publishing mailbox.
+
+Do not search Gmail as a generic fallback. Gmail may be used only when Jackie identifies Gmail as the source, project evidence identifies a Gmail mailbox as part of the business thread, the project is historical and predates the governed Microsoft mailbox, Microsoft evidence identifies a cross-platform communication requiring Gmail verification, or another concrete fact makes Gmail relevant.
+
+Evidence investigations should ask: "What is the governed JM1 system most likely to own this event?" They should not ask: "Which connected connector can be searched?"
+
 ## Prohibited
 
 - Workflow-specific HTML
