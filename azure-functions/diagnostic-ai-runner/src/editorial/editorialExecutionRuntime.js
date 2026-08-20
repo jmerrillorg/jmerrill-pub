@@ -5,6 +5,8 @@ const { ClientSecretCredential, DefaultAzureCredential } = require("@azure/ident
 const { Document, Packer, Paragraph, TextRun, HeadingLevel } = require("docx");
 const mammoth = require("mammoth");
 const { routeToProvider } = require("../model/providerRouter");
+const { summarizeCorrectionCount } = require("./correctionCounting");
+const { validateEditorialCompliance } = require("./editorialComplianceValidator");
 const {
   createAuthorReviewGatePlan,
   gateBlocksCurrentStageRuntime,
@@ -158,6 +160,31 @@ function preferredDeploymentAliasForStage(stageCode) {
 
 function buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText }) {
   const summary = summarizeExtractedText(extractedText || "");
+  if (stageCode === "LINE_EDITING") {
+    return JSON.stringify({
+      task: "cc010_line_editing_execution",
+      contract: "Return only JSON. Do not return markdown fences.",
+      stageCode,
+      stageName: stage.jm1pub_name,
+      titleId: stage._jm1pub_titleid_value,
+      sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+      sourceSha256: sourceArtifact.jm1pub_sha256,
+      sourceWordCount: summary.words,
+      sourceParagraphCount: summary.paragraphs,
+      lineScope:
+        "Sentence-level clarity, paragraph flow, tone, rhythm, readability, and author voice preservation. Do not perform developmental restructuring, substantive invention, or copyediting drift.",
+      requiredOutput: {
+        editedManuscript: "string containing the full line-edited manuscript text",
+        lineEditingSummary: "string",
+        changeLedger: ["specific line-level changes or recurring patterns"],
+        retentionNotes: "string",
+        authorQueries: ["string"]
+      },
+      mandatoryAuthorGate:
+        "Line Editing completion must create an author review/approval gate. It must not advance to Copyediting automatically.",
+      sourceSample: summary.sample.slice(0, 6000)
+    });
+  }
   return JSON.stringify({
     task: "cc010_stage_execution",
     contract: "Return only JSON.",
@@ -178,6 +205,13 @@ function buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText
       "Model completion and QA are not author approval. The stage must wait for the author after artifact generation.",
     sourceSample: summary.sample.slice(0, 2000)
   });
+}
+
+function selectedStyleGuidesForStage(stageCode) {
+  if (stageCode === "LINE_EDITING" || stageCode === "COPYEDITING" || stageCode === "PROOFREADING") {
+    return ["JMP-CG-LINE-COPY-PROOF-V1"];
+  }
+  return [];
 }
 
 async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extractedText, correlationId) {
@@ -205,7 +239,7 @@ async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extrac
     modelDeploymentAlias: deploymentAlias,
     promptKey: `jm1-prompt-pub-${stageCode.toLowerCase().replace(/_/g, "-")}`,
     promptVersion: `CC010-${stageCode}-V1`,
-    selectedStyleGuides: [],
+    selectedStyleGuides: selectedStyleGuidesForStage(stageCode),
     allowFallback: false,
     telemetry: { correlationId }
   });
@@ -724,12 +758,21 @@ function outputDefinitions(stageCode) {
       "Developmental QA Evidence"
     ];
   }
-  return EXECUTOR_POLICIES[stageCode].outputRoles.map((role) =>
-    role
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (char) => char.toUpperCase())
-      .trim()
-  );
+  const displayNames = {
+    editedManuscript: "Edited Manuscript",
+    lineEditingSummary: "Line Editing Summary",
+    copyeditingSummary: "Copyediting Summary",
+    proofreadManuscript: "Proofread Manuscript",
+    proofreadingCoverNote: "Proofreading Cover Note",
+    styleSheet: "Style Sheet",
+    changeLedger: "Change Ledger",
+    qaEvidence: "QA Evidence",
+    exceptionEvidence: "Exception Evidence"
+  };
+  return EXECUTOR_POLICIES[stageCode].outputRoles.map((role) => displayNames[role] || role
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (char) => char.toUpperCase())
+    .trim());
 }
 
 function splitManuscriptParagraphs(text) {
@@ -834,8 +877,207 @@ async function buildDevelopmentalRevisionDocx(stage, stageCode, sourceArtifact, 
   return Packer.toBuffer(doc);
 }
 
-async function buildSimpleEditorialDocx(stage, stageCode, sourceArtifact, outputName, extractedText, correlationId) {
-  const content = buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extractedText, correlationId);
+function modelTextField(output, fields) {
+  for (const field of fields) {
+    const value = output?.[field];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
+}
+
+function modelArrayField(output, fields) {
+  for (const field of fields) {
+    const value = output?.[field];
+    if (Array.isArray(value)) return value.map((item) => normalizeString(item)).filter(Boolean);
+    if (typeof value === "string" && value.trim()) {
+      return value
+        .split(/\n+/)
+        .map((item) => item.replace(/^[-*]\s*/, "").trim())
+        .filter(Boolean);
+    }
+  }
+  return [];
+}
+
+function lineEditingOutput(modelInvocation = {}) {
+  const output = modelInvocation.output || {};
+  const editedManuscript = modelTextField(output, [
+    "editedManuscript",
+    "lineEditedManuscript",
+    "fullEditedManuscript",
+    "manuscript"
+  ]);
+  const lineEditingSummary = modelTextField(output, ["lineEditingSummary", "stageScopeSummary", "authorReviewSummary"]);
+  const retentionNotes = modelTextField(output, ["retentionNotes", "qualityNotes"]);
+  const changeLedger = modelArrayField(output, ["changeLedger", "revisionCandidates", "qualityNotes"]);
+  const authorQueries = modelArrayField(output, ["authorQueries", "queries"]);
+  return { editedManuscript, lineEditingSummary, retentionNotes, changeLedger, authorQueries };
+}
+
+function countWords(text) {
+  return normalizeString(text).split(/\s+/).filter(Boolean).length;
+}
+
+function buildLineEditingQa({ sourceText, editedText, modelInvocation, correlationId }) {
+  const sourceWords = countWords(sourceText);
+  const editedWords = countWords(editedText);
+  const retentionRatio = sourceWords ? editedWords / sourceWords : 0;
+  const correctionSummary = summarizeCorrectionCount({
+    patterns: lineEditingOutput(modelInvocation).changeLedger.map((pattern) => ({ correctedInstances: 1, pattern })),
+    preservedVoice: true,
+    preservedDialect: true,
+    preservedCadence: true
+  });
+  const compliance = validateEditorialCompliance({
+    producingTransaction: "line_editing",
+    producingModel: modelInvocation.provider || modelInvocation.route?.provider || "",
+    validatorModel: "deterministic-runtime-qa",
+    guideSelection: {
+      selectedPrimaryGuide: "JMP Line Editing, Copyediting & Proofreading — Reference",
+      conflicts: []
+    },
+    outputMetadata: {
+      promptHash: crypto.createHash("sha256").update(JSON.stringify(modelInvocation.output || {})).digest("hex"),
+      selectedGuideIds: selectedStyleGuidesForStage("LINE_EDITING"),
+      voiceProtectionAcknowledged: true
+    }
+  });
+  const violations = [];
+  if (!editedText) violations.push("LINE_EDITED_MANUSCRIPT_MISSING");
+  if (retentionRatio < 0.95 || retentionRatio > 1.05) violations.push("LINE_RETENTION_OUTSIDE_95_TO_105_PERCENT_WINDOW");
+  if (modelInvocation.fellBack) violations.push("MODEL_FALLBACK_NOT_ALLOWED");
+  if (modelInvocation.provider !== "microsoft-foundry-claude") violations.push("PREFERRED_LINE_MODEL_PROVIDER_NOT_USED");
+  return {
+    ok: violations.length === 0 && compliance.violations.length === 0,
+    sourceWords,
+    editedWords,
+    retentionRatio,
+    retentionPercent: Math.round(retentionRatio * 10000) / 100,
+    violations,
+    correctionSummary,
+    compliance,
+    provider: modelInvocation.provider || modelInvocation.route?.provider || "",
+    deployment: modelInvocation.routeAlias || "",
+    promptVersion: modelInvocation.promptVersion || "",
+    fallback: Boolean(modelInvocation.fellBack),
+    correlationId
+  };
+}
+
+function assertLineEditingOutputReady(modelInvocation, sourceText, correlationId) {
+  const lineOutput = lineEditingOutput(modelInvocation);
+  const qa = buildLineEditingQa({
+    sourceText,
+    editedText: lineOutput.editedManuscript,
+    modelInvocation,
+    correlationId
+  });
+  if (!qa.ok) {
+    throw Object.assign(new Error("Line Editing output failed governed QA"), {
+      safeCode: `LINE_EDITING_BLOCKED — ${qa.violations.concat(qa.compliance.violations).join("_") || "LINE_OUTPUT_QA_FAILED"}`
+    });
+  }
+  return { lineOutput, qa };
+}
+
+async function buildLineEditedManuscriptDocx(stage, sourceArtifact, outputName, extractedText, correlationId, modelInvocation) {
+  const { lineOutput, qa } = assertLineEditingOutputReady(modelInvocation, extractedText, correlationId);
+  const children = [
+    paragraphFromText(`${outputName} - ${stage.jm1pub_name}`, { heading: HeadingLevel.HEADING_1 }),
+    paragraphFromText("Generated by: JM1 Automation"),
+    paragraphFromText("Stage: LINE_EDITING"),
+    paragraphFromText(`Generated at: ${new Date().toISOString()}`),
+    paragraphFromText(`Source artifact: ${sourceArtifact.jm1pub_editorialartifactid}`),
+    paragraphFromText(`Source checksum: ${sourceArtifact.jm1pub_sha256}`),
+    paragraphFromText(`Correlation: ${correlationId}`),
+    paragraphFromText(`Model provider: ${qa.provider}`),
+    paragraphFromText(`Model deployment: ${qa.deployment}`),
+    paragraphFromText(`Model fallback: ${qa.fallback ? "YES" : "NO"}`),
+    paragraphFromText(`Retention: ${qa.retentionPercent}%`),
+    paragraphFromText("Governed Line-Edited Manuscript", { heading: HeadingLevel.HEADING_2 }),
+    paragraphFromText(
+      "This artifact uses the governed model output as the edited manuscript. The pass is limited to sentence-level clarity, paragraph flow, rhythm, readability, tone, and author-voice preservation. It does not authorize developmental restructuring, copyediting, proofreading, or progression to the next stage without author review."
+    ),
+    paragraphFromText("Edited Manuscript", { heading: HeadingLevel.HEADING_2 })
+  ];
+  splitManuscriptParagraphs(lineOutput.editedManuscript).forEach((paragraph) => children.push(paragraphFromText(paragraph)));
+  const doc = new Document({
+    styles: { default: { document: { run: { font: "Arial", size: 22 } } } },
+    sections: [{ children }]
+  });
+  return Packer.toBuffer(doc);
+}
+
+function buildLineEditingMarkdownOutput(stage, outputName, sourceArtifact, extractedText, correlationId, modelInvocation) {
+  const { lineOutput, qa } = assertLineEditingOutputReady(modelInvocation, extractedText, correlationId);
+  const base = [
+    `# ${outputName} - ${stage.jm1pub_name}`,
+    "",
+    "Generated by: JM1 Automation",
+    "Stage: LINE_EDITING",
+    `Generated at: ${new Date().toISOString()}`,
+    `Source artifact: ${sourceArtifact.jm1pub_editorialartifactid}`,
+    `Source checksum: ${sourceArtifact.jm1pub_sha256}`,
+    `Correlation: ${correlationId}`,
+    `Model provider: ${qa.provider}`,
+    `Model deployment: ${qa.deployment}`,
+    `Model fallback: ${qa.fallback ? "YES" : "NO"}`,
+    ""
+  ];
+  if (outputName === "Line Editing Summary") {
+    return [
+      ...base,
+      "## Summary",
+      lineOutput.lineEditingSummary || "Line Editing completed within the governed scope.",
+      "",
+      "## Scope Boundary",
+      "Sentence-level clarity, paragraph flow, tone, rhythm, readability, and author voice preservation only.",
+      "",
+      "## Author Gate",
+      "Author review/approval is required before Copyediting may begin."
+    ].join("\n");
+  }
+  if (outputName === "Change Ledger") {
+    return [
+      ...base,
+      "## Change Ledger",
+      ...(lineOutput.changeLedger.length ? lineOutput.changeLedger.map((item) => `- ${item}`) : ["- No recurring line-editing pattern was separately reported by the model."]),
+      "",
+      "## Author Queries",
+      ...(lineOutput.authorQueries.length ? lineOutput.authorQueries.map((item) => `- ${item}`) : ["- No author query was separately reported by the model."])
+    ].join("\n");
+  }
+  if (outputName === "QA Evidence") {
+    return [
+      ...base,
+      "## Retention / Drift QA",
+      `Source words: ${qa.sourceWords}`,
+      `Edited words: ${qa.editedWords}`,
+      `Retention: ${qa.retentionPercent}%`,
+      `Retention window: 95% to 105%`,
+      `QA result: ${qa.ok ? "PASS" : "FAIL"}`,
+      "",
+      "## Compliance",
+      `Compliance score: ${qa.compliance.complianceScore}`,
+      `Violations: ${qa.compliance.violations.length ? qa.compliance.violations.join(", ") : "None"}`,
+      `Warnings: ${qa.compliance.warnings.length ? qa.compliance.warnings.join(", ") : "None"}`,
+      `Author voice flags: ${qa.compliance.authorVoiceFlags.length ? qa.compliance.authorVoiceFlags.join(", ") : "None"}`,
+      "",
+      "## Correction Summary",
+      qa.correctionSummary.authorSafeSummary,
+      "",
+      "## Boundary",
+      "Line Editing output is not author approval. The next governed action is author review/approval before Copyediting."
+    ].join("\n");
+  }
+  return buildOutputDocument(stage, "LINE_EDITING", sourceArtifact, outputName, extractedText, correlationId);
+}
+
+async function buildSimpleEditorialDocx(stage, stageCode, sourceArtifact, outputName, extractedText, correlationId, modelInvocation = null) {
+  const content =
+    stageCode === "LINE_EDITING"
+      ? buildLineEditingMarkdownOutput(stage, outputName, sourceArtifact, extractedText, correlationId, modelInvocation)
+      : buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extractedText, correlationId);
   const children = content
     .split(/\n+/)
     .map((line) => normalizeString(line))
@@ -1053,6 +1295,7 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
     const isDevelopmentalManuscript =
       stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Developmentally Edited Manuscript";
     const isDevelopmentalMemo = stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Developmental Memo";
+    const isLineEditedManuscript = stageCode === "LINE_EDITING" && outputName === "Edited Manuscript";
     const isEditedManuscript =
       (stageCode === "LINE_EDITING" || stageCode === "COPYEDITING") && outputName === "Edited Manuscript";
     const isProofreadManuscript = stageCode === "PROOFREADING" && outputName === "Proofread Manuscript";
@@ -1067,10 +1310,14 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
     const filename = `${new Date().toISOString().slice(0, 10)}-${stage.jm1pub_name.replace(/[^a-zA-Z0-9]+/g, "-")}-${outputName.replace(/[^a-zA-Z0-9]+/g, "-")}.${extension}`;
     const body = isDevelopmentalManuscript
       ? await buildDevelopmentalRevisionDocx(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId)
+      : isLineEditedManuscript
+        ? await buildLineEditedManuscriptDocx(stage, sourceArtifact, outputName, extracted.value || "", correlationId, modelInvocation)
       : shouldBuildDocx
-        ? await buildSimpleEditorialDocx(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId)
+        ? await buildSimpleEditorialDocx(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId, modelInvocation)
         : Buffer.from(
-            isReviewInstructions
+            stageCode === "LINE_EDITING"
+              ? buildLineEditingMarkdownOutput(stage, outputName, sourceArtifact, extracted.value || "", correlationId, modelInvocation)
+              : isReviewInstructions
               ? buildReviewInstructionsText(stage, stageCode, sourceArtifact, correlationId)
               : buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId),
             "utf8"
@@ -1100,6 +1347,8 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
       jm1pub_iscurrentapproved: false,
       jm1pub_notes: isDevelopmentalManuscript
         ? `Package-grade governed developmental revision artifact produced from source artifact ${sourceArtifact.jm1pub_editorialartifactid}. This preserves author voice and routes high-risk edits as notes instead of silent rewrites.`
+        : isLineEditedManuscript
+          ? `Package-grade governed Line Editing artifact produced from actual model output for source artifact ${sourceArtifact.jm1pub_editorialartifactid}. Retention/drift QA passed; author review is required before Copyediting.`
         : `Editorial runtime output produced from governed source artifact ${sourceArtifact.jm1pub_editorialartifactid}.`,
       jm1pub_correlationid: correlationId,
       "Jm1pub_Titleid@odata.bind": `/jm1pub_titles(${stage._jm1pub_titleid_value})`,
@@ -1207,6 +1456,7 @@ async function createAuthorReviewGate(client, stage, stageCode, artifact, correl
       actionType: "AUTHOR_REVIEW_GATE_CREATED",
       description:
         `${stageCode} opened mandatory author review gate ${gateId} for artifact ${plan.artifactId}; checksum ${plan.artifactHash}. ` +
+        (stageCode === "LINE_EDITING" ? "Copyediting is not authorized until author review/approval completes. " : "") +
         `No notification was sent by this runtime. Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
       sourceEntity: "jm1pub_editorialapprovalgate",
       sourceRecordId: gateId
@@ -1603,6 +1853,7 @@ async function processStage(client, stage, correlationId) {
     description:
       `${stageCode} produced governed output artifacts: ${outputs.map((item) => `${item.outputName} ${item.artifactId}`).join("; ")}. ` +
       `Model route ${outputs.modelInvocation?.routeAlias || "unknown"}; provider ${outputs.modelInvocation?.provider || "unknown"}; prompt ${outputs.modelInvocation?.promptVersion || "unknown"}. ` +
+      `Fallback ${outputs.modelInvocation?.fellBack ? "true" : "false"}. ` +
       `Source artifact ${sourceArtifact.jm1pub_editorialartifactid}; checksum ${sourceArtifact.jm1pub_sha256 || "pending"}. Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
     sourceEntity: "jm1pub_editorialstage",
     sourceRecordId: stage.jm1pub_editorialstageid

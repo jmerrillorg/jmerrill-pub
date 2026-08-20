@@ -2,6 +2,7 @@
 
 const assert = require("node:assert/strict");
 const test = require("node:test");
+const mammoth = require("mammoth");
 
 const {
   EXECUTOR_POLICIES,
@@ -435,6 +436,247 @@ test("developmental editing materializes a package-grade manuscript docx artifac
     assert.equal(logs.some((log) => log.jm1_actiontype === "PACKAGE_MANIFEST_CREATED"), true);
     assert.equal(logs.some((log) => log.jm1_actiontype === "PACKAGE_QA_COMPLETED"), true);
     assert.equal(logs.some((log) => log.jm1_actiontype === "AUTHOR_REVIEW_GATE_CREATED"), true);
+  } finally {
+    graphRequest.override = null;
+    extractSourceText.override = null;
+    invokeStageModelProvider.override = null;
+  }
+});
+
+test("line editing materializes model-supplied edited manuscript and opens author gate", async () => {
+  const created = [];
+  const patched = [];
+  const logs = [];
+  const uploadedBodies = new Map();
+  const sourceText = "This sentence reads clearly today.\n\nThis paragraph keeps rhythm intact.";
+  const editedText = "This sentence reads more clearly.\n\nThis paragraph keeps rhythm intact.";
+  const sourceBuffer = Buffer.from(sourceText);
+  const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
+  graphRequest.override = async (path, options = {}) => {
+    if (path.endsWith("/content") && !options.method) return sourceBuffer;
+    if (path.includes("?$select=id,name,parentReference,size,webUrl") || path.includes("?$select=id,parentReference")) {
+      return { id: "source-item", parentReference: { id: "parent-folder" }, webUrl: "https://sharepoint/source.docx" };
+    }
+    if (options.method === "PUT") {
+      const name = decodeURIComponent(path.split(":/").at(-2) || "output");
+      uploadedBodies.set(name, options.body);
+      return {
+        id: `uploaded-${uploadedBodies.size}`,
+        name,
+        size: Buffer.isBuffer(options.body) ? options.body.length : Buffer.byteLength(String(options.body || "")),
+        webUrl: "https://sharepoint/output"
+      };
+    }
+    throw new Error(`Unexpected graph path ${path}`);
+  };
+  extractSourceText.override = async () => ({ value: sourceText });
+  invokeStageModelProvider.override = async () => ({
+    ok: true,
+    provider: "microsoft-foundry-claude",
+    routeAlias: "jm1-editorial-devline-primary",
+    promptVersion: "CC010-LINE_EDITING-V1",
+    fellBack: false,
+    output: {
+      editedManuscript: editedText,
+      lineEditingSummary: "Improved sentence clarity while preserving voice.",
+      changeLedger: ["Smoothed one sentence for clarity without changing meaning."],
+      retentionNotes: "Full manuscript retained.",
+      authorQueries: []
+    }
+  });
+  const client = {
+    async list(entitySet, query = {}) {
+      if (entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1pub_editorialstages") {
+        return [{ jm1pub_editorialstageid: "stage-dev", jm1pub_stagetype: 100000001 }];
+      }
+      if (
+        entitySet === "jm1pub_editorialartifacts" &&
+        query.$filter?.includes("_jm1pub_editorialstageid_value eq stage-dev")
+      ) {
+        return [{ jm1pub_editorialartifactid: "artifact-dev", jm1pub_sha256: "sha-dev", jm1pub_iscurrentapproved: true }];
+      }
+      if (entitySet === "jm1pub_editorialapprovalgates" && query.$filter?.includes("_jm1pub_editorialstageid_value eq stage-dev")) {
+        return [
+          {
+            jm1pub_editorialapprovalgateid: "gate-dev",
+            jm1pub_gatestatus: 196650003,
+            jm1pub_authordecision: 196650000,
+            jm1pub_authordecisionon: "2026-08-19T01:28:44Z",
+            jm1pub_nextstageauthorized: true,
+            _jm1pub_deliverableartifactid_value: "artifact-dev"
+          }
+        ];
+      }
+      if (entitySet === "jm1pub_editorialapprovalgates") return [];
+      if (entitySet === "jm1pub_editorialartifacts" && query.$filter?.includes("jm1pub_editorialartifactname eq")) return [];
+      if (entitySet === "jm1pub_editorialartifacts") {
+        return [
+          {
+            jm1pub_editorialartifactid: "source-artifact",
+            jm1pub_editorialartifactname: "Approved Developmental Artifact - Test",
+            jm1pub_filename: "developmental-approved.docx",
+            jm1pub_repositorydriveid: "drive",
+            jm1pub_repositoryitemid: "item",
+            jm1pub_sha256: sourceSha,
+            jm1pub_iscurrentapproved: true
+          }
+        ];
+      }
+      return [];
+    },
+    async create(entitySet, payload) {
+      if (entitySet === "jm1_executionlogs") {
+        logs.push(payload);
+        return `log-${logs.length}`;
+      }
+      created.push({ entitySet, payload });
+      return `created-${created.length}`;
+    },
+    async patch(entitySet, id, payload) {
+      patched.push({ entitySet, id, payload });
+    }
+  };
+  try {
+    const result = await runEditorialExecutionRuntime(
+      { correlationId: "line-model-output-test", maxTasks: 1 },
+      {
+        client,
+        stages: [
+          {
+            jm1pub_editorialstageid: "stage-line",
+            jm1pub_name: "Line Editing - Test",
+            jm1pub_stagetype: 100000002,
+            jm1pub_stagestatus: 100000001,
+            _jm1pub_titleid_value: "title-1",
+            _jm1pub_publishingassetid_value: "asset-1"
+          }
+        ]
+      }
+    );
+    assert.equal(result.results[0].status, "VALIDATING");
+    const manuscript = created.find((item) =>
+      item.entitySet === "jm1pub_editorialartifacts" &&
+      item.payload.jm1pub_editorialartifactname.startsWith("Edited Manuscript")
+    );
+    const qaEvidence = created.find((item) =>
+      item.entitySet === "jm1pub_editorialartifacts" &&
+      item.payload.jm1pub_editorialartifactname.startsWith("QA Evidence")
+    );
+    assert.ok(manuscript);
+    assert.equal(manuscript.payload.jm1pub_fileextension, "docx");
+    assert.match(manuscript.payload.jm1pub_notes, /actual model output/);
+    assert.ok(qaEvidence);
+    const docText = await mammoth.extractRawText({ buffer: uploadedBodies.get(manuscript.payload.jm1pub_filename) });
+    assert.match(docText.value, /This sentence reads more clearly/);
+    assert.doesNotMatch(docText.value, /Developmental Editing Output/);
+    const qaBody = uploadedBodies.get(qaEvidence.payload.jm1pub_filename).toString("utf8");
+    assert.match(qaBody, /Retention \/ Drift QA/);
+    assert.match(qaBody, /Model provider: microsoft-foundry-claude/);
+    assert.match(qaBody, /Model fallback: NO/);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "AUTHOR_REVIEW_GATE_CREATED"), true);
+    assert.equal(logs.some((log) => log.jm1_actiondescription?.includes("Copyediting is not authorized")), true);
+  } finally {
+    graphRequest.override = null;
+    extractSourceText.override = null;
+    invokeStageModelProvider.override = null;
+  }
+});
+
+test("line editing fails closed when governed model output lacks edited manuscript text", async () => {
+  const logs = [];
+  const patches = [];
+  const sourceText = "This sentence reads clearly today.\n\nThis paragraph keeps rhythm intact.";
+  const sourceBuffer = Buffer.from(sourceText);
+  const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
+  graphRequest.override = async (path, options = {}) => {
+    assert.notEqual(options.method, "PUT");
+    if (path.endsWith("/content") && !options.method) return sourceBuffer;
+    if (path.includes("?$select=id,name,parentReference,size,webUrl") || path.includes("?$select=id,parentReference")) {
+      return { id: "source-item", parentReference: { id: "parent-folder" }, webUrl: "https://sharepoint/source.docx" };
+    }
+    throw new Error(`Unexpected graph path ${path}`);
+  };
+  extractSourceText.override = async () => ({ value: sourceText });
+  invokeStageModelProvider.override = async () => ({
+    ok: true,
+    provider: "microsoft-foundry-claude",
+    routeAlias: "jm1-editorial-devline-primary",
+    promptVersion: "CC010-LINE_EDITING-V1",
+    fellBack: false,
+    output: {
+      lineEditingSummary: "Summary without manuscript must fail."
+    }
+  });
+  const client = {
+    async list(entitySet, query = {}) {
+      if (entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1pub_editorialstages") {
+        return [{ jm1pub_editorialstageid: "stage-dev", jm1pub_stagetype: 100000001 }];
+      }
+      if (
+        entitySet === "jm1pub_editorialartifacts" &&
+        query.$filter?.includes("_jm1pub_editorialstageid_value eq stage-dev")
+      ) {
+        return [{ jm1pub_editorialartifactid: "artifact-dev", jm1pub_sha256: "sha-dev", jm1pub_iscurrentapproved: true }];
+      }
+      if (entitySet === "jm1pub_editorialapprovalgates" && query.$filter?.includes("_jm1pub_editorialstageid_value eq stage-dev")) {
+        return [
+          {
+            jm1pub_editorialapprovalgateid: "gate-dev",
+            jm1pub_gatestatus: 196650003,
+            jm1pub_authordecision: 196650000,
+            jm1pub_authordecisionon: "2026-08-19T01:28:44Z",
+            jm1pub_nextstageauthorized: true,
+            _jm1pub_deliverableartifactid_value: "artifact-dev"
+          }
+        ];
+      }
+      if (entitySet === "jm1pub_editorialartifacts") {
+        return [
+          {
+            jm1pub_editorialartifactid: "source-artifact",
+            jm1pub_editorialartifactname: "Approved Developmental Artifact - Test",
+            jm1pub_filename: "developmental-approved.docx",
+            jm1pub_repositorydriveid: "drive",
+            jm1pub_repositoryitemid: "item",
+            jm1pub_sha256: sourceSha,
+            jm1pub_iscurrentapproved: true
+          }
+        ];
+      }
+      return [];
+    },
+    async create(entitySet, payload) {
+      assert.equal(entitySet, "jm1_executionlogs");
+      logs.push(payload);
+      return `log-${logs.length}`;
+    },
+    async patch(entitySet, id, payload) {
+      patches.push({ entitySet, id, payload });
+    }
+  };
+  try {
+    const result = await runEditorialExecutionRuntime(
+      { correlationId: "line-missing-output-test", maxTasks: 1 },
+      {
+        client,
+        stages: [
+          {
+            jm1pub_editorialstageid: "stage-line",
+            jm1pub_name: "Line Editing - Test",
+            jm1pub_stagetype: 100000002,
+            jm1pub_stagestatus: 100000001,
+            _jm1pub_titleid_value: "title-1",
+            _jm1pub_publishingassetid_value: "asset-1"
+          }
+        ]
+      }
+    );
+    assert.equal(result.results[0].status, "EXCEPTION");
+    assert.match(result.results[0].exactBlocker, /LINE_EDITED_MANUSCRIPT_MISSING/);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "ACTIVE_EDITORIAL_OUTPUT_CREATED"), false);
+    assert.equal(patches.some((patch) => /LINE_EDITED_MANUSCRIPT_MISSING/.test(patch.payload.jm1pub_internaloperationalsummary)), true);
   } finally {
     graphRequest.override = null;
     extractSourceText.override = null;
