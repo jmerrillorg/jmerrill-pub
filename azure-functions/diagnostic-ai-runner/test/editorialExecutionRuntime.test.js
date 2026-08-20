@@ -114,6 +114,7 @@ test("source Graph identity blockers are retriable while substantive blockers re
     false
   );
   assert.equal(shouldPreserveExistingExactBlocker("LINE_EDITING_BLOCKED — MODEL_INVOCATION_FAILED"), false);
+  assert.equal(shouldPreserveExistingExactBlocker("LINE_EDITING_BLOCKED — MODEL_RESPONSE_NOT_JSON"), false);
   assert.equal(
     shouldPreserveExistingExactBlocker("DEVELOPMENTAL_EDITING_BLOCKED — CANONICAL_COMPILATION_FILE_AMBIGUOUS"),
     true

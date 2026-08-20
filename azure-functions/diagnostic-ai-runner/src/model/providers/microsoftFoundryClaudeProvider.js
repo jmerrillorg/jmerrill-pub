@@ -13,6 +13,14 @@ const REQUIRED_VARS = ["AZURE_FOUNDRY_ENDPOINT"];
 const DEFAULT_ANTHROPIC_VERSION = "2023-06-01";
 const DEFAULT_MAX_OUTPUT_TOKENS = 4096;
 const TOKEN_SCOPE = "https://ai.azure.com/.default";
+const STRUCTURED_OUTPUT_TOOL = Object.freeze({
+  name: "submit_jm1_structured_output",
+  description: "Submit the complete JM1 governed structured output object requested by the prompt.",
+  input_schema: {
+    type: "object",
+    additionalProperties: true
+  }
+});
 
 function checkConfig(route = {}) {
   const missing = REQUIRED_VARS.filter((name) => !process.env[name]);
@@ -44,6 +52,8 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
     model: deployment,
     messages: [{ role: "user", content: promptBody }],
     max_tokens: DEFAULT_MAX_OUTPUT_TOKENS,
+    tools: [STRUCTURED_OUTPUT_TOOL],
+    tool_choice: { type: "tool", name: STRUCTURED_OUTPUT_TOOL.name },
     stream: false
   };
 
@@ -117,8 +127,32 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
       };
     }
 
-    const content = extractTextContent(responseBody);
     const usage = responseBody?.usage || {};
+    const toolInput = extractStructuredToolInput(responseBody);
+    if (toolInput) {
+      return {
+        ok: true,
+        provider: "microsoft-foundry-claude",
+        configMissing: null,
+        output: toolInput,
+        tokenCounts: {
+          input: usage.input_tokens || 0,
+          output: usage.output_tokens || 0,
+          total: (usage.input_tokens || 0) + (usage.output_tokens || 0)
+        },
+        httpStatus,
+        request: {
+          deployment,
+          maxOutputTokens: requestBody.max_tokens,
+          responseContract: "anthropic-messages-tool"
+        },
+        rateLimit,
+        error: null,
+        responseClassification: "tool-use"
+      };
+    }
+
+    const content = extractTextContent(responseBody);
     const parsed = parseStructuredJsonObject(content);
     if (!parsed.ok) {
       return {
@@ -135,7 +169,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
         request: {
           deployment,
           maxOutputTokens: requestBody.max_tokens,
-          responseContract: "anthropic-messages"
+          responseContract: "anthropic-messages-tool"
         },
         rateLimit,
         error: parsed.error
@@ -156,7 +190,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
       request: {
         deployment,
         maxOutputTokens: requestBody.max_tokens,
-        responseContract: "anthropic-messages"
+        responseContract: "anthropic-messages-tool"
       },
       rateLimit,
       error: null,
@@ -192,12 +226,28 @@ function extractTextContent(responseBody) {
     .trim();
 }
 
+function extractStructuredToolInput(responseBody) {
+  const content = responseBody?.content;
+  if (!Array.isArray(content)) return null;
+  const toolBlock = content.find((part) =>
+    part &&
+    part.type === "tool_use" &&
+    part.name === STRUCTURED_OUTPUT_TOOL.name &&
+    part.input &&
+    typeof part.input === "object" &&
+    !Array.isArray(part.input)
+  );
+  return toolBlock?.input || null;
+}
+
 module.exports = {
   DEFAULT_ANTHROPIC_VERSION,
   DEFAULT_MAX_OUTPUT_TOKENS,
   REQUIRED_VARS,
+  STRUCTURED_OUTPUT_TOOL,
   TOKEN_SCOPE,
   call,
   checkConfig,
+  extractStructuredToolInput,
   extractTextContent
 };
