@@ -1507,14 +1507,39 @@ function lineEditingOutput(modelInvocation = {}) {
   const output = modelInvocation.output || {};
   const editedManuscript = modelTextField(output, [
     "editedManuscript",
+    "edited_manuscript",
     "lineEditedManuscript",
+    "line_edited_manuscript",
+    "lineEditedText",
+    "line_edited_text",
     "fullEditedManuscript",
+    "full_edited_manuscript",
+    "editedText",
+    "edited_text",
+    "manuscriptText",
+    "manuscript_text",
+    "revisedText",
+    "revised_text",
     "manuscript"
   ]);
-  const lineEditingSummary = modelTextField(output, ["lineEditingSummary", "stageScopeSummary", "authorReviewSummary"]);
-  const retentionNotes = modelTextField(output, ["retentionNotes", "qualityNotes"]);
-  const changeLedger = modelArrayField(output, ["changeLedger", "revisionCandidates", "qualityNotes"]);
-  const authorQueries = modelArrayField(output, ["authorQueries", "queries"]);
+  const lineEditingSummary = modelTextField(output, [
+    "lineEditingSummary",
+    "line_editing_summary",
+    "stageScopeSummary",
+    "stage_scope_summary",
+    "authorReviewSummary",
+    "author_review_summary"
+  ]);
+  const retentionNotes = modelTextField(output, ["retentionNotes", "retention_notes", "qualityNotes", "quality_notes"]);
+  const changeLedger = modelArrayField(output, [
+    "changeLedger",
+    "change_ledger",
+    "revisionCandidates",
+    "revision_candidates",
+    "qualityNotes",
+    "quality_notes"
+  ]);
+  const authorQueries = modelArrayField(output, ["authorQueries", "author_queries", "queries"]);
   return { editedManuscript, lineEditingSummary, retentionNotes, changeLedger, authorQueries };
 }
 

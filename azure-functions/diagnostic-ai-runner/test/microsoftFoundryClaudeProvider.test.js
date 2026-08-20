@@ -238,6 +238,7 @@ describe("microsoftFoundryClaudeProvider", () => {
         "authorQueries"
       ]);
       assert.equal(parsedBody.tools[0].input_schema.properties.editedManuscript.minLength, 1);
+      assert.equal(parsedBody.max_tokens, 8192);
     } finally {
       restore();
     }

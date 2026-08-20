@@ -12,6 +12,7 @@ const {
 const REQUIRED_VARS = ["AZURE_FOUNDRY_ENDPOINT"];
 const DEFAULT_ANTHROPIC_VERSION = "2023-06-01";
 const DEFAULT_MAX_OUTPUT_TOKENS = 4096;
+const DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS = 8192;
 const TOKEN_SCOPE = "https://ai.azure.com/.default";
 const STRUCTURED_OUTPUT_TOOL = Object.freeze({
   name: "submit_jm1_structured_output",
@@ -75,10 +76,11 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
   const deployment = route.deploymentName;
   const url = `${endpoint}/anthropic/v1/messages`;
   const structuredOutputTool = selectStructuredOutputTool(promptBody);
+  const maxOutputTokens = selectMaxOutputTokens(promptBody);
   const requestBody = {
     model: deployment,
     messages: [{ role: "user", content: promptBody }],
-    max_tokens: DEFAULT_MAX_OUTPUT_TOKENS,
+    max_tokens: maxOutputTokens,
     tools: [structuredOutputTool],
     tool_choice: { type: "tool", name: structuredOutputTool.name },
     stream: false
@@ -254,9 +256,23 @@ function extractTextContent(responseBody) {
 }
 
 function selectStructuredOutputTool(promptBody) {
-  return typeof promptBody === "string" && promptBody.includes("cc010_line_editing_full_manuscript_chunk_execution")
+  return isLineEditingChunkPrompt(promptBody)
     ? LINE_EDITING_CHUNK_OUTPUT_TOOL
     : STRUCTURED_OUTPUT_TOOL;
+}
+
+function isLineEditingChunkPrompt(promptBody) {
+  return typeof promptBody === "string" && promptBody.includes("cc010_line_editing_full_manuscript_chunk_execution");
+}
+
+function parsePositiveInteger(value, fallback) {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function selectMaxOutputTokens(promptBody) {
+  if (!isLineEditingChunkPrompt(promptBody)) return DEFAULT_MAX_OUTPUT_TOKENS;
+  return parsePositiveInteger(process.env.AZURE_FOUNDRY_LINE_CHUNK_MAX_OUTPUT_TOKENS, DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS);
 }
 
 function extractStructuredToolInput(responseBody) {
@@ -275,6 +291,7 @@ function extractStructuredToolInput(responseBody) {
 
 module.exports = {
   DEFAULT_ANTHROPIC_VERSION,
+  DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS,
   DEFAULT_MAX_OUTPUT_TOKENS,
   LINE_EDITING_CHUNK_OUTPUT_TOOL,
   REQUIRED_VARS,
@@ -284,5 +301,7 @@ module.exports = {
   checkConfig,
   extractStructuredToolInput,
   extractTextContent,
+  isLineEditingChunkPrompt,
+  selectMaxOutputTokens,
   selectStructuredOutputTool
 };

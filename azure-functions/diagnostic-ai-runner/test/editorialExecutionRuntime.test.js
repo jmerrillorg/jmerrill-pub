@@ -560,11 +560,11 @@ test("line editing provider route chunks and aggregates full-manuscript output",
       fellBack: false,
       tokenCounts: { input: 10, output: 8, total: 18 },
       output: {
-        editedManuscript: prompt.sourceText.replace("rough", "clear"),
-        lineEditingSummary: `Edited chunk ${prompt.chunkIndex}.`,
-        changeLedger: [`Smoothed chunk ${prompt.chunkIndex}.`],
-        retentionNotes: "Chunk retained.",
-        authorQueries: []
+        line_edited_text: prompt.sourceText.replace("rough", "clear"),
+        line_editing_summary: `Edited chunk ${prompt.chunkIndex}.`,
+        change_ledger: [`Smoothed chunk ${prompt.chunkIndex}.`],
+        retention_notes: "Chunk retained.",
+        author_queries: []
       }
     };
   };
