@@ -1125,7 +1125,9 @@ function shouldPreserveExistingExactBlocker(exactBlocker) {
   if (!exactBlocker) return false;
   const retryableBlockers = [
     "SOURCE_GRAPH_IDENTITY_MISSING",
-    "LINE_RETENTION_OUTSIDE_95_TO_100_PERCENT_WINDOW"
+    "LINE_RETENTION_OUTSIDE_95_TO_100_PERCENT_WINDOW",
+    "LINE_EDITED_MANUSCRIPT_MISSING",
+    "LINE_CHUNK_EDITED_MANUSCRIPT_MISSING"
   ];
   return !retryableBlockers.some((retryable) => exactBlocker.includes(retryable));
 }
