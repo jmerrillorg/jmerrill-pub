@@ -46,7 +46,8 @@ const GATE_CODES = Object.freeze({
   COPYEDITING: 196650003,
   PROOFREADING: 196650004
 });
-const DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT = 3000;
+const DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT = 1800;
+const DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY = 4;
 
 const EXECUTOR_POLICIES = {
   EDITORIAL_REVIEW: {
@@ -551,6 +552,10 @@ function lineEditingChunkWordLimit() {
   return parsePositiveInteger(process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT, DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT);
 }
 
+function lineEditingChunkConcurrency() {
+  return parsePositiveInteger(process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY, DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY);
+}
+
 function splitLineEditingSourceChunks(text, maxWords = lineEditingChunkWordLimit()) {
   const normalized = normalizeString(text).replace(/\r\n/g, "\n");
   const sourceParagraphs = normalized
@@ -692,10 +697,13 @@ async function invokeSingleStageModelProvider({
 async function invokeLineEditingModelProvider(stage, sourceArtifact, extractedText, correlationId, upstreamContext = null) {
   const chunks = splitLineEditingSourceChunks(extractedText);
   const totalWordCount = summarizeExtractedText(extractedText || "").words;
-  const chunkOutputs = [];
   const tokenCounts = { input: 0, output: 0, total: 0 };
-  let firstResult = null;
-  for (let index = 0; index < chunks.length; index += 1) {
+  const chunkResults = new Array(chunks.length);
+  const concurrency = Math.min(lineEditingChunkConcurrency(), chunks.length);
+  let nextIndex = 0;
+  let failure = null;
+
+  async function runChunk(index) {
     const chunkIndex = index + 1;
     const result = await invokeSingleStageModelProvider({
       stage,
@@ -716,24 +724,51 @@ async function invokeLineEditingModelProvider(stage, sourceArtifact, extractedTe
       diagnosticId: `${normalizeString(stage._jm1pub_titleid_value) || normalizeString(stage.jm1pub_editorialstageid)}:line-chunk-${chunkIndex}`,
       promptVersion: "CC010-LINE_EDITING-CHUNK-V1"
     });
-    if (!firstResult) firstResult = result;
-    tokenCounts.input += result.tokenCounts?.input || 0;
-    tokenCounts.output += result.tokenCounts?.output || 0;
-    tokenCounts.total += result.tokenCounts?.total || 0;
-    if (!result.ok || result.fellBack) return { ...result, tokenCounts, chunkCount: chunks.length, failedChunk: chunkIndex };
+    if (!result.ok || result.fellBack) return { chunkIndex, result, output: null, failed: true };
     const output = lineEditingOutput(result);
     if (!output.editedManuscript) {
       return {
-        ...result,
-        ok: false,
-        tokenCounts,
-        chunkCount: chunks.length,
-        failedChunk: chunkIndex,
-        error: "LINE_CHUNK_EDITED_MANUSCRIPT_MISSING"
+        chunkIndex,
+        result: {
+          ...result,
+          ok: false,
+          error: "LINE_CHUNK_EDITED_MANUSCRIPT_MISSING"
+        },
+        output,
+        failed: true
       };
     }
-    chunkOutputs.push({ ...output, routeAlias: result.routeAlias, provider: result.provider, promptVersion: result.promptVersion });
+    return { chunkIndex, result, output, failed: false };
   }
+
+  async function worker() {
+    while (!failure && nextIndex < chunks.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      const chunkResult = await runChunk(index);
+      chunkResults[index] = chunkResult;
+      if (chunkResult.failed) failure = chunkResult;
+    }
+  }
+
+  await Promise.all(Array.from({ length: concurrency }, () => worker()));
+
+  for (const item of chunkResults.filter(Boolean)) {
+    tokenCounts.input += item.result.tokenCounts?.input || 0;
+    tokenCounts.output += item.result.tokenCounts?.output || 0;
+    tokenCounts.total += item.result.tokenCounts?.total || 0;
+  }
+
+  const firstResult = chunkResults.find(Boolean)?.result || null;
+  if (failure) return { ...failure.result, tokenCounts, chunkCount: chunks.length, failedChunk: failure.chunkIndex };
+
+  const chunkOutputs = chunkResults.map((item) => ({
+    ...item.output,
+    routeAlias: item.result.routeAlias,
+    provider: item.result.provider,
+    promptVersion: item.result.promptVersion
+  }));
+
   return {
     ...(firstResult || {}),
     ok: true,
@@ -2580,6 +2615,7 @@ async function runEditorialExecutionRuntime(options = {}, deps = {}) {
 }
 
 module.exports = {
+  DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY,
   DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT,
   EXECUTOR_POLICIES,
   STAGE_STATUS,

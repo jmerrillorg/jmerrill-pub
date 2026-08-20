@@ -5,6 +5,7 @@ const test = require("node:test");
 const mammoth = require("mammoth");
 
 const {
+  DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY,
   DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT,
   EXECUTOR_POLICIES,
   authorGateBlocksRuntime,
@@ -513,8 +514,9 @@ test("line editing default chunk size is production-sized for full-manuscript ex
   const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
   delete process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
   try {
-    assert.equal(DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT, 3000);
-    const sourceText = Array.from({ length: 6001 }, (_, index) => `word${index}`).join(" ");
+    assert.equal(DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT, 1800);
+    assert.equal(DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY, 4);
+    const sourceText = Array.from({ length: 3601 }, (_, index) => `word${index}`).join(" ");
     const chunks = splitLineEditingSourceChunks(sourceText);
     assert.equal(chunks.length, 3);
     assert.equal(chunks.join(" "), sourceText);
@@ -552,8 +554,12 @@ test("line editing chunk prompt includes sourceText instead of sample-only input
 
 test("line editing provider route chunks and aggregates full-manuscript output", async () => {
   const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
+  const previousConcurrency = process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY;
   process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = "7";
+  process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY = "2";
   const calls = [];
+  let activeCalls = 0;
+  let maxActiveCalls = 0;
   const stage = {
     jm1pub_editorialstageid: "stage-line",
     jm1pub_name: "Line Editing - Test",
@@ -567,8 +573,12 @@ test("line editing provider route chunks and aggregates full-manuscript output",
     jm1pub_iscurrentapproved: true
   };
   invokeSingleStageModelProvider.override = async (input) => {
+    activeCalls += 1;
+    maxActiveCalls = Math.max(maxActiveCalls, activeCalls);
     calls.push(input);
     const prompt = JSON.parse(input.promptBody);
+    await new Promise((resolve) => setTimeout(resolve, prompt.chunkIndex === 1 ? 20 : 1));
+    activeCalls -= 1;
     return {
       ok: true,
       provider: "microsoft-foundry-claude",
@@ -597,6 +607,7 @@ test("line editing provider route chunks and aggregates full-manuscript output",
     assert.equal(result.ok, true);
     assert.equal(result.chunkCount, 3);
     assert.equal(calls.length, 3);
+    assert.equal(maxActiveCalls, 2);
     assert.match(result.output.editedManuscript, /This clear paragraph/);
     assert.match(result.output.editedManuscript, /This clear second paragraph/);
     assert.equal(result.tokenCounts.total, 54);
@@ -605,6 +616,8 @@ test("line editing provider route chunks and aggregates full-manuscript output",
     invokeSingleStageModelProvider.override = null;
     if (previousLimit === undefined) delete process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
     else process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = previousLimit;
+    if (previousConcurrency === undefined) delete process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY;
+    else process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY = previousConcurrency;
   }
 });
 
