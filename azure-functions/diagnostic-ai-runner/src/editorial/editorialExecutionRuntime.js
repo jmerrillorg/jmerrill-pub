@@ -1127,7 +1127,8 @@ function shouldPreserveExistingExactBlocker(exactBlocker) {
     "SOURCE_GRAPH_IDENTITY_MISSING",
     "LINE_RETENTION_OUTSIDE_95_TO_100_PERCENT_WINDOW",
     "LINE_EDITED_MANUSCRIPT_MISSING",
-    "LINE_CHUNK_EDITED_MANUSCRIPT_MISSING"
+    "LINE_CHUNK_EDITED_MANUSCRIPT_MISSING",
+    "MODEL_INVOCATION_FAILED"
   ];
   return !retryableBlockers.some((retryable) => exactBlocker.includes(retryable));
 }
@@ -1175,6 +1176,15 @@ function buildExactBlocker(stageCode, sourceArtifact) {
     return `${stageCode}_BLOCKED — SOURCE_LOCATION_MISSING`;
   }
   return "";
+}
+
+function safeBlockerReason(value, fallback) {
+  const normalized = normalizeString(value)
+    .toUpperCase()
+    .replace(/[^A-Z0-9_]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 160);
+  return normalized || fallback;
 }
 
 async function extractSourceText(sourceBuffer, stageCode) {
@@ -1891,7 +1901,7 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
   );
   if (!modelInvocation.ok || modelInvocation.fellBack) {
     throw Object.assign(new Error(modelInvocation.error || "Governed model route failed"), {
-      safeCode: `${stageCode}_BLOCKED — MODEL_INVOCATION_FAILED`
+      safeCode: `${stageCode}_BLOCKED — ${safeBlockerReason(modelInvocation.error, "MODEL_INVOCATION_FAILED")}`
     });
   }
   const outputs = [];

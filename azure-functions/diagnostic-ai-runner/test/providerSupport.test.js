@@ -6,6 +6,7 @@ const assert = require("node:assert/strict");
 const {
   buildRateLimitMetadata,
   collectSafeRateLimitHeaders,
+  extractFirstJsonObject,
   parseStructuredJsonObject,
   parseRetryAfterMs
 } = require("../src/model/providerSupport");
@@ -23,6 +24,16 @@ describe("provider support", () => {
     assert.equal(result.ok, true);
     assert.equal(result.value.ok, true);
     assert.equal(result.classification, "fenced-repaired");
+  });
+
+  test("extracts the first balanced JSON object from wrapped model text", () => {
+    const content = "Here is the result:\n{\"editedManuscript\":\"text with } brace in string\",\"ok\":true}\nDone.";
+    const extracted = extractFirstJsonObject(content);
+    assert.equal(extracted, "{\"editedManuscript\":\"text with } brace in string\",\"ok\":true}");
+    const result = parseStructuredJsonObject(content);
+    assert.equal(result.ok, true);
+    assert.equal(result.value.editedManuscript, "text with } brace in string");
+    assert.equal(result.classification, "extracted-json");
   });
 
   test("classifies malformed fenced JSON", () => {

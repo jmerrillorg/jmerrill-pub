@@ -170,17 +170,21 @@ function parseStructuredJsonObject(content) {
     };
   }
 
-  const attempts = [trimmed];
+  const attempts = [{ candidate: trimmed, classification: "direct-json" }];
   if (trimmed.startsWith("```")) {
     const repaired = trimmed
       .replace(/^```[a-zA-Z0-9_-]*\s*/u, "")
       .replace(/\s*```$/u, "")
       .trim();
-    attempts.push(repaired);
+    attempts.push({ candidate: repaired, classification: "fenced-repaired" });
+  }
+  const extracted = extractFirstJsonObject(trimmed);
+  if (extracted && !attempts.some((attempt) => attempt.candidate === extracted)) {
+    attempts.push({ candidate: extracted, classification: "extracted-json" });
   }
 
   for (let index = 0; index < attempts.length; index += 1) {
-    const candidate = attempts[index];
+    const { candidate, classification } = attempts[index];
     try {
       const parsed = JSON.parse(candidate);
       if (!parsed || Array.isArray(parsed) || typeof parsed !== "object") {
@@ -188,14 +192,14 @@ function parseStructuredJsonObject(content) {
           ok: false,
           error: "MODEL_RESPONSE_JSON_NOT_OBJECT",
           repaired: index > 0,
-          classification: index > 0 ? "fenced-non-object" : "non-object"
+          classification: classification === "direct-json" ? "non-object" : `${classification}-non-object`
         };
       }
       return {
         ok: true,
         value: parsed,
         repaired: index > 0,
-        classification: index > 0 ? "fenced-repaired" : "direct-json"
+        classification
       };
     } catch {
       // try the bounded repair candidate once
@@ -210,6 +214,37 @@ function parseStructuredJsonObject(content) {
   };
 }
 
+function extractFirstJsonObject(text) {
+  const start = text.indexOf("{");
+  if (start < 0) return "";
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let index = start; index < text.length; index += 1) {
+    const character = text[index];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (character === "\\") {
+        escaped = true;
+      } else if (character === "\"") {
+        inString = false;
+      }
+      continue;
+    }
+    if (character === "\"") {
+      inString = true;
+      continue;
+    }
+    if (character === "{") depth += 1;
+    if (character === "}") {
+      depth -= 1;
+      if (depth === 0) return text.slice(start, index + 1).trim();
+    }
+  }
+  return "";
+}
+
 module.exports = {
   buildRateLimitMetadata,
   collectSafeRateLimitHeaders,
@@ -217,6 +252,7 @@ module.exports = {
   DEFAULT_BASE_DELAY_MS,
   DEFAULT_MAX_RETRIES,
   computeBackoffDelayMs,
+  extractFirstJsonObject,
   fetchWithRetry,
   getProviderRuntimeOptions,
   parseRetryAfterMs,
