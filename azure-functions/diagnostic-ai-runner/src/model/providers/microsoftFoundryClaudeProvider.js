@@ -21,6 +21,32 @@ const STRUCTURED_OUTPUT_TOOL = Object.freeze({
     additionalProperties: true
   }
 });
+const LINE_EDITING_CHUNK_OUTPUT_TOOL = Object.freeze({
+  name: "submit_jm1_structured_output",
+  description: "Submit the complete governed Line Editing chunk output.",
+  input_schema: {
+    type: "object",
+    properties: {
+      editedManuscript: {
+        type: "string",
+        minLength: 1,
+        description: "The full line-edited text for this exact chunk. Do not omit source paragraphs."
+      },
+      lineEditingSummary: { type: "string", minLength: 1 },
+      changeLedger: {
+        type: "array",
+        items: { type: "string" }
+      },
+      retentionNotes: { type: "string", minLength: 1 },
+      authorQueries: {
+        type: "array",
+        items: { type: "string" }
+      }
+    },
+    required: ["editedManuscript", "lineEditingSummary", "changeLedger", "retentionNotes", "authorQueries"],
+    additionalProperties: true
+  }
+});
 
 function checkConfig(route = {}) {
   const missing = REQUIRED_VARS.filter((name) => !process.env[name]);
@@ -48,12 +74,13 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
   const anthropicVersion = process.env.AZURE_FOUNDRY_ANTHROPIC_VERSION || DEFAULT_ANTHROPIC_VERSION;
   const deployment = route.deploymentName;
   const url = `${endpoint}/anthropic/v1/messages`;
+  const structuredOutputTool = selectStructuredOutputTool(promptBody);
   const requestBody = {
     model: deployment,
     messages: [{ role: "user", content: promptBody }],
     max_tokens: DEFAULT_MAX_OUTPUT_TOKENS,
-    tools: [STRUCTURED_OUTPUT_TOOL],
-    tool_choice: { type: "tool", name: STRUCTURED_OUTPUT_TOOL.name },
+    tools: [structuredOutputTool],
+    tool_choice: { type: "tool", name: structuredOutputTool.name },
     stream: false
   };
 
@@ -226,6 +253,12 @@ function extractTextContent(responseBody) {
     .trim();
 }
 
+function selectStructuredOutputTool(promptBody) {
+  return typeof promptBody === "string" && promptBody.includes("cc010_line_editing_full_manuscript_chunk_execution")
+    ? LINE_EDITING_CHUNK_OUTPUT_TOOL
+    : STRUCTURED_OUTPUT_TOOL;
+}
+
 function extractStructuredToolInput(responseBody) {
   const content = responseBody?.content;
   if (!Array.isArray(content)) return null;
@@ -243,11 +276,13 @@ function extractStructuredToolInput(responseBody) {
 module.exports = {
   DEFAULT_ANTHROPIC_VERSION,
   DEFAULT_MAX_OUTPUT_TOKENS,
+  LINE_EDITING_CHUNK_OUTPUT_TOOL,
   REQUIRED_VARS,
   STRUCTURED_OUTPUT_TOOL,
   TOKEN_SCOPE,
   call,
   checkConfig,
   extractStructuredToolInput,
-  extractTextContent
+  extractTextContent,
+  selectStructuredOutputTool
 };
