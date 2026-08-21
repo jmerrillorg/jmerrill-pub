@@ -26,6 +26,8 @@ export type DataverseReplayResult =
   | { status: 'failed'; reason: string; retryable: boolean }
 
 const ACKNOWLEDGMENT_STATUS_SENT = 835500001
+const ACKNOWLEDGMENT_STATUS_PENDING = 835500000
+const ACKNOWLEDGMENT_STATUS_EXCEPTION = 835500002
 const WORKSPACE_STATUS_CREATED = 835513001
 
 export async function writePublishingIntakeToDataverse(
@@ -258,6 +260,37 @@ export async function markPublishingIntakeAcknowledgmentSent(
       retryable: true,
     }
   }
+}
+
+export async function markPublishingIntakeAcknowledgmentPending(
+  recordId: string | undefined,
+  attemptedAt = new Date().toISOString(),
+): Promise<DataverseUpdateResult> {
+  if (!recordId) return { status: 'skipped', reason: 'missing_record_id' }
+
+  return updatePublishingIntakeRecord(recordId, {
+    jm1_acknowledgmentsent: false,
+    jm1_acknowledgmentstatus: ACKNOWLEDGMENT_STATUS_PENDING,
+    jm1_acknowledgmentlastattempton: attemptedAt,
+    jm1_acknowledgmentattemptcount: 1,
+    jm1_acknowledgmenterror: null,
+  }, 'acknowledgment_pending_writeback')
+}
+
+export async function markPublishingIntakeAcknowledgmentFailed(
+  recordId: string | undefined,
+  reason: string,
+  failedAt = new Date().toISOString(),
+): Promise<DataverseUpdateResult> {
+  if (!recordId) return { status: 'skipped', reason: 'missing_record_id' }
+
+  return updatePublishingIntakeRecord(recordId, {
+    jm1_acknowledgmentsent: false,
+    jm1_acknowledgmentstatus: ACKNOWLEDGMENT_STATUS_EXCEPTION,
+    jm1_acknowledgmentlastattempton: failedAt,
+    jm1_acknowledgmentattemptcount: 1,
+    jm1_acknowledgmenterror: sanitizeDataverseMessage(reason).slice(0, 240),
+  }, 'acknowledgment_failed_writeback')
 }
 
 export async function markPublishingIntakeWorkspaceCreated(

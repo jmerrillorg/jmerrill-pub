@@ -436,7 +436,7 @@ export default function JoinForm() {
     return (
       <Panel>
         <h2 className="mb-3 text-white" style={headingStyle}>Thank you, {form.firstName} — welcome to the family conversation.</h2>
-        <p className="mb-4 text-[15px] leading-[1.75] text-white/75">
+        <p className="mb-4 text-[15px] leading-[1.75] text-slate-100">
           {form.manuscriptSubmissionChoice === 'now'
             ? 'Your publishing inquiry and manuscript have been received. We will review the project with care and keep you informed about the next step.'
             : 'Your publishing inquiry has been received. We will keep it connected to this reference while you prepare the manuscript you want us to review.'}
@@ -460,7 +460,7 @@ export default function JoinForm() {
     return (
       <Panel>
         <h2 className="mb-3 text-white" style={headingStyle}>Your story may already be with us.</h2>
-        <p className="text-[15px] leading-[1.75] text-white/75">
+        <p className="text-[15px] leading-[1.75] text-slate-100">
           We detected a repeated submission attempt. Please check your email for a confirmation, or contact publishing@jmerrill.one and we&apos;ll take care of you personally.
         </p>
       </Panel>
@@ -468,11 +468,11 @@ export default function JoinForm() {
   }
 
   return (
-    <div className="rounded-3xl border border-blue-200/20 bg-[#18283B] p-6 shadow-[0_20px_70px_rgba(0,0,0,0.24)] sm:p-8">
+    <div className="rounded-3xl border border-blue-200/30 bg-[#18283B] p-6 text-slate-50 shadow-[0_20px_70px_rgba(0,0,0,0.24)] sm:p-8">
       <form onSubmit={handleSubmit} className="flex flex-col gap-8" noValidate>
         <section className="flex flex-col gap-3" aria-labelledby="welcome-heading">
           <SectionHeading id="welcome-heading" title="Welcome" />
-          <p className="text-[14px] leading-[1.75] text-white/72">
+          <p className="text-[14px] leading-[1.75] text-slate-100">
             J Merrill Publishing reviews each submitted project thoughtfully and personally. Completing this inquiry starts a publishing conversation; it does not guarantee publication. After we receive your details, we will confirm the next step and whether your manuscript is ready for Editorial Review.
           </p>
         </section>
@@ -554,9 +554,9 @@ export default function JoinForm() {
             </Field>
           </div>
 
-          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/15 bg-white/[0.06] p-4">
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/25 bg-[#0F1C2E] p-4">
             <input id="billingSameAsMailing" name="billingSameAsMailing" type="checkbox" checked={form.billingSameAsMailing} onChange={set('billingSameAsMailing')} className="mt-1 accent-blue-500" />
-            <span className="text-[13px] leading-[1.7] text-white/75">This is also my billing address.</span>
+            <span className="text-[13px] leading-[1.7] text-slate-100">This is also my billing address.</span>
           </label>
 
           {!form.billingSameAsMailing && (
@@ -640,7 +640,7 @@ export default function JoinForm() {
           </Field>
 
           <div>
-            <label htmlFor="manuscriptFile" className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.1em] text-white/70">
+            <label htmlFor="manuscriptFile" className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.1em] text-slate-100">
               Manuscript file
             </label>
             <input
@@ -652,7 +652,7 @@ export default function JoinForm() {
               className={`${fieldClass(Boolean(errors.manuscriptFile))} file:mr-4 file:rounded-full file:border-0 file:bg-blue-500 file:px-4 file:py-2 file:text-[12px] file:font-semibold file:text-white hover:file:bg-blue-600`}
             />
             {!errors.manuscriptFile && (
-              <p className="mt-1.5 text-[11px] leading-[1.6] text-white/55">
+              <p className="mt-1.5 text-[11px] leading-[1.6] text-slate-200">
                 Optional. Upload .docx, .doc, .pages, .rtf, or .pdf up to 25 MB. Pages files are preserved as the original source and normalized separately when needed.
               </p>
             )}
@@ -729,9 +729,9 @@ export default function JoinForm() {
             </select>
           </Field>
 
-          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/15 bg-white/[0.06] p-4">
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/25 bg-[#0F1C2E] p-4">
             <input id="referred" name="referred" type="checkbox" checked={form.referred} onChange={set('referred')} className="mt-1 accent-blue-500" />
-            <span className="text-[13px] leading-[1.7] text-white/75">I was referred by someone connected to J Merrill Publishing.</span>
+            <span className="text-[13px] leading-[1.7] text-slate-100">I was referred by someone connected to J Merrill Publishing.</span>
           </label>
 
           {form.referred && (
@@ -764,9 +764,9 @@ export default function JoinForm() {
           <SectionHeading id="verification-heading" title="Rights, permission, and verification" />
 
           <Field label="Rights attestation" name="rightsAttestation" required error={visibleError('rightsAttestation', touched, errors)}>
-            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/15 bg-white/[0.06] p-4 focus-within:border-blue-400">
+            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/25 bg-[#0F1C2E] p-4 focus-within:border-blue-400">
               <input id="rightsAttestation" name="rightsAttestation" type="checkbox" checked={form.rightsAttestation} onChange={set('rightsAttestation')} onBlur={markTouched('rightsAttestation')} className="mt-1 accent-blue-500" />
-              <span className="text-[13px] leading-[1.7] text-white/75">
+              <span className="text-[13px] leading-[1.7] text-slate-100">
                 I have authority to submit this project for review and have disclosed any known ownership, rights, or third-party material concerns below.
               </span>
             </label>
@@ -786,7 +786,7 @@ export default function JoinForm() {
           </Field>
 
           <Field label="Service communication consent" name="serviceCommunicationConsent" required error={visibleError('serviceCommunicationConsent', touched, errors)}>
-            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/15 bg-white/[0.06] p-4 focus-within:border-blue-400">
+            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/25 bg-[#0F1C2E] p-4 focus-within:border-blue-400">
               <input
                 id="serviceCommunicationConsent"
                 name="serviceCommunicationConsent"
@@ -799,16 +799,16 @@ export default function JoinForm() {
                 onBlur={markTouched('serviceCommunicationConsent')}
                 className="mt-1 accent-blue-500"
               />
-              <span className="text-[13px] leading-[1.7] text-white/75">
+              <span className="text-[13px] leading-[1.7] text-slate-100">
                 I give J Merrill Publishing permission to review my inquiry and any manuscript file or link I provide, and to contact me about my book. I understand this form does not collect payment data, SSN, or banking information.
               </span>
             </label>
           </Field>
 
           <Field label="Marketing consent" name="marketingConsent" error={visibleError('marketingConsent', touched, errors)}>
-            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/15 bg-white/[0.06] p-4 focus-within:border-blue-400">
+            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/25 bg-[#0F1C2E] p-4 focus-within:border-blue-400">
               <input id="marketingConsent" name="marketingConsent" type="checkbox" checked={form.marketingConsent} onChange={set('marketingConsent')} onBlur={markTouched('marketingConsent')} className="mt-1 accent-blue-500" />
-              <span className="text-[13px] leading-[1.7] text-white/75">
+              <span className="text-[13px] leading-[1.7] text-slate-100">
                 I would also like to receive occasional publishing news, updates, or general communications. This is optional and not required for Publishing service communication.
               </span>
             </label>
@@ -816,7 +816,7 @@ export default function JoinForm() {
 
           <div>
             {verificationConfigStatus === 'loading' && (
-              <p className="min-h-[70px] rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-5 text-[13px] text-white/70">
+              <p className="min-h-[70px] rounded-2xl border border-white/20 bg-[#0F1C2E] px-4 py-5 text-[13px] text-slate-100">
                 Preparing verification…
               </p>
             )}
@@ -892,12 +892,12 @@ function Field({
 }) {
   return (
     <div>
-      <label htmlFor={name} className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.1em] text-white/70">
+      <label htmlFor={name} className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.1em] text-slate-100">
         {label} {required && <span className="text-blue-300">*</span>}
       </label>
       {children}
       {helper && !error && (
-        <p className="mt-1.5 text-[11px] leading-[1.6] text-white/55">
+        <p className="mt-1.5 text-[11px] leading-[1.6] text-slate-200">
           {helper}
         </p>
       )}
@@ -912,7 +912,7 @@ function Field({
 
 function Panel({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-3xl border border-blue-500/25 bg-[#18283B] p-8 text-center shadow-[0_20px_70px_rgba(0,0,0,0.24)] sm:p-12">
+    <div className="rounded-3xl border border-blue-500/30 bg-[#18283B] p-8 text-center text-slate-50 shadow-[0_20px_70px_rgba(0,0,0,0.24)] sm:p-12">
       {children}
     </div>
   )
@@ -1000,9 +1000,9 @@ function markAllTouched(): Partial<Record<keyof JoinFormState, boolean>> {
 
 function fieldClass(hasError: boolean) {
   return [
-    'w-full rounded-xl border bg-white/[0.08] px-4 py-3 text-[14px] text-white placeholder:text-white/30 transition-colors',
+    'w-full rounded-xl border bg-[#0F1C2E] px-4 py-3 text-[14px] text-white placeholder:text-slate-300 transition-colors',
     'focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 focus:ring-offset-[#0F1C2E]',
-    hasError ? 'border-red-300 focus:border-red-200' : 'border-white/15 focus:border-blue-400',
+    hasError ? 'border-red-300 focus:border-red-200' : 'border-white/30 focus:border-blue-400',
   ].join(' ')
 }
 

@@ -133,6 +133,12 @@ export type PublisherQueueItem = {
   capability: string
   sourceLocation: string
   submissionDate: string
+  manuscriptState: 'MANUSCRIPT_PENDING' | 'MANUSCRIPT_RECEIVED'
+  waitingOn: string
+  acknowledgmentState: 'AUTHOR_ACK_PENDING' | 'AUTHOR_ACK_SENT' | 'AUTHOR_ACK_FAILED' | 'AUTHOR_ACK_RETRY_REQUIRED'
+  acknowledgmentError?: string
+  notificationState: 'NOTIFICATION_PENDING' | 'NOTIFICATION_SENT' | 'NOTIFICATION_FAILED' | 'NOTIFICATION_RETRY_REQUIRED'
+  systemAttentionFlag: boolean
   currentBlocker: string
   recommendedNextAction: string
   actionOwner: 'publisher' | 'author' | 'system' | 'external'
@@ -1376,7 +1382,7 @@ function assertLinkedContact(intake: DataverseRow) {
 async function getRecentIntakes(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1_publishingintakes', {
     $select:
-      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_intakestatus,jm1_workspacestatus,jm1_stageatsubmission,jm1_stage0handoffstatus,jm1_stage0handoffcreated,jm1_additionalnotes,_jm1_stage0diagnostic_value,_jm1_linkedcontact_value,_jm1_linkedlead_value,_jm1_lead_value,_jm1_opportunity_value,createdon,modifiedon',
+      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_intakestatus,jm1_workspacestatus,jm1_stageatsubmission,jm1_stage0handoffstatus,jm1_stage0handoffcreated,jm1_additionalnotes,jm1_acknowledgmentsent,jm1_acknowledgmentstatus,jm1_acknowledgmenterror,jm1_acknowledgmentlastattempton,jm1_acknowledgmentattemptcount,_jm1_stage0diagnostic_value,_jm1_linkedcontact_value,_jm1_linkedlead_value,_jm1_lead_value,_jm1_opportunity_value,createdon,modifiedon',
     $orderby: 'createdon desc',
     $top: '40',
   })
@@ -1498,6 +1504,12 @@ function buildQueueItem(
   const sourceLocation = stringValue(intake.jm1_manuscripturl || intake.jm1_submissionurl)
   const hasManuscript = intake.jm1_manuscriptreceived === true || Boolean(sourceLocation)
   const intakeNotes = stringValue(intake.jm1_additionalnotes)
+  const acknowledgmentState = acknowledgmentStateForIntake(intake)
+  const notificationState = notificationStateForIntake(intake, logs)
+  const systemAttentionFlag = acknowledgmentState === 'AUTHOR_ACK_FAILED' ||
+    acknowledgmentState === 'AUTHOR_ACK_RETRY_REQUIRED' ||
+    notificationState === 'NOTIFICATION_FAILED' ||
+    notificationState === 'NOTIFICATION_RETRY_REQUIRED'
   const hasContact = Boolean(dataverseLookupId(intake, '_jm1_linkedcontact_value'))
   const stage0RequiresJackie = stage0RequiresJackieGate(diagnostic, { hasManuscript })
   const currentStage = dataverseFormatted(title || {}, 'jm1pub_stage') || 'Intake'
@@ -1590,6 +1602,12 @@ function buildQueueItem(
         : 'Publisher Intake',
     sourceLocation,
     submissionDate: stringValue(intake.createdon),
+    manuscriptState: hasManuscript ? 'MANUSCRIPT_RECEIVED' : 'MANUSCRIPT_PENDING',
+    waitingOn: hasManuscript ? 'JMP' : 'Prospect',
+    acknowledgmentState,
+    acknowledgmentError: stringValue(intake.jm1_acknowledgmenterror),
+    notificationState,
+    systemAttentionFlag,
     currentBlocker,
     recommendedNextAction,
     actionOwner,
@@ -1630,6 +1648,48 @@ function deriveIntakeSpecificBlocker(intakeNotes: string, hasManuscript: boolean
   }
 
   return fallback
+}
+
+function acknowledgmentStateForIntake(
+  intake: DataverseRow,
+): PublisherQueueItem['acknowledgmentState'] {
+  if (intake.jm1_acknowledgmentsent === true || Number(intake.jm1_acknowledgmentstatus) === 835500001) {
+    return 'AUTHOR_ACK_SENT'
+  }
+
+  if (Number(intake.jm1_acknowledgmentstatus) === 835500002) {
+    return 'AUTHOR_ACK_FAILED'
+  }
+
+  if (Number(intake.jm1_acknowledgmentattemptcount || 0) > 0 && stringValue(intake.jm1_acknowledgmenterror)) {
+    return 'AUTHOR_ACK_RETRY_REQUIRED'
+  }
+
+  return 'AUTHOR_ACK_PENDING'
+}
+
+function notificationStateForIntake(
+  intake: DataverseRow,
+  logs: DataverseRow[],
+): PublisherQueueItem['notificationState'] {
+  const intakeId = stringValue(intake.jm1_publishingintakeid)
+  const reference = stringValue(intake.jm1_intakereferencecode)
+  const relatedLog = logs.find((row) => {
+    const action = stringValue(row.jm1_actiontype)
+    const description = stringValue(row.jm1_actiondescription)
+    return (
+      stringValue(row.jm1_sourcerecordid) === intakeId ||
+      (reference && (description.includes(reference) || stringValue(row.jm1_name).includes(reference)))
+    ) && /JOIN_INTERNAL_NOTIFICATION|PUBLISHING_NOTIFICATION|NOTIFICATION/i.test(action)
+  })
+
+  const notes = stringValue(intake.jm1_additionalnotes)
+  const action = stringValue(relatedLog?.jm1_actiontype)
+  const evidence = `${action}\n${stringValue(relatedLog?.jm1_actiondescription)}\n${notes}`
+  if (/FAILED|notification_failed|relay_rejected|relay_exception/i.test(evidence)) return 'NOTIFICATION_FAILED'
+  if (/SENT|accepted|JOIN_INTERNAL_NOTIFICATION_SENT/i.test(evidence)) return 'NOTIFICATION_SENT'
+  if (/RETRY/i.test(evidence)) return 'NOTIFICATION_RETRY_REQUIRED'
+  return 'NOTIFICATION_PENDING'
 }
 
 function buildWorkloadItems(

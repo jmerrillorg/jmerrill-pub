@@ -6,7 +6,7 @@ type AcknowledgmentIntake = NormalizedPublishingIntake & {
 }
 
 type AuthorAcknowledgmentResult =
-  | { status: 'sent' }
+  | { status: 'sent'; provider: string; providerMessageId?: string; recipient: string }
   | { status: 'skipped'; reason: 'relay_configuration_missing' }
   | { status: 'failed'; reason: string }
 
@@ -29,7 +29,15 @@ export async function sendJoinAuthorAcknowledgment(
       body: JSON.stringify(buildAuthorAcknowledgmentPayload(intake)),
     })
 
-    if (response.status === 200 || response.status === 202) return { status: 'sent' }
+    if (response.status === 200 || response.status === 202) {
+      const body = await safeJson(response)
+      return {
+        status: 'sent',
+        provider: stringValue(body?.provider) || 'acs-email-relay',
+        providerMessageId: stringValue(body?.providerMessageId || body?.operationId),
+        recipient: stringValue(body?.recipient || body?.to) || intake.email,
+      }
+    }
 
     const body = await safeResponseText(response)
     return {
@@ -101,6 +109,21 @@ async function safeResponseText(response: Response) {
   } catch {
     return ''
   }
+}
+
+async function safeJson(response: Response): Promise<Record<string, unknown> | null> {
+  try {
+    const parsed: unknown = await response.json()
+    return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)
+      ? parsed as Record<string, unknown>
+      : null
+  } catch {
+    return null
+  }
+}
+
+function stringValue(value: unknown) {
+  return typeof value === 'string' ? value.trim() : ''
 }
 
 function summarizeRelayError(body: string) {
