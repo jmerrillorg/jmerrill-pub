@@ -54,9 +54,11 @@ function loadRelayModule() {
       safeErrorCode,
       validateInternalNotificationPayload,
       validateJoinInternalNotificationPayload,
+      validatePaymentInternalNotificationPayload,
       validateApprovedAuthorResponsePayload,
       buildInternalNotificationEmail,
       buildJoinInternalNotificationEmail,
+      buildPaymentInternalNotificationEmail,
       buildApprovedAuthorResponseEmail,
       validatePublishingAcknowledgmentEmail,
       validateCanonicalPackageAcceptancePayload,
@@ -431,6 +433,32 @@ function validJoinInternalPayload(overrides = {}) {
   };
 }
 
+function validPaymentInternalPayload(overrides = {}) {
+  return {
+    notificationType: "PUBLISHING_PAYMENT_RECEIVED",
+    recipient: "publishing@jmerrill.one",
+    authorName: "Atta Darko",
+    projectTitle: "Untitled",
+    opportunityId: "131da28b-919c-f111-b8dc-6045bdd69435",
+    packageCode: "JMP-PKG-STARTER",
+    paymentOption: "EIGHT_PAYMENTS",
+    installmentCount: 8,
+    amountPaid: "$259.88",
+    paymentTimestamp: "2026-08-21T16:35:16.000Z",
+    paymentIntentId: "pi_3U6UygJCiOVFpgYu1V9iO8xW",
+    chargeId: "py_3U6UygJCiOVFpgYu16C8l9aL",
+    invoiceId: "in_1U6UvvJCiOVFpgYubDg2z1e9",
+    invoiceNumber: "9P5TH1BQ-0001",
+    customerId: "cus_V6iLQUvk68RyJB",
+    subscriptionId: "sub_1U6UvvJCiOVFpgYuwpqG6sFe",
+    subscriptionScheduleId: "sub_sched_1U6UvvJCiOVFpgYuik8ptyYp",
+    joinedFamilyState: "BLOCKED_AGREEMENT_NOT_EXECUTED",
+    actionRequired: "Confirm agreement execution before Joined the Family is set.",
+    noAuthorCommunication: true,
+    ...overrides
+  };
+}
+
 function assertRejected(result, reason) {
   assert.equal(result.ok, false);
   assert.equal(result.reason, reason);
@@ -471,6 +499,38 @@ test("valid /join internal notification builds ACS email to publishing@jmerrill.
   assert.match(email.content.plainText, /Dataverse Intake:/);
   assert.match(email.content.plainText, /No author-facing message was sent/);
   assert.equal(JSON.stringify(email.recipients).includes("hagher.hagher@example.com"), false);
+});
+
+test("valid Publishing payment internal notification builds ACS email to publishing@jmerrill.one", () => {
+  const { validatePaymentInternalNotificationPayload, buildPaymentInternalNotificationEmail } = loadRelayModule();
+  const result = validatePaymentInternalNotificationPayload(validPaymentInternalPayload());
+
+  assert.equal(result.ok, true);
+  const email = buildPaymentInternalNotificationEmail(result.value);
+  assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
+  assert.equal(JSON.stringify(email.recipients.to.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
+  assert.equal(Object.hasOwn(email.recipients, "cc"), false);
+  assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
+  assert.match(email.content.subject, /Publishing Payment Received - Atta Darko - \$259\.88/);
+  assert.match(email.content.plainText, /A Publishing payment was received and reconciled/);
+  assert.match(email.content.plainText, /No author-facing message was sent/);
+});
+
+test("Publishing payment internal notification rejects wrong recipient and missing no-author-communication confirmation", () => {
+  const { validatePaymentInternalNotificationPayload } = loadRelayModule();
+
+  assertRejected(
+    validatePaymentInternalNotificationPayload(validPaymentInternalPayload({ recipient: "ops@jmerrill.one" })),
+    "RECIPIENT_INVALID"
+  );
+  assertRejected(
+    validatePaymentInternalNotificationPayload(validPaymentInternalPayload({ to: ["author@example.com"] })),
+    "RECIPIENT_INVALID"
+  );
+  assertRejected(
+    validatePaymentInternalNotificationPayload(validPaymentInternalPayload({ noAuthorCommunication: false })),
+    "NO_AUTHOR_COMMUNICATION_CONFIRMATION_REQUIRED"
+  );
 });
 
 test("/join internal notification rejects wrong recipient, author recipient, and unsafe fields", () => {

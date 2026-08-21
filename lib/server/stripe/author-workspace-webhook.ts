@@ -25,12 +25,17 @@ type StripeWebhookObject = {
   id?: string
   object?: string
   amount?: number
+  amount_paid?: number
   amount_received?: number
   amount_total?: number
   currency?: string
+  customer?: string
+  invoice?: string
+  latest_charge?: string | { id?: string; paid?: boolean; status?: string; amount?: number; created?: number }
   metadata?: Record<string, string>
   payment_intent?: string
   payment_status?: string
+  subscription?: string
   status?: string
 }
 
@@ -110,8 +115,65 @@ export function classifyCommissioningWebhookEvent(event: StripeWebhookEvent) {
   }
 }
 
+export function classifyPublishingPaymentSuccessEvent(event: StripeWebhookEvent) {
+  const object = event.data?.object || {}
+  const eventType = event.type || ''
+  if (![
+    'checkout.session.completed',
+    'payment_intent.succeeded',
+    'invoice.paid',
+    'invoice.payment_succeeded',
+    'charge.succeeded',
+  ].includes(eventType)) {
+    return { process: false, code: 'event_type_ignored' }
+  }
+
+  const amount = getEventAmountCents(eventType, object)
+  const currency = String(object.currency || '').toLowerCase()
+  const paymentComplete =
+    eventType === 'checkout.session.completed'
+      ? object.payment_status === 'paid' || object.status === 'complete'
+      : object.status === 'succeeded' || object.status === 'paid'
+
+  if (!Number.isFinite(Number(amount)) || Number(amount) <= 0 || currency !== 'usd' || !paymentComplete) {
+    return { process: false, code: 'publishing_payment_not_confirmed' }
+  }
+
+  const latestCharge = object.latest_charge
+  return {
+    process: true,
+    code: 'publishing_payment_confirmed',
+    safeEvent: {
+      eventId: event.id || null,
+      eventType,
+      objectId: object.id || null,
+      objectType: object.object || null,
+      amountCents: Number(amount),
+      currency,
+      customerId: typeof object.customer === 'string' ? object.customer : null,
+      invoiceId: typeof object.invoice === 'string'
+        ? object.invoice
+        : object.object === 'invoice'
+          ? object.id || null
+          : null,
+      paymentIntentId: typeof object.payment_intent === 'string'
+        ? object.payment_intent
+        : object.object === 'payment_intent'
+          ? object.id || null
+          : null,
+      chargeId: typeof latestCharge === 'string'
+        ? latestCharge
+        : latestCharge?.id || (object.object === 'charge' ? object.id || null : null),
+      subscriptionId: typeof object.subscription === 'string' ? object.subscription : null,
+      created: event.created || null,
+      metadata: object.metadata || {},
+    },
+  }
+}
+
 function getEventAmountCents(eventType: string, object: StripeWebhookObject) {
   if (eventType === 'checkout.session.completed') return object.amount_total
+  if (eventType === 'invoice.paid' || eventType === 'invoice.payment_succeeded') return object.amount_paid || object.amount_total || object.amount
   return object.amount_received || object.amount
 }
 
