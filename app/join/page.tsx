@@ -59,7 +59,7 @@ export default function JoinPage() {
 
         {/* Or schedule */}
         <div className="text-center mt-8">
-          <p className="text-[14px] text-white/72 mb-3">Prefer to talk first?</p>
+          <p className="text-[14px] text-slate-100 mb-3">Prefer to talk first?</p>
           <a
             href="https://outlook.office.com/book/JMerrillPublishing@jmerrill.one/?ismsaljsauthenabled"
             target="_blank"

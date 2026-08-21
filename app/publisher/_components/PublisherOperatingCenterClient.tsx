@@ -55,14 +55,14 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     if (filter === 'blocked') return items.filter((item) => item.holdReason)
     if (filter === 'editorial') return items.filter((item) => item.currentStage === 'Editorial')
     if (filter === 'new') return items.filter((item) => item.ageDays <= 1)
-    if (filter === 'unacknowledged') return items.filter((item) => !item.latestExecutionEvidence?.includes('ACKNOWLEDG'))
+    if (filter === 'unacknowledged') return items.filter((item) => item.acknowledgmentState !== 'AUTHOR_ACK_SENT')
     if (filter === 'manuscript-pending') return items.filter((item) => item.currentBlocker === 'Source manuscript/material evidence is missing')
     if (filter === 'normalization-pending') return items.filter((item) => item.currentBlocker.toLowerCase().includes('normalization'))
     if (filter === 'editorial-ready') return items.filter((item) => item.currentBlocker === 'Editorial Review ready')
     if (filter === 'editorial-aging') return items.filter((item) => item.currentStage === 'Editorial' && item.ageDays >= 3)
     if (filter === 'recommendation-pending') return items.filter((item) => item.currentBlocker.toLowerCase().includes('recommendation'))
-    if (filter === 'notification-failed') return items.filter((item) => item.latestExecutionEvidence?.includes('NOTIFICATION') && item.latestExecutionEvidence.includes('FAILED'))
-    if (filter === 'system-attention') return items.filter((item) => item.actionOwner === 'system' || item.currentBlocker.toLowerCase().includes('system'))
+    if (filter === 'notification-failed') return items.filter((item) => item.notificationState.includes('FAILED') || item.acknowledgmentState.includes('FAILED'))
+    if (filter === 'system-attention') return items.filter((item) => item.systemAttentionFlag || item.actionOwner === 'system' || item.currentBlocker.toLowerCase().includes('system'))
     if (filter === 'stale') return items.filter((item) => item.overdueState === 'overdue' || item.overdueState === 'stalled')
     return items
   }, [filter, snapshot])
@@ -939,6 +939,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Badge label={item.actionOwner === 'publisher' ? 'Publisher Action' : 'Automation Tracking'} tone={item.actionOwner === 'publisher' ? 'blue' : 'amber'} />
+                  <Badge label={item.acknowledgmentState} tone={item.acknowledgmentState === 'AUTHOR_ACK_SENT' ? 'blue' : 'amber'} />
                   <Badge label={item.contractStatus} />
                   <Badge label={item.paymentStatus} />
                 </div>
@@ -950,10 +951,15 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                 <Info label="Asset ID" value={item.assetId || 'Not created'} />
                 <Info label="Age" value={`${item.ageDays} day${item.ageDays === 1 ? '' : 's'} · ${item.ageBucket}`} />
                 <Info label="Queue state" value={item.overdueState} />
+                <Info label="Manuscript" value={item.manuscriptState} />
+                <Info label="Waiting On" value={item.waitingOn} />
+                <Info label="Acknowledgment" value={item.acknowledgmentState} />
+                <Info label="Notification" value={item.notificationState} />
                 <Info label="Editorial" value={item.editorialStage} />
                 <Info label="Capability" value={item.capability} />
                 <Info label="Current blocker" value={item.currentBlocker} />
                 <Info label="Next valid action" value={item.recommendedNextAction} />
+                <Info label="System attention" value={item.systemAttentionFlag ? 'YES' : 'NO'} />
               </div>
 
               <div className="mt-5 border-t border-white/10 pt-4">

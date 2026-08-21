@@ -16,6 +16,8 @@ import {
 import { sendJoinAuthorAcknowledgment } from '@/lib/publishing/intake/authorAcknowledgment'
 import {
   findPublishingIntakeByIdempotencyKey,
+  markPublishingIntakeAcknowledgmentFailed,
+  markPublishingIntakeAcknowledgmentPending,
   markPublishingIntakeAcknowledgmentSent,
   writePublishingIntakeWithRetry,
 } from '@/lib/publishing/intake/dataverse'
@@ -348,11 +350,46 @@ async function handlePublishingIntakePost(req: NextRequest) {
       })
     }
 
+    if (dataverse.status === 'success') {
+      const pendingWriteback = await markPublishingIntakeAcknowledgmentPending(dataverse.recordId)
+      if (pendingWriteback.status !== 'success') {
+        const pendingFailure = pendingWriteback.status === 'failed'
+          ? pendingWriteback.reason
+          : `acknowledgment_pending_${pendingWriteback.reason}`
+        await enqueuePublishingIntakeRecovery({
+          intakeReference: acceptedIntake.reference,
+          dataverseRecordId: dataverse.recordId,
+          workspaceFolderId: acceptedIntake.workspaceFolderId,
+          correlationId: acceptedIntake.idempotencyKey,
+          failedOperationType: 'ACKNOWLEDGMENT_WRITEBACK',
+          failureClassification: classifyRecoverableFailure(pendingFailure),
+          safeErrorCode: pendingFailure,
+        })
+      }
+    }
+
     const acknowledgment = await sendJoinAuthorAcknowledgment(acceptedWithContinuation)
     if (acknowledgment.status !== 'sent') {
       const acknowledgmentFailure = acknowledgment.status === 'failed'
         ? acknowledgment.reason
         : `acknowledgment_${acknowledgment.reason}`
+      if (dataverse.status === 'success') {
+        const failedWriteback = await markPublishingIntakeAcknowledgmentFailed(dataverse.recordId, acknowledgmentFailure)
+        if (failedWriteback.status !== 'success') {
+          const writebackFailure = failedWriteback.status === 'failed'
+            ? failedWriteback.reason
+            : `acknowledgment_failed_${failedWriteback.reason}`
+          await enqueuePublishingIntakeRecovery({
+            intakeReference: acceptedIntake.reference,
+            dataverseRecordId: dataverse.recordId,
+            workspaceFolderId: acceptedIntake.workspaceFolderId,
+            correlationId: acceptedIntake.idempotencyKey,
+            failedOperationType: 'ACKNOWLEDGMENT_WRITEBACK',
+            failureClassification: classifyRecoverableFailure(writebackFailure),
+            safeErrorCode: writebackFailure,
+          })
+        }
+      }
       const recovery = await enqueuePublishingIntakeRecovery({
         intakeReference: acceptedIntake.reference,
         dataverseRecordId: dataverse.status === 'success' ? dataverse.recordId : undefined,
