@@ -329,7 +329,10 @@ async function reconcileReferral(
     token,
     `jm1_executionlogs?$select=jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription&$filter=${encodeURIComponent(`jm1_sourcerecordid eq '${input.opportunityId}' and (contains(jm1_actiondescription,'referr') or contains(jm1_name,'REFERR'))`)}&$top=5`,
   )
-  const hasReferrer = Array.isArray(logs.value) && logs.value.some((row: DataverseRow) => /referr/i.test(`${row.jm1_name} ${row.jm1_actiondescription}`))
+  const hasReferrer = Array.isArray(logs.value) && logs.value.some((row: DataverseRow) => {
+    const text = `${row.jm1_name} ${row.jm1_actiontype} ${row.jm1_actiondescription}`
+    return /REFERRAL_ATTRIBUTION|REFERRED_BY|REFERRING_AUTHOR|referrer:/i.test(text)
+  })
   if (!hasReferrer) {
     const created = await logOnce(config, token, {
       name: `NO-QUALIFYING-REFERRER-${input.opportunityId}`,
