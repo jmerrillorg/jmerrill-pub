@@ -202,6 +202,9 @@ describe("automatic payment response preview", () => {
     assert.doesNotMatch(communication.rendered.subject, /JMP-INT/);
     assert.match(communication.rendered.html, /J MERRILL PUBLISHING/);
     assert.ok(communication.rendered.html.indexOf("Payment Options") < communication.rendered.html.indexOf("Choose Your Payment Option"));
+    assert.match(communication.rendered.html, /Scheduled payments/);
+    assert.match(communication.rendered.html, /Payment 1: \$760\.50 \+ applicable tax/);
+    assert.match(communication.rendered.html, /Payment 8: \$380\.21 \+ applicable tax/);
     assert.match(communication.rendered.text, /JMP-INT-202608-ABC123/);
     assert.match(communication.rendered.text, /\$2,925\.00/);
     assert.match(communication.rendered.text, /\$3,042\.00 \+ applicable tax/);
@@ -224,10 +227,15 @@ describe("automatic payment response preview", () => {
       title: "Indomitable",
       subjectOverride: "Your Publishing Payment Options for Indomitable",
       actionUrl: "https://jmerrill.pub/author/payment-options/indomitable",
+      correctionNotice: "This corrected message includes the exact payment amounts for each payment option. Please use this version when choosing your payment option.",
       approvedBy: "jackie"
     });
     assert.equal(communication.ok, true);
     assert.equal(communication.rendered.subject, "Your Publishing Payment Options for Indomitable");
+    assert.match(communication.rendered.html, /This corrected message includes the exact payment amounts/);
+    assert.match(communication.rendered.html, /Payment 1: \$2,261\.25 \+ applicable tax/);
+    assert.match(communication.rendered.html, /Payment 4: \$1,141\.86 \+ applicable tax/);
+    assert.match(communication.rendered.html, /Payment 8: \$582\.17 \+ applicable tax/);
     assert.match(communication.rendered.text, /Payment-plan charge/);
     assert.match(communication.rendered.text, /There is no early-payoff penalty/);
     assert.doesNotMatch(communication.rendered.text, /4% transaction fee/);
@@ -283,6 +291,31 @@ describe("automatic payment response preview", () => {
     assert.ok(validation.blockers.includes("TAX_FABRICATED"));
     assert.ok(validation.blockers.includes("PREMATURE_JOINED_THE_FAMILY_LANGUAGE"));
     assert.ok(validation.blockers.includes("PRICING_LOCKED_BEFORE_PAYMENT_SELECTION"));
+  });
+
+  test("package-acceptance validator rejects HTML that omits scheduled installment amounts", () => {
+    const preview = buildOfferPreview({
+      packageAcceptedEvent: packageEvent({
+        selectedPackageCode: PACKAGE_CODES.PROFESSIONAL,
+        title: "Indomitable"
+      }),
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    const communication = renderPackageAcceptanceCommunication(preview, {
+      authorName: "Quanishia",
+      authorEmail: "quanishadockery7777@gmail.com",
+      title: "Indomitable",
+      actionUrl: "https://jmerrill.pub/author/payment-options/indomitable",
+      approvedBy: "jackie"
+    });
+    const invalid = {
+      ...communication.rendered,
+      html: communication.rendered.html.replace(/\$582\.17 \+ applicable tax/g, "")
+    };
+    const validation = validatePackageAcceptanceCommunication(invalid, preview);
+
+    assert.equal(validation.ok, false);
+    assert.ok(validation.blockers.includes("HTML_INSTALLMENT_AMOUNT_MISSING_8_PAY_8"));
   });
 });
 

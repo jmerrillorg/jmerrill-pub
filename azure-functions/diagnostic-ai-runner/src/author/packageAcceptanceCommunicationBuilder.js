@@ -87,12 +87,19 @@ function buildPaymentOptionsText(rows) {
 }
 
 function buildPaymentOptionsHtml(rows) {
+  const installmentLinesHtml = (row) => {
+    if (row.installments.length <= 1) return "";
+    const lines = row.installments
+      .map((installment) => `Payment ${escapeHtml(String(installment.number))}: ${escapeHtml(installment.total)} + applicable tax`)
+      .join("<br>");
+    return `<br><span style="display:block;color:#111827;font-size:13px;margin-top:8px;font-weight:700;">Scheduled payments</span><span style="display:block;color:#374151;font-size:13px;margin-top:3px;">${lines}</span>`;
+  };
   return rows.map((row) => `
                   <tr>
                     <td style="border:1px solid #d8dee9;padding:10px;font-weight:700;">${escapeHtml(row.label)}</td>
                     <td style="border:1px solid #d8dee9;padding:10px;">${escapeHtml(row.principal)}</td>
                     <td style="border:1px solid #d8dee9;padding:10px;">${escapeHtml(row.fee)}</td>
-                    <td style="border:1px solid #d8dee9;padding:10px;">${escapeHtml(row.total)} + applicable tax<br><span style="color:#4b5563;font-size:12px;">${escapeHtml(row.feeNote)}</span></td>
+                    <td style="border:1px solid #d8dee9;padding:10px;">${escapeHtml(row.total)} + applicable tax<br><span style="color:#4b5563;font-size:12px;">${escapeHtml(row.feeNote)}</span>${installmentLinesHtml(row)}</td>
                   </tr>`).join("");
 }
 
@@ -158,6 +165,16 @@ function validatePackageAcceptanceCommunication(rendered, preview) {
     if (!combined.includes(plan.totalDueFormatted) || !combined.includes(plan.principalTotalFormatted) || !combined.includes(chargeTotal)) {
       blockers.push(`PAYMENT_OPTION_DIFFERS_FROM_ENGINE_${plan.planCode}`);
     }
+    if (plan.planCode !== "FULL_PAY") {
+      for (const installment of plan.installments || []) {
+        if (!html.includes(installment.totalDueFormatted)) {
+          blockers.push(`HTML_INSTALLMENT_AMOUNT_MISSING_${plan.planCode}_${installment.installmentNumber}`);
+        }
+        if (!text.includes(installment.totalDueFormatted)) {
+          blockers.push(`TEXT_INSTALLMENT_AMOUNT_MISSING_${plan.planCode}_${installment.installmentNumber}`);
+        }
+      }
+    }
   }
   if (preview?.pricingState === PRICING_STATES.PRICING_LOCKED) blockers.push("PRICING_LOCKED_BEFORE_PAYMENT_SELECTION");
 
@@ -181,6 +198,7 @@ function renderPackageAcceptanceCommunication(preview, input = {}) {
   const rows = paymentOptionRows(offer);
   const referralCopy = buildReferralCopy(preview);
   const subject = normalizeString(input.subjectOverride) || `Your Publishing Payment Options for ${title}`;
+  const correctionNotice = normalizeString(input.correctionNotice);
   const returningLine = offer.returningAuthorPercent > 0
     ? `Because of your existing J Merrill Publishing relationship, your Returning Author Benefit of ${formatPercent(offer.returningAuthorPercent)} has already been included below.`
     : "No returning-author benefit applies to this preview.";
@@ -191,6 +209,7 @@ function renderPackageAcceptanceCommunication(preview, input = {}) {
     `Good day ${authorName},`,
     "",
     `Thank you for letting us know you'd like to move forward with ${title}. We've prepared the payment choices for your recommended ${offer.packageName} so you can choose the option that works best for you.`,
+    ...(correctionNotice ? ["", correctionNotice] : []),
     "",
     "Why you are receiving this",
     `You accepted the recommended ${offer.packageName} for ${title}.`,
@@ -246,6 +265,7 @@ function renderPackageAcceptanceCommunication(preview, input = {}) {
               <td style="padding:28px;">
                 <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Good day ${escapeHtml(authorName)},</p>
                 <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Thank you for letting us know you'd like to move forward with <strong>${escapeHtml(title)}</strong>. We've prepared the payment choices for your recommended <strong>${escapeHtml(offer.packageName)}</strong> so you can choose the option that works best for you.</p>
+                ${correctionNotice ? `<p style="margin:0 0 18px;font-size:15px;line-height:1.55;background:#eff6ff;border-left:4px solid #1d4ed8;padding:12px 14px;">${escapeHtml(correctionNotice)}</p>` : ""}
                 <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">Why you are receiving this</h2>
                 <p style="margin:0 0 18px;font-size:15px;line-height:1.55;">You accepted the recommended ${escapeHtml(offer.packageName)} for ${escapeHtml(title)}.</p>
                 <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">What JMP has prepared</h2>
@@ -258,7 +278,7 @@ function renderPackageAcceptanceCommunication(preview, input = {}) {
                   <tr>
                     <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Option</th>
                     <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Principal</th>
-                    <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Fee</th>
+                    <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Payment-plan charge</th>
                     <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Total before tax</th>
                   </tr>
                   ${buildPaymentOptionsHtml(rows)}
