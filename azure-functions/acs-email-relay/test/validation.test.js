@@ -55,10 +55,12 @@ function loadRelayModule() {
       validateInternalNotificationPayload,
       validateJoinInternalNotificationPayload,
       validatePaymentInternalNotificationPayload,
+      validateJoinedFamilyInternalNotificationPayload,
       validateApprovedAuthorResponsePayload,
       buildInternalNotificationEmail,
       buildJoinInternalNotificationEmail,
       buildPaymentInternalNotificationEmail,
+      buildJoinedFamilyInternalNotificationEmail,
       buildApprovedAuthorResponseEmail,
       validatePublishingAcknowledgmentEmail,
       validateCanonicalPackageAcceptancePayload,
@@ -459,6 +461,31 @@ function validPaymentInternalPayload(overrides = {}) {
   };
 }
 
+function validJoinedFamilyInternalPayload(overrides = {}) {
+  return {
+    notificationType: "PUBLISHING_JOINED_THE_FAMILY",
+    recipient: "publishing@jmerrill.one",
+    authorName: "Atta Boateng",
+    projectTitle: "Untitled",
+    opportunityId: "131da28b-919c-f111-b8dc-6045bdd69435",
+    packageCode: "JMP-PKG-STARTER",
+    paymentOption: "EIGHT_PAYMENTS",
+    paymentPolicy: "JMP_MULTIPAY_TRANSACTION_FEE_4_PERCENT_v1.0",
+    paymentStatus: "1 of 8 paid",
+    paymentsRemaining: 7,
+    agreementExecutedOn: "2026-08-19T15:42:58.000Z",
+    initialPaymentReceivedOn: "2026-08-21T16:35:16.000Z",
+    joinedTheFamilyOn: "2026-08-21T16:35:16.000Z",
+    workspaceStatus: "Active",
+    onboardingStatus: "Started; required details remain incomplete",
+    productionAuthorization: "Commercial production authorization confirmed",
+    finalDeliveryGate: "Closed until remaining payment obligation is complete",
+    nextAction: "Complete onboarding readiness review.",
+    noAuthorCommunication: true,
+    ...overrides
+  };
+}
+
 function assertRejected(result, reason) {
   assert.equal(result.ok, false);
   assert.equal(result.reason, reason);
@@ -529,6 +556,39 @@ test("Publishing payment internal notification rejects wrong recipient and missi
   );
   assertRejected(
     validatePaymentInternalNotificationPayload(validPaymentInternalPayload({ noAuthorCommunication: false })),
+    "NO_AUTHOR_COMMUNICATION_CONFIRMATION_REQUIRED"
+  );
+});
+
+test("valid Publishing joined-family internal notification builds separate ACS email to publishing@jmerrill.one", () => {
+  const { validateJoinedFamilyInternalNotificationPayload, buildJoinedFamilyInternalNotificationEmail } = loadRelayModule();
+  const result = validateJoinedFamilyInternalNotificationPayload(validJoinedFamilyInternalPayload());
+
+  assert.equal(result.ok, true);
+  const email = buildJoinedFamilyInternalNotificationEmail(result.value);
+  assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
+  assert.equal(JSON.stringify(email.recipients.to.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
+  assert.equal(Object.hasOwn(email.recipients, "cc"), false);
+  assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
+  assert.match(email.content.subject, /Joined the Family - Atta Boateng - Untitled/);
+  assert.match(email.content.plainText, /has joined the J Merrill Publishing family/);
+  assert.match(email.content.plainText, /No author-facing message was sent/);
+  assert.doesNotMatch(email.content.subject, /Payment Received/);
+});
+
+test("Publishing joined-family internal notification rejects wrong recipient and duplicate author send risk", () => {
+  const { validateJoinedFamilyInternalNotificationPayload } = loadRelayModule();
+
+  assertRejected(
+    validateJoinedFamilyInternalNotificationPayload(validJoinedFamilyInternalPayload({ recipient: "ops@jmerrill.one" })),
+    "RECIPIENT_INVALID"
+  );
+  assertRejected(
+    validateJoinedFamilyInternalNotificationPayload(validJoinedFamilyInternalPayload({ to: ["author@example.com"] })),
+    "RECIPIENT_INVALID"
+  );
+  assertRejected(
+    validateJoinedFamilyInternalNotificationPayload(validJoinedFamilyInternalPayload({ noAuthorCommunication: false })),
     "NO_AUTHOR_COMMUNICATION_CONFIRMATION_REQUIRED"
   );
 });

@@ -365,12 +365,23 @@ async function getOpportunity(config: DataverseConfig, token: string, opportunit
   return dataverseRequest(
     config,
     token,
-    `opportunities(${opportunityId})?$select=opportunityid,name,jm1pub_projecttitle,jm1pub_intaketrackingid,jm1pub_packagerecommended,jm1_m6authorselectedpackagecode,jm1_m6selectedpaymentamount,jm1_m6selectedpaymenttotal,jm1_m6selectedinstallmentcount,jm1_m6selectedpaymentoption,jm1_m6paymentselectionevidencelog,jm1pub_contractstatus,jm1_m6agreementpreparationstatus,jm1_m6firstpaymentstatus,jm1_m6firstpaymentconfirmedon,_parentcontactid_value,_customerid_value`,
+    `opportunities(${opportunityId})?$select=opportunityid,name,jm1pub_projecttitle,jm1pub_intaketrackingid,jm1pub_packagerecommended,jm1_m6authorselectedpackagecode,jm1_m6selectedpaymentamount,jm1_m6selectedpaymenttotal,jm1_m6selectedinstallmentcount,jm1_m6selectedpaymentoption,jm1_m6paymentselectionevidencelog,jm1pub_contractstatus,jm1_m6agreementpreparationstatus,jm1_m6authorportalstatus,jm1_m6onboardingstatus,jm1_m6firstpaymentstatus,jm1_m6firstpaymentconfirmedon,_parentcontactid_value,_customerid_value`,
   )
 }
 
 async function findSignedContractForOpportunity(config: DataverseConfig, token: string, opportunityId: string) {
-  const filter = `_jm1pub_opportunity_value eq ${opportunityId} and (jm1pub_status eq ${CONTRACT_STATUS.ACTIVE} or jm1pub_providerstatus eq 'SIGNNOW_SIGNED')`
+  const signedProviderStatuses = [
+    'SIGNNOW_SIGNED',
+    'ADOBE_SIGNED',
+    'ADOBE_SIGNED_COMPLETED',
+    'ADOBE_COMPLETED',
+    'SIGNED',
+    'COMPLETED',
+  ]
+  const providerStatusFilter = signedProviderStatuses
+    .map((status) => `jm1pub_providerstatus eq '${status}'`)
+    .join(' or ')
+  const filter = `_jm1pub_opportunity_value eq ${opportunityId} and (jm1pub_status eq ${CONTRACT_STATUS.ACTIVE} or ${providerStatusFilter})`
   const result = await dataverseRequest(
     config,
     token,

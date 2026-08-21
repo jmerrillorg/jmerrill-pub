@@ -18,6 +18,7 @@ const INTERNAL_VISIBILITY_MAILBOX = "publishing@jmerrill.one";
 const INTERNAL_NOTIFICATION_TYPE = "AUTHOR_DRAFT_READY_FOR_REVIEW";
 const JOIN_INTERNAL_NOTIFICATION_TYPE = "JOIN_INTAKE_RECEIVED";
 const PAYMENT_INTERNAL_NOTIFICATION_TYPE = "PUBLISHING_PAYMENT_RECEIVED";
+const JOINED_FAMILY_INTERNAL_NOTIFICATION_TYPE = "PUBLISHING_JOINED_THE_FAMILY";
 const APPROVED_AUTHOR_RESPONSE_TYPE = "APPROVED_AUTHOR_RESPONSE";
 const AUTHOR_REVIEW_PACKAGE_TEMPLATE = "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1";
 const FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE = "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1";
@@ -27,6 +28,7 @@ const CANONICAL_AUTHOR_RENDER_MODE = "CANONICAL_HTML";
 const INTERNAL_NOTIFICATION_SENT = "INTERNAL_NOTIFICATION_SENT";
 const JOIN_INTERNAL_NOTIFICATION_SENT = "JOIN_INTERNAL_NOTIFICATION_SENT";
 const PAYMENT_INTERNAL_NOTIFICATION_SENT = "PAYMENT_INTERNAL_NOTIFICATION_SENT";
+const JOINED_FAMILY_INTERNAL_NOTIFICATION_SENT = "JOINED_FAMILY_INTERNAL_NOTIFICATION_SENT";
 const AUTHOR_RESPONSE_SENT = "AUTHOR_RESPONSE_SENT";
 const DRAFT_STATUS = "DRAFT_ONLY";
 const DRAFT_APPROVAL_STATUS = "PENDING_HUMAN_APPROVAL";
@@ -725,6 +727,67 @@ function validatePaymentInternalNotificationPayload(payload = {}) {
   };
 }
 
+function validateJoinedFamilyInternalNotificationPayload(payload = {}) {
+  if (hasUnsafeField(payload)) {
+    return { ok: false, reason: "UNSAFE_FIELD_PRESENT" };
+  }
+
+  const recipient = normalizeText(payload.recipient || payload.to).toLowerCase();
+  const to = normalizeRecipients(payload.to === undefined ? recipient : payload.to);
+  const cc = normalizeRecipients(payload.cc);
+  const bcc = normalizeRecipients(payload.bcc);
+  const allRecipients = [...to, ...cc, ...bcc];
+  const opportunityId = normalizeText(payload.opportunityId);
+
+  if (normalizeText(payload.notificationType) !== JOINED_FAMILY_INTERNAL_NOTIFICATION_TYPE) {
+    return { ok: false, reason: "NOTIFICATION_TYPE_INVALID" };
+  }
+
+  if (recipient !== INTERNAL_VISIBILITY_MAILBOX || to.length !== 1 || to[0] !== INTERNAL_VISIBILITY_MAILBOX) {
+    return { ok: false, reason: "RECIPIENT_INVALID" };
+  }
+
+  if (cc.length > 0 || bcc.length > 0) {
+    return { ok: false, reason: "CC_BCC_NOT_ALLOWED" };
+  }
+
+  if (allRecipients.some(isJmerrillPubMailbox)) {
+    return { ok: false, reason: "JMERRILL_PUB_MAILBOX_NOT_ALLOWED" };
+  }
+
+  if (!normalizeText(payload.authorName)) return { ok: false, reason: "AUTHOR_NAME_MISSING" };
+  if (!normalizeText(payload.projectTitle)) return { ok: false, reason: "PROJECT_TITLE_MISSING" };
+  if (!opportunityId || !DIAGNOSTIC_ID_PATTERN.test(opportunityId)) return { ok: false, reason: "OPPORTUNITY_ID_INVALID" };
+  if (!normalizeText(payload.agreementExecutedOn)) return { ok: false, reason: "AGREEMENT_EXECUTED_ON_MISSING" };
+  if (!normalizeText(payload.initialPaymentReceivedOn)) return { ok: false, reason: "INITIAL_PAYMENT_RECEIVED_ON_MISSING" };
+  if (!normalizeText(payload.joinedTheFamilyOn)) return { ok: false, reason: "JOINED_THE_FAMILY_ON_MISSING" };
+  if (payload.noAuthorCommunication !== true) return { ok: false, reason: "NO_AUTHOR_COMMUNICATION_CONFIRMATION_REQUIRED" };
+
+  return {
+    ok: true,
+    value: {
+      notificationType: JOINED_FAMILY_INTERNAL_NOTIFICATION_TYPE,
+      recipient: INTERNAL_VISIBILITY_MAILBOX,
+      authorName: normalizeText(payload.authorName),
+      projectTitle: normalizeText(payload.projectTitle),
+      opportunityId,
+      packageCode: normalizeText(payload.packageCode),
+      paymentOption: normalizeText(payload.paymentOption),
+      paymentPolicy: normalizeText(payload.paymentPolicy),
+      paymentStatus: normalizeText(payload.paymentStatus) || "1 of 8 paid",
+      paymentsRemaining: normalizeText(String(payload.paymentsRemaining || "")),
+      agreementExecutedOn: normalizeText(payload.agreementExecutedOn),
+      initialPaymentReceivedOn: normalizeText(payload.initialPaymentReceivedOn),
+      joinedTheFamilyOn: normalizeText(payload.joinedTheFamilyOn),
+      workspaceStatus: normalizeText(payload.workspaceStatus) || "Provisioning / Active",
+      onboardingStatus: normalizeText(payload.onboardingStatus) || "Started; incomplete items remain",
+      productionAuthorization: normalizeText(payload.productionAuthorization) || "Commercial production authorization confirmed",
+      finalDeliveryGate: normalizeText(payload.finalDeliveryGate) || "Closed until payment obligation is complete",
+      nextAction: normalizeBody(payload.nextAction) || "Review onboarding readiness and continue governed author setup.",
+    }
+  };
+}
+
 function validateApprovedAuthorResponsePayload(payload = {}) {
   const common = validateCommonMilestoneFields(payload);
   if (!common.ok) return common;
@@ -1163,6 +1226,53 @@ function buildPaymentInternalNotificationEmail(payload) {
   };
 }
 
+function buildJoinedFamilyInternalNotificationEmail(payload) {
+  const plainText = [
+    "Internal notification only.",
+    "",
+    `${payload.authorName} has joined the J Merrill Publishing family.`,
+    "",
+    `Author: ${payload.authorName}`,
+    `Book Title: ${payload.projectTitle}`,
+    `Package: ${payload.packageCode || "not provided"}`,
+    `Payment Option: ${payload.paymentOption || "not provided"}`,
+    `Payment Policy: ${payload.paymentPolicy || "not provided"}`,
+    `Payment Status: ${payload.paymentStatus}`,
+    `Payments Remaining: ${payload.paymentsRemaining || "not provided"}`,
+    "",
+    `Agreement Executed On: ${payload.agreementExecutedOn}`,
+    `Initial Payment Received On: ${payload.initialPaymentReceivedOn}`,
+    `Joined the Family On: ${payload.joinedTheFamilyOn}`,
+    "",
+    `Workspace: ${payload.workspaceStatus}`,
+    `Onboarding: ${payload.onboardingStatus}`,
+    `Production Authorization: ${payload.productionAuthorization}`,
+    `Final Delivery Payment Gate: ${payload.finalDeliveryGate}`,
+    "",
+    `Opportunity: ${payload.opportunityId}`,
+    "",
+    `Next governed action: ${payload.nextAction}`,
+    "",
+    "No author-facing message was sent by this internal notification."
+  ].filter(Boolean).join("\n");
+
+  return {
+    senderAddress: getAcsSenderAddress(),
+    content: {
+      subject: `Joined the Family - ${payload.authorName} - ${payload.projectTitle}`,
+      plainText
+    },
+    recipients: {
+      to: [
+        {
+          address: INTERNAL_VISIBILITY_MAILBOX,
+          displayName: "J Merrill Publishing"
+        }
+      ]
+    }
+  };
+}
+
 function buildApprovedAuthorResponseEmail(payload) {
   return {
     senderAddress: getAuthorResponseSenderAddress(),
@@ -1464,6 +1574,57 @@ app.http("send-publishing-payment-internal-notification", {
       context.error(`ACS relay Publishing payment internal notification send failed: ${code}; opportunity=${validation.value.opportunityId}`);
       return milestoneServerError(code, {
         intakeReferenceCode: validation.value.intakeReferenceCode || validation.value.opportunityId
+      });
+    }
+  }
+});
+
+app.http("send-publishing-joined-family-internal-notification", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "send-publishing-joined-family-internal-notification",
+  handler: async (request, context) => {
+    let body = {};
+
+    if (!verifyRelayKey(request)) {
+      context.warn("ACS relay rejected Publishing joined-family internal notification with invalid auth.");
+      return milestoneUnauthorized(body);
+    }
+
+    try {
+      body = await request.json();
+    } catch (_error) {
+      context.warn("ACS relay rejected malformed Publishing joined-family internal notification JSON.");
+      return milestoneValidationError("INVALID_JSON", body);
+    }
+
+    const validation = validateJoinedFamilyInternalNotificationPayload(body || {});
+    if (!validation.ok) {
+      context.warn(`ACS relay Publishing joined-family notification validation failed: ${validation.reason}; opportunity=${normalizeText(body?.opportunityId)}`);
+      return milestoneValidationError(validation.reason, body);
+    }
+
+    try {
+      const providerMessageId = await sendAcsMessage(buildJoinedFamilyInternalNotificationEmail(validation.value));
+      context.info(`ACS relay accepted Publishing joined-family internal notification; opportunity=${validation.value.opportunityId}`);
+
+      return {
+        status: 202,
+        jsonBody: {
+          accepted: true,
+          messageType: JOINED_FAMILY_INTERNAL_NOTIFICATION_TYPE,
+          deliveryStatus: JOINED_FAMILY_INTERNAL_NOTIFICATION_SENT,
+          recipient: INTERNAL_VISIBILITY_MAILBOX,
+          opportunityId: validation.value.opportunityId,
+          provider: ACS_PROVIDER_NAME,
+          providerMessageId
+        }
+      };
+    } catch (error) {
+      const code = safeErrorCode(error);
+      context.error(`ACS relay Publishing joined-family internal notification send failed: ${code}; opportunity=${validation.value.opportunityId}`);
+      return milestoneServerError(code, {
+        intakeReferenceCode: validation.value.opportunityId
       });
     }
   }
