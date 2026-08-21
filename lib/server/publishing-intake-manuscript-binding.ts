@@ -178,7 +178,7 @@ async function patchIntakeWithArtifact(
   notes: string[],
 ) {
   const existingNotes = stringValue(intake.jm1_additionalnotes)
-  const nextNotes = [existingNotes, ...notes].filter(Boolean).join('\n').slice(0, 950)
+  const nextNotes = [...notes, existingNotes].filter(Boolean).join('\n').slice(0, 950)
   await dataversePatch(config, 'jm1_publishingintakes', intakeId, {
     jm1_manuscriptreceived: true,
     jm1_manuscripturl: artifact.manuscriptUrl,

@@ -1618,7 +1618,10 @@ function buildQueueItem(
 }
 
 function deriveIntakeSpecificBlocker(intakeNotes: string, hasManuscript: boolean, fallback: string) {
-  if (hasManuscript && /NORMALIZATION_PENDING|normalization_required|format=pages|format=pdf|format=doc/i.test(intakeNotes)) {
+  if (
+    hasManuscript &&
+    /NORMALIZATION_PENDING|normalization_required|format=(pages|pdf|doc)(?:;|\s|$)/i.test(intakeNotes)
+  ) {
     return 'Manuscript normalization pending'
   }
 
