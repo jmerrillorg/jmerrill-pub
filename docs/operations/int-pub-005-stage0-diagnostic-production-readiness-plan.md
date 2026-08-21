@@ -938,7 +938,7 @@ PR #102 adds concrete ACS Email relay routes for Milestone #5 controlled testing
 - `/api/send-internal-author-draft-review-notification`
 - `/api/send-approved-author-response`
 
-Both routes use the existing ACS relay authentication pattern with `JM1_RELAY_API_KEY`, ACS Email only, and sender `DoNotReply@email.jmerrill.one`.
+Both routes use the existing ACS relay authentication pattern with `JM1_RELAY_API_KEY`, ACS Email only, and sender `publishing@email.jmerrill.one`.
 
 ### Recipient rules
 

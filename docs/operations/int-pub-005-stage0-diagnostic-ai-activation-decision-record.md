@@ -982,7 +982,7 @@ PR #102 introduces concrete ACS Email relay routes for Milestone #5 controlled t
 - Added `/api/send-approved-author-response`.
 - Both routes require the existing relay key pattern.
 - Both routes use ACS Email only.
-- Sender must be `DoNotReply@email.jmerrill.one`.
+- Sender must be `publishing@email.jmerrill.one`.
 - Internal route recipient is locked to `publishing@jmerrill.one`.
 - Approved author response route requires `publishing@jmerrill.one` copy/internal visibility.
 - `@jmerrill.pub` is rejected as an active mailbox.

@@ -212,7 +212,7 @@ Milestone #5 failure responses do not include full email body, manuscript text, 
 Required:
 
 - `JM1_RELAY_API_KEY`: shared relay key expected in `x-jm1-relay-key`.
-- `ACS_EMAIL_SENDER`: `DoNotReply@email.jmerrill.one`.
+- `ACS_EMAIL_SENDER`: `publishing@email.jmerrill.one`.
 
 Choose one ACS authentication model:
 
@@ -239,7 +239,7 @@ Suggested resources:
 - Application Insights: create or reuse a JM1 communications telemetry instance
 - ACS resource: `acs-jm1-core`
 - Email Communication Service: `email-jm1-core`
-- Connected sender: `DoNotReply@email.jmerrill.one`
+- Connected sender: `publishing@email.jmerrill.one`
 
 ## Deployment Steps
 
@@ -248,7 +248,7 @@ Suggested resources:
 3. Assign the managed identity the minimum ACS role that allows email send, or configure `ACS_CONNECTION_STRING` as a Key Vault reference.
 4. Set Function App settings:
    - `JM1_RELAY_API_KEY`
-   - `ACS_EMAIL_SENDER=DoNotReply@email.jmerrill.one`
+   - `ACS_EMAIL_SENDER=publishing@email.jmerrill.one`
    - `ACS_ENDPOINT` or `ACS_CONNECTION_STRING`
    - `APPLICATIONINSIGHTS_CONNECTION_STRING` if not already wired
 5. Deploy `azure-functions/acs-email-relay`.

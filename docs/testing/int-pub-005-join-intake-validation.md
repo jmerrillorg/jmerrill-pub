@@ -242,7 +242,7 @@ The author acknowledgment is a required customer-facing completion step after a 
 - Status: active, `statecode: 1`, `statuscode: 2`
 - Relay endpoint: `https://func-jm1-acs-email-relay.azurewebsites.net/api/send-author-acknowledgment`
 - Relay key handling: `jm1_INTPUB005RelayApiKey` resolves through a Power Platform secret environment variable backed by Azure Key Vault secret `jm1-int-pub-005-relay-api-key`
-- Sender: `DoNotReply@email.jmerrill.one`
+- Sender: `publishing@email.jmerrill.one`
 
 Website repair path:
 

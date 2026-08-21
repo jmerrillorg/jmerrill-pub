@@ -5,7 +5,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 function loadRelayModule() {
-  process.env.ACS_EMAIL_SENDER = "DoNotReply@email.jmerrill.one";
+  process.env.ACS_EMAIL_SENDER = "publishing@email.jmerrill.one";
   process.env.ACS_AUTHOR_RESPONSE_EMAIL_SENDER = "publishing@email.jmerrill.one";
 
   const routes = {};
@@ -58,6 +58,7 @@ function loadRelayModule() {
       buildInternalNotificationEmail,
       buildJoinInternalNotificationEmail,
       buildApprovedAuthorResponseEmail,
+      validatePublishingAcknowledgmentEmail,
       milestoneValidationError,
       milestoneUnauthorized
     };`,
@@ -128,8 +129,8 @@ test("acknowledgment confirms editorial review when manuscript link is present",
 
   assert.equal(result.ok, true);
   const email = buildAcknowledgmentEmail(result.value);
-  assert.match(email.content.plainText, /We received your manuscript link/);
-  assert.match(email.content.plainText, /Editorial Review Team will begin evaluating/);
+  assert.match(email.content.plainText, /Your manuscript is connected to your inquiry/);
+  assert.match(email.content.plainText, /prepare it for the right Editorial Review step/);
   assert.doesNotMatch(email.content.plainText, /We did not receive a manuscript link/);
 });
 
@@ -146,13 +147,13 @@ test("acknowledgment asks for manuscript file or link when missing", () => {
 
   assert.equal(result.ok, true);
   const email = buildAcknowledgmentEmail(result.value);
-  assert.match(email.content.plainText, /We did not receive a manuscript file or shareable manuscript link/);
-  assert.match(email.content.plainText, /reply with your manuscript attached or with a shareable manuscript link/);
-  assert.match(email.content.plainText, /Editorial review will begin as soon as we receive access/);
+  assert.match(email.content.plainText, /We do not yet have a manuscript file or shareable manuscript link/);
+  assert.match(email.content.plainText, /reply to this message with the file attached or with a shareable manuscript link/);
+  assert.match(email.content.plainText, /Editorial Review cannot begin until the manuscript is connected/);
   assert.doesNotMatch(email.content.plainText, /We received your manuscript link/);
 });
 
-test("acknowledgment includes Publishing mailbox CC and no reply-to by default", () => {
+test("acknowledgment includes Publishing mailbox CC and canonical reply-to", () => {
   const { validatePayload, buildAcknowledgmentEmail } = loadRelayModule();
 
   const result = validatePayload({
@@ -164,8 +165,32 @@ test("acknowledgment includes Publishing mailbox CC and no reply-to by default",
   });
 
   const email = buildAcknowledgmentEmail(result.value);
-  assert.equal(Object.hasOwn(email, "replyTo"), false);
+  assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
+  assert.equal(email.replyTo[0].address, "publishing@jmerrill.one");
   assert.equal(JSON.stringify(email.recipients.cc.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
+});
+
+test("acknowledgment uses human-first subject, branded HTML, and body reference", () => {
+  const { validatePayload, buildAcknowledgmentEmail, validatePublishingAcknowledgmentEmail } = loadRelayModule();
+
+  const result = validatePayload({
+    reference: "JMP-INT-202608-OZT8IO",
+    to: "author@example.com",
+    firstName: "Author",
+    projectTitle: "New Book Test",
+    intakeChannel: "INT-PUB-005 /join",
+    continuationUrl: "https://jmerrill.pub/join/continue/test-token"
+  });
+
+  assert.equal(result.ok, true);
+  const email = buildAcknowledgmentEmail(result.value);
+  assert.equal(email.content.subject, "We Received Your Publishing Inquiry for New Book Test");
+  assert.doesNotMatch(email.content.subject, /JMP-INT-202608-OZT8IO/);
+  assert.match(email.content.plainText, /JMP-INT-202608-OZT8IO/);
+  assert.match(email.content.html, /J MERRILL PUBLISHING/);
+  assert.match(email.content.html, /Add Your Manuscript/);
+  assert.doesNotMatch(`${email.content.html}\n${email.content.plainText}`, /Author Workspace|author\/portal/i);
+  assert.equal(validatePublishingAcknowledgmentEmail(email, result.value).ok, true);
 });
 
 const diagnosticId = "64e387e0-7e6a-f111-a826-00224820105b";
@@ -420,7 +445,7 @@ test("valid internal notification builds ACS email to publishing@jmerrill.one", 
 
   assert.equal(result.ok, true);
   const email = buildInternalNotificationEmail(result.value);
-  assert.equal(email.senderAddress, "DoNotReply@email.jmerrill.one");
+  assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
   assert.equal(JSON.stringify(email.recipients.to.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
   assert.equal(Object.hasOwn(email.recipients, "cc"), false);
   assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
@@ -435,7 +460,7 @@ test("valid /join internal notification builds ACS email to publishing@jmerrill.
 
   assert.equal(result.ok, true);
   const email = buildJoinInternalNotificationEmail(result.value);
-  assert.equal(email.senderAddress, "DoNotReply@email.jmerrill.one");
+  assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
   assert.equal(JSON.stringify(email.recipients.to.map((recipient) => recipient.address)), JSON.stringify(["publishing@jmerrill.one"]));
   assert.equal(Object.hasOwn(email.recipients, "cc"), false);
   assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
@@ -545,7 +570,7 @@ test("approved author response sender address is publishing@email.jmerrill.one",
   assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
 });
 
-test("approved author response sender is never @jmerrill.pub or DoNotReply (different sender than acknowledgment/internal sends)", () => {
+test("approved author response sender is never @jmerrill.pub or DoNotReply", () => {
   const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
   const result = validateApprovedAuthorResponsePayload(validAuthorResponsePayload());
 

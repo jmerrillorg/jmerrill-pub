@@ -61,7 +61,7 @@ PR #102 adds concrete ACS Email relay routes for Milestone #5 controlled testing
 - `POST /api/send-internal-author-draft-review-notification`
 - `POST /api/send-approved-author-response`
 
-Both routes use `JM1_RELAY_API_KEY` with `x-jm1-relay-key` and send through ACS Email using `DoNotReply@email.jmerrill.one`.
+Both routes use `JM1_RELAY_API_KEY` with `x-jm1-relay-key` and send through ACS Email using `publishing@email.jmerrill.one`.
 
 The internal route sends only to `publishing@jmerrill.one`, with no author To/CC/BCC. The approved author-response route sends only to the approved author email and copies or internally mirrors `publishing@jmerrill.one`.
 
@@ -74,15 +74,15 @@ The diagnostic runner uses the `acs-relay` provider mode to call the ACS relay r
 ```text
 JM1_INTERNAL_NOTIFICATIONS_ENABLED=false
 JM1_INTERNAL_NOTIFICATION_PROVIDER=acs-relay
-JM1_INTERNAL_NOTIFICATION_FROM=DoNotReply@email.jmerrill.one
-JM1_INTERNAL_NOTIFICATION_REPLY_TO=DoNotReply@email.jmerrill.one
+JM1_INTERNAL_NOTIFICATION_FROM=publishing@email.jmerrill.one
+JM1_INTERNAL_NOTIFICATION_REPLY_TO=publishing@jmerrill.one
 JM1_INTERNAL_NOTIFICATION_RELAY_URL=https://func-jm1-acs-email-relay.azurewebsites.net
 JM1_INTERNAL_NOTIFICATION_RELAY_KEY=<secure relay key>
 
 JM1_AUTHOR_RESPONSE_SEND_ENABLED=false
 JM1_AUTHOR_RESPONSE_SEND_PROVIDER=acs-relay
-JM1_AUTHOR_RESPONSE_SEND_FROM=DoNotReply@email.jmerrill.one
-JM1_AUTHOR_RESPONSE_SEND_REPLY_TO=DoNotReply@email.jmerrill.one
+JM1_AUTHOR_RESPONSE_SEND_FROM=publishing@email.jmerrill.one
+JM1_AUTHOR_RESPONSE_SEND_REPLY_TO=publishing@jmerrill.one
 JM1_AUTHOR_RESPONSE_SEND_RELAY_URL=https://func-jm1-acs-email-relay.azurewebsites.net
 JM1_AUTHOR_RESPONSE_SEND_RELAY_KEY=<secure relay key>
 ```
