@@ -18,7 +18,7 @@ const {
   renderPackageAcceptanceCommunication,
   validatePackageAcceptanceCommunication
 } = require("../src/author/packageAcceptanceCommunicationBuilder");
-const { PACKAGE_CODES } = require("../src/author/authorOfferEngine");
+const { PACKAGE_CODES, NEW_FINANCING_POLICY_VERSION } = require("../src/author/authorOfferEngine");
 const { computeInstallmentStripeAmountFromAuthorOffer } = require("../src/payment/agreementPaymentLinkMapping");
 
 function packageEvent(overrides = {}) {
@@ -97,6 +97,25 @@ describe("automatic payment response preview", () => {
     });
     assert.equal(preview.offer.adjustedPackagePrincipalFormatted, "$4,500.00");
     assert.equal(plan(preview, "8_PAY").totalDueFormatted, "$4,680.00");
+  });
+
+  test("Quanishia implementation case receives new financing policy preview, not legacy 4 percent", () => {
+    const preview = buildOfferPreview({
+      packageAcceptedEvent: packageEvent({
+        selectedPackageCode: PACKAGE_CODES.PROFESSIONAL,
+        authorId: "5bb796dc-cd95-f111-8076-7c1e525b15c2",
+        authorName: "Quanishia Dockery",
+        title: "Indomitable",
+        intakeReferenceCode: "JMP-INT-202608-0AOS7L"
+      }),
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    assert.equal(preview.offer.paymentPolicyVersion, NEW_FINANCING_POLICY_VERSION);
+    assert.equal(plan(preview, "2_PAY").totalDueFormatted, "$4,522.50");
+    assert.equal(plan(preview, "4_PAY").totalDueFormatted, "$4,567.50");
+    assert.equal(plan(preview, "8_PAY").totalDueFormatted, "$4,657.50");
+    assert.equal(plan(preview, "8_PAY").multiPayFeeTotalFormatted, "$0.00");
+    assert.equal(plan(preview, "8_PAY").planChargeTotalFormatted, "$157.50");
   });
 
   test("returning Professional author has loyalty automatically applied", () => {
@@ -182,12 +201,37 @@ describe("automatic payment response preview", () => {
     assert.equal(communication.rendered.subject, "Your Publishing Payment Options for New Book Test");
     assert.doesNotMatch(communication.rendered.subject, /JMP-INT/);
     assert.match(communication.rendered.html, /J MERRILL PUBLISHING/);
-    assert.match(communication.rendered.html, /Choose Your Payment Option/);
+    assert.ok(communication.rendered.html.indexOf("Payment Options") < communication.rendered.html.indexOf("Choose Your Payment Option"));
     assert.match(communication.rendered.text, /JMP-INT-202608-ABC123/);
     assert.match(communication.rendered.text, /\$2,925\.00/);
     assert.match(communication.rendered.text, /\$3,042\.00 \+ applicable tax/);
     assert.equal(communication.sendApproval.templateMetadata.renderer, "JM1 Enterprise Communication Renderer");
     assert.equal(communication.negativeProof.rendererRecalculatesPricing, 0);
+  });
+
+  test("package-acceptance communication can render the new financing terminology and short subject", () => {
+    const preview = buildOfferPreview({
+      packageAcceptedEvent: packageEvent({
+        selectedPackageCode: PACKAGE_CODES.PROFESSIONAL,
+        title: "Indomitable",
+        intakeReferenceCode: "JMP-INT-202608-0AOS7L"
+      }),
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    const communication = renderPackageAcceptanceCommunication(preview, {
+      authorName: "Quanishia",
+      authorEmail: "quanishadockery7777@gmail.com",
+      title: "Indomitable",
+      subjectOverride: "Your Publishing Payment Options for Indomitable",
+      actionUrl: "https://jmerrill.pub/author/payment-options/indomitable",
+      approvedBy: "jackie"
+    });
+    assert.equal(communication.ok, true);
+    assert.equal(communication.rendered.subject, "Your Publishing Payment Options for Indomitable");
+    assert.match(communication.rendered.text, /Payment-plan charge/);
+    assert.match(communication.rendered.text, /There is no early-payoff penalty/);
+    assert.doesNotMatch(communication.rendered.text, /4% transaction fee/);
+    assert.ok(communication.rendered.text.indexOf("Payment Options") < communication.rendered.text.indexOf("Choose Your Payment Option"));
   });
 
   test("package-acceptance communication keeps referral selection pending and does not auto-consume credit", () => {

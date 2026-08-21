@@ -2,21 +2,26 @@
 
 const {
   PACKAGE_CATALOG,
-  PACKAGE_CODES,
-  PROCESSING_FEE_RATE
+  PACKAGE_CODES
 } = require("./milestone6BusinessSourceLayer");
+const {
+  LEGACY_PAYMENT_POLICY_VERSION,
+  NEW_FINANCING_POLICY_VERSION,
+  DEFAULT_PAYMENT_POLICY_VERSION,
+  PLAN_CONFIGS,
+  allocateCents,
+  buildPaymentPlans,
+  calculateEarlyPayoff,
+  formatUsd: formatPolicyUsd,
+  resolvePaymentPolicyVersion
+} = require("./paymentPolicyEngine");
 
 const PRICING_RULE_VERSION = "JMP_AUTHOR_LOYALTY_REFERRAL_v1.0";
-const PAYMENT_FEE_POLICY_VERSION = "JMP_MULTIPAY_TRANSACTION_FEE_4_PERCENT_v1.0";
+const PAYMENT_FEE_POLICY_VERSION = LEGACY_PAYMENT_POLICY_VERSION;
 const MAX_COMBINED_BENEFIT_PERCENT = 50;
 const REFERRAL_CREDIT_PERCENT = 10;
 
-const PAYMENT_PLANS = Object.freeze([
-  Object.freeze({ planCode: "FULL_PAY", paymentCount: 1, cadence: "single payment", multiPayFeeApplies: false }),
-  Object.freeze({ planCode: "2_PAY", paymentCount: 2, cadence: "monthly after first payment", multiPayFeeApplies: true }),
-  Object.freeze({ planCode: "4_PAY", paymentCount: 4, cadence: "monthly after first payment", multiPayFeeApplies: true }),
-  Object.freeze({ planCode: "8_PAY", paymentCount: 8, cadence: "monthly after first payment", multiPayFeeApplies: true })
-]);
+const PAYMENT_PLANS = PLAN_CONFIGS;
 
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -32,7 +37,7 @@ function usdFromCents(cents) {
 }
 
 function formatUsd(amountUsd) {
-  return `$${amountUsd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return formatPolicyUsd(amountUsd);
 }
 
 function resolvePackage(packageCode) {
@@ -73,60 +78,11 @@ function referralChoices({ returningPercent, referralCreditsAvailablePercent }) 
 }
 
 function allocateInstallmentPrincipalCents(totalCents, paymentCount) {
-  if (paymentCount <= 0) return [];
-  if (paymentCount === 1) return [totalCents];
-  const nominal = Math.round(totalCents / paymentCount);
-  const rows = Array.from({ length: paymentCount - 1 }, () => nominal);
-  rows.push(totalCents - nominal * (paymentCount - 1));
-  return rows;
+  return allocateCents(totalCents, paymentCount);
 }
 
-function buildPaymentPlan(adjustedPrincipalCents, plan) {
-  const principalRows = allocateInstallmentPrincipalCents(adjustedPrincipalCents, plan.paymentCount);
-  const installments = principalRows.map((principalCents, index) => {
-    const multiPayFeeCents = plan.multiPayFeeApplies
-      ? Math.round(principalCents * PROCESSING_FEE_RATE)
-      : 0;
-    const totalDueCents = principalCents + multiPayFeeCents;
-    return Object.freeze({
-      installmentNumber: index + 1,
-      principalCents,
-      principal: usdFromCents(principalCents),
-      principalFormatted: formatUsd(usdFromCents(principalCents)),
-      multiPayFeeCents,
-      multiPayFee: usdFromCents(multiPayFeeCents),
-      multiPayFeeFormatted: formatUsd(usdFromCents(multiPayFeeCents)),
-      taxStatus: "EXTERNAL",
-      taxCents: null,
-      tax: null,
-      totalDueCents,
-      totalDue: usdFromCents(totalDueCents),
-      totalDueFormatted: formatUsd(usdFromCents(totalDueCents))
-    });
-  });
-  const feeTotalCents = installments.reduce((sum, item) => sum + item.multiPayFeeCents, 0);
-  return Object.freeze({
-    planCode: plan.planCode,
-    paymentCount: plan.paymentCount,
-    cadence: plan.cadence,
-    multiPayFeePolicyVersion: PAYMENT_FEE_POLICY_VERSION,
-    multiPayFeeRate: plan.multiPayFeeApplies ? PROCESSING_FEE_RATE : 0,
-    principalTotalCents: adjustedPrincipalCents,
-    principalTotal: usdFromCents(adjustedPrincipalCents),
-    principalTotalFormatted: formatUsd(usdFromCents(adjustedPrincipalCents)),
-    multiPayFeeTotalCents: feeTotalCents,
-    multiPayFeeTotal: usdFromCents(feeTotalCents),
-    multiPayFeeTotalFormatted: formatUsd(usdFromCents(feeTotalCents)),
-    taxTreatment: "PENDING_EXTERNAL",
-    totalDueCents: adjustedPrincipalCents + feeTotalCents,
-    totalDue: usdFromCents(adjustedPrincipalCents + feeTotalCents),
-    totalDueFormatted: formatUsd(usdFromCents(adjustedPrincipalCents + feeTotalCents)),
-    installments
-  });
-}
-
-function buildPaymentOptions(adjustedPrincipalCents) {
-  return PAYMENT_PLANS.map((plan) => buildPaymentPlan(adjustedPrincipalCents, plan));
+function buildPaymentOptions(adjustedPrincipalCents, paymentPolicyVersion = DEFAULT_PAYMENT_POLICY_VERSION) {
+  return buildPaymentPlans(adjustedPrincipalCents, paymentPolicyVersion);
 }
 
 function evaluateReferralLedger(events = []) {
@@ -200,7 +156,8 @@ function calculateAuthorOffer(input = {}) {
   const basePackagePriceCents = packageInfo?.basePackagePriceCents || 0;
   const reductionCents = Math.round(basePackagePriceCents * combinedBenefitPercent / 100);
   const adjustedPackagePrincipalCents = Math.max(0, basePackagePriceCents - reductionCents);
-  const paymentOptions = buildPaymentOptions(adjustedPackagePrincipalCents);
+  const paymentPolicyVersion = resolvePaymentPolicyVersion(input.paymentPolicyVersion || input.paymentFeePolicyVersion);
+  const paymentOptions = buildPaymentOptions(adjustedPackagePrincipalCents, paymentPolicyVersion);
 
   if (errors.length) {
     return { ok: false, errors, pricingRuleVersion: PRICING_RULE_VERSION };
@@ -230,7 +187,9 @@ function calculateAuthorOffer(input = {}) {
     adjustedPackagePrincipalFormatted: formatUsd(usdFromCents(adjustedPackagePrincipalCents)),
     taxTreatment: "PENDING_EXTERNAL",
     pricingRuleVersion: normalizeString(input.pricingRuleVersion) || PRICING_RULE_VERSION,
-    paymentFeePolicyVersion: PAYMENT_FEE_POLICY_VERSION,
+    relationshipPricingRuleVersion: normalizeString(input.relationshipPricingRuleVersion) || PRICING_RULE_VERSION,
+    paymentPolicyVersion,
+    paymentFeePolicyVersion: paymentPolicyVersion,
     benefitCharacter: Object.freeze({
       cash: false,
       refundable: false,
@@ -253,6 +212,8 @@ function buildPricingSnapshot(offer, selection = {}) {
     immutable: true,
     snapshotStatus: "PRICING_LOCKED",
     pricingRuleVersion: offer.pricingRuleVersion,
+    relationshipPricingRuleVersion: offer.relationshipPricingRuleVersion || offer.pricingRuleVersion,
+    paymentPolicyVersion: offer.paymentPolicyVersion || offer.paymentFeePolicyVersion,
     paymentFeePolicyVersion: offer.paymentFeePolicyVersion,
     authorId: offer.authorId,
     titleId: offer.titleId,
@@ -285,6 +246,9 @@ function buildPricingSnapshot(offer, selection = {}) {
 module.exports = {
   PRICING_RULE_VERSION,
   PAYMENT_FEE_POLICY_VERSION,
+  LEGACY_PAYMENT_POLICY_VERSION,
+  NEW_FINANCING_POLICY_VERSION,
+  DEFAULT_PAYMENT_POLICY_VERSION,
   MAX_COMBINED_BENEFIT_PERCENT,
   REFERRAL_CREDIT_PERCENT,
   PAYMENT_PLANS,
@@ -292,6 +256,7 @@ module.exports = {
   calculateAuthorOffer,
   buildPaymentOptions,
   buildPricingSnapshot,
+  calculateEarlyPayoff,
   evaluateReferralLedger,
   formatUsd,
   returningAuthorPercent,

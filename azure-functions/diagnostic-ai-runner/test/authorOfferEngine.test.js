@@ -4,8 +4,11 @@ const { describe, test } = require("node:test");
 const assert = require("node:assert/strict");
 const {
   PACKAGE_CODES,
+  LEGACY_PAYMENT_POLICY_VERSION,
+  NEW_FINANCING_POLICY_VERSION,
   calculateAuthorOffer,
   buildPricingSnapshot,
+  calculateEarlyPayoff,
   evaluateReferralLedger,
   returningAuthorPercent,
   allocateInstallmentPrincipalCents
@@ -152,6 +155,80 @@ describe("payment-plan principal allocation and 4 percent fee rounding", () => {
   });
 });
 
+describe("versioned payment policies", () => {
+  test("legacy policy remains available for Atta-class contracts", () => {
+    const offer = calculateAuthorOffer({
+      packageCode: PACKAGE_CODES.STARTER,
+      paymentPolicyVersion: LEGACY_PAYMENT_POLICY_VERSION
+    });
+    assert.equal(offer.paymentPolicyVersion, LEGACY_PAYMENT_POLICY_VERSION);
+    assert.equal(plan(offer, "8_PAY").totalDueFormatted, "$2,078.99");
+    assert.equal(plan(offer, "8_PAY").multiPayFeeTotalFormatted, "$79.99");
+  });
+
+  test("new financing policy produces Model B study totals for all package levels", () => {
+    const starter = calculateAuthorOffer({ packageCode: PACKAGE_CODES.STARTER, paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION });
+    const professional = calculateAuthorOffer({ packageCode: PACKAGE_CODES.PROFESSIONAL, paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION });
+    const premier = calculateAuthorOffer({ packageCode: PACKAGE_CODES.PREMIER, paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION });
+
+    assert.equal(plan(starter, "2_PAY").totalDueFormatted, "$2,009.00");
+    assert.equal(plan(starter, "4_PAY").totalDueFormatted, "$2,028.99");
+    assert.equal(plan(starter, "8_PAY").totalDueFormatted, "$2,068.97");
+    assert.equal(plan(professional, "2_PAY").totalDueFormatted, "$4,522.50");
+    assert.equal(plan(professional, "4_PAY").totalDueFormatted, "$4,567.50");
+    assert.equal(plan(professional, "8_PAY").totalDueFormatted, "$4,657.50");
+    assert.equal(plan(premier, "2_PAY").totalDueFormatted, "$7,537.50");
+    assert.equal(plan(premier, "4_PAY").totalDueFormatted, "$7,612.50");
+    assert.equal(plan(premier, "8_PAY").totalDueFormatted, "$7,762.50");
+  });
+
+  test("new financing policy has no transaction fee and separates plan charge", () => {
+    const offer = calculateAuthorOffer({
+      packageCode: PACKAGE_CODES.PROFESSIONAL,
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    const eightPay = plan(offer, "8_PAY");
+    assert.equal(eightPay.multiPayFeeTotalFormatted, "$0.00");
+    assert.equal(eightPay.planChargeTotalFormatted, "$157.50");
+    assert.equal(eightPay.authorFacingChargeLabel, "Payment-plan charge");
+    assert.equal(eightPay.earlyPayoff.noPenalty, true);
+    assert.equal(eightPay.earlyPayoff.unearnedFutureChargeWaived, true);
+  });
+
+  test("new financing policy preserves loyalty/referral cap before payment policy", () => {
+    const offer = calculateAuthorOffer({
+      packageCode: PACKAGE_CODES.PROFESSIONAL,
+      priorEligibleTitleCount: 2,
+      referralCreditsAvailablePercent: 20,
+      referralCreditsRequestedPercent: 20,
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    assert.equal(offer.adjustedPackagePrincipalFormatted, "$2,925.00");
+    assert.equal(plan(offer, "8_PAY").planChargeTotalFormatted, "$102.38");
+    assert.equal(plan(offer, "8_PAY").totalDueFormatted, "$3,027.38");
+  });
+
+  test("early payoff waives unearned future plan charges with no penalty", () => {
+    const starter = calculateAuthorOffer({
+      packageCode: PACKAGE_CODES.STARTER,
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    const payoff = calculateEarlyPayoff({
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION,
+      selectedPlan: plan(starter, "8_PAY"),
+      originalPrincipalCents: starter.adjustedPackagePrincipalCents,
+      originalFinanceChargeCents: plan(starter, "8_PAY").financeChargeTotalCents,
+      paymentsMade: 4,
+      principalPaidCents: 99952
+    });
+    assert.equal(payoff.principalRemainingFormatted, "$999.48");
+    assert.equal(payoff.earnedChargeFormatted, "$29.99");
+    assert.equal(payoff.unearnedChargeWaivedFormatted, "$39.98");
+    assert.equal(payoff.earlyPayoffPenaltyFormatted, "$0.00");
+    assert.equal(payoff.payoffAmountFormatted, "$1,029.47");
+  });
+});
+
 describe("pricing snapshots", () => {
   test("locked snapshot preserves the title offer even if later referral balance changes", () => {
     const offer = calculateAuthorOffer({
@@ -173,6 +250,8 @@ describe("pricing snapshots", () => {
     });
     assert.equal(snapshot.ok, true);
     assert.equal(snapshot.immutable, true);
+    assert.equal(snapshot.relationshipPricingRuleVersion, "JMP_AUTHOR_LOYALTY_REFERRAL_v1.0");
+    assert.equal(snapshot.paymentPolicyVersion, LEGACY_PAYMENT_POLICY_VERSION);
     assert.equal(snapshot.adjustedPackagePrincipalCents, 292500);
     assert.equal(snapshot.referralCreditsAppliedPercent, 20);
     assert.equal(laterOffer.referralCreditsAppliedPercent, 35);

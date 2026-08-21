@@ -3,6 +3,11 @@
 const { describe, test } = require("node:test");
 const assert = require("node:assert/strict");
 const { computeAgreementFields, MANUSCRIPT_DEADLINE_TEXT } = require("../src/agreement/agreementFieldComputer");
+const {
+  calculateAuthorOffer,
+  buildPricingSnapshot,
+  NEW_FINANCING_POLICY_VERSION
+} = require("../src/author/authorOfferEngine");
 
 function baseInput(overrides = {}) {
   return {
@@ -180,5 +185,25 @@ describe("computeAgreementFields — single payment has no fee, multi-payment op
     assert.equal(computeAgreementFields(baseInput({ paymentOption: "TWO_PAYMENTS" })).paymentSchedule.requiresScheduleAAttachment, false);
     assert.equal(computeAgreementFields(baseInput({ paymentOption: "FOUR_PAYMENTS" })).paymentSchedule.requiresScheduleAAttachment, true);
     assert.equal(computeAgreementFields(baseInput({ paymentOption: "TWELVE_PAYMENTS" })).paymentSchedule.requiresScheduleAAttachment, true);
+  });
+
+  test("new financing policy disclosure consumes the immutable pricing snapshot", () => {
+    const offer = calculateAuthorOffer({
+      packageCode: "JMP-PKG-PRO",
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    const snapshot = buildPricingSnapshot(offer, { planCode: "8_PAY", lockedAt: "2026-08-21T10:00:00Z" });
+    const r = computeAgreementFields(baseInput({
+      paymentOption: "EIGHT_PAYMENTS",
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION,
+      pricingSnapshot: snapshot.snapshot
+    }));
+    assert.equal(r.ok, true);
+    assert.equal(r.paymentSchedule.paymentPolicyVersion, NEW_FINANCING_POLICY_VERSION);
+    assert.equal(r.paymentSchedule.totalFormatted, "$4,657.50");
+    assert.equal(r.paymentSchedule.planChargeTotalFormatted, "$157.50");
+    assert.equal(r.paymentSchedule.planChargeLabel, "Payment-plan charge");
+    assert.equal(r.paymentSchedule.earlyPayoff.noPenalty, true);
+    assert.equal(r.paymentSchedule.earlyPayoff.unearnedFutureChargeWaived, true);
   });
 });

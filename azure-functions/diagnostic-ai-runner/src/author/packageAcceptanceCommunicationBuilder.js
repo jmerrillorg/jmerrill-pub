@@ -53,15 +53,16 @@ function paymentOptionRows(offer) {
   return offer.paymentOptions.map((plan) => ({
     label: PLAN_LABELS[plan.planCode] || plan.planCode,
     principal: plan.principalTotalFormatted,
-    fee: plan.multiPayFeeTotalFormatted,
+    fee: plan.planChargeTotalFormatted || plan.multiPayFeeTotalFormatted,
     total: plan.totalDueFormatted,
+    feeLabel: plan.authorFacingChargeLabel || "Payment-plan charge",
     feeNote: plan.planCode === "FULL_PAY"
-      ? "No multi-pay transaction fee"
-      : "4% transaction fee included per installment",
+      ? (plan.authorFacingChargeLabel || "No payment-plan charge")
+      : `${plan.authorFacingChargeLabel || "Payment-plan charge"} included in the scheduled payments`,
     installments: plan.installments.map((row) => ({
       number: row.installmentNumber,
       principal: row.principalFormatted,
-      fee: row.multiPayFeeFormatted,
+      fee: row.planChargeFormatted || row.multiPayFeeFormatted,
       total: row.totalDueFormatted
     }))
   }));
@@ -72,13 +73,13 @@ function buildPaymentOptionsText(rows) {
     const lines = [
       `${row.label}: ${row.total} + applicable tax`,
       `  Principal: ${row.principal}`,
-      `  Multi-pay transaction fee: ${row.fee}`,
+      `  ${row.feeLabel}: ${row.fee}`,
       `  ${row.feeNote}`
     ];
     if (row.installments.length > 1) {
       lines.push("  Installments:");
       for (const installment of row.installments) {
-        lines.push(`    ${installment.number}. ${installment.principal} principal + ${installment.fee} fee = ${installment.total} + applicable tax`);
+        lines.push(`    ${installment.number}. ${installment.principal} principal + ${installment.fee} ${row.feeLabel.toLowerCase()} = ${installment.total} + applicable tax`);
       }
     }
     return lines;
@@ -153,7 +154,8 @@ function validatePackageAcceptanceCommunication(rendered, preview) {
   if (offer && offer.combinedBenefitPercent > 50) blockers.push("COMBINED_BENEFIT_OVER_50_PERCENT");
   if (preview?.liveActions?.mutatesReferralBalance !== false) blockers.push("REFERRAL_AUTO_CONSUMED");
   for (const plan of offer?.paymentOptions || []) {
-    if (!combined.includes(plan.totalDueFormatted) || !combined.includes(plan.principalTotalFormatted) || !combined.includes(plan.multiPayFeeTotalFormatted)) {
+    const chargeTotal = plan.planChargeTotalFormatted || plan.multiPayFeeTotalFormatted;
+    if (!combined.includes(plan.totalDueFormatted) || !combined.includes(plan.principalTotalFormatted) || !combined.includes(chargeTotal)) {
       blockers.push(`PAYMENT_OPTION_DIFFERS_FROM_ENGINE_${plan.planCode}`);
     }
   }
@@ -178,7 +180,7 @@ function renderPackageAcceptanceCommunication(preview, input = {}) {
   offer.title = title;
   const rows = paymentOptionRows(offer);
   const referralCopy = buildReferralCopy(preview);
-  const subject = `Your Publishing Payment Options for ${title}`;
+  const subject = normalizeString(input.subjectOverride) || `Your Publishing Payment Options for ${title}`;
   const returningLine = offer.returningAuthorPercent > 0
     ? `Because of your existing J Merrill Publishing relationship, your Returning Author Benefit of ${formatPercent(offer.returningAuthorPercent)} has already been included below.`
     : "No returning-author benefit applies to this preview.";
@@ -202,12 +204,15 @@ function renderPackageAcceptanceCommunication(preview, input = {}) {
     `Adjusted package principal: ${offer.adjustedPackagePrincipalFormatted}`,
     "Tax: plus applicable tax. Tax is not calculated in this preview.",
     "",
+    "Payment Options",
+    buildPaymentOptionsText(rows),
+    "",
+    "Pay off early",
+    "You may pay the remaining balance early at any time. There is no early-payoff penalty. Any unearned future payment-plan charges are not due after payoff.",
+    "",
     "What we need from you",
     referralInstruction,
     `Choose Your Payment Option: ${actionUrl}`,
-    "",
-    "Payment Options",
-    buildPaymentOptionsText(rows),
     "",
     "What happens next",
     "After your payment-plan selection, pricing locks from the same offer snapshot, the agreement/addendum uses that snapshot, and the payment arrangement is prepared. Your publishing engagement is complete only after agreement execution and the required initial payment are complete.",
@@ -248,9 +253,6 @@ function renderPackageAcceptanceCommunication(preview, input = {}) {
                 <p style="margin:0 0 12px;font-size:15px;line-height:1.55;">${escapeHtml(returningLine)}</p>
                 ${referralCopy.html}
                 <p style="margin:0 0 12px;font-size:15px;line-height:1.55;"><strong>Tax:</strong> plus applicable tax. Tax is not calculated in this preview.</p>
-                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">What we need from you</h2>
-                <p style="margin:0 0 18px;font-size:15px;line-height:1.55;">${escapeHtml(referralInstruction)}</p>
-                <p style="margin:20px 0;"><a href="${escapeHtml(actionUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;border-radius:4px;padding:12px 18px;font-weight:700;">Choose Your Payment Option</a></p>
                 <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">Payment Options</h2>
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;font-size:14px;line-height:1.45;">
                   <tr>
@@ -261,6 +263,11 @@ function renderPackageAcceptanceCommunication(preview, input = {}) {
                   </tr>
                   ${buildPaymentOptionsHtml(rows)}
                 </table>
+                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">Pay off early</h2>
+                <p style="margin:0 0 18px;font-size:15px;line-height:1.55;">You may pay the remaining balance early at any time. There is no early-payoff penalty. Any unearned future payment-plan charges are not due after payoff.</p>
+                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">What we need from you</h2>
+                <p style="margin:0 0 18px;font-size:15px;line-height:1.55;">${escapeHtml(referralInstruction)}</p>
+                <p style="margin:20px 0;"><a href="${escapeHtml(actionUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;border-radius:4px;padding:12px 18px;font-weight:700;">Choose Your Payment Option</a></p>
                 <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">What happens next</h2>
                 <p style="margin:0 0 18px;font-size:15px;line-height:1.55;">After your payment-plan selection, pricing locks from the same offer snapshot, the agreement/addendum uses that snapshot, and the payment arrangement is prepared. Your publishing engagement is complete only after agreement execution and the required initial payment are complete.</p>
                 <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">Support</h2>

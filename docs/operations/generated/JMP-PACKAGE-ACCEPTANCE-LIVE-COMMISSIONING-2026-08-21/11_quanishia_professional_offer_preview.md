@@ -54,6 +54,8 @@ Good-standing gap effect: no block for this offer preview because no available r
 
 ## Author Offer Engine Output
 
+Supersession note: this 4% multi-pay preview is prior evidence only. It is superseded for Quanishia Dockery / *Indomitable* by the founder override and `../JMP-FINANCING-MODEL-IMPLEMENTATION-2026-08-21/12_quanishia_offer_preview.md`. Do not send this prior preview to the author.
+
 Runtime source: `authorOfferEngine.js`.
 
 Pricing rule version: `JMP_AUTHOR_LOYALTY_REFERRAL_v1.0`.
@@ -90,4 +92,3 @@ Tax treatment: `PENDING_EXTERNAL`; plus applicable tax; tax not calculated in pr
 - Pricing locked before payment selection: 0
 - Stripe created before payment selection: 0
 - Author communication sent: 0
-

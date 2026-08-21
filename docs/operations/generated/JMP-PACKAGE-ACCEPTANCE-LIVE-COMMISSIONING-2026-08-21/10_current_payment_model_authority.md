@@ -4,7 +4,9 @@ Last verified: 2026-08-21T09:08:40Z
 
 ## Classification
 
-`NEW_FINANCING_MODEL_STILL_STUDY_ONLY`
+`SUPERSEDED_BY_FOUNDER_OVERRIDE`
+
+This file records the prior readback from the controlled commissioning pass. It is superseded for Quanishia Dockery / *Indomitable* by the 2026-08-21 founder override and the implementation evidence in `../JMP-FINANCING-MODEL-IMPLEMENTATION-2026-08-21/`.
 
 ## Evidence Sources
 
@@ -31,13 +33,12 @@ Last verified: 2026-08-21T09:08:40Z
 | Offer Engine support | PASS for `JMP_AUTHOR_LOYALTY_REFERRAL_v1.0` plus `JMP_MULTIPAY_TRANSACTION_FEE_4_PERCENT_v1.0`; no current implementation of future financing model |
 | Stripe support | Current package/product mapping exists; no Stripe implementation for future financing model located |
 | Atta grandfathering | Atta remains under `LEGACY_CURRENT_CONTRACT - 4% PER MULTI-PAY TRANSACTION`; Atta mutations in this pass: 0 |
-| Quanishia applicable model | Current implemented 4% multi-pay transaction-fee model |
+| Quanishia applicable model | `JMP_FINANCING_EARLY_PAYOFF_v1.0` after merge/deploy/validation under the founder override |
 
 ## Negative Proof
 
-- Future financing model canonized as current policy: 0
-- Future financing model implemented in Author Offer Engine: 0
-- Future financing model implemented in Stripe/payment runtime: 0
-- Future financing model applied to Quanishia: 0
+- Future financing model canonized as current policy: Superseded by later implementation evidence
+- Future financing model implemented in Author Offer Engine: Superseded by later implementation evidence
+- Future financing model implemented in Stripe/payment runtime: Superseded by later implementation evidence
+- Future financing model applied to Quanishia: Pending merge/deploy/validation/send gate
 - Atta mutation: 0
-

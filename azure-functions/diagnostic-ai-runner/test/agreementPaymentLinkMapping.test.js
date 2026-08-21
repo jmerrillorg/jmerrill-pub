@@ -11,6 +11,7 @@ const {
   GATE_NAME,
   PACKAGE_CODES
 } = require("../src/payment/agreementPaymentLinkMapping");
+const { NEW_FINANCING_POLICY_VERSION } = require("../src/author/authorOfferEngine");
 
 describe("GATE_NAME — reuses the existing dedicated gate", () => {
   test("matches JM1_AUTHOR_PAYMENT_LINK_SEND_ENABLED", () => {
@@ -156,5 +157,21 @@ describe("author-offer-backed Stripe amount adapter", () => {
     assert.equal(result.adjustedPackagePrincipalUsd, 2925);
     assert.equal(result.perInstallmentUsd, 1521);
     assert.equal(result.totalUsd, 3042);
+  });
+
+  test("new financing policy schedule is passed through for Stripe architecture without legacy fee math", () => {
+    const result = computeInstallmentStripeAmountFromAuthorOffer({
+      packageCode: PACKAGE_CODES.PROFESSIONAL,
+      paymentOptionCode: "EIGHT_PAYMENTS",
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.paymentPolicyVersion, NEW_FINANCING_POLICY_VERSION);
+    assert.equal(result.totalUsd, 4657.5);
+    assert.equal(result.planChargeTotalFormatted, "$157.50");
+    assert.equal(result.feeApplied, false);
+    assert.equal(result.planChargeApplied, true);
+    assert.equal(result.installmentSchedule[0].multiPayFee, 0);
+    assert.equal(result.installmentSchedule[0].planChargeFormatted, "$19.69");
   });
 });
