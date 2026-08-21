@@ -32,7 +32,7 @@ function validateContract(rendered, overrides = {}) {
 }
 
 function loadRelayModule() {
-  process.env.ACS_EMAIL_SENDER = 'DoNotReply@email.jmerrill.one'
+  process.env.ACS_EMAIL_SENDER = 'publishing@email.jmerrill.one'
   process.env.ACS_AUTHOR_RESPONSE_EMAIL_SENDER = 'publishing@email.jmerrill.one'
 
   const routes = {}

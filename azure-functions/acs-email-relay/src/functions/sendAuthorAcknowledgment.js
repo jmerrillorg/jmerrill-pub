@@ -10,11 +10,9 @@ const MAX_FIELD_LENGTH = 300;
 const MAX_BODY_LENGTH = 6000;
 const MAX_HTML_BODY_LENGTH = 50000;
 const ACS_PROVIDER_NAME = "acs-email";
-const ACS_SENDER = "DoNotReply@email.jmerrill.one";
-// Dedicated sender for author-facing approved responses only (Milestone 6
-// continuation communication and beyond). Separate from ACS_SENDER, which
-// remains DoNotReply for the unrelated intake-acknowledgment and internal-
-// notification sends — those are unaffected by this change.
+const ACS_SENDER = "publishing@email.jmerrill.one";
+// Canonical Publishing ACS sender for author-facing and Publishing-owned relay
+// messages. Reply capture remains the governed Publishing mailbox below.
 const AUTHOR_RESPONSE_SENDER = "publishing@email.jmerrill.one";
 const INTERNAL_VISIBILITY_MAILBOX = "publishing@jmerrill.one";
 const INTERNAL_NOTIFICATION_TYPE = "AUTHOR_DRAFT_READY_FOR_REVIEW";
@@ -262,6 +260,10 @@ function validatePayload(payload) {
   const projectTitle = normalizeText(payload.projectTitle) || DEFAULT_PROJECT_TITLE;
   const intakeChannel = safeTrim(payload.intakeChannel);
   const manuscriptUrl = normalizeBody(payload.manuscriptUrl);
+  const manuscriptChoice = normalizeText(payload.manuscriptChoice);
+  const manuscriptLifecycleState = normalizeText(payload.manuscriptLifecycleState);
+  const continuationUrl = normalizeBody(payload.continuationUrl);
+  const nextStep = normalizeBody(payload.nextStep);
 
   if (!reference || !REFERENCE_PATTERN.test(reference)) {
     return { ok: false, code: "INVALID_REFERENCE", reference };
@@ -292,9 +294,89 @@ function validatePayload(payload) {
       firstName,
       projectTitle,
       intakeChannel,
-      hasManuscriptLink: Boolean(manuscriptUrl)
+      hasManuscriptLink: Boolean(manuscriptUrl),
+      manuscriptChoice,
+      manuscriptLifecycleState,
+      continuationUrl,
+      nextStep
     }
   };
+}
+
+function escapeHtml(value) {
+  return safeTrim(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function isHttpsUrl(value) {
+  return /^https:\/\/[^\s]+$/i.test(safeTrim(value));
+}
+
+function buildAcknowledgmentCopy(payload) {
+  if (payload.manuscriptLifecycleState === "NORMALIZATION_PENDING") {
+    return {
+      statusHeading: "We received your inquiry and manuscript file.",
+      statusText: "Your manuscript is being prepared for Editorial Review. We will let you know if we need anything else before review can continue.",
+      actionHeading: "What we need from you",
+      actionText: "No action is needed from you right now."
+    };
+  }
+
+  if (payload.hasManuscriptLink) {
+    return {
+      statusHeading: "We received your inquiry and manuscript link.",
+      statusText: "Your manuscript is connected to your inquiry. Our team will prepare it for the right Editorial Review step and follow up with the next clear action.",
+      actionHeading: "What we need from you",
+      actionText: "No action is needed from you right now unless we contact you for an updated file or access correction."
+    };
+  }
+
+  const hasContinuation = isHttpsUrl(payload.continuationUrl);
+  return {
+    statusHeading: "We received your inquiry.",
+    statusText: "We do not yet have a manuscript file or shareable manuscript link connected to this inquiry.",
+    actionHeading: "What we need from you",
+    actionText: hasContinuation
+      ? "When your manuscript is ready, use the secure continuation link below to add it. Editorial Review cannot begin until the manuscript is connected."
+      : "When your manuscript is ready, reply to this message with the file attached or with a shareable manuscript link. Editorial Review cannot begin until the manuscript is connected.",
+    ctaLabel: hasContinuation ? "Add Your Manuscript" : "",
+    ctaUrl: hasContinuation ? payload.continuationUrl : ""
+  };
+}
+
+function validatePublishingAcknowledgmentEmail(email, payload) {
+  const text = email.content?.plainText || "";
+  const html = email.content?.html || "";
+  const subject = email.content?.subject || "";
+  const projectTitle = payload.projectTitle || DEFAULT_PROJECT_TITLE;
+
+  if (email.senderAddress !== ACS_SENDER) return { ok: false, reason: "FROM_NOT_CANONICAL" };
+  if (!Array.isArray(email.replyTo) || email.replyTo[0]?.address !== INTERNAL_VISIBILITY_MAILBOX) {
+    return { ok: false, reason: "REPLY_TO_NOT_CANONICAL" };
+  }
+  if (subject.includes(payload.reference) || REFERENCE_PATTERN.test(subject) || DIAGNOSTIC_ID_PATTERN.test(subject)) {
+    return { ok: false, reason: "SUBJECT_EXPOSES_INTERNAL_REFERENCE" };
+  }
+  if (!subject.includes(projectTitle) || !/^We Received Your Publishing Inquiry for /i.test(subject)) {
+    return { ok: false, reason: "SUBJECT_NOT_HUMAN_FIRST" };
+  }
+  if (!html || !/^<!doctype html>/i.test(html) || !html.includes("J MERRILL PUBLISHING")) {
+    return { ok: false, reason: "CANONICAL_HTML_MISSING" };
+  }
+  if (!text.includes(payload.reference) || !html.includes(escapeHtml(payload.reference))) {
+    return { ok: false, reason: "BODY_REFERENCE_MISSING" };
+  }
+  if (/Author Workspace|author\/portal/i.test(`${html}\n${text}`)) {
+    return { ok: false, reason: "PROSPECT_STAGE_WORKSPACE_LINK_BLOCKED" };
+  }
+  if (/\b(Dataverse|execution log|workflow record|internal instruction|package manifest|evidence file)\b/i.test(`${html}\n${text}`)) {
+    return { ok: false, reason: "INTERNAL_LANGUAGE_BLOCKED" };
+  }
+  return { ok: true };
 }
 
 function buildAcknowledgmentEmail(payload) {
@@ -306,30 +388,36 @@ function buildAcknowledgmentEmail(payload) {
     });
   }
 
-  const subject = `We received your publishing inquiry — ${payload.reference}`;
-  const manuscriptCopy = payload.hasManuscriptLink
-    ? [
-        "We received your manuscript link with your inquiry. Our Editorial Review Team will begin evaluating the material you provided and the story details you shared.",
-        "",
-        "If we need anything else before review can continue, we will let you know."
-      ]
-    : [
-        "We did not receive a manuscript file or shareable manuscript link with your inquiry.",
-        "",
-        "Please reply with your manuscript attached or with a shareable manuscript link when it is ready. Editorial review will begin as soon as we receive access to the manuscript."
-      ];
+  const projectTitle = payload.projectTitle || DEFAULT_PROJECT_TITLE;
+  const subject = `We Received Your Publishing Inquiry for ${projectTitle}`;
+  const copy = buildAcknowledgmentCopy(payload);
+  const ctaText = copy.ctaLabel && copy.ctaUrl ? [`${copy.ctaLabel}: ${copy.ctaUrl}`, ""] : [];
   const plainText = [
     `Good day ${payload.firstName},`,
     "",
     "Thank you for reaching out to J Merrill Publishing and trusting us with the first step of your publishing journey.",
     "",
-    `We received your inquiry for ${payload.projectTitle}, and your reference number is:`,
+    `Book / project: ${projectTitle}`,
+    "",
+    "Why you are receiving this:",
+    "We received your publishing inquiry and are confirming the next step.",
+    "",
+    "Reference for your records:",
     "",
     payload.reference,
     "",
-    ...manuscriptCopy,
+    "What has happened:",
+    copy.statusText,
     "",
-    "Your book is more than a project. It carries your story, your voice, and the people you hope to reach. Our team will review the details you shared and follow up within 7–10 business days with the next right step.",
+    `${copy.actionHeading}:`,
+    copy.actionText,
+    "",
+    ...ctaText,
+    ...(payload.nextStep ? ["Next step:", payload.nextStep, ""] : []),
+    "What happens next:",
+    "Our team will review the details you shared and follow up within 7-10 business days with the next right step.",
+    "",
+    "Your book is more than a project. It carries your story, your voice, and the people you hope to reach.",
     "",
     "Please keep this reference number for your records.",
     "",
@@ -339,13 +427,57 @@ function buildAcknowledgmentEmail(payload) {
     "Helping Authors Help Themselves",
     "https://jmerrill.pub"
   ].join("\n");
+  const html = `<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:0;background:#f6f7f9;color:#1f2933;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f6f7f9;padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="640" cellspacing="0" cellpadding="0" style="max-width:640px;width:100%;background:#ffffff;border:1px solid #d9dee7;">
+            <tr>
+              <td style="background:#162033;color:#ffffff;padding:24px 28px;">
+                <div style="font-size:13px;letter-spacing:.08em;font-weight:700;">J MERRILL PUBLISHING</div>
+                <div style="font-size:12px;color:#cbd5e1;margin-top:6px;">A Division of J Merrill One</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px;">
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Good day ${escapeHtml(payload.firstName)},</p>
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Thank you for reaching out to J Merrill Publishing and trusting us with the first step of your publishing journey.</p>
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;"><strong>Book / project:</strong> ${escapeHtml(projectTitle)}</p>
+                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#162033;">Why you are receiving this</h2>
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">We received your publishing inquiry and are confirming the next step.</p>
+                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#162033;">What has happened</h2>
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;"><strong>${escapeHtml(copy.statusHeading)}</strong> ${escapeHtml(copy.statusText)}</p>
+                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#162033;">What we need from you</h2>
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">${escapeHtml(copy.actionText)}</p>
+                ${copy.ctaLabel && copy.ctaUrl ? `<p style="margin:24px 0;"><a href="${escapeHtml(copy.ctaUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;border-radius:4px;padding:12px 18px;font-weight:700;">${escapeHtml(copy.ctaLabel)}</a></p>` : ""}
+                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#162033;">What happens next</h2>
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Our team will review the details you shared and follow up within 7-10 business days with the next right step.</p>
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Please keep this reference number for your records: <strong>${escapeHtml(payload.reference)}</strong></p>
+                <p style="margin:24px 0 0;font-size:16px;line-height:1.55;">With care,<br>J Merrill Publishing<br><span style="color:#4b5563;">Helping Authors Help Themselves</span></p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
 
-  return {
+  const email = {
     senderAddress,
     content: {
       subject,
-      plainText
+      plainText,
+      html
     },
+    replyTo: [
+      {
+        address: INTERNAL_VISIBILITY_MAILBOX,
+        displayName: "J Merrill Publishing"
+      }
+    ],
     recipients: {
       to: [
         {
@@ -359,6 +491,15 @@ function buildAcknowledgmentEmail(payload) {
       }))
     }
   };
+
+  const validation = validatePublishingAcknowledgmentEmail(email, payload);
+  if (!validation.ok) {
+    throw Object.assign(new Error("Publishing acknowledgment failed canon validation."), {
+      safeCode: validation.reason
+    });
+  }
+
+  return email;
 }
 
 function validateCommonMilestoneFields(payload) {
