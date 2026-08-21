@@ -1,6 +1,10 @@
 import type { NormalizedPublishingIntake } from './schema'
 import { PUBLISHING_EMAIL_CANON, ensurePublishingAuthorEmailCc } from '@/lib/server/publishing-email-canon'
 
+type AcknowledgmentIntake = NormalizedPublishingIntake & {
+  continuationUrl?: string
+}
+
 type AuthorAcknowledgmentResult =
   | { status: 'sent' }
   | { status: 'skipped'; reason: 'relay_configuration_missing' }
@@ -9,7 +13,7 @@ type AuthorAcknowledgmentResult =
 const RELAY_ROUTE = 'send-author-acknowledgment'
 
 export async function sendJoinAuthorAcknowledgment(
-  intake: NormalizedPublishingIntake,
+  intake: AcknowledgmentIntake,
 ): Promise<AuthorAcknowledgmentResult> {
   const config = getRelayConfig()
   if (!config.ok) return { status: 'skipped', reason: 'relay_configuration_missing' }
@@ -40,7 +44,7 @@ export async function sendJoinAuthorAcknowledgment(
   }
 }
 
-function buildAuthorAcknowledgmentPayload(intake: NormalizedPublishingIntake) {
+function buildAuthorAcknowledgmentPayload(intake: AcknowledgmentIntake) {
   return {
     reference: intake.reference,
     to: intake.email,
@@ -50,7 +54,24 @@ function buildAuthorAcknowledgmentPayload(intake: NormalizedPublishingIntake) {
     projectTitle: intake.bookTitle,
     intakeChannel: intake.intakeChannel,
     manuscriptUrl: intake.manuscriptUrl || null,
+    manuscriptChoice: intake.manuscriptSubmissionChoice,
+    manuscriptLifecycleState: intake.manuscriptLifecycleState,
+    waitingOn: intake.waitingOn,
+    continuationUrl: intake.continuationUrl || null,
+    nextStep: authorFacingNextStep(intake),
   }
+}
+
+function authorFacingNextStep(intake: AcknowledgmentIntake) {
+  if (intake.manuscriptSubmissionChoice === 'later') {
+    return 'Your inquiry has been received. Please use the secure continuation link to add the manuscript when you are ready; Editorial Review cannot begin until a manuscript is connected.'
+  }
+
+  if (intake.manuscriptLifecycleState === 'NORMALIZATION_PENDING') {
+    return 'Your inquiry and manuscript have been received. JMP is preparing the manuscript file for Editorial Review.'
+  }
+
+  return 'Your inquiry and manuscript have been received. JMP will review the project and keep you informed about the next step.'
 }
 
 function getRelayConfig(): { ok: true; value: { relayUrl: string; relayKey: string } } | { ok: false } {
