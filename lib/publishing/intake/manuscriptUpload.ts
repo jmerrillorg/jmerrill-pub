@@ -73,7 +73,7 @@ export type ManuscriptLinkVerificationResult =
   | { status: 'usable'; manuscriptUrl: string }
   | { status: 'failed'; reason: 'inaccessible_link' | 'invalid_link' | 'unsafe_link' | 'link_check_timeout' }
 
-type ManuscriptFileExtension = 'docx' | 'doc' | 'pages' | 'rtf' | 'pdf' | 'md'
+type ManuscriptFileExtension = 'docx' | 'doc' | 'pages' | 'rtf' | 'pdf'
 type ManuscriptReviewFlag = 'preferred_editable' | 'cleanup_required' | 'normalization_required' | 'review_only'
 type ManuscriptUploadErrorCode =
   | 'empty_file'
@@ -119,7 +119,6 @@ const EXTENSION_FLAGS: Record<ManuscriptFileExtension, ManuscriptReviewFlag> = {
   pages: 'normalization_required',
   rtf: 'preferred_editable',
   pdf: 'review_only',
-  md: 'preferred_editable',
 }
 
 export function validateManuscriptUploadCandidate(candidate: ManuscriptUploadCandidate): ManuscriptUploadValidation {
@@ -590,8 +589,7 @@ function getAllowedExtension(fileName: string): ManuscriptFileExtension | null {
     extension === 'doc' ||
     extension === 'pages' ||
     extension === 'rtf' ||
-    extension === 'pdf' ||
-    extension === 'md'
+    extension === 'pdf'
   ) return extension
   return null
 }
