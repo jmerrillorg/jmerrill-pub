@@ -47,10 +47,11 @@ const CHECKS = {
 
 const FORMER_AUTHOR_PORTAL_FALLBACK = 'jm1-author-portal-session'
 
-export function GET() {
+export async function GET() {
   const dependencies = Object.fromEntries(
     Object.entries(CHECKS).map(([name, keys]) => [name, dependencyHealth(keys)]),
-  ) as Record<keyof typeof CHECKS, DependencyHealth>
+  ) as Record<keyof typeof CHECKS | 'relayHost', DependencyHealth>
+  dependencies.relayHost = await relayHostHealth()
 
   const paymentGate = String(process.env.JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED || '').toLowerCase() === 'true'
     ? 'enabled'
@@ -108,5 +109,51 @@ function dependencyHealth(required: readonly string[]): DependencyHealth {
     required: [...required],
     present,
     missing,
+  }
+}
+
+async function relayHostHealth(): Promise<DependencyHealth> {
+  const required = ['JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL'] as const
+  const baseUrl = process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL?.trim().replace(/\/+$/, '')
+  if (!baseUrl) return { status: 'degraded', required: [...required], present: [], missing: [...required] }
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 3500)
+
+  try {
+    const response = await fetch(`${baseUrl}/api/send-author-acknowledgment`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: '{}',
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+    const contentType = response.headers.get('content-type') || ''
+    const handlerAuthReached = response.status === 401 && contentType.includes('application/json')
+
+    return {
+      status: handlerAuthReached ? 'ready' : 'degraded',
+      required: [...required],
+      present: [...required],
+      missing: [],
+      notes: [
+        handlerAuthReached
+          ? 'relay_handler_reachable_unauthorized_probe'
+          : `relay_probe_unexpected_status:${response.status}`,
+      ],
+    }
+  } catch (error) {
+    return {
+      status: 'degraded',
+      required: [...required],
+      present: [...required],
+      missing: [],
+      notes: [`relay_probe_exception:${error instanceof Error ? error.name : 'unknown'}`],
+    }
+  } finally {
+    clearTimeout(timeout)
   }
 }

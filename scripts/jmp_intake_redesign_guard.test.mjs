@@ -14,6 +14,7 @@ const emailBindingRoute = readFileSync(new URL('../app/api/publisher/operating-c
 const acknowledgment = readFileSync(new URL('../lib/publishing/intake/authorAcknowledgment.ts', import.meta.url), 'utf8')
 const publisher = readFileSync(new URL('../lib/server/publisher-operating-center.ts', import.meta.url), 'utf8')
 const publisherClient = readFileSync(new URL('../app/publisher/_components/PublisherOperatingCenterClient.tsx', import.meta.url), 'utf8')
+const healthRoute = readFileSync(new URL('../app/api/health/route.ts', import.meta.url), 'utf8')
 
 test('JMP /join keeps founder-approved manuscript formats', () => {
   for (const extension of ['.docx', '.doc', '.pages', '.rtf', '.pdf']) {
@@ -84,6 +85,13 @@ test('JMP intake persists durable author acknowledgment state and exposes queue 
   assert.match(publisher, /systemAttentionFlag/)
   assert.match(publisherClient, /item\.acknowledgmentState !== 'AUTHOR_ACK_SENT'/)
   assert.match(publisherClient, /item\.systemAttentionFlag/)
+})
+
+test('JMP health checks relay handler reachability, not just relay config presence', () => {
+  assert.match(healthRoute, /relayHostHealth/)
+  assert.match(healthRoute, /send-author-acknowledgment/)
+  assert.match(healthRoute, /response\.status === 401/)
+  assert.match(healthRoute, /relay_handler_reachable_unauthorized_probe/)
 })
 
 test('JMP intake supports governed email manuscript binding', () => {
