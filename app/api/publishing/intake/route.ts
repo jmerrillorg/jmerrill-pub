@@ -4,12 +4,18 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import {
+  buildContinuationUrl,
+  createIntakeContinuationToken,
+  type IntakeContinuationClaims,
+} from '@/lib/publishing/intake/continuation'
+import {
   classifyRecoverableFailure,
   enqueuePublishingIntakeDeadLetter,
   enqueuePublishingIntakeRecovery,
 } from '@/lib/publishing/intake/deadLetter'
 import { sendJoinAuthorAcknowledgment } from '@/lib/publishing/intake/authorAcknowledgment'
 import {
+  findPublishingIntakeByIdempotencyKey,
   markPublishingIntakeAcknowledgmentSent,
   writePublishingIntakeWithRetry,
 } from '@/lib/publishing/intake/dataverse'
@@ -36,7 +42,7 @@ import { autoInitializeOutsideInquiryEditorialReview } from '@/lib/server/publis
 export const dynamic = 'force-dynamic'
 
 type IntakeResponseBody =
-  | { status: 'received'; reference: string }
+  | { status: 'received'; reference: string; continuationUrl?: string }
   | { status: 'invalid'; code: 'validation_failed'; errors: IntakeValidationError[] }
   | { status: 'duplicate' }
   | { status: 'rate_limited' }
@@ -186,6 +192,18 @@ async function handlePublishingIntakePost(req: NextRequest) {
   }
 
   const submittedManuscriptUrl = validation.data.manuscriptUrl
+  if (validation.data.manuscriptSubmissionChoice === 'now' && !manuscriptFile && !submittedManuscriptUrl) {
+    return json(
+      {
+        status: 'invalid',
+        code: 'validation_failed',
+        errors: [{ field: 'manuscriptSubmissionChoice', message: 'Upload a manuscript file or provide a manuscript link, or choose to send the manuscript later.' }],
+      },
+      400,
+      originResult.origin,
+    )
+  }
+
   if (submittedManuscriptUrl && !manuscriptFile) {
     const linkVerification = await verifyShareableManuscriptLink(submittedManuscriptUrl)
     if (linkVerification.status !== 'usable') {
@@ -203,7 +221,25 @@ async function handlePublishingIntakePost(req: NextRequest) {
 
   const replay = getIdempotencyReplay(validation.data.idempotencyKey)
   if (replay) {
-    return json({ status: 'duplicate' }, 409, originResult.origin)
+    return json({ status: 'received', reference: replay.reference }, 201, originResult.origin)
+  }
+
+  const durableReplay = await findPublishingIntakeByIdempotencyKey(validation.data.idempotencyKey)
+  if (durableReplay.status === 'found') {
+    rememberIdempotencyKey(validation.data.idempotencyKey, durableReplay.reference)
+    return json({ status: 'received', reference: durableReplay.reference }, 201, originResult.origin)
+  }
+
+  if (durableReplay.status === 'failed' && process.env.NODE_ENV === 'production') {
+    console.error('Publishing intake idempotency lookup failed before acceptance.', {
+      reason: durableReplay.reason,
+    })
+
+    return json(
+      buildErrorResponse('dataverse_write_failed', sanitizeDiagnosticDetail(durableReplay.reason)),
+      durableReplay.retryable ? 503 : 500,
+      originResult.origin,
+    )
   }
 
   const reference = generateIntakeReference()
@@ -230,6 +266,13 @@ async function handlePublishingIntakePost(req: NextRequest) {
         ...intake,
         manuscriptUrl: workspace.manuscriptUrl,
         manuscriptReceived: true,
+        manuscriptLifecycleState: workspace.reviewFlag === 'normalization_required'
+          ? 'NORMALIZATION_PENDING'
+          : 'UPLOADED',
+        prospectState: workspace.reviewFlag === 'normalization_required'
+          ? 'NORMALIZATION_PENDING'
+          : 'MANUSCRIPT_RECEIVED',
+        waitingOn: workspace.reviewFlag === 'normalization_required' ? 'JMP/System' : 'JMP',
         workspaceUrl: workspace.workspaceUrl,
         workspaceFolderId: workspace.workspaceFolderId,
       }
@@ -238,6 +281,9 @@ async function handlePublishingIntakePost(req: NextRequest) {
       acceptedIntake = {
         ...intake,
         manuscriptReceived: true,
+        manuscriptLifecycleState: 'UPLOADED',
+        prospectState: 'MANUSCRIPT_RECEIVED',
+        waitingOn: 'JMP',
         workspaceUrl: workspace.status === 'created' ? workspace.workspaceUrl : undefined,
         workspaceFolderId: workspace.status === 'created' ? workspace.workspaceFolderId : undefined,
       }
@@ -269,9 +315,15 @@ async function handlePublishingIntakePost(req: NextRequest) {
   const dataverse = await writePublishingIntakeWithRetry(acceptedIntake)
   if (dataverse.status === 'success' || dataverse.status === 'skipped') {
     rememberIdempotencyKey(acceptedIntake.idempotencyKey, reference)
+    const continuation = dataverse.status === 'success' && dataverse.recordId && acceptedIntake.manuscriptSubmissionChoice === 'later'
+      ? buildContinuation(dataverse.recordId, acceptedIntake.reference)
+      : null
+    const acceptedWithContinuation = continuation
+      ? { ...acceptedIntake, continuationUrl: continuation.url }
+      : acceptedIntake
 
     const notification = await sendJoinInternalNotification(
-      acceptedIntake,
+      acceptedWithContinuation,
       dataverse.status === 'success' ? { recordId: dataverse.recordId } : undefined,
     )
     if (notification.status !== 'sent') {
@@ -296,7 +348,7 @@ async function handlePublishingIntakePost(req: NextRequest) {
       })
     }
 
-    const acknowledgment = await sendJoinAuthorAcknowledgment(acceptedIntake)
+    const acknowledgment = await sendJoinAuthorAcknowledgment(acceptedWithContinuation)
     if (acknowledgment.status !== 'sent') {
       const acknowledgmentFailure = acknowledgment.status === 'failed'
         ? acknowledgment.reason
@@ -342,7 +394,11 @@ async function handlePublishingIntakePost(req: NextRequest) {
       }
     }
 
-    if (dataverse.status === 'success' && dataverse.recordId) {
+    if (
+      dataverse.status === 'success' &&
+      dataverse.recordId &&
+      (acceptedIntake.manuscriptReceived === true || Boolean(acceptedIntake.manuscriptUrl))
+    ) {
       try {
         const orchestration = await autoInitializeOutsideInquiryEditorialReview({
           intakeId: dataverse.recordId,
@@ -387,7 +443,15 @@ async function handlePublishingIntakePost(req: NextRequest) {
       }
     }
 
-    return json({ status: 'received', reference }, 201, originResult.origin)
+    return json(
+      {
+        status: 'received',
+        reference,
+        ...(continuation ? { continuationUrl: continuation.url } : {}),
+      },
+      201,
+      originResult.origin,
+    )
   }
 
   const deadLetter = await enqueuePublishingIntakeDeadLetter(acceptedIntake, dataverse.reason)
@@ -414,6 +478,17 @@ async function handlePublishingIntakePost(req: NextRequest) {
     diagnostics.httpStatus,
     originResult.origin,
   )
+}
+
+function buildContinuation(intakeId: string, reference: string): { claims: IntakeContinuationClaims; url: string } | null {
+  const token = createIntakeContinuationToken({ intakeId, reference })
+  const verification = token ? buildContinuationUrl(token) : ''
+  if (!verification) return null
+  const parsed = token.split('.')[1]
+  const claims = parsed
+    ? JSON.parse(Buffer.from(parsed, 'base64url').toString('utf8')) as IntakeContinuationClaims
+    : null
+  return claims ? { claims, url: verification } : null
 }
 
 async function parseIntakeRequest(req: NextRequest): Promise<ParsedIntakeRequest> {
@@ -450,7 +525,16 @@ async function parseIntakeRequest(req: NextRequest): Promise<ParsedIntakeRequest
 
 function coerceMultipartValue(key: string, value: string): unknown {
   if (key === 'wordCount') return Number.parseInt(value, 10)
-  if (key === 'consent') return value === 'true'
+  if ([
+    'consent',
+    'serviceCommunicationConsent',
+    'rightsAttestation',
+    'marketingConsent',
+    'billingSameAsMailing',
+    'referred',
+  ].includes(key)) {
+    return value === 'true'
+  }
   return value
 }
 
@@ -492,7 +576,7 @@ function manuscriptLinkError(reason: string) {
     return 'We could not confirm this manuscript link before the request timed out. Please upload the file or provide a reachable share link.'
   }
 
-  return 'Provide a reachable manuscript link, or upload a .docx, .doc, .pdf, or .md file.'
+  return 'Provide a reachable manuscript link, or upload a .docx, .doc, .pages, .rtf, or .pdf file.'
 }
 
 function buildErrorResponse(code: IntakeErrorCode, detail: string, reference?: string): IntakeErrorResponse {
@@ -569,7 +653,7 @@ function getAllowedOrigins() {
       : []),
   ]
 
-  return new Set(configured?.length ? configured : defaults)
+  return new Set([...defaults, ...(configured || [])])
 }
 
 function corsHeaders(origin?: string | null) {

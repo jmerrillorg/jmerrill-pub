@@ -1376,7 +1376,7 @@ function assertLinkedContact(intake: DataverseRow) {
 async function getRecentIntakes(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1_publishingintakes', {
     $select:
-      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_intakestatus,jm1_workspacestatus,jm1_stageatsubmission,jm1_stage0handoffstatus,jm1_stage0handoffcreated,_jm1_stage0diagnostic_value,_jm1_linkedcontact_value,_jm1_linkedlead_value,_jm1_lead_value,_jm1_opportunity_value,createdon,modifiedon',
+      'jm1_publishingintakeid,jm1_name,jm1_firstname,jm1_lastname,jm1_email,jm1_projecttitle,jm1_intakereferencecode,jm1_manuscripturl,jm1_submissionurl,jm1_manuscriptreceived,jm1_intakestatus,jm1_workspacestatus,jm1_stageatsubmission,jm1_stage0handoffstatus,jm1_stage0handoffcreated,jm1_additionalnotes,_jm1_stage0diagnostic_value,_jm1_linkedcontact_value,_jm1_linkedlead_value,_jm1_lead_value,_jm1_opportunity_value,createdon,modifiedon',
     $orderby: 'createdon desc',
     $top: '40',
   })
@@ -1497,6 +1497,7 @@ function buildQueueItem(
   )
   const sourceLocation = stringValue(intake.jm1_manuscripturl || intake.jm1_submissionurl)
   const hasManuscript = intake.jm1_manuscriptreceived === true || Boolean(sourceLocation)
+  const intakeNotes = stringValue(intake.jm1_additionalnotes)
   const hasContact = Boolean(dataverseLookupId(intake, '_jm1_linkedcontact_value'))
   const stage0RequiresJackie = stage0RequiresJackieGate(diagnostic, { hasManuscript })
   const currentStage = dataverseFormatted(title || {}, 'jm1pub_stage') || 'Intake'
@@ -1513,7 +1514,10 @@ function buildQueueItem(
         latestAction: latestActionType,
       })
     : undefined
-  const currentBlocker = deriveQueueBlocker(
+  const currentBlocker = deriveIntakeSpecificBlocker(
+    intakeNotes,
+    hasManuscript,
+    deriveQueueBlocker(
     editorialWorkloadState,
     deriveBlocker({
       hasManuscript,
@@ -1524,6 +1528,7 @@ function buildQueueItem(
       hasEditorialStage,
       stage0RequiresJackie,
     }),
+    ),
   )
   const authorizedActions = buildAuthorizedActions(currentBlocker, hasContact)
   const recommendedNextAction =
@@ -1610,6 +1615,18 @@ function buildQueueItem(
     sharePointLink: sourceLocation,
     authorizedActions,
   }
+}
+
+function deriveIntakeSpecificBlocker(intakeNotes: string, hasManuscript: boolean, fallback: string) {
+  if (hasManuscript && /NORMALIZATION_PENDING|normalization_required|format=pages|format=pdf|format=doc/i.test(intakeNotes)) {
+    return 'Manuscript normalization pending'
+  }
+
+  if (/NOTIFICATION.*FAILED|notification_failed/i.test(intakeNotes)) {
+    return 'Notification failure requires retry'
+  }
+
+  return fallback
 }
 
 function buildWorkloadItems(

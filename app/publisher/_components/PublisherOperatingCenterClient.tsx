@@ -54,6 +54,16 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     if (filter === 'publisher') return items.filter((item) => item.actionOwner === 'publisher')
     if (filter === 'blocked') return items.filter((item) => item.holdReason)
     if (filter === 'editorial') return items.filter((item) => item.currentStage === 'Editorial')
+    if (filter === 'new') return items.filter((item) => item.ageDays <= 1)
+    if (filter === 'unacknowledged') return items.filter((item) => !item.latestExecutionEvidence?.includes('ACKNOWLEDG'))
+    if (filter === 'manuscript-pending') return items.filter((item) => item.currentBlocker === 'Source manuscript/material evidence is missing')
+    if (filter === 'normalization-pending') return items.filter((item) => item.currentBlocker.toLowerCase().includes('normalization'))
+    if (filter === 'editorial-ready') return items.filter((item) => item.currentBlocker === 'Editorial Review ready')
+    if (filter === 'editorial-aging') return items.filter((item) => item.currentStage === 'Editorial' && item.ageDays >= 3)
+    if (filter === 'recommendation-pending') return items.filter((item) => item.currentBlocker.toLowerCase().includes('recommendation'))
+    if (filter === 'notification-failed') return items.filter((item) => item.latestExecutionEvidence?.includes('NOTIFICATION') && item.latestExecutionEvidence.includes('FAILED'))
+    if (filter === 'system-attention') return items.filter((item) => item.actionOwner === 'system' || item.currentBlocker.toLowerCase().includes('system'))
+    if (filter === 'stale') return items.filter((item) => item.overdueState === 'overdue' || item.overdueState === 'stalled')
     return items
   }, [filter, snapshot])
 
@@ -887,6 +897,16 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
           {[
             ['all', 'All assets'],
             ['proof', 'Proof assets'],
+            ['new', 'New'],
+            ['unacknowledged', 'Unacknowledged'],
+            ['manuscript-pending', 'Manuscript Pending'],
+            ['normalization-pending', 'Normalization Pending'],
+            ['editorial-ready', 'Editorial Ready'],
+            ['editorial-aging', 'Editorial Aging'],
+            ['recommendation-pending', 'Recommendation Pending'],
+            ['notification-failed', 'Notification Failed'],
+            ['system-attention', 'System Attention'],
+            ['stale', 'Stale Inquiry'],
             ['publisher', 'Publisher action'],
             ['blocked', 'Dependency Holds'],
             ['editorial', 'Editorial'],

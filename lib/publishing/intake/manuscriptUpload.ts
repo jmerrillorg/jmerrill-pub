@@ -25,6 +25,46 @@ export type ManuscriptUploadResult =
   | { status: 'skipped'; reason: 'no_file' }
   | { status: 'failed'; reason: string }
 
+export type StoredManuscriptArtifact = {
+  manuscriptUrl: string
+  fileName: string
+  originalFileName: string
+  fileType: ManuscriptFileExtension
+  contentType: string
+  size: number
+  sha256: string
+  reviewFlag: ManuscriptReviewFlag
+  workspaceUrl: string
+  workspaceFolderId: string
+  sharePointItemId: string
+}
+
+export type ExistingIntakeWorkspaceInput = {
+  reference: string
+  firstName: string
+  lastName: string
+  bookTitle: string
+  idempotencyKey?: string
+}
+
+export type ManuscriptArtifactProvenance =
+  | {
+      source: 'JOIN_UPLOAD' | 'CONTINUATION_UPLOAD'
+      route: string
+    }
+  | {
+      source: 'EMAIL'
+      route: 'publisher-email-binding'
+      mailbox: string
+      messageId: string
+      attachmentId: string
+      receivedOn: string
+      sender?: string
+      recipientMailbox?: string
+      boundBy?: string
+      boundOn?: string
+    }
+
 export type InquiryWorkspaceResult =
   | { status: 'created'; workspaceUrl: string; workspaceFolderId: string }
   | { status: 'failed'; reason: string }
@@ -33,8 +73,8 @@ export type ManuscriptLinkVerificationResult =
   | { status: 'usable'; manuscriptUrl: string }
   | { status: 'failed'; reason: 'inaccessible_link' | 'invalid_link' | 'unsafe_link' | 'link_check_timeout' }
 
-type ManuscriptFileExtension = 'docx' | 'doc' | 'pdf' | 'md'
-type ManuscriptReviewFlag = 'preferred_editable' | 'cleanup_required' | 'review_only'
+type ManuscriptFileExtension = 'docx' | 'doc' | 'pages' | 'rtf' | 'pdf' | 'md'
+type ManuscriptReviewFlag = 'preferred_editable' | 'cleanup_required' | 'normalization_required' | 'review_only'
 type ManuscriptUploadErrorCode =
   | 'empty_file'
   | 'file_too_large'
@@ -76,6 +116,8 @@ const ORIGINAL_MANUSCRIPT_FOLDER = '01_Manuscript/Original'
 const EXTENSION_FLAGS: Record<ManuscriptFileExtension, ManuscriptReviewFlag> = {
   docx: 'preferred_editable',
   doc: 'cleanup_required',
+  pages: 'normalization_required',
+  rtf: 'preferred_editable',
   pdf: 'review_only',
   md: 'preferred_editable',
 }
@@ -96,7 +138,7 @@ export function validateManuscriptUploadCandidate(candidate: ManuscriptUploadCan
 
   const extension = getAllowedExtension(safeName)
   if (!extension) {
-    return { ok: false, code: 'unsupported_file_type', message: 'Upload a .docx, .doc, .pdf, or .md manuscript file.' }
+    return { ok: false, code: 'unsupported_file_type', message: 'Upload a .docx, .doc, .pages, .rtf, or .pdf manuscript file.' }
   }
 
   return {
@@ -120,44 +162,24 @@ export async function uploadManuscriptToInquiryWorkspace(
   if (!config.ok) return { status: 'failed', reason: `sharepoint_configuration_missing:${config.missing.join(',')}` }
 
   try {
-    const context = await ensureInquiryWorkspaceContext(intake, config.value)
-    const manuscriptFolder = await ensureFolderPath(
-      context.token,
-      context.driveId,
-      `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}`,
-    )
-    const uploadFileName = buildUploadFileName(intake.reference, validation.value.fileName)
-    const sourceSha256 = computeSha256(validation.value.bytes)
-    const uploaded = await uploadSmallFile(
-      context.token,
-      context.driveId,
-      `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}/${uploadFileName}`,
-      validation.value.bytes,
-      validation.value.contentType,
-    )
-    const sourceManifestBytes = encodeUtf8Json(buildSourceArtifactManifest({
+    const stored = await storeOriginalManuscriptArtifact({
       intake,
-      uploaded,
-      uploadFileName,
+      candidate: validation.value,
       validation,
-      sourceSha256,
-    }))
-    await uploadSmallFile(
-      context.token,
-      context.driveId,
-      `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}/${intake.reference} - source-artifact-manifest.json`,
-      sourceManifestBytes,
-      'application/json',
-    )
+      provenance: {
+        source: 'JOIN_UPLOAD',
+        route: '/api/publishing/intake',
+      },
+    })
 
     return {
       status: 'uploaded',
-      manuscriptUrl: uploaded.webUrl,
-      fileName: uploadFileName,
-      fileType: validation.extension,
-      reviewFlag: validation.reviewFlag,
-      workspaceUrl: context.workspace.webUrl || manuscriptFolder.webUrl,
-      workspaceFolderId: context.workspace.id,
+      manuscriptUrl: stored.manuscriptUrl,
+      fileName: stored.fileName,
+      fileType: stored.fileType,
+      reviewFlag: stored.reviewFlag,
+      workspaceUrl: stored.workspaceUrl,
+      workspaceFolderId: stored.workspaceFolderId,
     }
   } catch (error) {
     return {
@@ -165,6 +187,63 @@ export async function uploadManuscriptToInquiryWorkspace(
       reason: summarizeUploadError(error),
     }
   }
+}
+
+export async function storeOriginalManuscriptArtifact(input: {
+  intake: ExistingIntakeWorkspaceInput
+  candidate: ManuscriptUploadCandidate
+  provenance: ManuscriptArtifactProvenance
+  validation?: ManuscriptUploadValidation & { ok: true }
+}): Promise<StoredManuscriptArtifact> {
+  const validation = input.validation || validateManuscriptUploadCandidate(input.candidate)
+  if (!validation.ok) throw new Error(validation.code)
+
+  const config = getGraphConfig()
+  if (!config.ok) throw new Error(`sharepoint_configuration_missing:${config.missing.join(',')}`)
+
+  const context = await ensureExistingInquiryWorkspaceContext(input.intake, config.value)
+  const manuscriptFolder = await ensureFolderPath(
+    context.token,
+    context.driveId,
+    `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}`,
+  )
+  const uploadFileName = buildUploadFileName(input.intake.reference, validation.value.fileName)
+  const sourceSha256 = computeSha256(validation.value.bytes)
+  const uploaded = await uploadSmallFile(
+    context.token,
+    context.driveId,
+    `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}/${uploadFileName}`,
+    validation.value.bytes,
+    validation.value.contentType,
+  )
+  const artifact: StoredManuscriptArtifact = {
+    manuscriptUrl: uploaded.webUrl,
+    fileName: uploadFileName,
+    originalFileName: validation.value.fileName,
+    fileType: validation.extension,
+    contentType: validation.value.contentType || 'application/octet-stream',
+    size: validation.value.size,
+    sha256: sourceSha256,
+    reviewFlag: validation.reviewFlag,
+    workspaceUrl: context.workspace.webUrl || manuscriptFolder.webUrl,
+    workspaceFolderId: context.workspace.id,
+    sharePointItemId: uploaded.id,
+  }
+  const sourceManifestBytes = encodeUtf8Json(buildSourceArtifactManifest({
+    intake: input.intake,
+    artifact,
+    provenance: input.provenance,
+  }))
+  const manifestName = `${input.intake.reference} - ${sourceSha256.slice(0, 12)} - source-artifact-manifest.json`
+  await uploadSmallFile(
+    context.token,
+    context.driveId,
+    `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}/${manifestName}`,
+    sourceManifestBytes,
+    'application/json',
+  )
+
+  return artifact
 }
 
 export async function ensureInquiryWorkspace(intake: NormalizedPublishingIntake): Promise<InquiryWorkspaceResult> {
@@ -242,38 +321,35 @@ export async function verifyShareableManuscriptLink(url: string): Promise<Manusc
 
 export const manuscriptUploadPolicy = {
   maxBytes: MAX_MANUSCRIPT_UPLOAD_BYTES,
-  allowedExtensions: ['.docx', '.doc', '.pdf', '.md'],
+  allowedExtensions: ['.docx', '.doc', '.pages', '.rtf', '.pdf'],
   flags: EXTENSION_FLAGS,
 } as const
 
 export function buildSourceArtifactManifest(input: {
-  intake: NormalizedPublishingIntake
-  uploaded: GraphDriveItem
-  uploadFileName: string
-  validation: ManuscriptUploadValidation & { ok: true }
-  sourceSha256: string
+  intake: ExistingIntakeWorkspaceInput
+  artifact: StoredManuscriptArtifact
+  provenance: ManuscriptArtifactProvenance
 }) {
   return {
     schema: 'JM1_PUBLISHING_SOURCE_ARTIFACT_MANIFEST_V1',
     title: input.intake.bookTitle,
     author: `${input.intake.firstName} ${input.intake.lastName}`.trim(),
     intakeReference: input.intake.reference,
-    correlationId: input.intake.idempotencyKey,
+    correlationId: input.intake.idempotencyKey || input.intake.reference,
     sourceArtifact: {
       immutable: true,
-      fileName: input.uploadFileName,
-      originalFileName: input.validation.value.fileName,
-      sourceFormat: input.validation.extension,
-      contentType: input.validation.value.contentType || 'application/octet-stream',
-      sizeBytes: input.validation.value.size,
-      sha256: input.sourceSha256,
-      reviewFlag: input.validation.reviewFlag,
-      sharePointItemId: input.uploaded.id,
-      sharePointWebUrl: input.uploaded.webUrl,
+      fileName: input.artifact.fileName,
+      originalFileName: input.artifact.originalFileName,
+      sourceFormat: input.artifact.fileType,
+      contentType: input.artifact.contentType,
+      sizeBytes: input.artifact.size,
+      sha256: input.artifact.sha256,
+      reviewFlag: input.artifact.reviewFlag,
+      sharePointItemId: input.artifact.sharePointItemId,
+      sharePointWebUrl: input.artifact.manuscriptUrl,
     },
     provenance: {
-      receivedThrough: 'website-join',
-      route: '/api/publishing/intake',
+      ...input.provenance,
       sourceMutationPolicy: 'preserve_original_unchanged',
       downstreamVersionsMustDeriveFromSource: true,
     },
@@ -338,6 +414,13 @@ async function getDriveByName(token: string, siteId: string, driveName: string):
 
 async function ensureInquiryWorkspaceContext(
   intake: NormalizedPublishingIntake,
+  config: GraphConfig,
+): Promise<InquiryWorkspaceContext> {
+  return ensureExistingInquiryWorkspaceContext(intake, config)
+}
+
+async function ensureExistingInquiryWorkspaceContext(
+  intake: ExistingIntakeWorkspaceInput,
   config: GraphConfig,
 ): Promise<InquiryWorkspaceContext> {
   const token = await getGraphAccessToken(config)
@@ -467,7 +550,7 @@ function parseDriveItem(value: unknown): GraphDriveItem {
   }
 }
 
-function buildWorkspaceFolderName(intake: NormalizedPublishingIntake) {
+function buildWorkspaceFolderName(intake: ExistingIntakeWorkspaceInput) {
   const authorName = sanitizePathSegment(`${intake.firstName} ${intake.lastName}`)
   const title = sanitizePathSegment(intake.bookTitle)
   return `${intake.reference} - ${authorName} - ${title}`.slice(0, 180)
@@ -502,7 +585,14 @@ function sanitizeFileName(value: string) {
 
 function getAllowedExtension(fileName: string): ManuscriptFileExtension | null {
   const extension = fileName.split('.').pop()?.toLowerCase()
-  if (extension === 'docx' || extension === 'doc' || extension === 'pdf' || extension === 'md') return extension
+  if (
+    extension === 'docx' ||
+    extension === 'doc' ||
+    extension === 'pages' ||
+    extension === 'rtf' ||
+    extension === 'pdf' ||
+    extension === 'md'
+  ) return extension
   return null
 }
 

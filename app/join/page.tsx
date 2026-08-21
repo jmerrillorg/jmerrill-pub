@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import JoinForm from './JoinForm'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Join the Family — Start Your Publishing Journey',
   description: "Tell us about your book, your message, and where you are in the journey. We'll help you understand the right next step while your voice and rights stay at the center.",

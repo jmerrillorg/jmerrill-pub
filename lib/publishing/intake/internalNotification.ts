@@ -1,5 +1,9 @@
 import type { NormalizedPublishingIntake } from './schema'
 
+type InternalNotificationIntake = NormalizedPublishingIntake & {
+  continuationUrl?: string
+}
+
 type InternalNotificationResult =
   | { status: 'sent' }
   | { status: 'skipped'; reason: 'relay_configuration_missing' }
@@ -8,7 +12,7 @@ type InternalNotificationResult =
 const RELAY_ROUTE = 'send-join-internal-notification'
 
 export async function sendJoinInternalNotification(
-  intake: NormalizedPublishingIntake,
+  intake: InternalNotificationIntake,
   options: { recordId?: string } = {},
 ): Promise<InternalNotificationResult> {
   const config = getRelayConfig()
@@ -40,7 +44,7 @@ export async function sendJoinInternalNotification(
   }
 }
 
-function buildJoinInternalNotificationPayload(intake: NormalizedPublishingIntake, recordId?: string) {
+function buildJoinInternalNotificationPayload(intake: InternalNotificationIntake, recordId?: string) {
   return {
     notificationType: 'JOIN_INTAKE_RECEIVED',
     reference: intake.reference,
@@ -50,10 +54,15 @@ function buildJoinInternalNotificationPayload(intake: NormalizedPublishingIntake
     projectTitle: intake.bookTitle,
     manuscriptType: intake.workType,
     manuscriptStatus: intake.manuscriptStatus,
+    manuscriptLifecycleState: intake.manuscriptLifecycleState,
+    waitingOn: intake.waitingOn,
+    continuationUrl: intake.continuationUrl || undefined,
     intakeChannel: intake.intakeChannel,
     dataverseIntakeUrl: recordId ? buildDataverseRecordUrl('jm1_publishingintake', recordId) : undefined,
     stageStatus: 'Intake received; routing/workspace automation pending or in progress.',
-    nextAction: 'Review the new /join intake and confirm Contact, Lead, workspace, and Stage 0 routing completed.',
+    nextAction: intake.manuscriptSubmissionChoice === 'later'
+      ? 'Monitor manuscript continuation. Editorial Review must not begin until manuscript evidence is bound.'
+      : 'Review the new /join intake and confirm Contact, Lead, workspace, and Editorial Review routing completed.',
     recipient: 'publishing@jmerrill.one',
   }
 }

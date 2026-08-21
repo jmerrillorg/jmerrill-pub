@@ -19,6 +19,12 @@ export type DataverseUpdateResult =
   | { status: 'skipped'; reason: 'non_production_mapping_pending' | 'missing_record_id' }
   | { status: 'failed'; reason: string; retryable: boolean }
 
+export type DataverseReplayResult =
+  | { status: 'found'; reference: string; recordId?: string }
+  | { status: 'not_found' }
+  | { status: 'skipped'; reason: 'non_production_mapping_pending' }
+  | { status: 'failed'; reason: string; retryable: boolean }
+
 const ACKNOWLEDGMENT_STATUS_SENT = 835500001
 const WORKSPACE_STATUS_CREATED = 835513001
 
@@ -105,6 +111,75 @@ export async function writePublishingIntakeWithRetry(payload: NormalizedPublishi
   }
 
   return lastResult
+}
+
+export async function findPublishingIntakeByIdempotencyKey(idempotencyKey: string): Promise<DataverseReplayResult> {
+  const config = getDataverseConfig()
+
+  if (!config.ok) {
+    if (process.env.NODE_ENV !== 'production') {
+      return { status: 'skipped', reason: 'non_production_mapping_pending' }
+    }
+
+    return {
+      status: 'failed',
+      reason: `dataverse_configuration_missing: ${config.missing.join(', ')}`,
+      retryable: false,
+    }
+  }
+
+  try {
+    const accessToken = await getDataverseAccessToken(config.value)
+    const columns = CONFIRMED_DATAVERSE_MAPPING_REQUIRED.columns
+    const filter = `${columns.idempotencyKey} eq '${escapeODataString(idempotencyKey)}'`
+    const query = new URLSearchParams({
+      $select: `jm1_publishingintakeid,${columns.reference}`,
+      $filter: filter,
+      $top: '1',
+    })
+    const response = await fetch(
+      `${config.value.webApiBaseUrl}/${config.value.entitySet}?${query.toString()}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+          'OData-MaxVersion': '4.0',
+          'OData-Version': '4.0',
+        },
+      },
+    )
+
+    if (!response.ok) {
+      const errorBody = await safeResponseText(response)
+      const dataverseError = summarizeDataverseError(errorBody)
+      return {
+        status: 'failed',
+        reason: `dataverse_replay_lookup_failed:${response.status}:${dataverseError.code}`,
+        retryable: isRetryableStatus(response.status),
+      }
+    }
+
+    const json = await response.json().catch(() => null)
+    const first = isRecord(json) && Array.isArray(json.value) ? json.value[0] : undefined
+    if (!isRecord(first)) return { status: 'not_found' }
+
+    const referenceValue = first[columns.reference]
+    const reference = typeof referenceValue === 'string' ? referenceValue : ''
+    return reference
+      ? {
+          status: 'found',
+          reference,
+          recordId: typeof first.jm1_publishingintakeid === 'string' ? first.jm1_publishingintakeid : undefined,
+        }
+      : { status: 'not_found' }
+  } catch (error) {
+    return {
+      status: 'failed',
+      reason: `dataverse_replay_lookup_exception:${summarizeWriteException(error)}`,
+      retryable: true,
+    }
+  }
 }
 
 export async function markPublishingIntakeAcknowledgmentSent(
@@ -374,7 +449,7 @@ function buildPublishingIntakeDataversePayload(payload: NormalizedPublishingInta
     [columns.publishedBefore]: publishedBeforeOptions[payload.publishedBefore],
     [columns.bookDescription]: payload.bookDescription,
     [columns.referralSource]: payload.referralSource,
-    [columns.additionalNotes]: payload.additionalNotes,
+    [columns.additionalNotes]: buildCanonicalAdditionalNotes(payload),
     [columns.consent]: payload.consent,
     [columns.consentTerms]: payload.consent,
     [columns.reference]: payload.reference,
@@ -383,6 +458,46 @@ function buildPublishingIntakeDataversePayload(payload: NormalizedPublishingInta
     [columns.consentTimestamp]: payload.consentTimestamp,
     [columns.wordCountSource]: payload.wordCountSource,
   })
+}
+
+function buildCanonicalAdditionalNotes(payload: NormalizedPublishingIntake) {
+  const context = [
+    payload.additionalNotes ? `Author notes: ${payload.additionalNotes}` : '',
+    `Payload: ${payload.payloadVersion}`,
+    `Manuscript choice: ${payload.manuscriptSubmissionChoice}`,
+    `Prospect state: ${payload.prospectState}`,
+    `Manuscript state: ${payload.manuscriptLifecycleState}`,
+    `Waiting on: ${payload.waitingOn}`,
+    `Preferred name: ${payload.preferredName || 'not provided'}`,
+    `Publishing name: ${payload.publishingName || 'not provided'}`,
+    `Pen name: ${payload.penName || 'not provided'}`,
+    `Preferred communication: ${payload.preferredCommunication || 'not provided'}`,
+    `Returning author: ${payload.returningAuthor || 'not provided'}`,
+    `Address: ${payload.streetAddress}${payload.addressLine2 ? `, ${payload.addressLine2}` : ''}, ${payload.city}, ${payload.stateProvince} ${payload.postalCode}, ${payload.country}`,
+    payload.billingSameAsMailing
+      ? 'Billing address: same as mailing'
+      : `Billing address: ${payload.billingStreetAddress || ''}${payload.billingAddressLine2 ? `, ${payload.billingAddressLine2}` : ''}, ${payload.billingCity || ''}, ${payload.billingStateProvince || ''} ${payload.billingPostalCode || ''}, ${payload.billingCountry || ''}`,
+    payload.subtitle ? `Subtitle: ${payload.subtitle}` : '',
+    payload.intendedAudience ? `Audience: ${payload.intendedAudience}` : '',
+    payload.bookGoals ? `Goals: ${payload.bookGoals}` : '',
+    payload.desiredTimeline ? `Timeline: ${payload.desiredTimeline}` : '',
+    payload.priorPublishingHistory ? `Prior publishing: ${payload.priorPublishingHistory}` : '',
+    payload.referred ? `Referral: ${payload.referrerName || 'yes'} ${payload.referrerEmail || ''} ${payload.referrerRelationship || ''}`.trim() : 'Referral: no',
+    payload.heardAboutJmp ? `Heard about JMP: ${payload.heardAboutJmp}` : '',
+    payload.whyJmp ? `Why JMP: ${payload.whyJmp}` : '',
+    payload.publishingPartnerHope ? `Partner hope: ${payload.publishingPartnerHope}` : '',
+    payload.authorPlatform ? `Author platform: ${payload.authorPlatform}` : '',
+    payload.accessibilityNotes ? `Accessibility: ${payload.accessibilityNotes}` : '',
+    payload.thirdPartyMaterialDisclosure ? `Third-party material: ${payload.thirdPartyMaterialDisclosure}` : '',
+    payload.aiDisclosure ? `AI disclosure: ${payload.aiDisclosure}` : '',
+    payload.sensitiveContentDisclosure ? `Sensitive content: ${payload.sensitiveContentDisclosure}` : '',
+    `Marketing consent: ${payload.marketingConsent ? 'yes' : 'no'}`,
+    payload.utmSource || payload.utmMedium || payload.utmCampaign
+      ? `Attribution: source=${payload.utmSource || ''}; medium=${payload.utmMedium || ''}; campaign=${payload.utmCampaign || ''}; content=${payload.utmContent || ''}; landing=${payload.landingPage || ''}; referrer=${payload.referrerUrl || ''}; campaignId=${payload.campaignId || ''}`
+      : '',
+  ].filter(Boolean).join('\n')
+
+  return context.slice(0, 950)
 }
 
 function buildPublishingIntakeName(payload: NormalizedPublishingIntake) {
@@ -395,6 +510,10 @@ function omitUndefined(values: Record<string, string | number | boolean | undefi
 
 function cleanUrl(value?: string) {
   return value?.trim().replace(/\/+$/, '')
+}
+
+function escapeODataString(value: string) {
+  return value.replace(/'/g, "''")
 }
 
 function extractDataverseRecordId(entityUrl?: string) {
