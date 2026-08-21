@@ -1,6 +1,10 @@
 "use strict";
 
 const { computeComplimentaryEntitlements } = require("./authorCopyPolicy");
+const {
+  NEW_FINANCING_POLICY_VERSION,
+  buildPaymentOptions
+} = require("../author/authorOfferEngine");
 
 /**
  * Computes the safe, validated field values needed to fill the
@@ -68,6 +72,47 @@ function selectedEditionsFormatsLabel(entitlements = []) {
   return entitlements
     .map((entitlement) => `${entitlement.productFormCode} ${entitlement.productFormName}`)
     .join("; ");
+}
+
+function authorOfferPlanCode(paymentOption) {
+  return {
+    SINGLE: "FULL_PAY",
+    TWO_PAYMENTS: "2_PAY",
+    FOUR_PAYMENTS: "4_PAY",
+    EIGHT_PAYMENTS: "8_PAY"
+  }[paymentOption] || null;
+}
+
+function scheduleFromAuthorOfferPlan(plan) {
+  if (!plan) return null;
+  const rows = plan.installments.map((installment, i) => ({
+    paymentNumber: i + 1,
+    amountFormatted: installment.totalDueFormatted,
+    principalFormatted: installment.principalFormatted,
+    planChargeFormatted: installment.planChargeFormatted || installment.multiPayFeeFormatted,
+    dueDateNote: i === 0
+      ? "Due at signing / upon first payment — Author determines the start date by making this payment. Production begins upon receipt."
+      : "Due on the same calendar day each period following the first payment."
+  }));
+  return {
+    installments: plan.paymentCount,
+    perInstallmentUsd: plan.installments[0]?.totalDue || 0,
+    perInstallmentFormatted: plan.installments[0]?.totalDueFormatted || "$0.00",
+    totalUsd: plan.totalDue,
+    totalFormatted: plan.totalDueFormatted,
+    feeApplies: plan.planChargeTotalCents > 0 || plan.multiPayFeeTotalCents > 0,
+    planChargeLabel: plan.authorFacingChargeLabel,
+    planChargeTotalUsd: plan.planChargeTotal,
+    planChargeTotalFormatted: plan.planChargeTotalFormatted,
+    principalTotalUsd: plan.principalTotal,
+    principalTotalFormatted: plan.principalTotalFormatted,
+    paymentPolicyVersion: plan.paymentPolicyVersion,
+    earlyPayoff: plan.earlyPayoff,
+    internalCommissioning: false,
+    disposition: "AUTHOR_PAYMENT_REQUIRED",
+    requiresScheduleAAttachment: plan.paymentCount > 3,
+    rows
+  };
 }
 
 /**
@@ -146,15 +191,27 @@ function computeAgreementFields(input = {}) {
       audiobookIncluded: null, paymentSchedule: null };
   }
 
-  const totalUsd = paymentInfo.internalCommissioning
-    ? 0
-    : Math.round(packageInfo.fee * (paymentInfo.feeApplies ? 1.04 : 1) * 100) / 100;
-  const perInstallmentUsd = paymentInfo.internalCommissioning
-    ? 0
-    : Math.round((totalUsd / paymentInfo.installments) * 100) / 100;
-  const requiresScheduleAAttachment = paymentInfo.installments > 3;
+  const snapshotPlan = input.pricingSnapshot?.paymentPlan || input.paymentPlan;
+  const selectedAuthorOfferPlan = snapshotPlan || (
+    input.paymentPolicyVersion === NEW_FINANCING_POLICY_VERSION && authorOfferPlanCode(paymentOption)
+      ? buildPaymentOptions(Math.round(packageInfo.fee * 100), input.paymentPolicyVersion).find((plan) => plan.planCode === authorOfferPlanCode(paymentOption))
+      : null
+  );
+  const newPolicySchedule = scheduleFromAuthorOfferPlan(selectedAuthorOfferPlan);
 
-  const rows = paymentInfo.internalCommissioning ? [] : Array.from({ length: paymentInfo.installments }, (_, i) => ({
+  const totalUsd = newPolicySchedule
+    ? newPolicySchedule.totalUsd
+    : paymentInfo.internalCommissioning
+      ? 0
+      : Math.round(packageInfo.fee * (paymentInfo.feeApplies ? 1.04 : 1) * 100) / 100;
+  const perInstallmentUsd = newPolicySchedule
+    ? newPolicySchedule.perInstallmentUsd
+    : paymentInfo.internalCommissioning
+      ? 0
+      : Math.round((totalUsd / paymentInfo.installments) * 100) / 100;
+  const requiresScheduleAAttachment = newPolicySchedule ? newPolicySchedule.requiresScheduleAAttachment : paymentInfo.installments > 3;
+
+  const rows = newPolicySchedule ? newPolicySchedule.rows : paymentInfo.internalCommissioning ? [] : Array.from({ length: paymentInfo.installments }, (_, i) => ({
     paymentNumber: i + 1,
     amountFormatted: formatUsd(perInstallmentUsd),
     dueDateNote: i === 0
@@ -185,7 +242,14 @@ function computeAgreementFields(input = {}) {
       perInstallmentFormatted: formatUsd(perInstallmentUsd),
       totalUsd,
       totalFormatted: formatUsd(totalUsd),
-      feeApplies: paymentInfo.feeApplies,
+      feeApplies: newPolicySchedule ? newPolicySchedule.feeApplies : paymentInfo.feeApplies,
+      planChargeLabel: newPolicySchedule?.planChargeLabel || (paymentInfo.feeApplies ? "Processing fee" : "No fee"),
+      planChargeTotalUsd: newPolicySchedule?.planChargeTotalUsd ?? (paymentInfo.feeApplies ? Math.round(packageInfo.fee * 0.04 * 100) / 100 : 0),
+      planChargeTotalFormatted: newPolicySchedule?.planChargeTotalFormatted || formatUsd(paymentInfo.feeApplies ? Math.round(packageInfo.fee * 0.04 * 100) / 100 : 0),
+      principalTotalUsd: newPolicySchedule?.principalTotalUsd ?? packageInfo.fee,
+      principalTotalFormatted: newPolicySchedule?.principalTotalFormatted || formatUsd(packageInfo.fee),
+      paymentPolicyVersion: newPolicySchedule?.paymentPolicyVersion || input.paymentPolicyVersion || "JMP_MULTIPAY_TRANSACTION_FEE_4_PERCENT_v1.0",
+      earlyPayoff: newPolicySchedule?.earlyPayoff || null,
       internalCommissioning: paymentInfo.internalCommissioning === true,
       disposition: paymentInfo.internalCommissioning === true ? "INTERNAL_COMMISSIONING" : "AUTHOR_PAYMENT_REQUIRED",
       requiresScheduleAAttachment,

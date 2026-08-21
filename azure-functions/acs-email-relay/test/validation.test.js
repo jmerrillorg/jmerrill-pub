@@ -59,6 +59,7 @@ function loadRelayModule() {
       buildJoinInternalNotificationEmail,
       buildApprovedAuthorResponseEmail,
       validatePublishingAcknowledgmentEmail,
+      validateCanonicalPackageAcceptancePayload,
       milestoneValidationError,
       milestoneUnauthorized
     };`,
@@ -797,6 +798,86 @@ test("approved editorial recommendation rejects text-only payloads", () => {
   const result = relay.validateApprovedAuthorResponsePayload(validEditorialRecommendationPayload({ htmlBody: "" }));
 
   assertRejected(result, "EDITORIAL_RECOMMENDATION_HTML_REQUIRED");
+});
+
+test("package-acceptance payment-options payload requires canonical HTML, subject, metadata, and body reference", () => {
+  const relay = loadRelayModule();
+  const html = `<!doctype html>
+<html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table>
+<p>A Division of J Merrill One</p>
+<p>Helping Authors Help Themselves.</p>
+<h2>Why you are receiving this</h2>
+<h2>What JMP has prepared</h2>
+<h2>What we need from you</h2>
+<a href="https://jmerrill.pub/author/payment-options/test" style="display:inline-block;background:#1d4ed8;">Choose Your Payment Option</a>
+<h2>Payment Options</h2>
+<h2>What happens next</h2>
+<h2>Support</h2>
+<p>The Publishing Team</p>
+<p>JMP-INT-202608-ABC123</p>
+</body></html>`;
+  const body = [
+    "Why you are receiving this",
+    "What JMP has prepared",
+    "What we need from you",
+    "Payment Options",
+    "What happens next",
+    "Support",
+    "JMP-INT-202608-ABC123"
+  ].join("\n");
+  const valid = relay.validateApprovedAuthorResponsePayload({
+    messageType: "APPROVED_AUTHOR_RESPONSE",
+    diagnosticId,
+    intakeReferenceCode: "JMP-INT-202608-ABC123",
+    authorEmail: "author@example.com",
+    authorName: "Author",
+    projectTitle: "New Book Test",
+    subject: "Your Publishing Payment Options for New Book Test",
+    body,
+    htmlBody: html,
+    templateName: "PACKAGE_ACCEPTANCE_PAYMENT_OPTIONS_V1",
+    templateVersion: "1.0.0",
+    templateMetadata: {
+      htmlSha256: "a".repeat(64),
+      textSha256: "b".repeat(64),
+      qualityGate: "PASS",
+      renderer: "JM1 Enterprise Communication Renderer",
+      rendererVersion: "1.0.0",
+      renderMode: "CANONICAL_HTML",
+      renderTemplateGuard: "PASS"
+    },
+    approvedBy: "jackie",
+    approvedOn: "2026-08-21T08:00:00.000Z",
+    internalVisibilityMailbox: "publishing@jmerrill.one",
+    futureSendRequiresInternalCopy: true,
+    futureSendRequiresDataverseLog: true
+  });
+
+  assert.equal(valid.ok, true);
+});
+
+test("package-acceptance payload rejects reference-led subject and missing HTML", () => {
+  const relay = loadRelayModule();
+  const result = relay.validateApprovedAuthorResponsePayload({
+    messageType: "APPROVED_AUTHOR_RESPONSE",
+    diagnosticId,
+    intakeReferenceCode: "JMP-INT-202608-ABC123",
+    authorEmail: "author@example.com",
+    authorName: "Author",
+    projectTitle: "New Book Test",
+    subject: "JMP-INT-202608-ABC123 - payment options",
+    body: "Plain payment options.",
+    htmlBody: "",
+    templateName: "PACKAGE_ACCEPTANCE_PAYMENT_OPTIONS_V1",
+    approvedBy: "jackie",
+    approvedOn: "2026-08-21T08:00:00.000Z",
+    internalVisibilityMailbox: "publishing@jmerrill.one",
+    futureSendRequiresInternalCopy: true,
+    futureSendRequiresDataverseLog: true
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "PACKAGE_ACCEPTANCE_HTML_REQUIRED");
 });
 
 test("routes are registered without changing acknowledgment route", () => {

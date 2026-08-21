@@ -20,6 +20,7 @@ const JOIN_INTERNAL_NOTIFICATION_TYPE = "JOIN_INTAKE_RECEIVED";
 const APPROVED_AUTHOR_RESPONSE_TYPE = "APPROVED_AUTHOR_RESPONSE";
 const AUTHOR_REVIEW_PACKAGE_TEMPLATE = "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1";
 const FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE = "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1";
+const PACKAGE_ACCEPTANCE_TEMPLATE = "PACKAGE_ACCEPTANCE_PAYMENT_OPTIONS_V1";
 const CANONICAL_AUTHOR_RENDERER = "JM1 Enterprise Communication Renderer";
 const CANONICAL_AUTHOR_RENDER_MODE = "CANONICAL_HTML";
 const INTERNAL_NOTIFICATION_SENT = "INTERNAL_NOTIFICATION_SENT";
@@ -729,6 +730,24 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
     }
   }
 
+  if (normalizeText(payload.templateName) === PACKAGE_ACCEPTANCE_TEMPLATE) {
+    if (!htmlBody) {
+      return { ok: false, reason: "PACKAGE_ACCEPTANCE_HTML_REQUIRED" };
+    }
+    const renderValidation = validateCanonicalPackageAcceptancePayload({
+      htmlBody,
+      body,
+      subject,
+      templateMetadata: payload.templateMetadata,
+      templateName: payload.templateName,
+      projectTitle: payload.projectTitle,
+      intakeReferenceCode: common.intakeReferenceCode
+    });
+    if (!renderValidation.ok) {
+      return { ok: false, reason: renderValidation.reason };
+    }
+  }
+
   if (!normalizeText(payload.approvedBy)) {
     return { ok: false, reason: "APPROVED_BY_MISSING" };
   }
@@ -777,6 +796,61 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       cc
     }
   };
+}
+
+function validateCanonicalPackageAcceptancePayload(payload = {}) {
+  const html = normalizeHtmlBody(payload.htmlBody);
+  const text = normalizeBody(payload.body);
+  const subject = normalizeText(payload.subject);
+  const projectTitle = normalizeText(payload.projectTitle);
+  const intakeReferenceCode = normalizeText(payload.intakeReferenceCode);
+  const metadata = payload.templateMetadata && typeof payload.templateMetadata === "object" ? payload.templateMetadata : null;
+
+  if (!metadata) return { ok: false, reason: "PACKAGE_ACCEPTANCE_TEMPLATE_METADATA_REQUIRED" };
+  if (normalizeText(metadata.qualityGate) !== "PASS") return { ok: false, reason: "PACKAGE_ACCEPTANCE_QUALITY_GATE_REQUIRED" };
+  if (normalizeText(metadata.renderMode) !== CANONICAL_AUTHOR_RENDER_MODE) return { ok: false, reason: "PACKAGE_ACCEPTANCE_CANONICAL_RENDER_MODE_REQUIRED" };
+  if (normalizeText(metadata.renderTemplateGuard) !== "PASS") return { ok: false, reason: "PACKAGE_ACCEPTANCE_RENDER_TEMPLATE_GUARD_REQUIRED" };
+  if (normalizeText(metadata.renderer) !== CANONICAL_AUTHOR_RENDERER) return { ok: false, reason: "PACKAGE_ACCEPTANCE_CANONICAL_RENDERER_REQUIRED" };
+  for (const [field, value] of [["htmlSha256", metadata.htmlSha256], ["textSha256", metadata.textSha256]]) {
+    if (!/^[0-9a-f]{64}$/i.test(normalizeText(value))) return { ok: false, reason: `PACKAGE_ACCEPTANCE_${field.toUpperCase()}_INVALID` };
+  }
+  if (!projectTitle || !subject.includes(projectTitle)) return { ok: false, reason: "PACKAGE_ACCEPTANCE_SUBJECT_TITLE_REQUIRED" };
+  if (subject.includes(intakeReferenceCode) || REFERENCE_PATTERN.test(subject) || DIAGNOSTIC_ID_PATTERN.test(subject)) {
+    return { ok: false, reason: "PACKAGE_ACCEPTANCE_SUBJECT_INTERNAL_REFERENCE_BLOCKED" };
+  }
+  for (const fragment of [
+    "<!doctype html>",
+    "<table",
+    "J MERRILL PUBLISHING",
+    "A Division of J Merrill One",
+    "Helping Authors Help Themselves.",
+    "Why you are receiving this",
+    "What JMP has prepared",
+    "What we need from you",
+    "Payment Options",
+    "What happens next",
+    "Support",
+    "Choose Your Payment Option",
+    "The Publishing Team"
+  ]) {
+    if (!html.toLowerCase().includes(fragment.toLowerCase())) return { ok: false, reason: "PACKAGE_ACCEPTANCE_CANONICAL_STRUCTURE_REQUIRED" };
+  }
+  for (const fragment of ["Why you are receiving this", "What JMP has prepared", "What we need from you", "Payment Options", "What happens next", "Support"]) {
+    if (!text.includes(fragment)) return { ok: false, reason: "PACKAGE_ACCEPTANCE_TEXT_STRUCTURE_REQUIRED" };
+  }
+  if (!text.includes(intakeReferenceCode) || !html.includes(intakeReferenceCode)) return { ok: false, reason: "PACKAGE_ACCEPTANCE_BODY_REFERENCE_REQUIRED" };
+  if (!/<a\b[^>]+href="https:\/\/[^"]+"[^>]+style="[^"]*(display:inline-block|background:)/i.test(html)) {
+    return { ok: false, reason: "PACKAGE_ACCEPTANCE_CTA_BUTTON_REQUIRED" };
+  }
+  if (/\b(Dataverse|execution log|workflow record|internal instruction|package manifest|response mechanism|evidence file|PACKAGE_ACCEPTED|OFFER_PREVIEW|pricing rule version|opportunity ID)\b/i.test(`${html}\n${text}`)) {
+    return { ok: false, reason: "PACKAGE_ACCEPTANCE_INTERNAL_LANGUAGE_BLOCKED" };
+  }
+  if (/\bJOINED_THE_FAMILY|fully enrolled|production has started|welcome to the family\b/i.test(`${html}\n${text}`)) {
+    return { ok: false, reason: "PACKAGE_ACCEPTANCE_PREMATURE_JOINED_FAMILY_BLOCKED" };
+  }
+  if (/\btax\s+(is|will be)\s+\$?\d/i.test(`${html}\n${text}`)) return { ok: false, reason: "PACKAGE_ACCEPTANCE_TAX_GUESS_BLOCKED" };
+
+  return { ok: true };
 }
 
 function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {

@@ -141,6 +141,10 @@ function computeInstallmentStripeAmountFromAuthorOffer(input = {}) {
     perInstallmentCents: plan.installments[0]?.totalDueCents || 0,
     totalCents: plan.totalDueCents,
     feeApplied: plan.multiPayFeeRate > 0,
+    planChargeApplied: (plan.planChargeTotalCents || 0) > 0,
+    paymentPolicyVersion: offer.paymentPolicyVersion || plan.paymentPolicyVersion,
+    planChargeTotalCents: plan.planChargeTotalCents || 0,
+    planChargeTotalFormatted: plan.planChargeTotalFormatted || plan.multiPayFeeTotalFormatted,
     installmentSchedule: plan.installments
   };
 }

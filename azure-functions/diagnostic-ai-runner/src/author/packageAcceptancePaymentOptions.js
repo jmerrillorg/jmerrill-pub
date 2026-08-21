@@ -147,7 +147,8 @@ function buildOfferPreview(input = {}) {
     referralLedger: input.referralLedger,
     referralCreditsAvailablePercent,
     referralCreditsRequestedPercent,
-    pricingRuleVersion: input.pricingRuleVersion || PRICING_RULE_VERSION
+    pricingRuleVersion: input.pricingRuleVersion || PRICING_RULE_VERSION,
+    paymentPolicyVersion: input.paymentPolicyVersion
   });
   if (!offer.ok) return { ok: false, errors: offer.errors, packageAcceptedEvent };
 
@@ -171,8 +172,9 @@ function buildOfferPreview(input = {}) {
       mutatesReferralBalance: false,
       createsStripePaymentLink: false,
       regeneratesAgreement: false,
-      triggersJoinedTheFamily: false
-    })
+        triggersJoinedTheFamily: false,
+        calculatesPaymentPolicyInRenderer: false
+      })
   });
 }
 
@@ -197,7 +199,13 @@ function renderPaymentOptionsResponsePreview(preview) {
     lines.push(`Adjusted package principal: ${offer.adjustedPackagePrincipalFormatted}`);
     lines.push("Payment options:");
     for (const plan of offer.paymentOptions) {
-      lines.push(`${PLAN_LABELS[plan.planCode]}: ${plan.totalDueFormatted} total (${plan.principalTotalFormatted} principal; ${plan.multiPayFeeTotalFormatted} multi-pay fee), plus applicable tax.`);
+      const charge = plan.planChargeTotalFormatted || plan.multiPayFeeTotalFormatted;
+      const chargeLabel = plan.authorFacingChargeLabel || "payment-plan charge";
+      lines.push(`${PLAN_LABELS[plan.planCode]}: ${plan.totalDueFormatted} total (${plan.principalTotalFormatted} principal; ${charge} ${chargeLabel.toLowerCase()}), plus applicable tax.`);
+    }
+    const financed = offer.paymentOptions.find((plan) => plan.earlyPayoff?.available);
+    if (financed?.earlyPayoff) {
+      lines.push("Early payoff: no early-payoff penalty; unearned future payment-plan charges are not collected after payoff.");
     }
   }
   lines.push("Tax remains calculated externally. This preview is not a payment link and has not been sent automatically.");
