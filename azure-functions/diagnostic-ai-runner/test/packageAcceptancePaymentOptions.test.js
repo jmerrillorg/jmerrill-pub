@@ -13,6 +13,11 @@ const {
   buildOpportunityStatusProjection,
   buildExistingAuthorPreview
 } = require("../src/author/packageAcceptancePaymentOptions");
+const {
+  TEMPLATE_NAME,
+  renderPackageAcceptanceCommunication,
+  validatePackageAcceptanceCommunication
+} = require("../src/author/packageAcceptanceCommunicationBuilder");
 const { PACKAGE_CODES } = require("../src/author/authorOfferEngine");
 const { computeInstallmentStripeAmountFromAuthorOffer } = require("../src/payment/agreementPaymentLinkMapping");
 
@@ -147,6 +152,93 @@ describe("automatic payment response preview", () => {
     const response = renderPaymentOptionsResponsePreview(buildOfferPreview({ packageAcceptedEvent: packageEvent() }));
     assert.equal(response.liveAutoSendEnabled, false);
     assert.equal(response.negativeProof.liveAutoSendBeforeCommissioning, 0);
+  });
+
+  test("package-acceptance communication renders canonical HTML/text from Author Offer Engine output", () => {
+    const preview = buildOfferPreview({
+      packageAcceptedEvent: packageEvent({
+        selectedPackageCode: PACKAGE_CODES.PROFESSIONAL,
+        title: "New Book Test",
+        intakeReferenceCode: "JMP-INT-202608-ABC123"
+      }),
+      priorEligibleTitleCount: 2,
+      referralCreditsAvailablePercent: 20,
+      referralCreditsSelectedPercent: 20
+    });
+    const communication = renderPackageAcceptanceCommunication(preview, {
+      authorName: "Author",
+      authorEmail: "author@example.com",
+      title: "New Book Test",
+      actionUrl: "https://jmerrill.pub/author/payment-options/test",
+      approvedBy: "jackie",
+      approvedOn: "2026-08-21T08:00:00.000Z"
+    });
+
+    assert.equal(communication.ok, true);
+    assert.equal(communication.sendApproval.messageType, "APPROVED_AUTHOR_RESPONSE");
+    assert.equal(communication.sendApproval.templateName, TEMPLATE_NAME);
+    assert.equal(communication.sendApproval.subject, "Your Publishing Payment Options for New Book Test");
+    assert.match(communication.sendApproval.htmlBody, /Choose Your Payment Option/);
+    assert.equal(communication.rendered.subject, "Your Publishing Payment Options for New Book Test");
+    assert.doesNotMatch(communication.rendered.subject, /JMP-INT/);
+    assert.match(communication.rendered.html, /J MERRILL PUBLISHING/);
+    assert.match(communication.rendered.html, /Choose Your Payment Option/);
+    assert.match(communication.rendered.text, /JMP-INT-202608-ABC123/);
+    assert.match(communication.rendered.text, /\$2,925\.00/);
+    assert.match(communication.rendered.text, /\$3,042\.00 \+ applicable tax/);
+    assert.equal(communication.sendApproval.templateMetadata.renderer, "JM1 Enterprise Communication Renderer");
+    assert.equal(communication.negativeProof.rendererRecalculatesPricing, 0);
+  });
+
+  test("package-acceptance communication keeps referral selection pending and does not auto-consume credit", () => {
+    const preview = buildOfferPreview({
+      packageAcceptedEvent: packageEvent({
+        selectedPackageCode: PACKAGE_CODES.PREMIER,
+        title: "Referral Book"
+      }),
+      priorEligibleTitleCount: 4,
+      referralCreditsAvailablePercent: 40
+    });
+    const communication = renderPackageAcceptanceCommunication(preview, {
+      authorName: "Author",
+      authorEmail: "author@example.com",
+      title: "Referral Book",
+      actionUrl: "https://jmerrill.pub/author/payment-options/referral",
+      approvedBy: "jackie"
+    });
+
+    assert.equal(preview.pricingState, PRICING_STATES.REFERRAL_SELECTION_PENDING);
+    assert.equal(communication.ok, true);
+    assert.match(communication.rendered.text, /Referral credit available: 40%/);
+    assert.match(communication.rendered.text, /Selectable now: 0% \/ 10% \/ 20% \/ 30%/);
+    assert.equal(communication.previewState.pricingLocked, false);
+    assert.equal(communication.negativeProof.referralAutoConsumed, 0);
+  });
+
+  test("package-acceptance validator rejects reference-led subjects, invented tax, premature family language, and pricing lock", () => {
+    const preview = buildOfferPreview({
+      packageAcceptedEvent: packageEvent({ title: "New Book Test" })
+    });
+    const communication = renderPackageAcceptanceCommunication(preview, {
+      authorName: "Author",
+      authorEmail: "author@example.com",
+      title: "New Book Test",
+      actionUrl: "https://jmerrill.pub/author/payment-options/test",
+      approvedBy: "jackie"
+    });
+    const invalid = {
+      ...communication.rendered,
+      subject: "JMP-INT-202608-ABC123 - Payment Options",
+      text: `${communication.rendered.text}\nTax will be $20.\nWelcome to the family.`
+    };
+    const lockedPreview = { ...preview, pricingState: PRICING_STATES.PRICING_LOCKED };
+    const validation = validatePackageAcceptanceCommunication(invalid, lockedPreview);
+
+    assert.equal(validation.ok, false);
+    assert.ok(validation.blockers.includes("SUBJECT_LEADS_WITH_INTERNAL_REFERENCE"));
+    assert.ok(validation.blockers.includes("TAX_FABRICATED"));
+    assert.ok(validation.blockers.includes("PREMATURE_JOINED_THE_FAMILY_LANGUAGE"));
+    assert.ok(validation.blockers.includes("PRICING_LOCKED_BEFORE_PAYMENT_SELECTION"));
   });
 });
 
