@@ -8,6 +8,11 @@
 
 const { readPublishingMailboxReply, PUBLISHING_MAILBOX } = require("../mail/publishingMailboxReader");
 const { classifyPackageReply } = require("../mail/publishingPackageReplyClassifier");
+const {
+  buildPackageAcceptedEvent,
+  buildOfferPreview,
+  renderPaymentOptionsResponsePreview
+} = require("../author/packageAcceptancePaymentOptions");
 const { createHash } = require("node:crypto");
 
 const EXECUTION_STATUS = { SUCCESS: 835500001, FAILED: 835500002 };
@@ -543,6 +548,71 @@ async function processPackageSelectionReply(client, diagnostic, deps, triggerSou
     sourceEntity: "jm1pub_editorialdiagnostic",
     sourceRecordId: diagnosticId
   });
+  const offerContext = await (deps.resolvePackageAcceptanceOfferContext || (async () => ({})))({
+    diagnostic,
+    reply,
+    selectedPackage,
+    idempotencyKey
+  });
+  const packageAcceptedEvent = buildPackageAcceptedEvent({
+    diagnosticId,
+    authorId: normalizeString(diagnostic._jm1pub_authorcontact_value),
+    titleId: diagnosticId,
+    title: normalizeString(diagnostic.jm1pub_name),
+    intakeReferenceCode: normalizeString(diagnostic.jm1_intakereferencecode),
+    selectedPackageCode: selectedPackage.code,
+    decisionSource: `inbound:${PUBLISHING_MAILBOX}`,
+    decisionChannel: "MICROSOFT_365_OUTLOOK",
+    decisionTimestamp: receivedAt,
+    supportingCommunicationId: inboundMessageId,
+    recommendationContext: {
+      recommendedPackage: normalizeString(diagnostic.jm1pub_recommendedpackage),
+      authorDraftSubject: normalizeString(diagnostic.jm1_authordraftsubject)
+    },
+    idempotencyKey
+  });
+  const packageAcceptedLog = await writeLog(client, {
+    actionType: "PACKAGE_ACCEPTED",
+    name: `PACKAGE_ACCEPTED - ${diagnosticId}`,
+    description:
+      `Package acceptance event established; selectedPackage=${selectedPackage.name} (${selectedPackage.code}); ` +
+      `decisionChannel=MICROSOFT_365_OUTLOOK; sourceMailbox=${PUBLISHING_MAILBOX}; Idempotency: ${idempotencyKey}.`,
+    sourceEntity: "jm1pub_editorialdiagnostic",
+    sourceRecordId: diagnosticId
+  });
+  const offerPreview = buildOfferPreview({
+    packageAcceptedEvent,
+    priorEligibleTitleCount: offerContext.priorEligibleTitleCount,
+    referralCreditsAvailablePercent: offerContext.referralCreditsAvailablePercent,
+    referralCreditsSelectedPercent: offerContext.referralCreditsSelectedPercent,
+    referralLedger: offerContext.referralLedger
+  });
+  let offerPreviewLog = null;
+  let responsePreviewLog = null;
+  let responsePreview = null;
+  if (offerPreview.ok) {
+    offerPreviewLog = await writeLog(client, {
+      actionType: "OFFER_PREVIEW_GENERATED",
+      name: `OFFER_PREVIEW_GENERATED - ${diagnosticId}`,
+      description:
+        `Canonical Author Offer Engine generated ${offerPreview.pricingState}; package=${offerPreview.offer.packageCode}; ` +
+        `loyalty=${offerPreview.offer.returningAuthorPercent}; referralAvailable=${offerPreview.offer.referralCreditsAvailablePercent}; ` +
+        `referralApplied=${offerPreview.offer.referralCreditsAppliedPercent}; adjustedPrincipal=${offerPreview.offer.adjustedPackagePrincipalFormatted}; ` +
+        `pricingRuleVersion=${offerPreview.offer.pricingRuleVersion}; liveAuthorSend=0; StripeWrite=0; agreementRegeneration=0; Idempotency: ${idempotencyKey}.`,
+      sourceEntity: "jm1pub_editorialdiagnostic",
+      sourceRecordId: diagnosticId
+    });
+    responsePreview = renderPaymentOptionsResponsePreview(offerPreview);
+    responsePreviewLog = await writeLog(client, {
+      actionType: "RESPONSE_PREVIEW",
+      name: `RESPONSE_PREVIEW - ${diagnosticId}`,
+      description:
+        `Payment-options response preview prepared through ${PUBLISHING_MAILBOX}; renderer=${responsePreview.rendererAuthority}; ` +
+        `state=${responsePreview.pricingState}; liveAutoSend=0; referralBalanceMutation=0; StripeWrite=0; agreementRegeneration=0; Idempotency: ${idempotencyKey}.`,
+      sourceEntity: "jm1pub_editorialdiagnostic",
+      sourceRecordId: diagnosticId
+    });
+  }
   const completedLog = await writePackageStateLog(client, {
     state: RESPONSE_STATES.COMPLETED,
     diagnosticId,
@@ -558,7 +628,10 @@ async function processPackageSelectionReply(client, diagnostic, deps, triggerSou
     confidence,
     receivedDateTime: receivedAt,
     processingState: RESPONSE_STATES.COMPLETED,
-    executionLogIds: [discoveredLog, correlatedLog, classifiedLog, capturedLog, selectedLog, completedLog]
+    packageAcceptedEvent,
+    offerPreview,
+    responsePreview,
+    executionLogIds: [discoveredLog, correlatedLog, classifiedLog, capturedLog, selectedLog, packageAcceptedLog, offerPreviewLog, responsePreviewLog, completedLog].filter(Boolean)
   };
 }
 
