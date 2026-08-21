@@ -182,6 +182,34 @@ describe("versioned payment policies", () => {
     assert.equal(plan(premier, "8_PAY").totalDueFormatted, "$7,762.50");
   });
 
+  test("Professional reference schedules allocate exact cents with no installment sum mismatch", () => {
+    const professional = calculateAuthorOffer({
+      packageCode: PACKAGE_CODES.PROFESSIONAL,
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    const twoPay = plan(professional, "2_PAY");
+    const fourPay = plan(professional, "4_PAY");
+    const eightPay = plan(professional, "8_PAY");
+
+    assert.deepEqual(twoPay.installments.map((row) => row.totalDueFormatted), ["$2,261.25", "$2,261.25"]);
+    assert.deepEqual(fourPay.installments.map((row) => row.totalDueFormatted), ["$1,141.88", "$1,141.88", "$1,141.88", "$1,141.86"]);
+    assert.deepEqual(eightPay.installments.map((row) => row.totalDueFormatted), [
+      "$582.19", "$582.19", "$582.19", "$582.19", "$582.19", "$582.19", "$582.19", "$582.17"
+    ]);
+    for (const option of [twoPay, fourPay, eightPay]) {
+      assert.equal(
+        option.installments.reduce((sum, row) => sum + row.totalDueCents, 0),
+        option.totalDueCents,
+        `${option.planCode} scheduled installments must sum to the exact scheduled total`
+      );
+      assert.equal(
+        option.installments.reduce((sum, row) => sum + row.planChargeCents, 0),
+        option.planChargeTotalCents,
+        `${option.planCode} plan-charge installments must sum to the exact plan charge`
+      );
+    }
+  });
+
   test("new financing policy has no transaction fee and separates plan charge", () => {
     const offer = calculateAuthorOffer({
       packageCode: PACKAGE_CODES.PROFESSIONAL,
@@ -226,6 +254,86 @@ describe("versioned payment policies", () => {
     assert.equal(payoff.unearnedChargeWaivedFormatted, "$39.98");
     assert.equal(payoff.earlyPayoffPenaltyFormatted, "$0.00");
     assert.equal(payoff.payoffAmountFormatted, "$1,029.47");
+  });
+
+  test("early payoff earning is deterministic across required term positions", () => {
+    const professional = calculateAuthorOffer({
+      packageCode: PACKAGE_CODES.PROFESSIONAL,
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    const eightPay = plan(professional, "8_PAY");
+    const principalPaidThrough = (paymentCount) => eightPay.installments
+      .slice(0, paymentCount)
+      .reduce((sum, row) => sum + row.principalCents, 0);
+    const payoffAt = ({ label, paymentsMade, elapsedFinancedMonths }) => ({
+      label,
+      result: calculateEarlyPayoff({
+        paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION,
+        selectedPlan: eightPay,
+        originalPrincipalCents: professional.adjustedPackagePrincipalCents,
+        originalFinanceChargeCents: eightPay.financeChargeTotalCents,
+        paymentsMade,
+        principalPaidCents: principalPaidThrough(paymentsMade),
+        elapsedFinancedMonths
+      })
+    });
+    const cases = [
+      payoffAt({ label: "after first payment", paymentsMade: 1, elapsedFinancedMonths: 0 }),
+      payoffAt({ label: "25 percent of term", paymentsMade: 2, elapsedFinancedMonths: 1.75 }),
+      payoffAt({ label: "50 percent of term", paymentsMade: 4, elapsedFinancedMonths: 3.5 }),
+      payoffAt({ label: "75 percent of term", paymentsMade: 6, elapsedFinancedMonths: 5.25 }),
+      payoffAt({ label: "before final payment", paymentsMade: 7, elapsedFinancedMonths: 6 })
+    ];
+
+    assert.deepEqual(cases.map(({ label, result }) => ({
+      label,
+      principalRemaining: result.principalRemainingFormatted,
+      earnedCharge: result.earnedChargeFormatted,
+      unearnedWaived: result.unearnedChargeWaivedFormatted,
+      payoff: result.payoffAmountFormatted,
+      penalty: result.earlyPayoffPenaltyFormatted
+    })), [
+      {
+        label: "after first payment",
+        principalRemaining: "$3,937.50",
+        earnedCharge: "$0.00",
+        unearnedWaived: "$157.50",
+        payoff: "$3,937.50",
+        penalty: "$0.00"
+      },
+      {
+        label: "25 percent of term",
+        principalRemaining: "$3,375.00",
+        earnedCharge: "$39.38",
+        unearnedWaived: "$118.12",
+        payoff: "$3,414.38",
+        penalty: "$0.00"
+      },
+      {
+        label: "50 percent of term",
+        principalRemaining: "$2,250.00",
+        earnedCharge: "$78.75",
+        unearnedWaived: "$78.75",
+        payoff: "$2,328.75",
+        penalty: "$0.00"
+      },
+      {
+        label: "75 percent of term",
+        principalRemaining: "$1,125.00",
+        earnedCharge: "$118.13",
+        unearnedWaived: "$39.37",
+        payoff: "$1,243.13",
+        penalty: "$0.00"
+      },
+      {
+        label: "before final payment",
+        principalRemaining: "$562.50",
+        earnedCharge: "$135.00",
+        unearnedWaived: "$22.50",
+        payoff: "$697.50",
+        penalty: "$0.00"
+      }
+    ]);
   });
 });
 

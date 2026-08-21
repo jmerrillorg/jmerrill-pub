@@ -185,7 +185,7 @@ function buildPaymentPlans(adjustedPrincipalCents, paymentPolicyVersion) {
   return PLAN_CONFIGS.map((plan) => builder(adjustedPrincipalCents, plan));
 }
 
-function earnedPlanChargeCents({ originalFinanceChargeCents, selectedPlan, paymentsMade, payoffDate }) {
+function earnedPlanChargeCents({ originalFinanceChargeCents, selectedPlan, paymentsMade, payoffDate, elapsedFinancedMonths: elapsedFinancedMonthsInput }) {
   const plan = typeof selectedPlan === "string"
     ? PLAN_CONFIGS.find((item) => item.planCode === selectedPlan)
     : selectedPlan;
@@ -195,6 +195,9 @@ function earnedPlanChargeCents({ originalFinanceChargeCents, selectedPlan, payme
 
   const completedPayments = Math.max(0, Math.floor(Number(paymentsMade) || 0));
   let elapsedFinancedMonths = Math.max(0, Math.min(financedMonths, completedPayments - 1));
+  if (inputHasFiniteNumber(elapsedFinancedMonthsInput)) {
+    elapsedFinancedMonths = Math.max(0, Math.min(financedMonths, Number(elapsedFinancedMonthsInput)));
+  }
   if (payoffDate && plan?.startDate) {
     const start = new Date(plan.startDate);
     const payoff = new Date(payoffDate);
@@ -204,6 +207,10 @@ function earnedPlanChargeCents({ originalFinanceChargeCents, selectedPlan, payme
     }
   }
   return Math.round(totalCharge * elapsedFinancedMonths / financedMonths);
+}
+
+function inputHasFiniteNumber(value) {
+  return value !== undefined && value !== null && Number.isFinite(Number(value));
 }
 
 function calculateEarlyPayoff(input = {}) {
@@ -220,7 +227,8 @@ function calculateEarlyPayoff(input = {}) {
       originalFinanceChargeCents,
       selectedPlan,
       paymentsMade: input.paymentsMade,
-      payoffDate: input.payoffDate
+      payoffDate: input.payoffDate,
+      elapsedFinancedMonths: input.elapsedFinancedMonths
     })
     : Math.max(0, Math.round(Number(input.financeChargeEarnedCents ?? input.financeChargeEarned) || 0));
   const unearnedChargeWaivedCents = Math.max(0, originalFinanceChargeCents - earnedChargeCents);

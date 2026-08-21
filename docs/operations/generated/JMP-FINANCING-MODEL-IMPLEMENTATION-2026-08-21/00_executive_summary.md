@@ -1,12 +1,12 @@
 # JMP Financing Model Implementation Evidence
 
-Last verified: 2026-08-21T00:00:00Z
+Last verified: 2026-08-21T18:49:27Z
 
 ## Classification
 
 `NEW_FINANCING_MODEL_IMPLEMENTATION_IN_PROGRESS`
 
-The founder override establishes Quanishia Dockery / *Indomitable* as the implementation case for the new JMP financing and early-payoff model. This package records the policy, runtime implementation, test coverage, and no-send boundary for that model.
+The founder override establishes Quanishia Dockery / *Indomitable* as the implementation case for the new JMP financing and early-payoff model. The subsequent founder approval explicitly approves the 6% annual simple plan charge on 2026-08-21. This package records the policy, runtime implementation, test coverage, and no-send boundary for that model.
 
 ## Implemented Authority
 
@@ -15,6 +15,7 @@ The founder override establishes Quanishia Dockery / *Indomitable* as the implem
 | New policy version | `JMP_FINANCING_EARLY_PAYOFF_v1.0` |
 | Legacy policy retained | `JMP_MULTIPAY_TRANSACTION_FEE_4_PERCENT_v1.0` |
 | Relationship pricing retained | `JMP_AUTHOR_LOYALTY_REFERRAL_v1.0` |
+| Founder-approved rate | 6% annual simple plan charge |
 | Cash price before financing | PASS |
 | Simple plan charge | 6% annual simple charge, prorated by financed months |
 | Compounding / actuarial carrier rule | NOT USED |
@@ -28,6 +29,8 @@ The founder override establishes Quanishia Dockery / *Indomitable* as the implem
 
 - Diagnostic runner tests: `1995 / 1995 PASS`
 - New payment-policy unit coverage: PASS
+- Exact-cent schedule allocation: PASS
+- Required early-payoff term-position cases: PASS
 - Quanishia Professional offer preview: PASS
 - Agreement field computation consumes versioned pricing snapshot: PASS
 - Stripe/payment adapter preserves policy version and charge fields: PASS
@@ -49,4 +52,3 @@ The founder override establishes Quanishia Dockery / *Indomitable* as the implem
 - `13_controlled_commissioning.md`
 - `14_final_production_certification.md`
 - `checksums.sha256`
-
