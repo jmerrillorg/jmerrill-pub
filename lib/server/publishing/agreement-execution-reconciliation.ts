@@ -190,7 +190,7 @@ function contractPayload(input: ReturnType<typeof normalizeAgreementInput> & { o
     jm1pub_contractname: `Executed Publishing Agreement - ${authorName(opportunity)} - ${titleName(opportunity, input)} - 2026-08-19`,
     jm1pub_contracttype: CONTRACT_TYPE.AUTHOR_AGREEMENT,
     jm1pub_status: CONTRACT_STATUS.ACTIVE,
-    jm1pub_docurl: input.artifactPath,
+    jm1pub_docurl: compactArtifactReference(input),
     jm1pub_esignprovider: providerChoice(input.provider),
     jm1pub_agreementsenton: input.authorSignedOn || input.executedOn,
     jm1pub_signeddate: input.executedOn,
@@ -210,7 +210,7 @@ async function findContract(config: DataverseConfig, token: string, input: Retur
   const filters = [
     `_jm1pub_opportunity_value eq ${input.opportunityId}`,
     `jm1pub_provideragreementid eq '${encodeODataString(input.providerTransactionId)}'`,
-    `jm1pub_docurl eq '${encodeODataString(input.artifactPath)}'`,
+    `jm1pub_docurl eq '${encodeODataString(compactArtifactReference(input))}'`,
   ].join(' or ')
   const result = await dataverseRequest(
     config,
@@ -434,7 +434,7 @@ async function logAgreementExecutedOnce(
     actionType: 'PUBLISHING_AGREEMENT_EXECUTED',
     description: [
       'Founder-supplied executed agreement reconciled into structured contract authority.',
-      `Artifact checksum ${input.checksum}; provider ${input.provider}; provider transaction ${input.providerTransactionId}.`,
+      `Artifact ${input.artifactPath}; checksum ${input.checksum}; provider ${input.provider}; provider transaction ${input.providerTransactionId}.`,
       `Author signed ${input.authorSignedOn || 'not provided'}; publisher signed ${input.publisherSignedOn || 'not provided'}; completed ${input.executedOn}.`,
       `Package ${input.packageCode || 'not provided'}; payment policy ${input.paymentPolicy}.`,
       'The signed PDF was not regenerated or replaced.',
@@ -585,6 +585,11 @@ async function postExecutionLog(config: DataverseConfig, token: string, input: {
 
 function providerChoice(provider: string) {
   return provider.toUpperCase().includes('ADOBE') ? ESIGN_PROVIDER.ADOBE_SIGN : ESIGN_PROVIDER.OTHER
+}
+
+function compactArtifactReference(input: { artifactPath: string; checksum: string }) {
+  const fileName = input.artifactPath.split('/').filter(Boolean).pop() || 'signed-agreement.pdf'
+  return `${fileName} sha256:${input.checksum.slice(0, 16)}`.slice(0, 100)
 }
 
 function onboardingRemainingItems() {
