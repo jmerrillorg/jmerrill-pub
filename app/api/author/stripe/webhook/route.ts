@@ -7,8 +7,10 @@ import {
 import {
   classifyCommissioningWebhookEvent,
   classifyPublishingPaymentSuccessEvent,
+  classifyStripeConnectAccountUpdateEvent,
   verifyStripeWebhook,
 } from '@/lib/server/stripe/author-workspace-webhook'
+import { syncConnectAccountStatusByAccountId } from '@/lib/server/stripe/author-workspace-stripe'
 import { processPublishingPaymentSuccess, type PublishingPaymentSuccess } from '@/lib/server/stripe/publishing-payment-event'
 
 export const runtime = 'nodejs'
@@ -24,6 +26,30 @@ export async function POST(req: NextRequest) {
 
   const classification = classifyCommissioningWebhookEvent(verification.event)
   if (!classification.process) {
+    const connectAccountUpdate = classifyStripeConnectAccountUpdateEvent(verification.event)
+    if (connectAccountUpdate.process) {
+      const safeEvent = connectAccountUpdate.safeEvent
+      if (!safeEvent) throw new Error('stripe_connect_safe_event_missing')
+      const account = verification.event.data?.object || {}
+      const readiness = await syncConnectAccountStatusByAccountId(safeEvent.accountId, account)
+      const executionLog = await writeSafeExecutionLog({
+        name: `STRIPE-CONNECT-STATUS-SYNC-${safeEvent.accountId}`,
+        actionType: 'STRIPE_CONNECT_STATUS_SYNCHRONIZED',
+        description:
+          `Stripe account.updated synchronized safe Connect readiness fields. Account ${safeEvent.accountId}; readiness ${readiness.readiness}; requirements due count ${safeEvent.requirementsDue.length}. No payout, transfer, Business Central posting, royalty calculation, or Bill.com change occurred.`,
+        sourceEntity: 'stripe_account',
+        sourceRecordId: safeEvent.accountId,
+      }).catch(() => ({ created: false, id: null, detail: 'execution_log_write_failed' }))
+
+      return NextResponse.json({
+        received: true,
+        processed: true,
+        code: connectAccountUpdate.code,
+        readiness,
+        executionLog,
+      })
+    }
+
     const publishingPayment = classifyPublishingPaymentSuccessEvent(verification.event)
     if (!publishingPayment.process) {
       return NextResponse.json({ received: true, processed: false, code: classification.code })

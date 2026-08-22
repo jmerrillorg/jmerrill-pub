@@ -1,27 +1,10 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-
-type PortalContext = {
-  portalContext?: {
-    stripeAccountId?: string
-  } | null
-}
+import { useState } from 'react'
 
 export function StripeConnectSetupCard() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'error'>('idle')
   const [error, setError] = useState('')
-
-  const existingStripeAccountId = useMemo(() => {
-    try {
-      const raw = sessionStorage.getItem('jmp-author-portal-context')
-      if (!raw) return ''
-      const parsed = JSON.parse(raw) as PortalContext
-      return parsed?.portalContext?.stripeAccountId || ''
-    } catch {
-      return ''
-    }
-  }, [])
 
   async function handlePayoutEnrollment() {
     setStatus('submitting')
@@ -37,9 +20,7 @@ export function StripeConnectSetupCard() {
             sessionStorage.getItem('jmp-author-onboarding-access-code') ||
             '',
         },
-        body: JSON.stringify({
-          stripeAccountId: existingStripeAccountId || undefined,
-        }),
+        body: JSON.stringify({}),
       })
 
       const data = await response.json()
@@ -65,11 +46,6 @@ export function StripeConnectSetupCard() {
             that a payment is currently due, approved, or scheduled.
           </p>
         </div>
-        {existingStripeAccountId ? (
-          <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-[10px] uppercase tracking-[0.1em] text-emerald-200">
-            Existing enrollment account ready
-          </span>
-        ) : null}
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
