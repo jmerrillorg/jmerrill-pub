@@ -302,7 +302,17 @@ export type PublisherTodayItem = {
   evidenceLinks: Array<{
     label: string
     href: string
+    checksum?: string
+    artifactType?: string
+    version?: string
+    current?: boolean
   }>
+  activeFormats?: string[]
+  workspaceState?: string
+  workspaceEntitlementState?: string
+  onboardingState?: string
+  commercialEvidenceText?: string
+  formatEvidenceText?: string
   allowedActions: Array<{
     id: PublisherActionId
     label: string
@@ -3208,6 +3218,12 @@ function titleItemsToOperatingCard(
     nextAction: primary.nextAction,
     ageDays: primary.ageDays,
     evidenceLinks: primary.evidenceLinks,
+    activeFormats: primary.activeFormats,
+    workspaceState: primary.workspaceState,
+    workspaceEntitlementState: primary.workspaceEntitlementState,
+    onboardingState: primary.onboardingState,
+    commercialEvidenceText: primary.commercialEvidenceText,
+    formatEvidenceText: primary.formatEvidenceText,
     portfolioState: primary.portfolioState,
   })
   const liveClassification = isSyntheticTitle(primary.title) ? 'TEST_CERTIFICATION' : 'LIVE'
@@ -3664,6 +3680,8 @@ function portfolioToTodayItem(item: PublisherPortfolioItem): PublisherTodayItem 
     qaState: item.confidence,
     dependency: item.exceptionReason || item.evidence.slice(0, 2).join('; ') || 'No active exception',
     evidenceLinks: [],
+    activeFormats: item.activeFormats,
+    formatEvidenceText: `${item.publicationStatus} ${item.distributionStatus} ${item.isbn13s.join(' ')} ${item.evidence.join('; ')}`,
     allowedActions: [],
     lastMovement: item.evidence[0] || 'Portfolio classification read from Core-backed title and asset evidence',
   }

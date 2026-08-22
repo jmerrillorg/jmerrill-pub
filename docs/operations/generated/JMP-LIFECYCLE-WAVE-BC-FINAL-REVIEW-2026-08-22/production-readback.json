@@ -1,0 +1,390 @@
+{
+  "generatedAt": "2026-08-22T07:36:30.910Z",
+  "resource": "https://jm1hq.crm.dynamics.com",
+  "apiBase": "https://jm1hq.crm.dynamics.com/api/data/v9.2",
+  "method": "READ_ONLY_GET",
+  "liveWrites": 0,
+  "queryStatus": {
+    "titles": {
+      "ok": true,
+      "count": 400
+    },
+    "editorialStages": {
+      "ok": true,
+      "count": 30
+    },
+    "artifacts": {
+      "ok": true,
+      "count": 314
+    },
+    "intakes": {
+      "ok": true,
+      "count": 31
+    },
+    "opportunities": {
+      "ok": true,
+      "count": 5
+    },
+    "gates": {
+      "ok": true,
+      "count": 16
+    },
+    "productionProjects": {
+      "ok": true,
+      "count": 2
+    },
+    "productionTasks": {
+      "ok": true,
+      "count": 8
+    }
+  },
+  "counts": {
+    "titles": 400,
+    "editorialStages": 30,
+    "artifacts": 314,
+    "intakes": 31,
+    "opportunities": 5,
+    "gates": 16,
+    "formats": 314,
+    "workspaceRecords": 27,
+    "commercialEvidenceRecords": 4,
+    "productionProjects": 2
+  },
+  "portfolioMetrics": {
+    "totalTitlesRead": 400,
+    "deterministicallyMapped": 17,
+    "contextuallyMapped": 0,
+    "mappingConflicts": 1,
+    "mappingIncomplete": 382,
+    "systemAttentionCount": 383,
+    "authorActionYesCount": 3,
+    "authorActionNoCount": 397,
+    "unresolvedNextActionCount": 383
+  },
+  "coverage": [
+    {
+      "domain": "Artifact identity",
+      "applicable": 314,
+      "covered": 314,
+      "coveragePct": 100,
+      "conflict": 0,
+      "dataGap": 0
+    },
+    {
+      "domain": "Artifact type",
+      "applicable": 314,
+      "covered": 314,
+      "coveragePct": 100,
+      "conflict": 0,
+      "dataGap": 0
+    },
+    {
+      "domain": "Artifact version",
+      "applicable": 314,
+      "covered": 2,
+      "coveragePct": 0.6,
+      "conflict": 0,
+      "dataGap": 312
+    },
+    {
+      "domain": "Artifact current/superseded state",
+      "applicable": 314,
+      "covered": 0,
+      "coveragePct": 0,
+      "conflict": 0,
+      "dataGap": 314
+    },
+    {
+      "domain": "Artifact checksum",
+      "applicable": 314,
+      "covered": 0,
+      "coveragePct": 0,
+      "conflict": 0,
+      "dataGap": 314
+    },
+    {
+      "domain": "Artifact provenance",
+      "applicable": 314,
+      "covered": 312,
+      "coveragePct": 99.4,
+      "conflict": 0,
+      "dataGap": 2
+    },
+    {
+      "domain": "Artifact title binding",
+      "applicable": 314,
+      "covered": 314,
+      "coveragePct": 100,
+      "conflict": 0,
+      "dataGap": 0
+    },
+    {
+      "domain": "Artifact readiness binding",
+      "applicable": 314,
+      "covered": 295,
+      "coveragePct": 93.9,
+      "conflict": 0,
+      "dataGap": 19
+    },
+    {
+      "domain": "Author Relationship",
+      "applicable": 400,
+      "covered": 338,
+      "coveragePct": 84.5,
+      "conflict": 0,
+      "dataGap": 62
+    },
+    {
+      "domain": "Workspace entitlement",
+      "applicable": 31,
+      "covered": 0,
+      "coveragePct": 0,
+      "conflict": 0,
+      "dataGap": 31
+    },
+    {
+      "domain": "Workspace active",
+      "applicable": 31,
+      "covered": 0,
+      "coveragePct": 0,
+      "conflict": 0,
+      "dataGap": 31
+    },
+    {
+      "domain": "Onboarding status",
+      "applicable": 5,
+      "covered": 4,
+      "coveragePct": 80,
+      "conflict": 0,
+      "dataGap": 1
+    },
+    {
+      "domain": "Returning-author workspace continuity",
+      "applicable": "N/A",
+      "covered": "N/A",
+      "coveragePct": null,
+      "conflict": 0,
+      "dataGap": "N/A"
+    },
+    {
+      "domain": "Package accepted",
+      "applicable": 5,
+      "covered": 4,
+      "coveragePct": 80,
+      "conflict": 0,
+      "dataGap": 1
+    },
+    {
+      "domain": "Pricing locked",
+      "applicable": 5,
+      "covered": 1,
+      "coveragePct": 20,
+      "conflict": 0,
+      "dataGap": 4
+    },
+    {
+      "domain": "Agreement executed",
+      "applicable": 5,
+      "covered": 2,
+      "coveragePct": 40,
+      "conflict": 0,
+      "dataGap": 3
+    },
+    {
+      "domain": "Initial payment",
+      "applicable": 5,
+      "covered": 0,
+      "coveragePct": 0,
+      "conflict": 0,
+      "dataGap": 5
+    },
+    {
+      "domain": "Installment detail",
+      "applicable": 5,
+      "covered": 3,
+      "coveragePct": 60,
+      "conflict": 0,
+      "dataGap": 2
+    },
+    {
+      "domain": "Joined the Family",
+      "applicable": 5,
+      "covered": 0,
+      "coveragePct": 0,
+      "conflict": 0,
+      "dataGap": 5
+    },
+    {
+      "domain": "Format identity",
+      "applicable": 314,
+      "covered": 314,
+      "coveragePct": 100,
+      "conflict": 0,
+      "dataGap": 0
+    },
+    {
+      "domain": "Identifier",
+      "applicable": 314,
+      "covered": 291,
+      "coveragePct": 92.7,
+      "conflict": 0,
+      "dataGap": 23
+    },
+    {
+      "domain": "Distribution route",
+      "applicable": 314,
+      "covered": 312,
+      "coveragePct": 99.4,
+      "conflict": 0,
+      "dataGap": 2
+    },
+    {
+      "domain": "External reference",
+      "applicable": 314,
+      "covered": 17,
+      "coveragePct": 5.4,
+      "conflict": 0,
+      "dataGap": 297
+    },
+    {
+      "domain": "Live state",
+      "applicable": 314,
+      "covered": 0,
+      "coveragePct": 0,
+      "conflict": 0,
+      "dataGap": 314
+    },
+    {
+      "domain": "Verified URL",
+      "applicable": 314,
+      "covered": 17,
+      "coveragePct": 5.4,
+      "conflict": 0,
+      "dataGap": 297
+    },
+    {
+      "domain": "Format certification",
+      "applicable": 314,
+      "covered": 0,
+      "coveragePct": 0,
+      "conflict": 0,
+      "dataGap": 314
+    }
+  ],
+  "representatives": [
+    {
+      "pattern": "/atta|untitled/i",
+      "found": true,
+      "titleId": "ca68c994-fd89-f111-ab10-00224820105b",
+      "title": "Untitled",
+      "author": "Atta Boateng",
+      "mapping": "DETERMINISTIC",
+      "stages": 1,
+      "artifacts": 1,
+      "gates": 1
+    },
+    {
+      "pattern": "/death do us part/i",
+      "found": true,
+      "titleId": "f79006b7-f595-f111-8076-00224820105b",
+      "title": "'TIL DEATH DO US PART",
+      "author": "Jackie Smith, Jr.",
+      "mapping": "DETERMINISTIC",
+      "stages": 1,
+      "artifacts": 1,
+      "gates": 0
+    },
+    {
+      "pattern": "/establishing glory/i",
+      "found": true,
+      "titleId": "9242c1c2-c37a-f111-ab0f-000d3a14673b",
+      "title": "Establishing Glory",
+      "author": "",
+      "mapping": "INCOMPLETE",
+      "stages": 0,
+      "artifacts": 9,
+      "gates": 0
+    },
+    {
+      "pattern": "/editorial review/i",
+      "found": true,
+      "titleId": "e797232b-da7a-f111-ab0f-00224820105b",
+      "title": "The Intentional Leader",
+      "author": "Jackie Smith Jr",
+      "mapping": "CONFLICT",
+      "stages": 6,
+      "artifacts": 1,
+      "gates": 7
+    },
+    {
+      "pattern": "/line/i",
+      "found": true,
+      "titleId": "b17e1ee0-b389-f111-ab10-000d3a14673b",
+      "title": "Discipline and Direction",
+      "author": "Terry Stephens",
+      "mapping": "DETERMINISTIC",
+      "stages": 0,
+      "artifacts": 0,
+      "gates": 0
+    },
+    {
+      "pattern": "/copy/i",
+      "found": false
+    },
+    {
+      "pattern": "/proof/i",
+      "found": true,
+      "titleId": "39515cd9-7a8a-f111-ab10-000d3a1a9efa",
+      "title": "JM1 Duplicate Proof 20260727173641",
+      "author": "JM1 Duplicate20260727173641",
+      "mapping": "DETERMINISTIC",
+      "stages": 1,
+      "artifacts": 1,
+      "gates": 0
+    },
+    {
+      "pattern": "/layout/i",
+      "found": false
+    },
+    {
+      "pattern": "/published|royalt|stage 10/i",
+      "found": false
+    }
+  ],
+  "dataGapCategories": {
+    "RESOLVABLE_FROM_EXISTING_EVIDENCE": [
+      "Artifact version",
+      "Artifact current/superseded state",
+      "Artifact checksum",
+      "Artifact provenance",
+      "Artifact readiness binding",
+      "Workspace entitlement",
+      "Workspace active",
+      "Package accepted",
+      "Pricing locked",
+      "Agreement executed",
+      "Initial payment"
+    ],
+    "STRUCTURAL_FUTURE_IMPLEMENTATION": [
+      "Returning-author workspace continuity",
+      "Format certification",
+      "Royalty payout readiness",
+      "Release manifest certification"
+    ],
+    "LEGACY_EVIDENCE_UNAVAILABLE": [
+      "Artifact current/superseded state",
+      "Artifact checksum",
+      "Workspace entitlement",
+      "Workspace active",
+      "Initial payment",
+      "Joined the Family",
+      "Live state",
+      "Format certification"
+    ],
+    "MAPPING_CONFLICT": 1,
+    "EVIDENCE_CONFLICT": 0,
+    "NOT_APPLICABLE": [
+      "Returning-author workspace continuity"
+    ]
+  }
+}

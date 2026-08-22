@@ -56,6 +56,7 @@ jobs:
           npm run jm1-canon-guard-enforcement
           npm run jmp-lifecycle-authority-guard
           npm run jmp-lifecycle-wave-b-operating-center-guard
+          npm run jmp-lifecycle-wave-c-evidence-completion-guard
           npm run jm1-initiative-handoff-guard
           node --test scripts/jmp_intake_redesign_guard.test.mjs
           node scripts/check-catalog-runtime-source.mjs
