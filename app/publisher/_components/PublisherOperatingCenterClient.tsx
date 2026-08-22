@@ -1474,6 +1474,9 @@ function TitleDetailDrawer({
           <MiniFact label="Review state" value={card.currentArtifact.reviewState} />
           <MiniFact label="Artifact Authority" value={`${card.canonicalLifecycle.sourceArtifact.artifactType} · ${card.canonicalLifecycle.sourceArtifact.certificationState}`} />
           <MiniFact label="Checksum" value={card.canonicalLifecycle.sourceArtifact.checksum} />
+          <MiniFact label="Identity Evidence" value={`${card.canonicalLifecycle.lifecycleEvidence.artifact.identity.status} — ${card.canonicalLifecycle.lifecycleEvidence.artifact.identity.reason}`} />
+          <MiniFact label="Provenance Evidence" value={`${card.canonicalLifecycle.lifecycleEvidence.artifact.provenance.status} — ${card.canonicalLifecycle.lifecycleEvidence.artifact.provenance.reason}`} />
+          <MiniFact label="Current Version Evidence" value={`${card.canonicalLifecycle.lifecycleEvidence.artifact.currentVersion.status} — ${card.canonicalLifecycle.lifecycleEvidence.artifact.currentVersion.reason}`} />
           {card.currentArtifact.href && <a className="text-[12px] font-semibold text-blue-200 underline" href={card.currentArtifact.href}>Open artifact</a>}
         </DetailBlock>
 
@@ -1521,6 +1524,14 @@ function TitleDetailDrawer({
           <MiniFact label="Author Access" value={card.canonicalLifecycle.workspaceEntitlementState} />
           <MiniFact label="Onboarding" value={card.canonicalLifecycle.onboardingState} />
           <MiniFact label="Royalty Payout" value={card.canonicalLifecycle.royaltyPayoutReadiness} />
+        </DetailBlock>
+
+        <DetailBlock title="Lifecycle Evidence">
+          <MiniFact label="Artifact Coverage" value={`identity ${card.canonicalLifecycle.lifecycleEvidence.coverage.artifactIdentity}; checksum ${card.canonicalLifecycle.lifecycleEvidence.coverage.artifactChecksum}; provenance ${card.canonicalLifecycle.lifecycleEvidence.coverage.artifactProvenance}`} />
+          <MiniFact label="Workspace Coverage" value={`entitlement ${card.canonicalLifecycle.lifecycleEvidence.coverage.workspaceEntitlement}; active ${card.canonicalLifecycle.lifecycleEvidence.coverage.workspaceActive}; onboarding ${card.canonicalLifecycle.lifecycleEvidence.coverage.onboarding}`} />
+          <MiniFact label="Commercial Coverage" value={`package ${card.canonicalLifecycle.lifecycleEvidence.coverage.packageAccepted}; pricing ${card.canonicalLifecycle.lifecycleEvidence.coverage.pricingLocked}; agreement ${card.canonicalLifecycle.lifecycleEvidence.coverage.agreementExecuted}; payment ${card.canonicalLifecycle.lifecycleEvidence.coverage.payment}; family ${card.canonicalLifecycle.lifecycleEvidence.coverage.joinedFamily}`} />
+          <MiniFact label="Format Coverage" value={`identity ${card.canonicalLifecycle.lifecycleEvidence.coverage.formatIdentity}; distribution ${card.canonicalLifecycle.lifecycleEvidence.coverage.formatDistribution}; certification ${card.canonicalLifecycle.lifecycleEvidence.coverage.certification}`} />
+          <MiniFact label="Conflict Count" value={String(card.canonicalLifecycle.lifecycleEvidence.conflictCount)} />
         </DetailBlock>
 
         <DetailBlock title="Actions">

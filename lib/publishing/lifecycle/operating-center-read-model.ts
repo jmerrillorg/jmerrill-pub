@@ -29,6 +29,33 @@ export type CanonicalSystemAttentionCode =
 
 export type CanonicalReadinessState = 'READY' | 'NOT_READY' | 'BLOCKED' | 'NOT_APPLICABLE' | 'DATA_GAP'
 
+export type CanonicalEvidenceStatus = 'SUPPORTED' | 'CONFLICT' | 'INCOMPLETE' | 'NOT_APPLICABLE'
+
+export type CanonicalDataGapClassification = 'RESOLVABLE' | 'STRUCTURAL'
+
+export type CanonicalEvidenceRecord = {
+  source: string
+  value: string
+  confidence: 'DETERMINISTIC' | 'CONTEXTUAL' | 'CONFLICT' | 'INCOMPLETE'
+}
+
+export type CanonicalEvidenceFacet = {
+  status: CanonicalEvidenceStatus
+  value: string
+  reason: string
+  evidence: CanonicalEvidenceRecord[]
+  dataGapReason?: string
+  gapClassification?: CanonicalDataGapClassification
+}
+
+export type CanonicalReadinessDimension =
+  | 'editorial'
+  | 'bookProduction'
+  | 'metadata'
+  | 'distribution'
+  | 'royaltyPayout'
+  | 'finalDeliveryPayment'
+
 export type CanonicalPublisherProjectionInput = {
   author: string
   bookTitle: string
@@ -50,9 +77,14 @@ export type CanonicalPublisherProjectionInput = {
   exactBlocker?: string
   nextAction?: string
   ageDays?: number
-  evidenceLinks?: Array<{ label: string; href: string }>
+  evidenceLinks?: Array<{ label: string; href: string; checksum?: string; artifactType?: string; version?: string; current?: boolean }>
   activeFormats?: string[]
   portfolioState?: string
+  workspaceState?: string
+  workspaceEntitlementState?: string
+  onboardingState?: string
+  commercialEvidenceText?: string
+  formatEvidenceText?: string
 }
 
 export type CanonicalPublisherReadModel = {
@@ -96,6 +128,54 @@ export type CanonicalPublisherReadModel = {
     certificationState: string
     source: string
   }
+  lifecycleEvidence: {
+    artifact: {
+      identity: CanonicalEvidenceFacet
+      checksum: CanonicalEvidenceFacet
+      provenance: CanonicalEvidenceFacet
+      currentVersion: CanonicalEvidenceFacet
+      ambiguity: CanonicalEvidenceFacet
+    }
+    authorWorkspace: {
+      relationship: CanonicalEvidenceFacet
+      entitlement: CanonicalEvidenceFacet
+      activeWorkspace: CanonicalEvidenceFacet
+      onboarding: CanonicalEvidenceFacet
+    }
+    commercial: {
+      packageAccepted: CanonicalEvidenceFacet
+      pricingLocked: CanonicalEvidenceFacet
+      agreementExecuted: CanonicalEvidenceFacet
+      initialPayment: CanonicalEvidenceFacet
+      installments: CanonicalEvidenceFacet
+      joinedFamily: CanonicalEvidenceFacet
+    }
+    formats: Array<{
+      format: string
+      identity: CanonicalEvidenceFacet
+      distribution: CanonicalEvidenceFacet
+      certification: CanonicalEvidenceFacet
+      verifiedUrl: CanonicalEvidenceFacet
+    }>
+    readinessContracts: Record<CanonicalReadinessDimension, CanonicalEvidenceFacet>
+    coverage: {
+      artifactIdentity: CanonicalEvidenceStatus
+      artifactChecksum: CanonicalEvidenceStatus
+      artifactProvenance: CanonicalEvidenceStatus
+      workspaceEntitlement: CanonicalEvidenceStatus
+      workspaceActive: CanonicalEvidenceStatus
+      onboarding: CanonicalEvidenceStatus
+      packageAccepted: CanonicalEvidenceStatus
+      pricingLocked: CanonicalEvidenceStatus
+      agreementExecuted: CanonicalEvidenceStatus
+      payment: CanonicalEvidenceStatus
+      joinedFamily: CanonicalEvidenceStatus
+      formatIdentity: CanonicalEvidenceStatus
+      formatDistribution: CanonicalEvidenceStatus
+      certification: CanonicalEvidenceStatus
+    }
+    conflictCount: number
+  }
   workingImprint: string
   recommendedImprint: string
   confirmedImprint: string
@@ -138,6 +218,8 @@ export type CanonicalPublisherReadModel = {
     currentSource: string
     available: boolean
     remediationWave: string
+    reason: string
+    classification: CanonicalDataGapClassification
   }>
   sourceAttribution: string[]
 }
@@ -181,6 +263,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     : null
   const splitBrain = detectSplitBrain(input)
   const artifact = sourceArtifactFor(input, mapping)
+  const lifecycleEvidence = lifecycleEvidenceFor(input, mapping, artifact)
   const waitingOn = canonicalWaitingOwner(input)
   const systemAttention = systemAttentionFor(input, mapping, splitBrain, artifact.artifactType === 'DATA_GAP')
   const authorActionRequired = authorActionFor(input, waitingOn, mapping)
@@ -228,6 +311,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     systemAttention,
     authorActionRequired,
     sourceArtifact: artifact,
+    lifecycleEvidence,
     workingImprint: 'DATA_GAP',
     recommendedImprint: 'DATA_GAP',
     confirmedImprint: 'DATA_GAP',
@@ -243,9 +327,9 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     metadataState: metadataStateFor(input),
     distributionState: distributionStateFor(input),
     postPublicationState: postPublicationStateFor(input),
-    workspaceState: 'DATA_GAP',
-    workspaceEntitlementState: 'DATA_GAP',
-    onboardingState: 'DATA_GAP',
+    workspaceState: input.workspaceState || 'DATA_GAP',
+    workspaceEntitlementState: input.workspaceEntitlementState || 'DATA_GAP',
+    onboardingState: input.onboardingState || 'DATA_GAP',
     royaltyPayoutReadiness: royaltyReadinessFor(input),
     readiness: readinessFor(input, mapping),
     nextGovernedAction,
@@ -347,12 +431,151 @@ function sourceArtifactFor(input: CanonicalPublisherProjectionInput, mapping: Le
     }
   }
   return {
-    artifactType: mapping.canonicalSubstage || mapping.canonicalStage || 'SOURCE_EVIDENCE',
+    artifactType: first.artifactType || mapping.canonicalSubstage || mapping.canonicalStage || 'SOURCE_EVIDENCE',
     artifactId: first.href,
-    checksum: 'DATA_GAP',
-    version: input.qaState || 'Current',
+    checksum: first.checksum || checksumFromText(`${first.label} ${first.href}`) || 'DATA_GAP',
+    version: first.version || input.qaState || 'Current',
     certificationState: input.packageState || 'DATA_GAP',
     source: first.label,
+  }
+}
+
+function lifecycleEvidenceFor(
+  input: CanonicalPublisherProjectionInput,
+  mapping: LegacyMappingResult,
+  artifact: CanonicalPublisherReadModel['sourceArtifact'],
+): CanonicalPublisherReadModel['lifecycleEvidence'] {
+  const artifactLinks = input.evidenceLinks || []
+  const sourceText = [
+    input.legacySourceState,
+    input.pipelineStage,
+    input.editorialStage,
+    input.substage,
+    input.packageState,
+    input.qaState,
+    input.dependency,
+    input.portfolioState,
+    input.commercialEvidenceText,
+    input.formatEvidenceText,
+    ...artifactLinks.flatMap((link) => [link.label, link.href, link.checksum || '', link.version || '']),
+  ].join(' ')
+  const commercialText = `${input.packageState || ''} ${input.dependency || ''} ${input.portfolioState || ''} ${input.commercialEvidenceText || ''}`
+  const artifactIdentity = artifact.artifactId === 'DATA_GAP'
+    ? dataGapFacet('No governing artifact identifier is surfaced by the current read-model item.', 'Artifact Registry', 'RESOLVABLE')
+    : supportedFacet(artifact.artifactId, artifact.source, 'Artifact identifier is surfaced by an evidence link.', mapping.resultCode === 'CANONICAL_MAPPING_CONTEXTUAL' ? 'CONTEXTUAL' : 'DETERMINISTIC')
+  const artifactChecksum = artifact.checksum === 'DATA_GAP'
+    ? dataGapFacet('Checksum is not available on the surfaced artifact evidence.', 'Artifact Registry checksum field', 'RESOLVABLE')
+    : supportedFacet(artifact.checksum, artifact.source, 'Checksum is attached to the governing artifact evidence.')
+  const artifactProvenance = artifactLinks.length
+    ? supportedFacet(artifactLinks.map((link) => link.label).join('; '), 'Publisher Operating Center evidence links', 'Artifact provenance is traceable to surfaced source links.', 'CONTEXTUAL')
+    : dataGapFacet('No provenance link is surfaced for the governing artifact.', 'Dataverse/SharePoint artifact lineage', 'RESOLVABLE')
+  const currentVersion = artifactLinks.some((link) => link.current === false) || /superseded|obsolete|replaced/i.test(sourceText)
+    ? conflictFacet('Superseded artifact evidence is present; current governing version must be confirmed.', 'Artifact lineage')
+    : artifact.artifactId === 'DATA_GAP'
+      ? dataGapFacet('Current version cannot be determined without a governing artifact.', 'Artifact Registry current-version flag', 'RESOLVABLE')
+      : supportedFacet(artifact.version, artifact.source, 'Current artifact version is projected from surfaced QA/version evidence.', 'CONTEXTUAL')
+  const ambiguity = mapping.resultCode === 'CANONICAL_MAPPING_CONFLICT'
+    ? conflictFacet(mapping.notes, 'Lifecycle mapping registry')
+    : /conflict|split.?brain|ambiguous/i.test(sourceText)
+      ? conflictFacet('Source evidence contains ambiguity or conflict markers.', 'Operating Center source evidence')
+      : supportedFacet('No surfaced artifact ambiguity', 'Publisher Operating Center read model', 'No artifact ambiguity is surfaced in this item.', 'CONTEXTUAL')
+
+  const relationship = relationshipStateFor(input) === 'DATA_GAP'
+    ? dataGapFacet('Author relationship state is not explicitly recorded.', 'Author relationship registry', 'STRUCTURAL')
+    : supportedFacet(relationshipStateFor(input), 'Lifecycle projection', 'Relationship is projected independently from title stage.', 'CONTEXTUAL')
+  const entitlement = input.workspaceEntitlementState
+    ? supportedFacet(input.workspaceEntitlementState, 'Workspace entitlement source', 'Workspace entitlement evidence is surfaced.')
+    : dataGapFacet('Workspace entitlement is not present in the current title projection.', 'Author workspace entitlement registry', 'STRUCTURAL')
+  const activeWorkspace = input.workspaceState
+    ? supportedFacet(input.workspaceState, 'Author workspace source', 'Workspace active-state evidence is surfaced.')
+    : dataGapFacet('Workspace active state is not present in the current title projection.', 'Author workspace registry', 'STRUCTURAL')
+  const onboarding = input.onboardingState
+    ? supportedFacet(input.onboardingState, 'Author onboarding source', 'Onboarding state evidence is surfaced.')
+    : dataGapFacet('Onboarding nuance is not present in the current title projection.', 'Author onboarding registry', 'STRUCTURAL')
+
+  const packageAccepted = evidenceFromRegex(commercialText, /package accepted/i, 'Package accepted', 'Package acceptance evidence is surfaced.', 'Commercial package event ledger')
+  const pricingLocked = evidenceFromRegex(commercialText, /pricing locked|locked price|price locked|quote locked/i, 'Pricing locked', 'Pricing lock evidence is surfaced.', 'Commercial pricing ledger')
+  const agreementExecuted = evidenceFromRegex(commercialText, /agreement executed|agreement signed|signed agreement|contract executed/i, 'Agreement executed', 'Agreement execution evidence is surfaced.', 'Agreement ledger')
+  const initialPayment = evidenceFromRegex(commercialText, /initial payment|first payment|deposit|paid/i, 'Initial payment', 'Initial payment evidence is surfaced.', 'Stripe payment ledger')
+  const installments = evidenceFromRegex(commercialText, /\b(2|4|8)[- ]?pay\b|installment/i, paymentPlanFor(input), 'Installment plan evidence is surfaced.', 'Stripe payment ledger')
+  const joinedFamily = joinedFamilyFor(input).value === 'YES'
+    ? agreementExecuted.status === 'SUPPORTED' && initialPayment.status === 'SUPPORTED'
+      ? supportedFacet('Joined the Family', 'Commercial event chain', 'Joined the Family is supported by agreement and payment evidence.')
+      : conflictFacet('Joined the Family is surfaced without both agreement execution and initial payment evidence.', 'Commercial event chain')
+    : joinedFamilyFor(input).value === 'NO'
+      ? supportedFacet('Not Joined the Family', 'Commercial event chain', joinedFamilyFor(input).reason, 'CONTEXTUAL')
+      : dataGapFacet(joinedFamilyFor(input).reason, 'Agreement plus initial payment ledgers', 'STRUCTURAL')
+
+  const formats = formatEvidenceFor(input)
+  const readinessContracts = readinessContractsFor(input, mapping, {
+    packageAccepted,
+    agreementExecuted,
+    initialPayment,
+    formats,
+    artifactIdentity,
+  })
+  const coverage = {
+    artifactIdentity: artifactIdentity.status,
+    artifactChecksum: artifactChecksum.status,
+    artifactProvenance: artifactProvenance.status,
+    workspaceEntitlement: entitlement.status,
+    workspaceActive: activeWorkspace.status,
+    onboarding: onboarding.status,
+    packageAccepted: packageAccepted.status,
+    pricingLocked: pricingLocked.status,
+    agreementExecuted: agreementExecuted.status,
+    payment: initialPayment.status,
+    joinedFamily: joinedFamily.status,
+    formatIdentity: aggregateStatus(formats.map((format) => format.identity.status)),
+    formatDistribution: aggregateStatus(formats.map((format) => format.distribution.status)),
+    certification: aggregateStatus(formats.map((format) => format.certification.status)),
+  }
+  const allStatuses = [
+    artifactIdentity,
+    artifactChecksum,
+    artifactProvenance,
+    currentVersion,
+    ambiguity,
+    relationship,
+    entitlement,
+    activeWorkspace,
+    onboarding,
+    packageAccepted,
+    pricingLocked,
+    agreementExecuted,
+    initialPayment,
+    installments,
+    joinedFamily,
+    ...Object.values(readinessContracts),
+    ...formats.flatMap((format) => [format.identity, format.distribution, format.certification, format.verifiedUrl]),
+  ].map((facet) => facet.status)
+
+  return {
+    artifact: {
+      identity: artifactIdentity,
+      checksum: artifactChecksum,
+      provenance: artifactProvenance,
+      currentVersion,
+      ambiguity,
+    },
+    authorWorkspace: {
+      relationship,
+      entitlement,
+      activeWorkspace,
+      onboarding,
+    },
+    commercial: {
+      packageAccepted,
+      pricingLocked,
+      agreementExecuted,
+      initialPayment,
+      installments,
+      joinedFamily,
+    },
+    formats,
+    readinessContracts,
+    coverage,
+    conflictCount: allStatuses.filter((status) => status === 'CONFLICT').length,
   }
 }
 
@@ -380,8 +603,136 @@ function readinessFor(input: CanonicalPublisherProjectionInput, mapping: LegacyM
   }
 }
 
+function readinessContractsFor(
+  input: CanonicalPublisherProjectionInput,
+  mapping: LegacyMappingResult,
+  evidence: {
+    packageAccepted: CanonicalEvidenceFacet
+    agreementExecuted: CanonicalEvidenceFacet
+    initialPayment: CanonicalEvidenceFacet
+    formats: CanonicalPublisherReadModel['lifecycleEvidence']['formats']
+    artifactIdentity: CanonicalEvidenceFacet
+  },
+): CanonicalPublisherReadModel['lifecycleEvidence']['readinessContracts'] {
+  const readiness = readinessFor(input, mapping)
+  return {
+    editorial: readinessFacet(readiness.editorial, evidence.artifactIdentity, 'Editorial readiness requires a governing editorial artifact and non-conflicting lifecycle stage.'),
+    bookProduction: readinessFacet(readiness.bookProduction, evidence.artifactIdentity, 'Book production readiness requires current production artifact evidence.'),
+    metadata: readiness.metadata === 'READY'
+      ? supportedFacet('Metadata ready', 'Lifecycle projection', 'Metadata readiness is surfaced by title state.', 'CONTEXTUAL')
+      : dataGapFacet('Metadata readiness is not supported by surfaced evidence.', 'Metadata readiness registry', 'RESOLVABLE'),
+    distribution: readiness.distribution === 'READY' && evidence.formats.some((format) => format.distribution.status === 'SUPPORTED')
+      ? supportedFacet('Distribution ready', 'Format distribution evidence', 'At least one format has distribution evidence.')
+      : dataGapFacet('Distribution readiness is not supported by format-level release evidence.', 'Distribution platform registry', 'STRUCTURAL'),
+    royaltyPayout: readiness.royaltyPayout === 'READY'
+      ? supportedFacet('Royalty payout review surfaced', 'Royalty decision read model', 'Royalty readiness is surfaced by post-publication state.', 'CONTEXTUAL')
+      : dataGapFacet('Royalty payout readiness remains outside the Operating Center title projection.', 'Stripe Connect / royalty payout registry', 'STRUCTURAL'),
+    finalDeliveryPayment: evidence.agreementExecuted.status === 'SUPPORTED' && evidence.initialPayment.status === 'SUPPORTED'
+      ? supportedFacet('Final delivery payment prerequisites partially surfaced', 'Commercial evidence chain', 'Agreement and initial payment evidence are surfaced.', 'CONTEXTUAL')
+      : dataGapFacet('Final delivery payment readiness lacks complete agreement/payment evidence.', 'Commercial payment ledger', 'STRUCTURAL'),
+  }
+}
+
+function readinessFacet(
+  readiness: CanonicalReadinessState,
+  evidence: CanonicalEvidenceFacet,
+  reason: string,
+): CanonicalEvidenceFacet {
+  if (readiness === 'BLOCKED') return conflictFacet('Readiness is blocked by lifecycle mapping conflict or incomplete mapping.', 'Lifecycle registry')
+  if (readiness === 'READY' && evidence.status === 'SUPPORTED') return supportedFacet('READY', evidence.evidence[0]?.source || 'Readiness projection', reason, evidence.evidence[0]?.confidence || 'CONTEXTUAL')
+  if (readiness === 'NOT_APPLICABLE') return { status: 'NOT_APPLICABLE', value: 'NOT_APPLICABLE', reason, evidence: [] }
+  return dataGapFacet(reason, 'Canonical readiness evidence', 'RESOLVABLE')
+}
+
+function formatEvidenceFor(input: CanonicalPublisherProjectionInput): CanonicalPublisherReadModel['lifecycleEvidence']['formats'] {
+  const formats = input.activeFormats?.length ? input.activeFormats : ['Paperback', 'Hardcover', 'Ebook', 'Audiobook']
+  const text = `${input.legacySourceState} ${input.pipelineStage || ''} ${input.substage || ''} ${input.packageState || ''} ${input.formatEvidenceText || ''}`
+  return formats.map((format) => {
+    const formatPattern = new RegExp(format.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
+    const formatSeen = formatPattern.test(text) || Boolean(input.activeFormats?.includes(format))
+    const formatContext = evidenceContextForFormat(input.formatEvidenceText || text, format)
+    const distributionReady = formatContext !== '' && /submitted|live|released|catalog|distribution|published/i.test(formatContext)
+    const certified = formatContext !== '' && /certified|approved|ready/i.test(formatContext)
+    const verifiedUrl = formatContext !== '' && /https?:\/\//i.test(formatContext)
+    return {
+      format,
+      identity: formatSeen
+        ? supportedFacet(format, 'Format projection', 'Format identity is surfaced by active format or format evidence.', 'CONTEXTUAL')
+        : dataGapFacet(`No ${format} identity evidence is surfaced.`, 'Format registry', 'STRUCTURAL'),
+      distribution: distributionReady
+        ? supportedFacet('Distribution evidence surfaced', 'Distribution evidence', `${format} distribution state is surfaced.`, 'CONTEXTUAL')
+        : dataGapFacet(`${format} distribution/live state is not surfaced.`, 'Distribution platform registry', 'STRUCTURAL'),
+      certification: certified
+        ? supportedFacet('Certification evidence surfaced', 'Readiness evidence', `${format} certification/readiness evidence is surfaced.`, 'CONTEXTUAL')
+        : dataGapFacet(`${format} certification evidence is not surfaced.`, 'Certification/readiness ledger', 'STRUCTURAL'),
+      verifiedUrl: verifiedUrl
+        ? supportedFacet('Verified URL surfaced', 'Distribution evidence', `${format} verified URL evidence is surfaced.`, 'CONTEXTUAL')
+        : dataGapFacet(`${format} verified URL is not surfaced.`, 'Distribution platform URL registry', 'STRUCTURAL'),
+    }
+  })
+}
+
+function evidenceContextForFormat(text: string, format: string) {
+  return text
+    .split(/[.;\n]/)
+    .filter((part) => new RegExp(format.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(part))
+    .join(' ')
+}
+
+function evidenceFromRegex(text: string, pattern: RegExp, value: string, reason: string, expectedSource: string): CanonicalEvidenceFacet {
+  return pattern.test(text)
+    ? supportedFacet(value, expectedSource, reason, 'CONTEXTUAL')
+    : dataGapFacet(`${reason.replace(' is surfaced.', '')} is not surfaced.`, expectedSource, 'STRUCTURAL')
+}
+
+function supportedFacet(
+  value: string,
+  source: string,
+  reason: string,
+  confidence: CanonicalEvidenceRecord['confidence'] = 'DETERMINISTIC',
+): CanonicalEvidenceFacet {
+  return {
+    status: 'SUPPORTED',
+    value: value || 'SUPPORTED',
+    reason,
+    evidence: [{ source, value: value || 'SUPPORTED', confidence }],
+  }
+}
+
+function conflictFacet(reason: string, source: string): CanonicalEvidenceFacet {
+  return {
+    status: 'CONFLICT',
+    value: 'CONFLICT',
+    reason,
+    evidence: [{ source, value: reason, confidence: 'CONFLICT' }],
+  }
+}
+
+function dataGapFacet(reason: string, source: string, classification: CanonicalDataGapClassification): CanonicalEvidenceFacet {
+  return {
+    status: 'INCOMPLETE',
+    value: 'DATA_GAP',
+    reason,
+    dataGapReason: reason,
+    gapClassification: classification,
+    evidence: [{ source, value: 'DATA_GAP', confidence: 'INCOMPLETE' }],
+  }
+}
+
+function aggregateStatus(statuses: CanonicalEvidenceStatus[]): CanonicalEvidenceStatus {
+  if (statuses.includes('CONFLICT')) return 'CONFLICT'
+  if (statuses.length && statuses.every((status) => status === 'SUPPORTED')) return 'SUPPORTED'
+  if (statuses.length && statuses.every((status) => status === 'NOT_APPLICABLE')) return 'NOT_APPLICABLE'
+  return 'INCOMPLETE'
+}
+
+function checksumFromText(text: string) {
+  return text.match(/\b[a-f0-9]{64}\b/i)?.[0] || ''
+}
+
 function dataGapsFor(input: CanonicalPublisherProjectionInput): CanonicalPublisherReadModel['dataGaps'] {
   const gaps: CanonicalPublisherReadModel['dataGaps'] = []
+  const checksumAvailable = input.evidenceLinks?.some((link) => link.checksum || checksumFromText(`${link.label} ${link.href}`)) || false
   if (!input.evidenceLinks?.length) {
     gaps.push({
       field: 'sourceChecksum',
@@ -389,6 +740,29 @@ function dataGapsFor(input: CanonicalPublisherProjectionInput): CanonicalPublish
       currentSource: 'Publisher Operating Center evidence links',
       available: false,
       remediationWave: 'Wave C - artifact authority binding',
+      reason: 'No artifact evidence link is available to carry checksum/provenance.',
+      classification: 'RESOLVABLE',
+    })
+  } else if (!checksumAvailable) {
+    gaps.push({
+      field: 'sourceChecksum',
+      expectedSource: 'Artifact Registry',
+      currentSource: 'Publisher Operating Center evidence links',
+      available: false,
+      remediationWave: 'Wave C - artifact checksum completion',
+      reason: 'Artifact identity is present, but checksum is not attached.',
+      classification: 'RESOLVABLE',
+    })
+  }
+  if (!input.workspaceState || !input.workspaceEntitlementState || !input.onboardingState) {
+    gaps.push({
+      field: 'workspaceEntitlementActiveOnboarding',
+      expectedSource: 'Author workspace and onboarding registries',
+      currentSource: 'Publisher Operating Center title projection',
+      available: false,
+      remediationWave: 'Wave C - author workspace evidence completion',
+      reason: 'Workspace active state, entitlement, or onboarding nuance is not surfaced on the title item.',
+      classification: 'STRUCTURAL',
     })
   }
   gaps.push({
@@ -397,6 +771,8 @@ function dataGapsFor(input: CanonicalPublisherProjectionInput): CanonicalPublish
     currentSource: 'Royalty decision read model',
     available: /royalt/i.test(`${input.pipelineStage || ''} ${input.editorialStage || ''}`),
     remediationWave: 'Wave D - royalty payout canonicalization',
+    reason: 'Royalty payout readiness requires the payout registry, not only title lifecycle evidence.',
+    classification: 'STRUCTURAL',
   })
   return gaps
 }
