@@ -10,6 +10,7 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const shims = [
   ['../lib/publishing/lifecycle/registry', 'registry.ts'],
   ['../lib/publishing/lifecycle/legacy-mapping', 'legacy-mapping.ts'],
+  ['../lib/publishing/lifecycle/wave-c1-evidence-authority', 'wave-c1-evidence-authority.ts'],
   ['../lib/publishing/lifecycle/operating-center-read-model', 'operating-center-read-model.ts'],
 ]
 const created = []

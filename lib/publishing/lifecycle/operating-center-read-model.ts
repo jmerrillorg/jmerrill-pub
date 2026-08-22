@@ -6,6 +6,13 @@ import {
   type WaitingOwner,
 } from './registry'
 import { mapLegacyLifecycleValue, type LegacyMappingInput, type LegacyMappingResult } from './legacy-mapping'
+import {
+  evaluateWaveC1ArtifactAuthority,
+  evaluateWaveC1CommercialAuthority,
+  evaluateWaveC1FormatAuthority,
+  evaluateWaveC1WorkspaceAuthority,
+  waveC1RoyaltyReadiness,
+} from './wave-c1-evidence-authority'
 
 export type CanonicalMappingDisposition = LegacyMappingResult['resultCode']
 
@@ -84,7 +91,31 @@ export type CanonicalPublisherProjectionInput = {
   workspaceEntitlementState?: string
   onboardingState?: string
   commercialEvidenceText?: string
+  pricingEvidenceText?: string
+  agreementEvidenceText?: string
+  agreementDocumentAvailable?: boolean
+  contractStatus?: string
+  providerStatus?: string
+  signedDate?: string
+  agreementExecutionLog?: boolean
+  paymentEvidenceText?: string
+  firstPaymentStatus?: string
+  firstPaymentConfirmedOn?: string
+  firstPaymentConfirmationSource?: string
+  successfulPaymentEvent?: boolean
+  requiredInitialPayment?: boolean
+  correctCommercialContext?: boolean
+  joinedFamilyEvidenceText?: string
+  joinedFamilyEvent?: boolean
+  workspaceProvisioningEvidenceText?: string
   formatEvidenceText?: string
+  artifactEvidenceSource?: string
+  artifactStorageReference?: string
+  artifactChecksumAlgorithm?: string
+  artifactByteReadable?: boolean
+  derivedFromArtifactId?: string
+  duplicateCurrentArtifactCount?: number
+  artifactChecksumMismatch?: boolean
 }
 
 export type CanonicalPublisherReadModel = {
@@ -176,6 +207,14 @@ export type CanonicalPublisherReadModel = {
     }
     conflictCount: number
   }
+  waveC1EvidenceAuthority: {
+    artifact: ReturnType<typeof evaluateWaveC1ArtifactAuthority>
+    commercial: ReturnType<typeof evaluateWaveC1CommercialAuthority>
+    workspace: ReturnType<typeof evaluateWaveC1WorkspaceAuthority>
+    formats: ReturnType<typeof evaluateWaveC1FormatAuthority>[]
+    royalty: ReturnType<typeof waveC1RoyaltyReadiness>
+    controlledWriteAuthorityEligible: 'NO' | 'LIMITED_COMMERCIAL_EVENT_WRITE_CANDIDATE'
+  }
   workingImprint: string
   recommendedImprint: string
   confirmedImprint: string
@@ -264,6 +303,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
   const splitBrain = detectSplitBrain(input)
   const artifact = sourceArtifactFor(input, mapping)
   const lifecycleEvidence = lifecycleEvidenceFor(input, mapping, artifact)
+  const waveC1EvidenceAuthority = waveC1EvidenceAuthorityFor(input, artifact)
   const waitingOn = canonicalWaitingOwner(input)
   const systemAttention = systemAttentionFor(input, mapping, splitBrain, artifact.artifactType === 'DATA_GAP')
   const authorActionRequired = authorActionFor(input, waitingOn, mapping)
@@ -312,6 +352,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     authorActionRequired,
     sourceArtifact: artifact,
     lifecycleEvidence,
+    waveC1EvidenceAuthority,
     workingImprint: 'DATA_GAP',
     recommendedImprint: 'DATA_GAP',
     confirmedImprint: 'DATA_GAP',
@@ -336,6 +377,76 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     age: typeof input.ageDays === 'number' ? `${input.ageDays} day${input.ageDays === 1 ? '' : 's'}` : 'unknown',
     dataGaps,
     sourceAttribution: ['Dataverse', 'Publisher Operating Center read model', 'JMP lifecycle registry v1.0'],
+  }
+}
+
+function waveC1EvidenceAuthorityFor(
+  input: CanonicalPublisherProjectionInput,
+  artifact: CanonicalPublisherReadModel['sourceArtifact'],
+): CanonicalPublisherReadModel['waveC1EvidenceAuthority'] {
+  const artifactAuthority = evaluateWaveC1ArtifactAuthority({
+    artifactId: artifact.artifactId === 'DATA_GAP' ? '' : artifact.artifactId,
+    artifactType: artifact.artifactType,
+    artifactStatus: artifact.certificationState,
+    artifactTitleId: input.titleId,
+    expectedTitleId: input.titleId,
+    evidenceSource: input.artifactEvidenceSource || artifact.source,
+    storageReference: input.artifactStorageReference || artifact.artifactId,
+    checksum: artifact.checksum === 'DATA_GAP' ? '' : artifact.checksum,
+    checksumAlgorithm: input.artifactChecksumAlgorithm,
+    version: artifact.version,
+    current: input.evidenceLinks?.[0]?.current,
+    byteReadable: input.artifactByteReadable,
+    derivedFromArtifactId: input.derivedFromArtifactId,
+    duplicateCurrentCount: input.duplicateCurrentArtifactCount,
+    checksumMismatch: input.artifactChecksumMismatch,
+  })
+  const commercialAuthority = evaluateWaveC1CommercialAuthority({
+    packageState: input.packageState,
+    commercialEvidenceText: input.commercialEvidenceText,
+    pricingEvidenceText: input.pricingEvidenceText,
+    agreementEvidenceText: input.agreementEvidenceText,
+    agreementDocumentAvailable: input.agreementDocumentAvailable,
+    contractStatus: input.contractStatus,
+    providerStatus: input.providerStatus,
+    signedDate: input.signedDate,
+    agreementExecutionLog: input.agreementExecutionLog,
+    paymentEvidenceText: input.paymentEvidenceText,
+    firstPaymentStatus: input.firstPaymentStatus,
+    firstPaymentConfirmedOn: input.firstPaymentConfirmedOn,
+    firstPaymentConfirmationSource: input.firstPaymentConfirmationSource,
+    successfulPaymentEvent: input.successfulPaymentEvent,
+    requiredInitialPayment: input.requiredInitialPayment,
+    correctCommercialContext: input.correctCommercialContext,
+    joinedFamilyEvidenceText: input.joinedFamilyEvidenceText,
+    joinedFamilyEvent: input.joinedFamilyEvent,
+  })
+  const workspaceAuthority = evaluateWaveC1WorkspaceAuthority({
+    authorRelationshipState: relationshipStateFor(input),
+    joinedFamilyEvent: input.joinedFamilyEvent,
+    entitlementEvidenceText: input.workspaceEntitlementState,
+    workspaceProvisioningEvidenceText: input.workspaceProvisioningEvidenceText,
+    workspaceActiveEvidenceText: input.workspaceState,
+    onboardingState: input.onboardingState,
+  })
+  const formats = (input.activeFormats?.length ? input.activeFormats : ['Paperback', 'Hardcover', 'Ebook', 'Audiobook']).map((format) =>
+    evaluateWaveC1FormatAuthority({
+      format,
+      identityEvidenceText: input.formatEvidenceText,
+      distributionEvidenceText: input.formatEvidenceText,
+      liveUrl: input.formatEvidenceText?.match(/https?:\/\/\S+/)?.[0],
+      liveState: input.legacySourceState,
+      certificationEvidenceText: input.formatEvidenceText,
+    }),
+  )
+  const royalty = waveC1RoyaltyReadiness()
+  return {
+    artifact: artifactAuthority,
+    commercial: commercialAuthority,
+    workspace: workspaceAuthority,
+    formats,
+    royalty,
+    controlledWriteAuthorityEligible: commercialAuthority.controlledWriteAuthorityEligible,
   }
 }
 

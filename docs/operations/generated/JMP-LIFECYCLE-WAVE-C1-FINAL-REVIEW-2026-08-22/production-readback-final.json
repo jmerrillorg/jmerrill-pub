@@ -1,0 +1,174 @@
+{
+  "generatedAt": "2026-08-22T11:00:35.734Z",
+  "mode": "READ_ONLY_NO_WRITES_SANITIZED",
+  "runtime": {
+    "node": "v24.19.0",
+    "npm": "captured separately"
+  },
+  "counts": {
+    "jm1_publishingintakes": 31,
+    "jm1pub_titles": 400,
+    "jm1pub_publishingassets": 314,
+    "jm1pub_editorialapprovalgates": 16,
+    "opportunities": 5,
+    "jm1pub_contracts": 3,
+    "jm1_executionlogs": 5000,
+    "jm1_productionprojects": 2,
+    "jm1_productiontasks": 8
+  },
+  "coverage": {
+    "artifactIdentity": [
+      314,
+      314
+    ],
+    "artifactType": [
+      314,
+      314
+    ],
+    "artifactTitleBinding": [
+      314,
+      314
+    ],
+    "artifactProvenance": [
+      312,
+      314
+    ],
+    "artifactChecksum": [
+      0,
+      314
+    ],
+    "pricingLocked": [
+      3,
+      5
+    ],
+    "agreementExecuted": [
+      3,
+      3
+    ],
+    "initialPayment": [
+      3,
+      5
+    ],
+    "joinedFamilyPrerequisiteEvidence": [
+      3,
+      5
+    ],
+    "workspaceEntitlement": [
+      0,
+      5
+    ],
+    "workspaceActive": [
+      0,
+      5
+    ],
+    "onboarding": [
+      4,
+      5
+    ],
+    "formatIdentity": [
+      314,
+      314
+    ],
+    "formatLiveEvidence": [
+      312,
+      314
+    ],
+    "formatCertification": [
+      0,
+      314
+    ],
+    "royaltyPayoutReadiness": [
+      0,
+      0
+    ]
+  },
+  "artifactByClass": {
+    "Paperback": 172,
+    "eBook": 83,
+    "Hardcover": 33,
+    "Other": 17,
+    "Audiobook": 9
+  },
+  "commercial": {
+    "packageAccepted": 4,
+    "pricingLocked": 3,
+    "agreementExecutedByContract": 3,
+    "agreementRecordsWithOpportunityBinding": 2,
+    "agreementRecordsWithAuthorBinding": 3,
+    "agreementRecordsWithTitleBinding": 1,
+    "agreementRecordsWithSignedDate": 3,
+    "agreementRecordsWithExecutionReference": 3,
+    "initialPayment": 3,
+    "joinedFamilyLogs": 0,
+    "joinedFamilyConflicts": 0
+  },
+  "workspace": {
+    "workspaceLogs": 165,
+    "onboardingSignals": 4
+  },
+  "queryStatus": {
+    "jm1_publishingintakes": {
+      "ok": true,
+      "status": 200,
+      "count": 31,
+      "selectedFieldsHash": "7473e22b8b58fa73794c501657d1b390d8e1be93bb7ee1bec5f55640951173f2"
+    },
+    "jm1pub_titles": {
+      "ok": true,
+      "status": 200,
+      "count": 400,
+      "selectedFieldsHash": "a062d7394af5e68d7316eab3fdb22b43def932594a472950c363eb430f4911b8"
+    },
+    "jm1pub_publishingassets": {
+      "ok": true,
+      "status": 200,
+      "count": 314,
+      "selectedFieldsHash": "c85b8ee1382acb83dae5c6622e9cf8bb6835c16947e3f89865191a48392abe36"
+    },
+    "jm1pub_editorialapprovalgates": {
+      "ok": true,
+      "status": 200,
+      "count": 16,
+      "selectedFieldsHash": "39963fb5244abee0937503aaa3747e76ffcff1d40e487b8f887088caeb0db063"
+    },
+    "opportunities": {
+      "ok": true,
+      "status": 200,
+      "count": 5,
+      "selectedFieldsHash": "395e6bb337eab5337925f0c61957869af18577cb747e1d11e97abecad4d08d32"
+    },
+    "jm1pub_contracts": {
+      "ok": true,
+      "status": 200,
+      "count": 3,
+      "selectedFieldsHash": "8f5f7344d5238408bbbbf298edbd5cf313e1f618548122e88178765a4704efa4"
+    },
+    "jm1_executionlogs": {
+      "ok": true,
+      "status": 200,
+      "count": 5000,
+      "selectedFieldsHash": "02db7c71c808e14c76d1489df892d67a9e9a66bb512ec36ff8b0cb416453f76b"
+    },
+    "jm1_productionprojects": {
+      "ok": true,
+      "status": 200,
+      "count": 2,
+      "selectedFieldsHash": "3c2eb4e6ad449512d5b05ac2c6c9cc4593f24c34e3d431b3c16fa35384e15273"
+    },
+    "jm1_productiontasks": {
+      "ok": true,
+      "status": 200,
+      "count": 8,
+      "selectedFieldsHash": "c239e8ba8b457ff55e478e37ef552e7296a9b1ac42f3bd34994e76e133226b6f"
+    }
+  },
+  "writeProof": {
+    "post": 0,
+    "patch": 0,
+    "delete": 0
+  },
+  "privacy": {
+    "rawProductionRowsStored": false,
+    "redaction": "Repository artifact stores aggregate counts/classifications only; raw names, descriptions, URLs, payment/provider references, and GUID-level rows omitted."
+  }
+}
