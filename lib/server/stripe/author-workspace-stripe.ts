@@ -154,10 +154,7 @@ export function buildRecipientAccountParams(identity: AuthorConnectIdentity) {
   assertAuthorConnectIdentity(identity)
   const params = new URLSearchParams({
     type: 'standard',
-    country: 'US',
     email: identity.authorEmail,
-    business_type: 'individual',
-    'business_profile[name]': identity.payeeName,
     'metadata[jm1_division]': 'publishing',
     'metadata[jm1_contact_id]': identity.contactId,
     'metadata[jm1_author_relationship_id]': identity.authorRelationshipId,

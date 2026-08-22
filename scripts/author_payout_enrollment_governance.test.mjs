@@ -118,6 +118,8 @@ test('connected-account payload is author/payee scoped and omits title metadata 
 
   assert.equal(params.get('type'), 'standard')
   assert.equal(params.get('email'), identity.authorEmail)
+  assert.equal(params.get('business_type'), null)
+  assert.equal(params.get('business_profile[name]'), null)
   assert.equal(params.get('metadata[jm1_contact_id]'), identity.contactId)
   assert.equal(params.get('metadata[jm1_author_relationship_id]'), identity.authorRelationshipId)
   assert.equal(params.get('metadata[jm1_royalty_payee_id]'), identity.royaltyPayeeId)
