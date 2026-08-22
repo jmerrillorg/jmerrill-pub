@@ -59,9 +59,6 @@ function installMockFetch(calls, options = {}) {
       ok: true,
       status: 200,
       async json() {
-        if (path.endsWith('/accounts/search')) {
-          return { object: 'search_result', data: options.searchAccount ? [options.searchAccount] : [] }
-        }
         if (path.startsWith('/v1/accounts/acct_')) {
           return options.retrieveAccount || {
             id: path.split('/').pop(),
@@ -79,6 +76,13 @@ function installMockFetch(calls, options = {}) {
           }
         }
         if (path === '/v1/accounts') {
+          if ((request.method || 'GET') === 'GET') {
+            return {
+              object: 'list',
+              data: options.searchAccount ? [options.searchAccount] : [],
+              has_more: false,
+            }
+          }
           return {
             id: 'acct_MockAuthorPayoutEnrollment',
             object: 'account',
@@ -157,7 +161,7 @@ test('existing Dataverse connected account is retrieved and reused only after id
   assert.deepEqual(calls.map((call) => call.path), ['/v1/accounts/acct_ExistingAuthor'])
 })
 
-test('existing Stripe search match is reused before creating a replacement account', async () => {
+test('existing Stripe metadata match is reused before creating a replacement account', async () => {
   const calls = []
   installMockFetch(calls, {
     searchAccount: {
@@ -177,7 +181,7 @@ test('existing Stripe search match is reused before creating a replacement accou
   assert.equal(result.accountId, 'acct_SearchAuthor')
   assert.equal(result.reused, true)
   assert.equal(result.source, 'stripe_identity_search')
-  assert.deepEqual(calls.map((call) => call.path), ['/v1/accounts/search'])
+  assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts']])
 })
 
 test('new connected account creation uses royalty-payee idempotency and no money movement', async () => {
@@ -191,7 +195,7 @@ test('new connected account creation uses royalty-payee idempotency and no money
     reused: false,
     source: 'created',
   })
-  assert.deepEqual(calls.map((call) => call.path), ['/v1/accounts/search', '/v1/accounts'])
+  assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts'], ['POST', '/v1/accounts']])
   assert.equal(calls[1].headers['Idempotency-Key'], `jm1-author-payout-enrollment-account-${identity.royaltyPayeeId}-v1`)
   assert.equal(calls[1].body.get('metadata[jm1_royalty_payee_id]'), identity.royaltyPayeeId)
 })
@@ -304,6 +308,6 @@ test('enrollment workflow never calls Stripe money-movement APIs', async () => {
   const { accountId } = await stripe.resolveRecipientAccountId(identity)
   await stripe.createRecipientAccountLink(accountId, identity)
 
-  assert.deepEqual(calls.map((call) => call.path), ['/v1/accounts/search', '/v1/accounts', '/v1/account_links'])
+  assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts'], ['POST', '/v1/accounts'], ['POST', '/v1/account_links']])
   assert.ok(calls.every((call) => !/^\/v1\/(charges|payment_intents|payouts|refunds|transfers)(\/|$)/.test(call.path)))
 })
