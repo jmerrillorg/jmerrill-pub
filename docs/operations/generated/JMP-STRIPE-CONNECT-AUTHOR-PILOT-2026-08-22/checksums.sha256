@@ -1,0 +1,11 @@
+24d3b23d616bfabaa94cfa0da6a224c5f69bb1492dbc9b107e92c5603428503b  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/00-executive-summary.md
+ad602e50dc679c43a315853b5e88d5bb277afbbacb4478a694d8a4084529605f  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/01-pr567-canonicalization.md
+7e45efdc9b27cd4c4d4dab524d8546b2a74e96ea10a3fdf3966d66a3196f378c  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/02-pilot-selection.md
+69d05889e813c1d734f4860434a3c93aad73ee53bea40f9d0b8baa668b811b4f  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/03-author-account-link-validation.md
+beddf6b09cfb913fdc44edb378dd6706ee3e488293efc71bde022d6c89d82994  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/04-connect-account-create-reuse.md
+3e2c0d25eeb993e95f8cd46effef6342d919cd6abc27fc90115e8fd7fe86a8af  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/05-onboarding-link-integrity.md
+8de24281b7aa0c709ff9273952aedc1dc1a2f84ddc542858b89160f852baadfe  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/06-author-communications.md
+9b7d8f4e3cf506d01629313ef622371cbbcd48d774365e0a36f0d00b59d1485d  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/07-status-synchronization.md
+d9b8fc862bff194d14786c891c499a1dfb6a010efbc0fa4dcdb5503dac94d316  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/08-idempotency.md
+23aacd06daa7b1ef84a97e0e8ed5b44c96885cbe9349d8477a0b8d2f78066ec3  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/09-security-negative-proof.md
+c8748b5464f95328bdf3db1988dcaf4b157157a236f8238ab4e7d719020bea9d  docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILOT-2026-08-22/10-full-cohort-readiness.md
