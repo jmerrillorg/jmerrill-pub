@@ -171,6 +171,30 @@ export function classifyPublishingPaymentSuccessEvent(event: StripeWebhookEvent)
   }
 }
 
+export function classifyStripeConnectAccountUpdateEvent(event: StripeWebhookEvent) {
+  const object = event.data?.object || {}
+  const eventType = event.type || ''
+  if (eventType !== 'account.updated') return { process: false, code: 'event_type_ignored' }
+  if (object.object !== 'account' || !object.id) return { process: false, code: 'stripe_connect_account_missing' }
+  return {
+    process: true,
+    code: 'stripe_connect_account_updated',
+    safeEvent: {
+      eventId: event.id || null,
+      eventType,
+      accountId: object.id,
+      detailsSubmitted: Boolean((object as any).details_submitted),
+      payoutsEnabled: Boolean((object as any).payouts_enabled),
+      chargesEnabled: Boolean((object as any).charges_enabled),
+      requirementsDue: [
+        ...(((object as any).requirements?.currently_due || []) as string[]),
+        ...(((object as any).requirements?.past_due || []) as string[]),
+      ],
+      metadata: object.metadata || {},
+    },
+  }
+}
+
 function getEventAmountCents(eventType: string, object: StripeWebhookObject) {
   if (eventType === 'checkout.session.completed') return object.amount_total
   if (eventType === 'invoice.paid' || eventType === 'invoice.payment_succeeded') return object.amount_paid || object.amount_total || object.amount
