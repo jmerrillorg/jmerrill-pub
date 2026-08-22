@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import {
   CONTROLLER_VERSION,
   buildWorkQueue,
@@ -64,7 +65,7 @@ async function main() {
   console.log(JSON.stringify(summary, null, 2))
 }
 
-async function readPortfolioSource(token) {
+export async function readPortfolioSource(token) {
   const [titles, intakes, opportunities, authorProfiles, stages, gates, artifacts, productionProjects, productionTasks, logs] = await Promise.all([
     dvList(token, 'jm1pub_titles', {
       $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_name,jm1pub_stage,jm1pub_publicationstatus,jm1_lifecyclestage,jm1pub_authordisplayname,jm1pub_authorname,modifiedon,createdon,statecode,statuscode',
@@ -103,7 +104,7 @@ async function readPortfolioSource(token) {
       $filter: 'statecode eq 0',
     }),
     dvList(token, 'jm1_executionlogs', {
-      $select: 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_sourceentity,jm1_sourcerecordid,jm1_executionstatus,createdon,jm1_completedon',
+      $select: 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription,jm1_sourceentity,jm1_sourcerecordid,jm1_executionstatus,createdon,jm1_completedon',
       $orderby: 'createdon desc',
       $top: '500',
     }),
@@ -134,7 +135,7 @@ async function readPortfolioSource(token) {
   }
 }
 
-function buildControllerRecords(source) {
+export function buildControllerRecords(source) {
   const stagesByTitle = groupBy(source.stages, (row) => row._jm1pub_titleid_value || row.jm1pub_titleidname)
   const gatesByTitle = groupBy(source.gates, (row) => row._jm1pub_titleid_value || row.jm1pub_titleidname)
   const artifactsByTitle = groupBy(source.artifacts, (row) => row._jm1pub_titleid_value || row.jm1pub_titleidname)
@@ -363,7 +364,7 @@ async function dvList(token, entitySet, params) {
   return rows
 }
 
-function getToken() {
+export function getToken() {
   return execFileSync('az', ['account', 'get-access-token', '--resource', DATAVERSE_RESOURCE, '--query', 'accessToken', '-o', 'tsv'], {
     encoding: 'utf8',
   }).trim()
@@ -444,7 +445,9 @@ function runtimeLooksCommissioned(stage, gate, production) {
   return /healthy|ready|proof|author review|line|copy|layout|production/i.test(text)
 }
 
-main().catch((error) => {
-  console.error(error)
-  process.exitCode = 1
-})
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error(error)
+    process.exitCode = 1
+  })
+}

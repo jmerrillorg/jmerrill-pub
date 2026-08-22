@@ -64,7 +64,10 @@
     "dirty-worktree-scope-guard": "node scripts/dirty_worktree_scope_guard.mjs",
     "gate-w3-slot-identity-guard": "node scripts/gate_w3_slot_identity_guard.mjs",
     "jm1-power-platform-solution-lifecycle-guard": "node scripts/jm1_power_platform_solution_lifecycle_guard.mjs",
-    "jm1-prune-publishing-sales-solution": "node scripts/jm1_prune_publishing_sales_solution.mjs"
+    "jm1-prune-publishing-sales-solution": "node scripts/jm1_prune_publishing_sales_solution.mjs",
+    "portfolio-automation-controller-guard": "node --test scripts/jmp_portfolio_automation_controller.test.mjs",
+    "portfolio-automation-wave2-guard": "node --test scripts/jmp_portfolio_automation_controller.test.mjs scripts/jmp_portfolio_automation_wave2.test.mjs",
+    "portfolio-automation-wave2": "node scripts/jmp_portfolio_automation_wave2.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",
