@@ -1,10 +1,10 @@
 # P0 Prospect Editorial Review Lifecycle Remediation
 
-Last verified: 2026-08-15
+Last verified: 2026-08-16T02:38:45Z
 
-Evidence source: local branch `codex/p0-prospect-editorial-review-remediation-20260815`
+Evidence source: PR #513 merge, GitHub Actions run `31921889872`, production health readback, and live Dataverse read-only probe.
 
-Status: IMPLEMENTED / LOCAL VALIDATION PASSED / PRODUCTION DEPLOYMENT PENDING
+Status: IMPLEMENTED / MERGED / PRODUCTION HEALTH READBACK PASS / LIVE SEND HELD
 
 This package records the P0 remediation for the defect class where a prospect/inquiry Editorial Review could be treated as an active contracted-author editorial-stage approval package.
 
@@ -34,6 +34,7 @@ Known environment note:
 
 Production/live boundary:
 
-- Production deployment: NOT EXECUTED from this local branch.
-- Atta corrective send: NOT EXECUTED from this local branch.
-- Prospect dispatch hold lift: NOT EXECUTED from this local branch.
+- PR #513 merged to `origin/main` at `846920e343703f11410bc6cf3ce900f42fc4bc7f`.
+- Production health at `https://jmerrill.pub/api/health` returned `status=ready` and `release=846920e343703f11410bc6cf3ce900f42fc4bc7f`.
+- Atta corrective send: HELD. The production website policy is corrected, but the Azure diagnostic function send/resend route still persists stale `Awaiting Author Response` semantics and is not certified for the corrected prospect package-selection state.
+- Prospect dispatch hold lift: NOT LIFTED. The hold can lift only after the actual production sender path is reconciled with the corrected prospect contract.
