@@ -55,6 +55,7 @@ jobs:
           npm run jm1-canon-consistency-guard
           npm run jm1-canon-guard-enforcement
           npm run jmp-lifecycle-authority-guard
+          npm run jmp-lifecycle-wave-b-operating-center-guard
           npm run jm1-initiative-handoff-guard
           npm run author-communication-brand-guard
           npm run program006-dispatch-guard

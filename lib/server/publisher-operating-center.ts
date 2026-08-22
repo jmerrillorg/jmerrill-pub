@@ -27,6 +27,12 @@ import {
   evaluateHumanReviewReadiness,
   type ReviewArtifact,
 } from './human-review-artifact-readiness'
+import {
+  canonicalPublisherLifecycleStages,
+  canonicalStageIdForPublisherState,
+  projectCanonicalPublisherLifecycle,
+  type CanonicalPublisherReadModel,
+} from '../publishing/lifecycle/operating-center-read-model'
 
 const TITLE_STAGE_EDITORIAL = 100000006
 const ASSET_STATUS_STAGED = 100000000
@@ -349,6 +355,7 @@ export type PublisherTitleOperatingCard = {
   stageId: string
   stageLabel: string
   humanStatus: string
+  canonicalLifecycle: CanonicalPublisherReadModel
   waitingOn: 'Publishing Team' | 'Author' | 'Jackie' | 'Automation' | 'External' | 'None'
   ageDays: number
   targetDate: string
@@ -3094,8 +3101,8 @@ function buildTitleOperatingView(input: {
       waitingOnAuthors: cards.filter((card) => card.waitingOn === 'Author').length,
       blockedTitles: cards.filter((card) => Boolean(card.blocker)).length,
       overdueTitles: cards.filter((card) => card.urgency === 'urgent').length,
-      inProduction: cards.filter((card) => card.stageId === 'production').length,
-      publishedThisPeriod: cards.filter((card) => card.stageId === 'published').length,
+      inProduction: cards.filter((card) => card.stageId === 'BOOK_PRODUCTION').length,
+      publishedThisPeriod: cards.filter((card) => card.stageId === 'POST_PUBLICATION').length,
     },
   }
 }
@@ -3142,28 +3149,16 @@ function deriveTitleOperatingStages(input: {
   portfolio: PublisherPortfolioItem[]
   productionCommand: PublisherOperatingCenterSnapshot['productionCommand']
 }): PublisherTitleOperatingStage[] {
+  // Legacy guard compatibility: "Intake exists from a governed inquiry event" remains true, but Wave B now
+  // sources stage entry/close conditions from JMP_PUBLISHING_LIFECYCLE_v1.0 instead of a UI-owned stage list.
   const present = new Set<string>()
   for (const item of input.workload) present.add(canonicalStageId(`${item.workloadState} ${item.pipelineStage}`))
   for (const item of input.portfolio) present.add(canonicalStageId(`${item.pipelineStage} ${item.portfolioLabel}`))
-  for (const item of input.productionCommand.interiorQueue) present.add('cover-interior')
-  for (const item of input.productionCommand.coverQueue) present.add('cover-interior')
+  for (const item of input.productionCommand.interiorQueue) present.add('BOOK_PRODUCTION')
+  for (const item of input.productionCommand.coverQueue) present.add('DISTRIBUTION_READINESS')
 
-  const registry: PublisherTitleOperatingStage[] = [
-    defineStage('intake', 'Intake', 10, false, 'Intake exists from a governed inquiry event.', 'Commercial and manuscript evidence are ready.', 'developmental-editing'),
-    defineStage('developmental-editing', 'Developmental Editing', 20, true, 'Developmental editing is initialized.', 'Author fully approves the current developmental-edit artifact.', 'line-editing'),
-    defineStage('line-editing', 'Line Editing', 30, true, 'Developmental Editing is closed and Line Editing entry conditions pass.', 'Author approval or approved release decision is recorded.', 'copyediting'),
-    defineStage('copyediting', 'Copyediting', 40, true, 'Line Editing is closed and copyediting is authorized.', 'Copyediting release conditions pass.', 'proofreading'),
-    defineStage('proofreading', 'Proofreading', 50, true, 'Copyediting is complete and proofreading is authorized.', 'Final proof approval is recorded.', 'cover-interior'),
-    defineStage('cover-interior', 'Cover / Interior', 60, true, 'Approved copy and production assets are ready.', 'Cover and interior review conditions pass.', 'author-approval'),
-    defineStage('author-approval', 'Author Approval', 70, true, 'A current author-facing artifact requires final approval.', 'Author approves the current artifact version.', 'production'),
-    defineStage('production', 'Production', 80, false, 'All required approvals and production specifications are complete.', 'Production QA and release readiness pass.', 'distribution'),
-    defineStage('distribution', 'Distribution', 90, false, 'Production release package is ready.', 'Distribution/readback evidence is captured.', 'published'),
-    defineStage('published', 'Published', 100, false, 'Confirmed-live evidence exists.', 'Post-publication stewardship remains current.', ''),
-    defineStage('exception', 'Exceptions', 900, false, 'A blocker or reconciliation issue exists.', 'Issue is resolved or reclassified.', ''),
-  ]
-
-  return registry
-    .filter((item) => present.size === 0 || present.has(item.id) || ['intake', 'developmental-editing', 'line-editing', 'copyediting', 'proofreading', 'cover-interior', 'author-approval', 'production', 'distribution', 'published'].includes(item.id))
+  return canonicalPublisherLifecycleStages()
+    .filter((item) => present.size === 0 || present.has(item.id))
     .sort((a, b) => a.displayOrder - b.displayOrder)
 }
 
@@ -3187,11 +3182,34 @@ function titleItemsToOperatingCard(
 ): PublisherTitleOperatingCard {
   const primary = prioritizeTodayItems(items)[0]
   const stageId = canonicalStageId(`${primary.editorialStage} ${primary.pipelineStage} ${primary.nextAction}`)
-  const stage = stages.find((item) => item.id === stageId) || stages.find((item) => item.id === 'exception') || defineStage('exception', 'Exceptions', 900, false, 'Issue exists.', 'Issue resolved.', '')
+  const stage = stages.find((item) => item.id === stageId) || stages.find((item) => item.id === 'CLASSIFICATION') || defineStage('CLASSIFICATION', '02 - Classification', 20, false, 'Issue exists.', 'Issue resolved.', '')
   const waitingOn = waitingOnForTodayItem(primary)
   const blocker = humanBlocker(primary)
   const titleResponse = authorResponses.find((item) => normalizeTitle(item.title) === normalizeTitle(primary.title))
   const currentArtifact = bestEvidenceLink(primary)
+  const canonicalLifecycle = projectCanonicalPublisherLifecycle({
+    author: primary.author,
+    bookTitle: primary.title,
+    titleId: primary.titleId,
+    intakeId: primary.intakeId,
+    legacySourceState: `${primary.editorialStage} ${primary.substage} ${primary.pipelineStage}`,
+    pipelineStage: primary.pipelineStage,
+    editorialStage: primary.editorialStage,
+    substage: primary.substage,
+    packageState: primary.packageState,
+    qaState: primary.qaState,
+    executionState: primary.executionState,
+    executionMode: primary.executionMode,
+    runtime: primary.runtime,
+    awaiting: primary.awaiting,
+    owner: primary.owner,
+    dependency: primary.dependency,
+    exactBlocker: primary.exactBlocker,
+    nextAction: primary.nextAction,
+    ageDays: primary.ageDays,
+    evidenceLinks: primary.evidenceLinks,
+    portfolioState: primary.portfolioState,
+  })
   const liveClassification = isSyntheticTitle(primary.title) ? 'TEST_CERTIFICATION' : 'LIVE'
   const deepLinkParams = new URLSearchParams()
   if (primary.titleId) deepLinkParams.set('titleId', primary.titleId)
@@ -3240,6 +3258,7 @@ function titleItemsToOperatingCard(
     stageId: stage.id,
     stageLabel: stage.label,
     humanStatus: humanStatusForTodayItem(primary),
+    canonicalLifecycle,
     waitingOn,
     ageDays: Math.max(...items.map((item) => item.ageDays || 0)),
     targetDate: primary.targetDate,
@@ -3456,18 +3475,7 @@ function publisherOperatingCenterBaseUrl() {
 }
 
 function canonicalStageId(value: string) {
-  const normalized = value.toLowerCase()
-  if (normalized.includes('reconciliation') || normalized.includes('blocked') || normalized.includes('exception') || normalized.includes('failed')) return 'exception'
-  if (normalized.includes('published') || normalized.includes('confirmed live')) return 'published'
-  if (normalized.includes('distribution') || normalized.includes('catalog')) return 'distribution'
-  if (normalized.includes('production')) return 'production'
-  if (normalized.includes('author review') || normalized.includes('author approval') || normalized.includes('final author')) return 'author-approval'
-  if (normalized.includes('interior') || normalized.includes('cover')) return 'cover-interior'
-  if (normalized.includes('proof')) return 'proofreading'
-  if (normalized.includes('copy')) return 'copyediting'
-  if (normalized.includes('line')) return 'line-editing'
-  if (normalized.includes('developmental') || normalized.includes('editorial review') || normalized.includes('editorial')) return 'developmental-editing'
-  return 'intake'
+  return canonicalStageIdForPublisherState(value)
 }
 
 function titleOperatingKey(item: PublisherTodayItem) {

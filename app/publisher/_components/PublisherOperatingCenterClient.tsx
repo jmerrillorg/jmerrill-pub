@@ -72,10 +72,10 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     const cards = snapshot?.titleOperatingView.cards || []
     const liveFiltered = includeTestRecords ? cards : cards.filter((card) => card.liveClassification === 'LIVE')
     if (boardView === 'needs-jackie') return liveFiltered.filter((card) => card.waitingOn === 'Jackie')
-    if (boardView === 'waiting-authors') return liveFiltered.filter((card) => card.waitingOn === 'Author')
-    if (boardView === 'exceptions') return liveFiltered.filter((card) => card.urgency === 'urgent' || Boolean(card.blocker))
-    if (boardView === 'production') return liveFiltered.filter((card) => card.stageId === 'production' || card.stageId === 'cover-interior')
-    if (boardView === 'catalog') return liveFiltered.filter((card) => card.stageId === 'distribution' || card.stageId === 'published')
+    if (boardView === 'waiting-authors') return liveFiltered.filter((card) => card.canonicalLifecycle.waitingOn === 'Author')
+    if (boardView === 'exceptions') return liveFiltered.filter((card) => card.urgency === 'urgent' || Boolean(card.blocker) || card.canonicalLifecycle.systemAttention.severity === 'BLOCKING')
+    if (boardView === 'production') return liveFiltered.filter((card) => card.stageId === 'BOOK_PRODUCTION' || card.stageId === 'DISTRIBUTION_READINESS')
+    if (boardView === 'catalog') return liveFiltered.filter((card) => card.stageId === 'DISTRIBUTION_RELEASE' || card.stageId === 'POST_PUBLICATION')
     return liveFiltered
   }, [boardView, includeTestRecords, snapshot])
   const selectedResolution = useMemo(() => {
@@ -1267,7 +1267,7 @@ function TitlePipelineBoard({
           <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Title Pipeline Board</p>
           <h2 className="mt-2 text-3xl font-semibold">Process as the interface</h2>
           <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
-            One real title appears once, in its current governed stage, with what it is waiting on and what can happen next.
+            One real title appears once, projected through JMP_PUBLISHING_LIFECYCLE_v1.0, with what it is waiting on and what can happen next.
           </p>
           <p className="mt-2 text-[11px] leading-5 text-white/35">{snapshot.titleOperatingView.stageSource}</p>
         </div>
@@ -1391,8 +1391,10 @@ function TitlePipelineCard({
         <StatusDot urgency={card.urgency} />
       </div>
       <div className="mt-3 grid gap-2">
-        <MiniFact label="Status" value={card.humanStatus} />
-        <MiniFact label="Waiting on" value={card.waitingOn} />
+        <MiniFact label="Stage" value={`${card.canonicalLifecycle.titleLifecycleStage.number} - ${card.canonicalLifecycle.titleLifecycleStage.label}`} />
+        <MiniFact label="Substage" value={card.canonicalLifecycle.titleLifecycleSubstage.label} />
+        <MiniFact label="Waiting on" value={card.canonicalLifecycle.waitingOn} />
+        <MiniFact label="Attention" value={card.canonicalLifecycle.systemAttention.code} />
         <MiniFact label="Age" value={`${card.ageDays} day${card.ageDays === 1 ? '' : 's'}`} />
       </div>
       {card.blocker && <p className="mt-3 border-l-2 border-amber-300 pl-3 text-[11px] leading-5 text-amber-100">{card.blocker}</p>}
@@ -1444,15 +1446,34 @@ function TitleDetailDrawer({
 
       <div className="mt-5 grid gap-3">
         <DetailBlock title="Current Situation">
-          <MiniFact label="Stage" value={card.stageLabel} />
+          <MiniFact label="Canonical Stage" value={`${card.canonicalLifecycle.titleLifecycleStage.number} - ${card.canonicalLifecycle.titleLifecycleStage.label}`} />
+          <MiniFact label="Canonical Substage" value={`${card.canonicalLifecycle.titleLifecycleSubstage.number} - ${card.canonicalLifecycle.titleLifecycleSubstage.label}`} />
+          <MiniFact label="Mapping" value={`${card.canonicalLifecycle.canonicalMappingStatus}: ${card.canonicalLifecycle.canonicalMappingReason}`} />
           <MiniFact label="Status" value={card.humanStatus} />
           <MiniFact label="Why it is waiting" value={card.blocker || 'No blocker is currently recorded.'} />
+        </DetailBlock>
+
+        <DetailBlock title="Lifecycle Dimensions">
+          <MiniFact label="Prospect / Commercial" value={card.canonicalLifecycle.prospectCommercialState} />
+          <MiniFact label="Title Lifecycle" value={`${card.canonicalLifecycle.titleLifecycleStage.number} - ${card.canonicalLifecycle.titleLifecycleStage.label}`} />
+          <MiniFact label="Author Relationship" value={card.canonicalLifecycle.authorRelationshipState} />
+          <MiniFact label="Joined the Family" value={`${card.canonicalLifecycle.joinedTheFamily.value} — ${card.canonicalLifecycle.joinedTheFamily.reason}`} />
+        </DetailBlock>
+
+        <DetailBlock title="Waiting / Attention / Next Action">
+          <MiniFact label="Waiting On" value={card.canonicalLifecycle.waitingOn} />
+          <MiniFact label="System Attention" value={`${card.canonicalLifecycle.systemAttention.code} — ${card.canonicalLifecycle.systemAttention.reason}`} />
+          <MiniFact label="Severity" value={card.canonicalLifecycle.systemAttention.severity} />
+          <MiniFact label="Author Action" value={`${card.canonicalLifecycle.authorActionRequired.label} — ${card.canonicalLifecycle.authorActionRequired.reason}`} />
+          <MiniFact label="Next Governed Action" value={`${card.canonicalLifecycle.nextGovernedAction.action} (${card.canonicalLifecycle.nextGovernedAction.confidence})`} />
         </DetailBlock>
 
         <DetailBlock title="Current Artifact">
           <MiniFact label="Artifact" value={card.currentArtifact.label} />
           <MiniFact label="Version" value={card.currentArtifact.version} />
           <MiniFact label="Review state" value={card.currentArtifact.reviewState} />
+          <MiniFact label="Artifact Authority" value={`${card.canonicalLifecycle.sourceArtifact.artifactType} · ${card.canonicalLifecycle.sourceArtifact.certificationState}`} />
+          <MiniFact label="Checksum" value={card.canonicalLifecycle.sourceArtifact.checksum} />
           {card.currentArtifact.href && <a className="text-[12px] font-semibold text-blue-200 underline" href={card.currentArtifact.href}>Open artifact</a>}
         </DetailBlock>
 
@@ -1479,6 +1500,27 @@ function TitleDetailDrawer({
           <MiniFact label="Next" value={card.nextStage} />
           <MiniFact label="Eligible" value={card.nextStageEligible ? 'YES' : 'NO'} />
           {!card.nextStageEligible && <MiniFact label="Reason" value={card.nextStageBlockedReason} />}
+        </DetailBlock>
+
+        <DetailBlock title="Stage-Specific Readiness">
+          <MiniFact label="Editorial" value={card.canonicalLifecycle.readiness.editorial} />
+          <MiniFact label="Book Production" value={card.canonicalLifecycle.readiness.bookProduction} />
+          <MiniFact label="Metadata" value={card.canonicalLifecycle.readiness.metadata} />
+          <MiniFact label="Distribution" value={card.canonicalLifecycle.readiness.distribution} />
+          <MiniFact label="Royalty Payout" value={card.canonicalLifecycle.readiness.royaltyPayout} />
+          <MiniFact label="Final Delivery" value={card.canonicalLifecycle.readiness.finalDeliveryPayment} />
+        </DetailBlock>
+
+        <DetailBlock title="Commercial / Workspace / Royalty">
+          <MiniFact label="Package Recommendation" value={card.canonicalLifecycle.packageRecommendation} />
+          <MiniFact label="Package Accepted" value={card.canonicalLifecycle.packageAccepted} />
+          <MiniFact label="Payment Policy" value={card.canonicalLifecycle.paymentPolicy} />
+          <MiniFact label="Payment Plan" value={card.canonicalLifecycle.paymentPlan} />
+          <MiniFact label="Payment State" value={card.canonicalLifecycle.paymentState} />
+          <MiniFact label="Workspace" value={card.canonicalLifecycle.workspaceState} />
+          <MiniFact label="Author Access" value={card.canonicalLifecycle.workspaceEntitlementState} />
+          <MiniFact label="Onboarding" value={card.canonicalLifecycle.onboardingState} />
+          <MiniFact label="Royalty Payout" value={card.canonicalLifecycle.royaltyPayoutReadiness} />
         </DetailBlock>
 
         <DetailBlock title="Actions">
@@ -1508,6 +1550,9 @@ function TitleDetailDrawer({
             <MiniFact label="Raw status" value={card.technical.rawStatus} />
             <MiniFact label="Runtime state" value={card.technical.runtimeState} />
             <MiniFact label="Execution owner" value={card.technical.executionOwner} />
+            <MiniFact label="Lifecycle version" value={card.canonicalLifecycle.lifecycleVersion} />
+            <MiniFact label="Legacy source" value={card.canonicalLifecycle.legacySourceState} />
+            <MiniFact label="Data gaps" value={card.canonicalLifecycle.dataGaps.map((gap) => `${gap.field}: ${gap.remediationWave}`).join('; ') || 'None surfaced'} />
             <MiniFact label="Evidence references" value={card.technical.evidenceReferences.join('; ') || 'None surfaced'} />
           </div>
         </details>
