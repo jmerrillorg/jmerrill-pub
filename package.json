@@ -40,6 +40,7 @@
     "author-decision-propagation-guard": "node --test scripts/author_decision_closeout_propagation.test.mjs",
     "author-response-runtime-remediation-guard": "node --test azure-functions/diagnostic-ai-runner/test/authorReviewResponseConsumer.test.js",
     "p0-prospect-editorial-review-lifecycle-guard": "node --test scripts/p0_prospect_editorial_review_lifecycle_guard.test.mjs",
+    "jmp-lifecycle-authority-guard": "node --test scripts/jmp_lifecycle_authority_guard.test.mjs",
     "artifact-propagation-guard": "node --test scripts/author_decision_closeout_propagation.test.mjs",
     "awaiting-state-closure-guard": "node --test scripts/author_decision_closeout_propagation.test.mjs",
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",
