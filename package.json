@@ -54,6 +54,7 @@
     "author-royalty-connect-migration-source-guard": "node --test scripts/author_royalty_connect_migration_source_guard.test.mjs",
     "author-royalty-identity-reconciliation-guard": "node --test scripts/author_royalty_identity_reconciliation.test.mjs",
     "cv01a-author-experience-guard": "node --test scripts/cv01a_author_experience.test.mjs",
+    "atta-editorial-delivery-entitlement-guard": "node --test scripts/atta_editorial_delivery_entitlement_guard.test.mjs",
     "jm1-bootstrap": "node scripts/jm1_bootstrap.mjs",
     "jm1-bootstrap-guard": "node --test scripts/jm1_bootstrap_guard.test.mjs",
     "jm1-canon-consistency-guard": "node --test scripts/jm1_canon_consistency_guard.test.mjs",
