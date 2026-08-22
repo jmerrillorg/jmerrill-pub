@@ -220,11 +220,22 @@ export async function retrieveConnectedAccount(accountId: string) {
 }
 
 export async function searchConnectedAccountByIdentity(identity: AuthorConnectIdentity) {
-  const query = `metadata['jm1_royalty_payee_id']:'${stripeSearchEscape(identity.royaltyPayeeId)}'`
-  const result = await stripeJson(`/v1/accounts/search?query=${encodeURIComponent(query)}&limit=2`, {
-    keyType: 'connect',
-  })
-  const matches = Array.isArray(result.data) ? result.data : []
+  const matches: StripeAccountObject[] = []
+  let startingAfter = ''
+
+  for (let page = 0; page < 20; page += 1) {
+    const query = new URLSearchParams({ limit: '100' })
+    if (startingAfter) query.set('starting_after', startingAfter)
+    const result = await stripeJson(`/v1/accounts?${query.toString()}`, { keyType: 'connect' })
+    const data = Array.isArray(result.data) ? result.data : []
+    matches.push(...data.filter((account) => account.metadata?.jm1_royalty_payee_id === identity.royaltyPayeeId))
+    if (matches.length > 1) throw new Error('stripe_connect_account_ambiguous')
+    if (!result.has_more) break
+    const lastAccountId = data[data.length - 1]?.id
+    if (!lastAccountId) break
+    startingAfter = lastAccountId
+  }
+
   if (matches.length > 1) throw new Error('stripe_connect_account_ambiguous')
   return matches[0] || null
 }
@@ -435,8 +446,4 @@ function clean(value?: string) {
 
 function normalizeEmail(value?: string) {
   return clean(value).toLowerCase()
-}
-
-function stripeSearchEscape(value: string) {
-  return value.replace(/'/g, "\\'")
 }
