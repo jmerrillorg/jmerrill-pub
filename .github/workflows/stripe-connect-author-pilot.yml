@@ -1,0 +1,143 @@
+name: Publishing Stripe Connect Author Pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Dry-run before confirmed execution.
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - execute
+      confirm:
+        description: Confirm real author-facing pilot sends.
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      expected_production_release:
+        description: Production release SHA expected before invocation.
+        required: true
+      max_authors:
+        description: Pilot size, bounded to 3-5 authors.
+        required: true
+        default: "3"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publishing-stripe-connect-author-pilot
+  cancel-in-progress: false
+
+env:
+  PRODUCTION_HEALTH_URL: https://jmerrill.pub/api/health
+  PILOT_URL: https://jmerrill.pub/api/author/stripe/connect/pilot
+
+jobs:
+  pilot:
+    name: Protected Stripe Connect author pilot
+    runs-on: ubuntu-latest
+    environment: jmerrill-pub-production
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Commissioned Bootstrap Gate
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run jm1-bootstrap -- --initiative "Publishing Stripe Connect Author Pilot" --mode "production-mutation"
+          npm run jm1-bootstrap-guard
+          npm run jm1-canon-consistency-guard
+          npm run jm1-canon-guard-enforcement
+          node --test scripts/author_payout_enrollment_governance.test.mjs scripts/stripe_connect_author_pilot.test.mjs
+
+      - name: Verify Production Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$(mktemp)"
+          code="$(curl -fsS -o "$body" -w '%{http_code}' --max-time 20 "$PRODUCTION_HEALTH_URL" || true)"
+          if [ "$code" != "200" ]; then
+            echo "Production health returned HTTP $code." >&2
+            exit 1
+          fi
+          node -e "const fs=require('fs'); const h=JSON.parse(fs.readFileSync(process.argv[1],'utf8')); if (h.status !== 'ready' || h.release !== process.argv[2] || h.paymentGate !== 'disabled' || h.dependencies?.stripeEnrollment?.status !== 'ready') process.exit(1)" "$body" "${{ inputs.expected_production_release }}"
+
+      - name: Confirm Execution Boundary
+        if: inputs.mode == 'execute'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ inputs.confirm }}" = "true"
+          test "${{ inputs.max_authors }}" -ge 3
+          test "${{ inputs.max_authors }}" -le 5
+
+      - name: Obtain GitHub OIDC Identity
+        id: oidc
+        shell: bash
+        run: |
+          set -euo pipefail
+          OIDC_RESPONSE="$(curl -fsS \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=jm1-pub-stripe-connect-author-pilot")"
+          OIDC_JWT="$(jq -r '.value' <<<"${OIDC_RESPONSE}")"
+          if [[ -z "${OIDC_JWT}" || "${OIDC_JWT}" == "null" ]]; then
+            echo "OIDC request failed." >&2
+            exit 1
+          fi
+          {
+            echo "token<<EOF"
+            echo "${OIDC_JWT}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Invoke Pilot
+        shell: bash
+        run: |
+          set -euo pipefail
+          BODY="$(jq -cn \
+            --arg mode "${{ inputs.mode }}" \
+            --arg confirm "${{ inputs.confirm }}" \
+            --arg expectedProductionRelease "${{ inputs.expected_production_release }}" \
+            --arg maxAuthors "${{ inputs.max_authors }}" \
+            '{
+              mode: $mode,
+              confirm: ($confirm == "true"),
+              expectedProductionRelease: $expectedProductionRelease,
+              maxAuthors: ($maxAuthors | tonumber)
+            }')"
+          status="$(curl -sS \
+            -o stripe-connect-author-pilot-result.json \
+            -w '%{http_code}' \
+            -X POST "$PILOT_URL" \
+            -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --data "$BODY")"
+          cat stripe-connect-author-pilot-result.json
+          if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+            echo "Pilot endpoint returned HTTP $status" >&2
+            exit 1
+          fi
+          node -e "const fs=require('fs'); const r=JSON.parse(fs.readFileSync('stripe-connect-author-pilot-result.json','utf8')).result; if (!r || r.royaltyPayouts !== 0 || r.stripeTransfers !== 0 || r.billComDisabled !== false || r.payoutCutover !== false) process.exit(1); if ('${{ inputs.mode }}' === 'execute' && r.classification !== 'STRIPE_CONNECT_AUTHOR_PILOT_PASS') process.exit(1)"
+
+      - name: Preserve Pilot Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stripe-connect-author-pilot-result
+          path: stripe-connect-author-pilot-result.json
+          if-no-files-found: ignore
