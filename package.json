@@ -48,6 +48,8 @@
     "author-facing-html-render-enforcement-guard": "node --test scripts/author_facing_html_render_enforcement.test.mjs",
     "author-facing-email-cc-canon-guard": "node --test scripts/author_facing_email_cc_canon.test.mjs",
     "pr473-commissioning-consolidation-guard": "node --test scripts/pr473_commissioning_consolidation_guard.test.mjs",
+    "author-royalty-connect-migration-source-guard": "node --test scripts/author_royalty_connect_migration_source_guard.test.mjs",
+    "author-royalty-identity-reconciliation-guard": "node --test scripts/author_royalty_identity_reconciliation.test.mjs",
     "cv01a-author-experience-guard": "node --test scripts/cv01a_author_experience.test.mjs",
     "jm1-bootstrap": "node scripts/jm1_bootstrap.mjs",
     "jm1-bootstrap-guard": "node --test scripts/jm1_bootstrap_guard.test.mjs",
