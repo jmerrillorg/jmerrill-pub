@@ -77,6 +77,7 @@ export async function main() {
       status: 'DRY_RUN_READY',
       accountSource: 'not_executed',
       accountIdRedacted: '',
+      accountIdHash: '',
       readiness: 'not_executed',
       providerMessageId: '',
       executionLogId: '',
@@ -302,6 +303,7 @@ async function executePilot(selected) {
         status: 'ONBOARDING_INVITED',
         accountSource: accountResolution.source,
         accountIdRedacted: redactStripeId(accountResolution.accountId),
+        accountIdHash: hash(accountResolution.accountId),
         readiness: readiness.readiness,
         providerMessageId: communication.providerMessageId || 'not-returned-by-relay',
         executionLogId: log.id || '',
@@ -492,7 +494,9 @@ function buildNegativeProof(selection, execution) {
       const candidate = selection.population.find((row) => row.contactId === author.contactId)
       return candidate && candidate.readiness === 'HUMAN_REVIEW_REQUIRED'
     }).length,
-    duplicate_Stripe_account: duplicateCount(execution.authors.map((author) => author.accountIdRedacted).filter(Boolean)),
+    duplicate_Stripe_account: duplicateCount(
+      execution.authors.map((author) => author.accountIdHash || author.accountIdRedacted).filter(Boolean),
+    ),
     cross_author_link: execution.failures.filter((failure) => /cross_author_link|onboarding_link_account_mismatch/.test(failure.reason)).length,
     shared_generic_link: 0,
     bank_data_exposed: 0,

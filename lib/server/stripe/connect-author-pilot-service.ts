@@ -59,6 +59,7 @@ type PilotExecutionAuthor = {
   status: string
   accountSource: string
   accountIdRedacted: string
+  accountIdHash: string
   readiness: string
   providerMessageId: string
   executionLogId: string
@@ -203,6 +204,7 @@ function dryRunExecution(selected: PilotCandidate[]) {
       status: 'DRY_RUN_READY',
       accountSource: 'not_executed',
       accountIdRedacted: '',
+      accountIdHash: '',
       readiness: 'not_executed',
       providerMessageId: '',
       executionLogId: '',
@@ -258,6 +260,7 @@ async function executePilot(config: DataverseServerConfig, selected: PilotCandid
         status: 'ONBOARDING_INVITED',
         accountSource: accountResolution.source,
         accountIdRedacted: redactStripeId(accountResolution.accountId),
+        accountIdHash: hash(accountResolution.accountId),
         readiness: readiness.readiness,
         providerMessageId: communication.providerMessageId || 'not-returned-by-relay',
         executionLogId: log.id || '',
@@ -377,11 +380,14 @@ function buildHtmlInvitation(identity: AuthorConnectIdentity, linkUrl: string) {
 
 function buildNegativeProof(
   selection: ReturnType<typeof selectPilotAuthors>,
-  execution: { failures: Array<{ reason: string }>; authors: Array<{ contactId: string; accountIdRedacted: string }> },
+  execution: { failures: Array<{ reason: string }>; authors: Array<{ contactId: string; accountIdRedacted: string; accountIdHash?: string }> },
 ) {
+  const accountIds = execution.authors
+    .map((author) => 'accountIdHash' in author ? String(author.accountIdHash || '') : author.accountIdRedacted)
+    .filter(Boolean)
   return {
     exception_author_processed: execution.authors.filter((author) => selection.selected.every((candidate) => candidate.contactId !== author.contactId)).length,
-    duplicate_Stripe_account: duplicateCount(execution.authors.map((author) => author.accountIdRedacted).filter(Boolean)),
+    duplicate_Stripe_account: duplicateCount(accountIds),
     cross_author_link: execution.failures.filter((failure) => /cross_author_link|onboarding_link_account_mismatch/.test(failure.reason)).length,
     shared_generic_link: 0,
     bank_data_exposed: 0,
