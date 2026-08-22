@@ -6,8 +6,10 @@ import {
 } from '@/lib/server/stripe/author-workspace-stripe'
 import {
   classifyCommissioningWebhookEvent,
+  classifyPublishingPaymentSuccessEvent,
   verifyStripeWebhook,
 } from '@/lib/server/stripe/author-workspace-webhook'
+import { processPublishingPaymentSuccess, type PublishingPaymentSuccess } from '@/lib/server/stripe/publishing-payment-event'
 
 export const runtime = 'nodejs'
 
@@ -22,7 +24,32 @@ export async function POST(req: NextRequest) {
 
   const classification = classifyCommissioningWebhookEvent(verification.event)
   if (!classification.process) {
-    return NextResponse.json({ received: true, processed: false, code: classification.code })
+    const publishingPayment = classifyPublishingPaymentSuccessEvent(verification.event)
+    if (!publishingPayment.process) {
+      return NextResponse.json({ received: true, processed: false, code: classification.code })
+    }
+
+    const safeEvent = publishingPayment.safeEvent
+    if (!safeEvent) {
+      return NextResponse.json({ received: true, processed: false, code: 'publishing_payment_safe_event_missing' }, { status: 422 })
+    }
+
+    const paymentSuccess: PublishingPaymentSuccess = {
+      amountCents: safeEvent.amountCents,
+      currency: safeEvent.currency,
+      eventId: safeEvent.eventId,
+      eventType: safeEvent.eventType,
+      customerId: safeEvent.customerId,
+      invoiceId: safeEvent.invoiceId,
+      paymentIntentId: safeEvent.paymentIntentId,
+      chargeId: safeEvent.chargeId,
+      subscriptionId: safeEvent.subscriptionId,
+      created: safeEvent.created,
+      source: 'STRIPE_WEBHOOK',
+    }
+    const result = await processPublishingPaymentSuccess(paymentSuccess)
+    const status = result.ok ? 200 : 422
+    return NextResponse.json({ received: true, processed: result.ok, result }, { status })
   }
 
   let paymentStatusWriteback = { updated: false, id: null as string | null, detail: 'not_attempted' }
