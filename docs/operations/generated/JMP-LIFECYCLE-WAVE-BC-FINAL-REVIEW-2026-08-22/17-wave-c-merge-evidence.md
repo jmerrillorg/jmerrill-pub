@@ -1,3 +1,10 @@
 # Wave C Merge Evidence
 
-Pending until PR #562 merge completes. Required fields to finalize after merge: Wave C PR, Wave C merge SHA, origin/main SHA, production deployed YES/NO, production writes performed 0.
+| Field | Value |
+| --- | --- |
+| Wave C PR | https://github.com/jmerrillorg/jmerrill-pub/pull/562 |
+| Wave C merge SHA | 7a45d08dd4bb9d6117d1a64878b201c33e61b26b |
+| origin/main SHA | 7a45d08dd4bb9d6117d1a64878b201c33e61b26b |
+| merge timestamp | 2026-08-22T07:42:56Z |
+| production deployed | NO - deployment was not verified by this evidence task |
+| production writes performed | 0 |
