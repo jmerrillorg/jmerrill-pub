@@ -43,6 +43,7 @@
     "jmp-lifecycle-authority-guard": "node --test scripts/jmp_lifecycle_authority_guard.test.mjs",
     "jmp-lifecycle-wave-b-operating-center-guard": "node --test scripts/jmp_lifecycle_wave_b_operating_center.test.mjs",
     "jmp-lifecycle-wave-c-evidence-completion-guard": "node --test scripts/jmp_lifecycle_wave_c_evidence_completion.test.mjs",
+    "jmp-lifecycle-wave-c1-artifact-commercial-evidence-guard": "node --test scripts/jmp_lifecycle_wave_c1_artifact_commercial_evidence.test.mjs",
     "artifact-propagation-guard": "node --test scripts/author_decision_closeout_propagation.test.mjs",
     "awaiting-state-closure-guard": "node --test scripts/author_decision_closeout_propagation.test.mjs",
     "workspace-integrity-guard": "node scripts/publishing_workspace_integrity_guard.test.mjs",

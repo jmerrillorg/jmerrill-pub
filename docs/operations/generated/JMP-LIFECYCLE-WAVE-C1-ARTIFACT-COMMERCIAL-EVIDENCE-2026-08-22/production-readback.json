@@ -1,0 +1,111 @@
+{
+  "generatedAt": "2026-08-22T08:16:43.093Z",
+  "mode": "READ_ONLY_NO_WRITES",
+  "privacy": {
+    "rawProductionRowsStored": false,
+    "redaction": "Full Dataverse rows, execution descriptions, names, URLs, and payment/provider references are omitted from repository evidence. Counts and source classifications are retained."
+  },
+  "queryStatus": {
+    "jm1pub_titles": {
+      "ok": true,
+      "count": 250,
+      "status": 200,
+      "selectedFieldsHash": "b15913a7f2f7347b2856cbb835c39068b8c2a2b6c93e1bbe47bfe753d3258160"
+    },
+    "jm1pub_publishingassets": {
+      "ok": true,
+      "count": 314,
+      "status": 200,
+      "selectedFieldsHash": "e66ad37370b34209b20e9d163b0c52e09fd01d5349587d6827d281ce2fa5fb81"
+    },
+    "opportunities": {
+      "ok": true,
+      "count": 5,
+      "status": 200,
+      "selectedFieldsHash": "9be34f3e549c5324c9dbb9da9e9f4a386eba40dbb07948c525355be7dcb70023"
+    },
+    "jm1pub_contracts": {
+      "ok": true,
+      "count": 3,
+      "status": 200,
+      "selectedFieldsHash": "39de3c6364ff7f66d19a462bf6bc30d6e18e580393701aba4bd902cbf49ec241"
+    },
+    "jm1_executionlogs": {
+      "ok": true,
+      "count": 5000,
+      "status": 200,
+      "selectedFieldsHash": "01478130083c02c9fab99dcfc195f5cb8d7bb4e106ff5014dfad20e7850ec0b3"
+    }
+  },
+  "summary": {
+    "counts": {
+      "jm1pub_titles": 250,
+      "jm1pub_publishingassets": 314,
+      "opportunities": 5,
+      "jm1pub_contracts": 3,
+      "jm1_executionlogs": 5000
+    },
+    "artifact": {
+      "identity": 314,
+      "type": 314,
+      "titleBinding": 314,
+      "provenance": 312,
+      "checksum": 0,
+      "byClass": {
+        "Paperback": 172,
+        "eBook": 83,
+        "Hardcover": 33,
+        "Other": 17,
+        "Audiobook": 9
+      }
+    },
+    "commercial": {
+      "opportunities": 5,
+      "packageAccepted": 4,
+      "pricingLocked": 3,
+      "agreementExecutedByOpportunity": 2,
+      "agreementExecutedByContract": 3,
+      "initialPayment": 3,
+      "joinedFamilyLogs": 1,
+      "joinedFamilyConflicts": 1
+    },
+    "workspace": {
+      "authorPortalActiveSignals": 0,
+      "onboardingSignals": 4,
+      "workspaceLogs": 17
+    },
+    "formats": {
+      "identity": 314,
+      "distribution": 312,
+      "externalReference": 308,
+      "certification": 0
+    }
+  },
+  "authorityDetails": {
+    "agreementExecution": {
+      "classification": "AUTHORITATIVE_FOR_PRESENT_CONTRACT_LEDGER_ROWS",
+      "recordCount": 3,
+      "source": "jm1pub_contracts contract/provider/signed-date ledger",
+      "durability": "Dataverse governed contract table",
+      "binding": "Opportunity/author/title lookups were queried where present; raw IDs are omitted from repository evidence.",
+      "ambiguity": "No duplicate authority count stored in sanitized package; final review re-read may inspect locally if needed."
+    },
+    "initialPayment": {
+      "classification": "AUTHORITATIVE_FOR_PRESENT_FIRST_PAYMENT_FIELDS",
+      "recordCount": 3,
+      "source": "Opportunity first-payment status + confirmed timestamp + confirmation source",
+      "durability": "Dataverse opportunity commercial fields populated by payment runtime",
+      "sensitiveFields": "External payment identifiers, credentials, and raw payment descriptions are not stored."
+    },
+    "joinedFamily": {
+      "eventLogs": 1,
+      "conflictOrBlockSignals": 1,
+      "rule": "AGREEMENT_EXECUTED + REQUIRED_INITIAL_PAYMENT_RECEIVED = JOINED_THE_FAMILY; event conflicts are preserved rather than backfilled."
+    }
+  },
+  "writeProof": {
+    "post": 0,
+    "patch": 0,
+    "delete": 0
+  }
+}

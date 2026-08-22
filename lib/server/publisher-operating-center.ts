@@ -133,6 +133,11 @@ export type PublisherQueueItem = {
   diagnosticStatus?: string
   contractStatus: string
   paymentStatus: string
+  agreementPreparationStatus?: string
+  paymentConfirmedOn?: string
+  paymentConfirmationSource?: string
+  packageSelectionStatus?: string
+  paymentOptionPreparationStatus?: string
   rightsStatus: string
   currentStage: string
   editorialStage: string
@@ -312,6 +317,14 @@ export type PublisherTodayItem = {
   workspaceEntitlementState?: string
   onboardingState?: string
   commercialEvidenceText?: string
+  pricingEvidenceText?: string
+  agreementEvidenceText?: string
+  contractStatus?: string
+  paymentEvidenceText?: string
+  firstPaymentStatus?: string
+  firstPaymentConfirmedOn?: string
+  firstPaymentConfirmationSource?: string
+  joinedFamilyEvidenceText?: string
   formatEvidenceText?: string
   allowedActions: Array<{
     id: PublisherActionId
@@ -1444,7 +1457,7 @@ async function getRecentApprovalGates(config: DataverseServerConfig) {
 async function getRecentOpportunities(config: DataverseServerConfig) {
   return dataverseList(config, 'opportunities', {
     $select:
-      'opportunityid,name,jm1pub_projecttitle,jm1pub_intaketrackingid,jm1pub_contractstatus,jm1_m6firstpaymentstatus,jm1_m6firstpaymentconfirmedon,jm1_m6agreementpreparationstatus,jm1_m6onboardingstatus,jm1_m6packageselectionstatus,jm1_m6paymentoptionpreparationstatus,_parentcontactid_value,_customerid_value,createdon,modifiedon',
+      'opportunityid,name,jm1pub_projecttitle,jm1pub_intaketrackingid,jm1pub_contractstatus,jm1_m6firstpaymentstatus,jm1_m6firstpaymentconfirmedon,jm1_m6firstpaymentconfirmationsource,jm1_m6agreementpreparationstatus,jm1_m6onboardingstatus,jm1_m6packageselectionstatus,jm1_m6paymentoptionpreparationstatus,jm1_m6selectedpaymentoption,jm1_m6selectedpaymentamount,jm1_m6selectedinstallmentcount,_parentcontactid_value,_customerid_value,createdon,modifiedon',
     $orderby: 'createdon desc',
     $top: '100',
   })
@@ -1605,6 +1618,11 @@ function buildQueueItem(
     diagnosticStatus: dataverseFormatted(diagnostic || {}, 'jm1pub_diagnosticstatus') || '',
     contractStatus: dataverseFormatted(opportunity || {}, 'jm1pub_contractstatus') || (title?._jm1pub_contract_value ? 'Linked' : 'Not confirmed'),
     paymentStatus: dataverseFormatted(opportunity || {}, 'jm1_m6firstpaymentstatus') || 'Not confirmed',
+    agreementPreparationStatus: stringValue(opportunity?.jm1_m6agreementpreparationstatus) || dataverseFormatted(opportunity || {}, 'jm1_m6agreementpreparationstatus'),
+    paymentConfirmedOn: stringValue(opportunity?.jm1_m6firstpaymentconfirmedon),
+    paymentConfirmationSource: dataverseFormatted(opportunity || {}, 'jm1_m6firstpaymentconfirmationsource') || stringValue(opportunity?.jm1_m6firstpaymentconfirmationsource),
+    packageSelectionStatus: dataverseFormatted(opportunity || {}, 'jm1_m6packageselectionstatus') || stringValue(opportunity?.jm1_m6packageselectionstatus),
+    paymentOptionPreparationStatus: dataverseFormatted(opportunity || {}, 'jm1_m6paymentoptionpreparationstatus') || stringValue(opportunity?.jm1_m6paymentoptionpreparationstatus),
     rightsStatus: hasContact ? 'Contact linked; rights evidence pending publisher review' : 'Contact link missing',
     currentStage,
     editorialStage: editorialStage
@@ -3223,6 +3241,14 @@ function titleItemsToOperatingCard(
     workspaceEntitlementState: primary.workspaceEntitlementState,
     onboardingState: primary.onboardingState,
     commercialEvidenceText: primary.commercialEvidenceText,
+    pricingEvidenceText: primary.pricingEvidenceText,
+    agreementEvidenceText: primary.agreementEvidenceText,
+    contractStatus: primary.contractStatus,
+    paymentEvidenceText: primary.paymentEvidenceText,
+    firstPaymentStatus: primary.firstPaymentStatus,
+    firstPaymentConfirmedOn: primary.firstPaymentConfirmedOn,
+    firstPaymentConfirmationSource: primary.firstPaymentConfirmationSource,
+    joinedFamilyEvidenceText: primary.joinedFamilyEvidenceText,
     formatEvidenceText: primary.formatEvidenceText,
     portfolioState: primary.portfolioState,
   })
@@ -3595,6 +3621,21 @@ function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
     qaState: 'Not applicable',
     dependency: item.holdReason || item.currentBlocker,
     evidenceLinks,
+    commercialEvidenceText: [
+      item.packageSelectionStatus,
+      item.paymentOptionPreparationStatus,
+      item.contractStatus,
+      item.paymentStatus,
+      item.agreementPreparationStatus,
+    ].filter(Boolean).join('; '),
+    pricingEvidenceText: [item.paymentOptionPreparationStatus, item.packageSelectionStatus].filter(Boolean).join('; '),
+    agreementEvidenceText: [item.contractStatus, item.agreementPreparationStatus].filter(Boolean).join('; '),
+    contractStatus: item.contractStatus,
+    paymentEvidenceText: [item.paymentStatus, item.paymentConfirmedOn, item.paymentConfirmationSource].filter(Boolean).join('; '),
+    firstPaymentStatus: item.paymentStatus,
+    firstPaymentConfirmedOn: item.paymentConfirmedOn,
+    firstPaymentConfirmationSource: item.paymentConfirmationSource,
+    joinedFamilyEvidenceText: item.agreementPreparationStatus,
     allowedActions: item.authorizedActions
       .filter((action) => action.id !== 'view_only')
       .map((action) => ({ id: action.id, label: action.label })),
