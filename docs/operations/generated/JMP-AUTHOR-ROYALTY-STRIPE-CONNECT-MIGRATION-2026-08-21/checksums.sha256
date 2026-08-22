@@ -1,0 +1,17 @@
+f1dfc29274f89530ca6dd39ae7a31a782ec4eea12c9890ad1a1aa9bf7de95fb1  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/00-executive-summary.md
+59d0f9626746b940422d1e43d9bace280f6f8e4611b7d7393509abffbb9df2f5  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/01-source-population-summary.md
+1d2de0bd89a63e7458be5972c5dec26cd79762aea74338a97387000bf624aed4  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/02-identity-reconciliation.md
+11b95a7a7b95db1e88b63bee17f5fda8205f1249cd54eb685ee0af7466029c2b  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/03-stripe-connect-architecture.md
+0b35a0117711364276efed949bfab755fcb76f7c1d6db870309c09352188cad9  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/04-dataverse-mapping.md
+29cc1d32ae1c143fa7c6570bf0d8fc931370f0285230ceec61357a28e7cbffc1  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/05-author-invitation-canon.md
+868c2acdf6ae87949525caf1c8fb326efdc3a678d93f52b03f754384320e13f4  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/06-pilot-plan.md
+a7462a5850f30a2eeb14a2b22e5e3ae4e5e9eef717d22d05a75b783e6b5bec7e  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/07-pilot-results.md
+fd20657f32577ac0565101019aeddd09c39e944af97ea55346f3f6040a9e9222  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/08-full-batch-results.md
+4c85336f2b702fab338c5e43de9420e14bd3e92cc13f5544bbb534181038dbcc  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/09-exception-queue.md
+492306e639d46b3039a7fefd41e88e86a7cf345ef7f135d422c0f9dcc46e59aa  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/10-operating-center-readiness.md
+7c2aa2f8a5c1a6459f996a04473afe7ca9abb9f3e5b9d6212442272917719341  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/11-future-author-onboarding.md
+3aca047063df486d0a3369ad11cd0ba192794c96fac460926b0a687efad6b23c  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/12-billcom-cutover-plan.md
+8e3fb005d3b676ca34c1ef360ff7cc903315b2eab40919f37c22be100397294c  docs/operations/generated/JMP-AUTHOR-ROYALTY-STRIPE-CONNECT-MIGRATION-2026-08-21/13-final-certification.md
+227e0dda98cd00f0e2a933a65105e02a6135c34ca6ad9e27ea42c15683123107  scripts/author_royalty_connect_migration_source_guard.mjs
+f5441dd57f88aa4a7d18f6cad0a8be9bf69191ad5bfdfebc642ac61e1b94c909  scripts/author_royalty_connect_migration_source_guard.test.mjs
+73d04c32f1284b64d06ef979a8788fe6716b6474f970d5b7f4aa6b0c04399726  package.json
