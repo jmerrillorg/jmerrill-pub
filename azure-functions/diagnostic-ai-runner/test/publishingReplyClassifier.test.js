@@ -30,6 +30,16 @@ describe("classifyPublishingReply — payment-option selections", () => {
     assert.equal(classifyPublishingReply("Can I do 12 payments?").classification, CLASSIFICATION.TWELVE_PAYMENTS);
   });
 
+  test('"18 payments" / "18 months" classify as EIGHTEEN_PAYMENTS, not TWELVE_PAYMENTS (regression: extended financing terms were previously unrecognized by this classifier)', () => {
+    assert.equal(classifyPublishingReply("Can I do 18 payments?").classification, CLASSIFICATION.EIGHTEEN_PAYMENTS);
+    assert.equal(classifyPublishingReply("I'd like the 18 month option").classification, CLASSIFICATION.EIGHTEEN_PAYMENTS);
+  });
+
+  test('"24 payments" / "24 months" classify as TWENTY_FOUR_PAYMENTS, not FOUR_PAYMENTS or TWELVE_PAYMENTS', () => {
+    assert.equal(classifyPublishingReply("Can I do 24 payments?").classification, CLASSIFICATION.TWENTY_FOUR_PAYMENTS);
+    assert.equal(classifyPublishingReply("24 months works for me").classification, CLASSIFICATION.TWENTY_FOUR_PAYMENTS);
+  });
+
   test('"eight payments" (spelled out) classifies as EIGHT_PAYMENTS', () => {
     assert.equal(classifyPublishingReply("eight payments sounds good").classification, CLASSIFICATION.EIGHT_PAYMENTS);
   });

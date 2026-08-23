@@ -3,6 +3,8 @@
 const { computeComplimentaryEntitlements } = require("./authorCopyPolicy");
 const {
   NEW_FINANCING_POLICY_VERSION,
+  isNewFinancingPolicyVersion,
+  resolvePaymentPolicyVersion,
   buildPaymentOptions
 } = require("../author/authorOfferEngine");
 
@@ -201,11 +203,36 @@ function computeAgreementFields(input = {}) {
   }
 
   const snapshotPlan = input.pricingSnapshot?.paymentPlan || input.paymentPlan;
-  const selectedAuthorOfferPlan = snapshotPlan || (
-    input.paymentPolicyVersion === NEW_FINANCING_POLICY_VERSION && authorOfferPlanCode(paymentOption)
-      ? buildPaymentOptions(Math.round(packageInfo.fee * 100), input.paymentPolicyVersion).find((plan) => plan.planCode === authorOfferPlanCode(paymentOption))
-      : null
-  );
+  // Any currently-valid financing version (v1.0 or v1.1 — see
+  // isNewFinancingPolicyVersion) must route through the financing engine
+  // here, not only the current version constant. A prior defect checked
+  // strict equality against NEW_FINANCING_POLICY_VERSION only, so an
+  // already-issued v1.0 snapshot would silently fall through to the legacy
+  // 4% transaction-fee math below instead of the 6% financing schedule.
+  let selectedAuthorOfferPlan = snapshotPlan;
+  if (!selectedAuthorOfferPlan && authorOfferPlanCode(paymentOption)) {
+    // A payment policy version, if supplied at all, must resolve explicitly
+    // and fail closed if unrecognized — it must never be silently treated
+    // as "not new financing" and fall through to legacy math below, which
+    // is exactly the failure mode this check exists to prevent.
+    try {
+      const resolvedPolicyVersion = input.paymentPolicyVersion
+        ? resolvePaymentPolicyVersion(input.paymentPolicyVersion)
+        : null;
+      if (resolvedPolicyVersion && isNewFinancingPolicyVersion(resolvedPolicyVersion)) {
+        selectedAuthorOfferPlan = buildPaymentOptions(Math.round(packageInfo.fee * 100), resolvedPolicyVersion)
+          .find((plan) => plan.planCode === authorOfferPlanCode(paymentOption));
+      }
+    } catch (err) {
+      if (err?.code === "PAYMENT_POLICY_VERSION_UNRECOGNIZED") {
+        return { ok: false, errors: ["PAYMENT_POLICY_VERSION_UNRECOGNIZED"], title: null, authorLegalName: null,
+          imprintLabel: null, contractDate: null, officialManuscriptWordCount: null, wordCountSource: null,
+          manuscriptDeadlineText: null, packageLabel: null, packageFeeUsd: null, packageFeeFormatted: null,
+          complimentaryCopies: null, complimentaryEntitlements: null, audiobookIncluded: null, paymentSchedule: null };
+      }
+      throw err;
+    }
+  }
   const newPolicySchedule = scheduleFromAuthorOfferPlan(selectedAuthorOfferPlan);
 
   const totalUsd = newPolicySchedule

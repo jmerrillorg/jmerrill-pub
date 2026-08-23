@@ -14,6 +14,8 @@ const CLASSIFICATION = Object.freeze({
   FOUR_PAYMENTS: "FOUR_PAYMENTS",
   EIGHT_PAYMENTS: "EIGHT_PAYMENTS",
   TWELVE_PAYMENTS: "TWELVE_PAYMENTS",
+  EIGHTEEN_PAYMENTS: "EIGHTEEN_PAYMENTS",
+  TWENTY_FOUR_PAYMENTS: "TWENTY_FOUR_PAYMENTS",
   CALL_REQUESTED: "CALL_REQUESTED",
   QUESTION: "QUESTION",
   HOLD: "HOLD",
@@ -23,7 +25,9 @@ const CLASSIFICATION = Object.freeze({
 // Checked in this order — an explicit payment-option selection takes
 // precedence over incidental call/question/hold language in the same reply.
 const PAYMENT_OPTION_PATTERNS = [
-  { classification: CLASSIFICATION.TWELVE_PAYMENTS, patterns: [/\b12\s*payments?\b/i, /\btwelve\s*payments?\b/i] },
+  { classification: CLASSIFICATION.TWENTY_FOUR_PAYMENTS, patterns: [/\b24\s*payments?\b/i, /\btwenty[\s-]?four\s*payments?\b/i, /\b24\s*months?\b/i] },
+  { classification: CLASSIFICATION.EIGHTEEN_PAYMENTS, patterns: [/\b18\s*payments?\b/i, /\beighteen\s*payments?\b/i, /\b18\s*months?\b/i] },
+  { classification: CLASSIFICATION.TWELVE_PAYMENTS, patterns: [/\b12\s*payments?\b/i, /\btwelve\s*payments?\b/i, /\b12\s*months?\b/i] },
   { classification: CLASSIFICATION.EIGHT_PAYMENTS, patterns: [/\b8\s*payments?\b/i, /\beight\s*payments?\b/i] },
   { classification: CLASSIFICATION.FOUR_PAYMENTS, patterns: [/\b4\s*payments?\b/i, /\bfour\s*payments?\b/i] },
   { classification: CLASSIFICATION.TWO_PAYMENTS, patterns: [/\b2\s*payments?\b/i, /\btwo\s*payments?\b/i] },
