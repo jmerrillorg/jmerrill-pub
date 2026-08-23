@@ -174,7 +174,8 @@ jobs:
           printf '{"releaseSha":"%s","productionReleaseSha":"%s"}\n' "$release_sha" "$production_release_sha" \
             >> "$evidence_path"
 
-          expected_function_count=30
+          expected_function_count="$(unzip -Z1 "$RUNNER_TEMP/deploy/diagnostic-ai-runner.zip" | grep -E '^src/functions/[^/]+\.js$' | wc -l | tr -d ' ')"
+          test "$expected_function_count" -gt 0
           function_names="$(az functionapp function list \
             --name "$FUNCTION_APP_NAME" \
             --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
