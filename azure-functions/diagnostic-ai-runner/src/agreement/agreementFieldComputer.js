@@ -51,6 +51,8 @@ const PAYMENT_OPTION_INFO = Object.freeze({
   FOUR_PAYMENTS: { installments: 4, feeApplies: true },
   EIGHT_PAYMENTS: { installments: 8, feeApplies: true },
   TWELVE_PAYMENTS: { installments: 12, feeApplies: true },
+  EIGHTEEN_PAYMENTS: { installments: 18, feeApplies: true },
+  TWENTY_FOUR_PAYMENTS: { installments: 24, feeApplies: true },
   INTERNAL_COMMISSIONING: {
     installments: 0,
     feeApplies: false,
@@ -79,7 +81,14 @@ function authorOfferPlanCode(paymentOption) {
     SINGLE: "FULL_PAY",
     TWO_PAYMENTS: "2_PAY",
     FOUR_PAYMENTS: "4_PAY",
-    EIGHT_PAYMENTS: "8_PAY"
+    EIGHT_PAYMENTS: "8_PAY",
+    // TWELVE_PAYMENTS existed in PAYMENT_OPTION_INFO before this change but
+    // was never mapped here, so a 12-pay selection silently fell through to
+    // the legacy 4%-transaction-fee math instead of the 6% financing engine.
+    // Fixed as part of extending the ladder to 12/18/24.
+    TWELVE_PAYMENTS: "12_PAY",
+    EIGHTEEN_PAYMENTS: "18_PAY",
+    TWENTY_FOUR_PAYMENTS: "24_PAY"
   }[paymentOption] || null;
 }
 

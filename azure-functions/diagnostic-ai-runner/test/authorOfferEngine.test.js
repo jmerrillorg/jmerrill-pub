@@ -370,7 +370,7 @@ describe("package examples", () => {
   test("Starter new-author offer includes Full / 2 / 4 / 8 without discount", () => {
     const offer = calculateAuthorOffer({ packageCode: PACKAGE_CODES.STARTER });
     assert.equal(offer.adjustedPackagePrincipal, 1999);
-    assert.deepEqual(offer.paymentOptions.map((item) => item.planCode), ["FULL_PAY", "2_PAY", "4_PAY", "8_PAY"]);
+    assert.deepEqual(offer.paymentOptions.map((item) => item.planCode), ["FULL_PAY", "2_PAY", "4_PAY", "8_PAY", "12_PAY", "18_PAY", "24_PAY"]);
   });
 
   test("Professional stacking example returns $2,925 adjusted principal", () => {

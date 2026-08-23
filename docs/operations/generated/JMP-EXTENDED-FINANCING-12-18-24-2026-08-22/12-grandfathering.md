@@ -1,0 +1,5 @@
+# Grandfathering
+
+- Atta's existing 8-Pay / 4% legacy arrangement: untouched. `LEGACY_PAYMENT_POLICY_VERSION` ("JMP_MULTIPAY_TRANSACTION_FEE_4_PERCENT_v1.0") and its builder (`buildLegacyPlan`) were not modified in any way that changes legacy output — verified via the full 2020-test suite passing with zero regressions, and the legacy-specific tests in `authorOfferEngine.test.js` ("payment-plan principal allocation and 4 percent fee rounding") still pass unchanged.
+- No 16-month plan was ever implemented in `PLAN_CONFIGS`, so there is no locked-agreement grandfathering concern at the engine level for that specific term — confirmed via repo-wide search (zero matches for "16_PAY"/"16-pay"/"sixteen-pay" anywhere in code before this change).
+- No executed agreement, locked pricing snapshot, or historical payment record was modified by this change. This was a pure additive change to the plan registry plus one bug fix (12-pay engine mapping) that only affects future, not-yet-locked selections.
