@@ -206,4 +206,46 @@ describe("computeAgreementFields — single payment has no fee, multi-payment op
     assert.equal(r.paymentSchedule.earlyPayoff.noPenalty, true);
     assert.equal(r.paymentSchedule.earlyPayoff.unearnedFutureChargeWaived, true);
   });
+
+  test("TWELVE_PAYMENTS under the new financing policy uses the 6% engine, not the legacy 4% fee (regression: authorOfferPlanCode previously had no TWELVE_PAYMENTS mapping, so a 12-pay selection silently fell through to legacy math)", () => {
+    const r = computeAgreementFields(baseInput({
+      paymentOption: "TWELVE_PAYMENTS",
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    }));
+    assert.equal(r.ok, true);
+    assert.equal(r.paymentSchedule.paymentPolicyVersion, NEW_FINANCING_POLICY_VERSION);
+    // Professional package $4,500.00, 12-pay, no loyalty/referral benefit:
+    // matches the independently verified Quanishia reference fixture exactly.
+    assert.equal(r.paymentSchedule.totalFormatted, "$4,747.50");
+    // The legacy path would have produced $4,500 * 1.04 = $4,680.00 instead —
+    // asserting inequality is the actual regression proof.
+    assert.notEqual(r.paymentSchedule.totalFormatted, "$4,680.00");
+  });
+
+  test("EIGHTEEN_PAYMENTS and TWENTY_FOUR_PAYMENTS resolve through the new financing engine", () => {
+    const r18 = computeAgreementFields(baseInput({
+      paymentOption: "EIGHTEEN_PAYMENTS",
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    }));
+    assert.equal(r18.ok, true);
+    assert.equal(r18.paymentSchedule.paymentPolicyVersion, NEW_FINANCING_POLICY_VERSION);
+    assert.equal(r18.paymentSchedule.totalFormatted, "$4,882.50");
+
+    const r24 = computeAgreementFields(baseInput({
+      paymentOption: "TWENTY_FOUR_PAYMENTS",
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    }));
+    assert.equal(r24.ok, true);
+    assert.equal(r24.paymentSchedule.paymentPolicyVersion, NEW_FINANCING_POLICY_VERSION);
+    assert.equal(r24.paymentSchedule.totalFormatted, "$5,017.50");
+  });
+
+  test("an unsupported payment option (e.g. a retired 16-month code) is rejected, not silently accepted", () => {
+    const r = computeAgreementFields(baseInput({
+      paymentOption: "SIXTEEN_PAYMENTS",
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    }));
+    assert.equal(r.ok, false);
+    assert.ok(r.errors.includes("PAYMENT_OPTION_UNRECOGNIZED"));
+  });
 });

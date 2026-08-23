@@ -1,7 +1,14 @@
 "use strict";
 
 const LEGACY_PAYMENT_POLICY_VERSION = "JMP_MULTIPAY_TRANSACTION_FEE_4_PERCENT_v1.0";
-const NEW_FINANCING_POLICY_VERSION = "JMP_FINANCING_EARLY_PAYOFF_v1.0";
+// v1.1: standard financing ladder extended to include 12/18/24-month
+// extended-financing terms alongside the existing 2/4/8-month standard
+// flexible plans. Economics (6% annual simple plan charge, no penalty,
+// unearned future charge waived) are unchanged from v1.0 — this is an
+// availability change, not an economic-rule change, so it is versioned
+// rather than silently mutating v1.0's semantics in place.
+const NEW_FINANCING_POLICY_VERSION = "JMP_FINANCING_EARLY_PAYOFF_v1.1";
+const NEW_FINANCING_POLICY_VERSION_v1_0 = "JMP_FINANCING_EARLY_PAYOFF_v1.0";
 const DEFAULT_PAYMENT_POLICY_VERSION = LEGACY_PAYMENT_POLICY_VERSION;
 const LEGACY_TRANSACTION_FEE_RATE = 0.04;
 const NEW_FINANCING_ANNUAL_SIMPLE_RATE = 0.06;
@@ -10,7 +17,10 @@ const PLAN_CONFIGS = Object.freeze([
   Object.freeze({ planCode: "FULL_PAY", paymentCount: 1, cadence: "single payment", financedMonths: 0 }),
   Object.freeze({ planCode: "2_PAY", paymentCount: 2, cadence: "monthly after first payment", financedMonths: 1 }),
   Object.freeze({ planCode: "4_PAY", paymentCount: 4, cadence: "monthly after first payment", financedMonths: 3 }),
-  Object.freeze({ planCode: "8_PAY", paymentCount: 8, cadence: "monthly after first payment", financedMonths: 7 })
+  Object.freeze({ planCode: "8_PAY", paymentCount: 8, cadence: "monthly after first payment", financedMonths: 7 }),
+  Object.freeze({ planCode: "12_PAY", paymentCount: 12, cadence: "monthly after first payment", financedMonths: 11 }),
+  Object.freeze({ planCode: "18_PAY", paymentCount: 18, cadence: "monthly after first payment", financedMonths: 17 }),
+  Object.freeze({ planCode: "24_PAY", paymentCount: 24, cadence: "monthly after first payment", financedMonths: 23 })
 ]);
 
 function normalizeString(value) {
@@ -34,10 +44,20 @@ function allocateCents(totalCents, paymentCount) {
   return rows;
 }
 
+// v1.0 snapshots/records already locked before the 12/18/24 availability
+// change must keep resolving to the new-financing math family (same 6%
+// simple-plan-charge economics as v1.1 — only plan *availability* changed,
+// not the formula) rather than silently downgrading to legacy 4% because
+// the exact version string no longer matches the current constant.
+function isNewFinancingPolicyVersion(normalized) {
+  return normalized === NEW_FINANCING_POLICY_VERSION || normalized === NEW_FINANCING_POLICY_VERSION_v1_0;
+}
+
 function resolvePaymentPolicyVersion(version) {
   const normalized = normalizeString(version);
   if (!normalized) return DEFAULT_PAYMENT_POLICY_VERSION;
-  if ([LEGACY_PAYMENT_POLICY_VERSION, NEW_FINANCING_POLICY_VERSION].includes(normalized)) return normalized;
+  if (normalized === LEGACY_PAYMENT_POLICY_VERSION) return normalized;
+  if (isNewFinancingPolicyVersion(normalized)) return normalized;
   return DEFAULT_PAYMENT_POLICY_VERSION;
 }
 
@@ -112,7 +132,7 @@ function buildLegacyPlan(adjustedPrincipalCents, plan) {
   });
 }
 
-function buildNewFinancingPlan(adjustedPrincipalCents, plan) {
+function buildNewFinancingPlan(adjustedPrincipalCents, plan, resolvedPolicyVersion) {
   const principalRows = allocateCents(adjustedPrincipalCents, plan.paymentCount);
   const financeChargeTotalCents = newFinanceChargeTotalCents(adjustedPrincipalCents, plan);
   const chargeRows = allocateCents(financeChargeTotalCents, plan.paymentCount);
@@ -146,7 +166,7 @@ function buildNewFinancingPlan(adjustedPrincipalCents, plan) {
     paymentCount: plan.paymentCount,
     cadence: plan.cadence,
     financedMonths: plan.financedMonths,
-    paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION,
+    paymentPolicyVersion: resolvedPolicyVersion || NEW_FINANCING_POLICY_VERSION,
     paymentPolicyKind: "SIMPLE_PLAN_CHARGE_EARLY_PAYOFF",
     authorFacingChargeLabel: plan.planCode === "FULL_PAY" ? "No payment-plan charge" : "Payment-plan charge",
     planChargeRate: plan.planCode === "FULL_PAY" ? 0 : NEW_FINANCING_ANNUAL_SIMPLE_RATE,
@@ -181,8 +201,10 @@ function buildNewFinancingPlan(adjustedPrincipalCents, plan) {
 
 function buildPaymentPlans(adjustedPrincipalCents, paymentPolicyVersion) {
   const resolved = resolvePaymentPolicyVersion(paymentPolicyVersion);
-  const builder = resolved === NEW_FINANCING_POLICY_VERSION ? buildNewFinancingPlan : buildLegacyPlan;
-  return PLAN_CONFIGS.map((plan) => builder(adjustedPrincipalCents, plan));
+  if (isNewFinancingPolicyVersion(resolved)) {
+    return PLAN_CONFIGS.map((plan) => buildNewFinancingPlan(adjustedPrincipalCents, plan, resolved));
+  }
+  return PLAN_CONFIGS.map((plan) => buildLegacyPlan(adjustedPrincipalCents, plan));
 }
 
 function earnedPlanChargeCents({ originalFinanceChargeCents, selectedPlan, paymentsMade, payoffDate, elapsedFinancedMonths: elapsedFinancedMonthsInput }) {
@@ -222,7 +244,7 @@ function calculateEarlyPayoff(input = {}) {
   const originalFinanceChargeCents = Math.max(0, Math.round(Number(input.originalFinanceChargeCents ?? input.originalFinanceCharge) || 0));
   const principalPaidCents = Math.max(0, Math.round(Number(input.principalPaidCents ?? input.principalPaid) || 0));
   const principalRemainingCents = Math.max(0, originalPrincipalCents - principalPaidCents);
-  const earnedChargeCents = paymentPolicyVersion === NEW_FINANCING_POLICY_VERSION
+  const earnedChargeCents = isNewFinancingPolicyVersion(paymentPolicyVersion)
     ? earnedPlanChargeCents({
       originalFinanceChargeCents,
       selectedPlan,
@@ -259,6 +281,7 @@ function calculateEarlyPayoff(input = {}) {
 module.exports = {
   LEGACY_PAYMENT_POLICY_VERSION,
   NEW_FINANCING_POLICY_VERSION,
+  NEW_FINANCING_POLICY_VERSION_v1_0,
   DEFAULT_PAYMENT_POLICY_VERSION,
   LEGACY_TRANSACTION_FEE_RATE,
   NEW_FINANCING_ANNUAL_SIMPLE_RATE,
@@ -267,5 +290,6 @@ module.exports = {
   buildPaymentPlans,
   calculateEarlyPayoff,
   formatUsd,
-  resolvePaymentPolicyVersion
+  resolvePaymentPolicyVersion,
+  isNewFinancingPolicyVersion
 };

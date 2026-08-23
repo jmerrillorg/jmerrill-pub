@@ -12,10 +12,13 @@ const CANONICAL_RENDERER = "JM1 Enterprise Communication Renderer";
 const CANONICAL_RENDER_MODE = "CANONICAL_HTML";
 
 const PLAN_LABELS = Object.freeze({
-  FULL_PAY: "Full Pay",
-  "2_PAY": "2-Pay",
-  "4_PAY": "4-Pay",
-  "8_PAY": "8-Pay"
+  FULL_PAY: "Pay in Full",
+  "2_PAY": "2 months",
+  "4_PAY": "4 months",
+  "8_PAY": "8 months",
+  "12_PAY": "12 months",
+  "18_PAY": "18 months",
+  "24_PAY": "24 months"
 });
 
 function normalizeString(value) {
@@ -49,32 +52,45 @@ function formatPercent(value) {
   return `${Math.max(0, Math.floor(Number(value) || 0))}%`;
 }
 
+// Author-facing primary surface is Term / Payment / Total Before Tax only
+// (see JMP-EXTENDED-FINANCING-12-18-24-2026-08-22 canon). Principal and
+// plan-charge remain computed and available here for internal use and
+// required disclosures, but are not the primary display columns.
 function paymentOptionRows(offer) {
-  return offer.paymentOptions.map((plan) => ({
-    label: PLAN_LABELS[plan.planCode] || plan.planCode,
-    principal: plan.principalTotalFormatted,
-    fee: plan.planChargeTotalFormatted || plan.multiPayFeeTotalFormatted,
-    total: plan.totalDueFormatted,
-    feeLabel: plan.authorFacingChargeLabel || "Payment-plan charge",
-    feeNote: plan.planCode === "FULL_PAY"
-      ? (plan.authorFacingChargeLabel || "No payment-plan charge")
-      : `${plan.authorFacingChargeLabel || "Payment-plan charge"} included in the scheduled payments`,
-    installments: plan.installments.map((row) => ({
+  return offer.paymentOptions.map((plan) => {
+    const installments = plan.installments.map((row) => ({
       number: row.installmentNumber,
       principal: row.principalFormatted,
       fee: row.planChargeFormatted || row.multiPayFeeFormatted,
       total: row.totalDueFormatted
-    }))
-  }));
+    }));
+    const isMultiPay = plan.planCode !== "FULL_PAY";
+    const firstAmount = installments[0]?.total || plan.totalDueFormatted;
+    const hasFinalAdjustment = isMultiPay && installments.some((row) => row.total !== firstAmount);
+    return {
+      label: PLAN_LABELS[plan.planCode] || plan.planCode,
+      principal: plan.principalTotalFormatted,
+      fee: plan.planChargeTotalFormatted || plan.multiPayFeeTotalFormatted,
+      total: plan.totalDueFormatted,
+      // Primary author-facing fields:
+      payment: isMultiPay ? `${firstAmount}/month${hasFinalAdjustment ? "*" : ""}` : `${plan.totalDueFormatted} one-time`,
+      totalBeforeTax: plan.totalDueFormatted,
+      hasFinalAdjustment,
+      feeLabel: plan.authorFacingChargeLabel || "Payment-plan charge",
+      feeNote: plan.planCode === "FULL_PAY"
+        ? (plan.authorFacingChargeLabel || "No payment-plan charge")
+        : `${plan.authorFacingChargeLabel || "Payment-plan charge"} included in the scheduled payments`,
+      installments
+    };
+  });
 }
 
 function buildPaymentOptionsText(rows) {
-  return rows.flatMap((row) => {
+  const header = "Term | Payment | Total Before Tax";
+  const table = rows.map((row) => `${row.label} | ${row.payment} | ${row.total} + applicable tax`);
+  const disclosure = rows.flatMap((row) => {
     const lines = [
-      `${row.label}: ${row.total} + applicable tax`,
-      `  Principal: ${row.principal}`,
-      `  ${row.feeLabel}: ${row.fee}`,
-      `  ${row.feeNote}`
+      `${row.label} detail: Principal ${row.principal}; ${row.feeLabel} ${row.fee}; ${row.feeNote}.`
     ];
     if (row.installments.length > 1) {
       lines.push("  Installments:");
@@ -83,24 +99,31 @@ function buildPaymentOptionsText(rows) {
       }
     }
     return lines;
-  }).join("\n");
+  });
+  return [header, ...table, "", "Detail (for your records):", ...disclosure].join("\n");
 }
 
 function buildPaymentOptionsHtml(rows) {
+  return rows.map((row) => `
+                  <tr>
+                    <td style="border:1px solid #d8dee9;padding:10px;font-weight:700;">${escapeHtml(row.label)}</td>
+                    <td style="border:1px solid #d8dee9;padding:10px;">${escapeHtml(row.payment)}</td>
+                    <td style="border:1px solid #d8dee9;padding:10px;">${escapeHtml(row.totalBeforeTax)}</td>
+                  </tr>`).join("");
+}
+
+// Internal/disclosure detail (principal, plan-charge, per-installment
+// breakdown) — not part of the primary Term/Payment/Total Before Tax
+// surface, but preserved for required disclosures per canon.
+function buildPaymentOptionsDisclosureHtml(rows) {
   const installmentLinesHtml = (row) => {
     if (row.installments.length <= 1) return "";
     const lines = row.installments
       .map((installment) => `Payment ${escapeHtml(String(installment.number))}: ${escapeHtml(installment.total)} + applicable tax`)
       .join("<br>");
-    return `<br><span style="display:block;color:#111827;font-size:13px;margin-top:8px;font-weight:700;">Scheduled payments</span><span style="display:block;color:#374151;font-size:13px;margin-top:3px;">${lines}</span>`;
+    return `<br><span style="display:block;color:#111827;font-size:12px;margin-top:6px;font-weight:700;">Scheduled payments</span><span style="display:block;color:#374151;font-size:12px;margin-top:2px;">${lines}</span>`;
   };
-  return rows.map((row) => `
-                  <tr>
-                    <td style="border:1px solid #d8dee9;padding:10px;font-weight:700;">${escapeHtml(row.label)}</td>
-                    <td style="border:1px solid #d8dee9;padding:10px;">${escapeHtml(row.principal)}</td>
-                    <td style="border:1px solid #d8dee9;padding:10px;">${escapeHtml(row.fee)}</td>
-                    <td style="border:1px solid #d8dee9;padding:10px;">${escapeHtml(row.total)} + applicable tax<br><span style="color:#4b5563;font-size:12px;">${escapeHtml(row.feeNote)}</span>${installmentLinesHtml(row)}</td>
-                  </tr>`).join("");
+  return rows.map((row) => `<p style="margin:0 0 10px;font-size:12px;color:#4b5563;"><strong>${escapeHtml(row.label)}:</strong> Principal ${escapeHtml(row.principal)}; ${escapeHtml(row.feeLabel)} ${escapeHtml(row.fee)}; ${escapeHtml(row.feeNote)}.${installmentLinesHtml(row)}</p>`).join("");
 }
 
 function buildReferralCopy(preview) {
@@ -274,15 +297,17 @@ function renderPackageAcceptanceCommunication(preview, input = {}) {
                 ${referralCopy.html}
                 <p style="margin:0 0 12px;font-size:15px;line-height:1.55;"><strong>Tax:</strong> plus applicable tax. Tax is not calculated in this preview.</p>
                 <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">Payment Options</h2>
+                <p style="margin:0 0 12px;font-size:15px;line-height:1.55;">Choose the payment schedule that works best for you.</p>
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;font-size:14px;line-height:1.45;">
                   <tr>
-                    <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Option</th>
-                    <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Principal</th>
-                    <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Payment-plan charge</th>
-                    <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Total before tax</th>
+                    <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Term</th>
+                    <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Payment</th>
+                    <th align="left" style="border:1px solid #d8dee9;padding:10px;background:#f3f4f6;">Total Before Tax</th>
                   </tr>
                   ${buildPaymentOptionsHtml(rows)}
                 </table>
+                <p style="margin:10px 0 18px;font-size:12px;line-height:1.5;color:#4b5563;">Payments shown are plus applicable tax. *A final installment may adjust by a few cents so the total is exact. Detail below for your records.</p>
+                <div style="margin:0 0 18px;">${buildPaymentOptionsDisclosureHtml(rows)}</div>
                 <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">Pay off early</h2>
                 <p style="margin:0 0 18px;font-size:15px;line-height:1.55;">You may pay the remaining balance early at any time. There is no early-payoff penalty. Any unearned future payment-plan charges are not due after payoff.</p>
                 <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#111827;">What we need from you</h2>

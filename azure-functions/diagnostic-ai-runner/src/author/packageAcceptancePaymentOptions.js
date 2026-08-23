@@ -36,7 +36,10 @@ const PLAN_LABELS = Object.freeze({
   FULL_PAY: "Full Pay",
   "2_PAY": "2-Pay",
   "4_PAY": "4-Pay",
-  "8_PAY": "8-Pay"
+  "8_PAY": "8-Pay",
+  "12_PAY": "12-Pay",
+  "18_PAY": "18-Pay",
+  "24_PAY": "24-Pay"
 });
 
 function normalizeString(value) {
