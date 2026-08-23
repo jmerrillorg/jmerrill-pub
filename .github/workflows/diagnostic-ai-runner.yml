@@ -183,12 +183,12 @@ jobs:
           # The health endpoint must itself confirm the same release is live —
           # not just that the app setting was written.
           python3 -c "
-import json,sys
-with open('$RUNNER_TEMP/diagnostic-ai-runner-health.json') as f:
-    body = json.load(f)
-assert body.get('release') == '$GITHUB_SHA', f\"health endpoint reports release={body.get('release')!r}, expected $GITHUB_SHA\"
-print('Health endpoint release matches deployed SHA — PASS')
-"
+            import json,sys
+            with open('$RUNNER_TEMP/diagnostic-ai-runner-health.json') as f:
+              body = json.load(f)
+            assert body.get('release') == '$GITHUB_SHA', f\"health endpoint reports release={body.get('release')!r}, expected $GITHUB_SHA\"
+            print('Health endpoint release matches deployed SHA — PASS')
+            "
 
       - name: Upload deployment evidence
         uses: actions/upload-artifact@v4
