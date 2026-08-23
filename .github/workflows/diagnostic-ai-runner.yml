@@ -1,6 +1,7 @@
 name: Diagnostic AI Runner CI/CD
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
