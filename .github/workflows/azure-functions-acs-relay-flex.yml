@@ -1,0 +1,118 @@
+name: Deploy ACS Email Relay to Flex Consumption (Node 24)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "azure-functions/acs-email-relay/**"
+      - ".github/workflows/azure-functions-acs-relay-flex.yml"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: jm1-acs-email-relay-flex-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "24"
+  AZURE_RESOURCE_GROUP: rg-jm1-communications
+  FUNCTION_APP_NAME: func-jm1-acs-email-relay-flex
+  FUNCTION_APP_WORKING_DIR: azure-functions/acs-email-relay
+
+jobs:
+  validate-and-deploy:
+    name: Validate, Package, Deploy to Flex
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.FUNCTION_APP_WORKING_DIR }}/package-lock.json
+
+      - name: Verify Node 24
+        run: |
+          node_major=$(node -e "process.stdout.write(process.version.split('.')[0].slice(1))")
+          if [ "$node_major" != "24" ]; then
+            echo "FATAL: Node major must be 24, got $node_major"
+            exit 1
+          fi
+          echo "Node version: $(node --version) — PASS"
+
+      - name: Install dependencies
+        working-directory: ${{ env.FUNCTION_APP_WORKING_DIR }}
+        run: npm ci
+
+      - name: Run tests
+        working-directory: ${{ env.FUNCTION_APP_WORKING_DIR }}
+        run: npm test
+
+      - name: Lint check
+        working-directory: ${{ env.FUNCTION_APP_WORKING_DIR }}
+        run: npm run lint
+
+      - name: Audit
+        working-directory: ${{ env.FUNCTION_APP_WORKING_DIR }}
+        run: npm audit --audit-level=high
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Package function for Flex deployment
+        working-directory: ${{ env.FUNCTION_APP_WORKING_DIR }}
+        run: |
+          # Flex Consumption uses zip-deploy (One Deploy semantics, not WEBSITE_RUN_FROM_PACKAGE)
+          zip -r /tmp/acs-relay-${{ github.sha }}.zip . \
+            --exclude "*.test.js" \
+            --exclude "local.settings.*" \
+            --exclude ".env*"
+          ls -lh /tmp/acs-relay-${{ github.sha }}.zip
+
+      - name: Deploy to Flex Function App
+        run: |
+          az functionapp deployment source config-zip \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --src "/tmp/acs-relay-${{ github.sha }}.zip"
+
+      - name: Verify Node 24 on deployed runtime
+        run: |
+          runtime=$(az functionapp config show \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --query "linuxFxVersion" -o tsv)
+          echo "Deployed runtime: $runtime"
+          if [[ "$runtime" != *"NODE|24"* ]]; then
+            echo "FATAL: Deployed runtime is not Node 24: $runtime"
+            exit 1
+          fi
+          echo "Runtime proof: $runtime — PASS"
+
+      - name: Health check
+        run: |
+          # Allow app to start after deployment
+          sleep 30
+          status=$(az functionapp show \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --query "state" -o tsv)
+          echo "Function App state: $status"
+          if [ "$status" != "Running" ]; then
+            echo "FATAL: Function App not Running after deployment"
+            exit 1
+          fi
+          echo "Health: $status — PASS"

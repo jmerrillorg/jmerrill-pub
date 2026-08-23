@@ -5,12 +5,13 @@
   "description": "Governed ACS Email relay for JM1 INT-PUB-005 author acknowledgments.",
   "main": "src/functions/*.js",
   "engines": {
-    "node": ">=22 <25"
+    "node": ">=24 <25"
   },
   "scripts": {
     "start": "func start",
     "lint": "node --check src/functions/sendAuthorAcknowledgment.js",
-    "test": "node --test"
+    "test": "node --test",
+    "test:node-guard": "node -e \"if (parseInt(process.version.split('.')[0].slice(1)) !== 24) { console.error('Node 24 required, got ' + process.version); process.exit(1); } console.log('Node version OK:', process.version);\""
   },
   "dependencies": {
     "@azure/communication-email": "^1.0.0",
