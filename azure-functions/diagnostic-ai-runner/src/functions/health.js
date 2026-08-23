@@ -11,21 +11,23 @@ const { app } = require("@azure/functions");
  * pattern already used elsewhere in the JMP estate (e.g. the Next.js
  * app-jm1-pub-prod /api/health route).
  */
+async function healthHandler() {
+  return {
+    status: 200,
+    jsonBody: {
+      status: "ready",
+      release: process.env.JM1_RELEASE_SHA || null,
+      productionRelease: process.env.JM1_PRODUCTION_RELEASE_SHA || null,
+      node: process.version
+    }
+  };
+}
+
 app.http("health", {
   methods: ["GET"],
   authLevel: "anonymous",
   route: "health",
-  handler: async () => {
-    return {
-      status: 200,
-      jsonBody: {
-        status: "ready",
-        release: process.env.JM1_RELEASE_SHA || null,
-        productionRelease: process.env.JM1_PRODUCTION_RELEASE_SHA || null,
-        node: process.version
-      }
-    };
-  }
+  handler: healthHandler
 });
 
-module.exports = {};
+module.exports = { healthHandler };
