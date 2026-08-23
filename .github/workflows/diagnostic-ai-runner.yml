@@ -178,7 +178,7 @@ jobs:
           function_names="$(az functionapp function list \
             --name "$FUNCTION_APP_NAME" \
             --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
-            --query "[].name" \
+            --query "[].properties.name" \
             --output tsv)"
           actual_function_count="$(printf '%s\n' "$function_names" | sed '/^$/d' | wc -l | tr -d ' ')"
           test "$actual_function_count" -eq "$expected_function_count"
