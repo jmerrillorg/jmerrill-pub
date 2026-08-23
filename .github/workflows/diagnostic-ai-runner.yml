@@ -1,0 +1,193 @@
+name: Diagnostic AI Runner CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "azure-functions/diagnostic-ai-runner/**"
+      - ".github/workflows/diagnostic-ai-runner.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "azure-functions/diagnostic-ai-runner/**"
+      - ".github/workflows/diagnostic-ai-runner.yml"
+
+permissions:
+  contents: read
+
+env:
+  FUNCTION_APP_NAME: func-jm1-diagnostic-ai-runner
+  FUNCTION_APP_RESOURCE_GROUP: rg-jm1-ai
+  FUNCTION_APP_PATH: azure-functions/diagnostic-ai-runner
+
+jobs:
+  validate-and-package:
+    name: Validate and package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: azure-functions/diagnostic-ai-runner/package-lock.json
+
+      - name: Install dependencies
+        working-directory: azure-functions/diagnostic-ai-runner
+        run: npm ci
+
+      - name: Run full package validation
+        working-directory: azure-functions/diagnostic-ai-runner
+        run: npm test
+
+      - name: Run package lint checks
+        working-directory: azure-functions/diagnostic-ai-runner
+        run: npm run lint
+
+      - name: Build deterministic deployment package
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_path="$RUNNER_TEMP/diagnostic-ai-runner.zip"
+          package_root="$RUNNER_TEMP/diagnostic-ai-runner-package"
+          source_date_epoch="$(git show -s --format=%ct "$GITHUB_SHA")"
+
+          rm -rf "$package_root"
+          mkdir -p "$package_root"
+          git archive \
+            --format=tar \
+            --mtime="@$source_date_epoch" \
+            "$GITHUB_SHA:$FUNCTION_APP_PATH" | tar -xf - -C "$package_root"
+          rm -rf "$package_root/test" "$package_root/local.settings.example.json"
+
+          (
+            cd "$package_root"
+            find . -type f -print | sed 's#^\./##' | LC_ALL=C sort | zip -X -q "$package_path" -@
+          )
+
+          test -f "$package_path"
+          unzip -Z1 "$package_path" | sort > "$RUNNER_TEMP/package-files.txt"
+          grep -Fx "host.json" "$RUNNER_TEMP/package-files.txt"
+          grep -Fx "package.json" "$RUNNER_TEMP/package-files.txt"
+          grep -Fx "package-lock.json" "$RUNNER_TEMP/package-files.txt"
+          grep -Fx "src/functions/runStage0Diagnostic.js" "$RUNNER_TEMP/package-files.txt"
+          if grep -Eq "(^|/)azure-functions/diagnostic-ai-runner/" "$RUNNER_TEMP/package-files.txt"; then
+            echo "Package contains an incorrect nested source directory" >&2
+            exit 1
+          fi
+          if grep -Eq "(^|/)(node_modules|test)/" "$RUNNER_TEMP/package-files.txt"; then
+            echo "Package contains excluded development content" >&2
+            exit 1
+          fi
+          echo "package_path=$package_path" >> "$GITHUB_OUTPUT"
+
+      - name: Upload immutable deployment artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: diagnostic-ai-runner-${{ github.sha }}
+          path: ${{ steps.package.outputs.package_path }}
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy:
+    name: Deploy production Function App
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate-and-package
+    runs-on: ubuntu-latest
+    environment:
+      name: jmerrill-pub-production
+      url: https://func-jm1-diagnostic-ai-runner.azurewebsites.net
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download immutable deployment artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: diagnostic-ai-runner-${{ github.sha }}
+          path: "$RUNNER_TEMP/deploy"
+
+      - name: Log in to Azure with OIDC
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Function App package
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.FUNCTION_APP_NAME }}
+          package: "$RUNNER_TEMP/deploy/diagnostic-ai-runner.zip"
+
+      - name: Record deployed commit SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          az functionapp config appsettings set \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --settings \
+              JM1_RELEASE_SHA="$GITHUB_SHA" \
+              JM1_PRODUCTION_RELEASE_SHA="$GITHUB_SHA" \
+            --output none
+
+      - name: Run production host and readback checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence_path="$RUNNER_TEMP/diagnostic-ai-runner-readback.json"
+          az functionapp show \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --query "{name:name,state:state,kind:kind,location:location,serverFarmId:serverFarmId,linuxFxVersion:siteConfig.linuxFxVersion}" \
+            --output json > "$evidence_path"
+          state="$(az functionapp show \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --query state \
+            --output tsv)"
+          test "$state" = "Running"
+
+          az functionapp function list \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --query "[].name" \
+            --output json > "$RUNNER_TEMP/diagnostic-ai-runner-functions.json"
+          grep -q "run-stage0-diagnostic" "$RUNNER_TEMP/diagnostic-ai-runner-functions.json"
+
+          az functionapp config appsettings list \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --query "[?name=='JM1_RELEASE_SHA' || name=='JM1_PRODUCTION_RELEASE_SHA'].{name:name,value:value}" \
+            --output json > "$RUNNER_TEMP/diagnostic-ai-runner-release-readback.json"
+          release_sha="$(az functionapp config appsettings list \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --query "[?name=='JM1_RELEASE_SHA'].value | [0]" \
+            --output tsv)"
+          production_release_sha="$(az functionapp config appsettings list \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --query "[?name=='JM1_PRODUCTION_RELEASE_SHA'].value | [0]" \
+            --output tsv)"
+          test "$release_sha" = "$GITHUB_SHA"
+          test "$production_release_sha" = "$GITHUB_SHA"
+
+      - name: Upload deployment evidence
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: diagnostic-ai-runner-deployment-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/diagnostic-ai-runner-readback.json
+            ${{ runner.temp }}/diagnostic-ai-runner-functions.json
+            ${{ runner.temp }}/diagnostic-ai-runner-release-readback.json
+          if-no-files-found: warn
+          retention-days: 90
