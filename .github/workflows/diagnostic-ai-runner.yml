@@ -1,7 +1,6 @@
 name: Diagnostic AI Runner CI/CD
 
 on:
-  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -52,19 +51,12 @@ jobs:
         run: |
           set -euo pipefail
           package_path="$RUNNER_TEMP/diagnostic-ai-runner.zip"
-          package_root="$RUNNER_TEMP/diagnostic-ai-runner-package"
           source_date_epoch="$(git show -s --format=%ct "$GITHUB_SHA")"
-          rm -rf "$package_root"
-          mkdir -p "$package_root"
           git archive \
-            --format=tar \
+            --format=zip \
             --mtime="@$source_date_epoch" \
-            "$GITHUB_SHA:$FUNCTION_APP_PATH" | tar -xf - -C "$package_root"
-          rm -rf "$package_root/test" "$package_root/local.settings.example.json"
-          (
-            cd "$package_root"
-            find . -type f -print | sed 's#^\./##' | LC_ALL=C sort | zip -X -q "$package_path" -@
-          )
+            --output="$package_path" \
+            "$GITHUB_SHA:$FUNCTION_APP_PATH"
 
           test -f "$package_path"
           unzip -Z1 "$package_path" | sort > "$RUNNER_TEMP/package-files.txt"
@@ -182,13 +174,12 @@ jobs:
           cat "$RUNNER_TEMP/diagnostic-ai-runner-health.json"
           # The health endpoint must itself confirm the same release is live —
           # not just that the app setting was written.
-          python3 -c "
-            import json,sys
-            with open('$RUNNER_TEMP/diagnostic-ai-runner-health.json') as f:
-              body = json.load(f)
-            assert body.get('release') == '$GITHUB_SHA', f\"health endpoint reports release={body.get('release')!r}, expected $GITHUB_SHA\"
-            print('Health endpoint release matches deployed SHA — PASS')
-            "
+          deployed_release="$(python3 -c "import json; print(json.load(open('$RUNNER_TEMP/diagnostic-ai-runner-health.json')).get('release'))")"
+          if [ "$deployed_release" != "$GITHUB_SHA" ]; then
+            echo "FATAL: health endpoint reports release=$deployed_release, expected $GITHUB_SHA" >&2
+            exit 1
+          fi
+          echo "Health endpoint release matches deployed SHA — PASS"
 
       - name: Upload deployment evidence
         uses: actions/upload-artifact@v4
