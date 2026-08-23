@@ -1,5 +1,6 @@
 "use strict";
 
+require("./functions/health");
 require("./functions/getPublisherRecommendationReview");
 require("./functions/runAgreementDocumentPreparation");
 require("./functions/runAgreementPackageSend");
