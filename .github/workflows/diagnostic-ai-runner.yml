@@ -51,12 +51,19 @@ jobs:
         run: |
           set -euo pipefail
           package_path="$RUNNER_TEMP/diagnostic-ai-runner.zip"
+          package_root="$RUNNER_TEMP/diagnostic-ai-runner-package"
           source_date_epoch="$(git show -s --format=%ct "$GITHUB_SHA")"
+          rm -rf "$package_root"
+          mkdir -p "$package_root"
           git archive \
-            --format=zip \
+            --format=tar \
             --mtime="@$source_date_epoch" \
-            --output="$package_path" \
-            "$GITHUB_SHA:$FUNCTION_APP_PATH"
+            "$GITHUB_SHA:$FUNCTION_APP_PATH" | tar -xf - -C "$package_root"
+          rm -rf "$package_root/test" "$package_root/local.settings.example.json"
+          (
+            cd "$package_root"
+            find . -type f -print | sed 's#^\./##' | LC_ALL=C sort | zip -X -q "$package_path" -@
+          )
 
           test -f "$package_path"
           unzip -Z1 "$package_path" | sort > "$RUNNER_TEMP/package-files.txt"
