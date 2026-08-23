@@ -13,7 +13,8 @@ const {
   buildPaymentPlans,
   calculateEarlyPayoff,
   formatUsd: formatPolicyUsd,
-  resolvePaymentPolicyVersion
+  resolvePaymentPolicyVersion,
+  isNewFinancingPolicyVersion
 } = require("./paymentPolicyEngine");
 
 const PRICING_RULE_VERSION = "JMP_AUTHOR_LOYALTY_REFERRAL_v1.0";
@@ -156,8 +157,21 @@ function calculateAuthorOffer(input = {}) {
   const basePackagePriceCents = packageInfo?.basePackagePriceCents || 0;
   const reductionCents = Math.round(basePackagePriceCents * combinedBenefitPercent / 100);
   const adjustedPackagePrincipalCents = Math.max(0, basePackagePriceCents - reductionCents);
-  const paymentPolicyVersion = resolvePaymentPolicyVersion(input.paymentPolicyVersion || input.paymentFeePolicyVersion);
-  const paymentOptions = buildPaymentOptions(adjustedPackagePrincipalCents, paymentPolicyVersion);
+  let paymentPolicyVersion;
+  let paymentOptions;
+  try {
+    paymentPolicyVersion = resolvePaymentPolicyVersion(input.paymentPolicyVersion || input.paymentFeePolicyVersion);
+    paymentOptions = buildPaymentOptions(adjustedPackagePrincipalCents, paymentPolicyVersion);
+  } catch (err) {
+    if (err?.code === "PAYMENT_POLICY_VERSION_UNRECOGNIZED") {
+      // Fail closed: an unrecognized payment-policy version is a policy-authority
+      // defect, not a reason to silently price under legacy or any other policy.
+      // Surface it as a governed offer-build error rather than crashing the caller.
+      errors.push("PAYMENT_POLICY_VERSION_UNRECOGNIZED");
+      return { ok: false, errors, pricingRuleVersion: PRICING_RULE_VERSION };
+    }
+    throw err;
+  }
 
   if (errors.length) {
     return { ok: false, errors, pricingRuleVersion: PRICING_RULE_VERSION };
@@ -249,6 +263,8 @@ module.exports = {
   LEGACY_PAYMENT_POLICY_VERSION,
   NEW_FINANCING_POLICY_VERSION,
   DEFAULT_PAYMENT_POLICY_VERSION,
+  isNewFinancingPolicyVersion,
+  resolvePaymentPolicyVersion,
   MAX_COMBINED_BENEFIT_PERCENT,
   REFERRAL_CREDIT_PERCENT,
   PAYMENT_PLANS,

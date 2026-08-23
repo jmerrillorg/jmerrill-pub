@@ -176,8 +176,23 @@ describe("paymentPolicyEngine — extended financing ladder (12/18/24 months)", 
       assert.equal(planByCode(v10Plans, "FULL_PAY").paymentPolicyVersion, NEW_FINANCING_POLICY_VERSION_v1_0);
     });
 
-    test("unrecognized version falls back to legacy default, not new financing", () => {
-      assert.equal(resolvePaymentPolicyVersion("not-a-real-version"), LEGACY_PAYMENT_POLICY_VERSION);
+    test("unrecognized version FAILS CLOSED — throws, never silently resolves to legacy or any other policy", () => {
+      assert.throws(
+        () => resolvePaymentPolicyVersion("not-a-real-version"),
+        (err) => err.code === "PAYMENT_POLICY_VERSION_UNRECOGNIZED"
+      );
+    });
+
+    test("no version supplied at all resolves to the documented legacy default (distinct from an unrecognized version)", () => {
+      assert.equal(resolvePaymentPolicyVersion(""), LEGACY_PAYMENT_POLICY_VERSION);
+      assert.equal(resolvePaymentPolicyVersion(undefined), LEGACY_PAYMENT_POLICY_VERSION);
+    });
+
+    test("buildPaymentPlans fails closed for an unrecognized policy version rather than pricing under legacy or new financing", () => {
+      assert.throws(
+        () => buildPaymentPlans(QUANISHIA_PRINCIPAL_CENTS, "JMP_FINANCING_EARLY_PAYOFF_v9.9"),
+        (err) => err.code === "PAYMENT_POLICY_VERSION_UNRECOGNIZED"
+      );
     });
   });
 

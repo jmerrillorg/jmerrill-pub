@@ -53,12 +53,40 @@ function isNewFinancingPolicyVersion(normalized) {
   return normalized === NEW_FINANCING_POLICY_VERSION || normalized === NEW_FINANCING_POLICY_VERSION_v1_0;
 }
 
+// Thrown when a payment-policy version string is present but does not match
+// any version this engine explicitly recognizes. There must be no implicit
+// fallback between financing policies: an unrecognized version is a policy-
+// authority defect (e.g. a typo, a retired version, a version this engine
+// has not yet been taught), not evidence that legacy pricing should apply.
+class PaymentPolicyVersionUnrecognizedError extends Error {
+  constructor(version) {
+    super(`Unrecognized payment policy version: ${JSON.stringify(version)}. Refusing to fall back to another policy.`);
+    this.name = "PaymentPolicyVersionUnrecognizedError";
+    this.code = "PAYMENT_POLICY_VERSION_UNRECOGNIZED";
+    this.version = version;
+  }
+}
+
+// Every currently valid financing-policy version must resolve explicitly and
+// immutably. A version-constant bump (e.g. v1.0 -> v1.1) must never make a
+// previously valid, already-issued/locked snapshot become "unknown" and fall
+// through to a different policy (legacy or otherwise).
+//
+// - No version supplied at all (normalized === "") is the one explicit,
+//   documented default: it means the caller made no policy request, and this
+//   engine's long-standing default is the legacy 4% transaction-fee policy.
+//   This is a real, named policy outcome — not a fallback from an unknown
+//   value.
+// - A version string that IS supplied but does not match a version this
+//   engine explicitly recognizes (legacy, financing v1.0, financing v1.1) is
+//   a defect and must fail closed rather than silently resolve to legacy or
+//   anything else.
 function resolvePaymentPolicyVersion(version) {
   const normalized = normalizeString(version);
   if (!normalized) return DEFAULT_PAYMENT_POLICY_VERSION;
   if (normalized === LEGACY_PAYMENT_POLICY_VERSION) return normalized;
   if (isNewFinancingPolicyVersion(normalized)) return normalized;
-  return DEFAULT_PAYMENT_POLICY_VERSION;
+  throw new PaymentPolicyVersionUnrecognizedError(normalized);
 }
 
 function legacyChargeCents(principalCents, plan) {
@@ -279,6 +307,7 @@ function calculateEarlyPayoff(input = {}) {
 }
 
 module.exports = {
+  PaymentPolicyVersionUnrecognizedError,
   LEGACY_PAYMENT_POLICY_VERSION,
   NEW_FINANCING_POLICY_VERSION,
   NEW_FINANCING_POLICY_VERSION_v1_0,

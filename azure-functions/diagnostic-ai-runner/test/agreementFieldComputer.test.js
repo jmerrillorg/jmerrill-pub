@@ -8,6 +8,7 @@ const {
   buildPricingSnapshot,
   NEW_FINANCING_POLICY_VERSION
 } = require("../src/author/authorOfferEngine");
+const { NEW_FINANCING_POLICY_VERSION_v1_0 } = require("../src/author/paymentPolicyEngine");
 
 function baseInput(overrides = {}) {
   return {
@@ -247,5 +248,25 @@ describe("computeAgreementFields — single payment has no fee, multi-payment op
     }));
     assert.equal(r.ok, false);
     assert.ok(r.errors.includes("PAYMENT_OPTION_UNRECOGNIZED"));
+  });
+
+  test("a locked v1.0 snapshot uses the 6% financing engine here too, not legacy math (regression: this file's own routing check compared strictly against NEW_FINANCING_POLICY_VERSION, so an already-issued v1.0 snapshot would have silently fallen through to legacy 4% math a second time, independent of the authorOfferEngine fix)", () => {
+    const r = computeAgreementFields(baseInput({
+      paymentOption: "TWELVE_PAYMENTS",
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION_v1_0
+    }));
+    assert.equal(r.ok, true);
+    assert.equal(r.paymentSchedule.paymentPolicyVersion, NEW_FINANCING_POLICY_VERSION_v1_0);
+    assert.equal(r.paymentSchedule.totalFormatted, "$4,747.50");
+    assert.notEqual(r.paymentSchedule.totalFormatted, "$4,680.00");
+  });
+
+  test("an unrecognized payment policy version fails closed here as well — never silently prices under legacy math", () => {
+    const r = computeAgreementFields(baseInput({
+      paymentOption: "TWELVE_PAYMENTS",
+      paymentPolicyVersion: "JMP_FINANCING_EARLY_PAYOFF_v9.9"
+    }));
+    assert.equal(r.ok, false);
+    assert.ok(r.errors.includes("PAYMENT_POLICY_VERSION_UNRECOGNIZED"));
   });
 });

@@ -167,7 +167,9 @@ const PAYMENT_OPTIONS = Object.freeze([
   Object.freeze({ code: "TWO_PAYMENTS", payments: 2, minimumPackageTotalUsd: 0 }),
   Object.freeze({ code: "FOUR_PAYMENTS", payments: 4, minimumPackageTotalUsd: 0 }),
   Object.freeze({ code: "EIGHT_PAYMENTS", payments: 8, minimumPackageTotalUsd: 1000 }),
-  Object.freeze({ code: "TWELVE_PAYMENTS", payments: 12, minimumPackageTotalUsd: 2000 })
+  Object.freeze({ code: "TWELVE_PAYMENTS", payments: 12, minimumPackageTotalUsd: 2000 }),
+  Object.freeze({ code: "EIGHTEEN_PAYMENTS", payments: 18, minimumPackageTotalUsd: 2000 }),
+  Object.freeze({ code: "TWENTY_FOUR_PAYMENTS", payments: 24, minimumPackageTotalUsd: 2000 })
 ]);
 
 const PROCESSING_FEE_RATE = 0.04;

@@ -170,7 +170,7 @@ describe("Milestone 6 business source readiness", () => {
     assert.equal(result.readiness.stripeProductMappingStatus, "STRIPE_MAPPING_CONFIRMED");
     assert.equal(result.readiness.stripePriceMappingStatus, "STRIPE_MAPPING_CONFIRMED");
     assert.equal(result.readiness.blockers.includes(BLOCKING_STATUSES.stripeMappingMissing), false);
-    assert.equal(result.readiness.paymentOptionsPreview.length, 5);
+    assert.equal(result.readiness.paymentOptionsPreview.length, 7);
     assert.equal(result.readiness.paymentOptionsPreview.every((option) => option.processingFeeRate === PROCESSING_FEE_RATE), true);
     assert.equal(result.readiness.paymentOptionsPreview.every((option) => option.stripeLinkCreated === false), true);
     assert.equal(result.readiness.paymentOptionsPreview.every((option) => option.invoiceCreated === false), true);
