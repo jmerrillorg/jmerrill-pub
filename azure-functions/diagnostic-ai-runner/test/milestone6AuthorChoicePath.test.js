@@ -65,7 +65,7 @@ describe("Milestone 6B author package-selection branches", () => {
     assert.equal(result.payloads.opportunityPayload.jm1_m6authorselectedpackagecode, PACKAGE_CODES.PROFESSIONAL);
     assert.equal(result.payloads.opportunityPayload.jm1_m6packageselectionstatus, STATUS.packageSelected);
     assert.equal(result.payloads.opportunityPayload.jm1_m6paymentoptionpreparationstatus, STATUS.paymentOptionsPrepared);
-    assert.equal(result.paymentOptions.length, 5);
+    assert.equal(result.paymentOptions.length, 7);
     assert.equal(result.paymentOptions.every((option) => option.processingFeeRate === 0.04), true);
     assert.equal(result.paymentOptions.every((option) => option.stripePaymentLinkCreated === false), true);
     assert.equal(result.paymentOptions.every((option) => option.invoiceCreated === false), true);
@@ -116,7 +116,7 @@ describe("Milestone 6B author package-selection branches", () => {
     assert.equal(selected.ok, true);
     assert.equal(selected.selectedPackage.code, PACKAGE_CODES.PREMIER);
     assert.equal(selected.branch.paymentOptionPreparationStatus, STATUS.paymentOptionsPrepared);
-    assert.equal(selected.paymentOptions.length, 5);
+    assert.equal(selected.paymentOptions.length, 7);
   });
 
   test("custom quote path blocks payment options and routes to human quote review", () => {
@@ -171,7 +171,7 @@ describe("Milestone 6B payment option preparation", () => {
   test("payment option data includes 4% processing fee and safe Stripe mapping only", () => {
     const options = buildPaymentOptionData(PACKAGE_CODES.PROFESSIONAL);
 
-    assert.equal(options.length, 5);
+    assert.equal(options.length, 7);
     assert.equal(options[0].selectedPackageCode, PACKAGE_CODES.PROFESSIONAL);
     assert.equal(options[0].stripeProductId, "prod_UjRnnUiTQgHlrm");
     assert.equal(options[0].stripePriceId, "price_1TjyuZJCiOVFpgYur0FWmcj7");
