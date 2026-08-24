@@ -21,11 +21,17 @@ env:
   FUNCTION_APP_NAME: func-jm1-diagnostic-ai-runner
   FUNCTION_APP_RESOURCE_GROUP: rg-jm1-ai
   FUNCTION_APP_PATH: azure-functions/diagnostic-ai-runner
+  DEPLOYMENT_STORAGE_ACCOUNT: stjm1diagrunner
+  DEPLOYMENT_STORAGE_CONTAINER: publishing
+  DEPLOYMENT_EVIDENCE_PREFIX: deployment-evidence/diagnostic-ai-runner
 
 jobs:
   validate-and-package:
     name: Validate and package
     runs-on: ubuntu-latest
+    outputs:
+      package_sha256: ${{ steps.package.outputs.package_sha256 }}
+      expected_function_count: ${{ steps.package.outputs.expected_function_count }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -79,6 +85,11 @@ jobs:
 
           test -f "$package_path"
           unzip -Z1 "$package_path" | sort > "$RUNNER_TEMP/package-files.txt"
+          package_sha256="$(sha256sum "$package_path" | awk '{print $1}')"
+          expected_function_count="$(grep -RhoE "app\\.(http|timer|storage|serviceBus|eventGrid|cosmosDB|eventHub|generic)" "$package_root/src" | wc -l | tr -d ' ')"
+          expected_source_module_count="$(grep -E '^src/functions/[^/]+\.js$' "$RUNNER_TEMP/package-files.txt" | wc -l | tr -d ' ')"
+          test "$expected_function_count" -gt 0
+          test "$expected_source_module_count" -gt 0
           grep -Fx "host.json" "$RUNNER_TEMP/package-files.txt"
           grep -Fx "package.json" "$RUNNER_TEMP/package-files.txt"
           grep -Fx "package-lock.json" "$RUNNER_TEMP/package-files.txt"
@@ -86,6 +97,7 @@ jobs:
           grep -Fx "src/index.js" "$RUNNER_TEMP/package-files.txt"
           grep -Fx "src/functions/runStage0Diagnostic.js" "$RUNNER_TEMP/package-files.txt"
           grep -Fx "node_modules/@azure/functions/package.json" "$RUNNER_TEMP/package-files.txt"
+          grep -Eq "^node_modules/" "$RUNNER_TEMP/package-files.txt"
           if grep -Eq "(^|/)azure-functions/diagnostic-ai-runner/" "$RUNNER_TEMP/package-files.txt"; then
             echo "Package contains an incorrect nested source directory" >&2
             exit 1
@@ -94,13 +106,24 @@ jobs:
             echo "Package contains excluded runner development content" >&2
             exit 1
           fi
+          if grep -Eq "(^|/)(local\.settings[^/]*|\.env[^/]*)$" "$RUNNER_TEMP/package-files.txt"; then
+            echo "Package contains excluded local settings or env content" >&2
+            exit 1
+          fi
+          printf '{"sourceSha":"%s","artifactName":"diagnostic-ai-runner.zip","artifactSha256":"%s","expectedFunctionCount":%s,"expectedSourceModuleCount":%s}\n' \
+            "$GITHUB_SHA" "$package_sha256" "$expected_function_count" "$expected_source_module_count" > "$RUNNER_TEMP/diagnostic-ai-runner-package-manifest.json"
           echo "package_path=$package_path" >> "$GITHUB_OUTPUT"
+          echo "package_sha256=$package_sha256" >> "$GITHUB_OUTPUT"
+          echo "expected_function_count=$expected_function_count" >> "$GITHUB_OUTPUT"
 
       - name: Upload immutable deployment artifact
         uses: actions/upload-artifact@v7
         with:
           name: diagnostic-ai-runner-${{ github.sha }}
-          path: ${{ steps.package.outputs.package_path }}
+          path: |
+            ${{ steps.package.outputs.package_path }}
+            ${{ runner.temp }}/package-files.txt
+            ${{ runner.temp }}/diagnostic-ai-runner-package-manifest.json
           if-no-files-found: error
           retention-days: 30
 
@@ -128,6 +151,27 @@ jobs:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Persist release package candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_path="${RUNNER_TEMP}/deploy/diagnostic-ai-runner.zip"
+          artifact_sha256="$(sha256sum "$package_path" | awk '{print $1}')"
+          test "$artifact_sha256" = "${{ needs.validate-and-package.outputs.package_sha256 }}"
+          package_blob_name="${DEPLOYMENT_EVIDENCE_PREFIX}/artifacts/diagnostic-ai-runner-${GITHUB_SHA}.zip"
+          az storage blob upload \
+            --account-name "$DEPLOYMENT_STORAGE_ACCOUNT" \
+            --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
+            --name "$package_blob_name" \
+            --file "$package_path" \
+            --auth-mode login \
+            --overwrite true \
+            --output none
+          {
+            echo "JM1_PACKAGE_BLOB_NAME=$package_blob_name"
+            echo "JM1_PACKAGE_SHA256=$artifact_sha256"
+          } >> "$GITHUB_ENV"
 
       - name: Deploy Function App package
         uses: Azure/functions-action@v1
@@ -258,3 +302,111 @@ jobs:
             ${{ runner.temp }}/*-probe.json
           if-no-files-found: warn
           retention-days: 90
+
+      - name: Persist last-known-good deployment evidence
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          deployed_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          expected_function_count="${{ needs.validate-and-package.outputs.expected_function_count }}"
+          expected_source_module_count="$(unzip -Z1 "$RUNNER_TEMP/deploy/diagnostic-ai-runner.zip" | grep -E '^src/functions/[^/]+\.js$' | wc -l | tr -d ' ')"
+          DEPLOYED_AT="$deployed_at" EXPECTED_FUNCTION_COUNT="$expected_function_count" EXPECTED_SOURCE_MODULE_COUNT="$expected_source_module_count" python3 - <<'PY' > "$RUNNER_TEMP/diagnostic-ai-runner-last-known-good.json"
+          import json
+          import os
+          from pathlib import Path
+
+          health_path = Path(os.environ["RUNNER_TEMP"]) / "diagnostic-ai-runner-health.json"
+          health = json.loads(health_path.read_text())
+          payload = {
+              "status": "LAST_KNOWN_GOOD",
+              "sourceSha": os.environ["GITHUB_SHA"],
+              "artifactSha256": os.environ["JM1_PACKAGE_SHA256"],
+              "artifactName": "diagnostic-ai-runner.zip",
+              "artifactBlobName": os.environ["JM1_PACKAGE_BLOB_NAME"],
+              "githubRunId": os.environ["GITHUB_RUN_ID"],
+              "deployedAt": os.environ["DEPLOYED_AT"],
+              "expectedFunctionCount": int(os.environ["EXPECTED_FUNCTION_COUNT"]),
+              "expectedSourceModuleCount": int(os.environ["EXPECTED_SOURCE_MODULE_COUNT"]),
+              "healthResult": health,
+              "deploymentModel": "READY_TO_RUN_PACKAGE_WEBSITE_RUN_FROM_PACKAGE",
+              "node": health.get("node"),
+              "slotCapability": "NO_SLOT_AVAILABLE_FOR_DYNAMIC_LINUX_CONSUMPTION_APP",
+              "rollbackAuthority": "storage_blob_artifact_plus_last_known_good_manifest"
+          }
+          print(json.dumps(payload, indent=2, sort_keys=True))
+          PY
+          az storage blob upload \
+            --account-name "$DEPLOYMENT_STORAGE_ACCOUNT" \
+            --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
+            --name "${DEPLOYMENT_EVIDENCE_PREFIX}/releases/${GITHUB_SHA}.json" \
+            --file "$RUNNER_TEMP/diagnostic-ai-runner-last-known-good.json" \
+            --auth-mode login \
+            --overwrite true \
+            --output none
+          az storage blob upload \
+            --account-name "$DEPLOYMENT_STORAGE_ACCOUNT" \
+            --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
+            --name "${DEPLOYMENT_EVIDENCE_PREFIX}/LAST_KNOWN_GOOD.json" \
+            --file "$RUNNER_TEMP/diagnostic-ai-runner-last-known-good.json" \
+            --auth-mode login \
+            --overwrite true \
+            --output none
+        env:
+          EXPECTED_FUNCTION_COUNT: ${{ needs.validate-and-package.outputs.expected_function_count }}
+
+      - name: Roll back to last-known-good package on validation failure
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          lkg_path="$RUNNER_TEMP/diagnostic-ai-runner-last-known-good.json"
+          if ! az storage blob download \
+            --account-name "$DEPLOYMENT_STORAGE_ACCOUNT" \
+            --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
+            --name "${DEPLOYMENT_EVIDENCE_PREFIX}/LAST_KNOWN_GOOD.json" \
+            --file "$lkg_path" \
+            --auth-mode login \
+            --overwrite true \
+            --output none; then
+            echo "No last-known-good deployment manifest is available; rollback cannot be performed." >&2
+            exit 1
+          fi
+          package_blob_name="$(python3 -c "import json; print(json.load(open('$lkg_path'))['artifactBlobName'])")"
+          source_sha="$(python3 -c "import json; print(json.load(open('$lkg_path'))['sourceSha'])")"
+          expiry="$(date -u -d '+365 days' +%Y-%m-%dT%H:%MZ)"
+          sas="$(az storage blob generate-sas \
+            --account-name "$DEPLOYMENT_STORAGE_ACCOUNT" \
+            --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
+            --name "$package_blob_name" \
+            --permissions r \
+            --expiry "$expiry" \
+            --auth-mode login \
+            --as-user \
+            --output tsv)"
+          package_url="https://${DEPLOYMENT_STORAGE_ACCOUNT}.blob.core.windows.net/${DEPLOYMENT_STORAGE_CONTAINER}/${package_blob_name}?${sas}"
+          az functionapp config appsettings set \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --settings \
+              WEBSITE_RUN_FROM_PACKAGE="$package_url" \
+              JM1_RELEASE_SHA="$source_sha" \
+              JM1_PRODUCTION_RELEASE_SHA="$source_sha" \
+            --output none
+          az functionapp restart \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --output none
+          for attempt in 1 2 3 4 5 6; do
+            if curl --fail --silent --show-error --max-time 30 \
+              "https://${FUNCTION_APP_NAME}.azurewebsites.net/api/health" \
+              --output "$RUNNER_TEMP/diagnostic-ai-runner-rollback-health.json"; then
+              rollback_release="$(python3 -c "import json; print(json.load(open('$RUNNER_TEMP/diagnostic-ai-runner-rollback-health.json')).get('release'))")"
+              test "$rollback_release" = "$source_sha"
+              echo "Rollback to last-known-good release $source_sha verified."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Rollback to last-known-good package failed health verification." >&2
+          exit 1
