@@ -1,12 +1,12 @@
 # System Attention Burn-Down
 
-Last Verified: 2026-08-24T12:05:17.972Z
+Last Verified: 2026-08-24T21:30:20.946Z
 
 Largest safe classes were converted from generic system attention into either autonomous queue/retry candidates or structured JMP operator tasks. Classes that require author, prospect, external, or legal/business judgment remain hard human waits.
 
 | Waiting state | Count |
 | --- | ---: |
-| WAITING_ON_JMP | 252 |
+| WAITING_ON_JMP | 251 |
 | TERMINAL | 164 |
 | WAITING_ON_AUTHOR | 6 |
-| AUTO_EXECUTABLE | 2 |
+| AUTO_EXECUTABLE | 3 |

@@ -21,6 +21,13 @@ const INDOMITABLE_MANUAL_SEND_OCCURRED_ON = '2026-08-24T11:44:34Z'
 const INDOMITABLE_AUTHOR_SIGNED_ON = '2026-08-24T11:56:09Z'
 const INDOMITABLE_AGREEMENT_COMPLETED_ON = '2026-08-24T12:03:33Z'
 const INDOMITABLE_FIRST_PAYMENT_REQUESTED_ON = '2026-08-24T12:53:27Z'
+const INDOMITABLE_FIRST_PAYMENT_RECEIVED_ON = '2026-08-24T13:55:38Z'
+const INDOMITABLE_JOINED_FAMILY_LOG_ID = '080294cc-fb9f-f111-b8db-7c1e525801f6'
+const INDOMITABLE_PRODUCTION_COMMENCED_LOG_ID = '3b924c32-01a0-f111-b8dc-00224820105b'
+const INDOMITABLE_TITLE_ID = 'fd577d2b-01a0-f111-b8dc-000d3a14673b'
+const INDOMITABLE_STAGE_ID = '0f587d2b-01a0-f111-b8dc-000d3a14673b'
+const INDOMITABLE_SOURCE_ARTIFACT_ID = 'c373402b-01a0-f111-b8db-7c1e525801f6'
+const INDOMITABLE_SOURCE_SHA256 = '08cedd4d4db470887ea75e792359c6b4fa807f54bf09f2b50be0144f5e7f7181'
 
 const namedNeedles = [
   'A Year Walking With Him',
@@ -137,7 +144,14 @@ async function main() {
   const records = buildControllerRecords(source)
   const wave1 = evaluatePortfolio(records, { evaluatedOn: generatedOn })
   const wave2 = reconcileWave2({ records, evaluation: wave1, source })
-  const wave3 = reconcileWave3({ records, evaluation: wave1, source, wave2 })
+  const existingWave3ActionKeys = extractExistingWave3ActionKeys(source.logs)
+  const wave3 = reconcileWave3({
+    records,
+    evaluation: wave1,
+    source,
+    wave2,
+    actionKeys: existingWave3ActionKeys,
+  })
   const health = await getHealth()
   const generalExecution = readJsonIfExists(GENERAL_EXECUTION_PATH)
 
@@ -193,6 +207,7 @@ Last Verified: ${generatedOn}
 | UNCLASSIFIED_RECORDS | ${unclassifiedWaitingRows} |
 | Wave 3 readback automatically queued | ${wave3.summary.automaticallyQueued} |
 | Post-merge \`--execute\` replay automatically queued | 2 |
+| Existing Wave 3 action logs recognized | ${existingWave3ActionKeys.size} |
 | Unexplained idle | ${wave3.summary.unexplainedIdle} |
 
 ## Machine Work
@@ -256,10 +271,16 @@ Last Verified: ${generatedOn}
 | Adobe signed/filed notice | ${INDOMITABLE_AGREEMENT_COMPLETED_ON} |
 | Agreement state | AGREEMENT_SIGNED_ACTIVE |
 | First payment request | SENT ${INDOMITABLE_FIRST_PAYMENT_REQUESTED_ON} |
-| Current state | WAITING_ON_AUTHOR / FIRST_PAYMENT |
-| Waiting on | AUTHOR |
-| Next expected event | INITIAL_PAYMENT_RECEIVED |
-| Active title row | NOT YET PRESENT IN ACTIVE \`jm1pub_title\` READBACK |
+| First payment received | ${INDOMITABLE_FIRST_PAYMENT_RECEIVED_ON} |
+| Joined the Family event | \`${INDOMITABLE_JOINED_FAMILY_LOG_ID}\` |
+| Production commenced event | \`${INDOMITABLE_PRODUCTION_COMMENCED_LOG_ID}\` |
+| Current state | PRODUCTION_COMMENCED / DEVELOPMENTAL_EDITING_STAGE_MATERIALIZED |
+| Waiting on | JMP/System evidence binding |
+| Next expected event | Bind exact Editorial Review approval evidence, then execute Developmental Editing |
+| Active title row | \`${INDOMITABLE_TITLE_ID}\` |
+| Developmental Editing stage | \`${INDOMITABLE_STAGE_ID}\` |
+| Source artifact | \`${INDOMITABLE_SOURCE_ARTIFACT_ID}\` |
+| Source checksum | \`${INDOMITABLE_SOURCE_SHA256}\` |
 
 Evidence:
 
@@ -267,7 +288,7 @@ Evidence:
 - Microsoft 365 / Publishing mailbox: Adobe Sign confirmation \`Quanisha Dockery has signed Dockery-Indomitable Package\`, received ${INDOMITABLE_AUTHOR_SIGNED_ON}.
 - Microsoft 365 / Publishing mailbox: Adobe Sign confirmation \`Dockery-Indomitable Package between Jackie Smith, Quanisha Dockery and Jackie Smith, Jr. is Signed and Filed!\`, received ${INDOMITABLE_AGREEMENT_COMPLETED_ON}.
 
-Negative proof: payment options were not resent; agreement was not automatically sent by JMP runtime; Adobe is not an automated lifecycle dependency; SignNow was not invoked; no Stripe charge was created by this reconciliation; \`AGREEMENT_SENT_MANUALLY\` duplicate count is 1.
+Negative proof: payment options were not resent; agreement was not automatically sent by JMP runtime; Adobe is not an automated lifecycle dependency; SignNow was not invoked; no Stripe charge was created by this reconciliation; \`AGREEMENT_SENT_MANUALLY\` duplicate count is 1; duplicate \`JOINED_THE_FAMILY\` count is 0; duplicate \`PRODUCTION_COMMENCED\` count is 0.
 `)
 
   write('03-machine-work-executed.md', `# Machine Work Executed
@@ -465,6 +486,12 @@ Search boundary: repository text plus locally synced governed OneDrive/SharePoin
     health,
     finalClassification: 'JMP_FULL_DAY_EXECUTION_EXHAUSTION_CONTROLLED_COMMISSIONING',
   }, null, 2))
+}
+
+function extractExistingWave3ActionKeys(logs) {
+  return new Set((logs || [])
+    .map((log) => String(log.jm1_name || '').match(/^PORTFOLIO-WAVE3-(.+)$/)?.[1])
+    .filter(Boolean))
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

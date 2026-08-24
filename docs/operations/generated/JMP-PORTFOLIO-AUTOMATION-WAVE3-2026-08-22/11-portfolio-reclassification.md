@@ -1,10 +1,10 @@
 # Portfolio Reclassification
 
-Last Verified: 2026-08-24T12:05:17.972Z
+Last Verified: 2026-08-24T21:30:20.946Z
 
 | Composition | Count |
 | --- | ---: |
-| Active pipeline | 22 |
+| Active pipeline | 23 |
 | Active post-publication | 164 |
 | Active stewardship | 0 |
 | Legacy unresolved | 1 |

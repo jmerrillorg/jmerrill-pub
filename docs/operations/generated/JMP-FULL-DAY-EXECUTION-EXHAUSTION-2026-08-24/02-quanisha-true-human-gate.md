@@ -1,6 +1,6 @@
 # Quanisha / Indomitable
 
-Last Verified: 2026-08-24T13:05:33.667Z
+Last Verified: 2026-08-24T21:30:37.417Z
 
 | Field | Value |
 | --- | --- |
@@ -24,10 +24,16 @@ Last Verified: 2026-08-24T13:05:33.667Z
 | Adobe signed/filed notice | 2026-08-24T12:03:33Z |
 | Agreement state | AGREEMENT_SIGNED_ACTIVE |
 | First payment request | SENT 2026-08-24T12:53:27Z |
-| Current state | WAITING_ON_AUTHOR / FIRST_PAYMENT |
-| Waiting on | AUTHOR |
-| Next expected event | INITIAL_PAYMENT_RECEIVED |
-| Active title row | NOT YET PRESENT IN ACTIVE `jm1pub_title` READBACK |
+| First payment received | 2026-08-24T13:55:38Z |
+| Joined the Family event | `080294cc-fb9f-f111-b8db-7c1e525801f6` |
+| Production commenced event | `3b924c32-01a0-f111-b8dc-00224820105b` |
+| Current state | PRODUCTION_COMMENCED / DEVELOPMENTAL_EDITING_STAGE_MATERIALIZED |
+| Waiting on | JMP/System evidence binding |
+| Next expected event | Bind exact Editorial Review approval evidence, then execute Developmental Editing |
+| Active title row | `fd577d2b-01a0-f111-b8dc-000d3a14673b` |
+| Developmental Editing stage | `0f587d2b-01a0-f111-b8dc-000d3a14673b` |
+| Source artifact | `c373402b-01a0-f111-b8db-7c1e525801f6` |
+| Source checksum | `08cedd4d4db470887ea75e792359c6b4fa807f54bf09f2b50be0144f5e7f7181` |
 
 Evidence:
 
@@ -35,4 +41,4 @@ Evidence:
 - Microsoft 365 / Publishing mailbox: Adobe Sign confirmation `Quanisha Dockery has signed Dockery-Indomitable Package`, received 2026-08-24T11:56:09Z.
 - Microsoft 365 / Publishing mailbox: Adobe Sign confirmation `Dockery-Indomitable Package between Jackie Smith, Quanisha Dockery and Jackie Smith, Jr. is Signed and Filed!`, received 2026-08-24T12:03:33Z.
 
-Negative proof: payment options were not resent; agreement was not automatically sent by JMP runtime; Adobe is not an automated lifecycle dependency; SignNow was not invoked; no Stripe charge was created by this reconciliation; `AGREEMENT_SENT_MANUALLY` duplicate count is 1.
+Negative proof: payment options were not resent; agreement was not automatically sent by JMP runtime; Adobe is not an automated lifecycle dependency; SignNow was not invoked; no Stripe charge was created by this reconciliation; `AGREEMENT_SENT_MANUALLY` duplicate count is 1; duplicate `JOINED_THE_FAMILY` count is 0; duplicate `PRODUCTION_COMMENCED` count is 0.
