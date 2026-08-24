@@ -1,0 +1,51 @@
+# Waiting On JMP Reconciliation
+
+Last Verified: 2026-08-24T13:05:33.667Z
+
+## Current Task Class Distribution
+
+Scope: this table covers only the current `WAITING_ON_JMP` source population. The 2 current `AUTO_EXECUTABLE` rows are a separate execution population and are not counted inside the `WAITING_ON_JMP` denominator.
+
+| Reconciliation field | Count |
+| --- | ---: |
+| WAITING_ON_JMP_SOURCE_COUNT | 252 |
+| CLASSIFIED_UNIQUE_RECORD_COUNT | 252 |
+| AUTO_EXECUTABLE_SEPARATE_POPULATION | 2 |
+| DUPLICATE_CLASSIFICATIONS | 0 |
+| UNCLASSIFIED_RECORDS | 0 |
+
+| Exhaustion class | Count |
+| --- | ---: |
+| TERMINAL_OR_LEGACY_RECONCILIATION | 179 |
+| DETERMINISTIC_DATA_REPAIR_OR_EVIDENCE_BINDING | 60 |
+| RUNTIME_REPAIR_REQUIRED | 7 |
+| TRUE_JMP_HUMAN_GATE | 5 |
+| LEGACY_RECONCILIATION | 1 |
+
+## Separate AUTO_EXECUTABLE Population
+
+| Exhaustion class | Count |
+| --- | ---: |
+| RUNTIME_REPAIR_REQUIRED | 2 |
+
+## System Attention Class Distribution
+
+| System class | Count |
+| --- | ---: |
+| TERMINAL_STATE_CONFLICT | 179 |
+| MISSING_AUTHOR_RELATIONSHIP | 31 |
+| MISSING_ARTIFACT | 21 |
+| MISSING_CANONICAL_LINK | 7 |
+| RUNTIME_NOT_COMMISSIONED | 7 |
+| LIFECYCLE_MAPPING_CONFLICT | 5 |
+| LEGACY_RECONCILIATION | 1 |
+| PRODUCTION_DEPENDENCY_MISSING | 1 |
+
+## Waiting State Distribution
+
+| Waiting state | Count |
+| --- | ---: |
+| WAITING_ON_JMP | 252 |
+| TERMINAL | 164 |
+| WAITING_ON_AUTHOR | 6 |
+| AUTO_EXECUTABLE | 2 |
