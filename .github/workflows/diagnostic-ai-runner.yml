@@ -189,15 +189,24 @@ jobs:
 
           expected_function_count="$(unzip -Z1 "$RUNNER_TEMP/deploy/diagnostic-ai-runner.zip" | grep -E '^src/functions/[^/]+\.js$' | wc -l | tr -d ' ')"
           test "$expected_function_count" -gt 0
+          echo "Deployment package contains $expected_function_count function registrations"
+
+          # Azure's management-plane function catalog can lag or return empty
+          # for Node v4 worker-indexed apps even after Sync Trigger succeeds.
+          # Treat it as useful readback evidence when it is populated, but use
+          # live route probes below as the deployment gate.
           function_names="$(az functionapp function list \
             --name "$FUNCTION_APP_NAME" \
             --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
             --query "[].properties.name" \
-            --output tsv)"
+            --output tsv || true)"
           actual_function_count="$(printf '%s\n' "$function_names" | sed '/^$/d' | wc -l | tr -d ' ')"
-          test "$actual_function_count" -eq "$expected_function_count"
-          printf '%s\n' "$function_names" | grep -Fx "health"
-          echo "Indexed function catalog matches expected count ($expected_function_count)"
+          if [ "$actual_function_count" -eq "$expected_function_count" ]; then
+            printf '%s\n' "$function_names" | grep -Fx "health"
+            echo "Azure management-plane function catalog matches expected count ($expected_function_count)"
+          else
+            echo "Azure management-plane function catalog reported $actual_function_count of $expected_function_count functions; continuing to live route probes."
+          fi
 
           for attempt in 1 2 3 4 5 6; do
             if curl --fail --silent --show-error --max-time 30 \
@@ -218,6 +227,26 @@ jobs:
           fi
           echo "Health endpoint release matches deployed SHA — PASS"
 
+          for route in \
+            run-stage0-diagnostic \
+            run-payment-option-commercial-continuation \
+            run-governed-agreement-generation \
+            run-manual-signature-handoff; do
+            status="$(curl --silent --show-error --max-time 30 \
+              --output "$RUNNER_TEMP/${route}-probe.json" \
+              --write-out "%{http_code}" \
+              --request POST \
+              --header "content-type: application/json" \
+              --data '{}' \
+              "https://$FUNCTION_APP_NAME.azurewebsites.net/api/$route")"
+            if [ "$status" = "404" ] || [ "$status" = "000" ]; then
+              echo "FATAL: route probe failed for $route with HTTP $status" >&2
+              cat "$RUNNER_TEMP/${route}-probe.json" >&2 || true
+              exit 1
+            fi
+            echo "Route probe for $route returned HTTP $status — indexed route present"
+          done
+
       - name: Upload deployment evidence
         uses: actions/upload-artifact@v7
         if: always()
@@ -226,5 +255,6 @@ jobs:
           path: |
             ${{ runner.temp }}/diagnostic-ai-runner-readback.json
             ${{ runner.temp }}/diagnostic-ai-runner-health.json
+            ${{ runner.temp }}/*-probe.json
           if-no-files-found: warn
           retention-days: 90
