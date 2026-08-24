@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const JSZip = require("jszip");
 const { isValidDocxBuffer, DOCX_MIME_TYPE } = require("../src/agreement/agreementDocxValidator");
 
-async function buildMinimalDocx() {
+async function buildMinimalDocx(documentXml = "<w:document/>") {
   const zip = new JSZip();
   zip.file("[Content_Types].xml", [
     '<?xml version="1.0"?>',
@@ -19,7 +19,7 @@ async function buildMinimalDocx() {
     '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>',
     '</Relationships>'
   ].join(""));
-  zip.file("word/document.xml", "<w:document/>");
+  zip.file("word/document.xml", documentXml);
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
@@ -66,6 +66,13 @@ describe("isValidDocxBuffer", () => {
     const result = await isValidDocxBuffer(buffer);
     assert.equal(result.valid, false);
     assert.equal(result.reason, "MISSING_PACKAGE_RELS");
+  });
+
+  test("rejects a zip-shaped DOCX with malformed word/document.xml", async () => {
+    const buffer = await buildMinimalDocx("<w:document><w:body><w:p></w:body></w:document>");
+    const result = await isValidDocxBuffer(buffer);
+    assert.equal(result.valid, false);
+    assert.equal(result.reason, "WORD_DOCUMENT_XML_MALFORMED");
   });
 
   test("DOCX_MIME_TYPE matches the standard Office Open XML word-processing MIME type", () => {

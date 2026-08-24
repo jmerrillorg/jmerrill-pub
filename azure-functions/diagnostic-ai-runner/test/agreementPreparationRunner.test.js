@@ -163,14 +163,17 @@ describe("applyPublisherSignatureToAgreementBuffer", () => {
 
   test("embeds the governed publisher signature in the v1.3.1 two-column signature table shape", async () => {
     const docx = await buildMinimalDocx([
-      "<w:p><w:r><w:t>PUBLISHER</w:t></w:r><w:r><w:t>AUTHOR</w:t></w:r></w:p>",
+      "<w:tbl><w:tr>",
+      "<w:tc><w:p><w:r><w:t>Publisher</w:t></w:r></w:p>",
       "<w:p><w:r><w:t>J Merrill Publishing, Inc.</w:t></w:r></w:p>",
       "<w:p><w:r><w:t>By: _______________________________</w:t></w:r></w:p>",
       "<w:p><w:r><w:t>Jackie Smith, Jr., President &amp; CEO, J Merrill Publishing, Inc.</w:t></w:r></w:p>",
-      "<w:p><w:r><w:t>Date: _____________________________</w:t></w:r></w:p>",
+      "<w:p><w:r><w:t>Date: _____________________________</w:t></w:r></w:p></w:tc>",
+      "<w:tc><w:p><w:r><w:t>Author</w:t></w:r></w:p>",
       "<w:p><w:r><w:t>Jackie Smith Jr</w:t></w:r></w:p>",
       "<w:p><w:r><w:t>Signature: ________________________</w:t></w:r></w:p>",
-      "<w:p><w:r><w:t>Date: _____________________________</w:t></w:r></w:p>"
+      "<w:p><w:r><w:t>Date: _____________________________</w:t></w:r></w:p></w:tc>",
+      "</w:tr></w:tbl>"
     ].join(""));
     const result = await applyPublisherSignatureToAgreementBuffer(docx, PNG_SIGNATURE_BYTES, { contractDate: "2026-08-13" });
     assert.equal(result.applied, true);
@@ -181,6 +184,8 @@ describe("applyPublisherSignatureToAgreementBuffer", () => {
     assert.ok(xml.includes("Publisher Signature"));
     assert.ok(xml.includes("Date: 2026-08-13"));
     assert.ok(xml.includes("Signature: ________________________"), "author signature blank remains present");
+    assert.ok(xml.includes("</w:tc><w:tc>"), "signature table cells remain intact");
+    assert.match(xml, /<w:tbl>[\s\S]*<w:tr>[\s\S]*<w:tc>[\s\S]*Publisher Signature[\s\S]*<\/w:tc><w:tc>[\s\S]*Author[\s\S]*<\/w:tc>[\s\S]*<\/w:tr><\/w:tbl>/);
   });
 });
 

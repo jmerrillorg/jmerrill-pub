@@ -1,6 +1,6 @@
 # Wave 3 Executive Summary
 
-Last Verified: 2026-08-24T11:00:37.279Z
+Last Verified: 2026-08-24T11:26:57.930Z
 
 Classification: JMP_AUTONOMOUS_PORTFOLIO_WAVE3_CONTROLLED_COMMISSIONING
 
@@ -16,10 +16,6 @@ PR #568 was merged to canonical main before this Wave 3 branch was created. Wave
 | Automatically resumed/retried | 0 | 0 |
 | Structured operator tasks | 0 | 252 |
 | Unexplained idle | 0 | 0 |
-
-## Indomitable Manual-Gate Correction
-
-`READY_FOR_MANUAL_SIGNATURE_SEND` is now recognized as an already prepared agreement package and a Jackie manual-send gate, not as missing agreement work. Two preliminary `GENERATE_CONTRACT_FROM_LOCKED_PRICING` execution-log rows from the first 2026-08-24 replay were preserved and marked superseded; no agreement generation, author send, e-sign invocation, Stripe charge, pricing change, or contract replacement was executed by those rows.
 
 ## Negative Proof
 

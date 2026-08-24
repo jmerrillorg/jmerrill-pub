@@ -195,18 +195,41 @@ function buildPublisherSignatureDrawing(relId, { widthEmu = 2057400, heightEmu =
   ].join("");
 }
 
+function findTextElementIndex(xml, text, fromIndex = 0) {
+  const pattern = new RegExp(`<w:t(?:\\\\s[^>]*)?>${text}</w:t>`, "i");
+  const match = xml.slice(fromIndex).match(pattern);
+  return match ? fromIndex + match.index : -1;
+}
+
+function replaceParagraphContaining(xml, index, replacement) {
+  let paragraphStart = -1;
+  const paragraphPattern = /<w:p(?:\s[^>]*)?>/g;
+  let match;
+  while ((match = paragraphPattern.exec(xml)) !== null) {
+    if (match.index > index) break;
+    paragraphStart = match.index;
+  }
+  const paragraphEnd = xml.indexOf("</w:p>", index);
+  if (paragraphStart === -1 || paragraphEnd === -1) {
+    return { xml, inserted: false };
+  }
+  return {
+    xml: xml.slice(0, paragraphStart) + replacement + xml.slice(paragraphEnd + "</w:p>".length),
+    inserted: true
+  };
+}
+
 function replacePublisherSignatureLine(xml, relId) {
-  const publisherIndex = xml.indexOf("<w:t>Publisher</w:t>");
-  const authorIndex = xml.indexOf("<w:t>Author</w:t>", publisherIndex);
+  const publisherIndex = findTextElementIndex(xml, "Publisher");
+  const authorIndex = findTextElementIndex(xml, "Author", publisherIndex);
   if (publisherIndex === -1 || authorIndex === -1) {
     return replaceFinalPublisherByLine(xml, relId);
   }
   const before = xml.slice(0, publisherIndex);
   const block = xml.slice(publisherIndex, authorIndex);
   const after = xml.slice(authorIndex);
-  const linePattern = /<w:p\b[^>]*>[\s\S]*?<w:t>By: _{3,}<\/w:t>[\s\S]*?<\/w:p>/;
-  const match = block.match(linePattern);
-  if (!match) {
+  const byIndex = block.search(/<w:t(?:\s[^>]*)?>By: _{3,}<\/w:t>/i);
+  if (byIndex === -1) {
     return replaceFinalPublisherByLine(xml, relId);
   }
   const replacement = [
@@ -215,11 +238,13 @@ function replacePublisherSignatureLine(xml, relId) {
     buildPublisherSignatureDrawing(relId),
     '</w:p>'
   ].join("");
-  return { xml: before + block.replace(linePattern, replacement) + after, inserted: true };
+  const result = replaceParagraphContaining(block, byIndex, replacement);
+  if (!result.inserted) return replaceFinalPublisherByLine(xml, relId);
+  return { xml: before + result.xml + after, inserted: true };
 }
 
 function replaceFinalPublisherByLine(xml, relId) {
-  const linePattern = /<w:p\b[^>]*>[\s\S]*?<w:t>By: _{3,}<\/w:t>[\s\S]*?<\/w:p>/g;
+  const linePattern = /<w:t(?:\s[^>]*)?>By: _{3,}<\/w:t>/gi;
   const matches = Array.from(xml.matchAll(linePattern));
   if (matches.length === 0) {
     return { xml, inserted: false };
@@ -231,22 +256,19 @@ function replaceFinalPublisherByLine(xml, relId) {
     buildPublisherSignatureDrawing(relId),
     '</w:p>'
   ].join("");
-  return {
-    xml: xml.slice(0, match.index) + replacement + xml.slice(match.index + match[0].length),
-    inserted: true
-  };
+  return replaceParagraphContaining(xml, match.index, replacement);
 }
 
 function replacePublisherDateLine(xml, contractDate) {
-  const publisherIndex = xml.indexOf("<w:t>Publisher</w:t>");
-  const authorIndex = xml.indexOf("<w:t>Author</w:t>", publisherIndex);
+  const publisherIndex = findTextElementIndex(xml, "Publisher");
+  const authorIndex = findTextElementIndex(xml, "Author", publisherIndex);
   if (publisherIndex === -1 || authorIndex === -1) {
     return replaceFinalPublisherDateLine(xml, contractDate);
   }
   const before = xml.slice(0, publisherIndex);
   const block = xml.slice(publisherIndex, authorIndex);
   const after = xml.slice(authorIndex);
-  const updated = block.replace(/<w:t>Date: _{3,}<\/w:t>/, `<w:t>Date: ${escapeXmlAttr(contractDate)}</w:t>`);
+  const updated = block.replace(/<w:t(?:\s[^>]*)?>Date: _{3,}<\/w:t>/i, `<w:t>Date: ${escapeXmlAttr(contractDate)}</w:t>`);
   if (updated === block) {
     return replaceFinalPublisherDateLine(xml, contractDate);
   }
@@ -254,7 +276,7 @@ function replacePublisherDateLine(xml, contractDate) {
 }
 
 function replaceFinalPublisherDateLine(xml, contractDate) {
-  const linePattern = /<w:t>Date: _{3,}<\/w:t>/g;
+  const linePattern = /<w:t(?:\s[^>]*)?>Date: _{3,}<\/w:t>/gi;
   const matches = Array.from(xml.matchAll(linePattern));
   if (matches.length === 0) {
     return { xml, filled: false };
