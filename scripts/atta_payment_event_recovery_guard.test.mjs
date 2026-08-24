@@ -21,8 +21,16 @@ test('Publishing payment consumer preserves payment and agreement gates separate
   assert.match(consumerSource, /JOINED_THE_FAMILY/)
   assert.match(consumerSource, /JOINED_THE_FAMILY_BLOCKED/)
   assert.match(consumerSource, /AGREEMENT_SIGNED_ACTIVE/)
+  assert.match(consumerSource, /AGREEMENT_FULLY_EXECUTED/)
+  assert.match(consumerSource, /AGREEMENT_FULLY_EXECUTED_EVENT/)
   assert.match(consumerSource, /PAYMENT_AMOUNT_DOES_NOT_MATCH_SELECTED_INSTALLMENT/)
   assert.match(consumerSource, /PAYMENT_NOTIFICATION_ALREADY_SENT/)
+})
+
+test('Publishing payment consumer uses governed labels and no hardcoded author fallback', () => {
+  assert.match(consumerSource, /odata\.include-annotations="OData\.Community\.Display\.V1\.FormattedValue"/)
+  assert.match(consumerSource, /opportunityNameAuthorFallback/)
+  assert.doesNotMatch(consumerSource, /\|\| 'Atta Darko'/)
 })
 
 test('Atta grandfathered payment policy is not migrated or recalculated by recovery path', () => {

@@ -311,6 +311,7 @@ async function dataverseRequest(config: DataverseConfig, token: string, path: st
       'Content-Type': 'application/json',
       'OData-MaxVersion': '4.0',
       'OData-Version': '4.0',
+      Prefer: 'odata.include-annotations="OData.Community.Display.V1.FormattedValue"',
       ...(options.headers || {}),
     },
     body: options.body ? JSON.stringify(removeNullish(options.body)) : undefined,
@@ -386,6 +387,28 @@ async function findSignedContractForOpportunity(config: DataverseConfig, token: 
     config,
     token,
     `jm1pub_contracts?$select=jm1pub_contractid,jm1pub_contractname,jm1pub_status,jm1pub_providerstatus,jm1pub_signeddate,_jm1pub_opportunity_value&$filter=${encodeURIComponent(filter)}&$orderby=modifiedon desc&$top=1`,
+  )
+  if (Array.isArray(result.value) && result.value.length > 0) return result.value[0]
+
+  const executedAgreementEvent = await findAgreementExecutedEventForOpportunity(config, token, opportunityId)
+  if (!executedAgreementEvent) return null
+
+  return {
+    jm1pub_contractid: executedAgreementEvent.jm1_executionlogid,
+    jm1pub_contractname: executedAgreementEvent.jm1_name,
+    jm1pub_status: CONTRACT_STATUS.ACTIVE,
+    jm1pub_providerstatus: 'AGREEMENT_FULLY_EXECUTED_EVENT',
+    jm1pub_signeddate: executedAgreementEvent.jm1_completedon || executedAgreementEvent.createdon,
+    _jm1pub_opportunity_value: opportunityId,
+  }
+}
+
+async function findAgreementExecutedEventForOpportunity(config: DataverseConfig, token: string, opportunityId: string) {
+  const filter = `jm1_sourcerecordid eq '${encodeODataString(opportunityId)}' and jm1_actiontype eq 'AGREEMENT_FULLY_EXECUTED'`
+  const result = await dataverseRequest(
+    config,
+    token,
+    `jm1_executionlogs?$select=jm1_executionlogid,jm1_name,jm1_actiontype,jm1_completedon,createdon,jm1_sourcerecordid&$filter=${encodeURIComponent(filter)}&$orderby=createdon desc&$top=1`,
   )
   return Array.isArray(result.value) && result.value.length > 0 ? result.value[0] : null
 }
@@ -596,7 +619,15 @@ function isoFromStripeSeconds(value: unknown) {
 function authorName(opportunity: DataverseRow) {
   return normalizeString(opportunity['_parentcontactid_value@OData.Community.Display.V1.FormattedValue'])
     || normalizeString(opportunity['_customerid_value@OData.Community.Display.V1.FormattedValue'])
-    || 'Atta Darko'
+    || opportunityNameAuthorFallback(opportunity)
+    || 'Author'
+}
+
+function opportunityNameAuthorFallback(opportunity: DataverseRow) {
+  const name = normalizeString(opportunity.name)
+  if (!name) return null
+  const parts = name.split('—').map((part) => part.trim()).filter(Boolean)
+  return parts.length >= 3 ? parts[parts.length - 1] : null
 }
 
 function titleName(opportunity: DataverseRow) {
