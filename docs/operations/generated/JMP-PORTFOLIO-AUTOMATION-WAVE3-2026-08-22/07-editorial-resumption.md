@@ -1,6 +1,6 @@
 # Editorial Resumption
 
-Last Verified: 2026-08-24T11:26:57.930Z
+Last Verified: 2026-08-24T12:05:17.972Z
 
 The General's Will and The Long Watch are evaluated independently. If Line runtime/capacity permits, they are queueable through `QUEUE_COMMISSIONED_EDITORIAL_JOB`; if not, the exact runtime/capacity blocker is preserved.
 
