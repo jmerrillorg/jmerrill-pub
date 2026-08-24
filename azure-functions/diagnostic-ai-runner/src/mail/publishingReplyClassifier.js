@@ -139,11 +139,13 @@ function classifyPublishingReply(replyText) {
 // Maps a payment-option classification to its governed details for
 // JMP-PKG-PRO. Returns null for non-payment-option classifications.
 const PAYMENT_OPTION_DETAILS = Object.freeze({
-  [CLASSIFICATION.SINGLE]: { installments: 1, perInstallmentUsd: 4500.00, feeApplies: false },
-  [CLASSIFICATION.TWO_PAYMENTS]: { installments: 2, perInstallmentUsd: 2340.00, feeApplies: true },
-  [CLASSIFICATION.FOUR_PAYMENTS]: { installments: 4, perInstallmentUsd: 1170.00, feeApplies: true },
-  [CLASSIFICATION.EIGHT_PAYMENTS]: { installments: 8, perInstallmentUsd: 585.00, feeApplies: true },
-  [CLASSIFICATION.TWELVE_PAYMENTS]: { installments: 12, perInstallmentUsd: 390.00, feeApplies: true }
+  [CLASSIFICATION.SINGLE]: { installments: 1, perInstallmentUsd: 4500.00, totalUsd: 4500.00, feeApplies: false },
+  [CLASSIFICATION.TWO_PAYMENTS]: { installments: 2, perInstallmentUsd: 2261.25, totalUsd: 4522.50, feeApplies: true },
+  [CLASSIFICATION.FOUR_PAYMENTS]: { installments: 4, perInstallmentUsd: 1141.88, finalInstallmentUsd: 1141.86, totalUsd: 4567.50, feeApplies: true },
+  [CLASSIFICATION.EIGHT_PAYMENTS]: { installments: 8, perInstallmentUsd: 582.19, finalInstallmentUsd: 582.17, totalUsd: 4657.50, feeApplies: true },
+  [CLASSIFICATION.TWELVE_PAYMENTS]: { installments: 12, perInstallmentUsd: 395.63, finalInstallmentUsd: 395.57, totalUsd: 4747.50, feeApplies: true },
+  [CLASSIFICATION.EIGHTEEN_PAYMENTS]: { installments: 18, perInstallmentUsd: 271.25, totalUsd: 4882.50, feeApplies: true },
+  [CLASSIFICATION.TWENTY_FOUR_PAYMENTS]: { installments: 24, perInstallmentUsd: 209.06, finalInstallmentUsd: 209.12, totalUsd: 5017.50, feeApplies: true }
 });
 
 function getPaymentOptionDetails(classification) {

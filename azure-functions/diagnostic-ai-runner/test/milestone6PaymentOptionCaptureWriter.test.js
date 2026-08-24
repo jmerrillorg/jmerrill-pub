@@ -120,8 +120,13 @@ describe("validatePaymentOptionCapturePayload — allowlist and type enforcement
     assert.equal(r.reason, "UNKNOWN_FIELD_PRESENT");
   });
 
-  test("rejects installment count out of 1-12 range", () => {
-    const r = validatePaymentOptionCapturePayload({ ...VALID_PAYLOAD, jm1_m6selectedinstallmentcount: 13 });
+  test("accepts 18- and 24-month installment counts under the governed financing ladder", () => {
+    assert.equal(validatePaymentOptionCapturePayload({ ...VALID_PAYLOAD, jm1_m6selectedinstallmentcount: 18 }).valid, true);
+    assert.equal(validatePaymentOptionCapturePayload({ ...VALID_PAYLOAD, jm1_m6selectedinstallmentcount: 24 }).valid, true);
+  });
+
+  test("rejects installment count out of 1-24 range", () => {
+    const r = validatePaymentOptionCapturePayload({ ...VALID_PAYLOAD, jm1_m6selectedinstallmentcount: 25 });
     assert.equal(r.valid, false);
     assert.equal(r.reason, "INVALID_FIELD_VALUE");
     assert.ok(r.invalidFields.includes("jm1_m6selectedinstallmentcount"));

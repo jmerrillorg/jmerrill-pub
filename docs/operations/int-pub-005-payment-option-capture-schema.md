@@ -15,7 +15,7 @@ Added directly to the `opportunity` entity via the Dataverse Web API `CreateAttr
 |---|---|---|
 | `jm1_m6paymentoptionselectionstatus` | String | MaxLength 100 |
 | `jm1_m6selectedpaymentoption` | String | MaxLength 100 |
-| `jm1_m6selectedinstallmentcount` | Integer | 1–12 |
+| `jm1_m6selectedinstallmentcount` | Integer | 1–24 |
 | `jm1_m6selectedpaymentamount` | Decimal | 0–100000, precision 2 |
 | `jm1_m6selectedpaymenttotal` | Decimal | 0–100000, precision 2 |
 | `jm1_m6paymentselectionsource` | String | MaxLength 100 |
@@ -30,7 +30,7 @@ No financial-transaction entity (`jm1fin_invoice`, `jm1fin_payment`, `jm1fin_tra
 **`src/author/milestone6PaymentOptionCaptureWriter.js`** — dedicated, allowlisted, gated. Mirrors the established Milestone 6 writer pattern (`milestone6OpportunityWriter.js`):
 
 - PATCHes only `opportunities`, only the nine fields above
-- Per-field type validation (string/integer/number/ISO-date), not just presence — rejects an installment count outside 1–12, a negative amount, a non-numeric amount, an invalid date
+- Per-field type validation (string/integer/number/ISO-date), not just presence — rejects an installment count outside 1–24, a negative amount, a non-numeric amount, an invalid date
 - No create/POST capability for Opportunities exists in this module — duplicate-Opportunity creation is structurally impossible, not merely gated
 - Requires a **dedicated** gate, `JM1_PAYMENT_OPTION_CAPTURE_ENABLED`, separate from `JM1_OPPORTUNITY_UPDATE_ENABLED` (the original package-selection gate) — new code writing to a distinct field set gets its own gate, per instruction
 - Writes one safe `jm1_executionlogs` evidence record after success — no raw email body, raw Graph response, headers, tokens, or secrets ever appear in the evidence payload

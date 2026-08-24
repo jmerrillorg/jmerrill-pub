@@ -105,7 +105,10 @@ function offerPlanCodeFromPaymentOption(paymentOptionCode) {
     SINGLE: "FULL_PAY",
     TWO_PAYMENTS: "2_PAY",
     FOUR_PAYMENTS: "4_PAY",
-    EIGHT_PAYMENTS: "8_PAY"
+    EIGHT_PAYMENTS: "8_PAY",
+    TWELVE_PAYMENTS: "12_PAY",
+    EIGHTEEN_PAYMENTS: "18_PAY",
+    TWENTY_FOUR_PAYMENTS: "24_PAY"
   }[normalized] || "";
 }
 

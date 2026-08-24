@@ -129,7 +129,9 @@ describe("author-offer-backed Stripe amount adapter", () => {
     assert.equal(offerPlanCodeFromPaymentOption("TWO_PAYMENTS"), "2_PAY");
     assert.equal(offerPlanCodeFromPaymentOption("FOUR_PAYMENTS"), "4_PAY");
     assert.equal(offerPlanCodeFromPaymentOption("EIGHT_PAYMENTS"), "8_PAY");
-    assert.equal(offerPlanCodeFromPaymentOption("TWELVE_PAYMENTS"), "");
+    assert.equal(offerPlanCodeFromPaymentOption("TWELVE_PAYMENTS"), "12_PAY");
+    assert.equal(offerPlanCodeFromPaymentOption("EIGHTEEN_PAYMENTS"), "18_PAY");
+    assert.equal(offerPlanCodeFromPaymentOption("TWENTY_FOUR_PAYMENTS"), "24_PAY");
   });
 
   test("matches current no-discount Professional 8-pay total through the canonical offer engine", () => {
@@ -173,5 +175,18 @@ describe("author-offer-backed Stripe amount adapter", () => {
     assert.equal(result.planChargeApplied, true);
     assert.equal(result.installmentSchedule[0].multiPayFee, 0);
     assert.equal(result.installmentSchedule[0].planChargeFormatted, "$19.69");
+  });
+
+  test("supports Quanisha's 24-month Professional financing schedule", () => {
+    const result = computeInstallmentStripeAmountFromAuthorOffer({
+      packageCode: PACKAGE_CODES.PROFESSIONAL,
+      paymentOptionCode: "TWENTY_FOUR_PAYMENTS",
+      paymentPolicyVersion: NEW_FINANCING_POLICY_VERSION
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.totalUsd, 5017.50);
+    assert.equal(result.perInstallmentUsd, 209.06);
+    assert.equal(result.installmentSchedule.length, 24);
+    assert.equal(result.installmentSchedule[23].totalDue, 209.12);
   });
 });
