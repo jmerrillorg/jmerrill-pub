@@ -72,7 +72,7 @@ function blocked(reason, extra = {}) {
 
 function valueMatchesType(value, type) {
   if (type === "string") return typeof value === "string" && value.trim().length > 0;
-  if (type === "integer") return typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 12;
+  if (type === "integer") return typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 24;
   if (type === "number") return typeof value === "number" && Number.isFinite(value) && value >= 0;
   if (type === "isoDate") return typeof value === "string" && !Number.isNaN(Date.parse(value));
   return false;

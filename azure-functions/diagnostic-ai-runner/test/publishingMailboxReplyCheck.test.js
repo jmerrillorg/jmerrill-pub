@@ -141,7 +141,7 @@ describe("checkPublishingMailboxReply — reply found and classified", () => {
     assert.equal(result.found, true);
     assert.equal(result.classification, CLASSIFICATION.EIGHT_PAYMENTS);
     assert.equal(result.paymentOptionDetails.installments, 8);
-    assert.equal(result.paymentOptionDetails.perInstallmentUsd, 585.00);
+    assert.equal(result.paymentOptionDetails.perInstallmentUsd, 582.19);
     assert.equal(result.paymentOptionDetails.feeApplies, true);
   });
 
@@ -219,7 +219,7 @@ describe("buildReplyCheckExecutionLogPayload — safe evidence only", () => {
       opportunityId: REAL_OPPORTUNITY_ID,
       found: true,
       classification: CLASSIFICATION.EIGHT_PAYMENTS,
-      paymentOptionDetails: { installments: 8, perInstallmentUsd: 585.00, feeApplies: true },
+      paymentOptionDetails: { installments: 8, perInstallmentUsd: 582.19, feeApplies: true },
       receivedDateTime: "2026-06-21T02:00:00Z",
       completedAt: "2026-06-21T02:05:00Z",
       ...overrides
@@ -235,7 +235,7 @@ describe("buildReplyCheckExecutionLogPayload — safe evidence only", () => {
     const p = buildReplyCheckExecutionLogPayload(logInput());
     assert.ok(p.jm1_actiondescription.includes("EIGHT_PAYMENTS"));
     assert.ok(p.jm1_actiondescription.includes("installments: 8"));
-    assert.ok(p.jm1_actiondescription.includes("585.00"));
+    assert.ok(p.jm1_actiondescription.includes("582.19"));
   });
 
   test("never includes raw reply body text (no such field is even accepted as input)", () => {

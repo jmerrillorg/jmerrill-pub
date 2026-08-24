@@ -171,7 +171,9 @@ function buildPaymentOptionData(packageCode) {
     { code: "TWO_PAYMENTS", payments: 2, minimumPackageTotalUsd: 0 },
     { code: "FOUR_PAYMENTS", payments: 4, minimumPackageTotalUsd: 0 },
     { code: "EIGHT_PAYMENTS", payments: 8, minimumPackageTotalUsd: 1000 },
-    { code: "TWELVE_PAYMENTS", payments: 12, minimumPackageTotalUsd: 2000 }
+    { code: "TWELVE_PAYMENTS", payments: 12, minimumPackageTotalUsd: 2000 },
+    { code: "EIGHTEEN_PAYMENTS", payments: 18, minimumPackageTotalUsd: 2000 },
+    { code: "TWENTY_FOUR_PAYMENTS", payments: 24, minimumPackageTotalUsd: 2000 }
   ]
     .filter((option) => selectedPackage.costUsd >= option.minimumPackageTotalUsd)
     .map((option) => {

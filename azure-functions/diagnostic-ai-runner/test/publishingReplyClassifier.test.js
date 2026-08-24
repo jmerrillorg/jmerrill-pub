@@ -109,17 +109,33 @@ describe("getPaymentOptionDetails — governed JMP-PKG-PRO amounts", () => {
     assert.equal(d.feeApplies, false);
   });
 
-  test("EIGHT_PAYMENTS matches the approved amount and has the fee applied", () => {
+  test("EIGHT_PAYMENTS matches the approved financing amount and has the plan charge applied", () => {
     const d = getPaymentOptionDetails(CLASSIFICATION.EIGHT_PAYMENTS);
     assert.equal(d.installments, 8);
-    assert.equal(d.perInstallmentUsd, 585.00);
+    assert.equal(d.perInstallmentUsd, 582.19);
+    assert.equal(d.finalInstallmentUsd, 582.17);
+    assert.equal(d.totalUsd, 4657.50);
     assert.equal(d.feeApplies, true);
   });
 
-  test("TWO_PAYMENTS, FOUR_PAYMENTS, TWELVE_PAYMENTS all have the fee applied", () => {
-    for (const c of [CLASSIFICATION.TWO_PAYMENTS, CLASSIFICATION.FOUR_PAYMENTS, CLASSIFICATION.TWELVE_PAYMENTS]) {
+  test("TWO_PAYMENTS, FOUR_PAYMENTS, TWELVE_PAYMENTS, EIGHTEEN_PAYMENTS, and TWENTY_FOUR_PAYMENTS all have the plan charge applied", () => {
+    for (const c of [
+      CLASSIFICATION.TWO_PAYMENTS,
+      CLASSIFICATION.FOUR_PAYMENTS,
+      CLASSIFICATION.TWELVE_PAYMENTS,
+      CLASSIFICATION.EIGHTEEN_PAYMENTS,
+      CLASSIFICATION.TWENTY_FOUR_PAYMENTS
+    ]) {
       assert.equal(getPaymentOptionDetails(c).feeApplies, true);
     }
+  });
+
+  test("TWENTY_FOUR_PAYMENTS carries Quanisha's governed 24-month amount and final-payment adjustment", () => {
+    const d = getPaymentOptionDetails(CLASSIFICATION.TWENTY_FOUR_PAYMENTS);
+    assert.equal(d.installments, 24);
+    assert.equal(d.perInstallmentUsd, 209.06);
+    assert.equal(d.finalInstallmentUsd, 209.12);
+    assert.equal(d.totalUsd, 5017.50);
   });
 
   test("non-payment-option classifications return null", () => {
