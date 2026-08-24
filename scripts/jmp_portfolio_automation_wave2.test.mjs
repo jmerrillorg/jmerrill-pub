@@ -55,6 +55,31 @@ test('Indomitable locked pricing without agreement becomes autonomous contract q
   assert.match(item.nextGovernedAction, /agreement/)
 })
 
+test('Indomitable ready for manual signature send is a Jackie manual gate, not contract generation', () => {
+  const evaluation = evaluatePortfolio([
+    { recordType: 'prospect', title: 'Indomitable', author: 'Quanishia Dockery', waitingOn: 'Prospect' },
+  ], { evaluatedOn })
+  const source = {
+    ...emptySource,
+    opportunities: [{
+      opportunityid: 'opp-indomitable',
+      name: 'Indomitable — Professional Publishing Package — Quanisha Dockery',
+      jm1pub_projecttitle: 'Indomitable',
+      jm1_m6packageselectionstatus: 'PACKAGE_SELECTED',
+      jm1_m6paymentoptionselectionstatus: 'PAYMENT_OPTION_SELECTED',
+      jm1_m6selectedinstallmentcount: 24,
+      jm1_m6selectedpaymentamount: 209.06,
+      jm1_m6agreementpreparationstatus: 'READY_FOR_MANUAL_SIGNATURE_SEND',
+    }],
+  }
+  const result = reconcileWave2({ records: [], evaluation, source })
+  const item = result.items[0]
+
+  assert.equal(item.wave2WaitingState, 'WAITING_ON_JMP')
+  assert.equal(item.automationClass, 'NONE')
+  assert.match(item.nextGovernedAction, /Manual signature send prepared/)
+})
+
 test('known line-ready titles are queued by class instead of waiting on Jackie memory', () => {
   const evaluation = evaluatePortfolio([
     { recordType: 'title', titleId: 'gw', title: "The General's Will and Last Testament", author: 'Iyorwuese Hagher', titleStage: 'Editorial Production', runtimeAvailable: true },
