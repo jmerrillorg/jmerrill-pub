@@ -111,7 +111,7 @@ describe("generateSimplifiedAgreementPacket — produces the package-specific, s
     assert.equal(result.fields.paymentSchedule.totalFormatted, "$4,680.00");
   });
 
-  test("includes an Adobe-Sign-ready signing packet plan without a bundled audiobook addendum for Professional", async () => {
+  test("includes a manual-signature packet plan without a bundled audiobook addendum for Professional", async () => {
     process.env[GATE_NAME] = "true";
     const result = await generateSimplifiedAgreementPacket(controlledInput());
     assert.equal(result.signingPacketPlan.documents.length, 3);
@@ -134,7 +134,7 @@ describe("generateSimplifiedAgreementPacket — omits the audiobook document whe
   });
 });
 
-describe("generateSimplifiedAgreementPacket — never calls Adobe Sign, never sends, never reissues", () => {
+describe("generateSimplifiedAgreementPacket — never calls a signature provider, never sends, never reissues", () => {
   test("liveActions confirms build/generate-only scope", async () => {
     process.env[GATE_NAME] = "true";
     const result = await generateSimplifiedAgreementPacket(controlledInput());

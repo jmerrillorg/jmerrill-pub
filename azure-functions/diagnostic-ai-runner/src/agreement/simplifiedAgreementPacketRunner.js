@@ -7,10 +7,9 @@
  * Agreement (canonical, filled, unchanged) plus three NEW, simplified
  * documents: a package-specific Package Addendum, a simplified
  * Audiobook section, and a Stripe-aligned Payment Disclosure replacing
- * the manual Schedule A instrument. Designed to be presented to Adobe
- * Sign as multiple fileInfos within ONE agreement (a single signing
- * session) once Adobe Sign credentials exist — this module never calls
- * Adobe Sign and never sends anything.
+ * the manual Schedule A instrument. Designed to be prepared as one
+ * governed agreement package for Jackie manual signature handoff. This
+ * module never calls a paid signature provider and never sends anything.
  *
  * This does NOT replace or regenerate documents for any already-sent
  * controlled record. It is a standalone build/test capability until

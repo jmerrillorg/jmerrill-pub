@@ -117,13 +117,15 @@ describe("sendAgreementPackage — gate enforcement and validation", () => {
   });
 
 
-  test("default live path is blocked because DOCX attachment email is superseded by e-sign", async () => {
+  test("default live path is blocked because automatic attachment email is not the manual signature policy", async () => {
     process.env[GATE_NAME] = "true";
     const deps = await fakeDeps({ sendEmail: async () => { throw new Error("send must not be called"); } });
     const result = await sendAgreementPackage(controlledInput({ allowSupersededAttachmentSendForEvidence: false }), deps);
     assert.equal(result.ok, false);
-    assert.equal(result.reason, "ATTACHMENT_EMAIL_SIGNATURE_PATH_SUPERSEDED");
-    assert.equal(result.validEsignTransactionSendCount, 0);
+    assert.equal(result.reason, "AUTOMATIC_ATTACHMENT_EMAIL_NOT_AUTHORIZED_FOR_MANUAL_SIGNATURE_POLICY");
+    assert.equal(result.requiredNextState, "READY_FOR_MANUAL_SIGNATURE_SEND");
+    assert.equal(result.waitingOn, "WAITING_ON_JMP");
+    assert.equal(result.manualSignaturePolicy, true);
     assert.equal(result.liveActions.sentAuthorFacingOutput, false);
     assert.equal(result.liveActions.createdEsignTransaction, false);
     assert.equal(result.liveActions.markedSentForSignature, false);
