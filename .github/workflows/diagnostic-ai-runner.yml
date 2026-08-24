@@ -55,14 +55,26 @@ jobs:
           source_date_epoch="$(git show -s --format=%ct "$GITHUB_SHA")"
           rm -rf "$package_root"
           mkdir -p "$package_root"
+
+          # Linux Consumption + WEBSITE_RUN_FROM_PACKAGE must receive a
+          # self-contained package. A source-only zip can deploy cleanly but
+          # leave the Node worker unable to resolve @azure/functions, which
+          # indexes zero functions and makes /api/health return 404.
           git archive \
             --format=tar \
             --mtime="@$source_date_epoch" \
             "$GITHUB_SHA:$FUNCTION_APP_PATH" | tar -xf - -C "$package_root"
           rm -rf "$package_root/test" "$package_root/local.settings.example.json"
+
           (
             cd "$package_root"
-            find . -type f -print | sed 's#^\./##' | LC_ALL=C sort | zip -X -q "$package_path" -@
+            npm ci --omit=dev --ignore-scripts
+          )
+          test -f "$package_root/node_modules/@azure/functions/package.json"
+
+          (
+            cd "$package_root"
+            zip -X -q -r "$package_path" .
           )
 
           test -f "$package_path"
@@ -73,11 +85,12 @@ jobs:
           grep -Fx "src/functions/health.js" "$RUNNER_TEMP/package-files.txt"
           grep -Fx "src/index.js" "$RUNNER_TEMP/package-files.txt"
           grep -Fx "src/functions/runStage0Diagnostic.js" "$RUNNER_TEMP/package-files.txt"
+          grep -Fx "node_modules/@azure/functions/package.json" "$RUNNER_TEMP/package-files.txt"
           if grep -Eq "(^|/)azure-functions/diagnostic-ai-runner/" "$RUNNER_TEMP/package-files.txt"; then
             echo "Package contains an incorrect nested source directory" >&2
             exit 1
           fi
-          if grep -Eq "(^|/)(node_modules|test)/" "$RUNNER_TEMP/package-files.txt"; then
+          if grep -Eq "(^|/)test/" "$RUNNER_TEMP/package-files.txt"; then
             echo "Package contains excluded development content" >&2
             exit 1
           fi
@@ -121,9 +134,9 @@ jobs:
         with:
           app-name: ${{ env.FUNCTION_APP_NAME }}
           package: ${{ runner.temp }}/deploy/diagnostic-ai-runner.zip
-          scm-do-build-during-deployment: true
-          enable-oryx-build: true
-          remote-build: true
+          scm-do-build-during-deployment: false
+          enable-oryx-build: false
+          remote-build: false
 
       - name: Record deployed commit SHA
         shell: bash
