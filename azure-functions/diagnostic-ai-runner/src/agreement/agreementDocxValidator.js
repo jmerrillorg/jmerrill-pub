@@ -12,6 +12,26 @@ const JSZip = require("jszip");
 const DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const ZIP_SIGNATURE = Buffer.from([0x50, 0x4b, 0x03, 0x04]); // "PK\x03\x04"
 
+function lightXmlWellFormed(xml) {
+  if (typeof xml !== "string" || xml.trim() === "") return false;
+  const stack = [];
+  const tagPattern = /<\/([^>\s]+)>|<([^!?/][^>\s/]*)(?:\s[^>]*)?>/g;
+  let match;
+  while ((match = tagPattern.exec(xml)) !== null) {
+    const raw = match[0];
+    if (raw.endsWith("/>")) continue;
+    const closeName = match[1];
+    const openName = match[2];
+    if (openName) {
+      stack.push(openName);
+      continue;
+    }
+    const expected = stack.pop();
+    if (expected !== closeName) return false;
+  }
+  return stack.length === 0;
+}
+
 /**
  * @param {Buffer} buffer
  * @returns {Promise<{ valid: boolean, reason: string|null }>}
@@ -43,11 +63,16 @@ async function isValidDocxBuffer(buffer) {
 
   let contentTypesXml;
   let packageRelsXml;
+  let documentXml;
   try {
     contentTypesXml = await zip.file("[Content_Types].xml").async("string");
     packageRelsXml = await zip.file("_rels/.rels").async("string");
+    documentXml = await zip.file("word/document.xml").async("string");
   } catch {
     return { valid: false, reason: "OPENXML_PACKAGE_PART_READ_FAILED" };
+  }
+  if (!lightXmlWellFormed(documentXml)) {
+    return { valid: false, reason: "WORD_DOCUMENT_XML_MALFORMED" };
   }
   if (!contentTypesXml.includes("wordprocessingml.document.main+xml")) {
     return { valid: false, reason: "MISSING_MAIN_DOCUMENT_CONTENT_TYPE" };
@@ -59,4 +84,4 @@ async function isValidDocxBuffer(buffer) {
   return { valid: true, reason: null };
 }
 
-module.exports = { isValidDocxBuffer, DOCX_MIME_TYPE };
+module.exports = { isValidDocxBuffer, DOCX_MIME_TYPE, lightXmlWellFormed };

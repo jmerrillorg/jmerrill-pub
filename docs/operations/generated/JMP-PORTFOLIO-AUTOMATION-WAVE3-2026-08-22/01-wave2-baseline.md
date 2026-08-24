@@ -1,12 +1,12 @@
 # Wave 2 Baseline
 
-Last Verified: 2026-08-22T12:20:30.757Z
+Last Verified: 2026-08-24T11:26:57.930Z
 
 | Source | Count |
 | --- | ---: |
 | Titles | 360 |
 | Intakes | 31 |
-| Opportunities | 5 |
+| Opportunities | 6 |
 | Author Profiles | 55 |
 | Editorial Stages | 30 |
 | Approval Gates | 16 |
@@ -15,7 +15,7 @@ Last Verified: 2026-08-22T12:20:30.757Z
 | Production Tasks | 8 |
 | Execution Logs Read | 500 |
 
-Wave 1 records evaluated: 423.
+Wave 1 records evaluated: 424.
 Wave 2 System Attention after reconciliation: 250.
 Wave 2 auto-executable after reconciliation: 1.
 Wave 2 automatically queued: 0.
@@ -27,8 +27,8 @@ The Wave 2 increase from 246 to 250 is explained by stricter reconciliation, not
 | Movement | Count |
 | --- | ---: |
 | Added to System Attention by Wave 2 reconciliation | 5 |
-| Removed from System Attention by Wave 2 reconciliation | 1 |
-| Net change | 4 |
+| Removed from System Attention by Wave 2 reconciliation | 2 |
+| Net change | 3 |
 
 ### Added Rows
 
@@ -45,3 +45,4 @@ The Wave 2 increase from 246 to 250 is explained by stricter reconciliation, not
 | Author | Title | Prior bucket | Wave 2 state | Action |
 | --- | --- | --- | --- | --- |
 | Iyorwuese Hagher | The General’s Will and Last Testament | SYSTEM_ATTENTION_REQUIRED | AUTO_EXECUTABLE | Queue commissioned Line stage worker |
+| DATA_GAP | Indomitable | SYSTEM_ATTENTION_REQUIRED | WAITING_ON_JMP | Manual signature send prepared; Jackie must send the validated agreement package before author wait begins |

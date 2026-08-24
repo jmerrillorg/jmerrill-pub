@@ -139,6 +139,45 @@ test('Wave 3 generates contracts only from locked pricing without an agreement',
   assert.equal(wave3.items[0].wave3WaitingState, 'AUTO_EXECUTABLE')
 })
 
+test('Wave 3 preserves ready manual signature send as a Jackie gate', () => {
+  const source = emptySource({
+    opportunities: [
+      {
+        opportunityid: 'opp-1',
+        name: 'Indomitable — Professional Publishing Package — Quanisha Dockery',
+        jm1pub_projecttitle: 'Indomitable',
+        jm1_m6packageselectionstatus: 'PACKAGE_SELECTED',
+        jm1_m6paymentoptionselectionstatus: 'PAYMENT_OPTION_SELECTED',
+        jm1_m6selectedinstallmentcount: 24,
+        jm1_m6selectedpaymentamount: 209.06,
+        jm1_m6agreementpreparationstatus: 'READY_FOR_MANUAL_SIGNATURE_SEND',
+      },
+    ],
+  })
+  const records = [
+    {
+      author: 'Quanishia Dockery',
+      title: 'Indomitable',
+      titleStage: 'Commercial Activation',
+      packageAccepted: true,
+      paymentOptionSelected: true,
+      pricingLocked: true,
+      agreementGenerated: true,
+      modifiedOn: '2026-08-24T10:17:34Z',
+      createdOn: '2026-08-24T02:20:00Z',
+      evidence: ['test:opp'],
+    },
+  ]
+  const evaluation = evaluatePortfolio(records, { evaluatedOn: '2026-08-24T10:17:34Z' })
+  const wave2 = reconcileWave2({ records, evaluation, source })
+  const wave3 = reconcileWave3({ records, evaluation, source, wave2 })
+
+  assert.equal(wave3.items[0].wave3WaitingState, 'WAITING_ON_JMP')
+  assert.equal(wave3.items[0].wave3AutomationClass, 'CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP')
+  assert.match(wave3.items[0].wave3NextAction, /Manual signature send prepared/)
+  assert.notEqual(wave3.items[0].wave3AutomationClass, 'GENERATE_CONTRACT_FROM_LOCKED_PRICING')
+})
+
 test('Wave 3 idempotently marks already recorded actions', () => {
   const source = emptySource()
   const records = [

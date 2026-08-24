@@ -1,6 +1,6 @@
 # Operating Center Readback
 
-Last Verified: 2026-08-22T12:20:30.757Z
+Last Verified: 2026-08-24T11:26:57.930Z
 
 | Author | Title | Stage | Substage | Waiting On | System Attention | Next Action | Automation Class | Action Taken |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -224,7 +224,8 @@ Last Verified: 2026-08-22T12:20:30.757Z
 | Tawana Mars | Hop, Hop, Hop | DATA_GAP | DATA_GAP | WAITING_ON_JMP | TERMINAL_STATE_CONFLICT | Create structured operator task to resolve lifecycle/terminal-state conflict | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
 | Maurche Reed | I Am My Worst Enemy! | DATA_GAP | DATA_GAP | WAITING_ON_JMP | TERMINAL_STATE_CONFLICT | Create structured operator task to resolve lifecycle/terminal-state conflict | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
 | Maurche Reed | I Am My Worst Enemy! | POST_PUBLICATION | TERMINAL | TERMINAL | TERMINAL_STATE_CONFLICT | No production action; maintain stewardship only | NONE | NO_ACTION_TAKEN |
-| Quanisha Dockery | Indomitable Indomitable Escaping Witchcraft and Finding My Identity in Christ | INQUIRY_INTAKE | PROSPECT_RESPONSE | WAITING_ON_JMP | MISSING_CANONICAL_LINK | Create structured operator task to bind canonical title/project link from governed evidence | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
+| DATA_GAP | Indomitable | COMMERCIAL_ACTIVATION | AGREEMENT_GENERATION | WAITING_ON_JMP | MISSING_COMMERCIAL_STATE | Manual signature send prepared; Jackie must send the validated agreement package before author wait begins | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
+| Quanisha Dockery | Indomitable Indomitable Escaping Witchcraft and Finding My Identity in Christ | INQUIRY_INTAKE | PROSPECT_RESPONSE | WAITING_ON_JMP | MISSING_COMMERCIAL_STATE | Manual signature send prepared; Jackie must send the validated agreement package before author wait begins | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
 | KD Heard | Inner Peace Through Life's Storms | POST_PUBLICATION | TERMINAL | TERMINAL | TERMINAL_STATE_CONFLICT | No production action; maintain stewardship only | NONE | NO_ACTION_TAKEN |
 | KD Heard | Inner Peace Through Life's Storms | DATA_GAP | DATA_GAP | WAITING_ON_JMP | TERMINAL_STATE_CONFLICT | Create structured operator task to resolve lifecycle/terminal-state conflict | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
 | Edith Clay | Inspirations from God | POST_PUBLICATION | TERMINAL | TERMINAL | TERMINAL_STATE_CONFLICT | No production action; maintain stewardship only | NONE | NO_ACTION_TAKEN |
