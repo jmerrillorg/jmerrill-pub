@@ -1,6 +1,6 @@
 # Founder-Named Title Results
 
-Last Verified: 2026-08-24T13:05:33.667Z
+Last Verified: 2026-08-24T21:46:27.044Z
 
 | Requested | Found | Matches | Author | Canonical record | Starting/ending stage | Work executed | Output | Waiting On | Next action |
 | --- | --- | ---: | --- | --- | --- | --- | --- | --- | --- |
@@ -15,9 +15,9 @@ Last Verified: 2026-08-24T13:05:33.667Z
 | The General’s Will | YES | 1 | Iyorwuese Hagher | 2d21ab5b-4d80-f111-ab0f-7c1e525b15c2 | EDITORIAL_PRODUCTION / DATA_GAP | Line runtime retry; EXCEPTION | LINE_EDITING_BLOCKED — MICROSOFT_FOUNDRY_HTTP_429_RATE_LIMIT_OF_5000_PER_60S_EXCEEDED_FOR_USERBYMODELBYMINUTEOUTPUTTOKENS_PLEASE_WAIT_0_SECONDS_BEFORE_RETRYING | AUTO_EXECUTABLE | Queue commissioned Line stage worker |
 | The Long Watch | YES | 2 | Jackie Smith Jr | a69b9dfa-bb7b-f111-ab0f-7c1e525b15c2 | EDITORIAL_PRODUCTION / DATA_GAP | OPERATOR_TASK_PENDING | 2026-08-15-Developmental-Editing-The-Long-Watch-Developmentally-Edited-Manuscript.docx | WAITING_ON_JMP | Create structured operator task to commission/select runtime before movement |
 | Before You Were Born | YES | 1 | Sean Crowley | 91c5e1ef-2980-f111-ab0f-7c1e525b15c2 | EDITORIAL_PRODUCTION / AUTHOR_REVIEW | NO_ACTION_TAKEN | 2026-08-02-Developmental-Editing-Before-You-Were-Born-Package-Manifest-v2.json | WAITING_ON_AUTHOR | Awaiting Author Response |
-| Indomitable | YES | 2 | Quanisha Dockery | 74719cd6-cd95-f111-8076-6045bdd69678 | INQUIRY_INTAKE / PROSPECT_RESPONSE | OPERATOR_TASK_PENDING | DATA_GAP | WAITING_ON_JMP | Create structured operator task to bind canonical title/project link from governed evidence |
+| Indomitable | YES | 2 | Quanisha Dockery | fd577d2b-01a0-f111-b8dc-000d3a14673b | EDITORIAL_REVIEW_RECOMMENDATION / AUTHOR_REVIEW | NO_ACTION_TAKEN | 2026-08-24-Developmental-Editing-Indomitable-Package-Manifest-v1.json | WAITING_ON_AUTHOR | Ready for Author Review |
 | 'Til Death Do Us Part | YES | 1 | Jackie Smith, Jr. | f79006b7-f595-f111-8076-00224820105b | COMMERCIAL_ACTIVATION / PAYMENT_OPTION_SELECTION | NO_ACTION_TAKEN | DATA_GAP | WAITING_ON_AUTHOR | Await author payment-option selection |
 | Til Death Do Us Part | YES | 1 | Jackie Smith, Jr. | f79006b7-f595-f111-8076-00224820105b | COMMERCIAL_ACTIVATION / PAYMENT_OPTION_SELECTION | NO_ACTION_TAKEN | DATA_GAP | WAITING_ON_AUTHOR | Await author payment-option selection |
 | Atta | YES | 1 | Atta Boateng | ca68c994-fd89-f111-ab10-00224820105b | EDITORIAL_REVIEW_RECOMMENDATION / AUTHOR_REVIEW | NO_ACTION_TAKEN | 2026-08-15-Author-Facing Recommended Editorial Path-Untitled-v1.pdf | WAITING_ON_AUTHOR | Awaiting Author Response |
 | Untitled | YES | 3 | Atta Boateng | ca68c994-fd89-f111-ab10-00224820105b | EDITORIAL_REVIEW_RECOMMENDATION / AUTHOR_REVIEW | NO_ACTION_TAKEN | 2026-08-15-Author-Facing Recommended Editorial Path-Untitled-v1.pdf | WAITING_ON_AUTHOR | Awaiting Author Response |
-| Establishing Glory | YES | 22 | Jackie Smith, Jr. | b37e1ee0-b389-f111-ab10-000d3a14673b | DATA_GAP / DATA_GAP | OPERATOR_TASK_PENDING | DATA_GAP | WAITING_ON_JMP | Create structured operator task to bind current governed artifact/checksum |
+| Establishing Glory | YES | 22 | Jackie Smith, Jr. | b37e1ee0-b389-f111-ab10-000d3a14673b | DATA_GAP / DATA_GAP | OPERATOR_TASK_ALREADY_PRESENT | DATA_GAP | WAITING_ON_JMP | Bind current editorial artifact before stage movement |

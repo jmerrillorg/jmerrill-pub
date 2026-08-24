@@ -21,6 +21,23 @@ const INDOMITABLE_MANUAL_SEND_OCCURRED_ON = '2026-08-24T11:44:34Z'
 const INDOMITABLE_AUTHOR_SIGNED_ON = '2026-08-24T11:56:09Z'
 const INDOMITABLE_AGREEMENT_COMPLETED_ON = '2026-08-24T12:03:33Z'
 const INDOMITABLE_FIRST_PAYMENT_REQUESTED_ON = '2026-08-24T12:53:27Z'
+const INDOMITABLE_FIRST_PAYMENT_RECEIVED_ON = '2026-08-24T13:55:38Z'
+const INDOMITABLE_JOINED_FAMILY_LOG_ID = '080294cc-fb9f-f111-b8db-7c1e525801f6'
+const INDOMITABLE_PRODUCTION_COMMENCED_LOG_ID = '3b924c32-01a0-f111-b8dc-00224820105b'
+const INDOMITABLE_TITLE_ID = 'fd577d2b-01a0-f111-b8dc-000d3a14673b'
+const INDOMITABLE_STAGE_ID = '0f587d2b-01a0-f111-b8dc-000d3a14673b'
+const INDOMITABLE_SOURCE_ARTIFACT_ID = 'c373402b-01a0-f111-b8db-7c1e525801f6'
+const INDOMITABLE_SOURCE_SHA256 = '08cedd4d4db470887ea75e792359c6b4fa807f54bf09f2b50be0144f5e7f7181'
+const INDOMITABLE_EDITORIAL_REVIEW_STAGE_ID = '8156fd5a-04a0-f111-b8dc-7c1e525b15c2'
+const INDOMITABLE_EDITORIAL_APPROVAL_GATE_ID = '2a869367-04a0-f111-b8dc-000d3a14673b'
+const INDOMITABLE_EDITORIAL_APPROVAL_RECEIVED_ON = '2026-08-20T16:17:16Z'
+const INDOMITABLE_DEVELOPMENTAL_EXECUTION_IDEMPOTENCY_KEY = '122948b80c5d614fc4c5e3dc0a80516974b1a039efc756af817f78087fa4e870'
+const INDOMITABLE_DEVELOPMENTAL_OUTPUT_LOG_ID = '24393cd5-04a0-f111-b8dc-000d3a14673b'
+const INDOMITABLE_DEVELOPMENTAL_QA_LOG_ID = '25393cd5-04a0-f111-b8dc-000d3a14673b'
+const INDOMITABLE_DEVELOPMENTAL_MANUSCRIPT_ARTIFACT_ID = '13393cd5-04a0-f111-b8dc-000d3a14673b'
+const INDOMITABLE_DEVELOPMENTAL_MANUSCRIPT_SHA256 = 'f01472b5efbffdb8563e2e6b7f5791b742b2837d04765d444af73610d5a4c05c'
+const INDOMITABLE_DEVELOPMENTAL_AUTHOR_GATE_ID = '0cf8a1d7-04a0-f111-b8dc-00224820105b'
+const INDOMITABLE_DEVELOPMENTAL_PACKAGE_ID = 'pkg-0f587d2b-01a0-f111-b8dc-000d3a14673b-developmental-editing-v1'
 
 const namedNeedles = [
   'A Year Walking With Him',
@@ -137,7 +154,14 @@ async function main() {
   const records = buildControllerRecords(source)
   const wave1 = evaluatePortfolio(records, { evaluatedOn: generatedOn })
   const wave2 = reconcileWave2({ records, evaluation: wave1, source })
-  const wave3 = reconcileWave3({ records, evaluation: wave1, source, wave2 })
+  const existingWave3ActionKeys = extractExistingWave3ActionKeys(source.logs)
+  const wave3 = reconcileWave3({
+    records,
+    evaluation: wave1,
+    source,
+    wave2,
+    actionKeys: existingWave3ActionKeys,
+  })
   const health = await getHealth()
   const generalExecution = readJsonIfExists(GENERAL_EXECUTION_PATH)
 
@@ -193,6 +217,7 @@ Last Verified: ${generatedOn}
 | UNCLASSIFIED_RECORDS | ${unclassifiedWaitingRows} |
 | Wave 3 readback automatically queued | ${wave3.summary.automaticallyQueued} |
 | Post-merge \`--execute\` replay automatically queued | 2 |
+| Existing Wave 3 action logs recognized | ${existingWave3ActionKeys.size} |
 | Unexplained idle | ${wave3.summary.unexplainedIdle} |
 
 ## Machine Work
@@ -256,18 +281,37 @@ Last Verified: ${generatedOn}
 | Adobe signed/filed notice | ${INDOMITABLE_AGREEMENT_COMPLETED_ON} |
 | Agreement state | AGREEMENT_SIGNED_ACTIVE |
 | First payment request | SENT ${INDOMITABLE_FIRST_PAYMENT_REQUESTED_ON} |
-| Current state | WAITING_ON_AUTHOR / FIRST_PAYMENT |
-| Waiting on | AUTHOR |
-| Next expected event | INITIAL_PAYMENT_RECEIVED |
-| Active title row | NOT YET PRESENT IN ACTIVE \`jm1pub_title\` READBACK |
+| First payment received | ${INDOMITABLE_FIRST_PAYMENT_RECEIVED_ON} |
+| Joined the Family event | \`${INDOMITABLE_JOINED_FAMILY_LOG_ID}\` |
+| Production commenced event | \`${INDOMITABLE_PRODUCTION_COMMENCED_LOG_ID}\` |
+| Editorial Review approval evidence | BOUND |
+| Editorial Review approval source | Microsoft 365 / Outlook author reply, received ${INDOMITABLE_EDITORIAL_APPROVAL_RECEIVED_ON} |
+| Editorial Review stage | \`${INDOMITABLE_EDITORIAL_REVIEW_STAGE_ID}\` |
+| Editorial Review approval gate | \`${INDOMITABLE_EDITORIAL_APPROVAL_GATE_ID}\` |
+| Current state | DEVELOPMENTAL_EDITING_EXECUTED / PACKAGE_READY_INTERNAL |
+| Waiting on | AUTHOR_REVIEW_AFTER_STAGE_COMPLETION_AND_CADENCE |
+| Next expected event | Release/send governed Developmental author-review package only after QA and cadence authorization |
+| Active title row | \`${INDOMITABLE_TITLE_ID}\` |
+| Developmental Editing stage | \`${INDOMITABLE_STAGE_ID}\` |
+| Source artifact | \`${INDOMITABLE_SOURCE_ARTIFACT_ID}\` |
+| Source checksum | \`${INDOMITABLE_SOURCE_SHA256}\` |
+| Developmental execution idempotency key | \`${INDOMITABLE_DEVELOPMENTAL_EXECUTION_IDEMPOTENCY_KEY}\` |
+| Developmental output log | \`${INDOMITABLE_DEVELOPMENTAL_OUTPUT_LOG_ID}\` |
+| Developmental QA log | \`${INDOMITABLE_DEVELOPMENTAL_QA_LOG_ID}\` |
+| Developmentally edited manuscript artifact | \`${INDOMITABLE_DEVELOPMENTAL_MANUSCRIPT_ARTIFACT_ID}\` |
+| Developmentally edited manuscript checksum | \`${INDOMITABLE_DEVELOPMENTAL_MANUSCRIPT_SHA256}\` |
+| Developmental author-review gate | \`${INDOMITABLE_DEVELOPMENTAL_AUTHOR_GATE_ID}\` |
+| Developmental package | \`${INDOMITABLE_DEVELOPMENTAL_PACKAGE_ID}\` |
 
 Evidence:
 
 - Microsoft 365 / Publishing mailbox: Adobe Sign confirmation \`Dockery-Indomitable Package has been sent out for signature to quanishadockery7777@gmail.com\`, received ${INDOMITABLE_MANUAL_SEND_OCCURRED_ON}.
 - Microsoft 365 / Publishing mailbox: Adobe Sign confirmation \`Quanisha Dockery has signed Dockery-Indomitable Package\`, received ${INDOMITABLE_AUTHOR_SIGNED_ON}.
 - Microsoft 365 / Publishing mailbox: Adobe Sign confirmation \`Dockery-Indomitable Package between Jackie Smith, Quanisha Dockery and Jackie Smith, Jr. is Signed and Filed!\`, received ${INDOMITABLE_AGREEMENT_COMPLETED_ON}.
+- Microsoft 365 / Publishing mailbox: Quanisha replied to \`Your Editorial Review and Recommended Path for Indomitable\`, received ${INDOMITABLE_EDITORIAL_APPROVAL_RECEIVED_ON}; excerpt: "I am extremely interested in professional publishing package. How would we move forward with this process?"
+- Production targeted editorial runtime: Developmental Editing executed against exact source artifact/checksum and created governed output artifacts, QA evidence, package manifest, and author-review gate. External sends: 0.
 
-Negative proof: payment options were not resent; agreement was not automatically sent by JMP runtime; Adobe is not an automated lifecycle dependency; SignNow was not invoked; no Stripe charge was created by this reconciliation; \`AGREEMENT_SENT_MANUALLY\` duplicate count is 1.
+Negative proof: payment options were not resent; agreement was not automatically sent by JMP runtime; Adobe is not an automated lifecycle dependency; SignNow was not invoked; no Stripe charge was created by this reconciliation; no routine "we are starting" email was sent; no Developmental author-review package was sent before QA/cadence authorization; \`AGREEMENT_SENT_MANUALLY\` duplicate count is 1; duplicate \`JOINED_THE_FAMILY\` count is 0; duplicate \`PRODUCTION_COMMENCED\` count is 0.
 `)
 
   write('03-machine-work-executed.md', `# Machine Work Executed
@@ -287,6 +331,29 @@ Result: live targeted Line Editing runtime invoked. Current blocker remains prov
 Current controller action: \`CREATE_NEXT_PRODUCTION_WORK_ITEM\`.
 
 Execution finding: no commissioned Full Wrap runner or route was located. Existing evidence shows Interior Layout and Cover Design work exists, but Full Wrap finalization cannot be truthfully marked complete until a governed Full Wrap production execution contract exists.
+
+## Indomitable
+
+Targeted Developmental Editing executed through the production diagnostic runner after the exact Editorial Review approval was bound from the governed Publishing mailbox.
+
+| Field | Value |
+| --- | --- |
+| Title | Indomitable |
+| Author | Quanisha Dockery |
+| Stage | Developmental Editing |
+| Source artifact | \`${INDOMITABLE_SOURCE_ARTIFACT_ID}\` |
+| Source checksum | \`${INDOMITABLE_SOURCE_SHA256}\` |
+| Editorial approval gate | \`${INDOMITABLE_EDITORIAL_APPROVAL_GATE_ID}\` |
+| Runtime idempotency key | \`${INDOMITABLE_DEVELOPMENTAL_EXECUTION_IDEMPOTENCY_KEY}\` |
+| Output log | \`${INDOMITABLE_DEVELOPMENTAL_OUTPUT_LOG_ID}\` |
+| QA log | \`${INDOMITABLE_DEVELOPMENTAL_QA_LOG_ID}\` |
+| Edited manuscript artifact | \`${INDOMITABLE_DEVELOPMENTAL_MANUSCRIPT_ARTIFACT_ID}\` |
+| Edited manuscript checksum | \`${INDOMITABLE_DEVELOPMENTAL_MANUSCRIPT_SHA256}\` |
+| Package | \`${INDOMITABLE_DEVELOPMENTAL_PACKAGE_ID}\` |
+| Author gate | \`${INDOMITABLE_DEVELOPMENTAL_AUTHOR_GATE_ID}\` |
+| External sends | 0 |
+
+Next governed action: release/send the Developmental author-review package only after stage QA and cadence authorization.
 `)
 
   write('04-waiting-on-jmp-reconciliation.md', `# Waiting On JMP Reconciliation
@@ -465,6 +532,12 @@ Search boundary: repository text plus locally synced governed OneDrive/SharePoin
     health,
     finalClassification: 'JMP_FULL_DAY_EXECUTION_EXHAUSTION_CONTROLLED_COMMISSIONING',
   }, null, 2))
+}
+
+function extractExistingWave3ActionKeys(logs) {
+  return new Set((logs || [])
+    .map((log) => String(log.jm1_name || '').match(/^PORTFOLIO-WAVE3-(.+)$/)?.[1])
+    .filter(Boolean))
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

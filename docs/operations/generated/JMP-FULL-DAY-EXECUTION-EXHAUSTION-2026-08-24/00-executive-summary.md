@@ -1,6 +1,6 @@
 # JMP Full-Day Execution Exhaustion
 
-Last Verified: 2026-08-24T13:05:33.667Z
+Last Verified: 2026-08-24T21:46:27.044Z
 
 ## PR #595
 
@@ -11,7 +11,7 @@ Last Verified: 2026-08-24T13:05:33.667Z
 | Deployment required | YES |
 | Deployment workflow | https://github.com/jmerrillorg/jmerrill-pub/actions/runs/32723851174 |
 | Deployment workflow result | FAILED EARLY READBACK; live health later confirmed merged SHA |
-| Live health | `{"status":"ready","release":"c48661150f541747e205701328707d9eeae08c92","productionRelease":"c48661150f541747e205701328707d9eeae08c92","node":"v22.23.1"}` |
+| Live health | `{"status":"ready","release":"c48661150f541747e205701328707d9eeae08c92","productionRelease":"c48661150f541747e205701328707d9eeae08c92","node":"v22.23.2"}` |
 | Commissioned release | YES |
 
 ## Execution Result
@@ -20,15 +20,16 @@ Last Verified: 2026-08-24T13:05:33.667Z
 | --- | ---: |
 | Records evaluated | 424 |
 | Starting WAITING_ON_JMP | 252 |
-| Current WAITING_ON_JMP task rows | 252 |
-| AUTO_EXECUTABLE rows | 2 |
-| WAITING_ON_JMP_SOURCE_COUNT | 252 |
-| CLASSIFIED_UNIQUE_RECORD_COUNT | 252 |
-| AUTO_EXECUTABLE_SEPARATE_POPULATION | 2 |
+| Current WAITING_ON_JMP task rows | 250 |
+| AUTO_EXECUTABLE rows | 3 |
+| WAITING_ON_JMP_SOURCE_COUNT | 250 |
+| CLASSIFIED_UNIQUE_RECORD_COUNT | 250 |
+| AUTO_EXECUTABLE_SEPARATE_POPULATION | 3 |
 | DUPLICATE_CLASSIFICATIONS | 0 |
 | UNCLASSIFIED_RECORDS | 0 |
-| Wave 3 readback automatically queued | 0 |
+| Wave 3 readback automatically queued | 1 |
 | Post-merge `--execute` replay automatically queued | 2 |
+| Existing Wave 3 action logs recognized | 33 |
 | Unexplained idle | 0 |
 
 ## Machine Work

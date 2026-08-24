@@ -1,0 +1,62 @@
+{
+  "ok": true,
+  "status": "DRY_RUN_READY",
+  "executionMode": "DRY_RUN",
+  "idempotencyKey": "122948b80c5d614fc4c5e3dc0a80516974b1a039efc756af817f78087fa4e870",
+  "canonicalTitle": {
+    "titleId": "fd577d2b-01a0-f111-b8dc-000d3a14673b",
+    "title": "Indomitable",
+    "author": "Quanisha Dockery"
+  },
+  "currentStage": {
+    "stageId": "0f587d2b-01a0-f111-b8dc-000d3a14673b",
+    "stageName": "Developmental Editing - Indomitable",
+    "stageCode": "DEVELOPMENTAL_EDITING",
+    "stageStatus": 100000001
+  },
+  "exactSourceArtifact": {
+    "artifactId": "c373402b-01a0-f111-b8db-7c1e525801f6",
+    "name": "Governed Source Manuscript - Indomitable",
+    "filename": "Indomitable_Compiled_Batch1_2.docx",
+    "sha256": "08cedd4d4db470887ea75e792359c6b4fa807f54bf09f2b50be0144f5e7f7181",
+    "currentApproved": true
+  },
+  "authorApprovalEvidence": {
+    "approvedArtifactId": "c373402b-01a0-f111-b8db-7c1e525801f6",
+    "gates": [
+      {
+        "gateId": "2a869367-04a0-f111-b8dc-000d3a14673b",
+        "decisionOn": "2026-08-20T16:17:16Z",
+        "deliverableArtifactId": "c373402b-01a0-f111-b8db-7c1e525801f6"
+      }
+    ]
+  },
+  "styleGuide": [],
+  "targetStage": "DEVELOPMENTAL_EDITING",
+  "providerRoute": {
+    "provider": "stage-policy",
+    "deploymentAlias": "jm1-editorial-devline-primary",
+    "silentFallbackAllowed": false
+  },
+  "expectedMutations": [
+    "claim target editorial stage",
+    "read exact source artifact",
+    "invoke governed provider route",
+    "persist output artifacts",
+    "write QA evidence",
+    "create package manifest",
+    "create mandatory author-review gate"
+  ],
+  "expectedOutputArtifactType": [
+    "editedManuscript",
+    "developmentalMemo",
+    "changeLedger",
+    "qaEvidence"
+  ],
+  "expectedNextAuthorGate": {
+    "stageCode": "DEVELOPMENTAL_EDITING",
+    "nextStageAuthorized": false
+  },
+  "mutationsPerformed": 0,
+  "externalSends": 0
+}

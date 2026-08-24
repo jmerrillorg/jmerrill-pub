@@ -1,6 +1,6 @@
 # Governed Source Search
 
-Last Verified: 2026-08-24T13:05:33.667Z
+Last Verified: 2026-08-24T21:46:27.044Z
 
 Search boundary: repository text plus locally synced governed OneDrive/SharePoint tree at `/Users/jmerrillone/Library/CloudStorage/OneDrive-JMerrillFoundation,Inc/JM1-PUB`. Gmail was not searched.
 

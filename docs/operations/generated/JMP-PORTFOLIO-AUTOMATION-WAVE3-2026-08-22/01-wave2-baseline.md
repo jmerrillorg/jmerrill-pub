@@ -1,34 +1,34 @@
 # Wave 2 Baseline
 
-Last Verified: 2026-08-24T12:05:17.972Z
+Last Verified: 2026-08-24T21:43:53.509Z
 
 | Source | Count |
 | --- | ---: |
-| Titles | 360 |
+| Titles | 361 |
 | Intakes | 31 |
 | Opportunities | 6 |
 | Author Profiles | 55 |
-| Editorial Stages | 30 |
-| Approval Gates | 16 |
-| Editorial Artifacts | 111 |
+| Editorial Stages | 32 |
+| Approval Gates | 18 |
+| Editorial Artifacts | 118 |
 | Production Projects | 2 |
 | Production Tasks | 8 |
 | Execution Logs Read | 500 |
 
 Wave 1 records evaluated: 424.
-Wave 2 System Attention after reconciliation: 250.
+Wave 2 System Attention after reconciliation: 251.
 Wave 2 auto-executable after reconciliation: 1.
 Wave 2 automatically queued: 0.
 
 ## 246 to 250 Explanation
 
-The Wave 2 increase from 246 to 250 is explained by stricter reconciliation, not a Wave 3 controller regression.
+The Wave 2 increase from 246 to 251 is explained by stricter reconciliation, not a Wave 3 controller regression.
 
 | Movement | Count |
 | --- | ---: |
-| Added to System Attention by Wave 2 reconciliation | 5 |
-| Removed from System Attention by Wave 2 reconciliation | 2 |
-| Net change | 3 |
+| Added to System Attention by Wave 2 reconciliation | 6 |
+| Removed from System Attention by Wave 2 reconciliation | 1 |
+| Net change | 5 |
 
 ### Added Rows
 
@@ -39,10 +39,10 @@ The Wave 2 increase from 246 to 250 is explained by stricter reconciliation, not
 | Jackie Smith, Jr. | Establishing Glory 3: The Marriage Handbook | TERMINAL | MISSING_ARTIFACT_AUTHORITY | Bind current editorial artifact before stage movement |
 | Jackie Smith, Jr. | Establishing Glory: The Praise and Worship Handbook (2nd Edition) | TERMINAL | MISSING_ARTIFACT_AUTHORITY | Bind current editorial artifact before stage movement |
 | Jackie Smith Jr | The Long Watch - Intake Success Validation | WAITING_ON_PROSPECT | RUNTIME_NOT_COMMISSIONED | Confirm Line readiness and worker commissioning |
+| DATA_GAP | Publishing Intake - The Intentional Leader | AUTO_QUEUE_NOW | MISSING_PRODUCTION_STATE | Resolve final full-wrap prerequisites: trim, binding, paper, final page count, spine, distribution route, and current cover artifact |
 
 ### Removed Rows
 
 | Author | Title | Prior bucket | Wave 2 state | Action |
 | --- | --- | --- | --- | --- |
 | Iyorwuese Hagher | The General’s Will and Last Testament | SYSTEM_ATTENTION_REQUIRED | AUTO_EXECUTABLE | Queue commissioned Line stage worker |
-| DATA_GAP | Indomitable | SYSTEM_ATTENTION_REQUIRED | WAITING_ON_JMP | Manual signature send prepared; Jackie must send the validated agreement package before author wait begins |

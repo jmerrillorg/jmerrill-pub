@@ -1,0 +1,181 @@
+# Dataverse Binding Readback
+
+Last Verified: 2026-08-24T21:47:21.416Z
+
+```json
+{
+  "editorialStage": {
+    "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialstages(jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_stagecompletedate,_jm1pub_titleid_value)/$entity",
+    "@odata.etag": "W/\"49054628\"",
+    "jm1pub_editorialstageid": "8156fd5a-04a0-f111-b8dc-7c1e525b15c2",
+    "jm1pub_name": "Editorial Review - Indomitable",
+    "_jm1pub_titleid_value@OData.Community.Display.V1.FormattedValue": "Indomitable",
+    "_jm1pub_titleid_value": "fd577d2b-01a0-f111-b8dc-000d3a14673b",
+    "jm1pub_stagecompletedate@OData.Community.Display.V1.FormattedValue": "8/20/2026 12:17 PM",
+    "jm1pub_stagecompletedate": "2026-08-20T16:17:16Z",
+    "jm1pub_stagetype@OData.Community.Display.V1.FormattedValue": "Review",
+    "jm1pub_stagetype": 100000000,
+    "jm1pub_stagestatus@OData.Community.Display.V1.FormattedValue": "Complete",
+    "jm1pub_stagestatus": 100000008
+  },
+  "developmentalStage": {
+    "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialstages(jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_blockerreason,_jm1pub_titleid_value)/$entity",
+    "@odata.etag": "W/\"49054633\"",
+    "jm1pub_blockerreason": null,
+    "jm1pub_editorialstageid": "0f587d2b-01a0-f111-b8dc-000d3a14673b",
+    "jm1pub_name": "Developmental Editing - Indomitable",
+    "_jm1pub_titleid_value@OData.Community.Display.V1.FormattedValue": "Indomitable",
+    "_jm1pub_titleid_value": "fd577d2b-01a0-f111-b8dc-000d3a14673b",
+    "jm1pub_stagetype@OData.Community.Display.V1.FormattedValue": "Developmental",
+    "jm1pub_stagetype": 100000001,
+    "jm1pub_stagestatus@OData.Community.Display.V1.FormattedValue": "In Progress",
+    "jm1pub_stagestatus": 100000001
+  },
+  "artifact": {
+    "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialartifacts(jm1pub_editorialartifactid,jm1pub_filename,jm1pub_sha256,jm1pub_iscurrentapproved,_jm1pub_titleid_value,_jm1pub_editorialstageid_value)/$entity",
+    "@odata.etag": "W/\"49054630\"",
+    "_jm1pub_editorialstageid_value@OData.Community.Display.V1.FormattedValue": "Editorial Review - Indomitable",
+    "_jm1pub_editorialstageid_value": "8156fd5a-04a0-f111-b8dc-7c1e525b15c2",
+    "jm1pub_editorialartifactid": "c373402b-01a0-f111-b8db-7c1e525801f6",
+    "jm1pub_filename": "Indomitable_Compiled_Batch1_2.docx",
+    "_organizationid_value": "9dafb403-b493-f011-a700-000d3a106f37",
+    "jm1pub_iscurrentapproved@OData.Community.Display.V1.FormattedValue": "Yes",
+    "jm1pub_iscurrentapproved": true,
+    "_jm1pub_titleid_value@OData.Community.Display.V1.FormattedValue": "Indomitable",
+    "_jm1pub_titleid_value": "fd577d2b-01a0-f111-b8dc-000d3a14673b",
+    "jm1pub_sha256": "08cedd4d4db470887ea75e792359c6b4fa807f54bf09f2b50be0144f5e7f7181"
+  },
+  "gate": {
+    "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialapprovalgates(jm1pub_editorialapprovalgateid,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,jm1pub_authorresponsesummary,jm1pub_authordecisionsource,jm1pub_nextstageauthorized,_jm1pub_deliverableartifactid_value,_jm1pub_titleid_value,_jm1pub_editorialstageid_value)/$entity",
+    "@odata.etag": "W/\"49054632\"",
+    "_jm1pub_editorialstageid_value@OData.Community.Display.V1.FormattedValue": "Editorial Review - Indomitable",
+    "_jm1pub_editorialstageid_value": "8156fd5a-04a0-f111-b8dc-7c1e525b15c2",
+    "jm1pub_authordecisionsource": "OUTLOOK:2026-08-20T16:17:16Z:INDOMITABLE",
+    "jm1pub_editorialapprovalgateid": "2a869367-04a0-f111-b8dc-000d3a14673b",
+    "jm1pub_authorresponsesummary": "Author accepted the Professional Publishing Package path in response to the Editorial Review recommendation. Exact excerpt: \"I am extremely interested in professional publishing package. How would we move forward with this process?\"",
+    "jm1pub_authordecisionon@OData.Community.Display.V1.FormattedValue": "8/20/2026 12:17 PM",
+    "jm1pub_authordecisionon": "2026-08-20T16:17:16Z",
+    "jm1pub_gatestatus@OData.Community.Display.V1.FormattedValue": "Approved",
+    "jm1pub_gatestatus": 196650003,
+    "_organizationid_value": "9dafb403-b493-f011-a700-000d3a106f37",
+    "_jm1pub_deliverableartifactid_value@OData.Community.Display.V1.FormattedValue": "Governed Source Manuscript - Indomitable",
+    "_jm1pub_deliverableartifactid_value": "c373402b-01a0-f111-b8db-7c1e525801f6",
+    "jm1pub_authordecision@OData.Community.Display.V1.FormattedValue": "Approve",
+    "jm1pub_authordecision": 196650000,
+    "_jm1pub_titleid_value@OData.Community.Display.V1.FormattedValue": "Indomitable",
+    "_jm1pub_titleid_value": "fd577d2b-01a0-f111-b8dc-000d3a14673b",
+    "jm1pub_nextstageauthorized@OData.Community.Display.V1.FormattedValue": "Yes",
+    "jm1pub_nextstageauthorized": true
+  },
+  "logs": [
+    {
+      "@odata.etag": "W/\"49054626\"",
+      "jm1_executionstatus@OData.Community.Display.V1.FormattedValue": "Success",
+      "jm1_executionstatus": 835500001,
+      "jm1_executionlogid": "6797376e-04a0-f111-b8dc-000d3a14673b",
+      "jm1_name": "DEVELOPMENTAL-EDITING-AUTHORIZED-0f587d2b-01a0-f111-b8dc-000d3a14673b",
+      "jm1_actiontype": "DEVELOPMENTAL_EDITING_AUTHORIZED_BY_EDITORIAL_REVIEW_APPROVAL",
+      "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:40 PM",
+      "createdon": "2026-08-24T21:40:34Z",
+      "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:40 PM",
+      "jm1_completedon": "2026-08-24T21:40:32Z"
+    },
+    {
+      "@odata.etag": "W/\"49054624\"",
+      "jm1_executionstatus@OData.Community.Display.V1.FormattedValue": "Success",
+      "jm1_executionstatus": 835500001,
+      "jm1_executionlogid": "6697376e-04a0-f111-b8dc-000d3a14673b",
+      "jm1_name": "EDITORIAL-REVIEW-APPROVAL-EVIDENCE-BOUND-fd577d2b-01a0-f111-b8dc-000d3a14673b",
+      "jm1_actiontype": "EDITORIAL_REVIEW_APPROVAL_EVIDENCE_BOUND",
+      "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:40 PM",
+      "createdon": "2026-08-24T21:40:33Z",
+      "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/20/2026 12:17 PM",
+      "jm1_completedon": "2026-08-20T16:17:16Z"
+    },
+    {
+      "@odata.etag": "W/\"49054397\"",
+      "jm1_executionstatus@OData.Community.Display.V1.FormattedValue": "Success",
+      "jm1_executionstatus": 835500001,
+      "jm1_executionlogid": "6e465100-03a0-f111-b8db-7c1e525801f6",
+      "jm1_name": "PORTFOLIO-WAVE3-0e53b16ff5fe1265accd3592",
+      "jm1_actiontype": "PORTFOLIO_WAVE3_CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP",
+      "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:30 PM",
+      "createdon": "2026-08-24T21:30:24Z",
+      "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:30 PM",
+      "jm1_completedon": "2026-08-24T21:30:24Z"
+    },
+    {
+      "@odata.etag": "W/\"49054318\"",
+      "jm1_executionstatus@OData.Community.Display.V1.FormattedValue": "Success",
+      "jm1_executionstatus": 835500001,
+      "jm1_executionlogid": "795af5cb-02a0-f111-b8dc-7c1e525b15c2",
+      "jm1_name": "PORTFOLIO-WAVE3-72d76a5c3bee1a5027ecc50f",
+      "jm1_actiontype": "PORTFOLIO_WAVE3_CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP",
+      "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:28 PM",
+      "createdon": "2026-08-24T21:28:57Z",
+      "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:28 PM",
+      "jm1_completedon": "2026-08-24T21:28:57Z"
+    },
+    {
+      "@odata.etag": "W/\"49054286\"",
+      "jm1_executionstatus@OData.Community.Display.V1.FormattedValue": "Success",
+      "jm1_executionstatus": 835500001,
+      "jm1_executionlogid": "39f6003a-02a0-f111-b8dc-00224820105b",
+      "jm1_name": "PORTFOLIO-WAVE3-f3d74f02472df4ee6f9dea44",
+      "jm1_actiontype": "PORTFOLIO_WAVE3_CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP",
+      "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:24 PM",
+      "createdon": "2026-08-24T21:24:51Z",
+      "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:24 PM",
+      "jm1_completedon": "2026-08-24T21:24:51Z"
+    },
+    {
+      "@odata.etag": "W/\"49054274\"",
+      "jm1_executionstatus@OData.Community.Display.V1.FormattedValue": "Success",
+      "jm1_executionstatus": 835500001,
+      "jm1_executionlogid": "9a43d2f9-01a0-f111-b8dc-7c1e525b15c2",
+      "jm1_name": "PORTFOLIO-WAVE3-347c5df9042740423586f877",
+      "jm1_actiontype": "PORTFOLIO_WAVE3_QUEUE_COMMISSIONED_EDITORIAL_JOB",
+      "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:23 PM",
+      "createdon": "2026-08-24T21:23:07Z",
+      "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:23 PM",
+      "jm1_completedon": "2026-08-24T21:23:07Z"
+    },
+    {
+      "@odata.etag": "W/\"49054206\"",
+      "jm1_executionstatus@OData.Community.Display.V1.FormattedValue": "Escalated",
+      "jm1_executionstatus": 835500003,
+      "jm1_executionlogid": "3c924c32-01a0-f111-b8dc-00224820105b",
+      "jm1_name": "DEVELOPMENTAL-EDITING-EXECUTION-BLOCKED-0f587d2b-01a0-f111-b8dc-000d3a14673b",
+      "jm1_actiontype": "DEVELOPMENTAL_EDITING_EXECUTION_BLOCKED_EXACT_GATE",
+      "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:17 PM",
+      "createdon": "2026-08-24T21:17:27Z",
+      "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:17 PM",
+      "jm1_completedon": "2026-08-24T21:17:25Z"
+    },
+    {
+      "@odata.etag": "W/\"49054203\"",
+      "jm1_executionstatus@OData.Community.Display.V1.FormattedValue": "Success",
+      "jm1_executionstatus": 835500001,
+      "jm1_executionlogid": "ceef522f-01a0-f111-b8dc-6045bdd69678",
+      "jm1_name": "DEVELOPMENTAL-EDITING-STAGE-MATERIALIZED-fd577d2b-01a0-f111-b8dc-000d3a14673b",
+      "jm1_actiontype": "DEVELOPMENTAL_EDITING_STAGE_MATERIALIZED",
+      "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:17 PM",
+      "createdon": "2026-08-24T21:17:27Z",
+      "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:17 PM",
+      "jm1_completedon": "2026-08-24T21:17:25Z"
+    },
+    {
+      "@odata.etag": "W/\"49054200\"",
+      "jm1_executionstatus@OData.Community.Display.V1.FormattedValue": "Success",
+      "jm1_executionstatus": 835500001,
+      "jm1_executionlogid": "b5573b31-01a0-f111-b8db-7c1e525801f6",
+      "jm1_name": "EDITORIAL-SOURCE-BOUND-fd577d2b-01a0-f111-b8dc-000d3a14673b",
+      "jm1_actiontype": "EDITORIAL_SOURCE_ARTIFACT_BOUND",
+      "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:17 PM",
+      "createdon": "2026-08-24T21:17:27Z",
+      "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:17 PM",
+      "jm1_completedon": "2026-08-24T21:17:25Z"
+    }
+  ]
+}
+```

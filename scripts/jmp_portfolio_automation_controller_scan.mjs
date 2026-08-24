@@ -76,7 +76,7 @@ export async function readPortfolioSource(token) {
       $filter: 'statecode eq 0',
     }),
     dvList(token, 'opportunities', {
-      $select: 'opportunityid,name,jm1pub_projecttitle,jm1_m6authorselectedpackagecode,jm1_m6packageselectionstatus,jm1_m6paymentoptionselectionstatus,jm1_m6selectedinstallmentcount,jm1_m6paymentselectionreceivedon,jm1_m6agreementpreparationstatus,jm1_m6firstpaymentstatus,jm1_m6firstpaymentconfirmedon,jm1_m6onboardingstatus,jm1pub_contractstatus,jm1pub_reviewstatus,jm1pub_manuscriptsubmitted,modifiedon,createdon,statecode,statuscode',
+      $select: 'opportunityid,name,jm1pub_projecttitle,jm1_m6authorselectedpackagecode,jm1_m6packageselectionstatus,jm1_m6paymentoptionselectionstatus,jm1_m6selectedinstallmentcount,jm1_m6paymentselectionreceivedon,jm1_m6agreementpreparationstatus,jm1_m6firstpaymentstatus,jm1_m6firstpaymentconfirmedon,jm1_m6onboardingstatus,jm1_m6authorportalstatus,jm1pub_contractstatus,jm1pub_reviewstatus,jm1pub_manuscriptsubmitted,modifiedon,createdon,statecode,statuscode',
       $filter: 'statecode eq 0',
     }),
     dvList(token, 'jm1_authorprofiles', {
@@ -141,6 +141,7 @@ export function buildControllerRecords(source) {
   const artifactsByTitle = groupBy(source.artifacts, (row) => row._jm1pub_titleid_value || row.jm1pub_titleidname)
   const productionByTitle = groupBy(source.productionProjects, (row) => row._jm1_title_value || row.jm1_titlename)
   const opportunitiesByTitle = groupBy(source.opportunities, (row) => normalizeTitle(row.jm1pub_projecttitle || row.name))
+  const logsBySource = groupBy(source.logs, (row) => value(row.jm1_sourcerecordid))
   const titleRecords = source.titles.map((title) => {
     const titleName = value(title.jm1pub_titlename || title.jm1_titlename || title.jm1pub_name)
     const titleId = value(title.jm1pub_titleid)
@@ -149,12 +150,17 @@ export function buildControllerRecords(source) {
     const titleArtifacts = artifactsByTitle.get(titleId) || []
     const titleProduction = productionByTitle.get(titleId) || productionByTitle.get(titleName) || []
     const opportunity = firstByModified(opportunitiesByTitle.get(normalizeTitle(titleName)) || [])
+    const titleLogs = [
+      ...(logsBySource.get(titleId) || []),
+      ...(opportunity?.opportunityid ? logsBySource.get(opportunity.opportunityid) || [] : []),
+    ]
     return controllerRecordFromTitle(title, {
       titleStages,
       titleGates,
       titleArtifacts,
       titleProduction,
       opportunity,
+      logs: titleLogs,
     })
   })
 
@@ -164,7 +170,7 @@ export function buildControllerRecords(source) {
     .map((intake) => controllerRecordFromIntake(intake))
   const opportunityRecords = source.opportunities
     .filter((opp) => !titleNames.has(normalizeTitle(opp.jm1pub_projecttitle || opp.name)))
-    .map((opp) => controllerRecordFromOpportunity(opp))
+    .map((opp) => controllerRecordFromOpportunity(opp, logsBySource.get(opp.opportunityid) || []))
   const authorRecords = source.authorProfiles
     .map((profile) => ({
       recordType: 'author',
@@ -196,8 +202,12 @@ function controllerRecordFromTitle(title, related) {
     value(opportunity.jm1_m6paymentoptionselectionstatus),
     value(opportunity.jm1_m6agreementpreparationstatus),
     formatted(opportunity, 'jm1_m6firstpaymentstatus'),
+    formatted(opportunity, 'jm1_m6authorportalstatus'),
+    formatted(opportunity, 'jm1_m6onboardingstatus'),
     formatted(opportunity, 'jm1pub_contractstatus'),
   ].join(' ')
+  const joinedFamilyEvidence = hasExecutionLog(related.logs, 'JOINED_THE_FAMILY')
+  const productionCommencedEvidence = hasExecutionLog(related.logs, 'PRODUCTION_COMMENCED')
   return {
     recordType: 'title',
     author: value(title.jm1pub_authordisplayname || title.jm1pub_authorname || title.jm1_primaryauthorname || latestStage?.jm1pub_contactidname || opportunity.parentcontactidname),
@@ -216,7 +226,12 @@ function controllerRecordFromTitle(title, related) {
     agreementGenerated: /generated|prepared|sent|executed|signed/i.test(commercialText),
     agreementExecuted: /executed|signed/i.test(commercialText),
     initialPaymentReceived: /paid|received|confirmed/i.test(commercialText),
-    joinedFamily: /joined/i.test(commercialText),
+    joinedFamily: joinedFamilyEvidence || /joined/i.test(commercialText),
+    notes: [
+      joinedFamilyEvidence ? 'JOINED_THE_FAMILY' : '',
+      productionCommencedEvidence ? 'PRODUCTION_COMMENCED' : '',
+      commercialText,
+    ].filter(Boolean).join(' | '),
     authorGateRequired: /awaiting|author/i.test(gateStatus) && !/approved/i.test(authorDecision),
     authorAction: gateStatus || 'Await author response',
     currentArtifact: value(latestArtifact?.jm1pub_editorialartifactname || latestArtifact?.jm1pub_filename || title.jm1pub_currentmanuscriptname),
@@ -232,6 +247,9 @@ function controllerRecordFromTitle(title, related) {
       latestGate ? `Dataverse:jm1pub_editorialapprovalgate:${latestGate.jm1pub_editorialapprovalgateid}` : '',
       latestArtifact ? `Dataverse:jm1pub_editorialartifact:${latestArtifact.jm1pub_editorialartifactid}` : '',
       opportunity.opportunityid ? `Dataverse:opportunity:${opportunity.opportunityid}` : '',
+      ...((related.logs || [])
+        .filter((log) => ['JOINED_THE_FAMILY', 'PRODUCTION_COMMENCED'].includes(value(log.jm1_actiontype)))
+        .map((log) => `Dataverse:jm1_executionlog:${log.jm1_executionlogid}`)),
     ].filter(Boolean),
   }
 }
@@ -254,14 +272,17 @@ function controllerRecordFromIntake(intake) {
   }
 }
 
-function controllerRecordFromOpportunity(opp) {
+function controllerRecordFromOpportunity(opp, logs = []) {
   const commercialText = [
     value(opp.jm1_m6packageselectionstatus),
     value(opp.jm1_m6paymentoptionselectionstatus),
     value(opp.jm1_m6agreementpreparationstatus),
     formatted(opp, 'jm1_m6firstpaymentstatus'),
+    formatted(opp, 'jm1_m6authorportalstatus'),
+    formatted(opp, 'jm1_m6onboardingstatus'),
     formatted(opp, 'jm1pub_contractstatus'),
   ].join(' ')
+  const joinedFamilyEvidence = hasExecutionLog(logs, 'JOINED_THE_FAMILY')
   return {
     recordType: 'prospect',
     author: value(opp.parentcontactidname),
@@ -275,10 +296,21 @@ function controllerRecordFromOpportunity(opp) {
     agreementGenerated: /generated|prepared|sent|executed|signed/i.test(commercialText),
     agreementExecuted: /executed|signed/i.test(commercialText),
     initialPaymentReceived: /paid|received|confirmed/i.test(commercialText),
+    joinedFamily: joinedFamilyEvidence || /joined/i.test(commercialText),
+    notes: [joinedFamilyEvidence ? 'JOINED_THE_FAMILY' : '', commercialText].filter(Boolean).join(' | '),
     modifiedOn: value(opp.modifiedon),
     createdOn: value(opp.createdon),
-    evidence: [`Dataverse:opportunity:${opp.opportunityid}`],
+    evidence: [
+      `Dataverse:opportunity:${opp.opportunityid}`,
+      ...logs
+        .filter((log) => value(log.jm1_actiontype) === 'JOINED_THE_FAMILY')
+        .map((log) => `Dataverse:jm1_executionlog:${log.jm1_executionlogid}`),
+    ],
   }
+}
+
+function hasExecutionLog(logs, actionType) {
+  return (logs || []).some((log) => value(log.jm1_actiontype) === actionType || value(log.jm1_name).includes(actionType))
 }
 
 function buildEvidenceDocs({ summary, source, evaluation, workQueue, named }) {
