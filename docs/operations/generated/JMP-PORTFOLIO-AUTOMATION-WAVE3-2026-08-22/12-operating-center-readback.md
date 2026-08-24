@@ -1,6 +1,6 @@
 # Operating Center Readback
 
-Last Verified: 2026-08-24T21:30:20.946Z
+Last Verified: 2026-08-24T21:43:53.509Z
 
 | Author | Title | Stage | Substage | Waiting On | System Attention | Next Action | Automation Class | Action Taken |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -224,7 +224,7 @@ Last Verified: 2026-08-24T21:30:20.946Z
 | Tawana Mars | Hop, Hop, Hop | DATA_GAP | DATA_GAP | WAITING_ON_JMP | TERMINAL_STATE_CONFLICT | Create structured operator task to resolve lifecycle/terminal-state conflict | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
 | Maurche Reed | I Am My Worst Enemy! | DATA_GAP | DATA_GAP | WAITING_ON_JMP | TERMINAL_STATE_CONFLICT | Create structured operator task to resolve lifecycle/terminal-state conflict | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
 | Maurche Reed | I Am My Worst Enemy! | POST_PUBLICATION | TERMINAL | TERMINAL | TERMINAL_STATE_CONFLICT | No production action; maintain stewardship only | NONE | NO_ACTION_TAKEN |
-| Quanisha Dockery | Indomitable | EDITORIAL_PRODUCTION | DEVELOPMENTAL_EDITING | WAITING_ON_JMP | MISSING_ARTIFACT | Bind exact Editorial Review approval evidence to the governed source artifact before Developmental Editing execution | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_CREATED |
+| Quanisha Dockery | Indomitable | EDITORIAL_REVIEW_RECOMMENDATION | AUTHOR_REVIEW | WAITING_ON_AUTHOR | COMMUNICATION_FAILURE | Ready for Author Review | NONE | NO_ACTION_TAKEN |
 | Quanisha Dockery | Indomitable Indomitable Escaping Witchcraft and Finding My Identity in Christ | INQUIRY_INTAKE | DATA_GAP | WAITING_ON_JMP | MISSING_CANONICAL_LINK | Create structured operator task to bind canonical title/project link from governed evidence | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
 | KD Heard | Inner Peace Through Life's Storms | POST_PUBLICATION | TERMINAL | TERMINAL | TERMINAL_STATE_CONFLICT | No production action; maintain stewardship only | NONE | NO_ACTION_TAKEN |
 | KD Heard | Inner Peace Through Life's Storms | DATA_GAP | DATA_GAP | WAITING_ON_JMP | TERMINAL_STATE_CONFLICT | Create structured operator task to resolve lifecycle/terminal-state conflict | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |

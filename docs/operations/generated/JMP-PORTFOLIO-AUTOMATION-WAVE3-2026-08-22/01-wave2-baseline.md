@@ -1,6 +1,6 @@
 # Wave 2 Baseline
 
-Last Verified: 2026-08-24T21:30:20.946Z
+Last Verified: 2026-08-24T21:43:53.509Z
 
 | Source | Count |
 | --- | ---: |
@@ -8,21 +8,21 @@ Last Verified: 2026-08-24T21:30:20.946Z
 | Intakes | 31 |
 | Opportunities | 6 |
 | Author Profiles | 55 |
-| Editorial Stages | 31 |
-| Approval Gates | 16 |
-| Editorial Artifacts | 112 |
+| Editorial Stages | 32 |
+| Approval Gates | 18 |
+| Editorial Artifacts | 118 |
 | Production Projects | 2 |
 | Production Tasks | 8 |
 | Execution Logs Read | 500 |
 
 Wave 1 records evaluated: 424.
-Wave 2 System Attention after reconciliation: 252.
+Wave 2 System Attention after reconciliation: 251.
 Wave 2 auto-executable after reconciliation: 1.
 Wave 2 automatically queued: 0.
 
 ## 246 to 250 Explanation
 
-The Wave 2 increase from 246 to 252 is explained by stricter reconciliation, not a Wave 3 controller regression.
+The Wave 2 increase from 246 to 251 is explained by stricter reconciliation, not a Wave 3 controller regression.
 
 | Movement | Count |
 | --- | ---: |
