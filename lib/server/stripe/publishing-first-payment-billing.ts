@@ -487,7 +487,7 @@ async function getDataverseToken(config: DataverseConfig) {
 
 function getStripeSecret() {
   const secret = process.env.STRIPE_CHECKOUT_SECRET_KEY || process.env.STRIPE_SECRET_KEY || ''
-  if (!/^sk_(live|test|restricted)_/.test(secret)) throw Object.assign(new Error('stripe_secret_missing'), { safeCode: 'STRIPE_SECRET_MISSING' })
+  if (!/^(sk|rk)_(live|test|restricted)_/.test(secret)) throw Object.assign(new Error('stripe_secret_missing'), { safeCode: 'STRIPE_SECRET_MISSING' })
   return secret
 }
 
