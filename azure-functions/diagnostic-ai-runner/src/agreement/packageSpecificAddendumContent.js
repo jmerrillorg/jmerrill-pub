@@ -10,10 +10,9 @@
  * package-only addendum document requires either (a) a new, simplified,
  * single-package canonical template authored and approved by the
  * Publisher (recommended — safer than algorithmically deleting rows
- * from the existing multi-package template), or (b) Adobe Sign form-
- * field branching once that integration exists. Neither is built by
- * this module; it only defines the content that either approach must
- * present.
+ * from the existing multi-package template), or another approved
+ * package-rendering mechanism. This module only defines the content
+ * that the approved rendering path must present.
  */
 
 const { computeComplimentaryEntitlements } = require("./authorCopyPolicy");

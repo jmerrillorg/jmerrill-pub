@@ -6,9 +6,9 @@
  * Legacy governed agreement-package email send.
  *
  * This path is intentionally superseded for signature execution. It
- * MUST NOT be used to move a live agreement into Sent for Signature
- * because it emails source DOCX attachments instead of creating an
- * e-sign provider transaction/envelope with a secure review/sign link.
+ * MUST NOT be used to move a live agreement into a signature-sent state
+ * because current policy requires Jackie to manually send a validated
+ * agreement package and then record that manual send.
  *
  * Safety boundaries:
  *   - Recipient is always confirmed from Dataverse (the Opportunity's
@@ -222,11 +222,12 @@ async function sendAgreementPackage(input = {}, deps = {}) {
 
   if (!isGateOpen()) return blocked("GATE_CLOSED", { gate: GATE_NAME });
   if (!legacyAttachmentSendAllowed(input)) {
-    return blocked("ATTACHMENT_EMAIL_SIGNATURE_PATH_SUPERSEDED", {
+    return blocked("AUTOMATIC_ATTACHMENT_EMAIL_NOT_AUTHORIZED_FOR_MANUAL_SIGNATURE_POLICY", {
       defectiveEmailSendCount: 1,
-      validEsignTransactionSendCount: 0,
-      requiredNextState: "AWAITING_AUTHOR_FORMAT_SELECTION_OR_SIGNNOW_PROVIDER_CONFIGURATION",
-      canonicalProvider: "SIGNNOW",
+      requiredNextState: "READY_FOR_MANUAL_SIGNATURE_SEND",
+      waitingOn: "WAITING_ON_JMP",
+      canonicalProvider: null,
+      manualSignaturePolicy: true,
       supersededEventType: SUPERSEDED_EVENT_TYPE,
       liveActions: {
         sentAuthorFacingOutput: false,
