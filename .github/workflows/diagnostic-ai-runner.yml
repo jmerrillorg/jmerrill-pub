@@ -152,6 +152,19 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Resolve deployment evidence storage key
+        shell: bash
+        run: |
+          set -euo pipefail
+          storage_key="$(az storage account keys list \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --account-name "$DEPLOYMENT_STORAGE_ACCOUNT" \
+            --query '[0].value' \
+            --output tsv)"
+          test -n "$storage_key"
+          echo "::add-mask::$storage_key"
+          echo "AZURE_STORAGE_KEY=$storage_key" >> "$GITHUB_ENV"
+
       - name: Persist release package candidate
         shell: bash
         run: |
@@ -165,7 +178,7 @@ jobs:
             --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
             --name "$package_blob_name" \
             --file "$package_path" \
-            --auth-mode key \
+            --account-key "$AZURE_STORAGE_KEY" \
             --overwrite true \
             --output none
           {
@@ -341,7 +354,7 @@ jobs:
             --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
             --name "${DEPLOYMENT_EVIDENCE_PREFIX}/releases/${GITHUB_SHA}.json" \
             --file "$RUNNER_TEMP/diagnostic-ai-runner-last-known-good.json" \
-            --auth-mode key \
+            --account-key "$AZURE_STORAGE_KEY" \
             --overwrite true \
             --output none
           az storage blob upload \
@@ -349,7 +362,7 @@ jobs:
             --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
             --name "${DEPLOYMENT_EVIDENCE_PREFIX}/LAST_KNOWN_GOOD.json" \
             --file "$RUNNER_TEMP/diagnostic-ai-runner-last-known-good.json" \
-            --auth-mode key \
+            --account-key "$AZURE_STORAGE_KEY" \
             --overwrite true \
             --output none
         env:
@@ -366,7 +379,7 @@ jobs:
             --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
             --name "${DEPLOYMENT_EVIDENCE_PREFIX}/LAST_KNOWN_GOOD.json" \
             --file "$lkg_path" \
-            --auth-mode key \
+            --account-key "$AZURE_STORAGE_KEY" \
             --overwrite true \
             --output none; then
             echo "No last-known-good deployment manifest is available; rollback cannot be performed." >&2
@@ -381,7 +394,7 @@ jobs:
             --name "$package_blob_name" \
             --permissions r \
             --expiry "$expiry" \
-            --auth-mode key \
+            --account-key "$AZURE_STORAGE_KEY" \
             --output tsv)"
           package_url="https://${DEPLOYMENT_STORAGE_ACCOUNT}.blob.core.windows.net/${DEPLOYMENT_STORAGE_CONTAINER}/${package_blob_name}?${sas}"
           az functionapp config appsettings set \
