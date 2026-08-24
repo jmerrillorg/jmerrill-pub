@@ -48,6 +48,10 @@ test('Stripe creates a customer and invoice request without automatic card charg
   assert.doesNotMatch(service, /payment_intents|charges/)
 })
 
+test('Stripe secret guard accepts governed restricted keys as well as standard secret keys', () => {
+  assert.match(service, /\^\(sk\|rk\)_\(live\|test\|restricted\)_/)
+})
+
 test('idempotency and execution-log events are explicit', () => {
   for (const event of [
     'AGREEMENT_FULLY_EXECUTED',
