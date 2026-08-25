@@ -16,6 +16,12 @@ test("host.json declares the Azure Functions extension bundle required by queue 
   });
 });
 
+test("host.json queue trigger message encoding matches the raw JSON producer", () => {
+  const host = JSON.parse(fs.readFileSync(path.join(projectRoot, "host.json"), "utf8"));
+
+  assert.equal(host.extensions?.queues?.messageEncoding, "none");
+});
+
 test("package.json declares the storage queue dependency exactly once", () => {
   const packageJsonText = fs.readFileSync(path.join(projectRoot, "package.json"), "utf8");
   const queueDependencyOccurrences = packageJsonText.match(/"@azure\/storage-queue"/g) || [];
