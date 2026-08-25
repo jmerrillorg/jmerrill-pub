@@ -517,13 +517,13 @@ test("line editing source chunker preserves full manuscript text in order", () =
   assert.equal(chunks.join("\n\n"), sourceText);
 });
 
-test("line editing default chunk size is production-sized for full-manuscript execution", () => {
+test("line editing default chunk size is provider-sized for full-manuscript execution", () => {
   const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
   delete process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
   try {
-    assert.equal(DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT, 1800);
+    assert.equal(DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT, 800);
     assert.equal(DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY, 4);
-    const sourceText = Array.from({ length: 3601 }, (_, index) => `word${index}`).join(" ");
+    const sourceText = Array.from({ length: 1601 }, (_, index) => `word${index}`).join(" ");
     const chunks = splitLineEditingSourceChunks(sourceText);
     assert.equal(chunks.length, 3);
     assert.equal(chunks.join(" "), sourceText);
@@ -543,7 +543,7 @@ test("line editing capacity scheduler respects measured 5k output-token provider
     deploymentTpm: 100000,
     outputTpm: 5000,
     headroomRatio: 0.3,
-    maxOutputTokens: 4000
+    maxOutputTokens: 2000
   });
   assert.equal(concurrency, 1);
 });

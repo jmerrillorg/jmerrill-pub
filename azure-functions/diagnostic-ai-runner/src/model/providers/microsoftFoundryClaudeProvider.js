@@ -12,7 +12,7 @@ const {
 const REQUIRED_VARS = ["AZURE_FOUNDRY_ENDPOINT"];
 const DEFAULT_ANTHROPIC_VERSION = "2023-06-01";
 const DEFAULT_MAX_OUTPUT_TOKENS = 4096;
-const DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS = 4000;
+const DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS = 2000;
 const TOKEN_SCOPE = "https://ai.azure.com/.default";
 const STRUCTURED_OUTPUT_TOOL = Object.freeze({
   name: "submit_jm1_structured_output",
