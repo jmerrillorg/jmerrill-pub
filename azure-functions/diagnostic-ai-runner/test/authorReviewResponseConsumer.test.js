@@ -106,6 +106,34 @@ async function runOne({ gateOverrides = {}, replyOverrides = {}, existingLog = n
   return { client, result };
 }
 
+function cadenceContext(overrides = {}) {
+  return {
+    titleId,
+    stageId: "editorial-stage-001",
+    packageId,
+    currentStage: "DEVELOPMENTAL_EDITING",
+    stage: "DEVELOPMENTAL_EDITING",
+    nextStageIfApproved: "LINE_EDITING",
+    stageCompletedAt: "2026-08-10T14:00:00.000Z",
+    now: "2026-08-10T14:00:00.000Z",
+    manuscript: {
+      artifactId: "artifact-001",
+      artifactChecksum: "sha256:artifact-001",
+      wordCount: 45000,
+      countedAt: "2026-08-10T13:30:00.000Z",
+      countMethod: "GOVERNED_STAGE_ENTRY_ARTIFACT_COUNT"
+    },
+    bookType: "Leadership or business",
+    complexity: {
+      complexityFactors: [],
+      assignedBy: "Jackie Smith, Jr.",
+      assignedAt: "2026-08-10T13:45:00.000Z"
+    },
+    responseClassification: "APPROVED",
+    ...overrides
+  };
+}
+
 test("author review classifier recognizes concise approval", () => {
   assert.equal(classifyAuthorReviewResponse("I approve!"), DECISION.APPROVED);
   assert.equal(classifyAuthorReviewResponse("Please make these corrections"), DECISION.CHANGES_REQUESTED);
@@ -377,6 +405,30 @@ test("inbound approval begins at monitored mailbox and persists the gate decisio
   assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialapprovalgates" && call.payload.jm1pub_authordecision === 196650000 && call.payload.jm1pub_awaitingsince === null));
 });
 
+test("approval restart records governed cadence without production progression", async () => {
+  const client = createMockClient();
+  const result = await runAuthorReviewResponseConsumer(
+    { maxGates: 1 },
+    {
+      client,
+      readReply: async () => createReply({ receivedDateTime: "2026-08-10T14:00:00.000Z" }),
+      resolveAuthorResponseCadenceContext: async (_client, { receivedAt }) => cadenceContext({ stageCompletedAt: receivedAt, now: receivedAt })
+    }
+  );
+
+  assert.equal(result.results[0].outcome, "APPROVAL_PERSISTED");
+  assert.equal(result.results[0].productionProgression, 0);
+  assert.equal(result.results[0].cadenceRestart.action, "CADENCE_RESTARTED");
+  assert.equal(result.results[0].cadenceRestart.stage, "LINE_EDITING");
+  assert.equal(result.results[0].cadenceRestart.workerExecutionAuthorized, false);
+  assert.ok(client.calls.created.some((call) => {
+    return call.payload.jm1_actiontype === "AUTHOR_RESPONSE_CADENCE_RESTARTED" &&
+      /waitingOn=WAITING_ON_JMP/.test(call.payload.jm1_actiondescription) &&
+      /workerExecutionAuthorized=0/.test(call.payload.jm1_actiondescription);
+  }));
+  assert.ok(!client.calls.created.some((call) => call.entitySet === "jm1_productionprojects"));
+});
+
 test("correction response does not approve or start the next stage", async () => {
   const client = createMockClient();
   const result = await runAuthorReviewResponseConsumer(
@@ -398,6 +450,36 @@ test("correction response does not approve or start the next stage", async () =>
   assert.equal(result.processed, 1);
   assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "AUTHOR_CHANGES_REQUESTED"));
   assert.ok(!client.calls.created.some((call) => call.entitySet === "jm1_productionprojects"));
+});
+
+test("changes requested restarts current-stage cadence without false approval or worker execution", async () => {
+  const client = createMockClient();
+  const result = await runAuthorReviewResponseConsumer(
+    { maxGates: 1 },
+    {
+      client,
+      readReply: async () => createReply({
+        inboundMessageId: "inbound-cadence-corrections",
+        internetMessageId: "<cadence-corrections@jmerrill.one>",
+        receivedDateTime: "2026-08-10T14:00:00.000Z",
+        bodyText: "Please make these changes."
+      }),
+      resolveAuthorResponseCadenceContext: async (_client, { receivedAt }) => cadenceContext({
+        currentStage: "DEVELOPMENTAL_EDITING",
+        stage: "DEVELOPMENTAL_EDITING",
+        nextStageIfApproved: "LINE_EDITING",
+        stageCompletedAt: receivedAt,
+        now: receivedAt,
+        responseClassification: "CHANGES_REQUESTED"
+      })
+    }
+  );
+
+  assert.equal(result.results[0].outcome, "CHANGES_REQUESTED_PERSISTED");
+  assert.equal(result.results[0].cadenceRestart.action, "CADENCE_RESTARTED");
+  assert.equal(result.results[0].cadenceRestart.stageClosed, false);
+  assert.equal(result.results[0].cadenceRestart.stage, "DEVELOPMENTAL_EDITING");
+  assert.equal(result.results[0].cadenceRestart.workerExecutionAuthorized, false);
 });
 
 test("publishing sender copy is ignored and cannot be classified as author corrections", async () => {
@@ -506,6 +588,13 @@ test("duplicate provider message identity does not create a second response", as
   assert.equal(result.idempotent, 1);
   assert.equal(client.calls.created.length, 0);
   assert.equal(client.calls.patched.length, 0);
+});
+
+test("question response does not restart cadence", async () => {
+  const { client, result } = await runOne({ replyOverrides: { bodyText: "Can you clarify this before I approve?" } });
+  assert.equal(result.results[0].outcome, "QUESTIONS_REQUIRING_REVIEW_PERSISTED");
+  assert.equal(result.results[0].cadenceRestart.action, "NO_CADENCE_RESTART");
+  assert.ok(!client.calls.created.some((call) => call.payload.jm1_actiontype === "AUTHOR_RESPONSE_CADENCE_RESTARTED"));
 });
 
 test("short idempotency keys fit in execution-log descriptions", () => {
