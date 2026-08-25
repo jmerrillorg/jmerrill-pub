@@ -92,7 +92,8 @@ const EXECUTOR_POLICIES = {
 
 const TARGETED_EXECUTION_MODES = Object.freeze({
   DRY_RUN: "DRY_RUN",
-  EXECUTE: "EXECUTE"
+  EXECUTE: "EXECUTE",
+  EXECUTE_ASYNC: "EXECUTE_ASYNC"
 });
 
 function normalizeString(value) {
@@ -213,7 +214,7 @@ function validateTargetedExecutionInput(input = {}) {
   if (!normalizeString(input.sourceArtifactId)) return targetedBlocked(input, "SOURCE_ARTIFACT_ID_REQUIRED", "sourceArtifactId is required.");
   if (!normalizeString(input.sourceChecksum)) return targetedBlocked(input, "SOURCE_CHECKSUM_REQUIRED", "sourceChecksum is required.");
   if (!Object.values(TARGETED_EXECUTION_MODES).includes(mode)) {
-    return targetedBlocked(input, "EXECUTION_MODE_REQUIRED", "executionMode must be DRY_RUN or EXECUTE.");
+    return targetedBlocked(input, "EXECUTION_MODE_REQUIRED", "executionMode must be DRY_RUN, EXECUTE, or EXECUTE_ASYNC.");
   }
   if (input.authorApprovalRequired !== true) {
     return targetedBlocked(input, "AUTHOR_APPROVAL_REQUIRED", "authorApprovalRequired must be true for targeted editorial execution.");
@@ -339,7 +340,12 @@ async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
 
   return {
     ok: true,
-    status: normalized.executionMode === TARGETED_EXECUTION_MODES.DRY_RUN ? "DRY_RUN_READY" : "EXECUTION_READY",
+    status:
+      normalized.executionMode === TARGETED_EXECUTION_MODES.DRY_RUN
+        ? "DRY_RUN_READY"
+        : normalized.executionMode === TARGETED_EXECUTION_MODES.EXECUTE_ASYNC
+          ? "QUEUE_READY"
+          : "EXECUTION_READY",
     executionMode: normalized.executionMode,
     idempotencyKey,
     canonicalTitle: {
