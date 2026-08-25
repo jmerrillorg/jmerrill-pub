@@ -12,6 +12,7 @@ require("./functions/runEditorialPackageHandoffConsumer");
 require("./functions/runEditorialNextStageMaterialization");
 require("./functions/runTargetedEditorialExecution");
 require("./functions/runEditorialReviewNow");
+require("./functions/runFullWrapExecutor");
 require("./functions/runIntentionalLeaderAuthorResponse");
 require("./functions/runMilestone6ContinuationCommunication");
 require("./functions/runMilestone6EvidenceRecoveryLog");
