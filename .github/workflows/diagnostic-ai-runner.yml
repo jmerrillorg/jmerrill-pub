@@ -193,6 +193,14 @@ jobs:
               JM1_RELEASE_SHA="$GITHUB_SHA" \
               JM1_PRODUCTION_RELEASE_SHA="$GITHUB_SHA" \
             --output none
+          az functionapp restart \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --output none
+          az functionapp sync-function-triggers \
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
+            --output none || true
 
       - name: Run production health and readback checks
         shell: bash
@@ -252,19 +260,30 @@ jobs:
             echo "Azure management-plane function catalog reported $actual_function_count of $expected_function_count functions; continuing to live route probes."
           fi
 
-          for attempt in 1 2 3 4 5 6; do
+          deployed_release=""
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
             if curl --fail --silent --show-error --max-time 30 \
               "https://$FUNCTION_APP_NAME.azurewebsites.net/api/health" \
               --output "$RUNNER_TEMP/diagnostic-ai-runner-health.json"; then
-              break
+              deployed_release="$(python3 -c "import json; print(json.load(open('$RUNNER_TEMP/diagnostic-ai-runner-health.json')).get('release'))")"
+              if [ "$deployed_release" = "$GITHUB_SHA" ]; then
+                break
+              fi
+              echo "Health endpoint reports release=$deployed_release, expected $GITHUB_SHA (attempt $attempt); retrying in 10s..."
+              sleep 10
+              continue
+            else
+              echo "Health check not yet ready (attempt $attempt); retrying in 10s..."
+              sleep 10
             fi
-            echo "Health check not yet ready (attempt $attempt); retrying in 10s..."
-            sleep 10
           done
+          if [ ! -f "$RUNNER_TEMP/diagnostic-ai-runner-health.json" ]; then
+            echo "FATAL: health endpoint did not return a response." >&2
+            exit 1
+          fi
           cat "$RUNNER_TEMP/diagnostic-ai-runner-health.json"
           # The health endpoint must itself confirm the same release is live —
           # not just that the app setting was written.
-          deployed_release="$(python3 -c "import json; print(json.load(open('$RUNNER_TEMP/diagnostic-ai-runner-health.json')).get('release'))")"
           if [ "$deployed_release" != "$GITHUB_SHA" ]; then
             echo "FATAL: health endpoint reports release=$deployed_release, expected $GITHUB_SHA" >&2
             exit 1
@@ -374,7 +393,7 @@ jobs:
           fi
           package_blob_name="$(python3 -c "import json; print(json.load(open('$lkg_path'))['artifactBlobName'])")"
           source_sha="$(python3 -c "import json; print(json.load(open('$lkg_path'))['sourceSha'])")"
-          expiry="$(date -u -d '+365 days' +%Y-%m-%dT%H:%MZ)"
+          expiry="$(date -u -d '+6 days' +%Y-%m-%dT%H:%MZ)"
           sas="$(az storage blob generate-sas \
             --account-name "$DEPLOYMENT_STORAGE_ACCOUNT" \
             --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
