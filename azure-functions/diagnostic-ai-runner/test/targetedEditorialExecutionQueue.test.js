@@ -68,3 +68,49 @@ test("processQueuedTargetedEditorialExecution invokes the canonical targeted run
   assert.equal(calls[0].titleId, input.titleId);
   assert.equal(calls[0].sourceChecksum, input.sourceChecksum);
 });
+
+test("processQueuedTargetedEditorialExecution accepts Azure queue Buffer payloads", async () => {
+  const calls = [];
+  const message = buildQueuedTargetedEditorialExecutionMessage(input, { idempotencyKey: "idem-4" });
+  const result = await processQueuedTargetedEditorialExecution(Buffer.from(JSON.stringify(message), "utf8"), {
+    async runTargetedEditorialExecution(payload) {
+      calls.push(payload);
+      return { ok: true, status: "EXECUTED", idempotencyKey: "idem-4" };
+    }
+  });
+
+  assert.equal(result.status, "EXECUTED");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].executionMode, "EXECUTE");
+});
+
+test("processQueuedTargetedEditorialExecution accepts base64-encoded Azure queue text", async () => {
+  const calls = [];
+  const message = buildQueuedTargetedEditorialExecutionMessage(input, { idempotencyKey: "idem-5" });
+  const encoded = Buffer.from(JSON.stringify(message), "utf8").toString("base64");
+  const result = await processQueuedTargetedEditorialExecution(encoded, {
+    async runTargetedEditorialExecution(payload) {
+      calls.push(payload);
+      return { ok: true, status: "EXECUTED", idempotencyKey: "idem-5" };
+    }
+  });
+
+  assert.equal(result.status, "EXECUTED");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].titleId, input.titleId);
+});
+
+test("processQueuedTargetedEditorialExecution accepts wrapped queue trigger payloads", async () => {
+  const calls = [];
+  const message = buildQueuedTargetedEditorialExecutionMessage(input, { idempotencyKey: "idem-6" });
+  const result = await processQueuedTargetedEditorialExecution({ messageText: JSON.stringify(message) }, {
+    async runTargetedEditorialExecution(payload) {
+      calls.push(payload);
+      return { ok: true, status: "EXECUTED", idempotencyKey: "idem-6" };
+    }
+  });
+
+  assert.equal(result.status, "EXECUTED");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].sourceArtifactId, input.sourceArtifactId);
+});

@@ -64,8 +64,30 @@ async function enqueueTargetedEditorialExecution(input = {}, evaluated = {}, dep
 }
 
 function parseQueuedMessage(message) {
-  if (typeof message === "string") return JSON.parse(message);
-  if (message && typeof message === "object") return message;
+  if (Buffer.isBuffer(message)) return parseQueuedMessage(message.toString("utf8"));
+  if (typeof message === "string") {
+    const trimmed = message.trim();
+    if (!trimmed) {
+      throw Object.assign(new Error("Queued targeted editorial execution message is empty."), {
+        safeCode: "TARGETED_EDITORIAL_QUEUE_MESSAGE_EMPTY"
+      });
+    }
+    try {
+      return JSON.parse(trimmed);
+    } catch (error) {
+      const decoded = Buffer.from(trimmed, "base64").toString("utf8").trim();
+      if (decoded && decoded !== trimmed) {
+        return JSON.parse(decoded);
+      }
+      throw error;
+    }
+  }
+  if (message && typeof message === "object") {
+    if (message.kind) return message;
+    for (const key of ["messageText", "queueTrigger", "body", "data", "content"]) {
+      if (message[key]) return parseQueuedMessage(message[key]);
+    }
+  }
   throw Object.assign(new Error("Queued targeted editorial execution message is not JSON."), {
     safeCode: "TARGETED_EDITORIAL_QUEUE_MESSAGE_INVALID"
   });
