@@ -18,6 +18,7 @@ const {
   graphRequest,
   graphShareToken,
   calculateLineEditingChunkConcurrency,
+  parseNonNegativeInteger,
   invokeStageModelProvider,
   invokeSingleStageModelProvider,
   splitLineEditingSourceChunks,
@@ -30,6 +31,13 @@ const {
   evaluateTargetedEditorialExecution,
   runEditorialExecutionRuntime
 } = require("../src/editorial/editorialExecutionRuntime");
+
+test("parseNonNegativeInteger preserves numeric queue cursor values", () => {
+  assert.equal(parseNonNegativeInteger(1, 0), 1);
+  assert.equal(parseNonNegativeInteger("2", 0), 2);
+  assert.equal(parseNonNegativeInteger(0, 7), 0);
+  assert.equal(parseNonNegativeInteger("", 7), 7);
+});
 
 test("editorial execution runtime defines reusable executors for all required editorial stages", () => {
   assert.deepEqual(Object.keys(EXECUTOR_POLICIES).sort(), [
