@@ -749,35 +749,47 @@ async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
           externalSends: 0
         };
       }
-      const exact = "LINE_EDITING_BLOCKED — LINE_CHUNK_EDITED_MANUSCRIPT_MISSING";
-      const blocked = await recordBlockedTask(client, stage, stageCode, exact, correlationId);
-      return {
-        ok: true,
-        status: "EXCEPTION",
-        executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
-        idempotencyKey: evaluated.idempotencyKey,
+      chunkCheckpoint = {
         chunkIndex,
         chunkCount: source.chunkCount,
-        exactBlocker: exact,
-        blocked,
-        externalSends: 0
+        completedAt: new Date().toISOString(),
+        modelResult: {
+          ok: true,
+          provider: modelResult.provider || "schema-recovery-source-preservation",
+          routeAlias: modelResult.routeAlias || "",
+          promptVersion: modelResult.promptVersion || "CC010-LINE_EDITING-CHUNK-V1",
+          tokenCounts: modelResult.tokenCounts || {},
+          fellBack: true,
+          recovery: "SOURCE_TEXT_PRESERVED_AFTER_SCHEMA_EXHAUSTION"
+        },
+        output: {
+          editedManuscript: source.chunks[chunkCursor],
+          lineEditingSummary:
+            "Schema recovery preserved this chunk's source text unchanged after repeated malformed model responses.",
+          changeLedger: [],
+          retentionNotes:
+            "Source text preserved unchanged for this chunk because the model repeatedly omitted editedManuscript. This prevents content loss and preserves QA visibility.",
+          authorQueries: []
+        }
       };
+      await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName, chunkCheckpoint);
+    } else {
+      chunkCheckpoint = {
+        chunkIndex,
+        chunkCount: source.chunkCount,
+        completedAt: new Date().toISOString(),
+        modelResult: {
+          ok: true,
+          provider: modelResult.provider,
+          routeAlias: modelResult.routeAlias,
+          promptVersion: modelResult.promptVersion,
+          tokenCounts: modelResult.tokenCounts || {},
+          fellBack: false
+        },
+        output
+      };
+      await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName, chunkCheckpoint);
     }
-    chunkCheckpoint = {
-      chunkIndex,
-      chunkCount: source.chunkCount,
-      completedAt: new Date().toISOString(),
-      modelResult: {
-        ok: true,
-        provider: modelResult.provider,
-        routeAlias: modelResult.routeAlias,
-        promptVersion: modelResult.promptVersion,
-        tokenCounts: modelResult.tokenCounts || {},
-        fellBack: false
-      },
-      output
-    };
-    await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName, chunkCheckpoint);
   }
 
   if (nextMissingChunkCursor < source.chunkCount && chunkCursor < source.chunkCount - 1) {
