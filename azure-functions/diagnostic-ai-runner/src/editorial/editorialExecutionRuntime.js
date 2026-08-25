@@ -606,7 +606,7 @@ async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
   };
   await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, planName, plan);
 
-  const chunkCursor = Math.max(0, Math.min(source.chunkCount - 1, Number.parseInt(normalizeString(input.chunkCursor), 10) || 0));
+  const chunkCursor = Math.max(0, Math.min(source.chunkCount - 1, parseNonNegativeInteger(input.chunkCursor, 0)));
   const chunkIndex = chunkCursor + 1;
   const chunkName = `chunks/${String(chunkIndex).padStart(4, "0")}.json`;
   let chunkCheckpoint;
@@ -636,7 +636,7 @@ async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
       if (isRateLimitModelResult(modelResult)) {
         const retryAfterSeconds = Math.max(
           60,
-          Math.ceil(adaptiveLineEditingRetryDelayMs(modelResult, Number(input.chunkRetryAttempt || 0) + 1) / 1000)
+          Math.ceil(adaptiveLineEditingRetryDelayMs(modelResult, parseNonNegativeInteger(input.chunkRetryAttempt, 0) + 1) / 1000)
         );
         const queued = await enqueueTargetedEditorialChunk(queueClient, {
           ...input,
@@ -644,7 +644,7 @@ async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
           version: 1,
           chunked: true,
           chunkCursor,
-          chunkRetryAttempt: Number(input.chunkRetryAttempt || 0) + 1,
+          chunkRetryAttempt: parseNonNegativeInteger(input.chunkRetryAttempt, 0) + 1,
           executionMode: "EXECUTE"
         }, { visibilityTimeout: retryAfterSeconds });
         return {
@@ -933,6 +933,11 @@ function buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText
 function parsePositiveInteger(value, fallback) {
   const parsed = typeof value === "number" ? value : Number.parseInt(normalizeString(value), 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parseNonNegativeInteger(value, fallback = 0) {
+  const parsed = typeof value === "number" ? value : Number.parseInt(normalizeString(value), 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
 }
 
 function lineEditingChunkWordLimit() {
@@ -3254,6 +3259,7 @@ module.exports = {
   invokeStageModelProvider,
   invokeSingleStageModelProvider,
   calculateLineEditingChunkConcurrency,
+  parseNonNegativeInteger,
   splitLineEditingSourceChunks,
   buildLineEditingChunkPrompt,
   isLivePortfolioStage,
