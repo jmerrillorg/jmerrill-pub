@@ -1,7 +1,10 @@
 "use strict";
 
 const { QueueServiceClient } = require("@azure/storage-queue");
-const { runTargetedEditorialExecution } = require("./editorialExecutionRuntime");
+const {
+  runChunkedTargetedEditorialExecution,
+  runTargetedEditorialExecution
+} = require("./editorialExecutionRuntime");
 
 const DEFAULT_QUEUE_NAME = "jm1-targeted-editorial-execution";
 
@@ -100,7 +103,10 @@ async function processQueuedTargetedEditorialExecution(message, deps = {}) {
       safeCode: "TARGETED_EDITORIAL_QUEUE_MESSAGE_UNSUPPORTED"
     });
   }
-  const runner = deps.runTargetedEditorialExecution || runTargetedEditorialExecution;
+  const isLineEditing = normalizeString(parsed.stageCode).toUpperCase() === "LINE_EDITING";
+  const runner = isLineEditing
+    ? deps.runChunkedTargetedEditorialExecution || runChunkedTargetedEditorialExecution
+    : deps.runTargetedEditorialExecution || runTargetedEditorialExecution;
   return runner({
     titleId: parsed.titleId,
     stageCode: parsed.stageCode,
@@ -108,7 +114,10 @@ async function processQueuedTargetedEditorialExecution(message, deps = {}) {
     sourceChecksum: parsed.sourceChecksum,
     expectedCurrentStage: parsed.expectedCurrentStage,
     authorApprovalRequired: parsed.authorApprovalRequired === true,
-    executionMode: "EXECUTE"
+    executionMode: "EXECUTE",
+    chunked: parsed.chunked === true,
+    chunkCursor: parsed.chunkCursor,
+    chunkRetryAttempt: parsed.chunkRetryAttempt
   });
 }
 
