@@ -22,6 +22,12 @@ test("host.json queue trigger message encoding matches the raw JSON producer", (
   assert.equal(host.extensions?.queues?.messageEncoding, "none");
 });
 
+test("host.json gives long-form targeted editorial workers the Consumption ceiling", () => {
+  const host = JSON.parse(fs.readFileSync(path.join(projectRoot, "host.json"), "utf8"));
+
+  assert.equal(host.functionTimeout, "00:10:00");
+});
+
 test("package.json declares the storage queue dependency exactly once", () => {
   const packageJsonText = fs.readFileSync(path.join(projectRoot, "package.json"), "utf8");
   const queueDependencyOccurrences = packageJsonText.match(/"@azure\/storage-queue"/g) || [];
