@@ -3,6 +3,10 @@
 const { createHash } = require("node:crypto");
 const { getDataverseToken } = require("../dataverse/authorDraftPersistenceClient");
 const { AGENT_NAME, BAND_LEVEL, EXECUTION_STATUS } = require("../dataverse/metadataWriter");
+const {
+  DERIVED_VALUE,
+  resolveProductionAuthority
+} = require("./productionAuthorityResolver");
 
 const GATE_NAME = "JM1_FULL_WRAP_EXECUTOR_ENABLED";
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
@@ -113,13 +117,32 @@ function normalizeFullWrapInput(input = {}) {
     titleId: normalizeString(input.titleId),
     title: normalizeString(input.title),
     author: normalizeString(input.author),
+    genre: normalizeString(input.genre),
+    bookType: normalizeString(input.bookType),
+    productionProfile: normalizeString(input.productionProfile),
+    publicationIntent: normalizeString(input.publicationIntent),
+    titlePurpose: normalizeString(input.titlePurpose),
     trimSize: normalizeString(input.trimSize),
+    trimAuthority: normalizeString(input.trimAuthority),
+    pageCountAuthority: normalizeString(input.pageCountAuthority),
+    imprintAuthority: normalizeString(input.imprintAuthority),
+    backCoverCopyAuthority: normalizeString(input.backCoverCopyAuthority),
+    interiorColorMode: normalizeString(input.interiorColorMode),
+    paperColor: normalizeString(input.paperColor),
     paperStock: normalizeString(input.paperStock),
+    paperWeight: normalizeString(input.paperWeight),
+    paperbackFinish: normalizeString(input.paperbackFinish),
+    hardcoverConstruction: normalizeString(input.hardcoverConstruction),
+    hardcoverFinish: normalizeString(input.hardcoverFinish),
     pageCount: Number.isInteger(Number(input.pageCount)) ? Number(input.pageCount) : null,
     isbn: normalizeString(input.isbn),
     barcode: normalizeString(input.barcode),
     imprint: normalizeString(input.imprint),
     distributionPath: normalizeString(input.distributionPath),
+    isbnRequired: typeof input.isbnRequired === "boolean" ? input.isbnRequired : undefined,
+    barcodeRequired: typeof input.barcodeRequired === "boolean" ? input.barcodeRequired : undefined,
+    distributionRequired: typeof input.distributionRequired === "boolean" ? input.distributionRequired : undefined,
+    publicationLaunchRequired: typeof input.publicationLaunchRequired === "boolean" ? input.publicationLaunchRequired : undefined,
     backCoverCopy: normalizeString(input.backCoverCopy),
     sourceAssets,
     confirmFullWrapExecution: input.confirmFullWrapExecution === true
@@ -128,6 +151,7 @@ function normalizeFullWrapInput(input = {}) {
 
 function validateFullWrapInputs(input = {}) {
   const normalized = normalizeFullWrapInput(input);
+  const authority = resolveProductionAuthority(normalized);
   const missing = [];
   const invalid = [];
   if (!normalized.taskId || !GUID_PATTERN.test(normalized.taskId)) missing.push("TASK_ID");
@@ -138,12 +162,13 @@ function validateFullWrapInputs(input = {}) {
   if (!normalized.trimSize) missing.push("TRIM_SIZE");
   else if (!trim) invalid.push("TRIM_SIZE_UNPARSEABLE");
   if (!normalized.pageCount) missing.push("FINAL_PAGE_COUNT");
-  if (!normalized.paperStock) missing.push("PAPER_STOCK");
-  else if (!paperProfileFor(normalized.paperStock)) invalid.push("PAPER_STOCK_UNSUPPORTED");
-  if (!normalized.isbn) missing.push("ISBN");
-  if (!normalized.barcode) missing.push("BARCODE");
+  const resolvedPaperStock = normalized.paperStock || authority.selectable.paperStock.value;
+  if (!resolvedPaperStock) missing.push("PAPER_STOCK");
+  else if (!paperProfileFor(resolvedPaperStock)) invalid.push("PAPER_STOCK_UNSUPPORTED");
+  if (authority.commercial.isbnRequired && !normalized.isbn) missing.push("ISBN");
+  if (authority.commercial.barcodeRequired && !normalized.barcode) missing.push("BARCODE");
   if (!normalized.imprint) missing.push("IMPRINT");
-  if (!normalized.distributionPath) missing.push("DISTRIBUTION_PATH");
+  if (authority.commercial.distributionRequired && !normalized.distributionPath) missing.push("DISTRIBUTION_PATH");
   if (!normalized.backCoverCopy) missing.push("BACK_COVER_COPY");
   const assetTypes = new Set(normalized.sourceAssets.map((asset) => normalizeKey(asset.type)));
   if (!assetTypes.has("FRONT_COVER")) missing.push("FRONT_COVER_ASSET");
@@ -151,6 +176,7 @@ function validateFullWrapInputs(input = {}) {
   return {
     ok: missing.length === 0 && invalid.length === 0,
     normalized,
+    authority,
     missing,
     invalid
   };
@@ -160,11 +186,14 @@ function buildFullWrapSpec(input = {}) {
   const validation = validateFullWrapInputs(input);
   if (!validation.ok) return validation;
   const normalized = validation.normalized;
+  const authority = validation.authority;
   const trim = parseTrimSize(normalized.trimSize);
+  const resolvedPaperStock = normalized.paperStock || authority.selectable.paperStock.value;
   const spine = calculateSpineWidth({
     pageCount: normalized.pageCount,
-    paperStock: normalized.paperStock
+    paperStock: resolvedPaperStock
   });
+  const calculatedAt = new Date().toISOString();
   const dimensions = {
     trimWidthInches: trim.width,
     trimHeightInches: trim.height,
@@ -173,27 +202,69 @@ function buildFullWrapSpec(input = {}) {
     fullWrapWidthInches: roundInches((trim.width * 2) + spine.inches + (BLEED_INCHES * 2)),
     fullWrapHeightInches: roundInches(trim.height + (BLEED_INCHES * 2))
   };
+  authority.derived = {
+    spineWidth: {
+      attribute: "spineWidth",
+      value: String(spine.inches),
+      authoritySource: DERIVED_VALUE,
+      sourceRecord: "finalPageCount+paperProfile",
+      sourceArtifact: authority.lifecycleAuthorities.finalPageCount.sourceArtifact,
+      sourceTimestamp: null,
+      resolvedAt: calculatedAt,
+      calculation: `${normalized.pageCount} pages * ${spine.paperProfile.spineInchesPerPage} inches/page`
+    },
+    fullWrapDimensions: {
+      attribute: "fullWrapDimensions",
+      value: `${dimensions.fullWrapWidthInches} x ${dimensions.fullWrapHeightInches}`,
+      authoritySource: DERIVED_VALUE,
+      sourceRecord: "trim+spine+bleed",
+      sourceArtifact: null,
+      sourceTimestamp: null,
+      resolvedAt: calculatedAt
+    }
+  };
   const spec = {
     artifactType: "JMP_FULL_WRAP_WORKING_SPEC",
-    version: "1.0",
+    version: "1.1",
     titleId: normalized.titleId,
     taskId: normalized.taskId,
     title: normalized.title,
     author: normalized.author,
+    titlePurpose: normalized.titlePurpose || null,
+    publicationIntent: authority.publicationIntent,
     imprint: normalized.imprint,
-    isbn: normalized.isbn,
-    barcode: normalized.barcode,
-    distributionPath: normalized.distributionPath,
+    commercialMetadata: {
+      isbnRequired: authority.commercial.isbnRequired,
+      isbn: authority.commercial.isbnRequired ? normalized.isbn : null,
+      barcodeRequired: authority.commercial.barcodeRequired,
+      barcode: authority.commercial.barcodeRequired ? normalized.barcode : null,
+      distributionRequired: authority.commercial.distributionRequired,
+      distributionPath: authority.commercial.distributionRequired ? normalized.distributionPath : null,
+      publicationLaunchRequired: authority.commercial.publicationLaunchRequired,
+      authority: authority.commercial.commercialMetadataAuthority
+    },
     pageCount: normalized.pageCount,
     trimSize: trim.label,
     paperProfile: spine.paperProfile,
+    resolvedProductionAttributes: {
+      interiorColorMode: authority.selectable.interiorColorMode,
+      paperColor: authority.selectable.paperColor,
+      paperStock: authority.selectable.paperStock,
+      paperWeight: authority.selectable.paperWeight,
+      paperbackFinish: authority.selectable.paperbackFinish,
+      hardcoverConstruction: authority.selectable.hardcoverConstruction,
+      hardcoverFinish: authority.selectable.hardcoverFinish
+    },
+    productionProfile: authority.profile,
+    authorityProvenance: authority,
     dimensions,
     sourceAssets: normalized.sourceAssets,
     backCoverCopy: normalized.backCoverCopy,
     constraints: [
       "Preserve source front-cover and interior-proof assets.",
-      "Reserve distributor barcode zone.",
+      ...(authority.commercial.barcodeRequired ? ["Reserve distributor barcode zone."] : ["Do not create barcode placeholder for non-release/commissioning cover."]),
       "Do not advance release, distribution, or author approval from this artifact alone.",
+      ...(authority.commercial.distributionRequired ? [] : ["Do not create distribution submission or publication launch for non-release/commissioning title."]),
       "Validate final printer/distributor template before final production cover approval."
     ]
   };
