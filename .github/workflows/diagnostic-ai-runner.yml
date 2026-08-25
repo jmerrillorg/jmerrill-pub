@@ -294,7 +294,8 @@ jobs:
             run-stage0-diagnostic \
             run-payment-option-commercial-continuation \
             run-governed-agreement-generation \
-            run-manual-signature-handoff; do
+            run-manual-signature-handoff \
+            run-full-wrap-executor; do
             status="$(curl --silent --show-error --max-time 30 \
               --output "$RUNNER_TEMP/${route}-probe.json" \
               --write-out "%{http_code}" \
@@ -393,7 +394,9 @@ jobs:
           fi
           package_blob_name="$(python3 -c "import json; print(json.load(open('$lkg_path'))['artifactBlobName'])")"
           source_sha="$(python3 -c "import json; print(json.load(open('$lkg_path'))['sourceSha'])")"
-          expiry="$(date -u -d '+6 days' +%Y-%m-%dT%H:%MZ)"
+          # WEBSITE_RUN_FROM_PACKAGE reads the package URL after rollback, so
+          # the package SAS must outlive a short incident window.
+          expiry="$(date -u -d '+3650 days' +%Y-%m-%dT%H:%MZ)"
           sas="$(az storage blob generate-sas \
             --account-name "$DEPLOYMENT_STORAGE_ACCOUNT" \
             --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \

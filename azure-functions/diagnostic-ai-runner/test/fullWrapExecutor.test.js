@@ -21,7 +21,7 @@ function completeInput(overrides = {}) {
     author: "Jackie Smith Jr",
     trimSize: "6 x 9",
     paperStock: "55_CREAM",
-    pageCount: 393,
+    pageCount: 275,
     isbn: "9780000000000",
     barcode: "barcode://9780000000000",
     imprint: "J Merrill Publishing",
@@ -70,15 +70,15 @@ test("Full Wrap validation fails closed when production dimensions and barcode a
 });
 
 test("Full Wrap geometry uses final page count, trim, paper profile, and bleed", () => {
-  const spine = calculateSpineWidth({ pageCount: 393, paperStock: "55 lb cream" });
+  const spine = calculateSpineWidth({ pageCount: 275, paperStock: "55 lb cream" });
 
-  assert.equal(spine.inches, 0.9825);
+  assert.equal(spine.inches, 0.6875);
   assert.equal(spine.paperProfile.key, "55_CREAM");
 
   const result = buildFullWrapSpec(completeInput());
   assert.equal(result.ok, true);
   assert.equal(result.spec.dimensions.bleedInches, BLEED_INCHES);
-  assert.equal(result.spec.dimensions.fullWrapWidthInches, 13.2325);
+  assert.equal(result.spec.dimensions.fullWrapWidthInches, 12.9375);
   assert.equal(result.spec.dimensions.fullWrapHeightInches, 9.25);
   assert.match(result.checksum, /^[0-9a-f]{64}$/);
 });
@@ -107,7 +107,7 @@ test("Full Wrap execution logs blocked missing input without advancing lifecycle
       titleId: TITLE_ID,
       title: "The Intentional Leader",
       author: "Jackie Smith Jr",
-      pageCount: 393,
+      pageCount: 275,
       imprint: "J Merrill Publishing"
     }),
     dataverseRequest: async (_api, _token, path, options = {}) => {
