@@ -1,0 +1,41 @@
+[
+  {
+    "name": "jm1-editorial-devline-primary",
+    "model": {
+      "callRateLimit": null,
+      "format": "Anthropic",
+      "name": "claude-sonnet-5",
+      "publisher": null,
+      "source": null,
+      "sourceAccount": null,
+      "version": "2"
+    },
+    "sku": {
+      "capacity": 25,
+      "family": null,
+      "name": "GlobalStandard",
+      "size": null,
+      "tier": null
+    },
+    "rateLimits": [
+      {
+        "count": 25,
+        "dynamicThrottlingEnabled": null,
+        "key": "request",
+        "matchPatterns": null,
+        "minCount": null,
+        "renewalPeriod": 60
+      },
+      {
+        "count": 25000,
+        "dynamicThrottlingEnabled": null,
+        "key": "token",
+        "matchPatterns": null,
+        "minCount": null,
+        "renewalPeriod": 60
+      }
+    ],
+    "provisioningState": "Succeeded",
+    "currentCapacity": 25
+  }
+]

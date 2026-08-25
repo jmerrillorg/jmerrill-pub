@@ -1,0 +1,72 @@
+[
+  {
+    "etag": "\"2c04691f-c7b1-4769-a19b-84a4205f357b\"",
+    "id": "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-ai/providers/Microsoft.CognitiveServices/accounts/ais-jm1-foundry/deployments/jm1-editorial-devline-primary",
+    "name": "jm1-editorial-devline-primary",
+    "properties": {
+      "callRateLimit": null,
+      "capabilities": {
+        "agentsV2": "true",
+        "chatCompletion": "true"
+      },
+      "capacitySettings": null,
+      "currentCapacity": 25,
+      "deploymentState": "Running",
+      "dynamicThrottlingEnabled": null,
+      "model": {
+        "callRateLimit": null,
+        "format": "Anthropic",
+        "name": "claude-sonnet-5",
+        "publisher": null,
+        "source": null,
+        "sourceAccount": null,
+        "version": "2"
+      },
+      "parentDeploymentName": null,
+      "provisioningState": "Succeeded",
+      "raiPolicyName": "Microsoft.DefaultV2",
+      "rateLimits": [
+        {
+          "count": 25.0,
+          "dynamicThrottlingEnabled": null,
+          "key": "request",
+          "matchPatterns": null,
+          "minCount": null,
+          "renewalPeriod": 60.0
+        },
+        {
+          "count": 25000.0,
+          "dynamicThrottlingEnabled": null,
+          "key": "token",
+          "matchPatterns": null,
+          "minCount": null,
+          "renewalPeriod": 60.0
+        }
+      ],
+      "routing": null,
+      "scaleSettings": null,
+      "serviceTier": null,
+      "speculativeDecoding": null,
+      "spilloverDeploymentName": null,
+      "versionUpgradeOption": "OnceNewDefaultVersionAvailable"
+    },
+    "resourceGroup": "rg-jm1-ai",
+    "sku": {
+      "capacity": 25,
+      "family": null,
+      "name": "GlobalStandard",
+      "size": null,
+      "tier": null
+    },
+    "systemData": {
+      "createdAt": "2026-08-14T01:05:38.188871+00:00",
+      "createdBy": "jm1-admin@jmerrill.one",
+      "createdByType": "User",
+      "lastModifiedAt": "2026-08-14T01:05:38.188871+00:00",
+      "lastModifiedBy": "jm1-admin@jmerrill.one",
+      "lastModifiedByType": "User"
+    },
+    "tags": null,
+    "type": "Microsoft.CognitiveServices/accounts/deployments"
+  }
+]

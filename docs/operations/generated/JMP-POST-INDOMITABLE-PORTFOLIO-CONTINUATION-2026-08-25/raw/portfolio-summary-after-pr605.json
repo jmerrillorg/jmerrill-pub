@@ -1,0 +1,40 @@
+{
+  "generatedOn": "2026-08-25T07:33:11.644Z",
+  "counts": {
+    "titles": 361,
+    "intakes": 31,
+    "opportunities": 6,
+    "authorProfiles": 55,
+    "stages": 33,
+    "gates": 18,
+    "artifacts": 120,
+    "productionProjects": 2,
+    "productionTasks": 9,
+    "logsRead": 500
+  },
+  "recordsEvaluated": 424,
+  "summary": {
+    "systemAttentionBefore": 251,
+    "systemAttentionAfter": 0,
+    "genericSystemAttention": 0,
+    "autoExecutableBefore": 1,
+    "autoExecutableAfter": 3,
+    "automaticallyQueued": 0,
+    "automaticallyResumed": 0,
+    "retries": 0,
+    "operatorTasks": 250,
+    "successfulCompletions": 0,
+    "escalations": 0,
+    "unexplainedIdle": 0,
+    "staleDetected": 145,
+    "automaticallyRecovered": 253,
+    "humanWait": 257,
+    "mutations": 0
+  },
+  "waitingDistribution": {
+    "TERMINAL": 164,
+    "WAITING_ON_JMP": 250,
+    "WAITING_ON_AUTHOR": 7,
+    "AUTO_EXECUTABLE": 3
+  }
+}
