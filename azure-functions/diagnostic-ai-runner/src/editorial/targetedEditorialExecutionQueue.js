@@ -1,6 +1,6 @@
 "use strict";
 
-const { QueueClient } = require("@azure/storage-queue");
+const { QueueServiceClient } = require("@azure/storage-queue");
 const { runTargetedEditorialExecution } = require("./editorialExecutionRuntime");
 
 const DEFAULT_QUEUE_NAME = "jm1-targeted-editorial-execution";
@@ -21,7 +21,7 @@ function createQueueClient(deps = {}) {
       safeCode: "TARGETED_EDITORIAL_QUEUE_STORAGE_MISSING"
     });
   }
-  return QueueClient.fromConnectionString(connectionString, queueName());
+  return QueueServiceClient.fromConnectionString(connectionString).getQueueClient(queueName());
 }
 
 function buildQueuedTargetedEditorialExecutionMessage(input = {}, evaluated = {}) {
