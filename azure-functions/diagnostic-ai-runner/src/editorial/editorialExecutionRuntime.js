@@ -2,6 +2,8 @@
 
 const crypto = require("node:crypto");
 const { ClientSecretCredential, DefaultAzureCredential } = require("@azure/identity");
+const { BlobServiceClient } = require("@azure/storage-blob");
+const { QueueServiceClient } = require("@azure/storage-queue");
 const { Document, Packer, Paragraph, TextRun, HeadingLevel } = require("docx");
 const mammoth = require("mammoth");
 const { routeToProvider } = require("../model/providerRouter");
@@ -56,6 +58,9 @@ const DEFAULT_LINE_EDITING_CHUNK_MAX_OUTPUT_TOKENS = 2000;
 const DEFAULT_LINE_EDITING_ADAPTIVE_MAX_RETRIES = 2;
 const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS = 5000;
 const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_MAX_MS = 120000;
+const DEFAULT_TARGETED_EDITORIAL_QUEUE_NAME = "jm1-targeted-editorial-execution";
+const DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_CONTAINER = "publishing";
+const DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_PREFIX = "targeted-editorial-execution";
 
 const EXECUTOR_POLICIES = {
   EDITORIAL_REVIEW: {
@@ -434,6 +439,374 @@ async function runTargetedEditorialExecution(input = {}, deps = {}) {
   };
 }
 
+function buildChunkedLineEditingInvocation(chunkCheckpoints = []) {
+  const ordered = chunkCheckpoints
+    .slice()
+    .sort((left, right) => Number(left.chunkIndex || 0) - Number(right.chunkIndex || 0));
+  const tokenCounts = { input: 0, output: 0, total: 0 };
+  for (const item of ordered) {
+    tokenCounts.input += item.modelResult?.tokenCounts?.input || 0;
+    tokenCounts.output += item.modelResult?.tokenCounts?.output || 0;
+    tokenCounts.total += item.modelResult?.tokenCounts?.total || 0;
+  }
+  const first = ordered.find((item) => item.modelResult)?.modelResult || {};
+  return {
+    ...first,
+    ok: true,
+    fellBack: false,
+    tokenCounts,
+    output: {
+      editedManuscript: ordered.map((item) => normalizeString(item.output?.editedManuscript)).join("\n\n"),
+      lineEditingSummary: ordered
+        .map((item) => `Chunk ${item.chunkIndex}: ${normalizeString(item.output?.lineEditingSummary) || "Line editing completed."}`)
+        .join("\n"),
+      retentionNotes: ordered
+        .map((item) => `Chunk ${item.chunkIndex}: ${normalizeString(item.output?.retentionNotes) || "Source content retained."}`)
+        .join("\n"),
+      changeLedger: ordered.flatMap((item) => {
+        const entries = Array.isArray(item.output?.changeLedger) ? item.output.changeLedger : [];
+        return entries.length
+          ? entries.map((entry) => `Chunk ${item.chunkIndex}: ${entry}`)
+          : [`Chunk ${item.chunkIndex}: No recurring line-editing pattern separately reported.`];
+      }),
+      authorQueries: ordered.flatMap((item) => {
+        const entries = Array.isArray(item.output?.authorQueries) ? item.output.authorQueries : [];
+        return entries.map((entry) => `Chunk ${item.chunkIndex}: ${entry}`);
+      })
+    },
+    chunkCount: ordered.length,
+    scheduler: {
+      mode: "durable_queue_checkpoint",
+      chunkInvocations: ordered.length,
+      maxChunksPerInvocation: 1
+    },
+    promptVersion: "CC010-LINE_EDITING-CHUNK-V1"
+  };
+}
+
+async function loadTargetedLineEditingSource(stage, sourceArtifact, upstream, correlationId) {
+  const sourceRef = await resolveSourceGraphItem(sourceArtifact, "LINE_EDITING");
+  const sourceBuffer = await graphRequest(sourceRef.contentPath).catch((error) => {
+    throw Object.assign(error, {
+      safeCode: `LINE_EDITING_BLOCKED — ${error.safeCode || "GRAPH_DOWNLOAD_FAILED"}`,
+      graphDetail: graphFailureDetail(error, sourceArtifact)
+    });
+  });
+  const actualSha = crypto.createHash("sha256").update(sourceBuffer).digest("hex");
+  const expectedSha = normalizeString(sourceArtifact.jm1pub_sha256);
+  if (expectedSha && actualSha !== expectedSha) {
+    throw Object.assign(new Error("Source checksum mismatch"), {
+      safeCode: "LINE_EDITING_BLOCKED — SOURCE_CHECKSUM_MISMATCH"
+    });
+  }
+  const extracted = await extractSourceText(sourceBuffer, "LINE_EDITING");
+  const sourceText = extracted.value || "";
+  const chunks = splitLineEditingSourceChunks(sourceText);
+  return {
+    sourceSha256: actualSha,
+    totalWordCount: summarizeExtractedText(sourceText).words,
+    chunkWordLimit: lineEditingChunkWordLimit(),
+    chunkCount: chunks.length,
+    chunks,
+    upstreamSummary: summarizeUpstreamContextForPrompt(stage, "LINE_EDITING", sourceArtifact, upstream || {}),
+    correlationId
+  };
+}
+
+async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
+  const evaluated = await evaluateTargetedEditorialExecution(input, deps);
+  if (!evaluated.ok) return evaluated;
+  if (evaluated.executionMode === TARGETED_EXECUTION_MODES.DRY_RUN) {
+    const { stage, sourceArtifact, upstream, ...safe } = evaluated;
+    return { ...safe, mutationsPerformed: 0, externalSends: 0 };
+  }
+  if (evaluated.targetStage !== "LINE_EDITING") {
+    return runTargetedEditorialExecution(input, deps);
+  }
+
+  const client = deps.client || createDataverseClient(requireDataverseConfig(), deps);
+  const { checkpointStore, queueClient } = createStorageClients(deps);
+  const correlationId = `TARGETED-${evaluated.idempotencyKey}`;
+  const stage = evaluated.stage;
+  const stageCode = "LINE_EDITING";
+  const sourceArtifact = evaluated.sourceArtifact;
+  const completeName = "complete.json";
+  if (await checkpointExists(checkpointStore, evaluated.idempotencyKey, completeName)) {
+    return {
+      ok: true,
+      status: "OUTPUT_ALREADY_RECORDED",
+      executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+      idempotencyKey: evaluated.idempotencyKey,
+      canonicalTitle: evaluated.canonicalTitle,
+      currentStage: evaluated.currentStage,
+      exactSourceArtifact: evaluated.exactSourceArtifact,
+      checkpoint: await downloadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, completeName),
+      externalSends: 0
+    };
+  }
+
+  const commissioned = await recordRuntimeCommissioned(client, stageCode, correlationId);
+  const claim = await claimStageTask(client, stage, stageCode, correlationId);
+  const exactBlocker = buildExactBlocker(stageCode, sourceArtifact);
+  if (exactBlocker) {
+    const blocked = await recordBlockedTask(client, stage, stageCode, exactBlocker, correlationId);
+    return {
+      ok: true,
+      status: "EXCEPTION",
+      executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+      idempotencyKey: evaluated.idempotencyKey,
+      exactBlocker,
+      claim,
+      blocked,
+      externalSends: 0
+    };
+  }
+  await recordSourceExecutionReadiness(client, stage, stageCode, sourceArtifact, correlationId);
+  await recordLegacyOutputScopeClarification(client, stage, stageCode, sourceArtifact, correlationId);
+
+  const outputReadyVersion = "v4";
+  const outputIdempotencyKey = `editorial-runtime:output-ready-${outputReadyVersion}:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
+  const existing = await findExecutionLog(client, "ACTIVE_EDITORIAL_OUTPUT_CREATED", outputIdempotencyKey);
+  if (existing) {
+    const existingOutputs = await findExistingOutputArtifacts(client, stage, stageCode);
+    const reviewArtifact = selectPrimaryAuthorReviewArtifact(existingOutputs, null);
+    const authorGate = reviewArtifact
+      ? await createAuthorReviewGate(client, stage, stageCode, reviewArtifact, correlationId)
+      : { ok: false, reason: "AUTHOR_REVIEW_ARTIFACT_BINDING_MISSING" };
+    const checkpoint = await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, completeName, {
+      completedAt: new Date().toISOString(),
+      status: "OUTPUT_ALREADY_RECORDED",
+      sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+      authorGate
+    });
+    return {
+      ok: true,
+      status: "OUTPUT_ALREADY_RECORDED",
+      executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+      idempotencyKey: evaluated.idempotencyKey,
+      checkpoint,
+      authorGate,
+      externalSends: 0
+    };
+  }
+
+  const source = await loadTargetedLineEditingSource(stage, sourceArtifact, evaluated.upstream, correlationId);
+  const planName = "plan.json";
+  const plan = {
+    idempotencyKey: evaluated.idempotencyKey,
+    titleId: evaluated.canonicalTitle.titleId,
+    stageId: evaluated.currentStage.stageId,
+    stageCode,
+    sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+    sourceSha256: source.sourceSha256,
+    chunkCount: source.chunkCount,
+    chunkWordLimit: source.chunkWordLimit,
+    totalWordCount: source.totalWordCount,
+    createdAt: new Date().toISOString()
+  };
+  await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, planName, plan);
+
+  const chunkCursor = Math.max(0, Math.min(source.chunkCount - 1, Number.parseInt(normalizeString(input.chunkCursor), 10) || 0));
+  const chunkIndex = chunkCursor + 1;
+  const chunkName = `chunks/${String(chunkIndex).padStart(4, "0")}.json`;
+  let chunkCheckpoint;
+  if (await checkpointExists(checkpointStore, evaluated.idempotencyKey, chunkName)) {
+    chunkCheckpoint = await downloadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName);
+  } else {
+    const modelResult = await invokeSingleStageModelProvider({
+      stage,
+      stageCode,
+      sourceArtifact,
+      extractedText: source.chunks[chunkCursor],
+      correlationId: `${correlationId}:chunk-${chunkIndex}-of-${source.chunkCount}`,
+      upstreamContext: evaluated.upstream,
+      promptBody: buildLineEditingChunkPrompt({
+        stage,
+        sourceArtifact,
+        chunkText: source.chunks[chunkCursor],
+        chunkIndex,
+        chunkCount: source.chunkCount,
+        totalWordCount: source.totalWordCount,
+        upstreamContext: evaluated.upstream
+      }),
+      diagnosticId: `${normalizeString(stage._jm1pub_titleid_value) || normalizeString(stage.jm1pub_editorialstageid)}:line-chunk-${chunkIndex}`,
+      promptVersion: "CC010-LINE_EDITING-CHUNK-V1"
+    });
+    if (!modelResult.ok || modelResult.fellBack) {
+      if (isRateLimitModelResult(modelResult)) {
+        const retryAfterSeconds = Math.max(
+          60,
+          Math.ceil(adaptiveLineEditingRetryDelayMs(modelResult, Number(input.chunkRetryAttempt || 0) + 1) / 1000)
+        );
+        const queued = await enqueueTargetedEditorialChunk(queueClient, {
+          ...input,
+          kind: "TARGETED_EDITORIAL_EXECUTION",
+          version: 1,
+          chunked: true,
+          chunkCursor,
+          chunkRetryAttempt: Number(input.chunkRetryAttempt || 0) + 1,
+          executionMode: "EXECUTE"
+        }, { visibilityTimeout: retryAfterSeconds });
+        return {
+          ok: true,
+          status: "CHUNK_REQUEUED_AFTER_RATE_LIMIT",
+          executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+          idempotencyKey: evaluated.idempotencyKey,
+          chunkIndex,
+          chunkCount: source.chunkCount,
+          retryAfterSeconds,
+          queued,
+          externalSends: 0
+        };
+      }
+      const exact = `LINE_EDITING_BLOCKED — ${safeBlockerReason(modelResult.error, "MODEL_INVOCATION_FAILED")}`;
+      const blocked = await recordBlockedTask(client, stage, stageCode, exact, correlationId);
+      return {
+        ok: true,
+        status: "EXCEPTION",
+        executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+        idempotencyKey: evaluated.idempotencyKey,
+        chunkIndex,
+        chunkCount: source.chunkCount,
+        exactBlocker: exact,
+        blocked,
+        externalSends: 0
+      };
+    }
+    const output = lineEditingOutput(modelResult);
+    if (!output.editedManuscript) {
+      const exact = "LINE_EDITING_BLOCKED — LINE_CHUNK_EDITED_MANUSCRIPT_MISSING";
+      const blocked = await recordBlockedTask(client, stage, stageCode, exact, correlationId);
+      return {
+        ok: true,
+        status: "EXCEPTION",
+        executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+        idempotencyKey: evaluated.idempotencyKey,
+        chunkIndex,
+        chunkCount: source.chunkCount,
+        exactBlocker: exact,
+        blocked,
+        externalSends: 0
+      };
+    }
+    chunkCheckpoint = {
+      chunkIndex,
+      chunkCount: source.chunkCount,
+      completedAt: new Date().toISOString(),
+      modelResult: {
+        ok: true,
+        provider: modelResult.provider,
+        routeAlias: modelResult.routeAlias,
+        promptVersion: modelResult.promptVersion,
+        tokenCounts: modelResult.tokenCounts || {},
+        fellBack: false
+      },
+      output
+    };
+    await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName, chunkCheckpoint);
+  }
+
+  if (chunkCursor < source.chunkCount - 1) {
+    const queued = await enqueueTargetedEditorialChunk(queueClient, {
+      ...input,
+      kind: "TARGETED_EDITORIAL_EXECUTION",
+      version: 1,
+      chunked: true,
+      chunkCursor: chunkCursor + 1,
+      chunkRetryAttempt: 0,
+      executionMode: "EXECUTE"
+    });
+    return {
+      ok: true,
+      status: "CHUNK_COMPLETED_REQUEUED_NEXT",
+      executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+      idempotencyKey: evaluated.idempotencyKey,
+      chunkIndex,
+      chunkCount: source.chunkCount,
+      chunkCheckpoint: {
+        completedAt: chunkCheckpoint.completedAt,
+        modelProvider: chunkCheckpoint.modelResult?.provider || "",
+        routeAlias: chunkCheckpoint.modelResult?.routeAlias || ""
+      },
+      queued,
+      externalSends: 0
+    };
+  }
+
+  const checkpoints = [];
+  for (let index = 1; index <= source.chunkCount; index += 1) {
+    checkpoints.push(await downloadJsonCheckpoint(
+      checkpointStore,
+      evaluated.idempotencyKey,
+      `chunks/${String(index).padStart(4, "0")}.json`
+    ));
+  }
+  const modelInvocation = buildChunkedLineEditingInvocation(checkpoints);
+  let outputs;
+  try {
+    outputs = await materializeEditorialOutputs(
+      client,
+      stage,
+      stageCode,
+      sourceArtifact,
+      correlationId,
+      evaluated.upstream,
+      { modelInvocation }
+    );
+  } catch (error) {
+    const exact = error.safeCode || "LINE_EDITING_BLOCKED — OUTPUT_MATERIALIZATION_FAILED";
+    const diagnostics = await recordRejectedLineOutputDiagnostics(client, stage, stageCode, sourceArtifact, error, correlationId);
+    const blocked = await recordBlockedTask(client, stage, stageCode, exact, correlationId);
+    return {
+      ok: true,
+      status: "EXCEPTION",
+      executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+      idempotencyKey: evaluated.idempotencyKey,
+      exactBlocker: exact,
+      diagnostics,
+      blocked,
+      externalSends: 0
+    };
+  }
+  const finalized = await finalizeMaterializedEditorialOutputs(client, stage, stageCode, sourceArtifact, outputs, correlationId);
+  const completion = {
+    completedAt: new Date().toISOString(),
+    status: "EXECUTED",
+    sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+    outputCount: outputs.length,
+    outputArtifacts: outputs.map((item) => ({
+      outputName: item.outputName,
+      artifactId: item.artifactId,
+      sha256: item.sha256
+    })),
+    packageHandoff: finalized.packageHandoff || null
+  };
+  const checkpoint = await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, completeName, completion);
+  return {
+    ok: true,
+    status: "EXECUTED",
+    executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+    idempotencyKey: evaluated.idempotencyKey,
+    canonicalTitle: evaluated.canonicalTitle,
+    currentStage: evaluated.currentStage,
+    exactSourceArtifact: evaluated.exactSourceArtifact,
+    commissioned,
+    claim,
+    chunkCount: source.chunkCount,
+    checkpoint,
+    result: {
+      stageId: stage.jm1pub_editorialstageid,
+      titleId: stage._jm1pub_titleid_value,
+      stageCode,
+      status: "VALIDATING",
+      sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+      outputs,
+      ...finalized
+    },
+    externalSends: 0
+  };
+}
+
 function compactPromptText(value, maxLength = 1200) {
   const text = normalizeString(value).replace(/\s+/g, " ");
   if (text.length <= maxLength) return text;
@@ -686,6 +1059,86 @@ function adaptiveLineEditingRetryDelayMs(result, retryAttempt) {
 
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function targetedEditorialCheckpointContainerName() {
+  return normalizeString(process.env.JM1_TARGETED_EDITORIAL_CHECKPOINT_CONTAINER) ||
+    DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_CONTAINER;
+}
+
+function targetedEditorialCheckpointPrefix() {
+  return normalizeString(process.env.JM1_TARGETED_EDITORIAL_CHECKPOINT_PREFIX) ||
+    DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_PREFIX;
+}
+
+function targetedEditorialQueueName() {
+  return normalizeString(process.env.JM1_TARGETED_EDITORIAL_EXECUTION_QUEUE_NAME) ||
+    DEFAULT_TARGETED_EDITORIAL_QUEUE_NAME;
+}
+
+function createStorageClients(deps = {}) {
+  if (deps.checkpointStore && deps.queueClient) return deps;
+  const connectionString = normalizeString(process.env.AzureWebJobsStorage);
+  if (!connectionString && (!deps.checkpointStore || !deps.queueClient)) {
+    throw Object.assign(new Error("AzureWebJobsStorage is required for targeted editorial chunk checkpoints."), {
+      safeCode: "TARGETED_EDITORIAL_CHECKPOINT_STORAGE_MISSING"
+    });
+  }
+  const blobServiceClient = deps.blobServiceClient || BlobServiceClient.fromConnectionString(connectionString);
+  const queueServiceClient = deps.queueServiceClient || QueueServiceClient.fromConnectionString(connectionString);
+  return {
+    checkpointStore:
+      deps.checkpointStore ||
+      blobServiceClient.getContainerClient(targetedEditorialCheckpointContainerName()),
+    queueClient:
+      deps.queueClient ||
+      queueServiceClient.getQueueClient(targetedEditorialQueueName())
+  };
+}
+
+function targetedEditorialCheckpointBlobName(idempotencyKey, name) {
+  return [
+    targetedEditorialCheckpointPrefix().replace(/^\/+|\/+$/g, ""),
+    normalizeString(idempotencyKey),
+    name.replace(/^\/+/, "")
+  ].join("/");
+}
+
+async function uploadJsonCheckpoint(store, idempotencyKey, name, value) {
+  if (typeof store.createIfNotExists === "function") await store.createIfNotExists();
+  const blob = store.getBlockBlobClient(targetedEditorialCheckpointBlobName(idempotencyKey, name));
+  const body = Buffer.from(JSON.stringify(value, null, 2), "utf8");
+  if (typeof blob.exists === "function" && await blob.exists()) {
+    return { blobName: blob.name, sha256: crypto.createHash("sha256").update(body).digest("hex"), bytes: body.length, existed: true };
+  }
+  await blob.uploadData(body, {
+    blobHTTPHeaders: { blobContentType: "application/json" }
+  });
+  return { blobName: blob.name, sha256: crypto.createHash("sha256").update(body).digest("hex"), bytes: body.length };
+}
+
+async function downloadJsonCheckpoint(store, idempotencyKey, name) {
+  const blob = store.getBlockBlobClient(targetedEditorialCheckpointBlobName(idempotencyKey, name));
+  const buffer = await blob.downloadToBuffer();
+  return JSON.parse(buffer.toString("utf8"));
+}
+
+async function checkpointExists(store, idempotencyKey, name) {
+  const blob = store.getBlockBlobClient(targetedEditorialCheckpointBlobName(idempotencyKey, name));
+  return blob.exists();
+}
+
+async function enqueueTargetedEditorialChunk(queueClient, message, options = {}) {
+  if (typeof queueClient.createIfNotExists === "function") await queueClient.createIfNotExists();
+  const sendOptions = {};
+  if (Number.isFinite(Number(options.visibilityTimeout))) {
+    sendOptions.visibilityTimeout = Number(options.visibilityTimeout);
+  }
+  const result = await queueClient.sendMessage(JSON.stringify(message), sendOptions);
+  return {
+    messageId: result?.messageId || result?.messageID || null,
+    insertedOn: result?.insertedOn || null
+  };
 }
 
 function buildLineEditingChunkPrompt({
@@ -2074,7 +2527,15 @@ function buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extra
   ].join("\n");
 }
 
-async function materializeEditorialOutputs(client, stage, stageCode, sourceArtifact, correlationId, upstreamContext = null) {
+async function materializeEditorialOutputs(
+  client,
+  stage,
+  stageCode,
+  sourceArtifact,
+  correlationId,
+  upstreamContext = null,
+  options = {}
+) {
   const sourceRef = await resolveSourceGraphItem(sourceArtifact, stageCode);
   const driveId = sourceRef.driveId;
   const sourceItem = sourceRef.item;
@@ -2098,7 +2559,7 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
     });
   }
   const extracted = await extractSourceText(sourceBuffer, stageCode);
-  const modelInvocation = await invokeStageModelProvider(
+  const modelInvocation = options.modelInvocation || await invokeStageModelProvider(
     stage,
     stageCode,
     sourceArtifact,
@@ -2207,6 +2668,61 @@ async function materializeEditorialOutputs(client, stage, stageCode, sourceArtif
     fellBack: Boolean(modelInvocation.fellBack)
   };
   return outputs;
+}
+
+async function finalizeMaterializedEditorialOutputs(client, stage, stageCode, sourceArtifact, outputs, correlationId) {
+  await client.patch("jm1pub_editorialstages", stage.jm1pub_editorialstageid, {
+    jm1pub_internaloperationalsummary:
+      `${stageCode === "EDITORIAL_REVIEW" ? "PACKAGE_PREPARATION" : "EXECUTING"}: JM1 Automation created governed ${stageCode} output artifacts from checksum-validated source ${sourceArtifact.jm1pub_editorialartifactid}. QA evidence registered. Package release remains gated by stage completion, cadence, and canonical Package Engine policy.`,
+    jm1pub_authorsafesummary: "Editorial work is in progress internally. No author action is required at this time."
+  });
+  const outputReadyVersion = stageCode === "EDITORIAL_REVIEW" ? "v5" : "v4";
+  const idempotencyKey = `editorial-runtime:output-ready-${outputReadyVersion}:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
+  const outputLogId = await writeLog(client, {
+    name: `ACTIVE_EDITORIAL_OUTPUT_CREATED - ${stage.jm1pub_name}`,
+    actionType: "ACTIVE_EDITORIAL_OUTPUT_CREATED",
+    description:
+      `${stageCode} produced governed output artifacts: ${outputs.map((item) => `${item.outputName} ${item.artifactId}`).join("; ")}. ` +
+      `Model route ${outputs.modelInvocation?.routeAlias || "unknown"}; provider ${outputs.modelInvocation?.provider || "unknown"}; prompt ${outputs.modelInvocation?.promptVersion || "unknown"}. ` +
+      `Fallback ${outputs.modelInvocation?.fellBack ? "true" : "false"}. ` +
+      `Source artifact ${sourceArtifact.jm1pub_editorialartifactid}; checksum ${sourceArtifact.jm1pub_sha256 || "pending"}. Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
+    sourceEntity: "jm1pub_editorialstage",
+    sourceRecordId: stage.jm1pub_editorialstageid
+  });
+  const qaLogId = await writeLog(client, {
+    name: `ACTIVE_EDITORIAL_QA_COMPLETED - ${stage.jm1pub_name}`,
+    actionType: "ACTIVE_EDITORIAL_QA_COMPLETED",
+    description:
+      `${stageCode} QA completed: source/output distinction validated, source checksum matched, source file was materialized, output artifacts were uploaded and linked to the active title/stage, and package-grade deliverable requirements were evaluated. Package assembly remains gated until stage completion and cadence policy allow release. Correlation ${correlationId}.`,
+    sourceEntity: "jm1pub_editorialstage",
+    sourceRecordId: stage.jm1pub_editorialstageid
+  });
+  let packageHandoff = null;
+  try {
+    packageHandoff = await createPackageManifestArtifact(client, stage, stageCode, sourceArtifact, outputs, correlationId);
+  } catch (error) {
+    const exact = error.safeCode || `${stageCode}_BLOCKED — PACKAGE_ENGINE_HANDOFF_FAILED`;
+    await recordBlockedTask(client, stage, stageCode, exact, correlationId);
+    packageHandoff = { status: "EXCEPTION", exactBlocker: exact, graphDetail: error.graphDetail };
+  }
+  if (packageHandoff && !packageHandoff.skipped) {
+    const reviewArtifact = selectPrimaryAuthorReviewArtifact(outputs, packageHandoff);
+    const authorGate = reviewArtifact
+      ? await createAuthorReviewGate(client, stage, stageCode, reviewArtifact, correlationId)
+      : { ok: false, reason: "AUTHOR_REVIEW_ARTIFACT_BINDING_MISSING" };
+    await client.patch("jm1pub_editorialstages", stage.jm1pub_editorialstageid, {
+      jm1pub_internaloperationalsummary:
+        packageHandoff.status === "EXCEPTION"
+          ? `EXCEPTION — ${packageHandoff.exactBlocker}${packageHandoff.graphDetail ? `. ${packageHandoff.graphDetail}` : ""}`
+          : `PACKAGE_PREPARATION: Package Engine handoff completed for ${packageHandoff.packageId}; manifest ${packageHandoff.manifestArtifactId}; package checksum ${packageHandoff.packageChecksum}; QA ${packageHandoff.qaStatus}; cadence ${packageHandoff.cadenceStatus}; notification ${packageHandoff.notificationPolicy}; workspace ${packageHandoff.workspaceVisibility}. Author review gate ${authorGate.gateId || authorGate.reason || "pending"}. Next governed action: ${packageHandoff.nextGovernedAction}`,
+      jm1pub_authorsafesummary:
+        packageHandoff.status === "EXCEPTION"
+          ? "Editorial work is in progress internally. No author action is required at this time."
+          : "Editorial work has produced review materials. The publishing team will release them through the governed author review process when ready."
+    });
+    packageHandoff.authorGate = authorGate;
+  }
+  return { outputLogId, qaLogId, packageHandoff };
 }
 
 function selectPrimaryAuthorReviewArtifact(outputs, packageHandoff) {
@@ -2665,55 +3181,7 @@ async function processStage(client, stage, correlationId, options = {}) {
       blocked
     };
   }
-  await client.patch("jm1pub_editorialstages", stage.jm1pub_editorialstageid, {
-    jm1pub_internaloperationalsummary:
-      `${stageCode === "EDITORIAL_REVIEW" ? "PACKAGE_PREPARATION" : "EXECUTING"}: JM1 Automation created governed ${stageCode} output artifacts from checksum-validated source ${sourceArtifact.jm1pub_editorialartifactid}. QA evidence registered. Package release remains gated by stage completion, cadence, and canonical Package Engine policy.`,
-    jm1pub_authorsafesummary: "Editorial work is in progress internally. No author action is required at this time."
-  });
-  const outputLogId = await writeLog(client, {
-    name: `ACTIVE_EDITORIAL_OUTPUT_CREATED - ${stage.jm1pub_name}`,
-    actionType: "ACTIVE_EDITORIAL_OUTPUT_CREATED",
-    description:
-      `${stageCode} produced governed output artifacts: ${outputs.map((item) => `${item.outputName} ${item.artifactId}`).join("; ")}. ` +
-      `Model route ${outputs.modelInvocation?.routeAlias || "unknown"}; provider ${outputs.modelInvocation?.provider || "unknown"}; prompt ${outputs.modelInvocation?.promptVersion || "unknown"}. ` +
-      `Fallback ${outputs.modelInvocation?.fellBack ? "true" : "false"}. ` +
-      `Source artifact ${sourceArtifact.jm1pub_editorialartifactid}; checksum ${sourceArtifact.jm1pub_sha256 || "pending"}. Correlation ${correlationId}. Idempotency ${idempotencyKey}.`,
-    sourceEntity: "jm1pub_editorialstage",
-    sourceRecordId: stage.jm1pub_editorialstageid
-  });
-  const qaLogId = await writeLog(client, {
-    name: `ACTIVE_EDITORIAL_QA_COMPLETED - ${stage.jm1pub_name}`,
-    actionType: "ACTIVE_EDITORIAL_QA_COMPLETED",
-    description:
-      `${stageCode} QA completed: source/output distinction validated, source checksum matched, source file was materialized, output artifacts were uploaded and linked to the active title/stage, and package-grade deliverable requirements were evaluated. Package assembly remains gated until stage completion and cadence policy allow release. Correlation ${correlationId}.`,
-    sourceEntity: "jm1pub_editorialstage",
-    sourceRecordId: stage.jm1pub_editorialstageid
-  });
-  let packageHandoff = null;
-  try {
-    packageHandoff = await createPackageManifestArtifact(client, stage, stageCode, sourceArtifact, outputs, correlationId);
-  } catch (error) {
-    const exact = error.safeCode || `${stageCode}_BLOCKED — PACKAGE_ENGINE_HANDOFF_FAILED`;
-    await recordBlockedTask(client, stage, stageCode, exact, correlationId);
-    packageHandoff = { status: "EXCEPTION", exactBlocker: exact, graphDetail: error.graphDetail };
-  }
-  if (packageHandoff && !packageHandoff.skipped) {
-    const reviewArtifact = selectPrimaryAuthorReviewArtifact(outputs, packageHandoff);
-    const authorGate = reviewArtifact
-      ? await createAuthorReviewGate(client, stage, stageCode, reviewArtifact, correlationId)
-      : { ok: false, reason: "AUTHOR_REVIEW_ARTIFACT_BINDING_MISSING" };
-    await client.patch("jm1pub_editorialstages", stage.jm1pub_editorialstageid, {
-      jm1pub_internaloperationalsummary:
-        packageHandoff.status === "EXCEPTION"
-          ? `EXCEPTION — ${packageHandoff.exactBlocker}${packageHandoff.graphDetail ? `. ${packageHandoff.graphDetail}` : ""}`
-          : `PACKAGE_PREPARATION: Package Engine handoff completed for ${packageHandoff.packageId}; manifest ${packageHandoff.manifestArtifactId}; package checksum ${packageHandoff.packageChecksum}; QA ${packageHandoff.qaStatus}; cadence ${packageHandoff.cadenceStatus}; notification ${packageHandoff.notificationPolicy}; workspace ${packageHandoff.workspaceVisibility}. Author review gate ${authorGate.gateId || authorGate.reason || "pending"}. Next governed action: ${packageHandoff.nextGovernedAction}`,
-      jm1pub_authorsafesummary:
-        packageHandoff.status === "EXCEPTION"
-          ? "Editorial work is in progress internally. No author action is required at this time."
-          : "Editorial work has produced review materials. The publishing team will release them through the governed author review process when ready."
-    });
-    packageHandoff.authorGate = authorGate;
-  }
+  const finalized = await finalizeMaterializedEditorialOutputs(client, stage, stageCode, sourceArtifact, outputs, correlationId);
   return {
     stageId: stage.jm1pub_editorialstageid,
     titleId: stage._jm1pub_titleid_value,
@@ -2721,9 +3189,7 @@ async function processStage(client, stage, correlationId, options = {}) {
     status: "VALIDATING",
     sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
     outputs,
-    outputLogId,
-    qaLogId,
-    packageHandoff
+    ...finalized
   };
 }
 
@@ -2803,6 +3269,7 @@ module.exports = {
   shouldPreserveExistingExactBlocker,
   writeLog,
   evaluateTargetedEditorialExecution,
+  runChunkedTargetedEditorialExecution,
   runTargetedEditorialExecution,
   targetedExecutionIdempotencyKey,
   runEditorialExecutionRuntime

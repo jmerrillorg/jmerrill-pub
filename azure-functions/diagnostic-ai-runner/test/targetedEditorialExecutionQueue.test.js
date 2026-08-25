@@ -53,11 +53,11 @@ test("enqueueTargetedEditorialExecution writes one durable queue message without
   assert.equal(queued.sourceArtifactId, input.sourceArtifactId);
 });
 
-test("processQueuedTargetedEditorialExecution invokes the canonical targeted runtime exactly once", async () => {
+test("processQueuedTargetedEditorialExecution invokes the durable chunked runtime for Line Editing", async () => {
   const calls = [];
   const message = buildQueuedTargetedEditorialExecutionMessage(input, { idempotencyKey: "idem-3" });
   const result = await processQueuedTargetedEditorialExecution(JSON.stringify(message), {
-    async runTargetedEditorialExecution(payload) {
+    async runChunkedTargetedEditorialExecution(payload) {
       calls.push(payload);
       return { ok: true, status: "EXECUTED", idempotencyKey: "idem-3" };
     }
@@ -69,11 +69,30 @@ test("processQueuedTargetedEditorialExecution invokes the canonical targeted run
   assert.equal(calls[0].sourceChecksum, input.sourceChecksum);
 });
 
+test("processQueuedTargetedEditorialExecution preserves the direct runtime for non-Line stages", async () => {
+  const calls = [];
+  const developmentalInput = { ...input, stageCode: "DEVELOPMENTAL_EDITING" };
+  const message = buildQueuedTargetedEditorialExecutionMessage(developmentalInput, { idempotencyKey: "idem-3b" });
+  const result = await processQueuedTargetedEditorialExecution(JSON.stringify(message), {
+    async runTargetedEditorialExecution(payload) {
+      calls.push(payload);
+      return { ok: true, status: "EXECUTED", idempotencyKey: "idem-3b" };
+    },
+    async runChunkedTargetedEditorialExecution() {
+      throw new Error("Line chunked runtime should not be used for Developmental Editing.");
+    }
+  });
+  assert.equal(result.status, "EXECUTED");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].executionMode, "EXECUTE");
+  assert.equal(calls[0].stageCode, "DEVELOPMENTAL_EDITING");
+});
+
 test("processQueuedTargetedEditorialExecution accepts Azure queue Buffer payloads", async () => {
   const calls = [];
   const message = buildQueuedTargetedEditorialExecutionMessage(input, { idempotencyKey: "idem-4" });
   const result = await processQueuedTargetedEditorialExecution(Buffer.from(JSON.stringify(message), "utf8"), {
-    async runTargetedEditorialExecution(payload) {
+    async runChunkedTargetedEditorialExecution(payload) {
       calls.push(payload);
       return { ok: true, status: "EXECUTED", idempotencyKey: "idem-4" };
     }
@@ -89,7 +108,7 @@ test("processQueuedTargetedEditorialExecution accepts base64-encoded Azure queue
   const message = buildQueuedTargetedEditorialExecutionMessage(input, { idempotencyKey: "idem-5" });
   const encoded = Buffer.from(JSON.stringify(message), "utf8").toString("base64");
   const result = await processQueuedTargetedEditorialExecution(encoded, {
-    async runTargetedEditorialExecution(payload) {
+    async runChunkedTargetedEditorialExecution(payload) {
       calls.push(payload);
       return { ok: true, status: "EXECUTED", idempotencyKey: "idem-5" };
     }
@@ -104,7 +123,7 @@ test("processQueuedTargetedEditorialExecution accepts wrapped queue trigger payl
   const calls = [];
   const message = buildQueuedTargetedEditorialExecutionMessage(input, { idempotencyKey: "idem-6" });
   const result = await processQueuedTargetedEditorialExecution({ messageText: JSON.stringify(message) }, {
-    async runTargetedEditorialExecution(payload) {
+    async runChunkedTargetedEditorialExecution(payload) {
       calls.push(payload);
       return { ok: true, status: "EXECUTED", idempotencyKey: "idem-6" };
     }
