@@ -48,6 +48,13 @@ const GATE_CODES = Object.freeze({
 });
 const DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT = 1800;
 const DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY = 4;
+const DEFAULT_LINE_EDITING_DEPLOYMENT_TPM = 100000;
+const DEFAULT_LINE_EDITING_OUTPUT_BUCKET_RATIO = 0.2;
+const DEFAULT_LINE_EDITING_CAPACITY_HEADROOM_RATIO = 0.3;
+const DEFAULT_LINE_EDITING_CHUNK_MAX_OUTPUT_TOKENS = 8192;
+const DEFAULT_LINE_EDITING_ADAPTIVE_MAX_RETRIES = 2;
+const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS = 5000;
+const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_MAX_MS = 120000;
 
 const EXECUTOR_POLICIES = {
   EDITORIAL_REVIEW: {
@@ -544,7 +551,7 @@ function buildStageModelPrompt({ stage, stageCode, sourceArtifact, extractedText
 }
 
 function parsePositiveInteger(value, fallback) {
-  const parsed = Number.parseInt(normalizeString(value), 10);
+  const parsed = typeof value === "number" ? value : Number.parseInt(normalizeString(value), 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
@@ -554,6 +561,60 @@ function lineEditingChunkWordLimit() {
 
 function lineEditingChunkConcurrency() {
   return parsePositiveInteger(process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY, DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY);
+}
+
+function parseRatio(value, fallback) {
+  const numeric = Number(normalizeString(value));
+  return Number.isFinite(numeric) && numeric > 0 && numeric < 1 ? numeric : fallback;
+}
+
+function lineEditingCapacityOptions() {
+  return {
+    configuredMaxConcurrency: lineEditingChunkConcurrency(),
+    deploymentTpm: parsePositiveInteger(
+      process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM || process.env.AZURE_FOUNDRY_DEPLOYMENT_TPM,
+      DEFAULT_LINE_EDITING_DEPLOYMENT_TPM
+    ),
+    outputBucketRatio: parseRatio(
+      process.env.JM1_LINE_EDITING_OUTPUT_BUCKET_RATIO,
+      DEFAULT_LINE_EDITING_OUTPUT_BUCKET_RATIO
+    ),
+    headroomRatio: parseRatio(
+      process.env.JM1_LINE_EDITING_CAPACITY_HEADROOM_RATIO,
+      DEFAULT_LINE_EDITING_CAPACITY_HEADROOM_RATIO
+    ),
+    maxOutputTokens: parsePositiveInteger(
+      process.env.AZURE_FOUNDRY_LINE_CHUNK_MAX_OUTPUT_TOKENS,
+      DEFAULT_LINE_EDITING_CHUNK_MAX_OUTPUT_TOKENS
+    )
+  };
+}
+
+function estimateLineEditingInputTokens(chunkText) {
+  const words = summarizeExtractedText(chunkText || "").words;
+  return Math.max(1000, Math.ceil(words * 1.6) + 2500);
+}
+
+function calculateLineEditingChunkConcurrency(chunks, options = {}) {
+  const capacity = { ...lineEditingCapacityOptions(), ...options };
+  const chunkCount = Array.isArray(chunks) ? chunks.length : Number(chunks) || 0;
+  if (chunkCount <= 0) return 1;
+  const effectiveTpm = Math.max(1, Math.floor(capacity.deploymentTpm * (1 - capacity.headroomRatio)));
+  const effectiveOutputTpm = Math.max(1, Math.floor(capacity.deploymentTpm * capacity.outputBucketRatio * (1 - capacity.headroomRatio)));
+  const maxInputReservation = Array.isArray(chunks)
+    ? Math.max(...chunks.map((chunk) => estimateLineEditingInputTokens(chunk)))
+    : 1;
+  const inputBound = Math.max(1, Math.floor(effectiveTpm / Math.max(1, maxInputReservation)));
+  const outputBound = Math.max(1, Math.floor(effectiveOutputTpm / Math.max(1, capacity.maxOutputTokens)));
+  return Math.max(
+    1,
+    Math.min(
+      parsePositiveInteger(capacity.configuredMaxConcurrency, DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY),
+      inputBound,
+      outputBound,
+      chunkCount
+    )
+  );
 }
 
 function splitLineEditingSourceChunks(text, maxWords = lineEditingChunkWordLimit()) {
@@ -589,6 +650,31 @@ function splitLineEditingSourceChunks(text, maxWords = lineEditingChunkWordLimit
   }
   if (current.length) chunks.push(current.join("\n\n"));
   return chunks.length ? chunks : [normalized];
+}
+
+function isRateLimitModelResult(result) {
+  const status = Number(result?.httpStatus);
+  return status === 429 || /(^|[^0-9])429([^0-9]|$)|HTTP_429|RATE_LIMIT/i.test(normalizeString(result?.error));
+}
+
+function adaptiveLineEditingRetryDelayMs(result, retryAttempt) {
+  const retryAfterMs = Number(result?.rateLimit?.retryAfterMs);
+  const floor = parsePositiveInteger(
+    process.env.JM1_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS,
+    DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS
+  );
+  const max = Math.max(
+    floor,
+    parsePositiveInteger(process.env.JM1_LINE_EDITING_ADAPTIVE_RETRY_MAX_MS, DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_MAX_MS)
+  );
+  if (Number.isFinite(retryAfterMs) && retryAfterMs >= 0) {
+    return Math.min(max, Math.max(floor, retryAfterMs));
+  }
+  return Math.min(max, Math.max(floor, floor * Math.pow(2, Math.max(0, retryAttempt - 1))));
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function buildLineEditingChunkPrompt({
@@ -699,9 +785,19 @@ async function invokeLineEditingModelProvider(stage, sourceArtifact, extractedTe
   const totalWordCount = summarizeExtractedText(extractedText || "").words;
   const tokenCounts = { input: 0, output: 0, total: 0 };
   const chunkResults = new Array(chunks.length);
-  const concurrency = Math.min(lineEditingChunkConcurrency(), chunks.length);
-  let nextIndex = 0;
+  let concurrency = calculateLineEditingChunkConcurrency(chunks);
+  const retryAttempts = new Array(chunks.length).fill(0);
+  const maxAdaptiveRetries = parsePositiveInteger(
+    process.env.JM1_LINE_EDITING_ADAPTIVE_MAX_RETRIES,
+    DEFAULT_LINE_EDITING_ADAPTIVE_MAX_RETRIES
+  );
   let failure = null;
+  const scheduler = {
+    initialConcurrency: concurrency,
+    finalConcurrency: concurrency,
+    adaptiveRetries: 0,
+    rateLimitReductions: 0
+  };
 
   async function runChunk(index) {
     const chunkIndex = index + 1;
@@ -741,17 +837,50 @@ async function invokeLineEditingModelProvider(stage, sourceArtifact, extractedTe
     return { chunkIndex, result, output, failed: false };
   }
 
-  async function worker() {
-    while (!failure && nextIndex < chunks.length) {
-      const index = nextIndex;
-      nextIndex += 1;
-      const chunkResult = await runChunk(index);
-      chunkResults[index] = chunkResult;
-      if (chunkResult.failed) failure = chunkResult;
+  async function runRound(pendingIndexes) {
+    const roundResults = [];
+    let nextIndex = 0;
+    async function worker() {
+      while (nextIndex < pendingIndexes.length) {
+        const index = pendingIndexes[nextIndex];
+        nextIndex += 1;
+        const chunkResult = await runChunk(index);
+        roundResults.push({ index, chunkResult });
+      }
     }
+    await Promise.all(Array.from({ length: Math.min(concurrency, pendingIndexes.length) }, () => worker()));
+    return roundResults;
   }
 
-  await Promise.all(Array.from({ length: concurrency }, () => worker()));
+  let pendingIndexes = chunks.map((_chunk, index) => index);
+  while (pendingIndexes.length && !failure) {
+    const roundResults = await runRound(pendingIndexes);
+    const retryable = [];
+    for (const { index, chunkResult } of roundResults) {
+      if (chunkResult.failed && isRateLimitModelResult(chunkResult.result) && retryAttempts[index] < maxAdaptiveRetries) {
+        retryAttempts[index] += 1;
+        retryable.push({ index, chunkResult });
+        continue;
+      }
+      chunkResults[index] = chunkResult;
+      if (chunkResult.failed) {
+        failure = chunkResult;
+      }
+    }
+    if (retryable.length && !failure) {
+      scheduler.adaptiveRetries += retryable.length;
+      scheduler.rateLimitReductions += 1;
+      const retryDelayMs = Math.max(...retryable.map(({ chunkResult }) =>
+        adaptiveLineEditingRetryDelayMs(chunkResult.result, retryAttempts[chunkResult.chunkIndex - 1])
+      ));
+      concurrency = Math.max(1, Math.floor(concurrency / 2));
+      scheduler.finalConcurrency = concurrency;
+      await wait(retryDelayMs);
+      pendingIndexes = retryable.map(({ index }) => index);
+    } else {
+      pendingIndexes = [];
+    }
+  }
 
   for (const item of chunkResults.filter(Boolean)) {
     tokenCounts.input += item.result.tokenCounts?.input || 0;
@@ -760,7 +889,7 @@ async function invokeLineEditingModelProvider(stage, sourceArtifact, extractedTe
   }
 
   const firstResult = chunkResults.find(Boolean)?.result || null;
-  if (failure) return { ...failure.result, tokenCounts, chunkCount: chunks.length, failedChunk: failure.chunkIndex };
+  if (failure) return { ...failure.result, tokenCounts, chunkCount: chunks.length, failedChunk: failure.chunkIndex, scheduler };
 
   const chunkOutputs = chunkResults.map((item) => ({
     ...item.output,
@@ -787,6 +916,7 @@ async function invokeLineEditingModelProvider(stage, sourceArtifact, extractedTe
       )
     },
     chunkCount: chunks.length,
+    scheduler,
     promptVersion: "CC010-LINE_EDITING-CHUNK-V1"
   };
 }
@@ -2616,6 +2746,9 @@ async function runEditorialExecutionRuntime(options = {}, deps = {}) {
 
 module.exports = {
   DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY,
+  DEFAULT_LINE_EDITING_DEPLOYMENT_TPM,
+  DEFAULT_LINE_EDITING_OUTPUT_BUCKET_RATIO,
+  DEFAULT_LINE_EDITING_CAPACITY_HEADROOM_RATIO,
   DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT,
   EXECUTOR_POLICIES,
   STAGE_STATUS,
@@ -2639,6 +2772,7 @@ module.exports = {
   graphShareToken,
   invokeStageModelProvider,
   invokeSingleStageModelProvider,
+  calculateLineEditingChunkConcurrency,
   splitLineEditingSourceChunks,
   buildLineEditingChunkPrompt,
   isLivePortfolioStage,

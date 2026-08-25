@@ -5,7 +5,9 @@ const assert = require("node:assert/strict");
 
 const {
   buildRateLimitMetadata,
+  classifyRateLimit,
   collectSafeRateLimitHeaders,
+  computeBackoffDelayMs,
   extractFirstJsonObject,
   parseStructuredJsonObject,
   parseRetryAfterMs
@@ -68,8 +70,46 @@ describe("provider support", () => {
   test("builds retry-after metadata for workflow scheduling evidence", () => {
     const headers = new Headers({ "retry-after": "90" });
     const result = buildRateLimitMetadata(headers);
+    assert.equal(result.classification, "UNKNOWN");
     assert.equal(result.retryAfterMs, 90000);
     assert.equal(result.retryAfterSeconds, 90);
     assert.equal(result.headers["retry-after"], "90");
+  });
+
+  test("Retry-After zero still uses the governed retry floor", () => {
+    const delay = computeBackoffDelayMs({
+      attempt: 1,
+      baseDelayMs: 10,
+      jitterRatio: 0,
+      retryAfterMs: 0,
+      minRetryDelayMs: 5000,
+      maxRetryDelayMs: 120000
+    });
+    assert.equal(delay, 5000);
+  });
+
+  test("positive Retry-After is honored within floor and cap", () => {
+    assert.equal(
+      computeBackoffDelayMs({
+        attempt: 1,
+        baseDelayMs: 10,
+        jitterRatio: 0,
+        retryAfterMs: 61000,
+        minRetryDelayMs: 5000,
+        maxRetryDelayMs: 120000
+      }),
+      61000
+    );
+  });
+
+  test("classifies provider 429 input and output token buckets", () => {
+    assert.equal(
+      classifyRateLimit(new Headers(), { error: { code: "userByModelByMinuteOutputTokens" } }),
+      "OUTPUT_TOKENS"
+    );
+    assert.equal(
+      classifyRateLimit(new Headers(), { error: { code: "userByModelByMinuteUncachedInputTokens" } }),
+      "UNCACHED_INPUT_TOKENS"
+    );
   });
 });

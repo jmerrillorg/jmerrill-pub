@@ -17,6 +17,7 @@ const {
   findUpstreamApprovalEvidence,
   graphRequest,
   graphShareToken,
+  calculateLineEditingChunkConcurrency,
   invokeStageModelProvider,
   invokeSingleStageModelProvider,
   splitLineEditingSourceChunks,
@@ -526,6 +527,21 @@ test("line editing default chunk size is production-sized for full-manuscript ex
   }
 });
 
+test("line editing capacity scheduler recommends one chunk at 100k TPM with output-bucket headroom", () => {
+  const chunks = [
+    Array.from({ length: 1800 }, (_, index) => `word${index}`).join(" "),
+    Array.from({ length: 1800 }, (_, index) => `next${index}`).join(" ")
+  ];
+  const concurrency = calculateLineEditingChunkConcurrency(chunks, {
+    configuredMaxConcurrency: 4,
+    deploymentTpm: 100000,
+    outputBucketRatio: 0.2,
+    headroomRatio: 0.3,
+    maxOutputTokens: 8192
+  });
+  assert.equal(concurrency, 1);
+});
+
 test("line editing chunk prompt includes sourceText instead of sample-only input", () => {
   const prompt = JSON.parse(buildLineEditingChunkPrompt({
     stage: {
@@ -555,8 +571,10 @@ test("line editing chunk prompt includes sourceText instead of sample-only input
 test("line editing provider route chunks and aggregates full-manuscript output", async () => {
   const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
   const previousConcurrency = process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY;
+  const previousTpm = process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM;
   process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = "7";
   process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY = "2";
+  process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM = "1000000";
   const calls = [];
   let activeCalls = 0;
   let maxActiveCalls = 0;
@@ -618,6 +636,106 @@ test("line editing provider route chunks and aggregates full-manuscript output",
     else process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = previousLimit;
     if (previousConcurrency === undefined) delete process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY;
     else process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY = previousConcurrency;
+    if (previousTpm === undefined) delete process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM;
+    else process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM = previousTpm;
+  }
+});
+
+test("line editing scheduler retries one throttled chunk without losing successful chunks", async () => {
+  const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
+  const previousConcurrency = process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY;
+  const previousTpm = process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM;
+  const previousAdaptiveRetries = process.env.JM1_LINE_EDITING_ADAPTIVE_MAX_RETRIES;
+  const previousRetryFloor = process.env.JM1_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS;
+  process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = "7";
+  process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY = "2";
+  process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM = "1000000";
+  process.env.JM1_LINE_EDITING_ADAPTIVE_MAX_RETRIES = "1";
+  process.env.JM1_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS = "1";
+  const attempts = new Map();
+  invokeSingleStageModelProvider.override = async (input) => {
+    const prompt = JSON.parse(input.promptBody);
+    const count = attempts.get(prompt.chunkIndex) || 0;
+    attempts.set(prompt.chunkIndex, count + 1);
+    if (prompt.chunkIndex === 1 && count === 0) {
+      return {
+        ok: false,
+        provider: "microsoft-foundry-claude",
+        routeAlias: "jm1-editorial-devline-primary",
+        promptVersion: input.promptVersion,
+        fellBack: false,
+        httpStatus: 429,
+        rateLimit: {
+          classification: "OUTPUT_TOKENS",
+          retryAfterMs: 0
+        },
+        tokenCounts: { input: 0, output: 0, total: 0 },
+        error: "MICROSOFT_FOUNDRY_HTTP_429: userByModelByMinuteOutputTokens"
+      };
+    }
+    return {
+      ok: true,
+      provider: "microsoft-foundry-claude",
+      routeAlias: "jm1-editorial-devline-primary",
+      promptVersion: input.promptVersion,
+      fellBack: false,
+      tokenCounts: { input: 10, output: 8, total: 18 },
+      output: {
+        editedManuscript: `${prompt.sourceText} edited`,
+        lineEditingSummary: `Edited chunk ${prompt.chunkIndex}.`,
+        changeLedger: [],
+        retentionNotes: "Chunk retained.",
+        authorQueries: []
+      }
+    };
+  };
+  try {
+    const sourceText = [
+      "Chapter One",
+      "",
+      "This rough paragraph keeps source order.",
+      "",
+      "This rough second paragraph also remains."
+    ].join("\n");
+    const result = await invokeStageModelProvider(
+      {
+        jm1pub_editorialstageid: "stage-line",
+        jm1pub_name: "Line Editing - Test",
+        _jm1pub_titleid_value: "title-1"
+      },
+      "LINE_EDITING",
+      {
+        jm1pub_editorialartifactid: "source-artifact",
+        jm1pub_editorialartifactname: "Approved Developmental Manuscript",
+        jm1pub_filename: "approved.docx",
+        jm1pub_sha256: "sha-source",
+        jm1pub_iscurrentapproved: true
+      },
+      sourceText,
+      "chunk-retry-test",
+      null
+    );
+    assert.equal(result.ok, true);
+    assert.equal(result.chunkCount, 3);
+    assert.equal(attempts.get(1), 2);
+    assert.equal(attempts.get(2), 1);
+    assert.equal(attempts.get(3), 1);
+    assert.equal(result.scheduler.rateLimitReductions, 1);
+    assert.equal(result.scheduler.finalConcurrency, 1);
+    assert.equal(result.output.editedManuscript.includes("Chapter One edited"), true);
+    assert.equal(result.output.editedManuscript.includes("second paragraph"), true);
+  } finally {
+    invokeSingleStageModelProvider.override = null;
+    if (previousLimit === undefined) delete process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
+    else process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = previousLimit;
+    if (previousConcurrency === undefined) delete process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY;
+    else process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY = previousConcurrency;
+    if (previousTpm === undefined) delete process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM;
+    else process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM = previousTpm;
+    if (previousAdaptiveRetries === undefined) delete process.env.JM1_LINE_EDITING_ADAPTIVE_MAX_RETRIES;
+    else process.env.JM1_LINE_EDITING_ADAPTIVE_MAX_RETRIES = previousAdaptiveRetries;
+    if (previousRetryFloor === undefined) delete process.env.JM1_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS;
+    else process.env.JM1_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS = previousRetryFloor;
   }
 });
 
