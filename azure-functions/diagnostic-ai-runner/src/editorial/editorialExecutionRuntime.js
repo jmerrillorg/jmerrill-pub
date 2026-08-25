@@ -49,9 +49,10 @@ const GATE_CODES = Object.freeze({
 const DEFAULT_LINE_EDITING_CHUNK_WORD_LIMIT = 1800;
 const DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY = 4;
 const DEFAULT_LINE_EDITING_DEPLOYMENT_TPM = 100000;
+const DEFAULT_LINE_EDITING_OUTPUT_TPM = 5000;
 const DEFAULT_LINE_EDITING_OUTPUT_BUCKET_RATIO = 0.2;
 const DEFAULT_LINE_EDITING_CAPACITY_HEADROOM_RATIO = 0.3;
-const DEFAULT_LINE_EDITING_CHUNK_MAX_OUTPUT_TOKENS = 8192;
+const DEFAULT_LINE_EDITING_CHUNK_MAX_OUTPUT_TOKENS = 4000;
 const DEFAULT_LINE_EDITING_ADAPTIVE_MAX_RETRIES = 2;
 const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS = 5000;
 const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_MAX_MS = 120000;
@@ -569,12 +570,14 @@ function parseRatio(value, fallback) {
 }
 
 function lineEditingCapacityOptions() {
+  const configuredOutputTpm = parsePositiveInteger(process.env.JM1_LINE_EDITING_OUTPUT_TPM, 0);
   return {
     configuredMaxConcurrency: lineEditingChunkConcurrency(),
     deploymentTpm: parsePositiveInteger(
       process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM || process.env.AZURE_FOUNDRY_DEPLOYMENT_TPM,
       DEFAULT_LINE_EDITING_DEPLOYMENT_TPM
     ),
+    outputTpm: configuredOutputTpm || DEFAULT_LINE_EDITING_OUTPUT_TPM,
     outputBucketRatio: parseRatio(
       process.env.JM1_LINE_EDITING_OUTPUT_BUCKET_RATIO,
       DEFAULT_LINE_EDITING_OUTPUT_BUCKET_RATIO
@@ -600,7 +603,9 @@ function calculateLineEditingChunkConcurrency(chunks, options = {}) {
   const chunkCount = Array.isArray(chunks) ? chunks.length : Number(chunks) || 0;
   if (chunkCount <= 0) return 1;
   const effectiveTpm = Math.max(1, Math.floor(capacity.deploymentTpm * (1 - capacity.headroomRatio)));
-  const effectiveOutputTpm = Math.max(1, Math.floor(capacity.deploymentTpm * capacity.outputBucketRatio * (1 - capacity.headroomRatio)));
+  const configuredOutputTpm = parsePositiveInteger(capacity.outputTpm, 0);
+  const outputTpm = configuredOutputTpm || Math.floor(capacity.deploymentTpm * capacity.outputBucketRatio);
+  const effectiveOutputTpm = Math.max(1, Math.floor(outputTpm * (1 - capacity.headroomRatio)));
   const maxInputReservation = Array.isArray(chunks)
     ? Math.max(...chunks.map((chunk) => estimateLineEditingInputTokens(chunk)))
     : 1;

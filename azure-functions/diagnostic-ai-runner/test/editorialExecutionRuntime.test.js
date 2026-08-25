@@ -533,7 +533,7 @@ test("line editing default chunk size is production-sized for full-manuscript ex
   }
 });
 
-test("line editing capacity scheduler recommends one chunk at 100k TPM with output-bucket headroom", () => {
+test("line editing capacity scheduler respects measured 5k output-token provider bucket", () => {
   const chunks = [
     Array.from({ length: 1800 }, (_, index) => `word${index}`).join(" "),
     Array.from({ length: 1800 }, (_, index) => `next${index}`).join(" ")
@@ -541,9 +541,9 @@ test("line editing capacity scheduler recommends one chunk at 100k TPM with outp
   const concurrency = calculateLineEditingChunkConcurrency(chunks, {
     configuredMaxConcurrency: 4,
     deploymentTpm: 100000,
-    outputBucketRatio: 0.2,
+    outputTpm: 5000,
     headroomRatio: 0.3,
-    maxOutputTokens: 8192
+    maxOutputTokens: 4000
   });
   assert.equal(concurrency, 1);
 });
@@ -578,9 +578,11 @@ test("line editing provider route chunks and aggregates full-manuscript output",
   const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
   const previousConcurrency = process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY;
   const previousTpm = process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM;
+  const previousOutputTpm = process.env.JM1_LINE_EDITING_OUTPUT_TPM;
   process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = "7";
   process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY = "2";
   process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM = "1000000";
+  process.env.JM1_LINE_EDITING_OUTPUT_TPM = "1000000";
   const calls = [];
   let activeCalls = 0;
   let maxActiveCalls = 0;
@@ -644,6 +646,8 @@ test("line editing provider route chunks and aggregates full-manuscript output",
     else process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY = previousConcurrency;
     if (previousTpm === undefined) delete process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM;
     else process.env.JM1_LINE_EDITING_DEPLOYMENT_TPM = previousTpm;
+    if (previousOutputTpm === undefined) delete process.env.JM1_LINE_EDITING_OUTPUT_TPM;
+    else process.env.JM1_LINE_EDITING_OUTPUT_TPM = previousOutputTpm;
   }
 });
 
