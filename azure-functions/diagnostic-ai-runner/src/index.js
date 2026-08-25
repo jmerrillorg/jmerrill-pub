@@ -11,6 +11,7 @@ require("./functions/runEditorialExecutionRuntime");
 require("./functions/runEditorialPackageHandoffConsumer");
 require("./functions/runEditorialNextStageMaterialization");
 require("./functions/runTargetedEditorialExecution");
+require("./functions/runTargetedEditorialExecutionWorker");
 require("./functions/runEditorialReviewNow");
 require("./functions/runFullWrapExecutor");
 require("./functions/runIntentionalLeaderAuthorResponse");

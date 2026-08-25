@@ -1,7 +1,11 @@
 "use strict";
 
 const { app } = require("@azure/functions");
-const { runTargetedEditorialExecution } = require("../editorial/editorialExecutionRuntime");
+const {
+  evaluateTargetedEditorialExecution,
+  runTargetedEditorialExecution
+} = require("../editorial/editorialExecutionRuntime");
+const { enqueueTargetedEditorialExecution } = require("../editorial/targetedEditorialExecutionQueue");
 
 app.http("run-targeted-editorial-execution", {
   methods: ["POST"],
@@ -16,6 +20,21 @@ app.http("run-targeted-editorial-execution", {
     }
 
     const body = await request.json().catch(() => ({}));
+    if (String(body.executionMode || "").trim().toUpperCase() === "EXECUTE_ASYNC") {
+      const evaluated = await evaluateTargetedEditorialExecution(body);
+      if (!evaluated.ok) return { status: 422, jsonBody: evaluated };
+      const queued = await enqueueTargetedEditorialExecution(body, evaluated);
+      return {
+        status: 202,
+        jsonBody: {
+          ...evaluated,
+          ...queued,
+          executionMode: "EXECUTE_ASYNC",
+          mutationsPerformedInline: 0,
+          externalSends: 0
+        }
+      };
+    }
     const result = await runTargetedEditorialExecution(body);
     return { status: result.ok ? 200 : 422, jsonBody: result };
   }
