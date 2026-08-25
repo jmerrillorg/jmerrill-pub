@@ -39,6 +39,9 @@ function loadRelayModule() {
       if (name === "@azure/identity") {
         return { DefaultAzureCredential: class DefaultAzureCredential {} };
       }
+      if (name.startsWith("../")) {
+        return require(path.join(path.dirname(filePath), name));
+      }
 
       return require(name);
     },

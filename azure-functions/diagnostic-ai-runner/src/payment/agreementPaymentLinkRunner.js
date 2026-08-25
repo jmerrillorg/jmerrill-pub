@@ -34,6 +34,10 @@ const {
 const { DIAGNOSTIC_ID_PATTERN, INTAKE_REFERENCE_PATTERN } = require("../queue/diagnosticQueueSelector");
 const { AGENT_NAME, BAND_LEVEL, EXECUTION_STATUS, SOURCE_ENTITY } = require("../dataverse/metadataWriter");
 const { classifyDataverseWriteError } = require("../author/milestone6OpportunityWriter");
+const {
+  assertPolicyAllows,
+  resolvePaymentAuthority
+} = require("../policy/canonPolicyLayer");
 
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
 const EVENT_TYPE = "AGREEMENT_PAYMENT_LINK_CREATED";
@@ -151,6 +155,17 @@ async function createAgreementPaymentLink(input = {}, deps = {}) {
   if (!packageCode) return blocked("PACKAGE_CODE_MISSING");
   if (!paymentOptionCode) return blocked("PAYMENT_OPTION_CODE_MISSING");
 
+  const paymentAuthority = resolvePaymentAuthority({
+    processor: input.paymentProcessor || "STRIPE",
+    context: "NEW_PUBLISHING_TRANSACTION",
+    opportunityId
+  });
+  try {
+    assertPolicyAllows(paymentAuthority);
+  } catch {
+    return blocked("PAYMENT_AUTHORITY_DENIED", { policyDecision: paymentAuthority });
+  }
+
   const computed = computeInstallmentStripeAmount({ packageCode, paymentOptionCode });
   if (!computed.ok) return blocked("STRIPE_MAPPING_RESOLUTION_FAILED", { detail: computed.error });
 
@@ -222,6 +237,9 @@ async function createAgreementPaymentLink(input = {}, deps = {}) {
     // any log) but is never included in the execution-log evidence above.
     paymentLinkUrl: linkResult.paymentLinkUrl || null,
     executionLog,
+    policyDecisions: {
+      paymentAuthority
+    },
     gateUsed: GATE_NAME,
     liveActions: {
       createsPaymentLink: true,

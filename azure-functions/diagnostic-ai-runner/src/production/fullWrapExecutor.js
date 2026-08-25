@@ -7,6 +7,11 @@ const {
   DERIVED_VALUE,
   resolveProductionAuthority
 } = require("./productionAuthorityResolver");
+const {
+  assertPolicyAllows,
+  resolveProductionAuthority: resolveRuntimeProductionAuthority,
+  resolvePublicationIntentAuthority
+} = require("../policy/canonPolicyLayer");
 
 const GATE_NAME = "JM1_FULL_WRAP_EXECUTOR_ENABLED";
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
@@ -152,6 +157,14 @@ function normalizeFullWrapInput(input = {}) {
 function validateFullWrapInputs(input = {}) {
   const normalized = normalizeFullWrapInput(input);
   const authority = resolveProductionAuthority(normalized);
+  const publicationIntentAuthority = resolvePublicationIntentAuthority({
+    publicationIntent: normalized.publicationIntent,
+    titleId: normalized.titleId
+  });
+  const runtimeProductionAuthority = resolveRuntimeProductionAuthority({
+    ...normalized,
+    sourceRecord: normalized.taskId || normalized.titleId
+  });
   const missing = [];
   const invalid = [];
   if (!normalized.taskId || !GUID_PATTERN.test(normalized.taskId)) missing.push("TASK_ID");
@@ -173,12 +186,19 @@ function validateFullWrapInputs(input = {}) {
   const assetTypes = new Set(normalized.sourceAssets.map((asset) => normalizeKey(asset.type)));
   if (!assetTypes.has("FRONT_COVER")) missing.push("FRONT_COVER_ASSET");
   if (!assetTypes.has("INTERIOR_PROOF")) missing.push("INTERIOR_PROOF_ASSET");
+  const ok = missing.length === 0 && invalid.length === 0 && runtimeProductionAuthority.MUTATION_ALLOWED === true;
   return {
-    ok: missing.length === 0 && invalid.length === 0,
+    ok,
     normalized,
     authority,
+    policyDecisions: {
+      publicationIntentAuthority,
+      runtimeProductionAuthority
+    },
     missing,
-    invalid
+    invalid: runtimeProductionAuthority.MUTATION_ALLOWED === true
+      ? invalid
+      : [...invalid, runtimeProductionAuthority.REASON]
   };
 }
 
@@ -187,6 +207,7 @@ function buildFullWrapSpec(input = {}) {
   if (!validation.ok) return validation;
   const normalized = validation.normalized;
   const authority = validation.authority;
+  assertPolicyAllows(validation.policyDecisions.runtimeProductionAuthority);
   const trim = parseTrimSize(normalized.trimSize);
   const resolvedPaperStock = normalized.paperStock || authority.selectable.paperStock.value;
   const spine = calculateSpineWidth({
@@ -257,6 +278,7 @@ function buildFullWrapSpec(input = {}) {
     },
     productionProfile: authority.profile,
     authorityProvenance: authority,
+    policyDecisions: validation.policyDecisions,
     dimensions,
     sourceAssets: normalized.sourceAssets,
     backCoverCopy: normalized.backCoverCopy,
