@@ -375,6 +375,151 @@ function compactDecisionSource(inboundMessageId) {
   return `inbound:${PUBLISHING_MAILBOX}:${normalized.slice(0, 44)}`;
 }
 
+async function loadCadenceEngine() {
+  return import("../../../../lib/server/editorial-cadence-engine.ts");
+}
+
+function cadenceClassification(decision) {
+  if (decision === DECISION.APPROVED) return "APPROVED";
+  if (decision === DECISION.APPROVED_WITH_CORRECTIONS) return "APPROVED_WITH_CORRECTIONS";
+  if (decision === DECISION.CHANGES_REQUESTED) return "CHANGES_REQUESTED";
+  if (decision === DECISION.QUESTIONS_OR_REVIEW_REQUIRED) return "QUESTION_ONLY";
+  if (decision === DECISION.PENDING_AMBIGUOUS) return "AMBIGUOUS";
+  return null;
+}
+
+function inferCadenceStage(gate) {
+  const source = `${normalizeString(gate.jm1pub_editorialapprovalgatename)} ${normalizeString(gate.jm1pub_gatecode)}`.toLowerCase();
+  if (source.includes("developmental")) return "DEVELOPMENTAL_EDITING";
+  if (source.includes("line")) return "LINE_EDITING";
+  if (source.includes("copyedit")) return "COPYEDITING";
+  if (source.includes("proofread")) return "PROOFREADING";
+  if (source.includes("interior") || source.includes("layout")) return "INTERIOR_LAYOUT";
+  if (source.includes("cover")) return "COVER_DESIGN";
+  if (source.includes("production proof")) return "PRODUCTION_PROOF";
+  if (source.includes("distribution preparation")) return "DISTRIBUTION_PREPARATION";
+  if (source.includes("distribution submission")) return "DISTRIBUTION_SUBMISSION";
+  if (source.includes("publication launch")) return "PUBLICATION_LAUNCH";
+  if (source.includes("editorial review")) return "EDITORIAL_REVIEW";
+  return null;
+}
+
+function nextStageForApprovedResponse(stage) {
+  return {
+    EDITORIAL_REVIEW: "DEVELOPMENTAL_EDITING",
+    DEVELOPMENTAL_EDITING: "LINE_EDITING",
+    LINE_EDITING: "COPYEDITING",
+    COPYEDITING: "PROOFREADING",
+    PROOFREADING: "INTERIOR_LAYOUT",
+    INTERIOR_LAYOUT: "COVER_DESIGN",
+    COVER_DESIGN: "PRODUCTION_PROOF",
+    PRODUCTION_PROOF: "DISTRIBUTION_PREPARATION",
+    DISTRIBUTION_PREPARATION: "DISTRIBUTION_SUBMISSION",
+    DISTRIBUTION_SUBMISSION: "PUBLICATION_LAUNCH"
+  }[stage] || stage;
+}
+
+async function defaultResolveAuthorResponseCadenceContext(_client, { gate, reply, classification, receivedAt }) {
+  const responseClassification = cadenceClassification(classification);
+  if (!responseClassification || responseClassification === "QUESTION_ONLY" || responseClassification === "AMBIGUOUS") return null;
+  const currentStage = inferCadenceStage(gate);
+  const titleId = normalizeString(gate._jm1pub_titleid_value || gate.titleId);
+  const stageId = normalizeString(gate._jm1pub_editorialstageid_value || gate.stageId || gate.jm1pub_editorialapprovalgateid);
+  const packageId = normalizeString(gate.jm1pub_packageid) || `${titleId || "unknown-title"}:${gate.jm1pub_editorialapprovalgateid}:author-response`;
+  const artifactId = normalizeString(gate._jm1pub_deliverableartifactid_value || gate.artifactId);
+  const artifactChecksum = normalizeString(gate.jm1pub_artifactchecksum || gate.artifactChecksum);
+  const wordCount = Number(gate.jm1pub_wordcount || gate.wordCount);
+  const bookType = normalizeString(gate.jm1pub_booktype || gate.bookType);
+  const complexityScoreRaw = gate.jm1pub_complexityscore ?? gate.complexityScore;
+  const complexityFactorsRaw = gate.jm1pub_complexityfactors ?? gate.complexityFactors ?? "";
+  const complexityFactors = Array.isArray(complexityFactorsRaw)
+    ? complexityFactorsRaw
+    : normalizeString(complexityFactorsRaw).split(/[;,]/).map((item) => item.trim()).filter(Boolean);
+  const assignedBy = normalizeString(gate.jm1pub_complexityassignedby || gate.complexityAssignedBy);
+  const assignedAt = normalizeString(gate.jm1pub_complexityassignedat || gate.complexityAssignedAt);
+  if (!currentStage || !titleId || !stageId || !artifactId || !artifactChecksum || !Number.isFinite(wordCount) || !bookType || !assignedBy || !assignedAt) {
+    return null;
+  }
+  return {
+    titleId,
+    stageId,
+    packageId,
+    currentStage,
+    stage: currentStage,
+    nextStageIfApproved: nextStageForApprovedResponse(currentStage),
+    stageCompletedAt: receivedAt,
+    now: receivedAt,
+    manuscript: {
+      artifactId,
+      artifactChecksum,
+      wordCount,
+      countedAt: normalizeString(gate.jm1pub_wordcountcountedat || gate.countedAt) || receivedAt,
+      countMethod: normalizeString(gate.jm1pub_wordcountmethod || gate.countMethod) || "GOVERNED_STAGE_ENTRY_ARTIFACT_COUNT"
+    },
+    bookType,
+    complexity: {
+      complexityScore: complexityScoreRaw === undefined || complexityScoreRaw === null || complexityScoreRaw === "" ? undefined : Number(complexityScoreRaw),
+      complexityFactors,
+      assignedBy,
+      assignedAt
+    },
+    priorAuthorPackageDeliveredAt: normalizeString(gate.jm1pub_priorauthorpackagedeliveredat || gate.priorAuthorPackageDeliveredAt) || null,
+    responseClassification
+  };
+}
+
+async function recordAuthorResponseCadenceRestart(client, gate, reply, classification, receivedAt, idempotencyKey, deps = {}) {
+  const responseClassification = cadenceClassification(classification);
+  if (!responseClassification || responseClassification === "QUESTION_ONLY" || responseClassification === "AMBIGUOUS") {
+    return { action: "NO_CADENCE_RESTART", reason: responseClassification || "CLASSIFICATION_NOT_CADENCE_ELIGIBLE" };
+  }
+  const resolver = deps.resolveAuthorResponseCadenceContext || defaultResolveAuthorResponseCadenceContext;
+  const context = await resolver(client, { gate, reply, classification, receivedAt, idempotencyKey });
+  if (!context) {
+    const logId = await writeLog(client, {
+      actionType: "AUTHOR_RESPONSE_CADENCE_RESTART_BLOCKED",
+      name: `AUTHOR_RESPONSE_CADENCE_RESTART_BLOCKED - ${gate.jm1pub_editorialapprovalgateid}`,
+      description:
+        `Cadence restart blocked because canonical calculation evidence is incomplete; classification=${classification}; ` +
+        `productionProgression=0; workerExecutionAuthorized=0; Idempotency: ${idempotencyKey}.`,
+      sourceEntity: "jm1pub_editorialapprovalgate",
+      sourceRecordId: gate.jm1pub_editorialapprovalgateid,
+      failed: true
+    });
+    return { action: "CADENCE_RESTART_BLOCKED", reason: "CANONICAL_CALCULATION_EVIDENCE_INCOMPLETE", executionLogIds: [logId] };
+  }
+  try {
+    const engine = deps.cadenceEngine || (await loadCadenceEngine());
+    const result = engine.applyAuthorResponseCadenceRestart(context);
+    if (result.action !== "CADENCE_RESTARTED") return result;
+    const payload = engine.buildEditorialCadencePersistencePayload(result.schedule);
+    const logId = await writeLog(client, {
+      actionType: "AUTHOR_RESPONSE_CADENCE_RESTARTED",
+      name: `AUTHOR_RESPONSE_CADENCE_RESTARTED - ${gate.jm1pub_editorialapprovalgateid}`,
+      description:
+        `Editorial cadence restarted under ${payload.policyVersion}; stage=${payload.stage}; status=${payload.status}; ` +
+        `waitingOn=${payload.waitingOn}; earliestReleaseAt=${payload.earliestReleaseAt}; scheduledReleaseAt=${payload.scheduledReleaseAt}; ` +
+        `nextAutomaticAction=${payload.nextAutomaticAction}; productionProgression=0; workerExecutionAuthorized=0; Idempotency: ${idempotencyKey}.`,
+      sourceEntity: "jm1pub_editorialapprovalgate",
+      sourceRecordId: gate.jm1pub_editorialapprovalgateid
+    });
+    return { ...result, persistencePayload: payload, executionLogIds: [logId] };
+  } catch (error) {
+    const reason = normalizeString(error.reason || error.code || error.safeCode || error.message) || "CADENCE_CALCULATION_FAILED";
+    const logId = await writeLog(client, {
+      actionType: "AUTHOR_RESPONSE_CADENCE_RESTART_BLOCKED",
+      name: `AUTHOR_RESPONSE_CADENCE_RESTART_BLOCKED - ${gate.jm1pub_editorialapprovalgateid}`,
+      description:
+        `Cadence restart failed closed; reason=${reason}; classification=${classification}; ` +
+        `productionProgression=0; workerExecutionAuthorized=0; Idempotency: ${idempotencyKey}.`,
+      sourceEntity: "jm1pub_editorialapprovalgate",
+      sourceRecordId: gate.jm1pub_editorialapprovalgateid,
+      failed: true
+    });
+    return { action: "CADENCE_RESTART_BLOCKED", reason, executionLogIds: [logId] };
+  }
+}
+
 async function findOpenAuthorReviewGates(client, maxGates) {
   return client.list("jm1pub_editorialapprovalgates", {
     $select:
@@ -761,12 +906,14 @@ async function processGateReply(client, gate, deps, triggerSource) {
       sourceEntity: "jm1pub_editorialapprovalgate",
       sourceRecordId: gateId
     });
+    const cadenceRestart = await recordAuthorResponseCadenceRestart(client, gate, reply, classification, receivedAt, idempotencyKey, deps);
     const completedLog = await writeStateLog(client, {
       state: RESPONSE_STATES.COMPLETED,
       gateId,
       inboundMessageId,
       idempotencyKey,
-      description: "Inbound listener completed durable response capture, classification, notes persistence, awaiting-state closure, and execution logging. It did not call the transition handler."
+      description:
+        "Inbound listener completed durable response capture, classification, notes persistence, awaiting-state closure, cadence restart evaluation, and execution logging. It did not call the transition handler."
     });
     return {
       gateId,
@@ -775,8 +922,20 @@ async function processGateReply(client, gate, deps, triggerSource) {
       processingState: RESPONSE_STATES.COMPLETED,
       acknowledgementPolicy: acknowledgement.status,
       productionProgression: 0,
+      cadenceRestart,
       manualRecovery,
-      executionLogIds: [discoveredLog, claimedLog, correlatedLog, classifiedLog, correlationLog, capturedLog, persistedLog, decisionLog, completedLog]
+      executionLogIds: [
+        discoveredLog,
+        claimedLog,
+        correlatedLog,
+        classifiedLog,
+        correlationLog,
+        capturedLog,
+        persistedLog,
+        decisionLog,
+        ...(cadenceRestart.executionLogIds || []),
+        completedLog
+      ]
     };
   }
 
