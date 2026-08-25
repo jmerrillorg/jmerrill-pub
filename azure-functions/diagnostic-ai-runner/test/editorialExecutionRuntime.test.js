@@ -15,6 +15,7 @@ const {
   extractSourceText,
   findSourceArtifact,
   findUpstreamApprovalEvidence,
+  firstMissingLineEditingChunkCursor,
   graphRequest,
   graphShareToken,
   calculateLineEditingChunkConcurrency,
@@ -37,6 +38,25 @@ test("parseNonNegativeInteger preserves numeric queue cursor values", () => {
   assert.equal(parseNonNegativeInteger("2", 0), 2);
   assert.equal(parseNonNegativeInteger(0, 7), 0);
   assert.equal(parseNonNegativeInteger("", 7), 7);
+});
+
+test("firstMissingLineEditingChunkCursor resumes from durable checkpoints instead of stale queue cursor", async () => {
+  const existing = new Set([
+    "targeted-editorial-execution/idem-1/chunks/0001.json",
+    "targeted-editorial-execution/idem-1/chunks/0002.json",
+    "targeted-editorial-execution/idem-1/chunks/0003.json"
+  ]);
+  const store = {
+    getBlockBlobClient(name) {
+      return {
+        async exists() {
+          return existing.has(name);
+        }
+      };
+    }
+  };
+
+  assert.equal(await firstMissingLineEditingChunkCursor(store, "idem-1", 145), 3);
 });
 
 test("editorial execution runtime defines reusable executors for all required editorial stages", () => {

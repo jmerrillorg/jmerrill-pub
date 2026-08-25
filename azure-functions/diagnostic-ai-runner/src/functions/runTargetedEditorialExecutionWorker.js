@@ -11,8 +11,13 @@ app.storageQueue("run-targeted-editorial-execution-worker", {
   connection: "AzureWebJobsStorage",
   handler: async (message, context) => {
     const result = await processQueuedTargetedEditorialExecution(message);
+    const chunk =
+      result.chunkIndex && result.chunkCount
+        ? `; chunk=${result.chunkIndex}/${result.chunkCount}`
+        : "";
+    const blocker = result.exactBlocker ? `; blocker=${result.exactBlocker}` : "";
     context.info(
-      `Targeted editorial execution worker completed; status=${result.status}; idempotency=${result.idempotencyKey || "n/a"}`
+      `Targeted editorial execution worker completed; status=${result.status}; idempotency=${result.idempotencyKey || "n/a"}${chunk}${blocker}`
     );
   }
 });

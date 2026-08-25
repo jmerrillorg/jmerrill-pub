@@ -606,11 +606,22 @@ async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
   };
   await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, planName, plan);
 
-  const chunkCursor = Math.max(0, Math.min(source.chunkCount - 1, parseNonNegativeInteger(input.chunkCursor, 0)));
+  const requestedChunkCursor = Math.max(0, Math.min(source.chunkCount - 1, parseNonNegativeInteger(input.chunkCursor, 0)));
+  const nextMissingChunkCursor = await firstMissingLineEditingChunkCursor(
+    checkpointStore,
+    evaluated.idempotencyKey,
+    source.chunkCount
+  );
+  const chunkCursor =
+    nextMissingChunkCursor < source.chunkCount
+      ? nextMissingChunkCursor
+      : requestedChunkCursor;
   const chunkIndex = chunkCursor + 1;
-  const chunkName = `chunks/${String(chunkIndex).padStart(4, "0")}.json`;
+  const chunkName = lineEditingChunkCheckpointName(chunkIndex);
   let chunkCheckpoint;
-  if (await checkpointExists(checkpointStore, evaluated.idempotencyKey, chunkName)) {
+  if (nextMissingChunkCursor >= source.chunkCount) {
+    chunkCheckpoint = await downloadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName);
+  } else if (await checkpointExists(checkpointStore, evaluated.idempotencyKey, chunkName)) {
     chunkCheckpoint = await downloadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName);
   } else {
     const modelResult = await invokeSingleStageModelProvider({
@@ -706,7 +717,7 @@ async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
     await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName, chunkCheckpoint);
   }
 
-  if (chunkCursor < source.chunkCount - 1) {
+  if (nextMissingChunkCursor < source.chunkCount && chunkCursor < source.chunkCount - 1) {
     const queued = await enqueueTargetedEditorialChunk(queueClient, {
       ...input,
       kind: "TARGETED_EDITORIAL_EXECUTION",
@@ -738,7 +749,7 @@ async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
     checkpoints.push(await downloadJsonCheckpoint(
       checkpointStore,
       evaluated.idempotencyKey,
-      `chunks/${String(index).padStart(4, "0")}.json`
+      lineEditingChunkCheckpointName(index)
     ));
   }
   const modelInvocation = buildChunkedLineEditingInvocation(checkpoints);
@@ -1107,6 +1118,20 @@ function targetedEditorialCheckpointBlobName(idempotencyKey, name) {
     normalizeString(idempotencyKey),
     name.replace(/^\/+/, "")
   ].join("/");
+}
+
+function lineEditingChunkCheckpointName(chunkIndex) {
+  return `chunks/${String(chunkIndex).padStart(4, "0")}.json`;
+}
+
+async function firstMissingLineEditingChunkCursor(store, idempotencyKey, chunkCount) {
+  const boundedChunkCount = Math.max(0, parseNonNegativeInteger(chunkCount, 0));
+  for (let index = 1; index <= boundedChunkCount; index += 1) {
+    if (!await checkpointExists(store, idempotencyKey, lineEditingChunkCheckpointName(index))) {
+      return index - 1;
+    }
+  }
+  return boundedChunkCount;
 }
 
 async function uploadJsonCheckpoint(store, idempotencyKey, name, value) {
@@ -3259,6 +3284,7 @@ module.exports = {
   invokeStageModelProvider,
   invokeSingleStageModelProvider,
   calculateLineEditingChunkConcurrency,
+  firstMissingLineEditingChunkCursor,
   parseNonNegativeInteger,
   splitLineEditingSourceChunks,
   buildLineEditingChunkPrompt,
