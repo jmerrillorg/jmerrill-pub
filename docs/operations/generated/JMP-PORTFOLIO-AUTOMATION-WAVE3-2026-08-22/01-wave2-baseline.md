@@ -1,6 +1,6 @@
 # Wave 2 Baseline
 
-Last Verified: 2026-08-24T21:43:53.509Z
+Last Verified: 2026-08-25T02:04:22.235Z
 
 | Source | Count |
 | --- | ---: |
@@ -8,11 +8,11 @@ Last Verified: 2026-08-24T21:43:53.509Z
 | Intakes | 31 |
 | Opportunities | 6 |
 | Author Profiles | 55 |
-| Editorial Stages | 32 |
+| Editorial Stages | 33 |
 | Approval Gates | 18 |
-| Editorial Artifacts | 118 |
+| Editorial Artifacts | 120 |
 | Production Projects | 2 |
-| Production Tasks | 8 |
+| Production Tasks | 9 |
 | Execution Logs Read | 500 |
 
 Wave 1 records evaluated: 424.

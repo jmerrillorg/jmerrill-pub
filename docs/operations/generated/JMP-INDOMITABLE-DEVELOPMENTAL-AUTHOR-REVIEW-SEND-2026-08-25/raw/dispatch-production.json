@@ -1,0 +1,48 @@
+{
+  "service": "PublishingDispatchService",
+  "operation": "dispatchAuthorPackage",
+  "executionMode": "PRODUCTION",
+  "titleId": "fd577d2b-01a0-f111-b8dc-000d3a14673b",
+  "stageId": "0f587d2b-01a0-f111-b8dc-000d3a14673b",
+  "packageId": "pkg-0f587d2b-01a0-f111-b8dc-000d3a14673b-developmental-editing-v2",
+  "recipientContactId": "5bb796dc-cd95-f111-8076-7c1e525b15c2",
+  "recipientEmail": "quanishadockery7777@gmail.com",
+  "gateId": "0cf8a1d7-04a0-f111-b8dc-00224820105b",
+  "idempotencyKey": "author-package-notification:fd577d2b-01a0-f111-b8dc-000d3a14673b:DEVELOPMENTAL_EDITING_REVIEW:recipient:5bb796dc-cd95-f111-8076-7c1e525b15c2:pkg-0f587d2b-01a0-f111-b8dc-000d3a14673b-developmental-editing-v2:v2:83c40ae52e8bc64d455d312cac64259883110f6c5f2d3f2962ccc180071c6f9a",
+  "naturalKey": "Title + fd577d2b-01a0-f111-b8dc-000d3a14673b + Stage + 0f587d2b-01a0-f111-b8dc-000d3a14673b + Package Version + v2 + Recipient + 5bb796dc-cd95-f111-8076-7c1e525b15c2",
+  "validation": {
+    "currentPackage": "PASS",
+    "titleReadiness": "PASS",
+    "authorFacingIdentity": "PASS",
+    "recipient": "PASS",
+    "manifest": "PASS",
+    "qa": "PASS",
+    "duplicateSend": "PASS",
+    "currentGate": "PASS",
+    "intakeReference": "PASS",
+    "currentPackageVersion": "PASS",
+    "requiredAttachments": "PASS",
+    "attachmentChecksums": "PASS",
+    "portalAccessPreflight": "PASS",
+    "workspaceTarget": "FAIL"
+  },
+  "blockers": [],
+  "executionLogIds": [
+    "7eddc9e2-28a0-f111-b8dc-7c1e525b15c2",
+    "0a7bd5e8-28a0-f111-b8dc-7c1e525b15c2",
+    "87fcb0e4-28a0-f111-b8dc-000d3a14673b",
+    "fe7cc5e8-28a0-f111-b8dc-00224820105b"
+  ],
+  "proposedMutations": [
+    "create-or-reuse-one-author-review-gate",
+    "send-one-branded-author-package-through-acs",
+    "attach-required-author-safe-package-artifacts",
+    "write-dataverse-send-log",
+    "write-execution-log-chain",
+    "refresh-publisher-operating-center-projection",
+    "refresh-author-operating-center-projection-as-secondary-view",
+    "require-email-first-operational-delivery-certification-before-seven-day-response-clock"
+  ],
+  "status": "operationally_certified",
+  "providerMessageId": "accepted-without-provider-message-id"
+}

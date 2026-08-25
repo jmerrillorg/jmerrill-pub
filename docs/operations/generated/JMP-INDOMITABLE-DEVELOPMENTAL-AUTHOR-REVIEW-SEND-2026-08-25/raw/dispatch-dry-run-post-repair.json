@@ -1,0 +1,45 @@
+{
+  "service": "PublishingDispatchService",
+  "operation": "dispatchAuthorPackage",
+  "executionMode": "DRY_RUN",
+  "titleId": "fd577d2b-01a0-f111-b8dc-000d3a14673b",
+  "stageId": "0f587d2b-01a0-f111-b8dc-000d3a14673b",
+  "packageId": "pkg-0f587d2b-01a0-f111-b8dc-000d3a14673b-developmental-editing-v2",
+  "recipientContactId": "5bb796dc-cd95-f111-8076-7c1e525b15c2",
+  "recipientEmail": "quanishadockery7777@gmail.com",
+  "gateId": "0cf8a1d7-04a0-f111-b8dc-00224820105b",
+  "idempotencyKey": "author-package-notification:fd577d2b-01a0-f111-b8dc-000d3a14673b:DEVELOPMENTAL_EDITING_REVIEW:recipient:5bb796dc-cd95-f111-8076-7c1e525b15c2:pkg-0f587d2b-01a0-f111-b8dc-000d3a14673b-developmental-editing-v2:v2:3fbc9142db67f1e55e20cd15790ca51eb4c5bb8aedf7d16590963cf58fa620ca",
+  "naturalKey": "Title + fd577d2b-01a0-f111-b8dc-000d3a14673b + Stage + 0f587d2b-01a0-f111-b8dc-000d3a14673b + Package Version + v2 + Recipient + 5bb796dc-cd95-f111-8076-7c1e525b15c2",
+  "validation": {
+    "currentPackage": "PASS",
+    "titleReadiness": "PASS",
+    "authorFacingIdentity": "PASS",
+    "recipient": "PASS",
+    "manifest": "PASS",
+    "qa": "FAIL",
+    "duplicateSend": "PASS",
+    "currentGate": "PASS",
+    "intakeReference": "PASS",
+    "currentPackageVersion": "PASS",
+    "requiredAttachments": "FAIL",
+    "attachmentChecksums": "PASS",
+    "portalAccessPreflight": "PASS",
+    "workspaceTarget": "FAIL"
+  },
+  "blockers": [
+    "PUBLISHING_DISPATCH_BLOCKED - QA",
+    "PUBLISHING_DISPATCH_BLOCKED - REQUIREDATTACHMENTS"
+  ],
+  "executionLogIds": [],
+  "proposedMutations": [
+    "create-or-reuse-one-author-review-gate",
+    "send-one-branded-author-package-through-acs",
+    "attach-required-author-safe-package-artifacts",
+    "write-dataverse-send-log",
+    "write-execution-log-chain",
+    "refresh-publisher-operating-center-projection",
+    "refresh-author-operating-center-projection-as-secondary-view",
+    "require-email-first-operational-delivery-certification-before-seven-day-response-clock"
+  ],
+  "status": "blocked"
+}

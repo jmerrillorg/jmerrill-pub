@@ -1,0 +1,16 @@
+{
+  "generatedOn": "2026-08-25T02:04:22.235Z",
+  "execute": true,
+  "classification": "JMP_AUTONOMOUS_PORTFOLIO_WAVE3_CONTROLLED_COMMISSIONING",
+  "recordsEvaluated": 424,
+  "systemAttentionBefore": 251,
+  "systemAttentionAfter": 0,
+  "genericSystemAttention": 0,
+  "autoExecutableBefore": 1,
+  "autoExecutableAfter": 3,
+  "automaticallyQueued": 3,
+  "automaticallyResumed": 0,
+  "operatorTasks": 250,
+  "unexplainedIdle": 0,
+  "mutations": 0
+}
