@@ -58,7 +58,7 @@ const DEFAULT_LINE_EDITING_CHUNK_MAX_OUTPUT_TOKENS = 2000;
 const DEFAULT_LINE_EDITING_ADAPTIVE_MAX_RETRIES = 2;
 const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS = 5000;
 const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_MAX_MS = 120000;
-const DEFAULT_LINE_EDITING_SCHEMA_MISS_MAX_RETRIES = 2;
+const DEFAULT_LINE_EDITING_SCHEMA_MISS_MAX_RETRIES = 3;
 const DEFAULT_LINE_EDITING_TRANSIENT_MODEL_MAX_RETRIES = 3;
 const DEFAULT_TARGETED_EDITORIAL_QUEUE_NAME = "jm1-targeted-editorial-execution";
 const DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_CONTAINER = "publishing";
@@ -1267,6 +1267,7 @@ function buildLineEditingChunkPrompt({
   schemaRetryAttempt = 0
 }) {
   const chunkSummary = summarizeExtractedText(chunkText || "");
+  const retryAttempt = parseNonNegativeInteger(schemaRetryAttempt, 0);
   return JSON.stringify({
     task: "cc010_line_editing_full_manuscript_chunk_execution",
     contract:
@@ -1293,9 +1294,11 @@ function buildLineEditingChunkPrompt({
     requiredExactJsonKeys:
       ["editedManuscript", "lineEditingSummary", "changeLedger", "retentionNotes", "authorQueries"],
     schemaRetryInstruction:
-      parseNonNegativeInteger(schemaRetryAttempt, 0) > 0
-        ? "The previous chunk response did not include editedManuscript. This retry must include editedManuscript exactly as a top-level output key containing the complete edited text for this chunk."
-        : "",
+      retryAttempt > 1
+        ? "The previous chunk responses did not include editedManuscript. This retry must return a JSON object with editedManuscript exactly as a top-level key. editedManuscript must contain the complete text for this chunk. If no line edits are needed, copy sourceText into editedManuscript unchanged. Do not summarize or replace editedManuscript with notes."
+        : retryAttempt > 0
+          ? "The previous chunk response did not include editedManuscript. This retry must include editedManuscript exactly as a top-level output key containing the complete edited text for this chunk."
+          : "",
     chunkAssemblyInvariant:
       "This is one governed chunk of a full-manuscript Line Editing pass. Preserve chunk order. Do not add headings unless present in the chunk. Do not omit source paragraphs.",
     sourceText: chunkText

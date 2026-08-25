@@ -862,6 +862,34 @@ test("line editing chunk prompt includes sourceText instead of sample-only input
   assert.match(prompt.schemaRetryInstruction, /previous chunk response did not include editedManuscript/);
 });
 
+test("line editing chunk prompt escalates repeated schema retries without author-gate mutation", () => {
+  const prompt = JSON.parse(buildLineEditingChunkPrompt({
+    stage: {
+      jm1pub_editorialstageid: "stage-line",
+      jm1pub_name: "Line Editing - Test",
+      _jm1pub_titleid_value: "title-1"
+    },
+    sourceArtifact: {
+      jm1pub_editorialartifactid: "source-artifact",
+      jm1pub_editorialartifactname: "Approved Developmental Manuscript",
+      jm1pub_filename: "approved.docx",
+      jm1pub_sha256: "sha-source",
+      jm1pub_iscurrentapproved: true
+    },
+    chunkText: "The complete chunk text must never be replaced by notes.",
+    chunkIndex: 106,
+    chunkCount: 145,
+    totalWordCount: 113901,
+    upstreamContext: null,
+    schemaRetryAttempt: 2
+  }));
+
+  assert.match(prompt.schemaRetryInstruction, /previous chunk responses did not include editedManuscript/);
+  assert.match(prompt.schemaRetryInstruction, /copy sourceText into editedManuscript unchanged/);
+  assert.equal(prompt.sourceText, "The complete chunk text must never be replaced by notes.");
+  assert.equal(prompt.requiredExactJsonKeys.includes("editedManuscript"), true);
+});
+
 test("line editing provider route chunks and aggregates full-manuscript output", async () => {
   const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
   const previousConcurrency = process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY;
