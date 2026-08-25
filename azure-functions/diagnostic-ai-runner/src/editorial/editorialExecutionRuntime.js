@@ -19,6 +19,7 @@ const {
   resolveArtifactSupersessionAuthority,
   resolveEditorialStageAuthority
 } = require("../policy/canonPolicyLayer");
+const { evaluateBlock04StageTransition } = require("./block04EditorialPolicy");
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 
@@ -327,6 +328,21 @@ async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
       idempotencyKey
     });
   }
+  const block04PolicyDecision = evaluateBlock04StageTransition({
+    toStage: normalized.stageCode,
+    scopeStages: normalized.block04ScopeStages || normalized.scopeStages || [],
+    completedStages: normalized.block04CompletedStages || normalized.completedStages || [],
+    cadenceEligible: normalized.cadenceEligible !== false,
+    scheduledReleaseAt: normalized.scheduledReleaseAt,
+    titleId: normalized.titleId,
+    stageId: normalizeString(stage.jm1pub_editorialstageid)
+  });
+  if (!block04PolicyDecision.ok) {
+    return targetedBlocked(normalized, "BLOCK_04_STAGE_AUTHORITY_DENIED", block04PolicyDecision.reason, {
+      idempotencyKey,
+      policyDecision: block04PolicyDecision
+    });
+  }
   const editorialPolicyDecision = resolveEditorialStageAuthority({
     stageCode: normalized.stageCode,
     priorAuthorGateCleared: upstream.ok,
@@ -417,6 +433,7 @@ async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
         }))
     },
     styleGuide: selectedStyleGuidesForStage(normalized.stageCode),
+    block04PolicyDecision,
     targetStage: normalized.stageCode,
     providerRoute: {
       provider: normalized.stageCode === "LINE_EDITING" ? "microsoft-foundry-claude" : "stage-policy",
