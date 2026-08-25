@@ -1295,7 +1295,11 @@ function shouldPreserveExistingExactBlocker(exactBlocker) {
     "LINE_CHUNK_EDITED_MANUSCRIPT_MISSING",
     "MODEL_INVOCATION_FAILED",
     "MODEL_RESPONSE_NOT_JSON",
-    "MODEL_CALL_EXCEPTION_REQUEST_TIMEOUT"
+    "MODEL_CALL_EXCEPTION_REQUEST_TIMEOUT",
+    "MICROSOFT_FOUNDRY_HTTP_429",
+    "RATE_LIMIT",
+    "USERBYMODELBYMINUTEOUTPUTTOKENS",
+    "USERBYMODELBYMINUTEUNCACHEDINPUTTOKENS"
   ];
   return !retryableBlockers.some((retryable) => exactBlocker.includes(retryable));
 }
