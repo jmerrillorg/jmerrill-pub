@@ -58,6 +58,7 @@ const DEFAULT_LINE_EDITING_CHUNK_MAX_OUTPUT_TOKENS = 2000;
 const DEFAULT_LINE_EDITING_ADAPTIVE_MAX_RETRIES = 2;
 const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS = 5000;
 const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_MAX_MS = 120000;
+const DEFAULT_LINE_EDITING_SCHEMA_MISS_MAX_RETRIES = 2;
 const DEFAULT_TARGETED_EDITORIAL_QUEUE_NAME = "jm1-targeted-editorial-execution";
 const DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_CONTAINER = "publishing";
 const DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_PREFIX = "targeted-editorial-execution";
@@ -638,7 +639,8 @@ async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
         chunkIndex,
         chunkCount: source.chunkCount,
         totalWordCount: source.totalWordCount,
-        upstreamContext: evaluated.upstream
+        upstreamContext: evaluated.upstream,
+        schemaRetryAttempt: parseNonNegativeInteger(input.chunkRetryAttempt, 0)
       }),
       diagnosticId: `${normalizeString(stage._jm1pub_titleid_value) || normalizeString(stage.jm1pub_editorialstageid)}:line-chunk-${chunkIndex}`,
       promptVersion: "CC010-LINE_EDITING-CHUNK-V1"
@@ -686,6 +688,29 @@ async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
     }
     const output = lineEditingOutput(modelResult);
     if (!output.editedManuscript) {
+      const schemaRetryAttempt = parseNonNegativeInteger(input.chunkRetryAttempt, 0);
+      if (schemaRetryAttempt < lineEditingSchemaMissMaxRetries()) {
+        const queued = await enqueueTargetedEditorialChunk(queueClient, {
+          ...input,
+          kind: "TARGETED_EDITORIAL_EXECUTION",
+          version: 1,
+          chunked: true,
+          chunkCursor,
+          chunkRetryAttempt: schemaRetryAttempt + 1,
+          executionMode: "EXECUTE"
+        }, { visibilityTimeout: 60 });
+        return {
+          ok: true,
+          status: "CHUNK_REQUEUED_AFTER_SCHEMA_MISS",
+          executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+          idempotencyKey: evaluated.idempotencyKey,
+          chunkIndex,
+          chunkCount: source.chunkCount,
+          retryAfterSeconds: 60,
+          queued,
+          externalSends: 0
+        };
+      }
       const exact = "LINE_EDITING_BLOCKED — LINE_CHUNK_EDITED_MANUSCRIPT_MISSING";
       const blocked = await recordBlockedTask(client, stage, stageCode, exact, correlationId);
       return {
@@ -959,6 +984,13 @@ function lineEditingChunkConcurrency() {
   return parsePositiveInteger(process.env.JM1_LINE_EDITING_CHUNK_CONCURRENCY, DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY);
 }
 
+function lineEditingSchemaMissMaxRetries() {
+  return parsePositiveInteger(
+    process.env.JM1_LINE_EDITING_SCHEMA_MISS_MAX_RETRIES,
+    DEFAULT_LINE_EDITING_SCHEMA_MISS_MAX_RETRIES
+  );
+}
+
 function parseRatio(value, fallback) {
   const numeric = Number(normalizeString(value));
   return Number.isFinite(numeric) && numeric > 0 && numeric < 1 ? numeric : fallback;
@@ -1178,7 +1210,8 @@ function buildLineEditingChunkPrompt({
   chunkIndex,
   chunkCount,
   totalWordCount,
-  upstreamContext
+  upstreamContext,
+  schemaRetryAttempt = 0
 }) {
   const chunkSummary = summarizeExtractedText(chunkText || "");
   return JSON.stringify({
@@ -1204,6 +1237,12 @@ function buildLineEditingChunkPrompt({
       retentionNotes: "string",
       authorQueries: ["string"]
     },
+    requiredExactJsonKeys:
+      ["editedManuscript", "lineEditingSummary", "changeLedger", "retentionNotes", "authorQueries"],
+    schemaRetryInstruction:
+      parseNonNegativeInteger(schemaRetryAttempt, 0) > 0
+        ? "The previous chunk response did not include editedManuscript. This retry must include editedManuscript exactly as a top-level output key containing the complete edited text for this chunk."
+        : "",
     chunkAssemblyInvariant:
       "This is one governed chunk of a full-manuscript Line Editing pass. Preserve chunk order. Do not add headings unless present in the chunk. Do not omit source paragraphs.",
     sourceText: chunkText
