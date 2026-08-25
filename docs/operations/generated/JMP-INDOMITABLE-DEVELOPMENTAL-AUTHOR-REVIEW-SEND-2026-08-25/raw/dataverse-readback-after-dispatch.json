@@ -1,0 +1,96 @@
+{
+  "checkedAt": "2026-08-25T02:02:45.309Z",
+  "stage": {
+    "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialstages(jm1pub_editorialstageid,jm1pub_name,jm1pub_stagestatus,jm1pub_authorsafesummary,jm1pub_internaloperationalsummary,jm1pub_currentgatecount,jm1pub_correlationid,jm1pub_intakereference,jm1pub_publishingintakereference)/$entity",
+    "@odata.etag": "W/\"49058986\"",
+    "jm1pub_authorsafesummary": "Editorial work is in package preparation. No new author action is required until the package is released.",
+    "jm1pub_internaloperationalsummary": "PublishingDispatchService certified operational delivery. Email is the official delivery mechanism; branded HTML, plain text, required attachments, checksums, archive, Dataverse send evidence, direct reply path, and single gate passed. Author Operating Center status NOT_APPLICABLE is secondary and non-blocking. Idempotency author-package-notification:fd577d2b-01a0-f111-b8dc-000d3a14673b:DEVELOPMENTAL_EDITING_REVIEW:recipient:5bb796dc-cd95-f111-8076-7c1e525b15c2:pkg-0f587d2b-01a0-f111-b8dc-000d3a14673b-developmental-editing-v2:v2:83c40ae52e8bc64d455d312cac64259883110f6c5f2d3f2962ccc180071c6f9a.",
+    "jm1pub_currentgatecount@OData.Community.Display.V1.FormattedValue": "1",
+    "jm1pub_currentgatecount": 1,
+    "jm1pub_editorialstageid": "0f587d2b-01a0-f111-b8dc-000d3a14673b",
+    "jm1pub_publishingintakereference": "JMP-INT-202608-0AOS7L",
+    "jm1pub_name": "Developmental Editing - Indomitable",
+    "jm1pub_intakereference": "JMP-INT-202608-0AOS7L",
+    "jm1pub_correlationid": "INDOMITABLE-DEVELOPMENTAL-AUTHOR-REVIEW-2026-08-25-PRODUCTION",
+    "jm1pub_stagestatus@OData.Community.Display.V1.FormattedValue": "In Progress",
+    "jm1pub_stagestatus": 100000001
+  },
+  "gate": {
+    "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialapprovalgates(jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatestatus,jm1pub_authorresponsesummary,jm1pub_authordecisionsource,jm1pub_awaitingsince,jm1pub_nextstageauthorized,jm1pub_correlationid,_jm1pub_deliverableartifactid_value)/$entity",
+    "@odata.etag": "W/\"49058987\"",
+    "jm1pub_editorialapprovalgatename": "Developmental Edit Author Review - Developmental Editing - Indomitable",
+    "jm1pub_authordecisionsource": "operational-certification:author-package-notification:fd577d2b-01a0-f111-b8dc-000d3a14673b:DEVELOPME",
+    "jm1pub_editorialapprovalgateid": "0cf8a1d7-04a0-f111-b8dc-00224820105b",
+    "jm1pub_correlationid": "INDOMITABLE-DEVELOPMENTAL-AUTHOR-REVIEW-2026-08-25-PRODUCTION",
+    "jm1pub_authorresponsesummary": "Developmental Editing package delivery is OPERATIONALLY_CERTIFIED. Seven-calendar-day author response period started after compliant email delivery.",
+    "jm1pub_gatestatus@OData.Community.Display.V1.FormattedValue": "Awaiting Author Response",
+    "jm1pub_gatestatus": 196650002,
+    "_organizationid_value": "9dafb403-b493-f011-a700-000d3a106f37",
+    "_jm1pub_deliverableartifactid_value@OData.Community.Display.V1.FormattedValue": "Developmentally Edited Manuscript - Developmental Editing - Indomitable",
+    "_jm1pub_deliverableartifactid_value": "13393cd5-04a0-f111-b8dc-000d3a14673b",
+    "jm1pub_awaitingsince@OData.Community.Display.V1.FormattedValue": "8/24/2026 10:01 PM",
+    "jm1pub_awaitingsince": "2026-08-25T02:01:42Z",
+    "jm1pub_nextstageauthorized@OData.Community.Display.V1.FormattedValue": "No",
+    "jm1pub_nextstageauthorized": false
+  },
+  "logs": {
+    "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1_executionlogs(jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription,jm1_completedon,createdon)",
+    "value": [
+      {
+        "@odata.etag": "W/\"49058989\"",
+        "jm1_executionlogid": "fe7cc5e8-28a0-f111-b8dc-00224820105b",
+        "jm1_name": "PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED - Indomitable",
+        "jm1_actiondescription": "Idempotency author-package-notification:fd577d2b-01a0-f111-b8dc-000d3a14673b:DEVELOPMENTAL_EDITING_REVIEW:recipient:5bb796dc-cd95-f111-8076-7c1e525b15c2:pkg-0f587d2b-01a0-f111-b8dc-000d3a14673b-developmental-editing-v2:v2:83c40ae52e8bc64d455d312cac64259883110f6c5f2d3f2962ccc180071c6f9a. Operational delivery certification passed by codex. Gate 0cf8a1d7-04a0-f111-b8dc-00224820105b moved to AWAITING_AUTHOR_RESPONSE after branded HTML, plain text, required attachments, attachment checksums, archive, Dataverse send evidence, direct reply path, and single active gate passed. Portal status NOT_APPLICABLE is secondary and not required for ordinary editorial review. Seven-day response clock started at 2026-08-25T02:01:42.279Z. Natural key Title + fd577d2b-01a0-f111-b8dc-000d3a14673b + Stage + 0f587d2b-01a0-f111-b8dc-000d3a14673b + Package Version + v2 + Recipient + 5bb796dc-cd95-f111-8076-7c1e525b15c2. Correlation INDOMITABLE-DEVELOPMENTAL-AUTHOR-REVIEW-2026-08-25-PRODUCTION.",
+        "jm1_actiontype": "PUBLISHING_DISPATCH_OPERATIONALLY_CERTIFIED",
+        "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 10:01 PM",
+        "createdon": "2026-08-25T02:01:42Z",
+        "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 10:01 PM",
+        "jm1_completedon": "2026-08-25T02:01:42Z"
+      },
+      {
+        "@odata.etag": "W/\"49058984\"",
+        "jm1_executionlogid": "87fcb0e4-28a0-f111-b8dc-000d3a14673b",
+        "jm1_name": "PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING - Indomitable",
+        "jm1_actiondescription": "Awaiting operational delivery certification: branded HTML, plain text, required email attachments, attachment checksums, archive, Dataverse send evidence, direct reply path, and one active gate. The portal is a secondary view and is not required for ordinary editorial review. Correlation INDOMITABLE-DEVELOPMENTAL-AUTHOR-REVIEW-2026-08-25-PRODUCTION. Natural key Title + fd577d2b-01a0-f111-b8dc-000d3a14673b + Stage + 0f587d2b-01a0-f111-b8dc-000d3a14673b + Package Version + v2 + Recipient + 5bb796dc-cd95-f111-8076-7c1e525b15c2.",
+        "jm1_actiontype": "PUBLISHING_DISPATCH_OPERATIONAL_CERTIFICATION_PENDING",
+        "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 10:01 PM",
+        "createdon": "2026-08-25T02:01:40Z",
+        "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 10:01 PM",
+        "jm1_completedon": "2026-08-25T02:01:40Z"
+      },
+      {
+        "@odata.etag": "W/\"49058981\"",
+        "jm1_executionlogid": "0a7bd5e8-28a0-f111-b8dc-7c1e525b15c2",
+        "jm1_name": "PUBLISHING_DISPATCH_TECHNICALLY_RELEASED - Indomitable",
+        "jm1_actiondescription": "Idempotency author-package-notification:fd577d2b-01a0-f111-b8dc-000d3a14673b:DEVELOPMENTAL_EDITING_REVIEW:recipient:5bb796dc-cd95-f111-8076-7c1e525b15c2:pkg-0f587d2b-01a0-f111-b8dc-000d3a14673b-developmental-editing-v2:v2:83c40ae52e8bc64d455d312cac64259883110f6c5f2d3f2962ccc180071c6f9a. ACS accepted package send request after provider accepted-without-provider-message-id. Gate 0cf8a1d7-04a0-f111-b8dc-00224820105b remains READY_FOR_AUTHOR_RELEASE until operational certification passes. No seven-day response clock starts at technical release. Natural key Title + fd577d2b-01a0-f111-b8dc-000d3a14673b + Stage + 0f587d2b-01a0-f111-b8dc-000d3a14673b + Package Version + v2 + Recipient + 5bb796dc-cd95-f111-8076-7c1e525b15c2.",
+        "jm1_actiontype": "PUBLISHING_DISPATCH_TECHNICALLY_RELEASED",
+        "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 10:01 PM",
+        "createdon": "2026-08-25T02:01:40Z",
+        "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 10:01 PM",
+        "jm1_completedon": "2026-08-25T02:01:40Z"
+      },
+      {
+        "@odata.etag": "W/\"49058972\"",
+        "jm1_executionlogid": "7eddc9e2-28a0-f111-b8dc-7c1e525b15c2",
+        "jm1_name": "PUBLISHING_DISPATCH_TRANSACTION_STARTED - Indomitable",
+        "jm1_actiondescription": "Operation dispatchAuthorPackage started by codex. Natural key Title + fd577d2b-01a0-f111-b8dc-000d3a14673b + Stage + 0f587d2b-01a0-f111-b8dc-000d3a14673b + Package Version + v2 + Recipient + 5bb796dc-cd95-f111-8076-7c1e525b15c2. Title fd577d2b-01a0-f111-b8dc-000d3a14673b; stage 0f587d2b-01a0-f111-b8dc-000d3a14673b; package pkg-0f587d2b-01a0-f111-b8dc-000d3a14673b-developmental-editing-v2; gate 0cf8a1d7-04a0-f111-b8dc-00224820105b. Required physical attachments editedManuscript:cc623f67930899574c596205662f404f26544620f7c5cb465fdd5acc47622fef, reviewInstructions:2207c4cfd312fde9ffca5b2640b3239043bd45d53fba311845712be174578c95. Execution mode PRODUCTION; idempotency author-package-notification:fd577d2b-01a0-f111-b8dc-000d3a14673b:DEVELOPMENTAL_EDITING_REVIEW:recipient:5bb796dc-cd95-f111-8076-7c1e525b15c2:pkg-0f587d2b-01a0-f111-b8dc-000d3a14673b-developmental-editing-v2:v2:83c40ae52e8bc64d455d312cac64259883110f6c5f2d3f2962ccc180071c6f9a; correlation INDOMITABLE-DEVELOPMENTAL-AUTHOR-REVIEW-",
+        "jm1_actiontype": "PUBLISHING_DISPATCH_TRANSACTION_STARTED",
+        "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 10:01 PM",
+        "createdon": "2026-08-25T02:01:36Z",
+        "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 10:01 PM",
+        "jm1_completedon": "2026-08-25T02:01:36Z"
+      },
+      {
+        "@odata.etag": "W/\"49054710\"",
+        "jm1_executionlogid": "0ff8a1d7-04a0-f111-b8dc-00224820105b",
+        "jm1_name": "AUTHOR_REVIEW_GATE_CREATED - Developmental Editing - Indomitable",
+        "jm1_actiondescription": "DEVELOPMENTAL_EDITING opened mandatory author review gate 0cf8a1d7-04a0-f111-b8dc-00224820105b for artifact 13393cd5-04a0-f111-b8dc-000d3a14673b; checksum f01472b5efbffdb8563e2e6b7f5791b742b2837d04765d444af73610d5a4c05c. No notification was sent by this runtime. Correlation TARGETED-122948b80c5d614fc4c5e3dc0a80516974b1a039efc756af817f78087fa4e870. Idempotency editorial-runtime:author-review-gate:0f587d2b-01a0-f111-b8dc-000d3a14673b:DEVELOPMENTAL_EDITING:13393cd5-04a0-f111-b8dc-000d3a14673b:f01472b5efbffdb8563e2e6b7f5791b742b2837d04765d444af73610d5a4c05c.",
+        "jm1_actiontype": "AUTHOR_REVIEW_GATE_CREATED",
+        "createdon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:43 PM",
+        "createdon": "2026-08-24T21:43:33Z",
+        "jm1_completedon@OData.Community.Display.V1.FormattedValue": "8/24/2026 5:43 PM",
+        "jm1_completedon": "2026-08-24T21:43:33Z"
+      }
+    ]
+  }
+}

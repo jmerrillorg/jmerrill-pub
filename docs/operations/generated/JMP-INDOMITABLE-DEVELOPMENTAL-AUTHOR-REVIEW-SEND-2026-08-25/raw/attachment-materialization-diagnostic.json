@@ -1,0 +1,42 @@
+{
+  "artifactPopulation": [
+    {
+      "file": "2026-08-24-Developmental-Editing-Indomitable-Developmentally-Edited-Manuscript.docx",
+      "status": "Delivered",
+      "visibility": "Author Facing"
+    },
+    {
+      "file": "2026-08-25-Developmental-Editing-Indomitable-Editorial-Review-Guide.pdf",
+      "status": "Delivered",
+      "visibility": "Author Facing"
+    }
+  ],
+  "out": [
+    {
+      "role": "editedManuscript",
+      "selected": "2026-08-24-Developmental-Editing-Indomitable-Developmentally-Edited-Manuscript.docx",
+      "artifactId": "13393cd5-04a0-f111-b8dc-000d3a14673b",
+      "http": 200,
+      "size": 45710,
+      "expectedSha": "f01472b5efbffdb8563e2e6b7f5791b742b2837d04765d444af73610d5a4c05c",
+      "actualSha": "cc623f67930899574c596205662f404f26544620f7c5cb465fdd5acc47622fef",
+      "publicBlocker": "",
+      "binary": {
+        "ok": true
+      }
+    },
+    {
+      "role": "reviewInstructions",
+      "selected": "2026-08-25-Developmental-Editing-Indomitable-Editorial-Review-Guide.pdf",
+      "artifactId": "7ac33be2-27a0-f111-b8dc-000d3a14673b",
+      "http": 200,
+      "size": 5151,
+      "expectedSha": "2207c4cfd312fde9ffca5b2640b3239043bd45d53fba311845712be174578c95",
+      "actualSha": "2207c4cfd312fde9ffca5b2640b3239043bd45d53fba311845712be174578c95",
+      "publicBlocker": "",
+      "binary": {
+        "ok": true
+      }
+    }
+  ]
+}

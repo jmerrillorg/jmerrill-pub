@@ -1,0 +1,16 @@
+✔ Wave 3 converts generic system attention into specific actionable classes (7.894791ms)
+✔ Wave 3 preserves author decisions as hard waits (0.281959ms)
+✔ Wave 3 does not park structural title-link defects on prospect wait (0.241333ms)
+✔ Wave 3 maps line-ready titles to commissioned editorial queue class (0.221792ms)
+✔ Wave 3 generates contracts only from locked pricing without an agreement (0.640042ms)
+✔ Wave 3 preserves ready manual signature send as a Jackie gate (0.406042ms)
+✔ Wave 3 idempotently marks already recorded actions (0.195875ms)
+✔ Wave 3 summary can reduce system attention without claiming full commissioning (0.614291ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 124.456167

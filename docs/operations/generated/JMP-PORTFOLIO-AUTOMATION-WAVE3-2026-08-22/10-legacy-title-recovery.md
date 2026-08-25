@@ -1,6 +1,6 @@
 # Legacy Title Recovery
 
-Last Verified: 2026-08-24T21:43:53.509Z
+Last Verified: 2026-08-25T02:04:22.235Z
 
 | Title | Found in governed readback | Disposition | Note | Evidence |
 | --- | --- | --- | --- | --- |

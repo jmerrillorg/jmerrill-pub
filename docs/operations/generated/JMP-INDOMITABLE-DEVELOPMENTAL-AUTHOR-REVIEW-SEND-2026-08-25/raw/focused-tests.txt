@@ -1,0 +1,78 @@
+✔ author email without declared CC injects Publishing mailbox (1.673792ms)
+✔ author email already containing Publishing CC does not duplicate it (0.090417ms)
+✔ case-variant Publishing CC normalizes to one effective recipient (0.0555ms)
+✔ author email retry preserves required CC without adding duplicates (0.058375ms)
+✔ manual-recovery author send uses governed CC enforcement (0.053916ms)
+✔ agent-triggered author send uses governed CC enforcement (0.0405ms)
+✔ Stage 0 author acknowledgement relay injects Publishing CC (1.898917ms)
+✔ editorial author review relay injects Publishing CC (1.354334ms)
+✔ cover/proof author review relay enforces Publishing CC on approved author response path (1.023625ms)
+✔ distribution/launch author communication uses governed CC enforcement (0.113583ms)
+✔ royalty/payment author communication uses governed CC enforcement (0.0575ms)
+✔ internal-only notification does not apply author CC rule (0.745167ms)
+✔ missing required CC that cannot be injected fails safely (0.075666ms)
+✔ replay/idempotent send guard preserves one Publishing CC and does not imply duplicate communication (0.058167ms)
+✔ canonical renderer stamps render-enforcement metadata (3.640958ms)
+✔ cover review uses the governed author review package template (0.613375ms)
+✔ cover review renders publishing-grade HTML shell (0.257208ms)
+✔ cover review renders a styled CTA button (0.484375ms)
+✔ cover review includes required author-facing sections (0.207708ms)
+✔ cover review plain-text body carries portal reference and signature (0.165333ms)
+✔ cover review does not expose internal execution language (0.205708ms)
+✔ render contract passes for canonical cover review (0.44125ms)
+✔ render contract blocks missing HTML (0.242833ms)
+✔ render contract blocks simple transactional HTML (0.2535ms)
+✔ render contract blocks missing metadata (0.198333ms)
+✔ render contract blocks wrong renderer metadata (0.165584ms)
+✔ render contract blocks implicit plain text for canonical templates (0.137458ms)
+✔ plain text exception requires explicit registered template (0.042167ms)
+✔ plain text exception is rejected for normal author review template (0.104583ms)
+✔ unknown author-facing email type fails closed (0.160291ms)
+✔ registered author-facing matrix contains status update and cover review paths (0.082625ms)
+✔ final developmental review renders as reply-only with no portal friction (1.336583ms)
+✔ registered author-facing matrix includes future lifecycle communications (0.059666ms)
+✔ relay accepts canonical author review package payload (3.252709ms)
+✔ relay preserves canonical HTML in ACS message content (1.031542ms)
+✔ relay rejects author review package without canonical render mode (1.264791ms)
+✔ relay rejects author review package without canonical renderer (0.905292ms)
+✔ relay rejects author review package without styled CTA (3.14875ms)
+✔ relay rejects author review package with internal language (0.772666ms)
+✔ relay preserves attachment bytes while enforcing canonical HTML (0.643042ms)
+✔ status update remains canonical HTML (0.180708ms)
+PASS every author-review package type declares attachment policy
+PASS workspace link alone does not satisfy attachment policy
+PASS canonical package identity drives notification idempotency
+PASS corrected send is email-first and avoids clock-start language before certification
+PASS canonical events exist for audit, correction, transaction completion, and autostart arming
+PASS author package notification validates canonical From, Reply-To, and Publishing CC policy
+PASS ACS sender supports real attachments instead of link-only notification
+PASS author package email fails closed if internal artifacts enter MIME inventory
+PASS author package notifications require shared branded HTML and plain text
+✔ scripts/author_package_notification_engine.test.mjs (135.089875ms)
+✔ PROGRAM-006 exposes one canonical PublishingDispatchService operation (0.727792ms)
+✔ dispatch service owns validation, natural idempotency, and transaction evidence (0.256ms)
+✔ dispatch service allows working-title author review while preserving identity protection (0.963334ms)
+✔ working-title policy treats Untitled as valid through editorial and final-only downstream gates (0.228292ms)
+✔ dispatch service reuses governed branding and package notification controls (0.153708ms)
+✔ dispatch service fails closed unless real package attachments are materialized (0.291ms)
+✔ dispatch service separates technical release from operational certification (0.394209ms)
+✔ successful dispatch automatically certifies delivery without a second provider send (0.473417ms)
+✔ existing technical release recovery certifies the gate without resending (0.184459ms)
+✔ automatic certification evidence requires governed attachments, checksums, direct reply, and one active gate (0.637292ms)
+✔ ACS relay requires and forwards attachments for author-review packages (0.145084ms)
+✔ legacy callers delegate dispatch to the canonical service (0.083083ms)
+✔ canonical dispatch endpoint is OIDC protected and mode constrained (0.075208ms)
+✔ operational certification endpoint is OIDC protected and evidence constrained (0.071084ms)
+✔ operational certification workflow is protected and evidence backed (0.0785ms)
+✔ executive recovery sends corrected stage-specific author package copy (0.202916ms)
+✔ executive recovery exposes package version for corrected replacement dispatch (0.037875ms)
+✔ PROGRAM-006 rejects corrupt package binaries and nonfunctional action links (27.939125ms)
+✔ PROGRAM-006 keeps service-generated roles out of physical email attachments (0.306333ms)
+ℹ tests 61
+ℹ suites 0
+ℹ pass 61
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 590.622625
