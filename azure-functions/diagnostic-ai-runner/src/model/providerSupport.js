@@ -3,6 +3,8 @@
 const DEFAULT_API_TIMEOUT_MS = 45000;
 const DEFAULT_MAX_RETRIES = 2;
 const DEFAULT_BASE_DELAY_MS = 750;
+const DEFAULT_MIN_RETRY_DELAY_MS = 5000;
+const DEFAULT_MAX_RETRY_DELAY_MS = 120000;
 const DEFAULT_JITTER_RATIO = 0.2;
 
 function normalizePositiveInt(value, fallback) {
@@ -23,6 +25,14 @@ function getProviderRuntimeOptions(prefix) {
     baseDelayMs: normalizePositiveInt(
       process.env[`${prefix}_BASE_DELAY_MS`] || process.env.JM1_AI_PROVIDER_BASE_DELAY_MS,
       DEFAULT_BASE_DELAY_MS
+    ),
+    minRetryDelayMs: normalizePositiveInt(
+      process.env[`${prefix}_MIN_RETRY_DELAY_MS`] || process.env.JM1_AI_PROVIDER_MIN_RETRY_DELAY_MS,
+      DEFAULT_MIN_RETRY_DELAY_MS
+    ),
+    maxRetryDelayMs: normalizePositiveInt(
+      process.env[`${prefix}_MAX_RETRY_DELAY_MS`] || process.env.JM1_AI_PROVIDER_MAX_RETRY_DELAY_MS,
+      DEFAULT_MAX_RETRY_DELAY_MS
     ),
     jitterRatio: Number(process.env[`${prefix}_JITTER_RATIO`] || process.env.JM1_AI_PROVIDER_JITTER_RATIO || DEFAULT_JITTER_RATIO)
   };
@@ -83,24 +93,52 @@ function collectSafeRateLimitHeaders(headers) {
   return safeHeaders;
 }
 
-function buildRateLimitMetadata(headers) {
+function classifyRateLimit(headers, responseBody = null) {
+  const safeHeaders = collectSafeRateLimitHeaders(headers);
+  const text = [
+    responseBody?.error?.code,
+    responseBody?.error?.message,
+    ...Object.entries(safeHeaders).map(([key, value]) => `${key}:${value}`)
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  if (/outputtokens|output.tokens|output token/.test(text)) return "OUTPUT_TOKENS";
+  if (/uncachedinputtokens|uncached.input|inputtokens|input.tokens|input token/.test(text)) return "UNCACHED_INPUT_TOKENS";
+  if (/requests|request/.test(text)) return "REQUESTS";
+  if (/token/.test(text)) return "TOKENS";
+  return "UNKNOWN";
+}
+
+function buildRateLimitMetadata(headers, responseBody = null) {
   const safeHeaders = collectSafeRateLimitHeaders(headers);
   const retryAfterMs = parseRetryAfterMs(headers);
   return {
+    classification: classifyRateLimit(headers, responseBody),
     retryAfterMs,
     retryAfterSeconds: Number.isFinite(retryAfterMs) ? Math.ceil(retryAfterMs / 1000) : null,
     headers: safeHeaders
   };
 }
 
-function computeBackoffDelayMs({ attempt, baseDelayMs, jitterRatio, retryAfterMs }) {
+function computeBackoffDelayMs({
+  attempt,
+  baseDelayMs,
+  jitterRatio,
+  retryAfterMs,
+  minRetryDelayMs = DEFAULT_MIN_RETRY_DELAY_MS,
+  maxRetryDelayMs = DEFAULT_MAX_RETRY_DELAY_MS
+}) {
+  const minDelay = normalizePositiveInt(minRetryDelayMs, DEFAULT_MIN_RETRY_DELAY_MS);
+  const maxDelay = Math.max(minDelay, normalizePositiveInt(maxRetryDelayMs, DEFAULT_MAX_RETRY_DELAY_MS));
   if (Number.isFinite(retryAfterMs) && retryAfterMs >= 0) {
-    return retryAfterMs;
+    return Math.min(maxDelay, Math.max(minDelay, retryAfterMs));
   }
 
   const exponential = baseDelayMs * Math.pow(2, Math.max(0, attempt - 1));
   const jitter = exponential * (Number.isFinite(jitterRatio) ? jitterRatio : DEFAULT_JITTER_RATIO) * Math.random();
-  return Math.round(exponential + jitter);
+  return Math.min(maxDelay, Math.max(minDelay, Math.round(exponential + jitter)));
 }
 
 async function fetchWithRetry({
@@ -108,6 +146,8 @@ async function fetchWithRetry({
   timeoutMs,
   maxRetries,
   baseDelayMs,
+  minRetryDelayMs,
+  maxRetryDelayMs,
   jitterRatio,
   shouldRetry
 }) {
@@ -125,6 +165,8 @@ async function fetchWithRetry({
         const delayMs = computeBackoffDelayMs({
           attempt,
           baseDelayMs,
+          minRetryDelayMs,
+          maxRetryDelayMs,
           jitterRatio,
           retryAfterMs: parseRetryAfterMs(response.headers)
         });
@@ -142,7 +184,14 @@ async function fetchWithRetry({
         throw error;
       }
 
-      const delayMs = computeBackoffDelayMs({ attempt, baseDelayMs, jitterRatio, retryAfterMs: null });
+      const delayMs = computeBackoffDelayMs({
+        attempt,
+        baseDelayMs,
+        minRetryDelayMs,
+        maxRetryDelayMs,
+        jitterRatio,
+        retryAfterMs: null
+      });
       await sleep(delayMs);
     }
   }
@@ -247,10 +296,13 @@ function extractFirstJsonObject(text) {
 
 module.exports = {
   buildRateLimitMetadata,
+  classifyRateLimit,
   collectSafeRateLimitHeaders,
   DEFAULT_API_TIMEOUT_MS,
   DEFAULT_BASE_DELAY_MS,
+  DEFAULT_MAX_RETRY_DELAY_MS,
   DEFAULT_MAX_RETRIES,
+  DEFAULT_MIN_RETRY_DELAY_MS,
   computeBackoffDelayMs,
   extractFirstJsonObject,
   fetchWithRetry,

@@ -114,6 +114,8 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
         timeoutMs: runtimeOptions.timeoutMs,
         maxRetries: runtimeOptions.maxRetries,
         baseDelayMs: runtimeOptions.baseDelayMs,
+        minRetryDelayMs: runtimeOptions.minRetryDelayMs,
+        maxRetryDelayMs: runtimeOptions.maxRetryDelayMs,
         jitterRatio: runtimeOptions.jitterRatio,
         shouldRetry: (result) => [408, 409, 429, 500, 502, 503, 504].includes(result.status),
         requestFn: ({ signal }) => fetch(url, {
@@ -130,8 +132,8 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
     );
 
     httpStatus = response.status;
-    const rateLimit = buildRateLimitMetadata(response.headers);
     const responseBody = await response.json().catch(() => ({}));
+    const rateLimit = buildRateLimitMetadata(response.headers, responseBody);
 
     if (!response.ok) {
       const providerMessage = typeof responseBody?.error?.message === "string"
