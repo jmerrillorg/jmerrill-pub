@@ -15,7 +15,6 @@
     "@azure/functions": "^4.7.0",
     "@azure/identity": "^4.5.0",
     "@azure/storage-blob": "^12.32.0",
-    "@azure/storage-queue": "^12.28.0",
     "@azure/storage-queue": "^12.31.0",
     "applicationinsights": "^2.9.8",
     "docx": "^9.7.1",
