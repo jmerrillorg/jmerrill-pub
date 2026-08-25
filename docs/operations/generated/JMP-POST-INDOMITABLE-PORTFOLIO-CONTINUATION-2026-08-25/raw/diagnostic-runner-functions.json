@@ -1,0 +1,134 @@
+[
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/get-publisher-recommendation-review",
+    "name": "func-jm1-diagnostic-ai-runner/get-publisher-recommendation-review"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/health",
+    "name": "func-jm1-diagnostic-ai-runner/health"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-agreement-document-preparation",
+    "name": "func-jm1-diagnostic-ai-runner/run-agreement-document-preparation"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-agreement-package-send",
+    "name": "func-jm1-diagnostic-ai-runner/run-agreement-package-send"
+  },
+  {
+    "invoke_url_template": null,
+    "name": "func-jm1-diagnostic-ai-runner/run-approval-event-consumer"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-approval-event-consumer-admin-replay",
+    "name": "func-jm1-diagnostic-ai-runner/run-approval-event-consumer-admin-replay"
+  },
+  {
+    "invoke_url_template": null,
+    "name": "func-jm1-diagnostic-ai-runner/run-author-review-response-consumer"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-author-review-response-consumer-admin-replay",
+    "name": "func-jm1-diagnostic-ai-runner/run-author-review-response-consumer-admin-replay"
+  },
+  {
+    "invoke_url_template": null,
+    "name": "func-jm1-diagnostic-ai-runner/run-editorial-execution-runtime"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-editorial-execution-runtime-admin-replay",
+    "name": "func-jm1-diagnostic-ai-runner/run-editorial-execution-runtime-admin-replay"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-editorial-next-stage-materialization",
+    "name": "func-jm1-diagnostic-ai-runner/run-editorial-next-stage-materialization"
+  },
+  {
+    "invoke_url_template": null,
+    "name": "func-jm1-diagnostic-ai-runner/run-editorial-package-handoff-consumer"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-editorial-review-now",
+    "name": "func-jm1-diagnostic-ai-runner/run-editorial-review-now"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-full-wrap-executor",
+    "name": "func-jm1-diagnostic-ai-runner/run-full-wrap-executor"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-governed-agreement-generation",
+    "name": "func-jm1-diagnostic-ai-runner/run-governed-agreement-generation"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-intentional-leader-author-response",
+    "name": "func-jm1-diagnostic-ai-runner/run-intentional-leader-author-response"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-manual-signature-handoff",
+    "name": "func-jm1-diagnostic-ai-runner/run-manual-signature-handoff"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-milestone6-continuation-communication",
+    "name": "func-jm1-diagnostic-ai-runner/run-milestone6-continuation-communication"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-milestone6-evidence-recovery-log",
+    "name": "func-jm1-diagnostic-ai-runner/run-milestone6-evidence-recovery-log"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-milestone6-opportunity-update",
+    "name": "func-jm1-diagnostic-ai-runner/run-milestone6-opportunity-update"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-milestone6-payment-option-capture",
+    "name": "func-jm1-diagnostic-ai-runner/run-milestone6-payment-option-capture"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-op000-track-a-adoption",
+    "name": "func-jm1-diagnostic-ai-runner/run-op000-track-a-adoption"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-op000-track-b-adoption",
+    "name": "func-jm1-diagnostic-ai-runner/run-op000-track-b-adoption"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-package-selection-commercial-continuation",
+    "name": "func-jm1-diagnostic-ai-runner/run-package-selection-commercial-continuation"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-payment-option-commercial-continuation",
+    "name": "func-jm1-diagnostic-ai-runner/run-payment-option-commercial-continuation"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-precontract-editorial-review",
+    "name": "func-jm1-diagnostic-ai-runner/run-precontract-editorial-review"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-publisher-recommendation-action",
+    "name": "func-jm1-diagnostic-ai-runner/run-publisher-recommendation-action"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-publisher-review-decision",
+    "name": "func-jm1-diagnostic-ai-runner/run-publisher-review-decision"
+  },
+  {
+    "invoke_url_template": null,
+    "name": "func-jm1-diagnostic-ai-runner/run-publishing-intake-autostart-recovery"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-publishing-mailbox-reply-check",
+    "name": "func-jm1-diagnostic-ai-runner/run-publishing-mailbox-reply-check"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-stage0-diagnostic",
+    "name": "func-jm1-diagnostic-ai-runner/run-stage0-diagnostic"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/run-targeted-editorial-execution",
+    "name": "func-jm1-diagnostic-ai-runner/run-targeted-editorial-execution"
+  },
+  {
+    "invoke_url_template": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/signnow-webhook",
+    "name": "func-jm1-diagnostic-ai-runner/signnow-webhook"
+  }
+]
