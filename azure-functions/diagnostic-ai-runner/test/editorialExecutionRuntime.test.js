@@ -572,6 +572,128 @@ test("chunked targeted Line Editing requeues malformed chunk output before block
   }
 });
 
+test("chunked targeted Line Editing requeues transient model fetch failures without blocking the stage", async () => {
+  const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
+  const previousTransientRetries = process.env.JM1_LINE_EDITING_TRANSIENT_MODEL_MAX_RETRIES;
+  process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = "1";
+  process.env.JM1_LINE_EDITING_TRANSIENT_MODEL_MAX_RETRIES = "3";
+
+  const sourceText = Array.from({ length: 47 }, (_, index) => `word${index + 1}`).join("\n\n");
+  const sourceBuffer = Buffer.from(sourceText, "utf8");
+  const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
+  const executionInput = {
+    titleId: "title-1",
+    stageCode: "LINE_EDITING",
+    sourceArtifactId: "artifact-dev",
+    sourceChecksum: sourceSha,
+    expectedCurrentStage: "DEVELOPMENTAL_COMPLETE",
+    authorApprovalRequired: true,
+    executionMode: "EXECUTE",
+    chunked: true,
+    chunkCursor: 45,
+    chunkTransientRetryAttempt: 0
+  };
+  const checkpointPrefix = `targeted-editorial-execution/${targetedExecutionIdempotencyKey(executionInput)}`;
+  const checkpointBodies = new Map();
+  for (let index = 1; index <= 45; index += 1) {
+    checkpointBodies.set(
+      `${checkpointPrefix}/chunks/${String(index).padStart(4, "0")}.json`,
+      Buffer.from(JSON.stringify({ chunkIndex: index, output: { editedManuscript: `word${index}` } }))
+    );
+  }
+  const sentMessages = [];
+  const checkpointStore = {
+    async createIfNotExists() {},
+    getBlockBlobClient(name) {
+      return {
+        name,
+        async exists() {
+          return checkpointBodies.has(name);
+        },
+        async uploadData(body) {
+          checkpointBodies.set(name, Buffer.from(body));
+        },
+        async downloadToBuffer() {
+          return checkpointBodies.get(name);
+        }
+      };
+    }
+  };
+  const queueClient = {
+    async createIfNotExists() {},
+    async sendMessage(body, options) {
+      sentMessages.push({ body: JSON.parse(body), options });
+      return { messageId: `message-${sentMessages.length}`, insertedOn: "2026-08-25T18:00:00Z" };
+    }
+  };
+  const client = targetedExecutionClient({
+    sourceArtifacts: [
+      {
+        jm1pub_editorialartifactid: "artifact-dev",
+        jm1pub_editorialartifactname: "Final Developmental Manuscript",
+        jm1pub_filename: "developmental-approved.docx",
+        jm1pub_sha256: sourceSha,
+        jm1pub_repositorydriveid: "drive-1",
+        jm1pub_repositoryitemid: "source-item",
+        jm1pub_iscurrentapproved: true,
+        _jm1pub_titleid_value: "title-1",
+        _jm1pub_editorialstageid_value: "stage-dev"
+      }
+    ],
+    upstreamArtifacts: [
+      {
+        jm1pub_editorialartifactid: "artifact-dev",
+        jm1pub_editorialartifactname: "Final Developmental Manuscript",
+        jm1pub_filename: "developmental-approved.docx",
+        jm1pub_sha256: sourceSha,
+        jm1pub_iscurrentapproved: true,
+        _jm1pub_titleid_value: "title-1",
+        _jm1pub_editorialstageid_value: "stage-dev"
+      }
+    ]
+  });
+  graphRequest.override = async (path) => {
+    if (path === "drives/drive-1/items/source-item?$select=id,name,parentReference,size,webUrl") {
+      return { id: "source-item", parentReference: { driveId: "drive-1", id: "parent-1" }, webUrl: "https://sharepoint/source.docx" };
+    }
+    if (path === "drives/drive-1/items/source-item/content") return sourceBuffer;
+    throw new Error(`Unexpected graph path ${path}`);
+  };
+  extractSourceText.override = async () => ({ value: sourceText });
+  invokeSingleStageModelProvider.override = async () => ({
+    ok: false,
+    provider: "microsoft-foundry-claude",
+    routeAlias: "jm1-editorial-devline-primary",
+    promptVersion: "CC010-LINE_EDITING-CHUNK-V1",
+    fellBack: false,
+    error: "MODEL_CALL_EXCEPTION_FETCH_FAILED"
+  });
+
+  try {
+    const result = await runChunkedTargetedEditorialExecution(
+      executionInput,
+      { client, checkpointStore, queueClient }
+    );
+
+    assert.equal(result.status, "CHUNK_REQUEUED_AFTER_TRANSIENT_MODEL_ERROR");
+    assert.equal(result.chunkIndex, 46);
+    assert.equal(sentMessages.length, 1);
+    assert.equal(sentMessages[0].body.chunkCursor, 45);
+    assert.equal(sentMessages[0].body.chunkTransientRetryAttempt, 1);
+    assert.equal(sentMessages[0].options.visibilityTimeout, 60);
+    assert.equal(checkpointBodies.has(`${checkpointPrefix}/chunks/0046.json`), false);
+    assert.equal(client.patches.length, 0);
+  } finally {
+    graphRequest.override = null;
+    extractSourceText.override = null;
+    invokeSingleStageModelProvider.override = null;
+    if (previousLimit === undefined) delete process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
+    else process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT = previousLimit;
+    if (previousTransientRetries === undefined) delete process.env.JM1_LINE_EDITING_TRANSIENT_MODEL_MAX_RETRIES;
+    else process.env.JM1_LINE_EDITING_TRANSIENT_MODEL_MAX_RETRIES = previousTransientRetries;
+  }
+});
+
 test("line editing prompt inherits author-approved developmental context", () => {
   const prompt = JSON.parse(buildStageModelPrompt({
     stage: {
