@@ -327,9 +327,9 @@ async function latestPackageCompletionLog(client, stageId) {
     $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon",
     $filter: `jm1_actiontype eq 'EDITORIAL_PACKAGE_HANDOFF_COMPLETED' and jm1_sourcerecordid eq '${escapeODataText(stageId)}'`,
     $orderby: "createdon desc",
-    $top: "1"
+    $top: "10"
   });
-  return rows[0] || null;
+  return rows.find((row) => !/CHECKSUM_REPAIR|METADATA_REFRESH|BLOCK04-CADENCE-PACKAGE-MANIFEST-REFRESH/i.test(normalizeString(row.jm1_actiondescription))) || rows[0] || null;
 }
 
 function buildSchedule(stage, cadenceLog, completionLog, now) {

@@ -108,7 +108,7 @@ function makeClient(overrides = {}) {
           jm1_actiondescription: "cadence scheduled"
         }];
       }
-      if (entitySet === "jm1_executionlogs" && /EDITORIAL_PACKAGE_HANDOFF_COMPLETED/.test(query.$filter || "")) return [completion];
+      if (entitySet === "jm1_executionlogs" && /EDITORIAL_PACKAGE_HANDOFF_COMPLETED/.test(query.$filter || "")) return overrides.completionLogs || [completion];
       if (entitySet === "jm1_executionlogs") return [];
       return [];
     },
@@ -202,6 +202,38 @@ test("package identity is parsed from current handoff summaries", () => {
 test("hold duration reports expired only after boundary", () => {
   assert.equal(remainingHoldDuration("2026-08-26T00:00:00Z", "2026-08-26T00:00:01Z"), "expired");
   assert.match(remainingHoldDuration("2026-08-26T01:00:00Z", "2026-08-26T00:00:00Z"), /^1h/);
+});
+
+test("metadata-refresh package completion does not restart an already due cadence hold", async () => {
+  const client = makeClient({
+    completionLogs: [
+      {
+        jm1_executionlogid: "metadata-refresh-completion",
+        jm1_actiontype: "EDITORIAL_PACKAGE_HANDOFF_COMPLETED",
+        jm1_sourcerecordid: stageId,
+        createdon: "2026-08-28T14:00:00Z",
+        jm1_actiondescription:
+          `Package handoff completed. Package ${packageId}; version v1; manifest artifact-before-you-were-born; QA READY_INTERNAL; cadence CADENCE_HOLD; ` +
+          "Correlation BLOCK04-CADENCE-PACKAGE-MANIFEST-REFRESH-2026-08-28T14:00Z. Idempotency metadata-refresh."
+      },
+      {
+        jm1_executionlogid: "real-completion",
+        jm1_actiontype: "EDITORIAL_PACKAGE_HANDOFF_COMPLETED",
+        jm1_sourcerecordid: stageId,
+        createdon: "2026-08-20T15:00:00Z",
+        jm1_actiondescription:
+          `Package handoff completed. Package ${packageId}; version v1; manifest artifact-before-you-were-born; QA READY_INTERNAL; cadence CADENCE_HOLD.`
+      }
+    ]
+  });
+  const deps = senderDeps();
+  const result = await runEditorialCadenceReleaseConsumer(
+    { now: "2026-08-28T15:00:00Z", correlationId: "test-metadata-refresh-does-not-reset-cadence" },
+    { client, ...deps }
+  );
+  assert.equal(result.packageSent, 1);
+  assert.equal(result.results[0].schedule.cadenceStartedAt, "2026-08-20T15:00:00Z");
+  assert.equal(deps.sends.length, 1);
 });
 
 test("due package with no canonical or mailbox delivery evidence sends once through governed ACS relay", async () => {
