@@ -1,6 +1,10 @@
 const { app } = require("@azure/functions");
 const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
+const {
+  assertPolicyAllows,
+  resolveCommunicationAuthority
+} = require("../policy/canonPolicyLayer");
 
 const ALLOWED_INTAKE_CHANNEL = "INT-PUB-005 /join";
 const DEFAULT_PROJECT_TITLE = "your book";
@@ -503,6 +507,14 @@ function buildAcknowledgmentEmail(payload) {
       safeCode: validation.reason
     });
   }
+  const authority = resolveCommunicationAuthority({
+    senderAddress: email.senderAddress,
+    content: email.content,
+    replyTo: email.replyTo,
+    recipients: email.recipients,
+    sourceRecord: payload.reference
+  });
+  assertPolicyAllows(authority);
 
   return email;
 }

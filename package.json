@@ -59,6 +59,8 @@
     "jm1-bootstrap-guard": "node --test scripts/jm1_bootstrap_guard.test.mjs",
     "jm1-canon-consistency-guard": "node --test scripts/jm1_canon_consistency_guard.test.mjs",
     "jm1-canon-guard-enforcement": "node --test scripts/jm1_canon_guard_enforcement.test.mjs",
+    "jm1-runtime-policy-layer-guard": "node --test scripts/jm1_runtime_policy_layer.test.mjs",
+    "jm1-runtime-policy-drift-audit": "node scripts/jm1_runtime_policy_drift_audit.mjs",
     "jm1-initiative-handoff-guard": "node --test scripts/jm1_initiative_handoff_guard.test.mjs",
     "jm1-commissioning-guard": "node --test scripts/jm1_commissioning_guard.test.mjs",
     "functions-package-access-guard": "node scripts/check-functions-package-access-hygiene.mjs",

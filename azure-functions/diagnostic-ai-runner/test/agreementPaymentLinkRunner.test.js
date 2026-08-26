@@ -102,6 +102,17 @@ describe("createAgreementPaymentLink — validation before gate check", () => {
     const result = await createAgreementPaymentLink(controlledInput({ packageCode: "NOT_REAL" }), {});
     assert.equal(result.reason, "STRIPE_MAPPING_RESOLUTION_FAILED");
   });
+
+  test("rejects MoonClerk for new Publishing payment-link work before any link creation", async () => {
+    process.env[GATE_NAME] = "true";
+    const createPaymentLink = fakeCreatePaymentLink();
+    const result = await createAgreementPaymentLink(controlledInput({ paymentProcessor: "MoonClerk" }), { createPaymentLink });
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "PAYMENT_AUTHORITY_DENIED");
+    assert.equal(result.policyDecision.DECISION, "DENY");
+    assert.equal(result.policyDecision.violationEvent, "PAYMENT_PROCESSOR_CANON_VIOLATION");
+    assert.equal(createPaymentLink.wasCalled(), false);
+  });
 });
 
 describe("createAgreementPaymentLink — when the gate is open, creates exactly the confirmed JMP-PKG-PRO / EIGHT_PAYMENTS link", () => {

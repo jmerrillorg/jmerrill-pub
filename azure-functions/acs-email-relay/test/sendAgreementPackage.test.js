@@ -26,6 +26,9 @@ function loadAgreementPackageModule() {
       if (name === "@azure/identity") {
         return { DefaultAzureCredential: class DefaultAzureCredential {} };
       }
+      if (name.startsWith("../")) {
+        return require(path.join(path.dirname(filePath), name));
+      }
       return require(name);
     },
     process,
@@ -216,6 +219,8 @@ test("buildAgreementPackageSendEmail — sender, replyTo, Publishing CC, and att
   assert.equal(email.recipients.to[0].address, "chosen2k7@gmail.com");
   assert.equal(email.recipients.cc[0].address, "publishing@jmerrill.one");
   assert.equal(Object.hasOwn(email.recipients, "bcc"), false);
+  assert.match(email.content.html, /^<!doctype html>/i);
+  assert.match(email.content.html, /J MERRILL PUBLISHING/);
   assert.equal(email.attachments.length, 4);
   assert.ok(email.attachments.every((a) => a.contentType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
 });

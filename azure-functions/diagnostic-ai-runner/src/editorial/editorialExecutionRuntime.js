@@ -15,6 +15,10 @@ const {
   gateBlocksCurrentStageRuntime,
   evaluateNextStageEligibility
 } = require("./editorialAuthorGatePolicy");
+const {
+  resolveArtifactSupersessionAuthority,
+  resolveEditorialStageAuthority
+} = require("../policy/canonPolicyLayer");
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 
@@ -323,10 +327,35 @@ async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
       idempotencyKey
     });
   }
+  const editorialPolicyDecision = resolveEditorialStageAuthority({
+    stageCode: normalized.stageCode,
+    priorAuthorGateCleared: upstream.ok,
+    cadenceEligible: normalized.cadenceEligible !== false,
+    scheduledReleaseAt: normalized.scheduledReleaseAt,
+    titleId: normalized.titleId,
+    stageId: normalizeString(stage.jm1pub_editorialstageid)
+  });
+  if (editorialPolicyDecision.MUTATION_ALLOWED !== true) {
+    return targetedBlocked(normalized, "EDITORIAL_STAGE_AUTHORITY_DENIED", editorialPolicyDecision.REASON, {
+      idempotencyKey,
+      policyDecision: editorialPolicyDecision
+    });
+  }
   if (normalizeString(upstream.approvedArtifactId) !== normalizeString(normalized.sourceArtifactId)) {
     return targetedBlocked(normalized, "AUTHOR_APPROVAL_BINDS_DIFFERENT_ARTIFACT", "Upstream approval does not bind to the requested source artifact.", {
       idempotencyKey,
       approvedArtifactId: upstream.approvedArtifactId
+    });
+  }
+  const sourceArtifactPolicyDecision = resolveArtifactSupersessionAuthority({
+    artifactId: sourceArtifact.jm1pub_editorialartifactid,
+    status: sourceArtifact.jm1pub_artifactstatus,
+    isCurrent: sourceArtifact.jm1pub_iscurrentapproved
+  });
+  if (sourceArtifactPolicyDecision.MUTATION_ALLOWED !== true) {
+    return targetedBlocked(normalized, "SOURCE_ARTIFACT_AUTHORITY_DENIED", sourceArtifactPolicyDecision.REASON, {
+      idempotencyKey,
+      policyDecision: sourceArtifactPolicyDecision
     });
   }
   const expected = expectedCurrentStageMatches(normalized, upstream, normalized.stageCode);
@@ -3264,8 +3293,40 @@ async function processStage(client, stage, correlationId, options = {}) {
       blocked
     };
   }
+  const editorialPolicyDecision = resolveEditorialStageAuthority({
+    stageCode,
+    priorAuthorGateCleared: upstream.ok,
+    cadenceEligible: true,
+    titleId: stage._jm1pub_titleid_value,
+    stageId: stage.jm1pub_editorialstageid
+  });
+  if (editorialPolicyDecision.MUTATION_ALLOWED !== true) {
+    return {
+      stageId: stage.jm1pub_editorialstageid,
+      titleId: stage._jm1pub_titleid_value,
+      stageCode,
+      status: "BLOCKED_CANON_POLICY",
+      reason: editorialPolicyDecision.REASON,
+      policyDecision: editorialPolicyDecision
+    };
+  }
   const claim = await claimStageTask(client, stage, stageCode, correlationId);
   const sourceArtifact = options.sourceArtifact || await findSourceArtifact(client, stage);
+  const sourceArtifactPolicyDecision = resolveArtifactSupersessionAuthority({
+    artifactId: sourceArtifact?.jm1pub_editorialartifactid,
+    status: sourceArtifact?.jm1pub_artifactstatus,
+    isCurrent: sourceArtifact?.jm1pub_iscurrentapproved
+  });
+  if (sourceArtifactPolicyDecision.MUTATION_ALLOWED !== true) {
+    return {
+      stageId: stage.jm1pub_editorialstageid,
+      titleId: stage._jm1pub_titleid_value,
+      stageCode,
+      status: "BLOCKED_CANON_POLICY",
+      reason: sourceArtifactPolicyDecision.REASON,
+      policyDecision: sourceArtifactPolicyDecision
+    };
+  }
   const exactBlocker = buildExactBlocker(stageCode, sourceArtifact);
   if (exactBlocker) {
     const blocked = await recordBlockedTask(client, stage, stageCode, exactBlocker, correlationId);

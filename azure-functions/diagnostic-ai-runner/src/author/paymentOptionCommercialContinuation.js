@@ -15,6 +15,11 @@ const { getDataverseToken } = require("../dataverse/authorDraftPersistenceClient
 const { AGENT_NAME, BAND_LEVEL, EXECUTION_STATUS } = require("../dataverse/metadataWriter");
 const { NEW_FINANCING_POLICY_VERSION } = require("./authorOfferEngine");
 const { computeInstallmentStripeAmountFromAuthorOffer } = require("../payment/agreementPaymentLinkMapping");
+const {
+  assertPolicyAllows,
+  resolveCommunicationAuthority,
+  resolvePaymentAuthority
+} = require("../policy/canonPolicyLayer");
 
 const GATE_NAME = "JM1_PAYMENT_OPTION_COMMERCIAL_CONTINUATION_ENABLED";
 const EXECUTION_LOG_ENTITY_SET = "jm1_executionlogs";
@@ -210,6 +215,31 @@ async function continuePaymentOptionCommercialPath(input = {}, deps = {}) {
     const state = validateSelectedPaymentState(opportunity);
     if (!state.ok) return blocked("PAYMENT_OPTION_STATE_INVALID", { errors: state.errors });
 
+    const paymentAuthority = resolvePaymentAuthority({
+      processor: "STRIPE",
+      context: "NEW_PUBLISHING_TRANSACTION",
+      opportunityId
+    });
+    try {
+      assertPolicyAllows(paymentAuthority);
+    } catch {
+      return blocked("PAYMENT_AUTHORITY_DENIED", { policyDecision: paymentAuthority });
+    }
+
+    const communicationAuthority = resolveCommunicationAuthority({
+      from: "publishing@email.jmerrill.one",
+      replyTo: "publishing@jmerrill.one",
+      to: [normalizeString(opportunity.jm1pub_projecttitle) ? "author@example.invalid" : "author@example.invalid"],
+      cc: ["publishing@jmerrill.one"],
+      html: "<!doctype html><html><body>Manual signature handoff metadata only.</body></html>",
+      sourceRecord: opportunityId
+    });
+    try {
+      assertPolicyAllows(communicationAuthority);
+    } catch {
+      return blocked("COMMUNICATION_AUTHORITY_DENIED", { policyDecision: communicationAuthority });
+    }
+
     if (opportunity.jm1pub_contractstatus != null || normalizeString(opportunity.jm1pub_contracturl)) {
       return blocked("EXISTING_AGREEMENT_OR_CONTRACT_STATE_PRESENT", {
         contractStatus: opportunity.jm1pub_contractstatus ?? null,
@@ -307,6 +337,10 @@ async function continuePaymentOptionCommercialPath(input = {}, deps = {}) {
         htmlRequired: true,
         sent: false,
         blocker: null
+      },
+      policyDecisions: {
+        paymentAuthority,
+        communicationAuthority
       },
       stripe: {
         customerCreated: false,

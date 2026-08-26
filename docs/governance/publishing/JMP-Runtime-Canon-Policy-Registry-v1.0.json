@@ -1,0 +1,153 @@
+{
+  "registryId": "JMP-RUNTIME-CANON-POLICY-REGISTRY-v1.0",
+  "status": "CANON",
+  "effectiveDate": "2026-08-25",
+  "ownerAuthority": "Jackie Smith, Jr. — Governance Authority",
+  "implementationModule": "azure-functions/diagnostic-ai-runner/src/policy/canonPolicyLayer.js",
+  "policies": [
+    {
+      "policyId": "JMP-PAYMENT-AUTHORITY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Publishing payment",
+      "enforcementClass": "PRE_MUTATION_HARD_GATE",
+      "canonSource": "JM1 Canon Enforcement & Runtime Policy Layer v1 / Publishing commercial authority",
+      "resolver": "resolvePaymentAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-COMMUNICATION-AUTHORITY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Publishing communication",
+      "enforcementClass": "PRE_SEND_HARD_GATE",
+      "canonSource": "JM1 Enterprise Communication Standard v1.0 / Microsoft-first communications evidence routing",
+      "resolver": "resolveCommunicationAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-AUTHOR-TITLE-IDENTITY-AUTHORITY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Author/title identity",
+      "enforcementClass": "PRE_MUTATION_HARD_GATE",
+      "canonSource": "JM1 Canon Enforcement & Runtime Policy Layer v1",
+      "resolver": "resolveIdentityAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-AUTHOR-FACING-ARTIFACT-SAFETY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Author-facing artifact safety",
+      "enforcementClass": "PRE_SEND_HARD_GATE",
+      "canonSource": "JM1 Canon Enforcement & Runtime Policy Layer v1",
+      "resolver": "resolveArtifactAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-ARTIFACT-SUPERSESSION-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Artifact authority",
+      "enforcementClass": "PRE_MUTATION_HARD_GATE",
+      "canonSource": "JM1 Canon Enforcement & Runtime Policy Layer v1",
+      "resolver": "resolveArtifactSupersessionAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-EDITORIAL-GATE-AUTHORITY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Editorial stage authority",
+      "enforcementClass": "PRE_WORKER_HARD_GATE",
+      "canonSource": "JMP Editorial Cadence Doctrine v1.0 / Slice 3 PF state machine",
+      "resolver": "resolveEditorialStageAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-PUBLICATION-INTENT-AUTHORITY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Publication intent",
+      "enforcementClass": "PRE_PRODUCTION_HARD_GATE",
+      "canonSource": "JM1 Canon Enforcement & Runtime Policy Layer v1 / Target Architecture v1.0",
+      "resolver": "resolvePublicationIntentAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-PRODUCTION-AUTHORITY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Production authority",
+      "enforcementClass": "PRE_PRODUCTION_HARD_GATE",
+      "canonSource": "PUB-STD-Onboarding-First-Production-Authority",
+      "resolver": "resolveProductionAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-DISTRIBUTION-AUTHORITY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Distribution authority",
+      "enforcementClass": "PRE_DISTRIBUTION_HARD_GATE",
+      "canonSource": "JM1 Canon Enforcement & Runtime Policy Layer v1 / Publication intent authority",
+      "resolver": "resolveDistributionAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-CADENCE-AUTHORITY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Editorial cadence",
+      "enforcementClass": "PRE_AUTHOR_RELEASE_HARD_GATE",
+      "canonSource": "JMP Editorial Cadence Doctrine v1.0",
+      "resolver": "resolveCadenceAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-WAITING-ON-AUTHORITY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Waiting-on classification",
+      "enforcementClass": "READ_MODEL_HARD_GATE",
+      "canonSource": "JM1 Canon Enforcement & Runtime Policy Layer v1",
+      "resolver": "resolveWaitingOnAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-LEGACY-ROUTING-AUTHORITY-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Legacy system routing",
+      "enforcementClass": "PRE_MUTATION_HARD_GATE",
+      "canonSource": "JM1 Canon Enforcement & Runtime Policy Layer v1",
+      "resolver": "resolveLegacySystemAuthority",
+      "effectiveDate": "2026-08-25",
+      "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    }
+  ]
+}
