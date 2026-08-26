@@ -280,7 +280,47 @@ describe("readPublishingMailboxDeliveryEvidence — sent package correlation", (
     assert.equal(result.correlationSource, "PUBLISHING_MAILBOX");
     assert.equal(result.correlationConfidence, "HIGH");
     assert.ok(calls[0].url.includes("mailFolders/inbox/messages"));
+    assert.ok(calls[0].url.includes("receivedDateTime%20ge"));
+    assert.ok(calls[0].url.includes("$orderby=receivedDateTime desc"));
     assert.ok(calls[1].url.includes("mailFolders/sentitems/messages"));
+    assert.ok(calls[1].url.includes("sentDateTime%20ge"));
+    assert.ok(calls[1].url.includes("$orderby=sentDateTime desc"));
+  });
+
+  test("normalizes sent item sentDateTime as deliveredAt for correlation ordering", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([
+      graphMessagesResponse([]),
+      graphMessagesResponse([
+        message({
+          id: "sent-package",
+          internetMessageId: "<sent-package@jmerrill.one>",
+          subject: "Developmental Review - Before You Were Born",
+          from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
+          toRecipients: [{ emailAddress: { address: "sean@example.com" } }],
+          ccRecipients: [{ emailAddress: { address: PUBLISHING_MAILBOX } }],
+          receivedDateTime: null,
+          sentDateTime: "2026-06-21T03:00:00Z",
+          body: { content: "Package pkg-before-you-were-born-developmental-v1 is ready. Manifest artifact-before-you-were-born." }
+        })
+      ])
+    ]);
+    const result = await readPublishingMailboxDeliveryEvidence(
+      {
+        subjectContains: "Before You Were Born",
+        afterIso: AFTER_ISO,
+        title: "Before You Were Born",
+        stage: "Developmental Review",
+        packageId: "pkg-before-you-were-born-developmental-v1",
+        artifactId: "artifact-before-you-were-born",
+        recipient: "sean@example.com"
+      },
+      FAKE_TOKEN_DEPS
+    );
+    assert.equal(result.ok, true);
+    assert.equal(result.found, true);
+    assert.equal(result.folder, "sentitems");
+    assert.equal(result.deliveredAt, "2026-06-21T03:00:00Z");
   });
 
   test("wrong-author delivery evidence does not correlate without exact package or artifact evidence", async () => {
