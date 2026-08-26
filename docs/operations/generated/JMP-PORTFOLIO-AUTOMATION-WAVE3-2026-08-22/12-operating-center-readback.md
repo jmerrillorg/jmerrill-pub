@@ -1,6 +1,6 @@
 # Operating Center Readback
 
-Last Verified: 2026-08-26T14:34:10.977Z
+Last Verified: 2026-08-26T20:52:30.391Z
 
 | Author | Title | Stage | Substage | Waiting On | System Attention | Next Action | Automation Class | Action Taken |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -373,7 +373,7 @@ Last Verified: 2026-08-26T14:34:10.977Z
 | DATA_GAP | The Journey: The Inspiration and Message Behind the Music | DATA_GAP | DATA_GAP | WAITING_ON_JMP | MISSING_AUTHOR_RELATIONSHIP | Create structured operator task to bind author relationship before continuation | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
 | Christina Chislom | The Little Girl with the Plow! | DATA_GAP | DATA_GAP | WAITING_ON_JMP | TERMINAL_STATE_CONFLICT | Create structured operator task to resolve lifecycle/terminal-state conflict | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
 | Christina Chislom | The Little Girl with the Plow! | DATA_GAP | DATA_GAP | WAITING_ON_JMP | TERMINAL_STATE_CONFLICT | Create structured operator task to resolve lifecycle/terminal-state conflict | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
-| Jackie Smith Jr | The Long Watch | EDITORIAL_REVIEW_RECOMMENDATION | AUTHOR_REVIEW | AUTO_EXECUTABLE | LIFECYCLE_MAPPING_CONFLICT | Queue Line stage when capacity policy permits; do not depend on Jackie memory | QUEUE_COMMISSIONED_EDITORIAL_JOB | QUEUED_EXECUTION_LOG_CREATED |
+| Jackie Smith Jr | The Long Watch | EDITORIAL_REVIEW_RECOMMENDATION | AUTHOR_REVIEW | AUTO_EXECUTABLE | LIFECYCLE_MAPPING_CONFLICT | Queue Line stage when capacity policy permits; do not depend on Jackie memory | QUEUE_COMMISSIONED_EDITORIAL_JOB | QUEUE_ALREADY_PRESENT |
 | Jackie Smith Jr | The Long Watch - Intake Success Validation | INQUIRY_INTAKE | PROSPECT_RESPONSE | WAITING_ON_JMP | RUNTIME_NOT_COMMISSIONED | Create structured operator task to commission/select runtime before movement | CREATE_OPERATOR_TASK_FOR_EXTERNAL_MANUAL_STEP | OPERATOR_TASK_ALREADY_PRESENT |
 | Sylvia Benson | The Master's Piece | POST_PUBLICATION | TERMINAL | TERMINAL | TERMINAL_STATE_CONFLICT | No production action; maintain stewardship only | NONE | NO_ACTION_TAKEN |
 | Sylvia Benson | The Master's Piece | POST_PUBLICATION | TERMINAL | TERMINAL | TERMINAL_STATE_CONFLICT | No production action; maintain stewardship only | NONE | NO_ACTION_TAKEN |

@@ -1,6 +1,6 @@
 # Wave 3 Executive Summary
 
-Last Verified: 2026-08-26T14:34:10.977Z
+Last Verified: 2026-08-26T20:52:30.391Z
 
 Classification: JMP_AUTONOMOUS_PORTFOLIO_WAVE3_CONTROLLED_COMMISSIONING
 

@@ -1,6 +1,6 @@
 # Current Portfolio Recovery
 
-Last Verified: 2026-08-26T14:34:02.047Z
+Last Verified: 2026-08-26T20:52:19.616Z
 
 | Author | Title | Bucket | Stage | Substage | Waiting On | Execution State | Next Governed Action | Machine | Human Gate | Runtime | Age | SLA |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---: | --- |
@@ -178,12 +178,12 @@ Last Verified: 2026-08-26T14:34:02.047Z
 | Karen Hill | From Stylist to CEO | SYSTEM_ATTENTION_REQUIRED | DATA_GAP | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | NO | 4 | OVERDUE |
 | Karen Hill | From Stylist to CEO | SYSTEM_ATTENTION_REQUIRED | DATA_GAP | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | NO | 4 | OVERDUE |
 | Karen Hill | From Stylist to CEO | TERMINAL | POST_PUBLICATION | TERMINAL | None | NONE | Post-publication stewardship or terminal record | NO | NO | NO | 4 | NO_SLA |
-| Gate W1 Docx Synthetic | GATE-W1 App Service Staging DOCX Join 1785342161378 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 26 | OVERDUE |
-| Gate W1 Long Docx Synthetic | GATE-W1 App Service Staging Long DOCX Join 1785342346355 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 26 | OVERDUE |
-| Gate W1 Multipart Synthetic | GATE-W1 App Service Staging Multipart Join 1785341972350 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 26 | OVERDUE |
-| Gate W1 Join Synthetic | GATE-W1 App Service Staging Positive Join 1785341427544 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 26 | OVERDUE |
-| Gate W1 Synthetic | GATE-W1 Synthetic Certification Manuscript 20260729 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 26 | OVERDUE |
-| Gate W1 Synthetic | GATE-W1 Synthetic Recommendation Manuscript 20260729 | WAITING_ON_AUTHOR | EDITORIAL_REVIEW_RECOMMENDATION | AUTHOR_REVIEW | Author | NONE | Ready for Author Review | NO | YES | YES | 19 | OVERDUE |
+| Gate W1 Docx Synthetic | GATE-W1 App Service Staging DOCX Join 1785342161378 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 27 | OVERDUE |
+| Gate W1 Long Docx Synthetic | GATE-W1 App Service Staging Long DOCX Join 1785342346355 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 27 | OVERDUE |
+| Gate W1 Multipart Synthetic | GATE-W1 App Service Staging Multipart Join 1785341972350 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 27 | OVERDUE |
+| Gate W1 Join Synthetic | GATE-W1 App Service Staging Positive Join 1785341427544 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 27 | OVERDUE |
+| Gate W1 Synthetic | GATE-W1 Synthetic Certification Manuscript 20260729 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 27 | OVERDUE |
+| Gate W1 Synthetic | GATE-W1 Synthetic Recommendation Manuscript 20260729 | WAITING_ON_AUTHOR | EDITORIAL_REVIEW_RECOMMENDATION | AUTHOR_REVIEW | Author | NONE | Ready for Author Review | NO | YES | YES | 20 | OVERDUE |
 | Jaylonna Stevette | Getting Back 2 Happy | TERMINAL | POST_PUBLICATION | TERMINAL | None | NONE | Post-publication stewardship or terminal record | NO | NO | NO | 30 | NO_SLA |
 | Jaylonna Stevette | Getting Back 2 Happy | SYSTEM_ATTENTION_REQUIRED | DATA_GAP | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | NO | 30 | OVERDUE |
 | Jaylonna Stevette | Getting Back 2 Happy: The Chronicles of Tabby (Unabridged) | SYSTEM_ATTENTION_REQUIRED | DATA_GAP | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | NO | 30 | OVERDUE |
@@ -242,13 +242,13 @@ Last Verified: 2026-08-26T14:34:02.047Z
 | JM1 Duplicate20260727173641 | JM1 Duplicate Proof 20260727173641 | SYSTEM_ATTENTION_REQUIRED | EDITORIAL_REVIEW_RECOMMENDATION | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 29 | OVERDUE |
 | JM1 Preview Author A | JM1 Preview Synthetic Artifact A | WAITING_ON_AUTHOR | EDITORIAL_REVIEW_RECOMMENDATION | AUTHOR_REVIEW | Author | NONE | Awaiting Author Response | NO | YES | YES | 29 | OVERDUE |
 | JM1 Preview Author B | JM1 Preview Synthetic Artifact B | WAITING_ON_AUTHOR | EDITORIAL_REVIEW_RECOMMENDATION | AUTHOR_REVIEW | Author | NONE | Awaiting Author Response | NO | YES | NO | 29 | OVERDUE |
-| JM1 SyntheticFetch20260727165010 | JM1 Synthetic Intake Fetch Proof 20260727165010 | SYSTEM_ATTENTION_REQUIRED | INQUIRY_INTAKE | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Evaluate classification/editorial-review readiness | NO | NO | NO | 29 | OVERDUE |
+| JM1 SyntheticFetch20260727165010 | JM1 Synthetic Intake Fetch Proof 20260727165010 | SYSTEM_ATTENTION_REQUIRED | INQUIRY_INTAKE | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Evaluate classification/editorial-review readiness | NO | NO | NO | 30 | OVERDUE |
 | JM1 SyntheticFinal20260727170349 | JM1 Synthetic Intake Final Proof 20260727170349 | SYSTEM_ATTENTION_REQUIRED | INQUIRY_INTAKE | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 29 | OVERDUE |
 | JM1 SyntheticFinal20260727172010 | JM1 Synthetic Intake Final Proof 20260727172010 | SYSTEM_ATTENTION_REQUIRED | INQUIRY_INTAKE | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 29 | OVERDUE |
 | JM1 SyntheticRestored20260727173332 | JM1 Synthetic Intake Restored Proof 20260727173332 | SYSTEM_ATTENTION_REQUIRED | INQUIRY_INTAKE | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | YES | 29 | OVERDUE |
-| JM1 SyntheticIntake20260727163730 | JM1 Synthetic Intake SEV1 Proof 20260727163730 | SYSTEM_ATTENTION_REQUIRED | INQUIRY_INTAKE | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Evaluate classification/editorial-review readiness | NO | NO | NO | 29 | OVERDUE |
-| JM1 SyntheticIntake20260727164554 | JM1 Synthetic Intake SEV1 Proof 20260727164554 | SYSTEM_ATTENTION_REQUIRED | INQUIRY_INTAKE | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Evaluate classification/editorial-review readiness | NO | NO | NO | 29 | OVERDUE |
-| DATA_GAP | JMP-INT-202607-YEUSKK — GATE-W1 Synthetic Recommendation Manuscript 20260729 | SYSTEM_ATTENTION_REQUIRED | DATA_GAP | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | NO | 27 | OVERDUE |
+| JM1 SyntheticIntake20260727163730 | JM1 Synthetic Intake SEV1 Proof 20260727163730 | SYSTEM_ATTENTION_REQUIRED | INQUIRY_INTAKE | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Evaluate classification/editorial-review readiness | NO | NO | NO | 30 | OVERDUE |
+| JM1 SyntheticIntake20260727164554 | JM1 Synthetic Intake SEV1 Proof 20260727164554 | SYSTEM_ATTENTION_REQUIRED | INQUIRY_INTAKE | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Evaluate classification/editorial-review readiness | NO | NO | NO | 30 | OVERDUE |
+| DATA_GAP | JMP-INT-202607-YEUSKK — GATE-W1 Synthetic Recommendation Manuscript 20260729 | SYSTEM_ATTENTION_REQUIRED | DATA_GAP | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | NO | 28 | OVERDUE |
 | Adrean Young | Just What I Needed | SYSTEM_ATTENTION_REQUIRED | DATA_GAP | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | NO | 4 | OVERDUE |
 | Adrean Young | Just What I Needed | SYSTEM_ATTENTION_REQUIRED | DATA_GAP | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | NO | 4 | OVERDUE |
 | DATA_GAP | Just What I Needed: Daily Devotional | SYSTEM_ATTENTION_REQUIRED | DATA_GAP | DATA_GAP | JMP | FAILED_ATTENTION_REQUIRED | Classify next governed action | NO | NO | NO | 44 | OVERDUE |
