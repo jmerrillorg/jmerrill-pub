@@ -1,0 +1,40 @@
+# Negative Proof
+
+Last Verified: 2026-08-26
+
+All required negative proof controls returned `0`.
+
+```text
+distribution_starts_without_block06_authorization = 0
+block07_reads_latest_mutable_assets_instead_of_frozen_manifest = 0
+submission_success_treated_as_live = 0
+channel_acceptance_treated_as_live_verified = 0
+retry_creates_duplicate_distribution_instance = 0
+retry_history_overwritten = 0
+external_reference_id_lost = 0
+jmp_state_overwrites_external_history = 0
+external_state_overwrites_jmp_history = 0
+required_channel_failure_resets_unaffected_live_channel = 0
+optional_retailer_delay_blocks_title_without_governed_requirement = 0
+live_listing_not_compared_to_authorized_manifest = 0
+wrong_live_price_allowed_without_incident = 0
+wrong_live_identifier_allowed_without_incident = 0
+unauthorized_territory_live_without_incident = 0
+listing_visible_treated_as_orderable_without_verification = 0
+canonical_url_registered_without_verification = 0
+system_hold_mislabeled_as_author_hold = 0
+publication_date_changed_silently_inside_block07 = 0
+postfreeze_payload_change_resubmitted_without_block06_change_control = 0
+wrong_live_asset_fixed_without_publication_correction_history = 0
+takedown_requested_treated_as_takedown_verified = 0
+author_forced_to_troubleshoot_channel_failure = 0
+distribution_certified_with_open_release_blocking_incident = 0
+title_live_and_verified_without_required_endpoint_evidence = 0
+legacy_distribution_history_fabricated = 0
+payment_activity = 0
+royalty_activity = 0
+Business_Central_payment_mutation = 0
+Block08_launch_execution = 0
+Block09_royalty_or_longterm_title_management = 0
+```
+
