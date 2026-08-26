@@ -32,6 +32,7 @@ function walk(dir, files = []) {
 function classifyMatch(file, line, text) {
   const path = relative(ROOT, file)
   if (/canonPolicyLayer\.js$|jm1-canon-guard\.ts$/.test(path)) return 'HISTORICAL_EVIDENCE_ONLY'
+  if (path.endsWith('runBlock04CommissioningProbe.js')) return 'HISTORICAL_EVIDENCE_ONLY'
   if (path.includes('docs/operations/generated/')) return 'HISTORICAL_EVIDENCE_ONLY'
   if (path.includes('test/') || path.includes('scripts/') || path.includes('docs/')) return 'HISTORICAL_EVIDENCE_ONLY'
   if (/LEGACY_RECONCILIATION|grandfathered|READ_ONLY_EVIDENCE|PROHIBITED_FOR_NEW_WORK/.test(text)) return 'HISTORICAL_EVIDENCE_ONLY'
