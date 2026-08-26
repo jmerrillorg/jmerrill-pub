@@ -221,6 +221,9 @@ test("due package with no canonical or mailbox delivery evidence sends once thro
   assert.deepEqual(deps.sends[0].cc, ["publishing@jmerrill.one"]);
   assert.equal(deps.sends[0].templateName, "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1");
   assert.equal(deps.sends[0].attachments.length, 2);
+  const stageRead = client.calls.listed.find((call) => call.entitySet === "jm1pub_editorialstages");
+  assert.match(stageRead.query.$select, /jm1pub_intakereference/);
+  assert.match(stageRead.query.$select, /jm1pub_publishingintakereference/);
   assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT"));
   assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialapprovalgates" && call.payload.jm1pub_gatestatus === 196650002));
 });
