@@ -1,13 +1,13 @@
 # Idempotency
 
-Last Verified: 2026-08-22T11:59:59.764Z
+Last Verified: 2026-08-26T14:39:18.126Z
 
-| Control | Result |
+| Control | State |
 | --- | --- |
-| One author/payee to one Connect relationship | PASS |
-| Title-level accounts created | 0 |
-| Duplicate accounts after readback | 0 |
-| Duplicate invitations in successful execute run | 0 |
-| Retry after blocked runs | PASS; blocked runs produced 0 accounts / 0 links / 0 sends |
+| Account create idempotency key | royalty-payee scoped |
+| Account reuse before create | enforced |
+| Existing account mismatch | fail closed |
+| Link reissue behavior | same acct_* if later needed |
+| Duplicate payout account prevention | enforced by identity search + metadata assertion |
 
-The successful run produced exactly three account creations, three onboarding links, three invitations, and three execution-log IDs for the three selected authors. Earlier blocked runs are preserved and produced no author-facing mutation.
+Replay is expected to reuse the same account for each payee and issue a fresh Stripe-hosted onboarding link only when needed. The link is transient and not persisted.

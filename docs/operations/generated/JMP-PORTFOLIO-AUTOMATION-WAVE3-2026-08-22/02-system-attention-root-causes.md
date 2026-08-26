@@ -1,6 +1,6 @@
 # System Attention Root Causes
 
-Last Verified: 2026-08-25T02:04:22.235Z
+Last Verified: 2026-08-26T14:34:10.977Z
 
 Wave 3 maps every System Attention row to a specific class. Generic System Attention target: 0. Current generic count: 0.
 
@@ -12,7 +12,7 @@ Wave 3 maps every System Attention row to a specific class. Generic System Atten
 | MISSING_AUTHOR_RELATIONSHIP | 31 | 0 | -31 |
 | MISSING_CANONICAL_LINK | 5 | 0 | -5 |
 | PRODUCTION_DEPENDENCY_MISSING | 2 | 0 | -2 |
-| RUNTIME_NOT_COMMISSIONED | 7 | 0 | -7 |
+| RUNTIME_NOT_COMMISSIONED | 6 | 0 | -6 |
 | TERMINAL_STATE_CONFLICT | 179 | 0 | -179 |
 
 ## Largest Remaining Classes
