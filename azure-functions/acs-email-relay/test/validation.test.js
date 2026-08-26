@@ -842,6 +842,21 @@ test("final developmental review rejects accidental portal links", () => {
   );
 });
 
+test("final developmental review rejects duplicate author-facing signatures", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const base = validFinalDevelopmentalReviewPayload();
+
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validFinalDevelopmentalReviewPayload({
+      htmlBody: base.htmlBody.replace(
+        "</body>",
+        "<p>The Publishing Team</p><p>J Merrill Publishing, Inc.</p><p>The Publishing Team</p><p>J Merrill Publishing, Inc.</p></body>"
+      )
+    })),
+    "AUTHOR_REVIEW_PACKAGE_DUPLICATE_SIGNATURE_BLOCKED"
+  );
+});
+
 test("approved author-review package preserves full attachment base64 payloads", () => {
   const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
   const payloadBytes = Buffer.from("author-safe summary ".repeat(500));
