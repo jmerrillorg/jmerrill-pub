@@ -1,0 +1,20 @@
+# Cross-Block Handoffs
+
+Last verified: 2026-08-26
+
+All handoffs require `authorId`, `titleId`, `artifactId`, `checksum`, and `correlationId`.
+
+All handoffs have immutable snapshots, duplicate protection, and fail-closed behavior.
+
+| Boundary | Exit event | Handoff object |
+|---|---|---|
+| 01 -> 02 | `EDITORIAL_REVIEW_READY` | `INTAKE_EDITORIAL_HANDOFF` |
+| 02 -> 03 | `PACKAGE_ACCEPTED` | `COMMERCIAL_OFFER_HANDOFF` |
+| 03 -> 04 | `JOINED_THE_FAMILY` | `EDITORIAL_ENTRY_HANDOFF` |
+| 04 -> 05 | `FINAL_EDITORIAL_CERTIFICATION` | `PRODUCTION_HANDOFF_PACKAGE` |
+| 05 -> 06 | `PRODUCTION_COMPLETE` | `RELEASE_READINESS_HANDOFF` |
+| 06 -> 07 | `DISTRIBUTION_AUTHORIZED` | `FROZEN_RELEASE_MANIFEST` |
+| 07 -> 08 | `PRIMARY_RELEASE_LIVE` | `LAUNCH_MARKETING_HANDOFF` |
+| 07 -> 09 | `TITLE_LIVE_AND_VERIFIED` | `BLOCK09_DISTRIBUTION_RECORD_HANDOFF` |
+| 08 -> 09 | `LAUNCH_CYCLE_COMPLETE` | `BLOCK09_MARKETING_HANDOFF` |
+| 09 -> 01 | `AUTHOR_RELATIONSHIP_UPDATED` | `RETURNING_AUTHOR_RECOGNITION_HANDOFF` |

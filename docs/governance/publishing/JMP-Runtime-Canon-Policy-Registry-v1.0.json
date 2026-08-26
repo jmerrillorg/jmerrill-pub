@@ -132,12 +132,20 @@
         "negativeProof": "Block09-waits-for-Block08, current default overwrites executed contract, list-price royalty basis, statement/payment recalculation, sale/remittance/cash collapse, failed payment eliminating liability, closed-period rewrite, missing source lineage, author/payee collapse, invented tax rules, eBook annual print fee, edition overwrite, unclassified post-publication change, low-sales automatic reversion, terminal deletion, archive with unresolved obligations, email-only published-author support, comp ledger absence, Block08 evergreen handoff absence, legacy history fabrication, real royalty payment, real royalty/payment email, real statement send, real annual-fee invoice, real tax mutation, real Business Central payment posting, real retirement/reversion/takedown commissioning probes are denied."
       },
       {
+        "policyId": "JMP-PUBLISHING-LIFECYCLE-01-09-CLOSURE-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "wholeSystemLifecycleClosure / run-whole-lifecycle-closure-probe",
+        "liveProof": "Whole-system lifecycle closure probe covers Blocks 01-03 commissioning, Blocks 04-09 canonical replay, 10 cross-block handoffs, end-to-end identity, artifact lineage, waiting-on authority, clocks/watchdogs, Microsoft-first communication routing, system-of-record boundaries, synthetic golden path, negative golden path, real-title readback, and returning-author loop.",
+        "negativeProof": "Wrong author/title binding, filename-as-artifact-authority, reconstructed handoff, author-wait misclassification, human gate bypass, MoonClerk new-payment path, payment before commercial gate, editorial/cadence/production/distribution/marketing/Block09 bypasses, real royalty/payment/Business Central commissioning mutations, historical fabrication, and returning-author history loss are denied."
+      },
+      {
         "policyId": "JMP-DISTRIBUTION-AUTHORITY-v1.0",
         "canonStatus": "CANON",
-        "runtimeStatus": "IMPLEMENTED_NOT_COMMISSIONED",
+        "runtimeStatus": "COMMISSIONED",
         "implementation": "resolveDistributionAuthority",
-        "liveProof": "No distribution mutation or distribution live probe was performed in this commissioning pass.",
-        "negativeProof": "Not exercised; distribution remains implemented and gated but not separately commissioned here."
+        "liveProof": "Distribution authority is commissioned through the Block 07 Distribution & Publication final certification probe, which validates frozen-manifest execution, channel instances, endpoint requirements, idempotent submission semantics, external state normalization, live verification, public listing validation, canonical URL registration, publication state, targeted remediation, and Block 08/09 handoffs.",
+        "negativeProof": "Distribution without frozen manifest, submission success as live, channel acceptance as live verified, duplicate canonical distribution instances, overwritten attempt history, missing external IDs, wrong price/identifier/territory, unverified URL registration, takedown-as-verified, launch, payment, royalty, and Business Central mutation probes are denied."
       },
       {
         "policyId": "JMP-CADENCE-AUTHORITY-v1.0",
@@ -337,6 +345,22 @@
         "monthly-royalty-spreadsheet-as-title-management-system semantics",
         "list-price-as-royalty-basis semantics",
         "retirement-reversion-takedown-collapse semantics"
+      ],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-PUBLISHING-LIFECYCLE-01-09-CLOSURE-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Publishing lifecycle Blocks 01-09",
+      "enforcementClass": "WHOLE_LIFECYCLE_CLOSURE_AND_CROSS_BLOCK_HANDOFF_HARD_GATE",
+      "canonSource": "JM1 Canon Enforcement & Runtime Policy Layer v1 / Blocks 01-09 commissioning probes",
+      "resolver": "runWholeLifecycleClosure",
+      "effectiveDate": "2026-08-26",
+      "supersedes": [
+        "document-only whole-lifecycle assumptions",
+        "block-level-only commissioning semantics",
+        "stale handoff reconstruction"
       ],
       "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
     },

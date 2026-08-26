@@ -14,6 +14,7 @@ require("./functions/runBlock06FinalCertificationProbe");
 require("./functions/runBlock07FinalCertificationProbe");
 require("./functions/runBlock08FinalCertificationProbe");
 require("./functions/runBlock09FinalCertificationProbe");
+require("./functions/runWholeLifecycleClosureProbe");
 require("./functions/runEditorialPackageHandoffConsumer");
 require("./functions/runEditorialCadenceReleaseConsumer");
 require("./functions/runEditorialNextStageMaterialization");
