@@ -379,6 +379,32 @@ test("targeted editorial execution dry-run resolves exactly one Line stage/sourc
   assert.equal(client.patches.length, 0);
 });
 
+test("targeted editorial execution enforces Block 04 scope-stage transition evidence when supplied", async () => {
+  const result = await evaluateTargetedEditorialExecution(
+    {
+      titleId: "title-1",
+      stageCode: "LINE_EDITING",
+      sourceArtifactId: "artifact-dev",
+      sourceChecksum: "sha-dev",
+      expectedCurrentStage: "DEVELOPMENTAL_COMPLETE",
+      authorApprovalRequired: true,
+      executionMode: "DRY_RUN",
+      block04ScopeStages: [
+        { stageType: "DEVELOPMENTAL_EDITING", applicable: true },
+        { stageType: "LINE_EDITING", applicable: true },
+        { stageType: "COPYEDITING", applicable: true },
+        { stageType: "PROOFREADING", applicable: true }
+      ],
+      block04CompletedStages: []
+    },
+    { client: targetedExecutionClient() }
+  );
+
+  assert.equal(result.ok, false);
+  assert.equal(result.code, "BLOCK_04_STAGE_AUTHORITY_DENIED");
+  assert.equal(result.policyDecision.missing.includes("DEVELOPMENTAL_EDITING"), true);
+});
+
 test("targeted editorial execution rejects missing target stage instead of creating one implicitly", async () => {
   const result = await evaluateTargetedEditorialExecution(
     {
