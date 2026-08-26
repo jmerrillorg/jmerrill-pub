@@ -35,9 +35,16 @@ Safe unauthenticated probe:
 - Result: `401 UNAUTHORIZED`
 - Meaning: relay key gate remained enforced.
 
+Duplicate-footer fail-closed probe:
+
+- Route: `POST /api/send-approved-author-response`
+- Payload: synthetic author-review message containing two canonical Publishing footer blocks
+- Result: `400 ACS_RELAY_VALIDATION_FAILED`
+- Reason: `AUTHOR_REVIEW_PACKAGE_DUPLICATE_SIGNATURE_BLOCKED`
+- Author-facing send: `0`
+
 ## Workflow Target Drift
 
 The GitHub deployment workflow still references `func-jm1-acs-email-relay-flex`, but Azure readback did not find that function app in `rg-jm1-communications`. The live relay app is `func-jm1-acs-email-relay` and was deployed directly for this commissioning pass.
 
 This is recorded as deployment-target drift evidence. It did not block the live ACS relay verification above.
-
