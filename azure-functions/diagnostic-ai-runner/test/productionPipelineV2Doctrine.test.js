@@ -85,6 +85,30 @@ const {
   validateRetailEconomics,
   validateRightsTerritories
 } = require("../src/release/releaseReadinessCommissioning");
+const {
+  CHANNEL_STATES,
+  auditBlock07Requirements,
+  buildBlock07FinalCertificationProbe,
+  buildBlock08Handoff,
+  buildBlock09Handoff,
+  certifyDistribution,
+  completeSyntheticDistribution,
+  createChannelDistributionInstance,
+  derivePublicationState,
+  evaluateDistributionWatchdog,
+  evaluatePublicationDate,
+  openPublicationIncident,
+  registerCanonicalLiveUrl,
+  requestEmergencyTakedown,
+  routeDistributionRemediation,
+  runBlock07BypassTests,
+  runBlock07SyntheticCommissioningMatrix,
+  runFinalBlock07Commissioning,
+  submitDistributionInstance,
+  validateBlock07Entry,
+  validateLiveListing,
+  verifyLiveState
+} = require("../src/distribution/block07DistributionCommissioning");
 
 describe("JM1 Production Pipeline v2.0 doctrine", () => {
   test("starts interior layout and cover design in parallel after proofreading approval", () => {
@@ -951,5 +975,147 @@ describe("JM1 Production Pipeline v2.0 doctrine", () => {
     assert.equal(probe.negative.failures.length, 0);
     assert.equal(probe.finalEvent, "DISTRIBUTION_AUTHORIZED");
     assert.equal(probe.handoff, "BLOCK07_HANDOFF_PACKAGE_READY");
+  });
+
+  test("Block 07 entry gate requires frozen Block 06 authorization and denies mutable-latest execution", () => {
+    const fixture = completeSyntheticDistribution();
+
+    assert.equal(validateBlock07Entry(fixture.entry).ok, true);
+    assert.equal(validateBlock07Entry({ ...fixture.entry, distributionAuthorized: false }).ok, false);
+    assert.equal(validateBlock07Entry({ ...fixture.entry, preDistributionCertified: false }).ok, false);
+    assert.equal(validateBlock07Entry({ ...fixture.entry, releasePackageFrozen: false }).ok, false);
+    assert.equal(validateBlock07Entry({ ...fixture.entry, releaseManifest: null }).ok, false);
+    assert.equal(validateBlock07Entry({ ...fixture.entry, block07ReadsLatestMutableAssets: true }).missing.includes("FROZEN_MANIFEST_ONLY"), true);
+  });
+
+  test("Block 07 creates stable channel distribution instance identity and idempotent attempts", () => {
+    const fixture = completeSyntheticDistribution();
+    const pendingInput = {
+      ...fixture.instances[0],
+      jmpOperationalState: "NOT_SUBMITTED",
+      externalChannelState: "NOT_SUBMITTED",
+      verificationState: "NOT_VERIFIED",
+      attempts: []
+    };
+    const instance = createChannelDistributionInstance(pendingInput).instance;
+    const duplicate = createChannelDistributionInstance(pendingInput).instance;
+    const submitted = submitDistributionInstance(instance);
+    const retry = submitDistributionInstance(submitted.instance, { attemptId: "ATTEMPT-RETRY" });
+
+    assert.equal(instance.distributionInstanceId, duplicate.distributionInstanceId);
+    assert.equal(submitted.ok, true);
+    assert.equal(submitted.instance.jmpOperationalState, "SUBMITTED");
+    assert.equal(submitted.instance.verificationState, "NOT_VERIFIED");
+    assert.equal(retry.instance.distributionInstanceId, instance.distributionInstanceId);
+    assert.equal(retry.instance.attempts.length, 2);
+    assert.equal(retry.instance.attempts[0].attempt, 1);
+  });
+
+  test("Block 07 live verification requires evidence and manifest comparison before URL registration", () => {
+    const fixture = completeSyntheticDistribution();
+    const instance = fixture.instances[0];
+    const unverified = verifyLiveState({ ...instance, publicUrlVerified: false });
+    const verified = verifyLiveState(instance);
+    const mismatch = validateLiveListing({
+      manifestExpectation: { isbn: "9780000000000", price: "19.99" },
+      liveListing: { isbn: "9780000000000", price: "29.99" }
+    });
+
+    assert.equal(unverified.ok, false);
+    assert.equal(verified.ok, true);
+    assert.equal(registerCanonicalLiveUrl({ ...instance, verificationState: "NOT_VERIFIED" }).ok, false);
+    assert.equal(registerCanonicalLiveUrl(instance).ok, true);
+    assert.equal(mismatch.ok, false);
+    assert.equal(mismatch.result, "BLOCKING_MISMATCH");
+  });
+
+  test("Block 07 publication state separates required, optional, title-live, and fully-live states", () => {
+    const fixture = completeSyntheticDistribution();
+    const partial = derivePublicationState([
+      fixture.instances[0],
+      { ...fixture.instances[0], formatId: "EBOOK", endpointRequirement: "EXPECTED", verificationState: "NOT_VERIFIED" },
+      { ...fixture.instances[2], endpointRequirement: "OPTIONAL", verificationState: "NOT_VERIFIED" }
+    ]);
+    const full = derivePublicationState(fixture.instances);
+
+    assert.equal(partial.titleLive, true);
+    assert.equal(partial.fullyLive, false);
+    assert.equal(partial.optionalAbsentBlocksTitle, false);
+    assert.equal(full.titleState, "FULLY_LIVE");
+    assert.equal(full.releaseHealth, "HEALTHY");
+  });
+
+  test("Block 07 remediation, incident, takedown, watchdog, and date controls fail closed", () => {
+    const remediation = routeDistributionRemediation({ errorDomain: "PRICE_MISMATCH" });
+    const incident = openPublicationIncident({ blocking: true, incidentType: "WRONG_PRICE" });
+    const takedownPending = requestEmergencyTakedown({ requested: true, verified: false });
+    const watchdog = evaluateDistributionWatchdog({ lastCheckedHoursAgo: 49, slaHours: 24, externalChannelState: CHANNEL_STATES.PROCESSING });
+    const date = evaluatePublicationDate({ authorizedDate: "2026-09-15", attemptedDate: "2026-09-16" });
+
+    assert.equal(remediation.reopensBlock06ChangeControl, true);
+    assert.equal(remediation.resetsUnaffectedChannels, false);
+    assert.equal(incident.blocksCertification, true);
+    assert.equal(takedownPending.state, "TAKEDOWN_PENDING");
+    assert.equal(takedownPending.takenDownVerified, false);
+    assert.equal(watchdog.ok, false);
+    assert.equal(watchdog.waitingOn, "SYSTEM_ATTENTION_REQUIRED");
+    assert.equal(date.ok, false);
+  });
+
+  test("Block 07 handoffs expose only verified publication state to Block 08 and Block 09", () => {
+    const fixture = completeSyntheticDistribution();
+    const block08 = buildBlock08Handoff(fixture.instances);
+    const block09 = buildBlock09Handoff(fixture.instances);
+
+    assert.equal(block08.ok, true);
+    assert.equal(block08.handoff.event, "PRIMARY_RELEASE_LIVE");
+    assert.equal(block08.handoff.canonicalVerifiedLiveUrls.every((link) => link.verified === true), true);
+    assert.equal(block09.ok, true);
+    assert.equal(block09.handoff.event, "BLOCK09_DISTRIBUTION_RECORD_HANDOFF_READY");
+    assert.equal(block09.handoff.records.length, fixture.instances.length);
+  });
+
+  test("Block 07 deliberate bypass suite and synthetic commissioning matrix pass", () => {
+    const bypass = runBlock07BypassTests();
+    const synthetic = runBlock07SyntheticCommissioningMatrix();
+
+    assert.equal(bypass.ok, true);
+    assert.equal(bypass.count, 36);
+    assert.equal(bypass.failures.length, 0);
+    assert.equal(synthetic.ok, true);
+    assert.equal(synthetic.count, 40);
+    assert.equal(synthetic.results.filter((row) => !row.ok).length, 0);
+  });
+
+  test("Block 07 final commissioning registers every distribution domain and preserves downstream boundaries", () => {
+    const commissioning = runFinalBlock07Commissioning();
+
+    assert.equal(commissioning.ok, true);
+    assert.equal(commissioning.classification, "DISTRIBUTION_FULLY_COMMISSIONED");
+    assert.equal(commissioning.registerSummary.totalDomains, 41);
+    assert.equal(commissioning.registerSummary.commissioned, 41);
+    assert.equal(commissioning.certification.certified, true);
+    assert.equal(commissioning.certification.event, "TITLE_LIVE_AND_VERIFIED");
+    assert.equal(commissioning.certification.block08.handoff.event, "PRIMARY_RELEASE_LIVE");
+    assert.equal(commissioning.certification.block09.handoff.event, "BLOCK09_DISTRIBUTION_RECORD_HANDOFF_READY");
+    assert.equal(Object.values(commissioning.negativeProof).every((value) => value === 0), true);
+  });
+
+  test("Block 07 audit and final certification Function probe return distribution fully commissioned", () => {
+    const audit = auditBlock07Requirements();
+    const certification = certifyDistribution(completeSyntheticDistribution().instances);
+    const probe = buildBlock07FinalCertificationProbe();
+
+    assert.equal(audit.length >= 17, true);
+    assert.equal(certification.certified, true);
+    assert.equal(probe.status, "ready");
+    assert.equal(probe.classification, "DISTRIBUTION_FULLY_COMMISSIONED");
+    assert.equal(probe.domains.totalDomains, 41);
+    assert.equal(probe.bypass.failures, 0);
+    assert.equal(probe.synthetic.failures, 0);
+    assert.equal(probe.negative.failures.length, 0);
+    assert.equal(probe.finalEvent, "TITLE_LIVE_AND_VERIFIED");
+    assert.equal(probe.block08Handoff, "PRIMARY_RELEASE_LIVE");
+    assert.equal(probe.block09Handoff, "BLOCK09_DISTRIBUTION_RECORD_HANDOFF_READY");
   });
 });

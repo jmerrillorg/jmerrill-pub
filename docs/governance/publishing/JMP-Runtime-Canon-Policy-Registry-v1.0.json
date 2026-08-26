@@ -108,6 +108,14 @@
         "negativeProof": "Distribution readiness score alone, open hard blocker, invented rights, invalid route, invalid economics, stale/mismatched metadata, manifest mutation, Block 07 mutable latest reads, distribution submission, retailer activation, launch execution, payment, royalty, and Business Central mutation probes are denied."
       },
       {
+        "policyId": "JMP-BLOCK07-DISTRIBUTION-PUBLICATION-COMMISSIONING-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "block07DistributionCommissioning / run-block07-final-certification-probe",
+        "liveProof": "Block 07 final certification probe covers frozen-manifest execution, channel distribution instances, endpoint requirements, idempotent submission, external state normalization, live verification, public listing validation, canonical URL registration, publication state, targeted remediation, incident/takedown controls, Block 08 handoff, Block 09 handoff, and distribution certification.",
+        "negativeProof": "Submission success as live, channel acceptance as live verified, duplicate canonical distribution instances, overwritten attempt history, missing external IDs, external/JMP state overwrite, wrong price/identifier/territory, unverified URL registration, takedown-as-verified, Block 08 launch, payment, royalty, and Business Central mutation probes are denied."
+      },
+      {
         "policyId": "JMP-DISTRIBUTION-AUTHORITY-v1.0",
         "canonStatus": "CANON",
         "runtimeStatus": "IMPLEMENTED_NOT_COMMISSIONED",
@@ -263,6 +271,22 @@
       "effectiveDate": "2026-08-26",
       "supersedes": [
         "distribution-readiness-score-as-release-authority semantics"
+      ],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-BLOCK07-DISTRIBUTION-PUBLICATION-COMMISSIONING-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Block 07 distribution and publication lifecycle",
+      "enforcementClass": "DISTRIBUTION_SUBMISSION_AND_LIVE_VERIFICATION_HARD_GATE",
+      "canonSource": "JMP Block 07 Distribution & Publication / JM1 Canon Enforcement & Runtime Policy Layer v1",
+      "resolver": "runFinalBlock07Commissioning",
+      "effectiveDate": "2026-08-26",
+      "supersedes": [
+        "submission-success-as-live semantics",
+        "channel-acceptance-as-live-verified semantics",
+        "distribution execution from mutable latest assets"
       ],
       "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
     },
