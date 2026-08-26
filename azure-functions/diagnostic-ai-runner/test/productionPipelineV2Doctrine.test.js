@@ -109,6 +109,32 @@ const {
   validateLiveListing,
   verifyLiveState
 } = require("../src/distribution/block07DistributionCommissioning");
+const {
+  auditBlock08Requirements,
+  buildBlock08FinalCertificationProbe,
+  buildBlock09MarketingHandoff,
+  buildLaunchPerformanceReview,
+  captureCampaignMetrics,
+  certifyLaunchCycle,
+  completeSyntheticMarketingCampaign,
+  createMarketingScopeLock,
+  createTitleMarketingCampaign,
+  evaluateAttribution,
+  evaluateMarketingWatchdog,
+  registerMarketingAsset,
+  resolveCtaAuthority,
+  resolveMarketingEntitlement,
+  runBlock08BypassTests,
+  runBlock08SyntheticCommissioningMatrix,
+  runFinalBlock08Commissioning,
+  validateAuthorMarketingApproval,
+  validateBlock08Entry,
+  validateMarketingConsent,
+  validatePreorderMarketing,
+  validateReviewArc,
+  validateReviewQuoteUsage,
+  validateSocialExecution
+} = require("../src/marketing/block08LaunchMarketingCommissioning");
 
 describe("JM1 Production Pipeline v2.0 doctrine", () => {
   test("starts interior layout and cover design in parallel after proofreading approval", () => {
@@ -1117,5 +1143,143 @@ describe("JM1 Production Pipeline v2.0 doctrine", () => {
     assert.equal(probe.finalEvent, "TITLE_LIVE_AND_VERIFIED");
     assert.equal(probe.block08Handoff, "PRIMARY_RELEASE_LIVE");
     assert.equal(probe.block09Handoff, "BLOCK09_DISTRIBUTION_RECORD_HANDOFF_READY");
+  });
+
+  test("Block 08 entry starts from Block 07 live handoff and refuses unverified CTA activation", () => {
+    const fixture = completeSyntheticMarketingCampaign();
+
+    assert.equal(validateBlock08Entry(fixture).ok, true);
+    assert.equal(validateBlock08Entry({ ...fixture, primaryReleaseLive: false }).ok, false);
+    assert.equal(validateBlock08Entry({ ...fixture, verifiedBuyLinks: [] }).ok, false);
+    assert.equal(validateBlock08Entry({ ...fixture, releaseHealth: "INCIDENT" }).ok, false);
+    assert.equal(validateBlock08Entry({ ...fixture, unverifiedBuyNowCta: true }).missing.includes("VERIFIED_CTA_REQUIRED"), true);
+  });
+
+  test("Block 08 creates a governed campaign object before live launch and never uses package name as workflow", () => {
+    const fixture = completeSyntheticMarketingCampaign({ primaryReleaseLive: false });
+    const campaign = createTitleMarketingCampaign(fixture);
+    const scope = createMarketingScopeLock(fixture);
+
+    assert.equal(campaign.ok, true);
+    assert.equal(campaign.campaign.titleId, fixture.titleId);
+    assert.equal(campaign.campaign.releaseManifestId, fixture.releaseManifestId);
+    assert.equal(campaign.campaign.status, "PLANNING");
+    assert.equal(scope.ok, true);
+    assert.equal(createMarketingScopeLock({ ...fixture, packageNameAsWorkflow: true }).ok, false);
+    assert.equal(resolveMarketingEntitlement("JMP-PKG-PRO").status, "CURRENT");
+  });
+
+  test("Block 08 author representation and asset gates separate routine execution from author approval", () => {
+    const fixture = completeSyntheticMarketingCampaign();
+    const campaignId = fixture.campaign.campaignId;
+
+    assert.equal(validateAuthorMarketingApproval({ campaignId, assetId: "routine", contentType: "ROUTINE_CAPTION" }).ok, true);
+    assert.equal(validateAuthorMarketingApproval({ campaignId, assetId: "routine", contentType: "ROUTINE_CAPTION", requiresApprovalForRoutineLowRisk: true }).ok, false);
+    assert.equal(validateAuthorMarketingApproval({ campaignId, assetId: "story", contentType: "PERSONAL_STORY", authorApproved: false }).ok, false);
+    assert.equal(validateAuthorMarketingApproval({ campaignId, assetId: "story", contentType: "PERSONAL_STORY", authorApproved: true }).ok, true);
+    assert.equal(registerMarketingAsset({ campaignId, titleId: fixture.titleId, assetType: "COVER_GRAPHIC", coverApproved: false }).ok, false);
+    assert.equal(registerMarketingAsset({ campaignId, titleId: fixture.titleId, assetType: "COVER_GRAPHIC", coverApproved: true }).ok, true);
+  });
+
+  test("Block 08 consent, social, preorder, and CTA controls fail closed without blocking service communication", () => {
+    const fixture = completeSyntheticMarketingCampaign();
+
+    assert.equal(validateMarketingConsent({ communicationType: "SERVICE", marketingConsent: false }).ok, true);
+    assert.equal(validateMarketingConsent({ communicationType: "PROMOTIONAL", marketingConsent: false }).ok, false);
+    assert.equal(validateMarketingConsent({ communicationType: "PROMOTIONAL", marketingConsent: true }).ok, true);
+    assert.equal(validateSocialExecution({ accountVerified: false }).ok, false);
+    assert.equal(validateSocialExecution({ accountVerified: true, executionSystemBecomesRecord: true }).ok, false);
+    assert.equal(validatePreorderMarketing({ preorderAuthorized: true, preorderEndpointLiveVerified: false }).ok, false);
+    assert.equal(resolveCtaAuthority({ ...fixture.verifiedBuyLinks[0], verified: true, urlHealthy: false }).event, "CTA_SUPPRESSED");
+    assert.equal(resolveCtaAuthority({ ...fixture.verifiedBuyLinks[0], campaignId: fixture.campaign.campaignId, verified: true, urlHealthy: true }).ok, true);
+  });
+
+  test("Block 08 review/ARC, quote, attribution, and metrics preserve provenance and confidence", () => {
+    const fixture = completeSyntheticMarketingCampaign();
+    const campaignId = fixture.campaign.campaignId;
+
+    assert.equal(validateReviewArc({ staleArtifact: true }).ok, false);
+    assert.equal(validateReviewArc({}).ok, true);
+    assert.equal(validateReviewQuoteUsage({ quote: "Great", permissionStatus: "UNKNOWN" }).ok, false);
+    assert.equal(validateReviewQuoteUsage({ quote: "Great", permissionStatus: "APPROVED" }).ok, true);
+    assert.equal(evaluateAttribution({ campaignId, fabricateSalesAttribution: true }).ok, false);
+    assert.equal(evaluateAttribution({ campaignId, trafficEvidence: true }).confidence, "CORRELATED");
+    assert.equal(captureCampaignMetrics({ campaignId, metrics: fixture.metrics }).ok, true);
+    assert.equal(captureCampaignMetrics({ metrics: fixture.metrics }).ok, false);
+  });
+
+  test("Block 08 launch-cycle close requires full performance review and evergreen handoff, not sales target or launch day", () => {
+    const fixture = completeSyntheticMarketingCampaign();
+    const required = {
+      ...fixture,
+      activities: fixture.activities,
+      authorParticipation: fixture.authorParticipation,
+      launchWindowClosed: true,
+      metricsCaptured: true,
+      performanceReviewComplete: true,
+      evergreenHandoffComplete: true
+    };
+
+    assert.equal(certifyLaunchCycle(required).event, "LAUNCH_CYCLE_COMPLETE");
+    assert.equal(certifyLaunchCycle({ ...required, salesTargetRequired: true }).ok, false);
+    assert.equal(certifyLaunchCycle({ ...required, launchDayOnly: true }).ok, false);
+    assert.equal(certifyLaunchCycle({ ...required, performanceReviewComplete: false }).ok, false);
+    assert.equal(buildLaunchPerformanceReview({ campaignId: fixture.campaign.campaignId, skipReview: true }).ok, false);
+  });
+
+  test("Block 08 watchdog surfaces stale campaign work without converting it into author wait", () => {
+    const pass = evaluateMarketingWatchdog({});
+    const stale = evaluateMarketingWatchdog({ primaryReleaseLiveBuyNowInactive: true, brokenCtaStillActive: true });
+
+    assert.equal(pass.ok, true);
+    assert.equal(stale.ok, false);
+    assert.equal(stale.event, "MARKETING_ATTENTION_REQUIRED");
+    assert.equal(stale.waitingOn, "JMP_SYSTEM");
+  });
+
+  test("Block 08 deliberate bypass suite and synthetic commissioning matrix pass", () => {
+    const bypass = runBlock08BypassTests();
+    const synthetic = runBlock08SyntheticCommissioningMatrix();
+
+    assert.equal(bypass.ok, true);
+    assert.equal(bypass.count, 35);
+    assert.equal(bypass.failures.length, 0);
+    assert.equal(synthetic.ok, true);
+    assert.equal(synthetic.count, 44);
+    assert.equal(synthetic.results.filter((row) => !row.ok).length, 0);
+  });
+
+  test("Block 08 final commissioning registers every launch-marketing domain and preserves commissioning boundaries", () => {
+    const commissioning = runFinalBlock08Commissioning();
+
+    assert.equal(commissioning.ok, true);
+    assert.equal(commissioning.classification, "LAUNCH_MARKETING_FULLY_COMMISSIONED");
+    assert.equal(commissioning.registerSummary.totalDomains, 55);
+    assert.equal(commissioning.registerSummary.commissioned, 55);
+    assert.equal(commissioning.certification.event, "LAUNCH_CYCLE_COMPLETE");
+    assert.equal(commissioning.block09Handoff.event, "BLOCK09_MARKETING_HANDOFF_READY");
+    assert.equal(Object.values(commissioning.negativeProof).every((value) => value === 0), true);
+    assert.equal(commissioning.negativeProof.real_promotional_email_sent_for_commissioning, 0);
+    assert.equal(commissioning.negativeProof.real_social_post_published_for_commissioning, 0);
+    assert.equal(commissioning.negativeProof.real_ad_spend, 0);
+  });
+
+  test("Block 08 audit and final certification Function probe return launch marketing fully commissioned", () => {
+    const audit = auditBlock08Requirements();
+    const fixture = completeSyntheticMarketingCampaign();
+    const handoff = buildBlock09MarketingHandoff({ ...fixture, campaignId: fixture.campaign.campaignId, launchCycleComplete: true });
+    const probe = buildBlock08FinalCertificationProbe();
+
+    assert.equal(audit.length >= 25, true);
+    assert.equal(handoff.ok, true);
+    assert.equal(handoff.event, "BLOCK09_MARKETING_HANDOFF_READY");
+    assert.equal(probe.status, "ready");
+    assert.equal(probe.classification, "LAUNCH_MARKETING_FULLY_COMMISSIONED");
+    assert.equal(probe.domains.totalDomains, 55);
+    assert.equal(probe.bypass.failures, 0);
+    assert.equal(probe.synthetic.failures, 0);
+    assert.equal(probe.negative.failures.length, 0);
+    assert.equal(probe.finalEvent, "LAUNCH_CYCLE_COMPLETE");
+    assert.equal(probe.block09Handoff, "BLOCK09_MARKETING_HANDOFF_READY");
   });
 });
