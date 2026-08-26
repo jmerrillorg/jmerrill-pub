@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "func start",
-    "lint": "node --check src/functions/sendAuthorAcknowledgment.js src/functions/sendAgreementPackage.js src/policy/canonPolicyLayer.js",
+    "lint": "node --check src/functions/sendAuthorAcknowledgment.js src/functions/sendAgreementPackage.js src/policy/canonPolicyLayer.js src/policy/acsSenderRegistry.js",
     "test": "node --test",
     "test:node-guard": "node -e \"if (parseInt(process.version.split('.')[0].slice(1)) !== 24) { console.error('Node 24 required, got ' + process.version); process.exit(1); } console.log('Node version OK:', process.version);\""
   },

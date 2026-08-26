@@ -5,6 +5,12 @@ const {
   assertPolicyAllows,
   resolveCommunicationAuthority
 } = require("../policy/canonPolicyLayer");
+const {
+  resolveSenderProfile,
+  validateMessageIdentity,
+  validateSenderForBrand,
+  validateSignatureBlock
+} = require("../policy/acsSenderRegistry");
 
 const ALLOWED_INTAKE_CHANNEL = "INT-PUB-005 /join";
 const DEFAULT_PROJECT_TITLE = "your book";
@@ -14,11 +20,10 @@ const MAX_FIELD_LENGTH = 300;
 const MAX_BODY_LENGTH = 6000;
 const MAX_HTML_BODY_LENGTH = 50000;
 const ACS_PROVIDER_NAME = "acs-email";
-const ACS_SENDER = "publishing@email.jmerrill.one";
-// Canonical Publishing ACS sender for author-facing and Publishing-owned relay
-// messages. Reply capture remains the governed Publishing mailbox below.
-const AUTHOR_RESPONSE_SENDER = "publishing@email.jmerrill.one";
-const INTERNAL_VISIBILITY_MAILBOX = "publishing@jmerrill.one";
+const PUBLISHING_SENDER_PROFILE = resolveSenderProfile("JMP");
+const ACS_SENDER = PUBLISHING_SENDER_PROFILE.acsFrom;
+const AUTHOR_RESPONSE_SENDER = PUBLISHING_SENDER_PROFILE.acsFrom;
+const INTERNAL_VISIBILITY_MAILBOX = PUBLISHING_SENDER_PROFILE.replyTo;
 const INTERNAL_NOTIFICATION_TYPE = "AUTHOR_DRAFT_READY_FOR_REVIEW";
 const JOIN_INTERNAL_NOTIFICATION_TYPE = "JOIN_INTAKE_RECEIVED";
 const PAYMENT_INTERNAL_NOTIFICATION_TYPE = "PUBLISHING_PAYMENT_RECEIVED";
@@ -367,6 +372,15 @@ function validatePublishingAcknowledgmentEmail(email, payload) {
   if (!Array.isArray(email.replyTo) || email.replyTo[0]?.address !== INTERNAL_VISIBILITY_MAILBOX) {
     return { ok: false, reason: "REPLY_TO_NOT_CANONICAL" };
   }
+  const identity = validateMessageIdentity({
+    brand: "JMP",
+    from: email.senderAddress,
+    replyTo: email.replyTo[0]?.address,
+    cc: email.recipients?.cc?.map((recipient) => recipient.address) || []
+  });
+  if (!identity.ok) return { ok: false, reason: identity.reason };
+  const signature = validateSignatureBlock({ brand: "JMP", text: `${text}\n${html}` });
+  if (!signature.ok) return { ok: false, reason: signature.reason };
   if (subject.includes(payload.reference) || REFERENCE_PATTERN.test(subject) || DIAGNOSTIC_ID_PATTERN.test(subject)) {
     return { ok: false, reason: "SUBJECT_EXPOSES_INTERNAL_REFERENCE" };
   }
@@ -1092,9 +1106,10 @@ function getAcsSenderAddress() {
     });
   }
 
-  if (senderAddress !== ACS_SENDER || isJmerrillPubMailbox(senderAddress)) {
+  const identity = validateSenderForBrand({ brand: "JMP", from: senderAddress });
+  if (!identity.ok || isJmerrillPubMailbox(senderAddress)) {
     throw Object.assign(new Error("ACS sender is invalid."), {
-      safeCode: "ACS_SENDER_INVALID"
+      safeCode: identity.reason || "ACS_SENDER_INVALID"
     });
   }
 
@@ -1110,9 +1125,10 @@ function getAuthorResponseSenderAddress() {
     });
   }
 
-  if (senderAddress !== AUTHOR_RESPONSE_SENDER || isJmerrillPubMailbox(senderAddress)) {
+  const identity = validateSenderForBrand({ brand: "JMP", from: senderAddress });
+  if (!identity.ok || isJmerrillPubMailbox(senderAddress)) {
     throw Object.assign(new Error("ACS author-response sender is invalid."), {
-      safeCode: "ACS_AUTHOR_RESPONSE_SENDER_INVALID"
+      safeCode: identity.reason || "ACS_AUTHOR_RESPONSE_SENDER_INVALID"
     });
   }
 
