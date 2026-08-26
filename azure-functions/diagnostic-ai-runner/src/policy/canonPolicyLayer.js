@@ -167,6 +167,18 @@ const POLICY_REGISTRY = Object.freeze([
     ownerAuthority: "Jackie Smith, Jr. — Governance Authority"
   }),
   Object.freeze({
+    policyId: "JMP-BLOCK05-PRODUCTION-COMMISSIONING-v1.0",
+    version: "1.0",
+    status: POLICY_STATUS.CANON,
+    domain: "Block 05 production lifecycle",
+    enforcementClass: "PRE_PRODUCTION_AND_CERTIFICATION_HARD_GATE",
+    canonSource: "JMP Block 05 Production Operating System / JM1 Canon Enforcement & Runtime Policy Layer v1",
+    resolver: "resolveBlock05ProductionAuthority",
+    effectiveDate: "2026-08-26",
+    supersedes: ["JM1 Production Pipeline v2.0 distribution-readiness-as-production-completion semantics"],
+    ownerAuthority: "Jackie Smith, Jr. — Governance Authority"
+  }),
+  Object.freeze({
     policyId: "JMP-DISTRIBUTION-AUTHORITY-v1.0",
     version: "1.0",
     status: POLICY_STATUS.CANON,
@@ -521,6 +533,70 @@ function resolveProductionAuthority(input = {}) {
   });
 }
 
+function resolveBlock05ProductionAuthority(input = {}) {
+  const resolver = "resolveBlock05ProductionAuthority";
+  const sourceRecord = normalizeString(input.sourceRecord || input.titleId || input.productionMasterId || input.taskId) || null;
+  const missing = [];
+  const phase = normalizeKey(input.phase || "FINAL_CERTIFICATION");
+
+  if (phase === "ENTRY") {
+    if (input.finalEditorialCertified !== true) missing.push("FINAL_EDITORIAL_CERTIFIED");
+    if (input.productionReady !== true) missing.push("PRODUCTION_READY");
+    if (!normalizeString(input.finalEditorialManuscriptId || input.finalEditorialManuscript?.artifactId)) missing.push("FINAL_EDITORIAL_MANUSCRIPT");
+    if (!normalizeString(input.finalEditorialChecksum || input.finalEditorialManuscript?.checksum)) missing.push("FINAL_EDITORIAL_CHECKSUM");
+    if (input.editorialApprovalsComplete !== true) missing.push("EDITORIAL_APPROVALS_COMPLETE");
+    if (input.styleSheetAvailable !== true) missing.push("TITLE_STYLE_SHEET");
+    if (input.productionNotesAvailable !== true) missing.push("PRODUCTION_NOTES");
+    if (input.activeTitleProject !== true) missing.push("ACTIVE_TITLE_PROJECT");
+    if (input.formatEntitlementsResolved !== true) missing.push("PACKAGE_FORMAT_ENTITLEMENTS");
+  }
+
+  if (phase === "PRODUCTION_MASTER") {
+    if (input.mutateFinalEditorial === true) missing.push("FINAL_EDITORIAL_MANUSCRIPT_IMMUTABLE");
+    if (!normalizeString(input.derivedFrom || input.finalEditorialManuscriptId)) missing.push("DERIVED_FROM_FINAL_EDITORIAL_MANUSCRIPT");
+    if (!normalizeString(input.sourceChecksum || input.finalEditorialChecksum)) missing.push("SOURCE_CHECKSUM");
+  }
+
+  if (phase === "FINAL_CERTIFICATION") {
+    if (input.scopeLockComplete !== true) missing.push("PRODUCTION_SCOPE_LOCK");
+    if (input.requiredWorkstreamsCertified !== true) missing.push("ALL_REQUIRED_WORKSTREAMS_CERTIFIED");
+    if (input.requiredAuthorApprovalsComplete !== true) missing.push("ALL_REQUIRED_AUTHOR_APPROVALS_COMPLETE");
+    if (input.technicalValidationsPass !== true) missing.push("ALL_TECHNICAL_VALIDATIONS_PASS");
+    if (input.finalArtifactsIdentified !== true) missing.push("FINAL_ARTIFACTS_IDENTIFIED");
+    if (input.checksumsVerified !== true) missing.push("CHECKSUMS_VERIFIED");
+    if (input.publicationMetadataReady !== true) missing.push("PUBLICATION_METADATA_PACKAGE_READY");
+    if (input.accessibilitySatisfiedOrGoverned !== true) missing.push("ACCESSIBILITY_SATISFIED_OR_GOVERNED");
+    if (input.crossFormatSynchronizationPass !== true) missing.push("CROSS_FORMAT_SYNCHRONIZATION_PASS");
+    if (input.handoffPackageComplete !== true) missing.push("BLOCK06_HANDOFF_PACKAGE");
+  }
+
+  if (input.authorDecision && normalizeKey(input.authorDecision) !== "APPROVED") missing.push("AUTHOR_DECISION_NOT_APPROVAL");
+  if (input.authorApprovalRequiresArtifactBinding === true && !normalizeString(input.artifactId)) missing.push("AUTHOR_APPROVAL_ARTIFACT_BINDING");
+  if (input.authorApprovalTreatedAsTechnicalValidation === true) missing.push("AUTHOR_APPROVAL_NOT_TECHNICAL_VALIDATION");
+  if (input.coverMarketabilityTreatedAsTechnicalPass === true) missing.push("COVER_MARKETABILITY_NOT_TECHNICAL_PASS");
+  if (input.pageCountChanged === true && input.coverRegenerated !== true) missing.push("COVER_REGENERATION_REQUIRED");
+  if (input.productionMasterChanged === true && input.derivedAssetsRevalidated !== true) missing.push("DERIVED_ASSET_REVALIDATION_REQUIRED");
+  if (input.unresolvedProductionCorrection === true) missing.push("UNRESOLVED_PRODUCTION_CORRECTION");
+  if (asArray(input.attemptedActions).map(normalizeKey).includes("DISTRIBUTION_SUBMISSION")) missing.push("BLOCK05_DISTRIBUTION_SUBMISSION_FORBIDDEN");
+
+  if (missing.length) {
+    return deny(resolver, "Block 05 production lifecycle hard gate blocked mutation/certification.", {
+      sourceRecord,
+      evidence: missing,
+      extra: { phase, missing: [...new Set(missing)], violationEvent: "BLOCK05_PRODUCTION_CANON_VIOLATION" }
+    });
+  }
+
+  return allow(resolver, "Block 05 production lifecycle authority resolved.", {
+    sourceRecord,
+    evidence: [`phase=${phase}`],
+    extra: {
+      phase,
+      publicationAssetsReadyAllowed: phase === "FINAL_CERTIFICATION"
+    }
+  });
+}
+
 function resolveCadenceAuthority(input = {}) {
   const resolver = "resolveCadenceAuthority";
   const sourceRecord = normalizeString(input.sourceRecord || input.cadenceScheduleId || input.stageId) || null;
@@ -608,6 +684,7 @@ module.exports = {
   resolveIdentityAuthority,
   resolveLegacySystemAuthority,
   resolvePaymentAuthority,
+  resolveBlock05ProductionAuthority,
   resolveProductionAuthority,
   resolvePublicationIntentAuthority,
   resolveWaitingOnAuthority

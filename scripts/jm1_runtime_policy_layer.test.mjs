@@ -17,6 +17,7 @@ test('policy registry exposes every required resolver with canonical decision sh
     'resolveEditorialStageAuthority',
     'resolvePublicationIntentAuthority',
     'resolveProductionAuthority',
+    'resolveBlock05ProductionAuthority',
     'resolveDistributionAuthority',
     'resolveCadenceAuthority',
     'resolveWaitingOnAuthority',
@@ -137,6 +138,55 @@ test('production authority fails closed when full-wrap inputs are missing', () =
   })
   assert.equal(denied.DECISION, 'DENY')
   assert.deepEqual(denied.missing, ['BACK_COVER_COPY'])
+})
+
+test('Block 05 production authority blocks entry, stale artifacts, and distribution submission', () => {
+  const entry = policy.resolveBlock05ProductionAuthority({
+    phase: 'ENTRY',
+    productionReady: true,
+    finalEditorialManuscriptId: 'artifact-1',
+    finalEditorialChecksum: 'a'.repeat(64),
+    editorialApprovalsComplete: true,
+    styleSheetAvailable: true,
+    productionNotesAvailable: true,
+    activeTitleProject: true,
+    formatEntitlementsResolved: true,
+  })
+  assert.equal(entry.DECISION, 'DENY')
+  assert.equal(entry.missing.includes('FINAL_EDITORIAL_CERTIFIED'), true)
+
+  const final = policy.resolveBlock05ProductionAuthority({
+    phase: 'FINAL_CERTIFICATION',
+    scopeLockComplete: true,
+    requiredWorkstreamsCertified: true,
+    requiredAuthorApprovalsComplete: true,
+    technicalValidationsPass: true,
+    finalArtifactsIdentified: true,
+    checksumsVerified: true,
+    publicationMetadataReady: true,
+    accessibilitySatisfiedOrGoverned: true,
+    crossFormatSynchronizationPass: true,
+    handoffPackageComplete: true,
+    attemptedActions: ['DISTRIBUTION_SUBMISSION'],
+  })
+  assert.equal(final.DECISION, 'DENY')
+  assert.equal(final.missing.includes('BLOCK05_DISTRIBUTION_SUBMISSION_FORBIDDEN'), true)
+
+  const allowed = policy.resolveBlock05ProductionAuthority({
+    phase: 'FINAL_CERTIFICATION',
+    scopeLockComplete: true,
+    requiredWorkstreamsCertified: true,
+    requiredAuthorApprovalsComplete: true,
+    technicalValidationsPass: true,
+    finalArtifactsIdentified: true,
+    checksumsVerified: true,
+    publicationMetadataReady: true,
+    accessibilitySatisfiedOrGoverned: true,
+    crossFormatSynchronizationPass: true,
+    handoffPackageComplete: true,
+  })
+  assert.equal(allowed.MUTATION_ALLOWED, true)
+  assert.equal(allowed.publicationAssetsReadyAllowed, true)
 })
 
 test('waiting-on authority denies author wait without a delivered current request', () => {
