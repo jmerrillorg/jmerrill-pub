@@ -38,6 +38,10 @@ function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function isGuid(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(normalizeString(value));
+}
+
 function escapeODataText(value) {
   return normalizeString(value).replace(/'/g, "''");
 }
@@ -367,6 +371,7 @@ async function recordDueSystemAttention(client, stage, title, packageInfo, sched
 async function processCadenceLog(client, cadenceLog, now, correlationId, deps = {}) {
   const stageId = normalizeString(cadenceLog.jm1_sourcerecordid);
   if (!stageId) return { status: "SKIPPED", reason: "CADENCE_LOG_WITHOUT_STAGE", logId: cadenceLog.jm1_executionlogid };
+  if (!isGuid(stageId)) return { status: "SKIPPED", reason: "CADENCE_LOG_SOURCE_NOT_STAGE_GUID", sourceRecordId: stageId, logId: cadenceLog.jm1_executionlogid };
   const stage = await getStage(client, stageId);
   if (!stage) return { status: "SKIPPED", reason: "STAGE_NOT_FOUND", stageId };
   const title = normalizeString(stage._jm1pub_titleid_value) ? await getTitle(client, stage._jm1pub_titleid_value) : null;
@@ -449,6 +454,7 @@ module.exports = {
   addBusinessDays,
   buildSchedule,
   correlateMailboxDelivery,
+  isGuid,
   normalizeStageCode,
   parsePackage,
   remainingHoldDuration,

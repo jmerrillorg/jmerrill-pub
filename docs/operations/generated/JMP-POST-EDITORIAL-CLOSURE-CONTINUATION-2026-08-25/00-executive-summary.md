@@ -40,7 +40,7 @@ This pass repaired the missing cadence-release ownership path for author-facing 
 
 | Check | Result |
 | --- | --- |
-| `npm test -- --test-reporter=spec test/editorialCadenceReleaseConsumer.test.js test/publishingMailboxReader.test.js test/authorReviewResponseConsumer.test.js` | PASS, 91 / 91 |
+| `npm test -- --test-reporter=spec test/editorialCadenceReleaseConsumer.test.js test/publishingMailboxReader.test.js test/authorReviewResponseConsumer.test.js` | PASS, 92 / 92 |
 | `npm run lint` in diagnostic runner | PASS |
 | Root `npm run type-check` | PASS |
 | Canon policy guard | PASS, 10 / 10 |
