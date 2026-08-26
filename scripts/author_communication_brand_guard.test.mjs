@@ -6,6 +6,7 @@ const jiti = createJiti(import.meta.url)
 const brand = jiti('../lib/server/author-communication-brand.ts')
 const engine = jiti('../lib/server/author-package-notification-engine.ts')
 const terminology = jiti('../lib/server/author-facing-terminology.ts')
+const humanFirst = jiti('../lib/server/jm1-human-first-why-first-policy.ts')
 
 function attachment(role, fileName, contentType, bytes) {
   return {
@@ -44,15 +45,6 @@ test('shared author communication renderer produces branded HTML and plain text'
   assert.match(rendered.html, /The Intentional Leader/)
   assert.match(rendered.html, /A Division of J Merrill One/)
   assert.match(rendered.html, /Helping Authors Help Themselves\./)
-  assert.match(rendered.html, /Why you are receiving this/)
-  assert.match(rendered.html, /What(?:'|&#39;)s attached/)
-  assert.match(rendered.html, /What we need from you/)
-  assert.match(rendered.html, /How to respond/)
-  assert.match(rendered.html, /What happens next/)
-  assert.match(rendered.text, /Why you are receiving this/)
-  assert.match(rendered.text, /What's attached/)
-  assert.match(rendered.text, /What we need from you/)
-  assert.match(rendered.text, /How to respond/)
   assert.match(rendered.html, /<a href="https:\/\/jmerrill\.pub\/author\/portal\?action=review-package&amp;titleId=title-intentional-leader"/)
   assert.match(rendered.text, /Optional Author Operating Center access: https:\/\/jmerrill\.pub\/author\/portal/)
   assert.match(rendered.text, /Reply directly to publishing@jmerrill\.one/)
@@ -110,9 +102,63 @@ test('author communication validation blocks unformatted or text-only output', (
 
   assert.equal(validation.ok, false)
   assert.match(validation.blocker, /HTML_BODY_MISSING/)
-  assert.match(validation.blocker, /ATTACHMENT_BLOCK_MISSING/)
-  assert.match(validation.blocker, /AUTHOR_REVIEW_BLOCK_MISSING/)
   assert.match(validation.blocker, /PLAIN_TEXT_SIGNATURE_MISSING/)
+})
+
+test('human-first policy allows plain professional author email without section-heading scaffold', () => {
+  const content = `Good day, Iyorwuese,
+
+Your developmental edit of The General's Will and Last Testament is ready for review.
+
+I've attached the complete edited manuscript along with a short review guide.
+
+Please read through the manuscript carefully. If everything looks good, reply with "Approved." If you'd like changes, simply tell us what you'd like adjusted.
+
+Once we receive your approval, we'll prepare the book for the next editing stage.
+
+The Publishing Team
+J Merrill Publishing, Inc.`
+  const result = humanFirst.assertHumanFirstWhyFirst({
+    division: 'J Merrill Publishing',
+    brand: 'publishing',
+    recipientName: 'Iyorwuese',
+    recipientRelationship: 'Publishing author',
+    communicationType: 'AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1',
+    eventOrTrigger: 'Developmental edit ready for author review',
+    whyContext: 'The author needs the complete edited manuscript for review.',
+    actionRequired: 'Reply Approved or request changes.',
+    jm1NextStep: 'Prepare the book for the next editing stage after approval.',
+    content,
+    channel: 'EMAIL',
+    sender: 'publishing@email.jmerrill.one',
+    replyTo: 'publishing@jmerrill.one',
+    cc: ['publishing@jmerrill.one'],
+    riskClass: 'AUTHOR_REVIEW',
+  })
+  assert.equal(result.decision, 'ALLOW')
+})
+
+test('human-first policy denies internal runtime language and wrong Publishing sender', () => {
+  const result = humanFirst.assertHumanFirstWhyFirst({
+    division: 'J Merrill Publishing',
+    brand: 'publishing',
+    recipientName: 'Iyorwuese',
+    recipientRelationship: 'Publishing author',
+    communicationType: 'AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1',
+    eventOrTrigger: 'Developmental edit ready for author review',
+    whyContext: 'The author needs the complete edited manuscript for review.',
+    actionRequired: 'Reply Approved.',
+    jm1NextStep: 'Advance to Line Edit.',
+    content: 'The package manifest and artifactId 8f6b0ef4-1111-4222-8333-123456789abc passed technical validation in the runtime queue.',
+    channel: 'EMAIL',
+    sender: 'noreply@email.jmerrill.one',
+    replyTo: 'publishing@jmerrill.one',
+    cc: ['publishing@jmerrill.one'],
+  })
+  assert.equal(result.decision, 'DENY')
+  assert.ok(result.violations.includes('WRONG_BRAND_SENDER_IDENTITY'))
+  assert.ok(result.violations.includes('INTERNAL_TERM_ARTIFACT_ID'))
+  assert.ok(result.violations.includes('INTERNAL_TERM_MANIFEST'))
 })
 
 test('author package notification copy uses the shared brand renderer', () => {

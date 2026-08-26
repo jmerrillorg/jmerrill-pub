@@ -9,11 +9,13 @@ const brandShim = new URL('../lib/server/author-communication-brand', import.met
 const rendererShim = new URL('../lib/server/jm1-enterprise-communication-renderer', import.meta.url)
 const designTokensShim = new URL('../lib/server/jm1-enterprise-design-tokens', import.meta.url)
 const terminologyShim = new URL('../lib/server/author-facing-terminology', import.meta.url)
+const humanFirstShim = new URL('../lib/server/jm1-human-first-why-first-policy', import.meta.url)
 let createdNotificationShim = false
 let createdBrandShim = false
 let createdRendererShim = false
 let createdDesignTokensShim = false
 let createdTerminologyShim = false
+let createdHumanFirstShim = false
 if (!existsSync(notificationShim)) {
   symlinkSync('author-package-notification-engine.ts', notificationShim)
   createdNotificationShim = true
@@ -34,12 +36,17 @@ if (!existsSync(terminologyShim)) {
   symlinkSync('author-facing-terminology.ts', terminologyShim)
   createdTerminologyShim = true
 }
+if (!existsSync(humanFirstShim)) {
+  symlinkSync('jm1-human-first-why-first-policy.ts', humanFirstShim)
+  createdHumanFirstShim = true
+}
 after(() => {
   if (createdNotificationShim) unlinkSync(notificationShim)
   if (createdBrandShim) unlinkSync(brandShim)
   if (createdRendererShim) unlinkSync(rendererShim)
   if (createdDesignTokensShim) unlinkSync(designTokensShim)
   if (createdTerminologyShim) unlinkSync(terminologyShim)
+  if (createdHumanFirstShim) unlinkSync(humanFirstShim)
 })
 
 const {
@@ -48,6 +55,7 @@ const {
   buildNotificationInputFromPackage,
   certifyGovernedCadenceRetest,
   createAuthorReviewResponseClock,
+  createCorrectedAuthorReviewDeliveryEvidence,
   createPackageManifest,
   evaluatePackageCadence,
   getPackagePolicy,
@@ -136,6 +144,20 @@ function artifact(role, overrides = {}) {
     manuscriptSectionsComplete: overrides.manuscriptSectionsComplete,
     productionNotesVisible: overrides.productionNotesVisible,
     truncatedOutput: overrides.truncatedOutput,
+    audienceClassification:
+      overrides.audienceClassification ||
+      (['authorResponseMechanism', 'packageManifest', 'authorCoverMessage', 'developmentalMemo'].includes(role)
+        ? 'INTERNAL_ONLY'
+        : 'AUTHOR_REVIEW'),
+    artifactTypeAuthority: overrides.artifactTypeAuthority || 'STRUCTURED_METADATA',
+    wordCount: overrides.wordCount ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? 12_000 : undefined),
+    expectedSourceWordCount: overrides.expectedSourceWordCount ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? 12_000 : undefined),
+    sourceLineageVerified: overrides.sourceLineageVerified ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? true : undefined),
+    fullStructuralSpan: overrides.fullStructuralSpan ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? true : undefined),
+    expectedOpeningContentPresent: overrides.expectedOpeningContentPresent ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? true : undefined),
+    expectedEndingContentPresent: overrides.expectedEndingContentPresent ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? true : undefined),
+    chapterContinuityPassed: overrides.chapterContinuityPassed ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? true : undefined),
+    internalMetadataLeak: overrides.internalMetadataLeak,
     contentBytesBase64: overrides.contentBytesBase64 || bytes.toString('base64'),
   }
 }
@@ -539,7 +561,6 @@ test('Developmental and Interior packages keep response, manifest, and cover-mes
     developmentalNotification.attachments.map((attachment) => attachment.role).toSorted(),
     [
       'editedManuscript',
-      'editorialMemo',
       'reviewInstructions',
     ].toSorted(),
   )
@@ -563,6 +584,69 @@ test('Developmental and Interior packages keep response, manifest, and cover-mes
     }),
     'AUTHOR_PACKAGE_INTERNAL_ARTIFACT_EXPOSED:authorResponseMechanism',
   )
+})
+
+test('Developmental author review requires a complete author-facing manuscript, not an internal memo or filename match', () => {
+  const truncated = developmentalPackage({
+    artifacts: [
+      artifact('editedManuscript', {
+        stageId: 'stage-developmental',
+        titleId: 'title-developmental',
+        filename: 'The General’s Will and Last Testament - Edited Manuscript.docx',
+        wordCount: 1_155,
+        expectedSourceWordCount: 113_900,
+        fullStructuralSpan: false,
+        expectedEndingContentPresent: false,
+        chapterContinuityPassed: false,
+      }),
+      artifact('developmentalMemo', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('reviewInstructions', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('authorResponseMechanism', { stageId: 'stage-developmental', titleId: 'title-developmental', mimeType: 'text/plain' }),
+      artifact('packageManifest', { stageId: 'stage-developmental', titleId: 'title-developmental', mimeType: 'application/json' }),
+      artifact('authorCoverMessage', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+    ],
+  })
+  assert.equal(truncated.qaStatus, 'QA_FAILED')
+  assert.ok(truncated.qaFailures.some((failure) => failure.code === 'PACKAGE_QA_FAILED - MANUSCRIPT_WORD_COUNT_SANITY'))
+  assert.ok(truncated.qaFailures.some((failure) => failure.code === 'PACKAGE_QA_FAILED - AUTHOR_REVIEW_MANUSCRIPT_INCOMPLETE'))
+
+  const filenameOnly = developmentalPackage({
+    artifacts: [
+      artifact('editedManuscript', {
+        stageId: 'stage-developmental',
+        titleId: 'title-developmental',
+        artifactTypeAuthority: 'FILENAME_ONLY',
+      }),
+      artifact('developmentalMemo', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('reviewInstructions', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('authorResponseMechanism', { stageId: 'stage-developmental', titleId: 'title-developmental', mimeType: 'text/plain' }),
+      artifact('packageManifest', { stageId: 'stage-developmental', titleId: 'title-developmental', mimeType: 'application/json' }),
+      artifact('authorCoverMessage', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+    ],
+  })
+  assert.equal(filenameOnly.qaStatus, 'QA_FAILED')
+  assert.ok(filenameOnly.qaFailures.some((failure) => failure.code === 'PACKAGE_QA_FAILED - FILENAME_NOT_ARTIFACT_TYPE_AUTHORITY'))
+})
+
+test('invalid original author-review delivery does not start response clock; corrected valid delivery does', () => {
+  const evidence = createCorrectedAuthorReviewDeliveryEvidence({
+    originalDeliveryAt: '2026-08-25T02:01:42.000Z',
+    defectReason: 'REQUIRED_REVIEW_ARTIFACT_INVALID',
+    correctedDeliveryAt: '2026-08-26T15:30:00.000Z',
+    correctedDeliveryValid: true,
+  })
+  assert.equal(evidence.originalDeliveryValid, false)
+  assert.equal(evidence.responseClockStartedAt, '2026-08-26T15:30:00.000Z')
+  assert.equal(evidence.responseClock?.responseDueAt, '2026-09-02T15:30:00.000Z')
+
+  const blocked = createCorrectedAuthorReviewDeliveryEvidence({
+    originalDeliveryAt: '2026-08-25T02:01:42.000Z',
+    defectReason: 'REQUIRED_REVIEW_ARTIFACT_INVALID',
+    correctedDeliveryAt: '2026-08-26T15:30:00.000Z',
+    correctedDeliveryValid: false,
+  })
+  assert.equal(blocked.responseClockStartedAt, null)
+  assert.equal(blocked.responseClock, null)
 })
 
 test('Developmental package cannot release without summary, instructions, response path, and manifest', () => {

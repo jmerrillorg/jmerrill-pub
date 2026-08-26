@@ -73,6 +73,11 @@ export type PackageQaFailure =
   | 'PACKAGE_QA_FAILED - MISSING_TOC'
   | 'PACKAGE_QA_FAILED - MISSING_MANUSCRIPT_SECTIONS'
   | 'PACKAGE_QA_FAILED - VISUAL_QA_NOT_PASSED'
+  | 'PACKAGE_QA_FAILED - ARTIFACT_AUDIENCE_MISMATCH'
+  | 'PACKAGE_QA_FAILED - AUTHOR_REVIEW_MANUSCRIPT_INCOMPLETE'
+  | 'PACKAGE_QA_FAILED - MANUSCRIPT_WORD_COUNT_SANITY'
+  | 'PACKAGE_QA_FAILED - INTERNAL_METADATA_LEAK'
+  | 'PACKAGE_QA_FAILED - FILENAME_NOT_ARTIFACT_TYPE_AUTHORITY'
 
 export type PackageArtifactRole =
   | 'assessment'
@@ -121,6 +126,24 @@ export type AuthorReviewResponseClock = {
   overdueAt: string
   internalEscalationAt: string
   autoApprovalAuthorized: false
+}
+
+export type ArtifactAudienceClassification =
+  | 'INTERNAL_ONLY'
+  | 'AUTHOR_REVIEW'
+  | 'AUTHOR_DELIVERABLE'
+  | 'PUBLIC_RELEASE'
+  | 'VENDOR_DELIVERABLE'
+  | 'EVIDENCE_ONLY'
+
+export type CorrectedAuthorReviewDeliveryEvidence = {
+  originalDeliveryAt: string
+  originalDeliveryValid: false
+  defectReason: string
+  correctedDeliveryAt: string
+  correctedDeliveryValid: boolean
+  responseClockStartedAt: string | null
+  responseClock: AuthorReviewResponseClock | null
 }
 
 export type AuthorReviewResponseInput = {
@@ -254,6 +277,16 @@ export type PackageArtifactInput = {
   manuscriptSectionsComplete?: boolean
   productionNotesVisible?: boolean
   truncatedOutput?: boolean
+  audienceClassification?: ArtifactAudienceClassification
+  artifactTypeAuthority?: 'STRUCTURED_METADATA' | 'FILENAME_ONLY' | string
+  wordCount?: number
+  expectedSourceWordCount?: number
+  sourceLineageVerified?: boolean
+  fullStructuralSpan?: boolean
+  expectedOpeningContentPresent?: boolean
+  expectedEndingContentPresent?: boolean
+  chapterContinuityPassed?: boolean
+  internalMetadataLeak?: boolean
 }
 
 export type PackageManifestItem = {
@@ -377,12 +410,10 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     qaChecks: baseQaChecks(),
     emailAttachmentRoles: [
       'editedManuscript',
-      'developmentalMemo',
       'reviewInstructions',
     ],
     workspaceDownloadRoles: [
       'editedManuscript',
-      'developmentalMemo',
       'reviewInstructions',
     ],
     cadencePolicyId: 'EDITORIAL_AUTHOR_REVIEW_BY_WORD_COUNT',
@@ -606,6 +637,7 @@ export function validatePackageQa(input: {
     if (artifact.canRender === false) {
       failures.push({ code: 'PACKAGE_QA_FAILED - RENDER_FAILURE', detail: role })
     }
+    failures.push(...validateAuthorFacingArtifactControls(artifact, policy, input.manifest.stageCode))
     if (requiresProductionProofControls(artifact.role)) {
       failures.push(...validateProductionProofControls(artifact))
     }
@@ -623,6 +655,82 @@ export function validatePackageQa(input: {
 
   if (failures.length) return { ok: false, status: 'QA_FAILED', completedAt: input.completedAt, failures }
   return { ok: true, status: 'READY_INTERNAL', completedAt: input.completedAt, checks: policy.qaChecks }
+}
+
+function validateAuthorFacingArtifactControls(
+  artifact: PackageArtifactInput,
+  policy: CanonicalPackagePolicy,
+  stageCode: PackageStageCode,
+) {
+  const failures: Array<{ code: PackageQaFailure; detail: string }> = []
+  const defaultsAuthorVisible = policy.workspaceDownloadRoles.includes(artifact.role)
+  const defaultsEmailAttachment = policy.emailAttachmentRoles.includes(artifact.role)
+  const defaultsWorkspaceDownload = policy.workspaceDownloadRoles.includes(artifact.role)
+  const authorFacing = artifact.authorVisible ?? defaultsAuthorVisible
+  const emailAttachment = artifact.emailAttachment ?? defaultsEmailAttachment
+  const workspaceDownload = artifact.workspaceDownload ?? defaultsWorkspaceDownload
+  const leavesInternalContext = authorFacing || emailAttachment || workspaceDownload
+  const audience = artifact.audienceClassification
+
+  if (leavesInternalContext && (!audience || audience === 'INTERNAL_ONLY' || audience === 'EVIDENCE_ONLY')) {
+    failures.push({
+      code: 'PACKAGE_QA_FAILED - ARTIFACT_AUDIENCE_MISMATCH',
+      detail: `${artifact.role}:${audience || 'missing'}`,
+    })
+  }
+
+  if (artifact.internalMetadataLeak === true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - INTERNAL_METADATA_LEAK', detail: artifact.role })
+  }
+
+  if (isAuthorReviewManuscriptRole(artifact.role)) {
+    failures.push(...validateAuthorReviewManuscriptArtifact(artifact, stageCode))
+  }
+
+  return failures
+}
+
+function isAuthorReviewManuscriptRole(role: PackageArtifactRole) {
+  return role === 'editedManuscript' || role === 'proofreadManuscript'
+}
+
+function validateAuthorReviewManuscriptArtifact(artifact: PackageArtifactInput, stageCode: PackageStageCode) {
+  const failures: Array<{ code: PackageQaFailure; detail: string }> = []
+  if (artifact.artifactTypeAuthority === 'FILENAME_ONLY') {
+    failures.push({ code: 'PACKAGE_QA_FAILED - FILENAME_NOT_ARTIFACT_TYPE_AUTHORITY', detail: artifact.role })
+  }
+  const requiredChecks = [
+    ['sourceLineageVerified', artifact.sourceLineageVerified],
+    ['fullStructuralSpan', artifact.fullStructuralSpan],
+    ['expectedOpeningContentPresent', artifact.expectedOpeningContentPresent],
+    ['expectedEndingContentPresent', artifact.expectedEndingContentPresent],
+    ['chapterContinuityPassed', artifact.chapterContinuityPassed],
+  ] as const
+  for (const [name, value] of requiredChecks) {
+    if (value === false) {
+      failures.push({ code: 'PACKAGE_QA_FAILED - AUTHOR_REVIEW_MANUSCRIPT_INCOMPLETE', detail: `${artifact.role}:${name}` })
+    }
+  }
+  if (artifact.truncatedOutput === true) {
+    failures.push({ code: 'PACKAGE_QA_FAILED - TRUNCATED_OUTPUT', detail: artifact.role })
+  }
+  if (stageCode === 'DEVELOPMENTAL_EDITING' || artifact.expectedSourceWordCount || artifact.wordCount) {
+    const actual = artifact.wordCount || 0
+    const expected = artifact.expectedSourceWordCount || 0
+    if (expected >= 10_000 && actual > 0 && actual < Math.max(5_000, Math.floor(expected * 0.75))) {
+      failures.push({
+        code: 'PACKAGE_QA_FAILED - MANUSCRIPT_WORD_COUNT_SANITY',
+        detail: `${artifact.role}:actual-${actual}:expected-${expected}`,
+      })
+    }
+    if (expected >= 10_000 && actual === 0) {
+      failures.push({
+        code: 'PACKAGE_QA_FAILED - MANUSCRIPT_WORD_COUNT_SANITY',
+        detail: `${artifact.role}:word-count-missing:expected-${expected}`,
+      })
+    }
+  }
+  return failures
 }
 
 function requiresProductionProofControls(role: PackageArtifactRole) {
@@ -731,6 +839,29 @@ export function createAuthorReviewResponseClock(input: {
     overdueAt: addCalendarDays(input.deliveredAt, period),
     internalEscalationAt: addCalendarDays(input.deliveredAt, AUTHOR_REVIEW_ESCALATION_DAY),
     autoApprovalAuthorized: false,
+  }
+}
+
+export function createCorrectedAuthorReviewDeliveryEvidence(input: {
+  originalDeliveryAt: string
+  defectReason: string
+  correctedDeliveryAt: string
+  correctedDeliveryValid: boolean
+  contractResponsePeriodCalendarDays?: number
+}): CorrectedAuthorReviewDeliveryEvidence {
+  const responseClock = createAuthorReviewResponseClock({
+    deliveredAt: input.correctedDeliveryAt,
+    deliverySucceeded: input.correctedDeliveryValid,
+    contractResponsePeriodCalendarDays: input.contractResponsePeriodCalendarDays,
+  })
+  return {
+    originalDeliveryAt: input.originalDeliveryAt,
+    originalDeliveryValid: false,
+    defectReason: input.defectReason,
+    correctedDeliveryAt: input.correctedDeliveryAt,
+    correctedDeliveryValid: input.correctedDeliveryValid,
+    responseClockStartedAt: responseClock?.deliveredAt || null,
+    responseClock,
   }
 }
 

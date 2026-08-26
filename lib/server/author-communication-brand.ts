@@ -15,6 +15,7 @@ import {
   AUTHOR_FACING_ACTOR_TERMINOLOGY_RULE,
   validateAuthorFacingPublishingActorTerminology,
 } from './author-facing-terminology'
+import { assertHumanFirstWhyFirst } from './jm1-human-first-why-first-policy'
 
 export const AUTHOR_COMMUNICATION_BRAND = {
   templateFamily: 'JM1_AUTHOR_COMMUNICATION',
@@ -186,30 +187,45 @@ export function validateAuthorCommunicationEmail(input: {
   }
   if (/<h1[^>]*>\s*(Warmly|J Merrill Publishing)\s*<\/h1>/i.test(html)) blockers.push('INVENTED_CLOSING_OR_BRAND_H1')
   if (/\nWarmly,\s*\nJ Merrill Publishing\b/i.test(text)) blockers.push('INVENTED_CLOSING_PRESENT')
-  if (!html.includes('Why you are receiving this')) blockers.push('WHY_FIRST_BLOCK_MISSING')
-  if (!html.includes("What's attached") && !html.includes('What&#39;s attached')) blockers.push('ATTACHMENT_BLOCK_MISSING')
-  if (!/What we need from you/.test(html)) blockers.push('AUTHOR_REVIEW_BLOCK_MISSING')
-  if (!html.includes('How to respond')) blockers.push('AUTHOR_ACTION_BLOCK_MISSING')
-  if (!html.includes('What happens next')) blockers.push('NEXT_STEPS_BLOCK_MISSING')
   if (!replyOnly && !/<a\b[^>]+href="https:\/\/[^"]+"/i.test(html)) blockers.push('PRIMARY_ACTION_LINK_MISSING')
   if (replyOnly && /author\/portal|Author Operating Center|<a\b[^>]+href=/i.test(`${html}\n${text}`)) blockers.push('REPLY_ONLY_PORTAL_OR_LINK_PRESENT')
   if (/<span[^>]*>\s*(Review Package and Reply|Approve|Review)/i.test(html) && !/<a\b[^>]*>\s*(Review Package and Reply|Approve|Review)/i.test(html)) {
     blockers.push('PRIMARY_ACTION_NOT_CLICKABLE')
   }
-  if (!text.includes('Why you are receiving this')) blockers.push('PLAIN_TEXT_WHY_FIRST_BLOCK_MISSING')
-  if (!text.includes("What's attached")) blockers.push('PLAIN_TEXT_ATTACHMENT_BLOCK_MISSING')
-  if (!text.includes('What we need from you')) blockers.push('PLAIN_TEXT_AUTHOR_REVIEW_BLOCK_MISSING')
-  if (!text.includes('How to respond')) blockers.push('PLAIN_TEXT_AUTHOR_ACTION_BLOCK_MISSING')
   if (!replyOnly && !/Optional Author Operating Center access:\s*https:\/\//i.test(text)) blockers.push('PLAIN_TEXT_OPTIONAL_PORTAL_URL_MISSING')
   if (!text.includes(AUTHOR_COMMUNICATION_BRAND.signature)) blockers.push('PLAIN_TEXT_SIGNATURE_MISSING')
   const terminology = validateAuthorFacingPublishingActorTerminology(`${html}\n${text}`)
   if (!terminology.ok) {
     blockers.push(`STANDALONE_PUBLISHING_ACTOR_TERMINOLOGY - ${AUTHOR_FACING_ACTOR_TERMINOLOGY_RULE}`)
   }
+  const humanFirst = assertHumanFirstWhyFirst({
+    division: 'J Merrill Publishing',
+    brand: 'publishing',
+    recipientName: inferGreetingRecipient(text),
+    recipientRelationship: 'Publishing author',
+    communicationType: input.templateName || 'author communication',
+    eventOrTrigger: input.templateName || 'author communication render',
+    whyContext: text,
+    actionRequired: text,
+    jm1NextStep: text,
+    content: `${html}\n${text}`,
+    channel: 'EMAIL',
+    sender: 'publishing@email.jmerrill.one',
+    replyTo: 'publishing@jmerrill.one',
+    cc: ['publishing@jmerrill.one'],
+    riskClass: 'AUTHOR_REVIEW',
+  })
+  if (humanFirst.decision === 'DENY' || humanFirst.decision === 'HUMAN_REVIEW_REQUIRED') {
+    blockers.push(`JM1_HUMAN_FIRST_WHY_FIRST_${humanFirst.decision} - ${[...humanFirst.violations, ...humanFirst.warnings].join(',')}`)
+  }
 
   return blockers.length
     ? { ok: false, blocker: `AUTHOR_COMMUNICATION_BLOCKED - ${blockers.join(',')}` }
     : { ok: true }
+}
+
+function inferGreetingRecipient(text: string) {
+  return text.match(/Good day,\s*([^,\n]+)/i)?.[1]?.trim() || 'Author'
 }
 
 export function validateAuthorCommunicationRenderContract(input: {
