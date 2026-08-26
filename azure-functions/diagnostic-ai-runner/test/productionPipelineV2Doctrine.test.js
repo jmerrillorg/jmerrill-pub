@@ -135,6 +135,39 @@ const {
   validateReviewQuoteUsage,
   validateSocialExecution
 } = require("../src/marketing/block08LaunchMarketingCommissioning");
+const {
+  auditBlock09Requirements,
+  buildAuthorWorkspacePublishedTitleHome,
+  buildBlock09FinalCertificationProbe,
+  buildPublishedTitleBaseline,
+  buildPublisherOperatingCenterBacklistSurface,
+  buildRecurringClocks,
+  buildWorkEditionFormatHierarchy,
+  calculateRoyalty,
+  classifyPostPublicationChange,
+  createAnnualDistributionFeeObligations,
+  createRoyaltyPayable,
+  createRoyaltyPeriod,
+  deriveTitleHealth,
+  evaluateArchiveReadiness,
+  evaluateBlock09Watchdog,
+  evaluateContractMilestone,
+  fulfillAuthorCopies,
+  generateRoyaltyStatement,
+  ingestSalesSourceReport,
+  mergeEvergreenMarketingHandoff,
+  processRoyaltyPaymentAttempt,
+  reconcileRemittanceAndCash,
+  resolveRoyaltyRuleVersion,
+  routePublishedAuthorSupport,
+  runBlock09BypassTests,
+  runBlock09SyntheticCommissioningMatrix,
+  runFinalBlock09Commissioning,
+  applyLateAdjustment,
+  separateTerminalStates,
+  updateAuthorRelationshipLoop,
+  validateBlock09Activation
+} = require("../src/titleManagement/block09TitleManagementCommissioning");
 
 describe("JM1 Production Pipeline v2.0 doctrine", () => {
   test("starts interior layout and cover design in parallel after proofreading approval", () => {
@@ -1281,5 +1314,204 @@ describe("JM1 Production Pipeline v2.0 doctrine", () => {
     assert.equal(probe.negative.failures.length, 0);
     assert.equal(probe.finalEvent, "LAUNCH_CYCLE_COMPLETE");
     assert.equal(probe.block09Handoff, "BLOCK09_MARKETING_HANDOFF_READY");
+  });
+
+  test("Block 09 activates from Block 07 live verification and does not wait for Block 08 close", () => {
+    const distribution = completeSyntheticDistribution();
+    const activation = validateBlock09Activation({ titleLiveAndVerified: true, distributionRecords: distribution.instances, block08LaunchCycleComplete: false });
+    const blocked = validateBlock09Activation({ titleLiveAndVerified: true, distributionRecords: distribution.instances, block08LaunchCycleCompleteRequired: true });
+    const baseline = buildPublishedTitleBaseline({ titleLiveAndVerified: true, distributionRecords: distribution.instances });
+
+    assert.equal(activation.ok, true);
+    assert.equal(activation.event, "TITLE_MANAGEMENT_ACTIVE");
+    assert.equal(activation.block08MayContinue, true);
+    assert.equal(blocked.ok, false);
+    assert.equal(baseline.ok, true);
+    assert.equal(baseline.baseline.royaltyRuleVersion, "ROYALTY_RULE_STANDARD_70_GOVERNED_NET_v1.0");
+  });
+
+  test("Block 09 preserves work, edition, format, and historical edition economics", () => {
+    const hierarchy = buildWorkEditionFormatHierarchy();
+
+    assert.equal(hierarchy.editions.length, 2);
+    assert.equal(hierarchy.editions[0].preservesHistory, true);
+    assert.equal(hierarchy.editions[1].successorTo, "EDITION-1");
+    assert.equal(hierarchy.newEditionOverwritesOld, false);
+    assert.equal(hierarchy.editions[0].salesLedgerScope, "EDITION_1_ONLY");
+  });
+
+  test("Block 09 royalty rule resolution honors executed contract and rejects list-price shortcut", () => {
+    const standard = resolveRoyaltyRuleVersion();
+    const historical = resolveRoyaltyRuleVersion({ executedContract: { contractId: "OLD", contractVersion: "Historical", rate: 0.5, basis: "GOVERNED_NET" } });
+    const override = resolveRoyaltyRuleVersion({ forceCurrentDefaultOverContract: true });
+    const listPrice = resolveRoyaltyRuleVersion({ useListPriceAsBasis: true });
+
+    assert.equal(standard.ok, true);
+    assert.equal(standard.rule.rate, 0.7);
+    assert.equal(historical.rule.rate, 0.5);
+    assert.equal(override.ok, false);
+    assert.equal(listPrice.ok, false);
+  });
+
+  test("Block 09 source ingestion, sales ledger, remittance, and cash stay separate", () => {
+    const ingestion = ingestSalesSourceReport();
+    const duplicate = ingestSalesSourceReport({ duplicateFile: true });
+    const remittance = reconcileRemittanceAndCash();
+
+    assert.equal(ingestion.ok, true);
+    assert.equal(ingestion.ledgerEvents.length, 3);
+    assert.equal(ingestion.ledgerEvents.every((event) => event.immutableSourceLineage), true);
+    assert.equal(duplicate.event, "SALES_DATA_ATTENTION_REQUIRED");
+    assert.equal(remittance.saleEqualsRemittance, false);
+    assert.equal(remittance.remittanceEqualsCash, false);
+  });
+
+  test("Block 09 royalty engine is the only calculation authority and statements consume ledger facts", () => {
+    const ingestion = ingestSalesSourceReport();
+    const royalty = calculateRoyalty({ salesEvents: ingestion.ledgerEvents });
+    const recalculation = calculateRoyalty({ statementTemplateRecalculates: true });
+    const statement = generateRoyaltyStatement();
+    const recalcStatement = generateRoyaltyStatement({ recalculateInTemplate: true });
+
+    assert.equal(royalty.ok, true);
+    assert.equal(royalty.royaltyResults[0].calculationAuthority, "ROYALTY_ENGINE");
+    assert.equal(recalculation.ok, false);
+    assert.equal(statement.ok, true);
+    assert.equal(statement.statement.calculatesRoyalty, false);
+    assert.equal(recalcStatement.ok, false);
+  });
+
+  test("Block 09 royalty periods, late adjustments, payment clock, and failed-payment liability are governed", () => {
+    const period = createRoyaltyPeriod({ period: "2026-09" });
+    const adjustment = applyLateAdjustment();
+    const rewrite = applyLateAdjustment({ rewriteClosedPeriod: true });
+    const payable = createRoyaltyPayable();
+    const failed = processRoyaltyPaymentAttempt({ payable: payable.payable, fail: true });
+    const realPayment = processRoyaltyPaymentAttempt({ realPayment: true });
+
+    assert.equal(period.statementDue, "2026-10-14");
+    assert.equal(period.paymentDue, "2026-12-29");
+    assert.equal(adjustment.ok, true);
+    assert.equal(rewrite.ok, false);
+    assert.equal(failed.liabilityRemains, true);
+    assert.equal(failed.reissueRequired, true);
+    assert.equal(realPayment.ok, false);
+  });
+
+  test("Block 09 annual distribution fees apply only to print formats and real invoices are blocked", () => {
+    const fees = createAnnualDistributionFeeObligations();
+    const ebook = createAnnualDistributionFeeObligations({ chargeEbookFee: true });
+    const realInvoice = createAnnualDistributionFeeObligations({ realInvoice: true });
+
+    assert.equal(fees.ok, true);
+    assert.deepEqual(fees.obligations.map((fee) => fee.format).sort(), ["HARDCOVER", "PAPERBACK"]);
+    assert.equal(fees.obligations.every((fee) => fee.amount === 30), true);
+    assert.equal(ebook.ok, false);
+    assert.equal(realInvoice.ok, false);
+  });
+
+  test("Block 09 published-author support routes email to Customer Service and keeps royalty/payment replies with Jackie", () => {
+    const metadata = routePublishedAuthorSupport({ category: "METADATA_UPDATE" });
+    const royalty = routePublishedAuthorSupport({ category: "ROYALTY_QUESTION" });
+    const emailOnly = routePublishedAuthorSupport({ emailOnly: true });
+
+    assert.equal(metadata.ok, true);
+    assert.equal(metadata.case.system, "DYNAMICS_365_CUSTOMER_SERVICE");
+    assert.equal(royalty.case.waitingOn, "JACKIE_REVIEW_REQUIRED");
+    assert.equal(royalty.case.autoRoyaltyPaymentResponseSent, false);
+    assert.equal(emailOnly.ok, false);
+  });
+
+  test("Block 09 Author Workspace, comps, evergreen, and returning-author loop preserve history", () => {
+    const workspace = buildAuthorWorkspacePublishedTitleHome();
+    const comps = fulfillAuthorCopies();
+    const noLedger = fulfillAuthorCopies({ withoutLedger: true });
+    const evergreen = mergeEvergreenMarketingHandoff();
+    const authorLoop = updateAuthorRelationshipLoop();
+
+    assert.equal(workspace.visibleSections.includes("Royalty Statements"), true);
+    assert.equal(workspace.authorForcedToReenterHistory, false);
+    assert.equal(comps.ok, true);
+    assert.equal(comps.ledger.podIsInventory, false);
+    assert.equal(noLedger.ok, false);
+    assert.equal(evergreen.ok, true);
+    assert.equal(authorLoop.authorRelationship.futureBlock01Recognition, true);
+  });
+
+  test("Block 09 post-publication change routing is proportional and re-enters upstream blocks when required", () => {
+    const metadata = classifyPostPublicationChange({ type: "METADATA_ONLY" });
+    const material = classifyPostPublicationChange({ type: "MATERIAL_CONTENT_REVISION" });
+    const format = classifyPostPublicationChange({ type: "FORMAT_EXPANSION" });
+    const bypass = classifyPostPublicationChange({ bypassClassification: true });
+
+    assert.equal(metadata.route.includes("BLOCK09_VALIDATE"), true);
+    assert.equal(metadata.fullLifecycleForcedForMetadataOnly, false);
+    assert.equal(material.route.includes("BLOCK04"), true);
+    assert.equal(format.route.includes("BLOCK05"), true);
+    assert.equal(format.route.includes("BLOCK08_FORMAT_LAUNCH"), true);
+    assert.equal(bypass.ok, false);
+  });
+
+  test("Block 09 health, contract rights, terminal states, archive, clocks, and watchdog are explicit", () => {
+    const health = deriveTitleHealth({ commercialPerformance: "LOW_SALES" });
+    const contract = evaluateContractMilestone({ lowSales: true });
+    const automaticReversion = evaluateContractMilestone({ lowSalesAutomaticReversion: true });
+    const states = separateTerminalStates();
+    const archiveDenied = evaluateArchiveReadiness({ unresolvedFinancialObligation: true });
+    const archiveReady = evaluateArchiveReadiness();
+    const clocks = buildRecurringClocks();
+    const watchdog = evaluateBlock09Watchdog({ statementOverdue: true });
+    const surface = buildPublisherOperatingCenterBacklistSurface();
+
+    assert.equal(health.lowSalesAloneUnhealthy, false);
+    assert.equal(health.opaqueScore, false);
+    assert.equal(contract.milestone.reversionState, "REVERSION_REVIEW_REQUIRED");
+    assert.equal(automaticReversion.ok, false);
+    assert.equal(states.ok, true);
+    assert.equal(archiveDenied.ok, false);
+    assert.equal(archiveReady.event, "TITLE_MANAGEMENT_ARCHIVED");
+    assert.equal(clocks.eventDrivenMonitoring, true);
+    assert.equal(watchdog.event, "TITLE_ATTENTION_REQUIRED");
+    assert.equal(surface.views.includes("Royalty Period Due"), true);
+  });
+
+  test("Block 09 deliberate bypass suite and synthetic commissioning matrix pass", () => {
+    const bypass = runBlock09BypassTests();
+    const synthetic = runBlock09SyntheticCommissioningMatrix();
+
+    assert.equal(bypass.ok, true);
+    assert.equal(bypass.count, 40);
+    assert.equal(bypass.failures.length, 0);
+    assert.equal(synthetic.ok, true);
+    assert.equal(synthetic.count, 56);
+    assert.equal(synthetic.results.filter((row) => !row.ok).length, 0);
+  });
+
+  test("Block 09 final commissioning registers every title-management domain and preserves real-financial boundaries", () => {
+    const commissioning = runFinalBlock09Commissioning();
+
+    assert.equal(commissioning.ok, true);
+    assert.equal(commissioning.classification, "TITLE_MANAGEMENT_FULLY_COMMISSIONED");
+    assert.equal(commissioning.registerSummary.totalDomains, 61);
+    assert.equal(commissioning.registerSummary.commissioned, 61);
+    assert.equal(commissioning.activation.event, "TITLE_MANAGEMENT_ACTIVE");
+    assert.equal(commissioning.realFinancialBoundary.royaltyPayments, "DISABLED_FOR_COMMISSIONING");
+    assert.equal(commissioning.negativeProof.real_royalty_payment_sent_for_commissioning, 0);
+    assert.equal(Object.values(commissioning.negativeProof).every((value) => value === 0), true);
+  });
+
+  test("Block 09 audit and final certification Function probe return title management fully commissioned", () => {
+    const audit = auditBlock09Requirements();
+    const probe = buildBlock09FinalCertificationProbe();
+
+    assert.equal(audit.length >= 33, true);
+    assert.equal(probe.status, "ready");
+    assert.equal(probe.classification, "TITLE_MANAGEMENT_FULLY_COMMISSIONED");
+    assert.equal(probe.domains.totalDomains, 61);
+    assert.equal(probe.bypass.failures, 0);
+    assert.equal(probe.synthetic.failures, 0);
+    assert.equal(probe.negative.failures.length, 0);
+    assert.equal(probe.finalEvent, "TITLE_MANAGEMENT_ACTIVE");
+    assert.equal(probe.archiveEvent, "TITLE_MANAGEMENT_ARCHIVED");
   });
 });
