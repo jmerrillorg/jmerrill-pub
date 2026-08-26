@@ -1,6 +1,6 @@
 # Executive Summary
 
-Last Verified: 2026-08-26T14:34:02.047Z
+Last Verified: 2026-08-26T20:52:19.616Z
 
 Classification: JMP_AUTONOMOUS_PORTFOLIO_CONTROLLED_COMMISSIONING
 
