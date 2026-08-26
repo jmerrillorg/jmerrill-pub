@@ -16,6 +16,7 @@ const {
 const stageId = "fd577d2b-01a0-f111-b8dc-000d3a14673b";
 const titleId = "title-before-you-were-born";
 const gateId = "gate-before-you-were-born";
+const contactId = "dfb397e7-3b7c-f111-ab0f-6045bdd69435";
 const packageId = "pkg-before-you-were-born-developmental-v1";
 
 function makeClient(overrides = {}) {
@@ -24,6 +25,9 @@ function makeClient(overrides = {}) {
     jm1pub_editorialstageid: stageId,
     jm1pub_name: "Developmental Editing - Before You Were Born",
     _jm1pub_titleid_value: titleId,
+    _jm1pub_contactid_value: contactId,
+    jm1pub_intakereference: "JMP-INT-202607-LQPHEK",
+    jm1pub_publishingintakereference: "JMP-INT-202607-LQPHEK",
     jm1pub_internaloperationalsummary: `PACKAGE_PREPARATION: Editorial-to-Package handoff completed for ${packageId}; manifest artifact-before-you-were-born; package checksum ${"a".repeat(64)}; QA READY_INTERNAL;`,
     jm1pub_authorsafesummary: ""
   };
@@ -35,10 +39,49 @@ function makeClient(overrides = {}) {
   const gate = {
     jm1pub_editorialapprovalgateid: gateId,
     jm1pub_editorialapprovalgatename: "Developmental Review - Before You Were Born",
-    jm1pub_gatestatus: 196650000,
+    jm1pub_gatestatus: 196650001,
     _jm1pub_titleid_value: titleId,
-    _jm1pub_editorialstageid_value: stageId,
-    jm1pub_authoremail: "sean@example.com"
+    _jm1pub_editorialstageid_value: stageId
+  };
+  const contact = {
+    contactid: contactId,
+    fullname: "Sean Crowley",
+    emailaddress1: "sean@example.com"
+  };
+  const artifacts = [
+    {
+      jm1pub_editorialartifactid: "artifact-edited-manuscript",
+      jm1pub_editorialartifactname: "Developmentally Edited Manuscript - Developmental Editing - Before You Were Born",
+      jm1pub_filename: "Before You Were Born - Developmentally Edited Manuscript.docx",
+      jm1pub_artifactstatus: 196650002,
+      jm1pub_visibility: 196650001,
+      jm1pub_sha256: "",
+      jm1pub_repositorydriveid: "drive",
+      jm1pub_repositoryitemid: "item-docx",
+      jm1pub_filesizebytes: 100,
+      jm1pub_iscurrentapproved: true,
+      _jm1pub_titleid_value: titleId,
+      _jm1pub_editorialstageid_value: stageId
+    },
+    {
+      jm1pub_editorialartifactid: "artifact-review-instructions",
+      jm1pub_editorialartifactname: "Developmental Review Instructions - Developmental Editing - Before You Were Born",
+      jm1pub_filename: "Before You Were Born - Review Instructions.txt",
+      jm1pub_artifactstatus: 196650002,
+      jm1pub_visibility: 196650001,
+      jm1pub_sha256: "",
+      jm1pub_repositorydriveid: "drive",
+      jm1pub_repositoryitemid: "item-txt",
+      jm1pub_filesizebytes: 64,
+      jm1pub_iscurrentapproved: true,
+      _jm1pub_titleid_value: titleId,
+      _jm1pub_editorialstageid_value: stageId
+    }
+  ];
+  const alreadyDeliveredGate = {
+    ...gate,
+    jm1pub_gatestatus: 196650002,
+    jm1pub_authorresponsesummary: "Developmental Editing package delivery is OPERATIONALLY_CERTIFIED. Seven-calendar-day author response period started after compliant email delivery."
   };
   const completion = {
     jm1_executionlogid: "completion-log",
@@ -53,7 +96,9 @@ function makeClient(overrides = {}) {
       calls.listed.push({ entitySet, query });
       if (entitySet === "jm1pub_editorialstages") return [overrides.stage || stage];
       if (entitySet === "jm1pub_titles") return [overrides.title || title];
+      if (entitySet === "contacts") return overrides.contact === null ? [] : [overrides.contact || contact];
       if (entitySet === "jm1pub_editorialapprovalgates") return [overrides.gate || gate];
+      if (entitySet === "jm1pub_editorialartifacts") return overrides.artifacts || artifacts;
       if (entitySet === "jm1_executionlogs" && /PACKAGE_CADENCE_SCHEDULED/.test(query.$filter || "")) {
         return overrides.cadenceLogs || [{
           jm1_executionlogid: "cadence-log",
@@ -81,9 +126,41 @@ function makeClient(overrides = {}) {
   };
 }
 
+function senderDeps(extra = {}) {
+  const sends = [];
+  return {
+    sends,
+    readDeliveryEvidence: async () => ({ ok: true, found: false, ambiguous: false, code: "NO_DELIVERY_EVIDENCE_FOUND" }),
+    downloadArtifact: async (artifact) => artifact.jm1pub_repositoryitemid === "item-docx"
+      ? Buffer.from("PK test word/document.xml payload")
+      : Buffer.from("Please review these materials and reply with your decision."),
+    sendRelay: async (payload) => {
+      sends.push(payload);
+      return {
+        status: "SENT",
+        providerMessageId: "acs-message-1",
+        attachmentCount: payload.attachments.length,
+        attachmentChecksums: payload.attachments.map((attachment) => `${attachment.role}:${attachment.sha256}`),
+        subject: payload.subject,
+        from: "publishing@email.jmerrill.one",
+        replyTo: "publishing@jmerrill.one",
+        cc: ["publishing@jmerrill.one"]
+      };
+    },
+    ...extra
+  };
+}
+
 test("line editing cadence uses canonical five-business-day baseline", () => {
   assert.equal(STAGE_BASELINE_BUSINESS_DAYS.LINE_EDITING, 5);
   assert.equal(normalizeStageCode({ jm1pub_name: "Line Editing - The Long Watch" }), "LINE_EDITING");
+  assert.equal(
+    normalizeStageCode({
+      jm1pub_name: "Editorial Review - The Long Watch",
+      jm1pub_internaloperationalsummary: "CADENCE_RELEASE_RUNTIME: READY_FOR_RELEASE; stage COVER_DESIGN;"
+    }),
+    "EDITORIAL_REVIEW"
+  );
   assert.equal(addBusinessDays("2026-08-25T21:50:03Z", 5), "2026-09-01T21:50:03.000Z");
 });
 
@@ -101,7 +178,7 @@ test("schedule is future-owned system work until release boundary passes", () =>
   assert.notEqual(schedule.remainingHoldDuration, "expired");
 });
 
-test("due cadence becomes system attention when send binding is missing", () => {
+test("due cadence marks the release boundary as expired", () => {
   const schedule = buildSchedule(
     { jm1pub_name: "Line Editing - The General's Will" },
     { createdon: "2026-08-25T20:10:03Z" },
@@ -127,19 +204,93 @@ test("hold duration reports expired only after boundary", () => {
   assert.match(remainingHoldDuration("2026-08-26T01:00:00Z", "2026-08-26T00:00:00Z"), /^1h/);
 });
 
-test("due package with no canonical or mailbox delivery evidence remains system attention", async () => {
+test("due package with no canonical or mailbox delivery evidence sends once through governed ACS relay", async () => {
   const client = makeClient();
+  const deps = senderDeps();
   const result = await runEditorialCadenceReleaseConsumer(
     { now: "2026-08-28T15:00:00Z", correlationId: "test-no-delivery" },
-    {
-      client,
-      readDeliveryEvidence: async () => ({ ok: true, found: false, ambiguous: false, code: "NO_DELIVERY_EVIDENCE_FOUND" })
-    }
+    { client, ...deps }
   );
-  assert.equal(result.dueSystemAttention, 1);
+  assert.equal(result.dueSystemAttention, 0);
   assert.equal(result.deliveredRepaired, 0);
-  assert.equal(result.results[0].status, "DUE_SYSTEM_ATTENTION");
-  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_SYSTEM_ATTENTION_REQUIRED"));
+  assert.equal(result.packageSent, 1);
+  assert.equal(result.results[0].status, "PACKAGE_SENT");
+  assert.equal(deps.sends.length, 1);
+  assert.equal(deps.sends[0].authorEmail, "sean@example.com");
+  assert.equal(deps.sends[0].internalVisibilityMailbox, "publishing@jmerrill.one");
+  assert.deepEqual(deps.sends[0].cc, ["publishing@jmerrill.one"]);
+  assert.equal(deps.sends[0].templateName, "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1");
+  assert.equal(deps.sends[0].attachments.length, 2);
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT"));
+  assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialapprovalgates" && call.payload.jm1pub_gatestatus === 196650002));
+});
+
+test("due package with missing contact fails closed as ambiguous and does not send", async () => {
+  const client = makeClient({
+    stage: {
+      jm1pub_editorialstageid: stageId,
+      jm1pub_name: "Developmental Editing - Establishing Glory",
+      _jm1pub_titleid_value: titleId,
+      _jm1pub_contactid_value: null,
+      jm1pub_intakereference: "JMP-INT-202607-LQPHEK",
+      jm1pub_publishingintakereference: "JMP-INT-202607-LQPHEK",
+      jm1pub_internaloperationalsummary: `Package handoff completed. Package ${packageId}; QA READY_INTERNAL;`
+    }
+  });
+  const deps = senderDeps();
+  const result = await runEditorialCadenceReleaseConsumer(
+    { now: "2026-08-28T15:00:00Z", correlationId: "test-missing-contact" },
+    { client, ...deps }
+  );
+  assert.equal(result.nonSendable, 1);
+  assert.equal(result.dueSystemAttention, 0);
+  assert.equal(result.results[0].status, "AMBIGUOUS");
+  assert.deepEqual(result.results[0].blockers, ["CONTACT_MISSING", "AUTHOR_EMAIL_MISSING"]);
+  assert.equal(deps.sends.length, 0);
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_SEND_BLOCKED"));
+});
+
+test("already operationally certified gate is treated as already released and not resent", async () => {
+  const client = makeClient({
+    gate: {
+      jm1pub_editorialapprovalgateid: gateId,
+      jm1pub_editorialapprovalgatename: "Developmental Review - Before You Were Born",
+      jm1pub_gatestatus: 196650002,
+      jm1pub_authorresponsesummary: "Developmental Editing package delivery is OPERATIONALLY_CERTIFIED. Seven-calendar-day author response period started after compliant email delivery.",
+      _jm1pub_titleid_value: titleId,
+      _jm1pub_editorialstageid_value: stageId
+    }
+  });
+  const deps = senderDeps();
+  const result = await runEditorialCadenceReleaseConsumer(
+    { now: "2026-08-28T15:00:00Z", correlationId: "test-already-certified" },
+    { client, ...deps }
+  );
+  assert.equal(result.alreadyReleased, 1);
+  assert.equal(result.results[0].sentActionType, "GATE_AWAITING_AUTHOR_RESPONSE");
+  assert.equal(deps.sends.length, 0);
+});
+
+test("cadence-not-required package is reconciled as non-sendable instead of sent", async () => {
+  const client = makeClient({
+    cadenceLogs: [{
+      jm1_executionlogid: "cadence-not-required",
+      jm1_actiontype: "PACKAGE_CADENCE_SCHEDULED",
+      jm1_sourcerecordid: stageId,
+      createdon: "2026-08-20T15:00:00Z",
+      jm1_actiondescription: "CADENCE_NOT_REQUIRED: publisher-facing Editorial Review decision package; no author release scheduled."
+    }]
+  });
+  const deps = senderDeps();
+  const result = await runEditorialCadenceReleaseConsumer(
+    { now: "2026-08-28T15:00:00Z", correlationId: "test-cadence-not-required" },
+    { client, ...deps }
+  );
+  assert.equal(result.nonSendable, 1);
+  assert.equal(result.results[0].status, "AMBIGUOUS");
+  assert.equal(result.results[0].reason, "CADENCE_NOT_AUTHOR_RELEASE_ELIGIBLE");
+  assert.equal(deps.sends.length, 0);
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_NON_SENDABLE_RECONCILED"));
 });
 
 test("mailbox delivery repairs missing internal send event and prevents duplicate send", async () => {

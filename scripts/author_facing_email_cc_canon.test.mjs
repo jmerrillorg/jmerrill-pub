@@ -44,6 +44,9 @@ function loadRelayModule() {
       if (name === '@azure/functions') return { app: { http: (name, config) => { routes[name] = config } } }
       if (name === '@azure/communication-email') return { EmailClient: class EmailClient {} }
       if (name === '@azure/identity') return { DefaultAzureCredential: class DefaultAzureCredential {} }
+      if (name === '../policy/canonPolicyLayer') {
+        return require(path.join(process.cwd(), 'azure-functions', 'acs-email-relay', 'src', 'policy', 'canonPolicyLayer.js'))
+      }
       return require(name)
     },
     process,
