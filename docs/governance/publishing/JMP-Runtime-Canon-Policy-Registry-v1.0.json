@@ -116,6 +116,14 @@
         "negativeProof": "Submission success as live, channel acceptance as live verified, duplicate canonical distribution instances, overwritten attempt history, missing external IDs, external/JMP state overwrite, wrong price/identifier/territory, unverified URL registration, takedown-as-verified, Block 08 launch, payment, royalty, and Business Central mutation probes are denied."
       },
       {
+        "policyId": "JMP-BLOCK08-LAUNCH-MARKETING-COMMISSIONING-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "block08LaunchMarketingCommissioning / run-block08-final-certification-probe",
+        "liveProof": "Block 08 final certification probe covers upstream marketing triggers, governed title campaign object, brief, positioning lock, message house, package entitlement, scope lock, author participation, representation-risk approvals, marketing asset registry, campaign plan/calendar, preorder/live CTA gates, consent, social/email/web execution governance, release-health CTA suppression, campaign health, attribution, metrics, optimization, performance review, evergreen handoff, Publisher Operating Center, Author Workspace, and Block 09 marketing handoff.",
+        "negativeProof": "Marketing-only-after-Block07, campaign without title relationship, package-as-workflow, silent scope changes, repeated author intake, routine low-risk overapproval, high-risk no-approval, unversioned asset overwrite, unapproved cover, unverified preorder/live CTA, broken CTA promotion, release incident ignored, promotional email without consent, external platform as system of record, fabricated attribution, sales target as gate, launch-day-only closeout, real promotional email/social/ad/media/ARC commissioning, payment, royalty, Business Central, and Block09 long-term management probes are denied."
+      },
+      {
         "policyId": "JMP-DISTRIBUTION-AUTHORITY-v1.0",
         "canonStatus": "CANON",
         "runtimeStatus": "IMPLEMENTED_NOT_COMMISSIONED",
@@ -287,6 +295,23 @@
         "submission-success-as-live semantics",
         "channel-acceptance-as-live-verified semantics",
         "distribution execution from mutable latest assets"
+      ],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-BLOCK08-LAUNCH-MARKETING-COMMISSIONING-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Block 08 launch and marketing lifecycle",
+      "enforcementClass": "LAUNCH_MARKETING_CAMPAIGN_AND_CTA_HARD_GATE",
+      "canonSource": "JMP Block 08 Launch & Marketing Operating System / JM1 Canon Enforcement & Runtime Policy Layer v1",
+      "resolver": "runFinalBlock08Commissioning",
+      "effectiveDate": "2026-08-26",
+      "supersedes": [
+        "launch-day-as-marketing-completion semantics",
+        "sales-target-as-lifecycle-gate semantics",
+        "external-marketing-platform-as-campaign-system-of-record semantics",
+        "unverified-retailer-link-as-campaign-CTA semantics"
       ],
       "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
     },

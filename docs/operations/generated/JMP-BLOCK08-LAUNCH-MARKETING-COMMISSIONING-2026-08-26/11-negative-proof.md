@@ -1,0 +1,43 @@
+# Negative Proof
+
+Last Verified: 2026-08-26
+
+All required negative proof controls returned `0`.
+
+```text
+marketing_first_begins_only_after_block07 = 0
+campaign_created_without_title_relationship = 0
+package_name_used_as_workflow_without_scope_lock = 0
+marketing_scope_silently_expanded = 0
+marketing_scope_silently_reduced = 0
+author_forced_to_repeat_governed_marketing_intake = 0
+author_approval_required_for_every_routine_marketing_asset = 0
+high_representation_risk_content_published_without_required_author_approval = 0
+marketing_asset_overwritten_without_history = 0
+unapproved_cover_used_for_public_marketing = 0
+preorder_promoted_without_verified_preorder_endpoint = 0
+buy_now_promoted_without_verified_live_endpoint = 0
+broken_buy_link_continues_active_promotion_after_known_failure = 0
+release_incident_ignored_by_marketing = 0
+marketing_consent_required_for_service_communication = 0
+promotional_email_sent_without_required_marketing_consent = 0
+social_platform_execution_becomes_competing_system_of_record = 0
+campaign_metrics_detached_from_campaign_identity = 0
+sales_attribution_fabricated_when_unavailable = 0
+optional_author_activity_blocks_launch_cycle_without_governed_requirement = 0
+sales_target_required_to_close_block08 = 0
+launch_day_alone_closes_block08 = 0
+campaign_health_collapsed_into_release_health = 0
+block09_receives_no_durable_marketing_intelligence = 0
+legacy_marketing_history_fabricated = 0
+real_promotional_email_sent_for_commissioning = 0
+real_social_post_published_for_commissioning = 0
+real_ad_spend = 0
+real_media_outreach_for_commissioning = 0
+real_ARC_sent_for_commissioning = 0
+payment_activity = 0
+royalty_activity = 0
+Business_Central_payment_mutation = 0
+Block09_longterm_title_management_performed = 0
+```
+
