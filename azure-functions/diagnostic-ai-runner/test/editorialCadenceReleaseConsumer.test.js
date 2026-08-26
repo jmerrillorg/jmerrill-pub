@@ -233,3 +233,22 @@ test("future scheduled package does not invoke mailbox repair or send path", asy
   assert.equal(mailboxReads, 0);
   assert.equal(result.results[0].status, "SCHEDULED_AUTOMATIC_FUTURE");
 });
+
+test("legacy package-id cadence source is skipped instead of queried as an editorial stage", async () => {
+  const client = makeClient({
+    cadenceLogs: [{
+      jm1_executionlogid: "legacy-package-source",
+      jm1_actiontype: "PACKAGE_CADENCE_SCHEDULED",
+      jm1_sourcerecordid: "pkg-8face475-8f80-f111-ab0f-00224820105b-editorial-review-v1",
+      createdon: "2026-08-20T15:00:00Z",
+      jm1_actiondescription: "legacy source"
+    }]
+  });
+  const result = await runEditorialCadenceReleaseConsumer(
+    { now: "2026-08-28T15:00:00Z", correlationId: "test-legacy-package-source" },
+    { client }
+  );
+  assert.equal(result.results[0].status, "SKIPPED");
+  assert.equal(result.results[0].reason, "CADENCE_LOG_SOURCE_NOT_STAGE_GUID");
+  assert.ok(!client.calls.listed.some((call) => call.entitySet === "jm1pub_editorialstages"));
+});
