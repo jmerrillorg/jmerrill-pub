@@ -8,6 +8,7 @@ require("./functions/runGovernedAgreementGeneration");
 require("./functions/runApprovalEventConsumer");
 require("./functions/runAuthorReviewResponseConsumer");
 require("./functions/runEditorialExecutionRuntime");
+require("./functions/runBlock04CommissioningProbe");
 require("./functions/runEditorialPackageHandoffConsumer");
 require("./functions/runEditorialNextStageMaterialization");
 require("./functions/runTargetedEditorialExecution");
