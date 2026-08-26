@@ -160,10 +160,6 @@ export function validateJm1EnterpriseCommunication(input: {
   if (/\bmust use the portal|required to use the portal|portal is required\b/i.test(text)) blockers.push('MANDATORY_PORTAL_LANGUAGE')
   if (/<h1[^>]*>\s*(Warmly|J Merrill Publishing)\s*<\/h1>/i.test(html)) blockers.push('INVENTED_CLOSING_OR_BRAND_H1')
   if (/\nWarmly,\s*\nJ Merrill Publishing\b/i.test(text)) blockers.push('INVENTED_CLOSING_PRESENT')
-  for (const label of ['Why you are receiving this', 'What has been completed', "What's attached", 'How to respond', 'What happens next', 'Support']) {
-    if (!html.includes(label) && !html.includes(escapeHtml(label))) blockers.push(`${label.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}_MISSING`)
-    if (!text.includes(label)) blockers.push(`PLAIN_TEXT_${label.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}_MISSING`)
-  }
   if (html.includes('What we need from you') !== text.includes('What we need from you')) {
     blockers.push('HTML_TEXT_REVIEW_PROMPT_PARITY_MISSING')
   }

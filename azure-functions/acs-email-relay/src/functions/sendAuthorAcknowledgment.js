@@ -1035,11 +1035,6 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
     "J MERRILL PUBLISHING",
     "A Division of J Merrill One",
     "Helping Authors Help Themselves.",
-    "Why you are receiving this",
-    "What has been completed",
-    "How to respond",
-    "What happens next",
-    "Support",
     "The Publishing Team"
   ];
 
@@ -1047,14 +1042,6 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
     if (!html.toLowerCase().includes(fragment.toLowerCase())) {
       return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_CANONICAL_STRUCTURE_REQUIRED" };
     }
-  }
-
-  if (!html.includes("What's attached") && !html.includes("What&#39;s attached")) {
-    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_CANONICAL_STRUCTURE_REQUIRED" };
-  }
-
-  if (!html.includes("What we need from you")) {
-    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_REVIEW_PROMPT_REQUIRED" };
   }
 
   if (!replyOnly && !/<a\b[^>]+href="https:\/\/[^"]+"[^>]+style="[^"]*(display:inline-block|background:)/i.test(html)) {
@@ -1069,11 +1056,23 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
     return { ok: false, reason: "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_REPLY_ONLY_REQUIRED" };
   }
 
-  if (/\b(Dataverse|execution log|workflow record|internal instruction|package manifest|response mechanism|evidence file)\b/i.test(`${html}\n${text}`)) {
+  if (!/\b(Approved|approve|corrections|changes|questions|reply)\b/i.test(text)) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_AUTHOR_ACTION_REQUIRED" };
+  }
+
+  if (!/\b(next|once we receive|after approval|the Publishing Team will)\b/i.test(text)) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_NEXT_STEP_REQUIRED" };
+  }
+
+  if (/\b(Dataverse|execution log|workflow record|internal instruction|package manifest|response mechanism|evidence file|artifactId|correlation|checksum|runtime|system attention|technical validation)\b/i.test(stripUrls(`${html}\n${text}`))) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_INTERNAL_LANGUAGE_BLOCKED" };
   }
 
   return { ok: true };
+}
+
+function stripUrls(value) {
+  return String(value || "").replace(/https?:\/\/\S+/gi, "[governed-link]");
 }
 
 function getAcsSenderAddress() {
