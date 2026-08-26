@@ -5,6 +5,11 @@ const {
   assertPolicyAllows,
   resolveCommunicationAuthority
 } = require("../policy/canonPolicyLayer");
+const {
+  resolveSenderProfile,
+  validateMessageIdentity,
+  validateSenderForBrand
+} = require("../policy/acsSenderRegistry");
 
 const REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i;
 const DIAGNOSTIC_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -12,11 +17,10 @@ const MAX_FIELD_LENGTH = 300;
 const MAX_BODY_LENGTH = 6000;
 const ACS_PROVIDER_NAME = "acs-email";
 
-// Same dedicated sender used for approved author-facing responses —
-// never the bare DoNotReply sender, never @jmerrill.pub.
-const AUTHOR_RESPONSE_SENDER = "publishing@email.jmerrill.one";
-const INTERNAL_VISIBILITY_MAILBOX = "publishing@jmerrill.one";
-const SENDER_DISPLAY_NAME = "J Merrill Publishing";
+const PUBLISHING_SENDER_PROFILE = resolveSenderProfile("JMP");
+const AUTHOR_RESPONSE_SENDER = PUBLISHING_SENDER_PROFILE.acsFrom;
+const INTERNAL_VISIBILITY_MAILBOX = PUBLISHING_SENDER_PROFILE.replyTo;
+const SENDER_DISPLAY_NAME = PUBLISHING_SENDER_PROFILE.organizationDisplayName;
 const AGREEMENT_PACKAGE_SEND_TYPE = "AGREEMENT_PACKAGE_SEND";
 const AGREEMENT_PACKAGE_SENT = "AGREEMENT_PACKAGE_SENT";
 
@@ -176,8 +180,9 @@ function getAuthorResponseSenderAddress() {
   if (!senderAddress) {
     throw Object.assign(new Error("ACS author-response sender is missing."), { safeCode: "ACS_AUTHOR_RESPONSE_SENDER_MISSING" });
   }
-  if (senderAddress !== AUTHOR_RESPONSE_SENDER || isJmerrillPubMailbox(senderAddress)) {
-    throw Object.assign(new Error("ACS author-response sender is invalid."), { safeCode: "ACS_AUTHOR_RESPONSE_SENDER_INVALID" });
+  const identity = validateSenderForBrand({ brand: "JMP", from: senderAddress });
+  if (!identity.ok || isJmerrillPubMailbox(senderAddress)) {
+    throw Object.assign(new Error("ACS author-response sender is invalid."), { safeCode: identity.reason || "ACS_AUTHOR_RESPONSE_SENDER_INVALID" });
   }
   return senderAddress;
 }
@@ -358,6 +363,15 @@ function buildAgreementPackageSendEmail(value) {
       contentInBase64: a.contentInBase64
     }))
   };
+  const identity = validateMessageIdentity({
+    brand: "JMP",
+    from: email.senderAddress,
+    replyTo: email.replyTo[0]?.address,
+    cc: email.recipients.cc.map((recipient) => recipient.address)
+  });
+  if (!identity.ok) {
+    throw Object.assign(new Error("Agreement package email failed ACS sender identity validation."), { safeCode: identity.reason });
+  }
   const authority = resolveCommunicationAuthority({
     senderAddress: email.senderAddress,
     content: email.content,

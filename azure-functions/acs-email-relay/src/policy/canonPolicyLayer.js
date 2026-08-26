@@ -1,9 +1,13 @@
 "use strict";
 
+const { resolveSenderProfile } = require("./acsSenderRegistry");
+
+const PUBLISHING_SENDER_PROFILE = resolveSenderProfile("JMP");
+
 const PUBLISHING_COMMUNICATION_CANON = Object.freeze({
-  from: "publishing@email.jmerrill.one",
-  replyTo: "publishing@jmerrill.one",
-  cc: "publishing@jmerrill.one",
+  from: PUBLISHING_SENDER_PROFILE.acsFrom,
+  replyTo: PUBLISHING_SENDER_PROFILE.replyTo,
+  cc: PUBLISHING_SENDER_PROFILE.ccAddress,
   format: "HTML"
 });
 
