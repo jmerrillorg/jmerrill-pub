@@ -569,18 +569,23 @@ async function processCadenceLog(client, cadenceLog, now, correlationId, deps = 
       const blocked = await recordCadenceSendBlocked(client, stage, title, packageInfo, schedule, validationBlockers, correlationId);
       return { status: "AMBIGUOUS", stageId, title: titleName(title), packageId: packageInfo.packageId, schedule, persisted, mailboxCorrelation, blocked, blockers: validationBlockers };
     }
-    const sendResult = await sendCadenceAuthorReviewPackage({
-      stage,
-      titleId: stage._jm1pub_titleid_value,
-      titleName: titleName(title),
-      authorName: authorName(stage, title, contact),
-      contact,
-      gate,
-      packageInfo,
-      completionLog,
-      artifacts,
-      schedule
-    }, deps);
+    let sendResult;
+    try {
+      sendResult = await sendCadenceAuthorReviewPackage({
+        stage,
+        titleId: stage._jm1pub_titleid_value,
+        titleName: titleName(title),
+        authorName: authorName(stage, title, contact),
+        contact,
+        gate,
+        packageInfo,
+        completionLog,
+        artifacts,
+        schedule
+      }, deps);
+    } catch (err) {
+      sendResult = { status: "BLOCKED", blockers: [err?.safeCode || err?.message || "SEND_EXCEPTION"] };
+    }
     if (sendResult.status !== "SENT") {
       const blocked = await recordCadenceSendBlocked(client, stage, title, packageInfo, schedule, sendResult.blockers || [sendResult.status || "SEND_FAILED"], correlationId);
       return { status: "AMBIGUOUS", stageId, title: titleName(title), packageId: packageInfo.packageId, schedule, persisted, mailboxCorrelation, blocked, blockers: sendResult.blockers || [sendResult.status || "SEND_FAILED"] };

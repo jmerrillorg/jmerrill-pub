@@ -73,7 +73,7 @@ function makeClient(overrides = {}) {
       jm1pub_repositorydriveid: "drive",
       jm1pub_repositoryitemid: "item-txt",
       jm1pub_filesizebytes: 64,
-      jm1pub_iscurrentapproved: true,
+      jm1pub_iscurrentapproved: false,
       _jm1pub_titleid_value: titleId,
       _jm1pub_editorialstageid_value: stageId
     }
@@ -249,6 +249,21 @@ test("due package with missing contact fails closed as ambiguous and does not se
   assert.equal(result.dueSystemAttention, 0);
   assert.equal(result.results[0].status, "AMBIGUOUS");
   assert.deepEqual(result.results[0].blockers, ["CONTACT_MISSING", "AUTHOR_EMAIL_MISSING"]);
+  assert.equal(deps.sends.length, 0);
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_SEND_BLOCKED"));
+});
+
+test("due package with missing required attachment fails closed without failing the timer", async () => {
+  const client = makeClient({ artifacts: [] });
+  const deps = senderDeps();
+  const result = await runEditorialCadenceReleaseConsumer(
+    { now: "2026-08-28T15:00:00Z", correlationId: "test-missing-attachment" },
+    { client, ...deps }
+  );
+  assert.equal(result.nonSendable, 1);
+  assert.equal(result.dueSystemAttention, 0);
+  assert.equal(result.results[0].status, "AMBIGUOUS");
+  assert.deepEqual(result.results[0].blockers, ["REQUIRED_ATTACHMENT_MISSING:editedManuscript"]);
   assert.equal(deps.sends.length, 0);
   assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_SEND_BLOCKED"));
 });

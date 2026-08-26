@@ -102,6 +102,7 @@ function rolePatterns(role) {
 function isAuthorVisibleArtifact(artifact) {
   if (artifact?.jm1pub_supersededon) return false;
   if (artifact?.jm1pub_iscurrentapproved === true) return true;
+  if (Number(artifact?.jm1pub_artifactstatus || 0) === 196650002 && Number(artifact?.jm1pub_visibility || 0) === 196650001) return true;
   const status = `${artifact?.["jm1pub_artifactstatus@OData.Community.Display.V1.FormattedValue"] || ""} ${artifact?.jm1pub_artifactstatus || ""}`;
   const visibility = `${artifact?.["jm1pub_visibility@OData.Community.Display.V1.FormattedValue"] || ""} ${artifact?.jm1pub_visibility || ""}`;
   return /approved|current|author|release/i.test(`${status} ${visibility}`);
