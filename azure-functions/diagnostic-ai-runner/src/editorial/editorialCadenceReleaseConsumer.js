@@ -98,7 +98,7 @@ function parsePackage(summary, logDescription) {
 async function getStage(client, stageId) {
   const rows = await client.list("jm1pub_editorialstages", {
     $select:
-      "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,_jm1pub_titleid_value,_jm1pub_contactid_value,modifiedon,createdon",
+      "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,jm1pub_intakereference,jm1pub_publishingintakereference,_jm1pub_titleid_value,_jm1pub_contactid_value,modifiedon,createdon",
     $filter: `jm1pub_editorialstageid eq ${stageId}`,
     $top: "1"
   });
