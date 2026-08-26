@@ -124,6 +124,14 @@
         "negativeProof": "Marketing-only-after-Block07, campaign without title relationship, package-as-workflow, silent scope changes, repeated author intake, routine low-risk overapproval, high-risk no-approval, unversioned asset overwrite, unapproved cover, unverified preorder/live CTA, broken CTA promotion, release incident ignored, promotional email without consent, external platform as system of record, fabricated attribution, sales target as gate, launch-day-only closeout, real promotional email/social/ad/media/ARC commissioning, payment, royalty, Business Central, and Block09 long-term management probes are denied."
       },
       {
+        "policyId": "JMP-BLOCK09-POST-DISTRIBUTION-TITLE-MANAGEMENT-COMMISSIONING-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "block09TitleManagementCommissioning / run-block09-final-certification-probe",
+        "liveProof": "Block 09 final certification probe covers immediate title-management activation after TITLE_LIVE_AND_VERIFIED, Block 08 overlap, published title baseline, work/edition/format history, contract-specific royalty rule resolution, sales source lineage, normalized sales ledger, remittance/cash separation, royalty ledger, monthly reporting and payment clocks, failed-payment liability preservation, annual print-format fee clock, Customer Service routing, Author Workspace published-title home, post-publication change routing, evergreen handoff, multidimensional title health, contract/rights monitoring, terminal disposition, archive, author relationship feedback, recurring clocks, watchdog, and Publisher Operating Center backlist command center.",
+        "negativeProof": "Block09-waits-for-Block08, current default overwrites executed contract, list-price royalty basis, statement/payment recalculation, sale/remittance/cash collapse, failed payment eliminating liability, closed-period rewrite, missing source lineage, author/payee collapse, invented tax rules, eBook annual print fee, edition overwrite, unclassified post-publication change, low-sales automatic reversion, terminal deletion, archive with unresolved obligations, email-only published-author support, comp ledger absence, Block08 evergreen handoff absence, legacy history fabrication, real royalty payment, real royalty/payment email, real statement send, real annual-fee invoice, real tax mutation, real Business Central payment posting, real retirement/reversion/takedown commissioning probes are denied."
+      },
+      {
         "policyId": "JMP-DISTRIBUTION-AUTHORITY-v1.0",
         "canonStatus": "CANON",
         "runtimeStatus": "IMPLEMENTED_NOT_COMMISSIONED",
@@ -312,6 +320,23 @@
         "sales-target-as-lifecycle-gate semantics",
         "external-marketing-platform-as-campaign-system-of-record semantics",
         "unverified-retailer-link-as-campaign-CTA semantics"
+      ],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-BLOCK09-POST-DISTRIBUTION-TITLE-MANAGEMENT-COMMISSIONING-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Block 09 post-distribution and title management lifecycle",
+      "enforcementClass": "PUBLISHED_TITLE_MANAGEMENT_AND_BACKLIST_OPERATIONS_HARD_GATE",
+      "canonSource": "JMP Block 09 Post-Distribution & Title Management Operating System / JM1 Canon Enforcement & Runtime Policy Layer v1",
+      "resolver": "runFinalBlock09Commissioning",
+      "effectiveDate": "2026-08-26",
+      "supersedes": [
+        "launch-completion-as-title-management-start semantics",
+        "monthly-royalty-spreadsheet-as-title-management-system semantics",
+        "list-price-as-royalty-basis semantics",
+        "retirement-reversion-takedown-collapse semantics"
       ],
       "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
     },
