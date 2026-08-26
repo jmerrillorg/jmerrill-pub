@@ -9,6 +9,7 @@ require("./functions/runApprovalEventConsumer");
 require("./functions/runAuthorReviewResponseConsumer");
 require("./functions/runEditorialExecutionRuntime");
 require("./functions/runBlock04CommissioningProbe");
+require("./functions/runBlock05FinalCertificationProbe");
 require("./functions/runEditorialPackageHandoffConsumer");
 require("./functions/runEditorialCadenceReleaseConsumer");
 require("./functions/runEditorialNextStageMaterialization");

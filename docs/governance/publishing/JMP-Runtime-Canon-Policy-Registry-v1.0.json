@@ -92,6 +92,14 @@
         "negativeProof": "Production Ready without final editorial certification is denied."
       },
       {
+        "policyId": "JMP-BLOCK05-PRODUCTION-COMMISSIONING-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolveBlock05ProductionAuthority / block05ProductionCommissioning / run-block05-final-certification-probe",
+        "liveProof": "Block 05 final certification probe covers every material production workstream and returns PRODUCTION_FULLY_COMMISSIONED when bypass, synthetic matrix, workstream register, final certification, and Block 06 handoff all pass.",
+        "negativeProof": "Distribution submission, publication assets false-positive, raw output before QA, approval without artifact binding, stale cover geometry, stale formats, missing identifiers, EPUB without validation, and accessibility claim without evidence probes are denied."
+      },
+      {
         "policyId": "JMP-DISTRIBUTION-AUTHORITY-v1.0",
         "canonStatus": "CANON",
         "runtimeStatus": "IMPLEMENTED_NOT_COMMISSIONED",
@@ -220,6 +228,20 @@
       "resolver": "resolveProductionAuthority",
       "effectiveDate": "2026-08-25",
       "supersedes": [],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-BLOCK05-PRODUCTION-COMMISSIONING-v1.0",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Block 05 production lifecycle",
+      "enforcementClass": "PRE_PRODUCTION_AND_CERTIFICATION_HARD_GATE",
+      "canonSource": "JMP Block 05 Production Operating System / JM1 Canon Enforcement & Runtime Policy Layer v1",
+      "resolver": "resolveBlock05ProductionAuthority",
+      "effectiveDate": "2026-08-26",
+      "supersedes": [
+        "JM1 Production Pipeline v2.0 distribution-readiness-as-production-completion semantics"
+      ],
       "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
     },
     {
