@@ -1,20 +1,20 @@
 # Executive Summary
 
-Last Verified: 2026-08-22T08:19:57.929Z
+Last Verified: 2026-08-26T14:34:02.047Z
 
 Classification: JMP_AUTONOMOUS_PORTFOLIO_CONTROLLED_COMMISSIONING
 
 | Metric | Count |
 | --- | ---: |
-| Active title records | 360 |
+| Active title records | 361 |
 | Active prospect records | 8 |
-| Active author stewardship records | 55 |
-| Post-publication / terminal stewardship | 167 |
-| Records evaluated | 423 |
-| Auto-executable recommendations | 0 |
-| Work queue candidates | 0 |
-| Waiting on Author | 7 |
-| Waiting on JMP / System Attention | 246 |
+| Active author stewardship records | 56 |
+| Post-publication / terminal stewardship | 168 |
+| Records evaluated | 425 |
+| Auto-executable recommendations | 1 |
+| Work queue candidates | 1 |
+| Waiting on Author | 10 |
+| Waiting on JMP / System Attention | 244 |
 | Waiting on External / Recovery | 0 |
 | Unexplained idle | 2 |
 | Production mutations | 0 |

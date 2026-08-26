@@ -1,11 +1,11 @@
-# Security and Negative Proof
+# Security Negative Proof
 
-Last Verified: 2026-08-22T11:59:59.764Z
+Last Verified: 2026-08-26T14:39:18.126Z
 
-| Proof | Count / State |
-| --- | --- |
+| Proof | Count |
+| --- | ---: |
 | exception_author_processed | 0 |
-| duplicate_Stripe_account | 0 after hash readback and PR #572 correction |
+| duplicate_Stripe_account | 0 |
 | cross_author_link | 0 |
 | shared_generic_link | 0 |
 | bank_data_exposed | 0 |
@@ -19,5 +19,3 @@ Last Verified: 2026-08-22T11:59:59.764Z
 | contract_changed | 0 |
 | rights_changed | 0 |
 | historical_payment_changed | 0 |
-
-Bill.com remains PAYOUT_SYSTEM = BILL_COM_LEGACY. No royalty payout, Stripe transfer, or Bill.com cutover was authorized or executed.

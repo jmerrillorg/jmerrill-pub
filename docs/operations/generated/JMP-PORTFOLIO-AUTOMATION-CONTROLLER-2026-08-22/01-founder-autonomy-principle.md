@@ -1,6 +1,6 @@
 # Founder Autonomy Principle
 
-Last Verified: 2026-08-22T08:19:57.929Z
+Last Verified: 2026-08-26T14:34:02.047Z
 
 Canonical principle: if the next governed action is known, prerequisites are satisfied, and no human decision is required, the system must execute or queue it automatically.
 

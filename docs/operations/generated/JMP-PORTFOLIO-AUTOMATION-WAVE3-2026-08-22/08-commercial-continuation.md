@@ -1,6 +1,6 @@
 # Commercial Continuation
 
-Last Verified: 2026-08-25T02:04:22.235Z
+Last Verified: 2026-08-26T14:34:10.977Z
 
 Commercial continuation binds title state, recommendation, package/payment state, pricing lock, and agreement state. If payment option is selected and pricing locked, missing agreement becomes `GENERATE_CONTRACT_FROM_LOCKED_PRICING`; otherwise it remains Waiting On Author.
 

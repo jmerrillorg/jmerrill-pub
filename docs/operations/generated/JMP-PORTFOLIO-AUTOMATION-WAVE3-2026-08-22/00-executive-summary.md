@@ -1,6 +1,6 @@
 # Wave 3 Executive Summary
 
-Last Verified: 2026-08-25T02:04:22.235Z
+Last Verified: 2026-08-26T14:34:10.977Z
 
 Classification: JMP_AUTONOMOUS_PORTFOLIO_WAVE3_CONTROLLED_COMMISSIONING
 
@@ -8,13 +8,13 @@ PR #568 was merged to canonical main before this Wave 3 branch was created. Wave
 
 | Metric | Before | After |
 | --- | ---: | ---: |
-| Records evaluated | 424 | 424 |
-| System Attention | 251 | 0 |
+| Records evaluated | 425 | 425 |
+| System Attention | 250 | 0 |
 | Generic System Attention | - | 0 |
-| Auto-executable | 1 | 3 |
-| Automatically queued | 0 | 3 |
+| Auto-executable | 2 | 4 |
+| Automatically queued | 0 | 4 |
 | Automatically resumed/retried | 0 | 0 |
-| Structured operator tasks | 0 | 250 |
+| Structured operator tasks | 0 | 249 |
 | Unexplained idle | 0 | 0 |
 
 ## Negative Proof

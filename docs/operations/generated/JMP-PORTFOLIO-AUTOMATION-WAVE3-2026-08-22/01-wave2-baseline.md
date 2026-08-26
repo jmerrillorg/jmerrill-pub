@@ -1,34 +1,34 @@
 # Wave 2 Baseline
 
-Last Verified: 2026-08-25T02:04:22.235Z
+Last Verified: 2026-08-26T14:34:10.977Z
 
 | Source | Count |
 | --- | ---: |
 | Titles | 361 |
 | Intakes | 31 |
 | Opportunities | 6 |
-| Author Profiles | 55 |
+| Author Profiles | 56 |
 | Editorial Stages | 33 |
-| Approval Gates | 18 |
-| Editorial Artifacts | 120 |
+| Approval Gates | 20 |
+| Editorial Artifacts | 130 |
 | Production Projects | 2 |
 | Production Tasks | 9 |
 | Execution Logs Read | 500 |
 
-Wave 1 records evaluated: 424.
-Wave 2 System Attention after reconciliation: 251.
-Wave 2 auto-executable after reconciliation: 1.
+Wave 1 records evaluated: 425.
+Wave 2 System Attention after reconciliation: 250.
+Wave 2 auto-executable after reconciliation: 2.
 Wave 2 automatically queued: 0.
 
 ## 246 to 250 Explanation
 
-The Wave 2 increase from 246 to 251 is explained by stricter reconciliation, not a Wave 3 controller regression.
+The Wave 2 increase from 246 to 250 is explained by stricter reconciliation, not a Wave 3 controller regression.
 
 | Movement | Count |
 | --- | ---: |
 | Added to System Attention by Wave 2 reconciliation | 6 |
-| Removed from System Attention by Wave 2 reconciliation | 1 |
-| Net change | 5 |
+| Removed from System Attention by Wave 2 reconciliation | 0 |
+| Net change | 6 |
 
 ### Added Rows
 
@@ -45,4 +45,4 @@ The Wave 2 increase from 246 to 251 is explained by stricter reconciliation, not
 
 | Author | Title | Prior bucket | Wave 2 state | Action |
 | --- | --- | --- | --- | --- |
-| Iyorwuese Hagher | The General’s Will and Last Testament | SYSTEM_ATTENTION_REQUIRED | AUTO_EXECUTABLE | Queue commissioned Line stage worker |
+| - | - | - | - | - |
