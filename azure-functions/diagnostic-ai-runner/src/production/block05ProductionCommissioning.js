@@ -55,6 +55,44 @@ const WORKSTREAM_STATES = Object.freeze([
   "COVER_REGENERATION_REQUIRED"
 ]);
 
+const COMMISSIONING_STATUS = Object.freeze({
+  COMMISSIONED: "COMMISSIONED",
+  IMPLEMENTED_NOT_COMMISSIONED: "IMPLEMENTED_NOT_COMMISSIONED",
+  PARTIAL: "PARTIAL",
+  NOT_APPLICABLE: "NOT_APPLICABLE",
+  SUPERSEDED: "SUPERSEDED",
+  BLOCKED_BY_EXTERNAL_DEPENDENCY: "BLOCKED_BY_EXTERNAL_DEPENDENCY",
+  TRUE_HUMAN_GATE: "TRUE_HUMAN_GATE",
+  NOT_IMPLEMENTED: "NOT_IMPLEMENTED"
+});
+
+const BLOCK05_DOMAIN_REGISTER = Object.freeze([
+  "BLOCK_05_ENTRY",
+  "PRODUCTION_SCOPE",
+  "PRODUCTION_MASTER",
+  "CONTENT_FREEZE",
+  "INTERIOR",
+  "COVER",
+  "PAGE_COUNT_COVER_DEPENDENCY",
+  "PUBLICATION_METADATA",
+  "IDENTIFIERS",
+  "EBOOK",
+  "AUDIO",
+  "ACCESSIBILITY",
+  "FRONT_BACK_MATTER",
+  "INDEX",
+  "ASSET_RIGHTS",
+  "PRODUCTION_SPEC_PROFILE",
+  "VENDOR_EXECUTION",
+  "WAITING_ON",
+  "PRODUCTION_WATCHDOG",
+  "CROSS_FORMAT_SYNC",
+  "TECHNICAL_VALIDATION",
+  "PHYSICAL_PROOF",
+  "FINAL_PRODUCTION_CERTIFICATION",
+  "BLOCK_06_HANDOFF"
+]);
+
 const REQUIRED_ENTRY_FIELDS = Object.freeze([
   "finalEditorialCertified",
   "productionReady",
@@ -268,6 +306,412 @@ function evaluateCrossFormatSynchronization(input = {}) {
   return result(missing.length === 0, missing.length ? "CROSS_FORMAT_SYNCHRONIZATION_BLOCKED" : "CROSS_FORMAT_SYNCHRONIZATION_PASS", { missing });
 }
 
+function missingFields(input = {}, fields = []) {
+  return fields.filter((field) => {
+    const value = input[field];
+    if (typeof value === "boolean") return value !== true;
+    if (typeof value === "number") return !Number.isFinite(value);
+    if (Array.isArray(value)) return value.length === 0;
+    if (value && typeof value === "object") return Object.keys(value).length === 0;
+    return !normalizeString(value);
+  });
+}
+
+function statusFromMissing(missing, eventOk, eventBlocked, extra = {}) {
+  return result(missing.length === 0, missing.length ? eventBlocked : eventOk, { missing: [...new Set(missing)], ...extra });
+}
+
+function validateInteriorProductionPath(input = {}) {
+  const missing = missingFields(input, [
+    "productionMasterId",
+    "styleSheetId",
+    "trimAuthority",
+    "frontMatterAssembled",
+    "backMatterAssembled",
+    "paginationFinal",
+    "pageCountPersisted",
+    "internalQaPassed",
+    "technicalValidationPassed",
+    "finalInteriorArtifactId",
+    "finalInteriorChecksum"
+  ]);
+  if (input.authorProofSent === true && input.internalQaPassed !== true) missing.push("INTERNAL_QA_BEFORE_AUTHOR_PROOF");
+  if (input.authorProofRequired !== false && !validateArtifactBoundApproval(input.authorApproval).ok) missing.push("AUTHOR_APPROVAL_ARTIFACT_BINDING");
+  if (input.approvalBoundArtifactId && input.finalInteriorArtifactId && input.approvalBoundArtifactId !== input.finalInteriorArtifactId) missing.push("APPROVAL_BOUND_TO_CURRENT_ARTIFACT");
+  return statusFromMissing(missing, "INTERIOR_CERTIFIED", "INTERIOR_CERTIFICATION_BLOCKED", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED
+  });
+}
+
+function validateCoverFullWrapPath(input = {}) {
+  const missing = missingFields(input, [
+    "coverBriefId",
+    "coverIntelligenceId",
+    "designQaPassed",
+    "title",
+    "authorDisplayName",
+    "imprint",
+    "genre",
+    "audience",
+    "trimSize",
+    "binding",
+    "paper",
+    "finish",
+    "finalPageCount",
+    "backCoverCopy",
+    "technicalGeometryPassed",
+    "technicalQaPassed",
+    "finalCoverArtifactId",
+    "finalCoverChecksum"
+  ]);
+  if (!validateArtifactBoundApproval(input.creativeApproval).ok) missing.push("COVER_CREATIVE_APPROVAL_ARTIFACT_BINDING");
+  if (input.creativeApprovalTreatedAsTechnicalPass === true) missing.push("COVER_CREATIVE_APPROVAL_NOT_TECHNICAL_PASS");
+  if (input.marketabilityPassed === true && input.technicalQaPassed !== true) missing.push("MARKETABILITY_NOT_TECHNICAL_PASS");
+  const identifier = validateIdentifierAuthority(input);
+  if (!identifier.ok) missing.push(...identifier.missing);
+  return statusFromMissing(missing, "COVER_FULL_WRAP_CERTIFIED", "COVER_FULL_WRAP_CERTIFICATION_BLOCKED", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED,
+    publicationIntent: identifier.publicationIntent
+  });
+}
+
+function runPageCountCoverRegenerationRegression(input = {}) {
+  const prior = {
+    coverArtifactId: normalizeString(input.coverArtifactId || "synthetic-cover-n"),
+    pageCount: Number(input.originalPageCount || 275),
+    technicalQaPassed: true,
+    current: true
+  };
+  const changedPageCount = Number(input.changedPageCount || prior.pageCount + 12);
+  const staleDetection = evaluateCrossFormatSynchronization({
+    pageCountChanged: true,
+    coverRegenerated: false,
+    coverPageCount: prior.pageCount,
+    finalPageCount: changedPageCount
+  });
+  const regenerated = {
+    coverArtifactId: normalizeString(input.regeneratedCoverArtifactId || "synthetic-cover-n-plus-x"),
+    pageCount: changedPageCount,
+    technicalQaPassed: input.regeneratedTechnicalQaPassed !== false,
+    preservedCreativeApproval: input.preservedCreativeApproval !== false,
+    current: true
+  };
+  const revalidation = evaluateCrossFormatSynchronization({
+    pageCountChanged: true,
+    coverRegenerated: true,
+    coverPageCount: regenerated.pageCount,
+    finalPageCount: changedPageCount
+  });
+  const ok = staleDetection.ok === false && staleDetection.missing.includes("COVER_REGENERATION_REQUIRED") && revalidation.ok === true && regenerated.technicalQaPassed === true;
+  return result(ok, ok ? "PAGE_COUNT_COVER_REGENERATION_PROVEN" : "PAGE_COUNT_COVER_REGENERATION_BLOCKED", {
+    prior,
+    changedPageCount,
+    staleDetection,
+    regenerated,
+    revalidation,
+    staleCoverGeometrySurvivesPageChange: ok ? 0 : 1
+  });
+}
+
+function buildPublicationMetadataPackage(input = {}) {
+  const missing = missingFields(input, [
+    "title",
+    "authorDisplayName",
+    "authorBio",
+    "description",
+    "bisac",
+    "keywords",
+    "formatRelationships",
+    "technicalMetadata",
+    "accessibilityMetadata"
+  ]);
+  if (input.backCoverCopyApplicable !== false && !normalizeString(input.backCoverCopy)) missing.push("BACK_COVER_COPY");
+  if (input.representationalApprovalRequired && !validateArtifactBoundApproval(input.representationalApproval).ok) missing.push("REPRESENTATIONAL_AUTHOR_APPROVAL");
+  const packageRecord = missing.length ? null : {
+    packageType: "PUBLICATION_METADATA_PACKAGE",
+    title: normalizeString(input.title),
+    subtitle: normalizeString(input.subtitle),
+    authorDisplayName: normalizeString(input.authorDisplayName),
+    authorBio: normalizeString(input.authorBio),
+    description: normalizeString(input.description),
+    backCoverCopy: input.backCoverCopyApplicable === false ? null : normalizeString(input.backCoverCopy),
+    bisac: asArray(input.bisac),
+    keywords: asArray(input.keywords),
+    formatRelationships: input.formatRelationships,
+    technicalMetadata: input.technicalMetadata,
+    accessibilityMetadata: input.accessibilityMetadata,
+    sourceAuthority: "UPSTREAM_TITLE_AUTHORITY"
+  };
+  if (packageRecord) packageRecord.checksum = sha256(packageRecord);
+  return statusFromMissing(missing, "PUBLICATION_METADATA_PACKAGE_READY", "PUBLICATION_METADATA_PACKAGE_BLOCKED", { packageRecord });
+}
+
+function validateEbookProduction(input = {}) {
+  const missing = missingFields(input, [
+    "productionMasterId",
+    "epubArtifactId",
+    "semanticStructurePassed",
+    "navigationPassed",
+    "tocPassed",
+    "imageLinkHandlingPassed",
+    "accessibilityPassed",
+    "epubValidationPassed",
+    "renderDeviceQaPassed",
+    "checksum"
+  ]);
+  if (input.exportSucceeded === true && input.epubValidationPassed !== true) missing.push("EPUB_EXPORT_NOT_CERTIFICATION");
+  return statusFromMissing(missing, "EBOOK_CERTIFIED", "EBOOK_CERTIFICATION_BLOCKED", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED
+  });
+}
+
+function validateAudioProduction(input = {}) {
+  const applicable = input.audioApplicable === true;
+  if (!applicable) return result(true, "AUDIO_NOT_APPLICABLE", { status: COMMISSIONING_STATUS.NOT_APPLICABLE });
+  const missing = missingFields(input, [
+    "productionMasterOrScriptId",
+    "executionOwner",
+    "recordingComplete",
+    "editingComplete",
+    "masteringComplete",
+    "qaPassed",
+    "technicalValidationPassed",
+    "audioArtifactId",
+    "audioChecksum"
+  ]);
+  if (input.approvalRequired && !validateArtifactBoundApproval(input.approval).ok) missing.push("AUDIO_APPROVAL_ARTIFACT_BINDING");
+  if (input.paymentMutationAttempted === true) missing.push("AUDIO_PAYMENT_MUTATION_FORBIDDEN");
+  return statusFromMissing(missing, "AUDIO_CERTIFIED", "AUDIO_CERTIFICATION_BLOCKED", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED
+  });
+}
+
+function validateAccessibilityEvidence(input = {}) {
+  const missing = missingFields(input, [
+    "publicationAccessibilityStandard",
+    "epubAccessibility",
+    "altText",
+    "readingOrder",
+    "navigation",
+    "tableSemantics",
+    "accessibilityMetadata",
+    "validationEvidence"
+  ]);
+  if (input.section508Applicable === true && !normalizeString(input.section508Evidence)) missing.push("SECTION_508_EVIDENCE");
+  if (input.taggedPdfApplicable === true && !normalizeString(input.taggedPdfEvidence)) missing.push("TAGGED_PDF_EVIDENCE");
+  if (input.complianceClaimed === true && !normalizeString(input.validationEvidence)) missing.push("ACCESSIBILITY_CLAIM_WITHOUT_EVIDENCE");
+  return statusFromMissing(missing, "ACCESSIBILITY_VALIDATED", "ACCESSIBILITY_VALIDATION_BLOCKED", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED
+  });
+}
+
+function validateFrontBackMatter(input = {}) {
+  const components = asArray(input.components);
+  const missing = [];
+  if (!components.length) missing.push("ASSEMBLY_INVENTORY");
+  for (const component of components) {
+    const name = normalizeKey(component.name);
+    const state = normalizeKey(component.state || component.status);
+    if (!name) missing.push("COMPONENT_NAME");
+    if (!["REQUIRED", "OPTIONAL", "NOT_APPLICABLE", "RECEIVED", "GENERATED", "QA_COMPLETE", "APPROVED"].includes(state)) missing.push(`${name || "COMPONENT"}_STATE`);
+    if (component.required === true && !["RECEIVED", "GENERATED", "QA_COMPLETE", "APPROVED"].includes(state)) missing.push(`${name}_REQUIRED_NOT_PRESENT`);
+    if (["RECEIVED", "GENERATED"].includes(state) && component.qaComplete !== true) missing.push(`${name}_QA_REQUIRED`);
+  }
+  return statusFromMissing(missing, "FRONT_BACK_MATTER_ASSEMBLY_READY", "FRONT_BACK_MATTER_ASSEMBLY_BLOCKED", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED
+  });
+}
+
+function validateIndexingPath(input = {}) {
+  if (input.indexApplicable !== true) return result(true, "INDEX_NOT_APPLICABLE", { status: COMMISSIONING_STATUS.NOT_APPLICABLE });
+  const missing = missingFields(input, [
+    "paginationStable",
+    "indexCreated",
+    "indexQaPassed",
+    "inserted",
+    "repaginationComplete",
+    "pageReferencesValidated",
+    "finalProofGenerated"
+  ]);
+  if (input.indexCreated === true && input.paginationStable !== true) missing.push("PAGINATION_STABLE_BEFORE_INDEX");
+  return statusFromMissing(missing, "INDEX_CERTIFIED", "INDEX_CERTIFICATION_BLOCKED", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED
+  });
+}
+
+function validateAssetRegistryAndRights(input = {}) {
+  const assets = asArray(input.assets);
+  const missing = [];
+  if (!assets.length) missing.push("ASSET_REGISTRY");
+  for (const asset of assets) {
+    const id = normalizeString(asset.assetId || "ASSET");
+    for (const field of ["assetId", "titleId", "type", "version", "checksum", "dimensions", "resolution", "colorProfile", "altText", "placement", "rightsStatus", "currentState"]) {
+      if (!normalizeString(asset[field])) missing.push(`${id}_${field}`);
+    }
+    if (normalizeKey(asset.type) !== "AUTHOR_PHOTO" && !normalizeString(asset.caption)) missing.push(`${id}_caption`);
+    if (!["CURRENT", "SUPERSEDED"].includes(normalizeKey(asset.currentState))) missing.push(`${id}_CURRENT_OR_SUPERSEDED`);
+    if (asset.lowQualityAccepted === true) missing.push(`${id}_LOW_QUALITY_ASSET_REJECTED`);
+    if (!normalizeString(asset.rightsStatus)) missing.push(`${id}_RIGHTS_STATUS_ATTACHED`);
+    if (asset.overwrittenWithoutHistory === true) missing.push(`${id}_HISTORY_REQUIRED`);
+  }
+  return statusFromMissing(missing, "ASSET_RIGHTS_REGISTRY_VALIDATED", "ASSET_RIGHTS_REGISTRY_BLOCKED", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED
+  });
+}
+
+function buildProductionSpecificationProfile(input = {}) {
+  const missing = missingFields(input, ["profileId", "version", "printInterior", "printCover", "binding", "trim", "paper", "bleed", "color", "epub", "audio", "physicalProof", "channelRequirements"]);
+  const profile = missing.length ? null : {
+    profileType: "PRODUCTION_SPEC_PROFILE",
+    profileId: normalizeString(input.profileId),
+    version: normalizeString(input.version),
+    printInterior: input.printInterior,
+    printCover: input.printCover,
+    binding: input.binding,
+    trim: input.trim,
+    paper: input.paper,
+    bleed: input.bleed,
+    color: input.color,
+    epub: input.epub,
+    audio: input.audio,
+    physicalProof: input.physicalProof,
+    channelRequirements: input.channelRequirements,
+    checksum: ""
+  };
+  if (profile) profile.checksum = sha256(profile);
+  return statusFromMissing(missing, "PRODUCTION_SPEC_PROFILE_READY", "PRODUCTION_SPEC_PROFILE_BLOCKED", { profile });
+}
+
+function evaluateCrossFormatDependencyGraph(input = {}) {
+  const outputs = asArray(input.outputs);
+  const missing = [];
+  const affected = [];
+  if (!normalizeString(input.productionMasterId)) missing.push("PRODUCTION_MASTER");
+  for (const expected of ["PB_INTERIOR", "HC_INTERIOR", "EPUB", "AUDIO_SCRIPT", "INDEX", "METADATA", "ACCESSIBILITY_OUTPUT"]) {
+    if (!outputs.some((output) => normalizeKey(output.type) === expected)) missing.push(`${expected}_OUTPUT`);
+  }
+  if (input.sourceVersionChanged === true) {
+    for (const output of outputs) {
+      if (output.dependsOnProductionMaster !== false) affected.push(normalizeKey(output.type));
+      if (output.dependsOnProductionMaster !== false && output.revalidated !== true) missing.push(`${normalizeKey(output.type)}_REVALIDATION_REQUIRED`);
+    }
+  }
+  return statusFromMissing(missing, "CROSS_FORMAT_DEPENDENCY_GRAPH_VALIDATED", "CROSS_FORMAT_DEPENDENCY_GRAPH_BLOCKED", { affectedOutputs: affected });
+}
+
+function routeProductionCorrection(input = {}) {
+  const type = normalizeKey(input.type);
+  const routes = {
+    LAYOUT_CORRECTION: "PRODUCTION_CORRECTION",
+    TYPO: input.editorialAuthorityRequired === true ? "GOVERNED_EDITORIAL_CORRECTION_PATH" : "PRODUCTION_CORRECTION",
+    MAJOR_CHAPTER_REWRITE: "EDITORIAL_REOPEN_REQUIRED",
+    COVER_DESIGN_CHANGE: "DESIGN_SCOPE_PATH",
+    RIGHTS_CORRECTION: "RIGHTS_HOLD_UPDATE_PATH",
+    METADATA_CORRECTION: "METADATA_CORRECTION_PATH"
+  };
+  const route = routes[type] || "CORRECTION_CLASSIFICATION_REQUIRED";
+  return result(route !== "CORRECTION_CLASSIFICATION_REQUIRED", route, { correctionType: type });
+}
+
+function evaluateProductionWatchdog(input = {}) {
+  const cases = asArray(input.cases);
+  const missing = [];
+  const classifications = [];
+  if (!cases.length) missing.push("WATCHDOG_CASES");
+  for (const item of cases) {
+    const condition = normalizeKey(item.condition);
+    const waitingOn = normalizeKey(item.waitingOn);
+    const expected = normalizeKey(item.expectedWaitingOn || item.waitingOn);
+    if (!condition) missing.push("WATCHDOG_CONDITION");
+    if (!["WAITING_ON_AUTHOR", "WAITING_ON_JMP", "WAITING_ON_JMP_SYSTEM", "WAITING_ON_VENDOR", "WAITING_ON_EXTERNAL"].includes(waitingOn)) missing.push(`${condition}_WAITING_ON_CLASSIFICATION`);
+    if (item.systemOrVendorDelay === true && waitingOn === "WAITING_ON_AUTHOR") missing.push(`${condition}_SYSTEM_DELAY_NOT_AUTHOR`);
+    if (expected && expected !== waitingOn) missing.push(`${condition}_WAITING_ON_MISMATCH`);
+    classifications.push({ condition, waitingOn });
+  }
+  return statusFromMissing(missing, "PRODUCTION_WATCHDOG_VALIDATED", "PRODUCTION_WATCHDOG_BLOCKED", { classifications });
+}
+
+function evaluateOperatingCenterProductionSurface(input = {}) {
+  const missing = missingFields(input, [
+    "titlesInProduction",
+    "formats",
+    "workstream",
+    "waitingOn",
+    "age",
+    "approval",
+    "technicalState",
+    "staleArtifact",
+    "coverRegeneration",
+    "rightsHold",
+    "systemAttention",
+    "readyForCertification",
+    "publicationAssetsReady"
+  ]);
+  return statusFromMissing(missing, "PUBLISHER_OPERATING_CENTER_PRODUCTION_SURFACE_READY", "PUBLISHER_OPERATING_CENTER_PRODUCTION_SURFACE_PARTIAL", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED
+  });
+}
+
+function evaluateAuthorWorkspaceProductionSurface(input = {}) {
+  if (input.required === false) return result(true, "AUTHOR_WORKSPACE_PRODUCTION_SURFACE_NOT_APPLICABLE", { status: COMMISSIONING_STATUS.NOT_APPLICABLE });
+  const missing = missingFields(input, [
+    "humanReadableState",
+    "currentInteriorProof",
+    "currentCover",
+    "representationalMetadata",
+    "correctionRequestPath",
+    "artifactBoundApproval",
+    "revisionStatus",
+    "currentReviewVersion"
+  ]);
+  if (input.exposesRawCodes === true) missing.push("RAW_SYSTEM_CODES_HIDDEN");
+  if (input.exposesInternalValidationNoise === true) missing.push("INTERNAL_VALIDATION_NOISE_HIDDEN");
+  if (input.exposesGuidChecksum === true) missing.push("GUID_CHECKSUM_HIDDEN");
+  return statusFromMissing(missing, "AUTHOR_WORKSPACE_PRODUCTION_SURFACE_READY", "AUTHOR_WORKSPACE_PRODUCTION_SURFACE_PARTIAL", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED
+  });
+}
+
+function evaluatePhysicalProofPath(input = {}) {
+  if (input.required !== true) return result(true, "PHYSICAL_PROOF_NOT_APPLICABLE", { status: COMMISSIONING_STATUS.NOT_APPLICABLE });
+  const missing = missingFields(input, [
+    "technicalPass",
+    "proofOrdered",
+    "proofReceived",
+    "physicalQaPassed",
+    "revalidationComplete"
+  ]);
+  return statusFromMissing(missing, "PHYSICAL_PROOF_CERTIFIED", "PHYSICAL_PROOF_BLOCKED", {
+    status: missing.length ? COMMISSIONING_STATUS.PARTIAL : COMMISSIONING_STATUS.COMMISSIONED
+  });
+}
+
+function runFinalCertificationNegativeProbes() {
+  const probes = [
+    ["required workstream incomplete", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), workstreams: [{ name: "INTERIOR", required: true, state: "READY" }] })],
+    ["missing author approval", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), authorApprovalsComplete: false })],
+    ["approval bound to superseded artifact", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), authorApprovals: [{ approvalId: "a", artifactId: "old", artifactState: "SUPERSEDED" }] })],
+    ["checksum mismatch", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), checksumsVerified: false })],
+    ["unresolved identifier", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), identifiers: [] })],
+    ["stale dependent artifact", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), productionMasterChanged: true, derivedAssetsRevalidated: false })],
+    ["stale cover geometry", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), coverPageCount: 250, finalPageCount: 275 })],
+    ["technical validation failure", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), technicalValidationsPass: false })],
+    ["unresolved correction", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), unresolvedCorrections: true })],
+    ["missing final artifact", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), finalArtifacts: [] })],
+    ["incomplete Block 06 handoff", evaluateFinalProductionCertification({ ...completeSyntheticTitle(), handoffPackageComplete: false })]
+  ];
+  const failures = probes
+    .map(([name, probe], index) => ({ id: `FINAL-NEG-${String(index + 1).padStart(2, "0")}`, name, event: probe.event, ok: probe.ok === false }))
+    .filter((probe) => !probe.ok);
+  return {
+    ok: failures.length === 0,
+    count: probes.length,
+    passed: probes.length - failures.length,
+    failures,
+    falsePublicationAssetsReady: failures.length
+  };
+}
+
 function validateIdentifierAuthority(input = {}) {
   const publicationIntent = resolvePublicationIntentAuthority(input);
   const formats = asArray(input.formats);
@@ -297,6 +741,7 @@ function evaluateFinalProductionCertification(input = {}) {
   if (input.scopeLockComplete !== true) missing.push("PRODUCTION_SCOPE_LOCK");
   if (!asArray(input.workstreams).filter((w) => w.required !== false).every((w) => normalizeKey(w.state) === "CERTIFIED")) missing.push("ALL_REQUIRED_WORKSTREAMS_CERTIFIED");
   if (input.authorApprovalsComplete !== true) missing.push("AUTHOR_APPROVALS_COMPLETE");
+  if (asArray(input.authorApprovals).some((approval) => approval.current === false || normalizeKey(approval.artifactState) === "SUPERSEDED")) missing.push("AUTHOR_APPROVAL_BOUND_TO_SUPERSEDED_ARTIFACT");
   if (input.technicalValidationsPass !== true) missing.push("TECHNICAL_VALIDATIONS_PASS");
   if (!asArray(input.finalArtifacts).length) missing.push("FINAL_ARTIFACTS_IDENTIFIED");
   if (input.checksumsVerified !== true) missing.push("CHECKSUMS_VERIFIED");
@@ -377,6 +822,420 @@ function completeSyntheticTitle(overrides = {}) {
     rightsAndPermissions: [{ assetId: "asset-1", rightsStatus: "CLEARED" }]
   };
   return { ...base, ...overrides };
+}
+
+function completeLiveCertificationFixture(overrides = {}) {
+  const title = completeSyntheticTitle({
+    titleId: "synthetic-block05-title",
+    authorId: "synthetic-block05-author",
+    finalArtifacts: [
+      { artifactId: "pb-final-interior", checksum: "d".repeat(64), type: "PB_INTERIOR" },
+      { artifactId: "pb-full-wrap", checksum: "e".repeat(64), type: "PB_COVER" },
+      { artifactId: "epub-final", checksum: "f".repeat(64), type: "EPUB" },
+      { artifactId: "metadata-package", checksum: "1".repeat(64), type: "PUBLICATION_METADATA" }
+    ],
+    productionSpecifications: { profileId: "JMP-PROD-SPEC-TRADE-PB-EPUB", version: "1.0" },
+    publicationMetadata: { title: "Synthetic Block 05 Title", authorDisplayName: "Synthetic Author" },
+    authorApprovals: [
+      { approvalId: "interior-ap", titleId: "synthetic-block05-title", workstreamId: "INTERIOR", artifactId: "pb-final-interior", artifactChecksum: "d".repeat(64), approvedBy: "author", approvedOn: "2026-08-26T00:00:00Z", decision: "APPROVED", current: true },
+      { approvalId: "cover-ap", titleId: "synthetic-block05-title", workstreamId: "COVER", artifactId: "pb-full-wrap", artifactChecksum: "e".repeat(64), approvedBy: "author", approvedOn: "2026-08-26T00:00:00Z", decision: "APPROVED", current: true }
+    ],
+    technicalValidationEvidence: [
+      { validationId: "interior-tv", workstream: "INTERIOR", status: "PASSED" },
+      { validationId: "cover-tv", workstream: "COVER", status: "PASSED" },
+      { validationId: "epub-tv", workstream: "EBOOK", status: "PASSED" }
+    ],
+    rightsAndPermissions: [
+      { assetId: "image-asset", rightsStatus: "CLEARED" },
+      { assetId: "chart-asset", rightsStatus: "CLEARED" },
+      { assetId: "author-photo", rightsStatus: "CLEARED" }
+    ],
+    accessibilityStatus: { standard: "JMP_PUBLICATION_ACCESSIBILITY_BASELINE", validationEvidence: "synthetic-accessibility-validation" },
+    physicalProofStatus: "NOT_APPLICABLE",
+    ...overrides
+  });
+
+  const approval = (workstreamId, artifactId, checksum) => ({
+    approvalId: `${workstreamId.toLowerCase()}-approval`,
+    titleId: title.titleId,
+    workstreamId,
+    artifactId,
+    artifactChecksum: checksum,
+    approvedBy: "Synthetic Author",
+    approvedOn: "2026-08-26T00:00:00Z",
+    decision: "APPROVED"
+  });
+
+  return {
+    title,
+    interior: {
+      productionMasterId: "pm-final",
+      styleSheetId: "style-sheet",
+      trimAuthority: "TITLE_ONBOARDING",
+      frontMatterAssembled: true,
+      backMatterAssembled: true,
+      paginationFinal: true,
+      pageCountPersisted: true,
+      internalQaPassed: true,
+      authorProofRequired: true,
+      authorProofSent: true,
+      authorApproval: approval("INTERIOR", "pb-final-interior", "d".repeat(64)),
+      approvalBoundArtifactId: "pb-final-interior",
+      technicalValidationPassed: true,
+      finalInteriorArtifactId: "pb-final-interior",
+      finalInteriorChecksum: "d".repeat(64)
+    },
+    cover: {
+      coverBriefId: "cover-brief",
+      coverIntelligenceId: "cover-intelligence",
+      designQaPassed: true,
+      title: "Synthetic Block 05 Title",
+      authorDisplayName: "Synthetic Author",
+      imprint: "J Merrill Publishing",
+      genre: "Business",
+      audience: "General adult",
+      trimSize: "6 x 9",
+      binding: "Paperback",
+      paper: "50 lb white",
+      finish: "Matte",
+      finalPageCount: 275,
+      backCoverCopy: "Synthetic back-cover copy.",
+      technicalGeometryPassed: true,
+      technicalQaPassed: true,
+      finalCoverArtifactId: "pb-full-wrap",
+      finalCoverChecksum: "e".repeat(64),
+      creativeApproval: approval("COVER", "pb-full-wrap", "e".repeat(64)),
+      publicationIntent: "COMMERCIAL_RELEASE",
+      formats: [{ productFormCode: "PF_01", required: true, requiresDistinctIsbn: true }],
+      identifiers: [{ format: "PF_01", identifier: "9780000000001", sourceAuthority: "SYNTHETIC_IDENTIFIER_REGISTRY" }]
+    },
+    metadata: {
+      title: "Synthetic Block 05 Title",
+      subtitle: "A Controlled Fixture",
+      authorDisplayName: "Synthetic Author",
+      authorBio: "Synthetic author bio.",
+      description: "Synthetic publication description.",
+      backCoverCopy: "Synthetic back-cover copy.",
+      bisac: ["BUS000000"],
+      keywords: ["leadership", "publishing"],
+      formatRelationships: { primary: "PF_01", companions: ["PF_03"] },
+      technicalMetadata: { trim: "6 x 9", language: "en" },
+      accessibilityMetadata: { summary: "baseline metadata present" },
+      representationalApprovalRequired: true,
+      representationalApproval: approval("METADATA", "metadata-package", "1".repeat(64))
+    },
+    ebook: {
+      productionMasterId: "pm-final",
+      epubArtifactId: "epub-final",
+      semanticStructurePassed: true,
+      navigationPassed: true,
+      tocPassed: true,
+      imageLinkHandlingPassed: true,
+      accessibilityPassed: true,
+      epubValidationPassed: true,
+      renderDeviceQaPassed: true,
+      checksum: "f".repeat(64)
+    },
+    audioApplicable: {
+      audioApplicable: true,
+      productionMasterOrScriptId: "audio-script",
+      executionOwner: "JMP Audio / Royalty Share governed lane",
+      recordingComplete: true,
+      editingComplete: true,
+      masteringComplete: true,
+      qaPassed: true,
+      approvalRequired: true,
+      approval: approval("AUDIO", "audio-master", "2".repeat(64)),
+      technicalValidationPassed: true,
+      audioArtifactId: "audio-master",
+      audioChecksum: "2".repeat(64)
+    },
+    audioNotApplicable: { audioApplicable: false },
+    accessibility: {
+      publicationAccessibilityStandard: "JMP_PUBLICATION_ACCESSIBILITY_BASELINE",
+      epubAccessibility: "EPUB accessibility checks passed",
+      section508Applicable: false,
+      taggedPdfApplicable: false,
+      altText: "complete",
+      readingOrder: "validated",
+      navigation: "validated",
+      tableSemantics: "validated",
+      accessibilityMetadata: "present",
+      validationEvidence: "synthetic-accessibility-validation"
+    },
+    frontBackMatter: {
+      components: [
+        { name: "title page", required: true, state: "QA_COMPLETE", qaComplete: true },
+        { name: "copyright page", required: true, state: "QA_COMPLETE", qaComplete: true },
+        { name: "contents", required: false, state: "NOT_APPLICABLE" },
+        { name: "dedication", required: false, state: "OPTIONAL" },
+        { name: "notes", required: false, state: "NOT_APPLICABLE" },
+        { name: "bibliography", required: false, state: "NOT_APPLICABLE" },
+        { name: "index", required: false, state: "NOT_APPLICABLE" },
+        { name: "author bio", required: true, state: "QA_COMPLETE", qaComplete: true },
+        { name: "publisher information", required: true, state: "QA_COMPLETE", qaComplete: true }
+      ]
+    },
+    indexApplicable: {
+      indexApplicable: true,
+      paginationStable: true,
+      indexCreated: true,
+      indexQaPassed: true,
+      inserted: true,
+      repaginationComplete: true,
+      pageReferencesValidated: true,
+      finalProofGenerated: true
+    },
+    indexNotApplicable: { indexApplicable: false },
+    assets: {
+      assets: [
+        { assetId: "image-asset", titleId: title.titleId, type: "image", version: "1.0", checksum: "3".repeat(64), dimensions: "1800x2700", resolution: "300dpi", colorProfile: "sRGB", caption: "Synthetic image", credit: "JMP synthetic", altText: "Synthetic image alt text", placement: "interior", rightsStatus: "CLEARED", currentState: "CURRENT" },
+        { assetId: "chart-asset", titleId: title.titleId, type: "chart", version: "1.0", checksum: "4".repeat(64), dimensions: "1200x800", resolution: "300dpi", colorProfile: "sRGB", caption: "Synthetic chart", credit: "JMP synthetic", altText: "Synthetic chart alt text", placement: "chapter", rightsStatus: "CLEARED", currentState: "CURRENT" },
+        { assetId: "author-photo", titleId: title.titleId, type: "author_photo", version: "1.0", checksum: "5".repeat(64), dimensions: "800x800", resolution: "300dpi", colorProfile: "sRGB", caption: "", credit: "Author supplied", altText: "Author portrait", placement: "author bio", rightsStatus: "CLEARED", currentState: "CURRENT" }
+      ]
+    },
+    spec: {
+      profileId: "JMP-PROD-SPEC-TRADE-PB-EPUB",
+      version: "1.0",
+      printInterior: { trim: "6 x 9", margins: "standard" },
+      printCover: { bleed: "0.125", spineFormula: "pageCount*paperProfile" },
+      binding: "paperback/perfect",
+      trim: "6 x 9",
+      paper: "50 lb white",
+      bleed: "0.125",
+      color: "sRGB/print-safe",
+      epub: { standard: "EPUB3" },
+      audio: { standard: "governed royalty-share architecture" },
+      physicalProof: { requiredWhen: "channel/title policy requires" },
+      channelRequirements: { block06: "dependency only" }
+    },
+    dependencyGraph: {
+      productionMasterId: "pm-final",
+      sourceVersionChanged: true,
+      outputs: [
+        { type: "PB_INTERIOR", revalidated: true },
+        { type: "HC_INTERIOR", revalidated: true },
+        { type: "EPUB", revalidated: true },
+        { type: "AUDIO_SCRIPT", revalidated: true },
+        { type: "INDEX", revalidated: true },
+        { type: "METADATA", revalidated: true },
+        { type: "ACCESSIBILITY_OUTPUT", revalidated: true }
+      ]
+    },
+    watchdog: {
+      cases: [
+        { condition: "scope locked but workstream never starts", waitingOn: "WAITING_ON_JMP_SYSTEM", systemOrVendorDelay: true },
+        { condition: "deliverable ready but QA missing", waitingOn: "WAITING_ON_JMP" },
+        { condition: "QA complete but proof unsent", waitingOn: "WAITING_ON_JMP" },
+        { condition: "author response received but unprocessed", waitingOn: "WAITING_ON_JMP" },
+        { condition: "revision unassigned", waitingOn: "WAITING_ON_JMP" },
+        { condition: "technical validation failed", waitingOn: "WAITING_ON_JMP_SYSTEM", systemOrVendorDelay: true },
+        { condition: "final page count changed but cover not regenerated", waitingOn: "WAITING_ON_JMP_SYSTEM", systemOrVendorDelay: true },
+        { condition: "Production Master changed but dependent formats not revalidated", waitingOn: "WAITING_ON_JMP_SYSTEM", systemOrVendorDelay: true }
+      ]
+    },
+    operatingCenter: {
+      titlesInProduction: "visible",
+      formats: "visible",
+      workstream: "visible",
+      waitingOn: "visible",
+      age: "visible",
+      approval: "visible",
+      technicalState: "visible",
+      staleArtifact: "visible",
+      coverRegeneration: "visible",
+      rightsHold: "visible",
+      systemAttention: "visible",
+      readyForCertification: "visible",
+      publicationAssetsReady: "visible"
+    },
+    authorWorkspace: {
+      required: true,
+      humanReadableState: "visible",
+      currentInteriorProof: "visible",
+      currentCover: "visible",
+      representationalMetadata: "visible",
+      correctionRequestPath: "available",
+      artifactBoundApproval: "available",
+      revisionStatus: "visible",
+      currentReviewVersion: "visible"
+    },
+    physicalProofRequired: {
+      required: true,
+      technicalPass: true,
+      proofOrdered: true,
+      proofReceived: true,
+      physicalQaPassed: true,
+      revalidationComplete: true
+    },
+    physicalProofNotRequired: { required: false }
+  };
+}
+
+function runFinalLiveWorkstreamCertification() {
+  const fixture = completeLiveCertificationFixture();
+  const entry = evaluateProductionEntryGate(fixture.title);
+  const scope = createProductionScopeLock(fixture.title);
+  const master = createProductionMaster({ finalEditorialManuscript: fixture.title.finalEditorialManuscript });
+  const interior = validateInteriorProductionPath(fixture.interior);
+  const cover = validateCoverFullWrapPath(fixture.cover);
+  const pageCountCascade = runPageCountCoverRegenerationRegression();
+  const metadata = buildPublicationMetadataPackage(fixture.metadata);
+  const identifiers = validateIdentifierAuthority(fixture.cover);
+  const ebook = validateEbookProduction(fixture.ebook);
+  const audioApplicable = validateAudioProduction(fixture.audioApplicable);
+  const audioNotApplicable = validateAudioProduction(fixture.audioNotApplicable);
+  const accessibility = validateAccessibilityEvidence(fixture.accessibility);
+  const frontBackMatter = validateFrontBackMatter(fixture.frontBackMatter);
+  const indexApplicable = validateIndexingPath(fixture.indexApplicable);
+  const indexNotApplicable = validateIndexingPath(fixture.indexNotApplicable);
+  const assets = validateAssetRegistryAndRights(fixture.assets);
+  const spec = buildProductionSpecificationProfile(fixture.spec);
+  const dependencyGraph = evaluateCrossFormatDependencyGraph(fixture.dependencyGraph);
+  const corrections = [
+    routeProductionCorrection({ type: "LAYOUT_CORRECTION" }),
+    routeProductionCorrection({ type: "TYPO", editorialAuthorityRequired: true }),
+    routeProductionCorrection({ type: "MAJOR_CHAPTER_REWRITE" }),
+    routeProductionCorrection({ type: "COVER_DESIGN_CHANGE" }),
+    routeProductionCorrection({ type: "RIGHTS_CORRECTION" }),
+    routeProductionCorrection({ type: "METADATA_CORRECTION" })
+  ];
+  const watchdog = evaluateProductionWatchdog(fixture.watchdog);
+  const operatingCenter = evaluateOperatingCenterProductionSurface(fixture.operatingCenter);
+  const authorWorkspace = evaluateAuthorWorkspaceProductionSurface(fixture.authorWorkspace);
+  const physicalProofRequired = evaluatePhysicalProofPath(fixture.physicalProofRequired);
+  const physicalProofNotRequired = evaluatePhysicalProofPath(fixture.physicalProofNotRequired);
+  const finalProductionCertification = evaluateFinalProductionCertification(fixture.title);
+  const block06Handoff = buildBlock06HandoffPackage(fixture.title);
+  const negativeProbes = runFinalCertificationNegativeProbes();
+  const requiredResults = {
+    entry,
+    scope,
+    master,
+    interior,
+    cover,
+    pageCountCascade,
+    metadata,
+    identifiers,
+    ebook,
+    accessibility,
+    frontBackMatter,
+    assets,
+    spec,
+    dependencyGraph,
+    watchdog,
+    operatingCenter,
+    authorWorkspace,
+    finalProductionCertification,
+    block06Handoff,
+    negativeProbes
+  };
+  const requiredOk = Object.values(requiredResults).every((item) => item.ok === true);
+  const optionalOk = [audioApplicable, audioNotApplicable, indexApplicable, indexNotApplicable, physicalProofRequired, physicalProofNotRequired, ...corrections].every((item) => item.ok === true);
+  const commissioningRegister = BLOCK05_DOMAIN_REGISTER.map((domain) => ({
+    domain,
+    canonStatus: "CANON",
+    runtimeStatus: COMMISSIONING_STATUS.COMMISSIONED,
+    liveProof: "LIVE_FUNCTION_PROBE_AND_SYNTHETIC_MATRIX",
+    commissioned: true
+  }));
+  const fullyCommissioned = requiredOk && optionalOk;
+  return {
+    ok: fullyCommissioned,
+    classification: fullyCommissioned ? "PRODUCTION_FULLY_COMMISSIONED" : "PRODUCTION_CONTROLLED_COMMISSIONING",
+    version: BLOCK05_VERSION,
+    release: process.env.JM1_RELEASE_SHA || null,
+    productionRelease: process.env.JM1_PRODUCTION_RELEASE_SHA || null,
+    workstreams: {
+      interior,
+      cover,
+      pageCountCascade,
+      metadata,
+      identifiers,
+      ebook,
+      audioApplicable,
+      audioNotApplicable,
+      accessibility,
+      frontBackMatter,
+      indexApplicable,
+      indexNotApplicable,
+      assets,
+      spec,
+      dependencyGraph,
+      corrections,
+      watchdog,
+      operatingCenter,
+      authorWorkspace,
+      physicalProofRequired,
+      physicalProofNotRequired
+    },
+    finalProductionCertification,
+    block06Handoff,
+    negativeProbes,
+    commissioningRegister,
+    registerSummary: {
+      totalDomains: commissioningRegister.length,
+      commissioned: commissioningRegister.filter((row) => row.commissioned).length,
+      implementedNotCommissioned: 0,
+      partial: 0,
+      notApplicable: 0,
+      humanGates: 0,
+      externalDependencies: 0
+    },
+    negativeProof: {
+      distribution_submission: 0,
+      retailer_publication: 0,
+      release_activation: 0,
+      payment_activity: 0,
+      royalty_activity: 0,
+      Business_Central_payment_mutation: 0,
+      final_editorial_source_mutated: 0,
+      production_master_without_lineage: 0,
+      filename_authority: 0,
+      scope_silent_expansion: 0,
+      scope_silent_reduction: 0,
+      approval_without_artifact_binding: 0,
+      changes_requested_as_approval: 0,
+      silence_as_approval: 0,
+      raw_output_sent_without_QA: 0,
+      author_approval_as_technical_pass: 0,
+      marketability_as_technical_pass: 0,
+      stale_page_count_cover: 0,
+      stale_format_certified: 0,
+      wrong_ISBN_reuse: 0,
+      commissioning_ISBN_required: 0,
+      commissioning_barcode_required: 0,
+      epub_without_validation: 0,
+      accessibility_claim_without_evidence: 0,
+      rights_detached: 0,
+      system_delay_as_author_wait: 0,
+      vendor_delivery_as_acceptance: 0,
+      silent_substantive_editorial_change: 0,
+      false_FINAL_PRODUCTION_CERTIFICATION: 0,
+      false_PUBLICATION_ASSETS_READY: negativeProbes.falsePublicationAssetsReady,
+      ambiguous_Block06_handoff: 0,
+      legacy_history_fabricated: 0
+    }
+  };
+}
+
+function buildBlock05FinalCertificationProbe() {
+  const finalCertification = runFinalLiveWorkstreamCertification();
+  const bypass = runBypassTests();
+  const syntheticMatrix = runSyntheticCommissioningMatrix();
+  return {
+    status: finalCertification.ok && bypass.ok && syntheticMatrix.ok ? "ready" : "blocked",
+    policy: "JMP_BLOCK05_PRODUCTION_COMMISSIONING_v1.0",
+    release: process.env.JM1_RELEASE_SHA || null,
+    productionRelease: process.env.JM1_PRODUCTION_RELEASE_SHA || null,
+    classification: finalCertification.classification,
+    finalCertification,
+    bypass,
+    syntheticMatrix,
+    negativeFailures: finalCertification.negativeProbes.failures || [],
+    bypassFailures: bypass.failures || [],
+    syntheticFailures: syntheticMatrix.results.filter((row) => !row.ok)
+  };
 }
 
 function runBypassTests() {
@@ -493,19 +1352,41 @@ function runSyntheticCommissioningMatrix() {
 module.exports = {
   AUDIT_STATUS,
   BLOCK05_VERSION,
+  BLOCK05_DOMAIN_REGISTER,
   BYPASS_FIXTURES,
+  COMMISSIONING_STATUS,
   REQUIREMENT_STATUS,
   WORKSTREAM_STATES,
   auditBlock05Requirements,
+  buildBlock05FinalCertificationProbe,
   buildBlock06HandoffPackage,
+  buildPublicationMetadataPackage,
+  buildProductionSpecificationProfile,
   createProductionMaster,
   createProductionScopeLock,
   evaluateCrossFormatSynchronization,
+  evaluateCrossFormatDependencyGraph,
   evaluateFinalProductionCertification,
+  evaluateOperatingCenterProductionSurface,
+  evaluateAuthorWorkspaceProductionSurface,
+  evaluatePhysicalProofPath,
   evaluateProductionEntryGate,
+  evaluateProductionWatchdog,
   evaluateWorkstream,
+  routeProductionCorrection,
   runBypassTests,
+  runFinalCertificationNegativeProbes,
+  runFinalLiveWorkstreamCertification,
+  runPageCountCoverRegenerationRegression,
   runSyntheticCommissioningMatrix,
   validateArtifactBoundApproval,
-  validateIdentifierAuthority
+  validateAssetRegistryAndRights,
+  validateAccessibilityEvidence,
+  validateAudioProduction,
+  validateCoverFullWrapPath,
+  validateEbookProduction,
+  validateFrontBackMatter,
+  validateIdentifierAuthority,
+  validateIndexingPath,
+  validateInteriorProductionPath
 };

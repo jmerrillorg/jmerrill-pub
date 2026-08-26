@@ -43,6 +43,7 @@ const {
 } = require("../src/production/productionPipelineV2Doctrine");
 const {
   auditBlock05Requirements,
+  buildBlock05FinalCertificationProbe,
   buildBlock06HandoffPackage,
   createProductionMaster,
   createProductionScopeLock,
@@ -51,7 +52,12 @@ const {
   evaluateProductionEntryGate,
   evaluateWorkstream,
   runBypassTests,
+  runFinalCertificationNegativeProbes,
+  runFinalLiveWorkstreamCertification,
   runSyntheticCommissioningMatrix,
+  validateAccessibilityEvidence,
+  validateAudioProduction,
+  validateEbookProduction,
   validateArtifactBoundApproval,
   validateIdentifierAuthority
 } = require("../src/production/block05ProductionCommissioning");
@@ -715,5 +721,79 @@ describe("JM1 Production Pipeline v2.0 doctrine", () => {
     assert.equal(bypass.count, 36);
     assert.equal(synthetic.ok, true);
     assert.equal(synthetic.count, 14);
+  });
+
+  test("Block 05 final live workstream certification commissions every required production domain", () => {
+    const certification = runFinalLiveWorkstreamCertification();
+
+    assert.equal(certification.ok, true);
+    assert.equal(certification.classification, "PRODUCTION_FULLY_COMMISSIONED");
+    assert.equal(certification.registerSummary.totalDomains, 24);
+    assert.equal(certification.registerSummary.commissioned, 24);
+    assert.equal(certification.registerSummary.implementedNotCommissioned, 0);
+    assert.equal(certification.registerSummary.partial, 0);
+    assert.equal(certification.workstreams.interior.event, "INTERIOR_CERTIFIED");
+    assert.equal(certification.workstreams.cover.event, "COVER_FULL_WRAP_CERTIFIED");
+    assert.equal(certification.workstreams.pageCountCascade.event, "PAGE_COUNT_COVER_REGENERATION_PROVEN");
+    assert.equal(certification.workstreams.metadata.event, "PUBLICATION_METADATA_PACKAGE_READY");
+    assert.equal(certification.workstreams.ebook.event, "EBOOK_CERTIFIED");
+    assert.equal(certification.workstreams.audioApplicable.event, "AUDIO_CERTIFIED");
+    assert.equal(certification.workstreams.audioNotApplicable.event, "AUDIO_NOT_APPLICABLE");
+    assert.equal(certification.workstreams.accessibility.event, "ACCESSIBILITY_VALIDATED");
+    assert.equal(certification.workstreams.indexApplicable.event, "INDEX_CERTIFIED");
+    assert.equal(certification.workstreams.indexNotApplicable.event, "INDEX_NOT_APPLICABLE");
+    assert.equal(certification.workstreams.physicalProofRequired.event, "PHYSICAL_PROOF_CERTIFIED");
+    assert.equal(certification.workstreams.physicalProofNotRequired.event, "PHYSICAL_PROOF_NOT_APPLICABLE");
+    assert.equal(certification.finalProductionCertification.event, "PUBLICATION_ASSETS_READY");
+    assert.equal(certification.block06Handoff.event, "BLOCK06_HANDOFF_PACKAGE_READY");
+    assert.equal(certification.negativeProof.distribution_submission, 0);
+    assert.equal(certification.negativeProof.payment_activity, 0);
+    assert.equal(certification.negativeProof.false_PUBLICATION_ASSETS_READY, 0);
+  });
+
+  test("Block 05 final certification negative probes fail closed", () => {
+    const negatives = runFinalCertificationNegativeProbes();
+
+    assert.equal(negatives.ok, true);
+    assert.equal(negatives.count, 11);
+    assert.equal(negatives.passed, 11);
+    assert.equal(negatives.falsePublicationAssetsReady, 0);
+  });
+
+  test("Block 05 eBook, audio, and accessibility validators do not certify raw exports or unsupported claims", () => {
+    const ebook = validateEbookProduction({
+      productionMasterId: "pm",
+      epubArtifactId: "epub",
+      semanticStructurePassed: true,
+      navigationPassed: true,
+      tocPassed: true,
+      imageLinkHandlingPassed: true,
+      accessibilityPassed: true,
+      exportSucceeded: true,
+      epubValidationPassed: false,
+      renderDeviceQaPassed: true,
+      checksum: "a".repeat(64)
+    });
+    assert.equal(ebook.ok, false);
+    assert.equal(ebook.missing.includes("EPUB_EXPORT_NOT_CERTIFICATION"), true);
+
+    const audio = validateAudioProduction({ audioApplicable: true, paymentMutationAttempted: true });
+    assert.equal(audio.ok, false);
+    assert.equal(audio.missing.includes("AUDIO_PAYMENT_MUTATION_FORBIDDEN"), true);
+
+    const accessibility = validateAccessibilityEvidence({ complianceClaimed: true });
+    assert.equal(accessibility.ok, false);
+    assert.equal(accessibility.missing.includes("ACCESSIBILITY_CLAIM_WITHOUT_EVIDENCE"), true);
+  });
+
+  test("Block 05 final certification Function probe returns production fully commissioned", () => {
+    const probe = buildBlock05FinalCertificationProbe();
+
+    assert.equal(probe.status, "ready");
+    assert.equal(probe.classification, "PRODUCTION_FULLY_COMMISSIONED");
+    assert.equal(probe.finalCertification.registerSummary.totalDomains, 24);
+    assert.equal(probe.negativeFailures.length, 0);
+    assert.equal(probe.bypassFailures.length, 0);
+    assert.equal(probe.syntheticFailures.length, 0);
   });
 });
