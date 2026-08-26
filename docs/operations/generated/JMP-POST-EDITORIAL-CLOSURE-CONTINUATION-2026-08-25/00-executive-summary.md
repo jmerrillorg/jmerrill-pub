@@ -1,6 +1,6 @@
 # JMP Post-Editorial Closure Continuation
 
-Last Verified: 2026-08-26T01:22:38Z
+Last Verified: 2026-08-26T02:38:00Z
 
 ## Classification
 
@@ -19,11 +19,12 @@ This pass repaired the missing cadence-release ownership path for author-facing 
 | Frequency | Every 10 minutes (`0 */10 * * * *`) |
 | Runtime package deployed | YES |
 | `/api/health` after deployment | 200 |
-| Production release label | Pending final post-merge deployment readback |
+| Production release label | `17bab886d693314a7179edcd6100d2dda7598dfc` |
 | Duplicate send guard | Stage/package/scheduledReleaseAt idempotency key plus governed Publishing mailbox delivery correlation |
 | Failure path | `PACKAGE_CADENCE_RELEASE_SYSTEM_ATTENTION_REQUIRED` or `PACKAGE_CADENCE_RELEASE_MAILBOX_CORRELATION_AMBIGUOUS` |
 | Delivery repair path | `PACKAGE_CADENCE_RELEASE_MAILBOX_DELIVERY_CORRELATED` |
 | Response correlation path | `PACKAGE_CADENCE_RELEASE_AUTHOR_RESPONSE_CORRELATED`; acknowledgment remains non-approval |
+| Graph folder timestamp handling | Inbox uses `receivedDateTime`; Sent Items uses `sentDateTime` |
 
 ## Key Readback
 
@@ -40,7 +41,7 @@ This pass repaired the missing cadence-release ownership path for author-facing 
 
 | Check | Result |
 | --- | --- |
-| `npm test -- --test-reporter=spec test/editorialCadenceReleaseConsumer.test.js test/publishingMailboxReader.test.js test/authorReviewResponseConsumer.test.js` | PASS, 92 / 92 |
+| `npm test -- --test-reporter=spec test/editorialCadenceReleaseConsumer.test.js test/publishingMailboxReader.test.js test/authorReviewResponseConsumer.test.js` | PASS, 93 / 93 |
 | `npm run lint` in diagnostic runner | PASS |
 | Root `npm run type-check` | PASS |
 | Canon policy guard | PASS, 10 / 10 |

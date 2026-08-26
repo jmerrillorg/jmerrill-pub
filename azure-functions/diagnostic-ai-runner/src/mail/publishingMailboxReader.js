@@ -121,14 +121,19 @@ function sha256Buffer(buffer) {
  * after `afterIso`, requesting only the fields needed for filtering and
  * classification. GET only — no other Graph verb is ever used.
  */
+function folderTimestampField(folder) {
+  return normalizeString(folder).toLowerCase() === "sentitems" ? "sentDateTime" : "receivedDateTime";
+}
+
 async function fetchRecentFolderMessages(token, folder, afterIso, deps = {}) {
-  const filter = encodeURIComponent(`receivedDateTime ge ${afterIso}`);
+  const timestampField = folderTimestampField(folder);
+  const filter = encodeURIComponent(`${timestampField} ge ${afterIso}`);
   const select = encodeURIComponent(
-    "id,internetMessageId,subject,from,toRecipients,ccRecipients,receivedDateTime,bodyPreview,body,conversationId,hasAttachments"
+    "id,internetMessageId,subject,from,toRecipients,ccRecipients,receivedDateTime,sentDateTime,bodyPreview,body,conversationId,hasAttachments"
   );
   const url =
     `${GRAPH_BASE}/users/${encodeURIComponent(PUBLISHING_MAILBOX)}/mailFolders/${encodeURIComponent(folder)}/messages` +
-    `?$filter=${filter}&$select=${select}&$orderby=receivedDateTime desc&$top=${MAX_MESSAGES_FETCHED}`;
+    `?$filter=${filter}&$select=${select}&$orderby=${timestampField} desc&$top=${MAX_MESSAGES_FETCHED}`;
 
   const response = await getFetchImpl(deps)(url, {
     method: "GET",
@@ -159,6 +164,7 @@ function safeMessage(message = {}, folder = "inbox") {
   const toRecipients = normalizeRecipients(message.toRecipients);
   const ccRecipients = normalizeRecipients(message.ccRecipients);
   const bodyText = normalizeString(message.body?.content) || normalizeString(message.bodyPreview) || "";
+  const eventDateTime = normalizeString(message.receivedDateTime) || normalizeString(message.sentDateTime) || null;
   return {
     folder,
     inboundMessageId: normalizeString(message.id) || null,
@@ -169,6 +175,8 @@ function safeMessage(message = {}, folder = "inbox") {
     toRecipients,
     ccRecipients,
     receivedDateTime: normalizeString(message.receivedDateTime) || null,
+    sentDateTime: normalizeString(message.sentDateTime) || null,
+    eventDateTime,
     hasAttachments: message.hasAttachments === true,
     bodyText
   };
@@ -242,7 +250,7 @@ async function readPublishingMailboxDeliveryEvidence(input = {}, deps = {}) {
     .filter((message) => normalizeString(message.subject).toLowerCase().includes(subjectLower))
     .map((message) => ({ message, match: deliveryEvidenceConfidence(message, input) }))
     .filter((candidate) => candidate.match.ok)
-    .sort((a, b) => new Date(b.message.receivedDateTime || 0).getTime() - new Date(a.message.receivedDateTime || 0).getTime());
+    .sort((a, b) => new Date(b.message.eventDateTime || 0).getTime() - new Date(a.message.eventDateTime || 0).getTime());
 
   if (candidates.length === 0) {
     return { ok: true, code: "NO_DELIVERY_EVIDENCE_FOUND", found: false, ambiguous: false, sourceMailbox: PUBLISHING_MAILBOX };
@@ -272,7 +280,7 @@ async function readPublishingMailboxDeliveryEvidence(input = {}, deps = {}) {
     correlationConfidence: latest.match.confidence,
     matchEvidence: [...latest.match.exact, ...latest.match.supporting],
     ...latest.message,
-    deliveredAt: latest.message.receivedDateTime
+    deliveredAt: latest.message.eventDateTime
   };
 }
 
@@ -520,5 +528,6 @@ module.exports = {
   MAX_MESSAGES_FETCHED,
   FILE_ATTACHMENT_TYPE,
   INTERNAL_PUBLISHING_SENDERS,
+  folderTimestampField,
   extractAuthorReplyText
 };
