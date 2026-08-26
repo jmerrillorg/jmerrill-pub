@@ -10,6 +10,7 @@ require("./functions/runAuthorReviewResponseConsumer");
 require("./functions/runEditorialExecutionRuntime");
 require("./functions/runBlock04CommissioningProbe");
 require("./functions/runEditorialPackageHandoffConsumer");
+require("./functions/runEditorialCadenceReleaseConsumer");
 require("./functions/runEditorialNextStageMaterialization");
 require("./functions/runTargetedEditorialExecution");
 require("./functions/runTargetedEditorialExecutionWorker");
