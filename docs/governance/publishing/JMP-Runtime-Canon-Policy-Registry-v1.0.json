@@ -4,6 +4,127 @@
   "effectiveDate": "2026-08-25",
   "ownerAuthority": "Jackie Smith, Jr. — Governance Authority",
   "implementationModule": "azure-functions/diagnostic-ai-runner/src/policy/canonPolicyLayer.js",
+  "commissioningRegister": {
+    "commissionedAt": "2026-08-26T01:55:00Z",
+    "deployedSha": "391f15addc2f80eee6a3bbff2ccca399534b68e9",
+    "runtime": "func-jm1-diagnostic-ai-runner",
+    "runtimeHealth": "READY",
+    "nodeRuntime": "v22.23.2",
+    "liveProof": [
+      "Diagnostic AI Runner health readback reports release and productionRelease 391f15addc2f80eee6a3bbff2ccca399534b68e9.",
+      "Production function route run-block04-commissioning-probe is registered.",
+      "Production Block 04 commissioning probe returned zero negativeFailures and zero alternateFailures.",
+      "Production ACS relay routes fail closed without a relay key and preserve canonical sender/reply-to/CC validation in tests.",
+      "Publishing web /api/health reports release 391f15addc2f80eee6a3bbff2ccca399534b68e9."
+    ],
+    "negativeProof": {
+      "requiredBlock04BypassProbes": 18,
+      "requiredBlock04BypassFailures": 0,
+      "canonPolicyGuardTests": "10/10 PASS",
+      "block04FocusedTests": "61/61 PASS",
+      "typeCheck": "PASS"
+    },
+    "driftMonitor": "scripts/jm1_runtime_policy_drift_audit.mjs",
+    "driftAuditStatus": "COMPLETED_WITH_REMAINING_FINDINGS",
+    "policies": [
+      {
+        "policyId": "JMP-PAYMENT-AUTHORITY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolvePaymentAuthority",
+        "liveProof": "Stripe allowed for new Publishing payment authority; MoonClerk denied for new work and legacy reconciliation remains allowed.",
+        "negativeProof": "NEW_PAYMENT_TO_MOONCLERK denied; no MoonClerk new payment created."
+      },
+      {
+        "policyId": "JMP-COMMUNICATION-AUTHORITY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolveCommunicationAuthority / ACS relay validation",
+        "liveProof": "ACS relay deployed and routes fail closed; canonical author-facing configuration requires publishing@email.jmerrill.one, publishing@jmerrill.one Reply-To, Publishing CC, and HTML.",
+        "negativeProof": "Wrong sender, NoReply sender, missing Reply-To, missing CC, and plain-text-only author send are denied."
+      },
+      {
+        "policyId": "JMP-AUTHOR-TITLE-IDENTITY-AUTHORITY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolveIdentityAuthority",
+        "liveProof": "Canonical Contact / Author / Title relationship required before mutation.",
+        "negativeProof": "Atta / Indomitable mismatch is denied."
+      },
+      {
+        "policyId": "JMP-AUTHOR-FACING-ARTIFACT-SAFETY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolveArtifactAuthority / resolveAuthorReviewRelease",
+        "liveProof": "Author-facing release requires author-safe rendered content and artifact identity.",
+        "negativeProof": "Internal metadata, raw AI output, and package-before-QA probes are denied."
+      },
+      {
+        "policyId": "JMP-ARTIFACT-SUPERSESSION-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolveArtifactSupersessionAuthority / resolveNextStageSourceAuthority",
+        "liveProof": "Current approved artifact lineage is required for downstream use.",
+        "negativeProof": "Superseded or wrong source artifact probe is denied."
+      },
+      {
+        "policyId": "JMP-EDITORIAL-GATE-AUTHORITY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolveEditorialStageAuthority / block04EditorialPolicy",
+        "liveProof": "Block 04 production probe passes all required editorial gate and final-certification checks.",
+        "negativeProof": "All 18 Block 04 bypass attempts fail closed."
+      },
+      {
+        "policyId": "JMP-PUBLICATION-INTENT-AUTHORITY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolvePublicationIntentAuthority",
+        "liveProof": "Commissioning / non-release intent does not require ISBN, barcode, distribution, or publication launch.",
+        "negativeProof": "Commercial release requirements are not imposed on commissioning titles."
+      },
+      {
+        "policyId": "JMP-PRODUCTION-AUTHORITY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolveProductionAuthority / buildProductionHandoffPackage",
+        "liveProof": "Synthetic production handoff passes only after final editorial certification.",
+        "negativeProof": "Production Ready without final editorial certification is denied."
+      },
+      {
+        "policyId": "JMP-DISTRIBUTION-AUTHORITY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "IMPLEMENTED_NOT_COMMISSIONED",
+        "implementation": "resolveDistributionAuthority",
+        "liveProof": "No distribution mutation or distribution live probe was performed in this commissioning pass.",
+        "negativeProof": "Not exercised; distribution remains implemented and gated but not separately commissioned here."
+      },
+      {
+        "policyId": "JMP-CADENCE-AUTHORITY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolveCadenceAuthority / evaluateBlock04StageTransition",
+        "liveProof": "Cadence hold blocks downstream editorial execution until eligible.",
+        "negativeProof": "Cadence hold bypass probe is denied."
+      },
+      {
+        "policyId": "JMP-WAITING-ON-AUTHORITY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolveWaitingOnAuthority / resolveWaitingOnTruth",
+        "liveProof": "Waiting On Author requires a current delivered request and no system failure.",
+        "negativeProof": "System failure as Waiting On Author is denied."
+      },
+      {
+        "policyId": "JMP-LEGACY-ROUTING-AUTHORITY-v1.0",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONED",
+        "implementation": "resolveLegacySystemAuthority",
+        "liveProof": "Legacy systems remain reconciliation-only for new work boundaries.",
+        "negativeProof": "MoonClerk fallback and legacy new-work routing probes are denied."
+      }
+    ]
+  },
   "policies": [
     {
       "policyId": "JMP-PAYMENT-AUTHORITY-v1.0",
