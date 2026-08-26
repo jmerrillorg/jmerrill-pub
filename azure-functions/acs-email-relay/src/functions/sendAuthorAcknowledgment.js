@@ -1064,11 +1064,19 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_NEXT_STEP_REQUIRED" };
   }
 
+  if (canonicalPublishingFooterCount(`${html}\n${text}`) > 1) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_DUPLICATE_SIGNATURE_BLOCKED" };
+  }
+
   if (/\b(Dataverse|execution log|workflow record|internal instruction|package manifest|response mechanism|evidence file|artifactId|correlation|checksum|runtime|system attention|technical validation)\b/i.test(stripUrls(`${html}\n${text}`))) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_INTERNAL_LANGUAGE_BLOCKED" };
   }
 
   return { ok: true };
+}
+
+function canonicalPublishingFooterCount(value) {
+  return (String(value || "").match(/The Publishing Team[\s\S]{0,120}?J Merrill Publishing,\s*Inc\./gi) || []).length;
 }
 
 function stripUrls(value) {
