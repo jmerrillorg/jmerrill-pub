@@ -19,9 +19,11 @@ This pass repaired the missing cadence-release ownership path for author-facing 
 | Frequency | Every 10 minutes (`0 */10 * * * *`) |
 | Runtime package deployed | YES |
 | `/api/health` after deployment | 200 |
-| Production release label | `309820ad6c38f5c601cba8638978d4099267ea88` |
-| Duplicate send guard | Stage/package/scheduledReleaseAt idempotency key |
-| Failure path | `PACKAGE_CADENCE_RELEASE_SYSTEM_ATTENTION_REQUIRED` |
+| Production release label | Pending final post-merge deployment readback |
+| Duplicate send guard | Stage/package/scheduledReleaseAt idempotency key plus governed Publishing mailbox delivery correlation |
+| Failure path | `PACKAGE_CADENCE_RELEASE_SYSTEM_ATTENTION_REQUIRED` or `PACKAGE_CADENCE_RELEASE_MAILBOX_CORRELATION_AMBIGUOUS` |
+| Delivery repair path | `PACKAGE_CADENCE_RELEASE_MAILBOX_DELIVERY_CORRELATED` |
+| Response correlation path | `PACKAGE_CADENCE_RELEASE_AUTHOR_RESPONSE_CORRELATED`; acknowledgment remains non-approval |
 
 ## Key Readback
 
@@ -38,8 +40,10 @@ This pass repaired the missing cadence-release ownership path for author-facing 
 
 | Check | Result |
 | --- | --- |
-| `npm test -- --test-reporter=spec test/editorialCadenceReleaseConsumer.test.js` | PASS, 5 / 5 |
+| `npm test -- --test-reporter=spec test/editorialCadenceReleaseConsumer.test.js test/publishingMailboxReader.test.js test/authorReviewResponseConsumer.test.js` | PASS, 91 / 91 |
 | `npm run lint` in diagnostic runner | PASS |
+| Root `npm run type-check` | PASS |
+| Canon policy guard | PASS, 10 / 10 |
 | Live cadence readback | PASS |
 | Health readback | PASS |
 
@@ -55,4 +59,3 @@ This pass repaired the missing cadence-release ownership path for author-facing 
 | Stripe Connect account duplicated | 0 |
 | Royalty amount fabricated | 0 |
 | Downstream editorial execution thawed | 0 |
-

@@ -4,6 +4,7 @@ const { describe, test, beforeEach, afterEach } = require("node:test");
 const assert = require("node:assert/strict");
 const {
   readPublishingMailboxReply,
+  readPublishingMailboxDeliveryEvidence,
   listPublishingMailboxMessageAttachments,
   fetchPublishingMailboxMessageAttachment,
   GATE_NAME,
@@ -241,6 +242,109 @@ describe("readPublishingMailboxReply — subject/thread filtering", () => {
     const result = await readPublishingMailboxReply({ subjectContains: SUBJECT, afterIso: AFTER_ISO }, FAKE_TOKEN_DEPS);
     assert.equal(result.receivedDateTime, "2026-06-21T05:00:00Z");
     assert.equal(result.bodyText, "8 payments");
+  });
+});
+
+describe("readPublishingMailboxDeliveryEvidence — sent package correlation", () => {
+  test("reads Inbox and Sent Items from the governed mailbox and returns high-confidence delivery evidence", async () => {
+    process.env[GATE_NAME] = "true";
+    const calls = mockFetchSequence([
+      graphMessagesResponse([
+        message({
+          id: "cc-copy",
+          internetMessageId: "<delivered-package@jmerrill.one>",
+          subject: "Developmental Review - Before You Were Born",
+          from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
+          toRecipients: [{ emailAddress: { address: "sean@example.com" } }],
+          ccRecipients: [{ emailAddress: { address: PUBLISHING_MAILBOX } }],
+          body: { content: "Package pkg-before-you-were-born-developmental-v1 is ready. Manifest artifact-before-you-were-born." }
+        })
+      ]),
+      graphMessagesResponse([])
+    ]);
+    const result = await readPublishingMailboxDeliveryEvidence(
+      {
+        subjectContains: "Before You Were Born",
+        afterIso: AFTER_ISO,
+        title: "Before You Were Born",
+        stage: "Developmental Review",
+        packageId: "pkg-before-you-were-born-developmental-v1",
+        artifactId: "artifact-before-you-were-born",
+        recipient: "sean@example.com"
+      },
+      FAKE_TOKEN_DEPS
+    );
+    assert.equal(result.ok, true);
+    assert.equal(result.found, true);
+    assert.equal(result.deliveryStatus, "DELIVERED");
+    assert.equal(result.correlationSource, "PUBLISHING_MAILBOX");
+    assert.equal(result.correlationConfidence, "HIGH");
+    assert.ok(calls[0].url.includes("mailFolders/inbox/messages"));
+    assert.ok(calls[1].url.includes("mailFolders/sentitems/messages"));
+  });
+
+  test("wrong-author delivery evidence does not correlate without exact package or artifact evidence", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([
+      graphMessagesResponse([
+        message({
+          subject: "Developmental Review - Before You Were Born",
+          toRecipients: [{ emailAddress: { address: "wrong@example.com" } }],
+          ccRecipients: [{ emailAddress: { address: PUBLISHING_MAILBOX } }],
+          body: { content: "Developmental Review package for Before You Were Born." }
+        })
+      ]),
+      graphMessagesResponse([])
+    ]);
+    const result = await readPublishingMailboxDeliveryEvidence(
+      {
+        subjectContains: "Before You Were Born",
+        afterIso: AFTER_ISO,
+        title: "Before You Were Born",
+        stage: "Developmental Review",
+        recipient: "sean@example.com"
+      },
+      FAKE_TOKEN_DEPS
+    );
+    assert.equal(result.ok, true);
+    assert.equal(result.found, false);
+    assert.equal(result.code, "NO_DELIVERY_EVIDENCE_FOUND");
+  });
+
+  test("ambiguous medium-confidence mailbox delivery evidence fails closed", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([
+      graphMessagesResponse([
+        message({
+          id: "candidate-1",
+          subject: "Developmental Review - Before You Were Born",
+          toRecipients: [{ emailAddress: { address: "sean@example.com" } }],
+          body: { content: "Developmental Review package for Before You Were Born." }
+        }),
+        message({
+          id: "candidate-2",
+          subject: "Developmental Review - Before You Were Born",
+          receivedDateTime: "2026-06-21T01:59:00Z",
+          toRecipients: [{ emailAddress: { address: "sean@example.com" } }],
+          body: { content: "Developmental Review package for Before You Were Born." }
+        })
+      ]),
+      graphMessagesResponse([])
+    ]);
+    const result = await readPublishingMailboxDeliveryEvidence(
+      {
+        subjectContains: "Before You Were Born",
+        afterIso: AFTER_ISO,
+        title: "Before You Were Born",
+        stage: "Developmental Review",
+        recipient: "sean@example.com"
+      },
+      FAKE_TOKEN_DEPS
+    );
+    assert.equal(result.ok, true);
+    assert.equal(result.found, false);
+    assert.equal(result.ambiguous, true);
+    assert.equal(result.code, "AMBIGUOUS_DELIVERY_EVIDENCE");
   });
 });
 

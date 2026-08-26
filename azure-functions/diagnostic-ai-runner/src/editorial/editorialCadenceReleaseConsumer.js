@@ -6,6 +6,12 @@ const {
   requireDataverseConfig,
   writeLog
 } = require("./editorialExecutionRuntime");
+const {
+  PUBLISHING_MAILBOX,
+  readPublishingMailboxDeliveryEvidence,
+  readPublishingMailboxReply
+} = require("../mail/publishingMailboxReader");
+const { classifyAuthorReviewResponse, DECISION } = require("../orchestration/authorReviewResponseConsumer");
 
 const POLICY_VERSION = "JMP Editorial Cadence Doctrine v1.0";
 const CONSUMER_VERSION = "editorial-cadence-release-consumer:v1.0.0";
@@ -96,6 +102,25 @@ async function getTitle(client, titleId) {
   return rows[0] || null;
 }
 
+function titleName(title) {
+  return normalizeString(title?.jm1pub_titlename) || normalizeString(title?.jm1pub_name) || "";
+}
+
+function stageName(stage) {
+  return normalizeString(stage?.jm1pub_name) || normalizeString(stage?.jm1pub_stagetype) || "";
+}
+
+function authorEmail(stage, gate, title) {
+  return [
+    gate?.jm1pub_authoremail,
+    gate?.jm1_authoremail,
+    gate?.authorEmail,
+    stage?.jm1pub_authoremail,
+    title?.jm1pub_authoremail,
+    title?.emailaddress1
+  ].map((value) => normalizeString(value).toLowerCase()).find(Boolean) || "";
+}
+
 async function getCurrentGate(client, stage) {
   const rows = await client.list("jm1pub_editorialapprovalgates", {
     $select:
@@ -126,6 +151,127 @@ async function packageAlreadySent(client, stageId, packageId) {
     $top: "5"
   });
   return rows[0] || null;
+}
+
+async function recordMailboxCorrelation(client, stage, title, gate, packageInfo, delivery, correlationId) {
+  const idempotencyKey = [
+    "editorial-cadence-release",
+    "mailbox-delivered",
+    stage.jm1pub_editorialstageid,
+    packageInfo.packageId || "package-unknown",
+    delivery.internetMessageId || delivery.inboundMessageId || "message-unknown",
+    CONSUMER_VERSION
+  ].join(":");
+  const existing = await findExecutionLog(client, "PACKAGE_CADENCE_RELEASE_MAILBOX_DELIVERY_CORRELATED", idempotencyKey);
+  const description =
+    `Idempotency ${idempotencyKey}. DELIVERY_STATUS=DELIVERED; deliveredAt=${delivery.deliveredAt || delivery.receivedDateTime || "UNKNOWN"}; ` +
+    `message=${delivery.internetMessageId || delivery.inboundMessageId || "UNKNOWN"}; source=${delivery.correlationSource || "PUBLISHING_MAILBOX"}; ` +
+    `confidence=${delivery.correlationConfidence || "UNKNOWN"}; mailbox=${PUBLISHING_MAILBOX}; title=${titleName(title) || "UNKNOWN"}; ` +
+    `gate=${gate?.jm1pub_editorialapprovalgateid || "UNKNOWN"}; package=${packageInfo.packageId || "UNKNOWN"}; ` +
+    `CORRELATION_REPAIRED=TRUE; correlation=${correlationId}.`;
+  await client.patch("jm1pub_editorialstages", stage.jm1pub_editorialstageid, {
+    jm1pub_internaloperationalsummary: description,
+    jm1pub_authorsafesummary: "Your review package has already been delivered through the governed Publishing mailbox. Please review it and reply when ready."
+  });
+  if (existing) return { idempotent: true, logId: existing.jm1_executionlogid, idempotencyKey };
+  const logId = await writeLog(client, {
+    name: `PACKAGE_CADENCE_RELEASE_MAILBOX_DELIVERY_CORRELATED - ${stage.jm1pub_name}`,
+    actionType: "PACKAGE_CADENCE_RELEASE_MAILBOX_DELIVERY_CORRELATED",
+    description,
+    sourceEntity: "jm1pub_editorialstage",
+    sourceRecordId: stage.jm1pub_editorialstageid
+  });
+  return { idempotent: false, logId, idempotencyKey };
+}
+
+async function recordMailboxAmbiguity(client, stage, title, packageInfo, delivery, correlationId) {
+  const idempotencyKey = [
+    "editorial-cadence-release",
+    "mailbox-ambiguous",
+    stage.jm1pub_editorialstageid,
+    packageInfo.packageId || "package-unknown",
+    CONSUMER_VERSION
+  ].join(":");
+  const existing = await findExecutionLog(client, "PACKAGE_CADENCE_RELEASE_MAILBOX_CORRELATION_AMBIGUOUS", idempotencyKey);
+  if (existing) return { idempotent: true, logId: existing.jm1_executionlogid };
+  const logId = await writeLog(client, {
+    name: `PACKAGE_CADENCE_RELEASE_MAILBOX_CORRELATION_AMBIGUOUS - ${stage.jm1pub_name}`,
+    actionType: "PACKAGE_CADENCE_RELEASE_MAILBOX_CORRELATION_AMBIGUOUS",
+    failed: true,
+    description:
+      `Idempotency ${idempotencyKey}. Delivery evidence is ambiguous; no package will be resent. ` +
+      `Title ${titleName(title) || "UNKNOWN"}; package ${packageInfo.packageId || "UNKNOWN"}; ` +
+      `candidateCount=${delivery.candidateCount || "UNKNOWN"}; source=${PUBLISHING_MAILBOX}; correlation=${correlationId}.`,
+    sourceEntity: "jm1pub_editorialstage",
+    sourceRecordId: stage.jm1pub_editorialstageid
+  });
+  return { idempotent: false, logId };
+}
+
+async function recordAuthorResponseCorrelation(client, stage, gate, response, classification, correlationId) {
+  const idempotencyKey = [
+    "editorial-cadence-release",
+    "author-response",
+    stage.jm1pub_editorialstageid,
+    gate?.jm1pub_editorialapprovalgateid || "gate-unknown",
+    response.internetMessageId || response.inboundMessageId || "message-unknown",
+    CONSUMER_VERSION
+  ].join(":");
+  const existing = await findExecutionLog(client, "PACKAGE_CADENCE_RELEASE_AUTHOR_RESPONSE_CORRELATED", idempotencyKey);
+  if (existing) return { idempotent: true, logId: existing.jm1_executionlogid, classification };
+  const logId = await writeLog(client, {
+    name: `PACKAGE_CADENCE_RELEASE_AUTHOR_RESPONSE_CORRELATED - ${stage.jm1pub_name}`,
+    actionType: "PACKAGE_CADENCE_RELEASE_AUTHOR_RESPONSE_CORRELATED",
+    failed: classification !== DECISION.ACKNOWLEDGMENT_ONLY && classification !== DECISION.APPROVED,
+    description:
+      `Idempotency ${idempotencyKey}. Governed response found after delivered package; classification=${classification}; ` +
+      `message=${response.internetMessageId || response.inboundMessageId || "UNKNOWN"}; received=${response.receivedDateTime || "UNKNOWN"}; ` +
+      `source=${PUBLISHING_MAILBOX}; approvalFabricated=0; acknowledgmentTreatedAsApproval=${classification === DECISION.ACKNOWLEDGMENT_ONLY ? 0 : "N/A"}; ` +
+      `correlation=${correlationId}.`,
+    sourceEntity: "jm1pub_editorialapprovalgate",
+    sourceRecordId: gate?.jm1pub_editorialapprovalgateid || stage.jm1pub_editorialstageid
+  });
+  return { idempotent: false, logId, classification };
+}
+
+async function correlateMailboxDelivery(client, stage, title, gate, packageInfo, schedule, correlationId, deps = {}) {
+  const subjectContains = titleName(title) || stageName(stage);
+  if (!subjectContains) return { status: "MAILBOX_CORRELATION_SKIPPED", reason: "SUBJECT_PROBE_UNAVAILABLE" };
+  const reader = deps.readDeliveryEvidence || readPublishingMailboxDeliveryEvidence;
+  const delivery = await reader(
+    {
+      subjectContains,
+      afterIso: schedule.cadenceStartedAt,
+      title: titleName(title),
+      stage: normalizeStageCode(stage).replace(/_/g, " "),
+      packageId: packageInfo.packageId,
+      artifactId: packageInfo.manifestArtifactId,
+      recipient: authorEmail(stage, gate, title)
+    },
+    deps
+  );
+  if (!delivery.ok) return { status: "MAILBOX_CORRELATION_UNAVAILABLE", reason: delivery.reason || delivery.code };
+  if (delivery.ambiguous) {
+    const ambiguity = await recordMailboxAmbiguity(client, stage, title, packageInfo, delivery, correlationId);
+    return { status: "AMBIGUOUS_CORRELATION", delivery, ambiguity };
+  }
+  if (!delivery.found) return { status: "NO_MAILBOX_DELIVERY_EVIDENCE", delivery };
+
+  const repair = await recordMailboxCorrelation(client, stage, title, gate, packageInfo, delivery, correlationId);
+  const responseReader = deps.readResponseEvidence || readPublishingMailboxReply;
+  const response = await responseReader(
+    {
+      subjectContains,
+      afterIso: delivery.deliveredAt || delivery.receivedDateTime || schedule.cadenceStartedAt
+    },
+    deps
+  );
+  if (response.ok && response.found) {
+    const classification = classifyAuthorReviewResponse(response.bodyText || "");
+    const responseRepair = await recordAuthorResponseCorrelation(client, stage, gate, response, classification, correlationId);
+    return { status: "MAILBOX_DELIVERY_REPAIRED_WITH_RESPONSE", delivery, repair, response, responseRepair, responseClassification: classification };
+  }
+  return { status: "MAILBOX_DELIVERY_REPAIRED", delivery, repair, response };
 }
 
 async function latestPackageCompletionLog(client, stageId) {
@@ -218,7 +364,7 @@ async function recordDueSystemAttention(client, stage, title, packageInfo, sched
   return { idempotent: false, logId };
 }
 
-async function processCadenceLog(client, cadenceLog, now, correlationId) {
+async function processCadenceLog(client, cadenceLog, now, correlationId, deps = {}) {
   const stageId = normalizeString(cadenceLog.jm1_sourcerecordid);
   if (!stageId) return { status: "SKIPPED", reason: "CADENCE_LOG_WITHOUT_STAGE", logId: cadenceLog.jm1_executionlogid };
   const stage = await getStage(client, stageId);
@@ -242,8 +388,15 @@ async function processCadenceLog(client, cadenceLog, now, correlationId) {
   const persisted = await persistSchedule(client, stage, title, gate, packageInfo, schedule, correlationId);
 
   if (schedule.due) {
+    const mailboxCorrelation = await correlateMailboxDelivery(client, stage, title, gate, packageInfo, schedule, correlationId, deps);
+    if (mailboxCorrelation.status === "MAILBOX_DELIVERY_REPAIRED" || mailboxCorrelation.status === "MAILBOX_DELIVERY_REPAIRED_WITH_RESPONSE") {
+      return { status: mailboxCorrelation.status, stageId, title: titleName(title), packageId: packageInfo.packageId, schedule, persisted, mailboxCorrelation };
+    }
+    if (mailboxCorrelation.status === "AMBIGUOUS_CORRELATION") {
+      return { status: "AMBIGUOUS_CORRELATION", stageId, title: titleName(title), packageId: packageInfo.packageId, schedule, persisted, mailboxCorrelation };
+    }
     const attention = await recordDueSystemAttention(client, stage, title, packageInfo, schedule, correlationId);
-    return { status: "DUE_SYSTEM_ATTENTION", stageId, title: title?.jm1pub_titlename || title?.jm1pub_name || "", packageId: packageInfo.packageId, schedule, persisted, attention };
+    return { status: "DUE_SYSTEM_ATTENTION", stageId, title: titleName(title), packageId: packageInfo.packageId, schedule, persisted, mailboxCorrelation, attention };
   }
 
   return { status: "SCHEDULED_AUTOMATIC_FUTURE", stageId, title: title?.jm1pub_titlename || title?.jm1pub_name || "", packageId: packageInfo.packageId, schedule, persisted };
@@ -261,13 +414,16 @@ async function runEditorialCadenceReleaseConsumer(options = {}, deps = {}) {
     const stageId = normalizeString(cadenceLog.jm1_sourcerecordid);
     if (stageId && processedStages.has(stageId)) continue;
     if (stageId) processedStages.add(stageId);
-    results.push(await processCadenceLog(client, cadenceLog, now, correlationId));
+    results.push(await processCadenceLog(client, cadenceLog, now, correlationId, deps));
   }
+  const deliveredRepaired = results.filter((item) => item.status === "MAILBOX_DELIVERY_REPAIRED" || item.status === "MAILBOX_DELIVERY_REPAIRED_WITH_RESPONSE").length;
+  const responsesReconciled = results.filter((item) => item.status === "MAILBOX_DELIVERY_REPAIRED_WITH_RESPONSE").length;
+  const ambiguous = results.filter((item) => item.status === "AMBIGUOUS_CORRELATION").length;
   await writeLog(client, {
     name: "EDITORIAL_CADENCE_RELEASE_HEALTH_REFRESHED",
     actionType: "EDITORIAL_CADENCE_RELEASE_HEALTH_REFRESHED",
     description:
-      `Cadence release health refreshed. Schedules examined ${cadenceLogs.length}; unique ${results.length}; scheduled ${results.filter((item) => item.status === "SCHEDULED_AUTOMATIC_FUTURE").length}; due-system-attention ${results.filter((item) => item.status === "DUE_SYSTEM_ATTENTION").length}; already-released ${results.filter((item) => item.status === "ALREADY_RELEASED").length}. Correlation ${correlationId}.`,
+      `Cadence release health refreshed. Schedules examined ${cadenceLogs.length}; unique ${results.length}; scheduled ${results.filter((item) => item.status === "SCHEDULED_AUTOMATIC_FUTURE").length}; due-system-attention ${results.filter((item) => item.status === "DUE_SYSTEM_ATTENTION").length}; already-released ${results.filter((item) => item.status === "ALREADY_RELEASED").length}; mailbox-delivery-repaired ${deliveredRepaired}; author-responses-reconciled ${responsesReconciled}; ambiguous ${ambiguous}. Correlation ${correlationId}.`,
     sourceEntity: "jm1_editorial_cadence_release_runtime",
     sourceRecordId: correlationId
   });
@@ -279,6 +435,9 @@ async function runEditorialCadenceReleaseConsumer(options = {}, deps = {}) {
     scheduled: results.filter((item) => item.status === "SCHEDULED_AUTOMATIC_FUTURE").length,
     dueSystemAttention: results.filter((item) => item.status === "DUE_SYSTEM_ATTENTION").length,
     alreadyReleased: results.filter((item) => item.status === "ALREADY_RELEASED").length,
+    deliveredRepaired,
+    responsesReconciled,
+    ambiguous,
     results
   };
 }
@@ -289,6 +448,7 @@ module.exports = {
   STAGE_BASELINE_BUSINESS_DAYS,
   addBusinessDays,
   buildSchedule,
+  correlateMailboxDelivery,
   normalizeStageCode,
   parsePackage,
   remainingHoldDuration,
