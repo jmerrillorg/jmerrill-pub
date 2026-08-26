@@ -14,7 +14,7 @@ export const OUT_DIR = 'docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILO
 export const PR567_MERGE_SHA = '01f157c85650ecf6802f02148b9337b69a90aa88'
 export const PRODUCTION_HEALTH_URL = 'https://jmerrill.pub/api/health'
 export const RELAY_ROUTE = 'send-approved-author-response'
-export const AUTHOR_SUBJECT = 'Set Up Your J Merrill Publishing Royalty Payments'
+export const AUTHOR_SUBJECT = 'Set Up Direct Deposit with J Merrill Publishing'
 export const MAX_PILOT_AUTHORS = 3
 
 const ENTITY_PAYEE_PATTERN = /\b(LLC|L\.L\.C\.|INC|INC\.|CORP|CORPORATION|COMPANY|CO\.|FOUNDATION|MINISTRIES|CHURCH|TRUST|ESTATE)\b/i
@@ -399,7 +399,7 @@ async function sendAuthorInvitation({ identity, linkUrl, expiresAt }) {
       authorEmail: identity.authorEmail,
       to: identity.authorEmail,
       authorName: identity.authorName,
-      projectTitle: 'Author Royalty Payments',
+      projectTitle: 'Direct Deposit Setup',
       subject: AUTHOR_SUBJECT,
       body: text,
       htmlBody: html,
@@ -435,13 +435,13 @@ function buildTextInvitation(identity, linkUrl) {
   return [
     `Good day ${firstName(identity.authorName)},`,
     '',
-    'J Merrill Publishing is updating the secure system used to send author royalty payments.',
+    'J Merrill Publishing is setting up secure direct deposit for author payments.',
     '',
-    'Stripe Connect will securely collect and verify your payout and tax information. Please do not send banking or tax information by email.',
+    'Stripe Connect will securely collect and verify your banking, tax, and identity information. Please do not send banking or tax information by email.',
     '',
-    'Completing setup now helps avoid future royalty-payment delays.',
+    'You do not need a separate J Merrill Publishing code for this setup. If Stripe asks for a verification code, that code comes from Stripe.',
     '',
-    `Set up your royalty payments: ${linkUrl}`,
+    `Set up direct deposit: ${linkUrl}`,
     '',
     'If you have questions, simply reply to this message and the Publishing Team will help.',
     '',
@@ -461,11 +461,11 @@ function buildHtmlInvitation(identity, linkUrl) {
       </div>
       <div style="padding:28px;">
         <p>Good day ${escapeHtml(firstName(identity.authorName))},</p>
-        <p>J Merrill Publishing is updating the secure system used to send author royalty payments.</p>
-        <p>Stripe Connect will securely collect and verify your payout and tax information. Please do not send banking or tax information by email.</p>
-        <p>Completing setup now helps avoid future royalty-payment delays.</p>
+        <p>J Merrill Publishing is setting up secure direct deposit for author payments.</p>
+        <p>Stripe Connect will securely collect and verify your banking, tax, and identity information. Please do not send banking or tax information by email.</p>
+        <p>You do not need a separate J Merrill Publishing code for this setup. If Stripe asks for a verification code, that code comes from Stripe.</p>
         <p style="margin:28px 0;">
-          <a href="${escapeHtml(linkUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:6px;">Set Up Your Royalty Payments</a>
+          <a href="${escapeHtml(linkUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:6px;">Set Up Direct Deposit</a>
         </p>
         <p>If you have questions, simply reply to this message and the Publishing Team will help.</p>
         <p>With care,<br>J Merrill Publishing</p>
