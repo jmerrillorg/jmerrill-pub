@@ -41,6 +41,20 @@ const {
   reconcileIllustrationLegacyOffering,
   buildEditionReadiness
 } = require("../src/production/productionPipelineV2Doctrine");
+const {
+  auditBlock05Requirements,
+  buildBlock06HandoffPackage,
+  createProductionMaster,
+  createProductionScopeLock,
+  evaluateCrossFormatSynchronization,
+  evaluateFinalProductionCertification,
+  evaluateProductionEntryGate,
+  evaluateWorkstream,
+  runBypassTests,
+  runSyntheticCommissioningMatrix,
+  validateArtifactBoundApproval,
+  validateIdentifierAuthority
+} = require("../src/production/block05ProductionCommissioning");
 
 describe("JM1 Production Pipeline v2.0 doctrine", () => {
   test("starts interior layout and cover design in parallel after proofreading approval", () => {
@@ -538,5 +552,168 @@ describe("JM1 Production Pipeline v2.0 doctrine", () => {
     assert.equal(result.canonicalMapping, "ILL");
     assert.equal(result.duplicationRisk, true);
     assert.equal(result.JackieDecisionRequired, true);
+  });
+
+  test("Block 05 requirement lineage separates current/refined canon from superseded distribution activity", () => {
+    const audit = auditBlock05Requirements();
+    assert.equal(audit.length >= 13, true);
+    assert.equal(audit.every((row) => row.canProceedToRuntime === true), true);
+    assert.equal(audit.every((row) => row.auditStatus === "IMPLEMENTED_ENFORCED"), true);
+    assert.equal(audit.find((row) => row.domain === "Distribution Readiness / Mock Distribution").lineage, "REFINED");
+  });
+
+  test("Block 05 entry gate fails closed without semantic editorial handoff authority", () => {
+    const blocked = evaluateProductionEntryGate({
+      productionReady: true,
+      finalEditorialManuscript: { artifactId: "final.docx", checksum: "a".repeat(64), authority: "FILENAME" }
+    });
+    assert.equal(blocked.ok, false);
+    assert.equal(blocked.missing.includes("finalEditorialCertified"), true);
+    assert.equal(blocked.missing.includes("SEMANTIC_ARTIFACT_AUTHORITY"), true);
+
+    const ready = evaluateProductionEntryGate({
+      finalEditorialCertified: true,
+      productionReady: true,
+      finalEditorialManuscript: { artifactId: "artifact-1", checksum: "a".repeat(64), authority: "FINAL_EDITORIAL_CERTIFICATION" },
+      finalEditorialChecksum: "a".repeat(64),
+      editorialApprovalsComplete: true,
+      styleSheetAvailable: true,
+      productionNotesAvailable: true,
+      activeTitleProject: true,
+      formatEntitlementsResolved: true
+    });
+    assert.equal(ready.event, "PRODUCTION_ENTRY_READY");
+  });
+
+  test("Block 05 creates immutable lineage-bound Production Master and scope lock", () => {
+    const scope = createProductionScopeLock({
+      titleId: "title-1",
+      packageVersion: "JMP-PKG-STARTER-v1",
+      formats: [{ productFormCode: "PF_01", packageEntitlement: true, required: true }]
+    });
+    assert.equal(scope.ok, true);
+    assert.match(scope.lock.checksum, /^[0-9a-f]{64}$/);
+
+    const blockedScope = createProductionScopeLock({
+      titleId: "title-1",
+      packageVersion: "JMP-PKG-STARTER-v1",
+      formats: [{ productFormCode: "PF_01", packageEntitlement: true, required: true }],
+      silentExpansion: true
+    });
+    assert.equal(blockedScope.ok, false);
+    assert.equal(blockedScope.missing.includes("SCOPE_CHANGE_AUTHORITY"), true);
+
+    const master = createProductionMaster({
+      finalEditorialManuscript: { artifactId: "final-editorial", checksum: "a".repeat(64) }
+    });
+    assert.equal(master.ok, true);
+    assert.equal(master.productionMaster.derivedFrom, "final-editorial");
+    assert.equal(master.productionMaster.contentFrozen, true);
+
+    const mutation = createProductionMaster({
+      finalEditorialManuscript: { artifactId: "final-editorial", checksum: "a".repeat(64) },
+      mutateFinalEditorial: true
+    });
+    assert.equal(mutation.ok, false);
+    assert.equal(mutation.missing.includes("FINAL_EDITORIAL_IMMUTABILITY"), true);
+  });
+
+  test("Block 05 workstream approvals are artifact-bound and do not confuse approval with technical pass", () => {
+    const approval = validateArtifactBoundApproval({
+      approvalId: "approval-1",
+      titleId: "title-1",
+      workstreamId: "cover",
+      artifactId: "cover-v3",
+      artifactChecksum: "a".repeat(64),
+      approvedBy: "Author",
+      approvedOn: "2026-08-26T00:00:00Z",
+      decision: "APPROVED"
+    });
+    assert.equal(approval.ok, true);
+
+    const changes = validateArtifactBoundApproval({
+      approvalId: "approval-1",
+      titleId: "title-1",
+      workstreamId: "cover",
+      artifactId: "cover-v3",
+      artifactChecksum: "a".repeat(64),
+      approvedBy: "Author",
+      approvedOn: "2026-08-26T00:00:00Z",
+      decision: "CHANGES_REQUESTED"
+    });
+    assert.equal(changes.ok, false);
+
+    const cover = evaluateWorkstream({
+      name: "COVER",
+      marketabilityPassed: true,
+      technicalValidationRequired: true,
+      technicalValidationPassed: false
+    });
+    assert.equal(cover.ok, false);
+    assert.equal(cover.missing.includes("TECHNICAL_VALIDATION"), true);
+    assert.equal(cover.missing.includes("COVER_TECHNICAL_PASS"), true);
+  });
+
+  test("Block 05 cross-format synchronization fails stale cover and stale derived assets closed", () => {
+    assert.equal(evaluateCrossFormatSynchronization({ pageCountChanged: true, coverRegenerated: false }).event, "CROSS_FORMAT_SYNCHRONIZATION_BLOCKED");
+    assert.equal(evaluateCrossFormatSynchronization({ productionMasterChanged: true, derivedAssetsRevalidated: false }).event, "CROSS_FORMAT_SYNCHRONIZATION_BLOCKED");
+    assert.equal(evaluateCrossFormatSynchronization({ coverPageCount: 250, finalPageCount: 275 }).event, "CROSS_FORMAT_SYNCHRONIZATION_BLOCKED");
+    assert.equal(evaluateCrossFormatSynchronization({ coverPageCount: 275, finalPageCount: 275 }).event, "CROSS_FORMAT_SYNCHRONIZATION_PASS");
+  });
+
+  test("Block 05 identifier authority respects publication intent and blocks cross-format ISBN reuse", () => {
+    const nonRelease = validateIdentifierAuthority({
+      publicationIntent: "COMMISSIONING",
+      formats: [{ productFormCode: "PF_01", required: true, requiresDistinctIsbn: true }],
+      identifiers: []
+    });
+    assert.equal(nonRelease.ok, true);
+    assert.equal(nonRelease.publicationIntent.isbnRequired, false);
+
+    const reuse = validateIdentifierAuthority({
+      publicationIntent: "COMMERCIAL_RELEASE",
+      formats: [{ productFormCode: "PF_01", required: true, requiresDistinctIsbn: true }, { productFormCode: "PF_02", required: true, requiresDistinctIsbn: true }],
+      identifiers: [{ format: "PF_01", identifier: "9780000000001", sourceAuthority: "REG" }, { format: "PF_02", identifier: "9780000000001", sourceAuthority: "REG" }]
+    });
+    assert.equal(reuse.ok, false);
+    assert.equal(reuse.missing.includes("CROSS_FORMAT_IDENTIFIER_REUSE"), true);
+  });
+
+  test("Block 05 final production certification and Block 06 handoff are deterministic and fail closed", () => {
+    const base = {
+      titleId: "title-1",
+      authorId: "author-1",
+      imprint: "J Merrill Publishing",
+      packageVersion: "pkg-v1",
+      publicationIntent: "NON_RELEASE",
+      formats: [{ productFormCode: "PF_01", required: true, requiresDistinctIsbn: true }],
+      identifiers: [],
+      scopeLockComplete: true,
+      workstreams: [{ name: "INTERIOR", required: true, state: "CERTIFIED" }, { name: "COVER", required: true, state: "CERTIFIED" }],
+      authorApprovalsComplete: true,
+      technicalValidationsPass: true,
+      finalArtifacts: [{ artifactId: "final-print", checksum: "b".repeat(64) }],
+      checksumsVerified: true,
+      publicationMetadataReady: true,
+      accessibilitySatisfiedOrGoverned: true,
+      handoffPackageComplete: true
+    };
+    assert.equal(evaluateFinalProductionCertification(base).event, "PUBLICATION_ASSETS_READY");
+    const handoff = buildBlock06HandoffPackage(base);
+    assert.equal(handoff.ok, true);
+    assert.match(handoff.handoffPackage.checksum, /^[0-9a-f]{64}$/);
+
+    const forbidden = evaluateFinalProductionCertification({ ...base, attemptedActions: ["DISTRIBUTION_SUBMISSION"] });
+    assert.equal(forbidden.ok, false);
+    assert.equal(forbidden.missing.includes("BLOCK05_DISTRIBUTION_SUBMISSION_FORBIDDEN"), true);
+  });
+
+  test("Block 05 deliberate bypass suite and synthetic commissioning matrix pass", () => {
+    const bypass = runBypassTests();
+    const synthetic = runSyntheticCommissioningMatrix();
+    assert.equal(bypass.ok, true);
+    assert.equal(bypass.count, 36);
+    assert.equal(synthetic.ok, true);
+    assert.equal(synthetic.count, 14);
   });
 });
