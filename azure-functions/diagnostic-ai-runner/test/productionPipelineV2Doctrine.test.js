@@ -61,6 +61,30 @@ const {
   validateArtifactBoundApproval,
   validateIdentifierAuthority
 } = require("../src/production/block05ProductionCommissioning");
+const {
+  auditBlock06Requirements,
+  buildBlock06FinalCertificationProbe,
+  buildBlock07Handoff,
+  completeSyntheticRelease,
+  createReleaseManifest,
+  evaluateAuthorReleaseConfirmation,
+  evaluateBlock06EntryGate,
+  evaluatePostFreezeChange,
+  evaluatePublisherReleaseAuthorization,
+  freezeReleasePackage,
+  routeReadinessRemediation,
+  runBlock06BypassTests,
+  runBlock06SyntheticCommissioningMatrix,
+  runFinalBlock06Commissioning,
+  runFinalReleaseReadinessCertification,
+  validateAssetMetadataConsistency,
+  validateChannelRoutes,
+  validateFormatEditionReconciliation,
+  validateIdentifierConsistency,
+  validatePublicationDate,
+  validateRetailEconomics,
+  validateRightsTerritories
+} = require("../src/release/releaseReadinessCommissioning");
 
 describe("JM1 Production Pipeline v2.0 doctrine", () => {
   test("starts interior layout and cover design in parallel after proofreading approval", () => {
@@ -795,5 +819,137 @@ describe("JM1 Production Pipeline v2.0 doctrine", () => {
     assert.equal(probe.negativeFailures.length, 0);
     assert.equal(probe.bypassFailures.length, 0);
     assert.equal(probe.syntheticFailures.length, 0);
+  });
+
+  test("Block 06 entry starts only from the commissioned Block 05 handoff and respects non-release intent", () => {
+    const base = completeSyntheticRelease();
+    assert.equal(evaluateBlock06EntryGate(base).event, "RELEASE_READINESS_ENTRY_READY");
+
+    const blocked = evaluateBlock06EntryGate({ ...base, finalProductionCertified: false });
+    assert.equal(blocked.ok, false);
+    assert.equal(blocked.missing.includes("FINAL_PRODUCTION_CERTIFIED"), true);
+
+    const nonRelease = evaluateBlock06EntryGate({ ...base, publicationIntent: "NON_RELEASE", identifiers: [], pricing: [], routes: [], rights: [] });
+    assert.equal(nonRelease.ok, true);
+    assert.equal(nonRelease.event, "BLOCK06_NOT_APPLICABLE_FOR_NON_RELEASE");
+  });
+
+  test("Block 06 creates an exact versioned Release Manifest with immutable snapshots", () => {
+    const manifest = createReleaseManifest(completeSyntheticRelease());
+
+    assert.equal(manifest.ok, true);
+    assert.equal(manifest.manifest.status, "RELEASE_CANDIDATE");
+    assert.equal(manifest.manifest.formats.length, 1);
+    assert.match(manifest.manifest.checksum, /^[0-9a-f]{64}$/);
+
+    const blocked = createReleaseManifest({ titleId: "t" });
+    assert.equal(blocked.ok, false);
+    assert.equal(blocked.missing.includes("RELEASE_VERSION"), true);
+    assert.equal(blocked.missing.includes("RIGHTS_SNAPSHOT"), true);
+  });
+
+  test("Block 06 format, asset, metadata, and identifier reconciliation fails closed", () => {
+    const base = completeSyntheticRelease();
+
+    assert.equal(validateFormatEditionReconciliation(base).event, "FORMAT_EDITION_RECONCILED");
+    assert.equal(validateFormatEditionReconciliation({ ...base, assets: [] }).ok, false);
+    assert.equal(validateAssetMetadataConsistency({ ...base, assets: [{ ...base.assets[0], title: "Wrong Title" }] }).ok, false);
+    assert.equal(validateIdentifierConsistency({ ...base, identifiers: [{ format: "PAPERBACK", identifier: "1", coverIdentifier: "2", copyrightIdentifier: "1", metadataIdentifier: "1", sourceAuthority: "REG" }] }).ok, false);
+  });
+
+  test("Block 06 rights, economics, routes, and publication dates are hard gates", () => {
+    const base = completeSyntheticRelease();
+
+    assert.equal(validateRightsTerritories(base).event, "RIGHTS_TERRITORIES_VALID");
+    assert.equal(validateRightsTerritories({ ...base, rights: [{ ...base.rights[0], sourceAgreement: "" }] }).ok, false);
+    assert.equal(validateRetailEconomics(base).event, "RETAIL_ECONOMICS_VALID");
+    assert.equal(validateRetailEconomics({ ...base, pricing: [{ ...base.pricing[0], retailPrice: 5, manufacturingCost: 8 }] }).ok, false);
+    assert.equal(validateChannelRoutes(base).event, "CHANNEL_ROUTES_VALID");
+    assert.equal(validateChannelRoutes({ ...base, routes: [{ ...base.routes[0], valid: false }] }).ok, false);
+    assert.equal(validatePublicationDate(base).event, "PUBLICATION_DATE_LOCKED");
+    assert.equal(validatePublicationDate({ ...base, targetPublicationDate: "2026-10-07T00:00:00Z" }).ok, false);
+  });
+
+  test("Block 06 author confirmation and Publisher authorization bind to exact manifest versions", () => {
+    const base = completeSyntheticRelease();
+    const manifest = createReleaseManifest(base).manifest;
+    const input = { ...base, releaseManifestId: manifest.releaseManifestId, releaseVersion: manifest.releaseVersion };
+
+    assert.equal(evaluateAuthorReleaseConfirmation(input).event, "AUTHOR_RELEASE_CONFIRMED");
+    assert.equal(evaluateAuthorReleaseConfirmation({ ...input, manifestMateriallyChanged: true }).ok, false);
+    assert.equal(evaluatePublisherReleaseAuthorization(input, []).event, "PUBLISHER_RELEASE_AUTHORIZED");
+    assert.equal(evaluatePublisherReleaseAuthorization(input, [{ domain: "RIGHTS" }]).ok, false);
+  });
+
+  test("Block 06 freeze, certificate, and Block 07 handoff preserve frozen manifest authority", () => {
+    const final = runFinalReleaseReadinessCertification();
+
+    assert.equal(final.ok, true);
+    assert.equal(final.preDistributionCertified, true);
+    assert.equal(final.distributionAuthorized, true);
+    assert.equal(final.freeze.event, "RELEASE_PACKAGE_FROZEN");
+    assert.equal(final.certificate.event, "RELEASE_READINESS_CERTIFICATE_CREATED");
+    assert.equal(final.block07Handoff.event, "BLOCK07_HANDOFF_PACKAGE_READY");
+    assert.equal(final.block07Handoff.handoff.distributionAuthorized, true);
+
+    const blockedHandoff = buildBlock07Handoff({
+      frozenManifest: final.freeze.frozenManifest,
+      certificate: final.certificate.certificate,
+      preDistributionCertified: true,
+      block07ReadsLatestMutableFields: true
+    });
+    assert.equal(blockedHandoff.ok, false);
+    assert.equal(blockedHandoff.missing.includes("BLOCK07_MUTABLE_LATEST_FORBIDDEN"), true);
+
+    assert.equal(freezeReleasePackage({ manifest: final.releaseManifest.manifest, postFreezeMutationAttempted: true }, { blockers: [] }).ok, false);
+    assert.equal(evaluatePostFreezeChange({ type: "IDENTIFIER_CHANGE" }).recertificationImpact, "FULL_RECERTIFICATION");
+  });
+
+  test("Block 06 deliberate bypass suite and synthetic commissioning matrix pass", () => {
+    const bypass = runBlock06BypassTests();
+    const synthetic = runBlock06SyntheticCommissioningMatrix();
+
+    assert.equal(bypass.ok, true);
+    assert.equal(bypass.count, 37);
+    assert.equal(synthetic.ok, true);
+    assert.equal(synthetic.count, 33);
+  });
+
+  test("Block 06 final commissioning registers every release-readiness domain and forbids downstream mutations", () => {
+    const commissioning = runFinalBlock06Commissioning();
+
+    assert.equal(commissioning.ok, true);
+    assert.equal(commissioning.classification, "RELEASE_READINESS_FULLY_COMMISSIONED");
+    assert.equal(commissioning.registerSummary.totalDomains, 28);
+    assert.equal(commissioning.registerSummary.commissioned, 28);
+    assert.equal(commissioning.finalCertification.distributionAuthorized, true);
+    assert.equal(commissioning.negativeProof.distribution_submission_performed_in_block06, 0);
+    assert.equal(commissioning.negativeProof.retailer_activation, 0);
+    assert.equal(commissioning.negativeProof.payment_activity, 0);
+    assert.equal(commissioning.negativeProof.Business_Central_payment_mutation, 0);
+    assert.equal(commissioning.realTitles[0].classification, "COMMISSIONING_NON_RELEASE_BLOCK06_NA");
+  });
+
+  test("Block 06 audit and remediation preserve current canon and targeted revalidation", () => {
+    const audit = auditBlock06Requirements();
+    const remediation = routeReadinessRemediation({ domain: "IDENTIFIER" });
+
+    assert.equal(audit.length >= 18, true);
+    assert.equal(audit.filter((row) => row.auditStatus === "IMPLEMENTED_ENFORCED").length >= 14, true);
+    assert.equal(remediation.ok, true);
+    assert.equal(remediation.resetsUnrelatedPassedDomains, false);
+  });
+
+  test("Block 06 final certification Function probe returns release readiness fully commissioned", () => {
+    const probe = buildBlock06FinalCertificationProbe();
+
+    assert.equal(probe.status, "ready");
+    assert.equal(probe.classification, "RELEASE_READINESS_FULLY_COMMISSIONED");
+    assert.equal(probe.domains.totalDomains, 28);
+    assert.equal(probe.bypass.failures, 0);
+    assert.equal(probe.synthetic.failures, 0);
+    assert.equal(probe.negative.failures.length, 0);
+    assert.equal(probe.finalEvent, "DISTRIBUTION_AUTHORIZED");
+    assert.equal(probe.handoff, "BLOCK07_HANDOFF_PACKAGE_READY");
   });
 });
