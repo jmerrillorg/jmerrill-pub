@@ -71,7 +71,8 @@ test("decided brands resolve to their own ACS sender and reply authority", () =>
     ["JMP", "publishing@email.jmerrill.one", "publishing@jmerrill.one"],
     ["JMF", "financial@email.jmerrill.one", "financial@jmerrill.one"],
     ["JMFN", "foundation@email.jmerrill.one", "foundation@jmerrill.one"],
-    ["JMPRODUCTIONS", "productions@email.jmerrill.one", "productions@jmerrill.one"]
+    ["JMPRODUCTIONS", "productions@email.jmerrill.one", "productions@jmerrill.one"],
+    ["AIC", "aic@email.agapeic.org", "aic@agapeic.org"]
   ]) {
     const result = validateEnterprisePayload(validPayload({
       brand,
@@ -93,11 +94,70 @@ test("wrong brand sender fails closed instead of falling back to Publishing", ()
   assert.equal(result.reason, "ACS_BRAND_SENDER_MISMATCH");
 });
 
-test("AIC sender remains Founder decision required", () => {
+test("AIC routine service communication uses governed sender and reply path", () => {
   const { validateEnterprisePayload } = loadEnterpriseRelayModule();
-  const result = validateEnterprisePayload(validPayload({ brand: "AIC" }));
+  const result = validateEnterprisePayload(validPayload({
+    brand: "AIC",
+    subject: "Your Agape International Cathedral update",
+    plainText: "Good day. We are sending this because your service reminder is ready. We look forward to worshiping together.",
+    html: "<!doctype html><html><body><p>Good day.</p><p>We are sending this because your service reminder is ready.</p><p>We look forward to worshiping together.</p><p>Agape International Cathedral</p></body></html>"
+  }));
+  assert.equal(result.ok, true);
+  assert.equal(result.value.senderAddress, "aic@email.agapeic.org");
+  assert.equal(result.value.replyTo, "aic@agapeic.org");
+  assert.equal(result.value.profile.replyMailboxAuthority, "aic@agapeic.org");
+});
+
+test("AIC permits one signature in each multipart body representation", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  const result = validateEnterprisePayload(validPayload({
+    brand: "AIC",
+    subject: "Your Agape International Cathedral update",
+    plainText: "Good day. This service reminder is ready.\n\nAgape International Cathedral",
+    html: "<!doctype html><html><body><p>Good day.</p><p>This service reminder is ready.</p><p>Agape International Cathedral</p></body></html>"
+  }));
+  assert.equal(result.ok, true);
+});
+
+test("AIC cannot use another JM1 brand sender", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  for (const senderAddress of ["publishing@email.jmerrill.one", "one@email.jmerrill.one"]) {
+    const result = validateEnterprisePayload(validPayload({
+      brand: "AIC",
+      senderAddress,
+      replyTo: "aic@agapeic.org"
+    }));
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "ACS_BRAND_SENDER_MISMATCH");
+  }
+});
+
+test("AIC fails closed for wrong ministry context and Planning Center sender-authority misuse", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  const wrongContext = validateEnterprisePayload(validPayload({
+    brand: "AIC",
+    relationshipContextValid: false
+  }));
+  assert.equal(wrongContext.ok, false);
+  assert.equal(wrongContext.reason, "ACS_RELATIONSHIP_CONTEXT_MISMATCH");
+
+  const planningCenterSenderAuthority = validateEnterprisePayload(validPayload({
+    brand: "AIC",
+    planningCenterAsSenderAuthority: true
+  }));
+  assert.equal(planningCenterSenderAuthority.ok, false);
+  assert.equal(planningCenterSenderAuthority.reason, "ACS_PLANNING_CENTER_AUTHORITY_MISMATCH");
+});
+
+test("AIC sensitive pastoral, legal, or financial context requires human review", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  const result = validateEnterprisePayload(validPayload({
+    brand: "AIC",
+    plainText: "Please review this confidential pastoral care update.",
+    html: "<!doctype html><html><body><p>Please review this confidential pastoral care update.</p><p>Agape International Cathedral</p></body></html>"
+  }));
   assert.equal(result.ok, false);
-  assert.equal(result.reason, "AIC_SENDER_IDENTITY_FOUNDER_DECISION_REQUIRED");
+  assert.equal(result.reason, "HUMAN_REVIEW_REQUIRED_AIC_SENSITIVE_CONTEXT");
 });
 
 test("Publishing requires visibility CC on the shared relay", () => {
