@@ -1,0 +1,36 @@
+# Negative Proof
+
+Last Verified: 2026-08-26
+
+```text
+block06_creates_new_publication_asset_as_normal_work = 0
+block06_repeats_block05_author_asset_approval = 0
+distribution_readiness_score_alone_authorizes_release = 0
+high_score_overrides_hard_blocker = 0
+territory_invented_without_contractual_authority = 0
+distribution_route_exceeds_rights_grant = 0
+format_without_certified_asset = 0
+certified_asset_without_reconciled_format = 0
+identifier_mismatch_allowed_to_release = 0
+metadata_mismatch_allowed_to_release = 0
+retail_economics_invalid_but_release_authorized = 0
+returnability_hidden_as_manual_distributor_guess = 0
+channel_route_selected_inside_block07_without_block06_authority = 0
+publication_date_locked_without_feasibility_check = 0
+postfreeze_change_mutates_manifest_silently = 0
+author_confirmation_transfers_to_materially_changed_manifest = 0
+publisher_authorization_transfers_to_materially_changed_manifest = 0
+required_accessibility_failure_ignored = 0
+system_hold_mislabeled_as_author_hold = 0
+notification_failure_loses_readiness_state = 0
+targeted_rework_resets_unrelated_passed_domains_without_need = 0
+release_manifest_reads_latest_mutable_files_during_block07 = 0
+distribution_submission_performed_in_block06 = 0
+legacy_release_history_fabricated = 0
+payment_activity = 0
+royalty_activity = 0
+Business_Central_payment_mutation = 0
+retailer_activation = 0
+launch_execution = 0
+```
+
