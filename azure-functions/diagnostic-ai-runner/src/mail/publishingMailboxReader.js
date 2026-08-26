@@ -121,13 +121,13 @@ function sha256Buffer(buffer) {
  * after `afterIso`, requesting only the fields needed for filtering and
  * classification. GET only — no other Graph verb is ever used.
  */
-async function fetchRecentInboxMessages(token, afterIso, deps = {}) {
+async function fetchRecentFolderMessages(token, folder, afterIso, deps = {}) {
   const filter = encodeURIComponent(`receivedDateTime ge ${afterIso}`);
   const select = encodeURIComponent(
     "id,internetMessageId,subject,from,toRecipients,ccRecipients,receivedDateTime,bodyPreview,body,conversationId,hasAttachments"
   );
   const url =
-    `${GRAPH_BASE}/users/${encodeURIComponent(PUBLISHING_MAILBOX)}/mailFolders/inbox/messages` +
+    `${GRAPH_BASE}/users/${encodeURIComponent(PUBLISHING_MAILBOX)}/mailFolders/${encodeURIComponent(folder)}/messages` +
     `?$filter=${filter}&$select=${select}&$orderby=receivedDateTime desc&$top=${MAX_MESSAGES_FETCHED}`;
 
   const response = await getFetchImpl(deps)(url, {
@@ -148,6 +148,132 @@ async function fetchRecentInboxMessages(token, afterIso, deps = {}) {
 
   const body = await response.json().catch(() => ({}));
   return Array.isArray(body.value) ? body.value : [];
+}
+
+async function fetchRecentInboxMessages(token, afterIso, deps = {}) {
+  return fetchRecentFolderMessages(token, "inbox", afterIso, deps);
+}
+
+function safeMessage(message = {}, folder = "inbox") {
+  const senderAddress = normalizeString(message.from?.emailAddress?.address).toLowerCase();
+  const toRecipients = normalizeRecipients(message.toRecipients);
+  const ccRecipients = normalizeRecipients(message.ccRecipients);
+  const bodyText = normalizeString(message.body?.content) || normalizeString(message.bodyPreview) || "";
+  return {
+    folder,
+    inboundMessageId: normalizeString(message.id) || null,
+    internetMessageId: normalizeString(message.internetMessageId) || null,
+    conversationId: normalizeString(message.conversationId) || null,
+    subject: normalizeString(message.subject) || null,
+    senderAddress,
+    toRecipients,
+    ccRecipients,
+    receivedDateTime: normalizeString(message.receivedDateTime) || null,
+    hasAttachments: message.hasAttachments === true,
+    bodyText
+  };
+}
+
+function includesAny(haystack, needles) {
+  const source = normalizeString(haystack).toLowerCase();
+  return needles.map((item) => normalizeString(item).toLowerCase()).filter(Boolean).some((item) => source.includes(item));
+}
+
+function deliveryEvidenceConfidence(message, input) {
+  const haystack = `${message.subject || ""}\n${message.bodyText || ""}`;
+  const packageId = normalizeString(input.packageId);
+  const artifactId = normalizeString(input.artifactId);
+  const title = normalizeString(input.title);
+  const stage = normalizeString(input.stage);
+  const recipient = normalizeString(input.recipient).toLowerCase();
+  const exact = [];
+  const supporting = [];
+  const recipients = [...message.toRecipients, ...message.ccRecipients];
+
+  if (recipient && !recipients.includes(recipient)) return { ok: false, confidence: "LOW", exact, supporting };
+
+  if (packageId && includesAny(haystack, [packageId])) exact.push("PACKAGE_ID");
+  if (artifactId && includesAny(haystack, [artifactId])) exact.push("ARTIFACT_ID");
+  if (recipient && recipients.includes(recipient)) exact.push("RECIPIENT");
+  if (title && includesAny(haystack, [title])) supporting.push("TITLE");
+  if (stage && includesAny(haystack, [stage])) supporting.push("STAGE");
+
+  if (exact.includes("PACKAGE_ID") || exact.includes("ARTIFACT_ID")) return { ok: true, confidence: "HIGH", exact, supporting };
+  if (exact.includes("RECIPIENT") && supporting.length >= 2) return { ok: true, confidence: "HIGH", exact, supporting };
+  if (exact.includes("RECIPIENT") && supporting.length >= 1) return { ok: true, confidence: "MEDIUM", exact, supporting };
+  if (supporting.length >= 2) return { ok: true, confidence: "MEDIUM", exact, supporting };
+  return { ok: false, confidence: "LOW", exact, supporting };
+}
+
+/**
+ * Reads governed Publishing mailbox evidence that an author package was
+ * already delivered. This is read-only and searches only publishing@jmerrill.one.
+ * It intentionally admits internal Publishing/ACS senders because delivery
+ * evidence often reaches the governed mailbox through the required CC copy.
+ */
+async function readPublishingMailboxDeliveryEvidence(input = {}, deps = {}) {
+  const subjectContains = normalizeString(input.subjectContains);
+  const afterIso = normalizeString(input.afterIso);
+  if (!subjectContains) return blocked("SUBJECT_FILTER_MISSING", { found: false, ambiguous: false });
+  if (!afterIso || Number.isNaN(Date.parse(afterIso))) return blocked("AFTER_TIMESTAMP_INVALID", { found: false, ambiguous: false });
+  if (!isGateOpen()) return blocked("GATE_CLOSED", { gate: GATE_NAME, found: false, ambiguous: false });
+
+  let token;
+  try {
+    token = await getGraphToken(deps);
+  } catch (err) {
+    return blocked(err.safeCode || "GRAPH_AUTH_FAILED", { found: false, ambiguous: false });
+  }
+
+  let messages;
+  try {
+    const inbox = await fetchRecentFolderMessages(token, "inbox", afterIso, deps);
+    const sent = await fetchRecentFolderMessages(token, "sentitems", afterIso, deps);
+    messages = [
+      ...inbox.map((message) => safeMessage(message, "inbox")),
+      ...sent.map((message) => safeMessage(message, "sentitems"))
+    ];
+  } catch (err) {
+    return blocked(err.safeCode || "GRAPH_MAILBOX_READ_FAILED", { httpStatus: err.httpStatus || null, found: false, ambiguous: false });
+  }
+
+  const subjectLower = subjectContains.toLowerCase();
+  const candidates = messages
+    .filter((message) => normalizeString(message.subject).toLowerCase().includes(subjectLower))
+    .map((message) => ({ message, match: deliveryEvidenceConfidence(message, input) }))
+    .filter((candidate) => candidate.match.ok)
+    .sort((a, b) => new Date(b.message.receivedDateTime || 0).getTime() - new Date(a.message.receivedDateTime || 0).getTime());
+
+  if (candidates.length === 0) {
+    return { ok: true, code: "NO_DELIVERY_EVIDENCE_FOUND", found: false, ambiguous: false, sourceMailbox: PUBLISHING_MAILBOX };
+  }
+
+  const topHasPackageOrArtifact = candidates[0]?.match?.exact?.includes("PACKAGE_ID") || candidates[0]?.match?.exact?.includes("ARTIFACT_ID");
+  if (candidates.length > 1 && !topHasPackageOrArtifact) {
+    return {
+      ok: true,
+      code: "AMBIGUOUS_DELIVERY_EVIDENCE",
+      found: false,
+      ambiguous: true,
+      sourceMailbox: PUBLISHING_MAILBOX,
+      candidateCount: candidates.length
+    };
+  }
+
+  const latest = candidates[0];
+  return {
+    ok: true,
+    code: "DELIVERY_EVIDENCE_FOUND",
+    found: true,
+    ambiguous: false,
+    sourceMailbox: PUBLISHING_MAILBOX,
+    deliveryStatus: "DELIVERED",
+    correlationSource: "PUBLISHING_MAILBOX",
+    correlationConfidence: latest.match.confidence,
+    matchEvidence: [...latest.match.exact, ...latest.match.supporting],
+    ...latest.message,
+    deliveredAt: latest.message.receivedDateTime
+  };
 }
 
 async function fetchMessageAttachmentMetadata(token, messageId, deps = {}) {
@@ -386,6 +512,7 @@ async function fetchPublishingMailboxMessageAttachment(input = {}, deps = {}) {
 
 module.exports = {
   readPublishingMailboxReply,
+  readPublishingMailboxDeliveryEvidence,
   listPublishingMailboxMessageAttachments,
   fetchPublishingMailboxMessageAttachment,
   GATE_NAME,
