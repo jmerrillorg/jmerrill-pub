@@ -56,7 +56,7 @@ test('pilot selection blocks when fewer than three first-time clean authors exis
 })
 
 test('author communication contract uses canonical subject and #567 merge authority', () => {
-  assert.equal(AUTHOR_SUBJECT, 'Set Up Your J Merrill Publishing Stripe Connect')
+  assert.equal(AUTHOR_SUBJECT, 'Set Up Direct Deposit with J Merrill Publishing')
   assert.match(PR567_MERGE_SHA, /^[0-9a-f]{40}$/)
 })
 

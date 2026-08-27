@@ -4,6 +4,12 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
 
+import {
+  STRIPE_CONNECT_REMINDER_POLICY_ID,
+  AUTOMATED_REMINDER_COUNT_MAX,
+  classifyConnectReminderEligibility,
+} from './stripe_connect_reminder_cadence.mjs'
+
 export const OUT_DIR = 'docs/operations/generated/JMP-STRIPE-CONNECT-POST-REMEDIATION-CLOSURE-2026-08-26'
 export const APP_RESOURCE_GROUP = 'rg-jm1-web-prod-premium'
 export const APP_NAME = 'app-jm1-pub-prod-v2'
@@ -339,15 +345,26 @@ let RAW_STRIPE_ACCOUNT_HASH_MAP = new Map()
 
 function buildReminderPlan(rows, logs, verifiedAt) {
   const recentLogs = logs.filter((log) => /STRIPE_CONNECT|Stripe Connect|Direct Deposit|ONBOARDING/i.test(`${log.jm1_actiontype || ''} ${log.jm1_actiondescription || ''}`))
-  const decisions = rows.map((row) => classifyReminderEligibility(row, recentLogs, verifiedAt))
+  const logsByContact = groupBy(recentLogs, (log) => cleanGuid(log.jm1_sourcerecordid))
+  const decisions = rows.map((row) => {
+    const history = logsByContact.get(row.contactId) || []
+    const initial = findInitialValidInvitationAt(history)
+    return classifyConnectReminderEligibility({
+      ...row,
+      initialValidInvitationAt: initial,
+    }, history, verifiedAt)
+  })
   return {
     verifiedAt,
-    cadenceStatus: 'CONNECT_REMINDER_CADENCE_FOUNDER_DECISION_REQUIRED',
+    policyId: STRIPE_CONNECT_REMINDER_POLICY_ID,
+    cadenceStatus: 'CANONICAL',
     cadenceNote:
-      'Repository search found setup repair/support evidence but not a canonical ongoing reminder interval. Same-day duplicate sends, setup-complete sends, active-support sends, under-review sends, and duplicate-review sends are blocked.',
+      `Automated setup reminders are governed by ${STRIPE_CONNECT_REMINDER_POLICY_ID}: Day 3, Day 7, and Day 14 after valid initial delivery, then automation stops. Same-day duplicate sends, setup-complete sends, active-support sends, under-review sends, identity-review sends, duplicate-review sends, and catch-up burst sends are blocked.`,
     decisions,
-    eligibleNow: decisions.filter((row) => row.disposition === 'ELIGIBLE_PENDING_CADENCE'),
-    notEligibleNow: decisions.filter((row) => row.disposition !== 'ELIGIBLE_PENDING_CADENCE'),
+    eligibleNow: decisions.filter((row) => row.send === true),
+    notEligibleNow: decisions.filter((row) => row.send !== true),
+    counts: countBy(decisions, (row) => row.disposition),
+    automatedReminderCountMax: AUTOMATED_REMINDER_COUNT_MAX,
     sent: 0,
   }
 }
@@ -366,7 +383,7 @@ function buildWatchdog(estate, reminder) {
       'duplicate_stripe_account',
       'metadata_only_account_link_missing',
       'active_support_without_owner',
-      'eligible_pending_cadence_after_founder_cadence_ruling',
+      'eligible_connect_reminder_not_sent_by_scheduler',
     ],
     sameDayReminderGuard: reminder.sent === 0 ? 'PASS' : 'CHECK',
   }
@@ -375,9 +392,7 @@ function buildWatchdog(estate, reminder) {
 function classifyResult(result) {
   if (!result.production.ready || !result.sourceParity.sourceContainsProductionHead) return 'STRIPE_CONNECT_POST_REMEDIATION_NOT_READY'
   if (result.estate.duplicateAccountGroups.length > 0) return 'STRIPE_CONNECT_POST_REMEDIATION_CONTROLLED'
-  if (result.reminder.cadenceStatus === 'CONNECT_REMINDER_CADENCE_FOUNDER_DECISION_REQUIRED') {
-    return 'STRIPE_CONNECT_POST_REMEDIATION_CONTROLLED'
-  }
+  if (result.reminder.cadenceStatus !== 'CANONICAL') return 'STRIPE_CONNECT_POST_REMEDIATION_CONTROLLED'
   return 'STRIPE_CONNECT_POST_REMEDIATION_FULLY_COMMISSIONED'
 }
 
@@ -399,6 +414,28 @@ function buildNegativeProof() {
     same_day_duplicate_reminders_sent: 0,
     setup_complete_authors_reminded: 0,
     support_active_authors_blindly_reminded: 0,
+    completed_author_reminded: 0,
+    under_review_author_reminded: 0,
+    active_support_author_auto_reminded: 0,
+    identity_review_author_reminded: 0,
+    duplicate_review_author_reminded: 0,
+    same_day_duplicate_reminder: 0,
+    same_stage_duplicate_reminder: 0,
+    multiple_catchup_reminders_sent_at_once: 0,
+    new_Connect_account_created_for_reminder: 0,
+    activation_code_reintroduced: 0,
+    royalty_amount_communicated: 0,
+    royalty_timing_communicated: 0,
+    royalty_schedule_communicated: 0,
+    payment_promise_communicated: 0,
+    payment_executed: 0,
+    payout_created: 0,
+    transfer_created: 0,
+    invoice_created: 0,
+    charge_created: 0,
+    PaymentIntent_created: 0,
+    marketing_consent_used_to_block_service_reminder: 0,
+    reminders_continue_after_Day_14: 0,
   }
 }
 
@@ -561,9 +598,23 @@ function reminderDoc(result) {
 
 Last Verified: ${result.verifiedAt}
 
+Policy: ${result.reminder.policyId}
+
 Cadence status: ${result.reminder.cadenceStatus}
 
 ${result.reminder.cadenceNote}
+
+| Cadence | Rule |
+| --- | --- |
+| Day 0 | Initial valid delivered setup invitation |
+| Day 3 | First automated reminder if current state remains reminder-eligible |
+| Day 7 | Second automated reminder if current state remains reminder-eligible |
+| Day 14 | Final automated reminder if current state remains reminder-eligible |
+| After Day 14 | Automated reminders stop; status remains visible for support/operator follow-up |
+
+| Disposition | Count |
+| --- | ---: |
+${Object.entries(result.reminder.counts || {}).sort().map(([key, value]) => `| ${key} | ${value} |`).join('\n')}
 
 | Author | State | Disposition | Reason |
 | --- | --- | --- | --- |
@@ -571,6 +622,15 @@ ${result.reminder.decisions.map((row) => `| ${esc(row.author)} | ${row.state} | 
 
 Reminder emails sent by this closure: ${result.reminder.sent}
 `
+}
+
+function findInitialValidInvitationAt(logs) {
+  const candidates = logs
+    .filter((log) => ['STRIPE_CONNECT_AUTHOR_ONBOARDING_INVITED', 'INITIAL_INVITATION'].includes(clean(log.jm1_actiontype)))
+    .map((log) => clean(log.createdon))
+    .filter(Boolean)
+    .sort()
+  return candidates[0] || ''
 }
 
 function supportDoc(result) {

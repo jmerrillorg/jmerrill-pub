@@ -140,6 +140,14 @@
         "negativeProof": "Wrong author/title binding, filename-as-artifact-authority, reconstructed handoff, author-wait misclassification, human gate bypass, MoonClerk new-payment path, payment before commercial gate, editorial/cadence/production/distribution/marketing/Block09 bypasses, real royalty/payment/Business Central commissioning mutations, historical fabrication, and returning-author history loss are denied."
       },
       {
+        "policyId": "JMP-STRIPE-CONNECT-REMINDER-CADENCE-v1",
+        "canonStatus": "CANON",
+        "runtimeStatus": "COMMISSIONING",
+        "implementation": "stripe_connect_reminder_cadence / stripe_connect_post_remediation_closure",
+        "liveProof": "Reminder cadence engine evaluates Day 3, Day 7, and Day 14 eligibility from valid initial invitation delivery, reads current setup state, blocks completed/review/support cases, and sends no catch-up burst.",
+        "negativeProof": "Completed authors, under-review authors, active-support authors, identity-review authors, duplicate-review authors, same-day duplicates, same-stage duplicates, new Connect accounts for reminders, activation-code prompts, royalty/payment language, and money movement are denied."
+      },
+      {
         "policyId": "JMP-DISTRIBUTION-AUTHORITY-v1.0",
         "canonStatus": "CANON",
         "runtimeStatus": "COMMISSIONED",
@@ -361,6 +369,20 @@
         "document-only whole-lifecycle assumptions",
         "block-level-only commissioning semantics",
         "stale handoff reconstruction"
+      ],
+      "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
+    },
+    {
+      "policyId": "JMP-STRIPE-CONNECT-REMINDER-CADENCE-v1",
+      "version": "1.0",
+      "status": "CANON",
+      "domain": "Stripe Connect direct-deposit setup reminders",
+      "enforcementClass": "PRE_SEND_STATE_AWARE_HARD_GATE",
+      "canonSource": "docs/governance/publishing/JMP-STRIPE-CONNECT-REMINDER-CADENCE-v1.md",
+      "resolver": "classifyConnectReminderEligibility",
+      "effectiveDate": "2026-08-27",
+      "supersedes": [
+        "CONNECT_REMINDER_CADENCE_FOUNDER_DECISION_REQUIRED"
       ],
       "ownerAuthority": "Jackie Smith, Jr. — Governance Authority"
     },
