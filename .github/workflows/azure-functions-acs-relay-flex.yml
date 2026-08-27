@@ -20,7 +20,7 @@ concurrency:
 env:
   NODE_VERSION: "24"
   AZURE_RESOURCE_GROUP: rg-jm1-communications
-  FUNCTION_APP_NAME: func-jm1-acs-email-relay-flex
+  FUNCTION_APP_NAME: func-jm1-acs-email-relay
   FUNCTION_APP_WORKING_DIR: azure-functions/acs-email-relay
 
 jobs:
