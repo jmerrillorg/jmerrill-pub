@@ -123,7 +123,10 @@ jobs:
           az functionapp config appsettings set \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$FUNCTION_APP_NAME" \
-            --settings "WEBSITE_RUN_FROM_PACKAGE=${package_url}?${package_sas}" \
+            --settings \
+              "WEBSITE_RUN_FROM_PACKAGE=${package_url}?${package_sas}" \
+              "JM1_RELEASE_SHA=${{ github.sha }}" \
+              "JM1_PRODUCTION_RELEASE_SHA=${{ github.sha }}" \
             -o none
 
           az functionapp restart \
