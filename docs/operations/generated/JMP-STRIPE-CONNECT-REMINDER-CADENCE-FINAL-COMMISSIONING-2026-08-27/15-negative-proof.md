@@ -1,0 +1,32 @@
+# Negative Proof
+
+| Assertion | Count |
+| --- | ---: |
+| corrective_Day0_resent | 0 |
+| old_broken_invitation_used_as_active_Day0 | 0 |
+| Day3_sent_early | 0 |
+| Day7_sent_early | 0 |
+| Day14_sent_early | 0 |
+| reminder_after_Day14 | 0 |
+| completed_author_reminded | 0 |
+| under_review_author_reminded | 0 |
+| active_support_author_reminded | 0 |
+| duplicate_stage_reminder | 0 |
+| same_day_duplicate | 0 |
+| new_Connect_account_created_for_reminder | 0 |
+| activation_code_reintroduced | 0 |
+| Stripe_readback_failure_treated_as_ineligible | 0 |
+| real_author_timestamp_mutated_for_test | 0 |
+| production_business_truth_fabricated | 0 |
+| royalty_amount_communicated | 0 |
+| royalty_timing_communicated | 0 |
+| royalty_schedule_communicated | 0 |
+| payment_promise_communicated | 0 |
+| payment_executed | 0 |
+| payout_created | 0 |
+| transfer_created | 0 |
+| invoice_created | 0 |
+| charge_created | 0 |
+| PaymentIntent_created | 0 |
+| Business_Central_payment_posted | 0 |
+| failed_sends | 0 |
