@@ -77,7 +77,7 @@ describe("runEnterpriseMailboxReadbackHealth", () => {
     assert.equal(calls.length, 4);
   });
 
-  test("probes AIC by canonical Graph object id and uses GET only", async () => {
+  test("probes AIC mailbox folders by canonical mail-read principal and uses GET only", async () => {
     process.env[HEALTH_GATE_NAME] = "true";
     const calls = mockFetchSequence([
       response(200, { id: GOVERNED_MAILBOXES.AIC.objectId }),
@@ -88,7 +88,7 @@ describe("runEnterpriseMailboxReadbackHealth", () => {
 
     await runEnterpriseMailboxReadbackHealth({ brand: "AIC" }, tokenDeps);
     assert.equal(calls.length, 4);
-    assert.ok(calls[0].url.includes(encodeURIComponent(GOVERNED_MAILBOXES.AIC.objectId)));
+    assert.ok(calls[0].url.includes(encodeURIComponent(GOVERNED_MAILBOXES.AIC.mailReadPrincipal)));
     assert.ok(calls.every((call) => call.options.method === "GET"));
     assert.ok(calls[1].url.includes("/mailFolders?"));
     assert.ok(calls[2].url.includes("/mailFolders/inbox/messages?"));
@@ -109,6 +109,24 @@ describe("runEnterpriseMailboxReadbackHealth", () => {
     assert.equal(result.probes.mailFolders.status, 403);
     assert.equal(result.probes.mailFolders.graphErrorCode, "ErrorAccessDenied");
     assert.equal(Object.prototype.hasOwnProperty.call(result, "body"), false);
+  });
+
+  test("treats user profile read as informational when mail folder readback passes", async () => {
+    process.env[HEALTH_GATE_NAME] = "true";
+    mockFetchSequence([
+      response(403, { error: { code: "Authorization_RequestDenied" } }),
+      response(200, { value: [{ displayName: "Inbox", totalItemCount: 3, unreadItemCount: 0 }] }),
+      response(200, { value: [] }),
+      response(200, { value: [] })
+    ]);
+
+    const result = await runEnterpriseMailboxReadbackHealth({ brand: "AIC" }, tokenDeps);
+    assert.equal(result.ok, true);
+    assert.equal(result.code, "ENTERPRISE_MAILBOX_READBACK_HEALTH_PASS");
+    assert.equal(result.probes.userObject.result, "FAIL");
+    assert.equal(result.probes.mailFolders.result, "PASS");
+    assert.equal(result.mailbox.objectId, GOVERNED_MAILBOXES.AIC.objectId);
+    assert.equal(result.mailbox.mailReadPrincipal, GOVERNED_MAILBOXES.AIC.primarySmtp);
   });
 
   test("bounded proof lookup returns safe metadata only", async () => {
