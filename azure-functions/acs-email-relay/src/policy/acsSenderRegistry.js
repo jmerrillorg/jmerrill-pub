@@ -102,6 +102,29 @@ const REGISTRY = Object.freeze({
       "plain-English",
       "not always sermon-like"
     ]
+  }),
+  JSJ: profile({
+    brand: "JSJ",
+    acsFrom: "jackie@email.jackiesmithjr.com",
+    replyTo: "jackie@jmerrill.one",
+    replyMailboxAuthority: "jackie@jmerrill.one",
+    replyAddressType: "MAILBOX",
+    inboundProcessingMailbox: "jackie@jmerrill.one",
+    ccRequired: false,
+    ccAddress: null,
+    organizationDisplayName: "Jackie Smith Jr.",
+    signatureName: "Jackie Smith Jr.",
+    publicContactIdentity: "jackie@jmerrill.one",
+    website: "jackiesmithjr.com",
+    riskPolicy: "PERSONAL_BRAND",
+    voice: [
+      "personal",
+      "reflective",
+      "direct",
+      "human",
+      "plain-English",
+      "not divisional"
+    ]
   })
 });
 
