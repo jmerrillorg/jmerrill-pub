@@ -487,7 +487,7 @@ test('author-facing setup card uses direct-deposit language and no dead-end acti
 test('invitation copy is setup-only and avoids royalty amount, timing, schedule, and activation-code prompts', () => {
   const serviceSource = readFileSync('lib/server/stripe/connect-author-pilot-service.ts', 'utf8')
 
-  assert.match(serviceSource, /Set Up Your J Merrill Publishing Stripe Connect/)
+  assert.match(serviceSource, /Set Up Direct Deposit with J Merrill Publishing/)
   assert.match(serviceSource, /Complete Stripe Connect Setup/)
   assert.match(serviceSource, /Stripe Connect as the secure setup process/)
   assert.doesNotMatch(serviceSource, /future royalty-payment delays|Set Up Your Royalty Payments|royalty amount|royalty schedule|activation code|recovery code/i)
@@ -527,7 +527,7 @@ test('Connect setup communication template omits royalty-payment response langua
     readFileSync('scripts/stripe_connect_author_pilot.mjs', 'utf8'),
   ].join('\n')
 
-  assert.match(sources, /Set Up Your J Merrill Publishing Stripe Connect/)
+  assert.match(sources, /Set Up Direct Deposit with J Merrill Publishing/)
   assert.match(sources, /Complete Stripe Connect setup/)
   assert.doesNotMatch(sources, /Set Up Your Royalty Payments/)
   assert.doesNotMatch(sources, /royalty-payment delays/)

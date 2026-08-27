@@ -10,7 +10,8 @@ import {
   classifyConnectReminderEligibility,
 } from './stripe_connect_reminder_cadence.mjs'
 
-export const OUT_DIR = 'docs/operations/generated/JMP-STRIPE-CONNECT-POST-REMEDIATION-CLOSURE-2026-08-26'
+export const OUT_DIR = process.env.JMP_STRIPE_CONNECT_EVIDENCE_OUT_DIR ||
+  'docs/operations/generated/JMP-STRIPE-CONNECT-POST-REMEDIATION-CLOSURE-2026-08-26'
 export const APP_RESOURCE_GROUP = 'rg-jm1-web-prod-premium'
 export const APP_NAME = 'app-jm1-pub-prod-v2'
 export const PRODUCTION_HEALTH_URL = 'https://jmerrill.pub/api/health'
@@ -18,6 +19,7 @@ export const DV_RESOURCE = 'https://jm1hq.crm.dynamics.com'
 export const DV_API = `${DV_RESOURCE}/api/data/v9.2`
 export const PR_656_HEAD = '3609171655ea21baddd031a14d803783706b3e7b'
 export const PR_656_MERGE_SHA = '0e3f10df62f16b412f23b758cc28f3cf27e8545d'
+export const PR_662_MERGE_SHA = '6142f46992eeb2c305c991ed291ca69b73738675'
 export const BRANCH = 'codex/stripe-connect-post-remediation-closure-20260827'
 export const CORRECTED_REMEDIATION_PACKAGE =
   'docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-ONBOARDING-JOURNEY-REMEDIATION-2026-08-26'
@@ -162,7 +164,7 @@ async function readProductionHealth() {
     ready:
       response.status === 200 &&
       body.status === 'ready' &&
-      [PR_656_HEAD, PR_656_MERGE_SHA].includes(body.release) &&
+      Boolean(body.release) &&
       body.dependencies?.stripeEnrollment?.status === 'ready',
   }
 }
@@ -390,7 +392,10 @@ function buildWatchdog(estate, reminder) {
 }
 
 function classifyResult(result) {
-  if (!result.production.ready || !result.sourceParity.sourceContainsProductionHead) return 'STRIPE_CONNECT_POST_REMEDIATION_NOT_READY'
+  const productionOnCurrentSource = result.production.release === result.sourceParity.originMain
+  if (!result.production.ready || !result.sourceParity.sourceContainsProductionHead || !productionOnCurrentSource) {
+    return 'STRIPE_CONNECT_POST_REMEDIATION_NOT_READY'
+  }
   if (result.estate.duplicateAccountGroups.length > 0) return 'STRIPE_CONNECT_POST_REMEDIATION_CONTROLLED'
   if (result.reminder.cadenceStatus !== 'CANONICAL') return 'STRIPE_CONNECT_POST_REMEDIATION_CONTROLLED'
   return 'STRIPE_CONNECT_POST_REMEDIATION_FULLY_COMMISSIONED'
@@ -463,7 +468,7 @@ function writeEvidencePackage(result) {
   mkdirSync(OUT_DIR, { recursive: true })
   const docs = {
     '00-executive-summary.md': executiveSummary(result),
-    '01-pr656-merge-and-source-parity.md': pr656Doc(result),
+    '01-merge-and-source-parity.md': sourceParityDoc(result),
     '02-production-health-and-route-proof.md': routeDoc(result),
     '03-active-author-connect-estate.md': estateDoc(result),
     '04-target-author-readback.md': targetDoc(result),
@@ -486,7 +491,8 @@ function writeEvidencePackage(result) {
 }
 
 function executiveSummary(result) {
-  return `# Stripe Connect Post-Remediation Closure
+  const productionOnCurrentSource = result.production.release === result.sourceParity.originMain
+  return `# Stripe Connect Live-Authority Estate Corrective Readback
 
 Last Verified: ${result.verifiedAt}
 
@@ -494,12 +500,11 @@ Classification: ${classifyResult(result)}
 
 | Metric | State |
 | --- | --- |
-| PR #656 merged | YES |
-| PR #656 head | ${PR_656_HEAD} |
-| PR #656 merge SHA | ${PR_656_MERGE_SHA} |
+| PR #662 merge SHA | ${PR_662_MERGE_SHA} |
 | Production release | ${result.production.release} |
 | Production health | ${result.production.ready ? 'PASS' : 'CHECK'} |
-| Source contains production-proven head | ${result.sourceParity.sourceContainsProductionHead ? 'YES' : 'NO'} |
+| Production release equals origin/main | ${productionOnCurrentSource ? 'YES' : 'NO'} |
+| Source contains prior proven Connect head | ${result.sourceParity.sourceContainsProductionHead ? 'YES' : 'NO'} |
 | Active author relationships assessed | ${result.estate.rows.length} |
 | Duplicate account groups | ${result.estate.duplicateAccountGroups.length} |
 | Reminder emails sent in this closure | ${result.reminder.sent} |
@@ -509,8 +514,9 @@ No royalty amount, royalty timing, payout, transfer, charge, invoice, PaymentInt
 `
 }
 
-function pr656Doc(result) {
-  return `# PR #656 Merge And Source Parity
+function sourceParityDoc(result) {
+  const productionOnCurrentSource = result.production.release === result.sourceParity.originMain
+  return `# Merge And Source Parity
 
 Last Verified: ${result.verifiedAt}
 
@@ -519,12 +525,14 @@ Last Verified: ${result.verifiedAt}
 | Branch | ${result.sourceParity.branch} |
 | Branch HEAD | ${result.sourceParity.head} |
 | origin/main | ${result.sourceParity.originMain} |
+| PR #662 merge SHA | ${PR_662_MERGE_SHA} |
 | PR #656 head | ${result.sourceParity.pr656Head} |
 | PR #656 merge SHA | ${result.sourceParity.pr656MergeSha} |
 | origin/main contains PR #656 head | ${result.sourceParity.sourceContainsProductionHead ? 'YES' : 'NO'} |
 | closure branch contains PR #656 head | ${result.sourceParity.prHeadInBranch ? 'YES' : 'NO'} |
+| production release equals origin/main | ${productionOnCurrentSource ? 'YES' : 'NO'} |
 
-Production currently reports release ${result.production.release}. The repaired source is reachable from origin/main.
+Production currently reports release ${result.production.release}. The deployed release, current source, and prior proven Connect onboarding runtime are all reconciled when the production release equals origin/main and origin/main contains PR #656.
 `
 }
 
@@ -700,7 +708,7 @@ Last Verified: ${result.verifiedAt}
 | --- | --- |
 | Evidence generator | ${result.validation.generatedBy} |
 | Production health readback | ${result.production.ready ? 'PASS' : 'CHECK'} |
-| Source/production parity | ${result.sourceParity.sourceContainsProductionHead ? 'PASS' : 'CHECK'} |
+| Source/production parity | ${result.production.release === result.sourceParity.originMain ? 'PASS' : 'CHECK'} |
 | Connect route proof | ${result.routeProof.summary} |
 | Active-author live Stripe readback | PASS |
 | Duplicate scan | ${result.estate.duplicateAccountGroups.length === 0 ? 'PASS' : 'REVIEW'} |
@@ -768,6 +776,40 @@ function estateCsv(rows) {
   ].join('\n') + '\n'
 }
 
+export function parseKeyVaultReference(value) {
+  const raw = clean(value)
+  if (!raw.startsWith('@Microsoft.KeyVault(') || !raw.endsWith(')')) return null
+  const inner = raw.slice('@Microsoft.KeyVault('.length, -1)
+  const parts = Object.fromEntries(inner.split(';').map((part) => {
+    const [key, ...rest] = part.split('=')
+    return [clean(key), clean(rest.join('='))]
+  }).filter(([key, parsedValue]) => key && parsedValue))
+  if (parts.SecretUri) return { id: parts.SecretUri }
+  if (parts.VaultName && parts.SecretName) {
+    return {
+      vaultName: parts.VaultName,
+      secretName: parts.SecretName,
+      secretVersion: parts.SecretVersion || '',
+    }
+  }
+  return null
+}
+
+function resolveAppSettingValue(setting) {
+  const reference = parseKeyVaultReference(setting?.value)
+  if (!reference) return setting?.value || ''
+  if (reference.id) {
+    return execFileSync('az', ['keyvault', 'secret', 'show', '--id', reference.id, '--query', 'value', '-o', 'tsv'], {
+      encoding: 'utf8',
+      maxBuffer: 1024 * 1024,
+    }).trim()
+  }
+  const args = ['keyvault', 'secret', 'show', '--vault-name', reference.vaultName, '--name', reference.secretName]
+  if (reference.secretVersion) args.push('--version', reference.secretVersion)
+  args.push('--query', 'value', '-o', 'tsv')
+  return execFileSync('az', args, { encoding: 'utf8', maxBuffer: 1024 * 1024 }).trim()
+}
+
 function loadProductionAppSettings() {
   const raw = execFileSync('az', [
     'webapp',
@@ -784,7 +826,7 @@ function loadProductionAppSettings() {
   const settings = JSON.parse(raw)
   for (const setting of settings) {
     if (!REQUIRED_APP_SETTINGS.includes(setting.name)) continue
-    if (!process.env[setting.name] && setting.value) process.env[setting.name] = setting.value
+    if (!process.env[setting.name] && setting.value) process.env[setting.name] = resolveAppSettingValue(setting)
   }
 }
 

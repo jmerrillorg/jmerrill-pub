@@ -14,7 +14,7 @@ export const OUT_DIR = 'docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILO
 export const PR567_MERGE_SHA = '01f157c85650ecf6802f02148b9337b69a90aa88'
 export const PRODUCTION_HEALTH_URL = 'https://jmerrill.pub/api/health'
 export const RELAY_ROUTE = 'send-approved-author-response'
-export const AUTHOR_SUBJECT = 'Set Up Your J Merrill Publishing Stripe Connect'
+export const AUTHOR_SUBJECT = 'Set Up Direct Deposit with J Merrill Publishing'
 export const MAX_PILOT_AUTHORS = 3
 
 const ENTITY_PAYEE_PATTERN = /\b(LLC|L\.L\.C\.|INC|INC\.|CORP|CORPORATION|COMPANY|CO\.|FOUNDATION|MINISTRIES|CHURCH|TRUST|ESTATE)\b/i
@@ -117,6 +117,40 @@ export async function main() {
   }, null, 2))
 }
 
+function parseKeyVaultReference(value) {
+  const raw = clean(value)
+  if (!raw.startsWith('@Microsoft.KeyVault(') || !raw.endsWith(')')) return null
+  const inner = raw.slice('@Microsoft.KeyVault('.length, -1)
+  const parts = Object.fromEntries(inner.split(';').map((part) => {
+    const [key, ...rest] = part.split('=')
+    return [clean(key), clean(rest.join('='))]
+  }).filter(([key, parsedValue]) => key && parsedValue))
+  if (parts.SecretUri) return { id: parts.SecretUri }
+  if (parts.VaultName && parts.SecretName) {
+    return {
+      vaultName: parts.VaultName,
+      secretName: parts.SecretName,
+      secretVersion: parts.SecretVersion || '',
+    }
+  }
+  return null
+}
+
+function resolveAppSettingValue(setting) {
+  const reference = parseKeyVaultReference(setting?.value)
+  if (!reference) return setting?.value || ''
+  if (reference.id) {
+    return execFileSync('az', ['keyvault', 'secret', 'show', '--id', reference.id, '--query', 'value', '-o', 'tsv'], {
+      encoding: 'utf8',
+      maxBuffer: 1024 * 1024,
+    }).trim()
+  }
+  const args = ['keyvault', 'secret', 'show', '--vault-name', reference.vaultName, '--name', reference.secretName]
+  if (reference.secretVersion) args.push('--version', reference.secretVersion)
+  args.push('--query', 'value', '-o', 'tsv')
+  return execFileSync('az', args, { encoding: 'utf8', maxBuffer: 1024 * 1024 }).trim()
+}
+
 function loadProductionAppSettings() {
   const raw = execFileSync('az', [
     'webapp',
@@ -133,7 +167,7 @@ function loadProductionAppSettings() {
   const settings = JSON.parse(raw)
   for (const setting of settings) {
     if (!REQUIRED_APP_SETTINGS.includes(setting.name)) continue
-    if (!process.env[setting.name] && setting.value) process.env[setting.name] = setting.value
+    if (!process.env[setting.name] && setting.value) process.env[setting.name] = resolveAppSettingValue(setting)
   }
 }
 

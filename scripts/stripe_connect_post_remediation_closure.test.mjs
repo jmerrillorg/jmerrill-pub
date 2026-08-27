@@ -6,12 +6,21 @@ import {
   PR_656_MERGE_SHA,
   classifyConnectState,
   classifyReminderEligibility,
+  parseKeyVaultReference,
 } from './stripe_connect_post_remediation_closure.mjs'
 import { classifyConnectReminderEligibility } from './stripe_connect_reminder_cadence.mjs'
 
 test('post-remediation production release may be the proven head or merge commit', () => {
   assert.ok([PR_656_HEAD, PR_656_MERGE_SHA].includes(PR_656_HEAD))
   assert.ok([PR_656_HEAD, PR_656_MERGE_SHA].includes(PR_656_MERGE_SHA))
+})
+
+test('production app setting loader recognizes Key Vault SecretUri references', () => {
+  const parsed = parseKeyVaultReference('@Microsoft.KeyVault(SecretUri=https://kv-jm1.vault.azure.net/secrets/stripe-connect-secret/abc123)')
+  assert.deepEqual(parsed, {
+    id: 'https://kv-jm1.vault.azure.net/secrets/stripe-connect-secret/abc123',
+  })
+  assert.equal(parseKeyVaultReference('sk_live_not_a_real_key'), null)
 })
 
 test('live Stripe readiness maps complete setup only from submitted, payout-enabled, no-due state', () => {
