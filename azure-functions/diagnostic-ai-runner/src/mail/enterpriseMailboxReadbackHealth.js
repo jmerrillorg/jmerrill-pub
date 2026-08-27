@@ -59,6 +59,16 @@ function graphUserId(target) {
   return target.mailReadPrincipal || target.objectId || target.upn || target.primarySmtp;
 }
 
+function graphUserIdCandidates(target) {
+  const candidates = [
+    graphUserId(target),
+    target.primarySmtp,
+    target.upn,
+    target.objectId
+  ].map(normalizeString).filter(Boolean);
+  return [...new Set(candidates)];
+}
+
 async function getGraphToken(deps = {}) {
   if (typeof deps.getToken === "function") return deps.getToken(GRAPH_SCOPE);
   const credential = new DefaultAzureCredential();
@@ -135,29 +145,47 @@ async function runEnterpriseMailboxReadbackHealth(input = {}, deps = {}) {
   }
 
   const verifiedAt = deps.now ? deps.now() : new Date().toISOString();
-  const userId = graphUserId(target);
-  const encodedUser = encodeURIComponent(userId);
+  let selectedUserId = null;
+  let selectedProbeSet = null;
+  const principalAttempts = [];
 
-  const userProbe = await graphJson(
-    token,
-    `${GRAPH_BASE}/users/${encodedUser}?$select=id,displayName,userPrincipalName,mail,accountEnabled`,
-    deps
-  );
-  const foldersProbe = await graphJson(
-    token,
-    `${GRAPH_BASE}/users/${encodedUser}/mailFolders?$select=id,displayName,totalItemCount,unreadItemCount&$top=50`,
-    deps
-  );
-  const inboxProbe = await graphJson(
-    token,
-    `${GRAPH_BASE}/users/${encodedUser}/mailFolders/inbox/messages?$select=id,subject,from,toRecipients,ccRecipients,replyTo,receivedDateTime,internetMessageId,conversationId,hasAttachments&$orderby=receivedDateTime desc&$top=1`,
-    deps
-  );
-  const sentProbe = await graphJson(
-    token,
-    `${GRAPH_BASE}/users/${encodedUser}/mailFolders/sentitems/messages?$select=id,subject,from,toRecipients,ccRecipients,replyTo,sentDateTime,internetMessageId,conversationId,hasAttachments&$orderby=sentDateTime desc&$top=1`,
-    deps
-  );
+  for (const candidate of graphUserIdCandidates(target)) {
+    const encodedUser = encodeURIComponent(candidate);
+    const userProbe = await graphJson(
+      token,
+      `${GRAPH_BASE}/users/${encodedUser}?$select=id,displayName,userPrincipalName,mail,accountEnabled`,
+      deps
+    );
+    const foldersProbe = await graphJson(
+      token,
+      `${GRAPH_BASE}/users/${encodedUser}/mailFolders?$select=id,displayName,totalItemCount,unreadItemCount&$top=50`,
+      deps
+    );
+    const inboxProbe = await graphJson(
+      token,
+      `${GRAPH_BASE}/users/${encodedUser}/mailFolders/inbox/messages?$select=id,subject,from,toRecipients,ccRecipients,replyTo,receivedDateTime,internetMessageId,conversationId,hasAttachments&$orderby=receivedDateTime desc&$top=1`,
+      deps
+    );
+    const sentProbe = await graphJson(
+      token,
+      `${GRAPH_BASE}/users/${encodedUser}/mailFolders/sentitems/messages?$select=id,subject,from,toRecipients,ccRecipients,replyTo,sentDateTime,internetMessageId,conversationId,hasAttachments&$orderby=sentDateTime desc&$top=1`,
+      deps
+    );
+    const requiredProbesPass = foldersProbe.ok && inboxProbe.ok && sentProbe.ok;
+    principalAttempts.push({
+      principal: candidate,
+      userObject: safeProbeResult(userProbe),
+      mailFolders: safeProbeResult(foldersProbe),
+      inbox: safeProbeResult(inboxProbe),
+      sentItems: safeProbeResult(sentProbe)
+    });
+    selectedUserId = candidate;
+    selectedProbeSet = { userProbe, foldersProbe, inboxProbe, sentProbe };
+    if (requiredProbesPass) break;
+  }
+
+  const { userProbe, foldersProbe, inboxProbe, sentProbe } = selectedProbeSet;
+  const encodedUser = encodeURIComponent(selectedUserId);
 
   let proof = null;
   const subjectContains = normalizeString(input.subjectContains);
@@ -207,9 +235,11 @@ async function runEnterpriseMailboxReadbackHealth(input = {}, deps = {}) {
       upn: target.upn,
       primarySmtp: target.primarySmtp,
       mailReadPrincipal: target.mailReadPrincipal,
+      selectedMailReadPrincipal: selectedUserId,
       expectedAcsFrom: target.expectedAcsFrom,
       expectedReplyTo: target.expectedReplyTo
     },
+    principalAttempts,
     probes: {
       userObject: safeProbeResult(userProbe),
       mailFolders: safeProbeResult(foldersProbe),
