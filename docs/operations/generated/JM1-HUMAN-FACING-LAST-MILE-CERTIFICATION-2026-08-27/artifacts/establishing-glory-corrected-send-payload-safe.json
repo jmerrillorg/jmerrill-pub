@@ -1,0 +1,47 @@
+{
+  "messageType": "APPROVED_AUTHOR_RESPONSE",
+  "diagnosticId": "3362a1cb-1984-f111-ab0f-000d3a14673b",
+  "intakeReferenceCode": "JMP-INT-202608-EG-LASTMILE",
+  "authorEmail": "chosen2k7@gmail.com",
+  "to": "chosen2k7@gmail.com",
+  "cc": [
+    "publishing@jmerrill.one"
+  ],
+  "authorName": "Jackie Smith Jr",
+  "projectTitle": "Establishing Glory: The Library",
+  "subject": "Corrected Developmental Editing Materials - Establishing Glory: The Library",
+  "body": "Good day, Jackie,\n\nYour developmental edit of Establishing Glory: The Library is ready for review.\n\nWe found that the manuscript file included with our earlier message was not the correct review copy. We have corrected that, and the complete edited manuscript is attached here along with a short review guide.\n\nPlease review the manuscript carefully. If everything looks good, reply with \"Approved.\" If you would like changes, simply tell us what you would like adjusted.\n\nOnce we receive your response, we will move the book to the next editing stage.\n\nIf you have any questions while reviewing it, just reply to this email.\n\nThe Publishing Team\nJ Merrill Publishing, Inc.",
+  "htmlBody": "<!doctype html>\n<html><body style=\"margin:0;padding:0;background:#f6f7fb;font-family:Arial,Helvetica,sans-serif;color:#111827;\"><table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f6f7fb;padding:24px 0;\"><tr><td align=\"center\"><table role=\"presentation\" width=\"680\" cellspacing=\"0\" cellpadding=\"0\" style=\"width:680px;max-width:100%;background:#ffffff;border:1px solid #e5e7eb;\"><tr><td style=\"background:#111827;color:#ffffff;padding:20px 28px;\"><div style=\"font-size:15px;font-weight:700;letter-spacing:.04em;\">J MERRILL PUBLISHING</div><div style=\"font-size:13px;margin-top:4px;\">A Division of J Merrill One</div></td></tr><tr><td style=\"padding:28px;font-size:16px;line-height:1.55;\"><p style=\"margin:0 0 16px;\">Good day, Jackie,</p><p style=\"margin:0 0 16px;\">Your developmental edit of <strong>Establishing Glory: The Library</strong> is ready for review.</p><p style=\"margin:0 0 16px;\">We found that the manuscript file included with our earlier message was not the correct review copy. We have corrected that, and the complete edited manuscript is attached here along with a short review guide.</p><p style=\"margin:0 0 16px;\">Please review the manuscript carefully. If everything looks good, reply with <strong>Approved</strong>. If you would like changes, simply tell us what you would like adjusted.</p><p style=\"margin:0 0 16px;\">Once we receive your response, we will move the book to the next editing stage.</p><p style=\"margin:0 0 20px;\">If you have any questions while reviewing it, just reply to this email.</p><p style=\"margin:0;\">The Publishing Team<br>J Merrill Publishing, Inc.</p></td></tr><tr><td style=\"background:#f3f4f6;color:#4b5563;padding:16px 28px;font-size:12px;line-height:1.45;\">Helping Authors Help Themselves.</td></tr></table></td></tr></table></body></html>",
+  "templateName": "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1",
+  "templateVersion": "1.1.0-human-last-mile",
+  "templateMetadata": {
+    "htmlSha256": "9ce8af92d69e48a9920bd59331e22d52f489bcb5e94d2f1ce3199e5cfce8d050",
+    "textSha256": "112f228493949e2555bf932aac447d368148ff28868a85fedbfc8561751982a5",
+    "qualityGate": "PASS",
+    "brandSystem": "J MERRILL PUBLISHING",
+    "enterpriseStandard": "JM1-HUMAN-FACING-LAST-MILE-CERTIFICATION-v1",
+    "renderer": "JM1 Enterprise Communication Renderer",
+    "rendererVersion": "1.1.0-human-last-mile",
+    "renderMode": "CANONICAL_HTML",
+    "renderTemplateGuard": "PASS"
+  },
+  "attachments": [
+    {
+      "name": "Establishing Glory The Library - Developmentally Edited Manuscript - Corrected Author Review.docx",
+      "contentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "sha256": "9aae176de7b318fec3d4e8c7b9ebf7750433261a4130dffcd14e4a50d4b9abf1",
+      "bytes": 145532
+    },
+    {
+      "name": "Establishing Glory The Library - Editorial Review Guide.txt",
+      "contentType": "text/plain",
+      "sha256": "66d1a5357bde86e5df6502cd42b500f22fa5166aa9faacc6ba105747ab785792",
+      "bytes": 548
+    }
+  ],
+  "approvedBy": "Jackie Smith Jr. - Founder Authority / Human-last-mile corrective delivery",
+  "approvedOn": "2026-08-27T09:57:16.863Z",
+  "internalVisibilityMailbox": "publishing@jmerrill.one",
+  "futureSendRequiresInternalCopy": true,
+  "futureSendRequiresDataverseLog": true
+}

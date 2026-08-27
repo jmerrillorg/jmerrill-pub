@@ -1,0 +1,12 @@
+{
+  "status": 400,
+  "ok": false,
+  "body": {
+    "accepted": false,
+    "code": "ACS_RELAY_VALIDATION_FAILED",
+    "reason": "INTAKE_REFERENCE_CODE_INVALID",
+    "intakeReferenceCode": "ESTABLISHING-GLORY-HUMAN-LAST-MILE-20260827",
+    "diagnosticId": "3362a1cb-1984-f111-ab0f-000d3a14673b"
+  },
+  "recordedAt": "2026-08-27T09:56:31.419Z"
+}

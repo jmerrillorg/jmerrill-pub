@@ -1,0 +1,12 @@
+{
+  "status": 401,
+  "ok": false,
+  "body": {
+    "accepted": false,
+    "code": "UNAUTHORIZED",
+    "reason": "UNAUTHORIZED",
+    "intakeReferenceCode": "",
+    "diagnosticId": ""
+  },
+  "recordedAt": "2026-08-27T09:55:44.105Z"
+}

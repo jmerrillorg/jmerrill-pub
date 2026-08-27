@@ -264,54 +264,31 @@ function validAuthorReviewPackagePayload(overrides = {}) {
     <table role="presentation"><tr><td>J MERRILL PUBLISHING</td></tr></table>
     <p>A Division of J Merrill One</p>
     <p>Helping Authors Help Themselves.</p>
-    <h1>Cover Design Review</h1>
-    <h2>Why you are receiving this</h2>
-    <p>Your cover design review package is ready.</p>
-    <h2>What has been completed</h2>
-    <ul><li>The Publishing Team prepared the current author-facing files.</li></ul>
-    <h2>What's attached</h2>
-    <ul><li>Cover concept image.</li></ul>
-    <h2>What we need from you</h2>
-    <p>Please review the package.</p>
-    <h2>How to respond</h2>
-    <p>Reply directly to publishing@jmerrill.one.</p>
-    <a href="https://jmerrill.pub/author/portal?action=review-package" style="display:inline-block;background:#1D4ED8;color:#ffffff;">View in Author Operating Center</a>
-    <h2>What happens next</h2>
-    <p>The Publishing Team records your response.</p>
-    <h2>Support</h2>
-    <p>Reply to this email and the Publishing Team will help.</p>
-    <p>The Publishing Team</p>
+    <p>Good day, Jackie,</p>
+    <p>Your developmental editing materials for <strong>Before You Were Born</strong> are ready for review.</p>
+    <p>The edited manuscript and review guide are attached here.</p>
+    <p>Please review the manuscript carefully. If everything looks good, reply with "Approved." If you would like changes, tell us what you would like adjusted.</p>
+    <p>Once we receive your response, we will move the book to the next editing stage or review the requested changes.</p>
+    <p>The Publishing Team<br>J Merrill Publishing, Inc.</p>
   </body>
 </html>`;
   return validAuthorResponsePayload({
     subject: "Developmental Editing Review Package - Before You Were Born",
     body: [
-      "Good day, Author,",
+      "Good day, Jackie,",
       "",
-      "Why you are receiving this",
-      "Your package is ready.",
+      "Your developmental editing materials for Before You Were Born are ready for review.",
       "",
-      "What has been completed",
-      "- The Publishing Team prepared the current author-facing files.",
+      "The edited manuscript and review guide are attached here.",
       "",
-      "What's attached",
-      "- Current author-review manuscript",
+      "Please review the manuscript carefully. If everything looks good, reply with \"Approved.\" If you would like changes, tell us what you would like adjusted.",
       "",
-      "What we need from you",
-      "Please review the package.",
+      "Once we receive your response, we will move the book to the next editing stage or review the requested changes.",
       "",
-      "How to respond",
-      "Reply directly to publishing@jmerrill.one.",
+      "If you have any questions while reviewing it, just reply to this email.",
       "",
-      "Optional Author Operating Center access: https://jmerrill.pub/author/portal?action=review-package",
-      "",
-      "What happens next",
-      "- The Publishing Team records your response.",
-      "",
-      "Support",
-      "Reply to this email and the Publishing Team will help.",
-      "",
-      "The Publishing Team"
+      "The Publishing Team",
+      "J Merrill Publishing, Inc."
     ].join("\n"),
     htmlBody: canonicalHtml,
     templateName: "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1",
@@ -345,51 +322,27 @@ function validFinalDevelopmentalReviewPayload(overrides = {}) {
     <table role="presentation"><tr><td>J MERRILL PUBLISHING</td></tr></table>
     <p>A Division of J Merrill One</p>
     <p>Helping Authors Help Themselves.</p>
-    <h1>Final Developmental Review</h1>
-    <h2>Why you are receiving this</h2>
-    <p>The Publishing Team has incorporated the revisions requested during developmental editing.</p>
-    <h2>What has been completed</h2>
-    <ul><li>The Publishing Team verified the revised manuscript.</li></ul>
-    <h2>What's attached</h2>
-    <ul><li>The revised developmental-edit manuscript.</li></ul>
-    <h2>What we need from you</h2>
+    <p>Good day, Iyorwuese,</p>
+    <p>The revised developmental-edit manuscript for <strong>The General’s Will and Last Testament</strong> is ready for review.</p>
     <p>Please review the attached manuscript and reply with Approved or Changes still required.</p>
-    <h2>How to respond</h2>
-    <p>Reply to this email with Approved or Changes still required.</p>
-    <h2>What happens next</h2>
-    <p>The Publishing Team records your response.</p>
-    <h2>Support</h2>
-    <p>Reply to this email and the Publishing Team will help.</p>
-    <p>The Publishing Team</p>
+    <p>Once we receive your response, we will move the book to the next editing stage or review the requested changes.</p>
+    <p>The Publishing Team<br>J Merrill Publishing, Inc.</p>
   </body>
 </html>`;
   return validAuthorResponsePayload({
+    authorName: "Iyorwuese Hagher",
     subject: "Final Developmental Review - The General’s Will and Last Testament",
     body: [
       "Good day, Iyorwuese,",
       "",
-      "Why you are receiving this",
-      "The Publishing Team has incorporated the revisions requested during developmental editing.",
+      "The revised developmental-edit manuscript for The General’s Will and Last Testament is ready for review.",
       "",
-      "What has been completed",
-      "- The Publishing Team verified the revised manuscript.",
-      "",
-      "What's attached",
-      "- The revised developmental-edit manuscript.",
-      "",
-      "What we need from you",
-      "Please review the attached manuscript and reply with Approved or Changes still required.",
-      "",
-      "How to respond",
       "Reply to this email with Approved or Changes still required.",
       "",
-      "What happens next",
-      "- The Publishing Team records your response.",
+      "Once we receive your response, we will move the book to the next editing stage or review the requested changes.",
       "",
-      "Support",
-      "Reply to this email and the Publishing Team will help.",
-      "",
-      "The Publishing Team"
+      "The Publishing Team",
+      "J Merrill Publishing, Inc."
     ].join("\n"),
     htmlBody: canonicalHtml,
     templateName: "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1",
@@ -816,6 +769,48 @@ test("approved author-review package sends validated attachments to ACS", () => 
   assert.equal(email.attachments[0].contentInBase64, Buffer.from("author-safe summary").toString("base64"));
 });
 
+test("approved author-review package rejects bad full-name greeting", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const base = validAuthorReviewPackagePayload();
+
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload({
+      authorName: "Jackie Smith Jr",
+      body: base.body.replace("Good day, Jackie,", "Good day Jackie Smith Jr,"),
+      htmlBody: base.htmlBody.replace("Good day, Jackie,", "Good day Jackie Smith Jr,")
+    })),
+    "AUTHOR_REVIEW_PACKAGE_GREETING_LAST_MILE_BLOCKED"
+  );
+});
+
+test("approved author-review package rejects routine email bloat", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const base = validAuthorReviewPackagePayload();
+
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload({
+      htmlBody: base.htmlBody.replace(
+        "<p>The edited manuscript and review guide are attached here.</p>",
+        "<h1>Review</h1><h2>Why</h2><h2>Next</h2><p>The edited manuscript and review guide are attached here.</p>"
+      )
+    })),
+    "AUTHOR_REVIEW_PACKAGE_TEMPLATE_BLOAT_BLOCKED"
+  );
+});
+
+test("approved author-review package rejects Establishing Glory internal wording regression", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const base = validAuthorReviewPackagePayload();
+
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload({
+      body: base.body.replace("The edited manuscript and review guide are attached here.", "The current author-facing files are ready for the current publishing stage."),
+      htmlBody: base.htmlBody.replace("The edited manuscript and review guide are attached here.", "The current author-facing files are ready for the current publishing stage.")
+    })),
+    "AUTHOR_REVIEW_PACKAGE_INTERNAL_LANGUAGE_BLOCKED"
+  );
+});
+
 test("final developmental review permits reply-only canonical HTML without portal CTA", () => {
   const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
   const result = validateApprovedAuthorResponsePayload(validFinalDevelopmentalReviewPayload());
@@ -834,8 +829,8 @@ test("final developmental review rejects accidental portal links", () => {
   assertRejected(
     validateApprovedAuthorResponsePayload(validFinalDevelopmentalReviewPayload({
       htmlBody: validFinalDevelopmentalReviewPayload().htmlBody.replace(
-        "<h2>What happens next</h2>",
-        '<a href="https://jmerrill.pub/author/portal?action=final-developmental-review">Open Author Operating Center</a><h2>What happens next</h2>'
+        "</body>",
+        '<a href="https://jmerrill.pub/author/portal?action=final-developmental-review">Open Author Operating Center</a></body>'
       )
     })),
     "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_REPLY_ONLY_REQUIRED"

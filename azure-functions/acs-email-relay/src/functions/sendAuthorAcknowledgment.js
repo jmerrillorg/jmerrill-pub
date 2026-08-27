@@ -19,6 +19,7 @@ const DIAGNOSTIC_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-
 const MAX_FIELD_LENGTH = 300;
 const MAX_BODY_LENGTH = 6000;
 const MAX_HTML_BODY_LENGTH = 50000;
+const MAX_ROUTINE_AUTHOR_REVIEW_HEADINGS = 2;
 const ACS_PROVIDER_NAME = "acs-email";
 const PUBLISHING_SENDER_PROFILE = resolveSenderProfile("JMP");
 const ACS_SENDER = PUBLISHING_SENDER_PROFILE.acsFrom;
@@ -874,7 +875,8 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       htmlBody,
       body,
       templateMetadata: payload.templateMetadata,
-      templateName: payload.templateName
+      templateName: payload.templateName,
+      authorName: payload.authorName
     });
     if (!renderValidation.ok) {
       return { ok: false, reason: renderValidation.reason };
@@ -1058,14 +1060,6 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
     }
   }
 
-  if (!replyOnly && !/<a\b[^>]+href="https:\/\/[^"]+"[^>]+style="[^"]*(display:inline-block|background:)/i.test(html)) {
-    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_CTA_BUTTON_REQUIRED" };
-  }
-
-  if (!replyOnly && !text.includes("Optional Author Operating Center access: https://")) {
-    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_TEXT_PORTAL_REFERENCE_REQUIRED" };
-  }
-
   if (replyOnly && /author\/portal|Author Operating Center|<a\b[^>]+href=/i.test(`${html}\n${text}`)) {
     return { ok: false, reason: "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_REPLY_ONLY_REQUIRED" };
   }
@@ -1082,11 +1076,37 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_DUPLICATE_SIGNATURE_BLOCKED" };
   }
 
-  if (/\b(Dataverse|execution log|workflow record|internal instruction|package manifest|response mechanism|evidence file|artifactId|correlation|checksum|runtime|system attention|technical validation)\b/i.test(stripUrls(`${html}\n${text}`))) {
+  if (!validateNaturalGreeting({ html, text, authorName: payload.authorName }).ok) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_GREETING_LAST_MILE_BLOCKED" };
+  }
+
+  if (routineHeadingCount(html) > MAX_ROUTINE_AUTHOR_REVIEW_HEADINGS) {
+    return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_TEMPLATE_BLOAT_BLOCKED" };
+  }
+
+  if (/\b(Dataverse|execution log|workflow record|internal instruction|package manifest|response mechanism|evidence file|artifactId|correlation|checksum|runtime|system attention|technical validation|current author-facing files|current publishing stage|project history|governed artifact|execution state|package-grade)\b/i.test(stripUrls(`${html}\n${text}`))) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_INTERNAL_LANGUAGE_BLOCKED" };
   }
 
   return { ok: true };
+}
+
+function routineHeadingCount(html) {
+  return (String(html || "").match(/<h[1-6]\b/gi) || []).length;
+}
+
+function validateNaturalGreeting({ html, text, authorName }) {
+  const combined = `${html || ""}\n${text || ""}`;
+  const first = normalizeText(authorName).split(/\s+/)[0];
+  const full = normalizeText(authorName);
+  if (full && new RegExp(`Good day\\s+${escapeRegExp(full)},`, "i").test(combined)) return { ok: false };
+  if (first && new RegExp(`Good day\\s+${escapeRegExp(first)},`, "i").test(combined)) return { ok: false };
+  if (first && !new RegExp(`Good day,\\s*${escapeRegExp(first)},`, "i").test(combined)) return { ok: false };
+  return { ok: true };
+}
+
+function escapeRegExp(value) {
+  return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function canonicalPublishingFooterCount(value) {

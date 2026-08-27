@@ -1,0 +1,29 @@
+{
+  "policyId": "JM1-HUMAN-FACING-LAST-MILE-CERTIFICATION-v1",
+  "status": "CANON",
+  "executable": true,
+  "firstProvingImplementation": "J Merrill Publishing author-review package",
+  "decisionOutcomes": [
+    "ALLOW",
+    "ALLOW_WITH_WARNING",
+    "DENY",
+    "HUMAN_REVIEW_REQUIRED"
+  ],
+  "commissioningResults": [
+    "NOT_PROVEN",
+    "TECHNICALLY_PROVEN",
+    "HUMAN_LAST_MILE_PROVEN"
+  ],
+  "invalidationTriggers": [
+    "template",
+    "brandOverlay",
+    "senderIdentity",
+    "replyRouting",
+    "attachmentGenerator",
+    "artifactSelectionLogic",
+    "acsRelayTransformation",
+    "signatureOrFooter",
+    "documentRenderer"
+  ],
+  "generatedAt": "2026-08-27T10:01:47.895Z"
+}

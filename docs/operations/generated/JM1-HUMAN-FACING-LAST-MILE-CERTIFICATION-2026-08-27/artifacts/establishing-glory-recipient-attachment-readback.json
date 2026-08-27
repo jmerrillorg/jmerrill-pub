@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "status": 403,
+  "body": {
+    "error": {
+      "code": "ErrorAccessDenied",
+      "message": "Access is denied. Check credentials and try again."
+    }
+  },
+  "message": "Access is denied. Check credentials and try again.",
+  "recordedAt": "2026-08-27T09:58:38.729Z"
+}

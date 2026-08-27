@@ -1,0 +1,25 @@
+{
+  "recordedAt": "2026-08-27T10:07:52.310Z",
+  "diagnosticRunner": {
+    "deploymentCommand": "az functionapp deployment source config-zip",
+    "deploymentExitCode": 0,
+    "app": "func-jm1-diagnostic-ai-runner",
+    "resourceGroup": "rg-jm1-ai",
+    "state": "Running",
+    "lastModifiedTimeUtc": "2026-08-27T10:07:18.636666",
+    "health": {
+      "httpStatus": 200,
+      "status": "ready",
+      "release": "073de67b772be59def6b446a7640084c26b8a0e5",
+      "productionRelease": "073de67b772be59def6b446a7640084c26b8a0e5",
+      "node": "v22.23.2"
+    },
+    "routeReadback": "func-jm1-diagnostic-ai-runner routes listed successfully, including run-editorial-cadence-release-consumer and run-author-review-response-consumer."
+  },
+  "acsRelay": {
+    "app": "func-jm1-acs-email-relay",
+    "resourceGroup": "rg-jm1-communications",
+    "state": "Running",
+    "routeReadback": "send-approved-author-response route present after deployment."
+  }
+}
