@@ -83,12 +83,26 @@ jobs:
 
       - name: Deploy to Function App
         run: |
-          az webapp deploy \
-            --resource-group "$AZURE_RESOURCE_GROUP" \
-            --name "$FUNCTION_APP_NAME" \
-            --src-path "/tmp/acs-relay-${{ github.sha }}.zip" \
-            --type zip \
-            --async false
+          for attempt in 1 2 3; do
+            echo "Deploy attempt $attempt of 3"
+            if az webapp deploy \
+              --resource-group "$AZURE_RESOURCE_GROUP" \
+              --name "$FUNCTION_APP_NAME" \
+              --src-path "/tmp/acs-relay-${{ github.sha }}.zip" \
+              --type zip \
+              --async false; then
+              echo "Deploy attempt $attempt — PASS"
+              exit 0
+            fi
+
+            if [ "$attempt" = "3" ]; then
+              echo "FATAL: ACS relay deployment failed after 3 attempts"
+              exit 1
+            fi
+
+            echo "Deploy attempt $attempt failed; waiting for SCM recovery before retry"
+            sleep 30
+          done
 
       - name: Verify Node 24 on deployed runtime
         run: |
