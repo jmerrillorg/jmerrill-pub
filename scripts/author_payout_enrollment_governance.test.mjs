@@ -81,7 +81,7 @@ function installMockFetch(calls, options = {}) {
           if ((request.method || 'GET') === 'GET') {
             return {
               object: 'list',
-              data: options.searchAccount ? [options.searchAccount] : [],
+              data: options.searchAccounts || (options.searchAccount ? [options.searchAccount] : []),
               has_more: false,
             }
           }
@@ -146,6 +146,16 @@ test('future prohibited capabilities and title metadata fail validation', () => 
   assert.throws(() => stripe.assertEnrollmentAccountParams(params), /stripe_enrollment_title_metadata_blocked/)
 })
 
+test('canonical identity policy declares one Connect account per royalty payee and duplicate-create prohibitions', () => {
+  assert.equal(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.name, 'PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1')
+  assert.equal(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.invariant, 'one_royalty_payee_one_canonical_stripe_connect_account')
+  assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.matchingPrecedence.includes('stored_dataverse_account_id'))
+  assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.matchingPrecedence.includes('exact_email'))
+  assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.allowedOperations.includes('refresh_account_link'))
+  assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.prohibitedOperations.includes('create_while_duplicate_review_pending'))
+  assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.prohibitedOperations.includes('shared_onboarding_link'))
+})
+
 test('existing Dataverse connected account is retrieved and reused only after identity match', async () => {
   const calls = []
   installMockFetch(calls)
@@ -183,6 +193,53 @@ test('existing Stripe metadata match is reused before creating a replacement acc
   assert.equal(result.accountId, 'acct_SearchAuthor')
   assert.equal(result.reused, true)
   assert.equal(result.source, 'stripe_identity_search')
+  assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts']])
+})
+
+test('single exact-email connected account is reused before creating a duplicate', async () => {
+  const calls = []
+  installMockFetch(calls, {
+    searchAccount: {
+      id: 'acct_EmailOnlyAuthor',
+      object: 'account',
+      email: identity.authorEmail.toUpperCase(),
+      metadata: {},
+    },
+  })
+
+  const result = await stripe.resolveRecipientAccountId(identity)
+
+  assert.equal(result.accountId, 'acct_EmailOnlyAuthor')
+  assert.equal(result.reused, true)
+  assert.equal(result.source, 'stripe_email_search')
+  assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts']])
+})
+
+test('multiple plausible connected accounts block creation and require duplicate review', async () => {
+  const calls = []
+  installMockFetch(calls, {
+    searchAccounts: [
+      {
+        id: 'acct_MetadataAuthor',
+        object: 'account',
+        email: identity.authorEmail,
+        metadata: {
+          jm1_royalty_payee_id: identity.royaltyPayeeId,
+        },
+      },
+      {
+        id: 'acct_EmailAuthor',
+        object: 'account',
+        email: identity.authorEmail,
+        metadata: {},
+      },
+    ],
+  })
+
+  await assert.rejects(
+    () => stripe.resolveRecipientAccountId(identity),
+    /CONNECT_DUPLICATE_REVIEW/,
+  )
   assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts']])
 })
 
@@ -255,6 +312,54 @@ test('wrong-author Stripe account metadata fails closed', () => {
   )
 })
 
+test('title-named payee account is classified as noncanonical retirement candidate', () => {
+  assert.equal(stripe.classifyConnectedAccountForAuthorEstate({
+    id: 'acct_TitleNamed',
+    business_profile: { name: 'The Intentional Leader' },
+    email: 'project@example.com',
+    metadata: {},
+  }, [identity]), 'NONCANONICAL_RETIREMENT_CANDIDATE')
+})
+
+test('drift detection surfaces duplicate, missing, stale, and title-name risks', () => {
+  const missingIdentity = {
+    ...identity,
+    contactId: '33333333-3333-3333-3333-333333333333',
+    authorRelationshipId: '44444444-4444-4444-4444-444444444444',
+    royaltyPayeeId: '44444444-4444-4444-4444-444444444444',
+    authorEmail: 'missing@example.com',
+  }
+
+  const findings = stripe.detectStripeConnectDrift([identity, missingIdentity], [
+    {
+      id: 'acct_MetadataAuthor',
+      email: identity.authorEmail,
+      metadata: { jm1_royalty_payee_id: identity.royaltyPayeeId },
+      details_submitted: false,
+      payouts_enabled: false,
+    },
+    {
+      id: 'acct_EmailAuthor',
+      email: identity.authorEmail,
+      metadata: {},
+      details_submitted: false,
+      payouts_enabled: false,
+    },
+    {
+      id: 'acct_TitleNamed',
+      business_profile: { name: 'The Intentional Leader' },
+      metadata: {},
+    },
+  ])
+
+  assert.deepEqual(findings, [
+    'AUTHOR_WITHOUT_CONNECT_STATE',
+    'CONNECT_ACCOUNT_WITHOUT_DATAVERSE_LINK',
+    'MULTIPLE_CONNECT_ACCOUNTS_FOR_PAYEE',
+    'TITLE_NAME_USED_AS_PAYEE_ACCOUNT',
+  ])
+})
+
 test('status mapping separates started, submitted, requirements, and ready states', () => {
   assert.equal(stripe.mapConnectAccountReadiness({
     details_submitted: false,
@@ -299,6 +404,29 @@ test('human status mapping uses author-readable setup states', () => {
     payouts_enabled: true,
     requirements: { currently_due: [], past_due: [] },
   }), 'SETUP_COMPLETE')
+})
+
+test('author enrollment state mapping has no unknown state', () => {
+  const states = [
+    stripe.mapAuthorConnectEnrollmentState({ id: 'acct_ready', details_submitted: true, payouts_enabled: true, requirements: { currently_due: [], past_due: [] } }),
+    stripe.mapAuthorConnectEnrollmentState({ id: 'acct_invited', details_submitted: false, payouts_enabled: false, requirements: { currently_due: [], past_due: [] } }, { invitationSent: true }),
+    stripe.mapAuthorConnectEnrollmentState({ id: 'acct_incomplete', details_submitted: false, payouts_enabled: false, requirements: { currently_due: [], past_due: [] } }),
+    stripe.mapAuthorConnectEnrollmentState({ id: 'acct_action', details_submitted: true, payouts_enabled: false, requirements: { currently_due: ['external_account'], past_due: [] } }),
+    stripe.mapAuthorConnectEnrollmentState({ id: 'acct_review', details_submitted: true, payouts_enabled: false, requirements: { currently_due: [], past_due: [] } }),
+    stripe.mapAuthorConnectEnrollmentState(null, { duplicateReview: true }),
+    stripe.mapAuthorConnectEnrollmentState(null, { identityReview: true }),
+  ]
+
+  assert.deepEqual(states, [
+    'PAYOUT_READY',
+    'ONBOARDING_INVITED',
+    'ONBOARDING_INCOMPLETE',
+    'ACTION_REQUIRED',
+    'UNDER_REVIEW',
+    'DUPLICATE_REVIEW',
+    'IDENTITY_REVIEW',
+  ])
+  assert.ok(!states.includes('UNKNOWN'))
 })
 
 test('webhook classifier recognizes account.updated for automatic status synchronization', () => {
@@ -359,9 +487,9 @@ test('author-facing setup card uses direct-deposit language and no dead-end acti
 test('invitation copy is setup-only and avoids royalty amount, timing, schedule, and activation-code prompts', () => {
   const serviceSource = readFileSync('lib/server/stripe/connect-author-pilot-service.ts', 'utf8')
 
-  assert.match(serviceSource, /Set Up Direct Deposit with J Merrill Publishing/)
-  assert.match(serviceSource, /Set Up Direct Deposit/)
-  assert.match(serviceSource, /verification code, that code comes from Stripe/)
+  assert.match(serviceSource, /Set Up Your J Merrill Publishing Stripe Connect/)
+  assert.match(serviceSource, /Complete Stripe Connect Setup/)
+  assert.match(serviceSource, /Stripe Connect as the secure setup process/)
   assert.doesNotMatch(serviceSource, /future royalty-payment delays|Set Up Your Royalty Payments|royalty amount|royalty schedule|activation code|recovery code/i)
 })
 
@@ -377,6 +505,60 @@ test('enrollment source cannot create or alter a royalty payable or trigger paym
 
   assert.doesNotMatch(routeSource, /createCommissioningCheckoutSession|checkoutUrl|paymentStatus/)
   assert.doesNotMatch(routeSource, /updateCommissioningOpportunityPaymentStatus|royaltyPayable|payableAmount/i)
+})
+
+test('Connect setup email is enabled unless the communication gate is explicitly disabled', () => {
+  const source = readFileSync('lib/server/stripe/connect-author-pilot-service.ts', 'utf8')
+
+  assert.match(source, /STRIPE_CONNECT_EMAIL_SEND/)
+  assert.match(source, /isStripeConnectEmailSendEnabled/)
+  assert.match(source, /configured !== 'false'/)
+  assert.match(source, /configured !== 'disabled'/)
+  assert.match(source, /configured !== '0'/)
+  assert.match(source, /ACCOUNT_LINK_READY/)
+  assert.match(source, /JACKIE_SEND_READY_NOT_SENT/)
+  assert.match(source, /emailAutomationDisabled/)
+  assert.match(source, /email-disabled/)
+})
+
+test('Connect setup communication template omits royalty-payment response language', () => {
+  const sources = [
+    readFileSync('lib/server/stripe/connect-author-pilot-service.ts', 'utf8'),
+    readFileSync('scripts/stripe_connect_author_pilot.mjs', 'utf8'),
+  ].join('\n')
+
+  assert.match(sources, /Set Up Your J Merrill Publishing Stripe Connect/)
+  assert.match(sources, /Complete Stripe Connect setup/)
+  assert.doesNotMatch(sources, /Set Up Your Royalty Payments/)
+  assert.doesNotMatch(sources, /royalty-payment delays/)
+  assert.doesNotMatch(sources, /projectTitle: 'Author Royalty Payments'/)
+})
+
+test('Connect Account Links use signed refresh and return contexts', async () => {
+  const calls = []
+  installMockFetch(calls)
+
+  const { accountId } = await stripe.resolveRecipientAccountId(identity)
+  await stripe.createRecipientAccountLink(accountId, identity)
+
+  const linkRequest = calls.find((call) => call.path === '/v1/account_links')
+  assert.ok(linkRequest)
+  assert.match(linkRequest.body.get('refresh_url'), /\/api\/author\/stripe\/connect\/refresh\?token=/)
+  assert.match(linkRequest.body.get('return_url'), /\/author\/financial-setup\?connect=return&token=/)
+  assert.doesNotMatch(linkRequest.body.get('refresh_url'), /contact=/)
+})
+
+test('legacy Connect financial setup links bypass the generic activation-code gate', () => {
+  const pageSource = readFileSync('app/author/financial-setup/page.tsx', 'utf8')
+  const refreshSource = readFileSync('app/api/author/stripe/connect/refresh/route.ts', 'utf8')
+
+  assert.match(pageSource, /isValidLegacyConnectContact/)
+  assert.ok(pageSource.includes('redirect(`/api/author/stripe/connect/refresh?contact='))
+  assert.match(pageSource, /ConnectReturnExperience/)
+  assert.match(refreshSource, /createFreshConnectAccountLinkFromLegacyContact/)
+  assert.match(refreshSource, /legacy_connect_account_missing/)
+  assert.match(refreshSource, /The author was not sent to an activation-code gate/)
+  assert.match(refreshSource, /P0_CONNECT_JOURNEY_REGRESSION/)
 })
 
 test('payment operations fail closed while the commissioning payment gate is false', async () => {
@@ -412,7 +594,13 @@ test('commissioning matrix captures the governed Connect journey and negative pr
     connect_return_requires_JMP_activation_code: pageSource.indexOf('if (token)') >= 0 && pageSource.indexOf('if (token)') < pageSource.indexOf('<AuthorGate scope="portal">') ? 0 : 1,
     connect_refresh_requires_JMP_activation_code: !/requireAuthorAccess|validateAuthorPortalAccessCode/.test(refreshSource) ? 0 : 1,
     expired_link_creates_new_Connect_account: !/resolveRecipientAccountId/.test(refreshSource) ? 0 : 1,
-    arbitrary_contactId_query_grants_access: !/searchParams\?\.(contact|contactId)|nextUrl\.searchParams\.get\(['"]contact/.test(combined) ? 0 : 1,
+    arbitrary_contactId_query_grants_access: /nextUrl\.searchParams\.get\(['"]contact/.test(combined) &&
+      /resolveGovernedAuthorConnectIdentity/.test(refreshSource) &&
+      /legacy_connect_account_missing/.test(refreshSource) &&
+      /assertConnectedAccountMatchesIdentity/.test(refreshSource) &&
+      /persistConnectAccountLinkage/.test(refreshSource)
+      ? 0
+      : 1,
     bank_data_stored_in_JMP: !/bankAccountNumber|routingNumber|taxIdentifier|socialSecurity|taxId/i.test(combined) ? 0 : 1,
     royalty_amount_timing_schedule_in_setup_email: !/royalty amount|royalty timing|payment schedule|payment amount/i.test(readFileSync('lib/server/stripe/connect-author-pilot-service.ts', 'utf8')) ? 0 : 1,
     generic_Author_Hub_auth_weakened: /<AuthorGate scope="portal">/.test(pageSource) ? 0 : 1,

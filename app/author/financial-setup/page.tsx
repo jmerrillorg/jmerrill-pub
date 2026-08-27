@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 
 import { AuthorGate } from '../_components/AuthorGate'
 import { AuthorPortalShell } from '../_components/AuthorPortalShell'
@@ -21,10 +22,16 @@ export const metadata: Metadata = {
 export default async function AuthorFinancialSetupPage({
   searchParams,
 }: {
-  searchParams?: Record<string, string | string[] | undefined>
+  searchParams?: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>
 }) {
-  const connectMode = first(searchParams?.connect)
-  const token = first(searchParams?.token)
+  const params = await searchParams
+  const contact = first(params?.contact)
+  if (isValidLegacyConnectContact(contact)) {
+    redirect(`/api/author/stripe/connect/refresh?contact=${encodeURIComponent(contact)}`)
+  }
+
+  const connectMode = first(params?.connect)
+  const token = first(params?.token)
   if (token) {
     return <ConnectReturnExperience token={token} />
   }
@@ -181,4 +188,8 @@ function humanStatusCopy(status: ConnectHumanStatus) {
 
 function first(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] || '' : value || ''
+}
+
+function isValidLegacyConnectContact(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
 }

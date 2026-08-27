@@ -43,6 +43,9 @@ export type StripeAccountObject = {
   object?: string
   email?: string
   livemode?: boolean
+  business_profile?: {
+    name?: string | null
+  }
   details_submitted?: boolean
   payouts_enabled?: boolean
   charges_enabled?: boolean
@@ -81,6 +84,43 @@ export type ConnectHumanStatus =
   | 'UNDER_REVIEW'
   | 'SETUP_COMPLETE'
   | 'SUPPORT_REQUIRED'
+
+export type ConnectedAccountMatchEvidence =
+  | 'stored_dataverse_account_id'
+  | 'metadata_contact_id'
+  | 'metadata_author_relationship_id'
+  | 'metadata_royalty_payee_id'
+  | 'exact_email'
+
+export type ConnectedAccountCandidate = {
+  account: StripeAccountObject
+  evidence: ConnectedAccountMatchEvidence[]
+}
+
+export const PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1 = Object.freeze({
+  name: 'PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1',
+  invariant: 'one_royalty_payee_one_canonical_stripe_connect_account',
+  matchingPrecedence: [
+    'stored_dataverse_account_id',
+    'metadata_contact_id',
+    'metadata_author_relationship_id',
+    'metadata_royalty_payee_id',
+    'exact_email',
+  ],
+  allowedOperations: [
+    'reuse_canonical_connect_account',
+    'refresh_account_link',
+    'update_readiness_status',
+    'reconcile_historical_duplicate',
+  ],
+  prohibitedOperations: [
+    'second_account_when_canonical_exists',
+    'create_while_duplicate_review_pending',
+    'shared_onboarding_link',
+    'cross_author_link',
+    'title_as_payee_without_authority',
+  ],
+} as const)
 
 const PROHIBITED_ENROLLMENT_CAPABILITY_KEYS = [
   'capabilities[card_payments][requested]',
@@ -216,10 +256,17 @@ export async function resolveRecipientAccountId(identity: AuthorConnectIdentity)
     return { accountId: identity.existingStripeAccountId, reused: true, source: 'dataverse_existing' as const }
   }
 
-  const existing = await searchConnectedAccountByIdentity(identity)
-  if (existing?.id) {
-    assertConnectedAccountMatchesIdentity(existing, identity)
-    return { accountId: existing.id, reused: true, source: 'stripe_identity_search' as const }
+  const candidates = await findConnectedAccountCandidates(identity)
+  if (candidates.length > 1) {
+    throw new Error('CONNECT_DUPLICATE_REVIEW')
+  }
+  const existing = candidates[0]
+  if (existing?.account.id) {
+    assertConnectedAccountMatchesIdentity(existing.account, identity)
+    const source = existing.evidence.some((item) => item.startsWith('metadata_'))
+      ? 'stripe_identity_search'
+      : 'stripe_email_search'
+    return { accountId: existing.account.id, reused: true, source: source as 'stripe_identity_search' | 'stripe_email_search' }
   }
 
   const account = await createRecipientAccount(identity)
@@ -241,24 +288,118 @@ export async function retrieveConnectedAccount(accountId: string) {
 }
 
 export async function searchConnectedAccountByIdentity(identity: AuthorConnectIdentity) {
-  const matches: StripeAccountObject[] = []
+  const candidates = await findConnectedAccountCandidates(identity)
+  if (candidates.length > 1) throw new Error('CONNECT_DUPLICATE_REVIEW')
+  return candidates[0]?.account || null
+}
+
+export async function findConnectedAccountCandidates(
+  identity: AuthorConnectIdentity,
+  providedAccounts?: StripeAccountObject[],
+) {
+  assertAuthorConnectIdentity(identity)
+  const accounts = providedAccounts || await listConnectedAccountsForReconciliation()
+  return accounts
+    .map((account) => ({
+      account,
+      evidence: getConnectedAccountMatchEvidence(account, identity),
+    }))
+    .filter((candidate) => candidate.account.id && candidate.evidence.length > 0)
+}
+
+export async function listConnectedAccountsForReconciliation(maxPages = 20) {
+  const accounts: StripeAccountObject[] = []
   let startingAfter = ''
 
-  for (let page = 0; page < 20; page += 1) {
+  for (let page = 0; page < maxPages; page += 1) {
     const query = new URLSearchParams({ limit: '100' })
     if (startingAfter) query.set('starting_after', startingAfter)
     const result = await stripeJson(`/v1/accounts?${query.toString()}`, { keyType: 'connect' })
     const data = Array.isArray(result.data) ? result.data : []
-    matches.push(...data.filter((account) => account.metadata?.jm1_royalty_payee_id === identity.royaltyPayeeId))
-    if (matches.length > 1) throw new Error('stripe_connect_account_ambiguous')
+    accounts.push(...data)
     if (!result.has_more) break
     const lastAccountId = data[data.length - 1]?.id
     if (!lastAccountId) break
     startingAfter = lastAccountId
   }
 
-  if (matches.length > 1) throw new Error('stripe_connect_account_ambiguous')
-  return matches[0] || null
+  return accounts
+}
+
+export function getConnectedAccountMatchEvidence(account: StripeAccountObject, identity: AuthorConnectIdentity) {
+  const metadata = account.metadata || {}
+  const evidence: ConnectedAccountMatchEvidence[] = []
+  if (identity.existingStripeAccountId && account.id === identity.existingStripeAccountId) {
+    evidence.push('stored_dataverse_account_id')
+  }
+  if (metadata.jm1_contact_id === identity.contactId) evidence.push('metadata_contact_id')
+  if (metadata.jm1_author_relationship_id === identity.authorRelationshipId) evidence.push('metadata_author_relationship_id')
+  if (metadata.jm1_royalty_payee_id === identity.royaltyPayeeId) evidence.push('metadata_royalty_payee_id')
+  if (normalizeEmail(account.email) && normalizeEmail(account.email) === normalizeEmail(identity.authorEmail)) {
+    evidence.push('exact_email')
+  }
+  return evidence
+}
+
+export function classifyConnectedAccountForAuthorEstate(account: StripeAccountObject, identities: AuthorConnectIdentity[] = []) {
+  if (isTitleNamedPayeeAccount(account)) return 'NONCANONICAL_RETIREMENT_CANDIDATE'
+  const candidates = identities
+    .map((identity) => ({ identity, evidence: getConnectedAccountMatchEvidence(account, identity) }))
+    .filter((candidate) => candidate.evidence.length > 0)
+  if (candidates.length === 0) return account.livemode === false ? 'TEST' : 'CONNECT_ACCOUNT_WITHOUT_DATAVERSE_LINK'
+  if (candidates.length > 1) return 'CONNECT_DUPLICATE_REVIEW'
+  assertConnectedAccountMatchesIdentity(account, candidates[0].identity)
+  const readiness = mapConnectAccountReadiness(account).readiness
+  if (readiness === 'READY_FOR_ROYALTIES') return 'CONNECT_CANONICAL_READY'
+  if (account.details_submitted) return 'CONNECT_ACTION_REQUIRED'
+  return 'CONNECT_EXISTS_ONBOARDING_INCOMPLETE'
+}
+
+export function detectStripeConnectDrift(identities: AuthorConnectIdentity[], accounts: StripeAccountObject[]) {
+  const findings: string[] = []
+  const accountIds = new Set(accounts.map((account) => account.id).filter(Boolean))
+  const accountById = new Map(accounts.filter((account) => account.id).map((account) => [account.id, account]))
+
+  for (const identity of identities) {
+    const candidates = accounts
+      .map((account) => ({ account, evidence: getConnectedAccountMatchEvidence(account, identity) }))
+      .filter((candidate) => candidate.evidence.length > 0)
+    if (!identity.existingStripeAccountId && candidates.length === 0) findings.push('AUTHOR_WITHOUT_CONNECT_STATE')
+    if (candidates.length > 1) findings.push('MULTIPLE_CONNECT_ACCOUNTS_FOR_PAYEE')
+    if (identity.existingStripeAccountId && !accountIds.has(identity.existingStripeAccountId)) {
+      findings.push('DATAVERSE_CONNECT_ID_NOT_FOUND_IN_STRIPE')
+    }
+    const stored = identity.existingStripeAccountId ? accountById.get(identity.existingStripeAccountId) : null
+    if (stored) {
+      try {
+        assertConnectedAccountMatchesIdentity(stored, identity)
+      } catch {
+        findings.push('CONNECTED_ACCOUNT_IDENTITY_MISMATCH')
+      }
+      if (mapConnectAccountReadiness(stored).readiness === 'READY_FOR_ROYALTIES' && !stored.details_submitted) {
+        findings.push('PAYOUT_READY_BUT_DATAVERSE_STALE')
+      }
+    }
+  }
+
+  if (accounts.some(isTitleNamedPayeeAccount)) findings.push('TITLE_NAME_USED_AS_PAYEE_ACCOUNT')
+  if (accounts.some((account) => !hasDataverseIdentityMetadata(account))) findings.push('CONNECT_ACCOUNT_WITHOUT_DATAVERSE_LINK')
+  return [...new Set(findings)].sort()
+}
+
+export function isTitleNamedPayeeAccount(account: StripeAccountObject) {
+  const names = [
+    account.business_profile?.name,
+    account.metadata?.jm1_title,
+    account.metadata?.jm1_reference,
+    account.metadata?.jm1_payee_name,
+  ].map((value) => normalizeComparable(value))
+  return names.some((value) => value === normalizeComparable(COMMISSIONING_TITLE))
+}
+
+function hasDataverseIdentityMetadata(account: StripeAccountObject) {
+  const metadata = account.metadata || {}
+  return Boolean(metadata.jm1_contact_id || metadata.jm1_author_relationship_id || metadata.jm1_royalty_payee_id)
 }
 
 export async function createRecipientAccountLink(accountId: string, identity: AuthorConnectIdentity) {
@@ -456,6 +597,24 @@ export function mapConnectHumanStatus(account: StripeAccountObject): ConnectHuma
   return 'NOT_STARTED'
 }
 
+export function mapAuthorConnectEnrollmentState(account: StripeAccountObject | null, options: {
+  duplicateReview?: boolean
+  identityReview?: boolean
+  invitationSent?: boolean
+} = {}) {
+  if (options.duplicateReview) return 'DUPLICATE_REVIEW'
+  if (options.identityReview || !account?.id) return 'IDENTITY_REVIEW'
+  const requirements = [
+    ...(account.requirements?.currently_due || []),
+    ...(account.requirements?.past_due || []),
+  ].filter(Boolean)
+  if (account.details_submitted && account.payouts_enabled && requirements.length === 0) return 'PAYOUT_READY'
+  if (account.details_submitted && requirements.length === 0 && !account.payouts_enabled) return 'UNDER_REVIEW'
+  if (requirements.length > 0) return 'ACTION_REQUIRED'
+  if (options.invitationSent) return 'ONBOARDING_INVITED'
+  return 'ONBOARDING_INCOMPLETE'
+}
+
 export async function createCommissioningCheckoutSession() {
   assertCommissioningPaymentGateOpen()
 
@@ -593,4 +752,11 @@ function clean(value?: string) {
 
 function normalizeEmail(value?: string) {
   return clean(value).toLowerCase()
+}
+
+function normalizeComparable(value?: string | null) {
+  return clean(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
 }
