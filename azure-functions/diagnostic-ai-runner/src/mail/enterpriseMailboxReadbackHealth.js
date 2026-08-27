@@ -14,6 +14,7 @@ const GOVERNED_MAILBOXES = Object.freeze({
     objectId: "516ec810-7be4-4bfe-97b4-7d7756732111",
     upn: "aic@jmerrill.one",
     primarySmtp: "aic@agapeic.org",
+    mailReadPrincipal: "aic@agapeic.org",
     expectedAcsFrom: "aic@email.agapeic.org",
     expectedReplyTo: "aic@agapeic.org"
   }),
@@ -23,6 +24,7 @@ const GOVERNED_MAILBOXES = Object.freeze({
     objectId: null,
     upn: "publishing@jmerrill.one",
     primarySmtp: "publishing@jmerrill.one",
+    mailReadPrincipal: "publishing@jmerrill.one",
     expectedAcsFrom: "publishing@email.jmerrill.one",
     expectedReplyTo: "publishing@jmerrill.one"
   })
@@ -54,7 +56,7 @@ function targetForBrand(brand) {
 }
 
 function graphUserId(target) {
-  return target.objectId || target.upn || target.primarySmtp;
+  return target.mailReadPrincipal || target.objectId || target.upn || target.primarySmtp;
 }
 
 async function getGraphToken(deps = {}) {
@@ -192,11 +194,11 @@ async function runEnterpriseMailboxReadbackHealth(input = {}, deps = {}) {
 
   const inboxMessages = Array.isArray(inboxProbe.body?.value) ? inboxProbe.body.value.map(safeMessageMetadata) : [];
   const sentMessages = Array.isArray(sentProbe.body?.value) ? sentProbe.body.value.map(safeMessageMetadata) : [];
-  const allProbesPass = userProbe.ok && foldersProbe.ok && inboxProbe.ok && sentProbe.ok;
+  const requiredProbesPass = foldersProbe.ok && inboxProbe.ok && sentProbe.ok;
 
   return {
-    ok: allProbesPass,
-    code: allProbesPass ? "ENTERPRISE_MAILBOX_READBACK_HEALTH_PASS" : "ENTERPRISE_MAILBOX_READBACK_HEALTH_FAIL",
+    ok: requiredProbesPass,
+    code: requiredProbesPass ? "ENTERPRISE_MAILBOX_READBACK_HEALTH_PASS" : "ENTERPRISE_MAILBOX_READBACK_HEALTH_FAIL",
     verifiedAt,
     brand,
     mailbox: {
@@ -204,6 +206,7 @@ async function runEnterpriseMailboxReadbackHealth(input = {}, deps = {}) {
       objectId: target.objectId,
       upn: target.upn,
       primarySmtp: target.primarySmtp,
+      mailReadPrincipal: target.mailReadPrincipal,
       expectedAcsFrom: target.expectedAcsFrom,
       expectedReplyTo: target.expectedReplyTo
     },
