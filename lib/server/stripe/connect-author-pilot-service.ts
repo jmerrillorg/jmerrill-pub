@@ -22,8 +22,9 @@ import {
 
 export const STRIPE_CONNECT_AUTHOR_PILOT_COHORT = 'JMP_STRIPE_CONNECT_AUTHOR_PILOT_2026_08_22'
 export const STRIPE_CONNECT_AUTHOR_PILOT_VERSION = 'JMP_STRIPE_CONNECT_AUTHOR_PILOT_2026_08_22_v1'
-export const STRIPE_CONNECT_AUTHOR_PILOT_SUBJECT = 'Set Up Direct Deposit with J Merrill Publishing'
+export const STRIPE_CONNECT_AUTHOR_PILOT_SUBJECT = 'Set Up Your J Merrill Publishing Stripe Connect'
 export const STRIPE_CONNECT_AUTHOR_PILOT_TEMPLATE = 'STRIPE_CONNECT_AUTHOR_PAYOUT_ENROLLMENT_V1'
+export const STRIPE_CONNECT_EMAIL_SEND_DISABLED_STATUS = 'ACCOUNT_LINK_READY'
 
 const ENTITY_PAYEE_PATTERN = /\b(LLC|L\.L\.C\.|INC|INC\.|CORP|CORPORATION|COMPANY|CO\.|FOUNDATION|MINISTRIES|CHURCH|TRUST|ESTATE)\b/i
 const NON_PILOT_NAME_PATTERN = /\b(deleted|test|sample|synthetic|admin)\b/i
@@ -81,8 +82,13 @@ export async function runStripeConnectAuthorPilot(request: StripeConnectAuthorPi
     ? await executePilot(config, selection.selected)
     : dryRunExecution(selection.selected)
 
+  const emailSendEnabled = isStripeConnectEmailSendEnabled()
+  const executePassed = request.mode === 'execute' && execution.failures.length === 0 && (
+    emailSendEnabled ? execution.invitationsSent >= 3 : execution.linksGenerated >= 3
+  )
+
   return {
-    classification: request.mode === 'execute' && execution.failures.length === 0 && execution.invitationsSent >= 3
+    classification: executePassed
       ? 'STRIPE_CONNECT_AUTHOR_PILOT_PASS'
       : 'STRIPE_CONNECT_AUTHOR_PILOT_BLOCKED',
     version: STRIPE_CONNECT_AUTHOR_PILOT_VERSION,
@@ -96,6 +102,7 @@ export async function runStripeConnectAuthorPilot(request: StripeConnectAuthorPi
     accountsReused: execution.accountsReused,
     linksGenerated: execution.linksGenerated,
     invitationsSent: execution.invitationsSent,
+    emailAutomationDisabled: !emailSendEnabled,
     failures: execution.failures,
     authors: execution.authors,
     negativeProof: buildNegativeProof(selection, execution),
@@ -213,6 +220,7 @@ function dryRunExecution(selected: PilotCandidate[]) {
 }
 
 async function executePilot(config: DataverseServerConfig, selected: PilotCandidate[]) {
+  const emailSendEnabled = isStripeConnectEmailSendEnabled()
   const execution = {
     invitationsSent: 0,
     accountsCreated: 0,
@@ -234,20 +242,23 @@ async function executePilot(config: DataverseServerConfig, selected: PilotCandid
       const readiness = await persistConnectAccountLinkage(config, identity, account)
       const link = await createRecipientAccountLink(accountResolution.accountId, identity)
       if (!link.url) throw new Error('stripe_account_link_missing_url')
-      const communication = await sendAuthorInvitation(identity, link.url, link.expires_at || null)
+      const communication = emailSendEnabled
+        ? await sendAuthorInvitation(identity, link.url, link.expires_at || null)
+        : await persistAccountLinkReady(config, identity)
       const log = await writeSafeExecutionLog({
-        name: `${STRIPE_CONNECT_AUTHOR_PILOT_COHORT}-INVITED-${identity.royaltyPayeeId}`,
-        actionType: 'STRIPE_CONNECT_AUTHOR_ONBOARDING_INVITED',
+        name: `${STRIPE_CONNECT_AUTHOR_PILOT_COHORT}-${emailSendEnabled ? 'INVITED' : 'LINK_READY'}-${identity.royaltyPayeeId}`,
+        actionType: emailSendEnabled ? 'STRIPE_CONNECT_AUTHOR_ONBOARDING_INVITED' : 'STRIPE_CONNECT_AUTHOR_ACCOUNT_LINK_READY_NOT_SENT',
         description:
-          `Stripe Connect author payout enrollment invitation sent for cohort ${STRIPE_CONNECT_AUTHOR_PILOT_COHORT}. ` +
+          `Stripe Connect author payout enrollment account link ${emailSendEnabled ? 'sent' : 'generated and held for manual delivery'} for cohort ${STRIPE_CONNECT_AUTHOR_PILOT_COHORT}. ` +
           `Contact ${identity.contactId}; Author Relationship ${identity.authorRelationshipId}; Royalty Payee ${identity.royaltyPayeeId}; ` +
           `account source ${accountResolution.source}; readiness ${readiness.readiness}; provider ${communication.provider}. ` +
-          'Transient onboarding URL was sent only to the intended author and is not stored in this log. No royalty payout, transfer, Bill.com disablement, payout cutover, contract change, rights change, or historical payment change occurred.',
+          `Transient onboarding URL was ${emailSendEnabled ? 'sent only to the intended author' : 'not emailed and is not stored'} in this log. ` +
+          'No royalty payout, transfer, Bill.com disablement, payout cutover, contract change, rights change, or historical payment change occurred.',
         sourceEntity: 'contact',
         sourceRecordId: identity.contactId,
       }).catch(() => ({ created: false, id: null, detail: 'execution_log_write_failed' }))
 
-      execution.invitationsSent += 1
+      if (emailSendEnabled) execution.invitationsSent += 1
       execution.linksGenerated += 1
       if (accountResolution.reused) execution.accountsReused += 1
       else execution.accountsCreated += 1
@@ -257,12 +268,12 @@ async function executePilot(config: DataverseServerConfig, selected: PilotCandid
         authorRelationshipId: identity.authorRelationshipId,
         royaltyPayeeId: identity.royaltyPayeeId,
         emailHash: hash(identity.authorEmail),
-        status: 'ONBOARDING_INVITED',
+        status: emailSendEnabled ? 'ONBOARDING_INVITED' : STRIPE_CONNECT_EMAIL_SEND_DISABLED_STATUS,
         accountSource: accountResolution.source,
         accountIdRedacted: redactStripeId(accountResolution.accountId),
         accountIdHash: hash(accountResolution.accountId),
         readiness: readiness.readiness,
-        providerMessageId: communication.providerMessageId || 'not-returned-by-relay',
+        providerMessageId: communication.providerMessageId || (emailSendEnabled ? 'not-returned-by-relay' : 'not-sent-email-disabled'),
         executionLogId: log.id || '',
       })
     } catch (error) {
@@ -274,6 +285,11 @@ async function executePilot(config: DataverseServerConfig, selected: PilotCandid
     }
   }
   return execution
+}
+
+export function isStripeConnectEmailSendEnabled() {
+  const configured = clean(process.env.STRIPE_CONNECT_EMAIL_SEND || process.env.JM1_STRIPE_CONNECT_EMAIL_SEND_ENABLED).toLowerCase()
+  return configured !== 'false' && configured !== 'disabled' && configured !== '0'
 }
 
 function identityFromCandidate(candidate: PilotCandidate): AuthorConnectIdentity {
@@ -307,6 +323,19 @@ async function persistConnectAccountLinkage(config: DataverseServerConfig, ident
   return status
 }
 
+async function persistAccountLinkReady(config: DataverseServerConfig, identity: AuthorConnectIdentity) {
+  await dataversePatch(config, 'contacts', identity.contactId, {
+    jm1pub_stripeonboardingstatus: STRIPE_CONNECT_EMAIL_SEND_DISABLED_STATUS,
+    jm1pub_stripelastverifiedat: new Date().toISOString(),
+    jm1pub_stripelastsyncresult: 'JACKIE_SEND_READY_NOT_SENT',
+    jm1pub_stripepilotcohort: STRIPE_CONNECT_AUTHOR_PILOT_COHORT,
+  })
+  return {
+    provider: 'email-disabled',
+    providerMessageId: '',
+  }
+}
+
 async function sendAuthorInvitation(identity: AuthorConnectIdentity, linkUrl: string, expiresAt: string | null) {
   const relayUrl = clean(process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL || process.env.JM1_INTERNAL_NOTIFICATION_RELAY_URL)
   const relayKey = clean(process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY || process.env.JM1_INTERNAL_NOTIFICATION_RELAY_KEY)
@@ -325,7 +354,7 @@ async function sendAuthorInvitation(identity: AuthorConnectIdentity, linkUrl: st
       authorEmail: identity.authorEmail,
       to: identity.authorEmail,
       authorName: identity.authorName,
-      projectTitle: 'Direct Deposit Setup',
+      projectTitle: 'Stripe Connect Setup',
       subject: STRIPE_CONNECT_AUTHOR_PILOT_SUBJECT,
       body: buildTextInvitation(identity, linkUrl),
       htmlBody: buildHtmlInvitation(identity, linkUrl),
@@ -359,15 +388,13 @@ function buildTextInvitation(identity: AuthorConnectIdentity, linkUrl: string) {
   return [
     `Good day ${firstName(identity.authorName)},`,
     '',
-    'J Merrill Publishing is setting up secure direct deposit for author payments.',
+    'J Merrill Publishing uses Stripe Connect as the secure setup process for direct deposit and payout information.',
     '',
-    'Stripe Connect will securely collect and verify your banking, tax, and identity information. Please do not send banking or tax information by email.',
+    'Please use the secure Stripe-hosted link below to complete your banking, tax, and identity setup inside Stripe. Please do not send banking or tax information by email.',
     '',
-    'You do not need a separate J Merrill Publishing code for this setup. If Stripe asks for a verification code, that code comes from Stripe.',
+    `Complete Stripe Connect setup: ${linkUrl}`,
     '',
-    `Set up direct deposit: ${linkUrl}`,
-    '',
-    'If you have questions, simply reply to this message and the Publishing Team will help.',
+    'If you have trouble with the setup link, reply to this message and the Publishing Team will help with Stripe Connect setup.',
     '',
     'With care,',
     'J Merrill Publishing',
@@ -375,7 +402,7 @@ function buildTextInvitation(identity: AuthorConnectIdentity, linkUrl: string) {
 }
 
 function buildHtmlInvitation(identity: AuthorConnectIdentity, linkUrl: string) {
-  return `<!doctype html><html><body style="margin:0;background:#f6f7f9;font-family:Arial,Helvetica,sans-serif;color:#111827;"><div style="max-width:680px;margin:0 auto;background:#ffffff;"><div style="background:#111827;color:#ffffff;padding:24px 28px;"><div style="font-size:18px;font-weight:700;">J Merrill Publishing</div><div style="font-size:13px;margin-top:4px;">A Division of J Merrill One</div></div><div style="padding:28px;"><p>Good day ${escapeHtml(firstName(identity.authorName))},</p><p>J Merrill Publishing is setting up secure direct deposit for author payments.</p><p>Stripe Connect will securely collect and verify your banking, tax, and identity information. Please do not send banking or tax information by email.</p><p>You do not need a separate J Merrill Publishing code for this setup. If Stripe asks for a verification code, that code comes from Stripe.</p><p style="margin:28px 0;"><a href="${escapeHtml(linkUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:6px;">Set Up Direct Deposit</a></p><p>If you have questions, simply reply to this message and the Publishing Team will help.</p><p>With care,<br>J Merrill Publishing</p></div></div></body></html>`
+  return `<!doctype html><html><body style="margin:0;background:#f6f7f9;font-family:Arial,Helvetica,sans-serif;color:#111827;"><div style="max-width:680px;margin:0 auto;background:#ffffff;"><div style="background:#111827;color:#ffffff;padding:24px 28px;"><div style="font-size:18px;font-weight:700;">J Merrill Publishing</div><div style="font-size:13px;margin-top:4px;">A Division of J Merrill One</div></div><div style="padding:28px;"><p>Good day ${escapeHtml(firstName(identity.authorName))},</p><p>J Merrill Publishing uses Stripe Connect as the secure setup process for direct deposit and payout information.</p><p>Please use the secure Stripe-hosted link below to complete your banking, tax, and identity setup inside Stripe. Please do not send banking or tax information by email.</p><p style="margin:28px 0;"><a href="${escapeHtml(linkUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:6px;">Complete Stripe Connect Setup</a></p><p>If you have trouble with the setup link, reply to this message and the Publishing Team will help with Stripe Connect setup.</p><p>With care,<br>J Merrill Publishing</p></div></div></body></html>`
 }
 
 function buildNegativeProof(

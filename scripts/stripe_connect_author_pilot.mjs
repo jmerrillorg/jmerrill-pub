@@ -14,7 +14,7 @@ export const OUT_DIR = 'docs/operations/generated/JMP-STRIPE-CONNECT-AUTHOR-PILO
 export const PR567_MERGE_SHA = '01f157c85650ecf6802f02148b9337b69a90aa88'
 export const PRODUCTION_HEALTH_URL = 'https://jmerrill.pub/api/health'
 export const RELAY_ROUTE = 'send-approved-author-response'
-export const AUTHOR_SUBJECT = 'Set Up Direct Deposit with J Merrill Publishing'
+export const AUTHOR_SUBJECT = 'Set Up Your J Merrill Publishing Stripe Connect'
 export const MAX_PILOT_AUTHORS = 3
 
 const ENTITY_PAYEE_PATTERN = /\b(LLC|L\.L\.C\.|INC|INC\.|CORP|CORPORATION|COMPANY|CO\.|FOUNDATION|MINISTRIES|CHURCH|TRUST|ESTATE)\b/i
@@ -399,7 +399,7 @@ async function sendAuthorInvitation({ identity, linkUrl, expiresAt }) {
       authorEmail: identity.authorEmail,
       to: identity.authorEmail,
       authorName: identity.authorName,
-      projectTitle: 'Direct Deposit Setup',
+      projectTitle: 'Stripe Connect Setup',
       subject: AUTHOR_SUBJECT,
       body: text,
       htmlBody: html,
@@ -435,15 +435,13 @@ function buildTextInvitation(identity, linkUrl) {
   return [
     `Good day ${firstName(identity.authorName)},`,
     '',
-    'J Merrill Publishing is setting up secure direct deposit for author payments.',
+    'J Merrill Publishing uses Stripe Connect as the secure setup process for direct deposit and payout information.',
     '',
-    'Stripe Connect will securely collect and verify your banking, tax, and identity information. Please do not send banking or tax information by email.',
+    'Please use the secure Stripe-hosted link below to complete your banking, tax, and identity setup inside Stripe. Please do not send banking or tax information by email.',
     '',
-    'You do not need a separate J Merrill Publishing code for this setup. If Stripe asks for a verification code, that code comes from Stripe.',
+    `Complete Stripe Connect setup: ${linkUrl}`,
     '',
-    `Set up direct deposit: ${linkUrl}`,
-    '',
-    'If you have questions, simply reply to this message and the Publishing Team will help.',
+    'If you have trouble with the setup link, reply to this message and the Publishing Team will help with Stripe Connect setup.',
     '',
     'With care,',
     'J Merrill Publishing',
@@ -461,13 +459,12 @@ function buildHtmlInvitation(identity, linkUrl) {
       </div>
       <div style="padding:28px;">
         <p>Good day ${escapeHtml(firstName(identity.authorName))},</p>
-        <p>J Merrill Publishing is setting up secure direct deposit for author payments.</p>
-        <p>Stripe Connect will securely collect and verify your banking, tax, and identity information. Please do not send banking or tax information by email.</p>
-        <p>You do not need a separate J Merrill Publishing code for this setup. If Stripe asks for a verification code, that code comes from Stripe.</p>
+        <p>J Merrill Publishing uses Stripe Connect as the secure setup process for direct deposit and payout information.</p>
+        <p>Please use the secure Stripe-hosted link below to complete your banking, tax, and identity setup inside Stripe. Please do not send banking or tax information by email.</p>
         <p style="margin:28px 0;">
-          <a href="${escapeHtml(linkUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:6px;">Set Up Direct Deposit</a>
+          <a href="${escapeHtml(linkUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:6px;">Complete Stripe Connect Setup</a>
         </p>
-        <p>If you have questions, simply reply to this message and the Publishing Team will help.</p>
+        <p>If you have trouble with the setup link, reply to this message and the Publishing Team will help with Stripe Connect setup.</p>
         <p>With care,<br>J Merrill Publishing</p>
       </div>
     </div>
