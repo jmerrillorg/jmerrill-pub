@@ -77,6 +77,31 @@ const REGISTRY = Object.freeze({
     publicContactIdentity: "productions@jmerrill.one",
     website: "jmerrill.productions",
     riskPolicy: "PRODUCTIONS"
+  }),
+  AIC: profile({
+    brand: "AIC",
+    acsFrom: "aic@email.agapeic.org",
+    replyTo: "aic@agapeic.org",
+    replyMailboxAuthority: "aic@agapeic.org",
+    replyAddressType: "MAILBOX",
+    inboundProcessingMailbox: "aic@agapeic.org",
+    ccRequired: false,
+    ccAddress: null,
+    organizationDisplayName: "Agape International Cathedral",
+    signatureName: "Agape International Cathedral",
+    publicContactIdentity: "aic@agapeic.org",
+    website: "agapeic.org",
+    riskPolicy: "AIC",
+    planningCenterBoundary: "PLANNING_CENTER_REMAINS_MINISTRY_EVENT_REGISTRATION_SOURCE_OF_RECORD",
+    voice: [
+      "faith-centered where appropriate",
+      "warm",
+      "clear",
+      "natural",
+      "community-aware",
+      "plain-English",
+      "not always sermon-like"
+    ]
   })
 });
 
@@ -99,7 +124,6 @@ function normalizeAddress(value) {
 function getSenderProfile(brand) {
   const normalized = normalizeBrand(brand);
   if (!normalized) return { ok: false, reason: "ACS_BRAND_REQUIRED" };
-  if (normalized === "AIC") return { ok: false, reason: "AIC_SENDER_IDENTITY_FOUNDER_DECISION_REQUIRED" };
   const profile = REGISTRY[normalized];
   if (!profile) return { ok: false, reason: "ACS_BRAND_UNKNOWN" };
   return { ok: true, profile };

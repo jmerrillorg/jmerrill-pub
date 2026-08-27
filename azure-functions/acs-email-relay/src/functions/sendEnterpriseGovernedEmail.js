@@ -160,10 +160,21 @@ function validateEnterprisePayload(payload = {}) {
   });
   if (!identity.ok) return { ok: false, reason: identity.reason };
 
-  const signature = validateSignatureBlock({ brand, text: `${plainText}\n${html}` });
-  if (!signature.ok) return { ok: false, reason: signature.reason };
+  const plainTextSignature = validateSignatureBlock({ brand, text: plainText });
+  if (!plainTextSignature.ok) return { ok: false, reason: plainTextSignature.reason };
+  const htmlSignature = validateSignatureBlock({ brand, text: html });
+  if (!htmlSignature.ok) return { ok: false, reason: htmlSignature.reason };
 
   if (HIGH_RISK_VALUES.has(riskClassification)) return { ok: false, reason: "HUMAN_REVIEW_REQUIRED_HIGH_RISK" };
+  if (profile.riskPolicy === "AIC" && payload.planningCenterAsSenderAuthority === true) {
+    return { ok: false, reason: "ACS_PLANNING_CENTER_AUTHORITY_MISMATCH" };
+  }
+  if (profile.riskPolicy === "AIC" && payload.relationshipContextValid === false) {
+    return { ok: false, reason: "ACS_RELATIONSHIP_CONTEXT_MISMATCH" };
+  }
+  if (profile.riskPolicy === "AIC" && /counseling|pastoral care|confidential|legal|attorney|financial hardship|crisis/i.test(`${subject}\n${plainText}\n${html}`)) {
+    return { ok: false, reason: "HUMAN_REVIEW_REQUIRED_AIC_SENSITIVE_CONTEXT" };
+  }
   if (profile.riskPolicy === "FINANCIAL" && /legal|attorney|guarantee|guaranteed|ensures|avoid probate|legally sound/i.test(`${subject}\n${plainText}\n${html}`)) {
     return { ok: false, reason: "HUMAN_REVIEW_REQUIRED_FINANCIAL_COMPLIANCE" };
   }

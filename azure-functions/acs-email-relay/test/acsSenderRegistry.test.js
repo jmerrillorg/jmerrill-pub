@@ -25,7 +25,8 @@ test("configured branch senders are allowed only for their own brand", () => {
     ["JMP", "publishing@email.jmerrill.one"],
     ["JMF", "financial@email.jmerrill.one"],
     ["JMFN", "foundation@email.jmerrill.one"],
-    ["JMPRODUCTIONS", "productions@email.jmerrill.one"]
+    ["JMPRODUCTIONS", "productions@email.jmerrill.one"],
+    ["AIC", "aic@email.agapeic.org"]
   ]) {
     const result = validateSenderForBrand({ brand, from });
     assert.equal(result.ok, true, brand);
@@ -39,6 +40,14 @@ test("cross-brand sender mismatch fails closed", () => {
   );
   assert.deepEqual(
     pick(validateSenderForBrand({ brand: "JMFN", from: "one@email.jmerrill.one" })),
+    { ok: false, reason: "ACS_BRAND_SENDER_MISMATCH" }
+  );
+  assert.deepEqual(
+    pick(validateSenderForBrand({ brand: "AIC", from: "publishing@email.jmerrill.one" })),
+    { ok: false, reason: "ACS_BRAND_SENDER_MISMATCH" }
+  );
+  assert.deepEqual(
+    pick(validateSenderForBrand({ brand: "AIC", from: "one@email.jmerrill.one" })),
     { ok: false, reason: "ACS_BRAND_SENDER_MISMATCH" }
   );
 });
@@ -84,16 +93,24 @@ test("duplicate signature is denied", () => {
   );
 });
 
-test("missing, unknown, and AIC brand fail closed", () => {
-  assert.deepEqual(pick(getSenderProfile("")), { ok: false, reason: "ACS_BRAND_REQUIRED" });
-  assert.deepEqual(pick(getSenderProfile("UNKNOWN")), { ok: false, reason: "ACS_BRAND_UNKNOWN" });
-  assert.deepEqual(pick(getSenderProfile("AIC")), { ok: false, reason: "AIC_SENDER_IDENTITY_FOUNDER_DECISION_REQUIRED" });
+test("AIC sender identity is governed by its own ACS sender and reply mailbox", () => {
+  const profile = getSenderProfile("AIC");
+  assert.equal(profile.ok, true);
+  assert.equal(profile.profile.acsFrom, "aic@email.agapeic.org");
+  assert.equal(profile.profile.replyTo, "aic@agapeic.org");
+  assert.equal(profile.profile.replyMailboxAuthority, "aic@agapeic.org");
+  assert.equal(profile.profile.riskPolicy, "AIC");
 });
 
-test("registry contains exactly the decided non-AIC brands", () => {
+test("missing and unknown brands fail closed", () => {
+  assert.deepEqual(pick(getSenderProfile("")), { ok: false, reason: "ACS_BRAND_REQUIRED" });
+  assert.deepEqual(pick(getSenderProfile("UNKNOWN")), { ok: false, reason: "ACS_BRAND_UNKNOWN" });
+});
+
+test("registry contains the decided enterprise brands including AIC", () => {
   assert.deepEqual(
     listSenderProfiles().map((profile) => profile.brand).sort(),
-    ["JM1", "JMF", "JMFN", "JMP", "JMPRODUCTIONS"].sort()
+    ["AIC", "JM1", "JMF", "JMFN", "JMP", "JMPRODUCTIONS"].sort()
   );
 });
 
