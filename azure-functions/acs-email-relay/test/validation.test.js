@@ -857,6 +857,13 @@ test("final developmental review rejects duplicate author-facing signatures", ()
   );
 });
 
+test("author-review package permits one canonical signature in html and text alternatives", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const result = validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload());
+
+  assert.equal(result.ok, true);
+});
+
 test("approved author-review package preserves full attachment base64 payloads", () => {
   const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
   const payloadBytes = Buffer.from("author-safe summary ".repeat(500));

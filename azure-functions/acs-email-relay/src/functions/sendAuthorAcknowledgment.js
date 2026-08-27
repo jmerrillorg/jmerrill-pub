@@ -1078,7 +1078,7 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_NEXT_STEP_REQUIRED" };
   }
 
-  if (canonicalPublishingFooterCount(`${html}\n${text}`) > 1) {
+  if (canonicalPublishingFooterCount(html) > 1 || canonicalPublishingFooterCount(text) > 1) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_DUPLICATE_SIGNATURE_BLOCKED" };
   }
 
