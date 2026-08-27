@@ -54,6 +54,8 @@
     "pr473-commissioning-consolidation-guard": "node --test scripts/pr473_commissioning_consolidation_guard.test.mjs",
     "author-royalty-connect-migration-source-guard": "node --test scripts/author_royalty_connect_migration_source_guard.test.mjs",
     "author-royalty-identity-reconciliation-guard": "node --test scripts/author_royalty_identity_reconciliation.test.mjs",
+    "stripe-connect-reminder-cadence-guard": "node --test scripts/stripe_connect_reminder_cadence.test.mjs scripts/stripe_connect_post_remediation_closure.test.mjs",
+    "stripe-connect-reminder-cadence": "node scripts/stripe_connect_post_remediation_closure.mjs --load-app-settings",
     "cv01a-author-experience-guard": "node --test scripts/cv01a_author_experience.test.mjs",
     "jm1-bootstrap": "node scripts/jm1_bootstrap.mjs",
     "jm1-bootstrap-guard": "node --test scripts/jm1_bootstrap_guard.test.mjs",

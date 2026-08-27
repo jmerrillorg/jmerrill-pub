@@ -7,6 +7,7 @@ import {
   classifyConnectState,
   classifyReminderEligibility,
 } from './stripe_connect_post_remediation_closure.mjs'
+import { classifyConnectReminderEligibility } from './stripe_connect_reminder_cadence.mjs'
 
 test('post-remediation production release may be the proven head or merge commit', () => {
   assert.ok([PR_656_HEAD, PR_656_MERGE_SHA].includes(PR_656_HEAD))
@@ -76,4 +77,21 @@ test('reminder gate treats recent Connect communication as not eligible now', ()
     jm1_actiontype: 'STRIPE_CONNECT_AUTHOR_ONBOARDING_INVITED',
   }]
   assert.equal(classifyReminderEligibility(row, logs, new Date().toISOString()).reason, 'RECENT_SETUP_COMMUNICATION')
+})
+
+test('canonical reminder cadence uses Day 0 valid delivery and sends only the next elapsed stage', () => {
+  const decision = classifyConnectReminderEligibility({
+    authorName: 'Author',
+    contactId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    accountExists: true,
+    state: 'SETUP_IN_PROGRESS',
+    supportState: 'NONE',
+    initialValidInvitationAt: '2026-08-20T12:00:00Z',
+  }, [
+    { eventType: 'INITIAL_INVITATION', deliveryStatus: 'SENT' },
+  ], '2026-08-27T12:01:00Z')
+
+  assert.equal(decision.send, true)
+  assert.equal(decision.reminderStage, 'REMINDER_1')
+  assert.equal(decision.disposition, 'DAY_3_ELIGIBLE')
 })
