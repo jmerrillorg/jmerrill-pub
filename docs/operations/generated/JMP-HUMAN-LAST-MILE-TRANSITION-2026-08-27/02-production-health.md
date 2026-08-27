@@ -1,6 +1,6 @@
 # Production Health Evidence
 
-Last Verified: 2026-08-27T10:49:52Z
+Last Verified: 2026-08-27T11:06:33Z
 
 ## `/api/health`
 
@@ -17,3 +17,8 @@ The production surface was healthy during this pass. The health endpoint release
 
 No new runtime health blocker was observed during this pass. Current system blockers remain closed unless a later production readback proves a new defect.
 
+## Deployment Readback After Merge
+
+- Premium App Service workflow: SUCCESS for main merge 985d2bff0f79452094c52855703900f1668d965b
+- Diagnostic Runner: manually deployed dependency-inclusive package for main tip bdd8443569226ffaa28cefb11e67f1b97e2eed4b; `/api/health` reports release and productionRelease equal to bdd8443569226ffaa28cefb11e67f1b97e2eed4b.
+- ACS Email Relay: manually deployed dependency-inclusive package for main tip bdd8443569226ffaa28cefb11e67f1b97e2eed4b; Function App readback reports Running and expected routes listed.
