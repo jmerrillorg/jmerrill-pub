@@ -13,6 +13,7 @@ const ORIGINAL_ENV = {
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   JM1_STRIPE_SECRET_KEY: process.env.JM1_STRIPE_SECRET_KEY,
   JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED: process.env.JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED,
+  AUTHOR_CONNECT_ENROLLMENT_TOKEN_SECRET: process.env.AUTHOR_CONNECT_ENROLLMENT_TOKEN_SECRET,
 }
 
 const identity = Object.freeze({
@@ -28,6 +29,7 @@ const identity = Object.freeze({
 
 function resetEnv() {
   process.env.STRIPE_CONNECT_SECRET_KEY = 'mock-connect-secret-not-a-stripe-key'
+  process.env.AUTHOR_CONNECT_ENROLLMENT_TOKEN_SECRET = 'mock-connect-enrollment-token-secret'
   delete process.env.STRIPE_SECRET_KEY
   delete process.env.JM1_STRIPE_SECRET_KEY
   process.env.JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED = 'false'
@@ -211,7 +213,31 @@ test('account-link creation is unique to the verified account and identity', asy
   assert.equal(calls[0].path, '/v1/account_links')
   assert.equal(calls[0].body.get('type'), 'account_onboarding')
   assert.equal(calls[0].body.get('account'), 'acct_MockAuthorPayoutEnrollment')
+  assert.match(calls[0].body.get('return_url'), /^https:\/\/jmerrill\.pub\/author\/financial-setup\?connect=return&token=/)
+  assert.match(calls[0].body.get('refresh_url'), /^https:\/\/jmerrill\.pub\/api\/author\/stripe\/connect\/refresh\?token=/)
+  assert.doesNotMatch(calls[0].body.get('return_url'), /author\/portal|contact=/)
+  assert.doesNotMatch(calls[0].body.get('refresh_url'), /contact=/)
   assert.match(calls[0].headers['Idempotency-Key'], new RegExp(`jm1-connect-account-link-${identity.royaltyPayeeId}-`))
+})
+
+test('enrollment token preserves verified author, payee, and account context without exposing an activation code', () => {
+  const token = stripe.createConnectEnrollmentToken(identity, 'acct_MockAuthorPayoutEnrollment', 1_800_000_000_000)
+  const context = stripe.verifyConnectEnrollmentToken(token, 1_800_000_001_000)
+
+  assert.equal(context.purpose, 'stripe_connect_direct_deposit_setup')
+  assert.equal(context.contactId, identity.contactId)
+  assert.equal(context.authorRelationshipId, identity.authorRelationshipId)
+  assert.equal(context.royaltyPayeeId, identity.royaltyPayeeId)
+  assert.equal(context.stripeAccountId, 'acct_MockAuthorPayoutEnrollment')
+  assert.doesNotMatch(token, /JMP-AUTHOR|activation|recovery/i)
+})
+
+test('tampered, expired, and malformed enrollment contexts fail closed', () => {
+  const token = stripe.createConnectEnrollmentToken(identity, 'acct_MockAuthorPayoutEnrollment', 1_800_000_000_000)
+
+  assert.throws(() => stripe.verifyConnectEnrollmentToken(`${token}x`, 1_800_000_001_000), /connect_enrollment_context_invalid/)
+  assert.throws(() => stripe.verifyConnectEnrollmentToken(token, 1_802_700_000_000), /connect_enrollment_context_expired/)
+  assert.throws(() => stripe.verifyConnectEnrollmentToken('not-a-token', 1_800_000_001_000), /connect_enrollment_context_invalid/)
 })
 
 test('wrong-author Stripe account metadata fails closed', () => {
@@ -249,6 +275,32 @@ test('status mapping separates started, submitted, requirements, and ready state
   }).readiness, 'READY_FOR_ROYALTIES')
 })
 
+test('human status mapping uses author-readable setup states', () => {
+  assert.equal(stripe.mapConnectHumanStatus({
+    details_submitted: false,
+    payouts_enabled: false,
+    requirements: { currently_due: ['external_account'], past_due: [] },
+  }), 'SETUP_IN_PROGRESS')
+
+  assert.equal(stripe.mapConnectHumanStatus({
+    details_submitted: true,
+    payouts_enabled: false,
+    requirements: { currently_due: ['verification.document'], past_due: [] },
+  }), 'MORE_INFORMATION_NEEDED')
+
+  assert.equal(stripe.mapConnectHumanStatus({
+    details_submitted: true,
+    payouts_enabled: false,
+    requirements: { currently_due: [], past_due: [] },
+  }), 'UNDER_REVIEW')
+
+  assert.equal(stripe.mapConnectHumanStatus({
+    details_submitted: true,
+    payouts_enabled: true,
+    requirements: { currently_due: [], past_due: [] },
+  }), 'SETUP_COMPLETE')
+})
+
 test('webhook classifier recognizes account.updated for automatic status synchronization', () => {
   const result = webhook.classifyStripeConnectAccountUpdateEvent({
     id: 'evt_account',
@@ -273,6 +325,44 @@ test('route no longer trusts posted Stripe account ids or title-specific constan
   assert.doesNotMatch(routeSource, /COMMISSIONING_REFERENCE|The Intentional Leader/)
   assert.match(routeSource, /validateAuthorPortalAccessCode/)
   assert.match(routeSource, /resolveGovernedAuthorConnectIdentity/)
+})
+
+test('financial setup page has a Connect-only return path and does not force activation-code copy for signed returns', () => {
+  const pageSource = readFileSync('app/author/financial-setup/page.tsx', 'utf8')
+
+  assert.match(pageSource, /ConnectReturnExperience/)
+  assert.match(pageSource, /readConnectEnrollmentStatusFromToken/)
+  assert.match(pageSource, /Set up direct deposit/)
+  assert.match(pageSource, /verification code, that code comes from Stripe/)
+  assert.doesNotMatch(pageSource, /future payment readiness/i)
+  assert.doesNotMatch(pageSource, /payment readiness/i)
+  assert.doesNotMatch(pageSource, /governed recovery|requirements object|Connect account status token|runtime/i)
+})
+
+test('Connect refresh route reissues a fresh link from signed context without author portal gate imports', () => {
+  const routeSource = readFileSync('app/api/author/stripe/connect/refresh/route.ts', 'utf8')
+
+  assert.match(routeSource, /createFreshConnectAccountLinkFromToken/)
+  assert.match(routeSource, /NextResponse\.redirect/)
+  assert.doesNotMatch(routeSource, /requireAuthorAccess|validateAuthorPortalAccessCode|AUTHOR_ONBOARDING_ACCESS_CODE/)
+  assert.doesNotMatch(routeSource, /charges|payment_intents|payouts|transfers|invoices/i)
+})
+
+test('author-facing setup card uses direct-deposit language and no dead-end activation code', () => {
+  const clientSource = readFileSync('app/author/_components/StripeConnectSetupCard.tsx', 'utf8')
+
+  assert.match(clientSource, /Set Up Direct Deposit/)
+  assert.match(clientSource, /J Merrill\s*\n\s*Publishing does not collect those details by email/)
+  assert.doesNotMatch(clientSource, /future payment readiness|Open Author Payout Enrollment|activation code|recovery code/i)
+})
+
+test('invitation copy is setup-only and avoids royalty amount, timing, schedule, and activation-code prompts', () => {
+  const serviceSource = readFileSync('lib/server/stripe/connect-author-pilot-service.ts', 'utf8')
+
+  assert.match(serviceSource, /Set Up Direct Deposit with J Merrill Publishing/)
+  assert.match(serviceSource, /Set Up Direct Deposit/)
+  assert.match(serviceSource, /verification code, that code comes from Stripe/)
+  assert.doesNotMatch(serviceSource, /future royalty-payment delays|Set Up Your Royalty Payments|royalty amount|royalty schedule|activation code|recovery code/i)
 })
 
 test('client no longer sends body-provided stripeAccountId from session storage', () => {
@@ -310,4 +400,31 @@ test('enrollment workflow never calls Stripe money-movement APIs', async () => {
 
   assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts'], ['POST', '/v1/accounts'], ['POST', '/v1/account_links']])
   assert.ok(calls.every((call) => !/^\/v1\/(charges|payment_intents|payouts|refunds|transfers)(\/|$)/.test(call.path)))
+})
+
+test('commissioning matrix captures the governed Connect journey and negative proof contract', () => {
+  const routeSource = readFileSync('app/api/author/stripe/connect/start/route.ts', 'utf8')
+  const refreshSource = readFileSync('app/api/author/stripe/connect/refresh/route.ts', 'utf8')
+  const pageSource = readFileSync('app/author/financial-setup/page.tsx', 'utf8')
+  const combined = `${routeSource}\n${refreshSource}\n${pageSource}`
+
+  const negativeProof = {
+    connect_return_requires_JMP_activation_code: pageSource.indexOf('if (token)') >= 0 && pageSource.indexOf('if (token)') < pageSource.indexOf('<AuthorGate scope="portal">') ? 0 : 1,
+    connect_refresh_requires_JMP_activation_code: !/requireAuthorAccess|validateAuthorPortalAccessCode/.test(refreshSource) ? 0 : 1,
+    expired_link_creates_new_Connect_account: !/resolveRecipientAccountId/.test(refreshSource) ? 0 : 1,
+    arbitrary_contactId_query_grants_access: !/searchParams\?\.(contact|contactId)|nextUrl\.searchParams\.get\(['"]contact/.test(combined) ? 0 : 1,
+    bank_data_stored_in_JMP: !/bankAccountNumber|routingNumber|taxIdentifier|socialSecurity|taxId/i.test(combined) ? 0 : 1,
+    royalty_amount_timing_schedule_in_setup_email: !/royalty amount|royalty timing|payment schedule|payment amount/i.test(readFileSync('lib/server/stripe/connect-author-pilot-service.ts', 'utf8')) ? 0 : 1,
+    generic_Author_Hub_auth_weakened: /<AuthorGate scope="portal">/.test(pageSource) ? 0 : 1,
+  }
+
+  assert.deepEqual(negativeProof, {
+    connect_return_requires_JMP_activation_code: 0,
+    connect_refresh_requires_JMP_activation_code: 0,
+    expired_link_creates_new_Connect_account: 0,
+    arbitrary_contactId_query_grants_access: 0,
+    bank_data_stored_in_JMP: 0,
+    royalty_amount_timing_schedule_in_setup_email: 0,
+    generic_Author_Hub_auth_weakened: 0,
+  })
 })

@@ -24,13 +24,13 @@ export function StripeConnectSetupCard() {
       })
 
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Unable to open Author Payout Enrollment.')
-      if (!data.onboardingUrl) throw new Error('Author Payout Enrollment link was not returned.')
+      if (!response.ok) throw new Error(data.error || 'Unable to open direct deposit setup.')
+      if (!data.onboardingUrl) throw new Error('Direct deposit setup link was not returned.')
 
       window.location.assign(data.onboardingUrl)
     } catch (err: any) {
       setStatus('error')
-      setError(err.message || 'Unable to open Author Payout Enrollment right now.')
+      setError(err.message || 'Unable to open direct deposit setup right now.')
     }
   }
 
@@ -38,19 +38,18 @@ export function StripeConnectSetupCard() {
     <div className="rounded-[32px] border border-white/8 bg-white/[0.04] p-7 sm:p-9">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Author Payout Enrollment</p>
-          <h2 className="mt-3 text-[28px] font-semibold text-white">Securely provide future payment details.</h2>
+          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-blue-300">Direct Deposit</p>
+          <h2 className="mt-3 text-[28px] font-semibold text-white">Set up direct deposit with Stripe.</h2>
           <p className="mt-3 max-w-[760px] text-[14px] font-light leading-[1.8] text-white/45">
-            Author Payout Enrollment allows you to securely provide Stripe with the identity, tax, and banking
-            information needed to receive future payments from J Merrill Publishing. Completing enrollment does not mean
-            that a payment is currently due, approved, or scheduled.
+            Stripe securely collects the identity, tax, and banking information needed for direct deposit. J Merrill
+            Publishing does not collect those details by email.
           </p>
         </div>
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {[
-          ['What this does', 'Opens Stripe-hosted enrollment so identity, tax, and banking details stay with Stripe.'],
+          ['What this does', 'Opens Stripe-hosted setup so banking, tax, and identity details stay with Stripe.'],
           ['What it does not do', 'It does not approve, schedule, release, or guarantee any payment from J Merrill Publishing.'],
         ].map(([heading, body]) => (
           <div key={heading} className="rounded-2xl border border-white/8 bg-black/15 p-5">
@@ -67,7 +66,7 @@ export function StripeConnectSetupCard() {
           disabled={status === 'submitting'}
           className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-blue-500 px-7 text-[13px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.35)] transition-all hover:-translate-y-0.5 hover:bg-blue-600 disabled:opacity-60"
         >
-          {status === 'submitting' ? 'Opening enrollment...' : 'Open Author Payout Enrollment'}
+          {status === 'submitting' ? 'Opening setup...' : 'Set Up Direct Deposit'}
         </button>
         <p className="text-[12px] leading-[1.7] text-white/30">
           Payment approval remains a separate J Merrill Publishing financial process.

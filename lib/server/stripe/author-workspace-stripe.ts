@@ -1,3 +1,5 @@
+import { createHmac, timingSafeEqual } from 'node:crypto'
+
 import {
   dataverseFirst,
   dataverseList,
@@ -60,6 +62,25 @@ export type StripeResponse = StripeAccountObject & {
   has_more?: boolean
   payment_status?: string
 }
+
+export type ConnectEnrollmentContext = {
+  v: 1
+  purpose: 'stripe_connect_direct_deposit_setup'
+  contactId: string
+  authorRelationshipId: string
+  royaltyPayeeId: string
+  stripeAccountId: string
+  issuedAt: number
+  expiresAt: number
+}
+
+export type ConnectHumanStatus =
+  | 'NOT_STARTED'
+  | 'SETUP_IN_PROGRESS'
+  | 'MORE_INFORMATION_NEEDED'
+  | 'UNDER_REVIEW'
+  | 'SETUP_COMPLETE'
+  | 'SUPPORT_REQUIRED'
 
 const PROHIBITED_ENROLLMENT_CAPABILITY_KEYS = [
   'capabilities[card_payments][requested]',
@@ -243,16 +264,99 @@ export async function searchConnectedAccountByIdentity(identity: AuthorConnectId
 export async function createRecipientAccountLink(accountId: string, identity: AuthorConnectIdentity) {
   assertAuthorConnectIdentity(identity)
   if (!/^acct_[A-Za-z0-9]+$/.test(accountId)) throw new Error('stripe_account_id_invalid')
+  const token = createConnectEnrollmentToken(identity, accountId)
+  const baseUrl = getPublicSiteUrl()
+  const encodedToken = encodeURIComponent(token)
   return stripeForm('/v1/account_links', new URLSearchParams({
     account: accountId,
     type: 'account_onboarding',
-    refresh_url: `https://jmerrill.pub/author/financial-setup?contact=${encodeURIComponent(identity.contactId)}`,
-    return_url: 'https://jmerrill.pub/author/portal?stripe=returned',
+    refresh_url: `${baseUrl}/api/author/stripe/connect/refresh?token=${encodedToken}`,
+    return_url: `${baseUrl}/author/financial-setup?connect=return&token=${encodedToken}`,
     'collection_options[fields]': 'eventually_due',
   }), {
     idempotencyKey: `jm1-connect-account-link-${identity.royaltyPayeeId}-${Date.now()}`,
     keyType: 'connect',
   })
+}
+
+export function createConnectEnrollmentToken(identity: AuthorConnectIdentity, accountId: string, now = Date.now()) {
+  assertAuthorConnectIdentity(identity)
+  if (!/^acct_[A-Za-z0-9]+$/.test(accountId)) throw new Error('stripe_account_id_invalid')
+  const context: ConnectEnrollmentContext = {
+    v: 1,
+    purpose: 'stripe_connect_direct_deposit_setup',
+    contactId: identity.contactId,
+    authorRelationshipId: identity.authorRelationshipId,
+    royaltyPayeeId: identity.royaltyPayeeId,
+    stripeAccountId: accountId,
+    issuedAt: now,
+    expiresAt: now + 1000 * 60 * 60 * 24 * 30,
+  }
+  const payload = base64url(JSON.stringify(context))
+  return `${payload}.${signConnectEnrollmentPayload(payload)}`
+}
+
+export function verifyConnectEnrollmentToken(token: string, now = Date.now()): ConnectEnrollmentContext {
+  const [payload, signature, extra] = String(token || '').split('.')
+  if (!payload || !signature || extra) throw new Error('connect_enrollment_context_invalid')
+  const expected = signConnectEnrollmentPayload(payload)
+  if (!safeEqual(signature, expected)) throw new Error('connect_enrollment_context_invalid')
+
+  let context: ConnectEnrollmentContext
+  try {
+    context = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'))
+  } catch {
+    throw new Error('connect_enrollment_context_invalid')
+  }
+
+  if (context.v !== 1 || context.purpose !== 'stripe_connect_direct_deposit_setup') {
+    throw new Error('connect_enrollment_context_invalid')
+  }
+  if (!cleanGuid(context.contactId) || !cleanGuid(context.authorRelationshipId) || !cleanGuid(context.royaltyPayeeId)) {
+    throw new Error('connect_enrollment_context_invalid')
+  }
+  if (!/^acct_[A-Za-z0-9]+$/.test(context.stripeAccountId)) throw new Error('connect_enrollment_context_invalid')
+  if (!Number.isFinite(context.expiresAt) || context.expiresAt < now) throw new Error('connect_enrollment_context_expired')
+  return context
+}
+
+export async function readConnectEnrollmentStatusFromToken(
+  token: string,
+  config: DataverseServerConfig | null = getDataverseServerConfig(),
+) {
+  if (!config) throw new Error('dataverse_config_missing')
+  const context = verifyConnectEnrollmentToken(token)
+  const identity = await resolveGovernedAuthorConnectIdentity({
+    contactId: context.contactId,
+    authorRelationshipId: context.authorRelationshipId,
+    royaltyPayeeId: context.royaltyPayeeId,
+  }, config)
+  if (identity.existingStripeAccountId && identity.existingStripeAccountId !== context.stripeAccountId) {
+    throw new Error('connect_enrollment_account_mismatch')
+  }
+  const account = await retrieveConnectedAccount(context.stripeAccountId)
+  assertConnectedAccountMatchesIdentity(account, identity)
+  const readiness = await persistConnectAccountLinkage(config, identity, account)
+  return {
+    identity,
+    account,
+    readiness,
+    humanStatus: mapConnectHumanStatus(account),
+    context,
+  }
+}
+
+export async function createFreshConnectAccountLinkFromToken(
+  token: string,
+  config: DataverseServerConfig | null = getDataverseServerConfig(),
+) {
+  const status = await readConnectEnrollmentStatusFromToken(token, config)
+  const link = await createRecipientAccountLink(status.context.stripeAccountId, {
+    ...status.identity,
+    existingStripeAccountId: status.context.stripeAccountId,
+  })
+  if (!link.url) throw new Error('stripe_account_link_missing_url')
+  return { ...status, link }
 }
 
 export function assertConnectedAccountMatchesIdentity(account: StripeAccountObject, identity: AuthorConnectIdentity) {
@@ -339,6 +443,19 @@ export function mapConnectAccountReadiness(account: StripeAccountObject) {
   }
 }
 
+export function mapConnectHumanStatus(account: StripeAccountObject): ConnectHumanStatus {
+  const current = account.requirements?.currently_due || []
+  const pastDue = account.requirements?.past_due || []
+  const disabledReason = account.requirements?.disabled_reason || ''
+  const dueCount = current.length + pastDue.length
+  if (account.details_submitted && account.payouts_enabled && dueCount === 0) return 'SETUP_COMPLETE'
+  if (pastDue.length > 0 || disabledReason) return 'MORE_INFORMATION_NEEDED'
+  if (account.details_submitted && dueCount > 0) return 'MORE_INFORMATION_NEEDED'
+  if (account.details_submitted && dueCount === 0) return 'UNDER_REVIEW'
+  if (dueCount > 0) return 'SETUP_IN_PROGRESS'
+  return 'NOT_STARTED'
+}
+
 export async function createCommissioningCheckoutSession() {
   assertCommissioningPaymentGateOpen()
 
@@ -411,6 +528,36 @@ function getStripeSecret(keyType: StripeKeyType) {
   const secret = primary || fallback || ''
   if (!secret) throw new Error(`stripe_${keyType}_secret_missing`)
   return secret
+}
+
+function getConnectEnrollmentSecret() {
+  const secret =
+    process.env.AUTHOR_CONNECT_ENROLLMENT_TOKEN_SECRET ||
+    process.env.AUTHOR_PORTAL_ACCESS_CODE_PEPPER ||
+    process.env.AUTHOR_PORTAL_MASTER_ACCESS_CODE ||
+    ''
+  if (!secret && process.env.NODE_ENV === 'production') throw new Error('connect_enrollment_secret_missing')
+  return secret || 'local-connect-enrollment-secret'
+}
+
+function signConnectEnrollmentPayload(payload: string) {
+  return createHmac('sha256', getConnectEnrollmentSecret()).update(payload).digest('base64url')
+}
+
+function safeEqual(actual: string, expected: string) {
+  const actualBuffer = Buffer.from(actual)
+  const expectedBuffer = Buffer.from(expected)
+  return actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer)
+}
+
+function base64url(value: string) {
+  return Buffer.from(value, 'utf8').toString('base64url')
+}
+
+function getPublicSiteUrl() {
+  return (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.JM1_PUBLIC_SITE_URL || 'https://jmerrill.pub')
+    .trim()
+    .replace(/\/+$/, '')
 }
 
 function stripeHeaders(options: { contentType: string; apiVersion?: string; idempotencyKey?: string; keyType: StripeKeyType }) {
