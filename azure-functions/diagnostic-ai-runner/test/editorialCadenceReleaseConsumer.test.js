@@ -2,6 +2,7 @@
 
 const assert = require("node:assert/strict");
 const test = require("node:test");
+const { Document, Packer, Paragraph } = require("docx");
 
 const {
   STAGE_BASELINE_BUSINESS_DAYS,
@@ -126,13 +127,32 @@ function makeClient(overrides = {}) {
   };
 }
 
+let cleanDocxPromise;
+
+function cleanDocxFixture() {
+  if (!cleanDocxPromise) {
+    const doc = new Document({
+      sections: [{
+        children: [
+          new Paragraph("Before You Were Born"),
+          new Paragraph("Chapter One"),
+          ...Array.from({ length: 900 }, (_, index) => new Paragraph(`This clean manuscript paragraph ${index + 1} contains story text for review and continues the book with character, scene, voice, continuity, and chapter movement.`)),
+          new Paragraph("The End")
+        ]
+      }]
+    });
+    cleanDocxPromise = Packer.toBuffer(doc);
+  }
+  return cleanDocxPromise;
+}
+
 function senderDeps(extra = {}) {
   const sends = [];
   return {
     sends,
     readDeliveryEvidence: async () => ({ ok: true, found: false, ambiguous: false, code: "NO_DELIVERY_EVIDENCE_FOUND" }),
     downloadArtifact: async (artifact) => artifact.jm1pub_repositoryitemid === "item-docx"
-      ? Buffer.from("PK test word/document.xml payload")
+      ? await cleanDocxFixture()
       : Buffer.from("Please review these materials and reply with your decision."),
     sendRelay: async (payload) => {
       sends.push(payload);

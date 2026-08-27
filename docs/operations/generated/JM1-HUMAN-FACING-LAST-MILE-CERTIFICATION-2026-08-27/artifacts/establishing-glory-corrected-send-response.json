@@ -1,0 +1,15 @@
+{
+  "status": 202,
+  "ok": true,
+  "body": {
+    "accepted": true,
+    "messageType": "APPROVED_AUTHOR_RESPONSE",
+    "deliveryStatus": "AUTHOR_RESPONSE_SENT",
+    "recipient": "chosen2k7@gmail.com",
+    "internalVisibilityMailbox": "publishing@jmerrill.one",
+    "intakeReferenceCode": "JMP-INT-202608-EG-LASTMILE",
+    "diagnosticId": "3362a1cb-1984-f111-ab0f-000d3a14673b",
+    "provider": "acs-email"
+  },
+  "recordedAt": "2026-08-27T09:57:18.068Z"
+}

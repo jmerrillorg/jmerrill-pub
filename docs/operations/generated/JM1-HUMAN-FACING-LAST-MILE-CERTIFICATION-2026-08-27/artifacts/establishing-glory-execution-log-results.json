@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "gateId": "b2fdf644-678e-f111-8077-00224820105b",
+  "results": [
+    {
+      "actionType": "HUMAN_LAST_MILE_DEFECT_RECORDED",
+      "action": "created",
+      "id": "ef352295-fea1-f111-b8dc-000d3a1a9efa",
+      "createdon": "2026-08-27T10:03:49Z"
+    },
+    {
+      "actionType": "ESTABLISHING_GLORY_CORRECTED_AUTHOR_REVIEW_DELIVERED",
+      "action": "created",
+      "id": "c72d8f93-fea1-f111-b8dc-6045bdd69738",
+      "createdon": "2026-08-27T10:03:50Z"
+    },
+    {
+      "actionType": "AUTHOR_RESPONSE_CLOCK_RESET_TO_CORRECTED_DELIVERY",
+      "action": "created",
+      "id": "aff2df95-fea1-f111-b8dc-000d3a14673b",
+      "createdon": "2026-08-27T10:03:50Z"
+    }
+  ],
+  "recordedAt": "2026-08-27T10:03:50.460Z"
+}

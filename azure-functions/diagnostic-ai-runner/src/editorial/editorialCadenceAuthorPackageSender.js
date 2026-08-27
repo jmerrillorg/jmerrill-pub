@@ -2,6 +2,11 @@
 
 const { createHash } = require("node:crypto");
 const { DefaultAzureCredential } = require("@azure/identity");
+const {
+  POLICY_ID: HUMAN_LAST_MILE_POLICY_ID,
+  certifyAuthorManuscriptAttachment,
+  certifyEmailLastMile
+} = require("../policy/humanLastMileCertification");
 
 const APPROVED_MESSAGE_TYPE = "APPROVED_AUTHOR_RESPONSE";
 const AUTHOR_REVIEW_PACKAGE_TEMPLATE = "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1";
@@ -222,13 +227,21 @@ async function materializeAttachments(input, deps = {}) {
     }
     const blocker = validateAttachmentBytes(role, fileName, buffer);
     if (blocker) throw Object.assign(new Error(blocker), { safeCode: blocker });
+    const certification = await certifyAuthorManuscriptAttachment({ role, fileName, buffer });
+    if (certification.decision === "DENY") {
+      throw Object.assign(
+        new Error(`HUMAN_LAST_MILE_ARTIFACT_ATTENTION_REQUIRED:${role}:${certification.violations.join(",")}`),
+        { safeCode: `HUMAN_LAST_MILE_ARTIFACT_ATTENTION_REQUIRED:${role}`, certification }
+      );
+    }
     attachments.push({
       name: fileName,
       contentType: contentTypeFor(fileName),
       contentInBase64: buffer.toString("base64"),
       role,
       artifactId: normalizeString(artifact.jm1pub_editorialartifactid),
-      sha256: actualSha
+      sha256: actualSha,
+      lastMileCertification: certification
     });
   }
   return attachments;
@@ -251,41 +264,24 @@ function buildAuthorResponseUrl(input) {
 function renderReviewCopy(input) {
   const label = stageLabel(input.stageCode);
   const title = normalizeString(input.titleName) || "your book";
-  const author = normalizeString(input.authorName) || "Author";
-  const actionUrl = buildAuthorResponseUrl(input);
+  const author = normalizeString(input.authorName).split(/\s+/)[0] || "Author";
   const packageInventory = input.attachments.map((attachment) => attachment.name);
   const subject = `${label} Materials - ${title}`;
   const text = [
-    `Good day ${author},`,
+    `Good day, ${author},`,
     "",
-    `Your ${label.toLowerCase()} materials for ${title} are ready for your review.`,
+    `Your ${label.toLowerCase()} materials for ${title} are ready for review.`,
     "",
-    "Why you are receiving this",
-    `The publishing team has completed the current ${label.toLowerCase()} package for your book.`,
+    "The complete review copy is attached here, along with a short review guide.",
     "",
-    "What has been completed",
-    "The publishing team prepared the current author-facing files.",
-    "The files you need for this review are attached to this email.",
-    "Your Author Operating Center has also been updated if you would like to view your project history or download another copy.",
-    "",
-    "What's attached",
+    "Attached:",
     ...packageInventory.map((name) => `- ${name}`),
     "",
-    "What we need from you",
-    "Please review the attached files for the current publishing stage.",
+    "Please review the manuscript carefully. If everything looks good, reply with \"Approved.\" If you'd like changes, simply tell us what you'd like adjusted.",
     "",
-    "How to respond",
-    "Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions. You may also include one consolidated correction list in your reply.",
+    "Once we receive your response, we'll move the book to the next editing stage or review the requested changes.",
     "",
-    `Optional Author Operating Center access: ${actionUrl}`,
-    "",
-    "What happens next",
-    "The publishing team will record your response.",
-    "If you approve, the project can move to the next publishing stage.",
-    "If you request corrections, the publishing team will review them before any stage movement.",
-    "",
-    "Support",
-    "If you have questions, reply directly to this message.",
+    "If you have any questions while reviewing it, just reply to this email.",
     "",
     "The Publishing Team",
     "J Merrill Publishing, Inc."
@@ -297,26 +293,24 @@ function renderReviewCopy(input) {
 <table role="presentation" width="680" cellpadding="0" cellspacing="0" style="width:680px;max-width:100%;background:#ffffff;border:1px solid #d9e0ea;">
 <tr><td style="background:#111827;color:#ffffff;padding:24px 28px;"><strong>J MERRILL PUBLISHING</strong><br><span style="font-size:13px;">A Division of J Merrill One</span><br><span style="font-size:13px;">Helping Authors Help Themselves.</span></td></tr>
 <tr><td style="padding:28px;">
-<p>Good day ${escapeHtml(author)},</p>
-<p>Your ${escapeHtml(label.toLowerCase())} materials for <strong>${escapeHtml(title)}</strong> are ready for your review.</p>
-<h2 style="font-size:18px;">Why you are receiving this</h2>
-<p>The publishing team has completed the current ${escapeHtml(label.toLowerCase())} package for your book.</p>
-<h2 style="font-size:18px;">What has been completed</h2>
-<p>The publishing team prepared the current author-facing files. The files you need for this review are attached to this email. Your Author Operating Center has also been updated if you would like to view your project history or download another copy.</p>
-<h2 style="font-size:18px;">What&#39;s attached</h2>
+<p>Good day, ${escapeHtml(author)},</p>
+<p>Your ${escapeHtml(label.toLowerCase())} materials for <strong>${escapeHtml(title)}</strong> are ready for review.</p>
+<p>The complete review copy is attached here, along with a short review guide.</p>
+<p><strong>Attached:</strong></p>
 <ul>${htmlList}</ul>
-<h2 style="font-size:18px;">What we need from you</h2>
-<p>Please review the attached files for the current publishing stage.</p>
-<h2 style="font-size:18px;">How to respond</h2>
-<p>Reply directly to <a href="mailto:publishing@jmerrill.one">publishing@jmerrill.one</a> with Approved, Approved with corrections, or I have questions. You may also include one consolidated correction list in your reply.</p>
-<p><a href="${escapeHtml(actionUrl)}" style="display:inline-block;background:#1f4ed8;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:4px;font-weight:bold;">View in Author Operating Center</a></p>
-<h2 style="font-size:18px;">What happens next</h2>
-<p>The publishing team will record your response. If you approve, the project can move to the next publishing stage. If you request corrections, the publishing team will review them before any stage movement.</p>
-<h2 style="font-size:18px;">Support</h2>
-<p>If you have questions, reply directly to this message.</p>
+<p>Please review the manuscript carefully. If everything looks good, reply with &quot;Approved.&quot; If you&#39;d like changes, simply tell us what you&#39;d like adjusted.</p>
+<p>Once we receive your response, we&#39;ll move the book to the next editing stage or review the requested changes.</p>
+<p>If you have any questions while reviewing it, just reply to this email.</p>
 <p>The Publishing Team<br>J Merrill Publishing, Inc.</p>
 </td></tr></table></td></tr></table>
 </body></html>`;
+  const certification = certifyEmailLastMile({ htmlBody: html, body: text, authorName: input.authorName });
+  if (certification.decision === "DENY") {
+    throw Object.assign(
+      new Error(`HUMAN_LAST_MILE_EMAIL_ATTENTION_REQUIRED:${certification.violations.join(",")}`),
+      { safeCode: "HUMAN_LAST_MILE_EMAIL_ATTENTION_REQUIRED", certification }
+    );
+  }
   return {
     subject,
     body: text,
@@ -332,7 +326,10 @@ function renderReviewCopy(input) {
       renderer: CANONICAL_RENDERER,
       rendererVersion: "1.0.0",
       renderMode: CANONICAL_RENDER_MODE,
-      renderTemplateGuard: "PASS"
+      renderTemplateGuard: "PASS",
+      lastMilePolicyVersion: HUMAN_LAST_MILE_POLICY_ID,
+      lastMileCertification: certification.decision,
+      lastMileCommissioningResult: certification.commissioningResult
     }
   };
 }

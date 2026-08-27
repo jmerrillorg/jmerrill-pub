@@ -1,0 +1,27 @@
+{
+  "sentAt": "2026-08-27T09:39:54.187Z",
+  "httpStatus": 400,
+  "accepted": false,
+  "responseBody": {
+    "accepted": false,
+    "code": "ACS_RELAY_VALIDATION_FAILED",
+    "reason": "AUTHOR_REVIEW_PACKAGE_CTA_BUTTON_REQUIRED",
+    "intakeReferenceCode": "JMP-INT-202407-EG-LIBRARY",
+    "diagnosticId": "b2fdf644-678e-f111-8077-00224820105b"
+  },
+  "subject": "Corrected Developmental Editing Materials - Establishing Glory: The Library",
+  "to": [
+    "chosen2k7@gmail.com"
+  ],
+  "cc": [
+    "publishing@jmerrill.one"
+  ],
+  "replyTo": "publishing@jmerrill.one",
+  "attachmentCount": 2,
+  "attachmentChecksums": {
+    "manuscript": "9aae176de7b318fec3d4e8c7b9ebf7750433261a4130dffcd14e4a50d4b9abf1",
+    "guide": "66d1a5357bde86e5df6502cd42b500f22fa5166aa9faacc6ba105747ab785792"
+  },
+  "htmlSha256": "f1970532681565ca9e91eff64ea4867cfe2d3538781314f709b6fdb258eebb9c",
+  "textSha256": "112f228493949e2555bf932aac447d368148ff28868a85fedbfc8561751982a5"
+}

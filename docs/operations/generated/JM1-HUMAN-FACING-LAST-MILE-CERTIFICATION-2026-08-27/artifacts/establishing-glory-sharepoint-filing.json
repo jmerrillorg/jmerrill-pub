@@ -1,0 +1,22 @@
+{
+  "recordedAt": "2026-08-27T10:04:32.416Z",
+  "hostname": "jmerrillfoundation.sharepoint.com",
+  "sitePath": "/sites/publishing",
+  "folder": "JM1-PUB/02_Active-Pipeline/01_Onboarding/Smith, Jackie Establishing Glory- The Library/02-MANUSCRIPT",
+  "files": [
+    {
+      "role": "corrected-author-review-manuscript",
+      "fileName": "2026-08-27-Establishing-Glory-Developmental-Editing-Corrected-Author-Review.docx",
+      "itemId": "01DF3SEQJ2UZF7VZDGHJA2CVQATZXX6RFR",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7BFA4BA63A-66E4-413A-A156-009E6F7F44B1%7D&file=2026-08-27-Establishing-Glory-Developmental-Editing-Corrected-Author-Review.docx&action=default&mobileredirect=true"
+    },
+    {
+      "role": "editorial-review-guide",
+      "fileName": "2026-08-27-Establishing-Glory-Developmental-Editing-Review-Guide.txt",
+      "itemId": "01DF3SEQKJJZTPZTDZOVHYTUADCLOZSC6S",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/JM1-PUB/02_Active-Pipeline/01_Onboarding/Smith,%20Jackie%20Establishing%20Glory-%20The%20Library/02-MANUSCRIPT/2026-08-27-Establishing-Glory-Developmental-Editing-Review-Guide.txt"
+    }
+  ]
+}
