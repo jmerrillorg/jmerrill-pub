@@ -181,6 +181,9 @@ function validateEnterprisePayload(payload = {}) {
   if (profile.riskPolicy === "PRODUCTIONS" && /rights|license|contract|talent release|usage rights/i.test(`${subject}\n${plainText}\n${html}`)) {
     return { ok: false, reason: "HUMAN_REVIEW_REQUIRED_RIGHTS_CONTRACT" };
   }
+  if (profile.riskPolicy === "PERSONAL_BRAND" && /publishing agreement|royalty|financial advice|legal advice|contract terms|rights transfer|tax advice/i.test(`${subject}\n${plainText}\n${html}`)) {
+    return { ok: false, reason: "HUMAN_REVIEW_REQUIRED_JSJ_PERSONAL_BRAND_BOUNDARY" };
+  }
   if (profile.riskPolicy === "FOUNDATION" && FOUNDATION_PROMOTIONAL_TYPES.has(messageType) && payload.marketingConsent !== true) {
     return { ok: false, reason: "FOUNDATION_MARKETING_CONSENT_REQUIRED" };
   }

@@ -26,7 +26,8 @@ test("configured branch senders are allowed only for their own brand", () => {
     ["JMF", "financial@email.jmerrill.one"],
     ["JMFN", "foundation@email.jmerrill.one"],
     ["JMPRODUCTIONS", "productions@email.jmerrill.one"],
-    ["AIC", "aic@email.agapeic.org"]
+    ["AIC", "aic@email.agapeic.org"],
+    ["JSJ", "jackie@email.jackiesmithjr.com"]
   ]) {
     const result = validateSenderForBrand({ brand, from });
     assert.equal(result.ok, true, brand);
@@ -48,6 +49,18 @@ test("cross-brand sender mismatch fails closed", () => {
   );
   assert.deepEqual(
     pick(validateSenderForBrand({ brand: "AIC", from: "one@email.jmerrill.one" })),
+    { ok: false, reason: "ACS_BRAND_SENDER_MISMATCH" }
+  );
+  assert.deepEqual(
+    pick(validateSenderForBrand({ brand: "JSJ", from: "one@email.jmerrill.one" })),
+    { ok: false, reason: "ACS_BRAND_SENDER_MISMATCH" }
+  );
+  assert.deepEqual(
+    pick(validateSenderForBrand({ brand: "JSJ", from: "aic@email.agapeic.org" })),
+    { ok: false, reason: "ACS_BRAND_SENDER_MISMATCH" }
+  );
+  assert.deepEqual(
+    pick(validateSenderForBrand({ brand: "JMP", from: "jackie@email.jackiesmithjr.com" })),
     { ok: false, reason: "ACS_BRAND_SENDER_MISMATCH" }
   );
 });
@@ -102,15 +115,45 @@ test("AIC sender identity is governed by its own ACS sender and reply mailbox", 
   assert.equal(profile.profile.riskPolicy, "AIC");
 });
 
+test("JSJ sender identity is governed by the Jackie Smith Jr. personal brand domain", () => {
+  const profile = getSenderProfile("JSJ");
+  assert.equal(profile.ok, true);
+  assert.equal(profile.profile.acsFrom, "jackie@email.jackiesmithjr.com");
+  assert.equal(profile.profile.replyTo, "jackie@jmerrill.one");
+  assert.equal(profile.profile.replyMailboxAuthority, "jackie@jmerrill.one");
+  assert.equal(profile.profile.replyAddressType, "MAILBOX");
+  assert.equal(profile.profile.riskPolicy, "PERSONAL_BRAND");
+
+  assert.equal(validateMessageIdentity({
+    brand: "JSJ",
+    from: "jackie@email.jackiesmithjr.com",
+    replyTo: "jackie@jmerrill.one"
+  }).ok, true);
+
+  for (const from of [
+    "one@email.jmerrill.one",
+    "publishing@email.jmerrill.one",
+    "financial@email.jmerrill.one",
+    "foundation@email.jmerrill.one",
+    "productions@email.jmerrill.one",
+    "aic@email.agapeic.org"
+  ]) {
+    assert.deepEqual(
+      pick(validateMessageIdentity({ brand: "JSJ", from, replyTo: "jackie@jmerrill.one" })),
+      { ok: false, reason: "ACS_BRAND_SENDER_MISMATCH" }
+    );
+  }
+});
+
 test("missing and unknown brands fail closed", () => {
   assert.deepEqual(pick(getSenderProfile("")), { ok: false, reason: "ACS_BRAND_REQUIRED" });
   assert.deepEqual(pick(getSenderProfile("UNKNOWN")), { ok: false, reason: "ACS_BRAND_UNKNOWN" });
 });
 
-test("registry contains the decided enterprise brands including AIC", () => {
+test("registry contains the decided enterprise brands including AIC and JSJ", () => {
   assert.deepEqual(
     listSenderProfiles().map((profile) => profile.brand).sort(),
-    ["AIC", "JM1", "JMF", "JMFN", "JMP", "JMPRODUCTIONS"].sort()
+    ["AIC", "JM1", "JMF", "JMFN", "JMP", "JMPRODUCTIONS", "JSJ"].sort()
   );
 });
 

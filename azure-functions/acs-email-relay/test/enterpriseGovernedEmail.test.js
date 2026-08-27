@@ -72,7 +72,8 @@ test("decided brands resolve to their own ACS sender and reply authority", () =>
     ["JMF", "financial@email.jmerrill.one", "financial@jmerrill.one"],
     ["JMFN", "foundation@email.jmerrill.one", "foundation@jmerrill.one"],
     ["JMPRODUCTIONS", "productions@email.jmerrill.one", "productions@jmerrill.one"],
-    ["AIC", "aic@email.agapeic.org", "aic@agapeic.org"]
+    ["AIC", "aic@email.agapeic.org", "aic@agapeic.org"],
+    ["JSJ", "jackie@email.jackiesmithjr.com", "jackie@jmerrill.one"]
   ]) {
     const result = validateEnterprisePayload(validPayload({
       brand,
@@ -130,6 +131,66 @@ test("AIC cannot use another JM1 brand sender", () => {
     assert.equal(result.ok, false);
     assert.equal(result.reason, "ACS_BRAND_SENDER_MISMATCH");
   }
+});
+
+test("JSJ routine personal-brand communication uses governed personal sender and Jackie reply mailbox", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  const result = validateEnterprisePayload(validPayload({
+    brand: "JSJ",
+    subject: "A note from Jackie Smith Jr.",
+    plainText: "Good day. I am sending this because I wanted to share a personal update from my desk.\n\nJackie Smith Jr.",
+    html: "<!doctype html><html><body><p>Good day.</p><p>I am sending this because I wanted to share a personal update from my desk.</p><p>Jackie Smith Jr.</p></body></html>"
+  }));
+  assert.equal(result.ok, true);
+  assert.equal(result.value.senderAddress, "jackie@email.jackiesmithjr.com");
+  assert.equal(result.value.replyTo, "jackie@jmerrill.one");
+  assert.equal(result.value.profile.replyMailboxAuthority, "jackie@jmerrill.one");
+});
+
+test("JSJ cannot borrow enterprise, divisional, or AIC sender domains", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  for (const senderAddress of [
+    "one@email.jmerrill.one",
+    "publishing@email.jmerrill.one",
+    "financial@email.jmerrill.one",
+    "foundation@email.jmerrill.one",
+    "productions@email.jmerrill.one",
+    "aic@email.agapeic.org"
+  ]) {
+    const result = validateEnterprisePayload(validPayload({
+      brand: "JSJ",
+      senderAddress,
+      replyTo: "jackie@jmerrill.one"
+    }));
+    assert.equal(result.ok, false, senderAddress);
+    assert.equal(result.reason, "ACS_BRAND_SENDER_MISMATCH");
+  }
+});
+
+test("Other contexts cannot use the JSJ personal-brand sender", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  for (const brand of ["JMP", "JMF", "AIC"]) {
+    const result = validateEnterprisePayload(validPayload({
+      brand,
+      senderAddress: "jackie@email.jackiesmithjr.com",
+      replyTo: brand === "AIC" ? "aic@agapeic.org" : brand === "JMF" ? "financial@jmerrill.one" : "publishing@jmerrill.one",
+      cc: brand === "JMP" ? ["publishing@jmerrill.one"] : []
+    }));
+    assert.equal(result.ok, false, brand);
+    assert.equal(result.reason, "ACS_BRAND_SENDER_MISMATCH");
+  }
+});
+
+test("JSJ personal-brand sender cannot carry divisional legal, financial, or contract authority", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  const result = validateEnterprisePayload(validPayload({
+    brand: "JSJ",
+    subject: "A note from Jackie Smith Jr.",
+    plainText: "Good day. This publishing agreement update contains contract terms for your review.\n\nJackie Smith Jr.",
+    html: "<!doctype html><html><body><p>Good day.</p><p>This publishing agreement update contains contract terms for your review.</p><p>Jackie Smith Jr.</p></body></html>"
+  }));
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "HUMAN_REVIEW_REQUIRED_JSJ_PERSONAL_BRAND_BOUNDARY");
 });
 
 test("AIC fails closed for wrong ministry context and Planning Center sender-authority misuse", () => {
