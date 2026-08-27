@@ -1,4 +1,4 @@
-name: Deploy ACS Email Relay to Flex Consumption (Node 24)
+name: Deploy ACS Email Relay (Node 24)
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: jm1-acs-email-relay-flex-${{ github.ref }}
+  group: jm1-acs-email-relay-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -22,10 +22,12 @@ env:
   AZURE_RESOURCE_GROUP: rg-jm1-communications
   FUNCTION_APP_NAME: func-jm1-acs-email-relay
   FUNCTION_APP_WORKING_DIR: azure-functions/acs-email-relay
+  PACKAGE_STORAGE_ACCOUNT: stjm1acsrelay
+  PACKAGE_CONTAINER: function-releases
 
 jobs:
   validate-and-deploy:
-    name: Validate, Package, Deploy to Flex
+    name: Validate, Package, Deploy
     runs-on: ubuntu-latest
     environment: production
 
@@ -72,22 +74,80 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Package function for Flex deployment
+      - name: Package function for zip deployment
         working-directory: ${{ env.FUNCTION_APP_WORKING_DIR }}
         run: |
-          # Flex Consumption uses zip-deploy (One Deploy semantics, not WEBSITE_RUN_FROM_PACKAGE)
           zip -r /tmp/acs-relay-${{ github.sha }}.zip . \
             --exclude "*.test.js" \
             --exclude "local.settings.*" \
             --exclude ".env*"
           ls -lh /tmp/acs-relay-${{ github.sha }}.zip
 
-      - name: Deploy to Flex Function App
+      - name: Deploy run-from-package to Function App
         run: |
-          az functionapp deployment source config-zip \
+          package_name="acs-relay-${{ github.sha }}.zip"
+          package_path="/tmp/$package_name"
+          expires_on=$(date -u -d "+10 years" "+%Y-%m-%dT%H:%MZ")
+          account_key=$(az storage account keys list \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --query "[0].value" \
+            -o tsv)
+
+          az storage blob upload \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --container-name "$PACKAGE_CONTAINER" \
+            --name "$package_name" \
+            --file "$package_path" \
+            --overwrite true \
+            --account-key "$account_key" \
+            -o none
+
+          package_url=$(az storage blob url \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --container-name "$PACKAGE_CONTAINER" \
+            --name "$package_name" \
+            --account-key "$account_key" \
+            -o tsv)
+
+          package_sas=$(az storage blob generate-sas \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --container-name "$PACKAGE_CONTAINER" \
+            --name "$package_name" \
+            --permissions r \
+            --expiry "$expires_on" \
+            --https-only \
+            --account-key "$account_key" \
+            -o tsv)
+
+          az functionapp config appsettings set \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$FUNCTION_APP_NAME" \
-            --src "/tmp/acs-relay-${{ github.sha }}.zip"
+            --settings "WEBSITE_RUN_FROM_PACKAGE=${package_url}?${package_sas}" \
+            -o none
+
+          az functionapp restart \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            -o none
+
+          echo "Package deployment: $package_name — PASS"
+
+      - name: Verify deployed package provenance
+        run: |
+          package_name="acs-relay-${{ github.sha }}.zip"
+          package_setting=$(az functionapp config appsettings list \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --query "[?name=='WEBSITE_RUN_FROM_PACKAGE'].value | [0]" \
+            -o tsv)
+
+          if [[ "$package_setting" != *"$package_name"* ]]; then
+            echo "FATAL: WEBSITE_RUN_FROM_PACKAGE does not reference $package_name"
+            exit 1
+          fi
+
+          echo "Package provenance: $package_name — PASS"
 
       - name: Verify Node 24 on deployed runtime
         run: |
