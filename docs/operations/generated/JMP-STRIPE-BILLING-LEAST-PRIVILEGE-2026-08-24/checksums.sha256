@@ -1,0 +1,6 @@
+9c7c106d35a1415f4ee476566fe6dfda121f5753a1f2e025e9f7ae147e66d1d8  docs/operations/generated/JMP-STRIPE-BILLING-LEAST-PRIVILEGE-2026-08-24/00-executive-summary.md
+5a2cc33ad37341cee06bbafdc5c6003f861a3eede092afd8e094df6349053deb  docs/operations/generated/JMP-STRIPE-BILLING-LEAST-PRIVILEGE-2026-08-24/01-required-stripe-operations.md
+2a58151faa0e816a5985568cd44ca34f55a277f87fa3bdd78c76adb4046b38c2  docs/operations/generated/JMP-STRIPE-BILLING-LEAST-PRIVILEGE-2026-08-24/02-live-permission-readback.md
+ae2bf9a9a050bc4158c70881890335cc4f0303222975aa4376d03e341ed72e28  docs/operations/generated/JMP-STRIPE-BILLING-LEAST-PRIVILEGE-2026-08-24/03-quanisha-readback.md
+bd50e80290b278670eb5204daad21f2ba4e93a3b6e39d7069a600adf0bc0d280  docs/operations/generated/JMP-STRIPE-BILLING-LEAST-PRIVILEGE-2026-08-24/04-secret-rotation-handoff.md
+d464c4837a9f6984dbbcb638b37c772ae2a4b97661b740986f6d342b0ab13fa6  docs/operations/generated/JMP-STRIPE-BILLING-LEAST-PRIVILEGE-2026-08-24/05-validation.md
