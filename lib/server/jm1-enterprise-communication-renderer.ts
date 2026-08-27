@@ -279,7 +279,7 @@ function renderHtml(input: Jm1EnterpriseCommunicationInput) {
                 </div>
                 ${input.replyOnly ? '' : `<p style="margin:0 0 22px;"><a href="${escapeHtml(input.actionUrl || '')}" style="display:inline-block;background:${colors.primaryCta};color:${colors.surfaceWhite};padding:11px 16px;font-size:14px;font-weight:700;text-decoration:none;">${escapeHtml(input.actionLabel || '')}</a></p>
                 <h2 style="margin:24px 0 10px;font-size:${type.headingM};color:${colors.textPrimary};">Optional Author Operating Center access</h2>
-                <p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">Your Author Operating Center is secondary to email and available when you want another copy or project history.</p>`}
+                <p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">Your Author Operating Center is secondary to email and available when you want another copy of these review materials.</p>`}
                 ${listSection('What happens next', timeline, colors.textSecondary, type.body, colors.textPrimary, type.headingM)}
                 ${section('Support', input.supportNote || '', colors.textSecondary, type.body, colors.textPrimary, type.headingM)}
                 ${input.operationalNote ? `<p style="margin:22px 0 0;font-size:${type.caption};line-height:1.6;color:${colors.textSecondary};">${escapeHtml(input.operationalNote)}</p>` : ''}
