@@ -129,6 +129,27 @@ describe("runEnterpriseMailboxReadbackHealth", () => {
     assert.equal(result.mailbox.mailReadPrincipal, GOVERNED_MAILBOXES.AIC.primarySmtp);
   });
 
+  test("falls back across governed AIC mailbox identifiers without broadening scope", async () => {
+    process.env[HEALTH_GATE_NAME] = "true";
+    const calls = mockFetchSequence([
+      response(403, { error: { code: "Authorization_RequestDenied" } }),
+      response(403, { error: { code: "ErrorAccessDenied" } }),
+      response(403, { error: { code: "ErrorAccessDenied" } }),
+      response(403, { error: { code: "ErrorAccessDenied" } }),
+      response(403, { error: { code: "Authorization_RequestDenied" } }),
+      response(200, { value: [{ displayName: "Inbox", totalItemCount: 3, unreadItemCount: 0 }] }),
+      response(200, { value: [] }),
+      response(200, { value: [] })
+    ]);
+
+    const result = await runEnterpriseMailboxReadbackHealth({ brand: "AIC" }, tokenDeps);
+    assert.equal(result.ok, true);
+    assert.equal(result.mailbox.selectedMailReadPrincipal, GOVERNED_MAILBOXES.AIC.upn);
+    assert.equal(result.principalAttempts.length, 2);
+    assert.ok(calls[0].url.includes(encodeURIComponent(GOVERNED_MAILBOXES.AIC.primarySmtp)));
+    assert.ok(calls[4].url.includes(encodeURIComponent(GOVERNED_MAILBOXES.AIC.upn)));
+  });
+
   test("bounded proof lookup returns safe metadata only", async () => {
     process.env[HEALTH_GATE_NAME] = "true";
     const calls = mockFetchSequence([
