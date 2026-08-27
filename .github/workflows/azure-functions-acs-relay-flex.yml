@@ -22,6 +22,8 @@ env:
   AZURE_RESOURCE_GROUP: rg-jm1-communications
   FUNCTION_APP_NAME: func-jm1-acs-email-relay
   FUNCTION_APP_WORKING_DIR: azure-functions/acs-email-relay
+  PACKAGE_STORAGE_ACCOUNT: stjm1acsrelay
+  PACKAGE_CONTAINER: function-releases
 
 jobs:
   validate-and-deploy:
@@ -81,28 +83,67 @@ jobs:
             --exclude ".env*"
           ls -lh /tmp/acs-relay-${{ github.sha }}.zip
 
-      - name: Deploy to Function App
+      - name: Deploy run-from-package to Function App
         run: |
-          for attempt in 1 2 3; do
-            echo "Deploy attempt $attempt of 3"
-            if az webapp deploy \
-              --resource-group "$AZURE_RESOURCE_GROUP" \
-              --name "$FUNCTION_APP_NAME" \
-              --src-path "/tmp/acs-relay-${{ github.sha }}.zip" \
-              --type zip \
-              --async false; then
-              echo "Deploy attempt $attempt — PASS"
-              exit 0
-            fi
+          package_name="acs-relay-${{ github.sha }}.zip"
+          package_path="/tmp/$package_name"
+          expires_on=$(date -u -d "+10 years" "+%Y-%m-%dT%H:%MZ")
 
-            if [ "$attempt" = "3" ]; then
-              echo "FATAL: ACS relay deployment failed after 3 attempts"
-              exit 1
-            fi
+          az storage blob upload \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --container-name "$PACKAGE_CONTAINER" \
+            --name "$package_name" \
+            --file "$package_path" \
+            --overwrite true \
+            --auth-mode login \
+            -o none
 
-            echo "Deploy attempt $attempt failed; waiting for SCM recovery before retry"
-            sleep 30
-          done
+          package_url=$(az storage blob url \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --container-name "$PACKAGE_CONTAINER" \
+            --name "$package_name" \
+            --auth-mode login \
+            -o tsv)
+
+          package_sas=$(az storage blob generate-sas \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --container-name "$PACKAGE_CONTAINER" \
+            --name "$package_name" \
+            --permissions r \
+            --expiry "$expires_on" \
+            --https-only \
+            --as-user \
+            --auth-mode login \
+            -o tsv)
+
+          az functionapp config appsettings set \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --settings "WEBSITE_RUN_FROM_PACKAGE=${package_url}?${package_sas}" \
+            -o none
+
+          az functionapp restart \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            -o none
+
+          echo "Package deployment: $package_name — PASS"
+
+      - name: Verify deployed package provenance
+        run: |
+          package_name="acs-relay-${{ github.sha }}.zip"
+          package_setting=$(az functionapp config appsettings list \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --query "[?name=='WEBSITE_RUN_FROM_PACKAGE'].value | [0]" \
+            -o tsv)
+
+          if [[ "$package_setting" != *"$package_name"* ]]; then
+            echo "FATAL: WEBSITE_RUN_FROM_PACKAGE does not reference $package_name"
+            exit 1
+          fi
+
+          echo "Package provenance: $package_name — PASS"
 
       - name: Verify Node 24 on deployed runtime
         run: |
