@@ -329,7 +329,15 @@ async function latestPackageCompletionLog(client, stageId) {
     $orderby: "createdon desc",
     $top: "10"
   });
-  return rows.find((row) => !/CHECKSUM_REPAIR|METADATA_REFRESH|BLOCK04-CADENCE-PACKAGE-MANIFEST-REFRESH/i.test(normalizeString(row.jm1_actiondescription))) || rows[0] || null;
+  const validRows = rows.filter((row) => !/CHECKSUM_REPAIR|METADATA_REFRESH|BLOCK04-CADENCE-PACKAGE-MANIFEST-REFRESH/i.test(normalizeString(row.jm1_actiondescription)));
+  const candidates = validRows.length ? validRows : rows;
+  const currentPackageId = parsePackage(candidates[0]?.jm1_actiondescription || "").packageId;
+  const currentPackageRows = currentPackageId
+    ? candidates.filter((row) => parsePackage(row.jm1_actiondescription || "").packageId === currentPackageId)
+    : candidates;
+  return currentPackageRows
+    .slice()
+    .sort((a, b) => new Date(a.createdon || 0).getTime() - new Date(b.createdon || 0).getTime())[0] || null;
 }
 
 function buildSchedule(stage, cadenceLog, completionLog, now) {

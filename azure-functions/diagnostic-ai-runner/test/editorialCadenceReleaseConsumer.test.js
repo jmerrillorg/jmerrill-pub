@@ -236,6 +236,38 @@ test("metadata-refresh package completion does not restart an already due cadenc
   assert.equal(deps.sends.length, 1);
 });
 
+test("repeated package handoff for same output does not restart cadence hold", async () => {
+  const client = makeClient({
+    completionLogs: [
+      {
+        jm1_executionlogid: "same-output-repeat",
+        jm1_actiontype: "EDITORIAL_PACKAGE_HANDOFF_COMPLETED",
+        jm1_sourcerecordid: stageId,
+        createdon: "2026-08-27T01:30:02Z",
+        jm1_actiondescription:
+          `Package handoff completed. Package ${packageId}; version v1; manifest artifact-before-you-were-born; QA READY_INTERNAL; cadence CADENCE_HOLD; ` +
+          "Correlation EDITORIAL-PACKAGE-HANDOFF-TIMER-2026-08-27T01:30:00.003Z."
+      },
+      {
+        jm1_executionlogid: "original-output-package",
+        jm1_actiontype: "EDITORIAL_PACKAGE_HANDOFF_COMPLETED",
+        jm1_sourcerecordid: stageId,
+        createdon: "2026-08-20T15:00:00Z",
+        jm1_actiondescription:
+          `Package handoff completed. Package ${packageId}; version v1; manifest artifact-before-you-were-born; QA READY_INTERNAL; cadence CADENCE_HOLD.`
+      }
+    ]
+  });
+  const deps = senderDeps();
+  const result = await runEditorialCadenceReleaseConsumer(
+    { now: "2026-08-25T15:00:00Z", correlationId: "test-repeated-package-handoff-does-not-reset-cadence" },
+    { client, ...deps }
+  );
+  assert.equal(result.results[0].schedule.cadenceStartedAt, "2026-08-20T15:00:00Z");
+  assert.equal(result.results[0].schedule.scheduledReleaseAt, "2026-08-27T15:00:00.000Z");
+  assert.equal(result.results[0].status, "SCHEDULED_AUTOMATIC_FUTURE");
+});
+
 test("due package with no canonical or mailbox delivery evidence sends once through governed ACS relay", async () => {
   const client = makeClient();
   const deps = senderDeps();
