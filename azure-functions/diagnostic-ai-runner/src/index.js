@@ -37,5 +37,6 @@ require("./functions/runPublisherRecommendationAction");
 require("./functions/runPublisherReviewDecision");
 require("./functions/runPublishingIntakeAutostartRecovery");
 require("./functions/runPublishingMailboxReplyCheck");
+require("./functions/runEnterpriseMailboxReadbackHealth");
 require("./functions/runStage0Diagnostic");
 require("./functions/signNowWebhook");
