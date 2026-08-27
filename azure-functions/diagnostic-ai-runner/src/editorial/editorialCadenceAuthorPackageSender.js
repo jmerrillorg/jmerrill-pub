@@ -264,15 +264,15 @@ function renderReviewCopy(input) {
     `The publishing team has completed the current ${label.toLowerCase()} package for your book.`,
     "",
     "What has been completed",
-    "The publishing team prepared the current author-facing files.",
-    "The files you need for this review are attached to this email.",
-    "Your Author Operating Center has also been updated if you would like to view your project history or download another copy.",
+    "The publishing team prepared the review materials for your book.",
+    "The complete manuscript or proof for this review is attached to this email.",
+    "Your Author Operating Center has also been updated if you would like to download another copy.",
     "",
     "What's attached",
     ...packageInventory.map((name) => `- ${name}`),
     "",
     "What we need from you",
-    "Please review the attached files for the current publishing stage.",
+    "Please review the attached materials for this step. You do not need to use the portal to complete this review.",
     "",
     "How to respond",
     "Reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or I have questions. You may also include one consolidated correction list in your reply.",
@@ -302,11 +302,11 @@ function renderReviewCopy(input) {
 <h2 style="font-size:18px;">Why you are receiving this</h2>
 <p>The publishing team has completed the current ${escapeHtml(label.toLowerCase())} package for your book.</p>
 <h2 style="font-size:18px;">What has been completed</h2>
-<p>The publishing team prepared the current author-facing files. The files you need for this review are attached to this email. Your Author Operating Center has also been updated if you would like to view your project history or download another copy.</p>
+<p>The publishing team prepared the review materials for your book. The complete manuscript or proof for this review is attached to this email. Your Author Operating Center has also been updated if you would like to download another copy.</p>
 <h2 style="font-size:18px;">What&#39;s attached</h2>
 <ul>${htmlList}</ul>
 <h2 style="font-size:18px;">What we need from you</h2>
-<p>Please review the attached files for the current publishing stage.</p>
+<p>Please review the attached materials for this step. You do not need to use the portal to complete this review.</p>
 <h2 style="font-size:18px;">How to respond</h2>
 <p>Reply directly to <a href="mailto:publishing@jmerrill.one">publishing@jmerrill.one</a> with Approved, Approved with corrections, or I have questions. You may also include one consolidated correction list in your reply.</p>
 <p><a href="${escapeHtml(actionUrl)}" style="display:inline-block;background:#1f4ed8;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:4px;font-weight:bold;">View in Author Operating Center</a></p>

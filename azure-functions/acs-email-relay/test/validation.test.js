@@ -268,7 +268,7 @@ function validAuthorReviewPackagePayload(overrides = {}) {
     <h2>Why you are receiving this</h2>
     <p>Your cover design review package is ready.</p>
     <h2>What has been completed</h2>
-    <ul><li>The Publishing Team prepared the current author-facing files.</li></ul>
+    <ul><li>The Publishing Team prepared the review materials for your book.</li></ul>
     <h2>What's attached</h2>
     <ul><li>Cover concept image.</li></ul>
     <h2>What we need from you</h2>
@@ -292,7 +292,7 @@ function validAuthorReviewPackagePayload(overrides = {}) {
       "Your package is ready.",
       "",
       "What has been completed",
-      "- The Publishing Team prepared the current author-facing files.",
+      "- The Publishing Team prepared the review materials for your book.",
       "",
       "What's attached",
       "- Current author-review manuscript",
