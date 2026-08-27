@@ -1,6 +1,6 @@
 # JMP Human Last-Mile Transition - Executive Summary
 
-Last Verified: 2026-08-27T10:49:52Z
+Last Verified: 2026-08-27T11:06:33Z
 
 ## Scope
 
@@ -18,10 +18,13 @@ This package records the transition from system-blocker closure to human-facing 
 - Long Watch Line package rerun: NO
 - Pre-send last-mile enforcement added: YES
 - Active author-review runtime source copy remediated: YES
+- Premium App Service deployment: PASS
+- Diagnostic Runner deployment: MANUAL DEPLOY / HEALTH PASS
+- ACS Email Relay deployment: MANUAL DEPLOY / RUNNING / ROUTES LISTED
+- GitHub ACS OIDC deployment path: RBAC BLOCKED
 - Evidence classification: CONTROLLED COMMISSIONING
 
 ## Final Classifications
 
 - System blockers: JMP_CURRENT_SYSTEM_BLOCKERS_CLOSED
 - Publishing human-facing: JMP_HUMAN_LAST_MILE_CONTROLLED_COMMISSIONING
-
