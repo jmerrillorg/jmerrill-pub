@@ -88,6 +88,11 @@ jobs:
           package_name="acs-relay-${{ github.sha }}.zip"
           package_path="/tmp/$package_name"
           expires_on=$(date -u -d "+10 years" "+%Y-%m-%dT%H:%MZ")
+          account_key=$(az storage account keys list \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --query "[0].value" \
+            -o tsv)
 
           az storage blob upload \
             --account-name "$PACKAGE_STORAGE_ACCOUNT" \
@@ -95,14 +100,14 @@ jobs:
             --name "$package_name" \
             --file "$package_path" \
             --overwrite true \
-            --auth-mode login \
+            --account-key "$account_key" \
             -o none
 
           package_url=$(az storage blob url \
             --account-name "$PACKAGE_STORAGE_ACCOUNT" \
             --container-name "$PACKAGE_CONTAINER" \
             --name "$package_name" \
-            --auth-mode login \
+            --account-key "$account_key" \
             -o tsv)
 
           package_sas=$(az storage blob generate-sas \
@@ -112,8 +117,7 @@ jobs:
             --permissions r \
             --expiry "$expires_on" \
             --https-only \
-            --as-user \
-            --auth-mode login \
+            --account-key "$account_key" \
             -o tsv)
 
           az functionapp config appsettings set \
