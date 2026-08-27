@@ -1,4 +1,4 @@
-name: Deploy ACS Email Relay to Flex Consumption (Node 24)
+name: Deploy ACS Email Relay (Node 24)
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: jm1-acs-email-relay-flex-${{ github.ref }}
+  group: jm1-acs-email-relay-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -25,7 +25,7 @@ env:
 
 jobs:
   validate-and-deploy:
-    name: Validate, Package, Deploy to Flex
+    name: Validate, Package, Deploy
     runs-on: ubuntu-latest
     environment: production
 
@@ -72,22 +72,23 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Package function for Flex deployment
+      - name: Package function for zip deployment
         working-directory: ${{ env.FUNCTION_APP_WORKING_DIR }}
         run: |
-          # Flex Consumption uses zip-deploy (One Deploy semantics, not WEBSITE_RUN_FROM_PACKAGE)
           zip -r /tmp/acs-relay-${{ github.sha }}.zip . \
             --exclude "*.test.js" \
             --exclude "local.settings.*" \
             --exclude ".env*"
           ls -lh /tmp/acs-relay-${{ github.sha }}.zip
 
-      - name: Deploy to Flex Function App
+      - name: Deploy to Function App
         run: |
-          az functionapp deployment source config-zip \
+          az webapp deploy \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$FUNCTION_APP_NAME" \
-            --src "/tmp/acs-relay-${{ github.sha }}.zip"
+            --src-path "/tmp/acs-relay-${{ github.sha }}.zip" \
+            --type zip \
+            --async false
 
       - name: Verify Node 24 on deployed runtime
         run: |
