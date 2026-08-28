@@ -1,0 +1,14 @@
+# Artifact Role Model
+
+Last Verified: 2026-08-28T03:43:26.345Z
+
+| Role | May Be Author-Facing Manuscript Authority |
+| --- | --- |
+| AUTHOR_REVIEW_MANUSCRIPT | YES |
+| AUTHOR_REVIEW_INSTRUCTIONS | NO |
+| AUTHOR_REVIEW_PROOF | YES for proof stages only |
+| INTERNAL_EDITORIAL_ARTIFACT | NO |
+| INTERNAL_EXECUTION_ARTIFACT | NO |
+| INTERNAL_QA_ARTIFACT | NO |
+| INTERNAL_MANIFEST | NO |
+| EVIDENCE_ONLY | NO |
