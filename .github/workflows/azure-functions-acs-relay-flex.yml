@@ -1,4 +1,4 @@
-name: Deploy ACS Email Relay (Node 24)
+name: Deploy ACS Email Relay (Node 22)
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  NODE_VERSION: "24"
+  NODE_VERSION: "22"
   AZURE_RESOURCE_GROUP: rg-jm1-communications
   FUNCTION_APP_NAME: func-jm1-acs-email-relay
   FUNCTION_APP_WORKING_DIR: azure-functions/acs-email-relay
@@ -35,18 +35,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node 24
+      - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
           cache-dependency-path: ${{ env.FUNCTION_APP_WORKING_DIR }}/package-lock.json
 
-      - name: Verify Node 24
+      - name: Verify Node 22
         run: |
           node_major=$(node -e "process.stdout.write(process.version.split('.')[0].slice(1))")
-          if [ "$node_major" != "24" ]; then
-            echo "FATAL: Node major must be 24, got $node_major"
+          if [ "$node_major" != "22" ]; then
+            echo "FATAL: Node major must be 22, got $node_major"
             exit 1
           fi
           echo "Node version: $(node --version) — PASS"
@@ -125,8 +125,18 @@ jobs:
             --name "$FUNCTION_APP_NAME" \
             --settings \
               "WEBSITE_RUN_FROM_PACKAGE=${package_url}?${package_sas}" \
+              "ENABLE_ORYX_BUILD=false" \
+              "SCM_DO_BUILD_DURING_DEPLOYMENT=false" \
+              "WEBSITES_ENABLE_APP_SERVICE_STORAGE=false" \
+              "WEBSITE_USE_PLACEHOLDER=0" \
               "JM1_RELEASE_SHA=${{ github.sha }}" \
               "JM1_PRODUCTION_RELEASE_SHA=${{ github.sha }}" \
+            -o none
+
+          az functionapp config set \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --linux-fx-version "Node|22" \
             -o none
 
           az functionapp restart \
@@ -152,23 +162,22 @@ jobs:
 
           echo "Package provenance: $package_name — PASS"
 
-      - name: Verify Node 24 on deployed runtime
+      - name: Verify Node 22 on deployed runtime
         run: |
           runtime=$(az functionapp config show \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$FUNCTION_APP_NAME" \
             --query "linuxFxVersion" -o tsv)
           echo "Deployed runtime: $runtime"
-          if [[ "$runtime" != *"NODE|24"* ]]; then
-            echo "FATAL: Deployed runtime is not Node 24: $runtime"
+          if [[ "$runtime" != *"Node|22"* && "$runtime" != *"NODE|22"* ]]; then
+            echo "FATAL: Deployed runtime is not Node 22: $runtime"
             exit 1
           fi
           echo "Runtime proof: $runtime — PASS"
 
-      - name: Health check
+      - name: Host and route health check
         run: |
-          # Allow app to start after deployment
-          sleep 30
+          sleep 45
           status=$(az functionapp show \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$FUNCTION_APP_NAME" \
@@ -178,4 +187,23 @@ jobs:
             echo "FATAL: Function App not Running after deployment"
             exit 1
           fi
-          echo "Health: $status — PASS"
+
+          http_status=$(curl -sS -o /tmp/relay-health-body.txt -w "%{http_code}" \
+            -X POST "https://${FUNCTION_APP_NAME}.azurewebsites.net/api/send-enterprise-governed-email" \
+            -H "content-type: application/json" \
+            --data '{"brand":"JM1","sourceRecord":"ci-health-check"}')
+
+          echo "Unauthenticated route health status: $http_status"
+          if [ "$http_status" != "401" ]; then
+            echo "FATAL: Relay route did not return governed 401 health response"
+            cat /tmp/relay-health-body.txt
+            exit 1
+          fi
+
+          if ! grep -q "UNAUTHORIZED" /tmp/relay-health-body.txt; then
+            echo "FATAL: Relay health response did not come from governed handler"
+            cat /tmp/relay-health-body.txt
+            exit 1
+          fi
+
+          echo "Host and route health: PASS"
