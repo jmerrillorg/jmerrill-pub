@@ -3,6 +3,7 @@
 // Stage-specific exception? N
 
 import { EmailClient, type EmailAttachment, type EmailMessage } from '@azure/communication-email'
+import { createHash } from 'node:crypto'
 import { strFromU8, unzipSync } from 'fflate'
 import {
   renderAuthorCommunicationEmail,
@@ -553,6 +554,12 @@ export function validateGovernedPackageAttachmentBinary(
     bytes = Buffer.from(attachment.contentBytesBase64, 'base64')
   } catch {
     return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${attachment.role}:BASE64_DECODE_FAILED` }
+  }
+  const declaredSha = (attachment.sha256 || '').trim().toLowerCase()
+  if (declaredSha) {
+    if (!/^[a-f0-9]{64}$/.test(declaredSha)) return { ok: false, blocker: `ATTACHMENT_CHECKSUM_INVALID:${attachment.role}` }
+    const actualSha = createHash('sha256').update(bytes).digest('hex')
+    if (actualSha !== declaredSha) return { ok: false, blocker: `ATTACHMENT_CHECKSUM_MISMATCH:${attachment.role}` }
   }
   const declaredSize = attachment.sizeBytes || bytes.byteLength
   if (bytes.byteLength === 0 || declaredSize === 0) return { ok: false, blocker: `ATTACHMENT_BINARY_INVALID:${attachment.role}:EMPTY` }
