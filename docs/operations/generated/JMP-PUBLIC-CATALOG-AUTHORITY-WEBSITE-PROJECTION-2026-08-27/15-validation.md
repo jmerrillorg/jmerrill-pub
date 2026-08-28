@@ -1,6 +1,6 @@
 # Validation
 
-Last Verified: 2026-08-27T23:15:00-04:00
+Last Verified: 2026-08-27T23:20:00-04:00
 
 | Command | Result |
 | --- | --- |
@@ -19,11 +19,11 @@ Package checksum:
 
 Post-deploy readback after readiness correction:
 
-- `/api/health`: PASS, release `a45af85aefa16d9dafb264292eb5eb77724e7ffc`, Dataverse ready.
+- `/api/health`: PASS, release `29a5dcd5f242dc257251a0ee367f7f88a2d82a92`, Dataverse ready.
 - `/api/public-catalog`: PASS, 113 titles / 65 authors.
 - Public projection readiness: 103 titles ready for public verification, 10 true holds, 113 metadata warnings.
 - Blocking issue distribution: 6 duplicate title-slug rows, 3 missing author-attribution rows, 1 missing author-page row.
 - Representative title page `/books/delicious-ideas`: HTTP 200.
 - Representative author page `/authors/agape-international-cathedral`: HTTP 200.
 - Representative title page JSON-LD: PASS.
-- Sitemap production readback before runtime-dynamic correction: 0 projected title/author URLs, requiring final sitemap patch.
+- Sitemap production readback after runtime-dynamic correction: PASS, 178 projected title/author URLs.
