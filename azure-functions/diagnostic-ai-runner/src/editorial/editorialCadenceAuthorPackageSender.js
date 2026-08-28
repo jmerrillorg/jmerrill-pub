@@ -13,6 +13,7 @@ const RELAY_FALLBACK_URL = "https://func-jm1-acs-email-relay.azurewebsites.net";
 const GRAPH_SCOPE = "https://graph.microsoft.com/.default";
 const SYSTEM_OPERATOR = "github-oidc:jmerrill-pub-production";
 const INTAKE_REFERENCE_PATTERN = /^JMP-INT-\d{6}-[A-Z0-9-]+$/i;
+const AUTHOR_FACING_VISIBILITY = 196650000;
 
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -101,11 +102,13 @@ function rolePatterns(role) {
 
 function isAuthorVisibleArtifact(artifact) {
   if (artifact?.jm1pub_supersededon) return false;
-  if (artifact?.jm1pub_iscurrentapproved === true) return true;
-  if (Number(artifact?.jm1pub_artifactstatus || 0) === 196650002 && Number(artifact?.jm1pub_visibility || 0) === 196650001) return true;
   const status = `${artifact?.["jm1pub_artifactstatus@OData.Community.Display.V1.FormattedValue"] || ""} ${artifact?.jm1pub_artifactstatus || ""}`;
   const visibility = `${artifact?.["jm1pub_visibility@OData.Community.Display.V1.FormattedValue"] || ""} ${artifact?.jm1pub_visibility || ""}`;
-  return /approved|current|author|release/i.test(`${status} ${visibility}`);
+  const authorFacing =
+    Number(artifact?.jm1pub_visibility || 0) === AUTHOR_FACING_VISIBILITY ||
+    /\bauthor facing\b/i.test(visibility);
+  if (!authorFacing) return false;
+  return artifact?.jm1pub_iscurrentapproved === true || /approved|current|author|release|delivered/i.test(`${status} ${visibility}`);
 }
 
 function artifactHaystack(artifact) {

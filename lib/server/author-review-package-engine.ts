@@ -78,6 +78,7 @@ export type PackageQaFailure =
   | 'PACKAGE_QA_FAILED - MANUSCRIPT_WORD_COUNT_SANITY'
   | 'PACKAGE_QA_FAILED - INTERNAL_METADATA_LEAK'
   | 'PACKAGE_QA_FAILED - FILENAME_NOT_ARTIFACT_TYPE_AUTHORITY'
+  | 'PACKAGE_QA_FAILED - AUTHOR_FACING_ARTIFACT_BINDING_INVALID'
 
 export type PackageArtifactRole =
   | 'assessment'
@@ -135,6 +136,65 @@ export type ArtifactAudienceClassification =
   | 'PUBLIC_RELEASE'
   | 'VENDOR_DELIVERABLE'
   | 'EVIDENCE_ONLY'
+
+export type AuthorFacingArtifactRoleAuthority =
+  | 'AUTHOR_REVIEW_MANUSCRIPT'
+  | 'AUTHOR_REVIEW_INSTRUCTIONS'
+  | 'AUTHOR_REVIEW_PROOF'
+  | 'AUTHOR_REVIEW_COVER_PROOF'
+  | 'INTERNAL_EDITORIAL_ARTIFACT'
+  | 'INTERNAL_EXECUTION_ARTIFACT'
+  | 'INTERNAL_QA_ARTIFACT'
+  | 'INTERNAL_MANIFEST'
+  | 'EVIDENCE_ONLY'
+
+export type AuthorFacingArtifactBindingStatus =
+  | 'CORRECT_BINDING'
+  | 'MISSING_AUTHOR_FACING_BINDING'
+  | 'WRAPPER_BOUND_AS_AUTHOR_FACING'
+  | 'WRONG_ARTIFACT_ROLE'
+  | 'WRONG_TITLE'
+  | 'WRONG_STAGE'
+  | 'WRONG_AUTHOR'
+  | 'SUPERSEDED_ARTIFACT_BOUND'
+  | 'NOT_CURRENT_ARTIFACT'
+  | 'CHECKSUM_ONLY_DRIFT'
+  | 'QA_NOT_PASSED'
+
+export type AuthorFacingArtifactBindingInput = {
+  expectedTitleId: string
+  expectedStageId: string
+  expectedAuthorId?: string
+  boundArtifactId?: string
+  boundArtifactRoleAuthority?: AuthorFacingArtifactRoleAuthority | string
+  boundArtifactAudience?: ArtifactAudienceClassification | string
+  boundArtifactTitleId?: string
+  boundArtifactStageId?: string
+  boundArtifactAuthorId?: string
+  boundArtifactChecksum?: string
+  deliveredAttachmentChecksum?: string
+  deliveredContentChecksum?: string
+  cleanArtifactChecksum?: string
+  cleanContentChecksum?: string
+  current?: boolean
+  superseded?: boolean
+  qaState?: 'PASS' | 'FAIL' | 'UNKNOWN' | string
+}
+
+export type AuthorFacingArtifactBindingResult = {
+  ok: boolean
+  status: AuthorFacingArtifactBindingStatus
+  detail: string
+}
+
+export const AUTHOR_FACING_ARTIFACT_AUTHORITY_POLICY = {
+  policyId: 'JMP-AUTHOR-FACING-ARTIFACT-AUTHORITY-v1',
+  status: 'CANON',
+  authorFacingManuscriptRole: 'AUTHOR_REVIEW_MANUSCRIPT',
+  authorWaitRequiresCurrentAuthorFacingArtifact: true,
+  approvalRequiresExactDeliveredArtifactBinding: true,
+  checksumOnlyPatchPermitted: false,
+} as const
 
 export type CorrectedAuthorReviewDeliveryEvidence = {
   originalDeliveryAt: string
@@ -278,6 +338,7 @@ export type PackageArtifactInput = {
   productionNotesVisible?: boolean
   truncatedOutput?: boolean
   audienceClassification?: ArtifactAudienceClassification
+  artifactRoleAuthority?: AuthorFacingArtifactRoleAuthority | string
   artifactTypeAuthority?: 'STRUCTURED_METADATA' | 'FILENAME_ONLY' | string
   wordCount?: number
   expectedSourceWordCount?: number
@@ -287,6 +348,9 @@ export type PackageArtifactInput = {
   expectedEndingContentPresent?: boolean
   chapterContinuityPassed?: boolean
   internalMetadataLeak?: boolean
+  qaState?: 'PASS' | 'FAIL' | 'UNKNOWN' | string
+  isCurrentAuthorFacingAuthority?: boolean
+  superseded?: boolean
 }
 
 export type PackageManifestItem = {
@@ -696,6 +760,26 @@ function isAuthorReviewManuscriptRole(role: PackageArtifactRole) {
 
 function validateAuthorReviewManuscriptArtifact(artifact: PackageArtifactInput, stageCode: PackageStageCode) {
   const failures: Array<{ code: PackageQaFailure; detail: string }> = []
+  const binding = classifyAuthorFacingArtifactBinding({
+    expectedTitleId: artifact.titleId,
+    expectedStageId: artifact.stageId,
+    boundArtifactId: artifact.artifactId,
+    boundArtifactRoleAuthority: artifact.artifactRoleAuthority,
+    boundArtifactAudience: artifact.audienceClassification,
+    boundArtifactTitleId: artifact.titleId,
+    boundArtifactStageId: artifact.stageId,
+    boundArtifactChecksum: artifact.checksum,
+    cleanArtifactChecksum: artifact.checksum,
+    current: artifact.isCurrentAuthorFacingAuthority ?? true,
+    superseded: artifact.superseded,
+    qaState: artifact.qaState ?? 'PASS',
+  })
+  if (!binding.ok) {
+    failures.push({
+      code: 'PACKAGE_QA_FAILED - AUTHOR_FACING_ARTIFACT_BINDING_INVALID',
+      detail: `${artifact.role}:${binding.status}`,
+    })
+  }
   if (artifact.artifactTypeAuthority === 'FILENAME_ONLY') {
     failures.push({ code: 'PACKAGE_QA_FAILED - FILENAME_NOT_ARTIFACT_TYPE_AUTHORITY', detail: artifact.role })
   }
@@ -731,6 +815,100 @@ function validateAuthorReviewManuscriptArtifact(artifact: PackageArtifactInput, 
     }
   }
   return failures
+}
+
+export function classifyAuthorFacingArtifactBinding(input: AuthorFacingArtifactBindingInput): AuthorFacingArtifactBindingResult {
+  const role = normalizeAuthority(input.boundArtifactRoleAuthority)
+  const audience = normalizeAuthority(input.boundArtifactAudience)
+  if (!input.boundArtifactId) return bindingResult('MISSING_AUTHOR_FACING_BINDING', 'No artifact is bound as the author-facing manuscript authority.')
+  if (input.superseded) return bindingResult('SUPERSEDED_ARTIFACT_BOUND', 'The bound artifact has been superseded.')
+  if (input.current === false) return bindingResult('NOT_CURRENT_ARTIFACT', 'The bound artifact is not marked current.')
+  if (input.boundArtifactTitleId && input.boundArtifactTitleId !== input.expectedTitleId) return bindingResult('WRONG_TITLE', 'The bound artifact belongs to a different title.')
+  if (input.boundArtifactStageId && input.boundArtifactStageId !== input.expectedStageId) return bindingResult('WRONG_STAGE', 'The bound artifact belongs to a different stage.')
+  if (input.expectedAuthorId && input.boundArtifactAuthorId && input.boundArtifactAuthorId !== input.expectedAuthorId) return bindingResult('WRONG_AUTHOR', 'The bound artifact belongs to a different author.')
+  if (role !== 'AUTHOR_REVIEW_MANUSCRIPT') {
+    if (audience === 'INTERNAL_ONLY' || role.startsWith('INTERNAL_')) {
+      return bindingResult('WRAPPER_BOUND_AS_AUTHOR_FACING', 'An internal or wrapper artifact is bound where the author-review manuscript must be bound.')
+    }
+    return bindingResult('WRONG_ARTIFACT_ROLE', 'The bound artifact is not identified as the author-review manuscript.')
+  }
+  if (audience !== 'AUTHOR_REVIEW' && audience !== 'AUTHOR_DELIVERABLE') {
+    return bindingResult('WRONG_ARTIFACT_ROLE', 'The bound manuscript is not classified for author review delivery.')
+  }
+  if (input.qaState && input.qaState !== 'PASS') return bindingResult('QA_NOT_PASSED', 'The bound author-facing manuscript has not passed QA.')
+  const boundChecksum = normalizeChecksum(input.boundArtifactChecksum)
+  const deliveredChecksum = normalizeChecksum(input.deliveredAttachmentChecksum)
+  const cleanChecksum = normalizeChecksum(input.cleanArtifactChecksum)
+  const deliveredContent = normalizeChecksum(input.deliveredContentChecksum)
+  const cleanContent = normalizeChecksum(input.cleanContentChecksum)
+  if (cleanChecksum && boundChecksum && cleanChecksum !== boundChecksum) return bindingResult('CHECKSUM_ONLY_DRIFT', 'The bound artifact checksum does not match the clean author-facing manuscript checksum.')
+  if (deliveredChecksum && boundChecksum && deliveredChecksum !== boundChecksum && (!deliveredContent || deliveredContent !== cleanContent)) {
+    return bindingResult('CHECKSUM_ONLY_DRIFT', 'The delivered attachment is not byte-identical or content-equivalent to the bound artifact.')
+  }
+  return bindingResult('CORRECT_BINDING', 'The current author-facing manuscript authority is bound to the clean reviewed artifact.')
+}
+
+export function validatePackageManifestAuthorFacingAuthority(input: {
+  stageCode: PackageStageCode
+  artifacts: PackageArtifactInput[]
+}) {
+  const failures: Array<{ artifactId: string; role: PackageArtifactRole; status: AuthorFacingArtifactBindingStatus }> = []
+  for (const artifact of input.artifacts) {
+    if (!isAuthorReviewManuscriptRole(artifact.role)) continue
+    const result = classifyAuthorFacingArtifactBinding({
+      expectedTitleId: artifact.titleId,
+      expectedStageId: artifact.stageId,
+      boundArtifactId: artifact.artifactId,
+      boundArtifactRoleAuthority: artifact.artifactRoleAuthority,
+      boundArtifactAudience: artifact.audienceClassification,
+      boundArtifactTitleId: artifact.titleId,
+      boundArtifactStageId: artifact.stageId,
+      boundArtifactChecksum: artifact.checksum,
+      cleanArtifactChecksum: artifact.checksum,
+      current: artifact.isCurrentAuthorFacingAuthority ?? true,
+      superseded: artifact.superseded,
+      qaState: artifact.qaState ?? 'PASS',
+    })
+    if (!result.ok) failures.push({ artifactId: artifact.artifactId, role: artifact.role, status: result.status })
+  }
+  return {
+    ok: failures.length === 0,
+    policyId: AUTHOR_FACING_ARTIFACT_AUTHORITY_POLICY.policyId,
+    failures,
+  }
+}
+
+export function validateWaitingOnAuthorArtifactBinding(input: AuthorFacingArtifactBindingInput & { waitingOn: string }) {
+  if (normalizeAuthority(input.waitingOn) !== 'WAITING_ON_AUTHOR') {
+    return { ok: true, status: 'NOT_AUTHOR_WAIT' as const }
+  }
+  const binding = classifyAuthorFacingArtifactBinding(input)
+  return { ok: binding.ok, status: binding.status, detail: binding.detail }
+}
+
+export function validateExactApprovalArtifactBinding(input: AuthorFacingArtifactBindingInput & {
+  approvalMessageId: string
+  approvalAt: string
+  repliedToMessageId?: string
+}) {
+  if (!input.approvalMessageId || !input.approvalAt) {
+    return { ok: false, status: 'APPROVAL_EVIDENCE_MISSING' as const, detail: 'Approval message and timestamp are required.' }
+  }
+  const binding = classifyAuthorFacingArtifactBinding(input)
+  if (!binding.ok) return { ok: false, status: binding.status, detail: binding.detail }
+  return {
+    ok: true,
+    status: 'EXACT_ARTIFACT_APPROVAL_BINDABLE' as const,
+    detail: 'Approval can be bound to the clean author-facing manuscript that was delivered for the same title, stage, and author.',
+  }
+}
+
+function bindingResult(status: AuthorFacingArtifactBindingStatus, detail: string): AuthorFacingArtifactBindingResult {
+  return { ok: status === 'CORRECT_BINDING', status, detail }
+}
+
+function normalizeAuthority(value: unknown) {
+  return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_+|_+$/g, '')
 }
 
 function requiresProductionProofControls(role: PackageArtifactRole) {
@@ -1214,7 +1392,8 @@ function buildPackageIdempotencyKey(input: {
   return ['package-engine', input.titleId, input.stageCode, input.gateId, input.packageId, input.packageVersion].join(':')
 }
 
-function normalizeChecksum(value: string) {
+function normalizeChecksum(value?: string) {
+  if (!value) return ''
   return /^[a-f0-9]{64}$/i.test(value) ? value.toLowerCase() : ''
 }
 

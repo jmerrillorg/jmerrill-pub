@@ -64,7 +64,10 @@ const {
   publisherTodayPackageMetrics,
   supersedePackage,
   validateAuthorReviewResponseMechanism,
+  validateExactApprovalArtifactBinding,
+  validatePackageManifestAuthorFacingAuthority,
   validatePackageQa,
+  validateWaitingOnAuthorArtifactBinding,
 } = await import('../lib/server/author-review-package-engine.ts')
 const {
   authorFacingAttachmentBlocker,
@@ -158,6 +161,13 @@ function artifact(role, overrides = {}) {
       (['authorResponseMechanism', 'packageManifest', 'authorCoverMessage', 'developmentalMemo'].includes(role)
         ? 'INTERNAL_ONLY'
         : 'AUTHOR_REVIEW'),
+    artifactRoleAuthority:
+      overrides.artifactRoleAuthority ||
+      (role === 'editedManuscript' || role === 'proofreadManuscript'
+        ? 'AUTHOR_REVIEW_MANUSCRIPT'
+        : ['authorResponseMechanism', 'packageManifest', 'authorCoverMessage', 'developmentalMemo'].includes(role)
+          ? 'INTERNAL_EDITORIAL_ARTIFACT'
+          : 'AUTHOR_REVIEW_INSTRUCTIONS'),
     artifactTypeAuthority: overrides.artifactTypeAuthority || 'STRUCTURED_METADATA',
     wordCount: overrides.wordCount ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? 12_000 : undefined),
     expectedSourceWordCount: overrides.expectedSourceWordCount ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? 12_000 : undefined),
@@ -167,6 +177,9 @@ function artifact(role, overrides = {}) {
     expectedEndingContentPresent: overrides.expectedEndingContentPresent ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? true : undefined),
     chapterContinuityPassed: overrides.chapterContinuityPassed ?? (role === 'editedManuscript' || role === 'proofreadManuscript' ? true : undefined),
     internalMetadataLeak: overrides.internalMetadataLeak,
+    qaState: overrides.qaState || 'PASS',
+    isCurrentAuthorFacingAuthority: overrides.isCurrentAuthorFacingAuthority ?? true,
+    superseded: overrides.superseded,
     contentBytesBase64: overrides.contentBytesBase64 || bytes.toString('base64'),
   }
 }
@@ -660,6 +673,77 @@ test('last-mile attachment certification denies internal wrapper text inside a m
   const validation = validateAuthorPackageNotification(notification)
   assert.equal(validation.ok, false)
   assert.match(validation.blocker, /ATTACHMENT_RECIPIENT_SURFACE_INVALID:editedManuscript:GENERATED_BY_JM1_AUTOMATION/)
+})
+
+test('author-facing manuscript authority rejects internal wrapper artifact binding before release', () => {
+  const pkg = developmentalPackage({
+    artifacts: [
+      artifact('editedManuscript', {
+        stageId: 'stage-developmental',
+        titleId: 'title-developmental',
+        audienceClassification: 'INTERNAL_ONLY',
+        artifactRoleAuthority: 'INTERNAL_EDITORIAL_ARTIFACT',
+      }),
+      artifact('developmentalMemo', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('reviewInstructions', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+      artifact('authorResponseMechanism', { stageId: 'stage-developmental', titleId: 'title-developmental', mimeType: 'text/plain' }),
+      artifact('packageManifest', { stageId: 'stage-developmental', titleId: 'title-developmental', mimeType: 'application/json' }),
+      artifact('authorCoverMessage', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+    ],
+  })
+
+  assert.equal(pkg.qaStatus, 'QA_FAILED')
+  assert.ok(pkg.qaFailures.some((failure) => failure.code === 'PACKAGE_QA_FAILED - AUTHOR_FACING_ARTIFACT_BINDING_INVALID'))
+
+  const manifestGuard = validatePackageManifestAuthorFacingAuthority({
+    stageCode: 'DEVELOPMENTAL_EDITING',
+    artifacts: pkg.manifest.artifacts.map((item) => ({
+      ...artifact(item.artifactRole, { stageId: pkg.stageId, titleId: pkg.titleId }),
+      artifactId: item.artifactId,
+      role: item.artifactRole,
+      artifactRoleAuthority: item.artifactRole === 'editedManuscript' ? 'INTERNAL_EDITORIAL_ARTIFACT' : 'AUTHOR_REVIEW_INSTRUCTIONS',
+      audienceClassification: item.artifactRole === 'editedManuscript' ? 'INTERNAL_ONLY' : 'AUTHOR_REVIEW',
+    })),
+  })
+  assert.equal(manifestGuard.ok, false)
+  assert.equal(manifestGuard.failures[0].status, 'WRAPPER_BOUND_AS_AUTHOR_FACING')
+})
+
+test('waiting-on-author and approval binding require the clean current author-review manuscript', () => {
+  const common = {
+    expectedTitleId: 'title-establishing-glory',
+    expectedStageId: 'stage-developmental',
+    expectedAuthorId: 'contact-jackie',
+    boundArtifactId: 'artifact-clean-author-facing',
+    boundArtifactRoleAuthority: 'AUTHOR_REVIEW_MANUSCRIPT',
+    boundArtifactAudience: 'AUTHOR_REVIEW',
+    boundArtifactTitleId: 'title-establishing-glory',
+    boundArtifactStageId: 'stage-developmental',
+    boundArtifactAuthorId: 'contact-jackie',
+    boundArtifactChecksum: 'c'.repeat(64),
+    cleanArtifactChecksum: 'c'.repeat(64),
+    deliveredAttachmentChecksum: '9'.repeat(64),
+    deliveredContentChecksum: '6'.repeat(64),
+    cleanContentChecksum: '6'.repeat(64),
+    current: true,
+    superseded: false,
+    qaState: 'PASS',
+  }
+
+  assert.equal(validateWaitingOnAuthorArtifactBinding({ ...common, waitingOn: 'WAITING_ON_AUTHOR' }).ok, true)
+  assert.equal(validateExactApprovalArtifactBinding({
+    ...common,
+    approvalMessageId: '<approval@example>',
+    approvalAt: '2026-08-27T10:11:47Z',
+    repliedToMessageId: '<delivery@example>',
+  }).status, 'EXACT_ARTIFACT_APPROVAL_BINDABLE')
+
+  assert.equal(validateWaitingOnAuthorArtifactBinding({
+    ...common,
+    waitingOn: 'WAITING_ON_AUTHOR',
+    boundArtifactRoleAuthority: 'INTERNAL_EDITORIAL_ARTIFACT',
+    boundArtifactAudience: 'INTERNAL_ONLY',
+  }).status, 'WRAPPER_BOUND_AS_AUTHOR_FACING')
 })
 
 test('last-mile attachment certification rejects stale checksum labels on different payload bytes', () => {

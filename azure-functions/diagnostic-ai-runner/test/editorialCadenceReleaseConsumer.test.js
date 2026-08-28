@@ -54,7 +54,8 @@ function makeClient(overrides = {}) {
       jm1pub_editorialartifactname: "Developmentally Edited Manuscript - Developmental Editing - Before You Were Born",
       jm1pub_filename: "Before You Were Born - Developmentally Edited Manuscript.docx",
       jm1pub_artifactstatus: 196650002,
-      jm1pub_visibility: 196650001,
+      jm1pub_visibility: 196650000,
+      "jm1pub_visibility@OData.Community.Display.V1.FormattedValue": "Author Facing",
       jm1pub_sha256: "",
       jm1pub_repositorydriveid: "drive",
       jm1pub_repositoryitemid: "item-docx",
@@ -68,7 +69,8 @@ function makeClient(overrides = {}) {
       jm1pub_editorialartifactname: "Developmental Review Instructions - Developmental Editing - Before You Were Born",
       jm1pub_filename: "Before You Were Born - Review Instructions.txt",
       jm1pub_artifactstatus: 196650002,
-      jm1pub_visibility: 196650001,
+      jm1pub_visibility: 196650000,
+      "jm1pub_visibility@OData.Community.Display.V1.FormattedValue": "Author Facing",
       jm1pub_sha256: "",
       jm1pub_repositorydriveid: "drive",
       jm1pub_repositoryitemid: "item-txt",
@@ -330,6 +332,52 @@ test("due package with missing required attachment fails closed without failing 
   assert.deepEqual(result.results[0].blockers, ["REQUIRED_ATTACHMENT_MISSING:editedManuscript"]);
   assert.equal(deps.sends.length, 0);
   assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_SEND_BLOCKED"));
+});
+
+test("due package rejects internal delivered manuscript artifacts as author-facing authority drift", async () => {
+  const client = makeClient({
+    artifacts: [
+      {
+        jm1pub_editorialartifactid: "artifact-internal-wrapper",
+        jm1pub_editorialartifactname: "Developmentally Edited Manuscript - Developmental Editing - Before You Were Born",
+        jm1pub_filename: "Before You Were Born - Developmentally Edited Manuscript.docx",
+        jm1pub_artifactstatus: 196650002,
+        jm1pub_visibility: 196650001,
+        "jm1pub_visibility@OData.Community.Display.V1.FormattedValue": "Internal Only",
+        jm1pub_sha256: "",
+        jm1pub_repositorydriveid: "drive",
+        jm1pub_repositoryitemid: "item-docx",
+        jm1pub_filesizebytes: 100,
+        jm1pub_iscurrentapproved: true,
+        _jm1pub_titleid_value: titleId,
+        _jm1pub_editorialstageid_value: stageId
+      },
+      {
+        jm1pub_editorialartifactid: "artifact-review-instructions",
+        jm1pub_editorialartifactname: "Developmental Review Instructions - Developmental Editing - Before You Were Born",
+        jm1pub_filename: "Before You Were Born - Review Instructions.txt",
+        jm1pub_artifactstatus: 196650002,
+        jm1pub_visibility: 196650000,
+        "jm1pub_visibility@OData.Community.Display.V1.FormattedValue": "Author Facing",
+        jm1pub_sha256: "",
+        jm1pub_repositorydriveid: "drive",
+        jm1pub_repositoryitemid: "item-txt",
+        jm1pub_filesizebytes: 64,
+        jm1pub_iscurrentapproved: false,
+        _jm1pub_titleid_value: titleId,
+        _jm1pub_editorialstageid_value: stageId
+      }
+    ]
+  });
+  const deps = senderDeps();
+  const result = await runEditorialCadenceReleaseConsumer(
+    { now: "2026-08-28T15:00:00Z", correlationId: "test-internal-wrapper-not-author-facing" },
+    { client, ...deps }
+  );
+  assert.equal(result.nonSendable, 1);
+  assert.equal(result.results[0].status, "AMBIGUOUS");
+  assert.deepEqual(result.results[0].blockers, ["REQUIRED_ATTACHMENT_MISSING:editedManuscript"]);
+  assert.equal(deps.sends.length, 0);
 });
 
 test("already operationally certified gate is treated as already released and not resent", async () => {
