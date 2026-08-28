@@ -1,13 +1,13 @@
 # Deployment Readback
 
-Last Verified: 2026-08-28T08:17:14.058Z
+Last Verified: 2026-08-28T08:23:19.373Z
 Health URL: https://jmerrill.pub/api/health
 ```json
 {
   "service": "jmerrill-pub",
   "status": "ready",
-  "release": "486a8e245066c28e3779c5b37aa92f2ca93622a1",
-  "checkedAt": "2026-08-28T08:18:02.018Z",
+  "release": "f8770aff2b37b1da4d1e21d0ceaf2a16e1ee8608",
+  "checkedAt": "2026-08-28T08:24:14.413Z",
   "paymentGate": "disabled",
   "dependencies": {
     "configuration": {

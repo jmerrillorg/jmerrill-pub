@@ -1,11 +1,11 @@
 {
-  "verifiedAt": "2026-08-28T08:17:14.058Z",
-  "mode": "dry-run",
+  "verifiedAt": "2026-08-28T08:23:19.373Z",
+  "mode": "execute",
   "health": {
     "service": "jmerrill-pub",
     "status": "ready",
-    "release": "486a8e245066c28e3779c5b37aa92f2ca93622a1",
-    "checkedAt": "2026-08-28T08:18:02.018Z",
+    "release": "f8770aff2b37b1da4d1e21d0ceaf2a16e1ee8608",
+    "checkedAt": "2026-08-28T08:24:14.413Z",
     "paymentGate": "disabled",
     "dependencies": {
       "configuration": {
@@ -112,216 +112,38 @@
     }
   },
   "before": {
-    "generatedAt": "2026-08-28T08:17:14.479Z",
+    "generatedAt": "2026-08-28T08:23:19.834Z",
     "summary": {
       "totalTitles": 113,
       "totalAuthors": 65,
-      "duplicateTitleSlugs": [
-        "god-s-nudge",
-        "the-master-s-piece",
-        "warrior-s-breed"
-      ],
+      "duplicateTitleSlugs": [],
       "duplicateAuthorSlugs": [],
-      "titlesReadyForPublicVerification": 106,
-      "titlesOnHold": 7,
+      "titlesReadyForPublicVerification": 113,
+      "titlesOnHold": 0,
       "titlesWithMetadataWarnings": 113
     }
   },
   "after": {
-    "generatedAt": "2026-08-28T08:17:15.346Z",
+    "generatedAt": "2026-08-28T08:23:20.876Z",
     "summary": {
       "totalTitles": 113,
       "totalAuthors": 65,
-      "duplicateTitleSlugs": [
-        "god-s-nudge",
-        "the-master-s-piece",
-        "warrior-s-breed"
-      ],
+      "duplicateTitleSlugs": [],
       "duplicateAuthorSlugs": [],
-      "titlesReadyForPublicVerification": 106,
-      "titlesOnHold": 7,
+      "titlesReadyForPublicVerification": 113,
+      "titlesOnHold": 0,
       "titlesWithMetadataWarnings": 113
     }
   },
-  "holdsBefore": [
-    {
-      "id": "07106fd3-c27a-f111-ab0f-6045bdd69435",
-      "title": "The Paper Champ",
-      "slug": "the-paper-champ",
-      "authorDisplayName": "Anonymous",
-      "issues": [
-        "MISSING_AUTHOR_PAGE"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "fec27b7a-cc7a-f111-ab0f-6045bdd69435",
-      "title": "Warrior's Breed",
-      "slug": "warrior-s-breed",
-      "authorDisplayName": "Dean Wilson",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "935f72d0-c27a-f111-ab0f-6045bdd69738",
-      "title": "Warrior's Breed",
-      "slug": "warrior-s-breed",
-      "authorDisplayName": "Dean Wilson",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
-      "title": "The Master's Piece",
-      "slug": "the-master-s-piece",
-      "authorDisplayName": "Sylvia Benson",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "733cd77a-cc7a-f111-ab0f-6045bdd69678",
-      "title": "The Master's Piece",
-      "slug": "the-master-s-piece",
-      "authorDisplayName": "Sylvia Benson",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
-      "title": "God's Nudge",
-      "slug": "god-s-nudge",
-      "authorDisplayName": "Tekisha Wimbush",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "7e000573-cc7a-f111-ab0f-7c1e525b15c2",
-      "title": "God's Nudge",
-      "slug": "god-s-nudge",
-      "authorDisplayName": "Tekisha Wimbush",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    }
-  ],
-  "holdsAfter": [
-    {
-      "id": "07106fd3-c27a-f111-ab0f-6045bdd69435",
-      "title": "The Paper Champ",
-      "slug": "the-paper-champ",
-      "authorDisplayName": "Anonymous",
-      "issues": [
-        "MISSING_AUTHOR_PAGE"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "fec27b7a-cc7a-f111-ab0f-6045bdd69435",
-      "title": "Warrior's Breed",
-      "slug": "warrior-s-breed",
-      "authorDisplayName": "Dean Wilson",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "935f72d0-c27a-f111-ab0f-6045bdd69738",
-      "title": "Warrior's Breed",
-      "slug": "warrior-s-breed",
-      "authorDisplayName": "Dean Wilson",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
-      "title": "The Master's Piece",
-      "slug": "the-master-s-piece",
-      "authorDisplayName": "Sylvia Benson",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "733cd77a-cc7a-f111-ab0f-6045bdd69678",
-      "title": "The Master's Piece",
-      "slug": "the-master-s-piece",
-      "authorDisplayName": "Sylvia Benson",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
-      "title": "God's Nudge",
-      "slug": "god-s-nudge",
-      "authorDisplayName": "Tekisha Wimbush",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    },
-    {
-      "id": "7e000573-cc7a-f111-ab0f-7c1e525b15c2",
-      "title": "God's Nudge",
-      "slug": "god-s-nudge",
-      "authorDisplayName": "Tekisha Wimbush",
-      "issues": [
-        "DUPLICATE_TITLE_SLUG"
-      ],
-      "warnings": [
-        "MISSING_ISBN"
-      ]
-    }
-  ],
+  "holdsBefore": [],
+  "holdsAfter": [],
   "repairs": [
     {
       "id": "1159fcc8-c37a-f111-ab0f-000d3a14673b",
       "title": "Memoir of a Black Christian Nationalist: Seeds of Liberation (Unabridged)",
       "author": "Shelley McIntosh",
       "evidence": "data/books.json and Publisher Master Imprint Register evidence identify Memoir of a Black Christian Nationalist as Shelley McIntosh.",
-      "verifiedAt": "2026-08-28T08:17:14.058Z",
+      "verifiedAt": "2026-08-28T08:23:19.373Z",
       "beforeAuthorDisplayName": "Shelley McIntosh",
       "beforeAuthorName": "Shelley McIntosh",
       "afterAuthorDisplayName": "Shelley McIntosh",
@@ -333,7 +155,7 @@
       "title": "Music Ministry Unplugged: Real Lessons for Those who Lead and Serve in Music Ministry",
       "author": "Will Harris",
       "evidence": "Publisher Master Imprint Register confirmed Music Ministry Unplugged belongs to Will Harris; prior catalog evidence records Dr. Will Harris.",
-      "verifiedAt": "2026-08-28T08:17:14.058Z",
+      "verifiedAt": "2026-08-28T08:23:19.373Z",
       "beforeAuthorDisplayName": "Will Harris",
       "beforeAuthorName": "Will Harris",
       "afterAuthorDisplayName": "Will Harris",
@@ -345,7 +167,7 @@
       "title": "The Fight for the Promiseland: Battle Strategies for Victorious People",
       "author": "Cheryl Cook",
       "evidence": "Publisher Master Imprint Register certified The Fight for the Promiseland by Cheryl Cook.",
-      "verifiedAt": "2026-08-28T08:17:14.058Z",
+      "verifiedAt": "2026-08-28T08:23:19.373Z",
       "beforeAuthorDisplayName": "Cheryl Cook",
       "beforeAuthorName": "Cheryl Cook",
       "afterAuthorDisplayName": "Cheryl Cook",
@@ -355,66 +177,15 @@
   ],
   "slugPolicy": {
     "policy": "When Dataverse contains duplicate public title slugs, the projection preserves the first deterministic title identity by title/id ordering on the base slug and appends a stable title-ID suffix to the other participants. Title ID remains the identity; the projected slug is the public route.",
-    "duplicateSlugsBefore": [
-      "god-s-nudge",
-      "the-master-s-piece",
-      "warrior-s-breed"
-    ],
-    "duplicateSlugsAfter": [
-      "god-s-nudge",
-      "the-master-s-piece",
-      "warrior-s-breed"
-    ],
-    "repairedGroups": {
-      "warrior-s-breed": [
-        {
-          "id": "fec27b7a-cc7a-f111-ab0f-6045bdd69435",
-          "title": "Warrior's Breed",
-          "priorSlug": "warrior-s-breed",
-          "projectedSlug": "warrior-s-breed"
-        },
-        {
-          "id": "935f72d0-c27a-f111-ab0f-6045bdd69738",
-          "title": "Warrior's Breed",
-          "priorSlug": "warrior-s-breed",
-          "projectedSlug": "warrior-s-breed"
-        }
-      ],
-      "the-master-s-piece": [
-        {
-          "id": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
-          "title": "The Master's Piece",
-          "priorSlug": "the-master-s-piece",
-          "projectedSlug": "the-master-s-piece"
-        },
-        {
-          "id": "733cd77a-cc7a-f111-ab0f-6045bdd69678",
-          "title": "The Master's Piece",
-          "priorSlug": "the-master-s-piece",
-          "projectedSlug": "the-master-s-piece"
-        }
-      ],
-      "god-s-nudge": [
-        {
-          "id": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
-          "title": "God's Nudge",
-          "priorSlug": "god-s-nudge",
-          "projectedSlug": "god-s-nudge"
-        },
-        {
-          "id": "7e000573-cc7a-f111-ab0f-7c1e525b15c2",
-          "title": "God's Nudge",
-          "priorSlug": "god-s-nudge",
-          "projectedSlug": "god-s-nudge"
-        }
-      ]
-    }
+    "duplicateSlugsBefore": [],
+    "duplicateSlugsAfter": [],
+    "repairedGroups": {}
   },
   "pageChecks": {
-    "readyCount": 106,
-    "checked": 106,
-    "pass": 103,
-    "fail": 3,
+    "readyCount": 113,
+    "checked": 113,
+    "pass": 113,
+    "fail": 0,
     "rows": [
       {
         "id": "c70f6fd3-c27a-f111-ab0f-6045bdd69435",
@@ -468,6 +239,19 @@
             "status": 200
           }
         ],
+        "pass": true
+      },
+      {
+        "id": "07106fd3-c27a-f111-ab0f-6045bdd69435",
+        "title": "The Paper Champ",
+        "slug": "the-paper-champ",
+        "authorDisplayName": "Anonymous",
+        "titlePage": "https://jmerrill.pub/books/the-paper-champ",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [],
         "pass": true
       },
       {
@@ -638,17 +422,17 @@
         "slug": "the-fight-for-the-promiseland-battle-strategies-for-victorious-people",
         "authorDisplayName": "Cheryl Cook",
         "titlePage": "https://jmerrill.pub/books/the-fight-for-the-promiseland-battle-strategies-for-victorious-people",
-        "titlePageStatus": 404,
-        "titlePageHasTitle": false,
-        "titlePageHasAuthor": false,
-        "titlePageHasJsonLd": false,
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
         "authorPages": [
           {
             "url": "https://jmerrill.pub/authors/cheryl-cook",
             "status": 200
           }
         ],
-        "pass": false
+        "pass": true
       },
       {
         "id": "7b5f72d0-c27a-f111-ab0f-6045bdd69738",
@@ -933,6 +717,42 @@
         "authorPages": [
           {
             "url": "https://jmerrill.pub/authors/david-williams",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "935f72d0-c27a-f111-ab0f-6045bdd69738",
+        "title": "Warrior's Breed",
+        "slug": "warrior-s-breed",
+        "authorDisplayName": "Dean Wilson",
+        "titlePage": "https://jmerrill.pub/books/warrior-s-breed",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/dean-wilson",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "fec27b7a-cc7a-f111-ab0f-6045bdd69435",
+        "title": "Warrior's Breed",
+        "slug": "warrior-s-breed-fec27b7a",
+        "authorDisplayName": "Dean Wilson",
+        "titlePage": "https://jmerrill.pub/books/warrior-s-breed-fec27b7a",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/dean-wilson",
             "status": 200
           }
         ],
@@ -2006,17 +1826,17 @@
         "slug": "memoir-of-a-black-christian-nationalist-seeds-of-liberation-unabridged",
         "authorDisplayName": "Shelley McIntosh",
         "titlePage": "https://jmerrill.pub/books/memoir-of-a-black-christian-nationalist-seeds-of-liberation-unabridged",
-        "titlePageStatus": 404,
-        "titlePageHasTitle": false,
-        "titlePageHasAuthor": false,
-        "titlePageHasJsonLd": false,
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
         "authorPages": [
           {
             "url": "https://jmerrill.pub/authors/shelley-mcintosh",
             "status": 200
           }
         ],
-        "pass": false
+        "pass": true
       },
       {
         "id": "d9f603d3-c27a-f111-ab0f-000d3a14673b",
@@ -2031,6 +1851,78 @@
         "authorPages": [
           {
             "url": "https://jmerrill.pub/authors/shelley-mcintosh",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "733cd77a-cc7a-f111-ab0f-6045bdd69678",
+        "title": "The Master's Piece",
+        "slug": "the-master-s-piece",
+        "authorDisplayName": "Sylvia Benson",
+        "titlePage": "https://jmerrill.pub/books/the-master-s-piece",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/sylvia-benson",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "The Master's Piece",
+        "slug": "the-master-s-piece-c3f603d3",
+        "authorDisplayName": "Sylvia Benson",
+        "titlePage": "https://jmerrill.pub/books/the-master-s-piece-c3f603d3",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/sylvia-benson",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
+        "title": "God's Nudge",
+        "slug": "god-s-nudge",
+        "authorDisplayName": "Tekisha Wimbush",
+        "titlePage": "https://jmerrill.pub/books/god-s-nudge",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/tekisha-wimbush",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "7e000573-cc7a-f111-ab0f-7c1e525b15c2",
+        "title": "God's Nudge",
+        "slug": "god-s-nudge-7e000573",
+        "authorDisplayName": "Tekisha Wimbush",
+        "titlePage": "https://jmerrill.pub/books/god-s-nudge-7e000573",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/tekisha-wimbush",
             "status": 200
           }
         ],
@@ -2276,17 +2168,17 @@
         "slug": "music-ministry-unplugged-real-lessons-for-those-who-lead-and-serve-in-music-ministry",
         "authorDisplayName": "Will Harris",
         "titlePage": "https://jmerrill.pub/books/music-ministry-unplugged-real-lessons-for-those-who-lead-and-serve-in-music-ministry",
-        "titlePageStatus": 404,
-        "titlePageHasTitle": false,
-        "titlePageHasAuthor": false,
-        "titlePageHasJsonLd": false,
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
         "authorPages": [
           {
             "url": "https://jmerrill.pub/authors/will-harris",
             "status": 200
           }
         ],
-        "pass": false
+        "pass": true
       },
       {
         "id": "60137ed6-c27a-f111-ab0f-6045bdd69738",
@@ -2336,12 +2228,12 @@
     "public_catalog_architecture_redesigned": 0,
     "title_identity_changed": 0,
     "random_slug_generated": 0,
-    "duplicate_public_title_slug_remaining": 3,
+    "duplicate_public_title_slug_remaining": 0,
     "duplicate_public_author_slug_remaining": 0,
     "missing_author_attribution_remaining": 0,
-    "anonymous_author_profile_required": 1,
+    "anonymous_author_profile_required": 0,
     "non_deterministic_author_repair": 0,
-    "broken_ready_public_pages": 3
+    "broken_ready_public_pages": 0
   },
-  "classification": "JMP_PUBLIC_CATALOG_DATA_NORMALIZATION_BLOCKED"
+  "classification": "JMP_PUBLIC_CATALOG_DATA_NORMALIZATION_VERIFIED"
 }
