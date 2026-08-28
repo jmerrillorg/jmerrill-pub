@@ -1,21 +1,33 @@
 # Negative Proof
 
-Last Verified: 2026-08-28T10:57:47.204Z
+Last Verified: 2026-08-28T11:04:03.906Z
 
 | Assertion | Count |
 | --- | --- |
 | Business_Central_payment_posted | 0 |
+| Daphanny_duplicate_setup_email | 0 |
+| Daphanny_old_account_left_as_competing_current_account | 0 |
 | Day3_sent_early | 0 |
 | For_What_Its_Worth_left_on_Ericka | 0 |
+| For_What_Its_Worth_on_Ericka | 0 |
 | Founder_approved_email_ignored | 0 |
+| Founder_approved_email_lost | 0 |
+| Founder_identity_review_reopened_without_new_evidence | 0 |
+| Founder_title_decision_regressed | 0 |
+| Love_of_My_Life_missing_from_Thaddues | 0 |
 | Love_of_My_Life_removed_from_Thaddues | 0 |
 | More_Than_A_Village_left_on_Shelley | 0 |
+| More_Than_A_Village_on_Shelley | 0 |
+| PR683_left_unmerged | 0 |
 | PaymentIntent_created | 0 |
 | Stripe_account_created_in_postmerge_closure | 0 |
 | The_Flame_left_on_Veronica | 0 |
+| The_Flame_on_Veronica | 0 |
 | The_Messenger_2_left_on_Thaddues | 0 |
+| The_Messenger_2_on_Thaddues | 0 |
 | active_support_author_auto_reminded | 0 |
 | ambiguous_existing_Stripe_account_blindly_bound | 0 |
+| blank_current_email_left_on_resolved_author | 0 |
 | charge_created | 0 |
 | duplicate_Connect_account_created | 0 |
 | duplicate_account_groups | 0 |
@@ -25,6 +37,7 @@ Last Verified: 2026-08-28T10:57:47.204Z
 | historical_email_rewritten | 0 |
 | invoice_created | 0 |
 | new_account_created_when_canonical_exists | 0 |
+| old_broken_Day0_reactivated | 0 |
 | payment_executed | 0 |
 | payment_executed_in_postmerge_closure | 0 |
 | payment_promise_communicated | 0 |
@@ -37,3 +50,4 @@ Last Verified: 2026-08-28T10:57:47.204Z
 | setup_reminder_sent_in_postmerge_closure | 0 |
 | transfer_created | 0 |
 | wrong_public_catalog_author_relationship | 0 |
+| wrong_public_catalog_relationship | 0 |

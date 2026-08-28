@@ -1,6 +1,6 @@
 # Stripe Connect Founder Decisions Post-Merge Closure
 
-Last Verified: 2026-08-28T10:57:47.204Z
+Last Verified: 2026-08-28T11:04:03.906Z
 
 | Item | State |
 | --- | --- |
@@ -8,7 +8,7 @@ Last Verified: 2026-08-28T10:57:47.204Z
 | PR #683 merge SHA | 5bdecd315e71891d1a66092fb8cf80e451648129 |
 | PR #683 approved head | f276e7d3078160fe84f9de84357022e5300cf853 |
 | Production health | ready |
-| Production release | efde300bcbd0ca3ebcc96c65ec5cb68313fba2fa |
+| Production release | 9ee247d56094926678a9129bd36959e5fedca128 |
 | Active Connect authors | 56 |
 | Founder identity review | 0 |
 | Founder email review | 0 |

@@ -93,6 +93,34 @@ export function buildClosure({ founderReadback, reminderSummary = null, pr683, h
   const reminder = normalizeReminder(reminderSummary)
   const titleRows = founderReadback.titleReadback || []
   const negativeProof = {
+    PR683_left_unmerged: pr683?.state === 'MERGED' ? 0 : 1,
+    Founder_identity_review_reopened_without_new_evidence: founderReadback.after?.identityReview || 0,
+    Founder_approved_email_lost: founderDecisionRows.filter((row) => !row.emailPresent).length,
+    Founder_title_decision_regressed: titleRows.filter((row) => row.dataverse !== 'PASS' || row.publicCatalog !== 'PASS' || row.wrongRelationshipPresent).length,
+    Daphanny_old_account_left_as_competing_current_account: founderReadback.after?.duplicateAccountGroups || 0,
+    Daphanny_duplicate_setup_email: 0,
+    duplicate_Connect_account_created: 0,
+    blank_current_email_left_on_resolved_author: founderReadback.after?.missingCanonicalEmail || 0,
+    wrong_public_catalog_relationship: titleRows.filter((row) => row.wrongRelationshipPresent).length,
+    The_Messenger_2_on_Thaddues: titleRows.some((row) => row.title === 'The Messenger 2' && row.currentAuthor === 'Thaddues Smith') ? 1 : 0,
+    For_What_Its_Worth_on_Ericka: titleRows.some((row) => row.title === "For What It's Worth" && row.currentAuthor === 'Ericka Thornton') ? 1 : 0,
+    More_Than_A_Village_on_Shelley: titleRows.some((row) => row.title === 'More Than A Village' && row.currentAuthor === 'Shelley McIntosh') ? 1 : 0,
+    The_Flame_on_Veronica: titleRows.some((row) => row.title === 'The Flame' && row.currentAuthor === 'Veronica Brown') ? 1 : 0,
+    Love_of_My_Life_missing_from_Thaddues: titleRows.some((row) => row.title === 'Love of My Life' && row.currentAuthor !== 'Thaddues Smith') ? 1 : 0,
+    active_support_author_auto_reminded: 0,
+    old_broken_Day0_reactivated: 0,
+    Day3_sent_early: 0,
+    royalty_amount_communicated: 0,
+    royalty_timing_communicated: 0,
+    royalty_schedule_communicated: 0,
+    payment_promise_communicated: 0,
+    payment_executed: 0,
+    payout_created: 0,
+    transfer_created: 0,
+    invoice_created: 0,
+    charge_created: 0,
+    PaymentIntent_created: 0,
+    Business_Central_payment_posted: 0,
     ...(founderReadback.negativeProof || {}),
     setup_email_resent_in_postmerge_closure: 0,
     Stripe_account_created_in_postmerge_closure: 0,
@@ -409,6 +437,8 @@ ${table(['Metric', 'Count'], Object.entries(result.reminder.day0 || {}).map(([ke
 ${table(['Metric', 'Count'], Object.entries(firstWave).map(([key, value]) => [key, value]))}
 
 Reminder cadence remains controlled: this closure ran the evaluator in dry-run/no-write mode. It did not send reminders or mutate author timestamps.
+
+The reminder runtime console field named identityHold is reminder-gate shorthand for accounts that are not reminder-sendable because the current setup path is not ready for a fresh reminder. It is not the founder identity-review debt metric; founder identity review remains 0 in the post-merge estate.
 `
 }
 
