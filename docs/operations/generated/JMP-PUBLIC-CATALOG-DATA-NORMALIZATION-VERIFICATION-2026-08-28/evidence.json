@@ -1,0 +1,2347 @@
+{
+  "verifiedAt": "2026-08-28T08:17:14.058Z",
+  "mode": "dry-run",
+  "health": {
+    "service": "jmerrill-pub",
+    "status": "ready",
+    "release": "486a8e245066c28e3779c5b37aa92f2ca93622a1",
+    "checkedAt": "2026-08-28T08:18:02.018Z",
+    "paymentGate": "disabled",
+    "dependencies": {
+      "configuration": {
+        "status": "ready",
+        "required": [
+          "NODE_ENV"
+        ],
+        "present": [
+          "NODE_ENV"
+        ],
+        "missing": []
+      },
+      "dataverse": {
+        "status": "ready",
+        "required": [
+          "DATAVERSE_TENANT_ID",
+          "DATAVERSE_CLIENT_ID",
+          "DATAVERSE_CLIENT_SECRET",
+          "DATAVERSE_RESOURCE_URL",
+          "DATAVERSE_WEB_API_BASE_URL"
+        ],
+        "present": [
+          "DATAVERSE_TENANT_ID",
+          "DATAVERSE_CLIENT_ID",
+          "DATAVERSE_CLIENT_SECRET",
+          "DATAVERSE_RESOURCE_URL",
+          "DATAVERSE_WEB_API_BASE_URL"
+        ],
+        "missing": []
+      },
+      "graph": {
+        "status": "ready",
+        "required": [
+          "SHAREPOINT_TENANT_ID",
+          "SHAREPOINT_CLIENT_ID",
+          "SHAREPOINT_CLIENT_SECRET"
+        ],
+        "present": [
+          "SHAREPOINT_TENANT_ID",
+          "SHAREPOINT_CLIENT_ID",
+          "SHAREPOINT_CLIENT_SECRET"
+        ],
+        "missing": []
+      },
+      "acs": {
+        "status": "ready",
+        "required": [
+          "JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL",
+          "JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY"
+        ],
+        "present": [
+          "JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL",
+          "JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY"
+        ],
+        "missing": []
+      },
+      "artifact": {
+        "status": "ready",
+        "required": [
+          "JOIN_WORKSPACE_INQUIRY_ROOT"
+        ],
+        "present": [
+          "JOIN_WORKSPACE_INQUIRY_ROOT"
+        ],
+        "missing": []
+      },
+      "authorPortal": {
+        "status": "ready",
+        "required": [
+          "AUTHOR_PORTAL_SESSION_SECRET"
+        ],
+        "present": [
+          "AUTHOR_PORTAL_SESSION_SECRET"
+        ],
+        "missing": []
+      },
+      "stripeEnrollment": {
+        "status": "ready",
+        "required": [
+          "STRIPE_CONNECT_SECRET_KEY",
+          "JM1_STRIPE_CONNECT_ENABLED",
+          "JM1_STRIPE_MODE"
+        ],
+        "present": [
+          "STRIPE_CONNECT_SECRET_KEY",
+          "JM1_STRIPE_CONNECT_ENABLED",
+          "JM1_STRIPE_MODE"
+        ],
+        "missing": []
+      },
+      "relayHost": {
+        "status": "ready",
+        "required": [
+          "JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL"
+        ],
+        "present": [
+          "JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL"
+        ],
+        "missing": [],
+        "notes": [
+          "relay_handler_reachable_unauthorized_probe"
+        ]
+      }
+    }
+  },
+  "before": {
+    "generatedAt": "2026-08-28T08:17:14.479Z",
+    "summary": {
+      "totalTitles": 113,
+      "totalAuthors": 65,
+      "duplicateTitleSlugs": [
+        "god-s-nudge",
+        "the-master-s-piece",
+        "warrior-s-breed"
+      ],
+      "duplicateAuthorSlugs": [],
+      "titlesReadyForPublicVerification": 106,
+      "titlesOnHold": 7,
+      "titlesWithMetadataWarnings": 113
+    }
+  },
+  "after": {
+    "generatedAt": "2026-08-28T08:17:15.346Z",
+    "summary": {
+      "totalTitles": 113,
+      "totalAuthors": 65,
+      "duplicateTitleSlugs": [
+        "god-s-nudge",
+        "the-master-s-piece",
+        "warrior-s-breed"
+      ],
+      "duplicateAuthorSlugs": [],
+      "titlesReadyForPublicVerification": 106,
+      "titlesOnHold": 7,
+      "titlesWithMetadataWarnings": 113
+    }
+  },
+  "holdsBefore": [
+    {
+      "id": "07106fd3-c27a-f111-ab0f-6045bdd69435",
+      "title": "The Paper Champ",
+      "slug": "the-paper-champ",
+      "authorDisplayName": "Anonymous",
+      "issues": [
+        "MISSING_AUTHOR_PAGE"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "fec27b7a-cc7a-f111-ab0f-6045bdd69435",
+      "title": "Warrior's Breed",
+      "slug": "warrior-s-breed",
+      "authorDisplayName": "Dean Wilson",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "935f72d0-c27a-f111-ab0f-6045bdd69738",
+      "title": "Warrior's Breed",
+      "slug": "warrior-s-breed",
+      "authorDisplayName": "Dean Wilson",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
+      "title": "The Master's Piece",
+      "slug": "the-master-s-piece",
+      "authorDisplayName": "Sylvia Benson",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "733cd77a-cc7a-f111-ab0f-6045bdd69678",
+      "title": "The Master's Piece",
+      "slug": "the-master-s-piece",
+      "authorDisplayName": "Sylvia Benson",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
+      "title": "God's Nudge",
+      "slug": "god-s-nudge",
+      "authorDisplayName": "Tekisha Wimbush",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "7e000573-cc7a-f111-ab0f-7c1e525b15c2",
+      "title": "God's Nudge",
+      "slug": "god-s-nudge",
+      "authorDisplayName": "Tekisha Wimbush",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    }
+  ],
+  "holdsAfter": [
+    {
+      "id": "07106fd3-c27a-f111-ab0f-6045bdd69435",
+      "title": "The Paper Champ",
+      "slug": "the-paper-champ",
+      "authorDisplayName": "Anonymous",
+      "issues": [
+        "MISSING_AUTHOR_PAGE"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "fec27b7a-cc7a-f111-ab0f-6045bdd69435",
+      "title": "Warrior's Breed",
+      "slug": "warrior-s-breed",
+      "authorDisplayName": "Dean Wilson",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "935f72d0-c27a-f111-ab0f-6045bdd69738",
+      "title": "Warrior's Breed",
+      "slug": "warrior-s-breed",
+      "authorDisplayName": "Dean Wilson",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
+      "title": "The Master's Piece",
+      "slug": "the-master-s-piece",
+      "authorDisplayName": "Sylvia Benson",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "733cd77a-cc7a-f111-ab0f-6045bdd69678",
+      "title": "The Master's Piece",
+      "slug": "the-master-s-piece",
+      "authorDisplayName": "Sylvia Benson",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
+      "title": "God's Nudge",
+      "slug": "god-s-nudge",
+      "authorDisplayName": "Tekisha Wimbush",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    },
+    {
+      "id": "7e000573-cc7a-f111-ab0f-7c1e525b15c2",
+      "title": "God's Nudge",
+      "slug": "god-s-nudge",
+      "authorDisplayName": "Tekisha Wimbush",
+      "issues": [
+        "DUPLICATE_TITLE_SLUG"
+      ],
+      "warnings": [
+        "MISSING_ISBN"
+      ]
+    }
+  ],
+  "repairs": [
+    {
+      "id": "1159fcc8-c37a-f111-ab0f-000d3a14673b",
+      "title": "Memoir of a Black Christian Nationalist: Seeds of Liberation (Unabridged)",
+      "author": "Shelley McIntosh",
+      "evidence": "data/books.json and Publisher Master Imprint Register evidence identify Memoir of a Black Christian Nationalist as Shelley McIntosh.",
+      "verifiedAt": "2026-08-28T08:17:14.058Z",
+      "beforeAuthorDisplayName": "Shelley McIntosh",
+      "beforeAuthorName": "Shelley McIntosh",
+      "afterAuthorDisplayName": "Shelley McIntosh",
+      "afterAuthorName": "Shelley McIntosh",
+      "status": "NO_OP_MATCH"
+    },
+    {
+      "id": "982156cd-c37a-f111-ab0f-00224820105b",
+      "title": "Music Ministry Unplugged: Real Lessons for Those who Lead and Serve in Music Ministry",
+      "author": "Will Harris",
+      "evidence": "Publisher Master Imprint Register confirmed Music Ministry Unplugged belongs to Will Harris; prior catalog evidence records Dr. Will Harris.",
+      "verifiedAt": "2026-08-28T08:17:14.058Z",
+      "beforeAuthorDisplayName": "Will Harris",
+      "beforeAuthorName": "Will Harris",
+      "afterAuthorDisplayName": "Will Harris",
+      "afterAuthorName": "Will Harris",
+      "status": "NO_OP_MATCH"
+    },
+    {
+      "id": "952556cd-c37a-f111-ab0f-00224820105b",
+      "title": "The Fight for the Promiseland: Battle Strategies for Victorious People",
+      "author": "Cheryl Cook",
+      "evidence": "Publisher Master Imprint Register certified The Fight for the Promiseland by Cheryl Cook.",
+      "verifiedAt": "2026-08-28T08:17:14.058Z",
+      "beforeAuthorDisplayName": "Cheryl Cook",
+      "beforeAuthorName": "Cheryl Cook",
+      "afterAuthorDisplayName": "Cheryl Cook",
+      "afterAuthorName": "Cheryl Cook",
+      "status": "NO_OP_MATCH"
+    }
+  ],
+  "slugPolicy": {
+    "policy": "When Dataverse contains duplicate public title slugs, the projection preserves the first deterministic title identity by title/id ordering on the base slug and appends a stable title-ID suffix to the other participants. Title ID remains the identity; the projected slug is the public route.",
+    "duplicateSlugsBefore": [
+      "god-s-nudge",
+      "the-master-s-piece",
+      "warrior-s-breed"
+    ],
+    "duplicateSlugsAfter": [
+      "god-s-nudge",
+      "the-master-s-piece",
+      "warrior-s-breed"
+    ],
+    "repairedGroups": {
+      "warrior-s-breed": [
+        {
+          "id": "fec27b7a-cc7a-f111-ab0f-6045bdd69435",
+          "title": "Warrior's Breed",
+          "priorSlug": "warrior-s-breed",
+          "projectedSlug": "warrior-s-breed"
+        },
+        {
+          "id": "935f72d0-c27a-f111-ab0f-6045bdd69738",
+          "title": "Warrior's Breed",
+          "priorSlug": "warrior-s-breed",
+          "projectedSlug": "warrior-s-breed"
+        }
+      ],
+      "the-master-s-piece": [
+        {
+          "id": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
+          "title": "The Master's Piece",
+          "priorSlug": "the-master-s-piece",
+          "projectedSlug": "the-master-s-piece"
+        },
+        {
+          "id": "733cd77a-cc7a-f111-ab0f-6045bdd69678",
+          "title": "The Master's Piece",
+          "priorSlug": "the-master-s-piece",
+          "projectedSlug": "the-master-s-piece"
+        }
+      ],
+      "god-s-nudge": [
+        {
+          "id": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
+          "title": "God's Nudge",
+          "priorSlug": "god-s-nudge",
+          "projectedSlug": "god-s-nudge"
+        },
+        {
+          "id": "7e000573-cc7a-f111-ab0f-7c1e525b15c2",
+          "title": "God's Nudge",
+          "priorSlug": "god-s-nudge",
+          "projectedSlug": "god-s-nudge"
+        }
+      ]
+    }
+  },
+  "pageChecks": {
+    "readyCount": 106,
+    "checked": 106,
+    "pass": 103,
+    "fail": 3,
+    "rows": [
+      {
+        "id": "c70f6fd3-c27a-f111-ab0f-6045bdd69435",
+        "title": "Delicious Ideas!",
+        "slug": "delicious-ideas",
+        "authorDisplayName": "Agape International Cathedral",
+        "titlePage": "https://jmerrill.pub/books/delicious-ideas",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/agape-international-cathedral",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "3f09d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "A Trubie's Guide Pt. 1",
+        "slug": "a-truebies-guide-part-1",
+        "authorDisplayName": "Alesia Corpening",
+        "titlePage": "https://jmerrill.pub/books/a-truebies-guide-part-1",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/alesia-corpening",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "848904ca-c27a-f111-ab0f-6045bdd69738",
+        "title": "A Trubie's Guide Pt. 2",
+        "slug": "a-truebies-guide-part-2",
+        "authorDisplayName": "Alesia Corpening",
+        "titlePage": "https://jmerrill.pub/books/a-truebies-guide-part-2",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/alesia-corpening",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "f0084bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Pieces of Me All over the Place",
+        "slug": "pieces-of-me-all-over-the-place",
+        "authorDisplayName": "Ashanti Flemister",
+        "titlePage": "https://jmerrill.pub/books/pieces-of-me-all-over-the-place",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/ashanti-flemister",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "15e01ad3-c27a-f111-ab0f-6045bdd69678",
+        "title": "Support Beyond the Cycle",
+        "slug": "support-beyond-the-cycle",
+        "authorDisplayName": "Brandyn McElroy",
+        "titlePage": "https://jmerrill.pub/books/support-beyond-the-cycle",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/brandyn-mcelroy",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "614797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Abortion!",
+        "slug": "abortion",
+        "authorDisplayName": "Carolyn Booker-Pierce",
+        "titlePage": "https://jmerrill.pub/books/abortion",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/carolyn-booker-pierce",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9b4b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "Because the Lord Is My Shepherd",
+        "slug": "because-the-lord-is-my-shepherd",
+        "authorDisplayName": "Carolyn Booker-Pierce",
+        "titlePage": "https://jmerrill.pub/books/because-the-lord-is-my-shepherd",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/carolyn-booker-pierce",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+        "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+        "slug": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+        "authorDisplayName": "Carolyn Booker-Pierce",
+        "titlePage": "https://jmerrill.pub/books/girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/carolyn-booker-pierce",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "ec0f6fd3-c27a-f111-ab0f-6045bdd69435",
+        "title": "Loving the Addict",
+        "slug": "loving-the-addict",
+        "authorDisplayName": "Carolyn Booker-Pierce",
+        "titlePage": "https://jmerrill.pub/books/loving-the-addict",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/carolyn-booker-pierce",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "d4f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "More Than a Village",
+        "slug": "more-than-a-village",
+        "authorDisplayName": "Carolyn Booker-Pierce",
+        "titlePage": "https://jmerrill.pub/books/more-than-a-village",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/carolyn-booker-pierce",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "a74b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "You're Still Not Crazy",
+        "slug": "you-re-still-not-crazy",
+        "authorDisplayName": "Carolyn Booker-Pierce",
+        "titlePage": "https://jmerrill.pub/books/you-re-still-not-crazy",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/carolyn-booker-pierce",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "c84b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "The Fight for the Promiseland",
+        "slug": "the-fight-for-the-promiseland",
+        "authorDisplayName": "Cheryl Cook",
+        "titlePage": "https://jmerrill.pub/books/the-fight-for-the-promiseland",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cheryl-cook",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "952556cd-c37a-f111-ab0f-00224820105b",
+        "title": "The Fight for the Promiseland: Battle Strategies for Victorious People",
+        "slug": "the-fight-for-the-promiseland-battle-strategies-for-victorious-people",
+        "authorDisplayName": "Cheryl Cook",
+        "titlePage": "https://jmerrill.pub/books/the-fight-for-the-promiseland-battle-strategies-for-victorious-people",
+        "titlePageStatus": 404,
+        "titlePageHasTitle": false,
+        "titlePageHasAuthor": false,
+        "titlePageHasJsonLd": false,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cheryl-cook",
+            "status": 200
+          }
+        ],
+        "pass": false
+      },
+      {
+        "id": "7b5f72d0-c27a-f111-ab0f-6045bdd69738",
+        "title": "Help God, I Am - the Collection",
+        "slug": "help-god-i-am-the-collection",
+        "authorDisplayName": "Cheryl Travis",
+        "titlePage": "https://jmerrill.pub/books/help-god-i-am-the-collection",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cheryl-travis",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "293274cd-c27a-f111-ab0f-6045bdd69435",
+        "title": "Help God, I Am Afraid",
+        "slug": "help-god-i-am-afraid",
+        "authorDisplayName": "Cheryl Travis",
+        "titlePage": "https://jmerrill.pub/books/help-god-i-am-afraid",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cheryl-travis",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "6309d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "Help God, I Am Angry",
+        "slug": "help-god-i-am-angry",
+        "authorDisplayName": "Cheryl Travis",
+        "titlePage": "https://jmerrill.pub/books/help-god-i-am-angry",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cheryl-travis",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "99064bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Help God, I Am Confused",
+        "slug": "help-god-i-am-confused",
+        "authorDisplayName": "Cheryl Travis",
+        "titlePage": "https://jmerrill.pub/books/help-god-i-am-confused",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cheryl-travis",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "343274cd-c27a-f111-ab0f-6045bdd69435",
+        "title": "Help God, I Am Hurt",
+        "slug": "help-god-i-am-hurt",
+        "authorDisplayName": "Cheryl Travis",
+        "titlePage": "https://jmerrill.pub/books/help-god-i-am-hurt",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cheryl-travis",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "6409d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "Help God, I Am Lonely",
+        "slug": "help-god-i-am-lonely",
+        "authorDisplayName": "Cheryl Travis",
+        "titlePage": "https://jmerrill.pub/books/help-god-i-am-lonely",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cheryl-travis",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Help God, I Am Lost",
+        "slug": "help-god-i-am-lost",
+        "authorDisplayName": "Cheryl Travis",
+        "titlePage": "https://jmerrill.pub/books/help-god-i-am-lost",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cheryl-travis",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "6509d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "Help God, I Am Sad",
+        "slug": "help-god-i-am-sad",
+        "authorDisplayName": "Cheryl Travis",
+        "titlePage": "https://jmerrill.pub/books/help-god-i-am-sad",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cheryl-travis",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "d5084bcd-c27a-f111-ab0f-00224820105b",
+        "title": "My ABC's",
+        "slug": "my-abc-s",
+        "authorDisplayName": "Christy Grogg",
+        "titlePage": "https://jmerrill.pub/books/my-abc-s",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/christy-grogg",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "bff603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "Speech Therapy Works!",
+        "slug": "speech-therapy-works",
+        "authorDisplayName": "Cynthia Sloan",
+        "titlePage": "https://jmerrill.pub/books/speech-therapy-works",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/cynthia-sloan",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "69b21fc6-c27a-f111-ab0f-000d3a14673b",
+        "title": "365 Days of Transparency",
+        "slug": "365-days-of-transparency",
+        "authorDisplayName": "Daphanny Baker",
+        "titlePage": "https://jmerrill.pub/books/365-days-of-transparency",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/daphanny-baker",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "ab084bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Lady Daphanny's Altar",
+        "slug": "lady-daphanny-s-altar",
+        "authorDisplayName": "Daphanny Baker",
+        "titlePage": "https://jmerrill.pub/books/lady-daphanny-s-altar",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/daphanny-baker",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "4be01ad3-c27a-f111-ab0f-6045bdd69678",
+        "title": "Peaches Can Do It!",
+        "slug": "peaches-can-do-it",
+        "authorDisplayName": "Daphanny Baker",
+        "titlePage": "https://jmerrill.pub/books/peaches-can-do-it",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/daphanny-baker",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "930f6fd3-c27a-f111-ab0f-6045bdd69435",
+        "title": "The Messenger",
+        "slug": "the-messenger",
+        "authorDisplayName": "Daphanny Baker",
+        "titlePage": "https://jmerrill.pub/books/the-messenger",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/daphanny-baker",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "69137ed6-c27a-f111-ab0f-6045bdd69738",
+        "title": "The Messenger 2",
+        "slug": "the-messenger-2",
+        "authorDisplayName": "Daphanny Baker",
+        "titlePage": "https://jmerrill.pub/books/the-messenger-2",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/daphanny-baker",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "604797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Words of a Troubled Soul",
+        "slug": "words-of-a-troubled-soul",
+        "authorDisplayName": "David Williams",
+        "titlePage": "https://jmerrill.pub/books/words-of-a-troubled-soul",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/david-williams",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "b3084bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Life after Detour",
+        "slug": "life-after-detour",
+        "authorDisplayName": "Deanna Jones",
+        "titlePage": "https://jmerrill.pub/books/life-after-detour",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/deanna-jones",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "998797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "BEE Careful",
+        "slug": "bee-careful",
+        "authorDisplayName": "Deborah Eiland",
+        "titlePage": "https://jmerrill.pub/books/bee-careful",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/deborah-eiland",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "26e01ad3-c27a-f111-ab0f-6045bdd69678",
+        "title": "Jalen Becomes a Big Brother",
+        "slug": "jalen-becomes-a-big-brother",
+        "authorDisplayName": "Deborah Eiland",
+        "titlePage": "https://jmerrill.pub/books/jalen-becomes-a-big-brother",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/deborah-eiland",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "17e01ad3-c27a-f111-ab0f-6045bdd69678",
+        "title": "The Girl with the Ebony Locs and the Three Bears",
+        "slug": "the-girl-with-the-ebony-locs-and-the-three-bears",
+        "authorDisplayName": "Deborah Eiland",
+        "titlePage": "https://jmerrill.pub/books/the-girl-with-the-ebony-locs-and-the-three-bears",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/deborah-eiland",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "19e01ad3-c27a-f111-ab0f-6045bdd69678",
+        "title": "The Princess and the Black-Eyed Pea",
+        "slug": "the-princess-and-the-black-eyed-pea",
+        "authorDisplayName": "Deborah Eiland",
+        "titlePage": "https://jmerrill.pub/books/the-princess-and-the-black-eyed-pea",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/deborah-eiland",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "7a064bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Aligned!",
+        "slug": "aligned",
+        "authorDisplayName": "Dennis Brown",
+        "titlePage": "https://jmerrill.pub/books/aligned",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/dennis-brown",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "911a04cd-c27a-f111-ab0f-000d3a14673b",
+        "title": "Connected!",
+        "slug": "connected",
+        "authorDisplayName": "Dennis Brown",
+        "titlePage": "https://jmerrill.pub/books/connected",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/dennis-brown",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "d6f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "The Flame",
+        "slug": "the-flame",
+        "authorDisplayName": "Dennis Brown",
+        "titlePage": "https://jmerrill.pub/books/the-flame",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/dennis-brown",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "991a04cd-c27a-f111-ab0f-000d3a14673b",
+        "title": "Love Lucy",
+        "slug": "love-lucy",
+        "authorDisplayName": "Diane Johnson",
+        "titlePage": "https://jmerrill.pub/books/love-lucy",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/diane-johnson",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "d0f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "27 Days to Overcoming Depression",
+        "slug": "27-days-to-overcoming-depression",
+        "authorDisplayName": "Donjia Walls",
+        "titlePage": "https://jmerrill.pub/books/27-days-to-overcoming-depression",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/donjia-walls",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "5c4797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Ordinary People Searching for Greatness",
+        "slug": "ordinary-people-searching-for-greatness",
+        "authorDisplayName": "Earline Neal",
+        "titlePage": "https://jmerrill.pub/books/ordinary-people-searching-for-greatness",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/earline-neal",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "971a04cd-c27a-f111-ab0f-000d3a14673b",
+        "title": "Inspirations from God",
+        "slug": "inspirations-from-god",
+        "authorDisplayName": "Edith Clay",
+        "titlePage": "https://jmerrill.pub/books/inspirations-from-god",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/edith-clay",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "3e09d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "7 Step Jumpstart to Becoming Your Best Self",
+        "slug": "7-step-jumpstart-to-becoming-your-best-self",
+        "authorDisplayName": "Ericka Johnson-Settles",
+        "titlePage": "https://jmerrill.pub/books/7-step-jumpstart-to-becoming-your-best-self",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/ericka-johnson-settles",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "4009d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "Are You Sure That You Are Ready?",
+        "slug": "are-you-sure-that-you-are-ready",
+        "authorDisplayName": "Ericka Thornton",
+        "titlePage": "https://jmerrill.pub/books/are-you-sure-that-you-are-ready",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/ericka-thornton",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9a8797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Conquer Your Fears and Win",
+        "slug": "conquer-your-fears-and-win",
+        "authorDisplayName": "Gloria Patterson",
+        "titlePage": "https://jmerrill.pub/books/conquer-your-fears-and-win",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/gloria-patterson",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "65137ed6-c27a-f111-ab0f-6045bdd69738",
+        "title": "When Zuri Came to Earth",
+        "slug": "when-zuri-came-to-earth",
+        "authorDisplayName": "Gwendolyn Rucker-Carr",
+        "titlePage": "https://jmerrill.pub/books/when-zuri-came-to-earth",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/gwendolyn-rucker-carr",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "c74b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "A Portrait of Paradise",
+        "slug": "a-portrait-of-paradise",
+        "authorDisplayName": "Iyorwuese Hagher",
+        "titlePage": "https://jmerrill.pub/books/a-portrait-of-paradise",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/iyorwuese-hagher",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "c44b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "The Conquest of Azenga",
+        "slug": "the-conquest-of-azenga",
+        "authorDisplayName": "Iyorwuese Hagher",
+        "titlePage": "https://jmerrill.pub/books/the-conquest-of-azenga",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/iyorwuese-hagher",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "dcf603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "101 Wisdom Lessons for Life and Living",
+        "slug": "100-wisdom-lessons-for-life-and-living",
+        "authorDisplayName": "J. Derrick Johnson",
+        "titlePage": "https://jmerrill.pub/books/100-wisdom-lessons-for-life-and-living",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/j-derrick-johnson",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "fb3174cd-c27a-f111-ab0f-6045bdd69435",
+        "title": "Establishing Glory 2: The Relationship Handbook (2nd Edition)",
+        "slug": "establishing-glory-2",
+        "authorDisplayName": "Jackie Smith, Jr.",
+        "titlePage": "https://jmerrill.pub/books/establishing-glory-2",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/jackie-smith-jr",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9c8797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Establishing Glory 3: The Marriage Handbook",
+        "slug": "establishing-glory-3",
+        "authorDisplayName": "Jackie Smith, Jr.",
+        "titlePage": "https://jmerrill.pub/books/establishing-glory-3",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/jackie-smith-jr",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9d8797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Establishing Glory: The Praise and Worship Handbook (2nd Edition)",
+        "slug": "establishing-glory",
+        "authorDisplayName": "Jackie Smith, Jr.",
+        "titlePage": "https://jmerrill.pub/books/establishing-glory",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/jackie-smith-jr",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "a5084bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Jewels by Lady J",
+        "slug": "jewels-by-lady-j",
+        "authorDisplayName": "Janet Stephens",
+        "titlePage": "https://jmerrill.pub/books/jewels-by-lady-j",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/janet-stephens",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "7b064bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Almost Happy",
+        "slug": "almost-happy",
+        "authorDisplayName": "Jaylonna Stevette",
+        "titlePage": "https://jmerrill.pub/books/almost-happy",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/jaylonna-stevette",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "6109d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "Getting Back 2 Happy",
+        "slug": "getting-back-2-happy",
+        "authorDisplayName": "Jaylonna Stevette",
+        "titlePage": "https://jmerrill.pub/books/getting-back-2-happy",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/jaylonna-stevette",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "624797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Have You Considered My Servant?",
+        "slug": "have-you-considered-my-servant",
+        "authorDisplayName": "Jaylonna Stevette",
+        "titlePage": "https://jmerrill.pub/books/have-you-considered-my-servant",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/jaylonna-stevette",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "a05f72d0-c27a-f111-ab0f-6045bdd69738",
+        "title": "Naughty Tales",
+        "slug": "naughty-tales",
+        "authorDisplayName": "Jaylonna Stevette",
+        "titlePage": "https://jmerrill.pub/books/naughty-tales",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/jaylonna-stevette",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "24e01ad3-c27a-f111-ab0f-6045bdd69678",
+        "title": "From Stylist to CEO",
+        "slug": "from-stylist-to-ceo",
+        "authorDisplayName": "Karen Hill",
+        "titlePage": "https://jmerrill.pub/books/from-stylist-to-ceo",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/karen-hill",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "The Great Hair Restart",
+        "slug": "the-great-hair-restart",
+        "authorDisplayName": "Karen Hill",
+        "titlePage": "https://jmerrill.pub/books/the-great-hair-restart",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/karen-hill",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "df0f6fd3-c27a-f111-ab0f-6045bdd69435",
+        "title": "Inner Peace Through Life's Storms",
+        "slug": "inner-peace-through-life-s-storms",
+        "authorDisplayName": "KD Heard",
+        "titlePage": "https://jmerrill.pub/books/inner-peace-through-life-s-storms",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/kd-heard",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "958904ca-c27a-f111-ab0f-6045bdd69738",
+        "title": "For What It's Worth",
+        "slug": "for-what-it-s-worth",
+        "authorDisplayName": "Kelli Milligan Stammen",
+        "titlePage": "https://jmerrill.pub/books/for-what-it-s-worth",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/kelli-milligan-stammen",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "66137ed6-c27a-f111-ab0f-6045bdd69738",
+        "title": "Your Peace Is a Priority",
+        "slug": "your-peace-is-a-priority",
+        "authorDisplayName": "Kiena Hughley",
+        "titlePage": "https://jmerrill.pub/books/your-peace-is-a-priority",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/kiena-hughley",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "b34b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "Girl, Did You Know... ?",
+        "slug": "girl-did-you-know",
+        "authorDisplayName": "Kimberly Reeder",
+        "titlePage": "https://jmerrill.pub/books/girl-did-you-know",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/kimberly-reeder",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "835f72d0-c27a-f111-ab0f-6045bdd69738",
+        "title": "Love Is an Action Word",
+        "slug": "love-is-an-action-word",
+        "authorDisplayName": "Kurt Broadnax",
+        "titlePage": "https://jmerrill.pub/books/love-is-an-action-word",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/kurt-broadnax",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "b73274cd-c27a-f111-ab0f-6045bdd69435",
+        "title": "Seasons of Life",
+        "slug": "seasons-of-life",
+        "authorDisplayName": "Kurt Broadnax",
+        "titlePage": "https://jmerrill.pub/books/seasons-of-life",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/kurt-broadnax",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "c9f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "Uncomfortable Conversations with God",
+        "slug": "uncomfortable-conversations-with-god",
+        "authorDisplayName": "Leslie Banks",
+        "titlePage": "https://jmerrill.pub/books/uncomfortable-conversations-with-god",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/leslie-banks",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "6909d7cb-c27a-f111-ab0f-6045bdd69678",
+        "title": "Let Me Tell You About It",
+        "slug": "let-me-tell-you-about-it",
+        "authorDisplayName": "Lisa Clark",
+        "titlePage": "https://jmerrill.pub/books/let-me-tell-you-about-it",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/lisa-clark",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "33106fd3-c27a-f111-ab0f-6045bdd69435",
+        "title": "Damaged",
+        "slug": "damaged",
+        "authorDisplayName": "Lisa Taylor",
+        "titlePage": "https://jmerrill.pub/books/damaged",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/lisa-taylor",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "d7f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "The Release of the Spirit",
+        "slug": "the-release-of-the-spirit",
+        "authorDisplayName": "Lyle Goddard",
+        "titlePage": "https://jmerrill.pub/books/the-release-of-the-spirit",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/lyle-goddard",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9a4b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "When a Thug Meets Jesus",
+        "slug": "when-a-thug-meets-jesus",
+        "authorDisplayName": "Mack Hughley",
+        "titlePage": "https://jmerrill.pub/books/when-a-thug-meets-jesus",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/mack-hughley",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "594797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Mirror of Refining Insight",
+        "slug": "mirror-of-refining-insight",
+        "authorDisplayName": "Marvin Grayson",
+        "titlePage": "https://jmerrill.pub/books/mirror-of-refining-insight",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/marvin-grayson",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "563274cd-c27a-f111-ab0f-6045bdd69435",
+        "title": "I Am My Worst Enemy!",
+        "slug": "i-am-my-worst-enemy",
+        "authorDisplayName": "Maurche Reed",
+        "titlePage": "https://jmerrill.pub/books/i-am-my-worst-enemy",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/maurche-reed",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "885f72d0-c27a-f111-ab0f-6045bdd69738",
+        "title": "The Healed Me",
+        "slug": "the-healed-me",
+        "authorDisplayName": "Maurche Reed",
+        "titlePage": "https://jmerrill.pub/books/the-healed-me",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/maurche-reed",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "554797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Hodge Podge of Life",
+        "slug": "hodge-podge-of-life",
+        "authorDisplayName": "Mildred Beard",
+        "titlePage": "https://jmerrill.pub/books/hodge-podge-of-life",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/mildred-beard",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "901a04cd-c27a-f111-ab0f-000d3a14673b",
+        "title": "Bodacious",
+        "slug": "bodacious",
+        "authorDisplayName": "Nathaniel Short",
+        "titlePage": "https://jmerrill.pub/books/bodacious",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/nathaniel-short",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "16e01ad3-c27a-f111-ab0f-6045bdd69678",
+        "title": "The Celestial Advantage",
+        "slug": "the-celestial-advantage",
+        "authorDisplayName": "Obadiah Harris",
+        "titlePage": "https://jmerrill.pub/books/the-celestial-advantage",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/obadiah-harris",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "d13274cd-c27a-f111-ab0f-6045bdd69435",
+        "title": "The Doctrine of the Last Things",
+        "slug": "the-doctrine-of-last-things",
+        "authorDisplayName": "Obadiah Harris",
+        "titlePage": "https://jmerrill.pub/books/the-doctrine-of-last-things",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/obadiah-harris",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9e3274cd-c27a-f111-ab0f-6045bdd69435",
+        "title": "Never Give up on Love",
+        "slug": "never-give-up-on-love",
+        "authorDisplayName": "Pamela Smith",
+        "titlePage": "https://jmerrill.pub/books/never-give-up-on-love",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/pamela-smith",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "62137ed6-c27a-f111-ab0f-6045bdd69738",
+        "title": "The Sun, the Shadow, and the Silence",
+        "slug": "the-sun-the-shadow-and-the-silence",
+        "authorDisplayName": "R. Dorian Night",
+        "titlePage": "https://jmerrill.pub/books/the-sun-the-shadow-and-the-silence",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/r-dorian-night",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "c2f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "The Hood",
+        "slug": "the-hood",
+        "authorDisplayName": "Randall Beverly",
+        "titlePage": "https://jmerrill.pub/books/the-hood",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/randall-beverly",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "cc4b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "Divinely Inspired",
+        "slug": "divinely-inspired",
+        "authorDisplayName": "Regina Scales",
+        "titlePage": "https://jmerrill.pub/books/divinely-inspired",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/regina-scales",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9e8ffdd6-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Why Faith Works for Some and Not for Others",
+        "slug": "why-faith-works-for-some-and-not-for-others",
+        "authorDisplayName": "Rodney Waller",
+        "titlePage": "https://jmerrill.pub/books/why-faith-works-for-some-and-not-for-others",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/rodney-waller",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "944b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "The Journey",
+        "slug": "the-journey",
+        "authorDisplayName": "Rosetta Perry",
+        "titlePage": "https://jmerrill.pub/books/the-journey",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/rosetta-perry",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9c4b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "Destined to Break the Curse",
+        "slug": "destined-to-break-the-curse",
+        "authorDisplayName": "Sean Smith, Sr.",
+        "titlePage": "https://jmerrill.pub/books/destined-to-break-the-curse",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/sean-smith-sr",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9b8797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "Destined to Break the Curse Devotional",
+        "slug": "destined-to-break-the-curse-devotional",
+        "authorDisplayName": "Sean Smith, Sr.",
+        "titlePage": "https://jmerrill.pub/books/destined-to-break-the-curse-devotional",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/sean-smith-sr",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "921a04cd-c27a-f111-ab0f-000d3a14673b",
+        "title": "Focus, Trust, & Follow",
+        "slug": "focus-trust-and-follow",
+        "authorDisplayName": "Shana Byrd",
+        "titlePage": "https://jmerrill.pub/books/focus-trust-and-follow",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/shana-byrd",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "6f8904ca-c27a-f111-ab0f-6045bdd69738",
+        "title": "A Blended Family",
+        "slug": "a-blended-family",
+        "authorDisplayName": "Shecara Norris",
+        "titlePage": "https://jmerrill.pub/books/a-blended-family",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/shecara-norris",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "841a04cd-c27a-f111-ab0f-000d3a14673b",
+        "title": "A Principal's Tale",
+        "slug": "a-principal-s-tale",
+        "authorDisplayName": "Shelley McIntosh",
+        "titlePage": "https://jmerrill.pub/books/a-principal-s-tale",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/shelley-mcintosh",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "903274cd-c27a-f111-ab0f-6045bdd69435",
+        "title": "Memoir of a Black Christian Nationalist",
+        "slug": "memoir-of-a-black-christian-nationalist",
+        "authorDisplayName": "Shelley McIntosh",
+        "titlePage": "https://jmerrill.pub/books/memoir-of-a-black-christian-nationalist",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/shelley-mcintosh",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "1159fcc8-c37a-f111-ab0f-000d3a14673b",
+        "title": "Memoir of a Black Christian Nationalist: Seeds of Liberation (Unabridged)",
+        "slug": "memoir-of-a-black-christian-nationalist-seeds-of-liberation-unabridged",
+        "authorDisplayName": "Shelley McIntosh",
+        "titlePage": "https://jmerrill.pub/books/memoir-of-a-black-christian-nationalist-seeds-of-liberation-unabridged",
+        "titlePageStatus": 404,
+        "titlePageHasTitle": false,
+        "titlePageHasAuthor": false,
+        "titlePageHasJsonLd": false,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/shelley-mcintosh",
+            "status": 200
+          }
+        ],
+        "pass": false
+      },
+      {
+        "id": "d9f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "Warriors and Angels",
+        "slug": "warriors-and-angels",
+        "authorDisplayName": "Shelley McIntosh",
+        "titlePage": "https://jmerrill.pub/books/warriors-and-angels",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/shelley-mcintosh",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "5e4797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "The I Am In Me Part 2, Second Edition",
+        "slug": "the-i-am-in-me-part-2",
+        "authorDisplayName": "Tekisha Wimbush",
+        "titlePage": "https://jmerrill.pub/books/the-i-am-in-me-part-2",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/tekisha-wimbush",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "5f4797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "The I Am in Me, Second Edition",
+        "slug": "the-i-am-in-me",
+        "authorDisplayName": "Tekisha Wimbush",
+        "titlePage": "https://jmerrill.pub/books/the-i-am-in-me",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/tekisha-wimbush",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "928904ca-c27a-f111-ab0f-6045bdd69738",
+        "title": "Biblical Prescriptions for Life's Troubles",
+        "slug": "biblical-prescriptions-for-life-s-troubles",
+        "authorDisplayName": "Terry Stephens",
+        "titlePage": "https://jmerrill.pub/books/biblical-prescriptions-for-life-s-troubles",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/terry-stephens",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "80064bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Discipline and Direction",
+        "slug": "discipline-and-direction",
+        "authorDisplayName": "Terry Stephens",
+        "titlePage": "https://jmerrill.pub/books/discipline-and-direction",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/terry-stephens",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "82064bcd-c27a-f111-ab0f-00224820105b",
+        "title": "God's Business Plan",
+        "slug": "god-s-business-plan",
+        "authorDisplayName": "Terry Stephens",
+        "titlePage": "https://jmerrill.pub/books/god-s-business-plan",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/terry-stephens",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "aa084bcd-c27a-f111-ab0f-00224820105b",
+        "title": "Kingdom Equipment 101",
+        "slug": "kingdom-equipment-101",
+        "authorDisplayName": "Terry Stephens",
+        "titlePage": "https://jmerrill.pub/books/kingdom-equipment-101",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/terry-stephens",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9a1a04cd-c27a-f111-ab0f-000d3a14673b",
+        "title": "Love of My Life",
+        "slug": "love-of-my-life",
+        "authorDisplayName": "Thaddues Smith",
+        "titlePage": "https://jmerrill.pub/books/love-of-my-life",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/thaddues-smith",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "994b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "Understanding the Misunderstood",
+        "slug": "understanding-the-misunderstood",
+        "authorDisplayName": "Tia Benincase",
+        "titlePage": "https://jmerrill.pub/books/understanding-the-misunderstood",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/tia-benincase",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9a8904ca-c27a-f111-ab0f-6045bdd69738",
+        "title": "Grandmothers Educating Minds, 2nd Edition",
+        "slug": "grandmothers-educating-minds-2nd-edition",
+        "authorDisplayName": "Toni Kleckley",
+        "titlePage": "https://jmerrill.pub/books/grandmothers-educating-minds-2nd-edition",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/toni-kleckley",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "c1f603d3-c27a-f111-ab0f-000d3a14673b",
+        "title": "The ESSENCE of Life",
+        "slug": "the-essence-of-life-love-letters-to-christ",
+        "authorDisplayName": "Tracy Norris",
+        "titlePage": "https://jmerrill.pub/books/the-essence-of-life-love-letters-to-christ",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/tracy-norris",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "5b4797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "One Soul",
+        "slug": "one-soul",
+        "authorDisplayName": "Veronica Brown",
+        "titlePage": "https://jmerrill.pub/books/one-soul",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/veronica-brown",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "865f72d0-c27a-f111-ab0f-6045bdd69738",
+        "title": "Number 23 and Me",
+        "slug": "number-23-and-me",
+        "authorDisplayName": "Wayne Pounds",
+        "titlePage": "https://jmerrill.pub/books/number-23-and-me",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/wayne-pounds",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "67137ed6-c27a-f111-ab0f-6045bdd69738",
+        "title": "Music Ministry Unplugged",
+        "slug": "music-ministry-unplugged",
+        "authorDisplayName": "Will Harris",
+        "titlePage": "https://jmerrill.pub/books/music-ministry-unplugged",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/will-harris",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "982156cd-c37a-f111-ab0f-00224820105b",
+        "title": "Music Ministry Unplugged: Real Lessons for Those who Lead and Serve in Music Ministry",
+        "slug": "music-ministry-unplugged-real-lessons-for-those-who-lead-and-serve-in-music-ministry",
+        "authorDisplayName": "Will Harris",
+        "titlePage": "https://jmerrill.pub/books/music-ministry-unplugged-real-lessons-for-those-who-lead-and-serve-in-music-ministry",
+        "titlePageStatus": 404,
+        "titlePageHasTitle": false,
+        "titlePageHasAuthor": false,
+        "titlePageHasJsonLd": false,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/will-harris",
+            "status": 200
+          }
+        ],
+        "pass": false
+      },
+      {
+        "id": "60137ed6-c27a-f111-ab0f-6045bdd69738",
+        "title": "Taylor Made",
+        "slug": "taylor-made",
+        "authorDisplayName": "Will Harris",
+        "titlePage": "https://jmerrill.pub/books/taylor-made",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/will-harris",
+            "status": 200
+          }
+        ],
+        "pass": true
+      },
+      {
+        "id": "9d8ffdd6-c27a-f111-ab0f-7c1e525b15c2",
+        "title": "War Mother",
+        "slug": "war-mother",
+        "authorDisplayName": "Winter Dockery",
+        "titlePage": "https://jmerrill.pub/books/war-mother",
+        "titlePageStatus": 200,
+        "titlePageHasTitle": true,
+        "titlePageHasAuthor": true,
+        "titlePageHasJsonLd": true,
+        "authorPages": [
+          {
+            "url": "https://jmerrill.pub/authors/winter-dockery",
+            "status": 200
+          }
+        ],
+        "pass": true
+      }
+    ]
+  },
+  "warnings": {
+    "count": 113,
+    "distribution": {
+      "MISSING_ISBN": 113
+    }
+  },
+  "negativeProof": {
+    "public_catalog_architecture_redesigned": 0,
+    "title_identity_changed": 0,
+    "random_slug_generated": 0,
+    "duplicate_public_title_slug_remaining": 3,
+    "duplicate_public_author_slug_remaining": 0,
+    "missing_author_attribution_remaining": 0,
+    "anonymous_author_profile_required": 1,
+    "non_deterministic_author_repair": 0,
+    "broken_ready_public_pages": 3
+  },
+  "classification": "JMP_PUBLIC_CATALOG_DATA_NORMALIZATION_BLOCKED"
+}

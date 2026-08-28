@@ -122,6 +122,15 @@ test('anonymous or hidden public attribution can avoid author page requirement',
   assert.equal(result.ok, true)
 })
 
+test('anonymous public attribution is ready without a public author page', () => {
+  const result = projection.evaluatePublicCatalogReadiness(title({
+    authorDisplayName: 'Anonymous',
+    authors: [],
+  }))
+  assert.equal(result.status, 'READY')
+  assert.deepEqual(result.issues, [])
+})
+
 test('missing slug, format, ISBN, and author attribution are held for repair', () => {
   const result = projection.evaluatePublicCatalogReadiness(title({
     slug: '',
@@ -160,19 +169,33 @@ test('duplicate title and author slugs are surfaced as public projection holds',
   assert.ok(result.issues.includes('DUPLICATE_AUTHOR_SLUG'))
 })
 
-test('projection summary reconciles totals and duplicate slugs', () => {
+test('public title projection disambiguates duplicate slugs with stable title identity', () => {
+  const titles = projection.projectPublicCatalogTitles([
+    title({ id: 'fec27b7a-cc7a-f111-ab0f-6045bdd69435', slug: 'warrior-s-breed', title: "Warrior's Breed" }),
+    title({ id: '935f72d0-c27a-f111-ab0f-6045bdd69738', slug: 'warrior-s-breed', title: "Warrior's Breed" }),
+  ])
+  assert.deepEqual(
+    titles.map((item) => [item.id, item.slug]),
+    [
+      ['935f72d0-c27a-f111-ab0f-6045bdd69738', 'warrior-s-breed'],
+      ['fec27b7a-cc7a-f111-ab0f-6045bdd69435', 'warrior-s-breed-fec27b7a'],
+    ],
+  )
+})
+
+test('projection summary reconciles totals after canonical slug projection', () => {
   const titles = [
     title({ id: '1', slug: 'alpha', title: 'Alpha' }),
     title({ id: '2', slug: 'alpha', title: 'Alpha Duplicate' }),
     title({ id: '3', slug: '', title: 'Missing Slug' }),
   ]
-  const summary = projection.buildPublicCatalogProjectionSummary(titles, [
+  const summary = projection.buildPublicCatalogProjectionSummary(projection.projectPublicCatalogTitles(titles), [
     { contactId: 'a', slug: 'public-author', name: 'Public Author', shortBio: '', photoUrl: '', titleCount: 2, genres: [], imprints: [] },
     { contactId: 'b', slug: 'public-author', name: 'Public Author B', shortBio: '', photoUrl: '', titleCount: 1, genres: [], imprints: [] },
   ])
   assert.equal(summary.totalTitles, 3)
   assert.equal(summary.totalAuthors, 2)
-  assert.deepEqual(summary.duplicateTitleSlugs, ['alpha'])
+  assert.deepEqual(summary.duplicateTitleSlugs, [])
   assert.deepEqual(summary.duplicateAuthorSlugs, ['public-author'])
   assert.equal(summary.titlesOnHold, 3)
   assert.equal(summary.titlesWithMetadataWarnings, 0)
@@ -233,6 +256,12 @@ test('title and author pages emit JSON-LD from projected catalog data', () => {
   assert.match(titlePage, /'@type': 'Book'/)
   assert.match(authorPage, /application\/ld\+json/)
   assert.match(authorPage, /'@type': 'Person'/)
+})
+
+test('title detail lookup reads the projected catalog before matching slugs', () => {
+  const source = readFileSync('lib/server/dataverse/catalog.ts', 'utf8')
+  assert.match(source, /projectPublicCatalogTitles\(titleRows\.map/)
+  assert.doesNotMatch(source, /jm1pub_slug eq '\\$\\{safeSlug\\}'/)
 })
 
 test('sitemap is runtime-driven so public catalog URLs come from production Dataverse', () => {
