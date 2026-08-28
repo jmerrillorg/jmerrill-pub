@@ -1,11 +1,12 @@
 # Title Page Verification
 
-Last Verified: 2026-08-28T08:17:14.058Z
+Last Verified: 2026-08-28T08:23:19.373Z
 | id | title | slug | titlePageStatus | titlePageHasTitle | titlePageHasAuthor | titlePageHasJsonLd | pass |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | c70f6fd3-c27a-f111-ab0f-6045bdd69435 | Delicious Ideas! | delicious-ideas | 200 | true | true | true | true |
 | 3f09d7cb-c27a-f111-ab0f-6045bdd69678 | A Trubie's Guide Pt. 1 | a-truebies-guide-part-1 | 200 | true | true | true | true |
 | 848904ca-c27a-f111-ab0f-6045bdd69738 | A Trubie's Guide Pt. 2 | a-truebies-guide-part-2 | 200 | true | true | true | true |
+| 07106fd3-c27a-f111-ab0f-6045bdd69435 | The Paper Champ | the-paper-champ | 200 | true | true | true | true |
 | f0084bcd-c27a-f111-ab0f-00224820105b | Pieces of Me All over the Place | pieces-of-me-all-over-the-place | 200 | true | true | true | true |
 | 15e01ad3-c27a-f111-ab0f-6045bdd69678 | Support Beyond the Cycle | support-beyond-the-cycle | 200 | true | true | true | true |
 | 614797d0-c27a-f111-ab0f-7c1e525b15c2 | Abortion! | abortion | 200 | true | true | true | true |
@@ -15,7 +16,7 @@ Last Verified: 2026-08-28T08:17:14.058Z
 | d4f603d3-c27a-f111-ab0f-000d3a14673b | More Than a Village | more-than-a-village | 200 | true | true | true | true |
 | a74b00d4-c27a-f111-ab0f-00224820105b | You're Still Not Crazy | you-re-still-not-crazy | 200 | true | true | true | true |
 | c84b00d4-c27a-f111-ab0f-00224820105b | The Fight for the Promiseland | the-fight-for-the-promiseland | 200 | true | true | true | true |
-| 952556cd-c37a-f111-ab0f-00224820105b | The Fight for the Promiseland: Battle Strategies for Victorious People | the-fight-for-the-promiseland-battle-strategies-for-victorious-people | 404 | false | false | false | false |
+| 952556cd-c37a-f111-ab0f-00224820105b | The Fight for the Promiseland: Battle Strategies for Victorious People | the-fight-for-the-promiseland-battle-strategies-for-victorious-people | 200 | true | true | true | true |
 | 7b5f72d0-c27a-f111-ab0f-6045bdd69738 | Help God, I Am - the Collection | help-god-i-am-the-collection | 200 | true | true | true | true |
 | 293274cd-c27a-f111-ab0f-6045bdd69435 | Help God, I Am Afraid | help-god-i-am-afraid | 200 | true | true | true | true |
 | 6309d7cb-c27a-f111-ab0f-6045bdd69678 | Help God, I Am Angry | help-god-i-am-angry | 200 | true | true | true | true |
@@ -32,6 +33,8 @@ Last Verified: 2026-08-28T08:17:14.058Z
 | 930f6fd3-c27a-f111-ab0f-6045bdd69435 | The Messenger | the-messenger | 200 | true | true | true | true |
 | 69137ed6-c27a-f111-ab0f-6045bdd69738 | The Messenger 2 | the-messenger-2 | 200 | true | true | true | true |
 | 604797d0-c27a-f111-ab0f-7c1e525b15c2 | Words of a Troubled Soul | words-of-a-troubled-soul | 200 | true | true | true | true |
+| 935f72d0-c27a-f111-ab0f-6045bdd69738 | Warrior's Breed | warrior-s-breed | 200 | true | true | true | true |
+| fec27b7a-cc7a-f111-ab0f-6045bdd69435 | Warrior's Breed | warrior-s-breed-fec27b7a | 200 | true | true | true | true |
 | b3084bcd-c27a-f111-ab0f-00224820105b | Life after Detour | life-after-detour | 200 | true | true | true | true |
 | 998797ca-c27a-f111-ab0f-7c1e525b15c2 | BEE Careful | bee-careful | 200 | true | true | true | true |
 | 26e01ad3-c27a-f111-ab0f-6045bdd69678 | Jalen Becomes a Big Brother | jalen-becomes-a-big-brother | 200 | true | true | true | true |
@@ -91,8 +94,12 @@ Last Verified: 2026-08-28T08:17:14.058Z
 | 6f8904ca-c27a-f111-ab0f-6045bdd69738 | A Blended Family | a-blended-family | 200 | true | true | true | true |
 | 841a04cd-c27a-f111-ab0f-000d3a14673b | A Principal's Tale | a-principal-s-tale | 200 | true | true | true | true |
 | 903274cd-c27a-f111-ab0f-6045bdd69435 | Memoir of a Black Christian Nationalist | memoir-of-a-black-christian-nationalist | 200 | true | true | true | true |
-| 1159fcc8-c37a-f111-ab0f-000d3a14673b | Memoir of a Black Christian Nationalist: Seeds of Liberation (Unabridged) | memoir-of-a-black-christian-nationalist-seeds-of-liberation-unabridged | 404 | false | false | false | false |
+| 1159fcc8-c37a-f111-ab0f-000d3a14673b | Memoir of a Black Christian Nationalist: Seeds of Liberation (Unabridged) | memoir-of-a-black-christian-nationalist-seeds-of-liberation-unabridged | 200 | true | true | true | true |
 | d9f603d3-c27a-f111-ab0f-000d3a14673b | Warriors and Angels | warriors-and-angels | 200 | true | true | true | true |
+| 733cd77a-cc7a-f111-ab0f-6045bdd69678 | The Master's Piece | the-master-s-piece | 200 | true | true | true | true |
+| c3f603d3-c27a-f111-ab0f-000d3a14673b | The Master's Piece | the-master-s-piece-c3f603d3 | 200 | true | true | true | true |
+| 1c3274cd-c27a-f111-ab0f-6045bdd69435 | God's Nudge | god-s-nudge | 200 | true | true | true | true |
+| 7e000573-cc7a-f111-ab0f-7c1e525b15c2 | God's Nudge | god-s-nudge-7e000573 | 200 | true | true | true | true |
 | 5e4797d0-c27a-f111-ab0f-7c1e525b15c2 | The I Am In Me Part 2, Second Edition | the-i-am-in-me-part-2 | 200 | true | true | true | true |
 | 5f4797d0-c27a-f111-ab0f-7c1e525b15c2 | The I Am in Me, Second Edition | the-i-am-in-me | 200 | true | true | true | true |
 | 928904ca-c27a-f111-ab0f-6045bdd69738 | Biblical Prescriptions for Life's Troubles | biblical-prescriptions-for-life-s-troubles | 200 | true | true | true | true |
@@ -106,6 +113,6 @@ Last Verified: 2026-08-28T08:17:14.058Z
 | 5b4797d0-c27a-f111-ab0f-7c1e525b15c2 | One Soul | one-soul | 200 | true | true | true | true |
 | 865f72d0-c27a-f111-ab0f-6045bdd69738 | Number 23 and Me | number-23-and-me | 200 | true | true | true | true |
 | 67137ed6-c27a-f111-ab0f-6045bdd69738 | Music Ministry Unplugged | music-ministry-unplugged | 200 | true | true | true | true |
-| 982156cd-c37a-f111-ab0f-00224820105b | Music Ministry Unplugged: Real Lessons for Those who Lead and Serve in Music Ministry | music-ministry-unplugged-real-lessons-for-those-who-lead-and-serve-in-music-ministry | 404 | false | false | false | false |
+| 982156cd-c37a-f111-ab0f-00224820105b | Music Ministry Unplugged: Real Lessons for Those who Lead and Serve in Music Ministry | music-ministry-unplugged-real-lessons-for-those-who-lead-and-serve-in-music-ministry | 200 | true | true | true | true |
 | 60137ed6-c27a-f111-ab0f-6045bdd69738 | Taylor Made | taylor-made | 200 | true | true | true | true |
 | 9d8ffdd6-c27a-f111-ab0f-7c1e525b15c2 | War Mother | war-mother | 200 | true | true | true | true |

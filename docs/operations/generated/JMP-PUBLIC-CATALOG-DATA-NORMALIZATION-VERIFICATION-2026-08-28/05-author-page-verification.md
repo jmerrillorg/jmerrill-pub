@@ -1,6 +1,6 @@
 # Author Page Verification
 
-Last Verified: 2026-08-28T08:17:14.058Z
+Last Verified: 2026-08-28T08:23:19.373Z
 | title | authorDisplayName | authorPage | status |
 | --- | --- | --- | --- |
 | Delicious Ideas! | Agape International Cathedral | https://jmerrill.pub/authors/agape-international-cathedral | 200 |
@@ -32,6 +32,8 @@ Last Verified: 2026-08-28T08:17:14.058Z
 | The Messenger | Daphanny Baker | https://jmerrill.pub/authors/daphanny-baker | 200 |
 | The Messenger 2 | Daphanny Baker | https://jmerrill.pub/authors/daphanny-baker | 200 |
 | Words of a Troubled Soul | David Williams | https://jmerrill.pub/authors/david-williams | 200 |
+| Warrior's Breed | Dean Wilson | https://jmerrill.pub/authors/dean-wilson | 200 |
+| Warrior's Breed | Dean Wilson | https://jmerrill.pub/authors/dean-wilson | 200 |
 | Life after Detour | Deanna Jones | https://jmerrill.pub/authors/deanna-jones | 200 |
 | BEE Careful | Deborah Eiland | https://jmerrill.pub/authors/deborah-eiland | 200 |
 | Jalen Becomes a Big Brother | Deborah Eiland | https://jmerrill.pub/authors/deborah-eiland | 200 |
@@ -93,6 +95,10 @@ Last Verified: 2026-08-28T08:17:14.058Z
 | Memoir of a Black Christian Nationalist | Shelley McIntosh | https://jmerrill.pub/authors/shelley-mcintosh | 200 |
 | Memoir of a Black Christian Nationalist: Seeds of Liberation (Unabridged) | Shelley McIntosh | https://jmerrill.pub/authors/shelley-mcintosh | 200 |
 | Warriors and Angels | Shelley McIntosh | https://jmerrill.pub/authors/shelley-mcintosh | 200 |
+| The Master's Piece | Sylvia Benson | https://jmerrill.pub/authors/sylvia-benson | 200 |
+| The Master's Piece | Sylvia Benson | https://jmerrill.pub/authors/sylvia-benson | 200 |
+| God's Nudge | Tekisha Wimbush | https://jmerrill.pub/authors/tekisha-wimbush | 200 |
+| God's Nudge | Tekisha Wimbush | https://jmerrill.pub/authors/tekisha-wimbush | 200 |
 | The I Am In Me Part 2, Second Edition | Tekisha Wimbush | https://jmerrill.pub/authors/tekisha-wimbush | 200 |
 | The I Am in Me, Second Edition | Tekisha Wimbush | https://jmerrill.pub/authors/tekisha-wimbush | 200 |
 | Biblical Prescriptions for Life's Troubles | Terry Stephens | https://jmerrill.pub/authors/terry-stephens | 200 |
