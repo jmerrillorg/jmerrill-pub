@@ -4,6 +4,7 @@
  * Governed provider boundary for approved author-facing response sends.
  */
 
+const { createHash } = require("node:crypto");
 const {
   INTERNAL_VISIBILITY_MAILBOX
 } = require("./authorResponseDraftBuilder");
@@ -34,6 +35,46 @@ function normalizeString(value) {
 
 function isPlainObject(value) {
   return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
+function normalizeAuthorResponseAttachments(value) {
+  if (value == null) return { ok: true, attachments: [] };
+  if (!Array.isArray(value)) return { ok: false, reason: "AUTHOR_RESPONSE_ATTACHMENTS_INVALID" };
+
+  const attachments = [];
+  for (const attachment of value) {
+    if (!isPlainObject(attachment)) return { ok: false, reason: "AUTHOR_RESPONSE_ATTACHMENT_INVALID" };
+    const name = normalizeString(attachment.name || attachment.fileName || attachment.filename);
+    const contentType = normalizeString(attachment.contentType || attachment.mimeType);
+    const contentInBase64 = normalizeString(attachment.contentInBase64 || attachment.contentBytesBase64);
+    const sha256 = normalizeString(attachment.sha256 || attachment.checksum).toLowerCase();
+    if (!name) return { ok: false, reason: "AUTHOR_RESPONSE_ATTACHMENT_NAME_MISSING" };
+    if (!contentType) return { ok: false, reason: "AUTHOR_RESPONSE_ATTACHMENT_CONTENT_TYPE_MISSING" };
+    if (!contentInBase64) return { ok: false, reason: "AUTHOR_RESPONSE_ATTACHMENT_CONTENT_MISSING" };
+    const bytes = Buffer.from(contentInBase64, "base64");
+    if (bytes.byteLength === 0) return { ok: false, reason: "AUTHOR_RESPONSE_ATTACHMENT_CONTENT_MISSING" };
+    if (sha256) {
+      if (!/^[a-f0-9]{64}$/.test(sha256)) return { ok: false, reason: "AUTHOR_RESPONSE_ATTACHMENT_CHECKSUM_INVALID" };
+      const actualSha256 = createHash("sha256").update(bytes).digest("hex");
+      if (actualSha256 !== sha256) return { ok: false, reason: "AUTHOR_RESPONSE_ATTACHMENT_CHECKSUM_MISMATCH" };
+    }
+    attachments.push({
+      name,
+      contentType,
+      contentInBase64,
+      sha256: sha256 || null,
+      role: normalizeString(attachment.role) || null,
+      artifactId: normalizeString(attachment.artifactId) || null
+    });
+  }
+  return { ok: true, attachments };
+}
+
+function isAuthorReviewAttachmentRequiredTemplate(templateName) {
+  return [
+    "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1",
+    "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1"
+  ].includes(normalizeString(templateName));
 }
 
 /**
@@ -162,7 +203,15 @@ function buildAuthorResponseRelayPayload(email) {
     internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
     futureSendRequiresInternalCopy: true,
     futureSendRequiresDataverseLog: true,
-    bcc: [INTERNAL_VISIBILITY_MAILBOX]
+    bcc: [INTERNAL_VISIBILITY_MAILBOX],
+    attachments: Array.isArray(email.attachments)
+      ? email.attachments.map((attachment) => ({
+        name: attachment.name,
+        contentType: attachment.contentType,
+        contentInBase64: attachment.contentInBase64,
+        sha256: attachment.sha256 || null
+      }))
+      : []
   };
 }
 
@@ -224,11 +273,16 @@ function validateAuthorResponseSendInput(input = {}) {
   if (approval.templateName === "EDITORIAL_RECOMMENDATION_LETTER_V1" && !normalizeString(approval.draftHtmlBody)) {
     return { ok: false, reason: "EDITORIAL_RECOMMENDATION_HTML_REQUIRED" };
   }
+  const attachmentValidation = normalizeAuthorResponseAttachments(input.attachments || approval.attachments);
+  if (!attachmentValidation.ok) return { ok: false, reason: attachmentValidation.reason };
+  if (isAuthorReviewAttachmentRequiredTemplate(approval.templateName) && attachmentValidation.attachments.length === 0) {
+    return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENTS_MISSING" };
+  }
   if (approval.internalVisibilityMailbox !== INTERNAL_VISIBILITY_MAILBOX) return { ok: false, reason: "INTERNAL_VISIBILITY_MAILBOX_INVALID" };
   if (approval.futureSendRequiresInternalCopy !== true) return { ok: false, reason: "FUTURE_INTERNAL_COPY_REQUIRED" };
   if (approval.futureSendRequiresDataverseLog !== true) return { ok: false, reason: "FUTURE_DATAVERSE_SEND_LOG_REQUIRED" };
 
-  return { ok: true, to, cc, bcc };
+  return { ok: true, to, cc, bcc, attachments: attachmentValidation.attachments };
 }
 
 function buildAuthorResponseEmail(input = {}, config = getAuthorResponseSendProviderConfig()) {
@@ -258,6 +312,7 @@ function buildAuthorResponseEmail(input = {}, config = getAuthorResponseSendProv
       body: input.sendApproval.draftBody,
       htmlBody: input.sendApproval.draftHtmlBody || null,
       templateName: input.sendApproval.templateName,
+      attachments: validation.attachments,
       providerName: config.providerName,
       internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
       sendApproval: input.sendApproval

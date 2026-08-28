@@ -1,6 +1,7 @@
 const { app } = require("@azure/functions");
 const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
+const { createHash } = require("node:crypto");
 const {
   assertPolicyAllows,
   resolveCommunicationAuthority
@@ -1357,11 +1358,18 @@ function normalizeAuthorReviewAttachments(value) {
     const name = normalizeText(attachment.name);
     const contentType = normalizeText(attachment.contentType);
     const contentInBase64 = safeTrim(attachment.contentInBase64);
+    const sha256 = normalizeText(attachment.sha256).toLowerCase();
     if (!name) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_NAME_MISSING" };
     if (!contentType) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CONTENT_TYPE_MISSING" };
     if (!contentInBase64) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CONTENT_MISSING" };
-    totalBytes += Buffer.byteLength(contentInBase64, "base64");
-    normalized.push({ name, contentType, contentInBase64 });
+    const bytes = Buffer.from(contentInBase64, "base64");
+    if (sha256) {
+      if (!/^[a-f0-9]{64}$/.test(sha256)) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CHECKSUM_INVALID" };
+      const actualSha256 = createHash("sha256").update(bytes).digest("hex");
+      if (actualSha256 !== sha256) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CHECKSUM_MISMATCH" };
+    }
+    totalBytes += bytes.byteLength;
+    normalized.push({ name, contentType, contentInBase64, sha256 });
   }
 
   if (totalBytes > 20 * 1024 * 1024) {

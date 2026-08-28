@@ -816,6 +816,25 @@ test("approved author-review package sends validated attachments to ACS", () => 
   assert.equal(email.attachments[0].contentInBase64, Buffer.from("author-safe summary").toString("base64"));
 });
 
+test("approved author-review package rejects attachment checksum mismatch", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const payloadBytes = Buffer.from("author-safe summary");
+
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload({
+      attachments: [
+        {
+          name: "Before You Were Born - Developmental Summary.pdf",
+          contentType: "application/pdf",
+          contentInBase64: payloadBytes.toString("base64"),
+          sha256: "0".repeat(64)
+        }
+      ]
+    })),
+    "AUTHOR_REVIEW_ATTACHMENT_CHECKSUM_MISMATCH"
+  );
+});
+
 test("final developmental review permits reply-only canonical HTML without portal CTA", () => {
   const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
   const result = validateApprovedAuthorResponsePayload(validFinalDevelopmentalReviewPayload());

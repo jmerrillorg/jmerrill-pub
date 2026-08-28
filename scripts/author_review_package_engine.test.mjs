@@ -662,6 +662,31 @@ test('last-mile attachment certification denies internal wrapper text inside a m
   assert.match(validation.blocker, /ATTACHMENT_RECIPIENT_SURFACE_INVALID:editedManuscript:GENERATED_BY_JM1_AUTOMATION/)
 })
 
+test('last-mile attachment certification rejects stale checksum labels on different payload bytes', () => {
+  const actualBytes = fakeDocx('Establishing Glory: The Library')
+  const staleArtifactBytes = fakeDocx('Different governed artifact')
+  const notification = buildNotificationInputFromPackage({
+    pkg: developmentalPackage(),
+    recipientEmail: 'developmental-author@example.test',
+    workspaceAccessLocation: 'https://jmerrill.pub/author/portal',
+    notificationTemplateId: 'developmental-review',
+    attachments: [
+      artifact('editedManuscript', {
+        stageId: 'stage-developmental',
+        titleId: 'title-developmental',
+        titleName: 'Establishing Glory: The Library',
+        bytes: actualBytes,
+        checksum: sha(staleArtifactBytes),
+      }),
+      artifact('reviewInstructions', { stageId: 'stage-developmental', titleId: 'title-developmental' }),
+    ],
+  })
+
+  const validation = validateAuthorPackageNotification(notification)
+  assert.equal(validation.ok, false)
+  assert.match(validation.blocker, /ATTACHMENT_CHECKSUM_MISMATCH:editedManuscript/)
+})
+
 test('last-mile manuscript profile denies tiny system artifacts wearing manuscript filenames', () => {
   const shortDocx = tinyDocx(`Establishing Glory edited manuscript placeholder ${'x'.repeat(12_000)}`)
   const notification = buildNotificationInputFromPackage({

@@ -2,6 +2,7 @@
 
 const { describe, test } = require("node:test");
 const assert = require("node:assert/strict");
+const { createHash } = require("node:crypto");
 const {
   buildAuthorResponseSendApproval,
   AUTHOR_RESPONSE_SEND_DECISION,
@@ -69,6 +70,18 @@ function enabledEnv(overrides = {}) {
     [ENV_VARS.from]: "publishing@email.jmerrill.one",
     [ENV_VARS.replyTo]: "publishing@jmerrill.one",
     ...overrides
+  };
+}
+
+function authorReviewAttachment(overrides = {}) {
+  const bytes = Buffer.from(overrides.content || "author-safe governed review package");
+  return {
+    name: overrides.name || "Before You Were Born - Developmental Summary.pdf",
+    contentType: overrides.contentType || "application/pdf",
+    contentInBase64: bytes.toString("base64"),
+    sha256: overrides.sha256 || createHash("sha256").update(bytes).digest("hex"),
+    role: overrides.role || "developmentalSummary",
+    artifactId: overrides.artifactId || "artifact-developmental-summary"
   };
 }
 
@@ -368,6 +381,95 @@ describe("author response provider boundary", () => {
       assert.deepEqual(body.bcc, [INTERNAL_VISIBILITY_MAILBOX]);
       assert.equal(body.htmlBody, null);
       assert.equal(JSON.stringify(result).includes("SECRET_RELAY_KEY"), false);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  test("author-review package sends require checksum-verified attachments", async () => {
+    const calls = [];
+    const sendApproval = approval({
+      record: {
+        templateName: "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1",
+        templateVersion: "1.0.0",
+        draftHtmlBody: "<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table></body></html>"
+      }
+    });
+    const result = await sendConfiguredAuthorResponse({
+      input: { sendApproval, attachments: [authorReviewAttachment()] },
+      env: enabledEnv(),
+      providers: {
+        injected: {
+          async send(message) {
+            calls.push(message);
+            return { messageId: "author-review-package-message-id" };
+          }
+        }
+      }
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].attachments.length, 1);
+    assert.equal(calls[0].attachments[0].sha256, authorReviewAttachment().sha256);
+  });
+
+  test("author-review package sends fail closed when attachment bytes do not match checksum", () => {
+    const sendApproval = approval({
+      record: {
+        templateName: "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1",
+        templateVersion: "1.0.0",
+        draftHtmlBody: "<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table></body></html>"
+      }
+    });
+
+    assertSafeFailure(buildAuthorResponseEmail(
+      { sendApproval, attachments: [authorReviewAttachment({ sha256: "0".repeat(64) })] },
+      getAuthorResponseSendProviderConfig(enabledEnv())
+    ), "AUTHOR_RESPONSE_ATTACHMENT_CHECKSUM_MISMATCH");
+  });
+
+  test("ACS relay provider preserves author-review attachments for relay validation", async () => {
+    const originalFetch = global.fetch;
+    const calls = [];
+    global.fetch = async (url, options) => {
+      calls.push({ url, options });
+      return {
+        ok: true,
+        async json() {
+          return {
+            accepted: true,
+            providerMessageId: "acs-author-review-package-message-id"
+          };
+        }
+      };
+    };
+
+    try {
+      const attachment = authorReviewAttachment();
+      const sendApproval = approval({
+        record: {
+          templateName: "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1",
+          templateVersion: "1.0.0",
+          draftHtmlBody: "<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table></body></html>"
+        }
+      });
+      const result = await sendConfiguredAuthorResponse({
+        input: { sendApproval, attachments: [attachment] },
+        env: enabledEnv({
+          [ENV_VARS.provider]: PROVIDER.ACS_RELAY,
+          [ENV_VARS.relayUrl]: "https://func-jm1-acs-email-relay.azurewebsites.net",
+          [ENV_VARS.relayKey]: "SECRET_RELAY_KEY"
+        })
+      });
+
+      assert.equal(result.ok, true);
+      assert.equal(calls.length, 1);
+      const body = JSON.parse(calls[0].options.body);
+      assert.equal(body.attachments.length, 1);
+      assert.equal(body.attachments[0].name, attachment.name);
+      assert.equal(body.attachments[0].sha256, attachment.sha256);
+      assert.equal(body.attachments[0].contentInBase64, attachment.contentInBase64);
     } finally {
       global.fetch = originalFetch;
     }
