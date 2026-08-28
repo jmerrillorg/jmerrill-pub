@@ -27,6 +27,8 @@ export type LifecycleValidationCode =
   | 'LIFECYCLE_MAPPING_CONFLICT'
   | 'INVALID_WAITING_OWNER'
   | 'INVALID_SYSTEM_ATTENTION'
+  | 'JMP_PUBLIC_TITLE_PAGE_MISSING'
+  | 'JMP_PUBLIC_AUTHOR_PAGE_MISSING'
 
 export type ValidationResult = {
   ok: boolean
@@ -242,6 +244,14 @@ export function validateTransition(input: TransitionRequest): ValidationResult {
 
   if (input.fromStage === 'POST_PUBLICATION' && input.toStage === 'DISTRIBUTION_RELEASE') {
     return fail('INVALID_TRANSITION', 'Post-publication workstreams do not push the title back into Stage 09.')
+  }
+
+  if (input.fromStage === 'DISTRIBUTION_RELEASE' && input.toStage === 'POST_PUBLICATION') {
+    const publicCatalogProjection = findArtifact(input, 'PUBLIC_CATALOG_PROJECTION')
+    if (!publicCatalogProjection) {
+      return fail('JMP_PUBLIC_TITLE_PAGE_MISSING', 'TITLE_LIVE_AND_VERIFIED requires a JMP public catalog projection artifact before post-publication stewardship.')
+    }
+    return ok('Title live verification includes JMP public catalog projection evidence.')
   }
 
   if (input.toStage === 'DISTRIBUTION_RELEASE') {

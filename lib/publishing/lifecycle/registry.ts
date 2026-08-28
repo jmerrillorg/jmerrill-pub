@@ -84,6 +84,7 @@ export type ArtifactType =
   | 'PROOF_ARTIFACT'
   | 'FINAL_INTERIOR'
   | 'DISTRIBUTION_ARTIFACT'
+  | 'PUBLIC_CATALOG_PROJECTION'
   | 'COVER_CONCEPT_ARTIFACT'
   | 'METADATA_RECORD'
 
@@ -688,12 +689,12 @@ export const JMP_PUBLISHING_LIFECYCLE_REGISTRY: LifecycleStage[] = [
     lifecycleDimensions: ['TITLE'],
     contract: contract({
       entryConditions: ['Distribution readiness is certified for intended format(s).'],
-      exitConditions: ['Release/live evidence is recorded and title enters post-publication stewardship.'],
-      sourceOfTruth: ['distribution channel evidence', 'publishing asset', 'execution log'],
+      exitConditions: ['Release/live evidence and JMP public title/author page projection are recorded before title enters post-publication stewardship.'],
+      sourceOfTruth: ['distribution channel evidence', 'publishing asset', 'JMP public catalog projection', 'execution log'],
       workDefinition: 'Submit/release through governed distribution and launch readiness workflow.',
       sourceArtifactTypes: ['DISTRIBUTION_ARTIFACT'],
-      outputArtifactTypes: ['DISTRIBUTION_ARTIFACT'],
-      qualityGate: 'Distributor submission and confirmed-live readback are distinct.',
+      outputArtifactTypes: ['DISTRIBUTION_ARTIFACT', 'PUBLIC_CATALOG_PROJECTION'],
+      qualityGate: 'Distributor submission, confirmed-live readback, and JMP-controlled public page verification are distinct.',
       nextStage: 'POST_PUBLICATION',
       nextSubstage: 'POST_PUBLICATION_STEWARDSHIP',
     }),
@@ -719,10 +720,11 @@ export const JMP_PUBLISHING_LIFECYCLE_REGISTRY: LifecycleStage[] = [
         substageSequence: 2,
         contract: contract({
           entryConditions: ['Submission/release plan exists.'],
-          exitConditions: ['Release/live status is source-backed.'],
-          sourceOfTruth: ['confirmed-live readback', 'release evidence'],
-          workDefinition: 'Confirm launch/release evidence.',
-          qualityGate: 'Release closure sends title to persistent post-publication stewardship.',
+          exitConditions: ['Release/live status is source-backed and the JMP title page plus required author page are verified.'],
+          sourceOfTruth: ['confirmed-live readback', 'release evidence', 'JMP public catalog projection'],
+          workDefinition: 'Confirm launch/release evidence and verify the JMP public title/author catalog pages.',
+          outputArtifactTypes: ['PUBLIC_CATALOG_PROJECTION'],
+          qualityGate: 'Release closure requires JMP public page verification; retailer pages are evidence only.',
           nextStage: 'POST_PUBLICATION',
           nextSubstage: 'POST_PUBLICATION_STEWARDSHIP',
         }),

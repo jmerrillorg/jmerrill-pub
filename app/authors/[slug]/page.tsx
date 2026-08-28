@@ -46,6 +46,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: result.data.name,
     description: result.data.shortBio,
+    alternates: {
+      canonical: `/authors/${result.data.slug}`,
+    },
+    openGraph: {
+      title: result.data.name,
+      description: result.data.shortBio,
+      type: 'profile',
+      url: `/authors/${result.data.slug}`,
+      images: result.data.photoUrl ? [{ url: result.data.photoUrl, alt: result.data.name }] : undefined,
+    },
   }
 }
 
@@ -57,9 +67,31 @@ export default async function AuthorProfilePage({ params }: Props) {
   if (!result.data) notFound()
 
   const author = result.data
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: author.name,
+    url: `https://jmerrill.pub/authors/${author.slug}`,
+    image: author.photoUrl || undefined,
+    description: author.longBio || author.shortBio || undefined,
+    worksFor: {
+      '@type': 'Organization',
+      name: 'J Merrill Publishing',
+      url: 'https://jmerrill.pub',
+    },
+    subjectOf: author.titles.map((title) => ({
+      '@type': 'Book',
+      name: title.title,
+      url: `https://jmerrill.pub/books/${title.slug || title.id}`,
+    })),
+  }
 
   return (
     <div className="pt-[76px]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <section className="relative overflow-hidden border-b border-white/5 bg-[#0F1C2E] px-6 py-20 sm:px-12">
         <div
           className="absolute inset-0"
@@ -88,7 +120,7 @@ export default async function AuthorProfilePage({ params }: Props) {
               </div>
               <h1
                 className="text-white"
-                style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(40px,5vw,68px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.02em' }}
+                style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(40px,5vw,68px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: 0 }}
               >
                 {author.name}
               </h1>
