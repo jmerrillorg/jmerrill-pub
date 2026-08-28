@@ -2,6 +2,8 @@ import { MetadataRoute } from 'next'
 import { imprintStrategies } from '@/data/imprints'
 import { listPublicAuthors, listPublicCatalogTitles } from '@/lib/server/dataverse/catalog'
 
+export const dynamic = 'force-dynamic'
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = 'https://jmerrill.pub'
 

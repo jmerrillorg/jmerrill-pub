@@ -234,3 +234,10 @@ test('title and author pages emit JSON-LD from projected catalog data', () => {
   assert.match(authorPage, /application\/ld\+json/)
   assert.match(authorPage, /'@type': 'Person'/)
 })
+
+test('sitemap is runtime-driven so public catalog URLs come from production Dataverse', () => {
+  const sitemap = readFileSync('app/sitemap.ts', 'utf8')
+  assert.match(sitemap, /export const dynamic = 'force-dynamic'/)
+  assert.match(sitemap, /listPublicCatalogTitles\(\)/)
+  assert.match(sitemap, /listPublicAuthors\(\)/)
+})

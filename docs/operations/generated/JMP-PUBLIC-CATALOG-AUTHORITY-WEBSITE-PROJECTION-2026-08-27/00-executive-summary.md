@@ -1,6 +1,6 @@
 # JMP Public Catalog Authority + Website Projection
 
-Last Verified: 2026-08-27T22:56:00-04:00
+Last Verified: 2026-08-27T23:15:00-04:00
 
 This package records the governed website-projection implementation for `jmerrill.pub`.
 
@@ -17,6 +17,7 @@ The public website now has an explicit projection authority layer: public title 
 | Readiness correction | Public-page blockers are separated from metadata warnings |
 | SEO / JSON-LD | Added for title and author pages |
 | Validation | PASS |
-| Public deployment | Completed on merge SHA `2dd56a81a4fa5d5c425ee72fb461f4e3c7afc48f`; readiness correction pending follow-up deploy |
+| Public deployment | Completed on merge SHA `a45af85aefa16d9dafb264292eb5eb77724e7ffc`; Dataverse readback verified |
+| Sitemap projection | Runtime-driven sitemap correction in progress so title/author routes project from production Dataverse |
 
 No catalog language, prices, author communications, Stripe records, Dataverse data, Business Central data, or external retailer listings were modified by this repository change.
