@@ -81,6 +81,38 @@ export type CatalogStats = {
   lastUpdated: string
 }
 
+export type PublicCatalogPageUrls = {
+  titlePage: string
+  authorPages: string[]
+}
+
+export type PublicCatalogReadinessStatus = 'READY' | 'HOLD'
+
+export type PublicCatalogReadinessIssue =
+  | 'MISSING_TITLE'
+  | 'MISSING_TITLE_SLUG'
+  | 'MISSING_AUTHOR_ATTRIBUTION'
+  | 'MISSING_AUTHOR_PAGE'
+  | 'MISSING_FORMAT'
+  | 'MISSING_ISBN'
+  | 'DUPLICATE_TITLE_SLUG'
+  | 'DUPLICATE_AUTHOR_SLUG'
+
+export type PublicCatalogReadiness = {
+  status: PublicCatalogReadinessStatus
+  issues: PublicCatalogReadinessIssue[]
+  pageUrls: PublicCatalogPageUrls
+}
+
+export type PublicCatalogProjectionSummary = {
+  totalTitles: number
+  totalAuthors: number
+  duplicateTitleSlugs: string[]
+  duplicateAuthorSlugs: string[]
+  titlesReadyForPublicVerification: number
+  titlesOnHold: number
+}
+
 export type CatalogReadResult<T> =
   | { ok: true; data: T }
   | { ok: false; error: string; missingConfig?: string[] }

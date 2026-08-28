@@ -9,6 +9,7 @@ import type {
   CatalogTitleDetail,
   CatalogTitleSummary,
 } from '@/lib/catalog/types'
+import { projectPublicCatalogTitles } from '@/lib/catalog/public-projection'
 import {
   resolvePublicAuthorIdentity,
   suppressesPersonalAuthorIdentity,
@@ -103,7 +104,7 @@ export async function listPublicCatalogTitles(): Promise<CatalogReadResult<Catal
 
     const related = await loadRelatedCatalogData(config, token, titleRows)
     const summaries = titleRows.map((row) => buildTitleSummary(row, related))
-    return summaries.filter((title) => title.title)
+    return projectPublicCatalogTitles(summaries.filter((title) => title.title))
   })
 }
 

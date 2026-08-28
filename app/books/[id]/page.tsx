@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { BookCard } from '@/components/content/BookCard'
 import { CTASection } from '@/components/content/CTASection'
 import { catalogAuthorDisplayName, catalogTitleToBookCardRecord } from '@/lib/catalog/display'
+import { publicCatalogPageUrls } from '@/lib/catalog/public-projection'
 import type { CatalogTitleDetail } from '@/lib/catalog/types'
 import { getPublicCatalogTitleBySlug } from '@/lib/server/dataverse/catalog'
 import { getImprintStrategyByLabel } from '@/data/imprints'
@@ -74,6 +75,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${book.title} by ${catalogAuthorDisplayName(book)}`,
     description: book.shortDescription || `Book details for ${book.title} from J Merrill Publishing.`,
+    alternates: {
+      canonical: `/books/${book.slug || book.id}`,
+    },
+    openGraph: {
+      title: `${book.title} by ${catalogAuthorDisplayName(book)}`,
+      description: book.shortDescription || `Book details for ${book.title} from J Merrill Publishing.`,
+      type: 'book',
+      url: `/books/${book.slug || book.id}`,
+      images: book.coverUrl ? [{ url: book.coverUrl, alt: `${book.title} cover` }] : undefined,
+    },
   }
 }
 
@@ -89,6 +100,31 @@ export default async function BookPage({ params }: Props) {
   const authorProfileVisible = Boolean(authorSlug)
   const coverIsRemote = Boolean(book.coverUrl?.startsWith('http'))
   const readerImprint = getImprintStrategyByLabel(book.certifiedImprint)
+  const pageUrls = publicCatalogPageUrls(book)
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    name: book.title,
+    alternateName: book.subtitle || undefined,
+    author: book.authors.length
+      ? book.authors.map((author) => ({
+          '@type': 'Person',
+          name: author.name,
+          url: pageUrls.authorPages.find((url) => url.endsWith(`/${author.slug}`)),
+        }))
+      : { '@type': 'Person', name: authorName },
+    publisher: {
+      '@type': 'Organization',
+      name: 'J Merrill Publishing',
+      url: 'https://jmerrill.pub',
+    },
+    url: pageUrls.titlePage,
+    image: book.coverUrl || undefined,
+    isbn: book.primaryIsbn || book.isbnByFormat[0]?.isbn || undefined,
+    bookFormat: book.formats,
+    datePublished: book.releaseDate || undefined,
+    description: book.shortDescription || undefined,
+  }
   const isbnDisplay =
     book.isbnByFormat.length > 1
       ? book.isbnByFormat.map((item) => `${item.format}: ${item.isbn}`).join(' · ')
@@ -97,6 +133,10 @@ export default async function BookPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-[#070710] pt-[76px]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="border-b border-white/5 px-6 py-5 sm:px-12">
         <div className="mx-auto max-w-[1280px]">
           <Link href="/books" className="inline-flex items-center gap-2 text-[13px] text-white/30 transition-colors hover:text-blue-400">
@@ -216,7 +256,7 @@ export default async function BookPage({ params }: Props) {
 
             <h1
               className="mt-6 text-white"
-              style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(34px,4vw,58px)', fontWeight: 700, lineHeight: 1.08, letterSpacing: '-0.02em' }}
+              style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 'clamp(34px,4vw,58px)', fontWeight: 700, lineHeight: 1.08, letterSpacing: 0 }}
             >
               {book.title}
             </h1>
