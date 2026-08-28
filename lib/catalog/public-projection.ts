@@ -46,12 +46,13 @@ export function evaluatePublicCatalogReadiness(
   duplicateAuthorSlugs: Set<string> = new Set(),
 ): PublicCatalogReadiness {
   const issues: PublicCatalogReadinessIssue[] = []
+  const warnings: PublicCatalogReadinessIssue[] = []
   if (!title.title) issues.push('MISSING_TITLE')
   if (!title.slug) issues.push('MISSING_TITLE_SLUG')
   if (!title.authorDisplayName) issues.push('MISSING_AUTHOR_ATTRIBUTION')
   if (title.authorDisplayName && !title.authors.length) issues.push('MISSING_AUTHOR_PAGE')
-  if (!title.formats.length) issues.push('MISSING_FORMAT')
-  if (!title.isbnByFormat.length && !title.primaryIsbn) issues.push('MISSING_ISBN')
+  if (!title.formats.length) warnings.push('MISSING_FORMAT')
+  if (!title.isbnByFormat.length && !title.primaryIsbn) warnings.push('MISSING_ISBN')
   if (title.slug && duplicateTitleSlugs.has(normalizeKey(title.slug))) issues.push('DUPLICATE_TITLE_SLUG')
   for (const author of title.authors) {
     if (author.slug && duplicateAuthorSlugs.has(normalizeKey(author.slug))) {
@@ -63,6 +64,7 @@ export function evaluatePublicCatalogReadiness(
   return {
     status: issues.length ? 'HOLD' : 'READY',
     issues: Array.from(new Set(issues)),
+    warnings: Array.from(new Set(warnings)),
     pageUrls: publicCatalogPageUrls(title),
   }
 }
@@ -84,6 +86,7 @@ export function buildPublicCatalogProjectionSummary(
     duplicateAuthorSlugs,
     titlesReadyForPublicVerification: readiness.filter((item) => item.status === 'READY').length,
     titlesOnHold: readiness.filter((item) => item.status === 'HOLD').length,
+    titlesWithMetadataWarnings: readiness.filter((item) => item.warnings.length).length,
   }
 }
 

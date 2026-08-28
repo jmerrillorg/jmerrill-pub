@@ -14,8 +14,9 @@ The public website now has an explicit projection authority layer: public title 
 | Title page contract | `/books/{canonical-title-slug}` |
 | Author page contract | `/authors/{canonical-author-slug}` |
 | `TITLE_LIVE_AND_VERIFIED` gate | Requires JMP public catalog projection evidence |
+| Readiness correction | Public-page blockers are separated from metadata warnings |
 | SEO / JSON-LD | Added for title and author pages |
 | Validation | PASS |
-| Public deployment | Pending PR merge/deployment |
+| Public deployment | Completed on merge SHA `2dd56a81a4fa5d5c425ee72fb461f4e3c7afc48f`; readiness correction pending follow-up deploy |
 
 No catalog language, prices, author communications, Stripe records, Dataverse data, Business Central data, or external retailer listings were modified by this repository change.

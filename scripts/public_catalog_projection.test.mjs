@@ -135,9 +135,18 @@ test('missing slug, format, ISBN, and author attribution are held for repair', (
   assert.deepEqual(result.issues, [
     'MISSING_TITLE_SLUG',
     'MISSING_AUTHOR_ATTRIBUTION',
-    'MISSING_FORMAT',
-    'MISSING_ISBN',
   ])
+  assert.deepEqual(result.warnings, ['MISSING_FORMAT', 'MISSING_ISBN'])
+})
+
+test('missing ISBN is metadata repair evidence but does not block public page verification', () => {
+  const result = projection.evaluatePublicCatalogReadiness(title({
+    primaryIsbn: '',
+    isbnByFormat: [],
+  }))
+  assert.equal(result.status, 'READY')
+  assert.deepEqual(result.issues, [])
+  assert.deepEqual(result.warnings, ['MISSING_ISBN'])
 })
 
 test('duplicate title and author slugs are surfaced as public projection holds', () => {
@@ -166,6 +175,7 @@ test('projection summary reconciles totals and duplicate slugs', () => {
   assert.deepEqual(summary.duplicateTitleSlugs, ['alpha'])
   assert.deepEqual(summary.duplicateAuthorSlugs, ['public-author'])
   assert.equal(summary.titlesOnHold, 3)
+  assert.equal(summary.titlesWithMetadataWarnings, 0)
 })
 
 test('projection ordering is deterministic by author then title', () => {

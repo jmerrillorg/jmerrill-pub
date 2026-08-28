@@ -17,6 +17,7 @@ Coverage:
 - anonymous/hidden profile behavior;
 - missing slug/format/ISBN/author attribution holds;
 - duplicate slug holds;
+- missing ISBN as metadata warning rather than live-page blocker;
 - projection summary counts;
 - deterministic projection ordering;
 - lifecycle transition to post-publication requires public projection artifact;

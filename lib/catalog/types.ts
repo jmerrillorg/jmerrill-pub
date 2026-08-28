@@ -101,6 +101,7 @@ export type PublicCatalogReadinessIssue =
 export type PublicCatalogReadiness = {
   status: PublicCatalogReadinessStatus
   issues: PublicCatalogReadinessIssue[]
+  warnings: PublicCatalogReadinessIssue[]
   pageUrls: PublicCatalogPageUrls
 }
 
@@ -111,6 +112,7 @@ export type PublicCatalogProjectionSummary = {
   duplicateAuthorSlugs: string[]
   titlesReadyForPublicVerification: number
   titlesOnHold: number
+  titlesWithMetadataWarnings: number
 }
 
 export type CatalogReadResult<T> =
