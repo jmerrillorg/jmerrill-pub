@@ -62,7 +62,7 @@ export const titleAuthorOverrides: Record<string, string> = {
   'memoir-of-a-black-christian-nationalist': 'Shelley McIntosh',
   'mirror-of-refining-insight': 'Marvin Grayson',
   'music-ministry-unplugged': 'Will Harris',
-  'more-than-a-village': 'Carolyn Pierce',
+  'more-than-a-village': 'Carolyn Booker-Pierce',
   'my-abc-s': 'Christy Grogg',
   'never-give-up-on-love': 'Pamela Smith',
   'number-23-and-me': 'Wayne Pounds',
