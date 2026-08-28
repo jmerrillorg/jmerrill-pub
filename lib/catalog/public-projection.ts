@@ -50,7 +50,9 @@ export function evaluatePublicCatalogReadiness(
   if (!title.title) issues.push('MISSING_TITLE')
   if (!title.slug) issues.push('MISSING_TITLE_SLUG')
   if (!title.authorDisplayName) issues.push('MISSING_AUTHOR_ATTRIBUTION')
-  if (title.authorDisplayName && !title.authors.length) issues.push('MISSING_AUTHOR_PAGE')
+  if (title.authorDisplayName && !title.authors.length && requiresPublicAuthorPage(title.authorDisplayName)) {
+    issues.push('MISSING_AUTHOR_PAGE')
+  }
   if (!title.formats.length) warnings.push('MISSING_FORMAT')
   if (!title.isbnByFormat.length && !title.primaryIsbn) warnings.push('MISSING_ISBN')
   if (title.slug && duplicateTitleSlugs.has(normalizeKey(title.slug))) issues.push('DUPLICATE_TITLE_SLUG')
@@ -91,10 +93,39 @@ export function buildPublicCatalogProjectionSummary(
 }
 
 export function projectPublicCatalogTitles(titles: CatalogTitleSummary[]): CatalogTitleSummary[] {
-  return [...titles].sort((a, b) => {
+  return disambiguatePublicTitleSlugs(titles).sort((a, b) => {
     const author = a.authorDisplayName.localeCompare(b.authorDisplayName)
     if (author !== 0) return author
-    return a.title.localeCompare(b.title)
+    const title = a.title.localeCompare(b.title)
+    if (title !== 0) return title
+    return a.id.localeCompare(b.id)
+  })
+}
+
+export function disambiguatePublicTitleSlugs(titles: CatalogTitleSummary[]): CatalogTitleSummary[] {
+  const groups = new Map<string, CatalogTitleSummary[]>()
+
+  for (const title of titles) {
+    const key = normalizeKey(title.slug)
+    if (!key) continue
+    groups.set(key, [...(groups.get(key) || []), title])
+  }
+
+  const slugById = new Map<string, string>()
+  const usedSlugs = new Set<string>()
+
+  for (const group of Array.from(groups.values()).sort(compareSlugGroups)) {
+    const ordered = [...group].sort(compareTitleIdentity)
+    for (const [index, title] of ordered.entries()) {
+      const baseSlug = title.slug
+      const nextSlug = index === 0 ? reserveSlug(baseSlug, title.id, usedSlugs) : reserveDisambiguatedSlug(baseSlug, title.id, usedSlugs)
+      slugById.set(title.id, nextSlug)
+    }
+  }
+
+  return titles.map((title) => {
+    const slug = slugById.get(title.id) || title.slug
+    return slug === title.slug ? title : { ...title, slug }
   })
 }
 
@@ -151,4 +182,45 @@ function findDuplicates(values: string[]) {
 
 function normalizeKey(value: string) {
   return value.trim().toLowerCase()
+}
+
+function requiresPublicAuthorPage(authorDisplayName: string) {
+  const normalized = normalizeKey(authorDisplayName)
+  return normalized !== 'anonymous' && normalized !== 'anonymous author'
+}
+
+function compareSlugGroups(a: CatalogTitleSummary[], b: CatalogTitleSummary[]) {
+  return normalizeKey(a[0]?.slug || '').localeCompare(normalizeKey(b[0]?.slug || ''))
+}
+
+function compareTitleIdentity(a: CatalogTitleSummary, b: CatalogTitleSummary) {
+  const byTitle = a.title.localeCompare(b.title)
+  if (byTitle !== 0) return byTitle
+  return a.id.localeCompare(b.id)
+}
+
+function reserveSlug(slug: string, id: string, usedSlugs: Set<string>) {
+  if (!usedSlugs.has(normalizeKey(slug))) {
+    usedSlugs.add(normalizeKey(slug))
+    return slug
+  }
+  return reserveDisambiguatedSlug(slug, id, usedSlugs)
+}
+
+function reserveDisambiguatedSlug(slug: string, id: string, usedSlugs: Set<string>) {
+  const cleanId = id.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
+  const suffixes = [cleanId.slice(0, 8), cleanId.slice(0, 12), cleanId].filter(Boolean)
+
+  for (const suffix of suffixes) {
+    const candidate = `${slug}-${suffix}`
+    const key = normalizeKey(candidate)
+    if (!usedSlugs.has(key)) {
+      usedSlugs.add(key)
+      return candidate
+    }
+  }
+
+  const fallback = `${slug}-${cleanId || normalizeKey(id)}`
+  usedSlugs.add(normalizeKey(fallback))
+  return fallback
 }

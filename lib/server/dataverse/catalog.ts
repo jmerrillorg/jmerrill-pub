@@ -110,22 +110,22 @@ export async function listPublicCatalogTitles(): Promise<CatalogReadResult<Catal
 
 export async function getPublicCatalogTitleBySlug(slug: string): Promise<CatalogReadResult<CatalogTitleDetail | null>> {
   return withCatalogRead(async (config, token) => {
-    const safeSlug = escapeODataString(slug)
     const titleRows = await dataverseGetCollection(config, token, config.titleEntitySet, {
       select: TITLE_SELECT,
-      filter: `${PUBLIC_CATALOG_FILTER} and jm1pub_slug eq '${safeSlug}'`,
-      top: 1,
+      filter: PUBLIC_CATALOG_FILTER,
+      orderby: 'jm1pub_titlename asc',
     })
 
-    const row = titleRows[0]
-    if (!row) return null
+    const related = await loadRelatedCatalogData(config, token, titleRows)
+    const summaries = projectPublicCatalogTitles(titleRows.map((row) => buildTitleSummary(row, related)).filter((title) => title.title))
+    const summary = summaries.find((title) => title.slug === slug || title.id === slug)
+    if (!summary) return null
 
-    const related = await loadRelatedCatalogData(config, token, [row])
-    const summary = buildTitleSummary(row, related)
-    const relatedResult = await listTitlesByCertifiedImprint(summary.certifiedImprint)
-    const relatedTitles = relatedResult.ok
-      ? relatedResult.data.filter((title) => title.id !== summary.id).slice(0, 4)
-      : []
+    const row = titleRows.find((item) => stringField(item, 'jm1pub_titleid') === summary.id)
+    if (!row) return null
+    const relatedTitles = summaries
+      .filter((title) => title.id !== summary.id && title.certifiedImprint === summary.certifiedImprint)
+      .slice(0, 4)
 
     return {
       ...summary,
@@ -159,7 +159,7 @@ export async function listPublicAuthors(): Promise<CatalogReadResult<CatalogAuth
     ])
 
     const related = await loadRelatedCatalogData(config, token, titleRows)
-    const titles = titleRows.map((row) => buildTitleSummary(row, related))
+    const titles = projectPublicCatalogTitles(titleRows.map((row) => buildTitleSummary(row, related)).filter((title) => title.title))
     return buildAuthorSummaries(contactRows, titles)
   })
 }
@@ -180,7 +180,7 @@ export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadRe
     ])
 
     const related = await loadRelatedCatalogData(config, token, titleRows)
-    const titles = titleRows.map((row) => buildTitleSummary(row, related))
+    const titles = projectPublicCatalogTitles(titleRows.map((row) => buildTitleSummary(row, related)).filter((title) => title.title))
     const summaries = buildAuthorSummaries(contactRows, titles)
     const summary = summaries.find((author) => author.slug === slug)
     if (!summary) return null
@@ -512,7 +512,7 @@ async function dataverseGetCollection(
       'OData-Version': '4.0',
       Prefer: 'odata.include-annotations="OData.Community.Display.V1.FormattedValue"',
     },
-    next: { revalidate: 300 },
+    cache: 'no-store',
   })
 
   if (!response.ok) {
