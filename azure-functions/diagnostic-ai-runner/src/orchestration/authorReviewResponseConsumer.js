@@ -38,6 +38,25 @@ const DECISION = Object.freeze({
   PENDING_AMBIGUOUS: "PENDING_AMBIGUOUS",
   ACKNOWLEDGMENT_ONLY: "ACKNOWLEDGMENT_ONLY"
 });
+const MESSAGE_INTENT = Object.freeze({
+  ACKNOWLEDGMENT: "ACKNOWLEDGMENT",
+  APPROVAL: "APPROVAL",
+  ACCESS_HELP: "ACCESS_HELP",
+  ACCESS_CODE_REQUEST: "ACCESS_CODE_REQUEST",
+  FILE_RECEIVED: "FILE_RECEIVED",
+  QUESTION: "QUESTION",
+  CHANGES_REQUESTED: "CHANGES_REQUESTED",
+  HOLD: "HOLD"
+});
+const SEAN_FOUNDER_CORRECTION = Object.freeze({
+  gateId: "e996abe7-2f8e-f111-8077-000d3a14673b",
+  titleId: "91c5e1ef-2980-f111-ab0f-7c1e525b15c2",
+  authorEmail: "scrowley50@gmail.com",
+  originalClassification: "ACKNOWLEDGMENT_REVIEW_START_NOT_APPROVAL",
+  correctedClassification: "DEVELOPMENTAL_EDITING_APPROVED_WITH_ACCESS_HELP",
+  authoritativeLifecycleDecision: DECISION.APPROVED,
+  correctionSource: "JACKIE_FOUNDER_AUTHORITY_2026-08-29"
+});
 const ACKNOWLEDGEMENT_POLICY = Object.freeze({
   status: "NOT_YET_GOVERNED",
   wouldSend: false,
@@ -166,6 +185,88 @@ function classifyAuthorReviewResponse(text) {
   if (/\b(corrections?|changes?|revise|revision|fix)\b/.test(normalized)) return DECISION.CHANGES_REQUESTED;
   if (/\?|\b(question|clarify|discussion|call)\b/.test(normalized)) return DECISION.QUESTIONS_OR_REVIEW_REQUIRED;
   return DECISION.PENDING_AMBIGUOUS;
+}
+
+function classifyAuthorReviewMessageIntents(text) {
+  const normalized = normalizeString(text).toLowerCase().replace(/[’]/g, "'");
+  const intents = new Set();
+  if (/^(thank you|thanks|received|got it|i have received|i received|i got|i will review|will review|looking now)\b/.test(normalized)) {
+    intents.add(MESSAGE_INTENT.ACKNOWLEDGMENT);
+  }
+  if (/\b(received|got|have the files|got the files|received the files)\b/.test(normalized)) intents.add(MESSAGE_INTENT.FILE_RECEIVED);
+  if (/\b(access code|login code|sign[- ]?in code|portal access|author central|author center|author operating center|workspace access)\b/.test(normalized)) {
+    intents.add(MESSAGE_INTENT.ACCESS_HELP);
+    intents.add(MESSAGE_INTENT.ACCESS_CODE_REQUEST);
+  }
+  if (/\b(can't|cannot|unable to|trouble|problem|issue)\s+(log|sign|get)\s*(in|on|into)?\b/.test(normalized)) {
+    intents.add(MESSAGE_INTENT.ACCESS_HELP);
+  }
+  if (/\b(i approve|approved by me|you have my approval|approved to proceed|everything looks good and i approve|looks good and i approve)\b/.test(normalized) || /^(approved|approve|yes approved)\b/.test(normalized)) {
+    intents.add(MESSAGE_INTENT.APPROVAL);
+  }
+  if (/\b(corrections?|changes?|revise|revision|fix|notes?)\b/.test(normalized)) intents.add(MESSAGE_INTENT.CHANGES_REQUESTED);
+  if (/\?|\b(question|clarify|can you|could you|may i|please let me know)\b/.test(normalized)) intents.add(MESSAGE_INTENT.QUESTION);
+  if (/\b(hold|pause|wait|not ready|do not proceed|don't proceed)\b/.test(normalized)) intents.add(MESSAGE_INTENT.HOLD);
+  return Array.from(intents);
+}
+
+function supportActionsForIntents(intents) {
+  const actions = new Set();
+  if (intents.includes(MESSAGE_INTENT.ACCESS_HELP) || intents.includes(MESSAGE_INTENT.ACCESS_CODE_REQUEST)) actions.add("ACCESS_HELP");
+  return Array.from(actions);
+}
+
+function isSeanFounderCorrection(gate, reply) {
+  const gateId = normalizeString(gate.jm1pub_editorialapprovalgateid).toLowerCase();
+  const titleId = normalizeString(gate._jm1pub_titleid_value || gate.titleId).toLowerCase();
+  const sender = normalizeString(reply.senderAddress).toLowerCase();
+  const subject = normalizeString(reply.subject).toLowerCase();
+  const body = normalizeString(reply.bodyText).toLowerCase().replace(/[’]/g, "'");
+  return (
+    gateId === SEAN_FOUNDER_CORRECTION.gateId &&
+    (!titleId || titleId === SEAN_FOUNDER_CORRECTION.titleId) &&
+    sender === SEAN_FOUNDER_CORRECTION.authorEmail &&
+    subject.includes("developmental editing materials") &&
+    body.includes("i have received the files") &&
+    body.includes("please approve them") &&
+    body.includes("author") &&
+    body.includes("access code")
+  );
+}
+
+function resolveAuthorReviewDecision(gate, reply) {
+  const originalDecision = classifyAuthorReviewResponse(reply.bodyText || "");
+  let messageIntents = classifyAuthorReviewMessageIntents(reply.bodyText || "");
+  if (isSeanFounderCorrection(gate, reply)) {
+    messageIntents = Array.from(new Set([
+      ...messageIntents,
+      MESSAGE_INTENT.ACKNOWLEDGMENT,
+      MESSAGE_INTENT.FILE_RECEIVED,
+      MESSAGE_INTENT.APPROVAL,
+      MESSAGE_INTENT.ACCESS_HELP,
+      MESSAGE_INTENT.ACCESS_CODE_REQUEST
+    ]));
+    return {
+      classification: SEAN_FOUNDER_CORRECTION.authoritativeLifecycleDecision,
+      originalClassification: originalDecision === DECISION.ACKNOWLEDGMENT_ONLY ? SEAN_FOUNDER_CORRECTION.originalClassification : originalDecision,
+      correctedClassification: SEAN_FOUNDER_CORRECTION.correctedClassification,
+      authoritativeLifecycleDecision: DECISION.APPROVED,
+      messageIntents,
+      supportActions: supportActionsForIntents(messageIntents),
+      founderAuthorityCorrection: true,
+      correctionSource: SEAN_FOUNDER_CORRECTION.correctionSource
+    };
+  }
+  return {
+    classification: originalDecision,
+    originalClassification: originalDecision,
+    correctedClassification: null,
+    authoritativeLifecycleDecision: decisionCode(originalDecision) === null ? null : originalDecision,
+    messageIntents,
+    supportActions: supportActionsForIntents(messageIntents),
+    founderAuthorityCorrection: false,
+    correctionSource: null
+  };
 }
 
 function decisionCode(decision) {
@@ -845,7 +946,8 @@ async function processGateReply(client, gate, deps, triggerSource) {
     idempotencyKey,
     description: `Inbound response correlated with CORRELATED_HIGH_CONFIDENCE; subjectProbe="${subjectContains}".`
   });
-  const classification = classifyAuthorReviewResponse(reply.bodyText || "");
+  const decisionResolution = resolveAuthorReviewDecision(gate, reply);
+  const classification = decisionResolution.classification;
   const receivedAt = normalizeString(reply.receivedDateTime) || new Date().toISOString();
   const source = compactDecisionSource(inboundMessageId);
   const manualRecovery = isManualRecoveryGate(gate);
@@ -856,7 +958,10 @@ async function processGateReply(client, gate, deps, triggerSource) {
     gateId,
     inboundMessageId,
     idempotencyKey,
-    description: `Author response classified as ${classification}; deterministic rules applied; trigger=${triggerSource}.`,
+    description:
+      `Author response classified as ${classification}; messageIntents=${decisionResolution.messageIntents.join("|") || "none"}; ` +
+      `supportActions=${decisionResolution.supportActions.join("|") || "none"}; founderAuthorityCorrection=${decisionResolution.founderAuthorityCorrection ? "YES" : "NO"}; ` +
+      `originalClassification=${decisionResolution.originalClassification || "none"}; correctedClassification=${decisionResolution.correctedClassification || "none"}; trigger=${triggerSource}.`,
     failed: classification === "AMBIGUOUS"
   });
   const correlationLog = await writeLog(client, {
@@ -876,6 +981,9 @@ async function processGateReply(client, gate, deps, triggerSource) {
       `package=${gate.jm1pub_packageid || reply.packageId || "unknown"}; decisionRequest=${gate.jm1pub_decisionrequestid || reply.decisionRequestId || "unknown"}; ` +
       `message=${inboundMessageId}; received=${receivedAt}; classification=${classification}; notesReference=jm1pub_authorresponsesummary; ` +
       `awaitingState=CLOSE_MATCHING_RESPONSE_WAIT; manualRecovery=${manualRecovery ? "YES" : "NO"}; correlation=${correlation.mode}; ` +
+      `messageIntents=${decisionResolution.messageIntents.join("|") || "none"}; supportActions=${decisionResolution.supportActions.join("|") || "none"}; ` +
+      `founderAuthorityCorrection=${decisionResolution.founderAuthorityCorrection ? "YES" : "NO"}; correctionSource=${decisionResolution.correctionSource || "none"}; ` +
+      `originalClassification=${decisionResolution.originalClassification || "none"}; correctedClassification=${decisionResolution.correctedClassification || "none"}; ` +
       `acknowledgementPolicy=${acknowledgement.status}; Idempotency: ${idempotencyKey}.`,
     sourceEntity: "jm1pub_editorialapprovalgate",
     sourceRecordId: gateId
@@ -902,7 +1010,9 @@ async function processGateReply(client, gate, deps, triggerSource) {
       name: `${decisionActionType(classification)} - ${gateId}`,
       description:
         `${decisionSummary(classification)} Decision=${classification}; author=${identity.sender}; manualRecovery=${manualRecovery ? "YES" : "NO"}; ` +
-        `productionProgression=0; acknowledgementPolicy=${acknowledgement.status}; Idempotency: ${idempotencyKey}.`,
+        `messageIntents=${decisionResolution.messageIntents.join("|") || "none"}; supportActions=${decisionResolution.supportActions.join("|") || "none"}; ` +
+        `founderAuthorityCorrection=${decisionResolution.founderAuthorityCorrection ? "YES" : "NO"}; originalClassification=${decisionResolution.originalClassification || "none"}; ` +
+        `correctedClassification=${decisionResolution.correctedClassification || "none"}; productionProgression=0; acknowledgementPolicy=${acknowledgement.status}; Idempotency: ${idempotencyKey}.`,
       sourceEntity: "jm1pub_editorialapprovalgate",
       sourceRecordId: gateId
     });
@@ -924,6 +1034,11 @@ async function processGateReply(client, gate, deps, triggerSource) {
       productionProgression: 0,
       cadenceRestart,
       manualRecovery,
+      messageIntents: decisionResolution.messageIntents,
+      supportActions: decisionResolution.supportActions,
+      founderAuthorityCorrection: decisionResolution.founderAuthorityCorrection,
+      originalClassification: decisionResolution.originalClassification,
+      correctedClassification: decisionResolution.correctedClassification,
       executionLogIds: [
         discoveredLog,
         claimedLog,
@@ -967,6 +1082,11 @@ async function processGateReply(client, gate, deps, triggerSource) {
     acknowledgementPolicy: acknowledgement.status,
     productionProgression: 0,
     manualRecovery,
+    messageIntents: decisionResolution.messageIntents,
+    supportActions: decisionResolution.supportActions,
+    founderAuthorityCorrection: decisionResolution.founderAuthorityCorrection,
+    originalClassification: decisionResolution.originalClassification,
+    correctedClassification: decisionResolution.correctedClassification,
     executionLogIds: [discoveredLog, claimedLog, correlatedLog, classifiedLog, correlationLog, capturedLog, terminalLog, reviewLog]
   };
 }
@@ -1010,6 +1130,8 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
 module.exports = {
   runAuthorReviewResponseConsumer,
   classifyAuthorReviewResponse,
+  classifyAuthorReviewMessageIntents,
+  resolveAuthorReviewDecision,
   stableIdempotencyKey,
   stablePackageSelectionIdempotencyKey,
   createDataverseClient,

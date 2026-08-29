@@ -21,6 +21,7 @@
     "slice2-commercial-catalog-schema-spec-guard": "node --test scripts/slice2_commercial_catalog_schema_spec_guard.mjs",
     "slice3-implementation-planning-guard": "node --test scripts/slice3_implementation_planning_guard.test.mjs",
     "author-auth-guard": "node scripts/check-author-operating-center-auth.mjs && node scripts/author_external_id_claim_resolution.test.mjs && node --test scripts/author_activation_recovery_governance.test.mjs",
+    "author-access-reply-intake-guard": "node --test scripts/author_access_reply_intake.test.mjs",
     "royalty-import-guard": "node scripts/check-royalty-import-route.mjs",
     "program005-pipeline-guard": "node scripts/program005_publishing_pipeline_reliability.test.mjs",
     "program006-dispatch-guard": "node --test scripts/program006_publishing_dispatch_service.test.mjs",
