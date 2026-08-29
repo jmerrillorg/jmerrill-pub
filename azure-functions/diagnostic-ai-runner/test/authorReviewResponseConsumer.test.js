@@ -566,6 +566,47 @@ test("acknowledgment-only response is preserved but does not approve the gate", 
   assert.ok(!client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialapprovalgates"));
 });
 
+test("Sean founder-corrected mixed-intent reply records Developmental approval and access-help intent once", async () => {
+  const seanGateId = "e996abe7-2f8e-f111-8077-000d3a14673b";
+  const { client, result } = await runOne({
+    gateOverrides: {
+      jm1pub_editorialapprovalgateid: seanGateId,
+      jm1pub_editorialapprovalgatename: "Developmental Editing Review Materials - Before You Were Born",
+      jm1pub_gatecode: "DEVELOPMENTAL_EDITING_AUTHOR_REVIEW",
+      jm1pub_authoremail: "scrowley50@gmail.com",
+      _jm1pub_titleid_value: "91c5e1ef-2980-f111-ab0f-7c1e525b15c2",
+      jm1pub_packageid: "pkg-88189235-8f80-f111-ab0f-6045bdd69435-developmental-editing-v2",
+      jm1pub_outboundmessageid: "outbound-sean-developmental-package",
+      jm1pub_threadid: "conv-sean-developmental"
+    },
+    replyOverrides: {
+      inboundMessageId: "AAMkAGNiOTQzYmYyLTk0MDEtNGVlYS05NTgyLWFhMmUxM2Y0MzhiOQBGAAAAAACfs17WM6mYQJ_3z0t8_9doBwD_Xbi2Wq2JSYocf3NG5QZjAAAAAAEMAAD_Xbi2Wq2JSYocf3NG5QZjAADiW0HwAAA=",
+      internetMessageId: "<sean-mixed-intent@jmerrill.one>",
+      conversationId: "conv-sean-developmental",
+      inReplyToMessageId: "outbound-sean-developmental-package",
+      references: ["outbound-sean-developmental-package"],
+      senderAddress: "scrowley50@gmail.com",
+      subject: "Re: Developmental Editing Materials - Before You Were Born",
+      receivedDateTime: "2026-08-28T09:29:27Z",
+      bodyText: "Thank you, I have received the files and please approve them. Also can May I have the Authors central access code?"
+    }
+  });
+
+  assert.equal(result.results[0].outcome, "APPROVAL_PERSISTED");
+  assert.equal(result.results[0].founderAuthorityCorrection, true);
+  assert.equal(result.results[0].originalClassification, "ACKNOWLEDGMENT_REVIEW_START_NOT_APPROVAL");
+  assert.equal(result.results[0].correctedClassification, "DEVELOPMENTAL_EDITING_APPROVED_WITH_ACCESS_HELP");
+  assert.ok(result.results[0].messageIntents.includes("APPROVAL"));
+  assert.ok(result.results[0].messageIntents.includes("ACCESS_HELP"));
+  assert.deepEqual(result.results[0].supportActions, ["ACCESS_HELP"]);
+  assert.equal(client.calls.patched.filter((call) => call.entitySet === "jm1pub_editorialapprovalgates").length, 1);
+  assert.ok(client.calls.patched.some((call) => call.id === seanGateId && call.payload.jm1pub_authordecision === 196650000));
+  const descriptions = client.calls.created.map((call) => call.payload.jm1_actiondescription).join("\n");
+  assert.match(descriptions, /founderAuthorityCorrection=YES/);
+  assert.match(descriptions, /messageIntents=.*APPROVAL/);
+  assert.match(descriptions, /supportActions=ACCESS_HELP/);
+});
+
 test("duplicate provider message identity does not create a second response", async () => {
   const client = createMockClient({ existingLog: { jm1_executionlogid: "existing-completed" } });
 

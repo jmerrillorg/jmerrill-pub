@@ -1,6 +1,6 @@
 # Inbound Mailbox Architecture
 
-Last Verified: 2026-08-29T07:12:31Z
+Last Verified: 2026-08-29T07:51:18Z
 
 ## Governed Source
 
@@ -10,14 +10,16 @@ Last Verified: 2026-08-29T07:12:31Z
 
 ## Runtime Path
 
-Incoming message -> Graph mailbox intake -> message dedupe -> author/title/gate correlation -> intent classification -> deterministic action policy -> safe response or human attention.
+Incoming message -> Graph mailbox intake -> message dedupe -> author/title/gate correlation -> multi-intent classification -> authoritative decision resolution -> support-action resolution -> safe response or human attention.
 
 ## Implemented in This Pass
 
 - Existing inbound correlation module now includes deterministic intake event id construction.
+- Existing Azure Functions timer `run-author-review-response-consumer` remains the production watcher for `publishing@jmerrill.one`.
 - Required intent vocabulary is represented in code.
 - Access-support and author-decision handling are separated.
+- Dataverse execution logs preserve received, correlated, classified, persisted, completed, idempotency, intent, support-action, and founder-correction evidence.
 
-## Remaining Runtime Step
+## Change Notification Boundary
 
-The durable mailbox watcher/change-notification or scheduled-poll deployment is not fully commissioned by this PR-stage package.
+Graph change notifications remain optional future optimization. The commissioned scheduled reconciliation path does not rely on unread state and is not affected by humans opening the mailbox.

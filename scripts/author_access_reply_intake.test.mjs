@@ -7,20 +7,27 @@ import createJiti from 'jiti'
 const jiti = createJiti(import.meta.url)
 const intake = jiti('../lib/server/author-response-inbound-correlation.ts')
 
-test('Sean access-code reply remains acknowledgment/review-start, not approval', () => {
+test('Sean founder-corrected reply is approval plus access help', () => {
   const result = intake.classifyPublishingInboundAuthorIntent({
     subject: 'Re: Developmental Editing Materials - Before You Were Born',
+    gateId: 'e996abe7-2f8e-f111-8077-000d3a14673b',
+    inboundMessageId:
+      'AAMkAGNiOTQzYmYyLTk0MDEtNGVlYS05NTgyLWFhMmUxM2Y0MzhiOQBGAAAAAACfs17WM6mYQJ_3z0t8_9doBwD_Xbi2Wq2JSYocf3NG5QZjAAAAAAEMAAD_Xbi2Wq2JSYocf3NG5QZjAADiW0HwAAA=',
     bodyText:
       'Thank you, I have received the files and please approve them. Also can May I have the Authors central access code?',
   })
 
-  assert.equal(result.authorityClassification, 'ACCESS_SUPPORT_REQUEST')
-  assert.equal(result.lifecycleAction, 'CREATE_ACCESS_RECOVERY_EVENT')
+  assert.equal(result.authorityClassification, 'DEVELOPMENTAL_EDITING_APPROVED_WITH_ACCESS_HELP')
+  assert.equal(result.originalAuthorityClassification, 'ACCESS_SUPPORT_REQUEST')
+  assert.equal(result.authoritativeLifecycleDecision, 'APPROVED')
+  assert.deepEqual(result.supportActions, ['ACCESS_HELP'])
+  assert.equal(result.lifecycleAction, 'RECORD_AUTHOR_APPROVAL')
   assert.equal(result.confidence, 'HIGH')
   assert.ok(result.intents.includes('ACCESS_CODE_REQUEST'))
   assert.ok(result.intents.includes('FILE_RECEIVED'))
   assert.ok(result.intents.includes('ACKNOWLEDGMENT_ONLY'))
-  assert.equal(result.intents.includes('APPROVED'), false)
+  assert.ok(result.intents.includes('APPROVED'))
+  assert.equal(result.founderAuthorityCorrection, true)
 })
 
 test('please approve them is never treated as author approval', () => {
