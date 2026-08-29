@@ -152,7 +152,7 @@ export function AuthorGate({
           Your Author Operating Center is private.
         </h2>
         <p className="mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/40">
-          Sign in with your secure author account if it has already been activated. If you are setting up access for the first time or need governed recovery, use the activation code provided by J Merrill Publishing.
+          Sign in with your secure author account if it has already been activated. If you are setting up access for the first time or need recovery, use the one-time activation or recovery code provided through the governed Publishing process.
         </p>
       </div>
 
@@ -164,7 +164,7 @@ export function AuthorGate({
           Sign in
         </a>
         <div className="text-[12px] leading-[1.7] text-white/35">
-          Use your author-owned sign-in for routine access. Activation codes remain available only for first-time setup and governed recovery.
+          Use your author-owned sign-in for routine access. One-time codes are only for first-time setup or verified recovery.
         </div>
       </div>
 
@@ -195,7 +195,11 @@ export function AuthorGate({
       ) : null}
 
       <p className="mt-4 text-[12px] leading-[1.7] text-white/35">
-        J Merrill Publishing will never ask for your password. If you need secure access restoration, contact publishing@jmerrill.one so staff can verify your identity and issue a one-time recovery code.
+        J Merrill Publishing will never ask for your password. If you cannot get in, email{' '}
+        <a className="text-blue-300 underline-offset-4 hover:underline" href="mailto:publishing@jmerrill.one?subject=Author%20access%20help">
+          publishing@jmerrill.one
+        </a>{' '}
+        from the email connected to your author record.
       </p>
     </div>
   )

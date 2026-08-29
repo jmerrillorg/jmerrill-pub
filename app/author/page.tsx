@@ -22,10 +22,18 @@ const hubCards = [
   {
     status: 'Secure',
     title: 'Author Workspace',
-    body: 'For invited authors with a private access code. Your next steps stay inside your workspace.',
+    body: 'For active authors using secure author sign-in. Your next steps stay inside your workspace.',
     href: '/author/portal',
-    cta: 'Open workspace',
-    secondary: 'Invitation only',
+    cta: 'Author Sign In',
+    secondary: 'Private access',
+  },
+  {
+    status: 'Support',
+    title: 'Account Access',
+    body: 'If you cannot sign in, contact the Publishing Team from the email address connected to your author record.',
+    href: 'mailto:publishing@jmerrill.one?subject=Author%20access%20help',
+    cta: 'Need help?',
+    secondary: 'Reply-monitored',
   },
   {
     status: 'Live',
@@ -75,7 +83,7 @@ export default function AuthorHubPage() {
           </p>
         </section>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 lg:grid-cols-4">
           {hubCards.map((card) => (
             <div key={card.title} className="bg-white/[0.04] border border-white/8 rounded-3xl p-8">
               <p
@@ -120,8 +128,9 @@ export default function AuthorHubPage() {
             <em className="not-italic italic text-blue-500">Simple when you arrive.</em>
           </h2>
           <p className="text-[15px] font-light text-white/40 leading-[1.75]">
-            If you already have an invitation code, your workspace will guide you to the next step. If you are new to
-            J Merrill Publishing, start with Join the Family.
+            If your author access is already active, sign in with the email connected to your author record. If you
+            cannot get in, use account access help and the Publishing Team will route the request through the governed
+            recovery path.
           </p>
           <p className="mt-4 text-[13px] font-light text-white/35">Questions? Contact publishing@jmerrill.one</p>
         </div>
