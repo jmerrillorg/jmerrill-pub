@@ -56,6 +56,9 @@ function loadRelayModule() {
       if (name === '../policy/canonPolicyLayer') {
         return require(path.join(process.cwd(), 'azure-functions', 'acs-email-relay', 'src', 'policy', 'canonPolicyLayer.js'))
       }
+      if (name === '../policy/acsSenderRegistry') {
+        return require(path.join(process.cwd(), 'azure-functions', 'acs-email-relay', 'src', 'policy', 'acsSenderRegistry.js'))
+      }
       return require(name)
     },
     process,

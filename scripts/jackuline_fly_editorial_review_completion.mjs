@@ -6,6 +6,12 @@ import { join } from 'node:path'
 
 const require = createRequire(import.meta.url)
 const mammoth = require('../azure-functions/diagnostic-ai-runner/node_modules/mammoth')
+const {
+  catalogPackage,
+  buildAuthorCenteredPackageRationale,
+  validatePackageRecommendation,
+  evaluateJackulineRegressionScenario,
+} = require('../azure-functions/diagnostic-ai-runner/src/author/authorCommunicationPreflight')
 
 const DV_BASE = 'https://jm1hq.crm.dynamics.com/api/data/v9.2'
 const DV_RESOURCE = 'https://jm1hq.crm.dynamics.com'
@@ -33,6 +39,16 @@ const OPTION = Object.freeze({
 })
 
 export function finalRecommendation() {
+  const starter = catalogPackage('JMP-PKG-STARTER')
+  const professional = catalogPackage('JMP-PKG-PRO')
+  const primaryRationale = buildAuthorCenteredPackageRationale({
+    packageCode: starter.code,
+    projectTitle: JACKULINE.title,
+  })
+  const alternateRationale = buildAuthorCenteredPackageRationale({
+    packageCode: professional.code,
+    projectTitle: JACKULINE.title,
+  })
   return {
     editorialReviewComplete: true,
     editorialReadinessScore: '7/10',
@@ -44,11 +60,15 @@ export function finalRecommendation() {
     suggestedImprint: 'J Merrill Publishing',
     publisherApprovalRequired: false,
     primaryPackage: 'JMP-PKG-STARTER',
-    primaryPackageName: 'Starter Publishing Package',
-    primaryRationale: 'The manuscript is short enough for Starter and appears to need focused developmental guidance, workbook-structure refinement, copyediting, proofreading, and standard production support rather than a larger editorial buildout.',
+    primaryPackageName: starter.name,
+    primaryPackagePrice: starter.price,
+    primaryPackagePriceSource: starter.priceSource,
+    primaryRationale,
     alternatePackage: 'JMP-PKG-PRO',
-    alternatePackageName: 'Professional Publishing Package',
-    alternateRationale: 'Professional is the strongest alternate if Jackuline wants deeper hands-on development of the workbook exercises, market positioning, reference/attribution cleanup, and a more intensive preparation path before production.',
+    alternatePackageName: professional.name,
+    alternatePackagePrice: professional.price,
+    alternatePackagePriceSource: professional.priceSource,
+    alternateRationale,
     recommendationState: 'RECOMMENDATION_SENT_READY',
     concept: 'A faith-informed healing and wholeness workbook organized around eight life dimensions.',
     structure: 'Clear organizing framework, with refinement needed around repetition, transitions, exercise flow, and the duplicated/overlapping introductory material noted by the internal review.',
@@ -83,7 +103,7 @@ export function buildAuthorRecommendationEmail(review = finalRecommendation()) {
   const body = [
     `Good day ${JACKULINE.firstName},`,
     '',
-    `Thank you again for trusting J Merrill Publishing with ${JACKULINE.title}. We have completed the Editorial Review of your manuscript and are ready to share the recommended next step.`,
+    `Thank you again for trusting J Merrill Publishing with ${JACKULINE.title}. We have your manuscript, and we have completed the Editorial Review. You do not need to resend it.`,
     '',
     'What stood out',
     'Your manuscript has a clear heart for helping women heal, reflect, and move toward wholeness. The eight-dimension framework gives the book a strong organizing idea, and the workbook/journal direction gives readers a practical way to engage with the material.',
@@ -93,10 +113,10 @@ export function buildAuthorRecommendationEmail(review = finalRecommendation()) {
     '',
     `Suggested imprint: ${review.suggestedImprint}`,
     '',
-    `Primary recommendation: ${review.primaryPackageName}`,
+    `Primary recommendation: ${review.primaryPackageName} - ${review.primaryPackagePrice}`,
     review.primaryRationale,
     '',
-    `Alternate option: ${review.alternatePackageName}`,
+    `Alternate option: ${review.alternatePackageName} - ${review.alternatePackagePrice}`,
     review.alternateRationale,
     '',
     'A few items we still need from you',
@@ -122,14 +142,14 @@ export function buildAuthorRecommendationEmail(review = finalRecommendation()) {
           </td></tr>
           <tr><td style="padding:28px;">
             <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Good day ${escapeHtml(JACKULINE.firstName)},</p>
-            <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Thank you again for trusting J Merrill Publishing with <strong>${escapeHtml(JACKULINE.title)}</strong>. We have completed the Editorial Review of your manuscript and are ready to share the recommended next step.</p>
+            <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Thank you again for trusting J Merrill Publishing with <strong>${escapeHtml(JACKULINE.title)}</strong>. We have your manuscript, and we have completed the Editorial Review. You do not need to resend it.</p>
             <h2 style="font-size:18px;line-height:1.35;margin:24px 0 10px;color:#111827;">What stood out</h2>
             <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Your manuscript has a clear heart for helping women heal, reflect, and move toward wholeness. The eight-dimension framework gives the book a strong organizing idea, and the workbook/journal direction gives readers a practical way to engage with the material.</p>
             <h2 style="font-size:18px;line-height:1.35;margin:24px 0 10px;color:#111827;">Where editorial support will help</h2>
             <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">The manuscript would benefit from focused developmental editing to strengthen the flow of the framework, reduce repetition, refine the workbook exercises, and make the faith/Higher Power language feel consistent for the intended audience. It also needs copyediting, proofreading, and a careful review of references, attribution, and the “8 Dimensions of Wholeness” terminology before publication work moves forward.</p>
             <p style="margin:0 0 12px;font-size:16px;line-height:1.55;"><strong>Suggested imprint:</strong> ${escapeHtml(review.suggestedImprint)}</p>
-            <p style="margin:0 0 12px;font-size:16px;line-height:1.55;"><strong>Primary recommendation:</strong> ${escapeHtml(review.primaryPackageName)}<br>${escapeHtml(review.primaryRationale)}</p>
-            <p style="margin:0 0 18px;font-size:16px;line-height:1.55;"><strong>Alternate option:</strong> ${escapeHtml(review.alternatePackageName)}<br>${escapeHtml(review.alternateRationale)}</p>
+            <p style="margin:0 0 12px;font-size:16px;line-height:1.55;"><strong>Primary recommendation:</strong> ${escapeHtml(review.primaryPackageName)} - ${escapeHtml(review.primaryPackagePrice)}<br>${escapeHtml(review.primaryRationale)}</p>
+            <p style="margin:0 0 18px;font-size:16px;line-height:1.55;"><strong>Alternate option:</strong> ${escapeHtml(review.alternatePackageName)} - ${escapeHtml(review.alternatePackagePrice)}<br>${escapeHtml(review.alternateRationale)}</p>
             <h2 style="font-size:18px;line-height:1.35;margin:24px 0 10px;color:#111827;">A few items we still need from you</h2>
             <ul style="margin:0 0 18px 20px;padding:0;font-size:16px;line-height:1.55;">
               ${review.rightsAiSensitiveFollowup.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
@@ -164,6 +184,14 @@ async function main() {
   result.before = { diagnostic, completionLog: Boolean(completionLog), sendLog: Boolean(sendLog) }
   result.manuscript = manuscript
   result.review = review
+  result.communicationGovernance = {
+    ...evaluateJackulineRegressionScenario(),
+    packageRecommendation: validatePackageRecommendation({
+      primaryPackageCode: review.primaryPackage,
+      alternatePackageCode: review.alternatePackage,
+      rationale: `${review.primaryRationale}\n${review.alternateRationale}`,
+    }),
+  }
   const email = buildAuthorRecommendationEmail(review)
   result.email = { subject: email.subject, htmlSha256: sha256(email.htmlBody), textSha256: sha256(email.body) }
 
