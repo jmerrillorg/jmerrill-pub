@@ -446,6 +446,8 @@ export async function sendAuthorOtpEmail(input: {
   })
   const validation = validatePublishingOutboundEmail(draft)
   if (!validation.ok) throw new Error(validation.blocker)
+  const relayDiagnosticId = authorOtpDiagnosticId(input.correlationId)
+  const relayReference = authorOtpRelayReference(new Date())
 
   const response = await fetch(`${relayUrl.trim().replace(/\/$/, '')}/api/send-approved-author-response`, {
     method: 'POST',
@@ -455,8 +457,8 @@ export async function sendAuthorOtpEmail(input: {
     },
     body: JSON.stringify({
       messageType: 'APPROVED_AUTHOR_RESPONSE',
-      intakeReferenceCode: input.correlationId,
-      diagnosticId: input.correlationId,
+      intakeReferenceCode: relayReference,
+      diagnosticId: relayDiagnosticId,
       authorEmail: input.to,
       to: input.to,
       authorName: input.authorName,
@@ -534,6 +536,16 @@ function hydrateStoreRecord(row: DataverseRow): AuthorOtpStoreRecord | null {
 
 function otpLogName(challengeId: string) {
   return `AUTHOR_EMAIL_OTP_${challengeId}`
+}
+
+function authorOtpDiagnosticId(correlationId: string) {
+  return correlationId.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)?.[0] || randomUUID()
+}
+
+function authorOtpRelayReference(date: Date) {
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  return `JMP-INT-${year}${month}-AOCOTP`
 }
 
 function hashIdentifier(value: string) {
