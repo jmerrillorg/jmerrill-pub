@@ -14,6 +14,7 @@ async function withOtpEnv(fn) {
     AUTHOR_EMAIL_OTP_TTL_SECONDS: process.env.AUTHOR_EMAIL_OTP_TTL_SECONDS,
     AUTHOR_EMAIL_OTP_RESEND_COOLDOWN_SECONDS: process.env.AUTHOR_EMAIL_OTP_RESEND_COOLDOWN_SECONDS,
     AUTHOR_EMAIL_OTP_REQUEST_LIMIT: process.env.AUTHOR_EMAIL_OTP_REQUEST_LIMIT,
+    AUTHOR_EMAIL_OTP_CONTACT_LOGIN_FIELDS: process.env.AUTHOR_EMAIL_OTP_CONTACT_LOGIN_FIELDS,
     AUTHOR_PORTAL_SESSION_SECRET: process.env.AUTHOR_PORTAL_SESSION_SECRET,
     NODE_ENV: process.env.NODE_ENV,
   }
@@ -22,6 +23,7 @@ async function withOtpEnv(fn) {
   process.env.AUTHOR_EMAIL_OTP_TTL_SECONDS = '600'
   process.env.AUTHOR_EMAIL_OTP_RESEND_COOLDOWN_SECONDS = '60'
   process.env.AUTHOR_EMAIL_OTP_REQUEST_LIMIT = '5'
+  delete process.env.AUTHOR_EMAIL_OTP_CONTACT_LOGIN_FIELDS
   process.env.AUTHOR_PORTAL_SESSION_SECRET = 'author-portal-session-test-secret-2026-strong-enough'
 
   try {
@@ -62,7 +64,9 @@ function authorContact(email = 'Author@Example.test') {
   return {
     contactId: CONTACT_ID,
     email: email.toLowerCase(),
+    primaryEmail: email.toLowerCase(),
     name: 'Active Author',
+    authorProfileId: '22222222-2222-2222-2222-222222222222',
   }
 }
 
@@ -214,6 +218,127 @@ test('resend cooldown suppresses duplicate challenge delivery', async () => {
     assert.equal(store.records.length, 1)
     assert.equal(sent.length, 1)
   })
+})
+
+test('alternate Contact email sends OTP to submitted login email but resolves canonical Contact', async () => {
+  await withOtpEnv(async () => {
+    const store = new MemoryOtpStore()
+    const sent = []
+    const result = await otp.requestAuthorEmailOtp('ALT@Example.test', {
+      store,
+      resolveContact: async () => ({
+        contactId: CONTACT_ID,
+        email: 'alt@example.test',
+        primaryEmail: 'primary@example.test',
+        name: 'Active Author',
+        authorProfileId: '22222222-2222-2222-2222-222222222222',
+      }),
+      sendEmail: async (message) => {
+        sent.push(message)
+        return { provider: 'acs-email', providerMessageId: 'message-1' }
+      },
+    })
+
+    assert.equal(result.accepted, true)
+    assert.equal(store.records.length, 1)
+    assert.equal(store.records[0].contactId, CONTACT_ID)
+    assert.equal(store.records[0].contactEmail, 'alt@example.test')
+    assert.equal(sent[0].to, 'alt@example.test')
+  })
+})
+
+test('Contact login email resolver requires one Contact and exactly one active Author Profile', () => {
+  const profileId = '22222222-2222-2222-2222-222222222222'
+  const contact = {
+    contactid: CONTACT_ID,
+    fullname: 'Active Author',
+    emailaddress1: 'primary@example.test',
+    emailaddress2: 'alt@example.test',
+    emailaddress3: '',
+    jm1pub_isauthor: true,
+  }
+  const profile = {
+    jm1_authorprofileid: profileId,
+    _jm1_contact_value: CONTACT_ID,
+  }
+
+  const resolved = otp.resolveAuthorOtpContactFromRows({
+    email: ' ALT@example.test ',
+    contacts: [contact],
+    profiles: [profile],
+  })
+  assert.equal(resolved?.contactId, CONTACT_ID)
+  assert.equal(resolved?.email, 'alt@example.test')
+  assert.equal(resolved?.primaryEmail, 'primary@example.test')
+  assert.equal(resolved?.authorProfileId, profileId)
+
+  assert.equal(
+    otp.resolveAuthorOtpContactFromRows({
+      email: 'alt@example.test',
+      contacts: [contact, { ...contact, contactid: '33333333-3333-3333-3333-333333333333' }],
+      profiles: [profile],
+    }),
+    null,
+  )
+
+  assert.equal(
+    otp.resolveAuthorOtpContactFromRows({
+      email: 'alt@example.test',
+      contacts: [contact],
+      profiles: [],
+    }),
+    null,
+  )
+
+  assert.equal(
+    otp.resolveAuthorOtpContactFromRows({
+      email: 'alt@example.test',
+      contacts: [contact],
+      profiles: [profile, { ...profile, jm1_authorprofileid: '44444444-4444-4444-4444-444444444444' }],
+    }),
+    null,
+  )
+})
+
+test('Contact login resolver only accepts explicitly supported fields', () => {
+  const contact = {
+    contactid: CONTACT_ID,
+    fullname: 'Active Author',
+    emailaddress1: 'primary@example.test',
+    emailaddress2: 'alt@example.test',
+    adx_identity_username: 'portal-user@example.test',
+    jm1pub_isauthor: true,
+  }
+  const profile = {
+    jm1_authorprofileid: '22222222-2222-2222-2222-222222222222',
+    _jm1_contact_value: CONTACT_ID,
+  }
+
+  assert.equal(
+    otp.resolveAuthorOtpContactFromRows({
+      email: 'portal-user@example.test',
+      contacts: [contact],
+      profiles: [profile],
+    }),
+    null,
+  )
+  assert.equal(
+    otp.resolveAuthorOtpContactFromRows({
+      email: 'portal-user@example.test',
+      contacts: [contact],
+      profiles: [profile],
+      loginFields: ['adx_identity_username'],
+    })?.contactId,
+    CONTACT_ID,
+  )
+  assert.equal(
+    otp.resolveAuthorOtpContactFromRows({
+      email: 'alt@example.test',
+      contacts: [{ ...contact, jm1pub_isauthor: false }],
+      profiles: [profile],
+    }),
+    null,
+  )
 })
 
 test('routine author login uses OTP provider and Contact-first context; activation code remains separate', () => {
