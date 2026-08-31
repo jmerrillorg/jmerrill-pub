@@ -319,6 +319,24 @@ export async function getAuthorPortalContextFromAuthorEmail(
   )
 }
 
+export async function getAuthorPortalContextFromContactId(
+  contactId: string,
+  overrides?: ResolveOverrides,
+) {
+  const normalizedContactId = contactId.trim().toLowerCase()
+  if (!normalizedContactId) return null
+
+  return resolveAuthorPortalContext(
+    {
+      v: 1,
+      contactId: normalizedContactId,
+      scope: 'relationship',
+      issuedAt: new Date().toISOString(),
+    },
+    overrides,
+  )
+}
+
 export async function getAuthorPortalContextFromExternalId(
   externalUserIdentifier: string,
   overrides?: ResolveOverrides,

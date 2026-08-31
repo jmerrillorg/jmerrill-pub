@@ -9,7 +9,7 @@ export type DataverseServerConfig = {
   webApiBaseUrl: string
 }
 
-type DataverseRow = Record<string, unknown>
+export type DataverseRow = Record<string, unknown>
 
 export function getDataverseServerConfig(): DataverseServerConfig | null {
   const resourceUrl = cleanUrl(process.env.DATAVERSE_RESOURCE_URL || DEFAULT_RESOURCE_URL)
@@ -106,6 +106,7 @@ export async function dataversePatch(
   entitySet: string,
   id: string,
   payload: Record<string, unknown>,
+  options: { ifMatch?: string } = {},
 ) {
   const token = await getDataverseAccessToken(config)
   const response = await fetch(`${config.webApiBaseUrl}/${entitySet}(${id})`, {
@@ -116,6 +117,7 @@ export async function dataversePatch(
       'Content-Type': 'application/json',
       'OData-MaxVersion': '4.0',
       'OData-Version': '4.0',
+      ...(options.ifMatch ? { 'If-Match': options.ifMatch } : {}),
     },
     body: JSON.stringify(payload),
     cache: 'no-store',

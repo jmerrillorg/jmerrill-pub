@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { requireAuthorAccess, validateAuthorPortalAccessCode } from '@/lib/server/author-access'
+import { getDurableAuthorSession } from '@/lib/server/author-durable-auth'
+import {
+  getAuthorPortalContextFromAuthorEmail,
+  getAuthorPortalContextFromContactId,
+  getAuthorPortalContextFromCookies,
+  getAuthorPortalContextFromExternalId,
+} from '@/lib/server/author-portal-context'
 import { writeSafeExecutionLog } from '@/lib/server/dataverse-execution-log'
 import { getDataverseServerConfig } from '@/lib/server/dataverse-server'
 import {
@@ -15,9 +21,6 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
-    const unauthorized = requireAuthorAccess(req)
-    if (unauthorized) return unauthorized
-
     if (!isStripeConnectGateOpen()) {
       return NextResponse.json(
         { error: 'Author Payout Enrollment is not open for this workspace yet.' },
@@ -25,11 +28,11 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const access = validateAuthorPortalAccessCode(req.headers.get('x-author-access-code'))
-    if (!access.success || access.accessType !== 'author' || !access.portalContext?.contactId) {
+    const authorContext = await resolveAuthorConnectStartContext()
+    if (!authorContext?.author.contactId) {
       return NextResponse.json(
-        { error: 'Author Payout Enrollment requires an exact author relationship access context.' },
-        { status: 403 },
+        { error: 'Author Payout Enrollment requires an active author sign-in.' },
+        { status: 401 },
       )
     }
 
@@ -37,8 +40,8 @@ export async function POST(req: NextRequest) {
     if (!config) throw new Error('dataverse_config_missing')
 
     const identity = await resolveGovernedAuthorConnectIdentity({
-      contactId: access.portalContext.contactId,
-      authorEmail: undefined,
+      contactId: authorContext.author.contactId,
+      authorEmail: authorContext.author.email,
     }, config)
     const { accountId, reused, source } = await resolveRecipientAccountId(identity)
     const account = await retrieveConnectedAccount(accountId)
@@ -83,4 +86,26 @@ export async function POST(req: NextRequest) {
       { status: 502 },
     )
   }
+}
+
+async function resolveAuthorConnectStartContext() {
+  const cookieContext = await getAuthorPortalContextFromCookies().catch(() => null)
+  if (cookieContext?.author.contactId) return cookieContext
+
+  const durableSession = await getDurableAuthorSession()
+  const durableUser = durableSession?.user as
+    | { authorObjectId?: string; authorContactId?: string; role?: string; email?: string | null }
+    | undefined
+  if (!durableUser || durableUser.role === 'publisher') return null
+
+  if (durableUser.authorContactId) {
+    return getAuthorPortalContextFromContactId(durableUser.authorContactId)
+  }
+  if (durableUser.authorObjectId) {
+    return getAuthorPortalContextFromExternalId(durableUser.authorObjectId)
+  }
+  if (durableUser.email) {
+    return getAuthorPortalContextFromAuthorEmail(durableUser.email)
+  }
+  return null
 }
