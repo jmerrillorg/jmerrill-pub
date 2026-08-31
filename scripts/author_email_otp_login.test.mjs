@@ -341,6 +341,56 @@ test('Contact login resolver only accepts explicitly supported fields', () => {
   )
 })
 
+test('OTP email relay payload uses ACS-approved diagnostic and reference fields', async () => {
+  await withOtpEnv(async () => {
+    const previous = {
+      relayUrl: process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL,
+      relayKey: process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY,
+      fetch: globalThis.fetch,
+    }
+    process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL = 'https://relay.example.test'
+    process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY = 'relay-key'
+    const calls = []
+    globalThis.fetch = async (url, options) => {
+      calls.push({
+        url: String(url),
+        body: JSON.parse(String(options.body)),
+      })
+      return new Response(JSON.stringify({
+        accepted: true,
+        provider: 'acs-email-relay',
+        providerMessageId: 'message-1',
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    }
+
+    try {
+      await otp.sendAuthorOtpEmail({
+        to: 'chosen2k7@gmail.com',
+        authorName: 'Jackie Smith Jr',
+        code: '123456',
+        expiresAt: new Date(Date.now() + 600000).toISOString(),
+        correlationId: 'AOC-OTP-dac575df-caa0-49c1-9069-ab99d0168631',
+      })
+    } finally {
+      globalThis.fetch = previous.fetch
+      if (previous.relayUrl === undefined) delete process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL
+      else process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL = previous.relayUrl
+      if (previous.relayKey === undefined) delete process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY
+      else process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY = previous.relayKey
+    }
+
+    assert.equal(calls.length, 1)
+    assert.match(calls[0].url, /\/api\/send-approved-author-response$/)
+    assert.equal(calls[0].body.diagnosticId, 'dac575df-caa0-49c1-9069-ab99d0168631')
+    assert.match(calls[0].body.intakeReferenceCode, /^JMP-INT-\d{6}-AOCOTP$/)
+    assert.equal(calls[0].body.authorEmail, 'chosen2k7@gmail.com')
+    assert.equal(calls[0].body.to, 'chosen2k7@gmail.com')
+    assert.equal(calls[0].body.internalVisibilityMailbox, 'publishing@jmerrill.one')
+    assert.equal(calls[0].body.futureSendRequiresInternalCopy, true)
+    assert.equal(calls[0].body.futureSendRequiresDataverseLog, true)
+  })
+})
+
 test('routine author login uses OTP provider and Contact-first context; activation code remains separate', () => {
   const gate = readFileSync('app/author/_components/AuthorGate.tsx', 'utf8')
   const auth = readFileSync('lib/server/author-durable-auth.ts', 'utf8')
