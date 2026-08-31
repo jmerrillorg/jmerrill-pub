@@ -239,7 +239,7 @@ test('Author Portal protected routes resolve durable context from External ID be
       if (file === 'app/api/author/context/route.ts') {
         assert.match(
           source,
-          /const externalId = durableUser\?\.authorObjectId[\s\S]+const email = durableUser\?\.email[\s\S]+const context = externalId[\s\S]+getAuthorPortalContextFromExternalId[\s\S]+getAuthorPortalContextFromAuthorEmail/,
+          /const contactId = durableUser\?\.authorContactId[\s\S]+const externalId = durableUser\?\.authorObjectId[\s\S]+const email = durableUser\?\.email[\s\S]+const context = contactId[\s\S]+getAuthorPortalContextFromContactId[\s\S]+getAuthorPortalContextFromExternalId[\s\S]+getAuthorPortalContextFromAuthorEmail/,
           file,
         )
       } else {

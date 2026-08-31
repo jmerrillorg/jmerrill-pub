@@ -451,7 +451,9 @@ test('route no longer trusts posted Stripe account ids or title-specific constan
 
   assert.doesNotMatch(routeSource, /body\?\.stripeAccountId|existingStripeAccountId/)
   assert.doesNotMatch(routeSource, /COMMISSIONING_REFERENCE|The Intentional Leader/)
-  assert.match(routeSource, /validateAuthorPortalAccessCode/)
+  assert.match(routeSource, /resolveAuthorConnectStartContext/)
+  assert.match(routeSource, /getDurableAuthorSession|getAuthorPortalContextFromCookies/)
+  assert.doesNotMatch(routeSource, /x-author-access-code|validateAuthorPortalAccessCode/)
   assert.match(routeSource, /resolveGovernedAuthorConnectIdentity/)
 })
 

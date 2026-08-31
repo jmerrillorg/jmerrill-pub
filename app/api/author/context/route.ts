@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 import { getAuthorPortalContextFromCookies } from '@/lib/server/author-portal-context'
 import { getDurableAuthorSession } from '@/lib/server/author-durable-auth'
 import {
+  getAuthorPortalContextFromContactId,
   getAuthorPortalContextFromAuthorEmail,
   getAuthorPortalContextFromExternalId,
   setAuthorPortalSessionCookie,
@@ -41,8 +42,9 @@ export async function GET(request: Request) {
 
   const durableSession = await getDurableAuthorSession()
   const durableUser = durableSession?.user as
-    | { authorObjectId?: string; role?: string; email?: string | null }
+    | { authorObjectId?: string; authorContactId?: string; role?: string; email?: string | null }
     | undefined
+  const contactId = durableUser?.authorContactId
   const externalId = durableUser?.authorObjectId
   const email = durableUser?.email
 
@@ -67,11 +69,13 @@ export async function GET(request: Request) {
     )
   }
 
-  const context = externalId
-    ? await getAuthorPortalContextFromExternalId(externalId, overrides)
-    : email
-      ? await getAuthorPortalContextFromAuthorEmail(email, overrides)
-      : null
+  const context = contactId
+    ? await getAuthorPortalContextFromContactId(contactId, overrides)
+    : externalId
+      ? await getAuthorPortalContextFromExternalId(externalId, overrides)
+      : email
+        ? await getAuthorPortalContextFromAuthorEmail(email, overrides)
+        : null
 
   if (!context) {
     logAuthorWorkspaceAuth({
@@ -80,7 +84,7 @@ export async function GET(request: Request) {
       sessionSource: durableSession ? 'durable_session' : 'none',
       providerRole: durableUser?.role,
       failureReason: durableSession ? 'author_relationship_not_resolved' : 'author_session_missing',
-      subjectHash: hashSafe(externalId || email || ''),
+      subjectHash: hashSafe(contactId || externalId || email || ''),
       authorEmail: email || undefined,
     })
 
@@ -122,7 +126,7 @@ export async function GET(request: Request) {
     sessionSource: 'durable_session',
     providerRole: durableUser?.role,
     workspaceResult: 'resolved',
-    subjectHash: hashSafe(externalId || email || ''),
+    subjectHash: hashSafe(contactId || externalId || email || ''),
     contactId: context.author.contactId,
     authorEmail: context.author.email,
     selectedProjectKey: context.selectedProjectKey,

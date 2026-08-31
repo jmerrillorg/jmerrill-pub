@@ -13,12 +13,9 @@ export function StripeConnectSetupCard() {
     try {
       const response = await fetch('/api/author/stripe/connect/start', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json',
-          'x-author-access-code':
-            sessionStorage.getItem('jmp-author-portal-access-code') ||
-            sessionStorage.getItem('jmp-author-onboarding-access-code') ||
-            '',
         },
         body: JSON.stringify({}),
       })

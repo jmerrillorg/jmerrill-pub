@@ -1,8 +1,11 @@
 import { getServerSession, type NextAuthOptions } from 'next-auth'
 import AzureADProvider from 'next-auth/providers/azure-ad'
+import CredentialsProvider from 'next-auth/providers/credentials'
 
 import { getDataverseServerConfig, dataverseFirst } from './dataverse-server'
+import { authorizeAuthorEmailOtpCredentials } from './author-email-otp'
 import {
+  AUTHOR_EMAIL_OTP_PROVIDER_ID,
   AUTHOR_OPERATING_CENTER_PROVIDER_ID,
   PUBLISHER_OPERATING_CENTER_PROVIDER_ID,
 } from '../author-durable-auth-shared'
@@ -370,7 +373,22 @@ function getAuthorizedPublisherIdentity({
   }
 }
 
-const providers = [buildAuthorIdentityProvider(), buildPublisherIdentityProvider()].filter(Boolean) as NonNullable<
+function buildAuthorEmailOtpProvider() {
+  return CredentialsProvider({
+    id: AUTHOR_EMAIL_OTP_PROVIDER_ID,
+    name: 'J Merrill Publishing Email Code',
+    credentials: {
+      email: { label: 'Email', type: 'email' },
+      challengeId: { label: 'Challenge', type: 'text' },
+      code: { label: 'Code', type: 'text' },
+    },
+    async authorize(credentials) {
+      return authorizeAuthorEmailOtpCredentials(credentials as Record<string, unknown> | undefined)
+    },
+  })
+}
+
+const providers = [buildAuthorEmailOtpProvider(), buildAuthorIdentityProvider(), buildPublisherIdentityProvider()].filter(Boolean) as NonNullable<
   NextAuthOptions['providers']
 >
 
@@ -398,6 +416,10 @@ export const authorAuthOptions: NextAuthOptions = {
             user,
           }),
         )
+      }
+
+      if (account?.provider === AUTHOR_EMAIL_OTP_PROVIDER_ID) {
+        return Boolean(user?.email)
       }
 
       const publisherIdentity = getAuthorizedPublisherIdentity({
@@ -442,6 +464,21 @@ export const authorAuthOptions: NextAuthOptions = {
           token.role = 'author'
           token.provider = AUTHOR_OPERATING_CENTER_PROVIDER_ID
           if (authorIdentity.objectId) token.authorObjectId = authorIdentity.objectId
+        }
+        return token
+      }
+
+      if (account?.provider === AUTHOR_EMAIL_OTP_PROVIDER_ID) {
+        const otpUser = user as ({ authorContactId?: unknown; email?: string | null } | undefined)
+        const contactId = typeof otpUser?.authorContactId === 'string'
+          ? otpUser.authorContactId.trim().toLowerCase()
+          : ''
+        const email = typeof user?.email === 'string' ? user.email.trim().toLowerCase() : ''
+        if (email && contactId) {
+          token.email = email
+          token.role = 'author'
+          token.provider = AUTHOR_EMAIL_OTP_PROVIDER_ID
+          token.authorContactId = contactId
         }
         return token
       }
@@ -495,6 +532,9 @@ export const authorAuthOptions: NextAuthOptions = {
       }
       if (session.user && typeof token.authorObjectId === 'string') {
         ;(session.user as { authorObjectId?: string }).authorObjectId = token.authorObjectId
+      }
+      if (session.user && typeof token.authorContactId === 'string') {
+        ;(session.user as { authorContactId?: string }).authorContactId = token.authorContactId
       }
       return session
     },

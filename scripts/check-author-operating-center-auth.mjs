@@ -19,11 +19,21 @@ const checks = [
   },
   {
     ok: sharedSource.includes("AUTHOR_OPERATING_CENTER_PROVIDER_ID = 'jm1-author-operating-center'"),
-    message: 'stable provider id defined',
+    message: 'stable Microsoft provider id defined',
   },
   {
-    ok: gateSource.includes('/api/auth/signin/${AUTHOR_OPERATING_CENTER_PROVIDER_ID}?callbackUrl=%2Fauthor%2Fportal'),
-    message: 'portal sign-in CTA targets provider directly',
+    ok:
+      sharedSource.includes("AUTHOR_EMAIL_OTP_PROVIDER_ID = 'jm1-author-email-otp'") &&
+      authSource.includes('CredentialsProvider') &&
+      authSource.includes('authorizeAuthorEmailOtpCredentials'),
+    message: 'routine email OTP provider defined',
+  },
+  {
+    ok:
+      gateSource.includes('Send Code') &&
+      gateSource.includes('AUTHOR_EMAIL_OTP_PROVIDER_ID') &&
+      gateSource.includes('Activation or recovery'),
+    message: 'portal routine login uses OTP and separates lifecycle recovery',
   },
 ]
 

@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { AUTHOR_OPERATING_CENTER_PROVIDER_ID } from '@/lib/author-durable-auth-shared'
+import { signIn } from 'next-auth/react'
+import { AUTHOR_EMAIL_OTP_PROVIDER_ID } from '@/lib/author-durable-auth-shared'
 
 type AuthorGateScope = 'forms' | 'portal'
 
@@ -18,9 +19,15 @@ export function AuthorGate({
   scope?: AuthorGateScope
 }) {
   const [code, setCode] = useState('')
+  const [email, setEmail] = useState('')
+  const [otpCode, setOtpCode] = useState('')
+  const [challengeId, setChallengeId] = useState('')
+  const [otpPhase, setOtpPhase] = useState<'email' | 'code'>('email')
+  const [resendAfter, setResendAfter] = useState(0)
   const [unlocked, setUnlocked] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [otpSubmitting, setOtpSubmitting] = useState(false)
   const [checkingSession, setCheckingSession] = useState(false)
   const unlockedKey = scope === 'portal' ? PORTAL_UNLOCKED_KEY : 'jmp-author-onboarding-unlocked'
   const bootstrapContextKey =
@@ -66,6 +73,71 @@ export function AuthorGate({
       mounted = false
     }
   }, [scope, unlockedKey, bootstrapContextKey])
+
+  useEffect(() => {
+    if (!resendAfter) return
+    const interval = window.setInterval(() => {
+      setResendAfter((value) => Math.max(0, value - 1))
+    }, 1000)
+    return () => window.clearInterval(interval)
+  }, [resendAfter])
+
+  async function sendOtpCode() {
+    setOtpSubmitting(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/author/otp/request', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(data.error || 'Author sign-in is temporarily unavailable.')
+      setChallengeId(String(data.challengeId || ''))
+      setResendAfter(Number(data.resendAfterSeconds || 60))
+      setOtpPhase('code')
+    } catch (err: any) {
+      setError(err.message || 'Unable to send an author access code.')
+    } finally {
+      setOtpSubmitting(false)
+    }
+  }
+
+  async function handleOtpRequest(event: React.FormEvent) {
+    event.preventDefault()
+    await sendOtpCode()
+  }
+
+  async function handleOtpVerify(event: React.FormEvent) {
+    event.preventDefault()
+    setOtpSubmitting(true)
+    setError('')
+
+    try {
+      const result = await signIn(AUTHOR_EMAIL_OTP_PROVIDER_ID, {
+        redirect: false,
+        email,
+        challengeId,
+        code: otpCode,
+        callbackUrl: '/author/portal',
+      })
+      if (result?.error) throw new Error('The code was not accepted. Please check the code and try again.')
+
+      const recovered = await tryRecoverAuthorSession(window.location.search)
+      if (!recovered?.ok) {
+        throw new Error('Your sign-in was accepted, but your author workspace could not be opened.')
+      }
+      sessionStorage.setItem(unlockedKey, 'true')
+      await storeBootstrapContext(recovered, bootstrapContextKey)
+      setUnlocked(true)
+    } catch (err: any) {
+      setError(err.message || 'Unable to verify your author access code.')
+    } finally {
+      setOtpSubmitting(false)
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -135,7 +207,6 @@ export function AuthorGate({
     )
   }
 
-  const signInUrl = `/api/auth/signin/${AUTHOR_OPERATING_CENTER_PROVIDER_ID}?callbackUrl=%2Fauthor%2Fportal`
   const signedInRelationshipError =
     /sign-in was found|publisher sign-in was found|relationship could not be resolved/i.test(error)
 
@@ -152,40 +223,85 @@ export function AuthorGate({
           Your Author Operating Center is private.
         </h2>
         <p className="mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/40">
-          Sign in with your secure author account if it has already been activated. If you are setting up access for the first time or need recovery, use the one-time activation or recovery code provided through the governed Publishing process.
+          Enter the email connected to your active author record. We will send a short-lived one-time code for routine access.
         </p>
       </div>
 
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <a
-          href={signInUrl}
-          className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-blue-500 px-7 text-[13px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.35)] transition-all hover:-translate-y-0.5 hover:bg-blue-600"
-        >
-          Sign in
-        </a>
-        <div className="text-[12px] leading-[1.7] text-white/35">
-          Use your author-owned sign-in for routine access. One-time codes are only for first-time setup or verified recovery.
-        </div>
-      </div>
-
-      {signedInRelationshipError ? null : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:flex-row">
+      {signedInRelationshipError ? null : otpPhase === 'email' ? (
+        <form onSubmit={handleOtpRequest} className="flex flex-col gap-4 sm:flex-row">
           <input
-            type="password"
-            value={code}
-            onChange={(event) => setCode(event.target.value)}
-            placeholder="Activation or recovery code"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="Author email"
+            autoComplete="email"
             className="min-h-[52px] flex-1 rounded-2xl border border-white/10 bg-white/5 px-5 text-[14px] text-white outline-none transition-colors placeholder:text-white/20 focus:border-blue-500"
             required
           />
           <button
             type="submit"
-            disabled={submitting}
+            disabled={otpSubmitting}
             className="min-h-[52px] rounded-full bg-blue-500 px-7 text-[13px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.35)] transition-all hover:-translate-y-0.5 hover:bg-blue-600 disabled:opacity-60"
           >
-            {submitting ? 'Checking...' : 'Unlock'}
+            {otpSubmitting ? 'Sending...' : 'Send Code'}
           </button>
         </form>
+      ) : (
+        <form onSubmit={handleOtpVerify} className="flex flex-col gap-4 sm:flex-row">
+          <input
+            type="text"
+            inputMode="numeric"
+            value={otpCode}
+            onChange={(event) => setOtpCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+            placeholder="Six-digit code"
+            autoComplete="one-time-code"
+            className="min-h-[52px] flex-1 rounded-2xl border border-white/10 bg-white/5 px-5 text-[14px] text-white outline-none transition-colors placeholder:text-white/20 focus:border-blue-500"
+            required
+          />
+          <button
+            type="submit"
+            disabled={otpSubmitting || otpCode.length !== 6}
+            className="min-h-[52px] rounded-full bg-blue-500 px-7 text-[13px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.35)] transition-all hover:-translate-y-0.5 hover:bg-blue-600 disabled:opacity-60"
+          >
+            {otpSubmitting ? 'Checking...' : 'Continue'}
+          </button>
+          <button
+            type="button"
+            disabled={otpSubmitting || resendAfter > 0}
+            onClick={() => void sendOtpCode()}
+            className="min-h-[52px] rounded-full border border-white/10 px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/65 transition-colors hover:border-white/20 hover:text-white disabled:opacity-40"
+          >
+            {resendAfter > 0 ? `Resend in ${resendAfter}s` : 'Resend'}
+          </button>
+        </form>
+      )}
+
+      {signedInRelationshipError ? null : (
+        <details className="mt-5 rounded-2xl border border-white/8 bg-black/10 p-4">
+          <summary className="cursor-pointer text-[12px] font-semibold uppercase tracking-[0.08em] text-white/50">
+            Activation or recovery
+          </summary>
+          <p className="mt-3 text-[12px] leading-[1.7] text-white/35">
+            Use this only when the Publishing Team has issued a lifecycle activation or recovery code.
+          </p>
+          <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4 sm:flex-row">
+            <input
+              type="password"
+              value={code}
+              onChange={(event) => setCode(event.target.value)}
+              placeholder="Activation or recovery code"
+              className="min-h-[52px] flex-1 rounded-2xl border border-white/10 bg-white/5 px-5 text-[14px] text-white outline-none transition-colors placeholder:text-white/20 focus:border-blue-500"
+              required
+            />
+            <button
+              type="submit"
+              disabled={submitting}
+              className="min-h-[52px] rounded-full bg-blue-500 px-7 text-[13px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_4px_20px_rgba(30,144,255,0.35)] transition-all hover:-translate-y-0.5 hover:bg-blue-600 disabled:opacity-60"
+            >
+              {submitting ? 'Checking...' : 'Unlock'}
+            </button>
+          </form>
+        </details>
       )}
 
       {error ? (
