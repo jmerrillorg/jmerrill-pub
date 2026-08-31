@@ -92,14 +92,29 @@ export function buildPublicCatalogProjectionSummary(
   }
 }
 
+// Default public catalog order: canonical release date (jm1pub_releasedate,
+// exposed on CatalogTitleSummary.releaseDate) descending, newest first —
+// never createdon/modifiedon or any other administrative timestamp. Titles
+// with no release date on record sort after every dated title. Ties (same
+// release date, or both undated) break by title A-Z, then id for full
+// determinism.
 export function projectPublicCatalogTitles(titles: CatalogTitleSummary[]): CatalogTitleSummary[] {
   return disambiguatePublicTitleSlugs(titles).sort((a, b) => {
-    const author = a.authorDisplayName.localeCompare(b.authorDisplayName)
-    if (author !== 0) return author
+    const dateCompare = compareReleaseDateDescending(a.releaseDate, b.releaseDate)
+    if (dateCompare !== 0) return dateCompare
     const title = a.title.localeCompare(b.title)
     if (title !== 0) return title
     return a.id.localeCompare(b.id)
   })
+}
+
+function compareReleaseDateDescending(a: string, b: string): number {
+  const aHas = Boolean(a)
+  const bHas = Boolean(b)
+  if (aHas && bHas) return b.localeCompare(a) // ISO YYYY-MM-DD strings sort correctly lexicographically
+  if (aHas && !bHas) return -1 // dated titles before undated
+  if (!aHas && bHas) return 1
+  return 0 // both undated — fall through to title tiebreak
 }
 
 export function disambiguatePublicTitleSlugs(titles: CatalogTitleSummary[]): CatalogTitleSummary[] {

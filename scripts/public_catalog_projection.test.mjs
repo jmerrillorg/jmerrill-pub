@@ -201,12 +201,51 @@ test('projection summary reconciles totals after canonical slug projection', () 
   assert.equal(summary.titlesWithMetadataWarnings, 0)
 })
 
-test('projection ordering is deterministic by author then title', () => {
+test('default projection order is canonical release date descending, newest first', () => {
   const ordered = projection.projectPublicCatalogTitles([
-    title({ id: 'b', title: 'Beta', authorDisplayName: 'Z Author' }),
-    title({ id: 'a', title: 'Alpha', authorDisplayName: 'A Author' }),
+    title({ id: 'old', title: 'Earlier Title', releaseDate: '2025-11-04' }),
+    title({ id: 'newest', title: 'Strategies For Success', releaseDate: '2026-09-22' }),
+    title({ id: 'mid', title: 'Another Title', releaseDate: '2026-08-18' }),
+  ])
+  assert.deepEqual(ordered.map((item) => item.id), ['newest', 'mid', 'old'])
+})
+
+test('same release date falls back to title A-Z', () => {
+  const ordered = projection.projectPublicCatalogTitles([
+    title({ id: 'c', title: 'Title C', releaseDate: '2026-08-27' }),
+    title({ id: 'a', title: 'Title A', releaseDate: '2026-08-27' }),
+    title({ id: 'b', title: 'Title B', releaseDate: '2026-08-27' }),
+  ])
+  assert.deepEqual(ordered.map((item) => item.id), ['a', 'b', 'c'])
+})
+
+test('a title with no release date sorts after every dated title, regardless of author', () => {
+  const ordered = projection.projectPublicCatalogTitles([
+    title({ id: 'undated', title: 'Undated Title', releaseDate: '', authorDisplayName: 'A Author' }),
+    title({ id: 'dated', title: 'Zzz Dated Title', releaseDate: '2020-01-01', authorDisplayName: 'Z Author' }),
+  ])
+  assert.deepEqual(ordered.map((item) => item.id), ['dated', 'undated'])
+})
+
+test('multiple titles with no release date sort A-Z among themselves', () => {
+  const ordered = projection.projectPublicCatalogTitles([
+    title({ id: 'b', title: 'Undated B', releaseDate: '' }),
+    title({ id: 'a', title: 'Undated A', releaseDate: '' }),
   ])
   assert.deepEqual(ordered.map((item) => item.id), ['a', 'b'])
+})
+
+test('ordering uses only the canonical release date field, never createdon/modifiedon or any other administrative timestamp', () => {
+  // CatalogTitleSummary has no createdon/modifiedon field at all — projection
+  // ordering can only ever read releaseDate. This fixture proves that even
+  // when a record's releaseDate is earlier than another's, it is not
+  // reordered by some other (nonexistent, here) timestamp field smuggled
+  // onto the object.
+  const ordered = projection.projectPublicCatalogTitles([
+    title({ id: 'real-newer', title: 'Real Newer', releaseDate: '2026-01-01', createdon: '2020-01-01', modifiedon: '2020-01-01' }),
+    title({ id: 'real-older', title: 'Real Older', releaseDate: '2020-01-01', createdon: '2026-01-01', modifiedon: '2026-01-01' }),
+  ])
+  assert.deepEqual(ordered.map((item) => item.id), ['real-newer', 'real-older'])
 })
 
 test('lifecycle transition to post-publication requires public catalog projection artifact', () => {
