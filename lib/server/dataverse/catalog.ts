@@ -411,13 +411,83 @@ async function withCatalogRead<T>(
     }
   }
 
+  // Resilient read: a Dataverse 401 does not necessarily mean the credential
+  // is wrong — it can mean the specific token this request obtained was
+  // rejected (expired, or otherwise stale by the time it reached Dataverse).
+  // Discard that token and request exactly one fresh one before giving up.
+  // This must never retry more than once, and a second rejection always
+  // fails closed rather than looping.
   try {
     const token = await getDataverseAccessToken(config.value)
     return { ok: true, data: await read(config.value, token) }
-  } catch (error) {
-    console.error('Dataverse catalog read failed.', summarizeError(error))
-    return { ok: false, error: summarizeError(error) }
+  } catch (firstError) {
+    if (!isDataverseUnauthorizedError(firstError)) {
+      console.error('Dataverse catalog read failed.', summarizeError(firstError))
+      return { ok: false, error: summarizeError(firstError) }
+    }
+
+    console.warn('Dataverse catalog read rejected (401); discarding token and retrying once.', {
+      ...safeErrorDetails(firstError),
+    })
+
+    try {
+      const freshToken = await getDataverseAccessToken(config.value)
+      const data = await read(config.value, freshToken)
+      console.info('Dataverse catalog read succeeded on retry after a discarded/rejected token.')
+      return { ok: true, data }
+    } catch (secondError) {
+      console.error('Dataverse catalog read failed closed after one retry.', {
+        first: safeErrorDetails(firstError),
+        second: safeErrorDetails(secondError),
+      })
+      return { ok: false, error: summarizeError(secondError) }
+    }
   }
+}
+
+class DataverseUnauthorizedError extends Error {
+  readonly status: number
+  readonly entitySet: string
+  readonly dataverseErrorCode?: string
+  readonly dataverseMessage?: string
+  readonly serviceRequestId?: string
+
+  constructor(params: {
+    status: number
+    entitySet: string
+    dataverseErrorCode?: string
+    dataverseMessage?: string
+    serviceRequestId?: string
+  }) {
+    super(`dataverse_catalog_read_failed:${params.entitySet}:${params.status}`)
+    this.name = 'DataverseUnauthorizedError'
+    this.status = params.status
+    this.entitySet = params.entitySet
+    this.dataverseErrorCode = params.dataverseErrorCode
+    this.dataverseMessage = params.dataverseMessage
+    this.serviceRequestId = params.serviceRequestId
+  }
+}
+
+function isDataverseUnauthorizedError(error: unknown): error is DataverseUnauthorizedError {
+  return error instanceof DataverseUnauthorizedError && error.status === 401
+}
+
+// Safe, non-secret error details for logs: HTTP status, Dataverse's own
+// error code/message (never a header, never a token), and the correlation
+// ID Dataverse returns for support/escalation. Never includes the
+// Authorization header, access token, or client secret.
+function safeErrorDetails(error: unknown) {
+  if (error instanceof DataverseUnauthorizedError) {
+    return {
+      status: error.status,
+      entitySet: error.entitySet,
+      dataverseErrorCode: error.dataverseErrorCode,
+      dataverseMessage: error.dataverseMessage,
+      serviceRequestId: error.serviceRequestId,
+    }
+  }
+  return { message: summarizeError(error) }
 }
 
 function getCatalogConfig(): { ok: true; value: DataverseCatalogConfig } | { ok: false; missing: string[] } {
@@ -474,6 +544,10 @@ async function getDataverseAccessToken(config: DataverseCatalogConfig) {
       client_secret: config.clientSecret,
       scope: `${config.resourceUrl}/.default`,
     }),
+    // Explicit, not inherited from the route segment's `dynamic` config: a
+    // token response must never be served from Next.js's fetch Data Cache.
+    // Every catalog read gets its own token request.
+    cache: 'no-store',
   })
 
   const json = await response.json().catch(() => null)
@@ -516,6 +590,17 @@ async function dataverseGetCollection(
   })
 
   if (!response.ok) {
+    if (response.status === 401) {
+      const body = await response.json().catch(() => null)
+      const dvError = isRecord(body) && isRecord(body.error) ? body.error : null
+      throw new DataverseUnauthorizedError({
+        status: response.status,
+        entitySet,
+        dataverseErrorCode: typeof dvError?.code === 'string' ? dvError.code : undefined,
+        dataverseMessage: typeof dvError?.message === 'string' ? dvError.message : undefined,
+        serviceRequestId: response.headers.get('x-ms-service-request-id') || undefined,
+      })
+    }
     throw new Error(`dataverse_catalog_read_failed:${entitySet}:${response.status}`)
   }
 
