@@ -76,8 +76,18 @@ export type AuthorOtpDeps = {
 export type ResolvedAuthorOtpContact = {
   contactId: string
   email: string
+  primaryEmail: string
   name: string
+  authorProfileId: string
 }
+
+type AuthorOtpContactLoginField = 'emailaddress1' | 'emailaddress2' | 'emailaddress3' | 'adx_identity_username'
+
+const DEFAULT_AUTHOR_OTP_CONTACT_LOGIN_FIELDS: AuthorOtpContactLoginField[] = [
+  'emailaddress1',
+  'emailaddress2',
+  'emailaddress3',
+]
 
 export function normalizeAuthorEmail(value?: string | null) {
   return value?.trim().toLowerCase() || ''
@@ -298,11 +308,22 @@ export async function resolveReturningAuthorContactByEmail(email: string): Promi
   const config = getDataverseServerConfig()
   if (!config) return null
 
+  const loginFields = getAuthorOtpContactLoginFields()
   const escaped = escapeODataText(normalizedEmail)
+  const emailFilters = loginFields.map((field) => `${field} eq '${escaped}'`)
   const contacts = await dataverseList(config, 'contacts', {
-    $select: 'contactid,fullname,emailaddress1,emailaddress2,emailaddress3,jm1pub_isauthor,statecode,statuscode',
-    $filter:
-      `statecode eq 0 and (emailaddress1 eq '${escaped}' or emailaddress2 eq '${escaped}' or emailaddress3 eq '${escaped}' or adx_identity_username eq '${escaped}')`,
+    $select: [
+      'contactid',
+      'fullname',
+      'emailaddress1',
+      'emailaddress2',
+      'emailaddress3',
+      'adx_identity_username',
+      'jm1pub_isauthor',
+      'statecode',
+      'statuscode',
+    ].join(','),
+    $filter: `statecode eq 0 and (${emailFilters.join(' or ')})`,
     $top: '2',
   })
   if (contacts.length !== 1) return null
@@ -316,17 +337,79 @@ export async function resolveReturningAuthorContactByEmail(email: string): Promi
     $filter: `_jm1_contact_value eq ${contactId} and statecode eq 0`,
     $top: '2',
   })
-  if (profiles.length < 1) return null
+  return resolveAuthorOtpContactFromRows({
+    email: normalizedEmail,
+    contacts,
+    profiles,
+    loginFields,
+  })
+}
+
+export function resolveAuthorOtpContactFromRows({
+  email,
+  contacts,
+  profiles,
+  loginFields = getAuthorOtpContactLoginFields(),
+}: {
+  email: string
+  contacts: DataverseRow[]
+  profiles: DataverseRow[]
+  loginFields?: AuthorOtpContactLoginField[]
+}): ResolvedAuthorOtpContact | null {
+  const normalizedEmail = normalizeAuthorEmail(email)
+  if (!normalizedEmail) return null
+
+  const matchingContacts = contacts.filter((contact) =>
+    loginFields.some((field) => normalizeAuthorEmail(stringValue(contact[field])) === normalizedEmail),
+  )
+  if (matchingContacts.length !== 1) return null
+
+  const contact = matchingContacts[0]
+  if (contact.jm1pub_isauthor === false) return null
+
+  const contactId = dataverseLookupId(contact, 'contactid')
+  if (!contactId) return null
+
+  const matchingProfiles = profiles.filter((profile) => {
+    const profileContactId = dataverseLookupId(profile, '_jm1_contact_value')
+    return profileContactId.toLowerCase() === contactId.toLowerCase()
+  })
+  if (matchingProfiles.length !== 1) return null
+
+  const authorProfileId = dataverseLookupId(matchingProfiles[0], 'jm1_authorprofileid')
+  if (!authorProfileId) return null
+
+  const primaryEmail =
+    normalizeAuthorEmail(stringValue(contact.emailaddress1)) ||
+    normalizeAuthorEmail(stringValue(contact.emailaddress2)) ||
+    normalizeAuthorEmail(stringValue(contact.emailaddress3)) ||
+    normalizedEmail
 
   return {
     contactId,
-    email:
-      normalizeAuthorEmail(stringValue(contact.emailaddress1)) ||
-      normalizeAuthorEmail(stringValue(contact.emailaddress2)) ||
-      normalizeAuthorEmail(stringValue(contact.emailaddress3)) ||
-      normalizedEmail,
+    email: normalizedEmail,
+    primaryEmail,
     name: stringValue(contact.fullname) || 'Author',
+    authorProfileId,
   }
+}
+
+export function getAuthorOtpContactLoginFields(): AuthorOtpContactLoginField[] {
+  const configured = (process.env.AUTHOR_EMAIL_OTP_CONTACT_LOGIN_FIELDS || '')
+    .split(',')
+    .map((field) => field.trim().toLowerCase())
+    .filter(Boolean)
+
+  const requested = configured.length > 0 ? configured : DEFAULT_AUTHOR_OTP_CONTACT_LOGIN_FIELDS
+  const supported = new Set<AuthorOtpContactLoginField>([
+    'emailaddress1',
+    'emailaddress2',
+    'emailaddress3',
+    'adx_identity_username',
+  ])
+  const fields = requested.filter((field): field is AuthorOtpContactLoginField => supported.has(field as AuthorOtpContactLoginField))
+
+  return fields.length > 0 ? [...new Set(fields)] : [...DEFAULT_AUTHOR_OTP_CONTACT_LOGIN_FIELDS]
 }
 
 export async function sendAuthorOtpEmail(input: {
