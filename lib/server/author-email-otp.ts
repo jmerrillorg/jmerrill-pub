@@ -1,5 +1,4 @@
 import { createHash, createHmac, randomInt, randomUUID, timingSafeEqual } from 'node:crypto'
-import { EmailClient, type EmailMessage } from '@azure/communication-email'
 
 import {
   dataverseCreate,
@@ -256,7 +255,7 @@ export class DataverseAuthorOtpChallengeStore implements AuthorOtpChallengeStore
   async findActiveByChallenge(challengeId: string) {
     if (!this.config) throw new Error('dataverse_config_missing')
     const row = await dataverseFirst(this.config, 'jm1_executionlogs', {
-      $select: 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription,@odata.etag',
+      $select: 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription',
       $filter: `jm1_name eq '${escapeODataText(otpLogName(challengeId))}' and jm1_actiontype eq '${CHALLENGE_ACTION_TYPE}'`,
     })
     return row ? hydrateStoreRecord(row) : null
@@ -265,7 +264,7 @@ export class DataverseAuthorOtpChallengeStore implements AuthorOtpChallengeStore
   async listRecentByEmailHash(emailHash: string, sinceIso: string) {
     if (!this.config) throw new Error('dataverse_config_missing')
     const rows = await dataverseList(this.config, 'jm1_executionlogs', {
-      $select: 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription,@odata.etag',
+      $select: 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription',
       $filter: `jm1_actiontype eq '${CHALLENGE_ACTION_TYPE}' and jm1_startedon ge ${sinceIso}`,
       $orderby: 'jm1_startedon desc',
       $top: '50',
@@ -337,8 +336,9 @@ export async function sendAuthorOtpEmail(input: {
   expiresAt: string
   correlationId: string
 }) {
-  const connectionString = process.env.ACS_EMAIL_CONNECTION_STRING || process.env.AZURE_COMMUNICATION_EMAIL_CONNECTION_STRING || ''
-  if (!connectionString) throw new Error('author_otp_email_connection_missing')
+  const relayUrl = process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL || process.env.JM1_INTERNAL_NOTIFICATION_RELAY_URL || ''
+  const relayKey = process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY || process.env.JM1_INTERNAL_NOTIFICATION_RELAY_KEY || ''
+  if (!relayUrl.trim() || !relayKey.trim()) throw new Error('author_otp_relay_configuration_missing')
 
   const expiresMinutes = Math.max(1, Math.ceil((Date.parse(input.expiresAt) - Date.now()) / 60000))
   const text = [
@@ -364,25 +364,47 @@ export async function sendAuthorOtpEmail(input: {
   const validation = validatePublishingOutboundEmail(draft)
   if (!validation.ok) throw new Error(validation.blocker)
 
-  const client = new EmailClient(connectionString)
-  const message: EmailMessage = {
-    senderAddress: PUBLISHING_EMAIL_CANON.outboundFrom,
-    replyTo: [{ address: PUBLISHING_EMAIL_CANON.replyTo, displayName: 'J Merrill Publishing' }],
-    content: {
+  const response = await fetch(`${relayUrl.trim().replace(/\/$/, '')}/api/send-approved-author-response`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-jm1-relay-key': relayKey.trim(),
+    },
+    body: JSON.stringify({
+      messageType: 'APPROVED_AUTHOR_RESPONSE',
+      intakeReferenceCode: input.correlationId,
+      diagnosticId: input.correlationId,
+      authorEmail: input.to,
+      to: input.to,
+      authorName: input.authorName,
+      projectTitle: 'Author Operating Center',
       subject: draft.subject,
-      plainText: draft.text,
-      html,
-    },
-    recipients: {
-      to: draft.to.map((address) => ({ address })),
-      cc: (draft.cc || []).map((address) => ({ address })),
-    },
+      body: draft.text,
+      htmlBody: html,
+      templateName: 'AUTHOR_EMAIL_OTP_LOGIN_V1',
+      templateVersion: AUTHOR_EMAIL_OTP_POLICY,
+      templateMetadata: {
+        qualityGate: 'AUTHOR_EMAIL_OTP_LOGIN',
+        brandSystem: 'J Merrill Publishing',
+        enterpriseStandard: 'JM1-COM-001',
+        renderer: 'author-email-otp',
+        rendererVersion: AUTHOR_EMAIL_OTP_POLICY,
+        renderMode: 'CANONICAL_HTML',
+      },
+      approvedBy: 'J Merrill Publishing author access policy',
+      approvedOn: new Date().toISOString(),
+      internalVisibilityMailbox: PUBLISHING_EMAIL_CANON.archiveCopy,
+      futureSendRequiresInternalCopy: true,
+      futureSendRequiresDataverseLog: true,
+    }),
+  })
+  const result = await response.json().catch(() => ({}))
+  if (!response.ok || result.accepted !== true) {
+    throw new Error(result.code || result.reason || `author_otp_relay_rejected:${response.status}`)
   }
-  const poller = await client.beginSend(message)
-  const result = await poller.pollUntilDone()
   return {
-    provider: 'acs-email',
-    providerMessageId: result.id || 'not-returned-by-provider',
+    provider: result.provider || 'acs-email-relay',
+    providerMessageId: result.providerMessageId || 'not-returned-by-provider',
   }
 }
 
