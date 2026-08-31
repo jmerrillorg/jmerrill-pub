@@ -36,6 +36,14 @@ export async function GET() {
       id: title.id,
       slug: title.slug,
       title: title.title,
+      // Canonical jm1pub_releasedate -> CatalogTitleSummary.releaseDate,
+      // already computed in lib/server/dataverse/catalog.ts and already the
+      // field projectPublicCatalogTitles() sorts by (see
+      // lib/catalog/public-projection.ts). This route was simply never
+      // serializing it — no new date logic here, just exposing the existing
+      // value. Empty string (no release date on record) is preserved as-is
+      // rather than coerced to null, matching CatalogTitleSummary's own type.
+      releaseDate: title.releaseDate,
       authorDisplayName: title.authorDisplayName,
       authors: title.authors.map((author) => ({
         slug: author.slug,
