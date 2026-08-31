@@ -283,6 +283,19 @@ test('public API exposes a sanitized projection route', () => {
   assert.doesNotMatch(route, /clientSecret|tenantId|DATAVERSE_CLIENT_SECRET|legalAuthorName/)
 })
 
+test('public API payload exposes releaseDate, sourced from title.releaseDate directly (no second date computation)', () => {
+  const route = readFileSync('app/api/public-catalog/route.ts', 'utf8')
+  assert.match(route, /releaseDate:\s*title\.releaseDate/)
+})
+
+test('/books consumes the same sorted projection as the API route — no second sort implementation', () => {
+  const booksPage = readFileSync('app/books/page.tsx', 'utf8')
+  assert.match(booksPage, /listPublicCatalogTitles/)
+  // The only .sort() call in this file is the unrelated imprint-filter list;
+  // it must not re-sort the books array itself by any date/title logic.
+  assert.doesNotMatch(booksPage, /books\.sort\(/)
+})
+
 test('runtime pages do not import the legacy static books catalog', () => {
   const sourceGuard = readFileSync('scripts/check-catalog-runtime-source.mjs', 'utf8')
   assert.match(sourceGuard, /Do not add runtime imports of data\/books\.json/)
