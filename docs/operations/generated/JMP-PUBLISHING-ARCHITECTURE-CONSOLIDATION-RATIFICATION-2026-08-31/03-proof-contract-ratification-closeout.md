@@ -60,7 +60,7 @@ Remaining governance risks at the time this Proof Contract closeout was created 
 | Internal validation title proof segment | NOT YET SELECTED / NOT YET EXECUTED |
 | Freeze exit | NOT MET / REQUIRES JACKIE DECISION PACKET |
 
-Later status note: Path B v0.9 was subsequently ratified in `05-path-b-ratification-closeout.md`. The Capability Maturity Model extension remains CANON-CANDIDATE / NOT RATIFIED.
+Later status note: Path B v0.9 was subsequently ratified in `05-path-b-ratification-closeout.md`. The Capability Maturity Model extension was subsequently ratified in `07-cmm-ratification-closeout.md`. This table preserves the point-in-time state at Proof Contract ratification.
 
 ## Recommendation
 
@@ -70,4 +70,4 @@ Do not claim `AUTONOMOUS_SUCCESSFUL_PROOF` or `AUTONOMOUSLY_PROVEN` for affected
 
 ## Boundary
 
-No runtime code, schema, workflow, deployment, author communication, Stripe, SharePoint, Business Central, website, mailbox, production infrastructure, Path B implementation, or CMM extension ratification occurred.
+No runtime code, schema, workflow, deployment, author communication, Stripe, SharePoint, Business Central, website, mailbox, production infrastructure, Path B implementation, or CMM extension implementation occurred in this Proof Contract ratification pass.

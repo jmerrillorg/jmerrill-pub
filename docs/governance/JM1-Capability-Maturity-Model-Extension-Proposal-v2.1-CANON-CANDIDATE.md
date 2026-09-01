@@ -1,11 +1,14 @@
 # JM1 Capability Maturity Model Extension Proposal v2.1
 
-Classification: CANON-CANDIDATE / EXTENSION PROPOSAL
-Ratification status: NOT CANON / NOT YET RATIFIED
+Classification: CANONICAL CAPABILITY MATURITY MODEL EXTENSION
+Ratification status: RATIFIED BY FOUNDER DECISION, 2026-09-01
 Authority lane: 01_GOVERNANCE
 Prepared: 2026-08-31
 Relationship to existing model: Proposal only; does not silently modify, replace, or supersede Capability Maturity Model v2.0 or the earlier capability maturity registry.
 Implementation authority: NO
+Founder ruling captured: Publishing Architecture Consolidation handoff, 2026-08-31
+Ratification ruling captured: RATIFY_WITH_NARROW_CLARIFICATIONS, 2026-09-01
+Filename note: filename retains the original canon-candidate branch path for PR continuity; this header is the governing status.
 
 ## 1. Executive Read
 
@@ -19,7 +22,7 @@ The proposed ladder is:
 4. PROVEN
 5. AUTONOMOUSLY_PROVEN
 
-This is candidate language only. It does not alter current maturity records unless Jackie separately ratifies the extension.
+This extension is ratified as a classification framework only. It does not alter current maturity records, authorize implementation, or promote any existing capability without a separate evidence-backed maturity evaluation.
 
 ## 2. Architecture Impact
 
@@ -50,7 +53,7 @@ Existing evidence shows two maturity lineages in the repository:
 - The security baseline package records maturity using Designed, Entitled, Activated, Proven fields and cites PROGRAM-004 Amendment 1 Annex S and Maturity Model v2.0 record fields.
 - The earlier JM1 Capability Maturity Registry uses Levels 0-3: Concept, Proof, Provisionally Certified, Enterprise Certified.
 
-This proposal does not reconcile those lineages by force. It proposes a future extension that Jackie can ratify after review.
+This extension does not reconcile those lineages by force. Existing maturity levels and prior classifications remain preserved unless separately mapped through governed evidence.
 
 ### Candidate Rule for PROVEN
 
@@ -66,7 +69,94 @@ This proposal does not reconcile those lineages by force. It proposes a future e
 - with observability sufficient to diagnose success/failure;
 - with governed dependency readiness;
 - with ALM controls sufficient for the dependency scope;
-- with idempotency and replay evidence where applicable.
+- with idempotency and replay evidence where applicable;
+- with repeatability or reproducibility evidence where applicable;
+- with negative proof that prohibited side effects did not occur where applicable;
+- with rollback or recovery behavior proven or explicitly governed as not applicable.
+
+`AUTONOMOUSLY_PROVEN` requires an applicable Proof Contract PASS, but:
+
+`PROOF_CONTRACT_PASS != AUTOMATIC_MATURITY_PROMOTION`.
+
+Proof establishes evidence for a defined claim. Maturity classifies the demonstrated state of the capability. Promotion to `AUTONOMOUSLY_PROVEN` requires all maturity-level criteria in addition to the applicable Proof Contract result.
+
+`manual_intervention_count == 0` is necessary for an autonomous-operation claim, but is not independently sufficient to classify a capability `AUTONOMOUSLY_PROVEN`. Zero manual intervention does not compensate for failed required outcomes, missing authority, missing security proof, missing negative proof, hidden fallback, non-repeatable execution, missing recovery evidence, or insufficient observability.
+
+For event-driven behavior, autonomous maturity requires evidence of idempotency, replay safety, duplicate-event handling, deterministic rebuilding or recomputation where applicable, and prevention of duplicate external side effects. A single successful happy-path execution is insufficient by itself.
+
+A failure, rejection, partial execution, recovery event, exception, or approved deviation must not be concealed by a final successful state. The maturity evaluation must preserve evidence of what happened and classify the capability according to the full proof basis, not only the end state.
+
+### Authority Boundary
+
+Maturity classification never grants operational authority.
+
+`AUTHENTICATION != A5 CONSENT`.
+
+`AUTONOMOUSLY_PROVEN != A5 AUTHORITY`.
+
+A capability proven technically autonomous remains subject to the applicable A0-A5 authority requirement for the action being performed. Authentication, authorization to view, authorization to perform an operational action, approval, acceptance, acknowledgment, final-proof approval, contractual consent, signature, and A5 consent are separate authority concepts.
+
+### Security Boundary
+
+Maturity classification cannot bypass security classification.
+
+`MATURITY_LEVEL != SECURITY_AUTHORIZATION`.
+
+`AUTONOMOUSLY_PROVEN` does not authorize access to or operation of Security Tier 2 capabilities. This includes, where applicable, royalties, contracts, payment records, payout information, financial information, and other sensitive protected data. Those capabilities retain their independent security proof and activation gates.
+
+### Lifecycle Boundary
+
+Capability maturity is not lifecycle state.
+
+`CAPABILITY_MATURITY != LIFECYCLE_STATE`.
+
+Capability maturity cannot advance lifecycle state, override lifecycle state, substitute for a Transition Contract, create alternate lifecycle authority, or override the Authority Matrix. The canonical Publishing lifecycle remains governed separately under the ratified Path B architecture amendment and the existing lifecycle authority model.
+
+### Scope and Authorization Boundary
+
+The maturity model is classificatory, not a roadmap or authorization mechanism.
+
+`MATURITY_TARGET != COMMITTED_SCOPE`.
+
+`CANONICAL_MATURITY_MODEL != AUTHORIZATION_TO_IMPLEMENT`.
+
+A maturity level or maturity target does not mean JM1 has committed to build, funded, scheduled, placed on the roadmap, authorized runtime implementation, authorized deployment, or authorized production activation for the capability.
+
+### Currentness and Invalidation
+
+Maturity evidence must remain current to support a current maturity claim. Use the following minimal evidence-currentness statuses:
+
+| Status | Meaning |
+|---|---|
+| CURRENT | The evidence basis still applies to the capability, scope, environment, authority, dependencies, security posture, and runtime being claimed. |
+| STALE | The evidence basis may no longer apply and must be reevaluated before supporting a current maturity claim. |
+| INVALIDATED | The evidence basis no longer supports the claimed maturity level. |
+| SUPERSEDED | A newer governed proof or maturity evaluation replaces the prior evidence basis. |
+
+Reevaluation is required after material code changes, architecture changes, dependency changes, security changes, authority-policy changes, environment changes, regressions, failed production proof, newly discovered manual intervention, observability failures, or invalidated or superseded proof evidence. A stale or invalidated proof basis cannot support a current `AUTONOMOUSLY_PROVEN` claim.
+
+### False-Positive Protection
+
+None of the following, standing alone, prove `AUTONOMOUSLY_PROVEN`:
+
+| Signal | Required interpretation |
+|---|---|
+| HTTP 200 | HTTP 200 != AUTONOMOUSLY_PROVEN |
+| Successful deployment | DEPLOYED != AUTONOMOUSLY_PROVEN |
+| No logged exception | NO_LOGGED_EXCEPTION != AUTONOMOUS_SUCCESS |
+| Authentication success | AUTHENTICATION_SUCCESS != A5_CONSENT_OR_AUTONOMOUS_PROOF |
+| User click | USER_CLICK != A5_CONSENT_OR_AUTONOMOUS_PROOF |
+| Workflow completion flag | WORKFLOW_COMPLETION_FLAG != CAPABILITY_AUTONOMY_PROVEN |
+| Record creation | RECORD_CREATED != CAPABILITY_AUTONOMY_PROVEN |
+| Evidence-file existence | EVIDENCE_EXISTS != CLAIM_PROVEN |
+| Single happy-path execution | SINGLE_HAPPY_PATH != AUTONOMOUSLY_PROVEN |
+| Manual operator completion | MANUAL_COMPLETION != AUTONOMOUSLY_PROVEN |
+| Manual fallback | MANUAL_FALLBACK != AUTONOMOUS_SUCCESS |
+| Founder approval | FOUNDER_APPROVAL != CAPABILITY_AUTONOMY_PROVEN |
+| Architecture ratification | ARCHITECTURE_RATIFIED != CAPABILITY_AUTONOMY_PROVEN |
+| Test-suite PASS | TEST_SUITE_PASS != AUTONOMOUSLY_PROVEN |
+
+These may be evidence components where relevant, but they are not independently sufficient proof.
 
 ### Current ALM Ceiling
 
@@ -84,20 +174,30 @@ The primary risk is premature maturity promotion. If a capability depends on man
 
 The second risk is freezing all proof work until ALM is perfect. This proposal avoids that by preserving the useful distinction between functional proof and autonomous proof. Proof work may proceed while the maturity ceiling remains visible.
 
-The third risk is silent supersession of existing canon. This document is deliberately labeled as a proposal and does not change existing records until ratified.
+The third risk is silent supersession of existing canon. This extension does not change existing records unless a separate governed mapping or maturity-evaluation pass explicitly does so.
 
 ## 5. Recommendation
 
-Adopt this proposal only after the Proof Contract Standard has been reviewed. If ratified, apply it prospectively to capabilities evaluated under Proof Contracts and migrate older maturity records only through a governed mapping pass.
+Apply this extension prospectively to capabilities evaluated under Proof Contracts and migrate older maturity records only through a governed mapping pass.
+
+Existing `PROVEN` capabilities remain `PROVEN` unless independently qualified under the new `AUTONOMOUSLY_PROVEN` standard.
+
+`AUTOMATIC_PROVEN_PROMOTION = NO`.
+
+No bulk reclassification is authorized by this ratification.
 
 Recommended next decisions:
 
-1. Decide whether this proposal should become Capability Maturity Model v2.1.
-2. Decide whether existing Level 0-3 capability records should be mapped to the new ladder.
-3. Decide how to record `FUNCTIONALLY_PROVEN + ALM_MATURITY_BLOCK`.
-4. Decide which roles may assign or approve `AUTONOMOUSLY_PROVEN`.
+1. Decide whether existing Level 0-3 capability records should be mapped to the new ladder.
+2. Decide how to record `FUNCTIONALLY_PROVEN + ALM_MATURITY_BLOCK`.
+3. Decide which roles may assign or approve `AUTONOMOUSLY_PROVEN`.
 
 ## Validation Notes
 
-This proposal is consistent with the current proof discipline and the active Publishing discretionary architecture freeze. It supports proof work but prevents autonomous proof claims from exceeding dependency and ALM maturity.
+This extension is consistent with the current proof discipline, the ratified Proof Contract Standard, the ratified Path B architecture amendment, the existing Publishing lifecycle authority, A0-A5 authority controls, security-tier governance, and the active Publishing discretionary architecture freeze. It supports proof work but prevents autonomous proof claims from exceeding dependency and ALM maturity.
 
+Client-title automation freeze: ACTIVE.
+
+Publishing discretionary architecture freeze: ACTIVE.
+
+Runtime implementation authorized: NO.

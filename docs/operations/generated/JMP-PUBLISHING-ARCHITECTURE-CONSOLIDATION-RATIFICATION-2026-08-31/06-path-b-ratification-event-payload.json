@@ -24,6 +24,7 @@
   "createdOn": "2026-09-01T07:44:40Z",
   "notes": [
     "Dataverse write completed with query-first idempotency.",
-    "The source-controlled payload preserves the safe metadata written to jm1_executionlogs."
+    "The source-controlled payload preserves the safe metadata written to jm1_executionlogs.",
+    "Later status note: the CMM extension was subsequently ratified in a separate governance event."
   ]
 }

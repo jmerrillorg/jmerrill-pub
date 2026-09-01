@@ -65,11 +65,12 @@ Remaining governance risks are outside this artifact:
 | Internal validation title proof segment | NOT YET SELECTED / NOT YET EXECUTED |
 | Freeze exit | NOT MET / REQUIRES JACKIE DECISION PACKET |
 
+Later status note: The Capability Maturity Model extension was subsequently ratified in `07-cmm-ratification-closeout.md`. This table preserves the point-in-time state at Path B ratification.
+
 ## Recommendation
 
 Use Path B with the ratified Proof Contract Standard on the first internal validation title lifecycle segment. Do not implement Path B runtime behavior, schemas, flows, services, event infrastructure, Lifecycle Projection Engine runtime components, or Dataverse changes from this ratification alone.
 
 ## Boundary
 
-No runtime code, schema, workflow, deployment, author communication, Stripe, SharePoint, Business Central, website, mailbox, production infrastructure, or CMM extension ratification occurred.
-
+No runtime code, schema, workflow, deployment, author communication, Stripe, SharePoint, Business Central, website, mailbox, production infrastructure, or CMM extension implementation occurred in this Path B ratification pass.
