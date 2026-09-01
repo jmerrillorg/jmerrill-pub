@@ -41,6 +41,26 @@ export type CanonicalEvidenceStatus = 'SUPPORTED' | 'CONFLICT' | 'INCOMPLETE' | 
 
 export type CanonicalDataGapClassification = 'RESOLVABLE' | 'STRUCTURAL'
 
+export type CanonicalCommercialModel =
+  | 'CURRENT_MODEL'
+  | 'LEGACY_MODEL'
+  | 'GRANDFATHERED'
+  | 'ROYALTY_SHARE'
+  | 'COMPLIMENTARY_SPECIAL'
+  | 'OTHER_GOVERNED_EXCEPTION'
+  | 'DATA_GAP'
+
+export type CanonicalGateStatus = 'PASS' | 'BLOCKED' | 'NOT_APPLICABLE' | 'INSUFFICIENT_EVIDENCE'
+
+export type CanonicalStageTrustClassification =
+  | 'TRUSTED_STAGE'
+  | 'TRUSTED_STAGE_WITH_NONBLOCKING_DATA_GAP'
+  | 'RECONCILIATION_REQUIRED'
+  | 'INSUFFICIENT_TRANSITION_EVIDENCE'
+  | 'COMMERCIAL_GATE_BLOCKED'
+  | 'EDITORIAL_GATE_BLOCKED'
+  | 'LEGACY_GOVERNED_EXCEPTION'
+
 export type CanonicalEvidenceRecord = {
   source: string
   value: string
@@ -108,6 +128,14 @@ export type CanonicalPublisherProjectionInput = {
   correctCommercialContext?: boolean
   joinedFamilyEvidenceText?: string
   joinedFamilyEvent?: boolean
+  commercialModel?: CanonicalCommercialModel | string
+  authorAuthenticationEvidenceText?: string
+  authorDecisionEvidenceText?: string
+  authorDecisionCaptured?: boolean
+  authorApproved?: boolean
+  changesRequested?: boolean
+  holdRequested?: boolean
+  transitionAuthorized?: boolean
   workspaceProvisioningEvidenceText?: string
   formatEvidenceText?: string
   artifactEvidenceSource?: string
@@ -226,6 +254,21 @@ export type CanonicalPublisherReadModel = {
     transitionAuthority: string
     transitionEvidence: string
   }
+  stageTruth: {
+    commercialModel: CanonicalCommercialModel
+    commercialGateStatus: CanonicalGateStatus
+    editorialGateStatus: CanonicalGateStatus
+    trustClassification: CanonicalStageTrustClassification
+    blockingTransition: string
+    blockingEvidence: string
+    blockingPartyClass: WaitingOwner | 'NONE'
+    artifactAuthorityRequired: 'YES' | 'NO'
+    projectedStage: StageCode | 'DATA_GAP'
+    projectedSubstage: SubstageCode | 'DATA_GAP'
+    rawClaimedStage: StageCode | 'DATA_GAP'
+    rawClaimedSubstage: SubstageCode | 'DATA_GAP'
+    manualInterventionRequiredForRecompute: 'YES' | 'NO'
+  }
   waveC1EvidenceAuthority: {
     artifact: ReturnType<typeof evaluateWaveC1ArtifactAuthority>
     commercial: ReturnType<typeof evaluateWaveC1CommercialAuthority>
@@ -320,12 +363,20 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
       )
     : null
   const canonicalAuthority = canonicalAuthorityFor(input, rawStage?.stageCode || 'DATA_GAP', rawSubstage?.substageCode || 'DATA_GAP', mapping)
-  const stage = canonicalAuthority.isCurrentOperationalAuthority ? rawStage : null
-  const substage = canonicalAuthority.isCurrentOperationalAuthority ? rawSubstage : null
   const splitBrain = detectSplitBrain(input)
   const artifact = sourceArtifactFor(input, mapping)
   const lifecycleEvidence = lifecycleEvidenceFor(input, mapping, artifact)
   const waveC1EvidenceAuthority = waveC1EvidenceAuthorityFor(input, artifact)
+  const stageTruth = governedStageTruthFor(input, mapping, canonicalAuthority, lifecycleEvidence, waveC1EvidenceAuthority, rawStage?.stageCode || 'DATA_GAP', rawSubstage?.substageCode || 'DATA_GAP')
+  const governedStage = stageTruth.projectedStage === 'DATA_GAP'
+    ? null
+    : JMP_PUBLISHING_LIFECYCLE_REGISTRY.find((candidate) => candidate.stageCode === stageTruth.projectedStage) || null
+  const governedSubstage = stageTruth.projectedSubstage === 'DATA_GAP'
+    ? null
+    : (governedStage?.substages.find((candidate) => candidate.substageCode === stageTruth.projectedSubstage) ||
+      JMP_PUBLISHING_LIFECYCLE_REGISTRY.flatMap((candidate) => candidate.substages).find(
+        (candidate) => candidate.substageCode === stageTruth.projectedSubstage,
+      ) || null)
   const waitingOn = canonicalWaitingOwner(input)
   const systemAttention = canonicalAuthority.requiresReconciliation || !canonicalAuthority.isCurrentOperationalAuthority
     ? canonicalAuthority.requiresReconciliation
@@ -362,8 +413,16 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
           confidence: 'UNRESOLVED' as const,
           reason: mapping.notes,
         }
+      : stageTruth.trustClassification === 'COMMERCIAL_GATE_BLOCKED' ||
+        stageTruth.trustClassification === 'EDITORIAL_GATE_BLOCKED' ||
+        stageTruth.trustClassification === 'INSUFFICIENT_TRANSITION_EVIDENCE'
+        ? {
+            action: `Resolve ${stageTruth.blockingTransition}`,
+            confidence: 'UNRESOLVED' as const,
+            reason: stageTruth.blockingEvidence,
+          }
       : {
-          action: input.nextAction || nextActionFor(stage?.stageCode, substage?.substageCode, waitingOn),
+          action: input.nextAction || nextActionFor(governedStage?.stageCode, governedSubstage?.substageCode, waitingOn),
           confidence: 'CONFIRMED' as const,
           reason: 'Derived from canonical lifecycle projection and current Operating Center evidence.',
         }
@@ -375,17 +434,17 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     prospectCommercialState: commercialStateFor(input),
     authorRelationshipState: relationshipStateFor(input),
     titleLifecycleStage: {
-      code: stage?.stageCode || 'DATA_GAP',
-      number: stage ? String(stage.stageSequence).padStart(2, '0') : 'DATA_GAP',
-      label: stage ? stage.stageName : 'DATA_GAP',
+      code: governedStage?.stageCode || 'DATA_GAP',
+      number: governedStage ? String(governedStage.stageSequence).padStart(2, '0') : 'DATA_GAP',
+      label: governedStage ? governedStage.stageName : 'DATA_GAP',
     },
     titleLifecycleSubstage: {
-      code: substage?.substageCode || 'DATA_GAP',
-      number: stage && substage ? `${String(stage.stageSequence).padStart(2, '0')}${letterFor(substage.substageSequence)}` : 'DATA_GAP',
-      label: substage?.substageName || 'DATA_GAP',
-      applicability: substage?.substageCode === 'DEVELOPMENTAL_EDITING' && /starter/i.test(input.packageState || '')
+      code: governedSubstage?.substageCode || 'DATA_GAP',
+      number: governedStage && governedSubstage ? `${String(governedStage.stageSequence).padStart(2, '0')}${letterFor(governedSubstage.substageSequence)}` : 'DATA_GAP',
+      label: governedSubstage?.substageName || 'DATA_GAP',
+      applicability: governedSubstage?.substageCode === 'DEVELOPMENTAL_EDITING' && /starter/i.test(input.packageState || '')
         ? 'NOT_APPLICABLE'
-        : substage
+        : governedSubstage
           ? 'APPLICABLE'
           : 'DATA_GAP',
     },
@@ -400,6 +459,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     sourceArtifact: artifact,
     lifecycleEvidence,
     canonicalAuthority,
+    stageTruth,
     waveC1EvidenceAuthority,
     workingImprint: 'DATA_GAP',
     recommendedImprint: 'DATA_GAP',
@@ -426,6 +486,349 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     dataGaps,
     sourceAttribution: ['Dataverse', 'Publisher Operating Center read model', 'JMP lifecycle registry v1.0'],
   }
+}
+
+function governedStageTruthFor(
+  input: CanonicalPublisherProjectionInput,
+  mapping: LegacyMappingResult,
+  canonicalAuthority: CanonicalPublisherReadModel['canonicalAuthority'],
+  lifecycleEvidence: CanonicalPublisherReadModel['lifecycleEvidence'],
+  waveC1EvidenceAuthority: CanonicalPublisherReadModel['waveC1EvidenceAuthority'],
+  rawClaimedStage: StageCode | 'DATA_GAP',
+  rawClaimedSubstage: SubstageCode | 'DATA_GAP',
+): CanonicalPublisherReadModel['stageTruth'] {
+  const commercialModel = commercialModelFor(input, canonicalAuthority)
+  const claimedSequence = stageSequence(rawClaimedStage)
+  const text = stageTruthText(input)
+  const mapped = mapping.resultCode !== 'CANONICAL_MAPPING_CONFLICT' && mapping.resultCode !== 'CANONICAL_MAPPING_INCOMPLETE'
+
+  const base: Omit<CanonicalPublisherReadModel['stageTruth'], 'commercialGateStatus' | 'editorialGateStatus' | 'trustClassification' | 'blockingTransition' | 'blockingEvidence' | 'blockingPartyClass' | 'artifactAuthorityRequired' | 'projectedStage' | 'projectedSubstage'> = {
+    commercialModel,
+    rawClaimedStage,
+    rawClaimedSubstage,
+    manualInterventionRequiredForRecompute: 'NO',
+  }
+
+  if (!canonicalAuthority.isCurrentOperationalAuthority) {
+    return {
+      ...base,
+      commercialGateStatus: 'NOT_APPLICABLE',
+      editorialGateStatus: 'NOT_APPLICABLE',
+      trustClassification: canonicalAuthority.requiresReconciliation ? 'RECONCILIATION_REQUIRED' : 'INSUFFICIENT_TRANSITION_EVIDENCE',
+      blockingTransition: canonicalAuthority.requiresReconciliation ? 'CANONICAL_AUTHORITY_RECONCILIATION' : 'NONCURRENT_RECORD_SUPPRESSION',
+      blockingEvidence: canonicalAuthority.transitionEvidence,
+      blockingPartyClass: canonicalAuthority.requiresReconciliation ? 'JMP/System' : 'NONE',
+      artifactAuthorityRequired: 'NO',
+      projectedStage: 'DATA_GAP',
+      projectedSubstage: 'DATA_GAP',
+    }
+  }
+
+  if (!mapped || rawClaimedStage === 'DATA_GAP') {
+    return {
+      ...base,
+      commercialGateStatus: 'INSUFFICIENT_EVIDENCE',
+      editorialGateStatus: 'INSUFFICIENT_EVIDENCE',
+      trustClassification: 'INSUFFICIENT_TRANSITION_EVIDENCE',
+      blockingTransition: 'LIFECYCLE_MAPPING',
+      blockingEvidence: mapping.notes || 'No explicit lifecycle mapping can establish a governed stage.',
+      blockingPartyClass: 'JMP/System',
+      artifactAuthorityRequired: /artifact|manuscript|proof|layout|editorial/i.test(text) ? 'YES' : 'NO',
+      projectedStage: 'DATA_GAP',
+      projectedSubstage: 'DATA_GAP',
+    }
+  }
+
+  const commercialException = commercialModel !== 'CURRENT_MODEL'
+  const commercialGate = commercialGateFor(input, lifecycleEvidence, waveC1EvidenceAuthority, rawClaimedStage, commercialModel)
+  if (commercialGate.status === 'BLOCKED') {
+    return {
+      ...base,
+      commercialGateStatus: 'BLOCKED',
+      editorialGateStatus: 'NOT_APPLICABLE',
+      trustClassification: 'COMMERCIAL_GATE_BLOCKED',
+      blockingTransition: commercialGate.transition,
+      blockingEvidence: commercialGate.evidence,
+      blockingPartyClass: commercialGate.party,
+      artifactAuthorityRequired: 'NO',
+      projectedStage: commercialGate.projectedStage,
+      projectedSubstage: commercialGate.projectedSubstage,
+    }
+  }
+
+  if (commercialException && rawClaimedStage === 'POST_PUBLICATION') {
+    return {
+      ...base,
+      commercialGateStatus: commercialGate.status,
+      editorialGateStatus: 'NOT_APPLICABLE',
+      trustClassification: 'LEGACY_GOVERNED_EXCEPTION',
+      blockingTransition: 'NONE',
+      blockingEvidence: `${commercialModel} post-publication authority prevents false application of current-model commercial/editorial prerequisites.`,
+      blockingPartyClass: 'NONE',
+      artifactAuthorityRequired: 'NO',
+      projectedStage: rawClaimedStage,
+      projectedSubstage: rawClaimedSubstage,
+    }
+  }
+
+  const editorialGate = editorialGateFor(input, lifecycleEvidence, rawClaimedStage, rawClaimedSubstage)
+  if (editorialGate.status === 'BLOCKED') {
+    return {
+      ...base,
+      commercialGateStatus: commercialGate.status,
+      editorialGateStatus: 'BLOCKED',
+      trustClassification: 'EDITORIAL_GATE_BLOCKED',
+      blockingTransition: editorialGate.transition,
+      blockingEvidence: editorialGate.evidence,
+      blockingPartyClass: editorialGate.party,
+      artifactAuthorityRequired: editorialGate.artifactAuthorityRequired,
+      projectedStage: editorialGate.projectedStage,
+      projectedSubstage: editorialGate.projectedSubstage,
+    }
+  }
+
+  return {
+    ...base,
+    commercialGateStatus: commercialGate.status,
+    editorialGateStatus: editorialGate.status,
+    trustClassification: commercialException
+      ? 'LEGACY_GOVERNED_EXCEPTION'
+      : lifecycleEvidence.conflictCount > 0 || lifecycleEvidence.coverage.artifactChecksum === 'INCOMPLETE'
+        ? 'TRUSTED_STAGE_WITH_NONBLOCKING_DATA_GAP'
+        : 'TRUSTED_STAGE',
+    blockingTransition: 'NONE',
+    blockingEvidence: commercialException
+      ? `${commercialModel} prevents false application of current-model commercial prerequisites.`
+      : 'All applicable surfaced transition prerequisites pass for the projected stage.',
+    blockingPartyClass: 'NONE',
+    artifactAuthorityRequired: lifecycleEvidence.coverage.artifactIdentity === 'INCOMPLETE' && claimedSequence >= stageSequence('EDITORIAL_PRODUCTION') ? 'YES' : 'NO',
+    projectedStage: rawClaimedStage,
+    projectedSubstage: rawClaimedSubstage,
+  }
+}
+
+function commercialModelFor(
+  input: CanonicalPublisherProjectionInput,
+  canonicalAuthority: CanonicalPublisherReadModel['canonicalAuthority'],
+): CanonicalCommercialModel {
+  const explicit = normalize(String(input.commercialModel || ''))
+  if (explicit.includes('CURRENT')) return 'CURRENT_MODEL'
+  if (explicit.includes('GRANDFATHER')) return 'GRANDFATHERED'
+  if (explicit.includes('ROYALTY')) return 'ROYALTY_SHARE'
+  if (explicit.includes('COMPLIMENTARY') || explicit.includes('SPECIAL')) return 'COMPLIMENTARY_SPECIAL'
+  if (explicit.includes('LEGACY')) return 'LEGACY_MODEL'
+  if (explicit.includes('EXCEPTION')) return 'OTHER_GOVERNED_EXCEPTION'
+
+  const text = stageTruthText(input)
+  if (/GRANDFATHER|LEGACY 8 PAY|4%|FOUR PERCENT|OLD CONTRACT|PRIOR CONTRACT/.test(text)) return 'GRANDFATHERED'
+  if (/ROYALTY SHARE|TRADITIONAL|JM SIGNATURE|NO AUTHOR PAYMENT/.test(text)) return 'ROYALTY_SHARE'
+  if (/COMPLIMENTARY|SPECIAL|NO COST|SCHOLARSHIP/.test(text)) return 'COMPLIMENTARY_SPECIAL'
+  if (/PACKAGE_SELECTED|PACKAGE ACCEPTED|PAYMENT OPTION|PRICING LOCKED|SIGNED|PAID CONFIRMED/.test(text)) return 'CURRENT_MODEL'
+  if (canonicalAuthority.classification === 'CANONICAL_PUBLISHED_TITLE') return 'LEGACY_MODEL'
+  return 'DATA_GAP'
+}
+
+function commercialGateFor(
+  input: CanonicalPublisherProjectionInput,
+  lifecycleEvidence: CanonicalPublisherReadModel['lifecycleEvidence'],
+  waveC1EvidenceAuthority: CanonicalPublisherReadModel['waveC1EvidenceAuthority'],
+  claimedStage: StageCode | 'DATA_GAP',
+  commercialModel: CanonicalCommercialModel,
+) {
+  const claimedSequence = stageSequence(claimedStage)
+  const packageAccepted = lifecycleEvidence.commercial.packageAccepted.status === 'SUPPORTED' ||
+    /PACKAGE_SELECTED|PACKAGE ACCEPTED|ACCEPTED PACKAGE|AUTHOR SELECTED PACKAGE/.test(stageTruthText(input))
+  const agreementExecuted = waveC1EvidenceAuthority.commercial.agreementExecuted.status === 'SUPPORTED' &&
+    waveC1EvidenceAuthority.commercial.agreementExecuted.strength === 'AUTHORITATIVE'
+  const paymentReceived = waveC1EvidenceAuthority.commercial.initialPayment.status === 'SUPPORTED' &&
+    waveC1EvidenceAuthority.commercial.initialPayment.strength === 'AUTHORITATIVE'
+  const joined = agreementExecuted && paymentReceived
+
+  if (commercialModel !== 'CURRENT_MODEL') {
+    return {
+      status: commercialModel === 'DATA_GAP' && claimedSequence >= stageSequence('COMMERCIAL_ACTIVATION') ? 'INSUFFICIENT_EVIDENCE' as const : 'NOT_APPLICABLE' as const,
+      transition: 'NONE',
+      evidence: `${commercialModel} applicability does not force modern commercial prerequisites.`,
+      party: 'NONE' as const,
+      projectedStage: claimedStage,
+      projectedSubstage: 'DATA_GAP' as const,
+    }
+  }
+
+  if (claimedSequence >= stageSequence('COMMERCIAL_ACTIVATION') && !packageAccepted) {
+    return {
+      status: 'BLOCKED' as const,
+      transition: 'PACKAGE_ACCEPTED',
+      evidence: 'Current-model commercial activation requires package-acceptance evidence.',
+      party: 'Prospect' as const,
+      projectedStage: 'EDITORIAL_REVIEW_RECOMMENDATION' as const,
+      projectedSubstage: 'PUBLISHING_RECOMMENDATION' as const,
+    }
+  }
+
+  if (claimedSequence >= stageSequence('AUTHOR_ONBOARDING') && (!agreementExecuted || !paymentReceived)) {
+    return {
+      status: 'BLOCKED' as const,
+      transition: !agreementExecuted ? 'AGREEMENT_EXECUTED' : 'INITIAL_PAYMENT_RECEIVED',
+      evidence: 'Current-model Joined the Family requires authoritative executed-agreement proof plus required initial-payment proof.',
+      party: !agreementExecuted ? 'Author' as const : 'External' as const,
+      projectedStage: 'COMMERCIAL_ACTIVATION' as const,
+      projectedSubstage: 'COMMERCIAL_ACTIVATION_EVENT' as const,
+    }
+  }
+
+  return {
+    status: claimedSequence >= stageSequence('COMMERCIAL_ACTIVATION') ? 'PASS' as const : 'NOT_APPLICABLE' as const,
+    transition: joined ? 'JOINED_THE_FAMILY' : packageAccepted ? 'PACKAGE_ACCEPTED' : 'NONE',
+    evidence: joined
+      ? 'Agreement execution and initial payment are authoritative.'
+      : packageAccepted
+        ? 'Package acceptance is surfaced; Joined the Family is not required for this stage.'
+        : 'No commercial gate applies to this projected stage.',
+    party: 'NONE' as const,
+    projectedStage: claimedStage,
+    projectedSubstage: 'DATA_GAP' as const,
+  }
+}
+
+function editorialGateFor(
+  input: CanonicalPublisherProjectionInput,
+  lifecycleEvidence: CanonicalPublisherReadModel['lifecycleEvidence'],
+  claimedStage: StageCode | 'DATA_GAP',
+  claimedSubstage: SubstageCode | 'DATA_GAP',
+) {
+  const text = stageTruthText(input)
+  const claimedSequence = stageSequence(claimedStage)
+  const editorialSequence = editorialSubstageSequence(claimedSubstage)
+  const artifactIdentitySupported = lifecycleEvidence.artifact.identity.status === 'SUPPORTED'
+  const authorAuthenticated = /AUTHENTICATED|SESSION|LOGIN|PORTAL ACCESS/.test(text) || Boolean(input.authorAuthenticationEvidenceText)
+  const approvalCaptured =
+    input.authorApproved === true ||
+    input.transitionAuthorized === true ||
+    input.authorDecisionCaptured === true ||
+    /AUTHOR APPROVED|APPROVED_COPY|APPROVED_LINE|APPROVED_DEVELOPMENTAL|APPROVAL_EVIDENCE_BOUND|NEXTSTAGEAUTHORIZED|NEXT STAGE AUTHORIZED/.test(text)
+  const changesRequested = input.changesRequested === true || /CHANGES REQUESTED|REVISION REQUESTED|REQUESTED CHANGES/.test(text)
+  const holdRequested = input.holdRequested === true || /HOLD REQUESTED|AUTHOR HOLD|PROJECT HOLD/.test(text)
+
+  if (claimedSequence < stageSequence('EDITORIAL_PRODUCTION')) {
+    return {
+      status: 'NOT_APPLICABLE' as const,
+      transition: 'NONE',
+      evidence: 'No editorial sequence gate applies before editorial production.',
+      party: 'NONE' as const,
+      artifactAuthorityRequired: 'NO' as const,
+      projectedStage: claimedStage,
+      projectedSubstage: claimedSubstage,
+    }
+  }
+
+  if (changesRequested || holdRequested) {
+    return {
+      status: 'BLOCKED' as const,
+      transition: changesRequested ? 'AUTHOR_CHANGES_REQUESTED' : 'AUTHOR_HOLD_REQUESTED',
+      evidence: changesRequested ? 'Requested changes prevent later-stage advancement.' : 'Author hold preserves current gate without manufacturing advancement.',
+      party: 'Author' as const,
+      artifactAuthorityRequired: 'YES' as const,
+      projectedStage: 'EDITORIAL_PRODUCTION' as const,
+      projectedSubstage: priorAuthorReviewSubstage(claimedSubstage),
+    }
+  }
+
+  if (!artifactIdentitySupported) {
+    return {
+      status: 'BLOCKED' as const,
+      transition: 'CURRENT_ARTIFACT_BOUND',
+      evidence: 'Editorial production requires a current artifact bound to the canonical title; artifact existence alone is insufficient.',
+      party: 'JMP/System' as const,
+      artifactAuthorityRequired: 'YES' as const,
+      projectedStage: 'AUTHOR_ONBOARDING' as const,
+      projectedSubstage: 'AUTHOR_ONBOARDING_TASKS' as const,
+    }
+  }
+
+  if (claimedSequence >= stageSequence('BOOK_PRODUCTION') && !approvalCaptured) {
+    return {
+      status: 'BLOCKED' as const,
+      transition: authorAuthenticated ? 'AUTHOR_APPROVAL_NOT_AUTHENTICATION' : 'PRIOR_AUTHOR_GATE_RESOLVED',
+      evidence: authorAuthenticated
+        ? 'Author authentication is not final editorial approval and cannot authorize production movement.'
+        : 'Book production requires the applicable prior editorial author approval chain.',
+      party: 'Author' as const,
+      artifactAuthorityRequired: 'YES' as const,
+      projectedStage: 'BOOK_PRODUCTION' as const,
+      projectedSubstage: 'DATA_GAP' as const,
+    }
+  }
+
+  if (editorialSequence >= editorialSubstageSequence('LINE_EDITING') && !approvalCaptured) {
+    return {
+      status: 'BLOCKED' as const,
+      transition: authorAuthenticated ? 'AUTHOR_APPROVAL_NOT_AUTHENTICATION' : 'PRIOR_AUTHOR_GATE_RESOLVED',
+      evidence: authorAuthenticated
+        ? 'Author authentication is not author approval and cannot authorize the next editorial stage.'
+        : 'Later editorial stage requires resolved prior author approval evidence.',
+      party: 'Author' as const,
+      artifactAuthorityRequired: 'YES' as const,
+      projectedStage: 'EDITORIAL_PRODUCTION' as const,
+      projectedSubstage: priorAuthorReviewSubstage(claimedSubstage),
+    }
+  }
+
+  return {
+    status: 'PASS' as const,
+    transition: 'EDITORIAL_TRANSITION_PREREQUISITES',
+    evidence: 'Applicable editorial transition prerequisites are surfaced.',
+    party: 'NONE' as const,
+    artifactAuthorityRequired: 'NO' as const,
+    projectedStage: claimedStage,
+    projectedSubstage: claimedSubstage,
+  }
+}
+
+function stageSequence(stage: StageCode | 'DATA_GAP') {
+  return JMP_PUBLISHING_LIFECYCLE_REGISTRY.find((candidate) => candidate.stageCode === stage)?.stageSequence || 0
+}
+
+function editorialSubstageSequence(substage: SubstageCode | 'DATA_GAP') {
+  const found = JMP_PUBLISHING_LIFECYCLE_REGISTRY
+    .find((stage) => stage.stageCode === 'EDITORIAL_PRODUCTION')
+    ?.substages.find((candidate) => candidate.substageCode === substage)
+  return found?.substageSequence || 0
+}
+
+function priorAuthorReviewSubstage(substage: SubstageCode | 'DATA_GAP'): SubstageCode {
+  if (substage === 'COPYEDITING' || substage === 'COPY_AUTHOR_REVIEW') return 'LINE_AUTHOR_REVIEW'
+  if (substage === 'LINE_EDITING' || substage === 'LINE_AUTHOR_REVIEW') return 'DEVELOPMENTAL_AUTHOR_REVIEW'
+  return 'DEVELOPMENTAL_AUTHOR_REVIEW'
+}
+
+function stageTruthText(input: CanonicalPublisherProjectionInput) {
+  return normalize([
+    input.legacySourceState,
+    input.pipelineStage,
+    input.editorialStage,
+    input.substage,
+    input.packageState,
+    input.qaState,
+    input.executionState,
+    input.dependency,
+    input.exactBlocker,
+    input.commercialEvidenceText,
+    input.pricingEvidenceText,
+    input.agreementEvidenceText,
+    input.contractStatus,
+    input.providerStatus,
+    input.paymentEvidenceText,
+    input.firstPaymentStatus,
+    input.firstPaymentConfirmedOn,
+    input.firstPaymentConfirmationSource,
+    input.joinedFamilyEvidenceText,
+    input.authorAuthenticationEvidenceText,
+    input.authorDecisionEvidenceText,
+    input.artifactEvidenceSource,
+    input.artifactStorageReference,
+    ...(input.evidenceLinks || []).flatMap((link) => [link.label, link.href, link.checksum || '', link.artifactType || '', link.version || '']),
+  ].filter(Boolean).join(' '))
 }
 
 function canonicalAuthorityFor(
@@ -556,7 +959,11 @@ function waveC1EvidenceAuthorityFor(
 function legacyMappingInputForState(value: string, input: Partial<CanonicalPublisherProjectionInput>): LegacyMappingInput {
   const code = legacyCodeForState(value)
   return {
-    legacyAuthority: code.startsWith('J') ? 'Pipeline Register J0-J8' : input.legacyAuthority || 'PackageStageCode',
+    legacyAuthority: code.startsWith('J')
+      ? 'Pipeline Register J0-J8'
+      : code === 'PACKAGE_ACCEPTED'
+        ? 'Opportunity/Commercial'
+        : input.legacyAuthority || 'PackageStageCode',
     legacyValue: code,
     lifecycleContext: lifecycleContextFor(code, input),
     packageState: input.packageState,
@@ -573,6 +980,7 @@ function legacyCodeForState(value: string) {
   if (normalized.includes('DEVELOPMENTAL')) return 'DEVELOPMENTAL_EDITING'
   if (normalized.includes('COVER')) return 'COVER_DESIGN'
   if (normalized.includes('PRODUCTION')) return 'PRODUCTION_PROOF'
+  if (normalized.includes('JOINED') || normalized.includes('FAMILY')) return 'J4 Onboarding'
   if (normalized.includes('PACKAGE ACCEPTED')) return 'PACKAGE_ACCEPTED'
   if (normalized.includes('RECOMMENDATION')) return 'J2 Recommendation'
   if (normalized.includes('EDITORIAL REVIEW')) return 'EDITORIAL_REVIEW'

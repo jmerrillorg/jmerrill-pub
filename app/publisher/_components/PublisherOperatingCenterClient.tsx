@@ -1460,6 +1460,16 @@ function TitleDetailDrawer({
           <MiniFact label="Joined the Family" value={`${card.canonicalLifecycle.joinedTheFamily.value} — ${card.canonicalLifecycle.joinedTheFamily.reason}`} />
         </DetailBlock>
 
+        <DetailBlock title="Stage Truth">
+          <MiniFact label="Trust" value={card.canonicalLifecycle.stageTruth.trustClassification} />
+          <MiniFact label="Commercial model" value={card.canonicalLifecycle.stageTruth.commercialModel} />
+          <MiniFact label="Commercial gate" value={card.canonicalLifecycle.stageTruth.commercialGateStatus} />
+          <MiniFact label="Editorial gate" value={card.canonicalLifecycle.stageTruth.editorialGateStatus} />
+          <MiniFact label="Blocking transition" value={card.canonicalLifecycle.stageTruth.blockingTransition} />
+          <MiniFact label="Blocking party" value={card.canonicalLifecycle.stageTruth.blockingPartyClass} />
+          <MiniFact label="Artifact authority needed" value={card.canonicalLifecycle.stageTruth.artifactAuthorityRequired} />
+        </DetailBlock>
+
         <DetailBlock title="Waiting / Attention / Next Action">
           <MiniFact label="Waiting On" value={card.canonicalLifecycle.waitingOn} />
           <MiniFact label="System Attention" value={`${card.canonicalLifecycle.systemAttention.code} — ${card.canonicalLifecycle.systemAttention.reason}`} />

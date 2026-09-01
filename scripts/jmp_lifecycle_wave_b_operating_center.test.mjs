@@ -17,8 +17,12 @@ const created = []
 for (const [shimPath, target] of shims) {
   const shim = new URL(shimPath, import.meta.url)
   if (!existsSync(shim)) {
-    symlinkSync(target, shim)
-    created.push(shim)
+    try {
+      symlinkSync(target, shim)
+      created.push(shim)
+    } catch (error) {
+      if (error?.code !== 'EEXIST') throw error
+    }
   }
 }
 after(() => {
@@ -62,6 +66,8 @@ test('exact legacy Line Editing maps to canonical title lifecycle without migrat
     dependency: 'Provider capacity hold',
     nextAction: 'Wait for provider capacity',
     ageDays: 6,
+    evidenceLinks: [{ label: 'Approved developmental artifact', href: 'sharepoint://title-1/approved-developmental.docx', checksum: 'a'.repeat(64), artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT', current: true }],
+    authorApproved: true,
   })
 
   assert.equal(projection.canonicalMappingStatus, 'CANONICAL_MAPPING_EXACT')
@@ -159,6 +165,8 @@ test('author action, human wait, and system attention are separate fields', () =
     legacySourceState: 'Line Editing',
     owner: 'JM1 Automation',
     dependency: 'Foundry provider backpressure',
+    evidenceLinks: [{ label: 'Approved developmental artifact', href: 'sharepoint://title-5/approved-developmental.docx', checksum: 'b'.repeat(64), artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT', current: true }],
+    authorApproved: true,
   })
 
   assert.equal(authorWait.waitingOn, 'Author')
@@ -175,6 +183,7 @@ test('stage applicability allows Starter package to omit Developmental Editing',
     titleId: 'title-6',
     legacySourceState: 'Developmental Editing',
     packageState: 'Starter package',
+    evidenceLinks: [{ label: 'Source manuscript', href: 'sharepoint://title-6/source.docx', checksum: 'c'.repeat(64), artifactType: 'EDITORIAL_WORKING_SOURCE', current: true }],
   })
 
   assert.equal(projection.titleLifecycleSubstage.code, 'DEVELOPMENTAL_EDITING')
