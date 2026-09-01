@@ -1,8 +1,10 @@
 c4afda46269dfdc283a6b1aedd302f8572fdac4fbace1db9d7be8892775cca5b  docs/governance/JM1-PROOF-CONTRACT-STANDARD-v1.0-CANON-CANDIDATE.md
-ed2f67e465ceae9439f8a2596234bc16f2139eeb06d500855ec90cf6aa119401  docs/architecture/publishing/JMP-Path-B-v0.9-Hybrid-Lifecycle-Amendment-CANON-CANDIDATE.md
+408f48736e9879f638c04028c287210a986e74afb402c5c8af4146e877b3014b  docs/architecture/publishing/JMP-Path-B-v0.9-Hybrid-Lifecycle-Amendment-CANON-CANDIDATE.md
 d99d7bf9f5e753b5c4d5df22501148045984057e8dd688ea5daf946183a4b289  docs/governance/JM1-Capability-Maturity-Model-Extension-Proposal-v2.1-CANON-CANDIDATE.md
-155203d44276e5fdc1e11864df4b2376ffb14f07edb4dd912d4a1937b3d4f89e  docs/operations/generated/JMP-PUBLISHING-ARCHITECTURE-CONSOLIDATION-RATIFICATION-2026-08-31/00-ratification-packet.md
+363c5d09b4fb7039213eba502cf3aa07a150e9b71fa144ccce8e8a1c895338e1  docs/operations/generated/JMP-PUBLISHING-ARCHITECTURE-CONSOLIDATION-RATIFICATION-2026-08-31/00-ratification-packet.md
 e215e4cbc6c8107238b49136e6c96e1d6c8b5dad75e8e1554bde5efb6f1415af  docs/operations/generated/JMP-PUBLISHING-ARCHITECTURE-CONSOLIDATION-RATIFICATION-2026-08-31/01-source-validation.md
 fa3244fe63f9937298ab4d7b5b8fac7cb341e0a6ee908a090e2857094de4b53d  docs/operations/generated/JMP-PUBLISHING-ARCHITECTURE-CONSOLIDATION-RATIFICATION-2026-08-31/02-execution-log-payload.json
-ccae3879f18877d8293787769f1efd3c58f1c605cfd15df90a7ec23243d8dfac  docs/operations/generated/JMP-PUBLISHING-ARCHITECTURE-CONSOLIDATION-RATIFICATION-2026-08-31/03-proof-contract-ratification-closeout.md
+6375df31ad2bb04387096470c1cbed6e14737f0a94ac28800ec7456514df6570  docs/operations/generated/JMP-PUBLISHING-ARCHITECTURE-CONSOLIDATION-RATIFICATION-2026-08-31/03-proof-contract-ratification-closeout.md
 d4824d52114bd60265e3b3a37247dbb786be70a629d6a98f0dc40e3ec1916203  docs/operations/generated/JMP-PUBLISHING-ARCHITECTURE-CONSOLIDATION-RATIFICATION-2026-08-31/04-proof-contract-ratification-event-payload.json
+d9f6364e9af1317b1837fb41f2eba8a743611770f7c6feb8ab7fa67d523e4b69  docs/operations/generated/JMP-PUBLISHING-ARCHITECTURE-CONSOLIDATION-RATIFICATION-2026-08-31/05-path-b-ratification-closeout.md
+589b6f18c9a5b77018c9607f2b75935e162b4af7a6cb3a0980a273c0e8d399ef  docs/operations/generated/JMP-PUBLISHING-ARCHITECTURE-CONSOLIDATION-RATIFICATION-2026-08-31/06-path-b-ratification-event-payload.json

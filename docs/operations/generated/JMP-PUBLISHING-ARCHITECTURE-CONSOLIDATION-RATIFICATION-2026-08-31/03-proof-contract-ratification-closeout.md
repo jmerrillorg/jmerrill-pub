@@ -50,7 +50,7 @@ The standard now explicitly includes:
 
 ## Risk
 
-Remaining governance risks are outside this artifact:
+Remaining governance risks at the time this Proof Contract closeout was created were outside this artifact:
 
 | Risk | Status |
 |---|---|
@@ -59,6 +59,8 @@ Remaining governance risks are outside this artifact:
 | Publishing discretionary architecture freeze | ACTIVE |
 | Internal validation title proof segment | NOT YET SELECTED / NOT YET EXECUTED |
 | Freeze exit | NOT MET / REQUIRES JACKIE DECISION PACKET |
+
+Later status note: Path B v0.9 was subsequently ratified in `05-path-b-ratification-closeout.md`. The Capability Maturity Model extension remains CANON-CANDIDATE / NOT RATIFIED.
 
 ## Recommendation
 
@@ -69,4 +71,3 @@ Do not claim `AUTONOMOUS_SUCCESSFUL_PROOF` or `AUTONOMOUSLY_PROVEN` for affected
 ## Boundary
 
 No runtime code, schema, workflow, deployment, author communication, Stripe, SharePoint, Business Central, website, mailbox, production infrastructure, Path B implementation, or CMM extension ratification occurred.
-
