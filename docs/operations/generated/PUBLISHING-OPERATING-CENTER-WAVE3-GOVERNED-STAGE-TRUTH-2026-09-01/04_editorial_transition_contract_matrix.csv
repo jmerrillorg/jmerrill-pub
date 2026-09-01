@@ -1,0 +1,10 @@
+SUBSTAGE,REQUIRED_EVIDENCE,TRANSITION_OUTPUT,RULE
+DEVELOPMENTAL_EDITING,Source/current editorial artifact bound,Developmental artifact,No later stage may project until prior required author gate and artifact binding are proven.
+DEVELOPMENTAL_AUTHOR_REVIEW,Developmental artifact delivered to author,Approved developmental artifact or requested changes/hold,No later stage may project until prior required author gate and artifact binding are proven.
+LINE_EDITING,Developmental approval or predecessor not applicable,Line artifact,No later stage may project until prior required author gate and artifact binding are proven.
+LINE_AUTHOR_REVIEW,Line artifact delivered to author,Approved line artifact or requested changes/hold,No later stage may project until prior required author gate and artifact binding are proven.
+COPYEDITING,Line approval or predecessor not applicable,Copy artifact,No later stage may project until prior required author gate and artifact binding are proven.
+COPY_AUTHOR_REVIEW,Copy artifact delivered to author,Approved copy artifact or requested changes/hold,No later stage may project until prior required author gate and artifact binding are proven.
+INTERIOR_LAYOUT,Approved copy/final editorial source,Layout artifact,No later stage may project until prior required author gate and artifact binding are proven.
+PROOFREADING,Layout artifact exists,Proof artifact,No later stage may project until prior required author gate and artifact binding are proven.
+FINAL_AUTHOR_APPROVAL,Proof artifact exists,Final author approval bound to proof/final interior,No later stage may project until prior required author gate and artifact binding are proven.

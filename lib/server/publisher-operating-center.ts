@@ -3280,6 +3280,9 @@ function titleItemsToOperatingCard(
     firstPaymentConfirmedOn: primary.firstPaymentConfirmedOn,
     firstPaymentConfirmationSource: primary.firstPaymentConfirmationSource,
     joinedFamilyEvidenceText: primary.joinedFamilyEvidenceText,
+    authorDecisionEvidenceText: titleResponse
+      ? [titleResponse.classifiedDecision, titleResponse.threadEvidence, titleResponse.nextAction].filter(Boolean).join('; ')
+      : undefined,
     formatEvidenceText: primary.formatEvidenceText,
     portfolioState: primary.portfolioState,
     canonicalAuthorityClassification: primary.canonicalAuthorityClassification,
