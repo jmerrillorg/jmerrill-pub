@@ -45,7 +45,17 @@ function project(overrides = {}) {
     canonicalTitleReference: 'title-wave3-current',
     canonicalAuthorContactReference: 'contact-wave3',
     sourceAuthority: 'Wave 1 canonical authority fields',
-    evidenceLinks: [{ label: 'Approved developmental artifact', href: 'sharepoint://wave3/approved-developmental.docx', checksum, artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT', current: true }],
+    evidenceLinks: [{
+      label: 'Approved developmental artifact',
+      href: 'sharepoint://drive/items/wave3-approved-developmental',
+      artifactId: 'wave3-approved-developmental',
+      titleId: 'title-wave3-current',
+      checksum,
+      artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT',
+      version: 'v1',
+      current: true,
+      stageCode: 'EDITORIAL_PRODUCTION',
+    }],
     authorApproved: true,
     ...overrides,
   })
@@ -104,7 +114,7 @@ test('grandfathered project is not falsely blocked by modern commercial gate', (
 
 test('artifact existence alone does not advance into Line Editing', () => {
   const projection = project({
-    evidenceLinks: [{ label: 'Line artifact', href: 'sharepoint://wave3/line.docx', checksum, artifactType: 'LINE_ARTIFACT', current: true }],
+    evidenceLinks: [{ label: 'Line artifact', href: 'sharepoint://drive/items/wave3-line', artifactId: 'wave3-line', titleId: 'title-wave3-current', checksum, artifactType: 'LINE_ARTIFACT', version: 'v1', current: true, stageCode: 'EDITORIAL_PRODUCTION' }],
     authorApproved: false,
     transitionAuthorized: false,
   })
@@ -116,7 +126,7 @@ test('artifact existence alone does not advance into Line Editing', () => {
 
 test('author authentication alone does not approve', () => {
   const projection = project({
-    evidenceLinks: [{ label: 'Developmental artifact', href: 'sharepoint://wave3/developmental.docx', checksum, artifactType: 'DEVELOPMENTAL_ARTIFACT', current: true }],
+    evidenceLinks: [{ label: 'Developmental artifact', href: 'sharepoint://drive/items/wave3-developmental', artifactId: 'wave3-developmental', titleId: 'title-wave3-current', checksum, artifactType: 'DEVELOPMENTAL_ARTIFACT', version: 'v1', current: true, stageCode: 'EDITORIAL_PRODUCTION' }],
     authorApproved: false,
     transitionAuthorized: false,
     authorAuthenticationEvidenceText: 'Author authenticated in portal',
@@ -140,7 +150,7 @@ test('prior editorial stage prerequisite is enforced for Copyediting', () => {
   const projection = project({
     legacySourceState: 'Copyediting',
     editorialStage: 'Copyediting',
-    evidenceLinks: [{ label: 'Copy artifact', href: 'sharepoint://wave3/copy.docx', checksum, artifactType: 'COPY_ARTIFACT', current: true }],
+    evidenceLinks: [{ label: 'Copy artifact', href: 'sharepoint://drive/items/wave3-copy', artifactId: 'wave3-copy', titleId: 'title-wave3-current', checksum, artifactType: 'COPY_ARTIFACT', version: 'v1', current: true, stageCode: 'EDITORIAL_PRODUCTION' }],
     authorApproved: false,
     transitionAuthorized: false,
   })
@@ -154,7 +164,7 @@ test('later-stage artifact cannot skip earlier transition', () => {
   const projection = project({
     legacySourceState: 'Proofreading',
     editorialStage: 'Proofreading',
-    evidenceLinks: [{ label: 'Proof artifact', href: 'sharepoint://wave3/proof.pdf', checksum, artifactType: 'PROOF_ARTIFACT', current: true }],
+    evidenceLinks: [{ label: 'Proof artifact', href: 'sharepoint://drive/items/wave3-proof', artifactId: 'wave3-proof', titleId: 'title-wave3-current', checksum, artifactType: 'PROOF_ARTIFACT', version: 'v1', current: true, stageCode: 'BOOK_PRODUCTION' }],
     authorApproved: false,
   })
 

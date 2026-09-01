@@ -66,7 +66,17 @@ test('exact legacy Line Editing maps to canonical title lifecycle without migrat
     dependency: 'Provider capacity hold',
     nextAction: 'Wait for provider capacity',
     ageDays: 6,
-    evidenceLinks: [{ label: 'Approved developmental artifact', href: 'sharepoint://title-1/approved-developmental.docx', checksum: 'a'.repeat(64), artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT', current: true }],
+    evidenceLinks: [{
+      label: 'Approved developmental artifact',
+      href: 'sharepoint://drive/items/title-1-approved-developmental',
+      artifactId: 'title-1-approved-developmental',
+      titleId: 'title-1',
+      checksum: 'a'.repeat(64),
+      artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT',
+      version: 'v1',
+      current: true,
+      stageCode: 'EDITORIAL_PRODUCTION',
+    }],
     authorApproved: true,
   })
 
@@ -159,7 +169,7 @@ test('author action, human wait, and system attention are separate fields', () =
     legacySourceState: 'Line Author Review',
     owner: 'Author',
     nextAction: 'Approve Line Edit',
-    evidenceLinks: [{ label: 'Line artifact', href: 'sharepoint://title-4/line.docx', checksum: 'a'.repeat(64), artifactType: 'LINE_ARTIFACT', current: true }],
+    evidenceLinks: [{ label: 'Line artifact', href: 'sharepoint://drive/items/title-4-line', artifactId: 'title-4-line', titleId: 'title-4', checksum: 'a'.repeat(64), artifactType: 'LINE_ARTIFACT', version: 'v1', current: true, stageCode: 'EDITORIAL_PRODUCTION' }],
   })
   const systemWait = projectCanonicalPublisherLifecycle({
     author: 'Author',
@@ -169,7 +179,7 @@ test('author action, human wait, and system attention are separate fields', () =
     owner: 'JM1 Automation',
     dependency: 'Foundry provider backpressure',
     nextAction: 'Retry provider capacity',
-    evidenceLinks: [{ label: 'Approved developmental artifact', href: 'sharepoint://title-5/approved-developmental.docx', checksum: 'b'.repeat(64), artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT', current: true }],
+    evidenceLinks: [{ label: 'Approved developmental artifact', href: 'sharepoint://drive/items/title-5-approved-developmental', artifactId: 'title-5-approved-developmental', titleId: 'title-5', checksum: 'b'.repeat(64), artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT', version: 'v1', current: true, stageCode: 'EDITORIAL_PRODUCTION' }],
     authorApproved: true,
   })
 
@@ -187,7 +197,7 @@ test('stage applicability allows Starter package to omit Developmental Editing',
     titleId: 'title-6',
     legacySourceState: 'Developmental Editing',
     packageState: 'Starter package',
-    evidenceLinks: [{ label: 'Source manuscript', href: 'sharepoint://title-6/source.docx', checksum: 'c'.repeat(64), artifactType: 'EDITORIAL_WORKING_SOURCE', current: true }],
+    evidenceLinks: [{ label: 'Source manuscript', href: 'sharepoint://drive/items/title-6-source', artifactId: 'title-6-source', titleId: 'title-6', checksum: 'c'.repeat(64), artifactType: 'EDITORIAL_WORKING_SOURCE', version: 'v1', current: true, stageCode: 'EDITORIAL_PRODUCTION' }],
   })
 
   assert.equal(projection.titleLifecycleSubstage.code, 'DEVELOPMENTAL_EDITING')

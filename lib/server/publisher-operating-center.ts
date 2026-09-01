@@ -3245,7 +3245,7 @@ function titleItemsToOperatingCard(
   const waitingOn = waitingOnForTodayItem(primary)
   const blocker = humanBlocker(primary)
   const titleResponse = authorResponses.find((item) => normalizeTitle(item.title) === normalizeTitle(primary.title))
-  const currentArtifact = bestEvidenceLink(primary)
+  const candidateArtifact = bestEvidenceLink(primary)
   const canonicalLifecycle = projectCanonicalPublisherLifecycle({
     author: primary.author,
     bookTitle: primary.title,
@@ -3307,8 +3307,9 @@ function titleItemsToOperatingCard(
   if (primary.diagnosticId) deepLinkParams.set('diagnosticId', primary.diagnosticId)
   deepLinkParams.set('action', primary.nextAction)
   const defaultActionUrl = `${publisherOperatingCenterBaseUrl()}/publisher/operating-center?${deepLinkParams.toString()}`
-  const actionUrl = currentArtifact.href?.includes('/publisher/operating-center')
-    ? currentArtifact.href
+  const currentArtifact = currentArtifactForProjection(canonicalLifecycle, candidateArtifact)
+  const actionUrl = candidateArtifact.href?.includes('/publisher/operating-center')
+    ? candidateArtifact.href
     : defaultActionUrl
   const notificationState = notificationStateFor(primary, logs)
   const baseActions = primary.allowedActions.length
@@ -3644,6 +3645,28 @@ function bestEvidenceLink(item: PublisherTodayItem): PublisherTitleOperatingCard
     href: first?.href || '',
     version: item.qaState || 'Current',
     reviewState: item.packageState || 'Not applicable',
+  }
+}
+
+function currentArtifactForProjection(
+  canonicalLifecycle: CanonicalPublisherReadModel,
+  candidate: PublisherTitleOperatingCard['currentArtifact'],
+): PublisherTitleOperatingCard['currentArtifact'] {
+  const artifactTruth = canonicalLifecycle.artifactTruth
+  if (artifactTruth.artifactTrustClassification !== 'TRUSTED_CURRENT_ARTIFACT') {
+    return {
+      label: artifactTruth.displayLabel,
+      href: '',
+      version: artifactTruth.currentArtifactVersion,
+      reviewState: artifactTruth.artifactTrustClassification,
+    }
+  }
+
+  return {
+    label: artifactTruth.displayLabel || candidate.label,
+    href: candidate.href,
+    version: artifactTruth.currentArtifactVersion || candidate.version,
+    reviewState: artifactTruth.artifactApprovalStatus,
   }
 }
 
