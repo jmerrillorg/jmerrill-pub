@@ -1,0 +1,29 @@
+{
+  "entitySet": "jm1_executionlogs",
+  "writeStatus": "WRITTEN_TO_DATAVERSE",
+  "eventType": "JM1_PROOF_CONTRACT_STANDARD_RATIFIED",
+  "payload": {
+    "jm1_name": "JM1-PROOF-CONTRACT-STANDARD-v1.0-RATIFIED",
+    "jm1_actiontype": "JM1_PROOF_CONTRACT_STANDARD_RATIFIED",
+    "jm1_agentname": "codex",
+    "jm1_agentmodel": "gpt-5",
+    "jm1_bandlevel": 835500000,
+    "jm1_executionstatus": 835500001,
+    "jm1_startedon": "2026-09-01T07:29:38.328Z",
+    "jm1_completedon": "2026-09-01T07:29:38.328Z",
+    "jm1_sourceentity": "repository_governance_branch",
+    "jm1_sourcerecordid": "codex/publishing-architecture-consolidation-ratification-20260831",
+    "jm1_actiondescription": "Founder decision RATIFY_WITH_NARROW_CLARIFICATIONS applied to JM1 Proof Contract Standard v1.0 only. Narrow clarifications added: claim identity/scope/environment, expected vs actual outcomes, evidence sufficiency, negative proof applicability, rollback/recovery applicability, exceptions/deviations, final classification, human authority vs manual intervention, A0-A5 compatibility, AUTHENTICATION != A5 CONSENT, security-tier objective proof, and false-positive protections. Proof Contract Standard final status: CANONICAL GOVERNANCE STANDARD. Path B and CMM extension remain CANON-CANDIDATE. Publishing discretionary architecture freeze remains ACTIVE. No runtime/schema/workflow/deployment/author communication mutation authorized."
+  },
+  "ratificationStatus": {
+    "Proof Contract Standard": "CANONICAL GOVERNANCE STANDARD / RATIFIED",
+    "Path B v0.9 Architecture Amendment": "CANON-CANDIDATE / NOT RATIFIED",
+    "Capability Maturity Model Extension Proposal": "CANON-CANDIDATE / NOT RATIFIED"
+  },
+  "executionLogId": "fa92ace1-d6a5-f111-b8de-7c1e525b15c2",
+  "createdOn": "2026-09-01T07:29:38Z",
+  "notes": [
+    "Dataverse write completed with query-first idempotency.",
+    "The source-controlled payload preserves the safe metadata written to jm1_executionlogs."
+  ]
+}
