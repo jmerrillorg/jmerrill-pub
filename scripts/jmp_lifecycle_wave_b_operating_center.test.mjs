@@ -147,7 +147,7 @@ test('three lifecycle dimensions remain distinct and package accepted is not Joi
   assert.equal(projection.prospectCommercialState, 'PACKAGE_ACCEPTED')
   assert.equal(projection.authorRelationshipState, 'PROSPECT')
   assert.equal(projection.joinedTheFamily.value, 'NO')
-  assert.equal(projection.waitingTruth.waitingOn, 'Prospect')
+  assert.equal(projection.waitingTruth.waitingOn, 'WAITING_ON_AUTHOR')
   assert.equal(projection.waitingTruth.waitingReason, 'INITIAL_PAYMENT_REQUIRED')
 })
 
@@ -173,9 +173,9 @@ test('author action, human wait, and system attention are separate fields', () =
     authorApproved: true,
   })
 
-  assert.equal(authorWait.waitingTruth.waitingOn, 'Author')
+  assert.equal(authorWait.waitingTruth.waitingOn, 'WAITING_ON_AUTHOR')
   assert.equal(authorWait.authorActionRequired.label, 'YES')
-  assert.equal(systemWait.waitingTruth.waitingOn, 'JMP/System')
+  assert.equal(systemWait.waitingTruth.waitingOn, 'WAITING_ON_SYSTEM')
   assert.equal(systemWait.authorActionRequired.label, 'NO')
   assert.equal(systemWait.systemAttention.code, 'PROVIDER_BACKPRESSURE')
 })
