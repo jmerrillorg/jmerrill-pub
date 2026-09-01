@@ -73,6 +73,35 @@ export type CanonicalTimerTrustClassification =
   | 'INSUFFICIENT_TIMESTAMP_EVIDENCE'
   | 'RECONCILIATION_REQUIRED'
 
+export type CanonicalArtifactClass =
+  | 'SOURCE_MANUSCRIPT'
+  | 'NORMALIZED_MANUSCRIPT'
+  | 'DEVELOPMENTAL_EDIT'
+  | 'COPYEDIT'
+  | 'LINE_EDIT'
+  | 'PROOF'
+  | 'FINAL_INTERIOR'
+  | 'COVER'
+  | 'EBOOK'
+  | 'AUDIO'
+  | 'PRODUCTION_SOURCE'
+  | 'DISTRIBUTION_ASSET'
+  | 'MARKETING_ASSET'
+  | 'HISTORICAL_ARTIFACT'
+  | 'SUPERSEDED_ARTIFACT'
+  | 'UNKNOWN_ARTIFACT'
+
+export type CanonicalArtifactTrustClassification =
+  | 'TRUSTED_CURRENT_ARTIFACT'
+  | 'NO_CURRENT_ARTIFACT_REQUIRED'
+  | 'NO_AUTHORITATIVE_ARTIFACT_FOUND'
+  | 'AMBIGUOUS_TITLE_BINDING'
+  | 'AMBIGUOUS_VERSION'
+  | 'STAGE_INCOMPATIBLE_ARTIFACT'
+  | 'APPROVAL_VERSION_MISMATCH'
+  | 'LEGACY_ARTIFACT_ONLY'
+  | 'RECONCILIATION_REQUIRED'
+
 export type CanonicalWaitingOn =
   | 'WAITING_ON_AUTHOR'
   | 'WAITING_ON_JMP'
@@ -130,7 +159,23 @@ export type CanonicalPublisherProjectionInput = {
   exactBlocker?: string
   nextAction?: string
   ageDays?: number
-  evidenceLinks?: Array<{ label: string; href: string; checksum?: string; artifactType?: string; version?: string; current?: boolean }>
+  evidenceLinks?: Array<{
+    label: string
+    href: string
+    checksum?: string
+    artifactType?: string
+    version?: string
+    current?: boolean
+    titleId?: string
+    canonicalWorkId?: string
+    editionId?: string
+    publishingAssetId?: string
+    artifactId?: string
+    stageCode?: StageCode
+    substageCode?: SubstageCode
+    approvalArtifactId?: string
+    approvalVersion?: string
+  }>
   activeFormats?: string[]
   portfolioState?: string
   workspaceState?: string
@@ -322,6 +367,22 @@ export type CanonicalPublisherReadModel = {
     exceptionReason: string
     timerDisplay: string
   }
+  artifactTruth: {
+    currentArtifactId: string
+    publishingAssetId: string
+    canonicalTitleReference: string
+    canonicalWorkReference: string
+    editionReference: string
+    currentArtifactClass: CanonicalArtifactClass
+    currentArtifactVersion: string
+    artifactTitleBinding: 'BOUND_TO_CANONICAL_TITLE' | 'AMBIGUOUS_TITLE_BINDING' | 'MISSING_TITLE_BINDING' | 'NOT_REQUIRED'
+    artifactStageCompatibility: 'VALID_FOR_PROVEN_STAGE' | 'STAGE_INCOMPATIBLE_ARTIFACT' | 'NOT_APPLICABLE' | 'UNKNOWN'
+    artifactApprovalStatus: 'APPROVAL_BOUND_TO_VERSION' | 'APPROVAL_VERSION_MISMATCH' | 'APPROVAL_NOT_REQUIRED' | 'APPROVAL_NOT_PRESENT'
+    artifactTrustClassification: CanonicalArtifactTrustClassification
+    exceptionReason: string
+    authoritySource: string
+    displayLabel: string
+  }
   waveC1EvidenceAuthority: {
     artifact: ReturnType<typeof evaluateWaveC1ArtifactAuthority>
     commercial: ReturnType<typeof evaluateWaveC1CommercialAuthority>
@@ -421,6 +482,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
   const lifecycleEvidence = lifecycleEvidenceFor(input, mapping, artifact)
   const waveC1EvidenceAuthority = waveC1EvidenceAuthorityFor(input, artifact)
   const stageTruth = governedStageTruthFor(input, mapping, canonicalAuthority, lifecycleEvidence, waveC1EvidenceAuthority, rawStage?.stageCode || 'DATA_GAP', rawSubstage?.substageCode || 'DATA_GAP')
+  const artifactTruth = governedArtifactTruthFor(input, mapping, artifact, canonicalAuthority, stageTruth)
   const governedStage = stageTruth.projectedStage === 'DATA_GAP'
     ? null
     : JMP_PUBLISHING_LIFECYCLE_REGISTRY.find((candidate) => candidate.stageCode === stageTruth.projectedStage) || null
@@ -515,6 +577,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     canonicalAuthority,
     stageTruth,
     waitingTruth,
+    artifactTruth,
     waveC1EvidenceAuthority,
     workingImprint: 'DATA_GAP',
     recommendedImprint: 'DATA_GAP',
@@ -1369,6 +1432,185 @@ function sourceArtifactFor(input: CanonicalPublisherProjectionInput, mapping: Le
   }
 }
 
+function governedArtifactTruthFor(
+  input: CanonicalPublisherProjectionInput,
+  mapping: LegacyMappingResult,
+  artifact: CanonicalPublisherReadModel['sourceArtifact'],
+  canonicalAuthority: CanonicalPublisherReadModel['canonicalAuthority'],
+  stageTruth: CanonicalPublisherReadModel['stageTruth'],
+): CanonicalPublisherReadModel['artifactTruth'] {
+  const links = input.evidenceLinks || []
+  const currentCandidates = links.filter((link) => link.current !== false)
+  const first = currentCandidates[0] || links[0]
+  const currentArtifactClass = artifactClassFor(first?.artifactType || artifact.artifactType || mapping.canonicalSubstage || mapping.canonicalStage || undefined)
+  const artifactRequired = currentArtifactRequiredFor(canonicalAuthority, stageTruth)
+  const titleBinding = first ? artifactTitleBindingFor(input, first) : artifactRequired ? 'MISSING_TITLE_BINDING' : 'NOT_REQUIRED'
+  const stageCompatibility = first ? stageCompatibilityFor(stageTruth, currentArtifactClass, first) : artifactRequired ? 'UNKNOWN' : 'NOT_APPLICABLE'
+  const approvalStatus = approvalStatusFor(input, first)
+
+  if (canonicalAuthority.requiresReconciliation || stageTruth.trustClassification === 'RECONCILIATION_REQUIRED') {
+    return artifactTruth('RECONCILIATION_REQUIRED', currentArtifactClass, first, input, 'AMBIGUOUS_TITLE_BINDING', stageCompatibility, approvalStatus, 'Canonical title authority must be reconciled before current artifact authority can be asserted.')
+  }
+
+  if (!artifactRequired && !first) {
+    return artifactTruth('NO_CURRENT_ARTIFACT_REQUIRED', 'UNKNOWN_ARTIFACT', first, input, 'NOT_REQUIRED', 'NOT_APPLICABLE', 'APPROVAL_NOT_REQUIRED', 'No current active artifact is required for this proven governed state.')
+  }
+
+  if (!first) {
+    return artifactTruth('NO_AUTHORITATIVE_ARTIFACT_FOUND', 'UNKNOWN_ARTIFACT', first, input, 'MISSING_TITLE_BINDING', 'UNKNOWN', 'APPROVAL_NOT_PRESENT', 'No artifact candidate is surfaced by an authoritative asset relationship.')
+  }
+
+  if (canonicalAuthority.currentAuthorityRelationship === 'NONCURRENT_REFERENCE_ONLY') {
+    return artifactTruth('LEGACY_ARTIFACT_ONLY', currentArtifactClass, first, input, 'NOT_REQUIRED', 'NOT_APPLICABLE', 'APPROVAL_NOT_REQUIRED', 'Artifact belongs to a noncurrent or historical record and cannot become current operational authority.')
+  }
+
+  if (titleBinding !== 'BOUND_TO_CANONICAL_TITLE') {
+    return artifactTruth('AMBIGUOUS_TITLE_BINDING', currentArtifactClass, first, input, titleBinding, stageCompatibility, approvalStatus, 'Artifact title/work binding is not proven by canonical title, work, publishing asset, or immutable SharePoint identity evidence.')
+  }
+
+  if (currentCandidates.length > 1 || first.current !== true) {
+    return artifactTruth('AMBIGUOUS_VERSION', currentArtifactClass, first, input, titleBinding, stageCompatibility, approvalStatus, currentCandidates.length > 1 ? 'Multiple candidate current artifacts are surfaced for the same projection.' : 'Current version is not explicitly marked; newest timestamp, filename, or folder path is insufficient.')
+  }
+
+  if (/superseded|obsolete|replaced/i.test(`${first.label} ${first.href} ${first.artifactType || ''} ${first.version || ''}`)) {
+    return artifactTruth('LEGACY_ARTIFACT_ONLY', currentArtifactClass, first, input, titleBinding, stageCompatibility, approvalStatus, 'Artifact is explicitly marked superseded, obsolete, replaced, or historical.')
+  }
+
+  if (stageCompatibility === 'STAGE_INCOMPATIBLE_ARTIFACT') {
+    return artifactTruth('STAGE_INCOMPATIBLE_ARTIFACT', currentArtifactClass, first, input, titleBinding, stageCompatibility, approvalStatus, 'Artifact class or explicit stage binding is incompatible with the proven governed stage.')
+  }
+
+  if (approvalStatus === 'APPROVAL_VERSION_MISMATCH') {
+    return artifactTruth('APPROVAL_VERSION_MISMATCH', currentArtifactClass, first, input, titleBinding, stageCompatibility, approvalStatus, 'Author approval evidence does not bind to the exact current artifact/version.')
+  }
+
+  if (!isImmutableArtifactReference(first) || !isSha256(first.checksum)) {
+    return artifactTruth('NO_AUTHORITATIVE_ARTIFACT_FOUND', currentArtifactClass, first, input, titleBinding, stageCompatibility, approvalStatus, 'Artifact exists, but immutable identity and SHA-256 checksum are not both surfaced.')
+  }
+
+  return artifactTruth('TRUSTED_CURRENT_ARTIFACT', currentArtifactClass, first, input, titleBinding, stageCompatibility, approvalStatus, 'Current artifact is explicitly bound to the canonical title/work, current version, stage-compatible, and checksum-supported.')
+}
+
+function artifactTruth(
+  artifactTrustClassification: CanonicalArtifactTrustClassification,
+  currentArtifactClass: CanonicalArtifactClass,
+  link: NonNullable<CanonicalPublisherProjectionInput['evidenceLinks']>[number] | undefined,
+  input: CanonicalPublisherProjectionInput,
+  artifactTitleBinding: CanonicalPublisherReadModel['artifactTruth']['artifactTitleBinding'],
+  artifactStageCompatibility: CanonicalPublisherReadModel['artifactTruth']['artifactStageCompatibility'],
+  artifactApprovalStatus: CanonicalPublisherReadModel['artifactTruth']['artifactApprovalStatus'],
+  exceptionReason: string,
+): CanonicalPublisherReadModel['artifactTruth'] {
+  return {
+    currentArtifactId: link?.artifactId || link?.href || 'DATA_GAP',
+    publishingAssetId: link?.publishingAssetId || input.derivedFromArtifactId || 'DATA_GAP',
+    canonicalTitleReference: input.canonicalTitleReference || input.titleId || 'DATA_GAP',
+    canonicalWorkReference: link?.canonicalWorkId || 'DATA_GAP',
+    editionReference: link?.editionId || 'DATA_GAP',
+    currentArtifactClass,
+    currentArtifactVersion: link?.version || 'DATA_GAP',
+    artifactTitleBinding,
+    artifactStageCompatibility,
+    artifactApprovalStatus,
+    artifactTrustClassification,
+    exceptionReason,
+    authoritySource: link ? 'Publisher Operating Center evidence link + canonical projection fields' : 'Canonical projection no-artifact state',
+    displayLabel: displayLabelForArtifactTrust(artifactTrustClassification, link),
+  }
+}
+
+function artifactClassFor(value?: string): CanonicalArtifactClass {
+  const text = normalize(value || '')
+  if (/SOURCE|AUTHOR SUBMISSION|ORIGINAL|MANUSCRIPT RECEIVED/.test(text)) return 'SOURCE_MANUSCRIPT'
+  if (/NORMALIZED/.test(text)) return 'NORMALIZED_MANUSCRIPT'
+  if (/DEVELOPMENTAL/.test(text)) return 'DEVELOPMENTAL_EDIT'
+  if (/COPY/.test(text)) return 'COPYEDIT'
+  if (/LINE/.test(text)) return 'LINE_EDIT'
+  if (/PROOF/.test(text)) return 'PROOF'
+  if (/FINAL INTERIOR|PRINT INTERIOR|INTERIOR PDF/.test(text)) return 'FINAL_INTERIOR'
+  if (/COVER|FULL WRAP/.test(text)) return 'COVER'
+  if (/EPUB|EBOOK/.test(text)) return 'EBOOK'
+  if (/AUDIO|WAV|MP3/.test(text)) return 'AUDIO'
+  if (/PRODUCTION SOURCE|INDESIGN|VELLUM|MASTER/.test(text)) return 'PRODUCTION_SOURCE'
+  if (/DISTRIBUTION|INGRAM|KDP|ACX|BOWKER/.test(text)) return 'DISTRIBUTION_ASSET'
+  if (/MARKETING|MEDIA|LAUNCH/.test(text)) return 'MARKETING_ASSET'
+  if (/HISTORICAL|ARCHIVE/.test(text)) return 'HISTORICAL_ARTIFACT'
+  if (/SUPERSEDED|OBSOLETE|REPLACED/.test(text)) return 'SUPERSEDED_ARTIFACT'
+  return 'UNKNOWN_ARTIFACT'
+}
+
+function currentArtifactRequiredFor(
+  canonicalAuthority: CanonicalPublisherReadModel['canonicalAuthority'],
+  stageTruth: CanonicalPublisherReadModel['stageTruth'],
+) {
+  if (!canonicalAuthority.isCurrentOperationalAuthority) return false
+  if (stageTruth.artifactAuthorityRequired === 'YES') return true
+  return ['EDITORIAL_PRODUCTION', 'BOOK_PRODUCTION', 'DISTRIBUTION_READINESS', 'DISTRIBUTION_RELEASE'].includes(stageTruth.projectedStage)
+}
+
+function artifactTitleBindingFor(
+  input: CanonicalPublisherProjectionInput,
+  link: NonNullable<CanonicalPublisherProjectionInput['evidenceLinks']>[number],
+): CanonicalPublisherReadModel['artifactTruth']['artifactTitleBinding'] {
+  const canonicalTitle = input.canonicalTitleReference || input.titleId || ''
+  if (link.titleId && canonicalTitle && link.titleId === canonicalTitle) return 'BOUND_TO_CANONICAL_TITLE'
+  if (link.canonicalWorkId && canonicalTitle) return 'BOUND_TO_CANONICAL_TITLE'
+  if (link.publishingAssetId && input.derivedFromArtifactId && link.publishingAssetId === input.derivedFromArtifactId) return 'BOUND_TO_CANONICAL_TITLE'
+  if (link.titleId && canonicalTitle && link.titleId !== canonicalTitle) return 'AMBIGUOUS_TITLE_BINDING'
+  return 'MISSING_TITLE_BINDING'
+}
+
+function stageCompatibilityFor(
+  stageTruth: CanonicalPublisherReadModel['stageTruth'],
+  artifactClass: CanonicalArtifactClass,
+  link?: NonNullable<CanonicalPublisherProjectionInput['evidenceLinks']>[number],
+): CanonicalPublisherReadModel['artifactTruth']['artifactStageCompatibility'] {
+  if (stageTruth.projectedStage === 'DATA_GAP') return 'UNKNOWN'
+  if (link?.stageCode && link.stageCode !== stageTruth.projectedStage) return 'STAGE_INCOMPATIBLE_ARTIFACT'
+  if (link?.substageCode && stageTruth.projectedSubstage !== 'DATA_GAP' && link.substageCode !== stageTruth.projectedSubstage) return 'STAGE_INCOMPATIBLE_ARTIFACT'
+  const stage = stageTruth.projectedStage
+  const editorialArtifacts: CanonicalArtifactClass[] = ['SOURCE_MANUSCRIPT', 'NORMALIZED_MANUSCRIPT', 'DEVELOPMENTAL_EDIT', 'LINE_EDIT', 'COPYEDIT', 'PROOF']
+  if (stage === 'EDITORIAL_PRODUCTION' && editorialArtifacts.includes(artifactClass)) return 'VALID_FOR_PROVEN_STAGE'
+  if (stage === 'BOOK_PRODUCTION' && ['FINAL_INTERIOR', 'COVER', 'PRODUCTION_SOURCE', 'PROOF'].includes(artifactClass)) return 'VALID_FOR_PROVEN_STAGE'
+  if ((stage === 'DISTRIBUTION_READINESS' || stage === 'DISTRIBUTION_RELEASE') && ['FINAL_INTERIOR', 'COVER', 'EBOOK', 'AUDIO', 'DISTRIBUTION_ASSET'].includes(artifactClass)) return 'VALID_FOR_PROVEN_STAGE'
+  if (stage === 'POST_PUBLICATION') return 'NOT_APPLICABLE'
+  if (artifactClass === 'UNKNOWN_ARTIFACT') return 'UNKNOWN'
+  return 'STAGE_INCOMPATIBLE_ARTIFACT'
+}
+
+function approvalStatusFor(
+  input: CanonicalPublisherProjectionInput,
+  link?: NonNullable<CanonicalPublisherProjectionInput['evidenceLinks']>[number],
+): CanonicalPublisherReadModel['artifactTruth']['artifactApprovalStatus'] {
+  if (!input.authorApproved && !input.authorDecisionCaptured && !input.transitionAuthorized) return 'APPROVAL_NOT_REQUIRED'
+  if (!link) return 'APPROVAL_NOT_PRESENT'
+  const decisionText = `${input.authorDecisionEvidenceText || ''} ${link.approvalArtifactId || ''} ${link.approvalVersion || ''}`
+  if (link.approvalArtifactId && link.approvalArtifactId !== (link.artifactId || link.href)) return 'APPROVAL_VERSION_MISMATCH'
+  if (link.approvalVersion && link.version && link.approvalVersion !== link.version) return 'APPROVAL_VERSION_MISMATCH'
+  if (link.version && input.authorDecisionEvidenceText && !decisionText.includes(link.version)) return 'APPROVAL_VERSION_MISMATCH'
+  return 'APPROVAL_BOUND_TO_VERSION'
+}
+
+function isImmutableArtifactReference(link: NonNullable<CanonicalPublisherProjectionInput['evidenceLinks']>[number]) {
+  return Boolean(link.artifactId || link.publishingAssetId || /sharepoint|driveitem|\/items\/|\/artifacts\/[0-9a-f-]{16,}/i.test(link.href))
+}
+
+function isSha256(value?: string) {
+  return /^[a-f0-9]{64}$/i.test(value || '')
+}
+
+function displayLabelForArtifactTrust(
+  classification: CanonicalArtifactTrustClassification,
+  link?: NonNullable<CanonicalPublisherProjectionInput['evidenceLinks']>[number],
+) {
+  if (classification === 'TRUSTED_CURRENT_ARTIFACT') return link?.label || 'Current authoritative artifact'
+  if (classification === 'NO_CURRENT_ARTIFACT_REQUIRED') return 'No current artifact required'
+  if (classification === 'NO_AUTHORITATIVE_ARTIFACT_FOUND') return 'Authoritative artifact not found'
+  if (classification === 'RECONCILIATION_REQUIRED') return 'Artifact reconciliation required'
+  if (classification === 'LEGACY_ARTIFACT_ONLY') return 'Legacy artifact only'
+  return 'Artifact reconciliation required'
+}
+
 function lifecycleEvidenceFor(
   input: CanonicalPublisherProjectionInput,
   mapping: LegacyMappingResult,
@@ -1389,9 +1631,19 @@ function lifecycleEvidenceFor(
     ...artifactLinks.flatMap((link) => [link.label, link.href, link.checksum || '', link.version || '']),
   ].join(' ')
   const commercialText = `${input.packageState || ''} ${input.dependency || ''} ${input.portfolioState || ''} ${input.commercialEvidenceText || ''}`
+  const firstArtifactLink = artifactLinks.find((link) => link.current !== false) || artifactLinks[0]
+  const artifactTitleBinding = firstArtifactLink ? artifactTitleBindingFor(input, firstArtifactLink) : 'MISSING_TITLE_BINDING'
+  const authoritativeArtifactIdentity =
+    firstArtifactLink &&
+    artifactTitleBinding === 'BOUND_TO_CANONICAL_TITLE' &&
+    firstArtifactLink.current === true &&
+    isImmutableArtifactReference(firstArtifactLink) &&
+    isSha256(firstArtifactLink.checksum)
   const artifactIdentity = artifact.artifactId === 'DATA_GAP'
     ? dataGapFacet('No governing artifact identifier is surfaced by the current read-model item.', 'Artifact Registry', 'RESOLVABLE')
-    : supportedFacet(artifact.artifactId, artifact.source, 'Artifact identifier is surfaced by an evidence link.', mapping.resultCode === 'CANONICAL_MAPPING_CONTEXTUAL' ? 'CONTEXTUAL' : 'DETERMINISTIC')
+    : authoritativeArtifactIdentity
+      ? supportedFacet(artifact.artifactId, artifact.source, 'Artifact identity is bound to canonical title/work, explicit current version, immutable identity, and SHA-256 checksum.', mapping.resultCode === 'CANONICAL_MAPPING_CONTEXTUAL' ? 'CONTEXTUAL' : 'DETERMINISTIC')
+      : dataGapFacet('Artifact candidate exists, but current authority is not proven by title binding, current-version marker, immutable identity, and checksum.', 'Artifact Authority contract', 'RESOLVABLE')
   const artifactChecksum = artifact.checksum === 'DATA_GAP'
     ? dataGapFacet('Checksum is not available on the surfaced artifact evidence.', 'Artifact Registry checksum field', 'RESOLVABLE')
     : supportedFacet(artifact.checksum, artifact.source, 'Checksum is attached to the governing artifact evidence.')
@@ -1402,7 +1654,9 @@ function lifecycleEvidenceFor(
     ? conflictFacet('Superseded artifact evidence is present; current governing version must be confirmed.', 'Artifact lineage')
     : artifact.artifactId === 'DATA_GAP'
       ? dataGapFacet('Current version cannot be determined without a governing artifact.', 'Artifact Registry current-version flag', 'RESOLVABLE')
-      : supportedFacet(artifact.version, artifact.source, 'Current artifact version is projected from surfaced QA/version evidence.', 'CONTEXTUAL')
+      : authoritativeArtifactIdentity
+        ? supportedFacet(artifact.version, artifact.source, 'Current artifact version is explicitly marked and bound to the authoritative artifact.', 'DETERMINISTIC')
+        : dataGapFacet('Current version cannot be determined from filename, path, or timestamp alone.', 'Artifact Authority contract', 'RESOLVABLE')
   const ambiguity = mapping.resultCode === 'CANONICAL_MAPPING_CONFLICT'
     ? conflictFacet(mapping.notes, 'Lifecycle mapping registry')
     : /conflict|split.?brain|ambiguous/i.test(sourceText)

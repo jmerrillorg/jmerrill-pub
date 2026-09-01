@@ -45,7 +45,17 @@ function project(overrides = {}) {
     canonicalTitleReference: 'title-wave2-current',
     canonicalAuthorContactReference: 'contact-wave2',
     sourceAuthority: 'Wave 1 canonical authority fields',
-    evidenceLinks: [{ label: 'Approved developmental artifact', href: 'sharepoint://wave2/approved-developmental.docx', checksum: 'd'.repeat(64), artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT', current: true }],
+    evidenceLinks: [{
+      label: 'Approved developmental artifact',
+      href: 'sharepoint://drive/items/wave2-approved-developmental',
+      artifactId: 'wave2-approved-developmental',
+      titleId: 'title-wave2-current',
+      checksum: 'd'.repeat(64),
+      artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT',
+      version: 'v1',
+      current: true,
+      stageCode: 'EDITORIAL_PRODUCTION',
+    }],
     authorApproved: true,
     ...overrides,
   })

@@ -1486,8 +1486,14 @@ function TitleDetailDrawer({
 
         <DetailBlock title="Current Artifact">
           <MiniFact label="Artifact" value={card.currentArtifact.label} />
+          <MiniFact label="Artifact trust" value={card.canonicalLifecycle.artifactTruth.artifactTrustClassification} />
+          <MiniFact label="Class" value={card.canonicalLifecycle.artifactTruth.currentArtifactClass} />
           <MiniFact label="Version" value={card.currentArtifact.version} />
           <MiniFact label="Review state" value={card.currentArtifact.reviewState} />
+          <MiniFact label="Title binding" value={card.canonicalLifecycle.artifactTruth.artifactTitleBinding} />
+          <MiniFact label="Stage fit" value={card.canonicalLifecycle.artifactTruth.artifactStageCompatibility} />
+          <MiniFact label="Approval binding" value={card.canonicalLifecycle.artifactTruth.artifactApprovalStatus} />
+          <MiniFact label="Artifact exception" value={card.canonicalLifecycle.artifactTruth.exceptionReason} />
           <MiniFact label="Artifact Authority" value={`${card.canonicalLifecycle.sourceArtifact.artifactType} · ${card.canonicalLifecycle.sourceArtifact.certificationState}`} />
           <MiniFact label="Checksum" value={card.canonicalLifecycle.sourceArtifact.checksum} />
           <MiniFact label="Identity Evidence" value={`${card.canonicalLifecycle.lifecycleEvidence.artifact.identity.status} — ${card.canonicalLifecycle.lifecycleEvidence.artifact.identity.reason}`} />

@@ -44,7 +44,17 @@ function project(overrides = {}) {
     canonicalTitleReference: 'title-wave4-current',
     canonicalAuthorContactReference: 'contact-wave4',
     sourceAuthority: 'Wave 1 canonical authority fields',
-    evidenceLinks: [{ label: 'Approved developmental artifact', href: 'sharepoint://wave4/approved-developmental.docx', checksum, artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT', current: true }],
+    evidenceLinks: [{
+      label: 'Approved developmental artifact',
+      href: 'sharepoint://drive/items/wave4-approved-developmental',
+      artifactId: 'wave4-approved-developmental',
+      titleId: 'title-wave4-current',
+      checksum,
+      artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT',
+      version: 'v1',
+      current: true,
+      stageCode: 'EDITORIAL_PRODUCTION',
+    }],
     authorApproved: true,
     projectionAsOf: '2026-09-01T12:00:00Z',
     ...overrides,
@@ -73,7 +83,7 @@ test('missing timestamp never falls back to raw ageDays', () => {
     legacySourceState: 'Book Production',
     authorApproved: false,
     nextAction: 'Await author review response',
-    owner: 'WAITING_ON_AUTHOR',
+    owner: 'Author',
     ageDays: 381,
   })
 
@@ -161,7 +171,7 @@ test('editorial work and publisher review can be trusted only from explicit acti
 test('external vendor waiting is distinct from system attention', () => {
   const projection = project({
     nextAction: 'External vendor distribution update',
-    owner: 'WAITING_ON_EXTERNAL_VENDOR',
+    owner: 'External',
     awaiting: 'Distributor',
     waitingStartedAt: '2026-08-29T12:00:00Z',
     waitingStartEvent: 'VENDOR_REQUEST_SUBMITTED',
@@ -215,7 +225,7 @@ test('legacy completed title has no active waiting timer', () => {
 test('unresolved authority gets reconciliation-required without false party assignment', () => {
   const projection = project({
     canonicalAuthorityClassification: 'REQUIRES_RECONCILIATION',
-    owner: 'WAITING_ON_AUTHOR',
+    owner: 'Author',
     awaiting: 'author',
     ageDays: 77,
   })
@@ -228,7 +238,7 @@ test('unresolved authority gets reconciliation-required without false party assi
 test('duplicate source cannot override waiting state', () => {
   const projection = project({
     canonicalAuthorityClassification: 'DUPLICATE_RECORD',
-    owner: 'WAITING_ON_AUTHOR',
+    owner: 'Author',
     awaiting: 'author',
     nextAction: 'Author review',
     ageDays: 44,

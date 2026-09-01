@@ -1,0 +1,17 @@
+ARTIFACT_CLASS,DESCRIPTION
+SOURCE_MANUSCRIPT,Original or received author manuscript source
+NORMALIZED_MANUSCRIPT,Normalized manuscript prepared for editorial work
+DEVELOPMENTAL_EDIT,Developmental editing artifact
+LINE_EDIT,Line editing artifact
+COPYEDIT,Copyediting artifact
+PROOF,Proof/review artifact
+FINAL_INTERIOR,Final interior production artifact
+COVER,Cover/full-wrap artifact
+EBOOK,Ebook/EPUB artifact
+AUDIO,Audio/audiobook artifact
+PRODUCTION_SOURCE,Production source/master file
+DISTRIBUTION_ASSET,Distribution platform asset
+MARKETING_ASSET,Marketing asset
+HISTORICAL_ARTIFACT,Historical reference only
+SUPERSEDED_ARTIFACT,Explicitly replaced artifact
+UNKNOWN_ARTIFACT,Artifact class not proven
