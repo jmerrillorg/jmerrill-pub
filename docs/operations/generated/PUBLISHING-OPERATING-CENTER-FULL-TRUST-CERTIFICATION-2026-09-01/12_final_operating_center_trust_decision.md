@@ -2,7 +2,7 @@
 
 FINAL_OPERATING_CENTER_TRUST_CLASSIFICATION = OPERATING_CENTER_PARTIALLY_TRUSTED
 
-This certification does not classify the Operating Center as fully trusted because authenticated Publisher Operating Center UI/API readback was not available to this CLI session. Based on generated projection evidence, there are no untrustworthy rows and the only modeled exceptions are the six explicit reconciliation cases.
+This certification does not classify the Operating Center as fully trusted. Authenticated UI readback found a concrete projection divergence. Indomitable is certified as COMMERCIAL_ACTIVATION / PACKAGE_ACCEPTANCE / NOT_WAITING, while the production UI presents it as Stage 05 / Author Onboarding Tasks / JMP-System with artifact authority unresolved.
 
 OPERATING_CENTER_ADVISORY_ONLY_RESTRICTION = RETAIN
 CLIENT_TITLE_AUTOMATION_FREEZE = ACTIVE

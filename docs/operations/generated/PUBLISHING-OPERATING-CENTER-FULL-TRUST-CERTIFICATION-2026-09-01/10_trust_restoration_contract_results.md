@@ -13,6 +13,6 @@
 | 0 duplicate current-authority influence | PASS |
 | Repeatability / replay proof | PASS |
 | Negative proof | PASS |
-| Authenticated production readback | BLOCKED |
+| Authenticated production readback | FAIL |
 
-TRUST_RESTORATION_CONTRACT = BLOCKED_AUTHENTICATED_PRODUCTION_READBACK_REQUIRED
+TRUST_RESTORATION_CONTRACT = FAIL_AUTHENTICATED_UI_PROJECTION_DIVERGENCE

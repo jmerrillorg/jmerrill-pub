@@ -12,4 +12,4 @@ UNTRUSTWORTHY = 0
 
 Systemic defect retest is clean: stage ahead-of-evidence, commercial-gate, editorial-gate, Waiting On, timer, artifact-stage, transition-authority, legacy-contamination, and duplicate-authority errors are all 0.
 
-Founder decision required: decide whether to provide/perform authenticated Publisher Operating Center readback. Until that proof is attached, keep the Operating Center advisory-only restriction in place.
+Authenticated Publisher session readback was performed. Founder decision required: keep the Operating Center advisory-only restriction in place and route the authenticated UI/projection divergence into a narrow remediation pass before trust can be lifted.

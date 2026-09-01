@@ -1,6 +1,6 @@
 # Certification Scope
 
-Generated: 2026-09-01T18:08:54.273Z
+Generated: 2026-09-01T18:20:04.244Z
 
 This package certifies the deployed Publishing Operating Center trust model from the current canonical Wave 3, Wave 4, and Wave 5 evidence projections on main.
 

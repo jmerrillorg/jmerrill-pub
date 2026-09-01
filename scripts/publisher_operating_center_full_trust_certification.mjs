@@ -13,6 +13,37 @@ const outDir = join(root, 'docs/operations/generated/PUBLISHING-OPERATING-CENTER
 const deployedSha = process.env.POC_CERT_DEPLOYED_SHA || '2330cf2df2973b42cac211b18410a403ff2a5ac1'
 const productionHealth = process.env.POC_CERT_PRODUCTION_HEALTH || 'PASS'
 const productionApiReadback = process.env.POC_CERT_AUTHENTICATED_READBACK || 'BLOCKED_NO_AUTHENTICATED_PUBLISHER_SESSION_AVAILABLE_TO_CLI'
+const authenticatedPublisherSession = process.env.POC_CERT_AUTHENTICATED_PUBLISHER_SESSION || 'PASS'
+const authenticatedApiReadback = process.env.POC_CERT_AUTHENTICATED_API_READBACK || 'BLOCKED_BROWSER_CLIENT_DIRECT_API_NAVIGATION_BLOCKED_AND_PAGE_SANDBOX_NETWORK_APIS_UNAVAILABLE'
+const authenticatedUiReadback = process.env.POC_CERT_AUTHENTICATED_UI_READBACK || 'FAIL'
+const uiApiProjectionDivergences = parseJsonEnv('POC_CERT_UI_API_PROJECTION_DIVERGENCES', [
+  {
+    sample: 'CURRENT ACTIVE AUTHORITY',
+    sourceRecordId: 'W1-301',
+    title: 'Indomitable',
+    certifiedProjection: {
+      stage: 'COMMERCIAL_ACTIVATION',
+      substage: 'PACKAGE_ACCEPTANCE',
+      waitingOn: 'NOT_WAITING',
+      waitingReason: 'NO_CURRENT_GOVERNED_ACTION',
+      timer: 'NONE',
+      currentArtifact: 'DATA_GAP',
+      artifactAuthority: 'NO_CURRENT_ARTIFACT_REQUIRED',
+      nextGovernedAction: 'No current governed action is outstanding',
+      reconciliationStatus: 'CERTIFIED',
+    },
+    visibleUiValue: {
+      stage: '05 - Join the Family & Author Onboarding',
+      substage: 'Author Onboarding Tasks',
+      waitingOn: 'JMP/System',
+      attention: 'ARTIFACT_AUTHORITY_UNRESOLVED',
+      age: '0 days',
+      nextVisibleText: 'BLOCKED - PROOFREADING',
+    },
+    result: 'FAIL',
+    reason: 'Authenticated UI presents a later/different operational lifecycle state and responsibility than the certified projection for the deterministic current-authority sample.',
+  },
+])
 
 mkdirSync(outDir, { recursive: true })
 
@@ -65,7 +96,27 @@ const summary = summarize(certificationRows)
 summary.generatedAt = new Date().toISOString()
 summary.deployedSha = deployedSha
 summary.productionHealth = productionHealth
-summary.productionReadbackPass = productionApiReadback === 'PASS' ? 'YES' : 'NO'
+summary.authenticatedPublisherSession = authenticatedPublisherSession
+summary.authenticatedApiReadback = authenticatedApiReadback
+summary.authenticatedUiReadback = authenticatedUiReadback
+summary.uiApiProjectionDivergences = uiApiProjectionDivergences
+summary.sampledRecords = {
+  currentAuthority: 'W1-301 / Indomitable / FAIL',
+  legacyException: 'W1-175 / JM1 Duplicate Proof 20260727173641 / PASS_VISIBLE_IN_AUTHENTICATED_UI',
+  noncanonicalSuppression: 'W1-048 / 100 Wisdom Lessons for Life and Living / PASS_VISIBLE_IN_AUTHENTICATED_UI',
+  reconciliationRequired: 'W1-042 / Indomitable Indomitable Escaping Witchcraft and Finding My Identity in Christ / PASS_VISIBLE_AS_UNRESOLVED_IN_AUTHENTICATED_UI',
+  noActiveTimer: 'W1-001 / (Untitled) / CATEGORY_AVAILABLE_IN_PROJECTION; DEFAULT_UI_FILTER_DID_NOT_SURFACE_TITLE_STRING',
+  authoritativeTimer: 'NOT_PRESENT_IN_CERTIFIED_POPULATION',
+  noCurrentArtifactRequired: 'W1-001 / (Untitled) / CATEGORY_AVAILABLE_IN_PROJECTION; DEFAULT_UI_FILTER_DID_NOT_SURFACE_TITLE_STRING',
+  trustedCurrentArtifact: 'NOT_PRESENT_IN_CERTIFIED_POPULATION',
+}
+summary.currentAuthoritySamplePass = uiApiProjectionDivergences.some((item) => item.sample === 'CURRENT ACTIVE AUTHORITY') ? 'NO' : 'YES'
+summary.legacyExceptionSamplePass = 'YES'
+summary.noncanonicalSuppressionSamplePass = 'YES'
+summary.reconciliationSamplePass = 'YES'
+summary.timerSamplePass = 'PARTIAL_NO_AUTHORITATIVE_TIMER_IN_CERTIFIED_POPULATION'
+summary.artifactSamplePass = 'PARTIAL_NO_TRUSTED_CURRENT_ARTIFACT_IN_CERTIFIED_POPULATION'
+summary.productionReadbackPass = authenticatedApiReadback === 'PASS' && authenticatedUiReadback === 'PASS' ? 'YES' : 'NO'
 summary.productionApiReadback = productionApiReadback
 summary.replayIdentical = replayIdentical ? 'YES' : 'NO'
 summary.manualInterventionCount = 0
@@ -138,7 +189,7 @@ writeCsv(join(outDir, '06_reconciliation_exception_certification.csv'), reconcil
 })))
 writeFileSync(join(outDir, '07_negative_proof.md'), negativeProofDoc(summary))
 writeFileSync(join(outDir, '08_replay_repeatability_proof.md'), replayProof(summary))
-writeFileSync(join(outDir, '09_authenticated_ui_api_readback.md'), uiApiReadback(summary))
+writeFileSync(join(outDir, '09_authenticated_ui_api_readback.md'), `${uiApiReadback(summary).trimEnd()}\n`)
 writeFileSync(join(outDir, '10_trust_restoration_contract_results.md'), trustRestorationContract(summary))
 writeFileSync(join(outDir, '11_proof_contract.md'), proofContract(summary))
 writeFileSync(join(outDir, '12_final_operating_center_trust_decision.md'), finalDecision(summary))
@@ -259,6 +310,8 @@ function negativeProofPass(summary) {
 }
 
 function proofContractStatus(summary) {
+  if (summary.authenticatedUiReadback === 'FAIL' || summary.uiApiProjectionDivergences.length > 0) return 'FAIL_AUTHENTICATED_UI_PROJECTION_DIVERGENCE'
+  if (summary.authenticatedApiReadback !== 'PASS') return 'BLOCKED_AUTHENTICATED_API_READBACK_REQUIRED'
   if (summary.productionReadbackPass !== 'YES') return 'BLOCKED_AUTHENTICATED_PRODUCTION_READBACK_REQUIRED'
   if (summary.negativeProofPass !== 'YES' || summary.replayIdentical !== 'YES' || summary.manualInterventionCount !== 0) return 'FAIL'
   if (summary.untrustworthy > 0) return 'FAIL'
@@ -267,6 +320,7 @@ function proofContractStatus(summary) {
 
 function finalTrustDecision(summary) {
   if (summary.proofContractStatus === 'PASS' && summary.reconciliationRequired === 6) return 'OPERATING_CENTER_TRUSTED_WITH_EXPLICIT_RECONCILIATION_EXCEPTIONS'
+  if (summary.proofContractStatus === 'FAIL_AUTHENTICATED_UI_PROJECTION_DIVERGENCE') return 'OPERATING_CENTER_PARTIALLY_TRUSTED'
   if (summary.untrustworthy === 0 && summary.productionReadbackPass !== 'YES') return 'OPERATING_CENTER_PARTIALLY_TRUSTED'
   if (summary.untrustworthy > 0) return 'OPERATING_CENTER_UNTRUSTWORTHY'
   return 'OPERATING_CENTER_TRUSTED'
@@ -345,13 +399,22 @@ The complete certification projection was materialized from the same authoritati
 }
 
 function uiApiReadback(summary) {
+  const divergenceText = summary.uiApiProjectionDivergences.length
+    ? `\n## UI / Projection Divergences\n\n${summary.uiApiProjectionDivergences.map((item, index) => `### ${index + 1}. ${item.sample}: ${item.title}\n\nSOURCE_RECORD_ID = ${item.sourceRecordId}\nRESULT = ${item.result}\nREASON = ${item.reason}\n\nCERTIFIED_PROJECTION_VALUE:\n\n\`\`\`json\n${JSON.stringify(item.certifiedProjection, null, 2)}\n\`\`\`\n\nVISIBLE_UI_VALUE:\n\n\`\`\`json\n${JSON.stringify(item.visibleUiValue, null, 2)}\n\`\`\`\n`).join('\n')}`
+    : '\nNo UI / projection divergences were observed.'
   return `# Authenticated UI / API Readback
 
 PRODUCTION_HEALTH = ${summary.productionHealth}
 DEPLOYED_SHA = ${summary.deployedSha}
-AUTHENTICATED_PUBLISHER_OPERATING_CENTER_READBACK = ${summary.productionApiReadback}
+AUTHENTICATED_PUBLISHER_SESSION = ${summary.authenticatedPublisherSession}
+AUTHENTICATED_API_READBACK = ${summary.authenticatedApiReadback}
+AUTHENTICATED_UI_READBACK = ${summary.authenticatedUiReadback}
+PRODUCTION_READBACK_PASS = ${summary.productionReadbackPass}
 
-Unauthenticated 401 is not used as proof of UI correctness for this certification. A Publisher session token was not available to the CLI during this pass, so the formal trust contract remains blocked on authenticated production readback.
+The Publisher Operating Center was opened in an authenticated browser session as jm1-admin@jmerrill.one. Direct API navigation was blocked by the browser client and the browser evaluation sandbox did not expose network APIs, so API body capture remains unavailable through this tool path.
+
+Unauthenticated 401 is not used as proof of UI correctness for this certification.
+${divergenceText}
 `
 }
 
@@ -371,7 +434,7 @@ function trustRestorationContract(summary) {
 | 0 duplicate current-authority influence | ${summary.duplicateAuthorityCases === 0 ? 'PASS' : 'FAIL'} |
 | Repeatability / replay proof | ${summary.replayIdentical === 'YES' ? 'PASS' : 'FAIL'} |
 | Negative proof | ${summary.negativeProofPass === 'YES' ? 'PASS' : 'FAIL'} |
-| Authenticated production readback | ${summary.productionReadbackPass === 'YES' ? 'PASS' : 'BLOCKED'} |
+| Authenticated production readback | ${summary.productionReadbackPass === 'YES' ? 'PASS' : 'FAIL'} |
 
 TRUST_RESTORATION_CONTRACT = ${summary.proofContractStatus}
 `
@@ -382,16 +445,19 @@ function proofContract(summary) {
 
 PROOF_CONTRACT_STATUS = ${summary.proofContractStatus}
 
-All projection/data tests are passing, all 408 rows are classified, replay is identical, manual intervention count is 0, and negative proof passes. The only remaining proof-contract blocker is authenticated production UI/API readback.
+All projection/data tests are passing, all 408 rows are classified, replay is identical, manual intervention count is 0, and negative proof passes. Authenticated Publisher session proof is now available, but the visible UI diverges from the certified projection for the deterministic current-authority sample, so the proof contract does not pass.
 `
 }
 
 function finalDecision(summary) {
+  const divergenceSentence = summary.uiApiProjectionDivergences.length
+    ? 'Authenticated UI readback found a concrete projection divergence. Indomitable is certified as COMMERCIAL_ACTIVATION / PACKAGE_ACCEPTANCE / NOT_WAITING, while the production UI presents it as Stage 05 / Author Onboarding Tasks / JMP-System with artifact authority unresolved.'
+    : 'Authenticated production UI/API readback was not available to this CLI session.'
   return `# Final Operating Center Trust Decision
 
 FINAL_OPERATING_CENTER_TRUST_CLASSIFICATION = ${summary.finalTrustClassification}
 
-This certification does not classify the Operating Center as fully trusted because authenticated Publisher Operating Center UI/API readback was not available to this CLI session. Based on generated projection evidence, there are no untrustworthy rows and the only modeled exceptions are the six explicit reconciliation cases.
+This certification does not classify the Operating Center as fully trusted. ${divergenceSentence}
 
 OPERATING_CENTER_ADVISORY_ONLY_RESTRICTION = ${summary.operatingCenterAdvisoryOnlyRestriction}
 CLIENT_TITLE_AUTOMATION_FREEZE = ${summary.clientTitleAutomationFreeze}
@@ -416,8 +482,17 @@ UNTRUSTWORTHY = ${summary.untrustworthy}
 
 Systemic defect retest is clean: stage ahead-of-evidence, commercial-gate, editorial-gate, Waiting On, timer, artifact-stage, transition-authority, legacy-contamination, and duplicate-authority errors are all 0.
 
-Founder decision required: decide whether to provide/perform authenticated Publisher Operating Center readback. Until that proof is attached, keep the Operating Center advisory-only restriction in place.
+Authenticated Publisher session readback was performed. Founder decision required: keep the Operating Center advisory-only restriction in place and route the authenticated UI/projection divergence into a narrow remediation pass before trust can be lifted.
 `
+}
+
+function parseJsonEnv(name, fallback) {
+  if (!process.env[name]) return fallback
+  try {
+    return JSON.parse(process.env[name])
+  } catch {
+    return fallback
+  }
 }
 
 function count(rows, key, value) {
