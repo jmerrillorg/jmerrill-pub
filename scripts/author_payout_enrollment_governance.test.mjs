@@ -150,7 +150,7 @@ test('canonical identity policy declares one Connect account per royalty payee a
   assert.equal(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.name, 'PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1')
   assert.equal(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.invariant, 'one_royalty_payee_one_canonical_stripe_connect_account')
   assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.matchingPrecedence.includes('stored_dataverse_account_id'))
-  assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.matchingPrecedence.includes('exact_email'))
+  assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.matchingPrecedence.includes('governed_reconciliation_required_for_exact_email'))
   assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.allowedOperations.includes('refresh_account_link'))
   assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.prohibitedOperations.includes('create_while_duplicate_review_pending'))
   assert.ok(stripe.PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1.prohibitedOperations.includes('shared_onboarding_link'))
@@ -196,7 +196,7 @@ test('existing Stripe metadata match is reused before creating a replacement acc
   assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts']])
 })
 
-test('single exact-email connected account is reused before creating a duplicate', async () => {
+test('single exact-email connected account requires governed reconciliation before reuse', async () => {
   const calls = []
   installMockFetch(calls, {
     searchAccount: {
@@ -207,15 +207,71 @@ test('single exact-email connected account is reused before creating a duplicate
     },
   })
 
-  const result = await stripe.resolveRecipientAccountId(identity)
-
-  assert.equal(result.accountId, 'acct_EmailOnlyAuthor')
-  assert.equal(result.reused, true)
-  assert.equal(result.source, 'stripe_email_search')
+  await assert.rejects(
+    () => stripe.resolveRecipientAccountId(identity),
+    /CONNECT_RECONCILIATION_REQUIRED/,
+  )
+  assert.equal(calls.length, 1)
   assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts']])
 })
 
-test('multiple plausible connected accounts block creation and require duplicate review', async () => {
+test('alternate login email does not authorize a second Stripe identity when legacy email evidence exists', async () => {
+  const calls = []
+  installMockFetch(calls, {
+    searchAccount: {
+      id: 'acct_AlternateEmailOnlyAuthor',
+      object: 'account',
+      email: 'alternate@example.com',
+      metadata: {},
+    },
+  })
+
+  await assert.rejects(
+    () => stripe.resolveRecipientAccountId({ ...identity, authorEmail: 'alternate@example.com' }),
+    /CONNECT_RECONCILIATION_REQUIRED/,
+  )
+  assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts']])
+})
+
+test('title-specific connected account evidence cannot override canonical author identity', async () => {
+  const calls = []
+  installMockFetch(calls, {
+    searchAccount: {
+      id: 'acct_TitleSpecificAuthor',
+      object: 'account',
+      email: identity.authorEmail,
+      business_profile: { name: 'The Intentional Leader' },
+      metadata: { jm1_title: 'The Intentional Leader' },
+    },
+  })
+
+  await assert.rejects(
+    () => stripe.resolveRecipientAccountId(identity),
+    /CONNECT_RECONCILIATION_REQUIRED/,
+  )
+  assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts']])
+})
+
+test('parallel canonical start attempts reuse stored account without replacement account creation', async () => {
+  const calls = []
+  installMockFetch(calls)
+
+  const starts = await Promise.all([
+    stripe.resolveRecipientAccountId({ ...identity, existingStripeAccountId: 'acct_ExistingAuthor' }),
+    stripe.resolveRecipientAccountId({ ...identity, existingStripeAccountId: 'acct_ExistingAuthor' }),
+  ])
+
+  assert.deepEqual(starts, [
+    { accountId: 'acct_ExistingAuthor', reused: true, source: 'dataverse_existing' },
+    { accountId: 'acct_ExistingAuthor', reused: true, source: 'dataverse_existing' },
+  ])
+  assert.deepEqual(calls.map((call) => [call.method, call.path]), [
+    ['GET', '/v1/accounts/acct_ExistingAuthor'],
+    ['GET', '/v1/accounts/acct_ExistingAuthor'],
+  ])
+})
+
+test('authoritative metadata account wins over legacy email-only evidence without creating a duplicate', async () => {
   const calls = []
   installMockFetch(calls, {
     searchAccounts: [
@@ -232,6 +288,37 @@ test('multiple plausible connected accounts block creation and require duplicate
         object: 'account',
         email: identity.authorEmail,
         metadata: {},
+      },
+    ],
+  })
+
+  const result = await stripe.resolveRecipientAccountId(identity)
+
+  assert.equal(result.accountId, 'acct_MetadataAuthor')
+  assert.equal(result.reused, true)
+  assert.equal(result.source, 'stripe_identity_search')
+  assert.deepEqual(calls.map((call) => [call.method, call.path]), [['GET', '/v1/accounts']])
+})
+
+test('multiple authoritative connected accounts block creation and require duplicate review', async () => {
+  const calls = []
+  installMockFetch(calls, {
+    searchAccounts: [
+      {
+        id: 'acct_MetadataContactAuthor',
+        object: 'account',
+        email: identity.authorEmail,
+        metadata: {
+          jm1_contact_id: identity.contactId,
+        },
+      },
+      {
+        id: 'acct_MetadataPayeeAuthor',
+        object: 'account',
+        email: identity.authorEmail,
+        metadata: {
+          jm1_royalty_payee_id: identity.royaltyPayeeId,
+        },
       },
     ],
   })
