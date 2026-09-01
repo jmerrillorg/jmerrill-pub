@@ -1,0 +1,29 @@
+{
+  "entitySet": "jm1_executionlogs",
+  "writeStatus": "WRITTEN_TO_DATAVERSE",
+  "executionLogId": "db21f254-75a5-f111-b8de-000d3a14673b",
+  "createdOn": "2026-08-31T19:51:21Z",
+  "eventType": "PUBLISHING_ARCHITECTURE_CONSOLIDATION_CANON_CANDIDATE_APPROVED",
+  "payload": {
+    "jm1_name": "PUBLISHING-ARCHITECTURE-CONSOLIDATION-2026-08-31",
+    "jm1_actiontype": "PUBLISHING_ARCHITECTURE_CONSOLIDATION_CANON_CANDIDATE_APPROVED",
+    "jm1_agentname": "codex",
+    "jm1_agentmodel": "gpt-5",
+    "jm1_bandlevel": 835500000,
+    "jm1_executionstatus": 835500001,
+    "jm1_startedon": "2026-08-31T19:51:20.000Z",
+    "jm1_completedon": "2026-08-31T19:51:20.000Z",
+    "jm1_sourceentity": "repository_governance_branch",
+    "jm1_sourcerecordid": "codex/publishing-architecture-consolidation-ratification-20260831",
+    "jm1_actiondescription": "Founder ruling captured as canon-candidate approval only. Three artifacts split: Proof Contract Standard first gating artifact, Path B v0.9 Hybrid Lifecycle Amendment, Capability Maturity Model Extension Proposal. Publishing discretionary architecture freeze remains active. Permitted work: proof standard, defect remediation, proof-enabling architecture, missing dependency remediation, security/compliance, ALM, and evidence/governance correction. Freeze exit requires ratified/authorized Proof Contract, one internal validation title lifecycle segment proven, evidence captured, defects dispositioned, and Jackie decision packet. Evidence Registry requires authoritative_source and authority_basis. ALM maturity ceiling: 692 dependency edges and 38 unpackaged prerequisites; affected capabilities must not be AUTONOMOUSLY_PROVEN until dependency/ALM controls are governed. No runtime/schema/deployment/author communication mutation authorized."
+  },
+  "ratificationStatus": {
+    "Proof Contract Standard": "CANON-CANDIDATE / NOT RATIFIED",
+    "Path B v0.9 Architecture Amendment": "CANON-CANDIDATE / NOT RATIFIED",
+    "Capability Maturity Model Extension Proposal": "CANON-CANDIDATE / NOT RATIFIED"
+  },
+  "notes": [
+    "Dataverse write succeeded through an authorized local Azure CLI token path.",
+    "The source-controlled payload preserves the safe metadata written to jm1_executionlogs."
+  ]
+}

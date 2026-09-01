@@ -1,0 +1,30 @@
+{
+  "entitySet": "jm1_executionlogs",
+  "writeStatus": "WRITTEN_TO_DATAVERSE",
+  "eventType": "JMP_PATH_B_V0_9_ARCHITECTURE_AMENDMENT_RATIFIED",
+  "payload": {
+    "jm1_name": "JMP-PATH-B-v0.9-RATIFIED",
+    "jm1_actiontype": "JMP_PATH_B_V0_9_ARCHITECTURE_AMENDMENT_RATIFIED",
+    "jm1_agentname": "codex",
+    "jm1_agentmodel": "gpt-5",
+    "jm1_bandlevel": 835500000,
+    "jm1_executionstatus": 835500001,
+    "jm1_startedon": "2026-09-01T07:44:39.358Z",
+    "jm1_completedon": "2026-09-01T07:44:39.358Z",
+    "jm1_sourceentity": "repository_governance_branch",
+    "jm1_sourcerecordid": "codex/publishing-architecture-consolidation-ratification-20260831",
+    "jm1_actiondescription": "Founder decision RATIFY_WITH_NARROW_CLARIFICATIONS applied to JMP Path B v0.9 Hybrid Lifecycle Architecture Amendment only. Narrow clarifications added: lifecycle registry not replaced, J0-J8 as macro abstraction/mapping only, projection conflict authority, event ordering/replay/idempotency, failed-transition recovery, Proof Contract integration, A0-A5 and AUTHENTICATION != A5 CONSENT boundary, and Security Tier 2 boundary. Path B final status: CANONICAL ARCHITECTURE AMENDMENT. CMM extension remains CANON-CANDIDATE. Publishing discretionary architecture freeze and client-title automation freeze remain ACTIVE. No runtime/schema/workflow/deployment/author communication mutation authorized."
+  },
+  "ratificationStatus": {
+    "Proof Contract Standard": "CANONICAL GOVERNANCE STANDARD / RATIFIED",
+    "Path B v0.9 Architecture Amendment": "CANONICAL ARCHITECTURE AMENDMENT / RATIFIED",
+    "Capability Maturity Model Extension Proposal": "CANON-CANDIDATE / NOT RATIFIED"
+  },
+  "executionLogId": "f44281fa-d8a5-f111-b8de-6045bdd69738",
+  "createdOn": "2026-09-01T07:44:40Z",
+  "notes": [
+    "Dataverse write completed with query-first idempotency.",
+    "The source-controlled payload preserves the safe metadata written to jm1_executionlogs.",
+    "Later status note: the CMM extension was subsequently ratified in a separate governance event."
+  ]
+}
