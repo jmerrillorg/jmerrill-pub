@@ -105,7 +105,7 @@ export const PUB_STRIPE_CONNECT_AUTHOR_IDENTITY_V1 = Object.freeze({
     'metadata_contact_id',
     'metadata_author_relationship_id',
     'metadata_royalty_payee_id',
-    'exact_email',
+    'governed_reconciliation_required_for_exact_email',
   ],
   allowedOperations: [
     'reuse_canonical_connect_account',
@@ -257,16 +257,17 @@ export async function resolveRecipientAccountId(identity: AuthorConnectIdentity)
   }
 
   const candidates = await findConnectedAccountCandidates(identity)
-  if (candidates.length > 1) {
+  const authoritativeCandidates = candidates.filter((candidate) => hasAuthoritativeConnectedAccountEvidence(candidate))
+  if (authoritativeCandidates.length > 1) {
     throw new Error('CONNECT_DUPLICATE_REVIEW')
   }
-  const existing = candidates[0]
+  const existing = authoritativeCandidates[0]
   if (existing?.account.id) {
     assertConnectedAccountMatchesIdentity(existing.account, identity)
-    const source = existing.evidence.some((item) => item.startsWith('metadata_'))
-      ? 'stripe_identity_search'
-      : 'stripe_email_search'
-    return { accountId: existing.account.id, reused: true, source: source as 'stripe_identity_search' | 'stripe_email_search' }
+    return { accountId: existing.account.id, reused: true, source: 'stripe_identity_search' as const }
+  }
+  if (candidates.length > 0) {
+    throw new Error('CONNECT_RECONCILIATION_REQUIRED')
   }
 
   const account = await createRecipientAccount(identity)
@@ -289,8 +290,11 @@ export async function retrieveConnectedAccount(accountId: string) {
 
 export async function searchConnectedAccountByIdentity(identity: AuthorConnectIdentity) {
   const candidates = await findConnectedAccountCandidates(identity)
-  if (candidates.length > 1) throw new Error('CONNECT_DUPLICATE_REVIEW')
-  return candidates[0]?.account || null
+  const authoritativeCandidates = candidates.filter((candidate) => hasAuthoritativeConnectedAccountEvidence(candidate))
+  if (authoritativeCandidates.length > 1) throw new Error('CONNECT_DUPLICATE_REVIEW')
+  if (authoritativeCandidates[0]?.account) return authoritativeCandidates[0].account
+  if (candidates.length > 0) throw new Error('CONNECT_RECONCILIATION_REQUIRED')
+  return null
 }
 
 export async function findConnectedAccountCandidates(
@@ -353,6 +357,10 @@ export function classifyConnectedAccountForAuthorEstate(account: StripeAccountOb
   if (readiness === 'READY_FOR_ROYALTIES') return 'CONNECT_CANONICAL_READY'
   if (account.details_submitted) return 'CONNECT_ACTION_REQUIRED'
   return 'CONNECT_EXISTS_ONBOARDING_INCOMPLETE'
+}
+
+export function hasAuthoritativeConnectedAccountEvidence(candidate: ConnectedAccountCandidate) {
+  return candidate.evidence.some((item) => item === 'stored_dataverse_account_id' || item.startsWith('metadata_'))
 }
 
 export function detectStripeConnectDrift(identities: AuthorConnectIdentity[], accounts: StripeAccountObject[]) {
