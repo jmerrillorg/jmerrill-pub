@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-09-01T11:51:03.858Z",
+  "wave1Baseline": "4cbabf032ed2256410d574c091ae6c954543d19a",
+  "recordsProjected": 408,
+  "canonicalCurrentAuthorityRecords": 21,
+  "noncanonicalRecordsSuppressedFromAuthority": 387,
+  "reconciliationRequired": 6,
+  "projectionAheadOfProvenState": 0,
+  "legacyOverrideCases": 0,
+  "duplicateOverrideCases": 0,
+  "canonicalAuthorityConsumption": "ENFORCED",
+  "replayDeterministic": "YES",
+  "stageFullyTrustworthy": "NO_LATER_WAVE_REQUIRED",
+  "waitingOnFullyTrustworthy": "NO_LATER_WAVE_REQUIRED",
+  "timerFullyTrustworthy": "NO_LATER_WAVE_REQUIRED",
+  "artifactFullyTrustworthy": "NO_LATER_WAVE_REQUIRED"
+}

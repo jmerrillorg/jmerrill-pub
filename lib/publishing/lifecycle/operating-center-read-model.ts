@@ -33,6 +33,7 @@ export type CanonicalSystemAttentionCode =
   | 'DELIVERY_CERTIFICATION_REQUIRED'
   | 'EXTERNAL_STATUS_UNAVAILABLE'
   | 'DATA_GAP'
+  | 'RECONCILIATION_REQUIRED'
 
 export type CanonicalReadinessState = 'READY' | 'NOT_READY' | 'BLOCKED' | 'NOT_APPLICABLE' | 'DATA_GAP'
 
@@ -116,6 +117,10 @@ export type CanonicalPublisherProjectionInput = {
   derivedFromArtifactId?: string
   duplicateCurrentArtifactCount?: number
   artifactChecksumMismatch?: boolean
+  canonicalAuthorityClassification?: string
+  canonicalTitleReference?: string
+  canonicalAuthorContactReference?: string
+  sourceAuthority?: string
 }
 
 export type CanonicalPublisherReadModel = {
@@ -207,6 +212,20 @@ export type CanonicalPublisherReadModel = {
     }
     conflictCount: number
   }
+  canonicalAuthority: {
+    classification: string
+    canonicalTitleReference: string
+    canonicalAuthorContactReference: string
+    sourceAuthority: string
+    currentAuthorityRelationship: string
+    isCurrentOperationalAuthority: boolean
+    requiresReconciliation: boolean
+    lastProvenGovernedStage: StageCode | 'DATA_GAP'
+    lastProvenGovernedSubstage: SubstageCode | 'DATA_GAP'
+    lastProvenTransition: string
+    transitionAuthority: string
+    transitionEvidence: string
+  }
   waveC1EvidenceAuthority: {
     artifact: ReturnType<typeof evaluateWaveC1ArtifactAuthority>
     commercial: ReturnType<typeof evaluateWaveC1CommercialAuthority>
@@ -291,24 +310,52 @@ export function canonicalStageIdForPublisherState(value: string): StageCode {
 export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProjectionInput): CanonicalPublisherReadModel {
   const mappingInput = legacyMappingInputForState(input.legacySourceState, input)
   const mapping = mapLegacyLifecycleValue(mappingInput)
-  const stage = mapping.canonicalStage
+  const rawStage = mapping.canonicalStage
     ? JMP_PUBLISHING_LIFECYCLE_REGISTRY.find((candidate) => candidate.stageCode === mapping.canonicalStage)
     : null
-  const substage = mapping.canonicalSubstage
-    ? stage?.substages.find((candidate) => candidate.substageCode === mapping.canonicalSubstage) ||
+  const rawSubstage = mapping.canonicalSubstage
+    ? rawStage?.substages.find((candidate) => candidate.substageCode === mapping.canonicalSubstage) ||
       JMP_PUBLISHING_LIFECYCLE_REGISTRY.flatMap((candidate) => candidate.substages).find(
         (candidate) => candidate.substageCode === mapping.canonicalSubstage,
       )
     : null
+  const canonicalAuthority = canonicalAuthorityFor(input, rawStage?.stageCode || 'DATA_GAP', rawSubstage?.substageCode || 'DATA_GAP', mapping)
+  const stage = canonicalAuthority.isCurrentOperationalAuthority ? rawStage : null
+  const substage = canonicalAuthority.isCurrentOperationalAuthority ? rawSubstage : null
   const splitBrain = detectSplitBrain(input)
   const artifact = sourceArtifactFor(input, mapping)
   const lifecycleEvidence = lifecycleEvidenceFor(input, mapping, artifact)
   const waveC1EvidenceAuthority = waveC1EvidenceAuthorityFor(input, artifact)
   const waitingOn = canonicalWaitingOwner(input)
-  const systemAttention = systemAttentionFor(input, mapping, splitBrain, artifact.artifactType === 'DATA_GAP')
+  const systemAttention = canonicalAuthority.requiresReconciliation || !canonicalAuthority.isCurrentOperationalAuthority
+    ? canonicalAuthority.requiresReconciliation
+      ? {
+        code: 'RECONCILIATION_REQUIRED' as const,
+        severity: 'BLOCKING' as const,
+        reason: `${canonicalAuthority.classification} cannot establish current lifecycle authority. ${canonicalAuthority.transitionEvidence}`,
+      }
+      : {
+          code: 'NONE' as const,
+          severity: 'INFO' as const,
+          reason: `${canonicalAuthority.classification} is preserved as descriptive history and suppressed from current lifecycle authority.`,
+        }
+    : systemAttentionFor(input, mapping, splitBrain, artifact.artifactType === 'DATA_GAP')
   const authorActionRequired = authorActionFor(input, waitingOn, mapping)
   const dataGaps = dataGapsFor(input)
   const nextGovernedAction =
+    canonicalAuthority.requiresReconciliation || !canonicalAuthority.isCurrentOperationalAuthority
+      ? canonicalAuthority.requiresReconciliation
+        ? {
+          action: 'Reconcile canonical title authority before projecting current lifecycle movement',
+          confidence: 'UNRESOLVED' as const,
+          reason: `${canonicalAuthority.classification} is descriptive/history-only for Wave 2 projection authority.`,
+        }
+        : {
+            action: 'Use canonical authority record for current lifecycle movement',
+            confidence: 'CONFIRMED' as const,
+            reason: `${canonicalAuthority.classification} remains queryable but cannot project current movement.`,
+          }
+      :
     mapping.resultCode === 'CANONICAL_MAPPING_CONFLICT' || mapping.resultCode === 'CANONICAL_MAPPING_INCOMPLETE'
       ? {
           action: 'Resolve lifecycle mapping conflict',
@@ -352,6 +399,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     authorActionRequired,
     sourceArtifact: artifact,
     lifecycleEvidence,
+    canonicalAuthority,
     waveC1EvidenceAuthority,
     workingImprint: 'DATA_GAP',
     recommendedImprint: 'DATA_GAP',
@@ -378,6 +426,61 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     dataGaps,
     sourceAttribution: ['Dataverse', 'Publisher Operating Center read model', 'JMP lifecycle registry v1.0'],
   }
+}
+
+function canonicalAuthorityFor(
+  input: CanonicalPublisherProjectionInput,
+  provenStage: StageCode | 'DATA_GAP',
+  provenSubstage: SubstageCode | 'DATA_GAP',
+  mapping: LegacyMappingResult,
+): CanonicalPublisherReadModel['canonicalAuthority'] {
+  const classification = normalizeAuthorityClassification(input.canonicalAuthorityClassification)
+  const sourceAuthority = input.sourceAuthority || 'Publisher Operating Center projection input'
+  const currentClassifications = new Set(['CANONICAL_CURRENT_TITLE', 'CANONICAL_PUBLISHED_TITLE', 'CANONICAL_EDITION', 'UNCLASSIFIED_LEGACY_COMPATIBILITY'])
+  const unresolvedClassifications = new Set(['REQUIRES_RECONCILIATION', 'ORPHAN'])
+  const noncurrentClassifications = new Set(['DUPLICATE_RECORD', 'LEGACY_TITLE_RECORD', 'LEGACY_RECORD', 'PLACEHOLDER', 'HISTORICAL_VERSION', 'NONCURRENT_HISTORICAL_RECORD'])
+  const isCurrentOperationalAuthority = currentClassifications.has(classification)
+  const requiresReconciliation = unresolvedClassifications.has(classification)
+  const relationship = isCurrentOperationalAuthority
+    ? 'CURRENT_OPERATIONAL_AUTHORITY'
+    : requiresReconciliation
+      ? 'RECONCILIATION_REQUIRED'
+      : noncurrentClassifications.has(classification)
+        ? 'NONCURRENT_REFERENCE_ONLY'
+        : 'RECONCILIATION_REQUIRED'
+  const trusted = isCurrentOperationalAuthority && mapping.resultCode !== 'CANONICAL_MAPPING_CONFLICT' && mapping.resultCode !== 'CANONICAL_MAPPING_INCOMPLETE'
+
+  return {
+    classification,
+    canonicalTitleReference: input.canonicalTitleReference || input.titleId || 'DATA_GAP',
+    canonicalAuthorContactReference: input.canonicalAuthorContactReference || 'DATA_GAP',
+    sourceAuthority,
+    currentAuthorityRelationship: relationship,
+    isCurrentOperationalAuthority,
+    requiresReconciliation: requiresReconciliation || (!isCurrentOperationalAuthority && !noncurrentClassifications.has(classification)),
+    lastProvenGovernedStage: trusted ? provenStage : 'DATA_GAP',
+    lastProvenGovernedSubstage: trusted ? provenSubstage : 'DATA_GAP',
+    lastProvenTransition: trusted ? `${provenStage}${provenSubstage !== 'DATA_GAP' ? `:${provenSubstage}` : ''}` : 'RECONCILIATION_REQUIRED',
+    transitionAuthority: trusted ? 'JMP lifecycle registry v1.0 + Wave 1 canonical authority fields' : 'Wave 1 canonical authority boundary',
+    transitionEvidence: trusted
+      ? `Projected from ${classification} record using ${mapping.resultCode}.`
+      : `Projection suppressed because ${classification} is not proven current operational authority.`,
+  }
+}
+
+function normalizeAuthorityClassification(value?: string) {
+  const normalized = normalize(value || '')
+  if (!normalized) return 'UNCLASSIFIED_LEGACY_COMPATIBILITY'
+  if (normalized.includes('CANONICAL_CURRENT')) return 'CANONICAL_CURRENT_TITLE'
+  if (normalized.includes('CANONICAL_PUBLISHED')) return 'CANONICAL_PUBLISHED_TITLE'
+  if (normalized.includes('CANONICAL_EDITION')) return 'CANONICAL_EDITION'
+  if (normalized.includes('DUPLICATE')) return 'DUPLICATE_RECORD'
+  if (normalized.includes('LEGACY')) return 'LEGACY_TITLE_RECORD'
+  if (normalized.includes('PLACEHOLDER')) return 'PLACEHOLDER'
+  if (normalized.includes('HISTORICAL')) return 'HISTORICAL_VERSION'
+  if (normalized.includes('ORPHAN')) return 'ORPHAN'
+  if (normalized.includes('REQUIRES_RECONCILIATION') || normalized.includes('RECONCILIATION')) return 'REQUIRES_RECONCILIATION'
+  return value || 'UNKNOWN'
 }
 
 function waveC1EvidenceAuthorityFor(

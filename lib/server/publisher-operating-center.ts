@@ -169,6 +169,10 @@ export type PublisherQueueItem = {
   ageBucket: '0-2 days' | '3-7 days' | '8-14 days' | '15-30 days' | 'Over 30 days'
   overdueState: 'current' | 'watch' | 'overdue' | 'stalled'
   duplicateRisk: string
+  canonicalAuthorityClassification?: string
+  canonicalTitleReference?: string
+  canonicalAuthorContactReference?: string
+  sourceAuthority?: string
   latestExecutionEvidence?: string
   sharePointLink?: string
   authorizedActions: Array<{
@@ -245,6 +249,10 @@ export type PublisherWorkloadItem = {
     message: string
   }
   latestExecutionEvidence: string
+  canonicalAuthorityClassification?: string
+  canonicalTitleReference?: string
+  canonicalAuthorContactReference?: string
+  sourceAuthority?: string
 }
 
 export type PublisherPortfolioItem = {
@@ -265,6 +273,10 @@ export type PublisherPortfolioItem = {
   confidence: 'high' | 'medium' | 'low'
   exceptionReason?: string
   nextAction: string
+  canonicalAuthorityClassification?: string
+  canonicalTitleReference?: string
+  canonicalAuthorContactReference?: string
+  sourceAuthority?: string
 }
 
 export type PublisherTodayItem = {
@@ -326,6 +338,10 @@ export type PublisherTodayItem = {
   firstPaymentConfirmationSource?: string
   joinedFamilyEvidenceText?: string
   formatEvidenceText?: string
+  canonicalAuthorityClassification?: string
+  canonicalTitleReference?: string
+  canonicalAuthorContactReference?: string
+  sourceAuthority?: string
   allowedActions: Array<{
     id: PublisherActionId
     label: string
@@ -1421,7 +1437,7 @@ async function getRecentIntakes(config: DataverseServerConfig) {
 async function getRecentTitles(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1pub_titles', {
     $select:
-      'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,jm1pub_stage,jm1pub_status,jm1pub_publicationstatus,jm1pub_publiccatalogstatus,_jm1pub_contract_value,_jm1_author_value,createdon,modifiedon',
+      'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,jm1pub_stage,jm1pub_status,jm1pub_publicationstatus,jm1pub_publiccatalogstatus,jm1_canonicalstatus,jm1_canonicaltitlereference,jm1_canonicalauthorcontactreference,jm1_sourceauthority,_jm1pub_contract_value,_jm1_author_value,createdon,modifiedon',
     $orderby: 'createdon desc',
     $top: '250',
   })
@@ -1662,6 +1678,10 @@ function buildQueueItem(
     ageBucket: ageBucket(daysOld),
     overdueState: overdueState(daysOld, currentBlocker),
     duplicateRisk: titleId ? 'Existing title match found' : 'No title match found',
+    canonicalAuthorityClassification: canonicalAuthorityClassificationForTitle(title),
+    canonicalTitleReference: stringValue(title?.jm1_canonicaltitlereference),
+    canonicalAuthorContactReference: stringValue(title?.jm1_canonicalauthorcontactreference),
+    sourceAuthority: stringValue(title?.jm1_sourceauthority),
     latestExecutionEvidence: log
       ? `${stringValue(log.jm1_actiontype)} (${stringValue(log.jm1_executionlogid)})`
       : undefined,
@@ -1735,7 +1755,7 @@ function buildWorkloadItems(
   logs: DataverseRow[],
   portfolio: PublisherPortfolioItem[],
 ): PublisherWorkloadItem[] {
-  const draftItems = titles
+  const draftItems = (titles
     .map((title) => {
       const titleId = stringValue(title.jm1pub_titleid)
       const portfolioItem = portfolio.find((item) => item.titleId === titleId)
@@ -1824,9 +1844,13 @@ function buildWorkloadItems(
         latestExecutionEvidence: latestLog
           ? `${stringValue(latestLog.jm1_actiontype)} (${stringValue(latestLog.jm1_executionlogid)})`
           : 'No recent execution evidence found',
+        canonicalAuthorityClassification: canonicalAuthorityClassificationForTitle(title),
+        canonicalTitleReference: stringValue(title.jm1_canonicaltitlereference),
+        canonicalAuthorContactReference: stringValue(title.jm1_canonicalauthorcontactreference),
+        sourceAuthority: stringValue(title.jm1_sourceauthority),
       }
     })
-    .filter((item): item is PublisherWorkloadItem => Boolean(item && item.title && isActiveWorkloadItem(item)))
+    .filter((item) => Boolean(item && item.title && isActiveWorkloadItem(item as PublisherWorkloadItem))) as PublisherWorkloadItem[])
     .sort((a, b) => workloadPriority(a) - workloadPriority(b) || b.ageDays - a.ageDays)
 
   const activeByCapability = countWorkloadByCapability(draftItems)
@@ -1877,9 +1901,18 @@ function buildPortfolioItems(
         confidence: classification.confidence,
         exceptionReason: classification.exceptionReason,
         nextAction: derivePortfolioNextAction(classification),
+        canonicalAuthorityClassification: canonicalAuthorityClassificationForTitle(title),
+        canonicalTitleReference: stringValue(title.jm1_canonicaltitlereference),
+        canonicalAuthorContactReference: stringValue(title.jm1_canonicalauthorcontactreference),
+        sourceAuthority: stringValue(title.jm1_sourceauthority),
       }
     })
     .sort((a, b) => portfolioSortOrder(a) - portfolioSortOrder(b) || a.title.localeCompare(b.title))
+}
+
+function canonicalAuthorityClassificationForTitle(title?: DataverseRow) {
+  if (!title) return ''
+  return dataverseFormatted(title, 'jm1_canonicalstatus') || stringValue(title.jm1_canonicalstatus)
 }
 
 function derivePortfolioNextAction(classification: CatalogPortfolioClassification) {
@@ -3209,8 +3242,6 @@ function titleItemsToOperatingCard(
   logs: DataverseRow[],
 ): PublisherTitleOperatingCard {
   const primary = prioritizeTodayItems(items)[0]
-  const stageId = canonicalStageId(`${primary.editorialStage} ${primary.pipelineStage} ${primary.nextAction}`)
-  const stage = stages.find((item) => item.id === stageId) || stages.find((item) => item.id === 'CLASSIFICATION') || defineStage('CLASSIFICATION', '02 - Classification', 20, false, 'Issue exists.', 'Issue resolved.', '')
   const waitingOn = waitingOnForTodayItem(primary)
   const blocker = humanBlocker(primary)
   const titleResponse = authorResponses.find((item) => normalizeTitle(item.title) === normalizeTitle(primary.title))
@@ -3251,7 +3282,15 @@ function titleItemsToOperatingCard(
     joinedFamilyEvidenceText: primary.joinedFamilyEvidenceText,
     formatEvidenceText: primary.formatEvidenceText,
     portfolioState: primary.portfolioState,
+    canonicalAuthorityClassification: primary.canonicalAuthorityClassification,
+    canonicalTitleReference: primary.canonicalTitleReference,
+    canonicalAuthorContactReference: primary.canonicalAuthorContactReference,
+    sourceAuthority: primary.sourceAuthority,
   })
+  const projectedStageId = canonicalLifecycle.titleLifecycleStage.code === 'DATA_GAP'
+    ? 'CLASSIFICATION'
+    : canonicalLifecycle.titleLifecycleStage.code
+  const stage = stages.find((item) => item.id === projectedStageId) || stages.find((item) => item.id === 'CLASSIFICATION') || defineStage('CLASSIFICATION', '02 - Classification', 20, false, 'Issue exists.', 'Issue resolved.', '')
   const liveClassification = isSyntheticTitle(primary.title) ? 'TEST_CERTIFICATION' : 'LIVE'
   const deepLinkParams = new URLSearchParams()
   if (primary.titleId) deepLinkParams.set('titleId', primary.titleId)
@@ -3473,7 +3512,22 @@ async function writeJackieNotificationFailure(config: DataverseServerConfig, eve
 
 function notificationStateFor(item: PublisherTodayItem, logs: DataverseRow[]) {
   const sourceRecord = item.titleId || item.intakeId || item.recordId
-  const idempotencyKey = `jackie-action:${sourceRecord}:${canonicalStageId(`${item.editorialStage} ${item.pipelineStage} ${item.nextAction}`)}:${item.nextAction}`
+  const stageId = projectCanonicalPublisherLifecycle({
+    author: item.author,
+    bookTitle: item.title,
+    titleId: item.titleId,
+    intakeId: item.intakeId,
+    legacySourceState: `${item.editorialStage} ${item.substage} ${item.pipelineStage}`,
+    pipelineStage: item.pipelineStage,
+    editorialStage: item.editorialStage,
+    substage: item.substage,
+    owner: item.owner,
+    canonicalAuthorityClassification: item.canonicalAuthorityClassification,
+    canonicalTitleReference: item.canonicalTitleReference,
+    canonicalAuthorContactReference: item.canonicalAuthorContactReference,
+    sourceAuthority: item.sourceAuthority,
+  }).titleLifecycleStage.code
+  const idempotencyKey = `jackie-action:${sourceRecord}:${stageId === 'DATA_GAP' ? 'CLASSIFICATION' : stageId}:${item.nextAction}`
   const evidence = logs.find((log) => {
     const actionType = stringValue(log.jm1_actiontype)
     return (
@@ -3636,6 +3690,10 @@ function queueToTodayItem(item: PublisherQueueItem): PublisherTodayItem {
     firstPaymentConfirmedOn: item.paymentConfirmedOn,
     firstPaymentConfirmationSource: item.paymentConfirmationSource,
     joinedFamilyEvidenceText: item.agreementPreparationStatus,
+    canonicalAuthorityClassification: item.canonicalAuthorityClassification,
+    canonicalTitleReference: item.canonicalTitleReference,
+    canonicalAuthorContactReference: item.canonicalAuthorContactReference,
+    sourceAuthority: item.sourceAuthority,
     allowedActions: item.authorizedActions
       .filter((action) => action.id !== 'view_only')
       .map((action) => ({ id: action.id, label: action.label })),
@@ -3686,6 +3744,10 @@ function workloadToTodayItem(item: PublisherWorkloadItem): PublisherTodayItem {
     qaState: item.internalQaState,
     dependency: item.holdReason || item.readinessGuard.message,
     evidenceLinks: [],
+    canonicalAuthorityClassification: item.canonicalAuthorityClassification,
+    canonicalTitleReference: item.canonicalTitleReference,
+    canonicalAuthorContactReference: item.canonicalAuthorContactReference,
+    sourceAuthority: item.sourceAuthority,
     allowedActions: [],
     lastMovement: item.latestExecutionEvidence,
   }
@@ -3723,6 +3785,10 @@ function portfolioToTodayItem(item: PublisherPortfolioItem): PublisherTodayItem 
     evidenceLinks: [],
     activeFormats: item.activeFormats,
     formatEvidenceText: `${item.publicationStatus} ${item.distributionStatus} ${item.isbn13s.join(' ')} ${item.evidence.join('; ')}`,
+    canonicalAuthorityClassification: item.canonicalAuthorityClassification,
+    canonicalTitleReference: item.canonicalTitleReference,
+    canonicalAuthorContactReference: item.canonicalAuthorContactReference,
+    sourceAuthority: item.sourceAuthority,
     allowedActions: [],
     lastMovement: item.evidence[0] || 'Portfolio classification read from Core-backed title and asset evidence',
   }
