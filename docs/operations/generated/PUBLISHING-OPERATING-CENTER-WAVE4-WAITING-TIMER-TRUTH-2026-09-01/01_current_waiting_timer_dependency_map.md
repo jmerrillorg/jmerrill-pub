@@ -1,6 +1,6 @@
 # Current Waiting/Timer Dependency Map
 
-Last verified: 2026-09-01T13:35:14.627Z
+Last verified: 2026-09-01T13:41:15.672Z
 
 | Input | Current semantics | Consumer | Authority status | Known failure mode | Replacement authority |
 |---|---|---|---|---|---|

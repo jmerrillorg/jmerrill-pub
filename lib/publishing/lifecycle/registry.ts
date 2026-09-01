@@ -11,22 +11,7 @@ export const JMP_PUBLISHING_LIFECYCLE_METADATA = {
   changeAcknowledgment: 'JMP_PUBLISHING_LIFECYCLE_v1.0_WAVE_A_AUTHORIZED_2026-08-21',
 } as const
 
-export const WAITING_OWNERS = [
-  'Prospect',
-  'Author',
-  'JMP',
-  'JMP/System',
-  'External',
-  'Editor',
-  'Contract',
-  'Payment',
-  'Approval',
-  'Artifact',
-  'System',
-  'External Vendor',
-  'Not Waiting',
-  'Reconciliation Required',
-] as const
+export const WAITING_OWNERS = ['Prospect', 'Author', 'JMP', 'JMP/System', 'External'] as const
 
 export const SYSTEM_ATTENTION_CODES = [
   'NONE',

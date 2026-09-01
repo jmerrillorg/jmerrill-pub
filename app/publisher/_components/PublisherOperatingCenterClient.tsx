@@ -1441,7 +1441,7 @@ function TitleDetailDrawer({
           <h3 className="mt-2 text-2xl font-semibold leading-tight">{card.title}</h3>
           <p className="mt-1 text-[13px] text-white/55">{card.author}</p>
         </div>
-        <Badge label={card.canonicalLifecycle.waitingTruth.waitingOn} tone={card.canonicalLifecycle.waitingTruth.waitingOn === 'JMP' ? 'amber' : 'blue'} />
+        <Badge label={card.canonicalLifecycle.waitingTruth.waitingOn} tone={card.canonicalLifecycle.waitingTruth.broadWaitingOwner === 'JMP' ? 'amber' : 'blue'} />
       </div>
 
       <div className="mt-5 grid gap-3">

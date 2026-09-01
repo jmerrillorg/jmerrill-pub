@@ -61,7 +61,7 @@ test('author approval request derives author waiting and trusted timer from deli
     waitingStartEvidence: 'ACS delivery accepted for author review package',
   })
 
-  assert.equal(projection.waitingTruth.waitingOn, 'Author')
+  assert.equal(projection.waitingTruth.waitingOn, 'WAITING_ON_AUTHOR')
   assert.equal(projection.waitingTruth.waitingReason, 'AUTHOR_EDITORIAL_APPROVAL')
   assert.equal(projection.waitingTruth.waitingTrustClassification, 'TRUSTED_WAITING_ON')
   assert.equal(projection.waitingTruth.timerTrustClassification, 'TRUSTED_TIMER')
@@ -73,11 +73,11 @@ test('missing timestamp never falls back to raw ageDays', () => {
     legacySourceState: 'Book Production',
     authorApproved: false,
     nextAction: 'Await author review response',
-    owner: 'Author',
+    owner: 'WAITING_ON_AUTHOR',
     ageDays: 381,
   })
 
-  assert.equal(projection.waitingTruth.waitingOn, 'Author')
+  assert.equal(projection.waitingTruth.waitingOn, 'WAITING_ON_AUTHOR')
   assert.equal(projection.waitingTruth.timerTrustClassification, 'INSUFFICIENT_TIMESTAMP_EVIDENCE')
   assert.equal(projection.waitingTruth.elapsedDays, null)
   assert.equal(projection.age, 'Timing evidence unavailable')
@@ -91,7 +91,7 @@ test('author changes re-anchor responsibility to editor', () => {
     waitingStartEventId: 'evt-changes',
   })
 
-  assert.equal(projection.waitingTruth.waitingOn, 'Editor')
+  assert.equal(projection.waitingTruth.waitingOn, 'WAITING_ON_EDITOR')
   assert.equal(projection.waitingTruth.waitingReason, 'AUTHOR_CHANGES_REQUESTED')
   assert.equal(projection.waitingTruth.timerTrustClassification, 'TRUSTED_TIMER')
   assert.equal(projection.waitingTruth.elapsedDays, 1)
@@ -105,7 +105,7 @@ test('author approval ends prior waiting condition', () => {
     waitingStartEvent: 'OLD_AUTHOR_REVIEW_DELIVERED',
   })
 
-  assert.equal(projection.waitingTruth.waitingOn, 'Not Waiting')
+  assert.equal(projection.waitingTruth.waitingOn, 'NOT_WAITING')
   assert.equal(projection.waitingTruth.timerTrustClassification, 'NO_ACTIVE_TIMER')
   assert.equal(projection.waitingTruth.elapsedDays, null)
 })
@@ -120,7 +120,7 @@ test('contract waiting derives from agreement execution transition', () => {
     firstPaymentConfirmationSource: 'Stripe',
   })
 
-  assert.equal(projection.waitingTruth.waitingOn, 'Contract')
+  assert.equal(projection.waitingTruth.waitingOn, 'WAITING_ON_CONTRACT')
   assert.equal(projection.waitingTruth.waitingReason, 'CONTRACT_EXECUTION_REQUIRED')
 })
 
@@ -132,7 +132,7 @@ test('payment waiting derives from initial payment transition', () => {
     contractStatus: 'Signed',
   })
 
-  assert.equal(projection.waitingTruth.waitingOn, 'Payment')
+  assert.equal(projection.waitingTruth.waitingOn, 'WAITING_ON_PAYMENT')
   assert.equal(projection.waitingTruth.waitingReason, 'INITIAL_PAYMENT_REQUIRED')
 })
 
@@ -152,22 +152,22 @@ test('editorial work and publisher review can be trusted only from explicit acti
     waitingStartEvent: 'PUBLISHER_REVIEW_REQUIRED',
   })
 
-  assert.equal(editorial.waitingTruth.waitingOn, 'JMP/System')
+  assert.equal(editorial.waitingTruth.waitingOn, 'WAITING_ON_SYSTEM')
   assert.equal(editorial.waitingTruth.waitingReason, 'EDITORIAL_WORK_IN_PROGRESS')
-  assert.equal(publisher.waitingTruth.waitingOn, 'JMP')
+  assert.equal(publisher.waitingTruth.waitingOn, 'WAITING_ON_JMP')
   assert.equal(publisher.waitingTruth.waitingReason, 'PUBLISHER_REVIEW_REQUIRED')
 })
 
 test('external vendor waiting is distinct from system attention', () => {
   const projection = project({
     nextAction: 'External vendor distribution update',
-    owner: 'External',
+    owner: 'WAITING_ON_EXTERNAL_VENDOR',
     awaiting: 'Distributor',
     waitingStartedAt: '2026-08-29T12:00:00Z',
     waitingStartEvent: 'VENDOR_REQUEST_SUBMITTED',
   })
 
-  assert.equal(projection.waitingTruth.waitingOn, 'External')
+  assert.equal(projection.waitingTruth.waitingOn, 'WAITING_ON_EXTERNAL_VENDOR')
   assert.equal(projection.waitingTruth.waitingReason, 'EXTERNAL_VENDOR_ACTION')
 })
 
@@ -207,7 +207,7 @@ test('legacy completed title has no active waiting timer', () => {
     ageDays: 120,
   })
 
-  assert.equal(projection.waitingTruth.waitingOn, 'Not Waiting')
+  assert.equal(projection.waitingTruth.waitingOn, 'NOT_WAITING')
   assert.equal(projection.waitingTruth.waitingTrustClassification, 'NOT_WAITING')
   assert.equal(projection.waitingTruth.timerTrustClassification, 'NO_ACTIVE_TIMER')
 })
@@ -215,12 +215,12 @@ test('legacy completed title has no active waiting timer', () => {
 test('unresolved authority gets reconciliation-required without false party assignment', () => {
   const projection = project({
     canonicalAuthorityClassification: 'REQUIRES_RECONCILIATION',
-    owner: 'Author',
+    owner: 'WAITING_ON_AUTHOR',
     awaiting: 'author',
     ageDays: 77,
   })
 
-  assert.equal(projection.waitingTruth.waitingOn, 'Reconciliation Required')
+  assert.equal(projection.waitingTruth.waitingOn, 'RECONCILIATION_REQUIRED')
   assert.equal(projection.waitingTruth.waitingTrustClassification, 'RECONCILIATION_REQUIRED')
   assert.equal(projection.waitingTruth.timerTrustClassification, 'RECONCILIATION_REQUIRED')
 })
@@ -228,13 +228,13 @@ test('unresolved authority gets reconciliation-required without false party assi
 test('duplicate source cannot override waiting state', () => {
   const projection = project({
     canonicalAuthorityClassification: 'DUPLICATE_RECORD',
-    owner: 'Author',
+    owner: 'WAITING_ON_AUTHOR',
     awaiting: 'author',
     nextAction: 'Author review',
     ageDays: 44,
   })
 
-  assert.equal(projection.waitingTruth.waitingOn, 'Not Waiting')
+  assert.equal(projection.waitingTruth.waitingOn, 'NOT_WAITING')
   assert.equal(projection.waitingTruth.timerTrustClassification, 'NO_ACTIVE_TIMER')
 })
 

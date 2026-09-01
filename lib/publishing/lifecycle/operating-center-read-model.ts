@@ -73,6 +73,19 @@ export type CanonicalTimerTrustClassification =
   | 'INSUFFICIENT_TIMESTAMP_EVIDENCE'
   | 'RECONCILIATION_REQUIRED'
 
+export type CanonicalWaitingOn =
+  | 'WAITING_ON_AUTHOR'
+  | 'WAITING_ON_JMP'
+  | 'WAITING_ON_EDITOR'
+  | 'WAITING_ON_EXTERNAL_VENDOR'
+  | 'WAITING_ON_CONTRACT'
+  | 'WAITING_ON_PAYMENT'
+  | 'WAITING_ON_APPROVAL'
+  | 'WAITING_ON_ARTIFACT'
+  | 'WAITING_ON_SYSTEM'
+  | 'NOT_WAITING'
+  | 'RECONCILIATION_REQUIRED'
+
 export type CanonicalEvidenceRecord = {
   source: string
   value: string
@@ -290,7 +303,8 @@ export type CanonicalPublisherReadModel = {
   }
   waitingTruth: {
     requiredNextAction: string
-    waitingOn: WaitingOwner
+    waitingOn: CanonicalWaitingOn
+    broadWaitingOwner: WaitingOwner
     waitingReason: string
     waitingStartedAt: string
     waitingStartEvent: string
@@ -417,7 +431,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
         (candidate) => candidate.substageCode === stageTruth.projectedSubstage,
       ) || null)
   const waitingTruth = governedWaitingTruthFor(input, stageTruth, canonicalAuthority)
-  const waitingOn = waitingTruth.waitingOn
+  const waitingOn = waitingTruth.broadWaitingOwner
   const systemAttention = canonicalAuthority.requiresReconciliation || !canonicalAuthority.isCurrentOperationalAuthority
     ? canonicalAuthority.requiresReconciliation
       ? {
@@ -863,6 +877,7 @@ function governedWaitingTruthFor(
   return {
     requiredNextAction: waiting.requiredNextAction,
     waitingOn: waiting.waitingOn,
+    broadWaitingOwner: broadWaitingOwnerFor(waiting.waitingOn),
     waitingReason: waiting.waitingReason,
     waitingStartedAt: timerTrustClassification === 'TRUSTED_TIMER' ? startedAt : '',
     waitingStartEvent: timerTrustClassification === 'TRUSTED_TIMER' ? input.waitingStartEvent || '' : '',
@@ -902,7 +917,7 @@ function waitingSemanticsFor(
   if (canonicalAuthority.requiresReconciliation || stageTruth.trustClassification === 'RECONCILIATION_REQUIRED') {
     return {
       requiredNextAction: 'Reconcile canonical title authority',
-      waitingOn: 'Reconciliation Required',
+      waitingOn: 'RECONCILIATION_REQUIRED',
       waitingReason: 'SYSTEM_RECONCILIATION',
       waitingTrustClassification: 'RECONCILIATION_REQUIRED',
     }
@@ -914,7 +929,7 @@ function waitingSemanticsFor(
   ) {
     return {
       requiredNextAction: 'No current governed action is outstanding',
-      waitingOn: 'Not Waiting',
+      waitingOn: 'NOT_WAITING',
       waitingReason: 'NO_CURRENT_GOVERNED_ACTION',
       waitingTrustClassification: 'NOT_WAITING',
     }
@@ -923,7 +938,7 @@ function waitingSemanticsFor(
   if (onHold) {
     return {
       requiredNextAction: input.nextAction || 'Resume from governed hold when authorized',
-      waitingOn: stageTruth.blockingPartyClass === 'NONE' ? canonicalWaitingOwner(input) : stageTruth.blockingPartyClass,
+      waitingOn: semanticWaitingOnFor(stageTruth.blockingPartyClass === 'NONE' ? canonicalWaitingOwner(input) : stageTruth.blockingPartyClass),
       waitingReason: 'GOVERNED_HOLD',
       waitingTrustClassification: 'TRUSTED_WAITING_ON',
     }
@@ -939,7 +954,7 @@ function waitingSemanticsFor(
   ) {
     return {
       requiredNextAction: 'No current governed action is outstanding',
-      waitingOn: 'Not Waiting',
+      waitingOn: 'NOT_WAITING',
       waitingReason: 'AUTHOR_GATE_RESOLVED',
       waitingTrustClassification: 'NOT_WAITING',
     }
@@ -948,7 +963,7 @@ function waitingSemanticsFor(
   const explicitAction = input.nextAction || input.waitingStartEvent || ''
   const explicitReason = waitingReasonFromAction(explicitAction)
   const owner = ownerForWaitingReason(explicitReason, canonicalWaitingOwner(input))
-  if (explicitAction && (owner !== 'JMP' || input.waitingStartedAt)) {
+  if (explicitAction && (owner !== 'WAITING_ON_JMP' || input.waitingStartedAt)) {
     return {
       requiredNextAction: input.nextAction || input.waitingStartEvent || 'Current governed action became outstanding',
       waitingOn: owner,
@@ -968,7 +983,7 @@ function waitingSemanticsFor(
 
   return {
     requiredNextAction: 'No current governed action is outstanding',
-    waitingOn: 'Not Waiting',
+    waitingOn: 'NOT_WAITING',
     waitingReason: 'NO_CURRENT_GOVERNED_ACTION',
     waitingTrustClassification: 'NOT_WAITING',
   }
@@ -984,23 +999,23 @@ function waitingForBlockingTransition(
     case 'PACKAGE_ACCEPTED':
       return waiting('Record author package acceptance', 'Prospect', 'AUTHOR_PACKAGE_ACCEPTANCE')
     case 'AGREEMENT_EXECUTED':
-      return waiting('Obtain executed publishing agreement', 'Contract', 'CONTRACT_EXECUTION_REQUIRED')
+      return waiting('Obtain executed publishing agreement', 'WAITING_ON_CONTRACT', 'CONTRACT_EXECUTION_REQUIRED')
     case 'INITIAL_PAYMENT_RECEIVED':
-      return waiting('Receive required initial payment', 'Payment', 'INITIAL_PAYMENT_REQUIRED')
+      return waiting('Receive required initial payment', 'WAITING_ON_PAYMENT', 'INITIAL_PAYMENT_REQUIRED')
     case 'CURRENT_ARTIFACT_BOUND':
-      return waiting('Bind the current governed artifact', 'Artifact', 'ARTIFACT_REQUIRED')
+      return waiting('Bind the current governed artifact', 'WAITING_ON_ARTIFACT', 'ARTIFACT_REQUIRED')
     case 'AUTHOR_APPROVAL_NOT_AUTHENTICATION':
     case 'PRIOR_AUTHOR_GATE_RESOLVED':
       return waiting('Obtain governed author approval', 'Author', 'AUTHOR_EDITORIAL_APPROVAL')
     case 'AUTHOR_CHANGES_REQUESTED':
-      return waiting('Process author-requested changes', 'Editor', 'AUTHOR_CHANGES_REQUESTED')
+      return waiting('Process author-requested changes', 'WAITING_ON_EDITOR', 'AUTHOR_CHANGES_REQUESTED')
     case 'AUTHOR_HOLD_REQUESTED':
       return waiting('Resume from author hold when authorized', 'Author', 'GOVERNED_HOLD')
     case 'LIFECYCLE_MAPPING':
     case 'CANONICAL_AUTHORITY_RECONCILIATION':
       return {
         requiredNextAction: 'Reconcile canonical title authority',
-        waitingOn: 'Reconciliation Required',
+        waitingOn: 'RECONCILIATION_REQUIRED',
         waitingReason: 'SYSTEM_RECONCILIATION',
         waitingTrustClassification: 'RECONCILIATION_REQUIRED',
       }
@@ -1009,10 +1024,12 @@ function waitingForBlockingTransition(
   }
 }
 
-function waiting(requiredNextAction: string, waitingOn: WaitingOwner, waitingReason: string) {
+function waiting(requiredNextAction: string, waitingOn: WaitingOwner | CanonicalWaitingOn, waitingReason: string) {
   return {
     requiredNextAction,
-    waitingOn,
+    waitingOn: waitingOn.startsWith('WAITING_ON_') || waitingOn === 'NOT_WAITING' || waitingOn === 'RECONCILIATION_REQUIRED'
+      ? waitingOn as CanonicalWaitingOn
+      : semanticWaitingOnFor(waitingOn as WaitingOwner),
     waitingReason,
     waitingTrustClassification: 'TRUSTED_WAITING_ON' as const,
   }
@@ -1030,15 +1047,31 @@ function waitingReasonFromAction(action: string) {
   return 'SYSTEM_RECONCILIATION'
 }
 
-function ownerForWaitingReason(reason: string, fallback: WaitingOwner): WaitingOwner {
-  if (reason === 'AUTHOR_EDITORIAL_APPROVAL') return 'Author'
-  if (reason === 'CONTRACT_EXECUTION_REQUIRED') return 'Contract'
-  if (reason === 'INITIAL_PAYMENT_REQUIRED') return fallback === 'Prospect' ? 'Prospect' : 'Payment'
-  if (reason === 'EDITORIAL_WORK_IN_PROGRESS') return fallback === 'Author' ? 'Editor' : fallback
-  if (reason === 'PUBLISHER_REVIEW_REQUIRED') return 'JMP'
-  if (reason === 'EXTERNAL_VENDOR_ACTION') return 'External'
-  if (reason === 'ARTIFACT_REQUIRED') return 'Artifact'
-  return fallback
+function ownerForWaitingReason(reason: string, fallback: WaitingOwner): CanonicalWaitingOn {
+  if (reason === 'AUTHOR_EDITORIAL_APPROVAL') return 'WAITING_ON_AUTHOR'
+  if (reason === 'CONTRACT_EXECUTION_REQUIRED') return 'WAITING_ON_CONTRACT'
+  if (reason === 'INITIAL_PAYMENT_REQUIRED') return fallback === 'Prospect' ? 'WAITING_ON_AUTHOR' : 'WAITING_ON_PAYMENT'
+  if (reason === 'EDITORIAL_WORK_IN_PROGRESS') return fallback === 'Author' ? 'WAITING_ON_EDITOR' : semanticWaitingOnFor(fallback)
+  if (reason === 'PUBLISHER_REVIEW_REQUIRED') return 'WAITING_ON_JMP'
+  if (reason === 'EXTERNAL_VENDOR_ACTION') return 'WAITING_ON_EXTERNAL_VENDOR'
+  if (reason === 'ARTIFACT_REQUIRED') return 'WAITING_ON_ARTIFACT'
+  return semanticWaitingOnFor(fallback)
+}
+
+function semanticWaitingOnFor(owner: WaitingOwner): CanonicalWaitingOn {
+  if (owner === 'Author') return 'WAITING_ON_AUTHOR'
+  if (owner === 'Prospect') return 'WAITING_ON_AUTHOR'
+  if (owner === 'External') return 'WAITING_ON_EXTERNAL_VENDOR'
+  if (owner === 'JMP/System') return 'WAITING_ON_SYSTEM'
+  return 'WAITING_ON_JMP'
+}
+
+function broadWaitingOwnerFor(owner: CanonicalWaitingOn): WaitingOwner {
+  if (owner === 'WAITING_ON_AUTHOR') return 'Author'
+  if (owner === 'WAITING_ON_EXTERNAL_VENDOR') return 'External'
+  if (owner === 'WAITING_ON_SYSTEM' || owner === 'RECONCILIATION_REQUIRED') return 'JMP/System'
+  if (owner === 'WAITING_ON_CONTRACT' || owner === 'WAITING_ON_PAYMENT' || owner === 'WAITING_ON_ARTIFACT' || owner === 'WAITING_ON_APPROVAL') return 'JMP/System'
+  return 'JMP'
 }
 
 function timerExceptionReason(
