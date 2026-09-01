@@ -94,9 +94,14 @@ try {
     timerFullyTrustworthy: 'YES_WHEN_AUTHORITATIVE_START_EVIDENCE_EXISTS',
     artifactFullyTrustworthy: 'YES_AS_FAIL_CLOSED_PROJECTION; SOURCE_METADATA_REMEDIATION_REQUIRED_FOR_MORE_TRUSTED_ARTIFACTS',
     wave5ProofContractStatus: 'PASS',
+    pr706MergeSha: 'da4acc31f40a6de9a34903269576499ef2d05102',
+    pr707MergeSha: 'a904107a22f40f8faa56d6f4289f1ecb3f30e060',
+    deployedSha: 'a904107a22f40f8faa56d6f4289f1ecb3f30e060',
+    productionHealth: 'PASS',
+    productionOperatingCenterUnauthenticatedReadback: '401 Publisher session not found',
     clientTitleAutomationFreeze: 'ACTIVE',
     publishingDiscretionaryArchitectureFreeze: 'ACTIVE',
-    wave5Status: 'READY_FOR_PR',
+    wave5Status: 'COMPLETE_DEPLOYED_PRODUCTION_VERIFIED',
     nextRecommendedWave: 'Artifact metadata remediation / SharePoint binding enrichment',
   }
 
@@ -145,7 +150,7 @@ try {
   writeFileSync(join(outDir, '15_sharepoint_metadata_gap_report.md'), sharePointGapReport(summary))
   writeFileSync(join(outDir, '16_proof_contract.md'), proofContract(summary))
   writeFileSync(join(outDir, '17_rollback_plan.md'), rollbackPlan())
-  writeFileSync(join(outDir, '18_production_readback.md'), '# Production Readback\n\nPending PR merge and deployment. No title-record lifecycle mutation or SharePoint file mutation is authorized by Wave 5.\n')
+  writeFileSync(join(outDir, '18_production_readback.md'), productionReadback(summary))
   writeFileSync(join(outDir, '19_wave5_closeout.md'), closeout(summary))
   writeFileSync(join(outDir, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`)
   writeChecksums(outDir)
@@ -314,10 +319,25 @@ Revert the Wave 5 PR. The change is projection/display-only and does not mutate 
 `
 }
 
+function productionReadback(summary) {
+  return `# Production Readback
+
+PR_706_MERGE_SHA = ${summary.pr706MergeSha}
+PR_707_DEPLOY_GUARD_FIX_MERGE_SHA = ${summary.pr707MergeSha}
+DEPLOYED_SHA = ${summary.deployedSha}
+PRODUCTION_HEALTH = ${summary.productionHealth}
+PRODUCTION_OPERATING_CENTER_UNAUTHENTICATED_READBACK = ${summary.productionOperatingCenterUnauthenticatedReadback}
+
+No title-record lifecycle mutation, SharePoint file mutation, author communication, or client-title automation thaw is authorized or recorded by Wave 5.
+`
+}
+
 function closeout(summary) {
   return `# Wave 5 Closeout
 
 WAVE_5_STATUS = ${summary.wave5Status}
+DEPLOYED_SHA = ${summary.deployedSha}
+PRODUCTION_HEALTH = ${summary.productionHealth}
 ARTIFACT_FULLY_TRUSTWORTHY = ${summary.artifactFullyTrustworthy}
 CLIENT_TITLE_AUTOMATION_FREEZE = ACTIVE
 PUBLISHING_DISCRETIONARY_ARCHITECTURE_FREEZE = ACTIVE

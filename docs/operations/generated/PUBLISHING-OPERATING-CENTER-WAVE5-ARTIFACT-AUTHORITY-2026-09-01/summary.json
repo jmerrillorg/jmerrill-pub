@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-01T17:46:18.227Z",
+  "generatedAt": "2026-09-01T17:54:02.106Z",
   "sourceRecordUniverse": 408,
   "expected": 408,
   "currentAuthorityUniverse": 21,
@@ -32,8 +32,13 @@
   "timerFullyTrustworthy": "YES_WHEN_AUTHORITATIVE_START_EVIDENCE_EXISTS",
   "artifactFullyTrustworthy": "YES_AS_FAIL_CLOSED_PROJECTION; SOURCE_METADATA_REMEDIATION_REQUIRED_FOR_MORE_TRUSTED_ARTIFACTS",
   "wave5ProofContractStatus": "PASS",
+  "pr706MergeSha": "da4acc31f40a6de9a34903269576499ef2d05102",
+  "pr707MergeSha": "a904107a22f40f8faa56d6f4289f1ecb3f30e060",
+  "deployedSha": "a904107a22f40f8faa56d6f4289f1ecb3f30e060",
+  "productionHealth": "PASS",
+  "productionOperatingCenterUnauthenticatedReadback": "401 Publisher session not found",
   "clientTitleAutomationFreeze": "ACTIVE",
   "publishingDiscretionaryArchitectureFreeze": "ACTIVE",
-  "wave5Status": "READY_FOR_PR",
+  "wave5Status": "COMPLETE_DEPLOYED_PRODUCTION_VERIFIED",
   "nextRecommendedWave": "Artifact metadata remediation / SharePoint binding enrichment"
 }

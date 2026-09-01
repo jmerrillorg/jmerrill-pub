@@ -1,6 +1,6 @@
 # Artifact Dependency Map
 
-Last verified: 2026-09-01T17:46:18.227Z
+Last verified: 2026-09-01T17:54:02.106Z
 
 | Source system | Source table/field | Artifact influence | Authority status |
 |---|---|---|---|
