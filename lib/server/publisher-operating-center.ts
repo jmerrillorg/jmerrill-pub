@@ -3241,77 +3241,18 @@ function titleItemsToOperatingCard(
   authorResponses: PublisherAuthorResponseQueueItem[],
   logs: DataverseRow[],
 ): PublisherTitleOperatingCard {
-  const primary = prioritizeTodayItems(items)[0]
-  const waitingOn = waitingOnForTodayItem(primary)
-  const blocker = humanBlocker(primary)
-  const titleResponse = authorResponses.find((item) => normalizeTitle(item.title) === normalizeTitle(primary.title))
+  const selected = selectGovernedProjectionPrimaryItem(items, authorResponses)
+  const primary = selected.item
+  const titleResponse = selected.titleResponse
+  const canonicalLifecycle = selected.canonicalLifecycle
+  const waitingOn = waitingOnForCanonicalLifecycle(canonicalLifecycle)
+  const blocker = blockerForCanonicalLifecycle(canonicalLifecycle, primary)
   const candidateArtifact = bestEvidenceLink(primary)
-  const canonicalLifecycle = projectCanonicalPublisherLifecycle({
-    author: primary.author,
-    bookTitle: primary.title,
-    titleId: primary.titleId,
-    intakeId: primary.intakeId,
-    legacySourceState: `${primary.editorialStage} ${primary.substage} ${primary.pipelineStage}`,
-    pipelineStage: primary.pipelineStage,
-    editorialStage: primary.editorialStage,
-    substage: primary.substage,
-    packageState: primary.packageState,
-    qaState: primary.qaState,
-    executionState: primary.executionState,
-    executionMode: primary.executionMode,
-    runtime: primary.runtime,
-    awaiting: primary.awaiting,
-    owner: primary.owner,
-    dependency: primary.dependency,
-    exactBlocker: primary.exactBlocker,
-    nextAction: primary.nextAction,
-    ageDays: primary.ageDays,
-    evidenceLinks: primary.evidenceLinks,
-    activeFormats: primary.activeFormats,
-    workspaceState: primary.workspaceState,
-    workspaceEntitlementState: primary.workspaceEntitlementState,
-    onboardingState: primary.onboardingState,
-    commercialEvidenceText: primary.commercialEvidenceText,
-    pricingEvidenceText: primary.pricingEvidenceText,
-    agreementEvidenceText: primary.agreementEvidenceText,
-    contractStatus: primary.contractStatus,
-    paymentEvidenceText: primary.paymentEvidenceText,
-    firstPaymentStatus: primary.firstPaymentStatus,
-    firstPaymentConfirmedOn: primary.firstPaymentConfirmedOn,
-    firstPaymentConfirmationSource: primary.firstPaymentConfirmationSource,
-    joinedFamilyEvidenceText: primary.joinedFamilyEvidenceText,
-    authorDecisionEvidenceText: titleResponse
-      ? [titleResponse.classifiedDecision, titleResponse.threadEvidence, titleResponse.nextAction].filter(Boolean).join('; ')
-      : undefined,
-    holdRequested: /hold/i.test(`${primary.exactBlocker || ''} ${primary.dependency || ''}`),
-    waitingStartedAt: authoritativeWaitingStartFor(primary),
-    waitingStartEvent: authoritativeWaitingStartEventFor(primary),
-    waitingStartEventId: authoritativeWaitingStartEventIdFor(primary),
-    waitingStartEvidence: authoritativeWaitingStartEvidenceFor(primary),
-    formatEvidenceText: primary.formatEvidenceText,
-    portfolioState: primary.portfolioState,
-    canonicalAuthorityClassification: primary.canonicalAuthorityClassification,
-    canonicalTitleReference: primary.canonicalTitleReference,
-    canonicalAuthorContactReference: primary.canonicalAuthorContactReference,
-    sourceAuthority: primary.sourceAuthority,
-  })
-  const projectedStageId = canonicalLifecycle.titleLifecycleStage.code === 'DATA_GAP'
-    ? 'CLASSIFICATION'
-    : canonicalLifecycle.titleLifecycleStage.code
-  const stage = stages.find((item) => item.id === projectedStageId) || stages.find((item) => item.id === 'CLASSIFICATION') || defineStage('CLASSIFICATION', '02 - Classification', 20, false, 'Issue exists.', 'Issue resolved.', '')
-  const liveClassification = isSyntheticTitle(primary.title) ? 'TEST_CERTIFICATION' : 'LIVE'
-  const deepLinkParams = new URLSearchParams()
-  if (primary.titleId) deepLinkParams.set('titleId', primary.titleId)
-  else if (primary.intakeId) deepLinkParams.set('intakeId', primary.intakeId)
-  else deepLinkParams.set('recordId', primary.recordId)
-  if (primary.diagnosticId) deepLinkParams.set('diagnosticId', primary.diagnosticId)
-  deepLinkParams.set('action', primary.nextAction)
-  const defaultActionUrl = `${publisherOperatingCenterBaseUrl()}/publisher/operating-center?${deepLinkParams.toString()}`
-  const currentArtifact = currentArtifactForProjection(canonicalLifecycle, candidateArtifact)
-  const actionUrl = candidateArtifact.href?.includes('/publisher/operating-center')
-    ? candidateArtifact.href
-    : defaultActionUrl
-  const notificationState = notificationStateFor(primary, logs)
+  const nextAction = canonicalLifecycle.nextGovernedAction.action || primary.nextAction || 'Review current title state'
+  const humanStatus = humanStatusForCanonicalLifecycle(canonicalLifecycle, primary)
+  const projectionAgeDays = canonicalLifecycle.waitingTruth.elapsedDays ?? Math.max(...items.map((item) => item.ageDays || 0))
+  const notificationSource = prioritizeTodayItems(items).find((item) => item.owner === 'Jackie') || primary
+  const notificationState = notificationStateFor(notificationSource, logs)
   const baseActions = primary.allowedActions.length
     ? primary.allowedActions.map((action) => ({
         id: action.id,
@@ -3326,7 +3267,7 @@ function titleItemsToOperatingCard(
         unavailableReason: '',
       }]
   const notificationAction =
-    primary.owner === 'Jackie' && notificationState.state !== 'SENT'
+    waitingOn === 'Jackie' && notificationState.state !== 'SENT'
       ? [
           {
             id: 'notify_jackie_action_required' as PublisherActionId,
@@ -3338,6 +3279,23 @@ function titleItemsToOperatingCard(
       : []
   const actions = [...notificationAction, ...baseActions]
 
+  const projectedStageId = canonicalLifecycle.titleLifecycleStage.code === 'DATA_GAP'
+    ? 'CLASSIFICATION'
+    : canonicalLifecycle.titleLifecycleStage.code
+  const stage = stages.find((item) => item.id === projectedStageId) || stages.find((item) => item.id === 'CLASSIFICATION') || defineStage('CLASSIFICATION', '02 - Classification', 20, false, 'Issue exists.', 'Issue resolved.', '')
+  const liveClassification = isSyntheticTitle(primary.title) ? 'TEST_CERTIFICATION' : 'LIVE'
+  const deepLinkParams = new URLSearchParams()
+  if (primary.titleId) deepLinkParams.set('titleId', primary.titleId)
+  else if (primary.intakeId) deepLinkParams.set('intakeId', primary.intakeId)
+  else deepLinkParams.set('recordId', primary.recordId)
+  if (primary.diagnosticId) deepLinkParams.set('diagnosticId', primary.diagnosticId)
+  deepLinkParams.set('action', nextAction)
+  const defaultActionUrl = `${publisherOperatingCenterBaseUrl()}/publisher/operating-center?${deepLinkParams.toString()}`
+  const currentArtifact = currentArtifactForProjection(canonicalLifecycle, candidateArtifact)
+  const actionUrl = candidateArtifact.href?.includes('/publisher/operating-center')
+    ? candidateArtifact.href
+    : defaultActionUrl
+
   return {
     key: `title:${primary.titleId || primary.recordId || primary.key}`,
     titleId: primary.titleId,
@@ -3347,16 +3305,16 @@ function titleItemsToOperatingCard(
     author: primary.author,
     stageId: stage.id,
     stageLabel: stage.label,
-    humanStatus: humanStatusForTodayItem(primary),
+    humanStatus,
     canonicalLifecycle,
     waitingOn,
-    ageDays: Math.max(...items.map((item) => item.ageDays || 0)),
+    ageDays: projectionAgeDays,
     targetDate: primary.targetDate,
-    urgency: primary.severity === 'urgent' ? 'urgent' : primary.severity === 'watch' || primary.ageDays > 7 ? 'watch' : 'normal',
+    urgency: primary.severity === 'urgent' ? 'urgent' : primary.severity === 'watch' || projectionAgeDays > 7 ? 'watch' : 'normal',
     blocker,
-    nextAction: primary.nextAction || 'Review current title state',
+    nextAction,
     nextStage: stages.find((item) => item.id === stage.nextStageId)?.label || 'No next stage',
-    nextStageEligible: !blocker && waitingOn !== 'Author' && stage.nextStageId !== '',
+    nextStageEligible: canonicalLifecycle.nextGovernedAction.confidence === 'CONFIRMED' && !blocker && waitingOn !== 'Author' && stage.nextStageId !== '',
     nextStageBlockedReason: blocker || (waitingOn === 'Author' ? 'Waiting for author response or approval.' : stage.nextStageId ? '' : 'No next stage is currently defined.'),
     latestMovement: primary.lastMovement,
     currentArtifact,
@@ -3369,11 +3327,11 @@ function titleItemsToOperatingCard(
     },
     jackieDecision: waitingOn === 'Jackie'
       ? {
-          what: primary.nextAction || 'Publisher decision required',
+          what: nextAction || 'Publisher decision required',
           why: blocker || primary.exactBlocker || primary.dependency || 'Publisher authority is required before this title can move.',
           review: currentArtifact.label,
           decisionOptions: actions.map((action) => action.label),
-          consequence: primary.nextAction ? `After this decision, ${primary.nextAction.toLowerCase()}.` : 'The title state will refresh after the governed action records.',
+          consequence: nextAction ? `After this decision, ${nextAction.toLowerCase()}.` : 'The title state will refresh after the governed action records.',
           notificationState: notificationState.state,
           lastNotified: notificationState.lastNotified,
           operatingCenterUrl: actionUrl,
@@ -3393,6 +3351,166 @@ function titleItemsToOperatingCard(
     },
     liveClassification,
   }
+}
+
+function projectTodayItemCanonicalLifecycle(
+  item: PublisherTodayItem,
+  titleResponse?: PublisherAuthorResponseQueueItem,
+): CanonicalPublisherReadModel {
+  return projectCanonicalPublisherLifecycle({
+    author: item.author,
+    bookTitle: item.title,
+    titleId: item.titleId,
+    intakeId: item.intakeId,
+    legacySourceState: `${item.editorialStage} ${item.substage} ${item.pipelineStage}`,
+    pipelineStage: item.pipelineStage,
+    editorialStage: item.editorialStage,
+    substage: item.substage,
+    packageState: item.packageState,
+    qaState: item.qaState,
+    executionState: item.executionState,
+    executionMode: item.executionMode,
+    runtime: item.runtime,
+    awaiting: item.awaiting,
+    owner: item.owner,
+    dependency: item.dependency,
+    exactBlocker: item.exactBlocker,
+    nextAction: item.nextAction,
+    ageDays: item.ageDays,
+    evidenceLinks: item.evidenceLinks,
+    activeFormats: item.activeFormats,
+    workspaceState: item.workspaceState,
+    workspaceEntitlementState: item.workspaceEntitlementState,
+    onboardingState: item.onboardingState,
+    commercialEvidenceText: item.commercialEvidenceText,
+    pricingEvidenceText: item.pricingEvidenceText,
+    agreementEvidenceText: item.agreementEvidenceText,
+    contractStatus: item.contractStatus,
+    paymentEvidenceText: item.paymentEvidenceText,
+    firstPaymentStatus: item.firstPaymentStatus,
+    firstPaymentConfirmedOn: item.firstPaymentConfirmedOn,
+    firstPaymentConfirmationSource: item.firstPaymentConfirmationSource,
+    joinedFamilyEvidenceText: item.joinedFamilyEvidenceText,
+    authorDecisionEvidenceText: titleResponse
+      ? [titleResponse.classifiedDecision, titleResponse.threadEvidence, titleResponse.nextAction].filter(Boolean).join('; ')
+      : undefined,
+    holdRequested: /hold/i.test(`${item.exactBlocker || ''} ${item.dependency || ''}`),
+    waitingStartedAt: authoritativeWaitingStartFor(item),
+    waitingStartEvent: authoritativeWaitingStartEventFor(item),
+    waitingStartEventId: authoritativeWaitingStartEventIdFor(item),
+    waitingStartEvidence: authoritativeWaitingStartEvidenceFor(item),
+    formatEvidenceText: item.formatEvidenceText,
+    portfolioState: item.portfolioState,
+    canonicalAuthorityClassification: item.canonicalAuthorityClassification,
+    canonicalTitleReference: item.canonicalTitleReference,
+    canonicalAuthorContactReference: item.canonicalAuthorContactReference,
+    sourceAuthority: item.sourceAuthority,
+  })
+}
+
+export function selectGovernedProjectionPrimaryItem(
+  items: PublisherTodayItem[],
+  authorResponses: PublisherAuthorResponseQueueItem[] = [],
+): {
+  item: PublisherTodayItem
+  titleResponse?: PublisherAuthorResponseQueueItem
+  canonicalLifecycle: CanonicalPublisherReadModel
+} {
+  const candidates = prioritizeTodayItems(items).map((item) => {
+    const titleResponse = authorResponses.find((response) => normalizeTitle(response.title) === normalizeTitle(item.title))
+    const canonicalLifecycle = projectTodayItemCanonicalLifecycle(item, titleResponse)
+    return {
+      item,
+      titleResponse,
+      canonicalLifecycle,
+      score: governedProjectionPrimaryScore(item, canonicalLifecycle),
+    }
+  })
+
+  return candidates.sort((a, b) => b.score - a.score || todayItemSpecificity(b.item) - todayItemSpecificity(a.item))[0]
+}
+
+function governedProjectionPrimaryScore(item: PublisherTodayItem, lifecycle: CanonicalPublisherReadModel) {
+  const stageTrustRank: Record<CanonicalPublisherReadModel['stageTruth']['trustClassification'], number> = {
+    TRUSTED_STAGE: 600,
+    TRUSTED_STAGE_WITH_NONBLOCKING_DATA_GAP: 550,
+    LEGACY_GOVERNED_EXCEPTION: 425,
+    INSUFFICIENT_TRANSITION_EVIDENCE: 250,
+    COMMERCIAL_GATE_BLOCKED: 175,
+    EDITORIAL_GATE_BLOCKED: 175,
+    RECONCILIATION_REQUIRED: -400,
+  }
+  const waitingTrustRank: Record<CanonicalPublisherReadModel['waitingTruth']['waitingTrustClassification'], number> = {
+    NOT_WAITING: 300,
+    TRUSTED_WAITING_ON: 250,
+    INSUFFICIENT_ACTION_EVIDENCE: 75,
+    RECONCILIATION_REQUIRED: -300,
+  }
+  const artifactTrustRank: Record<CanonicalPublisherReadModel['artifactTruth']['artifactTrustClassification'], number> = {
+    NO_CURRENT_ARTIFACT_REQUIRED: 250,
+    TRUSTED_CURRENT_ARTIFACT: 225,
+    LEGACY_ARTIFACT_ONLY: 75,
+    NO_AUTHORITATIVE_ARTIFACT_FOUND: -75,
+    AMBIGUOUS_TITLE_BINDING: -100,
+    AMBIGUOUS_VERSION: -100,
+    STAGE_INCOMPATIBLE_ARTIFACT: -125,
+    APPROVAL_VERSION_MISMATCH: -125,
+    RECONCILIATION_REQUIRED: -300,
+  }
+  const attentionRank: Record<CanonicalPublisherReadModel['systemAttention']['severity'], number> = {
+    INFO: 150,
+    ATTENTION: 25,
+    BLOCKING: -250,
+  }
+
+  return (
+    (lifecycle.canonicalAuthority.isCurrentOperationalAuthority ? 1000 : 0) +
+    (lifecycle.canonicalAuthority.requiresReconciliation ? -1000 : 0) +
+    stageTrustRank[lifecycle.stageTruth.trustClassification] +
+    waitingTrustRank[lifecycle.waitingTruth.waitingTrustClassification] +
+    artifactTrustRank[lifecycle.artifactTruth.artifactTrustClassification] +
+    attentionRank[lifecycle.systemAttention.severity] +
+    (item.canonicalAuthorityClassification === 'CANONICAL_CURRENT_TITLE' ? 250 : 0) +
+    (item.titleId ? 50 : 0) -
+    (item.key.startsWith('production:') || item.key.startsWith('workload:') ? 25 : 0)
+  )
+}
+
+function waitingOnForCanonicalLifecycle(canonicalLifecycle: CanonicalPublisherReadModel): PublisherTitleOperatingCard['waitingOn'] {
+  switch (canonicalLifecycle.waitingTruth.broadWaitingOwner) {
+    case 'Author':
+    case 'Prospect':
+      return 'Author'
+    case 'External':
+      return 'External'
+    case 'JMP/System':
+      return canonicalLifecycle.waitingTruth.waitingOn === 'NOT_WAITING' ? 'None' : 'Automation'
+    case 'JMP':
+      return 'Publishing Team'
+    default:
+      return 'None'
+  }
+}
+
+function humanStatusForCanonicalLifecycle(canonicalLifecycle: CanonicalPublisherReadModel, item: PublisherTodayItem) {
+  if (canonicalLifecycle.waitingTruth.waitingOn === 'NOT_WAITING') return 'Current'
+  if (canonicalLifecycle.waitingTruth.waitingOn === 'RECONCILIATION_REQUIRED') return 'Needs reconciliation'
+  if (canonicalLifecycle.waitingTruth.broadWaitingOwner === 'Author') return 'Waiting on Author'
+  if (canonicalLifecycle.waitingTruth.broadWaitingOwner === 'Prospect') return 'Waiting on Author'
+  if (canonicalLifecycle.waitingTruth.broadWaitingOwner === 'External') return 'Waiting on External'
+  if (canonicalLifecycle.systemAttention.severity === 'BLOCKING') return 'System Attention'
+  return humanStatusForTodayItem(item)
+}
+
+function blockerForCanonicalLifecycle(canonicalLifecycle: CanonicalPublisherReadModel, item: PublisherTodayItem) {
+  if (canonicalLifecycle.waitingTruth.waitingOn === 'NOT_WAITING') return ''
+  if (canonicalLifecycle.systemAttention.severity === 'BLOCKING') {
+    return canonicalLifecycle.systemAttention.reason
+  }
+  if (canonicalLifecycle.waitingTruth.waitingTrustClassification === 'RECONCILIATION_REQUIRED') {
+    return canonicalLifecycle.waitingTruth.exceptionReason || canonicalLifecycle.waitingTruth.waitingReason
+  }
+  return humanBlocker(item)
 }
 
 function authoritativeWaitingStartFor(item: PublisherTodayItem) {
