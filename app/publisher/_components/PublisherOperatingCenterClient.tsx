@@ -1441,7 +1441,7 @@ function TitleDetailDrawer({
           <h3 className="mt-2 text-2xl font-semibold leading-tight">{card.title}</h3>
           <p className="mt-1 text-[13px] text-white/55">{card.author}</p>
         </div>
-        <Badge label={card.waitingOn} tone={card.waitingOn === 'Jackie' ? 'amber' : 'blue'} />
+        <Badge label={card.canonicalLifecycle.waitingTruth.waitingOn} tone={card.canonicalLifecycle.waitingTruth.waitingOn === 'JMP' ? 'amber' : 'blue'} />
       </div>
 
       <div className="mt-5 grid gap-3">
@@ -1471,7 +1471,13 @@ function TitleDetailDrawer({
         </DetailBlock>
 
         <DetailBlock title="Waiting / Attention / Next Action">
-          <MiniFact label="Waiting On" value={card.canonicalLifecycle.waitingOn} />
+          <MiniFact label="Waiting On" value={card.canonicalLifecycle.waitingTruth.waitingOn} />
+          <MiniFact label="Waiting trust" value={card.canonicalLifecycle.waitingTruth.waitingTrustClassification} />
+          <MiniFact label="Reason" value={card.canonicalLifecycle.waitingTruth.waitingReason} />
+          <MiniFact label="Timer" value={card.canonicalLifecycle.waitingTruth.timerDisplay} />
+          <MiniFact label="Timer trust" value={card.canonicalLifecycle.waitingTruth.timerTrustClassification} />
+          <MiniFact label="Waiting started" value={card.canonicalLifecycle.waitingTruth.waitingStartedAt || 'Timing evidence unavailable'} />
+          <MiniFact label="Start event" value={card.canonicalLifecycle.waitingTruth.waitingStartEvent || card.canonicalLifecycle.waitingTruth.exceptionReason} />
           <MiniFact label="System Attention" value={`${card.canonicalLifecycle.systemAttention.code} — ${card.canonicalLifecycle.systemAttention.reason}`} />
           <MiniFact label="Severity" value={card.canonicalLifecycle.systemAttention.severity} />
           <MiniFact label="Author Action" value={`${card.canonicalLifecycle.authorActionRequired.label} — ${card.canonicalLifecycle.authorActionRequired.reason}`} />

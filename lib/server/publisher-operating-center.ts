@@ -3283,6 +3283,11 @@ function titleItemsToOperatingCard(
     authorDecisionEvidenceText: titleResponse
       ? [titleResponse.classifiedDecision, titleResponse.threadEvidence, titleResponse.nextAction].filter(Boolean).join('; ')
       : undefined,
+    holdRequested: /hold/i.test(`${primary.exactBlocker || ''} ${primary.dependency || ''}`),
+    waitingStartedAt: authoritativeWaitingStartFor(primary),
+    waitingStartEvent: authoritativeWaitingStartEventFor(primary),
+    waitingStartEventId: authoritativeWaitingStartEventIdFor(primary),
+    waitingStartEvidence: authoritativeWaitingStartEvidenceFor(primary),
     formatEvidenceText: primary.formatEvidenceText,
     portfolioState: primary.portfolioState,
     canonicalAuthorityClassification: primary.canonicalAuthorityClassification,
@@ -3387,6 +3392,31 @@ function titleItemsToOperatingCard(
     },
     liveClassification,
   }
+}
+
+function authoritativeWaitingStartFor(item: PublisherTodayItem) {
+  return isAuthoritativeWaitingTimestamp(item.lastTrigger) ? item.lastTrigger : ''
+}
+
+function authoritativeWaitingStartEventFor(item: PublisherTodayItem) {
+  if (!authoritativeWaitingStartFor(item)) return ''
+  return item.nextAction || item.awaiting || item.exactBlocker || 'Current governed action became outstanding'
+}
+
+function authoritativeWaitingStartEventIdFor(item: PublisherTodayItem) {
+  if (!authoritativeWaitingStartFor(item)) return ''
+  return item.diagnosticId || item.recordId || item.titleId || item.intakeId || ''
+}
+
+function authoritativeWaitingStartEvidenceFor(item: PublisherTodayItem) {
+  if (!authoritativeWaitingStartFor(item)) return ''
+  return [item.lastTrigger, item.nextAction, item.exactBlocker].filter(Boolean).join(' | ')
+}
+
+function isAuthoritativeWaitingTimestamp(value: string) {
+  if (!value) return false
+  if (/unknown|pending|none|not |no /i.test(value)) return false
+  return !Number.isNaN(new Date(value).getTime())
 }
 
 export async function dispatchJackieActionRequiredNotification(input: {
