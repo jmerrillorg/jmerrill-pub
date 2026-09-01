@@ -301,7 +301,8 @@ function buildSummary({ sourceCounts, crosswalk, postwrite, updated, noOps, erro
     deterministicRecords: crosswalk.filter((row) => row.DETERMINISTIC === 'YES').length,
     ambiguousRecords: crosswalk.filter((row) => row.DETERMINISTIC !== 'YES').length,
     founderDecisionRecords: crosswalk.filter((row) => row.FOUNDER_DECISION_REQUIRED === 'YES').length,
-    canonicalDistinctTitleCount: new Set(crosswalk.filter((row) => row.CANONICAL_TITLE_ID).map((row) => row.CANONICAL_TITLE_ID)).size,
+    canonicalDistinctTitleCount: 'RELABELED_SEE_CANONICAL_AUTHORITY_REFERENCE_COUNT',
+    canonicalAuthorityReferenceCount: new Set(crosswalk.filter((row) => row.CANONICAL_TITLE_ID).map((row) => row.CANONICAL_TITLE_ID)).size,
     canonicalActiveProjectCount: new Set(crosswalk.filter((row) => row.CANONICAL_PROJECT_ID).map((row) => row.CANONICAL_PROJECT_ID)).size,
     counts: {
       canonicalCurrentTitle: roleCounts.CANONICAL_CURRENT_TITLE || 0,
@@ -551,7 +552,8 @@ DETERMINISTIC_RECORDS = ${summary.deterministicRecords}
 AMBIGUOUS_RECORDS = ${summary.ambiguousRecords}
 FOUNDER_DECISION_RECORDS = ${summary.founderDecisionRecords}
 
-CANONICAL_DISTINCT_TITLE_COUNT = ${summary.canonicalDistinctTitleCount}
+CANONICAL_AUTHORITY_REFERENCE_COUNT = ${summary.canonicalAuthorityReferenceCount}
+PRIOR_CANONICAL_DISTINCT_TITLE_COUNT_408 = RELABELED
 CANONICAL_ACTIVE_PROJECT_COUNT = ${summary.canonicalActiveProjectCount}
 CANONICAL_PUBLISHED_TITLE_COUNT = ${summary.counts.canonicalPublishedTitle}
 LEGACY_RECORD_COUNT = ${summary.counts.legacyRecord}

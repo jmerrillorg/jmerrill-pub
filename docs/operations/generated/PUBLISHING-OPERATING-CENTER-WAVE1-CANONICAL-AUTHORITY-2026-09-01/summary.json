@@ -39,7 +39,8 @@
   "deterministicRecords": 402,
   "ambiguousRecords": 6,
   "founderDecisionRecords": 6,
-  "canonicalDistinctTitleCount": 408,
+  "canonicalDistinctTitleCount": "RELABELED_SEE_CANONICAL_AUTHORITY_REFERENCE_COUNT",
+  "canonicalAuthorityReferenceCount": 408,
   "canonicalActiveProjectCount": 5,
   "counts": {
     "canonicalCurrentTitle": 1,
@@ -80,5 +81,21 @@
     "First live pass populated authority fields but over-classified MISSING_CONTACT_BINDING as ORPHAN; no lifecycle, Waiting On, or timer fields were touched.",
     "Corrective live pass reclassified MISSING_CONTACT_BINDING as a relationship defect outside Wave 1 mutation scope and updated 382 live title authority rows.",
     "Final replay produced 0 updates, 402 no-op matches, 6 non-live source records, and 0 write errors."
-  ]
+  ],
+  "operatingCenterRecordCount": 408,
+  "canonicalAuthorityClassifiedRecordCount": 408,
+  "distinctSourceTitleIdCount": 408,
+  "distinctCanonicalTitleIdCount": "NOT_CERTIFIED_BY_WAVE1",
+  "priorCanonicalDistinctTitleCount408": "RELABELED",
+  "canonicalAuthorityReferenceCount": 408,
+  "distinctCanonicalWorkCount": 200,
+  "distinctEditionCount": 0,
+  "uniqueDuplicateSourceTitleIds": 334,
+  "sourceRecordsCollapsingToExistingCanonicalTitle": "NOT_DETERMINED_BY_WAVE1",
+  "oneToOneCanonicalRecords": 74,
+  "manyToOneCanonicalGroups": 126,
+  "duplicateGroupCount": 126,
+  "prior198Classification": "PRIOR_ESTIMATE_SUPERSEDED",
+  "prior198Explanation": "No committed source for the literal metric was located in PR/issue search or current checked-out evidence. Wave 1 ID-backed grouping yields 200 canonical work/group proxies: 126 duplicate ID groups plus 74 non-duplicate source records. The prior 198 estimate is close to this grouped-work concept but is not the current certified count.",
+  "sameSixCasePopulation": "YES"
 }

@@ -26,3 +26,13 @@ Checks:
 - Replay no-op matches = 402
 - Non-live source records = 6
 - Replay write errors = 0
+
+## Semantic Certification
+
+- PRIOR_CANONICAL_DISTINCT_TITLE_COUNT_408 = RELABELED
+- DISTINCT_CANONICAL_TITLE_ID_COUNT = NOT_CERTIFIED_BY_WAVE1
+- DISTINCT_CANONICAL_WORK_COUNT = 200
+- DUPLICATE_ID_GROUPS = 126
+- MANY_TO_ONE_CANONICAL_GROUPS = 126
+- SAME_SIX_CASE_POPULATION = YES
+- Dataverse writes during semantic certification = 0
