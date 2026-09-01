@@ -1393,7 +1393,7 @@ function TitlePipelineCard({
       <div className="mt-3 grid gap-2">
         <MiniFact label="Stage" value={`${card.canonicalLifecycle.titleLifecycleStage.number} - ${card.canonicalLifecycle.titleLifecycleStage.label}`} />
         <MiniFact label="Substage" value={card.canonicalLifecycle.titleLifecycleSubstage.label} />
-        <MiniFact label="Waiting on" value={card.canonicalLifecycle.waitingOn} />
+        <MiniFact label="Waiting on" value={card.canonicalLifecycle.waitingTruth.waitingOn} />
         <MiniFact label="Attention" value={card.canonicalLifecycle.systemAttention.code} />
         <MiniFact label="Timer" value={card.canonicalLifecycle.waitingTruth.timerDisplay} />
       </div>

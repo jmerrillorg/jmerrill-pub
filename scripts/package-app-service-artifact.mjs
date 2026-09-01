@@ -22,6 +22,9 @@ const packagePath = resolve(packageName)
 const packageDir = resolve('.appservice-package')
 const requiredRuntimeFiles = [
   'docs/architecture/generated/JMP-CATALOG-RECONCILIATION-FINAL-2026-08-05/09-slice2-seed-manifest.json',
+  'docs/operations/generated/PUBLISHING-OPERATING-CENTER-WAVE3-GOVERNED-STAGE-TRUTH-2026-09-01/11_postimplementation_408_stage_projection.csv',
+  'docs/operations/generated/PUBLISHING-OPERATING-CENTER-WAVE4-WAITING-TIMER-TRUTH-2026-09-01/10_postimplementation_408_waiting_timer.csv',
+  'docs/operations/generated/PUBLISHING-OPERATING-CENTER-WAVE5-ARTIFACT-AUTHORITY-2026-09-01/12_postimplementation_408_artifact_projection.csv',
 ]
 
 if (!existsSync(resolve(standaloneDir, 'server.js'))) {

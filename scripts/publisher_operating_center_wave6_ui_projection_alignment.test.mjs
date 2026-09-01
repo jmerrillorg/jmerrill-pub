@@ -80,7 +80,8 @@ test('artifact attention remains diagnostic and cannot become the title stage so
 
 test('artifact attention cannot override Waiting On when the governed state is not waiting', () => {
   assert.match(server, /function waitingOnForCanonicalLifecycle/)
-  assert.match(server, /canonicalLifecycle\.waitingTruth\.waitingOn === 'NOT_WAITING' \? 'None' : 'Automation'/)
+  assert.match(server, /if \(canonicalLifecycle\.waitingTruth\.waitingOn === 'NOT_WAITING'\) return 'None'/)
+  assert.match(client, /<MiniFact label="Waiting on" value=\{card\.canonicalLifecycle\.waitingTruth\.waitingOn\} \/>/)
   assert.doesNotMatch(server, /const waitingOn = waitingOnForTodayItem\(primary\)/)
 })
 

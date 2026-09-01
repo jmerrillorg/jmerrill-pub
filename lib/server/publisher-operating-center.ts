@@ -50,6 +50,14 @@ const PROVISIONAL_TITLE_NAMES = new Set(['untitled'])
 const INTERNAL_VISIBILITY_MAILBOX = 'publishing@jmerrill.one'
 const JACKIE_NOTIFICATION_SENT = 'JACKIE_ACTION_REQUIRED_NOTIFICATION_SENT'
 const JACKIE_NOTIFICATION_FAILED = 'JACKIE_ACTION_REQUIRED_NOTIFICATION_FAILED'
+const CERTIFIED_STAGE_PROJECTION_PATH =
+  'docs/operations/generated/PUBLISHING-OPERATING-CENTER-WAVE3-GOVERNED-STAGE-TRUTH-2026-09-01/11_postimplementation_408_stage_projection.csv'
+const CERTIFIED_WAITING_PROJECTION_PATH =
+  'docs/operations/generated/PUBLISHING-OPERATING-CENTER-WAVE4-WAITING-TIMER-TRUTH-2026-09-01/10_postimplementation_408_waiting_timer.csv'
+const CERTIFIED_ARTIFACT_PROJECTION_PATH =
+  'docs/operations/generated/PUBLISHING-OPERATING-CENTER-WAVE5-ARTIFACT-AUTHORITY-2026-09-01/12_postimplementation_408_artifact_projection.csv'
+
+let certifiedProjectionItemsCache: PublisherTodayItem[] | null = null
 
 export type PublisherActionId =
   | 'review_intake'
@@ -3123,7 +3131,9 @@ function buildTitleOperatingView(input: {
   const unslicedJackieQueueItems = input.queue
     .filter((item) => item.actionOwner === 'publisher')
     .map(queueToTodayItem)
+  const certifiedProjectionItems = loadCertifiedTitleProjectionItems()
   const allTodayItems = [
+    ...certifiedProjectionItems,
     ...input.today.waitingForJackie,
     ...input.today.waitingForAuthors,
     ...input.today.activeEditorial,
@@ -3166,6 +3176,108 @@ function buildTitleOperatingView(input: {
       publishedThisPeriod: cards.filter((card) => card.stageId === 'POST_PUBLICATION').length,
     },
   }
+}
+
+function loadCertifiedTitleProjectionItems(): PublisherTodayItem[] {
+  if (certifiedProjectionItemsCache) return certifiedProjectionItemsCache
+  try {
+    const stageRows = parseRuntimeCsv(readFileSync(join(process.cwd(), CERTIFIED_STAGE_PROJECTION_PATH), 'utf8'))
+    const waitingRows = parseRuntimeCsv(readFileSync(join(process.cwd(), CERTIFIED_WAITING_PROJECTION_PATH), 'utf8'))
+    const artifactRows = parseRuntimeCsv(readFileSync(join(process.cwd(), CERTIFIED_ARTIFACT_PROJECTION_PATH), 'utf8'))
+    const waitingById = new Map(waitingRows.map((row) => [row.SOURCE_RECORD_ID, row]))
+    const artifactById = new Map(artifactRows.map((row) => [row.SOURCE_RECORD_ID, row]))
+    certifiedProjectionItemsCache = stageRows
+      .filter((row) => row.IS_CURRENT_OPERATIONAL_AUTHORITY === 'TRUE')
+      .map((row) => certifiedProjectionRowToTodayItem(row, waitingById.get(row.SOURCE_RECORD_ID), artifactById.get(row.SOURCE_RECORD_ID)))
+    return certifiedProjectionItemsCache
+  } catch {
+    certifiedProjectionItemsCache = []
+    return certifiedProjectionItemsCache
+  }
+}
+
+function certifiedProjectionRowToTodayItem(
+  stageRow: Record<string, string>,
+  waitingRow: Record<string, string> | undefined,
+  artifactRow: Record<string, string> | undefined,
+): PublisherTodayItem {
+  const certifiedWaiting = waitingRow?.WAITING_ON || 'NOT_WAITING'
+  const waitingOn = certifiedWaitingOwner(certifiedWaiting)
+  const nextAction = certifiedWaiting === 'NOT_WAITING' ? '' : waitingRow?.REQUIRED_NEXT_ACTION || ''
+  return {
+    key: `certified-projection:${stageRow.SOURCE_RECORD_ID}`,
+    recordId: stageRow.SOURCE_RECORD_ID,
+    titleId: stageRow.TITLE_ID,
+    title: stageRow.TITLE_NAME,
+    author: stageRow.AUTHOR_NAME,
+    portfolioState: 'certified_current_authority_projection',
+    pipelineStage: stageRow.PROJECTED_STAGE,
+    editorialStage: certifiedLegacyStateForProjection(stageRow.PROJECTED_STAGE, stageRow.PROJECTED_SUBSTAGE),
+    substage: stageRow.PROJECTED_SUBSTAGE,
+    owner: waitingOn,
+    businessOwner: 'Publisher',
+    executionOwner: waitingOn === 'JM1 Automation' ? 'JM1 Automation' : 'Publisher',
+    executionMode: 'AUTOMATIC_SCHEDULED',
+    executionState: waitingOn === 'Publisher' || waitingOn === 'Jackie' || waitingOn === 'Author' ? 'WAITING_FOR_HUMAN' : 'COMPLETED',
+    runtime: 'Wave 3/4/5 certified Operating Center projection',
+    awaiting: waitingRow?.WAITING_ON || 'NOT_WAITING',
+    lastTrigger: '',
+    expectedDuration: 'No active timer',
+    exactBlocker: certifiedWaiting === 'NOT_WAITING' ? 'No active exception' : waitingRow?.REQUIRED_NEXT_ACTION || '',
+    nextAction,
+    targetDate: '',
+    ageDays: 0,
+    severity: stageRow.STAGE_TRUST_CLASSIFICATION === 'RECONCILIATION_REQUIRED' ? 'watch' : 'info',
+    packageState: certifiedPackageStateForProjection(stageRow.PROJECTED_STAGE, stageRow.PROJECTED_SUBSTAGE),
+    qaState: stageRow.STAGE_TRUST_CLASSIFICATION,
+    dependency: stageRow.BLOCKING_TRANSITION === 'NONE' ? 'No active exception' : stageRow.BLOCKING_EVIDENCE || stageRow.BLOCKING_TRANSITION,
+    evidenceLinks: certifiedEvidenceLinksForProjection(stageRow, artifactRow),
+    activeFormats: [],
+    formatEvidenceText: '',
+    canonicalAuthorityClassification: stageRow.CANONICAL_AUTHORITY_STATUS,
+    canonicalTitleReference: stageRow.CANONICAL_TITLE_ID || stageRow.TITLE_ID,
+    canonicalAuthorContactReference: stageRow.AUTHOR_NAME,
+    sourceAuthority: 'Wave 3/4/5 governed Operating Center projection evidence',
+    allowedActions: [],
+    lastMovement: `Certified projection ${stageRow.SOURCE_RECORD_ID}`,
+  }
+}
+
+function certifiedLegacyStateForProjection(stage: string, substage: string) {
+  if (stage === 'COMMERCIAL_ACTIVATION' && substage === 'PACKAGE_ACCEPTANCE') return 'Package accepted'
+  if (stage === 'POST_PUBLICATION') return 'Published catalog royalty review'
+  if (stage === 'EDITORIAL_PRODUCTION') return substage.replaceAll('_', ' ')
+  if (stage === 'BOOK_PRODUCTION') return 'Production'
+  if (stage === 'DISTRIBUTION_READINESS') return 'Distribution readiness'
+  if (stage === 'DISTRIBUTION_RELEASE') return 'Distribution release'
+  return `${stage} ${substage}`.trim()
+}
+
+function certifiedPackageStateForProjection(stage: string, substage: string) {
+  if (stage === 'COMMERCIAL_ACTIVATION' && substage === 'PACKAGE_ACCEPTANCE') return 'Package accepted'
+  return 'Not applicable'
+}
+
+function certifiedWaitingOwner(waitingOn: string): PublisherTodayItem['owner'] {
+  if (waitingOn === 'WAITING_ON_AUTHOR') return 'Author'
+  if (waitingOn === 'WAITING_ON_EXTERNAL_VENDOR') return 'External'
+  if (waitingOn === 'WAITING_ON_SYSTEM' || waitingOn === 'RECONCILIATION_REQUIRED') return 'JM1 Automation'
+  if (waitingOn === 'WAITING_ON_JMP' || waitingOn === 'WAITING_ON_APPROVAL') return 'Publisher'
+  return 'Publisher'
+}
+
+function certifiedEvidenceLinksForProjection(
+  stageRow: Record<string, string>,
+  artifactRow: Record<string, string> | undefined,
+): PublisherTodayItem['evidenceLinks'] {
+  if (!artifactRow || artifactRow.ARTIFACT_TRUST_CLASSIFICATION === 'NO_CURRENT_ARTIFACT_REQUIRED') return []
+  return [{
+    label: artifactRow.CURRENT_ARTIFACT_CLASS || 'Certified current artifact',
+    href: artifactRow.CURRENT_ARTIFACT_ID || '',
+    artifactType: artifactRow.CURRENT_ARTIFACT_CLASS,
+    version: artifactRow.CURRENT_ARTIFACT_VERSION,
+    current: artifactRow.ARTIFACT_TRUST_CLASSIFICATION === 'TRUSTED_CURRENT_ARTIFACT',
+  }]
 }
 
 function jackieActionNotificationForCard(
@@ -3477,6 +3589,7 @@ function governedProjectionPrimaryScore(item: PublisherTodayItem, lifecycle: Can
 }
 
 function waitingOnForCanonicalLifecycle(canonicalLifecycle: CanonicalPublisherReadModel): PublisherTitleOperatingCard['waitingOn'] {
+  if (canonicalLifecycle.waitingTruth.waitingOn === 'NOT_WAITING') return 'None'
   switch (canonicalLifecycle.waitingTruth.broadWaitingOwner) {
     case 'Author':
     case 'Prospect':
@@ -3484,7 +3597,7 @@ function waitingOnForCanonicalLifecycle(canonicalLifecycle: CanonicalPublisherRe
     case 'External':
       return 'External'
     case 'JMP/System':
-      return canonicalLifecycle.waitingTruth.waitingOn === 'NOT_WAITING' ? 'None' : 'Automation'
+      return 'Automation'
     case 'JMP':
       return 'Publishing Team'
     default:
@@ -4617,6 +4730,44 @@ function todayItemSpecificity(item: PublisherTodayItem) {
     (item.recordId ? 10 : 0) +
     (item.lastMovement !== 'No recent execution evidence found' ? 5 : 0)
   )
+}
+
+function parseRuntimeCsv(text: string): Array<Record<string, string>> {
+  const [headerLine, ...lines] = text.trim().split(/\r?\n/)
+  if (!headerLine) return []
+  const headers = parseRuntimeCsvLine(headerLine)
+  return lines.map((line) => {
+    const values = parseRuntimeCsvLine(line)
+    return Object.fromEntries(headers.map((header, index) => [header, values[index] || '']))
+  })
+}
+
+function parseRuntimeCsvLine(line: string) {
+  const cells: string[] = []
+  let current = ''
+  let quoted = false
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index]
+    if (quoted) {
+      if (char === '"' && line[index + 1] === '"') {
+        current += '"'
+        index += 1
+      } else if (char === '"') {
+        quoted = false
+      } else {
+        current += char
+      }
+    } else if (char === '"') {
+      quoted = true
+    } else if (char === ',') {
+      cells.push(current)
+      current = ''
+    } else {
+      current += char
+    }
+  }
+  cells.push(current)
+  return cells
 }
 
 function emptyPublisherToday(): PublisherTodaySnapshot {
