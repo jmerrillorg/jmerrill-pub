@@ -36,11 +36,14 @@ test('artifact identity, checksum, provenance, and current version evidence are 
     legacySourceState: 'Line Editing',
     evidenceLinks: [{
       label: 'Line edit artifact',
-      href: 'https://sharepoint.example/line-edit.docx',
+      href: 'sharepoint://drive/items/line-edit-artifact-v3',
       checksum,
       artifactType: 'LINE_EDITING',
       version: 'v3',
       current: true,
+      artifactId: 'line-edit-artifact-v3',
+      titleId: 'title-artifact',
+      stageCode: 'EDITORIAL_PRODUCTION',
     }],
   })
 
